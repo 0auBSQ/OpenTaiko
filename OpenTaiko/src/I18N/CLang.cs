@@ -62,6 +62,11 @@ internal class CLang {
 		return (Entries.TryGetValue(key, out string? value)) ? value : InvalidKey.SafeFormat(key);
 	}
 	public string GetString(string key, params object?[] values) {
+		if (Object.Equals(values[0], 1)) { // Only the first parameter is going to be judged either singular or plural.
+			if (Entries.TryGetValue(key + "_SINGULAR", out string? _value)) {
+				return _value.SafeFormat(values);
+			}
+		}
 		return (Entries.TryGetValue(key, out string? value)) ? value.SafeFormat(values) : InvalidKey.SafeFormat(key);
 	}
 

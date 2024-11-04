@@ -61,6 +61,7 @@
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2_SINGULAR": "Processing {0} score...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "단위도장/타워모드 숨기기",
@@ -409,6 +410,7 @@
 		"MODAL_TITLE_SONG": "신곡!",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN_SINGULAR": "+{0} Coin (Total: {1})",
 		"MODAL_MESSAGE_COIN": "+{0} Coins (Total: {1})",
 
 		// Online Lounge
@@ -473,6 +475,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "모든 큰 노트는 <c.#c800ff>스왑</c> 노트로 변경됩니다.",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> 노트가 보이게 됩니다.",
 		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL_SINGULAR": " 1 히트에서 자동으로 <c.#ffff00>연타가</c>됩니다.",
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": " {0} 히트에서 자동으로 <c.#ffff00>연타가</c>됩니다.",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
 		// {0}: Coin multiplier
@@ -486,9 +489,9 @@
 		"UNLOCK_COIN_BOUGHT": "아이템 구매 완료!",
 		"UNLOCK_COIN_MORE": "코인이 부족합니다!",
 
-		"UNLOCK_CONDITION_ERROR_SINGULAR": "다음 조건입니다: {0}에 1 값이 필요합니다.",
-		"UNLOCK_CONDITION_ERROR": "다음 조건입니다: {0}에 {1} 값이 필요합니다.",
-		"UNLOCK_CONDITION_ERROR2": "다음 조건입니다: {0} requires ({1} * n) values and n references.",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "다음 조건입니다: {1}에 1 값이 필요합니다.",
+		"UNLOCK_CONDITION_ERROR": "다음 조건입니다: {1}에 {0} 값이 필요합니다.",
+		"UNLOCK_CONDITION_ERROR2": "다음 조건입니다: {1} requires ({0} * n) values and n references.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -504,46 +507,46 @@
 		"UNLOCK_CONDITION_AIWIN": "AI 배틀 모드에서 {0}번 승리하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY_ONCE": "이 아이템을 잠금 해제하려면 1회를 플레이하세요! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_SINGULAR": "이 아이템을 잠금 해제하려면 1회를 플레이하세요! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY_TWICE": "이 아이템을 잠금 해제하려면 2회를 플레이하세요! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "이 아이템을 잠금 해제하려면 {0}회를 플레이하세요! ({1}/{0})", // tp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: Total plays needed
+		// {0}: Total plays needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "이 아이템을 잠금 해제하려면 1곡을 {0}하세요! ({2}/{1})", // sd
-		"UNLOCK_CONDITION_PLAYDISTINCT": "이 아이템을 잠금 해제하려면 {1}곡을 {0}하세요! ({2}/{1})", // sd
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "이 아이템을 잠금 해제하려면 1곡을 {1}하세요! ({2}/{0})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "이 아이템을 잠금 해제하려면 {0}곡을 {1}하세요! ({2}/{0})", // sd
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2} 난이도로 {0}를 해야합니다! ({3}/{1})", // dp
-		"UNLOCK_CONDITION_PLAYDIFF": "이 아이템을 잠금 해제하려면 {1} 곡에서 {2} 난이도로 {0}를 해야합니다! ({3}/{1})", // dp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2} 난이도로 {1}를 해야합니다! ({3}/{0})", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "이 아이템을 잠금 해제하려면 {0} 곡에서 {2} 난이도로 {1}를 해야합니다! ({3}/{0})", // dp
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2}성 난이도로 {0}를 해야합니다! ({3}/{1})", // lp
-		"UNLOCK_CONDITION_PLAYLEVEL": "이 아이템을 잠금 해제하려면 {1} 곡에서 {2}성 난이도로 {0}를 해야합니다! ({3}/{1})", // lp
-		// {0}: Current progress
-		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({0}/{1})", // sp, sg, sc
-		"UNLOCK_CONDITION_CHALLENGE": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "이 아이템을 잠금 해제하려면 1 곡에서 {2}성 난이도로 {1}를 해야합니다! ({3}/{0})", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "이 아이템을 잠금 해제하려면 {0} 곡에서 {2}성 난이도로 {1}를 해야합니다! ({3}/{0})", // lp
+		// {0}: Total # of challenges
+		// {1}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({1}/{0})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "이 아이템의 잠금 해제하려면 다음과 같은 성과를 달성하세요:  ({1}/{0})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
 		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {1} 곡을 {2}로 {0}하세요.", // sp
-		// {0}: Clear type
-		// {1}: # of songs needed
+		// {0}: # of songs needed
+		// {1}: Clear type
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {2}에 있는 1 곡을 {0}하세요. ({3}/{1})", // sg
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {2}에 있는 {1} 곡을 {0}하세요. ({3}/{1})", // sg
-		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {2}이(가) 만든 1 곡을 {0}하세요. ({3}/{1})", // sc
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {2}이(가) 만든 {1} 곡을 {0}하세요. ({3}/{1})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {2}에 있는 1 곡을 {0}하세요. ({3}/{0})", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {2}에 있는 {0} 곡을 {1}하세요. ({3}/{0})", // sg
+		// {0}: # of songs needed
+		// {1}: Clear type
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {2}이(가) 만든 1 곡을 {1}하세요. ({3}/{0})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {2}이(가) 만든 {0} 곡을 {1}하세요. ({3}/{0})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "플레이",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "플레이",

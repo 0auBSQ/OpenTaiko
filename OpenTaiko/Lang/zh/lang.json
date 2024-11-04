@@ -61,6 +61,7 @@
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2_SINGULAR": "正在处理 {0} 份成绩……\n<c.#0bb000>{1} ／ {2} 已处理</c>（<c.#f0ad4e>{3} 跳过</c> ／ <c.#b00000>{4} 失败</c>）\n\n{5}",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "正在处理 {0} 份成绩……\n<c.#0bb000>{1} ／ {2} 已处理</c>（<c.#f0ad4e>{3} 跳过</c> ／ <c.#b00000>{4} 失败</c>）\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
@@ -409,6 +410,7 @@
 		"MODAL_TITLE_SONG": "获得新歌曲！",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN_SINGULAR": "+{0}金币（总计：{1}）",
 		"MODAL_MESSAGE_COIN": "+{0}金币（总计：{1}）",
 
 		// Online Lounge
@@ -473,6 +475,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "所有大音符变成<c.#c800ff>交换</c>音符",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>音符变为可视",
 		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL_SINGULAR": "自动以 1 打／秒<c.#ffff00>连打</c>",
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "自动以 {0} 打／秒<c.#ffff00>连打</c>",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>分开</c><c.#0088ff>跑道</c>",
 		// {0}: Coin multiplier
@@ -486,9 +489,9 @@
 		"UNLOCK_COIN_BOUGHT": "购买成功！",
 		"UNLOCK_COIN_MORE": "金币不足！",
 
-		"UNLOCK_CONDITION_ERROR_SINGULAR": "需求条件：{0}需要 1 个值。",
-		"UNLOCK_CONDITION_ERROR": "需求条件：{0}需要 {1} 个值。",
-		"UNLOCK_CONDITION_ERROR2": "需求条件：{0}需要（{1} × n）个值和 n 项参考。",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "需求条件：{1}需要 1 个值。",
+		"UNLOCK_CONDITION_ERROR": "需求条件：{1}需要 {0} 个值。",
+		"UNLOCK_CONDITION_ERROR2": "需求条件：{1}需要（{0} × n）个值和 n 项参考。",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -504,46 +507,46 @@
 		"UNLOCK_CONDITION_AIWIN": "获胜 {0} 次 AI 对战以解锁该物品！（{1}／{0}）", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY_ONCE": "游玩 1 次以解锁该物品！（{1}／{0}）", // tp
+		"UNLOCK_CONDITION_PLAY_SINGULAR": "游玩 1 次以解锁该物品！（{1}／{0}）", // tp
 		"UNLOCK_CONDITION_PLAY_TWICE": "游玩 2 次以解锁该物品！（{1}／{0}）", // tp
 		"UNLOCK_CONDITION_PLAY": "游玩 {0} 次以解锁该物品！（{1}／{0}）", // tp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: Total plays needed
+		// {0}: Total plays needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} 1 首歌曲以解锁该物品！（{2}／{1}）", // sd
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} 首歌曲以解锁该物品！（{2}／{1}）", // sd
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{1} 1 首歌曲以解锁该物品！（{2}／{0}）", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{1} {0} 首歌曲以解锁该物品！（{2}／{0}）", // sd
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "在{2}难度下{0} 1 首歌曲以解锁该物品！（{3}／{1}）", // dp
-		"UNLOCK_CONDITION_PLAYDIFF": "在{2}难度下{0} {1} 首歌曲以解锁该物品！（{3}／{1}）", // dp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "在{2}难度下{1} 1 首歌曲以解锁该物品！（{3}／{0}）", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "在{2}难度下{1} {0} 首歌曲以解锁该物品！（{3}／{0}）", // dp
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} 1 首 {2} ★歌曲以解锁该物品！（{3}／{1}）", // lp
-		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} 首 {2} ★歌曲以解锁该物品！（{3}／{1}）", // lp
-		// {0}: Current progress
-		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "获得以下表现以解锁该物品：　（{0}／{1}）", // sp, sg, sc
-		"UNLOCK_CONDITION_CHALLENGE": "获得以下表现以解锁该物品：　（{0}／{1}）", // sp, sg, sc
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{1} 1 首 {2} ★歌曲以解锁该物品！（{3}／{0}）", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "{1} {0} 首 {2} ★歌曲以解锁该物品！（{3}／{0}）", // lp
+		// {0}: Total # of challenges
+		// {1}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "获得以下表现以解锁该物品：　（{1}／{0}）", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "获得以下表现以解锁该物品：　（{1}／{0}）", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
 		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- 在{2}难度下{0} {1} 。", // sp
-		// {0}: Clear type
-		// {1}: # of songs needed
+		// {0}: # of songs needed
+		// {1}: Clear type
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- 在文件夹 {2} 下{0} 1 首歌曲。（{3}／{1}）", // sg
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- 在文件夹 {2} 下{0} {1} 首歌曲。（{3}／{1}）", // sg
-		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} {2} 制作的 1 张谱面。（{3}／{1}）", // sc
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {2} 制作的 {1} 张谱面。（{3}／{1}）", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- 在文件夹 {2} 下{1} 1 首歌曲。（{3}／{0}）", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- 在文件夹 {2} 下{1} {0} 首歌曲。（{3}／{0}）", // sg
+		// {0}: # of songs needed
+		// {1}: Clear type
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {1} {2} 制作的 1 张谱面。（{3}／{0}）", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {1} {2} 制作的 {0} 张谱面。（{3}／{0}）", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "游玩",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "游玩",

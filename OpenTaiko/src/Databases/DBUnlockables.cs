@@ -130,52 +130,38 @@ class DBUnlockables {
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.Medals }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "ce":
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.TotalEarnedMedals }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "ap":
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.AIBattleModePlaycount }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "aw":
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.AIBattleModeWins }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "tp":
 					if (this.Values.Length == 1)
 						return tConditionMet(new int[] { (int)OpenTaiko.SaveFileInstances[player].data.TotalPlaycount }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "sd":
 					if (this.Values.Length == 2)
 						return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "dp":
 				case "lp":
 					if (this.Values.Length == 3)
 						return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
 					else
-						if (this.RequiredArgCount == 1)
-							return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount.ToString()));
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount.ToString(), this.Condition));
 				case "sp":
 				case "sg":
 				case "sc":
@@ -183,7 +169,7 @@ class DBUnlockables {
 						&& this.Reference.Length == this.Values.Length / this.RequiredArgCount)
 						return tConditionMet(new int[] { tGetCountChartsPassingCondition(player) }, screen);
 					else
-						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR2", this.Condition, this.RequiredArgCount.ToString()));
+						return (false, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR2", this.RequiredArgCount.ToString(), this.Condition));
 				case "ig":
 					return (false, "");
 			}
@@ -299,9 +285,7 @@ class DBUnlockables {
 				RequiredArgCount = RequiredArgs[Condition];
 
 			if (this.Values.Length < this.RequiredArgCount)
-				if (this.RequiredArgCount == 1)
-					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR_SINGULAR", this.Condition, this.RequiredArgCount);
-				return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.Condition, this.RequiredArgCount);
+				return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.RequiredArgCount, this.Condition);
 
 			// Only the player loaded as 1P can check unlockables in real time
 			var SaveData = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data;
@@ -323,24 +307,13 @@ class DBUnlockables {
 							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_COST", this.Values[0]);
 						return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
 					}
-				case "ce": {
-						if (this.Values[0] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN_SINGULAR", this.Values[0], SaveData.TotalEarnedMedals);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN", this.Values[0], SaveData.TotalEarnedMedals);
-					}
-				case "ap": {
-						if (this.Values[0] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIPLAY_SINGULAR", this.Values[0], SaveData.AIBattleModePlaycount);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIPLAY", this.Values[0], SaveData.AIBattleModePlaycount);
-					}
-				case "aw": {
-						if (this.Values[0] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIWIN_SINGULAR", this.Values[0], SaveData.AIBattleModeWins);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIWIN", this.Values[0], SaveData.AIBattleModeWins);
-					}
+				case "ce":
+					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_EARN", this.Values[0], SaveData.TotalEarnedMedals);
+				case "ap":
+					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIPLAY", this.Values[0], SaveData.AIBattleModePlaycount);
+				case "aw":
+					return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_AIWIN", this.Values[0], SaveData.AIBattleModeWins);
 				case "tp": {
-						if (this.Values[0] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY_ONCE", this.Values[0], SaveData.TotalPlaycount);
 						if (this.Values[0] == 2)
 							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY_TWICE", this.Values[0], SaveData.TotalPlaycount);
 						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAY", this.Values[0], SaveData.TotalPlaycount);
@@ -361,9 +334,7 @@ class DBUnlockables {
 						var _count = _values[_aimedStatus];
 						var statusString = GetRequiredClearStatus(_aimedStatus);
 
-						if (this.Values[0] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR", statusString, this.Values[0], _count);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDISTINCT", statusString, this.Values[0], _count);
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDISTINCT", this.Values[0], statusString, _count);
 					}
 				case "dp": {
 						var _aimedDifficulty = this.Values[0];
@@ -382,9 +353,7 @@ class DBUnlockables {
 
 						var diffString = (_aimedDifficulty == (int)Difficulty.Oni) ? CLangManager.LangInstance.GetString("DIFF_EXEXTRA") : CLangManager.LangInstance.GetDifficulty(_aimedDifficulty);
 						var statusString = GetRequiredClearStatus(_aimedStatus);
-						if (this.Values[2] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF_SINGULAR", statusString, this.Values[2], diffString, _count);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF", statusString, this.Values[2], diffString, _count);
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYDIFF", this.Values[2], statusString, diffString, _count);
 					}
 				case "lp": {
 						var _aimedDifficulty = this.Values[0];
@@ -399,9 +368,7 @@ class DBUnlockables {
 						else _count = ChartStats.LevelPerfects.TryGetValue(_aimedDifficulty, out var value) ? value : 0;
 
 						var statusString = GetRequiredClearStatus(_aimedStatus);
-						if (this.Values[2] == 1)
-							return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL_SINGULAR", statusString, this.Values[2], _aimedDifficulty, _count);
-						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL", statusString, this.Values[2], _aimedDifficulty, _count);
+						return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_PLAYLEVEL", this.Values[2], statusString, _aimedDifficulty, _count);
 					}
 				case "sp": {
 						List<string> _rows = new List<string>();
@@ -440,10 +407,7 @@ class DBUnlockables {
 						}
 
 						// Push front
-						if (_challengeCount == 1)
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_SINGULAR", _count, _challengeCount));
-						else
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _challengeCount, _count));
 						return String.Join("\n", _rows);
 					}
 				case "sg": {
@@ -467,16 +431,10 @@ class DBUnlockables {
 
 
 							var statusString = GetRequiredClearStatus(_aimedStatus);
-							if (_songCount == 1)
-								_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR", statusString, _songCount, _genreName, _satifsiedCount));
-							else
-								_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE", statusString, _songCount, _genreName, _satifsiedCount));
+							_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYGENRE", _songCount, statusString, _genreName, _satifsiedCount));
 						}
 
-						if (_challengeCount == 1)
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_SINGULAR", _count, _challengeCount));
-						else
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _challengeCount, _count));
 						return String.Join("\n", _rows);
 					}
 				case "sc": {
@@ -500,16 +458,10 @@ class DBUnlockables {
 
 
 							var statusString = GetRequiredClearStatus(_aimedStatus);
-							if (_songCount == 1)
-								_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR", statusString, _songCount, _charterName, _satifsiedCount));
-							else
-								_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER", statusString, _songCount, _charterName, _satifsiedCount));
+							_rows.Add(CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER", _songCount, statusString, _charterName, _satifsiedCount));
 						}
 
-						if (_challengeCount == 1)
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE_SINGULAR", _count, _challengeCount));
-						else
-							_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _count, _challengeCount));
+						_rows.Insert(0, CLangManager.LangInstance.GetString("UNLOCK_CONDITION_CHALLENGE", _challengeCount, _count));
 						return String.Join("\n", _rows);
 					}
 

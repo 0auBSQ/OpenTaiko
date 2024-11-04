@@ -61,6 +61,7 @@
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2_SINGULAR": "Обработка {0} результата...\n<c.#0bb000>{1} из {2} импортировано</c> (<c.#f0ad4e>{3} пропущено</c> / <c.#b00000>{4} неудачно</c>)\n\n{5}",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Обработка {0} результата/ов...\n<c.#0bb000>{1} из {2} импортировано</c> (<c.#f0ad4e>{3} пропущено</c> / <c.#b00000>{4} неудачно</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Спрятать Дан и Башни",
@@ -409,6 +410,7 @@
 		"MODAL_TITLE_SONG": "Новая Песня!",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN_SINGULAR": "+{0} монет (Общие: {1})",
 		"MODAL_MESSAGE_COIN": "+{0} монет. (Общие: {1})",
 
 		// Online Lounge
@@ -473,6 +475,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Все большие ноты становятся <c.#c800ff>Самоблокирующимися</c> нотами",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> ноты становятся видимыми",
 		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL_SINGULAR": "Автоматически <c.#ffff00>дробит</c> со скоростью 1 удар/с",
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Автоматически <c.#ffff00>дробит</c> со скоростью {0} удар./с",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Разделяет</c> <c.#0088ff>Трассы</c>",
 		// {0}: Coin multiplier
@@ -486,9 +489,9 @@
 		"UNLOCK_COIN_BOUGHT": "Товар куплен!",
 		"UNLOCK_COIN_MORE": "Недостаточно монет!",
 
-		"UNLOCK_CONDITION_ERROR_SINGULAR": "Следующее условие: Для {0} требуется значение.",
-		"UNLOCK_CONDITION_ERROR": "Следующее условие: Для {0} требуется {1} значени..",
-		"UNLOCK_CONDITION_ERROR2": "Следующее условие: Для {0} требуется ({1} * n) значений и n ссылок.",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "Следующее условие: Для {1} требуется значение.",
+		"UNLOCK_CONDITION_ERROR": "Следующее условие: Для {1} требуется {0} значени..",
+		"UNLOCK_CONDITION_ERROR2": "Следующее условие: Для {1} требуется ({0} * n) значений и n ссылок.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -504,46 +507,46 @@
 		"UNLOCK_CONDITION_AIWIN": "Побеждайте {0} бытв. ИИ, чтобы разблокировать этот товар! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY_ONCE": "Играйте раз, чтобы разблокировать этот товар! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_SINGULAR": "Играйте раз, чтобы разблокировать этот товар! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY_TWICE": "Играйте 2 раза, чтобы разблокировать этот товар! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "Играйте {0} раз., чтобы разблокировать этот товар! ({1}/{0})", // tp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: Total plays needed
+		// {0}: Total plays needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} песню/е, чтобы разблокировать этот товар! ({2}/{1})", // sd
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} песн., чтобы разблокировать этот товар! ({2}/{1})", // sd
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{1} песню/е, чтобы разблокировать этот товар! ({2}/{0})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{1} {0} песн., чтобы разблокировать этот товар! ({2}/{0})", // sd
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{0} песню/е на {2} трудности, чтобы разблокировать этот товар! ({3}/{1})", // dp
-		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} песн. на {2} трудности, чтобы разблокировать этот товар! ({3}/{1})", // dp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{1} песню/е на {2} трудности, чтобы разблокировать этот товар! ({3}/{0})", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "{1} {0} песн. на {2} трудности, чтобы разблокировать этот товар! ({3}/{0})", // dp
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} песню/е с {2} звезд., чтобы разблокировать этот товар! ({3}/{1})", // lp
-		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} песн. с {2} звезд., чтобы разблокировать этот товар! ({3}/{1})", // lp
-		// {0}: Current progress
-		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Получайте следующее представление, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
-		"UNLOCK_CONDITION_CHALLENGE": "Получайте следующие представления, чтобы разблокировать этот товар:  ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{1} песню/е с рейтингом в {2} звезд., чтобы разблокировать этот товар! ({3}/{0})", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "{1} {0} песн. с рейтингом в {2} звезд., чтобы разблокировать этот товар! ({3}/{0})", // lp
+		// {0}: Total # of challenges
+		// {1}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Получайте следующее представление, чтобы разблокировать этот товар:  ({1}/{0})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "Получайте следующие представления, чтобы разблокировать этот товар:  ({1}/{0})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
 		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} на {2} трудности.", // sp
-		// {0}: Clear type
-		// {1}: # of songs needed
+		// {0}: # of songs needed
+		// {1}: Clear type
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {0} песню/е в папке {2}. ({3}/{1})", // sg
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} песн. в папке {2}. ({3}/{1})", // sg
-		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} партитуру/е сделано {2}. ({3}/{1})", // sc
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} партитур. сделано {2}. ({3}/{1})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {1} песню/е в папке {2}. ({3}/{0})", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {1} {0} песн. в папке {2}. ({3}/{0})", // sg
+		// {0}: # of songs needed
+		// {1}: Clear type
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {1} партитуру/е сделано {2}. ({3}/{0})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {1} {0} партитур. сделано {2}. ({3}/{0})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Играйте",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Играйте",

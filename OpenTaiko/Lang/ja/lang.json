@@ -61,6 +61,7 @@
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2_SINGULAR": "Processing {0} score...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "段・タワー譜面省略",
@@ -409,6 +410,7 @@
 		"MODAL_TITLE_SONG": "楽曲取得！",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN_SINGULAR": "+{0}コイン (累計: {1})",
 		"MODAL_MESSAGE_COIN": "+{0}コイン (累計: {1})",
 
 		// Online Lounge
@@ -473,6 +475,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
 		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL_SINGULAR": "Automatic <c.#ffff00>Rolls</c> at 1 hit/s",
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
 		// {0}: Coin multiplier
@@ -486,9 +489,9 @@
 		"UNLOCK_COIN_BOUGHT": "商品購入済み !",
 		"UNLOCK_COIN_MORE": "コインが足りません !",
 
-		"UNLOCK_CONDITION_ERROR_SINGULAR": "下記の条件 : {0} requires a value.",
-		"UNLOCK_CONDITION_ERROR": "下記の条件 : {0} requires {1} values.",
-		"UNLOCK_CONDITION_ERROR2": "下記の条件 : {0} requires ({1} * n) values and n references.",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "下記の条件 : {1} requires a value.",
+		"UNLOCK_CONDITION_ERROR": "下記の条件 : {1} requires {0} values.",
+		"UNLOCK_CONDITION_ERROR2": "下記の条件 : {1} requires ({0} * n) values and n references.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -504,46 +507,46 @@
 		"UNLOCK_CONDITION_AIWIN": "AI演奏バトルで{0}回勝利 ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY_ONCE": "1回プレイ ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_SINGULAR": "1回プレイ ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY_TWICE": "2回プレイ ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "{0}回プレイ ({1}/{0})", // tp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: Total plays needed
+		// {0}: Total plays needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "1譜面を{0} ({2}/{1})", // sd
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{1}譜面を{0} ({2}/{1})", // sd
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "1譜面を{1} ({2}/{0})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{1}譜面を{1} ({2}/{0})", // sd
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{2}で1譜面を{0} ({3}/{1})", // dp
-		"UNLOCK_CONDITION_PLAYDIFF": "{2}で{1}譜面を{0} ({3}/{1})", // dp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{2}で1譜面を{1} ({3}/{0})", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "{2}で{0}譜面を{1} ({3}/{0})", // dp
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{2}★の1譜面を{0} ({3}/{1})", // lp
-		"UNLOCK_CONDITION_PLAYLEVEL": "{2}★の{1}譜面を{0} ({3}/{1})", // lp
-		// {0}: Current progress
-		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "以下の条件をクリアしましょう！： ({0}/{1})", // sp, sg, sc
-		"UNLOCK_CONDITION_CHALLENGE": "以下の条件をクリアしましょう！： ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{2}★の1譜面を{1} ({3}/{0})", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "{2}★の{0}譜面を{1} ({3}/{0})", // lp
+		// {0}: Total # of challenges
+		// {1}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "以下の条件をクリアしましょう！： ({1}/{0})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "以下の条件をクリアしましょう！： ({1}/{0})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
 		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "※{1}{2}を{0}", // sp
-		// {0}: Clear type
-		// {1}: # of songs needed
+		// {0}: # of songs needed
+		// {1}: Clear type
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "※{2}ジャンルの1譜面を{0} ({3}/{1})", // sg
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "※{2}ジャンルの{1}譜面を{0} ({3}/{1})", // sg
-		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "※{2}さんの1譜面を{0} ({3}/{1})", // sc
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "※{2}さんの{1}譜面を{0} ({3}/{1})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "※{2}ジャンルの1譜面を{1} ({3}/{0})", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "※{2}ジャンルの{0}譜面を{1} ({3}/{0})", // sg
+		// {0}: # of songs needed
+		// {1}: Clear type
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "※{2}さんの1譜面を{1} ({3}/{0})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "※{2}さんの{0}譜面を{1} ({3}/{0})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "プレイ",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "プレイ",

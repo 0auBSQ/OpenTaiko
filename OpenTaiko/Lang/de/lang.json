@@ -61,6 +61,7 @@
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2_SINGULAR": "Processing {0} score...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Verarbeite {0} Ergebnisse...\n<c.#0bb000>{1} von {2} importiert</c> (<c.#f0ad4e>{3} übersprungen</c> / <c.#b00000>{4} fehlgeschlagen</c>)\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Turm ausblenden",
@@ -409,6 +410,7 @@
 		"MODAL_TITLE_SONG": "Neues Lied!",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
+		"MODAL_MESSAGE_COIN_SINGULAR": "+{0} Münze (Gesamt: {1})",
 		"MODAL_MESSAGE_COIN": "+{0} Münzen (Gesamt: {1})",
 
 		// Online Lounge
@@ -473,6 +475,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Alle großen Noten werden zu <c.#c800ff>Swap</c>-Noten",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> Noten werden sichtbar",
 		// {0}: # of auto-rolls per second
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL_SINGULAR": "Automatische <c.#ffff00>Rolls</c> mit 1 Schläge",
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatische <c.#ffff00>Rolls</c> mit {0} Schlägen",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Geteilte</c> <c.#0088ff>Spuren</c>",
 		// {0}: Coin multiplier
@@ -486,9 +489,9 @@
 		"UNLOCK_COIN_BOUGHT": "Artikel gekauft!",
 		"UNLOCK_COIN_MORE": "Nicht genug Münzen!",
 
-		"UNLOCK_CONDITION_ERROR_SINGULAR": "The following condition: {0} requires a value.",
-		"UNLOCK_CONDITION_ERROR": "Die folgende Bedingung: {0} erfordert {1} Werte.",
-		"UNLOCK_CONDITION_ERROR2": "Die folgende Bedingung: {0} erfordert ({1} * n) Werte und n Referenzen.",
+		"UNLOCK_CONDITION_ERROR_SINGULAR": "The following condition: {1} requires a value.",
+		"UNLOCK_CONDITION_ERROR": "Die folgende Bedingung: {1} erfordert {0} Werte.",
+		"UNLOCK_CONDITION_ERROR2": "Die folgende Bedingung: {1} erfordert ({0} * n) Werte und n Referenzen.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -504,47 +507,47 @@
 		"UNLOCK_CONDITION_AIWIN": "Gewinne {0} KI-Kämpfe, um diesen Artikel freizuschalten! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY_ONCE": "Play once to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY_SINGULAR": "Play once to unlock this item! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY_TWICE": "Play twice to unlock this item! ({1}/{0})", // tp
 		"UNLOCK_CONDITION_PLAY": "Spiele {0} Lieder, um diesen Artikel freizuschalten! ({1}/{0})", // tp
 		// The quantifier above has been changed from "songs" to "times", please change as soon as possible.
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: Total plays needed
+		// {0}: Total plays needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{0} a song to unlock this item! ({2}/{1})", // sd
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDISTINCT_SINGULAR": "{1} a song to unlock this item! ({2}/{0})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{1} {0} songs to unlock this item! ({2}/{0})", // sd
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{0} a song on {2} difficulty to unlock this item! ({3}/{1})", // dp
-		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} Lieder auf {2} Schwierigkeitsgrad, um diesen Artikel freizuschalten! ({3}/{1})", // dp
-		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
-		// {1}: # of songs needed
+		"UNLOCK_CONDITION_PLAYDIFF_SINGULAR": "{1} a song on {2} difficulty to unlock this item! ({3}/{0})", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "{1} {0} Lieder auf {2} Schwierigkeitsgrad, um diesen Artikel freizuschalten! ({3}/{0})", // dp
+		// {0}: # of songs needed
+		// {1}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{0} a song with a star rating of {2} to unlock this item! ({3}/{1})", // lp
-		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} Lieder mit einem Sterne-Rating von {2}, um diesen Artikel freizuschalten! ({3}/{1})", // lp
-		// {0}: Current progress
-		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Get the following performance to unlock this item:  ({0}/{1})", // sp, sg, sc
-		"UNLOCK_CONDITION_CHALLENGE": "Erreiche die folgenden Leistungen, um diesen Artikel freizuschalten: ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_PLAYLEVEL_SINGULAR": "{1} a song with a star rating of {2} to unlock this item! ({3}/{0})", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "{1} {0} songs with a star rating of {2} to unlock this item! ({3}/{0})", // lp
+		// {0}: Total # of challenges
+		// {1}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_SINGULAR": "Get the following performance to unlock this item:  ({1}/{0})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "Get the following performances to unlock this item:  ({1}/{0})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
 		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} auf {2} Schwierigkeitsgrad.", // sp
-		// {0}: Clear type
-		// {1}: # of songs needed
+		// {0}: # of songs needed
+		// {1}: Clear type
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {0} a song within the {2} folder. ({3}/{1})", // sg
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} Lieder im {2}-Ordner. ({3}/{1})", // sg
-		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {0} a chart made by {2}. ({3}/{1})", // sc
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} Charts erstellt von {2}. ({3}/{1})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE_SINGULAR": "- {1} a song within the {2} folder. ({3}/{0})", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {1} {0} Lieder im {2}-Ordner. ({3}/{0})", // sg
+		// {0}: # of songs needed
+		// {1}: Clear type
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER_SINGULAR": "- {1} a chart made by {2}. ({3}/{0})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {1} {0} Charts erstellt von {2}. ({3}/{0})", // sc
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Spiele",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Spiele",
