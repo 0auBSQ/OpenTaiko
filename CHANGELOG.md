@@ -2,6 +2,8 @@
 
 ## [0.6.0.16] - 2024-11-04 (Beta)
 
+This reverts commit db426c96472fc086d7c91b89edde26371a13a407.
+
 - Readable error message on screen instead of crashes before the startup screen (Missing skin, no audio device found, etc)
 - Few code translation from japanese to english
 - Minor refactoring on the stage change code to avoid repetitions (OpenTaiko.cs)
