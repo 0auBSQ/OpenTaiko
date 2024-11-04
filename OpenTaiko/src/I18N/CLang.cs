@@ -62,12 +62,15 @@ internal class CLang {
 		return (Entries.TryGetValue(key, out string? value)) ? value : InvalidKey.SafeFormat(key);
 	}
 	public string GetString(string key, params object?[] values) {
-		if (Object.Equals(values[0], 1)) { // Only the first parameter is going to be judged either singular or plural.
-			if (Entries.TryGetValue(key + "_SINGULAR", out string? _value)) {
-				return _value.SafeFormat(values);
-			}
-		}
+		key += GetCountingSuffix(key, values[0]); // Only the parameter {0} is going to be judged.
 		return (Entries.TryGetValue(key, out string? value)) ? value.SafeFormat(values) : InvalidKey.SafeFormat(key);
+	}
+
+	private string GetCountingSuffix(string key, object? value) {
+		if (Object.Equals(value, 1) && (Entries.TryGetValue(key + "_SINGULAR", out _)) == true) {
+			return "_SINGULAR";
+		}
+		return "";
 	}
 
 	public string GetDifficulty(int diff) {
