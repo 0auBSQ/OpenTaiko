@@ -209,7 +209,7 @@ jobs:
         uses: mukunku/tag-exists-action@v1.6.0
         id: check-tag
         with:
-          tag: ${{ env.projectVersion }}
+          tag: ${{ env.version }}
 
       - name: Create Release
         if: steps.check-tag.outputs.exists == 'false' && env.version != ''
@@ -217,8 +217,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.projectVersion }}
-          release_name: OpenTaiko v${{ env.projectVersion }}
+          tag_name: ${{ env.version }}
+          release_name: OpenTaiko v${{ env.version }}
           body: |
             Note: The releases do not contain skins nor songs.
             Please download/update through the OpenTaiko Hub: https://github.com/OpenTaiko/OpenTaiko-Hub/releases
@@ -226,10 +226,11 @@ jobs:
           prerelease: false
 
       - name: Upload All Builds
+        if: steps.check-tag.outputs.exists == 'false' && env.version != ''
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
           file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
           overwrite: true
-          tag_name: ${{ env.projectVersion }}
+          tag_name: ${{ env.version }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
