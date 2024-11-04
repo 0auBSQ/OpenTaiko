@@ -35,7 +35,7 @@ internal class CActImplScore : CAct演奏スコア共通 {
 				if (!this.ctBonusAddTimer[i].IsStoped) {
 					this.ctBonusAddTimer[i].Tick();
 					if (this.ctBonusAddTimer[i].IsEnded) {
-						OpenTaiko.stage演奏ドラム画面.actScore.BonusAdd(i);
+						OpenTaiko.stageGameScreen.actScore.BonusAdd(i);
 						this.ctBonusAddTimer[i].Stop();
 					}
 				}
@@ -90,7 +90,7 @@ internal class CActImplScore : CAct演奏スコア共通 {
 								this.nNowDisplayedAddScore--;
 							this.stScore[i].ctTimer.Stop();
 							this.stScore[i].b使用中 = false;
-							OpenTaiko.stage演奏ドラム画面.actDan.Update();
+							OpenTaiko.stageGameScreen.actDan.Update();
 						}
 
 						if (!stScore[i].bAddEnd) {

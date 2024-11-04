@@ -18,7 +18,7 @@ class CActImplScoreRank : CActivity {
 
 		for (int player = 0; player < 5; player++) {
 			this.ScoreRank[player] = new int[] { 500000, 600000, 700000, 800000, 900000, 950000,
-				Math.Max(1000000, (int)(OpenTaiko.stage演奏ドラム画面.nAddScoreNiji[player] * OpenTaiko.stage演奏ドラム画面.nNoteCount[player]) + (int)(OpenTaiko.stage演奏ドラム画面.nBalloonCount[player] * 100) + (int)(Math.Ceiling(OpenTaiko.stage演奏ドラム画面.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
+				Math.Max(1000000, (int)(OpenTaiko.stageGameScreen.nAddScoreNiji[player] * OpenTaiko.stageGameScreen.nNoteCount[player]) + (int)(OpenTaiko.stageGameScreen.nBalloonCount[player] * 100) + (int)(Math.Ceiling(OpenTaiko.stageGameScreen.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
 
 			for (int i = 0; i < 7; i++) {
 				this.counter[player][i] = new CCounter();
@@ -131,7 +131,7 @@ class CActImplScoreRank : CActivity {
 						#region [Ensou score ranks]
 
 						counter[player][i].Tick();
-						if (OpenTaiko.stage演奏ドラム画面.actScore.GetScore(player) >= ScoreRank[player][i]) {
+						if (OpenTaiko.stageGameScreen.actScore.GetScore(player) >= ScoreRank[player][i]) {
 							displayScoreRank(i, player, x, y);
 
 							#region [Legacy]
@@ -187,8 +187,8 @@ class CActImplScoreRank : CActivity {
 						progress >= 0.5,
 						progress >= 0.75,
 						progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-						OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0,
-						OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0
+						OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0,
+						OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0
 					};
 
 					counter[0][i].Tick();

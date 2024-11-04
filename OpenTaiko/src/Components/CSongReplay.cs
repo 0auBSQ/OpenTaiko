@@ -80,16 +80,16 @@ class CSongReplay {
 	public void tDanInputSongResults(int songNo) {
 		if (songNo >= DanSongCount) return;
 		if (songNo < 0) return;
-		IndividualGoodCount[songNo] = OpenTaiko.stage演奏ドラム画面.nGood[songNo];
-		IndividualOkCount[songNo] = OpenTaiko.stage演奏ドラム画面.nOk[songNo];
-		IndividualBadCount[songNo] = OpenTaiko.stage演奏ドラム画面.nBad[songNo];
-		IndividualRollCount[songNo] = OpenTaiko.stage演奏ドラム画面.nRoll[songNo];
-		IndividualMaxCombo[songNo] = OpenTaiko.stage演奏ドラム画面.nHighestCombo[songNo];
-		IndividualBoomCount[songNo] = OpenTaiko.stage演奏ドラム画面.nMine[songNo];
-		IndividualADLibCount[songNo] = OpenTaiko.stage演奏ドラム画面.nADLIB[songNo];
+		IndividualGoodCount[songNo] = OpenTaiko.stageGameScreen.nGood[songNo];
+		IndividualOkCount[songNo] = OpenTaiko.stageGameScreen.nOk[songNo];
+		IndividualBadCount[songNo] = OpenTaiko.stageGameScreen.nBad[songNo];
+		IndividualRollCount[songNo] = OpenTaiko.stageGameScreen.nRoll[songNo];
+		IndividualMaxCombo[songNo] = OpenTaiko.stageGameScreen.nHighestCombo[songNo];
+		IndividualBoomCount[songNo] = OpenTaiko.stageGameScreen.nMine[songNo];
+		IndividualADLibCount[songNo] = OpenTaiko.stageGameScreen.nADLIB[songNo];
 		danAccumulatedScore = 0;
 		for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore[acc];
-		IndividualScore[songNo] = (int)OpenTaiko.stage演奏ドラム画面.actScore.GetScore(0) - danAccumulatedScore;
+		IndividualScore[songNo] = (int)OpenTaiko.stageGameScreen.actScore.GetScore(0) - danAccumulatedScore;
 	}
 
 	#endregion
@@ -255,14 +255,14 @@ class CSongReplay {
 		// Player Name
 		PlayerName = OpenTaiko.SaveFileInstances[actualPlayer].data.Name;
 		// Performance informations
-		GoodCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nGreat;
-		OkCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nGood;
-		BadCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nMiss;
-		RollCount = OpenTaiko.stage演奏ドラム画面.GetRoll(storedPlayer);
-		MaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[storedPlayer];
-		BoomCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nMine;
-		ADLibCount = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nADLIB;
-		Score = OpenTaiko.stage演奏ドラム画面.CChartScore[storedPlayer].nScore;
+		GoodCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGreat;
+		OkCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGood;
+		BadCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMiss;
+		RollCount = OpenTaiko.stageGameScreen.GetRoll(storedPlayer);
+		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[storedPlayer];
+		BoomCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMine;
+		ADLibCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nADLIB;
+		Score = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nScore;
 		CoinValue = (short)Coins;
 		// Tower parameters
 		if (GameMode == 2) {
@@ -311,7 +311,7 @@ class CSongReplay {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[actualPlayer].data.Character];
 		GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 		// Gauge fill value
-		GaugeFill = (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[storedPlayer];
+		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[storedPlayer];
 		// Generation timestamp (in ticks)
 		Timestamp = DateTime.Now.Ticks;
 		// Compressed inputs and size

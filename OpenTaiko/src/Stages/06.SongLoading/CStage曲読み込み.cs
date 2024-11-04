@@ -304,8 +304,8 @@ internal class CStage曲読み込み : CStage {
 
 			OpenTaiko.Tx.SongLoading_Bg_Dan.t2D描画(0, 0 - (ct待機.CurrentValue <= 600 ? ct待機.CurrentValue / 10f : 60));
 
-			CTexture dp = (OpenTaiko.stage段位選択.段位リスト.stバー情報 != null)
-				? OpenTaiko.stage段位選択.段位リスト.stバー情報[OpenTaiko.stage段位選択.段位リスト.n現在の選択行].txDanPlate
+			CTexture dp = (OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null)
+				? OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.n現在の選択行].txDanPlate
 				: null;
 
 			CActSelect段位リスト.tDisplayDanPlate(dp,
@@ -438,7 +438,7 @@ internal class CStage曲読み込み : CStage {
 							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
 						}
 
-						OpenTaiko.stage演奏ドラム画面.Activate();
+						OpenTaiko.stageGameScreen.Activate();
 
 						span = (TimeSpan)(DateTime.Now - timeBeginLoadWAV);
 

@@ -59,7 +59,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 		//それぞれが独立したレイヤーでないといけないのでforループはパーツごとに分離すること。
 
-		if (OpenTaiko.ConfigIni.nPlayerCount <= 2 && !OpenTaiko.ConfigIni.bAIBattleMode) OpenTaiko.stage演奏ドラム画面.actMtaiko.DrawBackSymbol();
+		if (OpenTaiko.ConfigIni.nPlayerCount <= 2 && !OpenTaiko.ConfigIni.bAIBattleMode) OpenTaiko.stageGameScreen.actMtaiko.DrawBackSymbol();
 
 		#region[ レーン本体 ]
 
@@ -89,7 +89,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 		#endregion
 
-		if (OpenTaiko.ConfigIni.nPlayerCount > 2 && !OpenTaiko.ConfigIni.bAIBattleMode) OpenTaiko.stage演奏ドラム画面.actMtaiko.DrawBackSymbol();
+		if (OpenTaiko.ConfigIni.nPlayerCount > 2 && !OpenTaiko.ConfigIni.bAIBattleMode) OpenTaiko.stageGameScreen.actMtaiko.DrawBackSymbol();
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ 分岐アニメ制御タイマー ]
@@ -123,9 +123,9 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 		#region[ 分岐レイヤー ]
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (OpenTaiko.stage演奏ドラム画面.bUseBranch[i] == true) {
+			if (OpenTaiko.stageGameScreen.bUseBranch[i] == true) {
 				#region[ 動いていない ]
-				switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+				switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
 					case CTja.ECourse.eNormal:
 						if (OpenTaiko.Tx.Lane_Base[0] != null) {
 							OpenTaiko.Tx.Lane_Base[0].Opacity = 255;
@@ -208,7 +208,7 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 					#endregion
 				} else if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
-					OpenTaiko.stage演奏ドラム画面.actLane.Draw();
+					OpenTaiko.stageGameScreen.actLane.Draw();
 				}
 			}
 		}
@@ -216,7 +216,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ ゴーゴータイムレーン背景レイヤー ]
-			if (OpenTaiko.Tx.Lane_Background_GoGo != null && OpenTaiko.stage演奏ドラム画面.bIsGOGOTIME[i]) {
+			if (OpenTaiko.Tx.Lane_Background_GoGo != null && OpenTaiko.stageGameScreen.bIsGOGOTIME[i]) {
 				if (!this.ctゴーゴー.IsStoped) {
 					this.ctゴーゴー.Tick();
 				}
@@ -242,7 +242,7 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (OpenTaiko.stage演奏ドラム画面.bUseBranch[i] == true) {
+			if (OpenTaiko.stageGameScreen.bUseBranch[i] == true) {
 				#region NullCheck
 
 				bool _laneNull = false;
@@ -257,7 +257,7 @@ internal class CActImplLaneTaiko : CActivity {
 				#endregion
 
 				if (OpenTaiko.ConfigIni.SimpleMode) {
-					switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+					switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
 						case CTja.ECourse.eNormal:
 							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
@@ -273,7 +273,7 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 				} else if (OpenTaiko.ConfigIni.nBranchAnime == 0 && !_laneNull) {
 					if (!this.stBranch[i].ct分岐アニメ進行.IsTicked) {
-						switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+						switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
 							case CTja.ECourse.eNormal:
 								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
@@ -426,7 +426,7 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 
 					if (this.stBranch[i].nY座標 == 0) {
-						switch (OpenTaiko.stage演奏ドラム画面.nDisplayedBranchLane[i]) {
+						switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
 							case CTja.ECourse.eNormal:
 								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
 								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
@@ -494,14 +494,14 @@ internal class CActImplLaneTaiko : CActivity {
 		if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) {
 				OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
-				if (OpenTaiko.stage演奏ドラム画面.bDoublePlay) {
+				if (OpenTaiko.stageGameScreen.bDoublePlay) {
 					OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
 				}
 			}
 		}
 
 
-		OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.Draw();
+		OpenTaiko.stageGameScreen.actTaikoLaneFlash.Draw();
 
 
 
@@ -586,19 +586,19 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (this.n総移動時間[i] != -1) {
 				if (n移動方向[i] == 1) {
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動開始Y[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
 					//TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
 				} else {
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動開始Y[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
 					//TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
 				}
 
 				if (((int)nTime) > this.n移動開始時刻[i] + this.n総移動時間[i]) {
 					this.n総移動時間[i] = -1;
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[i] = this.n移動目的場所X[i];
-					OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[i] = this.n移動目的場所Y[i];
+					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動目的場所X[i];
+					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動目的場所Y[i];
 					//TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動目的場所X[i];
 				}
 			}
@@ -607,7 +607,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 
 
-		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stage演奏ドラム画面.ShowVideo) {
+		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo) {
 			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
@@ -628,15 +628,15 @@ internal class CActImplLaneTaiko : CActivity {
 			OpenTaiko.Tx.Judge_Frame.b加算合成 = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				OpenTaiko.Tx.Judge_Frame.t2D描画(
-					OpenTaiko.stage演奏ドラム画面.NoteOriginX[i],
-					OpenTaiko.stage演奏ドラム画面.NoteOriginY[i], new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+					OpenTaiko.stageGameScreen.NoteOriginX[i],
+					OpenTaiko.stageGameScreen.NoteOriginY[i], new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
 		}
 
 
 		#region[ ゴーゴー炎 ]
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (OpenTaiko.stage演奏ドラム画面.bIsGOGOTIME[i] && !OpenTaiko.ConfigIni.SimpleMode) {
+			if (OpenTaiko.stageGameScreen.bIsGOGOTIME[i] && !OpenTaiko.ConfigIni.SimpleMode) {
 				this.ctゴーゴー炎.TickLoop();
 
 				if (OpenTaiko.Tx.Effects_Fire != null) {
@@ -705,8 +705,8 @@ internal class CActImplLaneTaiko : CActivity {
 						x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[i];
 						y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[i];
 					}
-					x += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(i);
-					y += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(i);
+					x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(i);
+					y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(i);
 
 					switch (st状態[i].judge) {
 						case ENoteJudge.Perfect:
@@ -771,7 +771,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public void GOGOSTART() {
 		this.ctゴーゴー = new CCounter(0, 17, 18, OpenTaiko.Timer);
-		if (OpenTaiko.ConfigIni.nPlayerCount == 1 && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) OpenTaiko.stage演奏ドラム画面.GoGoSplash.StartSplash();
+		if (OpenTaiko.ConfigIni.nPlayerCount == 1 && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) OpenTaiko.stageGameScreen.GoGoSplash.StartSplash();
 	}
 
 
@@ -787,23 +787,23 @@ internal class CActImplLaneTaiko : CActivity {
 		this.stBranch[nPlayer].nBefore = n現在;
 		this.stBranch[nPlayer].nAfter = n次回;
 
-		OpenTaiko.stage演奏ドラム画面.actLane.t分岐レイヤー_コース変化(n現在, n次回, nPlayer);
+		OpenTaiko.stageGameScreen.actLane.t分岐レイヤー_コース変化(n現在, n次回, nPlayer);
 	}
 
 	public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs) {
 		this.n移動開始時刻[nPlayer] = (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
-		this.n移動開始X[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[nPlayer];
-		this.n移動開始Y[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[nPlayer];
+		this.n移動開始X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer];
+		this.n移動開始Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer];
 		this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);
 		this.n移動方向[nPlayer] = n移動方向;
 		this.n移動距離px[nPlayer] = n移動px;
 		this.nVerticalJSPos[nPlayer] = vJs;
 		if (n移動方向 == 0) {
-			this.n移動目的場所X[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[nPlayer] - n移動px;
-			this.n移動目的場所Y[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[nPlayer] - vJs;
+			this.n移動目的場所X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer] - n移動px;
+			this.n移動目的場所Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer] - vJs;
 		} else {
-			this.n移動目的場所X[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLX[nPlayer] + n移動px;
-			this.n移動目的場所Y[nPlayer] = OpenTaiko.stage演奏ドラム画面.JPOSCROLLY[nPlayer] + vJs;
+			this.n移動目的場所X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer] + n移動px;
+			this.n移動目的場所Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer] + vJs;
 		}
 	}
 

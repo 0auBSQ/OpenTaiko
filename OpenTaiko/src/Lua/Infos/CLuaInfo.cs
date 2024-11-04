@@ -5,7 +5,7 @@ internal class CLuaInfo {
 	public string lang => OpenTaiko.ConfigIni.sLang;
 	public bool simplemode => OpenTaiko.ConfigIni.SimpleMode;
 	public bool p1IsBlue => OpenTaiko.P1IsBlue();
-	public bool online => OpenTaiko.app.bネットワークに接続中;
+	public bool online => OpenTaiko.app.bInternetConnectionSuccess;
 
 	public string dir { get; init; }
 

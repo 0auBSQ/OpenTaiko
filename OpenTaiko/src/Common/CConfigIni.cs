@@ -875,6 +875,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		}
 
 		public bool KeyIsPressed(STKEYASSIGN[] pad) {
+			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
 			return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.Code));
 		}
 

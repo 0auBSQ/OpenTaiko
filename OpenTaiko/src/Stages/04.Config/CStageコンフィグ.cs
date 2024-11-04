@@ -407,7 +407,7 @@ internal class CStageコンフィグ : CStage {
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				if (!this.bメニューにフォーカス中) {
 					if (this.eItemPanelモード == EItemPanelモード.キーコード一覧) {
-						OpenTaiko.stageコンフィグ.tアサイン完了通知();
+						OpenTaiko.stageConfig.tアサイン完了通知();
 						return 0;
 					}
 					if (!this.actList.bIsKeyAssignSelected && !this.actList.bIsFocusingParameter)   // #24525 2011.3.15 yyagi, #32059 2013.9.17 yyagi

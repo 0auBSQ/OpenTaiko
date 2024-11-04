@@ -243,9 +243,9 @@ class CActSelect段位リスト : CStage {
 	private CCachedFontRenderer pfDanFolder, pfDanFolderDesc, pfDanSong, pfExamFont;
 	public TitleTextureKey[] ttkExams;
 
-	private CStage選曲.STNumber[] stLevel = new CStage選曲.STNumber[10];
-	private CStage選曲.STNumber[] stSoulNumber = new CStage選曲.STNumber[10];
-	private CStage選曲.STNumber[] stExamNumber = new CStage選曲.STNumber[10];
+	private CStageSongSelect.STNumber[] stLevel = new CStageSongSelect.STNumber[10];
+	private CStageSongSelect.STNumber[] stSoulNumber = new CStageSongSelect.STNumber[10];
+	private CStageSongSelect.STNumber[] stExamNumber = new CStageSongSelect.STNumber[10];
 
 	public List<CSongListNode> listSongs;
 	public STバー情報[] stバー情報;

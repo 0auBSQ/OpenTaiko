@@ -52,8 +52,8 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 			if (!sw.IsRunning)
 				this.sw = Stopwatch.StartNew();
 			if (sw.ElapsedMilliseconds > 1500) {
-				OpenTaiko.stage演奏ドラム画面.bPAUSE = false;
-				OpenTaiko.stage演奏ドラム画面.t演奏やりなおし();
+				OpenTaiko.stageGameScreen.bPAUSE = false;
+				OpenTaiko.stageGameScreen.t演奏やりなおし();
 
 				this.tDeativatePopupMenu();
 				this.sw.Reset();
@@ -64,25 +64,25 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	public override void tEnter押下Main(int nSortOrder) {
 		switch (n現在の選択行) {
 			case (int)EOrder.Continue:
-				OpenTaiko.stage演奏ドラム画面.bPAUSE = false;
+				OpenTaiko.stageGameScreen.bPAUSE = false;
 
 				SoundManager.PlayTimer.Resume();
 				OpenTaiko.Timer.Resume();
 				OpenTaiko.TJA.t全チップの再生再開();
-				OpenTaiko.stage演奏ドラム画面.actAVI.tPauseControl();
+				OpenTaiko.stageGameScreen.actAVI.tPauseControl();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
 				break;
 
 			case (int)EOrder.Redoing:
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-					OpenTaiko.stage演奏ドラム画面.tResetGameplayFinishedStatus();
+					OpenTaiko.stageGameScreen.tResetGameplayFinishedStatus();
 					this.bやり直しを選択した = true;
 					CActSelectPopupMenu.b選択した = true;
 				} else {
 					SoundManager.PlayTimer.Resume();
 					OpenTaiko.Timer.Resume();
-					OpenTaiko.stage演奏ドラム画面.t演奏中止();
+					OpenTaiko.stageGameScreen.t演奏中止();
 					CActSelectPopupMenu.b選択した = true;
 					this.tDeativatePopupMenu();
 				}
@@ -91,7 +91,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 			case (int)EOrder.Return:
 				SoundManager.PlayTimer.Resume();
 				OpenTaiko.Timer.Resume();
-				OpenTaiko.stage演奏ドラム画面.t演奏中止();
+				OpenTaiko.stageGameScreen.t演奏中止();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
 				break;

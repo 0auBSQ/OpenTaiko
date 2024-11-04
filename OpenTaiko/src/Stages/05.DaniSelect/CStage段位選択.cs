@@ -260,7 +260,7 @@ class CStage段位選択 : CStage {
 					OpenTaiko.Skin.soundError.tPlay();
 				}
 			} else {
-				OpenTaiko.stage段位選択.t段位を選択する();
+				OpenTaiko.stageDanSongSelect.t段位を選択する();
 			}
 			ct待機.CurrentValue = 0;
 			ct待機.Stop();

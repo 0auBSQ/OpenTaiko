@@ -41,7 +41,7 @@ internal class CActConfigKeyAssign : CActivity {
 					return;
 
 				case 0x11:
-					OpenTaiko.stageコンフィグ.tアサイン完了通知();
+					OpenTaiko.stageConfig.tアサイン完了通知();
 					return;
 			}
 			this.bキー入力待ち = true;
@@ -125,7 +125,7 @@ internal class CActConfigKeyAssign : CActivity {
 			int num5 = OpenTaiko.Skin.Config_KeyAssign_Move;
 			int x = OpenTaiko.Skin.Config_KeyAssign_Font[0];
 			int y = OpenTaiko.Skin.Config_KeyAssign_Font[1];
-			OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, this.strパッド名, false, 0.75f);
+			OpenTaiko.stageConfig.actFont.t文字列描画(x, y, this.strパッド名, false, 0.75f);
 			y += num5;
 			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad];
 			for (int i = 0; i < 0x10; i++) {
@@ -151,14 +151,14 @@ internal class CActConfigKeyAssign : CActivity {
 						break;
 
 					default:
-						OpenTaiko.stageコンフィグ.actFont.t文字列描画(x + num5, y, string.Format("{0,2}.", i + 1), this.n現在の選択行 == i, 0.75f);
+						OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, string.Format("{0,2}.", i + 1), this.n現在の選択行 == i, 0.75f);
 						break;
 				}
 				y += num5;
 			}
-			OpenTaiko.stageコンフィグ.actFont.t文字列描画(x + num5, y, "Reset", this.n現在の選択行 == 0x10, 0.75f);
+			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "Reset", this.n現在の選択行 == 0x10, 0.75f);
 			y += num5;
-			OpenTaiko.stageコンフィグ.actFont.t文字列描画(x + num5, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f);
+			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f);
 			y += num5;
 			if (this.bキー入力待ち && (OpenTaiko.Tx.Config_KeyAssign != null)) {
 				OpenTaiko.Tx.Config_KeyAssign.t2D描画(OpenTaiko.Skin.Config_KeyAssign[0], OpenTaiko.Skin.Config_KeyAssign[1]);
@@ -249,7 +249,7 @@ internal class CActConfigKeyAssign : CActivity {
 				}
 				break;
 		}
-		OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, string.Format("{0,2}. Joypad #{1} ", line, nID) + str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Joypad #{1} ", line, nID) + str, b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Gamepad(int line, int x, int y, int nID, int nCode, bool b強調) {
 		string str = "";
@@ -262,7 +262,7 @@ internal class CActConfigKeyAssign : CActivity {
 		} else {
 			str = string.Format("Code{0}", nCode);
 		}
-		OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, string.Format("{0,2}. Gamepad #{1} ", line, nID) + str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Gamepad #{1} ", line, nID) + str, b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Keyboard(int line, int x, int y, int nID, int nCode, bool b強調) {
 		string str = null;
@@ -275,13 +275,13 @@ internal class CActConfigKeyAssign : CActivity {
 		if (str == null) {
 			str = string.Format("{0,2}. Key 0x{1:X2}", line, nCode);
 		}
-		OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, str, b強調, 0.75f);
 	}
 	private void tアサインコードの描画_MidiIn(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, string.Format("{0,2}. MidiIn #{1} code.{2}", line, nID, nCode), b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. MidiIn #{1} code.{2}", line, nID, nCode), b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Mouse(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageコンフィグ.actFont.t文字列描画(x, y, string.Format("{0,2}. Mouse Button{1}", line, nCode), b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Mouse Button{1}", line, nCode), b強調, 0.75f);
 	}
 
 	private bool tキーチェックとアサイン_Gamepad() {

@@ -154,7 +154,7 @@ internal class CActImplBackground : CActivity {
 
 		this.ctSlideAnimation = new CCounter();
 		this.ctClimbDuration = new CCounter();
-		this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed)) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
+		this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed)) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 		this.ctClimbingAnimation = new CCounter();
 		this.ctRunningAnimation = new CCounter();
 		this.ctClearAnimation = new CCounter();
@@ -208,17 +208,17 @@ internal class CActImplBackground : CActivity {
 		#region [Upper background]
 
 		if (!IsUpNotFound) {
-			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) UpScript?.Update();
+			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update();
 			UpScript?.Draw();
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				#region [Tower animations variables]
 
-				this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1);
+				this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
 
 				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
-				currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 
 				#endregion
 
@@ -234,7 +234,7 @@ internal class CActImplBackground : CActivity {
 					#region [Floor number]
 
 					if (CFloorManagement.CurrentNumberOfLives > 0)
-						CFloorManagement.LastRegisteredFloor = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1;
+						CFloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
 
 					string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
@@ -329,10 +329,10 @@ internal class CActImplBackground : CActivity {
 
 			#region [Tower lower background]
 
-			float nextPositionMax140 = Math.Min((OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
+			float nextPositionMax140 = Math.Min((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
 			if (bFloorChanged == true)
-				ctSlideAnimation.Start(0, 1000, 120f / ((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed), OpenTaiko.Timer);
+				ctSlideAnimation.Start(0, 1000, 120f / ((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed), OpenTaiko.Timer);
 
 			float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
 
@@ -345,7 +345,7 @@ internal class CActImplBackground : CActivity {
 			//TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1],
 			//new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
 
-			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) DownScript.Update();
+			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript.Update();
 			DownScript.Draw();
 
 			#endregion
@@ -358,23 +358,23 @@ internal class CActImplBackground : CActivity {
 			int currentTower = currentTowerType;
 
 			// Will implement the roof later, need the beforehand total floor count calculation before
-			int nextTowerBase = ((OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
-			int towerBase = (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
+			int nextTowerBase = ((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
+			int towerBase = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
 
-			int currentDeco = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
-			int nextDeco = (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1) % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
+			int currentDeco = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
+			int nextDeco = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
 
 			// Microfix for the first floor suddenly changing texture
-			if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
+			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
 				currentDeco++;
-			if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
+			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
 				towerBase++;
 
 			int widthChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[0]);
 			int heightChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[1]);
 
 			// Current trunk
-			if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] < maxFloor)
+			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] < maxFloor)
 				OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
@@ -391,12 +391,12 @@ internal class CActImplBackground : CActivity {
 			int originY = OpenTaiko.Skin.Game_Tower_Floors_Move[1] - heightChange;
 
 			// Next trunk
-			if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
+			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
 				OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
 					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
-			else if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
+			else if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
 				OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
@@ -404,7 +404,7 @@ internal class CActImplBackground : CActivity {
 			}
 
 			// Next deco
-			if (OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
+			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
 				OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(
 					OpenTaiko.Skin.Game_Tower_Floors_Deco[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Deco[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange);
@@ -416,10 +416,10 @@ internal class CActImplBackground : CActivity {
 
 			bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 
-			bool stageEnded = OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
+			bool stageEnded = OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
-				float floorBPM = (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				float floorBPM = (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				ctClimbDuration.Start(0, 1500, 120f / floorBPM, OpenTaiko.Timer);
 				ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], OpenTaiko.Timer);
@@ -432,7 +432,7 @@ internal class CActImplBackground : CActivity {
 			bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
 
 			if (stageEnded && !TowerFinished && !isClimbing) {
-				float floorBPM = (float)(OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				float floorBPM = (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Fail[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter], OpenTaiko.Timer);
@@ -528,9 +528,9 @@ internal class CActImplBackground : CActivity {
 			ctFailAnimation?.Tick();
 
 			#endregion
-		} else if (!OpenTaiko.stage演奏ドラム画面.bDoublePlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+		} else if (!OpenTaiko.stageGameScreen.bDoublePlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (!IsDownNotFound) {
-				if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) DownScript?.Update();
+				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update();
 				DownScript?.Draw();
 			}
 		}

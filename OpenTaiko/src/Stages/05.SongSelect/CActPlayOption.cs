@@ -143,7 +143,7 @@ internal class CActPlayOption : CActivity {
 			return 0;
 
 		var act難易度 = OpenTaiko.stageSongSelect.actDifficultySelectionScreen;
-		var danAct = OpenTaiko.stage段位選択.段位挑戦選択画面;
+		var danAct = OpenTaiko.stageDanSongSelect.段位挑戦選択画面;
 
 		var _textures = new CTexture[]
 		{

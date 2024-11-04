@@ -181,8 +181,8 @@ internal class CActImplFireworks : CActivity {
 								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
 								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
 							}
-							nX += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
-							nY += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+							nX += OpenTaiko.stageGameScreen.GetJPOSCROLLX(this.st状態[i].nPlayer);
+							nY += OpenTaiko.stageGameScreen.GetJPOSCROLLY(this.st状態[i].nPlayer);
 
 							switch (st状態[i].judge) {
 								case ENoteJudge.Perfect:
@@ -254,8 +254,8 @@ internal class CActImplFireworks : CActivity {
 										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
 										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
 									}
-									x += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(this.st状態[i].nPlayer);
-									y += OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(this.st状態[i].nPlayer);
+									x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(this.st状態[i].nPlayer);
+									y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(this.st状態[i].nPlayer);
 
 									x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
 									y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);

@@ -212,7 +212,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		dtLastQueueOperation = DateTime.MinValue;
 
-		PuchiChara.ChangeBPM(60.0 / OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0]);
+		PuchiChara.ChangeBPM(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 
 		//dbUnit = Math.Ceiling( dbUnit * 1000.0 );
 		//dbUnit = dbUnit / 1000.0;
@@ -364,7 +364,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				&& (base.ePhaseID == CStage.EPhase.Common_NORMAL)) {
 				this.actStageFailed.Start();
 				this.actEnd.Start();
-				OpenTaiko.TJA.t全チップの再生停止();
+				OpenTaiko.TJA.tStopAllChips();
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 			}
 
@@ -542,7 +542,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
 								if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-									double dbUnit = (((60.0 / (OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[i]))));
+									double dbUnit = (((60.0 / (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]))));
 									this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
 								}
 							}
@@ -752,7 +752,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		this.tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Taiko, true, nInput, nPlayer);
 
 		if ((e判定 != ENoteJudge.Poor) && (e判定 != ENoteJudge.Miss)) {
-			OpenTaiko.stage演奏ドラム画面.actLaneTaiko.Start(pChip.nChannelNo, e判定, b両手入力, nPlayer);
+			OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip.nChannelNo, e判定, b両手入力, nPlayer);
 
 			int nFly = ChannelNumToFlyNoteNum(pChip, nPlayer, b両手入力, nInput);
 
@@ -855,7 +855,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						break;
 				}
 
-				if (OpenTaiko.stage演奏ドラム画面.isDeniedPlaying[nUsePlayer]) break;
+				if (OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]) break;
 
 				if (!OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.bAutoPlay[0] && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
 					break;
@@ -1114,8 +1114,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						break;
 				}
 
-				OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
-				OpenTaiko.stage演奏ドラム画面.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
+				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
+				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
 
 				#endregion
 
@@ -1373,8 +1373,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 						if (pChip.nChannelNo == 0x14 && _gt == EGameType.Konga) nLane = (int)PlayerLane.FlashType.Clap;
 
-						OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start((PlayerLane.FlashType)nLane);
-						OpenTaiko.stage演奏ドラム画面.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
+						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start((PlayerLane.FlashType)nLane);
+						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
 
 						this.actMtaiko.tMtaikoEvent(pChip.nChannelNo, this.nHand[nPlayer], nPlayer);
 
@@ -1456,7 +1456,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#endregion
 
 				#region[ HIDSUD & STEALTH ]
-				if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stage演奏ドラム画面.bCustomDoron) {
+				if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stageGameScreen.bCustomDoron) {
 					pChip.bShow = false;
 				}
 				#endregion
@@ -1672,7 +1672,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				CChip cChip = null;
 				if (pChip.nノーツ移動開始時刻ms != 0) // n先頭発声位置 value is only used when this condition is met
 				{
-					cChip = OpenTaiko.stage演奏ドラム画面.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, 0x10 + pChip.n連打音符State, 0, nPlayer);
+					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, 0x10 + pChip.n連打音符State, 0, nPlayer);
 					if (cChip != null) {
 						n先頭発声位置 = cChip.n発声時刻ms;
 					}
@@ -1707,7 +1707,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			#region[ HIDSUD & STEALTH ]
 
-			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stage演奏ドラム画面.bCustomDoron) {
+			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stageGameScreen.bCustomDoron) {
 				pChip.bShow = false;
 			}
 
@@ -2025,10 +2025,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Roll[0], OpenTaiko.Skin.Game_Judge_Meter_Roll[1], GetRoll(0), false, false);
 
 			int nNowTotal = this.nHitCount_ExclAuto.Drums.Perfect + this.nHitCount_ExclAuto.Drums.Great + this.nHitCount_ExclAuto.Drums.Miss;
-			double dbたたけた率 = Math.Round((100.0 * (OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great)) / (double)nNowTotal);
-			double dbPERFECT率 = Math.Round((100.0 * OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect) / (double)nNowTotal);
-			double dbGREAT率 = Math.Round((100.0 * OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great / (double)nNowTotal));
-			double dbMISS率 = Math.Round((100.0 * OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Miss / (double)nNowTotal));
+			double dbたたけた率 = Math.Round((100.0 * (OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great)) / (double)nNowTotal);
+			double dbPERFECT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect) / (double)nNowTotal);
+			double dbGREAT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great / (double)nNowTotal));
+			double dbMISS率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Miss / (double)nNowTotal));
 
 			if (double.IsNaN(dbたたけた率))
 				dbたたけた率 = 0;

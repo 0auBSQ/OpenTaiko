@@ -356,7 +356,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer) {
 		float fDamage;
-		int nコース = (int)OpenTaiko.stage演奏ドラム画面.nCurrentBranch[nPlayer];
+		int nコース = (int)OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer];
 
 		switch (e今回の判定) {
 			case ENoteJudge.Perfect:

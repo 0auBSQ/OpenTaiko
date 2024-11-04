@@ -24,8 +24,8 @@ internal class CActFIFOStart : CActivity {
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
-			OpenTaiko.stage演奏ドラム画面.actDan.Start(OpenTaiko.stage演奏ドラム画面.ListDan_Number);
-			OpenTaiko.stage演奏ドラム画面.ListDan_Number++;
+			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
+			OpenTaiko.stageGameScreen.ListDan_Number++;
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 		} else {

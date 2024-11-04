@@ -281,7 +281,7 @@ internal class DBSaves {
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
 		var choosenSong = OpenTaiko.stageSongSelect.rChoosenSong;
 		var choosenDifficulty = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
-		var chartScore = OpenTaiko.stage演奏ドラム画面.CChartScore[player];
+		var chartScore = OpenTaiko.stageGameScreen.CChartScore[player];
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
 		// Do not register the play if Dan/Tower and any mod is ON
@@ -315,7 +315,7 @@ internal class DBSaves {
 			currentPlay.HighScoreGoodCount = chartScore.nGreat;
 			currentPlay.HighScoreOkCount = chartScore.nGood;
 			currentPlay.HighScoreBadCount = chartScore.nMiss;
-			currentPlay.HighScoreMaxCombo = OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[player];
+			currentPlay.HighScoreMaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[player];
 			currentPlay.HighScoreRollCount = chartScore.nRoll;
 			currentPlay.HighScoreADLibCount = chartScore.nADLIB;
 			currentPlay.HighScoreBoomCount = chartScore.nMine;

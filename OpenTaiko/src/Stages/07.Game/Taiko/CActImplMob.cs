@@ -49,9 +49,9 @@ internal class CActImplMob : CActivity {
 	}
 
 	public override int Draw() {
-		if (!OpenTaiko.stage演奏ドラム画面.bDoublePlay) {
+		if (!OpenTaiko.stageGameScreen.bDoublePlay) {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-				if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) MobScript?.Update();
+				if (!OpenTaiko.stageGameScreen.bPAUSE) MobScript?.Update();
 				MobScript?.Draw();
 
 				/*

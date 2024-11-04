@@ -127,14 +127,14 @@ internal class CActImplDancer : CActivity {
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (OpenTaiko.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0) {
-				if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerCounter += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;
+				if (!OpenTaiko.stageGameScreen.bPAUSE) nNowDancerCounter += Math.Abs((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;
 				if (nNowDancerCounter >= 1) {
 					nNowDancerCounter = 0;
 				}
 				nNowDancerFrame = (int)(nNowDancerCounter * (this.ar踊り子モーション番号.Length - 1));
 
 				for (int i = 0; i < nDancerCount; i++) {
-					if ((int)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[0] >= OpenTaiko.Skin.Game_Dancer_Gauge[i]) {
+					if ((int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0] >= OpenTaiko.Skin.Game_Dancer_Gauge[i]) {
 						if (DancerStates[i] == 0) {
 							DancerStates[i] = 1;
 							nNowDancerInCounter[i] = 0;
@@ -153,7 +153,7 @@ internal class CActImplDancer : CActivity {
 								if (nDancerInInterval == 0) {
 									DancerStates[i] = 3;
 								} else {
-									if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)OpenTaiko.FPS.DeltaTime;
+									if (!OpenTaiko.stageGameScreen.bPAUSE) nNowDancerInCounter[i] += Math.Abs((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] / nDancerInInterval) * (float)OpenTaiko.FPS.DeltaTime;
 
 									if (nNowDancerInCounter[i] >= 1) {
 										nNowDancerInCounter[i] = 1;
@@ -172,7 +172,7 @@ internal class CActImplDancer : CActivity {
 								if (nDancerOutInterval == 0) {
 									DancerStates[i] = 0;
 								} else {
-									if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)OpenTaiko.FPS.DeltaTime;
+									if (!OpenTaiko.stageGameScreen.bPAUSE) nNowDancerOutCounter[i] += Math.Abs((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] / nDancerOutInterval) * (float)OpenTaiko.FPS.DeltaTime;
 
 									if (nNowDancerOutCounter[i] >= 1) {
 										nNowDancerOutCounter[i] = 1;
