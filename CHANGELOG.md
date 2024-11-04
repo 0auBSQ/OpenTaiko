@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.16] - 2024-11-04 (Beta)
+
+- Readable error message on screen instead of crashes before the startup screen (Missing skin, no audio device found, etc)
+- Few code translation from japanese to english
+- Minor refactoring on the stage change code to avoid repetitions (OpenTaiko.cs)
+
 ## [0.6.0.15] - 2024-11-02 (Beta)
 
 - Korean translation by AsPho
