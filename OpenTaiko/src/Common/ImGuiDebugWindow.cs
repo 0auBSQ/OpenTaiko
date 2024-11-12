@@ -274,7 +274,7 @@ public static class ImGuiDebugWindow {
 							ImGui.TextColored(OpenTaiko.ConfigIni.bAutoPlay[i] ? diff : normal,
 								"Auto: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
-							ImGui.Text("Hitsound: " + OpenTaiko.Skin.hsHitSoundsInformations.names[OpenTaiko.ConfigIni.nHitSounds[i]]);
+							ImGui.Text("Hitsound: " + OpenTaiko.Skin.hsHitSoundsInformations.names[OpenTaiko.ConfigIni.nHitSounds[i]].GetString("???"));
 
 							ImGui.TextColored(OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.None ? normal : diff,
 								"Fun Mods: " + OpenTaiko.ConfigIni.nFunMods[i].ToString());
