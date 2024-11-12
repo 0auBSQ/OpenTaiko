@@ -7,8 +7,7 @@ internal interface ILang {
 static internal class CLangManager {
 	// Cheap factory-like design pattern
 
-	public static (string, int) DefaultLanguage = ("ja", 0);
-	public static CLang LangInstance { get; private set; } = new CLang(Langcodes.FirstOrDefault("ja"));
+	public static CLang LangInstance { get; private set; } = new CLang("en");
 	public static void langAttach(string lang) {
 		LangInstance = CLang.GetCLang(lang);
 		CLuaScript.tReloadLanguage(lang);
