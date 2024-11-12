@@ -106,7 +106,7 @@ class CActImplTrainingMode : CActivity {
 					if (this.nCurrentMeasure > this.nMeasureCount)
 						this.nCurrentMeasure = this.nMeasureCount;
 
-					OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+					OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 					this.tMatchWithTheChartDisplayPosition(true);
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -118,7 +118,7 @@ class CActImplTrainingMode : CActivity {
 					if (this.nCurrentMeasure <= 0)
 						this.nCurrentMeasure = 1;
 
-					OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+					OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 					this.tMatchWithTheChartDisplayPosition(true);
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -128,7 +128,7 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure++;
-						OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -137,7 +137,7 @@ class CActImplTrainingMode : CActivity {
 						for (int index = 0; index < this.JumpPointList.Count; index++) {
 							if (this.JumpPointList[index].Time >= SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
-								OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.soundSkip.tPlay();
 								this.tMatchWithTheChartDisplayPosition(false);
 								break;
@@ -151,7 +151,7 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure--;
-						OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -160,7 +160,7 @@ class CActImplTrainingMode : CActivity {
 						for (int index = this.JumpPointList.Count - 1; index >= 0; index--) {
 							if (this.JumpPointList[index].Time <= SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
-								OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.sound特訓スキップ音.tPlay();
 								this.tMatchWithTheChartDisplayPosition(false);
 								break;
@@ -189,7 +189,7 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure = 1;
-						OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -200,7 +200,7 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure = this.nMeasureCount;
-						OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -221,8 +221,8 @@ class CActImplTrainingMode : CActivity {
 				}
 			}
 			if (!this.bTrainingPAUSE) {
-				if (this.nCurrentMeasure < OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0]) {
-					this.nCurrentMeasure = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0];
+				if (this.nCurrentMeasure < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0]) {
+					this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
 				}
 
 				if (SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed > this.n最終演奏位置ms) {
@@ -282,7 +282,7 @@ class CActImplTrainingMode : CActivity {
 		if (OpenTaiko.Tx.Tokkun_Speed_Measure != null)
 			OpenTaiko.Tx.Tokkun_Speed_Measure.t2D描画(OpenTaiko.Skin.Game_Training_Speed_Measure[0], OpenTaiko.Skin.Game_Training_Speed_Measure[1]);
 		var maxMeasureStr = this.nMeasureCount.ToString();
-		var measureStr = OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0].ToString();
+		var measureStr = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0].ToString();
 		if (OpenTaiko.Tx.Tokkun_SmallNumber != null) {
 			var x = OpenTaiko.Skin.Game_Training_MaxMeasureCount_XY[0];
 			foreach (char c in maxMeasureStr) {
@@ -329,7 +329,7 @@ class CActImplTrainingMode : CActivity {
 
 		this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 
-		OpenTaiko.stage演奏ドラム画面.Activate();
+		OpenTaiko.stageGameScreen.Activate();
 		SoundManager.PlayTimer.Pause();
 
 		for (int i = 0; i < dTX.listChip.Count; i++) {
@@ -342,10 +342,10 @@ class CActImplTrainingMode : CActivity {
 		}
 
 		OpenTaiko.TJA.t全チップの再生一時停止();
-		OpenTaiko.stage演奏ドラム画面.bPAUSE = true;
-		OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
+		OpenTaiko.stageGameScreen.bPAUSE = true;
+		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 		this.bTrainingPAUSE = true;
-		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaIsActive) OpenTaiko.stage演奏ドラム画面.actBalloon.KusuMiss();
+		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
 
 		this.tMatchWithTheChartDisplayPosition(false);
 	}
@@ -356,21 +356,21 @@ class CActImplTrainingMode : CActivity {
 		this.bCurrentlyScrolling = false;
 		SoundManager.PlayTimer.NowTimeMs = this.nスクロール後ms;
 
-		int n演奏開始Chip = OpenTaiko.stage演奏ドラム画面.nCurrentTopChip;
+		int n演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
 		int finalStartBar;
 
 		finalStartBar = this.nCurrentMeasure - 2;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		OpenTaiko.stage演奏ドラム画面.t演奏位置の変更(finalStartBar, 0);
+		OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
 
 
-		int n少し戻ってから演奏開始Chip = OpenTaiko.stage演奏ドラム画面.nCurrentTopChip;
+		int n少し戻ってから演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
 
-		OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] = 0;
-		OpenTaiko.stage演奏ドラム画面.t数値の初期化(true, true);
-		OpenTaiko.stage演奏ドラム画面.Activate();
-		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaIsActive) OpenTaiko.stage演奏ドラム画面.actBalloon.KusuMiss();
+		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = 0;
+		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
+		OpenTaiko.stageGameScreen.Activate();
+		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
 
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 
@@ -395,7 +395,7 @@ class CActImplTrainingMode : CActivity {
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			OpenTaiko.stage演奏ドラム画面.chip現在処理中の連打チップ[i] = null;
+			OpenTaiko.stageGameScreen.chip現在処理中の連打チップ[i] = null;
 		}
 
 		this.bTrainingPAUSE = false;
@@ -412,24 +412,24 @@ class CActImplTrainingMode : CActivity {
 
 			if (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 > nCurrentMeasure - 1) {
 				bSuccessSeek = true;
-				OpenTaiko.stage演奏ドラム画面.nCurrentTopChip = i;
+				OpenTaiko.stageGameScreen.nCurrentTopChip = i;
 				break;
 			}
 		}
 		if (!bSuccessSeek) {
-			OpenTaiko.stage演奏ドラム画面.nCurrentTopChip = 0;
+			OpenTaiko.stageGameScreen.nCurrentTopChip = 0;
 		} else {
-			while (dTX.listChip[OpenTaiko.stage演奏ドラム画面.nCurrentTopChip].n発声時刻ms == dTX.listChip[OpenTaiko.stage演奏ドラム画面.nCurrentTopChip - 1].n発声時刻ms && OpenTaiko.stage演奏ドラム画面.nCurrentTopChip != 0)
-				OpenTaiko.stage演奏ドラム画面.nCurrentTopChip--;
+			while (dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms == dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip - 1].n発声時刻ms && OpenTaiko.stageGameScreen.nCurrentTopChip != 0)
+				OpenTaiko.stageGameScreen.nCurrentTopChip--;
 		}
 
 		if (doScroll) {
-			this.nスクロール後ms = (long)(dTX.listChip[OpenTaiko.stage演奏ドラム画面.nCurrentTopChip].n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.nスクロール後ms = (long)(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			this.bCurrentlyScrolling = true;
 
 			this.ctScrollCounter = new CCounter(0, OpenTaiko.Skin.Game_Training_ScrollTime, 1, OpenTaiko.Timer);
 		} else {
-			SoundManager.PlayTimer.NowTimeMs = (long)(dTX.listChip[OpenTaiko.stage演奏ドラム画面.nCurrentTopChip].n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			SoundManager.PlayTimer.NowTimeMs = (long)(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms / OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 		}
 	}

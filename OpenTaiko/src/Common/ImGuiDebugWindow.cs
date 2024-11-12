@@ -50,7 +50,7 @@ public static class ImGuiDebugWindow {
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
 			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
 			ImGui.Text($"FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS.NowFPS : "???")}");
-			ImGui.Text("Current Stage: " + OpenTaiko.r現在のステージ.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.r現在のステージ.eStageID).ToString() + ")");
+			ImGui.Text("Current Stage: " + OpenTaiko.rCurrentStage.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.rCurrentStage.eStageID).ToString() + ")");
 			#endregion
 
 			ImGui.BeginTabBar("Tabs");
@@ -158,7 +158,7 @@ public static class ImGuiDebugWindow {
 	private static void Profile() {
 		if (ImGui.BeginTabItem("Profile")) {
 
-			ImGui.BeginDisabled(OpenTaiko.r現在のステージ.eStageID == CStage.EStage.Game);
+			ImGui.BeginDisabled(OpenTaiko.rCurrentStage.eStageID == CStage.EStage.Game);
 			int count = OpenTaiko.ConfigIni.nPlayerCount;
 			if (ImGui.InputInt("Player Count", ref count))
 				OpenTaiko.ConfigIni.nPlayerCount = Math.Clamp(count, 1, 5); // funny things can happen when the player count is set to 0
@@ -228,7 +228,7 @@ public static class ImGuiDebugWindow {
 	private static void Stage() {
 		if (ImGui.BeginTabItem("Stage")) {
 
-			switch (OpenTaiko.r現在のステージ.eStageID) {
+			switch (OpenTaiko.rCurrentStage.eStageID) {
 				case CStage.EStage.SongSelect:
 					System.Numerics.Vector4 normal = new System.Numerics.Vector4(1, 1, 1, 1);
 					System.Numerics.Vector4 diff = new System.Numerics.Vector4(0.5f, 1, 0.5f, 1);
@@ -364,7 +364,7 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndCombo();
 			}
-			if (OpenTaiko.r現在のステージ.eStageID != CStage.EStage.StartUp)
+			if (OpenTaiko.rCurrentStage.eStageID != CStage.EStage.StartUp)
 				CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
 			else
 				ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
@@ -377,65 +377,65 @@ public static class ImGuiDebugWindow {
 				currentStageMemoryUsage += CTextureListPopup(luascript.listDisposables.OfType<CTexture>(),
 					$"Module #{index}", $"MODULE{index++}_TEXTURES");
 
-			switch (OpenTaiko.r現在のステージ.eStageID) {
+			switch (OpenTaiko.rCurrentStage.eStageID) {
 				#region Game
 				case CStage.EStage.Game:
 
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actBackground.UpScript,
+					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBackground.UpScript,
 						"Up Background", "TEXTURE_LUA_UPBG");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actBackground.DownScript,
+					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBackground.DownScript,
 						"Down Background", "TEXTURE_LUA_DOWNBG");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actMob.MobScript,
+					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actMob.MobScript,
 						"Mob", "TEXTURE_LUA_MOB");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actBalloon.KusudamaScript,
+					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
 						"Kusudama", "TEXTURE_LUA_KUSUDAMA");
 
 					#region Endings
 					switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
 						case Difficulty.Tower:
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_DropoutScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
 								"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_PassScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PassScript,
 								"Tower Cleared", "TEXTURE_LUA_TOWERCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_FullComboScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_FullComboScript,
 								"Tower Full Combo", "TEXTURE_LUA_TOWERFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Tower_TopReached_PerfectScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PerfectScript,
 								"Tower Perfect Combo", "TEXTURE_LUA_TOWERPFC");
 							break;
 						case Difficulty.Dan:
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_FailScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_FailScript,
 								"Dan Clear Failed", "TEXTURE_LUA_DANFAILED");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PassScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PassScript,
 								"Dan Red Clear", "TEXTURE_LUA_DANCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_FullComboScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_FullComboScript,
 								"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Red_PerfectScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PerfectScript,
 								"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PassScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PassScript,
 								"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_FullComboScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_FullComboScript,
 								"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.Dan_Gold_PerfectScript,
+							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PerfectScript,
 								"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
 							break;
 						default:
 							if (OpenTaiko.ConfigIni.bAIBattleMode) {
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.AILoseScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AILoseScript,
 									"AI Clear Failed", "TEXTURE_LUA_AIFAILED");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.AIWinScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWinScript,
 									"AI Cleared", "TEXTURE_LUA_AICLEAR");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.AIWin_FullComboScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_FullComboScript,
 									"AI Full Combo", "TEXTURE_LUA_AIFC");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.AIWin_PerfectScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_PerfectScript,
 									"AI Perfect Combo", "TEXTURE_LUA_AIPFC");
 							} else {
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.FailedScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.FailedScript,
 									"Clear Failed", "TEXTURE_LUA_GAMEFAILED");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.ClearScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.ClearScript,
 									"Cleared", "TEXTURE_LUA_GAMECLEAR");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.FullComboScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.FullComboScript,
 									"Full Combo", "TEXTURE_LUA_GAMEFC");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stage演奏ドラム画面.actEnd.PerfectComboScript,
+								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.PerfectComboScript,
 									"Perfect Combo", "TEXTURE_LUA_GAMEPFC");
 							}
 							break;

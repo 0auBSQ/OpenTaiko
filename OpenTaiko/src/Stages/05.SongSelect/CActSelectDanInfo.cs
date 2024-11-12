@@ -86,7 +86,7 @@ class CActSelectDanInfo : CStage {
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = 1;
 
 				OpenTaiko.Tx.Dani_Level_Number.Opacity = opacity;
-				OpenTaiko.stage段位選択.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Scale);
+				OpenTaiko.stageDanSongSelect.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Y[pos], dan.Level, OpenTaiko.Skin.SongSelect_DanInfo_Level_Number_Scale);
 				OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
 				TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
@@ -106,7 +106,7 @@ class CActSelectDanInfo : CStage {
 				if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
 					Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 					if (danc != null) {
-						OpenTaiko.stage段位選択.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+						OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 					}
 				} else {
 					for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
@@ -124,7 +124,7 @@ class CActSelectDanInfo : CStage {
 							}
 
 							OpenTaiko.Tx.Dani_Exam_Number.Opacity = opacity;
-							OpenTaiko.stage段位選択.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+							OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 							OpenTaiko.Tx.Dani_Exam_Number.Opacity = 255;
 						}
 					}

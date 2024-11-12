@@ -247,23 +247,27 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStage起動 stage起動 {
+	public static CSystemError SystemError {
 		get;
 		private set;
 	}
-	public static CStageタイトル stageタイトル {
+	public static CStage起動 stageStartup {
 		get;
 		private set;
 	}
-	public static CStageコンフィグ stageコンフィグ {
+	public static CStageTitle stageTitle {
 		get;
 		private set;
 	}
-	public static CStage選曲 stageSongSelect {
+	public static CStageコンフィグ stageConfig {
 		get;
 		private set;
 	}
-	public static CStage段位選択 stage段位選択 {
+	public static CStageSongSelect stageSongSelect {
+		get;
+		private set;
+	}
+	public static CStage段位選択 stageDanSongSelect {
 		get;
 		private set;
 	}
@@ -282,15 +286,15 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStage曲読み込み stage曲読み込み {
+	public static CStage曲読み込み stageSongLoading {
 		get;
 		private set;
 	}
-	public static CStage演奏ドラム画面 stage演奏ドラム画面 {
+	public static CStage演奏ドラム画面 stageGameScreen {
 		get;
 		private set;
 	}
-	public static CStage結果 stage結果 {
+	public static CStage結果 stageResults {
 		get;
 		private set;
 	}
@@ -298,12 +302,12 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStage終了 stage終了 {
+	public static CStage終了 stageExit {
 		get;
 		private set;
 	}
-	public static CStage r現在のステージ = null;
-	public static CStage r直前のステージ = null;
+	public static CStage rCurrentStage = null;
+	public static CStage rPreviousStage = null;
 	public static string strEXEのあるフォルダ {
 		get;
 		private set;
@@ -312,11 +316,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public bool b次のタイミングで垂直帰線同期切り替えを行う {
+	public bool bSwitchVSyncAtTheNextFrame {
 		get;
 		set;
 	}
-	public bool b次のタイミングで全画面_ウィンドウ切り替えを行う {
+	public bool bSwitchFullScreenAtNextFrame {
 		get;
 		set;
 	}
@@ -371,6 +375,40 @@ internal class OpenTaiko : Game {
 	/// This could be treated as the player's first time launching the game.
 	/// </summary>
 	public static bool ConfigIsNew;
+
+	public void MountStage(CStage Stage) {
+		Stage.Activate();
+		if (!ConfigIni.PreAssetsLoading) {
+			Stage.CreateManagedResource();
+			Stage.CreateUnmanagedResource();
+		}
+	}
+
+	public void UnmountStage(CStage Stage) {
+		if (Stage != null) {
+			Stage.DeActivate();
+			if (!ConfigIni.PreAssetsLoading) {
+				Stage.ReleaseManagedResource();
+				Stage.ReleaseUnmanagedResource();
+			}
+		}
+	}
+
+	public void UnmountCurrentStage() {
+		UnmountStage(rCurrentStage);
+	}
+
+	public void ChangeStage(CStage Stage) {
+		UnmountCurrentStage();
+		MountStage(Stage);
+		rPreviousStage = rCurrentStage;
+		rCurrentStage = Stage;
+	}
+
+	public void TriggerSystemError(CSystemError.Errno errno) {
+		SystemError.LoadError(errno);
+		ChangeStage(SystemError);
+	}
 
 
 
@@ -516,26 +554,26 @@ internal class OpenTaiko : Game {
 
 			// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
 
-			if (r現在のステージ != null) {
-				OpenTaiko.NamePlate.lcNamePlate.Update();
-				this.n進行描画の戻り値 = (r現在のステージ != null) ? r現在のステージ.Draw() : 0;
+			if (rCurrentStage != null) {
+				OpenTaiko.NamePlate?.lcNamePlate.Update();
+				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
 				CScoreIni scoreIni = null;
 
-				#region [ 曲検索スレッドの起動/終了 ]
-				// ここに"Enumerating Songs..."表示を集約
-				actEnumSongs.Draw();                            // "Enumerating Songs..."アイコンの描画
+				#region [ Enumerate Songs thread ]
 
-				switch (r現在のステージ.eStageID) {
+				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
+
+				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.Title:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
 						if (EnumSongs != null) {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if (r現在のステージ.eStageID == CStage.EStage.Title &&
-								r直前のステージ.eStageID == CStage.EStage.StartUp &&
-								this.n進行描画の戻り値 == (int)CStageタイトル.E戻り値.継続 &&
+							if (rCurrentStage.eStageID == CStage.EStage.Title &&
+								rPreviousStage.eStageID == CStage.EStage.StartUp &&
+								this.nDrawLoopReturnValue == (int)CStageTitle.EReturnValue.継続 &&
 								!EnumSongs.IsSongListEnumStarted) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
@@ -549,8 +587,8 @@ internal class OpenTaiko : Game {
 							#endregion
 
 							#region [ 曲検索の中断と再開 ]
-							if (r現在のステージ.eStageID == CStage.EStage.SongSelect && !EnumSongs.IsSongListEnumCompletelyDone) {
-								switch (this.n進行描画の戻り値) {
+							if (rCurrentStage.eStageID == CStage.EStage.SongSelect && !EnumSongs.IsSongListEnumCompletelyDone) {
+								switch (this.nDrawLoopReturnValue) {
 									case 0:     // 何もない
 										EnumSongs.Resume();
 										EnumSongs.IsSlowdown = false;
@@ -574,7 +612,7 @@ internal class OpenTaiko : Game {
 							#endregion
 
 							#region [ 曲探索中断待ち待機 ]
-							if (r現在のステージ.eStageID == CStage.EStage.SongLoading && !EnumSongs.IsSongListEnumCompletelyDone &&
+							if (rCurrentStage.eStageID == CStage.EStage.SongLoading && !EnumSongs.IsSongListEnumCompletelyDone &&
 								EnumSongs.thDTXFileEnumerate != null)                           // #28700 2012.6.12 yyagi; at Compact mode, enumerating thread does not exist.
 							{
 								EnumSongs.WaitUntilSuspended();                                 // 念のため、曲検索が一時中断されるまで待機
@@ -591,7 +629,7 @@ internal class OpenTaiko : Game {
 								}
 								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
 
-								bool bRemakeSongTitleBar = (r現在のステージ.eStageID == CStage.EStage.SongSelect) ? true : false;
+								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
 								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
 								EnumSongs.SongListEnumCompletelyDone();
 							}
@@ -601,30 +639,22 @@ internal class OpenTaiko : Game {
 				}
 				#endregion
 
-				switch (r現在のステージ.eStageID) {
+				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.None:
+						break;
+
+					case CStage.EStage.CRASH:
 						break;
 
 					case CStage.EStage.StartUp:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
-							r現在のステージ.DeActivate();
-							if (!ConfigIni.PreAssetsLoading) {
-								r現在のステージ.ReleaseManagedResource();
-								r現在のステージ.ReleaseUnmanagedResource();
-							}
+						if (this.nDrawLoopReturnValue != 0) {
+							ChangeStage(stageTitle);
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Title");
-							stageタイトル.Activate();
-							if (!ConfigIni.PreAssetsLoading) {
-								stageタイトル.CreateManagedResource();
-								stageタイトル.CreateUnmanagedResource();
-							}
-							r直前のステージ = r現在のステージ;
-							r現在のステージ = stageタイトル;
 
-							this.tガベージコレクションを実行する();
+							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -633,174 +663,89 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Title:
 						#region [ *** ]
 						//-----------------------------
-						switch (this.n進行描画の戻り値) {
-							case (int)CStageタイトル.E戻り値.GAMESTART:
-								#region [ 選曲処理へ ]
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageTitle.EReturnValue.GAMESTART:
+								#region [ Song select ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageSongSelect);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Song Select");
-								stageSongSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageSongSelect.CreateManagedResource();
-									stageSongSelect.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageSongSelect;
 
 								OpenTaiko.latestSongSelect = stageSongSelect;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.DANGAMESTART:
-								#region [ 段位選択処理へ ]
+							case (int)CStageTitle.EReturnValue.DANGAMESTART:
+								#region [ Dan song select ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageDanSongSelect);
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Dan-i Dojo");
-								stage段位選択.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stage段位選択.CreateManagedResource();
-									stage段位選択.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage段位選択;
-								OpenTaiko.latestSongSelect = stage段位選択;
+								Trace.TraceInformation("■ Dan Select");
+
+								OpenTaiko.latestSongSelect = stageDanSongSelect;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.TAIKOTOWERSSTART:
-								#region [Online Lounge]
+							case (int)CStageTitle.EReturnValue.TAIKOTOWERSSTART:
+								#region [ Tower song select ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTowerSelect);
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Online Lounge");
-								stageTowerSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageTowerSelect.CreateManagedResource();
-									stageTowerSelect.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageTowerSelect;
+								Trace.TraceInformation("■ Tower Select");
+
+								OpenTaiko.latestSongSelect = stageTowerSelect;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.HEYA:
+							case (int)CStageTitle.EReturnValue.HEYA:
 								#region [Heya menu]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageHeya);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Taiko Heya");
-								stageHeya.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageHeya.CreateManagedResource();
-									stageHeya.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageHeya;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.ONLINELOUNGE:
+							case (int)CStageTitle.EReturnValue.ONLINELOUNGE:
 								#region [Online Lounge]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageOnlineLounge);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Online Lounge");
-								stageOnlineLounge.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageOnlineLounge.CreateManagedResource();
-									stageOnlineLounge.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageOnlineLounge;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.CONFIG:
+							case (int)CStageTitle.EReturnValue.CONFIG:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageConfig);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Config");
-								stageコンフィグ.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageコンフィグ.CreateManagedResource();
-									stageコンフィグ.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageコンフィグ;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.EXIT:
+							case (int)CStageTitle.EReturnValue.EXIT:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageExit);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ End");
-								stage終了.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stage終了.CreateManagedResource();
-									stage終了.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage終了;
 								//-----------------------------
 								#endregion
 								break;
 
-							case (int)CStageタイトル.E戻り値.AIBATTLEMODE:
-								#region [ 選曲処理へ ]
+							case (int)CStageTitle.EReturnValue.AIBATTLEMODE:
+								#region [ Song select (with AI) ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageSongSelect);
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Select");
-								stageSongSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageSongSelect.CreateManagedResource();
-									stageSongSelect.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageSongSelect;
+								Trace.TraceInformation("■ AI Battle Song Select");
 
 								OpenTaiko.latestSongSelect = stageSongSelect;
 								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
@@ -820,28 +765,17 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Config:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
-							switch (r直前のステージ.eStageID) {
+						if (this.nDrawLoopReturnValue != 0) {
+							switch (rPreviousStage.eStageID) {
 								case CStage.EStage.Title:
 									#region [ *** ]
 									//-----------------------------
-									r現在のステージ.DeActivate();
-									if (!ConfigIni.PreAssetsLoading) {
-										r現在のステージ.ReleaseManagedResource();
-										r現在のステージ.ReleaseUnmanagedResource();
-									}
+									ChangeStage(stageTitle);
 									Trace.TraceInformation("----------------------");
 									Trace.TraceInformation("■ Title");
-									stageタイトル.Activate();
-									if (!ConfigIni.PreAssetsLoading) {
-										stageタイトル.CreateManagedResource();
-										stageタイトル.CreateUnmanagedResource();
-									}
-									stageタイトル.tReloadMenus();
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stageタイトル;
+									stageTitle.tReloadMenus();
 
-									this.tガベージコレクションを実行する();
+									this.tExecuteGarbageCollection();
 									break;
 								//-----------------------------
 								#endregion
@@ -849,22 +783,11 @@ internal class OpenTaiko : Game {
 								case CStage.EStage.SongSelect:
 									#region [ *** ]
 									//-----------------------------
-									r現在のステージ.DeActivate();
-									if (!ConfigIni.PreAssetsLoading) {
-										r現在のステージ.ReleaseManagedResource();
-										r現在のステージ.ReleaseUnmanagedResource();
-									}
+									ChangeStage(stageSongSelect);
 									Trace.TraceInformation("----------------------");
 									Trace.TraceInformation("■ Song Select");
-									stageSongSelect.Activate();
-									if (!ConfigIni.PreAssetsLoading) {
-										stageSongSelect.CreateManagedResource();
-										stageSongSelect.CreateUnmanagedResource();
-									}
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stageSongSelect;
 
-									this.tガベージコレクションを実行する();
+									this.tExecuteGarbageCollection();
 									break;
 									//-----------------------------
 									#endregion
@@ -878,24 +801,13 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.SongSelect:
 						#region [ *** ]
 						//-----------------------------
-						switch (this.n進行描画の戻り値) {
-							case (int)CStage選曲.E戻り値.タイトルに戻る:
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTitle);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Title");
-								stageタイトル.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageタイトル.CreateManagedResource();
-									stageタイトル.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageタイトル;
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -905,103 +817,51 @@ internal class OpenTaiko : Game {
 									ConfigIni.bAIBattleMode = false;
 								}
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
-							case (int)CStage選曲.E戻り値.選曲した:
+							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageSongLoading);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Song Loading");
-								stage曲読み込み.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stage曲読み込み.CreateManagedResource();
-									stage曲読み込み.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage曲読み込み;
 
-								/*
-								Skin.bgm選曲画面イン.t停止する();
-								Skin.bgm選曲画面.t停止する();
-								*/
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
-							//							case (int) CStage選曲.E戻り値.オプション呼び出し:
-							#region [ *** ]
-							//								//-----------------------------
-							//								r現在のステージ.On非活性化();
-							//								Trace.TraceInformation( "----------------------" );
-							//								Trace.TraceInformation( "■ オプション" );
-							//								stageオプション.On活性化();
-							//								r直前のステージ = r現在のステージ;
-							//								r現在のステージ = stageオプション;
-							//
-							//								foreach( STPlugin pg in this.listプラグイン )
-							//								{
-							//									Directory.SetCurrentDirectory( pg.strプラグインフォルダ );
-							//									pg.plugin.Onステージ変更();
-							//									Directory.SetCurrentDirectory( CDTXMania.strEXEのあるフォルダ );
-							//								}
-							//
-							//								this.tガベージコレクションを実行する();
-							//								break;
-							//							//-----------------------------
-							#endregion
-
-							case (int)CStage選曲.E戻り値.コンフィグ呼び出し:
+							case (int)CStageSongSelect.EReturnValue.ConfigMenuOpened:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageConfig);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Config");
-								stageコンフィグ.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageコンフィグ.CreateManagedResource();
-									stageコンフィグ.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageコンフィグ;
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
-							case (int)CStage選曲.E戻り値.スキン変更:
+							case (int)CStageSongSelect.EReturnValue.SkinChange:
 
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								UnmountCurrentStage();
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Skin Change");
 								stageChangeSkin.Activate();
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageChangeSkin;
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageChangeSkin;
 								break;
 								//-----------------------------
 								#endregion
@@ -1012,57 +872,30 @@ internal class OpenTaiko : Game {
 
 					case CStage.EStage.DanDojoSelect:
 						#region [ *** ]
-						switch (this.n進行描画の戻り値) {
-							case (int)CStage選曲.E戻り値.タイトルに戻る:
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTitle);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Title");
-								stageタイトル.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageタイトル.CreateManagedResource();
-									stageタイトル.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageタイトル;
 
-								/*
-								Skin.bgm選曲画面イン.t停止する();
-								Skin.bgm選曲画面.t停止する();
-								*/
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
-							case (int)CStage選曲.E戻り値.選曲した:
+							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
-
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageSongLoading);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Song Loading");
-								stage曲読み込み.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stage曲読み込み.CreateManagedResource();
-									stage曲読み込み.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage曲読み込み;
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -1072,29 +905,18 @@ internal class OpenTaiko : Game {
 
 					case CStage.EStage.Heya:
 						#region [ *** ]
-						switch (this.n進行描画の戻り値) {
-							case (int)CStage選曲.E戻り値.タイトルに戻る:
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTitle);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Title");
-								stageタイトル.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageタイトル.CreateManagedResource();
-									stageタイトル.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageタイトル;
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -1105,54 +927,26 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.SongLoading:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
-							OpenTaiko.Pad.detectedDevice.Clear();  // 入力デバイスフラグクリア(2010.9.11)
-							r現在のステージ.DeActivate();
-							if (!ConfigIni.PreAssetsLoading) {
-								r現在のステージ.ReleaseManagedResource();
-								r現在のステージ.ReleaseUnmanagedResource();
-							}
-							#region [ ESC押下時は、曲の読み込みを中止して選曲画面に戻る ]
-							if (this.n進行描画の戻り値 == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
-								//DTX.t全チップの再生停止();
+						if (this.nDrawLoopReturnValue != 0) {
+							OpenTaiko.Pad.detectedDevice.Clear();
+							UnmountCurrentStage();
+							#region [ If ESC is pressed, cancel the loading and go back to song select ]
+							if (this.nDrawLoopReturnValue == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
+
 								if (TJA != null) {
 									TJA.DeActivate();
 									TJA.ReleaseManagedResource();
 									TJA.ReleaseUnmanagedResource();
 								}
 
-								// ???
-
-								/*
-								if (stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-								{
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ 段位選択");
-									stage段位選択.On活性化();
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stage段位選択;
-								}
-								else
-								{
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ 選曲");
-									stage選曲.On活性化();
-									r直前のステージ = r現在のステージ;
-									r現在のステージ = stage選曲;
-								}
-								*/
-
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Return to song select menu");
-								OpenTaiko.latestSongSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									OpenTaiko.latestSongSelect.CreateManagedResource();
-									OpenTaiko.latestSongSelect.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
+								MountStage(OpenTaiko.latestSongSelect);
+
+								rPreviousStage = rCurrentStage;
 
 								// Seek latest registered song select screen
-								r現在のステージ = OpenTaiko.latestSongSelect;
+								rCurrentStage = OpenTaiko.latestSongSelect;
 
 								break;
 							}
@@ -1160,22 +954,11 @@ internal class OpenTaiko : Game {
 
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Gameplay (Drum Screen)");
-#if false      // #23625 2011.1.11 Config.iniからダメージ/回復値の定数変更を行う場合はここを有効にする 087リリースに合わせ機能無効化
-for (int i = 0; i < 5; i++)
-{
-	for (int j = 0; j < 2; j++)
-	{
-		stage演奏ドラム画面.fDamageGaugeDelta[i, j] = ConfigIni.fGaugeFactor[i, j];
-	}
-}
-for (int i = 0; i < 3; i++) {
-	stage演奏ドラム画面.fDamageLevelFactor[i] = ConfigIni.fDamageLevelFactor[i];
-}
-#endif
-							r直前のステージ = r現在のステージ;
-							r現在のステージ = stage演奏ドラム画面;
 
-							this.tガベージコレクションを実行する();
+							rPreviousStage = rCurrentStage;
+							rCurrentStage = stageGameScreen;
+
+							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -1184,49 +967,45 @@ for (int i = 0; i < 3; i++) {
 					case CStage.EStage.Game:
 						#region [ *** ]
 
-						switch (this.n進行描画の戻り値) {
+						switch (this.nDrawLoopReturnValue) {
 							case (int)EGameplayScreenReturnValue.ReloadAndReplay:
-								#region [ DTXファイルを再読み込みして、再演奏 ]
-								TJA.t全チップの再生停止();
+								#region [ Restart play ]
+								TJA.tStopAllChips();
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								r現在のステージ.DeActivate();
+								rCurrentStage.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
+									rCurrentStage.ReleaseManagedResource();
+									rCurrentStage.ReleaseUnmanagedResource();
 								}
-								stage曲読み込み.Activate();
+								stageSongLoading.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
-									stage曲読み込み.CreateManagedResource();
-									stage曲読み込み.CreateUnmanagedResource();
+									stageSongLoading.CreateManagedResource();
+									stageSongLoading.CreateUnmanagedResource();
 								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage曲読み込み;
-								this.tガベージコレクションを実行する();
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageSongLoading;
+								this.tExecuteGarbageCollection();
 								break;
 							#endregion
 
-							//case (int) E演奏画面の戻り値.再演奏:
-							#region [ 再読み込み無しで、再演奏 ]
-							#endregion
-							//	break;
 
 							case (int)EGameplayScreenReturnValue.Continue:
 								break;
 
 							case (int)EGameplayScreenReturnValue.PerformanceInterrupted:
-								#region [ 演奏キャンセル ]
+								#region [ Play cancelled ]
 								//-----------------------------
 
-								TJA.t全チップの再生停止();
+								TJA.tStopAllChips();
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								r現在のステージ.DeActivate();
+								rCurrentStage.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
+									rCurrentStage.ReleaseManagedResource();
+									rCurrentStage.ReleaseUnmanagedResource();
 								}
 
 								Trace.TraceInformation("----------------------");
@@ -1236,29 +1015,29 @@ for (int i = 0; i < 3; i++) {
 									OpenTaiko.latestSongSelect.CreateManagedResource();
 									OpenTaiko.latestSongSelect.CreateUnmanagedResource();
 								}
-								r直前のステージ = r現在のステージ;
+								rPreviousStage = rCurrentStage;
 
 								// Seek latest registered song select screen
-								r現在のステージ = OpenTaiko.latestSongSelect;
+								rCurrentStage = OpenTaiko.latestSongSelect;
 
-								this.tガベージコレクションを実行する();
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
 							case (int)EGameplayScreenReturnValue.StageFailed:
-								#region [ 演奏失敗(StageFailed) ]
+								#region [ Stage failed (skip results) ]
 								//-----------------------------
 
-								TJA.t全チップの再生停止();
+								TJA.tStopAllChips();
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								r現在のステージ.DeActivate();
+								rCurrentStage.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
+									rCurrentStage.ReleaseManagedResource();
+									rCurrentStage.ReleaseUnmanagedResource();
 								}
 
 								Trace.TraceInformation("----------------------");
@@ -1268,37 +1047,37 @@ for (int i = 0; i < 3; i++) {
 									stageSongSelect.CreateManagedResource();
 									stageSongSelect.CreateUnmanagedResource();
 								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageSongSelect;
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageSongSelect;
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
 
 							case (int)EGameplayScreenReturnValue.StageCleared:
-								#region [ 演奏クリア ]
+								#region [ Stage completed (go to results) ]
 								//-----------------------------
 
 								// Fetch the results of the finished play
 								CScoreIni.C演奏記録 c演奏記録_Drums;
-								stage演奏ドラム画面.t演奏結果を格納する(out c演奏記録_Drums);
+								stageGameScreen.t演奏結果を格納する(out c演奏記録_Drums);
 
-								r現在のステージ.DeActivate();
+								rCurrentStage.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
+									rCurrentStage.ReleaseManagedResource();
+									rCurrentStage.ReleaseUnmanagedResource();
 								}
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Results");
-								stage結果.st演奏記録.Drums = c演奏記録_Drums;
-								stage結果.Activate();
+								stageResults.st演奏記録.Drums = c演奏記録_Drums;
+								stageResults.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
-									stage結果.CreateManagedResource();
-									stage結果.CreateUnmanagedResource();
+									stageResults.CreateManagedResource();
+									stageResults.CreateUnmanagedResource();
 								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage結果;
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageResults;
 
 								break;
 								//-----------------------------
@@ -1311,40 +1090,18 @@ for (int i = 0; i < 3; i++) {
 					case CStage.EStage.Results:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
+						if (this.nDrawLoopReturnValue != 0) {
 							//DTX.t全チップの再生一時停止();
 							TJA.t全チップの再生停止とミキサーからの削除();
 							TJA.DeActivate();
 							TJA.ReleaseManagedResource();
 							TJA.ReleaseUnmanagedResource();
-							r現在のステージ.DeActivate();
+							rCurrentStage.DeActivate();
 							if (!ConfigIni.PreAssetsLoading) {
-								r現在のステージ.ReleaseManagedResource();
-								r現在のステージ.ReleaseUnmanagedResource();
+								rCurrentStage.ReleaseManagedResource();
+								rCurrentStage.ReleaseUnmanagedResource();
 							}
-							this.tガベージコレクションを実行する();
-
-
-							// After result screen
-
-							/*
-							if (stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)
-							{
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 段位選択");
-								stage段位選択.On活性化();
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage段位選択;
-							}
-							else
-							{
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ 選曲");
-								stage選曲.On活性化();
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage選曲;
-							}
-							*/
+							this.tExecuteGarbageCollection();
 
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Return to song select menu");
@@ -1353,14 +1110,14 @@ for (int i = 0; i < 3; i++) {
 								OpenTaiko.latestSongSelect.CreateManagedResource();
 								OpenTaiko.latestSongSelect.CreateUnmanagedResource();
 							}
-							r直前のステージ = r現在のステージ;
+							rPreviousStage = rCurrentStage;
 
 							// Seek latest registered song select screen
-							r現在のステージ = OpenTaiko.latestSongSelect;
+							rCurrentStage = OpenTaiko.latestSongSelect;
 
 							stageSongSelect.NowSong++;
 
-							this.tガベージコレクションを実行する();
+							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -1369,29 +1126,18 @@ for (int i = 0; i < 3; i++) {
 
 					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
-						switch (this.n進行描画の戻り値) {
+						switch (this.nDrawLoopReturnValue) {
 							case (int)EReturnValue.ReturnToTitle:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTitle);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Title");
-								stageタイトル.Activate();
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageタイトル;
 
-								/*
-								Skin.bgm選曲画面イン.t停止する();
-								Skin.bgm選曲画面.t停止する();
-								*/
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
 							#endregion
@@ -1399,23 +1145,12 @@ for (int i = 0; i < 3; i++) {
 							case (int)EReturnValue.SongChoosen:
 								#region [ *** ]
 								//-----------------------------
+								ChangeStage(stageSongLoading);
 								latestSongSelect = stageTowerSelect;
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Song Loading");
-								stage曲読み込み.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stage曲読み込み.CreateManagedResource();
-									stage曲読み込み.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stage曲読み込み;
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -1426,22 +1161,12 @@ for (int i = 0; i < 3; i++) {
 					case CStage.EStage.ChangeSkin:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
-							r現在のステージ.DeActivate();
-							if (!ConfigIni.PreAssetsLoading) {
-								r現在のステージ.ReleaseManagedResource();
-								r現在のステージ.ReleaseUnmanagedResource();
-							}
+						if (this.nDrawLoopReturnValue != 0) {
+							ChangeStage(stageSongSelect);
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Song Select");
-							stageSongSelect.Activate();
-							if (!ConfigIni.PreAssetsLoading) {
-								stageSongSelect.CreateManagedResource();
-								stageSongSelect.CreateUnmanagedResource();
-							}
-							r直前のステージ = r現在のステージ;
-							r現在のステージ = stageSongSelect;
-							this.tガベージコレクションを実行する();
+
+							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -1450,7 +1175,7 @@ for (int i = 0; i < 3; i++) {
 					case CStage.EStage.End:
 						#region [ *** ]
 						//-----------------------------
-						if (this.n進行描画の戻り値 != 0) {
+						if (this.nDrawLoopReturnValue != 0) {
 							base.Exit();
 							return;
 						}
@@ -1460,29 +1185,18 @@ for (int i = 0; i < 3; i++) {
 
 					default:
 						#region [ *** ]
-						switch (this.n進行描画の戻り値) {
-							case (int)CStage選曲.E戻り値.タイトルに戻る:
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								r現在のステージ.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									r現在のステージ.ReleaseManagedResource();
-									r現在のステージ.ReleaseUnmanagedResource();
-								}
+								ChangeStage(stageTitle);
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Title");
-								stageタイトル.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageタイトル.CreateManagedResource();
-									stageタイトル.CreateUnmanagedResource();
-								}
-								r直前のステージ = r現在のステージ;
-								r現在のステージ = stageタイトル;
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
 
-								this.tガベージコレクションを実行する();
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -1493,7 +1207,7 @@ for (int i = 0; i < 3; i++) {
 
 				actScanningLoudness?.Draw();
 
-				if (!ConfigIni.bTokkunMode) {
+				if (!ConfigIni.bTokkunMode && rCurrentStage.eStageID != CStage.EStage.CRASH) {
 					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
 					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
 
@@ -1515,23 +1229,29 @@ for (int i = 0; i < 3; i++) {
 					Camera = Matrix4X4<float>.Identity;
 				}
 
-				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && OpenTaiko.Tx.Network_Connection != null) {
-					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.前回のシステム時刻ms) > 10000) {
-						this.前回のシステム時刻ms = SoundManager.PlayTimer.SystemTimeMs;
+				if (rCurrentStage != null
+					&& rCurrentStage.eStageID != CStage.EStage.StartUp
+					&& rCurrentStage.eStageID != CStage.EStage.CRASH
+					&& OpenTaiko.Tx.Network_Connection != null) {
+					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
+						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
 						Task.Factory.StartNew(() => {
 							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
 							PingReply reply = new Ping().Send("8.8.8.8", 5000);
-							this.bネットワークに接続中 = reply.Status == IPStatus.Success;
+							this.bInternetConnectionSuccess = reply.Status == IPStatus.Success;
 						});
 					}
-					OpenTaiko.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bネットワークに接続中 ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
+					OpenTaiko.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bInternetConnectionSuccess ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
 				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
 				// Display log cards
-				VisualLogManager.Display();
+				VisualLogManager?.Display();
 
-				if (r現在のステージ != null && r現在のステージ.eStageID != CStage.EStage.StartUp && OpenTaiko.Tx.Overlay != null) {
+				if (rCurrentStage != null
+					&& rCurrentStage.eStageID != CStage.EStage.StartUp
+					&& rCurrentStage.eStageID != CStage.EStage.CRASH
+					&& OpenTaiko.Tx.Overlay != null) {
 					OpenTaiko.Tx.Overlay.t2D描画(0, 0);
 				}
 			}
@@ -1539,17 +1259,17 @@ for (int i = 0; i < 3; i++) {
 			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
-					if (r現在のステージ.eStageID != CStage.EStage.Game) {
+					if (rCurrentStage.eStageID != CStage.EStage.Game) {
 						RefreshSkin();
-						r現在のステージ.DeActivate();
+						rCurrentStage.DeActivate();
 						if (!ConfigIni.PreAssetsLoading) {
-							r現在のステージ.ReleaseManagedResource();
-							r現在のステージ.ReleaseUnmanagedResource();
+							rCurrentStage.ReleaseManagedResource();
+							rCurrentStage.ReleaseUnmanagedResource();
 						}
-						r現在のステージ.Activate();
+						rCurrentStage.Activate();
 						if (!ConfigIni.PreAssetsLoading) {
-							r現在のステージ.CreateManagedResource();
-							r現在のステージ.CreateUnmanagedResource();
+							rCurrentStage.CreateManagedResource();
+							rCurrentStage.CreateUnmanagedResource();
 						}
 					}
 				} else {
@@ -1567,22 +1287,22 @@ for (int i = 0; i < 3; i++) {
 #endif
 			}
 
-			#region [ 全画面_ウインドウ切り替え ]
-			if (this.b次のタイミングで全画面_ウィンドウ切り替えを行う) {
+			#region [ Fullscreen Toggle ]
+			if (this.bSwitchFullScreenAtNextFrame) {
 				ConfigIni.bFullScreen = !ConfigIni.bFullScreen;
 				app.ToggleWindowMode();
-				this.b次のタイミングで全画面_ウィンドウ切り替えを行う = false;
+				this.bSwitchFullScreenAtNextFrame = false;
 			}
 			#endregion
-			#region [ 垂直基線同期切り替え ]
-			if (this.b次のタイミングで垂直帰線同期切り替えを行う) {
+			#region [ VSync Toggle ]
+			if (this.bSwitchVSyncAtTheNextFrame) {
 				VSync = ConfigIni.bEnableVSync;
-				this.b次のタイミングで垂直帰線同期切り替えを行う = false;
+				this.bSwitchVSyncAtTheNextFrame = false;
 			}
 			#endregion
 
 #if DEBUG
-			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F11))
+			if (OpenTaiko.InputManager != null && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F11))
 				OpenTaiko.ConfigIni.DEBUG_bShowImgui = !OpenTaiko.ConfigIni.DEBUG_bShowImgui;
 			if (OpenTaiko.ConfigIni.DEBUG_bShowImgui)
 				ImGuiDebugWindow.Draw();
@@ -1752,14 +1472,14 @@ for (int i = 0; i < 3; i++) {
 	//-----------------
 	private bool bマウスカーソル表示中 = true;
 	private bool b終了処理完了済み;
-	public bool bネットワークに接続中 { get; private set; } = false;
-	private long 前回のシステム時刻ms = long.MinValue;
+	public bool bInternetConnectionSuccess { get; private set; } = false;
+	private long PreviousSystemTimeMs = long.MinValue;
 	private static CTja[] tja = new CTja[5];
 
 	public static TextureLoader Tx = new TextureLoader();
 
 	public List<CActivity> listTopLevelActivities;
-	private int n進行描画の戻り値;
+	private int nDrawLoopReturnValue;
 	private string strWindowTitle
 	// ayo komi isn't this useless code? - tfd500
 	{
@@ -1774,6 +1494,12 @@ for (int i = 0; i < 3; i++) {
 	}
 
 	private void t起動処理() {
+
+		// Load System error beforehand
+		this.listTopLevelActivities = new List<CActivity>();
+		SystemError = new CSystemError();
+		this.listTopLevelActivities.Add(SystemError);
+
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
@@ -1815,7 +1541,9 @@ for (int i = 0; i < 3; i++) {
 					"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
 					"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
 				};
-				Environment.Exit(1);
+				ConfigIni.bOutputLogs = false;
+				Trace.WriteLine(mes_writeErr);
+				// Environment.Exit(1);
 			}
 		}
 		Trace.WriteLine("");
@@ -1831,6 +1559,7 @@ for (int i = 0; i < 3; i++) {
 		#endregion
 
 		TJA = null;
+
 
 		#region [ Skin の初期化 ]
 		//---------------------
@@ -1851,7 +1580,9 @@ for (int i = 0; i < 3; i++) {
 			catch (Exception e)
 			{
 				Trace.TraceInformation( "Skin failed to initialize." );
-				throw;
+				TriggerSystemError(CSystemError.Errno.ENO_SKINNOTFOUND);
+				return;
+				//throw;
 			}
 			finally
 			{
@@ -1952,7 +1683,9 @@ for (int i = 0; i < 3; i++) {
 			Trace.TraceInformation("DirectInput has been initialized.");
 		} catch (Exception exception2) {
 			Trace.TraceError("DirectInput and MIDI input failed to initialize.");
-			throw;
+			TriggerSystemError(CSystemError.Errno.ENO_INPUTINITFAILED);
+			return;
+			//throw;
 		} finally {
 			Trace.Unindent();
 		}
@@ -1968,6 +1701,8 @@ for (int i = 0; i < 3; i++) {
 		} catch (Exception exception3) {
 			Trace.TraceError(exception3.ToString());
 			Trace.TraceError("Pad failed to initialize.");
+			TriggerSystemError(CSystemError.Errno.ENO_PADINITFAILED);
+			return;
 		} finally {
 			Trace.Unindent();
 		}
@@ -2037,7 +1772,9 @@ for (int i = 0; i < 3; i++) {
 			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
 			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
 		} catch (Exception e) {
-			throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
+			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE);
+			return;
+			// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 		} finally {
 			Trace.Unindent();
 		}
@@ -2056,6 +1793,8 @@ for (int i = 0; i < 3; i++) {
 		} catch (Exception e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Song list failed to initialize.");
+			TriggerSystemError(CSystemError.Errno.ENO_SONGLISTINITFAILED);
+			return;
 		} finally {
 			Trace.Unindent();
 		}
@@ -2068,40 +1807,40 @@ for (int i = 0; i < 3; i++) {
 		#endregion
 		#region [ Stages initialisation ]
 		//---------------------
-		r現在のステージ = null;
-		r直前のステージ = null;
-		stage起動 = new CStage起動();
-		stageタイトル = new CStageタイトル();
-		stageコンフィグ = new CStageコンフィグ();
-		stageSongSelect = new CStage選曲();
-		stage段位選択 = new CStage段位選択();
+		rCurrentStage = null;
+		rPreviousStage = null;
+		stageStartup = new CStage起動();
+		stageTitle = new CStageTitle();
+		stageConfig = new CStageコンフィグ();
+		stageSongSelect = new CStageSongSelect();
+		stageDanSongSelect = new CStage段位選択();
 		stageHeya = new CStageHeya();
 		stageOnlineLounge = new CStageOnlineLounge();
 		stageTowerSelect = new CStageTowerSelect();
-		stage曲読み込み = new CStage曲読み込み();
-		stage演奏ドラム画面 = new CStage演奏ドラム画面();
-		stage結果 = new CStage結果();
-		stage結果.RefreshSkin();
+		stageSongLoading = new CStage曲読み込み();
+		stageGameScreen = new CStage演奏ドラム画面();
+		stageResults = new CStage結果();
+		stageResults.RefreshSkin();
 		stageChangeSkin = new CStageChangeSkin();
-		stage終了 = new CStage終了();
+		stageExit = new CStage終了();
 		NamePlate = new CNamePlate();
 		SaveFile = 0;
-		this.listTopLevelActivities = new List<CActivity>();
+
 		this.listTopLevelActivities.Add(actEnumSongs);
 		this.listTopLevelActivities.Add(actTextConsole);
-		this.listTopLevelActivities.Add(stage起動);
-		this.listTopLevelActivities.Add(stageタイトル);
-		this.listTopLevelActivities.Add(stageコンフィグ);
+		this.listTopLevelActivities.Add(stageStartup);
+		this.listTopLevelActivities.Add(stageTitle);
+		this.listTopLevelActivities.Add(stageConfig);
 		this.listTopLevelActivities.Add(stageSongSelect);
-		this.listTopLevelActivities.Add(stage段位選択);
+		this.listTopLevelActivities.Add(stageDanSongSelect);
 		this.listTopLevelActivities.Add(stageHeya);
 		this.listTopLevelActivities.Add(stageOnlineLounge);
 		this.listTopLevelActivities.Add(stageTowerSelect);
-		this.listTopLevelActivities.Add(stage曲読み込み);
-		this.listTopLevelActivities.Add(stage演奏ドラム画面);
-		this.listTopLevelActivities.Add(stage結果);
+		this.listTopLevelActivities.Add(stageSongLoading);
+		this.listTopLevelActivities.Add(stageGameScreen);
+		this.listTopLevelActivities.Add(stageResults);
 		this.listTopLevelActivities.Add(stageChangeSkin);
-		this.listTopLevelActivities.Add(stage終了);
+		this.listTopLevelActivities.Add(stageExit);
 		//---------------------
 		#endregion
 
@@ -2123,17 +1862,16 @@ for (int i = 0; i < 3; i++) {
 
 		Trace.TraceInformation("Application successfully started.");
 
-
 		#region [ 最初のステージの起動 ]
 		//---------------------
 		Trace.TraceInformation("----------------------");
 		Trace.TraceInformation("■ Startup");
 
-		r現在のステージ = stage起動;
-		r現在のステージ.Activate();
+		rCurrentStage = stageStartup;
+		rCurrentStage.Activate();
 		if (!ConfigIni.PreAssetsLoading) {
-			r現在のステージ.CreateManagedResource();
-			r現在のステージ.CreateUnmanagedResource();
+			rCurrentStage.CreateManagedResource();
+			rCurrentStage.CreateUnmanagedResource();
 		}
 
 		//---------------------
@@ -2174,15 +1912,15 @@ for (int i = 0; i < 3; i++) {
 			#endregion
 			#region [ 現在のステージの終了処理 ]
 			//---------------------
-			if (OpenTaiko.r現在のステージ != null && OpenTaiko.r現在のステージ.IsActivated)     // #25398 2011.06.07 MODIFY FROM
+			if (OpenTaiko.rCurrentStage != null && OpenTaiko.rCurrentStage.IsActivated)     // #25398 2011.06.07 MODIFY FROM
 			{
 				Trace.TraceInformation("Exiting stage...");
 				Trace.Indent();
 				try {
-					r現在のステージ.DeActivate();
+					rCurrentStage.DeActivate();
 					if (!ConfigIni.PreAssetsLoading) {
-						r現在のステージ.ReleaseManagedResource();
-						r現在のステージ.ReleaseUnmanagedResource();
+						rCurrentStage.ReleaseManagedResource();
+						rCurrentStage.ReleaseUnmanagedResource();
 					}
 					Trace.TraceInformation("Stage exited.");
 				} finally {
@@ -2367,10 +2105,10 @@ for (int i = 0; i < 3; i++) {
 				SoundGroupLevelController = null;
 				SongGainController = null;
 				LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: true);
-				actScanningLoudness.DeActivate();
+				actScanningLoudness?.DeActivate();
 				if (!ConfigIni.PreAssetsLoading) {
-					actScanningLoudness.ReleaseManagedResource();
-					actScanningLoudness.ReleaseUnmanagedResource();
+					actScanningLoudness?.ReleaseManagedResource();
+					actScanningLoudness?.ReleaseUnmanagedResource();
 				}
 				actScanningLoudness = null;
 			} finally {
@@ -2387,7 +2125,7 @@ for (int i = 0; i < 3; i++) {
 		}
 	}
 
-	private void tガベージコレクションを実行する() {
+	private void tExecuteGarbageCollection() {
 		GC.Collect(GC.MaxGeneration);
 		GC.WaitForPendingFinalizers();
 		GC.Collect(GC.MaxGeneration);
@@ -2421,7 +2159,7 @@ for (int i = 0; i < 3; i++) {
 		actTextConsole.CreateManagedResource();
 		actTextConsole.CreateUnmanagedResource();
 		OpenTaiko.NamePlate.RefleshSkin();
-		OpenTaiko.stage結果.RefreshSkin();
+		OpenTaiko.stageResults.RefreshSkin();
 		CActSelectPopupMenu.RefleshSkin();
 		CActSelect段位リスト.RefleshSkin();
 	}

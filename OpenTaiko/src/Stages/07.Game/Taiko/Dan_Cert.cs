@@ -61,16 +61,16 @@ internal class Dan_Cert : CActivity {
 
 		ScreenPoint = new double[] { OpenTaiko.Skin.Game_Lane_X[0] - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Resolution[0] };
 
-		OpenTaiko.stage演奏ドラム画面.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff);
+		OpenTaiko.stageGameScreen.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff);
 
-		OpenTaiko.stage演奏ドラム画面.ftDanReSetScoreNiji(OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber], OpenTaiko.TJA.nDan_BalloonCount[NowShowingNumber]);
-		OpenTaiko.stage演奏ドラム画面.ftDanReSetBranches(OpenTaiko.TJA.bHasBranchDan[NowShowingNumber]);
+		OpenTaiko.stageGameScreen.ftDanReSetScoreNiji(OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber], OpenTaiko.TJA.nDan_BalloonCount[NowShowingNumber]);
+		OpenTaiko.stageGameScreen.ftDanReSetBranches(OpenTaiko.TJA.bHasBranchDan[NowShowingNumber]);
 
 		IsAnimating = true;
 
 		//段位道場
 		//TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
-		OpenTaiko.stage演奏ドラム画面.actPanel.SetPanelString(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].Title,
+		OpenTaiko.stageGameScreen.actPanel.SetPanelString(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].Title,
 			CLangManager.LangInstance.GetString("TITLE_MODE_DAN"),
 			1 + NowShowingNumber + "曲目");
 
@@ -89,8 +89,8 @@ internal class Dan_Cert : CActivity {
 			}
 		}
 
-		if (OpenTaiko.stage演奏ドラム画面.ListDan_Number >= 1 && FirstSectionAnime)
-			OpenTaiko.stage演奏ドラム画面.ListDan_Number = 0;
+		if (OpenTaiko.stageGameScreen.ListDan_Number >= 1 && FirstSectionAnime)
+			OpenTaiko.stageGameScreen.ListDan_Number = 0;
 
 		FirstSectionAnime = false;
 		// 始点を決定する。
@@ -134,28 +134,28 @@ internal class Dan_Cert : CActivity {
 			var oldReached = Challenge[i].GetReached();
 			var isChangedAmount = false;
 
-			int totalGoods = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect;
-			int totalOks = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great;
-			int totalBads = (int)OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Miss;
-			int totalCombo = (int)OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0];
+			int totalGoods = (int)OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect;
+			int totalOks = (int)OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Great + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great;
+			int totalBads = (int)OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Miss;
+			int totalCombo = (int)OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0];
 
-			int individualGoods = OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber];
-			int individualOks = OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber];
-			int individualBads = OpenTaiko.stage演奏ドラム画面.nBad[NowShowingNumber];
-			int individualCombo = OpenTaiko.stage演奏ドラム画面.nHighestCombo[NowShowingNumber];
+			int individualGoods = OpenTaiko.stageGameScreen.nGood[NowShowingNumber];
+			int individualOks = OpenTaiko.stageGameScreen.nOk[NowShowingNumber];
+			int individualBads = OpenTaiko.stageGameScreen.nBad[NowShowingNumber];
+			int individualCombo = OpenTaiko.stageGameScreen.nHighestCombo[NowShowingNumber];
 
-			int totalADLIBs = OpenTaiko.stage演奏ドラム画面.CChartScore[0].nADLIB;
-			int totalMines = OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine;
+			int totalADLIBs = OpenTaiko.stageGameScreen.CChartScore[0].nADLIB;
+			int totalMines = OpenTaiko.stageGameScreen.CChartScore[0].nMine;
 
-			int individualADLIBs = OpenTaiko.stage演奏ドラム画面.nADLIB[NowShowingNumber];
-			int individualMines = OpenTaiko.stage演奏ドラム画面.nMine[NowShowingNumber];
+			int individualADLIBs = OpenTaiko.stageGameScreen.nADLIB[NowShowingNumber];
+			int individualMines = OpenTaiko.stageGameScreen.nMine[NowShowingNumber];
 
 			double accuracy = (totalGoods * 100 + totalOks * 50) / (double)(totalGoods + totalOks + totalBads);
 			double individualAccuracy = (individualGoods * 100 + individualOks * 50) / (double)(individualGoods + individualOks + individualBads);
 
 			switch (Challenge[i].GetExamType()) {
 				case Exam.Type.Gauge:
-					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[0]);
+					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0]);
 					break;
 				case Exam.Type.JudgePerfect:
 					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualGoods : totalGoods);
@@ -173,13 +173,13 @@ internal class Dan_Cert : CActivity {
 					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualMines : totalMines);
 					break;
 				case Exam.Type.Score:
-					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stage演奏ドラム画面.actScore.GetScore(0));
+					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stageGameScreen.actScore.GetScore(0));
 					break;
 				case Exam.Type.Roll:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.nRoll[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
+					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stageGameScreen.nRoll[NowShowingNumber] : (int)(OpenTaiko.stageGameScreen.GetRoll(0)));
 					break;
 				case Exam.Type.Hit:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber] + OpenTaiko.stage演奏ドラム画面.nRoll[NowShowingNumber] : (int)(OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stage演奏ドラム画面.nHitCount_InclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.nHitCount_ExclAuto.Drums.Great + OpenTaiko.stage演奏ドラム画面.GetRoll(0)));
+					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stageGameScreen.nGood[NowShowingNumber] + OpenTaiko.stageGameScreen.nOk[NowShowingNumber] + OpenTaiko.stageGameScreen.nRoll[NowShowingNumber] : (int)(OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Great + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great + OpenTaiko.stageGameScreen.GetRoll(0)));
 					break;
 				case Exam.Type.Combo:
 					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualCombo : totalCombo);
@@ -206,9 +206,9 @@ internal class Dan_Cert : CActivity {
 				Challenge[i].SetReached(!Challenge[i].IsCleared[0]);
 			} else {
 				songsnotesremain[NowShowingNumber] = OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber]
-													 - (OpenTaiko.stage演奏ドラム画面.nGood[NowShowingNumber]
-														+ OpenTaiko.stage演奏ドラム画面.nOk[NowShowingNumber]
-														+ OpenTaiko.stage演奏ドラム画面.nBad[NowShowingNumber]);
+													 - (OpenTaiko.stageGameScreen.nGood[NowShowingNumber]
+														+ OpenTaiko.stageGameScreen.nOk[NowShowingNumber]
+														+ OpenTaiko.stageGameScreen.nBad[NowShowingNumber]);
 
 				/*
                 notesremain = TJAPlayer3.DTX.nノーツ数[3]
@@ -221,9 +221,9 @@ internal class Dan_Cert : CActivity {
                 */
 
 				notesremain = OpenTaiko.TJA.nノーツ数[3]
-							  - (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
-								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
-								 + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss);
+							  - (OpenTaiko.stageGameScreen.CChartScore[0].nGood
+								 + OpenTaiko.stageGameScreen.CChartScore[0].nGreat
+								 + OpenTaiko.stageGameScreen.CChartScore[0].nMiss);
 
 				// 残り音符数が0になったときに判断されるやつ
 
@@ -253,8 +253,8 @@ internal class Dan_Cert : CActivity {
 								: notesremain < (Challenge[i].Value[0] - Challenge[i].Amount)) Challenge[i].SetReached(true);
 						break;
 					case Exam.Type.Combo:
-						if (notesremain + OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.P1 < ((Challenge[i].Value[0]))
-							&& OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
+						if (notesremain + OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1 < ((Challenge[i].Value[0]))
+							&& OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0] < (Challenge[i].Value[0])) Challenge[i].SetReached(true);
 						break;
 					default:
 						break;

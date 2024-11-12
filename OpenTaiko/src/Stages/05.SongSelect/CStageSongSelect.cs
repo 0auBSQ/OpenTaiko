@@ -74,7 +74,7 @@ static internal class CSongSelectSongManager {
 
 #endregion
 
-internal class CStage選曲 : CStage {
+internal class CStageSongSelect : CStage {
 	// Properties
 	public int nスクロールバー相対y座標 {
 		get {
@@ -137,7 +137,7 @@ internal class CStage選曲 : CStage {
 	}
 
 	// コンストラクタ
-	public CStage選曲() {
+	public CStageSongSelect() {
 		base.eStageID = CStage.EStage.SongSelect;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		base.IsDeActivated = true;
@@ -247,7 +247,7 @@ internal class CStage選曲 : CStage {
 		Trace.Indent();
 		try {
 			nChoosenSongDifficulty = new int[5];
-			this.eフェードアウト完了時の戻り値 = E戻り値.継続;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.継続;
 
 			// BGM played
 			this.bBGM再生済み = false;
@@ -351,7 +351,7 @@ internal class CStage選曲 : CStage {
 			//---------------------
 			if (base.IsFirstDraw) {
 				this.ct登場時アニメ用共通 = new CCounter(0, 100, 3, OpenTaiko.Timer);
-				if (OpenTaiko.r直前のステージ == OpenTaiko.stage結果) {
+				if (OpenTaiko.rPreviousStage == OpenTaiko.stageResults) {
 					this.actFIfrom結果画面.tフェードイン開始();
 					base.ePhaseID = CStage.EPhase.SongSelect_FadeInFromResults;
 				} else {
@@ -708,7 +708,7 @@ internal class CStage選曲 : CStage {
 				if (actQuickConfig.bGotoDetailConfig) {   // 詳細CONFIG呼び出し
 					actQuickConfig.tDeativatePopupMenu();
 					this.actPresound.tStopSound();
-					this.eフェードアウト完了時の戻り値 = E戻り値.コンフィグ呼び出し;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
+					this.eフェードアウト完了時の戻り値 = EReturnValue.ConfigMenuOpened;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
 					this.actFIFO.tフェードアウト開始();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
@@ -767,7 +767,7 @@ internal class CStage選曲 : CStage {
 							CSongSelectSongManager.enable();
 
 							OpenTaiko.Skin.soundCancelSFX.tPlay();
-							this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
+							this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 							this.actFIFO.tフェードアウト開始();
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							return 0;
@@ -789,7 +789,7 @@ internal class CStage選曲 : CStage {
 					if ((OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
 						OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {   // [SHIFT] + [F1] CONFIG
 						this.actPresound.tStopSound();
-						this.eフェードアウト完了時の戻り値 = E戻り値.コンフィグ呼び出し;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
+						this.eフェードアウト完了時の戻り値 = EReturnValue.ConfigMenuOpened;  // #24525 2011.3.16 yyagi: [SHIFT]-[F1]でCONFIG呼び出し
 						this.actFIFO.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
@@ -1156,13 +1156,13 @@ internal class CStage選曲 : CStage {
 		}
 		return 0;
 	}
-	public enum E戻り値 : int {
+	public enum EReturnValue : int {
 		継続,
-		タイトルに戻る,
-		選曲した,
+		BackToTitle,
+		SongSelected,
 		オプション呼び出し,
-		コンフィグ呼び出し,
-		スキン変更
+		ConfigMenuOpened,
+		SkinChange
 	}
 
 
@@ -1254,7 +1254,7 @@ internal class CStage選曲 : CStage {
 	public CCounter ct登場時アニメ用共通;
 	private CCounter ctOldBGScroll;
 	private CCounter ct背景スクロール用タイマー;
-	private E戻り値 eフェードアウト完了時の戻り値;
+	private EReturnValue eフェードアウト完了時の戻り値;
 	private CCachedFontRenderer ftフォント;
 	//private CTexture tx下部パネル;
 	//private CTexture tx上部パネル;
@@ -1557,7 +1557,7 @@ internal class CStage選曲 : CStage {
 		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
 
 		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}
@@ -1573,7 +1573,7 @@ internal class CStage選曲 : CStage {
 		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
 
 		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = E戻り値.選曲した;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}

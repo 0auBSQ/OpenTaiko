@@ -208,7 +208,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		try {
 			#region [ 0) システムサウンドの構築  ]
 			//-----------------------------
-			OpenTaiko.stage起動.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
+			OpenTaiko.stageStartup.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
 
 			Trace.TraceInformation("0) システムサウンドを構築します。");
 			Trace.Indent();
@@ -236,8 +236,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 						}
 					}
 				}
-				lock (OpenTaiko.stage起動.list進行文字列) {
-					OpenTaiko.stage起動.list進行文字列.Add("SYSTEM SOUND...OK");
+				lock (OpenTaiko.stageStartup.list進行文字列) {
+					OpenTaiko.stageStartup.list進行文字列.Add("SYSTEM SOUND...OK");
 				}
 			} finally {
 				Trace.Unindent();
@@ -246,7 +246,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			#endregion
 
 		} finally {
-			OpenTaiko.stage起動.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
+			OpenTaiko.stageStartup.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 			TimeSpan span = (TimeSpan)(DateTime.Now - now);
 			Trace.TraceInformation("起動所要時間: {0}", span.ToString());
 			lock (this)                         // #28700 2012.6.12 yyagi; state change must be in finally{} for exiting as of compact mode.

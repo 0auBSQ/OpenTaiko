@@ -14,9 +14,9 @@ class CMainMenuTab {
 	public bool implemented;
 	public CTexture barTex;
 	public CTexture barChara;
-	public CStageタイトル.E戻り値 rp;
+	public CStageTitle.EReturnValue rp;
 
-	public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CStageタイトル.E戻り値 returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
+	public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CStageTitle.EReturnValue returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
 		string title = GetBoxText(boxId);
 
 		ttkTitle = new TitleTextureKey(title, tpf, Color.White, col, 1280, Color.Black);
@@ -101,22 +101,22 @@ class CMainMenuTab {
 
 			#region [Return points]
 
-			CStageタイトル.E戻り値[] __rps =
+			CStageTitle.EReturnValue[] __rps =
 			{
-				CStageタイトル.E戻り値.GAMESTART,
-				CStageタイトル.E戻り値.DANGAMESTART,
-				CStageタイトル.E戻り値.TAIKOTOWERSSTART,
-				CStageタイトル.E戻り値.SHOPSTART,
-				CStageタイトル.E戻り値.BOUKENSTART,
-				CStageタイトル.E戻り値.HEYA,
-				CStageタイトル.E戻り値.CONFIG,
-				CStageタイトル.E戻り値.EXIT,
-				CStageタイトル.E戻り値.ONLINELOUNGE,
-				CStageタイトル.E戻り値.ENCYCLOPEDIA,
-				CStageタイトル.E戻り値.AIBATTLEMODE,
-				CStageタイトル.E戻り値.PLAYERSTATS,
-				CStageタイトル.E戻り値.CHARTEDITOR,
-				CStageタイトル.E戻り値.TOOLBOX,
+				CStageTitle.EReturnValue.GAMESTART,
+				CStageTitle.EReturnValue.DANGAMESTART,
+				CStageTitle.EReturnValue.TAIKOTOWERSSTART,
+				CStageTitle.EReturnValue.SHOPSTART,
+				CStageTitle.EReturnValue.BOUKENSTART,
+				CStageTitle.EReturnValue.HEYA,
+				CStageTitle.EReturnValue.CONFIG,
+				CStageTitle.EReturnValue.EXIT,
+				CStageTitle.EReturnValue.ONLINELOUNGE,
+				CStageTitle.EReturnValue.ENCYCLOPEDIA,
+				CStageTitle.EReturnValue.AIBATTLEMODE,
+				CStageTitle.EReturnValue.PLAYERSTATS,
+				CStageTitle.EReturnValue.CHARTEDITOR,
+				CStageTitle.EReturnValue.TOOLBOX,
 			};
 
 			#endregion
@@ -163,7 +163,7 @@ class CMainMenuTab {
 			#endregion
 
 			for (int i = 0; i < __MenuCount; i++) {
-				CStageタイトル.E戻り値 _rp = (i >= __rps.Length) ? CStageタイトル.E戻り値.GAMESTART : __rps[i];
+				CStageTitle.EReturnValue _rp = (i >= __rps.Length) ? CStageTitle.EReturnValue.GAMESTART : __rps[i];
 				Color _mc = (i >= __MenuColors.Length) ? Color.White : __MenuColors[i];
 				bool _1pr = (i >= _1PRestricts.Length) ? false : _1PRestricts[i];
 				bool _impl = (i >= _implemented.Length) ? false : _implemented[i];

@@ -30,8 +30,8 @@ internal class CActImplClearAnimation : CActivity {
 		// モードの決定。クリア失敗・フルコンボも事前に作っとく。
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			if (CFloorManagement.CurrentNumberOfLives > 0) {
-				if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
+					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.Tower_TopReached_Perfect;
 					else
 						this.Mode[0] = EndMode.Tower_TopReached_FullCombo;
@@ -41,14 +41,14 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!OpenTaiko.stage演奏ドラム画面.actDan.GetFailedAllChallenges()) {
+			if (!OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges()) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
 
-				bool bgold = OpenTaiko.stage演奏ドラム画面.actDan.GetExamStatus(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
+				bool bgold = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
 
-				if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
+					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
 					else
 						this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
@@ -61,9 +61,9 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Dan_Fail;
 			}
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			if (OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin) {
-				if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0) {
-					if (OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0)
+			if (OpenTaiko.stageGameScreen.bIsAIBattleWin) {
+				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
+					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.AI_Win_Perfect;
 					else
 						this.Mode[0] = EndMode.AI_Win_FullCombo;
@@ -78,10 +78,10 @@ internal class CActImplClearAnimation : CActivity {
 			// 今の段階では魂ゲージ80%以上でチェック。
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-					if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMine == 0)
+					if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[i].nMine == 0)
 					//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 					{
-						if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood == 0)
+						if (OpenTaiko.stageGameScreen.CChartScore[i].nGood == 0)
 						//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
 						{
 							this.Mode[i] = EndMode.StagePerfectCombo;
@@ -280,7 +280,7 @@ internal class CActImplClearAnimation : CActivity {
 	#region [effects]
 	// ------------------------------------
 	private void showEndEffect_Failed(int i) {
-		if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) FailedScript.Update(i);
+		if (!OpenTaiko.stageGameScreen.bPAUSE) FailedScript.Update(i);
 		FailedScript.Draw(i);
 
 		int[] y = new int[] { 0, 176 };
@@ -307,7 +307,7 @@ internal class CActImplClearAnimation : CActivity {
         */
 	}
 	private void showEndEffect_Clear(int i) {
-		if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) ClearScript.Update(i);
+		if (!OpenTaiko.stageGameScreen.bPAUSE) ClearScript.Update(i);
 		ClearScript.Draw(i);
 
 		/*
@@ -483,7 +483,7 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	private void showEndEffect_FullCombo(int i) {
-		if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) FullComboScript.Update(i);
+		if (!OpenTaiko.stageGameScreen.bPAUSE) FullComboScript.Update(i);
 		FullComboScript.Draw(i);
 
 		/*
@@ -501,7 +501,7 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	private void showEndEffect_PerfectCombo(int i) {
-		if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) PerfectComboScript.Update(i);
+		if (!OpenTaiko.stageGameScreen.bPAUSE) PerfectComboScript.Update(i);
 		PerfectComboScript.Draw(i);
 
 		/*
@@ -526,7 +526,7 @@ internal class CActImplClearAnimation : CActivity {
 		if (base.IsFirstDraw) {
 			base.IsFirstDraw = false;
 		}
-		if (this.ct進行メイン != null && (OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || OpenTaiko.stage演奏ドラム画面.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
+		if (this.ct進行メイン != null && (OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
 			this.ct進行メイン.Tick();
 
 			//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.灰, this.ct進行メイン.n現在の値.ToString() );
@@ -663,65 +663,65 @@ internal class CActImplClearAnimation : CActivity {
 						break;
 
 					case EndMode.AI_Win:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWinScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWinScript.Update(i);
 						AIWinScript.Draw(i);
 						break;
 					case EndMode.AI_Lose:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AILoseScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) AILoseScript.Update(i);
 						AILoseScript.Draw(i);
 						break;
 					case EndMode.AI_Win_FullCombo:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWin_FullComboScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_FullComboScript.Update(i);
 						AIWin_FullComboScript.Draw(i);
 						break;
 					case EndMode.AI_Win_Perfect:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) AIWin_PerfectScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_PerfectScript.Update(i);
 						AIWin_PerfectScript.Draw(i);
 						break;
 
 					case EndMode.Tower_Dropout:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_DropoutScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_DropoutScript.Update(i);
 						Tower_DropoutScript.Draw(i);
 						break;
 					case EndMode.Tower_TopReached_Pass:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PassScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PassScript.Update(i);
 						Tower_TopReached_PassScript.Draw(i);
 						break;
 					case EndMode.Tower_TopReached_FullCombo:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
 						Tower_TopReached_FullComboScript.Draw(i);
 						break;
 					case EndMode.Tower_TopReached_Perfect:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
 						Tower_TopReached_PerfectScript.Draw(i);
 						break;
 
 					case EndMode.Dan_Fail:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_FailScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_FailScript.Update(i);
 						Dan_FailScript.Draw(i);
 						break;
 					case EndMode.Dan_Red_Pass:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_PassScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PassScript.Update(i);
 						Dan_Red_PassScript.Draw(i);
 						break;
 					case EndMode.Dan_Red_FullCombo:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_FullComboScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_FullComboScript.Update(i);
 						Dan_Red_FullComboScript.Draw(i);
 						break;
 					case EndMode.Dan_Red_Perfect:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Red_PerfectScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PerfectScript.Update(i);
 						Dan_Red_PerfectScript.Draw(i);
 						break;
 					case EndMode.Dan_Gold_Pass:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_PassScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PassScript.Update(i);
 						Dan_Gold_PassScript.Draw(i);
 						break;
 					case EndMode.Dan_Gold_FullCombo:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_FullComboScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_FullComboScript.Update(i);
 						Dan_Gold_FullComboScript.Draw(i);
 						break;
 					case EndMode.Dan_Gold_Perfect:
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) Dan_Gold_PerfectScript.Update(i);
+						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PerfectScript.Update(i);
 						Dan_Gold_PerfectScript.Draw(i);
 						break;
 					default:

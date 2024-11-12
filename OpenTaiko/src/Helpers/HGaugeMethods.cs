@@ -407,7 +407,7 @@ class HGaugeMethods {
 			(Difficulty)_dif,
 			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif],
 			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
-			(float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player],
+			(float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
 		);
 	}
@@ -415,7 +415,7 @@ class HGaugeMethods {
 	public static bool UNSAFE_IsRainbow(int player) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		if (tGetGaugeTypeEnum(chara.effect.tGetGaugeType()) != EGaugeType.NORMAL) return false;
-		return (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player] >= 100f;
+		return (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player] >= 100f;
 	}
 
 	public static float UNSAFE_KillZonePercent(int player) {
@@ -430,7 +430,7 @@ class HGaugeMethods {
 		};
 
 		// Total hits and perfect hits
-		int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
+		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
 		int totalHits = dtxs[player].nノーツ数[3];
 
 		// Difficulty
@@ -530,7 +530,7 @@ class HGaugeMethods {
 		}
 
 		// Total hits and perfect hits
-		int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
+		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
 		int totalHits = dtxs[player].nノーツ数[3];
 
 		// Scale
@@ -545,7 +545,7 @@ class HGaugeMethods {
 		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif];
 
 		// Current percent
-		float currentPercent = (float)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[player];
+		float currentPercent = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player];
 
 		// Gauge type
 		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
@@ -608,7 +608,7 @@ class HGaugeMethods {
 		GaugeBox = new int[] { OpenTaiko.Skin.Result_Gauge_Rect[0], OpenTaiko.Skin.Result_Gauge_Rect[1], OpenTaiko.Skin.Result_Gauge_Rect[2], OpenTaiko.Skin.Result_Gauge_Rect[3] };
 
 		// Total hits and perfect hits
-		int perfectHits = OpenTaiko.stage演奏ドラム画面.CChartScore[player].nGreat;
+		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
 		int totalHits = dtxs[player].nノーツ数[3];
 
 		// Gauge type

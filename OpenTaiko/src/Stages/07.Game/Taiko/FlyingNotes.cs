@@ -79,8 +79,8 @@ internal class FlyingNotes : CActivity {
 					if (Flying[i].Counter.IsEnded) {
 						Flying[i].Counter.Stop();
 						Flying[i].IsUsing = false;
-						OpenTaiko.stage演奏ドラム画面.actGauge.Start(Flying[i].Lane, ENoteJudge.Perfect, Flying[i].Player);
-						OpenTaiko.stage演奏ドラム画面.actChipEffects.Start(Flying[i].Player, Flying[i].Lane);
+						OpenTaiko.stageGameScreen.actGauge.Start(Flying[i].Lane, ENoteJudge.Perfect, Flying[i].Player);
+						OpenTaiko.stageGameScreen.actChipEffects.Start(Flying[i].Player, Flying[i].Lane);
 					}
 					for (int n = Flying[i].OldValue; n < Flying[i].Counter.CurrentValue; n += 16) {
 						int endX;
@@ -111,8 +111,8 @@ internal class FlyingNotes : CActivity {
 
 						double value = (Flying[i].Counter.CurrentValue / 140.0);
 
-						Flying[i].X = StartPointX[Flying[i].Player] + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(Flying[i].Player) + (movingDistanceX * value);
-						Flying[i].Y = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(Flying[i].Player) + (int)(movingDistanceY * value);
+						Flying[i].X = StartPointX[Flying[i].Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLX(Flying[i].Player) + (movingDistanceX * value);
+						Flying[i].Y = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[Flying[i].Player] + OpenTaiko.stageGameScreen.GetJPOSCROLLY(Flying[i].Player) + (int)(movingDistanceY * value);
 
 						if (OpenTaiko.ConfigIni.bAIBattleMode) {
 							Flying[i].Y += Math.Sin(value * Math.PI) * ((Flying[i].Player == 0 ? -OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine : OpenTaiko.Skin.Game_Effect_FlyingNotes_Sine) / 3.0);
@@ -126,7 +126,7 @@ internal class FlyingNotes : CActivity {
 
 						if (n % OpenTaiko.Skin.Game_Effect_FireWorks_Timing == 0 && !Flying[i].IsRoll && Flying[i].Counter.CurrentValue > 18) {
 							if (Flying[i].Lane == 3 || Flying[i].Lane == 4) {
-								OpenTaiko.stage演奏ドラム画面.FireWorks.Start(Flying[i].Lane, Flying[i].Player, Flying[i].X, Flying[i].Y);
+								OpenTaiko.stageGameScreen.FireWorks.Start(Flying[i].Lane, Flying[i].Player, Flying[i].X, Flying[i].Y);
 							}
 						}
 

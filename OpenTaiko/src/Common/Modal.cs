@@ -8,7 +8,7 @@ internal class Modal {
 	}
 
 	public void tRegisterModal(int player) {
-		OpenTaiko.stage結果.lcModal.RegisterNewModal(player, rarity, modalType, reference);
+		OpenTaiko.stageResults.lcModal.RegisterNewModal(player, rarity, modalType, reference);
 	}
 
 	#region [Enum definitions]

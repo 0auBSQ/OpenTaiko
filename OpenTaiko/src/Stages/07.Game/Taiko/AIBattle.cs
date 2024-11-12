@@ -51,9 +51,9 @@ class AIBattle : CStage {
 				new System.Drawing.RectangleF(0, 0, barTex.szTextureSize.Width * length, barTex.szTextureSize.Height));
 		}
 
-		var nowSection = OpenTaiko.stage演奏ドラム画面.NowAIBattleSection;
+		var nowSection = OpenTaiko.stageGameScreen.NowAIBattleSection;
 
-		float nowLength = OpenTaiko.stage演奏ドラム画面.NowAIBattleSectionTime / (float)nowSection.Length;
+		float nowLength = OpenTaiko.stageGameScreen.NowAIBattleSectionTime / (float)nowSection.Length;
 		nowLength = Math.Min(nowLength, 1.0f);
 
 		if (nowLength < 0.75) {
@@ -63,7 +63,7 @@ class AIBattle : CStage {
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Finish, nowLength);
 		}
 
-		for (int i = 0; i < OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count; i++) {
+		for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
 			int upDown = (i % 2);
 
 			int base_width = OpenTaiko.Tx.AIBattle_Batch_Base.szTextureSize.Width / 6;
@@ -76,7 +76,7 @@ class AIBattle : CStage {
 
 			if (i == 0) {
 				nowBatchBaseRectX = 2 + (upDown == 0 ? 0 : 1);
-			} else if (i == OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count - 1) {
+			} else if (i == OpenTaiko.stageGameScreen.AIBattleSections.Count - 1) {
 				nowBatchBaseRectX = 4 + (upDown == 0 ? 0 : 1);
 			} else {
 				nowBatchBaseRectX = (upDown == 0 ? 0 : 1);
@@ -85,9 +85,9 @@ class AIBattle : CStage {
 			OpenTaiko.Tx.AIBattle_Batch_Base?.t2D描画(base_x, base_y, new System.Drawing.RectangleF(base_width * nowBatchBaseRectX, 0, base_width, base_height));
 		}
 
-		for (int i = 0; i < OpenTaiko.stage演奏ドラム画面.NowAIBattleSectionCount; i++) {
+		for (int i = 0; i < OpenTaiko.stageGameScreen.NowAIBattleSectionCount; i++) {
 
-			var section = OpenTaiko.stage演奏ドラム画面.AIBattleSections[i];
+			var section = OpenTaiko.stageGameScreen.AIBattleSections[i];
 
 			int upDown = (i % 2);
 
@@ -147,10 +147,10 @@ class AIBattle : CStage {
 
 			int[] numArr = new int[4]
 			{
-				OpenTaiko.stage演奏ドラム画面.CSectionScore[player].nGreat,
-				OpenTaiko.stage演奏ドラム画面.CSectionScore[player].nGood,
-				OpenTaiko.stage演奏ドラム画面.CSectionScore[player].nMiss,
-				OpenTaiko.stage演奏ドラム画面.CSectionScore[player].nRoll
+				OpenTaiko.stageGameScreen.CSectionScore[player].nGreat,
+				OpenTaiko.stageGameScreen.CSectionScore[player].nGood,
+				OpenTaiko.stageGameScreen.CSectionScore[player].nMiss,
+				OpenTaiko.stageGameScreen.CSectionScore[player].nRoll
 			};
 
 			int[] num_x = new int[4]

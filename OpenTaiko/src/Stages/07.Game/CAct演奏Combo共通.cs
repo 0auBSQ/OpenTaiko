@@ -396,7 +396,7 @@ internal class CAct演奏Combo共通 : CActivity {
 			OpenTaiko.Tx.Taiko_Combo_Text?.t2D拡大率考慮下中心基準描画(combo_text_x, combo_text_y);
 
 			int guide = 2;
-			var ccf = OpenTaiko.stage演奏ドラム画面.CChartScore[nPlayer];
+			var ccf = OpenTaiko.stageGameScreen.CChartScore[nPlayer];
 
 			if (ccf.nGood > 0)
 				guide = 1;

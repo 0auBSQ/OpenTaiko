@@ -82,8 +82,8 @@ internal class CStage結果 : CStage {
 			progress >= 0.5,
 			progress >= 0.75,
 			progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
-			OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss == 0 && OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMine == 0,
-			OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood == 0
+			OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0,
+			OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0
 		};
 
 		for (int i = 0; i < conditions.Length; i++) {
@@ -163,7 +163,7 @@ internal class CStage結果 : CStage {
 
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 					for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-						var ccf = OpenTaiko.stage演奏ドラム画面.CChartScore[p];
+						var ccf = OpenTaiko.stageGameScreen.CChartScore[p];
 
 						this.nクリア[p] = 0;
 						if (HGaugeMethods.UNSAFE_FastNormaCheck(p)) {
@@ -179,13 +179,13 @@ internal class CStage結果 : CStage {
 
 						}
 
-						if ((int)OpenTaiko.stage演奏ドラム画面.actScore.Get(p) < 500000) {
+						if ((int)OpenTaiko.stageGameScreen.actScore.Get(p) < 500000) {
 							this.nスコアランク[p] = 0;
 						} else {
-							var sr = OpenTaiko.stage演奏ドラム画面.ScoreRank.ScoreRank[p];
+							var sr = OpenTaiko.stageGameScreen.ScoreRank.ScoreRank[p];
 
 							for (int i = 0; i < 7; i++) {
-								if ((int)OpenTaiko.stage演奏ドラム画面.actScore.Get(p) >= sr[i]) {
+								if ((int)OpenTaiko.stageGameScreen.actScore.Get(p) >= sr[i]) {
 									this.nスコアランク[p] = i + 1;
 								}
 							}
@@ -235,7 +235,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stage演奏ドラム画面.actDan.GetExamStatus(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
 
 					int clearValue = 0;
 
@@ -425,7 +425,7 @@ internal class CStage結果 : CStage {
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stage演奏ドラム画面.actDan.GetExamStatus(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C);
+				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -487,9 +487,9 @@ internal class CStage結果 : CStage {
 
 					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 						clearModifier = modifiers[1] * diffModifier;
-						if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss == 0) {
+						if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0) {
 							clearModifier = modifiers[2] * diffModifier;
-							if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood == 0)
+							if (OpenTaiko.stageGameScreen.CChartScore[i].nGood == 0)
 								clearModifier = modifiers[3] * diffModifier;
 						}
 					}
@@ -505,15 +505,15 @@ internal class CStage結果 : CStage {
 					int scoreRankModifier = srModifiers[0] * diffModifier;
 
 					for (int j = 1; j < 8; j++) {
-						if (OpenTaiko.stage演奏ドラム画面.actScore.GetScore(i) >= OpenTaiko.stage演奏ドラム画面.ScoreRank.ScoreRank[i][j - 1])
+						if (OpenTaiko.stageGameScreen.actScore.GetScore(i) >= OpenTaiko.stageGameScreen.ScoreRank.ScoreRank[i][j - 1])
 							scoreRankModifier = srModifiers[j] * diffModifier;
 					}
 
 					#endregion
 
-					nTotalHits = OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood + OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss + OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGreat;
+					nTotalHits = OpenTaiko.stageGameScreen.CChartScore[i].nGood + OpenTaiko.stageGameScreen.CChartScore[i].nMiss + OpenTaiko.stageGameScreen.CChartScore[i].nGreat;
 
-					dAccuracyRate = Math.Pow((50 * OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood + 100 * OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGreat) / (double)(100 * nTotalHits), 3);
+					dAccuracyRate = Math.Pow((50 * OpenTaiko.stageGameScreen.CChartScore[i].nGood + 100 * OpenTaiko.stageGameScreen.CChartScore[i].nGreat) / (double)(100 * nTotalHits), 3);
 
 					if (clearModifier < 0)
 						this.nEarnedMedalsCount[i] = 5;
@@ -548,9 +548,9 @@ internal class CStage結果 : CStage {
 					int _cs = -1;
 					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 						_cs = 0;
-						if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss == 0) {
+						if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0) {
 							_cs = 1;
-							if (OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood == 0)
+							if (OpenTaiko.stageGameScreen.CChartScore[i].nGood == 0)
 								_cs = 2;
 						}
 					}
@@ -657,7 +657,7 @@ internal class CStage結果 : CStage {
 				this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stage演奏ドラム画面.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
 				Background.Init();
@@ -1129,7 +1129,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stage演奏ドラム画面.actDan.GetExamStatus(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1515,37 +1515,37 @@ internal class CStage結果 : CStage {
 
 		#region [ Global scores ]
 
-		int totalHit = OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat
-					   + OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood
-					   + OpenTaiko.stage演奏ドラム画面.GetRoll(0);
+		int totalHit = OpenTaiko.stageGameScreen.CChartScore[0].nGreat
+					   + OpenTaiko.stageGameScreen.CChartScore[0].nGood
+					   + OpenTaiko.stageGameScreen.GetRoll(0);
 
 		// Small digits
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Perfect[0] + offset, OpenTaiko.Skin.DanResult_Perfect[1],
-			OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGreat, 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nGreat, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Good[0] + offset, OpenTaiko.Skin.DanResult_Good[1],
-			OpenTaiko.stage演奏ドラム画面.CChartScore[0].nGood, 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nGood, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Miss[0] + offset, OpenTaiko.Skin.DanResult_Miss[1],
-			OpenTaiko.stage演奏ドラム画面.CChartScore[0].nMiss, 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nMiss, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Roll[0] + offset, OpenTaiko.Skin.DanResult_Roll[1],
-			OpenTaiko.stage演奏ドラム画面.GetRoll(0), 1.0f);
+			OpenTaiko.stageGameScreen.GetRoll(0), 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_MaxCombo[0] + offset, OpenTaiko.Skin.DanResult_MaxCombo[1],
-			OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[0], 1.0f);
+			OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0], 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_TotalHit[0] + offset, OpenTaiko.Skin.DanResult_TotalHit[1],
 			totalHit, 1.0f);
 
 		// Large digits
-		this.actParameterPanel.tスコア文字表示(OpenTaiko.Skin.DanResult_Score[0] + offset, OpenTaiko.Skin.DanResult_Score[1], (int)OpenTaiko.stage演奏ドラム画面.actScore.Get(0), 1.0f);
+		this.actParameterPanel.tスコア文字表示(OpenTaiko.Skin.DanResult_Score[0] + offset, OpenTaiko.Skin.DanResult_Score[1], (int)OpenTaiko.stageGameScreen.actScore.Get(0), 1.0f);
 
 		#endregion
 
 		#region [ Display exams ]
 
-		OpenTaiko.stage演奏ドラム画面.actDan.DrawExam(OpenTaiko.stage結果.st演奏記録.Drums.Dan_C, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, true, offset);
 
 		#endregion
 	}
@@ -1591,15 +1591,15 @@ internal class CStage結果 : CStage {
 		OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 
 		OpenTaiko.Tx.Dani_Level_Number.Opacity = opacity;
-		OpenTaiko.stage段位選択.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.DanResult_Level_Number_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
+		OpenTaiko.stageDanSongSelect.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.DanResult_Level_Number_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
 		OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
 		int[] scoresArr =
 		{
-			OpenTaiko.stage演奏ドラム画面.nGood[i],
-			OpenTaiko.stage演奏ドラム画面.nOk[i],
-			OpenTaiko.stage演奏ドラム画面.nBad[i],
-			OpenTaiko.stage演奏ドラム画面.nRoll[i]
+			OpenTaiko.stageGameScreen.nGood[i],
+			OpenTaiko.stageGameScreen.nOk[i],
+			OpenTaiko.stageGameScreen.nBad[i],
+			OpenTaiko.stageGameScreen.nRoll[i]
 		};
 
 		int[] num_x = {
@@ -1677,14 +1677,14 @@ internal class CStage結果 : CStage {
 		get {
 			if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				int clearCount = 0;
-				for (int i = 0; i < OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count; i++) {
-					if (OpenTaiko.stage演奏ドラム画面.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear) {
+				for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
+					if (OpenTaiko.stageGameScreen.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear) {
 						clearCount++;
 					}
 				}
-				return new bool[] { clearCount >= OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count / 2.0, false };
+				return new bool[] { clearCount >= OpenTaiko.stageGameScreen.AIBattleSections.Count / 2.0, false };
 			} else {
-				return new bool[] { OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared[0], OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared[1], OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared[2], OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared[3], OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared[4] };
+				return new bool[] { OpenTaiko.stageGameScreen.bIsAlreadyCleared[0], OpenTaiko.stageGameScreen.bIsAlreadyCleared[1], OpenTaiko.stageGameScreen.bIsAlreadyCleared[2], OpenTaiko.stageGameScreen.bIsAlreadyCleared[3], OpenTaiko.stageGameScreen.bIsAlreadyCleared[4] };
 			}
 		}
 	}

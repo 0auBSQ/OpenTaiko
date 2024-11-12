@@ -27,6 +27,8 @@ public class CStage : CActivity {
 		ChartEditor,
 		Toolbox,
 		TEMPLATE,           // No effect, for template class
+		CRASH,              // Special case, for CSystemError
+		CUSTOM,             // For custom stages in the future, generic with lua
 		End
 	}
 

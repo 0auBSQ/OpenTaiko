@@ -220,12 +220,12 @@ class ScriptBG : IDisposable {
 
 			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
-				OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared,
+				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				0,
-				OpenTaiko.stage演奏ドラム画面.AIBattleState,
-				OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin,
-				OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-				OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM,
+				OpenTaiko.stageGameScreen.AIBattleState,
+				OpenTaiko.stageGameScreen.bIsAIBattleWin,
+				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
 				new bool[] { false, false, false, false, false },
 				-1
 			);
@@ -245,7 +245,7 @@ class ScriptBG : IDisposable {
 				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
-				currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 			}
 			double timestamp = -1.0;
 
@@ -260,13 +260,13 @@ class ScriptBG : IDisposable {
 
 			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
-				OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared,
+				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				(double)currentFloorPositionMax140,
-				OpenTaiko.stage演奏ドラム画面.AIBattleState,
-				OpenTaiko.stage演奏ドラム画面.bIsAIBattleWin,
-				OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値,
-				OpenTaiko.stage演奏ドラム画面.actPlayInfo.dbBPM,
-				OpenTaiko.stage演奏ドラム画面.bIsGOGOTIME,
+				OpenTaiko.stageGameScreen.AIBattleState,
+				OpenTaiko.stageGameScreen.bIsAIBattleWin,
+				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
+				OpenTaiko.stageGameScreen.bIsGOGOTIME,
 				timestamp);
 			/*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
             LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);

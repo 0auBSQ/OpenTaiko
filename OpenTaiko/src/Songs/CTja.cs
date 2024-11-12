@@ -896,7 +896,7 @@ internal class CTja : CActivity {
 					if (nCurrentTime > wc.n再生開始時刻[i]) {
 						long nAbsTimeFromStartPlaying = nCurrentTime - wc.n再生開始時刻[i];
 						// WASAPI/ASIO用↓
-						if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
+						if (!OpenTaiko.stageGameScreen.bPAUSE) {
 							if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nAbsTimeFromStartPlaying);
 							else wc.rSound[i].tSetPositonToBegin(nAbsTimeFromStartPlaying);
 						} else {
@@ -1236,7 +1236,7 @@ internal class CTja : CActivity {
 			}
 		}
 	}
-	public void t全チップの再生停止() {
+	public void tStopAllChips() {
 		foreach (CWAV cwav in this.listWAV.Values) {
 			this.tWavの再生停止(cwav.n内部番号);
 		}
@@ -4465,7 +4465,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
 		{
-			if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
+			if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 			var chip = new CChip();
@@ -5723,7 +5723,7 @@ internal class CTja : CActivity {
 
 					if (File.Exists(filePaths[i])) {
 						try {
-							if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
+							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 								if (filePaths[i].EndsWith(".vtt")) {
 									using (VTTParser parser = new VTTParser()) {
 										this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
@@ -5750,7 +5750,7 @@ internal class CTja : CActivity {
 					strFilePath[index] = this.strフォルダ名 + strFiles[index];
 					if (File.Exists(strFilePath[index])) {
 						try {
-							if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
+							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
 								this.LyricFileParser(strFilePath[index], index);
 							this.bLyrics = true;
 							this.usingLyricsFile = true;
@@ -6294,7 +6294,7 @@ internal class CTja : CActivity {
 	// CActivity 実装
 	private CCachedFontRenderer pf歌詞フォント;
 	public override void Activate() {
-		if (OpenTaiko.r現在のステージ.eStageID == CStage.EStage.SongLoading) {
+		if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 			//まさかこれが原因で曲の読み込みが停止するとは思わなかった...
 			//どういうことかというとスキンを読み込むときに...いや厳密には
 			//RefleshSkinを呼び出した後一回Disposeしてnullにして解放(その後にまたインスタンスを作成する)するんだけど

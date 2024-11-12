@@ -71,10 +71,10 @@ internal class CActImplBalloon : CActivity {
 	public bool KusudamaIsActive { get; private set; } = false;
 
 	public void tDrawKusudama() {
-		if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) {
+		if (!OpenTaiko.stageGameScreen.bPAUSE) {
 			KusudamaScript.Update();
 		}
-		if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
+		if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
 			KusudamaScript.Draw();
 		}
 	}
@@ -155,7 +155,7 @@ internal class CActImplBalloon : CActivity {
                 if (TJAPlayer3.Tx.Kusudama != null)
                     TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                     */
-				if (!(OpenTaiko.stage演奏ドラム画面.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
+				if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
 					this.tKusudamaNumber(n連打数);
 			}
 
@@ -170,9 +170,9 @@ internal class CActImplBalloon : CActivity {
             }
             */
 		} else {
-			if (n連打数 == 0 && OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player]) {
-				OpenTaiko.stage演奏ドラム画面.actChara.b風船連打中[player] = false;
-				OpenTaiko.stage演奏ドラム画面.bCurrentlyDrumRoll[player] = false;
+			if (n連打数 == 0 && OpenTaiko.stageGameScreen.actChara.b風船連打中[player]) {
+				OpenTaiko.stageGameScreen.actChara.b風船連打中[player] = false;
+				OpenTaiko.stageGameScreen.bCurrentlyDrumRoll[player] = false;
 			}
 		}
 

@@ -55,8 +55,8 @@ internal class CActImplJudgeText : CActivity {
 							x = OpenTaiko.Skin.Game_Judge_X[j];
 							y = OpenTaiko.Skin.Game_Judge_Y[j];
 						}
-						x += (moveValue * OpenTaiko.Skin.Game_Judge_Move[0]) + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLX(j);
-						y += (moveValue * OpenTaiko.Skin.Game_Judge_Move[1]) + OpenTaiko.stage演奏ドラム画面.GetJPOSCROLLY(j);
+						x += (moveValue * OpenTaiko.Skin.Game_Judge_Move[0]) + OpenTaiko.stageGameScreen.GetJPOSCROLLX(j);
+						y += (moveValue * OpenTaiko.Skin.Game_Judge_Move[1]) + OpenTaiko.stageGameScreen.GetJPOSCROLLY(j);
 
 						OpenTaiko.Tx.Judge.Opacity = (int)(255f - (judgeC.counter.CurrentValue >= 360 ? ((judgeC.counter.CurrentValue - 360) / 50.0f) * 255f : 0f));
 						OpenTaiko.Tx.Judge.t2D描画(x, y, judgeC.rc);

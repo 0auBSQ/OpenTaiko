@@ -160,7 +160,7 @@ internal class CActResultParameterPanel : CActivity {
 
 
 	public void tSkipResultAnimations() {
-		OpenTaiko.stage結果.Background.SkipAnimation();
+		OpenTaiko.stageResults.Background.SkipAnimation();
 		ctMainCounter.CurrentValue = (int)MountainAppearValue;
 
 		for (int i = 0; i < b音声再生.Length; i++) {
@@ -181,7 +181,7 @@ internal class CActResultParameterPanel : CActivity {
 	public override void Activate() {
 		this.sdDTXで指定されたフルコンボ音 = null;
 
-		ttkAISection = new TitleTextureKey[OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count];
+		ttkAISection = new TitleTextureKey[OpenTaiko.stageGameScreen.AIBattleSections.Count];
 		for (int i = 0; i < ttkAISection.Length; i++) {
 			ttkAISection[i] = new TitleTextureKey(CLangManager.LangInstance.GetString("AI_SECTION", i + 1), pfAISectionText, Color.White, Color.Black, 1280);
 
@@ -235,7 +235,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		gaugeValues = new int[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			gaugeValues[i] = (int)OpenTaiko.stage演奏ドラム画面.actGauge.db現在のゲージ値[i];
+			gaugeValues[i] = (int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[i];
 		}
 
 		// Replace by max between 2 gauges if 2p
@@ -456,13 +456,13 @@ internal class CActResultParameterPanel : CActivity {
 
 						int[] scoresArr =
 						{
-							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGreat,
-							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nGood,
-							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMiss,
-							OpenTaiko.stage演奏ドラム画面.GetRoll(i),
-							OpenTaiko.stage演奏ドラム画面.actCombo.nCurrentCombo.最高値[i],
-							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nADLIB,
-							OpenTaiko.stage演奏ドラム画面.CChartScore[i].nMine,
+							OpenTaiko.stageGameScreen.CChartScore[i].nGreat,
+							OpenTaiko.stageGameScreen.CChartScore[i].nGood,
+							OpenTaiko.stageGameScreen.CChartScore[i].nMiss,
+							OpenTaiko.stageGameScreen.GetRoll(i),
+							OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[i],
+							OpenTaiko.stageGameScreen.CChartScore[i].nADLIB,
+							OpenTaiko.stageGameScreen.CChartScore[i].nMine,
 						};
 
 						int[][] num_x;
@@ -595,7 +595,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 								ctMainCounter.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 
-							this.tスコア文字表示(score_x, score_y, (int)OpenTaiko.stage演奏ドラム画面.actScore.Get(i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+							this.tスコア文字表示(score_x, score_y, (int)OpenTaiko.stageGameScreen.actScore.Get(i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
 
 							if (!b音声再生[8]) {
 								OpenTaiko.Skin.soundScoreDon.tPlay();
@@ -611,9 +611,9 @@ internal class CActResultParameterPanel : CActivity {
 
 			}
 
-			if (ctAISectionChange.CurrentValue == ctAISectionChange.EndValue && OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count > 5) {
+			if (ctAISectionChange.CurrentValue == ctAISectionChange.EndValue && OpenTaiko.stageGameScreen.AIBattleSections.Count > 5) {
 				NextAISection();
-			} else if (nNowAISection > 0 && OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count <= 5) {
+			} else if (nNowAISection > 0 && OpenTaiko.stageGameScreen.AIBattleSections.Count <= 5) {
 				// Fix locked sections
 				nNowAISection = 0;
 			}
@@ -625,14 +625,14 @@ internal class CActResultParameterPanel : CActivity {
 				int batch_height = OpenTaiko.Tx.Result_AIBattle_Batch.szTextureSize.Height;
 
 
-				for (int i = 0; i < OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count; i++) {
+				for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
 					int nowIndex = (i / 5);
-					int drawCount = Math.Min(OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count - (nowIndex * 5), 5);
+					int drawCount = Math.Min(OpenTaiko.stageGameScreen.AIBattleSections.Count - (nowIndex * 5), 5);
 
 					int drawPos = i % 5;
 					int batch_total_width = OpenTaiko.Skin.Result_AIBattle_Batch_Move[0] * drawCount;
 
-					var section = OpenTaiko.stage演奏ドラム画面.AIBattleSections[i];
+					var section = OpenTaiko.stageGameScreen.AIBattleSections[i];
 					int upDown = (drawPos % 2);
 
 					int x = OpenTaiko.Skin.Result_AIBattle_Batch[0] + (OpenTaiko.Skin.Result_AIBattle_Batch_Move[0] * drawPos) - (batch_total_width / 2);
@@ -673,7 +673,7 @@ internal class CActResultParameterPanel : CActivity {
 				if (ctMainCounter.CurrentValue >= MountainAppearValue) {
 					float flagScale = 2.0f - (Math.Min(Math.Max(ctMainCounter.CurrentValue - MountainAppearValue, 0), 200) / 200.0f);
 
-					CTexture tex = OpenTaiko.stage結果.bClear[0] ? OpenTaiko.Tx.Result_AIBattle_WinFlag_Clear : OpenTaiko.Tx.Result_AIBattle_WinFlag_Lose;
+					CTexture tex = OpenTaiko.stageResults.bClear[0] ? OpenTaiko.Tx.Result_AIBattle_WinFlag_Clear : OpenTaiko.Tx.Result_AIBattle_WinFlag_Lose;
 
 					tex.vcScaleRatio.X = flagScale;
 					tex.vcScaleRatio.Y = flagScale;
@@ -706,7 +706,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					if (ctUIMove.EndValue != 1000 && OpenTaiko.Skin.Result_Use1PUI && is1P) ctUIMove = new CCounter(0, 1000, 0.5, OpenTaiko.Timer);
 
-					if (OpenTaiko.stage結果.bClear[p]) {
+					if (OpenTaiko.stageResults.bClear[p]) {
 						if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 							CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.CLEAR);
 					} else {
@@ -887,17 +887,17 @@ internal class CActResultParameterPanel : CActivity {
 					else if (gaugeValues[p] >= 40.0f)
 						Mood = 1;
 
-					if (OpenTaiko.stage結果.nクリア[p] == 4) {
+					if (OpenTaiko.stageResults.nクリア[p] == 4) {
 						MoodV2 = 5;
-					} else if (OpenTaiko.stage結果.nクリア[p] == 3) {
+					} else if (OpenTaiko.stageResults.nクリア[p] == 3) {
 						MoodV2 = 4;
-					} else if (OpenTaiko.stage結果.nクリア[p] >= 1) {
+					} else if (OpenTaiko.stageResults.nクリア[p] >= 1) {
 						if (gaugeValues[p] >= 100.0f) {
 							MoodV2 = 3;
 						} else {
 							MoodV2 = 2;
 						}
-					} else if (OpenTaiko.stage結果.nクリア[p] == 0) {
+					} else if (OpenTaiko.stageResults.nクリア[p] == 0) {
 						if (gaugeValues[p] >= 40.0f) {
 							MoodV2 = 1;
 						} else {
@@ -993,7 +993,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_ScoreRankEffect.vcScaleRatio.Y = 1f;
 						}
 
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stage結果.nスコアランク[p] > 0) {
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageResults.nスコアランク[p] > 0) {
 							int CurrentFlash = 0;
 							int[] FlashTimes = { 1500, 1540, 1580, 1620, 1660, 1700, 1740, 1780 };
 
@@ -1019,7 +1019,7 @@ internal class CActResultParameterPanel : CActivity {
 							}
 
 							OpenTaiko.Tx.Result_ScoreRankEffect.t2D拡大率考慮中央基準描画(scoreRankEffect_x, scoreRankEffect_y,
-								new Rectangle((OpenTaiko.stage結果.nスコアランク[p] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
+								new Rectangle((OpenTaiko.stageResults.nスコアランク[p] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
 
 							if (!b音声再生[9] && ctMainCounter.CurrentValue >= ScoreApparitionTimeStamp + 1180) {
 								OpenTaiko.Skin.soundRankIn.tPlay();
@@ -1053,7 +1053,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_CrownEffect.vcScaleRatio.Y = 1f;
 						}
 
-						int ClearType = OpenTaiko.stage結果.nクリア[p] - 1;
+						int ClearType = OpenTaiko.stageResults.nクリア[p] - 1;
 
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)(Difficulty.Dan) && ClearType >= 0) {
 							int CurrentFlash = 0;
@@ -1184,7 +1184,7 @@ internal class CActResultParameterPanel : CActivity {
 		ctAISectionChange.CurrentValue = 0;
 
 		nNowAISection++;
-		if (nNowAISection >= Math.Ceiling(OpenTaiko.stage演奏ドラム画面.AIBattleSections.Count / 5.0)) {
+		if (nNowAISection >= Math.Ceiling(OpenTaiko.stageGameScreen.AIBattleSections.Count / 5.0)) {
 			nNowAISection = 0;
 
 		}

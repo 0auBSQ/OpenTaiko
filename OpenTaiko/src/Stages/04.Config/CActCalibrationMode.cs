@@ -72,7 +72,7 @@ internal class CActCalibrationMode : CActivity {
 		} else if (buttonIndex == 2 && decide) // Save
 		{
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = GetMedianOffset();
-			OpenTaiko.stageコンフィグ.actList.iGlobalOffsetMs.n現在の値 = GetMedianOffset();
+			OpenTaiko.stageConfig.actList.iGlobalOffsetMs.n現在の値 = GetMedianOffset();
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 			Stop();
 

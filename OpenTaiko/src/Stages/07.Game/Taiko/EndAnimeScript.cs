@@ -33,15 +33,15 @@ class EndAnimeScript : ScriptBG {
 				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
-				currentFloorPositionMax140 = Math.Min(OpenTaiko.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 			}
 
-			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime, OpenTaiko.FPS.NowFPS, OpenTaiko.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140);
+			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime, OpenTaiko.FPS.NowFPS, OpenTaiko.stageGameScreen.bIsAlreadyCleared, (double)currentFloorPositionMax140);
 			/*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
             LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
             LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-			if (!OpenTaiko.stage演奏ドラム画面.bPAUSE) LuaUpdate.Call(player);
+			if (!OpenTaiko.stageGameScreen.bPAUSE) LuaUpdate.Call(player);
 		} catch (Exception ex) {
 			LuaScript.Dispose();
 			LuaScript = null;

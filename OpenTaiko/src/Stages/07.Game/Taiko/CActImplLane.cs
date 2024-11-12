@@ -67,7 +67,7 @@ internal class CActImplLane : CActivity {
 
 		//アニメーション中の分岐レイヤー(背景)の描画を行う。
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (OpenTaiko.stage演奏ドラム画面.bUseBranch[i] == true) {
+			if (OpenTaiko.stageGameScreen.bUseBranch[i] == true) {
 
 				#region NullCheck
 

@@ -5,10 +5,10 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CStageタイトル : CStage {
+internal class CStageTitle : CStage {
 	// Constructor
 
-	public CStageタイトル() {
+	public CStageTitle() {
 		base.eStageID = CStage.EStage.Title;
 		base.IsDeActivated = true;
 		base.ChildActivities.Add(this.actFIfromSetup = new CActFIFOBlack());
@@ -114,7 +114,7 @@ internal class CStageタイトル : CStage {
 			#region [ 初めての進行描画 ]
 			//---------------------
 			if (base.IsFirstDraw) {
-				if (OpenTaiko.r直前のステージ == OpenTaiko.stage起動) {
+				if (OpenTaiko.rPreviousStage == OpenTaiko.stageStartup) {
 					this.actFIfromSetup.tフェードイン開始();
 					base.ePhaseID = CStage.EPhase.Title_FadeIn;
 				} else {
@@ -156,7 +156,7 @@ internal class CStageタイトル : CStage {
 							OpenTaiko.Skin.soundEntry.tPlay();
 					} else {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
-						this._idNextStageForced = E戻り値.EXIT;
+						this._idNextStageForced = EReturnValue.EXIT;
 						this.actFO.tフェードアウト開始(0, 500);
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
@@ -285,7 +285,7 @@ internal class CStageタイトル : CStage {
 					if (bモード選択) {
 						bool operationSucceded = false;
 
-						if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.DANGAMESTART || CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == E戻り値.TAIKOTOWERSSTART) {
+						if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.DANGAMESTART || CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.TAIKOTOWERSSTART) {
 							if (OpenTaiko.Songs管理.list曲ルート_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 								operationSucceded = true;
 						} else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
@@ -846,7 +846,7 @@ internal class CStageタイトル : CStage {
 		}
 		return 0;
 	}
-	public enum E戻り値 {
+	public enum EReturnValue {
 		継続 = 0,
 		GAMESTART,
 		DANGAMESTART,
@@ -970,7 +970,7 @@ internal class CStageタイトル : CStage {
 
 	private int n現在の選択行プレイヤーエントリー;
 	private int n現在の選択行モード選択;
-	private E戻り値? _idNextStageForced;
+	private EReturnValue? _idNextStageForced;
 
 	/*private Point[] ptプレイヤーエントリーバー座標 =
 		{ new Point(337, 488), new Point( 529, 487), new Point(743, 486) };
