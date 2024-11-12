@@ -294,10 +294,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			var hs = OpenTaiko.Skin.hsHitSoundsInformations;
 
-			this.soundRed[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.don[actual]), ESoundGroup.SoundEffect);
-			this.soundBlue[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.ka[actual]), ESoundGroup.SoundEffect);
-			this.soundAdlib[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.adlib[actual]), ESoundGroup.SoundEffect);
-			this.soundClap[i] = OpenTaiko.SoundManager.tCreateSound((@$"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + hs.clap[actual]), ESoundGroup.SoundEffect);
+			this.soundRed[i] = OpenTaiko.SoundManager.tCreateSound(hs.don[actual], ESoundGroup.SoundEffect);
+			this.soundBlue[i] = OpenTaiko.SoundManager.tCreateSound(hs.ka[actual], ESoundGroup.SoundEffect);
+			this.soundAdlib[i] = OpenTaiko.SoundManager.tCreateSound(hs.adlib[actual], ESoundGroup.SoundEffect);
+			this.soundClap[i] = OpenTaiko.SoundManager.tCreateSound(hs.clap[actual], ESoundGroup.SoundEffect);
 
 			int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
 			if (this.soundRed[i] != null) this.soundRed[i].SoundPosition = _panning;

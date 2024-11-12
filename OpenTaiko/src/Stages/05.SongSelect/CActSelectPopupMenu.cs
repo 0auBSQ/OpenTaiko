@@ -338,7 +338,7 @@ internal class CActSelectPopupMenu : CActivity {
 					//               }
 					//font.t文字列描画( (int)(340 * Scale.X), (int)(80 + i * 32), s, bValueBold, 1.0f * Scale.Y);
 					using (var bmpStr = bValueBold ?
-							   prvFont.DrawText(s, Color.White, Color.Black, null, Color.Yellow, Color.OrangeRed, 30) :
+							   prvFont.DrawText(s, Color.White, Color.OrangeRed, null, Color.Yellow, Color.OrangeRed, 30) :
 							   prvFont.DrawText(s, Color.White, Color.Black, null, 30)) {
 						using (var ctStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
 							ctStr.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Value[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],

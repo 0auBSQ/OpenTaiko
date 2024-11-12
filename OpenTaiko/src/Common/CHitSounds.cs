@@ -1,4 +1,6 @@
-﻿namespace OpenTaiko;
+﻿using Newtonsoft.Json;
+
+namespace OpenTaiko;
 
 class CHitSounds {
 	public CHitSounds(string path) {
@@ -12,21 +14,20 @@ class CHitSounds {
 		if (id >= names.Length || id >= data.Length)
 			return false;
 
-		string ext = this.data[id].format switch {
-			"WAV" => ".wav",
-			"OGG" => ".ogg",
-			_ => ""
-		};
+		string fileExtension(string file) {
+			string path = Path.Combine(data[id].path, file);
+			return File.Exists(path + ".ogg") ? path + ".ogg" : path + ".wav";
+		}
 
-		don[player] = data[id].path + "dong" + ext;
-		ka[player] = data[id].path + "ka" + ext;
-		adlib[player] = data[id].path + "Adlib" + ext;
-		clap[player] = data[id].path + "clap" + ext;
+		don[player] = fileExtension("dong");
+		ka[player] = fileExtension("ka");
+		adlib[player] = fileExtension("Adlib");
+		clap[player] = fileExtension("clap");
 
 		return true;
 	}
 
-	public string[] names;
+	public CLocalizationData[] names;
 
 	public string[] don = new string[5];
 	public string[] ka = new string[5];
@@ -36,18 +37,34 @@ class CHitSounds {
 	#region [private]
 
 	private class HitSoundsData {
-		public string name;
-		public string path;
-		public string format;
+		[JsonProperty("name")]
+		[JsonConverter(typeof(LocalizedStringConverter<CLocalizationData>))]
+		public CLocalizationData name = new();
+
+		[JsonIgnore]
+		public string path = $"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}_fallback{Path.DirectorySeparatorChar}";
+
+		public HitSoundsData() { name.SetString("default", "Unknown Hitsound"); }
+		public HitSoundsData(string path) : this() {
+			name.SetString("default", Path.GetRelativePath($"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}", path));
+			this.path = path;
+		}
 	}
 
 	private HitSoundsData[] data;
 
 	private void tLoadFile(string path) {
-		data = ConfigManager.GetConfig<List<HitSoundsData>>(path).ToArray();
-		names = new string[data.Length];
+		string[] directories = Directory.GetDirectories(path);
+		data = new HitSoundsData[directories.Length];
+		names = new CLocalizationData[data.Length];
+
 		for (int i = 0; i < data.Length; i++) {
+			string dir_path = Path.Combine(directories[i], "HitSounds.json");
+			data[i] = File.Exists(dir_path) ? ConfigManager.GetConfig<HitSoundsData>(dir_path) : new(directories[i]);
+			data[i].path = directories[i];
 			names[i] = data[i].name;
+
+			if (!File.Exists(dir_path)) { ConfigManager.SaveConfig(data[i], dir_path); }
 		}
 	}
 

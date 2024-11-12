@@ -83,7 +83,7 @@ internal class CActPlayOption : CActivity {
 
 		if (txOtoiro.Length > 0) {
 			for (int i = 0; i < txOtoiro.Length; i++) {
-				txOtoiro[i] = OptionTypeTx(hsInfo.names[i], Color.White, Color.Black);
+				txOtoiro[i] = OptionTypeTx(hsInfo.names[i].GetString("???"), Color.White, Color.Black);
 			}
 		} else {
 			txOtoiro = new CTexture[1];
