@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.17] - 2024-11-12 (Beta)
+
+- Make HitSounds.json per-folder instead of one central file
+- Initialize new JSON file if one does not exist in that folder, using folder name as Hitsound name
+- Add localization support for Hitsounds
+
 ## [0.6.0.16] - 2024-11-04 (Beta)
 
 - Readable error message on screen instead of crashes before the startup screen (Missing skin, no audio device found, etc)
