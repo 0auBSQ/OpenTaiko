@@ -2,7 +2,9 @@
   "name" : {
 	"strings": {
 	  "default": "Konga",
-	  "ja": "コンガ"
+	  "ja": "コンガ",
+	  "ru": "Конга",
+	  "zh": "康加鼓"
 	}
   }
 }
