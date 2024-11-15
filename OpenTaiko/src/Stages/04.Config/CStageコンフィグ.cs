@@ -377,15 +377,8 @@ internal class CStageコンフィグ : CStage {
 			actCalibrationMode.Update();
 			actCalibrationMode.Draw();
 		} else if (actList.ScoreIniImportThreadIsActive) {
-			if (OpenTaiko.Tx.Tile_Black != null) {
-				OpenTaiko.Tx.Tile_Black.Opacity = 191;
-				for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
-					for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
-						OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
-					}
-				}
-				OpenTaiko.Tx.Tile_Black.Opacity = 255;
-			}
+			HBlackBackdrop.Draw(191);
+
 			using (var prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale)) {
 				using (var status_text = new CTexture(prvFont.DrawText(
 						   CScoreIni_Importer.Status,

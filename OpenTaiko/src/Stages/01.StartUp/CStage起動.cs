@@ -181,14 +181,7 @@ internal class CStage起動 : CStage {
 				#endregion
 			} else if (OpenTaiko.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
 			{
-				if (OpenTaiko.Tx.Tile_Black != null) {
-					OpenTaiko.Tx.Tile_Black.Opacity = 255;
-					for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
-						for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
-							OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
-						}
-					}
-				}
+				HBlackBackdrop.Draw();
 
 				int x = langSelectOffset[0];
 				int y = langSelectOffset[1];
