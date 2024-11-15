@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.18] - 2024-11-15 (Beta)
+
+- Add Chinese and Russian Instrument Names
+
 ## [0.6.0.17] - 2024-11-12 (Beta)
 
 - Make HitSounds.json per-folder instead of one central file
