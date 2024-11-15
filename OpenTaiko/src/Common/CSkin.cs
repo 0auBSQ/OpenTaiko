@@ -6882,14 +6882,14 @@ internal class CSkin : IDisposable {
 							#region Heya
 							case "Heya_Main_Menu_X": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 6 || i < strSplit.Length; i++) {
+									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
 										Heya_Main_Menu_X[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
 							case "Heya_Main_Menu_Y": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 6 || i < strSplit.Length; i++) {
+									for (int i = 0; i < Math.Min(6, strSplit.Length); i++) {
 										Heya_Main_Menu_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
