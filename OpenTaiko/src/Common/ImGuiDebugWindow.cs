@@ -100,7 +100,7 @@ public static class ImGuiDebugWindow {
 			ImGui.Text("Unknown: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Unknown));
 
 			foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
-				if (ImGui.TreeNodeEx(device.CurrentType.ToString() + " (ID " + device.ID + " / Name: " + device.Name + ")")) {
+				if (ImGui.TreeNodeEx(device.CurrentType.ToString() + " (ID " + device.ID + " / Name: " + device.Name + " / GUID: " + device.GUID + ")")) {
 					switch (device.CurrentType) {
 						case InputDeviceType.Keyboard:
 							var keyboard = (CInputKeyboard)device;

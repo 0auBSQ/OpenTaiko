@@ -6882,21 +6882,21 @@ internal class CSkin : IDisposable {
 							#region Heya
 							case "Heya_Main_Menu_X": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
+									for (int i = 0; i < 6 || i < strSplit.Length; i++) {
 										Heya_Main_Menu_X[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
 							case "Heya_Main_Menu_Y": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
+									for (int i = 0; i < 6 || i < strSplit.Length; i++) {
 										Heya_Main_Menu_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
 							case "Heya_Main_Menu_Font_Offset": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
+									for (int i = 0; i < 2; i++) {
 										Heya_Main_Menu_Font_Offset[i] = int.Parse(strSplit[i]);
 									}
 									break;
@@ -9164,8 +9164,8 @@ internal class CSkin : IDisposable {
 
 	#region Heya
 
-	public int[] Heya_Main_Menu_X = new int[] { 164, 164, 164, 164, 164 };
-	public int[] Heya_Main_Menu_Y = new int[] { 26, 106, 186, 266, 346 };
+	public int[] Heya_Main_Menu_X = new int[] { 164, 164, 164, 164, 164, 164 };
+	public int[] Heya_Main_Menu_Y = new int[] { 26, 106, 186, 266, 346, 426 };
 	public int[] Heya_Main_Menu_Font_Offset = new int[] { 0, 14 };
 	public int Heya_Center_Menu_Box_Count = 11;
 	public int[] Heya_Center_Menu_Box_X = new int[] { -890, -588, -286, 16, 318, 620, 922, 1224, 1526, 1828, 2130 };

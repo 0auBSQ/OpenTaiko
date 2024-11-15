@@ -444,6 +444,8 @@
 		"HEYA_CHARA": "캐릭터",
 		"HEYA_DAN": "단위 제목",
 		"HEYA_NAMEPLATE": "칭호 타이틀",
+		"HEYA_NAME": "Name",
+		"HEYA_NAME_INFO": "Type your name (Confirm to save, Cancel to discard changes):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "이름: {0}",

@@ -444,6 +444,8 @@
 		"HEYA_CHARA": "Персонаж",
 		"HEYA_DAN": "Ранг дан",
 		"HEYA_NAMEPLATE": "Ранг таблички",
+		"HEYA_NAME": "Name",
+		"HEYA_NAME_INFO": "Type your name (Confirm to save, Cancel to discard changes):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "Имя: {0}",
