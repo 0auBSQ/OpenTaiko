@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.20] - 2024-11-16 (Beta)
+
+- [i18n] Changing Name Menu in Chinese and Russian
+
 ## [0.6.0.19] - 2024-11-15 (Beta)
 
 - Allow users to change their name via. Heya menu
