@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0.20] - 2024-11-16 (Beta)
+
+- [i18n] Changing Name Menu in Chinese and Russian
+
+## [0.6.0.19] - 2024-11-15 (Beta)
+
+- Allow users to change their name via. Heya menu
+
+## [0.6.0.18] - 2024-11-15 (Beta)
+
+- Add Chinese and Russian Instrument Names
+
 ## [0.6.0.17] - 2024-11-12 (Beta)
 
 - Make HitSounds.json per-folder instead of one central file

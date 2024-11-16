@@ -2,7 +2,9 @@
   "name" : {
 	"strings": {
 	  "default": "Taiko",
-	  "ja": "太鼓"
+	  "ja": "太鼓",
+	  "ru": "Тайко",
+	  "zh": "太鼓"
 	}
   }
 }

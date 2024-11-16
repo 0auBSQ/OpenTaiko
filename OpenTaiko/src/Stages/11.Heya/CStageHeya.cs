@@ -14,6 +14,14 @@ class CStageHeya : CStage {
 		base.ChildActivities.Add(this.PuchiChara = new PuchiChara());
 	}
 
+	private enum CurrentMenu : int {
+		ReturnToMenu = -1,
+		Puchi,
+		Chara,
+		Dan,
+		Title,
+		Name
+	}
 
 	public override void Activate() {
 		if (base.IsActivated)
@@ -38,17 +46,16 @@ class CStageHeya : CStage {
 
 		#region [Main menu]
 
-		this.ttkMainMenuOpt = new TitleTextureKey[5];
+		this.ttkMainMenuOpt = new TitleTextureKey[6];
 
 		this.ttkMainMenuOpt[0] = new TitleTextureKey(CLangManager.LangInstance.GetString("MENU_RETURN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
 		this.ttkMainMenuOpt[1] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_PUCHI"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
 		this.ttkMainMenuOpt[2] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_CHARA"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
 		this.ttkMainMenuOpt[3] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_DAN"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
 		this.ttkMainMenuOpt[4] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAMEPLATE"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
-		//for (int i = 1; i < ttkMainMenuOpt.Length; i++)
-		//{
-		//    this.ttkMainMenuOpt[i] = new TitleTextureKey(CLangManager.LangInstance.GetString(1030 + i), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
-		//}
+		this.ttkMainMenuOpt[5] = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAME"), this.pfHeyaFont, Color.White, Color.DarkGreen, 1000);
+
+		this.textInputInfo = new TitleTextureKey(CLangManager.LangInstance.GetString("HEYA_NAME_INFO"), this.pfHeyaFont, Color.White, Color.Black, 1000);
 
 		#endregion
 
@@ -108,7 +115,7 @@ class CStageHeya : CStage {
 		#endregion
 
 		// -1 : Main Menu, >= 0 : See Main menu opt
-		iCurrentMenu = -1;
+		iCurrentMenu = CurrentMenu.ReturnToMenu;
 		iMainMenuCurrent = 0;
 
 		#region [PuchiChara stuff]
@@ -139,6 +146,12 @@ class CStageHeya : CStage {
 			ttkCharacterAuthors[i] = new TitleTextureKey(OpenTaiko.Tx.Characters[i].metadata.tGetAuthor(), this.pfHeyaFont, Color.White, Color.Black, 1000);
 		}
 
+		#endregion
+
+		#region [Name stuff]
+		textInput = new CTextInput("", 64);
+		textInput.Text = OpenTaiko.SaveFileInstances[iPlayer].data.Name;
+		textInputTitle = new TitleTextureKey("", pfHeyaFont, Color.White, Color.Black, 1000);
 		#endregion
 
 		this.tResetOpts();
@@ -183,7 +196,7 @@ class CStageHeya : CStage {
 		for (int i = 0; i < this.ttkMainMenuOpt.Length; i++) {
 			CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkMainMenuOpt[i]);
 
-			if (iCurrentMenu != -1 || iMainMenuCurrent != i) {
+			if (iCurrentMenu != CurrentMenu.ReturnToMenu || iMainMenuCurrent != i) {
 				tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
 				OpenTaiko.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 			} else {
@@ -219,9 +232,9 @@ class CStageHeya : CStage {
 			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.X = renderRatioX;
 			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.Y = renderRatioY;
 		}
-		if (iCurrentMenu == 0 || iCurrentMenu == 1) OpenTaiko.Tx.Heya_Render_Field?.t2D描画(0, 0);
-		if (iCurrentMenu == 0) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
-		if (iCurrentMenu == 1) OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
+		if (iCurrentMenu == CurrentMenu.Puchi || iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Heya_Render_Field?.t2D描画(0, 0);
+		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
+		if (iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
 
 		#endregion
 
@@ -229,7 +242,7 @@ class CStageHeya : CStage {
 
 		#region [Petit chara]
 
-		if (iCurrentMenu == 0) {
+		if (iCurrentMenu == CurrentMenu.Puchi) {
 			for (int i = -(OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2); i < (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2) + 1; i++) {
 				int pos = (iPuchiCharaCount * 5 + iPuchiCharaCurrent + i) % iPuchiCharaCount;
 
@@ -294,7 +307,7 @@ class CStageHeya : CStage {
 
 		#region [Character]
 
-		if (iCurrentMenu == 1) {
+		if (iCurrentMenu == CurrentMenu.Chara) {
 			for (int i = -(OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2); i < (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2) + 1; i++) {
 				int pos = (iCharacterCount * 5 + iCharacterCurrent + i) % iCharacterCount;
 
@@ -356,7 +369,7 @@ class CStageHeya : CStage {
 
 		#region [Dan title]
 
-		if (iCurrentMenu == 2) {
+		if (iCurrentMenu == CurrentMenu.Dan) {
 			for (int i = -(OpenTaiko.Skin.Heya_Side_Menu_Count / 2); i < (OpenTaiko.Skin.Heya_Side_Menu_Count / 2) + 1; i++) {
 				int pos = (this.ttkDanTitles.Length * 5 + iDanTitleCurrent + i) % this.ttkDanTitles.Length;
 
@@ -364,11 +377,11 @@ class CStageHeya : CStage {
 
 				if (i != 0) {
 					tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
-					OpenTaiko.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.DarkGray);
+					OpenTaiko.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 					//TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
 				} else {
 					tmpTex.color4 = CConversion.ColorToColor4(Color.White);
-					OpenTaiko.Tx.Heya_Side_Menu.color4 = CConversion.ColorToColor4(Color.White);
+					OpenTaiko.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 					//TJAPlayer3.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 				}
 
@@ -397,7 +410,7 @@ class CStageHeya : CStage {
 
 		#region [Title plate]
 
-		if (iCurrentMenu == 3) {
+		if (iCurrentMenu == CurrentMenu.Title) {
 			for (int i = -(OpenTaiko.Skin.Heya_Side_Menu_Count / 2); i < (OpenTaiko.Skin.Heya_Side_Menu_Count / 2) + 1; i++) {
 				int pos = (this.ttkTitles.Length * 5 + iTitleCurrent + i) % this.ttkTitles.Length;
 
@@ -443,6 +456,19 @@ class CStageHeya : CStage {
 			}
 		}
 
+		if (iCurrentMenu == CurrentMenu.Name) {
+			textInput.Update();
+
+			HBlackBackdrop.Draw(191);
+
+			if (textInput.Text != textInputTitle.str) { textInputTitle = new TitleTextureKey(textInput.Text, pfHeyaFont, Color.White, Color.Black, 1000); }
+			CTexture text_tex = TitleTextureKey.ResolveTitleTexture(textInputTitle);
+			CTexture text_info = TitleTextureKey.ResolveTitleTexture(textInputInfo);
+
+			text_info.t2D_DisplayImage_AnchorCenter(960, 540);
+			text_tex.t2D_DisplayImage_AnchorCenter(960, 540 + text_info.szTextureSize.Height);
+		}
+
 		#endregion
 
 		#endregion
@@ -464,8 +490,8 @@ class CStageHeya : CStage {
 			#region [Asset description]
 
 			if (this.ttkInfoSection == null || this.ttkInfoSection.str == "") {
-				if (iCurrentMenu == 0) CHeyaDisplayAssetInformations.DisplayPuchicharaInfo(this.pfHeyaFont, OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent]);
-				if (iCurrentMenu == 1) CHeyaDisplayAssetInformations.DisplayCharacterInfo(this.pfHeyaFont, OpenTaiko.Tx.Characters[iCharacterCurrent]);
+				if (iCurrentMenu == CurrentMenu.Puchi) CHeyaDisplayAssetInformations.DisplayPuchicharaInfo(this.pfHeyaFont, OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent]);
+				if (iCurrentMenu == CurrentMenu.Chara) CHeyaDisplayAssetInformations.DisplayCharacterInfo(this.pfHeyaFont, OpenTaiko.Tx.Characters[iCharacterCurrent]);
 			}
 
 			#endregion
@@ -539,19 +565,22 @@ class CStageHeya : CStage {
 			ESelectStatus ess = ESelectStatus.SELECTED;
 
 			// Return to main menu
-			if (iCurrentMenu == -1 && iMainMenuCurrent == 0) {
+			if (iCurrentMenu == CurrentMenu.ReturnToMenu && iMainMenuCurrent == 0) {
 				OpenTaiko.Skin.soundHeyaBGM.tStop();
 				this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-			} else if (iCurrentMenu == -1) {
-				iCurrentMenu = iMainMenuCurrent - 1;
+			} else if (iCurrentMenu == CurrentMenu.ReturnToMenu) {
+				iCurrentMenu = (CurrentMenu)iMainMenuCurrent - 1;
 
-				if (iCurrentMenu == 0) {
+				if (iCurrentMenu == CurrentMenu.Puchi) {
 					this.tUpdateUnlockableTextChara();
 					this.tUpdateUnlockableTextPuchi();
 				}
-			} else if (iCurrentMenu == 0) {
+				else if (iCurrentMenu == CurrentMenu.Name) {
+					textInput.Text = OpenTaiko.SaveFileInstances[iPlayer].data.Name;
+				}
+			} else if (iCurrentMenu == CurrentMenu.Puchi) {
 				ess = this.tSelectPuchi();
 
 				if (ess == ESelectStatus.SELECTED) {
@@ -562,7 +591,7 @@ class CStageHeya : CStage {
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 					OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].welcome.tPlay();
 
-					iCurrentMenu = -1;
+					iCurrentMenu = CurrentMenu.ReturnToMenu;
 					this.tResetOpts();
 				} else if (ess == ESelectStatus.SUCCESS) {
 					//TJAPlayer3.NamePlateConfig.data.UnlockedPuchicharas[iPlayer].Add(TJAPlayer3.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
@@ -573,7 +602,7 @@ class CStageHeya : CStage {
 						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0]);
 
 				}
-			} else if (iCurrentMenu == 1) {
+			} else if (iCurrentMenu == CurrentMenu.Chara) {
 				ess = this.tSelectChara();
 
 				if (ess == ESelectStatus.SELECTED) {
@@ -593,7 +622,7 @@ class CStageHeya : CStage {
 
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
-					iCurrentMenu = -1;
+					iCurrentMenu = CurrentMenu.ReturnToMenu;
 					this.tResetOpts();
 				} else if (ess == ESelectStatus.SUCCESS) {
 					OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Add(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent]);
@@ -602,7 +631,7 @@ class CStageHeya : CStage {
 						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.Values[0]);
 					// Play modal animation here ?
 				}
-			} else if (iCurrentMenu == 2) {
+			} else if (iCurrentMenu == CurrentMenu.Dan) {
 				bool iG = false;
 				int cs = 0;
 
@@ -619,9 +648,9 @@ class CStageHeya : CStage {
 
 				OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
-				iCurrentMenu = -1;
+				iCurrentMenu = CurrentMenu.ReturnToMenu;
 				this.tResetOpts();
-			} else if (iCurrentMenu == 3) {
+			} else if (iCurrentMenu == CurrentMenu.Title) {
 				OpenTaiko.SaveFileInstances[iPlayer].data.Title = this.ttkTitles[iTitleCurrent].str;
 
 				if (OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null
@@ -645,7 +674,15 @@ class CStageHeya : CStage {
 
 				OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
-				iCurrentMenu = -1;
+				iCurrentMenu = CurrentMenu.ReturnToMenu;
+				this.tResetOpts();
+			}
+			else if (iCurrentMenu == CurrentMenu.Name) {
+				OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
+				OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
+				OpenTaiko.NamePlate.tNamePlateRefreshTitles(iPlayer);
+
+				iCurrentMenu = CurrentMenu.ReturnToMenu;
 				this.tResetOpts();
 			}
 
@@ -657,18 +694,19 @@ class CStageHeya : CStage {
 				OpenTaiko.Skin.SoundBanapas.tPlay(); // To change with a more appropriate sfx sooner or later
 
 			#endregion
-		} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+		}
+		else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 
-			if (iCurrentMenu == -1) {
+			if (iCurrentMenu == CurrentMenu.ReturnToMenu) {
 				OpenTaiko.Skin.soundHeyaBGM.tStop();
 				this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 			} else {
-				iCurrentMenu = -1;
+				iCurrentMenu = CurrentMenu.ReturnToMenu;
 				this.ttkInfoSection = null;
 				this.tResetOpts();
 			}
@@ -719,7 +757,7 @@ class CStageHeya : CStage {
 	private int iDanTitleCurrent;
 	private int iTitleCurrent;
 
-	private int iCurrentMenu;
+	private CurrentMenu iCurrentMenu;
 
 	private void tResetOpts() {
 		// Retrieve titles if they exist
@@ -764,20 +802,28 @@ class CStageHeya : CStage {
 		ScrollMode = off;
 		ScrollCounter.CurrentValue = 0;
 
-		if (iCurrentMenu == -1)
-			iMainMenuCurrent = (this.ttkMainMenuOpt.Length + iMainMenuCurrent + off) % this.ttkMainMenuOpt.Length;
-		else if (iCurrentMenu == 0) {
-			iPuchiCharaCurrent = (iPuchiCharaCount + iPuchiCharaCurrent + off) % iPuchiCharaCount;
-			tUpdateUnlockableTextPuchi();
-		} else if (iCurrentMenu == 1) {
-			iCharacterCurrent = (iCharacterCount + iCharacterCurrent + off) % iCharacterCount;
-			tUpdateUnlockableTextChara();
-		} else if (iCurrentMenu == 2)
-			iDanTitleCurrent = (this.ttkDanTitles.Length + iDanTitleCurrent + off) % this.ttkDanTitles.Length;
-		else if (iCurrentMenu == 3)
-			iTitleCurrent = (this.ttkTitles.Length + iTitleCurrent + off) % this.ttkTitles.Length;
-		else
-			return false;
+		switch (iCurrentMenu) {
+			case CurrentMenu.ReturnToMenu:
+				iMainMenuCurrent = (this.ttkMainMenuOpt.Length + iMainMenuCurrent + off) % this.ttkMainMenuOpt.Length;
+				break;
+			case CurrentMenu.Puchi:
+				iPuchiCharaCurrent = (iPuchiCharaCount + iPuchiCharaCurrent + off) % iPuchiCharaCount;
+				tUpdateUnlockableTextPuchi();
+				break;
+			case CurrentMenu.Chara:
+				iCharacterCurrent = (iCharacterCount + iCharacterCurrent + off) % iCharacterCount;
+				tUpdateUnlockableTextChara();
+				break;
+			case CurrentMenu.Dan:
+				iDanTitleCurrent = (this.ttkDanTitles.Length + iDanTitleCurrent + off) % this.ttkDanTitles.Length;
+				break;
+			case CurrentMenu.Title:
+				iTitleCurrent = (this.ttkTitles.Length + iTitleCurrent + off) % this.ttkTitles.Length;
+				break;
+			default:
+				return false;
+
+		}
 
 		return true;
 	}
@@ -921,6 +967,11 @@ class CStageHeya : CStage {
 
 	private int iPuchiCharaCount;
 	private int iCharacterCount;
+
+	private TitleTextureKey textInputInfo;
+	private TitleTextureKey textInputTitle;
+	private CTextInput textInput;
+	private bool isInputtingText;
 
 	private CCounter ScrollCounter;
 	private const int SideInterval_X = 10;

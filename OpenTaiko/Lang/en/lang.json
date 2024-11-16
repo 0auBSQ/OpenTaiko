@@ -444,6 +444,8 @@
 		"HEYA_CHARA": "Character",
 		"HEYA_DAN": "Dan Title",
 		"HEYA_NAMEPLATE": "Nameplate Title",
+		"HEYA_NAME": "Name",
+		"HEYA_NAME_INFO": "Type your name (Confirm to save, Cancel to discard changes):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "Name: {0}",
