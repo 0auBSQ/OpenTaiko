@@ -557,8 +557,10 @@ class CStageHeya : CStage {
 			if (this.tMove(-1)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			}
-		} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+		}
+		else if (iCurrentMenu != CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide))
+		{
 
 			#region [Decide]
 
@@ -677,14 +679,6 @@ class CStageHeya : CStage {
 				iCurrentMenu = CurrentMenu.ReturnToMenu;
 				this.tResetOpts();
 			}
-			else if (iCurrentMenu == CurrentMenu.Name) {
-				OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
-				OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
-				OpenTaiko.NamePlate.tNamePlateRefreshTitles(iPlayer);
-
-				iCurrentMenu = CurrentMenu.ReturnToMenu;
-				this.tResetOpts();
-			}
 
 			if (ess == ESelectStatus.SELECTED)
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -695,8 +689,9 @@ class CStageHeya : CStage {
 
 			#endregion
 		}
-		else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
+		else if (iCurrentMenu != CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel))
+		{
 
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 
@@ -712,6 +707,23 @@ class CStageHeya : CStage {
 			}
 
 
+			return 0;
+		}
+		else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+			OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
+			OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
+			OpenTaiko.NamePlate.tNamePlateRefreshTitles(iPlayer);
+
+			iCurrentMenu = CurrentMenu.ReturnToMenu;
+			this.tResetOpts();
+			OpenTaiko.Skin.soundDecideSFX.tPlay();
+			return 0;
+		}
+		else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+			OpenTaiko.Skin.soundDecideSFX.tPlay();
+			iCurrentMenu = CurrentMenu.ReturnToMenu;
+			this.ttkInfoSection = null;
+			this.tResetOpts();
 			return 0;
 		}
 
