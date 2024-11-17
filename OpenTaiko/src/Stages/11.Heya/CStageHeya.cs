@@ -558,8 +558,8 @@ class CStageHeya : CStage {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			}
 		}
-		else if (iCurrentMenu != CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide))
+		else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)))
 		{
 
 			#region [Decide]
@@ -689,8 +689,8 @@ class CStageHeya : CStage {
 
 			#endregion
 		}
-		else if (iCurrentMenu != CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel))
+		else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)))
 		{
 
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
