@@ -43,7 +43,7 @@ internal class CSystemError : CStage {
 			case Errno.ENO_SKINNOTFOUND: {
 					ErrorMessage += "No compatible skin was found.\n";
 					ErrorMessage += "Please ensure that you have a compatible skin within your System folder.\n";
-					ErrorMessage += "If you did not installed a skin, please do so through the OpenTaiko Hub (Skins tab).\n";
+					ErrorMessage += "If you have not installed a skin, please do so through the OpenTaiko Hub (Skins tab).\n";
 					ErrorMessage += "If this does not resolve the issue, please try updating your skins through the OpenTaiko Hub.\n";
 					break;
 				}
@@ -67,7 +67,7 @@ internal class CSystemError : CStage {
 		};
 
 		// Append a call to contact if necessary
-		ErrorMessage += "\nIf the error persits, please contact us through the links provided on the OpenTaiko Hub.";
+		ErrorMessage += "\nIf the error persists, please contact us through the links provided on the OpenTaiko Hub.";
 	}
 
 	// Constructor
