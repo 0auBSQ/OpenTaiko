@@ -445,7 +445,7 @@
 		"HEYA_DAN": "段位称号",
 		"HEYA_NAMEPLATE": "名牌称号",
 		"HEYA_NAME": "姓名",
-		"HEYA_NAME_INFO": "输入您的姓名（确认保存，取消放弃更改）：",
+		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "姓名：{0}",

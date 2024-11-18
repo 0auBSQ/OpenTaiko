@@ -445,7 +445,7 @@
 		"HEYA_DAN": "Ранг дан",
 		"HEYA_NAMEPLATE": "Ранг таблички",
 		"HEYA_NAME": "Имя",
-		"HEYA_NAME_INFO": "Введите своё имя («Выбрать», чтобы сохранить; «Отмена», чтобы отменить изменения):",
+		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "Имя: {0}",
