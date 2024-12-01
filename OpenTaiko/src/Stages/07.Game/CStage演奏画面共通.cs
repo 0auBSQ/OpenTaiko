@@ -4370,6 +4370,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		OpenTaiko.borderColor = new Color4(1f, 0f, 0f, 0f);
 
 		foreach (var chip in OpenTaiko.TJA.listChip) {
+			chip.ResetRollEffect();
 			if (chip.obj == null) continue;
 			chip.obj.isVisible = false;
 			chip.obj.yScale = 1.0f;
