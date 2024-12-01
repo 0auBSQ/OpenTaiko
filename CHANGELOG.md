@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.22] - 2024-12-01 (Beta)
+
+- Reset bar drumroll redness on retry or training-mode pause
+
 ## [0.6.0.21] - 2024-11-18 (Beta)
 
 - Fix confirm/cancel keyboard inputs ending name change early
