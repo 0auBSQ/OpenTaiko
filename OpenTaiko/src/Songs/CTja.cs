@@ -5001,6 +5001,11 @@ internal class CTja : CActivity {
 
 							}
 							if (NotesManager.IsRollEnd(chip)) {
+								if (this.nNowRollCountBranch[iBranch] < 0) {
+									// stray roll end; treated as blank
+									continue; // process this note symbol in the next branch
+								}
+
 								CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
 								chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
 								chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
