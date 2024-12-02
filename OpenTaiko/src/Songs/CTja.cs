@@ -617,8 +617,6 @@ internal class CTja : CActivity {
 
 	private int n現在の小節数 = 1;
 
-	private int nNowRoll = 0;
-	private int nNowRollCount = 0;
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
@@ -1405,9 +1403,6 @@ internal class CTja : CActivity {
 				int ms = 0;
 				int nBar = 0;
 				int nCount = 0;
-				this.nNowRollCount = 0;
-				for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-					this.nNowRollCountBranch[i] = 0;
 
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
@@ -1421,9 +1416,6 @@ internal class CTja : CActivity {
 					ch = chip.nChannelNo;
 
 					nCount++;
-					this.nNowRollCount++;
-					for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-						this.nNowRollCountBranch[i]++;
 
 					switch (ch) {
 						case 0x01: {
@@ -1483,8 +1475,6 @@ internal class CTja : CActivity {
 									chip.n発声時刻ms += this.nOFFSET;
 									chip.nNoteEndTimems += this.nOFFSET;
 								}
-
-								this.nNowRoll = this.nNowRollCount - 1;
 								continue;
 							}
 						case 0x18: {
@@ -1556,8 +1546,6 @@ internal class CTja : CActivity {
 									chip.n発声時刻ms += this.nOFFSET;
 									chip.nNoteEndTimems += this.nOFFSET;
 								}
-								this.nNowRoll = this.nNowRollCount - 1;
-
 								continue;
 							}
 						case 0x9A: {
