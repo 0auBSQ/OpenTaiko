@@ -619,7 +619,7 @@ internal class CTja : CActivity {
 
 	private int nNowRoll = 0;
 	private int nNowRollCount = 0;
-	private int[] nNowRollCountBranch = new int[3];
+	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
 	public int nOFFSET = 0;
@@ -4901,7 +4901,7 @@ internal class CTja : CActivity {
 							int iBranch = this.IsEndedBranching ? i : (int)this.n現在のコース;
 
 							if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17) {
-								if (this.nNowRollCountBranch[iBranch] > 0) {
+								if (this.nNowRollCountBranch[iBranch] >= 0) {
 									// repeated roll head; treated as blank
 									continue; // process this note symbol in the next branch
 								} else {
@@ -5010,7 +5010,7 @@ internal class CTja : CActivity {
 								chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
 								chip.n連打音符State = chipHead.nChannelNo - 0x10;
 
-								nNowRollCountBranch[iBranch] = 0;
+								nNowRollCountBranch[iBranch] = -1;
 							}
 
 							if (IsEnabledFixSENote) {
