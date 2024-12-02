@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.23] - 2024-12-02 (Beta)
+
+- Fix end of bar drumrolls wrongly snapped to 1/16th (only visually) in HB/BMScroll
+- Fix incorrect roll duration, missing rolls, or unended chart for rolls across branch sections
+- Force unended roll to end at the first non-roll note after it or #END
+
 ## [0.6.0.22] - 2024-12-01 (Beta)
 
 - Reset bar drumroll redness on retry or training-mode pause
