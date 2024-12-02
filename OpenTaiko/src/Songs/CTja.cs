@@ -2211,6 +2211,20 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip1);
 		} else if (command == "#END") {
+			// TaikoJiro compatibility: #END ends unended rolls
+			for (int i = 0; i < 3; i++) {
+				if (this.nNowRollCountBranch[i] >= 0) {
+					ECourse branch = (ECourse)i;
+					if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
+						Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
+							$"{nameof(CTja)}: An unended roll in branch {branch} is ended by #END. In {this.strファイル名の絶対パス}"
+							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strファイル名の絶対パス}"
+						);
+					}
+					InsertNoteAtDefCursor(8, 0, 1, branch);
+				}
+			}
+
 			//ためしに割り込む。
 			var chip = new CChip();
 
@@ -4886,19 +4900,35 @@ internal class CTja : CActivity {
 						// IsEndedBranchingがfalseで1回
 						// trueで3回だよ3回
 						for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-							int iBranch = this.IsEndedBranching ? i : (int)this.n現在のコース;
+							ECourse branch = this.IsEndedBranching ? (ECourse)i : this.n現在のコース;
+							int iBranch = (int)branch;
 
-							if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17) {
-								if (this.nNowRollCountBranch[iBranch] >= 0) {
+							// TODO: add judge-by-note-type methods to NotesManager
+							bool isRollHead = (nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17;
+							if (this.nNowRollCountBranch[iBranch] >= 0) {
+								if (isRollHead) {
 									// repeated roll head; treated as blank
 									continue; // process this note symbol in the next branch
-								} else {
-									// real roll head; predict chip index
-									this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
+								}
+								if (nObjectNum != 8) {
+									// TaikoJiro compatibility: A non-roll ends an unended roll
+									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
+										Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
+											$"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
+											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
+										);
+									}
+									InsertNoteAtDefCursor(8, n, n文字数, branch);
+
 								}
 							}
 
-							InsertNoteAtDefCursor(nObjectNum, n, n文字数, (ECourse)iBranch);
+							if (isRollHead) {
+								// real roll head; predict chip index
+								this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
+							}
+
+							InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
 						}
 					}
 
