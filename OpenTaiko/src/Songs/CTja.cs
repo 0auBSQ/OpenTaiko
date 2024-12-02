@@ -4895,22 +4895,21 @@ internal class CTja : CActivity {
 					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
 
 					if (nObjectNum != 0) {
-						if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17) {
-							if (nNowRoll != 0) {
-								this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / n文字数));
-								this.dbNowBMScollTime += (double)((this.dbBarLength) * (16.0 / n文字数));
-								continue;
-							} else {
-								this.nNowRollCount = listChip.Count;
-								for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-									this.nNowRollCountBranch[i] = listChip_Branch[i].Count;
-								nNowRoll = nObjectNum;
-							}
-						}
-
 						// IsEndedBranchingがfalseで1回
 						// trueで3回だよ3回
 						for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
+							int iBranch = this.IsEndedBranching ? i : (int)this.n現在のコース;
+
+							if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17) {
+								if (this.nNowRollCountBranch[iBranch] > 0) {
+									// repeated roll head; treated as blank
+									continue; // process this note symbol in the next branch
+								} else {
+									// real roll head; predict chip index
+									this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
+								}
+							}
+
 							var chip = new CChip();
 							chip.IsMissed = false;
 							chip.bHit = false;
@@ -5002,14 +5001,7 @@ internal class CTja : CActivity {
 
 							}
 							if (NotesManager.IsRollEnd(chip)) {
-								CChip chipHead;
-								if (!IsEndedBranching || i == 0) {
-									chipHead = listChip[nNowRollCount];
-								} else if (!IsEndedBranching) {
-									chipHead = listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]];
-								} else {
-									chipHead = listChip_Branch[i][nNowRollCountBranch[i]];
-								}
+								CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
 								chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
 								chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
 								chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
@@ -5018,8 +5010,7 @@ internal class CTja : CActivity {
 								chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
 								chip.n連打音符State = chipHead.nChannelNo - 0x10;
 
-								if (!IsEndedBranching || i == 2)
-									nNowRoll = 0;
+								nNowRollCountBranch[iBranch] = 0;
 							}
 
 							if (IsEnabledFixSENote) {
