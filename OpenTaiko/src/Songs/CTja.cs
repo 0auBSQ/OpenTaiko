@@ -5002,11 +5002,6 @@ internal class CTja : CActivity {
 
 							}
 							if (NotesManager.IsRollEnd(chip)) {
-								chip.nノーツ出現時刻ms = listChip[nNowRollCount].nノーツ出現時刻ms;
-								chip.nノーツ移動開始時刻ms = listChip[nNowRollCount].nノーツ移動開始時刻ms;
-
-								chip.n連打音符State = nNowRoll;
-
 								CChip chipHead;
 								if (!IsEndedBranching || i == 0) {
 									chipHead = listChip[nNowRollCount];
@@ -5018,6 +5013,10 @@ internal class CTja : CActivity {
 								chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
 								chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
 								chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
+
+								chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
+								chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
+								chip.n連打音符State = chipHead.nChannelNo - 0x10;
 
 								if (!IsEndedBranching || i == 2)
 									nNowRoll = 0;
