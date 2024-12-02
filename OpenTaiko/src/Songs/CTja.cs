@@ -5002,28 +5002,22 @@ internal class CTja : CActivity {
 
 							}
 							if (NotesManager.IsRollEnd(chip)) {
-								chip.nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-								chip.nNoteEndTimems = (int)this.dbNowTime;
-								chip.fBMSCROLLTime_end = (float)this.dbNowBMScollTime;
-
 								chip.nノーツ出現時刻ms = listChip[nNowRollCount].nノーツ出現時刻ms;
 								chip.nノーツ移動開始時刻ms = listChip[nNowRollCount].nノーツ移動開始時刻ms;
 
 								chip.n連打音符State = nNowRoll;
 
+								CChip chipHead;
 								if (!IsEndedBranching || i == 0) {
-									listChip[nNowRollCount].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip[nNowRollCount].nNoteEndTimems = (int)this.dbNowTime;
-									listChip[nNowRollCount].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+									chipHead = listChip[nNowRollCount];
 								} else if (!IsEndedBranching) {
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].nNoteEndTimems = (int)this.dbNowTime;
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+									chipHead = listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]];
 								} else {
-									listChip_Branch[i][nNowRollCountBranch[i]].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip_Branch[i][nNowRollCountBranch[i]].nNoteEndTimems = (int)this.dbNowTime;
-									listChip_Branch[i][nNowRollCountBranch[i]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
+									chipHead = listChip_Branch[i][nNowRollCountBranch[i]];
 								}
+								chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
+								chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
+								chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
 
 								if (!IsEndedBranching || i == 2)
 									nNowRoll = 0;
