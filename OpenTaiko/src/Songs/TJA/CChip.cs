@@ -15,11 +15,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbChipSizeRatio = 1.0;
 	public double db実数値;
 	public double dbBPM;
+	public double dbBPM_end;
 	public float fNow_Measure_s = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public float fNow_Measure_m = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public bool IsEndedBranching = false;//分岐が終わった時の連打譜面が非可視化になってしまうためフラグを追加.2020.04.21.akasoko26
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
+	public double dbSCROLL_end;
+	public double dbSCROLL_Y_end;
 	public ECourse nBranch;
 	public int nSenote;
 	public int nState;
@@ -173,12 +176,12 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.nHorizontalChipDistance = 0;
 		this.nNoteTipDistance_X = 0;
 		this.nNoteTipDistance_Y = 0;
-		this.dbBPM = 120.0;
+		this.dbBPM_end = this.dbBPM = 120.0;
 		this.fNow_Measure_m = 4.0f;
 		this.fNow_Measure_s = 4.0f;
 		this.nScrollDirection = 0;
-		this.dbSCROLL = 1.0;
-		this.dbSCROLL_Y = 0.0f;
+		this.dbSCROLL_end = this.dbSCROLL = 1.0;
+		this.dbSCROLL_Y_end = this.dbSCROLL_Y = 0.0f;
 	}
 	public override string ToString() {
 

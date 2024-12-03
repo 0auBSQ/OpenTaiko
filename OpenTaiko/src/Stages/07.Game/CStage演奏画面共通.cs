@@ -2872,13 +2872,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 			CChip pChip = dTX.listChip[nCurrentTopChip];
 			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
 			long time = pChip.n発声時刻ms - n現在時刻ms;
+			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
 
-			double _scrollSpeed = pChip.dbSCROLL * (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
-			double _scrollSpeed_Y = pChip.dbSCROLL_Y * (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
+			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
+			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
 			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
 			if (pChip.nNoteEndTimems != 0) {
-				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
-				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM, _scrollSpeed_Y, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
+				double _scrollSpeed_end = pChip.dbSCROLL_end * _scroll_rate;
+				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y_end * _scroll_rate;
+				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM_end, _scrollSpeed_end, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
+				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM_end, _scrollSpeed_Y_end, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
 			}
 
 
