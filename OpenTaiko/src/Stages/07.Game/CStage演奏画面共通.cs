@@ -3187,13 +3187,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 						break;
 					}
 				#endregion
-				#region [ 51: 拍線 ]
-				case 0x51:  // 拍線
-					if (!pChip.bHit && time < 0) {
-						pChip.bHit = true;
-					}
-					break;
-				#endregion
 				#region [ 54: 動画再生 ]
 				case 0x54:  // 動画再生
 					if (!pChip.bHit && time < 0) {
