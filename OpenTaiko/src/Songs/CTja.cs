@@ -1388,7 +1388,7 @@ internal class CTja : CActivity {
 						startIndex++;   // 1つ小さく過ぎているので、戻す
 					}
 					for (int j = startIndex; j <= i; j++) {
-						if (((this.listChip[j].nChannelNo == 0x50) || (this.listChip[j].nChannelNo == 0x51)) &&
+						if ((this.listChip[j].nChannelNo == 0x50) &&
 							(this.listChip[j].n整数値 == (36 * 36 - 1))) {
 							this.listChip[j].bVisible = bShowBeatBarLine;
 						}
@@ -1408,7 +1408,7 @@ internal class CTja : CActivity {
 				int BGM番号 = 0;
 
 				foreach (CChip chip in this.listChip) {
-					if (chip.nChannelNo == 0x02) { } else if (chip.nChannelNo == 0x01) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo >= 0x11 && chip.nChannelNo <= 0x1F) { } else if (chip.nChannelNo == 0x50) { } else if (chip.nChannelNo == 0x51) { } else if (chip.nChannelNo == 0x54) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo == 0xF1) { } else if (chip.nChannelNo == 0xF2) { } else if (chip.nChannelNo == 0xFF) { } else if (chip.nChannelNo == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo < 0x93)
+					if (chip.nChannelNo == 0x02) { } else if (chip.nChannelNo == 0x01) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo >= 0x11 && chip.nChannelNo <= 0x1F) { } else if (chip.nChannelNo == 0x50) { } else if (chip.nChannelNo == 0x54) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo == 0xF1) { } else if (chip.nChannelNo == 0xF2) { } else if (chip.nChannelNo == 0xFF) { } else if (chip.nChannelNo == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo < 0x93)
 						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
 					else if ((chip.nChannelNo > 0x9F && chip.nChannelNo < 0xA0) || (chip.nChannelNo >= 0xF0 && chip.nChannelNo < 0xFE))
 						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
@@ -4849,31 +4849,6 @@ internal class CTja : CActivity {
 
 					this.dbLastTime = this.dbNowTime;
 					this.b小節線を挿入している = true;
-
-					#region[ 拍線チップテスト ]
-					//1拍の時間を計算
-					double db1拍 = (60.0 / this.dbNowBPM) / 4.0;
-					//forループ(拍数)
-					for (int measure = 1; measure < this.fNow_Measure_s; measure++) {
-						CChip hakusen = new CChip();
-						hakusen.n発声位置 = ((this.n現在の小節数) * 384);
-						hakusen.n発声時刻ms = (int)(this.dbNowTime + (((db1拍 * 4.0)) * measure) * 1000.0);
-						hakusen.nChannelNo = 0x51;
-						hakusen.fBMSCROLLTime = this.dbNowBMScollTime;
-						hakusen.n整数値_内部番号 = this.n現在の小節数;
-						hakusen.n整数値 = 0;
-						hakusen.dbBPM = this.dbNowBPM;
-						hakusen.dbSCROLL = this.dbNowScroll;
-						hakusen.fNow_Measure_m = this.fNow_Measure_m;
-						hakusen.fNow_Measure_s = this.fNow_Measure_s;
-						hakusen.dbSCROLL_Y = this.dbNowScrollY;
-						hakusen.nBranch = n現在のコース;
-						hakusen.eScrollMode = eScrollMode;
-						this.listChip.Add(hakusen);
-					}
-
-					#endregion
-
 				}
 
 				for (int n = 0; n < InputText.Length; n++) {
