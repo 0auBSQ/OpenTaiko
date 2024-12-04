@@ -49,39 +49,32 @@ class NotesManager {
 		return -1;
 	}
 
-	public static int GetNoteX(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
-		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-		double screen_ratio = OpenTaiko.Skin.Resolution[0] / 1280.0;
-		switch (eScrollMode) {
-			case EScrollMode.Normal:
-				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-			case EScrollMode.BMScroll: {
-					return (int)((hbtime / 16.0) * interval * screen_ratio);
-				}
-			case EScrollMode.HBScroll: {
-					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-				}
-			default:
-				return 0;
+	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+		if (eScrollMode is EScrollMode.BMScroll) {
+			scroll = 1.0;
 		}
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
+		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
 	}
 
-	public static int GetNoteY(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
-		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-		double screen_ratio = OpenTaiko.Skin.Resolution[1] / 720.0;
-		switch (eScrollMode) {
-			case EScrollMode.Normal:
-				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-			case EScrollMode.BMScroll: {
-					return 0;
-				}
-			case EScrollMode.HBScroll: {
-					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-				}
-			default:
-				return 0;
+	public static int GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
+			return 0;
 		}
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
+		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
+		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
 	}
+
+	public static double getN4Beats(double msDTime, double th16DBeat, double bpm, EScrollMode eScrollMode)
+		=> eScrollMode switch {
+			EScrollMode.Normal => msDTime * bpm / 240000.0,
+			EScrollMode.BMScroll or EScrollMode.HBScroll => th16DBeat / 16.0,
+			_ => 0,
+		};
 
 	#endregion
 

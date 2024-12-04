@@ -1474,8 +1474,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 					float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+					double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 
-					y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+					y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 				}
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1691,7 +1692,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long __dbt = nowTime;
 				long time = pChip.n発声時刻ms - __dbt;
 				float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-				y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+				double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+				y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			}
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1900,9 +1902,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (pChip.dbSCROLL_Y != 0.0) {
 			double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 			long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
-			long time = pChip.n発声時刻ms - __dbt;
+			long msDTime = pChip.n発声時刻ms - __dbt;
 			float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-			y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+			y += NotesManager.GetNoteY(msDTime, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 
 			//y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
 		}
