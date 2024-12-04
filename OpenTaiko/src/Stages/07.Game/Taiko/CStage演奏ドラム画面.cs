@@ -1709,7 +1709,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			bool isBodyXInScreen = (Math.Min(x, x末端) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, x末端) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
-			if (NotesManager.IsRoll(pChip)) {
+			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
 				HideObscuringRoll(nPlayer, pChip, x, y, x末端, y末端, isBodyXInScreen, nowTime);
 			}
 
