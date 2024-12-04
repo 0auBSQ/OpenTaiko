@@ -5044,6 +5044,7 @@ internal class CTja : CActivity {
 			chipHead.dbBPM_end = chip.dbBPM_end = chip.dbBPM;
 			chipHead.dbSCROLL_end = chip.dbSCROLL_end = chip.dbSCROLL;
 			chipHead.dbSCROLL_Y_end = chip.dbSCROLL_Y_end = chip.dbSCROLL_Y;
+			chipHead.eScrollMode_end = chip.eScrollMode_end = chip.eScrollMode;
 
 			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
 			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;

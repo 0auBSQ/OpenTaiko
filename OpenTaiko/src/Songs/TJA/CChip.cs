@@ -5,6 +5,7 @@ namespace OpenTaiko;
 
 internal class CChip : IComparable<CChip>, ICloneable {
 	public EScrollMode eScrollMode;
+	public EScrollMode eScrollMode_end;
 	public bool bHit;
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
