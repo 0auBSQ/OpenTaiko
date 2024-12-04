@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.24] - 2024-12-04 (Beta)
+
+- Remove broken DTX legacy beatline chips processing (0x51)
+
 ## [0.6.0.23] - 2024-12-02 (Beta)
 
 - Fix end of bar drumrolls wrongly snapped to 1/16th (only visually) in HB/BMScroll
