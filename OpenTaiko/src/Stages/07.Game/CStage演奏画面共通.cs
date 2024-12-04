@@ -2872,16 +2872,19 @@ internal abstract class CStage演奏画面共通 : CStage {
 			CChip pChip = dTX.listChip[nCurrentTopChip];
 			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
 			long time = pChip.n発声時刻ms - n現在時刻ms;
+			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
 
 			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
 			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
-			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			if (pChip.nNoteEndTimems != 0) {
+				long msDTime_end = pChip.nNoteEndTimems - n現在時刻ms;
+				double th16DBeat_end = pChip.fBMSCROLLTime_end - play_bpm_time;
 				double _scrollSpeed_end = pChip.dbSCROLL_end * _scroll_rate;
 				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y_end * _scroll_rate;
-				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM_end, _scrollSpeed_end, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
-				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(pChip, (pChip.nNoteEndTimems - n現在時刻ms) * pChip.dbBPM_end, _scrollSpeed_Y_end, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, true);
+				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_end, pChip.eScrollMode);
+				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_Y_end, pChip.eScrollMode);
 			}
 
 

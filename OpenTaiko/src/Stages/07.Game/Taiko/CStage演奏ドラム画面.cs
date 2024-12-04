@@ -1473,8 +1473,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 					float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+					double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 
-					y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+					y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 				}
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1690,7 +1691,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long __dbt = nowTime;
 				long time = pChip.n発声時刻ms - __dbt;
 				float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-				y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+				double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+				y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			}
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1909,12 +1911,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 
 		// displacement per sec
-		float beat16th = (float)(pChip.fBMSCROLLTime + 4 * pChip.dbBPM / 60);
-		float beat16th_end = (float)(pChip.fBMSCROLLTime_end + 4 * pChip.dbBPM / 60);
-		int dxHead = NotesManager.GetNoteX(pChip, -1000 * pChip.dbBPM, pChip.dbSCROLL, OpenTaiko.Skin.Game_Notes_Interval, beat16th, pChip.eScrollMode, false);
-		int dyHead = NotesManager.GetNoteY(pChip, -1000 * pChip.dbBPM, pChip.dbSCROLL_Y, OpenTaiko.Skin.Game_Notes_Interval, beat16th, pChip.eScrollMode, false);
-		int dxEnd = NotesManager.GetNoteX(pChip, -1000 * pChip.dbBPM_end, pChip.dbSCROLL_end, OpenTaiko.Skin.Game_Notes_Interval, beat16th_end, pChip.eScrollMode, true);
-		int dyEnd = NotesManager.GetNoteY(pChip, -1000 * pChip.dbBPM_end, pChip.dbSCROLL_Y_end, OpenTaiko.Skin.Game_Notes_Interval, beat16th_end, pChip.eScrollMode, true);
+		double th16DBeat = -4 * pChip.dbBPM / 60;
+		int dxHead = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+		int dyHead = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL_Y, pChip.eScrollMode);
+		int dxEnd = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_end, pChip.eScrollMode);
+		int dyEnd = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_Y_end, pChip.eScrollMode);
 
 		// get move speed near the judgement mark
 
@@ -1963,9 +1964,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (pChip.dbSCROLL_Y != 0.0) {
 			double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 			long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
-			long time = pChip.n発声時刻ms - __dbt;
+			long msDTime = pChip.n発声時刻ms - __dbt;
 			float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-			y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+			y += NotesManager.GetNoteY(msDTime, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 
 			//y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
 		}
