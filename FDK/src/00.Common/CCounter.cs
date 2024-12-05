@@ -132,12 +132,16 @@ public class CCounter {
 			if (msNow < this.msNowTime)
 				this.msNowTime = msNow;
 
-			while ((msNow - this.msNowTime) >= this.msInterval) {
+			for (int i = 0; i < 8; ++i) {
+				if ((msNow - this.msNowTime) < this.msInterval)
+					return;
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.EndValue;
 
 				this.msNowTime += this.msInterval;
 			}
+
+			this.TickJump(msNow);
 		}
 	}
 
@@ -151,13 +155,31 @@ public class CCounter {
 			if (msNow < this.msNowTime)
 				this.msNowTime = msNow;
 
-			while ((msNow - this.msNowTime) >= this.msInterval) {
+			for (int i = 0; i < 8; ++i) {
+				if ((msNow - this.msNowTime) < this.msInterval)
+					return;
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.EndValue;
 
 				this.msNowTime += this.msInterval;
 			}
+
+			this.TickJump(msNow);
 		}
+	}
+
+	/// Jump over precalculated steps. Might be slower due to float division.
+	private void TickJump(double msNow) {
+		if ((msNow - this.msNowTime) < this.msInterval)
+			return;
+		int nStepsMax = (int)this.EndValue + 1 - (int)this.BeginValue;
+		long nSteps = (long)((msNow - this.msNowTime) / this.msInterval);
+		if (nSteps >= nStepsMax // attempt to prevent overflow
+			|| (this.CurrentValue += (int)nSteps) > this.EndValue
+			) {
+			this.CurrentValue = (int)this.EndValue;
+		}
+		this.msNowTime += nSteps * this.msInterval;
 	}
 
 	/// <summary>
@@ -170,12 +192,16 @@ public class CCounter {
 			if (msNow < this.msNowTime)
 				this.msNowTime = msNow;
 
-			while ((msNow - this.msNowTime) >= this.msInterval) {
+			for (int i = 0; i < 8; ++i) {
+				if ((msNow - this.msNowTime) < this.msInterval)
+					return;
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.BeginValue;
 
 				this.msNowTime += this.msInterval;
 			}
+
+			this.TickLoopJump(msNow);
 		}
 	}
 
@@ -189,13 +215,30 @@ public class CCounter {
 			if (msNow < this.msNowTime)
 				this.msNowTime = msNow;
 
-			while ((msNow - this.msNowTime) >= this.msInterval) {
+			for (int i = 0; i < 8; ++i) {
+				if ((msNow - this.msNowTime) < this.msInterval)
+					return;
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.BeginValue;
 
 				this.msNowTime += this.msInterval;
 			}
+
+			this.TickLoopJump(msNow);
 		}
+	}
+
+	/// Jump over precalculated steps. Might be slower due to float division.
+	private void TickLoopJump(double msNow) {
+		if ((msNow - this.msNowTime) < this.msInterval)
+			return;
+		int nStepsMax = (int)this.EndValue + 1 - (int)this.BeginValue;
+		long nSteps = (long)((msNow - this.msNowTime) / this.msInterval);
+		int dVal = (int)(nSteps % nStepsMax); // attempt to prevent overflow
+		if ((this.CurrentValue += dVal) > this.EndValue) {
+			this.CurrentValue = (int)this.BeginValue;
+		}
+		this.msNowTime += nSteps * this.msInterval;
 	}
 
 	/// <summary>
