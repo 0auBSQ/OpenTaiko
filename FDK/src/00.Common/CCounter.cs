@@ -13,6 +13,7 @@
 ///
 /// double値を使う場合、t進行db、t進行LoopDbを使うこと。
 /// また、double版では間隔の値はミリ秒単位ではなく、通常の秒単位になります。
+/// Note: For the double version, the given interval is in second only for new CCounter(), not for Start().
 /// </remarks>
 public class CCounter {
 	public bool IsStarted {
@@ -33,23 +34,23 @@ public class CCounter {
 		set;
 	}
 
-	public double _Interval {
+	public double _msInterval {
 		get {
-			return this.Interval;
+			return this.msInterval;
 		}
 		set {
-			this.Interval = value >= 0 ? value : value * -1;
+			this.msInterval = value >= 0 ? value : value * -1;
 		}
 	}
 
-	public double NowTime {
+	public double msNowTime {
 		get;
 		set;
 	}
 	// 状態プロパティ
 
 	public bool IsTicked {
-		get { return (this.NowTime != -1); }
+		get { return (this.msNowTime != -1); }
 	}
 	public bool IsStoped {
 		get { return !this.IsTicked; }
@@ -69,19 +70,19 @@ public class CCounter {
 		this.EndValue = 0;
 		this.CurrentValue = 0;
 		this.CurrentValue = 0;
-		this.NowTime = CSoundTimer.UnusedNum;
+		this.msNowTime = CSoundTimer.UnusedNum;
 	}
 
 	/// <summary>生成と同時に開始する。</summary>
-	public CCounter(double begin, double end, double interval, CTimer timer)
+	public CCounter(double begin, double end, double msInterval, CTimer timer)
 		: this() {
-		this.Start(begin, end, interval, timer);
+		this.Start(begin, end, msInterval, timer);
 	}
 
 	/// <summary>生成と同時に開始する。(double版)</summary>
-	public CCounter(double begin, double end, double interval, CSoundTimer timer)
+	public CCounter(double begin, double end, double secInterval, CSoundTimer timer)
 		: this() {
-		this.Start(begin, end, interval * 1000.0f, timer);
+		this.Start(begin, end, secInterval * 1000.0f, timer);
 	}
 
 
@@ -92,14 +93,14 @@ public class CCounter {
 	/// </summary>
 	/// <param name="begin">最初のカウント値。</param>
 	/// <param name="end">最後のカウント値。</param>
-	/// <param name="interval">カウント値を１増加させるのにかける時間（ミリ秒単位）。</param>
+	/// <param name="msInterval">カウント値を１増加させるのにかける時間（ミリ秒単位）。</param>
 	/// <param name="timer">カウントに使用するタイマ。</param>
-	public void Start(double begin, double end, double interval, CTimer timer) {
+	public void Start(double begin, double end, double msInterval, CTimer timer) {
 		this.BeginValue = begin;
 		this.EndValue = end;
-		this._Interval = interval;
+		this._msInterval = msInterval;
 		this.NormalTimer = timer;
-		this.NowTime = this.NormalTimer.NowTimeMs;
+		this.msNowTime = this.NormalTimer.NowTimeMs;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -109,14 +110,14 @@ public class CCounter {
 	/// </summary>
 	/// <param name="begin">最初のカウント値。</param>
 	/// <param name="end">最後のカウント値。</param>
-	/// <param name="interval">カウント値を１増加させるのにかける時間（秒単位）。</param>
+	/// <param name="msInterval">カウント値を１増加させるのにかける時間（ミリ秒単位）。</param>
 	/// <param name="timer">カウントに使用するタイマ。</param>
-	public void Start(double begin, double end, double interval, CSoundTimer timer) {
+	public void Start(double begin, double end, double msInterval, CSoundTimer timer) {
 		this.BeginValue = begin;
 		this.EndValue = end;
-		this._Interval = interval;
+		this._msInterval = msInterval;
 		this.TimerDB = timer;
-		this.NowTime = this.TimerDB.SystemTimeMs_Double;
+		this.msNowTime = this.TimerDB.SystemTimeMs_Double;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -126,16 +127,16 @@ public class CCounter {
 	/// カウント値が終了値に達している場合は、それ以上増加しない（終了値を維持する）。
 	/// </summary>
 	public void Tick() {
-		if ((this.NormalTimer != null) && (this.NowTime != CTimer.UnusedNum)) {
-			long num = this.NormalTimer.NowTimeMs;
-			if (num < this.NowTime)
-				this.NowTime = num;
+		if ((this.NormalTimer != null) && (this.msNowTime != CTimer.UnusedNum)) {
+			long msNow = this.NormalTimer.NowTimeMs;
+			if (msNow < this.msNowTime)
+				this.msNowTime = msNow;
 
-			while ((num - this.NowTime) >= this.Interval) {
+			while ((msNow - this.msNowTime) >= this.msInterval) {
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.EndValue;
 
-				this.NowTime += this.Interval;
+				this.msNowTime += this.msInterval;
 			}
 		}
 	}
@@ -145,16 +146,16 @@ public class CCounter {
 	/// カウント値が終了値に達している場合は、それ以上増加しない（終了値を維持する）。
 	/// </summary>
 	public void TickDB() {
-		if ((this.TimerDB != null) && (this.NowTime != CSoundTimer.UnusedNum)) {
-			double num = this.TimerDB.NowTimeMs;
-			if (num < this.NowTime)
-				this.NowTime = num;
+		if ((this.TimerDB != null) && (this.msNowTime != CSoundTimer.UnusedNum)) {
+			double msNow = this.TimerDB.NowTimeMs;
+			if (msNow < this.msNowTime)
+				this.msNowTime = msNow;
 
-			while ((num - this.NowTime) >= this.Interval) {
+			while ((msNow - this.msNowTime) >= this.msInterval) {
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.EndValue;
 
-				this.NowTime += this.Interval;
+				this.msNowTime += this.msInterval;
 			}
 		}
 	}
@@ -164,16 +165,16 @@ public class CCounter {
 	/// カウント値が終了値に達している場合は、次の増加タイミングで開始値に戻る（値がループする）。
 	/// </summary>
 	public void TickLoop() {
-		if ((this.NormalTimer != null) && (this.NowTime != CTimer.UnusedNum)) {
-			long num = this.NormalTimer.NowTimeMs;
-			if (num < this.NowTime)
-				this.NowTime = num;
+		if ((this.NormalTimer != null) && (this.msNowTime != CTimer.UnusedNum)) {
+			long msNow = this.NormalTimer.NowTimeMs;
+			if (msNow < this.msNowTime)
+				this.msNowTime = msNow;
 
-			while ((num - this.NowTime) >= this.Interval) {
+			while ((msNow - this.msNowTime) >= this.msInterval) {
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.BeginValue;
 
-				this.NowTime += this.Interval;
+				this.msNowTime += this.msInterval;
 			}
 		}
 	}
@@ -183,16 +184,16 @@ public class CCounter {
 	/// カウント値が終了値に達している場合は、次の増加タイミングで開始値に戻る（値がループする）。
 	/// </summary>
 	public void TickLoopDB() {
-		if ((this.TimerDB != null) && (this.NowTime != CSoundTimer.UnusedNum)) {
-			double num = this.TimerDB.NowTimeMs;
-			if (num < this.NowTime)
-				this.NowTime = num;
+		if ((this.TimerDB != null) && (this.msNowTime != CSoundTimer.UnusedNum)) {
+			double msNow = this.TimerDB.NowTimeMs;
+			if (msNow < this.msNowTime)
+				this.msNowTime = msNow;
 
-			while ((num - this.NowTime) >= this.Interval) {
+			while ((msNow - this.msNowTime) >= this.msInterval) {
 				if (++this.CurrentValue > this.EndValue)
 					this.CurrentValue = (int)this.BeginValue;
 
-				this.NowTime += this.Interval;
+				this.msNowTime += this.msInterval;
 			}
 		}
 	}
@@ -202,11 +203,11 @@ public class CCounter {
 	/// これ以降に t進行() や t進行Loop() を呼び出しても何も処理されない。
 	/// </summary>
 	public void Stop() {
-		this.NowTime = CTimer.UnusedNum;
+		this.msNowTime = CTimer.UnusedNum;
 	}
 
 	public void ChangeInterval(double Value) {
-		this._Interval = Value;
+		this._msInterval = Value;
 	}
 
 	// その他
@@ -232,23 +233,23 @@ public class CCounter {
 
 					keyProcess();
 					this.CurrentValue = second;
-					this.NowTime = this.NormalTimer.NowTimeMs;
+					this.msNowTime = this.NormalTimer.NowTimeMs;
 					return;
 
 				case second:
 
-					if ((this.NormalTimer.NowTimeMs - this.NowTime) > 200) {
+					if ((this.NormalTimer.NowTimeMs - this.msNowTime) > 200) {
 						keyProcess();
-						this.NowTime = this.NormalTimer.NowTimeMs;
+						this.msNowTime = this.NormalTimer.NowTimeMs;
 						this.CurrentValue = later;
 					}
 					return;
 
 				case later:
 
-					if ((this.NormalTimer.NowTimeMs - this.NowTime) > 30) {
+					if ((this.NormalTimer.NowTimeMs - this.msNowTime) > 30) {
 						keyProcess();
-						this.NowTime = this.NormalTimer.NowTimeMs;
+						this.msNowTime = this.NormalTimer.NowTimeMs;
 					}
 					return;
 			}
@@ -265,7 +266,7 @@ public class CCounter {
 	//-----------------
 	private CTimer NormalTimer;
 	private CSoundTimer TimerDB;
-	private double Interval;
+	private double msInterval;
 	//-----------------
 	#endregion
 }
