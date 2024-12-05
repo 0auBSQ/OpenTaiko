@@ -39,7 +39,7 @@ public class CCounter {
 			return this.msInterval;
 		}
 		set {
-			this.msInterval = value >= 0 ? value : value * -1;
+			this.msInterval = Math.Max(1e-6, Math.Abs(value));
 		}
 	}
 
