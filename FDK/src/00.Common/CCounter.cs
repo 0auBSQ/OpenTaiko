@@ -99,7 +99,7 @@ public class CCounter {
 		this.EndValue = end;
 		this._Interval = interval;
 		this.NormalTimer = timer;
-		this.NowTime = this.NormalTimer.NowTime;
+		this.NowTime = this.NormalTimer.NowTimeMs;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -116,7 +116,7 @@ public class CCounter {
 		this.EndValue = end;
 		this._Interval = interval;
 		this.TimerDB = timer;
-		this.NowTime = this.TimerDB.SystemTime_Double;
+		this.NowTime = this.TimerDB.SystemTimeMs_Double;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -127,7 +127,7 @@ public class CCounter {
 	/// </summary>
 	public void Tick() {
 		if ((this.NormalTimer != null) && (this.NowTime != CTimer.UnusedNum)) {
-			long num = this.NormalTimer.NowTime;
+			long num = this.NormalTimer.NowTimeMs;
 			if (num < this.NowTime)
 				this.NowTime = num;
 
@@ -146,7 +146,7 @@ public class CCounter {
 	/// </summary>
 	public void TickDB() {
 		if ((this.TimerDB != null) && (this.NowTime != CSoundTimer.UnusedNum)) {
-			double num = this.TimerDB.NowTime;
+			double num = this.TimerDB.NowTimeMs;
 			if (num < this.NowTime)
 				this.NowTime = num;
 
@@ -165,7 +165,7 @@ public class CCounter {
 	/// </summary>
 	public void TickLoop() {
 		if ((this.NormalTimer != null) && (this.NowTime != CTimer.UnusedNum)) {
-			long num = this.NormalTimer.NowTime;
+			long num = this.NormalTimer.NowTimeMs;
 			if (num < this.NowTime)
 				this.NowTime = num;
 
@@ -184,7 +184,7 @@ public class CCounter {
 	/// </summary>
 	public void TickLoopDB() {
 		if ((this.TimerDB != null) && (this.NowTime != CSoundTimer.UnusedNum)) {
-			double num = this.TimerDB.NowTime;
+			double num = this.TimerDB.NowTimeMs;
 			if (num < this.NowTime)
 				this.NowTime = num;
 
@@ -232,23 +232,23 @@ public class CCounter {
 
 					keyProcess();
 					this.CurrentValue = second;
-					this.NowTime = this.NormalTimer.NowTime;
+					this.NowTime = this.NormalTimer.NowTimeMs;
 					return;
 
 				case second:
 
-					if ((this.NormalTimer.NowTime - this.NowTime) > 200) {
+					if ((this.NormalTimer.NowTimeMs - this.NowTime) > 200) {
 						keyProcess();
-						this.NowTime = this.NormalTimer.NowTime;
+						this.NowTime = this.NormalTimer.NowTimeMs;
 						this.CurrentValue = later;
 					}
 					return;
 
 				case later:
 
-					if ((this.NormalTimer.NowTime - this.NowTime) > 30) {
+					if ((this.NormalTimer.NowTimeMs - this.NowTime) > 30) {
 						keyProcess();
-						this.NowTime = this.NormalTimer.NowTime;
+						this.NowTime = this.NormalTimer.NowTimeMs;
 					}
 					return;
 			}

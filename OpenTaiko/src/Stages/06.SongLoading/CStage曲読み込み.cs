@@ -140,11 +140,11 @@ internal class CStage曲読み込み : CStage {
 					CSkin.CSystemSound.r最後に再生した排他システムサウンド.tStop();
 				}
 				this.sd読み込み音.PlayStart();
-				this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTime;
+				this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTimeMs;
 				this.nBGMの総再生時間ms = this.sd読み込み音.TotalPlayTime;
 			} else {
 				OpenTaiko.Skin.sound曲読込開始音.tPlay();
-				this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTime;
+				this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTimeMs;
 				this.nBGMの総再生時間ms = OpenTaiko.Skin.sound曲読込開始音.n長さ_現在のサウンド;
 			}
 			//this.actFI.tフェードイン開始();							// #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
@@ -472,7 +472,7 @@ internal class CStage曲読み込み : CStage {
 				}
 
 			case CStage.EPhase.SongLoading_WaitForSoundSystemBGM: {
-					long nCurrentTime = OpenTaiko.Timer.NowTime;
+					long nCurrentTime = OpenTaiko.Timer.NowTimeMs;
 					if (nCurrentTime < this.nBGM再生開始時刻)
 						this.nBGM再生開始時刻 = nCurrentTime;
 

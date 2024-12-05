@@ -388,7 +388,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			if (this.st叩ききりまショー.bタイマー使用中) {
 				if (!this.st叩ききりまショー.ct残り時間.IsStoped || this.st叩ききりまショー.b加算アニメ中 == true) {
 					this.st叩ききりまショー.ct残り時間.Tick();
-					if (!OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる((long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), 0, 5000, 0) || this.st叩ききりまショー.b加算アニメ中 == true) {
+					if (!OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる((long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed), 0, 5000, 0) || this.st叩ききりまショー.b加算アニメ中 == true) {
 						this.st叩ききりまショー.bタイマー使用中 = false;
 						this.st叩ききりまショー.ct残り時間.Stop();
 					}
@@ -498,7 +498,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 		double n延長する時間 = 0;
 
 		//最後に延長した時刻から11秒経過していなければ延長を行わない。
-		if (this.n最後に時間延長した時刻 + 11000 <= (SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
+		if (this.n最後に時間延長した時刻 + 11000 <= (SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
 			//1項目につき5秒
 			//-精度
 			if (this.st叩ききりまショー.nヒット数_PERFECT != 0 || this.st叩ききりまショー.nヒット数_GREAT != 0) {
@@ -590,7 +590,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			#endregion
 
 
-			this.n最後に時間延長した時刻 = (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.n最後に時間延長した時刻 = (int)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			if (n延長する時間 < 0)
 				n延長する時間 = 0;
 			if (this.st叩ききりまショー.n区間ノート数 == 0)
@@ -651,7 +651,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			}
 
 
-			this.n最後に時間延長した時刻 = (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.n最後に時間延長した時刻 = (int)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			if (n延長する時間 < 0)
 				n延長する時間 = 0;
 

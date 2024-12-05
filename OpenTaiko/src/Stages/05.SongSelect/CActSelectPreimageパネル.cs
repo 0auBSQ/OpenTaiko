@@ -50,7 +50,7 @@ internal class CActSelectPreimageパネル : CActivity {
 				if ((this.ctDelayedDisplay.CurrentValue >= 0) && this.bNewPreimageStillLoading) {
 					this.tUpdatePreimage(OpenTaiko.stageSongSelect.r現在選択中のスコア);
 					OpenTaiko.Timer.Update();
-					this.ctDelayedDisplay.NowTime = OpenTaiko.Timer.NowTime;
+					this.ctDelayedDisplay.NowTime = OpenTaiko.Timer.NowTimeMs;
 					this.bNewPreimageLoaded = true;
 				} else if (this.ctDelayedDisplay.IsEnded && this.ctDelayedDisplay.IsTicked) {
 					this.ctDelayedDisplay.Stop();

@@ -575,11 +575,11 @@ internal class CAct演奏Combo共通 : CActivity {
 			#region [ nジャンプインデックス値 の進行。]
 			//-----------------
 			if (this.status[i].nジャンプインデックス値 < 360) {
-				if ((this.status[i].n前回の時刻_ジャンプ用 == -1) || (OpenTaiko.Timer.NowTime < this.status[i].n前回の時刻_ジャンプ用))
-					this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTime;
+				if ((this.status[i].n前回の時刻_ジャンプ用 == -1) || (OpenTaiko.Timer.NowTimeMs < this.status[i].n前回の時刻_ジャンプ用))
+					this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTimeMs;
 
 				const long INTERVAL = 2;
-				while ((OpenTaiko.Timer.NowTime - this.status[i].n前回の時刻_ジャンプ用) >= INTERVAL) {
+				while ((OpenTaiko.Timer.NowTimeMs - this.status[i].n前回の時刻_ジャンプ用) >= INTERVAL) {
 					if (this.status[i].nジャンプインデックス値 < 2000)
 						this.status[i].nジャンプインデックス値 += 3;
 
@@ -600,7 +600,7 @@ internal class CAct演奏Combo共通 : CActivity {
 						// モード変更
 						this.status[i].e現在のモード = EMode.進行表示中;
 						this.status[i].nジャンプインデックス値 = 0;
-						this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTime;
+						this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTimeMs;
 						goto Retry;
 					}
 
@@ -617,13 +617,13 @@ internal class CAct演奏Combo共通 : CActivity {
 						// モード変更
 						this.status[i].e現在のモード = EMode.残像表示中;
 						this.status[i].n残像表示中のCOMBO値 = this.status[i].n現在表示中のCOMBO値;
-						this.status[i].nコンボが切れた時刻 = OpenTaiko.Timer.NowTime;
+						this.status[i].nコンボが切れた時刻 = OpenTaiko.Timer.NowTimeMs;
 						goto Retry;
 					}
 
 					if (e今回の状態遷移イベント == EEvent.数値更新) {
 						this.status[i].nジャンプインデックス値 = 0;
-						this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTime;
+						this.status[i].n前回の時刻_ジャンプ用 = OpenTaiko.Timer.NowTimeMs;
 					}
 
 					this.status[i].n現在表示中のCOMBO値 = this.status[i].nCOMBO値;
@@ -660,7 +660,7 @@ internal class CAct演奏Combo共通 : CActivity {
 						this.status[i].e現在のモード = EMode.進行表示中;
 						goto Retry;
 					}
-					if ((OpenTaiko.Timer.NowTime - this.status[i].nコンボが切れた時刻) > 1000) {
+					if ((OpenTaiko.Timer.NowTimeMs - this.status[i].nコンボが切れた時刻) > 1000) {
 						// モード変更２
 						this.status[i].e現在のモード = EMode.非表示中;
 						goto Retry;

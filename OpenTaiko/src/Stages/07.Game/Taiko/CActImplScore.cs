@@ -10,7 +10,7 @@ internal class CActImplScore : CAct演奏スコア共通 {
 			if (base.IsFirstDraw) {
 				base.IsFirstDraw = false;
 			}
-			long num = FDK.SoundManager.PlayTimer.NowTime;
+			long num = FDK.SoundManager.PlayTimer.NowTimeMs;
 
 
 			if (!this.ctTimer.IsStoped) {

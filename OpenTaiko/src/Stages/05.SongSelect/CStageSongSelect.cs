@@ -1373,7 +1373,7 @@ internal class CStageSongSelect : CStage {
 			STCommandTime _stct = new STCommandTime {
 				eInst = _eInst,
 				ePad = _ePad,
-				time = OpenTaiko.Timer.NowTime
+				time = OpenTaiko.Timer.NowTimeMs
 			};
 
 			if (stct.Count >= buffersize) {
@@ -1400,7 +1400,7 @@ internal class CStageSongSelect : CStage {
 				return false;
 			}
 
-			long curTime = OpenTaiko.Timer.NowTime;
+			long curTime = OpenTaiko.Timer.NowTimeMs;
 			//Debug.WriteLine("Start checking...targetCount=" + targetCount);
 			for (int i = targetCount - 1, j = stciCount - 1; i >= 0; i--, j--) {
 				if (_ePad[i] != stct[j].ePad) {
