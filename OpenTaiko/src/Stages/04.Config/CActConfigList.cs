@@ -181,9 +181,9 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISCORDRPC_DESC"));
 		list項目リスト.Add(SendDiscordPlayingInformation);
 
-		this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT"), OpenTaiko.ConfigIni.bBufferedInputs,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT_DESC"));
-		this.list項目リスト.Add(this.iSystemBufferedInput);
+		//this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT"), OpenTaiko.ConfigIni.bBufferedInputs,
+		//	CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT_DESC"));
+		//this.list項目リスト.Add(this.iSystemBufferedInput);
 		this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG"), OpenTaiko.ConfigIni.bOutputLogs,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG_DESC"));
 		this.list項目リスト.Add(this.iLogOutputLog);
@@ -1612,7 +1612,7 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
 		OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
-		OpenTaiko.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
+		//OpenTaiko.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
 		OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 		OpenTaiko.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 		OpenTaiko.ConfigIni.bEnableBGA = this.iSystemBGA.bON;
