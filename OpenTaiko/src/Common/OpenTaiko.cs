@@ -1818,6 +1818,7 @@ internal class OpenTaiko : Game {
 		#region [ Modal queue initialisation ]
 
 		ModalManager = new CModalManager();
+		ModalManager.RefleshSkin();
 
 		#endregion
 
@@ -1836,7 +1837,6 @@ internal class OpenTaiko : Game {
 		stageSongLoading = new CStage曲読み込み();
 		stageGameScreen = new CStage演奏ドラム画面();
 		stageResults = new CStage結果();
-		stageResults.RefreshSkin();
 		stageChangeSkin = new CStageChangeSkin();
 		stageExit = new CStage終了();
 		NamePlate = new CNamePlate();
@@ -2169,7 +2169,6 @@ internal class OpenTaiko : Game {
 		actTextConsole.CreateUnmanagedResource();
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
-		OpenTaiko.stageResults.RefreshSkin();
 		CActSelectPopupMenu.RefleshSkin();
 		CActSelect段位リスト.RefleshSkin();
 	}
