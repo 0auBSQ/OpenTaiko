@@ -62,7 +62,7 @@ internal class CAct演奏ステージ失敗 : CActivity {
 	// メソッド
 
 	public void Start() {
-		this.dbFailedTime = OpenTaiko.Timer.NowTime;
+		this.dbFailedTime = OpenTaiko.Timer.NowTimeMs;
 		this.ct進行 = new CCounter(0, 300, 22, OpenTaiko.Timer);
 		if (OpenTaiko.ConfigIni.eGameMode != EGame.Off) {
 			this.ct進行 = new CCounter(0, 4000, 2, OpenTaiko.Timer);

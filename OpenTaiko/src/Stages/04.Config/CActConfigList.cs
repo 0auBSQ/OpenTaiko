@@ -1083,7 +1083,7 @@ internal class CActConfigList : CActivity {
 		#region [ 初めての進行描画 ]
 		//-----------------
 		if (base.IsFirstDraw) {
-			this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			this.ct三角矢印アニメ.Start(0, 9, 50, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}
@@ -1094,7 +1094,7 @@ internal class CActConfigList : CActivity {
 
 		#region [ 項目スクロールの進行 ]
 		//-----------------
-		long n現在時刻 = OpenTaiko.Timer.NowTime;
+		long n現在時刻 = OpenTaiko.Timer.NowTimeMs;
 		if (n現在時刻 < this.nスクロール用タイマ値) this.nスクロール用タイマ値 = n現在時刻;
 
 		const int INTERVAL = 2; // [ms]

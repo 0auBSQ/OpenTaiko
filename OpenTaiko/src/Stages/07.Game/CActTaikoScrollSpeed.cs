@@ -31,13 +31,13 @@ internal class CActTaikoScrollSpeed : CActivity {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
 				for (int i = 0; i < 5; i++) {
-					this.nScrollExclusiveTimer[i] = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+					this.nScrollExclusiveTimer[i] = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 
 				}
 
 				base.IsFirstDraw = false;
 			}
-			long nNowTime = SoundManager.PlayTimer.NowTime;
+			long nNowTime = SoundManager.PlayTimer.NowTimeMs;
 			for (int i = 0; i < 5; i++) {
 				double dbScrollSpeed = (double)OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.GetActualPlayer(i)];
 				if (nNowTime < this.nScrollExclusiveTimer[i]) {

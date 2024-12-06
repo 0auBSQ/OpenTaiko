@@ -17,31 +17,6 @@ public abstract class CTimerBase : IDisposable {
 	}
 	public abstract void Dispose();
 
-	#region [ DTXMania用に、語尾にmsのつかない宣言を追加 ]
-	public long SystemTime {
-		get { return SystemTimeMs; }
-	}
-	public long NowTime {
-		get { return NowTimeMs; }
-		set { NowTimeMs = value; }
-	}
-	public long PrevResetTime {
-		get { return PrevResetTimeMs; }
-	}
-
-	//double
-	public double SystemTime_Double {
-		get { return SystemTimeMs_Double; }
-	}
-	public double NowTime_Double {
-		get { return NowTimeMs_Double; }
-		set { NowTimeMs_Double = value; }
-	}
-	public double PrevResetTime_Double {
-		get { return PrevResetTimeMs_Double; }
-	}
-	#endregion
-
 	public long NowTimeMs {
 		get {
 			if (this.StopCount > 0)

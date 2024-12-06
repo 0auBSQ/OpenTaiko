@@ -43,11 +43,11 @@ internal class CActImplPad : CActivity {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
-				this.nY座標制御タイマ = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				this.nY座標制御タイマ = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				base.IsFirstDraw = false;
 			}
-			long num = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			long num = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 			if (num < this.nフラッシュ制御タイマ) {
 				this.nフラッシュ制御タイマ = num;
 			}
@@ -59,7 +59,7 @@ internal class CActImplPad : CActivity {
 				}
 				this.nフラッシュ制御タイマ += 15;
 			}
-			long num3 = SoundManager.PlayTimer.NowTime;
+			long num3 = SoundManager.PlayTimer.NowTimeMs;
 			if (num3 < this.nY座標制御タイマ) {
 				this.nY座標制御タイマ = num3;
 			}
