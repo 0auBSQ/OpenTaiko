@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.25] - 2024-12-06 (Beta)
+
+- Prevent CCounter from halting due to very large BPM
+
 ## [0.6.0.24] - 2024-12-04 (Beta)
 
 - Remove broken DTX legacy beatline chips processing (0x51)
