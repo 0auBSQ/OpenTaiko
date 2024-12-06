@@ -7,21 +7,9 @@ using FDK;
 namespace OpenTaiko;
 
 internal class CStage結果 : CStage {
-	// Modals Lua management
-
-	public CLuaModalScript lcModal { get; private set; }
-
-	public void RefreshSkin() {
-		lcModal?.Dispose();
-		lcModal = new CLuaModalScript(CSkin.Path("Modules/Modal"));
-
-	}
 
 	// Properties
 
-	public STDGBVALUE<bool> b新記録スキル;
-	public STDGBVALUE<bool> b新記録スコア;
-	public STDGBVALUE<bool> b新記録ランク;
 	public STDGBVALUE<float> fPerfect率;
 	public STDGBVALUE<float> fGreat率;
 	public STDGBVALUE<float> fGood率;
@@ -52,7 +40,6 @@ internal class CStage結果 : CStage {
 		this.st演奏記録.Taiko = new CScoreIni.C演奏記録();
 		this.r空うちドラムチップ = new CChip[10];
 		this.n総合ランク値 = -1;
-		this.nチャンネル0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 7, 6, 1, 7, 0 };
 		base.eStageID = CStage.EStage.Results;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		base.IsDeActivated = true;
@@ -147,14 +134,7 @@ internal class CStage結果 : CStage {
 				this.eフェードアウト完了時の戻り値 = E戻り値.継続;
 				this.bアニメが完了 = false;
 				this.bIsCheckedWhetherResultScreenShouldSaveOrNot = false;              // #24609 2011.3.14 yyagi
-				this.n最後に再生したHHのWAV番号 = -1;
-				this.n最後に再生したHHのチャンネル番号 = 0;
 
-				for (int i = 0; i < 3; i++) {
-					this.b新記録スキル[i] = false;
-					this.b新記録スコア[i] = false;
-					this.b新記録ランク[i] = false;
-				}
 				//---------------------
 				#endregion
 
@@ -580,21 +560,11 @@ internal class CStage結果 : CStage {
 
 			#region [Modals preprocessing]
 
-			if (OpenTaiko.ConfigIni.nPlayerCount == 1 || OpenTaiko.ConfigIni.bAIBattleMode) {
-				mqModals = new ModalQueue(Modal.EModalFormat.Full);
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 2) {
-				mqModals = new ModalQueue(Modal.EModalFormat.Half);
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 3 || OpenTaiko.ConfigIni.nPlayerCount == 4) {
-				mqModals = new ModalQueue(Modal.EModalFormat.Half_4P);
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-				mqModals = new ModalQueue(Modal.EModalFormat.Half_5P);
-			}
-
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (OpenTaiko.ConfigIni.bAutoPlay[i] || OpenTaiko.ConfigIni.bAIBattleMode && i == 1) continue;
 
 				if (this.nEarnedMedalsCount[i] > 0)
-					mqModals.tAddModal(
+					OpenTaiko.ModalManager.rModalQueue.tAddModal(
 						new Modal(
 							Modal.EModalType.Coin,
 							0,
@@ -605,21 +575,19 @@ internal class CStage結果 : CStage {
 
 				// Check unlockables
 				{
-					OpenTaiko.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, mqModals);
-					OpenTaiko.Databases.DBSongUnlockables.tGetUnlockedItems(i, mqModals);
+					OpenTaiko.Databases.DBNameplateUnlockables.tGetUnlockedItems(i, OpenTaiko.ModalManager.rModalQueue);
+					OpenTaiko.Databases.DBSongUnlockables.tGetUnlockedItems(i, OpenTaiko.ModalManager.rModalQueue);
 
 					foreach (var puchi in OpenTaiko.Tx.Puchichara) {
-						puchi.tGetUnlockedItems(i, mqModals);
+						puchi.tGetUnlockedItems(i, OpenTaiko.ModalManager.rModalQueue);
 					}
 
 					foreach (var chara in OpenTaiko.Tx.Characters) {
-						chara.tGetUnlockedItems(i, mqModals);
+						chara.tGetUnlockedItems(i, OpenTaiko.ModalManager.rModalQueue);
 					}
 				}
 
 			}
-
-			displayedModals = null;
 
 			#endregion
 
@@ -1364,10 +1332,7 @@ internal class CStage結果 : CStage {
 
 			#region [Display modals]
 
-			if (displayedModals != null) {
-				lcModal?.Update();
-				lcModal?.Draw();
-			}
+			OpenTaiko.ModalManager.Draw();
 
 			#endregion
 
@@ -1437,40 +1402,29 @@ internal class CStage結果 : CStage {
 					#endregion
 
 					else {
-						if ((lcModal?.AnimationFinished() ?? true)) {
-							OpenTaiko.Skin.soundDecideSFX.tPlay();
 
-							if (!mqModals.tAreBothQueuesEmpty()
-								&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-									|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
-								displayedModals = mqModals.tPopModalInOrder();
+						bool _modalsProcessed = OpenTaiko.ModalManager.InputManagement();
 
+						if (_modalsProcessed == true) {
+							#region [ Return to song select screen ]
 
-							} else if (OpenTaiko.ConfigIni.nPlayerCount == 1 || mqModals.tAreBothQueuesEmpty()) {
+							actFI.tフェードアウト開始();
 
-								if (!mqModals.tAreBothQueuesEmpty())
-									LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
+							if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
+								if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
+									OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
 
-								#region [ Return to song select screen ]
+							tPostprocessing();
 
-								actFI.tフェードアウト開始();
-
-								if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
-									if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-										OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
-
-								tPostprocessing();
-
-								{
-									base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-									this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-									bgmResultLoop.tStop();
-									OpenTaiko.Skin.bgmDanResult.tStop();
-									OpenTaiko.Skin.bgmTowerResult.tStop();
-								}
-
-								#endregion
+							{
+								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+								this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+								bgmResultLoop.tStop();
+								OpenTaiko.Skin.bgmDanResult.tStop();
+								OpenTaiko.Skin.bgmTowerResult.tStop();
 							}
+
+							#endregion
 						}
 
 					}
@@ -1667,9 +1621,6 @@ internal class CStage結果 : CStage {
 	private CActResultSongBar actSongBar;
 	private bool bアニメが完了;
 	private bool bIsCheckedWhetherResultScreenShouldSaveOrNot;              // #24509 2011.3.14 yyagi
-	private readonly int[] nチャンネル0Atoレーン07;
-	private int n最後に再生したHHのWAV番号;
-	private int n最後に再生したHHのチャンネル番号;
 	private CSound rResultSound;
 	public ResultBG Background;
 
@@ -1774,10 +1725,6 @@ internal class CStage結果 : CStage {
 			}
 		}
 	}
-
-	// Modal queues
-	private ModalQueue mqModals;
-	private Modal? displayedModals;
 
 	// Coins information
 	private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };

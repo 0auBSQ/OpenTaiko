@@ -8,7 +8,7 @@ internal class Modal {
 	}
 
 	public void tRegisterModal(int player) {
-		OpenTaiko.stageResults.lcModal.RegisterNewModal(player, rarity, modalType, reference);
+		OpenTaiko.ModalManager.RegisterNewModal(player, rarity, modalType, reference);
 	}
 
 	#region [Enum definitions]
@@ -22,14 +22,6 @@ internal class Modal {
 		Total = 5,
 	}
 
-	// Full : 1P standard modal, Half : Splitted screen modal
-	public enum EModalFormat {
-		Full,
-		Half,
-		Half_4P,
-		Half_5P,
-	}
-
 	#endregion
 
 	#region [Public variables]
@@ -39,7 +31,6 @@ internal class Modal {
 
 	public int rarity;
 	public EModalType modalType;
-	public EModalFormat modalFormat;
 
 	// For modalFormat = Half only
 	public int player;
