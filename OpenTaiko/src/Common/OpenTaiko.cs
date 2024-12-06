@@ -334,6 +334,13 @@ internal class OpenTaiko : Game {
 	// 0 : Hidari, 1 : Migi (1P only)
 	public static int PlayerSide = 0;
 
+	// Modal manager
+	public static CModalManager ModalManager {
+		get;
+		private set;
+	}
+
+
 	public static int GetActualPlayer(int player) {
 		if (SaveFile == 0 || player > 1)
 			return player;
@@ -497,7 +504,7 @@ internal class OpenTaiko : Game {
 	}
 
 	protected override void Initialize() {
-		this.t起動処理();
+		this.tStartupProcess();
 	}
 
 	protected override void LoadContent() {
@@ -529,7 +536,7 @@ internal class OpenTaiko : Game {
 		ConfigIni.bEnableVSync = VSync;
 		Framerate = 0;
 
-		this.t終了処理();
+		this.tExitProcess();
 		base.OnExiting();
 	}
 	protected override void Update() {
@@ -537,7 +544,7 @@ internal class OpenTaiko : Game {
 	}
 	protected override void Draw() {
 #if !DEBUG
-			try
+		try
 #endif
 		{
 			Timer?.Update();
@@ -1280,10 +1287,10 @@ internal class OpenTaiko : Game {
 					SaveResultScreen(strFullPath);
 				}
 #else
-					string strFullPath =
-						Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
-					strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
-					SaveResultScreen(strFullPath);
+				string strFullPath =
+					Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
+				strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
+				SaveResultScreen(strFullPath);
 #endif
 			}
 
@@ -1309,15 +1316,14 @@ internal class OpenTaiko : Game {
 #endif
 		}
 #if !DEBUG
-			catch( Exception e )
-			{
-				Trace.WriteLine( "" );
-				Trace.Write( e.ToString() );
-				Trace.WriteLine( "" );
-				Trace.WriteLine( "An error has occured." );
-                AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-				throw e;
-			}
+		catch (Exception e) {
+			Trace.WriteLine("");
+			Trace.Write(e.ToString());
+			Trace.WriteLine("");
+			Trace.WriteLine("An error has occured.");
+			AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
+			throw e;
+		}
 #endif
 	}
 
@@ -1493,7 +1499,7 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	private void t起動処理() {
+	private void tStartupProcess() {
 
 		// Load System error beforehand
 		this.listTopLevelActivities = new List<CActivity>();
@@ -1528,7 +1534,7 @@ internal class OpenTaiko : Game {
 		//---------------------
 		#endregion
 
-		#region [ ログ出力開始 ]
+		#region [ Log output initialisation ]
 		//---------------------
 		Trace.AutoFlush = true;
 		if (ConfigIni.bOutputLogs) {
@@ -1561,12 +1567,12 @@ internal class OpenTaiko : Game {
 		TJA = null;
 
 
-		#region [ Skin の初期化 ]
+		#region [ Skin initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initializing skin...");
 		Trace.Indent();
 #if !DEBUG
-			try
+		try
 #endif
 		{
 			Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
@@ -1577,23 +1583,20 @@ internal class OpenTaiko : Game {
 			Trace.TraceInformation("Skin successfully initialized.");
 		}
 #if !DEBUG
-			catch (Exception e)
-			{
-				Trace.TraceInformation( "Skin failed to initialize." );
-				TriggerSystemError(CSystemError.Errno.ENO_SKINNOTFOUND);
-				return;
-				//throw;
-			}
-			finally
-			{
-				Trace.Unindent();
-			}
+		catch (Exception e) {
+			Trace.TraceInformation("Skin failed to initialize.");
+			TriggerSystemError(CSystemError.Errno.ENO_SKINNOTFOUND);
+			return;
+			//throw;
+		} finally {
+			Trace.Unindent();
+		}
 #endif
 
 		//---------------------
 		#endregion
 		//-----------
-		#region [ Timer の初期化 ]
+		#region [ Timer initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initializing timer...");
 		Trace.Indent();
@@ -1607,7 +1610,7 @@ internal class OpenTaiko : Game {
 		#endregion
 		//-----------
 
-		#region [ FPS カウンタの初期化 ]
+		#region [ FPS counter initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initializing FPS counter...");
 		Trace.Indent();
@@ -1619,7 +1622,8 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ act文字コンソールの初期化 ]
+
+		#region [ Text console initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initializing console...");
 		Trace.Indent();
@@ -1639,7 +1643,8 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ Input管理 の初期化 ]
+
+		#region [ Input management initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 		Trace.Indent();
@@ -1691,7 +1696,8 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ Pad の初期化 ]
+
+		#region [ Pad initialisation ]
 		//---------------------
 		Trace.TraceInformation("Initialize pad...");
 		Trace.Indent();
@@ -1708,7 +1714,8 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ Sound管理 の初期化 ]
+
+		#region [ Sound Device initialization ]
 		//---------------------
 		Trace.TraceInformation("Initializing sound device...");
 		Trace.Indent();
@@ -1780,7 +1787,8 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ Songs管理 の初期化 ]
+
+		#region [ Songs management initialization ]
 		//---------------------
 		Trace.TraceInformation("Initializing song list...");
 		Trace.Indent();
@@ -1800,11 +1808,20 @@ internal class OpenTaiko : Game {
 		}
 		//---------------------
 		#endregion
-		#region [ Random の初期化 ]
+
+		#region [ Random initialization ]
 		//---------------------
 		Random = new Random();
 		//---------------------
 		#endregion
+
+		#region [ Modal queue initialisation ]
+
+		ModalManager = new CModalManager();
+		ModalManager.RefleshSkin();
+
+		#endregion
+
 		#region [ Stages initialisation ]
 		//---------------------
 		rCurrentStage = null;
@@ -1820,7 +1837,6 @@ internal class OpenTaiko : Game {
 		stageSongLoading = new CStage曲読み込み();
 		stageGameScreen = new CStage演奏ドラム画面();
 		stageResults = new CStage結果();
-		stageResults.RefreshSkin();
 		stageChangeSkin = new CStageChangeSkin();
 		stageExit = new CStage終了();
 		NamePlate = new CNamePlate();
@@ -1844,7 +1860,7 @@ internal class OpenTaiko : Game {
 		//---------------------
 		#endregion
 
-		#region Discordの処理
+		#region [ Discord Rpc initialisation]
 		DiscordClient = new DiscordRpcClient("939341030141096007");
 		DiscordClient?.Initialize();
 		StartupTime = DateTime.UtcNow;
@@ -1862,18 +1878,11 @@ internal class OpenTaiko : Game {
 
 		Trace.TraceInformation("Application successfully started.");
 
-		#region [ 最初のステージの起動 ]
+		#region [ Move to Startup Stage ]
 		//---------------------
+		ChangeStage(stageStartup);
 		Trace.TraceInformation("----------------------");
 		Trace.TraceInformation("■ Startup");
-
-		rCurrentStage = stageStartup;
-		rCurrentStage.Activate();
-		if (!ConfigIni.PreAssetsLoading) {
-			rCurrentStage.CreateManagedResource();
-			rCurrentStage.CreateUnmanagedResource();
-		}
-
 		//---------------------
 		#endregion
 	}
@@ -1887,7 +1896,7 @@ internal class OpenTaiko : Game {
 		base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
 	}
 
-	private void t終了処理() {
+	private void tExitProcess() {
 		if (!this.b終了処理完了済み) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
@@ -2159,7 +2168,7 @@ internal class OpenTaiko : Game {
 		actTextConsole.CreateManagedResource();
 		actTextConsole.CreateUnmanagedResource();
 		OpenTaiko.NamePlate.RefleshSkin();
-		OpenTaiko.stageResults.RefreshSkin();
+		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();
 		CActSelect段位リスト.RefleshSkin();
 	}

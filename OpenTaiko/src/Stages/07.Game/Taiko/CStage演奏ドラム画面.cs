@@ -489,7 +489,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.t進行描画_演奏情報();
 
-			if (OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
+			if (OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
 				this.actPanel.t歌詞テクスチャを生成する(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
 			}
 
@@ -1930,7 +1930,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			var chkChip = this.chip現在処理中の連打チップ[i];
 			if (chkChip != null) {
-				long nowTime = (long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				long nowTime = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
 				if ((NotesManager.IsGenericBalloon(chkChip) || NotesManager.IsKusudama(chkChip)) && (this.bCurrentlyDrumRoll[i] == true)) {
 					//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
@@ -1959,7 +1959,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		//常時イベントが発生しているメソッドのほうがいいんじゃないかという予想。
 		//CDTX.CChip chipNoHit = this.r指定時刻に一番近い未ヒットChip((int)CSound管理.rc演奏用タイマ.n現在時刻ms, 0);
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed), i);
+			CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed), i);
 
 			EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(i)];
 			bool _isBigKaTaiko = NotesManager.IsBigKaTaiko(chipNoHit, _gt);
@@ -1968,10 +1968,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			if (chipNoHit != null && (_isBigDonTaiko || _isBigKaTaiko)) {
 				CConfigIni.CTimingZones tz = this.GetTimingZones(i);
-				float timeC = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				float timeC = chipNoHit.n発声時刻ms - (float)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
 				int nWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
 				if (chipNoHit.eNoteState == ENoteState.Wait && timeC <= tz.nBadZone
-															&& chipNoHit.nProcessTime + nWaitTime <= (int)(SoundManager.PlayTimer.NowTime * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
+															&& chipNoHit.nProcessTime + nWaitTime <= (int)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) {
 					if (!_isSwapNote) {
 						this.tドラムヒット処理(chipNoHit.nProcessTime, EPad.RRed, chipNoHit, false, i);
 						//this.nWaitButton = 0;

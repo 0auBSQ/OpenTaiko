@@ -335,6 +335,7 @@ class CActImplTrainingMode : CActivity {
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			CChip pChip = dTX.listChip[i];
 			pChip.bHit = false;
+			pChip.ResetRollEffect();
 			if (dTX.listChip[i].nChannelNo != 0x50) {
 				pChip.bShow = true;
 				pChip.bVisible = true;

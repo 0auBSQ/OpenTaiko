@@ -617,9 +617,7 @@ internal class CTja : CActivity {
 
 	private int n現在の小節数 = 1;
 
-	private int nNowRoll = 0;
-	private int nNowRollCount = 0;
-	private int[] nNowRollCountBranch = new int[3];
+	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
 	public int nOFFSET = 0;
@@ -1390,7 +1388,7 @@ internal class CTja : CActivity {
 						startIndex++;   // 1つ小さく過ぎているので、戻す
 					}
 					for (int j = startIndex; j <= i; j++) {
-						if (((this.listChip[j].nChannelNo == 0x50) || (this.listChip[j].nChannelNo == 0x51)) &&
+						if ((this.listChip[j].nChannelNo == 0x50) &&
 							(this.listChip[j].n整数値 == (36 * 36 - 1))) {
 							this.listChip[j].bVisible = bShowBeatBarLine;
 						}
@@ -1405,15 +1403,12 @@ internal class CTja : CActivity {
 				int ms = 0;
 				int nBar = 0;
 				int nCount = 0;
-				this.nNowRollCount = 0;
-				for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-					this.nNowRollCountBranch[i] = 0;
 
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
 
 				foreach (CChip chip in this.listChip) {
-					if (chip.nChannelNo == 0x02) { } else if (chip.nChannelNo == 0x01) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo >= 0x11 && chip.nChannelNo <= 0x1F) { } else if (chip.nChannelNo == 0x50) { } else if (chip.nChannelNo == 0x51) { } else if (chip.nChannelNo == 0x54) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo == 0xF1) { } else if (chip.nChannelNo == 0xF2) { } else if (chip.nChannelNo == 0xFF) { } else if (chip.nChannelNo == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo < 0x93)
+					if (chip.nChannelNo == 0x02) { } else if (chip.nChannelNo == 0x01) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo >= 0x11 && chip.nChannelNo <= 0x1F) { } else if (chip.nChannelNo == 0x50) { } else if (chip.nChannelNo == 0x54) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo == 0xF1) { } else if (chip.nChannelNo == 0xF2) { } else if (chip.nChannelNo == 0xFF) { } else if (chip.nChannelNo == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo < 0x93)
 						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
 					else if ((chip.nChannelNo > 0x9F && chip.nChannelNo < 0xA0) || (chip.nChannelNo >= 0xF0 && chip.nChannelNo < 0xFE))
 						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
@@ -1421,9 +1416,6 @@ internal class CTja : CActivity {
 					ch = chip.nChannelNo;
 
 					nCount++;
-					this.nNowRollCount++;
-					for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-						this.nNowRollCountBranch[i]++;
 
 					switch (ch) {
 						case 0x01: {
@@ -1483,8 +1475,6 @@ internal class CTja : CActivity {
 									chip.n発声時刻ms += this.nOFFSET;
 									chip.nNoteEndTimems += this.nOFFSET;
 								}
-
-								this.nNowRoll = this.nNowRollCount - 1;
 								continue;
 							}
 						case 0x18: {
@@ -1556,8 +1546,6 @@ internal class CTja : CActivity {
 									chip.n発声時刻ms += this.nOFFSET;
 									chip.nNoteEndTimems += this.nOFFSET;
 								}
-								this.nNowRoll = this.nNowRollCount - 1;
-
 								continue;
 							}
 						case 0x9A: {
@@ -2223,6 +2211,20 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip1);
 		} else if (command == "#END") {
+			// TaikoJiro compatibility: #END ends unended rolls
+			for (int i = 0; i < 3; i++) {
+				if (this.nNowRollCountBranch[i] >= 0) {
+					ECourse branch = (ECourse)i;
+					if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
+						Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
+							$"{nameof(CTja)}: An unended roll in branch {branch} is ended by #END. In {this.strファイル名の絶対パス}"
+							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strファイル名の絶対パス}"
+						);
+					}
+					InsertNoteAtDefCursor(8, 0, 1, branch);
+				}
+			}
+
 			//ためしに割り込む。
 			var chip = new CChip();
 
@@ -4847,31 +4849,6 @@ internal class CTja : CActivity {
 
 					this.dbLastTime = this.dbNowTime;
 					this.b小節線を挿入している = true;
-
-					#region[ 拍線チップテスト ]
-					//1拍の時間を計算
-					double db1拍 = (60.0 / this.dbNowBPM) / 4.0;
-					//forループ(拍数)
-					for (int measure = 1; measure < this.fNow_Measure_s; measure++) {
-						CChip hakusen = new CChip();
-						hakusen.n発声位置 = ((this.n現在の小節数) * 384);
-						hakusen.n発声時刻ms = (int)(this.dbNowTime + (((db1拍 * 4.0)) * measure) * 1000.0);
-						hakusen.nChannelNo = 0x51;
-						hakusen.fBMSCROLLTime = this.dbNowBMScollTime;
-						hakusen.n整数値_内部番号 = this.n現在の小節数;
-						hakusen.n整数値 = 0;
-						hakusen.dbBPM = this.dbNowBPM;
-						hakusen.dbSCROLL = this.dbNowScroll;
-						hakusen.fNow_Measure_m = this.fNow_Measure_m;
-						hakusen.fNow_Measure_s = this.fNow_Measure_s;
-						hakusen.dbSCROLL_Y = this.dbNowScrollY;
-						hakusen.nBranch = n現在のコース;
-						hakusen.eScrollMode = eScrollMode;
-						this.listChip.Add(hakusen);
-					}
-
-					#endregion
-
 				}
 
 				for (int n = 0; n < InputText.Length; n++) {
@@ -4895,242 +4872,38 @@ internal class CTja : CActivity {
 					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
 
 					if (nObjectNum != 0) {
-						if ((nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17) {
-							if (nNowRoll != 0) {
-								this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / n文字数));
-								this.dbNowBMScollTime += (double)((this.dbBarLength) * (16.0 / n文字数));
-								continue;
-							} else {
-								this.nNowRollCount = listChip.Count;
-								for (int i = 0; i < this.nNowRollCountBranch.Length; i++)
-									this.nNowRollCountBranch[i] = listChip_Branch[i].Count;
-								nNowRoll = nObjectNum;
-							}
-						}
-
 						// IsEndedBranchingがfalseで1回
 						// trueで3回だよ3回
 						for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-							var chip = new CChip();
-							chip.IsMissed = false;
-							chip.bHit = false;
-							chip.bVisible = true;
-							chip.bShow = true;
-							chip.bShowRoll = true;
-							chip.nChannelNo = 0x10 + nObjectNum;
-							//chip.n発声位置 = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-							chip.n発声位置 = (int)((this.n現在の小節数 * 384.0) + ((384.0 * n) / n文字数));
-							chip.db発声位置 = this.dbNowTime;
-							chip.n発声時刻ms = (int)this.dbNowTime;
-							//chip.fBMSCROLLTime = (float)(( this.dbBarLength ) * (16.0f / this.n各小節の文字数[this.n現在の小節数]));
-							chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
-							chip.n整数値 = nObjectNum;
-							chip.n整数値_内部番号 = 1;
-							chip.IsEndedBranching = IsEndedBranching;
-							chip.fNow_Measure_m = this.fNow_Measure_m;
-							chip.fNow_Measure_s = this.fNow_Measure_s;
-							chip.dbBPM = this.dbNowBPM;
-							chip.dbSCROLL = this.dbNowScroll;
-							chip.dbSCROLL_Y = this.dbNowScrollY;
-							chip.nScrollDirection = this.nスクロール方向;
-							chip.eScrollMode = eScrollMode;
+							ECourse branch = this.IsEndedBranching ? (ECourse)i : this.n現在のコース;
+							int iBranch = (int)branch;
 
-							if (IsEndedBranching)
-								chip.nBranch = (ECourse)i;
-							else
-								chip.nBranch = n現在のコース;
-
-							chip.n分岐回数 = this.n内部番号BRANCH1to;
-							chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
-							chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
-							chip.nPlayerSide = this.nPlayerSide;
-							chip.bGOGOTIME = this.bGOGOTIME;
-
-							if (NotesManager.IsKusudama(chip)) {
-								if (IsEndedBranching) {
-								} else {
-									// Balloon in branches
-									chip.nChannelNo = 0x19;
+							// TODO: add judge-by-note-type methods to NotesManager
+							bool isRollHead = (nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17;
+							if (this.nNowRollCountBranch[iBranch] >= 0) {
+								if (isRollHead) {
+									// repeated roll head; treated as blank
+									continue; // process this note symbol in the next branch
 								}
-							}
-
-							if (NotesManager.IsGenericBalloon(chip)) {
-								//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
-
-								#region [Balloons]
-
-								switch (chip.nBranch) {
-									case ECourse.eNormal:
-										if (this.listBalloon_Normal.Count == 0) {
-											chip.nBalloon = 5;
-											break;
-										}
-
-										if (this.listBalloon_Normal.Count > this.listBalloon_Normal_数値管理) {
-											chip.nBalloon = this.listBalloon_Normal[this.listBalloon_Normal_数値管理];
-											this.listBalloon_Normal_数値管理++;
-											break;
-										}
-										break;
-									case ECourse.eExpert:
-										if (this.listBalloon_Expert.Count == 0) {
-											chip.nBalloon = 5;
-											break;
-										}
-
-										if (this.listBalloon_Expert.Count > this.listBalloon_Expert_数値管理) {
-											chip.nBalloon = this.listBalloon_Expert[this.listBalloon_Expert_数値管理];
-											this.listBalloon_Expert_数値管理++;
-											break;
-										}
-										break;
-									case ECourse.eMaster:
-										if (this.listBalloon_Master.Count == 0) {
-											chip.nBalloon = 5;
-											break;
-										}
-
-										if (this.listBalloon_Master.Count > this.listBalloon_Master_数値管理) {
-											chip.nBalloon = this.listBalloon_Master[this.listBalloon_Master_数値管理];
-											this.listBalloon_Master_数値管理++;
-											break;
-										}
-										break;
-								}
-
-								#endregion
-
-							}
-							if (NotesManager.IsRollEnd(chip)) {
-								chip.nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-								chip.nNoteEndTimems = (int)this.dbNowTime;
-								chip.fBMSCROLLTime_end = (float)this.dbNowBMScollTime;
-
-								chip.nノーツ出現時刻ms = listChip[nNowRollCount].nノーツ出現時刻ms;
-								chip.nノーツ移動開始時刻ms = listChip[nNowRollCount].nノーツ移動開始時刻ms;
-
-								chip.n連打音符State = nNowRoll;
-
-								if (!IsEndedBranching || i == 0) {
-									listChip[nNowRollCount].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip[nNowRollCount].nNoteEndTimems = (int)this.dbNowTime;
-									listChip[nNowRollCount].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
-								} else if (!IsEndedBranching) {
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].nNoteEndTimems = (int)this.dbNowTime;
-									listChip_Branch[(int)chip.nBranch][nNowRollCountBranch[(int)chip.nBranch]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
-								} else {
-									listChip_Branch[i][nNowRollCountBranch[i]].nNoteEndPosition = (this.n現在の小節数 * 384) + ((384 * n) / n文字数);
-									listChip_Branch[i][nNowRollCountBranch[i]].nNoteEndTimems = (int)this.dbNowTime;
-									listChip_Branch[i][nNowRollCountBranch[i]].fBMSCROLLTime_end = (int)this.dbNowBMScollTime;
-								}
-
-								if (!IsEndedBranching || i == 2)
-									nNowRoll = 0;
-							}
-
-							if (IsEnabledFixSENote) {
-								chip.IsFixedSENote = true;
-								chip.nSenote = FixSENote - 1;
-							}
-
-							#region[ 固定される種類のsenotesはここで設定しておく。 ]
-							switch (nObjectNum) {
-								case 3:
-									chip.nSenote = 5;
-									break;
-								case 4:
-									chip.nSenote = 6;
-									break;
-								case 5:
-									chip.nSenote = 7;
-									break;
-								case 6:
-									chip.nSenote = 0xA;
-									break;
-								case 7:
-									chip.nSenote = 0xB;
-									break;
-								case 8:
-									chip.nSenote = 0xC;
-									break;
-								case 9:
-									chip.nSenote = 0xB;
-									break;
-								case 0xA:
-									chip.nSenote = 5;
-									break;
-								case 0xB:
-									chip.nSenote = 6;
-									break;
-								case 0xD:
-									chip.nSenote = 0xB;
-									break;
-								case 0xF1:
-									chip.nSenote = 5;
-									break;
-							}
-							#endregion
-
-
-							if (NotesManager.IsMissableNote(chip)) {
-								#region [ 作り直し ]
-								//譜面分岐がない譜面でも値は加算されてしまうがしゃあない
-								//分岐を開始しない間は共通譜面としてみなす。
-								if (IsEndedBranching) {
-									this.nノーツ数_Branch[i]++;
-
-									if (i == 0) {
-										if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-											this.nDan_NotesCount[DanSongs.Number - 1]++;
-										}
-										this.nノーツ数[3]++;
+								if (nObjectNum != 8) {
+									// TaikoJiro compatibility: A non-roll ends an unended roll
+									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
+										Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
+											$"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
+											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
+										);
 									}
-								} else {
-									this.nノーツ数_Branch[(int)chip.nBranch]++;
-									if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
-										this.nDan_NotesCount[DanSongs.Number - 1]++;
-									}
+									InsertNoteAtDefCursor(8, n, n文字数, branch);
 
-									if (!this.b分岐を一回でも開始した) {
-										//IsEndedBranching==false = forloopが行われていないときのみ
-										for (int l = 0; l < 3; l++)
-											this.nノーツ数_Branch[l]++;
-									}
 								}
-
-								#endregion
-							} else if (NotesManager.IsGenericBalloon(chip)) {
-								//風船はこのままでも機能しているので何もしない.
-								if (IsEndedBranching) {
-									if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-										this.nDan_BalloonCount[DanSongs.Number - 1]++;
-									}
-								} else {
-									if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
-										this.nDan_BalloonCount[DanSongs.Number - 1]++;
-									}
-								}
-
-								if (this.b最初の分岐である == false) {
-									this.n風船数[(int)this.n現在のコース]++;
-								} else {
-									this.n風船数[3]++;
-								}
-
 							}
 
-							Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
-							Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
-							if (IsEndedBranching) {
-								this.listChip_Branch[i].Add(chip);
-								if (i == 0)
-									this.listChip.Add(chip);
-							} else {
-								this.listChip_Branch[(int)chip.nBranch].Add(chip);
-								this.listChip.Add(chip);
+							if (isRollHead) {
+								// real roll head; predict chip index
+								this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
 							}
 
+							InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
 						}
 					}
 
@@ -5142,6 +4915,215 @@ internal class CTja : CActivity {
 					this.dbNowBMScollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / (double)n文字数));
 				}
 			}
+		}
+	}
+
+	private void InsertNoteAtDefCursor(int noteType, int iDiv, int divsPerMeasure, ECourse branch) {
+		int iBranch = (int)branch;
+
+		var chip = new CChip();
+		chip.IsMissed = false;
+		chip.bHit = false;
+		chip.bVisible = true;
+		chip.bShow = true;
+		chip.bShowRoll = true;
+		chip.nChannelNo = 0x10 + noteType;
+		//chip.n発声位置 = (this.n現在の小節数 * 384) + ((384 * iDiv) / divsPerMeasure);
+		chip.n発声位置 = (int)((this.n現在の小節数 * 384.0) + ((384.0 * iDiv) / divsPerMeasure));
+		chip.db発声位置 = this.dbNowTime;
+		chip.n発声時刻ms = (int)this.dbNowTime;
+		//chip.fBMSCROLLTime = (float)(( this.dbBarLength ) * (16.0f / this.n各小節の文字数[this.n現在の小節数]));
+		chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
+		chip.n整数値 = noteType;
+		chip.n整数値_内部番号 = 1;
+		chip.IsEndedBranching = IsEndedBranching;
+		chip.fNow_Measure_m = this.fNow_Measure_m;
+		chip.fNow_Measure_s = this.fNow_Measure_s;
+		chip.dbBPM = this.dbNowBPM;
+		chip.dbSCROLL = this.dbNowScroll;
+		chip.dbSCROLL_Y = this.dbNowScrollY;
+		chip.nScrollDirection = this.nスクロール方向;
+		chip.eScrollMode = eScrollMode;
+		chip.nBranch = branch;
+		chip.n分岐回数 = this.n内部番号BRANCH1to;
+		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
+		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
+		chip.nPlayerSide = this.nPlayerSide;
+		chip.bGOGOTIME = this.bGOGOTIME;
+
+		if (NotesManager.IsKusudama(chip)) {
+			if (IsEndedBranching) {
+			} else {
+				// Balloon in branches
+				chip.nChannelNo = 0x19;
+			}
+		}
+
+		if (NotesManager.IsGenericBalloon(chip)) {
+			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
+
+			#region [Balloons]
+
+			switch (chip.nBranch) {
+				case ECourse.eNormal:
+					if (this.listBalloon_Normal.Count == 0) {
+						chip.nBalloon = 5;
+						break;
+					}
+
+					if (this.listBalloon_Normal.Count > this.listBalloon_Normal_数値管理) {
+						chip.nBalloon = this.listBalloon_Normal[this.listBalloon_Normal_数値管理];
+						this.listBalloon_Normal_数値管理++;
+						break;
+					}
+					break;
+				case ECourse.eExpert:
+					if (this.listBalloon_Expert.Count == 0) {
+						chip.nBalloon = 5;
+						break;
+					}
+
+					if (this.listBalloon_Expert.Count > this.listBalloon_Expert_数値管理) {
+						chip.nBalloon = this.listBalloon_Expert[this.listBalloon_Expert_数値管理];
+						this.listBalloon_Expert_数値管理++;
+						break;
+					}
+					break;
+				case ECourse.eMaster:
+					if (this.listBalloon_Master.Count == 0) {
+						chip.nBalloon = 5;
+						break;
+					}
+
+					if (this.listBalloon_Master.Count > this.listBalloon_Master_数値管理) {
+						chip.nBalloon = this.listBalloon_Master[this.listBalloon_Master_数値管理];
+						this.listBalloon_Master_数値管理++;
+						break;
+					}
+					break;
+			}
+
+			#endregion
+
+		}
+		if (NotesManager.IsRollEnd(chip)) {
+			if (this.nNowRollCountBranch[iBranch] < 0) {
+				// stray roll end; treated as blank
+				return; // process this note symbol in the next branch
+			}
+
+			CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
+			chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
+			chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
+			chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
+
+			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
+			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
+			chip.n連打音符State = chipHead.nChannelNo - 0x10;
+
+			this.nNowRollCountBranch[iBranch] = -1;
+		}
+
+		if (IsEnabledFixSENote) {
+			chip.IsFixedSENote = true;
+			chip.nSenote = FixSENote - 1;
+		}
+
+		#region[ 固定される種類のsenotesはここで設定しておく。 ]
+		switch (noteType) {
+			case 3:
+				chip.nSenote = 5;
+				break;
+			case 4:
+				chip.nSenote = 6;
+				break;
+			case 5:
+				chip.nSenote = 7;
+				break;
+			case 6:
+				chip.nSenote = 0xA;
+				break;
+			case 7:
+				chip.nSenote = 0xB;
+				break;
+			case 8:
+				chip.nSenote = 0xC;
+				break;
+			case 9:
+				chip.nSenote = 0xB;
+				break;
+			case 0xA:
+				chip.nSenote = 5;
+				break;
+			case 0xB:
+				chip.nSenote = 6;
+				break;
+			case 0xD:
+				chip.nSenote = 0xB;
+				break;
+			case 0xF1:
+				chip.nSenote = 5;
+				break;
+		}
+		#endregion
+
+
+		if (NotesManager.IsMissableNote(chip)) {
+			#region [ 作り直し ]
+			//譜面分岐がない譜面でも値は加算されてしまうがしゃあない
+			//分岐を開始しない間は共通譜面としてみなす。
+			if (IsEndedBranching) {
+				this.nノーツ数_Branch[iBranch]++;
+
+				if (branch == ECourse.eNormal) {
+					if (this.n参照中の難易度 == (int)Difficulty.Dan) {
+						this.nDan_NotesCount[DanSongs.Number - 1]++;
+					}
+					this.nノーツ数[3]++;
+				}
+			} else {
+				this.nノーツ数_Branch[(int)chip.nBranch]++;
+				if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
+					this.nDan_NotesCount[DanSongs.Number - 1]++;
+				}
+
+				if (!this.b分岐を一回でも開始した) {
+					//IsEndedBranching==false = forloopが行われていないときのみ
+					for (int l = 0; l < 3; l++)
+						this.nノーツ数_Branch[l]++;
+				}
+			}
+
+			#endregion
+		} else if (NotesManager.IsGenericBalloon(chip)) {
+			//風船はこのままでも機能しているので何もしない.
+			if (IsEndedBranching) {
+				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
+					this.nDan_BalloonCount[DanSongs.Number - 1]++;
+				}
+			} else {
+				if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
+					this.nDan_BalloonCount[DanSongs.Number - 1]++;
+				}
+			}
+
+			if (this.b最初の分岐である == false) {
+				this.n風船数[(int)this.n現在のコース]++;
+			} else {
+				this.n風船数[3]++;
+			}
+
+		}
+
+		Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
+		Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
+		if (IsEndedBranching) {
+			this.listChip_Branch[iBranch].Add(chip);
+			if (branch == ECourse.eNormal)
+				this.listChip.Add(chip);
+		} else {
+			this.listChip_Branch[(int)chip.nBranch].Add(chip);
+			this.listChip.Add(chip);
 		}
 	}
 

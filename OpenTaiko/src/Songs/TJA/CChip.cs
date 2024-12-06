@@ -133,9 +133,17 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 	public bool b演奏終了後も再生が続くチップである; // #32248 2013.10.14 yyagi
-	public CCounter RollDelay; // 18.9.22 AioiLight Add 連打時に赤くなるやつのタイマー
-	public CCounter RollInputTime; // 18.9.22 AioiLight Add  連打入力後、RollDelayが作動するまでのタイマー
+	public CCounter? RollDelay; // 18.9.22 AioiLight Add 連打時に赤くなるやつのタイマー
+	public CCounter? RollInputTime; // 18.9.22 AioiLight Add  連打入力後、RollDelayが作動するまでのタイマー
 	public int RollEffectLevel; // 18.9.22 AioiLight Add 連打時に赤くなるやつの度合い
+
+	public void ResetRollEffect() {
+		this.RollInputTime?.Stop();
+		this.RollInputTime = null;
+		this.RollDelay?.Stop();
+		this.RollDelay = null;
+		this.RollEffectLevel = 0;
+	}
 
 	public CChip() {
 		this.nHorizontalChipDistance = 0;

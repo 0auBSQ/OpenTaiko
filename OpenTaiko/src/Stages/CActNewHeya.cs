@@ -558,10 +558,8 @@ class CActNewHeya : CActivity {
 
 								if (i != 0) {
 									tmpTex.color4 = CConversion.ColorToColor4(Color.DarkGray);
-									OpenTaiko.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.DarkGray);
 								} else {
 									tmpTex.color4 = CConversion.ColorToColor4(Color.White);
-									OpenTaiko.Tx.NamePlateBase.color4 = CConversion.ColorToColor4(Color.White);
 								}
 
 								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);

@@ -23,7 +23,7 @@ public class CFPS {
 		this.NowFPS = 0;
 		this.DeltaTime = 0;
 		this.FPSTimer = new CTimer(CTimer.TimerType.MultiMedia);
-		this.BeginTime = this.FPSTimer.NowTime;
+		this.BeginTime = this.FPSTimer.NowTimeMs;
 		this.CoreFPS = 0;
 		this.ChangedFPS = false;
 	}
@@ -36,9 +36,9 @@ public class CFPS {
 		this.ChangedFPS = false;
 
 		const long INTERVAL = 1000;
-		this.DeltaTime = (this.FPSTimer.NowTime - this.PrevFrameTime) / 1000.0;
-		PrevFrameTime = this.FPSTimer.NowTime;
-		while ((this.FPSTimer.NowTime - this.BeginTime) >= INTERVAL) {
+		this.DeltaTime = (this.FPSTimer.NowTimeMs - this.PrevFrameTime) / 1000.0;
+		PrevFrameTime = this.FPSTimer.NowTimeMs;
+		while ((this.FPSTimer.NowTimeMs - this.BeginTime) >= INTERVAL) {
 			this.NowFPS = this.CoreFPS;
 			this.CoreFPS = 0;
 			this.ChangedFPS = true;

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0.25] - 2024-12-06 (Beta)
+
+- Prevent CCounter from halting due to very large BPM
+
+## [0.6.0.24] - 2024-12-04 (Beta)
+
+- Remove broken DTX legacy beatline chips processing (0x51)
+
+## [0.6.0.23] - 2024-12-02 (Beta)
+
+- Fix end of bar drumrolls wrongly snapped to 1/16th (only visually) in HB/BMScroll
+- Fix incorrect roll duration, missing rolls, or unended chart for rolls across branch sections
+- Force unended roll to end at the first non-roll note after it or #END
+
+## [0.6.0.22] - 2024-12-01 (Beta)
+
+- Reset bar drumroll redness on retry or training-mode pause
+
 ## [0.6.0.21] - 2024-11-18 (Beta)
 
 - Fix confirm/cancel keyboard inputs ending name change early
