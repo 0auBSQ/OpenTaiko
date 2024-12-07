@@ -69,7 +69,7 @@ public class CInputGamepad : IInputDevice, IDisposable {
 							nKey = i,
 							Pressed = true,
 							Released = false,
-							nTimeStamp = SampleFramework.Game.TimeMs,
+							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
 							nVelocity = 0,
 						}
 					);
@@ -85,7 +85,7 @@ public class CInputGamepad : IInputDevice, IDisposable {
 							nKey = i,
 							Pressed = false,
 							Released = true,
-							nTimeStamp = SampleFramework.Game.TimeMs,
+							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
 							nVelocity = 0,
 						}
 					);
