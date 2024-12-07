@@ -136,8 +136,8 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Change the sound buffer for wasapi sound playback mode.\nSet the number to be as low as possible\nwithout causing sound issues such as\nsong freezing and incorrect timing.\nSet it to 0 to use an estimated correct value,\nor use trial and error to find the correct value.\nNote: Exit CONFIGURATION to make\n     the setting take effect.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Size",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
-		"SETTINGS_SYSTEM_OSTIMER": "OS Timer Mode",
-		"SETTINGS_SYSTEM_OSTIMER_DESC": "Turning this on will create smoother note scroll,\nbut may introduce sound lag.\nTurning it off will create unstable note scroll,\nbut ensure no sound lag occurs.\n\nIf OFF, DTXMania uses its original\ntimer and the effect is vice versa.",
+		"SETTINGS_SYSTEM_OSTIMER": "Use OS Timer",
+		"SETTINGS_SYSTEM_OSTIMER_DESC": "Turning this on will make notes scroll more smoothly,\nbut might cause the chart to desync with song.\nTurning it off will prevent the chart\nfrom desyncing with the song,\nbut might make notes jitter when scrolling.",
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Create Log File",
