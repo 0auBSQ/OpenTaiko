@@ -151,7 +151,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord 状态显示",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "选择是否在 Discord 上共享曲目信息。",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "输入缓冲模式",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时所有输入都会被保留，但输入采样率会会降低，\n关闭时部分输入可能会被丢弃，但输入采样率会增高。",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时，判定时间精度将不受帧率限制，\n且所有输入都不会被忽略。\n关闭时，判定时间精度将受帧率限制，\n且部分输入可能会被忽略。",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",

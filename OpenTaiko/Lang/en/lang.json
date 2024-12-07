@@ -151,7 +151,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Rich Presence",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Toggle whether song information is shared with Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Buffered Input Mode",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "When this is turned on, no inputs will be dropped\nbut the input poll rate will decrease.\nWhen this is turned off, inputs may be dropped\nbut they will be polled more often.",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "When this is turned on,\nthe input resolution can exceed FPS\nand no inputs will be dropped\nWhen this is turned off,\nthe input resolution is limited by FPS\nand inputs may be dropped.",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Global Offset",
