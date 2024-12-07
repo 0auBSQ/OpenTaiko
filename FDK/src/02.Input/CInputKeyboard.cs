@@ -38,11 +38,11 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 		InputEvents.Clear();
 
 		for (int i = 0; i < KeyStates.Length; i++) {
-			if (KeyStates[i].Item1) {
-				if (KeyStates[i].Item2 >= 1) {
-					KeyStates[i].Item2 = 2;
+			if (KeyStates[i].isPressed) {
+				if (KeyStates[i].state >= 1) {
+					KeyStates[i].state = 2;
 				} else {
-					KeyStates[i].Item2 = 1;
+					KeyStates[i].state = 1;
 					InputEvents.Add(
 						new STInputEvent() {
 							nKey = i,
@@ -54,10 +54,10 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 					);
 				}
 			} else {
-				if (KeyStates[i].Item2 <= -1) {
-					KeyStates[i].Item2 = -2;
+				if (KeyStates[i].state <= -1) {
+					KeyStates[i].state = -2;
 				} else {
-					KeyStates[i].Item2 = -1;
+					KeyStates[i].state = -1;
 					InputEvents.Add(
 						new STInputEvent() {
 							nKey = i,
@@ -75,25 +75,25 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 	///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 	/// </param>
 	public bool KeyPressed(int nKey) {
-		return KeyStates[nKey].Item2 == 1;
+		return KeyStates[nKey].state == 1;
 	}
 	/// <param name="nKey">
 	///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
-	/// </param>
+	/// </param>	
 	public bool KeyPressing(int nKey) {
-		return KeyStates[nKey].Item2 >= 1;
+		return KeyStates[nKey].state >= 1;
 	}
 	/// <param name="nKey">
 	///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 	/// </param>
 	public bool KeyReleased(int nKey) {
-		return KeyStates[nKey].Item2 == -1;
+		return KeyStates[nKey].state == -1;
 	}
 	/// <param name="nKey">
 	///		調べる SlimDX.DirectInput.Key を int にキャストした値。（SharpDX.DirectInput.Key ではないので注意。）
 	/// </param>
 	public bool KeyReleasing(int nKey) {
-		return KeyStates[nKey].Item2 <= -1;
+		return KeyStates[nKey].state <= -1;
 	}
 	//-----------------
 	#endregion
@@ -116,7 +116,7 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 
 	#region [ private ]
 	//-----------------
-	public (bool, int)[] KeyStates { get; private set; } = new (bool, int)[144];
+	public (bool isPressed, int state)[] KeyStates { get; private set; } = new (bool, int)[144];
 	private bool IsDisposed;
 	//private CTimer timer;
 	//private CTimer ct;
@@ -125,14 +125,14 @@ public class CInputKeyboard : IInputDevice, IDisposable {
 	private void KeyDown(IKeyboard keyboard, Key key, int keyCode) {
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
-			KeyStates[(int)keyNum].Item1 = true;
+			KeyStates[(int)keyNum].isPressed = true;
 		}
 	}
 
 	private void KeyUp(IKeyboard keyboard, Key key, int keyCode) {
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
-			KeyStates[(int)keyNum].Item1 = false;
+			KeyStates[(int)keyNum].isPressed = false;
 		}
 	}
 

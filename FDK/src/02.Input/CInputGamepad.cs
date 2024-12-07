@@ -58,11 +58,11 @@ public class CInputGamepad : IInputDevice, IDisposable {
 		InputEvents.Clear();
 
 		for (int i = 0; i < ButtonStates.Length; i++) {
-			if (ButtonStates[i].Item1) {
-				if (ButtonStates[i].Item2 >= 1) {
-					ButtonStates[i].Item2 = 2;
+			if (ButtonStates[i].isPressed) {
+				if (ButtonStates[i].state >= 1) {
+					ButtonStates[i].state = 2;
 				} else {
-					ButtonStates[i].Item2 = 1;
+					ButtonStates[i].state = 1;
 
 					InputEvents.Add(
 						new STInputEvent() {
@@ -75,10 +75,10 @@ public class CInputGamepad : IInputDevice, IDisposable {
 					);
 				}
 			} else {
-				if (ButtonStates[i].Item2 <= -1) {
-					ButtonStates[i].Item2 = -2;
+				if (ButtonStates[i].state <= -1) {
+					ButtonStates[i].state = -2;
 				} else {
-					ButtonStates[i].Item2 = -1;
+					ButtonStates[i].state = -1;
 
 					InputEvents.Add(
 						new STInputEvent() {
@@ -95,16 +95,16 @@ public class CInputGamepad : IInputDevice, IDisposable {
 	}
 
 	public bool KeyPressed(int nButton) {
-		return ButtonStates[nButton].Item2 == 1;
+		return ButtonStates[nButton].state == 1;
 	}
 	public bool KeyPressing(int nButton) {
-		return ButtonStates[nButton].Item2 >= 1;
+		return ButtonStates[nButton].state >= 1;
 	}
 	public bool KeyReleased(int nButton) {
-		return ButtonStates[nButton].Item2 == -1;
+		return ButtonStates[nButton].state == -1;
 	}
 	public bool KeyReleasing(int nButton) {
-		return ButtonStates[nButton].Item2 <= -1;
+		return ButtonStates[nButton].state <= -1;
 	}
 	//-----------------
 	#endregion
@@ -127,18 +127,18 @@ public class CInputGamepad : IInputDevice, IDisposable {
 
 	#region [ private ]
 	//-----------------
-	public (bool, int)[] ButtonStates { get; private set; } = new (bool, int)[15];
+	public (bool isPressed, int state)[] ButtonStates { get; private set; } = new (bool, int)[15];
 	private bool IsDisposed;
 
 	private void Joystick_ButtonDown(IGamepad joystick, Button button) {
 		if (button.Name != ButtonName.Unknown) {
-			ButtonStates[(int)button.Name].Item1 = true;
+			ButtonStates[(int)button.Name].isPressed = true;
 		}
 	}
 
 	private void Joystick_ButtonUp(IGamepad joystick, Button button) {
 		if (button.Name != ButtonName.Unknown) {
-			ButtonStates[(int)button.Name].Item1 = false;
+			ButtonStates[(int)button.Name].isPressed = false;
 		}
 	}
 	//-----------------

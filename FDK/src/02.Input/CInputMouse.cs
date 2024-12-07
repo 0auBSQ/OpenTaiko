@@ -42,11 +42,11 @@ public class CInputMouse : IInputDevice, IDisposable {
 		InputEvents.Clear();
 
 		for (int i = 0; i < MouseStates.Length; i++) {
-			if (MouseStates[i].Item1) {
-				if (MouseStates[i].Item2 >= 1) {
-					MouseStates[i].Item2 = 2;
+			if (MouseStates[i].isPressed) {
+				if (MouseStates[i].state >= 1) {
+					MouseStates[i].state = 2;
 				} else {
-					MouseStates[i].Item2 = 1;
+					MouseStates[i].state = 1;
 					InputEvents.Add(
 						new STInputEvent() {
 							nKey = i,
@@ -58,10 +58,10 @@ public class CInputMouse : IInputDevice, IDisposable {
 					);
 				}
 			} else {
-				if (MouseStates[i].Item2 <= -1) {
-					MouseStates[i].Item2 = -2;
+				if (MouseStates[i].state <= -1) {
+					MouseStates[i].state = -2;
 				} else {
-					MouseStates[i].Item2 = -1;
+					MouseStates[i].state = -1;
 					InputEvents.Add(
 						new STInputEvent() {
 							nKey = i,
@@ -76,16 +76,16 @@ public class CInputMouse : IInputDevice, IDisposable {
 		}
 	}
 	public bool KeyPressed(int nButton) {
-		return MouseStates[nButton].Item2 == 1;
+		return MouseStates[nButton].state == 1;
 	}
 	public bool KeyPressing(int nButton) {
-		return MouseStates[nButton].Item2 >= 1;
+		return MouseStates[nButton].state >= 1;
 	}
 	public bool KeyReleased(int nButton) {
-		return MouseStates[nButton].Item2 == -1;
+		return MouseStates[nButton].state == -1;
 	}
 	public bool KeyReleasing(int nButton) {
-		return MouseStates[nButton].Item2 <= -1;
+		return MouseStates[nButton].state <= -1;
 	}
 	//-----------------
 	#endregion
@@ -108,7 +108,7 @@ public class CInputMouse : IInputDevice, IDisposable {
 
 	#region [ private ]
 	//-----------------
-	public (bool, int)[] MouseStates { get; private set; } = new (bool, int)[12];
+	public (bool isPressed, int state)[] MouseStates { get; private set; } = new (bool, int)[12];
 	private bool IsDisposed;
 
 	private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {
@@ -121,13 +121,13 @@ public class CInputMouse : IInputDevice, IDisposable {
 
 	private void Mouse_MouseDown(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			MouseStates[(int)mouseButton].Item1 = true;
+			MouseStates[(int)mouseButton].isPressed = true;
 		}
 	}
 
 	private void Mouse_MouseUp(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			MouseStates[(int)mouseButton].Item1 = false;
+			MouseStates[(int)mouseButton].isPressed = false;
 		}
 	}
 
