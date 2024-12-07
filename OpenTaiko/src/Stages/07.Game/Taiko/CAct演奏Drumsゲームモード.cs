@@ -388,7 +388,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			if (this.st叩ききりまショー.bタイマー使用中) {
 				if (!this.st叩ききりまショー.ct残り時間.IsStoped || this.st叩ききりまショー.b加算アニメ中 == true) {
 					this.st叩ききりまショー.ct残り時間.Tick();
-					if (!OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる((long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed), 0, 5000, 0) || this.st叩ききりまショー.b加算アニメ中 == true) {
+					if (!OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる((long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed), 5000, 0) || this.st叩ききりまショー.b加算アニメ中 == true) {
 						this.st叩ききりまショー.bタイマー使用中 = false;
 						this.st叩ききりまショー.ct残り時間.Stop();
 					}
@@ -396,7 +396,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			}
 
 			if (!this.st叩ききりまショー.bタイマー使用中 && this.st叩ききりまショー.b加算アニメ中 == false) {
-				if ((this.st叩ききりまショー.b最初のチップが叩かれた == true && (OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる(SoundManager.PlayTimer.NowTimeMs, 0, 2000, 0)))) {
+				if ((this.st叩ききりまショー.b最初のチップが叩かれた == true && (OpenTaiko.stageGameScreen.r検索範囲内にチップがあるか調べる(SoundManager.PlayTimer.NowTimeMs, 2000, 0)))) {
 					this.st叩ききりまショー.bタイマー使用中 = true;
 					int nCount = this.st叩ききりまショー.ct残り時間.CurrentValue;
 					this.st叩ききりまショー.ct残り時間 = new CCounter(0, 25000, 1, OpenTaiko.Timer);

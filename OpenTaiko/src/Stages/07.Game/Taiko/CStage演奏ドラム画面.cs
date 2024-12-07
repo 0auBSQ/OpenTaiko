@@ -796,7 +796,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	protected override void t入力処理_ドラム() {
 		// Input adjust deprecated
-		var nInputAdjustTimeMs = 0; // TJAPlayer3.ConfigIni.nInputAdjustTimeMs;
+		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
 
 		for (int nPad = 0; nPad < (int)EPad.Max; nPad++)        // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
@@ -1672,7 +1672,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				CChip cChip = null;
 				if (pChip.nノーツ移動開始時刻ms != 0) // n先頭発声位置 value is only used when this condition is met
 				{
-					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, 0x10 + pChip.n連打音符State, 0, nPlayer);
+					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, 0x10 + pChip.n連打音符State, nPlayer);
 					if (cChip != null) {
 						n先頭発声位置 = cChip.n発声時刻ms;
 					}
