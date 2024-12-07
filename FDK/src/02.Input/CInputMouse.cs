@@ -7,12 +7,11 @@ namespace FDK;
 public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	public const int MouseButtonCount = 8;
 
-	public CInputMouse(IMouse mouse) : base() {
+	public CInputMouse(IMouse mouse) : base(12) {
 		this.CurrentType = InputDeviceType.Mouse;
 		this.GUID = "";
 		this.ID = 0;
 		this.Name = mouse.Name;
-		this.ButtonStates = new (bool, int)[12];
 
 		mouse.Click += Mouse_Click;
 		mouse.DoubleClick += Mouse_DoubleClick;
@@ -33,13 +32,13 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 
 	private void Mouse_MouseDown(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			ButtonStates[(int)mouseButton].isPressed = true;
+			base.ButtonDown((int)mouseButton);
 		}
 	}
 
 	private void Mouse_MouseUp(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			ButtonStates[(int)mouseButton].isPressed = false;
+			base.ButtonUp((int)mouseButton);
 		}
 	}
 

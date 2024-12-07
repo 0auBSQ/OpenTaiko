@@ -3,12 +3,11 @@
 namespace FDK;
 
 public class CInputKeyboard : CInputButtonsBase, IInputDevice, IDisposable {
-	public CInputKeyboard(IReadOnlyList<IKeyboard> keyboards) : base() {
+	public CInputKeyboard(IReadOnlyList<IKeyboard> keyboards) : base(144) {
 		this.CurrentType = InputDeviceType.Keyboard;
 		this.GUID = "";
 		this.ID = 0;
 		this.Name = keyboards.Count > 0 ? keyboards[0].Name : "";
-		this.ButtonStates = new (bool, int)[144];
 
 		foreach (var keyboard in keyboards) {
 			keyboard.KeyDown += KeyDown;
@@ -16,19 +15,20 @@ public class CInputKeyboard : CInputButtonsBase, IInputDevice, IDisposable {
 			keyboard.KeyChar += KeyChar;
 		}
 	}
+
 	public (bool isPressed, int state)[] KeyStates => this.ButtonStates;
 
 	private void KeyDown(IKeyboard keyboard, Key key, int keyCode) {
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
-			ButtonStates[(int)keyNum].isPressed = true;
+			base.ButtonDown((int)keyNum);
 		}
 	}
 
 	private void KeyUp(IKeyboard keyboard, Key key, int keyCode) {
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
-			ButtonStates[(int)keyNum].isPressed = false;
+			base.ButtonUp((int)keyNum);
 		}
 	}
 

@@ -11,7 +11,7 @@ public class CInputMIDI : IInputDevice, IDisposable {
 	public CInputMIDI(uint nID) {
 		this.MidiInPtr = IntPtr.Zero;
 		this.EventBuffers = new List<STInputEvent>(32);
-		this.InputEvents = new List<STInputEvent>(32);
+		this.InputEvents = [];
 		this.CurrentType = InputDeviceType.MidiIn;
 		this.GUID = "";
 		this.ID = (int)nID;
@@ -67,13 +67,10 @@ public class CInputMIDI : IInputDevice, IDisposable {
 	public bool useBufferInput { get; set; }
 
 	public void Polling() {
+		// always buffered input
 		// this.list入力イベント = new List<STInputEvent>( 32 );
 		this.InputEvents.Clear();                                // #xxxxx 2012.6.11 yyagi; To optimize, I removed new();
-
-		for (int i = 0; i < this.EventBuffers.Count; i++)
-			this.InputEvents.Add(this.EventBuffers[i]);
-
-		this.EventBuffers.Clear();
+		(this.InputEvents, this.EventBuffers) = (this.EventBuffers, this.InputEvents); // swap buffer
 	}
 	public bool KeyPressed(int nKey) {
 		foreach (STInputEvent event2 in this.InputEvents) {
@@ -98,12 +95,8 @@ public class CInputMIDI : IInputDevice, IDisposable {
 	#region [ IDisposable 実装 ]
 	//-----------------
 	public void Dispose() {
-		if (this.EventBuffers != null) {
-			this.EventBuffers = null;
-		}
-		if (this.InputEvents != null) {
-			this.InputEvents = null;
-		}
+		this.EventBuffers.Clear();
+		this.InputEvents.Clear();
 	}
 	//-----------------
 	#endregion
