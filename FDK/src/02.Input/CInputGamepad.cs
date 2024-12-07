@@ -2,133 +2,20 @@ using Silk.NET.Input;
 
 namespace FDK;
 
-public class CInputGamepad : IInputDevice, IDisposable {
-	// Constructor
-
+public class CInputGamepad : CInputButtonsBase, IInputDevice, IDisposable {
 	private IGamepad Gamepad { get; set; }
 
-	public CInputGamepad(IGamepad gamepad) {
+	public CInputGamepad(IGamepad gamepad) : base() {
 		this.Gamepad = gamepad;
 		this.CurrentType = InputDeviceType.Gamepad;
 		this.GUID = gamepad.Index.ToString();
 		this.ID = gamepad.Index;
 		this.Name = gamepad.Name;
-
-		this.InputEvents = new List<STInputEvent>(32);
+		this.ButtonStates = new (bool, int)[15];
 
 		gamepad.ButtonDown += Joystick_ButtonDown;
 		gamepad.ButtonUp += Joystick_ButtonUp;
 	}
-
-
-	// メソッド
-
-	public void SetID(int nID) {
-		this.ID = nID;
-	}
-
-	#region [ IInputDevice 実装 ]
-	//-----------------
-	public InputDeviceType CurrentType {
-		get;
-		private set;
-	}
-	public string GUID {
-		get;
-		private set;
-	}
-	public int ID {
-		get;
-		private set;
-	}
-	public string Name {
-		get;
-		private set;
-	}
-	public List<STInputEvent> InputEvents {
-		get;
-		private set;
-	}
-	public string strDeviceName {
-		get;
-		set;
-	}
-
-	public void Polling(bool useBufferInput) {
-		InputEvents.Clear();
-
-		for (int i = 0; i < ButtonStates.Length; i++) {
-			if (ButtonStates[i].isPressed) {
-				if (ButtonStates[i].state >= 1) {
-					ButtonStates[i].state = 2;
-				} else {
-					ButtonStates[i].state = 1;
-
-					InputEvents.Add(
-						new STInputEvent() {
-							nKey = i,
-							Pressed = true,
-							Released = false,
-							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-							nVelocity = 0,
-						}
-					);
-				}
-			} else {
-				if (ButtonStates[i].state <= -1) {
-					ButtonStates[i].state = -2;
-				} else {
-					ButtonStates[i].state = -1;
-
-					InputEvents.Add(
-						new STInputEvent() {
-							nKey = i,
-							Pressed = false,
-							Released = true,
-							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-							nVelocity = 0,
-						}
-					);
-				}
-			}
-		}
-	}
-
-	public bool KeyPressed(int nButton) {
-		return ButtonStates[nButton].state == 1;
-	}
-	public bool KeyPressing(int nButton) {
-		return ButtonStates[nButton].state >= 1;
-	}
-	public bool KeyReleased(int nButton) {
-		return ButtonStates[nButton].state == -1;
-	}
-	public bool KeyReleasing(int nButton) {
-		return ButtonStates[nButton].state <= -1;
-	}
-	//-----------------
-	#endregion
-
-	#region [ IDisposable 実装 ]
-	//-----------------
-	public void Dispose() {
-		if (!this.IsDisposed) {
-			if (this.InputEvents != null) {
-				this.InputEvents = null;
-			}
-			this.IsDisposed = true;
-		}
-	}
-	//-----------------
-	#endregion
-
-
-	// その他
-
-	#region [ private ]
-	//-----------------
-	public (bool isPressed, int state)[] ButtonStates { get; private set; } = new (bool, int)[15];
-	private bool IsDisposed;
 
 	private void Joystick_ButtonDown(IGamepad joystick, Button button) {
 		if (button.Name != ButtonName.Unknown) {
@@ -141,6 +28,4 @@ public class CInputGamepad : IInputDevice, IDisposable {
 			ButtonStates[(int)button.Name].isPressed = false;
 		}
 	}
-	//-----------------
-	#endregion
 }

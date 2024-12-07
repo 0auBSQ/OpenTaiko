@@ -4,112 +4,24 @@ using Silk.NET.Input;
 
 namespace FDK;
 
-public class CInputMouse : IInputDevice, IDisposable {
-	// 定数
-
+public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	public const int MouseButtonCount = 8;
 
-
-	// Constructor
-
-	public CInputMouse(IMouse mouse) {
+	public CInputMouse(IMouse mouse) : base() {
 		this.CurrentType = InputDeviceType.Mouse;
 		this.GUID = "";
 		this.ID = 0;
 		this.Name = mouse.Name;
+		this.ButtonStates = new (bool, int)[12];
 
 		mouse.Click += Mouse_Click;
 		mouse.DoubleClick += Mouse_DoubleClick;
 		mouse.MouseDown += Mouse_MouseDown;
 		mouse.MouseUp += Mouse_MouseUp;
 		mouse.MouseMove += Mouse_MouseMove;
-
-		this.InputEvents = new List<STInputEvent>(32);
 	}
 
-
-	// メソッド
-
-	#region [ IInputDevice 実装 ]
-	//-----------------
-	public InputDeviceType CurrentType { get; private set; }
-	public string GUID { get; private set; }
-	public int ID { get; private set; }
-	public string Name { get; private set; }
-	public List<STInputEvent> InputEvents { get; private set; }
-
-	public void Polling(bool useBufferInput) {
-		InputEvents.Clear();
-
-		for (int i = 0; i < MouseStates.Length; i++) {
-			if (MouseStates[i].isPressed) {
-				if (MouseStates[i].state >= 1) {
-					MouseStates[i].state = 2;
-				} else {
-					MouseStates[i].state = 1;
-					InputEvents.Add(
-						new STInputEvent() {
-							nKey = i,
-							Pressed = true,
-							Released = false,
-							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-							nVelocity = 0,
-						}
-					);
-				}
-			} else {
-				if (MouseStates[i].state <= -1) {
-					MouseStates[i].state = -2;
-				} else {
-					MouseStates[i].state = -1;
-					InputEvents.Add(
-						new STInputEvent() {
-							nKey = i,
-							Pressed = false,
-							Released = true,
-							nTimeStamp = SoundManager.PlayTimer.SystemTimeMs, // Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-							nVelocity = 0,
-						}
-					);
-				}
-			}
-		}
-	}
-	public bool KeyPressed(int nButton) {
-		return MouseStates[nButton].state == 1;
-	}
-	public bool KeyPressing(int nButton) {
-		return MouseStates[nButton].state >= 1;
-	}
-	public bool KeyReleased(int nButton) {
-		return MouseStates[nButton].state == -1;
-	}
-	public bool KeyReleasing(int nButton) {
-		return MouseStates[nButton].state <= -1;
-	}
-	//-----------------
-	#endregion
-
-	#region [ IDisposable 実装 ]
-	//-----------------
-	public void Dispose() {
-		if (!this.IsDisposed) {
-			if (this.InputEvents != null) {
-				this.InputEvents = null;
-			}
-			this.IsDisposed = true;
-		}
-	}
-	//-----------------
-	#endregion
-
-
-	// その他
-
-	#region [ private ]
-	//-----------------
-	public (bool isPressed, int state)[] MouseStates { get; private set; } = new (bool, int)[12];
-	private bool IsDisposed;
+	public (bool isPressed, int state)[] MouseStates => this.ButtonStates;
 
 	private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {
 
@@ -121,19 +33,17 @@ public class CInputMouse : IInputDevice, IDisposable {
 
 	private void Mouse_MouseDown(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			MouseStates[(int)mouseButton].isPressed = true;
+			ButtonStates[(int)mouseButton].isPressed = true;
 		}
 	}
 
 	private void Mouse_MouseUp(IMouse mouse, MouseButton mouseButton) {
 		if (mouseButton != MouseButton.Unknown) {
-			MouseStates[(int)mouseButton].isPressed = false;
+			ButtonStates[(int)mouseButton].isPressed = false;
 		}
 	}
 
 	private void Mouse_MouseMove(IMouse mouse, Vector2 vector2) {
 
 	}
-	//-----------------
-	#endregion
 }
