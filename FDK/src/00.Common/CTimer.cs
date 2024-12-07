@@ -5,9 +5,9 @@ namespace FDK;
 public class CTimer : CTimerBase {
 	public enum TimerType {
 		Unknown = -1,
-		PerformanceCounter = 0,
-		MultiMedia = 0, // deprecated. was Windows-only, now treated the same as PerformanceCounter
-		GetTickCount = 2,
+		PerformanceCounter = 0, // always accurate, mainly for event-based input timing
+		MultiMedia = 1, // same accuracy at integer frame but not fraction frame, mainly for drawing
+		GetTickCount = 2, // 10~16ms low precision (unused)
 	}
 	public TimerType CurrentTimerType {
 		get;
@@ -20,6 +20,9 @@ public class CTimer : CTimerBase {
 			switch (this.CurrentTimerType) {
 				case TimerType.PerformanceCounter:
 					return performanceTimer?.ElapsedMilliseconds ?? 0;
+
+				case TimerType.MultiMedia:
+					return SampleFramework.Game.TimeMs;
 
 				case TimerType.GetTickCount:
 					return (long)Environment.TickCount;
@@ -37,6 +40,9 @@ public class CTimer : CTimerBase {
 				case TimerType.PerformanceCounter:
 					if (!this.GetSetPerformanceCounter())
 						this.GetSetTickCount();
+					break;
+
+				case TimerType.MultiMedia:
 					break;
 
 				case TimerType.GetTickCount:

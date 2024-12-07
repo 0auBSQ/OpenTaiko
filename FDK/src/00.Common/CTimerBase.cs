@@ -92,7 +92,7 @@ public abstract class CTimerBase : IDisposable {
 
 		this.StopCount++;
 	}
-	public void Update() {
+	public virtual void Update() {
 		this.UpdateSystemTime = this.SystemTimeMs;
 		this.UpdateSystemTime_Double = this.SystemTimeMs_Double;
 	}
