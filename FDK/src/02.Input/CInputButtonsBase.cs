@@ -22,7 +22,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public List<STInputEvent> InputEvents { get; protected set; }
 	public string strDeviceName { get; set; }
 
-	public virtual void Polling(bool useBufferInput) {
+	public void Polling(bool useBufferInput) {
 		InputEvents.Clear();
 
 		for (int i = 0; i < ButtonStates.Length; i++) {
