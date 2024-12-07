@@ -21,8 +21,9 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public string Name { get; protected set; }
 	public List<STInputEvent> InputEvents { get; protected set; }
 	public string strDeviceName { get; set; }
+	public bool useBufferInput { get; set; }
 
-	public void Polling(bool useBufferInput) {
+	public void Polling() {
 		InputEvents.Clear();
 
 		for (int i = 0; i < ButtonStates.Length; i++) {

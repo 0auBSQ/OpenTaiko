@@ -18,11 +18,12 @@ public interface IInputDevice : IDisposable {
 	List<STInputEvent> InputEvents {
 		get;
 	}
+	bool useBufferInput { get; set; }
 
 
 	// メソッドインターフェース
 
-	void Polling(bool bバッファ入力を使用する);
+	void Polling();
 	bool KeyPressed(int nKey);
 	bool KeyPressed(List<int> nKey) { return nKey.Any(key => KeyPressed(key)); }
 	bool KeyPressing(int nKey);
