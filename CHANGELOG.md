@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.26] - 2024-12-08 (Beta)
+
+- Fix Buffered Inputs
+- Fix input lag on VSync
+- Fix inputs being fps-restricted
+
 ## [0.6.0.25] - 2024-12-06 (Beta)
 
 - Prevent CCounter from halting due to very large BPM
