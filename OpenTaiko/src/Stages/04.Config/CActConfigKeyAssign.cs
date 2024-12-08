@@ -93,10 +93,10 @@ internal class CActConfigKeyAssign : CActivity {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					this.bキー入力待ち = false;
-					OpenTaiko.InputManager.Polling(false);
+					OpenTaiko.InputManager.Polling();
 				} else if ((this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn()) || (this.tキーチェックとアサイン_Joypad() || tキーチェックとアサイン_Gamepad() || this.tキーチェックとアサイン_Mouse())) {
 					this.bキー入力待ち = false;
-					OpenTaiko.InputManager.Polling(false);
+					OpenTaiko.InputManager.Polling();
 				}
 			} else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Delete) && (this.n現在の選択行 >= 0)) && (this.n現在の選択行 <= 15)) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();

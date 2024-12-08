@@ -540,7 +540,7 @@ internal class OpenTaiko : Game {
 		base.OnExiting();
 	}
 	protected override void Update() {
-		InputManager?.Polling(OpenTaiko.ConfigIni.bBufferedInputs);
+		InputManager?.Polling();
 	}
 	protected override void Draw() {
 #if !DEBUG
@@ -1650,7 +1650,7 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			bool bUseMIDIIn = true;
-			InputManager = new CInputManager(Window_);
+			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs);
 			foreach (IInputDevice device in InputManager.InputDevices) {
 				if ((device.CurrentType == InputDeviceType.Joystick) && !ConfigIni.dicJoystick.ContainsValue(device.GUID)) {
 					int key = 0;
