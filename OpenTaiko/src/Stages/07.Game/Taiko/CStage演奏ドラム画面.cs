@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using DiscordRPC;
@@ -1474,8 +1475,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 					float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+					double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 
-					y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+					y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 				}
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1691,7 +1693,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long __dbt = nowTime;
 				long time = pChip.n発声時刻ms - __dbt;
 				float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-				y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+				double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+				y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			}
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
@@ -1707,6 +1710,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 			}
 
+			bool isBodyXInScreen = (Math.Min(x, x末端) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, x末端) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
+			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
+				HideObscuringRoll(nPlayer, pChip, x, y, x末端, y末端, isBodyXInScreen, nowTime);
+			}
+
 			#region[ HIDSUD & STEALTH ]
 
 			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stageGameScreen.bCustomDoron) {
@@ -1718,8 +1726,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			//if( CDTXMania.ConfigIni.eScrollMode != EScrollMode.Normal )
 			//x -= 10;
 
-			//if(x末端 > 0 - TJAPlayer3.Skin.Game_Notes_Size[0] && x < TJAPlayer3.Skin.Resolution[0])
-			if ((Math.Min(x, x末端) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, x末端) > 0 - OpenTaiko.Skin.Game_Notes_Size[0])) {
+			if (pChip.bShowRoll && isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
 					//int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
 					//int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? base.n現在の音符の顔番号 * 130 : 0;
@@ -1881,6 +1888,65 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		#endregion
 	}
 
+	/// Detect and hide screen-obscuring rolls when any tips are out of screen
+	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, long nowTime) {
+		// display judging rolls
+		if (nowTime >= pChip.n発声時刻ms && nowTime <= pChip.nNoteEndTimems) {
+			pChip.bShowRoll = true;
+			return;
+		}
+
+		// ignore already out-of-screen rolls
+		bool isBodyYInScreen = (Math.Min(yHead, yEnd) < OpenTaiko.Skin.Resolution[1] && Math.Max(yHead, yEnd) > 0 - OpenTaiko.Skin.Game_Notes_Size[1]);
+		if (!(isBodyXInScreen && isBodyYInScreen)) {
+			return;
+		}
+
+		// display completely in-screen rolls
+		bool headInScreen = (xHead > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && xHead < OpenTaiko.Skin.Resolution[0])
+			&& (yHead > 0 - OpenTaiko.Skin.Game_Notes_Size[1] && yHead < OpenTaiko.Skin.Resolution[1]);
+		bool endInScreen = (xEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && xEnd < OpenTaiko.Skin.Resolution[0])
+			&& (yEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[1] && yEnd < OpenTaiko.Skin.Resolution[1]);
+		if (headInScreen && endInScreen) {
+			pChip.bShowRoll = true;
+			return;
+		}
+
+		// displacement per sec
+		double th16DBeat = -4 * pChip.dbBPM / 60;
+		int dxHead = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+		int dyHead = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL_Y, pChip.eScrollMode);
+		int dxEnd = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_end, pChip.eScrollMode_end);
+		int dyEnd = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_Y_end, pChip.eScrollMode_end);
+
+		// get move speed near the judgement mark
+
+		var head = new Vector2(xHead, yHead);
+		var end = new Vector2(xEnd, yEnd);
+		var origin = new Vector2(this.NoteOriginX[iPlayer], this.NoteOriginY[iPlayer]);
+		float pos = NearestLineSegRelPos(head, end, origin);
+
+		Vector2 dr = Vector2.Lerp(new(dxHead, dyHead), new(dxEnd, dyEnd), pos);
+		Vector2 rollNorm = Vector2.Normalize(new(yEnd - yHead, -(xEnd - xHead)));
+
+		int drCanMoveAwayMin = (OpenTaiko.Skin.Game_Notes_Size.Max() + 1) / 2;
+		// If the nearest point is roll tip, all moves may prevent obscuring.
+		// If the nearest point is roll body, only orthogonal moves may prevent obscuring.
+		float drAway = (pos > 0 && pos < 1) ? Math.Abs(Vector2.Dot(dr, rollNorm)) : dr.Length();
+		bool canMoveAway = drAway >= drCanMoveAwayMin;
+		pChip.bShowRoll = canMoveAway;
+	}
+
+	private static float NearestLineSegRelPos(Vector2 head, Vector2 end, Vector2 target) {
+		Vector2 body = end - head;
+		float len = body.Length();
+		Vector2 bodyUnit = Vector2.Normalize(body);
+
+		Vector2 dHead = target - head;
+		float dHeadProj = Vector2.Dot(dHead, bodyUnit);
+		return Math.Clamp(dHeadProj, 0f, len) / len;
+	}
+
 	protected override void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip) {
 	}
 	protected override void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip) {
@@ -1900,9 +1966,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (pChip.dbSCROLL_Y != 0.0) {
 			double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
 			long __dbt = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
-			long time = pChip.n発声時刻ms - __dbt;
+			long msDTime = pChip.n発声時刻ms - __dbt;
 			float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-			y += NotesManager.GetNoteY(pChip, time * pChip.dbBPM, _scrollSpeed, OpenTaiko.Skin.Game_Notes_Interval, play_bpm_time, pChip.eScrollMode, false);
+			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+			y += NotesManager.GetNoteY(msDTime, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 
 			//y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
 		}
