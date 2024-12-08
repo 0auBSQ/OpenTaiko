@@ -47,11 +47,11 @@ public class CInputManager : IDisposable {
 
 
 	// Constructor
-	public CInputManager(IWindow window, bool bUseMidiIn = true) {
-		Initialize(window, bUseMidiIn);
+	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true) {
+		Initialize(window, useBufferedInput, bUseMidiIn);
 	}
 
-	public void Initialize(IWindow window, bool bUseMidiIn) {
+	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn) {
 		Context = window.CreateInput();
 
 		this.InputDevices = new List<IInputDevice>(10);
@@ -131,14 +131,23 @@ public class CInputManager : IDisposable {
 		}
 		return null;
 	}
-	public void Polling(bool useBufferInput) {
+	public void SetUseBufferInput(bool useBufferInput) {
+		lock (this.objMidiIn排他用) {
+			for (int i = this.InputDevices.Count - 1; i >= 0; i--)
+			{
+				IInputDevice device = this.InputDevices[i];
+				device.useBufferInput = useBufferInput;
+			}
+		}
+	}
+	public void Polling() {
 		lock (this.objMidiIn排他用) {
 			//				foreach( IInputDevice device in this.list入力デバイス )
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)    // #24016 2011.1.6 yyagi: change not to use "foreach" to avoid InvalidOperation exception by Remove().
 			{
 				IInputDevice device = this.InputDevices[i];
 				try {
-					device.Polling(useBufferInput);
+					device.Polling();
 				} catch (Exception e)                                      // #24016 2011.1.6 yyagi: catch exception for unplugging USB joystick, and remove the device object from the polling items.
 				{
 					this.InputDevices.Remove(device);

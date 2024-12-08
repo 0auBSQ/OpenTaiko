@@ -1613,6 +1613,7 @@ internal class CActConfigList : CActivity {
 
 		OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
 		OpenTaiko.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
+		OpenTaiko.InputManager?.SetUseBufferInput(OpenTaiko.ConfigIni.bBufferedInputs);
 		OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 		OpenTaiko.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 		OpenTaiko.ConfigIni.bEnableBGA = this.iSystemBGA.bON;

@@ -136,8 +136,8 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "调整声音播放模式为 WASAPI 时的声音缓冲。\n没有出现如曲目冻结或时间错误的声音问题时，该项设置\n越小越好。\n建议设为 0 以使用估计值或通过不断尝试进行调整。\n退出设置界面以使此选项生效。",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Bass 模式缓冲区大小",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "当使用 Bass 模式时的缓冲区大小：\n— 范围： 0-99999 ms\n— 0：系统决定该值的大小\n该值越小，音频卡顿/延迟会更小，但或导致声音异常或\n爆音。\n退出设置界面以使此选项生效。",
-		"SETTINGS_SYSTEM_OSTIMER": "操作系统计时器模式",
-		"SETTINGS_SYSTEM_OSTIMER_DESC": "开启时音符滚动会更加顺畅，但或将导致声音延迟。\n关闭会确保无声音延迟，但音符滚动会更加不稳定。\n关闭时 DTXMania 会使用其原始的计时器。\n其效果反之亦然。",
+		"SETTINGS_SYSTEM_OSTIMER": "使用系统计时器",
+		"SETTINGS_SYSTEM_OSTIMER_DESC": "开启时音符滚动会更加顺畅，但可能导致谱面与歌曲不同步。\n关闭会确保谱面与歌曲同步，但音符滚动会较不顺畅。",
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "创建报错记录",
@@ -151,7 +151,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord 状态显示",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "选择是否在 Discord 上共享曲目信息。",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "输入缓冲模式",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时所有输入都会被保留，但输入采样率会会降低，\n关闭时部分输入可能会被丢弃，但输入采样率会增高。",
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启时，判定时间精度将不受帧率限制，\n且所有输入都不会被忽略。\n关闭时，判定时间精度将受帧率限制，\n且部分输入可能会被忽略。",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",

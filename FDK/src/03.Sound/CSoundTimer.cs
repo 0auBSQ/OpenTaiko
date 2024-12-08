@@ -32,9 +32,8 @@ public class CSoundTimer : CTimerBase {
 					return this.Device.ElapsedTimeMs;
 				} else {
 					if (FDK.SoundManager.bUseOSTimer)
-					//if ( true )
 					{
-						return ctDInputTimer.SystemTimeMs;              // 仮にCSoundTimerをCTimer相当の動作にしてみた
+						return SampleFramework.Game.TimeMs; // match TimerType.MultiMedia behavior
 					} else {
 						return this.Device.ElapsedTimeMs
 							   + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs);
@@ -47,57 +46,38 @@ public class CSoundTimer : CTimerBase {
 
 	internal CSoundTimer(ISoundDevice device) {
 		this.Device = device;
-
-		TimerCallback timerDelegate = new TimerCallback(SnapTimers);    // CSoundTimerをシステム時刻に変換するために、
-		timer = new Timer(timerDelegate, null, 0, 1000);                // CSoundTimerとCTimerを両方とも走らせておき、
-		ctDInputTimer = new CTimer(CTimer.TimerType.MultiMedia);          // 1秒に1回時差を測定するようにしておく
+		ctDInputTimer = new CTimer(CTimer.TimerType.PerformanceCounter);
 	}
 
-	private void SnapTimers(object o)   // 1秒に1回呼び出され、2つのタイマー間の現在値をそれぞれ保持する。
-	{
-		try {
-			this.nDInputTimerCounter = this.ctDInputTimer.SystemTimeMs;
-			this.nSoundTimerCounter = this.SystemTimeMs;
-			//Debug.WriteLine( "BaseCounter: " + nDInputTimerCounter + ", " + nSoundTimerCounter );
-		} catch (Exception e)
-		// サウンド設定変更時に、timer.Dispose()した後、timerが実際に停止する前にここに来てしまう場合があり
-		// その際にNullReferenceExceptionが発生する
-		// timerが実際に停止したことを検出してから次の設定をすべきだが、実装が難しいため、
-		// ここで単に例外破棄することで代替する
-		{
-			Trace.TraceInformation(e.ToString());
-			Trace.TraceInformation("FDK: CSoundTimer.SnapTimers(): 例外発生しましたが、継続します。");
+	public override void Update() {
+		base.Update();
+		// snap timers regularly, at integer frame
+		if (this.UpdateSystemTime - this.msSoundTimerOffset >= msSnapTimersInternal) {
+			this.SnapTimers();
 		}
 	}
-	public long nサウンドタイマーのシステム時刻msへの変換(long nDInputのタイムスタンプ) {
-		return nDInputのタイムスタンプ - this.nDInputTimerCounter + this.nSoundTimerCounter;    // Timer違いによる時差を補正する
+
+
+	const int msSnapTimersInternal = 1000;
+
+	private void SnapTimers() {
+		this.msDInputTimerOffset = this.ctDInputTimer.SystemTimeMs;
+		this.msSoundTimerOffset = this.SystemTimeMs;
+	}
+	public long msGetPreciseNowSoundTimerTime()
+		=> this.msDInputTimeToSoundTimerTime(this.ctDInputTimer.SystemTimeMs);
+	private long msDInputTimeToSoundTimerTime(long msDInputTime) {
+		return msDInputTime - this.msDInputTimerOffset + this.msSoundTimerOffset;    // Timer違いによる時差を補正する
 	}
 
 	public override void Dispose() {
-		// 特になし； ISoundDevice の解放は呼び出し元で行うこと。
-
-		//sendinputスレッド削除
-		if (timer != null) {
-			timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-			// ここで、実際にtimerが停止したことを確認するコードを追加すべきだが、やり方わからず。
-			// 代替策として、SnapTimers()中で、例外発生を破棄している。
-			timer.Dispose();
-			timer = null;
-		}
-		if (ct != null) {
-			ct.Pause();
-			ct.Dispose();
-			ct = null;
-		}
+		this.ctDInputTimer?.Dispose();
 	}
 
 	internal ISoundDevice Device = null;    // debugのため、一時的にprotectedをpublicにする。後で元に戻しておくこと。
 											//protected Thread thSendInput = null;
 											//protected Thread thSnapTimers = null;
 	private CTimer ctDInputTimer = null;
-	private long nDInputTimerCounter = 0;
-	private long nSoundTimerCounter = 0;
-	Timer timer = null;
-
-	private CTimer ct = null;                               // TESTCODE
+	private long msDInputTimerOffset = 0;
+	private long msSoundTimerOffset = 0;
 }

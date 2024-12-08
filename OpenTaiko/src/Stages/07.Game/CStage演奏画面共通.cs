@@ -971,9 +971,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private ENoteJudge e指定時刻からChipのJUDGEを返すImpl(long nTime, CChip pChip, int player = 0) {
 
 		if (pChip != null) {
-			pChip.nLag = (int)(nTime - pChip.n発声時刻ms);      // #23580 2011.1.3 yyagi: add "nInputAdjustTime" to add input timing adjust feature
+			pChip.nLag = (int)(nTime - pChip.n発声時刻ms);
 			int nDeltaTime = Math.Abs(pChip.nLag);
-			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime + nInputAdjustTime - pChip.n発声時刻ms));
+			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
 				if ((SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed) > pChip.n発声時刻ms && (SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed) < pChip.nNoteEndTimems) {
 					return ENoteJudge.Perfect;
@@ -1007,10 +1007,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return ENoteJudge.Miss;
 	}
 
-	protected CChip r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(long nTime, int nChannel, int nInputAdjustTime, int nPlayer) {
+	protected CChip r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(long nTime, int nChannel, int nPlayer) {
 		//sw2.Start();
 		//Trace.TraceInformation( "NTime={0}, nChannel={1:x2}", nTime, nChannel );
-		nTime += nInputAdjustTime;                      // #24239 2011.1.23 yyagi InputAdjust
 
 		int nIndex_InitialPositionSearchingToPast;
 		if (this.nCurrentTopChip == -1)             // 演奏データとして1個もチップがない場合は
@@ -2396,10 +2395,9 @@ internal abstract class CStage演奏画面共通 : CStage {
     */
 
 
-	protected CChip r指定時刻に一番近い未ヒットChip(long nTime, int nChannel, int nInputAdjustTime, int n検索範囲時間ms, int nPlayer) {
+	protected CChip r指定時刻に一番近い未ヒットChip(long nTime, int nChannel, int n検索範囲時間ms, int nPlayer) {
 		//sw2.Start();
 		//Trace.TraceInformation( "nTime={0}, nChannel={1:x2}, 現在のTop={2}", nTime, nChannel,CDTXMania.DTX.listChip[ this.n現在のトップChip ].n発声時刻ms );
-		nTime += nInputAdjustTime;
 
 		int nIndex_InitialPositionSearchingToPast;
 		int nTimeDiff;
@@ -2519,9 +2517,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//sw2.Stop();
 		return nearestChip;
 	}
-	public bool r検索範囲内にチップがあるか調べる(long nTime, int nInputAdjustTime, int n検索範囲時間ms, int nPlayer) {
-		nTime += nInputAdjustTime;
-
+	public bool r検索範囲内にチップがあるか調べる(long nTime, int n検索範囲時間ms, int nPlayer) {
 		for (int i = 0; i < listChip[nPlayer].Count; i++) {
 			CChip chip = listChip[nPlayer][i];
 			if (!chip.bHit) {
@@ -2824,7 +2820,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
 
-		if (this.r指定時刻に一番近い未ヒットChip((long)n現在時刻ms, 0x50, 0, 1000000, nPlayer) == null) {
+		if (this.r指定時刻に一番近い未ヒットChip((long)n現在時刻ms, 0x50, 1000000, nPlayer) == null) {
 			this.actChara.b演奏中[nPlayer] = false;
 		}
 
