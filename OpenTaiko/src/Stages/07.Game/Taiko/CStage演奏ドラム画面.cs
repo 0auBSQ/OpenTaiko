@@ -1696,6 +1696,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			}
 
+			if (NotesManager.IsGenericBalloon(pChip)) {
+				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.nNoteEndTimems) {
+					x = NoteOriginX[nPlayer];
+				} else if (nowTime >= pChip.nNoteEndTimems) {
+					x = x末端;
+				}
+			}
+
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
 				if (OpenTaiko.ConfigIni.nGameType[nPlayer] == EGameType.Konga) {
 					if (NotesManager.IsClapRoll(pChip)) {
@@ -1799,13 +1807,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					int _78_cut = 78 * _size[0] / 136;
 
 					if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
-						if (NotesManager.IsFuzeRoll(pChip)
-							&& nowTime >= pChip.n発声時刻ms && nowTime < pChip.nNoteEndTimems) {
-							x = NoteOriginX[nPlayer];
-							y = NoteOriginY[nPlayer];
-						}
-
-
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端);
 
 						if (OpenTaiko.Tx.SENotes[(int)_gt] != null) {
@@ -1827,11 +1828,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					if (NotesManager.IsBalloon(pChip) || NotesManager.IsKusudama(pChip)) {
 						if (pChip.bShow) {
-							if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.nNoteEndTimems)
-								x = NoteOriginX[nPlayer];
-							else if (nowTime >= pChip.nNoteEndTimems)
-								x = (NoteOriginX[nPlayer] + pChip.nNoteTipDistance_X);
-
 							NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2);
 							NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
 
