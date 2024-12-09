@@ -1699,8 +1699,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (NotesManager.IsGenericBalloon(pChip)) {
 				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.nNoteEndTimems) {
 					x = NoteOriginX[nPlayer];
+					y = NoteOriginY[nPlayer];
 				} else if (nowTime >= pChip.nNoteEndTimems) {
 					x = x末端;
+					y = y末端;
 				}
 			}
 
