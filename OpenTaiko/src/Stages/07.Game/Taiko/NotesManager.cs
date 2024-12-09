@@ -328,8 +328,12 @@ class NotesManager {
 		int _offset = 0;
 		var _texarr = OpenTaiko.Tx.Notes[(int)_gt];
 		int rollOrigin = (OpenTaiko.Skin.Game_Notes_Size[0] * 5);
-		float _adjust = OpenTaiko.Skin.Game_Notes_Size[0] / 2.0f;
-		float image_size = OpenTaiko.Skin.Game_Notes_Size[0];
+		float wImage = OpenTaiko.Skin.Game_Notes_Size[0];
+		float hImage = OpenTaiko.Skin.Game_Notes_Size[1];
+
+		// Hit-type notes are drawn anchoring to the top-left and are off center, but roll-type notes are not
+		float xHitNoteOffset = wImage / 2.0f;
+		float yHitNoteOffset = hImage / 2.0f;
 
 		if (IsSmallRoll(chip) || (_gt == EGameType.Taiko && IsYellowRoll(chip))) {
 			_offset = 0;
@@ -348,19 +352,10 @@ class NotesManager {
 		if (_texarr == null) return;
 
 		if (chip.bShowRoll) {
-			int index = x末端 - x;
-
-
-			//var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
 			var theta = -Math.Atan2(y末端 - y, x末端 - x);
-			// Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
-			if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI)
-				theta += 0.00000000001;
 
-
-			var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
-			var div = dist / image_size;
-			//var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
+			var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2));
+			var div = (dist + 2) / wImage; // + 2 (1 for head, 1 for back) to avoid the gap before tail
 
 			if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
 				_texarr.color4 = effectedColor;
@@ -370,33 +365,28 @@ class NotesManager {
 			// Body
 			_texarr.vcScaleRatio.X = (float)div;
 			_texarr.fZ軸中心回転 = (float)theta;
-			//var _x0 = x + _adjust;
-			//var _y0 = y + 0f;
 
-			var _center_x = (x + x末端 + image_size) / 2;
-			var _center_y = _adjust + (y + y末端) / 2;
-			//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-			//t2D拡大率考慮中央基準描画 t2D中心基準描画
+			var _center_x = (x + x末端) / 2 + xHitNoteOffset;
+			var _center_y = (y + y末端) / 2 + yHitNoteOffset;
+			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(
+				rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset,
+				0,
+				OpenTaiko.Skin.Game_Notes_Size[0],
+				OpenTaiko.Skin.Game_Notes_Size[1]));
 
 			// Tail
 			_texarr.vcScaleRatio.X = 1.0f;
-
-			// Only display the roll tail if the distance is high enough to see the tail texture to avoid math issues
-			if (dist > 3) {
-				//var _x0 = x末端 + _adjust;
-				//var _y0 = y末端 + 0f;
-				var _d = _adjust;
-
-				var x1 = x + _adjust;
-				var y1 = y + _adjust;
-				var x2 = x末端 + _adjust;
-				var y2 = y末端 + _adjust;
-				var _xc = x2 + (x2 - x1) * _d / dist;
-				var _yc = y2 + (y2 - y1) * _d / dist;
-				//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画((int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-				_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-			}
+			var _xc = x末端 + xHitNoteOffset;
+			var _yc = y末端 + yHitNoteOffset;
+			// notice that the texture for bar tail is centered at the mid-left of the image rect
+			// rotate around image rect center, find bar tail center relative to top-left of image rect
+			var xTailOrig = (Math.Cos(theta) * -wImage / 2) + wImage / 2;
+			var yTailOrig = (-Math.Sin(theta) * -wImage / 2) + hImage / 2;
+			_texarr.t2D描画((int)(_xc - xTailOrig), (int)(_yc - yTailOrig), 0, new Rectangle(
+				rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset,
+				frame,
+				OpenTaiko.Skin.Game_Notes_Size[0],
+				OpenTaiko.Skin.Game_Notes_Size[1]));
 
 			_texarr.fZ軸中心回転 = 0;
 		}
