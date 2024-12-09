@@ -347,57 +347,59 @@ class NotesManager {
 
 		if (_texarr == null) return;
 
-		int index = x末端 - x;
+		if (chip.bShowRoll) {
+			int index = x末端 - x;
 
 
-		//var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
-		var theta = -Math.Atan2(y末端 - y, x末端 - x);
-		// Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
-		if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI)
-			theta += 0.00000000001;
+			//var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
+			var theta = -Math.Atan2(y末端 - y, x末端 - x);
+			// Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
+			if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI)
+				theta += 0.00000000001;
 
 
-		var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
-		var div = dist / image_size;
-		//var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
+			var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
+			var div = dist / image_size;
+			//var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
 
-		if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
-			_texarr.color4 = effectedColor;
-		else
-			_texarr.color4 = normalColor;
+			if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
+				_texarr.color4 = effectedColor;
+			else
+				_texarr.color4 = normalColor;
 
-		// Body
-		_texarr.vcScaleRatio.X = (float)div;
-		_texarr.fZ軸中心回転 = (float)theta;
-		//var _x0 = x + _adjust;
-		//var _y0 = y + 0f;
+			// Body
+			_texarr.vcScaleRatio.X = (float)div;
+			_texarr.fZ軸中心回転 = (float)theta;
+			//var _x0 = x + _adjust;
+			//var _y0 = y + 0f;
 
-		var _center_x = (x + x末端 + image_size) / 2;
-		var _center_y = _adjust + (y + y末端) / 2;
-		//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-		_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-		//t2D拡大率考慮中央基準描画 t2D中心基準描画
+			var _center_x = (x + x末端 + image_size) / 2;
+			var _center_y = _adjust + (y + y末端) / 2;
+			//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			//t2D拡大率考慮中央基準描画 t2D中心基準描画
 
-		// Tail
-		_texarr.vcScaleRatio.X = 1.0f;
+			// Tail
+			_texarr.vcScaleRatio.X = 1.0f;
 
-		// Only display the roll tail if the distance is high enough to see the tail texture to avoid math issues
-		if (dist > 3) {
-			//var _x0 = x末端 + _adjust;
-			//var _y0 = y末端 + 0f;
-			var _d = _adjust;
+			// Only display the roll tail if the distance is high enough to see the tail texture to avoid math issues
+			if (dist > 3) {
+				//var _x0 = x末端 + _adjust;
+				//var _y0 = y末端 + 0f;
+				var _d = _adjust;
 
-			var x1 = x + _adjust;
-			var y1 = y + _adjust;
-			var x2 = x末端 + _adjust;
-			var y2 = y末端 + _adjust;
-			var _xc = x2 + (x2 - x1) * _d / dist;
-			var _yc = y2 + (y2 - y1) * _d / dist;
-			//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画((int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-			_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+				var x1 = x + _adjust;
+				var y1 = y + _adjust;
+				var x2 = x末端 + _adjust;
+				var y2 = y末端 + _adjust;
+				var _xc = x2 + (x2 - x1) * _d / dist;
+				var _yc = y2 + (y2 - y1) * _d / dist;
+				//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画((int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
+				_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			}
+
+			_texarr.fZ軸中心回転 = 0;
 		}
-
-		_texarr.fZ軸中心回転 = 0;
 
 		if (OpenTaiko.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
 			_texarr.color4 = effectedColor;

@@ -4504,6 +4504,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			dTX.listChip[i].bHit = false;
 			dTX.listChip[i].bShow = true;
+			dTX.listChip[i].bShowRoll = true;
 			dTX.listChip[i].bProcessed = false;
 			dTX.listChip[i].bVisible = true;
 			dTX.listChip[i].IsHitted = false;
