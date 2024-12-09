@@ -49,39 +49,32 @@ class NotesManager {
 		return -1;
 	}
 
-	public static int GetNoteX(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
-		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-		double screen_ratio = OpenTaiko.Skin.Resolution[0] / 1280.0;
-		switch (eScrollMode) {
-			case EScrollMode.Normal:
-				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-			case EScrollMode.BMScroll: {
-					return (int)((hbtime / 16.0) * interval * screen_ratio);
-				}
-			case EScrollMode.HBScroll: {
-					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-				}
-			default:
-				return 0;
+	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+		if (eScrollMode is EScrollMode.BMScroll) {
+			scroll = 1.0;
 		}
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
+		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
 	}
 
-	public static int GetNoteY(CChip pChip, double timems, double scroll, int interval, float play_bpm_time, EScrollMode eScrollMode, bool roll) {
-		double hbtime = ((roll ? pChip.fBMSCROLLTime_end : pChip.fBMSCROLLTime) - (play_bpm_time));
-		double screen_ratio = OpenTaiko.Skin.Resolution[1] / 720.0;
-		switch (eScrollMode) {
-			case EScrollMode.Normal:
-				return (int)((timems / 240000.0) * interval * scroll * screen_ratio);
-			case EScrollMode.BMScroll: {
-					return 0;
-				}
-			case EScrollMode.HBScroll: {
-					return (int)((hbtime / 16.0) * interval * scroll * screen_ratio);
-				}
-			default:
-				return 0;
+	public static int GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
+			return 0;
 		}
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
+		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
+		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
 	}
+
+	public static double getN4Beats(double msDTime, double th16DBeat, double bpm, EScrollMode eScrollMode)
+		=> eScrollMode switch {
+			EScrollMode.Normal => msDTime * bpm / 240000.0,
+			EScrollMode.BMScroll or EScrollMode.HBScroll => th16DBeat / 16.0,
+			_ => 0,
+		};
 
 	#endregion
 
@@ -335,8 +328,12 @@ class NotesManager {
 		int _offset = 0;
 		var _texarr = OpenTaiko.Tx.Notes[(int)_gt];
 		int rollOrigin = (OpenTaiko.Skin.Game_Notes_Size[0] * 5);
-		float _adjust = OpenTaiko.Skin.Game_Notes_Size[0] / 2.0f;
-		float image_size = OpenTaiko.Skin.Game_Notes_Size[0];
+		float wImage = OpenTaiko.Skin.Game_Notes_Size[0];
+		float hImage = OpenTaiko.Skin.Game_Notes_Size[1];
+
+		// Hit-type notes are drawn anchoring to the top-left and are off center, but roll-type notes are not
+		float xHitNoteOffset = wImage / 2.0f;
+		float yHitNoteOffset = hImage / 2.0f;
 
 		if (IsSmallRoll(chip) || (_gt == EGameType.Taiko && IsYellowRoll(chip))) {
 			_offset = 0;
@@ -354,57 +351,45 @@ class NotesManager {
 
 		if (_texarr == null) return;
 
-		int index = x末端 - x;
+		if (chip.bShowRoll) {
+			var theta = -Math.Atan2(y末端 - y, x末端 - x);
 
+			var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2));
+			var div = (dist + 2) / wImage; // + 2 (1 for head, 1 for back) to avoid the gap before tail
 
-		//var theta = -Math.Atan2(chip.dbSCROLL_Y, chip.dbSCROLL);
-		var theta = -Math.Atan2(y末端 - y, x末端 - x);
-		// Temporary patch for odd math bug, to fix later, still bugs on katharsis (negative roll)
-		if (chip.dbSCROLL_Y == 0)//theta == 0 || theta == -Math.PI)
-			theta += 0.00000000001;
+			if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
+				_texarr.color4 = effectedColor;
+			else
+				_texarr.color4 = normalColor;
 
+			// Body
+			_texarr.vcScaleRatio.X = (float)div;
+			_texarr.fZ軸中心回転 = (float)theta;
 
-		var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2)) + 1;
-		var div = dist / image_size;
-		//var odiv = (index - _adjust + _adjust + 1) / TJAPlayer3.Skin.Game_Notes_Size[0];
+			var _center_x = (x + x末端) / 2 + xHitNoteOffset;
+			var _center_y = (y + y末端) / 2 + yHitNoteOffset;
+			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(
+				rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset,
+				0,
+				OpenTaiko.Skin.Game_Notes_Size[0],
+				OpenTaiko.Skin.Game_Notes_Size[1]));
 
-		if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
-			_texarr.color4 = effectedColor;
-		else
-			_texarr.color4 = normalColor;
+			// Tail
+			_texarr.vcScaleRatio.X = 1.0f;
+			var _xc = x末端 + xHitNoteOffset;
+			var _yc = y末端 + yHitNoteOffset;
+			// notice that the texture for bar tail is centered at the mid-left of the image rect
+			// rotate around image rect center, find bar tail center relative to top-left of image rect
+			var xTailOrig = (Math.Cos(theta) * -wImage / 2) + wImage / 2;
+			var yTailOrig = (-Math.Sin(theta) * -wImage / 2) + hImage / 2;
+			_texarr.t2D描画((int)(_xc - xTailOrig), (int)(_yc - yTailOrig), 0, new Rectangle(
+				rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset,
+				frame,
+				OpenTaiko.Skin.Game_Notes_Size[0],
+				OpenTaiko.Skin.Game_Notes_Size[1]));
 
-		// Body
-		_texarr.vcScaleRatio.X = (float)div;
-		_texarr.fZ軸中心回転 = (float)theta;
-		//var _x0 = x + _adjust;
-		//var _y0 = y + 0f;
-
-		var _center_x = (x + x末端 + image_size) / 2;
-		var _center_y = _adjust + (y + y末端) / 2;
-		//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(_x0, _y0, new Rectangle(rollOrigin + TJAPlayer3.Skin.Game_Notes_Size[0] + _offset, 0, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-		_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
-		//t2D拡大率考慮中央基準描画 t2D中心基準描画
-
-		// Tail
-		_texarr.vcScaleRatio.X = 1.0f;
-
-		// Only display the roll tail if the distance is high enough to see the tail texture to avoid math issues
-		if (dist > 3) {
-			//var _x0 = x末端 + _adjust;
-			//var _y0 = y末端 + 0f;
-			var _d = _adjust;
-
-			var x1 = x + _adjust;
-			var y1 = y + _adjust;
-			var x2 = x末端 + _adjust;
-			var y2 = y末端 + _adjust;
-			var _xc = x2 + (x2 - x1) * _d / dist;
-			var _yc = y2 + (y2 - y1) * _d / dist;
-			//TJAPlayer3.Tx.Notes[(int)_gt].t2D描画((int)_x0, (int)_y0, 0, new Rectangle(rollOrigin + (TJAPlayer3.Skin.Game_Notes_Size[0] * 2) + _offset, frame, TJAPlayer3.Skin.Game_Notes_Size[0], TJAPlayer3.Skin.Game_Notes_Size[1]));
-			_texarr.t2D中心基準描画((int)_xc, (int)_yc, 0, new Rectangle(rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			_texarr.fZ軸中心回転 = 0;
 		}
-
-		_texarr.fZ軸中心回転 = 0;
 
 		if (OpenTaiko.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
 			_texarr.color4 = effectedColor;
