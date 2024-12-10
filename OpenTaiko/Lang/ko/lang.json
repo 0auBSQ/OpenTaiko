@@ -28,7 +28,7 @@
 		"SETTINGS_SYSTEM": "시스템 옵션",
 		"SETTINGS_SYSTEM_DESC": "전체 시스템 설정입니다.",
 		"SETTINGS_GAME": "게임 플레이 옵션",
-		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다,.",
+		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다.",
 		"SETTINGS_EXIT": "나가기",
 		"SETTINGS_EXIT_DESC": "저장하고 나가기.",
 
@@ -46,7 +46,7 @@
 		"SETTINGS_SYSTEM_LANGUAGE": "시스템 언어",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "시스템, 게임 언어를 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_PLAYERCOUNT": "플레이어 수",
-		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "플레이어 수를 변경 할 수 있습니다 .",
+		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "플레이어 수를 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_RELOADSONG": "곡 다시 불러오기",
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "곡 파일을 다시 불러옵니다.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "곡 다시 불러오기 (Hard reload)",
@@ -68,7 +68,7 @@
 
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "전체화면 모드",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경 할 수 있습니다..",
+		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경 할 수 있습니다.",
 		"SETTINGS_SYSTEM_VSYNC": "VSync 모드",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "VSync로 전환, 또는 해제 할 수 있습니다.\nVSync 모드로 전환하시면, 프레임이 60FPS로 고정됩니다, 하지만 인풋렉은 늘어납니다.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "그래픽 API",
