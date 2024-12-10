@@ -136,8 +136,9 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "WASAPI 버퍼를 변경 할 수 있습니다.\n0으로 설정하시면 자동으로 적절한 값으로 조정합니다.\n엄청 낮으면 소리 찢김 현상이 일어날 수도 있습니다.\n메인 메뉴로 돌아가시면 적용됩니다.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "BASS 버퍼 사이즈",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "BASS 버퍼를 변경 할 수 있습니다.\n0으로 설정하시면 OS가 자동으로 적절한 값으로 조정합니다.\n엄청 낮으면 소리 찢김 현상이 일어날 수도 있습니다.\n메인 메뉴로 돌아가시면 적용됩니다.",
-		"SETTINGS_SYSTEM_OSTIMER": "OS 타이머 모드",
+		"SETTINGS_SYSTEM_OSTIMER": "OS 타이머 모드", // Update the text of "Use OS Timer".
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "이 옵션을 켜면 노트 스크롤이 더 부드러워지지만 사운드 지연이 발생할 수 있습니다.\n 끄면 노트 스크롤이 불안정해지지만 사운드 지연이 발생하지 않습니다.\n 끄면 DTXMania는 원래의 타이머를 사용하며 그 반대의 효과도 발생합니다.",
+		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "로그 파일 만들기",
@@ -152,6 +153,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "디스코드 프로필에 게임 활동을 띄웁니다.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "버퍼링 입력 모드",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "이 옵션을 켜면 입력이 무시되지 않지만 입력 폴링 속도가 감소하고,\n이 옵션을 끄면 입력이 무시될 수 있지만 폴링 빈도가 높아집니다.",
+		// Please revise the text above from English.
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "글로벌 오프셋",
@@ -502,7 +504,11 @@
 		"UNLOCK_CONDITION_AIWIN": "AI 배틀 모드에서 {0}번 승리하여 이 아이템을 잠금 해제하세요! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY": "이 아이템을 잠금 해제하려면 {0}곡을 플레이하세요! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY": "이 아이템을 잠금 해제하려면 {0}회를 플레이하세요! ({1}/{0})", // tp
+		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
+		// {1}: Total plays needed
+		// {2}: Current progress
+		"UNLOCK_CONDITION_PLAYDISTINCT": "이 아이템을 잠금 해제하려면 {1}곡을 {0}하세요! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
@@ -552,7 +558,7 @@
 		"AI_NAME": "AI",
 		"AI_TITLE": "Deus-Ex-Machina",
 		// {0}: Section No.
-		"AI_SECTION": "섹션 {0}", // ~區
+		"AI_SECTION": "섹션 {0}",
 
 		// Mods
 		"MOD_NONE": "없음",
