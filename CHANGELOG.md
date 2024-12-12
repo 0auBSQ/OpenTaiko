@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0.28] - 2024-12-12 (Beta)
+
+- Russian text of Fix Input Timestamp Inaccuracy
+- Chinese text minor changes and lining
+- Text revision reminders in other languages
+- Japanese text fixes
+- Korean text of unlock conditions in playing, punctuations
+- Make Dutch text JSON line index consistent
+
+## [0.6.0.27] - 2024-12-09 (Beta)
+
+- [Feat] Make bar drumrolls stretchable
+- [Feat] Detect and hide screen-obscuring bar drumrolls when any tips are out of screen
+- [Fix] fix bar drumroll end stuck at judgement mark if occurred at 0ms since #START
+- [Fix] fix fuze rolls stretched back when exploded
+- [Fix] fix balloon-type notes not stayed on judgement mark vertically during their duration
+- [Fix] fix wrong drawn position of rotated bar-type roll tails
+
 ## [0.6.0.26] - 2024-12-08 (Beta)
 
 - Fix Buffered Inputs

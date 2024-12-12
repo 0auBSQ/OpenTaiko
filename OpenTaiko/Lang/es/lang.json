@@ -139,6 +139,7 @@
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
 		"SETTINGS_SYSTEM_OSTIMER": "Usar timer del sistema",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Usar esto puede hacer que las notas se vean\n más suaves, pero puede haber lag de sonido.\nNo usarlo va a hacer que las notas se vean inestables,\n pero sin ningún tipo de lag.\n\nEste ajuste solo está disponible\n usando WASAPI o ASIO.\n",
+		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Guardar registros",
@@ -153,6 +154,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Comparte la información del .tja que estas\n jugando en Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Entrada con buffer",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Cuando se activa, la entrada no tendrá pérdidas,\n pero la tasa de actualización de la entrada será menor.\nCuando se desactiva, pueden haber entradas perdidas\n pero se actualizarán con más frecuencia.",
+		// Please revise the text above from English.
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Compensación global de sonido",

@@ -42,7 +42,6 @@
 		"SETTINGS_KEYASSIGN_TRAINING": "Training Modus Toetsinstellingen",
 		"SETTINGS_KEYASSIGN_TRAINING_DESC": "Een tweede menu voor het instellen van toetsen\ntijdens de Training Modus.",
 
-
 		// Settings - System
 		"SETTINGS_SYSTEM_LANGUAGE": "Systeemtaal",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Verander de taal\nvan het spel en de menu's.",
@@ -76,6 +75,7 @@
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode:\nSelecteer de opties OpenGL,\nDirectX11, Vulkan of Metal.\nOpenGL is langzaam, maar compatibel en stabiel.\nDirectX11 is snel en stabiel, maar\n werkt alleen op Windows.\nVulkan werkt het snelst op Linux.\nMetal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",
 		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Bevriezen bij het starten verdwijnt.\nZet deze optie uit als sommige textures zwart worden.\nDeze optie activeert na het herstarten van OpenTaiko.",
+
 		"SETTINGS_SYSTEM_BGMOVIE": "Video's Afspelen",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Schakelt achtergrond video's aan/uit.\nAls dit is ingeschakeld en het lied geen video heeft,\ndan zal de achtergrond zwart worden.",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Afspeelmodus",
@@ -86,6 +86,7 @@
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Beide",
 		"SETTINGS_SYSTEM_LANEOPACITY": "Laan Achtergrond Doorzichtigheid",
 		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "Verandert de doorzichtigheid van de achtergrond\nbij het spelen van video's.\n\n0 = volledig doorzichtig,\n255 = niet doorzichtig.",
+
 		"SETTINGS_SYSTEM_BGA": "BGA Weergeven",
 		"SETTINGS_SYSTEM_BGA_DESC": "Schakelt animaties in de achtergrond aan/uit.",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "Karakters Weergeven",
@@ -102,6 +103,7 @@
 		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Laat PuchiChara foto's zien.",
 		"SETTINGS_SYSTEM_SIMPLEMODE": "Simpele Modus",
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Versimpelt graphics door visuele effecten en\nopmaak te verbergen tijdens gameplay.",
+
 		"SETTINGS_SYSTEM_SKIN": "Huidige Skin",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Kies een skin uit de systeemfolder om te gebruiken.",
 
@@ -120,10 +122,12 @@
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Past de volume aan voor het lied voorbeeld.\nU moet OpenTaiko herstarten na het verlaten van de\ninstellingen zodat deze configuratie opslaat.",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Toetsenbord Volume Wijziging",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Geeft aan hoeveel de volume wordt aangepast voor de\nvolume omhoog/omlaag knoppen.\nU kunt een waarde instellen tussen 1 en 20.",
+
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Lied Afspeel Buffer",
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "De tijdsduur voordat een lied afspeelt in het spel.\nAls deze waarde laag staat, kunnen nummers te vroeg afspelen.",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Lied Voorbeeld Buffer",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "De tijdsduur voordat een lied voorbeeld afspeelt.\nAls deze waarde erg laag staat kunnen\nliedjes tijdens het scrollen afspelen.\nU kunt een waarde kiezen tussen 0ms en 10000ms.",
+
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Geluid Afspeelmodus",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Werkt alleen op apparaten die ASIO audio ondersteunen\n- Heeft de laagste inputvertraging\nWasapi:\n- Alleen compatibel met Windows\n- Heeft de op een na laagste inputvertraging\nBASS:\n- Op alle platforms ondersteund\nOpmerking: verlaat de instellingen\nom dit op te slaan.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO Afspeelapparaat",
@@ -132,8 +136,9 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Verander de buffer voor het afspelen van geluid met WASAPI.\nStel het getal zo laag mogelijk in\nzonder dat er geluidsproblemen ontstaan\nzoals onjuiste timing of bevriezing.\nZet dit op 0 om een ingeschatte waarde te gebruiken,\nof wijzig dit handmatig tot u een juiste waarde vindt.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Grootte",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer grootte wanneer BASS wordt gebruikt.\nKan tussen 0~99999ms ingesteld worden.\nOp 0 stelt het OS\nautomatisch de buffer grootte in.\nHoe kleiner de waarde, hoe kleiner\nde vertraging voor geluid, maar het kan\nvoor krakende/vervormde audio zorgen.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
-		"SETTINGS_SYSTEM_OSTIMER": "OS Timer Modus",
+		"SETTINGS_SYSTEM_OSTIMER": "OS Timer Modus", // Update the text of "Use OS Timer".
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Met deze optie aan scrollen noten soepeler,\nmaar er kan geluidsvertraging ontstaan.\nMet deze optie uit scrollen noten onstabieler,\nzonder extra geluidsvertraging.\n\nOp UIT, gebruikt OpenTaiko de originele\ntimer en de effecten zijn vice versa.",
+		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Logbestanden Creëren",
@@ -148,6 +153,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Kiest of lied informatie wordt gedeeld met Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gebufferde Input Modus",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wanneer dit aan staat, worden geen inputs gemist\nmaar de polling frequentie vermindert.\nWanneer dit uit staat, worden inputs mogelijk gemist,\nmaar de polling frequentie is veel hoger.",
+		// Please revise the text above from English.
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Globale Offset",
@@ -485,7 +491,6 @@
 		"UNLOCK_COIN_MORE": "Niet genoeg munten!",
 
 		"UNLOCK_CONDITION_ERROR": "De volgende conditie: {0} vereist {1} waardes.",
-
 		"UNLOCK_CONDITION_ERROR2": "De volgende conditie: {0} vereist ({1} * n) waardes en n referenties.",
 
 		// {0}: Coin earn requirement
