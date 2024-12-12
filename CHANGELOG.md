@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0.28] - 2024-12-12 (Beta)
+
+- Russian text of Fix Input Timestamp Inaccuracy
+- Chinese text minor changes and lining
+- Text revision reminders in other languages
+- Japanese text fixes
+- Korean text of unlock conditions in playing, punctuations
+- Make Dutch text JSON line index consistent
+
 ## [0.6.0.27] - 2024-12-09 (Beta)
 
 - [Feat] Make bar drumrolls stretchable
