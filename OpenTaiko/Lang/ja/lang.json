@@ -72,7 +72,7 @@
 		"SETTINGS_SYSTEM_VSYNC": "垂直帰線同期",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "垂直帰線同期：\n画面の描画をディスプレイの垂直帰\n線中に行なう場合には ON を指定し\nます。ON にすると、ガタつきのない\n滑らかな画面描画が実現されます。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "グラフィックスAPI",
-		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Bass使用時のバッファサイズ:\n0～99999ms を指定可能です。\n0を指定すると、OSがバッファの\nサイズを自動設定します。\n値を小さくするほど発音ラグが\n減少しますが、音割れや異常動作を\n引き起こす場合があります。\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
+		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "描画の方式:\nOpenGL, DirectX11, Vulkan, Metal\nの中からグラフィックスAPIを選択します。\nOpenGLは遅いですが互換性が高く安定してます\nDirectX9は古いデバイスで高速です、\nDirectX11はWindowsでしか動作しませんが、\n早くて安定しています\nVulkanはWindowsとLinux環境で最速です\nMetalはMacのみですが最速です\n\nこの変更は再起動後に反映されます\n",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "非同期テクスチャ読み込み",
 		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "テクスチャの読み込み方法:\n起動時のフリーズが消えます\nテクスチャが黒くなる場合はこのオプションをOFFにしてください\nこの変更は再起動後に反映されます",
 
@@ -134,10 +134,11 @@
 		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "ASIOデバイス:\nASIO使用時のサウンドデバイスを\n選択します。\n\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
 		"SETTINGS_SYSTEM_WASAPIBUFFER": "WASAPIバッファサイズ",
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "WASAPI使用時のバッファサイズ:\n0～99999ms を指定可能です。\n0を指定すると、OSがバッファの\nサイズを自動設定します。\n値を小さくするほど発音ラグが\n減少しますが、音割れや異常動作を\n引き起こす場合があります。\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
-		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Size",
-		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
+		"SETTINGS_SYSTEM_BASSBUFFER": "Bassバッファサイズ",
+		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Bass使用時のバッファサイズ:\n0～99999ms を指定可能です。\n0を指定すると、OSがバッファの\nサイズを自動設定します。\n値を小さくするほど発音ラグが\n減少しますが、音割れや異常動作を\n引き起こす場合があります。\n※ 設定はCONFIGURATION画面の\n　終了時に有効になります。",
 		"SETTINGS_SYSTEM_OSTIMER": "OSタイマー使用",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "OSタイマーを使用するかどうか:\n演奏タイマーとして、OpenTaiko独自の\nタイマーを使うか、OS標準のタイマー\nを使うかを選択します。\nOS標準タイマーを使うとスクロールが\n滑らかになりますが、演奏で音ズレが\n発生することがあります。(そのため\nAdjustWavesの効果が適用されます。)\n\nこの指定はWASAPI/ASIO使用時のみ有効\nです。",
+		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Traceログ出力",
@@ -152,6 +153,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Discordに再生中の譜面情報を送信する",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "バッファ入力モード",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "バッファ入力モード：\nON にすると、FPS を超える入力解像\n度を実現します。\nOFF にすると、入力解像度は FPS に\n等しくなります。",
+		// Please revise the text above from English.
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "グローバルオフセット",

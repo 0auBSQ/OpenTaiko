@@ -138,6 +138,7 @@
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass:\nSize can be between 0～99999ms.\nA value of 0 will make the OS\nautomatically decide the size.\nThe smaller the value, the less\naudio lag there is, but may also\ncause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the\n　      settings take effect.",
 		"SETTINGS_SYSTEM_OSTIMER": "Utiliser le timer de l'OS",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Permet un défilement plus fluide des notes,\nmais peut augmenter les latences sonores.\nLe désactiver peut rendre le défilement\nplus sacadé,\nmais assure la présence d'aucun lag sonore.\nSeulement disponible avec\nWASAPI ou ASIO.\n",
+		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Journalisation",
@@ -152,6 +153,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Active ou non le partage d'informations\nde jeu avec Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Bufferisation des entrées",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Génère un fichier TJAPlayer3.log file à la fermeture\ndu jeu.\nPermet l'évaluation des performances et\nfacilite l'identification des erreurs.",
+		// Please revise the text above from English.
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Décalage général",
