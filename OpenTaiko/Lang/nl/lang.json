@@ -136,9 +136,8 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Verander de buffer voor het afspelen van geluid met WASAPI.\nStel het getal zo laag mogelijk in\nzonder dat er geluidsproblemen ontstaan\nzoals onjuiste timing of bevriezing.\nZet dit op 0 om een ingeschatte waarde te gebruiken,\nof wijzig dit handmatig tot u een juiste waarde vindt.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Grootte",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer grootte wanneer BASS wordt gebruikt.\nKan tussen 0~99999ms ingesteld worden.\nOp 0 stelt het OS\nautomatisch de buffer grootte in.\nHoe kleiner de waarde, hoe kleiner\nde vertraging voor geluid, maar het kan\nvoor krakende/vervormde audio zorgen.\nOpmerking: Verlaat de instellingen\nom deze wijzigingen op te slaan.",
-		"SETTINGS_SYSTEM_OSTIMER": "OS Timer Modus", // Update the text of "Use OS Timer".
+		"SETTINGS_SYSTEM_OSTIMER": "OS-timer gebruiken",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Met deze optie aan scrollen noten soepeler,\nmaar er kan geluidsvertraging ontstaan.\nMet deze optie uit scrollen noten onstabieler,\nzonder extra geluidsvertraging.\n\nOp UIT, gebruikt OpenTaiko de originele\ntimer en de effecten zijn vice versa.",
-		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Logbestanden Creëren",
@@ -152,8 +151,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Weergave",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Kiest of lied informatie wordt gedeeld met Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gebufferde Input Modus",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wanneer dit aan staat, worden geen inputs gemist\nmaar de polling frequentie vermindert.\nWanneer dit uit staat, worden inputs mogelijk gemist,\nmaar de polling frequentie is veel hoger.",
-		// Please revise the text above from English.
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Als deze optie is ingeschakeld, kan de ingangsresolutie hoger zijn\ndan de FPS en worden er geen ingangen gewist.\nAls deze optie is uitgeschakeld,\nwordt de ingangsresolutie beperkt door de FPS en kunnen er ingangen wegvallen.",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Globale Offset",
@@ -444,10 +442,10 @@
 		// Heya / Quick Heya
 		"HEYA_PUCHI": "Puchichara",
 		"HEYA_CHARA": "Character",
-		"HEYA_DAN": "Dan Title",
-		"HEYA_NAMEPLATE": "Nameplate Title",
+		"HEYA_DAN": "Dan Titel",
+		"HEYA_NAMEPLATE": "Naambordje Titel",
 		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
+		"HEYA_NAME_INFO": "Typ je naam (Enter om op te slaan, Escape om wijzigingen te negeren):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "Name: {0}",

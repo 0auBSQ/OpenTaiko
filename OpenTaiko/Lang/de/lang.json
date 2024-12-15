@@ -136,9 +136,8 @@
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Ändere den Soundpuffer für den Wasapi-Wiedergabemodus.\nSetze den Wert so niedrig wie möglich,\nohne Tonprobleme wie Einfrieren oder falsches Timing zu verursachen.\nSetze ihn auf 0, um einen geschätzten korrekten Wert zu verwenden,\noder finde den korrekten Wert durch Versuch und Irrtum.\nHinweis: Verlasse die KONFIGURATION, um die\n     Einstellung zu übernehmen.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Bass-Puffergröße",
 		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Puffergröße bei Verwendung von Bass:\nDie Größe kann zwischen 0 und 99999 ms liegen.\nEin Wert von 0 überlässt die Entscheidung dem Betriebssystem.\nJe kleiner der Wert, desto weniger Audioverzögerung gibt es,\ndies kann jedoch auch zu abnormen oder knisternden Tönen führen.\n※ Hinweis: Verlasse die KONFIGURATION, um die\n　     Einstellung zu übernehmen.",
-		"SETTINGS_SYSTEM_OSTIMER": "OS-Timer-Modus", // Update the text of "Use OS Timer".
+		"SETTINGS_SYSTEM_OSTIMER": "Verwende OS-Timer",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Das Einschalten sorgt für ein flüssigeres Noten-Scrolling,\nkann jedoch Tonverzögerungen verursachen.\nDas Ausschalten führt zu instabilem Noten-Scrolling,\nstellt jedoch sicher, dass keine Tonverzögerungen auftreten.\n\nWenn AUS, verwendet DTXMania seinen eigenen Timer,\nund der Effekt ist umgekehrt.",
-		// Please revise the text above from English.
 
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Protokolldatei erstellen",
@@ -152,8 +151,7 @@
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Rich Presence",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Bestimmt, ob Liedinformationen mit Discord geteilt werden.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gepufferter Eingabemodus",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wenn dies eingeschaltet ist, gehen keine Eingaben verloren,\naber die Eingabeabfragerate wird verringert.\nWenn dies ausgeschaltet ist, können Eingaben verloren gehen,\naber sie werden häufiger abgefragt.",
-		// Please revise the text above from English.
+		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Wenn diese Funktion aktiviert ist,\nkann die Eingangsauflösung die FPS überschreiten.\nWenn dies ausgeschaltet ist, ist die Eingabeauflösung durch FPS begrenzt\nund Eingaben können unterbrochen werden.",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Globaler Offset",
@@ -447,7 +445,7 @@
 		"HEYA_DAN": "Dan-Titel",
 		"HEYA_NAMEPLATE": "Namensschild-Titel",
 		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
+		"HEYA_NAME_INFO": "Geben Sie Ihren Namen ein (Enter zum Speichern, Escape zum Verwerfen der Änderungen):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "Name: {0}",
