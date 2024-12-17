@@ -1,0 +1,15 @@
+{
+  "name" : {
+	"strings": {
+	  "default": "None",
+	  "de": "Keine",
+	  "es": "Nada",
+	  "fr": "Aucun",
+	  "ja": "なし",
+	  "ko": "없음",
+	  "nl": "Geen",
+	  "ru": "Ничто",
+	  "zh": "无"
+	}
+  }
+}
