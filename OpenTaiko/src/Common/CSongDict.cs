@@ -219,7 +219,7 @@ internal class CSongDict {
 
 	// Generate search by difficulty folder
 	public static List<CSongListNode> tFetchSongsByDifficulty(CSongListNode parent, int difficulty = (int)Difficulty.Oni, int level = 8) {
-		List<CSongListNode> childList = [];
+		List<CSongListNode> childList = new List<CSongListNode>();
 
 		foreach (CSongListNode nodeT in nodes.Values) {
 			var score = nodeT.nLevel;
@@ -241,7 +241,7 @@ internal class CSongDict {
 	}
 
 	public static List<CSongListNode> tFetchSongsByTitle(CSongListNode parent, ETitleType type, string text) {
-		List<CSongListNode> childList = [];
+		List<CSongListNode> childList = new List<CSongListNode>();
 
 		foreach (CSongListNode nodeT in nodes.Values) {
 			string name = type switch {
