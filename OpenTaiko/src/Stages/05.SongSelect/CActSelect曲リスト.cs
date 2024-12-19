@@ -853,6 +853,8 @@ internal class CActSelect曲リスト : CActivity {
 			this.stバー情報[i].ttkタイトル = this.ttkGenerateSongNameTexture(this.stバー情報[i].strタイトル文字列, this.stバー情報[i].ForeColor, this.stバー情報[i].BackColor, stバー情報[i].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
 		}
 
+		searchTextInput = new CTextInput();
+
 		base.Activate();
 
 		this.t選択曲が変更された(true);      // #27648 2012.3.31 yyagi 選曲画面に入った直後の 現在位置/全アイテム数 の表示を正しく行うため
@@ -2041,6 +2043,43 @@ internal class CActSelect曲リスト : CActivity {
 
 			}
 		}
+		// god this context var code stinks, anyways,
+		// Context vars :
+		// 0 - Position
+		// 1 - Title type
+		else if (emc == eMenuContext.SearchByText) {
+			if (_contextVars[0] == 1) searchTextInput.Update();
+
+			OpenTaiko.Tx.SongSelect_Search_Window?.t2D描画(0, 0);
+
+			string type_text = _contextVars[1] switch {
+				(int)ETitleType.Title => "Title",
+				(int)ETitleType.Subtitle => "Subtitle",
+				(int)ETitleType.Charter => "Charter",
+				_ => "Title"
+			};
+
+			if ((searchTypeKey?.str ?? "") != type_text) {
+				searchTypeKey = new TitleTextureKey(type_text, pfMusicName, Color.White, Color.Black, 1000);
+			}
+			string text_display = _contextVars[0] == 1 ? searchTextInput.DisplayText : searchTextInput.Text;
+			if ((searchTextKey?.str ?? "") != text_display) {
+				searchTextKey = new TitleTextureKey(text_display, pfMusicName, Color.White, Color.Black, 1000);
+			}
+
+			var searchType = TitleTextureKey.ResolveTitleTexture(searchTypeKey);
+			var searchText = TitleTextureKey.ResolveTitleTexture(searchTextKey);
+
+			searchType?.tUpdateColor4(_contextVars[0] != 0 ? new Color4(0.5f, 0.5f, 0.5f, 1.0f) : new Color4(1.0f, 1.0f ,1.0f ,1.0f));
+			searchText?.tUpdateColor4(_contextVars[0] != 1 ? new Color4(0.5f, 0.5f, 0.5f, 1.0f) : new Color4(1.0f, 1.0f, 1.0f, 1.0f));
+
+			if (_contextVars[0] == 0)
+				OpenTaiko.Tx.SongSelect_Search_Arrow_Glow?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Search_Bar_X[0], OpenTaiko.Skin.SongSelect_Search_Bar_Y[0]);
+			if (_contextVars[0] == 1)
+				OpenTaiko.Tx.SongSelect_Search_Arrow?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Search_Bar_X[0], OpenTaiko.Skin.SongSelect_Search_Bar_Y[0]);
+			searchType?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Search_Bar_X[0], OpenTaiko.Skin.SongSelect_Search_Bar_Y[0]);
+			searchText?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Search_Bar_X[1], OpenTaiko.Skin.SongSelect_Search_Bar_Y[1]);
+		}
 		// Context vars :
 		// 0~4 - Selected difficulty (1~5P)
 		// 5 - Current menu (0~4 for each player)
@@ -2101,7 +2140,23 @@ internal class CActSelect曲リスト : CActivity {
 					}
 				}
 
-			} else if (emc == eMenuContext.Random) {
+			}
+			else if (emc == eMenuContext.SearchByText) {
+
+				if (_contextVars[0] == 0) {
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
+					_contextVars[0]++;
+				}
+				else if (_contextVars[0] == 1
+					&& !string.IsNullOrWhiteSpace(searchTextInput.Text)
+					&& OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+					OpenTaiko.Skin.soundDecideSFX.tPlay();
+					_contextVars[0]++;
+				}
+
+				if (_contextVars[0] >= 2) return true;
+			}
+			else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 				_contextVars[5]++;
@@ -2129,7 +2184,14 @@ internal class CActSelect曲リスト : CActivity {
 				// Clamp values
 				_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 				_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
-			} else if (emc == eMenuContext.Random) {
+			}
+			else if (emc == eMenuContext.SearchByText) {
+				if (_contextVars[0] == 0) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+					_contextVars[1] = Math.Max(--_contextVars[1], 0);
+				}
+			}
+			else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				_contextVars[_contextVars[5]]--;
@@ -2151,7 +2213,14 @@ internal class CActSelect曲リスト : CActivity {
 				// Clamp values
 				_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 				_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
-			} else if (emc == eMenuContext.Random) {
+			}
+			else if (emc == eMenuContext.SearchByText) {
+				if (_contextVars[0] == 0) {
+					OpenTaiko.Skin.soundChangeSFX.tPlay();
+					_contextVars[1] = Math.Min(++_contextVars[1], 2);
+				}
+			}
+			else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				_contextVars[_contextVars[5]]++;
@@ -2300,9 +2369,11 @@ internal class CActSelect曲リスト : CActivity {
 	private CCachedFontRenderer pfBoxText;
 	private CTexture[] txBoxText = new CTexture[3];
 
+	private TitleTextureKey searchTypeKey;
+	private TitleTextureKey searchTextKey;
 
-
-
+	private CTextInput searchTextInput;
+	public string searchTextResult { get { return searchTextInput?.Text ?? ""; } }
 
 
 
@@ -3053,7 +3124,13 @@ internal class CActSelect曲リスト : CActivity {
 public enum eMenuContext {
 	NONE,
 	SearchByDifficulty,
+	SearchByText,
 	Random,
+}
+public enum ETitleType {
+	Title,
+	Subtitle,
+	Charter
 }
 
 public enum eLayoutType {

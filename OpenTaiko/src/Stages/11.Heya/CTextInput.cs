@@ -37,6 +37,15 @@ namespace OpenTaiko {
 
 		public string Text = "";
 		/// <summary>
+		/// Used to display the current text with a blinking cursor, to imitate an input text box. For actual text, use <seealso cref="Text"/>.
+		/// </summary>
+		public string DisplayText {
+			get
+			{
+				return Text + (OpenTaiko.Timer.SystemTimeMs % 1000 >= 300 ? "|" : "");
+			}
+		}
+		/// <summary>
 		/// Length in bytes, not char count.
 		/// </summary>
 		public uint MaxLength = 64;

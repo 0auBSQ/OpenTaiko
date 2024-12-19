@@ -219,7 +219,7 @@ internal class CSongDict {
 
 	// Generate search by difficulty folder
 	public static List<CSongListNode> tFetchSongsByDifficulty(CSongListNode parent, int difficulty = (int)Difficulty.Oni, int level = 8) {
-		List<CSongListNode> childList = new List<CSongListNode>();
+		List<CSongListNode> childList = [];
 
 		foreach (CSongListNode nodeT in nodes.Values) {
 			var score = nodeT.nLevel;
@@ -227,8 +227,41 @@ internal class CSongDict {
 				|| (difficulty == (int)Difficulty.Oni && tLevelMatches(score[(int)Difficulty.Edit], level))) // Oni includes Ura
 			{
 				var node = tReadaptChildNote(parent, nodeT);
-				if (node != null) {
-					childList.Add(node);
+				if (node != null) childList.Add(node);
+			}
+		}
+
+		// Generate back buttons
+
+		string favPath = "./" + parent.ldTitle.GetString("") + "/";
+
+		tReinsertBackButtons(parent, childList, favPath);
+
+		return childList;
+	}
+
+	public static List<CSongListNode> tFetchSongsByTitle(CSongListNode parent, ETitleType type, string text) {
+		List<CSongListNode> childList = [];
+
+		foreach (CSongListNode nodeT in nodes.Values) {
+			string name = type switch {
+				ETitleType.Title => nodeT.ldTitle.GetString(""),
+				ETitleType.Subtitle => nodeT.ldSubtitle.GetString(""),
+				ETitleType.Charter => nodeT.strMaker,
+				_ => nodeT.ldTitle.GetString("")
+			};
+			if (name.Contains(text, StringComparison.InvariantCultureIgnoreCase)) {
+				var node = tReadaptChildNote(parent, nodeT);
+				if (node != null) childList.Add(node);
+			}
+			// Check if Charter is listed in NOTESDESIGNER(x) command instead
+			else if (type == ETitleType.Charter) { 
+				foreach (string charter in nodeT.strNotesDesigner) {
+					if (charter.Contains(text, StringComparison.InvariantCultureIgnoreCase)) {
+						var node = tReadaptChildNote(parent, nodeT);
+						if (node != null) childList.Add(node);
+						break;
+					}
 				}
 			}
 		}
