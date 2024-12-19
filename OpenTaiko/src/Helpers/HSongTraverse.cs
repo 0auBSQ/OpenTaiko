@@ -1,7 +1,7 @@
 ﻿namespace OpenTaiko;
 
 class HSongTraverse {
-	public static List<string> SpecialFolders = new List<string> { "Favorite", "最近遊んだ曲", "SearchD" };
+	public static List<string> SpecialFolders = new List<string> { "Favorite", "最近遊んだ曲", "SearchD", "SearchT" };
 
 	public static bool IsRegularFolder(CSongListNode node) {
 		if (node.nodeType != CSongListNode.ENodeType.BOX) return false;

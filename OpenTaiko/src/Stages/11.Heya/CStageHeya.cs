@@ -461,7 +461,7 @@ class CStageHeya : CStage {
 
 			HBlackBackdrop.Draw(191);
 
-			if (textInput.Text != textInputTitle.str) { textInputTitle = new TitleTextureKey(textInput.Text, pfHeyaFont, Color.White, Color.Black, 1000); }
+			if (textInput.DisplayText != textInputTitle.str) { textInputTitle = new TitleTextureKey(textInput.DisplayText, pfHeyaFont, Color.White, Color.Black, 1000); }
 			CTexture text_tex = TitleTextureKey.ResolveTitleTexture(textInputTitle);
 			CTexture text_info = TitleTextureKey.ResolveTitleTexture(textInputInfo);
 
@@ -720,7 +720,7 @@ class CStageHeya : CStage {
 			return 0;
 		}
 		else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
-			OpenTaiko.Skin.soundDecideSFX.tPlay();
+			OpenTaiko.Skin.soundCancelSFX.tPlay();
 			iCurrentMenu = CurrentMenu.ReturnToMenu;
 			this.ttkInfoSection = null;
 			this.tResetOpts();

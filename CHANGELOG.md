@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.29] - 2024-12-19 (Beta)
+
+- Adds a Search by Text new folder with a similar appearance to Search by Difficulty (Case-insensitive)
+
 ## [0.6.0.28] - 2024-12-12 (Beta)
 
 - Russian text of Fix Input Timestamp Inaccuracy
