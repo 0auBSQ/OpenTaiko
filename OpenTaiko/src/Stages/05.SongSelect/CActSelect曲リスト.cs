@@ -2043,7 +2043,6 @@ internal class CActSelect曲リスト : CActivity {
 
 			}
 		}
-		// god this context var code stinks, anyways,
 		// Context vars :
 		// 0 - Position
 		// 1 - Title type
