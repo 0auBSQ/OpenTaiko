@@ -2052,10 +2052,10 @@ internal class CActSelect曲リスト : CActivity {
 			OpenTaiko.Tx.SongSelect_Search_Window?.t2D描画(0, 0);
 
 			string type_text = _contextVars[1] switch {
-				(int)ETitleType.Title => "Title",
-				(int)ETitleType.Subtitle => "Subtitle",
-				(int)ETitleType.Charter => "Charter",
-				_ => "Title"
+				(int)ETitleType.Title => CLangManager.LangInstance.GetString("SONGSELECT_TEXTSEARCH_TITLE"),
+				(int)ETitleType.Subtitle => CLangManager.LangInstance.GetString("SONGSELECT_TEXTSEARCH_SUBTITLE"),
+				(int)ETitleType.Charter => CLangManager.LangInstance.GetString("SONGSELECT_TEXTSEARCH_CHARTER"),
+				_ => CLangManager.LangInstance.GetString("SONGSELECT_TEXTSEARCH_TITLE")
 			};
 
 			if ((searchTypeKey?.str ?? "") != type_text) {

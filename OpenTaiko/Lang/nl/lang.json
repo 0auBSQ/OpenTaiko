@@ -396,7 +396,11 @@
 		// {2}: Maximum BPM
 		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Maker: {0}",
+		"SONGSELECT_INFO_CHARTER": "Charter: {0}",
+
+		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
 
 		"SONGSELECT_QUICKCONFIG": "Snelle Coniguratie",
 		"SONGSELECT_QUICKCONFIG_MORE": "More...",
