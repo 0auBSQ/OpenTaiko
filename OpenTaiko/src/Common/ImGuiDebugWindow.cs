@@ -22,7 +22,7 @@ public static class ImGuiDebugWindow {
 	private static int currentStageMemoryUsage = 0;
 
 	private static int sortType = -1;
-	private static readonly string[] sortNames = ["Memory Usage (Highest->Lowest)", "Memory Usage (Lowest->Highest)", "Pointer ID"];
+	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
 	private static string reloadTexPath = "";
 	public static void Draw() {
 		if (SampleFramework.Game.ImGuiController == null) return;
@@ -212,6 +212,28 @@ public static class ImGuiDebugWindow {
 						}
 
 						ImGui.EndCombo();
+					}
+
+					if (ImGui.TreeNodeEx("Edit Dan Title")) {
+
+						ImGui.InputText("Title", ref OpenTaiko.SaveFileInstances[save].data.Dan, 16);
+
+						ImGui.Checkbox("Gold", ref OpenTaiko.SaveFileInstances[save].data.DanGold);
+
+						string[] clear_types = ["Clear", "FC", "Perfect"];
+						int clear_int = OpenTaiko.SaveFileInstances[save].data.DanType;
+						if (ImGui.BeginCombo("Clear Type", clear_types[clear_int])) {
+							for (int clear = 0; clear < clear_types.Length; clear++) {
+								if (ImGui.Selectable(clear_types[clear], clear_int == clear)) OpenTaiko.SaveFileInstances[save].data.DanType = clear;
+							}
+							ImGui.EndCombo();
+						}
+
+						if (ImGui.Button("Update")) {
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						ImGui.TreePop();
 					}
 
 					ImGui.NewLine();
