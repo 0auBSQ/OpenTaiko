@@ -398,6 +398,10 @@
 		// {0}: Charter name
 		"SONGSELECT_INFO_CHARTER": "Сделано: {0}",
 
+		"SONGSELECT_TEXTSEARCH_TITLE": "Название",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Подзаголовок",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Создатель партитуры",
+
 		"SONGSELECT_QUICKCONFIG": "Быстрые настройки",
 		"SONGSELECT_QUICKCONFIG_MORE": "Более...",
 

@@ -41,6 +41,37 @@ internal class CActConfigList : CActivity {
 	}
 	public int n現在の選択項目;
 
+	private static int GraphicsDeviceFromString(string device) {
+		switch (device) {
+			case "OpenGL": return 0;
+			case "DirectX11": return 1;
+			case "Vulkan": return 2;
+			case "Metal": return 3;
+			default: return 0;
+		}
+	}
+	private static string GraphicsDeviceFromInt(int device) {
+		switch (device) {
+			case 0: return "OpenGL";
+			case 1: return "DirectX11";
+			case 2: return "Vulkan";
+			case 3: return "Metal";
+			default: return "OpenGL";
+		}
+	}
+
+	private static string[] AvailableGraphicsDevices { get {
+			if (OperatingSystem.IsWindows()) return ["OpenGL", "DirectX11", "Vulkan"];
+			if (OperatingSystem.IsMacOS()) return ["OpenGL", "Metal"];
+			if (OperatingSystem.IsLinux()) return ["OpenGL", "Vulkan"];
+			return ["OpenGL", "DirectX11", "Vulkan", "Metal"];
+		}
+	}
+
+	private static int GraphicsDeviceIntFromConfigInt() {
+		return Math.Max(0, Array.IndexOf(AvailableGraphicsDevices, GraphicsDeviceFromInt(OpenTaiko.ConfigIni.nGraphicsDeviceType)));
+	}
+
 
 	// General system options
 	#region [ t項目リストの設定_System() ]
@@ -88,10 +119,9 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH_DESC"));
 		this.list項目リスト.Add(this.iSystemTimeStretch);
 
-		this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nGraphicsDeviceType,
+		this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
-			//new string[] { "OpenGL", "DirectX9", "DirectX11", "Vulkan", "Metal" });
-			new string[] { "OpenGL", "DirectX11", "Vulkan", "Metal" });
+			AvailableGraphicsDevices);
 		this.list項目リスト.Add(this.iSystemGraphicsType);
 
 		this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), OpenTaiko.ConfigIni.bFullScreen,
@@ -190,10 +220,13 @@ internal class CActConfigList : CActivity {
 
 		// #24820 2013.1.3 yyagi
 
-		this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nSoundDeviceType,
+		// Hide this option for non-Windows users since all other sound device options are Windows-exclusive.
+		if (OperatingSystem.IsWindows()) {
+			this.iSystemSoundType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nSoundDeviceType,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC"),
 			new string[] { "Bass", "ASIO", "WASAPI Exclusive", "WASAPI Shared" });
-		this.list項目リスト.Add(this.iSystemSoundType);
+			this.list項目リスト.Add(this.iSystemSoundType);
+		}
 
 		// #24820 2013.1.15 yyagi
 		this.iSystemBassBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BASSBUFFER"), 0, 99999, OpenTaiko.ConfigIni.nBassBufferSizeMs,
@@ -1032,7 +1065,7 @@ internal class CActConfigList : CActivity {
 				0,
 				this.iSystemASIODevice.n現在選択されている項目番号,
 				this.iSystemSoundTimerType.bON);
-			OpenTaiko.app.ShowWindowTitleWithSoundType();
+			OpenTaiko.app.ShowWindowTitle();
 			OpenTaiko.Skin.ReloadSkin();// 音声の再読み込みをすることによって、音量の初期化を防ぐ
 		}
 		#endregion
@@ -1607,7 +1640,7 @@ internal class CActConfigList : CActivity {
 	private void tConfigIniへ記録する_System() {
 		OpenTaiko.ConfigIni.nSongSpeed = this.iCommonPlaySpeed.n現在の値;
 
-		OpenTaiko.ConfigIni.nGraphicsDeviceType = this.iSystemGraphicsType.n現在選択されている項目番号;
+		OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
 		OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 

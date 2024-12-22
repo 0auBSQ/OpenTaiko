@@ -479,7 +479,25 @@ internal class OpenTaiko : Game {
 			ConfigIsNew = true;
 		}
 
-		switch (ConfigIni.nGraphicsDeviceType) {
+		if (ConfigIsNew) {
+			GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+
+			if (OperatingSystem.IsWindows()) {
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				ConfigIni.nGraphicsDeviceType = 0;
+			}
+			// While we aren't able to support MacOS, this check is included just in case this changes.
+			else if (OperatingSystem.IsMacOS()) {
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				ConfigIni.nGraphicsDeviceType = 3;
+			}
+			else if (OperatingSystem.IsLinux()) {
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				ConfigIni.nGraphicsDeviceType = 2;
+			}
+		}
+		else {
+			switch (ConfigIni.nGraphicsDeviceType) {
 			case 0:
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
 				break;
@@ -492,7 +510,9 @@ internal class OpenTaiko : Game {
 			case 3:
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
 				break;
+			}
 		}
+		
 
 		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
@@ -1561,6 +1581,14 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("OS Version: " + Environment.OSVersion);
 		Trace.TraceInformation("Processors: " + Environment.ProcessorCount.ToString());
 		Trace.TraceInformation("CLR Version: " + Environment.Version.ToString());
+
+		if (ConfigIsNew) {
+			Trace.TraceInformation("----------------------");
+			Trace.TraceInformation("No Config.ini file was found. This usually means you've launched the game for the first time. A Config.ini file will be generated after safely closing the game.");
+			Trace.TraceInformation("Thanks for joining us! (≧∇≦)ﾉ");
+			Trace.TraceInformation($"{GraphicsDeviceType_} was selected as the recommended Graphics Device for your OS.");
+			Trace.TraceInformation($"{(CConfigIni.ESoundDeviceTypeForConfig)ConfigIni.nSoundDeviceType} was selected as the recommended Sound Device for your OS.");
+		}
 		//---------------------
 		#endregion
 
@@ -1774,7 +1802,7 @@ internal class OpenTaiko : Game {
 				Trace.TraceInformation("Initialized loudness scanning, song gain control, and sound group level control.");
 			}
 
-			ShowWindowTitleWithSoundType();
+			ShowWindowTitle();
 			FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
 			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
 			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
@@ -1887,13 +1915,13 @@ internal class OpenTaiko : Game {
 		#endregion
 	}
 
-	public void ShowWindowTitleWithSoundType() {
+	public void ShowWindowTitle() {
 		string delay = "";
 		if (SoundManager.GetCurrentSoundDeviceType() != "DirectSound") {
 			delay = "(" + SoundManager.GetSoundDelay() + "ms)";
 		}
 		AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-		base.Text = asmApp.Name + " Ver." + VERSION + " (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
+		base.Text = asmApp.Name + " Ver." + VERSION + " - (" + GraphicsDeviceType_ + ") - (" + SoundManager.GetCurrentSoundDeviceType() + delay + ")";
 	}
 
 	private void tExitProcess() {
