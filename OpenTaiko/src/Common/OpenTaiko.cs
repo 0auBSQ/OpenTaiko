@@ -483,16 +483,8 @@ internal class OpenTaiko : Game {
 			GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
 
 			if (OperatingSystem.IsWindows()) {
-				if (OperatingSystem.IsWindowsVersionAtLeast(11)) {
-					// We're still not sure why our OpenGL renderer can't run on Windows 11,
-					// so we're falling back to this instead.
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
-					ConfigIni.nGraphicsDeviceType = 2;
-				}
-				else {
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
-					ConfigIni.nGraphicsDeviceType = 0;
-				}
+				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				ConfigIni.nGraphicsDeviceType = 0;
 			}
 			// While we aren't able to support MacOS, this check is included just in case this changes.
 			else if (OperatingSystem.IsMacOS()) {
