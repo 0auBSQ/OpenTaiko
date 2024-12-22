@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.30] - 2024-12-22 (Beta)
+
+- Set default Graphics Device type on first boot & only show supported Graphics Devices per OS
+
 ## [0.6.0.29] - 2024-12-19 (Beta)
 
 - Adds a Search by Text new folder with a similar appearance to Search by Difficulty (Case-insensitive)
