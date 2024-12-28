@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using SkiaSharp;
@@ -57,8 +58,14 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		if (File.Exists(fontpath))
 			paint.Typeface = SKTypeface.FromFile(fontpath, 0);
 
+		if (paint.Typeface == null) {
+			Trace.TraceWarning($"The requested font '{fontpath}' could not be found from a file or font family name. Falling back to SkiaSharp's default typeface.");
+			paint.Typeface = SKTypeface.CreateDefault();
+		}
+
+		// If a font couldn't be loaded despite the fallback implemented above, we're absolutely cooked.
 		if (paint.Typeface == null)
-			throw new FileNotFoundException(fontpath);
+			throw new FileNotFoundException("All attempts to load this font failed, including using SkiaSharp's default typeface as a fallback.", fontpath);
 
 		paint.TextSize = (pt * 1.3f);
 		paint.IsAntialias = true;
