@@ -199,6 +199,23 @@ public static class ImGuiDebugWindow {
 						ImGui.EndCombo();
 					}
 
+					if (ImGui.TreeNodeEx("Edit Nameplate")) {
+
+						ImGui.InputInt("Title Id", ref OpenTaiko.SaveFileInstances[save].data.TitleId);
+
+						ImGui.InputText("Title", ref OpenTaiko.SaveFileInstances[save].data.Title, 1024);
+
+						ImGui.InputInt("Title Rarity", ref OpenTaiko.SaveFileInstances[save].data.TitleRarityInt);
+
+						ImGui.InputInt("Title Type", ref OpenTaiko.SaveFileInstances[save].data.TitleType);
+
+						if (ImGui.Button("Update")) {
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						ImGui.TreePop();
+					}
+
 					if (ImGui.BeginCombo("Dan Title", OpenTaiko.SaveFileInstances[save].data.Dan)) {
 						foreach (var dan in OpenTaiko.SaveFileInstances[save].data.DanTitles) {
 							if (ImGui.Selectable(dan.Key)) {

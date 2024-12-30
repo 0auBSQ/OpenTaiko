@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.31] - 2024-12-30 (Beta)
+
+- Change OpenTaiko.log's encoding to UTF-8
+- Fallback to SkiaSharp's default typeface if all other methods fail
+- Log Egl related errors
+
 ## [0.6.0.30] - 2024-12-22 (Beta)
 
 - Set default Graphics Device type on first boot & only show supported Graphics Devices per OS
