@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OpenTK.Graphics.Egl; //OpenTKさん ありがとう!
 using Silk.NET.Core.Contexts;
 using Silk.NET.GLFW;
@@ -13,18 +14,24 @@ public class AngleContext : IGLContext {
 	public AngleContext(AnglePlatformType anglePlatformType, IWindow window) {
 		nint windowHandle;
 		nint display;
+		NativeWindowFlags selectedflag; // For logging
+
 		if (window.Native.Kind.HasFlag(NativeWindowFlags.Win32)) {
+			selectedflag = NativeWindowFlags.Win32;
 			windowHandle = window.Native.Win32.Value.Hwnd;
 			display = window.Native.Win32.Value.HDC;
 		} else if (window.Native.Kind.HasFlag(NativeWindowFlags.X11)) {
+			selectedflag = NativeWindowFlags.X11;
 			windowHandle = (nint)window.Native.X11.Value.Window;
 			// Temporary fix for the segfaults
 			// Note than X11 Display number is NOT always 0, it can be 1, 2 and so on for example in cases of user switching
 			display = 0;// Egl.GetDisplay(window.Native.X11.Value.Display);
 		} else if (window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa)) {
+			selectedflag = NativeWindowFlags.Cocoa;
 			windowHandle = window.Native.Cocoa.Value;
 			display = 0;
 		} else if (window.Native.Kind.HasFlag(NativeWindowFlags.Wayland)) {
+			selectedflag = NativeWindowFlags.Wayland;
 			windowHandle = window.Native.Wayland.Value.Surface;
 			display = window.Native.Wayland.Value.Display;
 		} else {
@@ -94,7 +101,16 @@ public class AngleContext : IGLContext {
 		//Surface = Egl.CreatePlatformWindowSurfaceEXT(Display, configs[0], windowHandle, null);
 		Surface = Egl.CreateWindowSurface(Display, configs[0], windowHandle, 0);
 
-		var error1 = Egl.GetError();
+		var error = Egl.GetError();
+		if (error != OpenTK.Graphics.Egl.ErrorCode.SUCCESS) {
+			Trace.TraceError("Ran into an error while setting up the window surface. OpenTaiko might be broken... :^(" +
+				$"\nEgl Error: {error}" +
+				$"\nWindow Flags: {window.Native.Kind} (Selected {selectedflag})" +
+				$"\nAnglePlatformType: {anglePlatformType}" +
+				$"\nDisplay: {Display}" +
+				$"\nContext: {Context}" +
+				$"\nSurface: {Surface}");
+		}
 	}
 
 	public nint Handle { get; set; }
