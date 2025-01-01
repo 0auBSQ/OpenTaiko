@@ -19,6 +19,7 @@ public class CInputKeyboard : CInputButtonsBase, IInputDevice, IDisposable {
 	public (bool isPressed, int state)[] KeyStates => this.ButtonStates;
 
 	private void KeyDown(IKeyboard keyboard, Key key, int keyCode) {
+		if ((int)key >= this.ButtonStates.Length) return;
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
 			base.ButtonDown((int)keyNum);
@@ -26,6 +27,7 @@ public class CInputKeyboard : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private void KeyUp(IKeyboard keyboard, Key key, int keyCode) {
+		if ((int)key >= this.ButtonStates.Length) return;
 		if (key != Key.Unknown) {
 			var keyNum = DeviceConstantConverter.DIKtoKey(key);
 			base.ButtonUp((int)keyNum);
