@@ -121,7 +121,7 @@ public class CInputManager : IDisposable {
 			}
 		}
 		else {
-			for (int i = InputDevices.Count - 1; i > -1; i--) {
+			for (int i = InputDevices.Count; i-- > 0;) {
 				var inputdevice = InputDevices[i];
 				if (!inputdevice.Device.IsConnected) {
 					Trace.TraceInformation($"An input device was disconnected. Device name: {inputdevice.Name} / Index: {inputdevice.ID} / Device Type: {inputdevice.CurrentType}");
