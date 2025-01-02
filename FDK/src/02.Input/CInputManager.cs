@@ -53,13 +53,14 @@ public class CInputManager : IDisposable {
 
 	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn) {
 		Context = window.CreateInput();
+		Context.ConnectionChanged += this.ConnectionChanged;
 
 		this.InputDevices = new List<IInputDevice>(10);
 		#region [ Enumerate keyboard/mouse: exception is masked if keyboard/mouse is not connected ]
 		CInputKeyboard cinputkeyboard = null;
 		CInputMouse cinputmouse = null;
 		try {
-			cinputkeyboard = new CInputKeyboard(Context.Keyboards);
+			cinputkeyboard = new CInputKeyboard(Context.Keyboards[0]);
 			cinputmouse = new CInputMouse(Context.Mice[0]);
 		} catch {
 		}
@@ -86,6 +87,49 @@ public class CInputManager : IDisposable {
 		}
 
 		SampleFramework.Game.InitImGuiController(window, Context);
+	}
+
+	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected) {
+		if (connected) {
+			if (device is IKeyboard) {
+				if (Keyboard == null) {
+					this.InputDevices.Add(new CInputKeyboard((IKeyboard)device));
+					Trace.TraceInformation($"A keyboard was connected. Device name: {device.Name}");
+				}
+				else {
+					Trace.TraceWarning($"A keyboard was connected, but there is another keyboard already loaded. This keyboard will not be used. Device name: {device.Name}");
+				}
+			}
+			else if (device is IMouse) {
+				if (Mouse == null) {
+					this.InputDevices.Add(new CInputMouse((IMouse)device));
+					Trace.TraceInformation($"A mouse was connected. Device name: {device.Name}");
+				} else {
+					Trace.TraceWarning($"A mouse was connected, but there is another mouse already loaded. This mouse will not be used. Device name: {device.Name}");
+				}
+			}
+			else if (device is IGamepad) {
+				this.InputDevices.Add(new CInputGamepad((IGamepad)device));
+				Trace.TraceInformation($"A gamepad was connected. Device name: {device.Name} / Index: {device.Index}");
+			}
+			else if (device is IJoystick) {
+				this.InputDevices.Add(new CInputJoystick((IJoystick)device));
+				Trace.TraceInformation($"A joystick was connected. Device name: {device.Name} / Index: {device.Index}");
+			}
+			else {
+				Trace.TraceWarning($"An input device was connected, but Silk.NET could not recognize what type of device this is. It will not be used. Device name: {device.Name}");
+			}
+		}
+		else {
+			for (int i = InputDevices.Count; i-- > 0;) {
+				var inputdevice = InputDevices[i];
+				if (!inputdevice.Device.IsConnected) {
+					Trace.TraceInformation($"An input device was disconnected. Device name: {inputdevice.Name} / Index: {inputdevice.ID} / Device Type: {inputdevice.CurrentType}");
+					inputdevice.Dispose();
+					this.InputDevices.Remove(inputdevice);
+				}
+			}
+		}
 	}
 
 
@@ -145,14 +189,14 @@ public class CInputManager : IDisposable {
 			//				foreach( IInputDevice device in this.list入力デバイス )
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)    // #24016 2011.1.6 yyagi: change not to use "foreach" to avoid InvalidOperation exception by Remove().
 			{
-				IInputDevice device = this.InputDevices[i];
 				try {
+					IInputDevice device = this.InputDevices[i];
 					device.Polling();
 				} catch (Exception e)                                      // #24016 2011.1.6 yyagi: catch exception for unplugging USB joystick, and remove the device object from the polling items.
 				{
-					this.InputDevices.Remove(device);
-					device.Dispose();
-					Trace.TraceError("tポーリング時に対象deviceが抜かれており例外発生。同deviceをポーリング対象からRemoveしました。");
+					//this.InputDevices.Remove(device);
+					//device.Dispose();
+					//Trace.TraceError("tポーリング時に対象deviceが抜かれており例外発生。同deviceをポーリング対象からRemoveしました。");
 				}
 			}
 		}

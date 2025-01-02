@@ -3,10 +3,9 @@
 namespace FDK;
 
 public class CInputJoystick : CInputButtonsBase, IInputDevice, IDisposable {
-	public IJoystick Joystick { get; private set; }
 
 	public CInputJoystick(IJoystick joystick) : base(18) {
-		this.Joystick = joystick;
+		this.Device = joystick;
 		this.CurrentType = InputDeviceType.Joystick;
 		this.GUID = joystick.Index.ToString();
 		this.ID = joystick.Index;
@@ -17,14 +16,14 @@ public class CInputJoystick : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private void Joystick_ButtonDown(IJoystick joystick, Button button) {
-		if (button.Name != ButtonName.Unknown) {
-			base.ButtonDown((int)button.Name);
+		if (button.Index >= 0 && button.Index < ButtonStates.Length) {
+			base.ButtonDown(button.Index);
 		}
 	}
 
 	private void Joystick_ButtonUp(IJoystick joystick, Button button) {
-		if (button.Name != ButtonName.Unknown) {
-			base.ButtonUp((int)button.Name);
+		if (button.Index >= 0 && button.Index < ButtonStates.Length) {
+			base.ButtonUp(button.Index);
 		}
 	}
 }

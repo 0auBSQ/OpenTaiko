@@ -8,7 +8,7 @@ public static class DeviceConstantConverter {
 	// メソッド
 
 	public static Key DIKtoKey(Silk.NET.Input.Key key) {
-		return _DIKtoKey[key];
+		return _DIKtoKey.TryGetValue(key, out Key value) ? value : Key.Unknown;
 	}
 
 

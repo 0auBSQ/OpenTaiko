@@ -9,6 +9,7 @@ public class CInputMIDI : IInputDevice, IDisposable {
 	// Constructor
 
 	public CInputMIDI(uint nID) {
+		this.Device = null;
 		this.MidiInPtr = IntPtr.Zero;
 		this.EventBuffers = new List<STInputEvent>(32);
 		this.InputEvents = [];
@@ -58,6 +59,7 @@ public class CInputMIDI : IInputDevice, IDisposable {
 
 	#region [ IInputDevice 実装 ]
 	//-----------------
+	public Silk.NET.Input.IInputDevice Device { get; private set; }
 	public InputDeviceType CurrentType { get; private set; }
 	public string GUID { get; private set; }
 	public int ID { get; private set; }

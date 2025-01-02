@@ -104,7 +104,7 @@ public static class ImGuiDebugWindow {
 					switch (device.CurrentType) {
 						case InputDeviceType.Keyboard:
 							var keyboard = (CInputKeyboard)device;
-							for (int i = 0; i < keyboard.KeyStates.Length; i++) {
+							for (int i = 0; i < keyboard.ButtonStates.Length; i++) {
 								if (keyboard.KeyPressed(i)) { ImGui.Text((SlimDXKeys.Key)i + " Pressed!"); }
 								if (keyboard.KeyPressing(i)) { ImGui.Text((SlimDXKeys.Key)i + " Pressing!"); }
 								if (keyboard.KeyReleased(i)) { ImGui.Text((SlimDXKeys.Key)i + " Released!"); }
@@ -142,10 +142,6 @@ public static class ImGuiDebugWindow {
 							//	if (midiin.InputEvents[i].Released) { ImGui.Text(midiin.InputEvents[i].nKey + " Released!"); }
 							//}
 							ImGui.TextColored(new Vector4(1, 0, 0, 1), "MIDI input polling is currently disabled.");
-							break;
-						case InputDeviceType.Unknown:
-							ImGui.TextDisabled("Unknown input device type.");
-							ImGui.TextDisabled("GUID: " + device.GUID);
 							break;
 					}
 					ImGui.TreePop();
