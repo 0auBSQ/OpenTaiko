@@ -16,13 +16,13 @@ public class CInputJoystick : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private void Joystick_ButtonDown(IJoystick joystick, Button button) {
-		if (button.Index > -1 && button.Index < ButtonStates.Length) {
+		if (button.Index >= 0 && button.Index < ButtonStates.Length) {
 			base.ButtonDown(button.Index);
 		}
 	}
 
 	private void Joystick_ButtonUp(IJoystick joystick, Button button) {
-		if (button.Index > -1 && button.Index < ButtonStates.Length) {
+		if (button.Index >= 0 && button.Index < ButtonStates.Length) {
 			base.ButtonUp(button.Index);
 		}
 	}

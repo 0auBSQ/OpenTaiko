@@ -42,11 +42,11 @@ public class CInputGamepad : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private ThumbstickDirection GetDirectionFromThumbstick(float raw) {
-		float value = raw / MathF.PI;
-		if (value == -0.5f) return ThumbstickDirection.Up;
-		if (value == 0) return ThumbstickDirection.Right;
-		if (value == 0.5f) return ThumbstickDirection.Down;
-		if (value == 1) return ThumbstickDirection.Left;
+		float value = raw * (180 / MathF.PI);
+		if (value >= -90 - 45 / 2f && value <= -90 + 45 / 2f) return ThumbstickDirection.Up;
+		if (value >= 0 - 45 / 2f && value <= 0 + 45 / 2f) return ThumbstickDirection.Right;
+		if (value >= 90 - 45 / 2f && value <= 90 + 45 / 2f) return ThumbstickDirection.Down;
+		if (value >= 180 - 45 / 2f || value <= -180 + 45 / 2f) return ThumbstickDirection.Left;
 		return ThumbstickDirection.Unknown;
 	}
 
