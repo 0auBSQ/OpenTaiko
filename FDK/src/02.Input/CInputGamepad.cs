@@ -55,6 +55,6 @@ public class CInputGamepad : CInputButtonsBase, IInputDevice, IDisposable {
 		Down,
 		Left,
 		Up,
-		Unknown
+		Unknown,
 	}
 }
