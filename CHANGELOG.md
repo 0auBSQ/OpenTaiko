@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0.32] - 2025-01-02 (Beta)
+
+- Allow input devices to be recognized after plugging in past startup
+- Fix joystick devices failing to send inputs (Fixes tatacons)
+- Unsupported keyboard key inputs no longer crash the game
+- Devices being plugged/unplugged are now logged
+
 ## [0.6.0.31] - 2024-12-30 (Beta)
 
 - Change OpenTaiko.log's encoding to UTF-8
