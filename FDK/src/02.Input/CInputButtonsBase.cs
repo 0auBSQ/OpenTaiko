@@ -18,6 +18,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 
 	#region [ IInputDevice 実装 ]
 	//-----------------
+	public Silk.NET.Input.IInputDevice Device { get; protected set; }
 	public InputDeviceType CurrentType { get; protected set; }
 	public string GUID { get; protected set; }
 	public int ID { get; protected set; }

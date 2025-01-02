@@ -3,6 +3,9 @@
 public interface IInputDevice : IDisposable {
 	// Properties
 
+	Silk.NET.Input.IInputDevice Device {
+		get;
+	}
 	InputDeviceType CurrentType {
 		get;
 	}
