@@ -8,6 +8,7 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	public const int MouseButtonCount = 8;
 
 	public CInputMouse(IMouse mouse) : base(12) {
+		this.Device = mouse;
 		this.CurrentType = InputDeviceType.Mouse;
 		this.GUID = "";
 		this.ID = 0;
