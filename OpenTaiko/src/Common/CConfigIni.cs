@@ -1117,6 +1117,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public int nDefaultAILevel = 4;
 	public int nAILevel = 4;
 	public bool bAIBattleMode = false;
+	public int nControllerDeadzone = 50;
 
 	public CAIPerformances[] apAIPerformances = {
 		new CAIPerformances(500, 400, 100, 7, 200),
@@ -2124,6 +2125,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; Using Buffered input (0:OFF, 1:ON)");
 		sw.WriteLine("BufferedInput={0}", this.bBufferedInputs ? 1 : 0);
 		sw.WriteLine();
+		sw.WriteLine("; Set the deadzone for all connected controllers' thumbsticks.");
+		sw.WriteLine("; Can be between 10% and 90%.");
+		sw.WriteLine("ControllerDeadzone={0}", this.nControllerDeadzone);
+		sw.WriteLine();
 		sw.WriteLine("; リザルト画像自動保存機能(0:OFF, 1:ON)"); // #25399 2011.6.9 yyagi
 		sw.WriteLine("; Set \"1\" if you'd like to save result screen image automatically"); //
 		sw.WriteLine("; when you get hiscore/hiskill."); //
@@ -2897,6 +2902,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "BufferedInput":
 				this.bBufferedInputs = CConversion.bONorOFF(value[0]);
+				break;
+			case "ControllerDeadzone":
+				this.nControllerDeadzone = CConversion.ParseIntInRange(value, 10, 90, this.nControllerDeadzone);
 				break;
 			case "PolyphonicSounds":
 				this.nPoliphonicSounds = CConversion.ParseIntInRange(value, 1, 8, this.nPoliphonicSounds);

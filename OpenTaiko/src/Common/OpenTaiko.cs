@@ -1677,8 +1677,7 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 		Trace.Indent();
 		try {
-			bool bUseMIDIIn = true;
-			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs);
+			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
 			foreach (IInputDevice device in InputManager.InputDevices) {
 				if ((device.CurrentType == InputDeviceType.Joystick) && !ConfigIni.dicJoystick.ContainsValue(device.GUID)) {
 					int key = 0;
