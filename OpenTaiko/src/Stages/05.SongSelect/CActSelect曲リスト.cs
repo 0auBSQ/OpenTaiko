@@ -2069,7 +2069,7 @@ internal class CActSelect曲リスト : CActivity {
 			var searchType = TitleTextureKey.ResolveTitleTexture(searchTypeKey);
 			var searchText = TitleTextureKey.ResolveTitleTexture(searchTextKey);
 
-			searchType?.tUpdateColor4(_contextVars[0] != 0 ? new Color4(0.5f, 0.5f, 0.5f, 1.0f) : new Color4(1.0f, 1.0f ,1.0f ,1.0f));
+			searchType?.tUpdateColor4(_contextVars[0] != 0 ? new Color4(0.5f, 0.5f, 0.5f, 1.0f) : new Color4(1.0f, 1.0f, 1.0f, 1.0f));
 			searchText?.tUpdateColor4(_contextVars[0] != 1 ? new Color4(0.5f, 0.5f, 0.5f, 1.0f) : new Color4(1.0f, 1.0f, 1.0f, 1.0f));
 
 			if (_contextVars[0] == 0)
@@ -2139,23 +2139,20 @@ internal class CActSelect曲リスト : CActivity {
 					}
 				}
 
-			}
-			else if (emc == eMenuContext.SearchByText) {
+			} else if (emc == eMenuContext.SearchByText) {
 
 				if (_contextVars[0] == 0) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					_contextVars[0]++;
-				}
-				else if (_contextVars[0] == 1
-					&& !string.IsNullOrWhiteSpace(searchTextInput.Text)
-					&& OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+				} else if (_contextVars[0] == 1
+					  && !string.IsNullOrWhiteSpace(searchTextInput.Text)
+					  && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					_contextVars[0]++;
 				}
 
 				if (_contextVars[0] >= 2) return true;
-			}
-			else if (emc == eMenuContext.Random) {
+			} else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 				_contextVars[5]++;
@@ -2183,14 +2180,12 @@ internal class CActSelect曲リスト : CActivity {
 				// Clamp values
 				_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 				_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
-			}
-			else if (emc == eMenuContext.SearchByText) {
+			} else if (emc == eMenuContext.SearchByText) {
 				if (_contextVars[0] == 0) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 					_contextVars[1] = Math.Max(--_contextVars[1], 0);
 				}
-			}
-			else if (emc == eMenuContext.Random) {
+			} else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				_contextVars[_contextVars[5]]--;
@@ -2212,14 +2207,12 @@ internal class CActSelect曲リスト : CActivity {
 				// Clamp values
 				_contextVars[0] = Math.Max(0, Math.Min((int)Difficulty.Oni, _contextVars[0]));
 				_contextVars[1] = Math.Max(1, Math.Min(13, _contextVars[1]));
-			}
-			else if (emc == eMenuContext.SearchByText) {
+			} else if (emc == eMenuContext.SearchByText) {
 				if (_contextVars[0] == 0) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 					_contextVars[1] = Math.Min(++_contextVars[1], 2);
 				}
-			}
-			else if (emc == eMenuContext.Random) {
+			} else if (emc == eMenuContext.Random) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
 				_contextVars[_contextVars[5]]++;
@@ -2636,10 +2629,7 @@ internal class CActSelect曲リスト : CActivity {
 		if (IsSongLocked) {
 			var SongUnlockable = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(rCurrentlySelectedSong);
 			if (SongUnlockable != null) {
-				string _cond = "???";
-				if (HRarity.tRarityToModalInt(SongUnlockable.rarity)
-					< HRarity.tRarityToModalInt("Epic"))
-					_cond = SongUnlockable.unlockConditions.tConditionMessage(DBUnlockables.CUnlockConditions.EScreen.SongSelect);
+				string _cond = SongUnlockable.GetUnlockMessage();
 				this.ttkNowUnlockConditionText = new TitleTextureKey(_cond, this.pfBoxText, Color.White, Color.Black, 1000);
 			}
 		}

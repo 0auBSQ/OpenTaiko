@@ -557,10 +557,8 @@ class CStageHeya : CStage {
 			if (this.tMove(-1)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			}
-		}
-		else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)))
-		{
+		} else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
+					 OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide))) {
 
 			#region [Decide]
 
@@ -578,8 +576,7 @@ class CStageHeya : CStage {
 				if (iCurrentMenu == CurrentMenu.Puchi) {
 					this.tUpdateUnlockableTextChara();
 					this.tUpdateUnlockableTextPuchi();
-				}
-				else if (iCurrentMenu == CurrentMenu.Name) {
+				} else if (iCurrentMenu == CurrentMenu.Name) {
 					textInput.Text = OpenTaiko.SaveFileInstances[iPlayer].data.Name;
 				}
 			} else if (iCurrentMenu == CurrentMenu.Puchi) {
@@ -688,10 +685,8 @@ class CStageHeya : CStage {
 				OpenTaiko.Skin.SoundBanapas.tPlay(); // To change with a more appropriate sfx sooner or later
 
 			#endregion
-		}
-		else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)))
-		{
+		} else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
+					 OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel))) {
 
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 
@@ -708,8 +703,7 @@ class CStageHeya : CStage {
 
 
 			return 0;
-		}
-		else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+		} else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
 			OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
 			OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 			OpenTaiko.NamePlate.tNamePlateRefreshTitles(iPlayer);
@@ -718,8 +712,7 @@ class CStageHeya : CStage {
 			this.tResetOpts();
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 			return 0;
-		}
-		else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+		} else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 			iCurrentMenu = CurrentMenu.ReturnToMenu;
 			this.ttkInfoSection = null;
@@ -889,10 +882,7 @@ class CStageHeya : CStage {
 
 		if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock != null
 			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent])) {
-			string _cond = "???";
-			if (HRarity.tRarityToModalInt(OpenTaiko.Tx.Characters[iCharacterCurrent].metadata.Rarity)
-				< HRarity.tRarityToModalInt("Epic"))
-				_cond = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage();
+			string _cond = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage();
 			this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);
 		} else
 			this.ttkInfoSection = null;
@@ -929,10 +919,7 @@ class CStageHeya : CStage {
 
 		if (OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
 			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[iPuchiCharaCurrent])) {
-			string _cond = "???";
-			if (HRarity.tRarityToModalInt(OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].metadata.Rarity)
-				< HRarity.tRarityToModalInt("Epic"))
-				_cond = OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMessage();
+			string _cond = OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMessage();
 			this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);
 		} else
 			this.ttkInfoSection = null;
