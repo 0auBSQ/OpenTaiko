@@ -13,12 +13,29 @@ internal class DBSaves {
 
 	public static SqliteConnection? GetSavesDBConnection() {
 		try {
-			if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) SavesDBConnection.Open();
+			if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) {
+				SavesDBConnection.Open();
+				FixSaveDB_IdxUniquePlay(SavesDBConnection);
+			}
 			return SavesDBConnection;
 		} catch {
 			LogNotification.PopError(_DBNotFoundError);
 			return null;
 		}
+	}
+
+	private static void FixSaveDB_IdxUniquePlay(SqliteConnection connection) {
+		var command = connection.CreateCommand();
+		command.CommandText = $"""
+			DROP INDEX IF EXISTS idx_unique_play;
+			CREATE UNIQUE INDEX idx_unique_play ON best_plays (
+				"ChartUniqueId",
+				"ChartDifficulty",
+				"PlayMods",
+				"SaveId"
+			);
+			""";
+		command.ExecuteNonQuery();
 	}
 
 	public static Int64 GetPlayerSaveId(int player) {
@@ -326,7 +343,7 @@ internal class DBSaves {
 			SqliteCommand cmd = connection.CreateCommand();
 			cmd.CommandText =
 				@$"
-                        SELECT * FROM best_plays WHERE ChartUniqueId='{currentPlay.ChartUniqueId}' AND PlayMods={currentPlay.PlayMods} and ChartDifficulty={currentPlay.ChartDifficulty};
+                        SELECT * FROM best_plays WHERE ChartUniqueId='{currentPlay.ChartUniqueId}' AND PlayMods={currentPlay.PlayMods} and ChartDifficulty={currentPlay.ChartDifficulty} AND SaveId={saveData.SaveId};
                     ";
 			SqliteDataReader reader = cmd.ExecuteReader();
 			while (reader.Read()) {
@@ -434,7 +451,7 @@ internal class DBSaves {
                             {currentPlay.HighScoreADLibCount},
                             {currentPlay.HighScoreBoomCount}
                         )
-                       ON CONFLICT(ChartUniqueId,ChartDifficulty,PlayMods) DO UPDATE SET
+                       ON CONFLICT(ChartUniqueId,ChartDifficulty,SaveId,PlayMods) DO UPDATE SET
                             PlayCount=best_plays.PlayCount+1,
                             ClearStatus=EXCLUDED.ClearStatus,
                             ScoreRank=EXCLUDED.ScoreRank,
