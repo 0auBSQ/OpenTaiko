@@ -182,7 +182,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 					switch (i) {
 						case 0:
 							right = right || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue);
-							left = left || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange);
+							left = left || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue);
 							decide = decide || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed));
 							break;
 						case 1:
