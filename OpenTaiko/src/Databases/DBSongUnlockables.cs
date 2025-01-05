@@ -40,6 +40,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 				su.unlockConditions.Values = JsonConvert.DeserializeObject<int[]>((string)reader["UnlockValues"]) ?? new int[] { 0 };
 				su.unlockConditions.Type = (string)reader["UnlockType"];
 				su.unlockConditions.Reference = JsonConvert.DeserializeObject<string[]>((string)reader["UnlockReferences"]) ?? new string[] { "" };
+				su.customUnlockText = JsonConvert.DeserializeObject<CLocalizationData>((string)reader["CustomUnlockText"]) ?? new CLocalizationData();
 
 				data[((string)reader["SongUniqueId"])] = su;
 			}
@@ -56,6 +57,13 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 
 		[JsonProperty("UnlockCondition")]
 		public DBUnlockables.CUnlockConditions unlockConditions;
+
+		[JsonProperty("CustomUnlockText")]
+		public CLocalizationData customUnlockText;
+
+		public string GetUnlockMessage() {
+			return customUnlockText.GetString(unlockConditions.tConditionMessage(DBUnlockables.CUnlockConditions.EScreen.SongSelect));
+		}
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {

@@ -35,4 +35,5 @@ public interface IInputDevice : IDisposable {
 	bool KeyReleased(List<int> nKey) { return nKey.Any(key => KeyReleased(key)); }
 	bool KeyReleasing(int nKey);
 	bool KeyReleasing(List<int> nKey) { return nKey.Any(key => KeyReleasing(key)); }
+	string GetButtonName(int nKey) { return $"Button{nKey}"; }
 }

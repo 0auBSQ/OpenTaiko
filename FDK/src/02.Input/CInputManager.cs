@@ -44,16 +44,18 @@ public class CInputManager : IDisposable {
 			return null;
 		}
 	}
+	public float Deadzone = 0.5f;
 
 
 	// Constructor
-	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true) {
-		Initialize(window, useBufferedInput, bUseMidiIn);
+	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
+		Initialize(window, useBufferedInput, bUseMidiIn, gamepad_deadzone);
 	}
 
-	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn) {
+	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
 		Context = window.CreateInput();
 		Context.ConnectionChanged += this.ConnectionChanged;
+		Deadzone = controller_deadzone;
 
 		this.InputDevices = new List<IInputDevice>(10);
 		#region [ Enumerate keyboard/mouse: exception is masked if keyboard/mouse is not connected ]
@@ -76,7 +78,7 @@ public class CInputManager : IDisposable {
 			this.InputDevices.Add(new CInputJoystick(joysticks));
 		}
 		foreach (var gamepad in Context.Gamepads) {
-			this.InputDevices.Add(new CInputGamepad(gamepad));
+			this.InputDevices.Add(new CInputGamepad(gamepad, Deadzone));
 		}
 		#endregion
 		Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
@@ -109,7 +111,7 @@ public class CInputManager : IDisposable {
 				}
 			}
 			else if (device is IGamepad) {
-				this.InputDevices.Add(new CInputGamepad((IGamepad)device));
+				this.InputDevices.Add(new CInputGamepad((IGamepad)device, Deadzone));
 				Trace.TraceInformation($"A gamepad was connected. Device name: {device.Name} / Index: {device.Index}");
 			}
 			else if (device is IJoystick) {

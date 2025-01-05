@@ -161,6 +161,9 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "校准您的偏移量。\n如果保存，将覆盖全局偏移量。",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "偏移量：{0}",
 
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected\ncontrollers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or\nrestart the game to apply changes.",
+
 		"SETTINGS_GAME_BADCOUNT": "完美模式",
 		"SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
 		"SETTINGS_GAME_NOTELOCK": "锁定音符模式",

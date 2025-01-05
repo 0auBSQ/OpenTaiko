@@ -121,17 +121,17 @@ public static class ImGuiDebugWindow {
 						case InputDeviceType.Gamepad:
 							var gamepad = (CInputGamepad)device;
 							for (int i = 0; i < gamepad.ButtonStates.Length; i++) {
-								if (gamepad.KeyPressed(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressed!"); }
-								if (gamepad.KeyPressing(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressing!"); }
-								if (gamepad.KeyReleased(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Released!"); }
+								if (gamepad.KeyPressed(i)) { ImGui.Text(gamepad.GetButtonName(i) + " Pressed!"); }
+								if (gamepad.KeyPressing(i)) { ImGui.Text(gamepad.GetButtonName(i) + " Pressing!"); }
+								if (gamepad.KeyReleased(i)) { ImGui.Text(gamepad.GetButtonName(i) + " Released!"); }
 							}
 							break;
 						case InputDeviceType.Joystick:
 							var joystick = (CInputJoystick)device;
 							for (int i = 0; i < joystick.ButtonStates.Length; i++) {
-								if (joystick.KeyPressed(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressed!"); }
-								if (joystick.KeyPressing(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Pressing!"); }
-								if (joystick.KeyReleased(i)) { ImGui.Text((Silk.NET.Input.ButtonName)i + " Released!"); }
+								if (joystick.KeyPressed(i)) { ImGui.Text(joystick.GetButtonName(i) + " Pressed!"); }
+								if (joystick.KeyPressing(i)) { ImGui.Text(joystick.GetButtonName(i) + " Pressing!"); }
+								if (joystick.KeyReleased(i)) { ImGui.Text(joystick.GetButtonName(i) + " Released!"); }
 							}
 							break;
 						case InputDeviceType.MidiIn:

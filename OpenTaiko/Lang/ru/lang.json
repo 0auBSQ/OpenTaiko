@@ -161,6 +161,9 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "Откалибровает ваш офсет.\nГлобальный офсет будет перезаписан, если он\nбудет сохранен.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "ОФСЕТ: {0}",
 
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected\ncontrollers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or\nrestart the game to apply changes.",
+
 		"SETTINGS_GAME_BADCOUNT": "Режим Канпэки",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Выбрает сколько «Плохо» позволяют раньше\nпесни автоматически проиграно.\nУстановите значение 0, чтобы выключить этот\nрежим.",
 		"SETTINGS_GAME_NOTELOCK": "Режим замока ноты",
