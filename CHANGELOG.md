@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.34] - 2025-01-05 (Beta)
+
+- Support for custom song unlockable text
+- No longer display "???" as unlockable message for Epic rarity assets
+
 ## [0.6.0.33] - 2025-01-03 (Beta)
 
 - Add Chapiter 4 and NEP03/4 unlocks
