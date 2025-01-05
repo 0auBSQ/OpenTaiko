@@ -163,6 +163,9 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "오프셋을 보정합니다.\n저장하면 글로벌 오프셋을 덮어씁니다.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
 
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected\ncontrollers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or\nrestart the game to apply changes.",
+
 		"SETTINGS_GAME_BADCOUNT": "완벽하게 모드",
 		"SETTINGS_GAME_BADCOUNT_DESC": "노래가 자동으로 실패하기 전에 허용되는 BAD 수를 선택합니다.\n모드를 비활성화하려면 이 값을 0으로 설정하세요.",
 		"SETTINGS_GAME_NOTELOCK": "노트잠금 모드",

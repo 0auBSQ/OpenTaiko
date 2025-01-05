@@ -417,6 +417,10 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC"));
 		this.list項目リスト.Add(this.iTaikoIgnoreSongUnlockables);
 
+		this.iControllerDeadzone = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_CONTROLLERDEADZONE"), 10, 90, OpenTaiko.ConfigIni.nControllerDeadzone,
+			CLangManager.LangInstance.GetString("SETTINGS_GAME_CONTROLLERDEADZONE_DESC"));
+		this.list項目リスト.Add(this.iControllerDeadzone);
+
 		this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DESC"));
 		this.list項目リスト.Add(this.iDrumsGoToKeyAssign);
@@ -1562,6 +1566,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iTaikoAutoPlay2P;
 	private CItemToggle iTaikoAutoRoll;
 	private CItemToggle iTaikoIgnoreSongUnlockables;
+	private CItemInteger iControllerDeadzone;
 
 	private CItemInteger iRollsPerSec;
 	private CItemInteger iAILevel;
@@ -1712,6 +1717,8 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.bTight = this.iDrumsTight.bON;
 
 		OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
+		OpenTaiko.ConfigIni.nControllerDeadzone = this.iControllerDeadzone.n現在の値;
+		OpenTaiko.InputManager.Deadzone = OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f;
 		OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
 		OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;

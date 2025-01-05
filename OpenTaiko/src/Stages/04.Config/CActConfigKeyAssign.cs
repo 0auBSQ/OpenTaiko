@@ -203,66 +203,10 @@ internal class CActConfigKeyAssign : CActivity {
 	//private CTexture txカーソル;
 
 	private void tアサインコードの描画_Joypad(int line, int x, int y, int nID, int nCode, bool b強調) {
-		string str = "";
-		switch (nCode) {
-			case 0:
-				str = "Left";
-				break;
-
-			case 1:
-				str = "Right";
-				break;
-
-			case 2:
-				str = "Up";
-				break;
-
-			case 3:
-				str = "Down";
-				break;
-
-			case 4:
-				str = "Forward";
-				break;
-
-			case 5:
-				str = "Back";
-				break;
-
-			case 6:
-				str = "CCW";
-				break;
-
-			case 7:
-				str = "CW";
-				break;
-
-			default:
-				if ((8 <= nCode) && (nCode < 8 + 128))              // other buttons (128 types)
-				{
-					str = string.Format("Button{0}", nCode - 7);
-				} else if ((8 + 128 <= nCode) && (nCode < 8 + 128 + 8))       // POV HAT ( 8 types; 45 degrees per HATs)
-				{
-					str = string.Format("POV {0}", (nCode - 8 - 128) * 45);
-				} else {
-					str = string.Format("Code{0}", nCode);
-				}
-				break;
-		}
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Joypad #{1} ", line, nID) + str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, $"{String.Format("{0,2}", line)}. Joystick #{nID} - {OpenTaiko.InputManager.Joystick(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Gamepad(int line, int x, int y, int nID, int nCode, bool b強調) {
-		string str = "";
-		if ((8 <= nCode) && (nCode < 8 + 128))              // other buttons (128 types)
-		{
-			str = string.Format("Button{0}", nCode - 7);
-		} else if ((8 + 128 <= nCode) && (nCode < 8 + 128 + 8))       // POV HAT ( 8 types; 45 degrees per HATs)
-		{
-			str = string.Format("POV {0}", (nCode - 8 - 128) * 45);
-		} else {
-			str = string.Format("Code{0}", nCode);
-		}
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Gamepad #{1} ", line, nID) + str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, $"{String.Format("{0,2}", line)}. Gamepad #{nID} - {OpenTaiko.InputManager.Gamepad(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Keyboard(int line, int x, int y, int nID, int nCode, bool b強調) {
 		string str = null;
@@ -285,9 +229,9 @@ internal class CActConfigKeyAssign : CActivity {
 	}
 
 	private bool tキーチェックとアサイン_Gamepad() {
-		foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
+		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.Gamepad) {
-				for (int i = 0; i < 15; i++)      // +8 for Axis, +8 for HAT
+				for (int i = 0; i < device.ButtonStates.Length; i++)
 				{
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -303,9 +247,9 @@ internal class CActConfigKeyAssign : CActivity {
 		return false;
 	}
 	private bool tキーチェックとアサイン_Joypad() {
-		foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
+		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.Joystick) {
-				for (int i = 0; i < 15; i++)      // +8 for Axis, +8 for HAT
+				for (int i = 0; i < device.ButtonStates.Length; i++)
 				{
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
