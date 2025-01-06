@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.36] - 2025-01-06 (Beta)
+
+- Fix "all your best were belong to the last player"
+
 ## [0.6.0.35] - 2025-01-05 (Beta)
 
 - Add Trigger & Thumbstick support for Gamepads
