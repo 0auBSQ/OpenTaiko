@@ -489,14 +489,18 @@ internal class CStageSongSelect : CStage {
 				ModIcons.tDisplayModsMenu(OpenTaiko.Skin.SongSelect_ModIcons_X[i], OpenTaiko.Skin.SongSelect_ModIcons_Y[i], i);
 			}
 
+			int dyGameMode = OpenTaiko.actTextConsole.fontHeight;
+			int yGameMode = 0;
 			if (OpenTaiko.ConfigIni.bTokkunMode)
-				OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
+				OpenTaiko.actTextConsole.Print(0, yGameMode, CTextConsole.EFontType.White, "GAME: TRAINING MODE");
+			yGameMode += dyGameMode;
 			if (OpenTaiko.ConfigIni.eGameMode == EGame.Survival)
-				OpenTaiko.actTextConsole.Print(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL");
+				OpenTaiko.actTextConsole.Print(0, yGameMode, CTextConsole.EFontType.White, "GAME: SURVIVAL");
 			if (OpenTaiko.ConfigIni.eGameMode == EGame.SurvivalHard)
-				OpenTaiko.actTextConsole.Print(0, 16, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
+				OpenTaiko.actTextConsole.Print(0, yGameMode, CTextConsole.EFontType.White, "GAME: SURVIVAL HARD");
+			yGameMode += dyGameMode;
 			if (OpenTaiko.ConfigIni.bSuperHard)
-				OpenTaiko.actTextConsole.Print(0, 32, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
+				OpenTaiko.actTextConsole.Print(0, yGameMode, CTextConsole.EFontType.Cyan, "SUPER HARD MODE : ON");
 
 			#endregion
 
@@ -1101,8 +1105,8 @@ internal class CStageSongSelect : CStage {
 					OpenTaiko.InputManager.Keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, true);
 				#endregion
 
-				this.actSortSongs.t進行描画();
-				this.actQuickConfig.t進行描画();
+				this.actSortSongs.Draw();
+				this.actQuickConfig.Draw();
 			}
 
 			#endregion

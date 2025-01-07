@@ -12,11 +12,11 @@ class ScriptBGFunc {
 		Textures = texs;
 		DirPath = dirPath;
 	}
-	public void DrawText(double x, double y, string text) {
-		OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
+	public (int x, int y) DrawText(double x, double y, string text) {
+		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
 	}
-	public void DrawNum(double x, double y, double text) {
-		OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
+	public (int x, int y) DrawNum(double x, double y, double text) {
+		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
 	}
 	public void AddGraph(string fileName) {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
@@ -147,12 +147,16 @@ class ScriptBG : IDisposable {
 			LuaUpdate = LuaScript.GetFunction("update");
 			LuaDraw = LuaScript.GetFunction("draw");
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
 	public bool Exists() {
 		return LuaScript != null;
+	}
+	private void Crash(Exception exception) {
+		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
+		LuaScript?.Dispose();
+		LuaScript = null;
 	}
 	public void Dispose() {
 		List<CTexture> texs = new List<CTexture>();
@@ -182,8 +186,7 @@ class ScriptBG : IDisposable {
 		try {
 			LuaClearIn.Call(player);
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
 	public void ClearOut(int player) {
@@ -191,8 +194,7 @@ class ScriptBG : IDisposable {
 		try {
 			LuaClearOut.Call(player);
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
 	public void Init() {
@@ -232,10 +234,10 @@ class ScriptBG : IDisposable {
 
 			LuaInit.Call();
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
+
 	public void Update() {
 		if (LuaScript == null) return;
 		try {
@@ -274,8 +276,7 @@ class ScriptBG : IDisposable {
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
 			LuaUpdate.Call();
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
 	public void Draw() {
@@ -283,8 +284,7 @@ class ScriptBG : IDisposable {
 		try {
 			LuaDraw.Call();
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			Crash(ex);
 		}
 	}
 }

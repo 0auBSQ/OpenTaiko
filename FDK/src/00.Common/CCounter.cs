@@ -74,13 +74,13 @@ public class CCounter {
 	}
 
 	/// <summary>生成と同時に開始する。</summary>
-	public CCounter(double begin, double end, double msInterval, CTimer timer)
+	public CCounter(double begin, double end, double msInterval, CTimer? timer)
 		: this() {
 		this.Start(begin, end, msInterval, timer);
 	}
 
 	/// <summary>生成と同時に開始する。(double版)</summary>
-	public CCounter(double begin, double end, double secInterval, CSoundTimer timer)
+	public CCounter(double begin, double end, double secInterval, CSoundTimer? timer)
 		: this() {
 		this.Start(begin, end, secInterval * 1000.0f, timer);
 	}
@@ -95,12 +95,12 @@ public class CCounter {
 	/// <param name="end">最後のカウント値。</param>
 	/// <param name="msInterval">カウント値を１増加させるのにかける時間（ミリ秒単位）。</param>
 	/// <param name="timer">カウントに使用するタイマ。</param>
-	public void Start(double begin, double end, double msInterval, CTimer timer) {
+	public void Start(double begin, double end, double msInterval, CTimer? timer) {
 		this.BeginValue = begin;
 		this.EndValue = end;
 		this._msInterval = msInterval;
 		this.NormalTimer = timer;
-		this.msNowTime = this.NormalTimer.NowTimeMs;
+		this.msNowTime = this.NormalTimer?.NowTimeMs ?? CTimer.UnusedNum;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -112,12 +112,12 @@ public class CCounter {
 	/// <param name="end">最後のカウント値。</param>
 	/// <param name="msInterval">カウント値を１増加させるのにかける時間（ミリ秒単位）。</param>
 	/// <param name="timer">カウントに使用するタイマ。</param>
-	public void Start(double begin, double end, double msInterval, CSoundTimer timer) {
+	public void Start(double begin, double end, double msInterval, CSoundTimer? timer) {
 		this.BeginValue = begin;
 		this.EndValue = end;
 		this._msInterval = msInterval;
 		this.TimerDB = timer;
-		this.msNowTime = this.TimerDB.SystemTimeMs_Double;
+		this.msNowTime = this.TimerDB?.SystemTimeMs_Double ?? CSoundTimer.UnusedNum;
 		this.CurrentValue = (int)begin;
 		this.IsStarted = true;
 	}
@@ -276,12 +276,14 @@ public class CCounter {
 
 					keyProcess();
 					this.CurrentValue = second;
-					this.msNowTime = this.NormalTimer.NowTimeMs;
+					if (this.NormalTimer != null) {
+						this.msNowTime = this.NormalTimer.NowTimeMs;
+					}
 					return;
 
 				case second:
 
-					if ((this.NormalTimer.NowTimeMs - this.msNowTime) > 200) {
+					if (this.NormalTimer != null && (this.NormalTimer.NowTimeMs - this.msNowTime) > 200) {
 						keyProcess();
 						this.msNowTime = this.NormalTimer.NowTimeMs;
 						this.CurrentValue = later;
@@ -290,7 +292,7 @@ public class CCounter {
 
 				case later:
 
-					if ((this.NormalTimer.NowTimeMs - this.msNowTime) > 30) {
+					if (this.NormalTimer != null && (this.NormalTimer.NowTimeMs - this.msNowTime) > 30) {
 						keyProcess();
 						this.msNowTime = this.NormalTimer.NowTimeMs;
 					}
@@ -307,8 +309,8 @@ public class CCounter {
 
 	#region [ private ]
 	//-----------------
-	private CTimer NormalTimer;
-	private CSoundTimer TimerDB;
+	private CTimer? NormalTimer;
+	private CSoundTimer? TimerDB;
 	private double msInterval;
 	//-----------------
 	#endregion
