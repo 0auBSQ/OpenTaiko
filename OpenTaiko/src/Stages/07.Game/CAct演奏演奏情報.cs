@@ -44,41 +44,42 @@ internal class CAct演奏演奏情報 : CActivity {
 	}
 	public void t進行描画(int x, int y) {
 		if (!base.IsDeActivated) {
-			y += 0x153;
+			int dy = OpenTaiko.actTextConsole.fontHeight;
+			y += 21 * dy + 3;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
-			y -= 0x10;
+			y -= dy;
 			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
 			string str = "Time:          " + ((((double)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0)).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, str);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1]));
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("BPM:           {0:####0.0000}", this.dbBPM[0]));
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Frame:         {0:####0} fps", OpenTaiko.FPS.NowFPS));
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, NotesTextN);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, NotesTextE);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, NotesTextM);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, NotesTextC);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("SCROLL:        {0:####0.00}", this.dbSCROLL));
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, ScoreModeText);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, ListChipText);
-			y -= 0x10;
+			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, ListChipMText);
 
 			//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound CPU :    {0:####0.00}%", CDTXMania.Sound管理.GetCPUusage() ) );
-			//y -= 0x10;
+			//y -= dy;
 			//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound Mixing:  {0:####0}", CDTXMania.Sound管理.GetMixingStreams() ) );
-			//y -= 0x10;
+			//y -= dy;
 			//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound Streams: {0:####0}", CDTXMania.Sound管理.GetStreams() ) );
-			//y -= 0x10;
+			//y -= dy;
 		}
 	}
 

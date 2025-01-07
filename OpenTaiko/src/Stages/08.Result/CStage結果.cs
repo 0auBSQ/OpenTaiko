@@ -1217,7 +1217,8 @@ internal class CStage結果 : CStage {
 
 					int sc = GetTowerScoreRank() - 1;
 
-					OpenTaiko.actTextConsole.Print(0, 40, CTextConsole.EFontType.White, sc.ToString());
+					int y = 2 * OpenTaiko.actTextConsole.fontHeight + 8;
+					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, sc.ToString());
 
 					if (sc >= 0 && OpenTaiko.Tx.TowerResult_ScoreRankEffect != null) {
 						int scoreRankEffect_width = OpenTaiko.Tx.TowerResult_ScoreRankEffect.szTextureSize.Width / 7;

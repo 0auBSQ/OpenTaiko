@@ -14,7 +14,7 @@ class CVisualLogManager {
 		private void InitTimeSinceCreation()
 			=> timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
 
-		public void Display(int screenPosition) {
+		public int Display(int y) {
 			if (timeSinceCreation.IsStoped) {
 				// OpenTaiko.Timer was null. Reinitialize.
 				InitTimeSinceCreation();
@@ -22,11 +22,11 @@ class CVisualLogManager {
 			timeSinceCreation.Tick();
 
 			// Display stuff here
-
-			int x = 0;
-			int y = 0 + (40 * screenPosition);
-
-			OpenTaiko.actTextConsole?.Print(x, y, CTextConsole.EFontType.Cyan, msg);
+			if (OpenTaiko.actTextConsole != null) {
+				y = OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.Cyan, msg).y;
+				y += OpenTaiko.actTextConsole.fontHeight + 24;
+			}
+			return y;
 		}
 
 		public bool IsExpired() {
@@ -46,8 +46,9 @@ class CVisualLogManager {
 		while (this.cards.TryPeek(out var card) && card.IsExpired()) {
 			this.cards.Dequeue();
 		}
-		foreach (var (card, i) in this.cards.Select((x, i) => (x, i)))
-			card.Display(i);
+		int y = 0;
+		foreach (var card in this.cards)
+			y = card.Display(y);
 	}
 
 	private readonly Queue<LogCard> cards = new Queue<LogCard>();
