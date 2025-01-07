@@ -40,12 +40,12 @@ internal class CAct演奏演奏情報 : CActivity {
 		base.Activate();
 	}
 	public override int Draw() {
-		throw new InvalidOperationException("Draw(int x, int y) のほうを使用してください。");
-	}
-	public void Draw(int x, int y) {
+		int dx = OpenTaiko.actTextConsole.fontWidth;
+		int dy = OpenTaiko.actTextConsole.fontHeight;
+		int x = OpenTaiko.Skin.Resolution[0] - 8 - 34 * dx;
+		int y = 404 * OpenTaiko.Skin.Resolution[1] / 720;
 		if (!base.IsDeActivated) {
-			int dy = OpenTaiko.actTextConsole.fontHeight;
-			y += 21 * dy + 3;
+			y += (13 - 1) * dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
 			y -= dy;
 			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
@@ -81,6 +81,7 @@ internal class CAct演奏演奏情報 : CActivity {
 			//CDTXMania.act文字コンソール.tPrint( x, y, C文字コンソール.Eフォント種別.白, string.Format( "Sound Streams: {0:####0}", CDTXMania.Sound管理.GetStreams() ) );
 			//y -= dy;
 		}
+		return 0;
 	}
 
 	private string NotesTextN;

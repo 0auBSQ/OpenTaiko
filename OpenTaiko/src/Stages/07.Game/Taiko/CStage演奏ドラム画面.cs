@@ -775,10 +775,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		this.actChipFireD.Draw();
 	}
 
-	protected override void t進行描画_演奏情報() {
-		base.t進行描画_演奏情報(1000, 257);
-	}
-
 	protected override void t紙吹雪_開始() {
 		//if( this.actCombo.n現在のコンボ数.Drums % 10 == 0 && this.actCombo.n現在のコンボ数.Drums > 0 )
 		{

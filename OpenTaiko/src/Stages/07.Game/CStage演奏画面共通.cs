@@ -4673,10 +4673,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return false;
 	}
 
-	protected abstract void t進行描画_演奏情報();
-	protected void t進行描画_演奏情報(int x, int y) {
+	protected void t進行描画_演奏情報() {
 		if (!OpenTaiko.ConfigIni.bDoNotDisplayPerformanceInfos) {
-			this.actPlayInfo.Draw(x, y);
+			this.actPlayInfo.Draw();
 		}
 	}
 	protected void t進行描画_背景() {
