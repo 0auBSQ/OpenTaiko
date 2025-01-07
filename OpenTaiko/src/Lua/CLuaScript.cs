@@ -170,33 +170,38 @@ class CLuaScript : IDisposable {
 		LuaScript = new Lua();
 		LuaScript.LoadCLRPackage();
 		LuaScript.State.Encoding = Encoding.UTF8;
-		LuaScript.DoFile($"{strDir}/Script.lua");
 
-		LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
-		LuaScript["fps"] = luaFPS;
+		try {
+			LuaScript.DoFile($"{strDir}/Script.lua");
 
-
-		lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
-		lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
-
-		LuaScript["loadConfig"] = LoadConfig;
-		LuaScript["loadTexture"] = LoadTexture;
-		LuaScript["loadSound"] = LoadSound;
-		LuaScript["loadFontRenderer"] = LoadFontRenderer;
-		LuaScript["createTitleTextureKey"] = CreateTitleTextureKey;
-		LuaScript["getTextTex"] = GetTextTex;
-		LuaScript["getNum"] = getNum;
-		LuaScript["getText"] = getText;
-		LuaScript["getNumArray"] = getNumArray;
-		LuaScript["getTextArray"] = getTextArray;
-		LuaScript["getLocalizedString"] = GetLocalizedString;
-		LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
-		LuaScript["debugLog"] = DebugLog;
+			LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
+			LuaScript["fps"] = luaFPS;
 
 
-		if (loadAssets) LoadAssets();
+			lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
+			lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
 
-		listScripts.Add(this);
+			LuaScript["loadConfig"] = LoadConfig;
+			LuaScript["loadTexture"] = LoadTexture;
+			LuaScript["loadSound"] = LoadSound;
+			LuaScript["loadFontRenderer"] = LoadFontRenderer;
+			LuaScript["createTitleTextureKey"] = CreateTitleTextureKey;
+			LuaScript["getTextTex"] = GetTextTex;
+			LuaScript["getNum"] = getNum;
+			LuaScript["getText"] = getText;
+			LuaScript["getNumArray"] = getNumArray;
+			LuaScript["getTextArray"] = getTextArray;
+			LuaScript["getLocalizedString"] = GetLocalizedString;
+			LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
+			LuaScript["debugLog"] = DebugLog;
+
+
+			if (loadAssets) LoadAssets();
+
+			listScripts.Add(this);
+		} catch (Exception e) {
+			Crash(e);
+		}
 	}
 
 	public void LoadAssets(params object[] args) {
