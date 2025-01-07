@@ -1964,7 +1964,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 
 		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
-			if (x >= 0 && x <= SampleFramework.GameWindowSize.Width) {
+			if (x >= 0 && x <= GameWindowSize.Width) {
 				if (pChip.bBranch) {
 					//this.tx小節線_branch.t2D描画( CDTXMania.app.Device, x - 3, y, new Rectangle( 0, 0, 3, 130 ) );
 					OpenTaiko.Tx.Bar_Branch?.t2D描画(x + ((OpenTaiko.Skin.Game_Notes_Size[0] - OpenTaiko.Tx.Bar_Branch.szTextureSize.Width) / 2), y, new Rectangle(0, 0, OpenTaiko.Tx.Bar_Branch.szTextureSize.Width, OpenTaiko.Skin.Game_Notes_Size[1]));

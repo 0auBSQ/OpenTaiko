@@ -1,4 +1,4 @@
-﻿namespace SampleFramework;
+﻿namespace FDK;
 
 public static class GameWindowSize {
 	public static int Width = 1280;

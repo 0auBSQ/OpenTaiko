@@ -4,7 +4,7 @@ using Silk.NET.Core.Contexts;
 using Silk.NET.GLFW;
 using Silk.NET.Windowing;
 
-namespace SampleFramework;
+namespace FDK;
 
 public class AngleContext : IGLContext {
 	private nint Display;

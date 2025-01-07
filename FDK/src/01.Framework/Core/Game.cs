@@ -32,7 +32,7 @@ using Silk.NET.OpenGLES.Extensions.ImGui;
 using Silk.NET.Windowing;
 using SkiaSharp;
 
-namespace SampleFramework;
+namespace FDK;
 
 /// <summary>
 /// Presents an easy to use wrapper for making games and samples.

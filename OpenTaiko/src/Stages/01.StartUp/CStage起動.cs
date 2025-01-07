@@ -32,7 +32,7 @@ internal class CStage起動 : CStage {
 					langList[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
 					langListHighlighted[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
 				}
-				langSelectOffset = new int[2] { SampleFramework.GameWindowSize.Width / 2, (SampleFramework.GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
+				langSelectOffset = new int[2] { GameWindowSize.Width / 2, (GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
 			}
 
 			this.list進行文字列 = new List<string>();
