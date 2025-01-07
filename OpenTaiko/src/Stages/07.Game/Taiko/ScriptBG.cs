@@ -12,11 +12,11 @@ class ScriptBGFunc {
 		Textures = texs;
 		DirPath = dirPath;
 	}
-	public void DrawText(double x, double y, string text) {
-		OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
+	public (int x, int y) DrawText(double x, double y, string text) {
+		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
 	}
-	public void DrawNum(double x, double y, double text) {
-		OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
+	public (int x, int y) DrawNum(double x, double y, double text) {
+		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
 	}
 	public void AddGraph(string fileName) {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
