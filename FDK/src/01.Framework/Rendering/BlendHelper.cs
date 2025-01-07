@@ -1,6 +1,6 @@
 using Silk.NET.OpenGLES;
 
-namespace SampleFramework;
+namespace FDK;
 
 public enum BlendType {
 	Normal,

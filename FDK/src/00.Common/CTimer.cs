@@ -22,7 +22,7 @@ public class CTimer : CTimerBase {
 					return performanceTimer?.ElapsedMilliseconds ?? 0;
 
 				case TimerType.MultiMedia:
-					return SampleFramework.Game.TimeMs;
+					return Game.TimeMs;
 
 				case TimerType.GetTickCount:
 					return (long)Environment.TickCount;

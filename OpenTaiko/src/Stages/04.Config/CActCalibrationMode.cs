@@ -94,8 +94,8 @@ internal class CActCalibrationMode : CActivity {
 
 		if (OpenTaiko.Tx.Tile_Black != null) {
 			OpenTaiko.Tx.Tile_Black.Opacity = 128;
-			for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
-				for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
+			for (int i = 0; i <= GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
+				for (int j = 0; j <= GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
 					OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
 				}
 			}
@@ -113,7 +113,7 @@ internal class CActCalibrationMode : CActivity {
 
 		OpenTaiko.Tx.Notes[0]?.t2D描画(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 
-		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < SampleFramework.GameWindowSize.Width + 500; x += 500) {
+		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < GameWindowSize.Width + 500; x += 500) {
 			OpenTaiko.Tx.Bar?.t2D描画(
 				(x - CalibrateTick.CurrentValue) + ((OpenTaiko.Skin.Game_Notes_Size[0] - OpenTaiko.Tx.Bar.szTextureSize.Width) / 2),
 				OpenTaiko.Skin.nScrollFieldY[0],

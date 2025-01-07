@@ -7,7 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using SampleFramework;
 using Silk.NET.Maths;
 using SkiaSharp;
 using Rectangle = System.Drawing.Rectangle;
