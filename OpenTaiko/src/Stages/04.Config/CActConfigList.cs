@@ -1109,9 +1109,9 @@ internal class CActConfigList : CActivity {
 		}
 	}
 	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(bool)のほうを使用してください。");
+		throw new InvalidOperationException("Draw(bool)のほうを使用してください。");
 	}
-	public int t進行描画(bool b項目リスト側にフォーカスがある) {
+	public int Draw(bool b項目リスト側にフォーカスがある) {
 		if (this.IsDeActivated)
 			return 0;
 

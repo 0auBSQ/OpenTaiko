@@ -2754,10 +2754,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 
-	protected abstract void t進行描画_AVI();
-	protected void t進行描画_AVI(int x, int y) {
+	protected void t進行描画_AVI() {
 		if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && OpenTaiko.ConfigIni.bEnableAVI) {
-			this.actAVI.t進行描画(x, y);
+			this.actAVI.Draw();
 		}
 	}
 	protected void t進行描画_STAGEFAILED() {
@@ -2777,10 +2776,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	protected abstract void t進行描画_パネル文字列();
-	protected void t進行描画_パネル文字列(int x, int y) {
+	protected void t進行描画_パネル文字列() {
 		if ((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
-			this.actPanel.t進行描画(x, y);
+			this.actPanel.Draw();
 		}
 	}
 	protected void tパネル文字列の設定() {
@@ -4678,7 +4676,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected abstract void t進行描画_演奏情報();
 	protected void t進行描画_演奏情報(int x, int y) {
 		if (!OpenTaiko.ConfigIni.bDoNotDisplayPerformanceInfos) {
-			this.actPlayInfo.t進行描画(x, y);
+			this.actPlayInfo.Draw(x, y);
 		}
 	}
 	protected void t進行描画_背景() {

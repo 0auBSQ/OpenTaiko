@@ -40,9 +40,9 @@ internal class CAct演奏演奏情報 : CActivity {
 		base.Activate();
 	}
 	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(int x, int y) のほうを使用してください。");
+		throw new InvalidOperationException("Draw(int x, int y) のほうを使用してください。");
 	}
-	public void t進行描画(int x, int y) {
+	public void Draw(int x, int y) {
 		if (!base.IsDeActivated) {
 			int dy = OpenTaiko.actTextConsole.fontHeight;
 			y += 21 * dy + 3;

@@ -211,10 +211,6 @@ internal class CActSelectPopupMenu : CActivity {
 	}
 
 	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(bool)のほうを使用してください。");
-	}
-
-	public int t進行描画() {
 		if (!base.IsDeActivated && this.bIsActivePopupMenu) {
 			if (this.bキー入力待ち) {
 				#region [ Shift-F1: CONFIG画面 ]

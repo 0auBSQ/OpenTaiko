@@ -313,7 +313,7 @@ internal class CStageコンフィグ : CStage {
 		//---------------------
 		switch (this.eItemPanelモード) {
 			case EItemPanelモード.パッド一覧:
-				this.actList.t進行描画(!this.bメニューにフォーカス中);
+				this.actList.Draw(!this.bメニューにフォーカス中);
 				break;
 
 			case EItemPanelモード.キーコード一覧:

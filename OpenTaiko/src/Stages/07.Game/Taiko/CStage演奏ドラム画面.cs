@@ -522,7 +522,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!ifp[i]) bIsFinishedPlaying = false;
 			}
 
-			this.actPauseMenu.t進行描画();
+			this.actPauseMenu.Draw();
 
 			//演奏終了→演出表示→フェードアウト
 			if (bIsFinishedPlaying && base.ePhaseID == CStage.EPhase.Common_NORMAL) {
@@ -771,17 +771,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Max(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] - 1, 0);
 	}
 
-
-	protected override void t進行描画_AVI() {
-		base.t進行描画_AVI(0, 0);
-	}
-
 	private void t進行描画_チップファイアD() {
 		this.actChipFireD.Draw();
-	}
-
-	protected override void t進行描画_パネル文字列() {
-		base.t進行描画_パネル文字列(336, 427);
 	}
 
 	protected override void t進行描画_演奏情報() {

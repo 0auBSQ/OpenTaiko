@@ -1105,8 +1105,8 @@ internal class CStageSongSelect : CStage {
 					OpenTaiko.InputManager.Keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, true);
 				#endregion
 
-				this.actSortSongs.t進行描画();
-				this.actQuickConfig.t進行描画();
+				this.actSortSongs.Draw();
+				this.actQuickConfig.Draw();
 			}
 
 			#endregion

@@ -190,9 +190,6 @@ internal class CAct演奏パネル文字列 : CActivity {
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(x,y)のほうを使用してください。");
-	}
-	public int t進行描画(int x, int y) {
 		if (OpenTaiko.stageGameScreen.actDan.IsAnimating || OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 		if (!base.IsDeActivated && !this.bMute) {
 			this.ct進行用.TickLoop();

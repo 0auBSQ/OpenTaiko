@@ -28,7 +28,7 @@ internal class CAct演奏AVI : CActivity {
 
 	public void tPauseControl() => this.rVD?.PauseControl();
 
-	public unsafe int t進行描画(int x, int y) {
+	public override unsafe int Draw() {
 		if (!base.IsDeActivated) {
 			if (this.rVD == null || !rVD.bDrawing)
 				return 0;
@@ -75,9 +75,6 @@ internal class CAct演奏AVI : CActivity {
 	}
 	public override void ReleaseManagedResource() {
 		base.ReleaseManagedResource();
-	}
-	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(int,int)のほうを使用してください。");
 	}
 
 
