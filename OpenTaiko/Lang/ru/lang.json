@@ -161,7 +161,7 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "Откалибровает ваш офсет.\nГлобальный офсет будет перезаписан, если он\nбудет сохранен.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "ОФСЕТ: {0}",
 
-		"SETTINGS_GAME_CONTROLLERDEADZONE": "Мертвая зона контроллера",
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Мертвая зона контроллеров",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Отрегулируйте значение мертвой зоны джойстика\nдля всех подключенных контроллеров. Оно может\nсоставлять от 10% до 90%.\n\nПосле сохранения подключите контроллер снова\nили перезапустите игру, чтобы применить\nизменения.",
 
 		"SETTINGS_GAME_BADCOUNT": "Режим Канпэки",
