@@ -1,22 +1,24 @@
-﻿using FDK;
+﻿using System.Diagnostics;
+using FDK;
 
 namespace OpenTaiko;
 
 class CVisualLogManager {
-	public enum ELogCardType {
-		LogInfo,
-		LogWarning,
-		LogError
-	}
-
 	class LogCard {
-		public LogCard(ELogCardType type, string message) {
+		public LogCard(TraceEventType type, string message) {
 			lct = type;
 			msg = message;
-			timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
+			InitTimeSinceCreation();
 		}
 
+		private void InitTimeSinceCreation()
+			=> timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
+
 		public void Display(int screenPosition) {
+			if (timeSinceCreation.IsStoped) {
+				// OpenTaiko.Timer was null. Reinitialize.
+				InitTimeSinceCreation();
+			}
 			timeSinceCreation.Tick();
 
 			// Display stuff here
@@ -24,7 +26,7 @@ class CVisualLogManager {
 			int x = 0;
 			int y = 0 + (40 * screenPosition);
 
-			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.Cyan, msg);
+			OpenTaiko.actTextConsole?.Print(x, y, CTextConsole.EFontType.Cyan, msg);
 		}
 
 		public bool IsExpired() {
@@ -32,19 +34,21 @@ class CVisualLogManager {
 		}
 
 		private CCounter timeSinceCreation;
-		private ELogCardType lct;
+		private TraceEventType lct;
 		private string msg;
 	}
 
-	public void PushCard(ELogCardType lct, string msg) {
-		cards.Add(new LogCard(lct, msg));
+	public void PushCard(TraceEventType lct, string msg) {
+		cards.Enqueue(new LogCard(lct, msg));
 	}
 
 	public void Display() {
-		for (int i = 0; i < cards.Count; i++)
-			cards[i].Display(i);
-		cards.RemoveAll(card => card.IsExpired());
+		while (this.cards.TryPeek(out var card) && card.IsExpired()) {
+			this.cards.Dequeue();
+		}
+		foreach (var (card, i) in this.cards.Select((x, i) => (x, i)))
+			card.Display(i);
 	}
 
-	private List<LogCard> cards = new List<LogCard>();
+	private readonly Queue<LogCard> cards = new Queue<LogCard>();
 }

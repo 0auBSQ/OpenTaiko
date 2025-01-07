@@ -358,7 +358,7 @@ internal class CStage曲読み込み : CStage {
 						if (OpenTaiko.TJA.listErrors.Count != 0) {
 							string message = "";
 							foreach (var text in OpenTaiko.TJA.listErrors) {
-								OpenTaiko.VisualLogManager.PushCard(CVisualLogManager.ELogCardType.LogError, text);
+								OpenTaiko.VisualLogManager.PushCard(TraceEventType.Error, text);
 								//System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
 							}
 						}

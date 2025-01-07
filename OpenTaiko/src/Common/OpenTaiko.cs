@@ -1526,6 +1526,8 @@ internal class OpenTaiko : Game {
 		SystemError = new CSystemError();
 		this.listTopLevelActivities.Add(SystemError);
 
+		VisualLogManager = new CVisualLogManager();
+
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
@@ -1542,8 +1544,6 @@ internal class OpenTaiko : Game {
 
 		Databases = new Databases();
 		Databases.tDatabases();
-
-		VisualLogManager = new CVisualLogManager();
 
 		if (!File.Exists("Saves.db3")) {
 			File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
