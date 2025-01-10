@@ -12,7 +12,7 @@ internal class CActオプションパネル : CActivity {
 		}
 	}
 	public override void CreateManagedResource() {
-		this.txオプションパネル = OpenTaiko.tテクスチャの生成(CSkin.Path(@"Graphics\Screen option panels.png"), false);
+		this.txオプションパネル = OpenTaiko.tテクスチャの生成(CSkin.Path($@"Graphics{Path.DirectorySeparatorChar}Screen option panels.png"), false);
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
