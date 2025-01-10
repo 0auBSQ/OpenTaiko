@@ -33,7 +33,7 @@ public class CSoundTimer : CTimerBase {
 				} else {
 					if (FDK.SoundManager.bUseOSTimer)
 					{
-						return SampleFramework.Game.TimeMs; // match TimerType.MultiMedia behavior
+						return Game.TimeMs; // match TimerType.MultiMedia behavior
 					} else {
 						return this.Device.ElapsedTimeMs
 							   + (this.Device.SystemTimer.SystemTimeMs - this.Device.UpdateSystemTimeMs);

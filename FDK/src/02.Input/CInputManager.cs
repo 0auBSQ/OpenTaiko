@@ -88,7 +88,7 @@ public class CInputManager : IDisposable {
 			} catch { }
 		}
 
-		SampleFramework.Game.InitImGuiController(window, Context);
+		Game.InitImGuiController(window, Context);
 	}
 
 	private void ConnectionChanged(Silk.NET.Input.IInputDevice device, bool connected) {

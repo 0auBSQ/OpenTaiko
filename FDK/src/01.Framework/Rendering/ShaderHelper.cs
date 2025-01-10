@@ -1,6 +1,6 @@
 using Silk.NET.OpenGLES;
 
-namespace SampleFramework;
+namespace FDK;
 
 public static class ShaderHelper {
 	public static uint CreateShader(string code, ShaderType shaderType) {

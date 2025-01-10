@@ -806,11 +806,16 @@ internal class CStageTitle : CStage {
 			//string strVersion = "KTT:J:A:I:2017072200";
 			string strCreator = "https://github.com/0AuBSQ/OpenTaiko";
 			AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-			OpenTaiko.actTextConsole.Print(4, 44, CTextConsole.EFontType.White, "DEBUG BUILD");
-			OpenTaiko.actTextConsole.Print(4, 4, CTextConsole.EFontType.White, asmApp.Name + " Ver." + OpenTaiko.VERSION + " (" + strCreator + ")");
-			OpenTaiko.actTextConsole.Print(4, 24, CTextConsole.EFontType.White, "Skin:" + OpenTaiko.Skin.Skin_Name + " Ver." + OpenTaiko.Skin.Skin_Version + " (" + OpenTaiko.Skin.Skin_Creator + ")");
+			int dy = OpenTaiko.actTextConsole.fontHeight;
+			int y = 4;
+			y = OpenTaiko.actTextConsole.Print(4, y, CTextConsole.EFontType.White, asmApp.Name + " Ver." + OpenTaiko.VERSION + " (" + strCreator + ")").y;
+			y += dy + 4;
+			y = OpenTaiko.actTextConsole.Print(4, y, CTextConsole.EFontType.White, "Skin:" + OpenTaiko.Skin.Skin_Name + " Ver." + OpenTaiko.Skin.Skin_Version + " (" + OpenTaiko.Skin.Skin_Creator + ")").y;
+			y += dy + 4;
 			//CDTXMania.act文字コンソール.tPrint(4, 24, C文字コンソール.Eフォント種別.白, strSubTitle);
-			OpenTaiko.actTextConsole.Print(4, (OpenTaiko.Skin.Resolution[1] - 24), CTextConsole.EFontType.White, "TJAPlayer3 forked TJAPlayer2 forPC(kairera0467)");
+			OpenTaiko.actTextConsole.Print(4, y, CTextConsole.EFontType.White, "DEBUG BUILD");
+			y = OpenTaiko.Skin.Resolution[1] - 8 - dy;
+			OpenTaiko.actTextConsole.Print(4, y, CTextConsole.EFontType.White, "TJAPlayer3 forked TJAPlayer2 forPC(kairera0467)");
 
 #endif
 			//TJAPlayer3.actTextConsole.tPrint(4, 64, CTextConsole.EFontType.White, CScoreIni_Importer.Status);

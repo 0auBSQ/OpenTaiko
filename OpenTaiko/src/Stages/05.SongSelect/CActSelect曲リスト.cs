@@ -2741,7 +2741,7 @@ internal class CActSelect曲リスト : CActivity {
 		CSongUniqueID csu = null,
 		CSongListNode reference = null
 	) {
-		if (x >= SampleFramework.GameWindowSize.Width || y >= SampleFramework.GameWindowSize.Height)
+		if (x >= GameWindowSize.Width || y >= GameWindowSize.Height)
 			return;
 
 		var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(reference);

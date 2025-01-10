@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using SampleFramework;
 using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using SkiaSharp;

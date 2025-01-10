@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using FDK;
 using ImGuiNET;
-using SampleFramework;
 
 namespace OpenTaiko;
 
@@ -25,7 +24,7 @@ public static class ImGuiDebugWindow {
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
 	private static string reloadTexPath = "";
 	public static void Draw() {
-		if (SampleFramework.Game.ImGuiController == null) return;
+		if (Game.ImGuiController == null) return;
 
 		#region Fetch allocated memory
 		if (SoundManager.PlayTimer.SystemTimeMs - memoryReadTimer > 5000) {

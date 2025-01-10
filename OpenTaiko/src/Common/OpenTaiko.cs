@@ -7,7 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using DiscordRPC;
 using FDK;
-using SampleFramework;
 using Silk.NET.Maths;
 using SkiaSharp;
 using Rectangle = System.Drawing.Rectangle;
@@ -1526,6 +1525,8 @@ internal class OpenTaiko : Game {
 		SystemError = new CSystemError();
 		this.listTopLevelActivities.Add(SystemError);
 
+		VisualLogManager = new CVisualLogManager();
+
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
@@ -1542,8 +1543,6 @@ internal class OpenTaiko : Game {
 
 		Databases = new Databases();
 		Databases.tDatabases();
-
-		VisualLogManager = new CVisualLogManager();
 
 		if (!File.Exists("Saves.db3")) {
 			File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");

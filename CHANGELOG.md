@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0.37] - 2025-01-07 (Beta)
+
+- [Fix] Saves.db3 failures no longer cause crashes
+- [Fix] Prevent crashes if FX Script.lua has Lua errors
+- [Fix] Gameplay debug info now shows at the right place
+- [Feat] LogNotification messages now show on screen top (FX and BG Lua script error, preimage-not-found warning, complex number format warning, modal-window-not-closed error, TJA parsing error)
+- [Feat] BG Lua script errors are now logged
+- [Feat] TJA parsing errors are now logged and as warnings.
+- [Feat] TextConsole messages now respect to font height
+
+## [0.6.0.36] - 2025-01-06 (Beta)
+
+- Fix "all your best were belong to the last player"
+
 ## [0.6.0.35] - 2025-01-05 (Beta)
 
 - Add Trigger & Thumbstick support for Gamepads

@@ -315,9 +315,9 @@ internal class CStage曲読み込み : CStage {
 
 			if (OpenTaiko.Tx.Tile_Black != null) {
 				OpenTaiko.Tx.Tile_Black.Opacity = (int)(ct待機.CurrentValue <= 51 ? (255 - ct待機.CurrentValue / 0.2f) : (this.ct待機.CurrentValue - 949) / 0.2);
-				for (int i = 0; i <= (SampleFramework.GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
+				for (int i = 0; i <= (GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size
 				{
-					for (int j = 0; j <= (SampleFramework.GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
+					for (int j = 0; j <= (GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 					{
 						OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 					}
@@ -358,7 +358,7 @@ internal class CStage曲読み込み : CStage {
 						if (OpenTaiko.TJA.listErrors.Count != 0) {
 							string message = "";
 							foreach (var text in OpenTaiko.TJA.listErrors) {
-								OpenTaiko.VisualLogManager.PushCard(CVisualLogManager.ELogCardType.LogError, text);
+								LogNotification.PopWarning(text);
 								//System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
 							}
 						}

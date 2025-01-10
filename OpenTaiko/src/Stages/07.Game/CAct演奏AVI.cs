@@ -16,7 +16,7 @@ internal class CAct演奏AVI : CActivity {
 		if (nチャンネル番号 == 0x54 && OpenTaiko.ConfigIni.bEnableAVI) {
 			this.rVD = rVD;
 			if (this.rVD != null) {
-				this.ratio1 = Math.Min((float)SampleFramework.GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)SampleFramework.GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));
+				this.ratio1 = Math.Min((float)GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));
 
 				if (!rVD.bPlaying) this.rVD.Start();
 			}
@@ -28,7 +28,7 @@ internal class CAct演奏AVI : CActivity {
 
 	public void tPauseControl() => this.rVD?.PauseControl();
 
-	public unsafe int t進行描画(int x, int y) {
+	public override unsafe int Draw() {
 		if (!base.IsDeActivated) {
 			if (this.rVD == null || !rVD.bDrawing)
 				return 0;
@@ -39,7 +39,7 @@ internal class CAct演奏AVI : CActivity {
 			this.tx描画用.vcScaleRatio.Y = this.ratio1;
 
 			if (OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.BackgroundOnly)) {
-				this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
+				this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, GameWindowSize.Width / 2, GameWindowSize.Height / 2);
 			}
 		}
 		return 0;
@@ -49,13 +49,13 @@ internal class CAct演奏AVI : CActivity {
 		if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.WindowOnly))
 			return;
 
-		float[] fRatio = new float[] { (SampleFramework.GameWindowSize.Width / 2) - 4.0f, (SampleFramework.GameWindowSize.Height / 2) - 4.0f }; //中央下表示
+		float[] fRatio = new float[] { (GameWindowSize.Width / 2) - 4.0f, (GameWindowSize.Height / 2) - 4.0f }; //中央下表示
 
 		float ratio = Math.Min((float)(fRatio[0] / this.rVD.FrameSize.Width), (float)(fRatio[1] / this.rVD.FrameSize.Height));
 		this.tx描画用.vcScaleRatio.X = ratio;
 		this.tx描画用.vcScaleRatio.Y = ratio;
 
-		this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Down, SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height);
+		this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Down, GameWindowSize.Width / 2, GameWindowSize.Height);
 	}
 
 	// CActivity 実装
@@ -75,9 +75,6 @@ internal class CAct演奏AVI : CActivity {
 	}
 	public override void ReleaseManagedResource() {
 		base.ReleaseManagedResource();
-	}
-	public override int Draw() {
-		throw new InvalidOperationException("t進行描画(int,int)のほうを使用してください。");
 	}
 
 

@@ -313,7 +313,7 @@ internal class CStageコンフィグ : CStage {
 		//---------------------
 		switch (this.eItemPanelモード) {
 			case EItemPanelモード.パッド一覧:
-				this.actList.t進行描画(!this.bメニューにフォーカス中);
+				this.actList.Draw(!this.bメニューにフォーカス中);
 				break;
 
 			case EItemPanelモード.キーコード一覧:
@@ -387,7 +387,7 @@ internal class CStageコンフィグ : CStage {
 						   null,
 						   30,
 						   true))) {
-					status_text.t2D_DisplayImage_AnchorCenter(SampleFramework.GameWindowSize.Width / 2, SampleFramework.GameWindowSize.Height / 2);
+					status_text.t2D_DisplayImage_AnchorCenter(GameWindowSize.Width / 2, GameWindowSize.Height / 2);
 				}
 			}
 		}

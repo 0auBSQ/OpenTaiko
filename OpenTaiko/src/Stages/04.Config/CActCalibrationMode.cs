@@ -94,8 +94,8 @@ internal class CActCalibrationMode : CActivity {
 
 		if (OpenTaiko.Tx.Tile_Black != null) {
 			OpenTaiko.Tx.Tile_Black.Opacity = 128;
-			for (int i = 0; i <= SampleFramework.GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
-				for (int j = 0; j <= SampleFramework.GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
+			for (int i = 0; i <= GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
+				for (int j = 0; j <= GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
 					OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
 				}
 			}
@@ -113,7 +113,7 @@ internal class CActCalibrationMode : CActivity {
 
 		OpenTaiko.Tx.Notes[0]?.t2D描画(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 
-		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < SampleFramework.GameWindowSize.Width + 500; x += 500) {
+		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < GameWindowSize.Width + 500; x += 500) {
 			OpenTaiko.Tx.Bar?.t2D描画(
 				(x - CalibrateTick.CurrentValue) + ((OpenTaiko.Skin.Game_Notes_Size[0] - OpenTaiko.Tx.Bar.szTextureSize.Width) / 2),
 				OpenTaiko.Skin.nScrollFieldY[0],
@@ -135,14 +135,16 @@ internal class CActCalibrationMode : CActivity {
 
 		offsettext?.t2D描画(OpenTaiko.Skin.Config_Calibration_OffsetText[0] - offsettext.szTextureSize.Width, OpenTaiko.Skin.Config_Calibration_OffsetText[1]);
 
-		OpenTaiko.actTextConsole.Print(OpenTaiko.Skin.Config_Calibration_InfoText[0], OpenTaiko.Skin.Config_Calibration_InfoText[1], CTextConsole.EFontType.Cyan,
-			"MEDIAN OFFSET : " + GetMedianOffset() + "ms\n");
-		OpenTaiko.actTextConsole.Print(OpenTaiko.Skin.Config_Calibration_InfoText[0], OpenTaiko.Skin.Config_Calibration_InfoText[1] + OpenTaiko.actTextConsole.fontHeight, CTextConsole.EFontType.White,
+		int xInfo = OpenTaiko.Skin.Config_Calibration_InfoText[0];
+		int yInfo = OpenTaiko.Skin.Config_Calibration_InfoText[1];
+		yInfo = OpenTaiko.actTextConsole.Print(xInfo, yInfo, CTextConsole.EFontType.Cyan,
+			"MEDIAN OFFSET : " + GetMedianOffset() + "ms\n").y;
+		yInfo = OpenTaiko.actTextConsole.Print(xInfo, yInfo, CTextConsole.EFontType.White,
 			"MIN OFFSET    : " + GetLowestOffset() + "ms\n" +
 			"MAX OFFSET    : " + GetHighestOffset() + "ms\n" +
 			"LAST OFFSET   : " + LastOffset + "ms\n" +
-			"OFFSET COUNT  : " + (Offsets != null ? Offsets.Count : 0));
-		OpenTaiko.actTextConsole.Print(OpenTaiko.Skin.Config_Calibration_InfoText[0], OpenTaiko.Skin.Config_Calibration_InfoText[1] + (OpenTaiko.actTextConsole.fontHeight * 5), CTextConsole.EFontType.White,
+			"OFFSET COUNT  : " + (Offsets != null ? Offsets.Count : 0) + "\n").y;
+		OpenTaiko.actTextConsole.Print(xInfo, yInfo, CTextConsole.EFontType.White,
 			"CURRENT OFFSET: " + CurrentOffset() + "ms");
 
 		#endregion

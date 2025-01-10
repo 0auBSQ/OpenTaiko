@@ -32,7 +32,7 @@ internal class CStage起動 : CStage {
 					langList[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
 					langListHighlighted[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
 				}
-				langSelectOffset = new int[2] { SampleFramework.GameWindowSize.Width / 2, (SampleFramework.GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
+				langSelectOffset = new int[2] { GameWindowSize.Width / 2, (GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
 			}
 
 			this.list進行文字列 = new List<string>();
@@ -81,8 +81,8 @@ internal class CStage起動 : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.list進行文字列.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums\n");
-				this.list進行文字列.Add("Product by.kairera0467\n");
+				this.list進行文字列.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums");
+				this.list進行文字列.Add("Product by.kairera0467");
 				this.list進行文字列.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
 
 				this.list進行文字列.Add("");
@@ -171,11 +171,12 @@ internal class CStage起動 : CStage {
 			if (ePhaseID != EPhase.Startup_Complete) {
 				#region [ this.list進行文字列＋this.現在進行中 の表示 ]
 				//-----------------
-				int x = 320;
-				int y = 20;
+				int x = (int)(320 * OpenTaiko.Skin.Resolution[0] / 1280.0);
+				int y = (int)(20 * OpenTaiko.Skin.Resolution[1] / 720.0);
+				int dy = (int)((OpenTaiko.actTextConsole.fontHeight + 8) * OpenTaiko.Skin.Resolution[1] / 720.0);
 				for (int i = 0; i < this.list進行文字列.Count; i++) {
-					OpenTaiko.actTextConsole.Print((int)(x * OpenTaiko.Skin.Resolution[0] / 1280.0), (int)(y * OpenTaiko.Skin.Resolution[1] / 720.0), CTextConsole.EFontType.White, this.list進行文字列[i]);
-					y += 24;
+					y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.list進行文字列[i]).y;
+					y += dy;
 				}
 				//-----------------
 				#endregion
