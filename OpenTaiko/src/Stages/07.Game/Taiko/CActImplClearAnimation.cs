@@ -238,7 +238,7 @@ internal class CActImplClearAnimation : CActivity {
 		this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
 		this.soundAIWinFullCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
 		this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
 			this.soundClear[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
 			this.soundFailed[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
 			this.soundFullCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
@@ -267,7 +267,7 @@ internal class CActImplClearAnimation : CActivity {
 		this.soundAIWinFullCombo?.tDispose();
 		this.soundAIWinPerfectCombo?.tDispose();
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
 			this.soundClear[i]?.tDispose();
 			this.soundFailed[i]?.tDispose();
 			this.soundFullCombo[i]?.tDispose();
