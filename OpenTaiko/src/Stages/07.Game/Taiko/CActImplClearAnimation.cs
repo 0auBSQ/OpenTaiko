@@ -238,7 +238,7 @@ internal class CActImplClearAnimation : CActivity {
 		this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
 		this.soundAIWinFullCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
 		this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
 			this.soundClear[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
 			this.soundFailed[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
 			this.soundFullCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
@@ -267,7 +267,7 @@ internal class CActImplClearAnimation : CActivity {
 		this.soundAIWinFullCombo?.tDispose();
 		this.soundAIWinPerfectCombo?.tDispose();
 
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
 			this.soundClear[i]?.tDispose();
 			this.soundFailed[i]?.tDispose();
 			this.soundFullCombo[i]?.tDispose();
@@ -536,25 +536,35 @@ internal class CActImplClearAnimation : CActivity {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
 
+					int pan = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
+
 					switch (this.Mode[i]) {
 						case EndMode.StageFailed:
 							FailedScript.PlayEndAnime(i);
+							this.soundFailed[i]?.SetPanning(pan);
 							this.soundFailed[i]?.PlayStart();
+							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 							break;
 						case EndMode.StageCleared:
 							ClearScript.PlayEndAnime(i);
+							this.soundClear[i]?.SetPanning(pan);
 							this.soundClear[i]?.PlayStart();
+							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 							break;
 						case EndMode.StageFullCombo:
 							FullComboScript.PlayEndAnime(i);
+							this.soundFullCombo[i]?.SetPanning(pan);
 							this.soundFullCombo[i]?.PlayStart();
+							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 							break;
 						case EndMode.StagePerfectCombo:
 							PerfectComboScript.PlayEndAnime(i);
+							this.soundPerfectCombo[i]?.SetPanning(pan);
 							this.soundPerfectCombo[i]?.PlayStart();
+							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
 							break;
 

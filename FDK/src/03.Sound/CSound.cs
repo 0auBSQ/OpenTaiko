@@ -253,6 +253,12 @@ public class CSound : IDisposable {
 		}
 	}
 
+	public void SetPanning(int pan) {
+		if (SoundPosition == pan) return;
+
+		SoundPosition = pan;
+	}
+
 	/// <summary>
 	/// <para>全インスタンスリスト。</para>
 	/// <para>～を作成する() で追加され、t解放する() or Dispose() で解放される。</para>

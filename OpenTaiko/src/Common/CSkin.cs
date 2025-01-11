@@ -65,30 +65,18 @@ internal class CSkin : IDisposable {
 		}
 		public int nPosition_CurrentlyPlayingSound {
 			get {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound == null)
-					return 0;
-
-				return sound.SoundPosition;
+				return this.rSound[1 - this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
 			}
 			set {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound != null)
-					sound.SoundPosition = value;
+				this.rSound[1 - this.nNextPlayingSoundNumber]?.SetPanning(value);
 			}
 		}
 		public int nPosition_NextPlayingSound {
 			get {
-				CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-				if (sound == null)
-					return 0;
-
-				return sound.SoundPosition;
+				return this.rSound[this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
 			}
 			set {
-				CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-				if (sound != null)
-					sound.SoundPosition = value;
+				this.rSound[this.nNextPlayingSoundNumber]?.SetPanning(value);
 			}
 		}
 		public int nAutomationLevel_現在のサウンド {
@@ -193,14 +181,17 @@ internal class CSkin : IDisposable {
 		}
 		public void tStop() {
 			this.bPlayed = false;
-			if (this.rSound[0] != null)
-				this.rSound[0].Stop();
 
-			if (this.rSound[1] != null)
-				this.rSound[1].Stop();
+			this.rSound[0]?.Stop();
+			this.rSound[1]?.Stop();
 
 			if (r最後に再生した排他システムサウンド == this)
 				r最後に再生した排他システムサウンド = null;
+		}
+
+		public void SetPanning(int pan) {
+			nPosition_CurrentlyPlayingSound = pan;
+			nPosition_NextPlayingSound = pan;
 		}
 
 		public void tRemoveMixer() {
