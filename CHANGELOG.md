@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.38] - 2025-01-11 (Beta)
+
+- Correctly load clear sounds & pan according to player count
+- Adjust Korean translations (AsPho)
+
 ## [0.6.0.37] - 2025-01-07 (Beta)
 
 - [Fix] Saves.db3 failures no longer cause crashes
