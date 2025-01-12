@@ -4108,7 +4108,9 @@ internal class CTja : CActivity {
 
 			string[] args = argument.Split(',');
 			try {
-				chip.strTargetTxName = args[0].Replace("/", "\\");
+				chip.strTargetTxName = args[0]
+					.Replace('/', Path.DirectorySeparatorChar)
+					.Replace('\\', Path.DirectorySeparatorChar);
 				chip.strNewPath = this.strフォルダ名 + args[1];
 
 				if (this.bSession譜面を読み込む) {
@@ -4138,7 +4140,9 @@ internal class CTja : CActivity {
 			chip.fNow_Measure_s = this.fNow_Measure_s;
 			chip.n整数値_内部番号 = 1;
 
-			chip.strTargetTxName = argument.Replace("/", "\\");
+			chip.strTargetTxName = argument
+				.Replace('/', Path.DirectorySeparatorChar)
+				.Replace('\\', Path.DirectorySeparatorChar);
 
 			// チップを配置。
 			this.listChip.Add(chip);
