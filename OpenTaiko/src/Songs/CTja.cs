@@ -6520,4 +6520,39 @@ internal class CTja : CActivity {
 	}
 	//-----------------
 	#endregion
+
+	// Time coordination converters
+
+	// DefTime is the time relative to the initial measure of the first song.
+	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
+	// * RawTjaTime is DefTime with additional initial padding time
+	public static double DefTimeToRawTjaTime(double msTime)
+		=> msTime + (((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0) + OpenTaiko.ConfigIni.MusicPreTimeMs);
+	public static double RawTjaTimeToDefTime(double msTime)
+		=> msTime - (((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0) + OpenTaiko.ConfigIni.MusicPreTimeMs);
+
+	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
+	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
+	// * For negative msOFFSET, all and only note-time-relative events are delayed by msOFFSET_Abs.
+	public static double RawTjaTimeToTjaTimeMusic(double msTime, CTja tja)
+		=> msTime + (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double TjaTimeToRawTjaTimeMusic(double msTime, CTja tja)
+		=> msTime - (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double RawTjaTimeToTjaTimeNote(double msTime, CTja tja)
+		=> msTime + (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double TjaTimeToRawTjaTimeNote(double msTime, CTja tja)
+		=> msTime - (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+
+	// GameTime is the real elapsed time of gameplay.
+	// SongPlaybackSpeed scales the GameTime into the corresponding TjaTime
+	// These converters are unit-independent.
+	public static double GameTimeToTjaTime(double time)
+		=> time * OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double TjaTimeToGameTime(double time)
+		=> time / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	// BeatSpeed (including BPM) is the reciprocal of time duration per beat.
+	public static double GameBeatSpeedToTjaBeatSpeed(double beatSpeed)
+		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
+		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
 }
