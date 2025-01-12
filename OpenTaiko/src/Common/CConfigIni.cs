@@ -1842,9 +1842,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		#endregion
 
 		sw.WriteLine("; 使用するSkinのフォルダ名。");
-		sw.WriteLine("; 例えば System\\Default\\Graphics\\... などの場合は、SkinPath=.\\Default\\ を指定します。");
+		sw.WriteLine("; 例えば System/Default/Graphics/... などの場合は、SkinPath=./Default/ を指定します。");
 		sw.WriteLine("; Skin folder path.");
-		sw.WriteLine("; e.g. System\\Default\\Graphics\\... -> Set SkinPath=.\\Default\\");
+		sw.WriteLine("; e.g. System/Default/Graphics/... -> Set SkinPath=./Default/");
 		sw.WriteLine("SkinPath={0}", relPath);
 		sw.WriteLine();
 		sw.WriteLine("; 事前画像読み込み機能を使うかどうか。(0: OFF, 1: ON)");
