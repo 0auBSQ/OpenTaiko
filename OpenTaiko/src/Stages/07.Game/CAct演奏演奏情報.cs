@@ -49,7 +49,7 @@ internal class CAct演奏演奏情報 : CActivity {
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
 			y -= dy;
 			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
-			string str = "Time:          " + ((((double)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0)).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
+			string str = "Time:          " + (CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) / 1000.0).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, str);
 			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1]));
