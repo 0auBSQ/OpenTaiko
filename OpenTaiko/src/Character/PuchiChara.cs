@@ -33,9 +33,9 @@ class PuchiChara : CActivity {
 		return puriChar;
 	}
 
-	public void ChangeBPM(double bpm) {
-		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, (int)(OpenTaiko.Skin.Game_PuchiChara_Timer * bpm / OpenTaiko.Skin.Game_PuchiChara[2]), OpenTaiko.Timer);
-		SineCounter = new CCounter(1, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer * bpm / 180, SoundManager.PlayTimer);
+	public void ChangeBPM(double secPerBeat) {
+		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, (int)(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]), OpenTaiko.Timer);
+		SineCounter = new CCounter(1, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180, SoundManager.PlayTimer);
 		this.inGame = true;
 	}
 
