@@ -53,7 +53,7 @@ internal class CActImplLaneTaiko : CActivity {
 	public override int Draw() {
 		if (base.IsFirstDraw) {
 			for (int i = 0; i < 5; i++)
-				this.stBranch[i].nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				this.stBranch[i].nフラッシュ制御タイマ = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			base.IsFirstDraw = false;
 		}
 
@@ -581,7 +581,7 @@ internal class CActImplLaneTaiko : CActivity {
             }
             */
 		}
-		var nTime = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+		var nTime = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (this.n総移動時間[i] != -1) {
@@ -791,7 +791,7 @@ internal class CActImplLaneTaiko : CActivity {
 	}
 
 	public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs) {
-		this.n移動開始時刻[nPlayer] = (int)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+		this.n移動開始時刻[nPlayer] = (int)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 		this.n移動開始X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer];
 		this.n移動開始Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer];
 		this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);

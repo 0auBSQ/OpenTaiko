@@ -154,7 +154,7 @@ internal class CActImplBackground : CActivity {
 
 		this.ctSlideAnimation = new CCounter();
 		this.ctClimbDuration = new CCounter();
-		this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed)) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
+		this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0])) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 		this.ctClimbingAnimation = new CCounter();
 		this.ctRunningAnimation = new CCounter();
 		this.ctClearAnimation = new CCounter();
@@ -332,7 +332,7 @@ internal class CActImplBackground : CActivity {
 			float nextPositionMax140 = Math.Min((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
 
 			if (bFloorChanged == true)
-				ctSlideAnimation.Start(0, 1000, 120f / ((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed), OpenTaiko.Timer);
+				ctSlideAnimation.Start(0, 1000, 120f / CTja.TjaBeatSpeedToGameBeatSpeed((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]), OpenTaiko.Timer);
 
 			float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
 
@@ -419,7 +419,7 @@ internal class CActImplBackground : CActivity {
 			bool stageEnded = OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
-				float floorBPM = (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 				ctClimbDuration.Start(0, 1500, 120f / floorBPM, OpenTaiko.Timer);
 				ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], OpenTaiko.Timer);
@@ -432,7 +432,7 @@ internal class CActImplBackground : CActivity {
 			bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
 
 			if (stageEnded && !TowerFinished && !isClimbing) {
-				float floorBPM = (float)(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0] * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 				ctClearAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Fail[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter], OpenTaiko.Timer);
