@@ -465,8 +465,8 @@ class CStageHeya : CStage {
 			CTexture text_tex = TitleTextureKey.ResolveTitleTexture(textInputTitle);
 			CTexture text_info = TitleTextureKey.ResolveTitleTexture(textInputInfo);
 
-			text_info.t2D_DisplayImage_AnchorCenter(960, 540);
-			text_tex.t2D_DisplayImage_AnchorCenter(960, 540 + text_info.szTextureSize.Height);
+			text_info.t2D_DisplayImage_AnchorCenter(GameWindowSize.Width / 2, GameWindowSize.Height / 2);
+			text_tex.t2D_DisplayImage_AnchorCenter(GameWindowSize.Width / 2, GameWindowSize.Height / 2 + text_info.szTextureSize.Height);
 		}
 
 		#endregion
