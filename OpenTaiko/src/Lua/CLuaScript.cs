@@ -170,6 +170,7 @@ class CLuaScript : IDisposable {
 		LuaScript = new Lua();
 		LuaScript.LoadCLRPackage();
 		LuaScript.State.Encoding = Encoding.UTF8;
+		LuaSecurity.Secure(LuaScript);
 
 		try {
 			LuaScript.DoFile($"{strDir}/Script.lua");

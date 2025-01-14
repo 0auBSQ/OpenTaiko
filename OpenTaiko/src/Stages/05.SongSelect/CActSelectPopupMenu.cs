@@ -87,14 +87,16 @@ internal class CActSelectPopupMenu : CActivity {
 		OpenTaiko.tDisposeSafely(ref prvFont);
 		InitializePrvFont();
 
-		using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem.str項目名, Color.White, Color.Black, null, 30)) {
+		using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem?.str項目名 ?? "", Color.White, Color.Black, null, 30)) {
 			OpenTaiko.tDisposeSafely(ref stqMenuTitle.txName);
 			stqMenuTitle.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
 		}
-		for (int i = 0; i < lciMenuItems.Length; i++) {
-			using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem.str項目名, Color.White, Color.Black, null, 30)) {
-				OpenTaiko.tDisposeSafely(ref lciMenuItems[i].txName);
-				lciMenuItems[i].txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+		if (lciMenuItems != null) {
+			for (int i = 0; i < lciMenuItems.Length; i++) {
+				using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem?.str項目名 ?? "", Color.White, Color.Black, null, 30)) {
+					OpenTaiko.tDisposeSafely(ref lciMenuItems[i].txName);
+					lciMenuItems[i].txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+				}
 			}
 		}
 	}

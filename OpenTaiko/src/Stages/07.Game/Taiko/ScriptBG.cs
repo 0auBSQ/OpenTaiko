@@ -127,6 +127,7 @@ class ScriptBG : IDisposable {
 
 		LuaScript = new Lua();
 		LuaScript.State.Encoding = Encoding.UTF8;
+		LuaSecurity.Secure(LuaScript);
 
 		LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
 
