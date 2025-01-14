@@ -13,12 +13,16 @@ for k, _ in pairs(io) do
 	io[k] = nil
 end
 io = nil
+for k, _ in pairs(debug) do
+	debug[k] = nil
+end
+debug = nil
 ");
 
 			lua.DoString(@"
-table.remove(package.searchers)
-table.remove(package.searchers)
-table.remove(package.searchers)
+while #package.searchers > 0 do
+    table.remove(package.searchers);
+end
 ");
 		}
 	}
