@@ -3,6 +3,7 @@
 namespace OpenTaiko {
 	public static class LuaSecurity {
 		public static void Secure(Lua lua) {
+
 			lua.DoString(@"
 for k, _ in pairs(os) do
 	if k ~= ""time"" then
@@ -17,9 +18,7 @@ for k, _ in pairs(debug) do
 	debug[k] = nil
 end
 debug = nil
-");
 
-			lua.DoString(@"
 while #package.searchers > 0 do
     table.remove(package.searchers);
 end
