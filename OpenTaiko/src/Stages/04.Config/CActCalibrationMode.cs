@@ -8,7 +8,7 @@ internal class CActCalibrationMode : CActivity {
 
 	public override void Activate() {
 		//hitSound = TJAPlayer3.SoundManager.tCreateSound($@"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}" + TJAPlayer3.Skin.hsHitSoundsInformations.don[0], ESoundGroup.SoundEffect);
-		font = HPrivateFastFont.tInstantiateMainFont(30);
+		font = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Calibration_Font_Scale);
 		base.Activate();
 	}
 

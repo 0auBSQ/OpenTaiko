@@ -1506,6 +1506,10 @@ internal class CSkin : IDisposable {
 									Config_KeyAssign_Move = int.Parse(strParam);
 									break;
 								}
+							case nameof(Config_Calibration_Font_Scale): {
+									Config_Calibration_Font_Scale = int.Parse(strParam);
+									break;
+								}
 							case nameof(Config_Calibration_OffsetText): {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -7678,6 +7682,7 @@ internal class CSkin : IDisposable {
 	public int[] Config_KeyAssign_Font = new int[] { 308, 64 };
 	public int Config_KeyAssign_Move = 20;
 
+	public int Config_Calibration_Font_Scale = 30;
 	public int[] Config_Calibration_OffsetText = new int[] { 300, 288 };
 	public int[] Config_Calibration_InfoText = new int[] { 8, 550 };
 	public Rectangle[] Config_Calibration_Highlights = new Rectangle[] {
