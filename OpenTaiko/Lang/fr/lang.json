@@ -1,13 +1,13 @@
 ﻿{
-  // The folder's name is used as the ID, which is used to identify which localized data to use.
-  // This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
-  // It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
-  // If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+	// The folder's name is used as the ID, which is used to identify which localized data to use.
+	// This includes TJAs with localized titles/subtitles (i.e. TITLEJA/SUBTITLEJA) and Lua scripts which utilize the "lang" variable.
+	// It is STRONGLY recommended that you use a two-letter language code that follows the ISO 639 standard. Keep the ID lowercased.
+	// If you aren't sure which code fits your language, please refer to https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
 
-  // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
-  // i.e. "日本語 (Japanese)"
-    "Language": "Français (French)",
-	"Version":  "0.6.0.0",
+	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
+	// i.e. "日本語 (Japanese)"
+	"Language": "Français (French)",
+	"Version": "0.6.0.0",
 	"Entries": {
 
 		// Common
@@ -615,10 +615,10 @@
 		"MOD_FUN_AVALANCHE": "Avalanche",
 		"MOD_FUN_MINESWEEPER": "Démineur"
 	},
-  // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
-  "InvalidKey": "KEY NOT FOUND: {0}",
-  // If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
-  // Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
-  "FontName": "Arial",
-  "BoxFontName": "Arial"
+	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
+	"InvalidKey": "KEY NOT FOUND: {0}",
+	// If a skin does not include a font for a specific language, the game will fallback to this language's fonts. This ensures that all text for all languages can be clearly read.
+	// Font name can be a file, or the name of an already installed font (i.e. "Arial"). If using a font name instead of a file name, please ensure that the user already has this font installed on their computer.
+	"FontName": "../font.ttf",
+	"BoxFontName": "../font.ttf"
 }
