@@ -12,6 +12,11 @@ namespace OpenTaiko;
  FOR DEBUGGING! This class is intended for developers only!
 */
 public static class ImGuiDebugWindow {
+	#region Public for debugging
+	public static bool DisableKeyboardInputs = false;
+	public static string OverrideBGPreset = "";
+	#endregion
+
 	private static bool showImGuiDemoWindow = false;
 	private static Assembly assemblyinfo = Assembly.GetExecutingAssembly();
 
@@ -44,6 +49,8 @@ public static class ImGuiDebugWindow {
 			#region Debug Info
 			ImGui.Checkbox("Show ImGui Demo Window", ref showImGuiDemoWindow);
 			if (showImGuiDemoWindow) { ImGui.ShowDemoWindow(); }
+			if (ImGui.Checkbox("Disable Keyboard Inputs to OpenTaiko", ref DisableKeyboardInputs))
+				((CInputKeyboard)OpenTaiko.InputManager.Keyboard).IMGUI_WindowIsFocused = DisableKeyboardInputs;
 
 			ImGui.Separator();
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
@@ -63,7 +70,7 @@ public static class ImGuiDebugWindow {
 			#endregion
 
 			ImGui.EndTabBar();
-
+			
 			ImGui.End();
 		}
 	}
@@ -169,7 +176,7 @@ public static class ImGuiDebugWindow {
 					ImGui.Text($"ID: {OpenTaiko.SaveFileInstances[save].data.SaveId}");
 					ImGui.InputText("Name", ref OpenTaiko.SaveFileInstances[save].data.Name, 64);
 
-					if (ImGui.Button("Update")) {
+					if (ImGui.Button("Update###UPDATE_PROFILE")) {
 						OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 						OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 					}
@@ -204,7 +211,7 @@ public static class ImGuiDebugWindow {
 
 						ImGui.InputInt("Title Type", ref OpenTaiko.SaveFileInstances[save].data.TitleType);
 
-						if (ImGui.Button("Update")) {
+						if (ImGui.Button("Update###UPDATE_NAMEPLATE")) {
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
@@ -241,7 +248,7 @@ public static class ImGuiDebugWindow {
 							ImGui.EndCombo();
 						}
 
-						if (ImGui.Button("Update")) {
+						if (ImGui.Button("Update###UPDATE_DAN")) {
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
@@ -264,6 +271,7 @@ public static class ImGuiDebugWindow {
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
 				case CStage.EStage.SongSelect:
+				case CStage.EStage.DanDojoSelect:
 					System.Numerics.Vector4 normal = new System.Numerics.Vector4(1, 1, 1, 1);
 					System.Numerics.Vector4 diff = new System.Numerics.Vector4(0.5f, 1, 0.5f, 1);
 
@@ -272,6 +280,11 @@ public static class ImGuiDebugWindow {
 
 					ImGui.TextColored(OpenTaiko.ConfigIni.bTokkunMode ? diff : normal,
 						"Training Mode: " + OpenTaiko.ConfigIni.bTokkunMode);
+
+					ImGui.InputText("Set BG Preset", ref OverrideBGPreset, 1024);
+					ImGui.Text("Type any preset name to override for the next selected song.\nLeave blank to disable this.");
+
+					ImGui.NewLine();
 
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 

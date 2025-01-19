@@ -34,6 +34,10 @@ class HScenePreset {
 
 		bool sectionIsValid = _ps != null ? ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).Count > 0 : false;
 
+#if DEBUG
+		if (!string.IsNullOrWhiteSpace(ImGuiDebugWindow.OverrideBGPreset))
+			return ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).TryGetValue(ImGuiDebugWindow.OverrideBGPreset, out var value) ? value : null;
+#endif
 		var preset = (sectionIsValid
 					  && OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset != null
 					  && ((Dictionary<string, DBSkinPreset.SkinScene>)_ps).ContainsKey(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset))

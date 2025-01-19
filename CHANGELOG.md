@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0.39] - 2025-01-16 (Beta)
+
+- The default font for most languages (when a skin doesn't include a font for that language) has been set to Noto Sans JP
+- The font size for the Offset text on the Calibration screen can now be adjusted
+- Fixed the user rename screen being off-center for resolutions other than 1920x1080
+- Lua security update
+
 ## [0.6.0.38] - 2025-01-11 (Beta)
 
 - Correctly load clear sounds & pan according to player count
