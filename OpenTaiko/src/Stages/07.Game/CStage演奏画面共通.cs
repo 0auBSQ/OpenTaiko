@@ -1442,9 +1442,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 					if (this.bPAUSE == false && rollSpeed > 0) // && TJAPlayer3.ConfigIni.bAuto先生の連打)
 					{
-						double rollSpeedScaled = rollSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+						double msPerRollTja = 1000.0 / rollSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
 						if ((SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)
-							> (pChip.n発声時刻ms + (1000.0 / rollSpeedScaled) * pChip.nRollCount)) {
+							> (pChip.n発声時刻ms + msPerRollTja * pChip.nRollCount)) {
 							EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 							int nLane = 0;
 
