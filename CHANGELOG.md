@@ -6,9 +6,15 @@
 - The font size for the Offset text on the Calibration screen can now be adjusted
 - Fixed the user rename screen being off-center for resolutions other than 1920x1080
 - Lua security update
+- The default font for most languages (when a skin doesn't include a font for that language) has been set to Noto Sans JP
+- The font size for the Offset text on the Calibration screen can now be adjusted
+- Fixed the user rename screen being off-center for resolutions other than 1920x1080
+- Lua security update
 
 ## [0.6.0.38] - 2025-01-11 (Beta)
 
+- Correctly load clear sounds & pan according to player count
+- Adjust Korean translations (AsPho)
 - Correctly load clear sounds & pan according to player count
 - Adjust Korean translations (AsPho)
 
@@ -21,26 +27,42 @@
 - [Feat] BG Lua script errors are now logged
 - [Feat] TJA parsing errors are now logged and as warnings.
 - [Feat] TextConsole messages now respect to font height
+- [Fix] Saves.db3 failures no longer cause crashes
+- [Fix] Prevent crashes if FX Script.lua has Lua errors
+- [Fix] Gameplay debug info now shows at the right place
+- [Feat] LogNotification messages now show on screen top (FX and BG Lua script error, preimage-not-found warning, complex number format warning, modal-window-not-closed error, TJA parsing error)
+- [Feat] BG Lua script errors are now logged
+- [Feat] TJA parsing errors are now logged and as warnings.
+- [Feat] TextConsole messages now respect to font height
 
 ## [0.6.0.36] - 2025-01-06 (Beta)
 
 - Fix "all your best were belong to the last player"
+- Fix "all your best were belong to the last player"
 
 ## [0.6.0.35] - 2025-01-05 (Beta)
 
+- Add Trigger & Thumbstick support for Gamepads
 - Add Trigger & Thumbstick support for Gamepads
 
 ## [0.6.0.34] - 2025-01-05 (Beta)
 
 - Support for custom song unlockable text
 - No longer display "???" as unlockable message for Epic rarity assets
+- Support for custom song unlockable text
+- No longer display "???" as unlockable message for Epic rarity assets
 
 ## [0.6.0.33] - 2025-01-03 (Beta)
 
 - Add Chapiter 4 and NEP03/4 unlocks
+- Add Chapiter 4 and NEP03/4 unlocks
 
 ## [0.6.0.32] - 2025-01-02 (Beta)
 
+- Allow input devices to be recognized after plugging in past startup
+- Fix joystick devices failing to send inputs (Fixes tatacons)
+- Unsupported keyboard key inputs no longer crash the game
+- Devices being plugged/unplugged are now logged
 - Allow input devices to be recognized after plugging in past startup
 - Fix joystick devices failing to send inputs (Fixes tatacons)
 - Unsupported keyboard key inputs no longer crash the game
