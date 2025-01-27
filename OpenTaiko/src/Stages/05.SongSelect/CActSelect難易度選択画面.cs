@@ -410,10 +410,10 @@ internal class CActSelect難易度選択画面 : CActivity {
 				for (int g = 0; g < 10; g++) {
 					if (level > g + 10) {
 						OpenTaiko.Tx.Difficulty_Star.color4 = new Color4(1f, 0.2f, 0.2f, 1.0f);
-						OpenTaiko.Tx.Difficulty_Star?.t2D描画(OpenTaiko.Skin.SongSelect_Difficulty_Star_X[i] + g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[0], OpenTaiko.Skin.SongSelect_Difficulty_Star_Y[i] + g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[1]);
+						OpenTaiko.Tx.Difficulty_Star?.t2D描画(OpenTaiko.Skin.SongSelect_Difficulty_Star_X[i] + (int)(g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[0]), OpenTaiko.Skin.SongSelect_Difficulty_Star_Y[i] + (int)(g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[1]));
 					} else if (level > g) {
 						OpenTaiko.Tx.Difficulty_Star.color4 = new Color4(1f, 1f, 1f, 1.0f);
-						OpenTaiko.Tx.Difficulty_Star?.t2D描画(OpenTaiko.Skin.SongSelect_Difficulty_Star_X[i] + g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[0], OpenTaiko.Skin.SongSelect_Difficulty_Star_Y[i] + g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[1]);
+						OpenTaiko.Tx.Difficulty_Star?.t2D描画(OpenTaiko.Skin.SongSelect_Difficulty_Star_X[i] + (int)(g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[0]), OpenTaiko.Skin.SongSelect_Difficulty_Star_Y[i] + (int)(g * OpenTaiko.Skin.SongSelect_Difficulty_Star_Interval[1]));
 					}
 
 				}

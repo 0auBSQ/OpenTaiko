@@ -200,7 +200,7 @@ internal class CActSelect曲リスト : CActivity {
 		this.ttkSelectedSongBPM = null;
 	}
 
-	public bool tBOXに入る() {
+	public bool tOpenBOX() {
 		//Trace.TraceInformation( "box enter" );
 		//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) );
 		//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
@@ -1861,7 +1861,7 @@ internal class CActSelect曲リスト : CActivity {
 
 		if (ctBoxOpen.CurrentValue >= 1620) {
 			if (bBoxOpen) {
-				this.tBOXに入る();
+				this.tOpenBOX();
 				bBoxOpen = false;
 			}
 			if (bBoxClose) {

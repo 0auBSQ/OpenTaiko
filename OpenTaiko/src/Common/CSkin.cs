@@ -2451,7 +2451,7 @@ internal class CSkin : IDisposable {
 							case "SongSelect_Difficulty_Star_Interval": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
-										SongSelect_Difficulty_Star_Interval[i] = int.Parse(strSplit[i]);
+										SongSelect_Difficulty_Star_Interval[i] = double.Parse(strSplit[i]);
 									}
 									break;
 								}
@@ -8111,7 +8111,7 @@ internal class CSkin : IDisposable {
 
 	public int[] SongSelect_Difficulty_Star_X = new int[] { 444, 587, 730, 873, 873 };
 	public int[] SongSelect_Difficulty_Star_Y = new int[] { 459, 459, 459, 459, 459 };
-	public int[] SongSelect_Difficulty_Star_Interval = new int[] { 10, 0 };
+	public double[] SongSelect_Difficulty_Star_Interval = new double[] { 10, 0 };
 
 	public int[] SongSelect_Difficulty_Number_X = new int[] { 498, 641, 784, 927, 927, 927, 927 };
 	public int[] SongSelect_Difficulty_Number_Y = new int[] { 435, 435, 435, 435, 435, 435, 435 };

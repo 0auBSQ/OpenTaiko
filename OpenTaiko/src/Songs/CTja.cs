@@ -4956,7 +4956,9 @@ internal class CTja : CActivity {
 		chip.bGOGOTIME = this.bGOGOTIME;
 
 		if (NotesManager.IsKusudama(chip)) {
-			if (IsEndedBranching) {
+			if (OpenTaiko.ConfigIni.bTokkunMode) {
+				chip.nChannelNo = 0x17; // Placeholder until kusudama visuals can be fixed in training mode
+			} else if (IsEndedBranching) {
 			} else {
 				// Balloon in branches
 				chip.nChannelNo = 0x19;
