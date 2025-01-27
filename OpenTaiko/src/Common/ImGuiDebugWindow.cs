@@ -235,7 +235,7 @@ public static class ImGuiDebugWindow {
 
 					if (ImGui.TreeNodeEx($"Edit Dan Title###EDIT_DAN_TITLE{i}")) {
 
-						ImGui.InputText($"Title#DAN_TITLE{i}", ref OpenTaiko.SaveFileInstances[save].data.Dan, 16);
+						ImGui.InputText($"Title###DAN_TITLE{i}", ref OpenTaiko.SaveFileInstances[save].data.Dan, 16);
 
 						ImGui.Checkbox($"Gold###DAN_GOLD{i}", ref OpenTaiko.SaveFileInstances[save].data.DanGold);
 
