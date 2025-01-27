@@ -181,7 +181,7 @@ public static class ImGuiDebugWindow {
 						OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 					}
 
-					string preview = OpenTaiko.SaveFileInstances[save].data.TitleId > 0 ? OpenTaiko.Databases.DBNameplateUnlockables.data[OpenTaiko.SaveFileInstances[save].data.TitleId].nameplateInfo.cld.GetString("") : "初心者";
+					string preview = OpenTaiko.SaveFileInstances[save].data.TitleId <= 0 ? "初心者" : OpenTaiko.Databases.DBNameplateUnlockables.data[OpenTaiko.SaveFileInstances[save].data.TitleId].nameplateInfo.cld.GetString("");
 
 					if (ImGui.BeginCombo($"Nameplate###NAMEPLATE{i}", preview)) {
 						foreach (long id in OpenTaiko.Databases.DBNameplateUnlockables.data.Keys) {
