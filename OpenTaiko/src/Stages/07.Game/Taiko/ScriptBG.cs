@@ -253,7 +253,7 @@ class ScriptBG : IDisposable {
 			double timestamp = -1.0;
 
 			if (OpenTaiko.TJA != null) {
-				double timeoffset = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? -2.0 : -8.2;
+				double timeoffset = -2.0 + (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay / 1000.0);
 				// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
 				timestamp = (CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) / 1000.0) +

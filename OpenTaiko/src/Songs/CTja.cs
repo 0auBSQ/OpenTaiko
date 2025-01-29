@@ -601,6 +601,7 @@ internal class CTja : CActivity {
 	public STLANEINT n可視チップ数;
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
+	public const double msDanNextSongDelay = 6200.0;
 	public string PANEL;
 	public string PATH_WAV;
 	public string PREIMAGE;
@@ -4568,7 +4569,7 @@ internal class CTja : CActivity {
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
 			nNextSongOffset += msOFFSET_Abs;
-			var delayTime = 6200.0 + msOFFSET_Abs; // 6.2秒ディレイ
+			var delayTime = msDanNextSongDelay + msOFFSET_Abs; // 6.2秒ディレイ
 											  //チップ追加して割り込んでみる。
 			var chip = new CChip();
 
