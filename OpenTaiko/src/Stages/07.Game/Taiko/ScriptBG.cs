@@ -253,12 +253,13 @@ class ScriptBG : IDisposable {
 			double timestamp = -1.0;
 
 			if (OpenTaiko.TJA != null) {
-				double timeoffset = -2.0 + (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay / 1000.0);
+				double msTimeOffset = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay;
 				// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
-				timestamp = (CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) / 1000.0) +
-							(-(OpenTaiko.ConfigIni.MusicPreTimeMs + OpenTaiko.TJA.msOFFSET_Abs) / 1000.0) +
-							timeoffset;
+				timestamp = (CTja.RawTjaTimeToDefTime(CTja.TjaTimeToRawTjaTimeNote(
+					CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs),
+					OpenTaiko.TJA
+				)) + msTimeOffset) / 1000.0;
 			}
 
 			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
