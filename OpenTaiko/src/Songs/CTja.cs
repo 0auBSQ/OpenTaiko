@@ -621,7 +621,7 @@ internal class CTja : CActivity {
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
-	public int msOFFSET_Abs = 0; // from initial measure to music begin
+	private int msOFFSET_Abs = 0; // from initial measure to music begin
 	private bool isOFFSET_Negative = false;
 	private int msMOVIEOFFSET_Abs = 0; // from music begin to video begin
 	private bool isMOVIEOFFSET_Negative = false;
