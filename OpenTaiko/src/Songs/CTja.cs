@@ -764,8 +764,8 @@ internal class CTja : CActivity {
 		this.BACKGROUND_GR = "";
 		this.PATH_WAV = "";
 		this.BPM = 120.0;
-		this.msOFFSET_Abs = OpenTaiko.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
-		this.isOFFSET_Negative = msOFFSET_Abs < 0;
+		this.msOFFSET_Abs = 0;
+		this.isOFFSET_Negative = false;
 		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 		stdgbvalue.Drums = 0;
 		stdgbvalue.Guitar = 0;
@@ -2179,7 +2179,14 @@ internal class CTja : CActivity {
 		#endregion
 
 		if (command == "#START") {
+			// apply global offset
+			var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
+			msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
+			this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
+			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
+
 			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
+			this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
 			AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
 			var chip = new CChip();
 
@@ -5492,16 +5499,11 @@ internal class CTja : CActivity {
 			}
 		} else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam)) {
 			this.msOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
-
 			this.isOFFSET_Negative = this.msOFFSET_Abs < 0 ? true : false;
 
-			this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
 			if (this.isOFFSET_Negative == true)
 				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 												  //tbOFFSET.Text = strCommandParam;
-
-			// Substract global offset
-			this.msOFFSET_Abs += ((this.isOFFSET_Negative == true) ? -OpenTaiko.ConfigIni.nGlobalOffsetMs : OpenTaiko.ConfigIni.nGlobalOffsetMs);
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
 			this.msMOVIEOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
 			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
