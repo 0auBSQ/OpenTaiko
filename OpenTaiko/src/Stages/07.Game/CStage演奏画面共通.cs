@@ -4287,7 +4287,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		float bpm_time = 0;
 		int last_input = 0;
 		float last_bpm_change_time;
-		play_time = (float)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) - tja.msOFFSET_Abs;
+		play_time = (float)CTja.TjaTimeToRawTjaTimeNote(CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), tja);
 
 		for (int i = 1; ; i++) {
 			//BPMCHANGEの数越えた
