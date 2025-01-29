@@ -2023,10 +2023,6 @@ internal class CTja : CActivity {
 			strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplitした後の譜面, 1);
 			this.n現在の小節数 = 1;
 			try {
-				#region[ 最初の処理 ]
-				//1小節の時間を挿入して開始時間を調節。
-				this.dbNowTime += ((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0);
-				#endregion
 				for (int i = 0; strSplitした後の譜面.Length > i; i++) {
 					nNowReadLine++;
 					str = strSplitした後の譜面[i];
@@ -2186,7 +2182,6 @@ internal class CTja : CActivity {
 			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
 			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
 			AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
 			var chip = new CChip();
 
@@ -6530,9 +6525,9 @@ internal class CTja : CActivity {
 	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
 	// * RawTjaTime is DefTime with additional initial padding time
 	public static double DefTimeToRawTjaTime(double msTime)
-		=> msTime + (((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0) + OpenTaiko.ConfigIni.MusicPreTimeMs);
+		=> msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
 	public static double RawTjaTimeToDefTime(double msTime)
-		=> msTime - (((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0) + OpenTaiko.ConfigIni.MusicPreTimeMs);
+		=> msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
 
 	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
 	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
