@@ -49,7 +49,7 @@ class CActImplTrainingMode : CActivity {
 			if (pChip.nChannelNo == 0x9E && !bIsInGoGo) {
 				bIsInGoGo = true;
 
-				var current = ((double)(pChip.db発声時刻ms * OpenTaiko.ConfigIni.SongPlaybackSpeed));
+				var current = pChip.db発声時刻ms;
 				var width = 0;
 				if (OpenTaiko.Tx.Tokkun_ProgressBar != null) width = OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width;
 
@@ -471,7 +471,7 @@ class CActImplTrainingMode : CActivity {
 	private CCounter ctScrollCounter;
 	private CCounter ctBackgroundScrollTimer;
 	private Easing easing = new Easing();
-	private long length = 1;
+	private long length = 1; // chart length in TJA time
 
 	private List<int> gogoXList;
 	private List<STJUMPP> JumpPointList;
