@@ -181,9 +181,27 @@ public static class ImGuiDebugWindow {
 						OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 					}
 
-					string preview = OpenTaiko.SaveFileInstances[save].data.TitleId <= 0 ? "初心者" : OpenTaiko.Databases.DBNameplateUnlockables.data[OpenTaiko.SaveFileInstances[save].data.TitleId].nameplateInfo.cld.GetString("");
+					string preview = OpenTaiko.SaveFileInstances[save].data.Title;
 
 					if (ImGui.BeginCombo($"Nameplate###NAMEPLATE{i}", preview)) {
+						if (ImGui.Selectable("(Clear Title)")) {
+							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
+							OpenTaiko.SaveFileInstances[save].data.Title = "";
+							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
+							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						if (ImGui.Selectable("初心者")) {
+							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
+							OpenTaiko.SaveFileInstances[save].data.Title = "初心者";
+							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
+							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
 						foreach (long id in OpenTaiko.Databases.DBNameplateUnlockables.data.Keys) {
 							bool unlocked = OpenTaiko.SaveFileInstances[save].data.UnlockedNameplateIds.Contains((int)id);
 
@@ -219,6 +237,23 @@ public static class ImGuiDebugWindow {
 					}
 
 					if (ImGui.BeginCombo($"Dan Title###DAN_TITLE{i}", OpenTaiko.SaveFileInstances[save].data.Dan)) {
+						if (ImGui.Selectable("(Clear Dan)")) {
+							OpenTaiko.SaveFileInstances[save].data.Dan = "";
+							OpenTaiko.SaveFileInstances[save].data.DanGold = false;
+							OpenTaiko.SaveFileInstances[save].data.DanType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						if (ImGui.Selectable("新人")) {
+							OpenTaiko.SaveFileInstances[save].data.Dan = "新人";
+							OpenTaiko.SaveFileInstances[save].data.DanGold = false;
+							OpenTaiko.SaveFileInstances[save].data.DanType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+
+						}
 						foreach (var dan in OpenTaiko.SaveFileInstances[save].data.DanTitles) {
 							if (ImGui.Selectable(dan.Key)) {
 								OpenTaiko.SaveFileInstances[save].data.Dan = dan.Key;
@@ -257,11 +292,21 @@ public static class ImGuiDebugWindow {
 
 
 					int current_chara = OpenTaiko.SaveFileInstances[save].data.Character;
-					if (ImGui.BeginCombo($"Select Character###SELECT_CHARACTER{i}", OpenTaiko.Tx.Characters[current_chara].metadata.tGetName())) {
+					if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.StartUp) {
+						ImGui.TextDisabled("Character selection unavailable during StartUp stage.");
+					}
+					else if (ImGui.BeginCombo($"Select Character###SELECT_CHARACTER{i}", OpenTaiko.Tx.Characters[current_chara].metadata.tGetName())) {
 						for (int chara = 0; chara < OpenTaiko.Tx.Characters.Length; chara++) {
 							if (ImGui.Selectable(OpenTaiko.Tx.Characters[chara].metadata.tGetName(), current_chara == chara)) {
 								OpenTaiko.Tx.ReloadCharacter(current_chara, chara, save);
 								OpenTaiko.SaveFileInstances[save].data.Character = chara;
+
+								OpenTaiko.SaveFileInstances[save].tUpdateCharacterName(OpenTaiko.Skin.Characters_DirName[chara]);
+								OpenTaiko.Skin.voiceTitleSanka[save]?.tPlay();
+								foreach (var animation in Enum.GetValues<CMenuCharacter.ECharacterAnimation>()) {
+									CMenuCharacter.tMenuResetTimer(animation);
+								}
+								OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							}
 						}
 						ImGui.EndCombo();
@@ -503,9 +548,10 @@ public static class ImGuiDebugWindow {
 
 			#region Script.lua Memory Usage
 			int index = 0;
-			foreach (CLuaScript luascript in CLuaScript.listScripts)
+			foreach (CLuaScript luascript in CLuaScript.listScripts) {
 				currentStageMemoryUsage += CTextureListPopup(luascript.listDisposables.OfType<CTexture>(),
 					$"Module #{index}", $"MODULE{index++}_TEXTURES");
+			}
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
 				#region Game
