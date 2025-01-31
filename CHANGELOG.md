@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.40] - 2025-01-31 (Beta)
+
+- Force all kusudamas to regular balloon in training mode
+
 ## [0.6.0.39] - 2025-01-16 (Beta)
 
 - The default font for most languages (when a skin doesn't include a font for that language) has been set to Noto Sans JP
