@@ -1037,6 +1037,14 @@ internal class CActConfigList : CActivity {
 		}
 		#endregion
 
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
+			int id = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.TitleId;
+			if (id > 0) {
+				var title = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
+				OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Title = title.nameplateInfo.cld.GetString("");
+			}
+			OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+		}
 		// #24820 2013.1.22 yyagi CONFIGでWASAPI/ASIO/DirectSound関連の設定を変更した場合、サウンドデバイスを再構築する。
 		// #33689 2014.6.17 yyagi CONFIGでSoundTimerTypeの設定を変更した場合も、サウンドデバイスを再構築する。
 		#region [ サウンドデバイス変更 ]

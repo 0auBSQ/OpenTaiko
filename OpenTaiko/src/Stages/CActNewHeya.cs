@@ -622,7 +622,7 @@ class CActNewHeya : CActivity {
 
 		if (OpenTaiko.Tx.Puchichara[CurrentIndex].unlock != null
 			&& !OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[CurrentIndex])) {
-			(bool, string?) response = OpenTaiko.Tx.Puchichara[CurrentIndex].unlock.tConditionMetWrapper(OpenTaiko.SaveFile);
+			(bool, string?) response = OpenTaiko.Tx.Puchichara[CurrentIndex].unlock.tConditionMetWrapper(CurrentPlayer);
 			//tConditionMet(
 			//new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -669,7 +669,7 @@ class CActNewHeya : CActivity {
 
 		if (OpenTaiko.Tx.Characters[CurrentIndex].unlock != null
 			&& !OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[CurrentIndex])) {
-			(bool, string?) response = OpenTaiko.Tx.Characters[CurrentIndex].unlock.tConditionMetWrapper(OpenTaiko.SaveFile);
+			(bool, string?) response = OpenTaiko.Tx.Characters[CurrentIndex].unlock.tConditionMetWrapper(CurrentPlayer);
 			//TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
 			//new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
