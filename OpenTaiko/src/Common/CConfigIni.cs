@@ -1993,9 +1993,11 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; 存在しないデバイスを指定すると、DTXManiaが起動しないことがあります。");
 		sw.WriteLine("; Sound device used by ASIO.");
 		sw.WriteLine("; Don't specify unconnected device, as the DTXMania may not bootup.");
-		string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
-		for (int i = 0; i < asiodev.Length; i++) {
-			sw.WriteLine("; {0}: {1}", i, asiodev[i]);
+		if (OperatingSystem.IsWindows()) {
+			string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
+			for (int i = 0; i < asiodev.Length; i++) {
+				sw.WriteLine("; {0}: {1}", i, asiodev[i]);
+			}
 		}
 
 		sw.WriteLine("ASIODevice={0}", (int)this.nASIODevice);
@@ -2797,8 +2799,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.nWASAPIBufferSizeMs = CConversion.ParseIntInRange(value, 0, 9999, this.nWASAPIBufferSizeMs);
 				break;
 			case "ASIODevice": {
-					string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
-					this.nASIODevice = CConversion.ParseIntInRange(value, 0, asiodev.Length - 1, this.nASIODevice);
+					if (OperatingSystem.IsWindows()) {
+						string[] asiodev = CEnumerateAllAsioDevices.GetAllASIODevices();
+						this.nASIODevice = CConversion.ParseIntInRange(value, 0, asiodev.Length - 1, this.nASIODevice);
+					}
+					else {
+						this.nASIODevice = 0;
+					}
 					break;
 				}
 			case "SoundTimerType":
