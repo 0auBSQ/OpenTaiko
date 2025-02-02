@@ -2977,9 +2977,9 @@ internal class CActSelect曲リスト : CActivity {
 		var _speed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 
 		double[] bpms = new double[3] {
-			_score.BaseBpm * _speed,
-			_score.MinBpm * _speed,
-			_score.MaxBpm * _speed
+			CTja.TjaBeatSpeedToGameBeatSpeed(_score.BaseBpm),
+			CTja.TjaBeatSpeedToGameBeatSpeed(_score.MinBpm),
+			CTja.TjaBeatSpeedToGameBeatSpeed(_score.MaxBpm),
 		};
 
 		string bpm_str = CLangManager.LangInstance.GetString("SONGSELECT_INFO_BPM", bpms[0]);
