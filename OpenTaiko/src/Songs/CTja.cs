@@ -526,7 +526,6 @@ internal class CTja : CActivity {
 		public double dbBMScollTime;
 		public double db移動待機時刻;
 		public double db出現時刻;
-		public double db再生速度;
 		public float fMeasure_s;
 		public float fMeasure_m;
 	}
@@ -553,7 +552,6 @@ internal class CTja : CActivity {
 	public double MaxBPM;
 	public STチップがある bチップがある;
 	public string COMMENT;
-	public double db再生速度;
 	public string GENRE;
 	public string MAKER;
 	public string[] NOTESDESIGNER = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
@@ -770,7 +768,6 @@ internal class CTja : CActivity {
 		stdgbvalue.Bass = 0;
 		this.LEVEL = stdgbvalue;
 		this.bHIDDENBRANCH = false;
-		this.db再生速度 = 1.0;
 		this.bチップがある = new STチップがある();
 		this.bチップがある.Drums = false;
 		this.bチップがある.Guitar = false;
@@ -855,15 +852,15 @@ internal class CTja : CActivity {
 		DanSongs.Number = 0;
 
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, 0, 0, false, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, 0, 0, false, difficulty);
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, nReadVersionUnused, nPlayerSide, bSession, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, nReadVersionUnused, nPlayerSide, bSession, difficulty);
 	}
 
 
@@ -1245,7 +1242,7 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void t入力(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty) {
+	public void t入力(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty) {
 		this.bヘッダのみ = bヘッダのみ;
 		this.strファイル名の絶対パス = Path.GetFullPath(strファイル名);
 		this.strファイル名 = Path.GetFileName(this.strファイル名の絶対パス);
@@ -1261,18 +1258,15 @@ internal class CTja : CActivity {
 			StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 			string str2 = reader.ReadToEnd();
 			reader.Close();
-			this.t入力_全入力文字列から(str2, str2, db再生速度, nBGMAdjust, difficulty);
+			this.t入力_全入力文字列から(str2, str2, db再生速度Unused, nBGMAdjust, difficulty);
 		} catch (Exception ex) {
 			Trace.TraceError("おや?エラーが出たようです。お兄様。");
 			Trace.TraceError(ex.ToString());
 			Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度, int nBGMAdjust, int Difficulty) {
+	public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度Unused, int nBGMAdjust, int Difficulty) {
 		if (!string.IsNullOrEmpty(str全入力文字列)) {
-			#region [ 改行カット ]
-			this.db再生速度 = db再生速度;
-			#endregion
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
 				this.n無限管理WAV[j] = -j;
@@ -1592,14 +1586,6 @@ internal class CTja : CActivity {
 								chip.dbBPM = this.dbNowBPM;
 								continue;
 							}
-					}
-				}
-				if (this.db再生速度 > 0.0) {
-					double _db再生速度 = this.db再生速度;
-					foreach (CChip chip in this.listChip) {
-						chip.n発声時刻ms = (int)(((double)chip.n発声時刻ms) / _db再生速度);
-						chip.db発声時刻ms = (((double)chip.n発声時刻ms) / _db再生速度);
-						chip.nNoteEndTimems = (int)(((double)chip.nNoteEndTimems) / _db再生速度);
 					}
 				}
 				#endregion
@@ -4721,7 +4707,6 @@ internal class CTja : CActivity {
 			cBranchStart.fMeasure_m = this.fNow_Measure_m;
 			cBranchStart.nMeasureCount = this.n現在の小節数;
 			cBranchStart.db移動待機時刻 = this.db移動待機時刻;
-			cBranchStart.db再生速度 = this.db再生速度;
 			cBranchStart.db出現時刻 = this.db出現時刻;
 			#endregion
 		} else {
@@ -4735,7 +4720,6 @@ internal class CTja : CActivity {
 			this.fNow_Measure_m = cBranchStart.fMeasure_m;
 			this.n現在の小節数 = cBranchStart.nMeasureCount;
 			this.db移動待機時刻 = cBranchStart.db移動待機時刻;
-			this.db再生速度 = cBranchStart.db再生速度;
 			this.db出現時刻 = cBranchStart.db出現時刻;
 			#endregion
 		}
@@ -6168,8 +6152,7 @@ internal class CTja : CActivity {
 
 					int duration = 0;
 					if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CTja.CWAV wc)) {
-						double _db再生速度 = this.db再生速度;
-						duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
+						duration = wc.rSound[0]?.TotalPlayTime ?? 0;
 					}
 					int n新RemoveMixer時刻ms, n新RemoveMixer位置;
 					t発声時刻msと発声位置を取得する(pChip.n発声時刻ms + duration + n発音後余裕ms, out n新RemoveMixer時刻ms, out n新RemoveMixer位置);
