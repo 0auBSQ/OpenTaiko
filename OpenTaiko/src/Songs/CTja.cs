@@ -2180,7 +2180,9 @@ internal class CTja : CActivity {
 			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
 			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
+			if (n参照中の難易度 != (int)Difficulty.Dan) { // applied instead at #NEXTSONG for Dans
+				AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
+			}
 			var chip = new CChip();
 
 			chip.nChannelNo = 0x01;
