@@ -594,8 +594,6 @@ internal class CTja : CActivity {
 	private double[] dbNowSCROLL_Expert;
 	private double[] dbNowSCROLL_Master;
 
-	private int nNextSongOffset;
-
 	public Dictionary<int, CDELAY> listDELAY;
 	public Dictionary<int, CBRANCH> listBRANCH;
 	public STLANEINT n可視チップ数;
@@ -2267,7 +2265,7 @@ internal class CTja : CActivity {
 				MinBPM = dbBPM;
 			}
 
-			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime - nNextSongOffset, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
+			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
 
 
 			//チップ追加して割り込んでみる。
@@ -4570,9 +4568,6 @@ internal class CTja : CActivity {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
-			nNextSongOffset += msOFFSET_Abs;
-			var delayTime = msDanNextSongDelay + msOFFSET_Abs; // 6.2秒ディレイ
-											  //チップ追加して割り込んでみる。
 			var chip = new CChip();
 
 			chip.nChannelNo = 0x9B;
@@ -4580,13 +4575,15 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			this.dbNowTime += delayTime;
-			this.dbNowBMScollTime += (delayTime - msOFFSET_Abs) * this.dbNowBPM / 15000;
 			chip.n整数値_内部番号 = 0;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
 			this.listChip.Add(chip);
+
+			// 6.2秒ディレイ
+			this.dbNowTime += msDanNextSongDelay;
+			this.dbNowBMScollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
 
 			AddMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
