@@ -4565,7 +4565,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#region [ BGMやギターなど、演奏開始のタイミングで再生がかかっているサウンドのの途中再生開始 ] // (CDTXのt入力_行解析_チップ配置()で小節番号が+1されているのを削っておくこと)
 		for (int i = this.nCurrentTopChip; i >= 0; i--) {
 			CChip pChip = dTX.listChip[i];
-			int nDuration = pChip.GetDuration();
+			int nDuration = (int)CTja.TjaDurationToGameDuration(pChip.GetDuration());
 			long n発声時刻ms = (long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, dTX);
 
 			if ((n発声時刻ms + nDuration > 0) && (n発声時刻ms <= nStartTime) && (nStartTime <= n発声時刻ms + nDuration)) {
