@@ -586,12 +586,12 @@ internal class CActImplLaneTaiko : CActivity {
 			var nTime = (long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			if (this.n総移動時間[i] != -1) {
 				if (n移動方向[i] == 1) {
-					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
-					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + ((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + ((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
 					//TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
 				} else {
-					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
-					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] - ((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
+					OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] - ((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.nVerticalJSPos[i]);
 					//TJAPlayer3.stage演奏ドラム画面.FlyingNotes.StartPointX[i] = this.n移動開始X[i] - (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
 				}
 
@@ -790,7 +790,7 @@ internal class CActImplLaneTaiko : CActivity {
 		OpenTaiko.stageGameScreen.actLane.t分岐レイヤー_コース変化(n現在, n次回, nPlayer);
 	}
 
-	public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs) {
+	public void t判定枠移動(double db移動時間, double n移動px, int n移動方向, int nPlayer, double vJs) {
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		this.n移動開始時刻[nPlayer] = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 		this.n移動開始X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer];
@@ -864,13 +864,13 @@ internal class CActImplLaneTaiko : CActivity {
 
 
 	private int[] n総移動時間 = new int[5];
-	private int[] n移動開始X = new int[5];
-	private int[] n移動開始Y = new int[5];
+	private double[] n移動開始X = new double[5];
+	private double[] n移動開始Y = new double[5];
 	private int[] n移動開始時刻 = new int[5];
-	private int[] n移動距離px = new int[5];
-	private int[] nVerticalJSPos = new int[5];
-	private int[] n移動目的場所X = new int[5];
-	private int[] n移動目的場所Y = new int[5];
+	private double[] n移動距離px = new double[5];
+	private double[] nVerticalJSPos = new double[5];
+	private double[] n移動目的場所X = new double[5];
+	private double[] n移動目的場所Y = new double[5];
 	private int[] n移動方向 = new int[5];
 
 	//-----------------

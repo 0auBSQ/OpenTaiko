@@ -44,11 +44,11 @@ internal class CTja : CActivity {
 	/// </summary>
 	public class CJPOSSCROLL {
 		public double db移動時間;
-		public int n移動距離px;
+		public double n移動距離px;
 		public int n移動方向; //移動方向は0(左)、1(右)の2つだけ。
 		public int n内部番号;
 		public int n表記上の番号;
-		public int nVerticalMove;
+		public double nVerticalMove;
 
 		public override string ToString() {
 			StringBuilder builder = new StringBuilder(0x80);
@@ -2238,15 +2238,15 @@ internal class CTja : CActivity {
 			strArray = argument.Split(chDelimiter);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
 			double db移動時刻 = Convert.ToDouble(strArray[0]);
-			int n移動px = 0;
-			int nComplexMove = 0;
+			double n移動px = 0;
+			double nComplexMove = 0;
 			if (strArray[1].IndexOf('i') != -1) {
 				double[] dbComplexNum = new double[2];
 				this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
-				n移動px = Convert.ToInt32(dbComplexNum[0]);
-				nComplexMove = Convert.ToInt32(dbComplexNum[1]);
+				n移動px = dbComplexNum[0];
+				nComplexMove = dbComplexNum[1];
 			} else
-				n移動px = Convert.ToInt32(strArray[1]);
+				n移動px = Convert.ToDouble(strArray[1]);
 
 
 			int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
