@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0.41] - 2025-02-08 (Beta)
+
+- [Fix] SongPlaybackSpeed misused to initialize speed-independent animation values
+- [Fix] entering training mode in non-1x play speed distorted displayed go-go time position
+- [Fix] GetNowPBMTime() (notes' and bar lines' position variable in HB/BMScroll) returned wrong beat position for charts with positive OFFSET
+- [Fix] ScriptBG Lua API gave wrong timestamp for charts with positive OFFSET:
+- [Fix] global offset bug completely by moving OFFSET handling to #START, including:
+=> Fix global offset was treated as positive when OFFSET: is not given in TJA
+=> Fix wrong HB/BMScroll position before the initial measure when OFFSET: is not given in TJA or is given before BPM:
+- [Fix] TJA+global offset wrongly re-applied on each dan song
+- [Fix] Mini-Taiko input highlight fade-out animation speed varied by play speed
+- [Fix] make initial song playback buffer play-speed-independent for regular charts
+- [Fix] music silenced when resumed from x+% of the song at x% song speed
+- [Chore] remove static extra (2 / PlaySpeed)-second delay beyond the song playback buffer
+- [Chore] remove redundant initial song playback buffer for Dans
+=> Save 3 seconds for retrying a Dan!
+
 ## [0.6.0.40] - 2025-01-31 (Beta)
 
 - Force all kusudamas to regular balloon in training mode
