@@ -791,7 +791,8 @@ internal class CActImplLaneTaiko : CActivity {
 	}
 
 	public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs) {
-		this.n移動開始時刻[nPlayer] = (int)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
+		this.n移動開始時刻[nPlayer] = (int)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja);
 		this.n移動開始X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer];
 		this.n移動開始Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer];
 		this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);
