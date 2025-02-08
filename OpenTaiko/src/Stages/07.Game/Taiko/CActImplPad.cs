@@ -43,11 +43,11 @@ internal class CActImplPad : CActivity {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.nフラッシュ制御タイマ = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-				this.nY座標制御タイマ = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+				this.nフラッシュ制御タイマ = SoundManager.PlayTimer.NowTimeMs;
+				this.nY座標制御タイマ = SoundManager.PlayTimer.NowTimeMs;
 				base.IsFirstDraw = false;
 			}
-			long num = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			long num = SoundManager.PlayTimer.NowTimeMs;
 			if (num < this.nフラッシュ制御タイマ) {
 				this.nフラッシュ制御タイマ = num;
 			}

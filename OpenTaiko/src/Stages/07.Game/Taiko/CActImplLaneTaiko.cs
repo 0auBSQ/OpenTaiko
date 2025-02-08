@@ -53,7 +53,7 @@ internal class CActImplLaneTaiko : CActivity {
 	public override int Draw() {
 		if (base.IsFirstDraw) {
 			for (int i = 0; i < 5; i++)
-				this.stBranch[i].nフラッシュ制御タイマ = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+				this.stBranch[i].nフラッシュ制御タイマ = SoundManager.PlayTimer.NowTimeMs;
 			base.IsFirstDraw = false;
 		}
 
