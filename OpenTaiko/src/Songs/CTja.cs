@@ -2166,9 +2166,6 @@ internal class CTja : CActivity {
 			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
 			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			if (n参照中の難易度 != (int)Difficulty.Dan) { // applied instead at #NEXTSONG for Dans
-				AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
-			}
 			var chip = new CChip();
 
 			chip.nChannelNo = 0x01;
@@ -4573,7 +4570,7 @@ internal class CTja : CActivity {
 			this.dbNowTime += msDanNextSongDelay;
 			this.dbNowBMScollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
 
-			AddMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
+			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
 			strArray = SplitComma(argument); // \,をエスケープ処理するメソッドだぞっ
 
@@ -6494,7 +6491,7 @@ internal class CTja : CActivity {
 	/// <summary>
 	/// 音源再生前の空白を追加するメソッド。
 	/// </summary>
-	private void AddMusicPreTimeMs() {
+	private void AddPreBakedMusicPreTimeMs() {
 		this.dbNowTime += OpenTaiko.ConfigIni.MusicPreTimeMs;
 		this.dbNowBMScollTime += OpenTaiko.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
 	}
@@ -6506,10 +6503,13 @@ internal class CTja : CActivity {
 	// DefTime is the time relative to the initial measure of the first song.
 	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
 	// * RawTjaTime is DefTime with additional initial padding time
-	public static double DefTimeToRawTjaTime(double msTime)
-		=> msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
-	public static double RawTjaTimeToDefTime(double msTime)
-		=> msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
+	// MusicPreTimeMs is pre-baked to only Dan
+	public static double DefTimeToRawTjaTime(double msTime, CTja tja)
+		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
+	public static double RawTjaTimeToDefTime(double msTime, CTja tja)
+		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
 
 	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
 	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
@@ -6525,11 +6525,24 @@ internal class CTja : CActivity {
 
 	// GameTime is the real elapsed time of gameplay.
 	// SongPlaybackSpeed scales the GameTime into the corresponding TjaTime
+	// MusicPreTimeMs is applied in real time to non-Dan
+	public static double GameTimeToTjaTime(double msTime, CTja tja)
+		=> GameDurationToTjaDuration((tja.n参照中の難易度 == (int)Difficulty.Dan) ?
+			msTime
+			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs);
+	public static double TjaTimeToGameTime(double msTime, CTja tja) {
+		msTime = TjaDurationToGameDuration(msTime);
+		return (tja.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
+			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
+	}
+
+	// GameDuration is time duration per beat.
 	// These converters are unit-independent.
-	public static double GameTimeToTjaTime(double time)
-		=> time * OpenTaiko.ConfigIni.SongPlaybackSpeed;
-	public static double TjaTimeToGameTime(double time)
-		=> time / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double GameDurationToTjaDuration(double duration)
+		=> duration * OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double TjaDurationToGameDuration(double duration)
+		=> duration / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+
 	// BeatSpeed (including BPM) is the reciprocal of time duration per beat.
 	public static double GameBeatSpeedToTjaBeatSpeed(double beatSpeed)
 		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;

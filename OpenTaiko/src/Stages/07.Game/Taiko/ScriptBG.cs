@@ -256,10 +256,12 @@ class ScriptBG : IDisposable {
 				double msTimeOffset = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay;
 				// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
-				timestamp = (CTja.RawTjaTimeToDefTime(CTja.TjaTimeToRawTjaTimeNote(
-					CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs),
+				timestamp = (CTja.RawTjaTimeToDefTime(
+					CTja.TjaTimeToRawTjaTimeNote(
+						CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, OpenTaiko.TJA),
+						OpenTaiko.TJA),
 					OpenTaiko.TJA
-				)) + msTimeOffset) / 1000.0;
+				) + msTimeOffset) / 1000.0;
 			}
 
 			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,

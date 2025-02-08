@@ -50,7 +50,7 @@ static internal class CFloorManagement {
 
 	// prevents one from playing in 7.65x or so speed and passing the life challenge easily.
 	public static double InvincibilityDurationSpeedDependent {
-		get => CTja.TjaTimeToGameTime(InvincibilityDuration);
+		get => CTja.TjaDurationToGameDuration(InvincibilityDuration);
 	}
 
 	// ms

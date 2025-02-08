@@ -581,9 +581,9 @@ internal class CActImplLaneTaiko : CActivity {
             }
             */
 		}
-		var nTime = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			var nTime = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, OpenTaiko.GetTJA(i)!);
 			if (this.n総移動時間[i] != -1) {
 				if (n移動方向[i] == 1) {
 					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
