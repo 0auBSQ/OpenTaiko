@@ -65,106 +65,46 @@ internal class OpenTaiko : Game {
 	}
 
 	#region [DTX instances]
-	public static CTja TJA {
-		get {
-			return tja[0];
-		}
-		set {
-			if ((tja[0] != null) && (app != null)) {
-				tja[0].DeActivate();
-				tja[0].ReleaseManagedResource();
-				tja[0].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[0]);
-			}
-			tja[0] = value;
-			if ((tja[0] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[0]);
-			}
-		}
+	public static CTja? TJA {
+		get => tja[0];
+		set => SetTJA(0, value);
 	}
-	public static CTja TJA_2P {
-		get {
-			return tja[1];
-		}
-		set {
-			if ((tja[1] != null) && (app != null)) {
-				tja[1].DeActivate();
-				tja[1].ReleaseManagedResource();
-				tja[1].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[1]);
-			}
-			tja[1] = value;
-			if ((tja[1] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[1]);
-			}
-		}
+	public static CTja? TJA_2P {
+		get => tja[1];
+		set => SetTJA(1, value);
 	}
-	public static CTja TJA_3P {
-		get {
-			return tja[2];
-		}
-		set {
-			if ((tja[2] != null) && (app != null)) {
-				tja[2].DeActivate();
-				tja[2].ReleaseManagedResource();
-				tja[2].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[2]);
-			}
-			tja[2] = value;
-			if ((tja[2] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[2]);
-			}
-		}
+	public static CTja? TJA_3P {
+		get => tja[2];
+		set => SetTJA(2, value);
 	}
-	public static CTja TJA_4P {
-		get {
-			return tja[3];
-		}
-		set {
-			if ((tja[3] != null) && (app != null)) {
-				tja[3].DeActivate();
-				tja[3].ReleaseManagedResource();
-				tja[3].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[3]);
-			}
-			tja[3] = value;
-			if ((tja[3] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[3]);
-			}
-		}
+	public static CTja? TJA_4P {
+		get => tja[3];
+		set => SetTJA(3, value);
 	}
-	public static CTja TJA_5P {
-		get {
-			return tja[4];
-		}
-		set {
-			if ((tja[4] != null) && (app != null)) {
-				tja[4].DeActivate();
-				tja[4].ReleaseManagedResource();
-				tja[4].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[4]);
-			}
-			tja[4] = value;
-			if ((tja[4] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[4]);
-			}
-		}
+	public static CTja? TJA_5P {
+		get => tja[4];
+		set => SetTJA(4, value);
 	}
 
-	public static CTja GetDTX(int player) {
-		switch (player) {
-			case 0:
-				return OpenTaiko.TJA;
-			case 1:
-				return OpenTaiko.TJA_2P;
-			case 2:
-				return OpenTaiko.TJA_3P;
-			case 3:
-				return OpenTaiko.TJA_4P;
-			case 4:
-				return OpenTaiko.TJA_5P;
+	public static CTja?[] TJAs
+		=> tja.Select(x => x).ToArray();
+
+	public static CTja? GetTJA(int player)
+		=> tja.ElementAtOrDefault(player);
+	public static void SetTJA(int player, CTja? value) {
+		if (!(player >= 0 && player <= tja.Length)) {
+			return;
 		}
-		return null;
+		if ((tja[player] != null) && (app != null)) {
+			tja[player].DeActivate();
+			tja[player].ReleaseManagedResource();
+			tja[player].ReleaseUnmanagedResource();
+			app.listTopLevelActivities.Remove(tja[player]);
+		}
+		tja[player] = value;
+		if ((tja[player] != null) && (app != null)) {
+			app.listTopLevelActivities.Add(tja[player]);
+		}
 	}
 
 	#endregion

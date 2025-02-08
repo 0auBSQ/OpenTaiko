@@ -31,7 +31,7 @@ internal class CActTaikoScrollSpeed : CActivity {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
 				for (int i = 0; i < 5; i++) {
-					this.nScrollExclusiveTimer[i] = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+					this.nScrollExclusiveTimer[i] = SoundManager.PlayTimer.NowTimeMs;
 
 				}
 

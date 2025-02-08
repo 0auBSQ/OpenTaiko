@@ -1145,7 +1145,7 @@ internal class CActConfigList : CActivity {
 		#region [ 初めての進行描画 ]
 		//-----------------
 		if (base.IsFirstDraw) {
-			this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.nスクロール用タイマ値 = OpenTaiko.Timer.NowTimeMs;
 			this.ct三角矢印アニメ.Start(0, 9, 50, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}

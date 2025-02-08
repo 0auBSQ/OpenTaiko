@@ -463,7 +463,7 @@ public static class ImGuiDebugWindow {
 						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
 							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
-							var dtx = OpenTaiko.GetDTX(i);
+							var dtx = OpenTaiko.GetTJA(i);
 
 							switch (game_difficulty) {
 								case Difficulty.Dan:

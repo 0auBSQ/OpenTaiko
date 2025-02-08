@@ -291,8 +291,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			}
 		}
 
-		double _db再生速度 = OpenTaiko.TJA.db再生速度;
-		return (int)(nDuration / _db再生速度);
+		return nDuration;
 	}
 
 	#region [ IComparable 実装 ]
