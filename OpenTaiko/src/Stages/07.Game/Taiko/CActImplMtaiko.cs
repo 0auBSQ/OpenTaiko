@@ -48,11 +48,11 @@ internal class CActImplMtaiko : CActivity {
 
 	public override int Draw() {
 		if (base.IsFirstDraw) {
-			this.nフラッシュ制御タイマ = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.nフラッシュ制御タイマ = SoundManager.PlayTimer.NowTimeMs;
 			base.IsFirstDraw = false;
 		}
 
-		long num = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+		long num = SoundManager.PlayTimer.NowTimeMs;
 		if (num < this.nフラッシュ制御タイマ) {
 			this.nフラッシュ制御タイマ = num;
 		}

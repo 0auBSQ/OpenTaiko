@@ -526,7 +526,6 @@ internal class CTja : CActivity {
 		public double dbBMScollTime;
 		public double db移動待機時刻;
 		public double db出現時刻;
-		public double db再生速度;
 		public float fMeasure_s;
 		public float fMeasure_m;
 	}
@@ -553,7 +552,6 @@ internal class CTja : CActivity {
 	public double MaxBPM;
 	public STチップがある bチップがある;
 	public string COMMENT;
-	public double db再生速度;
 	public string GENRE;
 	public string MAKER;
 	public string[] NOTESDESIGNER = new string[(int)Difficulty.Total] { "", "", "", "", "", "", "" };
@@ -594,13 +592,12 @@ internal class CTja : CActivity {
 	private double[] dbNowSCROLL_Expert;
 	private double[] dbNowSCROLL_Master;
 
-	private int nNextSongOffset;
-
 	public Dictionary<int, CDELAY> listDELAY;
 	public Dictionary<int, CBRANCH> listBRANCH;
 	public STLANEINT n可視チップ数;
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
+	public const double msDanNextSongDelay = 6200.0;
 	public string PANEL;
 	public string PATH_WAV;
 	public string PREIMAGE;
@@ -620,10 +617,10 @@ internal class CTja : CActivity {
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
 	private int[] n連打チップ_temp = new int[3];
-	public int nOFFSET = 0;
-	private bool bOFFSETの値がマイナスである = false;
-	private int nMOVIEOFFSET = 0;
-	private bool bMOVIEOFFSETの値がマイナスである = false;
+	private int msOFFSET_Abs = 0; // from initial measure to music begin
+	private bool isOFFSET_Negative = false;
+	private int msMOVIEOFFSET_Abs = 0; // from music begin to video begin
+	private bool isMOVIEOFFSET_Negative = false;
 	private double dbNowBPM = 120.0;
 	private int nDELAY = 0;
 
@@ -763,15 +760,14 @@ internal class CTja : CActivity {
 		this.BACKGROUND_GR = "";
 		this.PATH_WAV = "";
 		this.BPM = 120.0;
-		this.nOFFSET = OpenTaiko.ConfigIni.nGlobalOffsetMs; // When OFFSET isn't called (typically in Dans), it should default to the game's Global Offset to avoid desync.
-		this.bOFFSETの値がマイナスである = nOFFSET < 0;
+		this.msOFFSET_Abs = 0;
+		this.isOFFSET_Negative = false;
 		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 		stdgbvalue.Drums = 0;
 		stdgbvalue.Guitar = 0;
 		stdgbvalue.Bass = 0;
 		this.LEVEL = stdgbvalue;
 		this.bHIDDENBRANCH = false;
-		this.db再生速度 = 1.0;
 		this.bチップがある = new STチップがある();
 		this.bチップがある.Drums = false;
 		this.bチップがある.Guitar = false;
@@ -856,15 +852,15 @@ internal class CTja : CActivity {
 		DanSongs.Number = 0;
 
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, 0, 0, false, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, 0, 0, false, difficulty);
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度, nBGMAdjust, nReadVersionUnused, nPlayerSide, bSession, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, nReadVersionUnused, nPlayerSide, bSession, difficulty);
 	}
 
 
@@ -1246,7 +1242,7 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void t入力(string strファイル名, bool bヘッダのみ, double db再生速度, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty) {
+	public void t入力(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty) {
 		this.bヘッダのみ = bヘッダのみ;
 		this.strファイル名の絶対パス = Path.GetFullPath(strファイル名);
 		this.strファイル名 = Path.GetFileName(this.strファイル名の絶対パス);
@@ -1262,18 +1258,15 @@ internal class CTja : CActivity {
 			StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 			string str2 = reader.ReadToEnd();
 			reader.Close();
-			this.t入力_全入力文字列から(str2, str2, db再生速度, nBGMAdjust, difficulty);
+			this.t入力_全入力文字列から(str2, str2, db再生速度Unused, nBGMAdjust, difficulty);
 		} catch (Exception ex) {
 			Trace.TraceError("おや?エラーが出たようです。お兄様。");
 			Trace.TraceError(ex.ToString());
 			Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度, int nBGMAdjust, int Difficulty) {
+	public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度Unused, int nBGMAdjust, int Difficulty) {
 		if (!string.IsNullOrEmpty(str全入力文字列)) {
-			#region [ 改行カット ]
-			this.db再生速度 = db再生速度;
-			#endregion
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
 				this.n無限管理WAV[j] = -j;
@@ -1421,8 +1414,8 @@ internal class CTja : CActivity {
 						case 0x01: {
 								n発声位置 = chip.n発声位置;
 
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 
 								#region[listlyric2の時間合わせ]
@@ -1444,8 +1437,8 @@ internal class CTja : CActivity {
 						case 0x02:  // BarLength
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								dbBarLength = chip.db実数値;
 								continue;
@@ -1453,8 +1446,8 @@ internal class CTja : CActivity {
 						case 0x03:  // BPM
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								bpm = this.BASEBPM + chip.n整数値;
 								this.dbNowBPM = bpm;
@@ -1471,15 +1464,15 @@ internal class CTja : CActivity {
 						case 0x1D:
 						case 0x20:
 						case 0x21: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.nNoteEndTimems += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x18: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1493,8 +1486,8 @@ internal class CTja : CActivity {
 							break;
 
 						case 0x50: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								if (this.n内部番号BRANCH1to + 1 > this.listBRANCH.Count)
 									continue;
 
@@ -1520,8 +1513,8 @@ internal class CTja : CActivity {
 						case 0x08:  // 拡張BPM
 						{
 								n発声位置 = chip.n発声位置;
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
 								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
 									bpm = (cBPM.n表記上の番号 == 0 ? 0.0 : this.BASEBPM) + cBPM.dbBPM値;
@@ -1531,27 +1524,27 @@ internal class CTja : CActivity {
 							}
 						case 0x54:  // 動画再生
 						{
-								if (this.bOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nOFFSET;
-								if (this.bMOVIEOFFSETの値がマイナスである == false)
-									chip.n発声時刻ms += this.nMOVIEOFFSET;
+								if (this.isOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+								if (this.isMOVIEOFFSET_Negative == false)
+									chip.n発声時刻ms += this.msMOVIEOFFSET_Abs;
 								else
-									chip.n発声時刻ms -= this.nMOVIEOFFSET;
+									chip.n発声時刻ms -= this.msMOVIEOFFSET_Abs;
 								continue;
 							}
 						case 0x97:
 						case 0x98:
 						case 0x99: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.nNoteEndTimems += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x9A: {
 
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1559,48 +1552,40 @@ internal class CTja : CActivity {
 								continue;
 							}
 						case 0xDC: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xDE: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.n分岐時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.n分岐時刻ms += this.msOFFSET_Abs;
 								}
 								this.n現在のコース = chip.nBranch;
 								continue;
 							}
 						case 0x52: {
-								if (this.bOFFSETの値がマイナスである) {
-									chip.n発声時刻ms += this.nOFFSET;
-									chip.n分岐時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative) {
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+									chip.n分岐時刻ms += this.msOFFSET_Abs;
 								}
 								this.n現在のコース = chip.nBranch;
 								continue;
 							}
 						case 0xDF: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xE0: {
 								continue;
 							}
 						default: {
-								if (this.bOFFSETの値がマイナスである)
-									chip.n発声時刻ms += this.nOFFSET;
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
 								chip.dbBPM = this.dbNowBPM;
 								continue;
 							}
-					}
-				}
-				if (this.db再生速度 > 0.0) {
-					double _db再生速度 = this.db再生速度;
-					foreach (CChip chip in this.listChip) {
-						chip.n発声時刻ms = (int)(((double)chip.n発声時刻ms) / _db再生速度);
-						chip.db発声時刻ms = (((double)chip.n発声時刻ms) / _db再生速度);
-						chip.nNoteEndTimems = (int)(((double)chip.nNoteEndTimems) / _db再生速度);
 					}
 				}
 				#endregion
@@ -2022,10 +2007,6 @@ internal class CTja : CActivity {
 			strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplitした後の譜面, 1);
 			this.n現在の小節数 = 1;
 			try {
-				#region[ 最初の処理 ]
-				//1小節の時間を挿入して開始時間を調節。
-				this.dbNowTime += ((15000.0 / 120.0 * (4.0 / 4.0)) * 16.0);
-				#endregion
 				for (int i = 0; strSplitした後の譜面.Length > i; i++) {
 					nNowReadLine++;
 					str = strSplitした後の譜面[i];
@@ -2178,8 +2159,13 @@ internal class CTja : CActivity {
 		#endregion
 
 		if (command == "#START") {
+			// apply global offset
+			var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
+			msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
+			this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
+			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
+
 			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			AddMusicPreTimeMs(); // 音源を鳴らす前に遅延。
 			var chip = new CChip();
 
 			chip.nChannelNo = 0x01;
@@ -2196,10 +2182,10 @@ internal class CTja : CActivity {
 
 			var chip1 = new CChip();
 			chip1.nChannelNo = 0x54;
-			if (this.nMOVIEOFFSET == 0)
+			if (this.msMOVIEOFFSET_Abs == 0)
 				chip1.n発声時刻ms = (int)this.dbNowTime;
 			else
-				chip1.n発声時刻ms = (int)this.nMOVIEOFFSET;
+				chip1.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
 			chip1.dbBPM = this.dbNowBPM;
 			chip1.fNow_Measure_m = this.fNow_Measure_m;
 			chip1.fNow_Measure_s = this.fNow_Measure_s;
@@ -2264,7 +2250,7 @@ internal class CTja : CActivity {
 				MinBPM = dbBPM;
 			}
 
-			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime - nNextSongOffset, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
+			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = 0, dbBPM値 = dbBPM, bpm_change_time = this.dbNowTime, bpm_change_bmscroll_time = this.dbNowBMScollTime, bpm_change_course = this.n現在のコース });
 
 
 			//チップ追加して割り込んでみる。
@@ -4567,9 +4553,6 @@ internal class CTja : CActivity {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
-			nNextSongOffset += nOFFSET;
-			var delayTime = 6200.0 + nOFFSET; // 6.2秒ディレイ
-											  //チップ追加して割り込んでみる。
 			var chip = new CChip();
 
 			chip.nChannelNo = 0x9B;
@@ -4577,15 +4560,17 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			this.dbNowTime += delayTime;
-			this.dbNowBMScollTime += (delayTime - nOFFSET) * this.dbNowBPM / 15000;
 			chip.n整数値_内部番号 = 0;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
 			this.listChip.Add(chip);
 
-			AddMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
+			// 6.2秒ディレイ
+			this.dbNowTime += msDanNextSongDelay;
+			this.dbNowBMScollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
+
+			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
 			strArray = SplitComma(argument); // \,をエスケープ処理するメソッドだぞっ
 
@@ -4719,7 +4704,6 @@ internal class CTja : CActivity {
 			cBranchStart.fMeasure_m = this.fNow_Measure_m;
 			cBranchStart.nMeasureCount = this.n現在の小節数;
 			cBranchStart.db移動待機時刻 = this.db移動待機時刻;
-			cBranchStart.db再生速度 = this.db再生速度;
 			cBranchStart.db出現時刻 = this.db出現時刻;
 			#endregion
 		} else {
@@ -4733,7 +4717,6 @@ internal class CTja : CActivity {
 			this.fNow_Measure_m = cBranchStart.fMeasure_m;
 			this.n現在の小節数 = cBranchStart.nMeasureCount;
 			this.db移動待機時刻 = cBranchStart.db移動待機時刻;
-			this.db再生速度 = cBranchStart.db再生速度;
 			this.db出現時刻 = cBranchStart.db出現時刻;
 			#endregion
 		}
@@ -5490,23 +5473,18 @@ internal class CTja : CActivity {
 				}
 			}
 		} else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam)) {
-			this.nOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.msOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.isOFFSET_Negative = this.msOFFSET_Abs < 0 ? true : false;
 
-			this.bOFFSETの値がマイナスである = this.nOFFSET < 0 ? true : false;
-
-			this.listBPM[0].bpm_change_bmscroll_time = -2000 * this.dbNowBPM / 15000;
-			if (this.bOFFSETの値がマイナスである == true)
-				this.nOFFSET = this.nOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
+			if (this.isOFFSET_Negative == true)
+				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 												  //tbOFFSET.Text = strCommandParam;
-
-			// Substract global offset
-			this.nOFFSET += ((this.bOFFSETの値がマイナスである == true) ? -OpenTaiko.ConfigIni.nGlobalOffsetMs : OpenTaiko.ConfigIni.nGlobalOffsetMs);
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
-			this.nMOVIEOFFSET = (int)(Convert.ToDouble(strCommandParam) * 1000);
-			this.bMOVIEOFFSETの値がマイナスである = this.nMOVIEOFFSET < 0 ? true : false;
+			this.msMOVIEOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
 
-			if (this.bMOVIEOFFSETの値がマイナスである == true)
-				this.nMOVIEOFFSET = this.nMOVIEOFFSET * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
+			if (this.isMOVIEOFFSET_Negative == true)
+				this.msMOVIEOFFSET_Abs = this.msMOVIEOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 															//tbOFFSET.Text = strCommandParam;
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]
@@ -6171,8 +6149,7 @@ internal class CTja : CActivity {
 
 					int duration = 0;
 					if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CTja.CWAV wc)) {
-						double _db再生速度 = this.db再生速度;
-						duration = (wc.rSound[0] == null) ? 0 : (int)(wc.rSound[0].TotalPlayTime / _db再生速度); // #23664 durationに再生速度が加味されておらず、低速再生でBGMが途切れる問題を修正 (発声時刻msは、DTX読み込み時に再生速度加味済)
+						duration = wc.rSound[0]?.TotalPlayTime ?? 0;
 					}
 					int n新RemoveMixer時刻ms, n新RemoveMixer位置;
 					t発声時刻msと発声位置を取得する(pChip.n発声時刻ms + duration + n発音後余裕ms, out n新RemoveMixer時刻ms, out n新RemoveMixer位置);
@@ -6514,10 +6491,61 @@ internal class CTja : CActivity {
 	/// <summary>
 	/// 音源再生前の空白を追加するメソッド。
 	/// </summary>
-	private void AddMusicPreTimeMs() {
+	private void AddPreBakedMusicPreTimeMs() {
 		this.dbNowTime += OpenTaiko.ConfigIni.MusicPreTimeMs;
 		this.dbNowBMScollTime += OpenTaiko.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
 	}
 	//-----------------
 	#endregion
+
+	// Time coordination converters
+
+	// DefTime is the time relative to the initial measure of the first song.
+	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
+	// * RawTjaTime is DefTime with additional initial padding time
+	// MusicPreTimeMs is pre-baked to only Dan
+	public static double DefTimeToRawTjaTime(double msTime, CTja tja)
+		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
+	public static double RawTjaTimeToDefTime(double msTime, CTja tja)
+		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
+
+	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
+	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
+	// * For negative msOFFSET, all and only note-time-relative events are delayed by msOFFSET_Abs.
+	public static double RawTjaTimeToTjaTimeMusic(double msTime, CTja tja)
+		=> msTime + (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double TjaTimeToRawTjaTimeMusic(double msTime, CTja tja)
+		=> msTime - (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double RawTjaTimeToTjaTimeNote(double msTime, CTja tja)
+		=> msTime + (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public static double TjaTimeToRawTjaTimeNote(double msTime, CTja tja)
+		=> msTime - (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+
+	// GameTime is the real elapsed time of gameplay.
+	// SongPlaybackSpeed scales the GameTime into the corresponding TjaTime
+	// MusicPreTimeMs is applied in real time to non-Dan
+	public static double GameTimeToTjaTime(double msTime, CTja tja)
+		=> GameDurationToTjaDuration((tja.n参照中の難易度 == (int)Difficulty.Dan) ?
+			msTime
+			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs);
+	public static double TjaTimeToGameTime(double msTime, CTja tja) {
+		msTime = TjaDurationToGameDuration(msTime);
+		return (tja.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
+			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
+	}
+
+	// GameDuration is time duration per beat.
+	// These converters are unit-independent.
+	public static double GameDurationToTjaDuration(double duration)
+		=> duration * OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double TjaDurationToGameDuration(double duration)
+		=> duration / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+
+	// BeatSpeed (including BPM) is the reciprocal of time duration per beat.
+	public static double GameBeatSpeedToTjaBeatSpeed(double beatSpeed)
+		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
+		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
 }

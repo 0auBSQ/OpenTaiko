@@ -48,8 +48,9 @@ static internal class CFloorManagement {
 	public static int MaxNumberOfLives = 5;
 	public static int CurrentNumberOfLives = 5;
 
+	// prevents one from playing in 7.65x or so speed and passing the life challenge easily.
 	public static double InvincibilityDurationSpeedDependent {
-		get => ((double)InvincibilityDuration) / OpenTaiko.ConfigIni.SongPlaybackSpeed;
+		get => CTja.TjaDurationToGameDuration(InvincibilityDuration);
 	}
 
 	// ms
