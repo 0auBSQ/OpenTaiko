@@ -1396,13 +1396,13 @@ internal class CTja : CActivity {
 							}
 						case 0x02:  // BarLength
 						{
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0x03:  // Initial BPM
 						{
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 								// this.dbNowBPM has already been initialized
 								continue;
@@ -1466,7 +1466,7 @@ internal class CTja : CActivity {
 							}
 						case 0x08:  // 拡張BPM
 						{
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
 									bpm = (cBPM.n表記上の番号 == 0 ? 0.0 : this.BASEBPM) + cBPM.dbBPM値;
@@ -4620,7 +4620,7 @@ internal class CTja : CActivity {
 		var chipInitScroll = new CChip();
 
 		chipInitScroll.nChannelNo = 0x9D;
-		chipInitScroll.n発声位置 = ((this.n現在の小節数 - 2) * 384);
+		chipInitScroll.n発声位置 = (this.n現在の小節数 * 384);
 		chipInitScroll.n整数値 = 0x00;
 		chipInitScroll.n整数値_内部番号 = this.n内部番号SCROLL1to;
 		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
@@ -4637,7 +4637,7 @@ internal class CTja : CActivity {
 		var chipInitBpm = new CChip();
 
 		chipInitBpm.nChannelNo = 0x03;
-		chipInitBpm.n発声位置 = ((this.n現在の小節数 - 1) * 384);
+		chipInitBpm.n発声位置 = (this.n現在の小節数 * 384);
 		chipInitBpm.n整数値 = 0x00;
 		chipInitBpm.n整数値_内部番号 = 1;
 
@@ -4649,7 +4649,7 @@ internal class CTja : CActivity {
 		// and HBScroll gimmicks regarding `BPM:` are also supported in TaikoJiro,
 		// so it is now handled here for simplicity.
 		CChip chipInitBpmChange = new CChip();
-		chipInitBpmChange.n発声位置 = 0;
+		chipInitBpmChange.n発声位置 = (this.n現在の小節数 * 384);
 		chipInitBpmChange.nChannelNo = 8;      // 拡張BPM
 		chipInitBpmChange.n整数値 = 0;
 		chipInitBpmChange.n整数値_内部番号 = bpmInit.n内部番号;
@@ -4673,6 +4673,7 @@ internal class CTja : CActivity {
 		// add movie start chip
 		var chipMovie = new CChip();
 		chipMovie.nChannelNo = 0x54;
+		chipMovie.n発声位置 = 384;
 		if (this.msMOVIEOFFSET_Abs == 0)
 			chipMovie.n発声時刻ms = (int)this.dbNowTime;
 		else
