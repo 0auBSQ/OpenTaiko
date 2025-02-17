@@ -2952,10 +2952,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 					break;
 				#endregion
 				#region [ 03: BPM変更 ]
-				case 0x03:  // BPM変更
+				case 0x03:  // Initial BPM
 					if (!pChip.bHit && time < 0) {
 						pChip.bHit = true;
-						this.actPlayInfo.dbBPM[nPlayer] = dTX.BASEBPM; //2016.07.10 kairera0467 太鼓の仕様にあわせて修正。(そもそもの仕様が不明&コードミス疑惑)
+						// this.actPlayInfo.dbBPM[nPlayer] has already been initialized
+						// Alternative behavior: Start with 120 BPM chara speed, switch to initial BPM chara speed at this chip?
 					}
 					break;
 				#endregion

@@ -1391,7 +1391,7 @@ internal class CTja : CActivity {
 				this.n内部番号BRANCH1to = 0;
 				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
-				double bpm = 120.0;
+				double bpm = this.BASEBPM;
 				int n発声位置 = 0;
 				int ms = 0;
 				int nBar = 0;
@@ -1400,6 +1400,11 @@ internal class CTja : CActivity {
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
 
+
+				// Chip post-process:
+				// * Offset chips from RawTjaTime To TjaTime; see RawTjaTimeToTjaTimeMusic()
+				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
+				//   (also affect notes' time in TaikoJiro 2 (?))
 				foreach (CChip chip in this.listChip) {
 					switch (chip.nChannelNo) {
 						case 0x02 or 0x01 or 0x08:
@@ -1452,14 +1457,13 @@ internal class CTja : CActivity {
 								dbBarLength = chip.db実数値;
 								continue;
 							}
-						case 0x03:  // BPM
+						case 0x03:  // Initial BPM
 						{
 								n発声位置 = chip.n発声位置;
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 								ms = chip.n発声時刻ms;
-								bpm = this.BASEBPM + chip.n整数値;
-								this.dbNowBPM = bpm;
+								// this.dbNowBPM has already been initialized
 								continue;
 							}
 						case 0x04:  // BGA (レイヤBGA1)
