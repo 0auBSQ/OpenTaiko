@@ -1301,36 +1301,6 @@ internal class CTja : CActivity {
 			this.n無限管理PAN = null;
 			this.n無限管理SIZE = null;
 			if (!this.bヘッダのみ) {
-				#region [ BPM/BMP初期化 ]
-				int ch;
-				CBPM cbpm = null;
-				foreach (CBPM cbpm2 in this.listBPM.Values) {
-					if (cbpm2.n表記上の番号 == 0) {
-						cbpm = cbpm2;
-						break;
-					}
-				}
-				if (cbpm == null) {
-					cbpm = new CBPM();
-					cbpm.n内部番号 = this.n内部番号BPM1to++;
-					cbpm.n表記上の番号 = 0;
-					cbpm.dbBPM値 = 120.0;
-					this.listBPM.Add(cbpm.n内部番号, cbpm);
-					CChip chip = new CChip();
-					chip.n発声位置 = 0;
-					chip.nChannelNo = 8;      // 拡張BPM
-					chip.n整数値 = 0;
-					chip.n整数値_内部番号 = cbpm.n内部番号;
-					this.listChip.Insert(0, chip);
-				} else {
-					CChip chip = new CChip();
-					chip.n発声位置 = 0;
-					chip.nChannelNo = 8;      // 拡張BPM
-					chip.n整数値 = 0;
-					chip.n整数値_内部番号 = cbpm.n内部番号;
-					this.listChip.Insert(0, chip);
-				}
-				#endregion
 				#region [ CWAV初期化 ]
 				foreach (CWAV cwav in this.listWAV.Values) {
 					if (cwav.nチップサイズ < 0) {
@@ -1420,7 +1390,7 @@ internal class CTja : CActivity {
 							break;
 					}
 					nBar = chip.n発声位置 / 384;
-					ch = chip.nChannelNo;
+					int ch = chip.nChannelNo;
 
 					nCount++;
 
@@ -4692,7 +4662,8 @@ internal class CTja : CActivity {
 		this.n内部番号SCROLL1to++;
 
 		// apply initial BPM
-		this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = this.BASEBPM, });
+		CBPM bpmInit = new() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = this.BASEBPM, };
+		this.listBPM.Add(this.n内部番号BPM1to - 1, bpmInit);
 		this.n内部番号BPM1to++;
 
 		// add initial BPM chip
@@ -4704,6 +4675,18 @@ internal class CTja : CActivity {
 		chipInitBpm.n整数値_内部番号 = 1;
 
 		this.listChip.Add(chipInitBpm);
+
+		// add initial BPMCHANGE chip
+		// Previously this was set up with the first BPMCHANGE during chip post-processing as a part of DTX processing.
+		// However, `BPM:` in TJA is usually used for the actually initial BPM,
+		// and HBScroll gimmicks regarding `BPM:` are also supported in TaikoJiro,
+		// so it is now handled here for simplicity.
+		CChip chipInitBpmChange = new CChip();
+		chipInitBpmChange.n発声位置 = 0;
+		chipInitBpmChange.nChannelNo = 8;      // 拡張BPM
+		chipInitBpmChange.n整数値 = 0;
+		chipInitBpmChange.n整数値_内部番号 = bpmInit.n内部番号;
+		this.listChip.Add(chipInitBpmChange);
 
 		// add music start chip
 		//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
