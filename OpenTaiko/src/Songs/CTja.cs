@@ -1315,7 +1315,6 @@ internal class CTja : CActivity {
 					}
 				}
 				#endregion
-				#region [ 拍子_拍線の挿入 ]
 				if (this.listChip.Count > 0) {
 					this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
 												// 保守性確保を優先してここでのソートは残しておく
@@ -1323,38 +1322,6 @@ internal class CTja : CActivity {
 												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 												// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
-				#endregion
-				#region [ C2 [拍線_小節線表示指定] の処理 ]		// #28145 2012.4.21 yyagi; 2重ループをほぼ1重にして高速化
-				bool bShowBeatBarLine = true;
-				for (int i = 0; i < this.listChip.Count; i++) {
-					bool bChangedBeatBarStatus = false;
-					if ((this.listChip[i].nChannelNo == 0xc2)) {
-						if (this.listChip[i].n整数値 == 1)             // BAR/BEAT LINE = ON
-						{
-							bShowBeatBarLine = true;
-							bChangedBeatBarStatus = true;
-						} else if (this.listChip[i].n整数値 == 2)            // BAR/BEAT LINE = OFF
-						{
-							bShowBeatBarLine = false;
-							bChangedBeatBarStatus = true;
-						}
-					}
-					int startIndex = i;
-					if (bChangedBeatBarStatus)                          // C2チップの前に50/51チップが来ている可能性に配慮
-					{
-						while (startIndex > 0 && this.listChip[startIndex].n発声位置 == this.listChip[i].n発声位置) {
-							startIndex--;
-						}
-						startIndex++;   // 1つ小さく過ぎているので、戻す
-					}
-					for (int j = startIndex; j <= i; j++) {
-						if ((this.listChip[j].nChannelNo == 0x50) &&
-							(this.listChip[j].n整数値 == (36 * 36 - 1))) {
-							this.listChip[j].bVisible = bShowBeatBarLine;
-						}
-					}
-				}
-				#endregion
 				this.n内部番号BRANCH1to = 0;
 				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
