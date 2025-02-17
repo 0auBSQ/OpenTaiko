@@ -3319,11 +3319,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 								this.actPlayInfo.dbBPM[nPlayer] = cBPM.dbBPM値;// + dTX.BASEBPM;
 							}
 
-
-							for (int i = 0; i < 5; i++) {
-								ctChipAnime[i] = new CCounter(0, 3, 60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * 1 / 4, SoundManager.PlayTimer);
-							}
-
 							UpdateCharaCounter(nPlayer);
 							//this.actDancer.ct踊り子モーション = new CCounter(0, this.actDancer.ar踊り子モーション番号.Length - 1, (dbUnit * CDTXMania.Skin.Game_Dancer_Beat) / this.actDancer.ar踊り子モーション番号.Length, CSound管理.rc演奏用タイマ);
 							//this.actChara.ctモブモーション = new CCounter(0, this.actChara.arモブモーション番号.Length - 1, (dbUnit) / this.actChara.arモブモーション番号.Length, CSound管理.rc演奏用タイマ);
