@@ -2172,43 +2172,7 @@ internal class CTja : CActivity {
 		#endregion
 
 		if (command == "#START") {
-			// apply global offset
-			var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
-			msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
-			this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
-			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
-
-			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x01;
-			chip.n発声位置 = 384;
-			chip.n発声時刻ms = (int)this.dbNowTime;
-			chip.fNow_Measure_m = this.fNow_Measure_m;
-			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.fBMSCROLLTime = this.dbNowBMScollTime;
-			chip.n整数値 = 0x01;
-			chip.n整数値_内部番号 = 1;
-
-			// チップを配置。
-			this.listChip.Add(chip);
-
-			var chip1 = new CChip();
-			chip1.nChannelNo = 0x54;
-			if (this.msMOVIEOFFSET_Abs == 0)
-				chip1.n発声時刻ms = (int)this.dbNowTime;
-			else
-				chip1.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
-			chip1.dbBPM = this.dbNowBPM;
-			chip1.fNow_Measure_m = this.fNow_Measure_m;
-			chip1.fNow_Measure_s = this.fNow_Measure_s;
-			chip1.dbSCROLL = this.dbNowScroll;
-			chip1.n整数値 = 0x01;
-			chip1.n整数値_内部番号 = 1;
-
-			// チップを配置。
-
-			this.listChip.Add(chip1);
+			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
 			// TaikoJiro compatibility: #END ends unended rolls
 			for (int i = 0; i < 3; i++) {
@@ -4704,6 +4668,75 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		}
 	}
+
+	private void InitializeChartDefinitionBody() {
+		// apply global offset
+		var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
+		msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
+		this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
+		this.isOFFSET_Negative = (msOFFSET_Signed < 0);
+
+		// apply initial SCROLL
+		this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = this.dbScrollSpeed, });
+
+		// add initial SCROLL chip
+		var chipInitScroll = new CChip();
+
+		chipInitScroll.nChannelNo = 0x9D;
+		chipInitScroll.n発声位置 = ((this.n現在の小節数 - 2) * 384);
+		chipInitScroll.n整数値 = 0x00;
+		chipInitScroll.n整数値_内部番号 = this.n内部番号SCROLL1to;
+		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
+
+		this.listChip.Add(chipInitScroll);
+		this.n内部番号SCROLL1to++;
+
+		// apply initial BPM
+		this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = this.BASEBPM, });
+		this.n内部番号BPM1to++;
+
+		// add initial BPM chip
+		var chipInitBpm = new CChip();
+
+		chipInitBpm.nChannelNo = 0x03;
+		chipInitBpm.n発声位置 = ((this.n現在の小節数 - 1) * 384);
+		chipInitBpm.n整数値 = 0x00;
+		chipInitBpm.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipInitBpm);
+
+		// add music start chip
+		//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
+		var chipMusic = new CChip();
+
+		chipMusic.nChannelNo = 0x01;
+		chipMusic.n発声位置 = 384;
+		chipMusic.n発声時刻ms = (int)this.dbNowTime;
+		chipMusic.fNow_Measure_m = this.fNow_Measure_m;
+		chipMusic.fNow_Measure_s = this.fNow_Measure_s;
+		chipMusic.fBMSCROLLTime = this.dbNowBMScollTime;
+		chipMusic.n整数値 = 0x01;
+		chipMusic.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipMusic);
+
+		// add movie start chip
+		var chipMovie = new CChip();
+		chipMovie.nChannelNo = 0x54;
+		if (this.msMOVIEOFFSET_Abs == 0)
+			chipMovie.n発声時刻ms = (int)this.dbNowTime;
+		else
+			chipMovie.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
+		chipMovie.dbBPM = this.dbNowBPM;
+		chipMovie.fNow_Measure_m = this.fNow_Measure_m;
+		chipMovie.fNow_Measure_s = this.fNow_Measure_s;
+		chipMovie.dbSCROLL = this.dbNowScroll;
+		chipMovie.n整数値 = 0x01;
+		chipMovie.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipMovie);
+	}
+
 	void t現在のチップ情報を記録する(bool bInPut) {
 		//2020.04.21 こうなってしまったのは仕方がないな。。
 		if (bInPut) {
@@ -5441,21 +5474,6 @@ internal class CTja : CActivity {
 			this.MinBPM = dbBPM;
 			this.MaxBPM = dbBPM;
 			this.dbNowBPM = dbBPM;
-
-			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = dbBPM, });
-			this.n内部番号BPM1to++;
-
-
-			//チップ追加して割り込んでみる。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x03;
-			chip.n発声位置 = ((this.n現在の小節数 - 1) * 384);
-			chip.n整数値 = 0x00;
-			chip.n整数値_内部番号 = 1;
-
-			this.listChip.Add(chip);
-			//tbBPM.Text = strCommandParam;
 		} else if (strCommandName.Equals("WAVE")) {
 			if (strBGM_PATH != null) {
 				Trace.TraceWarning($"{nameof(CTja)} is ignoring an extra WAVE header in {this.strファイル名の絶対パス}");
@@ -5570,26 +5588,6 @@ internal class CTja : CActivity {
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
 
 			this.dbScrollSpeed = Convert.ToDouble(strCommandParam);
-
-			this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = this.dbScrollSpeed, });
-
-
-			//チップ追加して割り込んでみる。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x9D;
-			chip.n発声位置 = ((this.n現在の小節数 - 2) * 384);
-			chip.n整数値 = 0x00;
-			chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
-			chip.dbSCROLL = this.dbScrollSpeed;
-
-			// チップを配置。
-
-			this.listChip.Add(chip);
-			this.n内部番号SCROLL1to++;
-
-			//this.nScoreDiff = Convert.ToInt16( strCommandParam );
-			//tbScoreDiff.Text = strCommandParam;
 		} else if (strCommandName.Equals("GENRE")) {
 			//2015.03.28 kairera0467
 			//ジャンルの定義。DTXから入力もできるが、tjaからも入力できるようにする。
