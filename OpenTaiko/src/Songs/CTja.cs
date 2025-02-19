@@ -1376,16 +1376,10 @@ internal class CTja : CActivity {
 				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
 				//   (also affect notes' time in TaikoJiro 2 (?))
 				foreach (CChip chip in this.listChip) {
+					// reassign the timing of measure-position-based chips
+					// TODO: remove this process completely for 0xDD (#SECTION)
 					switch (chip.nChannelNo) {
-						case 0x02 or 0x01 or 0x08:
-						case >= 0x11 and <= 0x1F:
-						case 0x50 or 0x54:
-						case 0xF1 or 0xF2 or 0xFF:
-							break;
-						case 0xDD or 0xDF:
-						case < 0x93:
-						// case > 0x9F and < 0xA0: // impossible case
-						case >= 0xF0 and < 0xFE:
+						case 0xDD:
 							chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
 							break;
 					}
