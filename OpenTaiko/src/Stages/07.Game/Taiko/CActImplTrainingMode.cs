@@ -384,12 +384,6 @@ class CActImplTrainingMode : CActivity {
 				dTX.listChip[i].bVisible = false;
 				dTX.listChip[i].bShow = false;
 			}
-			if (i < n少し戻ってから演奏開始Chip && dTX.listChip[i].nChannelNo == 0x01) {
-				dTX.listChip[i].bHit = true;
-				dTX.listChip[i].IsHitted = true;
-				dTX.listChip[i].bVisible = false;
-				dTX.listChip[i].bShow = false;
-			}
 			if (dTX.listChip[i].nChannelNo == 0x50 && dTX.listChip[i].n整数値_内部番号 < finalStartBar) {
 				dTX.listChip[i].bHit = true;
 				dTX.listChip[i].IsHitted = true;

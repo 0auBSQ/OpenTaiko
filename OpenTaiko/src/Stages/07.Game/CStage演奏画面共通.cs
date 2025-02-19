@@ -2912,7 +2912,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 
 			if (pChip.nHorizontalChipDistance < -150) {
-				if (!(NotesManager.IsMissableNote(pChip))) {
+				if (NotesManager.IsHittableNote(pChip) && !(NotesManager.IsMissableNote(pChip))) {
 					//2016.02.11 kairera0467
 					//太鼓の単音符の場合は座標による判定を行わない。
 					//(ここで判定をすると高スピードでスクロールしている時に見逃し不可判定が行われない。)
@@ -2943,7 +2943,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			switch (pChip.nChannelNo) {
 				#region [ 01: BGM ]
 				case 0x01:  // BGM
-					if (!pChip.bHit && time < 0) {
+					if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bBGMPlayVoiceSound) {
 							dTX.tチップの再生(pChip, SoundManager.PlayTimer.PrevResetTimeMs + (long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, tja));
@@ -3196,7 +3196,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#endregion
 				#region [ 54: 動画再生 ]
 				case 0x54:  // 動画再生
-					if (!pChip.bHit && time < 0) {
+					if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bEnableAVI) {
 							if ((dTX.listVD.TryGetValue(pChip.n整数値_内部番号, out CVideoDecoder vd))) {
@@ -3210,7 +3210,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 					break;
 				case 0x55:
-					if (!pChip.bHit && time < 0) {
+					if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bEnableAVI) {
 							if ((dTX.listVD.TryGetValue(pChip.n整数値_内部番号, out CVideoDecoder vd))) {
@@ -4537,12 +4537,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 		}
+		int idxCurrentTopMostChip;
 		if (!bSuccessSeek) {
 			// this.n現在のトップChip = CDTXMania.DTX.listChip.Count - 1;
-			this.nCurrentTopChip = 0;       // 対象小節が存在しないなら、最初から再生
+			idxCurrentTopMostChip = this.nCurrentTopChip = 0;       // 対象小節が存在しないなら、最初から再生
 		} else {
-			while (this.nCurrentTopChip != 0 && dTX.listChip[this.nCurrentTopChip].n発声時刻ms == dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip - 1].n発声時刻ms)
-				OpenTaiko.stageGameScreen.nCurrentTopChip--;
+			idxCurrentTopMostChip = this.nCurrentTopChip;
+			while (this.nCurrentTopChip != 0 && dTX.listChip[this.nCurrentTopChip].n発声時刻ms == dTX.listChip[this.nCurrentTopChip - 1].n発声時刻ms)
+				this.nCurrentTopChip--;
 		}
 		#endregion
 		#region [ 演奏開始の発声時刻msを取得し、タイマに設定 ]
@@ -4559,14 +4561,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 		List<CSound> pausedCSound = new List<CSound>();
 
 		#region [ BGMやギターなど、演奏開始のタイミングで再生がかかっているサウンドのの途中再生開始 ] // (CDTXのt入力_行解析_チップ配置()で小節番号が+1されているのを削っておくこと)
-		for (int i = this.nCurrentTopChip; i >= 0; i--) {
+		for (int i = 0; i <= idxCurrentTopMostChip; ++i) {
 			CChip pChip = dTX.listChip[i];
 			int nDuration = (int)CTja.TjaDurationToGameDuration(pChip.GetDuration());
 			long n発声時刻ms = (long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, dTX);
 
-			if ((n発声時刻ms + nDuration > 0) && (n発声時刻ms <= nStartTime) && (nStartTime <= n発声時刻ms + nDuration)) {
+			if (n発声時刻ms <= nStartTime) {
 				if (pChip.nChannelNo == 0x01 && (pChip.nChannelNo >> 4) != 0xB) // wav系チャンネル、且つ、空打ちチップではない
 				{
+					pChip.bHit = true;
+					if (!((nDuration > 0) && (nStartTime <= n発声時刻ms + nDuration)))
+						continue;
+
 					CTja.CWAV wc;
 					bool b = dTX.listWAV.TryGetValue(pChip.n整数値_内部番号, out wc);
 					if (!b) continue;
@@ -4589,9 +4595,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#region [ 演奏開始時点で既に表示されているBGAとAVIの、シークと再生 ]
 		if (dTX.listVD.Count > 0) {
 			for (int i = 0; i < dTX.listChip.Count; i++) {
-				if (dTX.listChip[i].nChannelNo == 0x54) {
-					if (dTX.listChip[i].n発声時刻ms <= nStartTime) {
-						this.actAVI.Seek(nStartTime - dTX.listChip[i].n発声時刻ms);
+				CChip chip = dTX.listChip[i];
+				if (chip.nChannelNo == 0x54) {
+					if (chip.n発声時刻ms <= nStartTime) {
+						chip.bHit = true;
+						this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
 						this.actAVI.Start(0x54, this.actAVI.rVD);
 						break;
 					} else {
