@@ -583,7 +583,7 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			var nTime = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, OpenTaiko.GetTJA(i)!);
+			var nTime = (long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			if (this.n総移動時間[i] != -1) {
 				if (n移動方向[i] == 1) {
 					OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (int)((((int)nTime - this.n移動開始時刻[i]) / (double)(this.n総移動時間[i])) * this.n移動距離px[i]);
@@ -792,7 +792,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public void t判定枠移動(double db移動時間, int n移動px, int n移動方向, int nPlayer, int vJs) {
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
-		this.n移動開始時刻[nPlayer] = (int)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja);
+		this.n移動開始時刻[nPlayer] = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 		this.n移動開始X[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLX[nPlayer];
 		this.n移動開始Y[nPlayer] = OpenTaiko.stageGameScreen.JPOSCROLLY[nPlayer];
 		this.n総移動時間[nPlayer] = (int)(db移動時間 * 1000);

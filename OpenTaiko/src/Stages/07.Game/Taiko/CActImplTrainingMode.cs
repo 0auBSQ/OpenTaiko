@@ -137,7 +137,7 @@ class CActImplTrainingMode : CActivity {
 					}
 					if (t配列の値interval以下か(ref this.RBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
 						for (int index = 0; index < this.JumpPointList.Count; index++) {
-							if (this.JumpPointList[index].Time >= CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja)) {
+							if (this.JumpPointList[index].Time >= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
 								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.soundSkip.tPlay();
@@ -160,7 +160,7 @@ class CActImplTrainingMode : CActivity {
 					}
 					if (t配列の値interval以下か(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
 						for (int index = this.JumpPointList.Count - 1; index >= 0; index--) {
-							if (this.JumpPointList[index].Time <= CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja)) {
+							if (this.JumpPointList[index].Time <= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
 								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.sound特訓スキップ音.tPlay();
@@ -227,14 +227,14 @@ class CActImplTrainingMode : CActivity {
 					this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
 				}
 
-				if (CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja) > this.n最終演奏位置ms) {
-					this.n最終演奏位置ms = (long)(CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja));
+				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) > this.n最終演奏位置ms) {
+					this.n最終演奏位置ms = (long)(tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
 				}
 			}
 
 		}
 
-		var current = CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja);
+		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 		var percentage = double.Clamp(current / length, 0, 1);
 
 		var currentWhite = (double)(this.n最終演奏位置ms);
@@ -422,12 +422,12 @@ class CActImplTrainingMode : CActivity {
 		}
 
 		if (doScroll) {
-			this.nスクロール後ms = (long)CTja.TjaTimeToGameTime(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms, dTX);
+			this.nスクロール後ms = (long)dTX.TjaTimeToGameTime(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms);
 			this.bCurrentlyScrolling = true;
 
 			this.ctScrollCounter = new CCounter(0, OpenTaiko.Skin.Game_Training_ScrollTime, 1, OpenTaiko.Timer);
 		} else {
-			SoundManager.PlayTimer.NowTimeMs = (long)CTja.TjaTimeToGameTime(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms, dTX);
+			SoundManager.PlayTimer.NowTimeMs = (long)dTX.TjaTimeToGameTime(dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms);
 			this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 		}
 	}
@@ -435,7 +435,7 @@ class CActImplTrainingMode : CActivity {
 	public void tToggleBookmarkAtTheCurrentPosition() {
 		if (!this.bCurrentlyScrolling && this.bTrainingPAUSE) {
 			CTja tja = OpenTaiko.TJA!;
-			STJUMPP _JumpPoint = new STJUMPP() { Time = (long)CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja), Measure = this.nCurrentMeasure };
+			STJUMPP _JumpPoint = new STJUMPP() { Time = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), Measure = this.nCurrentMeasure };
 
 			if (!JumpPointList.Contains(_JumpPoint))
 				JumpPointList.Add(_JumpPoint);

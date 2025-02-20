@@ -6460,35 +6460,35 @@ internal class CTja : CActivity {
 	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
 	// * RawTjaTime is DefTime with additional initial padding time
 	// MusicPreTimeMs is pre-baked to only Dan
-	public static double DefTimeToRawTjaTime(double msTime, CTja tja)
-		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+	public double DefTimeToRawTjaTime(double msTime)
+		=> (this.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
 			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
-	public static double RawTjaTimeToDefTime(double msTime, CTja tja)
-		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+	public double RawTjaTimeToDefTime(double msTime)
+		=> (this.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
 			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
 
 	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
 	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
 	// * For negative msOFFSET, all and only note-time-relative events are delayed by msOFFSET_Abs.
-	public static double RawTjaTimeToTjaTimeMusic(double msTime, CTja tja)
-		=> msTime + (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double TjaTimeToRawTjaTimeMusic(double msTime, CTja tja)
-		=> msTime - (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double RawTjaTimeToTjaTimeNote(double msTime, CTja tja)
-		=> msTime + (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double TjaTimeToRawTjaTimeNote(double msTime, CTja tja)
-		=> msTime - (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public double RawTjaTimeToTjaTimeMusic(double msTime)
+		=> msTime + (!this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double TjaTimeToRawTjaTimeMusic(double msTime)
+		=> msTime - (!this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double RawTjaTimeToTjaTimeNote(double msTime)
+		=> msTime + (this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double TjaTimeToRawTjaTimeNote(double msTime)
+		=> msTime - (this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
 
 	// GameTime is the real elapsed time of gameplay.
 	// SongPlaybackSpeed scales the GameTime into the corresponding TjaTime
 	// MusicPreTimeMs is applied in real time to non-Dan
-	public static double GameTimeToTjaTime(double msTime, CTja tja)
-		=> GameDurationToTjaDuration((tja.n参照中の難易度 == (int)Difficulty.Dan) ?
+	public double GameTimeToTjaTime(double msTime)
+		=> GameDurationToTjaDuration((this.n参照中の難易度 == (int)Difficulty.Dan) ?
 			msTime
 			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs);
-	public static double TjaTimeToGameTime(double msTime, CTja tja) {
+	public double TjaTimeToGameTime(double msTime) {
 		msTime = TjaDurationToGameDuration(msTime);
-		return (tja.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
+		return (this.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
 			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
 	}
 
