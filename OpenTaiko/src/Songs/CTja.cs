@@ -79,26 +79,6 @@ internal class CTja : CActivity {
 		}
 	}
 
-	public class CDELAY {
-		public int nDELAY値; //格納時にはmsになっているため、doubleにはしない。
-		public int n内部番号;
-		public int n表記上の番号;
-		public double delay_time;
-		public double delay_bmscroll_time;
-		public double delay_bpm;
-		public ECourse delay_course = ECourse.eNormal;
-
-		public override string ToString() {
-			StringBuilder builder = new StringBuilder(0x80);
-			if (this.n内部番号 != this.n表記上の番号) {
-				builder.Append(string.Format("CDELAY{0}(内部{1})", CTja.tZZ(this.n表記上の番号), this.n内部番号));
-			} else {
-				builder.Append(string.Format("CDELAY{0}", CTja.tZZ(this.n表記上の番号)));
-			}
-			builder.Append(string.Format(", DELAY:{0}", this.nDELAY値));
-			return builder.ToString();
-		}
-	}
 	public enum EBranchConditionType {
 		Accuracy,
 		Drumroll,
@@ -328,7 +308,6 @@ internal class CTja : CActivity {
 	private double[] dbNowSCROLL_Expert;
 	private double[] dbNowSCROLL_Master;
 
-	public Dictionary<int, CDELAY> listDELAY;
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
 	public const double msDanNextSongDelay = 6200.0;
@@ -1969,7 +1948,6 @@ internal class CTja : CActivity {
 			}
 			nDELAY *= 1000;
 
-			this.listDELAY.Add(this.n内部番号DELAY1to, new CDELAY() { n内部番号 = this.n内部番号DELAY1to, n表記上の番号 = 0, nDELAY値 = (int)nDELAY, delay_bmscroll_time = this.dbLastBMScrollTime, delay_bpm = this.dbNowBPM, delay_course = this.n現在のコース, delay_time = this.dbLastTime });
 			//チップ追加して割り込んでみる。
 			var chip = new CChip();
 
@@ -1979,7 +1957,6 @@ internal class CTja : CActivity {
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
 			chip.nBranch = this.n現在のコース;
-			chip.n整数値_内部番号 = this.n内部番号DELAY1to;
 			chip.fBMSCROLLTime = this.dbNowBMScollTime;
 			// チップを配置。
 
@@ -1987,7 +1964,6 @@ internal class CTja : CActivity {
 			this.dbNowBMScollTime += nDELAY * this.dbNowBPM / 15000;
 
 			this.listChip.Add(chip);
-			this.n内部番号DELAY1to++;
 		} else if (command == "#GOGOSTART") {
 			var chip = new CChip();
 
@@ -4774,7 +4750,6 @@ internal class CTja : CActivity {
 		this.listSCROLL_Expert = new Dictionary<int, CSCROLL>();
 		this.listSCROLL_Master = new Dictionary<int, CSCROLL>();
 		this.listJPOSSCROLL = new Dictionary<int, CJPOSSCROLL>();
-		this.listDELAY = new Dictionary<int, CDELAY>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
 		this.listChip_Branch = new List<CChip>[3];
@@ -4811,10 +4786,6 @@ internal class CTja : CActivity {
 		if (this.listBPM != null) {
 			this.listBPM.Clear();
 			this.listBPM = null;
-		}
-		if (this.listDELAY != null) {
-			this.listDELAY.Clear();
-			this.listDELAY = null;
 		}
 		if (this.listSCROLL != null) {
 			this.listSCROLL.Clear();
@@ -4929,7 +4900,6 @@ internal class CTja : CActivity {
 	private int n内部番号BPM1to;
 	private int n内部番号SCROLL1to;
 	private int n内部番号JSCROLL1to;
-	private int n内部番号DELAY1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
 	private int[] n無限管理PAN;
