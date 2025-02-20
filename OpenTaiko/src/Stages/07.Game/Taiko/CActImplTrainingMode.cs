@@ -235,10 +235,10 @@ class CActImplTrainingMode : CActivity {
 		}
 
 		var current = CTja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs, tja);
-		var percentage = current / length;
+		var percentage = double.Clamp(current / length, 0, 1);
 
 		var currentWhite = (double)(this.n最終演奏位置ms);
-		var percentageWhite = currentWhite / length;
+		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
 
 		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
 		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
