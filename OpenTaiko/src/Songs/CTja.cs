@@ -1604,17 +1604,8 @@ internal class CTja : CActivity {
 		for (int i = 0; i < input.Length; i++) {
 			if (input[i].Equals(',')) // カンマにぶち当たった
 			{
-				if (i - 1 >= 0)// &&演算子でも、例外が起きるので...
-				{
-					if (input[i - 1].Equals('\\')) // 1文字前がバックスラッシュ
-					{
-						input = input.Remove(i - 1, 1);
-					} else {
-						// workingIndexから今の位置までをリストにブチ込む
-						result.Add(input.Substring(workingIndex, i - workingIndex));
-						// workingIndexに今の位置+1を代入
-						workingIndex = i + 1;
-					}
+				if (i - 1 >= 0 && input[i - 1].Equals('\\')) { // &&演算子でも、例外が起きるので...
+					input = input.Remove(i - 1, 1);
 				} else {
 					// workingIndexから今の位置までをリストにブチ込む
 					result.Add(input.Substring(workingIndex, i - workingIndex));
@@ -1636,32 +1627,6 @@ internal class CTja : CActivity {
 	/// <param name="InputText"></param>
 	private void t命令を挿入する(string InputText) {
 		#region [Split comma and arguments values]
-
-		string[] SplitComma(string input) {
-			var result = new List<string>();
-			var workingIndex = 0;
-			for (int i = 0; i < input.Length; i++) {
-				if (input[i] == ',') // カンマにぶち当たった
-				{
-					if (input[i - 1] == '\\') // 1文字前がバックスラッシュ
-					{
-						input = input.Remove(i - 1, 1);
-					} else {
-						// workingIndexから今の位置までをリストにブチ込む
-						result.Add(input.Substring(workingIndex, i - workingIndex));
-						// workingIndexに今の位置+1を代入
-						workingIndex = i + 1;
-					}
-				}
-				if (i + 1 == input.Length) // 最後に
-				{
-					result.Add(input.Substring(workingIndex, input.Length - workingIndex));
-				}
-			}
-			return result.ToArray();
-		}
-
-
 		var match = CommandAndArgumentRegex.Match(InputText);
 		if (!match.Success) {
 			return;
