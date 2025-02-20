@@ -4732,51 +4732,26 @@ internal class CTja : CActivity {
 			foreach (CWAV cwav in this.listWAV.Values) {
 				cwav.Dispose();
 			}
-			this.listWAV = null;
+			this.listWAV.Clear();
 		}
 		if (this.listVD != null) {
 			foreach (CVideoDecoder cvd in this.listVD.Values) {
 				cvd.Dispose();
 			}
-			this.listVD = null;
+			this.listVD.Clear();
 		}
-		if (this.listBPM != null) {
-			this.listBPM.Clear();
-			this.listBPM = null;
-		}
-		if (this.listJPOSSCROLL != null) {
-			this.listJPOSSCROLL.Clear();
-			this.listJPOSSCROLL = null;
-		}
-		if (this.List_DanSongs != null) {
-			this.List_DanSongs.Clear();
-			this.List_DanSongs = null;
-		}
+		this.listBPM?.Clear();
+		this.listJPOSSCROLL?.Clear();
+		this.List_DanSongs?.Clear();
+		this.listChip?.Clear();
 
-		if (this.listChip != null) {
-			this.listChip.Clear();
-		}
+		this.listBalloon?.Clear();
+		this.listBalloon_Normal?.Clear();
+		this.listBalloon_Expert?.Clear();
+		this.listBalloon_Master?.Clear();
 
-		if (this.listBalloon != null) {
-			this.listBalloon.Clear();
-		}
-		if (this.listBalloon_Normal != null) {
-			this.listBalloon_Normal.Clear();
-		}
-		if (this.listBalloon_Expert != null) {
-			this.listBalloon_Expert.Clear();
-		}
-		if (this.listBalloon_Master != null) {
-			this.listBalloon_Master.Clear();
-		}
-		if (this.listLyric != null) {
-			this.listLyric.Clear();
-		}
-		if (this.listLyric2 != null) {
-			this.listLyric2.Clear();
-		}
-
-
+		this.listLyric?.Clear();
+		this.listLyric2?.Clear();
 
 		if (this.listObj != null) {
 			foreach (KeyValuePair<string, CSongObject> pair in this.listObj) {
