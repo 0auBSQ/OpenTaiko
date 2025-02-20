@@ -105,35 +105,6 @@ internal class CTja : CActivity {
 		Score,
 		Accuracy_BigNotesOnly
 	}
-	public class CBRANCH {
-		public EBranchConditionType e分岐の種類; //0:精度分岐 1:連打分岐 2:スコア分岐 3:大音符のみの精度分岐
-		public double n条件数値A;
-		public double n条件数値B;
-		public double db分岐時間;
-		public double db分岐時間ms;
-		public double db判定時間;
-		public double dbBMScrollTime;
-		public double dbBPM;
-		public double dbSCROLL;
-		public int n現在の小節;
-		public int n命令時のChipList番号;
-
-		public int n表記上の番号;
-		public int n内部番号;
-
-		public override string ToString() {
-			StringBuilder builder = new StringBuilder(0x80);
-			if (this.n内部番号 != this.n表記上の番号) {
-				builder.Append(string.Format("CBRANCH{0}(内部{1})", CTja.tZZ(this.n表記上の番号), this.n内部番号));
-			} else {
-				builder.Append(string.Format("CBRANCH{0}", CTja.tZZ(this.n表記上の番号)));
-			}
-			builder.Append(string.Format(", BRANCH:{0}", this.e分岐の種類));
-			return builder.ToString();
-		}
-	}
-
-
 
 	public class CWAV : IDisposable {
 		public bool bBGMとして使う;
@@ -358,7 +329,6 @@ internal class CTja : CActivity {
 	private double[] dbNowSCROLL_Master;
 
 	public Dictionary<int, CDELAY> listDELAY;
-	public Dictionary<int, CBRANCH> listBRANCH;
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
 	public const double msDanNextSongDelay = 6200.0;
@@ -1049,11 +1019,9 @@ internal class CTja : CActivity {
 												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 												// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
-				this.n内部番号BRANCH1to = 0;
 				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
-				int nBar = 0;
 
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
@@ -1064,7 +1032,6 @@ internal class CTja : CActivity {
 				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
 				//   (also affect notes' time in TaikoJiro 2 (?))
 				foreach (CChip chip in this.listChip) {
-					nBar = chip.n発声位置 / 384;
 					int ch = chip.nChannelNo;
 
 					switch (ch) {
@@ -1136,14 +1103,6 @@ internal class CTja : CActivity {
 						case 0x50: {
 								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								if (this.n内部番号BRANCH1to + 1 > this.listBRANCH.Count)
-									continue;
-
-								if (this.listBRANCH[this.n内部番号BRANCH1to].n現在の小節 == nBar) {
-									chip.bBranch = true;
-									this.n内部番号BRANCH1to++;
-								}
-
 								continue;
 							}
 
@@ -1268,7 +1227,7 @@ internal class CTja : CActivity {
 				}
 				#endregion
 				#region[ seNotes計算 ]
-				if (this.listBRANCH.Count != 0)
+				if (this.bチップがある.Branch)
 					this.tSetSenotes_branch();
 				else
 					this.tSetSenotes();
@@ -3496,7 +3455,7 @@ internal class CTja : CActivity {
 		chip.nScrollDirection = this.nスクロール方向;
 		chip.eScrollMode = eScrollMode;
 		chip.nBranch = branch;
-		chip.n分岐回数 = this.n内部番号BRANCH1to;
+		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
 		chip.nPlayerSide = this.nPlayerSide;
@@ -4816,7 +4775,6 @@ internal class CTja : CActivity {
 		this.listSCROLL_Master = new Dictionary<int, CSCROLL>();
 		this.listJPOSSCROLL = new Dictionary<int, CJPOSSCROLL>();
 		this.listDELAY = new Dictionary<int, CDELAY>();
-		this.listBRANCH = new Dictionary<int, CBRANCH>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
 		this.listChip_Branch = new List<CChip>[3];
@@ -4857,10 +4815,6 @@ internal class CTja : CActivity {
 		if (this.listDELAY != null) {
 			this.listDELAY.Clear();
 			this.listDELAY = null;
-		}
-		if (this.listBRANCH != null) {
-			this.listBRANCH.Clear();
-			this.listBRANCH = null;
 		}
 		if (this.listSCROLL != null) {
 			this.listSCROLL.Clear();
@@ -4976,7 +4930,6 @@ internal class CTja : CActivity {
 	private int n内部番号SCROLL1to;
 	private int n内部番号JSCROLL1to;
 	private int n内部番号DELAY1to;
-	private int n内部番号BRANCH1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
 	private int[] n無限管理PAN;
