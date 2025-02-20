@@ -251,157 +251,6 @@ internal class CTja : CActivity {
 
 	// 構造体
 
-	public struct STLANEINT {
-		public int HH;
-		public int SD;
-		public int BD;
-		public int HT;
-		public int LT;
-		public int CY;
-		public int FT;
-		public int HHO;
-		public int RD;
-		public int LC;
-		public int LP;
-		public int LBD;
-
-		public int Drums {
-			get {
-				return this.HH + this.SD + this.BD + this.HT + this.LT + this.CY + this.FT + this.HHO + this.RD + this.LC + this.LP + this.LBD;
-			}
-		}
-		public int Guitar;
-		public int Bass;
-		public int Taiko_Red;
-		public int Taiko_Blue;
-
-		public int this[int index] {
-			get {
-				switch (index) {
-					case 0:
-						return this.HH;
-
-					case 1:
-						return this.SD;
-
-					case 2:
-						return this.BD;
-
-					case 3:
-						return this.HT;
-
-					case 4:
-						return this.LT;
-
-					case 5:
-						return this.CY;
-
-					case 6:
-						return this.FT;
-
-					case 7:
-						return this.HHO;
-
-					case 8:
-						return this.RD;
-
-					case 9:
-						return this.LC;
-
-					case 10:
-						return this.LP;
-
-					case 11:
-						return this.LBD;
-
-					case 12:
-						return this.Guitar;
-
-					case 13:
-						return this.Bass;
-
-					case 14:
-						return this.Taiko_Red;
-
-					case 15:
-						return this.Taiko_Blue;
-				}
-				throw new IndexOutOfRangeException();
-			}
-			set {
-				if (value < 0) {
-					throw new ArgumentOutOfRangeException();
-				}
-				switch (index) {
-					case 0:
-						this.HH = value;
-						return;
-
-					case 1:
-						this.SD = value;
-						return;
-
-					case 2:
-						this.BD = value;
-						return;
-
-					case 3:
-						this.HT = value;
-						return;
-
-					case 4:
-						this.LT = value;
-						return;
-
-					case 5:
-						this.CY = value;
-						return;
-
-					case 6:
-						this.FT = value;
-						return;
-
-					case 7:
-						this.HHO = value;
-						return;
-
-					case 8:
-						this.RD = value;
-						return;
-
-					case 9:
-						this.LC = value;
-						return;
-
-					case 10:
-						this.LP = value;
-						return;
-
-					case 11:
-						this.LBD = value;
-						return;
-
-					case 12:
-						this.Guitar = value;
-						return;
-
-					case 13:
-						this.Bass = value;
-						return;
-
-					case 14:
-						this.Taiko_Red = value;
-						return;
-
-					case 15:
-						this.Taiko_Blue = value;
-						return;
-				}
-				throw new IndexOutOfRangeException();
-			}
-		}
-	}
-
 	public struct STチップがある {
 		public bool Drums;
 		public bool Guitar;
@@ -594,7 +443,6 @@ internal class CTja : CActivity {
 
 	public Dictionary<int, CDELAY> listDELAY;
 	public Dictionary<int, CBRANCH> listBRANCH;
-	public STLANEINT n可視チップ数;
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
 	public const double msDanNextSongDelay = 6200.0;
@@ -1513,20 +1361,6 @@ internal class CTja : CActivity {
 				this.nBGMAdjust = 0;
 				this.t各自動再生音チップの再生時刻を変更する(nBGMAdjust);
 
-				#region [ 可視チップ数カウント ]
-				for (int n = 0; n < 14; n++) {
-					this.n可視チップ数[n] = 0;
-				}
-				foreach (CChip chip in this.listChip) {
-					int c = chip.nChannelNo;
-					if ((0x11 <= c) && (c <= 0x14)) {
-						if (c == 0x11 || c == 0x13)
-							this.n可視チップ数.Taiko_Red++;
-						else if (c == 0x12 || c == 0x14)
-							this.n可視チップ数.Taiko_Blue++;
-					}
-				}
-				#endregion
 				#region [ チップの種類を分類し、対応するフラグを立てる ]
 				foreach (CChip chip in this.listChip) {
 					if ((chip.nChannelNo == 0x01 && this.listWAV.TryGetValue(chip.n整数値_内部番号, out CWAV cwav)) && !cwav.listこのWAVを使用するチャンネル番号の集合.Contains(chip.nChannelNo)) {
