@@ -6186,34 +6186,35 @@ internal class CTja : CActivity {
 		// 発声時刻msから発声位置を逆算することはできないため、近似計算する。
 		// 具体的には、希望発声位置前後の2つのチップの発声位置の中間を取る。
 
-		if (n希望発声時刻ms < 0) {
-			n希望発声時刻ms = 0;
-		}
-		int index_min = -1, index_max = -1;
+		int index_min = int.MaxValue, index_max = int.MaxValue;
 		for (int i = 0; i < listChip.Count; i++)        // 希望発声位置前後の「前」の方のチップを検索
 		{
-			if (listChip[i].n発声時刻ms >= n希望発声時刻ms) {
+			int n発声時刻ms = listChip[i].n発声時刻ms;
+			if (n発声時刻ms >= n希望発声時刻ms) {
+				if (n発声時刻ms > n希望発声時刻ms)
+					--i; // is max chip
 				index_min = i;
+				index_max = i + 1;
 				break;
 			}
 		}
-		if (index_min < 0)  // 希望発声時刻に至らずに曲が終了してしまう場合
-		{
+		CChip? chip_min = listChip.ElementAtOrDefault(index_min);
+		if (index_min < 0 || chip_min?.n発声時刻ms < n希望発声時刻ms) { // not on chip nor exceeding end
+			n新発声時刻ms = n希望発声時刻ms;
+			n新発声位置 = chip_min?.n発声位置 ?? 0;
+			return true;
+		}
+
+		bool isOutOfBound = (index_min >= listChip.Count); // 希望発声時刻に至らずに曲が終了してしまう場合
+		if (index_max >= listChip.Count) {
 			// listの最終項目の時刻をそのまま使用する
 			//___のではダメ。BGMが尻切れになる。
 			// そこで、listの最終項目の発声時刻msと発生位置から、希望発声時刻に相当する希望発声位置を比例計算して求める。
-			n新発声時刻ms = listChip[listChip.Count - 1].n発声時刻ms;
-			n新発声位置 = listChip[listChip.Count - 1].n発声位置;
-			return false;
-		}
-		index_max = index_min + 1;
-		if (index_max >= listChip.Count) {
-			index_max = index_min;
+			index_min = index_max = listChip.Count - 1;
 		}
 		n新発声時刻ms = (listChip[index_max].n発声時刻ms + listChip[index_min].n発声時刻ms) / 2;
 		n新発声位置 = (listChip[index_max].n発声位置 + listChip[index_min].n発声位置) / 2;
-
-		return true;
+		return !isOutOfBound;
 	}
 
 	public void SwapGuitarBassInfos() {
