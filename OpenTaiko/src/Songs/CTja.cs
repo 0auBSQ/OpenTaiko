@@ -253,90 +253,7 @@ internal class CTja : CActivity {
 
 	public struct STチップがある {
 		public bool Drums;
-		public bool Guitar;
-		public bool Bass;
-
-		public bool HHOpen;
-		public bool Ride;
-		public bool LeftCymbal;
-		public bool OpenGuitar;
-		public bool OpenBass;
-
 		public bool Branch;
-
-		public bool this[int index] {
-			get {
-				switch (index) {
-					case 0:
-						return this.Drums;
-
-					case 1:
-						return this.Guitar;
-
-					case 2:
-						return this.Bass;
-
-					case 3:
-						return this.HHOpen;
-
-					case 4:
-						return this.Ride;
-
-					case 5:
-						return this.LeftCymbal;
-
-					case 6:
-						return this.OpenGuitar;
-
-					case 7:
-						return this.OpenBass;
-
-					case 8:
-						return this.Branch;
-				}
-				throw new IndexOutOfRangeException();
-			}
-			set {
-				switch (index) {
-					case 0:
-						this.Drums = value;
-						return;
-
-					case 1:
-						this.Guitar = value;
-						return;
-
-					case 2:
-						this.Bass = value;
-						return;
-
-					case 3:
-						this.HHOpen = value;
-						return;
-
-					case 4:
-						this.Ride = value;
-						return;
-
-					case 5:
-						this.LeftCymbal = value;
-						return;
-
-					case 6:
-						this.OpenGuitar = value;
-						return;
-
-					case 7:
-						this.OpenBass = value;
-						return;
-
-					case 8:
-						this.Branch = value;
-						return;
-				}
-				throw new IndexOutOfRangeException();
-			}
-		}
 	}
 	public enum ECourse {
 		eNormal,
@@ -616,14 +533,6 @@ internal class CTja : CActivity {
 		this.LEVEL = stdgbvalue;
 		this.bHIDDENBRANCH = false;
 		this.bチップがある = new STチップがある();
-		this.bチップがある.Drums = false;
-		this.bチップがある.Guitar = false;
-		this.bチップがある.Bass = false;
-		this.bチップがある.HHOpen = false;
-		this.bチップがある.Ride = false;
-		this.bチップがある.LeftCymbal = false;
-		this.bチップがある.OpenGuitar = false;
-		this.bチップがある.OpenBass = false;
 		this.strファイル名 = "";
 		this.strフォルダ名 = "";
 		this.strファイル名の絶対パス = "";
