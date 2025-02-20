@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0.42] - 2025-02-20 (Beta)
+
+- Fix wrong notes' scrolling BPM when `#BPMCHANGE` is put at chart start due to wrong post-process order of 0x03 (initial BPM:) and 0x08 (#BPMCHANGE)
+- Fix(CTja): only add initial-state chips once at `#START` to handle respecified/omitted/out-of-order headers
+- Fix inaccurate time of chip 0x55 (#BGAOFF) time by stop reassigning chips' time by measure position during TJA post-process, excepts for 0xDD (#SECTION)
+- Fix chip 0xDD (#SECTION) had unstable sorting order & inaccurate time by modifying assigned fields and stop reassigning chips' time by measure position during TJA post-process
+- Fix: prevent music play failure when music (0x01) is the first chip due to wrong mixer-adding time calculated in CTja.t発声時刻msと発声位置を取得する() [tGetSoundTimeMsAndSoundPosition]
+- Fix wrong chip time of invisible channels 0x02 (measure length), 0x03 (initial BPM), & 0x08 (internal BPM change)
+- (Enhancement) Increase interpreted MusicPreTimeMs by 1.5 seconds from Config.ini
+- Fix: ensure correct training mode measure count by setting CChip.bHit to true if and only if counted
+- Feat: apply MusicPreTimeMs properly to gameplay retry & training mode resume
+- Fix broken multiplayer Kusudama-to-Balloon conversion & training mode go-go marks due to inconsistent usage of n発声時刻ms vs. db発声時刻ms
+- Fix training mode progress bars could exceed the frame
+- Fix MOVIEOFFSET: not applied if negative, applied twice if positive, & wrongly applied to #BGAON
+
 ## [0.6.0.41] - 2025-02-08 (Beta)
 
 - [Fix] SongPlaybackSpeed misused to initialize speed-independent animation values
