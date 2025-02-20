@@ -365,12 +365,12 @@ class CActImplTrainingMode : CActivity {
 		finalStartBar = this.nCurrentMeasure - 2;
 		if (finalStartBar < 0) finalStartBar = 0;
 
+		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = 0;
 		OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
 
 
 		int n少し戻ってから演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
 
-		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = 0;
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
 		OpenTaiko.stageGameScreen.Activate();
 		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
@@ -385,6 +385,7 @@ class CActImplTrainingMode : CActivity {
 				dTX.listChip[i].bShow = false;
 			}
 			if (dTX.listChip[i].nChannelNo == 0x50 && dTX.listChip[i].n整数値_内部番号 < finalStartBar) {
+				OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = dTX.listChip[i].n整数値_内部番号;
 				dTX.listChip[i].bHit = true;
 				dTX.listChip[i].IsHitted = true;
 			}

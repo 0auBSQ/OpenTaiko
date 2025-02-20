@@ -3166,7 +3166,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x50:  // 小節線
 				{
 
-						if (!pChip.bHit && time < 0) {
+						if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't update while paused
 							//if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
 							if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
 								PassAIBattleSection();
@@ -3184,10 +3184,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if (this.actPlayInfo.NowMeasure[nPlayer] == 0) {
 								UpdateCharaCounter(nPlayer);
 							}
-							if (!bPAUSE)//2020.07.08 Mr-Ojii KabanFriends氏のコードを参考に
-							{
-								actPlayInfo.NowMeasure[nPlayer] = pChip.n整数値_内部番号;
-							}
+							actPlayInfo.NowMeasure[nPlayer] = pChip.n整数値_内部番号;
 							pChip.bHit = true;
 						}
 						this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
