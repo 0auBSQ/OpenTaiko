@@ -223,7 +223,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 							bOption[i] = true;
 						} else {
-							if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[i] - 2] > 0) {
+							if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[i] - 2] >= 0) {
 								//TJAPlayer3.stage選曲.ctChara_Jump[0].t開始(0, SongSelect_Chara_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
 
