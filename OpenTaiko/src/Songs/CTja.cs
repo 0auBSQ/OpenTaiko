@@ -1478,10 +1478,6 @@ internal class CTja : CActivity {
 						{
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								if (this.isMOVIEOFFSET_Negative == false)
-									chip.n発声時刻ms += this.msMOVIEOFFSET_Abs;
-								else
-									chip.n発声時刻ms -= this.msMOVIEOFFSET_Abs;
 								continue;
 							}
 						case 0x97:
@@ -4674,10 +4670,7 @@ internal class CTja : CActivity {
 		var chipMovie = new CChip();
 		chipMovie.nChannelNo = 0x54;
 		chipMovie.n発声位置 = 384;
-		if (this.msMOVIEOFFSET_Abs == 0)
-			chipMovie.n発声時刻ms = (int)this.dbNowTime;
-		else
-			chipMovie.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
+		chipMovie.n発声時刻ms = (int)this.dbNowTime + (this.isMOVIEOFFSET_Negative ? -this.msMOVIEOFFSET_Abs : this.msMOVIEOFFSET_Abs);
 		chipMovie.dbBPM = this.dbNowBPM;
 		chipMovie.fNow_Measure_m = this.fNow_Measure_m;
 		chipMovie.fNow_Measure_s = this.fNow_Measure_s;
