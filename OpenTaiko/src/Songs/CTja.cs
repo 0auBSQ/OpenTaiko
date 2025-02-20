@@ -348,9 +348,7 @@ internal class CTja : CActivity {
 	public bool b小節線を挿入している = false;
 
 	//Normal Regular Masterにしたいけどここは我慢。
-	private List<int> listBalloon_Normal;
-	private List<int> listBalloon_Expert;
-	private List<int> listBalloon_Master;
+	private List<int>[] listBalloon_Branch;
 	private List<int> listBalloon; //旧構文用
 
 	public List<SKBitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
@@ -360,9 +358,7 @@ internal class CTja : CActivity {
 
 	public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
 
-	private int listBalloon_Normal_数値管理;
-	private int listBalloon_Expert_数値管理;
-	private int listBalloon_Master_数値管理;
+	private int[] listBalloon_Branch_数値管理;
 
 	public string scenePreset;
 
@@ -455,9 +451,7 @@ internal class CTja : CActivity {
 		this.n無限管理BPM = new int[36 * 36];
 		this.n無限管理PAN = new int[36 * 36];
 		this.n無限管理SIZE = new int[36 * 36];
-		this.listBalloon_Normal_数値管理 = 0;
-		this.listBalloon_Expert_数値管理 = 0;
-		this.listBalloon_Master_数値管理 = 0;
+		this.listBalloon_Branch_数値管理 = new int[3];
 		this.nRESULTIMAGE用優先順位 = new int[7];
 		this.nRESULTMOVIE用優先順位 = new int[7];
 		this.nRESULTSOUND用優先順位 = new int[7];
@@ -1503,12 +1497,10 @@ internal class CTja : CActivity {
 				if (n譜面数 > 0) {
 					//2017.07.22 kairera0467 譜面が2つ以上ある場合はCOURSE以下のBALLOON命令を使う
 					this.listBalloon.Clear();
-					this.listBalloon_Normal.Clear();
-					this.listBalloon_Expert.Clear();
-					this.listBalloon_Master.Clear();
-					this.listBalloon_Normal_数値管理 = 0;
-					this.listBalloon_Expert_数値管理 = 0;
-					this.listBalloon_Master_数値管理 = 0;
+					foreach (var listBalloon in this.listBalloon_Branch)
+						listBalloon.Clear();
+					for (int i = 0; i < listBalloon_Branch_数値管理.Length; ++i)
+						this.listBalloon_Branch_数値管理[i] = 0;
 				}
 
 				for (int i = 0; i < strSplit読み込むコース.Length; i++) {
@@ -3345,50 +3337,14 @@ internal class CTja : CActivity {
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
-
-			#region [Balloons]
-
-			switch (chip.nBranch) {
-				case ECourse.eNormal:
-					if (this.listBalloon_Normal.Count == 0) {
-						chip.nBalloon = 5;
-						break;
-					}
-
-					if (this.listBalloon_Normal.Count > this.listBalloon_Normal_数値管理) {
-						chip.nBalloon = this.listBalloon_Normal[this.listBalloon_Normal_数値管理];
-						this.listBalloon_Normal_数値管理++;
-						break;
-					}
-					break;
-				case ECourse.eExpert:
-					if (this.listBalloon_Expert.Count == 0) {
-						chip.nBalloon = 5;
-						break;
-					}
-
-					if (this.listBalloon_Expert.Count > this.listBalloon_Expert_数値管理) {
-						chip.nBalloon = this.listBalloon_Expert[this.listBalloon_Expert_数値管理];
-						this.listBalloon_Expert_数値管理++;
-						break;
-					}
-					break;
-				case ECourse.eMaster:
-					if (this.listBalloon_Master.Count == 0) {
-						chip.nBalloon = 5;
-						break;
-					}
-
-					if (this.listBalloon_Master.Count > this.listBalloon_Master_数値管理) {
-						chip.nBalloon = this.listBalloon_Master[this.listBalloon_Master_数値管理];
-						this.listBalloon_Master_数値管理++;
-						break;
-					}
-					break;
+			var listBalloon = this.listBalloon_Branch[iBranch];
+			if (listBalloon.Count == 0) {
+				chip.nBalloon = 5;
 			}
-
-			#endregion
-
+			else if (listBalloon.Count > this.listBalloon_Branch_数値管理[iBranch]) {
+				chip.nBalloon = listBalloon[this.listBalloon_Branch_数値管理[iBranch]];
+				this.listBalloon_Branch_数値管理[iBranch]++;
+			}
 		}
 		if (NotesManager.IsRollEnd(chip)) {
 			if (this.nNowRollCountBranch[iBranch] < 0) {
@@ -3546,12 +3502,12 @@ internal class CTja : CActivity {
 		}
 
 		if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Normal);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Expert);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Master);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreModeTmp = value);
@@ -3869,12 +3825,12 @@ internal class CTja : CActivity {
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]
 		else if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Normal);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Expert);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Master);
+			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreModeTmp = value);
@@ -4649,9 +4605,7 @@ internal class CTja : CActivity {
 		this.listChip_Branch[1] = new List<CChip>();
 		this.listChip_Branch[2] = new List<CChip>();
 		this.listBalloon = new List<int>();
-		this.listBalloon_Normal = new List<int>();
-		this.listBalloon_Expert = new List<int>();
-		this.listBalloon_Master = new List<int>();
+		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
 		this.listLine = new List<CLine>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
@@ -4681,9 +4635,8 @@ internal class CTja : CActivity {
 		this.listChip?.Clear();
 
 		this.listBalloon?.Clear();
-		this.listBalloon_Normal?.Clear();
-		this.listBalloon_Expert?.Clear();
-		this.listBalloon_Master?.Clear();
+		foreach (var listBalloon in this.listBalloon_Branch)
+			listBalloon?.Clear();
 
 		this.listLyric?.Clear();
 		this.listLyric2?.Clear();
