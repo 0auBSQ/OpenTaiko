@@ -861,7 +861,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
 
 				// convert input time (mixer space) to note time
-				long msInputMixer = inputEvent.nTimeStamp - SoundManager.PlayTimer.PrevResetTimeMs;
+				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
 				long nTime = (long)CTja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs, tja);
 				//int nPad09 = ( nPad == (int) Eパッド.HP ) ? (int) Eパッド.BD : nPad;		// #27029 2012.1.5 yyagi
 

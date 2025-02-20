@@ -2946,7 +2946,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bBGMPlayVoiceSound) {
-							dTX.tチップの再生(pChip, SoundManager.PlayTimer.PrevResetTimeMs + (long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, tja));
+							dTX.tチップの再生(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, tja)));
 						}
 					}
 					break;
@@ -4569,7 +4569,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!b) continue;
 
 					if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
-						OpenTaiko.TJA.tチップの再生(pChip, (long)(SoundManager.PlayTimer.PrevResetTimeMs) + (long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, dTX));
+						OpenTaiko.TJA.tチップの再生(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)CTja.TjaTimeToGameTime(pChip.n発声時刻ms, dTX)));
 						#region [ PAUSEする ]
 						int j = wc.n現在再生中のサウンド番号;
 						if (wc.rSound[j] != null) {
