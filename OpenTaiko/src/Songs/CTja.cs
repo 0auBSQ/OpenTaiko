@@ -1783,63 +1783,38 @@ internal class CTja : CActivity {
 
 			this.n内部番号BPM1to++;
 		} else if (command == "#SCROLL") {
+			double[] dbComplexNum = new double[2];
 			//2016.08.13 kairera0467 複素数スクロールもどきのテスト
-			if (argument.IndexOf('i') != -1) {
+			try {
 				//iが入っていた場合、複素数スクロールとみなす。
-
-				double[] dbComplexNum = new double[2];
-				try {
+				if (argument.IndexOf('i') != -1)
 					this.tParsedComplexNumber(argument, ref dbComplexNum);
-				} catch (Exception ex) {
-					AddError(command, argument);
-					dbComplexNum[0] = 1.0;
-					dbComplexNum[1] = 0.0;
-				}
-
-				this.dbNowScroll = dbComplexNum[0];
-				this.dbNowScrollY = dbComplexNum[1];
-
-				//チップ追加して割り込んでみる。
-				var chip = new CChip();
-
-				chip.nChannelNo = 0x9D;
-				chip.n発声位置 = ((this.n現在の小節数) * 384) - 1;
-				chip.n発声時刻ms = (int)this.dbNowTime;
-				chip.fNow_Measure_m = this.fNow_Measure_m;
-				chip.fNow_Measure_s = this.fNow_Measure_s;
-				chip.dbSCROLL = dbComplexNum[0];
-				chip.dbSCROLL_Y = dbComplexNum[1];
-				chip.nBranch = this.n現在のコース;
-
-				// チップを配置。
-
-				this.listChip.Add(chip);
-			} else {
-				double dbSCROLL = 1.0;
-				if (!double.TryParse(argument, out dbSCROLL)) {
-					AddError(command, argument);
-					dbSCROLL = 1;
-				}
-
-				this.dbNowScroll = dbSCROLL;
-				this.dbNowScrollY = 0.0;
-
-				//チップ追加して割り込んでみる。
-				var chip = new CChip();
-
-				chip.nChannelNo = 0x9D;
-				chip.n発声位置 = ((this.n現在の小節数) * 384) - 1;
-				chip.n発声時刻ms = (int)this.dbNowTime;
-				chip.fNow_Measure_m = this.fNow_Measure_m;
-				chip.fNow_Measure_s = this.fNow_Measure_s;
-				chip.dbSCROLL = dbSCROLL;
-				chip.dbSCROLL_Y = 0.0;
-				chip.nBranch = this.n現在のコース;
-
-				// チップを配置。
-
-				this.listChip.Add(chip);
+				else
+					dbComplexNum[0] = double.Parse(argument);
+			} catch (Exception ex) {
+				AddError(command, argument);
+				dbComplexNum[0] = 1.0;
+				dbComplexNum[1] = 0.0;
 			}
+
+			this.dbNowScroll = dbComplexNum[0];
+			this.dbNowScrollY = dbComplexNum[1];
+
+			//チップ追加して割り込んでみる。
+			var chip = new CChip();
+
+			chip.nChannelNo = 0x9D;
+			chip.n発声位置 = ((this.n現在の小節数) * 384) - 1;
+			chip.n発声時刻ms = (int)this.dbNowTime;
+			chip.fNow_Measure_m = this.fNow_Measure_m;
+			chip.fNow_Measure_s = this.fNow_Measure_s;
+			chip.dbSCROLL = dbComplexNum[0];
+			chip.dbSCROLL_Y = dbComplexNum[1];
+			chip.nBranch = this.n現在のコース;
+
+			// チップを配置。
+
+			this.listChip.Add(chip);
 		} else if (command == "#MEASURE") {
 			strArray = argument.Split(new char[] { '/' });
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
