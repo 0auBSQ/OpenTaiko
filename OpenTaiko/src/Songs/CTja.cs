@@ -1604,8 +1604,9 @@ internal class CTja : CActivity {
 		for (int i = 0; i < input.Length; i++) {
 			if (input[i].Equals(',')) // カンマにぶち当たった
 			{
-				if (i - 1 >= 0 && input[i - 1].Equals('\\')) { // &&演算子でも、例外が起きるので...
+				if (i - 1 >= 0 && input[i - 1].Equals('\\')) {
 					input = input.Remove(i - 1, 1);
+					--i;
 				} else {
 					// workingIndexから今の位置までをリストにブチ込む
 					result.Add(input.Substring(workingIndex, i - workingIndex));
