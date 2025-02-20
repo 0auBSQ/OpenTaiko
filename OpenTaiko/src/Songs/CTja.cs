@@ -278,12 +278,6 @@ internal class CTja : CActivity {
 	public List<DanSongs> List_DanSongs;
 	private EScrollMode eScrollMode;
 
-
-
-	private double[] dbNowSCROLL_Normal;
-	private double[] dbNowSCROLL_Expert;
-	private double[] dbNowSCROLL_Master;
-
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
 	public const double msDanNextSongDelay = 6200.0;
@@ -937,9 +931,6 @@ internal class CTja : CActivity {
 			#region [ 入力/行解析 ]
 			#region[初期化]
 			this.dbNowScroll = 1.0;
-			this.dbNowSCROLL_Normal = new double[] { 1.0, 0.0 };
-			this.dbNowSCROLL_Expert = new double[] { 1.0, 0.0 };
-			this.dbNowSCROLL_Master = new double[] { 1.0, 0.0 };
 			this.n現在のコース = ECourse.eNormal;
 			#endregion
 			this.t入力_V4(str全入力文字列, Difficulty);
@@ -1808,25 +1799,6 @@ internal class CTja : CActivity {
 				this.dbNowScroll = dbComplexNum[0];
 				this.dbNowScrollY = dbComplexNum[1];
 
-				switch (this.n現在のコース) {
-					case ECourse.eNormal:
-						this.dbNowSCROLL_Normal[0] = dbComplexNum[0];
-						this.dbNowSCROLL_Normal[1] = dbComplexNum[1];
-						break;
-					case ECourse.eExpert:
-						this.dbNowSCROLL_Expert[0] = dbComplexNum[0];
-						this.dbNowSCROLL_Expert[1] = dbComplexNum[1];
-						break;
-					case ECourse.eMaster:
-						this.dbNowSCROLL_Master[0] = dbComplexNum[0];
-						this.dbNowSCROLL_Master[1] = dbComplexNum[1];
-						break;
-					default:
-						this.dbNowSCROLL_Normal[0] = dbComplexNum[0];
-						this.dbNowSCROLL_Normal[1] = dbComplexNum[1];
-						break;
-				}
-
 				//チップ追加して割り込んでみる。
 				var chip = new CChip();
 
@@ -1851,18 +1823,6 @@ internal class CTja : CActivity {
 
 				this.dbNowScroll = dbSCROLL;
 				this.dbNowScrollY = 0.0;
-
-				switch (this.n現在のコース) {
-					case ECourse.eNormal:
-						this.dbNowSCROLL_Normal[0] = dbSCROLL;
-						break;
-					case ECourse.eExpert:
-						this.dbNowSCROLL_Expert[0] = dbSCROLL;
-						break;
-					case ECourse.eMaster:
-						this.dbNowSCROLL_Master[0] = dbSCROLL;
-						break;
-				}
 
 				//チップ追加して割り込んでみる。
 				var chip = new CChip();
