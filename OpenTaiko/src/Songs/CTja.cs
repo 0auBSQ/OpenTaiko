@@ -225,10 +225,7 @@ internal class CTja : CActivity {
 	public class CLine {
 		public int n小節番号;
 		public int n文字数;
-		public double db発声時刻;
-		public double dbBMS時刻;
 		public ECourse nコース = ECourse.eNormal;
-		public int nタイプ;
 	}
 
 	// Properties
