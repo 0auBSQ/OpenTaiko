@@ -146,7 +146,7 @@ internal class CSongs管理 {
 
 						bool b = false;
 						for (int n = 0; n < (int)Difficulty.Total; n++) {
-							CTja dtx = new CTja(fileinfo.FullName, false, 1.0, 0, 1);
+							CTja dtx = new CTja(fileinfo.FullName, false, 0, 1);
 							if (dtx.b譜面が存在する[n]) {
 								c曲リストノード.difficultiesCount++;
 								c曲リストノード.rParentNode = node親;
@@ -282,7 +282,7 @@ internal class CSongs管理 {
 
 						this.n検索された曲ノード数++;
 					} else {
-						CTja dtx = new CTja(filePath, false, 1.0, 0, 0);
+						CTja dtx = new CTja(filePath, false, 0, 0);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
 

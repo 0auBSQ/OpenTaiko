@@ -345,15 +345,15 @@ internal class CStage曲読み込み : CStage {
 
 					//if( CDTXMania.DTX == null )
 					{
-						OpenTaiko.TJA = new CTja(str, false, 1.0, 0, 0, 0, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
+						OpenTaiko.TJA = new CTja(str, false, 0, 0, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
 						if (OpenTaiko.ConfigIni.nPlayerCount >= 2)
-							OpenTaiko.TJA_2P = new CTja(str, false, 1.0, 0, 0, 1, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[1]);
+							OpenTaiko.TJA_2P = new CTja(str, false, 0, 1, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[1]);
 						if (OpenTaiko.ConfigIni.nPlayerCount >= 3)
-							OpenTaiko.TJA_3P = new CTja(str, false, 1.0, 0, 0, 2, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[2]);
+							OpenTaiko.TJA_3P = new CTja(str, false, 0, 2, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[2]);
 						if (OpenTaiko.ConfigIni.nPlayerCount >= 4)
-							OpenTaiko.TJA_4P = new CTja(str, false, 1.0, 0, 0, 3, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[3]);
+							OpenTaiko.TJA_4P = new CTja(str, false, 0, 3, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[3]);
 						if (OpenTaiko.ConfigIni.nPlayerCount >= 5)
-							OpenTaiko.TJA_5P = new CTja(str, false, 1.0, 0, 0, 4, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[4]);
+							OpenTaiko.TJA_5P = new CTja(str, false, 0, 4, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[4]);
 
 						if (OpenTaiko.TJA.listErrors.Count != 0) {
 							string message = "";

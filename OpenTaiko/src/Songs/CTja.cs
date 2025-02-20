@@ -576,15 +576,15 @@ internal class CTja : CActivity {
 		DanSongs.Number = 0;
 
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, 0, 0, false, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, nBGMAdjust, 0, false, difficulty);
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty)
+	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, db再生速度Unused, nBGMAdjust, nReadVersionUnused, nPlayerSide, bSession, difficulty);
+		this.t入力(strファイル名, bヘッダのみ, nBGMAdjust, nPlayerSide, bSession, difficulty);
 	}
 
 
@@ -966,7 +966,7 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void t入力(string strファイル名, bool bヘッダのみ, double db再生速度Unused, int nBGMAdjust, int nReadVersionUnused, int nPlayerSide, bool bSession, int difficulty) {
+	public void t入力(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty) {
 		this.bヘッダのみ = bヘッダのみ;
 		this.strファイル名の絶対パス = Path.GetFullPath(strファイル名);
 		this.strファイル名 = Path.GetFileName(this.strファイル名の絶対パス);
@@ -982,14 +982,14 @@ internal class CTja : CActivity {
 			StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
 			string str2 = reader.ReadToEnd();
 			reader.Close();
-			this.t入力_全入力文字列から(str2, str2, db再生速度Unused, nBGMAdjust, difficulty);
+			this.t入力_全入力文字列から(str2, nBGMAdjust, difficulty);
 		} catch (Exception ex) {
 			Trace.TraceError("おや?エラーが出たようです。お兄様。");
 			Trace.TraceError(ex.ToString());
 			Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void t入力_全入力文字列から(string str全入力文字列, string str1Unused, double db再生速度Unused, int nBGMAdjust, int Difficulty) {
+	public void t入力_全入力文字列から(string str全入力文字列, int nBGMAdjust, int Difficulty) {
 		if (!string.IsNullOrEmpty(str全入力文字列)) {
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
