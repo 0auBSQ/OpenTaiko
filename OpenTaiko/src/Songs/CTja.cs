@@ -652,7 +652,6 @@ internal class CTja : CActivity {
 	public int[] nScoreDiff = new int[(int)Difficulty.Total]; //[y]
 	public bool[,] b配点が指定されている = new bool[3, (int)Difficulty.Total]; //2017.06.04 kairera0467 [ x, y ] x=通常(Init)or真打orDiff y=コース
 
-	private double dbBarLength;
 	public float fNow_Measure_s = 4.0f;
 	public float fNow_Measure_m = 4.0f;
 	public double dbNowTime = 0.0;
@@ -830,8 +829,6 @@ internal class CTja : CActivity {
 			this.b配点が指定されている[1, y] = false;
 			this.b配点が指定されている[2, y] = false;
 		}
-
-		this.dbBarLength = 1.0;
 
 		this.b最初の分岐である = true;
 
@@ -1301,36 +1298,6 @@ internal class CTja : CActivity {
 			this.n無限管理PAN = null;
 			this.n無限管理SIZE = null;
 			if (!this.bヘッダのみ) {
-				#region [ BPM/BMP初期化 ]
-				int ch;
-				CBPM cbpm = null;
-				foreach (CBPM cbpm2 in this.listBPM.Values) {
-					if (cbpm2.n表記上の番号 == 0) {
-						cbpm = cbpm2;
-						break;
-					}
-				}
-				if (cbpm == null) {
-					cbpm = new CBPM();
-					cbpm.n内部番号 = this.n内部番号BPM1to++;
-					cbpm.n表記上の番号 = 0;
-					cbpm.dbBPM値 = 120.0;
-					this.listBPM.Add(cbpm.n内部番号, cbpm);
-					CChip chip = new CChip();
-					chip.n発声位置 = 0;
-					chip.nChannelNo = 8;      // 拡張BPM
-					chip.n整数値 = 0;
-					chip.n整数値_内部番号 = cbpm.n内部番号;
-					this.listChip.Insert(0, chip);
-				} else {
-					CChip chip = new CChip();
-					chip.n発声位置 = 0;
-					chip.nChannelNo = 8;      // 拡張BPM
-					chip.n整数値 = 0;
-					chip.n整数値_内部番号 = cbpm.n内部番号;
-					this.listChip.Insert(0, chip);
-				}
-				#endregion
 				#region [ CWAV初期化 ]
 				foreach (CWAV cwav in this.listWAV.Values) {
 					if (cwav.nチップサイズ < 0) {
@@ -1391,32 +1358,25 @@ internal class CTja : CActivity {
 				this.n内部番号BRANCH1to = 0;
 				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
-				double bpm = 120.0;
-				int n発声位置 = 0;
-				int ms = 0;
+				double bpm = this.BASEBPM;
 				int nBar = 0;
-				int nCount = 0;
 
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
 
-				foreach (CChip chip in this.listChip) {
-					if (chip.nChannelNo == 0x02) { } else if (chip.nChannelNo == 0x01) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo >= 0x11 && chip.nChannelNo <= 0x1F) { } else if (chip.nChannelNo == 0x50) { } else if (chip.nChannelNo == 0x54) { } else if (chip.nChannelNo == 0x08) { } else if (chip.nChannelNo == 0xF1) { } else if (chip.nChannelNo == 0xF2) { } else if (chip.nChannelNo == 0xFF) { } else if (chip.nChannelNo == 0xDD) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo == 0xDF) { chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm)); } else if (chip.nChannelNo < 0x93)
-						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
-					else if ((chip.nChannelNo > 0x9F && chip.nChannelNo < 0xA0) || (chip.nChannelNo >= 0xF0 && chip.nChannelNo < 0xFE))
-						chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
-					nBar = chip.n発声位置 / 384;
-					ch = chip.nChannelNo;
 
-					nCount++;
+				// Chip post-process:
+				// * Offset chips from RawTjaTime To TjaTime; see RawTjaTimeToTjaTimeMusic()
+				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
+				//   (also affect notes' time in TaikoJiro 2 (?))
+				foreach (CChip chip in this.listChip) {
+					nBar = chip.n発声位置 / 384;
+					int ch = chip.nChannelNo;
 
 					switch (ch) {
 						case 0x01: {
-								n発声位置 = chip.n発声位置;
-
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
 
 								#region[listlyric2の時間合わせ]
 								for (int ind = 0; ind < listLyric2.Count; ind++) {
@@ -1436,21 +1396,15 @@ internal class CTja : CActivity {
 							}
 						case 0x02:  // BarLength
 						{
-								n発声位置 = chip.n発声位置;
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
-								dbBarLength = chip.db実数値;
 								continue;
 							}
-						case 0x03:  // BPM
+						case 0x03:  // Initial BPM
 						{
-								n発声位置 = chip.n発声位置;
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
-								bpm = this.BASEBPM + chip.n整数値;
-								this.dbNowBPM = bpm;
+								// this.dbNowBPM has already been initialized
 								continue;
 							}
 						case 0x04:  // BGA (レイヤBGA1)
@@ -1512,10 +1466,8 @@ internal class CTja : CActivity {
 							}
 						case 0x08:  // 拡張BPM
 						{
-								n発声位置 = chip.n発声位置;
-								if (this.isOFFSET_Negative == false)
+								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
 								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
 									bpm = (cBPM.n表記上の番号 == 0 ? 0.0 : this.BASEBPM) + cBPM.dbBPM値;
 									this.dbNowBPM = bpm;
@@ -1526,10 +1478,6 @@ internal class CTja : CActivity {
 						{
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								if (this.isMOVIEOFFSET_Negative == false)
-									chip.n発声時刻ms += this.msMOVIEOFFSET_Abs;
-								else
-									chip.n発声時刻ms -= this.msMOVIEOFFSET_Abs;
 								continue;
 							}
 						case 0x97:
@@ -2159,43 +2107,7 @@ internal class CTja : CActivity {
 		#endregion
 
 		if (command == "#START") {
-			// apply global offset
-			var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
-			msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
-			this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
-			this.isOFFSET_Negative = (msOFFSET_Signed < 0);
-
-			//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x01;
-			chip.n発声位置 = 384;
-			chip.n発声時刻ms = (int)this.dbNowTime;
-			chip.fNow_Measure_m = this.fNow_Measure_m;
-			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.fBMSCROLLTime = this.dbNowBMScollTime;
-			chip.n整数値 = 0x01;
-			chip.n整数値_内部番号 = 1;
-
-			// チップを配置。
-			this.listChip.Add(chip);
-
-			var chip1 = new CChip();
-			chip1.nChannelNo = 0x54;
-			if (this.msMOVIEOFFSET_Abs == 0)
-				chip1.n発声時刻ms = (int)this.dbNowTime;
-			else
-				chip1.n発声時刻ms = (int)this.msMOVIEOFFSET_Abs;
-			chip1.dbBPM = this.dbNowBPM;
-			chip1.fNow_Measure_m = this.fNow_Measure_m;
-			chip1.fNow_Measure_s = this.fNow_Measure_s;
-			chip1.dbSCROLL = this.dbNowScroll;
-			chip1.n整数値 = 0x01;
-			chip1.n整数値_内部番号 = 1;
-
-			// チップを配置。
-
-			this.listChip.Add(chip1);
+			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
 			// TaikoJiro compatibility: #END ends unended rolls
 			for (int i = 0; i < 3; i++) {
@@ -2394,7 +2306,6 @@ internal class CTja : CActivity {
 			}
 
 			double db小節長倍率 = dbLength[0] / dbLength[1];
-			this.dbBarLength = db小節長倍率;
 			this.fNow_Measure_m = (float)dbLength[1];
 			this.fNow_Measure_s = (float)dbLength[0];
 
@@ -4294,12 +4205,11 @@ internal class CTja : CActivity {
 			var chip = new CChip();
 
 			chip.nChannelNo = 0xDD;
-			chip.n発声位置 = ((this.n現在の小節数 - 1) * 384);
+			chip.n発声位置 = (this.n現在の小節数 * 384);
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
 			chip.n整数値_内部番号 = 1;
-			chip.db発声時刻ms = this.dbNowTime;
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#BRANCHSTART") {
@@ -4691,6 +4601,86 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		}
 	}
+
+	private void InitializeChartDefinitionBody() {
+		// apply global offset
+		var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
+		msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
+		this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
+		this.isOFFSET_Negative = (msOFFSET_Signed < 0);
+
+		// apply initial SCROLL
+		this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = this.dbScrollSpeed, });
+
+		// add initial SCROLL chip
+		var chipInitScroll = new CChip();
+
+		chipInitScroll.nChannelNo = 0x9D;
+		chipInitScroll.n発声位置 = (this.n現在の小節数 * 384);
+		chipInitScroll.n整数値 = 0x00;
+		chipInitScroll.n整数値_内部番号 = this.n内部番号SCROLL1to;
+		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
+
+		this.listChip.Add(chipInitScroll);
+		this.n内部番号SCROLL1to++;
+
+		// apply initial BPM
+		CBPM bpmInit = new() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = this.BASEBPM, };
+		this.listBPM.Add(this.n内部番号BPM1to - 1, bpmInit);
+		this.n内部番号BPM1to++;
+
+		// add initial BPM chip
+		var chipInitBpm = new CChip();
+
+		chipInitBpm.nChannelNo = 0x03;
+		chipInitBpm.n発声位置 = (this.n現在の小節数 * 384);
+		chipInitBpm.n整数値 = 0x00;
+		chipInitBpm.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipInitBpm);
+
+		// add initial BPMCHANGE chip
+		// Previously this was set up with the first BPMCHANGE during chip post-processing as a part of DTX processing.
+		// However, `BPM:` in TJA is usually used for the actually initial BPM,
+		// and HBScroll gimmicks regarding `BPM:` are also supported in TaikoJiro,
+		// so it is now handled here for simplicity.
+		CChip chipInitBpmChange = new CChip();
+		chipInitBpmChange.n発声位置 = (this.n現在の小節数 * 384);
+		chipInitBpmChange.nChannelNo = 8;      // 拡張BPM
+		chipInitBpmChange.n整数値 = 0;
+		chipInitBpmChange.n整数値_内部番号 = bpmInit.n内部番号;
+		this.listChip.Add(chipInitBpmChange);
+
+		// add music start chip
+		//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
+		var chipMusic = new CChip();
+
+		chipMusic.nChannelNo = 0x01;
+		chipMusic.n発声位置 = 384;
+		chipMusic.n発声時刻ms = (int)this.dbNowTime;
+		chipMusic.fNow_Measure_m = this.fNow_Measure_m;
+		chipMusic.fNow_Measure_s = this.fNow_Measure_s;
+		chipMusic.fBMSCROLLTime = this.dbNowBMScollTime;
+		chipMusic.n整数値 = 0x01;
+		chipMusic.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipMusic);
+
+		// add movie start chip
+		var chipMovie = new CChip();
+		chipMovie.nChannelNo = 0x54;
+		chipMovie.n発声位置 = 384;
+		chipMovie.n発声時刻ms = (int)this.dbNowTime + (this.isMOVIEOFFSET_Negative ? -this.msMOVIEOFFSET_Abs : this.msMOVIEOFFSET_Abs);
+		chipMovie.dbBPM = this.dbNowBPM;
+		chipMovie.fNow_Measure_m = this.fNow_Measure_m;
+		chipMovie.fNow_Measure_s = this.fNow_Measure_s;
+		chipMovie.dbSCROLL = this.dbNowScroll;
+		chipMovie.n整数値 = 0x01;
+		chipMovie.n整数値_内部番号 = 1;
+
+		this.listChip.Add(chipMovie);
+	}
+
 	void t現在のチップ情報を記録する(bool bInPut) {
 		//2020.04.21 こうなってしまったのは仕方がないな。。
 		if (bInPut) {
@@ -5428,21 +5418,6 @@ internal class CTja : CActivity {
 			this.MinBPM = dbBPM;
 			this.MaxBPM = dbBPM;
 			this.dbNowBPM = dbBPM;
-
-			this.listBPM.Add(this.n内部番号BPM1to - 1, new CBPM() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = dbBPM, });
-			this.n内部番号BPM1to++;
-
-
-			//チップ追加して割り込んでみる。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x03;
-			chip.n発声位置 = ((this.n現在の小節数 - 1) * 384);
-			chip.n整数値 = 0x00;
-			chip.n整数値_内部番号 = 1;
-
-			this.listChip.Add(chip);
-			//tbBPM.Text = strCommandParam;
 		} else if (strCommandName.Equals("WAVE")) {
 			if (strBGM_PATH != null) {
 				Trace.TraceWarning($"{nameof(CTja)} is ignoring an extra WAVE header in {this.strファイル名の絶対パス}");
@@ -5557,26 +5532,6 @@ internal class CTja : CActivity {
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
 
 			this.dbScrollSpeed = Convert.ToDouble(strCommandParam);
-
-			this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = this.dbScrollSpeed, });
-
-
-			//チップ追加して割り込んでみる。
-			var chip = new CChip();
-
-			chip.nChannelNo = 0x9D;
-			chip.n発声位置 = ((this.n現在の小節数 - 2) * 384);
-			chip.n整数値 = 0x00;
-			chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
-			chip.dbSCROLL = this.dbScrollSpeed;
-
-			// チップを配置。
-
-			this.listChip.Add(chip);
-			this.n内部番号SCROLL1to++;
-
-			//this.nScoreDiff = Convert.ToInt16( strCommandParam );
-			//tbScoreDiff.Text = strCommandParam;
 		} else if (strCommandName.Equals("GENRE")) {
 			//2015.03.28 kairera0467
 			//ジャンルの定義。DTXから入力もできるが、tjaからも入力できるようにする。
@@ -6225,34 +6180,35 @@ internal class CTja : CActivity {
 		// 発声時刻msから発声位置を逆算することはできないため、近似計算する。
 		// 具体的には、希望発声位置前後の2つのチップの発声位置の中間を取る。
 
-		if (n希望発声時刻ms < 0) {
-			n希望発声時刻ms = 0;
-		}
-		int index_min = -1, index_max = -1;
+		int index_min = int.MaxValue, index_max = int.MaxValue;
 		for (int i = 0; i < listChip.Count; i++)        // 希望発声位置前後の「前」の方のチップを検索
 		{
-			if (listChip[i].n発声時刻ms >= n希望発声時刻ms) {
+			int n発声時刻ms = listChip[i].n発声時刻ms;
+			if (n発声時刻ms >= n希望発声時刻ms) {
+				if (n発声時刻ms > n希望発声時刻ms)
+					--i; // is max chip
 				index_min = i;
+				index_max = i + 1;
 				break;
 			}
 		}
-		if (index_min < 0)  // 希望発声時刻に至らずに曲が終了してしまう場合
-		{
+		CChip? chip_min = listChip.ElementAtOrDefault(index_min);
+		if (index_min < 0 || chip_min?.n発声時刻ms < n希望発声時刻ms) { // not on chip nor exceeding end
+			n新発声時刻ms = n希望発声時刻ms;
+			n新発声位置 = chip_min?.n発声位置 ?? 0;
+			return true;
+		}
+
+		bool isOutOfBound = (index_min >= listChip.Count); // 希望発声時刻に至らずに曲が終了してしまう場合
+		if (index_max >= listChip.Count) {
 			// listの最終項目の時刻をそのまま使用する
 			//___のではダメ。BGMが尻切れになる。
 			// そこで、listの最終項目の発声時刻msと発生位置から、希望発声時刻に相当する希望発声位置を比例計算して求める。
-			n新発声時刻ms = listChip[listChip.Count - 1].n発声時刻ms;
-			n新発声位置 = listChip[listChip.Count - 1].n発声位置;
-			return false;
-		}
-		index_max = index_min + 1;
-		if (index_max >= listChip.Count) {
-			index_max = index_min;
+			index_min = index_max = listChip.Count - 1;
 		}
 		n新発声時刻ms = (listChip[index_max].n発声時刻ms + listChip[index_min].n発声時刻ms) / 2;
 		n新発声位置 = (listChip[index_max].n発声位置 + listChip[index_min].n発声位置) / 2;
-
-		return true;
+		return !isOutOfBound;
 	}
 
 	public void SwapGuitarBassInfos() {
@@ -6504,35 +6460,35 @@ internal class CTja : CActivity {
 	// RawTjaTime is time for chip.n発声時刻ms just before the post-processing of tja.t入力_V4().
 	// * RawTjaTime is DefTime with additional initial padding time
 	// MusicPreTimeMs is pre-baked to only Dan
-	public static double DefTimeToRawTjaTime(double msTime, CTja tja)
-		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+	public double DefTimeToRawTjaTime(double msTime)
+		=> (this.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
 			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
-	public static double RawTjaTimeToDefTime(double msTime, CTja tja)
-		=> (tja.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
+	public double RawTjaTimeToDefTime(double msTime)
+		=> (this.n参照中の難易度 != (int)Difficulty.Dan) ? msTime
 			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs;
 
 	// TjaTime is the time for chip.n発声時刻ms after the post-processing of tja.t入力_V4().
 	// * For positive msOFFSET, all and only music-time-relative events are delayed by msOFFSET_Abs.
 	// * For negative msOFFSET, all and only note-time-relative events are delayed by msOFFSET_Abs.
-	public static double RawTjaTimeToTjaTimeMusic(double msTime, CTja tja)
-		=> msTime + (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double TjaTimeToRawTjaTimeMusic(double msTime, CTja tja)
-		=> msTime - (!tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double RawTjaTimeToTjaTimeNote(double msTime, CTja tja)
-		=> msTime + (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
-	public static double TjaTimeToRawTjaTimeNote(double msTime, CTja tja)
-		=> msTime - (tja.isOFFSET_Negative ? tja.msOFFSET_Abs : 0);
+	public double RawTjaTimeToTjaTimeMusic(double msTime)
+		=> msTime + (!this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double TjaTimeToRawTjaTimeMusic(double msTime)
+		=> msTime - (!this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double RawTjaTimeToTjaTimeNote(double msTime)
+		=> msTime + (this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
+	public double TjaTimeToRawTjaTimeNote(double msTime)
+		=> msTime - (this.isOFFSET_Negative ? this.msOFFSET_Abs : 0);
 
 	// GameTime is the real elapsed time of gameplay.
 	// SongPlaybackSpeed scales the GameTime into the corresponding TjaTime
 	// MusicPreTimeMs is applied in real time to non-Dan
-	public static double GameTimeToTjaTime(double msTime, CTja tja)
-		=> GameDurationToTjaDuration((tja.n参照中の難易度 == (int)Difficulty.Dan) ?
+	public double GameTimeToTjaTime(double msTime)
+		=> GameDurationToTjaDuration((this.n参照中の難易度 == (int)Difficulty.Dan) ?
 			msTime
 			: msTime - OpenTaiko.ConfigIni.MusicPreTimeMs);
-	public static double TjaTimeToGameTime(double msTime, CTja tja) {
+	public double TjaTimeToGameTime(double msTime) {
 		msTime = TjaDurationToGameDuration(msTime);
-		return (tja.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
+		return (this.n参照中の難易度 == (int)Difficulty.Dan) ? msTime
 			: msTime + OpenTaiko.ConfigIni.MusicPreTimeMs;
 	}
 
