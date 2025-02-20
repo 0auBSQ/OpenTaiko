@@ -652,7 +652,6 @@ internal class CTja : CActivity {
 	public int[] nScoreDiff = new int[(int)Difficulty.Total]; //[y]
 	public bool[,] b配点が指定されている = new bool[3, (int)Difficulty.Total]; //2017.06.04 kairera0467 [ x, y ] x=通常(Init)or真打orDiff y=コース
 
-	private double dbBarLength;
 	public float fNow_Measure_s = 4.0f;
 	public float fNow_Measure_m = 4.0f;
 	public double dbNowTime = 0.0;
@@ -830,8 +829,6 @@ internal class CTja : CActivity {
 			this.b配点が指定されている[1, y] = false;
 			this.b配点が指定されている[2, y] = false;
 		}
-
-		this.dbBarLength = 1.0;
 
 		this.b最初の分岐である = true;
 
@@ -1362,10 +1359,7 @@ internal class CTja : CActivity {
 				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
-				int n発声位置 = 0;
-				int ms = 0;
 				int nBar = 0;
-				int nCount = 0;
 
 				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
 				int BGM番号 = 0;
@@ -1379,15 +1373,10 @@ internal class CTja : CActivity {
 					nBar = chip.n発声位置 / 384;
 					int ch = chip.nChannelNo;
 
-					nCount++;
-
 					switch (ch) {
 						case 0x01: {
-								n発声位置 = chip.n発声位置;
-
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
 
 								#region[listlyric2の時間合わせ]
 								for (int ind = 0; ind < listLyric2.Count; ind++) {
@@ -1407,19 +1396,14 @@ internal class CTja : CActivity {
 							}
 						case 0x02:  // BarLength
 						{
-								n発声位置 = chip.n発声位置;
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
-								dbBarLength = chip.db実数値;
 								continue;
 							}
 						case 0x03:  // Initial BPM
 						{
-								n発声位置 = chip.n発声位置;
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
 								// this.dbNowBPM has already been initialized
 								continue;
 							}
@@ -1482,10 +1466,8 @@ internal class CTja : CActivity {
 							}
 						case 0x08:  // 拡張BPM
 						{
-								n発声位置 = chip.n発声位置;
 								if (this.isOFFSET_Negative == false)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								ms = chip.n発声時刻ms;
 								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
 									bpm = (cBPM.n表記上の番号 == 0 ? 0.0 : this.BASEBPM) + cBPM.dbBPM値;
 									this.dbNowBPM = bpm;
@@ -2328,7 +2310,6 @@ internal class CTja : CActivity {
 			}
 
 			double db小節長倍率 = dbLength[0] / dbLength[1];
-			this.dbBarLength = db小節長倍率;
 			this.fNow_Measure_m = (float)dbLength[1];
 			this.fNow_Measure_s = (float)dbLength[0];
 
