@@ -4195,51 +4195,20 @@ internal class CTja : CActivity {
 	private void tSetSenotes_branch() {
 		#region[ list作成 ]
 		//ひとまずチップだけのリストを作成しておく。
-		List<CChip> list音符のみのリスト;
-		List<CChip> list普通譜面のみのリスト;
-		List<CChip> list玄人譜面のみのリスト;
-		List<CChip> list達人譜面のみのリスト;
-		list音符のみのリスト = new List<CChip>();
-		list普通譜面のみのリスト = new List<CChip>();
-		list玄人譜面のみのリスト = new List<CChip>();
-		list達人譜面のみのリスト = new List<CChip>();
+		List<CChip>[] list音符のみのリスト_Branch = new[] { new List<CChip>(), new List<CChip>(), new List<CChip>() };
 		int nCount = 0;
 		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
 			if (NotesManager.IsCommonNote(chip)) {
-				list音符のみのリスト.Add(chip);
-
-				switch (chip.nBranch) {
-					case ECourse.eNormal:
-						list普通譜面のみのリスト.Add(chip);
-						break;
-					case ECourse.eExpert:
-						list玄人譜面のみのリスト.Add(chip);
-						break;
-					case ECourse.eMaster:
-						list達人譜面のみのリスト.Add(chip);
-						break;
-				}
+				list音符のみのリスト_Branch[(int)chip.nBranch].Add(chip);
 			}
 		}
 		#endregion
 
 		//forで処理。
-		for (int n = 0; n < 3; n++) {
-			switch (n) {
-				case 0:
-					list音符のみのリスト = list普通譜面のみのリスト;
-					break;
-				case 1:
-					list音符のみのリスト = list玄人譜面のみのリスト;
-					break;
-				case 2:
-					list音符のみのリスト = list達人譜面のみのリスト;
-					break;
-			}
-
-			this.tSenotes_Core_V2(list音符のみのリスト, true);
+		for (int n = 0; n < list音符のみのリスト_Branch.Length; n++) {
+			this.tSenotes_Core_V2(list音符のみのリスト_Branch[n], true);
 		}
 
 	}
