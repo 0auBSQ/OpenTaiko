@@ -1376,13 +1376,6 @@ internal class CTja : CActivity {
 				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
 				//   (also affect notes' time in TaikoJiro 2 (?))
 				foreach (CChip chip in this.listChip) {
-					// reassign the timing of measure-position-based chips
-					// TODO: remove this process completely for 0xDD (#SECTION)
-					switch (chip.nChannelNo) {
-						case 0xDD:
-							chip.n発声時刻ms = ms + ((int)(((625 * (chip.n発声位置 - n発声位置)) * this.dbBarLength) / bpm));
-							break;
-					}
 					nBar = chip.n発声位置 / 384;
 					int ch = chip.nChannelNo;
 
@@ -4235,12 +4228,11 @@ internal class CTja : CActivity {
 			var chip = new CChip();
 
 			chip.nChannelNo = 0xDD;
-			chip.n発声位置 = ((this.n現在の小節数 - 1) * 384);
+			chip.n発声位置 = (this.n現在の小節数 * 384);
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
 			chip.n整数値_内部番号 = 1;
-			chip.db発声時刻ms = this.dbNowTime;
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#BRANCHSTART") {
