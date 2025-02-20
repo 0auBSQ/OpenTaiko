@@ -362,7 +362,7 @@ class CActImplTrainingMode : CActivity {
 		int n演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
 		int finalStartBar;
 
-		finalStartBar = this.nCurrentMeasure - 2;
+		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
 		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = 0;

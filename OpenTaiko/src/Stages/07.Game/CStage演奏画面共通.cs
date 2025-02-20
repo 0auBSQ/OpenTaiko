@@ -4518,20 +4518,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool bSuccessSeek = false;
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			CChip pChip = dTX.listChip[i];
-			if (nStartBar == 0) {
-				if (pChip.n発声位置 < 384 * nStartBar) {
-					continue;
-				} else {
-					bSuccessSeek = true;
-					this.nCurrentTopChip = i;
-					break;
-				}
-			} else {
-				if (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 > nStartBar - 1) {
-					bSuccessSeek = true;
-					this.nCurrentTopChip = i;
-					break;
-				}
+			if ((nStartBar == 0) ?
+				pChip.n発声時刻ms >= 0
+				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 >= nStartBar)
+				) {
+				bSuccessSeek = true;
+				this.nCurrentTopChip = i;
+				break;
 			}
 		}
 		int idxCurrentTopMostChip;
@@ -4545,7 +4538,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		#endregion
 		#region [ 演奏開始の発声時刻msを取得し、タイマに設定 ]
-		int nStartTime = (int)CTja.TjaTimeToGameTime(dTX.listChip[this.nCurrentTopChip].n発声時刻ms, dTX);
+		int nStartTime = (nStartBar == 0) ? 0
+			: ((int)CTja.TjaTimeToGameTime(dTX.listChip[this.nCurrentTopChip].n発声時刻ms, dTX) - OpenTaiko.ConfigIni.MusicPreTimeMs);
 
 		SoundManager.PlayTimer.Reset(); // これでPAUSE解除されるので、次のPAUSEチェックは不要
 										//if ( !this.bPAUSE )
