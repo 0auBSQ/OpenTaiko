@@ -1537,9 +1537,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.bIncludeSubfoldersOnRandomSelect = true;
 		this.nMinDisplayedCombo = new STDGBVALUE<int>();
 		this.nMinDisplayedCombo.Drums = 10;
-		this.nMinDisplayedCombo.Guitar = 10;
-		this.nMinDisplayedCombo.Bass = 10;
-		this.nMinDisplayedCombo.Taiko = 10;
 		this.nRollsPerSec = 15;
 		this.nAILevel = 1;
 		this.bAIBattleMode = false;

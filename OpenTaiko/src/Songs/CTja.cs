@@ -526,8 +526,6 @@ internal class CTja : CActivity {
 		this.isOFFSET_Negative = false;
 		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 		stdgbvalue.Drums = 0;
-		stdgbvalue.Guitar = 0;
-		stdgbvalue.Bass = 0;
 		this.LEVEL = stdgbvalue;
 		this.bHIDDENBRANCH = false;
 		this.bチップがある = new STチップがある();

@@ -458,9 +458,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public override void DeActivate() {
 		this.bgmlength = 1;
 		this.ctチップ模様アニメ.Drums = null;
-		this.ctチップ模様アニメ.Guitar = null;
-		this.ctチップ模様アニメ.Bass = null;
-		this.ctチップ模様アニメ.Taiko = null;
 
 		this.ctCamHMove = null;
 		this.ctCamVMove = null;

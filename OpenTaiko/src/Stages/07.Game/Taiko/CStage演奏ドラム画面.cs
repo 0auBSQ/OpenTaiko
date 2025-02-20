@@ -342,9 +342,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				SoundManager.PlayTimer.Reset();
 				OpenTaiko.Timer.Reset();
 				this.ctチップ模様アニメ.Drums = new CCounter(0, 1, 500, OpenTaiko.Timer);
-				this.ctチップ模様アニメ.Guitar = new CCounter(0, 0x17, 20, OpenTaiko.Timer);
-				this.ctチップ模様アニメ.Bass = new CCounter(0, 0x17, 20, OpenTaiko.Timer);
-				this.ctチップ模様アニメ.Taiko = new CCounter(0, 1, 500, OpenTaiko.Timer);
 
 				// this.actChipFireD.Start( Eレーン.HH );	// #31554 2013.6.12 yyagi
 				// 初チップヒット時のもたつき回避。最初にactChipFireD.Start()するときにJITが掛かって？
