@@ -623,7 +623,7 @@ internal class CSongs管理 {
 					if (!String.IsNullOrEmpty(cdtx.PREIMAGE))
 						c曲リストノード.score[i].譜面情報.Preimage = cdtx.PREIMAGE;
 					c曲リストノード.score[i].譜面情報.Presound = cdtx.PREVIEW;
-					c曲リストノード.score[i].譜面情報.Backgound = ((cdtx.BACKGROUND != null) && (cdtx.BACKGROUND.Length > 0)) ? cdtx.BACKGROUND : cdtx.BACKGROUND_GR;
+					c曲リストノード.score[i].譜面情報.Backgound = cdtx.BACKGROUND;
 					c曲リストノード.score[i].譜面情報.レベル.Drums = cdtx.LEVEL.Drums;
 					c曲リストノード.score[i].譜面情報.レベル.Guitar = cdtx.LEVEL.Guitar;
 					c曲リストノード.score[i].譜面情報.レベル.Bass = cdtx.LEVEL.Bass;

@@ -311,7 +311,6 @@ internal class CTja : CActivity {
 	public bool bSession譜面を読み込む;
 	public string ARTIST;
 	public string BACKGROUND;
-	public string BACKGROUND_GR;
 	public double BASEBPM;
 	public double BPM;
 	public double MinBPM;
@@ -521,7 +520,6 @@ internal class CTja : CActivity {
 		this.PREVIEW = "";
 		this.PREIMAGE = "";
 		this.BACKGROUND = "";
-		this.BACKGROUND_GR = "";
 		this.PATH_WAV = "";
 		this.BPM = 120.0;
 		this.msOFFSET_Abs = 0;
