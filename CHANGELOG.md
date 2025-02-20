@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.43] - 2025-02-20 (Beta)
+
+- [Fix] Make 0 stars charts selectable on song select
+
 ## [0.6.0.42] - 2025-02-20 (Beta)
 
 - Fix wrong notes' scrolling BPM when `#BPMCHANGE` is put at chart start due to wrong post-process order of 0x03 (initial BPM:) and 0x08 (#BPMCHANGE)
