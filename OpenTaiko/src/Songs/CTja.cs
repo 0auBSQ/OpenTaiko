@@ -39,23 +39,6 @@ internal class CTja : CActivity {
 			return builder.ToString();
 		}
 	}
-	public class CSCROLL {
-		public double dbSCROLL値;
-		public double dbSCROLL値Y;
-		public int n内部番号;
-		public int n表記上の番号;
-
-		public override string ToString() {
-			StringBuilder builder = new StringBuilder(0x80);
-			if (this.n内部番号 != this.n表記上の番号) {
-				builder.Append(string.Format("CSCROLL{0}(内部{1})", CTja.tZZ(this.n表記上の番号), this.n内部番号));
-			} else {
-				builder.Append(string.Format("CSCROLL{0}", CTja.tZZ(this.n表記上の番号)));
-			}
-			builder.Append(string.Format(", SCROLL:{0}", this.dbSCROLL値));
-			return builder.ToString();
-		}
-	}
 	/// <summary>
 	/// 判定ライン移動命令
 	/// </summary>
@@ -291,10 +274,6 @@ internal class CTja : CActivity {
 	public List<CChip> listChip;
 	public List<CChip>[] listChip_Branch;
 	public Dictionary<int, CWAV> listWAV;
-	public Dictionary<int, CSCROLL> listSCROLL;
-	public Dictionary<int, CSCROLL> listSCROLL_Normal;
-	public Dictionary<int, CSCROLL> listSCROLL_Expert;
-	public Dictionary<int, CSCROLL> listSCROLL_Master;
 	public Dictionary<int, CJPOSSCROLL> listJPOSSCROLL;
 	public List<DanSongs> List_DanSongs;
 	private EScrollMode eScrollMode;
@@ -1829,8 +1808,6 @@ internal class CTja : CActivity {
 				this.dbNowScroll = dbComplexNum[0];
 				this.dbNowScrollY = dbComplexNum[1];
 
-				this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = dbComplexNum[0], dbSCROLL値Y = dbComplexNum[1] });
-
 				switch (this.n現在のコース) {
 					case ECourse.eNormal:
 						this.dbNowSCROLL_Normal[0] = dbComplexNum[0];
@@ -1858,7 +1835,6 @@ internal class CTja : CActivity {
 				chip.n発声時刻ms = (int)this.dbNowTime;
 				chip.fNow_Measure_m = this.fNow_Measure_m;
 				chip.fNow_Measure_s = this.fNow_Measure_s;
-				chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
 				chip.dbSCROLL = dbComplexNum[0];
 				chip.dbSCROLL_Y = dbComplexNum[1];
 				chip.nBranch = this.n現在のコース;
@@ -1875,8 +1851,6 @@ internal class CTja : CActivity {
 
 				this.dbNowScroll = dbSCROLL;
 				this.dbNowScrollY = 0.0;
-
-				this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = dbSCROLL, dbSCROLL値Y = 0.0 });
 
 				switch (this.n現在のコース) {
 					case ECourse.eNormal:
@@ -1898,7 +1872,6 @@ internal class CTja : CActivity {
 				chip.n発声時刻ms = (int)this.dbNowTime;
 				chip.fNow_Measure_m = this.fNow_Measure_m;
 				chip.fNow_Measure_s = this.fNow_Measure_s;
-				chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
 				chip.dbSCROLL = dbSCROLL;
 				chip.dbSCROLL_Y = 0.0;
 				chip.nBranch = this.n現在のコース;
@@ -1907,7 +1880,6 @@ internal class CTja : CActivity {
 
 				this.listChip.Add(chip);
 			}
-			this.n内部番号SCROLL1to++;
 		} else if (command == "#MEASURE") {
 			strArray = argument.Split(new char[] { '/' });
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
@@ -2857,7 +2829,6 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
@@ -2873,7 +2844,6 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
@@ -2889,7 +2859,6 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.n整数値_内部番号 = this.n内部番号SCROLL1to;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
@@ -3115,20 +3084,15 @@ internal class CTja : CActivity {
 		this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
 		this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
-		// apply initial SCROLL
-		this.listSCROLL.Add(this.n内部番号SCROLL1to, new CSCROLL() { n内部番号 = this.n内部番号SCROLL1to, n表記上の番号 = 0, dbSCROLL値 = this.dbScrollSpeed, });
-
 		// add initial SCROLL chip
 		var chipInitScroll = new CChip();
 
 		chipInitScroll.nChannelNo = 0x9D;
 		chipInitScroll.n発声位置 = (this.n現在の小節数 * 384);
 		chipInitScroll.n整数値 = 0x00;
-		chipInitScroll.n整数値_内部番号 = this.n内部番号SCROLL1to;
 		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
 
 		this.listChip.Add(chipInitScroll);
-		this.n内部番号SCROLL1to++;
 
 		// apply initial BPM
 		CBPM bpmInit = new() { n内部番号 = this.n内部番号BPM1to - 1, n表記上の番号 = this.n内部番号BPM1to - 1, dbBPM値 = this.BASEBPM, };
@@ -4742,10 +4706,6 @@ internal class CTja : CActivity {
 		}
 		this.listWAV = new Dictionary<int, CWAV>();
 		this.listBPM = new Dictionary<int, CBPM>();
-		this.listSCROLL = new Dictionary<int, CSCROLL>();
-		this.listSCROLL_Normal = new Dictionary<int, CSCROLL>();
-		this.listSCROLL_Expert = new Dictionary<int, CSCROLL>();
-		this.listSCROLL_Master = new Dictionary<int, CSCROLL>();
 		this.listJPOSSCROLL = new Dictionary<int, CJPOSSCROLL>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
@@ -4783,23 +4743,6 @@ internal class CTja : CActivity {
 		if (this.listBPM != null) {
 			this.listBPM.Clear();
 			this.listBPM = null;
-		}
-		if (this.listSCROLL != null) {
-			this.listSCROLL.Clear();
-			this.listSCROLL = null;
-		}
-
-		if (this.listSCROLL_Normal != null) {
-			this.listSCROLL_Normal.Clear();
-			this.listSCROLL_Normal = null;
-		}
-		if (this.listSCROLL_Expert != null) {
-			this.listSCROLL_Expert.Clear();
-			this.listSCROLL_Expert = null;
-		}
-		if (this.listSCROLL_Master != null) {
-			this.listSCROLL_Master.Clear();
-			this.listSCROLL_Master = null;
 		}
 		if (this.listJPOSSCROLL != null) {
 			this.listJPOSSCROLL.Clear();
@@ -4895,7 +4838,6 @@ internal class CTja : CActivity {
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
 	private int n内部番号BPM1to;
-	private int n内部番号SCROLL1to;
 	private int n内部番号JSCROLL1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
