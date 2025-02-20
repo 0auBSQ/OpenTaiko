@@ -4081,29 +4081,15 @@ internal class CTja : CActivity {
 		// 相変わらず原始的なやり方だが、正常に動作した。
 		string[] Matchptn = new string[7] { "easy", "normal", "hard", "oni", "edit", "tower", "dan" };
 		for (int i = 0; i < Matchptn.Length; i++) {
-			if (Regex.IsMatch(str, Matchptn[i], RegexOptions.IgnoreCase)) {
+			if (string.Equals(str, Matchptn[i], StringComparison.InvariantCultureIgnoreCase)) {
 				return i;
 			}
 		}
 
-		switch (str) {
-			case "0":
-				return 0;
-			case "1":
-				return 1;
-			case "2":
-				return 2;
-			case "3":
-				return 3;
-			case "4":
-				return 4;
-			case "5":
-				return 5;
-			case "6":
-				return 6;
-			default:
-				return 3;
+		if (int.TryParse(str, out int iDiff) && (iDiff >= 0 && iDiff <= 6)) {
+			return iDiff;
 		}
+		return 3;
 	}
 
 	/// <summary>
