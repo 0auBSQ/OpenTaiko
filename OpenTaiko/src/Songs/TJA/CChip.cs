@@ -51,7 +51,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
 	public double fBMSCROLLTime_end;
-	public int n発声時刻ms;
+	public int n発声時刻ms { get => (int)db発声時刻ms; set => db発声時刻ms = value; }
 	public double n分岐時刻ms;
 
 
