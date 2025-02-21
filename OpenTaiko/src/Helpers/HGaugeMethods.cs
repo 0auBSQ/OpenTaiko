@@ -420,18 +420,11 @@ class HGaugeMethods {
 
 	public static float UNSAFE_KillZonePercent(int player) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CTja[] dtxs =
-		{
-			OpenTaiko.TJA,
-			OpenTaiko.TJA_2P,
-			OpenTaiko.TJA_3P,
-			OpenTaiko.TJA_4P,
-			OpenTaiko.TJA_5P
-		};
+		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtxs[player].nノーツ数[3];
+		int totalHits = dtx.nノーツ数[3];
 
 		// Difficulty
 		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
@@ -448,14 +441,7 @@ class HGaugeMethods {
 
 	public static void UNSAFE_DrawGaugeFast(int player, int opacity, int rainbowTextureIndex, int soulFlameIndex) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CTja[] dtxs =
-		{
-			OpenTaiko.TJA,
-			OpenTaiko.TJA_2P,
-			OpenTaiko.TJA_3P,
-			OpenTaiko.TJA_4P,
-			OpenTaiko.TJA_5P
-		};
+		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
 		GaugeBox = new int[] { OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3] };
@@ -531,7 +517,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtxs[player].nノーツ数[3];
+		int totalHits = dtx.nノーツ数[3];
 
 		// Scale
 		float scale = 1.0f;
@@ -595,21 +581,14 @@ class HGaugeMethods {
 
 	public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		CTja[] dtxs =
-		{
-			OpenTaiko.TJA,
-			OpenTaiko.TJA_2P,
-			OpenTaiko.TJA_3P,
-			OpenTaiko.TJA_4P,
-			OpenTaiko.TJA_5P
-		};
+		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
 		GaugeBox = new int[] { OpenTaiko.Skin.Result_Gauge_Rect[0], OpenTaiko.Skin.Result_Gauge_Rect[1], OpenTaiko.Skin.Result_Gauge_Rect[2], OpenTaiko.Skin.Result_Gauge_Rect[3] };
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtxs[player].nノーツ数[3];
+		int totalHits = dtx.nノーツ数[3];
 
 		// Gauge type
 		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());

@@ -65,25 +65,9 @@ internal class OpenTaiko : Game {
 	}
 
 	#region [DTX instances]
-	public static CTja? TJA {
+	public static CTja? TJA { // only for P1
 		get => tja[0];
 		set => SetTJA(0, value);
-	}
-	public static CTja? TJA_2P {
-		get => tja[1];
-		set => SetTJA(1, value);
-	}
-	public static CTja? TJA_3P {
-		get => tja[2];
-		set => SetTJA(2, value);
-	}
-	public static CTja? TJA_4P {
-		get => tja[3];
-		set => SetTJA(3, value);
-	}
-	public static CTja? TJA_5P {
-		get => tja[4];
-		set => SetTJA(4, value);
 	}
 
 	public static CTja?[] TJAs
@@ -1441,7 +1425,7 @@ internal class OpenTaiko : Game {
 	private bool b終了処理完了済み;
 	public bool bInternetConnectionSuccess { get; private set; } = false;
 	private long PreviousSystemTimeMs = long.MinValue;
-	private static CTja[] tja = new CTja[5];
+	private static CTja[] tja = new CTja[MAX_PLAYERS];
 
 	public static TextureLoader Tx = new TextureLoader();
 
