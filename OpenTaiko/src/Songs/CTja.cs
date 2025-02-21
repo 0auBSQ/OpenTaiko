@@ -1728,8 +1728,8 @@ internal class CTja : CActivity {
 			chip1.nChannelNo = 0x9C;
 			chip1.n発声位置 = ((this.n現在の小節数) * 384);
 			chip1.n発声時刻ms = (int)this.dbNowTime;
-			chip.fNow_Measure_m = this.fNow_Measure_m;
-			chip.fNow_Measure_s = this.fNow_Measure_s;
+			chip1.fNow_Measure_m = this.fNow_Measure_m;
+			chip1.fNow_Measure_s = this.fNow_Measure_s;
 			chip1.fBMSCROLLTime = this.dbNowBMScollTime;
 			chip1.dbBPM = dbBPM;
 			chip1.dbSCROLL = this.dbNowScroll;
