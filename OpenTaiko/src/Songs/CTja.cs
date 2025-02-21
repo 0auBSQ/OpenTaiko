@@ -3144,28 +3144,9 @@ internal class CTja : CActivity {
 					// IsEndedBranchingがfalseで1回
 					// trueで3回だよ3回
 					for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-						CChip chip = new CChip();
-						chip.n発声位置 = ((this.n現在の小節数) * 384);
-						chip.nChannelNo = 0x50;
-						chip.n発声時刻ms = (int)this.dbNowTime;
+						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, n文字数, IsEndedBranching ? (ECourse)i : n現在のコース);
 						chip.n整数値 = this.n現在の小節数;
-						chip.n文字数 = n文字数;
 						chip.n整数値_内部番号 = this.n現在の小節数;
-						chip.dbBPM = this.dbNowBPM;
-						chip.fNow_Measure_m = this.fNow_Measure_m;
-						chip.fNow_Measure_s = this.fNow_Measure_s;
-						chip.IsEndedBranching = IsEndedBranching;
-						chip.dbSCROLL = this.dbNowScroll;
-						chip.dbSCROLL_Y = this.dbNowScrollY;
-						chip.fBMSCROLLTime = this.dbNowBMScollTime;
-						chip.eScrollMode = eScrollMode;
-
-						if (IsEndedBranching)
-							chip.nBranch = (ECourse)i;
-						else
-							chip.nBranch = n現在のコース;
-
-						chip.bVisible = true;
 						chip.bHideBarLine = this.bBARLINECUE[0] == 1;
 						#region [ 作り直し ]
 						if (IsEndedBranching) {
@@ -3258,33 +3239,38 @@ internal class CTja : CActivity {
 		}
 	}
 
+	private CChip NewScrolledChipAtDefCursor(int channelNo, int iDiv, int divsPerMeasure, ECourse branch)
+		=> new() {
+			nChannelNo = channelNo,
+			n発声位置 = (int)((this.n現在の小節数 * 384.0) + ((384.0 * iDiv) / divsPerMeasure)),
+			n文字数 = divsPerMeasure,
+			n発声時刻ms = (int)this.dbNowTime,
+			fBMSCROLLTime = this.dbNowBMScollTime,
+			fNow_Measure_m = this.fNow_Measure_m,
+			fNow_Measure_s = this.fNow_Measure_s,
+			dbBPM = this.dbNowBPM,
+			dbSCROLL = this.dbNowScroll,
+			dbSCROLL_Y = this.dbNowScrollY,
+			eScrollMode = this.eScrollMode,
+
+			IsEndedBranching = this.IsEndedBranching,
+			nBranch = branch,
+
+			bVisible = true,
+		};
+
 	private void InsertNoteAtDefCursor(int noteType, int iDiv, int divsPerMeasure, ECourse branch) {
 		int iBranch = (int)branch;
 
-		var chip = new CChip();
+		CChip chip = this.NewScrolledChipAtDefCursor(0x10 + noteType, iDiv, divsPerMeasure, branch);
 		chip.IsMissed = false;
 		chip.bHit = false;
-		chip.bVisible = true;
 		chip.bShow = true;
 		chip.bShowRoll = true;
-		chip.nChannelNo = 0x10 + noteType;
-		//chip.n発声位置 = (this.n現在の小節数 * 384) + ((384 * iDiv) / divsPerMeasure);
-		chip.n発声位置 = (int)((this.n現在の小節数 * 384.0) + ((384.0 * iDiv) / divsPerMeasure));
 		chip.db発声位置 = this.dbNowTime;
-		chip.n発声時刻ms = (int)this.dbNowTime;
-		//chip.fBMSCROLLTime = (float)(( this.dbBarLength ) * (16.0f / this.n各小節の文字数[this.n現在の小節数]));
-		chip.fBMSCROLLTime = this.dbNowBMScollTime;
 		chip.n整数値 = noteType;
 		chip.n整数値_内部番号 = 1;
-		chip.IsEndedBranching = IsEndedBranching;
-		chip.fNow_Measure_m = this.fNow_Measure_m;
-		chip.fNow_Measure_s = this.fNow_Measure_s;
-		chip.dbBPM = this.dbNowBPM;
-		chip.dbSCROLL = this.dbNowScroll;
-		chip.dbSCROLL_Y = this.dbNowScrollY;
 		chip.nScrollDirection = this.nスクロール方向;
-		chip.eScrollMode = eScrollMode;
-		chip.nBranch = branch;
 		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
