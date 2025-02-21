@@ -1408,10 +1408,6 @@ internal class CStage結果 : CStage {
 
 							actFI.tフェードアウト開始();
 
-							if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
-								if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-									OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
-
 							tPostprocessing();
 
 							{
