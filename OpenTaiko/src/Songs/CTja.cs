@@ -761,15 +761,8 @@ internal class CTja : CActivity {
 
 		if (OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayerSide))].effect.AllPurple) {
 			foreach (var chip in this.listChip) {
-				switch (chip.nChannelNo) {
-					case 0x13:
-					case 0x1A:
-						chip.nChannelNo = 0x101;
-						break;
-					case 0x14:
-					case 0x1B:
-						chip.nChannelNo = 0x101;
-						break;
+				if (chip.nChannelNo is 0x13 or 0x1A or 0x14 or 0x1B) {
+					chip.nChannelNo = 0x101;
 				}
 			}
 		}
@@ -2065,15 +2058,11 @@ internal class CTja : CActivity {
 			}
 		} else if (command == "#GAMETYPE") {
 			CChip chip = this.NewEventChipAtDefCursor(0xD8, 1);
-			switch (argument) {
-				case "Taiko":
-					chip.eGameType = EGameType.Taiko;
-					break;
-				case "Bongo":
-				case "Konga":
-					chip.eGameType = EGameType.Konga;
-					break;
-			}
+			chip.eGameType = argument switch {
+				"Taiko" => EGameType.Taiko,
+				"Bongo" or "Konga" => EGameType.Konga,
+				_ => chip.eGameType,
+			};
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -2857,41 +2846,20 @@ internal class CTja : CActivity {
 		}
 
 		#region[ 固定される種類のsenotesはここで設定しておく。 ]
-		switch (noteType) {
-			case 3:
-				chip.nSenote = 5;
-				break;
-			case 4:
-				chip.nSenote = 6;
-				break;
-			case 5:
-				chip.nSenote = 7;
-				break;
-			case 6:
-				chip.nSenote = 0xA;
-				break;
-			case 7:
-				chip.nSenote = 0xB;
-				break;
-			case 8:
-				chip.nSenote = 0xC;
-				break;
-			case 9:
-				chip.nSenote = 0xB;
-				break;
-			case 0xA:
-				chip.nSenote = 5;
-				break;
-			case 0xB:
-				chip.nSenote = 6;
-				break;
-			case 0xD:
-				chip.nSenote = 0xB;
-				break;
-			case 0xF1:
-				chip.nSenote = 5;
-				break;
-		}
+		chip.nSenote = noteType switch {
+			3 => 5,
+			4 => 6,
+			5 => 7,
+			6 => 0xA,
+			7 => 0xB,
+			8 => 0xC,
+			9 => 0xB,
+			0xA => 5,
+			0xB => 6,
+			0xD => 0xB,
+			0xF1 => 5,
+			_ => chip.nSenote,
+		};
 		#endregion
 
 
