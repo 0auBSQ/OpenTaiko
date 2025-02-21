@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.44] - 2025-02-21 (Beta)
+
+- Refactor CTJA & fix minor parsing issues
+
 ## [0.6.0.43] - 2025-02-20 (Beta)
 
 - [Fix] Make 0 stars charts selectable on song select
