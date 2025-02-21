@@ -43,12 +43,14 @@ internal class CTja : CActivity {
 	/// 判定ライン移動命令
 	/// </summary>
 	public class CJPOSSCROLL {
-		public double db移動時間;
-		public double n移動距離px;
-		public int n移動方向; //移動方向は0(左)、1(右)の2つだけ。
+		public double msMoveDt;
+		public double pxOrigX;
+		public double pxOrigY;
+		public double pxMoveDx;
+		public double pxMoveDy;
 		public int n内部番号;
 		public int n表記上の番号;
-		public double nVerticalMove;
+		public CChip? chip;
 
 		public override string ToString() {
 			StringBuilder builder = new StringBuilder(0x80);
@@ -57,7 +59,7 @@ internal class CTja : CActivity {
 			} else {
 				builder.Append(string.Format("CJPOSSCROLL{0}", CTja.tZZ(this.n表記上の番号)));
 			}
-			builder.Append(string.Format(", JPOSSCROLL:{0}", this.db移動時間));
+			builder.Append(string.Format(", JPOSSCROLL:{0}", this.msMoveDt / 1000));
 			return builder.ToString();
 		}
 	}
@@ -274,7 +276,7 @@ internal class CTja : CActivity {
 	public List<CChip> listChip;
 	public List<CChip>[] listChip_Branch;
 	public Dictionary<int, CWAV> listWAV;
-	public Dictionary<int, CJPOSSCROLL> listJPOSSCROLL;
+	public List<CJPOSSCROLL> listJPOSSCROLL;
 	public List<DanSongs> List_DanSongs;
 	private EScrollMode eScrollMode;
 
@@ -952,7 +954,6 @@ internal class CTja : CActivity {
 												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 												// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
-				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
 
@@ -964,6 +965,8 @@ internal class CTja : CActivity {
 				// * Offset chips from RawTjaTime To TjaTime; see RawTjaTimeToTjaTimeMusic()
 				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
 				//   (also affect notes' time in TaikoJiro 2 (?))
+				// * Truncate movement of unfinished JPosScrolls and calculate resulting source coordination for deterministic behavior
+				CJPOSSCROLL? lastJPosScroll = null;
 				foreach (CChip chip in this.listChip) {
 					int ch = chip.nChannelNo;
 
@@ -1112,6 +1115,33 @@ internal class CTja : CActivity {
 								continue;
 							}
 						case 0xE0: {
+								continue;
+							}
+						case 0xE2: { // #JPOSSCROLL
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+
+								// calculate accumulated movement by time order (not definition order)
+								CJPOSSCROLL jposs = this.listJPOSSCROLL[chip.n整数値_内部番号];
+								if (lastJPosScroll == null) {
+									jposs.pxOrigX = 0;
+									jposs.pxOrigY = 0;
+								} else {
+									if (lastJPosScroll.msMoveDt > 0) {
+										double msLastMoveDt = lastJPosScroll.msMoveDt;
+										double msCanMove = double.Max(0, chip.n発声時刻ms - lastJPosScroll.chip!.n発声時刻ms);
+										// truncate movement of last JPosScroll if unfinished
+										if (msCanMove < msLastMoveDt) {
+											double lastMoveRate = msCanMove / msLastMoveDt;
+											lastJPosScroll.msMoveDt = msCanMove;
+											lastJPosScroll.pxMoveDx *= lastMoveRate;
+											lastJPosScroll.pxMoveDy *= lastMoveRate;
+										}
+									}
+									jposs.pxOrigX = lastJPosScroll.pxOrigX + lastJPosScroll.pxMoveDx;
+									jposs.pxOrigY = lastJPosScroll.pxOrigY + lastJPosScroll.pxMoveDy;
+								}
+								lastJPosScroll = jposs;
 								continue;
 							}
 						default: {
@@ -2237,30 +2267,39 @@ internal class CTja : CActivity {
 		} else if (command == "#JPOSSCROLL") {
 			strArray = argument.Split(chDelimiter);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
-			double db移動時刻 = Convert.ToDouble(strArray[0]);
-			double n移動px = 0;
-			double nComplexMove = 0;
+			double msMoveDt = double.Max(0, 1000 * Convert.ToDouble(strArray[0]));
+			double pxMoveDx = 0;
+			double pxMoveDy = 0;
 			if (strArray[1].IndexOf('i') != -1) {
 				double[] dbComplexNum = new double[2];
 				this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
-				n移動px = dbComplexNum[0];
-				nComplexMove = dbComplexNum[1];
+				pxMoveDx = dbComplexNum[0];
+				pxMoveDy = dbComplexNum[1];
 			} else
-				n移動px = Convert.ToDouble(strArray[1]);
+				pxMoveDx = Convert.ToDouble(strArray[1]);
 
 
 			int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
+			if (n移動方向 == 0) { // same move direction as notes in `#SCROLL x+yi`
+				pxMoveDx = -pxMoveDx;
+				pxMoveDy = -pxMoveDy;
+			}
 
 			//チップ追加して割り込んでみる。
-			var chip = this.NewEventChipAtDefCursor(0xE2, 0);
+			var chip = this.NewEventChipAtDefCursor(0xE2, this.listJPOSSCROLL.Count);
 			chip.n発声位置 -= 1;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
-
-			this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向, nVerticalMove = nComplexMove });
+			this.listJPOSSCROLL.Add(new CJPOSSCROLL() {
+				n内部番号 = this.listJPOSSCROLL.Count,
+				n表記上の番号 = 0,
+				msMoveDt = msMoveDt,
+				pxMoveDx = pxMoveDx,
+				pxMoveDy = pxMoveDy,
+				chip = chip,
+			});
 			this.listChip.Add(chip);
-			this.n内部番号JSCROLL1to++;
 		} else if (command == "#SENOTECHANGE") {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
@@ -3955,7 +3994,7 @@ internal class CTja : CActivity {
 		}
 		this.listWAV = new Dictionary<int, CWAV>();
 		this.listBPM = new Dictionary<int, CBPM>();
-		this.listJPOSSCROLL = new Dictionary<int, CJPOSSCROLL>();
+		this.listJPOSSCROLL = new List<CJPOSSCROLL>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
 		this.listChip_Branch = new List<CChip>[3];
@@ -4059,7 +4098,6 @@ internal class CTja : CActivity {
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
 	private int n内部番号BPM1to;
-	private int n内部番号JSCROLL1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
 	private int[] n無限管理PAN;
