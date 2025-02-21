@@ -46,23 +46,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			nRollTimeMs[i] = 0;
 			nAddScoreNiji[i] = 0;
 
-			switch (i) {
-				case 0:
-					listChip[i] = OpenTaiko.TJA.listChip;
-					break;
-				case 1:
-					listChip[i] = OpenTaiko.TJA_2P.listChip;
-					break;
-				case 2:
-					listChip[i] = OpenTaiko.TJA_3P.listChip;
-					break;
-				case 3:
-					listChip[i] = OpenTaiko.TJA_4P.listChip;
-					break;
-				case 4:
-					listChip[i] = OpenTaiko.TJA_5P.listChip;
-					break;
-			}
+			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
 
 			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
 				balloonChips[i] = new();
@@ -92,26 +76,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CTja _dtx = OpenTaiko.TJA;
-			switch (i) //2017.08.11 kairera0467
-			{
-				case 0:
-					break;
-				case 1:
-					_dtx = OpenTaiko.TJA_2P;
-					break;
-				case 2:
-					_dtx = OpenTaiko.TJA_3P;
-					break;
-				case 3:
-					_dtx = OpenTaiko.TJA_4P;
-					break;
-				case 4:
-					_dtx = OpenTaiko.TJA_5P;
-					break;
-				default:
-					break;
-			}
+			CTja _dtx = OpenTaiko.GetTJA(i)!;
 
 			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
 				for (int j = 0; j < balloonChips[i].Count; j++) {
@@ -458,9 +423,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public override void DeActivate() {
 		this.bgmlength = 1;
 		this.ctチップ模様アニメ.Drums = null;
-		this.ctチップ模様アニメ.Guitar = null;
-		this.ctチップ模様アニメ.Bass = null;
-		this.ctチップ模様アニメ.Taiko = null;
 
 		this.ctCamHMove = null;
 		this.ctCamVMove = null;
@@ -2837,26 +2799,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		CConfigIni configIni = OpenTaiko.ConfigIni;
 
-		CTja dTX = OpenTaiko.TJA;
+		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
 		bool bAutoPlay = configIni.bAutoPlay[nPlayer];
-		switch (nPlayer) //2017.08.11 kairera0467
-		{
-			case 1:
-				bAutoPlay = configIni.bAutoPlay[nPlayer] || OpenTaiko.ConfigIni.bAIBattleMode;
-				dTX = OpenTaiko.TJA_2P;
-				break;
-			case 2:
-				dTX = OpenTaiko.TJA_3P;
-				break;
-			case 3:
-				dTX = OpenTaiko.TJA_4P;
-				break;
-			case 4:
-				dTX = OpenTaiko.TJA_5P;
-				break;
-			default:
-				break;
-		}
+		if (nPlayer == 1)
+			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
 
 		if (this.n分岐した回数[nPlayer] == 0) {
 			this.bUseBranch[nPlayer] = dTX.bHIDDENBRANCH ? false : dTX.bチップがある.Branch;
@@ -4037,26 +3983,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		CConfigIni configIni = OpenTaiko.ConfigIni;
 
-		CTja dTX = OpenTaiko.TJA;
+		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
 		bool bAutoPlay = configIni.bAutoPlay[nPlayer];
-		switch (nPlayer) //2017.08.11 kairera0467
-		{
-			case 1:
-				bAutoPlay = configIni.bAutoPlay[nPlayer] || OpenTaiko.ConfigIni.bAIBattleMode;
-				dTX = OpenTaiko.TJA_2P;
-				break;
-			case 2:
-				dTX = OpenTaiko.TJA_3P;
-				break;
-			case 3:
-				dTX = OpenTaiko.TJA_4P;
-				break;
-			case 4:
-				dTX = OpenTaiko.TJA_5P;
-				break;
-			default:
-				break;
-		}
+		if (nPlayer == 1)
+			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
 
 		var n現在時刻ms = (long)dTX.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 
@@ -4211,24 +4141,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public void t分岐処理(CTja.ECourse n分岐先, int nPlayer, double n発声位置, CTja.EBranchConditionType e分岐種類 = CTja.EBranchConditionType.Accuracy) {
 
-		CTja dTX = OpenTaiko.TJA;
-		switch (nPlayer) {
-			case 1:
-				dTX = OpenTaiko.TJA_2P;
-				break;
-			case 2:
-				dTX = OpenTaiko.TJA_3P;
-				break;
-			case 3:
-				dTX = OpenTaiko.TJA_4P;
-				break;
-			case 4:
-				dTX = OpenTaiko.TJA_5P;
-				break;
-			default:
-				break;
-		}
-
+		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
 
 		for (int A = 0; A < dTX.listChip.Count; A++) {
 			var Chip = dTX.listChip[A].nChannelNo;
@@ -4471,24 +4384,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		// まず全サウンドオフにする
 		OpenTaiko.TJA.tStopAllChips();
 		this.actAVI.Stop();
-		CTja dTX = OpenTaiko.TJA;
-		switch (nPlayer) {
-			case 1:
-				dTX = OpenTaiko.TJA_2P;
-				break;
-			case 2:
-				dTX = OpenTaiko.TJA_3P;
-				break;
-			case 3:
-				dTX = OpenTaiko.TJA_4P;
-				break;
-			case 4:
-				dTX = OpenTaiko.TJA_5P;
-				break;
-			default:
-				break;
-		}
-
+		CTja? dTX = OpenTaiko.GetTJA(nPlayer);
 		if (dTX == null) return; //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
 
 

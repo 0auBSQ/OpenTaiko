@@ -345,15 +345,8 @@ internal class CStage曲読み込み : CStage {
 
 					//if( CDTXMania.DTX == null )
 					{
-						OpenTaiko.TJA = new CTja(str, false, 1.0, 0, 0, 0, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
-						if (OpenTaiko.ConfigIni.nPlayerCount >= 2)
-							OpenTaiko.TJA_2P = new CTja(str, false, 1.0, 0, 0, 1, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[1]);
-						if (OpenTaiko.ConfigIni.nPlayerCount >= 3)
-							OpenTaiko.TJA_3P = new CTja(str, false, 1.0, 0, 0, 2, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[2]);
-						if (OpenTaiko.ConfigIni.nPlayerCount >= 4)
-							OpenTaiko.TJA_4P = new CTja(str, false, 1.0, 0, 0, 3, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[3]);
-						if (OpenTaiko.ConfigIni.nPlayerCount >= 5)
-							OpenTaiko.TJA_5P = new CTja(str, false, 1.0, 0, 0, 4, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[4]);
+						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
+							OpenTaiko.SetTJA(i, new CTja(str, false, 0, i, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]));
 
 						if (OpenTaiko.TJA.listErrors.Count != 0) {
 							string message = "";
@@ -430,12 +423,11 @@ internal class CStage曲読み込み : CStage {
 							OpenTaiko.TJA.PlanToAddMixerChannel();
 						}
 
-						var _dtx = new CTja[5] { OpenTaiko.TJA, OpenTaiko.TJA_2P, OpenTaiko.TJA_3P, OpenTaiko.TJA_4P, OpenTaiko.TJA_5P };
-
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-							_dtx[i]?.tRandomizeTaikoChips(i);
-							_dtx[i]?.tApplyFunMods(i);
-							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx[i].strファイル名の絶対パス, i);
+							var _dtx = OpenTaiko.GetTJA(i);
+							_dtx?.tRandomizeTaikoChips(i);
+							_dtx?.tApplyFunMods(i);
+							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strファイル名の絶対パス, i);
 						}
 
 						OpenTaiko.stageGameScreen.Activate();
