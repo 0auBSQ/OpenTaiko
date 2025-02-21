@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.45] - 2025-02-21 (Beta)
+
+- [Fix] No longer close the box and prevent the cursor being sent far for no reason after a after a completed play
+
 ## [0.6.0.44] - 2025-02-21 (Beta)
 
 - Refactor CTJA & fix minor parsing issues
