@@ -746,7 +746,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private CTja.EBranchConditionType eBranch種類;
 	public double nBranch条件数値A;
 	public double nBranch条件数値B;
-	private readonly int[] NowProcessingChip = new int[] { 0, 0, 0, 0, 0 };
 	protected int nCurrentKusudamaRollCount;
 	protected int nCurrentKusudamaCount;
 
@@ -2798,10 +2797,21 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		float play_bpm_time = this.GetNowPBMTime(dTX, 0);
 
-		//for ( int nCurrentTopChip = this.n現在のトップChip; nCurrentTopChip < dTX.listChip.Count; nCurrentTopChip++ )
-		for (int nCurrentTopChip = dTX.listChip.Count - 1; nCurrentTopChip > 0; nCurrentTopChip--) {
-			CChip pChip = dTX.listChip[nCurrentTopChip];
-			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
+		#region [update phase (bar lines' position)]
+		foreach (var pChip in dTX.listBarLineChip) {
+			long time = pChip.n発声時刻ms - n現在時刻ms;
+			long msDTime_end = time;
+			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
+			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
+
+			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
+			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
+			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
+		}
+		#endregion
+
+		#region [update phase (notes' position & auto judgement)]
+		foreach (var pChip in dTX.listNoteChip) {
 			long time = pChip.n発声時刻ms - n現在時刻ms;
 			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
@@ -2816,16 +2826,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.dbSCROLL_Y_end * _scroll_rate;
 				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_end, pChip.eScrollMode_end);
 				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_Y_end, pChip.eScrollMode_end);
-			}
-
-
-			if (pChip.eScrollMode == EScrollMode.BMScroll || pChip.eScrollMode == EScrollMode.HBScroll) {
-
-				/*
-                pChip.nバーからの距離dot.Taiko = (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * dbSCROLL * (db現在の譜面スクロール速度[nPlayer] + 1) / 2 / 5.0);
-                if ( pChip.nノーツ終了時刻ms != 0 )
-                    pChip.nバーからのノーツ末端距離dot = (int)(3 * 0.8335 * ((pChip.fBMSCROLLTime_end * NOTE_GAP) - (play_bpm_time * NOTE_GAP)) * pChip.dbSCROLL * (db現在の譜面スクロール速度[nPlayer] + 1.0) / 2 / 5.0);
-                */
 			}
 
 			if (!pChip.IsMissed && !pChip.bHit) {
@@ -2848,9 +2848,35 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 
-			if (pChip.nPlayerSide == nPlayer && pChip.n発声時刻ms >= n現在時刻ms) {
-				NowProcessingChip[pChip.nPlayerSide] = nCurrentTopChip;
+			switch (pChip.nChannelNo) {
+				case 0x15:
+				case 0x16:
+				case 0x17:
+				case 0x19:
+				case 0x1D:
+				case 0x20:
+				case 0x21: {
+						//if ((!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0)))
+						{
+							if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nNoteEndTimems >= (int)n現在時刻ms)) {
+								//if( this.n現在のコース == pChip.nコース )
+								if (pChip.bVisible == true)
+									this.chip現在処理中の連打チップ[nPlayer] = pChip;
+							}
+						}
+					}
+					break;
 			}
+		}
+		#endregion
+
+		#region [update phase, process forward for correct order of non-note events]
+		for (; this.nCurrentTopChip < dTX.listChip.Count; ++this.nCurrentTopChip) {
+			CChip pChip = dTX.listChip[this.nCurrentTopChip];
+			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
+			long time = pChip.n発声時刻ms - n現在時刻ms;
+			if (time >= 0) // not processed yet
+				break;
 
 			switch (pChip.nChannelNo) {
 				#region [ 01: BGM ]
@@ -2896,9 +2922,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x13:
 				case 0x14:
 				case 0x1C:
-				case 0x101: {
-						this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer);
-					}
+				case 0x101:
+					// draw later
 					break;
 
 				case 0x15:
@@ -2906,20 +2931,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x17:
 				case 0x19:
 				case 0x1D: {
-						//2015.03.28 kairera0467
-						//描画順序を変えるため、メイン処理だけをこちらに残して描画処理は分離。
-
-						//this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip);
-						//2015.04.13 kairera0467 ここを外さないと恋文2000の連打に対応できず、ここをつけないと他のコースと重なっている連打をどうにもできない。
-						//常時実行メソッドに渡したら対応できた!?
-						//if ((!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0)))
-						{
-							if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nNoteEndTimems >= (int)n現在時刻ms)) {
-								//if( this.n現在のコース == pChip.nコース )
-								if (pChip.bVisible == true)
-									this.chip現在処理中の連打チップ[nPlayer] = pChip;
-							}
-						}
 						if (!pChip.bProcessed && time < 0) {
 							if (NotesManager.IsKusudama(pChip)) {
 								if (!this.bCurrentlyDrumRoll[nPlayer] && nPlayer == 0) {
@@ -2939,8 +2950,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							}
 							pChip.bProcessed = true;
 						}
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+						// draw later
 					}
 
 					break;
@@ -3011,8 +3021,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							}
 							this.eRollState = ERollState.None;
 						}
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+						// draw later
 					}
 
 					break;
@@ -3022,23 +3031,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				case 0x1a:
 				case 0x1b:
-				case 0x1f: {
-						this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer);
-					}
+				case 0x1f:
+					// draw later
 					break;
 				#endregion
 				#region [ 20-2F: EmptySlot ]
 				case 0x20:
-				case 0x21: {
-						if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nNoteEndTimems >= (int)n現在時刻ms)) {
-							//if( this.n現在のコース == pChip.nコース )
-							if (pChip.bVisible == true)
-								this.chip現在処理中の連打チップ[nPlayer] = pChip;
-						}
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
-					}
+				case 0x21:
+					// draw later
 					break;
+
 				case 0x22:
 				case 0x23:
 				case 0x24:
@@ -3099,7 +3101,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							actPlayInfo.NowMeasure[nPlayer] = pChip.n整数値_内部番号;
 							pChip.bHit = true;
 						}
-						this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+						// draw later
 						break;
 					}
 				#endregion
@@ -3775,7 +3777,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit && time < 0) {
 						pChip.bHit = true;
 					}
-					this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+					// draw later
 					break;
 				case 0x09:
 					if (!pChip.bHit && time < 0) {
@@ -3796,18 +3798,82 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 					break;
 				#endregion
+			}
+		}
+		#endregion
 
-				#region [ その他(未定義) ]
-				default:
-					if (!pChip.bHit && time < 0) {
-						pChip.bHit = true;
+		#region [draw phase (bar line), backward for correct stack order]
+		for (int iChip = dTX.listBarLineChip.Count; iChip-- > 0;) {
+			CChip pChip = dTX.listBarLineChip[iChip];
+			switch (pChip.nChannelNo) {
+				case 0x50: // 小節線
+				case 0xe4: // #BARLINE
+					this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+					break;
+			}
+		}
+		#endregion
+
+		#region [draw phase (note), backward for correct stack order]
+		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
+			CChip pChip = dTX.listNoteChip[iChip];
+
+			switch (pChip.nChannelNo) {
+				#region [ 11-1f & 101-: Taiko ]
+				case 0x11:
+				case 0x12:
+				case 0x13:
+				case 0x14:
+				case 0x1C:
+				case 0x101: {
+						this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer);
+					}
+					break;
+
+				case 0x15:
+				case 0x16:
+				case 0x17:
+				case 0x19:
+				case 0x1D: {
+						//2015.03.28 kairera0467
+						//描画順序を変えるため、メイン処理だけをこちらに残して描画処理は分離。
+
+						//this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip);
+						//2015.04.13 kairera0467 ここを外さないと恋文2000の連打に対応できず、ここをつけないと他のコースと重なっている連打をどうにもできない。
+						//常時実行メソッドに渡したら対応できた!?
+						if (pChip.nDisplayPriority <= 0)
+							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+					}
+
+					break;
+				case 0x18: {
+						if (pChip.nDisplayPriority <= 0)
+							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+					}
+
+					break;
+
+				case 0x1e:
+					break;
+
+				case 0x1a:
+				case 0x1b:
+				case 0x1f: {
+						this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer);
+					}
+					break;
+				#endregion
+				#region [ 20-2F: EmptySlot ]
+				case 0x20:
+				case 0x21: {
+						if (pChip.nDisplayPriority <= 0)
+							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
 					}
 					break;
 					#endregion
 			}
-
 		}
-
+		#endregion
 
 		#region [ EXTENDED CONTROLS ]
 		if (ctCamVMove != null) //vertical camera move
@@ -3956,8 +4022,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		var n現在時刻ms = (long)dTX.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 
 		//for ( int nCurrentTopChip = this.n現在のトップChip; nCurrentTopChip < dTX.listChip.Count; nCurrentTopChip++ )
-		for (int nCurrentTopChip = dTX.listChip.Count - 1; nCurrentTopChip > 0; nCurrentTopChip--) {
-			CChip pChip = dTX.listChip[nCurrentTopChip];
+		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
+			CChip pChip = dTX.listNoteChip[iChip];
 
 			switch (pChip.nChannelNo) {
 				#region[ 15-19: Rolls ]
@@ -4316,7 +4382,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			for (int i = 0; i < 5; i++) {
 				this.actComboVoice.tReset(i);
-				NowProcessingChip[i] = 0;
 			}
 		}
 		nCurrentKusudamaCount = 0;

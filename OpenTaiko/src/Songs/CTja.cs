@@ -273,7 +273,9 @@ internal class CTja : CActivity {
 
 	public Dictionary<int, CVideoDecoder> listVD;
 	public Dictionary<int, CBPM> listBPM;
-	public List<CChip> listChip;
+	public List<CChip> listChip; // increasing time > chip priority > definition order
+	public List<CChip> listBarLineChip; // increasing definition order
+	public List<CChip> listNoteChip; // increasing definition order
 	public List<CChip>[] listChip_Branch;
 	public Dictionary<int, CWAV> listWAV;
 	public List<CJPOSSCROLL> listJPOSSCROLL;
@@ -948,7 +950,8 @@ internal class CTja : CActivity {
 				}
 				#endregion
 				if (this.listChip.Count > 0) {
-					this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
+					this.listChip = this.listChip.OrderBy(x => x).ToList();
+												// 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
 												// 保守性確保を優先してここでのソートは残しておく
 												// なお、093時点では、このソートを削除しても動作するようにはしてある。
 												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
@@ -1156,7 +1159,7 @@ internal class CTja : CActivity {
 
 				#region[listlyricを時間順に並び替え。]
 				this.listLyric2 = tmplistlyric;
-				this.listLyric2.Sort((a, b) => a.Time.CompareTo(b.Time));
+				this.listLyric2 = this.listLyric2.OrderBy(x => x.Time).ToList();
 				#endregion
 
 				this.nBGMAdjust = 0;
@@ -2105,6 +2108,7 @@ internal class CTja : CActivity {
 			chip.dbSCROLL_Y = this.dbNowScrollY;
 			chip.bHideBarLine = false;
 			this.listChip.Add(chip);
+			this.listBarLineChip.Add(chip);
 		} else if (command == "#SECTION") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xDD, 1)); //分岐:条件リセット
 		} else if (command == "#BRANCHSTART") {
@@ -2709,6 +2713,7 @@ internal class CTja : CActivity {
 						#endregion
 
 						this.listChip.Add(chip);
+						this.listBarLineChip.Add(chip);
 
 						#region [ 作り直し ]
 						if (IsEndedBranching)
@@ -2953,11 +2958,14 @@ internal class CTja : CActivity {
 		Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
 		if (IsEndedBranching) {
 			this.listChip_Branch[iBranch].Add(chip);
-			if (branch == ECourse.eNormal)
+			if (branch == ECourse.eNormal) {
 				this.listChip.Add(chip);
+				this.listNoteChip.Add(chip);
+			}
 		} else {
 			this.listChip_Branch[(int)chip.nBranch].Add(chip);
 			this.listChip.Add(chip);
+			this.listNoteChip.Add(chip);
 		}
 	}
 
@@ -3927,7 +3935,7 @@ internal class CTja : CActivity {
 		listChip.AddRange(listAddMixerChannel);
 		listChip.AddRange(listRemoveMixerChannel);
 		listChip.AddRange(listRemoveTiming);
-		listChip.Sort();
+		listChip = listChip.OrderBy(x => x).ToList();
 	}
 	private void DebugOut_CChipList(List<CChip> c) {
 		for (int i = 0; i < c.Count; i++) {
@@ -4001,6 +4009,8 @@ internal class CTja : CActivity {
 		this.listChip_Branch[0] = new List<CChip>();
 		this.listChip_Branch[1] = new List<CChip>();
 		this.listChip_Branch[2] = new List<CChip>();
+		this.listBarLineChip = new List<CChip>();
+		this.listNoteChip = new List<CChip>();
 		this.listBalloon = new List<int>();
 		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
 		this.listLine = new List<CLine>();
@@ -4030,6 +4040,8 @@ internal class CTja : CActivity {
 		this.listJPOSSCROLL?.Clear();
 		this.List_DanSongs?.Clear();
 		this.listChip?.Clear();
+		this.listBarLineChip?.Clear();
+		this.listNoteChip?.Clear();
 
 		this.listBalloon?.Clear();
 		foreach (var listBalloon in this.listBalloon_Branch)
