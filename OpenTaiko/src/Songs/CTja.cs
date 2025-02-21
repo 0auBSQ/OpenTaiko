@@ -1716,7 +1716,7 @@ internal class CTja : CActivity {
 			chip.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
+			chip.fBMSCROLLTime = this.dbNowBMScollTime;
 			chip.dbBPM = dbBPM;
 			chip.n整数値_内部番号 = this.n内部番号BPM1to - 1;
 
@@ -1730,7 +1730,7 @@ internal class CTja : CActivity {
 			chip1.n発声時刻ms = (int)this.dbNowTime;
 			chip.fNow_Measure_m = this.fNow_Measure_m;
 			chip.fNow_Measure_s = this.fNow_Measure_s;
-			chip1.fBMSCROLLTime = (float)this.dbNowBMScollTime;
+			chip1.fBMSCROLLTime = this.dbNowBMScollTime;
 			chip1.dbBPM = dbBPM;
 			chip1.dbSCROLL = this.dbNowScroll;
 			chip1.n整数値_内部番号 = this.n内部番号BPM1to - 1;
@@ -3157,7 +3157,7 @@ internal class CTja : CActivity {
 						chip.IsEndedBranching = IsEndedBranching;
 						chip.dbSCROLL = this.dbNowScroll;
 						chip.dbSCROLL_Y = this.dbNowScrollY;
-						chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
+						chip.fBMSCROLLTime = this.dbNowBMScollTime;
 						chip.eScrollMode = eScrollMode;
 
 						if (IsEndedBranching)
@@ -3273,7 +3273,7 @@ internal class CTja : CActivity {
 		chip.db発声位置 = this.dbNowTime;
 		chip.n発声時刻ms = (int)this.dbNowTime;
 		//chip.fBMSCROLLTime = (float)(( this.dbBarLength ) * (16.0f / this.n各小節の文字数[this.n現在の小節数]));
-		chip.fBMSCROLLTime = (float)this.dbNowBMScollTime;
+		chip.fBMSCROLLTime = this.dbNowBMScollTime;
 		chip.n整数値 = noteType;
 		chip.n整数値_内部番号 = 1;
 		chip.IsEndedBranching = IsEndedBranching;
