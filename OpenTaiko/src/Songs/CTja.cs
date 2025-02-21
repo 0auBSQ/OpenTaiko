@@ -2089,13 +2089,11 @@ internal class CTja : CActivity {
 		} else if (command == "#SECTION") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xDD, 1)); //分岐:条件リセット
 		} else if (command == "#BRANCHSTART") {
+			//分岐:分岐スタート
 			#region [ 譜面分岐のパース方法を作り直し ]
 			this.bチップがある.Branch = true;
 			this.b最初の分岐である = false;
 			this.b分岐を一回でも開始した = true;
-
-			//分岐:分岐スタート
-			EBranchConditionType e条件;
 
 			//条件数値。
 			double[] nNum = new double[2];
@@ -2115,23 +2113,12 @@ internal class CTja : CActivity {
 			nNum[0] = Convert.ToDouble(branchStartArgumentMatch.Groups[2].Value);
 			nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
 
-			switch (branchStartArgumentMatch.Groups[1].Value) {
-				case "p":
-					e条件 = EBranchConditionType.Accuracy;
-					break;
-				case "r":
-					e条件 = EBranchConditionType.Drumroll;
-					break;
-				case "s":
-					e条件 = EBranchConditionType.Score;
-					break;
-				case "d":
-					e条件 = EBranchConditionType.Accuracy_BigNotesOnly;
-					break;
-				default:
-					e条件 = EBranchConditionType.Accuracy;
-					break;
-			}
+			var e条件 = branchStartArgumentMatch.Groups[1].Value switch {
+				"r" => EBranchConditionType.Drumroll,
+				"s" => EBranchConditionType.Score,
+				"d" => EBranchConditionType.Accuracy_BigNotesOnly,
+				"p" or _ => EBranchConditionType.Accuracy,
+			};
 
 			#region [ 分岐開始時のチップ情報を記録 ]
 			//現在のチップ情報を記録する必要がある。
@@ -3072,70 +3059,35 @@ internal class CTja : CActivity {
 
 		if (strCommandName.StartsWith("EXAM")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				Exam.Type examType;
 				int[] examValue;
-				Exam.Range examRange;
 				var splitExam = strCommandParam.Split(',');
 				int examNumber = int.Parse(strCommandName.Substring(4)) - 1;
 
 				if (examNumber > CExamInfo.cMaxExam)
 					return;
-
-				switch (splitExam[0]) {
-					case "g":
-						examType = Exam.Type.Gauge;
-						break;
-					case "jp":
-						examType = Exam.Type.JudgePerfect;
-						break;
-					case "jg":
-						examType = Exam.Type.JudgeGood;
-						break;
-					case "jb":
-						examType = Exam.Type.JudgeBad;
-						break;
-					case "s":
-						examType = Exam.Type.Score;
-						break;
-					case "r":
-						examType = Exam.Type.Roll;
-						break;
-					case "h":
-						examType = Exam.Type.Hit;
-						break;
-					case "c":
-						examType = Exam.Type.Combo;
-						break;
-					case "a":
-						examType = Exam.Type.Accuracy;
-						break;
-					case "ja":
-						examType = Exam.Type.JudgeADLIB;
-						break;
-					case "jm":
-						examType = Exam.Type.JudgeMine;
-						break;
-					default:
-						examType = Exam.Type.Gauge;
-						break;
-				}
+				var examType = splitExam[0] switch {
+					"jp" => Exam.Type.JudgePerfect,
+					"jg" => Exam.Type.JudgeGood,
+					"jb" => Exam.Type.JudgeBad,
+					"s" => Exam.Type.Score,
+					"r" => Exam.Type.Roll,
+					"h" => Exam.Type.Hit,
+					"c" => Exam.Type.Combo,
+					"a" => Exam.Type.Accuracy,
+					"ja" => Exam.Type.JudgeADLIB,
+					"jm" => Exam.Type.JudgeMine,
+					"g" or _ => Exam.Type.Gauge,
+				};
 				try {
 					examValue = new int[] { int.Parse(splitExam[1]), int.Parse(splitExam[2]) };
 				} catch (Exception) {
 					examValue = new int[] { 100, 100 };
 				}
-				switch (splitExam[3]) {
-					case "m":
-						examRange = Exam.Range.More;
-						break;
-					case "l":
-						examRange = Exam.Range.Less;
-						break;
-					default:
-						examRange = Exam.Range.More;
-						break;
-				}
 
+				var examRange = splitExam[3] switch {
+					"l" => Exam.Range.Less,
+					"m" or _ => Exam.Range.More,
+				};
 				if (Dan_C[examNumber] == null)
 					Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
 
@@ -3346,26 +3298,13 @@ internal class CTja : CActivity {
 			}
 		} else if (strCommandName.Equals("GAUGEINCR")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				switch (strCommandParam.ToLower()) {
-					case "normal":
-						GaugeIncreaseMode = GaugeIncreaseMode.Normal;
-						break;
-					case "floor":
-						GaugeIncreaseMode = GaugeIncreaseMode.Floor;
-						break;
-					case "round":
-						GaugeIncreaseMode = GaugeIncreaseMode.Round;
-						break;
-					case "ceiling":
-						GaugeIncreaseMode = GaugeIncreaseMode.Ceiling;
-						break;
-					case "notfix":
-						GaugeIncreaseMode = GaugeIncreaseMode.NotFix;
-						break;
-					default:
-						GaugeIncreaseMode = GaugeIncreaseMode.Normal;
-						break;
-				}
+				GaugeIncreaseMode = strCommandParam.ToLower() switch {
+					"floor" => GaugeIncreaseMode.Floor,
+					"round" => GaugeIncreaseMode.Round,
+					"ceiling" => GaugeIncreaseMode.Ceiling,
+					"notfix" => GaugeIncreaseMode.NotFix,
+					"normal" or _ => GaugeIncreaseMode.Normal,
+				};
 			}
 		} else if (strCommandName.Equals("SCOREDIFF")) {
 			ParseOptionalInt16(value => this.nScoreDiff[this.n参照中の難易度] = value);
