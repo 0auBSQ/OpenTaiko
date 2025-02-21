@@ -2229,7 +2229,7 @@ internal class CTja : CActivity {
 			if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
-			var chip = this.NewEventChipAtDefCursor(0xF1, 0);
+			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
 			this.bLyrics = true;

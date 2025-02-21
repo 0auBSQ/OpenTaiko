@@ -305,9 +305,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nTotalRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.n分岐した回数 = new int[5];
 		this.Chara_MissCount = new int[5];
-		for (int i = 0; i < 2; i++) {
-			ShownLyric[i] = 0;
-		}
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];
 		this.JPOSCROLLY = new double[5];
@@ -712,7 +709,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool[] bLEVELHOLD = new bool[] { false, false, false, false, false };
 	protected int nListCount;
 
-	private readonly int[] ShownLyric = new int[] { 0, 0 };
 	public bool[] bCurrentlyDrumRoll = new bool[] { false, false, false, false, false }; //奥の手
 	private int[] nTotalRollCount = new int[5];
 	protected int[] nBalloonRemaining = new int[5];
@@ -3741,9 +3737,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xF1:
 					if (!pChip.bHit && time < 0) {
 						if (OpenTaiko.ConfigIni.nPlayerCount == 1) {
-							if (dTX.listLyric.Count > ShownLyric[nPlayer] && dTX.nPlayerSide == nPlayer) {
-								this.actPanel.t歌詞テクスチャを生成する(dTX.listLyric[ShownLyric[nPlayer]]);
-								ShownLyric[nPlayer]++;
+							if (pChip.n整数値_内部番号 >= 0 && pChip.n整数値_内部番号 < dTX.listLyric.Count) {
+								this.actPanel.t歌詞テクスチャを生成する(dTX.listLyric[pChip.n整数値_内部番号]);
 							}
 						}
 						pChip.bHit = true;
