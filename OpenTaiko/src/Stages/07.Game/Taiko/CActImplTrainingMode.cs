@@ -108,8 +108,6 @@ class CActImplTrainingMode : CActivity {
 					if (this.nCurrentMeasure > this.nMeasureCount)
 						this.nCurrentMeasure = this.nMeasureCount;
 
-					OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
-
 					this.tMatchWithTheChartDisplayPosition(true);
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
@@ -120,8 +118,6 @@ class CActImplTrainingMode : CActivity {
 					if (this.nCurrentMeasure <= 0)
 						this.nCurrentMeasure = 1;
 
-					OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
-
 					this.tMatchWithTheChartDisplayPosition(true);
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
@@ -130,7 +126,6 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure++;
-						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -139,7 +134,6 @@ class CActImplTrainingMode : CActivity {
 						for (int index = 0; index < this.JumpPointList.Count; index++) {
 							if (this.JumpPointList[index].Time >= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
-								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.soundSkip.tPlay();
 								this.tMatchWithTheChartDisplayPosition(false);
 								break;
@@ -162,7 +156,6 @@ class CActImplTrainingMode : CActivity {
 						for (int index = this.JumpPointList.Count - 1; index >= 0; index--) {
 							if (this.JumpPointList[index].Time <= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
-								OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 								OpenTaiko.Skin.sound特訓スキップ音.tPlay();
 								this.tMatchWithTheChartDisplayPosition(false);
 								break;
@@ -191,7 +184,6 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure = 1;
-						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -202,7 +194,6 @@ class CActImplTrainingMode : CActivity {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure = this.nMeasureCount;
-						OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
@@ -223,9 +214,7 @@ class CActImplTrainingMode : CActivity {
 				}
 			}
 			if (!this.bTrainingPAUSE) {
-				if (this.nCurrentMeasure < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0]) {
-					this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
-				}
+				this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
 
 				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) > this.n最終演奏位置ms) {
 					this.n最終演奏位置ms = (long)(tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
@@ -284,7 +273,7 @@ class CActImplTrainingMode : CActivity {
 		if (OpenTaiko.Tx.Tokkun_Speed_Measure != null)
 			OpenTaiko.Tx.Tokkun_Speed_Measure.t2D描画(OpenTaiko.Skin.Game_Training_Speed_Measure[0], OpenTaiko.Skin.Game_Training_Speed_Measure[1]);
 		var maxMeasureStr = this.nMeasureCount.ToString();
-		var measureStr = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0].ToString();
+		var measureStr = this.nCurrentMeasure.ToString();
 		if (OpenTaiko.Tx.Tokkun_SmallNumber != null) {
 			var x = OpenTaiko.Skin.Game_Training_MaxMeasureCount_XY[0];
 			foreach (char c in maxMeasureStr) {
@@ -365,7 +354,6 @@ class CActImplTrainingMode : CActivity {
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = 0;
 		OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
 
 
@@ -384,12 +372,6 @@ class CActImplTrainingMode : CActivity {
 				dTX.listChip[i].bVisible = false;
 				dTX.listChip[i].bShow = false;
 			}
-			if (dTX.listChip[i].nChannelNo == 0x50 && dTX.listChip[i].n整数値_内部番号 < finalStartBar) {
-				OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = dTX.listChip[i].n整数値_内部番号;
-				dTX.listChip[i].bHit = true;
-				dTX.listChip[i].IsHitted = true;
-			}
-
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
