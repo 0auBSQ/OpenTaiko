@@ -23,7 +23,7 @@ internal class CActImplLaneTaiko : CActivity {
 			this.stBranch[i].nBranch文字透明度 = 0;
 			this.stBranch[i].nY座標 = 0;
 
-			this.n総移動時間[i] = -1;
+			this.ResetPlayStates();
 		}
 		this.ctゴーゴー = new CCounter();
 
@@ -616,6 +616,12 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 
 		return base.Draw();
+	}
+
+	public void ResetPlayStates() {
+		for (int i = 0; i < 5; ++i) {
+			this.n総移動時間[i] = -1;
+		}
 	}
 
 	public void ゴーゴー炎() {

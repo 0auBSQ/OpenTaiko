@@ -177,108 +177,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public override void Activate() {
 		LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: false);
 
-		this.bフィルイン中 = false;
-		this.n待機中の大音符の座標 = 0;
-		this.actGame.t叩ききりまショー_初期化();
-		base.ReSetScore(OpenTaiko.TJA.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]], OpenTaiko.TJA.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]);
-
-		#region [ branch ]
-		for (int i = 0; i < 5; i++) {
-			this.n分岐した回数[i] = 0;
-			this.bLEVELHOLD[i] = false;
-		}
-		this.nBranch条件数値A = 0;
-		this.nBranch条件数値B = 0;
-		#endregion
-
-		if ((OpenTaiko.TJA.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
-			ShowVideo = true;
-		} else {
-			ShowVideo = false;
-		}
-
 		base.Activate();
-		base.ePhaseID = CStage.EPhase.Common_NORMAL;//初期化すれば、リザルト変遷は止まる。
-
-		for (int i = 0; i < 5; i++) {
-			ifp[i] = false;
-			isDeniedPlaying[i] = false;
-
-			if (bIsAlreadyCleared[i]) {
-				actBackground.ClearIn(i);
-			}
-		}
-
-		this.nStoredHit = new int[OpenTaiko.ConfigIni.nPlayerCount];
-
-		dtLastQueueOperation = DateTime.MinValue;
-
-		PuchiChara.ChangeBPM(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
-
-		//dbUnit = Math.Ceiling( dbUnit * 1000.0 );
-		//dbUnit = dbUnit / 1000.0;
-
-		//if (this.actChara.ctキャラクターアクションタイマ != null) this.actChara.ctキャラクターアクションタイマ = new CCounter();
-
-		//this.actDancer.ct通常モーション = new CCounter( 0, this.actDancer.arモーション番号_通常.Length - 1, ( dbUnit * 4.0) / this.actDancer.arモーション番号_通常.Length, CSound管理.rc演奏用タイマ );
-		//this.actDancer.ctモブ = new CCounter( 1.0, 16.0, ((60.0 / CDTXMania.stage演奏ドラム画面.actPlayInfo.dbBPM / 16.0 )), CSound管理.rc演奏用タイマ );
-
 
 		this.ct手つなぎ = new CCounter(0, 60, 20, OpenTaiko.Timer);
-		this.ShownLyric2 = 0;
-
-
-		string diffToString(int diff) {
-			string[] diffArr =
-			{
-				" Easy ",
-				" Normal ",
-				" Hard ",
-				" Extreme ",
-				" Extra ",
-				" Tower ",
-				" Dan "
-			};
-			string[] diffArrIcon =
-			{
-				"-",
-				"",
-				"+"
-			};
-
-			int level = OpenTaiko.stageSongSelect.rChoosenSong.nLevel[diff];
-			CTja.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
-
-			return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
-		}
-
-		// Discord Presence の更新
-		string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("")
-																			 + diffToString(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "";
-
-		// Byte count must be used instead of String.Length.
-		// The byte count is what Discord is concerned with. Some chars are greater than one byte.
-		if (Encoding.UTF8.GetBytes(details).Length > 128) {
-			byte[] details_byte = Encoding.UTF8.GetBytes(details);
-			Array.Resize(ref details_byte, 128);
-			details = Encoding.UTF8.GetString(details_byte);
-		}
-
-		var difficultyName = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]).ToString();
-
-		OpenTaiko.DiscordClient?.SetPresence(new RichPresence() {
-			Details = details,
-			State = "Playing" + (OpenTaiko.ConfigIni.bAutoPlay[0] == true ? " (Auto)" : ""),
-			Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(OpenTaiko.TJA.TjaTimeToGameTime(OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms))),
-			Assets = new Assets() {
-				SmallImageKey = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? difficultyName.ToLower() : "",
-				SmallImageText = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "",
-				LargeImageKey = OpenTaiko.LargeImageKey,
-				LargeImageText = OpenTaiko.LargeImageText,
-			}
-		});
-
-
 
 		// When performing calibration, reduce audio distraction from user input.
 		// For users who play primarily by listening to the music,
@@ -307,6 +208,97 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
 		}
 	}
+
+	public override void t数値の初期化(bool b演奏記録, bool b演奏状態) {
+		int prevTopChip = this.nCurrentTopChip;
+		base.t数値の初期化(b演奏記録, b演奏状態);
+
+		if (b演奏状態) {
+			this.actGame.t叩ききりまショー_初期化();
+
+			for (int i = 0; i < 5; i++) {
+				if (bIsAlreadyCleared[i]) {
+					actBackground.ClearIn(i);
+				}
+			}
+		}
+
+		if (b演奏状態) {
+			string diffToString(int diff) {
+				string[] diffArr =
+				{
+					" Easy ",
+					" Normal ",
+					" Hard ",
+					" Extreme ",
+					" Extra ",
+					" Tower ",
+					" Dan "
+				};
+				string[] diffArrIcon =
+				{
+					"-",
+					"",
+					"+"
+				};
+
+				int level = OpenTaiko.stageSongSelect.rChoosenSong.nLevel[diff];
+				CTja.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
+
+				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
+			}
+
+			// Discord Presence の更新
+			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("")
+																				 + diffToString(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+
+			// Byte count must be used instead of String.Length.
+			// The byte count is what Discord is concerned with. Some chars are greater than one byte.
+			if (Encoding.UTF8.GetBytes(details).Length > 128) {
+				byte[] details_byte = Encoding.UTF8.GetBytes(details);
+				Array.Resize(ref details_byte, 128);
+				details = Encoding.UTF8.GetString(details_byte);
+			}
+
+			var difficultyName = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]).ToString();
+
+			OpenTaiko.DiscordClient?.SetPresence(new RichPresence() {
+				Details = details,
+				State = "Playing" + (OpenTaiko.ConfigIni.bAutoPlay[0] == true ? " (Auto)" : ""),
+				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(OpenTaiko.TJA.TjaTimeToGameTime(OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms))),
+				Assets = new Assets() {
+					SmallImageKey = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? difficultyName.ToLower() : "",
+					SmallImageText = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "",
+					LargeImageKey = OpenTaiko.LargeImageKey,
+					LargeImageText = OpenTaiko.LargeImageText,
+				}
+			});
+		}
+
+		if (!b演奏状態 && prevTopChip <= 0)
+			return; // no needs to reset
+
+		#region [reset accumulated chip state]
+		this.bフィルイン中 = false;
+		this.n待機中の大音符の座標 = 0;
+
+		this.actLaneTaiko.ResetPlayStates();
+
+		PuchiChara.ChangeBPM(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+
+		//dbUnit = Math.Ceiling( dbUnit * 1000.0 );
+		//dbUnit = dbUnit / 1000.0;
+
+		//if (this.actChara.ctキャラクターアクションタイマ != null) this.actChara.ctキャラクターアクションタイマ = new CCounter();
+
+		//this.actDancer.ct通常モーション = new CCounter( 0, this.actDancer.arモーション番号_通常.Length - 1, ( dbUnit * 4.0) / this.actDancer.arモーション番号_通常.Length, CSound管理.rc演奏用タイマ );
+		//this.actDancer.ctモブ = new CCounter( 1.0, 16.0, ((60.0 / CDTXMania.stage演奏ドラム画面.actPlayInfo.dbBPM / 16.0 )), CSound管理.rc演奏用タイマ );
+
+
+		this.ShownLyric2 = 0;
+		#endregion
+	}
+
 	public override void DeActivate() {
 		this.ct手つなぎ = null;
 
