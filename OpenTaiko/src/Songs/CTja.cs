@@ -4194,4 +4194,17 @@ internal class CTja : CActivity {
 		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
 	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
 		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
+
+	public int GetListChipIndexOfMeasure(int iMeasure1to) {
+		for (int i = 0; i < this.listChip.Count; i++) {
+			CChip pChip = this.listChip[i];
+			if ((iMeasure1to == 0) ? // initial song position
+				pChip.n発声時刻ms >= 0
+				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 >= iMeasure1to)
+				) {
+				return i;
+			}
+		}
+		return 0; // 対象小節が存在しないなら、最初から再生
+	}
 }

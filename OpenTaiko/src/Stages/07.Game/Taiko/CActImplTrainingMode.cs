@@ -204,14 +204,18 @@ class CActImplTrainingMode : CActivity {
 				this.tToggleBookmarkAtTheCurrentPosition();
 
 			if (this.bCurrentlyScrolling) {
-				SoundManager.PlayTimer.NowTimeMs = easing.EaseOut(this.ctScrollCounter, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
+				int msTargetTime = easing.EaseOut(this.ctScrollCounter, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
 
 				this.ctScrollCounter.Tick();
 
-				if ((int)SoundManager.PlayTimer.NowTimeMs == (int)this.nスクロール後ms) {
+				if (msTargetTime == (int)this.nスクロール後ms) {
 					this.bCurrentlyScrolling = false;
-					SoundManager.PlayTimer.NowTimeMs = this.nスクロール後ms;
 				}
+				CChip? lastChipAtNow = OpenTaiko.TJA!.listChip.ElementAtOrDefault(OpenTaiko.stageGameScreen.nCurrentTopChip - 1);
+				if (lastChipAtNow != null && !CStage演奏画面共通.hasChipBeenPlayedAt(lastChipAtNow, OpenTaiko.TJA!.GameTimeToTjaTime(msTargetTime)))
+					OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
+
+				SoundManager.PlayTimer.NowTimeMs = msTargetTime;
 			}
 			if (!this.bTrainingPAUSE) {
 				this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
@@ -348,24 +352,19 @@ class CActImplTrainingMode : CActivity {
 		this.bCurrentlyScrolling = false;
 		SoundManager.PlayTimer.NowTimeMs = this.nスクロール後ms;
 
-		int n演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
 		int finalStartBar;
 
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
-
-
-		int n少し戻ってから演奏開始Chip = OpenTaiko.stageGameScreen.nCurrentTopChip;
+		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
 
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
 		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
 
-		for (int i = 0; i < dTX.listChip.Count; i++) {
-
-			//if (i < n演奏開始Chip && (dTX.listChip[i].nチャンネル番号 > 0x10 && dTX.listChip[i].nチャンネル番号 < 0x20)) //2020.07.08 ノーツだけ消す。 null参照回避のために順番変更
-			if (i < n演奏開始Chip && NotesManager.IsHittableNote(dTX.listChip[i])) {
+		for (int i = 0; i < n演奏開始Chip; i++) {
+			//2020.07.08 ノーツだけ消す。
+			if (NotesManager.IsHittableNote(dTX.listChip[i])) {
 				dTX.listChip[i].bHit = true;
 				dTX.listChip[i].IsHitted = true;
 				dTX.listChip[i].bVisible = false;
@@ -385,29 +384,18 @@ class CActImplTrainingMode : CActivity {
 
 		CTja dTX = OpenTaiko.TJA;
 
-		int soughtChip = 0;
-		bool isForward = false;
-		for (int i = 0; i < dTX.listChip.Count; i++) {
-			CChip pChip = dTX.listChip[i];
-
-			if (i >= OpenTaiko.stageGameScreen.nCurrentTopChip)
-				isForward = true;
-			if (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 > nCurrentMeasure - 1) {
-				soughtChip = i;
-				break;
-			}
-		}
-		if (!isForward) { // reset to handle past chips
-			OpenTaiko.stageGameScreen.nCurrentTopChip = 0;
+		int iCurrentMeasureChip = dTX.GetListChipIndexOfMeasure(this.nCurrentMeasure);
+		if (OpenTaiko.stageGameScreen.hasChipBeenPlayed(iCurrentMeasureChip + 1)) {
+			OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
 		}
 
 		if (doScroll) {
-			this.nスクロール後ms = (long)dTX.TjaTimeToGameTime(dTX.listChip[soughtChip].n発声時刻ms);
+			this.nスクロール後ms = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].n発声時刻ms);
 			this.bCurrentlyScrolling = true;
 
 			this.ctScrollCounter = new CCounter(0, OpenTaiko.Skin.Game_Training_ScrollTime, 1, OpenTaiko.Timer);
 		} else {
-			SoundManager.PlayTimer.NowTimeMs = (long)dTX.TjaTimeToGameTime(dTX.listChip[soughtChip].n発声時刻ms);
+			SoundManager.PlayTimer.NowTimeMs = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].n発声時刻ms);
 			this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 		}
 	}
