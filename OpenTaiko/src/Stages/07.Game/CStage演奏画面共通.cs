@@ -968,7 +968,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//sw2.Start();
 		//Trace.TraceInformation( "NTime={0}, nChannel={1:x2}", nTime, nChannel );
 
-		int nIndex_InitialPositionSearchingToPast;
 		if (this.nCurrentTopChip == -1)             // 演奏データとして1個もチップがない場合は
 		{
 			//sw2.Stop();
@@ -977,7 +976,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		List<CChip> playerListChip = listChip[nPlayer];
 		int count = playerListChip.Count;
-		int nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
 		if (this.nCurrentTopChip >= count)          // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
@@ -2092,7 +2092,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected CChip r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(long nTime, int nPlayer) {
 		//sw2.Start();
 
-		int nIndex_InitialPositionSearchingToPast;
 		int nTimeDiff;
 		int count = listChip[nPlayer].Count;
 		if (count <= 0)         // 演奏データとして1個もチップがない場合は
@@ -2101,7 +2100,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return null;
 		}
 
-		int nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
 		if (this.nCurrentTopChip >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
@@ -2349,7 +2349,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//sw2.Start();
 		//Trace.TraceInformation( "nTime={0}, nChannel={1:x2}, 現在のTop={2}", nTime, nChannel,CDTXMania.DTX.listChip[ this.n現在のトップChip ].n発声時刻ms );
 
-		int nIndex_InitialPositionSearchingToPast;
 		int nTimeDiff;
 		if (this.nCurrentTopChip == -1)         // 演奏データとして1個もチップがない場合は
 		{
@@ -2357,7 +2356,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return null;
 		}
 		int count = listChip[nPlayer].Count;
-		int nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
 		if (this.nCurrentTopChip >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
