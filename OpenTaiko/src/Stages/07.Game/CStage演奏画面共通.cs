@@ -4194,14 +4194,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bPAUSE = false;
 	}
 
-	// Workaround for abnormal song completion animation after retrying during normal song completion animation
-	public void tResetGameplayFinishedStatus() {
-		for (int i = 0; i < 5; i++) {
-			ifp[i] = false;
-			isDeniedPlaying[i] = false;
-		}
-	}
-
 	public void t演奏やりなおし() {
 		_AIBattleState = 0;
 		_AIBattleStateBatch = new Queue<float>[] { new Queue<float>(), new Queue<float>() };
