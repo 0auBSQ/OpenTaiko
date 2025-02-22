@@ -417,7 +417,7 @@ class CActImplTrainingMode : CActivity {
 		if (!bSuccessSeek) {
 			OpenTaiko.stageGameScreen.nCurrentTopChip = 0;
 		} else {
-			while (dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms == dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip - 1].n発声時刻ms && OpenTaiko.stageGameScreen.nCurrentTopChip != 0)
+			while (OpenTaiko.stageGameScreen.nCurrentTopChip != 0 && dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip].n発声時刻ms == dTX.listChip[OpenTaiko.stageGameScreen.nCurrentTopChip - 1].n発声時刻ms)
 				OpenTaiko.stageGameScreen.nCurrentTopChip--;
 		}
 
