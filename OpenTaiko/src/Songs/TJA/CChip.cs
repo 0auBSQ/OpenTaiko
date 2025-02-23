@@ -317,6 +317,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
 		};
 
+	public static readonly int nChannelNoMostPrior = Array.IndexOf(n優先度, n優先度.Min());
+	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
+
 	public int CompareTo(CChip other) {
 		// まずは位置で比較。
 

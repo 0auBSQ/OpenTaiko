@@ -360,7 +360,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		this.t背景テクスチャの生成();
 
-		this.nCurrentTopChip = -1; // reset for new chart
+		this.nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // reset for new chart
 		this.t数値の初期化(true, true);
 	}
 
@@ -640,13 +640,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public int[] nMine;
 
 	// chip-played state handling
-	public int nCurrentTopChip = -1; // index of CTja.listChip
+	public int[] nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // [iPlayer]; indexes of CTja.listChip
 	public static bool hasChipBeenPlayedAt(int chipListIndex, int targetChipListIndex)
 		=> chipListIndex < targetChipListIndex;
 	public static bool hasChipBeenPlayedAt(CChip chip, double msTargetTjaTime)
 		=> chip.n発声時刻ms < msTargetTjaTime;
-	public bool hasChipBeenPlayed(int chipListIndex)
-		=> hasChipBeenPlayedAt(chipListIndex, nCurrentTopChip);
+	public bool hasChipBeenPlayed(int chipListIndex, int iPlayer)
+		=> hasChipBeenPlayedAt(chipListIndex, nCurrentTopChip[iPlayer]);
 
 	protected volatile Queue<stmixer> queueMixerSound;      // #24820 2013.1.21 yyagi まずは単純にAdd/Removeを1個のキューでまとめて管理するやり方で設計する
 	protected DateTime dtLastQueueOperation;                //
@@ -941,7 +941,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//sw2.Start();
 		//Trace.TraceInformation( "NTime={0}, nChannel={1:x2}", nTime, nChannel );
 
-		if (this.nCurrentTopChip == -1)             // 演奏データとして1個もチップがない場合は
+		if (this.nCurrentTopChip[nPlayer] == -1)             // 演奏データとして1個もチップがない場合は
 		{
 			//sw2.Stop();
 			return null;
@@ -949,9 +949,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		List<CChip> playerListChip = listChip[nPlayer];
 		int count = playerListChip.Count;
-		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip[nPlayer];
 		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
-		if (this.nCurrentTopChip >= count)          // その時点で演奏すべきチップが既に全部無くなっていたら
+		if (this.nCurrentTopChip[nPlayer] >= count)          // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
 		}
@@ -1611,7 +1611,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 									break;
 								}
 							}
-							if (allDeniedPlaying) OpenTaiko.TJA.tStopAllChips(); // Stop playing song
+							if (allDeniedPlaying) {
+								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+									OpenTaiko.GetTJA(p)!.tStopAllChips(); // Stop playing song
+								}
+							}
 
 							// Stop timer : Pauses the whole game (to remove once is denied playing will work)
 							//CSound管理.rc演奏用タイマ.t一時停止();
@@ -2073,9 +2077,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return null;
 		}
 
-		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip[nPlayer];
 		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
-		if (this.nCurrentTopChip >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
+		if (this.nCurrentTopChip[nPlayer] >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
 		}
@@ -2323,15 +2327,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//Trace.TraceInformation( "nTime={0}, nChannel={1:x2}, 現在のTop={2}", nTime, nChannel,CDTXMania.DTX.listChip[ this.n現在のトップChip ].n発声時刻ms );
 
 		int nTimeDiff;
-		if (this.nCurrentTopChip == -1)         // 演奏データとして1個もチップがない場合は
+		if (this.nCurrentTopChip[nPlayer] == -1)         // 演奏データとして1個もチップがない場合は
 		{
 			//sw2.Stop();
 			return null;
 		}
 		int count = listChip[nPlayer].Count;
-		int nIndex_NearestChip_Future = this.nCurrentTopChip;
+		int nIndex_NearestChip_Future = this.nCurrentTopChip[nPlayer];
 		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
-		if (this.nCurrentTopChip >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
+		if (this.nCurrentTopChip[nPlayer] >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
 		{
 			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
 		}
@@ -2731,7 +2735,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if ((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
 			return true;
 		}
-		if ((this.nCurrentTopChip == -1) || (this.nCurrentTopChip >= listChip[nPlayer].Count)) {
+		if ((this.nCurrentTopChip[nPlayer] == -1) || (this.nCurrentTopChip[nPlayer] >= listChip[nPlayer].Count)) {
 			return true;
 		}
 		if (IsDanFailed) {
@@ -2845,8 +2849,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#endregion
 
 		#region [update phase, process forward for correct order of non-note events]
-		for (; this.nCurrentTopChip < dTX.listChip.Count; ++this.nCurrentTopChip) {
-			CChip pChip = dTX.listChip[this.nCurrentTopChip];
+		for (; this.nCurrentTopChip[nPlayer] < dTX.listChip.Count; ++this.nCurrentTopChip[nPlayer]) {
+			CChip pChip = dTX.listChip[this.nCurrentTopChip[nPlayer]];
 			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
 			if (!hasChipBeenPlayedAt(pChip, n現在時刻ms)) // not processed yet
 				break;
@@ -3181,7 +3185,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							this.actDan.Update();
 							if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
 								if (this.actDan.GetFailedAllChallenges()) {
-									this.nCurrentTopChip = OpenTaiko.TJA.listChip.Count - 1;   // 終端にシーク
+									this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 									IsDanFailed = true;
 									return true;
 								}
@@ -3981,7 +3985,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if ((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
 			return true;
 		}
-		if ((this.nCurrentTopChip == -1) || (this.nCurrentTopChip >= listChip[nPlayer].Count)) {
+		if ((this.nCurrentTopChip[nPlayer] == -1) || (this.nCurrentTopChip[nPlayer] >= listChip[nPlayer].Count)) {
 			return true;
 		}
 
@@ -4243,9 +4247,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actPanel.t歌詞テクスチャを削除する();
 		var cleared = (bool[])bIsAlreadyCleared.Clone();
 		this.t数値の初期化(true, true);
-		for (int i = 0; i < 5; i++) {
-			this.t演奏位置の変更(0, i);
-		}
+		this.t演奏位置の変更(0);
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (!bIsAlreadyCleared[i] && cleared[i]) {
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(i);
@@ -4268,7 +4270,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actPanel.Stop();               // PANEL表示停止
 		OpenTaiko.Timer.Pause();       // 再生時刻カウンタ停止
 
-		this.nCurrentTopChip = OpenTaiko.TJA.listChip.Count - 1;   // 終端にシーク
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
+			this.nCurrentTopChip[i] = OpenTaiko.GetTJA(i)!.listChip.Count - 1;   // 終端にシーク
 
 		// 自分自身のOn活性化()相当の処理もすべき。
 	}
@@ -4365,10 +4368,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		// rewind nCurrentTopChip
-		int prevTopChip = this.nCurrentTopChip;
-		this.nCurrentTopChip = (this.listChip[0].Count > 0) ? 0 : -1;
+		int[] iPrevTopChip = this.nCurrentTopChip.Copy();
+		int iPrevTopChipMax = this.nCurrentTopChip.Max();
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
+			this.nCurrentTopChip[i] = (this.listChip[i].Count > 0) ? 0 : -1;
 
-		if (!b演奏状態 && prevTopChip <= 0)
+		if (!b演奏状態 && iPrevTopChipMax <= 0)
 			return; // no needs to reset
 
 		// reset accumulated chip state
@@ -4414,7 +4419,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.ConfigIni.nGameType[i] = this.eFirstGameType[i];
 			this.bSplitLane[i] = false;
 
-			for (int iChip = 0; iChip < prevTopChip; ++iChip) {
+			for (int iChip = 0; iChip < iPrevTopChip[i]; ++iChip) {
 				CChip chip = tja.listChip[iChip];
 				if (!NotesManager.IsHittableNote(chip))
 					chip.bHit = false;
@@ -4446,35 +4451,51 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nStoredHit = new int[OpenTaiko.ConfigIni.nPlayerCount];
 	}
 
-	// returns the chip index at the target measure
-	public int t演奏位置の変更(int nStartBar, int nPlayer) {
+	// returns the chip index at the target measure of the first player
+	public int t演奏位置の変更(int nStartBar) {
 		// まず全サウンドオフにする
 		OpenTaiko.TJA.tStopAllChips();
 		this.actAVI.Stop();
-		CTja? dTX = OpenTaiko.GetTJA(nPlayer);
-		if (dTX == null) return 0; //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
+		if (OpenTaiko.TJA == null) return 0; //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
 
 		#region [ 再生開始小節の変更 ]
 		//nStartBar++;									// +1が必要
 
+		CTja dTX = OpenTaiko.TJA;
 		#region [ 処理を開始するチップの特定 ]
 		int iTargetChip = dTX.GetListChipIndexOfMeasure(nStartBar);
 		#endregion
 		#region [ 演奏開始の発声時刻msを取得し、タイマに設定 ]
 		int nStartTime = (nStartBar == 0) ? 0
 			: ((int)dTX.TjaTimeToGameTime(dTX.listChip[iTargetChip].n発声時刻ms) - OpenTaiko.ConfigIni.MusicPreTimeMs);
-		int msStartTjaTime = (int)dTX.GameTimeToTjaTime(nStartTime);
 
-		int iLastChipAtStart = iTargetChip;
-		// re-seek for the correct last-played chip at target time
-		while (iLastChipAtStart > 0 && !hasChipBeenPlayedAt(dTX.listChip[iLastChipAtStart], msStartTjaTime))
-			iLastChipAtStart--;
-		// forward to cover simultaneous chips
-		while (iLastChipAtStart + 1 < dTX.listChip.Count && hasChipBeenPlayedAt(dTX.listChip[iLastChipAtStart + 1], msStartTjaTime))
-			iLastChipAtStart++;
+		int[] iLastChipAtStart = new int[OpenTaiko.MAX_PLAYERS];
 
-		if (this.hasChipBeenPlayed(iLastChipAtStart + 1)) {
-			this.t数値の初期化(false, false); // rewind
+		iLastChipAtStart[0] = iTargetChip;
+		for (int nPlayer = 0; nPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++nPlayer) {
+			CTja tjai = OpenTaiko.GetTJA(nPlayer)!;
+			int msStartTjaTime = (int)tjai.GameTimeToTjaTime(nStartTime);
+			if (nPlayer != 0) {
+				CChip targetDummy = new() { nChannelNo = CChip.nChannelNoLeastPrior, n発声時刻ms = msStartTjaTime };
+				iLastChipAtStart[nPlayer] = tjai.listChip.BinarySearch(targetDummy);
+				if (iLastChipAtStart[nPlayer] < 0)
+					iLastChipAtStart[nPlayer] = int.Max(0, ~iLastChipAtStart[nPlayer] - 1);
+			}
+			// re-seek for the correct last-played chip at target time
+			while (iLastChipAtStart[nPlayer] > 0 && !hasChipBeenPlayedAt(tjai.listChip[iLastChipAtStart[nPlayer]], msStartTjaTime))
+				iLastChipAtStart[nPlayer]--;
+			// forward to cover simultaneous chips
+			while (iLastChipAtStart[nPlayer] + 1 < tjai.listChip.Count && hasChipBeenPlayedAt(tjai.listChip[iLastChipAtStart[nPlayer] + 1], msStartTjaTime))
+				iLastChipAtStart[nPlayer]++;
+		}
+
+		for (int nPlayer = 0; nPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++nPlayer) {
+			CTja tjai = OpenTaiko.GetTJA(nPlayer)!;
+			CChip? lastChipAtNow = tjai.listChip.ElementAtOrDefault(OpenTaiko.stageGameScreen.nCurrentTopChip[nPlayer] - 1);
+			if (lastChipAtNow != null && !hasChipBeenPlayedAt(lastChipAtNow, tjai.GameTimeToTjaTime(nStartTime))) {
+				OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
+				break;
+			}
 		}
 
 		SoundManager.PlayTimer.Reset(); // これでPAUSE解除されるので、次のPAUSEチェックは不要
@@ -4488,55 +4509,57 @@ internal abstract class CStage演奏画面共通 : CStage {
 		List<CSound> pausedCSound = new List<CSound>();
 
 		#region [ BGMやギターなど、演奏開始のタイミングで再生がかかっているサウンドのの途中再生開始 ] // (CDTXのt入力_行解析_チップ配置()で小節番号が+1されているのを削っておくこと)
-		for (int i = 0; i <= iLastChipAtStart; ++i) {
-			CChip pChip = dTX.listChip[i];
-			int nDuration = (int)CTja.TjaDurationToGameDuration(pChip.GetDuration());
-			long n発声時刻ms = (long)dTX.TjaTimeToGameTime(pChip.n発声時刻ms);
+		for (int nPlayer = 0; nPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++nPlayer) {
+			CTja tjai = OpenTaiko.GetTJA(nPlayer)!;
+			for (int i = 0; i <= iLastChipAtStart[nPlayer]; ++i) {
+				CChip pChip = tjai.listChip[i];
+				int nDuration = (int)CTja.TjaDurationToGameDuration(pChip.GetDuration());
+				long n発声時刻ms = (long)tjai.TjaTimeToGameTime(pChip.n発声時刻ms);
+				if (n発声時刻ms <= nStartTime) {
+					if (pChip.nChannelNo == 0x01 && (pChip.nChannelNo >> 4) != 0xB) // wav系チャンネル、且つ、空打ちチップではない
+					{
+						pChip.bHit = true;
+						if (!((nDuration > 0) && (nStartTime <= n発声時刻ms + nDuration)))
+							continue;
 
-			if (n発声時刻ms <= nStartTime) {
-				if (pChip.nChannelNo == 0x01 && (pChip.nChannelNo >> 4) != 0xB) // wav系チャンネル、且つ、空打ちチップではない
-				{
-					pChip.bHit = true;
-					if (!((nDuration > 0) && (nStartTime <= n発声時刻ms + nDuration)))
-						continue;
+						CTja.CWAV wc;
+						bool b = tjai.listWAV.TryGetValue(pChip.n整数値_内部番号, out wc);
+						if (!b) continue;
 
-					CTja.CWAV wc;
-					bool b = dTX.listWAV.TryGetValue(pChip.n整数値_内部番号, out wc);
-					if (!b) continue;
-
-					if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
-						OpenTaiko.TJA.tチップの再生(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)dTX.TjaTimeToGameTime(pChip.n発声時刻ms)));
-						#region [ PAUSEする ]
-						int j = wc.n現在再生中のサウンド番号;
-						if (wc.rSound[j] != null) {
-							wc.rSound[j].Pause();
-							wc.rSound[j].tSetPositonToBegin(nStartTime - n発声時刻ms);
-							pausedCSound.Add(wc.rSound[j]);
+						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
+							tjai.tチップの再生(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tjai.TjaTimeToGameTime(pChip.n発声時刻ms)));
+							#region [ PAUSEする ]
+							int j = wc.n現在再生中のサウンド番号;
+							if (wc.rSound[j] != null) {
+								wc.rSound[j].Pause();
+								wc.rSound[j].tSetPositonToBegin(nStartTime - n発声時刻ms);
+								pausedCSound.Add(wc.rSound[j]);
+							}
+							#endregion
 						}
-						#endregion
 					}
 				}
 			}
-		}
-		#endregion
-		#region [ 演奏開始時点で既に表示されているBGAとAVIの、シークと再生 ]
-		if (dTX.listVD.Count > 0) {
-			for (int i = 0; i < dTX.listChip.Count; i++) {
-				CChip chip = dTX.listChip[i];
-				if (chip.nChannelNo == 0x54) {
-					if (chip.n発声時刻ms <= nStartTime) {
-						chip.bHit = true;
-						this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
-						this.actAVI.Start(0x54, this.actAVI.rVD);
+			#endregion
+			#region [ 演奏開始時点で既に表示されているBGAとAVIの、シークと再生 ]
+			if (tjai.listVD.Count > 0) {
+				for (int i = 0; i < iLastChipAtStart[nPlayer]; i++) {
+					CChip chip = tjai.listChip[i];
+					if (chip.nChannelNo == 0x54) {
+						if (chip.n発声時刻ms <= nStartTime) {
+							chip.bHit = true;
+							this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
+							this.actAVI.Start(0x54, this.actAVI.rVD);
+							break;
+						} else {
+							this.actAVI.Seek(0);
+						}
 						break;
-					} else {
-						this.actAVI.Seek(0);
 					}
-					break;
 				}
 			}
+			#endregion
 		}
-		#endregion
 		#region [ PAUSEしていたサウンドを一斉に再生再開する(ただしタイマを止めているので、ここではまだ再生開始しない) ]
 
 		if (!(OpenTaiko.ConfigIni.bNoAudioIfNot1xSpeed && OpenTaiko.ConfigIni.nSongSpeed != 20))

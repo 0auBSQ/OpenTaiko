@@ -210,7 +210,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	public override void t数値の初期化(bool b演奏記録, bool b演奏状態) {
-		int prevTopChip = this.nCurrentTopChip;
+		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.t数値の初期化(b演奏記録, b演奏状態);
 
 		if (b演奏状態) {
@@ -275,7 +275,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			});
 		}
 
-		if (!b演奏状態 && prevTopChip <= 0)
+		if (!b演奏状態 && iPrevTopChipMax <= 0)
 			return; // no needs to reset
 
 		#region [reset accumulated chip state]

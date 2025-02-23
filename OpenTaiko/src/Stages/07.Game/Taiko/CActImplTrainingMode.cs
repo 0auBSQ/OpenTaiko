@@ -211,7 +211,7 @@ class CActImplTrainingMode : CActivity {
 				if (msTargetTime == (int)this.nスクロール後ms) {
 					this.bCurrentlyScrolling = false;
 				}
-				CChip? lastChipAtNow = OpenTaiko.TJA!.listChip.ElementAtOrDefault(OpenTaiko.stageGameScreen.nCurrentTopChip - 1);
+				CChip? lastChipAtNow = OpenTaiko.TJA!.listChip.ElementAtOrDefault(OpenTaiko.stageGameScreen.nCurrentTopChip[0] - 1);
 				if (lastChipAtNow != null && !CStage演奏画面共通.hasChipBeenPlayedAt(lastChipAtNow, OpenTaiko.TJA!.GameTimeToTjaTime(msTargetTime)))
 					OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
 
@@ -357,7 +357,7 @@ class CActImplTrainingMode : CActivity {
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar, 0);
+		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
 
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
 		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
@@ -385,8 +385,8 @@ class CActImplTrainingMode : CActivity {
 		CTja dTX = OpenTaiko.TJA;
 
 		int iCurrentMeasureChip = dTX.GetListChipIndexOfMeasure(this.nCurrentMeasure);
-		if (OpenTaiko.stageGameScreen.hasChipBeenPlayed(iCurrentMeasureChip + 1)) {
-			OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
+		if (OpenTaiko.stageGameScreen.hasChipBeenPlayed(iCurrentMeasureChip + 1, 0)) {
+			OpenTaiko.stageGameScreen.t数値の初期化(false, false); // reset to handle past chips
 		}
 
 		if (doScroll) {
