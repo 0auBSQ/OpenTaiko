@@ -2827,8 +2827,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (NotesManager.IsGenericRoll(pChip)) {
 				long msDTime_end = pChip.nNoteEndTimems - n現在時刻ms;
 				double th16DBeat_end = pChip.fBMSCROLLTime_end - play_bpm_time;
-				double _scrollSpeed_end = pChip.dbSCROLL_end * _scroll_rate;
-				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y_end * _scroll_rate;
+				double _scrollSpeed_end = pChip.dbSCROLL * _scroll_rate; //pChip.dbSCROLL_end * _scroll_rate;
+				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.dbSCROLL_Y_end * _scroll_rate;
 				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_end, pChip.eScrollMode_end);
 				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_Y_end, pChip.eScrollMode_end);
 			}
@@ -3113,7 +3113,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				{
 
 						if (!this.bPAUSE && !pChip.bHit && time < 0) { // can't update while paused
-							//if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
+																	   //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
 							if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
 								PassAIBattleSection();
 
