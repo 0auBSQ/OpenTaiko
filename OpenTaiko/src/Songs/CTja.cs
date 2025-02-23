@@ -4200,7 +4200,7 @@ internal class CTja : CActivity {
 			CChip pChip = this.listChip[i];
 			if ((iMeasure1to == 0) ? // initial song position
 				pChip.n発声時刻ms >= 0
-				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 >= iMeasure1to)
+				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 == iMeasure1to)
 				) {
 				return i;
 			}
