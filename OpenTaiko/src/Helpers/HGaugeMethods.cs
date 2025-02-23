@@ -405,7 +405,7 @@ class HGaugeMethods {
 		var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		return tNormaCheck(
 			(Difficulty)_dif,
-			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif],
+			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1,
 			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
 			(float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
@@ -429,7 +429,7 @@ class HGaugeMethods {
 		// Difficulty
 		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif].譜面情報.nレベル[_dif];
+		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
 
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
