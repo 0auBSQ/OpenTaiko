@@ -258,6 +258,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.tパネル文字列の設定();
 		//this.演奏判定ライン座標();
 		this.bIsGOGOTIME = new bool[] { false, false, false, false, false };
+		this.bWasGOGOTIME = new bool[] { false, false, false, false, false };
 		this.bIsMiss = new bool[] { false, false, false, false, false };
 		this.bUseBranch = new bool[] { false, false, false, false, false };
 		this.nCurrentBranch = new CTja.ECourse[5];
@@ -640,11 +641,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public int[] nMine;
 
 	// chip-played state handling
+	private bool isRewinding = false;
 	public int[] nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // [iPlayer]; indexes of CTja.listChip
 	public static bool hasChipBeenPlayedAt(int chipListIndex, int targetChipListIndex)
 		=> chipListIndex < targetChipListIndex;
 	public static bool hasChipBeenPlayedAt(CChip chip, double msTargetTjaTime)
-		=> chip.n発声時刻ms < msTargetTjaTime;
+		=> chip.n発声時刻ms <= msTargetTjaTime;
 	public bool hasChipBeenPlayed(int chipListIndex, int iPlayer)
 		=> hasChipBeenPlayedAt(chipListIndex, nCurrentTopChip[iPlayer]);
 
@@ -671,6 +673,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[5];
 
 	public bool[] bIsGOGOTIME = new bool[5];
+	private bool[] bWasGOGOTIME = new bool[5]; // go-go time state before rewinding
 	public bool[] bIsMiss = new bool[5];
 	public bool[] bUseBranch = new bool[5];
 	public CTja.ECourse[] nCurrentBranch = new CTja.ECourse[5]; //0:普通譜面 1:玄人譜面 2:達人譜面
@@ -3058,7 +3061,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				{
 
 						if (!this.bPAUSE && !pChip.bHit) { // can't update while paused
-																	   //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
+							//if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
 							if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
 								PassAIBattleSection();
 
@@ -3239,35 +3242,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						this.bIsGOGOTIME[nPlayer] = true;
-						//double dbUnit = (((60.0 / (CDTXMania.stage演奏ドラム画面.actPlayInfo.dbBPM))));
-						double dbUnit = (((60.0 / pChip.dbBPM)));
-
-						int Character = this.actChara.iCurrentCharacter[nPlayer];
-
-						{
-							if (OpenTaiko.Skin.Characters_GoGoStart_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-								if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer) || OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] == 0)) {
-									// 魂ゲージMAXではない
-									// ゴーゴースタート_ノーマル
-									this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart, true);
-									//this.actChara.キャラクター_アクション_10コンボ();
-								}
-							}
-							if (OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-								if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer)) {
-									this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart_Clear, true);
-								}
-							}
-							if (OpenTaiko.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-								if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
-									// 魂ゲージMAX
-									// ゴーゴースタート_MAX
-									this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.GoGoStart_Max, true);
-								}
-							}
-
-						}
-						OpenTaiko.stageGameScreen.actLaneTaiko.GOGOSTART();
+						if (!this.isRewinding)
+							this.StartGoGoTimeEffect(nPlayer);
 					}
 					break;
 				case 0x9F: //ゴーゴータイム
@@ -3777,6 +3753,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#endregion
 			}
 		}
+
+		if (this.isRewinding) {
+			this.isRewinding = false;
+			if (this.bIsGOGOTIME[nPlayer] && this.bIsGOGOTIME[nPlayer] != this.bWasGOGOTIME[nPlayer]) {
+				this.StartGoGoTimeEffect(nPlayer);
+			}
+			this.bWasGOGOTIME[nPlayer] = this.bIsGOGOTIME[nPlayer];
+		}
 		#endregion
 
 		#region [draw phase (bar line), backward for correct stack order]
@@ -3979,6 +3963,35 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#endregion
 
 		return false;
+	}
+
+	public void StartGoGoTimeEffect(int iPlayer) {
+		int Character = this.actChara.iCurrentCharacter[iPlayer];
+
+		{
+			if (OpenTaiko.Skin.Characters_GoGoStart_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
+				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer) || OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] == 0)) {
+					// 魂ゲージMAXではない
+					// ゴーゴースタート_ノーマル
+					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart, true);
+					//this.actChara.キャラクター_アクション_10コンボ();
+				}
+			}
+			if (OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
+				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
+					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart_Clear, true);
+				}
+			}
+			if (OpenTaiko.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
+				if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
+					// 魂ゲージMAX
+					// ゴーゴースタート_MAX
+					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart_Max, true);
+				}
+			}
+
+		}
+		OpenTaiko.stageGameScreen.actLaneTaiko.GOGOSTART();
 	}
 
 	protected bool t進行描画_チップ_連打(EInstrumentPad ePlayMode, int nPlayer) {
@@ -4277,6 +4290,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public virtual void t数値の初期化(bool b演奏記録, bool b演奏状態) {
+		this.isRewinding = true;
+
 		if (b演奏記録) {
 			this.b演奏にキーボードを使った = false;
 			this.b演奏にジョイパッドを使った = false;
@@ -4404,6 +4419,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 
+			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i];
 			this.bIsGOGOTIME[i] = false;
 			this.bBranchedChart[i] = false;
 			this.bCurrentlyDrumRoll[i] = false;
