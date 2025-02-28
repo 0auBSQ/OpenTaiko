@@ -149,13 +149,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				var _chip = _list[k];
 
 				if (NotesManager.IsGenericBalloon(_chip)) {
-					var _duration = (_chip.nNoteEndTimems - _chip.n発声時刻ms) / 1000.0;
+					var _duration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
 					var _expectedHits = (int)(_duration / 16.6f);
 					_totalBalloons += Math.Min(_chip.nBalloon, _expectedHits);
 				}
 
 				if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
-					_totalRolls += (_chip.nNoteEndTimems - _chip.n発声時刻ms) / 1000.0;
+					_totalRolls += (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
 			}
 
 			nNoteCount[i] = _totalNotes;
@@ -908,11 +908,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 			int nDeltaTime = Math.Abs(pChip.nLag);
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
-				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.nNoteEndTimems) {
+				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.end.n発声時刻ms) {
 					return ENoteJudge.Perfect;
 				}
 			} else if (NotesManager.IsGenericBalloon(pChip)) {
-				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms - 17 && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.nNoteEndTimems) {
+				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms - 17 && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.end.n発声時刻ms) {
 					return ENoteJudge.Perfect;
 				}
 			}
@@ -1045,7 +1045,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected bool tRollProcess(CChip pChip, double dbProcess_time, int num, int sort, int Input, int nPlayer) {
-		if (dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.nNoteEndTimems) {
+		if (dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.end.n発声時刻ms) {
 			if (pChip.nRollCount == 0) //連打カウントが0の時
 			{
 				this.actRoll.b表示[nPlayer] = true;
@@ -1176,7 +1176,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int balloon = pChip.nBalloon;
 
 		if ((int)nowTime >= pChip.n発声時刻ms
-			&& (int)nowTime < pChip.nNoteEndTimems) {
+			&& (int)nowTime < pChip.end.n発声時刻ms) {
 			if (IsKusudama) {
 				nCurrentKusudamaRollCount++;
 				rollCount = nCurrentKusudamaRollCount;
@@ -1455,7 +1455,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (balloon != 0 && this.bPAUSE == false) {
 						int rollSpeed = bAutoPlay ? balloon : puchichara.effect.Autoroll;
 
-						int balloonDuration = bAutoPlay ? (pChip.nNoteEndTimems - pChip.n発声時刻ms) : 1000;
+						int balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - pChip.n発声時刻ms) : 1000;
 
 						if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >
 							(pChip.n発声時刻ms + (balloonDuration / (double)rollSpeed) * rollCount)) {
@@ -1478,7 +1478,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				#endregion
 			} else if (NotesManager.IsRollEnd(pChip)) {
-				if (pChip.nNoteEndTimems <= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
+				if (pChip.end.n発声時刻ms <= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 					if (NotesManager.IsKusudama(pChip)) {
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 							chip現在処理中の連打チップ[i].bHit = true;
@@ -2104,7 +2104,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 					nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
 					if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
-						if (chip.nNoteEndTimems > nTime) {
+						if (chip.end.n発声時刻ms > nTime) {
 							break;
 						}
 					}
@@ -2165,7 +2165,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			//2015.11.5 kairera0467　連打音符の判定
 			if (NotesManager.IsGenericRoll(__tmpchp) && !NotesManager.IsRollEnd(__tmpchp)) {
-				if (listChip[nPlayer][nIndex_NearestChip_Future].n発声時刻ms <= nTime && listChip[nPlayer][nIndex_NearestChip_Future].nNoteEndTimems >= nTime) {
+				if (listChip[nPlayer][nIndex_NearestChip_Future].n発声時刻ms <= nTime && listChip[nPlayer][nIndex_NearestChip_Future].end.n発声時刻ms >= nTime) {
 					nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
 				}
 			}
@@ -2801,12 +2801,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
 			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
 			if (NotesManager.IsGenericRoll(pChip)) {
-				long msDTime_end = pChip.nNoteEndTimems - n現在時刻ms;
-				double th16DBeat_end = pChip.fBMSCROLLTime_end - play_bpm_time;
-				double _scrollSpeed_end = pChip.dbSCROLL * _scroll_rate; //pChip.dbSCROLL_end * _scroll_rate;
-				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.dbSCROLL_Y_end * _scroll_rate;
-				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_end, pChip.eScrollMode_end);
-				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM_end, _scrollSpeed_Y_end, pChip.eScrollMode_end);
+				long msDTime_end = pChip.end.n発声時刻ms - n現在時刻ms;
+				double th16DBeat_end = pChip.end.fBMSCROLLTime - play_bpm_time;
+				double _scrollSpeed_end = pChip.dbSCROLL * _scroll_rate; //pChip.end.dbSCROLL * _scroll_rate;
+				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.end.dbSCROLL_Y * _scroll_rate;
+				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.end.dbBPM, _scrollSpeed_end, pChip.end.eScrollMode);
+				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.end.dbBPM, _scrollSpeed_Y_end, pChip.end.eScrollMode);
 			}
 
 			if (!pChip.IsMissed && !pChip.bHit) {
@@ -2821,7 +2821,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						}
 					}
 				} else if (NotesManager.IsGenericRoll(pChip)) {
-					if (pChip.nNoteEndTimems <= n現在時刻ms) {
+					if (pChip.end.n発声時刻ms <= n現在時刻ms) {
 						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 							pChip.bHit = true;
 						}
@@ -2839,7 +2839,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x21: {
 						//if ((!pChip.bHit && (pChip.nバーからの距離dot.Drums < 0)))
 						{
-							if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.nNoteEndTimems >= (int)n現在時刻ms)) {
+							if ((pChip.n発声時刻ms <= (int)n現在時刻ms && pChip.end.n発声時刻ms >= (int)n現在時刻ms)) {
 								//if( this.n現在のコース == pChip.nコース )
 								if (pChip.bVisible == true)
 									this.chip現在処理中の連打チップ[nPlayer] = pChip;
@@ -2976,7 +2976,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 									}
 								}
 								if (chip現在処理中の連打チップ[nPlayer].nBalloon > chip現在処理中の連打チップ[nPlayer].nRollCount) {
-									if (pChip.n連打音符State == 13) {
+									if (NotesManager.IsFuzeRoll(pChip.start)) {
 										this.actJudgeString.Start(nPlayer, ENoteJudge.Mine);
 										OpenTaiko.stageGameScreen.actLaneTaiko.Start(0x11, ENoteJudge.Bad, true, nPlayer);
 										OpenTaiko.stageGameScreen.actChipFireD.Start(0x11, ENoteJudge.Mine, nPlayer);

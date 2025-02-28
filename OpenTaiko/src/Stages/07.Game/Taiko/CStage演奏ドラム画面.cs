@@ -1656,7 +1656,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				CChip cChip = null;
 				if (pChip.nノーツ移動開始時刻ms != 0) // n先頭発声位置 value is only used when this condition is met
 				{
-					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, 0x10 + pChip.n連打音符State, nPlayer);
+					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, pChip.start.nChannelNo, nPlayer);
 					if (cChip != null) {
 						n先頭発声位置 = cChip.n発声時刻ms;
 					}
@@ -1678,10 +1678,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			if (NotesManager.IsGenericBalloon(pChip)) {
-				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.nNoteEndTimems) {
+				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.end.n発声時刻ms) {
 					x = NoteOriginX[nPlayer];
 					y = NoteOriginY[nPlayer];
-				} else if (nowTime >= pChip.nNoteEndTimems) {
+				} else if (nowTime >= pChip.end.n発声時刻ms) {
 					x = x末端;
 					y = y末端;
 				}
@@ -1833,18 +1833,18 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
 							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
 						int n = 0;
-						switch (pChip.n連打音符State) {
-							case 5:
+						switch (pChip.start.nChannelNo) {
+							case 0x15:
 								n = 910;
 								break;
-							case 6:
+							case 0x16:
 								n = 1300;
 								break;
 							default:
 								n = 910;
 								break;
 						}
-						if (pChip.n連打音符State != 7 && pChip.n連打音符State != 9 && pChip.n連打音符State != 13) {
+						if (!NotesManager.IsGenericBalloon(pChip.start)) {
 							//if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
 							//    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
 							OpenTaiko.Tx.SENotes[(int)_gt]?.t2D描画(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
@@ -1854,7 +1854,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 			}
 
-			if (pChip.n発声時刻ms < nowTime && pChip.nNoteEndTimems > nowTime) {
+			if (pChip.n発声時刻ms < nowTime && pChip.end.n発声時刻ms > nowTime) {
 				var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))];
 
 				//時間内でかつ0x9Aじゃないならならヒット処理
@@ -1871,7 +1871,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	/// Detect and hide screen-obscuring rolls when any tips are out of screen
 	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, long nowTime) {
 		// display judging rolls
-		if (nowTime >= pChip.n発声時刻ms && nowTime <= pChip.nNoteEndTimems) {
+		if (nowTime >= pChip.n発声時刻ms && nowTime <= pChip.end.n発声時刻ms) {
 			pChip.bShowRoll = true;
 			return;
 		}
@@ -1896,8 +1896,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		double th16DBeat = -4 * pChip.dbBPM / 60;
 		int dxHead = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
 		int dyHead = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM, pChip.dbSCROLL_Y, pChip.eScrollMode);
-		int dxEnd = NotesManager.GetNoteX(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_end, pChip.eScrollMode_end);
-		int dyEnd = NotesManager.GetNoteY(-1000, th16DBeat, pChip.dbBPM_end, pChip.dbSCROLL_Y_end, pChip.eScrollMode_end);
+		int dxEnd = NotesManager.GetNoteX(-1000, th16DBeat, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.eScrollMode);
+		int dyEnd = NotesManager.GetNoteY(-1000, th16DBeat, pChip.end.dbBPM, pChip.end.dbSCROLL_Y, pChip.end.eScrollMode);
 
 		// get move speed near the judgement mark
 
@@ -1986,7 +1986,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if ((NotesManager.IsGenericBalloon(chkChip) || NotesManager.IsKusudama(chkChip)) && (this.bCurrentlyDrumRoll[i] == true)) {
 					//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
 					if (chkChip.n発声時刻ms <= (int)nowTime
-						&& chkChip.nNoteEndTimems + 500 >= (int)nowTime) {
+						&& chkChip.end.n発声時刻ms + 500 >= (int)nowTime) {
 						var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
 						if (!NotesManager.IsFuzeRoll(chkChip)) chkChip.bShow = false;
 						this.actBalloon.On進行描画(

@@ -1020,7 +1020,6 @@ internal class CTja : CActivity {
 						case 0x21: {
 								if (this.isOFFSET_Negative) {
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1077,7 +1076,6 @@ internal class CTja : CActivity {
 						case 0x99: {
 								if (this.isOFFSET_Negative) {
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -2869,17 +2867,11 @@ internal class CTja : CActivity {
 			}
 
 			CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
-			chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
-			chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
-			chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
-			chipHead.dbBPM_end = chip.dbBPM_end = chip.dbBPM;
-			chipHead.dbSCROLL_end = chip.dbSCROLL_end = chip.dbSCROLL;
-			chipHead.dbSCROLL_Y_end = chip.dbSCROLL_Y_end = chip.dbSCROLL_Y;
-			chipHead.eScrollMode_end = chip.eScrollMode_end = chip.eScrollMode;
+			chip.start = chipHead;
+			chipHead.end = chip;
 
 			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
 			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
-			chip.n連打音符State = chipHead.nChannelNo - 0x10;
 
 			this.nNowRollCountBranch[iBranch] = -1;
 		}
