@@ -1653,14 +1653,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				else
 					pChip.bShow = true;
 
-				CChip cChip = null;
-				if (pChip.nノーツ移動開始時刻ms != 0) // n先頭発声位置 value is only used when this condition is met
-				{
-					cChip = OpenTaiko.stageGameScreen.r指定時刻に一番近い連打Chip_ヒット未済問わず不可視考慮(pChip.n発声時刻ms, pChip.start.nChannelNo, nPlayer);
-					if (cChip != null) {
-						n先頭発声位置 = cChip.n発声時刻ms;
-					}
-				}
+				if (pChip.nノーツ移動開始時刻ms != 0)
+					n先頭発声位置 = pChip.start.n発声時刻ms;
 			}
 
 			int x = NoteOriginX[nPlayer] + nノート座標;
