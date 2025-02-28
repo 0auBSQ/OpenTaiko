@@ -718,15 +718,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 
 
-		if (pChip == null) {
+		if (!(pChip != null && NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip))) {
 			return false;
 		}
-
-		if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip)) {
+		if (NotesManager.IsGenericRoll(pChip)) {
 			this.tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Taiko, true, nInput, nPlayer);
 			return true;
-		} else if (!NotesManager.IsHittableNote(pChip)) {
-			return false;
 		}
 
 		ENoteJudge e判定 = this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer);
@@ -1108,8 +1105,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
 
 
-				if (this.bCurrentlyDrumRoll[nUsePlayer]) {
-					chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer];
+				if (this.chip現在処理中の連打チップ[nUsePlayer].Count > 0) {
+					chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer][0];
 					e判定 = ENoteJudge.Perfect;
 				}
 
@@ -1309,7 +1306,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				//-----------------------------
 				int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
 								// BAD or TIGHT 時の処理。
-				if (OpenTaiko.ConfigIni.bTight && !bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
+				if (OpenTaiko.ConfigIni.bTight && !this.bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
 					this.tチップのヒット処理_BadならびにTight時のMiss(chipNoHit.nBranch, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
 				//-----------------------------
 				#endregion
@@ -1973,30 +1970,29 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
-			var chkChip = this.chip現在処理中の連打チップ[i];
-			if (chkChip != null) {
+			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
+				var chkChip = this.chip現在処理中の連打チップ[i][iChip];
 				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
-				if ((NotesManager.IsGenericBalloon(chkChip) || NotesManager.IsKusudama(chkChip)) && (this.bCurrentlyDrumRoll[i] == true)) {
-					//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
-					if (chkChip.n発声時刻ms <= (int)nowTime
-						&& chkChip.end.n発声時刻ms + 500 >= (int)nowTime) {
-						var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
-						if (!NotesManager.IsFuzeRoll(chkChip)) chkChip.bShow = false;
-						this.actBalloon.On進行描画(
-							balloon,
-							this.nBalloonRemaining[i],
-							i,
-							NotesManager.IsFuzeRoll(chkChip)
-								? CActImplBalloon.EBalloonType.FUSEROLL
-								: NotesManager.IsKusudama(chkChip)
-									? CActImplBalloon.EBalloonType.KUSUDAMA
-									: CActImplBalloon.EBalloonType.BALLOON
-						);
-					} else {
-						this.nCurrentRollCount[i] = 0;
-					}
-
+				if (!(NotesManager.IsGenericBalloon(chkChip) && (chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip)))) {
+					continue;
+				}
+				//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
+				if (chkChip.n発声時刻ms <= (int)nowTime
+					&& chkChip.end.n発声時刻ms + 500 >= (int)nowTime
+					) {
+					var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
+					var rollCount = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaRollCount : chkChip.nRollCount;
+					if (!NotesManager.IsFuzeRoll(chkChip))
+						chkChip.bShow = false;
+					this.actBalloon.On進行描画(
+						balloon,
+						balloon - rollCount,
+						i,
+						NotesManager.IsFuzeRoll(chkChip) ? CActImplBalloon.EBalloonType.FUSEROLL
+							: NotesManager.IsKusudama(chkChip) ? CActImplBalloon.EBalloonType.KUSUDAMA
+							: CActImplBalloon.EBalloonType.BALLOON
+					);
 				}
 			}
 		}

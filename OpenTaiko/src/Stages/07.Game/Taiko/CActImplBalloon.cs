@@ -161,24 +161,6 @@ internal class CActImplBalloon : CActivity {
 
 			//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.白, n連打数.ToString() );
 		}
-		if (btype == EBalloonType.KUSUDAMA) {
-			/*
-            for(int i = 0; i < TJAPlayer3.ConfigIni.nPlayerCount; i++)
-            {
-                TJAPlayer3.stage演奏ドラム画面.actChara.b風船連打中[i] = false;
-                TJAPlayer3.stage演奏ドラム画面.b連打中[i] = false;
-            }
-            */
-		} else {
-			if (n連打数 == 0 && OpenTaiko.stageGameScreen.actChara.b風船連打中[player]) {
-				OpenTaiko.stageGameScreen.actChara.b風船連打中[player] = false;
-				OpenTaiko.stageGameScreen.bCurrentlyDrumRoll[player] = false;
-			}
-		}
-
-
-
-
 
 		return base.Draw();
 	}

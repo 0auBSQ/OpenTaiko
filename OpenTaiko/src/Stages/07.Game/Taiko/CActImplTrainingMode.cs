@@ -341,7 +341,6 @@ class CActImplTrainingMode : CActivity {
 		OpenTaiko.stageGameScreen.bPAUSE = true;
 		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 		this.bTrainingPAUSE = true;
-		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
 
 		this.tMatchWithTheChartDisplayPosition(false);
 	}
@@ -360,7 +359,6 @@ class CActImplTrainingMode : CActivity {
 		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
 
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
-		if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.stageGameScreen.actBalloon.KusudamaIsActive) OpenTaiko.stageGameScreen.actBalloon.KusuMiss();
 
 		for (int i = 0; i < n演奏開始Chip; i++) {
 			//2020.07.08 ノーツだけ消す。
@@ -370,10 +368,6 @@ class CActImplTrainingMode : CActivity {
 				dTX.listChip[i].bVisible = false;
 				dTX.listChip[i].bShow = false;
 			}
-		}
-
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			OpenTaiko.stageGameScreen.chip現在処理中の連打チップ[i] = null;
 		}
 
 		this.bTrainingPAUSE = false;
