@@ -362,12 +362,19 @@ class CActImplTrainingMode : CActivity {
 
 		for (int i = 0; i < n演奏開始Chip; i++) {
 			//2020.07.08 ノーツだけ消す。
-			if (NotesManager.IsHittableNote(dTX.listChip[i])) {
-				dTX.listChip[i].bHit = true;
-				dTX.listChip[i].IsHitted = true;
-				dTX.listChip[i].bVisible = false;
-				dTX.listChip[i].bShow = false;
+			CChip chip = dTX.listChip[i];
+			if (!NotesManager.IsHittableNote(chip)) {
+				continue;
 			}
+			if (NotesManager.IsRollEnd(chip)) {
+				chip = chip.start;
+			} else if (NotesManager.IsGenericRoll(chip)) {
+				continue;
+			}
+			chip.bHit = true;
+			chip.IsHitted = true;
+			chip.bVisible = false;
+			chip.bShow = false;
 		}
 
 		this.bTrainingPAUSE = false;
