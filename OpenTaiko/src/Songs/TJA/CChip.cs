@@ -66,26 +66,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 	//EXTENDED COMMANDS
-	public int fCamTimeMs;
-	public string strCamEaseType;
-	public Easing.CalcType fCamMoveType;
-
-	public float fCamScrollStartX;
-	public float fCamScrollStartY;
-	public float fCamScrollEndX;
-	public float fCamScrollEndY;
-
-	public float fCamRotationStart;
-	public float fCamRotationEnd;
-
-	public float fCamZoomStart;
-	public float fCamZoomEnd;
-
-	public float fCamScaleStartX;
-	public float fCamScaleStartY;
-	public float fCamScaleEndX;
-	public float fCamScaleEndY;
-
 	public Color4 borderColor;
 
 	public int fObjTimeMs;

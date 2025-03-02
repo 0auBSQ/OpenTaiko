@@ -1723,7 +1723,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMVMOVESTART") {
 			//starts vertical camera moving: <start x> to <end y>
 			this.ParseArgCamStartCommand(command, argument, 0xA0, ref this.currentCamVMoveChip,
-				(chip, start) => chip.fCamScrollStartY = start, (chip, end) => chip.fCamScrollEndY = end,
 				"#CAMVMOVEEND");
 		} else if (command == "#CAMVMOVEEND") {
 			//ends vertical camera moving
@@ -1731,7 +1730,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMHMOVESTART") {
 			//starts horizontal camera moving: <start x> to <end x>
 			this.ParseArgCamStartCommand(command, argument, 0xA2, ref this.currentCamHMoveChip,
-				(chip, start) => chip.fCamScrollStartX = start, (chip, end) => chip.fCamScrollEndX = end,
 				"#CAMHMOVEEND");
 		} else if (command == "#CAMHMOVEEND") {
 			//ends horizontal camera moving
@@ -1739,7 +1737,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMZOOMSTART") {
 			//starts zooming in/out the screen: <start value> to <end value>
 			this.ParseArgCamStartCommand(command, argument, 0xA4, ref this.currentCamZoomChip,
-				(chip, start) => chip.fCamZoomStart = start, (chip, end) => chip.fCamZoomEnd = end,
 				"#CAMZOOMEND");
 		} else if (command == "#CAMZOOMEND") {
 			//stops zooming
@@ -1747,7 +1744,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMROTATIONSTART") {
 			//starts rotating the screen: <start degrees> to <end degrees>
 			this.ParseArgCamStartCommand(command, argument, 0xA6, ref this.currentCamRotateChip,
-				(chip, start) => chip.fCamRotationStart = start, (chip, end) => chip.fCamRotationEnd = end,
 				"#CAMROTATIONEND");
 		} else if (command == "#CAMROTATIONEND") {
 			//stops screen rotation
@@ -1755,7 +1751,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMVSCALESTART") {
 			//starts rotating the screen: <start degrees> to <end degrees>
 			this.ParseArgCamStartCommand(command, argument, 0xA8, ref this.currentCamVScaleChip,
-				(chip, start) => chip.fCamScaleStartY = start, (chip, end) => chip.fCamScaleEndY = end,
 				"#CAMVSCALEEND");
 		} else if (command == "#CAMVSCALEEND") {
 			//ends vertical camera scaling
@@ -1763,7 +1758,6 @@ internal class CTja : CActivity {
 		} else if (command == "#CAMHSCALESTART") {
 			//starts horizontal camera scale changing: <start scale> to <end scale>
 			this.ParseArgCamStartCommand(command, argument, 0xB0, ref this.currentCamHScaleChip,
-				(chip, start) => chip.fCamScaleStartX = start, (chip, end) => chip.fCamScaleEndX = end,
 				"#CAMHSCALEEND");
 		} else if (command == "#CAMHSCALEEND") {
 			//ends horizontal camera scaling
@@ -1780,56 +1774,26 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#CAMHOFFSET") {
 			//sets camera x offset: <offset>
-			this.ParseArgCamSetCommand(command, argument, 0xB3, this.currentCamHMoveChip,
-				(chip, value) => chip.fCamScrollStartX = chip.fCamScrollEndX = value,
-				"#CAMHMOVEEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB3, this.currentCamHMoveChip, "#CAMHMOVEEND");
 		} else if (command == "#CAMVOFFSET") {
 			//sets camera y offset: <offset>
-			this.ParseArgCamSetCommand(command, argument, 0xB4, this.currentCamVMoveChip,
-				(chip, value) => chip.fCamScrollStartY = chip.fCamScrollEndY = value,
-				"#CAMVMOVEEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB4, this.currentCamVMoveChip, "#CAMVMOVEEND");
 		} else if (command == "#CAMZOOM") {
 			//sets camera zoom factor: <zoom factor>
-			this.ParseArgCamSetCommand(command, argument, 0xB5, this.currentCamZoomChip,
-				(chip, value) => chip.fCamZoomStart = chip.fCamZoomEnd = value,
-				"#CAMZOOMEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB5, this.currentCamZoomChip, "#CAMZOOMEND");
 		} else if (command == "#CAMROTATION") {
 			//sets camera rotation: <degrees>
-			this.ParseArgCamSetCommand(command, argument, 0xB6, this.currentCamRotateChip,
-				(chip, value) => chip.fCamRotationStart = chip.fCamRotationEnd = value,
-				"#CAMROTATIONEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB6, this.currentCamRotateChip, "#CAMROTATIONEND");
 		} else if (command == "#CAMHSCALE") {
 			//sets camera x scale: <scale>
-			this.ParseArgCamSetCommand(command, argument, 0xB7, this.currentCamHScaleChip,
-				(chip, value) => chip.fCamScaleStartX = chip.fCamScaleEndX = value,
-				"#CAMHSCALEEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB7, this.currentCamHScaleChip, "#CAMHSCALEEND");
 		} else if (command == "#CAMVSCALE") {
 			//sets camera y scale: <scale>
-			this.ParseArgCamSetCommand(command, argument, 0xB8, this.currentCamVScaleChip,
-				(chip, value) => chip.fCamScaleStartY = chip.fCamScaleEndY = value,
-				"#CAMVSCALEEND");
+			this.ParseArgCamSetCommand(command, argument, 0xB8, this.currentCamVScaleChip, "#CAMVSCALEEND");
 		} else if (command == "#CAMRESET") {
 			//resets camera properties
 			var chip = this.NewEventChipAtDefCursor(0xB9, 1);
-
-			chip.fCamScrollStartX = 0.0f;
-			chip.fCamScrollEndX = 0.0f;
-			chip.fCamScrollStartY = 0.0f;
-			chip.fCamScrollEndY = 0.0f;
-
-			chip.fCamZoomStart = 1.0f;
-			chip.fCamZoomEnd = 1.0f;
-			chip.fCamRotationStart = 0.0f;
-			chip.fCamRotationEnd = 0.0f;
-
-			chip.fCamScaleStartX = 1.0f;
-			chip.fCamScaleEndX = 1.0f;
-			chip.fCamScaleStartY = 1.0f;
-			chip.fCamScaleEndY = 1.0f;
-
-			chip.strCamEaseType = "IN_OUT";
-
-			// チップを配置。
+			chip.strObjEaseType = "IN_OUT";
 			this.listChip.Add(chip);
 		} else if (command == "#ENABLEDORON") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xBA, 1));
@@ -2303,11 +2267,11 @@ internal class CTja : CActivity {
 		return bpmPoint;
 	}
 
-	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, Action<CChip, float> setValue, string commandEnd) {
+	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, string commandEnd) {
 		if (camChip == null) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
-			setValue(chip, float.Parse(argument));
-			chip.strCamEaseType = "IN_OUT";
+			chip.fObjStart = chip.fObjEnd = float.Parse(argument);
+			chip.strObjEaseType = "IN_OUT";
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
@@ -2316,7 +2280,6 @@ internal class CTja : CActivity {
 	}
 
 	private void ParseArgCamStartCommand(string command, string argument, int channelNo, ref CChip? camChip,
-		Action<CChip, float> setStart, Action<CChip, float> setEnd,
 		string commandEnd
 	) {
 		if (camChip == null) {
@@ -2325,10 +2288,10 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 
 			string[] args = argument.Split(',');
-			setStart(chip, float.Parse(args[0]));
-			setEnd(chip, float.Parse(args[1]));
-			chip.strCamEaseType = args[2];
-			chip.fCamMoveType = TjaArgToEasingCalcType(args[3]);
+			chip.fObjStart = float.Parse(args[0]);
+			chip.fObjEnd = float.Parse(args[1]);
+			chip.strObjEaseType = args[2];
+			chip.objCalcType = TjaArgToEasingCalcType(args[3]);
 
 			camChip = chip;
 
@@ -2347,7 +2310,7 @@ internal class CTja : CActivity {
 			var index = this.listChip.IndexOf(camChip);
 			var msDiff = chip.n発声時刻ms - camChip.n発声時刻ms;
 
-			camChip.fCamTimeMs = msDiff;
+			camChip.fObjTimeMs = msDiff;
 			this.listChip[index] = camChip;
 
 			camChip = null;
