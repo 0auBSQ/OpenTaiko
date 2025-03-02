@@ -2536,7 +2536,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xb0: //camera horizontal scaling start
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers.Add((pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip)));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xa1: //camera vertical move end
@@ -2563,7 +2563,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xb8: //set camera y scale
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers.Add((pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip)));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xb9: //reset camera
@@ -2571,7 +2571,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 
 						OpenTaiko.borderColor = new Color4(0f, 0f, 0f, 0f);
-						this.objHandlers.Add((pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip)));
+						foreach (var key in GetObjHandlerKeys(pChip)) {
+							this.objHandlers.Remove(key);
+						}
+						GetObjHandlerSetter(pChip)(0);
 					}
 					break;
 				case 0xba: //enable doron
@@ -2614,7 +2617,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 
 						dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj);
-						objHandlers.Add((pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip)));
+						objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xbf: //object animation end
@@ -2645,7 +2648,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 
 						dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj);
-						objHandlers.Add((pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip)));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xd1: //change texture
@@ -3010,13 +3013,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#endregion
 
 		#region [ EXTENDED CONTROLS ]
-		for (int i = 0; i < this.objHandlers.Count; ++i) {
-			var (chip, counter, setter) = this.objHandlers[i];
+		List<string> keysToRemove = new();
+		foreach (var (key, (chip, counter, setter)) in this.objHandlers) {
 			counter.Tick();
 
 			float value = 0.0f;
 			if (counter.IsEnded) {
 				value = chip.fObjEnd;
+				keysToRemove.Add(key);
 			} else {
 				if (chip.strObjEaseType.Equals("IN")) value = Easing.EaseIn(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
 				if (chip.strObjEaseType.Equals("OUT")) value = Easing.EaseOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
@@ -3026,6 +3030,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 			setter(value);
+		}
+		foreach (var key in keysToRemove) {
+			this.objHandlers.Remove(key);
 		}
 		#endregion
 
@@ -3059,6 +3066,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 			0xC4 or 0xCE => (value) => chip.obj.xScale = value,
 			0xC6 or 0xCF => (value) => chip.obj.rotation = value,
 			0xC8 or 0xD0 => (value) => chip.obj.opacity = (int)value,
+			_ => throw new ArgumentOutOfRangeException(nameof(chip)),
+		};
+
+	private static string[] GetObjHandlerKeys(CChip chip)
+		=> chip.nChannelNo switch {
+			0xA0 or 0xB4 => ["cam_y"],
+			0xA2 or 0xB3 => ["cam_x"],
+			0xA4 or 0xB5 => ["cam_zoom"],
+			0xA6 or 0xB6 => ["cam_rotation"],
+			0xA8 or 0xB8 => ["cam_yScale"],
+			0xB0 or 0xB7 => ["cam_xScale"],
+			0xB9 => ["cam_x", "cam_y", "cam_zoom", "cam_rotation", "cam_xScale", "cam_yScale"],
+			0xBE or 0xCB => [$"obj_{chip.strObjName}_y"],
+			0xC0 or 0xCC => [$"obj_{chip.strObjName}_x"],
+			0xC2 or 0xCD => [$"obj_{chip.strObjName}_yScale"],
+			0xC4 or 0xCE => [$"obj_{chip.strObjName}_xScale"],
+			0xC6 or 0xCF => [$"obj_{chip.strObjName}_rotation"],
+			0xC8 or 0xD0 => [$"obj_{chip.strObjName}_opacity"],
 			_ => throw new ArgumentOutOfRangeException(nameof(chip)),
 		};
 
@@ -3644,6 +3669,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 				CChip chip = tja.listChip[iChip];
 				if (!NotesManager.IsHittableNote(chip))
 					chip.bHit = false;
+				CSongObject? obj = chip.obj;
+				if (obj != null) {
+					obj.isVisible = false;
+					obj.yScale = 1.0f;
+					obj.xScale = 1.0f;
+					obj.rotation = 0.0f;
+					obj.opacity = 255;
+					obj.frame = 0;
+				}
 			}
 
 			for (int iChip = this.chipNowProcessingMultiHitNotes[i].Count; iChip-- > 0;) {
@@ -3654,15 +3688,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.chipNowProcessingMultiHitNotes[i].Clear();
 		}
 
-		foreach (var (chip, counter, setter) in this.objHandlers) {
-			if (chip.obj == null) continue;
-			chip.obj.isVisible = false;
-			chip.obj.yScale = 1.0f;
-			chip.obj.xScale = 1.0f;
-			chip.obj.rotation = 0.0f;
-			chip.obj.opacity = 255;
-			chip.obj.frame = 0;
-		}
 		this.objHandlers.Clear();
 
 		this.actAVI.rVD = null;
@@ -3930,7 +3955,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	#region [EXTENDED COMMANDS]
-	private List<(CChip chip, CCounter counter, Action<float> setter)> objHandlers;
+	private Dictionary<string, (CChip chip, CCounter counter, Action<float> setter)> objHandlers;
 
 	public bool bCustomDoron = false;
 	private bool bConfigUpdated = false;
