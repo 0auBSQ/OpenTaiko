@@ -648,7 +648,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public int[] nMine;
 
 	// chip-played state handling
-	private bool isRewinding = false;
+	protected bool isRewinding = false;
 	public int[] nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // [iPlayer]; indexes of CTja.listChip
 	public static bool hasChipBeenPlayedAt(int chipListIndex, int targetChipListIndex)
 		=> chipListIndex < targetChipListIndex;
@@ -3732,24 +3732,33 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			if (!chip.IsHitted) {
 				if (NotesManager.IsKusudama(chip)) {
-					if (this.nowProcessingKusudama == null && iPlayer == 0) {
-						this.nowProcessingKusudama = chip;
-						actBalloon.KusuIn();
-						actChara.KusuIn();
-						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-							this.bCurrentlyDrumRoll[i] = true;
-							this.actChara.b風船連打中[i] = true;
-						}
-					}
-
 					nCurrentKusudamaRollCount = 0;
 					nCurrentKusudamaCount += chip.nBalloon;
 				}
+				if (!this.bPAUSE && !this.isRewinding) {
+					this.ProcessRollHeadEffects(iPlayer, chip);
+				}
 			}
 		}
-		chip.bProcessed = true;
 		if (chip.end.bProcessed) { // handle negative-length rolls
 			this.ProcessRollEnd(iPlayer, chip, false);
+		}
+	}
+
+	public void ProcessRollHeadEffects(int iPlayer, CChip chip) {
+		if (chip.bProcessed)
+			return;
+		chip.bProcessed = true;
+		if (NotesManager.IsKusudama(chip)) {
+			if (this.nowProcessingKusudama == null && iPlayer == 0) {
+				this.nowProcessingKusudama = chip;
+				actBalloon.KusuIn();
+				actChara.KusuIn();
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+					this.bCurrentlyDrumRoll[i] = true;
+					this.actChara.b風船連打中[i] = true;
+				}
+			}
 		}
 	}
 
@@ -3765,48 +3774,54 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (NotesManager.IsGenericBalloon(chip)) {
 				if (NotesManager.IsKusudama(chip)) {
 					if (iPlayer == 0) {
-						actBalloon.KusuMiss();
-						OpenTaiko.Skin.soundKusudamaMiss.tPlay();
-						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-							this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
+						if (!this.bPAUSE && !this.isRewinding) {
+							actBalloon.KusuMiss();
+							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
+							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+								this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
 
-							if (actChara.CharaAction_Balloon_Delay[p] != null) actChara.CharaAction_Balloon_Delay[p] = new CCounter(0,
-								OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[p]] - 1,
-								1,
-								OpenTaiko.Timer);
+								if (actChara.CharaAction_Balloon_Delay[p] != null) actChara.CharaAction_Balloon_Delay[p] = new CCounter(0,
+									OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[p]] - 1,
+									1,
+									OpenTaiko.Timer);
+							}
 						}
 						nCurrentKusudamaRollCount = 0;
 						nCurrentKusudamaCount = 0;
 						this.nowProcessingKusudama = null;
 					}
 				} else {
-					if (chip.nRollCount > 0) {
-						this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Miss, true);
+					if (!this.bPAUSE && !this.isRewinding) {
+						if (chip.nRollCount > 0) {
+							this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Miss, true);
 
-						if (actChara.CharaAction_Balloon_Delay[iPlayer] != null) actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0,
-							OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1,
-							1,
-							OpenTaiko.Timer);
+							if (actChara.CharaAction_Balloon_Delay[iPlayer] != null) actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0,
+								OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1,
+								1,
+								OpenTaiko.Timer);
+						}
 					}
 				}
 				if (NotesManager.IsFuzeRoll(chip)) {
-					this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
-					OpenTaiko.stageGameScreen.actLaneTaiko.Start(0x11, ENoteJudge.Bad, true, iPlayer);
-					OpenTaiko.stageGameScreen.actChipFireD.Start(0x11, ENoteJudge.Mine, iPlayer);
-					actGauge.MineDamage(iPlayer);
-					OpenTaiko.Skin.soundBomb?.tPlay();
-					this.CChartScore[iPlayer].nMine++;
-					this.CSectionScore[iPlayer].nMine++;
-					this.CBranchScore[iPlayer].nMine++;
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-						CFloorManagement.damage();
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nMine[actDan.NowShowingNumber]++;
-					this.actCombo.nCurrentCombo[iPlayer] = 0;
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nCombo[actDan.NowShowingNumber] = 0;
-					this.actComboVoice.tReset(iPlayer);
-					this.bIsMiss[iPlayer] = true;
+					if (!this.bPAUSE && !this.isRewinding) {
+						this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
+						OpenTaiko.stageGameScreen.actLaneTaiko.Start(0x11, ENoteJudge.Bad, true, iPlayer);
+						OpenTaiko.stageGameScreen.actChipFireD.Start(0x11, ENoteJudge.Mine, iPlayer);
+						actGauge.MineDamage(iPlayer);
+						OpenTaiko.Skin.soundBomb?.tPlay();
+						this.CChartScore[iPlayer].nMine++;
+						this.CSectionScore[iPlayer].nMine++;
+						this.CBranchScore[iPlayer].nMine++;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+							CFloorManagement.damage();
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.nMine[actDan.NowShowingNumber]++;
+						this.actCombo.nCurrentCombo[iPlayer] = 0;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.nCombo[actDan.NowShowingNumber] = 0;
+						this.actComboVoice.tReset(iPlayer);
+						this.bIsMiss[iPlayer] = true;
+					}
 				}
 			}
 		}
@@ -3869,8 +3884,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsGenericBalloon(x))) {
 			this.actChara.b風船連打中[iPlayer] = false;
 		}
-		chip.bProcessed = !resetStates;
-		chip.end.bProcessed = !resetStates;
+		if (resetStates || (!this.bPAUSE && !this.isRewinding)) {
+			chip.bProcessed = !resetStates;
+			chip.end.bProcessed = !resetStates;
+		}
 	}
 
 	public void StartGoGoTimeEffect(int iPlayer) {

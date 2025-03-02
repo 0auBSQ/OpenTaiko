@@ -1974,6 +1974,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				var chkChip = this.chip現在処理中の連打チップ[i][iChip];
 				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
+				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
+					this.ProcessRollHeadEffects(i, chkChip);
+				}
 				if (!(NotesManager.IsGenericBalloon(chkChip) && (chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip)))) {
 					continue;
 				}
