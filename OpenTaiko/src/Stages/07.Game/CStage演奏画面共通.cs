@@ -369,13 +369,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bgmlength = 1;
 		this.ctチップ模様アニメ.Drums = null;
 
-		OpenTaiko.borderColor = new Color4(0f, 0f, 0f, 0f);
-		OpenTaiko.fCamXOffset = 0.0f;
-		OpenTaiko.fCamYOffset = 0.0f;
-		OpenTaiko.fCamXScale = 1.0f;
-		OpenTaiko.fCamYScale = 1.0f;
-		OpenTaiko.fCamRotation = 0.0f;
-		OpenTaiko.fCamZoomFactor = 1.0f;
+		OpenTaiko.ResetCameraStates();
 
 		for (int i = 0; i < 5; i++) {
 			ctChipAnime[i] = null;
@@ -2570,11 +2564,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						OpenTaiko.borderColor = new Color4(0f, 0f, 0f, 0f);
 						foreach (var key in GetObjHandlerKeys(pChip)) {
 							this.objHandlers.Remove(key);
 						}
-						GetObjHandlerSetter(pChip)(0);
+						OpenTaiko.ResetCameraStates();
 					}
 					break;
 				case 0xba: //enable doron
@@ -3056,14 +3049,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			0xA6 or 0xB6 => (value) => OpenTaiko.fCamRotation = value,
 			0xA8 or 0xB8 => (value) => OpenTaiko.fCamYScale = value,
 			0xB0 or 0xB7 => (value) => OpenTaiko.fCamXScale = value,
-			0xB9 => (value) => {
-				OpenTaiko.fCamXOffset = 0.0f;
-				OpenTaiko.fCamYOffset = 0.0f;
-				OpenTaiko.fCamZoomFactor = 1.0f;
-				OpenTaiko.fCamRotation = 0.0f;
-				OpenTaiko.fCamXScale = 1.0f;
-				OpenTaiko.fCamYScale = 1.0f;
-			},
+			0xB9 => (value) => OpenTaiko.ResetCameraStates(),
 			0xBE or 0xCB => (value) => chip.obj!.y = value,
 			0xC0 or 0xCC => (value) => chip.obj!.x = value,
 			0xC2 or 0xCD => (value) => chip.obj!.yScale = value,
@@ -3624,17 +3610,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			AIBattleSections[i].IsAnimated = false;
 		}
 
-		OpenTaiko.fCamXOffset = 0;
-
-		OpenTaiko.fCamYOffset = 0;
-
-		OpenTaiko.fCamZoomFactor = 1.0f;
-		OpenTaiko.fCamRotation = 0;
-
-		OpenTaiko.fCamXScale = 1.0f;
-		OpenTaiko.fCamYScale = 1.0f;
-
-		OpenTaiko.borderColor = new Color4(1f, 0f, 0f, 0f);
+		OpenTaiko.ResetCameraStates();
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
@@ -3673,15 +3649,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				CChip chip = tja.listChip[iChip];
 				if (!NotesManager.IsHittableNote(chip))
 					chip.bHit = false;
-				CSongObject? obj = chip.obj;
-				if (obj != null) {
-					obj.isVisible = false;
-					obj.yScale = 1.0f;
-					obj.xScale = 1.0f;
-					obj.rotation = 0.0f;
-					obj.opacity = 255;
-					obj.frame = 0;
-				}
+				chip.obj?.ResetStates();
 			}
 
 			for (int iChip = this.chipNowProcessingMultiHitNotes[i].Count; iChip-- > 0;) {

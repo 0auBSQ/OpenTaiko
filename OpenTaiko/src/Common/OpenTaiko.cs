@@ -2181,5 +2181,15 @@ internal class OpenTaiko : Game {
 	public static float fCamYScale = 1.0f;
 
 	public static Color4 borderColor = new Color4(1f, 0f, 0f, 0f);
+
+	public static void ResetCameraStates() {
+		fCamXOffset = 0;
+		fCamYOffset = 0;
+		fCamZoomFactor = 1.0f;
+		fCamRotation = 0;
+		fCamXScale = 1.0f;
+		fCamYScale = 1.0f;
+		borderColor = new Color4(1f, 0f, 0f, 0f);
+	}
 	#endregion
 }
