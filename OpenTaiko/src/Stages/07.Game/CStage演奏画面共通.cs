@@ -58,21 +58,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 				}
 			}
-
-			int n整数値管理 = 0;
-			if (r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(0, i) != null) //2020.07.08 Mr-Ojii 未ヒットチップがないときの例外の発生回避 <-(KabanFriends)コード借りましたごめんなさい(´・ω・`)
-			{
-				foreach (CChip chip in listChip[i]) {
-					chip.nListPosition = n整数値管理;
-					//if ((chip.nチャンネル番号 == 0x15 || chip.nチャンネル番号 == 0x16) && (n整数値管理 < this.listChip[i].Count - 1))
-					if ((NotesManager.IsRoll(chip) || NotesManager.IsFuzeRoll(chip)) && (n整数値管理 < this.listChip[i].Count - 1)) {
-						if (chip.db発声時刻ms < r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(0, i).db発声時刻ms) {
-							chip.nDisplayPriority = 1;
-						}
-					}
-					n整数値管理++;
-				}
-			}
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -3554,20 +3539,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x17:
 				case 0x19:
 				case 0x1D: {
-						//2015.03.28 kairera0467
-						//描画順序を変えるため、メイン処理だけをこちらに残して描画処理は分離。
-
-						//this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip);
-						//2015.04.13 kairera0467 ここを外さないと恋文2000の連打に対応できず、ここをつけないと他のコースと重なっている連打をどうにもできない。
-						//常時実行メソッドに渡したら対応できた!?
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+						this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
 					}
 
 					break;
 				case 0x18: {
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+						this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
 					}
 
 					break;
@@ -3585,8 +3562,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#region [ 20-2F: EmptySlot ]
 				case 0x20:
 				case 0x21: {
-						if (pChip.nDisplayPriority <= 0)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+						this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
 					}
 					break;
 					#endregion
@@ -3917,48 +3893,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		}
 		OpenTaiko.stageGameScreen.actLaneTaiko.GOGOSTART();
-	}
-
-	protected bool t進行描画_チップ_連打(EInstrumentPad ePlayMode, int nPlayer) {
-		if ((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
-			return true;
-		}
-		if ((this.nCurrentTopChip[nPlayer] == -1) || (this.nCurrentTopChip[nPlayer] >= listChip[nPlayer].Count)) {
-			return true;
-		}
-
-		CConfigIni configIni = OpenTaiko.ConfigIni;
-
-		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
-		bool bAutoPlay = configIni.bAutoPlay[nPlayer];
-		if (nPlayer == 1)
-			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
-
-		var n現在時刻ms = (long)dTX.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-
-		//for ( int nCurrentTopChip = this.n現在のトップChip; nCurrentTopChip < dTX.listChip.Count; nCurrentTopChip++ )
-		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
-			CChip pChip = dTX.listNoteChip[iChip];
-
-			switch (pChip.nChannelNo) {
-				#region[ 15-19: Rolls ]
-				case 0x15: //連打
-				case 0x16: //連打(大)
-				case 0x17: //風船
-				case 0x18: //連打終了
-				case 0x19:
-				case 0x1D:
-				case 0x20:
-				case 0x21: {
-						if (pChip.nDisplayPriority >= 1)
-							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
-					}
-					break;
-					#endregion
-			}
-
-		}
-		return false;
 	}
 
 	public void tBranchReset(int player) {

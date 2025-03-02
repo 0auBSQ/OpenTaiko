@@ -434,8 +434,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					ifp[i] = true;
 				}
 #endif
-
-				this.t進行描画_チップ_連打(EInstrumentPad.Drums, i);
 			}
 
 			this.actMtaiko.Draw();

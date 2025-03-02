@@ -27,7 +27,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nBalloon;
 	public int nProcessTime;
 	public int nScrollDirection;
-	public int nDisplayPriority; //(特殊)現状連打との判断目的で使用
 	public ENoteState eNoteState;
 	public int nChannelNo;
 	public int VideoStartTimeMs;
@@ -158,10 +157,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.n発声時刻ms = 0;
 		this.db発声時刻ms = 0.0D;
 		this.fBMSCROLLTime = 0;
-		this.nDisplayPriority = 0;
 		this.nLag = -999;
 		this.b演奏終了後も再生が続くチップである = false;
-		this.nListPosition = 0;                                 // Unused
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
 		this.IsMissed = false;
