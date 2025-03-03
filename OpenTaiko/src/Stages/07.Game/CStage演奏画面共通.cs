@@ -3754,7 +3754,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (NotesManager.IsGenericBalloon(chip)) {
 				if (NotesManager.IsKusudama(chip)) {
 					if (iPlayer == 0) {
-						if (!this.bPAUSE && !this.isRewinding) {
+						if (!this.bPAUSE && !this.isRewinding && actBalloon.KusudamaIsActive) {
 							actBalloon.KusuMiss();
 							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
 							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
