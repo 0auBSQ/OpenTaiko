@@ -1205,16 +1205,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int rollCount = pChip.nRollCount;
 		int balloon = pChip.nBalloon;
 
-		if (IsKusudama) {
-			nCurrentKusudamaRollCount++;
-			rollCount = nCurrentKusudamaRollCount;
-			balloon = nCurrentKusudamaCount;
-		}
-
 		if ((int)nowTime >= pChip.n発声時刻ms
 			&& (int)nowTime < pChip.nNoteEndTimems) {
-
 			if (IsKusudama) {
+				nCurrentKusudamaRollCount++;
+				rollCount = nCurrentKusudamaRollCount;
+				balloon = nCurrentKusudamaCount;
+
 				if (nCurrentKusudamaCount > 0) {
 					actChara.ChangeAnime(player, CActImplCharacter.Anime.Kusudama_Breaking, true);
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
