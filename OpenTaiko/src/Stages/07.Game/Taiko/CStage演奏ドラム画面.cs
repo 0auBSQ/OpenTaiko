@@ -1984,7 +1984,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					) {
 					var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
 					var rollCount = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaRollCount : chkChip.nRollCount;
-					if (!NotesManager.IsFuzeRoll(chkChip))
+					if (!this.bPAUSE && !this.isRewinding && !NotesManager.IsFuzeRoll(chkChip))
 						chkChip.bShow = false;
 					this.actBalloon.On進行描画(
 						balloon,
