@@ -2858,7 +2858,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 
 			if (pChip.nHorizontalChipDistance < -150) {
-				if (NotesManager.IsHittableNote(pChip) && !(NotesManager.IsMissableNote(pChip))) {
+				if (NotesManager.IsHittableNote(pChip) && NotesManager.IsGenericRoll(pChip)) {
 					//2016.02.11 kairera0467
 					//太鼓の単音符の場合は座標による判定を行わない。
 					//(ここで判定をすると高スピードでスクロールしている時に見逃し不可判定が行われない。)
