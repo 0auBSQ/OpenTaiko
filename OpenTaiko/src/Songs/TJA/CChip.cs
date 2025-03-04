@@ -6,10 +6,10 @@ namespace OpenTaiko;
 internal class CChip : IComparable<CChip>, ICloneable {
 	public EScrollMode eScrollMode;
 	public EScrollMode eScrollMode_end;
-	public bool bHit;
+	public bool bHit; // note is hit/broken or roll end is reached
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
-	public bool bProcessed = false;
+	public bool bProcessed = false; // roll-type-only: roll is hit once (roll-head-only) or chip time is reached
 	public bool bShow;
 	public bool bShowRoll;
 	public bool bBranch = false;
