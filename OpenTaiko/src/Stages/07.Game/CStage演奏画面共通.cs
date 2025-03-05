@@ -938,7 +938,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			int nDeltaTime = Math.Abs(pChip.nLag);
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
-				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) > pChip.n発声時刻ms && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.nNoteEndTimems) {
+				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.nNoteEndTimems) {
 					return ENoteJudge.Perfect;
 				}
 			} else if (NotesManager.IsGenericBalloon(pChip)) {
@@ -1205,16 +1205,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int rollCount = pChip.nRollCount;
 		int balloon = pChip.nBalloon;
 
-		if (IsKusudama) {
-			nCurrentKusudamaRollCount++;
-			rollCount = nCurrentKusudamaRollCount;
-			balloon = nCurrentKusudamaCount;
-		}
-
 		if ((int)nowTime >= pChip.n発声時刻ms
-			&& (int)nowTime <= pChip.nNoteEndTimems) {
-
+			&& (int)nowTime < pChip.nNoteEndTimems) {
 			if (IsKusudama) {
+				nCurrentKusudamaRollCount++;
+				rollCount = nCurrentKusudamaRollCount;
+				balloon = nCurrentKusudamaCount;
+
 				if (nCurrentKusudamaCount > 0) {
 					actChara.ChangeAnime(player, CActImplCharacter.Anime.Kusudama_Breaking, true);
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -2132,14 +2129,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 						break;
 					}
 					nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-				}
-			}
-			if (chip.bHit && chip.bVisible) // 2015.11.5 kairera0467 連打対策
-			{
-				if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
-					if (chip.nNoteEndTimems > nTime) {
-						nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-						break;
+					if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
+						if (chip.nNoteEndTimems > nTime) {
+							break;
+						}
 					}
 				}
 			}
@@ -2153,11 +2146,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			CChip chip = listChip[nPlayer][nIndex_NearestChip_Past];
 			//if ( (!chip.bHit && chip.b可視 ) && ( (  0x93 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x99 ) ) )
 
-			if ((!chip.bHit && chip.bVisible) && NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
-				break;
-			}
-			//2015.11.5 kairera0467 連打対策
-			else if ((chip.bVisible) && NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
+			if (chip.bVisible && !NotesManager.IsRollEnd(chip)
+				&& (!chip.bHit && NotesManager.IsHittableNote(chip) || chip.bProcessed && NotesManager.IsGenericRoll(chip))
+				) {
 				break;
 			}
 
@@ -2854,33 +2845,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 							this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
 						}
 					}
-				}
-			}
-
-			if (pChip.nHorizontalChipDistance < -150) {
-				if (NotesManager.IsHittableNote(pChip) && !(NotesManager.IsMissableNote(pChip))) {
-					//2016.02.11 kairera0467
-					//太鼓の単音符の場合は座標による判定を行わない。
-					//(ここで判定をすると高スピードでスクロールしている時に見逃し不可判定が行われない。)
-					pChip.bHit = true;
-				}
-			}
-
-			var cChipCurrentlyInProcess = chip現在処理中の連打チップ[nPlayer];
-			if (cChipCurrentlyInProcess != null && !cChipCurrentlyInProcess.bHit) {
-
-				//if( cChipCurrentlyInProcess.nチャンネル番号 >= 0x13 && cChipCurrentlyInProcess.nチャンネル番号 <= 0x15 )//|| pChip.nチャンネル番号 == 0x9A )
-				if (NotesManager.IsBigNote(cChipCurrentlyInProcess)) {
-					if (((cChipCurrentlyInProcess.nHorizontalChipDistance < -500) && (cChipCurrentlyInProcess.n発声時刻ms <= n現在時刻ms && cChipCurrentlyInProcess.nNoteEndTimems >= n現在時刻ms)))
-					//( ( chip現在処理中の連打チップ.nバーからのノーツ末端距離dot.Taiko < -500 ) && ( chip現在処理中の連打チップ.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && chip現在処理中の連打チップ.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
-					//( ( pChip.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && pChip.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
-					{
-						if (bAutoPlay)
-							this.tチップのヒット処理(n現在時刻ms, cChipCurrentlyInProcess, EInstrumentPad.Taiko, false, 0, nPlayer);
+				} else if (NotesManager.IsGenericRoll(pChip)) {
+					if (pChip.nNoteEndTimems <= n現在時刻ms) {
+						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
+							pChip.bHit = true;
+						}
 					}
 				}
 			}
-
 
 			if (pChip.nPlayerSide == nPlayer && pChip.n発声時刻ms >= n現在時刻ms) {
 				NowProcessingChip[pChip.nPlayerSide] = nCurrentTopChip;
@@ -2970,8 +2942,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 								for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 									nBalloonRemaining[i] = nCurrentKusudamaCount;
 								}
-								pChip.bProcessed = true;
 							}
+							pChip.bProcessed = true;
 						}
 						if (pChip.nDisplayPriority <= 0)
 							this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
@@ -3993,17 +3965,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//for ( int nCurrentTopChip = this.n現在のトップChip; nCurrentTopChip < dTX.listChip.Count; nCurrentTopChip++ )
 		for (int nCurrentTopChip = dTX.listChip.Count - 1; nCurrentTopChip > 0; nCurrentTopChip--) {
 			CChip pChip = dTX.listChip[nCurrentTopChip];
-
-			if (!pChip.bHit) {
-				bool bRollChip = NotesManager.IsGenericRoll(pChip);// pChip.nチャンネル番号 >= 0x15 && pChip.nチャンネル番号 <= 0x19;
-				if (bRollChip) {
-					if (pChip.nHorizontalChipDistance < -40) {
-						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
-							this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
-						}
-					}
-				}
-			}
 
 			switch (pChip.nChannelNo) {
 				#region[ 15-19: Rolls ]
