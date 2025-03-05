@@ -76,7 +76,6 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 			case (int)EOrder.Redoing:
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-					OpenTaiko.stageGameScreen.tResetGameplayFinishedStatus();
 					this.bやり直しを選択した = true;
 					CActSelectPopupMenu.b選択した = true;
 				} else {

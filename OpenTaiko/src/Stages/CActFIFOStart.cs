@@ -25,7 +25,6 @@ internal class CActFIFOStart : CActivity {
 			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
-			OpenTaiko.stageGameScreen.ListDan_Number++;
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 		} else {
