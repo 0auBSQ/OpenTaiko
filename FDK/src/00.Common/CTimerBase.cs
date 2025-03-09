@@ -107,6 +107,18 @@ public abstract class CTimerBase : IDisposable {
 		}
 	}
 
+	// Time coordination converters
+	// GameTime is the real elapsed time of gameplay (excluding pauses).
+	// SystemTime is the real elapsed time, including pauses.
+	public long GameTimeToSystemTime(long msGameTime)
+		=> msGameTime + this.PrevResetTimeMs;
+	public long SystemTimeToGameTime(long msSystemTime)
+		=> msSystemTime - this.PrevResetTimeMs;
+	public double GameTimeToSystemTime(double msGameTime)
+		=> msGameTime + this.PrevResetTimeMs_Double;
+	public double SystemTimeToGameTime(double msSystemTime)
+		=> msSystemTime - this.PrevResetTimeMs_Double;
+
 	#region [ protected ]
 	//-----------------
 	protected long PauseSystemTimeMs = 0;

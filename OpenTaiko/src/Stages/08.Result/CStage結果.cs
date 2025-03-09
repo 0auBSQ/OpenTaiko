@@ -35,9 +35,6 @@ internal class CStage結果 : CStage {
 
 	public CStage結果() {
 		this.st演奏記録.Drums = new CScoreIni.C演奏記録();
-		this.st演奏記録.Guitar = new CScoreIni.C演奏記録();
-		this.st演奏記録.Bass = new CScoreIni.C演奏記録();
-		this.st演奏記録.Taiko = new CScoreIni.C演奏記録();
 		this.r空うちドラムチップ = new CChip[10];
 		this.n総合ランク値 = -1;
 		base.eStageID = CStage.EStage.Results;
@@ -1410,10 +1407,6 @@ internal class CStage結果 : CStage {
 							#region [ Return to song select screen ]
 
 							actFI.tフェードアウト開始();
-
-							if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
-								if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-									OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
 
 							tPostprocessing();
 

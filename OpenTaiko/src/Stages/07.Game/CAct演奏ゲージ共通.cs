@@ -28,11 +28,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 				dbゲージ増加量_Branch[i, n] = new float[5];
 			}
 		}
-		this.DTX[0] = OpenTaiko.TJA;
-		this.DTX[1] = OpenTaiko.TJA_2P;
-		this.DTX[2] = OpenTaiko.TJA_3P;
-		this.DTX[3] = OpenTaiko.TJA_4P;
-		this.DTX[4] = OpenTaiko.TJA_5P;
+		for (int i = 0; i < this.DTX.Length; ++i)
+			this.DTX[i] = OpenTaiko.GetTJA(i)!;
 		actLVLNFont = new CActLVLNFont();
 		actLVLNFont.Activate();
 		base.Activate();
@@ -439,7 +436,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	//-----------------
 	#endregion
 
-	private CTja[] DTX = new CTja[5];
+	private CTja[] DTX = new CTja[OpenTaiko.MAX_PLAYERS];
 	public double[] db現在のゲージ値 = new double[5];
 	protected CCounter ct炎;
 	protected CCounter ct虹アニメ;

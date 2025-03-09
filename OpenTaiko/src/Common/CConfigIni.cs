@@ -1279,6 +1279,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool PreAssetsLoading; // 事前画像描画モード
 	public bool SimpleMode; // 事前画像描画モード
 	public int MusicPreTimeMs; // 音源再生前の待機時間ms
+	public const int MusicPreTimeMsOffset = 1500; // Added to the MusicPreTimeMs config for the final interpreted value
 
 	public bool TJAP3FolderMode { get; private set; }
 
@@ -1536,9 +1537,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.bIncludeSubfoldersOnRandomSelect = true;
 		this.nMinDisplayedCombo = new STDGBVALUE<int>();
 		this.nMinDisplayedCombo.Drums = 10;
-		this.nMinDisplayedCombo.Guitar = 10;
-		this.nMinDisplayedCombo.Bass = 10;
-		this.nMinDisplayedCombo.Taiko = 10;
 		this.nRollsPerSec = 15;
 		this.nAILevel = 1;
 		this.bAIBattleMode = false;
@@ -1734,7 +1732,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		ASyncTextureLoad = true;
 		PreAssetsLoading = true;
 		SimpleMode = false;
-		MusicPreTimeMs = 1000; // 一秒
+		MusicPreTimeMs = 2500; // 2.5 seconds
 		SendDiscordPlayingInformation = true;
 
 		#region[ Ver.K追加 ]
@@ -2119,9 +2117,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine(
 			$"; Keyboard sound level increment ({MinimumKeyboardSoundLevelIncrement}-{MaximumKeyboardSoundLevelIncrement})");
 		sw.WriteLine("{0}={1}", nameof(KeyboardSoundLevelIncrement), KeyboardSoundLevelIncrement);
-		sw.WriteLine($"; 音源再生前の空白時間 (ms)");
-		sw.WriteLine($"; Blank time before music source to play. (ms)");
-		sw.WriteLine("{0}={1}", nameof(MusicPreTimeMs), MusicPreTimeMs);
+		sw.WriteLine($"; 音源再生前の空白時間 (ms) (最終値はこの値 + {MusicPreTimeMsOffset}ms)");
+		sw.WriteLine($"; Blank time before music source to play. (ms) (Final value is this value + {MusicPreTimeMsOffset}ms");
+		sw.WriteLine("{0}={1}", nameof(MusicPreTimeMs), MusicPreTimeMs - MusicPreTimeMsOffset);
 		sw.WriteLine();
 		sw.WriteLine("; バッファ入力モード(0:OFF, 1:ON)");
 		sw.WriteLine("; Using Buffered input (0:OFF, 1:ON)");
@@ -2893,7 +2891,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 					this.KeyboardSoundLevelIncrement);
 				break;
 			case nameof(this.MusicPreTimeMs):
-				this.MusicPreTimeMs = int.Parse(value);
+				this.MusicPreTimeMs = int.Parse(value) + MusicPreTimeMsOffset;
 				break;
 			case "AutoResultCapture":
 				this.bIsAutoResultCapture = CConversion.bONorOFF(value[0]);

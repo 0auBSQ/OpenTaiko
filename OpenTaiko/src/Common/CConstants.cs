@@ -338,42 +338,23 @@ public enum EInvisible {
 [StructLayout(LayoutKind.Sequential)]
 public struct STDGBVALUE<T>         // indexはE楽器パートと一致させること
 {
-	public T Drums;
-	public T Guitar;
-	public T Bass;
+	public T Drums { get => Taiko; set => Taiko = value; }
 	public T Taiko;
-	public T Unknown;
 	public T this[int index] {
 		get {
 			return index switch {
-				(int)EInstrumentPad.Drums => this.Drums,
-				(int)EInstrumentPad.Guitar => this.Guitar,
-				(int)EInstrumentPad.Bass => this.Bass,
-				(int)EInstrumentPad.Taiko => this.Taiko,
-				(int)EInstrumentPad.Unknown => this.Unknown,
+				(int)EInstrumentPad.Drums or (int)EInstrumentPad.Taiko => this.Taiko,
+				(int)EInstrumentPad.Guitar or (int)EInstrumentPad.Bass or (int)EInstrumentPad.Unknown => default,
 				_ => throw new IndexOutOfRangeException()
 			};
 		}
 		set {
 			switch (index) {
-				case (int)EInstrumentPad.Drums:
-					this.Drums = value;
-					return;
-
-				case (int)EInstrumentPad.Guitar:
-					this.Guitar = value;
-					return;
-
-				case (int)EInstrumentPad.Bass:
-					this.Bass = value;
-					return;
-
-				case (int)EInstrumentPad.Taiko:
+				case (int)EInstrumentPad.Drums or (int)EInstrumentPad.Taiko:
 					this.Taiko = value;
 					return;
 
-				case (int)EInstrumentPad.Unknown:
-					this.Unknown = value;
+				case (int)EInstrumentPad.Guitar or (int)EInstrumentPad.Bass or (int)EInstrumentPad.Unknown:
 					return;
 			}
 			throw new IndexOutOfRangeException();

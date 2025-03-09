@@ -6,10 +6,10 @@ namespace OpenTaiko;
 internal class CChip : IComparable<CChip>, ICloneable {
 	public EScrollMode eScrollMode;
 	public EScrollMode eScrollMode_end;
-	public bool bHit;
+	public bool bHit; // note is hit/broken or roll end is reached
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
-	public bool bProcessed = false;
+	public bool bProcessed = false; // roll-type-only: roll is hit once (roll-head-only) or chip time is reached
 	public bool bShow;
 	public bool bShowRoll;
 	public bool bBranch = false;
@@ -51,7 +51,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
 	public double fBMSCROLLTime_end;
-	public int n発声時刻ms;
+	public int n発声時刻ms { get => (int)db発声時刻ms; set => db発声時刻ms = value; }
 	public double n分岐時刻ms;
 
 

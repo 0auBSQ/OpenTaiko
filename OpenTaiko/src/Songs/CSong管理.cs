@@ -146,7 +146,7 @@ internal class CSongs管理 {
 
 						bool b = false;
 						for (int n = 0; n < (int)Difficulty.Total; n++) {
-							CTja dtx = new CTja(fileinfo.FullName, false, 1.0, 0, 1);
+							CTja dtx = new CTja(fileinfo.FullName, false, 0, 1);
 							if (dtx.b譜面が存在する[n]) {
 								c曲リストノード.difficultiesCount++;
 								c曲リストノード.rParentNode = node親;
@@ -282,7 +282,7 @@ internal class CSongs管理 {
 
 						this.n検索された曲ノード数++;
 					} else {
-						CTja dtx = new CTja(filePath, false, 1.0, 0, 0);
+						CTja dtx = new CTja(filePath, false, 0, 0);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
 
@@ -623,10 +623,8 @@ internal class CSongs管理 {
 					if (!String.IsNullOrEmpty(cdtx.PREIMAGE))
 						c曲リストノード.score[i].譜面情報.Preimage = cdtx.PREIMAGE;
 					c曲リストノード.score[i].譜面情報.Presound = cdtx.PREVIEW;
-					c曲リストノード.score[i].譜面情報.Backgound = ((cdtx.BACKGROUND != null) && (cdtx.BACKGROUND.Length > 0)) ? cdtx.BACKGROUND : cdtx.BACKGROUND_GR;
+					c曲リストノード.score[i].譜面情報.Backgound = cdtx.BACKGROUND;
 					c曲リストノード.score[i].譜面情報.レベル.Drums = cdtx.LEVEL.Drums;
-					c曲リストノード.score[i].譜面情報.レベル.Guitar = cdtx.LEVEL.Guitar;
-					c曲リストノード.score[i].譜面情報.レベル.Bass = cdtx.LEVEL.Bass;
 					c曲リストノード.score[i].譜面情報.レベルを非表示にする = cdtx.HIDDENLEVEL;
 					c曲リストノード.score[i].譜面情報.Bpm = cdtx.BPM;
 					c曲リストノード.score[i].譜面情報.BaseBpm = cdtx.BASEBPM;
@@ -679,8 +677,6 @@ internal class CSongs管理 {
 						sb.Append(", presound=" + c曲リストノード.score[i].譜面情報.Presound);
 						sb.Append(", background=" + c曲リストノード.score[i].譜面情報.Backgound);
 						sb.Append(", lvDr=" + c曲リストノード.score[i].譜面情報.レベル.Drums);
-						sb.Append(", lvGt=" + c曲リストノード.score[i].譜面情報.レベル.Guitar);
-						sb.Append(", lvBs=" + c曲リストノード.score[i].譜面情報.レベル.Bass);
 						sb.Append(", lvHide=" + c曲リストノード.score[i].譜面情報.レベルを非表示にする);
 						sb.Append(", type=" + c曲リストノード.score[i].譜面情報.曲種別);
 						sb.Append(", bpm=" + c曲リストノード.score[i].譜面情報.Bpm);
