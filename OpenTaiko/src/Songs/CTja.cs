@@ -1250,16 +1250,6 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private string tコメントを削除する(string input) {
-		string strOutput = Regex.Replace(input, @" *//.*", ""); //2017.01.28 DD コメント前のスペースも削除するように修正
-
-		return strOutput;
-	}
-
-	private string[] tコマンド行を削除したTJAを返す(string[] input) {
-		return this.tコマンド行を削除したTJAを返す(input, 0);
-	}
-
 	private string[] tコマンド行を削除したTJAを返す(string[] input, int nMode) {
 		var sb = new StringBuilder();
 
@@ -1321,9 +1311,6 @@ internal class CTja : CActivity {
 		return strOutput;
 	}
 
-	private string StringArrayToString(string[] input) {
-		return this.StringArrayToString(input, "");
-	}
 	private string StringArrayToString(string[] input, string strデリミタ文字) {
 		var sb = new StringBuilder();
 
@@ -1332,15 +1319,6 @@ internal class CTja : CActivity {
 		}
 
 		return sb.ToString();
-	}
-
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="InputText"></param>
-	/// <returns>1小節内の文字数</returns>
-	private int t1小節の文字数をカウントする(string InputText) {
-		return InputText.Length - 1;
 	}
 
 	/// <summary>
@@ -1610,33 +1588,6 @@ internal class CTja : CActivity {
 			}
 			#endregion
 		}
-	}
-
-	private CChip t発声位置から過去方向で一番近くにある指定チャンネルのチップを返す(int n発声時刻, int nチャンネル番号) {
-		//過去方向への検索
-		for (int i = this.listChip.Count - 1; i >= 0; i--) {
-			if (this.listChip[i].nChannelNo == nチャンネル番号) {
-				return this.listChip[i];
-			}
-		}
-
-		return null;
-	}
-
-	//現在、以下のような行には対応できていません。
-	//_パラメータを持つ命令がある
-	//_行の途中に命令がある
-	private int t文字数解析(string InputText) {
-		int n文字数 = 0;
-
-		for (int i = 0; i < InputText.Length; i++) {
-			if (this.CharConvertNote(InputText.Substring(i, 1)) != -1) {
-				n文字数++;
-			}
-		}
-
-
-		return n文字数;
 	}
 
 	private static readonly Regex CommandAndArgumentRegex =
@@ -4072,9 +4023,6 @@ internal class CTja : CActivity {
 		return !isOutOfBound;
 	}
 
-	public void SwapGuitarBassInfos() {
-	}
-
 	// SwapGuitarBassInfos_AutoFlags()は、CDTXからCConfigIniに移動。
 
 	// CActivity 実装
@@ -4226,12 +4174,6 @@ internal class CTja : CActivity {
 	private CChip currentCamHScaleChip;
 
 	private Dictionary<string, CChip> currentObjAnimations;
-
-	private void t行のコメント処理(ref string strText) {
-		int nCommentPos = strText.IndexOf("//");
-		if (nCommentPos != -1)
-			strText = strText.Remove(nCommentPos);
-	}
 
 	/// <summary>
 	/// 音源再生前の空白を追加するメソッド。
