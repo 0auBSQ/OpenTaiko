@@ -1249,7 +1249,6 @@ internal class CTja : CActivity {
 	/// <summary>
 	/// <paramref name="nMode"/> == 0: preserve notechart symbols
 	/// <paramref name="nMode"/> == 1: preserve notechart symbols, commands, and EXAM headers
-	/// <paramref name="nMode"/> == 2: preserve notechart symbols and #BRANCHSTART/#N/#E/#M commands
 	/// </summary>
 	/// <returns>TJA lines without certain commands and headers, as a List<> for preventing massive copy</returns>
 	private List<string> tコマンド行を削除したTJAを返す(string[] input, int nMode) {
@@ -1261,9 +1260,12 @@ internal class CTja : CActivity {
 			string line = input[n].Trim();
 
 			if (nMode == 0) {
-				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
-				{
-					sb.Add(line);
+				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
+					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
+						//A～Fで始まる命令が削除されない不具合の対策
+					} else {
+						sb.Add(line);
+					}
 				}
 			} else if (nMode == 1) {
 				if (!string.IsNullOrEmpty(line) &&
@@ -1275,19 +1277,6 @@ internal class CTja : CActivity {
 					} else {
 						sb.Add(line);
 					}
-				}
-			} else if (nMode == 2) {
-				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
-					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-						//A～Fで始まる命令が削除されない不具合の対策
-					} else {
-						sb.Add(line);
-					}
-				} else {
-					if (line.StartsWith("#BRANCHSTART") || line == "#N" || line == "#E" || line == "#M") {
-						sb.Add(line);
-					}
-
 				}
 			}
 		}
@@ -1317,15 +1306,6 @@ internal class CTja : CActivity {
 		}
 
 		return sb.ToString();
-	}
-
-	/// <summary>
-	///
-	/// </summary>
-	/// <param name="InputText"></param>
-	/// <returns>1小節内の文字数</returns>
-	private void t1小節の文字数をカウントしてリストに追加する(string InputText) {
-		this.divsPerMeasureAllBranches.Add(InputText.Length - 1);
 	}
 
 	/// <summary>
@@ -1489,10 +1469,10 @@ internal class CTja : CActivity {
 			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 
 
-			var str命令消去譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 2);
+			var str命令消去譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 0);
 
 			//ここで1行の文字数をカウント。配列にして返す。
-			string str = "";
+			int divPerMeasure = 0;
 			try {
 				if (n譜面数 > 0) {
 					//2017.07.22 kairera0467 譜面が2つ以上ある場合はCOURSE以下のBALLOON命令を使う
@@ -1510,15 +1490,10 @@ internal class CTja : CActivity {
 				}
 				for (int i = 0; i < str命令消去譜面.Count; i++) {
 					if (str命令消去譜面[i].IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(str命令消去譜面[i])) {
-						if (str命令消去譜面[i].Substring(0, 1) == "#") {
-							this.t1小節の文字数をカウントしてリストに追加する(str + str命令消去譜面[i]);
-						}
-
-						if (NotesManager.FastFlankedParsing(str命令消去譜面[i]))//this.CharConvertNote(str命令消去譜面[i].Substring(0, 1)) != -1)
-							str += str命令消去譜面[i];
+						divPerMeasure += str命令消去譜面[i].Length;
 					} else {
-						this.t1小節の文字数をカウントしてリストに追加する(str + str命令消去譜面[i]);
-						str = "";
+						this.divsPerMeasureAllBranches.Add(divPerMeasure + str命令消去譜面[i].Length - 1);
+						divPerMeasure = 0;
 					}
 				}
 			} catch (Exception ex) {
@@ -1534,8 +1509,7 @@ internal class CTja : CActivity {
 			try {
 				for (int i = 0; strSplitした後の譜面.Count > i; i++) {
 					nNowReadLine++;
-					str = strSplitした後の譜面[i];
-					this.t入力_行解析譜面_V4(str);
+					this.t入力_行解析譜面_V4(strSplitした後の譜面[i]);
 				}
 
 				// Retrieve all the global exams (non individual) at the end
