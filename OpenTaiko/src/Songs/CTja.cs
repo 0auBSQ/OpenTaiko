@@ -204,11 +204,6 @@ internal class CTja : CActivity {
 		eNormal,
 		eEx
 	}
-	public class CLine {
-		public int n小節番号;
-		public int n文字数;
-		public ECourse nコース = ECourse.eNormal;
-	}
 
 	// Properties
 
@@ -297,6 +292,7 @@ internal class CTja : CActivity {
 	public int nデモBGMオフセット;
 
 	private int n現在の小節数 = 1;
+	private int iNowMeasureAllBranches = 0;
 
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
 
@@ -326,7 +322,7 @@ internal class CTja : CActivity {
 	public CChip[] pDan_LastChip;
 	public int[] n風船数 = new int[4]; //0～2:各コース 3:共通
 
-	private List<CLine> listLine;
+	private List<int> divsPerMeasureAllBranches; // [iMeasureAllBranches]
 	private int nLineCountTemp; //分岐開始時の小節数を記録。
 	private ECourse nLineCountCourseTemp = ECourse.eNormal; //現在カウント中のコースを記録。
 
@@ -1329,31 +1325,7 @@ internal class CTja : CActivity {
 	/// <param name="InputText"></param>
 	/// <returns>1小節内の文字数</returns>
 	private void t1小節の文字数をカウントしてリストに追加する(string InputText) {
-		int nCount = 0;
-
-		if (InputText.StartsWith("#BRANCHSTART")) {
-			this.nLineCountTemp = this.n現在の小節数;
-			return;
-		} else if (InputText.StartsWith("#N")) {
-			this.nLineCountCourseTemp = ECourse.eNormal;
-			this.n現在の小節数 = this.nLineCountTemp;
-			return;
-		} else if (InputText.StartsWith("#E")) {
-			this.nLineCountCourseTemp = ECourse.eExpert;
-			this.n現在の小節数 = this.nLineCountTemp;
-			return;
-		} else if (InputText.StartsWith("#M")) {
-			this.nLineCountCourseTemp = ECourse.eMaster;
-			this.n現在の小節数 = this.nLineCountTemp;
-			return;
-		}
-
-		var line = new CLine();
-		line.nコース = this.nLineCountCourseTemp;
-		line.n文字数 = InputText.Length - 1;
-		line.n小節番号 = this.n現在の小節数;
-		this.listLine.Add(line);
-		this.n現在の小節数++;
+		this.divsPerMeasureAllBranches.Add(InputText.Length - 1);
 	}
 
 	/// <summary>
@@ -1558,6 +1530,7 @@ internal class CTja : CActivity {
 			//0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
 			var strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 1);
 			this.n現在の小節数 = 1;
+			this.iNowMeasureAllBranches = 0;
 			try {
 				for (int i = 0; strSplitした後の譜面.Count > i; i++) {
 					nNowReadLine++;
@@ -2649,15 +2622,8 @@ internal class CTja : CActivity {
 
 	private void t入力_行解析譜面_V4(string InputText) {
 		if (!String.IsNullOrEmpty(InputText)) {
-			int n文字数 = 16;
-
-			//現在のコース、小節に当てはまるものをリストから探して文字数を返す。
-			for (int i = 0; i < this.listLine.Count; i++) {
-				if (this.listLine[i].n小節番号 == this.n現在の小節数 && this.listLine[i].nコース == this.n現在のコース) {
-					n文字数 = this.listLine[i].n文字数;
-				}
-
-			}
+			int n文字数 = (this.iNowMeasureAllBranches < this.divsPerMeasureAllBranches.Count) ? 16 // after last comma
+				: this.divsPerMeasureAllBranches[this.iNowMeasureAllBranches];
 
 			if (InputText.StartsWith("#")) {
 				// Call orders here
@@ -2709,6 +2675,7 @@ internal class CTja : CActivity {
 							this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / 1));
 							this.dbNowBMScollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / 1));
 						}
+						++this.iNowMeasureAllBranches;
 						this.n現在の小節数++;
 						this.b小節線を挿入している = false;
 						return;
@@ -4048,7 +4015,7 @@ internal class CTja : CActivity {
 		this.listNoteChip = new List<CChip>();
 		this.listBalloon = new List<int>();
 		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
-		this.listLine = new List<CLine>();
+		this.divsPerMeasureAllBranches = new List<int>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
 		this.List_DanSongs = new List<DanSongs>();
