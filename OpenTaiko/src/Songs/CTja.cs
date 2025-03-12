@@ -1255,64 +1255,60 @@ internal class CTja : CActivity {
 	/// <paramref name="nMode"/> == 1: preserve notechart symbols, commands, and EXAM headers
 	/// <paramref name="nMode"/> == 2: preserve notechart symbols and #BRANCHSTART/#N/#E/#M commands
 	/// </summary>
-	/// <returns>TJA lines without certain commands and headers</returns>
-	private string[] tコマンド行を削除したTJAを返す(string[] input, int nMode) {
-		var sb = new StringBuilder();
-
-		// 18/11/11 AioiLight 譜面にSpace、スペース、Tab等が入っているとおかしくなるので修正。
-		// 多分コマンドもスペースが抜かれちゃっているが、コマンド行を除く譜面を返すので大丈夫(たぶん)。
-		for (int i = 0; i < input.Length; i++) {
-			input[i] = input[i].Trim();
-		}
+	/// <returns>TJA lines without certain commands and headers, as a List<> for preventing massive copy</returns>
+	private List<string> tコマンド行を削除したTJAを返す(string[] input, int nMode) {
+		List<string> sb = [];
 
 		for (int n = 0; n < input.Length; n++) {
+			// 18/11/11 AioiLight 譜面にSpace、スペース、Tab等が入っているとおかしくなるので修正。
+			// 多分コマンドもスペースが抜かれちゃっているが、コマンド行を除く譜面を返すので大丈夫(たぶん)。
+			string line = input[n].Trim();
+
 			if (nMode == 0) {
-				if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n]))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
+				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line))//this.CharConvertNote(input[n].Substring(0, 1)) != -1)
 				{
-					sb.Append(input[n] + "\n");
+					sb.Add(line);
 				}
 			} else if (nMode == 1) {
-				if (!string.IsNullOrEmpty(input[n]) &&
-					(input[n].Substring(0, 1) == "#"
-					 || input[n].StartsWith("EXAM")
-					 || NotesManager.FastFlankedParsing(input[n]))) {
-					if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
+				if (!string.IsNullOrEmpty(line) &&
+					(line.Substring(0, 1) == "#"
+					 || line.StartsWith("EXAM")
+					 || NotesManager.FastFlankedParsing(line))) {
+					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
 						//A～Fで始まる命令が削除されない不具合の対策
 					} else {
-						sb.Append(input[n] + "\n");
+						sb.Add(line);
 					}
 				}
 			} else if (nMode == 2) {
-				if (!string.IsNullOrEmpty(input[n]) && NotesManager.FastFlankedParsing(input[n])) {
-					if (input[n].StartsWith("BALLOON") || input[n].StartsWith("BPM")) {
+				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
+					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
 						//A～Fで始まる命令が削除されない不具合の対策
 					} else {
-						sb.Append(input[n] + "\n");
+						sb.Add(line);
 					}
 				} else {
-					if (input[n].StartsWith("#BRANCHSTART") || input[n] == "#N" || input[n] == "#E" || input[n] == "#M") {
-						sb.Append(input[n] + "\n");
+					if (line.StartsWith("#BRANCHSTART") || line == "#N" || line == "#E" || line == "#M") {
+						sb.Add(line);
 					}
 
 				}
 			}
 		}
 
-		string[] strOutput = sb.ToString().Split(this.dlmtEnter, StringSplitOptions.None);
-
-		return strOutput;
+		return sb;
 	}
 
 	private string[] t空のstring配列を詰めたstring配列を返す(string[] input) {
-		var sb = new StringBuilder();
+		List<string> sb = [];
 
 		for (int n = 0; n < input.Length; n++) {
 			if (!string.IsNullOrEmpty(input[n])) {
-				sb.Append(input[n] + "\n");
+				sb.Add(input[n]);
 			}
 		}
 
-		string[] strOutput = sb.ToString().Split(this.dlmtEnter, StringSplitOptions.None);
+		string[] strOutput = sb.ToArray();
 
 		return strOutput;
 	}
@@ -1364,13 +1360,10 @@ internal class CTja : CActivity {
 	/// 0:改行文字を削除して、デリミタとしてスペースを入れる。(返り値:string)
 	/// 1:改行文字を削除、さらにSplitして返す(返り値:string[n])
 	/// </summary>
-	/// <param name="strInput"></param>
+	/// <param name="str"></param>
 	/// <param name="nMode"></param>
 	/// <returns></returns>
-	private object str改行文字を削除する(string strInput, int nMode) {
-		string str = "";
-		str = strInput;
-
+	private object str改行文字を削除する(string str, int nMode) {
 		unsafe {
 			fixed (char* s = str) {
 				for (int i = 0; i < str.Length; i++) {
@@ -1385,12 +1378,7 @@ internal class CTja : CActivity {
 		if (nMode == 0) {
 			str = str.Replace("\n", " ");
 		} else if (nMode == 1) {
-			str = str + "\n";
-
-			string[] strArray;
-			strArray = str.Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
-
-			return strArray;
+			return str.Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		return str;
@@ -1526,13 +1514,12 @@ internal class CTja : CActivity {
 				this.strFullPath);
 
 			//命令をすべて消去した譜面
-			var str命令消去譜面 = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
+			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 
 
-			str命令消去譜面 = this.tコマンド行を削除したTJAを返す(str命令消去譜面, 2);
+			var str命令消去譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 2);
 
 			//ここで1行の文字数をカウント。配列にして返す。
-			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 			string str = "";
 			try {
 				if (n譜面数 > 0) {
@@ -1549,7 +1536,7 @@ internal class CTja : CActivity {
 						this.t難易度別ヘッダ(strSplit読み込むコース[i]);
 					}
 				}
-				for (int i = 0; i < str命令消去譜面.Length; i++) {
+				for (int i = 0; i < str命令消去譜面.Count; i++) {
 					if (str命令消去譜面[i].IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(str命令消去譜面[i])) {
 						if (str命令消去譜面[i].Substring(0, 1) == "#") {
 							this.t1小節の文字数をカウントしてリストに追加する(str + str命令消去譜面[i]);
@@ -1569,11 +1556,10 @@ internal class CTja : CActivity {
 
 			//読み込み部分本体に渡す譜面を作成。
 			//0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
-			var strSplitした後の譜面 = strSplit読み込むコース; //strSplitした譜面[ n読み込むコース ].Split( this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries );
-			strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplitした後の譜面, 1);
+			var strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 1);
 			this.n現在の小節数 = 1;
 			try {
-				for (int i = 0; strSplitした後の譜面.Length > i; i++) {
+				for (int i = 0; strSplitした後の譜面.Count > i; i++) {
 					nNowReadLine++;
 					str = strSplitした後の譜面[i];
 					this.t入力_行解析譜面_V4(str);
