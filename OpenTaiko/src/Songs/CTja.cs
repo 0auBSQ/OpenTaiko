@@ -1250,6 +1250,12 @@ internal class CTja : CActivity {
 		}
 	}
 
+	/// <summary>
+	/// <paramref name="nMode"/> == 0: preserve notechart symbols
+	/// <paramref name="nMode"/> == 1: preserve notechart symbols, commands, and EXAM headers
+	/// <paramref name="nMode"/> == 2: preserve notechart symbols and #BRANCHSTART/#N/#E/#M commands
+	/// </summary>
+	/// <returns>TJA lines without certain commands and headers</returns>
 	private string[] tコマンド行を削除したTJAを返す(string[] input, int nMode) {
 		var sb = new StringBuilder();
 
