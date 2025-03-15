@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.49] - 2025-03-15 (Beta)
+
+- [Fix] Stretch rolls are now also disabled on #BPMCHANGE
+- [Fix] Color tags no longer appear on unlocked dan titles
+
 ## [0.6.0.48] - 2025-03-10 (Beta)
 
 - [Feat] Support #JPOSSCROLL distance with fractional parts
