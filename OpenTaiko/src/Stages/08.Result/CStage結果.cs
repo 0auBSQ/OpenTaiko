@@ -253,7 +253,7 @@ internal class CStage結果 : CStage {
 							TJAPlayer3.SaveFile);
 						*/
 
-						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").Substring(0, 2),
+						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags().Substring(0, 2),
 							clearValue % 2 == 0,
 							(clearValue - 1) / 2);
 					}

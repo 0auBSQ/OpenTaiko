@@ -2631,8 +2631,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				double th16DBeat_end = pChip.end.fBMSCROLLTime - play_bpm_time;
 				double _scrollSpeed_end = pChip.dbSCROLL * _scroll_rate; //pChip.end.dbSCROLL * _scroll_rate;
 				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.end.dbSCROLL_Y * _scroll_rate;
-				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.end.dbBPM, _scrollSpeed_end, pChip.end.eScrollMode);
-				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.end.dbBPM, _scrollSpeed_Y_end, pChip.end.eScrollMode);
+				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM, _scrollSpeed_end, pChip.end.eScrollMode);
+				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM, _scrollSpeed_Y_end, pChip.end.eScrollMode);
 			}
 
 			if (!this.bPAUSE && !this.isRewinding) {
@@ -2790,7 +2790,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				{
 
 						if (!this.bPAUSE && !pChip.bHit) { // can't update while paused
-							//if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
+														   //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
 							if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
 								PassAIBattleSection();
 
@@ -3479,7 +3479,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 					}
 					break;
-				#endregion
+					#endregion
 			}
 		}
 
