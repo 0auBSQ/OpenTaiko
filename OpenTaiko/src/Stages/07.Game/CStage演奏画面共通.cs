@@ -2614,6 +2614,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
 			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
 			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
+			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed_Y, pChip.eScrollMode);
 		}
 		#endregion
 
@@ -2626,6 +2627,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
 			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
 			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
+			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed_Y, pChip.eScrollMode);
 			if (NotesManager.IsGenericRoll(pChip)) {
 				long msDTime_end = pChip.end.n発声時刻ms - n現在時刻ms;
 				double th16DBeat_end = pChip.end.fBMSCROLLTime - play_bpm_time;

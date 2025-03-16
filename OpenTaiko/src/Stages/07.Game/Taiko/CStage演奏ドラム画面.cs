@@ -1380,7 +1380,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 
 				int x = pChip.nHorizontalChipDistance;
-				int y = NoteOriginY[nPlayer];// + ((int)(pChip.nコース) * 100)
+				int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance; // either untouched (0/5) or unused (other) for #DIRECTION
 
 				int xTemp = 0;
 				int yTemp = 0;
@@ -1438,19 +1438,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				long __dbt = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				long time = pChip.n発声時刻ms - __dbt;
-
-				if (pChip.dbSCROLL_Y != 0.0) {
-					var dbSCROLL = pChip.eScrollMode == EScrollMode.BMScroll ? 1.0 : pChip.dbSCROLL;
-
-					y = NoteOriginY[nPlayer];
-
-
-					double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
-					float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-					double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
-
-					y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
-				}
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
 					if (NotesManager.IsDonNote(pChip)) {
@@ -1620,9 +1607,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				break;
 		}
 
-		int nノート座標 = pChip.nHorizontalChipDistance;
-		int nノート末端座標 = pChip.nNoteTipDistance_X;
-		int nノート末端座標_Y = pChip.nNoteTipDistance_Y;
 		int n先頭発声位置 = 0;
 
 		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
@@ -1652,19 +1636,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					n先頭発声位置 = pChip.start.n発声時刻ms;
 			}
 
-			int x = NoteOriginX[nPlayer] + nノート座標;
-			int x末端 = NoteOriginX[nPlayer] + nノート末端座標;
-			int y末端 = NoteOriginY[nPlayer] + nノート末端座標_Y;
-			int y = NoteOriginY[nPlayer];
-
-			if (pChip.dbSCROLL_Y != 0.0) {
-				double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
-				long __dbt = nowTime;
-				long time = pChip.n発声時刻ms - __dbt;
-				float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-				double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
-				y += NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
-			}
+			int x = NoteOriginX[nPlayer] + pChip.nHorizontalChipDistance;
+			int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance;
+			int x末端 = NoteOriginX[nPlayer] + pChip.nNoteTipDistance_X;
+			int y末端 = NoteOriginY[nPlayer] + pChip.nNoteTipDistance_Y;
 
 			if (NotesManager.IsGenericBalloon(pChip)) {
 				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.end.n発声時刻ms) {
@@ -1931,18 +1906,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
 		int x = NoteOriginX[nPlayer] + pChip.nHorizontalChipDistance;
-		int y = NoteOriginY[nPlayer];
-
-		if (pChip.dbSCROLL_Y != 0.0) {
-			double _scrollSpeed = pChip.dbSCROLL_Y * (this.actScrollSpeed.dbConfigScrollSpeed[nPlayer] + 1.0) / 10.0;
-			long __dbt = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-			long msDTime = pChip.n発声時刻ms - __dbt;
-			float play_bpm_time = this.GetNowPBMTime(dTX, 0);
-			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
-			y += NotesManager.GetNoteY(msDTime, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
-
-			//y += (int)(((pChip.n発声時刻ms - (CSound管理.rc演奏用タイマ.n現在時刻 * (((double)TJAPlayer3.ConfigIni.n演奏速度) / 20.0))) * pChip.dbBPM * pChip.dbSCROLL_Y * (this.act譜面スクロール速度.db現在の譜面スクロール速度[nPlayer] + 1.5)) / 628.7);
-		}
+		int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance;
 
 		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
 			if (x >= 0 && x <= GameWindowSize.Width) {
