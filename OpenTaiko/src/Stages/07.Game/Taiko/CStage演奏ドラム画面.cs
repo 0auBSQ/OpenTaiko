@@ -1638,8 +1638,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			int x = NoteOriginX[nPlayer] + pChip.nHorizontalChipDistance;
 			int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance;
-			int x末端 = NoteOriginX[nPlayer] + pChip.nNoteTipDistance_X;
-			int y末端 = NoteOriginY[nPlayer] + pChip.nNoteTipDistance_Y;
+			int x末端 = NoteOriginX[nPlayer] + pChip.end.nHorizontalChipDistance;
+			int y末端 = NoteOriginY[nPlayer] + pChip.end.nVerticalChipDistance;
 
 			if (NotesManager.IsGenericBalloon(pChip)) {
 				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.end.n発声時刻ms) {
