@@ -64,7 +64,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public CChip start;
 	public CChip end;
-
+	public bool useRollInterpolation = false;
 
 	//EXTENDED COMMANDS
 	public int fCamTimeMs;

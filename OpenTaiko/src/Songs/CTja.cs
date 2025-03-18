@@ -348,6 +348,81 @@ internal class CTja : CActivity {
 	public double dbLastTime = 0.0; //直前の小節の開始時間
 	public double dbLastBMScrollTime = 0.0;
 
+	/// <summary>
+	/// Heuristic detecting of (un)intended roll body interpolation (overridden by (incoming) TJA-compatibility settings)
+	/// </summary>
+	/// Each per-object scroll-modifying command (`#SCROLL` and `#HB/BM/NMSCROLL`) is tracked for applied scrolling objects (notes and bar lines, including hidden ones)
+	/// Heuristic patterns for intended interpolation points (a paired roll end or (potential extension) a mid-roll interpolation point):
+	/// * Exact-first pattern: Such a command applies to an interpolation point without any blanks (0) or bar lines (treated as inserted before notes and blanks) in between
+	/// * Unique pattern: Such a command applies to only a single scrolling object and the object is an interpolation point
+	/// accepted: 5 #SCROLL [8] 5 / 5 #SCROLL 0 [8] #SCROLL / 5 #SCROLL [8] #HBSCROLL 1 / 5 #HBSCROLL 0 [8] #NMSCROLL 1
+	/// rejected: 5 #SCROLL 0 [8] 1 / 5 #SCROLL bar-line [8] / 5 #SCROLL 0 [8] #HBSCROLL 1
+	private class RollInterpolationIntent {
+		public class IntentTracker {
+			enum ETrackingState : sbyte {
+				Rejected = -1,
+				Exact, // neither note symbols nor bar lines have appeared
+				Blank, // blank (0) has appeared
+				Unique, // a roll end (8) and blanks (0) have appeared
+			};
+
+			CChip? uncertainChip; // forbidden across branches
+			ETrackingState state;
+
+			public IntentTracker() => Reject();
+
+			public void Reject() {
+				this.uncertainChip = null;
+				this.state = ETrackingState.Rejected;
+			}
+
+			public void StartTracking() {
+				if (this.uncertainChip != null && this.state is not ETrackingState.Rejected) {
+					this.uncertainChip.useRollInterpolation = true; // accept
+				}
+				this.uncertainChip = null;
+				this.state = ETrackingState.Exact;
+			}
+
+			public void Advanceby(CChip? chip) {
+				if (chip == null) { // Note symbol 0
+					if (this.state is ETrackingState.Exact) {
+						this.state = ETrackingState.Blank;
+					}
+					return;
+				}
+				if (NotesManager.IsRollEnd(chip)) {
+					switch (this.state) {
+						case ETrackingState.Exact:
+							chip.useRollInterpolation = true; // accept current
+							this.Reject(); // reject future
+							return;
+
+						case ETrackingState.Blank:
+							this.uncertainChip = chip;
+							this.state = ETrackingState.Unique;
+							return;
+					}
+				}
+				this.Reject();
+			}
+		};
+
+		public IntentTracker Scroll = new();
+		public IntentTracker ScrollMethod = new();
+
+		public void FinalizeTracking() => forEachTracker(tracker => tracker.StartTracking());
+		public void Reject() => forEachTracker(tracker => tracker.Reject());
+		public void AdvanceBy(CChip? chip) => forEachTracker(tracker => tracker.Advanceby(chip));
+
+		void forEachTracker(Action<IntentTracker> action) {
+			action(this.Scroll);
+			action(this.ScrollMethod);
+		}
+	}
+
+	private RollInterpolationIntent rollInterpIntent = new();
+
 	public int[] bBARLINECUE = new int[2]; //命令を入れた次の小節の操作を実現するためのフラグ。0 = mainflag, 1 = cuetype
 	public bool b小節線を挿入している = false;
 
@@ -1686,9 +1761,11 @@ internal class CTja : CActivity {
 							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strファイル名の絶対パス}"
 						);
 					}
+					this.rollInterpIntent.Reject(); // probably unintended and should be avoided at the first place
 					InsertNoteAtDefCursor(8, 0, 1, branch);
 				}
 			}
+			this.rollInterpIntent.FinalizeTracking();
 
 			//ためしに割り込む。
 			var chip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0xFF);
@@ -1757,6 +1834,7 @@ internal class CTja : CActivity {
 			// チップを配置。
 
 			this.listChip.Add(chip);
+			this.rollInterpIntent.Scroll.StartTracking();
 		} else if (command == "#MEASURE") {
 			strArray = argument.Split(new char[] { '/' });
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
@@ -2107,9 +2185,12 @@ internal class CTja : CActivity {
 			chip.bHideBarLine = false;
 			this.listChip.Add(chip);
 			this.listBarLineChip.Add(chip);
+			this.rollInterpIntent.AdvanceBy(chip);
 		} else if (command == "#SECTION") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xDD, 1)); //分岐:条件リセット
 		} else if (command == "#BRANCHSTART") {
+			this.rollInterpIntent.Reject(); // probably unintended across branched sections
+
 			//分岐:分岐スタート
 			#region [ 譜面分岐のパース方法を作り直し ]
 			this.bチップがある.Branch = true;
@@ -2186,6 +2267,8 @@ internal class CTja : CActivity {
 			#endregion
 		} else if (command == "#N" || command == "#E" || command == "#M")//これCourseを全部集めてあとから分岐させればいい件
 		{
+			this.rollInterpIntent.Reject(); // probably unintended across branched sections
+
 			//開始時の情報にセット
 			t現在のチップ情報を記録する(false);
 
@@ -2200,6 +2283,8 @@ internal class CTja : CActivity {
 			chip.n発声位置 -= 1;
 			this.listChip.Add(chip);
 		} else if (command == "#BRANCHEND") {
+			this.rollInterpIntent.Reject(); // probably unintended across branched sections
+
 			//End用チャンネルをEmptyから引っ張ってきた。
 			var GoBranch = this.NewEventChipAtDefCursor(0x52, 1);
 			GoBranch.n発声位置 -= 1;
@@ -2383,6 +2468,7 @@ internal class CTja : CActivity {
 			chip.n発声位置 -= 1;
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
+			this.rollInterpIntent.ScrollMethod.StartTracking();
 		} else if (command == "#BMSCROLL") {
 			eScrollMode = EScrollMode.BMScroll;
 
@@ -2390,6 +2476,7 @@ internal class CTja : CActivity {
 			chip.n発声位置 -= 1;
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
+			this.rollInterpIntent.ScrollMethod.StartTracking();
 		} else if (command == "#HBSCROLL") {
 			eScrollMode = EScrollMode.HBScroll;
 
@@ -2397,6 +2484,7 @@ internal class CTja : CActivity {
 			chip.n発声位置 -= 1;
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
+			this.rollInterpIntent.ScrollMethod.StartTracking();
 		}
 	}
 
@@ -2723,6 +2811,7 @@ internal class CTja : CActivity {
 
 					this.dbLastTime = this.dbNowTime;
 					this.b小節線を挿入している = true;
+					this.rollInterpIntent.Reject(); // probably unintended (the per-section scroll speed change)
 				}
 
 				for (int n = 0; n < InputText.Length; n++) {
@@ -2745,7 +2834,9 @@ internal class CTja : CActivity {
 
 					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
 
-					if (nObjectNum != 0) {
+					if (nObjectNum == 0) {
+						this.rollInterpIntent.AdvanceBy(null);
+					} else {
 						// IsEndedBranchingがfalseで1回
 						// trueで3回だよ3回
 						for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
@@ -2757,6 +2848,7 @@ internal class CTja : CActivity {
 							if (this.nNowRollCountBranch[iBranch] >= 0) {
 								if (isRollHead) {
 									// repeated roll head; treated as blank
+									this.rollInterpIntent.Reject(); // reserved for potential "mid-roll-interpolation" extension
 									continue; // process this note symbol in the next branch
 								}
 								if (nObjectNum != 8) {
@@ -2767,6 +2859,7 @@ internal class CTja : CActivity {
 											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
 										);
 									}
+									this.rollInterpIntent.Reject(); // probably unintended (the per-note-head scroll speed change)
 									InsertNoteAtDefCursor(8, n, n文字数, branch);
 
 								}
@@ -2951,11 +3044,13 @@ internal class CTja : CActivity {
 			if (branch == ECourse.eNormal) {
 				this.listChip.Add(chip);
 				this.listNoteChip.Add(chip);
+				this.rollInterpIntent.AdvanceBy(chip);
 			}
 		} else {
 			this.listChip_Branch[(int)chip.nBranch].Add(chip);
 			this.listChip.Add(chip);
 			this.listNoteChip.Add(chip);
+			this.rollInterpIntent.AdvanceBy(chip);
 		}
 	}
 
@@ -4011,6 +4106,7 @@ internal class CTja : CActivity {
 		this.listTextures = new Dictionary<string, CTexture>();
 		this.listOriginalTextures = new Dictionary<string, CTexture>();
 		this.currentObjAnimations = new Dictionary<string, CChip>();
+		this.rollInterpIntent = new();
 		base.Activate();
 	}
 	public override void DeActivate() {
