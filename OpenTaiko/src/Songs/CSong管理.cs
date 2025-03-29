@@ -306,6 +306,9 @@ internal class CSongs管理 {
 								c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
 								c曲リストノード.uniqueId = dtx.uniqueID;
 
+								c曲リストノード.CutSceneIntro = dtx.CutSceneIntro;
+								c曲リストノード.CutSceneOutros = dtx.CutSceneOutros;
+
 								CSongDict.tAddSongNode(c曲リストノード.uniqueId, c曲リストノード);
 
 								c曲リストノード.score[n] = new CScore();

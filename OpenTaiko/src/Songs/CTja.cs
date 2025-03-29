@@ -412,6 +412,26 @@ internal class CTja : CActivity {
 	public Dictionary<string, CTexture> listOriginalTextures;
 	#endregion
 
+	#region [ OpenTaiko-Exclusive TJA Extension Data ]
+
+	public enum ECutSceneRepeatMode {
+		UntilFirstUnmet = -1,
+		FirstMet = 0,
+		EverytimeMet = 1,
+	}
+
+	[Serializable]
+	public class CutSceneDef {
+		public required string FullPath;
+		public BestPlayRecords.EClearStatus ClearRequirement = BestPlayRecords.EClearStatus.NONE;
+		public string RequirementRange = "me";
+		public ECutSceneRepeatMode RepeatMode = ECutSceneRepeatMode.FirstMet;
+	}
+
+	public CutSceneDef? CutSceneIntro;
+	public List<CutSceneDef> CutSceneOutros;
+
+	#endregion
 
 
 #if TEST_NOTEOFFMODE
@@ -492,6 +512,7 @@ internal class CTja : CActivity {
 		pDan_LastChip = new CChip[1];
 		DanSongs.Number = 0;
 
+		this.CutSceneOutros = new();
 	}
 	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int difficulty)
 		: this() {
@@ -3435,6 +3456,78 @@ internal class CTja : CActivity {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				this.strBGIMAGE_PATH = strCommandParam;
 			}
+		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
+			try {
+				string[] args = SplitComma(strCommandParam);
+				string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[0]);
+
+				if (string.IsNullOrEmpty(path)) {
+					this.CutSceneIntro = null;
+				} else {
+					string fullPath;
+					if (!string.IsNullOrEmpty(this.PATH_WAV))
+						fullPath = this.PATH_WAV + path;
+					else
+						fullPath = this.strフォルダ名 + path;
+
+					ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+					if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
+						repeatMode = int.Parse(args[1]) switch {
+							< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+							> 0 => ECutSceneRepeatMode.EverytimeMet,
+							0 or _ => ECutSceneRepeatMode.FirstMet,
+						};
+					}
+
+					this.CutSceneIntro = new() {
+						FullPath = fullPath,
+						RepeatMode = repeatMode,
+					};
+				}
+			} catch (Exception ex) {
+				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
+			}
+		} else if (strCommandName.Equals(".CUTSCENE_OUTRO")) { // .CUTSCENE_OUTRO:<path>,<clear status>,<scope>,<repeat?>,...
+			try {
+				List<CutSceneDef> outros = new();
+				string[] args = SplitComma(strCommandParam);
+				for (int iArg = 0; iArg < args.Length; iArg += 4) {
+					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[iArg + 0]);
+
+					if (!string.IsNullOrEmpty(path)) {
+						string fullPath;
+						if (!string.IsNullOrEmpty(this.PATH_WAV))
+							fullPath = this.PATH_WAV + path;
+						else
+							fullPath = this.strフォルダ名 + path;
+
+						BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
+						if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
+							clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(args[iArg + 1]);
+						}
+
+						string requirementRange = !(iArg + 2 < args.Length) ? "me" : args[iArg + 2].Trim();
+
+						ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+						if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
+							repeatMode = int.Parse(args[iArg + 3]) switch {
+								< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+								> 0 => ECutSceneRepeatMode.EverytimeMet,
+								0 or _ => ECutSceneRepeatMode.FirstMet,
+							};
+						}
+
+						outros.Add(new() {
+							FullPath = fullPath,
+							ClearRequirement = clearRequirement,
+							RequirementRange = requirementRange,
+							RepeatMode = repeatMode,
+						});
+					}
+				}
+			} catch (Exception ex) {
+				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
+			}
 		} else if (strCommandName.Equals("HIDDENBRANCH")) {
 			//2016.04.01 kairera0467 パラメーターは
 			if (!string.IsNullOrEmpty(strCommandParam)) {
@@ -4011,6 +4104,10 @@ internal class CTja : CActivity {
 		this.listTextures = new Dictionary<string, CTexture>();
 		this.listOriginalTextures = new Dictionary<string, CTexture>();
 		this.currentObjAnimations = new Dictionary<string, CChip>();
+
+		this.CutSceneIntro = null;
+		this.CutSceneOutros = [];
+
 		base.Activate();
 	}
 	public override void DeActivate() {

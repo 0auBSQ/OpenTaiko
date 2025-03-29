@@ -88,6 +88,13 @@ internal class CSongListNode {
 
 	public string strScenePreset = null;
 
+	#region [ OpenTaiko-Exclusive TJA Extension Data ]
+
+	public CTja.CutSceneDef? CutSceneIntro = null;
+	public List<CTja.CutSceneDef> CutSceneOutros = [];
+
+	#endregion
+
 	public string tGetUniqueId() {
 		return uniqueId?.data.id ?? "";
 	}
