@@ -473,14 +473,6 @@ internal class OpenTaiko : Game {
 		}
 	}
 	protected override void OnExiting() {
-		ConfigIni.nWindowBaseXPosition = WindowPosition.X;
-		ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
-		ConfigIni.nWindowWidth = WindowSize.X;
-		ConfigIni.nWindowHeight = WindowSize.Y;
-		ConfigIni.bFullScreen = FullScreen;
-		ConfigIni.bEnableVSync = VSync;
-		Framerate = 0;
-
 		this.tExitProcess();
 		base.OnExiting();
 	}
@@ -1852,6 +1844,15 @@ internal class OpenTaiko : Game {
 		if (!this.b終了処理完了済み) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
+
+			ConfigIni.nWindowBaseXPosition = WindowPosition.X;
+			ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
+			ConfigIni.nWindowWidth = WindowSize.X;
+			ConfigIni.nWindowHeight = WindowSize.Y;
+			ConfigIni.bFullScreen = FullScreen;
+			ConfigIni.bEnableVSync = VSync;
+			Framerate = 0;
+
 			#region [ 曲検索の終了処理 ]
 			//---------------------
 
