@@ -1575,23 +1575,9 @@ internal class CStageSongSelect : CStage {
 		tNotifySelectedSongChange();
 	}
 	private void t曲を選択する() {
-		// First assignation
-		this.rChoosenSong = this.actSongList.rCurrentlySelectedSong;
-		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
-
-		this.nChoosenSongDifficulty[0] = this.actSongList.n現在選択中の曲の現在の難易度レベル;
-		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
-
-		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
-		}
-		// TJAPlayer3.Skin.bgm選曲画面.t停止する();
-		CSongSelectSongManager.stopSong();
+		this.t曲を選択する(this.actSongList.n現在選択中の曲の現在の難易度レベル, 0);
 	}
 	public void t曲を選択する(int nCurrentLevel, int player) {
-		// Second assignation
 		this.rChoosenSong = this.actSongList.rCurrentlySelectedSong;
 		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
 
