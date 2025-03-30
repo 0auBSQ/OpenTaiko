@@ -2822,7 +2822,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if ((dTX.listVD.TryGetValue(pChip.n整数値_内部番号, out CVideoDecoder vd))) {
 								ShowVideo = true;
 								if (OpenTaiko.ConfigIni.bEnableAVI && vd != null) {
-									this.actAVI.Start(pChip.nChannelNo, vd);
+									this.actAVI.Start(vd);
 									this.actAVI.Seek(pChip.VideoStartTimeMs);
 								}
 							}
@@ -2843,7 +2843,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if ((dTX.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
 								ShowVideo = true;
 								if (OpenTaiko.ConfigIni.bEnableAVI && vd != null) {
-									this.actAVI.Start(pChip.nChannelNo, vd);
+									this.actAVI.Start(vd);
 								}
 							}
 						}
@@ -4430,7 +4430,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (chip.n発声時刻ms <= nStartTime) {
 							chip.bHit = true;
 							this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
-							this.actAVI.Start(0x54, this.actAVI.rVD);
+							this.actAVI.Start(this.actAVI.rVD);
 							break;
 						} else {
 							this.actAVI.Seek(0);
