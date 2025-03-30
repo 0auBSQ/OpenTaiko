@@ -217,21 +217,13 @@ internal class CSongs管理 {
 								if (dtx.Dan_C != null)
 									c曲リストノード.Dan_C = dtx.Dan_C;
 
-								if (!string.IsNullOrEmpty(dtx.GENRE)) {
-									if (c曲リストノード.rParentNode != null) {
-										c曲リストノード.songGenre = c曲リストノード.rParentNode.songGenre;
-										c曲リストノード.songGenrePanel = dtx.GENRE;
-									} else {
-										c曲リストノード.songGenre = dtx.GENRE;
-										c曲リストノード.songGenrePanel = dtx.GENRE;
-									}
-								} else {
-									c曲リストノード.songGenre = c曲リストノード.rParentNode.songGenre;
-									c曲リストノード.songGenrePanel = c曲リストノード.rParentNode.songGenre;
-								}
+								string? songGenreParent = string.IsNullOrEmpty(c曲リストノード.rParentNode?.songGenre) ? null
+									: c曲リストノード.rParentNode.songGenre;
+								c曲リストノード.songGenre = songGenreParent ?? dtx.GENRE ?? "";
+								c曲リストノード.songGenrePanel = (!string.IsNullOrEmpty(dtx.GENRE) ? dtx.GENRE : songGenreParent) ?? "";
 
-								if (c曲リストノード.strSelectBGPath == null || !File.Exists(str基点フォルダ + dtx.SELECTBG)) {
-									c曲リストノード.strSelectBGPath = c曲リストノード.rParentNode.strSelectBGPath;
+								if (!(dtx.SELECTBG != null && File.Exists(str基点フォルダ + dtx.SELECTBG))) {
+									c曲リストノード.strSelectBGPath = c曲リストノード.rParentNode?.strSelectBGPath;
 								} else {
 									c曲リストノード.strSelectBGPath = str基点フォルダ + dtx.SELECTBG;
 								}
