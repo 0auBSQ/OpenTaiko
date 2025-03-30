@@ -551,13 +551,15 @@ internal class CSongs管理 {
 					c曲リストノード.score[i].譜面情報.cDanTickColor = cdtx.DANTICKCOLOR;
 
 					c曲リストノード.score[i].譜面情報.nTotalFloor = 0;
-					for (int k = 0; k < cdtx.listChip.Count; k++) {
-						CChip pChip = cdtx.listChip[k];
+					if ((Difficulty)i is Difficulty.Tower) {
+						for (int k = 0; k < cdtx.listChip.Count; k++) {
+							CChip pChip = cdtx.listChip[k];
 
-						if (pChip.n整数値_内部番号 > c曲リストノード.score[i].譜面情報.nTotalFloor && pChip.nChannelNo == 0x50)
-							c曲リストノード.score[i].譜面情報.nTotalFloor = pChip.n整数値_内部番号;
+							if (pChip.n整数値_内部番号 > c曲リストノード.score[i].譜面情報.nTotalFloor && pChip.nChannelNo == 0x50)
+								c曲リストノード.score[i].譜面情報.nTotalFloor = pChip.n整数値_内部番号;
+						}
+						c曲リストノード.score[i].譜面情報.nTotalFloor++;
 					}
-					c曲リストノード.score[i].譜面情報.nTotalFloor++;
 
 
 
