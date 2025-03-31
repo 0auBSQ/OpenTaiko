@@ -49,14 +49,20 @@ public unsafe class CFrameConverter : IDisposable {
 	}
 
 	public void Dispose() {
-		Marshal.FreeHGlobal(_convertedFrameBufferPtr);
-		ffmpeg.sws_freeContext(convert_context);
+		if (_convertedFrameBufferPtr != 0) {
+			Marshal.FreeHGlobal(_convertedFrameBufferPtr);
+			_convertedFrameBufferPtr = 0;
+		}
+		if (convert_context != null) {
+			ffmpeg.sws_freeContext(convert_context);
+			this.convert_context = null;
+		}
 	}
 
 	private SwsContext* convert_context;
 	private readonly byte_ptrArray4 _dstData;
 	private readonly int_array4 _dstLinesize;
-	private readonly IntPtr _convertedFrameBufferPtr;
+	private IntPtr _convertedFrameBufferPtr;
 	private const AVPixelFormat CVPxfmt = AVPixelFormat.AV_PIX_FMT_RGBA;
 	private bool IsConvert = false;
 	private Size FrameSize;

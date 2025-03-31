@@ -62,6 +62,9 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Dispose() {
+		if (this.close)
+			return;
+
 		bDrawing = false;
 		close = true;
 		cts?.Cancel();
