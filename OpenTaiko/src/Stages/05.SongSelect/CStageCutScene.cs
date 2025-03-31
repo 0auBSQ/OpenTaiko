@@ -160,7 +160,7 @@ class CStageCutScene : CStage {
 			base.ePhaseID = EPhase.Common_FADEOUT;
 			switch (this.mode) {
 				case ECutSceneMode.Intro:
-					this.actFOIntro.tフェードアウト開始();
+					this.actFOIntro.tフェードアウト開始(true);
 					this.ReturnValueAfterFadingOut = EReturnValue.IntroFinished;
 					break;
 
