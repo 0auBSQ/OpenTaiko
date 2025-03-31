@@ -2,6 +2,7 @@
 
 ## [0.6.0.50] - 2025-03-31 (Beta)
 
+- Fix crash when rapidly closing the game twice
 - Remove deprecated code related to DTXMania's set.def
 - Fix songs without any parent `box.def` emptied out the entire song selection list due to null reference exception
 
