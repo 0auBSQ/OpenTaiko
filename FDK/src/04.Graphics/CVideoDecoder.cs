@@ -105,6 +105,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		CTimer.Pause();
 		this.bPlaying = false;
 		bDrawing = false;
+		this.bFinishPlaying = true;
 	}
 
 	public void InitRead() {
@@ -116,6 +117,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Seek(long timestampms) {
+		this.bFinishPlaying = false;
 		cts?.Cancel();
 		while (DS != DecodingState.Stopped) ;
 		if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
@@ -208,6 +210,7 @@ public unsafe class CVideoDecoder : IDisposable {
 						//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
 						ffmpeg.av_packet_unref(packet);
 					} else if (error == ffmpeg.AVERROR_EOF) {
+						this.bFinishPlaying = true;
 						return;
 					}
 				} else {
@@ -276,6 +279,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	//for play
 	public bool bPlaying { get; private set; } = false;
 	public bool bDrawing { get; private set; } = false;
+	public bool bFinishPlaying { get; private set; } = false;
 	private CTimer CTimer;
 	private AVRational Framerate;
 	private CTexture lastTexture;
