@@ -246,6 +246,8 @@ public unsafe class CVideoDecoder : IDisposable {
 		return null;
 	}
 
+	public double msPlayPosition => CTimer.NowTimeMs * _dbPlaySpeed;
+
 	public Size FrameSize {
 		get;
 		private set;

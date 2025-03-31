@@ -42,6 +42,7 @@ class CStageCutScene : CStage {
 		SoundManager.PlayTimer.Pause();
 		OpenTaiko.Timer.Pause();
 
+		this.sound?.Pause();
 		this.actAVI.Pause();
 	}
 
@@ -53,6 +54,9 @@ class CStageCutScene : CStage {
 		SoundManager.PlayTimer.Resume();
 
 		this.actAVI.Resume();
+		if (this.rVD != null) {
+			this.sound?.Resume((long)this.rVD.msPlayPosition);
+		}
 	}
 
 	public void Skip() {
@@ -111,6 +115,7 @@ class CStageCutScene : CStage {
 
 	public override void DeActivate() {
 		// On de-activation
+		this.StopSound();
 		this.rVD?.Dispose();
 
 		this.cutScenes?.Clear();
@@ -148,6 +153,7 @@ class CStageCutScene : CStage {
 				var cutScene = this.cutScenes[this.iCutScene];
 				if (this.LoadCutSceneAVI(cutScene)) {
 					this.actAVI.Start(this.rVD!, true);
+					this.sound?.PlayStart();
 					break;
 				}
 			}
@@ -190,10 +196,13 @@ class CStageCutScene : CStage {
 
 	private bool LoadCutSceneAVI(CTja.CutSceneDef cutScene) {
 		try {
+			this.StopSound();
 			this.rVD?.Dispose();
 			this.rVD = new CVideoDecoder(cutScene.FullPath);
+			this.rVD.Pause();
 			this.rVD.InitRead();
 			this.rVD.dbPlaySpeed = 1;
+			this.sound = CreateSound(cutScene.FullPath);
 			return true;
 		} catch (Exception e) {
 			Trace.TraceWarning(e.ToString() + "\n"
@@ -221,6 +230,44 @@ class CStageCutScene : CStage {
 		OutroFinished,
 	}
 
+	private static CSound? CreateSound(string? filepathAVI) {
+		if (string.IsNullOrEmpty(filepathAVI) || !File.Exists(filepathAVI)) {
+			return null;
+		}
+		CSound? sound = null;
+		try {
+			// load video as audio
+			sound = OpenTaiko.SoundManager.tCreateSound(filepathAVI, ESoundGroup.SongPlayback);
+			if (sound == null)
+				return null;
+
+			// 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
+			//                           Initialization, song enumeration, and/or interactions may have
+			//                           caused background scanning and the metadata may now be available.
+			//                           If is not yet available then we wish to queue scanning.
+			var loudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(filepathAVI);
+			OpenTaiko.SongGainController.Set(CSound.DefaultSongVol, loudnessMetadata, sound);
+
+			Trace.TraceInformation($"Loaded sound ({filepathAVI}) for video ({filepathAVI})");
+
+			return sound;
+		} catch (Exception e) {
+			Trace.TraceError(e.ToString());
+			Trace.TraceError($"Failed to load sound ({filepathAVI}) for video ({filepathAVI})");
+			sound?.Dispose();
+			return null;
+		}
+	}
+
+	public void StopSound() {
+		if (this.sound != null) {
+			this.sound.Stop();
+			OpenTaiko.SoundManager.tDisposeSound(this.sound);
+			this.sound = null;
+		}
+	}
+
+
 	#region [Private]
 
 	private enum ECutSceneMode {
@@ -238,6 +285,7 @@ class CStageCutScene : CStage {
 	private List<CTja.CutSceneDef>? cutScenes;
 	private int iCutScene;
 	private CVideoDecoder? rVD;
+	private CSound? sound;
 
 	private bool isPause;
 	private CActCutScenePauseMenu actPauseMenu;
