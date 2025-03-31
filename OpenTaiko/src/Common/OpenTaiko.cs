@@ -1071,7 +1071,7 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.ReturnToTitle:
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -1086,7 +1086,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)EReturnValue.SongChoosen:
+							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageSongLoading);
