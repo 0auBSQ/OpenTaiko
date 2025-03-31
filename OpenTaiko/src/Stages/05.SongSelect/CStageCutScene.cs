@@ -14,6 +14,7 @@ class CStageCutScene : CStage {
 		base.ChildActivities.Add(this.actAVI = new());
 		base.ChildActivities.Add(this.actFOIntro = new());
 		base.ChildActivities.Add(this.actFOOutro = new());
+		base.ChildActivities.Add(this.actPauseMenu = new());
 	}
 
 	public override void Activate() {
@@ -30,7 +31,38 @@ class CStageCutScene : CStage {
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		this.ReturnValueAfterFadingOut = EReturnValue.Continue;
 
+		this.isPause = false;
+
 		base.Activate();
+	}
+
+	public void Pause() {
+		this.isPause = true;
+
+		SoundManager.PlayTimer.Pause();
+		OpenTaiko.Timer.Pause();
+
+		this.actAVI.Pause();
+	}
+
+	public void Resume() {
+		this.isPause = false;
+
+		OpenTaiko.Timer.Resume();
+		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
+		SoundManager.PlayTimer.Resume();
+
+		this.actAVI.Resume();
+	}
+
+	public void Skip() {
+		this.isPause = false;
+
+		OpenTaiko.Timer.Resume();
+		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
+		SoundManager.PlayTimer.Resume();
+
+		this.actAVI.Stop(); // only skip one video
 	}
 
 	public bool LoadCutScenes(CStage stageLast) {
@@ -122,6 +154,7 @@ class CStageCutScene : CStage {
 		}
 
 		this.actAVI.Draw();
+		this.actPauseMenu.Draw();
 
 		if (base.ePhaseID == EPhase.Common_NORMAL && !(this.iCutScene < this.cutScenes!.Count)) {
 			base.ePhaseID = EPhase.Common_FADEOUT;
@@ -170,7 +203,15 @@ class CStageCutScene : CStage {
 
 	private void KeyInput() {
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
-		// TODO: Pause menu
+		if ((base.ePhaseID == CStage.EPhase.Common_NORMAL) && (
+			keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || keyboard.KeyPressed((int)SlimDXKeys.Key.F1) || OpenTaiko.Pad.bPressedGB(EPad.FT)
+			)) {
+			if (!this.actPauseMenu.bIsActivePopupMenu && !this.isPause) {
+				OpenTaiko.Skin.soundChangeSFX.tPlay();
+				this.Pause();
+				this.actPauseMenu.tActivatePopupMenu(0);
+			}
+		}
 	}
 
 	public enum EReturnValue : int {
@@ -196,6 +237,9 @@ class CStageCutScene : CStage {
 	private List<CTja.CutSceneDef>? cutScenes;
 	private int iCutScene;
 	private CVideoDecoder? rVD;
+
+	private bool isPause;
+	private CActCutScenePauseMenu actPauseMenu;
 
 	#endregion
 }
