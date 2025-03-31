@@ -2040,7 +2040,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				SoundManager.PlayTimer.Pause();
 				OpenTaiko.Timer.Pause();
 				OpenTaiko.TJA.t全チップの再生一時停止();
-				this.actAVI.tPauseControl();
+				this.actAVI.Pause();
 
 				this.bPAUSE = true;
 				this.actPauseMenu.tActivatePopupMenu(0);

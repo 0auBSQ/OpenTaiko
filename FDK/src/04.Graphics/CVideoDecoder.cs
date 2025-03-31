@@ -91,13 +91,21 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	}
 
-	public void PauseControl() {
+	public void Pause() {
+		CTimer.Pause();
+		this.bPlaying = false;
+	}
+
+	public void Resume() {
+		CTimer.Resume();
+		this.bPlaying = true;
+	}
+
+	public void TogglePause() {
 		if (this.bPlaying) {
-			CTimer.Pause();
-			this.bPlaying = false;
+			this.Pause();
 		} else {
-			CTimer.Resume();
-			this.bPlaying = true;
+			this.Resume();
 		}
 	}
 

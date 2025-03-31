@@ -31,7 +31,9 @@ internal class CAct演奏AVI : CActivity {
 
 	public void Stop() => this.rVD?.Stop();
 
-	public void tPauseControl() => this.rVD?.PauseControl();
+	public void Pause() => this.rVD?.Pause();
+	public void Resume() => this.rVD?.Resume();
+	public void TogglePause() => this.rVD?.TogglePause();
 
 	public override unsafe int Draw() {
 		if (!base.IsDeActivated) {
