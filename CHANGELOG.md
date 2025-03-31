@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.50] - 2025-03-31 (Beta)
+
+- Remove deprecated code related to DTXMania's set.def
+- Fix songs without any parent `box.def` emptied out the entire song selection list due to null reference exception
+
 ## [0.6.0.49] - 2025-03-15 (Beta)
 
 - [Fix] Stretch rolls are now also disabled on #BPMCHANGE
