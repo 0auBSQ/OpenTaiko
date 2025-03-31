@@ -37,7 +37,7 @@ internal class CAct演奏AVI : CActivity {
 
 	public override unsafe int Draw() {
 		if (!base.IsDeActivated) {
-			if (this.rVD == null || !rVD.bDrawing)
+			if (this.rVD == null || !(this.isCutScene || this.rVD.bDrawing))
 				return 0;
 
 			this.rVD.GetNowFrame(ref this.tx描画用);

@@ -111,6 +111,7 @@ class CStageCutScene : CStage {
 
 	public override void DeActivate() {
 		// On de-activation
+		this.rVD?.Dispose();
 
 		this.cutScenes?.Clear();
 		this.cutScenes = null;
@@ -143,7 +144,6 @@ class CStageCutScene : CStage {
 		this.KeyInput();
 
 		if ((this.rVD == null || this.rVD.bFinishPlaying) && this.iCutScene < this.cutScenes!.Count) {
-			this.rVD?.Dispose();
 			while (++this.iCutScene < this.cutScenes!.Count) {
 				var cutScene = this.cutScenes[this.iCutScene];
 				if (this.LoadCutSceneAVI(cutScene)) {
@@ -190,6 +190,7 @@ class CStageCutScene : CStage {
 
 	private bool LoadCutSceneAVI(CTja.CutSceneDef cutScene) {
 		try {
+			this.rVD?.Dispose();
 			this.rVD = new CVideoDecoder(cutScene.FullPath);
 			this.rVD.InitRead();
 			this.rVD.dbPlaySpeed = 1;
