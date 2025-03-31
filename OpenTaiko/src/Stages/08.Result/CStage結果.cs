@@ -43,7 +43,7 @@ internal class CStage結果 : CStage {
 		base.ChildActivities.Add(this.actParameterPanel = new CActResultParameterPanel());
 		base.ChildActivities.Add(this.actSongBar = new CActResultSongBar());
 		base.ChildActivities.Add(this.actOption = new CActオプションパネル());
-		base.ChildActivities.Add(this.actFI = new CActFIFOResult());
+		base.ChildActivities.Add(this.actFIFO = new CActFIFOResult());
 		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
 	}
 
@@ -699,7 +699,7 @@ internal class CStage結果 : CStage {
 
 			if (base.IsFirstDraw) {
 				this.ct登場用 = new CCounter(0, 100, 5, OpenTaiko.Timer);
-				this.actFI.tフェードイン開始();
+				this.actFIFO.tフェードイン開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 				if (this.rResultSound != null) {
@@ -1335,12 +1335,17 @@ internal class CStage結果 : CStage {
 			#endregion
 
 			if (base.ePhaseID == CStage.EPhase.Common_FADEIN) {
-				if (this.actFI.Draw() != 0) {
+				if (this.actFIFO.Draw() != 0) {
 					base.ePhaseID = CStage.EPhase.Common_NORMAL;
 				}
 			} else if ((base.ePhaseID == CStage.EPhase.Common_FADEOUT))         //&& ( this.actFO.On進行描画() != 0 ) )
 			{
-				return (int)this.eフェードアウト完了時の戻り値;
+				if (this.actFIFO.Draw() != 0) {
+					bgmResultLoop.tStop();
+					OpenTaiko.Skin.bgmDanResult.tStop();
+					OpenTaiko.Skin.bgmTowerResult.tStop();
+					return (int)this.eフェードアウト完了時の戻り値;
+				}
 			}
 
 			#region [ #24609 2011.3.14 yyagi ランク更新or演奏型スキル更新時、リザルト画像をpngで保存する ]
@@ -1362,11 +1367,8 @@ internal class CStage結果 : CStage {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 					#region [ Return to song select screen (Faster method) ]
 
-					bgmResultLoop.tStop();
-					OpenTaiko.Skin.bgmDanResult.tStop();
-					OpenTaiko.Skin.bgmTowerResult.tStop();
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					actFI.tフェードアウト開始();
+					actFIFO.tフェードアウト開始();
 
 					if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 						if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
@@ -1406,16 +1408,13 @@ internal class CStage結果 : CStage {
 						if (_modalsProcessed == true) {
 							#region [ Return to song select screen ]
 
-							actFI.tフェードアウト開始();
+							actFIFO.tフェードアウト開始();
 
 							tPostprocessing();
 
 							{
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 								this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-								bgmResultLoop.tStop();
-								OpenTaiko.Skin.bgmDanResult.tStop();
-								OpenTaiko.Skin.bgmTowerResult.tStop();
 							}
 
 							#endregion
@@ -1607,7 +1606,7 @@ internal class CStage結果 : CStage {
 
 	private CCounter ct登場用;
 	private E戻り値 eフェードアウト完了時の戻り値;
-	private CActFIFOResult actFI;
+	private CActFIFOResult actFIFO;
 	private CActFIFOBlack actFO;
 	private CActオプションパネル actOption;
 	private CActResultParameterPanel actParameterPanel;
