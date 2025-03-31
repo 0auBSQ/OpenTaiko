@@ -7,13 +7,18 @@ internal class CAct演奏AVI : CActivity {
 
 	public CAct演奏AVI() {
 		base.IsDeActivated = true;
+		this.isCutScene = false;
 	}
 
 
 	// メソッド
 
 	public void Start(CVideoDecoder rVD) {
-		if (OpenTaiko.ConfigIni.bEnableAVI) {
+		this.Start(rVD, false);
+	}
+	public void Start(CVideoDecoder rVD, bool isCutScene) {
+		this.isCutScene = isCutScene;
+		if (this.isCutScene || OpenTaiko.ConfigIni.bEnableAVI) {
 			this.rVD = rVD;
 			if (this.rVD != null) {
 				this.ratio1 = Math.Min((float)GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));
@@ -38,7 +43,7 @@ internal class CAct演奏AVI : CActivity {
 			this.tx描画用.vcScaleRatio.X = this.ratio1;
 			this.tx描画用.vcScaleRatio.Y = this.ratio1;
 
-			if (OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.BackgroundOnly)) {
+			if (this.isCutScene || OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.BackgroundOnly)) {
 				this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, GameWindowSize.Width / 2, GameWindowSize.Height / 2);
 			}
 		}
@@ -82,6 +87,8 @@ internal class CAct演奏AVI : CActivity {
 
 	#region [ private ]
 	//-----------------
+	private bool isCutScene;
+
 	private float ratio1;
 
 	private CTexture tx描画用;
