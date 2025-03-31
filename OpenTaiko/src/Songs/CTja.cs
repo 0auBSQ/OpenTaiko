@@ -3525,6 +3525,7 @@ internal class CTja : CActivity {
 						});
 					}
 				}
+				this.CutSceneOutros = outros;
 			} catch (Exception ex) {
 				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
 			}

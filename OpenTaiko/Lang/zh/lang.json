@@ -557,6 +557,7 @@
 		"PAUSE_TITLE": "暂停",
 		"PAUSE_RESUME": "继续",
 		"PAUSE_RESTART": "重新开始",
+		"PAUSE_SKIP": "跳过",
 		"PAUSE_EXIT": "退出",
 
 		// AI Info
