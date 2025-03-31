@@ -26,6 +26,9 @@ internal class CStage結果 : CStage {
 	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
 	public int[] nスコアランク = { 0, 0, 0, 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 	public int[] nHighScore = { 0, 0, 0, 0, 0 };
+	public bool[] IsScoreValid = [false, false, false, false, false];
+	public int[] ClearStatusesSaved = [0, 0, 0, 0, 0];
+	public int[] ScoreRanksSaved = [0, 0, 0, 0, 0];
 
 	public CChip[] r空うちドラムチップ;
 	public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
@@ -124,6 +127,10 @@ internal class CStage結果 : CStage {
 				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 3) < 1f),
 				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 4) < 1f)
 			};
+
+			this.IsScoreValid = [false, false, false, false, false];
+			this.ClearStatusesSaved = [0, 0, 0, 0, 0];
+			this.ScoreRanksSaved = [0, 0, 0, 0, 0];
 
 			{
 				#region [ 初期化 ]
@@ -533,7 +540,11 @@ internal class CStage結果 : CStage {
 					}
 
 					// Unsafe function, it is the only appropriate place to call it
-					DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
+					if (DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i])) {
+						this.IsScoreValid[i] = true;
+						this.ClearStatusesSaved[i] = clearStatuses[i];
+						this.ScoreRanksSaved[i] = scoreRanks[i];
+					}
 				}
 			}
 
