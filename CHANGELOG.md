@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.53] - 2025-04-01 (Beta)
+
+- [Hotfix] Prevent null-reference crash due to cutscenes were undefined in pre-0.6.0.52 song list cache
+
 ## [0.6.0.52] - 2025-04-01 (Beta)
 
 - Add .CUTSCENE_IN/OUTRO (custom OpenTaiko-exclusive TJA header for events/story mode) to play video cutscenes when starting a song (before loading screen) or after a cleared/failed play (after the results screen), skippable or pausable on the ESC/F1 menu
