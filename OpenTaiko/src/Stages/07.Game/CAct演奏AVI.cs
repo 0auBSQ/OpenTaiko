@@ -12,8 +12,8 @@ internal class CAct演奏AVI : CActivity {
 
 	// メソッド
 
-	public void Start(int nチャンネル番号, CVideoDecoder rVD) {
-		if (nチャンネル番号 == 0x54 && OpenTaiko.ConfigIni.bEnableAVI) {
+	public void Start(CVideoDecoder rVD) {
+		if (OpenTaiko.ConfigIni.bEnableAVI) {
 			this.rVD = rVD;
 			if (this.rVD != null) {
 				this.ratio1 = Math.Min((float)GameWindowSize.Height / ((float)this.rVD.FrameSize.Height), (float)GameWindowSize.Width / ((float)this.rVD.FrameSize.Height));

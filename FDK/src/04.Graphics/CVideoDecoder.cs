@@ -15,7 +15,6 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (!File.Exists(filename))
 			throw new FileNotFoundException(filename + " not found...");
 
-		format_context = ffmpeg.avformat_alloc_context();
 		fixed (AVFormatContext** format_contexttmp = &format_context) {
 			if (ffmpeg.avformat_open_input(format_contexttmp, filename, null, null) != 0)
 				throw new FileLoadException("avformat_open_input failed\n");
@@ -62,6 +61,9 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Dispose() {
+		if (this.close)
+			return;
+
 		bDrawing = false;
 		close = true;
 		cts?.Cancel();
@@ -259,7 +261,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	//for read & decode
 	private bool close = false;
 	private double _dbPlaySpeed = 1.0;
-	private static AVFormatContext* format_context;
+	private AVFormatContext* format_context;
 	private AVStream* video_stream;
 	private AVCodecContext* codec_context;
 	private ConcurrentQueue<CDecodedFrame> decodedframes;
