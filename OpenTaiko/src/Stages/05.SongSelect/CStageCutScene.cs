@@ -79,7 +79,7 @@ class CStageCutScene : CStage {
 			this.cutScenes = (selectedSong.CutSceneIntro != null) ? [selectedSong.CutSceneIntro] : [];
 		} else {
 			this.mode = ECutSceneMode.Outro;
-			this.cutScenes = [..selectedSong.CutSceneOutros];
+			this.cutScenes = (selectedSong.CutSceneOutros != null) ? [..selectedSong.CutSceneOutros] : [];
 		}
 		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x));
 		return this.cutScenes.Count > 0;
