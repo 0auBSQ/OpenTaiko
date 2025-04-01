@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.52] - 2025-04-01 (Beta)
+
+- Add .CUTSCENE_IN/OUTRO (custom OpenTaiko-exclusive TJA header for events/story mode) to play video cutscenes when starting a song (before loading screen) or after a cleared/failed play (after the results screen), skippable or pausable on the ESC/F1 menu
+- Restore result screen fade-out transition
+- Various minor refactoring
+
 ## [0.6.0.51] - 2025-04-01 (Beta)
 
 - Fix: prevent crash due to video resource double-free access violation errors
