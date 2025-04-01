@@ -1,5 +1,9 @@
 ﻿namespace OpenTaiko {
 	internal class CUnlockCE : CUnlockCondition {
+		/*
+		 * "Coins earned" Unlock condition object
+		 * Validates if the total earned coin count requirement is satisfied
+		 */
 
 
 		public CUnlockCE(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {

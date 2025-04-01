@@ -1,5 +1,9 @@
 ﻿namespace OpenTaiko {
 	internal class CUnlockTP : CUnlockCondition {
+		/*
+		 * "Total playcount" Unlock condition object
+		 * Validates if the total playcount requirement is satisfied
+		 */
 
 
 		public CUnlockTP(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {

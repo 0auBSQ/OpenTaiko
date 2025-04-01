@@ -2,10 +2,17 @@
 
 namespace OpenTaiko {
 	abstract class CUnlockCondition {
-		public CUnlockCondition(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) {
-			Values = rawJson.Values.Copy();
-			Type = rawJson.Type;
-			Reference = rawJson.Reference.Copy();
+		public CUnlockCondition(CUnlockConditionFactory.UnlockConditionJsonRaw? rawJson) {
+			// rawJson is nullable only for failed unlock conditions
+			if (rawJson != null) {
+				Values = rawJson.Values.Copy();
+				Type = rawJson.Type;
+				Reference = rawJson.Reference.Copy();
+			} else {
+				Values = [];
+				Type = "me";
+				Reference = [];
+			}
 		}
 
 		// Condition values

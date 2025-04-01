@@ -58,7 +58,7 @@ namespace OpenTaiko {
 
 		public CUnlockCondition? GenerateUnlockObjectFromJsonRaw(UnlockConditionJsonRaw? rawJson) {
 			if (rawJson == null) {
-				return null;
+				return new CUnlockError(null);
 			}
 
 			switch (rawJson.Condition) {
@@ -104,9 +104,16 @@ namespace OpenTaiko {
 				case "ig": {
 						return new CUnlockIG(rawJson);
 					}
+				case "andcomb": {
+						return new CUnlockAndComb(rawJson);
+					}
+				case "orcomb": {
+						// To do: parse references as json strings recursively and add them for both andcomb and orcomb
+						return new CUnlockOrComb(rawJson);
+					}
 			}
 
-			return null;
+			return new CUnlockError(null);
 		}
 
 		public CUnlockCondition? GenerateUnlockObjectFromJsonPath(string jsonPath) {

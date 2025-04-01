@@ -1,14 +1,13 @@
 ﻿namespace OpenTaiko {
-	internal class CUnlockIG : CUnlockCondition {
+	internal class CUnlockError : CUnlockCondition {
 		/*
-		 * "Impossible to get" Unlock condition object
-		 * For assets that are meant to be obtained only through database manipulation, should always be of rarity Mythical
+		 * Error unlock condition object
+		 * Used when Unlock condition fetching failed in order to have a non-null object displaying an error message in-game
 		 */
 
-
-		public CUnlockIG(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {
+		public CUnlockError(CUnlockConditionFactory.UnlockConditionJsonRaw? rawJson) : base(rawJson) {
 			this.RequiredArgCount = 0;
-			this.ConditionId = "ig";
+			this.ConditionId = "error";
 		}
 
 		public override (bool, string?) tConditionMet(int player, EScreen screen = EScreen.MyRoom) {
@@ -16,7 +15,7 @@
 		}
 
 		public override string tConditionMessage(EScreen screen = EScreen.MyRoom) {
-			return (CLangManager.LangInstance.GetString("UNLOCK_CONDITION_INVALID"));
+			return "Unlock condition fetching failed";
 		}
 
 		protected override int tGetCountChartsPassingCondition(int player) {

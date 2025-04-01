@@ -1,5 +1,9 @@
 ﻿namespace OpenTaiko {
 	internal class CUnlockAW : CUnlockCondition {
+		/*
+		 * "AI Battle wins" Unlock condition object
+		 * Validates if the total AI Battle win count requirement is satisfied
+		 */
 
 
 		public CUnlockAW(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {
