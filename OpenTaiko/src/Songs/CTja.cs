@@ -43,12 +43,14 @@ internal class CTja : CActivity {
 	/// 判定ライン移動命令
 	/// </summary>
 	public class CJPOSSCROLL {
-		public double db移動時間;
-		public int n移動距離px;
-		public int n移動方向; //移動方向は0(左)、1(右)の2つだけ。
+		public double msMoveDt;
+		public double pxOrigX;
+		public double pxOrigY;
+		public double pxMoveDx;
+		public double pxMoveDy;
 		public int n内部番号;
 		public int n表記上の番号;
-		public int nVerticalMove;
+		public CChip? chip;
 
 		public override string ToString() {
 			StringBuilder builder = new StringBuilder(0x80);
@@ -57,7 +59,7 @@ internal class CTja : CActivity {
 			} else {
 				builder.Append(string.Format("CJPOSSCROLL{0}", CTja.tZZ(this.n表記上の番号)));
 			}
-			builder.Append(string.Format(", JPOSSCROLL:{0}", this.db移動時間));
+			builder.Append(string.Format(", JPOSSCROLL:{0}", this.msMoveDt / 1000));
 			return builder.ToString();
 		}
 	}
@@ -271,10 +273,12 @@ internal class CTja : CActivity {
 
 	public Dictionary<int, CVideoDecoder> listVD;
 	public Dictionary<int, CBPM> listBPM;
-	public List<CChip> listChip;
+	public List<CChip> listChip; // increasing time > chip priority > definition order
+	public List<CChip> listBarLineChip; // increasing definition order
+	public List<CChip> listNoteChip; // increasing definition order
 	public List<CChip>[] listChip_Branch;
 	public Dictionary<int, CWAV> listWAV;
-	public Dictionary<int, CJPOSSCROLL> listJPOSSCROLL;
+	public List<CJPOSSCROLL> listJPOSSCROLL;
 	public List<DanSongs> List_DanSongs;
 	private EScrollMode eScrollMode;
 
@@ -408,6 +412,26 @@ internal class CTja : CActivity {
 	public Dictionary<string, CTexture> listOriginalTextures;
 	#endregion
 
+	#region [ OpenTaiko-Exclusive TJA Extension Data ]
+
+	public enum ECutSceneRepeatMode {
+		UntilFirstUnmet = -1,
+		FirstMet = 0,
+		EverytimeMet = 1,
+	}
+
+	[Serializable]
+	public class CutSceneDef {
+		public required string FullPath;
+		public BestPlayRecords.EClearStatus ClearRequirement = BestPlayRecords.EClearStatus.NONE;
+		public string RequirementRange = "me";
+		public ECutSceneRepeatMode RepeatMode = ECutSceneRepeatMode.FirstMet;
+	}
+
+	public CutSceneDef? CutSceneIntro;
+	public List<CutSceneDef> CutSceneOutros;
+
+	#endregion
 
 
 #if TEST_NOTEOFFMODE
@@ -488,6 +512,7 @@ internal class CTja : CActivity {
 		pDan_LastChip = new CChip[1];
 		DanSongs.Number = 0;
 
+		this.CutSceneOutros = new();
 	}
 	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int difficulty)
 		: this() {
@@ -946,13 +971,13 @@ internal class CTja : CActivity {
 				}
 				#endregion
 				if (this.listChip.Count > 0) {
-					this.listChip.Sort();       // 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
+					this.listChip = this.listChip.OrderBy(x => x).ToList();
+												// 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
 												// 保守性確保を優先してここでのソートは残しておく
 												// なお、093時点では、このソートを削除しても動作するようにはしてある。
 												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 												// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
-				this.n内部番号JSCROLL1to = 0;
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
 
@@ -964,6 +989,8 @@ internal class CTja : CActivity {
 				// * Offset chips from RawTjaTime To TjaTime; see RawTjaTimeToTjaTimeMusic()
 				// * TaikoJiro 1 behavior: Notes' scrolling BPM and HBScroll beat (but not time) are re-adjusted to the active timing
 				//   (also affect notes' time in TaikoJiro 2 (?))
+				// * Truncate movement of unfinished JPosScrolls and calculate resulting source coordination for deterministic behavior
+				CJPOSSCROLL? lastJPosScroll = null;
 				foreach (CChip chip in this.listChip) {
 					int ch = chip.nChannelNo;
 
@@ -1014,7 +1041,6 @@ internal class CTja : CActivity {
 						case 0x21: {
 								if (this.isOFFSET_Negative) {
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1071,7 +1097,6 @@ internal class CTja : CActivity {
 						case 0x99: {
 								if (this.isOFFSET_Negative) {
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-									chip.nNoteEndTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1114,6 +1139,33 @@ internal class CTja : CActivity {
 						case 0xE0: {
 								continue;
 							}
+						case 0xE2: { // #JPOSSCROLL
+								if (this.isOFFSET_Negative)
+									chip.n発声時刻ms += this.msOFFSET_Abs;
+
+								// calculate accumulated movement by time order (not definition order)
+								CJPOSSCROLL jposs = this.listJPOSSCROLL[chip.n整数値_内部番号];
+								if (lastJPosScroll == null) {
+									jposs.pxOrigX = 0;
+									jposs.pxOrigY = 0;
+								} else {
+									if (lastJPosScroll.msMoveDt > 0) {
+										double msLastMoveDt = lastJPosScroll.msMoveDt;
+										double msCanMove = double.Max(0, chip.n発声時刻ms - lastJPosScroll.chip!.n発声時刻ms);
+										// truncate movement of last JPosScroll if unfinished
+										if (msCanMove < msLastMoveDt) {
+											double lastMoveRate = msCanMove / msLastMoveDt;
+											lastJPosScroll.msMoveDt = msCanMove;
+											lastJPosScroll.pxMoveDx *= lastMoveRate;
+											lastJPosScroll.pxMoveDy *= lastMoveRate;
+										}
+									}
+									jposs.pxOrigX = lastJPosScroll.pxOrigX + lastJPosScroll.pxMoveDx;
+									jposs.pxOrigY = lastJPosScroll.pxOrigY + lastJPosScroll.pxMoveDy;
+								}
+								lastJPosScroll = jposs;
+								continue;
+							}
 						default: {
 								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
@@ -1126,7 +1178,7 @@ internal class CTja : CActivity {
 
 				#region[listlyricを時間順に並び替え。]
 				this.listLyric2 = tmplistlyric;
-				this.listLyric2.Sort((a, b) => a.Time.CompareTo(b.Time));
+				this.listLyric2 = this.listLyric2.OrderBy(x => x.Time).ToList();
 				#endregion
 
 				this.nBGMAdjust = 0;
@@ -2075,6 +2127,7 @@ internal class CTja : CActivity {
 			chip.dbSCROLL_Y = this.dbNowScrollY;
 			chip.bHideBarLine = false;
 			this.listChip.Add(chip);
+			this.listBarLineChip.Add(chip);
 		} else if (command == "#SECTION") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xDD, 1)); //分岐:条件リセット
 		} else if (command == "#BRANCHSTART") {
@@ -2199,7 +2252,7 @@ internal class CTja : CActivity {
 			if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
-			var chip = this.NewEventChipAtDefCursor(0xF1, 0);
+			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
 			this.bLyrics = true;
@@ -2237,35 +2290,44 @@ internal class CTja : CActivity {
 		} else if (command == "#JPOSSCROLL") {
 			strArray = argument.Split(chDelimiter);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
-			double db移動時刻 = Convert.ToDouble(strArray[0]);
-			int n移動px = 0;
-			int nComplexMove = 0;
+			double msMoveDt = double.Max(0, 1000 * Convert.ToDouble(strArray[0]));
+			double pxMoveDx = 0;
+			double pxMoveDy = 0;
 			if (strArray[1].IndexOf('i') != -1) {
 				double[] dbComplexNum = new double[2];
 				this.tParsedComplexNumber(strArray[1], ref dbComplexNum);
-				n移動px = Convert.ToInt32(dbComplexNum[0]);
-				nComplexMove = Convert.ToInt32(dbComplexNum[1]);
+				pxMoveDx = dbComplexNum[0];
+				pxMoveDy = dbComplexNum[1];
 			} else
-				n移動px = Convert.ToInt32(strArray[1]);
+				pxMoveDx = Convert.ToDouble(strArray[1]);
 
 
 			int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
+			if (n移動方向 == 0) { // same move direction as notes in `#SCROLL x+yi`
+				pxMoveDx = -pxMoveDx;
+				pxMoveDy = -pxMoveDy;
+			}
 
 			//チップ追加して割り込んでみる。
-			var chip = this.NewEventChipAtDefCursor(0xE2, 0);
+			var chip = this.NewEventChipAtDefCursor(0xE2, this.listJPOSSCROLL.Count);
 			chip.n発声位置 -= 1;
 			chip.nBranch = this.n現在のコース;
 
 			// チップを配置。
-
-			this.listJPOSSCROLL.Add(this.n内部番号JSCROLL1to, new CJPOSSCROLL() { n内部番号 = this.n内部番号JSCROLL1to, n表記上の番号 = 0, db移動時間 = db移動時刻, n移動距離px = n移動px, n移動方向 = n移動方向, nVerticalMove = nComplexMove });
+			this.listJPOSSCROLL.Add(new CJPOSSCROLL() {
+				n内部番号 = this.listJPOSSCROLL.Count,
+				n表記上の番号 = 0,
+				msMoveDt = msMoveDt,
+				pxMoveDx = pxMoveDx,
+				pxMoveDy = pxMoveDy,
+				chip = chip,
+			});
 			this.listChip.Add(chip);
-			this.n内部番号JSCROLL1to++;
 		} else if (command == "#SENOTECHANGE") {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
-			var chip = this.NewEventChipAtDefCursor(0x9B, 0);
+			var chip = this.NewEventChipAtDefCursor(0x9B, List_DanSongs.Count);
 			chip.n発声位置 -= ((this.n現在の小節数) * 384) - 1;
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
@@ -2670,6 +2732,7 @@ internal class CTja : CActivity {
 						#endregion
 
 						this.listChip.Add(chip);
+						this.listBarLineChip.Add(chip);
 
 						#region [ 作り直し ]
 						if (IsEndedBranching)
@@ -2798,9 +2861,7 @@ internal class CTja : CActivity {
 		chip.bGOGOTIME = this.bGOGOTIME;
 
 		if (NotesManager.IsKusudama(chip)) {
-			if (OpenTaiko.ConfigIni.bTokkunMode) {
-				chip.nChannelNo = 0x17; // Placeholder until kusudama visuals can be fixed in training mode
-			} else if (IsEndedBranching) {
+			if (IsEndedBranching) {
 			} else {
 				// Balloon in branches
 				chip.nChannelNo = 0x19;
@@ -2825,17 +2886,11 @@ internal class CTja : CActivity {
 			}
 
 			CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
-			chipHead.nNoteEndPosition = chip.nNoteEndPosition = chip.n発声位置;
-			chipHead.nNoteEndTimems = chip.nNoteEndTimems = chip.n発声時刻ms;
-			chipHead.fBMSCROLLTime_end = chip.fBMSCROLLTime_end = chip.fBMSCROLLTime;
-			chipHead.dbBPM_end = chip.dbBPM_end = chip.dbBPM;
-			chipHead.dbSCROLL_end = chip.dbSCROLL_end = chip.dbSCROLL;
-			chipHead.dbSCROLL_Y_end = chip.dbSCROLL_Y_end = chip.dbSCROLL_Y;
-			chipHead.eScrollMode_end = chip.eScrollMode_end = chip.eScrollMode;
+			chip.start = chipHead;
+			chipHead.end = chip;
 
 			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
 			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
-			chip.n連打音符State = chipHead.nChannelNo - 0x10;
 
 			this.nNowRollCountBranch[iBranch] = -1;
 		}
@@ -2914,11 +2969,14 @@ internal class CTja : CActivity {
 		Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
 		if (IsEndedBranching) {
 			this.listChip_Branch[iBranch].Add(chip);
-			if (branch == ECourse.eNormal)
+			if (branch == ECourse.eNormal) {
 				this.listChip.Add(chip);
+				this.listNoteChip.Add(chip);
+			}
 		} else {
 			this.listChip_Branch[(int)chip.nBranch].Add(chip);
 			this.listChip.Add(chip);
+			this.listNoteChip.Add(chip);
 		}
 	}
 
@@ -3397,6 +3455,79 @@ internal class CTja : CActivity {
 			//2016.02.02 kairera0467
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				this.strBGIMAGE_PATH = strCommandParam;
+			}
+		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
+			try {
+				string[] args = SplitComma(strCommandParam);
+				string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[0]);
+
+				if (string.IsNullOrEmpty(path)) {
+					this.CutSceneIntro = null;
+				} else {
+					string fullPath;
+					if (!string.IsNullOrEmpty(this.PATH_WAV))
+						fullPath = this.PATH_WAV + path;
+					else
+						fullPath = this.strフォルダ名 + path;
+
+					ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+					if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
+						repeatMode = int.Parse(args[1]) switch {
+							< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+							> 0 => ECutSceneRepeatMode.EverytimeMet,
+							0 or _ => ECutSceneRepeatMode.FirstMet,
+						};
+					}
+
+					this.CutSceneIntro = new() {
+						FullPath = fullPath,
+						RepeatMode = repeatMode,
+					};
+				}
+			} catch (Exception ex) {
+				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
+			}
+		} else if (strCommandName.Equals(".CUTSCENE_OUTRO")) { // .CUTSCENE_OUTRO:<path>,<clear status>,<scope>,<repeat?>,...
+			try {
+				List<CutSceneDef> outros = new();
+				string[] args = SplitComma(strCommandParam);
+				for (int iArg = 0; iArg < args.Length; iArg += 4) {
+					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[iArg + 0]);
+
+					if (!string.IsNullOrEmpty(path)) {
+						string fullPath;
+						if (!string.IsNullOrEmpty(this.PATH_WAV))
+							fullPath = this.PATH_WAV + path;
+						else
+							fullPath = this.strフォルダ名 + path;
+
+						BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
+						if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
+							clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(args[iArg + 1]);
+						}
+
+						string requirementRange = !(iArg + 2 < args.Length) ? "me" : args[iArg + 2].Trim();
+
+						ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+						if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
+							repeatMode = int.Parse(args[iArg + 3]) switch {
+								< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+								> 0 => ECutSceneRepeatMode.EverytimeMet,
+								0 or _ => ECutSceneRepeatMode.FirstMet,
+							};
+						}
+
+						outros.Add(new() {
+							FullPath = fullPath,
+							ClearRequirement = clearRequirement,
+							RequirementRange = requirementRange,
+							RepeatMode = repeatMode,
+						});
+					}
+				}
+				this.CutSceneOutros = outros;
+			} catch (Exception ex) {
+				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
 			}
 		} else if (strCommandName.Equals("HIDDENBRANCH")) {
 			//2016.04.01 kairera0467 パラメーターは
@@ -3888,7 +4019,7 @@ internal class CTja : CActivity {
 		listChip.AddRange(listAddMixerChannel);
 		listChip.AddRange(listRemoveMixerChannel);
 		listChip.AddRange(listRemoveTiming);
-		listChip.Sort();
+		listChip = listChip.OrderBy(x => x).ToList();
 	}
 	private void DebugOut_CChipList(List<CChip> c) {
 		for (int i = 0; i < c.Count; i++) {
@@ -3955,13 +4086,15 @@ internal class CTja : CActivity {
 		}
 		this.listWAV = new Dictionary<int, CWAV>();
 		this.listBPM = new Dictionary<int, CBPM>();
-		this.listJPOSSCROLL = new Dictionary<int, CJPOSSCROLL>();
+		this.listJPOSSCROLL = new List<CJPOSSCROLL>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
 		this.listChip_Branch = new List<CChip>[3];
 		this.listChip_Branch[0] = new List<CChip>();
 		this.listChip_Branch[1] = new List<CChip>();
 		this.listChip_Branch[2] = new List<CChip>();
+		this.listBarLineChip = new List<CChip>();
+		this.listNoteChip = new List<CChip>();
 		this.listBalloon = new List<int>();
 		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
 		this.listLine = new List<CLine>();
@@ -3972,6 +4105,10 @@ internal class CTja : CActivity {
 		this.listTextures = new Dictionary<string, CTexture>();
 		this.listOriginalTextures = new Dictionary<string, CTexture>();
 		this.currentObjAnimations = new Dictionary<string, CChip>();
+
+		this.CutSceneIntro = null;
+		this.CutSceneOutros = [];
+
 		base.Activate();
 	}
 	public override void DeActivate() {
@@ -3991,6 +4128,8 @@ internal class CTja : CActivity {
 		this.listJPOSSCROLL?.Clear();
 		this.List_DanSongs?.Clear();
 		this.listChip?.Clear();
+		this.listBarLineChip?.Clear();
+		this.listNoteChip?.Clear();
 
 		this.listBalloon?.Clear();
 		foreach (var listBalloon in this.listBalloon_Branch)
@@ -4059,7 +4198,6 @@ internal class CTja : CActivity {
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
 	private int n内部番号BPM1to;
-	private int n内部番号JSCROLL1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
 	private int[] n無限管理PAN;
@@ -4144,4 +4282,17 @@ internal class CTja : CActivity {
 		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
 	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
 		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
+
+	public int GetListChipIndexOfMeasure(int iMeasure1to) {
+		for (int i = 0; i < this.listChip.Count; i++) {
+			CChip pChip = this.listChip[i];
+			if ((iMeasure1to == 0) ? // initial song position
+				pChip.n発声時刻ms >= 0
+				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 == iMeasure1to)
+				) {
+				return i;
+			}
+		}
+		return 0; // 対象小節が存在しないなら、最初から再生
+	}
 }

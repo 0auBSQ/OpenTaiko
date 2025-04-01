@@ -290,9 +290,10 @@ internal class DBSaves {
 		return _bestPlays;
 	}
 
-	public static void RegisterPlay(int player, int clearStatus, int scoreRank) {
+	// return whether the score is valid and registered successfully
+	public static bool RegisterPlay(int player, int clearStatus, int scoreRank) {
 		SqliteConnection? connection = GetSavesDBConnection();
-		if (connection == null) return;
+		if (connection == null) return false;
 
 		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
@@ -302,7 +303,7 @@ internal class DBSaves {
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
 		// Do not register the play if Dan/Tower and any mod is ON
-		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return;
+		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return false;
 
 		// 1st step: Init best play record class
 
@@ -474,6 +475,8 @@ internal class DBSaves {
                 ";
 			cmd.ExecuteNonQuery();
 		}
+
+		return true;
 	}
 
 	#endregion

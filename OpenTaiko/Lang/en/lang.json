@@ -557,6 +557,7 @@
 		"PAUSE_TITLE": "Pause",
 		"PAUSE_RESUME": "Resume",
 		"PAUSE_RESTART": "Restart",
+		"PAUSE_SKIP": "Skip",
 		"PAUSE_EXIT": "Quit",
 
 		// AI Info

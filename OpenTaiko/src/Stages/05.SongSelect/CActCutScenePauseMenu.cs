@@ -3,17 +3,17 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CAct演奏PauseMenu : CActSelectPopupMenu {
+internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 	// コンストラクタ
 
-	public CAct演奏PauseMenu() {
-		CAct演奏PauseMenuMain();
+	public CActCutScenePauseMenu() {
+		CActCutScenePauseMenuMain();
 	}
 
-	private void CAct演奏PauseMenuMain() {
+	private void CActCutScenePauseMenuMain() {
 		this.bEsc有効 = false;
 		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
-		for (int nConfSet = 0; nConfSet < (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++) {
+		for (int nConfSet = 0; nConfSet < 2; nConfSet++) {
 			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
 			for (int nInst = 0; nInst < 3; nInst++) {
 				lci[nConfSet].Add(null);                                        // Drum/Guitar/Bassで3つ分、枠を作っておく
@@ -28,8 +28,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 		#region [ 共通 SET切り替え/More/Return ]
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_EXIT"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
+		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_SKIP"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 		#endregion
 
 		return l;
@@ -37,9 +36,8 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 	// メソッド
 	public override void tActivatePopupMenu(EInstrumentPad einst) {
-		this.CAct演奏PauseMenuMain();
+		this.CActCutScenePauseMenuMain();
 		CActSelectPopupMenu.b選択した = false;
-		this.bやり直しを選択した = false;
 		base.tActivatePopupMenu(einst);
 	}
 	//public void tDeativatePopupMenu()
@@ -47,50 +45,16 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	//	base.tDeativatePopupMenu();
 	//}
 
-	public override void t進行描画sub() {
-		if (this.bやり直しを選択した) {
-			if (!sw.IsRunning)
-				this.sw = Stopwatch.StartNew();
-			if (sw.ElapsedMilliseconds > 1500) {
-				OpenTaiko.stageGameScreen.bPAUSE = false;
-				OpenTaiko.stageGameScreen.t演奏やりなおし();
-
-				this.tDeativatePopupMenu();
-				this.sw.Reset();
-			}
-		}
-	}
-
 	public override void tEnter押下Main(int nSortOrder) {
 		switch (n現在の選択行) {
 			case (int)EOrder.Continue:
-				OpenTaiko.stageGameScreen.bPAUSE = false;
-
-				SoundManager.PlayTimer.Resume();
-				OpenTaiko.Timer.Resume();
-				OpenTaiko.TJA.t全チップの再生再開();
-				OpenTaiko.stageGameScreen.actAVI.Resume();
+				OpenTaiko.stageCutScene.Resume();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
 				break;
 
-			case (int)EOrder.Redoing:
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-					this.bやり直しを選択した = true;
-					CActSelectPopupMenu.b選択した = true;
-				} else {
-					SoundManager.PlayTimer.Resume();
-					OpenTaiko.Timer.Resume();
-					OpenTaiko.stageGameScreen.t演奏中止();
-					CActSelectPopupMenu.b選択した = true;
-					this.tDeativatePopupMenu();
-				}
-				break;
-
-			case (int)EOrder.Return:
-				SoundManager.PlayTimer.Resume();
-				OpenTaiko.Timer.Resume();
-				OpenTaiko.stageGameScreen.t演奏中止();
+			case (int)EOrder.Skip:
+				OpenTaiko.stageCutScene.Skip();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
 				break;
@@ -107,7 +71,6 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	public override void Activate() {
 		base.Activate();
 		this.bGotoDetailConfig = false;
-		this.sw = new Stopwatch();
 	}
 	public override void DeActivate() {
 		base.DeActivate();
@@ -133,16 +96,14 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	private List<List<List<CItemBase>>> lci;
 	private enum EOrder : int {
 		Continue,
-		Redoing,
-		Return, END,
-		Default = 99
+		Skip,
+		END,
+		Default = 99,
 	};
 
 	private bool b選択した;
 	private CTexture txパネル本体;
 	private CTexture tx文字列パネル;
-	private Stopwatch sw;
-	private bool bやり直しを選択した;
 	//-----------------
 	#endregion
 }

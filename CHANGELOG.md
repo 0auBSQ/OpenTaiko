@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.6.0.52] - 2025-04-01 (Beta)
+
+- Add .CUTSCENE_IN/OUTRO (custom OpenTaiko-exclusive TJA header for events/story mode) to play video cutscenes when starting a song (before loading screen) or after a cleared/failed play (after the results screen), skippable or pausable on the ESC/F1 menu
+- Restore result screen fade-out transition
+- Various minor refactoring
+
+## [0.6.0.51] - 2025-04-01 (Beta)
+
+- Fix: prevent crash due to video resource double-free access violation errors
+- Fix multiplayer video crash due to wrongly reusing AVFormatContext
+- Fix TJA `#BGAOFF` did not resume main video playback
+
+## [0.6.0.50] - 2025-03-31 (Beta)
+
+- Fix crash when rapidly closing the game twice
+- Remove deprecated code related to DTXMania's set.def
+- Fix songs without any parent `box.def` emptied out the entire song selection list due to null reference exception
+
+## [0.6.0.49] - 2025-03-15 (Beta)
+
+- [Fix] Stretch rolls are now also disabled on #BPMCHANGE
+- [Fix] Color tags no longer appear on unlocked dan titles
+
+## [0.6.0.48] - 2025-03-10 (Beta)
+
+- [Feat] Support #JPOSSCROLL distance with fractional parts
+- [Fix] Bar lines are now consistently drawn below notes.
+- [Fix] Notes are now drawn according to their definition order
+- [Fix] Re-enable Kusudamas in training mode
+- [Fix] Prevent notes from being "played" during training mode seeking
+- [Fix] Resuming in training mode will no longer remove unended rolls on the resuming point.
+- [Fix] The "force certain rolls to be drawn above non-rolls" behavior, which caused unstable draw order, is now removed.
+- [Fix] Negative-length Kusudama will no longer have its breaking animation played, unless it is hit during the pre–balloon-head 17ms judgement window before its end comes.
+
 ## [0.6.0.47] - 2025-03-05 (Beta)
 
 - [Fix] AD-LIBs and bombs were invisible and unhittable if their horizontal speed is negative
