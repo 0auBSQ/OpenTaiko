@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.51] - 2025-04-01 (Beta)
+
+- Fix: prevent crash due to video resource double-free access violation errors
+- Fix multiplayer video crash due to wrongly reusing AVFormatContext
+- Fix TJA `#BGAOFF` did not resume main video playback
+
 ## [0.6.0.50] - 2025-03-31 (Beta)
 
 - Fix crash when rapidly closing the game twice
