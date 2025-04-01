@@ -429,7 +429,7 @@ internal class CTja : CActivity {
 	}
 
 	public CutSceneDef? CutSceneIntro;
-	public List<CutSceneDef> CutSceneOutros;
+	public List<CutSceneDef> CutSceneOutros = [];
 
 	#endregion
 
