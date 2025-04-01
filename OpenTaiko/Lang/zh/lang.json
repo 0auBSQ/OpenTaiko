@@ -47,13 +47,13 @@
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "更改游戏及菜单的显示语言。",
 		"SETTINGS_SYSTEM_PLAYERCOUNT": "玩家数量",
 		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "选择游玩的玩家数量，最多同时可有 5 人游玩。",
-		"SETTINGS_SYSTEM_RELOADSONG": "重新载入歌曲",
-		"SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描歌曲文件夹并载入歌曲。",
-		"SETTINGS_SYSTEM_RELOADSONGCACHE": "重新载入歌曲（硬重新加载）",
-		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "清除既有缓存并从空白重新扫描歌曲文件夹并载入歌曲。",
+		"SETTINGS_SYSTEM_RELOADSONG": "重新加载歌曲",
+		"SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描歌曲文件夹并加载歌曲。",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE": "重新加载歌曲（硬重新加载）",
+		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "清除既有缓存并从空白重新扫描歌曲文件夹并加载歌曲。",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "导入 Score.ini 文件",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "导入 Score.ini 文件到数据库中。\n\n<c.#f0ad4e>警告\n下列内容将不会转移：\n— 过关状态\n— 游玩修改器\n— 击打数（良、可、不可、连打等）\n— 段位测验成绩",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "导入 Score.ini 文件到数据库中。\n\n<c.#f0ad4e>警告\n下列内容将不会迁移：\n— 过关状态\n— 游玩修改器\n— 击打数（良、可、不可、连打等）\n— 段位测验成绩",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "正在搜索成绩……",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
@@ -64,7 +64,7 @@
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "正在处理 {0} 份成绩……\n<c.#0bb000>{1} ／ {2} 已处理</c>（<c.#f0ad4e>{3} 跳过</c> ／ <c.#b00000>{4} 失败</c>）\n\n{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新载入歌曲以使此选项生效。",
+		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新加载歌曲以使此选项生效。",
 
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
