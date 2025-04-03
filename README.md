@@ -8,44 +8,44 @@
 
 # OpenTaiko
 
-Old TJAPlayer3-Develop-BSQ, a spiritual successor to TJAPlayer3.
+Also known as TJAPlayer3-Develop-BSQ, a spiritual successor to TJAPlayer3.
 
-- Discord : https://discord.gg/aA8scTvZ6B
-- Japanese Discord : https://discord.gg/CJ4nTkpy7t
+- Discord: https://discord.gg/aA8scTvZ6B
+- Japanese Discord: https://discord.gg/CJ4nTkpy7t
 
 - Changelogs: https://github.com/0auBSQ/OpenTaiko/blob/main/CHANGELOG.md
 
-## Cautions before using （IMPORTANT）
+## Before using OpenTaiko: （IMPORTANT）
 
 - It is **YOUR RESPONSIBILITY** to use this software. The creator will not take responsibilities for any problems you got from using this software.
 
-- Please research before asking people.
+- Please research your problems/bugs before asking people.
 
-- If your PC can not maintain 60fps stably, it will not work well with the software.
+- If your PC can not maintain 60FPS stably, OpenTaiko will not run well.
 
 - From 0.6.0 onwards, please download and manage OpenTaiko releases through the OpenTaiko Hub: https://github.com/OpenTaiko/OpenTaiko-Hub
 
 ## Additional notes 
 
-Songs, Skins and different assets are now on different repositories and only the minimum is provided for developement purposes, you can get the content either on the OpenTaiko Hub or on the following repositories:
+Songs, skins and different assets are now on different repositories and only the minimum is provided for developement purposes, you can get the content either on the OpenTaiko Hub or on the following repositories:
 
 - OpenTaiko Soundtrack: https://github.com/OpenTaiko/OpenTaiko-Soundtrack
-- OpenTaiko Skins (OWM, Simple Style): https://github.com/OpenTaiko/OpenTaiko-Skins
+- OpenTaiko Skins (OWM, SimpleStyle): https://github.com/OpenTaiko/OpenTaiko-Skins
 
 ### Using this software on streams and videos
 
 If there is an tag feature on the website you are using, tagging it as "OpenTaiko" will avoid confusion, and might raise video as similar content, so it is highly recommended.
 
 The author of this software does not support breaking copyright laws, so please follow as per your country's copyright laws.
-Additionally, the OpenTaiko team is strongly against the secondary distribution of skins trying to reproduce specific commercial video games.
+Additionally, the OpenTaiko team is strongly against secondary distribution of skins trying to reproduce specific commercial video games.
 
 ### Editing source code/Secondary distribution
 
-OpenTaiko is open source code with MIT license.
-Under the MIT license, you are allowed to make edits, or secondary distribute, however this is all **YOUR RESPONSIBILITY**.
-Also, under the used library's licenses, **PLEASE** include the "License" folder when editing or redistributing it.
+OpenTaiko is made to be an open-source simulator that complies with the MIT license.
+Under the MIT license, you are allowed to make edits, or do secondary distribution- but please note that it is **YOUR RESPONSIBILITY**.
+Also, under the used library's licenses, **PLEASE** include the "License" folder when editing or redistributing OpenTaiko.
 Please follow the creators' licenses and rules for other skins or song packages.
-OpenTaiko license does not apply in this case.
+The OpenTaiko License does not apply to the MIT license in this case.
 
 ### Goals/Non-goals
 
