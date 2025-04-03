@@ -2164,6 +2164,7 @@ internal class CTja : CActivity {
 
 			var e条件 = branchStartArgumentMatch.Groups[1].Value switch {
 				"r" => EBranchConditionType.Drumroll,
+				"rb" => EBranchConditionType.Drumroll_Big,
 				"s" => EBranchConditionType.Score,
 				"d" or "gb" => EBranchConditionType.Accuracy_Good_Big,
 				"g" => EBranchConditionType.Accuracy_Good,
