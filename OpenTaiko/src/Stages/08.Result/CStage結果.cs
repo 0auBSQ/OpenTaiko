@@ -46,7 +46,7 @@ internal class CStage結果 : CStage {
 		base.ChildActivities.Add(this.actParameterPanel = new CActResultParameterPanel());
 		base.ChildActivities.Add(this.actSongBar = new CActResultSongBar());
 		base.ChildActivities.Add(this.actOption = new CActオプションパネル());
-		base.ChildActivities.Add(this.actFIFO = new CActFIFOResult());
+		base.ChildActivities.Add(this.actFIFromGameplay = new CActFIFOResult());
 		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
 	}
 
@@ -710,7 +710,7 @@ internal class CStage結果 : CStage {
 
 			if (base.IsFirstDraw) {
 				this.ct登場用 = new CCounter(0, 100, 5, OpenTaiko.Timer);
-				this.actFIFO.tフェードイン開始();
+				this.actFIFromGameplay.tフェードイン開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 				if (this.rResultSound != null) {
@@ -1346,12 +1346,12 @@ internal class CStage結果 : CStage {
 			#endregion
 
 			if (base.ePhaseID == CStage.EPhase.Common_FADEIN) {
-				if (this.actFIFO.Draw() != 0) {
+				if (this.actFIFromGameplay.Draw() != 0) {
 					base.ePhaseID = CStage.EPhase.Common_NORMAL;
 				}
 			} else if ((base.ePhaseID == CStage.EPhase.Common_FADEOUT))         //&& ( this.actFO.On進行描画() != 0 ) )
 			{
-				if (this.actFIFO.Draw() != 0) {
+				if (this.actFO.Draw() != 0) {
 					bgmResultLoop.tStop();
 					OpenTaiko.Skin.bgmDanResult.tStop();
 					OpenTaiko.Skin.bgmTowerResult.tStop();
@@ -1379,7 +1379,7 @@ internal class CStage結果 : CStage {
 					#region [ Return to song select screen (Faster method) ]
 
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					actFIFO.tフェードアウト開始();
+					actFO.tフェードアウト開始();
 
 					if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 						if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
@@ -1419,7 +1419,7 @@ internal class CStage結果 : CStage {
 						if (_modalsProcessed == true) {
 							#region [ Return to song select screen ]
 
-							actFIFO.tフェードアウト開始();
+							actFO.tフェードアウト開始();
 
 							tPostprocessing();
 
@@ -1617,7 +1617,7 @@ internal class CStage結果 : CStage {
 
 	private CCounter ct登場用;
 	private E戻り値 eフェードアウト完了時の戻り値;
-	private CActFIFOResult actFIFO;
+	private CActFIFOResult actFIFromGameplay;
 	private CActFIFOBlack actFO;
 	private CActオプションパネル actOption;
 	private CActResultParameterPanel actParameterPanel;
