@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.54] - 2025-04-03 (Beta)
+
+- Fix: Fade out on results screen was too long due to using the in-game fade-out preset
+
 ## [0.6.0.53] - 2025-04-01 (Beta)
 
 - [Hotfix] Prevent null-reference crash due to cutscenes were undefined in pre-0.6.0.52 song list cache
