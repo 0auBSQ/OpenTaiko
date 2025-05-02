@@ -513,6 +513,7 @@ internal class CActImplCharacter : CActivity {
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
 					if (endAnime) {
+						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Balloon_Miss) {
@@ -535,6 +536,7 @@ internal class CActImplCharacter : CActivity {
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
 					if (endAnime) {
+						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Balloon_Breaking) {
@@ -578,6 +580,7 @@ internal class CActImplCharacter : CActivity {
 					}
 
 					if (endAnime) {
+						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Kusudama_Miss) {
@@ -605,6 +608,7 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuOutY, false, nowOpacity, true, player: i);
 
 					if (endAnime) {
+						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Kusudama_Breaking) {

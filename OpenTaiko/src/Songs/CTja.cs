@@ -290,9 +290,9 @@ internal class CTja : CActivity {
 	public string PREIMAGE;
 	public string PREVIEW;
 	public string strハッシュofDTXファイル;
-	public string strファイル名;
-	public string strファイル名の絶対パス;
-	public string strフォルダ名;
+	public string strFileName;
+	public string strFullPath;
+	public string strFolderPath;
 	public CLocalizationData SUBTITLE = new CLocalizationData();
 	public CLocalizationData TITLE = new CLocalizationData();
 	public double dbDTXVPlaySpeed;
@@ -468,9 +468,9 @@ internal class CTja : CActivity {
 		this.LEVEL = stdgbvalue;
 		this.bHIDDENBRANCH = false;
 		this.bチップがある = new STチップがある();
-		this.strファイル名 = "";
-		this.strフォルダ名 = "";
-		this.strファイル名の絶対パス = "";
+		this.strFileName = "";
+		this.strFolderPath = "";
+		this.strFullPath = "";
 		this.n無限管理WAV = new int[36 * 36];
 		this.n無限管理BPM = new int[36 * 36];
 		this.n無限管理PAN = new int[36 * 36];
@@ -529,7 +529,7 @@ internal class CTja : CActivity {
 	// メソッド
 
 	public void tAVIの読み込み() {
-		if (!this.bヘッダのみ) {
+		if (!this.bHeaderOnly) {
 			if (this.listVD != null) {
 				foreach (CVideoDecoder cvd in this.listVD.Values) {
 					cvd.InitRead();
@@ -580,7 +580,7 @@ internal class CTja : CActivity {
 		}
 	}
 	public void tWAVの読み込み(CWAV cwav) {
-		string str = string.IsNullOrEmpty(this.PATH_WAV) ? this.strフォルダ名 : this.PATH_WAV;
+		string str = string.IsNullOrEmpty(this.PATH_WAV) ? this.strFolderPath : this.PATH_WAV;
 		str = str + cwav.strファイル名;
 
 		try {
@@ -897,30 +897,26 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void t入力(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty) {
-		this.bヘッダのみ = bヘッダのみ;
-		this.strファイル名の絶対パス = Path.GetFullPath(strファイル名);
-		this.strファイル名 = Path.GetFileName(this.strファイル名の絶対パス);
-		this.strフォルダ名 = Path.GetDirectoryName(this.strファイル名の絶対パス) + Path.DirectorySeparatorChar;
+	public void t入力(string file_name, bool header_only, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty) {
+		this.bHeaderOnly = header_only;
+		this.strFullPath = Path.GetFullPath(file_name);
+		this.strFileName = Path.GetFileName(this.strFullPath);
+		this.strFolderPath = Path.GetDirectoryName(this.strFullPath) + Path.DirectorySeparatorChar;
 
 		// Unique ID parsing/generation
-		this.uniqueID = new CSongUniqueID(this.strフォルダ名 + @$"{Path.DirectorySeparatorChar}uniqueID.json");
+		this.uniqueID = new CSongUniqueID(this.strFolderPath + @$"{Path.DirectorySeparatorChar}uniqueID.json");
 
 		try {
 			this.nPlayerSide = nPlayerSide;
 			this.bSession譜面を読み込む = bSession;
-			//次郎方式
-			StreamReader reader = new StreamReader(strファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
-			string str2 = reader.ReadToEnd();
-			reader.Close();
-			this.t入力_全入力文字列から(str2, nBGMAdjust, difficulty);
+			this.tProcessAllText(CJudgeTextEncoding.ReadTextFile(file_name), nBGMAdjust, difficulty);
 		} catch (Exception ex) {
-			Trace.TraceError("おや?エラーが出たようです。お兄様。");
+			Trace.TraceError("Oh? It seems there was an error. Oh brother.");
 			Trace.TraceError(ex.ToString());
-			Trace.TraceError("例外が発生しましたが処理を継続します。 (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
+			Trace.TraceError("An exception occurred, but processing will continue. (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void t入力_全入力文字列から(string str全入力文字列, int nBGMAdjust, int Difficulty) {
+	public void tProcessAllText(string str全入力文字列, int nBGMAdjust, int Difficulty) {
 		if (!string.IsNullOrEmpty(str全入力文字列)) {
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
@@ -952,7 +948,7 @@ internal class CTja : CActivity {
 			this.n無限管理BPM = null;
 			this.n無限管理PAN = null;
 			this.n無限管理SIZE = null;
-			if (!this.bヘッダのみ) {
+			if (!this.bHeaderOnly) {
 				#region [ CWAV初期化 ]
 				foreach (CWAV cwav in this.listWAV.Values) {
 					if (cwav.nチップサイズ < 0) {
@@ -1459,7 +1455,7 @@ internal class CTja : CActivity {
 			//2017.02.03 DD ヘッダ内にある命令以外の文字列を削除
 			var startIndex = strInput.IndexOf("#START");
 			if (startIndex < 0) {
-				Trace.TraceWarning($"#START命令が少なくとも1つは必要です。 ({strファイル名の絶対パス})");
+				Trace.TraceWarning($"#START命令が少なくとも1つは必要です。 ({strFullPath})");
 			}
 			string strInputHeader = strInput.Remove(startIndex);
 			strInput = strInput.Remove(0, startIndex);
@@ -1527,7 +1523,7 @@ internal class CTja : CActivity {
 			strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
 				strSplitした譜面[n読み込むコース],
 				OpenTaiko.ConfigIni.nPlayerCount > 1 ? (this.nPlayerSide + 1) : 0,
-				this.strファイル名の絶対パス);
+				this.strFullPath);
 
 			//命令をすべて消去した譜面
 			var str命令消去譜面 = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
@@ -1703,8 +1699,8 @@ internal class CTja : CActivity {
 					ECourse branch = (ECourse)i;
 					if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
 						Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
-							$"{nameof(CTja)}: An unended roll in branch {branch} is ended by #END. In {this.strファイル名の絶対パス}"
-							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strファイル名の絶対パス}"
+							$"{nameof(CTja)}: An unended roll in branch {branch} is ended by #END. In {this.strFullPath}"
+							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strFullPath}"
 						);
 					}
 					InsertNoteAtDefCursor(8, 0, 1, branch);
@@ -1959,7 +1955,7 @@ internal class CTja : CActivity {
 				chip.strObjName = args[0];
 				chip.fObjX = float.Parse(args[1]);
 				chip.fObjY = float.Parse(args[2]);
-				var txPath = this.strフォルダ名 + args[3];
+				var txPath = this.strFolderPath + args[3];
 				Trace.TraceInformation("" + this.bSession譜面を読み込む);
 				if (this.bSession譜面を読み込む) {
 					var obj = new CSongObject(chip.strObjName, chip.fObjX, chip.fObjY, txPath);
@@ -2037,7 +2033,7 @@ internal class CTja : CActivity {
 				chip.strTargetTxName = args[0]
 					.Replace('/', Path.DirectorySeparatorChar)
 					.Replace('\\', Path.DirectorySeparatorChar);
-				chip.strNewPath = this.strフォルダ名 + args[1];
+				chip.strNewPath = this.strFolderPath + args[1];
 
 				if (this.bSession譜面を読み込む) {
 					if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
@@ -2382,7 +2378,7 @@ internal class CTja : CActivity {
 				n位置 = this.n無限管理PAN[this.n内部番号WAV1to],
 				SongVol = this.SongVol,
 				SongLoudnessMetadata = this.SongLoudnessMetadata,
-				strファイル名 = CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, dansongs.FileName),
+				strファイル名 = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, dansongs.FileName),
 				strコメント文 = "TJA BGM"
 			};
 			dansongs.Wave.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(dansongs.Wave.strファイル名);
@@ -2688,7 +2684,7 @@ internal class CTja : CActivity {
 	private void WarnSplitLength(string name, string[] strArray, int minimumLength) {
 		if (strArray.Length < minimumLength) {
 			Trace.TraceWarning(
-				$"命令 {name} のパラメータが足りません。少なくとも {minimumLength} つのパラメータが必要です。 (現在のパラメータ数: {strArray.Length}). ({strファイル名の絶対パス})");
+				$"命令 {name} のパラメータが足りません。少なくとも {minimumLength} つのパラメータが必要です。 (現在のパラメータ数: {strArray.Length}). ({strFullPath})");
 		}
 	}
 
@@ -2784,8 +2780,8 @@ internal class CTja : CActivity {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
 									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
 										Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
-											$"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
-											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strファイル名の絶対パス}"
+											$"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
+											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
 										);
 									}
 									InsertNoteAtDefCursor(8, n, n文字数, branch);
@@ -3131,7 +3127,7 @@ internal class CTja : CActivity {
 		if (short.TryParse(unparsedValue, out var value)) {
 			setValue(value);
 		} else {
-			Trace.TraceWarning($"命令名: {name} のパラメータの値が正しくないことを検知しました。値: {unparsedValue} ({strファイル名の絶対パス})");
+			Trace.TraceWarning($"命令名: {name} のパラメータの値が正しくないことを検知しました。値: {unparsedValue} ({strFullPath})");
 		}
 	}
 
@@ -3146,7 +3142,7 @@ internal class CTja : CActivity {
 
 				n打数 = Convert.ToInt32(strParam[n]);
 			} catch (Exception ex) {
-				Trace.TraceError($"おや?エラーが出たようです。お兄様。 ({strファイル名の絶対パス})");
+				Trace.TraceError($"おや?エラーが出たようです。お兄様。 ({strFullPath})");
 				Trace.TraceError(ex.ToString());
 				Trace.TraceError("例外が発生しましたが処理を継続します。 (95327158-4e83-4fa9-b5e9-ad3c3d4c2a22)");
 				break;
@@ -3255,16 +3251,16 @@ internal class CTja : CActivity {
 			this.dbNowBPM = dbBPM;
 		} else if (strCommandName.Equals("WAVE")) {
 			if (strBGM_PATH != null) {
-				Trace.TraceWarning($"{nameof(CTja)} is ignoring an extra WAVE header in {this.strファイル名の絶対パス}");
+				Trace.TraceWarning($"{nameof(CTja)} is ignoring an extra WAVE header in {this.strFullPath}");
 			} else {
-				this.strBGM_PATH = CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, strCommandParam);
+				this.strBGM_PATH = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 				//tbWave.Text = strCommandParam;
 				if (this.listWAV != null) {
 					// 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
 					//                           TJAP3 is either launching, enumerating songs, or is about to
 					//                           begin playing a song. If metadata is available, we want it now.
 					//                           If is not yet available then we wish to queue scanning.
-					var absoluteBgmPath = Path.Combine(this.strフォルダ名, this.strBGM_PATH);
+					var absoluteBgmPath = Path.Combine(this.strFolderPath, this.strBGM_PATH);
 					this.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(absoluteBgmPath);
 
 					var wav = new CWAV() {
@@ -3401,14 +3397,14 @@ internal class CTja : CActivity {
 
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				this.strBGVIDEO_PATH =
-					CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, strCommandParam);
+					CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 			}
 
 			string strVideoFilename;
 			if (!string.IsNullOrEmpty(this.PATH_WAV))
 				strVideoFilename = this.PATH_WAV + this.strBGVIDEO_PATH;
 			else
-				strVideoFilename = this.strフォルダ名 + this.strBGVIDEO_PATH;
+				strVideoFilename = this.strFolderPath + this.strBGVIDEO_PATH;
 
 			try {
 				CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
@@ -3430,14 +3426,14 @@ internal class CTja : CActivity {
 			string videoPath = "";
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				videoPath =
-					CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, strCommandParam);
+					CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 			}
 
 			string strVideoFilename;
 			if (!string.IsNullOrEmpty(this.PATH_WAV))
 				strVideoFilename = this.PATH_WAV + videoPath;
 			else
-				strVideoFilename = this.strフォルダ名 + videoPath;
+				strVideoFilename = this.strFolderPath + videoPath;
 
 			try {
 				CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
@@ -3459,7 +3455,7 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
 			try {
 				string[] args = SplitComma(strCommandParam);
-				string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[0]);
+				string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[0]);
 
 				if (string.IsNullOrEmpty(path)) {
 					this.CutSceneIntro = null;
@@ -3468,7 +3464,7 @@ internal class CTja : CActivity {
 					if (!string.IsNullOrEmpty(this.PATH_WAV))
 						fullPath = this.PATH_WAV + path;
 					else
-						fullPath = this.strフォルダ名 + path;
+						fullPath = this.strFolderPath + path;
 
 					ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
 					if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
@@ -3492,14 +3488,14 @@ internal class CTja : CActivity {
 				List<CutSceneDef> outros = new();
 				string[] args = SplitComma(strCommandParam);
 				for (int iArg = 0; iArg < args.Length; iArg += 4) {
-					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strフォルダ名, strファイル名, args[iArg + 0]);
+					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[iArg + 0]);
 
 					if (!string.IsNullOrEmpty(path)) {
 						string fullPath;
 						if (!string.IsNullOrEmpty(this.PATH_WAV))
 							fullPath = this.PATH_WAV + path;
 						else
-							fullPath = this.strフォルダ名 + path;
+							fullPath = this.strFolderPath + path;
 
 						BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
 						if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
@@ -3539,7 +3535,7 @@ internal class CTja : CActivity {
 				string[] files = SplitComma(strCommandParam);
 				string[] filePaths = new string[files.Length];
 				for (int i = 0; i < files.Length; i++) {
-					filePaths[i] = this.strフォルダ名 + files[i];
+					filePaths[i] = this.strFolderPath + files[i];
 
 					if (File.Exists(filePaths[i])) {
 						try {
@@ -3567,7 +3563,7 @@ internal class CTja : CActivity {
 				string[] strFiles = SplitComma(strCommandParam);
 				string[] strFilePath = new string[strFiles.Length];
 				for (int index = 0; index < strFiles.Length; index++) {
-					strFilePath[index] = this.strフォルダ名 + strFiles[index];
+					strFilePath[index] = this.strFolderPath + strFiles[index];
 					if (File.Exists(strFilePath[index])) {
 						try {
 							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
@@ -4189,7 +4185,7 @@ internal class CTja : CActivity {
 	// その他
 
 	#region [ private ]
-	private bool bヘッダのみ;
+	private bool bHeaderOnly;
 	private Stack<bool> bstackIFからENDIFをスキップする;
 
 	private int n現在の行数;
