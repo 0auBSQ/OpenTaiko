@@ -358,7 +358,7 @@ internal class CStage曲読み込み : CStage {
 
 						Trace.TraceInformation("---- Song information -----------------");
 						Trace.TraceInformation("TITLE: {0}", OpenTaiko.TJA.TITLE.GetString(""));
-						Trace.TraceInformation("FILE: {0}", OpenTaiko.TJA.strファイル名の絶対パス);
+						Trace.TraceInformation("FILE: {0}", OpenTaiko.TJA.strFullPath);
 						Trace.TraceInformation("---------------------------");
 
 						span = (TimeSpan)(DateTime.Now - timeBeginLoad);
@@ -427,7 +427,7 @@ internal class CStage曲読み込み : CStage {
 							var _dtx = OpenTaiko.GetTJA(i);
 							_dtx?.tRandomizeTaikoChips(i);
 							_dtx?.tApplyFunMods(i);
-							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strファイル名の絶対パス, i);
+							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
 						}
 
 						OpenTaiko.stageGameScreen.Activate();
