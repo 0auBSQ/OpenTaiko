@@ -121,7 +121,7 @@ internal class Dan_Cert : CActivity {
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
 
-		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
+		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
 		base.Activate();
 	}

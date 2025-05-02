@@ -606,7 +606,7 @@ internal class CStage結果 : CStage {
 			this.ctPhase3 = null;
 			examsShift = 0;
 
-			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
+			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
 			base.Activate();
 
