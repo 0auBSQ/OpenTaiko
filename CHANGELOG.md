@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.55] - 2025-05-02 (Beta)
+
+- [Fix] Softlock when selecting any dan from the Dan Dojo select menu
+- [Fix] Puchicharas suddenly disappearing after interacting with a Balloon or Kusudama
+- [Enhancement] UTF-8 support for tja charts
+
 ## [0.6.0.54] - 2025-04-03 (Beta)
 
 - Fix: Fade out on results screen was too long due to using the in-game fade-out preset
