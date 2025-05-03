@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.56] - 2025-05-03 (Beta)
+
+- [Fix] Stretching-disabled rolls still stretched on scroll method changes
+- [Fix] Stretching-disabled rolls have incorrect roll end SENote position
+
 ## [0.6.0.55] - 2025-05-02 (Beta)
 
 - [Fix] Softlock when selecting any dan from the Dan Dojo select menu
