@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.57] - 2025-05-03 (Beta)
+
+- [Chore] Update Silk.NET to 2.22
+
 ## [0.6.0.56] - 2025-05-03 (Beta)
 
 - [Fix] Stretching-disabled rolls still stretched on scroll method changes
