@@ -2614,6 +2614,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
 			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
 			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
+			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed_Y, pChip.eScrollMode);
 		}
 		#endregion
 
@@ -2623,17 +2624,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
 
-			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
-			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
-			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
-			if (NotesManager.IsGenericRoll(pChip)) {
-				long msDTime_end = pChip.end.n発声時刻ms - n現在時刻ms;
-				double th16DBeat_end = pChip.end.fBMSCROLLTime - play_bpm_time;
-				double _scrollSpeed_end = pChip.dbSCROLL * _scroll_rate; //pChip.end.dbSCROLL * _scroll_rate;
-				double _scrollSpeed_Y_end = pChip.dbSCROLL_Y * _scroll_rate;// pChip.end.dbSCROLL_Y * _scroll_rate;
-				pChip.nNoteTipDistance_X = NotesManager.GetNoteX(msDTime_end, th16DBeat_end, pChip.dbBPM, _scrollSpeed_end, pChip.end.eScrollMode);
-				pChip.nNoteTipDistance_Y = NotesManager.GetNoteY(msDTime_end, th16DBeat_end, pChip.dbBPM, _scrollSpeed_Y_end, pChip.end.eScrollMode);
-			}
+			CChip velocityRefChip = (NotesManager.IsRollEnd(pChip)) ? pChip.start : pChip; // && !StretchRoll
+			double _scrollSpeed = velocityRefChip.dbSCROLL * _scroll_rate;
+			double _scrollSpeed_Y = velocityRefChip.dbSCROLL_Y * _scroll_rate;
+			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, velocityRefChip.dbBPM, _scrollSpeed, velocityRefChip.eScrollMode);
+			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, velocityRefChip.dbBPM, _scrollSpeed_Y, velocityRefChip.eScrollMode);
 
 			if (!this.bPAUSE && !this.isRewinding) {
 				if (!pChip.IsMissed && !pChip.bHit) {

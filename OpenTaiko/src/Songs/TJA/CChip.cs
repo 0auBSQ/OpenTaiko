@@ -31,8 +31,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nChannelNo;
 	public int VideoStartTimeMs;
 	public int nHorizontalChipDistance;
-	public int nNoteTipDistance_X;
-	public int nNoteTipDistance_Y;
+	public int nVerticalChipDistance;
 	public int n整数値;
 	public int n文字数 = 16;
 
@@ -143,6 +142,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public CChip() {
 		this.nHorizontalChipDistance = 0;
+		this.nVerticalChipDistance = 0;
 		this.start = this;
 		this.end = this;
 	}
@@ -165,8 +165,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.bVisible = true;
 		this.nOpacity = 0xff;
 		this.nHorizontalChipDistance = 0;
-		this.nNoteTipDistance_X = 0;
-		this.nNoteTipDistance_Y = 0;
+		this.nVerticalChipDistance = 0;
 		this.dbBPM = 120.0;
 		this.fNow_Measure_m = 4.0f;
 		this.fNow_Measure_s = 4.0f;
