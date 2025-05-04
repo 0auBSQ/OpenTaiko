@@ -829,7 +829,6 @@ class CStageHeya : CStage {
 				return false;
 
 		}
-
 		return true;
 	}
 
