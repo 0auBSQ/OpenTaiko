@@ -455,22 +455,9 @@ class CActNewHeya : CActivity {
 								}
 								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);
 
-								int puriColumn = index % 5;
-								int puriRow = index / 5;
-
-								if (OpenTaiko.Tx.Puchichara[index].tx != null) {
-									float puchiScale = OpenTaiko.Skin.Resolution[1] / 1080.0f;
-
-									OpenTaiko.Tx.Puchichara[index].tx.vcScaleRatio.X = puchiScale;
-									OpenTaiko.Tx.Puchichara[index].tx.vcScaleRatio.Y = puchiScale;
-								}
-
-								OpenTaiko.Tx.Puchichara[index].tx?.t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0],
-									y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1] + (int)(OpenTaiko.stageSongSelect.PuchiChara.sineY),
-									new Rectangle((OpenTaiko.stageSongSelect.PuchiChara.Counter.CurrentValue + 2 * puriColumn) * OpenTaiko.Skin.Game_PuchiChara[0],
-										puriRow * OpenTaiko.Skin.Game_PuchiChara[1],
-										OpenTaiko.Skin.Game_PuchiChara[0],
-										OpenTaiko.Skin.Game_PuchiChara[1]));
+								OpenTaiko.stageSongSelect.PuchiChara.DrawPuchichara(index,
+									x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1],
+									OpenTaiko.Skin.Resolution[1] / 1080.0f, 255, true);
 
 								OpenTaiko.Tx.Puchichara[index].tx?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 
