@@ -244,13 +244,13 @@ internal class CSongDict {
 		List<CSongListNode> childList = new List<CSongListNode>();
 
 		foreach (CSongListNode nodeT in nodes.Values) {
-			string name = type switch {
-				ETitleType.Title => nodeT.ldTitle.GetString(""),
-				ETitleType.Subtitle => nodeT.ldSubtitle.GetString(""),
-				ETitleType.Charter => nodeT.strMaker,
-				_ => nodeT.ldTitle.GetString("")
+			string[] name = type switch {
+				ETitleType.Title => nodeT.ldTitle.GetAllStrings(),
+				ETitleType.Subtitle => nodeT.ldSubtitle.GetAllStrings(),
+				ETitleType.Charter => [nodeT.strMaker],
+				_ => nodeT.ldTitle.GetAllStrings()
 			};
-			if (name.Contains(text, StringComparison.InvariantCultureIgnoreCase)) {
+			if (name.Any(item => item.Contains(text, StringComparison.InvariantCultureIgnoreCase))) {
 				var node = tReadaptChildNote(parent, nodeT);
 				if (node != null) childList.Add(node);
 			}
