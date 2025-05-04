@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0.57] - 2025-05-03 (Beta)
+
+- [Chore] Update Silk.NET to 2.22
+
+## [0.6.0.56] - 2025-05-03 (Beta)
+
+- [Fix] Stretching-disabled rolls still stretched on scroll method changes
+- [Fix] Stretching-disabled rolls have incorrect roll end SENote position
+
+## [0.6.0.55] - 2025-05-02 (Beta)
+
+- [Fix] Softlock when selecting any dan from the Dan Dojo select menu
+- [Fix] Puchicharas suddenly disappearing after interacting with a Balloon or Kusudama
+- [Enhancement] UTF-8 support for tja charts
+
 ## [0.6.0.54] - 2025-04-03 (Beta)
 
 - Fix: Fade out on results screen was too long due to using the in-game fade-out preset
