@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.59] - 2025-05-09 (Beta)
+
+- [Feat] Add .optksc as a file format, for creating shortcuts pointing to existing songs
+- [Enhancement] Account for all localized text when using Search by Text feature in song select
+- [Enhancement] Various minor optimizations on puchichara display, scene presets
+
 ## [0.6.0.58] - 2025-05-04 (Beta)
 
 - [Hotfix] Revert 0.6.0.57 Silk.Net update due to unexpected crashes when inputing specific buttons
