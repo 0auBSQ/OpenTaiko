@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using OpenTaiko.CSongListNodeComparers;
@@ -186,7 +187,8 @@ internal class CSongs管理 {
 						}
 
 						this.n検索された曲ノード数++;
-					} else {
+					}
+					else {
 						CTja dtx = new CTja(filePath, false, 0, 0);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
@@ -449,6 +451,11 @@ internal class CSongs管理 {
 
 
 				c曲リストノード.childrenList = new List<CSongListNode>();
+				// OPTK Shortcut File
+				foreach (string shortcutpath in Directory.GetFiles(infoDir.FullName, "*.optksc", SearchOption.TopDirectoryOnly)) {
+					c曲リストノード.shortcutIds.AddRange(File.ReadAllLines(shortcutpath));
+				}
+
 				listノードリスト.Add(c曲リストノード);
 				if (OpenTaiko.ConfigIni.bOutputSongSearchLog) {
 					Trace.TraceInformation("box.def検出 : {0}", infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def");
