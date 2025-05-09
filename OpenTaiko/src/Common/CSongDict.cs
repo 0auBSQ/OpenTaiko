@@ -275,6 +275,26 @@ internal class CSongDict {
 		return childList;
 	}
 
+	public static List<CSongListNode> tFetchSongsByIds(CSongListNode parent) {
+		if (parent.shortcutIds.Count == 0) return new();
+		List<CSongListNode> childList = new List<CSongListNode>();
+
+		foreach (CSongListNode nodeT in nodes.Values) {
+			if (parent.shortcutIds.Contains(nodeT.tGetUniqueId())) {
+				var node = tReadaptChildNote(parent, nodeT);
+				if (node != null) childList.Add(node);
+			}
+		}
+
+		// Generate back buttons
+
+		string favPath = "./" + parent.ldTitle.GetString("") + "/";
+
+		tReinsertBackButtons(parent, childList, favPath);
+
+		return childList;
+	}
+
 	#endregion
 
 	#region [Score tables methods]

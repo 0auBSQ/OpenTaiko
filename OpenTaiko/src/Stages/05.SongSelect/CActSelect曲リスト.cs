@@ -1015,6 +1015,14 @@ internal class CActSelect曲リスト : CActivity {
 
 		string _append = "";
 		if (HSongTraverse.IsRegularFolder(rCurrentlySelectedSong)) {
+
+			if (!rCurrentlySelectedSong.shortcutIsParsed) {
+				if (rCurrentlySelectedSong.shortcutIds.Count > 0) {
+					rCurrentlySelectedSong.childrenList.AddRange(CSongDict.tFetchSongsByIds(rCurrentlySelectedSong));
+				}
+				rCurrentlySelectedSong.shortcutIsParsed = true;
+			}
+
 			int countTotalSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (_) => true);
 			int countUnlockedSongs = HSongTraverse.GetSongsMatchingCondition(rCurrentlySelectedSong, (song) => !OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(song));
 			_append = " ({0}/{1})".SafeFormat(countUnlockedSongs, countTotalSongs);
