@@ -258,22 +258,9 @@ class CStageHeya : CStage {
 
 				var scroll = DrawBox_Slot(i + (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2));
 
-				int puriColumn = pos % 5;
-				int puriRow = pos / 5;
-
-				if (OpenTaiko.Tx.Puchichara[pos].tx != null) {
-					float puchiScale = OpenTaiko.Skin.Resolution[1] / 1080.0f;
-
-					OpenTaiko.Tx.Puchichara[pos].tx.vcScaleRatio.X = puchiScale;
-					OpenTaiko.Tx.Puchichara[pos].tx.vcScaleRatio.Y = puchiScale;
-				}
-
-				OpenTaiko.Tx.Puchichara[pos].tx?.t2D拡大率考慮中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
-					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1] + (int)(PuchiChara.sineY),
-					new Rectangle((PuchiChara.Counter.CurrentValue + 2 * puriColumn) * OpenTaiko.Skin.Game_PuchiChara[0],
-						puriRow * OpenTaiko.Skin.Game_PuchiChara[1],
-						OpenTaiko.Skin.Game_PuchiChara[0],
-						OpenTaiko.Skin.Game_PuchiChara[1]));
+				PuchiChara.DrawPuchichara(pos,
+					scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0], scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1],
+				OpenTaiko.Skin.Resolution[1] / 1080.0f, 255, true);
 
 				OpenTaiko.Tx.Puchichara[pos].tx?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 

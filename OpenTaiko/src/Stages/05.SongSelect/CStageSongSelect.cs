@@ -947,9 +947,9 @@ internal class CStageSongSelect : CStage {
 														goto Decided;
 													}
 
-														#endregion
+													#endregion
 
-														CSongSelectSongManager.disable();
+													CSongSelectSongManager.disable();
 
 													OpenTaiko.Skin.soundDecideSFX.tPlay();
 													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
