@@ -65,6 +65,8 @@ public class CTexture : IDisposable {
 
 	private static int NoiseEffectID;
 	private static int TimeID;
+	private static int TextureWidthID;
+	private static int TextureHeightID;
 
 	/// <summary>
 	/// 描画に使用する共通のバッファを作成
@@ -103,6 +105,8 @@ public class CTexture : IDisposable {
                 uniform int noteMode;
 				uniform int useNoiseEffect;
 				uniform float time;
+				uniform float textureWidth;
+				uniform float textureHeight;
 
                 varying vec2 texcoord;
 
@@ -125,10 +129,18 @@ public class CTexture : IDisposable {
                         rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
                     }
 
-					vec4 texColor = texture2D(texture1, rect) * color;
+					// Clamp UV coordinates to prevent texture border artifacts with linear filtering
+					float edgeInsetX = 0.5 / textureWidth;
+					float edgeInsetY = 0.5 / textureHeight;
+
+					vec2 adjustedTexcoord = clamp(texcoord, vec2(edgeInsetX), vec2(1.0 - edgeInsetX));
+					adjustedTexcoord.y = clamp(texcoord.y, edgeInsetY, 1.0 - edgeInsetY);
+					vec2 sampleCoord = textureRect.xy + (adjustedTexcoord * textureRect.zw);
+
+					vec4 texColor = texture2D(texture1, sampleCoord) * color;
 
 					if (useNoiseEffect == 1) {
-						float n = randomGrayscale(rect);
+						float n = randomGrayscale(sampleCoord);
 						texColor.rgb = vec3(n);
 						// texColor.a = 1.0;
 					}
@@ -147,6 +159,8 @@ public class CTexture : IDisposable {
 		NoteModeID = Game.Gl.GetUniformLocation(ShaderProgram, "noteMode"); //テクスチャの切り抜きの座標と大きさ
 		NoiseEffectID = Game.Gl.GetUniformLocation(ShaderProgram, "useNoiseEffect");
 		TimeID = Game.Gl.GetUniformLocation(ShaderProgram, "time");
+		TextureWidthID = Game.Gl.GetUniformLocation(ShaderProgram, "textureWidth");
+		TextureHeightID = Game.Gl.GetUniformLocation(ShaderProgram, "textureHeight");
 
 		//------
 
@@ -732,6 +746,8 @@ public class CTexture : IDisposable {
 
 		Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
 		Game.Gl.Uniform2(ScaleID, new System.Numerics.Vector2(vcScaleRatio.X, vcScaleRatio.Y)); //変色用のカラーを設定
+		Game.Gl.Uniform1(TextureWidthID, (float)szTextureSize.Width);
+		Game.Gl.Uniform1(TextureHeightID, (float)szTextureSize.Height);
 
 		//テクスチャの切り抜きの座標と大きさを設定
 		Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
@@ -868,6 +884,8 @@ public class CTexture : IDisposable {
 
 		Game.Gl.Uniform4(ColorID, new System.Numerics.Vector4(color4.Red, color4.Green, color4.Blue, color4.Alpha)); //変色用のカラーを設定
 		Game.Gl.Uniform2(ScaleID, new System.Numerics.Vector2(vcScaleRatio.X, vcScaleRatio.Y)); //変色用のカラーを設定
+		Game.Gl.Uniform1(TextureWidthID, (float)szTextureSize.Width);
+		Game.Gl.Uniform1(TextureHeightID, (float)szTextureSize.Height);
 
 		//テクスチャの切り抜きの座標と大きさを設定
 		Game.Gl.Uniform4(TextureRectID, new System.Numerics.Vector4(
