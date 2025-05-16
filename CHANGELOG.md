@@ -2,6 +2,14 @@
 
 ## [0.6.0.39] - 2025-01-16 (Beta)
 
+i forgot to remove it, this is an extension of this specific PR: 72c8f71dda70d383a14f587f57dfeafb4fdaf82e (Reject TJAP3, embrace OpenTaiko)
+Keeping it slow with this one. I've got a ton of translation stuff that I need to do and then that's it. I cannot help any further due to my poor coding skillz :sob:
+- Replaced TJAPlayer3-f references in some error messages with OpenTaiko in Program.cs, along with some slight log modifications.
+- Replaced Input Calibration chart metadata with OpenTaiko Developers instead of TJAPlayer3 Developers in CStage曲読み込み.cs.
+- Fixed a tiny bug that I had while changing TJAPlayer3.cs. Oops.
+BONUS CHANGE:
+- If you check CActSelect曲リスト.cs, I have changed it to say "loading" instead of enumerating. It's more clear for the user and it saves a bit of coding space.
+Fixed some stuff with BSQ's supervision. Only doing log translation for now.
 - The default font for most languages (when a skin doesn't include a font for that language) has been set to Noto Sans JP
 - The font size for the Offset text on the Calibration screen can now be adjusted
 - Fixed the user rename screen being off-center for resolutions other than 1920x1080
