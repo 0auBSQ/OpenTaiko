@@ -1,172 +1,99 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace FDK
-{
-	public class CTimer : CTimerBase
-	{
-		public enum TimerType
-		{
-			Unknown = -1,
-			PerformanceCounter = 0,
-			MultiMedia = 1,
-			GetTickCount = 2,
+namespace FDK;
+
+public class CTimer : CTimerBase {
+	public enum TimerType {
+		Unknown = -1,
+		PerformanceCounter = 0, // always accurate, mainly for event-based input timing
+		MultiMedia = 1, // same accuracy at integer frame but not fraction frame, mainly for drawing
+		GetTickCount = 2, // 10~16ms low precision (unused)
+	}
+	public TimerType CurrentTimerType {
+		get;
+		protected set;
+	}
+
+
+	public override long SystemTimeMs {
+		get {
+			switch (this.CurrentTimerType) {
+				case TimerType.PerformanceCounter:
+					return performanceTimer?.ElapsedMilliseconds ?? 0;
+
+				case TimerType.MultiMedia:
+					return Game.TimeMs;
+
+				case TimerType.GetTickCount:
+					return (long)Environment.TickCount;
+			}
+			return 0;
 		}
-		public TimerType CurrentTimerType
-		{
-			get;
-			protected set;
-		}
+	}
 
+	public CTimer(TimerType timerType)
+		: base() {
+		this.CurrentTimerType = timerType;
 
-		public override long SystemTimeMs
-		{
-			get
-			{
-				/*
-				switch( this.eタイマ種別 )
-				{
-					case E種別.PerformanceCounter:
-						{
-							double num = 0.0;
-							if( this.n現在の周波数 != 0L )
-							{
-								long x = 0L;
-								QueryPerformanceCounter( ref x );
-								num = ( (double) x ) / ( ( (double) this.n現在の周波数 ) / 1000.0 );
-							}
-							return (long) num;
-						}
-					case E種別.MultiMedia:
-						return (long) timeGetTime();
+		if (ReferenceCount[(int)this.CurrentTimerType] == 0) {
+			switch (this.CurrentTimerType) {
+				case TimerType.PerformanceCounter:
+					if (!this.GetSetPerformanceCounter())
+						this.GetSetTickCount();
+					break;
 
-					case E種別.GetTickCount:
-						return (long) Environment.TickCount;
-				}
-				return 0;
-				*/
-				return SampleFramework.Game.TimeMs;
+				case TimerType.MultiMedia:
+					break;
+
+				case TimerType.GetTickCount:
+					this.GetSetTickCount();
+					break;
+
+				default:
+					throw new ArgumentException(string.Format("Unknown timer type. [{0}]", this.CurrentTimerType));
 			}
 		}
 
-		public CTimer( TimerType timerType )
-			:base()
-		{
-			this.CurrentTimerType = timerType;
+		base.Reset();
 
-			/*
-			if( n参照カウント[ (int) this.eタイマ種別 ] == 0 )
-			{
-				switch( this.eタイマ種別 )
-				{
-					case E種別.PerformanceCounter:
-						if( !this.b確認と設定_PerformanceCounter() && !this.b確認と設定_MultiMedia() )
-							this.b確認と設定_GetTickCount();
-						break;
+		ReferenceCount[(int)this.CurrentTimerType]++;
+	}
 
-					case E種別.MultiMedia:
-						if( !this.b確認と設定_MultiMedia() && !this.b確認と設定_PerformanceCounter() )
-							this.b確認と設定_GetTickCount();
-						break;
+	public override void Dispose() {
+		if (this.CurrentTimerType == TimerType.Unknown)
+			return;
 
-					case E種別.GetTickCount:
-						this.b確認と設定_GetTickCount();
-						break;
+		int type = (int)this.CurrentTimerType;
 
-					default:
-						throw new ArgumentException( string.Format( "未知のタイマ種別です。[{0}]", this.eタイマ種別 ) );
-				}
+		ReferenceCount[type] = Math.Max(ReferenceCount[type] - 1, 0);
+
+		if (ReferenceCount[type] == 0) {
+			if (this.CurrentTimerType == TimerType.PerformanceCounter) {
+				performanceTimer?.Stop();
+				performanceTimer = null;
 			}
-			*/
-	
-			base.Reset();
-
-			ReferenceCount[ (int) this.CurrentTimerType ]++;
-		}
-		
-		public override void Dispose()
-		{
-			if( this.CurrentTimerType == TimerType.Unknown )
-				return;
-
-			int type = (int) this.CurrentTimerType;
-
-			ReferenceCount[ type ] = Math.Max( ReferenceCount[ type ] - 1, 0 );
-
-			if( ReferenceCount[ type ] == 0 )
-			{
-				/*
-				if( this.eタイマ種別 == E種別.MultiMedia )
-					timeEndPeriod( this.timeCaps.wPeriodMin );
-				*/
-			}
-
-			this.CurrentTimerType = TimerType.Unknown;
 		}
 
-		#region [ protected ]
-		//-----------------
-		protected long CurrentFrequency;
-		protected static int[] ReferenceCount = new int[ 3 ];
-		//protected TimeCaps timeCaps;
+		this.CurrentTimerType = TimerType.Unknown;
+	}
 
-		protected bool GetSetTickCount()
-		{
-			this.CurrentTimerType = TimerType.GetTickCount;
+	#region [ protected ]
+	//-----------------
+	protected static Stopwatch? performanceTimer = null;
+	protected static int[] ReferenceCount = new int[3];
+
+	protected bool GetSetTickCount() {
+		this.CurrentTimerType = TimerType.GetTickCount;
+		return true;
+	}
+	protected bool GetSetPerformanceCounter() {
+		performanceTimer = Stopwatch.StartNew();
+		if (Stopwatch.Frequency != 0) {
+			this.CurrentTimerType = TimerType.PerformanceCounter;
 			return true;
 		}
-		/*
-		protected bool b確認と設定_MultiMedia()
-		{
-			this.timeCaps = new TimeCaps();
-			if( ( timeGetDevCaps( out this.timeCaps, (uint) Marshal.SizeOf( typeof( TimeCaps ) ) ) == 0 ) && ( this.timeCaps.wPeriodMin < 10 ) )
-			{
-				this.eタイマ種別 = E種別.MultiMedia;
-				timeBeginPeriod( this.timeCaps.wPeriodMin );
-				return true;
-			}
-			return false;
-		}
-		protected bool b確認と設定_PerformanceCounter()
-		{
-			if( QueryPerformanceFrequency( ref this.n現在の周波数 ) != 0 )
-			{
-				this.eタイマ種別 = E種別.PerformanceCounter;
-				return true;
-			}
-			return false;
-		}
-		*/
-		//-----------------
-		#endregion
-
-		#region [ DllImport ]
-		//-----------------
-		/*
-		[DllImport( "kernel32.dll" )]
-		protected static extern short QueryPerformanceCounter( ref long x );
-		[DllImport( "kernel32.dll" )]
-		protected static extern short QueryPerformanceFrequency( ref long x );
-		[DllImport( "winmm.dll" )]
-		protected static extern void timeBeginPeriod( uint x );
-		[DllImport( "winmm.dll" )]
-		protected static extern void timeEndPeriod( uint x );
-		[DllImport( "winmm.dll" )]
-		protected static extern uint timeGetDevCaps( out TimeCaps timeCaps, uint size );
-		[DllImport( "winmm.dll" )]
-		protected static extern uint timeGetTime();
-
-		[StructLayout( LayoutKind.Sequential )]
-		protected struct TimeCaps
-		{
-			public uint wPeriodMin;
-			public uint wPeriodMax;
-		}
-		*/
-		//-----------------
-		#endregion
+		return false;
 	}
+	//-----------------
+	#endregion
 }

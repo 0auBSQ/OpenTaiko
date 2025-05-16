@@ -1,35 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace OpenTaiko.Animations;
 
-namespace TJAPlayer3.Animations
-{
-    /// <summary>
-    /// アニメーション インターフェイス。
-    /// </summary>
-    interface IAnimatable
-    {
-        /// <summary>
-        /// アニメーションを開始します。
-        /// </summary>
-        void Start();
-        /// <summary>
-        /// アニメーションを停止します。
-        /// </summary>
-        void Stop();
-        /// <summary>
-        /// アニメーションをリセットします。
-        /// </summary>
-        void Reset();
-        /// <summary>
-        /// アニメーションの進行を行います。
-        /// </summary>
-        void Tick();
-        /// <summary>
-        /// アニメーションのパラメータを返します。
-        /// </summary>
-        /// <returns>アニメーションのパラメータを返します。</returns>
-        object GetAnimation();
-    }
+/// <summary>
+/// Animation interface.
+/// </summary>
+interface IAnimatable {
+	/// <summary>
+	/// Starts the animation.
+	/// </summary>
+	void Start();
+	/// <summary>
+	/// Stops the animation.
+	/// </summary>
+	void Stop();
+	/// <summary>
+	/// Resets the animation.
+	/// </summary>
+	void Reset();
+	/// <summary>
+	/// Advances the animation.
+	/// </summary>
+	void Tick();
+	/// <summary>
+	/// Returns the animation parameters.
+	/// </summary>
+	/// <returns>Animation parameters.</returns>
+	object GetAnimation();
 }

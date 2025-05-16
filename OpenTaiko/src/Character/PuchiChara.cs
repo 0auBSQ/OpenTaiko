@@ -1,133 +1,100 @@
-﻿using TJAPlayer3;
-using FDK;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using FDK;
 using Silk.NET.Maths;
-
 using Rectangle = System.Drawing.Rectangle;
 
-namespace TJAPlayer3
-{
-    class PuchiChara : CActivity
-    {
-        public PuchiChara()
-        {
-            base.IsDeActivated = true;
-        }
+namespace OpenTaiko;
 
-        public override void Activate()
-        {
-            Counter = new CCounter(0, TJAPlayer3.Skin.Game_PuchiChara[2] - 1, TJAPlayer3.Skin.Game_PuchiChara_Timer * 0.5f, TJAPlayer3.Timer);
-            SineCounter = new CCounter(0, 360, TJAPlayer3.Skin.Game_PuchiChara_SineTimer, SoundManager.PlayTimer);
-            SineCounterIdle = new CCounter(1, 360, (float)TJAPlayer3.Skin.Game_PuchiChara_SineTimer * 2f, TJAPlayer3.Timer);
-            this.inGame = false;
-            base.Activate();
-        }
-        public override void DeActivate()
-        {
-            Counter = null;
-            SineCounter = null;
-            SineCounterIdle = null;
-            base.DeActivate();
-        }
+class PuchiChara : CActivity {
+	public PuchiChara() {
+		base.IsDeActivated = true;
+	}
 
-        public static int tGetPuchiCharaIndexByName(int p)
-        {
-            var _pc = TJAPlayer3.SaveFileInstances[p].data.PuchiChara;
-            var _pcs = TJAPlayer3.Skin.Puchicharas_Name;
-            int puriChar = 0;
-            if (_pcs.Contains(_pc))
-                puriChar = _pcs.ToList().IndexOf(_pc);
+	public override void Activate() {
+		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, OpenTaiko.Skin.Game_PuchiChara_Timer * 0.5f, OpenTaiko.Timer);
+		SineCounter = new CCounter(0, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer, SoundManager.PlayTimer);
+		SineCounterIdle = new CCounter(1, 360, (float)OpenTaiko.Skin.Game_PuchiChara_SineTimer * 2f, OpenTaiko.Timer);
+		this.inGame = false;
+		base.Activate();
+	}
+	public override void DeActivate() {
+		Counter = null;
+		SineCounter = null;
+		SineCounterIdle = null;
+		base.DeActivate();
+	}
 
-            return puriChar;
-        }
-        
-        public void ChangeBPM(double bpm)
-        {
-            Counter = new CCounter(0, TJAPlayer3.Skin.Game_PuchiChara[2] - 1, (int)(TJAPlayer3.Skin.Game_PuchiChara_Timer * bpm / TJAPlayer3.Skin.Game_PuchiChara[2]), TJAPlayer3.Timer);
-            SineCounter = new CCounter(1, 360, TJAPlayer3.Skin.Game_PuchiChara_SineTimer * bpm / 180, SoundManager.PlayTimer);
-            this.inGame = true;
-        }
+	public static int tGetPuchiCharaIndexByName(int p) {
+		var _pc = OpenTaiko.SaveFileInstances[p].data.PuchiChara;
+		var _pcs = OpenTaiko.Skin.Puchicharas_Name;
+		int puriChar = 0;
+		if (_pcs.Contains(_pc))
+			puriChar = _pcs.ToList().IndexOf(_pc);
 
-        public void IdleAnimation()
-        {
-            this.inGame = false;
-        }
+		return puriChar;
+	}
 
-        /// <summary>
-        /// ぷちキャラを描画する。(オーバーライドじゃないよ)
-        /// </summary>
-        /// <param name="x">X座標(中央)</param>
-        /// <param name="y">Y座標(中央)</param>
-        /// <param name="alpha">不透明度</param>
-        /// <returns></returns>
-        public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f)
-        {
-            if (!TJAPlayer3.ConfigIni.ShowPuchiChara) return base.Draw();
-            if (Counter == null || SineCounter == null || TJAPlayer3.Tx.Puchichara == null) return base.Draw();
-            Counter.TickLoop();
-            SineCounter.TickLoopDB();
-            SineCounterIdle.TickLoop();
+	public void ChangeBPM(double bpm) {
+		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, (int)(OpenTaiko.Skin.Game_PuchiChara_Timer * bpm / OpenTaiko.Skin.Game_PuchiChara[2]), OpenTaiko.Timer);
+		SineCounter = new CCounter(1, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer * bpm / 180, SoundManager.PlayTimer);
+		this.inGame = true;
+	}
 
-            int p = TJAPlayer3.GetActualPlayer(player);
+	public void IdleAnimation() {
+		this.inGame = false;
+	}
 
-            /*
-            TJAPlayer3.act文字コンソール.tPrint(700, 500, C文字コンソール.Eフォント種別.白, Counter.n現在の値.ToString());
-            TJAPlayer3.act文字コンソール.tPrint(700, 520, C文字コンソール.Eフォント種別.白, SineCounter.n現在の値.ToString());
-            TJAPlayer3.act文字コンソール.tPrint(700, 540, C文字コンソール.Eフォント種別.白, SineCounterIdle.n現在の値.ToString());
-            */
+	/// <summary>
+	/// Draws Puchi Chara (small character) on the screen. Note: this is not an override.
+	/// </summary>
+	/// <param name="x">X coordinate (center)</param>
+	/// <param name="y">Y coordinate (center)</param>
+	/// <param name="alpha">Opacity (0-255)</param>
+	/// <returns></returns>
+	public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
+		if (!OpenTaiko.ConfigIni.ShowPuchiChara) return base.Draw();
+		if (Counter == null || SineCounter == null || OpenTaiko.Tx.Puchichara == null) return base.Draw();
+		Counter.TickLoop();
+		SineCounter.TickLoopDB();
+		SineCounterIdle.TickLoop();
 
-            if (inGame)
-                sineY = (double)SineCounter.CurrentValue;
-            else
-                sineY = (double)SineCounterIdle.CurrentValue;
+		int p = OpenTaiko.GetActualPlayer(player);
 
-            // TJAPlayer3.act文字コンソール.tPrint(700, 560, C文字コンソール.Eフォント種別.白, sineY.ToString());
+		if (inGame)
+			sineY = (double)SineCounter.CurrentValue;
+		else
+			sineY = (double)SineCounterIdle.CurrentValue;
 
-            sineY = Math.Sin(sineY * (Math.PI / 180)) * (TJAPlayer3.Skin.Game_PuchiChara_Sine * (isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] : TJAPlayer3.Skin.Game_PuchiChara_Scale[0]));
+		sineY = Math.Sin(sineY * (Math.PI / 180)) * (OpenTaiko.Skin.Game_PuchiChara_Sine * (isBalloon ? OpenTaiko.Skin.Game_PuchiChara_Scale[1] : OpenTaiko.Skin.Game_PuchiChara_Scale[0]));
 
-            // TJAPlayer3.act文字コンソール.tPrint(700, 580, C文字コンソール.Eフォント種別.白, sineY.ToString());
+		int puriChar = PuchiChara.tGetPuchiCharaIndexByName(p);
+		var chara = OpenTaiko.Tx.Puchichara[puriChar].tx;
 
-            //int puriChar = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[p]));
+		if (chara != null) {
+			float puchiScale = OpenTaiko.Skin.Resolution[1] / 720.0f;
 
-            int puriChar = PuchiChara.tGetPuchiCharaIndexByName(p);
+			chara.vcScaleRatio = new Vector3D<float>((isBalloon ? OpenTaiko.Skin.Game_PuchiChara_Scale[1] * puchiScale : OpenTaiko.Skin.Game_PuchiChara_Scale[0] * puchiScale));
+			chara.vcScaleRatio.X *= scale;
+			chara.vcScaleRatio.Y *= scale;
+			chara.Opacity = alpha;
 
-            var chara = TJAPlayer3.Tx.Puchichara[puriChar].tx;
-            //TJAPlayer3.Tx.PuchiChara[puriChar];
+			/* Todo :
+			 **
+			 ** - Yellow light color filter when isGrowing is true
+			 */
 
-            if (chara != null)
-            {
-                float puchiScale = TJAPlayer3.Skin.Resolution[1] / 720.0f;
+			int adjustedX = x - 32;
+			int adjustedY = y - 32;
 
-                chara.vcScaleRatio = new Vector3D<float>((isBalloon ? TJAPlayer3.Skin.Game_PuchiChara_Scale[1] * puchiScale : TJAPlayer3.Skin.Game_PuchiChara_Scale[0] * puchiScale));
-                chara.vcScaleRatio.X *= scale;
-                chara.vcScaleRatio.Y *= scale;
-                chara.Opacity = alpha;
+			chara.t2D拡大率考慮中央基準描画(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue + 2) * OpenTaiko.Skin.Game_PuchiChara[0], 0, OpenTaiko.Skin.Game_PuchiChara[0], OpenTaiko.Skin.Game_PuchiChara[1]));
+		}
 
-                // (isGrowing ? TJAPlayer3.Skin.Game_PuchiChara[1] : 0) => Height
+		return base.Draw();
+	}
 
-                /* To do :
-                **
-                ** - Yellow light color filter when isGrowing is true
-                */
+	public double sineY;
 
-                int adjustedX = x - 32;
-                int adjustedY = y - 32;
-
-                chara.t2D拡大率考慮中央基準描画(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue + 2) * TJAPlayer3.Skin.Game_PuchiChara[0], 0, TJAPlayer3.Skin.Game_PuchiChara[0], TJAPlayer3.Skin.Game_PuchiChara[1]));
-            }
-
-            return base.Draw();
-        }
-
-        public double sineY;
-
-        public CCounter Counter;
-        private CCounter SineCounter;
-        private CCounter SineCounterIdle;
-        private bool inGame;
-    }
+	public CCounter Counter;
+	private CCounter SineCounter;
+	private CCounter SineCounterIdle;
+	private bool inGame;
 }

@@ -1,68 +1,56 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3
-{
-    class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>>
-    {
-        public DBCDN()
-        {
-            _fn = @$"{TJAPlayer3.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}CDN.json";
-            base.tDBInitSavable();
-        }
+namespace OpenTaiko;
 
-        #region [Auxiliary classes]
+class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>> {
+	public DBCDN() {
+		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}CDN.json";
+		base.tDBInitSavable();
+	}
 
-        public class CDNHooks
-        {
-            public string id = "id";
-            public Dictionary<string, string> title = new Dictionary<string, string>()
-            {
-                ["default"] = "title",
-            };
-            public Dictionary<string, string> subtitle = new Dictionary<string, string>()
-            {
-                ["default"] = "subtitle",
-            };
-            public string[] difficulties = { "easy", "normal", "hard", "extreme", "extra", "tower", "dan" };
-            public string life = "life";
-            public string updateDate = "updateDate";
-            public string creationDate = "creationDate";
-            public string uploadDate = "uploadDate";
-            public Dictionary<string, string> md5 = new Dictionary<string, string>()
-            {
-                ["default"] = "md5",
-            };
-            public string genre = "genre";
-            public Dictionary<string, string> genreSub = new Dictionary<string, string>()
-            {
-                ["default"] = "name",
-            };
+	#region [Auxiliary classes]
 
-            public string charter = "charter";
-        }
+	public class CDNHooks {
+		public string id = "id";
+		public Dictionary<string, string> title = new Dictionary<string, string>() {
+			["default"] = "title",
+		};
+		public Dictionary<string, string> subtitle = new Dictionary<string, string>() {
+			["default"] = "subtitle",
+		};
+		public string[] difficulties = { "easy", "normal", "hard", "extreme", "extra", "tower", "dan" };
+		public string life = "life";
+		public string updateDate = "updateDate";
+		public string creationDate = "creationDate";
+		public string uploadDate = "uploadDate";
+		public Dictionary<string, string> md5 = new Dictionary<string, string>() {
+			["default"] = "md5",
+		};
+		public string genre = "genre";
+		public Dictionary<string, string> genreSub = new Dictionary<string, string>() {
+			["default"] = "name",
+		};
 
-        public class CDNData
-        {
+		public string charter = "charter";
+	}
 
-            [JsonProperty("baseUrl")]
-            public string BaseUrl;
+	public class CDNData {
 
-            [JsonProperty("download")]
-            public Dictionary<string, string> Download = new Dictionary<string, string>()
-            {
-                ["default"] = "download/",
-            };
+		[JsonProperty("baseUrl")]
+		public string BaseUrl;
 
-            [JsonProperty("songList")]
-            public string SongList;
+		[JsonProperty("download")]
+		public Dictionary<string, string> Download = new Dictionary<string, string>() {
+			["default"] = "download/",
+		};
 
-            [JsonProperty("hooks")]
-            public CDNHooks Hooks;
-        }
+		[JsonProperty("songList")]
+		public string SongList;
 
-        #endregion
+		[JsonProperty("hooks")]
+		public CDNHooks Hooks;
+	}
 
-    }
+	#endregion
+
 }

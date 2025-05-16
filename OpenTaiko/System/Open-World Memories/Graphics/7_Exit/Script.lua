@@ -37,6 +37,8 @@ function init()
       speech = "Speech/fr.png"
     elseif lang == "es" then
       speech = "Speech/es.png"
+    elseif lang == "ru" then
+      speech = "Speech/ru.png"
     elseif lang == "zh" then
       speech = "Speech/zh.png"
     end

@@ -82,11 +82,11 @@ function draw()
       func:SetOpacity(bgClearFade[1], "Dot_Clear.png")
       func:SetOpacity(bgClearFade[1], "Dango_Clear.png")
 
-      func:DrawGraph(0, 0, "BG_Red.png")
+      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Red.png")
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Red.png")
       func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Red.png")
 
-      func:DrawGraph(0, 0, "BG_Clear.png")
+      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
       func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
 
@@ -96,18 +96,18 @@ function draw()
       func:SetOpacity(bgClearFade[1], "Dot_Clear.png")
       func:SetOpacity(bgClearFade[1], "Dango_Clear.png")
 
-      func:DrawGraph(0, 0, "BG_Blue.png")
+      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Blue.png")
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Blue.png")
       func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Blue.png")
 
-      func:DrawGraph(0, 0, "BG_Clear.png")
+      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
       func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
 
     elseif playerCount == 2 then
 
-      func:DrawGraph(0, 0, "BG_Red.png")
-      func:DrawGraph(0, secondPlayerY, "BG_Blue.png")
+      func:DrawRectGraph(0, 0, 0, 0, loopWidth, loopHeight, "BG_Red.png")
+      func:DrawRectGraph(0, secondPlayerY, 0, 0, loopWidth, loopHeight, "BG_Blue.png")
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Red.png")
       func:DrawRectGraph(0, secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Blue.png")
       func:DrawRectGraph(0, dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Red.png")
@@ -118,7 +118,7 @@ function draw()
         func:SetOpacity(bgClearFade[player + 1], "Dot_Clear.png")
         func:SetOpacity(bgClearFade[player + 1], "Dango_Clear.png")
 
-        func:DrawGraph(0, player * secondPlayerY, "BG_Clear.png")
+        func:DrawRectGraph(0, player * secondPlayerY, 0, 0, loopWidth, loopHeight, "BG_Clear.png")
         func:DrawRectGraph(0, player * secondPlayerY, bgScrollX, bgScrollY, loopWidth, loopHeight, "Dot_Clear.png")
         func:DrawRectGraph(0, (player * secondPlayerY) + dangoOffset, bgScrollX, 0, loopWidth, loopHeight, "Dango_Clear.png")
       end
@@ -135,4 +135,12 @@ function draw()
       func:DrawRectGraph(0, 0, bgScrollX, bgScrollY, loopWidth, 1920, "Dot_Clear.png")
 
     end
+
+    -- Vulkan Debugging
+    -- func:DrawText(192,0,"Dango Scroll X: "..tostring(bgScrollX).."("..tostring(bgScrollX / 492)..")")
+    -- func:DrawText(192,16,"Dot Scroll X: "..tostring(bgScrollX).."("..tostring(bgScrollX/38)..")")
+    -- func:DrawText(192,32,"Dot Scroll Y: "..tostring(bgScrollY).."("..tostring(bgScrollY/42)..")")
+    -- func:DrawText(192,48,"Loop Width: "..tostring(loopWidth).."("..tostring(bgScrollX/loopWidth)..")")
+    -- func:DrawText(192,64,"Loop Height: "..tostring(loopHeight).."("..tostring(bgScrollY/loopHeight)..")")
+    
 end

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace FDK;
 
-namespace FDK
-{
-	public enum ESoundDeviceType
-	{
-		Bass,
-		ExclusiveWASAPI,
-		SharedWASAPI,
-		ASIO,
-		Unknown,
-	}
+public enum ESoundDeviceType {
+	Bass,
+	ExclusiveWASAPI,
+	SharedWASAPI,
+	ASIO,
+	Unknown,
 }

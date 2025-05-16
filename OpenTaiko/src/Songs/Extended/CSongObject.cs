@@ -1,111 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
-using FDK;
+﻿using FDK;
 
-namespace TJAPlayer3
-{
-    class CSongObject
-    {
-        public CSongObject(string name, float x, float y, string path)
-        {
-            this.name = path;
-            this.isVisible = false;
+namespace OpenTaiko;
 
-            this.x = x;
-            this.y = y;
-            this.rotation = 0f;
-            this.opacity = 255;
-            this.xScale = 1.0f;
-            this.yScale = 1.0f;
-            this.color = new Color4(1f, 1f, 1f, 1f);
-            this.frame = 0;
+class CSongObject {
+	public CSongObject(string name, float x, float y, string path) {
+		this.name = path;
+		this.isVisible = false;
 
-            FileAttributes attr = File.GetAttributes(path);
+		this.x = x;
+		this.y = y;
+		this.rotation = 0f;
+		this.opacity = 255;
+		this.xScale = 1.0f;
+		this.yScale = 1.0f;
+		this.color = new Color4(1f, 1f, 1f, 1f);
+		this.frame = 0;
 
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-            {
-                textures = TJAPlayer3.Tx.TxCSongFolder(path);
-            }
-            else
-            {
-                textures = new CTexture[1];
-                textures[0] = TJAPlayer3.Tx.TxCSong(path);
-            }
-        }
+		FileAttributes attr = File.GetAttributes(path);
 
-        public void tStartAnimation(double animInterval, bool loop)
-        {
-            counter.Start(0, textures.Length - 1, animInterval, TJAPlayer3.Timer);
-            counter.CurrentValue = this.frame;
+		if ((attr & FileAttributes.Directory) == FileAttributes.Directory) {
+			textures = OpenTaiko.Tx.TxCSongFolder(path);
+		} else {
+			textures = new CTexture[1];
+			textures[0] = OpenTaiko.Tx.TxCSong(path);
+		}
+	}
 
-            this.isLooping = loop;
-            this.isAnimating = true;
-        }
+	public void tStartAnimation(double animInterval, bool loop) {
+		counter.Start(0, textures.Length - 1, animInterval, OpenTaiko.Timer);
+		counter.CurrentValue = this.frame;
 
-        public void tStopAnimation()
-        {
-            counter.Stop();
-            this.isAnimating = false;
-        }
+		this.isLooping = loop;
+		this.isAnimating = true;
+	}
 
-        public void tDraw()
-        {
-            if (isAnimating)
-            {
-                if (isLooping) counter.TickLoop();
-                else
-                {
-                    counter.Tick();
-                    if (counter.IsEnded) this.tStopAnimation();
-                }
+	public void tStopAnimation() {
+		counter.Stop();
+		this.isAnimating = false;
+	}
 
-                frame = counter.CurrentValue;
-            }
+	public void tDraw() {
+		if (isAnimating) {
+			if (isLooping) counter.TickLoop();
+			else {
+				counter.Tick();
+				if (counter.IsEnded) this.tStopAnimation();
+			}
 
-            CTexture tx = this.textures[frame];
-            if (frame + 1 > textures.Length) return;
-            if (tx == null) return;
+			frame = counter.CurrentValue;
+		}
 
-            tx.fZ軸中心回転 = CConversion.DegreeToRadian(this.rotation);
-            tx.color4 = this.color;
-            tx.Opacity = this.opacity;
+		CTexture tx = this.textures[frame];
+		if (frame + 1 > textures.Length) return;
+		if (tx == null) return;
 
-            float screen_ratiox = TJAPlayer3.Skin.Resolution[0] / 1280.0f;
-            float screen_ratioy = TJAPlayer3.Skin.Resolution[1] / 720.0f;
-            if (isVisible) tx.t2D描画SongObj((int)(this.x * screen_ratiox), (int)(this.y * screen_ratioy), this.xScale * screen_ratiox, this.yScale * screen_ratioy);
-        }
+		tx.fZ軸中心回転 = CConversion.DegreeToRadian(this.rotation);
+		tx.color4 = this.color;
+		tx.Opacity = this.opacity;
 
-        public void tDispose()
-        {
-            this.isVisible = false;
-            foreach (CTexture tx in textures)
-            {
-                if (tx != null) tx.Dispose();
-            }
-        }
+		float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
+		float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
+		if (isVisible) tx.t2D描画SongObj((int)(this.x * screen_ratiox), (int)(this.y * screen_ratioy), this.xScale * screen_ratiox, this.yScale * screen_ratioy);
+	}
 
-        private CCounter counter = new CCounter();
-        private bool isAnimating;
-        private bool isLooping;
+	public void tDispose() {
+		this.isVisible = false;
+		foreach (CTexture tx in textures) {
+			if (tx != null) tx.Dispose();
+		}
+	}
 
-        public CTexture[] textures;
+	private CCounter counter = new CCounter();
+	private bool isAnimating;
+	private bool isLooping;
 
-        public string name;
-        public bool isVisible;
+	public CTexture[] textures;
 
-        public float x;
-        public float y;
-        public float rotation;
-        public int opacity;
-        public float xScale;
-        public float yScale;
-        public Color4 color;
+	public string name;
+	public bool isVisible;
 
-        public int frame;
-    }
+	public float x;
+	public float y;
+	public float rotation;
+	public int opacity;
+	public float xScale;
+	public float yScale;
+	public Color4 color;
+
+	public int frame;
 }

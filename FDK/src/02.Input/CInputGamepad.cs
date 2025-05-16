@@ -1,175 +1,101 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
 using Silk.NET.Input;
 
-namespace FDK
-{
-	public class CInputGamepad : IInputDevice, IDisposable
-	{
-		// コンストラクタ
+namespace FDK;
 
-		public CInputGamepad(IGamepad gamepad)
-		{
-			this.CurrentType = InputDeviceType.Gamepad;
-			this.GUID = gamepad.Index.ToString();
-			this.ID = gamepad.Index;
+public class CInputGamepad : CInputButtonsBase, IInputDevice, IDisposable {
 
-			this.InputEvents = new List<STInputEvent>(32);
+	public CInputGamepad(IGamepad gamepad, float deadzone = 0.5f) : base(gamepad.Buttons.Count + gamepad.Triggers.Count + (gamepad.Thumbsticks.Count * 4)) {
+		this.Device = gamepad;
+		this.CurrentType = InputDeviceType.Gamepad;
+		this.GUID = gamepad.Index.ToString();
+		this.ID = gamepad.Index;
+		this.Name = gamepad.Name;
 
-			gamepad.ButtonDown += Joystick_ButtonDown;
-			gamepad.ButtonUp += Joystick_ButtonUp;
-		}
-		
-		
-		// メソッド
-		
-		public void SetID( int nID )
-		{
-			this.ID = nID;
-		}
+		ButtonCount = gamepad.Buttons.Count;
+		TriggerCount = gamepad.Triggers.Count;
+		ThumbstickCount = gamepad.Thumbsticks.Count;
 
-		#region [ IInputDevice 実装 ]
-		//-----------------
-		public InputDeviceType CurrentType
-		{ 
-			get;
-			private set;
-		}
-		public string GUID
-		{
-			get;
-			private set;
-		}
-		public int ID
-		{ 
-			get; 
-			private set;
-		}
-		public List<STInputEvent> InputEvents 
-		{
-			get;
-			private set;
-		}
-		public string strDeviceName
-		{
-			get;
-			set;
-		}
+		gamepad.Deadzone = new Deadzone(deadzone, DeadzoneMethod.Traditional);
+		gamepad.ButtonDown += Gamepad_ButtonDown;
+		gamepad.ButtonUp += Gamepad_ButtonUp;
+		gamepad.ThumbstickMoved += Gamepad_ThumbstickMoved;
+		gamepad.TriggerMoved += Gamepad_TriggerMoved;
+	}
 
-		public void Polling(bool useBufferInput)
-		{
-			InputEvents.Clear();
-			
-			for (int i = 0; i < ButtonStates.Length; i++)
-			{
-				if (ButtonStates[i].Item1)
-				{
-					if (ButtonStates[i].Item2 >= 1)
-					{
-						ButtonStates[i].Item2 = 2;
-					}
-					else
-					{
-						ButtonStates[i].Item2 = 1;
+	private void Gamepad_TriggerMoved(IGamepad gamepad, Trigger trigger) {
+		int trigger_index = ButtonCount + trigger.Index;
 
-						InputEvents.Add(
-							new STInputEvent()
-							{
-								nKey = i,
-								Pressed = true,
-								Released = false,
-								nTimeStamp = SampleFramework.Game.TimeMs,
-								nVelocity = 0,
-							}
-						);
-					}
+		if (trigger.Position == 1) {
+			if (!KeyPressing(trigger_index)) { base.ButtonDown(trigger_index); }
+		} else {
+			if (!KeyReleased(trigger_index)) { base.ButtonUp(trigger_index); }
+		}
+	}
+	private void Gamepad_ThumbstickMoved(IGamepad gamepad, Thumbstick thumbstick) {
+		ThumbstickDirection direction = GetDirectionFromThumbstick(thumbstick.Direction);
+		if (direction == ThumbstickDirection.Unknown) return;
+
+		int thumbstick_index = ButtonCount + TriggerCount +
+			(thumbstick.Index * 4);
+
+		if (gamepad.Deadzone.Apply(thumbstick.Position) > 0) {
+			if (!KeyPressing(thumbstick_index)) {
+				for (int i = 0; i < 4; i++) {
+					if (i != (int)direction)
+						base.ButtonUp(thumbstick_index + i);
 				}
-				else
-				{
-					if (ButtonStates[i].Item2 <= -1)
-					{
-						ButtonStates[i].Item2 = -2;
-					}
-					else
-					{
-						ButtonStates[i].Item2 = -1;
-
-						InputEvents.Add(
-							new STInputEvent()
-							{
-								nKey = i,
-								Pressed = false,
-								Released = true,
-								nTimeStamp = SampleFramework.Game.TimeMs,
-								nVelocity = 0,
-							}
-						);
-					}
-				}
+				base.ButtonDown(thumbstick_index + (int)direction);
+			}
+		} else {
+			for (int i = 0; i < 4; i++) {
+				base.ButtonUp(thumbstick_index + i);
 			}
 		}
+	}
 
-		public bool KeyPressed(int nButton)
-		{
-			return ButtonStates[nButton].Item2 == 1;
+	private void Gamepad_ButtonDown(IGamepad gamepad, Button button) {
+		if (button.Name != ButtonName.Unknown) {
+			base.ButtonDown((int)button.Name);
 		}
-		public bool KeyPressing(int nButton)
-		{
-			return ButtonStates[nButton].Item2 >= 1;
-		}
-		public bool KeyReleased(int nButton)
-		{
-			return ButtonStates[nButton].Item2 == -1;
-		}
-		public bool KeyReleasing(int nButton)
-		{
-			return ButtonStates[nButton].Item2 <= -1;
-		}
-		//-----------------
-		#endregion
+	}
 
-		#region [ IDisposable 実装 ]
-		//-----------------
-		public void Dispose()
-		{
-			if(!this.IsDisposed)
-			{
-				if (this.InputEvents != null)
-				{
-					this.InputEvents = null;
-				}
-				this.IsDisposed = true;
-			}
+	private void Gamepad_ButtonUp(IGamepad gamepad, Button button) {
+		if (button.Name != ButtonName.Unknown) {
+			base.ButtonUp((int)button.Name);
 		}
-		//-----------------
-		#endregion
+	}
 
+	private ThumbstickDirection GetDirectionFromThumbstick(float raw) {
+		float value = raw * (180 / MathF.PI);
+		if (value >= -90 - 45 / 2f && value <= -90 + 45 / 2f) return ThumbstickDirection.Up;
+		if (value >= 0 - 45 / 2f && value <= 0 + 45 / 2f) return ThumbstickDirection.Right;
+		if (value >= 90 - 45 / 2f && value <= 90 + 45 / 2f) return ThumbstickDirection.Down;
+		if (value >= 180 - 45 / 2f || value <= -180 + 45 / 2f) return ThumbstickDirection.Left;
+		return ThumbstickDirection.Unknown;
+	}
 
-		// その他
+	private enum ThumbstickDirection {
+		Up = 0,
+		Right = 1,
+		Down = 2,
+		Left = 3,
+		Unknown = -1,
+	}
 
-		#region [ private ]
-		//-----------------
-		private (bool, int)[] ButtonStates = new (bool, int)[15];
-		private bool IsDisposed;
+	private int ButtonCount;
+	private int TriggerCount;
+	private int ThumbstickCount;
 
-		private void Joystick_ButtonDown(IGamepad joystick, Button button)
-		{
-			if (button.Name != ButtonName.Unknown)
-			{
-				ButtonStates[(int)button.Name].Item1 = true;
-			}
+	public string GetButtonName(int index) {
+		var gamepad = (IGamepad)Device;
+		if (index >= ButtonCount + TriggerCount) {
+			int thumbstick_index = index - (ButtonCount + TriggerCount);
+			return $"Thumbstick{thumbstick_index / 4} - {(ThumbstickDirection)(thumbstick_index % 4)}";
 		}
-
-		private void Joystick_ButtonUp(IGamepad joystick, Button button)
-		{
-			if (button.Name != ButtonName.Unknown)
-			{
-				ButtonStates[(int)button.Name].Item1 = false;
-			}
+		if (index >= ButtonCount) {
+			int trigger_index = index - ButtonCount;
+			return $"Trigger{trigger_index}";
 		}
-		//-----------------
-		#endregion
+		return gamepad.Buttons[index].Name.ToString();
 	}
 }

@@ -1,40 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FDK;
+﻿using FDK;
 
-namespace TJAPlayer3
-{
-    class FastRender
-    {
-        public FastRender()
-        {
-            
-        }
+namespace OpenTaiko;
 
-        public void Render()
+class FastRender {
+	public FastRender() {
+
+	}
+
+	public void Render() {
+		/*for (int i = 0; i < 5; i++)
         {
-            /*for (int i = 0; i < 5; i++)
+            for (int k = 0; k < TJAPlayer3.Skin.Game_Dancer_Ptn; k++)
             {
-                for (int k = 0; k < TJAPlayer3.Skin.Game_Dancer_Ptn; k++)
-                {
-                    NullCheckAndRender(ref TJAPlayer3.Tx.Dancer[i][k]);
-                }
-            }*/
+                NullCheckAndRender(ref TJAPlayer3.Tx.Dancer[i][k]);
+            }
+        }*/
 
-            NullCheckAndRender(ref TJAPlayer3.Tx.Effects_GoGoSplash);
+		NullCheckAndRender(ref OpenTaiko.Tx.Effects_GoGoSplash);
 
-            //NullCheckAndRender(ref TJAPlayer3.Tx.PuchiChara);
-            
-        }
+		//NullCheckAndRender(ref TJAPlayer3.Tx.PuchiChara);
 
-        private void NullCheckAndRender(ref CTexture tx)
-        {
-            if (tx == null) return;
-            tx.Opacity = 0;
-            tx.t2D描画(0, 0);
-            tx.Opacity = 255;
-        }
-    }
+	}
+
+	private void NullCheckAndRender(ref CTexture tx) {
+		if (tx == null) return;
+		tx.Opacity = 0;
+		tx.t2D描画(0, 0);
+		tx.Opacity = 255;
+	}
 }

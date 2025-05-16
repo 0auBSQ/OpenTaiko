@@ -1,126 +1,100 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 using FDK;
 
-namespace TJAPlayer3
-{
-	internal class CTextConsole : CActivity
-	{
-		// 定数
+namespace OpenTaiko;
 
-		public enum EFontType
-		{
-			White,
-			Cyan,
-			Gray,
-			WhiteSlim,
-			CyanSlim,
-			GraySlim
-		}
-
-		// メソッド
-
-		public void tPrint( int x, int y, EFontType font, string strAlphanumericString )
-		{
-			if( !base.IsDeActivated && !string.IsNullOrEmpty( strAlphanumericString ) )
-			{
-				int BOL = x;
-				for( int i = 0; i < strAlphanumericString.Length; i++ )
-				{
-					char ch = strAlphanumericString[ i ];
-					if( ch == '\n' )
-					{
-						x = BOL;
-						y += nFontHeight;
-					}
-					else
-					{
-						int index = str表記可能文字.IndexOf( ch );
-						if( index < 0 )
-						{
-							x += nFontWidth;
-						}
-						else
-						{
-							if( this.txフォント8x16[ (int) ( (int) font / (int) EFontType.WhiteSlim ) ] != null )
-							{
-								this.txフォント8x16[ (int) ( (int) font / (int) EFontType.WhiteSlim ) ].t2D描画( x, y, this.rc文字の矩形領域[ (int) ( (int) font % (int) EFontType.WhiteSlim ), index ] );
-							}
-							x += nFontWidth;
-						}
-					}
-				}
-			}
-		}
-
-
-		// CActivity 実装
-
-		public override void Activate()
-		{
-			base.Activate();
-		}
-		public override void DeActivate()
-		{
-			if( this.rc文字の矩形領域 != null )
-				this.rc文字の矩形領域 = null;
-
-			base.DeActivate();
-		}
-		public override void CreateManagedResource()
-		{
-			if( !base.IsDeActivated )
-			{
-				this.txフォント8x16[ 0 ] = TJAPlayer3.Tx.TxC(@"Console_Font.png");
-				this.txフォント8x16[ 1 ] = TJAPlayer3.Tx.TxC(@"Console_Font_Small.png");
-
-				nFontWidth = this.txフォント8x16[0].szTextureSize.Width / 32;
-				nFontHeight = this.txフォント8x16[0].szTextureSize.Height / 16;
-
-				this.rc文字の矩形領域 = new Rectangle[3, str表記可能文字.Length];
-				for (int i = 0; i < 3; i++)
-				{
-					for (int j = 0; j < str表記可能文字.Length; j++)
-					{
-						int regionX = nFontWidth * 16, regionY = nFontHeight * 8;
-						this.rc文字の矩形領域[i, j].X = ((i / 2) * regionX) + ((j % 16) * nFontWidth);
-						this.rc文字の矩形領域[i, j].Y = ((i % 2) * regionY) + ((j / 16) * nFontHeight);
-						this.rc文字の矩形領域[i, j].Width = nFontWidth;
-						this.rc文字の矩形領域[i, j].Height = nFontHeight;
-					}
-				}
-
-				base.CreateManagedResource();
-			}
-		}
-		public override void ReleaseManagedResource()
-		{
-			if( !base.IsDeActivated )
-			{
-				for( int i = 0; i < 2; i++ )
-				{
-					if( this.txフォント8x16[ i ] != null )
-					{
-						this.txフォント8x16[ i ].Dispose();
-						this.txフォント8x16[ i ] = null;
-					}
-				}
-				base.ReleaseManagedResource();
-			}
-		}
-
-
-		// その他
-
-		#region [ private ]
-		//-----------------
-		private Rectangle[,] rc文字の矩形領域;
-		private const string str表記可能文字 = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
-		public int nFontWidth = 8, nFontHeight = 16;
-		private CTexture[] txフォント8x16 = new CTexture[ 2 ];
-		//-----------------
-		#endregion
+internal class CTextConsole : CActivity {
+	public enum EFontType {
+		White,
+		Cyan,
+		Gray,
+		WhiteSlim,
+		CyanSlim,
+		GraySlim
 	}
+
+	public (int x, int y) Print(int x, int y, EFontType font, string alphanumericString)
+		=> this.Print(x, y, x, font, alphanumericString);
+
+	/// Print text with initial cursor position at (x, y) and set cursor to xLineBegin on line wraps
+	/// Returns (x, y) of final cursor position
+	public (int x, int y) Print(int x, int y, int xLineBegin, EFontType font, string alphanumericString) {
+		if (base.IsDeActivated || string.IsNullOrEmpty(alphanumericString)) {
+			return (x, y);
+		}
+
+		foreach (var ch in alphanumericString) {
+			if (ch == '\n') {
+				x = xLineBegin;
+				y += this.fontHeight;
+			} else {
+				int index = printableCharacters.IndexOf(ch);
+				if (index >= 0) {
+					if (this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)] != null) {
+						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2D描画(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
+					}
+				}
+
+				x += this.fontWidth;
+			}
+		}
+		return (x, y);
+	}
+
+	public override void DeActivate() {
+		if (this.characterRectangles != null)
+			this.characterRectangles = null;
+
+		base.DeActivate();
+	}
+
+	public override void CreateManagedResource() {
+		if (base.IsDeActivated) {
+			return;
+		}
+
+		this.fontTextures[0] = OpenTaiko.Tx.TxC(@"Console_Font.png");
+		this.fontTextures[1] = OpenTaiko.Tx.TxC(@"Console_Font_Small.png");
+
+		this.fontWidth = this.fontTextures[0].szTextureSize.Width / 32;
+		this.fontHeight = this.fontTextures[0].szTextureSize.Height / 16;
+
+		this.characterRectangles = new Rectangle[3, printableCharacters.Length];
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < printableCharacters.Length; j++) {
+				int regionX = this.fontWidth * 16, regionY = this.fontHeight * 8;
+				this.characterRectangles[i, j].X = ((i / 2) * regionX) + ((j % 16) * this.fontWidth);
+				this.characterRectangles[i, j].Y = ((i % 2) * regionY) + ((j / 16) * this.fontHeight);
+				this.characterRectangles[i, j].Width = this.fontWidth;
+				this.characterRectangles[i, j].Height = this.fontHeight;
+			}
+		}
+
+		base.CreateManagedResource();
+	}
+
+	public override void ReleaseManagedResource() {
+		if (base.IsDeActivated) {
+			return;
+		}
+
+		for (int i = 0; i < 2; i++) {
+			if (this.fontTextures[i] == null) {
+				continue;
+			}
+
+			this.fontTextures[i].Dispose();
+			this.fontTextures[i] = null;
+		}
+		base.ReleaseManagedResource();
+	}
+
+	#region [ private ]
+	//-----------------
+	private Rectangle[,] characterRectangles;
+	private const string printableCharacters = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ ";
+	public int fontWidth = 8, fontHeight = 16;
+	private CTexture[] fontTextures = new CTexture[2];
+	//-----------------
+	#endregion
 }

@@ -1,73 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
-namespace TJAPlayer3
-{
-    class CHitSounds
-    {
-        public CHitSounds(string path)
-        {
-            tLoadFile(path);
-            for (int i = 0; i < 5; i++)
-            {
-                tReloadHitSounds(TJAPlayer3.ConfigIni.nHitSounds[i], i);
-            }
-        }
+namespace OpenTaiko;
 
-        public bool tReloadHitSounds(int id, int player)
-        {
-            if (id >= names.Length || id >= data.Length)
-                return false;
+class CHitSounds {
+	public CHitSounds(string path) {
+		tLoadFile(path);
+		for (int i = 0; i < 5; i++) {
+			tReloadHitSounds(OpenTaiko.ConfigIni.nHitSounds[i], i);
+		}
+	}
 
-            string ext = "";
+	public bool tReloadHitSounds(int id, int player) {
+		if (id >= names.Length || id >= data.Length)
+			return false;
 
-            if (data[id].format == "WAV")
-                ext = ".wav";
-            else if (data[id].format == "OGG")
-                ext = ".ogg";
+		string fileExtension(string file) {
+			string path = Path.Combine(data[id].path, file);
+			return File.Exists(path + ".ogg") ? path + ".ogg" : path + ".wav";
+		}
 
-            don[player] = data[id].path + "dong" + ext;
-            ka[player] = data[id].path + "ka" + ext;
-            adlib[player] = data[id].path + "Adlib" + ext;
-            clap[player] = data[id].path + "clap" + ext;
+		don[player] = fileExtension("dong");
+		ka[player] = fileExtension("ka");
+		adlib[player] = fileExtension("Adlib");
+		clap[player] = fileExtension("clap");
 
-            return true;
-        }
+		return true;
+	}
 
-        public string[] names;
+	public CLocalizationData[] names;
 
-        public string[] don = new string[5];
-        public string[] ka = new string[5];
-        public string[] adlib = new string[5];
-        public string[] clap = new string[5];
+	public string[] don = new string[5];
+	public string[] ka = new string[5];
+	public string[] adlib = new string[5];
+	public string[] clap = new string[5];
 
-        #region [private]
+	#region [private]
 
-        private class HitSoundsData
-        {
-            public string name;
-            public string path;
-            public string format;
-        }
+	private class HitSoundsData {
+		[JsonProperty("name")]
+		[JsonConverter(typeof(LocalizedStringConverter<CLocalizationData>))]
+		public CLocalizationData name = new();
 
-        private HitSoundsData[] data;
+		[JsonIgnore]
+		public string path = $"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}_fallback{Path.DirectorySeparatorChar}";
 
-        private void tLoadFile(string path)
-        {
-            data = ConfigManager.GetConfig<List<HitSoundsData>>(path).ToArray();
+		public HitSoundsData() { name.SetString("default", "Unknown Hitsound"); }
+		public HitSoundsData(string path) : this() {
+			name.SetString("default", Path.GetRelativePath($"Global{Path.DirectorySeparatorChar}HitSounds{Path.DirectorySeparatorChar}", path));
+			this.path = path;
+		}
+	}
 
-            names = new string[data.Length];
+	private HitSoundsData[] data;
 
-            for (int i = 0; i < data.Length; i++)
-            {
-                names[i] = data[i].name;
-            }
-        }
+	private void tLoadFile(string path) {
+		string[] directories = Directory.GetDirectories(path);
+		data = new HitSoundsData[directories.Length];
+		names = new CLocalizationData[data.Length];
 
-        #endregion
+		for (int i = 0; i < data.Length; i++) {
+			string dir_path = Path.Combine(directories[i], "HitSounds.json");
+			data[i] = File.Exists(dir_path) ? ConfigManager.GetConfig<HitSoundsData>(dir_path) : new(directories[i]);
+			data[i].path = directories[i];
+			names[i] = data[i].name;
 
-    }
+			if (!File.Exists(dir_path)) { ConfigManager.SaveConfig(data[i], dir_path); }
+		}
+	}
+
+	#endregion
 }

@@ -1,46 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace OpenTaiko.Animations;
 
-namespace TJAPlayer3.Animations
-{
-    /// <summary>
-    /// イーズイン・アウトを行うクラス。
-    /// </summary>
-    class EaseInOut : Animator
-    {
-        /// <summary>
-        /// イーズイン・アウトを初期化します。
-        /// </summary>
-        /// <param name="startPoint">始点。</param>
-        /// <param name="endPoint">終点。</param>
-        /// <param name="timeMs">イージングにかける時間。</param>
-        public EaseInOut(int startPoint, int endPoint, int timeMs) : base(0, timeMs, 1, false)
-        {
-            StartPoint = startPoint;
-            EndPoint = endPoint;
-            Sa = EndPoint - StartPoint;
-            TimeMs = timeMs;
-        }
+/// <summary>
+/// A class that performs ease-in-out animation.
+/// </summary>
+class EaseInOut : Animator {
+	/// <summary>
+	/// Initialize Ease-in-out.
+	/// </summary>
+	/// <param name="startPoint">Starting point.</param>
+	/// <param name="endPoint">End point.</param>
+	/// <param name="timeMs">Time taken for easing, in milliseconds.</param>
+	public EaseInOut(int startPoint, int endPoint, int timeMs) : base(0, timeMs, 1, false) {
+		StartPoint = startPoint;
+		EndPoint = endPoint;
+		Sa = EndPoint - StartPoint;
+		TimeMs = timeMs;
+	}
 
-        public override object GetAnimation()
-        {
-            var persent = Counter.CurrentValue / (double)TimeMs * 2.0;
-            if (persent < 1)
-            {
-                return ((double)Sa / 2.0 * persent * persent * persent) + StartPoint;
-            }
-            else
-            {
-                persent -= 2;
-                return ((double)Sa / 2.0 * ((persent * persent * persent) + 2)) + StartPoint;
-            }
-        }
+	public override object GetAnimation() {
+		var percent = Counter.CurrentValue / (double)TimeMs * 2.0;
+		if (percent < 1) {
+			return ((double)Sa / 2.0 * percent * percent * percent) + StartPoint;
+		} else {
+			percent -= 2;
+			return ((double)Sa / 2.0 * ((percent * percent * percent) + 2)) + StartPoint;
+		}
+	}
 
-        private readonly int StartPoint;
-        private readonly int EndPoint;
-        private readonly int Sa;
-        private readonly int TimeMs;
-    }
+	private readonly int StartPoint;
+	private readonly int EndPoint;
+	private readonly int Sa;
+	private readonly int TimeMs;
 }

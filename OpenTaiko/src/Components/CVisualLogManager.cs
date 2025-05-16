@@ -1,64 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using FDK;
 
-namespace TJAPlayer3
-{
-    class CVisualLogManager
-    {
-        public enum ELogCardType
-        {
-            LogInfo,
-            LogWarning,
-            LogError
-        }
+namespace OpenTaiko;
 
-        class LogCard
-        {
-            public LogCard(ELogCardType type, string message)
-            {
-                lct = type;
-                msg = message;
-                timeSinceCreation = new CCounter(0, 10000, 1, TJAPlayer3.Timer);
-            }
+class CVisualLogManager {
+	class LogCard {
+		public LogCard(TraceEventType type, string message) {
+			lct = type;
+			msg = message;
+			InitTimeSinceCreation();
+		}
 
-            public void Display(int screenPosition)
-            {
-                timeSinceCreation.Tick();
+		private void InitTimeSinceCreation()
+			=> timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
 
-                // Display stuff here
+		public int Display(int y) {
+			if (timeSinceCreation.IsStoped) {
+				// OpenTaiko.Timer was null. Reinitialize.
+				InitTimeSinceCreation();
+			}
+			timeSinceCreation.Tick();
 
-                int x = 0;
-                int y = 0 + (40 * screenPosition);
+			// Display stuff here
+			if (OpenTaiko.actTextConsole != null) {
+				y = OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.Cyan, msg).y;
+				y += OpenTaiko.actTextConsole.fontHeight + 24;
+			}
+			return y;
+		}
 
-                TJAPlayer3.actTextConsole.tPrint(x, y, CTextConsole.EFontType.Cyan, msg);
-            }
+		public bool IsExpired() {
+			return timeSinceCreation.IsEnded;
+		}
 
-            public bool IsExpired()
-            {
-                return timeSinceCreation.IsEnded;
-            }
+		private CCounter timeSinceCreation;
+		private TraceEventType lct;
+		private string msg;
+	}
 
-            private CCounter timeSinceCreation;
-            private ELogCardType lct;
-            private string msg;
-        }
+	public void PushCard(TraceEventType lct, string msg) {
+		cards.Enqueue(new LogCard(lct, msg));
+	}
 
-        public void PushCard(ELogCardType lct, string msg)
-        {
-            cards.Add(new LogCard(lct, msg));
-        }
+	public void Display() {
+		while (this.cards.TryPeek(out var card) && card.IsExpired()) {
+			this.cards.Dequeue();
+		}
+		int y = 0;
+		foreach (var card in this.cards)
+			y = card.Display(y);
+	}
 
-        public void Display()
-        {
-            for (int i = 0; i < cards.Count; i++)
-                cards[i].Display(i);
-            cards.RemoveAll(card => card.IsExpired());
-        }
-
-        private List<LogCard> cards = new List<LogCard>();
-    }
+	private readonly Queue<LogCard> cards = new Queue<LogCard>();
 }

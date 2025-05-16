@@ -1,83 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NLua;
-using FDK;
+﻿using NLua;
 
-namespace TJAPlayer3
-{
-    class EndAnimeScript : ScriptBG
-    {
-        private LuaFunction LuaPlayEndAnime;
+namespace OpenTaiko;
 
-        public EndAnimeScript(string filePath) : base(filePath)
-        {
-            if (LuaScript != null)
-            {
-                LuaPlayEndAnime = LuaScript.GetFunction("playEndAnime");
-            }
-        }
+class EndAnimeScript : ScriptBG {
+	private LuaFunction LuaPlayEndAnime;
 
-        public new void Dispose()
-        {
-            base.Dispose();
-            LuaPlayEndAnime?.Dispose();
-        }
+	public EndAnimeScript(string filePath) : base(filePath) {
+		if (LuaScript != null) {
+			LuaPlayEndAnime = LuaScript.GetFunction("playEndAnime");
+		}
+	}
 
-        public void PlayEndAnime(int player)
-        {
-            if (LuaScript == null) return;
-            try
-            {
-                LuaPlayEndAnime.Call(player);
-            }
-            catch (Exception ex)
-            {
-            }
-        }
+	public new void Dispose() {
+		base.Dispose();
+		LuaPlayEndAnime?.Dispose();
+	}
 
-        public new void Update(int player)
-        {
-            if (LuaScript == null) return;
-            try
-            {
-                float currentFloorPositionMax140 = 0;
+	public void PlayEndAnime(int player) {
+		if (LuaScript == null) return;
+		try {
+			LuaPlayEndAnime.Call(player);
+		} catch (Exception ex) {
+		}
+	}
 
-                if (TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5] != null)
-                {
-                    int maxFloor = TJAPlayer3.stageSongSelect.rChoosenSong.arスコア[5].譜面情報.nTotalFloor;
-                    int nightTime = Math.Max(140, maxFloor / 2);
+	public new void Update(int player) {
+		if (LuaScript == null) return;
+		try {
+			float currentFloorPositionMax140 = 0;
 
-                    currentFloorPositionMax140 = Math.Min(TJAPlayer3.stage演奏ドラム画面.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
-                }
+			if (OpenTaiko.stageSongSelect.rChoosenSong.score[5] != null) {
+				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int nightTime = Math.Max(140, maxFloor / 2);
 
-                LuaUpdateValues.Call(TJAPlayer3.FPS.DeltaTime, TJAPlayer3.FPS.NowFPS, TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared, (double)currentFloorPositionMax140);
-                /*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
-                LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
-                LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
-                LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-                if (!TJAPlayer3.stage演奏ドラム画面.bPAUSE) LuaUpdate.Call(player);
-            }
-            catch (Exception ex)
-            {
-                LuaScript.Dispose();
-                LuaScript = null;
-            }
-        }
-        public new void Draw(int player)
-        {
-            if (LuaScript == null) return;
-            try
-            {
-                LuaDraw.Call(player);
-            }
-            catch (Exception ex)
-            {
-                LuaScript.Dispose();
-                LuaScript = null;
-            }
-        }
-    }
+				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+			}
+
+			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime, OpenTaiko.FPS.NowFPS, OpenTaiko.stageGameScreen.bIsAlreadyCleared, (double)currentFloorPositionMax140);
+			/*LuaScript.SetObjectToPath("fps", TJAPlayer3.FPS.n現在のFPS);
+            LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
+            LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
+            LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
+			if (!OpenTaiko.stageGameScreen.bPAUSE) LuaUpdate.Call(player);
+		} catch (Exception ex) {
+			LuaScript.Dispose();
+			LuaScript = null;
+		}
+	}
+	public new void Draw(int player) {
+		if (LuaScript == null) return;
+		try {
+			LuaDraw.Call(player);
+		} catch (Exception ex) {
+			LuaScript.Dispose();
+			LuaScript = null;
+		}
+	}
 }
