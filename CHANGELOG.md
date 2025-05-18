@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.60] - 2025-05-18 (Beta)
+
+- Update SongUnlockables.db3
+
 ## [0.6.0.59] - 2025-05-09 (Beta)
 
 - [Feat] Add .optksc as a file format, for creating shortcuts pointing to existing songs
