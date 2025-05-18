@@ -6,6 +6,7 @@ namespace FDK;
 
 public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	public const int MouseButtonCount = 8;
+	public (int x, int y) Position = (-1, -1);
 
 	public CInputMouse(IMouse mouse) : base(12) {
 		this.Device = mouse;
@@ -44,6 +45,6 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 	}
 
 	private void Mouse_MouseMove(IMouse mouse, Vector2 vector2) {
-
+		Position = ((int)mouse.Position.X, (int)mouse.Position.Y);
 	}
 }

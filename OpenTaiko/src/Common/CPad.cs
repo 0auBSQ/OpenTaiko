@@ -84,7 +84,8 @@ public class CPad {
 		return list;
 	}
 
-	public bool bPressed(EInstrumentPad part, EPad pad) {
+	public bool bPressed(EInstrumentPad part, EPad pad) { return bPressed(part, (EKeyConfigPad)pad); }
+	public bool bPressed(EInstrumentPad part, EKeyConfigPad pad) {
 		if (part == EInstrumentPad.Unknown) {
 			return false;
 		}
@@ -151,7 +152,8 @@ public class CPad {
 		return this.bPressed(EInstrumentPad.Guitar, pad) || this.bPressed(EInstrumentPad.Bass, pad);
 	}
 
-	public bool IsPressing(EInstrumentPad part, EPad pad) {
+	public bool IsPressing(EInstrumentPad part, EPad pad) { return IsPressing(part, (EKeyConfigPad)pad); }
+	public bool IsPressing(EInstrumentPad part, EKeyConfigPad pad) {
 		if (part == EInstrumentPad.Unknown) {
 			return false;
 		}
@@ -202,6 +204,102 @@ public class CPad {
 
 	public bool IsPressingGB(EPad pad) {
 		return this.IsPressing(EInstrumentPad.Guitar, pad) || this.IsPressing(EInstrumentPad.Bass, pad);
+	}
+
+	public bool IsReleasing(EInstrumentPad part, EPad pad) { return IsReleasing(part, (EKeyConfigPad)pad); }
+	public bool IsReleasing(EInstrumentPad part, EKeyConfigPad pad) {
+		if (part == EInstrumentPad.Unknown) {
+			return false;
+		}
+
+		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+		for (int i = 0; i < stkeyassignArray.Length; i++) {
+			switch (stkeyassignArray[i].InputDevice) {
+				case EInputDevice.Keyboard:
+					if (!this.inputManager.Keyboard.KeyReleasing(stkeyassignArray[i].Code)) {
+						return false;
+					}
+					break;
+
+				case EInputDevice.Joypad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) break;
+						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (!device.KeyReleasing(stkeyassignArray[i].Code))
+						return false;
+
+						break;
+					}
+
+				case EInputDevice.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
+							break;
+						}
+						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (!device.KeyReleasing(stkeyassignArray[i].Code))
+							return false;
+
+						break;
+					}
+				case EInputDevice.Mouse:
+					if (!this.inputManager.Mouse.KeyReleasing(stkeyassignArray[i].Code)) {
+						return false;
+					}
+					break;
+			}
+		}
+		return true;
+	}
+
+	public bool IsReleased(EInstrumentPad part, EPad pad) { return IsReleased(part, (EKeyConfigPad)pad); }
+	public bool IsReleased(EInstrumentPad part, EKeyConfigPad pad) {
+		if (part == EInstrumentPad.Unknown) {
+			return false;
+		}
+
+		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+		for (int i = 0; i < stkeyassignArray.Length; i++) {
+			switch (stkeyassignArray[i].InputDevice) {
+				case EInputDevice.Keyboard:
+					if (this.inputManager.Keyboard.KeyReleased(stkeyassignArray[i].Code))
+						return true;
+					break;
+
+				case EInputDevice.MIDIInput: {
+						IInputDevice device2 = this.inputManager.MidiIn(stkeyassignArray[i].ID);
+						if (device2 == null) break;
+						if (device2.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case EInputDevice.Joypad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (device.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case EInputDevice.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (device.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case EInputDevice.Mouse:
+					if (this.inputManager.Mouse.KeyReleased(stkeyassignArray[i].Code))
+						return true;
+					break;
+			}
+		}
+		return false;
 	}
 
 	#region [ private ]

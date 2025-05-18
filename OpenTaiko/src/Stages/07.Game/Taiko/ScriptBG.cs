@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using FDK;
+using Newtonsoft.Json.Linq;
 using NLua;
 
 namespace OpenTaiko;
@@ -12,6 +14,7 @@ class ScriptBGFunc {
 		Textures = texs;
 		DirPath = dirPath;
 	}
+
 	public (int x, int y) DrawText(double x, double y, string text) {
 		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
 	}
@@ -22,6 +25,7 @@ class ScriptBGFunc {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
 		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+		Textures[fileName]?.SetTextureWrapMode(Silk.NET.OpenGLES.TextureWrapMode.Repeat);
 	}
 	public void DrawGraph(double x, double y, string fileName) {
 		Textures[fileName]?.t2D描画((int)x, (int)y);
@@ -108,7 +112,10 @@ class ScriptBGFunc {
 	}
 }
 class ScriptBG : IDisposable {
-	public Dictionary<string, CTexture> Textures;
+	public Dictionary<string, CTexture> Textures = [];
+	public List<CTexture> TextureList = [];
+	public List<LuaSound> SoundList = [];
+	public List<LuaText> TextList = [];
 
 	protected Lua LuaScript;
 
@@ -121,15 +128,19 @@ class ScriptBG : IDisposable {
 	protected LuaFunction LuaDraw;
 
 	public ScriptBG(string filePath) {
-		Textures = new Dictionary<string, CTexture>();
-
 		if (!File.Exists(filePath)) return;
 
 		LuaScript = new Lua();
 		LuaScript.State.Encoding = Encoding.UTF8;
 		LuaSecurity.Secure(LuaScript);
 
-		LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
+		string path = Path.GetDirectoryName(filePath) ?? "";
+		LuaScript["func"] = new ScriptBGFunc(Textures, path);
+		LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, path);
+		LuaScript["SOUND"] = new LuaSoundFunc(SoundList, path);
+		LuaScript["TEXT"] = new LuaTextFunc(TextList, path);
+		LuaScript["CONFIG"] = new LuaConfigFunc(path);
+		LuaScript["INPUT"] = new LuaInputFunc();
 
 
 		try {
@@ -160,16 +171,31 @@ class ScriptBG : IDisposable {
 		LuaScript = null;
 	}
 	public void Dispose() {
-		List<CTexture> texs = new List<CTexture>();
-		foreach (var tex in Textures.Values) {
-			texs.Add(tex);
-		}
+		List<CTexture> texs = Textures.Values.ToList();
 		for (int i = 0; i < texs.Count; i++) {
 			var tex = texs[i];
 			OpenTaiko.tテクスチャの解放(ref tex);
 		}
 
+		for (int i = 0; i < TextureList.Count; i++) {
+			var luatex = TextureList[i];
+			OpenTaiko.tDisposeSafely(ref luatex);
+		}
+
+		for (int i = SoundList.Count - 1; i >= 0; i--) {
+			var sound = SoundList[i];
+			OpenTaiko.tDisposeSafely(ref sound);
+		}
+
+		for (int i = TextList.Count - 1; i >= 0; i--) {
+			var text = TextList[i];
+			OpenTaiko.tDisposeSafely(ref text);
+		}
+
 		Textures.Clear();
+		TextureList.Clear();
+		SoundList.Clear();
+		TextList.Clear();
 
 		LuaScript?.Dispose();
 

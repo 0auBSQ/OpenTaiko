@@ -49,10 +49,10 @@ public class CFontRenderer : IDisposable {
 	[Flags]
 	public enum FontStyle {
 		Regular = 0,
-		Bold,
-		Italic,
-		Underline,
-		Strikeout
+		Bold = 1,
+		Italic = 2,
+		Underline = 4,
+		Strikeout = 8
 	}
 
 	public static string DefaultFontName {

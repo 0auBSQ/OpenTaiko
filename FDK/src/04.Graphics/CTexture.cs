@@ -257,6 +257,7 @@ public class CTexture : IDisposable {
 		set;
 	}
 
+	//public BlendType blendType = BlendType.Normal;
 	public bool b加算合成 {
 		get;
 		set;
@@ -316,6 +317,12 @@ public class CTexture : IDisposable {
 	/// </summary>
 	public static float f画面比率 = 1.0f;
 
+	private TextureWrapMode _wrapMode = TextureWrapMode.ClampToEdge;
+	public TextureWrapMode WrapMode {
+		get { return _wrapMode; }
+		set { SetTextureWrapMode(value); }
+	}
+
 	public uint Pointer { get; internal set; }
 
 	// Constructor
@@ -341,9 +348,9 @@ public class CTexture : IDisposable {
 		//			this._txData = null;
 	}
 
-	public void UpdateTexture(CTexture texture, int n幅, int n高さ) {
+	public void UpdateTexture(CTexture texture, int width, int height) {
 		Pointer = texture.Pointer;
-		this.sz画像サイズ = new Size(n幅, n高さ);
+		this.sz画像サイズ = new Size(width, height);
 		this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
 		this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
 	}
@@ -434,8 +441,10 @@ public class CTexture : IDisposable {
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
@@ -482,6 +491,16 @@ public class CTexture : IDisposable {
 	public void tSetScale(float x, float y) {
 		vcScaleRatio.X = x;
 		vcScaleRatio.Y = y;
+	}
+
+	public void SetTextureWrapMode(TextureWrapMode wrapMode) {
+		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
+		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
+
+		Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+		_wrapMode = wrapMode;
 	}
 
 	// メソッド

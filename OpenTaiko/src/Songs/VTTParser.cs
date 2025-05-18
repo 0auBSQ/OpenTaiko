@@ -442,7 +442,7 @@ public class VTTParser : IDisposable {
 			max_height += height[i];
 		}
 
-		SKBitmap lyrictex = new SKBitmap(max_width > 0 ? max_width : 1, max_height - rubyheightoffset.Sum() > 0 ? max_height - rubyheightoffset.Sum() : 1); // Prevent exception with 0x0y Bitmap
+		SKBitmap lyrictex = new SKBitmap(Math.Max(max_width, 1), Math.Max(max_height - rubyheightoffset.Sum(), 1)); // Prevent exception with 0x0y Bitmap
 
 		if (textures.Count > 0) {
 			using (SKCanvas canvas = new SKCanvas(lyrictex)) {
