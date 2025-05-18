@@ -184,7 +184,6 @@ internal class CStageTitle : CStage {
 
 				// 1st step (Save file loading)
 				if (!bSaveIsLoading) {
-
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
 						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
 						// Hit 1P save
@@ -875,7 +874,7 @@ internal class CStageTitle : CStage {
 	#region [ private ]
 	//-----------------
 
-	private ScriptBG Background;
+	public ScriptBG Background;
 
 	// Directly propose the different game options if the save file is already loaded, go back to save file select by pressing "Escape"
 	private void SkipSaveFileStep() {

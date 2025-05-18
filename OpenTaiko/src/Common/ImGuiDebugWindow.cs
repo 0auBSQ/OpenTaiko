@@ -23,7 +23,7 @@ public static class ImGuiDebugWindow {
 	private static long memoryReadTimer = 0;
 	private static long pagedmemory = 0;
 	private static int textureMemoryUsage = 0;
-	private static int currentStageMemoryUsage = 0;
+	private static long currentStageMemoryUsage = 0;
 
 	private static int sortType = -1;
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
@@ -135,17 +135,21 @@ public static class ImGuiDebugWindow {
 		if (ImGui.BeginTabItem("Inputs")) {
 
 			ImGui.Text("Total Inputs Found: " + OpenTaiko.InputManager.InputDevices.Count());
-
-			ImGui.NewLine();
-
-			ImGui.Text("Input Count:");
-			ImGui.Indent();
+			ImGui.Text("Device Count:");
+			ImGui.Columns(3);
 			ImGui.Text("Keyboard: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Keyboard));
+			ImGui.NextColumn();
 			ImGui.Text("Mouse: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Mouse));
+			ImGui.NextColumn();
 			ImGui.Text("Gamepad: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Gamepad));
+			ImGui.NextColumn();
 			ImGui.Text("Joystick: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Joystick));
+			ImGui.NextColumn();
 			ImGui.Text("MIDI: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.MidiIn));
+			ImGui.NextColumn();
 			ImGui.Text("Unknown: " + OpenTaiko.InputManager.InputDevices.Count(device => device.CurrentType == InputDeviceType.Unknown));
+			ImGui.NextColumn();
+			ImGui.Columns(0);
 
 			foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
 				if (ImGui.TreeNodeEx(device.CurrentType.ToString() + " (ID " + device.ID + " / Name: " + device.Name + " / GUID: " + device.GUID + ")")) {
@@ -194,6 +198,30 @@ public static class ImGuiDebugWindow {
 					}
 					ImGui.TreePop();
 				}
+			}
+
+			if (ImGui.TreeNodeEx("Current Keybinds (via. EKeyConfigPart)")) {
+
+				foreach (var instrument in Enum.GetValues<EKeyConfigPart>()) {
+					if (instrument == EKeyConfigPart.Unknown) continue;
+
+					if (ImGui.TreeNodeEx(instrument.ToString())) {
+						foreach (var pad in Enum.GetValues<EPad>()) {
+							if (pad == EPad.Unknown || pad == EPad.Max) continue;
+							if (ImGui.TreeNodeEx(pad + "###" + instrument + "_" + pad)) {
+								CConfigIni.CKeyAssign.STKEYASSIGN[] info = OpenTaiko.ConfigIni.KeyAssign[(int)instrument][(int)pad];
+								for (int i = 0; i < info.Length; i++) {
+									ImGui.Text($"[{i}] (Input Device: {info[i].InputDevice})");
+									ImGui.Text("Code: " + info[i].Code + " / Device ID: " + info[i].ID);
+								}
+								ImGui.TreePop();
+							}
+						}
+						ImGui.TreePop();
+					}
+				}
+
+				ImGui.TreePop();
 			}
 
 			ImGui.EndTabItem();
@@ -567,6 +595,10 @@ public static class ImGuiDebugWindow {
 
 							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
 							var dtx = OpenTaiko.GetTJA(i);
+							if (dtx == null) {
+								ImGui.TreePop();
+								continue;
+							}
 
 							switch (game_difficulty) {
 								case Difficulty.Dan:
@@ -657,73 +689,75 @@ public static class ImGuiDebugWindow {
 			}
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
-				#region Game
-				case CStage.EStage.Game:
-
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBackground.UpScript,
-						"Up Background", "TEXTURE_LUA_UPBG");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBackground.DownScript,
-						"Down Background", "TEXTURE_LUA_DOWNBG");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actMob.MobScript,
-						"Mob", "TEXTURE_LUA_MOB");
-					currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
-						"Kusudama", "TEXTURE_LUA_KUSUDAMA");
-
-					#region Endings
-					switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
-						case Difficulty.Tower:
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
-								"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PassScript,
-								"Tower Cleared", "TEXTURE_LUA_TOWERCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_FullComboScript,
-								"Tower Full Combo", "TEXTURE_LUA_TOWERFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PerfectScript,
-								"Tower Perfect Combo", "TEXTURE_LUA_TOWERPFC");
-							break;
-						case Difficulty.Dan:
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_FailScript,
-								"Dan Clear Failed", "TEXTURE_LUA_DANFAILED");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PassScript,
-								"Dan Red Clear", "TEXTURE_LUA_DANCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_FullComboScript,
-								"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PerfectScript,
-								"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PassScript,
-								"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_FullComboScript,
-								"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
-							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PerfectScript,
-								"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
-							break;
-						default:
-							if (OpenTaiko.ConfigIni.bAIBattleMode) {
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AILoseScript,
-									"AI Clear Failed", "TEXTURE_LUA_AIFAILED");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWinScript,
-									"AI Cleared", "TEXTURE_LUA_AICLEAR");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_FullComboScript,
-									"AI Full Combo", "TEXTURE_LUA_AIFC");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_PerfectScript,
-									"AI Perfect Combo", "TEXTURE_LUA_AIPFC");
-							} else {
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.FailedScript,
-									"Clear Failed", "TEXTURE_LUA_GAMEFAILED");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.ClearScript,
-									"Cleared", "TEXTURE_LUA_GAMECLEAR");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.FullComboScript,
-									"Full Combo", "TEXTURE_LUA_GAMEFC");
-								currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.PerfectComboScript,
-									"Perfect Combo", "TEXTURE_LUA_GAMEPFC");
-							}
-							break;
+				case CStage.EStage.Title: {
+						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageTitle.Background,
+							"Background", "TEXTURE_LUA_TITLEBG");
+						break;
 					}
-					#endregion
+				case CStage.EStage.Game: {
 
-					#endregion
+						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.UpScript,
+							"Up Background", "TEXTURE_LUA_UPBG");
+						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.DownScript,
+							"Down Background", "TEXTURE_LUA_DOWNBG");
+						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actMob.MobScript,
+							"Mob", "TEXTURE_LUA_MOB");
+						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
+							"Kusudama", "TEXTURE_LUA_KUSUDAMA");
 
-					break;
+						#region Endings
+						switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+							case Difficulty.Tower:
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
+									"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PassScript,
+									"Tower Cleared", "TEXTURE_LUA_TOWERCLEAR");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_FullComboScript,
+									"Tower Full Combo", "TEXTURE_LUA_TOWERFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PerfectScript,
+									"Tower Perfect Combo", "TEXTURE_LUA_TOWERPFC");
+								break;
+							case Difficulty.Dan:
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_FailScript,
+									"Dan Clear Failed", "TEXTURE_LUA_DANFAILED");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PassScript,
+									"Dan Red Clear", "TEXTURE_LUA_DANCLEAR");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_FullComboScript,
+									"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PerfectScript,
+									"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PassScript,
+									"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_FullComboScript,
+									"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PerfectScript,
+									"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
+								break;
+							default:
+								if (OpenTaiko.ConfigIni.bAIBattleMode) {
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AILoseScript,
+										"AI Clear Failed", "TEXTURE_LUA_AIFAILED");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWinScript,
+										"AI Cleared", "TEXTURE_LUA_AICLEAR");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_FullComboScript,
+										"AI Full Combo", "TEXTURE_LUA_AIFC");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_PerfectScript,
+										"AI Perfect Combo", "TEXTURE_LUA_AIPFC");
+								} else {
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FailedScript,
+										"Clear Failed", "TEXTURE_LUA_GAMEFAILED");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.ClearScript,
+										"Cleared", "TEXTURE_LUA_GAMECLEAR");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FullComboScript,
+										"Full Combo", "TEXTURE_LUA_GAMEFC");
+									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.PerfectComboScript,
+										"Perfect Combo", "TEXTURE_LUA_GAMEPFC");
+								}
+								break;
+							}
+						#endregion
+						break;
+					}
 			}
 
 			ImGui.Text("Script.lua Tex Memory Usage: " + GetMemAllocationInMegabytes(currentStageMemoryUsage) + "MB");
@@ -738,21 +772,31 @@ public static class ImGuiDebugWindow {
 	private static void CTexturePopup(CTexture texture, string label) {
 		if (ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.Framed)) {
 
-			ImGui.BeginDisabled();
 			ImGui.InputText("Path", ref reloadTexPath, 2048);
-			if (ImGui.Button("Reload via. Path (To-do)")) {
-				// To-do
+			if (ImGui.Button($"Update via. Path###TEXTURE_UPDATE_{label}")) {
+				CTexture new_tex = new CTexture(reloadTexPath, false);
+				texture.UpdateTexture(new_tex, new_tex.sz画像サイズ.Width, new_tex.sz画像サイズ.Height);
 			}
-			ImGui.EndDisabled();
+			if (texture != null) {
+				if (ImGui.BeginCombo($"Texture Wrap Mode", texture.WrapMode.ToString())) {
+					foreach (var mode in Enum.GetValues<Silk.NET.OpenGLES.TextureWrapMode>().Distinct()) {
+						if (ImGui.Selectable(mode.ToString(), texture.WrapMode == mode)) {
+							texture.SetTextureWrapMode(mode);
+						}
+					}
+					ImGui.EndCombo();
+				}
+			}
 
 			ImGui.TreePop();
 		}
 		if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNone)) {
 			if (ImGui.BeginItemTooltip()) {
-				if (DrawCTextureForImGui(texture, 800, 800)) {
+				if (texture != null) {
+					DrawForImGui(texture, 800, 800);
 					ImGui.Text("Pointer: " + texture.Pointer);
 					ImGui.Text("Size: x" + texture.szTextureSize.Width + ",y" + texture.szTextureSize.Height);
-					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}", GetTextureMemAllocationInMegabytes(texture)) + "MB");
+					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}", GetMemAllocationInMegabytes(GetTextureMemAllocation(texture))) + "MB");
 				} else {
 					ImGui.TextDisabled("Texture is not loaded.");
 				}
@@ -760,9 +804,9 @@ public static class ImGuiDebugWindow {
 			}
 		}
 	}
-	private static int CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
+	private static long CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
 		if (textureList == null) return 0;
-		int memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
+		long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
 		if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
 			int index = 0;
@@ -773,26 +817,19 @@ public static class ImGuiDebugWindow {
 		}
 		return memoryCount;
 	}
-	private static int CTextureListPopup(ScriptBG script, string label, string id) {
-		return script != null ? CTextureListPopup(script.Textures.Values, label, id) : 0;
+	private static long TextureListPopup(ScriptBG script, string label, string id) {
+		if (script == null) return 0;
+		return CTextureListPopup([.. script.Textures.Values, .. script.TextureList], label, id);
 	}
-	private static bool DrawCTextureForImGui(CTexture texture) {
-		if (texture == null) return false;
-		return DrawCTextureForImGui(texture,
-			new Vector2(texture.szTextureSize.Width, texture.szTextureSize.Height),
-			new Vector2(0, 0), new Vector2(1, 1));
-	}
-	private static bool DrawCTextureForImGui(CTexture texture, int max_width, int max_height) {
-		if (texture == null) return false;
-		return DrawCTextureForImGui(texture, 0, 0,
+	private static void DrawForImGui(CTexture texture, int max_width, int max_height) {
+		DrawForImGui(texture, 0, 0,
 			Math.Min(texture.szTextureSize.Width, max_width), Math.Min(texture.szTextureSize.Height, max_height));
 	}
-	private static bool DrawCTextureForImGui(CTexture texture, int x, int y, int width, int height) {
-		return DrawCTextureForImGui(texture, new Rectangle(x, y, width, height));
+	private static void DrawForImGui(CTexture texture, int x, int y, int width, int height) {
+		DrawForImGui(texture, new Rectangle(x, y, width, height));
 	}
-	private static bool DrawCTextureForImGui(CTexture texture, Rectangle rect) {
-		if (texture == null) return false;
-		return DrawCTextureForImGui(texture,
+	private static void DrawForImGui(CTexture texture, Rectangle rect) {
+		DrawForImGui((nint)texture.Pointer,
 			new Vector2(rect.Width, rect.Height),
 			new Vector2((float)rect.X / texture.szTextureSize.Width, (float)rect.Y / texture.szTextureSize.Height),
 			new Vector2((float)rect.Right / texture.szTextureSize.Width, (float)rect.Bottom / texture.szTextureSize.Height));
@@ -800,30 +837,22 @@ public static class ImGuiDebugWindow {
 	/// <param name="image_size">Must be in pixels</param>
 	/// <param name="pos">Value is typically between 0.0f and 1.0f</param>
 	/// <param name="size">Value is typically between 0.0f and 1.0f</param>
-	private static bool DrawCTextureForImGui(CTexture texture, Vector2 image_size, Vector2 pos, Vector2 size) {
-		if (texture == null) return false;
-		ImGui.Image((nint)texture.Pointer, image_size, pos, size);
-		return true;
+	private static void DrawForImGui(nint texture, Vector2 image_size, Vector2 pos, Vector2 size) {
+		ImGui.Image(texture, image_size, pos, size);
 	}
 	#endregion
 
 	#region Helpers
-	private static float GetMemAllocationInMegabytes(int bytes) { return (float)bytes / (1024 * 1024); }
-	private static float GetTextureMemAllocationInMegabytes(CTexture texture) {
-		return (float)GetTextureMemAllocation(texture) / (1024 * 1024);
-	}
-	private static int GetTextureMemAllocation(CTexture texture) {
+	private static float GetMemAllocationInMegabytes(long bytes) { return (float)bytes / (1024 * 1024); }
+	private static long GetTextureMemAllocation(CTexture? texture) {
 		return texture != null ? (texture.szTextureSize.Width * texture.szTextureSize.Height * 4) : 0;
 	}
 	private static Vector4 ColorToVector4(Color color) {
 		return new Vector4((float)color.R / 255, (float)color.G / 255, (float)color.B / 255, (float)color.A / 255);
 	}
 
-	private static int GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture> textureList) {
+	private static long GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture?> textureList) {
 		return textureList.Where(tex => tex != null).Sum(GetTextureMemAllocation);
-	}
-	private static int GetTotalMemoryUsageFromCTextureList(ScriptBG script) {
-		return script != null ? GetTotalMemoryUsageFromCTextureList(script.Textures.Values) : 0;
 	}
 	#endregion
 

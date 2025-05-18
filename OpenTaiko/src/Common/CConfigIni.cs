@@ -878,6 +878,18 @@ internal class CConfigIni : INotifyPropertyChanged {
 			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
 			return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.Code));
 		}
+		public bool KeyIsPressing(STKEYASSIGN[] pad) {
+			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
+			return OpenTaiko.InputManager.Keyboard.KeyPressing(pad.ToList().ConvertAll<int>(key => key.Code));
+		}
+		public bool KeyIsReleased(STKEYASSIGN[] pad) {
+			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
+			return OpenTaiko.InputManager.Keyboard.KeyReleased(pad.ToList().ConvertAll<int>(key => key.Code));
+		}
+		public bool KeyIsReleasing(STKEYASSIGN[] pad) {
+			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
+			return OpenTaiko.InputManager.Keyboard.KeyReleasing(pad.ToList().ConvertAll<int>(key => key.Code));
+		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STKEYASSIGN {

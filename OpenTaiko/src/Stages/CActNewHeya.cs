@@ -478,7 +478,7 @@ class CActNewHeya : CActivity {
 									&& !OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[index])) {
 									OpenTaiko.Tx.NewHeya_Lock?.t2D描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[1]);
 
-									if (this.ttkInfoSection != null)
+									if (this.ttkInfoSection != null && index == CurrentIndex)
 										TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
 											.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
 								}
