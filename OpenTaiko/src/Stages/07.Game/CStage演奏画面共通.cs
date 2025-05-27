@@ -1241,9 +1241,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 							else
 								this.nHand[nPlayer] = 0;
 
-							if (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HBScroll))
-								pChip.fBMSCROLLTime -= OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * -0.05;
-
 							OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Red);
 							//CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( pChip.nチャンネル番号 == 0x15 ? 1 : 3, nPlayer );
 							OpenTaiko.stageGameScreen.FlyingNotes.Start(pChip.nChannelNo == 0x15 ? 1 : 3, nPlayer, true);
