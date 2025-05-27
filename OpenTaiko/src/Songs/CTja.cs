@@ -2694,7 +2694,13 @@ internal class CTja : CActivity {
 								this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
 							}
 
-							InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
+							if (nObjectNum < 0) {
+								Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
+									$"{nameof(CTja)}: Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
+									: $"{nameof(CTja)}: Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}");
+							} else {
+								InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
+							}
 						}
 					}
 
