@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.62] - 2025-05-27 (Beta)
+
+- HB/BMScroll roll fix
+
 ## [0.6.0.61] - 2025-05-19 (Beta)
 
 - Update NameplatesUnlockables.db3
