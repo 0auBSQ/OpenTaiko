@@ -1490,9 +1490,9 @@ internal class CTja : CActivity {
 				}
 				for (int i = 0; i < str命令消去譜面.Count; i++) {
 					if (str命令消去譜面[i].IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(str命令消去譜面[i])) {
-						divPerMeasure += str命令消去譜面[i].Length;
+						divPerMeasure += str命令消去譜面[i].Count(c => !char.IsWhiteSpace(c));
 					} else {
-						this.divsPerMeasureAllBranches.Add(divPerMeasure + str命令消去譜面[i].Length - 1);
+						this.divsPerMeasureAllBranches.Add(divPerMeasure + str命令消去譜面[i].Count(c => !char.IsWhiteSpace(c)) - 1);
 						divPerMeasure = 0;
 					}
 				}
@@ -2653,6 +2653,9 @@ internal class CTja : CActivity {
 						this.n現在の小節数++;
 						this.b小節線を挿入している = false;
 						return;
+					}
+					if (string.IsNullOrWhiteSpace(InputText.Substring(n, 1))) {
+						continue; // skip whitespaces
 					}
 
 					if (InputText.Substring(0, 1) == "F") {
