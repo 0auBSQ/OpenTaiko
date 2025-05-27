@@ -1392,15 +1392,6 @@ internal class CTja : CActivity {
 		nDifficulty = difficulty;
 		if (!String.IsNullOrEmpty(strInput)) //空なら通さない
 		{
-			//2017.02.03 DD ヘッダ内にある命令以外の文字列を削除
-			var startIndex = strInput.IndexOf("#START");
-			if (startIndex < 0) {
-				Trace.TraceWarning($"#START命令が少なくとも1つは必要です。 ({strFullPath})");
-			}
-			string strInputHeader = strInput.Remove(startIndex);
-			strInput = strInput.Remove(0, startIndex);
-			strInput = strInputHeader + "\n" + strInput;
-
 			//どうせ使わないので先にSplitしてコメントを削除。
 			var strSplitした譜面 = (string[])this.str改行文字を削除する(strInput, 1);
 
