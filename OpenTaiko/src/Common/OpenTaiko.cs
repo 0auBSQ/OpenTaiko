@@ -270,6 +270,12 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	// Unlockables factory
+	public static CUnlockConditionFactory UnlockConditionFactory {
+		get;
+		private set;
+	}
+
 
 	public static int GetActualPlayer(int player) {
 		if (SaveFile == 0 || player > 1)
@@ -420,29 +426,27 @@ internal class OpenTaiko : Game {
 			else if (OperatingSystem.IsMacOS()) {
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
 				ConfigIni.nGraphicsDeviceType = 3;
-			}
-			else if (OperatingSystem.IsLinux()) {
+			} else if (OperatingSystem.IsLinux()) {
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
 				ConfigIni.nGraphicsDeviceType = 2;
 			}
-		}
-		else {
+		} else {
 			switch (ConfigIni.nGraphicsDeviceType) {
-			case 0:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
-				break;
-			case 1:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
-				break;
-			case 2:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
-				break;
-			case 3:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
-				break;
+				case 0:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+					break;
+				case 1:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+					break;
+				case 2:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+					break;
+				case 3:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+					break;
 			}
 		}
-		
+
 
 		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
@@ -1498,6 +1502,11 @@ internal class OpenTaiko : Game {
 
 		VisualLogManager = new CVisualLogManager();
 
+		#region [ Unlock factory initialisation ]
+
+		UnlockConditionFactory = new CUnlockConditionFactory();
+
+		#endregion
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
