@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.63] - 2025-05-28 (Beta)
+
+- Refactor code handling Unlockables
+
 ## [0.6.0.62] - 2025-05-27 (Beta)
 
 - HB/BMScroll roll fix
