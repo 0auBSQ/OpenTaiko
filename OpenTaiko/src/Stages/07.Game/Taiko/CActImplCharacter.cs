@@ -151,7 +151,10 @@ internal class CActImplCharacter : CActivity {
 			ctKusuIn[i].Tick();
 
 			bool endAnime = nNowCharaCounter[i] >= 1;
-			nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * (nCharaFrameCount[i] + 1));
+			if (endAnime)
+				nNowCharaFrame[i] = nCharaFrameCount[i]; // max, to prevent a huge-value counter from overflowing the int
+			else
+				nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * (nCharaFrameCount[i] + 1));
 			nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
 
 			if (eNowAnime[i] != Anime.None) {
@@ -370,8 +373,11 @@ internal class CActImplCharacter : CActivity {
 						}
 						break;
 					case Anime.Kusudama_Miss: {
-							nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * 2 * (nCharaFrameCount[i] + 1));
-							nNowCharaFrame[i] = Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]);
+							if (endAnime)
+								nNowCharaFrame[i] = nCharaFrameCount[i]; // max, to prevent a huge-value counter from overflowing the int
+							else
+								nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * 2 * (nCharaFrameCount[i] + 1));
+							nNowCharaFrame[i] = Math.Clamp(nNowCharaFrame[i], 0, nCharaFrameCount[i]);
 							updateBalloon();
 						}
 						break;
