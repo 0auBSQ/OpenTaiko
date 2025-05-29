@@ -1250,38 +1250,33 @@ internal class CTja : CActivity {
 	/// <paramref name="nMode"/> == 0: preserve notechart symbols
 	/// <paramref name="nMode"/> == 1: preserve notechart symbols, commands, and EXAM headers
 	/// </summary>
-	/// <returns>TJA lines without certain commands and headers, as a List<> for preventing massive copy</returns>
-	private List<string> tコマンド行を削除したTJAを返す(string[] input, int nMode) {
-		List<string> sb = [];
+	/// <returns>A single TJA line without certain commands and headers, or null if nothing left</returns>
+	private static string? RemoveCommandFromTJALine(string input, int nMode) {
+		// 18/11/11 AioiLight 譜面にSpace、スペース、Tab等が入っているとおかしくなるので修正。
+		// 多分コマンドもスペースが抜かれちゃっているが、コマンド行を除く譜面を返すので大丈夫(たぶん)。
+		string line = input.Trim();
 
-		for (int n = 0; n < input.Length; n++) {
-			// 18/11/11 AioiLight 譜面にSpace、スペース、Tab等が入っているとおかしくなるので修正。
-			// 多分コマンドもスペースが抜かれちゃっているが、コマンド行を除く譜面を返すので大丈夫(たぶん)。
-			string line = input[n].Trim();
-
-			if (nMode == 0) {
-				if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
-					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-						//A～Fで始まる命令が削除されない不具合の対策
-					} else {
-						sb.Add(line);
-					}
+		if (nMode == 0) {
+			if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
+				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
+					//A～Fで始まる命令が削除されない不具合の対策
+				} else {
+					return line;
 				}
-			} else if (nMode == 1) {
-				if (!string.IsNullOrEmpty(line) &&
-					(line.Substring(0, 1) == "#"
-					 || line.StartsWith("EXAM")
-					 || NotesManager.FastFlankedParsing(line))) {
-					if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-						//A～Fで始まる命令が削除されない不具合の対策
-					} else {
-						sb.Add(line);
-					}
+			}
+		} else if (nMode == 1) {
+			if (!string.IsNullOrEmpty(line) &&
+				(line.Substring(0, 1) == "#"
+					|| line.StartsWith("EXAM")
+					|| NotesManager.FastFlankedParsing(line))) {
+				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
+					//A～Fで始まる命令が削除されない不具合の対策
+				} else {
+					return line;
 				}
 			}
 		}
-
-		return sb;
+		return null;
 	}
 
 	/// <summary>
@@ -1424,16 +1419,10 @@ internal class CTja : CActivity {
 			#endregion
 
 			//指定したコースの譜面の命令を消去する。
-			strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
+			var strCourse = strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
 				strSplitした譜面[n読み込むコース],
 				OpenTaiko.ConfigIni.nPlayerCount > 1 ? (this.nPlayerSide + 1) : 0,
 				this.strFullPath);
-
-			//命令をすべて消去した譜面
-			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
-
-
-			var str命令消去譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 0);
 
 			//ここで1行の文字数をカウント。配列にして返す。
 			int divPerMeasure = 0;
@@ -1447,17 +1436,27 @@ internal class CTja : CActivity {
 						this.listBalloon_Branch_数値管理[i] = 0;
 				}
 
-				for (int i = 0; i < strSplit読み込むコース.Length; i++) {
-					if (!String.IsNullOrEmpty(strSplit読み込むコース[i])) {
-						this.t難易度別ヘッダ(strSplit読み込むコース[i]);
+				{
+					using StringReader reader = new(strCourse);
+					for (string? line; (line = reader.ReadLine()) != null;) {
+						if (!String.IsNullOrEmpty(line)) {
+							this.t難易度別ヘッダ(line);
+						}
 					}
 				}
-				for (int i = 0; i < str命令消去譜面.Count; i++) {
-					if (str命令消去譜面[i].IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(str命令消去譜面[i])) {
-						divPerMeasure += str命令消去譜面[i].Count(c => !char.IsWhiteSpace(c));
-					} else {
-						this.divsPerMeasureAllBranches.Add(divPerMeasure + str命令消去譜面[i].Count(c => !char.IsWhiteSpace(c)) - 1);
-						divPerMeasure = 0;
+
+				{
+					using StringReader reader = new(strCourse);
+					for (string? line; (line = reader.ReadLine()) != null;) {
+						line = RemoveCommandFromTJALine(line, 0);
+						if (String.IsNullOrEmpty(line))
+							continue;
+						if (line.IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(line)) {
+							divPerMeasure += line.Count(c => !char.IsWhiteSpace(c));
+						} else {
+							this.divsPerMeasureAllBranches.Add(divPerMeasure + line.Count(c => !char.IsWhiteSpace(c)) - 1);
+							divPerMeasure = 0;
+						}
 					}
 				}
 				this.divsPerMeasureAllBranches.Add(divPerMeasure); // after last comma
@@ -1468,13 +1467,18 @@ internal class CTja : CActivity {
 
 			//読み込み部分本体に渡す譜面を作成。
 			//0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
-			var strSplitした後の譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 1);
 			this.n現在の小節数 = 1;
 			this.iNowMeasureAllBranches = 0;
 			try {
-				for (int i = 0; strSplitした後の譜面.Count > i; i++) {
-					nNowReadLine++;
-					this.t入力_行解析譜面_V4(strSplitした後の譜面[i]);
+				{
+					using StringReader reader = new(strCourse);
+					for (string? line; (line = reader.ReadLine()) != null;) {
+						line = RemoveCommandFromTJALine(line, 1);
+						if (String.IsNullOrEmpty(line))
+							continue;
+						nNowReadLine++;
+						this.t入力_行解析譜面_V4(line);
+					}
 				}
 
 				// Retrieve all the global exams (non individual) at the end
@@ -3502,34 +3506,34 @@ internal class CTja : CActivity {
 	private void LyricFileParser(string strFilePath, int ordnumber)//lrcファイルのパース用
 	{
 		string str = CJudgeTextEncoding.ReadTextFile(strFilePath);
-		var strSplit後 = str.Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 		Regex timeRegex = new Regex(@"^(\[)(\d{2})(:)(\d{2})([:.])(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		Regex timeRegexO = new Regex(@"^(\[)(\d{2})(:)(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		List<long> list;
-		for (int i = 0; i < strSplit後.Length; i++) {
+		using StringReader reader = new(str);
+		for (string? line; (line = reader.ReadLine()) != null;) {
 			list = new List<long>();
-			if (!String.IsNullOrEmpty(strSplit後[i])) {
-				if (strSplit後[i].StartsWith("[")) {
-					Match timestring = timeRegex.Match(strSplit後[i]), timestringO = timeRegexO.Match(strSplit後[i]);
+			if (!String.IsNullOrEmpty(line)) {
+				if (line.StartsWith("[")) {
+					Match timestring = timeRegex.Match(line), timestringO = timeRegexO.Match(line);
 					while (timestringO.Success || timestring.Success) {
 						long time;
 						if (timestring.Success) {
 							time = Int32.Parse(timestring.Groups[2].Value) * 60000 + Int32.Parse(timestring.Groups[4].Value) * 1000 + Int32.Parse(timestring.Groups[6].Value) * 10;
-							strSplit後[i] = strSplit後[i].Remove(0, 10);
+							line = line.Remove(0, 10);
 						} else if (timestringO.Success) {
 							time = Int32.Parse(timestringO.Groups[2].Value) * 60000 + Int32.Parse(timestringO.Groups[4].Value) * 1000;
-							strSplit後[i] = strSplit後[i].Remove(0, 7);
+							line = line.Remove(0, 7);
 						} else
 							break;
 						list.Add(time);
-						timestring = timeRegex.Match(strSplit後[i]);
-						timestringO = timeRegexO.Match(strSplit後[i]);
+						timestring = timeRegex.Match(line);
+						timestringO = timeRegexO.Match(line);
 					}
 
 					for (int listindex = 0; listindex < list.Count; listindex++) {
 						STLYRIC stlrc;
-						stlrc.Text = strSplit後[i];
-						stlrc.TextTex = this.pf歌詞フォント.DrawText(strSplit後[i], OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
+						stlrc.Text = line;
+						stlrc.TextTex = this.pf歌詞フォント.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
 						stlrc.Time = list[listindex];
 						stlrc.index = ordnumber;
 						this.listLyric2.Add(stlrc);
