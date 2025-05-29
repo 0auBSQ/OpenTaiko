@@ -563,8 +563,8 @@ internal class CActImplCharacter : CActivity {
 					if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][0]) {
 						CharaAction_Balloon_FadeOut[i].Start();
 					}
-					float kusuOutX = ((1.0f - MathF.Cos(nNowCharaCounter[i] * MathF.PI)) * OpenTaiko.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
-					float kusuOutY = (MathF.Sin(nNowCharaCounter[i] * MathF.PI / 2) * OpenTaiko.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
+					float kusuOutX = ((1.0f - MathF.Cos(Math.Min(1, nNowCharaCounter[i]) * MathF.PI)) * OpenTaiko.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
+					float kusuOutY = (MathF.Sin(Math.Min(1, nNowCharaCounter[i]) * MathF.PI / 2) * OpenTaiko.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
 
 					if (OpenTaiko.Skin.Characters_Kusudama_Broke_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
 						OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
@@ -595,7 +595,7 @@ internal class CActImplCharacter : CActivity {
 						CharaAction_Balloon_FadeOut[i].Start();
 					}
 
-					float kusuOutY = (Math.Max(nNowCharaCounter[i] - 0.5f, 0) * OpenTaiko.Skin.Resolution[1] * 2) * resolutionScaleY;
+					float kusuOutY = (Math.Max(Math.Min(1, nNowCharaCounter[i]) - 0.5f, 0) * OpenTaiko.Skin.Resolution[1] * 2) * resolutionScaleY;
 
 					if (OpenTaiko.Skin.Characters_Kusudama_Miss_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
 						OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
