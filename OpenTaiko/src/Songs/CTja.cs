@@ -361,9 +361,9 @@ internal class CTja : CActivity {
 
 	public bool[] b譜面が存在する = new bool[(int)Difficulty.Total];
 
-	private string[] dlmtSpace = { " " };
-	private string[] dlmtEnter = { "\n" };
-	private string[] dlmtCOURSE = { "COURSE:" };
+	private const string dlmtSpace = " ";
+	private const string dlmtEnter = "\n";
+	private const string dlmtCOURSE = "COURSE:";
 
 	private int nスクロール方向 = 0;
 	//2015.09.18 kairera0467
@@ -1328,7 +1328,7 @@ internal class CTja : CActivity {
 		if (nMode == 0) {
 			str = str.Replace("\n", " ");
 		} else if (nMode == 1) {
-			return str.Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
+			return str.Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		return str;
@@ -1344,7 +1344,7 @@ internal class CTja : CActivity {
 
 		if (strTJA.IndexOf("COURSE", 0) != -1) {
 			//tja内に「COURSE」があればここを使う。
-			string[] strTemp = strTJA.Split(this.dlmtCOURSE, StringSplitOptions.RemoveEmptyEntries);
+			string[] strTemp = strTJA.Split(dlmtCOURSE, StringSplitOptions.RemoveEmptyEntries);
 
 			for (int n = 1; n < strTemp.Length; n++) {
 				int nCourse = 0;
@@ -1455,7 +1455,7 @@ internal class CTja : CActivity {
 				this.strFullPath);
 
 			//命令をすべて消去した譜面
-			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
+			var strSplit読み込むコース = strSplitした譜面[n読み込むコース].Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 
 
 			var str命令消去譜面 = this.tコマンド行を削除したTJAを返す(strSplit読み込むコース, 0);
@@ -3527,7 +3527,7 @@ internal class CTja : CActivity {
 	private void LyricFileParser(string strFilePath, int ordnumber)//lrcファイルのパース用
 	{
 		string str = CJudgeTextEncoding.ReadTextFile(strFilePath);
-		var strSplit後 = str.Split(this.dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
+		var strSplit後 = str.Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
 		Regex timeRegex = new Regex(@"^(\[)(\d{2})(:)(\d{2})([:.])(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		Regex timeRegexO = new Regex(@"^(\[)(\d{2})(:)(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
 		List<long> list;
