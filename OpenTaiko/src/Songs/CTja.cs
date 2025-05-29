@@ -1284,54 +1284,51 @@ internal class CTja : CActivity {
 		return sb;
 	}
 
-	private string[] t空のstring配列を詰めたstring配列を返す(string[] input) {
-		List<string> sb = [];
-
-		for (int n = 0; n < input.Length; n++) {
-			if (!string.IsNullOrEmpty(input[n])) {
-				sb.Add(input[n]);
-			}
-		}
-
-		string[] strOutput = sb.ToArray();
-
-		return strOutput;
-	}
-
-	private string StringArrayToString(string[] input, string strデリミタ文字) {
-		var sb = new StringBuilder();
-
-		for (int n = 0; n < input.Length; n++) {
-			sb.Append(input[n] + strデリミタ文字);
-		}
-
-		return sb.ToString();
-	}
-
 	/// <summary>
-	/// 0:改行文字を削除して、デリミタとしてスペースを入れる。(返り値:string)
-	/// 1:改行文字を削除、さらにSplitして返す(返り値:string[n])
+	/// Preprocess TJA string:
+	/// * Replace tabs with spaces
+	/// * Remove comments and empty lines
+	/// * Read file-scope headers
 	/// </summary>
-	/// <param name="str"></param>
-	/// <param name="nMode"></param>
+	/// <param name="strTja"></param>
 	/// <returns></returns>
-	private object str改行文字を削除する(string str, int nMode) {
+	private string preprocessTjaStr(string strTja) {
+		// replace each tab with a space
 		unsafe {
-			fixed (char* s = str) {
-				for (int i = 0; i < str.Length; i++) {
+			fixed (char* s = strTja) {
+				for (int i = 0; i < strTja.Length; i++) {
 					if (s[i] == '\t')
 						s[i] = ' ';
 				}
 			}
 		}
 
-		if (nMode == 0) {
-			str = str.Replace("\n", " ");
-		} else if (nMode == 1) {
-			return str.Split(dlmtEnter, StringSplitOptions.RemoveEmptyEntries);
-		}
+		// Rebuild string
+		var sb = new StringBuilder();
+		// .NET 9+: foreach (Range range in span.Split(dlmtEnter))
+		for (int off = 0, eol; off < strTja.Length; off = eol + 1) {
+			eol = strTja.IndexOf(dlmtEnter, off);
+			if (eol < 0)
+				eol = strTja.Length;
+			// Remove comments
+			int idxComment = strTja.IndexOf("//", off, eol - off);
+			if (idxComment < 0)
+				idxComment = eol;
+			// Skip empty lines
+			if (idxComment <= off)
+				continue;
 
-		return str;
+			string line = strTja.Substring(off, idxComment - off);
+
+			//2015.05.21 kairera0467
+			//ヘッダの読み込みは譜面全体から該当する命令を探す。
+			//少し処理が遅くなる可能性はあるが、ここは正確性を重視する。
+			//点数などの指定は後から各コースで行うので問題は無いだろう。
+			this.t入力_行解析ヘッダ(line);
+
+			sb.Append(line + dlmtEnter);
+		}
+		return sb.ToString();
 	}
 
 	/// <summary>
@@ -1390,29 +1387,7 @@ internal class CTja : CActivity {
 		nDifficulty = difficulty;
 		if (!String.IsNullOrEmpty(strInput)) //空なら通さない
 		{
-			//どうせ使わないので先にSplitしてコメントを削除。
-			var strSplitした譜面 = (string[])this.str改行文字を削除する(strInput, 1);
-
-			for (int i = 0; strSplitした譜面.Length > i; i++) {
-				int idx = strSplitした譜面[i].IndexOf("//");
-				if (idx >= 0)
-					strSplitした譜面[i] = strSplitした譜面[i].Substring(0, idx);
-			}
-			//空のstring配列を詰める
-			strSplitした譜面 = this.t空のstring配列を詰めたstring配列を返す(strSplitした譜面);
-
-			#region[ヘッダ]
-
-			//2015.05.21 kairera0467
-			//ヘッダの読み込みは譜面全体から該当する命令を探す。
-			//少し処理が遅くなる可能性はあるが、ここは正確性を重視する。
-			//点数などの指定は後から各コースで行うので問題は無いだろう。
-
-			//SplitしたヘッダのLengthの回数だけ、forで回して各種情報を読み取っていく。
-			for (int i = 0; strSplitした譜面.Length > i; i++) {
-				this.t入力_行解析ヘッダ(strSplitした譜面[i]);
-			}
-			#endregion
+			strInput = this.preprocessTjaStr(strInput);
 
 			#region[譜面]
 
@@ -1421,7 +1396,7 @@ internal class CTja : CActivity {
 			bool b新処理 = false;
 
 			//まずはコースごとに譜面を分割。
-			strSplitした譜面 = this.tコースで譜面を分割する(this.StringArrayToString(strSplitした譜面, "\n"));
+			var strSplitした譜面 = this.tコースで譜面を分割する(strInput);
 			string strTest = "";
 			//存在するかのフラグ作成。
 			for (int i = 0; i < strSplitした譜面.Length; i++) {
