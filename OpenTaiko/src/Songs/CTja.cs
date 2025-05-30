@@ -1375,10 +1375,8 @@ internal class CTja : CActivity {
 		@"^(?!(TITLE|LEVEL|BPM|WAVE|OFFSET|BALLOON|EXAM1|EXAM2|EXAM3|EXAM4|EXAM5|EXAM6|EXAM7|DANTICK|DANTICKCOLOR|RENREN22|RENREN23|RENREN32|RENREN33|RENREN42|RENREN43|BALLOONNOR|BALLOONEXP|BALLOONMAS|SONGVOL|SEVOL|SCOREINIT|SCOREDIFF|COURSE|STYLE|TOWERTYPE|GAME|LIFE|DEMOSTART|SIDE|SUBTITLE|SCOREMODE|GENRE|MAKER|SELECTBG|MOVIEOFFSET|BGIMAGE|BGMOVIE|HIDDENBRANCH|GAUGEINCR|LYRICFILE|#HBSCROLL|#BMSCROLL)).+\n",
 		RegexOptions.Multiline | RegexOptions.Compiled);
 
-	private int nDifficulty;
-
 	public int nInstanceDifficulty {
-		get => this.nDifficulty;
+		get => this.n参照中の難易度;
 	}
 
 	/// <summary>
@@ -1390,7 +1388,6 @@ internal class CTja : CActivity {
 	/// </summary>
 	/// <param name="strInput">譜面のデータ</param>
 	private void t入力_V4(string strInput, int difficulty) {
-		nDifficulty = difficulty;
 		if (!String.IsNullOrEmpty(strInput)) //空なら通さない
 		{
 			strInput = this.preprocessTjaStr(strInput);
@@ -1427,6 +1424,7 @@ internal class CTja : CActivity {
 				}
 			} else
 				n読み込むコース = difficulty;
+			this.n参照中の難易度 = n読み込むコース;
 			#endregion
 
 			//指定したコースの譜面の命令を消去する。
@@ -1516,10 +1514,10 @@ internal class CTja : CActivity {
 		new Regex(@"^([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)$", RegexOptions.Compiled);
 
 	private void AddCommandError(string command, string argument, string reason) {
-		this.listErrors.Add($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)nDifficulty}, line {nNowReadLine}, in {strFullPath}: {reason}");
+		this.listErrors.Add($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}: {reason}");
 	}
 	private void AddWarn(string msg) {
-		this.listErrors.Add($"{nameof(CTja)}: {msg}, at {(Difficulty)nDifficulty}, line {nNowReadLine}, in {strFullPath}");
+		this.listErrors.Add($"{nameof(CTja)}: {msg}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}");
 	}
 
 	private string[] SplitComma(string input) {
