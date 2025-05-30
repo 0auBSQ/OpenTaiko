@@ -1562,14 +1562,12 @@ internal class CTja : CActivity {
 
 		var command = match.Groups[1].Value;
 		var argumentMatchGroup = match.Groups[2];
-		var argument = argumentMatchGroup.Success ? argumentMatchGroup.Value : null;
+		var argumentFull = argumentMatchGroup.Success ? argumentMatchGroup.Value : "";
 
-		while (true) {//命令の最後に,が残ってしまっているときの対応
-			if (argument != null && argument[argument.Length - 1] == ',')
-				argument = argument.Substring(0, argument.Length - 1);
-			else
-				break;
-		}
+		// For handling arguments ending in a ` `-or-`,`-containing string, use argumentFull
+
+		//命令の最後に,が残ってしまっているときの対応
+		var argument = argumentFull.TrimEnd([',', ' ']);
 
 		char[] chDelimiter = new char[] { ' ' };
 		string[] strArray = null;
@@ -1836,7 +1834,7 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xBC, 1);
 
 			try {
-				string[] args = argument.Split(',');
+				string[] args = argumentFull.Split(',');
 
 				chip.strObjName = args[0];
 				chip.fObjX = float.Parse(args[1]);
@@ -1914,7 +1912,7 @@ internal class CTja : CActivity {
 		} else if (command == "#CHANGETEXTURE") {
 			var chip = this.NewEventChipAtDefCursor(0xD1, 1);
 
-			string[] args = argument.Split(',');
+			string[] args = argumentFull.Split(',');
 			try {
 				chip.strTargetTxName = args[0]
 					.Replace('/', Path.DirectorySeparatorChar)
@@ -2132,7 +2130,7 @@ internal class CTja : CActivity {
 		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
 		{
 			if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
-				this.listLyric.Add(this.pf歌詞フォント.DrawText(argument, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
+				this.listLyric.Add(this.pf歌詞フォント.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
 			chip.nBranch = this.n現在のコース;
@@ -2231,7 +2229,7 @@ internal class CTja : CActivity {
 				}
 			}
 
-			strArray = SplitComma(argument); // \,をエスケープ処理するメソッドだぞっ
+			strArray = SplitComma(argumentFull); // \,をエスケープ処理するメソッドだぞっ
 			WarnSplitLength("#NEXTSONG", strArray, 4);
 			var dansongs = new DanSongs();
 
