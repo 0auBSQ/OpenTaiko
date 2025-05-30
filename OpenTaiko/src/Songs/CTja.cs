@@ -1318,7 +1318,7 @@ internal class CTja : CActivity {
 			//ヘッダの読み込みは譜面全体から該当する命令を探す。
 			//少し処理が遅くなる可能性はあるが、ここは正確性を重視する。
 			//点数などの指定は後から各コースで行うので問題は無いだろう。
-			this.t入力_行解析ヘッダ(line);
+			this.TryParseGlobalHeader(line);
 
 			sb.Append(line + dlmtEnter);
 		}
@@ -1451,7 +1451,7 @@ internal class CTja : CActivity {
 					using StringReader reader = new(strCourse);
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						if (!String.IsNullOrEmpty(line)) {
-							this.t難易度別ヘッダ(line);
+							this.TryParsePlayerSideHeader(line);
 						}
 					}
 				}
@@ -1515,14 +1515,11 @@ internal class CTja : CActivity {
 	private static readonly Regex BranchStartArgumentRegex =
 		new Regex(@"^([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)$", RegexOptions.Compiled);
 
-	private void AddError(string command, string argument) {
-		listErrors.Add($"コメントアウトを除く{(Difficulty)nDifficulty}の{nNowReadLine}行目の{command}が正しくありません。値が{argument}になっています");
+	private void AddCommandError(string command, string argument, string reason) {
+		this.listErrors.Add($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)nDifficulty}, line {nNowReadLine}, in {strFullPath}: {reason}");
 	}
-	private void AddError_Single(string str) {
-		listErrors.Add($"コメントアウトを除く{(Difficulty)nDifficulty}の{nNowReadLine}行目の{str}");
-	}
-	private void AddError(string str) {
-		listErrors.Add(str);
+	private void AddWarn(string msg) {
+		this.listErrors.Add($"{nameof(CTja)}: {msg}, at {(Difficulty)nDifficulty}, line {nNowReadLine}, in {strFullPath}");
 	}
 
 	private string[] SplitComma(string input) {
@@ -1549,11 +1546,7 @@ internal class CTja : CActivity {
 		return result.ToArray();
 	}
 
-	/// <summary>
-	/// 譜面読み込みメソッドV4で使用。
-	/// </summary>
-	/// <param name="InputText"></param>
-	private void t命令を挿入する(string InputText) {
+	private void TryParseCommand(string InputText) {
 		#region [Split comma and arguments values]
 		var match = CommandAndArgumentRegex.Match(InputText);
 		if (!match.Success) {
@@ -1568,11 +1561,20 @@ internal class CTja : CActivity {
 
 		//命令の最後に,が残ってしまっているときの対応
 		var argument = argumentFull.TrimEnd([',', ' ']);
-
-		string[] strArray = null;
-
 		#endregion
 
+		try {
+			this.ParseCommand(command, argument, argumentFull);
+		} catch (Exception ex) {
+			this.AddCommandError(command, argumentFull, ex.ToString());
+		}
+	}
+
+	/// <summary>
+	/// 譜面読み込みメソッドV4で使用。
+	/// </summary>
+	/// <param name="InputText"></param>
+	private void ParseCommand(string command, string argument, string argumentFull) {
 		if (command == "#START") {
 			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
@@ -1581,9 +1583,9 @@ internal class CTja : CActivity {
 				if (this.nNowRollCountBranch[i] >= 0) {
 					ECourse branch = (ECourse)i;
 					if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
-						Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
-							$"{nameof(CTja)}: An unended roll in branch {branch} is ended by #END. In {this.strFullPath}"
-							: $"{nameof(CTja)}: An unended roll is ended by #END. In {this.strFullPath}"
+						this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+							$"An unended roll in branch {branch} is ended by #END."
+							: $"An unended roll is ended by #END."
 						);
 					}
 					InsertNoteAtDefCursor(8, 0, 1, branch);
@@ -1612,7 +1614,7 @@ internal class CTja : CActivity {
 		} else if (command == "#BPMCHANGE") {
 			double dbBPM;
 			if (!double.TryParse(argument, out dbBPM)) {
-				AddError(command, argument);
+				AddCommandError(command, argument, "invalid number");
 				dbBPM = 150;
 			}
 			this.dbNowBPM = dbBPM;
@@ -1639,7 +1641,7 @@ internal class CTja : CActivity {
 				else
 					dbComplexNum[0] = double.Parse(argument);
 			} catch (Exception ex) {
-				AddError(command, argument);
+				this.AddCommandError(command, argument, "invalid complex number");
 				dbComplexNum[0] = 1.0;
 				dbComplexNum[1] = 0.0;
 			}
@@ -1658,7 +1660,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#MEASURE") {
-			strArray = argument.Split(new char[] { '/' });
+			var strArray = argument.Split(new char[] { '/' });
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
 
 			double[] dbLength = new double[2];
@@ -1666,7 +1668,7 @@ internal class CTja : CActivity {
 				dbLength[0] = Convert.ToDouble(strArray[0]);
 				dbLength[1] = Convert.ToDouble(strArray[1]);
 			} catch (Exception ex) {
-				AddError(command, argument);
+				this.AddCommandError(command, argument, "invalid number");
 			}
 
 			double db小節長倍率 = dbLength[0] / dbLength[1];
@@ -1677,7 +1679,7 @@ internal class CTja : CActivity {
 		} else if (command == "#DELAY") {
 			double nDELAY = 0;
 			if (!double.TryParse(argument, out nDELAY)) {
-				AddError(command, argument);
+				this.AddCommandError(command, argument, "invalid number");
 				nDELAY = 0;
 			}
 			nDELAY *= 1000;
@@ -1698,18 +1700,14 @@ internal class CTja : CActivity {
 			this.bGOGOTIME = false;
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x9F, 1));
 		} else if (command == "#BGAON") {
-			try {
-				var commandData = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				string listvdIndex = commandData[0];
-				var bgaStartTime = commandData[1];
-				int index = (10 * int.Parse(listvdIndex[0].ToString())) + int.Parse(listvdIndex[1].ToString()) + 2;
+			var commandData = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			string listvdIndex = commandData[0];
+			var bgaStartTime = commandData[1];
+			int index = (10 * int.Parse(listvdIndex[0].ToString())) + int.Parse(listvdIndex[1].ToString()) + 2;
 
-				var chip = this.NewEventChipAtDefCursor(0x54, index, index);
-				chip.VideoStartTimeMs = (int)(float.Parse(bgaStartTime) * 1000);
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			var chip = this.NewEventChipAtDefCursor(0x54, index, index);
+			chip.VideoStartTimeMs = (int)(float.Parse(bgaStartTime) * 1000);
+			this.listChip.Add(chip);
 		} else if (command == "#BGAOFF") {
 			int index = (10 * int.Parse(argument[0].ToString())) + int.Parse(argument[1].ToString()) + 2;
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x55, index, index));
@@ -1832,24 +1830,20 @@ internal class CTja : CActivity {
 			//adds object
 			var chip = this.NewEventChipAtDefCursor(0xBC, 1);
 
-			try {
-				string[] args = argumentFull.Split(',');
+			string[] args = argumentFull.Split(',');
 
-				chip.strObjName = args[0];
-				chip.fObjX = float.Parse(args[1]);
-				chip.fObjY = float.Parse(args[2]);
-				var txPath = this.strFolderPath + args[3];
-				Trace.TraceInformation("" + this.bSession譜面を読み込む);
-				if (this.bSession譜面を読み込む) {
-					var obj = new CSongObject(chip.strObjName, chip.fObjX, chip.fObjY, txPath);
-					this.listObj.Add(args[0], obj);
-				}
-
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
+			chip.strObjName = args[0];
+			chip.fObjX = float.Parse(args[1]);
+			chip.fObjY = float.Parse(args[2]);
+			var txPath = this.strFolderPath + args[3];
+			Trace.TraceInformation("" + this.bSession譜面を読み込む);
+			if (this.bSession譜面を読み込む) {
+				var obj = new CSongObject(chip.strObjName, chip.fObjX, chip.fObjY, txPath);
+				this.listObj.Add(args[0], obj);
 			}
+
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#REMOVEOBJECT") {
 			//removes object
 			var chip = this.NewEventChipAtDefCursor(0xBD, 1);
@@ -1886,16 +1880,12 @@ internal class CTja : CActivity {
 		} else if (command == "#OBJCOLOR") {
 			var chip = this.NewEventChipAtDefCursor(0xCA, 1);
 
-			try {
-				string[] args = argument.Split(',');
-				chip.strObjName = args[0];
-				chip.borderColor = new Color4(1f, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255);
+			string[] args = argument.Split(',');
+			chip.strObjName = args[0];
+			chip.borderColor = new Color4(1f, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255);
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#OBJY") {
 			this.ParseArgObjSetCommand(command, argument, 0xCB, "vmove", "#OBJVMOVEEND");
 		} else if (command == "#OBJX") {
@@ -1912,28 +1902,24 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xD1, 1);
 
 			string[] args = argumentFull.Split(',');
-			try {
-				chip.strTargetTxName = args[0]
-					.Replace('/', Path.DirectorySeparatorChar)
-					.Replace('\\', Path.DirectorySeparatorChar);
-				chip.strNewPath = this.strFolderPath + args[1];
+			chip.strTargetTxName = args[0]
+				.Replace('/', Path.DirectorySeparatorChar)
+				.Replace('\\', Path.DirectorySeparatorChar);
+			chip.strNewPath = this.strFolderPath + args[1];
 
-				if (this.bSession譜面を読み込む) {
-					if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
-						OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
-						this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
-					}
-					if (!this.listTextures.ContainsKey(chip.strNewPath)) {
-						CTexture tx = OpenTaiko.Tx.TxCSong(chip.strNewPath);
-						this.listTextures.Add(chip.strNewPath, tx);
-					}
+			if (this.bSession譜面を読み込む) {
+				if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
+					OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
+					this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
 				}
-
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
+				if (!this.listTextures.ContainsKey(chip.strNewPath)) {
+					CTexture tx = OpenTaiko.Tx.TxCSong(chip.strNewPath);
+					this.listTextures.Add(chip.strNewPath, tx);
+				}
 			}
+
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#RESETTEXTURE") {
 			var chip = this.NewEventChipAtDefCursor(0xD2, 1);
 			chip.strTargetTxName = argument
@@ -1948,28 +1934,20 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xD4, 1);
 
 			string[] args = argument.Split(',');
-			try {
-				chip.strObjName = args[0];
-				chip.dbAnimInterval = double.Parse(args[1]);
+			chip.strObjName = args[0];
+			chip.dbAnimInterval = double.Parse(args[1]);
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#OBJANIMSTARTLOOP") {
 			var chip = this.NewEventChipAtDefCursor(0xD5, 1);
 
 			string[] args = argument.Split(',');
-			try {
-				chip.strObjName = args[0];
-				chip.dbAnimInterval = double.Parse(args[1]);
+			chip.strObjName = args[0];
+			chip.dbAnimInterval = double.Parse(args[1]);
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#OBJANIMEND") {
 			var chip = this.NewEventChipAtDefCursor(0xD6, 1);
 			chip.strObjName = argument;
@@ -1978,15 +1956,11 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xD7, 1);
 
 			string[] args = argument.Split(',');
-			try {
-				chip.strObjName = args[0];
-				chip.intFrame = int.Parse(args[1]);
+			chip.strObjName = args[0];
+			chip.intFrame = int.Parse(args[1]);
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else if (command == "#GAMETYPE") {
 			CChip chip = this.NewEventChipAtDefCursor(0xD8, 1);
 			chip.eGameType = argument switch {
@@ -2149,7 +2123,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#SUDDEN") {
-			strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#SUDDEN", strArray, 2);
 			double db出現時刻 = Convert.ToDouble(strArray[0]);
 			double db移動待機時刻 = Convert.ToDouble(strArray[1]);
@@ -2167,7 +2141,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#JPOSSCROLL") {
-			strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
 			double msMoveDt = double.Max(0, 1000 * Convert.ToDouble(strArray[0]));
 			double pxMoveDx = 0;
@@ -2228,7 +2202,7 @@ internal class CTja : CActivity {
 				}
 			}
 
-			strArray = SplitComma(argumentFull); // \,をエスケープ処理するメソッドだぞっ
+			var strArray = SplitComma(argumentFull); // \,をエスケープ処理するメソッドだぞっ
 			WarnSplitLength("#NEXTSONG", strArray, 4);
 			var dansongs = new DanSongs();
 
@@ -2300,15 +2274,14 @@ internal class CTja : CActivity {
 			if (float.TryParse(argument, out float value)) {
 				setValue(chip, value);
 			} else {
-				AddError(command, argument);
+				this.AddCommandError(command, argument, "invalid number");
 			}
 			chip.strCamEaseType = "IN_OUT";
 
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			AddError_Single($"Missing {commandEnd}");
-			Trace.TraceInformation($"TJA ERROR: Missing {commandEnd}");
+			this.AddCommandError(command, argument, $"Missing {commandEnd}");
 		}
 	}
 
@@ -2321,23 +2294,18 @@ internal class CTja : CActivity {
 			//arguments: <start value>,<end value>,<easing type>,<calc type>
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 
-			try {
-				string[] args = argument.Split(',');
-				setStart(chip, float.Parse(args[0]));
-				setEnd(chip, float.Parse(args[1]));
-				chip.strCamEaseType = args[2];
-				chip.fCamMoveType = TjaArgToEasingCalcType(args[3]);
+			string[] args = argument.Split(',');
+			setStart(chip, float.Parse(args[0]));
+			setEnd(chip, float.Parse(args[1]));
+			chip.strCamEaseType = args[2];
+			chip.fCamMoveType = TjaArgToEasingCalcType(args[3]);
 
-				camChip = chip;
+			camChip = chip;
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} catch (Exception ex) {
-				AddError(command, argument);
-			}
+			// チップを配置。
+			this.listChip.Add(chip);
 		} else {
-			AddError_Single($"Missing {commandEnd}");
-			Trace.TraceInformation($"TJA ERROR: Missing {commandEnd}");
+			this.AddCommandError(command, argument, $"Missing {commandEnd}");
 		}
 	}
 
@@ -2357,60 +2325,48 @@ internal class CTja : CActivity {
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			AddError_Single($"Missing {commandStart}");
-			Trace.TraceInformation($"TJA ERROR: Missing {commandStart}");
+			this.AddCommandError(command, argument, $"Missing {commandStart}");
 		}
 	}
 
 	private void ParseArgObjSetCommand(string command, string argument, int channelNo, string animationKey, string commandEnd) {
 		string[] args = argument.Split(',');
-		try {
-			string name = args[0];
+		string name = args[0];
 
-			if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
-				var chip = this.NewEventChipAtDefCursor(channelNo, 0);
-				chip.strObjName = args[0];
-				chip.fObjStart = float.Parse(args[1]);
-				chip.fObjEnd = float.Parse(args[1]);
-				chip.strObjEaseType = "IN_OUT";
+		if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
+			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
+			chip.strObjName = args[0];
+			chip.fObjStart = float.Parse(args[1]);
+			chip.fObjEnd = float.Parse(args[1]);
+			chip.strObjEaseType = "IN_OUT";
 
-				// チップを配置。
-				this.listChip.Add(chip);
-			} else {
-				AddError_Single($"Missing {commandEnd}");
-				Trace.TraceInformation($"TJA ERROR: Missing {commandEnd}");
-			}
-		} catch (Exception ex) {
-			AddError(command, argument);
+			// チップを配置。
+			this.listChip.Add(chip);
+		} else {
+			this.AddCommandError(command, argument, $"Missing {commandEnd}");
 		}
 	}
 
 	private void ParseArgObjStartCommand(string command, string argument, int channelNo, string animationKey, string commandEnd) {
 		string[] args = argument.Split(',');
+		string name = args[0];
 
-		try {
-			string name = args[0];
+		if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
+			//starts attribute changing
+			//arguments: <start value>,<end value>,<easing type>,<calc type>
+			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
+			chip.strObjName = args[0];
+			chip.fObjStart = float.Parse(args[1]);
+			chip.fObjEnd = float.Parse(args[2]);
+			chip.strObjEaseType = args[3];
+			chip.objCalcType = TjaArgToEasingCalcType(args[4]);
 
-			if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
-				//starts attribute changing
-				//arguments: <start value>,<end value>,<easing type>,<calc type>
-				var chip = this.NewEventChipAtDefCursor(channelNo, 0);
-				chip.strObjName = args[0];
-				chip.fObjStart = float.Parse(args[1]);
-				chip.fObjEnd = float.Parse(args[2]);
-				chip.strObjEaseType = args[3];
-				chip.objCalcType = TjaArgToEasingCalcType(args[4]);
+			currentObjAnimations.Add($"{animationKey}_{name}", chip);
 
-				currentObjAnimations.Add($"{animationKey}_{name}", chip);
-
-				// チップを配置。
-				this.listChip.Add(chip);
-			} else {
-				AddError_Single($"Missing {commandEnd}");
-				Trace.TraceInformation($"TJA ERROR: Missing {commandEnd}");
-			}
-		} catch (Exception ex) {
-			AddError(command, argument);
+			// チップを配置。
+			this.listChip.Add(chip);
+		} else {
+			this.AddCommandError(command, argument, $"Missing {commandEnd}");
 		}
 	}
 
@@ -2435,8 +2391,7 @@ internal class CTja : CActivity {
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
-			AddError_Single($"Missing {commandStart}");
-			Trace.TraceInformation($"TJA ERROR: Missing {commandStart}");
+			this.AddCommandError(command, argument, $"Missing {commandStart}");
 		}
 	}
 
@@ -2559,8 +2514,7 @@ internal class CTja : CActivity {
 
 	private void WarnSplitLength(string name, string[] strArray, int minimumLength) {
 		if (strArray.Length < minimumLength) {
-			Trace.TraceWarning(
-				$"命令 {name} のパラメータが足りません。少なくとも {minimumLength} つのパラメータが必要です。 (現在のパラメータ数: {strArray.Length}). ({strFullPath})");
+			this.AddWarn($"Insufficient arguments to command {name}. Needs at least {minimumLength} but got {strArray.Length}.");
 		}
 	}
 
@@ -2570,10 +2524,10 @@ internal class CTja : CActivity {
 
 			if (InputText.StartsWith("#")) {
 				// Call orders here
-				this.t命令を挿入する(InputText);
+				this.TryParseCommand(InputText);
 				return;
 			} else if (InputText.StartsWith("EXAM")) {
-				this.tDanExamLoad(InputText);
+				this.TryDanExamLoad(InputText);
 				return;
 			} else {
 				if (this.b小節線を挿入している == false) {
@@ -2651,9 +2605,9 @@ internal class CTja : CActivity {
 								if (nObjectNum != 8) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
 									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
-										Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
-											$"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
-											: $"{nameof(CTja)}: An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
+										this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+											$"An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
+											: $"An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText}"
 										);
 									}
 									InsertNoteAtDefCursor(8, n, n文字数, branch);
@@ -2667,9 +2621,9 @@ internal class CTja : CActivity {
 							}
 
 							if (nObjectNum < 0) {
-								Trace.TraceWarning(this.bHasBranch[this.n参照中の難易度] ?
-									$"{nameof(CTja)}: Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}"
-									: $"{nameof(CTja)}: Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText} In {this.strFullPath}");
+								this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+									$"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
+									: $"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
 							} else {
 								InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
 							}
@@ -2853,20 +2807,19 @@ internal class CTja : CActivity {
 		}
 	}
 
-	/// <summary>
-	/// 難易度ごとによって変わるヘッダ値を読み込む。
-	/// (BALLOONなど。)
-	/// </summary>
-	/// <param name="InputText"></param>
-	private void t難易度別ヘッダ(string InputText) {
+	private void TryParsePlayerSideHeader(string InputText) {
+		// pre-#START commands
 		if (OpenTaiko.actEnumSongs != null && OpenTaiko.actEnumSongs.IsDeActivated) {
 			if (InputText.Equals("#NMSCROLL")) {
 				eScrollMode = EScrollMode.Normal;
+				return;
 			} else if (InputText.Equals("#HBSCROLL")) {
 				eScrollMode = EScrollMode.HBScroll;
+				return;
 			}
 			if (InputText.Equals("#BMSCROLL")) {
 				eScrollMode = EScrollMode.BMScroll;
+				return;
 			}
 		}
 
@@ -2878,18 +2831,30 @@ internal class CTja : CActivity {
 			strCommandName = strArray[0].Trim();
 			strCommandParam = strArray[1].Trim();
 		}
+		try {
+			this.ParsePerPlayerSideHeader(strCommandName, strCommandParam);
+		} catch (Exception ex) {
+			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+		}
+	}
 
+	/// <summary>
+	/// 難易度ごとによって変わるヘッダ値を読み込む。
+	/// (BALLOONなど。)
+	/// </summary>
+	/// <param name="InputText"></param>
+	private void ParsePerPlayerSideHeader(string strCommandName, string strCommandParam) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
 		if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreMode = value);
@@ -2937,7 +2902,7 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private void tDanExamLoad(string input) {
+	private void TryDanExamLoad(string input) {
 		string[] strArray = input.Split(new char[] { ':' }, 2);
 		string strCommandName = "";
 		string strCommandParam = "";
@@ -2947,6 +2912,14 @@ internal class CTja : CActivity {
 			strCommandParam = strArray[1].Trim();
 		}
 
+		try {
+			this.tDanExamLoad(strCommandName, strCommandParam);
+		} catch (Exception ex) {
+			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+		}
+	}
+
+	private void tDanExamLoad(string strCommandName, string strCommandParam) {
 		// Adapt to EXAM until 7, optimise condition
 
 		if (strCommandName.StartsWith("EXAM")) {
@@ -2997,12 +2970,12 @@ internal class CTja : CActivity {
 		if (short.TryParse(unparsedValue, out var value)) {
 			setValue(value);
 		} else {
-			Trace.TraceWarning($"命令名: {name} のパラメータの値が正しくないことを検知しました。値: {unparsedValue} ({strFullPath})");
+			this.AddWarn($"Command {name} has invalid argument: {unparsedValue}");
 		}
 	}
 
 
-	private void ParseBalloon(string strCommandParam, ref List<int> listBalloon) {
+	private void ParseBalloon(string strCommandName, string strCommandParam, ref List<int> listBalloon) {
 		string[] strParam = strCommandParam.Split(',');
 		var listTmp = new List<int>(strParam.Length);
 		for (int n = 0; n < strParam.Length; n++) {
@@ -3013,9 +2986,7 @@ internal class CTja : CActivity {
 
 				n打数 = Convert.ToInt32(strParam[n]);
 			} catch (Exception ex) {
-				Trace.TraceError($"おや?エラーが出たようです。お兄様。 ({strFullPath})");
-				Trace.TraceError(ex.ToString());
-				Trace.TraceError("例外が発生しましたが処理を継続します。 (95327158-4e83-4fa9-b5e9-ad3c3d4c2a22)");
+				this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
 				return;
 			}
 
@@ -3024,12 +2995,8 @@ internal class CTja : CActivity {
 		// Arguments are valid, update balloon list
 		listBalloon = listTmp;
 	}
-	private void t入力_行解析ヘッダ(string InputText) {
-		//やべー。先頭にコメント行あったらやばいやん。
-		string[] strArray = InputText.Split(new char[] { ':' }, 2);
-		string strCommandName = "";
-		string strCommandParam = "";
 
+	private void TryParseGlobalHeader(string InputText) {
 		if (InputText.StartsWith("#BRANCHSTART")) {
 			//2015.08.18 kairera0467
 			//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
@@ -3041,12 +3008,25 @@ internal class CTja : CActivity {
 			}
 		}
 
+		//やべー。先頭にコメント行あったらやばいやん。
+		string[] strArray = InputText.Split(new char[] { ':' }, 2);
+		string strCommandName = "";
+		string strCommandParam = "";
+
 		//まずは「:」でSplitして割り当てる。
 		if (strArray.Length == 2) {
 			strCommandName = strArray[0].Trim();
 			strCommandParam = strArray[1].Trim();
 		}
 
+		try {
+			this.ParseGlobalHeader(strCommandName, strCommandParam);
+		} catch (Exception ex) {
+			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+		}
+	}
+
+	private void ParseGlobalHeader(string strCommandName, string strCommandParam) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
@@ -3103,7 +3083,7 @@ internal class CTja : CActivity {
 			this.dbNowBPM = dbBPM;
 		} else if (strCommandName.Equals("WAVE")) {
 			if (strBGM_PATH != null) {
-				Trace.TraceWarning($"{nameof(CTja)} is ignoring an extra WAVE header in {this.strFullPath}");
+				this.AddWarn($"ignoring an extra WAVE header, argument: {strCommandParam}");
 			} else {
 				this.strBGM_PATH = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, strCommandParam);
 				//tbWave.Text = strCommandParam;
@@ -3147,12 +3127,12 @@ internal class CTja : CActivity {
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]
 		else if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
+			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreMode = value);
@@ -3266,8 +3246,8 @@ internal class CTja : CActivity {
 
 				this.listVD.Add(1, vd);
 			} catch (Exception e) {
-				Trace.TraceWarning(e.ToString() + "\n" +
-								   "動画のデコーダー生成で例外が発生しましたが、処理を継続します。");
+				this.AddWarn(e.ToString() + "\n"
+					+ $"{strCommandName}: Exception when generating decoder for video {strVideoFilename}; continued");
 				if (this.listVD.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
@@ -3294,8 +3274,8 @@ internal class CTja : CActivity {
 
 				this.listVD.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
 			} catch (Exception e) {
-				Trace.TraceWarning(e.ToString() + "\n" +
-								   "動画のデコーダー生成で例外が発生しましたが、処理を継続します。");
+				this.AddWarn(e.ToString() + "\n"
+					+ $"{strCommandName}: Exception when generating decoder for video {strVideoFilename}; continued.");
 				if (this.listVD.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
@@ -3305,78 +3285,70 @@ internal class CTja : CActivity {
 				this.strBGIMAGE_PATH = strCommandParam;
 			}
 		} else if (strCommandName.Equals(".CUTSCENE_INTRO")) { // .CUTSCENE_INTRO:<path>,<repeat?>
-			try {
-				string[] args = SplitComma(strCommandParam);
-				string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[0]);
+			string[] args = SplitComma(strCommandParam);
+			string path = !(0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[0]);
 
-				if (string.IsNullOrEmpty(path)) {
-					this.CutSceneIntro = null;
-				} else {
+			if (string.IsNullOrEmpty(path)) {
+				this.CutSceneIntro = null;
+			} else {
+				string fullPath;
+				if (!string.IsNullOrEmpty(this.PATH_WAV))
+					fullPath = this.PATH_WAV + path;
+				else
+					fullPath = this.strFolderPath + path;
+
+				ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
+				if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
+					repeatMode = int.Parse(args[1]) switch {
+						< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
+						> 0 => ECutSceneRepeatMode.EverytimeMet,
+						0 or _ => ECutSceneRepeatMode.FirstMet,
+					};
+				}
+
+				this.CutSceneIntro = new() {
+					FullPath = fullPath,
+					RepeatMode = repeatMode,
+				};
+			}
+		} else if (strCommandName.Equals(".CUTSCENE_OUTRO")) { // .CUTSCENE_OUTRO:<path>,<clear status>,<scope>,<repeat?>,...
+			List<CutSceneDef> outros = new();
+			string[] args = SplitComma(strCommandParam);
+			for (int iArg = 0; iArg < args.Length; iArg += 4) {
+				string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[iArg + 0]);
+
+				if (!string.IsNullOrEmpty(path)) {
 					string fullPath;
 					if (!string.IsNullOrEmpty(this.PATH_WAV))
 						fullPath = this.PATH_WAV + path;
 					else
 						fullPath = this.strFolderPath + path;
 
+					BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
+					if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
+						clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(args[iArg + 1]);
+					}
+
+					string requirementRange = !(iArg + 2 < args.Length) ? "me" : args[iArg + 2].Trim();
+
 					ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
-					if (1 < args.Length && !string.IsNullOrEmpty(args[1])) {
-						repeatMode = int.Parse(args[1]) switch {
+					if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
+						repeatMode = int.Parse(args[iArg + 3]) switch {
 							< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
 							> 0 => ECutSceneRepeatMode.EverytimeMet,
 							0 or _ => ECutSceneRepeatMode.FirstMet,
 						};
 					}
 
-					this.CutSceneIntro = new() {
+					outros.Add(new() {
 						FullPath = fullPath,
+						ClearRequirement = clearRequirement,
+						RequirementRange = requirementRange,
 						RepeatMode = repeatMode,
-					};
+					});
 				}
-			} catch (Exception ex) {
-				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
 			}
-		} else if (strCommandName.Equals(".CUTSCENE_OUTRO")) { // .CUTSCENE_OUTRO:<path>,<clear status>,<scope>,<repeat?>,...
-			try {
-				List<CutSceneDef> outros = new();
-				string[] args = SplitComma(strCommandParam);
-				for (int iArg = 0; iArg < args.Length; iArg += 4) {
-					string path = !(iArg + 0 < args.Length) ? "" : CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, args[iArg + 0]);
-
-					if (!string.IsNullOrEmpty(path)) {
-						string fullPath;
-						if (!string.IsNullOrEmpty(this.PATH_WAV))
-							fullPath = this.PATH_WAV + path;
-						else
-							fullPath = this.strFolderPath + path;
-
-						BestPlayRecords.EClearStatus clearRequirement = BestPlayRecords.EClearStatus.NONE;
-						if (iArg + 1 < args.Length && !string.IsNullOrEmpty(args[iArg + 1])) {
-							clearRequirement = (BestPlayRecords.EClearStatus)int.Parse(args[iArg + 1]);
-						}
-
-						string requirementRange = !(iArg + 2 < args.Length) ? "me" : args[iArg + 2].Trim();
-
-						ECutSceneRepeatMode repeatMode = ECutSceneRepeatMode.FirstMet;
-						if (iArg + 3 < args.Length && !string.IsNullOrEmpty(args[iArg + 3])) {
-							repeatMode = int.Parse(args[iArg + 3]) switch {
-								< 0 => ECutSceneRepeatMode.UntilFirstUnmet,
-								> 0 => ECutSceneRepeatMode.EverytimeMet,
-								0 or _ => ECutSceneRepeatMode.FirstMet,
-							};
-						}
-
-						outros.Add(new() {
-							FullPath = fullPath,
-							ClearRequirement = clearRequirement,
-							RequirementRange = requirementRange,
-							RepeatMode = repeatMode,
-						});
-					}
-				}
-				this.CutSceneOutros = outros;
-			} catch (Exception ex) {
-				this.AddError($"Invalid {strCommandName} argument: {strCommandParam}: {ex.ToString()}");
-			}
+			this.CutSceneOutros = outros;
 		} else if (strCommandName.Equals("HIDDENBRANCH")) {
 			//2016.04.01 kairera0467 パラメーターは
 			if (!string.IsNullOrEmpty(strCommandParam)) {
@@ -3405,7 +3377,7 @@ internal class CTja : CActivity {
 								}
 							}
 						} catch (Exception e) {
-							Trace.TraceError("Something went wrong while parsing a lyric file at {0}. More details : {1}", filePaths[i], e);
+							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}. More details : {e}");
 						}
 					}
 				}
