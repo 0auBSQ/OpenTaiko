@@ -2894,12 +2894,12 @@ internal class CTja : CActivity {
 		}
 
 		if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eNormal]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eExpert]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eMaster]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreModeTmp = value);
@@ -3019,8 +3019,9 @@ internal class CTja : CActivity {
 	}
 
 
-	private void ParseBalloon(string strCommandParam, List<int> listBalloon) {
+	private void ParseBalloon(string strCommandParam, ref List<int> listBalloon) {
 		string[] strParam = strCommandParam.Split(',');
+		var listTmp = new List<int>(strParam.Length);
 		for (int n = 0; n < strParam.Length; n++) {
 			int n打数;
 			try {
@@ -3032,11 +3033,13 @@ internal class CTja : CActivity {
 				Trace.TraceError($"おや?エラーが出たようです。お兄様。 ({strFullPath})");
 				Trace.TraceError(ex.ToString());
 				Trace.TraceError("例外が発生しましたが処理を継続します。 (95327158-4e83-4fa9-b5e9-ad3c3d4c2a22)");
-				break;
+				return;
 			}
 
-			listBalloon.Add(n打数);
+			listTmp.Add(n打数);
 		}
+		// Arguments are valid, update balloon list
+		listBalloon = listTmp;
 	}
 	private void t入力_行解析ヘッダ(string InputText) {
 		//やべー。先頭にコメント行あったらやばいやん。
@@ -3182,12 +3185,12 @@ internal class CTja : CActivity {
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]
 		else if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eNormal]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eExpert]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandParam, this.listBalloon_Branch[(int)ECourse.eMaster]);
+			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			ParseOptionalInt16(value => this.nScoreModeTmp = value);
