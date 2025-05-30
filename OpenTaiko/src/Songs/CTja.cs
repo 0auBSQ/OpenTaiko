@@ -363,7 +363,6 @@ internal class CTja : CActivity {
 
 	private const string dlmtSpace = " ";
 	private const string dlmtEnter = "\n";
-	private const string dlmtCOURSE = "COURSE:";
 
 	private int nスクロール方向 = 0;
 	//2015.09.18 kairera0467
@@ -1326,6 +1325,16 @@ internal class CTja : CActivity {
 		return sb.ToString();
 	}
 
+
+	private const RegexOptions CourseSectionSplitRegexOptions =
+		RegexOptions.Compiled |
+		RegexOptions.CultureInvariant |
+		RegexOptions.IgnoreCase |
+		RegexOptions.Multiline |
+		RegexOptions.Singleline;
+	private const string CoursePrefixRegexPattern = @"^COURSE\s*:"
+	private static readonly Regex CourseSplitRegex = new Regex($"(?={CoursePrefixRegexPattern})", CourseSectionSplitRegexOptions);
+
 	/// <summary>
 	/// コースごとに譜面を分割する。
 	/// </summary>
@@ -1334,22 +1343,24 @@ internal class CTja : CActivity {
 	private string[] tコースで譜面を分割する(string strTJA) {
 		string[] strCourseTJA = new string[(int)Difficulty.Total];
 
-		if (strTJA.IndexOf("COURSE", 0) != -1) {
+		string[] courseSections = CourseSplitRegex.Split(strTJA);
+		if (courseSections.Length > 1) {
 			//tja内に「COURSE」があればここを使う。
-			string[] strTemp = strTJA.Split(dlmtCOURSE, StringSplitOptions.RemoveEmptyEntries);
+			for (int n = 1; n < courseSections.Length; n++) {
+				if (string.IsNullOrEmpty(courseSections[n]))
+					continue;
 
-			for (int n = 1; n < strTemp.Length; n++) {
-				int nCourse = 0;
-				string nNC = "";
-				while (strTemp[n].Substring(0, 1) != "\n") //2017.01.29 DD COURSE単語表記に対応
-				{
-					nNC += strTemp[n].Substring(0, 1);
-					strTemp[n] = strTemp[n].Remove(0, 1);
-				}
+				// courseSections[n] (n > 1) starts with `COURSE` + `:`
+				int valueStart = courseSections[n].IndexOf(':') + 1;
 
-				if (this.strConvertCourse(nNC) != -1) {
-					nCourse = this.strConvertCourse(nNC);
-					strCourseTJA[nCourse] = strTemp[n];
+				int eol = courseSections[n].IndexOf(dlmtEnter);
+				if (eol < 0)
+					eol = courseSections[n].Length;
+
+				string strCourse = courseSections[n].Substring(valueStart, eol - valueStart);
+				int nCourse = this.strConvertCourse(strCourse);
+				if (nCourse != -1) {
+					strCourseTJA[nCourse] = courseSections[n];
 				}
 			}
 		} else {

@@ -63,7 +63,7 @@ public static class CDTXStyleExtractor {
 		$"{SheetStartPrefixRegexPattern}\\s*P2";
 
 	private static readonly Regex SectionSplitRegex = new Regex($"(?={StylePrefixRegexPattern})", StyleSectionSplitRegexOptions);
-	private static readonly Regex SubSectionSplitRegex = new Regex($"(?={SheetStartPrefixRegexPattern})|(?<=#END\\n)", StyleSectionSplitRegexOptions);
+	private static readonly Regex SubSectionSplitRegex = new Regex($"(?={SheetStartPrefixRegexPattern})|(?<=^#END\\n)", StyleSectionSplitRegexOptions);
 
 	private static readonly Regex StyleSingleSectionMatchRegex = new Regex(StyleSingleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
 	private static readonly Regex StyleDoubleSectionMatchRegex = new Regex(StyleDoubleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
