@@ -1332,7 +1332,7 @@ internal class CTja : CActivity {
 		RegexOptions.IgnoreCase |
 		RegexOptions.Multiline |
 		RegexOptions.Singleline;
-	private const string CoursePrefixRegexPattern = @"^COURSE\s*:"
+	private const string CoursePrefixRegexPattern = @"^COURSE\s*:";
 	private static readonly Regex CourseSplitRegex = new Regex($"(?={CoursePrefixRegexPattern})", CourseSectionSplitRegexOptions);
 
 	/// <summary>
@@ -3496,6 +3496,7 @@ internal class CTja : CActivity {
 
 		// 小文字大文字区別しない正規表現で仮対応。 (AioiLight)
 		// 相変わらず原始的なやり方だが、正常に動作した。
+		str = str.Trim();
 		string[] Matchptn = new string[7] { "easy", "normal", "hard", "oni", "edit", "tower", "dan" };
 		for (int i = 0; i < Matchptn.Length; i++) {
 			if (string.Equals(str, Matchptn[i], StringComparison.InvariantCultureIgnoreCase)) {
