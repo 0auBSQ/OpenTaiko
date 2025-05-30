@@ -1569,7 +1569,6 @@ internal class CTja : CActivity {
 		//命令の最後に,が残ってしまっているときの対応
 		var argument = argumentFull.TrimEnd([',', ' ']);
 
-		char[] chDelimiter = new char[] { ' ' };
 		string[] strArray = null;
 
 		#endregion
@@ -1700,7 +1699,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x9F, 1));
 		} else if (command == "#BGAON") {
 			try {
-				var commandData = argument.Split(' ');
+				var commandData = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 				string listvdIndex = commandData[0];
 				var bgaStartTime = commandData[1];
 				int index = (10 * int.Parse(listvdIndex[0].ToString())) + int.Parse(listvdIndex[1].ToString()) + 2;
@@ -2150,7 +2149,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#SUDDEN") {
-			strArray = argument.Split(chDelimiter);
+			strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#SUDDEN", strArray, 2);
 			double db出現時刻 = Convert.ToDouble(strArray[0]);
 			double db移動待機時刻 = Convert.ToDouble(strArray[1]);
@@ -2168,7 +2167,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#JPOSSCROLL") {
-			strArray = argument.Split(chDelimiter);
+			strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
 			double msMoveDt = double.Max(0, 1000 * Convert.ToDouble(strArray[0]));
 			double pxMoveDx = 0;
