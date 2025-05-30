@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.66] - 2025-05-30 (Beta)
+
+- Reintroduce the 0.6.0.64 update with the crashes fixed
+
 ## [0.6.0.65] - 2025-05-30 (Beta)
 
 - [Hotfix] Revert 0.6.0.64 due to unexpected crashes until a fix is proposed
