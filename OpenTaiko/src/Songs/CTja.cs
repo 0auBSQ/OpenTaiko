@@ -2220,8 +2220,6 @@ internal class CTja : CActivity {
 
 			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
-			strArray = SplitComma(argument); // \,をエスケープ処理するメソッドだぞっ
-
 			for (int i = listChip.Count - 1; i >= 0; i--) {
 				//if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
 				if (NotesManager.IsHittableNote(listChip[i])) {
@@ -2233,29 +2231,24 @@ internal class CTja : CActivity {
 				}
 			}
 
-			WarnSplitLength("#NEXTSONG", strArray, 8);
+			strArray = SplitComma(argument); // \,をエスケープ処理するメソッドだぞっ
+			WarnSplitLength("#NEXTSONG", strArray, 4);
 			var dansongs = new DanSongs();
-			dansongs.Title = strArray[0];
-			dansongs.SubTitle = strArray[1];
-			dansongs.Genre = strArray[2];
-			dansongs.FileName = strArray[3];
-			dansongs.ScoreInit = int.Parse(strArray[4]);
-			dansongs.ScoreDiff = int.Parse(strArray[5]);
 
-			if (strArray.Length >= 7 && strArray[6] != "" && strArray[6] != null)
-				dansongs.Level = int.Parse(strArray[6]);
-			else if (strArray.Length < 7)
-				dansongs.Level = 10;
+			// basic fields
+			dansongs.Title = (strArray.Length > 0) ? strArray[0] : "";
+			dansongs.SubTitle = (strArray.Length > 1) ? strArray[1] : "";
+			dansongs.Genre = (strArray.Length > 2) ? strArray[2] : "";
+			dansongs.FileName = (strArray.Length > 3) ? strArray[3] : "";
 
-			if (strArray.Length >= 8 && strArray[7] != "" && strArray[7] != null)
-				dansongs.Difficulty = strConvertCourse(strArray[7]);
-			else if (strArray.Length < 8)
-				dansongs.Difficulty = 3;
+			// required by TJAP3
+			dansongs.ScoreInit = (strArray.Length > 4 && !string.IsNullOrWhiteSpace(strArray[4])) ? int.Parse(strArray[4]) : -1;
+			dansongs.ScoreDiff = (strArray.Length > 5 && !string.IsNullOrWhiteSpace(strArray[5])) ? int.Parse(strArray[5]) : -1;
 
-			if (strArray.Length == 9 && strArray[8] != "" && strArray[8] != null)
-				dansongs.bTitleShow = bool.Parse(strArray[8]);
-			else if (strArray.Length < 9)
-				dansongs.bTitleShow = false;
+			// optional in TJAP3-Dev-ReW and OpTk
+			dansongs.Level = (strArray.Length > 6 && !string.IsNullOrWhiteSpace(strArray[6])) ? int.Parse(strArray[6]) : 10;
+			dansongs.Difficulty = (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7])) ? strConvertCourse(strArray[7]) : 3;
+			dansongs.bTitleShow = (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8])) ? bool.Parse(strArray[8]) : false;
 
 			dansongs.Wave = new CWAV {
 				n内部番号 = this.n内部番号WAV1to,
