@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.64] - 2025-05-30 (Beta)
+
+- Fix high BPM (e.g., 10^16) caused crash due to character frame index overflowed by huge-valued frame counter
+- Fix looped character animation had each loop delayed to align to drawing frame
+- Fix exiting Kusudama flew too far when BPM is high
+
 ## [0.6.0.63] - 2025-05-28 (Beta)
 
 - Refactor code handling Unlockables
