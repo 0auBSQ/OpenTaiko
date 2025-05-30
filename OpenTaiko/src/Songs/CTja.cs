@@ -1432,7 +1432,7 @@ internal class CTja : CActivity {
 			//指定したコースの譜面の命令を消去する。
 			var strCourse = strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
 				strSplitした譜面[n読み込むコース],
-				OpenTaiko.ConfigIni.nPlayerCount > 1 ? (this.nPlayerSide + 1) : 0,
+				(OpenTaiko.ConfigIni.nPlayerCount > 1 && !OpenTaiko.ConfigIni.bAIBattleMode) ? (this.nPlayerSide + 1) : 0,
 				this.strFullPath);
 
 			//ここで1行の文字数をカウント。配列にして返す。
