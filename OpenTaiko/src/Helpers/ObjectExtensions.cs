@@ -266,9 +266,8 @@ namespace System {
 				}
 
 				return new double[] { real, imaginary };
-			} catch (Exception ex) {
-				LogNotification.PopWarning($"'{input}': Incorrect complex number formatting, defaulting to 0");
-				return new double[] { 0, 0 }; // Return default value in case of error
+			} catch (FormatException ex) {
+				throw new FormatException("Invalid complex number", ex);
 			}
 		}
 	}

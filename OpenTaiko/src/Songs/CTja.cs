@@ -1610,11 +1610,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#BPMCHANGE") {
-			double dbBPM;
-			if (!double.TryParse(argument, out dbBPM)) {
-				AddCommandError(command, argument, "invalid number");
-				dbBPM = 150;
-			}
+			double dbBPM = double.Parse(argument);
 			this.dbNowBPM = dbBPM;
 
 			if (dbBPM > MaxBPM) {
@@ -1632,17 +1628,11 @@ internal class CTja : CActivity {
 		} else if (command == "#SCROLL") {
 			double[] dbComplexNum = new double[2];
 			//2016.08.13 kairera0467 複素数スクロールもどきのテスト
-			try {
-				//iが入っていた場合、複素数スクロールとみなす。
-				if (argument.IndexOf('i') != -1)
-					this.tParsedComplexNumber(argument, ref dbComplexNum);
-				else
-					dbComplexNum[0] = double.Parse(argument);
-			} catch (Exception ex) {
-				this.AddCommandError(command, argument, "invalid complex number");
-				dbComplexNum[0] = 1.0;
-				dbComplexNum[1] = 0.0;
-			}
+			//iが入っていた場合、複素数スクロールとみなす。
+			if (argument.IndexOf('i') != -1)
+				this.tParsedComplexNumber(argument, ref dbComplexNum);
+			else
+				dbComplexNum[0] = double.Parse(argument);
 
 			this.dbNowScroll = dbComplexNum[0];
 			this.dbNowScrollY = dbComplexNum[1];
@@ -1662,12 +1652,8 @@ internal class CTja : CActivity {
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
 
 			double[] dbLength = new double[2];
-			try {
-				dbLength[0] = Convert.ToDouble(strArray[0]);
-				dbLength[1] = Convert.ToDouble(strArray[1]);
-			} catch (Exception ex) {
-				this.AddCommandError(command, argument, "invalid number");
-			}
+			dbLength[0] = Convert.ToDouble(strArray[0]);
+			dbLength[1] = Convert.ToDouble(strArray[1]);
 
 			double db小節長倍率 = dbLength[0] / dbLength[1];
 			this.fNow_Measure_m = (float)dbLength[1];
@@ -1675,11 +1661,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x02, 1, argDb: db小節長倍率));
 		} else if (command == "#DELAY") {
-			double nDELAY = 0;
-			if (!double.TryParse(argument, out nDELAY)) {
-				this.AddCommandError(command, argument, "invalid number");
-				nDELAY = 0;
-			}
+			double nDELAY = double.Parse(argument);
 			nDELAY *= 1000;
 
 			//チップ追加して割り込んでみる。
@@ -2268,14 +2250,8 @@ internal class CTja : CActivity {
 	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, Action<CChip, float> setValue, string commandEnd) {
 		if (camChip == null) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
-
-			if (float.TryParse(argument, out float value)) {
-				setValue(chip, value);
-			} else {
-				this.AddCommandError(command, argument, "invalid number");
-			}
+			setValue(chip, float.Parse(argument));
 			chip.strCamEaseType = "IN_OUT";
-
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else {
@@ -2941,11 +2917,7 @@ internal class CTja : CActivity {
 					"jm" => Exam.Type.JudgeMine,
 					"g" or _ => Exam.Type.Gauge,
 				};
-				try {
-					examValue = new int[] { int.Parse(splitExam[1]), int.Parse(splitExam[2]) };
-				} catch (Exception) {
-					examValue = new int[] { 100, 100 };
-				}
+				examValue = new int[] { int.Parse(splitExam[1]), int.Parse(splitExam[2]) };
 
 				var examRange = splitExam[3] switch {
 					"l" => Exam.Range.Less,
