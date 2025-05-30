@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.65] - 2025-05-30 (Beta)
+
+- [Hotfix] Revert 0.6.0.64 due to unexpected crashes until a fix is proposed
+
 ## [0.6.0.64] - 2025-05-30 (Beta)
 
 - Fix high BPM (e.g., 10^16) caused crash due to character frame index overflowed by huge-valued frame counter
