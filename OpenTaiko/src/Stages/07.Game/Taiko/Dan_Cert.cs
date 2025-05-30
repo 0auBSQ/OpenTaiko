@@ -61,7 +61,7 @@ internal class Dan_Cert : CActivity {
 
 		ScreenPoint = new double[] { OpenTaiko.Skin.Game_Lane_X[0] - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Resolution[0] };
 
-		OpenTaiko.stageGameScreen.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff);
+		OpenTaiko.stageGameScreen.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff, 0);
 
 		OpenTaiko.stageGameScreen.ftDanReSetScoreNiji(OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber], OpenTaiko.TJA.nDan_BalloonCount[NowShowingNumber]);
 		OpenTaiko.stageGameScreen.ftDanReSetBranches(OpenTaiko.TJA.bHasBranchDan[NowShowingNumber]);
