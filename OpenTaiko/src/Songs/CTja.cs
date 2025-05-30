@@ -327,7 +327,7 @@ internal class CTja : CActivity {
 	private ECourse nLineCountCourseTemp = ECourse.eNormal; //現在カウント中のコースを記録。
 
 	public int n参照中の難易度 = 3;
-	public int nScoreModeTmp = 99; //2017.01.28 DD
+	public int nScoreMode = -1;
 	public int[,] nScoreInit = new int[2, (int)Difficulty.Total]; //[ x, y ] x=通常or真打 y=コース
 	public int[] nScoreDiff = new int[(int)Difficulty.Total]; //[y]
 	public bool[,] b配点が指定されている = new bool[3, (int)Difficulty.Total]; //2017.06.04 kairera0467 [ x, y ] x=通常(Init)or真打orDiff y=コース
@@ -2902,7 +2902,7 @@ internal class CTja : CActivity {
 			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
-			ParseOptionalInt16(value => this.nScoreModeTmp = value);
+			ParseOptionalInt16(value => this.nScoreMode = value);
 		} else if (strCommandName.Equals("SCOREINIT")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				string[] scoreinit = strCommandParam.Split(',');
@@ -2926,7 +2926,7 @@ internal class CTja : CActivity {
 			});
 		} else if (strCommandName.Equals("SCOREMODE")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.nScoreModeTmp = Convert.ToInt16(strCommandParam);
+				this.nScoreMode = Convert.ToInt16(strCommandParam);
 			}
 		} else if (strCommandName.Equals("SCOREINIT")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
@@ -2944,13 +2944,6 @@ internal class CTja : CActivity {
 				this.nScoreDiff[this.n参照中の難易度] = Convert.ToInt16(strCommandParam);
 				this.b配点が指定されている[1, this.n参照中の難易度] = true;
 			}
-		}
-		if (this.nScoreModeTmp == 99) //2017.01.28 DD SCOREMODEを入力していない場合のみConfigで設定したモードにする
-		{
-			this.nScoreModeTmp = OpenTaiko.ConfigIni.nScoreMode;
-		}
-		if (OpenTaiko.ConfigIni.nScoreMode == 3 && !this.b配点が指定されている[2, this.n参照中の難易度]) { //2017.06.04 kairera0467
-			this.nScoreModeTmp = 3;
 		}
 	}
 
@@ -3193,7 +3186,7 @@ internal class CTja : CActivity {
 			ParseBalloon(strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
 			//tbBALLOON.Text = strCommandParam;
 		} else if (strCommandName.Equals("SCOREMODE")) {
-			ParseOptionalInt16(value => this.nScoreModeTmp = value);
+			ParseOptionalInt16(value => this.nScoreMode = value);
 		} else if (strCommandName.Equals("SCOREINIT")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				string[] scoreinit = strCommandParam.Split(',');
@@ -3467,10 +3460,6 @@ internal class CTja : CActivity {
 					}
 				}
 			}
-		}
-		if (this.nScoreModeTmp == 99) {
-			//2017.01.28 DD
-			this.nScoreModeTmp = OpenTaiko.ConfigIni.nScoreMode;
 		}
 	}
 	/// <summary>

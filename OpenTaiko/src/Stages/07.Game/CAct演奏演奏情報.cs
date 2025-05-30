@@ -33,7 +33,7 @@ internal class CAct演奏演奏情報 : CActivity {
 		NotesTextE = string.Format("NoteE:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[1]);
 		NotesTextM = string.Format("NoteM:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[2]);
 		NotesTextC = string.Format("NoteC:         {0:####0}", OpenTaiko.TJA.nノーツ数[3]);
-		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.TJA.nScoreModeTmp);
+		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.stageGameScreen.scoreMode[0]);
 		ListChipText = string.Format("ListChip:      {0:####0}", _chipCounts[0]);
 		ListChipMText = string.Format("ListChipM:     {0:####0}", _chipCounts[1]);
 
