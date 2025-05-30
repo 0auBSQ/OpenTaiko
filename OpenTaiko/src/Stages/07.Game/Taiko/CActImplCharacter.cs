@@ -152,12 +152,13 @@ internal class CActImplCharacter : CActivity {
 
 			bool endAnime = nNowCharaCounter[i] >= 1;
 
+			// Notice that nCharaFrameCount is -1 when no frames are defined
 			void getNowCharaFrame(double speed = 1.0) {
 				if (endAnime)
-					nNowCharaFrame[i] = nCharaFrameCount[i]; // max, to prevent a huge-value counter from overflowing the int
+					nNowCharaFrame[i] = Math.Max(0, nCharaFrameCount[i]); // to prevent a huge-value counter from overflowing the int
 				else
 					nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * speed * (nCharaFrameCount[i] + 1));
-				nNowCharaFrame[i] = Math.Clamp(nNowCharaFrame[i], 0, nCharaFrameCount[i]);
+				nNowCharaFrame[i] = Math.Max(0, Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]));
 			}
 
 			void getNowCharaFrameLooped() {
@@ -166,7 +167,7 @@ internal class CActImplCharacter : CActivity {
 				else
 					nNowCharaCounter[i] = 0;
 				nNowCharaFrame[i] = (int)(nNowCharaCounter[i] * (nCharaFrameCount[i] + 1));
-				nNowCharaFrame[i] = Math.Clamp(nNowCharaFrame[i], 0, nCharaFrameCount[i]);
+				nNowCharaFrame[i] = Math.Max(0, Math.Min(nNowCharaFrame[i], nCharaFrameCount[i]));
 			}
 
 			if (eNowAnime[i] != Anime.None) {
