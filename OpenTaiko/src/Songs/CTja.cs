@@ -13,7 +13,6 @@ namespace OpenTaiko;
 internal class CTja : CActivity {
 	// 定数
 
-	public List<string> listErrors = new List<string>();
 	private int nNowReadLine;
 	// Class
 
@@ -1514,10 +1513,10 @@ internal class CTja : CActivity {
 		new Regex(@"^([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)$", RegexOptions.Compiled);
 
 	private void AddCommandError(string command, string argument, string reason) {
-		this.listErrors.Add($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}: {reason}");
+		LogNotification.PopWarning($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}: {reason}");
 	}
 	private void AddWarn(string msg) {
-		this.listErrors.Add($"{nameof(CTja)}: {msg}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}");
+		LogNotification.PopWarning($"{nameof(CTja)}: {msg}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}");
 	}
 
 	private string[] SplitComma(string input) {
