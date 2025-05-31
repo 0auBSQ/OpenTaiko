@@ -154,6 +154,136 @@ internal class CActImplLaneTaiko : CActivity {
 			#endregion
 		}
 
+		this.DrawBranchText(x, y);
+
+		if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
+			if (OpenTaiko.Tx.Lane_Background_Sub != null) {
+				OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
+				if (OpenTaiko.stageGameScreen.isMultiPlay) {
+					OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
+				}
+			}
+		}
+
+
+		OpenTaiko.stageGameScreen.actTaikoLaneFlash.Draw();
+
+
+
+		if (OpenTaiko.Tx.Taiko_Frame[0] != null) {
+			// Tower frame (without tamashii jauge) if playing a tower chart
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				int frame_x;
+				int frame_y;
+				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
+					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
+				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
+					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
+				} else {
+					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_X[i];
+					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_Y[i];
+				}
+
+				CTexture tex = null;
+
+				switch (i) {
+					case 0: {
+							if (OpenTaiko.ConfigIni.bTokkunMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[3];
+							} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[5];
+							} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+								tex = OpenTaiko.Tx.Taiko_Frame[2];
+							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
+								tex = OpenTaiko.Tx.Taiko_Frame[6];
+							} else {
+								tex = OpenTaiko.Tx.Taiko_Frame[0];
+							}
+						}
+						break;
+					case 1: {
+							if (OpenTaiko.ConfigIni.bAIBattleMode) {
+								tex = OpenTaiko.Tx.Taiko_Frame[4];
+							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
+								tex = OpenTaiko.Tx.Taiko_Frame[6];
+							} else {
+								tex = OpenTaiko.Tx.Taiko_Frame[1];
+							}
+						}
+						break;
+					case 2:
+						tex = OpenTaiko.Tx.Taiko_Frame[6];
+						break;
+					case 3:
+						tex = OpenTaiko.Tx.Taiko_Frame[6];
+						break;
+					case 4:
+						tex = OpenTaiko.Tx.Taiko_Frame[6];
+						break;
+				}
+
+				tex?.t2D描画(frame_x, frame_y);
+			}
+
+			/*
+            if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.Tx.Taiko_Frame[3] != null)
+                TJAPlayer3.Tx.Taiko_Frame[3]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
+            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
+                TJAPlayer3.Tx.Taiko_Frame[2]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
+            else if (TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Taiko_Frame[5] != null)
+                TJAPlayer3.Tx.Taiko_Frame[5]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
+            else
+                TJAPlayer3.Tx.Taiko_Frame[0]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
+
+            if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
+            {
+                if (TJAPlayer3.ConfigIni.bAIBattleMode)
+                    TJAPlayer3.Tx.Taiko_Frame[4]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
+                else
+                    TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
+            }
+            */
+		}
+
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (this.n総移動時間[i] == -1) {
+				continue;
+			}
+			var nTime = (int)(long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			if (nTime < this.n移動開始時刻[i]) { // in case of rewinding
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i];
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i];
+			} else if (nTime < this.n移動開始時刻[i] + this.n総移動時間[i]) {
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.n移動距離px[i]);
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.nVerticalJSPos[i]);
+			} else {
+				this.n総移動時間[i] = -1;
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動目的場所X[i];
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動目的場所Y[i];
+			}
+		}
+
+
+
+
+		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
+			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
+			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
+			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
+			if (OpenTaiko.Tx.Lane_Background_GoGo != null) OpenTaiko.Tx.Lane_Background_GoGo.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
+		} else {
+			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = 255;
+			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = 255;
+			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = 255;
+			if (OpenTaiko.Tx.Lane_Background_GoGo != null) OpenTaiko.Tx.Lane_Background_GoGo.Opacity = 255;
+		}
+
+		return base.Draw();
+	}
+
+	private void DrawBranchText(int[] x, int[] y) {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.stageGameScreen.bUseBranch[i] == true) {
 				#region NullCheck
@@ -402,133 +532,6 @@ internal class CActImplLaneTaiko : CActivity {
 
 			}
 		}
-
-
-		if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
-			if (OpenTaiko.Tx.Lane_Background_Sub != null) {
-				OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
-				if (OpenTaiko.stageGameScreen.isMultiPlay) {
-					OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
-				}
-			}
-		}
-
-
-		OpenTaiko.stageGameScreen.actTaikoLaneFlash.Draw();
-
-
-
-		if (OpenTaiko.Tx.Taiko_Frame[0] != null) {
-			// Tower frame (without tamashii jauge) if playing a tower chart
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				int frame_x;
-				int frame_y;
-				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
-					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
-				} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
-					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
-				} else {
-					frame_x = OpenTaiko.Skin.Game_Taiko_Frame_X[i];
-					frame_y = OpenTaiko.Skin.Game_Taiko_Frame_Y[i];
-				}
-
-				CTexture tex = null;
-
-				switch (i) {
-					case 0: {
-							if (OpenTaiko.ConfigIni.bTokkunMode) {
-								tex = OpenTaiko.Tx.Taiko_Frame[3];
-							} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-								tex = OpenTaiko.Tx.Taiko_Frame[5];
-							} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-								tex = OpenTaiko.Tx.Taiko_Frame[2];
-							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
-								tex = OpenTaiko.Tx.Taiko_Frame[6];
-							} else {
-								tex = OpenTaiko.Tx.Taiko_Frame[0];
-							}
-						}
-						break;
-					case 1: {
-							if (OpenTaiko.ConfigIni.bAIBattleMode) {
-								tex = OpenTaiko.Tx.Taiko_Frame[4];
-							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
-								tex = OpenTaiko.Tx.Taiko_Frame[6];
-							} else {
-								tex = OpenTaiko.Tx.Taiko_Frame[1];
-							}
-						}
-						break;
-					case 2:
-						tex = OpenTaiko.Tx.Taiko_Frame[6];
-						break;
-					case 3:
-						tex = OpenTaiko.Tx.Taiko_Frame[6];
-						break;
-					case 4:
-						tex = OpenTaiko.Tx.Taiko_Frame[6];
-						break;
-				}
-
-				tex?.t2D描画(frame_x, frame_y);
-			}
-
-			/*
-            if (TJAPlayer3.ConfigIni.bTokkunMode == true && TJAPlayer3.Tx.Taiko_Frame[3] != null)
-                TJAPlayer3.Tx.Taiko_Frame[3]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
-            else if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Tower && TJAPlayer3.Tx.Taiko_Frame[2] != null)
-                TJAPlayer3.Tx.Taiko_Frame[2]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
-            else if (TJAPlayer3.ConfigIni.bAIBattleMode && TJAPlayer3.Tx.Taiko_Frame[5] != null)
-                TJAPlayer3.Tx.Taiko_Frame[5]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
-            else
-                TJAPlayer3.Tx.Taiko_Frame[0]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[0], TJAPlayer3.Skin.Game_Taiko_Frame_Y[0]);
-
-            if (TJAPlayer3.stage演奏ドラム画面.bDoublePlay)
-            {
-                if (TJAPlayer3.ConfigIni.bAIBattleMode)
-                    TJAPlayer3.Tx.Taiko_Frame[4]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
-                else
-                    TJAPlayer3.Tx.Taiko_Frame[1]?.t2D描画(TJAPlayer3.Skin.Game_Taiko_Frame_X[1], TJAPlayer3.Skin.Game_Taiko_Frame_Y[1]);
-            }
-            */
-		}
-
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (this.n総移動時間[i] == -1) {
-				continue;
-			}
-			var nTime = (int)(long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-			if (nTime < this.n移動開始時刻[i]) { // in case of rewinding
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i];
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i];
-			} else if (nTime < this.n移動開始時刻[i] + this.n総移動時間[i]) {
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.n移動距離px[i]);
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.nVerticalJSPos[i]);
-			} else {
-				this.n総移動時間[i] = -1;
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動目的場所X[i];
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動目的場所Y[i];
-			}
-		}
-
-
-
-
-		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
-			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
-			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
-			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
-			if (OpenTaiko.Tx.Lane_Background_GoGo != null) OpenTaiko.Tx.Lane_Background_GoGo.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
-		} else {
-			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = 255;
-			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = 255;
-			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = 255;
-			if (OpenTaiko.Tx.Lane_Background_GoGo != null) OpenTaiko.Tx.Lane_Background_GoGo.Opacity = 255;
-		}
-
-		return base.Draw();
 	}
 
 	public void DrawBranchBG(int[] x, int[] y) {
