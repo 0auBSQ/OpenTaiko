@@ -3457,9 +3457,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamVMove.Tick();
 			float value = 0.0f;
-			if (currentCamVMoveChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
-			if (currentCamVMoveChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
-			if (currentCamVMoveChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+			if (currentCamVMoveChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+			if (currentCamVMoveChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
+			if (currentCamVMoveChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamVMove, currentCamVMoveChip.fCamScrollStartY, currentCamVMoveChip.fCamScrollEndY, currentCamVMoveChip.fCamMoveType);
 			OpenTaiko.fCamYOffset = float.IsNaN(value) ? currentCamVMoveChip.fCamScrollStartY : value;
 
 			if (ctCamVMove.IsEnded) {
@@ -3472,9 +3472,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamHMove.Tick();
 			float value = 0.0f;
-			if (currentCamHMoveChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
-			if (currentCamHMoveChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
-			if (currentCamHMoveChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+			if (currentCamHMoveChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+			if (currentCamHMoveChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
+			if (currentCamHMoveChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamHMove, currentCamHMoveChip.fCamScrollStartX, currentCamHMoveChip.fCamScrollEndX, currentCamHMoveChip.fCamMoveType);
 			OpenTaiko.fCamXOffset = float.IsNaN(value) ? currentCamHMoveChip.fCamScrollStartX : value;
 
 			if (ctCamHMove.IsEnded) {
@@ -3487,9 +3487,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamZoom.Tick();
 			float value = 0.0f;
-			if (currentCamZoomChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
-			if (currentCamZoomChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
-			if (currentCamZoomChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+			if (currentCamZoomChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+			if (currentCamZoomChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
+			if (currentCamZoomChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamZoom, currentCamZoomChip.fCamZoomStart, currentCamZoomChip.fCamZoomEnd, currentCamZoomChip.fCamMoveType);
 			OpenTaiko.fCamZoomFactor = float.IsNaN(value) ? currentCamZoomChip.fCamZoomStart : value;
 
 			if (ctCamZoom.IsEnded) {
@@ -3502,9 +3502,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamRotation.Tick();
 			float value = 0.0f;
-			if (currentCamRotateChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
-			if (currentCamRotateChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
-			if (currentCamRotateChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+			if (currentCamRotateChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+			if (currentCamRotateChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
+			if (currentCamRotateChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamRotation, currentCamRotateChip.fCamRotationStart, currentCamRotateChip.fCamRotationEnd, currentCamRotateChip.fCamMoveType);
 			OpenTaiko.fCamRotation = float.IsNaN(value) ? currentCamRotateChip.fCamRotationStart : value;
 
 			if (ctCamRotation.IsEnded) {
@@ -3517,9 +3517,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamVScale.Tick();
 			float value = 0.0f;
-			if (currentCamVScaleChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
-			if (currentCamVScaleChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
-			if (currentCamVScaleChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+			if (currentCamVScaleChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+			if (currentCamVScaleChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
+			if (currentCamVScaleChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamVScale, currentCamVScaleChip.fCamScaleStartY, currentCamVScaleChip.fCamScaleEndY, currentCamVScaleChip.fCamMoveType);
 			OpenTaiko.fCamYScale = float.IsNaN(value) ? currentCamVScaleChip.fCamScaleStartY : value;
 
 			if (ctCamVScale.IsEnded) {
@@ -3532,9 +3532,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		{
 			ctCamHScale.Tick();
 			float value = 0.0f;
-			if (currentCamHScaleChip.strCamEaseType.Equals("IN")) value = easing.EaseIn(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
-			if (currentCamHScaleChip.strCamEaseType.Equals("OUT")) value = easing.EaseOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
-			if (currentCamHScaleChip.strCamEaseType.Equals("IN_OUT")) value = easing.EaseInOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+			if (currentCamHScaleChip.strCamEaseType.Equals("IN")) value = Easing.EaseIn(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+			if (currentCamHScaleChip.strCamEaseType.Equals("OUT")) value = Easing.EaseOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
+			if (currentCamHScaleChip.strCamEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(ctCamHScale, currentCamHScaleChip.fCamScaleStartX, currentCamHScaleChip.fCamScaleEndX, currentCamHScaleChip.fCamMoveType);
 			OpenTaiko.fCamXScale = float.IsNaN(value) ? currentCamHScaleChip.fCamScaleStartX : value;
 
 			if (ctCamHScale.IsEnded) {
@@ -3555,9 +3555,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 					value = chip.fObjEnd;
 					counter = null;
 				} else {
-					if (chip.strObjEaseType.Equals("IN")) value = easing.EaseIn(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
-					if (chip.strObjEaseType.Equals("OUT")) value = easing.EaseOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
-					if (chip.strObjEaseType.Equals("IN_OUT")) value = easing.EaseInOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+					if (chip.strObjEaseType.Equals("IN")) value = Easing.EaseIn(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+					if (chip.strObjEaseType.Equals("OUT")) value = Easing.EaseOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
+					if (chip.strObjEaseType.Equals("IN_OUT")) value = Easing.EaseInOut(counter, chip.fObjStart, chip.fObjEnd, chip.objCalcType);
 					value = float.IsNaN(value) ? chip.fObjStart : value;
 				}
 
@@ -4447,8 +4447,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private Dictionary<CChip, CCounter> camHandlers;
 	private Dictionary<CChip, CCounter> objHandlers;
-
-	private Easing easing = new Easing();
 
 	public bool bCustomDoron = false;
 	private bool bConfigUpdated = false;

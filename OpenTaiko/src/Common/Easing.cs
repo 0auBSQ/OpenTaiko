@@ -2,178 +2,156 @@
 
 namespace OpenTaiko;
 
-class Easing {
-	public int EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
-		StartPoint = startPoint;
-		EndPoint = endPoint;
-		Sa = EndPoint - StartPoint;
-		TimeMs = (int)counter.EndValue;
-		Type = type;
-		CounterValue = counter.CurrentValue;
+static class Easing {
+	public static int EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		float Sa = endPoint - startPoint;
+		double TimeMs = (int)counter.EndValue;
+		double CounterValue = counter.CurrentValue / TimeMs;
+		double Value = 0;
 
-		switch (Type) {
+		switch (type) {
 			case CalcType.Quadratic: //Quadratic
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue * CounterValue + StartPoint;
+				Value = Sa * CounterValue * CounterValue + startPoint;
 				break;
 			case CalcType.Cubic: //Cubic
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue * CounterValue * CounterValue + StartPoint;
+				Value = Sa * CounterValue * CounterValue * CounterValue + startPoint;
 				break;
 			case CalcType.Quartic: //Quartic
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue * CounterValue * CounterValue * CounterValue + StartPoint;
+				Value = Sa * CounterValue * CounterValue * CounterValue * CounterValue + startPoint;
 				break;
 			case CalcType.Quintic: //Quintic
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + StartPoint;
+				Value = Sa * CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + startPoint;
 				break;
 			case CalcType.Sinusoidal: //Sinusoidal
-				Value = -Sa * Math.Cos(CounterValue / TimeMs * (Math.PI / 2)) + Sa + StartPoint;
+				Value = -Sa * Math.Cos(CounterValue * (Math.PI / 2)) + Sa + startPoint;
 				break;
 			case CalcType.Exponential: //Exponential
-				Value = Sa * Math.Pow(2, 10 * (CounterValue / TimeMs - 1)) + StartPoint;
+				Value = Sa * Math.Pow(2, 10 * (CounterValue - 1)) + startPoint;
 				break;
 			case CalcType.Circular: //Circular
-				CounterValue /= TimeMs;
-				Value = -Sa * (Math.Sqrt(1 - CounterValue * CounterValue) - 1) + StartPoint;
+				Value = -Sa * (Math.Sqrt(1 - CounterValue * CounterValue) - 1) + startPoint;
 				break;
 			case CalcType.Linear: //Linear
-				Value = Sa * (CounterValue / TimeMs) + StartPoint;
+				Value = Sa * (CounterValue) + startPoint;
+				break;
 				break;
 		}
 
 		return (int)Value;
 	}
-	public int EaseOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
-		StartPoint = startPoint;
-		EndPoint = endPoint;
-		Sa = EndPoint - StartPoint;
-		TimeMs = (int)counter.EndValue;
-		Type = type;
-		CounterValue = counter.CurrentValue;
+	public static int EaseOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		float Sa = endPoint - startPoint;
+		double TimeMs = (int)counter.EndValue;
+		double CounterValue = counter.CurrentValue / TimeMs;
+		double Value = 0;
 
-		switch (Type) {
+		switch (type) {
 			case CalcType.Quadratic: //Quadratic
-				CounterValue /= TimeMs;
-				Value = -Sa * CounterValue * (CounterValue - 2) + StartPoint;
+				Value = -Sa * CounterValue * (CounterValue - 2) + startPoint;
 				break;
 			case CalcType.Cubic: //Cubic
-				CounterValue /= TimeMs;
 				CounterValue--;
-				Value = Sa * (CounterValue * CounterValue * CounterValue + 1) + StartPoint;
+				Value = Sa * (CounterValue * CounterValue * CounterValue + 1) + startPoint;
 				break;
 			case CalcType.Quartic: //Quartic
-				CounterValue /= TimeMs;
 				CounterValue--;
-				Value = -Sa * (CounterValue * CounterValue * CounterValue * CounterValue - 1) + StartPoint;
+				Value = -Sa * (CounterValue * CounterValue * CounterValue * CounterValue - 1) + startPoint;
 				break;
 			case CalcType.Quintic: //Quintic
-				CounterValue /= TimeMs;
 				CounterValue--;
-				Value = Sa * (CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + 1) + StartPoint;
+				Value = Sa * (CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + 1) + startPoint;
 				break;
 			case CalcType.Sinusoidal: //Sinusoidal
-				Value = Sa * Math.Sin(CounterValue / TimeMs * (Math.PI / 2)) + StartPoint;
+				Value = Sa * Math.Sin(CounterValue * (Math.PI / 2)) + startPoint;
 				break;
 			case CalcType.Exponential: //Exponential
-				Value = Sa * (-Math.Pow(2, -10 * CounterValue / TimeMs) + 1) + StartPoint;
+				Value = Sa * (-Math.Pow(2, -10 * CounterValue) + 1) + startPoint;
 				break;
 			case CalcType.Circular: //Circular
-				CounterValue /= TimeMs;
 				CounterValue--;
-				Value = Sa * Math.Sqrt(1 - CounterValue * CounterValue) + StartPoint;
+				Value = Sa * Math.Sqrt(1 - CounterValue * CounterValue) + startPoint;
 				break;
 			case CalcType.Linear: //Linear
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue + StartPoint;
+				Value = Sa * CounterValue + startPoint;
+				break;
 				break;
 		}
 
 		return (int)Value;
 	}
-	public float EaseInOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
-		StartPoint = startPoint;
-		EndPoint = endPoint;
-		Sa = EndPoint - StartPoint;
-		TimeMs = counter.EndValue;
-		Type = type;
-		CounterValue = counter.CurrentValue;
+	public static float EaseInOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		float Sa = endPoint - startPoint;
+		double TimeMs = counter.EndValue;
+		double CounterValue = counter.CurrentValue / TimeMs;
+		double Value = 0;
 
-		switch (Type) {
+		switch (type) {
 			case CalcType.Quadratic: //Quadratic
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = Sa / 2 * CounterValue * CounterValue + StartPoint;
+					Value = Sa / 2 * CounterValue * CounterValue + startPoint;
 					break;
 				}
 				CounterValue--;
-				Value = -Sa / 2 * (CounterValue * (CounterValue - 2) - 1) + StartPoint;
+				Value = -Sa / 2 * (CounterValue * (CounterValue - 2) - 1) + startPoint;
 				break;
 			case CalcType.Cubic: //Cubic
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = Sa / 2 * CounterValue * CounterValue * CounterValue + StartPoint;
+					Value = Sa / 2 * CounterValue * CounterValue * CounterValue + startPoint;
 					break;
 				}
 				CounterValue -= 2;
-				Value = Sa / 2 * (CounterValue * CounterValue * CounterValue + 2) + StartPoint;
+				Value = Sa / 2 * (CounterValue * CounterValue * CounterValue + 2) + startPoint;
 				break;
 			case CalcType.Quartic: //Quartic
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = Sa / 2 * CounterValue * CounterValue * CounterValue * CounterValue + StartPoint;
+					Value = Sa / 2 * CounterValue * CounterValue * CounterValue * CounterValue + startPoint;
 					break;
 				}
 				CounterValue -= 2;
-				Value = -Sa / 2 * (CounterValue * CounterValue * CounterValue * CounterValue - 2) + StartPoint;
+				Value = -Sa / 2 * (CounterValue * CounterValue * CounterValue * CounterValue - 2) + startPoint;
 				break;
 			case CalcType.Quintic: //Quintic
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = Sa / 2 * CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + StartPoint;
+					Value = Sa / 2 * CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + startPoint;
 					break;
 				}
 				CounterValue -= 2;
-				Value = Sa / 2 * (CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + 2) + StartPoint;
+				Value = Sa / 2 * (CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + 2) + startPoint;
 				break;
 			case CalcType.Sinusoidal: //Sinusoidal
-				Value = -Sa / 2 * (Math.Cos(Math.PI * CounterValue / TimeMs) - 1) + StartPoint;
+				Value = -Sa / 2 * (Math.Cos(Math.PI * CounterValue) - 1) + startPoint;
 				break;
 			case CalcType.Exponential: //Exponential
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = Sa / 2 * Math.Pow(2, 10 * (CounterValue - 1)) + StartPoint;
+					Value = Sa / 2 * Math.Pow(2, 10 * (CounterValue - 1)) + startPoint;
 					break;
 				}
 				CounterValue--;
-				Value = Sa / 2 * (-Math.Pow(2, -10 * CounterValue) + 2) + StartPoint;
+				Value = Sa / 2 * (-Math.Pow(2, -10 * CounterValue) + 2) + startPoint;
 				break;
 			case CalcType.Circular: //Circular
-				CounterValue /= TimeMs / 2;
+				CounterValue *= 2;
 				if (CounterValue < 1) {
-					Value = -Sa / 2 * (Math.Sqrt(1 - CounterValue * CounterValue) - 1) + StartPoint;
+					Value = -Sa / 2 * (Math.Sqrt(1 - CounterValue * CounterValue) - 1) + startPoint;
 					break;
 				}
 				CounterValue -= 2;
-				Value = Sa / 2 * (Math.Sqrt(1 - CounterValue * CounterValue) + 1) + StartPoint;
+				Value = Sa / 2 * (Math.Sqrt(1 - CounterValue * CounterValue) + 1) + startPoint;
 				break;
 			case CalcType.Linear: //Linear
-				CounterValue /= TimeMs;
-				Value = Sa * CounterValue + StartPoint;
+				Value = Sa * CounterValue + startPoint;
+				break;
 				break;
 		}
 
 		return (float)Value;
 	}
 
-	private float StartPoint;
-	private float EndPoint;
-	private float Sa;
-	private double TimeMs;
-	private CalcType Type;
-	private double CounterValue;
-	private double Value;
 	public enum CalcType {
 		Quadratic,
 		Cubic,
