@@ -3262,7 +3262,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if (this.b強制分岐譜面[nPlayer])//強制分岐譜面だったら次回コースをそのコースにセット
 								this.nNextBranch[nPlayer] = this.E強制コース[nPlayer];
 
-							this.t分岐処理(this.nNextBranch[nPlayer], nPlayer, pChip.n分岐時刻ms, pChip.eBranchCondition);
+							this.t分岐処理(this.nNextBranch[nPlayer], nPlayer, pChip.n分岐時刻ms);
 
 							OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[nPlayer].nAfter, this.nNextBranch[nPlayer], nPlayer);
 							OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[nPlayer], this.nNextBranch[nPlayer], nPlayer);
@@ -3836,6 +3836,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		var e種類 = pChip.eBranchCondition;
 
+		if (e種類 == CTja.EBranchConditionType.None)
+			return; // keep current branch
+
 		//分岐の仕方が同じなので一緒にしていいと思う。
 		var b分岐種類が一致 = e種類 == CTja.EBranchConditionType.Accuracy || e種類 == CTja.EBranchConditionType.Score;
 
@@ -3916,7 +3919,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public void t分岐処理(CTja.ECourse n分岐先, int nPlayer, double n発声位置, CTja.EBranchConditionType e分岐種類 = CTja.EBranchConditionType.Accuracy) {
+	public void t分岐処理(CTja.ECourse n分岐先, int nPlayer, double n発声位置) {
 
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
 
