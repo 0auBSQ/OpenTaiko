@@ -299,169 +299,45 @@ internal class CActImplLaneTaiko : CActivity {
 
 				#endregion
 
+				int nBefore = (int)this.stBranch[i].nBefore;
+				int nAfter = (int)this.stBranch[i].nAfter;
 				if (OpenTaiko.ConfigIni.SimpleMode) {
-					switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
-						case CTja.ECourse.eNormal:
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
-							break;
-						case CTja.ECourse.eExpert:
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-							break;
-						case CTja.ECourse.eMaster:
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
-							break;
-					}
+					OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].Opacity = 255;
+					OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i], y[i]);
 				} else if (OpenTaiko.ConfigIni.nBranchAnime == 0 && !_laneNull) {
 					if (!this.stBranch[i].ct分岐アニメ進行.IsTicked) {
-						switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
-							case CTja.ECourse.eNormal:
-								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
-								break;
-							case CTja.ECourse.eExpert:
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-								break;
-							case CTja.ECourse.eMaster:
-								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
-								break;
-						}
+						OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].Opacity = 255;
+						OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i], y[i]);
 					}
 					if (this.stBranch[i].ct分岐アニメ進行.IsTicked) {
-						#region[ 普通譜面_レベルアップ ]
-						//普通→玄人
-						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-
-							OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 60));
-							//CDTXMania.Tx.Lane_Text[1].n透明度 = this.ct分岐アニメ進行.n現在の値 > 100 ? 255 : ( ( ( this.ct分岐アニメ進行.n現在の値 * 0xff ) / 60 ) );
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i] + this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] - 30) + this.stBranch[i].nY);
+						int progress = this.stBranch[i].ct分岐アニメ進行.CurrentValue;
+						if (Math.Abs(nAfter - nBefore) >= 2) {
+							// 2-level change
+							if (progress < 150) {
+								nAfter = 1;
 							} else {
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
+								progress -= 150;
+								nBefore = 1;
 							}
-
 						}
-
-						//普通→達人
-						if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] - 12) + this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 100));
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] - 20) + this.stBranch[i].nY);
-							}
-							//if( this.stBranch[ i ].ct分岐アニメ進行.n現在の値 >= 5 && this.stBranch[ i ].ct分岐アニメ進行.n現在の値 < 60 )
-							//{
-							//    this.stBranch[ i ].nY = this.stBranch[ i ].ct分岐アニメ進行.n現在の値 / 2;
-							//    this.tx普通譜面[ 1 ].t2D描画(CDTXMania.app.Device, 333, CDTXMania.Skin.nScrollFieldY[ i ] + this.stBranch[ i ].nY);
-							//    this.tx普通譜面[ 1 ].n透明度 = this.stBranch[ i ].ct分岐アニメ進行.n現在の値 > 100 ? 0 : ( 255 - ( ( this.stBranch[ i ].ct分岐アニメ進行.n現在の値 * 0xff) / 100));
-							//    this.tx玄人譜面[ 1 ].t2D描画(CDTXMania.app.Device, 333, ( CDTXMania.Skin.nScrollFieldY[ i ] - 10 ) + this.stBranch[ i ].nY);
-							//}
-							else if (this.stBranch[i].ct分岐アニメ進行.CurrentValue >= 60 && this.stBranch[i].ct分岐アニメ進行.CurrentValue < 150) {
-								this.stBranch[i].nY = 21;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-							} else if (this.stBranch[i].ct分岐アニメ進行.CurrentValue >= 150 && this.stBranch[i].ct分岐アニメ進行.CurrentValue < 210) {
-								this.stBranch[i].nY = ((this.stBranch[i].ct分岐アニメ進行.CurrentValue - 150) / 2);
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] + this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 100));
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] - 20) + this.stBranch[i].nY);
+						var opacity = (Math.Min(100, progress) * 0xff) / 100;
+						if (progress < 60) {
+							OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
+							OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+							this.stBranch[i].nY = progress / 2;
+							if (nAfter > nBefore) {
+								// AC7~14 level up: fly down
+								OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] + this.stBranch[i].nY);
+								OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] - 30) + this.stBranch[i].nY);
 							} else {
-								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
+								// AC7~14 level down: fly up
+								OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] - this.stBranch[i].nY);
+								OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] + 30) - this.stBranch[i].nY);
 							}
+						} else {
+							OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+							OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], y[i]);
 						}
-						#endregion
-						#region[ 玄人譜面_レベルアップ ]
-						//玄人→達人
-						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-
-							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 60));
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] + this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] - 20) + this.stBranch[i].nY);
-							} else {
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
-							}
-						}
-						#endregion
-						#region[ 玄人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-
-							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 60));
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] - this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] + 30) - this.stBranch[i].nY);
-							} else {
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
-							}
-						}
-						#endregion
-						#region[ 達人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 60));
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] - this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] + 30) - this.stBranch[i].nY);
-							} else if (this.stBranch[i].ct分岐アニメ進行.CurrentValue >= 60 && this.stBranch[i].ct分岐アニメ進行.CurrentValue < 150) {
-								this.stBranch[i].nY = 21;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-							} else if (this.stBranch[i].ct分岐アニメ進行.CurrentValue >= 150 && this.stBranch[i].ct分岐アニメ進行.CurrentValue < 210) {
-								this.stBranch[i].nY = ((this.stBranch[i].ct分岐アニメ進行.CurrentValue - 150) / 2);
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] - this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 100));
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] + 30) - this.stBranch[i].nY);
-							} else if (this.stBranch[i].ct分岐アニメ進行.CurrentValue >= 210) {
-								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
-							}
-						}
-						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
-							OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-							OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-
-							OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 0 : (255 - ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 60));
-							if (this.stBranch[i].ct分岐アニメ進行.CurrentValue < 60) {
-								this.stBranch[i].nY = this.stBranch[i].ct分岐アニメ進行.CurrentValue / 2;
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] - this.stBranch[i].nY);
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] + 30) - this.stBranch[i].nY);
-							} else {
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-							}
-
-						}
-						#endregion
 					}
 				} else if (!_laneNull) {
 					if (this.stBranch[i].nY座標 == 21) {
@@ -469,64 +345,21 @@ internal class CActImplLaneTaiko : CActivity {
 					}
 
 					if (this.stBranch[i].nY座標 == 0) {
-						switch (OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]) {
-							case CTja.ECourse.eNormal:
-								OpenTaiko.Tx.Lane_Text[0].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i]);
-								break;
-							case CTja.ECourse.eExpert:
-								OpenTaiko.Tx.Lane_Text[1].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i]);
-								break;
-							case CTja.ECourse.eMaster:
-								OpenTaiko.Tx.Lane_Text[2].Opacity = 255;
-								OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i]);
-								break;
+						OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].Opacity = 255;
+						OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i], y[i]);
+					} else if (this.stBranch[i].nY座標 != 0) {
+						var opacity = Math.Min(255, this.stBranch[i].nBranchレイヤー透明度);
+						OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
+						OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+						if (nAfter > nBefore) {
+							// AC15~ level up: fly up
+							OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
+							OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
+						} else {
+							// AC15~ level down: fly down
+							OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
+							OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] - 20) + this.stBranch[i].nY座標);
 						}
-					}
-
-					if (this.stBranch[i].nY座標 != 0) {
-						#region[ 普通譜面_レベルアップ ]
-						//普通→玄人
-						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
-							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						//普通→達人
-						if (this.stBranch[i].nBefore == CTja.ECourse.eNormal && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
-							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[0].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						#endregion
-						#region[ 玄人譜面_レベルアップ ]
-						//玄人→達人
-						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eMaster) {
-							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						#endregion
-						#region[ 玄人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CTja.ECourse.eExpert && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
-							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[1].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						#endregion
-						#region[ 達人譜面_レベルダウン ]
-						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
-							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[0].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						if (this.stBranch[i].nBefore == CTja.ECourse.eMaster && this.stBranch[i].nAfter == CTja.ECourse.eExpert) {
-							OpenTaiko.Tx.Lane_Text[2].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[1].t2D描画(x[i], (y[i] - 24) + this.stBranch[i].nY座標);
-							OpenTaiko.Tx.Lane_Text[2].Opacity = this.stBranch[i].nBranchレイヤー透明度;
-						}
-						#endregion
 					}
 				}
 
