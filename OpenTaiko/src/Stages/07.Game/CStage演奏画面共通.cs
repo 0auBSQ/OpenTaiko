@@ -2476,11 +2476,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (nPlayer == 1)
 			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
 
-		if (this.n分岐した回数[nPlayer] == 0) {
-			this.bUseBranch[nPlayer] = dTX.bHIDDENBRANCH ? false : dTX.bチップがある.Branch;
-		}
-
-
 		//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.灰, this.nLoopCount_Clear.ToString()  );
 
 		float play_bpm_time = this.GetNowPBMTime(dTX, 0);
@@ -3246,7 +3241,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
 						this.nBranch条件数値B = pChip.nBranchCondition2_Master;
 						if (!this.bLEVELHOLD[nPlayer]) {
-							OpenTaiko.stageGameScreen.bUseBranch[nPlayer] = true;
+							if (!OpenTaiko.stageGameScreen.bUseBranch[nPlayer]) {
+								OpenTaiko.stageGameScreen.bUseBranch[nPlayer] = true;
+								OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
+							}
 
 							CBRANCHSCORE branchScore;
 							if (OpenTaiko.ConfigIni.bAIBattleMode) {
@@ -4135,6 +4133,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.bIsGOGOTIME[i] = false;
 			this.bBranchedChart[i] = false;
 			this.n分岐した回数[i] = 0;
+			this.bUseBranch[i] = tja.bチップがある.Branch && !tja.bHIDDENBRANCH;
 
 			this.actPlayInfo.dbBPM[i] = tja.BASEBPM;
 			this.UpdateCharaCounter(i);
