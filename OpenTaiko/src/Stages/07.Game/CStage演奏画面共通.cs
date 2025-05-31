@@ -2509,7 +2509,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_AVI() {
-		if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && OpenTaiko.ConfigIni.bEnableAVI) {
+		if (((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut))
+			&& (this.actAVI?.rVD.bPlaying ?? false)
+			) {
+			this.actAVI.Pause(); // paused but still shown
+		}
+		if (OpenTaiko.ConfigIni.bEnableAVI) {
 			this.actAVI.Draw();
 		}
 	}
