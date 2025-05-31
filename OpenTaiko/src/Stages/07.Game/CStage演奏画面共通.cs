@@ -278,7 +278,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 		// Double play set here
-		this.bDoublePlay = OpenTaiko.ConfigIni.nPlayerCount >= 2 ? true : false;
+		this.isMultiPlay = OpenTaiko.ConfigIni.nPlayerCount >= 2 ? true : false;
 
 		this.nLoopCount_Clear = 1;
 
@@ -706,7 +706,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected CSound[] soundBlue = new CSound[5];
 	protected CSound[] soundAdlib = new CSound[5];
 	protected CSound[] soundClap = new CSound[5];
-	public bool bDoublePlay; // 2016.08.21 kairera0467 表示だけ。
+	public bool isMultiPlay; // 2016.08.21 kairera0467 表示だけ。
 	protected Stopwatch sw;     // 2011.6.13 最適化検討用のストップウォッチ
 	public int ListDan_Number;
 	private bool IsDanFailed;
