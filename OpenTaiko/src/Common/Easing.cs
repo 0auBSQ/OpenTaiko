@@ -4,9 +4,12 @@ namespace OpenTaiko;
 
 static class Easing {
 	public static int EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		double CounterValue = counter.CurrentValue / (double)(int)counter.EndValue;
+		return EaseIn(CounterValue, startPoint, endPoint, type);
+	}
+
+	public static int EaseIn(double CounterValue, float startPoint, float endPoint, CalcType type) {
 		float Sa = endPoint - startPoint;
-		double TimeMs = (int)counter.EndValue;
-		double CounterValue = counter.CurrentValue / TimeMs;
 		double Value = 0;
 
 		switch (type) {
@@ -39,10 +42,14 @@ static class Easing {
 
 		return (int)Value;
 	}
+
 	public static int EaseOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		double CounterValue = counter.CurrentValue / (double)(int)counter.EndValue;
+		return EaseOut(CounterValue, startPoint, endPoint, type);
+	}
+
+	public static int EaseOut(double CounterValue, float startPoint, float endPoint, CalcType type) {
 		float Sa = endPoint - startPoint;
-		double TimeMs = (int)counter.EndValue;
-		double CounterValue = counter.CurrentValue / TimeMs;
 		double Value = 0;
 
 		switch (type) {
@@ -79,10 +86,14 @@ static class Easing {
 
 		return (int)Value;
 	}
+
 	public static float EaseInOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
+		double CounterValue = counter.CurrentValue / (double)counter.EndValue;
+		return EaseInOut(CounterValue, startPoint, endPoint, type);
+	}
+
+	public static float EaseInOut(double CounterValue, float startPoint, float endPoint, CalcType type) {
 		float Sa = endPoint - startPoint;
-		double TimeMs = counter.EndValue;
-		double CounterValue = counter.CurrentValue / TimeMs;
 		double Value = 0;
 
 		switch (type) {
