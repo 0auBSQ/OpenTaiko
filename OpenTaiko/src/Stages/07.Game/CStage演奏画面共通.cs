@@ -2510,7 +2510,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 
-	protected void t進行描画_AVI() {
+	protected bool t進行描画_AVI() {
 		if (((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut))
 			&& (this.actAVI?.rVD.bPlaying ?? false)
 			) {
@@ -2518,7 +2518,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		if (OpenTaiko.ConfigIni.bEnableAVI) {
 			this.actAVI.Draw();
+			return true;
 		}
+		return false;
 	}
 	protected void t進行描画_STAGEFAILED() {
 		// Transition for failed games
@@ -4503,10 +4505,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actPlayInfo.Draw();
 		}
 	}
-	protected void t進行描画_背景() {
+	protected bool t進行描画_背景() {
 		if (this.txBgImage != null) {
 			this.txBgImage.t2D描画(0, 0);
+			return true;
 		}
+		return false;
 	}
 
 	protected void t進行描画_判定文字列1_通常位置指定の場合() {
