@@ -129,7 +129,6 @@ class Easing {
 				Value = -Sa / 2 * (CounterValue * CounterValue * CounterValue * CounterValue - 2) + StartPoint;
 				break;
 			case CalcType.Quintic: //Quintic
-				CounterValue /= TimeMs;
 				CounterValue /= TimeMs / 2;
 				if (CounterValue < 1) {
 					Value = Sa / 2 * CounterValue * CounterValue * CounterValue * CounterValue * CounterValue + StartPoint;
