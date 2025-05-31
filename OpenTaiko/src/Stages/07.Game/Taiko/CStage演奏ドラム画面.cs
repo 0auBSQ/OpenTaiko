@@ -421,7 +421,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			//this.t進行描画_レーン();
 			//this.t進行描画_レーンフラッシュD();
 
-			if ((OpenTaiko.ConfigIni.eClipDispType == EClipDispType.WindowOnly || OpenTaiko.ConfigIni.eClipDispType == EClipDispType.Both) && !this.isMultiPlay)
+			if (BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && !this.isMultiPlay)
 				this.actAVI.t窓表示();
 
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
