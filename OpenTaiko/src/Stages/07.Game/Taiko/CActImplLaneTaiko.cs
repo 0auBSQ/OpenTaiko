@@ -580,7 +580,7 @@ internal class CActImplLaneTaiko : CActivity {
 				#endregion
 
 				if (OpenTaiko.ConfigIni.nBranchAnime == 1) {
-					#region[ AC7～14風の背後レイヤー ]
+					#region[ AC15～風の背後レイヤー ]
 					int n透明度 = ((100 - this.stBranch[i].ct分岐アニメ進行.CurrentValue) * 0xff) / 100;
 
 					#region[ 普通譜面_レベルアップ ]
@@ -633,6 +633,7 @@ internal class CActImplLaneTaiko : CActivity {
 					#endregion
 					#endregion
 				} else if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
+					#region[ AC7～14風の背後レイヤー ]
 					#region[ 普通譜面_レベルアップ ]
 					//普通→玄人
 					if (this.stBranch[i].nBefore == 0 && this.stBranch[i].nAfter == CTja.ECourse.eNormal) {
@@ -693,6 +694,7 @@ internal class CActImplLaneTaiko : CActivity {
 						OpenTaiko.Tx.Lane_Base[2].Opacity = this.stBranch[i].ct分岐アニメ進行.CurrentValue > 100 ? 255 : ((this.stBranch[i].ct分岐アニメ進行.CurrentValue * 0xff) / 100);
 						OpenTaiko.Tx.Lane_Base[2].t2D描画(x[i], y[i]);
 					}
+					#endregion
 					#endregion
 				}
 			}
