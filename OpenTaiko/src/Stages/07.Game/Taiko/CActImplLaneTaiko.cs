@@ -22,6 +22,8 @@ internal class CActImplLaneTaiko : CActivity {
 			this.stBranch[i].nBranchレイヤー透明度 = 0;
 			this.stBranch[i].nBranch文字透明度 = 0;
 			this.stBranch[i].nY座標 = 0;
+			this.stBranch[i].ctFadeIn = null;
+			this.stBranch[i].dxFadeIn = 0;
 
 			this.ResetPlayStates();
 		}
@@ -119,6 +121,15 @@ internal class CActImplLaneTaiko : CActivity {
 				this.stBranch[i].ct分岐アニメ進行.Tick();
 				if (this.stBranch[i].ct分岐アニメ進行.IsEnded) {
 					this.stBranch[i].ct分岐アニメ進行.Stop();
+				}
+			}
+
+			var ctFadeIn = this.stBranch[i].ctFadeIn;
+			if (ctFadeIn?.IsUnEnded ?? false) {
+				ctFadeIn.Tick();
+				this.stBranch[i].dxFadeIn = (int)(300 * (1 - ctFadeIn.CurrentValue / ctFadeIn.EndValue));
+				if (ctFadeIn.IsEnded) {
+					this.stBranch[i].dxFadeIn = 0;
 				}
 			}
 			#endregion
@@ -294,7 +305,7 @@ internal class CActImplLaneTaiko : CActivity {
 			}
 			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ct分岐アニメ進行.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nY座標 == 0)) {
 				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].Opacity = 255;
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				continue;
 			}
 
@@ -319,16 +330,16 @@ internal class CActImplLaneTaiko : CActivity {
 					var nY = progress / 2;
 					if (nAfter > nBefore) {
 						// AC7~14 level up: fly down
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] + nY);
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] - 30) + nY);
+						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + nY);
+						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] - 30) + nY);
 					} else {
 						// AC7~14 level down: fly up
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] - nY);
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] + 30) - nY);
+						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - nY);
+						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] + 30) - nY);
 					}
 				} else {
 					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				}
 			} else {
 				var opacity = Math.Min(255, this.stBranch[i].nBranchレイヤー透明度);
@@ -336,12 +347,12 @@ internal class CActImplLaneTaiko : CActivity {
 				OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
 				if (nAfter > nBefore) {
 					// AC15~ level up: fly up
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] - this.stBranch[i].nY座標);
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] + 20) - this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] + 20) - this.stBranch[i].nY座標);
 				} else {
 					// AC15~ level down: fly down
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i], y[i] + this.stBranch[i].nY座標);
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i], (y[i] - 20) + this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] - 20) + this.stBranch[i].nY座標);
 				}
 			}
 		}
@@ -581,6 +592,13 @@ internal class CActImplLaneTaiko : CActivity {
 		this.stBranch[nPlayer].nAfter = n次回;
 	}
 
+	public void BranchText_FadeIn(int? msDelay, int nPlayer) {
+		this.stBranch[nPlayer].dxFadeIn = 300;
+		if (msDelay != null) {
+			this.stBranch[nPlayer].ctFadeIn = new CCounter(-msDelay.Value, 120, 1, OpenTaiko.Timer);
+		}
+	}
+
 	public void t判定枠移動(int nPlayer, CTja.CJPOSSCROLL jposscroll, int msTimeNote) {
 		this.n移動開始時刻[nPlayer] = msTimeNote;
 		this.n移動開始X[nPlayer] = jposscroll.pxOrigX;
@@ -643,6 +661,8 @@ internal class CActImplLaneTaiko : CActivity {
 		public int nBranchレイヤー透明度;
 		public int nBranch文字透明度;
 		public int nY座標;
+		public int dxFadeIn;
+		public CCounter? ctFadeIn;
 	}
 
 

@@ -343,6 +343,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 				this.actFI.tフェードイン開始();
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+					this.actLaneTaiko.BranchText_FadeIn(null, i);
+				}
 
 				// TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
 				base.IsFirstDraw = false;
