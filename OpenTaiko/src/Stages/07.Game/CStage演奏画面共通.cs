@@ -409,6 +409,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		queueMixerSound = null;
 		//			GCSettings.LatencyMode = this.gclatencymode;
 
+		this.actAVI.rVD = null; // Will be disposed by TJA.DeActivate() later
+
 		var meanLag = CLagLogger.LogAndReturnMeanLag();
 
 		this.actDan.IsAnimating = false;// IsAnimating=trueのときにそのまま選曲画面に戻ると、文字列が描画されない問題修正用。
@@ -4318,6 +4320,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		this.objHandlers.Clear();
 
+		this.actAVI.rVD = null;
 		if ((OpenTaiko.TJA.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
 			ShowVideo = true;
 		} else {
@@ -4415,24 +4418,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 							}
 							#endregion
 						}
-					}
-				}
-			}
-			#endregion
-			#region [ 演奏開始時点で既に表示されているBGAとAVIの、シークと再生 ]
-			if (tjai.listVD.Count > 0) {
-				for (int i = 0; i < iLastChipAtStart[nPlayer]; i++) {
-					CChip chip = tjai.listChip[i];
-					if (chip.nChannelNo == 0x54) {
-						if (chip.n発声時刻ms <= nStartTime) {
-							chip.bHit = true;
-							this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
-							this.actAVI.Start(this.actAVI.rVD);
-							break;
-						} else {
-							this.actAVI.Seek(0);
-						}
-						break;
 					}
 				}
 			}

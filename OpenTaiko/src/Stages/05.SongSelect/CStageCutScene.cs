@@ -117,6 +117,7 @@ class CStageCutScene : CStage {
 		// On de-activation
 		this.StopSound();
 		this.rVD?.Dispose();
+		this.rVD = null;
 
 		this.cutScenes?.Clear();
 		this.cutScenes = null;
