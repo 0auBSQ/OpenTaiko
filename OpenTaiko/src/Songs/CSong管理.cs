@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using OpenTaiko.CSongListNodeComparers;
@@ -187,8 +186,7 @@ internal class CSongs管理 {
 						}
 
 						this.n検索された曲ノード数++;
-					}
-					else {
+					} else {
 						CTja dtx = new CTja(filePath, false, 0, 0);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
@@ -590,7 +588,6 @@ internal class CSongs管理 {
 						sb.Append(", background=" + c曲リストノード.score[i].譜面情報.Backgound);
 						sb.Append(", lvDr=" + c曲リストノード.score[i].譜面情報.レベル.Drums);
 						sb.Append(", lvHide=" + c曲リストノード.score[i].譜面情報.レベルを非表示にする);
-						sb.Append(", type=" + c曲リストノード.score[i].譜面情報.曲種別);
 						sb.Append(", bpm=" + c曲リストノード.score[i].譜面情報.Bpm);
 						sb.Append(", basebpm=" + c曲リストノード.score[i].譜面情報.BaseBpm);
 						sb.Append(", minbpm=" + c曲リストノード.score[i].譜面情報.MinBpm);

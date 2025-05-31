@@ -4194,6 +4194,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.nCurrentRollCount[i] = 0;
 				this.nTotalRollCount[i] = 0;
 
+				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
+
 				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character];
 				switch (chara.effect.tGetGaugeType()) {
 					default:

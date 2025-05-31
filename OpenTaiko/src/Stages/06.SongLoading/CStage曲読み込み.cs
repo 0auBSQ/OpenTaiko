@@ -425,6 +425,7 @@ internal class CStage曲読み込み : CStage {
 
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 							var _dtx = OpenTaiko.GetTJA(i);
+							_dtx?.tInitLocalStores(i);
 							_dtx?.tRandomizeTaikoChips(i);
 							_dtx?.tApplyFunMods(i);
 							OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
