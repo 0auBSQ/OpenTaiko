@@ -363,8 +363,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			// Layer: background
 
 			// BGIMAGE
-			// (????)
-			if (!(String.IsNullOrEmpty(OpenTaiko.TJA.strBGIMAGE_PATH) && BGA_Shown)) //背景動画があったら背景画像を描画しない。
+			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && !string.IsNullOrEmpty(OpenTaiko.TJA.strBGIMAGE_PATH)) //背景動画があったら背景画像を描画しない。
 			{
 				this.t進行描画_背景();
 			}
