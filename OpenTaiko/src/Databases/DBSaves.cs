@@ -237,6 +237,56 @@ internal class DBSaves {
 
 	#endregion
 
+	#region [active_triggers Table]
+
+	public static HashSet<string> GetActiveTriggersSet(Int64 saveId) {
+		HashSet<string> _activeTriggers = new HashSet<string>();
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return _activeTriggers;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                    SELECT *
+                    FROM active_triggers
+                    WHERE SaveId={saveId};
+                ";
+		SqliteDataReader reader = command.ExecuteReader();
+		while (reader.Read()) {
+			string _triggerName = (string)reader["Trigger"];
+			_activeTriggers.Add(_triggerName);
+		}
+		reader.Close();
+
+		return _activeTriggers;
+	}
+
+	public static void DBToggleGlobalTrigger(Int64 saveId, string triggerName, bool triggerValue) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		if (triggerValue) {
+			command.CommandText =
+			@$"
+                    INSERT INTO active_triggers (Trigger, SaveId)
+					SELECT '{triggerName}', {saveId}
+					WHERE NOT EXISTS (
+						SELECT 1 FROM active_triggers WHERE Trigger='{triggerName}' AND SaveId={saveId}
+					);
+                ";
+		} else {
+			command.CommandText =
+			@$"
+                    DELETE FROM active_triggers
+					WHERE Trigger='{triggerName}' AND SaveId={saveId};
+                ";
+		}
+		command.ExecuteNonQuery();
+	}
+
+	#endregion
+
 	#region [best_plays Table]
 
 	public static Dictionary<string, BestPlayRecords.CBestPlayRecord> GetBestPlaysAsDict(Int64 saveId) {
