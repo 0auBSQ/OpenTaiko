@@ -37,6 +37,8 @@ static class Easing {
 			case CalcType.Linear: //Linear
 				Value = Sa * (CounterValue) + startPoint;
 				break;
+			case CalcType.Back: // Back
+				Value = Sa * ((Coef1_Back + 1) * CounterValue * CounterValue * CounterValue - Coef1_Back * CounterValue * CounterValue) + startPoint;
 				break;
 		}
 
@@ -81,6 +83,9 @@ static class Easing {
 			case CalcType.Linear: //Linear
 				Value = Sa * CounterValue + startPoint;
 				break;
+			case CalcType.Back: // Back
+				CounterValue--;
+				Value = Sa * (1 + (Coef1_Back + 1) * CounterValue * CounterValue * CounterValue + Coef1_Back * CounterValue * CounterValue) + startPoint;
 				break;
 		}
 
@@ -157,6 +162,14 @@ static class Easing {
 			case CalcType.Linear: //Linear
 				Value = Sa * CounterValue + startPoint;
 				break;
+			case CalcType.Back: // Back
+				CounterValue *= 2;
+				if (CounterValue < 1) {
+					Value = Sa / 2 * ((Coef2_Back + 1) * CounterValue * CounterValue * CounterValue - Coef2_Back * CounterValue * CounterValue) + startPoint;
+					break;
+				}
+				CounterValue -= 2;
+				Value = Sa / 2 * (2 + (Coef2_Back + 1) * CounterValue * CounterValue * CounterValue + Coef2_Back * CounterValue * CounterValue) + startPoint;
 				break;
 		}
 
@@ -171,6 +184,10 @@ static class Easing {
 		Sinusoidal,
 		Exponential,
 		Circular,
-		Linear
+		Linear,
+		Back,
 	}
+
+	private const double Coef1_Back = 1.70158;
+	private const double Coef2_Back = Coef1_Back * 1.525;
 }
