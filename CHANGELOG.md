@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0.67] - 2025-05-31 (Beta)
+
+- [Enhancement] Pause the BGA/MOVIE instead of hiding it for STAGE FAILED
+- [BugFix] Crash when playing a song with any BGA/MOVIE ever played, then choose another song, then seek to after any BPM/MOVIE in this song should play before any such event plays, and then resume play
+- [BugFix] BGIMAGE was drawn when BGA is shown or in training mode
+- [BugFix] BGA/MOVIE window display did not hide on #BGAOFF or retrying
+- [BugFix] BGIMAGE was overlapped by predefined background and was invisible
+
 ## [0.6.0.66] - 2025-05-30 (Beta)
 
 - Reintroduce the 0.6.0.64 update with the crashes fixed
