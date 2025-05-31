@@ -32,7 +32,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ChildActivities.Add(this.actFI = new CActFIFOStart());
 		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
 		base.ChildActivities.Add(this.actFOClear = new CActFIFOResult());
-		base.ChildActivities.Add(this.actLane = new CActImplLane());
 		base.ChildActivities.Add(this.actEnd = new CActImplClearAnimation());
 		base.ChildActivities.Add(this.actDancer = new CActImplDancer());
 		base.ChildActivities.Add(this.actMtaiko = new CActImplMtaiko());
@@ -599,7 +598,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public CActImplFireworks actChipFireD;
 
 	private CActImplPad actPad;
-	public CActImplLane actLane;
 	public CActImplMtaiko actMtaiko;
 	public CActImplLaneTaiko actLaneTaiko;
 	public CActImplClearAnimation actEnd;
