@@ -61,6 +61,7 @@ internal class CTja : CActivity {
 	}
 
 	public enum EBranchConditionType {
+		None,
 		Accuracy,
 		Drumroll,
 		Score,
@@ -1996,6 +1997,7 @@ internal class CTja : CActivity {
 			this.bチップがある.Branch = true;
 
 			//条件数値。
+			string strCond = "";
 			double[] nNum = new double[2];
 
 			//名前と条件Aの間に,が無いと正常に動作しなくなる.2020.04.23.akasoko26
@@ -2009,16 +2011,25 @@ internal class CTja : CActivity {
 				argument = argument.Insert(1, ",");
 			#endregion
 
-			var branchStartArgumentMatch = BranchStartArgumentRegex.Match(argument);
-			nNum[0] = Convert.ToDouble(branchStartArgumentMatch.Groups[2].Value);
-			nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
+			var e条件 = EBranchConditionType.None; // empty or unrecognized argument format: none
 
-			var e条件 = branchStartArgumentMatch.Groups[1].Value switch {
-				"r" => EBranchConditionType.Drumroll,
-				"s" => EBranchConditionType.Score,
-				"d" => EBranchConditionType.Accuracy_BigNotesOnly,
-				"p" or _ => EBranchConditionType.Accuracy,
-			};
+			var branchStartArgumentMatch = BranchStartArgumentRegex.Match(argument);
+			if (!string.IsNullOrWhiteSpace(argument)) {
+				try {
+					strCond = branchStartArgumentMatch.Groups[1].Value;
+					nNum[0] = Convert.ToDouble(branchStartArgumentMatch.Groups[2].Value);
+					nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
+
+					e条件 = strCond switch {
+						"r" => EBranchConditionType.Drumroll,
+						"s" => EBranchConditionType.Score,
+						"d" => EBranchConditionType.Accuracy_BigNotesOnly,
+						"p" or _ => EBranchConditionType.Accuracy, // traditional format with unrecognized condition: p
+					};
+				} catch (FormatException ex) {
+					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
+				}
+			}
 
 			#region [ 分岐開始時のチップ情報を記録 ]
 			//現在のチップ情報を記録する必要がある。
