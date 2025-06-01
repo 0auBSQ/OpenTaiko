@@ -3853,12 +3853,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			var chip = dTX.listChip[i];
 			bool isBarLine = (chip.nChannelNo == 0x50);
-			bool isScrollable = (NotesManager.IsHittableNote(chip) || isBarLine);
+			bool isScrollable = (NotesManager.IsHittableNote(chip) || isBarLine || chip.nChannelNo == 0xE4);
 			bool isRollEnd = NotesManager.IsRollEnd(chip);
 			if (!(isScrollable && chip.n発声時刻ms >= msBranchPoint))
 				continue;
 
-			// bar line is inserted per-branch even in common branch
+			// real bar line is inserted per-branch even in common branch
 			// branched roll head + non-branched end is treated as branched head + end
 			if (chip.IsEndedBranching && !isBarLine && (!isRollEnd || chip.start.IsEndedBranching))
 				continue;
