@@ -2046,8 +2046,7 @@ internal class CTja : CActivity {
 			chip.dbSCROLL = JudgeChipTime.chip?.dbSCROLL ?? 1;
 			chip.dbBPM = JudgeChipTime.chip?.dbBPM ?? this.BASEBPM;
 
-			//ノーツ * 0.5分後ろにして、ノーツが残らないようにする
-			chip.n分岐時刻ms = this.dbNowTime - ((15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m)) * 0.5);
+			chip.n分岐時刻ms = this.dbNowTime;
 			chip.eBranchCondition = e条件;
 			chip.nBranchCondition1_Professional = nNum[0];// listに追加していたが仕様を変更。
 			chip.nBranchCondition2_Master = nNum[1];// ""

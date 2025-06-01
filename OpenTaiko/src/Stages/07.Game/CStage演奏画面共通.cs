@@ -2496,6 +2496,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		#region [update phase (notes' position & auto judgement)]
 		foreach (var pChip in dTX.listNoteChip) {
+			if (!pChip.bVisible)
+				continue;
+
 			long time = pChip.n発声時刻ms - n現在時刻ms;
 			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
 			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
@@ -3257,7 +3260,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if (this.b強制分岐譜面[nPlayer])//強制分岐譜面だったら次回コースをそのコースにセット
 								this.nNextBranch[nPlayer] = this.E強制コース[nPlayer];
 
-							this.t分岐処理(this.nNextBranch[nPlayer], nPlayer, pChip.n分岐時刻ms);
+							this.t分岐処理(this.nNextBranch[nPlayer], nPlayer, (long)pChip.n分岐時刻ms);
 
 							OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[nPlayer].nAfter, this.nNextBranch[nPlayer], nPlayer);
 							OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[nPlayer], this.nNextBranch[nPlayer], nPlayer);
@@ -3371,7 +3374,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		if (!this.bPAUSE) {
 			foreach (var cChipCurrentlyInProcess in chip現在処理中の連打チップ[nPlayer]) {
-				if (cChipCurrentlyInProcess.bHit)
+				if (!cChipCurrentlyInProcess.bVisible || cChipCurrentlyInProcess.bHit)
 					continue;
 				//if( cChipCurrentlyInProcess.nチャンネル番号 >= 0x13 && cChipCurrentlyInProcess.nチャンネル番号 <= 0x15 )//|| pChip.nチャンネル番号 == 0x9A )
 				if (NotesManager.IsBigNote(cChipCurrentlyInProcess)) {
@@ -3583,19 +3586,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private void AddNowProcessingRollChip(int iPlayer, CChip chip) {
 		//if( this.n現在のコース == pChip.nコース )
-		if (chip.bVisible == true) {
-			int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip);
-			if (idx < 0) {
-				this.chip現在処理中の連打チップ[iPlayer].Insert(~idx, chip);
+		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip);
+		if (idx < 0) {
+			this.chip現在処理中の連打チップ[iPlayer].Insert(~idx, chip);
+		}
+		if (chip.bVisible && !chip.IsHitted) {
+			if (NotesManager.IsKusudama(chip)) {
+				nCurrentKusudamaRollCount = 0;
+				nCurrentKusudamaCount += chip.nBalloon;
 			}
-			if (!chip.IsHitted) {
-				if (NotesManager.IsKusudama(chip)) {
-					nCurrentKusudamaRollCount = 0;
-					nCurrentKusudamaCount += chip.nBalloon;
-				}
-				if (!this.bPAUSE && !this.isRewinding) {
-					this.ProcessRollHeadEffects(iPlayer, chip);
-				}
+			if (!this.bPAUSE && !this.isRewinding) {
+				this.ProcessRollHeadEffects(iPlayer, chip);
 			}
 		}
 		if (chip.end.bProcessed) { // handle negative-length rolls
@@ -3756,12 +3757,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
-		if (this.chip現在処理中の連打チップ[iPlayer].Count == 0) {
+		if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible)) {
 			this.bCurrentlyDrumRoll[iPlayer] = false;
 			this.actChara.b風船連打中[iPlayer] = false;
 			this.actChara.IsInKusudama = false;
 			this.eRollState = ERollState.None;
-		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsGenericBalloon(x))) {
+		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible && NotesManager.IsGenericBalloon(x))) {
 			this.actChara.b風船連打中[iPlayer] = false;
 			this.actChara.IsInKusudama = false;
 		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsKusudama(x))) {
@@ -3853,55 +3854,42 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private CTja.ECourse[] E強制コース = new CTja.ECourse[5];
 
-	public void t分岐処理(CTja.ECourse n分岐先, int nPlayer, double n発声位置) {
-
+	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint) {
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
 
-		for (int A = 0; A < dTX.listChip.Count; A++) {
-			var Chip = dTX.listChip[A].nChannelNo;
-			var _chip = dTX.listChip[A];
+		// For `#BRANCHSTART`, skip processing earlier defined notes and bar lines
+		for (int i = 0; i < dTX.listChip.Count; i++) {
+			var chip = dTX.listChip[i];
+			bool isBarLine = (chip.nChannelNo == 0x50);
+			bool isScrollable = (NotesManager.IsHittableNote(chip) || isBarLine);
+			bool isRollEnd = NotesManager.IsRollEnd(chip);
+			if (!(isScrollable && chip.n発声時刻ms >= msBranchPoint))
+				continue;
 
-			var bDontDeleteFlag = NotesManager.IsHittableNote(_chip);// Chip >= 0x11 && Chip <= 0x19;
-			var bRollAllFlag = NotesManager.IsGenericRoll(_chip);//Chip >= 0x15 && Chip <= 0x19;
-			var bBalloonOnlyFlag = NotesManager.IsGenericBalloon(_chip);//Chip == 0x17;
-			var bRollOnlyFlag = NotesManager.IsRoll(_chip);//Chip >= 0x15 && Chip <= 0x16;
+			// bar line is inserted per-branch even in common branch
+			// branched roll head + non-branched end is treated as branched head + end
+			if (chip.IsEndedBranching && !isBarLine && (!isRollEnd || chip.start.IsEndedBranching))
+				continue;
 
-			if (bDontDeleteFlag) {
-				if (dTX.listChip[A].n発声時刻ms > n発声位置) {
-					if (dTX.listChip[A].nBranch == n分岐先) {
-						dTX.listChip[A].bVisible = true;
+			if (chip.nBranch == branch) {
+				// non-branched head + branched end
+				if (isRollEnd && chip.start.IsEndedBranching && branch != CTja.ECourse.eNormal)
+					continue; // Currently treated as non-branch roll with the Normal branch end being the end; do not show the non-Normal end
 
-						if (dTX.listChip[A].IsEndedBranching) {
-							if (bRollAllFlag)//共通譜面時かつ、連打譜面だったら非可視化
-							{
-								dTX.listChip[A].bHit = true;
-								dTX.listChip[A].bShow = false;
-								dTX.listChip[A].bVisible = false;
-							}
-						}
-					} else {
-						if (!dTX.listChip[A].IsEndedBranching)
-							dTX.listChip[A].bVisible = false;
-					}
-					//共通なため分岐させない.
-					dTX.listChip[A].eNoteState = ENoteState.None;
+				chip.bVisible = true;
+				if (isRollEnd && chip.start.n発声時刻ms < msBranchPoint)
+					chip.start.bVisible = true; // show roll head before branch point and made hittable if end is shown
+			} else {
+				// non-branched head + branched end
+				if (isRollEnd && chip.start.IsEndedBranching)
+					continue; // Currently treated as non-branch roll with the end being Normal branch end; not hidable
 
-					if (dTX.listChip[A].IsEndedBranching && (dTX.listChip[A].nBranch == CTja.ECourse.eNormal)) {
-						if (bRollOnlyFlag)//共通譜面時かつ、連打譜面だったら可視化
-						{
-							dTX.listChip[A].bHit = false;
-							dTX.listChip[A].bShow = true;
-							dTX.listChip[A].bVisible = true;
-						} else {
-							if (bBalloonOnlyFlag)//共通譜面時かつ、風船譜面だったら可視化
-							{
-								dTX.listChip[A].bShow = true;
-								dTX.listChip[A].bVisible = true;
-							}
-						}
-					}
-				}
+				chip.bVisible = false;
+				chip.eNoteState = ENoteState.None; // cancel input
+				if (isRollEnd && chip.start.n発声時刻ms < msBranchPoint)
+					chip.start.bVisible = false; // hide hidable roll head before branch point if end is hide
 			}
+			
 		}
 	}
 
