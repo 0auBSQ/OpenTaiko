@@ -304,8 +304,8 @@ internal class CActImplLaneTaiko : CActivity {
 				this.stBranch[i].nY座標 = 0;
 			}
 			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ct分岐アニメ進行.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nY座標 == 0)) {
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].Opacity = 255;
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i]].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].Opacity = 255;
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				continue;
 			}
 
@@ -370,7 +370,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 			#region[ 動いていない ]
 			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ct分岐アニメ進行.IsTicked) {
-				int nBranch = (int)OpenTaiko.stageGameScreen.nDisplayedBranchLane[i];
+				int nBranch = (int)OpenTaiko.stageGameScreen.nTargetBranch[i];
 				OpenTaiko.Tx.Lane_Base[nBranch].Opacity = 255;
 				OpenTaiko.Tx.Lane_Base[nBranch].t2D描画(x[i], y[i]);
 				continue;
