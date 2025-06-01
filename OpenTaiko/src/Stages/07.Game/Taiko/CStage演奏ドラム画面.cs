@@ -1122,9 +1122,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, _gt);
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
 
-
-				if (this.chip現在処理中の連打チップ[nUsePlayer].Count > 0) {
-					chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer][0];
+				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible);
+				if (chipNoHitRoll != null) {
+					chipNoHit = chipNoHitRoll;
 					e判定 = ENoteJudge.Perfect;
 				}
 
@@ -1919,9 +1919,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	}
 	protected override void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		if (pChip.nBranch != this.nCurrentBranch[nPlayer])
-			return;
-
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
@@ -1955,6 +1952,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			double msBarRollProgress = 0;
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
 				var chkChip = this.chip現在処理中の連打チップ[i][iChip];
+				if (!chkChip.bVisible)
+					continue;
 				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
 				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
