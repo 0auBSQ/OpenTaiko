@@ -4112,6 +4112,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.n分岐した回数[i] = 0;
 			this.bUseBranch[i] = tja.bチップがある.Branch && !tja.bHIDDENBRANCH;
 
+			if (tja.bチップがある.Branch)
+				this.t分岐処理(CTja.ECourse.eNormal, i, double.MinValue);
+
 			this.actPlayInfo.dbBPM[i] = tja.BASEBPM;
 			this.UpdateCharaCounter(i);
 
