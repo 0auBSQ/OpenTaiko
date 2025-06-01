@@ -146,7 +146,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bIsMiss = new bool[] { false, false, false, false, false };
 		this.bUseBranch = new bool[] { false, false, false, false, false };
 		this.nCurrentBranch = new CTja.ECourse[5];
-		this.nNextBranch = new CTja.ECourse[5];
+		this.nTargetBranch = new CTja.ECourse[5];
 
 		for (int i = 0; i < 5; i++) {
 			OpenTaiko.stageGameScreen.actMtaiko.After[i] = CTja.ECourse.eNormal;
@@ -163,7 +163,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 
-		this.nDisplayedBranchLane = new CTja.ECourse[5];
 		this.bCurrentlyDrumRoll = new bool[] { false, false, false, false, false };
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.n分岐した回数 = new int[5];
@@ -361,7 +360,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public void ftDanReSetBranches(bool hasBranches) {
 		this.tBranchReset(0);
 
-		OpenTaiko.stageGameScreen.nDisplayedBranchLane[0] = CTja.ECourse.eNormal;
+		OpenTaiko.stageGameScreen.nTargetBranch[0] = CTja.ECourse.eNormal;
 		OpenTaiko.stageGameScreen.bUseBranch[0] = hasBranches;
 
 		// TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.b譜面分岐[(int)Difficulty.Dan] = hasBranches;
@@ -647,8 +646,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool[] bIsMiss = new bool[5];
 	public bool[] bUseBranch = new bool[5];
 	public CTja.ECourse[] nCurrentBranch = new CTja.ECourse[5]; //0:普通譜面 1:玄人譜面 2:達人譜面
-	public CTja.ECourse[] nNextBranch = new CTja.ECourse[5];
-	public CTja.ECourse[] nDisplayedBranchLane = new CTja.ECourse[5];
+	public CTja.ECourse[] nTargetBranch = new CTja.ECourse[5];
 	protected bool[] bBranchedChart = new bool[] { false, false, false, false, false };
 	protected int[] n分岐した回数 = new int[5];
 
@@ -688,7 +686,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected Stopwatch sw;     // 2011.6.13 最適化検討用のストップウォッチ
 	public int ListDan_Number;
 	private bool IsDanFailed;
-	private bool[] b強制分岐譜面 = new bool[5];
 	private CTja.EBranchConditionType eBranch種類;
 	public double nBranch条件数値A;
 	public double nBranch条件数値B;
@@ -2256,8 +2253,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[0], CTja.ECourse.eNormal, 0);
 
 				this.nCurrentBranch[0] = CTja.ECourse.eNormal;
-				this.nNextBranch[0] = CTja.ECourse.eNormal;
-				this.nDisplayedBranchLane[0] = CTja.ECourse.eNormal;
+				this.nTargetBranch[0] = CTja.ECourse.eNormal;
 
 
 				this.b強制的に分岐させた[0] = true;
@@ -2283,8 +2279,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 				this.nCurrentBranch[0] = CTja.ECourse.eExpert;
-				this.nNextBranch[0] = CTja.ECourse.eExpert;
-				this.nDisplayedBranchLane[0] = CTja.ECourse.eExpert;
+				this.nTargetBranch[0] = CTja.ECourse.eExpert;
 
 				this.b強制的に分岐させた[0] = true;
 			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster) &&
@@ -2308,8 +2303,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[0], CTja.ECourse.eMaster, 0);
 
 				this.nCurrentBranch[0] = CTja.ECourse.eMaster;
-				this.nNextBranch[0] = CTja.ECourse.eMaster;
-				this.nDisplayedBranchLane[0] = CTja.ECourse.eMaster;
+				this.nTargetBranch[0] = CTja.ECourse.eMaster;
 
 				this.b強制的に分岐させた[0] = true;
 			}
@@ -3238,7 +3232,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				case 0xDE: //Judgeに応じたCourseを取得
 					if (!pChip.bHit) {
-						this.b強制分岐譜面[nPlayer] = false;
 						//分岐の種類はプレイヤー関係ないと思う
 						this.eBranch種類 = pChip.eBranchCondition;
 						this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
@@ -3256,15 +3249,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 								branchScore = this.CBranchScore[nPlayer];
 							}
 							this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
+							this.t分岐処理(this.nTargetBranch[nPlayer], nPlayer, (long)pChip.n分岐時刻ms);
 
-							if (this.b強制分岐譜面[nPlayer])//強制分岐譜面だったら次回コースをそのコースにセット
-								this.nNextBranch[nPlayer] = this.E強制コース[nPlayer];
-
-							this.t分岐処理(this.nNextBranch[nPlayer], nPlayer, (long)pChip.n分岐時刻ms);
-
-							OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[nPlayer].nAfter, this.nNextBranch[nPlayer], nPlayer);
-							OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[nPlayer], this.nNextBranch[nPlayer], nPlayer);
-							this.nCurrentBranch[nPlayer] = this.nNextBranch[nPlayer];
+							OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[nPlayer].nAfter, this.nTargetBranch[nPlayer], nPlayer);
+							OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[nPlayer], this.nTargetBranch[nPlayer], nPlayer);
+							this.nCurrentBranch[nPlayer] = this.nTargetBranch[nPlayer];
 						}
 						this.n分岐した回数[nPlayer]++;
 						pChip.bHit = true;
@@ -3844,15 +3833,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		};
 
 		if (dbRate >= pChip.nBranchCondition2_Master) {
-			this.nDisplayedBranchLane[nPlayer] = this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
+			this.nTargetBranch[nPlayer] = CTja.ECourse.eMaster;
 		} else if (dbRate >= pChip.nBranchCondition1_Professional) {
-			this.nDisplayedBranchLane[nPlayer] = this.nNextBranch[nPlayer] = CTja.ECourse.eExpert;
+			this.nTargetBranch[nPlayer] = CTja.ECourse.eExpert;
 		} else {
-			this.nDisplayedBranchLane[nPlayer] = this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
+			this.nTargetBranch[nPlayer] = CTja.ECourse.eNormal;
 		}
 	}
-
-	private CTja.ECourse[] E強制コース = new CTja.ECourse[5];
 
 	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint) {
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
@@ -4020,8 +4007,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.bLEVELHOLD[i] = false;
 				this.b強制的に分岐させた[i] = false;
 				this.nCurrentBranch[i] = CTja.ECourse.eNormal;
-				this.nNextBranch[i] = CTja.ECourse.eNormal;
-				this.nDisplayedBranchLane[0] = CTja.ECourse.eNormal;
+				this.nTargetBranch[i] = CTja.ECourse.eNormal;
 				this.nCurrentRollCount[i] = 0;
 
 				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
