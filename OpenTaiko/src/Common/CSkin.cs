@@ -7643,6 +7643,8 @@ internal class CSkin : IDisposable {
 	public string Skin_Version = "Unknown";
 	public string Skin_Creator = "Unknown";
 	public int[] Resolution = new int[] { 1280, 720 };
+	public double ScaleX => Resolution[0] / 1280.0;
+	public double ScaleY => Resolution[1] / 720.0;
 	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
 	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }

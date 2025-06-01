@@ -127,7 +127,7 @@ internal class CActImplLaneTaiko : CActivity {
 			var ctFadeIn = this.stBranch[i].ctFadeIn;
 			if (ctFadeIn?.IsUnEnded ?? false) {
 				ctFadeIn.Tick();
-				this.stBranch[i].dxFadeIn = (int)(300 * (1 - ctFadeIn.CurrentValue / ctFadeIn.EndValue));
+				this.stBranch[i].dxFadeIn = Easing.EaseOut(ctFadeIn, (float)(OpenTaiko.Skin.ScaleY * 100), 0, Easing.CalcType.Back);
 				if (ctFadeIn.IsEnded) {
 					this.stBranch[i].dxFadeIn = 0;
 				}
@@ -327,15 +327,16 @@ internal class CActImplLaneTaiko : CActivity {
 				if (progress < 60) {
 					OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
 					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
-					var nY = progress / 2;
+					double ratio = progress / 60.0;
+					float max = (float)(OpenTaiko.Skin.ScaleY * 30);
 					if (nAfter > nBefore) {
 						// AC7~14 level up: fly down
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + nY);
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] - 30) + nY);
+						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					} else {
 						// AC7~14 level down: fly up
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - nY);
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] + 30) - nY);
+						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					}
 				} else {
 					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
@@ -345,14 +346,16 @@ internal class CActImplLaneTaiko : CActivity {
 				var opacity = Math.Min(255, this.stBranch[i].nBranchレイヤー透明度);
 				OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
 				OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
+				double ratio = this.stBranch[i].nY座標 / 20.0;
+				float max = (float)(OpenTaiko.Skin.ScaleY * 20);
 				if (nAfter > nBefore) {
 					// AC15~ level up: fly up
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - this.stBranch[i].nY座標);
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] + 20) - this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				} else {
 					// AC15~ level down: fly down
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + this.stBranch[i].nY座標);
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, (y[i] - 20) + this.stBranch[i].nY座標);
+					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				}
 			}
 		}
