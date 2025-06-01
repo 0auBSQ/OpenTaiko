@@ -2726,7 +2726,7 @@ internal class CTja : CActivity {
 		chip.IsEndedBranching = this.IsEndedBranching;
 		chip.nBranch = branch;
 
-		chip.bVisible = true;
+		chip.bVisible = (branch == ECourse.eNormal);
 		return chip;
 	}
 
