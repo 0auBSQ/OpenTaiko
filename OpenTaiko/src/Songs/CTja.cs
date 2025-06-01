@@ -2780,6 +2780,10 @@ internal class CTja : CActivity {
 			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
 			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
 
+			// treat branched head + non-branched end = branched head + end
+			if (!chipHead.IsEndedBranching)
+				chip.IsEndedBranching = false;
+
 			this.nNowRollCountBranch[iBranch] = -1;
 		}
 
@@ -2838,7 +2842,7 @@ internal class CTja : CActivity {
 			}
 		}
 
-		if (IsEndedBranching) {
+		if (chip.IsEndedBranching) {
 			this.listChip_Branch[iBranch].Add(chip);
 			if (branch == ECourse.eNormal) {
 				this.listChip.Add(chip);
