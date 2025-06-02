@@ -2043,13 +2043,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	}
 
-	public void ChangeBranch(CTja.ECourse nAfter, int i, bool stopAnime = false) {
-		this.nTargetBranch[i] = nAfter;
+	public void ChangeBranch(CTja.ECourse nAfter, int iPlayer, double msBranchPoint = double.MaxValue, bool stopAnime = false) {
+		this.nTargetBranch[iPlayer] = nAfter;
+		this.msTargetBranchTime[iPlayer] = msBranchPoint;
 		if (stopAnime)
-			this.nCurrentBranch[i] = nAfter;
-		var shownBranch = this.bUseBranch[i] ? nAfter : CTja.ECourse.eNormal;
-		this.actMtaiko.tBranchEvent(shownBranch, i, stopAnime: stopAnime);
-		this.actLaneTaiko.ChangeBranch(shownBranch, i, stopAnime: stopAnime);
+			this.nCurrentBranch[iPlayer] = nAfter;
+		var shownBranch = this.bUseBranch[iPlayer] ? nAfter : CTja.ECourse.eNormal;
+		this.actMtaiko.tBranchEvent(shownBranch, iPlayer, stopAnime: stopAnime);
+		this.actLaneTaiko.ChangeBranch(shownBranch, iPlayer, stopAnime: stopAnime);
 	}
 
 	private void t進行描画_リアルタイム判定数表示() {
