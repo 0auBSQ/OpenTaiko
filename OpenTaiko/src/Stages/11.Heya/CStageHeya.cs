@@ -585,6 +585,8 @@ class CStageHeya : CStage {
 					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[iPlayer].data.SaveId, "unlocked_puchicharas", OpenTaiko.Skin.Puchicharas_Name[iPuchiCharaCurrent]);
 					if (OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock is CUnlockCH)
 						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.Values[0]);
+					else if (OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock is CUnlockAndComb || OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock is CUnlockOrComb)
+						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.CoinStack);
 
 				}
 			} else if (iCurrentMenu == CurrentMenu.Chara) {
@@ -614,6 +616,8 @@ class CStageHeya : CStage {
 					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[iPlayer].data.SaveId, "unlocked_characters", OpenTaiko.Skin.Characters_DirName[iCharacterCurrent]);
 					if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockCH)
 						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.Values[0]);
+					else if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockAndComb || OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockOrComb)
+						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.CoinStack);
 					// Play modal animation here ?
 				}
 			} else if (iCurrentMenu == CurrentMenu.Dan) {

@@ -105,11 +105,10 @@ namespace OpenTaiko {
 						return new CUnlockIG(rawJson);
 					}
 				case "andcomb": {
-						return new CUnlockError(null); // new CUnlockAndComb(rawJson);
+						return new CUnlockAndComb(rawJson);
 					}
 				case "orcomb": {
-						// To do: parse references as json strings recursively and add them for both andcomb and orcomb
-						return new CUnlockError(null); // new CUnlockOrComb(rawJson);
+						return new CUnlockOrComb(rawJson);
 					}
 			}
 

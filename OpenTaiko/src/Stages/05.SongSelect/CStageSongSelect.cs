@@ -894,6 +894,8 @@ internal class CStageSongSelect : CStage {
 																);
 																if (SongToUnlock.unlockConditions is CUnlockCM)
 																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																else if (SongToUnlock.unlockConditions is CUnlockAndComb || SongToUnlock.unlockConditions is CUnlockOrComb)
+																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.CoinStack);
 																// Play modal animation here ?
 															} else
 																OpenTaiko.Skin.soundError.tPlay();

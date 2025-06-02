@@ -8,10 +8,12 @@ namespace OpenTaiko {
 				Values = rawJson.Values.Copy();
 				Type = rawJson.Type;
 				Reference = rawJson.Reference.Copy();
+				CoinStack = 0;
 			} else {
 				Values = [];
 				Type = "me";
 				Reference = [];
+				CoinStack = 0;
 			}
 		}
 
@@ -23,6 +25,9 @@ namespace OpenTaiko {
 
 		// Referenced charts
 		public string[] Reference;
+
+		// Used to get recursively coin counts on OR/AND comb conditions
+		public int CoinStack;
 
 		protected int RequiredArgCount = -1;
 		protected string ConditionId = "";
