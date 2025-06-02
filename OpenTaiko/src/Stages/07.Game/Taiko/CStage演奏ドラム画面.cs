@@ -652,10 +652,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		return eJudgeResult;
 	}
 
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part) {
+	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part) {
 		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, 0, EInstrumentPad.Drums);
 	}
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part, int nLane) {
+	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane) {
 		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, EInstrumentPad.Drums);
 	}
 
@@ -1322,7 +1322,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
 								// BAD or TIGHT 時の処理。
 				if (OpenTaiko.ConfigIni.bTight && !this.bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
-					this.tチップのヒット処理_BadならびにTight時のMiss(chipNoHit.nBranch, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
+					this.tチップのヒット処理_BadならびにTight時のMiss(null, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
 				//-----------------------------
 				#endregion
 			}
