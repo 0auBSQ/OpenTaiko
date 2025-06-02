@@ -121,6 +121,7 @@ internal class CActImplLaneTaiko : CActivity {
 				this.stBranch[i].ct分岐アニメ進行.Tick();
 				if (this.stBranch[i].ct分岐アニメ進行.IsEnded) {
 					this.stBranch[i].ct分岐アニメ進行.Stop();
+					this.stBranch[i].nBefore = this.stBranch[i].nAfter;
 				}
 			}
 
@@ -582,8 +583,13 @@ internal class CActImplLaneTaiko : CActivity {
 	}
 
 
-	public void t分岐レイヤー_コース変化(CTja.ECourse n現在, CTja.ECourse n次回, int nPlayer) {
-		if (n現在 == n次回) {
+	public void ChangeBranch(CTja.ECourse nAfter, int nPlayer, bool stopAnime = false) {
+		if (stopAnime) {
+			this.stBranch[nPlayer].ct分岐アニメ進行.Stop();
+			this.stBranch[nPlayer].nBefore = this.stBranch[nPlayer].nAfter = nAfter;
+			return;
+		}
+		if (this.stBranch[nPlayer].nAfter == nAfter) {
 			return;
 		}
 		this.stBranch[nPlayer].ct分岐アニメ進行 = new CCounter(0, 300, 2, OpenTaiko.Timer);
@@ -591,8 +597,8 @@ internal class CActImplLaneTaiko : CActivity {
 		this.stBranch[nPlayer].nBranchレイヤー透明度 = 6;
 		this.stBranch[nPlayer].nY座標 = 1;
 
-		this.stBranch[nPlayer].nBefore = n現在;
-		this.stBranch[nPlayer].nAfter = n次回;
+		this.stBranch[nPlayer].nBefore = this.stBranch[nPlayer].nAfter;
+		this.stBranch[nPlayer].nAfter = nAfter;
 	}
 
 	public void BranchText_FadeIn(int? msDelay, int nPlayer) {
