@@ -351,9 +351,9 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
 	}
 
-	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer) {
+	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
 		float fDamage;
-		int nコース = (int)OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer];
+		int nコース = (int)(chipBranch ?? OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer]);
 
 		switch (e今回の判定) {
 			case ENoteJudge.Perfect:

@@ -1341,7 +1341,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 		if (NotesManager.IsMissableNote(pChip)) {
-			actGauge.Damage(screenmode, eJudgeResult, nPlayer);
+			actGauge.Damage(screenmode, eJudgeResult, nPlayer, pChip.IsEndedBranching ? null : pChip.nBranch);
 		}
 
 
@@ -1742,12 +1742,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return ENoteJudge.Auto;
 	}
 
-	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part);
-	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part, int nLane);
+	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part);
+	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane);
 
-	protected void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part, int nLane, EInstrumentPad screenmode) {
+	protected void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane, EInstrumentPad screenmode) {
 		// Something looks wrong with this (Notelock mode)
-		actGauge.Damage(screenmode, ENoteJudge.Miss, 0);
+		actGauge.Damage(screenmode, ENoteJudge.Miss, 0, eCourse);
 		this.actCombo.nCurrentCombo.P1 = 0;
 		this.actCombo.nCurrentCombo.P2 = 0;
 		this.actCombo.nCurrentCombo.P3 = 0;
