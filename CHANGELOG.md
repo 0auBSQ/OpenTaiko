@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.69] - 2025-06-02 (Beta)
+
+- [Feat] Add the unlock conditions "andcomb" and "orcomb" allowing combining multiple unlock conditions for a single asset
+
 ## [0.6.0.68] - 2025-05-31 (Beta)
 
 - [Chore] Handle Global Triggers methods on save files
