@@ -642,10 +642,7 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndCombo();
 			}
-			if (OpenTaiko.rCurrentStage.eStageID != CStage.EStage.StartUp)
-				CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
-			else
-				ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
+			CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
 
 			currentStageMemoryUsage = 0;
 
@@ -762,16 +759,25 @@ public static class ImGuiDebugWindow {
 	}
 	private static long CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
 		if (textureList == null) return 0;
-		long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
+		try {
+			long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
-		if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
-			int index = 0;
-			foreach (CTexture tex in textureList) {
-				CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+			if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
+				int index = 0;
+				try {
+					foreach (CTexture tex in textureList) {
+						CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+					}
+				} catch (InvalidOperationException ex) {
+					ImGui.Text("(updating...)");
+				}
+				ImGui.TreePop();
 			}
-			ImGui.TreePop();
+			return memoryCount;
+		} catch (InvalidOperationException ex) {
+			ImGui.Text($"{label} Textures: (updating...)");
+			return 0;
 		}
-		return memoryCount;
 	}
 	private static long CTextureListPopup(ScriptBG script, string label, string id) {
 		return script != null ? CTextureListPopup(script.Textures.Values, label, id) : 0;
