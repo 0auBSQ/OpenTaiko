@@ -2136,11 +2136,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool r検索範囲内にチップがあるか調べる(long nTime, int n検索範囲時間ms, int nPlayer) {
 		for (int i = 0; i < listChip[nPlayer].Count; i++) {
 			CChip chip = listChip[nPlayer][i];
-			if (!chip.bHit) {
+			if (chip.bVisible && !chip.bHit) {
 				if (NotesManager.IsMissableNote(chip)) {
 					if (chip.n発声時刻ms < nTime + n検索範囲時間ms) {
-						if (chip.nBranch == this.nCurrentBranch[nPlayer]) //2016.06.14 kairera0467 譜面分岐も考慮するようにしてみる。
-							return true;
+						return true;
 					}
 				}
 			}

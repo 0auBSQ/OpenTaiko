@@ -650,7 +650,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	protected override ENoteJudge tチップのヒット処理(long nHitTime, CChip pChip, bool bCorrectLane) {
 		ENoteJudge eJudgeResult = tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Drums, bCorrectLane, 0);
 		// #24074 2011.01.23 add ikanick
-		if (pChip.nBranch == this.nCurrentBranch[0] && NotesManager.IsMissableNote(pChip) && pChip.bShow == true && eJudgeResult != ENoteJudge.Auto)
+		if (pChip.bVisible && NotesManager.IsMissableNote(pChip) && eJudgeResult != ENoteJudge.Auto)
 			this.actGame.t叩ききりまショー_判定から各数値を増加させる(eJudgeResult, (int)(nHitTime - pChip.n発声時刻ms));
 		return eJudgeResult;
 	}
