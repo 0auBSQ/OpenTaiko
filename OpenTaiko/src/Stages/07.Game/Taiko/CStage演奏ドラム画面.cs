@@ -2044,6 +2044,16 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	}
 
+	public void ChangeBranch(CTja.ECourse nAfter, int i, bool stopAnime = false) {
+		if (this.nTargetBranch[i] == nAfter && !stopAnime)
+			return;
+		this.nTargetBranch[i] = nAfter;
+		if (stopAnime)
+			this.nCurrentBranch[i] = nAfter;
+		this.actMtaiko.tBranchEvent(nAfter, i, stopAnime: stopAnime);
+		this.actLaneTaiko.ChangeBranch(nAfter, i, stopAnime: stopAnime);
+	}
+
 	private void t進行描画_リアルタイム判定数表示() {
 		var showJudgeInfo = false;
 

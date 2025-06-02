@@ -149,10 +149,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nTargetBranch = new CTja.ECourse[5];
 
 		for (int i = 0; i < 5; i++) {
-			OpenTaiko.stageGameScreen.actMtaiko.After[i] = CTja.ECourse.eNormal;
-			OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[i].nAfter = CTja.ECourse.eNormal;
-			OpenTaiko.stageGameScreen.actMtaiko.Before[i] = CTja.ECourse.eNormal;
-			OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[i].nBefore = CTja.ECourse.eNormal;
+			OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, i, stopAnime: true);
 		}
 
 		for (int i = 0; i < CBranchScore.Length; i++) {
@@ -360,10 +357,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public void ftDanReSetBranches(bool hasBranches) {
 		this.tBranchReset(0);
 
-		OpenTaiko.stageGameScreen.nTargetBranch[0] = CTja.ECourse.eNormal;
+		OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0, stopAnime: true);
 		OpenTaiko.stageGameScreen.bUseBranch[0] = hasBranches;
-
-		// TJAPlayer3.stage選曲.r確定されたスコア.譜面情報.b譜面分岐[(int)Difficulty.Dan] = hasBranches;
 	}
 
 
@@ -2241,14 +2236,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
 
 				this.t分岐処理(CTja.ECourse.eNormal, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-
-				OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[0].nAfter, CTja.ECourse.eNormal, 0);
-				OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[0], CTja.ECourse.eNormal, 0);
-
+				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0);
 				this.nCurrentBranch[0] = CTja.ECourse.eNormal;
-				this.nTargetBranch[0] = CTja.ECourse.eNormal;
-
-
 				this.b強制的に分岐させた[0] = true;
 			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert) &&
 					   (OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0]))      // #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
@@ -2266,14 +2255,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
 
 				this.t分岐処理(CTja.ECourse.eExpert, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-
-				OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[0].nAfter, CTja.ECourse.eExpert, 0);
-				OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[0], CTja.ECourse.eExpert, 0);
-
-
+				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eExpert, 0);
 				this.nCurrentBranch[0] = CTja.ECourse.eExpert;
-				this.nTargetBranch[0] = CTja.ECourse.eExpert;
-
 				this.b強制的に分岐させた[0] = true;
 			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster) &&
 					   (OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0]))      // #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
@@ -2291,13 +2274,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
 
 				this.t分岐処理(CTja.ECourse.eMaster, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-
-				OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[0].nAfter, CTja.ECourse.eMaster, 0);
-				OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[0], CTja.ECourse.eMaster, 0);
-
+				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eMaster, 0);
 				this.nCurrentBranch[0] = CTja.ECourse.eMaster;
-				this.nTargetBranch[0] = CTja.ECourse.eMaster;
-
 				this.b強制的に分岐させた[0] = true;
 			}
 
@@ -3239,12 +3217,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 							} else {
 								branchScore = this.CBranchScore[nPlayer];
 							}
-							this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
-							this.t分岐処理(this.nTargetBranch[nPlayer], nPlayer, (long)pChip.n分岐時刻ms);
-
-							OpenTaiko.stageGameScreen.actLaneTaiko.t分岐レイヤー_コース変化(OpenTaiko.stageGameScreen.actLaneTaiko.stBranch[nPlayer].nAfter, this.nTargetBranch[nPlayer], nPlayer);
-							OpenTaiko.stageGameScreen.actMtaiko.tBranchEvent(OpenTaiko.stageGameScreen.actMtaiko.After[nPlayer], this.nTargetBranch[nPlayer], nPlayer);
-							this.nCurrentBranch[nPlayer] = this.nTargetBranch[nPlayer];
+							var targetBranch = this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
+							this.t分岐処理(targetBranch, nPlayer, (long)pChip.n分岐時刻ms);
+							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer);
+							this.nCurrentBranch[nPlayer] = targetBranch;
 						}
 						this.n分岐した回数[nPlayer]++;
 						pChip.bHit = true;
@@ -3806,15 +3782,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public void tBranchJudge(CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer) {
+	public CTja.ECourse tBranchJudge(CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer) {
 		// Branch check score here
 
-		if (this.b強制的に分岐させた[nPlayer]) return;
+		if (this.b強制的に分岐させた[nPlayer]) return this.nTargetBranch[nPlayer];
 
 		var e種類 = pChip.eBranchCondition;
 
 		if (e種類 == CTja.EBranchConditionType.None)
-			return; // keep current branch
+			return this.nTargetBranch[nPlayer]; // keep current branch
 
 		double dbRate = e種類 switch {
 			CTja.EBranchConditionType.Accuracy => (n良 + n可 + n不可 == 0) ? 0 : (n良 + n可 * 0.5) / (n良 + n可 + n不可) * 100.0,
@@ -3825,11 +3801,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		};
 
 		if (dbRate >= pChip.nBranchCondition2_Master) {
-			this.nTargetBranch[nPlayer] = CTja.ECourse.eMaster;
+			return CTja.ECourse.eMaster;
 		} else if (dbRate >= pChip.nBranchCondition1_Professional) {
-			this.nTargetBranch[nPlayer] = CTja.ECourse.eExpert;
+			return CTja.ECourse.eExpert;
 		} else {
-			this.nTargetBranch[nPlayer] = CTja.ECourse.eNormal;
+			return CTja.ECourse.eNormal;
 		}
 	}
 
@@ -3995,8 +3971,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.bUseBranch[i] = false;
 				this.bLEVELHOLD[i] = false;
 				this.b強制的に分岐させた[i] = false;
-				this.nCurrentBranch[i] = CTja.ECourse.eNormal;
-				this.nTargetBranch[i] = CTja.ECourse.eNormal;
+				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, i, stopAnime: true);
 				this.nCurrentRollCount[i] = 0;
 
 				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
