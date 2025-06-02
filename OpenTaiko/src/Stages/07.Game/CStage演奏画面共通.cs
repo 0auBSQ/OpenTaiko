@@ -640,6 +640,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool[] bUseBranch = new bool[5];
 	public CTja.ECourse[] nCurrentBranch = new CTja.ECourse[5]; //0:普通譜面 1:玄人譜面 2:達人譜面
 	public CTja.ECourse[] nTargetBranch = new CTja.ECourse[5];
+	public double[] msTargetBranchTime = new double[5];
 	protected bool[] bBranchedChart = new bool[] { false, false, false, false, false };
 	protected int[] n分岐した回数 = new int[5];
 
@@ -2297,14 +2298,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		double db一小節後 = 0.0;
 		if (p判定枠に最も近いチップ != null)
 			db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
+		double msBranchPoint = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後;
 
 		if (!this.bUseBranch[0]) {
 			this.bUseBranch[0] = true;
 			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, 0);
 		}
-		this.t分岐処理(branch, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-		OpenTaiko.stageGameScreen.ChangeBranch(branch, 0);
-		this.nCurrentBranch[0] = branch;
+		this.t分岐処理(branch, 0, msBranchPoint);
+		OpenTaiko.stageGameScreen.ChangeBranch(branch, 0, msBranchPoint);
 		this.b強制的に分岐させた[0] = true;
 	}
 
@@ -2414,6 +2415,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool bAutoPlay = configIni.bAutoPlay[nPlayer];
 		if (nPlayer == 1)
 			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
+
+		if (dTX.bチップがある.Branch && n現在時刻ms >= this.msTargetBranchTime[nPlayer]) {
+			this.nCurrentBranch[nPlayer] = this.nTargetBranch[nPlayer];
+			this.msTargetBranchTime[nPlayer] = double.MaxValue;
+		}
 
 		//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.灰, this.nLoopCount_Clear.ToString()  );
 
@@ -3193,8 +3199,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							}
 							var targetBranch = this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
 							this.t分岐処理(targetBranch, nPlayer, (long)pChip.n分岐時刻ms);
-							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer);
-							this.nCurrentBranch[nPlayer] = targetBranch;
+							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer, pChip.n分岐時刻ms);
 						}
 						this.n分岐した回数[nPlayer]++;
 						pChip.bHit = true;
