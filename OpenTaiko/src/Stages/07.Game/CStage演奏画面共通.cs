@@ -2228,62 +2228,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actPauseMenu.tActivatePopupMenu(0);
 				}
 				// this.t演奏中止();
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal) &&
-					   (OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0])) {
-				if (!OpenTaiko.TJA.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
-
-				//listBRANCHを廃止したため強制分岐の開始値を
-				//rc演奏用タイマ.n現在時刻msから引っ張ることに
-
-				//判定枠に一番近いチップの情報を元に一小節分の値を計算する. 2020.04.21 akasoko26
-
-				var p判定枠に最も近いチップ = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 0);
-				double db一小節後 = 0.0;
-				if (p判定枠に最も近いチップ != null)
-					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
-
-				this.t分岐処理(CTja.ECourse.eNormal, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0);
-				this.nCurrentBranch[0] = CTja.ECourse.eNormal;
-				this.b強制的に分岐させた[0] = true;
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert) &&
-					   (OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0]))      // #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
-			{
-				if (!OpenTaiko.TJA.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
-
-				//listBRANCHを廃止したため強制分岐の開始値を
-				//rc演奏用タイマ.n現在時刻msから引っ張ることに
-
-				//判定枠に一番近いチップの情報を元に一小節分の値を計算する. 2020.04.21 akasoko26
-				var p判定枠に最も近いチップ = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 0);
-
-				double db一小節後 = 0.0;
-				if (p判定枠に最も近いチップ != null)
-					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
-
-				this.t分岐処理(CTja.ECourse.eExpert, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eExpert, 0);
-				this.nCurrentBranch[0] = CTja.ECourse.eExpert;
-				this.b強制的に分岐させた[0] = true;
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster) &&
-					   (OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0]))      // #24243 2011.1.16 yyagi UI for InputAdjustTime in playing screen.
-			{
-				if (!OpenTaiko.TJA.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
-
-				//listBRANCHを廃止したため強制分岐の開始値を
-				//rc演奏用タイマ.n現在時刻msから引っ張ることに
-
-				//判定枠に一番近いチップの情報を元に一小節分の値を計算する. 2020.04.21 akasoko26
-				var p判定枠に最も近いチップ = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 0);
-
-				double db一小節後 = 0.0;
-				if (p判定枠に最も近いチップ != null)
-					db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
-
-				this.t分岐処理(CTja.ECourse.eMaster, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
-				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eMaster, 0);
-				this.nCurrentBranch[0] = CTja.ECourse.eMaster;
-				this.b強制的に分岐させた[0] = true;
+			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal)) {
+				this.TrainingSwitchBranch(CTja.ECourse.eNormal);
+			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert)) {
+				this.TrainingSwitchBranch(CTja.ECourse.eExpert);
+			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster)) {
+				this.TrainingSwitchBranch(CTja.ECourse.eMaster);
 			}
 
 			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.DisplayHits)) {
@@ -2339,6 +2289,30 @@ internal abstract class CStage演奏画面共通 : CStage {
 		KeyboardSoundGroupLevelControlHandler.Handle(
 			keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, false);
 		#endregion
+	}
+
+	private void TrainingSwitchBranch(CTja.ECourse branch) {
+		CTja tja = OpenTaiko.TJA!;
+		if (!tja.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
+
+		//listBRANCHを廃止したため強制分岐の開始値を
+		//rc演奏用タイマ.n現在時刻msから引っ張ることに
+
+		//判定枠に一番近いチップの情報を元に一小節分の値を計算する. 2020.04.21 akasoko26
+
+		var p判定枠に最も近いチップ = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 0);
+		double db一小節後 = 0.0;
+		if (p判定枠に最も近いチップ != null)
+			db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
+
+		if (!this.bUseBranch[0]) {
+			this.bUseBranch[0] = true;
+			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, 0);
+		}
+		this.t分岐処理(branch, 0, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後);
+		OpenTaiko.stageGameScreen.ChangeBranch(branch, 0);
+		this.nCurrentBranch[0] = branch;
+		this.b強制的に分岐させた[0] = true;
 	}
 
 	protected void t入力メソッド記憶(EInstrumentPad part) {
