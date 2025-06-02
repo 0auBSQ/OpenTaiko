@@ -357,8 +357,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public void ftDanReSetBranches(bool hasBranches) {
 		this.tBranchReset(0);
 
-		OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0, stopAnime: true);
 		OpenTaiko.stageGameScreen.bUseBranch[0] = hasBranches;
+		OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, 0, stopAnime: true);
 	}
 
 
@@ -3206,8 +3206,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
 						this.nBranch条件数値B = pChip.nBranchCondition2_Master;
 						if (!this.bLEVELHOLD[nPlayer]) {
-							if (!OpenTaiko.stageGameScreen.bUseBranch[nPlayer]) {
-								OpenTaiko.stageGameScreen.bUseBranch[nPlayer] = true;
+							if (!this.bUseBranch[nPlayer]) {
+								this.bUseBranch[nPlayer] = true;
 								OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
 							}
 
