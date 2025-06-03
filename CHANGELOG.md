@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.70] - 2025-06-03 (Beta)
+
+- [Chore] Automatically update Saves.db to add the global counters table
+
 ## [0.6.0.69] - 2025-06-02 (Beta)
 
 - [Feat] Add the unlock conditions "andcomb" and "orcomb" allowing combining multiple unlock conditions for a single asset
