@@ -15,27 +15,13 @@ internal class DBSaves {
 		try {
 			if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) {
 				SavesDBConnection.Open();
-				FixSaveDB_IdxUniquePlay(SavesDBConnection);
+				DBSavesAutoupdate.HandleSavesDBAutoupdates(SavesDBConnection);
 			}
 			return SavesDBConnection;
 		} catch {
 			LogNotification.PopError(_DBNotFoundError);
 			return null;
 		}
-	}
-
-	private static void FixSaveDB_IdxUniquePlay(SqliteConnection connection) {
-		var command = connection.CreateCommand();
-		command.CommandText = $"""
-			DROP INDEX IF EXISTS idx_unique_play;
-			CREATE UNIQUE INDEX idx_unique_play ON best_plays (
-				"ChartUniqueId",
-				"ChartDifficulty",
-				"PlayMods",
-				"SaveId"
-			);
-			""";
-		command.ExecuteNonQuery();
 	}
 
 	public static Int64 GetPlayerSaveId(int player) {
