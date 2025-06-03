@@ -22,8 +22,8 @@ public static class ImGuiDebugWindow {
 
 	private static long memoryReadTimer = 0;
 	private static long pagedmemory = 0;
-	private static int textureMemoryUsage = 0;
-	private static int currentStageMemoryUsage = 0;
+	private static long textureMemoryUsage = 0;
+	private static long currentStageMemoryUsage = 0;
 
 	private static int sortType = -1;
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
@@ -642,10 +642,7 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndCombo();
 			}
-			if (OpenTaiko.rCurrentStage.eStageID != CStage.EStage.StartUp)
-				CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
-			else
-				ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
+			CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
 
 			currentStageMemoryUsage = 0;
 
@@ -760,20 +757,29 @@ public static class ImGuiDebugWindow {
 			}
 		}
 	}
-	private static int CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
+	private static long CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
 		if (textureList == null) return 0;
-		int memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
+		try {
+			long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
-		if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
-			int index = 0;
-			foreach (CTexture tex in textureList) {
-				CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+			if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
+				int index = 0;
+				try {
+					foreach (CTexture tex in textureList) {
+						CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+					}
+				} catch (InvalidOperationException ex) {
+					ImGui.Text("(updating...)");
+				}
+				ImGui.TreePop();
 			}
-			ImGui.TreePop();
+			return memoryCount;
+		} catch (InvalidOperationException ex) {
+			ImGui.Text($"{label} Textures: (updating...)");
+			return 0;
 		}
-		return memoryCount;
 	}
-	private static int CTextureListPopup(ScriptBG script, string label, string id) {
+	private static long CTextureListPopup(ScriptBG script, string label, string id) {
 		return script != null ? CTextureListPopup(script.Textures.Values, label, id) : 0;
 	}
 	private static bool DrawCTextureForImGui(CTexture texture) {
@@ -808,21 +814,21 @@ public static class ImGuiDebugWindow {
 	#endregion
 
 	#region Helpers
-	private static float GetMemAllocationInMegabytes(int bytes) { return (float)bytes / (1024 * 1024); }
+	private static float GetMemAllocationInMegabytes(long bytes) { return (float)bytes / (1024 * 1024); }
 	private static float GetTextureMemAllocationInMegabytes(CTexture texture) {
 		return (float)GetTextureMemAllocation(texture) / (1024 * 1024);
 	}
-	private static int GetTextureMemAllocation(CTexture texture) {
+	private static long GetTextureMemAllocation(CTexture texture) {
 		return texture != null ? (texture.szTextureSize.Width * texture.szTextureSize.Height * 4) : 0;
 	}
 	private static Vector4 ColorToVector4(Color color) {
 		return new Vector4((float)color.R / 255, (float)color.G / 255, (float)color.B / 255, (float)color.A / 255);
 	}
 
-	private static int GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture> textureList) {
+	private static long GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture> textureList) {
 		return textureList.Where(tex => tex != null).Sum(GetTextureMemAllocation);
 	}
-	private static int GetTotalMemoryUsageFromCTextureList(ScriptBG script) {
+	private static long GetTotalMemoryUsageFromCTextureList(ScriptBG script) {
 		return script != null ? GetTotalMemoryUsageFromCTextureList(script.Textures.Values) : 0;
 	}
 	#endregion
