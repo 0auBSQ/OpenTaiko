@@ -223,6 +223,59 @@ internal class DBSaves {
 
 	#endregion
 
+	#region [global_counters Table]
+
+	public static Dictionary<string, double> GetGlobalCountersDict(Int64 saveId) {
+		Dictionary<string, double> _globalCounters = new Dictionary<string, double>();
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return _globalCounters;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                    SELECT *
+                    FROM global_counters
+                    WHERE SaveId={saveId};
+                ";
+		SqliteDataReader reader = command.ExecuteReader();
+		while (reader.Read()) {
+			string _counterName = (string)reader["CounterName"];
+			double _counterValue = (double)reader["CounterValue"];
+			_globalCounters[_counterName] = _counterValue;
+		}
+		reader.Close();
+
+		return _globalCounters;
+	}
+
+	public static void DBSetGlobalCounter(Int64 saveId, string counterName, double counterValue) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                BEGIN TRANSACTION;
+
+				UPDATE global_counters
+				SET CounterValue = {counterValue}
+				WHERE CounterName = '{counterName}' AND SaveId = {saveId};
+
+				INSERT INTO global_counters (CounterName, SaveId, CounterValue)
+				SELECT '{counterName}', {saveId}, {counterValue}
+				WHERE NOT EXISTS (
+					SELECT 1 FROM global_counters
+					WHERE CounterName = '{counterName}' AND SaveId = {saveId}
+				);
+
+				COMMIT;
+            ";
+		command.ExecuteNonQuery();
+	}
+
+
+	#endregion
+
 	#region [active_triggers Table]
 
 	public static HashSet<string> GetActiveTriggersSet(Int64 saveId) {

@@ -261,6 +261,12 @@ internal class OpenTaiko : Game {
 
 	public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
+	public static SaveFile PrimarySaveFile {
+		get {
+			return SaveFileInstances[SaveFile];
+		}
+	}
+
 	// 0 : Hidari, 1 : Migi (1P only)
 	public static int PlayerSide = 0;
 

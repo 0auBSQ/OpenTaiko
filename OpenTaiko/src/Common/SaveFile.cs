@@ -25,6 +25,9 @@ internal class SaveFile {
 
 		// Global triggers
 		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+
+		// Global counters
+		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
 	}
 
 	public void tLoadUnlockables() {
@@ -48,7 +51,7 @@ internal class SaveFile {
 		if (data.GlobalCounters.ContainsKey(counterName)) data.GlobalCounters[counterName] = counterValue;
 		else data.GlobalCounters.Add(counterName, counterValue);
 
-		// TODO: Add the DBSaves call here, note that there must be an automated way to update the database beforehand
+		DBSaves.DBSetGlobalCounter(data.SaveId, counterName, counterValue);
 	}
 
 	public bool tGetGlobalTrigger(string triggerName) {
