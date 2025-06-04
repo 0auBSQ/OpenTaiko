@@ -62,6 +62,16 @@ namespace OpenTaiko {
 		public float GetRotation() {
 			return (float)((_texture?.fZRotation * 180 / Math.PI) ?? 0);
 		}
+		public string GetBlendMode() {
+			return (_texture?.blendType ?? null) switch {
+				BlendType.Normal => "Normal",
+				BlendType.Add => "Add",
+				BlendType.Multi => "Multi",
+				BlendType.Sub => "Sub",
+				BlendType.Screen => "Screen",
+				_ => "???"
+			};
+		}
 		public string GetWrapMode() {
 			return (_texture?.WrapMode ?? null) switch {
 				Silk.NET.OpenGLES.TextureWrapMode.ClampToEdge => "Edge",
@@ -88,37 +98,11 @@ namespace OpenTaiko {
 		public void SetBlendMode(string mode) {
 			if (_texture != null) {
 				switch (mode.ToLower()) {
-					case "normal":
-					default:
-						_texture.b加算合成 = false;
-						_texture.b乗算合成 = false;
-						_texture.b減算合成 = false;
-						_texture.bスクリーン合成 = false;
-						break;
-					case "add":
-						_texture.b加算合成 = true;
-						_texture.b乗算合成 = false;
-						_texture.b減算合成 = false;
-						_texture.bスクリーン合成 = false;
-						break;
-					case "multi":
-						_texture.b加算合成 = false;
-						_texture.b乗算合成 = true;
-						_texture.b減算合成 = false;
-						_texture.bスクリーン合成 = false;
-						break;
-					case "sub":
-						_texture.b加算合成 = false;
-						_texture.b乗算合成 = false;
-						_texture.b減算合成 = true;
-						_texture.bスクリーン合成 = false;
-						break;
-					case "screen":
-						_texture.b加算合成 = false;
-						_texture.b乗算合成 = false;
-						_texture.b減算合成 = false;
-						_texture.bスクリーン合成 = true;
-						break;
+					case "add": _texture.blendType = BlendType.Add; break;
+					case "multi": _texture.blendType = BlendType.Multi; break;
+					case "sub": _texture.blendType = BlendType.Sub; break;
+					case "screen": _texture.blendType = BlendType.Screen; break;
+					case "normal": _texture.blendType = BlendType.Normal; break;
 				}
 			}
 		}
@@ -160,16 +144,25 @@ namespace OpenTaiko {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaTexture luatex = new();
-			try {
-				var tex = OpenTaiko.tテクスチャの生成(full_path);
-				luatex = new LuaTexture(tex);
-				Textures.Add(tex);
-			} catch (Exception e) {
-				LogNotification.PopError($"Lua Texture failed to load: {e}");
-				luatex?.Dispose();
-				luatex = new();
+			if (File.Exists(full_path)) {
+				try {
+					var tex = OpenTaiko.tテクスチャの生成(full_path);
+					luatex = new LuaTexture(tex);
+					Textures.Add(tex);
+				} catch (Exception e) {
+					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
+					luatex?.Dispose();
+					luatex = new();
+				}
+			}
+			else {
+				LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
 			}
 			return luatex;
+		}
+
+		public bool Exists(string path) {
+			return File.Exists($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}");
 		}
 	}
 }

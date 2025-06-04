@@ -117,15 +117,15 @@ class ScriptBG : IDisposable {
 	public List<LuaSound> SoundList = [];
 	public List<LuaText> TextList = [];
 
-	protected Lua LuaScript;
+	protected Lua? LuaScript;
 
-	protected LuaFunction LuaSetConstValues;
-	protected LuaFunction LuaUpdateValues;
-	protected LuaFunction LuaClearIn;
-	protected LuaFunction LuaClearOut;
-	protected LuaFunction LuaInit;
-	protected LuaFunction LuaUpdate;
-	protected LuaFunction LuaDraw;
+	protected LuaFunction? LuaSetConstValues;
+	protected LuaFunction? LuaUpdateValues;
+	protected LuaFunction? LuaClearIn;
+	protected LuaFunction? LuaClearOut;
+	protected LuaFunction? LuaInit;
+	protected LuaFunction? LuaUpdate;
+	protected LuaFunction? LuaDraw;
 
 	public ScriptBG(string filePath) {
 		if (!File.Exists(filePath)) return;
@@ -211,16 +211,18 @@ class ScriptBG : IDisposable {
 	public void ClearIn(int player) {
 		if (LuaScript == null) return;
 		try {
-			LuaClearIn.Call(player);
+			LuaClearIn?.Call(player);
 		} catch (Exception ex) {
+			//LuaClearIn = null;
 			Crash(ex);
 		}
 	}
 	public void ClearOut(int player) {
 		if (LuaScript == null) return;
 		try {
-			LuaClearOut.Call(player);
+			LuaClearOut?.Call(player);
 		} catch (Exception ex) {
+			//LuaClearOut = null;
 			Crash(ex);
 		}
 	}
@@ -239,7 +241,7 @@ class ScriptBG : IDisposable {
 			}
 
 			// Initialisation
-			LuaSetConstValues.Call(OpenTaiko.ConfigIni.nPlayerCount,
+			LuaSetConstValues?.Call(OpenTaiko.ConfigIni.nPlayerCount,
 				OpenTaiko.P1IsBlue(),
 				OpenTaiko.ConfigIni.sLang,
 				OpenTaiko.ConfigIni.SimpleMode,
@@ -247,7 +249,7 @@ class ScriptBG : IDisposable {
 				raritiesC
 			);
 
-			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+			LuaUpdateValues?.Call(OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				0,
@@ -259,7 +261,7 @@ class ScriptBG : IDisposable {
 				-1
 			);
 
-			LuaInit.Call();
+			LuaInit?.Call();
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -288,7 +290,7 @@ class ScriptBG : IDisposable {
 				) + msTimeOffset) / 1000.0;
 			}
 
-			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+			LuaUpdateValues?.Call(OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				(double)currentFloorPositionMax140,
@@ -302,7 +304,7 @@ class ScriptBG : IDisposable {
             LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
             LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-			LuaUpdate.Call();
+			LuaUpdate?.Call();
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -310,7 +312,7 @@ class ScriptBG : IDisposable {
 	public void Draw() {
 		if (LuaScript == null) return;
 		try {
-			LuaDraw.Call();
+			LuaDraw?.Call();
 		} catch (Exception ex) {
 			Crash(ex);
 		}

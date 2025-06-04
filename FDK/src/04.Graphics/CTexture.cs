@@ -257,7 +257,7 @@ public class CTexture : IDisposable {
 		set;
 	}
 
-	//public BlendType blendType = BlendType.Normal;
+	public BlendType blendType = BlendType.Normal;
 	public bool b加算合成 {
 		get;
 		set;
@@ -698,20 +698,22 @@ public class CTexture : IDisposable {
 	public void t2D描画(float x, float y, float depth, RectangleF rc画像内の描画領域, bool flipX = false, bool flipY = false, bool rollMode = false) {
 		this.color4.Alpha = this._opacity / 255f;
 
-		BlendType blendType;
-		if (b加算合成) {
-			blendType = BlendType.Add;
-		} else if (b乗算合成) {
-			blendType = BlendType.Multi;
-		} else if (b減算合成) {
-			blendType = BlendType.Sub;
-		} else if (bスクリーン合成) {
-			blendType = BlendType.Screen;
-		} else {
-			blendType = BlendType.Normal;
+		BlendType blend_type = blendType;
+		if (blend_type == BlendType.Normal) {
+			if (b加算合成) {
+				blend_type = BlendType.Add;
+			} else if (b乗算合成) {
+				blend_type = BlendType.Multi;
+			} else if (b減算合成) {
+				blend_type = BlendType.Sub;
+			} else if (bスクリーン合成) {
+				blend_type = BlendType.Screen;
+			} else {
+				blend_type = BlendType.Normal;
+			}
 		}
 
-		BlendHelper.SetBlend(blendType);
+		BlendHelper.SetBlend(blend_type);
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
