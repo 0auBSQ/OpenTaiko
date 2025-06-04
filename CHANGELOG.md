@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.71] - 2025-06-04 (Beta)
+
+- [Chore] Global Counters database commands
+- [Chore] Few nameplates additions/renames
+- [Feat] Now handles repeat mode for chart cutscenes
+
 ## [0.6.0.70] - 2025-06-03 (Beta)
 
 - [Chore] Automatically update Saves.db to add the global counters table
