@@ -21,7 +21,7 @@ internal class CActImplRollEffect : CActivity {
 				RollCharas[i].Type = random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_Ptn);
 				RollCharas[i].OldValue = 0;
 				RollCharas[i].Counter = new CCounter(0, 5000, 1, OpenTaiko.Timer);
-				if (OpenTaiko.stageGameScreen.bDoublePlay) {
+				if (OpenTaiko.stageGameScreen.isMultiPlay) {
 					switch (player) {
 						case 0:
 							RollCharas[i].X = OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X[random.Next(0, OpenTaiko.Skin.Game_Effect_Roll_StartPoint_1P_X.Length)];

@@ -494,7 +494,7 @@ internal class CActImplLaneTaiko : CActivity {
 		if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) {
 				OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
-				if (OpenTaiko.stageGameScreen.bDoublePlay) {
+				if (OpenTaiko.stageGameScreen.isMultiPlay) {
 					OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
 				}
 			}

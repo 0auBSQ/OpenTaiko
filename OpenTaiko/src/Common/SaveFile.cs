@@ -19,8 +19,15 @@ internal class SaveFile {
 	}
 
 	public void tInitSaveFile() {
+		// Best plays
 		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
 		data.tFactorizeBestPlays();
+
+		// Global triggers
+		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+
+		// Global counters
+		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
 	}
 
 	public void tLoadUnlockables() {
@@ -30,6 +37,33 @@ internal class SaveFile {
 		data.UnlockedNameplateIds = DBSaves.FetchUnlockedNameplateIds(data.SaveId);
 		data.DanTitles = DBSaves.FetchUnlockedDanTitles(data.SaveId);
 	}
+
+	#region [Triggers and Counters]
+
+	public void tSetGlobalTrigger(string triggerName, bool triggerValue) {
+		if (triggerValue) data.ActiveTriggers.Add(triggerName);
+		else data.ActiveTriggers.Remove(triggerName);
+
+		DBSaves.DBToggleGlobalTrigger(data.SaveId, triggerName, triggerValue);
+	}
+
+	public void tSetGlobalCounter(string counterName, double counterValue) {
+		if (data.GlobalCounters.ContainsKey(counterName)) data.GlobalCounters[counterName] = counterValue;
+		else data.GlobalCounters.Add(counterName, counterValue);
+
+		DBSaves.DBSetGlobalCounter(data.SaveId, counterName, counterValue);
+	}
+
+	public bool tGetGlobalTrigger(string triggerName) {
+		return data.ActiveTriggers.Contains(triggerName);
+	}
+
+	public double tGetGlobalCounter(string counterName) {
+		data.GlobalCounters.TryGetValue(counterName, out double counterValue);
+		return counterValue;
+	}
+
+	#endregion
 
 
 	#region [Medals and PlayCount]
@@ -229,8 +263,12 @@ internal class SaveFile {
 		[JsonIgnore]
 		public List<int> UnlockedNameplateIds = new List<int>();
 
+		// Global Triggers
 		[JsonProperty("activeTriggers")]
 		public HashSet<string> ActiveTriggers = new HashSet<string>();
+
+		[JsonIgnore]
+		public Dictionary<string, double> GlobalCounters = new Dictionary<string, double>();
 
 		[JsonIgnore]
 		public Dictionary<string, BestPlayRecords.CBestPlayRecord> bestPlays = new Dictionary<string, BestPlayRecords.CBestPlayRecord>();

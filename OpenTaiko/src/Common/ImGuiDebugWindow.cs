@@ -22,7 +22,7 @@ public static class ImGuiDebugWindow {
 
 	private static long memoryReadTimer = 0;
 	private static long pagedmemory = 0;
-	private static int textureMemoryUsage = 0;
+	private static long textureMemoryUsage = 0;
 	private static long currentStageMemoryUsage = 0;
 
 	private static int sortType = -1;
@@ -674,10 +674,7 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndCombo();
 			}
-			if (OpenTaiko.rCurrentStage.eStageID != CStage.EStage.StartUp)
-				CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
-			else
-				ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
+			CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
 
 			currentStageMemoryUsage = 0;
 
@@ -689,75 +686,73 @@ public static class ImGuiDebugWindow {
 			}
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
-				case CStage.EStage.Title: {
-						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageTitle.Background,
-							"Background", "TEXTURE_LUA_TITLEBG");
-						break;
-					}
-				case CStage.EStage.Game: {
+				#region Game
+				case CStage.EStage.Game:
 
-						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.UpScript,
-							"Up Background", "TEXTURE_LUA_UPBG");
-						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.DownScript,
-							"Down Background", "TEXTURE_LUA_DOWNBG");
-						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actMob.MobScript,
-							"Mob", "TEXTURE_LUA_MOB");
-						currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
-							"Kusudama", "TEXTURE_LUA_KUSUDAMA");
+					currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.UpScript,
+						"Up Background", "TEXTURE_LUA_UPBG");
+					currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBackground.DownScript,
+						"Down Background", "TEXTURE_LUA_DOWNBG");
+					currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actMob.MobScript,
+						"Mob", "TEXTURE_LUA_MOB");
+					currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
+						"Kusudama", "TEXTURE_LUA_KUSUDAMA");
 
-						#region Endings
-						switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
-							case Difficulty.Tower:
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
-									"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PassScript,
-									"Tower Cleared", "TEXTURE_LUA_TOWERCLEAR");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_FullComboScript,
-									"Tower Full Combo", "TEXTURE_LUA_TOWERFC");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PerfectScript,
-									"Tower Perfect Combo", "TEXTURE_LUA_TOWERPFC");
-								break;
-							case Difficulty.Dan:
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_FailScript,
-									"Dan Clear Failed", "TEXTURE_LUA_DANFAILED");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PassScript,
-									"Dan Red Clear", "TEXTURE_LUA_DANCLEAR");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_FullComboScript,
-									"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PerfectScript,
-									"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PassScript,
-									"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_FullComboScript,
-									"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
-								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PerfectScript,
-									"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
-								break;
-							default:
-								if (OpenTaiko.ConfigIni.bAIBattleMode) {
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AILoseScript,
-										"AI Clear Failed", "TEXTURE_LUA_AIFAILED");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWinScript,
-										"AI Cleared", "TEXTURE_LUA_AICLEAR");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_FullComboScript,
-										"AI Full Combo", "TEXTURE_LUA_AIFC");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_PerfectScript,
-										"AI Perfect Combo", "TEXTURE_LUA_AIPFC");
-								} else {
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FailedScript,
-										"Clear Failed", "TEXTURE_LUA_GAMEFAILED");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.ClearScript,
-										"Cleared", "TEXTURE_LUA_GAMECLEAR");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FullComboScript,
-										"Full Combo", "TEXTURE_LUA_GAMEFC");
-									currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.PerfectComboScript,
-										"Perfect Combo", "TEXTURE_LUA_GAMEPFC");
-								}
-								break;
+					#region Endings
+					switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+						case Difficulty.Tower:
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
+								"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PassScript,
+								"Tower Cleared", "TEXTURE_LUA_TOWERCLEAR");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_FullComboScript,
+								"Tower Full Combo", "TEXTURE_LUA_TOWERFC");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_TopReached_PerfectScript,
+								"Tower Perfect Combo", "TEXTURE_LUA_TOWERPFC");
+							break;
+						case Difficulty.Dan:
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_FailScript,
+								"Dan Clear Failed", "TEXTURE_LUA_DANFAILED");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PassScript,
+								"Dan Red Clear", "TEXTURE_LUA_DANCLEAR");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_FullComboScript,
+								"Dan Red Full Combo", "TEXTURE_LUA_DANFC");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Red_PerfectScript,
+								"Dan Red Perfect", "TEXTURE_LUA_DANPFC");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PassScript,
+								"Dan Gold Clear", "TEXTURE_LUA_DANGOLDCLEAR");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_FullComboScript,
+								"Dan Gold Full Combo", "TEXTURE_LUA_DANGOLDFC");
+							currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.Dan_Gold_PerfectScript,
+								"Dan Gold Perfect", "TEXTURE_LUA_DANGOLDPFC");
+							break;
+						default:
+							if (OpenTaiko.ConfigIni.bAIBattleMode) {
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AILoseScript,
+									"AI Clear Failed", "TEXTURE_LUA_AIFAILED");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWinScript,
+									"AI Cleared", "TEXTURE_LUA_AICLEAR");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_FullComboScript,
+									"AI Full Combo", "TEXTURE_LUA_AIFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.AIWin_PerfectScript,
+									"AI Perfect Combo", "TEXTURE_LUA_AIPFC");
+							} else {
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FailedScript,
+									"Clear Failed", "TEXTURE_LUA_GAMEFAILED");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.ClearScript,
+									"Cleared", "TEXTURE_LUA_GAMECLEAR");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.FullComboScript,
+									"Full Combo", "TEXTURE_LUA_GAMEFC");
+								currentStageMemoryUsage += TextureListPopup(OpenTaiko.stageGameScreen.actEnd.PerfectComboScript,
+									"Perfect Combo", "TEXTURE_LUA_GAMEPFC");
 							}
-						#endregion
-						break;
+							break;
 					}
+					#endregion
+
+					#endregion
+
+					break;
 			}
 
 			ImGui.Text("Script.lua Tex Memory Usage: " + GetMemAllocationInMegabytes(currentStageMemoryUsage) + "MB");
@@ -806,16 +801,25 @@ public static class ImGuiDebugWindow {
 	}
 	private static long CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
 		if (textureList == null) return 0;
-		long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
+		try {
+			long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
-		if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
-			int index = 0;
-			foreach (CTexture tex in textureList) {
-				CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+			if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
+				int index = 0;
+				try {
+					foreach (CTexture tex in textureList) {
+						CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+					}
+				} catch (InvalidOperationException ex) {
+					ImGui.Text("(updating...)");
+				}
+				ImGui.TreePop();
 			}
-			ImGui.TreePop();
+			return memoryCount;
+		} catch (InvalidOperationException ex) {
+			ImGui.Text($"{label} Textures: (updating...)");
+			return 0;
 		}
-		return memoryCount;
 	}
 	private static long TextureListPopup(ScriptBG script, string label, string id) {
 		if (script == null) return 0;

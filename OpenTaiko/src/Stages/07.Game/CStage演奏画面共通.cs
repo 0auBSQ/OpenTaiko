@@ -278,7 +278,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 		// Double play set here
-		this.bDoublePlay = OpenTaiko.ConfigIni.nPlayerCount >= 2 ? true : false;
+		this.isMultiPlay = OpenTaiko.ConfigIni.nPlayerCount >= 2 ? true : false;
 
 		this.nLoopCount_Clear = 1;
 
@@ -408,6 +408,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		queueMixerSound.Clear();
 		queueMixerSound = null;
 		//			GCSettings.LatencyMode = this.gclatencymode;
+
+		this.actAVI.rVD = null; // Will be disposed by TJA.DeActivate() later
 
 		var meanLag = CLagLogger.LogAndReturnMeanLag();
 
@@ -706,7 +708,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected CSound[] soundBlue = new CSound[5];
 	protected CSound[] soundAdlib = new CSound[5];
 	protected CSound[] soundClap = new CSound[5];
-	public bool bDoublePlay; // 2016.08.21 kairera0467 表示だけ。
+	public bool isMultiPlay; // 2016.08.21 kairera0467 表示だけ。
 	protected Stopwatch sw;     // 2011.6.13 最適化検討用のストップウォッチ
 	public int ListDan_Number;
 	private bool IsDanFailed;
@@ -1240,9 +1242,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 								this.nHand[nPlayer]++;
 							else
 								this.nHand[nPlayer] = 0;
-
-							if (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] < 0 && (pChip.eScrollMode == EScrollMode.HBScroll))
-								pChip.fBMSCROLLTime -= OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * -0.05;
 
 							OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Red);
 							//CDTXMania.stage演奏ドラム画面.actChipFireTaiko.Start( pChip.nチャンネル番号 == 0x15 ? 1 : 3, nPlayer );
@@ -2511,10 +2510,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 
-	protected void t進行描画_AVI() {
-		if (((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) && OpenTaiko.ConfigIni.bEnableAVI) {
-			this.actAVI.Draw();
+	protected bool t進行描画_AVI() {
+		if (((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut))
+			&& (this.actAVI?.rVD.bPlaying ?? false)
+			) {
+			this.actAVI.Pause(); // paused but still shown
 		}
+		if (OpenTaiko.ConfigIni.bEnableAVI) {
+			this.actAVI.Draw();
+			return true;
+		}
+		return false;
 	}
 	protected void t進行描画_STAGEFAILED() {
 		// Transition for failed games
@@ -4188,6 +4194,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.nCurrentRollCount[i] = 0;
 				this.nTotalRollCount[i] = 0;
 
+				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
+
 				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character];
 				switch (chara.effect.tGetGaugeType()) {
 					default:
@@ -4316,6 +4324,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		this.objHandlers.Clear();
 
+		this.actAVI.rVD = null;
 		if ((OpenTaiko.TJA.listVD.TryGetValue(1, out CVideoDecoder vd2))) {
 			ShowVideo = true;
 		} else {
@@ -4417,24 +4426,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 			#endregion
-			#region [ 演奏開始時点で既に表示されているBGAとAVIの、シークと再生 ]
-			if (tjai.listVD.Count > 0) {
-				for (int i = 0; i < iLastChipAtStart[nPlayer]; i++) {
-					CChip chip = tjai.listChip[i];
-					if (chip.nChannelNo == 0x54) {
-						if (chip.n発声時刻ms <= nStartTime) {
-							chip.bHit = true;
-							this.actAVI.Seek(nStartTime - chip.n発声時刻ms);
-							this.actAVI.Start(this.actAVI.rVD);
-							break;
-						} else {
-							this.actAVI.Seek(0);
-						}
-						break;
-					}
-				}
-			}
-			#endregion
 		}
 		#region [ PAUSEしていたサウンドを一斉に再生再開する(ただしタイマを止めているので、ここではまだ再生開始しない) ]
 
@@ -4516,10 +4507,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actPlayInfo.Draw();
 		}
 	}
-	protected void t進行描画_背景() {
+	protected bool t進行描画_背景() {
 		if (this.txBgImage != null) {
 			this.txBgImage.t2D描画(0, 0);
+			return true;
 		}
+		return false;
 	}
 
 	protected void t進行描画_判定文字列1_通常位置指定の場合() {

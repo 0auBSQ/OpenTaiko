@@ -60,7 +60,6 @@ internal class CScore {
 		public STDGBVALUE<int> 演奏回数;
 		public STHISTORY 演奏履歴;
 		public bool レベルを非表示にする;
-		public CTja.E種別 曲種別;
 		public double Bpm;
 		public double BaseBpm;
 		public double MinBpm;
@@ -243,7 +242,6 @@ internal class CScore {
 		this.譜面情報.演奏履歴.行7 = "";
 		this.譜面情報.レベルを非表示にする = false;
 		this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
-		this.譜面情報.曲種別 = CTja.E種別.DTX;
 		this.譜面情報.Bpm = 120.0;
 		this.譜面情報.MinBpm = 120.0;
 		this.譜面情報.MaxBpm = 120.0;

@@ -32,8 +32,10 @@ internal class CSongDict {
 	}
 
 	public static void tAddSongNode(CSongUniqueID sid, CSongListNode node) {
-		if (sid != null && sid.data.id != null && sid.data.id != "" && !nodes.ContainsKey(sid.data.id))
-			nodes.Add(sid.data.id, node.Clone());
+		var id = sid?.data?.id ?? "";
+
+		if (!string.IsNullOrEmpty(id) && !nodes.ContainsKey(id))
+			nodes.Add(id, node.Clone());
 		tAddSongUrl(sid);
 	}
 
@@ -41,21 +43,21 @@ internal class CSongDict {
 		return urls.Contains(url);
 	}
 
-	public static void tAddSongUrl(CSongUniqueID sid) {
-		var url = sid.data.url;
+	public static void tAddSongUrl(CSongUniqueID? sid) {
+		var url = sid?.data?.url ?? "";
 
-		if (url != null && url != "" && !urls.Contains(url))
+		if (!string.IsNullOrEmpty(url) && !urls.Contains(url))
 			urls.Add(url);
 	}
 
-	public static void tRemoveSongUrl(CSongUniqueID sid) {
-		var url = sid.data.url;
+	public static void tRemoveSongUrl(CSongUniqueID? sid) {
+		var url = sid?.data?.url ?? "";
 
-		if (url != null && url != "" && urls.Contains(url))
+		if (!string.IsNullOrEmpty(url) && urls.Contains(url))
 			urls.Remove(url);
 	}
 
-	public static void tRemoveSongNode(CSongUniqueID sid) {
+	public static void tRemoveSongNode(CSongUniqueID? sid) {
 		if (sid != null && nodes.ContainsKey(sid.data.id)) {
 			tRemoveSongUrl(sid);
 			nodes.Remove(sid.data.id);

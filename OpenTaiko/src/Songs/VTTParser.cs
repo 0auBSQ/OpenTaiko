@@ -33,27 +33,18 @@ public class VTTParser : IDisposable {
 		public string Language;
 	}
 
-	private static string[] _vttdelimiter;
+	private static string[] _vttdelimiter = new[] { "-->", "- >", "->" };
 
-	private static Regex regexTimestamp;
+	private static Regex regexTimestamp = new Regex(@"(-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+)");
 
-	private static Regex regexOffset;
-	private static Regex regexLang;
+	private static Regex regexOffset = new Regex(@"Offset:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Offset: 00:01.001;" , "WEBVTT Offset: 1.001;"
+	private static Regex regexLang = new Regex(@"Language:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Language: ja;"
 
-	private static bool isUsingLang;
+	private bool isUsingLang = false;
 
 	private bool _isDisposed;
 
-	public VTTParser() {
-		_vttdelimiter = new[] { "-->", "- >", "->" };
-
-		regexTimestamp = new Regex(@"(-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+)");
-
-		regexOffset = new Regex(@"Offset:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Offset: 00:01.001;" , "WEBVTT Offset: 1.001;"
-		regexLang = new Regex(@"Language:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Language: ja;"
-
-		isUsingLang = false;
-	}
+	public VTTParser() { }
 
 	#region Dispose stuff
 	public void Dispose() {

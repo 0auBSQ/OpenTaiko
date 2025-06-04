@@ -10,7 +10,7 @@ class CPuchichara {
 	public CSkin.CSystemSound welcome;
 	public DBPuchichara.PuchicharaData metadata;
 	public DBPuchichara.PuchicharaEffect effect;
-	public DBUnlockables.CUnlockConditions unlock;
+	public CUnlockCondition? unlock;
 	public string _path;
 
 	public float GetEffectCoinMultiplier() {
@@ -30,7 +30,7 @@ class CPuchichara {
 		var _npvKey = Path.GetFileName(_path);
 
 		if (!_sf.Contains(_npvKey)) {
-			var _fulfilled = unlock?.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1 ?? false;
+			var _fulfilled = unlock?.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1 ?? false;
 
 			if (_fulfilled) {
 				_sf.Add(_npvKey);
@@ -80,7 +80,7 @@ class CPuchichara {
 
 		// Puchichara unlockables
 		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
-			unlock = ConfigManager.GetConfig<DBUnlockables.CUnlockConditions>($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
+			unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
 		else
 			unlock = null;
 	}
