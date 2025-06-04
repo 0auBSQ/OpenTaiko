@@ -95,7 +95,7 @@ internal class CAct演奏AVI : CActivity {
 
 	private CTexture tx描画用;
 
-	public CVideoDecoder rVD;
+	public CVideoDecoder? rVD;
 
 	//-----------------
 	#endregion

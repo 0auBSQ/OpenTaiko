@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.6.0.71] - 2025-06-04 (Beta)
+
+- [Chore] Global Counters database commands
+- [Chore] Few nameplates additions/renames
+- [Feat] Now handles repeat mode for chart cutscenes
+
+## [0.6.0.70] - 2025-06-03 (Beta)
+
+- [Chore] Automatically update Saves.db to add the global counters table
+
+## [0.6.0.69] - 2025-06-02 (Beta)
+
+- [Feat] Add the unlock conditions "andcomb" and "orcomb" allowing combining multiple unlock conditions for a single asset
+
+## [0.6.0.68] - 2025-05-31 (Beta)
+
+- [Chore] Handle Global Triggers methods on save files
+
+## [0.6.0.67] - 2025-05-31 (Beta)
+
+- [Enhancement] Pause the BGA/MOVIE instead of hiding it for STAGE FAILED
+- [BugFix] Crash when playing a song with any BGA/MOVIE ever played, then choose another song, then seek to after any BPM/MOVIE in this song should play before any such event plays, and then resume play
+- [BugFix] BGIMAGE was drawn when BGA is shown or in training mode
+- [BugFix] BGA/MOVIE window display did not hide on #BGAOFF or retrying
+- [BugFix] BGIMAGE was overlapped by predefined background and was invisible
+
+## [0.6.0.66] - 2025-05-30 (Beta)
+
+- Reintroduce the 0.6.0.64 update with the crashes fixed
+
+## [0.6.0.65] - 2025-05-30 (Beta)
+
+- [Hotfix] Revert 0.6.0.64 due to unexpected crashes until a fix is proposed
+
+## [0.6.0.64] - 2025-05-30 (Beta)
+
+- Fix high BPM (e.g., 10^16) caused crash due to character frame index overflowed by huge-valued frame counter
+- Fix looped character animation had each loop delayed to align to drawing frame
+- Fix exiting Kusudama flew too far when BPM is high
+
+## [0.6.0.63] - 2025-05-28 (Beta)
+
+- Refactor code handling Unlockables
+
+## [0.6.0.62] - 2025-05-27 (Beta)
+
+- HB/BMScroll roll fix
+
+## [0.6.0.61] - 2025-05-19 (Beta)
+
+- Update NameplatesUnlockables.db3
+
+## [0.6.0.60] - 2025-05-18 (Beta)
+
+- Update SongUnlockables.db3
+
 ## [0.6.0.59] - 2025-05-09 (Beta)
 
 - [Feat] Add .optksc as a file format, for creating shortcuts pointing to existing songs

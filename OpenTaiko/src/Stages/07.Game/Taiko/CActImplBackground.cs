@@ -528,7 +528,7 @@ internal class CActImplBackground : CActivity {
 			ctFailAnimation?.Tick();
 
 			#endregion
-		} else if (!OpenTaiko.stageGameScreen.bDoublePlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+		} else if (!OpenTaiko.stageGameScreen.isMultiPlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (!IsDownNotFound) {
 				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update();
 				DownScript?.Draw();

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using FDK;
@@ -13,8 +12,6 @@ namespace OpenTaiko;
 
 internal class CTja : CActivity {
 	// 定数
-
-	public enum E種別 { DTX, GDA, G2D, BMS, BME, SMF }
 
 	public List<string> listErrors = new List<string>();
 	private int nNowReadLine;
@@ -433,6 +430,13 @@ internal class CTja : CActivity {
 
 	#endregion
 
+	#region [Triggers and Counters]
+
+	public CLocalCounters LocalCounters = new CLocalCounters();
+	public CLocalTriggers LocalTriggers = new CLocalTriggers();
+
+	#endregion
+
 
 #if TEST_NOTEOFFMODE
 		public STLANEVALUE<bool> b演奏で直前の音を消音する;
@@ -511,6 +515,9 @@ internal class CTja : CActivity {
 		Dan_C = new Dan_C[CExamInfo.cMaxExam];
 		pDan_LastChip = new CChip[1];
 		DanSongs.Number = 0;
+
+		LocalCounters = new CLocalCounters();
+		LocalTriggers = new CLocalTriggers();
 
 		this.CutSceneOutros = new();
 	}
@@ -678,6 +685,11 @@ internal class CTja : CActivity {
 			default:
 				break;
 		}
+	}
+
+	public void tInitLocalStores(int player = 0) {
+		LocalCounters = new CLocalCounters(player);
+		LocalTriggers = new CLocalTriggers(player);
 	}
 
 	public void tRandomizeTaikoChips(int player = 0) {
@@ -968,11 +980,11 @@ internal class CTja : CActivity {
 				#endregion
 				if (this.listChip.Count > 0) {
 					this.listChip = this.listChip.OrderBy(x => x).ToList();
-												// 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
-												// 保守性確保を優先してここでのソートは残しておく
-												// なお、093時点では、このソートを削除しても動作するようにはしてある。
-												// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
-												// これにより、数ms程度ながらここでのソートも高速化されている。
+					// 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
+					// 保守性確保を優先してここでのソートは残しておく
+					// なお、093時点では、このソートを削除しても動作するようにはしてある。
+					// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
+					// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
@@ -1440,6 +1452,10 @@ internal class CTja : CActivity {
 
 	private int nDifficulty;
 
+	public int nInstanceDifficulty {
+		get => this.nDifficulty;
+	}
+
 	/// <summary>
 	/// 新型。
 	/// ○未実装
@@ -1711,7 +1727,7 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0xFF);
 			chip.n発声位置 = ((this.n現在の小節数 + 2) * 384);
 			chip.n発声時刻ms = (int)(this.dbNowTime + 1000); //2016.07.16 kairera0467 終了時から1秒後に設置するよう変更。
-			// チップを配置。
+														 // チップを配置。
 
 			if (n参照中の難易度 == (int)Difficulty.Dan) {
 				for (int i = listChip.Count - 1; i >= 0; i--) {
@@ -2869,8 +2885,7 @@ internal class CTja : CActivity {
 			var listBalloon = this.listBalloon_Branch[iBranch];
 			if (listBalloon.Count == 0) {
 				chip.nBalloon = 5;
-			}
-			else if (listBalloon.Count > this.listBalloon_Branch_数値管理[iBranch]) {
+			} else if (listBalloon.Count > this.listBalloon_Branch_数値管理[iBranch]) {
 				chip.nBalloon = listBalloon[this.listBalloon_Branch_数値管理[iBranch]];
 				this.listBalloon_Branch_数値管理[iBranch]++;
 			}
@@ -3284,14 +3299,14 @@ internal class CTja : CActivity {
 
 			if (this.isOFFSET_Negative == true)
 				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
-												  //tbOFFSET.Text = strCommandParam;
+															//tbOFFSET.Text = strCommandParam;
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
 			this.msMOVIEOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
 			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
 
 			if (this.isMOVIEOFFSET_Negative == true)
 				this.msMOVIEOFFSET_Abs = this.msMOVIEOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
-															//tbOFFSET.Text = strCommandParam;
+																	  //tbOFFSET.Text = strCommandParam;
 		}
 		#region[移動→不具合が起こるのでここも一応復活させておく]
 		else if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {

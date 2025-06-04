@@ -35,11 +35,20 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 				SongUnlockable su = new SongUnlockable();
 				su.hiddenIndex = (EHiddenIndex)(Int64)reader["HiddenIndex"];
 				su.rarity = (string)reader["Rarity"];
-				su.unlockConditions = new DBUnlockables.CUnlockConditions();
-				su.unlockConditions.Condition = (string)reader["UnlockCondition"];
-				su.unlockConditions.Values = JsonConvert.DeserializeObject<int[]>((string)reader["UnlockValues"]) ?? new int[] { 0 };
-				su.unlockConditions.Type = (string)reader["UnlockType"];
-				su.unlockConditions.Reference = JsonConvert.DeserializeObject<string[]>((string)reader["UnlockReferences"]) ?? new string[] { "" };
+
+				#region [ Build raw json ]
+
+				CUnlockConditionFactory.UnlockConditionJsonRaw _raw = new CUnlockConditionFactory.UnlockConditionJsonRaw(
+					(string)reader["UnlockCondition"],
+					JsonConvert.DeserializeObject<int[]>((string)reader["UnlockValues"]) ?? new int[] { 0 },
+					(string)reader["UnlockType"],
+					JsonConvert.DeserializeObject<string[]>((string)reader["UnlockReferences"]) ?? new string[] { "" }
+					);
+
+				su.unlockConditions = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonRaw(_raw);
+
+				#endregion
+
 				su.customUnlockText = JsonConvert.DeserializeObject<CLocalizationData>((string)reader["CustomUnlockText"]) ?? new CLocalizationData();
 
 				data[((string)reader["SongUniqueId"])] = su;
@@ -56,13 +65,13 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 		public string rarity;
 
 		[JsonProperty("UnlockCondition")]
-		public DBUnlockables.CUnlockConditions unlockConditions;
+		public CUnlockCondition unlockConditions;
 
 		[JsonProperty("CustomUnlockText")]
 		public CLocalizationData customUnlockText;
 
 		public string GetUnlockMessage() {
-			return customUnlockText.GetString(unlockConditions.tConditionMessage(DBUnlockables.CUnlockConditions.EScreen.SongSelect));
+			return customUnlockText.GetString(unlockConditions.tConditionMessage(CUnlockCondition.EScreen.SongSelect));
 		}
 	}
 
@@ -76,7 +85,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 			CSongListNode? _node = CSongDict.tGetNodeFromID(_npvKey);
 
 			if (!_sf.Contains(_npvKey)) {
-				var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
+				var _fulfilled = item.Value.unlockConditions.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1;
 
 				if (_fulfilled) {
 					_sf.Add(_npvKey);

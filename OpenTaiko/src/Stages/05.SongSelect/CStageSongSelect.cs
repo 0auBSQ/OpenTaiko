@@ -743,8 +743,7 @@ internal class CStageSongSelect : CStage {
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
 							#endregion
-						}
-						else if (this.actSongList.latestContext == eMenuContext.SearchByText) {
+						} else if (this.actSongList.latestContext == eMenuContext.SearchByText) {
 							#region [Trigger context box]
 
 							this.actSongList.rCurrentlySelectedSong.childrenList = CSongDict.tFetchSongsByTitle(
@@ -876,7 +875,7 @@ internal class CStageSongSelect : CStage {
 														var SongToUnlock = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
 
 														if (SongToUnlock != null) {
-															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMetWrapper(OpenTaiko.SaveFile, DBUnlockables.CUnlockConditions.EScreen.SongSelect);
+															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMet(OpenTaiko.SaveFile, CUnlockCondition.EScreen.SongSelect);
 
 															Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 															if (actSongList.ttkNowUnlockConditionText is not null) {
@@ -893,8 +892,10 @@ internal class CStageSongSelect : CStage {
 																	"unlocked_songs",
 																	this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
 																);
-																if (SongToUnlock.unlockConditions.Condition == "cm")
+																if (SongToUnlock.unlockConditions is CUnlockCM)
 																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																else if (SongToUnlock.unlockConditions is CUnlockAndComb || SongToUnlock.unlockConditions is CUnlockOrComb)
+																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.CoinStack);
 																// Play modal animation here ?
 															} else
 																OpenTaiko.Skin.soundError.tPlay();

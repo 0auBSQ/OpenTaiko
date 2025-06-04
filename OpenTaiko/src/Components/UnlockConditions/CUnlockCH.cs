@@ -5,6 +5,7 @@
 		public CUnlockCH(CUnlockConditionFactory.UnlockConditionJsonRaw rawJson) : base(rawJson) {
 			this.RequiredArgCount = 1;
 			this.ConditionId = "ch";
+			this.CoinStack = this.Values[0];
 		}
 
 		public override (bool, string?) tConditionMet(int player, EScreen screen = EScreen.MyRoom) {

@@ -3,7 +3,7 @@
 class CCharacter {
 	public DBCharacter.CharacterData metadata;
 	public DBCharacter.CharacterEffect effect;
-	public DBUnlockables.CUnlockConditions unlock;
+	public CUnlockCondition? unlock;
 	public string _path;
 	public int _idx;
 
@@ -24,7 +24,7 @@ class CCharacter {
 		var _npvKey = Path.GetFileName(_path);
 
 		if (!_sf.Contains(_npvKey)) {
-			var _fulfilled = unlock?.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1 ?? false;
+			var _fulfilled = unlock?.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1 ?? false;
 
 			if (_fulfilled) {
 				_sf.Add(_npvKey);
@@ -64,7 +64,7 @@ class CCharacter {
 
 		// Character unlockables
 		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
-			unlock = ConfigManager.GetConfig<DBUnlockables.CUnlockConditions>($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
+			unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
 		else
 			unlock = null;
 	}

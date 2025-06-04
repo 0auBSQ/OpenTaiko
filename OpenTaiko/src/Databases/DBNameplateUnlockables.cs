@@ -28,11 +28,20 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 			while (reader.Read()) {
 				NameplateUnlockable nu = new NameplateUnlockable();
 				nu.rarity = (string)reader["Rarity"];
-				nu.unlockConditions = new DBUnlockables.CUnlockConditions();
-				nu.unlockConditions.Condition = (string)reader["UnlockCondition"];
-				nu.unlockConditions.Values = JsonConvert.DeserializeObject<int[]>((string)reader["UnlockValues"]) ?? new int[] { 0 };
-				nu.unlockConditions.Type = (string)reader["UnlockType"];
-				nu.unlockConditions.Reference = JsonConvert.DeserializeObject<string[]>((string)reader["UnlockReferences"]) ?? new string[] { "" };
+
+				#region [ Build raw json ]
+
+				CUnlockConditionFactory.UnlockConditionJsonRaw _raw = new CUnlockConditionFactory.UnlockConditionJsonRaw(
+					(string)reader["UnlockCondition"],
+					JsonConvert.DeserializeObject<int[]>((string)reader["UnlockValues"]) ?? new int[] { 0 },
+					(string)reader["UnlockType"],
+					JsonConvert.DeserializeObject<string[]>((string)reader["UnlockReferences"]) ?? new string[] { "" }
+					);
+
+				nu.unlockConditions = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonRaw(_raw);
+
+				#endregion
+
 				nu.nameplateInfo = new SaveFile.CNamePlateTitle((int)((Int64)reader["NameplateType"]));
 
 				nu.nameplateInfo.cld.SetString("default", (string)reader["DefaultString"]);
@@ -54,7 +63,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 		public string rarity;
 
 		[JsonProperty("UnlockCondition")]
-		public DBUnlockables.CUnlockConditions unlockConditions;
+		public CUnlockCondition unlockConditions;
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
@@ -66,7 +75,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 			var _npvKey = (int)item.Key;
 			if (!_sf.Contains(_npvKey))// !_sf.ContainsKey(_npvKey))
 			{
-				var _fulfilled = item.Value.unlockConditions.tConditionMetWrapper(player, DBUnlockables.CUnlockConditions.EScreen.Internal).Item1;
+				var _fulfilled = item.Value.unlockConditions.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1;
 
 				if (_fulfilled) {
 					_sf.Add(_npvKey);

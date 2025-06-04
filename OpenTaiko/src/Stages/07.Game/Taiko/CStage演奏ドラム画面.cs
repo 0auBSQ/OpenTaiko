@@ -358,31 +358,31 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 			}
 
-			bool BGA_Hidden = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo;
+			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo;
 
-			// (????)
-			if (!String.IsNullOrEmpty(OpenTaiko.TJA.strBGIMAGE_PATH) || (OpenTaiko.TJA.listVD.Count == 0) || !ShowVideo || !OpenTaiko.ConfigIni.bEnableAVI) //背景動画があったら背景画像を描画しない。
-			{
-				this.t進行描画_背景();
-			}
+			// Layer: background
 
-			if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
-				this.t進行描画_AVI();
+			if (BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && this.t進行描画_AVI()) {
+				// BGMOVIE & #BGAON
+			} else if (!OpenTaiko.ConfigIni.bTokkunMode && this.t進行描画_背景()) {
+				// BGIMAGE
 			} else if (OpenTaiko.ConfigIni.bEnableBGA) {
-				if (OpenTaiko.ConfigIni.bTokkunMode) actTokkun.On進行描画_背景();
-				else actBackground.Draw();
+				if (OpenTaiko.ConfigIni.bTokkunMode)
+					actTokkun.On進行描画_背景();
+				else
+					actBackground.Draw();
 			}
 
-			if (!BGA_Hidden && !OpenTaiko.ConfigIni.bTokkunMode) {
+			// Layer: below-character background elements
+			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode) {
 				actRollChara.Draw();
+				if (!this.isMultiPlay) {
+					if (OpenTaiko.ConfigIni.ShowDancer)
+						actDancer.Draw();
+					if (OpenTaiko.ConfigIni.ShowFooter)
+						this.actFooter.Draw();
+				}
 			}
-
-			if (!BGA_Hidden && !bDoublePlay && OpenTaiko.ConfigIni.ShowDancer && !OpenTaiko.ConfigIni.bTokkunMode) {
-				actDancer.Draw();
-			}
-
-			if (!BGA_Hidden && !bDoublePlay && OpenTaiko.ConfigIni.ShowFooter && !OpenTaiko.ConfigIni.bTokkunMode)
-				this.actFooter.Draw();
 
 			//this.t進行描画_グラフ();   // #24074 2011.01.23 add ikanick
 
@@ -390,11 +390,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			//this.t進行描画_DANGER();
 			//this.t進行描画_判定ライン();
 
+			// 1/2-player mode character
 			if (OpenTaiko.ConfigIni.ShowChara && OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 				this.actChara.Draw();
 			}
 
-			if (!BGA_Hidden && OpenTaiko.ConfigIni.ShowMob && !OpenTaiko.ConfigIni.bTokkunMode)
+			// Layer: above-character background elements
+
+			if (!BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.ShowMob)
 				this.actMob.Draw();
 
 			if (OpenTaiko.ConfigIni.eGameMode != EGame.Off)
@@ -403,15 +406,17 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			this.t進行描画_譜面スクロール速度();
 			this.t進行描画_チップアニメ();
 
+			// Layer: note lane + below-note foreground elements
+
 			this.actLaneTaiko.Draw();
 
-			if (OpenTaiko.ConfigIni.ShowRunner && !OpenTaiko.ConfigIni.bAIBattleMode && OpenTaiko.ConfigIni.nPlayerCount <= 2)
+			if (OpenTaiko.ConfigIni.ShowRunner && !OpenTaiko.ConfigIni.bAIBattleMode && !this.isMultiPlay)
 				this.actRunner.Draw();
 
 			//this.t進行描画_レーン();
 			//this.t進行描画_レーンフラッシュD();
 
-			if ((OpenTaiko.ConfigIni.eClipDispType == EClipDispType.WindowOnly || OpenTaiko.ConfigIni.eClipDispType == EClipDispType.Both) && OpenTaiko.ConfigIni.nPlayerCount == 1)
+			if (BGA_Shown && !OpenTaiko.ConfigIni.bTokkunMode && !this.isMultiPlay)
 				this.actAVI.t窓表示();
 
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
@@ -423,6 +428,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.actDan.Draw();
 
+			// Layer: notes & bar lines
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
 				bool btmp = this.t進行描画_チップ(EInstrumentPad.Drums, i);
@@ -435,6 +441,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 #endif
 			}
+
+			// Layer: above-note elements
 
 			this.actMtaiko.Draw();
 
@@ -452,10 +460,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
 				this.t進行描画_スコア();
 
+			// 3+-player mode character
 			if (OpenTaiko.ConfigIni.ShowChara && OpenTaiko.ConfigIni.nPlayerCount > 2) {
 				this.actChara.Draw();
 			}
 
+			// note effects
 			this.Rainbow.Draw();
 			this.FireWorks.Draw();
 			this.actChipEffects.Draw();
@@ -465,17 +475,22 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.t進行描画_パネル文字列();
 
+			// dialogue balloons
+
 			this.actComboBalloon.Draw();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				this.actRoll.On進行描画(this.nCurrentRollCount[i], i);
 			}
 
+			// infos
 
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.t進行描画_判定文字列1_通常位置指定の場合();
 
 			this.t進行描画_演奏情報();
+
+			// LYRIC[S/FILE]: & #LYRIC
 
 			if (OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 				this.actPanel.t歌詞テクスチャを生成する(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
@@ -496,12 +511,16 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.ScoreRank.Draw();
 
+			// Layer: Interactive elements
+
 			if (OpenTaiko.ConfigIni.bTokkunMode) {
 				actTokkun.Draw();
 			}
 
 			// handle retry states here
 			this.actPauseMenu.Draw();
+
+			// Layer: Gameplay complete animation and fading out
 
 			bIsFinishedEndAnime = this.actEnd.Draw() == 1 ? true : false;
 			bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();

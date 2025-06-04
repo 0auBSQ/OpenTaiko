@@ -56,7 +56,7 @@ namespace OpenTaiko {
 		 * orcomb : "OR combination", fullfil at least one of the included conditions to unlock the asset, n references for each condition in the reference array as a stringified JSON
 		 */
 
-		public CUnlockCondition? GenerateUnlockObjectFromJsonRaw(UnlockConditionJsonRaw? rawJson) {
+		public CUnlockCondition GenerateUnlockObjectFromJsonRaw(UnlockConditionJsonRaw? rawJson) {
 			if (rawJson == null) {
 				return new CUnlockError(null);
 			}
@@ -108,7 +108,6 @@ namespace OpenTaiko {
 						return new CUnlockAndComb(rawJson);
 					}
 				case "orcomb": {
-						// To do: parse references as json strings recursively and add them for both andcomb and orcomb
 						return new CUnlockOrComb(rawJson);
 					}
 			}
@@ -116,7 +115,7 @@ namespace OpenTaiko {
 			return new CUnlockError(null);
 		}
 
-		public CUnlockCondition? GenerateUnlockObjectFromJsonPath(string jsonPath) {
+		public CUnlockCondition GenerateUnlockObjectFromJsonPath(string jsonPath) {
 			UnlockConditionJsonRaw? rawJson = ConfigManager.GetConfig<UnlockConditionJsonRaw>(jsonPath);
 
 			return this.GenerateUnlockObjectFromJsonRaw(rawJson);

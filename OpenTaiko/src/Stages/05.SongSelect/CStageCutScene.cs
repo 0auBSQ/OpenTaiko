@@ -24,7 +24,8 @@ class CStageCutScene : CStage {
 			return;
 
 		if (this.cutScenes == null)
-			this.LoadCutScenes(OpenTaiko.rPreviousStage);
+			this.cutScenes = [];
+		//this.LoadCutScenes(OpenTaiko.rPreviousStage);
 
 		this.iCutScene = -1;
 
@@ -79,15 +80,23 @@ class CStageCutScene : CStage {
 			this.cutScenes = (selectedSong.CutSceneIntro != null) ? [selectedSong.CutSceneIntro] : [];
 		} else {
 			this.mode = ECutSceneMode.Outro;
-			this.cutScenes = (selectedSong.CutSceneOutros != null) ? [..selectedSong.CutSceneOutros] : [];
+			this.cutScenes = (selectedSong.CutSceneOutros != null) ? [.. selectedSong.CutSceneOutros] : [];
 		}
-		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x));
+		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x, selectedSong));
 		return this.cutScenes.Count > 0;
 	}
 
-	private bool JudgeRequirement(CTja.CutSceneDef cutScene) {
+	private bool JudgeRequirement(CTja.CutSceneDef cutScene, CSongListNode? songInfo = null) {
+		string fileName = Path.GetFileName(cutScene.FullPath);
+		string _gTriggerName = $".regcutscene_{songInfo?.tGetUniqueId() ?? ""}_{this.mode.ToString()}_{fileName}".EscapeSingleQuotes();
+
 		if (OpenTaiko.ConfigIni.bAutoPlay[0]) {
 			return false; // no human player, no cut scene, no repeat status
+		}
+		if (OpenTaiko.PrimarySaveFile.tGetGlobalTrigger(_gTriggerName) == true
+			&& cutScene.RepeatMode != CTja.ECutSceneRepeatMode.EverytimeMet
+			) {
+			return false; // disabled depending on repeat mode
 		}
 		if (this.mode != ECutSceneMode.Intro) {
 			if (!OpenTaiko.stageResults.IsScoreValid[0]) {
@@ -104,12 +113,18 @@ class CStageCutScene : CStage {
 				"me" or _ => clearstatus >= clearRequirement,
 			};
 			if (!met) {
-				// TODO: Update repeat status
+				if (cutScene.RepeatMode == CTja.ECutSceneRepeatMode.UntilFirstUnmet) {
+					// First Unmet => Does not play AND disable its future plays
+					OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
+				}
 				return false;
 			}
 		}
 
-		// TODO: Judge by repeat status and update repeat status
+		if (cutScene.RepeatMode == CTja.ECutSceneRepeatMode.FirstMet) {
+			// First Met => Does play but disable future plays
+			OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
+		}
 		return true;
 	}
 
@@ -117,6 +132,7 @@ class CStageCutScene : CStage {
 		// On de-activation
 		this.StopSound();
 		this.rVD?.Dispose();
+		this.rVD = null;
 
 		this.cutScenes?.Clear();
 		this.cutScenes = null;
