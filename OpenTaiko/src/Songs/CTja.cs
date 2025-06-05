@@ -3556,9 +3556,8 @@ internal class CTja : CActivity {
 						try {
 							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 								if (filePaths[i].EndsWith(".vtt")) {
-									using (VTTParser parser = new VTTParser()) {
-										this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
-									}
+									VTTParser parser = new VTTParser();
+									this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
 									this.bLyrics = true;
 									this.usingLyricsFile = true;
 								} else if (filePaths[i].EndsWith(".lrc")) {
