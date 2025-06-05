@@ -8,7 +8,7 @@ using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
 
-public class VTTParser : IDisposable {
+public class VTTParser {
 	// TODO : timestamp tag support
 	[Flags]
 	private enum ParseMode {
@@ -45,28 +45,6 @@ public class VTTParser : IDisposable {
 	private bool _isDisposed;
 
 	public VTTParser() { }
-
-	#region Dispose stuff
-	public void Dispose() {
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected virtual void Dispose(bool disposing) {
-		if (!_isDisposed && disposing) {
-			_vttdelimiter = null;
-			regexTimestamp = null;
-
-			regexOffset = null;
-			regexLang = null;
-
-			isUsingLang = false;
-
-			_isDisposed = true;
-		}
-
-	}
-	#endregion
 
 	internal List<STLYRIC> ParseVTTFile(string filepath, int order, long offset) {
 		List<STLYRIC> lrclist = new List<STLYRIC>();
