@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
 	"Language": "中文 (Chinese)",
-	"Version":  "0.6.0.0",
+	"Version": "0.6.0.72",
 	"Entries": {
 
 		// Common
@@ -537,10 +537,27 @@
 		// {3}: Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- 在文件夹 {2} 下{0} {1} 首歌曲。（{3}／{1}）", // sg
 		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
+		// {1}: # of songs needed
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {2} 制作的 {1} 张谱面。（{3}／{1}）", // sc
+		// {0}: Activate / Desactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0}全局触发器{1}。（{2}）", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "全局计数器{1}的值{0} {2} 。（{3}）", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "禁用",
+		"UNLOCK_CONDITION_TRIGGER_1": "启用",
+
+		"UNLOCK_CONDITION_TYPE_l": "低于",
+		"UNLOCK_CONDITION_TYPE_le": "低于或等于",
+		"UNLOCK_CONDITION_TYPE_e": "等于",
+		"UNLOCK_CONDITION_TYPE_me": "高于或等于",
+		"UNLOCK_CONDITION_TYPE_m": "高于",
+		"UNLOCK_CONDITION_TYPE_d": "不等于",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "游玩",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "游玩",
