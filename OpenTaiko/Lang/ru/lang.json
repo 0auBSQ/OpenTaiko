@@ -547,10 +547,10 @@
 		// {0}: Unlock condition type
 		// {1}: Global Counter name
 		// {2}: Global Counter value to compare
-		"UNLOCK_CONDITION_GLOBAL_COUNTER": "Значение глобального счетчика {1} {0} {2}. ({3})", //gc
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "Значение глобального счётчика {1} {0} {2}. ({3})", //gc
 
-		"UNLOCK_CONDITION_TRIGGER_0": "Деактивировает",
-		"UNLOCK_CONDITION_TRIGGER_1": "Активировает",
+		"UNLOCK_CONDITION_TRIGGER_0": "Деактивирует",
+		"UNLOCK_CONDITION_TRIGGER_1": "Активирует",
 
 		"UNLOCK_CONDITION_TYPE_l": "ниже, чем",
 		"UNLOCK_CONDITION_TYPE_le": "ниже или равно",
