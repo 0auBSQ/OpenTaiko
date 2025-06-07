@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.72] - 2025-06-05 (Beta)
+
+- [Feat] Add Unlock conditions for Global counters and triggers
+
 ## [0.6.0.71] - 2025-06-04 (Beta)
 
 - [Chore] Global Counters database commands

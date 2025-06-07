@@ -64,6 +64,25 @@ namespace OpenTaiko {
 			}
 		}
 
+		public bool tValueRequirementMet(double val1, double val2) {
+			switch (this.Type) {
+				case "l":
+					return (val1 < val2);
+				case "le":
+					return (val1 <= val2);
+				case "e":
+					return (val1 == val2);
+				case "me":
+					return (val1 >= val2);
+				case "m":
+					return (val1 > val2);
+				case "d":
+					return (val1 != val2);
+				default:
+					return (val1 >= val2);
+			}
+		}
+
 		public string GetRequiredClearStatus(int status, bool exact = false) {
 			switch (status) {
 				case (int)EClearStatus.PERFECT:

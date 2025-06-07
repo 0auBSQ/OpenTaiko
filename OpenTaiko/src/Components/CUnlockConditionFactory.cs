@@ -49,6 +49,8 @@ namespace OpenTaiko {
 		 * ap : "AI battle plays", 1 value : [AI battle playcount]
 		 * aw : "AI battle wins", 1 value : [AI battle wins count]
 		 * ig : "Impossible to Get", (not recommanded) used to be able to have content in database that is impossible to unlock, no values
+		 * gt : "Global trigger", 1 value : [0: OFF, 1: ON], 1 reference : [Global trigger name]
+		 * gc : "Global counter", 1 value : [Value to compare], 1 reference : [Global counter name]
 		 *
 		 *
 		 * == Combined conditions (coming soon)
@@ -103,6 +105,12 @@ namespace OpenTaiko {
 					}
 				case "ig": {
 						return new CUnlockIG(rawJson);
+					}
+				case "gt": {
+						return new CUnlockGT(rawJson);
+					}
+				case "gc": {
+						return new CUnlockGC(rawJson);
 					}
 				case "andcomb": {
 						return new CUnlockAndComb(rawJson);
