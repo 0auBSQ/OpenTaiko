@@ -36,6 +36,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public int[] nBalloonCount = new int[5];
 	public double[] nRollTimeMs = new double[5];
 	public double[] nAddScoreNiji = new double[5];
+	public int[] scoreMode = new int[5];
 
 	public override void Activate() {
 		listChip = new List<CChip>[5];
@@ -62,6 +63,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja _dtx = OpenTaiko.GetTJA(i)!;
+
+			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
 
 			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
 				for (int j = 0; j < balloonChips[i].Count; j++) {
@@ -702,7 +705,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected const int NOTE_GAP = 25;
 	public int nLoopCount_Clear;
-	protected int[] nScore = new int[11];
+	protected int[,] nScore = new int[5, 11]; // [iPlayer, comboLevel]
 	protected int[] nHand = new int[5];
 	protected CSound[] soundRed = new CSound[5];
 	protected CSound[] soundBlue = new CSound[5];
@@ -1014,7 +1017,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			if (!OpenTaiko.ConfigIni.ShinuchiMode) {
 				// 旧配点・旧筐体配点
-				if (OpenTaiko.TJA.nScoreModeTmp == 0 || OpenTaiko.TJA.nScoreModeTmp == 1) {
+				if (this.scoreMode[nPlayer] == 0 || this.scoreMode[nPlayer] == 1) {
 					if (pChip.nChannelNo == 0x15)
 						nAddScore = 300L;
 					else
@@ -1761,17 +1764,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 
 				this.actScore.Add((long)nAddScore, nPlayer);
-			} else if (OpenTaiko.TJA.nScoreModeTmp == 2) {
+			} else if (this.scoreMode[nPlayer] == 2) {
 				if (nCombos < 10) {
-					nAddScore = this.nScore[0];
+					nAddScore = this.nScore[nPlayer, 0];
 				} else if (nCombos >= 10 && nCombos <= 29) {
-					nAddScore = this.nScore[1];
+					nAddScore = this.nScore[nPlayer, 1];
 				} else if (nCombos >= 30 && nCombos <= 49) {
-					nAddScore = this.nScore[2];
+					nAddScore = this.nScore[nPlayer, 2];
 				} else if (nCombos >= 50 && nCombos <= 99) {
-					nAddScore = this.nScore[3];
+					nAddScore = this.nScore[nPlayer, 3];
 				} else if (nCombos >= 100) {
-					nAddScore = this.nScore[4];
+					nAddScore = this.nScore[nPlayer, 4];
 				}
 
 				if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good) {
@@ -1802,29 +1805,29 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 
 				this.actScore.Add(nAddScore, nPlayer);
-			} else if (OpenTaiko.TJA.nScoreModeTmp == 1) {
+			} else if (this.scoreMode[nPlayer] == 1) {
 				if (nCombos < 10) {
-					nAddScore = this.nScore[0];
+					nAddScore = this.nScore[nPlayer, 0];
 				} else if (nCombos >= 10 && nCombos <= 19) {
-					nAddScore = this.nScore[1];
+					nAddScore = this.nScore[nPlayer, 1];
 				} else if (nCombos >= 20 && nCombos <= 29) {
-					nAddScore = this.nScore[2];
+					nAddScore = this.nScore[nPlayer, 2];
 				} else if (nCombos >= 30 && nCombos <= 39) {
-					nAddScore = this.nScore[3];
+					nAddScore = this.nScore[nPlayer, 3];
 				} else if (nCombos >= 40 && nCombos <= 49) {
-					nAddScore = this.nScore[4];
+					nAddScore = this.nScore[nPlayer, 4];
 				} else if (nCombos >= 50 && nCombos <= 59) {
-					nAddScore = this.nScore[5];
+					nAddScore = this.nScore[nPlayer, 5];
 				} else if (nCombos >= 60 && nCombos <= 69) {
-					nAddScore = this.nScore[6];
+					nAddScore = this.nScore[nPlayer, 6];
 				} else if (nCombos >= 70 && nCombos <= 79) {
-					nAddScore = this.nScore[7];
+					nAddScore = this.nScore[nPlayer, 7];
 				} else if (nCombos >= 80 && nCombos <= 89) {
-					nAddScore = this.nScore[8];
+					nAddScore = this.nScore[nPlayer, 8];
 				} else if (nCombos >= 90 && nCombos <= 99) {
-					nAddScore = this.nScore[9];
+					nAddScore = this.nScore[nPlayer, 9];
 				} else if (nCombos >= 100) {
-					nAddScore = this.nScore[10];
+					nAddScore = this.nScore[nPlayer, 10];
 				}
 
 				if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good) {
@@ -4242,7 +4245,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.ePhaseID = CStage.EPhase.Common_NORMAL;//初期化すれば、リザルト変遷は止まる。
 			this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.Continue;
 
-			this.ReSetScore(OpenTaiko.TJA.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]], OpenTaiko.TJA.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]);
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+				CTja tja = OpenTaiko.GetTJA(i)!;
+				this.ReSetScore(tja.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]], tja.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]], i);
+			}
 			this.nHand = new int[] { 0, 0, 0, 0, 0 };
 		}
 
@@ -4557,24 +4563,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return judgement;
 	}
 
-	public void ReSetScore(int scoreInit, int scoreDiff) {
+	public void ReSetScore(int scoreInit, int scoreDiff, int iPlayer) {
 		//一打目の処理落ちがひどいので、あらかじめここで点数の計算をしておく。
 		// -1だった場合、その前を引き継ぐ。
-		int nInit = scoreInit != -1 ? scoreInit : this.nScore[0];
-		int nDiff = scoreDiff != -1 ? scoreDiff : this.nScore[1] - this.nScore[0];
+		int nInit = scoreInit != -1 ? scoreInit : this.nScore[iPlayer, 0];
+		int nDiff = scoreDiff != -1 ? scoreDiff : this.nScore[iPlayer, 1] - this.nScore[iPlayer, 0];
 		int nAddScore = 0;
 		int[] n倍率 = { 0, 1, 2, 4, 8 };
 
-		if (OpenTaiko.TJA.nScoreModeTmp == 1) {
+		if (this.scoreMode[iPlayer] == 1) {
 			for (int i = 0; i < 11; i++) {
-				this.nScore[i] = (int)(nInit + (nDiff * (i)));
+				this.nScore[iPlayer, i] = (int)(nInit + (nDiff * (i)));
 			}
-		} else if (OpenTaiko.TJA.nScoreModeTmp == 2) {
+		} else if (this.scoreMode[iPlayer] == 2) {
 			for (int i = 0; i < 5; i++) {
-				this.nScore[i] = (int)(nInit + (nDiff * n倍率[i]));
+				this.nScore[iPlayer, i] = (int)(nInit + (nDiff * n倍率[i]));
 
-				this.nScore[i] = (int)(this.nScore[i] / 10.0);
-				this.nScore[i] = this.nScore[i] * 10;
+				this.nScore[iPlayer, i] = (int)(this.nScore[iPlayer, i] / 10.0);
+				this.nScore[iPlayer, i] = this.nScore[iPlayer, i] * 10;
 
 			}
 		}

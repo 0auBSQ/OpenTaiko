@@ -44,26 +44,8 @@ public class CJudgeTextEncoding {
 			str = reader.Text;
 		}
 
-		str = str.Replace(JudgeNewLine(str), "\n");
+		str = str.ReplaceLineEndings("\n");
 
 		return str;
 	}
-
-	/// <summary>
-	/// Environment.NewLineはプラットフォーム依存である。
-	/// だが、ファイルごとに改行コードは違うので、使用すべきではない。
-	/// なので、勝手に改行文字を判断する。
-	/// </summary>
-	/// <param name="str"></param>
-	/// <returns></returns>
-	public static string JudgeNewLine(string str) {
-		if (str.Contains("\r\n"))
-			return ("\r\n");
-
-		if (str.Contains("\r"))
-			return ("\r");
-
-		return ("\n");
-	}
-
 }

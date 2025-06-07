@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using FDK;
 
 namespace OpenTaiko;
@@ -43,13 +44,17 @@ class CVisualLogManager {
 	}
 
 	public void Display() {
-		while (this.cards.TryPeek(out var card) && card.IsExpired()) {
-			this.cards.Dequeue();
+		if (this.firstCard?.IsExpired() ?? true) {
+			while (this.cards.TryDequeue(out this.firstCard) && this.firstCard.IsExpired())
+				;
 		}
 		int y = 0;
+		if (this.firstCard != null)
+			y = this.firstCard.Display(y);
 		foreach (var card in this.cards)
 			y = card.Display(y);
 	}
 
-	private readonly Queue<LogCard> cards = new Queue<LogCard>();
+	private readonly ConcurrentQueue<LogCard> cards = new();
+	private LogCard? firstCard = null;
 }
