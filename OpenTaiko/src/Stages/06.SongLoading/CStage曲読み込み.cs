@@ -348,14 +348,6 @@ internal class CStage曲読み込み : CStage {
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
 							OpenTaiko.SetTJA(i, new CTja(str, false, 0, i, true, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]));
 
-						if (OpenTaiko.TJA.listErrors.Count != 0) {
-							string message = "";
-							foreach (var text in OpenTaiko.TJA.listErrors) {
-								LogNotification.PopWarning(text);
-								//System.Windows.Forms.MessageBox.Show(text, "譜面にエラーが見つかりました");
-							}
-						}
-
 						Trace.TraceInformation("---- Song information -----------------");
 						Trace.TraceInformation("TITLE: {0}", OpenTaiko.TJA.TITLE.GetString(""));
 						Trace.TraceInformation("FILE: {0}", OpenTaiko.TJA.strFullPath);

@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.6.0.73] - 2025-06-07 (Beta)
+
+- [Fix] Note symbols after last comma (before #END) were treated as 16 divisions per measure
+- [Fix] Unknown note symbols were treated as #NMSCROLL
+- [Fix] Ignore inner whitespaces in note symbol lines (Jiro cross compatibility)
+- [Fix] First arbitrary mid-line #START (e.g., TITLE:#START) to be recognized as #START by forbidding indentation of #START
+- [Fix] Commented-out or in-argument COURSE: & #END affected parsing by requiring them to be at line head
+- [Fix] COURSE: argument failed to be recognized when it has surrounding space(s)
+- [Fix] 2-players chart took in AI battle mode
+- [Fix] BALLOON headers could not reset balloon counts and failed to work per–player-side (Jiro cross compatibility)
+- [Fix] Non–Shin-uchi score setting for non-P1 was forced to P1's
+- [Fix] Make all #NEXTSONG argument soft-optional to prevent crashes due to ,s at line end ignored
+- [Fix] TJA command trailing , trimming issues
+- [Fix] Consecutive spaces in #JPOSSCROLL, #SUDDEN, & #BGAON terminates TJA parsing
+- [Fix] 2nd colon (:) and on ignored for per-player-side and EXAM headers and remove handling of impossible cases
+- [Fix] Crash when LogCards are frequently added into CVisualLogManager
+- [Fix] Last-defined difficulty was used as the score setting difficulty, <cd> store-expr variable difficulty, and reported parsing difficulty
+- [Fix] Reject invalid argument instead of using a default value for commands #BPMCHANGE, #SCROLL, #MEASURE, #DELAY, & CAM setter, and EXAM header
+- [Enhancement] Multiple tja chart parsing performance improvements
+- [Feat] Catch and report argument error per TJA header or command
+- [Feat] Print and log every TJA parse warning right away
+- [Feat] Use simplified message for printed TJA parse warnings
+
 ## [0.6.0.72] - 2025-06-05 (Beta)
 
 - [Feat] Add Unlock conditions for Global counters and triggers
