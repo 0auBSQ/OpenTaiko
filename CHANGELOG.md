@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.74] - 2025-06-07 (Beta)
+
+- [i18n] Global Trigger and Counter Russian and Chinese Text
+
 ## [0.6.0.73] - 2025-06-07 (Beta)
 
 - [Fix] Note symbols after last comma (before #END) were treated as 16 divisions per measure
