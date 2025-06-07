@@ -1512,11 +1512,50 @@ internal class CTja : CActivity {
 	private static readonly Regex BranchStartArgumentRegex =
 		new Regex(@"^([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)$", RegexOptions.Compiled);
 
-	private void AddCommandError(string command, string argument, string reason) {
-		LogNotification.PopWarning($"{nameof(CTja)}: Bad {command} arguments: {argument}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}: {reason}");
+	private static readonly Regex FormatExceptionMessageRegex =
+		new Regex(@"^The input string '(.*)' was not in a correct format.$", RegexOptions.Compiled);
+
+	private static string GetTjaErrorReason(Exception ex) {
+		switch (ex) {
+			case IndexOutOfRangeException:
+				return "Too few arguments";
+			case FormatException:
+				{
+					string? expectedType = null;
+					if (ex.TargetSite?.Name == "ParseComplex") {
+						expectedType = "Complex Number";
+					} else if (ex.TargetSite?.DeclaringType?.FullName?.StartsWith("System.") ?? false) {
+						expectedType = ex.TargetSite.DeclaringType.FullName.Substring("System.".Length);
+					}
+
+					var match = FormatExceptionMessageRegex.Match(ex.Message);
+					StringBuilder sb = new();
+					if (!string.IsNullOrEmpty(expectedType)) {
+						sb.Append($"Bad {expectedType} format");
+					} else {
+						sb.Append("Bad format");
+					}
+					if (match.Success) {
+						sb.Append($": [{match.Groups[1]}]");
+					}
+					return sb.ToString();
+				}
+
+			default:
+				return ex.Message;
+		}
 	}
-	private void AddWarn(string msg) {
-		LogNotification.PopWarning($"{nameof(CTja)}: {msg}, at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, in {strFullPath}");
+
+	private void AddWarn(string msg, Exception? ex = null) {
+		LogNotification.PopWarning($"[{strFileName}]: {msg}");
+		if (ex != null)
+			Trace.TraceWarning($"TJA file: '{strFullPath}', at {(Difficulty)this.n参照中の難易度}, line {nNowReadLine}, Error: {ex.ToString()}");
+	}
+	private void AddCommandError(string command, string argument, string reason, Exception? ex = null) {
+		this.AddWarn($"Bad {command} arguments: [{argument}]: {reason}", ex);
+	}
+	private void AddCommandError(string command, string argument, Exception ex) {
+		this.AddWarn($"Bad {command} arguments: [{argument}]: {GetTjaErrorReason(ex)}", ex);
 	}
 
 	private string[] SplitComma(string input) {
@@ -1563,7 +1602,7 @@ internal class CTja : CActivity {
 		try {
 			this.ParseCommand(command, argument, argumentFull);
 		} catch (Exception ex) {
-			this.AddCommandError(command, argumentFull, ex.ToString());
+			this.AddCommandError(command, argumentFull, ex);
 		}
 	}
 
@@ -2807,7 +2846,7 @@ internal class CTja : CActivity {
 		try {
 			this.ParsePerPlayerSideHeader(strCommandName, strCommandParam);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+			this.AddCommandError(strCommandName, strCommandParam, ex);
 		}
 	}
 
@@ -2888,7 +2927,7 @@ internal class CTja : CActivity {
 		try {
 			this.tDanExamLoad(strCommandName, strCommandParam);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+			this.AddCommandError(strCommandName, strCommandParam, ex);
 		}
 	}
 
@@ -2955,7 +2994,7 @@ internal class CTja : CActivity {
 
 				n打数 = Convert.ToInt32(strParam[n]);
 			} catch (Exception ex) {
-				this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+				this.AddCommandError(strCommandName, strCommandParam, ex);
 				return;
 			}
 
@@ -2991,7 +3030,7 @@ internal class CTja : CActivity {
 		try {
 			this.ParseGlobalHeader(strCommandName, strCommandParam);
 		} catch (Exception ex) {
-			this.AddCommandError(strCommandName, strCommandParam, ex.ToString());
+			this.AddCommandError(strCommandName, strCommandParam, ex);
 		}
 	}
 
@@ -3215,8 +3254,7 @@ internal class CTja : CActivity {
 
 				this.listVD.Add(1, vd);
 			} catch (Exception e) {
-				this.AddWarn(e.ToString() + "\n"
-					+ $"{strCommandName}: Exception when generating decoder for video {strVideoFilename}; continued");
+				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
 				if (this.listVD.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
@@ -3243,8 +3281,7 @@ internal class CTja : CActivity {
 
 				this.listVD.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
 			} catch (Exception e) {
-				this.AddWarn(e.ToString() + "\n"
-					+ $"{strCommandName}: Exception when generating decoder for video {strVideoFilename}; continued.");
+				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
 				if (this.listVD.ContainsKey(1))
 					this.listVD.Remove(1);
 			}
@@ -3346,7 +3383,7 @@ internal class CTja : CActivity {
 								}
 							}
 						} catch (Exception e) {
-							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}. More details : {e}");
+							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}: {e.Message}", e);
 						}
 					}
 				}
