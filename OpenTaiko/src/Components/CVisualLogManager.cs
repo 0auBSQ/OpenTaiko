@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using FDK;
 
 namespace OpenTaiko;
@@ -21,6 +20,9 @@ class CVisualLogManager {
 				InitTimeSinceCreation();
 			}
 			timeSinceCreation.Tick();
+
+			if (y >= GameWindowSize.Height)
+				return y; // exceeded screen; skip drawing
 
 			// Display stuff here
 			if (OpenTaiko.actTextConsole != null) {
@@ -51,10 +53,14 @@ class CVisualLogManager {
 		int y = 0;
 		if (this.firstCard != null)
 			y = this.firstCard.Display(y);
-		foreach (var card in this.cards)
-			y = card.Display(y);
+		try {
+			foreach (var card in this.cards)
+				y = card.Display(y);
+		} catch (InvalidOperationException ex) {
+			// item updated during drawing; skip
+		}
 	}
 
-	private readonly ConcurrentQueue<LogCard> cards = new();
+	private readonly Queue<LogCard> cards = new();
 	private LogCard? firstCard = null;
 }
