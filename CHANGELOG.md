@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.75] - 2025-06-08 (Beta)
+
+- [Enhancement] Add custom color support for VTT lyrics
+
 ## [0.6.0.74] - 2025-06-07 (Beta)
 
 - [i18n] Global Trigger and Counter Russian and Chinese Text
