@@ -2401,12 +2401,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actChara.b演奏中[nPlayer] = false;
 		}
 
-		var dbCurrentScrollSpeed = this.actScrollSpeed.dbConfigScrollSpeed;
-
-		//double speed = 264.0;	// BPM150の時の1小節の長さ[dot]
-		const double speed = 324.0; // BPM150の時の1小節の長さ[dot]
-
-		double ScrollSpeedTaiko = ((dbCurrentScrollSpeed[nPlayer] + 1.0) * speed) * 0.5 * 37.5 / 60000.0;
+		var scrollRate = this.GetScrollRate(nPlayer);
 
 		CConfigIni configIni = OpenTaiko.ConfigIni;
 
@@ -2422,19 +2417,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.灰, this.nLoopCount_Clear.ToString()  );
 
-		float play_bpm_time = this.GetNowPBMTime(dTX, 0);
+		double play_time = tja.TjaTimeToRawTjaTimeNote(n現在時刻ms);
+		var play_bpm_points = new[] {
+			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eNormal),
+			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eExpert),
+			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eMaster),
+		};
+		double[] th16NowBeats = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time)).ToArray();
 
 		#region [update phase (bar lines' position)]
 		foreach (var pChip in dTX.listBarLineChip) {
-			long time = pChip.n発声時刻ms - n現在時刻ms;
-			long msDTime_end = time;
-			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
-			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
+			if (!pChip.bVisible)
+				continue;
 
-			double _scrollSpeed = pChip.dbSCROLL * _scroll_rate;
-			double _scrollSpeed_Y = pChip.dbSCROLL_Y * _scroll_rate;
-			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, pChip.dbBPM, _scrollSpeed, pChip.eScrollMode);
-			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, pChip.dbBPM, _scrollSpeed_Y, pChip.eScrollMode);
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
 		}
 		#endregion
 
@@ -2443,22 +2439,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (!pChip.bVisible)
 				continue;
 
-			long time = pChip.n発声時刻ms - n現在時刻ms;
-			double th16DBeat = pChip.fBMSCROLLTime - play_bpm_time;
-			double _scroll_rate = (dbCurrentScrollSpeed[nPlayer] + 1.0) / 10.0;
-
-			CChip velocityRefChip = (NotesManager.IsRollEnd(pChip)) ? pChip.start : pChip; // && !StretchRoll
-			double _scrollSpeed = velocityRefChip.dbSCROLL * _scroll_rate;
-			double _scrollSpeed_Y = velocityRefChip.dbSCROLL_Y * _scroll_rate;
-			pChip.nHorizontalChipDistance = NotesManager.GetNoteX(time, th16DBeat, velocityRefChip.dbBPM, _scrollSpeed, velocityRefChip.eScrollMode);
-			pChip.nVerticalChipDistance = NotesManager.GetNoteY(time, th16DBeat, velocityRefChip.dbBPM, _scrollSpeed_Y, velocityRefChip.eScrollMode);
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
 
 			if (!this.bPAUSE && !this.isRewinding) {
 				if (!pChip.IsMissed && !pChip.bHit) {
 					if (NotesManager.IsMissableNote(pChip))//|| pChip.nチャンネル番号 == 0x9A )
 					{
 						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
-						if (time <= 0) {
+						if (pChip.n発声時刻ms <= n現在時刻ms) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
 								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
@@ -3516,6 +3504,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return false;
 	}
 
+	private double GetScrollRate(int iPlayer)
+		=> (this.actScrollSpeed.dbConfigScrollSpeed[iPlayer] + 1.0) / 10.0;
+
 	private void AddNowProcessingRollChip(int iPlayer, CChip chip) {
 		//if( this.n現在のコース == pChip.nコース )
 		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip);
@@ -3841,42 +3832,29 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return this.CChartScore[player].nRoll;
 	}
 
-	protected float GetNowPBMTime(CTja tja, float play_time) {
-		float bpm_time = 0;
-		int last_input = 0;
-		float last_bpm_change_time;
-		play_time = (float)tja.TjaTimeToRawTjaTimeNote(tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
-
-		for (int i = 1; ; i++) {
+	public static CTja.CBPM GetNowPBPMPoint(CTja tja, double play_time, CTja.ECourse branch) {
+		var last_match = (int)branch; // Initial 3 for each branch
+		for (int i = 3, iNext; i < tja.listBPM.Count; i = iNext) {
 			//BPMCHANGEの数越えた
-			if (i >= tja.listBPM.Count) {
-				CTja.CBPM cBPM = tja.listBPM[last_input];
-				bpm_time = (float)cBPM.bpm_change_bmscroll_time + ((play_time - (float)cBPM.bpm_change_time) * (float)cBPM.dbBPM値 / 15000.0f);
-				last_bpm_change_time = (float)cBPM.bpm_change_time;
-				break;
-			}
-			for (; i < tja.listBPM.Count; i++) {
-				CTja.CBPM cBPM = tja.listBPM[i];
-				if (cBPM.bpm_change_time == 0 || cBPM.bpm_change_course == this.nCurrentBranch[0]) {
+			for (iNext = i + 1; iNext < tja.listBPM.Count; ++iNext) {
+				if (tja.listBPM[iNext].bpm_change_course == branch)
 					break;
-				}
 			}
-			if (i == tja.listBPM.Count) {
-				i = tja.listBPM.Count - 1;
+			CTja.CBPM bpm = tja.listBPM[i];
+			if (bpm.bpm_change_course != branch)
 				continue;
-			}
-
-			if (play_time < tja.listBPM[i].bpm_change_time) {
-				CTja.CBPM cBPM = tja.listBPM[last_input];
-				bpm_time = (float)cBPM.bpm_change_bmscroll_time + ((play_time - (float)cBPM.bpm_change_time) * (float)cBPM.dbBPM値 / 15000.0f);
-				last_bpm_change_time = (float)cBPM.bpm_change_time;
-				break;
-			} else {
-				last_input = i;
+			CTja.CBPM? bpm_next = (iNext < tja.listBPM.Count) ? tja.listBPM[iNext] : null;
+			bool afterHead = ((int)play_time >= (int)bpm.bpm_change_time);
+			bool beforeEnd = (bpm_next == null || ((int)play_time < (int)bpm_next.bpm_change_time));
+			if (afterHead && beforeEnd) {
+				last_match = i;
 			}
 		}
+		return tja.listBPM[last_match];
+	}
 
-		return bpm_time;
+	public static double GetNowPBMTime(CTja.CBPM cBPM, double play_time) {
+		return cBPM.bpm_change_bmscroll_time + (play_time - cBPM.bpm_change_time) * cBPM.dbBPM値 / 15000.0;
 	}
 
 	public void t再読込() {

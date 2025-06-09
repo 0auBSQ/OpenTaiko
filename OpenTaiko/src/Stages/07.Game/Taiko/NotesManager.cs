@@ -76,6 +76,9 @@ class NotesManager {
 			_ => 0,
 		};
 
+	public static CChip GetVelocityRefChip(CChip chip)
+		=> (IsRollEnd(chip) && true /* TJAP3/OOS */) ? chip.start : chip; // && !StretchRoll
+
 	#endregion
 
 	#region [Gameplay]
