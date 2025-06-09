@@ -4,8 +4,8 @@ namespace OpenTaiko {
 	internal class LuaSongNode {
 		private CSongListNode? _node;
 		private List<LuaSongChart> _charts = new List<LuaSongChart>();
-		private List<LuaSongNode> _children = new List<LuaSongNode>();
-		private LuaSongNode? _parent;
+		protected List<LuaSongNode> _children = new List<LuaSongNode>();
+		protected LuaSongNode? _parent;
 
 		public bool NotNull {
 			get {
@@ -21,7 +21,7 @@ namespace OpenTaiko {
 			}
 		}
 
-		public bool IsBox {
+		public bool IsFolder {
 			get {
 				return NodeType == CSongListNode.ENodeType.BOX;
 			}
@@ -42,6 +42,66 @@ namespace OpenTaiko {
 		public bool IsSong {
 			get {
 				return NodeType == CSongListNode.ENodeType.SCORE;
+			}
+		}
+
+		#region [Folder specific]
+
+		private bool _opened = false;
+
+		public bool Opened {
+			get {
+				return IsFolder && _opened;
+			}
+			set {
+				_opened = value;
+			}
+		}
+
+		#endregion
+
+		#endregion
+
+		#region [Tree structure]
+
+		public int ChildrenCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count;
+			}
+		}
+
+		public bool IsLeaf {
+			get {
+				return (ChildrenCount == 0 || !Opened) && !IsRoot;
+			}
+		}
+
+		public bool IsRoot {
+			get {
+				return _parent == null;
+			}
+		}
+
+		public LuaSongNode? Parent {
+			get {
+				return _parent;
+			}
+		}
+
+		public List<LuaSongNode> Siblings {
+			get {
+				return (Parent != null) ? Parent.Children : new List<LuaSongNode>() { this };
+			}
+		}
+
+		public LuaSongNode? Child(int i) {
+			return _children[i];
+		}
+
+		public List<LuaSongNode> Children {
+			get {
+				return _children;
 			}
 		}
 
@@ -155,24 +215,24 @@ namespace OpenTaiko {
 		private void _FetchChildren() {
 			_children = new List<LuaSongNode>();
 
-			_node?.childrenList.ForEach((child) => {
+			_node?.childrenList?.ForEach((child) => {
 				LuaSongNode _child = new LuaSongNode(child, this);
 				_children.Add(_child);
 			});
 		}
 
-		public void AttachSongListNode(CSongListNode node) {
+		public void AttachSongListNode(CSongListNode node, bool recursive = true) {
 			_node = node;
 			_FetchCharts();
-			_FetchChildren();
+			if (recursive) _FetchChildren();
 		}
 
 		public LuaSongNode() {
 
 		}
 
-		public LuaSongNode(CSongListNode node, LuaSongNode? parent = null) {
-			AttachSongListNode(node);
+		public LuaSongNode(CSongListNode node, LuaSongNode? parent = null, bool recursive = true) {
+			AttachSongListNode(node, recursive);
 			this._parent = parent;
 		}
 	}

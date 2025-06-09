@@ -1,8 +1,126 @@
 ﻿namespace OpenTaiko {
 	internal class LuaSongList {
-		private LuaSongNode? _rootNode = null;
+		private LuaSongNodeRoot? _root;
+		private List<LuaSongNode> _currentPage = new List<LuaSongNode>();
 		private LuaSongNode? _currentNode = null;
+		private LuaSongListSettings _settings;
 
-		// TBD (TODO: Handle the song tree here for Lua song select screens)
+		public void ReloadSongList() {
+			_root = new LuaSongNodeRoot();
+			OpenTaiko.EnumSongs.Songs管理.list曲ルート.ForEach((song) => {
+				LuaSongNode _node = new LuaSongNode(song, _root);
+				_root.AppendChild(_node);
+			});
+
+			_currentNode = null;
+			_currentPage = GetRootPage();
+			if (_currentPage.Count > 0) _currentNode = _currentPage[0];
+		}
+
+		public LuaSongList(LuaSongListSettings settings) {
+			_settings = settings;
+			ReloadSongList();
+			LuaSongListListeners.RegisterSongList(this);
+		}
+
+		private List<LuaSongNode> GetLeaves() {
+			if (_root == null) return new List<LuaSongNode>();
+
+			List<LuaSongNode> _leaves = new List<LuaSongNode>();
+
+			void DFS(LuaSongNode node) {
+				if (node.IsLeaf)
+					_leaves.Add(node);
+				else {
+					// Don't crawl closen folder which are considered leaves
+					foreach (LuaSongNode child in node.Children)
+						DFS(child);
+				}
+			}
+
+			DFS(_root);
+			return _leaves;
+		}
+
+		private List<LuaSongNode> GetRootPage() {
+			List<LuaSongNode> _page = _root?.Children ?? new List<LuaSongNode>();
+
+			// Do the necessary post-process here (fe. adding random boxes, back boxes, etc)
+
+			return _page;
+		}
+
+		private List<LuaSongNode> GetCurrentPage() {
+			List<LuaSongNode> _page = new List<LuaSongNode>();
+
+			if (_settings.FlattenOpennedFolders == true) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
+			else _page = GetLeaves();
+
+			// Do the necessary post-process here (fe. adding random boxes, back boxes, etc)
+
+			return _page;
+		}
+
+		private int GetIndexInPage(LuaSongNode? _node) {
+			if (_node == null || _currentPage.Count == 0) return -1;
+			return _currentPage.IndexOf(_node);
+		}
+
+		public List<LuaSongNode?> GetCurrentlyDisplayedPage(int before, int after) {
+			List<LuaSongNode?> _displayedPage = new List<LuaSongNode?>();
+
+			int _curidx = GetIndexInPage(_currentNode);
+			if (_curidx < 0) return _displayedPage;
+
+			for (int i = -before; i <= after; i++) {
+				int _idx = _curidx + i;
+
+				if (_settings.ModuloPagination == true) {
+					int _count = _currentPage.Count;
+					int _modidx = ((_idx % _count) + _count) % _count;
+					_displayedPage.Add(_currentPage[_modidx]);
+				} else {
+					if (_idx >= 0 && _idx < _currentPage.Count) _displayedPage.Add(_currentPage[_idx]);
+					else _displayedPage.Add(null);
+				}
+			}
+
+			return _displayedPage;
+		}
+
+		public void Move(int offset) {
+			int _curidx = GetIndexInPage(_currentNode);
+			if (_curidx < 0) return;
+
+			int _newidx = _curidx + offset;
+			if (_settings.ModuloMovement == true) {
+				int _count = _currentPage.Count;
+				int _modidx = ((_newidx % _count) + _count) % _count;
+				_currentNode = _currentPage[_modidx];
+			} else {
+				int _fixidx = Math.Max(0, Math.Min(_currentPage.Count - 1, _newidx));
+				_currentNode = _currentPage[_fixidx];
+			}
+		}
+
+		public void OpenFolder() {
+			if (_currentNode == null) return;
+
+			if (_currentNode.IsFolder && !_currentNode.Opened && _currentNode.ChildrenCount > 0) {
+				_currentNode.Opened = true;
+				_currentNode = _currentNode.Child(0);
+				_currentPage = GetCurrentPage();
+			}
+		}
+
+		public void CloseFolder() {
+			if (_currentNode == null) return;
+
+			if (!_currentNode.IsRoot && _currentNode.Parent.IsFolder && _currentNode.Parent.Opened) {
+				_currentNode = _currentNode.Parent;
+				_currentNode.Opened = false;
+				_currentPage = GetCurrentPage();
+			}
+		}
 	}
 }

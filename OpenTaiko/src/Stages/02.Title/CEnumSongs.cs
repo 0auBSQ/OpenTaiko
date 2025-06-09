@@ -89,7 +89,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 曲リストのキャッシュ(songlist.db)取得スレッドの開始
 	/// </summary>
 	public void StartEnumFromCache() {
-		this.thDTXFileEnumerate = new Thread(new ThreadStart(this.t曲リストの構築1));
+		this.thDTXFileEnumerate = new Thread(new ThreadStart(this.EstablishSystemSounds));
 		this.thDTXFileEnumerate.Name = "曲リストの構築";
 		this.thDTXFileEnumerate.IsBackground = true;
 		this.thDTXFileEnumerate.Start();
@@ -127,10 +127,10 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	}
 
 	private void HardReloadSongList() {
-		this.t曲リストの構築2(true);
+		this.LoadSongListStructure(true);
 	}
 	private void ReloadSongList() {
-		this.t曲リストの構築2(false);
+		this.LoadSongListStructure(false);
 	}
 
 	/// <summary>
@@ -198,7 +198,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// <summary>
 	/// songlist.dbからの曲リスト構築
 	/// </summary>
-	public void t曲リストの構築1() {
+	public void EstablishSystemSounds() {
 		// ！注意！
 		// 本メソッドは別スレッドで動作するが、プラグイン側でカレントディレクトリを変更しても大丈夫なように、
 		// すべてのファイルアクセスは「絶対パス」で行うこと。(2010.9.16)
@@ -206,7 +206,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		DateTime now = DateTime.Now;
 
 		try {
-			#region [ 0) システムサウンドの構築  ]
+			#region [ Establish System Sounds  ]
 			//-----------------------------
 			OpenTaiko.stageStartup.ePhaseID = CStage.EPhase.Startup_0_CreateSystemSound;
 
@@ -261,7 +261,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 起動してタイトル画面に遷移した後にバックグラウンドで発生させる曲検索
 	/// #27060 2012.2.6 yyagi
 	/// </summary>
-	private void t曲リストの構築2(bool hard_reload = false) {
+	private void LoadSongListStructure(bool hard_reload = false) {
 		// ！注意！
 		// 本メソッドは別スレッドで動作するが、プラグイン側でカレントディレクトリを変更しても大丈夫なように、
 		// すべてのファイルアクセスは「絶対パス」で行うこと。(2010.9.16)
@@ -276,7 +276,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			}
 			Deserialize();
 
-			#region [ 2) 曲データの検索 ]
+			#region [ Search for songs data ]
 			//-----------------------------
 			//	base.eフェーズID = CStage.Eフェーズ.起動2_曲を検索してリストを作成する;
 
@@ -323,39 +323,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			//	}
 			//-----------------------------
 			#endregion
-			#region [ 4) songs.db になかった曲データをファイルから読み込んで反映 ]
-			//-----------------------------
-			//					base.eフェーズID = CStage.Eフェーズ.起動4_スコアキャッシュになかった曲をファイルから読み込んで反映する;
 
-			/*
-			int num2 = this.Songs管理.n検索されたスコア数 - this.Songs管理.nスコアキャッシュから反映できたスコア数;
-
-			Trace.TraceInformation( "{0}, {1}", this.Songs管理.n検索されたスコア数, this.Songs管理.nスコアキャッシュから反映できたスコア数 );
-			Trace.TraceInformation( "enum4) songs.db になかった曲データ[{0}スコア]の情報をファイルから読み込んで反映します。", num2 );
-			Trace.Indent();
-
-			try
-			{
-				this.Songs管理.tSongsDBになかった曲をファイルから読み込んで反映する();
-			}
-			catch ( Exception e )
-			{
-				Trace.TraceError( e.ToString() );
-				Trace.TraceError( "例外が発生しましたが処理を継続します。 (276bb40f-6406-40c1-9f03-e2a9869dbc88)" );
-			}
-			finally
-			{
-				Trace.TraceInformation( "曲データへの反映を完了しました。[{0}/{1}スコア]", this.Songs管理.nファイルから反映できたスコア数, num2 );
-				Trace.Unindent();
-			}
-			//					lock ( this.list進行文字列 )
-			//					{
-			//						this.list進行文字列.Add( string.Format( "{0} ... {1}/{2}", "Loading score properties from files", CDTXMania.Songs管理_裏読.nファイルから反映できたスコア数, CDTXMania.Songs管理_裏読.n検索されたスコア数 - cs.nスコアキャッシュから反映できたスコア数 ) );
-			//					}
-			*/
-			//-----------------------------
-			#endregion
-			#region [ 5) 曲リストへの後処理の適用 ]
+			#region [ Song list Post Processing ]
 			//-----------------------------
 			//					base.eフェーズID = CStage.Eフェーズ.起動5_曲リストへ後処理を適用する;
 
@@ -379,7 +348,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			#endregion
 
 			//				if ( !bSucceededFastBoot )	// songs2.db読み込みに成功したなら、songs2.dbを新たに作らない
-			#region [ 7) songs2.db への保存 ]		// #27060 2012.1.26 yyagi
+			#region [ Serialize songlist.db ]		// #27060 2012.1.26 yyagi
 			Trace.TraceInformation("enum7) 曲データの情報を songlist.db へ出力します。");
 			Trace.Indent();
 
@@ -389,6 +358,19 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			//-----------------------------
 			#endregion
 			//				}
+
+			#region [Reload all lua song list objects]
+
+			LuaSongListListeners.ResetSongLists();
+
+			// Tests
+
+			//LuaSongListSettings _sts = LuaSongListSettings.Generate();
+			//LuaSongList _sl = new LuaSongList(_sts);
+			//var _pg = _sl.GetCurrentlyDisplayedPage(10, 10);
+			//Debug.Print(_pg.ToString());
+
+			#endregion
 
 		} finally {
 			//				base.eフェーズID = CStage.Eフェーズ.起動7_完了;

@@ -94,7 +94,7 @@
 				_level = _from.nLevel[_chart];
 				_levelIcon = _from.nLevelIcon[_chart];
 				_notesDesigner = _from.strNotesDesigner[_chart];
-				_chartInfo = _from.score[_chart].譜面情報;
+				_chartInfo = _from.score[_chart]?.譜面情報 ?? null;
 				_score = _from.score[_chart];
 				_parent = parent;
 				_parentListNode = _from;
