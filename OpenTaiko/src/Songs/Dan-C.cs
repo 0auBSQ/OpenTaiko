@@ -99,28 +99,12 @@ public class Dan_C {
 	/// 条件と現在の値をチェックして、合格もしくは金合格をしてるか否かを更新する。
 	/// </summary>
 	private void UpdateCleared() {
-		if (ExamRange == Exam.Range.More) {
-			if (Amount >= GetValue()[0]) {
-				IsCleared[0] = true;
-				if (Amount >= GetValue()[1])
-					IsCleared[1] = true;
-				else
-					IsCleared[1] = false;
-			} else {
-				IsCleared[0] = false;
-				IsCleared[1] = false;
-			}
+		if (ExamRange != Exam.Range.Less) {
+			IsCleared[0] = (Amount >= GetValue()[0]);
+			IsCleared[1] = (IsCleared[0] && Amount >= GetValue()[1]);
 		} else {
-			if (Amount < GetValue()[1]) {
-				IsCleared[1] = true;
-			} else {
-				IsCleared[1] = false;
-			}
-			if (Amount < GetValue()[0]) {
-				IsCleared[0] = true;
-			} else {
-				IsCleared[0] = false;
-			}
+			IsCleared[0] = (Amount < GetValue()[0]);
+			IsCleared[1] = (IsCleared[0] && Amount < GetValue()[1]);
 		}
 	}
 
@@ -129,21 +113,13 @@ public class Dan_C {
 	/// </summary>
 	/// <returns>Amountの百分率。</returns>
 	public int GetAmountToPercent() {
-		var percent = 0.0D;
 		if (GetValue()[0] == 0) {
 			return 0;
 		}
-		if (ExamRange == Exam.Range.More) {
-			percent = 1.0 * Amount / GetValue()[0];
-		} else {
-			percent = (1.0 * (GetValue()[0] - Amount)) / GetValue()[0];
-		}
-		percent = percent * 100.0;
-		if (percent < 0.0)
-			percent = 0.0D;
-		if (percent > 100.0)
-			percent = 100.0D;
-		return (int)percent;
+		double ratio = (ExamRange != Exam.Range.Less) ?
+			(double)Amount / GetValue()[0]
+			: (double)(GetValue()[0] - Amount) / GetValue()[0];
+		return (int)double.Clamp(ratio * 100.0, 0.0, 100.0);
 	}
 
 	// オーバーライドメソッド
