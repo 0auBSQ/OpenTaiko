@@ -126,7 +126,62 @@ internal class Dan_Cert : CActivity {
 		base.Activate();
 	}
 
+	private class DanExamScore {
+		public int nGood, nOk, nBad, nHighestCombo, nRoll, nADLIB, nMine, nNotesMax, nNotesRemainMax;
+		public CChip? lastChip;
+
+		public double GetUpdatedAccuracy() => (nGood * 100 + nOk * 50) / (double)(nGood + nOk + nBad);
+		public int GetUpdatedNNotesRemainMax() => nNotesMax - (nGood + nOk + nBad);
+	}
+
 	public void Update() {
+		DanExamScore? individual = null;
+		DanExamScore? total = null;
+
+		#region [ Get current exam score ]
+		DanExamScore getIndividual() {
+			if (individual != null)
+				return individual;
+
+			individual = new() {
+				nGood = OpenTaiko.stageGameScreen.nGood[NowShowingNumber],
+				nOk = OpenTaiko.stageGameScreen.nOk[NowShowingNumber],
+				nBad = OpenTaiko.stageGameScreen.nBad[NowShowingNumber],
+				nHighestCombo = OpenTaiko.stageGameScreen.nHighestCombo[NowShowingNumber],
+				nRoll = OpenTaiko.stageGameScreen.nRoll[NowShowingNumber],
+
+				nADLIB = OpenTaiko.stageGameScreen.nADLIB[NowShowingNumber],
+				nMine = OpenTaiko.stageGameScreen.nMine[NowShowingNumber],
+
+				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
+				lastChip = OpenTaiko.TJA.pDan_LastChip[NowShowingNumber],
+			};
+			individual.nNotesRemainMax = this.songsnotesremain[NowShowingNumber] = individual.GetUpdatedNNotesRemainMax();
+			return individual;
+		}
+
+		DanExamScore getTotal() {
+			if (total != null)
+				return total;
+
+			total = new() {
+				nGood = OpenTaiko.stageGameScreen.CChartScore[0].nGreat,
+				nOk = OpenTaiko.stageGameScreen.CChartScore[0].nGood,
+				nBad = OpenTaiko.stageGameScreen.CChartScore[0].nMiss,
+				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
+				nRoll = OpenTaiko.stageGameScreen.GetRoll(0),
+
+				nADLIB = OpenTaiko.stageGameScreen.CChartScore[0].nADLIB,
+				nMine = OpenTaiko.stageGameScreen.CChartScore[0].nMine,
+
+				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
+				lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
+			};
+			total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
+			return total;
+		}
+		#endregion
+
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (Challenge[i] == null || !Challenge[i].ExamIsEnable) continue;
 			if (ExamChange[i] && Challenge[i] != OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i]) continue;
@@ -134,62 +189,22 @@ internal class Dan_Cert : CActivity {
 			var oldReached = Challenge[i].NotReached;
 			var isChangedAmount = false;
 
-			int totalGoods = (int)OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect;
-			int totalOks = (int)OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Great + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great;
-			int totalBads = (int)OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Miss;
-			int totalCombo = (int)OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0];
-
-			int individualGoods = OpenTaiko.stageGameScreen.nGood[NowShowingNumber];
-			int individualOks = OpenTaiko.stageGameScreen.nOk[NowShowingNumber];
-			int individualBads = OpenTaiko.stageGameScreen.nBad[NowShowingNumber];
-			int individualCombo = OpenTaiko.stageGameScreen.nHighestCombo[NowShowingNumber];
-
-			int totalADLIBs = OpenTaiko.stageGameScreen.CChartScore[0].nADLIB;
-			int totalMines = OpenTaiko.stageGameScreen.CChartScore[0].nMine;
-
-			int individualADLIBs = OpenTaiko.stageGameScreen.nADLIB[NowShowingNumber];
-			int individualMines = OpenTaiko.stageGameScreen.nMine[NowShowingNumber];
-
-			double accuracy = (totalGoods * 100 + totalOks * 50) / (double)(totalGoods + totalOks + totalBads);
-			double individualAccuracy = (individualGoods * 100 + individualOks * 50) / (double)(individualGoods + individualOks + individualBads);
-
-			switch (Challenge[i].ExamType) {
-				case Exam.Type.Gauge:
-					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0]);
-					break;
-				case Exam.Type.JudgePerfect:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualGoods : totalGoods);
-					break;
-				case Exam.Type.JudgeGood:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualOks : totalOks);
-					break;
-				case Exam.Type.JudgeBad:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualBads : totalBads);
-					break;
-				case Exam.Type.JudgeADLIB:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualADLIBs : totalADLIBs);
-					break;
-				case Exam.Type.JudgeMine:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualMines : totalMines);
-					break;
-				case Exam.Type.Score:
-					isChangedAmount = Challenge[i].Update((int)OpenTaiko.stageGameScreen.actScore.GetScore(0));
-					break;
-				case Exam.Type.Roll:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stageGameScreen.nRoll[NowShowingNumber] : (int)(OpenTaiko.stageGameScreen.GetRoll(0)));
-					break;
-				case Exam.Type.Hit:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? OpenTaiko.stageGameScreen.nGood[NowShowingNumber] + OpenTaiko.stageGameScreen.nOk[NowShowingNumber] + OpenTaiko.stageGameScreen.nRoll[NowShowingNumber] : (int)(OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_InclAuto.Drums.Great + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great + OpenTaiko.stageGameScreen.GetRoll(0)));
-					break;
-				case Exam.Type.Combo:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? individualCombo : totalCombo);
-					break;
-				case Exam.Type.Accuracy:
-					isChangedAmount = Challenge[i].Update(ExamChange[i] ? (int)individualAccuracy : (int)accuracy);
-					break;
-				default:
-					break;
-			}
+			DanExamScore score = ExamChange[i] ? getIndividual() : getTotal();
+			double examAmount = Challenge[i].ExamType switch {
+				Exam.Type.Gauge => OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0],
+				Exam.Type.JudgePerfect => score.nGood,
+				Exam.Type.JudgeGood => score.nOk,
+				Exam.Type.JudgeBad => score.nBad,
+				Exam.Type.JudgeADLIB => score.nADLIB,
+				Exam.Type.JudgeMine => score.nMine,
+				Exam.Type.Score => OpenTaiko.stageGameScreen.actScore.GetScore(0),
+				Exam.Type.Roll => score.nRoll,
+				Exam.Type.Hit => score.nGood + score.nOk + score.nRoll,
+				Exam.Type.Combo => score.nHighestCombo,
+				Exam.Type.Accuracy => score.GetUpdatedAccuracy(),
+				_ => 0,
+			};
+			isChangedAmount = Challenge[i].Update((int)examAmount);
 
 			// 値が変更されていたらアニメーションを行う。
 			if (isChangedAmount) {
@@ -205,30 +220,10 @@ internal class Dan_Cert : CActivity {
 			if (Challenge[i].ExamRange == Exam.Range.Less) {
 				Challenge[i].NotReached = !Challenge[i].GetIsCleared()[0];
 			} else {
-				songsnotesremain[NowShowingNumber] = OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber]
-													 - (OpenTaiko.stageGameScreen.nGood[NowShowingNumber]
-														+ OpenTaiko.stageGameScreen.nOk[NowShowingNumber]
-														+ OpenTaiko.stageGameScreen.nBad[NowShowingNumber]);
-
-				/*
-                notesremain = TJAPlayer3.DTX.nノーツ数[3]
-                    - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Perfect
-                        + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Perfect)
-                    - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Great
-                        + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great)
-                    - (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含む.Drums.Miss
-                        + TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss);
-                */
-
-				notesremain = OpenTaiko.TJA.nノーツ数[3]
-							  - (OpenTaiko.stageGameScreen.CChartScore[0].nGood
-								 + OpenTaiko.stageGameScreen.CChartScore[0].nGreat
-								 + OpenTaiko.stageGameScreen.CChartScore[0].nMiss);
-
 				// 残り音符数が0になったときに判断されるやつ
 
 				// Challenges that are judged when there are no remaining notes
-				if (ExamChange[i] ? songsnotesremain[NowShowingNumber] <= 0 : notesremain <= 0) {
+				if (score.nNotesRemainMax <= 0) {
 					// 残り音符数ゼロ
 					switch (Challenge[i].ExamType) {
 						case Exam.Type.Gauge:
@@ -248,56 +243,34 @@ internal class Dan_Cert : CActivity {
 					case Exam.Type.JudgePerfect:
 					case Exam.Type.JudgeGood:
 					case Exam.Type.JudgeBad:
-						if (ExamChange[i]
-								? songsnotesremain[NowShowingNumber] < (Challenge[i].GetValue()[0] - Challenge[i].Amount)
-								: notesremain < (Challenge[i].GetValue()[0] - Challenge[i].Amount)) Challenge[i].NotReached = true;
+						if (score.nNotesRemainMax < (Challenge[i].GetValue()[0] - Challenge[i].Amount)) Challenge[i].NotReached = true;
 						break;
 					case Exam.Type.Combo:
-						if (notesremain + OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1 < ((Challenge[i].GetValue()[0]))
-							&& OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0] < (Challenge[i].GetValue()[0])) Challenge[i].NotReached = true;
+						if (total.nNotesRemainMax + OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1 < ((Challenge[i].GetValue()[0]))
+							&& total.nHighestCombo < (Challenge[i].GetValue()[0])) Challenge[i].NotReached = true;
 						break;
 					default:
 						break;
 				}
 
 				// 音源が終了したやつの分岐。
-				// ( CDTXMania.DTX.listChip.Count > 0 ) ? CDTXMania.DTX.listChip[ CDTXMania.DTX.listChip.Count - 1 ].n発声時刻ms : 0;
-
 				// Check challenge fails at the end of each songs
 
-				if (OpenTaiko.TJA.listChip.Count > 0) {
-					if (ExamChange[i]
-							? OpenTaiko.TJA.pDan_LastChip[NowShowingNumber].n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
-							: OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
-						) {
-						switch (Challenge[i].ExamType) {
-							case Exam.Type.Score:
-							case Exam.Type.Hit:
-							// Should be checked in live "If no remaining roll"
-							case Exam.Type.Roll:
-							// Should be checked in live "If no remaining ADLIB/Mine"
-							case Exam.Type.JudgeADLIB:
-							case Exam.Type.JudgeMine:
-								if (Challenge[i].Amount < Challenge[i].GetValue()[0]) Challenge[i].NotReached = true;
-								break;
-							default:
-								break;
-						}
+				if (score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
+					switch (Challenge[i].ExamType) {
+						case Exam.Type.Score:
+						case Exam.Type.Hit:
+						// Should be checked in live "If no remaining roll"
+						case Exam.Type.Roll:
+						// Should be checked in live "If no remaining ADLIB/Mine"
+						case Exam.Type.JudgeADLIB:
+						case Exam.Type.JudgeMine:
+							if (Challenge[i].Amount < Challenge[i].GetValue()[0]) Challenge[i].NotReached = true;
+							break;
+						default:
+							break;
 					}
 				}
-
-				/*
-                if (!IsEnded[NowShowingNumber])
-                {
-                    if (TJAPlayer3.DTX.listChip.Count <= 0) continue;
-                    if (ExamChange[i]
-                        ? TJAPlayer3.DTX.pDan_LastChip[NowShowingNumber].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻//TJAPlayer3.Timer.n現在時刻
-                        : TJAPlayer3.DTX.listChip[TJAPlayer3.DTX.listChip.Count - 1].n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻)//TJAPlayer3.Timer.n現在時刻)
-                    {
-                        IsEnded[NowShowingNumber] = true;
-                    }
-                }
-                */
 			}
 			if (oldReached == false && Challenge[i].NotReached == true) {
 				Sound_Failed?.PlayStart();
