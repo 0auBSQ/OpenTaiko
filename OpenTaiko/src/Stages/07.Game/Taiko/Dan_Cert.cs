@@ -122,7 +122,7 @@ internal class Dan_Cert : CActivity {
 	}
 
 	private class DanExamScore {
-		public int nGood, nOk, nBad, nHighestCombo, nRoll, nADLIB, nMine, nNotesMax, nNotesRemainMax;
+		public int nGood, nOk, nBad, nCombo, nHighestCombo, nRoll, nADLIB, nMine, nNotesMax, nNotesRemainMax;
 		public CChip? lastChip;
 
 		public double GetUpdatedAccuracy() => (nGood * 100 + nOk * 50) / (double)(nGood + nOk + nBad);
@@ -142,6 +142,7 @@ internal class Dan_Cert : CActivity {
 				nGood = OpenTaiko.stageGameScreen.nGood[NowShowingNumber],
 				nOk = OpenTaiko.stageGameScreen.nOk[NowShowingNumber],
 				nBad = OpenTaiko.stageGameScreen.nBad[NowShowingNumber],
+				nCombo = OpenTaiko.stageGameScreen.nCombo[NowShowingNumber],
 				nHighestCombo = OpenTaiko.stageGameScreen.nHighestCombo[NowShowingNumber],
 				nRoll = OpenTaiko.stageGameScreen.nRoll[NowShowingNumber],
 
@@ -163,6 +164,7 @@ internal class Dan_Cert : CActivity {
 				nGood = OpenTaiko.stageGameScreen.CChartScore[0].nGreat,
 				nOk = OpenTaiko.stageGameScreen.CChartScore[0].nGood,
 				nBad = OpenTaiko.stageGameScreen.CChartScore[0].nMiss,
+				nCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1,
 				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
 				nRoll = OpenTaiko.stageGameScreen.GetRoll(0),
 
@@ -241,8 +243,11 @@ internal class Dan_Cert : CActivity {
 						if (score.nNotesRemainMax < (Challenge[i].GetValue()[0] - Challenge[i].Amount)) Challenge[i].NotReached = true;
 						break;
 					case Exam.Type.Combo:
-						if (total.nNotesRemainMax + OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1 < ((Challenge[i].GetValue()[0]))
-							&& total.nHighestCombo < (Challenge[i].GetValue()[0])) Challenge[i].NotReached = true;
+						if (score.nCombo + score.nNotesRemainMax < Challenge[i].GetValue()[0]
+							&& score.nHighestCombo < Challenge[i].GetValue()[0]
+							) {
+							Challenge[i].NotReached = true;
+						}
 						break;
 					default:
 						break;
