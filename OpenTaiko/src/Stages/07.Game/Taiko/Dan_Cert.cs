@@ -214,19 +214,21 @@ internal class Dan_Cert : CActivity {
 			}
 
 			// 条件の達成見込みがあるかどうか判断する。
-			if (Challenge[i].ExamRange == Exam.Range.Less) {
+
+			// 残り音符数が0になったときに判断されるやつ
+			// Challenges that are only judged when there are no remaining notes
+			bool judgeOnlyAfterLastNote = Challenge[i].ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
+
+			if (Challenge[i].ExamRange == Exam.Range.Less && !judgeOnlyAfterLastNote) {
 				Challenge[i].NotReached = !Challenge[i].GetIsCleared()[0];
 			} else {
-				// 残り音符数が0になったときに判断されるやつ
-				// Challenges that are judged when there are no remaining notes
-				bool judgeAfterLastNote = Challenge[i].ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
 				// Challenges that are monitored in live
 				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo;
 				// Other challenges: Check challenge fails at the end of each songs
 
 				bool judge = judgeEveryTime
-					|| (judgeAfterLastNote && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
-					|| (!judgeAfterLastNote && score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
+					|| (judgeOnlyAfterLastNote && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
+					|| (!judgeOnlyAfterLastNote && score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
 
 				if (judge) {
 					switch (Challenge[i].ExamType) {
