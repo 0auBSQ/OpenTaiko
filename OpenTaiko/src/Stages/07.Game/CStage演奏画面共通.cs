@@ -1473,224 +1473,114 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 
-
-		if (!bAutoPlay) {
-			if (!NotesManager.IsGenericRoll(pChip)) {
-
-				switch (eJudgeResult) {
-					case ENoteJudge.Perfect: {
-							if (NotesManager.IsADLIB(pChip))
-								break;
-
-							this.CBranchScore[nPlayer].nGreat++;
-							this.CChartScore[nPlayer].nGreat++;
-							this.CSectionScore[nPlayer].nGreat++;
-							this.Chara_MissCount[nPlayer] = 0;
-
-							if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Perfect++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nGood[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
-
-
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-
-							AIRegisterInput(nPlayer, 1);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+		switch (eJudgeResult) {
+			case ENoteJudge.Perfect: {
+					if (NotesManager.IsGenericRoll(pChip) || NotesManager.IsADLIB(pChip))
 						break;
-					case ENoteJudge.Great:
-					case ENoteJudge.Good: {
-							this.CBranchScore[nPlayer].nGood++;
-							this.CChartScore[nPlayer].nGood++;
-							this.CSectionScore[nPlayer].nGood++;
-							this.Chara_MissCount[nPlayer] = 0;
 
-							if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Great++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
+					this.CBranchScore[nPlayer].nGreat++;
+					this.CChartScore[nPlayer].nGreat++;
+					this.CSectionScore[nPlayer].nGreat++;
+					this.Chara_MissCount[nPlayer] = 0;
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nOk[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
+					if (nPlayer == 0)
+						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
+					this.actCombo.nCurrentCombo[nPlayer]++;
 
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+						this.nGood[actDan.NowShowingNumber]++;
+						this.tIncreaseComboDan(actDan.NowShowingNumber);
+					}
+
+					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+					} else {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
+					}
+
+					AIRegisterInput(nPlayer, 1);
+
+					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
 
-							AIRegisterInput(nPlayer, 0.5f);
+					if (this.bIsMiss[nPlayer]) {
+						returnChara();
+					}
 
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
-						break;
-					case ENoteJudge.Poor:
-					case ENoteJudge.Miss:
-					case ENoteJudge.Bad: {
-							if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
-								break;
-
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-								CFloorManagement.damage();
-
-							if (!bBombHit) {
-								if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-									this.nBad[actDan.NowShowingNumber]++;
-
-								this.CBranchScore[nPlayer].nMiss++;
-								this.CChartScore[nPlayer].nMiss++;
-								this.CSectionScore[nPlayer].nMiss++;
-								this.Chara_MissCount[nPlayer]++;
-
-								if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Miss++;
-							}
-
-							this.actCombo.nCurrentCombo[nPlayer] = 0;
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.nCombo[actDan.NowShowingNumber] = 0;
-							this.actComboVoice.tReset(nPlayer);
-
-							AIRegisterInput(nPlayer, 0f);
-
-							this.bIsMiss[nPlayer] = true;
-						}
-						break;
-					default:
-						this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
-						break;
+					this.bIsMiss[nPlayer] = false;
 				}
-			}
-		} else if (bAutoPlay) {
-			switch (eJudgeResult) {
-				case ENoteJudge.Perfect: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (NotesManager.IsADLIB(pChip))
-								break;
+				break;
+			case ENoteJudge.Great:
+			case ENoteJudge.Good: {
+					if (NotesManager.IsGenericRoll(pChip))
+						break;
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nGood[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
+					this.CBranchScore[nPlayer].nGood++;
+					this.CChartScore[nPlayer].nGood++;
+					this.CSectionScore[nPlayer].nGood++;
+					this.Chara_MissCount[nPlayer] = 0;
 
-							this.CBranchScore[nPlayer].nGreat++;
-							this.CChartScore[nPlayer].nGreat++;
-							this.CSectionScore[nPlayer].nGreat++;
-							this.Chara_MissCount[nPlayer] = 0;
+					if (nPlayer == 0)
+						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
+					this.actCombo.nCurrentCombo[nPlayer]++;
 
-							if (nPlayer == 0) this.nHitCount_InclAuto.Drums.Perfect++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-							//this.actCombo.ctコンボ加算.t進行();
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-							AIRegisterInput(nPlayer, 1);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+						this.nOk[actDan.NowShowingNumber]++;
+						this.tIncreaseComboDan(actDan.NowShowingNumber);
 					}
-					break;
 
-				case ENoteJudge.Great:
-				case ENoteJudge.Good: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nOk[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
-
-							this.CBranchScore[nPlayer].nGood++;
-							this.CChartScore[nPlayer].nGood++;
-							this.CSectionScore[nPlayer].nGood++;
-							this.Chara_MissCount[nPlayer] = 0;
-
-							if (nPlayer == 0) this.nHitCount_InclAuto.Drums.Great++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-
-							AIRegisterInput(nPlayer, 0.5f);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+					} else {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
 					}
-					break;
 
-				default: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
-								break;
+					AIRegisterInput(nPlayer, 0.5f);
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-								CFloorManagement.damage();
+					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
-							if (!bBombHit) {
-								if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-									this.nBad[actDan.NowShowingNumber]++;
-
-
-								this.CBranchScore[nPlayer].nMiss++;
-								this.CChartScore[nPlayer].nMiss++;
-								this.CSectionScore[nPlayer].nMiss++;
-								this.Chara_MissCount[nPlayer]++;
-							}
-
-							this.actCombo.nCurrentCombo[nPlayer] = 0;
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.nCombo[actDan.NowShowingNumber] = 0;
-							this.actComboVoice.tReset(nPlayer);
-
-							AIRegisterInput(nPlayer, 0f);
-
-
-							this.bIsMiss[nPlayer] = true;
-						}
+					if (this.bIsMiss[nPlayer]) {
+						returnChara();
 					}
-					break;
-			}
+
+					this.bIsMiss[nPlayer] = false;
+				}
+				break;
+			case ENoteJudge.Poor:
+			case ENoteJudge.Miss:
+			case ENoteJudge.Bad: {
+					if (NotesManager.IsGenericRoll(pChip) || !(NotesManager.IsMissableNote(pChip) || bBombHit))
+						break;
+
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+						CFloorManagement.damage();
+
+					if (!bBombHit) {
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.nBad[actDan.NowShowingNumber]++;
+
+						this.CBranchScore[nPlayer].nMiss++;
+						this.CChartScore[nPlayer].nMiss++;
+						this.CSectionScore[nPlayer].nMiss++;
+						this.Chara_MissCount[nPlayer]++;
+
+						if (nPlayer == 0)
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
+					}
+
+					this.actCombo.nCurrentCombo[nPlayer] = 0;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.nCombo[actDan.NowShowingNumber] = 0;
+					this.actComboVoice.tReset(nPlayer);
+
+					AIRegisterInput(nPlayer, 0f);
+
+					this.bIsMiss[nPlayer] = true;
+				}
+				break;
+			default:
+				this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
+				break;
 		}
 		actDan.Update();
 
