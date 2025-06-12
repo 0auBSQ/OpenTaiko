@@ -459,7 +459,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.stageGameScreen.CChartScore[i].nGreat,
 							OpenTaiko.stageGameScreen.CChartScore[i].nGood,
 							OpenTaiko.stageGameScreen.CChartScore[i].nMiss,
-							OpenTaiko.stageGameScreen.GetRoll(i),
+							OpenTaiko.stageGameScreen.CChartScore[i].nRoll,
 							OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[i],
 							OpenTaiko.stageGameScreen.CChartScore[i].nADLIB,
 							OpenTaiko.stageGameScreen.CChartScore[i].nMine,

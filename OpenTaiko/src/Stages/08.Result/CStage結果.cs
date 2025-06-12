@@ -1488,7 +1488,7 @@ internal class CStage結果 : CStage {
 			OpenTaiko.stageGameScreen.CChartScore[0].nMiss, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Roll[0] + offset, OpenTaiko.Skin.DanResult_Roll[1],
-			OpenTaiko.stageGameScreen.GetRoll(0), 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nRoll, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_MaxCombo[0] + offset, OpenTaiko.Skin.DanResult_MaxCombo[1],
 			OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0], 1.0f);
@@ -1554,10 +1554,10 @@ internal class CStage結果 : CStage {
 
 		int[] scoresArr =
 		{
-			OpenTaiko.stageGameScreen.nGood[i],
-			OpenTaiko.stageGameScreen.nOk[i],
-			OpenTaiko.stageGameScreen.nBad[i],
-			OpenTaiko.stageGameScreen.nRoll[i]
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGreat,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGood,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nMiss,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nRoll
 		};
 
 		int[] num_x = {

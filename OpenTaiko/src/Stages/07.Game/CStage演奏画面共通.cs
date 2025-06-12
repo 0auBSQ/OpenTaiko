@@ -164,7 +164,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nDisplayedBranchLane = new CTja.ECourse[5];
 		this.bCurrentlyDrumRoll = new bool[] { false, false, false, false, false };
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
-		this.nTotalRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.n分岐した回数 = new int[5];
 		this.Chara_MissCount = new int[5];
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
@@ -218,14 +217,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		// Note
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			nGood = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nCombo = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nHighestCombo = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nOk = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nBad = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nRoll = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nADLIB = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nMine = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+			this.DanSongScore = new CBRANCHSCORE[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+			for (int i = 0; i < this.DanSongScore.Length; ++i)
+				this.DanSongScore[i] = new();
 		}
 
 
@@ -502,14 +496,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 	/// .2020.04.21.akasoko26
 	/// </summary>
 	public class CBRANCHSCORE {
+		// unused
 		public CBRANCHSCORE cBigNotes;//大音符分岐時の情報をまとめるため
-		public int nRoll;
+		// is reset
+		public int nRoll; // with balloon hits, but should exclude them in branch condition for TaikoJiro compatibility
 		public int nGreat;
 		public int nGood;
 		public int nMiss;
+		// no reset
 		public int nScore;
 		public int nADLIB;
 		public int nMine;
+		// only used for dan-i
+		public int nHighestCombo;
+		public int nCombo;
 	}
 
 	public double[] JPOSCROLLX = new double[5];
@@ -628,14 +628,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_ExclAuto;
 	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_InclAuto;
 	public bool ShowVideo;
-	public int[] nGood;
-	public int[] nHighestCombo;
-	public int[] nCombo;
-	public int[] nOk;
-	public int[] nBad;
-	public int[] nRoll;
-	public int[] nADLIB;
-	public int[] nMine;
+	public CBRANCHSCORE[] DanSongScore = [];
 
 	// chip-played state handling
 	protected bool isRewinding = false;
@@ -684,7 +677,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected int nListCount;
 
 	public bool[] bCurrentlyDrumRoll = new bool[] { false, false, false, false, false }; //奥の手
-	private int[] nTotalRollCount = new int[5];
 	protected int[] nCurrentRollCount = new int[5];
 	public int[] Chara_MissCount;
 	protected ERollState eRollState;
@@ -891,9 +883,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void tIncreaseComboDan(int danSong) {
-		this.nCombo[danSong]++;
-		if (this.nCombo[danSong] > this.nHighestCombo[danSong])
-			this.nHighestCombo[danSong] = this.nCombo[danSong];
+		this.DanSongScore[danSong].nCombo++;
+		if (this.DanSongScore[danSong].nCombo > this.DanSongScore[danSong].nHighestCombo)
+			this.DanSongScore[danSong].nHighestCombo = this.DanSongScore[danSong].nCombo;
 	}
 
 	private ENoteJudge e指定時刻からChipのJUDGEを返すImpl(long nTime, CChip pChip, int player = 0) {
@@ -1001,7 +993,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			pChip.nRollCount++;
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-				this.nRoll[actDan.NowShowingNumber]++;
+				this.DanSongScore[actDan.NowShowingNumber].nRoll++;
 
 			this.nCurrentRollCount[nPlayer]++;
 
@@ -1009,7 +1001,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CChartScore[nPlayer].nRoll++;
 			this.CSectionScore[nPlayer].nRoll++;
 
-			this.nTotalRollCount[nPlayer]++;
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
 
@@ -1136,12 +1127,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			this.nRoll[actDan.NowShowingNumber]++;
+			this.DanSongScore[actDan.NowShowingNumber].nRoll++;
 		this.CBranchScore[player].nRoll++;
-		this.CChartScore[player].nRoll++;
+		this.CChartScore[player].nRoll++; //  成績発表の連打数に風船を含めるように (AioiLight)
 		this.CSectionScore[player].nRoll++;
-
-		this.nTotalRollCount[player]++; //  成績発表の連打数に風船を含めるように (AioiLight)
 
 		//分岐のための処理。実装してない。
 
@@ -1332,7 +1321,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CSectionScore[nPlayer].nADLIB++;
 					this.CBranchScore[nPlayer].nADLIB++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nADLIB[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
 				}
 			} else if (NotesManager.IsMine(pChip)) {
 				if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss) {
@@ -1347,7 +1336,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CSectionScore[nPlayer].nMine++;
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nMine[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nMine++;
 				}
 			} else {
 				if (eJudgeResult != ENoteJudge.Miss) {
@@ -1488,7 +1477,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actCombo.nCurrentCombo[nPlayer]++;
 
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-						this.nGood[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nGreat++;
 						this.tIncreaseComboDan(actDan.NowShowingNumber);
 					}
 
@@ -1525,7 +1514,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actCombo.nCurrentCombo[nPlayer]++;
 
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-						this.nOk[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nGood++;
 						this.tIncreaseComboDan(actDan.NowShowingNumber);
 					}
 
@@ -1557,7 +1546,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 					if (!bBombHit) {
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.nBad[actDan.NowShowingNumber]++;
+							this.DanSongScore[actDan.NowShowingNumber].nMiss++;
 
 						this.CBranchScore[nPlayer].nMiss++;
 						this.CChartScore[nPlayer].nMiss++;
@@ -1570,7 +1559,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 					this.actCombo.nCurrentCombo[nPlayer] = 0;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nCombo[actDan.NowShowingNumber] = 0;
+						this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 					this.actComboVoice.tReset(nPlayer);
 
 					AIRegisterInput(nPlayer, 0f);
@@ -3689,10 +3678,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 							CFloorManagement.damage();
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.nMine[actDan.NowShowingNumber]++;
+							this.DanSongScore[actDan.NowShowingNumber].nMine++;
 						this.actCombo.nCurrentCombo[iPlayer] = 0;
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.nCombo[actDan.NowShowingNumber] = 0;
+							this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 						this.actComboVoice.tReset(iPlayer);
 						this.bIsMiss[iPlayer] = true;
 					}
@@ -3959,7 +3948,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public int GetRoll(int player) {
-		return nTotalRollCount[player];
+		return this.CChartScore[player].nRoll;
 	}
 
 	protected float GetNowPBMTime(CTja tja, float play_time) {
@@ -4085,7 +4074,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.nNextBranch[i] = CTja.ECourse.eNormal;
 				this.nDisplayedBranchLane[0] = CTja.ECourse.eNormal;
 				this.nCurrentRollCount[i] = 0;
-				this.nTotalRollCount[i] = 0;
 
 				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
 
