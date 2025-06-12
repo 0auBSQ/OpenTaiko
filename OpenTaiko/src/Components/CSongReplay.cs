@@ -80,13 +80,13 @@ class CSongReplay {
 	public void tDanInputSongResults(int songNo) {
 		if (songNo >= DanSongCount) return;
 		if (songNo < 0) return;
-		IndividualGoodCount[songNo] = OpenTaiko.stageGameScreen.nGood[songNo];
-		IndividualOkCount[songNo] = OpenTaiko.stageGameScreen.nOk[songNo];
-		IndividualBadCount[songNo] = OpenTaiko.stageGameScreen.nBad[songNo];
-		IndividualRollCount[songNo] = OpenTaiko.stageGameScreen.nRoll[songNo];
-		IndividualMaxCombo[songNo] = OpenTaiko.stageGameScreen.nHighestCombo[songNo];
-		IndividualBoomCount[songNo] = OpenTaiko.stageGameScreen.nMine[songNo];
-		IndividualADLibCount[songNo] = OpenTaiko.stageGameScreen.nADLIB[songNo];
+		IndividualGoodCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGreat;
+		IndividualOkCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nGood;
+		IndividualBadCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMiss;
+		IndividualRollCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nRoll;
+		IndividualMaxCombo[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nHighestCombo;
+		IndividualBoomCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nMine;
+		IndividualADLibCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nADLIB;
 		danAccumulatedScore = 0;
 		for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore[acc];
 		IndividualScore[songNo] = (int)OpenTaiko.stageGameScreen.actScore.GetScore(0) - danAccumulatedScore;
@@ -258,7 +258,7 @@ class CSongReplay {
 		GoodCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGreat;
 		OkCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGood;
 		BadCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMiss;
-		RollCount = OpenTaiko.stageGameScreen.GetRoll(storedPlayer);
+		RollCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nRoll;
 		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[storedPlayer];
 		BoomCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMine;
 		ADLibCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nADLIB;

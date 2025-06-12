@@ -122,12 +122,14 @@ internal class Dan_Cert : CActivity {
 	}
 
 	private class DanExamScore {
-		public int nGood, nOk, nBad, nCombo, nHighestCombo, nRoll, nADLIB, nMine, nNotesMax, nNotesRemainMax;
+		public CStage演奏画面共通.CBRANCHSCORE? judges;
+		public int nCombo, nHighestCombo, nNotesMax, nNotesRemainMax;
 		public CChip? lastChip;
 		public bool hasBranch;
 
-		public double GetUpdatedAccuracy() => (nGood * 100 + nOk * 50) / (double)(nGood + nOk + nBad);
-		public int GetUpdatedNNotesRemainMax() => nNotesMax - (nGood + nOk + nBad);
+		public int GetUpdatedNNotesPast() => (judges!.nGreat + judges.nGood + judges.nMiss);
+		public double GetUpdatedAccuracy() => (judges!.nGreat! * 100 + judges.nGood * 50) / (double)GetUpdatedNNotesPast();
+		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
 	public void Update() {
@@ -140,15 +142,9 @@ internal class Dan_Cert : CActivity {
 				return individual;
 
 			individual = new() {
-				nGood = OpenTaiko.stageGameScreen.nGood[NowShowingNumber],
-				nOk = OpenTaiko.stageGameScreen.nOk[NowShowingNumber],
-				nBad = OpenTaiko.stageGameScreen.nBad[NowShowingNumber],
-				nCombo = OpenTaiko.stageGameScreen.nCombo[NowShowingNumber],
-				nHighestCombo = OpenTaiko.stageGameScreen.nHighestCombo[NowShowingNumber],
-				nRoll = OpenTaiko.stageGameScreen.nRoll[NowShowingNumber],
-
-				nADLIB = OpenTaiko.stageGameScreen.nADLIB[NowShowingNumber],
-				nMine = OpenTaiko.stageGameScreen.nMine[NowShowingNumber],
+				judges = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber],
+				nCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nCombo,
+				nHighestCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nHighestCombo,
 
 				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
 				lastChip = OpenTaiko.TJA.pDan_LastChip[NowShowingNumber],
@@ -163,15 +159,9 @@ internal class Dan_Cert : CActivity {
 				return total;
 
 			total = new() {
-				nGood = OpenTaiko.stageGameScreen.CChartScore[0].nGreat,
-				nOk = OpenTaiko.stageGameScreen.CChartScore[0].nGood,
-				nBad = OpenTaiko.stageGameScreen.CChartScore[0].nMiss,
+				judges = OpenTaiko.stageGameScreen.CChartScore[0],
 				nCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1,
 				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
-				nRoll = OpenTaiko.stageGameScreen.GetRoll(0),
-
-				nADLIB = OpenTaiko.stageGameScreen.CChartScore[0].nADLIB,
-				nMine = OpenTaiko.stageGameScreen.CChartScore[0].nMine,
 
 				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
 				lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
@@ -192,14 +182,14 @@ internal class Dan_Cert : CActivity {
 			DanExamScore score = ExamChange[i] ? getIndividual() : getTotal();
 			double examAmount = Challenge[i].ExamType switch {
 				Exam.Type.Gauge => OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0],
-				Exam.Type.JudgePerfect => score.nGood,
-				Exam.Type.JudgeGood => score.nOk,
-				Exam.Type.JudgeBad => score.nBad,
-				Exam.Type.JudgeADLIB => score.nADLIB,
-				Exam.Type.JudgeMine => score.nMine,
+				Exam.Type.JudgePerfect => score.judges!.nGreat,
+				Exam.Type.JudgeGood => score.judges!.nGood,
+				Exam.Type.JudgeBad => score.judges!.nMiss,
+				Exam.Type.JudgeADLIB => score.judges!.nADLIB,
+				Exam.Type.JudgeMine => score.judges!.nMine,
 				Exam.Type.Score => OpenTaiko.stageGameScreen.actScore.GetScore(0),
-				Exam.Type.Roll => score.nRoll,
-				Exam.Type.Hit => score.nGood + score.nOk + score.nRoll,
+				Exam.Type.Roll => score.judges!.nRoll,
+				Exam.Type.Hit => score.judges!.nGreat + score.judges.nGood + score.judges.nRoll,
 				Exam.Type.Combo => score.nHighestCombo,
 				Exam.Type.Accuracy => score.GetUpdatedAccuracy(),
 				_ => 0,
