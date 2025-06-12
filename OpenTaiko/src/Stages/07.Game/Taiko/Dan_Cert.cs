@@ -267,9 +267,9 @@ internal class Dan_Cert : CActivity {
 
 				if (OpenTaiko.TJA.listChip.Count > 0) {
 					if (ExamChange[i]
-							? OpenTaiko.TJA.pDan_LastChip[NowShowingNumber].n発声時刻ms <= SoundManager.PlayTimer.NowTimeMs//TJAPlayer3.Timer.n現在時刻
-							: OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms <= SoundManager.PlayTimer.NowTimeMs)//TJAPlayer3.Timer.n現在時刻)
-					{
+							? OpenTaiko.TJA.pDan_LastChip[NowShowingNumber].n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+							: OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+						) {
 						switch (Challenge[i].ExamType) {
 							case Exam.Type.Score:
 							case Exam.Type.Hit:
