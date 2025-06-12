@@ -124,6 +124,7 @@ internal class Dan_Cert : CActivity {
 	private class DanExamScore {
 		public CStage演奏画面共通.CBRANCHSCORE? judges;
 		public int nCombo, nHighestCombo, nNotesMax, nNotesRemainMax;
+		public int nBarRollMax, nBalloonHitMax, nAdLibMax, nMineMax;
 		public CChip? lastChip;
 		public bool hasBranch;
 
@@ -147,6 +148,11 @@ internal class Dan_Cert : CActivity {
 				nHighestCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nHighestCombo,
 
 				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
+				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount[NowShowingNumber],
+				nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount[NowShowingNumber],
+				nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount[NowShowingNumber],
+				nMineMax = OpenTaiko.TJA.nDan_MineCount[NowShowingNumber],
+
 				lastChip = OpenTaiko.TJA.pDan_LastChip[NowShowingNumber],
 				hasBranch = OpenTaiko.TJA.bHasBranchDan[NowShowingNumber],
 			};
@@ -164,6 +170,11 @@ internal class Dan_Cert : CActivity {
 				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
 
 				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
+				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount.Sum(),
+				nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount.Sum(),
+				nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount.Sum(),
+				nMineMax = OpenTaiko.TJA.nDan_MineCount.Sum(),
+
 				lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
 				hasBranch = OpenTaiko.TJA.bチップがある.Branch,
 			};
@@ -216,7 +227,8 @@ internal class Dan_Cert : CActivity {
 				Challenge[i].NotReached = !Challenge[i].GetIsCleared()[0];
 			} else {
 				// Challenges that are monitored in live
-				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo;
+				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
+					or Exam.Type.JudgeADLIB or Exam.Type.JudgeMine or Exam.Type.Roll or Exam.Type.Hit or Exam.Type.Accuracy;
 				// Other challenges: Check challenge fails at the end of each songs
 
 				bool judge = (judgeEveryTime && !score.hasBranch) // workaround: prevent judging too early for branched charts
@@ -233,6 +245,14 @@ internal class Dan_Cert : CActivity {
 							if (Challenge[i].Amount + score.nNotesRemainMax < Challenge[i].GetValue()[0])
 								Challenge[i].NotReached = true;
 							break;
+						case Exam.Type.JudgeADLIB:
+							if ((score.nAdLibMax - score.judges!.nADLIBMiss) < Challenge[i].GetValue()[0])
+								Challenge[i].NotReached = true;
+							break;
+						case Exam.Type.JudgeMine:
+							if ((score.nMineMax - score.judges!.nMineAvoid) < Challenge[i].GetValue()[0])
+								Challenge[i].NotReached = true;
+							break;
 						case Exam.Type.Combo:
 							if (score.nCombo + score.nNotesRemainMax < Challenge[i].GetValue()[0]
 								&& score.nHighestCombo < Challenge[i].GetValue()[0]
@@ -240,13 +260,32 @@ internal class Dan_Cert : CActivity {
 								Challenge[i].NotReached = true;
 							}
 							break;
-
-						default:
-						// Should be checked in live "If no remaining roll"
 						case Exam.Type.Roll:
-						// Should be checked in live "If no remaining ADLIB/Mine"
-						case Exam.Type.JudgeADLIB:
-						case Exam.Type.JudgeMine:
+							if (Challenge[i].Amount + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < Challenge[i].GetValue()[0]
+								&& score.nBarRollMax <= score.judges.nBarRollPass
+								) {
+								Challenge[i].NotReached = true;
+							}
+							break;
+						case Exam.Type.Hit:
+							if (Challenge[i].Amount + score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < Challenge[i].GetValue()[0]
+								&& score.nBarRollMax <= score.judges.nBarRollPass
+								) {
+								Challenge[i].NotReached = true;
+							}
+							break;
+						case Exam.Type.Accuracy:
+							if (Challenge[i].ExamRange != Exam.Range.Less) {
+								double accPointMax = (score.judges!.nGreat! + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
+								if (accPointMax < Challenge[i].GetValue()[0] * score.nNotesMax)
+									Challenge[i].NotReached = true;
+							} else {
+								double accPointMin = score.judges!.nGreat! * 100 + score.judges.nGood * 50;
+								if (accPointMin >= Challenge[i].GetValue()[0] * score.nNotesMax)
+									Challenge[i].NotReached = true;
+							}
+							break;
+						default:
 							if (!Challenge[i].GetIsCleared()[0])
 								Challenge[i].NotReached = true;
 							break;

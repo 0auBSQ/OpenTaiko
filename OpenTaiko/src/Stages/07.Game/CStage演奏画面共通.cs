@@ -506,7 +506,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		// no reset
 		public int nScore;
 		public int nADLIB;
+		public int nADLIBMiss;
 		public int nMine;
+		public int nMineAvoid;
+		public int nBarRollPass;
+		public int nBalloonHitPass;
 		// only used for dan-i
 		public int nHighestCombo;
 		public int nCombo;
@@ -1322,6 +1326,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CBranchScore[nPlayer].nADLIB++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
+				} else {
+					this.CChartScore[nPlayer].nADLIBMiss++;
+					this.CSectionScore[nPlayer].nADLIBMiss++;
+					this.CBranchScore[nPlayer].nADLIBMiss++;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.DanSongScore[actDan.NowShowingNumber].nADLIBMiss++;
 				}
 			} else if (NotesManager.IsMine(pChip)) {
 				if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss) {
@@ -1337,6 +1347,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[actDan.NowShowingNumber].nMine++;
+				} else {
+					this.CChartScore[nPlayer].nMineAvoid++;
+					this.CSectionScore[nPlayer].nMineAvoid++;
+					this.CBranchScore[nPlayer].nMineAvoid++;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
 				}
 			} else {
 				if (eJudgeResult != ENoteJudge.Miss) {
@@ -3729,6 +3745,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				if (actChara.CharaAction_Balloon_Delay[iPlayer] != null)
 					actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1, 1, OpenTaiko.Timer);
 			}
+			if (NotesManager.IsFuzeRoll(chip)) {
+				this.CChartScore[iPlayer].nMineAvoid++;
+				this.CSectionScore[iPlayer].nMineAvoid++;
+				this.CBranchScore[iPlayer].nMineAvoid++;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
+			}
 		}
 		this.RemoveNowProcessingRollChip(iPlayer, chip, false);
 	}
@@ -3740,6 +3763,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (NotesManager.IsKusudama(chip) && this.actBalloon.KusudamaIsActive) {
 			this.actBalloon.KusuMiss();
 		}
+
+		if (!resetStates && !chip.end.bProcessed && chip.end.bVisible) {
+			if (NotesManager.IsGenericBalloon(chip)) {
+				this.CChartScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				this.CSectionScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				this.CBranchScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nBalloonHitPass += chip.nBalloon;
+			} else {
+				this.CChartScore[iPlayer].nBarRollPass++;
+				this.CSectionScore[iPlayer].nBarRollPass++;
+				this.CBranchScore[iPlayer].nBarRollPass++;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nBarRollPass++;
+			}
+			this.actDan.Update();
+		}
+
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
 		if (this.chip現在処理中の連打チップ[iPlayer].Count == 0) {
 			this.bCurrentlyDrumRoll[iPlayer] = false;
