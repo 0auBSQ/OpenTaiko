@@ -41,23 +41,7 @@ public class Dan_C {
 		if (Amount < nowValue) isChangedAmount = true;
 		if (ExamRange == Exam.Range.Less && nowValue > GetValue()[0]) isChangedAmount = false; // n未満でその数を超えたらfalseを返す。
 		Amount = nowValue;
-		switch (ExamType) {
-			case Exam.Type.Gauge:
-			case Exam.Type.JudgePerfect:
-			case Exam.Type.JudgeGood:
-			case Exam.Type.JudgeBad:
-			case Exam.Type.Score:
-			case Exam.Type.Roll:
-			case Exam.Type.Hit:
-			case Exam.Type.Combo:
-			case Exam.Type.Accuracy:
-			case Exam.Type.JudgeADLIB:
-			case Exam.Type.JudgeMine:
-				UpdateCleared();
-				break;
-			default:
-				break;
-		}
+		UpdateCleared();
 		return isChangedAmount;
 	}
 
@@ -150,41 +134,9 @@ public class Dan_C {
 			return 0;
 		}
 		if (ExamRange == Exam.Range.More) {
-			switch (ExamType) {
-				case Exam.Type.Gauge:
-				case Exam.Type.JudgePerfect:
-				case Exam.Type.JudgeGood:
-				case Exam.Type.JudgeBad:
-				case Exam.Type.JudgeADLIB:
-				case Exam.Type.JudgeMine:
-				case Exam.Type.Score:
-				case Exam.Type.Roll:
-				case Exam.Type.Hit:
-				case Exam.Type.Combo:
-				case Exam.Type.Accuracy:
-					percent = 1.0 * Amount / GetValue()[0];
-					break;
-				default:
-					break;
-			}
+			percent = 1.0 * Amount / GetValue()[0];
 		} else {
-			switch (ExamType) {
-				case Exam.Type.Gauge:
-				case Exam.Type.JudgePerfect:
-				case Exam.Type.JudgeGood:
-				case Exam.Type.JudgeBad:
-				case Exam.Type.JudgeADLIB:
-				case Exam.Type.JudgeMine:
-				case Exam.Type.Score:
-				case Exam.Type.Roll:
-				case Exam.Type.Hit:
-				case Exam.Type.Combo:
-				case Exam.Type.Accuracy:
-					percent = (1.0 * (GetValue()[0] - Amount)) / GetValue()[0];
-					break;
-				default:
-					break;
-			}
+			percent = (1.0 * (GetValue()[0] - Amount)) / GetValue()[0];
 		}
 		percent = percent * 100.0;
 		if (percent < 0.0)
