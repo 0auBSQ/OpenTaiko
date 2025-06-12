@@ -228,7 +228,9 @@ internal class Dan_Cert : CActivity {
 
 				bool judge = judgeEveryTime
 					|| (judgeOnlyAfterLastNote && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
-					|| (!judgeOnlyAfterLastNote && score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
+					|| (score.lastChip?.bHit ?? true)
+					|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
+						&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
 
 				if (judge) {
 					switch (Challenge[i].ExamType) {
