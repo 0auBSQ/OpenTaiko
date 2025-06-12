@@ -465,7 +465,7 @@ public static class ImGuiDebugWindow {
 													for (int i = 0; i < dan_song.Dan_C.Length; i++) {
 														if (dan_song.Dan_C[i] != null) {
 															var dan_c = dan_song.Dan_C[i];
-															ImGui.Text($"Exam {i+1}: {dan_c.GetExamType()} ({dan_c.GetExamRange()} - {dan_c.GetValue(false)} - {dan_c.GetValue(true)})");
+															ImGui.Text($"Exam {i+1}: {dan_c.ExamType} ({dan_c.ExamRange} - {dan_c.GetValue()[0]} - {dan_c.GetValue()[1]})");
 														}
 														else
 															ImGui.TextDisabled($"Exam {i+1}: null");

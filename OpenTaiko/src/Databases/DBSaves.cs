@@ -412,7 +412,7 @@ internal class DBSaves {
 				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
 					for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
 						if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
-							int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
+							int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].Amount;
 							danResults[j].Add(amount);
 						}
 					}
@@ -472,9 +472,9 @@ internal class DBSaves {
 									int current = oldDanResults[j][i];
 									if (current == -1) {
 										danResults[j][i] = amount;
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More) {
+									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.More) {
 										danResults[j][i] = Math.Max(amount, current);
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less) {
+									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.Less) {
 										danResults[j][i] = Math.Min(amount, current);
 									}
 								}

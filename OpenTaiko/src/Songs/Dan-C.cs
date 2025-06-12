@@ -9,7 +9,7 @@ public class Dan_C {
 
 	}
 
-	public Dan_C(Dan_C dan_C) : this(dan_C.GetExamType(), new int[] { dan_C.GetValue(false), dan_C.GetValue(true) }, dan_C.GetExamRange()) {
+	public Dan_C(Dan_C dan_C) : this(dan_C.ExamType, dan_C.GetValue(), dan_C.ExamRange) {
 
 	}
 
@@ -19,12 +19,12 @@ public class Dan_C {
 	/// <param name="examType">条件の種別。</param>
 	/// <param name="value">条件の合格量。</param>
 	/// <param name="examRange">条件の合格の範囲。</param>
-	public Dan_C(Exam.Type examType, int[] value, Exam.Range examRange) {
+	public Dan_C(Exam.Type examType, ReadOnlySpan<int> value, Exam.Range examRange) {
 		IsEnable = true;
 		NotReached = false;
-		SetExamType(examType);
+		ExamType = examType;
 		SetValue(value[0], value[1]);
-		SetExamRange(examRange);
+		ExamRange = examRange;
 	}
 
 	/// <summary>
@@ -37,11 +37,11 @@ public class Dan_C {
 		if (nowValue < 0)
 			return isChangedAmount;
 
-		if (!GetEnable()) return isChangedAmount;
-		if (GetAmount() < nowValue) isChangedAmount = true;
-		if (GetExamRange() == Exam.Range.Less && nowValue > GetValue(false)) isChangedAmount = false; // n未満でその数を超えたらfalseを返す。
-		SetAmount(nowValue);
-		switch (GetExamType()) {
+		if (!ExamIsEnable) return isChangedAmount;
+		if (Amount < nowValue) isChangedAmount = true;
+		if (ExamRange == Exam.Range.Less && nowValue > GetValue()[0]) isChangedAmount = false; // n未満でその数を超えたらfalseを返す。
+		Amount = nowValue;
+		switch (ExamType) {
 			case Exam.Type.Gauge:
 			case Exam.Type.JudgePerfect:
 			case Exam.Type.JudgeGood:
@@ -53,7 +53,7 @@ public class Dan_C {
 			case Exam.Type.Accuracy:
 			case Exam.Type.JudgeADLIB:
 			case Exam.Type.JudgeMine:
-				SetCleared();
+				UpdateCleared();
 				break;
 			default:
 				break;
@@ -65,9 +65,7 @@ public class Dan_C {
 	/// 段位認定の条件が有効であるかどうかを返します。
 	/// </summary>
 	/// <returns>段位認定の条件が有効であるかどうか。</returns>
-	public bool GetEnable() {
-		return this.IsEnable;
-	}
+	public bool ExamIsEnable => this.IsEnable;
 
 	/// <summary>
 	/// 各合格条件のボーダーを設定します。
@@ -84,75 +82,43 @@ public class Dan_C {
 	/// </summary>
 	/// <param name="isGoldValue">trueを指定すると、金合格条件を返します。</param>
 	/// <returns>合格条件の値。</returns>
-	public int GetValue(bool isGoldValue) {
-		return isGoldValue == true ? this.Value[1] : this.Value[0];
-	}
-
-	/// <summary>
-	/// 現在の値を設定します。
-	/// </summary>
-	/// <param name="amount">現在の値。</param>
-	public void SetAmount(int amount) {
-		this.Amount = amount;
-	}
-
-	/// <summary>
-	/// 現在の値を返します。
-	/// </summary>
-	/// <returns>現在の値。</returns>
-	public int GetAmount() {
-		return this.Amount;
-	}
+	public ReadOnlySpan<int> GetValue() => this.Value;
 
 	/// <summary>
 	/// 条件の種別を返します。
 	/// </summary>
 	/// <returns>条件の種別</returns>
-	public Exam.Type GetExamType() {
-		return this.Type;
-	}
-
 	/// <summary>
 	/// 条件の種別を設定します。
 	/// </summary>
 	/// <param name="type">条件の種別。</param>
-	private void SetExamType(Exam.Type type) {
-		this.Type = type;
-	}
+	public Exam.Type ExamType { get => this.Type; private set => this.Type = value; }
 
 	/// <summary>
 	/// 条件の範囲を返します。
 	/// </summary>
 	/// <returns>条件の範囲</returns>
-	public Exam.Range GetExamRange() {
-		return this.Range;
-	}
-
 	/// <summary>
 	/// 条件の範囲を設定します。
 	/// </summary>
 	/// <param name="range"></param>
-	private void SetExamRange(Exam.Range range) {
-		this.Range = range;
-	}
+	public Exam.Range ExamRange { get => this.Range; private set => this.Range = value; }
 
 	/// <summary>
 	/// 条件にクリアしているかどうか返します。
 	/// </summary>
 	/// <returns>条件にクリアしているかどうか。</returns>
-	public bool[] GetCleared() {
-		return IsCleared;
-	}
+	public ReadOnlySpan<bool> GetIsCleared() => this.IsCleared;
 
 
 	/// <summary>
 	/// 条件と現在の値をチェックして、合格もしくは金合格をしてるか否かを更新する。
 	/// </summary>
-	private void SetCleared() {
-		if (GetExamRange() == Exam.Range.More) {
-			if (GetAmount() >= GetValue(false)) {
+	private void UpdateCleared() {
+		if (ExamRange == Exam.Range.More) {
+			if (Amount >= GetValue()[0]) {
 				IsCleared[0] = true;
-				if (GetAmount() >= GetValue(true))
+				if (Amount >= GetValue()[1])
 					IsCleared[1] = true;
 				else
 					IsCleared[1] = false;
@@ -161,12 +127,12 @@ public class Dan_C {
 				IsCleared[1] = false;
 			}
 		} else {
-			if (GetAmount() < GetValue(true)) {
+			if (Amount < GetValue()[1]) {
 				IsCleared[1] = true;
 			} else {
 				IsCleared[1] = false;
 			}
-			if (GetAmount() < GetValue(false)) {
+			if (Amount < GetValue()[0]) {
 				IsCleared[0] = true;
 			} else {
 				IsCleared[0] = false;
@@ -180,11 +146,11 @@ public class Dan_C {
 	/// <returns>Amountの百分率。</returns>
 	public int GetAmountToPercent() {
 		var percent = 0.0D;
-		if (GetValue(false) == 0) {
+		if (GetValue()[0] == 0) {
 			return 0;
 		}
-		if (GetExamRange() == Exam.Range.More) {
-			switch (GetExamType()) {
+		if (ExamRange == Exam.Range.More) {
+			switch (ExamType) {
 				case Exam.Type.Gauge:
 				case Exam.Type.JudgePerfect:
 				case Exam.Type.JudgeGood:
@@ -196,13 +162,13 @@ public class Dan_C {
 				case Exam.Type.Hit:
 				case Exam.Type.Combo:
 				case Exam.Type.Accuracy:
-					percent = 1.0 * GetAmount() / GetValue(false);
+					percent = 1.0 * Amount / GetValue()[0];
 					break;
 				default:
 					break;
 			}
 		} else {
-			switch (GetExamType()) {
+			switch (ExamType) {
 				case Exam.Type.Gauge:
 				case Exam.Type.JudgePerfect:
 				case Exam.Type.JudgeGood:
@@ -214,7 +180,7 @@ public class Dan_C {
 				case Exam.Type.Hit:
 				case Exam.Type.Combo:
 				case Exam.Type.Accuracy:
-					percent = (1.0 * (GetValue(false) - GetAmount())) / GetValue(false);
+					percent = (1.0 * (GetValue()[0] - Amount)) / GetValue()[0];
 					break;
 				default:
 					break;
@@ -228,33 +194,19 @@ public class Dan_C {
 		return (int)percent;
 	}
 
-	/// <summary>
-	/// 条件に達成できる見込みがあるかどうか値を代入します。
-	/// </summary>
-	/// <param name="notReached">未達成かどうか。</param>
-	public void SetReached(bool notReached) {
-		NotReached = notReached;
-	}
-
-	/// <summary>
-	/// 条件に達成できる見込みがあるかどうかを返します。
-	/// </summary>
-	/// <returns>条件に達成できる見込みがあるかどうか。</returns>
-	public bool GetReached() {
-		return NotReached;
-	}
-
 	// オーバーライドメソッド
 	/// <summary>
 	/// ToString()のオーバーライドメソッド。段位認定モードの各条件の現在状況をString型で返します。
 	/// </summary>
 	/// <returns>段位認定モードの各条件の現在状況。</returns>
 	public override string ToString() {
-		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5}/{6} / Percent: {7} / NotReached: {8}", GetExamType(), GetValue(false), GetValue(true), GetExamRange(), GetAmount(), GetCleared()[0], GetCleared()[1], GetAmountToPercent(), GetReached());
+		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5}/{6} / Percent: {7} / NotReached: {8}",
+			ExamType, GetValue()[0], GetValue()[1], ExamRange,
+			Amount, GetIsCleared()[0], GetIsCleared()[1], GetAmountToPercent(), NotReached);
 	}
 
 
-	// フィールド
+	#region [ Serialized fields, keep their name untouched ]
 	/// <summary>
 	/// その条件が有効であるかどうか。
 	/// </summary>
@@ -270,7 +222,7 @@ public class Dan_C {
 	/// <summary>
 	/// 条件の値。
 	/// </summary>
-	public int[] Value = new int[] { 0, 0 };
+	private int[] Value = new int[] { 0, 0 };
 	/// <summary>
 	/// 量。
 	/// </summary>
@@ -278,7 +230,7 @@ public class Dan_C {
 	/// <summary>
 	/// 条件をクリアしているか否か。
 	/// </summary>
-	public readonly bool[] IsCleared = new[] { false, false };
+	private readonly bool[] IsCleared = new[] { false, false };
 
 	/// <summary>
 	/// 曲ごとの条件を格納する
@@ -290,7 +242,8 @@ public class Dan_C {
 	/// この変数が一度trueになれば、基本的にfalseに戻ることはない。
 	/// (スコア加算については、この限りではない。)
 	/// </summary>
-	private bool NotReached = false;
+	public bool NotReached = false;
+	#endregion
 }
 
 public static class Exam {
