@@ -32,14 +32,10 @@ public class Dan_C {
 	/// </summary>
 	/// <param name="nowValue">その条件の現在の値。</param>
 	public bool Update(int nowValue) {
-		var isChangedAmount = false;
-
-		if (nowValue < 0)
-			return isChangedAmount;
-
-		if (!ExamIsEnable) return isChangedAmount;
-		if (Amount < nowValue) isChangedAmount = true;
-		if (ExamRange == Exam.Range.Less && nowValue > GetValue()[0]) isChangedAmount = false; // n未満でその数を超えたらfalseを返す。
+		if (!ExamIsEnable || nowValue < 0)
+			return false;
+		bool isChangedAmount = (ExamRange == Exam.Range.Less && nowValue > Amount && Amount > GetValue()[0]) ? false // n未満でその数を超えたらfalseを返す。
+			: ((int)nowValue != (int)Amount);
 		Amount = nowValue;
 		UpdateCleared();
 		return isChangedAmount;

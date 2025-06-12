@@ -47,12 +47,7 @@ internal class Dan_Cert : CActivity {
 					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null
 						&& OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
 					{
-						if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].ExamRange == Exam.Range.Less) {
-							OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].GetValue()[0];
-						} else {
-							OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = 0;
-						}
-
+						OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = 0;
 						ExamChange[j] = true;
 					}
 				}
