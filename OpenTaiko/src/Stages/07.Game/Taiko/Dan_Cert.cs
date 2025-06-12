@@ -58,7 +58,7 @@ internal class Dan_Cert : CActivity {
 
 		OpenTaiko.stageGameScreen.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff, 0);
 
-		OpenTaiko.stageGameScreen.ftDanReSetScoreNiji(OpenTaiko.TJA.nDan_NotesCount[NowShowingNumber], OpenTaiko.TJA.nDan_BalloonCount[NowShowingNumber]);
+		OpenTaiko.stageGameScreen.ftDanReSetScoreGen4ShinUchi(NowShowingNumber);
 		OpenTaiko.stageGameScreen.ftDanReSetBranches(OpenTaiko.TJA.bHasBranchDan[NowShowingNumber]);
 
 		IsAnimating = true;

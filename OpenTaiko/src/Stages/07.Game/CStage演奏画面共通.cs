@@ -33,132 +33,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 	// CStage 実装
 
 	public int[] nNoteCount = new int[5];
-	public int[] nBalloonCount = new int[5];
+	public int[] nBalloonHitCount = new int[5];
 	public double[] nRollTimeMs = new double[5];
-	public double[] nAddScoreNiji = new double[5];
+	public double[] nAddScoreGen4ShinUchi = new double[5];
 	public int[] scoreMode = new int[5];
+
+	public int[] nNoteCount_Dan = []; // [iDanSong]
+	public int[] nBalloonHitCount_Dan = [];
+	public double[] nRollTimeMs_Dan = [];
+	public double[] nAddScoreGen4ShinUchi_Dan = [];
 
 	public override void Activate() {
 		listChip = new List<CChip>[5];
-		List<CChip>[] balloonChips = new List<CChip>[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			nNoteCount[i] = 0;
-			nBalloonCount[i] = 0;
-			nRollTimeMs[i] = 0;
-			nAddScoreNiji[i] = 0;
-
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
-
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				balloonChips[i] = new();
-				for (int j = 0; j < listChip[i].Count; j++) {
-					var chip = listChip[i][j];
-
-					if (NotesManager.IsGenericBalloon(chip)) {
-						balloonChips[i].Add(chip);
-					}
-				}
-			}
 		}
 
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CTja _dtx = OpenTaiko.GetTJA(i)!;
-
-			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
-
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				for (int j = 0; j < balloonChips[i].Count; j++) {
-					var chip = balloonChips[i][j];
-					if (NotesManager.IsKusudama(chip)) {
-						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-							if (p == i) continue;
-							var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-
-							if (chip2 == null) {
-								var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-								if (!NotesManager.IsKusudama(chip3)) {
-									chip.nChannelNo = 0x17;
-								}
-							} else if (!NotesManager.IsKusudama(chip2)) {
-								chip.nChannelNo = 0x17;
-							}
-						}
-					}
-				}
-				/*
-                for(int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
-                {
-                    for(int j = 0; j < balloonChips[p].Count; j++)
-                    {
-                        var chip = balloonChips[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
-                        if (chip == null)
-                        {
-                            var chip2 = listChip[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
-                            if (NotesManager.IsKusudama(chip2))
-                            {
-                                chip.nチャンネル番号 = NotesManager.GetNoteValueFromChar("7");
-                            }
-                        }
-                        else if (NotesManager.IsKusudama(chip) && !NotesManager.IsKusudama(balloonChips[p][j]))
-                        {
-                            chip.nチャンネル番号 = balloonChips[p][j].nチャンネル番号;
-                        }
-                    }
-                }
-                */
-			}
-
-
-
-			int _totalNotes = 0;
-			int _totalBalloons = 0;
-			double _totalRolls = 0;
-
-			/*
-            for (int j = 0; j < (_dtx.bチップがある.Branch ? 2 : 1); j++)
-            {
-                var _list = (j == 0) ? _dtx.listChip : _dtx.listChip_Branch[2];
-
-                _totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
-                for (int k = 0; k < _list.Count; k++)
-                {
-                    var _chip = _list[k];
-                    _totalBalloons += _chip.nBalloon;
-                    if (NotesManager.IsRoll(_chip))
-                        _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
-                }
-            }
-            */
-
-			var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
-
-			_totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
-			for (int k = 0; k < _list.Count; k++) {
-				var _chip = _list[k];
-
-				if (NotesManager.IsGenericBalloon(_chip)) {
-					var _duration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
-					var _expectedHits = (int)(_duration / 16.6f);
-					_totalBalloons += Math.Min(_chip.nBalloon, _expectedHits);
-				}
-
-				if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
-					_totalRolls += (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
-			}
-
-			nNoteCount[i] = _totalNotes;
-			nBalloonCount[i] = _totalBalloons;
-			nRollTimeMs[i] = _totalRolls;
-		}
-
-		for (int k = 0; k < OpenTaiko.ConfigIni.nPlayerCount; k++) {
-			//nAddScoreNiji = (1000000 - (15 * RollTimems * 100) - (nBalloonCount * 100)) / TJAPlayer3.DTX.listChip.Count;
-			if (nNoteCount[k] == 0 && nBalloonCount[k] == 0) {
-				nAddScoreNiji[k] = 1000000;
-			} else {
-				nAddScoreNiji[k] = (double)Math.Ceiling((decimal)(1000000 - (nBalloonCount[k] * 100) - (nRollTimeMs[k] * 100 * 16.6)) / nNoteCount[k] / 10) * 10;
-			}
-
+		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			this.CalculateGen4ShinUchiScoreParameters_Dan();
+		} else {
+			this.CalculateGen4ShinUchiScoreParameters();
 		}
 
 
@@ -353,13 +247,119 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.t数値の初期化(true, true);
 	}
 
+	private void CalculateGen4ShinUchiScoreParameters() {
+		List<CChip>[] balloonChips = new List<CChip>[5];
 
-	public void ftDanReSetScoreNiji(int songNotes, int ballons) {
-		if (songNotes == 0 && ballons == 0) {
-			nAddScoreNiji[0] = 1000000;
-		} else {
-			nAddScoreNiji[0] = (double)Math.Ceiling((decimal)(1000000 - (ballons * 100)) / songNotes / 10) * 10;
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			this.nNoteCount[i] = 0;
+			this.nBalloonHitCount[i] = 0;
+			this.nRollTimeMs[i] = 0;
+			this.nAddScoreGen4ShinUchi[i] = 0;
+
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
+				balloonChips[i] = new();
+				for (int j = 0; j < listChip[i].Count; j++) {
+					var chip = listChip[i][j];
+
+					if (NotesManager.IsGenericBalloon(chip)) {
+						balloonChips[i].Add(chip);
+					}
+				}
+			}
 		}
+
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CTja _dtx = OpenTaiko.GetTJA(i)!;
+
+			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
+				for (int j = 0; j < balloonChips[i].Count; j++) {
+					var chip = balloonChips[i][j];
+					if (NotesManager.IsKusudama(chip)) {
+						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+							if (p == i) continue;
+							var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+
+							if (chip2 == null) {
+								var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+								if (!NotesManager.IsKusudama(chip3)) {
+									chip.nChannelNo = 0x17;
+								}
+							} else if (!NotesManager.IsKusudama(chip2)) {
+								chip.nChannelNo = 0x17;
+							}
+						}
+					}
+				}
+			}
+
+			var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
+			CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount[i], out this.nBalloonHitCount[i], out this.nRollTimeMs[i]);
+			this.nAddScoreGen4ShinUchi[i] = GetAddScoreGen4ShinUchi(this.nNoteCount[i], this.nBalloonHitCount[i], this.nRollTimeMs[i]);
+		}
+	}
+
+	private void CalculateGen4ShinUchiScoreParameters_Dan() {
+		this.nNoteCount_Dan = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nBalloonHitCount_Dan = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nRollTimeMs_Dan = new double[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nAddScoreGen4ShinUchi_Dan = new double[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+
+		CTja tja = OpenTaiko.GetTJA(0)!;
+		this.scoreMode[0] = (tja.nScoreMode >= 0) ? tja.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+
+		var _list = (tja.bチップがある.Branch) ? tja.listChip_Branch[2] : tja.listChip;
+		for (int iNextSongChip = 0, iNextSongChipNext; iNextSongChip >= 0; iNextSongChip = iNextSongChipNext) {
+			iNextSongChipNext = _list.FindIndex(iNextSongChip + 1, chip => (chip.nChannelNo == 0x9B));
+			CChip nextSongChip = _list[iNextSongChip];
+			int iDanSong = nextSongChip.n整数値_内部番号;
+			if ((nextSongChip.nChannelNo == 0x9B) && iDanSong >= 0) {
+				CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount_Dan[iDanSong], out this.nBalloonHitCount_Dan[iDanSong], out this.nRollTimeMs_Dan[iDanSong], iNextSongChip, iNextSongChipNext);
+				this.nAddScoreGen4ShinUchi_Dan[iDanSong] = GetAddScoreGen4ShinUchi(this.nNoteCount_Dan[iDanSong], this.nBalloonHitCount_Dan[iDanSong], this.nRollTimeMs_Dan[iDanSong]);
+			}
+		}
+	}
+
+	private static void CountGen4ShinUchiScoreNotes(List<CChip> listChip, out int nNotes, out int nBalloonHits, out double msRollTime, int startIdx = 0, int endIdx = -1) {
+		nNotes = 0;
+		nBalloonHits = 0;
+		msRollTime = 0;
+
+		if (endIdx < 0)
+			endIdx = listChip.Count;
+		for (int i = startIdx; i < endIdx; ++i) {
+			var _chip = listChip[i];
+			if (NotesManager.IsMissableNote(_chip))
+				++nNotes;
+
+			if (NotesManager.IsGenericBalloon(_chip)) {
+				var msDuration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
+				var expectedHits = (int)(msDuration / 1000 / 16.6f);
+				nBalloonHits += Math.Min(_chip.nBalloon, expectedHits);
+			}
+
+			if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
+				msRollTime += (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
+		}
+	}
+
+	public int GetCeilingGen4ShinUchiScore(int player)
+		=> Math.Max(1000000,
+			(int)(this.nAddScoreGen4ShinUchi[player] * this.nNoteCount[player])
+			+ (int)(this.nBalloonHitCount[player] * 100)
+			+ (int)(Math.Ceiling(16.6 * this.nRollTimeMs[player] / 1000 / 10) * 100 * 10));
+
+	public static double GetAddScoreGen4ShinUchi(int nSongNotes, int nSongBalloonHits, double msSongRollTime) {
+		if (nSongNotes == 0 && nSongBalloonHits == 0)
+			return 1000000;
+		return (double)Math.Ceiling((decimal)(
+			1000000 - (nSongBalloonHits * 100) - (16.6 * msSongRollTime / 1000 * 100)
+		) / nSongNotes / 10) * 10;
+	}
+
+	public void ftDanReSetScoreGen4ShinUchi(int iDanSong) {
+		this.nAddScoreGen4ShinUchi[0] = this.nAddScoreGen4ShinUchi_Dan[iDanSong];
 	}
 
 	public void ftDanReSetBranches(bool hasBranches) {
@@ -1756,10 +1756,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			if (OpenTaiko.ConfigIni.ShinuchiMode)  //2016.07.04 kairera0467 真打モード。
 			{
-				nAddScore = (long)nAddScoreNiji[nPlayer];
+				nAddScore = (long)nAddScoreGen4ShinUchi[nPlayer];
 
 				if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good) {
-					nAddScore = (long)nAddScoreNiji[nPlayer] / 20;
+					nAddScore = (long)nAddScoreGen4ShinUchi[nPlayer] / 20;
 					nAddScore = (long)nAddScore * 10;
 				}
 

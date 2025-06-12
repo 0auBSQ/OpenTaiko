@@ -2203,6 +2203,10 @@ internal class CTja : CActivity {
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
 
+			for (int ib = 0; ib < 3; ++ib) {
+				this.listChip_Branch[ib].Add(chip); // for per-song gen-4 Shin-uchi score calculation
+			}
+
 			// 6.2秒ディレイ
 			this.dbNowTime += msDanNextSongDelay;
 			this.dbNowBMScollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
