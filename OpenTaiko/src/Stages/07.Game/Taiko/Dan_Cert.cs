@@ -218,56 +218,40 @@ internal class Dan_Cert : CActivity {
 				Challenge[i].NotReached = !Challenge[i].GetIsCleared()[0];
 			} else {
 				// 残り音符数が0になったときに判断されるやつ
-
 				// Challenges that are judged when there are no remaining notes
-				if (score.nNotesRemainMax <= 0) {
-					// 残り音符数ゼロ
-					switch (Challenge[i].ExamType) {
-						case Exam.Type.Gauge:
-							if (Challenge[i].Amount < Challenge[i].GetValue()[0]) Challenge[i].NotReached = true;
-							break;
-						case Exam.Type.Accuracy:
-							if (Challenge[i].Amount < Challenge[i].GetValue()[0]) Challenge[i].NotReached = true;
-							break;
-						default:
-							// 何もしない
-							break;
-					}
-				}
-
+				bool judgeAfterLastNote = Challenge[i].ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
 				// Challenges that are monitored in live
-				switch (Challenge[i].ExamType) {
-					case Exam.Type.JudgePerfect:
-					case Exam.Type.JudgeGood:
-					case Exam.Type.JudgeBad:
-						if (score.nNotesRemainMax < (Challenge[i].GetValue()[0] - Challenge[i].Amount)) Challenge[i].NotReached = true;
-						break;
-					case Exam.Type.Combo:
-						if (score.nCombo + score.nNotesRemainMax < Challenge[i].GetValue()[0]
-							&& score.nHighestCombo < Challenge[i].GetValue()[0]
-							) {
-							Challenge[i].NotReached = true;
-						}
-						break;
-					default:
-						break;
-				}
+				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo;
+				// Other challenges: Check challenge fails at the end of each songs
 
-				// 音源が終了したやつの分岐。
-				// Check challenge fails at the end of each songs
+				bool judge = judgeEveryTime
+					|| (judgeAfterLastNote && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
+					|| (!judgeAfterLastNote && score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
 
-				if (score.lastChip != null && score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
+				if (judge) {
 					switch (Challenge[i].ExamType) {
-						case Exam.Type.Score:
-						case Exam.Type.Hit:
+						case Exam.Type.JudgePerfect:
+						case Exam.Type.JudgeGood:
+						case Exam.Type.JudgeBad:
+							if (Challenge[i].Amount + score.nNotesRemainMax < Challenge[i].GetValue()[0])
+								Challenge[i].NotReached = true;
+							break;
+						case Exam.Type.Combo:
+							if (score.nCombo + score.nNotesRemainMax < Challenge[i].GetValue()[0]
+								&& score.nHighestCombo < Challenge[i].GetValue()[0]
+								) {
+								Challenge[i].NotReached = true;
+							}
+							break;
+
+						default:
 						// Should be checked in live "If no remaining roll"
 						case Exam.Type.Roll:
 						// Should be checked in live "If no remaining ADLIB/Mine"
 						case Exam.Type.JudgeADLIB:
 						case Exam.Type.JudgeMine:
-							if (Challenge[i].Amount < Challenge[i].GetValue()[0]) Challenge[i].NotReached = true;
-							break;
-						default:
+							if (!Challenge[i].GetIsCleared()[0])
+								Challenge[i].NotReached = true;
 							break;
 					}
 				}
