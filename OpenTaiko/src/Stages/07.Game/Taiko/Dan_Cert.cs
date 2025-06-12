@@ -124,6 +124,7 @@ internal class Dan_Cert : CActivity {
 	private class DanExamScore {
 		public int nGood, nOk, nBad, nCombo, nHighestCombo, nRoll, nADLIB, nMine, nNotesMax, nNotesRemainMax;
 		public CChip? lastChip;
+		public bool hasBranch;
 
 		public double GetUpdatedAccuracy() => (nGood * 100 + nOk * 50) / (double)(nGood + nOk + nBad);
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - (nGood + nOk + nBad);
@@ -151,6 +152,7 @@ internal class Dan_Cert : CActivity {
 
 				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
 				lastChip = OpenTaiko.TJA.pDan_LastChip[NowShowingNumber],
+				hasBranch = OpenTaiko.TJA.bHasBranchDan[NowShowingNumber],
 			};
 			individual.nNotesRemainMax = this.songsnotesremain[NowShowingNumber] = individual.GetUpdatedNNotesRemainMax();
 			return individual;
@@ -173,6 +175,7 @@ internal class Dan_Cert : CActivity {
 
 				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
 				lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
+				hasBranch = OpenTaiko.TJA.bチップがある.Branch,
 			};
 			total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
 			return total;
@@ -226,8 +229,8 @@ internal class Dan_Cert : CActivity {
 				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo;
 				// Other challenges: Check challenge fails at the end of each songs
 
-				bool judge = judgeEveryTime
-					|| (judgeOnlyAfterLastNote && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
+				bool judge = (judgeEveryTime && !score.hasBranch) // workaround: prevent judging too early for branched charts
+					|| (judgeOnlyAfterLastNote && !score.hasBranch && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
 					|| (score.lastChip?.bHit ?? true)
 					|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
 						&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
