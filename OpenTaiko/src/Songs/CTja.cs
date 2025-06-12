@@ -229,7 +229,6 @@ internal class CTja : CActivity {
 		get;
 		private set;
 	}
-	public bool b分岐を一回でも開始した = false; //2020.04.22 akasoko26 分岐譜面のみ値を代入するように。
 
 	public int nPlayerSide; //2017.08.14 kairera0467 引数で指定する
 	public bool bSession譜面を読み込む;
@@ -310,16 +309,16 @@ internal class CTja : CActivity {
 	//分岐関連
 	private ECourse n現在のコース = ECourse.eNormal;
 
-	private bool b最初の分岐である;
 	public int[] nノーツ数 = new int[4]; //3:共通
 
 	public int[] nDan_NotesCount = new int[1];
-	public int[] nDan_BalloonCount = new int[1];
-	// public int[] nDan_BallonCount = new int[1];
+	public int[] nDan_AdLibCount = new int[1];
+	public int[] nDan_MineCount = new int[1];
+	public int[] nDan_BalloonHitCount = new int[1];
+	public int[] nDan_BarRollCount = new int[1];
 
 	public int[] nノーツ数_Branch = new int[4]; //
 	public CChip[] pDan_LastChip;
-	public int[] n風船数 = new int[4]; //0～2:各コース 3:共通
 
 	private List<int> divsPerMeasureAllBranches; // [iMeasureAllBranches]
 	private int nLineCountTemp; //分岐開始時の小節数を記録。
@@ -491,8 +490,6 @@ internal class CTja : CActivity {
 			this.b配点が指定されている[1, y] = false;
 			this.b配点が指定されている[2, y] = false;
 		}
-
-		this.b最初の分岐である = true;
 
 		this.SongVol = CSound.DefaultSongVol;
 		this.SongLoudnessMetadata = null;
@@ -2005,8 +2002,6 @@ internal class CTja : CActivity {
 			//分岐:分岐スタート
 			#region [ 譜面分岐のパース方法を作り直し ]
 			this.bチップがある.Branch = true;
-			this.b最初の分岐である = false;
-			this.b分岐を一回でも開始した = true;
 
 			//条件数値。
 			double[] nNum = new double[2];
@@ -2261,6 +2256,11 @@ internal class CTja : CActivity {
 			this.listWAV[1].strファイル名 = "";
 
 			Array.Resize(ref bHasBranchDan, List_DanSongs.Count);
+			Array.Resize(ref nDan_NotesCount, List_DanSongs.Count);
+			Array.Resize(ref nDan_AdLibCount, List_DanSongs.Count);
+			Array.Resize(ref nDan_MineCount, List_DanSongs.Count);
+			Array.Resize(ref nDan_BalloonHitCount, List_DanSongs.Count);
+			Array.Resize(ref nDan_BarRollCount, List_DanSongs.Count);
 			bHasBranchDan[bHasBranchDan.Length - 1] = false;
 
 			// チップを配置。
@@ -2762,54 +2762,33 @@ internal class CTja : CActivity {
 
 
 		if (NotesManager.IsMissableNote(chip)) {
-			#region [ 作り直し ]
 			//譜面分岐がない譜面でも値は加算されてしまうがしゃあない
 			//分岐を開始しない間は共通譜面としてみなす。
-			if (IsEndedBranching) {
-				this.nノーツ数_Branch[iBranch]++;
-
-				if (branch == ECourse.eNormal) {
-					if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-						this.nDan_NotesCount[DanSongs.Number - 1]++;
-					}
+			this.nノーツ数_Branch[iBranch]++;
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
+				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
+					this.nDan_NotesCount[DanSongs.Number - 1]++;
+					if (NotesManager.IsADLIB(chip))
+						this.nDan_AdLibCount[DanSongs.Number - 1]++;
+					else if (NotesManager.IsMine(chip))
+						this.nDan_MineCount[DanSongs.Number - 1]++;
+				}
+				if (IsEndedBranching) {
 					this.nノーツ数[3]++;
 				}
-			} else {
-				this.nノーツ数_Branch[(int)chip.nBranch]++;
-				if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
-					this.nDan_NotesCount[DanSongs.Number - 1]++;
-				}
-
-				if (!this.b分岐を一回でも開始した) {
-					//IsEndedBranching==false = forloopが行われていないときのみ
-					for (int l = 0; l < 3; l++)
-						this.nノーツ数_Branch[l]++;
-				}
 			}
-
-			#endregion
 		} else if (NotesManager.IsGenericBalloon(chip)) {
-			//風船はこのままでも機能しているので何もしない.
-			if (IsEndedBranching) {
-				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-					this.nDan_BalloonCount[DanSongs.Number - 1]++;
-				}
-			} else {
-				if (this.n参照中の難易度 == (int)Difficulty.Dan && chip.nBranch == ECourse.eMaster) {
-					this.nDan_BalloonCount[DanSongs.Number - 1]++;
-				}
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_BalloonHitCount[DanSongs.Number - 1] += chip.nBalloon;
 			}
-
-			if (this.b最初の分岐である == false) {
-				this.n風船数[(int)this.n現在のコース]++;
-			} else {
-				this.n風船数[3]++;
+		} else if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_BarRollCount[DanSongs.Number - 1]++;
+				if (NotesManager.IsFuzeRoll(chip))
+					this.nDan_MineCount[DanSongs.Number - 1]++;
 			}
-
 		}
 
-		Array.Resize(ref nDan_NotesCount, nDan_NotesCount.Length + 1);
-		Array.Resize(ref nDan_BalloonCount, nDan_BalloonCount.Length + 1);
 		if (IsEndedBranching) {
 			this.listChip_Branch[iBranch].Add(chip);
 			if (branch == ECourse.eNormal) {
