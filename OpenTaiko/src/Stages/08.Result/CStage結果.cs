@@ -219,7 +219,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int clearValue = 0;
 
@@ -409,7 +409,7 @@ internal class CStage結果 : CStage {
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -1105,7 +1105,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1503,7 +1503,7 @@ internal class CStage結果 : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs, true, offset);
 
 		#endregion
 	}

@@ -224,7 +224,7 @@ internal class Dan_Cert : CActivity {
 			bool judgeOnlyAfterLastNote = Challenge[i].ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
 
 			if (Challenge[i].ExamRange == Exam.Range.Less && !judgeOnlyAfterLastNote) {
-				Challenge[i].NotReached = !Challenge[i].GetIsCleared()[0];
+				Challenge[i].NotReached = (Challenge[i].GetExamStatus() < Exam.Status.Success);
 			} else {
 				// Challenges that are monitored in live
 				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
@@ -286,7 +286,7 @@ internal class Dan_Cert : CActivity {
 							}
 							break;
 						default:
-							if (!Challenge[i].GetIsCleared()[0])
+							if (Challenge[i].GetExamStatus() < Exam.Status.Success)
 								Challenge[i].NotReached = true;
 							break;
 					}
@@ -370,7 +370,7 @@ internal class Dan_Cert : CActivity {
 
 		OpenTaiko.Tx.DanC_Background?.t2D描画(0, 0);
 
-		DrawExam(Challenge);
+		DrawExam(this.Challenge, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 		// 幕のアニメーション
 		if (Counter_In != null) {
@@ -473,7 +473,7 @@ internal class Dan_Cert : CActivity {
 	}
 
 	// Regular ingame exams draw
-	public void DrawExam(Dan_C[] dan_C, bool isResult = false, int offX = 0) {
+	public void DrawExam(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs, bool isResult = false, int offX = 0) {
 		int count = 0;
 		int countNoGauge = 0;
 
@@ -546,26 +546,25 @@ internal class Dan_Cert : CActivity {
 				#region [Small bars]
 
 				if (ExamChange[i] == true) {
-					for (int j = 1; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; j++) {
-
-						if (!(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i] != null && OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i] != null))
+					for (int j = 1; j < danSongs.Count; j++) {
+						if (!(danSongs[j - 1].Dan_C[i] != null && danSongs[NowShowingNumber].Dan_C[i] != null))
 							continue;
 
 						// rainbowBetterSuccess (bool) : is current minibar better success ? | drawGaugeTypetwo (int) : Gauge style [0,2]
 						#region [Success type variables]
 
-						bool rainbowBetterSuccess = GetExamStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success
-													&& GetExamConfirmStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]);
+						bool rainbowBetterSuccess = danSongs[j - 1].Dan_C[i].GetExamStatus() == Exam.Status.Better_Success
+													&& GetExamConfirmStatus(danSongs[j - 1].Dan_C[i]);
 
 						int amountToPercent;
 						int drawGaugeTypetwo = 0;
 
 						if (!rainbowBetterSuccess) {
-							amountToPercent = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i].GetAmountToPercent();
+							amountToPercent = danSongs[j - 1].Dan_C[i].GetAmountToPercent();
 
 							if (amountToPercent >= 100)
 								drawGaugeTypetwo = 2;
-							else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i].ExamRange == Exam.Range.More && amountToPercent >= 70 || amountToPercent > 70)
+							else if (danSongs[j - 1].Dan_C[i].ExamRange == Exam.Range.More && amountToPercent >= 70 || amountToPercent > 70)
 								drawGaugeTypetwo = 1;
 						}
 
@@ -645,24 +644,24 @@ internal class Dan_Cert : CActivity {
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0].vcScaleRatio.Y = 0.35185f;
 
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0]?.t2D描画(miniBarPositionX + 3, miniBarPositionY + 2,
-									new Rectangle(0, 0, (int)(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Height));
+									new Rectangle(0, 0, (int)(danSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Height));
 							} else {
 								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
 								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].vcScaleRatio.Y = 0.35185f;
 
 								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo]?.t2D描画(miniBarPositionX + 3, miniBarPositionY + 2,
-									new Rectangle(0, 0, (int)(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Height));
+									new Rectangle(0, 0, (int)(danSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Height));
 							}
 
 							int _tmpMiniPadding = (int)(14f * OpenTaiko.Skin.Resolution[0] / 1280f);
 
 							// Usually +23 for gold and +17 for white, to test
 							DrawMiniNumber(
-								OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i].Amount,
+								danSongs[j - 1].Dan_C[i].Amount,
 								miniBarPositionX + 11,
 								miniBarPositionY + 20,
 								_tmpMiniPadding,
-								OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]);
+								danSongs[j - 1].Dan_C[i]);
 
 							CActSelect段位リスト.tDisplayDanIcon(j, miniBarPositionX + OpenTaiko.Skin.Game_DanC_DanIcon_Offset_Mini[0], miniBarPositionY + OpenTaiko.Skin.Game_DanC_DanIcon_Offset_Mini[1], miniIconOpacity, 0.5f, false);
 
@@ -699,7 +698,7 @@ internal class Dan_Cert : CActivity {
 				// LrainbowBetterSuccess (bool) : is current minibar better success ? | LdrawGaugeTypetwo (int) : Gauge style [0,2]
 				#region [Success type variables]
 
-				bool LrainbowBetterSuccess = GetExamStatus(dan_C[i]) == Exam.Status.Better_Success && GetExamConfirmStatus(dan_C[i]);
+				bool LrainbowBetterSuccess = dan_C[i].GetExamStatus() == Exam.Status.Better_Success && GetExamConfirmStatus(dan_C[i]);
 
 				int LamountToPercent;
 				int LdrawGaugeTypetwo = 0;
@@ -1022,19 +1021,18 @@ internal class Dan_Cert : CActivity {
 	/// n個の条件がひとつ以上達成失敗しているかどうかを返します。
 	/// </summary>
 	/// <returns>n個の条件がひとつ以上達成失敗しているか。</returns>
-	public bool GetFailedAllChallenges() {
-		var isFailed = false;
+	public static bool GetFailedAllChallenges(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs) {
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
-			if (Challenge[i] == null) continue;
-
-			for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; j++) {
-				if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i] != null) {
-					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i].NotReached) isFailed = true;
-				}
+			if (dan_C[i] == null)
+				continue;
+			for (int j = 0; j < danSongs.Count; j++) {
+				if (danSongs[j].Dan_C[i] != null && danSongs[j].Dan_C[i].NotReached)
+					return true;
 			}
-			if (Challenge[i].NotReached) isFailed = true;
+			if (dan_C[i].NotReached)
+				return true;
 		}
-		return isFailed;
+		return false;
 	}
 
 	/// <summary>
@@ -1042,45 +1040,35 @@ internal class Dan_Cert : CActivity {
 	/// </summary>
 	/// <param name="dan_C">条件。</param>
 	/// <returns>ExamStatus。</returns>
-	public Exam.Status GetExamStatus(Dan_C[] dan_C) {
+	public Exam.Status GetResultExamStatus(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs) {
 		var status = Exam.Status.Better_Success;
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
-
-
-			if (ExamChange[i] == true) {
-				for (int j = 1; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; j++) {
-					if (!(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i] != null))
-						continue;
-
-					bool rainbowBetterSuccess = GetExamStatus(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j - 1].Dan_C[i]) == Exam.Status.Better_Success;
-
-					if (!rainbowBetterSuccess) status = Exam.Status.Success;
+			if (ExamChange[i] && status == Exam.Status.Better_Success) {
+				for (int j = 0; j < danSongs.Count - 1; j++) { // last song already being checked
+					if (danSongs[j].Dan_C[i]?.GetExamStatus() < status) {
+						status = danSongs[j].Dan_C[i].GetExamStatus();
+						break;
+					}
 				}
 			}
 
-
-			if (dan_C[i] == null || dan_C[i].ExamIsEnable != true)
+			if (dan_C[i] == null || !dan_C[i].ExamIsEnable)
 				continue;
 
-			if (!dan_C[i].GetIsCleared()[1]) status = Exam.Status.Success;
-			if (!dan_C[i].GetIsCleared()[0]) return (Exam.Status.Failure);
+			if (dan_C[i].GetExamStatus() < status)
+				status = dan_C[i].GetExamStatus();
+			if (status < Exam.Status.Success) // only possible for the last reached song
+				return Exam.Status.Failure;
 		}
 
-		return status;
-	}
-
-	public Exam.Status GetExamStatus(Dan_C dan_C) {
-		var status = Exam.Status.Better_Success;
-		if (!dan_C.GetIsCleared()[1]) status = Exam.Status.Success;
-		if (!dan_C.GetIsCleared()[0]) status = Exam.Status.Failure;
 		return status;
 	}
 
 	public bool GetExamConfirmStatus(Dan_C dan_C) {
 		switch (dan_C.ExamRange) {
 			case Exam.Range.Less: {
-					if (GetExamStatus(dan_C) == Exam.Status.Better_Success && notesremain == 0)
+					if (dan_C.GetExamStatus() == Exam.Status.Better_Success && notesremain == 0)
 						return true;
 					else
 						return false;
@@ -1089,7 +1077,7 @@ internal class Dan_Cert : CActivity {
 			case Exam.Range.More: {
 					if (dan_C.ExamType == Exam.Type.Accuracy && notesremain != 0)
 						return false;
-					else if (GetExamStatus(dan_C) == Exam.Status.Better_Success)
+					else if (dan_C.GetExamStatus() == Exam.Status.Better_Success)
 						return true;
 					else
 						return false;
@@ -1098,10 +1086,7 @@ internal class Dan_Cert : CActivity {
 		return false;
 	}
 
-	public Dan_C[] GetExam() {
-		return Challenge;
-	}
-
+	public ReadOnlySpan<Dan_C> GetExam() => this.Challenge;
 
 	private readonly float[] ScoreScale = new float[]
 	{
