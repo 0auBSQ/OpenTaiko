@@ -88,8 +88,10 @@ public class Dan_C {
 	/// 条件にクリアしているかどうか返します。
 	/// </summary>
 	/// <returns>条件にクリアしているかどうか。</returns>
-	public ReadOnlySpan<bool> GetIsCleared() => this.IsCleared;
-
+	public Exam.Status GetExamStatus()
+		=> this.IsCleared[1] ? Exam.Status.Better_Success
+			: this.IsCleared[0] ? Exam.Status.Success
+			: Exam.Status.Failure;
 
 	/// <summary>
 	/// 条件と現在の値をチェックして、合格もしくは金合格をしてるか否かを更新する。
@@ -124,9 +126,9 @@ public class Dan_C {
 	/// </summary>
 	/// <returns>段位認定モードの各条件の現在状況。</returns>
 	public override string ToString() {
-		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5}/{6} / Percent: {7} / NotReached: {8}",
+		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5} / Percent: {6} / NotReached: {7}",
 			ExamType, GetValue()[0], GetValue()[1], ExamRange,
-			Amount, GetIsCleared()[0], GetIsCleared()[1], GetAmountToPercent(), NotReached);
+			Amount, GetExamStatus(), GetAmountToPercent(), NotReached);
 	}
 
 

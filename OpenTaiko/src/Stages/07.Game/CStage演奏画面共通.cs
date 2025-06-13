@@ -22,6 +22,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			Drums.nOkCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Great : this.nHitCount_ExclAuto.Drums.Great;
 			Drums.nBadCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Miss : this.nHitCount_ExclAuto.Drums.Miss;
 
+			// save result, as the original will be cleaned
+			// individual exams are saved to stageGameSelection
 			var danC = OpenTaiko.stageGameScreen.actDan.GetExam();
 			for (int i = 0; i < danC.Length; i++) {
 				Drums.Dan_C[i] = danC[i];
@@ -2815,7 +2817,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (pChip.nBranch == this.nCurrentBranch[nPlayer]) {
 							this.actDan.Update();
 							if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
-								if (this.actDan.GetFailedAllChallenges()) {
+								if (Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 									this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 									IsDanFailed = true;
 									return true;
