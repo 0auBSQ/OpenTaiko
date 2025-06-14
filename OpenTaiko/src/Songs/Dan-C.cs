@@ -21,7 +21,7 @@ public class Dan_C {
 	/// <param name="examRange">条件の合格の範囲。</param>
 	public Dan_C(Exam.Type examType, ReadOnlySpan<int> value, Exam.Range examRange) {
 		IsEnable = true;
-		NotReached = false;
+		ReachStatus = Exam.ReachStatus.Low;
 		ExamType = examType;
 		SetValue(value[0], value[1]);
 		ExamRange = examRange;
@@ -126,9 +126,9 @@ public class Dan_C {
 	/// </summary>
 	/// <returns>段位認定モードの各条件の現在状況。</returns>
 	public override string ToString() {
-		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5} / Percent: {6} / NotReached: {7}",
+		return String.Format("Type: {0} / Value: {1}/{2} / Range: {3} / Amount: {4} / Clear: {5} / Percent: {6} / ReachStatus: {7}",
 			ExamType, GetValue()[0], GetValue()[1], ExamRange,
-			Amount, GetExamStatus(), GetAmountToPercent(), NotReached);
+			Amount, GetExamStatus(), GetAmountToPercent(), ReachStatus);
 	}
 
 
@@ -168,8 +168,10 @@ public class Dan_C {
 	/// この変数が一度trueになれば、基本的にfalseに戻ることはない。
 	/// (スコア加算については、この限りではない。)
 	/// </summary>
-	public bool NotReached = false;
+	[Obsolete("use `ReachStatus == Exam.ReachStatus.Failure`")] private bool NotReached = false;
 	#endregion
+
+	[NonSerialized] public Exam.ReachStatus ReachStatus = Exam.ReachStatus.Low;
 }
 
 public static class Exam {
@@ -222,4 +224,23 @@ public static class Exam {
 		/// </summary>
 		Better_Success
 	}
+
+	public enum ReachStatus {
+		Failure = -2, // grey (transparent)
+		Danger = -1, // blinking red
+		Low = 0, // more: yellow / less: red
+		High, // light yellow
+		Near_Success, // blinking light yellow
+		Nearer_Success, // rapidly blinking light yellow
+		Success_Or_Better, // pink
+		Near_Better_Success, // blinking pink
+		Nearer_Better_Success, // rapidly blinking pink
+		Better_Success, // rainbow
+	}
+
+	public static ReachStatus ToReachStatus(Status status) => status switch {
+		Status.Success => ReachStatus.Success_Or_Better,
+		Status.Better_Success => ReachStatus.Better_Success,
+		_ => ReachStatus.Failure,
+	};
 }
