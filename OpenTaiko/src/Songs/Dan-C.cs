@@ -118,6 +118,15 @@ public class Dan_C {
 		return (int)double.Clamp(ratio * 100.0, 0.0, 100.0);
 	}
 
+	public double GetBetterAmountToPercent() {
+		if (this.Type is Exam.Type.Accuracy)
+			return 0; // uses its own rules
+		if (GetValue()[1] - GetValue()[0] <= 0)
+			return (this.GetDisplayedAmount() >= GetValue()[0]) ? 100 : 0;
+		double ratio = (double)(this.GetDisplayedAmount() - GetValue()[0]) / (GetValue()[1] - GetValue()[0]);
+		return double.Clamp(ratio * 100.0, 0.0, 100.0);
+	}
+
 	public int GetDisplayedAmount() {
 		int amount = (this.ExamRange != Exam.Range.Less) ? this.Amount : this.GetValue()[0] - this.Amount;
 		return Math.Max(0, amount);
