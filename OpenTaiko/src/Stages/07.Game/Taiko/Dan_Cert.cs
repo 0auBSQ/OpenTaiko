@@ -124,6 +124,7 @@ internal class Dan_Cert : CActivity {
 	private class DanExamScore {
 		public CStage演奏画面共通.CBRANCHSCORE? judges;
 		public int nCombo, nHighestCombo, nNotesMax, nNotesRemainMax;
+		public double msBarRollMax;
 		public int nBarRollMax, nBalloonHitMax, nAdLibMax, nMineMax;
 		public CChip? lastChip;
 		public bool hasBranch;
@@ -146,6 +147,7 @@ internal class Dan_Cert : CActivity {
 				judges = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber],
 				nCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nCombo,
 				nHighestCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nHighestCombo,
+				msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan[NowShowingNumber],
 
 				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
 				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount[NowShowingNumber],
@@ -168,6 +170,7 @@ internal class Dan_Cert : CActivity {
 				judges = OpenTaiko.stageGameScreen.CChartScore[0],
 				nCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1,
 				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
+				msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan.Sum(),
 
 				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
 				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount.Sum(),
@@ -338,7 +341,11 @@ internal class Dan_Cert : CActivity {
 						dan_C.ReachStatus = Exam.ReachStatus.Failure;
 						return true;
 					}
-					// TODO: detect danger status by roll length
+					double msRemainBarRoll = CTja.TjaDurationToGameDuration(score.msBarRollMax - (score.judges!.msBarRollPass + OpenTaiko.stageGameScreen.msCurrentBarRollProgress[0]));
+					if (dan_C.Amount + boundedHitsRemainMax + 20.0 * msRemainBarRoll / 1000 < dan_C.GetValue()[0]) {
+						dan_C.ReachStatus = Exam.ReachStatus.Danger;
+						return true;
+					}
 				}
 				resetDangerStatusIfSuccess(dan_C);
 			} else {

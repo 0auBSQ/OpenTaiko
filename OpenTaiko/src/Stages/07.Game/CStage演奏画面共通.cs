@@ -392,6 +392,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			ctChipAnimeLag[i] = null;
 			OpenTaiko.ConfigIni.nGameType[i] = eFirstGameType[i];
 			bSplitLane[i] = false;
+			this.msCurrentBarRollProgress[i] = 0;
 		}
 
 		this.nowProcessingKusudama = null;
@@ -513,6 +514,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		public int nMineAvoid;
 		public int nBarRollPass;
 		public int nBalloonHitPass;
+		public double msBarRollPass;
 		// only used for dan-i
 		public int nHighestCombo;
 		public int nCombo;
@@ -700,6 +702,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private CChip? nowProcessingKusudama = null;
 	public List<CChip>[] chip現在処理中の連打チップ = [[], [], [], [], []]; // [iPlayer][idxNowProcessingRoll]
+	public double[] msCurrentBarRollProgress = [0, 0, 0, 0, 0]; // [iPlayer]
 
 	protected const int NOTE_GAP = 25;
 	public int nLoopCount_Clear;
@@ -3779,6 +3782,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.CBranchScore[iPlayer].nBarRollPass++;
 				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					this.DanSongScore[actDan.NowShowingNumber].nBarRollPass++;
+
+				double msRollLength = chip.end.n発声時刻ms - chip.n発声時刻ms;
+				this.CChartScore[iPlayer].msBarRollPass += msRollLength;
+				this.CSectionScore[iPlayer].msBarRollPass += msRollLength;
+				this.CBranchScore[iPlayer].msBarRollPass += msRollLength;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].msBarRollPass += msRollLength;
 			}
 			this.actDan.Update();
 		}
@@ -4224,6 +4234,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			OpenTaiko.ConfigIni.nGameType[i] = this.eFirstGameType[i];
 			this.bSplitLane[i] = false;
+			this.msCurrentBarRollProgress[i] = 0;
 
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
 				var chip = this.chip現在処理中の連打チップ[i][iChip];
