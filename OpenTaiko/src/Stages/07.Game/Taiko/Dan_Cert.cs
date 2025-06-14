@@ -231,6 +231,7 @@ internal class Dan_Cert : CActivity {
 		_ => 0, // ... or for red
 	};
 
+
 	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score) {
 		// 条件の達成見込みがあるかどうか判断する。
 		var dan_C = this.Challenge[iExam];
@@ -246,101 +247,234 @@ internal class Dan_Cert : CActivity {
 			|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
 				&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
 
-		if (dan_C.ExamRange == Exam.Range.Less && !judgeOnlyAfterLastNote) {
-			if (dan_C.GetExamStatus() < Exam.Status.Success) {
-				dan_C.ReachStatus = Exam.ReachStatus.Failure;
-			} else if (isAfterLastNote || isAfterLastChip) {
-				dan_C.ReachStatus = Exam.ToReachStatus(dan_C.GetExamStatus());
-			} else {
-				dan_C.ReachStatus = dan_C.GetAmountToPercent() switch {
-					>= 100 => Exam.ReachStatus.Success_Or_Better,
-					> 70 => Exam.ReachStatus.High,
-					_ => Exam.ReachStatus.Low,
-				};
-			}
-		} else {
-			if (!judgeOnlyAfterLastNote || isAfterLastNote || isAfterLastChip) {
+		// returns whether the final judge has been done
+		static bool doFinalJudge(Dan_C dan_C) {
+			var clearStatus = dan_C.GetExamStatus();
+			dan_C.ReachStatus = Exam.ToReachStatus(clearStatus); // also reset danger status
+			return (clearStatus != Exam.Status.Success); // return false for further checking reach status
+		}
+
+		if (isAfterLastChip && doFinalJudge(dan_C))
+			return;
+
+		if (dan_C.ReachStatus == Exam.ReachStatus.Failure)
+			return;
+
+		if (!judgeOnlyAfterLastNote) {
+			if (dan_C.ExamRange != Exam.Range.Less) {
 				if (dan_C.GetExamStatus() == Exam.Status.Better_Success) {
 					dan_C.ReachStatus = Exam.ReachStatus.Better_Success;
 					return;
 				}
-			}
-
-			// Challenges that are monitored in live
-			bool judgeEveryTime = dan_C.ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
-				or Exam.Type.JudgeADLIB or Exam.Type.JudgeMine or Exam.Type.Roll or Exam.Type.Hit or Exam.Type.Accuracy;
-			// Other challenges: Check challenge fails at the end of each songs
-
-			bool judge = (judgeEveryTime && !score.hasBranch) // workaround: prevent judging too early for branched charts
-				|| (judgeOnlyAfterLastNote && isAfterLastNote)
-				|| isAfterLastChip;
-
-			if (judge) {
-				switch (dan_C.ExamType) {
-					case Exam.Type.JudgePerfect:
-					case Exam.Type.JudgeGood:
-					case Exam.Type.JudgeBad:
-						if (dan_C.Amount + score.nNotesRemainMax < dan_C.GetValue()[0])
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						break;
-					case Exam.Type.JudgeADLIB:
-						if ((score.nAdLibMax - score.judges!.nADLIBMiss) < dan_C.GetValue()[0])
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						break;
-					case Exam.Type.JudgeMine:
-						if ((score.nMineMax - score.judges!.nMineAvoid) < dan_C.GetValue()[0])
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						break;
-					case Exam.Type.Combo:
-						if (score.nCombo + score.nNotesRemainMax < dan_C.GetValue()[0]
-							&& score.nHighestCombo < dan_C.GetValue()[0]
-							) {
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						}
-						break;
-					case Exam.Type.Roll:
-						if (dan_C.Amount + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < dan_C.GetValue()[0]
-							&& score.nBarRollMax <= score.judges.nBarRollPass
-							) {
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						}
-						break;
-					case Exam.Type.Hit:
-						if (dan_C.Amount + score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < dan_C.GetValue()[0]
-							&& score.nBarRollMax <= score.judges.nBarRollPass
-							) {
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						}
-						break;
-					case Exam.Type.Accuracy:
-						if (dan_C.ExamRange != Exam.Range.Less) {
-							double accPointMax = (score.judges!.nGreat! + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
-							if (accPointMax < dan_C.GetValue()[0] * score.nNotesMax)
-								dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						} else {
-							double accPointMin = score.judges!.nGreat! * 100 + score.judges.nGood * 50;
-							if (accPointMin >= dan_C.GetValue()[0] * score.nNotesMax) {
-								dan_C.ReachStatus = Exam.ReachStatus.Failure;
-							} else if (isAfterLastNote || isAfterLastChip) {
-								dan_C.ReachStatus = Exam.ToReachStatus(dan_C.GetExamStatus());
-							}
-						}
-						break;
-					default:
-						if (dan_C.GetExamStatus() < Exam.Status.Success)
-							dan_C.ReachStatus = Exam.ReachStatus.Failure;
-						break;
-				}
-
-				if (dan_C.ReachStatus != Exam.ReachStatus.Failure) {
-					dan_C.ReachStatus = dan_C.GetAmountToPercent() switch {
-						>= 100 => Exam.ReachStatus.Success_Or_Better,
-						> 70 => Exam.ReachStatus.High,
-						_ => Exam.ReachStatus.Low,
-					};
+			} else {
+				if (dan_C.GetExamStatus() == Exam.Status.Failure) {
+					dan_C.ReachStatus = Exam.ReachStatus.Failure;
+					return;
 				}
 			}
 		}
+
+		// Challenges that are monitored in live
+		bool judgeFailureEveryTime = dan_C.ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
+			or Exam.Type.JudgeADLIB or Exam.Type.JudgeMine or Exam.Type.Roll or Exam.Type.Hit or Exam.Type.Accuracy;
+		// Other challenges: Check challenge fails at the end of each songs
+
+		bool judgeFailure = (judgeFailureEveryTime && !score.hasBranch) || isAfterLastChip; // workaround: prevent judging too early for branched charts
+
+		static void resetDangerStatusIfSuccess(Dan_C dan_C) {
+			if (dan_C.GetExamStatus() >= Exam.Status.Success)
+				dan_C.ReachStatus = Exam.ToReachStatus(dan_C.GetExamStatus()); // reset danger status
+		}
+
+		// returns whether the final judge has been done
+		static bool judgeGenericMore(DanExamScore score, Dan_C dan_C, bool judgeFailure, double amountRemainMax) {
+			if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
+				return true;
+			if (dan_C.GetExamStatus() < Exam.Status.Success) {
+				if (judgeFailure && amountRemainMax < dan_C.GetValue()[0] - dan_C.Amount) {
+					dan_C.ReachStatus = Exam.ReachStatus.Failure;
+					return true;
+				}
+				if (amountRemainMax - 0.02 * amountRemainMax < dan_C.GetValue()[0] - dan_C.Amount) {
+					dan_C.ReachStatus = Exam.ReachStatus.Danger;
+					return true;
+				}
+			}
+			resetDangerStatusIfSuccess(dan_C);
+			return false;
+		}
+
+		static bool judgeGenericLess(DanExamScore score, Dan_C dan_C, double amountRemainMax) {
+			if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
+				return true;
+			if (dan_C.Amount + 4 >= dan_C.GetValue()[0] && dan_C.Amount > 0) {
+				dan_C.ReachStatus = Exam.ReachStatus.Danger;
+				return true;
+			}
+			resetDangerStatusIfSuccess(dan_C);
+			return false;
+		}
+
+		static bool judgeGeneric(DanExamScore score, Dan_C dan_C, bool judgeFailure, double amountRemainMax) {
+			if (dan_C.ExamRange != Exam.Range.Less) {
+				if (judgeGenericMore(score, dan_C, judgeFailure, amountRemainMax))
+					return true;
+			} else {
+				if (judgeGenericLess(score, dan_C, amountRemainMax))
+					return true;
+			}
+			return false;
+		}
+
+		static bool judgeRoll(DanExamScore score, Dan_C dan_C, bool judgeFailure, double notesRemainMax, double boundedHitsRemainMax) {
+			if (dan_C.ExamRange != Exam.Range.Less) {
+				if (!score.hasBranch && notesRemainMax <= 0 && doFinalJudge(dan_C))
+					return true;
+				if (dan_C.GetExamStatus() < Exam.Status.Success) {
+					if (judgeFailure
+						&& (dan_C.Amount + boundedHitsRemainMax < dan_C.GetValue()[0])
+						&& (score.nBarRollMax <= score.judges!.nBarRollPass)
+						) {
+						dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						return true;
+					}
+					// TODO: detect danger status by roll length
+				}
+				resetDangerStatusIfSuccess(dan_C);
+			} else {
+				if (judgeGenericLess(score, dan_C, notesRemainMax))
+					return true;
+			}
+			return false;
+		}
+
+		double amountMax = score.nNotesMax;
+		double amountRemainMax = score.nNotesRemainMax;
+		switch (dan_C.ExamType) {
+			case Exam.Type.JudgePerfect:
+			case Exam.Type.JudgeGood:
+			case Exam.Type.JudgeBad:
+				if (judgeGeneric(score, dan_C, judgeFailure, amountRemainMax))
+					return;
+				break;
+			case Exam.Type.JudgeADLIB:
+				amountMax = score.nAdLibMax;
+				amountRemainMax = amountMax - score.judges!.nADLIBMiss;
+				if (judgeGeneric(score, dan_C, judgeFailure, amountRemainMax))
+					return;
+				break;
+			case Exam.Type.JudgeMine:
+				amountMax = score.nMineMax;
+				amountRemainMax = score.nMineMax - score.judges!.nMineAvoid;
+				if (judgeGeneric(score, dan_C, judgeFailure, amountRemainMax))
+					return;
+				break;
+			case Exam.Type.Combo:
+				if (dan_C.ExamRange != Exam.Range.Less) {
+					if (!score.hasBranch && score.nNotesRemainMax <= 0 && doFinalJudge(dan_C))
+						return;
+					if (dan_C.GetExamStatus() < Exam.Status.Success) {
+						if (judgeFailure && score.nCombo + score.nNotesRemainMax < dan_C.GetValue()[0]) {
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+							return;
+						}
+						if (score.nNotesRemainMax - 50 <= dan_C.GetValue()[0]) {
+							dan_C.ReachStatus = Exam.ReachStatus.Danger;
+							return;
+						}
+					}
+					resetDangerStatusIfSuccess(dan_C);
+				} else {
+					if (judgeGenericLess(score, dan_C, amountRemainMax))
+						return;
+				}
+				break;
+			case Exam.Type.Roll:
+				amountMax = score.nBarRollMax + score.nBalloonHitMax;
+				amountRemainMax = (score.nBarRollMax - score.judges!.nBarRollPass) + (score.nBalloonHitMax - score.judges.nBalloonHitPass);
+				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, score.nBalloonHitMax - score.judges!.nBalloonHitPass))
+					return;
+				break;
+			case Exam.Type.Hit:
+				amountMax = score.nNotesMax + score.nBarRollMax + score.nBalloonHitMax;
+				amountRemainMax = score.nNotesRemainMax + (score.nBarRollMax - score.judges!.nBarRollPass) + (score.nBalloonHitMax - score.judges.nBalloonHitPass);
+				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass)))
+					return;
+				break;
+			case Exam.Type.Accuracy:
+				if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
+					return;
+				double accPointSuccess = dan_C.GetValue()[0] * score.nNotesMax;
+				double accPointBetterSuccess = dan_C.GetValue()[1] * score.nNotesMax;
+				double accPointMax = (score.judges!.nGreat + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
+				double accPoint = score.judges.nGreat * 100 + score.judges.nGood * 50;
+				if (dan_C.ExamRange != Exam.Range.Less) {
+					if (dan_C.GetExamStatus() >= Exam.Status.Success) {
+						// reuse less-type rules for blinking status
+						dan_C.ReachStatus = getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax,
+							(accPointMax >= accPointBetterSuccess) ? Exam.Status.Better_Success : Exam.Status.Success);
+						return;
+					}
+					if (judgeFailure && accPointMax < accPointSuccess) {
+						dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						return;
+					}
+					if (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess && (score.nNotesRemainMax < score.nNotesMax)) {
+						dan_C.ReachStatus = Exam.ReachStatus.Danger;
+						return;
+					}
+					// else do not blink
+					dan_C.ReachStatus = (dan_C.GetAmountToPercent() < 50) ? Exam.ReachStatus.Low : Exam.ReachStatus.High;
+					return;
+				} else {
+					if (judgeFailure && accPoint >= accPointSuccess) {
+						dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						return;
+					}
+					if (accPoint + 4 * 100 >= accPointSuccess && accPoint > 0) {
+						dan_C.ReachStatus = Exam.ReachStatus.Danger;
+						return;
+					}
+				}
+				break;
+			default:
+				if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
+					return;
+				if (judgeFailure && dan_C.GetExamStatus() < Exam.Status.Success) {
+					dan_C.ReachStatus = Exam.ReachStatus.Failure;
+					return;
+				}
+				resetDangerStatusIfSuccess(dan_C);
+				break;
+		}
+
+		if (dan_C.ReachStatus == Exam.ReachStatus.Danger)
+			return; // keep danger status
+
+		static Exam.ReachStatus getGenericSuccessStatusLess(Dan_C dan_C, double amountMax, double amountRemainMax, Exam.Status status)
+			=> ((amountMax < 0) ? 0 : 100 * amountRemainMax / amountMax) switch {
+				< 5 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Nearer_Better_Success : Exam.ReachStatus.Nearer_Success,
+				< 10 => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
+				_ => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
+			};
+
+		dan_C.ReachStatus = (dan_C.ExamRange != Exam.Range.Less) ?
+			dan_C.GetAmountToPercent() switch {
+				< 50 => Exam.ReachStatus.Low,
+				< 95 => Exam.ReachStatus.High,
+				< 100 => Exam.ReachStatus.Near_Success,
+				_ => dan_C.GetBetterAmountToPercent() switch {
+					< 100.0 / 3 => Exam.ReachStatus.Success_Or_Better,
+					< 200.0 / 3 => Exam.ReachStatus.Near_Better_Success,
+					_ => Exam.ReachStatus.Nearer_Better_Success,
+				},
+			}
+			: dan_C.GetAmountToPercent() switch {
+				< 20 => Exam.ReachStatus.Danger,
+				< 30 => Exam.ReachStatus.Low,
+				_ => getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax, dan_C.GetExamStatus())
+			};
+
 	}
 
 	public override void DeActivate() {
