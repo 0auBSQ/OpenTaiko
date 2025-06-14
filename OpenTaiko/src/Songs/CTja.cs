@@ -63,8 +63,15 @@ internal class CTja : CActivity {
 	public enum EBranchConditionType {
 		Accuracy,
 		Drumroll,
+		Drumroll_Big,
 		Score,
-		Accuracy_BigNotesOnly
+		Accuracy_Good_Big,
+		Accuracy_Good,
+		Accuracy_OK_Big,
+		Accuracy_OK,
+		Accuracy_Bad,
+		Balloon,
+		Kusudama
 	}
 
 	public class CWAV : IDisposable {
@@ -2028,8 +2035,15 @@ internal class CTja : CActivity {
 
 			var e条件 = branchStartArgumentMatch.Groups[1].Value switch {
 				"r" => EBranchConditionType.Drumroll,
+				"rb" => EBranchConditionType.Drumroll_Big,
 				"s" => EBranchConditionType.Score,
-				"d" => EBranchConditionType.Accuracy_BigNotesOnly,
+				"d" or "gb" => EBranchConditionType.Accuracy_Good_Big,
+				"g" => EBranchConditionType.Accuracy_Good,
+				"ob" => EBranchConditionType.Accuracy_OK_Big,
+				"o" => EBranchConditionType.Accuracy_OK,
+				"b" => EBranchConditionType.Accuracy_Bad,
+				"bl" => EBranchConditionType.Balloon,
+				"ks" => EBranchConditionType.Kusudama,
 				"p" or _ => EBranchConditionType.Accuracy,
 			};
 
