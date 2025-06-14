@@ -114,10 +114,13 @@ public class Dan_C {
 		if (GetValue()[0] == 0) {
 			return 0;
 		}
-		double ratio = (ExamRange != Exam.Range.Less) ?
-			(double)Amount / GetValue()[0]
-			: (double)(GetValue()[0] - Amount) / GetValue()[0];
+		double ratio = (double)this.GetDisplayedAmount() / GetValue()[0];
 		return (int)double.Clamp(ratio * 100.0, 0.0, 100.0);
+	}
+
+	public int GetDisplayedAmount() {
+		int amount = (this.ExamRange != Exam.Range.Less) ? this.Amount : this.GetValue()[0] - this.Amount;
+		return Math.Max(0, amount);
 	}
 
 	// オーバーライドメソッド
