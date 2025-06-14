@@ -1008,7 +1008,7 @@ internal class Dan_Cert : CActivity {
 				#endregion
 
 				if (ExamChange[i]) {
-					CActSelect段位リスト.tDisplayDanIcon(NowShowingNumber + 1, barXOffset + OpenTaiko.Skin.Game_DanC_DanIcon_Offset[0], barYOffset + OpenTaiko.Skin.Game_DanC_DanIcon_Offset[1], iconOpacity, 0.6f, true);
+					CActSelect段位リスト.tDisplayDanIcon(this.NowCymbolShowingNumber + 1, barXOffset + OpenTaiko.Skin.Game_DanC_DanIcon_Offset[0], barYOffset + OpenTaiko.Skin.Game_DanC_DanIcon_Offset[1], iconOpacity, 0.6f, true);
 				}
 
 
