@@ -1202,6 +1202,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return ENoteJudge.Auto;
 
 		if (!NotesManager.IsGenericRoll(pChip)) {
+			if (pChip.IsHitted || (pChip.IsMissed && (pChip.eNoteState == ENoteState.Bad)))
+				return ENoteJudge.Auto; // no repeated judgements
 			if (!pChip.IsMissed)//通り越したチップでなければ判定！
 			{
 				pChip.bHit = true;
@@ -1212,7 +1214,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		ENoteJudge eJudgeResult = ENoteJudge.Auto;
 		{
 			//連打が短すぎると発声されない
-			eJudgeResult = (bCorrectLane) ? this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer) : ENoteJudge.Miss;
+			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer) : ENoteJudge.Miss;
+			// for hit-type notes, check pChip.IsMissed instead to avoid repeated miss judgements
 
 			// AI judges
 			eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
@@ -1331,7 +1334,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CBranchScore[nPlayer].nADLIB++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
-				} else {
+				} else if (pChip.IsMissed) {
 					this.CChartScore[nPlayer].nADLIBMiss++;
 					this.CSectionScore[nPlayer].nADLIBMiss++;
 					this.CBranchScore[nPlayer].nADLIBMiss++;
@@ -1352,7 +1355,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[actDan.NowShowingNumber].nMine++;
-				} else {
+				} else if (pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
 					this.CSectionScore[nPlayer].nMineAvoid++;
 					this.CBranchScore[nPlayer].nMineAvoid++;
@@ -1411,7 +1414,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 
-		if (eJudgeResult == ENoteJudge.Poor || eJudgeResult == ENoteJudge.Miss || eJudgeResult == ENoteJudge.Bad) {
+		if (eJudgeResult == ENoteJudge.Poor || pChip.IsMissed || eJudgeResult == ENoteJudge.Bad) {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 
 			// ランナー(みすったやつ)
@@ -1556,8 +1559,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.bIsMiss[nPlayer] = false;
 				}
 				break;
-			case ENoteJudge.Poor:
 			case ENoteJudge.Miss:
+				if (pChip.IsMissed)
+					goto case ENoteJudge.Poor;
+				break;
+			case ENoteJudge.Poor:
 			case ENoteJudge.Bad: {
 					if (NotesManager.IsGenericRoll(pChip) || !(NotesManager.IsMissableNote(pChip) || bBombHit))
 						break;
@@ -2547,8 +2553,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (time <= 0) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
-								pChip.eNoteState = ENoteState.Bad;
 								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
+								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
 							}
 						}
 					}
