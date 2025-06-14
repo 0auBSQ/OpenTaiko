@@ -21,7 +21,7 @@ public class Dan_C {
 	/// <param name="examRange">条件の合格の範囲。</param>
 	public Dan_C(Exam.Type examType, ReadOnlySpan<int> value, Exam.Range examRange) {
 		IsEnable = true;
-		ReachStatus = Exam.ReachStatus.Low;
+		ReachStatus = Exam.ReachStatus.Unknown;
 		ExamType = examType;
 		SetValue(value[0], value[1]);
 		ExamRange = examRange;
@@ -238,9 +238,10 @@ public static class Exam {
 	}
 
 	public enum ReachStatus {
-		Failure = -2, // grey (transparent)
-		Danger = -1, // blinking red
-		Low = 0, // more: yellow / less: red
+		Unknown, // no transition
+		Failure, // grey (transparent)
+		Danger, // blinking red
+		Low, // more: yellow / less: red
 		High, // light yellow
 		Near_Success, // blinking light yellow
 		Nearer_Success, // rapidly blinking light yellow
