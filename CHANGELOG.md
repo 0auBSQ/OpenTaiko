@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0.76] - 2025-06-14 (Beta)
+
+- [Fix] Fix gauge clear text sometimes being incorrectly scaled on blue 1P
+
+## [0.6.0.75] - 2025-06-08 (Beta)
+
+- [Enhancement] Add custom color support for VTT lyrics
+
+## [0.6.0.74] - 2025-06-07 (Beta)
+
+- [i18n] Global Trigger and Counter Russian and Chinese Text
+
 ## [0.6.0.73] - 2025-06-07 (Beta)
 
 - [Fix] Note symbols after last comma (before #END) were treated as 16 divisions per measure

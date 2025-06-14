@@ -176,7 +176,8 @@ public class VTTParser {
 									if (tagdata.StartsWith("c.")) {
 										lyricData.Add(data);
 										data.Text = String.Empty;
-										string[] colordata = tagdata.Split('.');
+										string[] colordata = tagdata.Split('.').Skip(1).ToArray();
+										int clr_index = 0;
 										foreach (string clr in colordata) {
 											switch (clr) {
 												case "white":
@@ -228,8 +229,19 @@ public class VTTParser {
 													data.BackColor = OpenTaiko.Skin.Game_Lyric_VTTBackColor[7];
 													break;
 												default:
+													if (clr.StartsWith('#')) {
+														var hex = System.Globalization.NumberStyles.HexNumber;
+														if (clr.Length == 7 &&
+															int.TryParse(clr.Substring(1,2), hex, null, out int red) &&
+															int.TryParse(clr.Substring(3,2), hex, null, out int green) &&
+															int.TryParse(clr.Substring(5,2), hex, null, out int blue)) {
+															if (clr_index % 2 == 0) data.ForeColor = Color.FromArgb(red, green, blue);
+															else data.BackColor = Color.FromArgb(red, green, blue);
+														}
+													}
 													break;
 											}
+											clr_index++;
 										}
 									} else if (tagdata.StartsWith("lang")) {
 										string[] langdata = tagdata.Split(' ');
