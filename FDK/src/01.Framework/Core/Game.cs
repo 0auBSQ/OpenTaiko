@@ -287,8 +287,12 @@ public abstract class Game : IDisposable {
 		options.Title = Text;
 
 
-		Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
-		//Silk.NET.Windowing.Sdl.SdlWindowing.Use();
+		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
+		if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland") {
+		    Silk.NET.Windowing.Sdl.SdlWindowing.Use();
+		} else {
+		    Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
+		}
 
 		Window_ = Window.Create(options);
 
