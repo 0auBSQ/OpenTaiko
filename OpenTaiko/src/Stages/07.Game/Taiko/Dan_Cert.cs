@@ -688,7 +688,7 @@ internal class Dan_Cert : CActivity {
 
 							// Usually +23 for gold and +17 for white, to test
 							DrawMiniNumber(
-								dan_CJ.Amount,
+								dan_CJ.GetDisplayedAmount(),
 								miniBarPositionX + 11,
 								miniBarPositionY + 20,
 								_tmpMiniPadding,
@@ -850,19 +850,11 @@ internal class Dan_Cert : CActivity {
 				#endregion
 
 				#region [Print the current value number]
-
-				int nowAmount = dan_C[i].Amount;
-
-				if (dan_C[i].ExamRange == Exam.Range.Less)
-					nowAmount = dan_C[i].GetValue()[0] - dan_C[i].Amount;
-
-				if (nowAmount < 0) nowAmount = 0;
-
 				float numberXScale = isSmallGauge ? OpenTaiko.Skin.Game_DanC_Number_Small_Scale * 0.6f : OpenTaiko.Skin.Game_DanC_Number_Small_Scale;
 				float numberYScale = isSmallGauge ? OpenTaiko.Skin.Game_DanC_Number_Small_Scale * 0.8f : OpenTaiko.Skin.Game_DanC_Number_Small_Scale;
 				int numberPadding = (int)(OpenTaiko.Skin.Game_DanC_Number_Padding * (isSmallGauge ? 0.6f : 1f));
 
-				DrawNumber(nowAmount,
+				DrawNumber(dan_C[i].GetDisplayedAmount(),
 					barXOffset + OpenTaiko.Skin.Game_DanC_Number_Small_Number_Offset[0],
 					lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Number_Small_Number_Offset[1],
 					numberPadding,
