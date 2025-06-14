@@ -187,7 +187,7 @@ internal class Dan_Cert : CActivity {
 			if (Challenge[i] == null || !Challenge[i].ExamIsEnable) continue;
 			if (ExamChange[i] && Challenge[i] != OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i]) continue;
 
-			var oldReached = Challenge[i].NotReached;
+			var oldNotReached = (Challenge[i].ReachStatus == Exam.ReachStatus.Failure);
 			var isChangedAmount = false;
 
 			DanExamScore score = ExamChange[i] ? getIndividual() : getTotal();
@@ -216,84 +216,129 @@ internal class Dan_Cert : CActivity {
 					Status[i].Timer_Amount = new CCounter(0, 11, 12, OpenTaiko.Timer);
 				}
 			}
+			this.UpdateReachStatus(NowShowingNumber, i, score);
+			if (!oldNotReached && (Challenge[i].ReachStatus == Exam.ReachStatus.Failure)) {
+				Sound_Failed?.PlayStart();
+			}
+		}
+	}
 
-			// 条件の達成見込みがあるかどうか判断する。
+	public static int GetIdxExamGaugeTexture(Exam.ReachStatus reachStatus, Exam.Range rangeType) => reachStatus switch {
+		Exam.ReachStatus.Better_Success => 2, // unused
+		>= Exam.ReachStatus.Success_Or_Better => 2,
+		>= Exam.ReachStatus.High => 1,
+		Exam.ReachStatus.Low when rangeType is Exam.Range.More => 0, // TODO: add dedicated texture for more-type Low
+		_ => 0, // ... or for red
+	};
 
-			// 残り音符数が0になったときに判断されるやつ
-			// Challenges that are only judged when there are no remaining notes
-			bool judgeOnlyAfterLastNote = Challenge[i].ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
+	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score) {
+		// 条件の達成見込みがあるかどうか判断する。
+		var dan_C = this.Challenge[iExam];
 
-			if (Challenge[i].ExamRange == Exam.Range.Less && !judgeOnlyAfterLastNote) {
-				Challenge[i].NotReached = (Challenge[i].GetExamStatus() < Exam.Status.Success);
+		// 残り音符数が0になったときに判断されるやつ
+		// Challenges that are only judged when there are no remaining notes
+		bool judgeOnlyAfterLastNote = dan_C.ExamType is Exam.Type.Gauge or Exam.Type.Accuracy;
+
+		// 残り音符数ゼロ
+		bool isAfterLastNote = (!score.hasBranch && score.nNotesRemainMax <= 0);
+		// 音源が終了したやつの分岐。
+		bool isAfterLastChip = (score.lastChip?.bHit ?? true)
+			|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
+				&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
+
+		if (dan_C.ExamRange == Exam.Range.Less && !judgeOnlyAfterLastNote) {
+			if (dan_C.GetExamStatus() < Exam.Status.Success) {
+				dan_C.ReachStatus = Exam.ReachStatus.Failure;
+			} else if (isAfterLastNote || isAfterLastChip) {
+				dan_C.ReachStatus = Exam.ToReachStatus(dan_C.GetExamStatus());
 			} else {
-				// Challenges that are monitored in live
-				bool judgeEveryTime = Challenge[i].ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
-					or Exam.Type.JudgeADLIB or Exam.Type.JudgeMine or Exam.Type.Roll or Exam.Type.Hit or Exam.Type.Accuracy;
-				// Other challenges: Check challenge fails at the end of each songs
-
-				bool judge = (judgeEveryTime && !score.hasBranch) // workaround: prevent judging too early for branched charts
-					|| (judgeOnlyAfterLastNote && !score.hasBranch && score.nNotesRemainMax <= 0) // 残り音符数ゼロ
-					|| (score.lastChip?.bHit ?? true)
-					|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
-						&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)); // 音源が終了したやつの分岐。
-
-				if (judge) {
-					switch (Challenge[i].ExamType) {
-						case Exam.Type.JudgePerfect:
-						case Exam.Type.JudgeGood:
-						case Exam.Type.JudgeBad:
-							if (Challenge[i].Amount + score.nNotesRemainMax < Challenge[i].GetValue()[0])
-								Challenge[i].NotReached = true;
-							break;
-						case Exam.Type.JudgeADLIB:
-							if ((score.nAdLibMax - score.judges!.nADLIBMiss) < Challenge[i].GetValue()[0])
-								Challenge[i].NotReached = true;
-							break;
-						case Exam.Type.JudgeMine:
-							if ((score.nMineMax - score.judges!.nMineAvoid) < Challenge[i].GetValue()[0])
-								Challenge[i].NotReached = true;
-							break;
-						case Exam.Type.Combo:
-							if (score.nCombo + score.nNotesRemainMax < Challenge[i].GetValue()[0]
-								&& score.nHighestCombo < Challenge[i].GetValue()[0]
-								) {
-								Challenge[i].NotReached = true;
-							}
-							break;
-						case Exam.Type.Roll:
-							if (Challenge[i].Amount + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < Challenge[i].GetValue()[0]
-								&& score.nBarRollMax <= score.judges.nBarRollPass
-								) {
-								Challenge[i].NotReached = true;
-							}
-							break;
-						case Exam.Type.Hit:
-							if (Challenge[i].Amount + score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < Challenge[i].GetValue()[0]
-								&& score.nBarRollMax <= score.judges.nBarRollPass
-								) {
-								Challenge[i].NotReached = true;
-							}
-							break;
-						case Exam.Type.Accuracy:
-							if (Challenge[i].ExamRange != Exam.Range.Less) {
-								double accPointMax = (score.judges!.nGreat! + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
-								if (accPointMax < Challenge[i].GetValue()[0] * score.nNotesMax)
-									Challenge[i].NotReached = true;
-							} else {
-								double accPointMin = score.judges!.nGreat! * 100 + score.judges.nGood * 50;
-								if (accPointMin >= Challenge[i].GetValue()[0] * score.nNotesMax)
-									Challenge[i].NotReached = true;
-							}
-							break;
-						default:
-							if (Challenge[i].GetExamStatus() < Exam.Status.Success)
-								Challenge[i].NotReached = true;
-							break;
-					}
+				dan_C.ReachStatus = dan_C.GetAmountToPercent() switch {
+					>= 100 => Exam.ReachStatus.Success_Or_Better,
+					> 70 => Exam.ReachStatus.High,
+					_ => Exam.ReachStatus.Low,
+				};
+			}
+		} else {
+			if (!judgeOnlyAfterLastNote || isAfterLastNote || isAfterLastChip) {
+				if (dan_C.GetExamStatus() == Exam.Status.Better_Success) {
+					dan_C.ReachStatus = Exam.ReachStatus.Better_Success;
+					return;
 				}
 			}
-			if (oldReached == false && Challenge[i].NotReached == true) {
-				Sound_Failed?.PlayStart();
+
+			// Challenges that are monitored in live
+			bool judgeEveryTime = dan_C.ExamType is Exam.Type.JudgePerfect or Exam.Type.JudgeGood or Exam.Type.JudgeBad or Exam.Type.Combo
+				or Exam.Type.JudgeADLIB or Exam.Type.JudgeMine or Exam.Type.Roll or Exam.Type.Hit or Exam.Type.Accuracy;
+			// Other challenges: Check challenge fails at the end of each songs
+
+			bool judge = (judgeEveryTime && !score.hasBranch) // workaround: prevent judging too early for branched charts
+				|| (judgeOnlyAfterLastNote && isAfterLastNote)
+				|| isAfterLastChip;
+
+			if (judge) {
+				switch (dan_C.ExamType) {
+					case Exam.Type.JudgePerfect:
+					case Exam.Type.JudgeGood:
+					case Exam.Type.JudgeBad:
+						if (dan_C.Amount + score.nNotesRemainMax < dan_C.GetValue()[0])
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						break;
+					case Exam.Type.JudgeADLIB:
+						if ((score.nAdLibMax - score.judges!.nADLIBMiss) < dan_C.GetValue()[0])
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						break;
+					case Exam.Type.JudgeMine:
+						if ((score.nMineMax - score.judges!.nMineAvoid) < dan_C.GetValue()[0])
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						break;
+					case Exam.Type.Combo:
+						if (score.nCombo + score.nNotesRemainMax < dan_C.GetValue()[0]
+							&& score.nHighestCombo < dan_C.GetValue()[0]
+							) {
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						}
+						break;
+					case Exam.Type.Roll:
+						if (dan_C.Amount + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < dan_C.GetValue()[0]
+							&& score.nBarRollMax <= score.judges.nBarRollPass
+							) {
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						}
+						break;
+					case Exam.Type.Hit:
+						if (dan_C.Amount + score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass) < dan_C.GetValue()[0]
+							&& score.nBarRollMax <= score.judges.nBarRollPass
+							) {
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						}
+						break;
+					case Exam.Type.Accuracy:
+						if (dan_C.ExamRange != Exam.Range.Less) {
+							double accPointMax = (score.judges!.nGreat! + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
+							if (accPointMax < dan_C.GetValue()[0] * score.nNotesMax)
+								dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						} else {
+							double accPointMin = score.judges!.nGreat! * 100 + score.judges.nGood * 50;
+							if (accPointMin >= dan_C.GetValue()[0] * score.nNotesMax) {
+								dan_C.ReachStatus = Exam.ReachStatus.Failure;
+							} else if (isAfterLastNote || isAfterLastChip) {
+								dan_C.ReachStatus = Exam.ToReachStatus(dan_C.GetExamStatus());
+							}
+						}
+						break;
+					default:
+						if (dan_C.GetExamStatus() < Exam.Status.Success)
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+						break;
+				}
+
+				if (dan_C.ReachStatus != Exam.ReachStatus.Failure) {
+					dan_C.ReachStatus = dan_C.GetAmountToPercent() switch {
+						>= 100 => Exam.ReachStatus.Success_Or_Better,
+						> 70 => Exam.ReachStatus.High,
+						_ => Exam.ReachStatus.Low,
+					};
+				}
 			}
 		}
 	}
@@ -411,6 +456,7 @@ internal class Dan_Cert : CActivity {
 							}
 							NowCymbolShowingNumber = NowShowingNumber;
 							bExamChangeCheck = true;
+							this.Update(); // refresh reach status
 						}
 					}
 				}
@@ -547,27 +593,12 @@ internal class Dan_Cert : CActivity {
 
 				if (ExamChange[i] == true) {
 					for (int j = 1; j < danSongs.Count; j++) {
-						if (!(danSongs[j - 1].Dan_C[i] != null && danSongs[NowShowingNumber].Dan_C[i] != null))
+						Dan_C dan_CJ = danSongs[j - 1].Dan_C[i];
+						if (!(dan_CJ != null && danSongs[NowShowingNumber].Dan_C[i] != null))
 							continue;
 
-						// rainbowBetterSuccess (bool) : is current minibar better success ? | drawGaugeTypetwo (int) : Gauge style [0,2]
 						#region [Success type variables]
-
-						bool rainbowBetterSuccess = danSongs[j - 1].Dan_C[i].GetExamStatus() == Exam.Status.Better_Success
-													&& GetExamConfirmStatus(danSongs[j - 1].Dan_C[i]);
-
-						int amountToPercent;
-						int drawGaugeTypetwo = 0;
-
-						if (!rainbowBetterSuccess) {
-							amountToPercent = danSongs[j - 1].Dan_C[i].GetAmountToPercent();
-
-							if (amountToPercent >= 100)
-								drawGaugeTypetwo = 2;
-							else if (danSongs[j - 1].Dan_C[i].ExamRange == Exam.Range.More && amountToPercent >= 70 || amountToPercent > 70)
-								drawGaugeTypetwo = 1;
-						}
-
+						int idxExamGaugeTextureJ = GetIdxExamGaugeTexture(dan_CJ.ReachStatus, dan_CJ.ExamRange);
 						#endregion
 
 						// Small bar elements base opacity
@@ -579,7 +610,7 @@ internal class Dan_Cert : CActivity {
 						OpenTaiko.Tx.Gauge_Dan_Rainbow[0].Opacity = 255;
 						OpenTaiko.Tx.DanC_MiniNumber.Opacity = 255;
 
-						OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = 255;
+						OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].Opacity = 255;
 
 						int miniIconOpacity = 255;
 
@@ -596,7 +627,7 @@ internal class Dan_Cert : CActivity {
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0].Opacity = counter800;
 								OpenTaiko.Tx.DanC_MiniNumber.Opacity = counter800;
 
-								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = counter800;
+								OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].Opacity = counter800;
 
 								miniIconOpacity = counter800;
 
@@ -610,7 +641,7 @@ internal class Dan_Cert : CActivity {
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0].Opacity = 0;
 								OpenTaiko.Tx.DanC_MiniNumber.Opacity = 0;
 
-								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].Opacity = 0;
+								OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].Opacity = 0;
 
 								miniIconOpacity = 0;
 
@@ -639,29 +670,29 @@ internal class Dan_Cert : CActivity {
 							OpenTaiko.Tx.DanC_Small_ExamCymbol?.t2D描画(miniBarPositionX - 30, miniBarPositionY - 3, new RectangleF(0, (j - 1) * 28, 30, 28));
 
 							// Display bar content
-							if (rainbowBetterSuccess) {
+							if (dan_CJ.ReachStatus == Exam.ReachStatus.Better_Success) {
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0].vcScaleRatio.Y = 0.35185f;
 
 								OpenTaiko.Tx.Gauge_Dan_Rainbow[0]?.t2D描画(miniBarPositionX + 3, miniBarPositionY + 2,
-									new Rectangle(0, 0, (int)(danSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Height));
+									new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[0].szTextureSize.Height));
 							} else {
-								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
-								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].vcScaleRatio.Y = 0.35185f;
+								OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].vcScaleRatio.X = 0.23875f * OpenTaiko.Tx.DanC_SmallBase.vcScaleRatio.X * (isSmallGauge ? 0.94f : 1f);
+								OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].vcScaleRatio.Y = 0.35185f;
 
-								OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo]?.t2D描画(miniBarPositionX + 3, miniBarPositionY + 2,
-									new Rectangle(0, 0, (int)(danSongs[j - 1].Dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[drawGaugeTypetwo].szTextureSize.Height));
+								OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ]?.t2D描画(miniBarPositionX + 3, miniBarPositionY + 2,
+									new Rectangle(0, 0, (int)(dan_CJ.GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTextureJ].szTextureSize.Height));
 							}
 
 							int _tmpMiniPadding = (int)(14f * OpenTaiko.Skin.Resolution[0] / 1280f);
 
 							// Usually +23 for gold and +17 for white, to test
 							DrawMiniNumber(
-								danSongs[j - 1].Dan_C[i].Amount,
+								dan_CJ.Amount,
 								miniBarPositionX + 11,
 								miniBarPositionY + 20,
 								_tmpMiniPadding,
-								danSongs[j - 1].Dan_C[i]);
+								dan_CJ.ReachStatus);
 
 							CActSelect段位リスト.tDisplayDanIcon(j, miniBarPositionX + OpenTaiko.Skin.Game_DanC_DanIcon_Offset_Mini[0], miniBarPositionY + OpenTaiko.Skin.Game_DanC_DanIcon_Offset_Mini[1], miniIconOpacity, 0.5f, false);
 
@@ -695,25 +726,8 @@ internal class Dan_Cert : CActivity {
 
 				#region [Large bars]
 
-				// LrainbowBetterSuccess (bool) : is current minibar better success ? | LdrawGaugeTypetwo (int) : Gauge style [0,2]
 				#region [Success type variables]
-
-				bool LrainbowBetterSuccess = dan_C[i].GetExamStatus() == Exam.Status.Better_Success && GetExamConfirmStatus(dan_C[i]);
-
-				int LamountToPercent;
-				int LdrawGaugeTypetwo = 0;
-
-				if (!LrainbowBetterSuccess) {
-					LamountToPercent = dan_C[i].GetAmountToPercent();
-
-					if (LamountToPercent >= 100)
-						LdrawGaugeTypetwo = 2;
-					else if (dan_C[i].ExamRange == Exam.Range.More && LamountToPercent >= 70 || LamountToPercent > 70)
-						LdrawGaugeTypetwo = 1;
-				}
-
-
-
+				int idxExamGaugeTexture = GetIdxExamGaugeTexture(dan_C[i].ReachStatus, dan_C[i].ExamRange);
 				#endregion
 
 				// rainbowIndex : Rainbow bar texture to display (int), rainbowBase : same as rainbowIndex, but 0 if the counter is maxed
@@ -721,7 +735,7 @@ internal class Dan_Cert : CActivity {
 
 				int rainbowIndex = 0;
 				int rainbowBase = 0;
-				if (LrainbowBetterSuccess) {
+				if (dan_C[i].ReachStatus == Exam.ReachStatus.Better_Success) {
 					this.ct虹アニメ.TickLoop();
 					this.ct虹透明度.TickLoop();
 
@@ -735,7 +749,7 @@ internal class Dan_Cert : CActivity {
 
 				#region [Default opacity]
 
-				OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = 255;
+				OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].Opacity = 255;
 
 				OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = 255;
 
@@ -751,7 +765,7 @@ internal class Dan_Cert : CActivity {
 					if (Counter_Wait.CurrentValue >= 800) {
 						#region [counter800 opacity]
 
-						OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = counter800;
+						OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].Opacity = counter800;
 
 						OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = counter800;
 
@@ -765,7 +779,7 @@ internal class Dan_Cert : CActivity {
 					} else if (Counter_Wait.CurrentValue >= 800 - 255) {
 						#region [counter255M255 opacity]
 
-						OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].Opacity = counter255M255;
+						OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].Opacity = counter255M255;
 
 						OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].Opacity = counter255M255;
 
@@ -786,7 +800,7 @@ internal class Dan_Cert : CActivity {
 
 				float xExtend = ExamChange[i] ? (isSmallGauge ? 0.215f * 0.663333333f : 0.663333333f) : (isSmallGauge ? 0.32154f : 1.0f);
 
-				if (LrainbowBetterSuccess) {
+				if (dan_C[i].ReachStatus == Exam.ReachStatus.Better_Success) {
 					#region [Rainbow gauge display]
 
 					OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].vcScaleRatio.X = xExtend;
@@ -801,7 +815,9 @@ internal class Dan_Cert : CActivity {
 
 					OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex]?.t2D拡大率考慮下基準描画(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0], lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Offset[1],
-						new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Height));
+						new Rectangle(0, 0,
+							(int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Width / 100.0)),
+							OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Height));
 
 					if (Counter_Wait != null && !(Counter_Wait.CurrentValue <= 1055 && Counter_Wait.CurrentValue >= 800 - 255)) {
 						OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowBase].Opacity = (ct虹透明度.CurrentValue * 255 / (int)ct虹透明度.EndValue) / 1;
@@ -809,17 +825,21 @@ internal class Dan_Cert : CActivity {
 
 					OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowBase]?.t2D拡大率考慮下基準描画(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0], lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Offset[1],
-						new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowBase].szTextureSize.Width / 100.0)), OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Height));
+						new Rectangle(0, 0,
+							(int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowBase].szTextureSize.Width / 100.0)),
+							OpenTaiko.Tx.Gauge_Dan_Rainbow[rainbowIndex].szTextureSize.Height));
 
 					#endregion
 				} else {
 					#region [Regular gauge display]
 
-					OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].vcScaleRatio.X = xExtend;
-					OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].vcScaleRatio.Y = 1.0f;
-					OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo]?.t2D拡大率考慮下基準描画(
+					OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].vcScaleRatio.X = xExtend;
+					OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].vcScaleRatio.Y = 1.0f;
+					OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture]?.t2D拡大率考慮下基準描画(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0], lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Offset[1],
-						new Rectangle(0, 0, (int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].szTextureSize.Width / 100.0)), OpenTaiko.Tx.DanC_Gauge[LdrawGaugeTypetwo].szTextureSize.Height));
+						new Rectangle(0, 0,
+							(int)(dan_C[i].GetAmountToPercent() * (OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].szTextureSize.Width / 100.0)),
+							OpenTaiko.Tx.DanC_Gauge[idxExamGaugeTexture].szTextureSize.Height));
 
 					#endregion
 				}
@@ -847,7 +867,7 @@ internal class Dan_Cert : CActivity {
 					lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Number_Small_Number_Offset[1],
 					numberPadding,
 					true,
-					dan_C[i],
+					dan_C[i].ReachStatus,
 					numberXScale,
 					numberYScale,
 					(Status[i].Timer_Amount != null ? ScoreScale[Status[i].Timer_Amount.CurrentValue] : 0f));
@@ -881,7 +901,7 @@ internal class Dan_Cert : CActivity {
 					lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Exam_Offset[1] - 1,
 					(int)(OpenTaiko.Skin.Game_DanC_Number_Small_Padding * OpenTaiko.Skin.Game_DanC_Exam_Number_Scale),
 					false,
-					dan_C[i]);
+					dan_C[i].ReachStatus);
 
 				int _offexX = (int)(22f * OpenTaiko.Skin.Resolution[0] / 1280f);
 				int _offexY = (int)(48f * OpenTaiko.Skin.Resolution[1] / 720f);
@@ -913,7 +933,7 @@ internal class Dan_Cert : CActivity {
 
 				OpenTaiko.Tx.DanC_Failed.vcScaleRatio.X = isSmallGauge ? 0.33f : 1f;
 
-				if (dan_C[i].NotReached) {
+				if (dan_C[i].ReachStatus == Exam.ReachStatus.Failure) {
 					OpenTaiko.Tx.DanC_Failed.t2D拡大率考慮下基準描画(
 						barXOffset + OpenTaiko.Skin.Game_DanC_Offset[0],
 						lowerBarYOffset - OpenTaiko.Skin.Game_DanC_Offset[1]);
@@ -945,7 +965,7 @@ internal class Dan_Cert : CActivity {
 					OpenTaiko.Skin.Game_DanC_Y[0] - OpenTaiko.Skin.Game_DanC_Exam_Offset[1] + _nbY,
 					(int)(OpenTaiko.Skin.Game_DanC_Number_Small_Padding * OpenTaiko.Skin.Game_DanC_Exam_Number_Scale),
 					false,
-					dan_C[i]);
+					dan_C[i].ReachStatus);
 
 				#endregion
 			}
@@ -962,8 +982,7 @@ internal class Dan_Cert : CActivity {
 	/// <param name="scaleX">拡大率X</param>
 	/// <param name="scaleY">拡大率Y</param>
 	/// <param name="scaleJump">アニメーション用拡大率(Yに加算される)。</param>
-	private void DrawNumber(int value, int x, int y, int padding, bool bBig, Dan_C dan_c, float scaleX = 1.0f, float scaleY = 1.0f, float scaleJump = 0.0f) {
-
+	private static void DrawNumber(int value, int x, int y, int padding, bool bBig, Exam.ReachStatus reachStatus, float scaleX = 1.0f, float scaleY = 1.0f, float scaleJump = 0.0f) {
 		if (OpenTaiko.Tx.DanC_Number == null || OpenTaiko.Tx.DanC_Small_Number == null || value < 0)
 			return;
 
@@ -979,7 +998,7 @@ internal class Dan_Cert : CActivity {
 			var notesRemainDigit = 0;
 			for (int i = 0; i < value.ToString().Length; i++) {
 				var number = Convert.ToInt32(value.ToString()[i].ToString());
-				Rectangle rectangle = new Rectangle(OpenTaiko.Skin.Game_DanC_Number_Size[0] * number - 1, GetExamConfirmStatus(dan_c) ? OpenTaiko.Skin.Game_DanC_Number_Size[1] : 0, OpenTaiko.Skin.Game_DanC_Number_Size[0], OpenTaiko.Skin.Game_DanC_Number_Size[1]);
+				Rectangle rectangle = new Rectangle(OpenTaiko.Skin.Game_DanC_Number_Size[0] * number - 1, (reachStatus == Exam.ReachStatus.Better_Success) ? OpenTaiko.Skin.Game_DanC_Number_Size[1] : 0, OpenTaiko.Skin.Game_DanC_Number_Size[0], OpenTaiko.Skin.Game_DanC_Number_Size[1]);
 				if (OpenTaiko.Tx.DanC_Number != null) {
 					OpenTaiko.Tx.DanC_Number.vcScaleRatio.X = scaleX;
 					OpenTaiko.Tx.DanC_Number.vcScaleRatio.Y = scaleY + scaleJump;
@@ -1002,7 +1021,7 @@ internal class Dan_Cert : CActivity {
 		}
 	}
 
-	public void DrawMiniNumber(int value, int x, int y, int padding, Dan_C dan_c) {
+	public static void DrawMiniNumber(int value, int x, int y, int padding, Exam.ReachStatus reachStatus) {
 		if (OpenTaiko.Tx.DanC_MiniNumber == null || value < 0)
 			return;
 
@@ -1011,7 +1030,7 @@ internal class Dan_Cert : CActivity {
 			return;
 		for (int i = 0; i < value.ToString().Length; i++) {
 			var number = Convert.ToInt32(value.ToString()[i].ToString());
-			Rectangle rectangle = new Rectangle(OpenTaiko.Skin.Game_DanC_MiniNumber_Size[0] * number - 1, GetExamConfirmStatus(dan_c) ? OpenTaiko.Skin.Game_DanC_MiniNumber_Size[1] : 0, OpenTaiko.Skin.Game_DanC_MiniNumber_Size[0], OpenTaiko.Skin.Game_DanC_MiniNumber_Size[1]);
+			Rectangle rectangle = new Rectangle(OpenTaiko.Skin.Game_DanC_MiniNumber_Size[0] * number - 1, (reachStatus == Exam.ReachStatus.Better_Success) ? OpenTaiko.Skin.Game_DanC_MiniNumber_Size[1] : 0, OpenTaiko.Skin.Game_DanC_MiniNumber_Size[0], OpenTaiko.Skin.Game_DanC_MiniNumber_Size[1]);
 			OpenTaiko.Tx.DanC_MiniNumber.t2D拡大率考慮下中心基準描画(x - (notesRemainDigit * padding), y, rectangle);
 			notesRemainDigit--;
 		}
@@ -1026,10 +1045,10 @@ internal class Dan_Cert : CActivity {
 			if (dan_C[i] == null)
 				continue;
 			for (int j = 0; j < danSongs.Count; j++) {
-				if (danSongs[j].Dan_C[i] != null && danSongs[j].Dan_C[i].NotReached)
+				if (danSongs[j].Dan_C[i]?.ReachStatus == Exam.ReachStatus.Failure)
 					return true;
 			}
-			if (dan_C[i].NotReached)
+			if (dan_C[i].ReachStatus == Exam.ReachStatus.Failure)
 				return true;
 		}
 		return false;
@@ -1065,27 +1084,6 @@ internal class Dan_Cert : CActivity {
 		return status;
 	}
 
-	public bool GetExamConfirmStatus(Dan_C dan_C) {
-		switch (dan_C.ExamRange) {
-			case Exam.Range.Less: {
-					if (dan_C.GetExamStatus() == Exam.Status.Better_Success && notesremain == 0)
-						return true;
-					else
-						return false;
-				}
-
-			case Exam.Range.More: {
-					if (dan_C.ExamType == Exam.Type.Accuracy && notesremain != 0)
-						return false;
-					else if (dan_C.GetExamStatus() == Exam.Status.Better_Success)
-						return true;
-					else
-						return false;
-				}
-		}
-		return false;
-	}
-
 	public ReadOnlySpan<Dan_C> GetExam() => this.Challenge;
 
 	private readonly float[] ScoreScale = new float[]
@@ -1104,9 +1102,7 @@ internal class Dan_Cert : CActivity {
 		0.000f
 	};
 
-	[StructLayout(LayoutKind.Sequential)]
 	struct ChallengeStatus {
-		public Color4 Color;
 		public CCounter Timer_Gauge;
 		public CCounter Timer_Amount;
 		public CCounter Timer_Failed;
