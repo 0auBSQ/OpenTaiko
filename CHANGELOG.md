@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.76] - 2025-06-14 (Beta)
+
+- [Fix] Fix gauge clear text sometimes being incorrectly scaled on blue 1P
+
 ## [0.6.0.75] - 2025-06-08 (Beta)
 
 - [Enhancement] Add custom color support for VTT lyrics
