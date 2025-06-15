@@ -558,27 +558,20 @@ internal class Dan_Cert : CActivity {
 		Counter_Out?.Tick();
 		Counter_Text?.Tick();
 
-		if (Counter_Text != null) {
-			if (Counter_Text.CurrentValue >= 2000) {
-				for (int i = Counter_Text_Old; i < Counter_Text.CurrentValue; i++) {
-					if (i % 2 == 0) {
-						if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
-							OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity--;
-						}
-						if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-							OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity--;
-						}
-					}
-				}
-			} else {
-				if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
-					OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = 255;
-				}
-				if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-					OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = 255;
-				}
+		if (Counter_Text?.CurrentValue >= 2000) {
+			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
+				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
 			}
-			Counter_Text_Old = Counter_Text.CurrentValue;
+			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
+				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
+			}
+		} else {
+			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
+				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = 255;
+			}
+			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
+				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = 255;
+			}
 		}
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
@@ -594,11 +587,10 @@ internal class Dan_Cert : CActivity {
 		// 幕のアニメーション
 		if (Counter_In != null) {
 			if (Counter_In.IsUnEnded) {
-				for (int i = Counter_In_Old; i < Counter_In.CurrentValue; i++) {
-					ScreenPoint[0] += (ScreenPointAnchor(1) - ScreenPoint[0]) / 180.0;
-					ScreenPoint[1] += (ScreenPointAnchor(1) - ScreenPoint[1]) / 180.0;
-				}
-				Counter_In_Old = Counter_In.CurrentValue;
+				const double smoothFactor = 1 - 1 / 180.0;
+				double endValueRatio = 1 - Math.Pow(smoothFactor, Counter_In.CurrentValue);
+				ScreenPoint[0] = endValueRatio * ScreenPointAnchor(1) + (1 - endValueRatio) * ScreenPointAnchor(0);
+				ScreenPoint[1] = endValueRatio * ScreenPointAnchor(1) + (1 - endValueRatio) * ScreenPointAnchor(2);
 				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Ceiling(ScreenPoint[0]) - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
 				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Floor(ScreenPoint[1]), OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
 				//CDTXMania.act文字コンソール.tPrint(0, 420, C文字コンソール.Eフォント種別.白, String.Format("{0} : {1}", ScreenPoint[0], ScreenPoint[1]));
@@ -1277,7 +1269,6 @@ internal class Dan_Cert : CActivity {
 	public int NowCymbolShowingNumber;
 	private CCounter Counter_In, Counter_Wait, Counter_Out, Counter_Text;
 	private double[] ScreenPoint;
-	private int Counter_In_Old, Counter_Out_Old, Counter_Text_Old;
 	public bool IsAnimating;
 
 	private static double ScreenPointAnchor(int i) => i switch {
