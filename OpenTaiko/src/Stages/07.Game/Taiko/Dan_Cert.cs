@@ -518,6 +518,12 @@ internal class Dan_Cert : CActivity {
 	}
 
 	public override void DeActivate() {
+		// clear out ongoing animation
+		Counter_In = null;
+		Counter_Wait = null;
+		Counter_Out = null;
+		Counter_Text = null;
+
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			Challenge[i] = null;
 		}
@@ -558,22 +564,6 @@ internal class Dan_Cert : CActivity {
 		Counter_Out?.Tick();
 		Counter_Text?.Tick();
 
-		if (Counter_Text?.CurrentValue >= 2000) {
-			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
-				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
-			}
-			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
-			}
-		} else {
-			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex != null) {
-				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex.Opacity = 255;
-			}
-			if (OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex != null) {
-				OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex.Opacity = 255;
-			}
-		}
-
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			Status[i].Timer_Amount?.Tick();
 		}
@@ -608,6 +598,8 @@ internal class Dan_Cert : CActivity {
 
 		if (Counter_Wait != null) {
 			if (Counter_Wait.IsUnEnded) {
+				// clear out ongoing animation from last song
+				Counter_In = null;
 				OpenTaiko.Tx.DanC_Screen?.t2D描画(OpenTaiko.Skin.Game_Lane_X[0], OpenTaiko.Skin.Game_Lane_Y[0]);
 
 				if (NowShowingNumber != 0) {
@@ -629,6 +621,9 @@ internal class Dan_Cert : CActivity {
 							NowCymbolShowingNumber = NowShowingNumber;
 							bExamChangeCheck = true;
 							this.Update(); // refresh reach status
+							// clear out ongoing animation from last song
+							Counter_Out = null;
+							Counter_Text = null;
 						}
 					}
 				}
@@ -640,9 +635,25 @@ internal class Dan_Cert : CActivity {
 			}
 		}
 		if (Counter_Text != null) {
+			if (Counter_Text.CurrentValue >= 2000) {
+				if (OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].TitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].TitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
+				}
+				if (OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].SubTitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].SubTitleTex.Opacity = Math.Max(0, 255 - (Counter_Text.CurrentValue - 2000) / 2);
+				}
+			} else {
+				if (OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].TitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].TitleTex.Opacity = 255;
+				}
+				if (OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].SubTitleTex != null) {
+					OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].SubTitleTex.Opacity = 255;
+				}
+			}
 			if (Counter_Text.IsUnEnded) {
-				var title = OpenTaiko.TJA.List_DanSongs[NowShowingNumber].TitleTex;
-				var subTitle = OpenTaiko.TJA.List_DanSongs[NowShowingNumber].SubTitleTex;
+
+				var title = OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].TitleTex;
+				var subTitle = OpenTaiko.TJA.List_DanSongs[NowCymbolShowingNumber].SubTitleTex;
 				if (subTitle == null)
 					title?.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Game_DanC_Title_X[0], OpenTaiko.Skin.Game_DanC_Title_Y[0]);
 				else {
@@ -1272,7 +1283,7 @@ internal class Dan_Cert : CActivity {
 	// アニメ関連
 	public int NowShowingNumber;
 	public int NowCymbolShowingNumber;
-	private CCounter Counter_In, Counter_Wait, Counter_Out, Counter_Text;
+	private CCounter? Counter_In, Counter_Wait, Counter_Out, Counter_Text;
 	private double[] ScreenPoint;
 	public bool IsAnimating;
 
