@@ -2071,6 +2071,11 @@ internal class CTja : CActivity {
 
 			IsEndedBranching = false;
 			#endregion
+
+			// handle here for the correct dan-i song index
+			if (this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.bHasBranchDan[this.bHasBranchDan.Length - 1] = true;
+			}
 		} else if (command == "#N" || command == "#E" || command == "#M")//これCourseを全部集めてあとから分岐させればいい件
 		{
 			//開始時の情報にセット
@@ -2993,10 +2998,6 @@ internal class CTja : CActivity {
 			//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
 			//Lengthのチェックをされる前ににif文を入れています。
 			this.bHasBranch[this.n参照中の難易度] = true;
-
-			if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.bHasBranchDan[this.bHasBranchDan.Length - 1] = true;
-			}
 		}
 
 		//やべー。先頭にコメント行あったらやばいやん。
