@@ -1951,6 +1951,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
+			double msBarRollProgress = 0;
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
 				var chkChip = this.chip現在処理中の連打チップ[i][iChip];
 				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
@@ -1958,7 +1959,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
 					this.ProcessRollHeadEffects(i, chkChip);
 				}
-				if (!(NotesManager.IsGenericBalloon(chkChip) && (chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip)))) {
+				if (!NotesManager.IsGenericBalloon(chkChip)) {
+					if (chkChip.end.bVisible && chkChip.end.n発声時刻ms >= (int)nowTime)
+						msBarRollProgress += (int)nowTime - chkChip.n発声時刻ms;
+					continue;
+				}
+				if (!(chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip))) {
 					continue;
 				}
 				//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
@@ -1978,6 +1984,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 							: CActImplBalloon.EBalloonType.BALLOON
 					);
 				}
+			}
+			if (msBarRollProgress != this.msCurrentBarRollProgress[i]) {
+				this.msCurrentBarRollProgress[i] = msBarRollProgress;
+				if (i == 0)
+					this.actDan.Update();
 			}
 		}
 		#region [ Treat big notes hit with a single hand ]
