@@ -2823,20 +2823,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 						this.ListDan_Number = pChip.n整数値_内部番号;
 						this.actPanel.t歌詞テクスチャを削除する();
-						if (pChip.nBranch == this.nCurrentBranch[nPlayer]) {
-							this.actDan.Update();
-							if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
-								if (Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
-									this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
-									IsDanFailed = true;
-									return true;
-								}
-
-								// Play next song here
-								this.actDan.Start(this.ListDan_Number);
-							} else {
-								actDan.FirstSectionAnime = true;
+						this.actDan.Update();
+						if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
+							if (Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
+								IsDanFailed = true;
+								return true;
 							}
+
+							// Play next song here
+							this.actDan.Start(this.ListDan_Number);
+						} else {
+							actDan.FirstSectionAnime = true;
 						}
 					}
 					break;
