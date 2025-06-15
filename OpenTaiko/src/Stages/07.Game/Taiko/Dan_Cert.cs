@@ -588,7 +588,12 @@ internal class Dan_Cert : CActivity {
 		if (Counter_In != null) {
 			if (Counter_In.IsUnEnded) {
 				const double smoothFactor = 1 - 1 / 180.0;
-				double endValueRatio = 1 - Math.Pow(smoothFactor, Counter_In.CurrentValue);
+				const int msLinearDuration = 150;
+				int msLinearOffset = (int)(Counter_In.EndValue + 1) - msLinearDuration;
+				double endValueRatio = 1 - Math.Pow(smoothFactor, Math.Min(msLinearOffset, Counter_In.CurrentValue));
+				if (Counter_In.CurrentValue > msLinearOffset) {
+					endValueRatio += (1 - endValueRatio) * (Counter_In.CurrentValue - msLinearOffset) / msLinearDuration;
+				}
 				ScreenPoint[0] = endValueRatio * ScreenPointAnchor(1) + (1 - endValueRatio) * ScreenPointAnchor(0);
 				ScreenPoint[1] = endValueRatio * ScreenPointAnchor(1) + (1 - endValueRatio) * ScreenPointAnchor(2);
 				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Ceiling(ScreenPoint[0]) - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
