@@ -144,53 +144,10 @@ internal class Dan_Cert : CActivity {
 		DanExamScore? individual = null;
 		DanExamScore? total = null;
 
-		#region [ Get current exam score ]
-		DanExamScore getIndividual() {
-			if (individual != null)
-				return individual;
-
-			individual = new() {
-				judges = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber],
-				nCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nCombo,
-				nHighestCombo = OpenTaiko.stageGameScreen.DanSongScore[NowShowingNumber].nHighestCombo,
-				msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan[NowShowingNumber],
-
-				nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[NowShowingNumber],
-				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount[NowShowingNumber],
-				nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount[NowShowingNumber],
-				nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount[NowShowingNumber],
-				nMineMax = OpenTaiko.TJA.nDan_MineCount[NowShowingNumber],
-
-				lastChip = OpenTaiko.TJA.pDan_LastChip[NowShowingNumber],
-				hasBranch = OpenTaiko.TJA.bHasBranchDan[NowShowingNumber],
-			};
-			individual.nNotesRemainMax = this.songsnotesremain[NowShowingNumber] = individual.GetUpdatedNNotesRemainMax();
-			return individual;
-		}
-
-		DanExamScore getTotal() {
-			if (total != null)
-				return total;
-
-			total = new() {
-				judges = OpenTaiko.stageGameScreen.CChartScore[0],
-				nCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1,
-				nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
-				msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan.Sum(),
-
-				nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
-				nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount.Sum(),
-				nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount.Sum(),
-				nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount.Sum(),
-				nMineMax = OpenTaiko.TJA.nDan_MineCount.Sum(),
-
-				lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
-				hasBranch = OpenTaiko.TJA.bチップがある.Branch,
-			};
-			total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
-			return total;
-		}
-		#endregion
+		DanExamScore getIndividual()
+			=> individual ??= this.GetIndividualExamScore(NowShowingNumber);
+		DanExamScore getTotal()
+			=> total ??= this.GetTotalExamScore();
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (Challenge[i] == null || !Challenge[i].ExamIsEnable) continue;
@@ -225,7 +182,7 @@ internal class Dan_Cert : CActivity {
 					Status[i].Timer_Amount = new CCounter(0, 11, 12, OpenTaiko.Timer);
 				}
 			}
-			this.UpdateReachStatus(NowShowingNumber, i, score);
+			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i]);
 			if (Challenge[i].ReachStatus != oldReachedStatus && oldReachedStatus != Exam.ReachStatus.Unknown) {
 				if (Challenge[i].ReachStatus == Exam.ReachStatus.Failure) {
 					Sound_Failed?.PlayStart();
@@ -234,6 +191,46 @@ internal class Dan_Cert : CActivity {
 				SetFlashSpeed(this.Status[i], this.Challenge[i].ReachStatus);
 			}
 		}
+	}
+
+	private DanExamScore GetIndividualExamScore(int iSong) {
+		DanExamScore individual = new() {
+			judges = OpenTaiko.stageGameScreen.DanSongScore[iSong],
+			nCombo = OpenTaiko.stageGameScreen.DanSongScore[iSong].nCombo,
+			nHighestCombo = OpenTaiko.stageGameScreen.DanSongScore[iSong].nHighestCombo,
+			msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan[iSong],
+
+			nNotesMax = OpenTaiko.TJA!.nDan_NotesCount[iSong],
+			nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount[iSong],
+			nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount[iSong],
+			nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount[iSong],
+			nMineMax = OpenTaiko.TJA.nDan_MineCount[iSong],
+
+			lastChip = OpenTaiko.TJA.pDan_LastChip[iSong],
+			hasBranch = OpenTaiko.TJA.bHasBranchDan[iSong],
+		};
+		individual.nNotesRemainMax = this.songsnotesremain[iSong] = individual.GetUpdatedNNotesRemainMax();
+		return individual;
+	}
+
+	private DanExamScore GetTotalExamScore() {
+		DanExamScore total = new() {
+			judges = OpenTaiko.stageGameScreen.CChartScore[0],
+			nCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.P1,
+			nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
+			msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan.Sum(),
+
+			nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
+			nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount.Sum(),
+			nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount.Sum(),
+			nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount.Sum(),
+			nMineMax = OpenTaiko.TJA.nDan_MineCount.Sum(),
+
+			lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
+			hasBranch = OpenTaiko.TJA.bチップがある.Branch,
+		};
+		total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
+		return total;
 	}
 
 	private static void SetFlashSpeed(ChallengeStatus challengeStatus, Exam.ReachStatus reachStatus) {
@@ -266,7 +263,7 @@ internal class Dan_Cert : CActivity {
 		_ => 0, // no flashing
 	};
 
-	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score) {
+	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score, bool isIndividualExam) {
 		// 条件の達成見込みがあるかどうか判断する。
 		var dan_C = this.Challenge[iExam];
 
@@ -338,10 +335,10 @@ internal class Dan_Cert : CActivity {
 			return false;
 		}
 
-		static bool judgeGenericLess(DanExamScore score, Dan_C dan_C, double amountRemainMax) {
+		static bool judgeGenericLess(DanExamScore score, Dan_C dan_C, double amountRemainMax, double dangerWeight = 1) {
 			if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
 				return true;
-			if (dan_C.Amount + 4 >= dan_C.GetValue()[0] && dan_C.Amount > 0) {
+			if (dan_C.Amount + 4 * dangerWeight >= dan_C.GetValue()[0] && dan_C.Amount > 0) {
 				dan_C.ReachStatus = Exam.ReachStatus.Danger;
 				return true;
 			}
@@ -360,27 +357,33 @@ internal class Dan_Cert : CActivity {
 			return false;
 		}
 
-		static bool judgeRoll(DanExamScore score, Dan_C dan_C, bool judgeFailure, double notesRemainMax, double boundedHitsRemainMax) {
+		static double getExpectedMaxBarRollHits(DanExamScore score) {
+			double msRemainBarRoll = CTja.TjaDurationToGameDuration(score.msBarRollMax - (score.judges!.msBarRollPass + OpenTaiko.stageGameScreen.msCurrentBarRollProgress[0]));
+			return 20.0 * msRemainBarRoll / 1000;
+		}
+
+		static bool judgeRoll(DanExamScore score, Dan_C dan_C, bool judgeFailure, double judgedNotesRemainMax, int noteHitWeight) {
 			if (dan_C.ExamRange != Exam.Range.Less) {
-				if (!score.hasBranch && notesRemainMax <= 0 && doFinalJudge(dan_C))
+				if (!score.hasBranch && judgedNotesRemainMax <= 0 && doFinalJudge(dan_C))
 					return true;
 				if (dan_C.GetExamStatus() < Exam.Status.Success) {
-					if (judgeFailure
-						&& (dan_C.Amount + boundedHitsRemainMax < dan_C.GetValue()[0])
+					int balloonHitRemainMax = score.nBalloonHitMax - score.judges!.nBalloonHitPass;
+					double maxHitsNoBarRoll = dan_C.Amount + (noteHitWeight * score.nNotesRemainMax) + balloonHitRemainMax;
+					if (judgeFailure && (maxHitsNoBarRoll < dan_C.GetValue()[0])
 						&& (score.nBarRollMax <= score.judges!.nBarRollPass)
 						) {
 						dan_C.ReachStatus = Exam.ReachStatus.Failure;
 						return true;
 					}
-					double msRemainBarRoll = CTja.TjaDurationToGameDuration(score.msBarRollMax - (score.judges!.msBarRollPass + OpenTaiko.stageGameScreen.msCurrentBarRollProgress[0]));
-					if (dan_C.Amount + boundedHitsRemainMax + 20.0 * msRemainBarRoll / 1000 < dan_C.GetValue()[0]) {
+					double expectedMaxHits = maxHitsNoBarRoll + getExpectedMaxBarRollHits(score);
+					if (expectedMaxHits < dan_C.GetValue()[0]) {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return true;
 					}
 				}
 				resetDangerStatusIfSuccess(dan_C);
 			} else {
-				if (judgeGenericLess(score, dan_C, notesRemainMax))
+				if (judgeGenericLess(score, dan_C, judgedNotesRemainMax))
 					return true;
 			}
 			return false;
@@ -430,13 +433,13 @@ internal class Dan_Cert : CActivity {
 			case Exam.Type.Roll:
 				amountMax = score.nBarRollMax + score.nBalloonHitMax;
 				amountRemainMax = (score.nBarRollMax - score.judges!.nBarRollPass) + (score.nBalloonHitMax - score.judges.nBalloonHitPass);
-				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, score.nBalloonHitMax - score.judges!.nBalloonHitPass))
+				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, 0))
 					return;
 				break;
 			case Exam.Type.Hit:
 				amountMax = score.nNotesMax + score.nBarRollMax + score.nBalloonHitMax;
 				amountRemainMax = score.nNotesRemainMax + (score.nBarRollMax - score.judges!.nBarRollPass) + (score.nBalloonHitMax - score.judges.nBalloonHitPass);
-				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, score.nNotesRemainMax + (score.nBalloonHitMax - score.judges!.nBalloonHitPass)))
+				if (judgeRoll(score, dan_C, judgeFailure, amountRemainMax, 1))
 					return;
 				break;
 			case Exam.Type.Accuracy:
@@ -473,6 +476,39 @@ internal class Dan_Cert : CActivity {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return;
 					}
+				}
+				break;
+			case Exam.Type.Score:
+				// Currently calculated with gen-4 Shin-uchi score for danger and failure status
+				amountMax = score.nNotesMax + score.nBarRollMax + score.nBalloonHitMax;
+				amountRemainMax = score.nNotesRemainMax + (score.nBarRollMax - score.judges!.nBarRollPass) + (score.nBalloonHitMax - score.judges.nBalloonHitPass);
+				if (dan_C.ExamRange != Exam.Range.Less) {
+					if (!score.hasBranch && amountRemainMax <= 0 && doFinalJudge(dan_C))
+						return;
+					double ptsMaxRemainingNote = 0;
+					for (int i = iSong; i < (isIndividualExam ? iSong + 1 : OpenTaiko.stageGameScreen.nAddScoreGen4ShinUchi_Dan.Length); ++i)
+						ptsMaxRemainingNote += OpenTaiko.stageGameScreen.nAddScoreGen4ShinUchi_Dan[i] * this.GetIndividualExamScore(i).nNotesRemainMax;
+
+					if (dan_C.GetExamStatus() < Exam.Status.Success) {
+						int balloonHitRemainMax = score.nBalloonHitMax - score.judges!.nBalloonHitPass;
+						double ptsMaxNoBarRoll = dan_C.Amount + ptsMaxRemainingNote + 100 * balloonHitRemainMax;
+						if (judgeFailure && OpenTaiko.ConfigIni.ShinuchiMode && (ptsMaxNoBarRoll < dan_C.GetValue()[0])
+							&& (score.nBarRollMax <= score.judges!.nBarRollPass)
+							) {
+							dan_C.ReachStatus = Exam.ReachStatus.Failure;
+							return;
+						}
+						double ptsMaxExpected = ptsMaxNoBarRoll + 100 * getExpectedMaxBarRollHits(score);
+						if (ptsMaxExpected < dan_C.GetValue()[0]) {
+							dan_C.ReachStatus = Exam.ReachStatus.Danger;
+							return;
+						}
+					}
+					resetDangerStatusIfSuccess(dan_C);
+				} else {
+					double ptsPerHitMax = OpenTaiko.stageGameScreen.nAddScoreGen4ShinUchi_Dan.Skip(iSong).Append(100).Max();
+					if (judgeGenericLess(score, dan_C, amountRemainMax, ptsPerHitMax))
+						return;
 				}
 				break;
 			default:
