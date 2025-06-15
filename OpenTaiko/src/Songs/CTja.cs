@@ -1628,13 +1628,8 @@ internal class CTja : CActivity {
 
 			if (n参照中の難易度 == (int)Difficulty.Dan) {
 				Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count);
-				for (int i = listChip.Count - 1; i >= 0; i--) {
-					if (NotesManager.IsHittableNote(listChip[i])) {
-						if (List_DanSongs.Count != 0) {
-							this.pDan_LastChip[List_DanSongs.Count - 1] = listChip[i];
-							break;
-						}
-					}
+				if (List_DanSongs.Count > 0) {
+					this.pDan_LastChip[List_DanSongs.Count - 1] = this.FindLastHittableOrChip(chip);
 				}
 			}
 
@@ -2208,15 +2203,10 @@ internal class CTja : CActivity {
 
 			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
+			// find last note in each branch
 			Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count + 1);
-			for (int i = listChip.Count - 1; i >= 0; i--) {
-				//if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
-				if (NotesManager.IsHittableNote(listChip[i])) {
-					if (List_DanSongs.Count != 0) {
-						this.pDan_LastChip[List_DanSongs.Count - 1] = listChip[i];
-						break;
-					}
-				}
+			if (List_DanSongs.Count > 0) {
+				this.pDan_LastChip[List_DanSongs.Count - 1] = this.FindLastHittableOrChip(chip);
 			}
 
 			var strArray = SplitComma(argumentFull); // \,をエスケープ処理するメソッドだぞっ
@@ -2287,6 +2277,25 @@ internal class CTja : CActivity {
 			chip.nBranch = this.n現在のコース;
 			this.listChip.Add(chip);
 		}
+	}
+
+	private CChip FindLastHittableOrChip(CChip chip) {
+		CChip[] lastChips = [chip, chip, chip];
+		bool[] lastIsHittables = [false, false, false];
+		for (int i = this.listChip.Count; i-- > 0;) {
+			CChip chipI = this.listChip[i];
+			for (int ib = 0; ib < (chipI.IsEndedBranching ? 3 : 1); ++ib) {
+				int ibReal = (chipI.IsEndedBranching ? ib : (int)chipI.nBranch);
+				if (!lastIsHittables[ibReal]) {
+					lastChips[ibReal] = chipI;
+					lastIsHittables[ibReal] = NotesManager.IsHittableNote(chipI);
+				}
+			}
+			if (lastIsHittables.All(b => b))
+				break; // all are hittable or has reached the last `#NEXTSONG`
+		}
+		CChip lastChip = lastChips.MaxBy(chip => chip.n発声時刻ms)!;
+		return lastChip;
 	}
 
 	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, Action<CChip, float> setValue, string commandEnd) {

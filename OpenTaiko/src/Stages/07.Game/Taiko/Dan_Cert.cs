@@ -226,7 +226,7 @@ internal class Dan_Cert : CActivity {
 			nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount.Sum(),
 			nMineMax = OpenTaiko.TJA.nDan_MineCount.Sum(),
 
-			lastChip = !(OpenTaiko.TJA.listChip.Count > 0) ? null : OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1],
+			lastChip = !(OpenTaiko.TJA.pDan_LastChip.Length > 0) ? null : OpenTaiko.TJA.pDan_LastChip[OpenTaiko.TJA.pDan_LastChip.Length - 1],
 			hasBranch = OpenTaiko.TJA.bチップがある.Branch,
 		};
 		total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
@@ -274,9 +274,12 @@ internal class Dan_Cert : CActivity {
 		// 残り音符数ゼロ
 		bool isAfterLastNote = (!score.hasBranch && score.nNotesRemainMax <= 0);
 		// 音源が終了したやつの分岐。
-		bool isAfterLastChip = (score.lastChip?.bHit ?? true)
-			|| ((!score.lastChip.bVisible || !NotesManager.IsHittableNote(score.lastChip))
-				&& score.lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
+		CChip? lastChip = score.lastChip;
+		bool isAfterLastChip = (lastChip == null)
+			|| ((NotesManager.IsHittableNote(lastChip) && lastChip.bVisible) ?
+				(NotesManager.IsGenericRoll(lastChip)) ? lastChip.end.bProcessed : (lastChip.bHit || lastChip.IsMissed)
+				: lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+			);
 
 		// returns whether the final judge has been done
 		static bool doFinalJudge(Dan_C dan_C) {
