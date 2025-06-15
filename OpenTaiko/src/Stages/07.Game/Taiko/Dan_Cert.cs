@@ -54,7 +54,7 @@ internal class Dan_Cert : CActivity {
 			}
 		}
 
-		ScreenPoint = new double[] { OpenTaiko.Skin.Game_Lane_X[0] - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Resolution[0] };
+		ScreenPoint = [ScreenPointAnchor(0), ScreenPointAnchor(2)];
 
 		OpenTaiko.stageGameScreen.ReSetScore(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreInit, OpenTaiko.TJA.List_DanSongs[NowShowingNumber].ScoreDiff, 0);
 
@@ -595,12 +595,12 @@ internal class Dan_Cert : CActivity {
 		if (Counter_In != null) {
 			if (Counter_In.IsUnEnded) {
 				for (int i = Counter_In_Old; i < Counter_In.CurrentValue; i++) {
-					ScreenPoint[0] += (OpenTaiko.Skin.Game_Lane_X[0] - ScreenPoint[0]) / 180.0;
-					ScreenPoint[1] += ((OpenTaiko.Skin.Resolution[0] / 2 + OpenTaiko.Skin.Game_Lane_X[0] / 2) - ScreenPoint[1]) / 180.0;
+					ScreenPoint[0] += (ScreenPointAnchor(1) - ScreenPoint[0]) / 180.0;
+					ScreenPoint[1] += (ScreenPointAnchor(1) - ScreenPoint[1]) / 180.0;
 				}
 				Counter_In_Old = Counter_In.CurrentValue;
-				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)ScreenPoint[0], OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
-				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)ScreenPoint[1], OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
+				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Ceiling(ScreenPoint[0]) - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
+				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Floor(ScreenPoint[1]), OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
 				//CDTXMania.act文字コンソール.tPrint(0, 420, C文字コンソール.Eフォント種別.白, String.Format("{0} : {1}", ScreenPoint[0], ScreenPoint[1]));
 			}
 			if (Counter_In.IsEnded) {
@@ -660,10 +660,11 @@ internal class Dan_Cert : CActivity {
 		}
 		if (Counter_Out != null) {
 			if (Counter_Out.IsUnEnded) {
-				ScreenPoint[0] = OpenTaiko.Skin.Game_Lane_X[0] - Math.Sin(Counter_Out.CurrentValue * (Math.PI / 180)) * 500;
-				ScreenPoint[1] = OpenTaiko.Skin.Game_Lane_X[0] + OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2 + Math.Sin(Counter_Out.CurrentValue * (Math.PI / 180)) * 500;
-				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)ScreenPoint[0], OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
-				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)ScreenPoint[1], OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
+				double laneCoverOpenAmount = Math.Sin(Counter_Out.CurrentValue * (Math.PI / 180)) * (ScreenPointAnchor(2) - ScreenPointAnchor(0)) / 2;
+				ScreenPoint[0] = ScreenPointAnchor(1) - laneCoverOpenAmount;
+				ScreenPoint[1] = ScreenPointAnchor(1) + laneCoverOpenAmount;
+				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Ceiling(ScreenPoint[0]) - OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(0, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
+				OpenTaiko.Tx.DanC_Screen?.t2D描画((int)Math.Floor(ScreenPoint[1]), OpenTaiko.Skin.Game_Lane_Y[0], new Rectangle(OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, 0, OpenTaiko.Tx.DanC_Screen.szTextureSize.Width / 2, OpenTaiko.Tx.DanC_Screen.szTextureSize.Height));
 				//CDTXMania.act文字コンソール.tPrint(0, 420, C文字コンソール.Eフォント種別.白, String.Format("{0} : {1}", ScreenPoint[0], ScreenPoint[1]));
 			}
 			if (Counter_Out.IsEnded) {
@@ -1278,6 +1279,12 @@ internal class Dan_Cert : CActivity {
 	private double[] ScreenPoint;
 	private int Counter_In_Old, Counter_Out_Old, Counter_Text_Old;
 	public bool IsAnimating;
+
+	private static double ScreenPointAnchor(int i) => i switch {
+		0 => OpenTaiko.Skin.Game_Lane_X[0],
+		1 => OpenTaiko.Skin.Game_Lane_X[0] + (OpenTaiko.Skin.Resolution[0] - OpenTaiko.Skin.Game_Lane_X[0]) / 2.0,
+		_ => OpenTaiko.Skin.Resolution[0],
+	};
 
 	//音声関連
 	private CSound Sound_Section;
