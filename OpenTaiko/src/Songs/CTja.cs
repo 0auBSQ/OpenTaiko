@@ -161,16 +161,12 @@ internal class CTja : CActivity {
 		public int ScoreDiff;
 		public int Level;
 		public int Difficulty;
-		public static int Number = 0;
+		[Obsolete("use List_DanSongs.Count")] public static int Number = 0;
 		public bool bTitleShow;
 		public Dan_C[] Dan_C = new Dan_C[CExamInfo.cMaxExam];
 
 		[NonSerialized]
 		public CWAV Wave;
-
-		public DanSongs() {
-			Number++;
-		}
 	}
 
 	public struct STLYRIC {
@@ -505,7 +501,6 @@ internal class CTja : CActivity {
 		Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Change default culture to invariant, fixes (Purota)
 		Dan_C = new Dan_C[CExamInfo.cMaxExam];
 		pDan_LastChip = new CChip[1];
-		DanSongs.Number = 0;
 
 		LocalCounters = new CLocalCounters();
 		LocalTriggers = new CLocalTriggers();
@@ -1487,7 +1482,7 @@ internal class CTja : CActivity {
 				}
 
 				// Retrieve all the global exams (non individual) at the end
-				if (DanSongs.Number > 0) {
+				if (List_DanSongs.Count > 0) {
 					for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 						if (Dan_C[i] != null && List_DanSongs[0].Dan_C[i] == null) {
 							List_DanSongs[0].Dan_C[i] = Dan_C[i];
@@ -1632,11 +1627,11 @@ internal class CTja : CActivity {
 														 // チップを配置。
 
 			if (n参照中の難易度 == (int)Difficulty.Dan) {
+				Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count);
 				for (int i = listChip.Count - 1; i >= 0; i--) {
 					if (NotesManager.IsHittableNote(listChip[i])) {
-						if (DanSongs.Number != 0) {
-							Array.Resize(ref this.pDan_LastChip, this.pDan_LastChip.Length + 1);
-							this.pDan_LastChip[DanSongs.Number - 1] = listChip[i];
+						if (List_DanSongs.Count != 0) {
+							this.pDan_LastChip[List_DanSongs.Count - 1] = listChip[i];
 							break;
 						}
 					}
@@ -2074,7 +2069,7 @@ internal class CTja : CActivity {
 
 			// handle here for the correct dan-i song index
 			if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.bHasBranchDan[this.bHasBranchDan.Length - 1] = true;
+				this.bHasBranchDan[List_DanSongs.Count - 1] = true;
 			}
 		} else if (command == "#N" || command == "#E" || command == "#M")//これCourseを全部集めてあとから分岐させればいい件
 		{
@@ -2213,12 +2208,12 @@ internal class CTja : CActivity {
 
 			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
+			Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count + 1);
 			for (int i = listChip.Count - 1; i >= 0; i--) {
 				//if (listChip[i].nチャンネル番号 >= 0x11 && listChip[i].nチャンネル番号 <= 0x18)
 				if (NotesManager.IsHittableNote(listChip[i])) {
-					if (DanSongs.Number != 0) {
-						Array.Resize(ref this.pDan_LastChip, this.pDan_LastChip.Length + 1);
-						this.pDan_LastChip[DanSongs.Number - 1] = listChip[i];
+					if (List_DanSongs.Count != 0) {
+						this.pDan_LastChip[List_DanSongs.Count - 1] = listChip[i];
 						break;
 					}
 				}
@@ -2266,7 +2261,7 @@ internal class CTja : CActivity {
 			Array.Resize(ref nDan_MineCount, List_DanSongs.Count);
 			Array.Resize(ref nDan_BalloonHitCount, List_DanSongs.Count);
 			Array.Resize(ref nDan_BarRollCount, List_DanSongs.Count);
-			bHasBranchDan[bHasBranchDan.Length - 1] = false;
+			bHasBranchDan[List_DanSongs.Count - 1] = false;
 
 			// チップを配置。
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x01, 1 + List_DanSongs.Count, 0x01));
@@ -2772,11 +2767,11 @@ internal class CTja : CActivity {
 			this.nノーツ数_Branch[iBranch]++;
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
 				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
-					this.nDan_NotesCount[DanSongs.Number - 1]++;
+					this.nDan_NotesCount[List_DanSongs.Count - 1]++;
 					if (NotesManager.IsADLIB(chip))
-						this.nDan_AdLibCount[DanSongs.Number - 1]++;
+						this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
 					else if (NotesManager.IsMine(chip))
-						this.nDan_MineCount[DanSongs.Number - 1]++;
+						this.nDan_MineCount[List_DanSongs.Count - 1]++;
 				}
 				if (IsEndedBranching) {
 					this.nノーツ数[3]++;
@@ -2784,13 +2779,13 @@ internal class CTja : CActivity {
 			}
 		} else if (NotesManager.IsGenericBalloon(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.nDan_BalloonHitCount[DanSongs.Number - 1] += chip.nBalloon;
+				this.nDan_BalloonHitCount[List_DanSongs.Count - 1] += chip.nBalloon;
 			}
 		} else if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.nDan_BarRollCount[DanSongs.Number - 1]++;
+				this.nDan_BarRollCount[List_DanSongs.Count - 1]++;
 				if (NotesManager.IsFuzeRoll(chip))
-					this.nDan_MineCount[DanSongs.Number - 1]++;
+					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		}
 
@@ -2952,8 +2947,8 @@ internal class CTja : CActivity {
 				if (Dan_C[examNumber] == null)
 					Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
 
-				if (DanSongs.Number > 0)
-					List_DanSongs[DanSongs.Number - 1].Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
+				if (List_DanSongs.Count > 0)
+					List_DanSongs[List_DanSongs.Count - 1].Dan_C[examNumber] = new Dan_C(examType, examValue, examRange);
 			}
 		}
 	}
