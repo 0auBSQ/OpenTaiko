@@ -71,7 +71,7 @@ internal class Dan_Cert : CActivity {
 
 		if (number == 0) {
 			Sound_Section_First?.PlayStart();
-			this.Update(); // resolve Unknown exam reach status
+			this.Update(resetFlash: true); // resolve Unknown exam reach status
 		} else {
 			Sound_Section?.PlayStart();
 		}
@@ -140,7 +140,7 @@ internal class Dan_Cert : CActivity {
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
-	public void Update() {
+	public void Update(bool resetFlash = false) {
 		DanExamScore? individual = null;
 		DanExamScore? total = null;
 
@@ -188,6 +188,8 @@ internal class Dan_Cert : CActivity {
 					Sound_Failed?.PlayStart();
 				}
 				this.Status[i].Timer_Gauge.Start(0, this.Status[i].Timer_Gauge.EndValue, 1, OpenTaiko.Timer);
+				SetFlashSpeed(this.Status[i], this.Challenge[i].ReachStatus);
+			} else if (resetFlash && (this.NowShowingNumber == 0 || this.ExamChange[i])) { // reset flash when changing gauge
 				SetFlashSpeed(this.Status[i], this.Challenge[i].ReachStatus);
 			}
 		}
@@ -652,14 +654,13 @@ internal class Dan_Cert : CActivity {
 									if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null) //個別の条件がありますよー
 									{
 										Challenge[j] = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
-										SetFlashSpeed(this.Status[j], this.Challenge[j].ReachStatus);
 										ExamChange[j] = true;
 									}
 								}
 							}
 							NowCymbolShowingNumber = NowShowingNumber;
 							bExamChangeCheck = true;
-							this.Update(); // refresh reach status
+							this.Update(resetFlash: true); // refresh reach status
 							// clear out ongoing animation from last song
 							Counter_Out = null;
 							Counter_Text = null;
