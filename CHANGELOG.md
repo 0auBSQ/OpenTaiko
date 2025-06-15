@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.77] - 2025-06-15 (Beta)
+
+- [Fix] Use SDL for Linux w/ Wayland fixing it not booting/booting with a blank window (GLFW is kept for Windows and Linux w/ X11)
+
 ## [0.6.0.76] - 2025-06-14 (Beta)
 
 - [Fix] Fix gauge clear text sometimes being incorrectly scaled on blue 1P
