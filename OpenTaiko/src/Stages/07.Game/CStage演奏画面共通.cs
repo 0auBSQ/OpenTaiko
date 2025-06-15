@@ -2576,6 +2576,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (!hasChipBeenPlayedAt(pChip, n現在時刻ms)) // not processed yet
 				break;
 
+			// handle last chip status of dan-i exams
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				if (dTX.pDan_LastChip.Contains(pChip)) {
+					this.actDan.Update();
+				}
+			}
+
 			switch (pChip.nChannelNo) {
 				#region [ 01: BGM ]
 				case 0x01:  // BGM
