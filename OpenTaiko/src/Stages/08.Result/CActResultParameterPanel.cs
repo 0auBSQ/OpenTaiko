@@ -1132,6 +1132,11 @@ internal class CActResultParameterPanel : CActivity {
 	public float MountainAppearValue;
 	private int GaugeFactor;
 
+	/// <summary>
+	/// Indexes:
+	/// 0: soundGauge, 1~7: soundPon (Perfect_X, Good_X, Miss_X, Roll_X, MaxCombo_X, ADLib_X, Bomb),
+	/// 8: soundScoreDon, 9: soundRankIn, 10: soundCrownIn, 11: voiceResultClearSuccess / voiceResultClearFailed
+	/// </summary>
 	public bool[] b音声再生 = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
 	// Cherry blossom flowers variables
