@@ -510,6 +510,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		public int nScore;
 		public int nADLIB;
 		public int nMine;
+		public int nBalloon;
+		public int nKusudama;
 	}
 
 	public double[] JPOSCROLLX = new double[5];
@@ -1146,6 +1148,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//分岐のための処理。実装してない。
 
 		//赤か青かの分岐
+		if (IsKusudama)
+			this.CBranchScore[player].nKusudama++;
+		else
+			this.CBranchScore[player].nBalloon++;
 
 		long nAddScore = 0;
 
@@ -3378,7 +3384,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							} else {
 								branchScore = this.CBranchScore[nPlayer];
 							}
-							this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
+							this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, branchScore.nBalloon, branchScore.nKusudama, nPlayer);
 
 							if (this.b強制分岐譜面[nPlayer])//強制分岐譜面だったら次回コースをそのコースにセット
 								this.nNextBranch[nPlayer] = this.E強制コース[nPlayer];
@@ -3914,6 +3920,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CBranchScore[player].nGood = 0;
 			this.CBranchScore[player].nMiss = 0;
 			this.CBranchScore[player].nRoll = 0;
+			this.CBranchScore[player].nBalloon = 0;
+			this.CBranchScore[player].nKusudama = 0;
 		} else {
 			for (int i = 0; i < CBranchScore.Length; i++) {
 				this.CBranchScore[i].cBigNotes.nGreat = 0;
@@ -3925,11 +3933,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.CBranchScore[i].nGood = 0;
 				this.CBranchScore[i].nMiss = 0;
 				this.CBranchScore[i].nRoll = 0;
+				this.CBranchScore[i].nBalloon = 0;
+				this.CBranchScore[i].nKusudama = 0;
 			}
 		}
 	}
 
-	public void tBranchJudge(CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer) {
+	public void tBranchJudge(CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int n風船に入れた打数, int nくすだまに入れた打数, int nPlayer) {
 		// Branch check score here
 
 		if (this.b強制的に分岐させた[nPlayer]) return;
@@ -3950,25 +3960,28 @@ internal abstract class CStage演奏画面共通 : CStage {
 			dbRate = nスコア;
 		} else if (e種類 == CTja.EBranchConditionType.Drumroll) {
 			dbRate = n連打数;
-		} else if (e種類 == CTja.EBranchConditionType.Accuracy_BigNotesOnly) {
+		} else if (e種類 == CTja.EBranchConditionType.Drumroll_Big) {
+			dbRate = cBRANCHSCORE.nRoll;
+		} else if (e種類 == CTja.EBranchConditionType.Accuracy_Good_Big) {
 			dbRate = cBRANCHSCORE.nGreat;
+		} else if (e種類 == CTja.EBranchConditionType.Accuracy_Good) {
+			dbRate = n良;
+		} else if (e種類 == CTja.EBranchConditionType.Accuracy_OK_Big) {
+			dbRate = cBRANCHSCORE.nGood;
+		} else if (e種類 == CTja.EBranchConditionType.Accuracy_OK) {
+			dbRate = n可;
+		} else if (e種類 == CTja.EBranchConditionType.Accuracy_Bad) {
+			dbRate = n不可;
+		} else if (e種類 == CTja.EBranchConditionType.Balloon) {
+			dbRate = n風船に入れた打数;
+		} else if (e種類 == CTja.EBranchConditionType.Kusudama) {
+			dbRate = nくすだまに入れた打数;
 		}
 
 
-		if (b分岐種類が一致) {
-			if (dbRate < pChip.nBranchCondition1_Professional) {
-				this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eNormal;
-				this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
-			} else if (dbRate >= pChip.nBranchCondition1_Professional && dbRate < pChip.nBranchCondition2_Master) {
-				this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eExpert;
-				this.nNextBranch[nPlayer] = CTja.ECourse.eExpert;
-			} else if (dbRate >= pChip.nBranchCondition2_Master) {
-				this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eMaster;
-				this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
-			}
-
-		} else if (e種類 == CTja.EBranchConditionType.Drumroll) {
-			if (!(pChip.nBranchCondition1_Professional == 0 && pChip.nBranchCondition2_Master == 0)) {
+		switch (e種類) {
+			case CTja.EBranchConditionType.Accuracy:
+			case CTja.EBranchConditionType.Score:
 				if (dbRate < pChip.nBranchCondition1_Professional) {
 					this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eNormal;
 					this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
@@ -3979,20 +3992,35 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eMaster;
 					this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
 				}
-			}
-		} else if (e種類 == CTja.EBranchConditionType.Accuracy_BigNotesOnly) {
-			if (!(pChip.nBranchCondition1_Professional == 0 && pChip.nBranchCondition2_Master == 0)) {
-				if (dbRate < pChip.nBranchCondition1_Professional) {
-					this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eNormal;
-					this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
-				} else if (dbRate >= pChip.nBranchCondition1_Professional && dbRate < pChip.nBranchCondition2_Master) {
-					this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eExpert;
-					this.nNextBranch[nPlayer] = CTja.ECourse.eExpert;
-				} else if (dbRate >= pChip.nBranchCondition2_Master) {
-					this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eMaster;
-					this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
+				break;
+			case CTja.EBranchConditionType.Accuracy_Bad:
+				if (!(pChip.nBranchCondition1_Professional == 0 && pChip.nBranchCondition2_Master == 0)) {
+					if (dbRate >= pChip.nBranchCondition1_Professional) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eNormal;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
+					} else if (dbRate < pChip.nBranchCondition1_Professional && dbRate >= pChip.nBranchCondition2_Master) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eExpert;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eExpert;
+					} else if (dbRate < pChip.nBranchCondition2_Master) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eMaster;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
+					}
 				}
-			}
+				break;
+			default:
+				if (!(pChip.nBranchCondition1_Professional == 0 && pChip.nBranchCondition2_Master == 0)) {
+					if (dbRate < pChip.nBranchCondition1_Professional) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eNormal;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eNormal;
+					} else if (dbRate >= pChip.nBranchCondition1_Professional && dbRate < pChip.nBranchCondition2_Master) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eExpert;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eExpert;
+					} else if (dbRate >= pChip.nBranchCondition2_Master) {
+						this.nDisplayedBranchLane[nPlayer] = CTja.ECourse.eMaster;
+						this.nNextBranch[nPlayer] = CTja.ECourse.eMaster;
+					}
+				}
+				break;
 		}
 	}
 
