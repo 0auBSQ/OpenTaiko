@@ -800,7 +800,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Cherry blossom animation]
 
-					if (gaugeValues[p] >= 80.0f && nDrawnPlayers <= 2) {
+					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nDrawnPlayers <= 2) {
 						OpenTaiko.Tx.Result_Flower.vcScaleRatio.X = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 						OpenTaiko.Tx.Result_Flower.vcScaleRatio.Y = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 
@@ -815,7 +815,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Cherry blossom Rotating flowers]
 
-					if (gaugeValues[p] >= 80.0f && nDrawnPlayers <= 2) {
+					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nDrawnPlayers <= 2) {
 						float FlowerTime = ctRotate_Flowers.CurrentValue;
 
 						for (int i = 0; i < 5; i++) {
@@ -848,7 +848,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Panel shines]
 
-					if (gaugeValues[p] >= 80.0f && nDrawnPlayers <= 2) {
+					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nDrawnPlayers <= 2) {
 						int ShineTime = (int)ctShine_Plate.CurrentValue;
 						int Quadrant500 = ShineTime % 500;
 
@@ -877,28 +877,23 @@ internal class CActResultParameterPanel : CActivity {
 					int Mood = 0;
 					int MoodV2 = 0;
 
-					if (gaugeValues[p] >= 100.0f)
-						Mood = 3;
-					else if (gaugeValues[p] >= 80.0f)
-						Mood = 2;
-					else if (gaugeValues[p] >= 40.0f)
-						Mood = 1;
-
 					if (OpenTaiko.stageResults.nクリア[p] == 4) {
+						Mood = 3;
 						MoodV2 = 5;
 					} else if (OpenTaiko.stageResults.nクリア[p] == 3) {
+						Mood = 3;
 						MoodV2 = 4;
 					} else if (OpenTaiko.stageResults.nクリア[p] >= 1) {
 						if (gaugeValues[p] >= 100.0f) {
-							MoodV2 = 3;
+							Mood = MoodV2 = 3;
 						} else {
-							MoodV2 = 2;
+							Mood = MoodV2 = 2;
 						}
 					} else if (OpenTaiko.stageResults.nクリア[p] == 0) {
 						if (gaugeValues[p] >= 40.0f) {
-							MoodV2 = 1;
+							Mood = MoodV2 = 1;
 						} else {
-							MoodV2 = 0;
+							Mood = MoodV2 = 0;
 						}
 					}
 
@@ -949,7 +944,7 @@ internal class CActResultParameterPanel : CActivity {
 							speech_bubble_y + (int)(OpenTaiko.Skin.Result_Speech_Text_Offset[1] * scale));
 					}
 					if (!b音声再生[11]) {
-						if (gaugeValues[p] >= 80.0f) {
+						if (OpenTaiko.stageResults.nクリア[p] >= 1) {
 							//TJAPlayer3.Skin.soundDonClear.t再生する();
 							OpenTaiko.Skin.voiceResultClearSuccess[OpenTaiko.GetActualPlayer(p)]?.tPlay();
 						} else {
