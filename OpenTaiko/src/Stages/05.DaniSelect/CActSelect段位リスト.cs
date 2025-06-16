@@ -441,7 +441,7 @@ class CActSelect段位リスト : CStage {
 					OpenTaiko.Tx.Dani_Bloc[2]?.t2D描画(scroll + Anime + OpenTaiko.Skin.DaniSelect_Bloc2[0], OpenTaiko.Skin.DaniSelect_Bloc2[1]);
 
 					if (stバー情報[currentSong].List_DanSongs[0].Dan_C[0] != null)
-						tSoulDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Value_Gauge[0], OpenTaiko.Skin.DaniSelect_Value_Gauge[1], stバー情報[currentSong].List_DanSongs[0].Dan_C[0].Value[0]);
+						tSoulDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Value_Gauge[0], OpenTaiko.Skin.DaniSelect_Value_Gauge[1], stバー情報[currentSong].List_DanSongs[0].Dan_C[0].GetValue()[0]);
 
 					//TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D下中央基準描画((int)(scroll + 396 + Anime), 452);
 					TitleTextureKey.ResolveTitleTexture(this.ttkExams[0]).t2D拡大率考慮中央基準描画((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_Text_Gauge[0], OpenTaiko.Skin.DaniSelect_Text_Gauge[1]);
@@ -622,7 +622,7 @@ class CActSelect段位リスト : CStage {
 									if (i < 6)
 										tExamDraw(scroll + Anime + exam_x + (i * moveX),
 											exam_y + (i * moveY),
-											stバー情報[currentSong].List_DanSongs[i].Dan_C[j].Value[0], stバー情報[currentSong].List_DanSongs[i].Dan_C[j].GetExamRange());
+											stバー情報[currentSong].List_DanSongs[i].Dan_C[j].GetValue()[0], stバー情報[currentSong].List_DanSongs[i].Dan_C[j].ExamRange);
 								} else {
 									//全体の条件ですよー
 
@@ -634,7 +634,7 @@ class CActSelect段位リスト : CStage {
 											OpenTaiko.Skin.DaniSelect_Exam_Bloc_Y[index]);
 									}
 
-									tExamDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Exam_X[index], OpenTaiko.Skin.DaniSelect_Exam_Y[index], stバー情報[currentSong].List_DanSongs[0].Dan_C[j].Value[0], stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetExamRange());
+									tExamDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Exam_X[index], OpenTaiko.Skin.DaniSelect_Exam_Y[index], stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetValue()[0], stバー情報[currentSong].List_DanSongs[0].Dan_C[j].ExamRange);
 
 								}
 
@@ -647,7 +647,7 @@ class CActSelect段位リスト : CStage {
 						#region [Exam title]
 
 						if (stバー情報[currentSong].List_DanSongs[0].Dan_C[j] != null) {
-							CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)stバー情報[currentSong].List_DanSongs[0].Dan_C[j].GetExamType()]);
+							CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)stバー情報[currentSong].List_DanSongs[0].Dan_C[j].ExamType]);
 
 							tmpTex.Opacity = opacity;
 							//tmpTex.t2D下中央基準描画((int)(scroll + 614 + Anime), 452 + index * 88);

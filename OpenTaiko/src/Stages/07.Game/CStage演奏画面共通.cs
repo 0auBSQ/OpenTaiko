@@ -22,6 +22,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			Drums.nOkCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Great : this.nHitCount_ExclAuto.Drums.Great;
 			Drums.nBadCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Miss : this.nHitCount_ExclAuto.Drums.Miss;
 
+			// save result, as the original will be cleaned
+			// individual exams are saved to stageGameSelection
 			var danC = OpenTaiko.stageGameScreen.actDan.GetExam();
 			for (int i = 0; i < danC.Length; i++) {
 				Drums.Dan_C[i] = danC[i];
@@ -33,132 +35,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 	// CStage 実装
 
 	public int[] nNoteCount = new int[5];
-	public int[] nBalloonCount = new int[5];
+	public int[] nBalloonHitCount = new int[5];
 	public double[] nRollTimeMs = new double[5];
-	public double[] nAddScoreNiji = new double[5];
+	public double[] nAddScoreGen4ShinUchi = new double[5];
 	public int[] scoreMode = new int[5];
+
+	public int[] nNoteCount_Dan = []; // [iDanSong]
+	public int[] nBalloonHitCount_Dan = [];
+	public double[] nRollTimeMs_Dan = [];
+	public double[] nAddScoreGen4ShinUchi_Dan = [];
 
 	public override void Activate() {
 		listChip = new List<CChip>[5];
-		List<CChip>[] balloonChips = new List<CChip>[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			nNoteCount[i] = 0;
-			nBalloonCount[i] = 0;
-			nRollTimeMs[i] = 0;
-			nAddScoreNiji[i] = 0;
-
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
-
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				balloonChips[i] = new();
-				for (int j = 0; j < listChip[i].Count; j++) {
-					var chip = listChip[i][j];
-
-					if (NotesManager.IsGenericBalloon(chip)) {
-						balloonChips[i].Add(chip);
-					}
-				}
-			}
 		}
 
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CTja _dtx = OpenTaiko.GetTJA(i)!;
-
-			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
-
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				for (int j = 0; j < balloonChips[i].Count; j++) {
-					var chip = balloonChips[i][j];
-					if (NotesManager.IsKusudama(chip)) {
-						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-							if (p == i) continue;
-							var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-
-							if (chip2 == null) {
-								var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-								if (!NotesManager.IsKusudama(chip3)) {
-									chip.nChannelNo = 0x17;
-								}
-							} else if (!NotesManager.IsKusudama(chip2)) {
-								chip.nChannelNo = 0x17;
-							}
-						}
-					}
-				}
-				/*
-                for(int p = 0; p < TJAPlayer3.ConfigIni.nPlayerCount; p++)
-                {
-                    for(int j = 0; j < balloonChips[p].Count; j++)
-                    {
-                        var chip = balloonChips[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
-                        if (chip == null)
-                        {
-                            var chip2 = listChip[i].Find(x => Math.Abs(x.db発声時刻ms - balloonChips[p][j].db発声時刻ms) < 100);
-                            if (NotesManager.IsKusudama(chip2))
-                            {
-                                chip.nチャンネル番号 = NotesManager.GetNoteValueFromChar("7");
-                            }
-                        }
-                        else if (NotesManager.IsKusudama(chip) && !NotesManager.IsKusudama(balloonChips[p][j]))
-                        {
-                            chip.nチャンネル番号 = balloonChips[p][j].nチャンネル番号;
-                        }
-                    }
-                }
-                */
-			}
-
-
-
-			int _totalNotes = 0;
-			int _totalBalloons = 0;
-			double _totalRolls = 0;
-
-			/*
-            for (int j = 0; j < (_dtx.bチップがある.Branch ? 2 : 1); j++)
-            {
-                var _list = (j == 0) ? _dtx.listChip : _dtx.listChip_Branch[2];
-
-                _totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
-                for (int k = 0; k < _list.Count; k++)
-                {
-                    var _chip = _list[k];
-                    _totalBalloons += _chip.nBalloon;
-                    if (NotesManager.IsRoll(_chip))
-                        _totalRolls += (_chip.nノーツ終了時刻ms - _chip.n発声時刻ms) / 1000.0;
-                }
-            }
-            */
-
-			var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
-
-			_totalNotes += _list.Where(num => NotesManager.IsMissableNote(num)).Count();
-			for (int k = 0; k < _list.Count; k++) {
-				var _chip = _list[k];
-
-				if (NotesManager.IsGenericBalloon(_chip)) {
-					var _duration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
-					var _expectedHits = (int)(_duration / 16.6f);
-					_totalBalloons += Math.Min(_chip.nBalloon, _expectedHits);
-				}
-
-				if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
-					_totalRolls += (_chip.end.n発声時刻ms - _chip.n発声時刻ms) / 1000.0;
-			}
-
-			nNoteCount[i] = _totalNotes;
-			nBalloonCount[i] = _totalBalloons;
-			nRollTimeMs[i] = _totalRolls;
-		}
-
-		for (int k = 0; k < OpenTaiko.ConfigIni.nPlayerCount; k++) {
-			//nAddScoreNiji = (1000000 - (15 * RollTimems * 100) - (nBalloonCount * 100)) / TJAPlayer3.DTX.listChip.Count;
-			if (nNoteCount[k] == 0 && nBalloonCount[k] == 0) {
-				nAddScoreNiji[k] = 1000000;
-			} else {
-				nAddScoreNiji[k] = (double)Math.Ceiling((decimal)(1000000 - (nBalloonCount[k] * 100) - (nRollTimeMs[k] * 100 * 16.6)) / nNoteCount[k] / 10) * 10;
-			}
-
+		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			this.CalculateGen4ShinUchiScoreParameters_Dan();
+		} else {
+			this.CalculateGen4ShinUchiScoreParameters();
 		}
 
 
@@ -270,7 +166,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nDisplayedBranchLane = new CTja.ECourse[5];
 		this.bCurrentlyDrumRoll = new bool[] { false, false, false, false, false };
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
-		this.nTotalRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.n分岐した回数 = new int[5];
 		this.Chara_MissCount = new int[5];
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
@@ -324,14 +219,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		// Note
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			nGood = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nCombo = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nHighestCombo = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nOk = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nBad = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nRoll = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nADLIB = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
-			nMine = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+			this.DanSongScore = new CBRANCHSCORE[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+			for (int i = 0; i < this.DanSongScore.Length; ++i)
+				this.DanSongScore[i] = new();
 		}
 
 
@@ -353,13 +243,119 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.t数値の初期化(true, true);
 	}
 
+	private void CalculateGen4ShinUchiScoreParameters() {
+		List<CChip>[] balloonChips = new List<CChip>[5];
 
-	public void ftDanReSetScoreNiji(int songNotes, int ballons) {
-		if (songNotes == 0 && ballons == 0) {
-			nAddScoreNiji[0] = 1000000;
-		} else {
-			nAddScoreNiji[0] = (double)Math.Ceiling((decimal)(1000000 - (ballons * 100)) / songNotes / 10) * 10;
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			this.nNoteCount[i] = 0;
+			this.nBalloonHitCount[i] = 0;
+			this.nRollTimeMs[i] = 0;
+			this.nAddScoreGen4ShinUchi[i] = 0;
+
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
+				balloonChips[i] = new();
+				for (int j = 0; j < listChip[i].Count; j++) {
+					var chip = listChip[i][j];
+
+					if (NotesManager.IsGenericBalloon(chip)) {
+						balloonChips[i].Add(chip);
+					}
+				}
+			}
 		}
+
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CTja _dtx = OpenTaiko.GetTJA(i)!;
+
+			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
+				for (int j = 0; j < balloonChips[i].Count; j++) {
+					var chip = balloonChips[i][j];
+					if (NotesManager.IsKusudama(chip)) {
+						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+							if (p == i) continue;
+							var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+
+							if (chip2 == null) {
+								var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
+								if (!NotesManager.IsKusudama(chip3)) {
+									chip.nChannelNo = 0x17;
+								}
+							} else if (!NotesManager.IsKusudama(chip2)) {
+								chip.nChannelNo = 0x17;
+							}
+						}
+					}
+				}
+			}
+
+			var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
+			CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount[i], out this.nBalloonHitCount[i], out this.nRollTimeMs[i]);
+			this.nAddScoreGen4ShinUchi[i] = GetAddScoreGen4ShinUchi(this.nNoteCount[i], this.nBalloonHitCount[i], this.nRollTimeMs[i]);
+		}
+	}
+
+	private void CalculateGen4ShinUchiScoreParameters_Dan() {
+		this.nNoteCount_Dan = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nBalloonHitCount_Dan = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nRollTimeMs_Dan = new double[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		this.nAddScoreGen4ShinUchi_Dan = new double[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+
+		CTja tja = OpenTaiko.GetTJA(0)!;
+		this.scoreMode[0] = (tja.nScoreMode >= 0) ? tja.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+
+		var _list = (tja.bチップがある.Branch) ? tja.listChip_Branch[2] : tja.listChip;
+		for (int iNextSongChip = 0, iNextSongChipNext; iNextSongChip >= 0; iNextSongChip = iNextSongChipNext) {
+			iNextSongChipNext = _list.FindIndex(iNextSongChip + 1, chip => (chip.nChannelNo == 0x9B));
+			CChip nextSongChip = _list[iNextSongChip];
+			int iDanSong = nextSongChip.n整数値_内部番号;
+			if ((nextSongChip.nChannelNo == 0x9B) && iDanSong >= 0) {
+				CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount_Dan[iDanSong], out this.nBalloonHitCount_Dan[iDanSong], out this.nRollTimeMs_Dan[iDanSong], iNextSongChip, iNextSongChipNext);
+				this.nAddScoreGen4ShinUchi_Dan[iDanSong] = GetAddScoreGen4ShinUchi(this.nNoteCount_Dan[iDanSong], this.nBalloonHitCount_Dan[iDanSong], this.nRollTimeMs_Dan[iDanSong]);
+			}
+		}
+	}
+
+	private static void CountGen4ShinUchiScoreNotes(List<CChip> listChip, out int nNotes, out int nBalloonHits, out double msRollTime, int startIdx = 0, int endIdx = -1) {
+		nNotes = 0;
+		nBalloonHits = 0;
+		msRollTime = 0;
+
+		if (endIdx < 0)
+			endIdx = listChip.Count;
+		for (int i = startIdx; i < endIdx; ++i) {
+			var _chip = listChip[i];
+			if (NotesManager.IsMissableNote(_chip))
+				++nNotes;
+
+			if (NotesManager.IsGenericBalloon(_chip)) {
+				var msDuration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
+				var expectedHits = (int)(msDuration / 1000 / 16.6f);
+				nBalloonHits += Math.Min(_chip.nBalloon, expectedHits);
+			}
+
+			if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
+				msRollTime += (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
+		}
+	}
+
+	public int GetCeilingGen4ShinUchiScore(int player)
+		=> Math.Max(1000000,
+			(int)(this.nAddScoreGen4ShinUchi[player] * this.nNoteCount[player])
+			+ (int)(this.nBalloonHitCount[player] * 100)
+			+ (int)(Math.Ceiling(16.6 * this.nRollTimeMs[player] / 1000 / 10) * 100 * 10));
+
+	public static double GetAddScoreGen4ShinUchi(int nSongNotes, int nSongBalloonHits, double msSongRollTime) {
+		if (nSongNotes == 0 && nSongBalloonHits == 0)
+			return 1000000;
+		return (double)Math.Ceiling((decimal)(
+			1000000 - (nSongBalloonHits * 100) - (16.6 * msSongRollTime / 1000 * 100)
+		) / nSongNotes / 10) * 10;
+	}
+
+	public void ftDanReSetScoreGen4ShinUchi(int iDanSong) {
+		this.nAddScoreGen4ShinUchi[0] = this.nAddScoreGen4ShinUchi_Dan[iDanSong];
 	}
 
 	public void ftDanReSetBranches(bool hasBranches) {
@@ -396,6 +392,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			ctChipAnimeLag[i] = null;
 			OpenTaiko.ConfigIni.nGameType[i] = eFirstGameType[i];
 			bSplitLane[i] = false;
+			this.msCurrentBarRollProgress[i] = 0;
 		}
 
 		this.nowProcessingKusudama = null;
@@ -502,14 +499,25 @@ internal abstract class CStage演奏画面共通 : CStage {
 	/// .2020.04.21.akasoko26
 	/// </summary>
 	public class CBRANCHSCORE {
+		// unused
 		public CBRANCHSCORE cBigNotes;//大音符分岐時の情報をまとめるため
-		public int nRoll;
+		// is reset
+		public int nRoll; // with balloon hits, but should exclude them in branch condition for TaikoJiro compatibility
 		public int nGreat;
 		public int nGood;
 		public int nMiss;
+		// no reset
 		public int nScore;
 		public int nADLIB;
+		public int nADLIBMiss;
 		public int nMine;
+		public int nMineAvoid;
+		public int nBarRollPass;
+		public int nBalloonHitPass;
+		public double msBarRollPass;
+		// only used for dan-i
+		public int nHighestCombo;
+		public int nCombo;
 	}
 
 	public double[] JPOSCROLLX = new double[5];
@@ -628,14 +636,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_ExclAuto;
 	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_InclAuto;
 	public bool ShowVideo;
-	public int[] nGood;
-	public int[] nHighestCombo;
-	public int[] nCombo;
-	public int[] nOk;
-	public int[] nBad;
-	public int[] nRoll;
-	public int[] nADLIB;
-	public int[] nMine;
+	public CBRANCHSCORE[] DanSongScore = [];
 
 	// chip-played state handling
 	protected bool isRewinding = false;
@@ -684,7 +685,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected int nListCount;
 
 	public bool[] bCurrentlyDrumRoll = new bool[] { false, false, false, false, false }; //奥の手
-	private int[] nTotalRollCount = new int[5];
 	protected int[] nCurrentRollCount = new int[5];
 	public int[] Chara_MissCount;
 	protected ERollState eRollState;
@@ -702,6 +702,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private CChip? nowProcessingKusudama = null;
 	public List<CChip>[] chip現在処理中の連打チップ = [[], [], [], [], []]; // [iPlayer][idxNowProcessingRoll]
+	public double[] msCurrentBarRollProgress = [0, 0, 0, 0, 0]; // [iPlayer]
 
 	protected const int NOTE_GAP = 25;
 	public int nLoopCount_Clear;
@@ -891,9 +892,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void tIncreaseComboDan(int danSong) {
-		this.nCombo[danSong]++;
-		if (this.nCombo[danSong] > this.nHighestCombo[danSong])
-			this.nHighestCombo[danSong] = this.nCombo[danSong];
+		this.DanSongScore[danSong].nCombo++;
+		if (this.DanSongScore[danSong].nCombo > this.DanSongScore[danSong].nHighestCombo)
+			this.DanSongScore[danSong].nHighestCombo = this.DanSongScore[danSong].nCombo;
 	}
 
 	private ENoteJudge e指定時刻からChipのJUDGEを返すImpl(long nTime, CChip pChip, int player = 0) {
@@ -1001,7 +1002,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			pChip.nRollCount++;
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-				this.nRoll[actDan.NowShowingNumber]++;
+				this.DanSongScore[actDan.NowShowingNumber].nRoll++;
 
 			this.nCurrentRollCount[nPlayer]++;
 
@@ -1009,7 +1010,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CChartScore[nPlayer].nRoll++;
 			this.CSectionScore[nPlayer].nRoll++;
 
-			this.nTotalRollCount[nPlayer]++;
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
 
@@ -1136,12 +1136,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			this.nRoll[actDan.NowShowingNumber]++;
+			this.DanSongScore[actDan.NowShowingNumber].nRoll++;
 		this.CBranchScore[player].nRoll++;
-		this.CChartScore[player].nRoll++;
+		this.CChartScore[player].nRoll++; //  成績発表の連打数に風船を含めるように (AioiLight)
 		this.CSectionScore[player].nRoll++;
-
-		this.nTotalRollCount[player]++; //  成績発表の連打数に風船を含めるように (AioiLight)
 
 		//分岐のための処理。実装してない。
 
@@ -1204,6 +1202,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return ENoteJudge.Auto;
 
 		if (!NotesManager.IsGenericRoll(pChip)) {
+			if (pChip.IsHitted || (pChip.IsMissed && (pChip.eNoteState == ENoteState.Bad)))
+				return ENoteJudge.Auto; // no repeated judgements
 			if (!pChip.IsMissed)//通り越したチップでなければ判定！
 			{
 				pChip.bHit = true;
@@ -1214,7 +1214,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		ENoteJudge eJudgeResult = ENoteJudge.Auto;
 		{
 			//連打が短すぎると発声されない
-			eJudgeResult = (bCorrectLane) ? this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer) : ENoteJudge.Miss;
+			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.e指定時刻からChipのJUDGEを返す(nHitTime, pChip, nPlayer) : ENoteJudge.Miss;
+			// for hit-type notes, check pChip.IsMissed instead to avoid repeated miss judgements
 
 			// AI judges
 			eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
@@ -1332,7 +1333,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CSectionScore[nPlayer].nADLIB++;
 					this.CBranchScore[nPlayer].nADLIB++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nADLIB[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
+				} else if (pChip.IsMissed) {
+					this.CChartScore[nPlayer].nADLIBMiss++;
+					this.CSectionScore[nPlayer].nADLIBMiss++;
+					this.CBranchScore[nPlayer].nADLIBMiss++;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.DanSongScore[actDan.NowShowingNumber].nADLIBMiss++;
 				}
 			} else if (NotesManager.IsMine(pChip)) {
 				if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss) {
@@ -1347,7 +1354,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CSectionScore[nPlayer].nMine++;
 					this.CBranchScore[nPlayer].nMine++;
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.nMine[actDan.NowShowingNumber]++;
+						this.DanSongScore[actDan.NowShowingNumber].nMine++;
+				} else if (pChip.IsMissed) {
+					this.CChartScore[nPlayer].nMineAvoid++;
+					this.CSectionScore[nPlayer].nMineAvoid++;
+					this.CBranchScore[nPlayer].nMineAvoid++;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
 				}
 			} else {
 				if (eJudgeResult != ENoteJudge.Miss) {
@@ -1401,7 +1414,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 
-		if (eJudgeResult == ENoteJudge.Poor || eJudgeResult == ENoteJudge.Miss || eJudgeResult == ENoteJudge.Bad) {
+		if (eJudgeResult == ENoteJudge.Poor || pChip.IsMissed || eJudgeResult == ENoteJudge.Bad) {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 
 			// ランナー(みすったやつ)
@@ -1473,224 +1486,117 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 
-
-		if (!bAutoPlay) {
-			if (!NotesManager.IsGenericRoll(pChip)) {
-
-				switch (eJudgeResult) {
-					case ENoteJudge.Perfect: {
-							if (NotesManager.IsADLIB(pChip))
-								break;
-
-							this.CBranchScore[nPlayer].nGreat++;
-							this.CChartScore[nPlayer].nGreat++;
-							this.CSectionScore[nPlayer].nGreat++;
-							this.Chara_MissCount[nPlayer] = 0;
-
-							if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Perfect++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nGood[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
-
-
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-
-							AIRegisterInput(nPlayer, 1);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+		switch (eJudgeResult) {
+			case ENoteJudge.Perfect: {
+					if (NotesManager.IsGenericRoll(pChip) || NotesManager.IsADLIB(pChip))
 						break;
-					case ENoteJudge.Great:
-					case ENoteJudge.Good: {
-							this.CBranchScore[nPlayer].nGood++;
-							this.CChartScore[nPlayer].nGood++;
-							this.CSectionScore[nPlayer].nGood++;
-							this.Chara_MissCount[nPlayer] = 0;
 
-							if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Great++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
+					this.CBranchScore[nPlayer].nGreat++;
+					this.CChartScore[nPlayer].nGreat++;
+					this.CSectionScore[nPlayer].nGreat++;
+					this.Chara_MissCount[nPlayer] = 0;
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nOk[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
+					if (nPlayer == 0)
+						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
+					this.actCombo.nCurrentCombo[nPlayer]++;
 
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+						this.DanSongScore[actDan.NowShowingNumber].nGreat++;
+						this.tIncreaseComboDan(actDan.NowShowingNumber);
+					}
+
+					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+					} else {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
+					}
+
+					AIRegisterInput(nPlayer, 1);
+
+					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
 
-							AIRegisterInput(nPlayer, 0.5f);
+					if (this.bIsMiss[nPlayer]) {
+						returnChara();
+					}
 
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
-						break;
-					case ENoteJudge.Poor:
-					case ENoteJudge.Miss:
-					case ENoteJudge.Bad: {
-							if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
-								break;
-
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-								CFloorManagement.damage();
-
-							if (!bBombHit) {
-								if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-									this.nBad[actDan.NowShowingNumber]++;
-
-								this.CBranchScore[nPlayer].nMiss++;
-								this.CChartScore[nPlayer].nMiss++;
-								this.CSectionScore[nPlayer].nMiss++;
-								this.Chara_MissCount[nPlayer]++;
-
-								if (nPlayer == 0) this.nHitCount_ExclAuto.Drums.Miss++;
-							}
-
-							this.actCombo.nCurrentCombo[nPlayer] = 0;
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.nCombo[actDan.NowShowingNumber] = 0;
-							this.actComboVoice.tReset(nPlayer);
-
-							AIRegisterInput(nPlayer, 0f);
-
-							this.bIsMiss[nPlayer] = true;
-						}
-						break;
-					default:
-						this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
-						break;
+					this.bIsMiss[nPlayer] = false;
 				}
-			}
-		} else if (bAutoPlay) {
-			switch (eJudgeResult) {
-				case ENoteJudge.Perfect: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (NotesManager.IsADLIB(pChip))
-								break;
+				break;
+			case ENoteJudge.Great:
+			case ENoteJudge.Good: {
+					if (NotesManager.IsGenericRoll(pChip))
+						break;
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nGood[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
+					this.CBranchScore[nPlayer].nGood++;
+					this.CChartScore[nPlayer].nGood++;
+					this.CSectionScore[nPlayer].nGood++;
+					this.Chara_MissCount[nPlayer] = 0;
 
-							this.CBranchScore[nPlayer].nGreat++;
-							this.CChartScore[nPlayer].nGreat++;
-							this.CSectionScore[nPlayer].nGreat++;
-							this.Chara_MissCount[nPlayer] = 0;
+					if (nPlayer == 0)
+						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
+					this.actCombo.nCurrentCombo[nPlayer]++;
 
-							if (nPlayer == 0) this.nHitCount_InclAuto.Drums.Perfect++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-							//this.actCombo.ctコンボ加算.t進行();
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-							AIRegisterInput(nPlayer, 1);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+						this.DanSongScore[actDan.NowShowingNumber].nGood++;
+						this.tIncreaseComboDan(actDan.NowShowingNumber);
 					}
-					break;
 
-				case ENoteJudge.Great:
-				case ENoteJudge.Good: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-								this.nOk[actDan.NowShowingNumber]++;
-								this.tIncreaseComboDan(actDan.NowShowingNumber);
-							}
-
-							this.CBranchScore[nPlayer].nGood++;
-							this.CChartScore[nPlayer].nGood++;
-							this.CSectionScore[nPlayer].nGood++;
-							this.Chara_MissCount[nPlayer] = 0;
-
-							if (nPlayer == 0) this.nHitCount_InclAuto.Drums.Great++;
-							this.actCombo.nCurrentCombo[nPlayer]++;
-
-							if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-							} else {
-								this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-							}
-
-
-							AIRegisterInput(nPlayer, 0.5f);
-
-							OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
-
-							if (this.bIsMiss[nPlayer]) {
-								returnChara();
-							}
-
-							this.bIsMiss[nPlayer] = false;
-						}
+					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+					} else {
+						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
 					}
-					break;
 
-				default: {
-						if (!NotesManager.IsGenericRoll(pChip)) {
-							if (!NotesManager.IsMissableNote(pChip) && !bBombHit)
-								break;
+					AIRegisterInput(nPlayer, 0.5f);
 
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-								CFloorManagement.damage();
+					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
-							if (!bBombHit) {
-								if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-									this.nBad[actDan.NowShowingNumber]++;
-
-
-								this.CBranchScore[nPlayer].nMiss++;
-								this.CChartScore[nPlayer].nMiss++;
-								this.CSectionScore[nPlayer].nMiss++;
-								this.Chara_MissCount[nPlayer]++;
-							}
-
-							this.actCombo.nCurrentCombo[nPlayer] = 0;
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.nCombo[actDan.NowShowingNumber] = 0;
-							this.actComboVoice.tReset(nPlayer);
-
-							AIRegisterInput(nPlayer, 0f);
-
-
-							this.bIsMiss[nPlayer] = true;
-						}
+					if (this.bIsMiss[nPlayer]) {
+						returnChara();
 					}
-					break;
-			}
+
+					this.bIsMiss[nPlayer] = false;
+				}
+				break;
+			case ENoteJudge.Miss:
+				if (pChip.IsMissed)
+					goto case ENoteJudge.Poor;
+				break;
+			case ENoteJudge.Poor:
+			case ENoteJudge.Bad: {
+					if (NotesManager.IsGenericRoll(pChip) || !(NotesManager.IsMissableNote(pChip) || bBombHit))
+						break;
+
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+						CFloorManagement.damage();
+
+					if (!bBombHit) {
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.DanSongScore[actDan.NowShowingNumber].nMiss++;
+
+						this.CBranchScore[nPlayer].nMiss++;
+						this.CChartScore[nPlayer].nMiss++;
+						this.CSectionScore[nPlayer].nMiss++;
+						this.Chara_MissCount[nPlayer]++;
+
+						if (nPlayer == 0)
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
+					}
+
+					this.actCombo.nCurrentCombo[nPlayer] = 0;
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+						this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
+					this.actComboVoice.tReset(nPlayer);
+
+					AIRegisterInput(nPlayer, 0f);
+
+					this.bIsMiss[nPlayer] = true;
+				}
+				break;
+			default:
+				this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
+				break;
 		}
 		actDan.Update();
 
@@ -1756,10 +1662,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			if (OpenTaiko.ConfigIni.ShinuchiMode)  //2016.07.04 kairera0467 真打モード。
 			{
-				nAddScore = (long)nAddScoreNiji[nPlayer];
+				nAddScore = (long)nAddScoreGen4ShinUchi[nPlayer];
 
 				if (eJudgeResult == ENoteJudge.Great || eJudgeResult == ENoteJudge.Good) {
-					nAddScore = (long)nAddScoreNiji[nPlayer] / 20;
+					nAddScore = (long)nAddScoreGen4ShinUchi[nPlayer] / 20;
 					nAddScore = (long)nAddScore * 10;
 				}
 
@@ -2647,8 +2553,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (time <= 0) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
-								pChip.eNoteState = ENoteState.Bad;
 								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
+								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
 							}
 						}
 					}
@@ -2669,6 +2575,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 			//Debug.WriteLine( "nCurrentTopChip=" + nCurrentTopChip + ", ch=" + pChip.nチャンネル番号.ToString("x2") + ", 発音位置=" + pChip.n発声位置 + ", 発声時刻ms=" + pChip.n発声時刻ms );
 			if (!hasChipBeenPlayedAt(pChip, n現在時刻ms)) // not processed yet
 				break;
+
+			// handle last chip status of dan-i exams
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				if (dTX.pDan_LastChip.Contains(pChip)) {
+					this.actDan.Update();
+				}
+			}
 
 			switch (pChip.nChannelNo) {
 				#region [ 01: BGM ]
@@ -2917,20 +2830,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 						this.ListDan_Number = pChip.n整数値_内部番号;
 						this.actPanel.t歌詞テクスチャを削除する();
-						if (pChip.nBranch == this.nCurrentBranch[nPlayer]) {
-							this.actDan.Update();
-							if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
-								if (this.actDan.GetFailedAllChallenges()) {
-									this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
-									IsDanFailed = true;
-									return true;
-								}
-
-								// Play next song here
-								this.actDan.Start(this.ListDan_Number);
-							} else {
-								actDan.FirstSectionAnime = true;
+						this.actDan.Update();
+						if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
+							if (Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
+								IsDanFailed = true;
+								return true;
 							}
+
+							// Play next song here
+							this.actDan.Start(this.ListDan_Number);
+						} else {
+							actDan.FirstSectionAnime = true;
 						}
 					}
 					break;
@@ -3799,10 +3710,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 							CFloorManagement.damage();
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.nMine[actDan.NowShowingNumber]++;
+							this.DanSongScore[actDan.NowShowingNumber].nMine++;
 						this.actCombo.nCurrentCombo[iPlayer] = 0;
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.nCombo[actDan.NowShowingNumber] = 0;
+							this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 						this.actComboVoice.tReset(iPlayer);
 						this.bIsMiss[iPlayer] = true;
 					}
@@ -3850,6 +3761,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				if (actChara.CharaAction_Balloon_Delay[iPlayer] != null)
 					actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1, 1, OpenTaiko.Timer);
 			}
+			if (NotesManager.IsFuzeRoll(chip)) {
+				this.CChartScore[iPlayer].nMineAvoid++;
+				this.CSectionScore[iPlayer].nMineAvoid++;
+				this.CBranchScore[iPlayer].nMineAvoid++;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
+			}
 		}
 		this.RemoveNowProcessingRollChip(iPlayer, chip, false);
 	}
@@ -3861,6 +3779,31 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (NotesManager.IsKusudama(chip) && this.actBalloon.KusudamaIsActive) {
 			this.actBalloon.KusuMiss();
 		}
+
+		if (!resetStates && !chip.end.bProcessed && chip.end.bVisible) {
+			if (NotesManager.IsGenericBalloon(chip)) {
+				this.CChartScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				this.CSectionScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				this.CBranchScore[iPlayer].nBalloonHitPass += chip.nBalloon;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nBalloonHitPass += chip.nBalloon;
+			} else {
+				this.CChartScore[iPlayer].nBarRollPass++;
+				this.CSectionScore[iPlayer].nBarRollPass++;
+				this.CBranchScore[iPlayer].nBarRollPass++;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].nBarRollPass++;
+
+				double msRollLength = chip.end.n発声時刻ms - chip.n発声時刻ms;
+				this.CChartScore[iPlayer].msBarRollPass += msRollLength;
+				this.CSectionScore[iPlayer].msBarRollPass += msRollLength;
+				this.CBranchScore[iPlayer].msBarRollPass += msRollLength;
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].msBarRollPass += msRollLength;
+			}
+			this.actDan.Update();
+		}
+
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
 		if (this.chip現在処理中の連打チップ[iPlayer].Count == 0) {
 			this.bCurrentlyDrumRoll[iPlayer] = false;
@@ -4069,7 +4012,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public int GetRoll(int player) {
-		return nTotalRollCount[player];
+		return this.CChartScore[player].nRoll;
 	}
 
 	protected float GetNowPBMTime(CTja tja, float play_time) {
@@ -4195,7 +4138,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.nNextBranch[i] = CTja.ECourse.eNormal;
 				this.nDisplayedBranchLane[0] = CTja.ECourse.eNormal;
 				this.nCurrentRollCount[i] = 0;
-				this.nTotalRollCount[i] = 0;
 
 				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
 
@@ -4303,6 +4245,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			OpenTaiko.ConfigIni.nGameType[i] = this.eFirstGameType[i];
 			this.bSplitLane[i] = false;
+			this.msCurrentBarRollProgress[i] = 0;
 
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
 				var chip = this.chip現在処理中の連打チップ[i][iChip];
