@@ -23,7 +23,7 @@ internal class CStage結果 : CStage {
 	public STDGBVALUE<int> nScoreRank;
 	public int n総合ランク値;
 
-	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:Not-cleared 1:Assisted-cleared 2:Cleared 3:Full-combo 4:Perfect
 	public int[] nスコアランク = { 0, 0, 0, 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 	public int[] nHighScore = { 0, 0, 0, 0, 0 };
 	public bool[] IsScoreValid = [false, false, false, false, false];
