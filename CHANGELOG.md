@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.79] - 2025-06-16 (Beta)
+
+- [Fix] AI battle mode result mode bugs due to not treating player count as 1, including character's "success"/"failed" voice looped every frame infinitely
+- [Fix] Result screen used hardcoded 80% gauge value for some success/failed animations and caused wrong animations for non–80%+-clear gauges
+
 ## [0.6.0.78] - 2025-06-16 (Beta)
 
 - [Enhancement] Judge exam requirement reachability live for JudgeADLIB, JudgeMine, Roll, Hit, Accuracy, & Score (use gen-4 score, no live failure in non–gen-4-Shin-uchi score mode) exams (no live failure for branched songs) 
