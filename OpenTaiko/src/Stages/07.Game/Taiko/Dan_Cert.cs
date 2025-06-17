@@ -469,8 +469,8 @@ internal class Dan_Cert : CActivity {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return;
 					}
-					// else do not blink
-					dan_C.ReachStatus = (dan_C.GetAmountToPercent() < 50) ? Exam.ReachStatus.Low : Exam.ReachStatus.High;
+					// use a separated color from filled gauge as the filled state is more concerned than the fill %
+					dan_C.ReachStatus = Exam.ReachStatus.Low;
 					return;
 				} else {
 					if (judgeFailure && accPoint >= accPointSuccess) {
