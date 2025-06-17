@@ -532,9 +532,9 @@ internal class Dan_Cert : CActivity {
 
 		Exam.ReachStatus getGenericSuccessStatusLess(Dan_C dan_C, double amountMax, double amountRemainMax, Exam.Status status)
 			=> ((amountMax < 0) ? 0 : 100 * amountRemainMax / amountMax) switch {
-				_ when isAfterLastChip => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High, // no white blinking at exam end
-				>= 10 => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
-				>= 5 => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
+				_ when isAfterLastChip => Exam.ReachStatus.High, // and if not better success // no white blinking at exam end
+				>= 10 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
+				>= 5 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
 				_ => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Nearer_Better_Success : Exam.ReachStatus.Nearer_Success,
 			};
 
