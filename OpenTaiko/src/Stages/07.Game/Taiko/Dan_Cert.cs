@@ -455,22 +455,22 @@ internal class Dan_Cert : CActivity {
 				double accPointMax = (score.judges!.nGreat + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
 				double accPoint = score.judges.nGreat * 100 + score.judges.nGood * 50;
 				if (dan_C.ExamRange != Exam.Range.Less) {
-					if (dan_C.GetExamStatus() >= Exam.Status.Success) {
-						// reuse less-type rules for blinking status
-						dan_C.ReachStatus = getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax,
-							(accPointMax >= accPointBetterSuccess) ? Exam.Status.Better_Success : Exam.Status.Success);
-						return;
-					}
 					if (judgeFailure && accPointMax < accPointSuccess) {
 						dan_C.ReachStatus = Exam.ReachStatus.Failure;
 						return;
 					}
-					if (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess && (score.nNotesRemainMax < score.nNotesMax)) {
+					if ((accPoint < accPointSuccess) && (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess) && (score.nNotesRemainMax < score.nNotesMax)) {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return;
 					}
-					// use a separated color from filled gauge as the filled state is more concerned than the fill %
-					dan_C.ReachStatus = Exam.ReachStatus.Low;
+					if (dan_C.GetExamStatus() < Exam.Status.Success) {
+						// use a separated color from filled gauge as the filled state is more concerned than the fill %
+						dan_C.ReachStatus = Exam.ReachStatus.Low;
+						return;
+					}
+					// reuse less-type rules for blinking status
+					dan_C.ReachStatus = getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax,
+						(accPointMax >= accPointBetterSuccess) ? Exam.Status.Better_Success : Exam.Status.Success);
 					return;
 				} else {
 					if (judgeFailure && accPoint >= accPointSuccess) {
