@@ -459,7 +459,9 @@ internal class Dan_Cert : CActivity {
 						dan_C.ReachStatus = Exam.ReachStatus.Failure;
 						return;
 					}
-					if ((accPoint < accPointSuccess) && (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess) && (score.nNotesRemainMax < score.nNotesMax)) {
+					if ((accPoint < accPointSuccess) && (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess)
+						&& !(score.judges.nGood <= 0 && score.judges.nMiss <= 0)
+						) {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return;
 					}
