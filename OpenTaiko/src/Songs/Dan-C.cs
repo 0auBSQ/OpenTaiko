@@ -111,11 +111,11 @@ public class Dan_C {
 	/// </summary>
 	/// <returns>Amountの百分率。</returns>
 	public int GetAmountToPercent() {
-		if (GetValue()[0] == 0) {
+		if (GetValue()[0] == 0 || this.GetDisplayedAmount() == 0) {
 			return 0;
 		}
 		double ratio = (double)this.GetDisplayedAmount() / GetValue()[0];
-		return (int)double.Clamp(ratio * 100.0, 0.0, 100.0);
+		return (int)double.Clamp(ratio * 100.0, 1, 100.0);
 	}
 
 	public double GetBetterAmountToPercent() {
