@@ -136,7 +136,7 @@ internal class Dan_Cert : CActivity {
 		public bool hasBranch;
 
 		public int GetUpdatedNNotesPast() => (judges!.nGreat + judges.nGood + judges.nMiss);
-		public double GetUpdatedAccuracy() => (judges!.nGreat! * 100 + judges.nGood * 50) / (double)GetUpdatedNNotesPast();
+		public double GetUpdatedAccuracy() => (judges!.nGreat! * 100 + judges.nGood * 50) / Math.Max(1, (double)GetUpdatedNNotesPast());
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
