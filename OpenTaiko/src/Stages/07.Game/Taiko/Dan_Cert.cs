@@ -136,7 +136,7 @@ internal class Dan_Cert : CActivity {
 		public bool hasBranch;
 
 		public int GetUpdatedNNotesPast() => (judges!.nGreat + judges.nGood + judges.nMiss);
-		public double GetUpdatedAccuracy() => (judges!.nGreat! * 100 + judges.nGood * 50) / (double)GetUpdatedNNotesPast();
+		public double GetUpdatedAccuracy() => (judges!.nGreat! * 100 + judges.nGood * 50) / Math.Max(1, (double)GetUpdatedNNotesPast());
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
@@ -455,22 +455,24 @@ internal class Dan_Cert : CActivity {
 				double accPointMax = (score.judges!.nGreat + score.nNotesRemainMax) * 100 + score.judges.nGood * 50;
 				double accPoint = score.judges.nGreat * 100 + score.judges.nGood * 50;
 				if (dan_C.ExamRange != Exam.Range.Less) {
-					if (dan_C.GetExamStatus() >= Exam.Status.Success) {
-						// reuse less-type rules for blinking status
-						dan_C.ReachStatus = getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax,
-							(accPointMax >= accPointBetterSuccess) ? Exam.Status.Better_Success : Exam.Status.Success);
-						return;
-					}
 					if (judgeFailure && accPointMax < accPointSuccess) {
 						dan_C.ReachStatus = Exam.ReachStatus.Failure;
 						return;
 					}
-					if (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess && (score.nNotesRemainMax < score.nNotesMax)) {
+					if ((accPoint < accPointSuccess) && (accPointMax - 0.02 * score.nNotesRemainMax * 100 < accPointSuccess)
+						&& !(score.judges.nGood <= 0 && score.judges.nMiss <= 0)
+						) {
 						dan_C.ReachStatus = Exam.ReachStatus.Danger;
 						return;
 					}
-					// else do not blink
-					dan_C.ReachStatus = (dan_C.GetAmountToPercent() < 50) ? Exam.ReachStatus.Low : Exam.ReachStatus.High;
+					if (dan_C.GetExamStatus() < Exam.Status.Success) {
+						// use a separated color from filled gauge as the filled state is more concerned than the fill %
+						dan_C.ReachStatus = Exam.ReachStatus.Low;
+						return;
+					}
+					// reuse less-type rules for blinking status
+					dan_C.ReachStatus = getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax,
+						(accPointMax >= accPointBetterSuccess) ? Exam.Status.Better_Success : Exam.Status.Success);
 					return;
 				} else {
 					if (judgeFailure && accPoint >= accPointSuccess) {
@@ -532,9 +534,9 @@ internal class Dan_Cert : CActivity {
 
 		Exam.ReachStatus getGenericSuccessStatusLess(Dan_C dan_C, double amountMax, double amountRemainMax, Exam.Status status)
 			=> ((amountMax < 0) ? 0 : 100 * amountRemainMax / amountMax) switch {
-				_ when isAfterLastChip => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High, // no white blinking at exam end
-				>= 10 => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
-				>= 5 => (dan_C.GetExamStatus() == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
+				_ when isAfterLastChip => Exam.ReachStatus.High, // and if not better success // no white blinking at exam end
+				>= 10 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
+				>= 5 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
 				_ => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Nearer_Better_Success : Exam.ReachStatus.Nearer_Success,
 			};
 
