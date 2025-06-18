@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.80] - 2025-06-18 (Beta)
+
+- [Fix] Fix accuracy exam monitoring
+
 ## [0.6.0.79] - 2025-06-16 (Beta)
 
 - [Fix] AI battle mode result mode bugs due to not treating player count as 1, including character's "success"/"failed" voice looped every frame infinitely
