@@ -6,16 +6,19 @@ namespace OpenTaiko;
 internal class CActFIFOStart : CActivity {
 	// メソッド
 
-	public void tフェードアウト開始() {
+	public void tフェードアウト開始() => tフェードアウト開始(false);
+	public void tフェードアウト開始(bool skipDelay) {
 		this.mode = EFIFOMode.FadeOut;
 
 		OpenTaiko.Skin.soundDanSelectBGM.tStop();
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			this.counter = new CCounter(0, 1255, 1, OpenTaiko.Timer);
+			this.counter = new CCounter(skipDelay ? 1000 : 0, 1255, 1, OpenTaiko.Timer);
 		else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			this.counter = new CCounter(0, 5500, 1, OpenTaiko.Timer);
+			this.counter = new CCounter(skipDelay ? 2000 : 0, 5500, 1, OpenTaiko.Timer);
+		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
+			this.counter = new CCounter(skipDelay ? 1000 : 0, 3580, 1, OpenTaiko.Timer);
 		} else {
-			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
+			this.counter = new CCounter(skipDelay ? 2580 : 0, 3580, 1, OpenTaiko.Timer);
 		}
 	}
 	public void tフェードイン開始() {
@@ -25,7 +28,6 @@ internal class CActFIFOStart : CActivity {
 			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
-			OpenTaiko.stageGameScreen.ListDan_Number++;
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 		} else {

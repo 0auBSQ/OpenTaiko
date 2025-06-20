@@ -543,6 +543,23 @@
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} charts made by {2}. ({3}/{1})", // sc
+		// {0}: Activate / Desactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} le levier global {1}. ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "Le compteur global {1} est {0} {2}. ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "Désactive",
+		"UNLOCK_CONDITION_TRIGGER_1": "Active",
+
+		"UNLOCK_CONDITION_TYPE_l": "inférieur à",
+		"UNLOCK_CONDITION_TYPE_le": "inférieur ou égal à",
+		"UNLOCK_CONDITION_TYPE_e": "égal à",
+		"UNLOCK_CONDITION_TYPE_me": "supérieur ou égal à",
+		"UNLOCK_CONDITION_TYPE_m": "supérieur à",
+		"UNLOCK_CONDITION_TYPE_d": "different de",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Play",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Play",
@@ -559,6 +576,7 @@
 		"PAUSE_TITLE": "Pause",
 		"PAUSE_RESUME": "Reprendre",
 		"PAUSE_RESTART": "Recommencer",
+		"PAUSE_SKIP": "Sauter",
 		"PAUSE_EXIT": "Quitter",
 
 		// AI Info

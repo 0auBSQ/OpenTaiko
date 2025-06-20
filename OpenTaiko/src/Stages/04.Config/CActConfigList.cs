@@ -233,16 +233,18 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BASSBUFFER_DESC"));
 		this.list項目リスト.Add(this.iSystemBassBufferSizeMs);
 
-		// #24820 2013.1.15 yyagi
-		this.iSystemWASAPIBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER"), 0, 99999, OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER_DESC"));
-		this.list項目リスト.Add(this.iSystemWASAPIBufferSizeMs);
+		if (OperatingSystem.IsWindows()) {
+			// #24820 2013.1.15 yyagi
+			this.iSystemWASAPIBufferSizeMs = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER"), 0, 99999, OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WASAPIBUFFER_DESC"));
+			this.list項目リスト.Add(this.iSystemWASAPIBufferSizeMs);
 
-		// #24820 2013.1.17 yyagi
-		this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nASIODevice,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK_DESC"),
-			CEnumerateAllAsioDevices.GetAllASIODevices());
-		this.list項目リスト.Add(this.iSystemASIODevice);
+			// #24820 2013.1.17 yyagi
+			this.iSystemASIODevice = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nASIODevice,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_ASIOPLAYBACK_DESC"),
+				CEnumerateAllAsioDevices.GetAllASIODevices());
+			this.list項目リスト.Add(this.iSystemASIODevice);
+		}
 
 		// #33689 2014.6.17 yyagi
 		this.iSystemSoundTimerType = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_OSTIMER"), OpenTaiko.ConfigIni.bUseOSTimer,
@@ -1015,10 +1017,12 @@ internal class CActConfigList : CActivity {
 		this.nスクロール用タイマ値 = -1;
 		this.ct三角矢印アニメ = new CCounter();
 
-		this.iSystemSoundType_initial = this.iSystemSoundType.n現在選択されている項目番号;   // CONFIGに入ったときの値を保持しておく
 		this.iSystemBassBufferSizeMs_initial = this.iSystemBassBufferSizeMs.n現在の値;              // CONFIG脱出時にこの値から変更されているようなら
-		this.iSystemWASAPIBufferSizeMs_initial = this.iSystemWASAPIBufferSizeMs.n現在の値;              // CONFIG脱出時にこの値から変更されているようなら
-		this.iSystemASIODevice_initial = this.iSystemASIODevice.n現在選択されている項目番号;
+		if (OperatingSystem.IsWindows()) {
+			this.iSystemSoundType_initial = this.iSystemSoundType.n現在選択されている項目番号;   // CONFIGに入ったときの値を保持しておく
+			this.iSystemWASAPIBufferSizeMs_initial = this.iSystemWASAPIBufferSizeMs.n現在の値;              // CONFIG脱出時にこの値から変更されているようなら
+			this.iSystemASIODevice_initial = this.iSystemASIODevice.n現在選択されている項目番号;
+		}
 		this.iSystemSoundTimerType_initial = this.iSystemSoundTimerType.GetIndex();
 		base.Activate();
 	}
@@ -1037,40 +1041,61 @@ internal class CActConfigList : CActivity {
 		}
 		#endregion
 
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
+			int id = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.TitleId;
+			if (id > 0) {
+				var title = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
+				OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Title = title.nameplateInfo.cld.GetString("");
+			}
+			OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+		}
 		// #24820 2013.1.22 yyagi CONFIGでWASAPI/ASIO/DirectSound関連の設定を変更した場合、サウンドデバイスを再構築する。
 		// #33689 2014.6.17 yyagi CONFIGでSoundTimerTypeの設定を変更した場合も、サウンドデバイスを再構築する。
 		#region [ サウンドデバイス変更 ]
-		if (this.iSystemSoundType_initial != this.iSystemSoundType.n現在選択されている項目番号 ||
+		if (OperatingSystem.IsWindows()) {
+			if (this.iSystemSoundType_initial != this.iSystemSoundType.n現在選択されている項目番号 ||
 			this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
 			this.iSystemWASAPIBufferSizeMs_initial != this.iSystemWASAPIBufferSizeMs.n現在の値 ||
 			this.iSystemASIODevice_initial != this.iSystemASIODevice.n現在選択されている項目番号 ||
 			this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
-			ESoundDeviceType soundDeviceType;
-			switch (this.iSystemSoundType.n現在選択されている項目番号) {
-				case 0:
-					soundDeviceType = ESoundDeviceType.Bass;
-					break;
-				case 1:
-					soundDeviceType = ESoundDeviceType.ASIO;
-					break;
-				case 2:
-					soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
-					break;
-				case 3:
-					soundDeviceType = ESoundDeviceType.SharedWASAPI;
-					break;
-				default:
-					soundDeviceType = ESoundDeviceType.Unknown;
-					break;
+				ESoundDeviceType soundDeviceType;
+				switch (this.iSystemSoundType.n現在選択されている項目番号) {
+					case 0:
+						soundDeviceType = ESoundDeviceType.Bass;
+						break;
+					case 1:
+						soundDeviceType = ESoundDeviceType.ASIO;
+						break;
+					case 2:
+						soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
+						break;
+					case 3:
+						soundDeviceType = ESoundDeviceType.SharedWASAPI;
+						break;
+					default:
+						soundDeviceType = ESoundDeviceType.Unknown;
+						break;
+				}
+				OpenTaiko.SoundManager.tInitialize(soundDeviceType,
+					this.iSystemBassBufferSizeMs.n現在の値,
+					this.iSystemWASAPIBufferSizeMs.n現在の値,
+					0,
+					this.iSystemASIODevice.n現在選択されている項目番号,
+					this.iSystemSoundTimerType.bON);
+				OpenTaiko.app.ShowWindowTitle();
+				OpenTaiko.Skin.ReloadSkin();// 音声の再読み込みをすることによって、音量の初期化を防ぐ
 			}
-			OpenTaiko.SoundManager.tInitialize(soundDeviceType,
-				this.iSystemBassBufferSizeMs.n現在の値,
-				this.iSystemWASAPIBufferSizeMs.n現在の値,
-				0,
-				this.iSystemASIODevice.n現在選択されている項目番号,
-				this.iSystemSoundTimerType.bON);
-			OpenTaiko.app.ShowWindowTitle();
-			OpenTaiko.Skin.ReloadSkin();// 音声の再読み込みをすることによって、音量の初期化を防ぐ
+		}
+		else {
+			if (this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
+				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
+				OpenTaiko.SoundManager.tInitialize(ESoundDeviceType.Bass,
+					this.iSystemBassBufferSizeMs.n現在の値,
+					0,
+					0,
+					0,
+					this.iSystemSoundTimerType.bON);
+			}
 		}
 		#endregion
 		#region [ サウンドのタイムストレッチモード変更 ]
@@ -1120,7 +1145,7 @@ internal class CActConfigList : CActivity {
 		#region [ 初めての進行描画 ]
 		//-----------------
 		if (base.IsFirstDraw) {
-			this.nスクロール用タイマ値 = (long)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+			this.nスクロール用タイマ値 = OpenTaiko.Timer.NowTimeMs;
 			this.ct三角矢印アニメ.Start(0, 9, 50, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}
@@ -1679,11 +1704,12 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName = skinSubFolders[nSkinIndex];               // #28195 2012.5.2 yyagi
 		OpenTaiko.Skin.SetCurrentSkinSubfolderFullName(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, true);
 
-		OpenTaiko.ConfigIni.nSoundDeviceType = this.iSystemSoundType.n現在選択されている項目番号;       // #24820 2013.1.3 yyagi
 		OpenTaiko.ConfigIni.nBassBufferSizeMs = this.iSystemBassBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
-		OpenTaiko.ConfigIni.nWASAPIBufferSizeMs = this.iSystemWASAPIBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
-																									   //			CDTXMania.ConfigIni.nASIOBufferSizeMs = this.iSystemASIOBufferSizeMs.n現在の値;					// #24820 2013.1.3 yyagi
-		OpenTaiko.ConfigIni.nASIODevice = this.iSystemASIODevice.n現在選択されている項目番号;           // #24820 2013.1.17 yyagi
+		if (OperatingSystem.IsWindows()) {
+			OpenTaiko.ConfigIni.nSoundDeviceType = this.iSystemSoundType.n現在選択されている項目番号;       // #24820 2013.1.3 yyagi
+			OpenTaiko.ConfigIni.nWASAPIBufferSizeMs = this.iSystemWASAPIBufferSizeMs.n現在の値;                // #24820 2013.1.15 yyagi
+			OpenTaiko.ConfigIni.nASIODevice = this.iSystemASIODevice.n現在選択されている項目番号;           // #24820 2013.1.17 yyagi
+		}
 		OpenTaiko.ConfigIni.bUseOSTimer = this.iSystemSoundTimerType.bON;                              // #33689 2014.6.17 yyagi
 
 		OpenTaiko.ConfigIni.bTimeStretch = this.iSystemTimeStretch.bON;                                    // #23664 2013.2.24 yyagi

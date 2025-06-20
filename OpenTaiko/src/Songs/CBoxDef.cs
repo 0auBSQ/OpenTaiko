@@ -41,7 +41,7 @@ internal class CBoxDef {
 		BoxChara = "0";
 		BgColor = Color.White;
 		DefaultPreimage = null;
-		ScenePreset = "";
+		ScenePreset = null;
 	}
 	public CBoxDef(string boxdefファイル名)
 		: this() {

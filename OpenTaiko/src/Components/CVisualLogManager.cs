@@ -21,6 +21,9 @@ class CVisualLogManager {
 			}
 			timeSinceCreation.Tick();
 
+			if (y >= GameWindowSize.Height)
+				return y; // exceeded screen; skip drawing
+
 			// Display stuff here
 			if (OpenTaiko.actTextConsole != null) {
 				y = OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.Cyan, msg).y;
@@ -43,13 +46,21 @@ class CVisualLogManager {
 	}
 
 	public void Display() {
-		while (this.cards.TryPeek(out var card) && card.IsExpired()) {
-			this.cards.Dequeue();
+		if (this.firstCard?.IsExpired() ?? true) {
+			while (this.cards.TryDequeue(out this.firstCard) && this.firstCard.IsExpired())
+				;
 		}
 		int y = 0;
-		foreach (var card in this.cards)
-			y = card.Display(y);
+		if (this.firstCard != null)
+			y = this.firstCard.Display(y);
+		try {
+			foreach (var card in this.cards)
+				y = card.Display(y);
+		} catch (InvalidOperationException ex) {
+			// item updated during drawing; skip
+		}
 	}
 
-	private readonly Queue<LogCard> cards = new Queue<LogCard>();
+	private readonly Queue<LogCard> cards = new();
+	private LogCard? firstCard = null;
 }

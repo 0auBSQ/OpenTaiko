@@ -22,12 +22,54 @@ public static class ImGuiDebugWindow {
 
 	private static long memoryReadTimer = 0;
 	private static long pagedmemory = 0;
-	private static int textureMemoryUsage = 0;
-	private static int currentStageMemoryUsage = 0;
+	private static long textureMemoryUsage = 0;
+	private static long currentStageMemoryUsage = 0;
 
 	private static int sortType = -1;
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
 	private static string reloadTexPath = "";
+
+	private static Dictionary<int, string> nameplate_Rarities = new() {
+		[0] = "Poor",
+		[1] = "Common",
+		[2] = "Uncommon",
+		[3] = "Rare",
+		[4] = "Epic",
+		[5] = "Legendary",
+		[6] = "Mythical"
+	};
+
+	private static Dictionary<string, string> nameplate_unlockCondition = new() {
+		{ "ch (Coins here)", "ch" },
+		{ "cs (Coins shop)", "cs" },
+		{ "cm (Coins menu)", "cm" },
+		{ "ce (Coins earned)", "ce" },
+		{ "dp (Difficulty pass)", "dp" },
+		{ "lp (Level pass)", "lp" },
+		{ "sp (Song performance)", "sp" },
+		{ "sg (Song genre (performance))", "sg" },
+		{ "sc (Song charter (performance))", "sc" },
+		{ "tp (Total plays)", "tp" },
+		{ "ap (AI battle plays)", "ap" },
+		{ "aw (AI battle wins)", "aw" }
+	};
+	private static int nameplate_ucId = 4;
+
+	private static Dictionary<string, string> nameplate_unlockType = new() {
+		{ "l (Less than)", "l" },
+		{ "le (Less or equal)", "le" },
+		{ "e (Equal)", "e" },
+		{ "me (More or equal)", "me" },
+		{ "m (More than)", "m" },
+		{ "d (Different)", "d" },
+	};
+	private static int nameplate_utId = 3;
+
+	private static string nameplate_unlockValues = "[]";
+	private static string nameplate_unlockReferences = "[]";
+	private static Dictionary<string, string> nameplate_Translations = [];
+	private static string translation_id = "";
+
 	public static void Draw() {
 		if (Game.ImGuiController == null) return;
 
@@ -174,16 +216,34 @@ public static class ImGuiDebugWindow {
 						ImGui.TextColored(new System.Numerics.Vector4(0.4f, 0.8f, 1.0f, 1.0f), "2P is occupied. AI Battle is active.");
 
 					ImGui.Text($"ID: {OpenTaiko.SaveFileInstances[save].data.SaveId}");
-					ImGui.InputText("Name", ref OpenTaiko.SaveFileInstances[save].data.Name, 64);
+					ImGui.InputText($"Name###NAME{i}", ref OpenTaiko.SaveFileInstances[save].data.Name, 64);
 
-					if (ImGui.Button("Update###UPDATE_PROFILE")) {
+					if (ImGui.Button($"Update###UPDATE_PROFILE{i}")) {
 						OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 						OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 					}
 
-					string preview = OpenTaiko.SaveFileInstances[save].data.TitleId == -1 ? "初心者" : OpenTaiko.Databases.DBNameplateUnlockables.data[OpenTaiko.SaveFileInstances[save].data.TitleId].nameplateInfo.cld.GetString("");
+					string preview = OpenTaiko.SaveFileInstances[save].data.Title;
 
-					if (ImGui.BeginCombo("Nameplate", preview)) {
+					if (ImGui.BeginCombo($"Nameplate###NAMEPLATE{i}", preview)) {
+						if (ImGui.Selectable("(Clear Title)")) {
+							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
+							OpenTaiko.SaveFileInstances[save].data.Title = "";
+							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
+							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						if (ImGui.Selectable("初心者")) {
+							OpenTaiko.SaveFileInstances[save].data.TitleId = -1;
+							OpenTaiko.SaveFileInstances[save].data.Title = "初心者";
+							OpenTaiko.SaveFileInstances[save].data.TitleRarityInt = 1;
+							OpenTaiko.SaveFileInstances[save].data.TitleType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
 						foreach (long id in OpenTaiko.Databases.DBNameplateUnlockables.data.Keys) {
 							bool unlocked = OpenTaiko.SaveFileInstances[save].data.UnlockedNameplateIds.Contains((int)id);
 
@@ -201,24 +261,102 @@ public static class ImGuiDebugWindow {
 						ImGui.EndCombo();
 					}
 
-					if (ImGui.TreeNodeEx("Edit Nameplate")) {
+					if (ImGui.TreeNodeEx($"Edit Nameplate###EDIT_NAMEPLATE{i}")) {
 
-						ImGui.InputInt("Title Id", ref OpenTaiko.SaveFileInstances[save].data.TitleId);
+						ImGui.InputInt($"Title Id###TITLE_ID{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleId);
 
-						ImGui.InputText("Title", ref OpenTaiko.SaveFileInstances[save].data.Title, 1024);
+						ImGui.InputText($"Title###TITLE{i}", ref OpenTaiko.SaveFileInstances[save].data.Title, 1024);
 
-						ImGui.InputInt("Title Rarity", ref OpenTaiko.SaveFileInstances[save].data.TitleRarityInt);
+						ImGui.InputInt($"Title Rarity###TITLE_RARITY{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleRarityInt);
 
-						ImGui.InputInt("Title Type", ref OpenTaiko.SaveFileInstances[save].data.TitleType);
+						ImGui.InputInt($"Title Type###TITLE_TYPE{i}", ref OpenTaiko.SaveFileInstances[save].data.TitleType);
 
-						if (ImGui.Button("Update###UPDATE_NAMEPLATE")) {
+						if (ImGui.Button($"Update###UPDATE_NAMEPLATE{i}")) {
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
+
+						#region NameplateUnlockables.db3
+						ImGui.SeparatorText("Add to NameplateUnlockables.db3");
+
+						if (ImGui.BeginCombo("Unlock Condition", nameplate_unlockCondition.Keys.ElementAt(nameplate_ucId))) {
+							foreach (var item in nameplate_unlockCondition) {
+								bool selected = nameplate_unlockCondition.Keys.ElementAt(nameplate_ucId) == item.Key;
+								if (ImGui.Selectable(item.Key, selected)) {
+									nameplate_ucId = nameplate_unlockCondition.ToList().IndexOf(item);
+								}
+							}
+							ImGui.EndCombo();
+						}
+
+						if (ImGui.BeginCombo("Unlock Type", nameplate_unlockType.Keys.ElementAt(nameplate_utId))) {
+							foreach (var item in nameplate_unlockType) {
+								bool selected = nameplate_unlockType.Keys.ElementAt(nameplate_utId) == item.Key;
+								if (ImGui.Selectable(item.Key, selected)) {
+									nameplate_utId = nameplate_unlockType.ToList().IndexOf(item);
+								}
+							}
+							ImGui.EndCombo();
+						}
+
+						ImGui.InputTextWithHint("Unlock Values", "[0,0,0]", ref nameplate_unlockValues, 256);
+
+						ImGui.InputTextWithHint("Unlock References", "[\"songId\"]", ref nameplate_unlockReferences, 2048);
+
+						ImGui.Text("Translations");
+						foreach (var translation in nameplate_Translations) {
+							string value = translation.Value;
+							if (ImGui.InputText(translation.Key + $"###NAMEPLATE_TRANSLATE_{translation.Key.ToUpper()}", ref value, 1024)) {
+								nameplate_Translations[translation.Key] = value;
+							}
+						}
+
+						ImGui.InputText("Id to Add/Remove", ref translation_id, 32);
+						if (ImGui.Button("Add")) {
+							nameplate_Translations.TryAdd(translation_id, "");
+						}
+						if (ImGui.Button("Remove")) {
+							nameplate_Translations.Remove(translation_id);
+						}
+
+						ImGui.SeparatorText("");
+
+						if (ImGui.Button("Add Current Nameplate to Database###NAMEPLATE_DATABASE_ADD")) {
+							OpenTaiko.Databases.DBNameplateUnlockables.AddToDatabase(
+								OpenTaiko.SaveFileInstances[save].data.Title,
+								OpenTaiko.SaveFileInstances[save].data.TitleType,
+								nameplate_Rarities[OpenTaiko.SaveFileInstances[save].data.TitleRarityInt],
+								nameplate_unlockCondition.Values.ToList()[nameplate_ucId],
+								nameplate_unlockType.Values.ToList()[nameplate_utId],
+								nameplate_unlockValues,
+								nameplate_unlockReferences,
+								nameplate_Translations
+								);
+						}
+						#endregion
+
 						ImGui.TreePop();
+
 					}
 
-					if (ImGui.BeginCombo("Dan Title", OpenTaiko.SaveFileInstances[save].data.Dan)) {
+					if (ImGui.BeginCombo($"Dan Title###DAN_TITLE{i}", OpenTaiko.SaveFileInstances[save].data.Dan)) {
+						if (ImGui.Selectable("(Clear Dan)")) {
+							OpenTaiko.SaveFileInstances[save].data.Dan = "";
+							OpenTaiko.SaveFileInstances[save].data.DanGold = false;
+							OpenTaiko.SaveFileInstances[save].data.DanType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+						}
+						if (ImGui.Selectable("新人")) {
+							OpenTaiko.SaveFileInstances[save].data.Dan = "新人";
+							OpenTaiko.SaveFileInstances[save].data.DanGold = false;
+							OpenTaiko.SaveFileInstances[save].data.DanType = 0;
+
+							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
+
+						}
 						foreach (var dan in OpenTaiko.SaveFileInstances[save].data.DanTitles) {
 							if (ImGui.Selectable(dan.Key)) {
 								OpenTaiko.SaveFileInstances[save].data.Dan = dan.Key;
@@ -233,26 +371,48 @@ public static class ImGuiDebugWindow {
 						ImGui.EndCombo();
 					}
 
-					if (ImGui.TreeNodeEx("Edit Dan Title")) {
+					if (ImGui.TreeNodeEx($"Edit Dan Title###EDIT_DAN_TITLE{i}")) {
 
-						ImGui.InputText("Title", ref OpenTaiko.SaveFileInstances[save].data.Dan, 16);
+						ImGui.InputText($"Title###DAN_TITLE{i}", ref OpenTaiko.SaveFileInstances[save].data.Dan, 16);
 
-						ImGui.Checkbox("Gold", ref OpenTaiko.SaveFileInstances[save].data.DanGold);
+						ImGui.Checkbox($"Gold###DAN_GOLD{i}", ref OpenTaiko.SaveFileInstances[save].data.DanGold);
 
 						string[] clear_types = ["Clear", "FC", "Perfect"];
 						int clear_int = OpenTaiko.SaveFileInstances[save].data.DanType;
-						if (ImGui.BeginCombo("Clear Type", clear_types[clear_int])) {
+						if (ImGui.BeginCombo($"Clear Type###CLEAR_TYPE{i}", clear_types[clear_int])) {
 							for (int clear = 0; clear < clear_types.Length; clear++) {
 								if (ImGui.Selectable(clear_types[clear], clear_int == clear)) OpenTaiko.SaveFileInstances[save].data.DanType = clear;
 							}
 							ImGui.EndCombo();
 						}
 
-						if (ImGui.Button("Update###UPDATE_DAN")) {
+						if (ImGui.Button($"Update###UPDATE_DAN{i}")) {
 							OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(save);
 						}
 						ImGui.TreePop();
+					}
+
+
+					int current_chara = OpenTaiko.SaveFileInstances[save].data.Character;
+					if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.StartUp) {
+						ImGui.TextDisabled("Character selection unavailable during StartUp stage.");
+					}
+					else if (ImGui.BeginCombo($"Select Character###SELECT_CHARACTER{i}", OpenTaiko.Tx.Characters[current_chara].metadata.tGetName())) {
+						for (int chara = 0; chara < OpenTaiko.Tx.Characters.Length; chara++) {
+							if (ImGui.Selectable(OpenTaiko.Tx.Characters[chara].metadata.tGetName(), current_chara == chara)) {
+								OpenTaiko.Tx.ReloadCharacter(current_chara, chara, save);
+								OpenTaiko.SaveFileInstances[save].data.Character = chara;
+
+								OpenTaiko.SaveFileInstances[save].tUpdateCharacterName(OpenTaiko.Skin.Characters_DirName[chara]);
+								OpenTaiko.Skin.voiceTitleSanka[save]?.tPlay();
+								foreach (var animation in Enum.GetValues<CMenuCharacter.ECharacterAnimation>()) {
+									CMenuCharacter.tMenuResetTimer(animation);
+								}
+								OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
+							}
+						}
+						ImGui.EndCombo();
 					}
 
 					ImGui.NewLine();
@@ -274,6 +434,64 @@ public static class ImGuiDebugWindow {
 				case CStage.EStage.DanDojoSelect:
 					System.Numerics.Vector4 normal = new System.Numerics.Vector4(1, 1, 1, 1);
 					System.Numerics.Vector4 diff = new System.Numerics.Vector4(0.5f, 1, 0.5f, 1);
+
+					if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongSelect && ImGui.TreeNodeEx("Current Song", ImGuiTreeNodeFlags.Framed)) {
+						if (OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong != null) {
+							CSongListNode song = OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong;
+
+							ImGui.Text($"Index: {OpenTaiko.stageSongSelect.actSongList.nSelectSongIndex}");
+							ImGui.Text($"Open Index: {song.Openindex}");
+							ImGui.Text($"Is Root: {song.rParentNode == null}");
+							ImGui.NewLine();
+							ImGui.Text("Title: " + song.ldTitle.GetString("???"));
+							ImGui.Text("Node Type: " + song.nodeType);
+							if (song.nodeType == CSongListNode.ENodeType.SCORE) {
+								if (ImGui.TreeNodeEx("Song Info")) {
+									for (int i = 0; i < song.nLevel.Count(); i++) {
+										if (song.nLevel[i] != -1) ImGui.Text($"{(Difficulty)i}: {song.nLevel[i]}");
+									}
+									if (song.nLevel[(int)Difficulty.Dan] != -1) {
+										if (ImGui.TreeNodeEx("Dan Songs")) {
+											for (int j = 0; j < song.DanSongs.Count; j++) {
+												var dan_song = song.DanSongs[j];
+												Vector4 is_hidden = dan_song.bTitleShow ? new(1, 0.5f, 1, 1) : new(1);
+												ImGui.TextColored(is_hidden, $"Song {j+1}: {dan_song.Title}{(dan_song.bTitleShow ? " (Hidden)" : "")}");
+												ImGui.Indent();
+												ImGui.TextColored(is_hidden, $"Difficulty: {(Difficulty)dan_song.Difficulty}");
+												ImGui.TextColored(is_hidden, $"Level: {dan_song.Level}");
+												ImGui.TextColored(is_hidden, $"Subtitle: {dan_song.SubTitle}");
+												ImGui.TextColored(is_hidden, $"Genre: {dan_song.Genre}");
+												if (ImGui.TreeNodeEx($"Dan_C###DAN_C{j}")) {
+													for (int i = 0; i < dan_song.Dan_C.Length; i++) {
+														if (dan_song.Dan_C[i] != null) {
+															var dan_c = dan_song.Dan_C[i];
+															ImGui.Text($"Exam {i+1}: {dan_c.ExamType} ({dan_c.ExamRange} - {dan_c.GetValue()[0]} - {dan_c.GetValue()[1]})");
+														}
+														else
+															ImGui.TextDisabled($"Exam {i+1}: null");
+													}
+													ImGui.TreePop();
+												}
+												ImGui.Unindent();
+											}
+											ImGui.TreePop();
+										}
+									}
+									if (song.nLevel[(int)Difficulty.Tower] != -1) {
+										ImGui.Text($"Side: {song.nSide}");
+										ImGui.Text($"Floor Count: {song.score[5]?.譜面情報.nTotalFloor.ToString() ?? "???"}");
+										ImGui.Text($"Life: {song.score[5]?.譜面情報.nLife.ToString() ?? "?"}");
+									}
+									ImGui.TreePop();
+								}
+							}
+							ImGui.NewLine();
+						}
+						else {
+							ImGui.TextDisabled("Current Song is null. How is this possible...?");
+						}
+						ImGui.TreePop();
+					}
 
 					ImGui.TextColored(OpenTaiko.ConfigIni.SongPlaybackSpeed == 1 ? normal : diff,
 						String.Format("Song Playback Speed: {0:0.00}", OpenTaiko.ConfigIni.SongPlaybackSpeed));
@@ -331,11 +549,24 @@ public static class ImGuiDebugWindow {
 					}
 					break;
 				case CStage.EStage.Game:
+					if (OpenTaiko.ConfigIni.bAIBattleMode) {
+						int level = OpenTaiko.ConfigIni.nAILevel - 1;
+						ImGui.TextColored(new(0.5f, 1, 1, 1), "AI Battle is Active.");
+						ImGui.Text("AI Level: " + (level+1));
+						ImGui.Indent();
+						ImGui.Text("Current AI Performance:");
+						ImGui.Text($"Good: {OpenTaiko.ConfigIni.apAIPerformances[level].nPerfectOdds}/1000 ({OpenTaiko.ConfigIni.apAIPerformances[level].nPerfectOdds / 10.0}％)");
+						ImGui.Text($"Ok: {OpenTaiko.ConfigIni.apAIPerformances[level].nGoodOdds}/1000 ({OpenTaiko.ConfigIni.apAIPerformances[level].nGoodOdds / 10.0}％)");
+						ImGui.Text($"Bad: {OpenTaiko.ConfigIni.apAIPerformances[level].nBadOdds}/1000 ({OpenTaiko.ConfigIni.apAIPerformances[level].nBadOdds / 10.0}％)");
+						ImGui.Text($"Mine: {OpenTaiko.ConfigIni.apAIPerformances[level].nMineHitOdds}/1000 ({OpenTaiko.ConfigIni.apAIPerformances[level].nMineHitOdds / 10.0}％)");
+						ImGui.Text($"Roll Speed: {OpenTaiko.ConfigIni.apAIPerformances[level].nRollSpeed}/s");
+						ImGui.Unindent();
+					}
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
 							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
-							var dtx = OpenTaiko.GetDTX(i);
+							var dtx = OpenTaiko.GetTJA(i);
 
 							switch (game_difficulty) {
 								case Difficulty.Dan:
@@ -411,18 +642,16 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndCombo();
 			}
-			if (OpenTaiko.rCurrentStage.eStageID != CStage.EStage.StartUp)
-				CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
-			else
-				ImGui.TextDisabled("To prevent crash during enumeration,\nyou can not view the texture list during StartUp stage.");
+			CTextureListPopup(OpenTaiko.Tx.listTexture, "Show listTexture", "TEXTURE_ALL");
 
 			currentStageMemoryUsage = 0;
 
 			#region Script.lua Memory Usage
 			int index = 0;
-			foreach (CLuaScript luascript in CLuaScript.listScripts)
+			foreach (CLuaScript luascript in CLuaScript.listScripts) {
 				currentStageMemoryUsage += CTextureListPopup(luascript.listDisposables.OfType<CTexture>(),
 					$"Module #{index}", $"MODULE{index++}_TEXTURES");
+			}
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
 				#region Game
@@ -528,20 +757,29 @@ public static class ImGuiDebugWindow {
 			}
 		}
 	}
-	private static int CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
+	private static long CTextureListPopup(IEnumerable<CTexture> textureList, string label, string id) {
 		if (textureList == null) return 0;
-		int memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
+		try {
+			long memoryCount = GetTotalMemoryUsageFromCTextureList(textureList);
 
-		if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
-			int index = 0;
-			foreach (CTexture tex in textureList) {
-				CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+			if (ImGui.TreeNodeEx($"{label} Textures: ({textureList.Count()} / {String.Format("{0:0.###}", GetMemAllocationInMegabytes(memoryCount))}MB)###{id}")) {
+				int index = 0;
+				try {
+					foreach (CTexture tex in textureList) {
+						CTexturePopup(tex, $"Texture #{index} (Pointer: {(tex != null ? tex.Pointer : "null")})###{id}_{index++}");
+					}
+				} catch (InvalidOperationException ex) {
+					ImGui.Text("(updating...)");
+				}
+				ImGui.TreePop();
 			}
-			ImGui.TreePop();
+			return memoryCount;
+		} catch (InvalidOperationException ex) {
+			ImGui.Text($"{label} Textures: (updating...)");
+			return 0;
 		}
-		return memoryCount;
 	}
-	private static int CTextureListPopup(ScriptBG script, string label, string id) {
+	private static long CTextureListPopup(ScriptBG script, string label, string id) {
 		return script != null ? CTextureListPopup(script.Textures.Values, label, id) : 0;
 	}
 	private static bool DrawCTextureForImGui(CTexture texture) {
@@ -576,21 +814,21 @@ public static class ImGuiDebugWindow {
 	#endregion
 
 	#region Helpers
-	private static float GetMemAllocationInMegabytes(int bytes) { return (float)bytes / (1024 * 1024); }
+	private static float GetMemAllocationInMegabytes(long bytes) { return (float)bytes / (1024 * 1024); }
 	private static float GetTextureMemAllocationInMegabytes(CTexture texture) {
 		return (float)GetTextureMemAllocation(texture) / (1024 * 1024);
 	}
-	private static int GetTextureMemAllocation(CTexture texture) {
+	private static long GetTextureMemAllocation(CTexture texture) {
 		return texture != null ? (texture.szTextureSize.Width * texture.szTextureSize.Height * 4) : 0;
 	}
 	private static Vector4 ColorToVector4(Color color) {
 		return new Vector4((float)color.R / 255, (float)color.G / 255, (float)color.B / 255, (float)color.A / 255);
 	}
 
-	private static int GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture> textureList) {
+	private static long GetTotalMemoryUsageFromCTextureList(IEnumerable<CTexture> textureList) {
 		return textureList.Where(tex => tex != null).Sum(GetTextureMemAllocation);
 	}
-	private static int GetTotalMemoryUsageFromCTextureList(ScriptBG script) {
+	private static long GetTotalMemoryUsageFromCTextureList(ScriptBG script) {
 		return script != null ? GetTotalMemoryUsageFromCTextureList(script.Textures.Values) : 0;
 	}
 	#endregion

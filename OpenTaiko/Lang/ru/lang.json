@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Русский (Russian)",
-	"Version": "0.6.0.0",
+	"Version": "0.6.0.72",
 	"Entries": {
 
 		// Common
@@ -367,7 +367,7 @@
 		"TITLE_MODE_TAIKO_DESC": "Играйте ваши любимые\nпесни в своём темпе!",
 		"TITLE_MODE_DAN_DESC": "Играйте в несколько партитурах подряд\nследующих сложных экзаменов,\nчтобы получить ранг ПРОПУСКА!",
 		"TITLE_MODE_TOWER_DESC": "Играйте в длинных партитурах с\nограниченным количеством жизней\nи доберитесь до вершины башни!",
-		"TITLE_MODE_SHOP_DESC": "Купите новые музыки,\nпти-персонажей и персонажей\nза монетам полученном из игры!",
+		"TITLE_MODE_SHOP_DESC": "Купите новые песни,\nпти-персонажей и персонажей\nза монетам полученном из игры!",
 		"TITLE_MODE_STORY_DESC": "Преодолевайте различные препятствия и\nоткрывать новый контент и горизонты!",
 		"TITLE_MODE_HEYA_DESC": "Измените вашу информацию\nили визуальные эффекты\nвашего персонажа!",
 		"TITLE_MODE_SETTINGS_DESC": "Измените ваш стиль игры\nили общие настройки!",
@@ -485,7 +485,7 @@
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Автоматически <c.#ffff00>дробит</c> со скоростью {0} удар./с",
 		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Разделяет</c> <c.#0088ff>Трассы</c>",
 		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монетов: x{0}",
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монет: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ОШИБКА] Недопустимое условие",
@@ -537,10 +537,27 @@
 		// {3}: Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} песн. в папке {2}. ({3}/{1})", // sg
 		// {0}: Clear type
-		// {1} # of songs needed
-		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
-		// {3} Current progress
+		// {1}: # of songs needed
+		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
+		// {3}: Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} партитур. сделано {2}. ({3}/{1})", // sc
+		// {0}: Activate / Desactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} глобальный триггер {1}. ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "Значение глобального счётчика {1} {0} {2}. ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "Деактивируйте",
+		"UNLOCK_CONDITION_TRIGGER_1": "Активируйте",
+
+		"UNLOCK_CONDITION_TYPE_l": "ниже, чем",
+		"UNLOCK_CONDITION_TYPE_le": "ниже или равно",
+		"UNLOCK_CONDITION_TYPE_e": "равно",
+		"UNLOCK_CONDITION_TYPE_me": "выше или равно",
+		"UNLOCK_CONDITION_TYPE_m": "выше, чем",
+		"UNLOCK_CONDITION_TYPE_d": "не равно",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Играйте",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Играйте",
@@ -557,6 +574,7 @@
 		"PAUSE_TITLE": "Пауза",
 		"PAUSE_RESUME": "Продолжить",
 		"PAUSE_RESTART": "Переиграть",
+		"PAUSE_SKIP": "Пропустить",
 		"PAUSE_EXIT": "Выход",
 
 		// AI Info
@@ -571,7 +589,7 @@
 		"MOD_SWITCH_OFF": "Выкл.",
 		"MOD_SWITCH_ON": "Вкл.",
 		"MOD_SCOREMULTIPLY": "Множитель очков: {0}",
-		"MOD_COINMULTIPLY": "Множитель монетов: {0}",
+		"MOD_COINMULTIPLY": "Множитель монет: {0}",
 
 		"MOD_SPEED": "Скорость",
 

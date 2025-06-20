@@ -33,7 +33,7 @@ internal class CAct演奏演奏情報 : CActivity {
 		NotesTextE = string.Format("NoteE:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[1]);
 		NotesTextM = string.Format("NoteM:         {0:####0}", OpenTaiko.TJA.nノーツ数_Branch[2]);
 		NotesTextC = string.Format("NoteC:         {0:####0}", OpenTaiko.TJA.nノーツ数[3]);
-		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.TJA.nScoreModeTmp);
+		ScoreModeText = string.Format("SCOREMODE:     {0:####0}", OpenTaiko.stageGameScreen.scoreMode[0]);
 		ListChipText = string.Format("ListChip:      {0:####0}", _chipCounts[0]);
 		ListChipMText = string.Format("ListChipM:     {0:####0}", _chipCounts[1]);
 
@@ -49,7 +49,7 @@ internal class CAct演奏演奏情報 : CActivity {
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Song/G. Offset:{0:####0}/{1:####0} ms", OpenTaiko.TJA.nBGMAdjust, OpenTaiko.ConfigIni.nGlobalOffsetMs));
 			y -= dy;
 			int num = (OpenTaiko.TJA.listChip.Count > 0) ? OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms : 0;
-			string str = "Time:          " + ((((double)(SoundManager.PlayTimer.NowTimeMs * OpenTaiko.ConfigIni.SongPlaybackSpeed)) / 1000.0)).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
+			string str = "Time:          " + (OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) / 1000.0).ToString("####0.00") + " / " + ((((double)num) / 1000.0)).ToString("####0.00");
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, str);
 			y -= dy;
 			OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, string.Format("Part:          {0:####0}/{1:####0}", NowMeasure[0], NowMeasure[1]));

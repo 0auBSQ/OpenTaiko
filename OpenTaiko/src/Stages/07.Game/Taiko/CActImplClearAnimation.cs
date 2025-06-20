@@ -41,11 +41,11 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges()) {
+			if (!Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
 
-				bool bgold = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C) == Exam.Status.Better_Success;
+				bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
 
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)

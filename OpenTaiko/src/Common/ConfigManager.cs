@@ -34,6 +34,10 @@ public static class ConfigManager {
 		return JsonConvert.DeserializeObject<T>(json, Settings);
 	}
 
+	public static T? JsonParse<T>(string json) where T : new() {
+		return JsonConvert.DeserializeObject<T>(json, Settings);
+	}
+
 	/// <summary>
 	/// Writes the object to a file.
 	/// </summary>
@@ -44,5 +48,9 @@ public static class ConfigManager {
 		using (var stream = new System.IO.StreamWriter(filePath, false, Encoding.UTF8)) {
 			stream.Write(JsonConvert.SerializeObject(obj, Formatting.None, Settings));
 		}
+	}
+
+	public static string JsonStringify(object obj) {
+		return JsonConvert.SerializeObject(obj, Formatting.None, Settings);
 	}
 }

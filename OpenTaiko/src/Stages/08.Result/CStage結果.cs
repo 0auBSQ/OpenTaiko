@@ -23,9 +23,12 @@ internal class CStage結果 : CStage {
 	public STDGBVALUE<int> nScoreRank;
 	public int n総合ランク値;
 
-	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:Not-cleared 1:Assisted-cleared 2:Cleared 3:Full-combo 4:Perfect
 	public int[] nスコアランク = { 0, 0, 0, 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 	public int[] nHighScore = { 0, 0, 0, 0, 0 };
+	public bool[] IsScoreValid = [false, false, false, false, false];
+	public int[] ClearStatusesSaved = [0, 0, 0, 0, 0];
+	public int[] ScoreRanksSaved = [0, 0, 0, 0, 0];
 
 	public CChip[] r空うちドラムチップ;
 	public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
@@ -35,9 +38,6 @@ internal class CStage結果 : CStage {
 
 	public CStage結果() {
 		this.st演奏記録.Drums = new CScoreIni.C演奏記録();
-		this.st演奏記録.Guitar = new CScoreIni.C演奏記録();
-		this.st演奏記録.Bass = new CScoreIni.C演奏記録();
-		this.st演奏記録.Taiko = new CScoreIni.C演奏記録();
 		this.r空うちドラムチップ = new CChip[10];
 		this.n総合ランク値 = -1;
 		base.eStageID = CStage.EStage.Results;
@@ -46,7 +46,7 @@ internal class CStage結果 : CStage {
 		base.ChildActivities.Add(this.actParameterPanel = new CActResultParameterPanel());
 		base.ChildActivities.Add(this.actSongBar = new CActResultSongBar());
 		base.ChildActivities.Add(this.actOption = new CActオプションパネル());
-		base.ChildActivities.Add(this.actFI = new CActFIFOResult());
+		base.ChildActivities.Add(this.actFIFromGameplay = new CActFIFOResult());
 		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
 	}
 
@@ -127,6 +127,10 @@ internal class CStage結果 : CStage {
 				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 3) < 1f),
 				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 4) < 1f)
 			};
+
+			this.IsScoreValid = [false, false, false, false, false];
+			this.ClearStatusesSaved = [0, 0, 0, 0, 0];
+			this.ScoreRanksSaved = [0, 0, 0, 0, 0];
 
 			{
 				#region [ 初期化 ]
@@ -215,7 +219,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int clearValue = 0;
 
@@ -256,7 +260,7 @@ internal class CStage結果 : CStage {
 							TJAPlayer3.SaveFile);
 						*/
 
-						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").Substring(0, 2),
+						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags().Substring(0, 2),
 							clearValue % 2 == 0,
 							(clearValue - 1) / 2);
 					}
@@ -405,7 +409,7 @@ internal class CStage結果 : CStage {
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -536,7 +540,11 @@ internal class CStage結果 : CStage {
 					}
 
 					// Unsafe function, it is the only appropriate place to call it
-					DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i]);
+					if (DBSaves.RegisterPlay(i, clearStatuses[i], scoreRanks[i])) {
+						this.IsScoreValid[i] = true;
+						this.ClearStatusesSaved[i] = clearStatuses[i];
+						this.ScoreRanksSaved[i] = scoreRanks[i];
+					}
 				}
 			}
 
@@ -598,7 +606,7 @@ internal class CStage結果 : CStage {
 			this.ctPhase3 = null;
 			examsShift = 0;
 
-			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strファイル名の絶対パス) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
+			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
 			base.Activate();
 
@@ -702,7 +710,7 @@ internal class CStage結果 : CStage {
 
 			if (base.IsFirstDraw) {
 				this.ct登場用 = new CCounter(0, 100, 5, OpenTaiko.Timer);
-				this.actFI.tフェードイン開始();
+				this.actFIFromGameplay.tフェードイン開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 				if (this.rResultSound != null) {
@@ -1097,7 +1105,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1338,12 +1346,17 @@ internal class CStage結果 : CStage {
 			#endregion
 
 			if (base.ePhaseID == CStage.EPhase.Common_FADEIN) {
-				if (this.actFI.Draw() != 0) {
+				if (this.actFIFromGameplay.Draw() != 0) {
 					base.ePhaseID = CStage.EPhase.Common_NORMAL;
 				}
 			} else if ((base.ePhaseID == CStage.EPhase.Common_FADEOUT))         //&& ( this.actFO.On進行描画() != 0 ) )
 			{
-				return (int)this.eフェードアウト完了時の戻り値;
+				if (this.actFO.Draw() != 0) {
+					bgmResultLoop.tStop();
+					OpenTaiko.Skin.bgmDanResult.tStop();
+					OpenTaiko.Skin.bgmTowerResult.tStop();
+					return (int)this.eフェードアウト完了時の戻り値;
+				}
 			}
 
 			#region [ #24609 2011.3.14 yyagi ランク更新or演奏型スキル更新時、リザルト画像をpngで保存する ]
@@ -1365,11 +1378,8 @@ internal class CStage結果 : CStage {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 					#region [ Return to song select screen (Faster method) ]
 
-					bgmResultLoop.tStop();
-					OpenTaiko.Skin.bgmDanResult.tStop();
-					OpenTaiko.Skin.bgmTowerResult.tStop();
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					actFI.tフェードアウト開始();
+					actFO.tフェードアウト開始();
 
 					if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
 						if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
@@ -1409,20 +1419,13 @@ internal class CStage結果 : CStage {
 						if (_modalsProcessed == true) {
 							#region [ Return to song select screen ]
 
-							actFI.tフェードアウト開始();
-
-							if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)
-								if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
-									OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
+							actFO.tフェードアウト開始();
 
 							tPostprocessing();
 
 							{
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 								this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-								bgmResultLoop.tStop();
-								OpenTaiko.Skin.bgmDanResult.tStop();
-								OpenTaiko.Skin.bgmTowerResult.tStop();
 							}
 
 							#endregion
@@ -1485,7 +1488,7 @@ internal class CStage結果 : CStage {
 			OpenTaiko.stageGameScreen.CChartScore[0].nMiss, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Roll[0] + offset, OpenTaiko.Skin.DanResult_Roll[1],
-			OpenTaiko.stageGameScreen.GetRoll(0), 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nRoll, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_MaxCombo[0] + offset, OpenTaiko.Skin.DanResult_MaxCombo[1],
 			OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0], 1.0f);
@@ -1500,7 +1503,7 @@ internal class CStage結果 : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs, true, offset);
 
 		#endregion
 	}
@@ -1551,10 +1554,10 @@ internal class CStage結果 : CStage {
 
 		int[] scoresArr =
 		{
-			OpenTaiko.stageGameScreen.nGood[i],
-			OpenTaiko.stageGameScreen.nOk[i],
-			OpenTaiko.stageGameScreen.nBad[i],
-			OpenTaiko.stageGameScreen.nRoll[i]
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGreat,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGood,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nMiss,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nRoll
 		};
 
 		int[] num_x = {
@@ -1614,7 +1617,7 @@ internal class CStage結果 : CStage {
 
 	private CCounter ct登場用;
 	private E戻り値 eフェードアウト完了時の戻り値;
-	private CActFIFOResult actFI;
+	private CActFIFOResult actFIFromGameplay;
 	private CActFIFOBlack actFO;
 	private CActオプションパネル actOption;
 	private CActResultParameterPanel actParameterPanel;

@@ -65,106 +65,30 @@ internal class OpenTaiko : Game {
 	}
 
 	#region [DTX instances]
-	public static CTja TJA {
-		get {
-			return tja[0];
-		}
-		set {
-			if ((tja[0] != null) && (app != null)) {
-				tja[0].DeActivate();
-				tja[0].ReleaseManagedResource();
-				tja[0].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[0]);
-			}
-			tja[0] = value;
-			if ((tja[0] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[0]);
-			}
-		}
-	}
-	public static CTja TJA_2P {
-		get {
-			return tja[1];
-		}
-		set {
-			if ((tja[1] != null) && (app != null)) {
-				tja[1].DeActivate();
-				tja[1].ReleaseManagedResource();
-				tja[1].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[1]);
-			}
-			tja[1] = value;
-			if ((tja[1] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[1]);
-			}
-		}
-	}
-	public static CTja TJA_3P {
-		get {
-			return tja[2];
-		}
-		set {
-			if ((tja[2] != null) && (app != null)) {
-				tja[2].DeActivate();
-				tja[2].ReleaseManagedResource();
-				tja[2].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[2]);
-			}
-			tja[2] = value;
-			if ((tja[2] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[2]);
-			}
-		}
-	}
-	public static CTja TJA_4P {
-		get {
-			return tja[3];
-		}
-		set {
-			if ((tja[3] != null) && (app != null)) {
-				tja[3].DeActivate();
-				tja[3].ReleaseManagedResource();
-				tja[3].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[3]);
-			}
-			tja[3] = value;
-			if ((tja[3] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[3]);
-			}
-		}
-	}
-	public static CTja TJA_5P {
-		get {
-			return tja[4];
-		}
-		set {
-			if ((tja[4] != null) && (app != null)) {
-				tja[4].DeActivate();
-				tja[4].ReleaseManagedResource();
-				tja[4].ReleaseUnmanagedResource();
-				app.listTopLevelActivities.Remove(tja[4]);
-			}
-			tja[4] = value;
-			if ((tja[4] != null) && (app != null)) {
-				app.listTopLevelActivities.Add(tja[4]);
-			}
-		}
+	public static CTja? TJA { // only for P1
+		get => tja[0];
+		set => SetTJA(0, value);
 	}
 
-	public static CTja GetDTX(int player) {
-		switch (player) {
-			case 0:
-				return OpenTaiko.TJA;
-			case 1:
-				return OpenTaiko.TJA_2P;
-			case 2:
-				return OpenTaiko.TJA_3P;
-			case 3:
-				return OpenTaiko.TJA_4P;
-			case 4:
-				return OpenTaiko.TJA_5P;
+	public static CTja?[] TJAs
+		=> tja.Select(x => x).ToArray();
+
+	public static CTja? GetTJA(int player)
+		=> tja.ElementAtOrDefault(player);
+	public static void SetTJA(int player, CTja? value) {
+		if (!(player >= 0 && player <= tja.Length)) {
+			return;
 		}
-		return null;
+		if ((tja[player] != null) && (app != null)) {
+			tja[player].DeActivate();
+			tja[player].ReleaseManagedResource();
+			tja[player].ReleaseUnmanagedResource();
+			app.listTopLevelActivities.Remove(tja[player]);
+		}
+		tja[player] = value;
+		if ((tja[player] != null) && (app != null)) {
+			app.listTopLevelActivities.Add(tja[player]);
+		}
 	}
 
 	#endregion
@@ -287,6 +211,11 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	public static CStageCutScene stageCutScene {
+		get;
+		private set;
+	}
+
 	public static CStage曲読み込み stageSongLoading {
 		get;
 		private set;
@@ -332,11 +261,23 @@ internal class OpenTaiko : Game {
 
 	public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
+	public static SaveFile PrimarySaveFile {
+		get {
+			return SaveFileInstances[SaveFile];
+		}
+	}
+
 	// 0 : Hidari, 1 : Migi (1P only)
 	public static int PlayerSide = 0;
 
 	// Modal manager
 	public static CModalManager ModalManager {
+		get;
+		private set;
+	}
+
+	// Unlockables factory
+	public static CUnlockConditionFactory UnlockConditionFactory {
 		get;
 		private set;
 	}
@@ -491,29 +432,27 @@ internal class OpenTaiko : Game {
 			else if (OperatingSystem.IsMacOS()) {
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
 				ConfigIni.nGraphicsDeviceType = 3;
-			}
-			else if (OperatingSystem.IsLinux()) {
+			} else if (OperatingSystem.IsLinux()) {
 				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
 				ConfigIni.nGraphicsDeviceType = 2;
 			}
-		}
-		else {
+		} else {
 			switch (ConfigIni.nGraphicsDeviceType) {
-			case 0:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
-				break;
-			case 1:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
-				break;
-			case 2:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
-				break;
-			case 3:
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
-				break;
+				case 0:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+					break;
+				case 1:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+					break;
+				case 2:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+					break;
+				case 3:
+					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+					break;
 			}
 		}
-		
+
 
 		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
@@ -549,14 +488,6 @@ internal class OpenTaiko : Game {
 		}
 	}
 	protected override void OnExiting() {
-		ConfigIni.nWindowBaseXPosition = WindowPosition.X;
-		ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
-		ConfigIni.nWindowWidth = WindowSize.X;
-		ConfigIni.nWindowHeight = WindowSize.Y;
-		ConfigIni.bFullScreen = FullScreen;
-		ConfigIni.bEnableVSync = VSync;
-		Framerate = 0;
-
 		this.tExitProcess();
 		base.OnExiting();
 	}
@@ -850,6 +781,21 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
+							case (int)CStageSongSelect.EReturnValue.PlayCutSceneIntro:
+								#region [ *** ]
+								//-----------------------------
+								ChangeStage(stageCutScene);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Cut Scene");
+
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								this.tExecuteGarbageCollection();
+								break;
+							//-----------------------------
+							#endregion
+
 							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
@@ -919,9 +865,10 @@ internal class OpenTaiko : Game {
 							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageSongLoading);
+								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
+								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Loading");
+								Trace.TraceInformation(playCutScenes ? "■ Cut Scene" : "■ Song Loading");
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -948,6 +895,27 @@ internal class OpenTaiko : Game {
 								break;
 								//-----------------------------
 								#endregion
+						}
+						#endregion
+						break;
+
+					case CStage.EStage.CutScene:
+						#region [ *** ]
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageCutScene.EReturnValue.IntroFinished:
+								ChangeStage(stageSongLoading);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Song Loading");
+
+								this.tExecuteGarbageCollection();
+								break;
+
+							case (int)CStageCutScene.EReturnValue.OutroFinished:
+								this.UnmountCurrentStage();
+								this.ReturnToSongSelection(OpenTaiko.stageResults);
+
+								this.tExecuteGarbageCollection();
+								break;
 						}
 						#endregion
 						break;
@@ -1131,21 +1099,17 @@ internal class OpenTaiko : Game {
 							}
 							this.tExecuteGarbageCollection();
 
-							Trace.TraceInformation("----------------------");
-							Trace.TraceInformation("■ Return to song select menu");
-							OpenTaiko.latestSongSelect.Activate();
-							if (!ConfigIni.PreAssetsLoading) {
-								OpenTaiko.latestSongSelect.CreateManagedResource();
-								OpenTaiko.latestSongSelect.CreateUnmanagedResource();
+							if (stageCutScene.LoadCutScenes(rCurrentStage)) {
+								//-----------------------------
+								this.MountStage(stageCutScene);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Cut Scene");
+
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageCutScene;
+							} else {
+								this.ReturnToSongSelection(rCurrentStage);
 							}
-							rPreviousStage = rCurrentStage;
-
-							// Seek latest registered song select screen
-							rCurrentStage = OpenTaiko.latestSongSelect;
-
-							stageSongSelect.NowSong++;
-
-							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -1155,7 +1119,7 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.ReturnToTitle:
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -1170,13 +1134,14 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)EReturnValue.SongChoosen:
+							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageSongLoading);
+								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
+								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
 								latestSongSelect = stageTowerSelect;
 								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Loading");
+								Trace.TraceInformation(playCutScenes ? "■ Cut Scene" : "■ Song Loading");
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1348,6 +1313,20 @@ internal class OpenTaiko : Game {
 #endif
 	}
 
+	private void ReturnToSongSelection(CStage fromStage) {
+		Trace.TraceInformation("----------------------");
+		Trace.TraceInformation("■ Return to song select menu");
+		this.MountStage(OpenTaiko.latestSongSelect);
+		rPreviousStage = fromStage;
+
+		// Seek latest registered song select screen
+		rCurrentStage = OpenTaiko.latestSongSelect;
+
+		stageSongSelect.NowSong++;
+
+		this.tExecuteGarbageCollection();
+	}
+
 	// その他
 
 	#region [ 汎用ヘルパー ]
@@ -1501,7 +1480,7 @@ internal class OpenTaiko : Game {
 	private bool b終了処理完了済み;
 	public bool bInternetConnectionSuccess { get; private set; } = false;
 	private long PreviousSystemTimeMs = long.MinValue;
-	private static CTja[] tja = new CTja[5];
+	private static CTja[] tja = new CTja[MAX_PLAYERS];
 
 	public static TextureLoader Tx = new TextureLoader();
 
@@ -1529,6 +1508,11 @@ internal class OpenTaiko : Game {
 
 		VisualLogManager = new CVisualLogManager();
 
+		#region [ Unlock factory initialisation ]
+
+		UnlockConditionFactory = new CUnlockConditionFactory();
+
+		#endregion
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
@@ -1862,6 +1846,7 @@ internal class OpenTaiko : Game {
 		stageHeya = new CStageHeya();
 		stageOnlineLounge = new CStageOnlineLounge();
 		stageTowerSelect = new CStageTowerSelect();
+		stageCutScene = new CStageCutScene();
 		stageSongLoading = new CStage曲読み込み();
 		stageGameScreen = new CStage演奏ドラム画面();
 		stageResults = new CStage結果();
@@ -1928,6 +1913,15 @@ internal class OpenTaiko : Game {
 		if (!this.b終了処理完了済み) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
+
+			ConfigIni.nWindowBaseXPosition = WindowPosition.X;
+			ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
+			ConfigIni.nWindowWidth = WindowSize.X;
+			ConfigIni.nWindowHeight = WindowSize.Y;
+			ConfigIni.bFullScreen = FullScreen;
+			ConfigIni.bEnableVSync = VSync;
+			Framerate = 0;
+
 			#region [ 曲検索の終了処理 ]
 			//---------------------
 

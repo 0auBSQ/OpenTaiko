@@ -76,6 +76,8 @@ internal class CSongListNode {
 
 	// Unique id
 	public CSongUniqueID uniqueId;
+	public List<string> shortcutIds = [];
+	public bool shortcutIsParsed;
 
 	public int nDanTick = 0;
 	public Color cDanTickColor = Color.White;
@@ -87,6 +89,13 @@ internal class CSongListNode {
 	// In-game visuals
 
 	public string strScenePreset = null;
+
+	#region [ OpenTaiko-Exclusive TJA Extension Data ]
+
+	public CTja.CutSceneDef? CutSceneIntro = null;
+	public List<CTja.CutSceneDef> CutSceneOutros = [];
+
+	#endregion
 
 	public string tGetUniqueId() {
 		return uniqueId?.data.id ?? "";

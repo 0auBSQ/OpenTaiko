@@ -5,25 +5,21 @@ namespace OpenTaiko;
 
 internal class CChip : IComparable<CChip>, ICloneable {
 	public EScrollMode eScrollMode;
-	public EScrollMode eScrollMode_end;
-	public bool bHit;
+	public bool bHit; // note is hit/broken or roll end is reached
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
-	public bool bProcessed = false;
+	public bool bProcessed = false; // roll-type-only: roll is hit once (roll-head-only) or chip time is reached
 	public bool bShow;
 	public bool bShowRoll;
 	public bool bBranch = false;
 	public double dbChipSizeRatio = 1.0;
 	public double db実数値;
 	public double dbBPM;
-	public double dbBPM_end;
 	public float fNow_Measure_s = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public float fNow_Measure_m = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public bool IsEndedBranching = false;//分岐が終わった時の連打譜面が非可視化になってしまうためフラグを追加.2020.04.21.akasoko26
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
-	public double dbSCROLL_end;
-	public double dbSCROLL_Y_end;
 	public ECourse nBranch;
 	public int nSenote;
 	public int nState;
@@ -31,13 +27,11 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nBalloon;
 	public int nProcessTime;
 	public int nScrollDirection;
-	public int nDisplayPriority; //(特殊)現状連打との判断目的で使用
 	public ENoteState eNoteState;
 	public int nChannelNo;
 	public int VideoStartTimeMs;
 	public int nHorizontalChipDistance;
-	public int nNoteTipDistance_X;
-	public int nNoteTipDistance_Y;
+	public int nVerticalChipDistance;
 	public int n整数値;
 	public int n文字数 = 16;
 
@@ -50,21 +44,16 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
-	public double fBMSCROLLTime_end;
-	public int n発声時刻ms;
+	public int n発声時刻ms { get => (int)db発声時刻ms; set => db発声時刻ms = value; }
 	public double n分岐時刻ms;
 
 
 	public double db発声時刻ms;
-	public int nNoteEndPosition;
-	public int nNoteEndTimems;
 	public int nノーツ出現時刻ms;
 	public int nノーツ移動開始時刻ms;
 	public int n分岐回数;
-	public int n連打音符State;
 	public int nLag;                // 2011.2.1 yyagi
 	public double db発声時刻;
-	public double db判定終了時刻;//連打系音符で使用
 	public double dbProcess_Time;
 	public int nPlayerSide;
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
@@ -73,6 +62,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool IsHitted = false;
 	public bool IsMissed = false;
 
+	public CChip start;
+	public CChip end;
 
 
 	//EXTENDED COMMANDS
@@ -151,6 +142,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public CChip() {
 		this.nHorizontalChipDistance = 0;
+		this.nVerticalChipDistance = 0;
+		this.start = this;
+		this.end = this;
 	}
 	public void t初期化() {
 		this.bBranch = false;
@@ -163,26 +157,21 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.n発声時刻ms = 0;
 		this.db発声時刻ms = 0.0D;
 		this.fBMSCROLLTime = 0;
-		this.nNoteEndPosition = 0;
-		this.nNoteEndTimems = 0;
-		this.nDisplayPriority = 0;
 		this.nLag = -999;
 		this.b演奏終了後も再生が続くチップである = false;
-		this.nListPosition = 0;                                 // Unused
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
 		this.IsMissed = false;
 		this.bVisible = true;
 		this.nOpacity = 0xff;
 		this.nHorizontalChipDistance = 0;
-		this.nNoteTipDistance_X = 0;
-		this.nNoteTipDistance_Y = 0;
-		this.dbBPM_end = this.dbBPM = 120.0;
+		this.nVerticalChipDistance = 0;
+		this.dbBPM = 120.0;
 		this.fNow_Measure_m = 4.0f;
 		this.fNow_Measure_s = 4.0f;
 		this.nScrollDirection = 0;
-		this.dbSCROLL_end = this.dbSCROLL = 1.0;
-		this.dbSCROLL_Y_end = this.dbSCROLL_Y = 0.0f;
+		this.dbSCROLL = 1.0;
+		this.dbSCROLL_Y = 0.0f;
 	}
 	public override string ToString() {
 
@@ -291,8 +280,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			}
 		}
 
-		double _db再生速度 = OpenTaiko.TJA.db再生速度;
-		return (int)(nDuration / _db再生速度);
+		return nDuration;
 	}
 
 	#region [ IComparable 実装 ]
@@ -301,10 +289,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	private static readonly byte[] n優先度 = new byte[] {
 			5, 5, 3, 7, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 5, //0x00
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x10
-			7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5, 5, 5, 5, 5, 5, //0x20
+			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x20
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x30
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x40
-			9, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x50
+			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x50 // preserve definition order of bar lines relative to notes
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x60
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x70
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x80
@@ -312,11 +300,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xA0
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xB0
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xC0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 4, 4, //0xD0
+			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 6, //0xD0 // required process order: notes -> 0xDE (branch animation) -> 0xDD (#SECTION)
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xE0
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xF0
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
 		};
+
+	public static readonly int nChannelNoMostPrior = Array.IndexOf(n優先度, n優先度.Min());
+	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
 
 	public int CompareTo(CChip other) {
 		// まずは位置で比較。

@@ -15,27 +15,13 @@ internal class DBSaves {
 		try {
 			if (SavesDBConnection != null && SavesDBConnection.State == ConnectionState.Closed) {
 				SavesDBConnection.Open();
-				FixSaveDB_IdxUniquePlay(SavesDBConnection);
+				DBSavesAutoupdate.HandleSavesDBAutoupdates(SavesDBConnection);
 			}
 			return SavesDBConnection;
 		} catch {
 			LogNotification.PopError(_DBNotFoundError);
 			return null;
 		}
-	}
-
-	private static void FixSaveDB_IdxUniquePlay(SqliteConnection connection) {
-		var command = connection.CreateCommand();
-		command.CommandText = $"""
-			DROP INDEX IF EXISTS idx_unique_play;
-			CREATE UNIQUE INDEX idx_unique_play ON best_plays (
-				"ChartUniqueId",
-				"ChartDifficulty",
-				"PlayMods",
-				"SaveId"
-			);
-			""";
-		command.ExecuteNonQuery();
 	}
 
 	public static Int64 GetPlayerSaveId(int player) {
@@ -237,6 +223,109 @@ internal class DBSaves {
 
 	#endregion
 
+	#region [global_counters Table]
+
+	public static Dictionary<string, double> GetGlobalCountersDict(Int64 saveId) {
+		Dictionary<string, double> _globalCounters = new Dictionary<string, double>();
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return _globalCounters;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                    SELECT *
+                    FROM global_counters
+                    WHERE SaveId={saveId};
+                ";
+		SqliteDataReader reader = command.ExecuteReader();
+		while (reader.Read()) {
+			string _counterName = (string)reader["CounterName"];
+			double _counterValue = (double)reader["CounterValue"];
+			_globalCounters[_counterName] = _counterValue;
+		}
+		reader.Close();
+
+		return _globalCounters;
+	}
+
+	public static void DBSetGlobalCounter(Int64 saveId, string counterName, double counterValue) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                BEGIN TRANSACTION;
+
+				UPDATE global_counters
+				SET CounterValue = {counterValue}
+				WHERE CounterName = '{counterName}' AND SaveId = {saveId};
+
+				INSERT INTO global_counters (CounterName, SaveId, CounterValue)
+				SELECT '{counterName}', {saveId}, {counterValue}
+				WHERE NOT EXISTS (
+					SELECT 1 FROM global_counters
+					WHERE CounterName = '{counterName}' AND SaveId = {saveId}
+				);
+
+				COMMIT;
+            ";
+		command.ExecuteNonQuery();
+	}
+
+
+	#endregion
+
+	#region [active_triggers Table]
+
+	public static HashSet<string> GetActiveTriggersSet(Int64 saveId) {
+		HashSet<string> _activeTriggers = new HashSet<string>();
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return _activeTriggers;
+
+		var command = connection.CreateCommand();
+		command.CommandText =
+			@$"
+                    SELECT *
+                    FROM active_triggers
+                    WHERE SaveId={saveId};
+                ";
+		SqliteDataReader reader = command.ExecuteReader();
+		while (reader.Read()) {
+			string _triggerName = (string)reader["Trigger"];
+			_activeTriggers.Add(_triggerName);
+		}
+		reader.Close();
+
+		return _activeTriggers;
+	}
+
+	public static void DBToggleGlobalTrigger(Int64 saveId, string triggerName, bool triggerValue) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		if (triggerValue) {
+			command.CommandText =
+			@$"
+                    INSERT INTO active_triggers (Trigger, SaveId)
+					SELECT '{triggerName}', {saveId}
+					WHERE NOT EXISTS (
+						SELECT 1 FROM active_triggers WHERE Trigger='{triggerName}' AND SaveId={saveId}
+					);
+                ";
+		} else {
+			command.CommandText =
+			@$"
+                    DELETE FROM active_triggers
+					WHERE Trigger='{triggerName}' AND SaveId={saveId};
+                ";
+		}
+		command.ExecuteNonQuery();
+	}
+
+	#endregion
+
 	#region [best_plays Table]
 
 	public static Dictionary<string, BestPlayRecords.CBestPlayRecord> GetBestPlaysAsDict(Int64 saveId) {
@@ -290,9 +379,10 @@ internal class DBSaves {
 		return _bestPlays;
 	}
 
-	public static void RegisterPlay(int player, int clearStatus, int scoreRank) {
+	// return whether the score is valid and registered successfully
+	public static bool RegisterPlay(int player, int clearStatus, int scoreRank) {
 		SqliteConnection? connection = GetSavesDBConnection();
-		if (connection == null) return;
+		if (connection == null) return false;
 
 		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
@@ -302,7 +392,7 @@ internal class DBSaves {
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
 		// Do not register the play if Dan/Tower and any mod is ON
-		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return;
+		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return false;
 
 		// 1st step: Init best play record class
 
@@ -322,7 +412,7 @@ internal class DBSaves {
 				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
 					for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
 						if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
-							int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetAmount();
+							int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].Amount;
 							danResults[j].Add(amount);
 						}
 					}
@@ -382,9 +472,9 @@ internal class DBSaves {
 									int current = oldDanResults[j][i];
 									if (current == -1) {
 										danResults[j][i] = amount;
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.More) {
+									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.More) {
 										danResults[j][i] = Math.Max(amount, current);
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].GetExamRange() == Exam.Range.Less) {
+									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.Less) {
 										danResults[j][i] = Math.Min(amount, current);
 									}
 								}
@@ -474,6 +564,8 @@ internal class DBSaves {
                 ";
 			cmd.ExecuteNonQuery();
 		}
+
+		return true;
 	}
 
 	#endregion

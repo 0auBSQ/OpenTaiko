@@ -543,6 +543,23 @@
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "※{2}さんの{1}譜面を{0} ({3}/{1})", // sc
+		// {0}: Activate / Desactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "グローバルトリガー{1}を{0} ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "グローバルカウンター{1}を{2}{0}にする ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "無効にする",
+		"UNLOCK_CONDITION_TRIGGER_1": "有効にする",
+
+		"UNLOCK_CONDITION_TYPE_l": "未満",
+		"UNLOCK_CONDITION_TYPE_le": "以下",
+		"UNLOCK_CONDITION_TYPE_e": "",
+		"UNLOCK_CONDITION_TYPE_me": "以上",
+		"UNLOCK_CONDITION_TYPE_m": "超過",
+		"UNLOCK_CONDITION_TYPE_d": "以外",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "プレイ",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "プレイ",
@@ -559,6 +576,7 @@
 		"PAUSE_TITLE": "ポーズ",
 		"PAUSE_RESUME": "もどる",
 		"PAUSE_RESTART": "やりなおす",
+		"PAUSE_SKIP": "スキップする",
 		"PAUSE_EXIT": "演奏中止",
 
 		// AI Info

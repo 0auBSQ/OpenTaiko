@@ -31,24 +31,27 @@ namespace OpenTaiko;
 /// 8. Reassemble the string
 /// </summary>
 public static class CDTXStyleExtractor {
-	private const RegexOptions StyleExtractorRegexOptions =
+	// The sections are splitted right before the header or command for the section kind,
+	// so only the first line need to be considered.
+	private const RegexOptions StyleGetSectionKindRegexOptions =
 		RegexOptions.Compiled |
 		RegexOptions.CultureInvariant |
 		RegexOptions.IgnoreCase |
-		RegexOptions.Multiline |
 		RegexOptions.Singleline;
 
-	private const string StylePrefixRegexPattern = @"^STYLE\s*:\s*";
+	// For splitting the sections, all lines need to be considered.
+	private const RegexOptions StyleSectionSplitRegexOptions =
+		StyleGetSectionKindRegexOptions |
+		RegexOptions.Multiline;
+
+	private const string StylePrefixRegexPattern = @"^STYLE\s*:";
 	private const string SheetStartPrefixRegexPattern = @"^#START";
 
 	private static readonly string StyleSingleSectionRegexMatchPattern =
-		$"{StylePrefixRegexPattern}(?:Single|1)";
+		$"{StylePrefixRegexPattern}\\s*(?:Single|1)";
 
 	private static readonly string StyleDoubleSectionRegexMatchPattern =
-		$"{StylePrefixRegexPattern}(?:Double|Couple|2)";
-
-	private static readonly string StyleUnrecognizedSectionRegexMatchPattern =
-		$"{StylePrefixRegexPattern}";
+		$"{StylePrefixRegexPattern}\\s*(?:Double|Couple|2)";
 
 	private static readonly string SheetStartBareRegexMatchPattern =
 		$"{SheetStartPrefixRegexPattern}$";
@@ -59,21 +62,17 @@ public static class CDTXStyleExtractor {
 	private static readonly string SheetStartP2RegexMatchPattern =
 		$"{SheetStartPrefixRegexPattern}\\s*P2";
 
-	private static readonly string SheetStartUnrecognizedRegexMatchPattern =
-		$"{SheetStartPrefixRegexPattern}.*$";
+	private static readonly Regex SectionSplitRegex = new Regex($"(?={StylePrefixRegexPattern})", StyleSectionSplitRegexOptions);
+	private static readonly Regex SubSectionSplitRegex = new Regex($"(?={SheetStartPrefixRegexPattern})|(?<=^#END\\n)", StyleSectionSplitRegexOptions);
 
-	private static readonly Regex SectionSplitRegex = new Regex($"(?={StylePrefixRegexPattern})", StyleExtractorRegexOptions);
-	private static readonly Regex SubSectionSplitRegex = new Regex($"(?={SheetStartPrefixRegexPattern})|(?<=#END\\n)", StyleExtractorRegexOptions);
+	private static readonly Regex StyleSingleSectionMatchRegex = new Regex(StyleSingleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex StyleDoubleSectionMatchRegex = new Regex(StyleDoubleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex StyleUnrecognizedSectionMatchRegex = new Regex(StylePrefixRegexPattern, StyleGetSectionKindRegexOptions);
 
-	private static readonly Regex StyleSingleSectionMatchRegex = new Regex(StyleSingleSectionRegexMatchPattern, StyleExtractorRegexOptions);
-	private static readonly Regex StyleDoubleSectionMatchRegex = new Regex(StyleDoubleSectionRegexMatchPattern, StyleExtractorRegexOptions);
-	private static readonly Regex StyleUnrecognizedSectionMatchRegex = new Regex(StyleUnrecognizedSectionRegexMatchPattern, StyleExtractorRegexOptions);
-
-	private static readonly Regex SheetStartPrefixMatchRegex = new Regex(SheetStartPrefixRegexPattern, StyleExtractorRegexOptions);
-	private static readonly Regex SheetStartBareMatchRegex = new Regex(SheetStartBareRegexMatchPattern, StyleExtractorRegexOptions);
-	private static readonly Regex SheetStartP1MatchRegex = new Regex(SheetStartP1RegexMatchPattern, StyleExtractorRegexOptions);
-	private static readonly Regex SheetStartP2MatchRegex = new Regex(SheetStartP2RegexMatchPattern, StyleExtractorRegexOptions);
-	private static readonly Regex SheetStartUnrecognizedMatchRegex = new Regex(SheetStartUnrecognizedRegexMatchPattern, StyleExtractorRegexOptions);
+	private static readonly Regex SheetStartBareMatchRegex = new Regex(SheetStartBareRegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex SheetStartP1MatchRegex = new Regex(SheetStartP1RegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex SheetStartP2MatchRegex = new Regex(SheetStartP2RegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex SheetStartUnrecognizedMatchRegex = new Regex(SheetStartPrefixRegexPattern, StyleGetSectionKindRegexOptions);
 
 	private static readonly SectionKindAndSubSectionKind StyleSingleAndSheetStartBare =
 		new SectionKindAndSubSectionKind(SectionKind.StyleSingle, SubSectionKind.SheetStartBare);
@@ -315,22 +314,20 @@ public static class CDTXStyleExtractor {
 	}
 
 	private static SubSectionKind GetSubsectionKind(string subsection) {
-		if (SheetStartPrefixMatchRegex.IsMatch(subsection)) {
-			if (SheetStartBareMatchRegex.IsMatch(subsection)) {
-				return SubSectionKind.SheetStartBare;
-			}
+		if (SheetStartBareMatchRegex.IsMatch(subsection)) {
+			return SubSectionKind.SheetStartBare;
+		}
 
-			if (SheetStartP1MatchRegex.IsMatch(subsection)) {
-				return SubSectionKind.SheetStartP1;
-			}
+		if (SheetStartP1MatchRegex.IsMatch(subsection)) {
+			return SubSectionKind.SheetStartP1;
+		}
 
-			if (SheetStartP2MatchRegex.IsMatch(subsection)) {
-				return SubSectionKind.SheetStartP2;
-			}
+		if (SheetStartP2MatchRegex.IsMatch(subsection)) {
+			return SubSectionKind.SheetStartP2;
+		}
 
-			if (SheetStartUnrecognizedMatchRegex.IsMatch(subsection)) {
-				return SubSectionKind.SheetStartUnrecognized;
-			}
+		if (SheetStartUnrecognizedMatchRegex.IsMatch(subsection)) {
+			return SubSectionKind.SheetStartUnrecognized;
 		}
 
 		return SubSectionKind.NonSheet;

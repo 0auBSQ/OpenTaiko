@@ -743,8 +743,7 @@ internal class CStageSongSelect : CStage {
 							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
 
 							#endregion
-						}
-						else if (this.actSongList.latestContext == eMenuContext.SearchByText) {
+						} else if (this.actSongList.latestContext == eMenuContext.SearchByText) {
 							#region [Trigger context box]
 
 							this.actSongList.rCurrentlySelectedSong.childrenList = CSongDict.tFetchSongsByTitle(
@@ -876,7 +875,7 @@ internal class CStageSongSelect : CStage {
 														var SongToUnlock = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
 
 														if (SongToUnlock != null) {
-															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMetWrapper(OpenTaiko.SaveFile, DBUnlockables.CUnlockConditions.EScreen.SongSelect);
+															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMet(OpenTaiko.SaveFile, CUnlockCondition.EScreen.SongSelect);
 
 															Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 															if (actSongList.ttkNowUnlockConditionText is not null) {
@@ -893,8 +892,10 @@ internal class CStageSongSelect : CStage {
 																	"unlocked_songs",
 																	this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
 																);
-																if (SongToUnlock.unlockConditions.Condition == "cm")
+																if (SongToUnlock.unlockConditions is CUnlockCM)
 																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																else if (SongToUnlock.unlockConditions is CUnlockAndComb || SongToUnlock.unlockConditions is CUnlockOrComb)
+																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.CoinStack);
 																// Play modal animation here ?
 															} else
 																OpenTaiko.Skin.soundError.tPlay();
@@ -947,9 +948,9 @@ internal class CStageSongSelect : CStage {
 														goto Decided;
 													}
 
-														#endregion
+													#endregion
 
-														CSongSelectSongManager.disable();
+													CSongSelectSongManager.disable();
 
 													OpenTaiko.Skin.soundDecideSFX.tPlay();
 													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
@@ -1185,6 +1186,7 @@ internal class CStageSongSelect : CStage {
 	public enum EReturnValue : int {
 		継続,
 		BackToTitle,
+		PlayCutSceneIntro,
 		SongSelected,
 		オプション呼び出し,
 		ConfigMenuOpened,
@@ -1575,23 +1577,9 @@ internal class CStageSongSelect : CStage {
 		tNotifySelectedSongChange();
 	}
 	private void t曲を選択する() {
-		// First assignation
-		this.rChoosenSong = this.actSongList.rCurrentlySelectedSong;
-		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
-
-		this.nChoosenSongDifficulty[0] = this.actSongList.n現在選択中の曲の現在の難易度レベル;
-		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
-
-		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
-		}
-		// TJAPlayer3.Skin.bgm選曲画面.t停止する();
-		CSongSelectSongManager.stopSong();
+		this.t曲を選択する(this.actSongList.n現在選択中の曲の現在の難易度レベル, 0);
 	}
 	public void t曲を選択する(int nCurrentLevel, int player) {
-		// Second assignation
 		this.rChoosenSong = this.actSongList.rCurrentlySelectedSong;
 		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
 
@@ -1599,13 +1587,27 @@ internal class CStageSongSelect : CStage {
 		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
 
 		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
-			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
+			if (OpenTaiko.stageCutScene.LoadCutScenes(this)) {
+				this.FadeToCutSceneIntro();
+			} else {
+				this.FadeOutToNowLoading();
+			}
 		}
 
 		// TJAPlayer3.Skin.bgm選曲画面.t停止する();
 		CSongSelectSongManager.stopSong();
+	}
+
+	private void FadeToCutSceneIntro() {
+		this.eフェードアウト完了時の戻り値 = EReturnValue.PlayCutSceneIntro;
+		this.actFIFO.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+		base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+	}
+
+	private void FadeOutToNowLoading() {
+		this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
+		this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+		base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 	}
 
 	// Foreach randomly selectable songs
