@@ -91,18 +91,16 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	public void Init(int nRiskyTimes_InitialVal, int nPlayer)       // ゲージ初期化
 	{
 		//ダメージ値の計算
-		{
-			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-			switch (chara.effect.tGetGaugeType()) {
-				default:
-				case "Normal":
-					this.db現在のゲージ値[nPlayer] = 0;
-					break;
-				case "Hard":
-				case "Extreme":
-					this.db現在のゲージ値[nPlayer] = 100;
-					break;
-			}
+		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
+		switch (chara.effect.tGetGaugeType()) {
+			default:
+			case "Normal":
+				this.db現在のゲージ値[nPlayer] = 0;
+				break;
+			case "Hard":
+			case "Extreme":
+				this.db現在のゲージ値[nPlayer] = 100;
+				break;
 		}
 
 		//ゲージのMAXまでの最低コンボ数を計算
@@ -176,130 +174,51 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		//ゲージ値計算
 		//実機に近い計算
 
-		this.dbゲージ増加量[0][nPlayer] = (float)nGaugeRankValue / 100.0f;
-		this.dbゲージ増加量[1][nPlayer] = (float)(nGaugeRankValue / 100.0f) * 0.5f;
-		this.dbゲージ増加量[2][nPlayer] = (float)(nGaugeRankValue / 100.0f) * dbDamageRate;
-
-		for (int i = 0; i < 3; i++) {
-			this.dbゲージ増加量_Branch[i, 0][nPlayer] = (float)nGaugeRankValue_branch[i] / 100.0f;
-			this.dbゲージ増加量_Branch[i, 1][nPlayer] = (float)(nGaugeRankValue_branch[i] / 100.0f) * 0.5f;
-			this.dbゲージ増加量_Branch[i, 2][nPlayer] = (float)(nGaugeRankValue_branch[i] / 100.0f) * dbDamageRate;
-		}
-
-		//this.dbゲージ増加量[ 0 ] = CDTXMania.DTX.bチップがある.Branch ? ( 130.0 / CDTXMania.DTX.nノーツ数[ 0 ] ) : ( 130.0 / CDTXMania.DTX.nノーツ数[ 3 ] );
-		//this.dbゲージ増加量[ 1 ] = CDTXMania.DTX.bチップがある.Branch ? ( 65.0 / CDTXMania.DTX.nノーツ数[ 0 ] ) : 65.0 / CDTXMania.DTX.nノーツ数[ 3 ];
-		//this.dbゲージ増加量[ 2 ] = CDTXMania.DTX.bチップがある.Branch ? ( -260.0 / CDTXMania.DTX.nノーツ数[ 0 ] ) : -260.0 / CDTXMania.DTX.nノーツ数[ 3 ];
-
 		//2015.03.26 kairera0467 計算を初期化時にするよう修正。
 
 		#region [ Handling infinity cases ]
 		float fIsDontInfinty = 0.4f;//適当に0.4で
 		float[] fAddVolume = new float[] { 1.0f, 0.5f, dbDamageRate };
 
-		for (int i = 0; i < 3; i++) {
-			for (int l = 0; l < 3; l++) {
-				if (!double.IsInfinity(nGaugeRankValue_branch[i] / 100.0f))//値がInfintyかチェック
-				{
-					fIsDontInfinty = (float)(nGaugeRankValue_branch[i] / 100.0f);
-					this.dbゲージ増加量_Branch[i, l][nPlayer] = fIsDontInfinty * fAddVolume[l];
+		for (int ib = 0; ib < 3; ++ib) {
+			if (!double.IsInfinity(nGaugeRankValue_branch[ib] / 100.0f)) { //値がInfintyかチェック
+				fIsDontInfinty = (float)(nGaugeRankValue_branch[ib] / 100.0f);
+				for (int ij = 0; ij < 3; ++ij) {
+					this.dbゲージ増加量_Branch[ib, ij][nPlayer] = fIsDontInfinty * fAddVolume[ij];
 				}
-			}
-		}
-		for (int i = 0; i < 3; i++) {
-			for (int l = 0; l < 3; l++) {
-				if (double.IsInfinity(nGaugeRankValue_branch[i] / 100.0f))//値がInfintyかチェック
-				{
+			} else {
+				for (int ij = 0; ij < 3; ++ij) {
+					// Handling infinity cases
 					//Infintyだった場合はInfintyではない値 * 3.0をしてその値を利用する。
-					this.dbゲージ増加量_Branch[i, l][nPlayer] = (fIsDontInfinty * fAddVolume[l]) * 3f;
+					this.dbゲージ増加量_Branch[ib, ij][nPlayer] = (fIsDontInfinty * fAddVolume[ij]) * 3f;
 				}
 			}
 		}
 		#endregion
 
 		#region [Rounding process]
-
-		var increase = new float[] { dbゲージ増加量[0][nPlayer], dbゲージ増加量[1][nPlayer], dbゲージ増加量[2][nPlayer] };
-		var increaseBranch = new float[3, 3];
-		for (int i = 0; i < 3; i++) {
-			increaseBranch[i, 0] = dbゲージ増加量_Branch[i, 0][nPlayer];
-			increaseBranch[i, 1] = dbゲージ増加量_Branch[i, 1][nPlayer];
-			increaseBranch[i, 2] = dbゲージ増加量_Branch[i, 0][nPlayer];
-		}
-		switch (this.DTX[nPlayer].GaugeIncreaseMode) {
-			case GaugeIncreaseMode.Normal:
-			case GaugeIncreaseMode.Floor:
-				// 切り捨て
-				for (int i = 0; i < 3; i++) {
-					increase[i] = (float)Math.Truncate(increase[i] * 10000.0f) / 10000.0f;
-				}
-				for (int i = 0; i < 3; i++) {
-					increaseBranch[i, 0] = (float)Math.Truncate(increaseBranch[i, 0] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 1] = (float)Math.Truncate(increaseBranch[i, 1] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 2] = (float)Math.Truncate(increaseBranch[i, 2] * 10000.0f) / 10000.0f;
-				}
-				break;
-			case GaugeIncreaseMode.Round:
-				// 四捨五入
-				for (int i = 0; i < 3; i++) {
-					increase[i] = (float)Math.Round(increase[i] * 10000.0f) / 10000.0f;
-				}
-				for (int i = 0; i < 3; i++) {
-					increaseBranch[i, 0] = (float)Math.Round(increaseBranch[i, 0] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 1] = (float)Math.Round(increaseBranch[i, 1] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 2] = (float)Math.Round(increaseBranch[i, 2] * 10000.0f) / 10000.0f;
-				}
-				break;
-			case GaugeIncreaseMode.Ceiling:
-				// 切り上げ
-				for (int i = 0; i < 3; i++) {
-					increase[i] = (float)Math.Ceiling(increase[i] * 10000.0f) / 10000.0f;
-				}
-				for (int i = 0; i < 3; i++) {
-					increaseBranch[i, 0] = (float)Math.Ceiling(increaseBranch[i, 0] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 1] = (float)Math.Ceiling(increaseBranch[i, 1] * 10000.0f) / 10000.0f;
-					increaseBranch[i, 2] = (float)Math.Ceiling(increaseBranch[i, 2] * 10000.0f) / 10000.0f;
-				}
-				break;
-			case GaugeIncreaseMode.NotFix:
-			default:
-				// 丸めない
-				break;
-		}
-
-		for (int i = 0; i < 3; i++) {
-			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-			switch (chara.effect.tGetGaugeType()) {
-				default:
-				case "Normal":
-					dbゲージ増加量[i][nPlayer] = increase[i];
-					break;
-				case "Hard":
-					dbゲージ増加量[i][nPlayer] = increase[i] * HGaugeMethods.HardGaugeFillRatio;
-					break;
-				case "Extreme":
-					dbゲージ増加量[i][nPlayer] = increase[i] * HGaugeMethods.ExtremeGaugeFillRatio;
-					break;
+		Func<float, float>? gaugeRoundFunc = this.DTX[nPlayer].GaugeIncreaseMode switch {
+			GaugeIncreaseMode.Normal or GaugeIncreaseMode.Floor => MathF.Truncate, // 切り捨て
+			GaugeIncreaseMode.Round => MathF.Round, // 四捨五入
+			GaugeIncreaseMode.Ceiling => MathF.Ceiling, // 切り上げ
+			GaugeIncreaseMode.NotFix or _ => null, // 丸めない
+		};
+		if (gaugeRoundFunc != null) {
+			for (int ib = 0; ib < 3; ++ib) {
+				for (int ij = 0; ij < 3; ++ij)
+					dbゲージ増加量_Branch[ib, ij][nPlayer] = gaugeRoundFunc(dbゲージ増加量_Branch[ib, ij][nPlayer] * 10000.0f) / 10000.0f;
 			}
 		}
-		for (int i = 0; i < 3; i++) {
-			var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-			switch (chara.effect.tGetGaugeType()) {
-				default:
-				case "Normal":
-					dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0];
-					dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1];
-					dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2];
-					break;
-				case "Hard":
-					dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] * HGaugeMethods.HardGaugeFillRatio;
-					dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] * HGaugeMethods.HardGaugeFillRatio;
-					dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] * HGaugeMethods.HardGaugeFillRatio;
-					break;
-				case "Extreme":
-					dbゲージ増加量_Branch[i, 0][nPlayer] = increaseBranch[i, 0] * HGaugeMethods.ExtremeGaugeFillRatio;
-					dbゲージ増加量_Branch[i, 1][nPlayer] = increaseBranch[i, 1] * HGaugeMethods.ExtremeGaugeFillRatio;
-					dbゲージ増加量_Branch[i, 2][nPlayer] = increaseBranch[i, 2] * HGaugeMethods.ExtremeGaugeFillRatio;
-					break;
+
+		float gaugeFillRatio = chara.effect.tGetGaugeType() switch {
+			"Hard" => HGaugeMethods.HardGaugeFillRatio,
+			"Extreme" => HGaugeMethods.ExtremeGaugeFillRatio,
+			"Normal" or _ => 1.0f,
+		};
+		if (gaugeFillRatio != 1) {
+			for (int ib = 0; ib < 3; ++ib) {
+				for (int ij = 0; ij < 3; ++ij)
+					dbゲージ増加量_Branch[ib, ij][nPlayer] *= gaugeFillRatio;
 			}
 		}
 		#endregion
