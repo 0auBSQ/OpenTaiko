@@ -335,7 +335,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				nBalloonHits += Math.Min(_chip.nBalloon, expectedHits);
 			}
 
-			if (NotesManager.IsRoll(_chip) || NotesManager.IsFuzeRoll(_chip))
+			if (NotesManager.IsRoll(_chip))
 				msRollTime += (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
 		}
 	}
