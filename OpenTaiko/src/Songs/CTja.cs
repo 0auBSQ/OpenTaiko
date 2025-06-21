@@ -2610,7 +2610,7 @@ internal class CTja : CActivity {
 					// IsEndedBranchingがfalseで1回
 					// trueで3回だよ3回
 					for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, n文字数, IsEndedBranching ? (ECourse)i : n現在のコース);
+						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, Math.Max(1, n文字数), IsEndedBranching ? (ECourse)i : n現在のコース);
 						chip.n整数値 = this.n現在の小節数;
 						chip.n整数値_内部番号 = this.n現在の小節数;
 						chip.bHideBarLine = this.bBARLINECUE[0] == 1;
