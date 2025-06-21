@@ -100,13 +100,13 @@ class CActSelectDanInfo : CStage {
 				Dan_C danc0 = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 
 				if (danc0 != null) {
-					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.GetExamType()]).t2D中心基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
+					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.ExamType]).t2D中心基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
 				}
 
 				if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
 					Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
 					if (danc != null) {
-						OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+						OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.GetValue()[0], danc.ExamRange, OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 					}
 				} else {
 					for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
@@ -124,7 +124,7 @@ class CActSelectDanInfo : CStage {
 							}
 
 							OpenTaiko.Tx.Dani_Exam_Number.Opacity = opacity;
-							OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.Value[0], danc.GetExamRange(), OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
+							OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[i % 3], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.GetValue()[0], danc.ExamRange, OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 							OpenTaiko.Tx.Dani_Exam_Number.Opacity = 255;
 						}
 					}

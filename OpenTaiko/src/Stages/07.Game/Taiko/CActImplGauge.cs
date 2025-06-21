@@ -189,9 +189,9 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 									OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] :
 									OpenTaiko.TJA.Dan_C[i];
 
-								if (dan_c.GetExamType() == Exam.Type.Gauge) {
-									OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (dan_c.GetValue(false) / 2 * nWidth), gauge_y[0],
-										new Rectangle((dan_c.GetValue(false) / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (dan_c.GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
+								if (dan_c.ExamType == Exam.Type.Gauge) {
+									OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (dan_c.GetValue()[0] / 2 * nWidth), gauge_y[0],
+										new Rectangle((dan_c.GetValue()[0] / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 								}
 							}
 						}
@@ -224,16 +224,16 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 								OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] :
 								OpenTaiko.TJA.Dan_C[i];
 
-							if (dan_c != null && dan_c.GetExamType() == Exam.Type.Gauge && db現在のゲージ値[0] >= dan_c.GetValue(false)) {
+							if (dan_c != null && dan_c.ExamType == Exam.Type.Gauge && db現在のゲージ値[0] >= dan_c.GetValue()[0]) {
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;
-								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x + (dan_c.GetValue(false) / 2 * nWidth), y, new Rectangle(dan_c.GetValue(false) / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue(false) / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
+								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x + (dan_c.GetValue()[0] / 2 * nWidth), y, new Rectangle(dan_c.GetValue()[0] / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								int Opacity = 0;
 								if (this.ctGaugeFlash.CurrentValue <= 365) Opacity = 0;
 								else if (this.ctGaugeFlash.CurrentValue <= 448) Opacity = (int)((this.ctGaugeFlash.CurrentValue - 365) / 83f * 255f);
 								else if (this.ctGaugeFlash.CurrentValue <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.CurrentValue - 448) / 83f * 255f);
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = Opacity;
-								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x, y, new Rectangle(0, 0, dan_c.GetValue(false) / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
+								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x, y, new Rectangle(0, 0, dan_c.GetValue()[0] / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								break;
 							}

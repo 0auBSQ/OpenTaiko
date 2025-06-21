@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.0.80] - 2025-06-18 (Beta)
+
+- [Fix] Fix accuracy exam monitoring
+
+## [0.6.0.79] - 2025-06-16 (Beta)
+
+- [Fix] AI battle mode result mode bugs due to not treating player count as 1, including character's "success"/"failed" voice looped every frame infinitely
+- [Fix] Result screen used hardcoded 80% gauge value for some success/failed animations and caused wrong animations for non–80%+-clear gauges
+
+## [0.6.0.78] - 2025-06-16 (Beta)
+
+- [Enhancement] Judge exam requirement reachability live for JudgeADLIB, JudgeMine, Roll, Hit, Accuracy, & Score (use gen-4 score, no live failure in non–gen-4-Shin-uchi score mode) exams (no live failure for branched songs) 
+- [Enhancement] Monitor gauge exam status with gen-4 style standard; monitor near-failure, near-success, near-better-success status and add gauge exam status transition and blinking animation
+- [Enhancement] Fade out past individual exams at 4th song and on
+- [Fix] Exam last note determination
+- [Fix] Miss jugements in auto were not counted in Dan exams
+- [Fix] Dan exam visuals
+- [Fix] Scoring issues in Dan charts (Balloons being treated as 1 hit in the score calculation formula)
+- [Fix] Dan gameplay failed to move to the next song if the last defined branch before #NEXTSONG is not taken
+- [Fix] First Dan song was the only song recognized as branched if the whole Dan contains any branched song even if not the first song
+
 ## [0.6.0.77] - 2025-06-15 (Beta)
 
 - [Fix] Use SDL for Linux w/ Wayland fixing it not booting/booting with a blank window (GLFW is kept for Windows and Linux w/ X11)

@@ -17,8 +17,7 @@ class CActImplScoreRank : CActivity {
         */
 
 		for (int player = 0; player < 5; player++) {
-			this.ScoreRank[player] = new int[] { 500000, 600000, 700000, 800000, 900000, 950000,
-				Math.Max(1000000, (int)(OpenTaiko.stageGameScreen.nAddScoreNiji[player] * OpenTaiko.stageGameScreen.nNoteCount[player]) + (int)(OpenTaiko.stageGameScreen.nBalloonCount[player] * 100) + (int)(Math.Ceiling(OpenTaiko.stageGameScreen.nRollTimeMs[player] * 16.6 / 10) * 100 * 10)) };
+			this.ScoreRank[player] = new int[] { 500000, 600000, 700000, 800000, 900000, 950000, OpenTaiko.stageGameScreen.GetCeilingGen4ShinUchiScore(player) };
 
 			for (int i = 0; i < 7; i++) {
 				this.counter[player][i] = new CCounter();

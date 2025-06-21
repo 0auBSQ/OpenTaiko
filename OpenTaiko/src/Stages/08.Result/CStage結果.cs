@@ -23,7 +23,7 @@ internal class CStage結果 : CStage {
 	public STDGBVALUE<int> nScoreRank;
 	public int n総合ランク値;
 
-	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:Not-cleared 1:Assisted-cleared 2:Cleared 3:Full-combo 4:Perfect
 	public int[] nスコアランク = { 0, 0, 0, 0, 0 };  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 	public int[] nHighScore = { 0, 0, 0, 0, 0 };
 	public bool[] IsScoreValid = [false, false, false, false, false];
@@ -219,7 +219,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int clearValue = 0;
 
@@ -409,7 +409,7 @@ internal class CStage結果 : CStage {
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -1105,7 +1105,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1488,7 +1488,7 @@ internal class CStage結果 : CStage {
 			OpenTaiko.stageGameScreen.CChartScore[0].nMiss, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_Roll[0] + offset, OpenTaiko.Skin.DanResult_Roll[1],
-			OpenTaiko.stageGameScreen.GetRoll(0), 1.0f);
+			OpenTaiko.stageGameScreen.CChartScore[0].nRoll, 1.0f);
 
 		this.actParameterPanel.t小文字表示(OpenTaiko.Skin.DanResult_MaxCombo[0] + offset, OpenTaiko.Skin.DanResult_MaxCombo[1],
 			OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0], 1.0f);
@@ -1503,7 +1503,7 @@ internal class CStage結果 : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs, true, offset);
 
 		#endregion
 	}
@@ -1554,10 +1554,10 @@ internal class CStage結果 : CStage {
 
 		int[] scoresArr =
 		{
-			OpenTaiko.stageGameScreen.nGood[i],
-			OpenTaiko.stageGameScreen.nOk[i],
-			OpenTaiko.stageGameScreen.nBad[i],
-			OpenTaiko.stageGameScreen.nRoll[i]
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGreat,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nGood,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nMiss,
+			OpenTaiko.stageGameScreen.DanSongScore[i].nRoll
 		};
 
 		int[] num_x = {
