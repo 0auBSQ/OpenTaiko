@@ -3199,6 +3199,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 							var targetBranch = this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
 							this.t分岐処理(targetBranch, nPlayer, (long)pChip.n分岐時刻ms);
 							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer, pChip.n分岐時刻ms);
+							if (pChip.hasLevelHold[(int)targetBranch])
+								this.bLEVELHOLD[nPlayer] = true;
 						}
 						this.n分岐した回数[nPlayer]++;
 						pChip.bHit = true;
@@ -3221,7 +3223,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xE1:
 					if (!pChip.bHit) {
 						//LEVELHOLD
-						this.bLEVELHOLD[nPlayer] = true;
+						if (pChip.hasLevelHold[0]) // lock up branch at chip
+							this.bLEVELHOLD[nPlayer] = true;
 					}
 					break;
 				case 0xE2:
