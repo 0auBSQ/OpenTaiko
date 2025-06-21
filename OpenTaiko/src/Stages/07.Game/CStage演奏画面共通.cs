@@ -3193,12 +3193,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.eBranch種類 = pChip.eBranchCondition;
 						this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
 						this.nBranch条件数値B = pChip.nBranchCondition2_Master;
-						if (!this.bLEVELHOLD[nPlayer]) {
-							if (!this.bUseBranch[nPlayer]) {
-								this.bUseBranch[nPlayer] = true;
-								OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
-							}
 
+						if (!this.bUseBranch[nPlayer]) {
+							this.bUseBranch[nPlayer] = true;
+							OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
+						}
+
+						if (!this.bLEVELHOLD[nPlayer]) {
 							CBRANCHSCORE branchScore;
 							if (OpenTaiko.ConfigIni.bAIBattleMode) {
 								branchScore = this.CBranchScore[0];
