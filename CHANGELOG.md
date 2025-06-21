@@ -2,6 +2,8 @@
 
 ## [0.6.0.80] - 2025-06-18 (Beta)
 
+there's already a repo for that that's used by OpTk Hub anyway, it's called the OpenTaiko Soundtrack repo
+feel free to comment or reject
 i forgot to remove it, this is an extension of this specific PR: 72c8f71dda70d383a14f587f57dfeafb4fdaf82e (Reject TJAP3, embrace OpenTaiko)
 Keeping it slow with this one. I've got a ton of translation stuff that I need to do and then that's it. I cannot help any further due to my poor coding skillz :sob:
 - Replaced TJAPlayer3-f references in some error messages with OpenTaiko in Program.cs, along with some slight log modifications.
