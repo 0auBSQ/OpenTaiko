@@ -1,8 +1,11 @@
-Menu SFX : 
+[These are remnants of an existing skin, SimpleStyle.]
+[The current assets, including sounds and textures, are now made by DashyDesu.]
+
+Menu SFX: 
 
 - Hitrison - https://hitrison.itch.io/menu-sfx-pack
 
-In-Game textures :
+In-Game textures:
 
 - TJAPlayer3 Default skin
 - Freepik (starline / vector_corp / Harryarts) (Patterns)
