@@ -41,6 +41,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
 	public EBranchConditionType eBranchCondition;
+	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;

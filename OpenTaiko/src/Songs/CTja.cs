@@ -205,6 +205,7 @@ internal class CTja : CActivity {
 
 
 	public class CBranchStartInfo {
+		public CChip? chipBranchStart;
 		public int nMeasureCount;
 		public double dbTime;
 		public double dbBPM;
@@ -2049,7 +2050,9 @@ internal class CTja : CActivity {
 			chip.eBranchCondition = e条件;
 			chip.nBranchCondition1_Professional = nNum[0];// listに追加していたが仕様を変更。
 			chip.nBranchCondition2_Master = nNum[1];// ""
+			chip.hasLevelHold = new bool[3];
 			this.listChip.Add(chip);
+			cBranchStart.chipBranchStart = chip;
 			#endregion
 
 			for (int i = 0; i < 3; i++)
@@ -2077,6 +2080,14 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xE1, 1);
 			chip.n発声位置 -= 1;
 			this.listChip.Add(chip);
+			if (!this.IsEndedBranching && this.cBranchStart.chipBranchStart != null) {
+				// lock up branch at branch switching
+				this.cBranchStart.chipBranchStart.hasLevelHold[(int)this.n現在のコース] = true;
+				chip.hasLevelHold = [false];
+			} else {
+				// lock up branch at chip
+				chip.hasLevelHold = [true];
+			}
 		} else if (command == "#BRANCHEND") {
 			//End用チャンネルをEmptyから引っ張ってきた。
 			var GoBranch = this.NewEventChipAtDefCursor(0x52, 1);
