@@ -904,7 +904,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			pChip.nLag = (int)(nTime - pChip.n発声時刻ms);
 			int nDeltaTime = Math.Abs(pChip.nLag);
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
-			if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
+			if (NotesManager.IsRoll(pChip)) {
 				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) >= pChip.n発声時刻ms && tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) < pChip.end.n発声時刻ms) {
 					return ENoteJudge.Perfect;
 				}
