@@ -2204,7 +2204,6 @@ internal class CTja : CActivity {
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
 			var chip = this.NewEventChipAtDefCursor(0x9B, List_DanSongs.Count);
-			chip.n発声位置 -= ((this.n現在の小節数) * 384) - 1;
 			this.listChip.Add(chip);
 
 			for (int ib = 0; ib < 3; ++ib) {
