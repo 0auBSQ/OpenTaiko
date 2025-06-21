@@ -2018,7 +2018,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					CTja.ECourse.eExpert => "EXPERT",
 					CTja.ECourse.eNormal or _ => "NORMAL",
 				};
-				OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, strNext);
+				var (x, _) = OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, strNext);
+				if (this.bLEVELHOLD[0])
+					(x, _) = OpenTaiko.actTextConsole.Print(x, y, 0, CTextConsole.EFontType.White, "(LEVELHELD)");
+				if (this.b強制的に分岐させた[0])
+					(x, _) = OpenTaiko.actTextConsole.Print(x, y, 0, CTextConsole.EFontType.White, "(FORCED)");
 
 				int nMeasuresToNextBranch = branchJudgePoint.n発声位置 / 384 - (this.actPlayInfo.NowMeasure[0] + 1); // round down
 				OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, $"NEXT BRANCH:{nMeasuresToNextBranch,3} BARS");
