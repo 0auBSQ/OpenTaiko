@@ -2776,24 +2776,28 @@ internal class CTja : CActivity {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
 				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
 					this.nDan_NotesCount[List_DanSongs.Count - 1]++;
-					if (NotesManager.IsADLIB(chip))
-						this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
-					else if (NotesManager.IsMine(chip))
-						this.nDan_MineCount[List_DanSongs.Count - 1]++;
 				}
 				if (IsEndedBranching) {
 					this.nノーツ数[3]++;
 				}
 			}
+		} else if (NotesManager.IsADLIB(chip)) {
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
+			}
+		} else if (NotesManager.IsMine(chip)) {
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_MineCount[List_DanSongs.Count - 1]++;
+			}
 		} else if (NotesManager.IsGenericBalloon(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
 				this.nDan_BalloonHitCount[List_DanSongs.Count - 1] += chip.nBalloon;
+				if (NotesManager.IsFuzeRoll(chip))
+					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		} else if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
 				this.nDan_BarRollCount[List_DanSongs.Count - 1]++;
-				if (NotesManager.IsFuzeRoll(chip))
-					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		}
 
