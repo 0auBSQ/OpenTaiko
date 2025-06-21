@@ -3191,13 +3191,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						}
 
 						if (!this.bLEVELHOLD[nPlayer]) {
-							CBRANCHSCORE branchScore;
-							if (OpenTaiko.ConfigIni.bAIBattleMode) {
-								branchScore = this.CBranchScore[0];
-							} else {
-								branchScore = this.CBranchScore[nPlayer];
-							}
-							var targetBranch = this.tBranchJudge(pChip, branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, nPlayer);
+							CTja.ECourse targetBranch = this.tBranchJudge(nPlayer, pChip);
 							this.t分岐処理(targetBranch, nPlayer, (long)pChip.n分岐時刻ms);
 							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer, pChip.n分岐時刻ms);
 							if (pChip.hasLevelHold[(int)targetBranch])
@@ -3764,23 +3758,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public CTja.ECourse tBranchJudge(CChip pChip, CBRANCHSCORE cBRANCHSCORE, int nスコア, int n連打数, int n良, int n可, int n不可, int nPlayer) {
+	public CTja.ECourse tBranchJudge(int nPlayer, CChip pChip) {
+		CBRANCHSCORE branchScore = this.CBranchScore[OpenTaiko.ConfigIni.bAIBattleMode ? 0 : nPlayer];
+		return this.tBranchJudge(nPlayer, pChip, branchScore);
+	}
+
+	public CTja.ECourse tBranchJudge(int nPlayer, CChip pChip, CBRANCHSCORE branchScore) {
 		// Branch check score here
+		if (this.bLEVELHOLD[nPlayer] || this.b強制的に分岐させた[nPlayer])
+			return this.nTargetBranch[nPlayer];
 
-		if (this.b強制的に分岐させた[nPlayer]) return this.nTargetBranch[nPlayer];
-
-		var e種類 = pChip.eBranchCondition;
-
-		if (e種類 == CTja.EBranchConditionType.None)
+		if (pChip.eBranchCondition == CTja.EBranchConditionType.None)
 			return this.nTargetBranch[nPlayer]; // keep current branch
 
-		double dbRate = e種類 switch {
-			CTja.EBranchConditionType.Accuracy => (n良 + n可 + n不可 == 0) ? 0 : (n良 + n可 * 0.5) / (n良 + n可 + n不可) * 100.0,
-			CTja.EBranchConditionType.Score => nスコア,
-			CTja.EBranchConditionType.Drumroll => n連打数,
-			CTja.EBranchConditionType.Accuracy_BigNotesOnly => cBRANCHSCORE.nGreat,
-			_ => 0,
-		};
+		double dbRate = GetBranchConditionScore(branchScore, pChip.eBranchCondition);
 
 		if (dbRate >= pChip.nBranchCondition2_Master) {
 			return CTja.ECourse.eMaster;
@@ -3790,6 +3781,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return CTja.ECourse.eNormal;
 		}
 	}
+
+	public double GetBranchConditionScore(int nPlayer, CTja.EBranchConditionType type) {
+		CBRANCHSCORE branchScore = this.CBranchScore[OpenTaiko.ConfigIni.bAIBattleMode ? 0 : nPlayer];
+		return GetBranchConditionScore(branchScore, type);
+	}
+
+	public static double GetBranchConditionScore(CBRANCHSCORE branchScore, CTja.EBranchConditionType type)
+		=> GetBranchConditionScore(branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, type);
+
+	public static double GetBranchConditionScore(CBRANCHSCORE branchScoreBig, int score, int nRolls, int nGreats, int nOks, int nBads, CTja.EBranchConditionType type) => type switch {
+		CTja.EBranchConditionType.Accuracy => (nGreats + nOks + nBads == 0) ? 0 : (nGreats + nOks * 0.5) / (nGreats + nOks + nBads) * 100.0,
+		CTja.EBranchConditionType.Score => score,
+		CTja.EBranchConditionType.Drumroll => nRolls,
+		CTja.EBranchConditionType.Accuracy_BigNotesOnly => branchScoreBig.nGreat,
+		_ => 0,
+	};
 
 	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint) {
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;

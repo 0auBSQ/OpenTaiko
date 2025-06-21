@@ -68,6 +68,14 @@ internal class CTja : CActivity {
 		Accuracy_BigNotesOnly
 	}
 
+	public static string EnumToTjaString(EBranchConditionType type) => type switch {
+		EBranchConditionType.Accuracy => "p",
+		EBranchConditionType.Drumroll => "r",
+		EBranchConditionType.Score => "s",
+		EBranchConditionType.Accuracy_BigNotesOnly => "d",
+		EBranchConditionType.None or _ => "",
+	};
+
 	public class CWAV : IDisposable {
 		public bool bBGMとして使う;
 		public List<int> listこのWAVを使用するチャンネル番号の集合 = new List<int>(16);
@@ -265,6 +273,7 @@ internal class CTja : CActivity {
 	public List<CChip> listBarLineChip; // increasing definition order
 	public List<CChip> listNoteChip; // increasing definition order
 	public List<CChip>[] listChip_Branch;
+	public List<CChip> listBRANCH; // increasing time > definition order (consistent with listChip)
 	public Dictionary<int, CWAV> listWAV;
 	public List<CJPOSSCROLL> listJPOSSCROLL;
 	public List<DanSongs> List_DanSongs;
@@ -976,6 +985,9 @@ internal class CTja : CActivity {
 					// なお、093時点では、このソートを削除しても動作するようにはしてある。
 					// (ここまでの一部チップ登録を、listChip.Add(c)から同Insert(0,c)に変更してある)
 					// これにより、数ms程度ながらここでのソートも高速化されている。
+				}
+				if (this.listBRANCH.Count > 0) {
+					this.listBRANCH = this.listBRANCH.OrderBy(x => x).ToList();
 				}
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
@@ -2042,6 +2054,7 @@ internal class CTja : CActivity {
 			chip.nChannelNo = 0xDE;
 			chip.IsEndedBranching = true;
 			chip.n発声時刻ms = (int)JudgeChipTime.msTime;
+			chip.n発声位置 = JudgeChipTime.chip?.n発声位置 ?? 0;
 			chip.fNow_Measure_m = JudgeChipTime.chip?.fNow_Measure_m ?? 4;
 			chip.fNow_Measure_s = JudgeChipTime.chip?.fNow_Measure_s ?? 4;
 			chip.dbSCROLL = JudgeChipTime.chip?.dbSCROLL ?? 1;
@@ -2053,6 +2066,7 @@ internal class CTja : CActivity {
 			chip.nBranchCondition2_Master = nNum[1];// ""
 			chip.hasLevelHold = new bool[3];
 			this.listChip.Add(chip);
+			this.listBRANCH.Add(chip);
 			cBranchStart.chipBranchStart = chip;
 			#endregion
 
@@ -3949,6 +3963,7 @@ internal class CTja : CActivity {
 		this.listNoteChip = new List<CChip>();
 		this.listBalloon = new List<int>();
 		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
+		this.listBRANCH = new List<CChip>();
 		this.divsPerMeasureAllBranches = new List<int>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
@@ -3982,6 +3997,7 @@ internal class CTja : CActivity {
 		this.listChip?.Clear();
 		this.listBarLineChip?.Clear();
 		this.listNoteChip?.Clear();
+		this.listBRANCH?.Clear();
 
 		this.listBalloon?.Clear();
 		foreach (var listBalloon in this.listBalloon_Branch)
