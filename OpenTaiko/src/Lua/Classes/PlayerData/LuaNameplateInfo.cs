@@ -48,8 +48,7 @@
 			#endregion
 			this._npu = _nnp;
 			this._id = -1;
-			// placeholder
-			this._lUC = null;
+			this._lUC = new LuaUnlockCondition();
 		}
 	}
 }
