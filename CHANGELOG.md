@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.81] - 2025-06-24 (Beta)
+
+- [Fix] Skip OS default fonts, fallback to packaged font instead
+
 ## [0.6.0.80] - 2025-06-18 (Beta)
 
 - [Fix] Fix accuracy exam monitoring
