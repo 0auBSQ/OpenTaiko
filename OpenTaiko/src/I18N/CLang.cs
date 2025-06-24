@@ -40,8 +40,8 @@ internal class CLang {
 			clang.Language = node["Language"].Deserialize<string>();
 			clang.Entries = node["Entries"].Deserialize<Dictionary<string, string>>();
 			clang.InvalidKey = node["InvalidKey"].Deserialize<string>();
-			clang.FontName = node["FontName"].Deserialize<string>();
-			clang.BoxFontName = node["BoxFontName"].Deserialize<string>();
+			clang.FontName = node["FontName"].Deserialize<string>().FixPath();
+			clang.BoxFontName = node["BoxFontName"].Deserialize<string>().FixPath();
 
 			return clang;
 		} else {
