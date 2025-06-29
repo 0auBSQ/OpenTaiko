@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.82] - 2025-06-29 (Beta)
+
+- [Chore] Add (future) ch6 nameplates
+
 ## [0.6.0.81] - 2025-06-24 (Beta)
 
 - [Fix] Skip OS default fonts, fallback to packaged font instead
