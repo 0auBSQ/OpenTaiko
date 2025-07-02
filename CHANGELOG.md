@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.83] - 2025-07-02 (Beta)
+
+- Unlockables and nameplates update
+
 ## [0.6.0.82] - 2025-06-29 (Beta)
 
 - [Chore] Add (future) ch6 nameplates
