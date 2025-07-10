@@ -15,7 +15,7 @@ end
 function init()
     func:AddGraph("Down.png");
     func:AddGraph("Down_Clear.png");
-    func:AddGraph("Down_Scroll.png");
+    func:AddGraph("Down_Scroll.png", "Repeat");
 end
 
 function update()

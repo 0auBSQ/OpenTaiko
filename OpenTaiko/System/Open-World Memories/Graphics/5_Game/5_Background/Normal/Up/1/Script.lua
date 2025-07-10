@@ -27,11 +27,11 @@ end
 function init()
     func:AddGraph("1P_Up_1st.png");
     func:AddGraph("2P_Up_1st.png");
-    func:AddGraph("1P_Up_3rd.png");
-    func:AddGraph("2P_Up_3rd.png");
+    func:AddGraph("1P_Up_3rd.png", "Repeat");
+    func:AddGraph("2P_Up_3rd.png", "Repeat");
     func:AddGraph("Clear_Up_1st.png");
-    func:AddGraph("Clear_Up_2nd.png");
-    func:AddGraph("Clear_Up_3rd.png");
+    func:AddGraph("Clear_Up_2nd.png", "Repeat");
+    func:AddGraph("Clear_Up_3rd.png", "Repeat");
 end
 
 function update()
