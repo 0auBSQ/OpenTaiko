@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using FDK;
 using NLua;
+using Silk.NET.OpenGLES;
 
 namespace OpenTaiko;
 
@@ -18,10 +19,11 @@ class ScriptBGFunc {
 	public (int x, int y) DrawNum(double x, double y, double text) {
 		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text.ToString());
 	}
-	public void AddGraph(string fileName) {
+	public void AddGraph(string fileName, string wrapMode = "") {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
 		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+		SetWrapMode(wrapMode, fileName);
 	}
 	public void DrawGraph(double x, double y, string fileName) {
 		Textures[fileName]?.t2D描画((int)x, (int)y);
@@ -90,6 +92,19 @@ class ScriptBGFunc {
 					Textures[fileName].bスクリーン合成 = true;
 					break;
 			}
+		}
+	}
+	public void SetWrapMode(string mode, string fileName) {
+		if (Textures[fileName] == null) return;
+
+		switch (mode.ToLower()) {
+			case "clamp to edge":
+			default:
+				Textures[fileName].tSetWrapMode(TextureWrapMode.ClampToEdge);
+				break;
+			case "repeat":
+				Textures[fileName].tSetWrapMode(TextureWrapMode.Repeat);
+				break;
 		}
 	}
 
