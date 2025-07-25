@@ -57,12 +57,13 @@ public class CFontRenderer : IDisposable {
 
 	public static string DefaultFontName {
 		get {
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				return "MS UI Gothic";
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				return "ヒラギノ角ゴ Std W8";//OSX搭載PC未所持のため暫定
-			else
-				return "Droid Sans Fallback";
+			//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			//	return "MS UI Gothic";
+			//else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			//	return "ヒラギノ角ゴ Std W8";//OSX搭載PC未所持のため暫定
+			//else
+			//	return "Droid Sans Fallback";
+			return "";
 		}
 	}
 
@@ -84,17 +85,15 @@ public class CFontRenderer : IDisposable {
 
 	protected void Initialize(string fontpath, int pt, FontStyle style) {
 		try {
-			this.textRenderer = new CSkiaSharpTextRenderer(fontpath, pt, style);
+			if (fontpath != null && FontExists(fontpath)) {
+				this.textRenderer = new CSkiaSharpTextRenderer(fontpath, pt, style);
+			}
+			else {
+				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), pt, style);
+			}
 			return;
 		} catch (Exception e) {
 			Trace.TraceWarning("SkiaSharpでのフォント生成に失敗しました。" + e.ToString());
-			this.textRenderer?.Dispose();
-		}
-
-		try {
-			this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), pt, style);
-		} catch (Exception e) {
-			Trace.TraceWarning("ビルトインフォントを使用してのフォント生成に失敗しました。" + e.ToString());
 			this.textRenderer?.Dispose();
 			throw;
 		}

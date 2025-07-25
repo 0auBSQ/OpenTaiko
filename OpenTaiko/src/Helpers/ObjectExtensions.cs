@@ -198,6 +198,10 @@ namespace System {
 			}
 		}
 
+		public static string FixPath(this string input) {
+			return input.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+		}
+
 		public static string[] SplitByCommas(this string input) {
 			// Regular expression to split by commas, but not by escaped commas (\,)
 			var pattern = @"(?<!\\),";
