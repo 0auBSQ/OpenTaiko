@@ -1,18 +1,20 @@
---func:DrawText(x, y, text)
---func:DrawNum(x, y, num)
---func:AddGraph("filename")
---func:DrawGraph(x, y, filename)
---func:DrawRectGraph(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:DrawGraphCenter(x, y, filename)
---func:DrawGraphRectCenter(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:SetOpacity(opacity, "filename")
---func:SetRotation(angle, "fileName")
---func:SetScale(xscale, yscale, "filename")
---func:SetColor(r, g, b, "filename")
-
 local timer = 0
 local speech = "Speech/en.png"
 local char = "Character/1.png"
+local id = 1
+
+local pos = {
+  { x=1058, y=131 },
+  { x=925, y=25 },
+  { x=1092, y=65 },
+  { x=951, y=288 },
+  { x=1142, y=17 },
+  { x=1108, y=35 },
+  { x=915, y=189 },
+  { x=1168, y=21 }
+}
+
+local total_chars = 8
 
 local center_pos = {540, 540}
 
@@ -45,9 +47,10 @@ function init()
 
     func:AddGraph(speech)
 
-    --Use this later when more chars are made
-    --math.randomseed(os.time())
-    --char = "Character/"..tostring(math.random(5))..".png"
+    -- Random character
+    math.randomseed(os.time())
+    id = math.random(total_chars)
+    char = "Character/"..tostring(id)..".png"
     func:AddGraph(char)
 
     timer = 0
@@ -69,6 +72,6 @@ function draw()
     func:DrawGraphCenter(center_pos[1], center_pos[2], "Circle1.png")
     func:DrawGraphCenter(center_pos[1], center_pos[2], "Logo.png")
     func:DrawGraphCenter(center_pos[1], center_pos[2], speech)
-    func:DrawGraph(0, 0, char)
-    func:DrawNum(0, 0, timer)
+    func:DrawGraph(pos[id].x, pos[id].y, char)
+    --func:DrawNum(0, 0, timer)
 end

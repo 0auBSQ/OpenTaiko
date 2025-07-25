@@ -31,7 +31,7 @@ local config_title_plate_offset_y = nil
 local config_titletypes = { "0", "1" }
 local config_titleplate_effects = { }
 
-local nameplate_count = 38
+local nameplate_count = 46
 
 local base = nil
 local dan_gradation = { }
@@ -49,13 +49,13 @@ local title_plate_star_big = { }
 local title_plate_star_small = { }
 local slash = nil
 
-local title_stars_folders = { "1", "2", "3" }
+local title_stars_folders = { "1", "2", "3", "4" }
 local title_stars = { { } }
 
 local title_badge_of_achievement = nil
-local nameplates_achievement = {134,135,136,78,66,71,44,14,17}
+local nameplates_achievement = {134,135,136,78,66,71,44,11,215,218,220,225,229,234,239,246,251,256,260,292}
 local title_badge_of_team_member = nil
-local nameplates_team_member = {}
+local nameplates_team_member = {291}
 
 local font_name_normal_size = nil
 local font_name_withtitle = nil
@@ -220,9 +220,12 @@ function implDrawRarityStars(o_x, o_y, opacity, rarity)
 	--Epic
 	elseif rarity == 4 then
 		star_count = 2
-	--Legendary / Mythical
-	elseif rarity >= 5 then
+	--Legendary
+	elseif rarity == 5 then
 		star_count = 3
+	--Mythical
+	elseif rarity >= 6 then
+		star_count = 4
 	end
 	
 	if star_count > 0 then

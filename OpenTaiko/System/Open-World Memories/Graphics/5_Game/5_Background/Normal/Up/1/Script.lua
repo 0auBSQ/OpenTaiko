@@ -38,7 +38,7 @@ function update()
     bgScrollX = bgScrollX - (59 * deltaTime);
     bgScrollX2 = bgScrollX2 - (100 * deltaTime);
     animeCounter1 = animeCounter1 + (0.5 * deltaTime);
-    animeCounter2 = animeCounter2 + (1 * deltaTime);
+    animeCounter2 = animeCounter2 + (0.5 * deltaTime);
 
 
     for player = 0, playerCount - 1 do

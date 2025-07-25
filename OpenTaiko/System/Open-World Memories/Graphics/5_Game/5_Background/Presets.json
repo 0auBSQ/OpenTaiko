@@ -1,60 +1,92 @@
 {
     "Regular": {
         "": {
-            "UP": [ "0","1" ],
-            "DOWN": [ "0","1","2" ],
-            "DANCER": [ "0" ],
+            "UP": [ "0","1","2","3" ],
+            "DOWN": ["0_TaikoClub","1_Field","2_Forest","3_Space","4_Spooky","5_Neighborhood"],
+            "DANCER": [ "0", "1" ],
             "FOOTER": [ "0" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
         },
         "Dango": {
             "UP": [ "0" ],
-            "DOWN": [ "0" ],
-            "DANCER": [ "0" ],
+            "DOWN": ["0_TaikoClub"],
+            "DANCER": [ "0","1" ],
             "FOOTER": [ "0" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
         },
         "Clouds": {
             "UP": [ "1" ],
-            "DOWN": [ "1" ],
-            "DANCER": [ "0" ],
+            "DOWN": ["5_Neighborhood"],
+            "DANCER": [ "0", "1" ],
             "FOOTER": [ "0" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
         },
-		"Forest": {
-            "UP": [ "1" ],
-            "DOWN": [ "2" ],
-            "DANCER": [ "0" ],
+        "Field": {
+            "UP": [ "3" ],
+            "DOWN": [ "1_Field" ],
+            "DANCER": [ "0", "1" ],
             "FOOTER": [ "0" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
+        },
+        "Forest": {
+            "UP": [ "2" ],
+            "DOWN": [ "2_Forest" ],
+            "DANCER": [ "0", "1" ],
+            "FOOTER": [ "0" ],
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
+        },
+        "Space": {
+            "UP": [ "3" ],
+            "DOWN": [ "3_Space" ],
+            "DANCER": [ "0", "1" ],
+            "FOOTER": [ "0" ],
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
+        },
+        "Spooky": {
+            "UP": [ "3" ],
+            "DOWN": [ "4_Spooky" ],
+            "DANCER": [ "0", "1" ],
+            "FOOTER": [ "0" ],
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
+        },
+        "WorldBarrier": {
+            "UP": [ "3" ],
+            "DOWN": [ "7_WorldBarrier" ],
+            "DANCER": [ "0", "1" ],
+            "FOOTER": [ "0" ],
+            "MOB": [ "0","1","2" ],
+            "RUNNER": [ "0" ]
         },
         "Dashy": {
             "UP": [ "8" ],
-            "DOWN": [ "8" ],
+            "DOWN": [ "8_Dashy" ],
             "DANCER": [ "Dashy" ],
             "FOOTER": [ "8" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
         },
         "Outfox": {
             "UP": [ "Outfox" ],
             "DOWN": [ "Outfox" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "Outfox" ],
-            "MOB": [ ],
-            "RUNNER": [ ]
+            "MOB": [ "1","2" ],
+            "RUNNER": [ "0" ]
         },
-		"Headquarters1": {
+        "Headquarters": {
             "UP": [ "0","1" ],
             "DOWN": [ "0","1","2" ],
             "DANCER": [ "0" ],
             "FOOTER": [ "0" ],
             "MOB": [ "0" ],
-            "RUNNER": [ ]
+            "RUNNER": [ "0" ]
         }
     },
     "Dan": {
