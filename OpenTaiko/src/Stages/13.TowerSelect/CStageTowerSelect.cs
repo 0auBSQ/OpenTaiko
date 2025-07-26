@@ -27,7 +27,7 @@ class CStageTowerSelect : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.継続;
+		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.Continuation;
 
 		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Tower);
 		tUpdateBarInfos();
@@ -80,7 +80,7 @@ class CStageTowerSelect : CStage {
 
 		#region [Input]
 
-		if (this.eフェードアウト完了時の戻り値 == CStageSongSelect.EReturnValue.継続) {
+		if (this.eフェードアウト完了時の戻り値 == CStageSongSelect.EReturnValue.Continuation) {
 			int returnTitle() {
 				OpenTaiko.Skin.soundDecideSFX.tStop(); // cancel if played
 				OpenTaiko.Skin.soundCancelSFX.tPlay();

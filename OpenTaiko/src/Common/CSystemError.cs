@@ -17,7 +17,8 @@ internal class CSystemError : CStage {
 		ENO_SKINNOTFOUND = 2,
 		ENO_PADINITFAILED = 3,
 		ENO_INPUTINITFAILED = 4,
-		ENO_SONGLISTINITFAILED = 5
+		ENO_SONGLISTINITFAILED = 5,
+		ENO_INVALIDSTAGENAME = 6
 	};
 
 	public void LoadError(Errno errno, Exception? exception = null, string? message = null) {
@@ -73,6 +74,12 @@ internal class CSystemError : CStage {
 					if (!string.IsNullOrEmpty(message))
 						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please try removing the songlist.db file within your OpenTaiko folder.";
+					break;
+				}
+			case Errno.ENO_INVALIDSTAGENAME: {
+					ErrorMessage += "The requested stage name was not found.\n";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.";
+					ErrorMessage += "If you are currently making a Lua module, please ensure that the requested Lua Stage name exists.";
 					break;
 				}
 
