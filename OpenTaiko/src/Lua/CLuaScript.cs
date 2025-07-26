@@ -267,7 +267,7 @@ class CLuaScript : IDisposable {
 		listScripts.Remove(this);
 	}
 
-	private void Crash(Exception exception) {
+	protected void Crash(Exception exception) {
 		bCrashed = true;
 
 		LogNotification.PopError($"Lua Script Error: {exception.ToString()}");

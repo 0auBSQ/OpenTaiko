@@ -247,7 +247,7 @@ internal class CStageSongSelect : CStage {
 		Trace.Indent();
 		try {
 			nChoosenSongDifficulty = new int[5];
-			this.eフェードアウト完了時の戻り値 = EReturnValue.継続;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
 			// BGM played
 			this.bBGM再生済み = false;
@@ -1184,11 +1184,11 @@ internal class CStageSongSelect : CStage {
 		return 0;
 	}
 	public enum EReturnValue : int {
-		継続,
+		Continuation,
 		BackToTitle,
 		PlayCutSceneIntro,
 		SongSelected,
-		オプション呼び出し,
+		CallOptions,
 		ConfigMenuOpened,
 		SkinChange
 	}
