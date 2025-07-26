@@ -1545,7 +1545,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.BoxFontName = CFontRenderer.DefaultFontName;
 		this.ApplyLoudnessMetadata = true;
 		this.bEnableCountdownTimer = true;
-		this.sLang = "ja";
+		this.sLang = "en";
 		this.nLayoutType = 1;
 
 		// 2018-08-28 twopointzero:
