@@ -3,6 +3,52 @@
 # OpenTaiko Installation Script - Linux version
 # Does not require OpenTaiko Hub
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Checking dependencies
+echo "Checking required dependencies..."
+
+missing_deps=()
+
+if ! command_exists curl; then
+    echo "ERROR: curl is not installed"
+    missing_deps+=("curl")
+fi
+
+if ! command_exists jq; then
+    echo "ERROR: jq is not installed (required for JSON parsing)"
+    missing_deps+=("jq")
+fi
+
+if ! command_exists unzip; then
+    echo "ERROR: unzip is not installed"
+    missing_deps+=("unzip")
+fi
+
+if ! command_exists git; then
+    echo "ERROR: git is not installed (required for soundtrack and skins)"
+    missing_deps+=("git")
+fi
+
+if [ ${#missing_deps[@]} -gt 0 ]; then
+    echo ""
+    echo "Missing required dependencies: ${missing_deps[*]}"
+    echo ""
+    echo "Install with:"
+    echo "  Ubuntu/Debian: sudo apt install ${missing_deps[*]}"
+    echo "  Fedora/RHEL:   sudo dnf install ${missing_deps[*]}"
+    echo "  Arch Linux:    sudo pacman -S ${missing_deps[*]}"
+    echo "  Alpine:        sudo apk add ${missing_deps[*]}"
+    echo ""
+    exit 1
+fi
+
+echo "All dependencies found."
+echo ""
+
 # Check system compatibility BEFORE doing anything
 echo "Checking system compatibility..."
 
