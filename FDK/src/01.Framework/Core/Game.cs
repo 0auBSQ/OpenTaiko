@@ -418,8 +418,7 @@ public abstract class Game : IDisposable {
 		} else {
 			Context = new AngleContext(GraphicsDeviceType_, Window_);
 
-			Context.SwapInterval(VSync ? 1 : 0);
-			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+			Context.MakeCurrent();
 		}
 
 		Gl = GL.GetApi(Context);
@@ -429,6 +428,11 @@ public abstract class Game : IDisposable {
 		CTexture.Init();
 
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+		if (!OperatingSystem.IsMacOS())
+			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+		
+		Context.SwapInterval(VSync ? 1 : 0);
 
 		Initialize();
 		LoadContent();
