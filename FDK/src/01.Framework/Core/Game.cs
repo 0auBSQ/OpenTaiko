@@ -282,12 +282,7 @@ public abstract class Game : IDisposable {
 		options.WindowState = FullScreen ? WindowState.Fullscreen : WindowState.Normal;
 		options.VSync = VSync;
 
-		if (OperatingSystem.IsMacOS()) {
-			// Revert to native OpenGL for macos
-			options.API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.Default, new APIVersion(3, 3));
-		} else {
-			options.API = GraphicsAPI.None;
-		}
+		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
 
 		options.WindowBorder = WindowBorder.Resizable;
 		options.Title = Text;
@@ -415,50 +410,25 @@ public abstract class Game : IDisposable {
 		Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
 
 		if (OperatingSystem.IsMacOS()) {
-			// Use native OpenGL
 			if (Window_.GLContext == null) {
 				throw new Exception("No native OpenGL context available");
 			}
 
-			Gl = GL.GetApi(Window_.GLContext);
-			
 			Context = Window_.GLContext;
-			
-			Gl.Enable(GLEnum.Blend);
-			BlendHelper.SetBlend(BlendType.Normal);
-			
-			CTexture.Init();
-			
-			var error = Gl.GetError();
-			if (error != GLEnum.NoError) {
-				throw new Exception($"OpenGL error after texture init: {error}");
-			}
-
-			Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			
-			ViewPortSize.X = Window_.Size.X;
-			ViewPortSize.Y = Window_.Size.Y;
-			ViewPortOffset.X = 0;
-			ViewPortOffset.Y = 0;
-			
-			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
-			
-			Gl.Viewport(0, 0, (uint)(Window_.Size.X * 2), (uint)(Window_.Size.Y * 2));
 		} else {
 			Context = new AngleContext(GraphicsDeviceType_, Window_);
-			Context.MakeCurrent();
 
-			Gl = GL.GetApi(Context);
-			//Gl = Window_.CreateOpenGLES();
-			Gl.Enable(GLEnum.Blend);
-			BlendHelper.SetBlend(BlendType.Normal);
-			CTexture.Init();
-
-			Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
 			Context.SwapInterval(VSync ? 1 : 0);
+			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
 		}
+
+		Gl = GL.GetApi(Context);
+
+		Gl.Enable(GLEnum.Blend);
+		BlendHelper.SetBlend(BlendType.Normal);
+		CTexture.Init();
+
+		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		Initialize();
 		LoadContent();
@@ -499,9 +469,7 @@ public abstract class Game : IDisposable {
 		ImGuiController?.Render();
 #endif
 
-		if (!OperatingSystem.IsMacOS()) {
-			Context.SwapBuffers();
-		}
+		if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
 	}
 
 	public void Window_Resize(Vector2D<int> size) {
