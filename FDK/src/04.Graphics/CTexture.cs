@@ -430,7 +430,20 @@ public class CTexture : IDisposable {
 		//-----
 
 		//テクスチャのデータをVramに送る
-		Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)pixelFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		if (OperatingSystem.IsMacOS()) {
+			// Desktop OpenGL requires sized internal formats
+			int internalFormat = pixelFormat switch {
+				PixelFormat.Bgra => (int)InternalFormat.Rgba8,
+				PixelFormat.Rgba => (int)InternalFormat.Rgba8,
+				PixelFormat.Rgb => (int)InternalFormat.Rgb8,
+				_ => (int)InternalFormat.Rgba8
+			};
+			
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		} else {
+			// OpenGL ES allows unsized internal formats
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)pixelFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		}
 		//-----
 
 		//拡大縮小の時の補完を指定------

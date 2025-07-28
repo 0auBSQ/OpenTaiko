@@ -281,8 +281,9 @@ public abstract class Game : IDisposable {
 		options.FramesPerSecond = VSync ? 0 : Framerate;
 		options.WindowState = FullScreen ? WindowState.Fullscreen : WindowState.Normal;
 		options.VSync = VSync;
-		//options.API = new GraphicsAPI( ContextAPI.OpenGLES, ContextProfile.Core, ContextFlags.Default, new APIVersion(2, 0));
-		options.API = GraphicsAPI.None;
+
+		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
+
 		options.WindowBorder = WindowBorder.Resizable;
 		options.Title = Text;
 
@@ -408,18 +409,29 @@ public abstract class Game : IDisposable {
 	public void Window_Load() {
 		Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
 
-		Context = new AngleContext(GraphicsDeviceType_, Window_);
-		Context.MakeCurrent();
+		if (OperatingSystem.IsMacOS()) {
+			if (Window_.GLContext == null) {
+				throw new Exception("No native OpenGL context available");
+			}
+
+			Context = Window_.GLContext;
+		} else {
+			Context = new AngleContext(GraphicsDeviceType_, Window_);
+
+			Context.MakeCurrent();
+		}
 
 		Gl = GL.GetApi(Context);
-		//Gl = Window_.CreateOpenGLES();
+
 		Gl.Enable(GLEnum.Blend);
 		BlendHelper.SetBlend(BlendType.Normal);
 		CTexture.Init();
 
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+		if (!OperatingSystem.IsMacOS())
+			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
+		
 		Context.SwapInterval(VSync ? 1 : 0);
 
 		Initialize();
@@ -461,7 +473,7 @@ public abstract class Game : IDisposable {
 		ImGuiController?.Render();
 #endif
 
-		Context.SwapBuffers();
+		if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
 	}
 
 	public void Window_Resize(Vector2D<int> size) {
