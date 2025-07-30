@@ -3,52 +3,6 @@
 # OpenTaiko Installation Script - Linux version
 # Does not require OpenTaiko Hub
 
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-# Checking dependencies
-echo "Checking required dependencies..."
-
-missing_deps=()
-
-if ! command_exists curl; then
-    echo "ERROR: curl is not installed"
-    missing_deps+=("curl")
-fi
-
-if ! command_exists jq; then
-    echo "ERROR: jq is not installed (required for JSON parsing)"
-    missing_deps+=("jq")
-fi
-
-if ! command_exists unzip; then
-    echo "ERROR: unzip is not installed"
-    missing_deps+=("unzip")
-fi
-
-if ! command_exists git; then
-    echo "ERROR: git is not installed (required for soundtrack and skins)"
-    missing_deps+=("git")
-fi
-
-if [ ${#missing_deps[@]} -gt 0 ]; then
-    echo ""
-    echo "Missing required dependencies: ${missing_deps[*]}"
-    echo ""
-    echo "Install with:"
-    echo "  Ubuntu/Debian: sudo apt install ${missing_deps[*]}"
-    echo "  Fedora/RHEL:   sudo dnf install ${missing_deps[*]}"
-    echo "  Arch Linux:    sudo pacman -S ${missing_deps[*]}"
-    echo "  Alpine:        sudo apk add ${missing_deps[*]}"
-    echo ""
-    exit 1
-fi
-
-echo "All dependencies found."
-echo ""
-
 # Check system compatibility BEFORE doing anything
 echo "Checking system compatibility..."
 
@@ -105,6 +59,8 @@ elif [ "$gpu_driver" = "amdgpu" ] && [ "$desktop_env" = "sway" ] && [ "$session_
     echo "GOOD: AMD GPU + Sway + Wayland - Known working configuration!"
 elif [ "$gpu_driver" = "intel" ] && [ "$desktop_env" = "sway" ] && [ "$session_type" = "wayland" ]; then
     echo "GOOD: Intel GPU + Sway + Wayland - Should work well!"
+elif [ "$gpu_driver" = "intel" ] && [[ "$desktop_env" =~ GNOME|gnome ]]; then
+    echo "GOOD: Intel GPU + GNOME - Should work well with OpenGL setting!"
 
 
 # Known problematic configurations
@@ -149,6 +105,7 @@ desktop_folder="$HOME/.local/share/applications"
 archive_filename="OpenTaiko.Linux.x64.zip"
 installation_folder="$current_dir/OpenTaiko"
 git_repo="0auBSQ/OpenTaiko"
+default_config_file=$installation_folder/publish/Config.ini
 
 # Create cache directory
 mkdir -p "$cache_dir"
@@ -346,6 +303,228 @@ Terminal=true
 Type=Application
 Categories=Game;
 EOF
+
+# Make sure we're in the right directory and write the config file
+cd "$installation_folder/publish" || exit 1
+
+# Write the default Config.ini file
+echo "Writing default Config.ini..."
+cat << EOF > "$default_config_file"
+[System]
+Version=0.6.0.81
+TJAPath=Songs/
+SkinPath=Open-World Memories/
+PreAssetsLoading=1
+FastRender=1
+ASyncTextureLoad=1
+SimpleMode=0
+Lang=en
+LayoutType=1
+SaveFileName=1P,2P,3P,4P,5P
+IgnoreSongUnlockables=0
+# 0 = OpenGL, 1=DirectX11, 2=Vulkan, 3=Metal
+GraphicsDeviceType=0
+FullScreen=0
+WindowWidth=1280
+WindowHeight=720
+WindowX=100
+WindowY=100
+DoubleClickFullScreen=0
+EnableSystemMenu=1
+BackSleep=1
+FontName=
+BoxFontName=
+VSyncWait=1
+SleepTimePerFrame=-1
+SoundDeviceType=0
+BassBufferSizeMs=1
+WASAPIBufferSizeMs=50
+ASIODevice=0
+SoundTimerType=1
+BGAlpha=100
+AVI=0
+BGA=1
+ClipDispType=1
+PreviewSoundWait=1000
+PreviewImageWait=100
+BGMSound=1
+DanTowerHide=0
+MinComboDrums=10
+RandomFromSubBox=1
+ShowDebugStatus=0
+ApplyLoudnessMetadata=1
+TargetLoudness=-7.4
+ApplySongVol=0
+SoundEffectLevel=80
+VoiceLevel=90
+SongPreviewLevel=90
+SongPlaybackLevel=85
+KeyboardSoundLevelIncrement=5
+MusicPreTimeMs=1000
+BufferedInput=1
+ControllerDeadzone=50
+AutoResultCapture=0
+SendDiscordPlayingInformation=1
+TimeStretch=0
+DirectShowMode=0
+GlobalOffset=0
+TJAP3FolderMode=0
+EndingAnime=0
+
+[AutoPlay]
+Taiko=0
+Taiko2P=0
+Taiko3P=0
+Taiko4P=0
+Taiko5P=0
+TaikoAutoRoll=1
+RollsPerSec=15
+DefaultAILevel=4
+
+[Log]
+OutputLog=1
+TraceSongSearch=0
+TraceCreatedDisposed=0
+TraceDTXDetails=0
+
+[PlayOption]
+ShowChara=1
+ShowDancer=1
+ShowRunner=1
+ShowMob=1
+ShowFooter=1
+ShowPuchiChara=1
+EnableCountDownTimer=1
+DrumsReverse=0
+Risky=0
+DrumsTight=0
+DrumsScrollSpeed1P=9
+DrumsScrollSpeed2P=9
+DrumsScrollSpeed3P=9
+DrumsScrollSpeed4P=9
+DrumsScrollSpeed5P=9
+TimingZones1P=2
+TimingZones2P=2
+TimingZones3P=2
+TimingZones4P=2
+TimingZones5P=2
+Gametype1P=0
+Gametype2P=0
+Gametype3P=0
+Gametype4P=0
+Gametype5P=0
+FunMods1P=0
+FunMods2P=0
+FunMods3P=0
+FunMods4P=0
+FunMods5P=0
+PlaySpeed=20
+PlaySpeedNotEqualOneNoSound=0
+DefaultCourse=1
+ScoreMode=2
+ShinuchiMode=1
+BigNotesWaitTime=50
+BigNotesJudge=0
+ForceNormalGauge=0
+NoInfo=0
+BranchAnime=1
+DefaultSongSort=2
+RecentlyPlayedMax=5
+TaikoRandom1P=0
+TaikoRandom2P=0
+TaikoRandom3P=0
+TaikoRandom4P=0
+TaikoRandom5P=0
+TaikoStealth1P=0
+TaikoStealth2P=0
+TaikoStealth3P=0
+TaikoStealth4P=0
+TaikoStealth5P=0
+GameMode=0
+TokkunSkipMeasures=0
+TokkunMashInterval=750
+Just1P=0
+Just2P=0
+Just3P=0
+Just4P=0
+HitSounds1P=0
+HitSounds2P=0
+HitSounds3P=0
+HitSounds4P=0
+JudgeCountDisplay=0
+ShowExExtraAnime=1
+PlayerCount=1
+
+[GUID]
+
+[DrumsKeyAssign]
+LeftRed=K015
+RightRed=K019
+LeftBlue=K013
+RightBlue=K020
+LeftRed2P=K011
+RightRed2P=K023
+LeftBlue2P=K012
+RightBlue2P=K047
+LeftRed3P=
+RightRed3P=
+LeftBlue3P=
+RightBlue3P=
+LeftRed4P=
+RightRed4P=
+LeftBlue4P=
+RightBlue4P=
+LeftRed5P=
+RightRed5P=
+LeftBlue5P=
+RightBlue5P=
+Clap=K017
+Clap2P=
+Clap3P=
+Clap4P=
+Clap5P=
+Decide=K015,K019
+Cancel=
+LeftChange=K013
+RightChange=K020
+
+[SystemKeyAssign]
+Capture=K065
+SongVolumeIncrease=K074
+SongVolumeDecrease=K0115
+DisplayHits=K057
+DisplayDebug=K049
+QuickConfig=K055
+NewHeya=K062
+SortSongs=K0126
+ToggleAutoP1=K056
+ToggleAutoP2=K057
+ToggleTrainingMode=K060
+CycleVideoDisplayMode=K058
+
+[TrainingKeyAssign]
+TrainingIncreaseScrollSpeed=K0132
+TrainingDecreaseScrollSpeed=K050
+TrainingIncreaseSongSpeed=K047
+TrainingDecreaseSongSpeed=K012
+TrainingToggleAuto=K059
+TrainingBranchNormal=K01
+TrainingBranchExpert=K02
+TrainingBranchMaster=K03
+TrainingPause=K0126,K019
+TrainingBookmark=K010
+TrainingMoveForwardMeasure=K0118,K020
+TrainingMoveBackMeasure=K076,K013
+TrainingSkipForwardMeasure=K0109
+TrainingSkipBackMeasure=K0108
+TrainingJumpToFirstMeasure=K070
+TrainingJumpToLastMeasure=K051
+
+[DEBUG]
+ImGui=1
+EOF
+
+echo "Config.ini created successfully."
 
 echo "OpenTaiko installation complete. You can now launch it from your applications menu."
 echo "You can also update the soundtrack and skins from your applications menu."
