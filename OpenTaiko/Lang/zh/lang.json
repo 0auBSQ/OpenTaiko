@@ -169,7 +169,7 @@
 		"SETTINGS_GAME_NOTELOCK": "锁定音符模式",
 		"SETTINGS_GAME_NOTELOCK_DESC": "切换是否会将空白处的敲击判断为“不可”。",
 		"SETTINGS_GAME_AILEVEL": "AI 等级",
-		"SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：关闭\n— 1+：2P 会变为 AI\n此选项会在自动模式开启时禁用。",
+		"SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：关闭\n— 1+：玩家 2 会变为 AI\n此选项会在玩家 2 的自动模式开启时禁用。",
 		"SETTINGS_GAME_NORMALGAUGE": "总是使用普通魂条",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "强制总是使用普通魂条，无视角色的修改器。",
 
