@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.86] - 2025-08-07 (Beta)
+
+- [Fix] Fix Rainbow gauges flickering
+
 ## [0.6.0.85] - 2025-08-02 (Beta)
 
 - [Fix] Fix a crash that occurs when clearing a Dan that has a title less than 2 chars in length
