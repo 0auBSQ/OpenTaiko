@@ -4145,11 +4145,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 				switch (chara.effect.tGetGaugeType()) {
 					default:
 					case "Normal":
-						bIsAlreadyCleared[i] = false;
+						bIsAlreadyMaxed[i] = bIsAlreadyCleared[i] = false;
 						break;
 					case "Hard":
 					case "Extreme":
 						bIsAlreadyCleared[i] = true;
+						bIsAlreadyMaxed[i] = false;
 						break;
 				}
 
