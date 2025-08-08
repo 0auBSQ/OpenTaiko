@@ -569,6 +569,7 @@ internal class CTja : CActivity {
 						cwav.rSound[i].Stop();
 					}
 				}
+				cwav.n一時停止時刻[i] = long.MinValue; // prevent unpause
 			}
 		}
 	}
@@ -876,7 +877,9 @@ internal class CTja : CActivity {
 	public void t全チップの再生再開() {
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused) {
+				// paused: pause >= play time (do resume)
+				// stopped: pause < play time (do not resume)
+				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused && cwav.n一時停止時刻[i] >= cwav.n再生開始時刻[i]) {
 					cwav.rSound[i].Resume(cwav.n一時停止時刻[i] - cwav.n再生開始時刻[i]);
 					cwav.n再生開始時刻[i] += SoundManager.PlayTimer.SystemTimeMs - cwav.n一時停止時刻[i];
 				}
