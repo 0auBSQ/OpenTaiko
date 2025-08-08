@@ -797,10 +797,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void UpdateCharaCounter(int nPlayer) {
-		for (int i = 0; i < 5; i++) {
-			ctChipAnime[i] = new CCounter(0, 3, CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i] * 1 / 4), SoundManager.PlayTimer);
-		}
-
+		ctChipAnime[nPlayer] = new CCounter(0, 3, CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * 1 / 4), SoundManager.PlayTimer);
 		OpenTaiko.stageGameScreen.PuchiChara.ChangeBPM(CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]));
 	}
 
@@ -1393,8 +1390,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
 
 		if (eJudgeResult != ENoteJudge.Poor && eJudgeResult != ENoteJudge.Miss) {
-			double dbUnit = (((60.0 / (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]))));
-
 			// ランナー(たたけたやつ)
 			this.actRunner.Start(nPlayer, false, pChip);
 
@@ -1472,10 +1467,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
-
-			double dbUnit = (((60.0 / (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]))));
-			dbUnit = (((60.0 / pChip.dbBPM)));
-
 			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
 				{
 					// 魂ゲージMAXではない
@@ -1610,9 +1601,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			// Combo voice here
 			this.actComboVoice.tPlay(this.actCombo.nCurrentCombo[nPlayer], nPlayer);
-
-			double dbUnit = (((60.0 / (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]))));
-			dbUnit = (((60.0 / pChip.dbBPM)));
 
 			//CDTXMania.act文字コンソール.tPrint(620, 80, C文字コンソール.Eフォント種別.白, "BPM: " + dbUnit.ToString());
 

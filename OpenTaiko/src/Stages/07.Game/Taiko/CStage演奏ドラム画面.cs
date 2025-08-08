@@ -284,7 +284,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		this.actLaneTaiko.ResetPlayStates();
 
-		PuchiChara.ChangeBPM(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+		for (int i = 0; i < 5; i++)
+			PuchiChara.ChangeBPM(CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]));
 
 		//dbUnit = Math.Ceiling( dbUnit * 1000.0 );
 		//dbUnit = dbUnit / 1000.0;
@@ -549,7 +550,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
 								if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-									double dbUnit = (((60.0 / (OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]))));
 									this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
 								}
 							}

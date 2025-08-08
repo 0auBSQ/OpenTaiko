@@ -125,7 +125,7 @@ internal class CActImplCharacter : CActivity {
 
 			void updateNormal() {
 				if (!OpenTaiko.stageGameScreen.bPAUSE) {
-					nNowCharaCounter[i] += ((Math.Abs((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime) / nCharaBeat[i];
+					nNowCharaCounter[i] += ((Math.Abs((float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i])) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime) / nCharaBeat[i];
 				}
 			}
 			void updateBalloon() {
