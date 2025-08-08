@@ -1099,7 +1099,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return false;
 		}
 
+		this.bCurrentlyDrumRoll[player] = true;
+		this.actChara.b風船連打中[player] = true;
 		if (IsKusudama) {
+			this.actChara.IsInKusudama = true;
 			rollCount = pChip.nRollCount = ++nCurrentKusudamaRollCount;
 			balloon = nCurrentKusudamaCount;
 			if (nCurrentKusudamaCount > 0) {
@@ -1114,8 +1117,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 		} else {
-			this.bCurrentlyDrumRoll[player] = true;
-			this.actChara.b風船連打中[player] = true;
 			actChara.ChangeAnime(player, CActImplCharacter.Anime.Balloon_Breaking, true);
 
 
@@ -3649,6 +3650,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.nowProcessingKusudama = chip;
 				actBalloon.KusuIn();
 				actChara.KusuIn();
+				this.actChara.IsInKusudama = true;
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					this.bCurrentlyDrumRoll[i] = true;
 					this.actChara.b風船連打中[i] = true;
@@ -3674,11 +3676,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
 							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
 								this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
-
-								if (actChara.CharaAction_Balloon_Delay[p] != null) actChara.CharaAction_Balloon_Delay[p] = new CCounter(0,
-									OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[p]] - 1,
-									1,
-									OpenTaiko.Timer);
 							}
 						}
 						nCurrentKusudamaRollCount = 0;
@@ -3689,11 +3686,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!this.bPAUSE && !this.isRewinding) {
 						if (chip.nRollCount > 0) {
 							this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Miss, true);
-
-							if (actChara.CharaAction_Balloon_Delay[iPlayer] != null) actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0,
-								OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1,
-								1,
-								OpenTaiko.Timer);
 						}
 					}
 				}
@@ -3741,8 +3733,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			actBalloon.KusuBroke();
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				actChara.ChangeAnime(i, CActImplCharacter.Anime.Kusudama_Broke, true);
-				if (actChara.CharaAction_Balloon_Delay[i] != null)
-					actChara.CharaAction_Balloon_Delay[i] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[i]] - 1, 1, OpenTaiko.Timer);
 			}
 		} else {
 			//ﾊﾟｧｰﾝ
@@ -3756,11 +3746,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			//this.b連打中 = false;
 			//this.actChara.b風船連打中 = false;
 			chip.bVisible = false;
-			{
-				actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Broke, true);
-				if (actChara.CharaAction_Balloon_Delay[iPlayer] != null)
-					actChara.CharaAction_Balloon_Delay[iPlayer] = new CCounter(0, OpenTaiko.Skin.Characters_Balloon_Delay[actChara.iCurrentCharacter[iPlayer]] - 1, 1, OpenTaiko.Timer);
-			}
+			actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Broke, true);
 			if (NotesManager.IsFuzeRoll(chip)) {
 				this.CChartScore[iPlayer].nMineAvoid++;
 				this.CSectionScore[iPlayer].nMineAvoid++;
@@ -3807,9 +3793,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
 		if (this.chip現在処理中の連打チップ[iPlayer].Count == 0) {
 			this.bCurrentlyDrumRoll[iPlayer] = false;
+			this.actChara.b風船連打中[iPlayer] = false;
+			this.actChara.IsInKusudama = false;
 			this.eRollState = ERollState.None;
 		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsGenericBalloon(x))) {
 			this.actChara.b風船連打中[iPlayer] = false;
+			this.actChara.IsInKusudama = false;
+		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsKusudama(x))) {
+			this.actChara.IsInKusudama = false;
 		}
 		if (resetStates || (!this.bPAUSE && !this.isRewinding)) {
 			chip.bProcessed = !resetStates;
