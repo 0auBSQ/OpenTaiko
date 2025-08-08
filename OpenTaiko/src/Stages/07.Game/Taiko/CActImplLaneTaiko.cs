@@ -674,6 +674,9 @@ internal class CActImplLaneTaiko : CActivity {
 						y += OpenTaiko.Skin.Game_Effect_Fire_Y[i];
 					}
 
+					x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(i);
+					y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(i);
+
 					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.X = f倍率;
 					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.Y = f倍率;
 
