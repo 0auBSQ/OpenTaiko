@@ -1602,7 +1602,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		#region[ Combo voice ]
 
-		if (!NotesManager.IsGenericRoll(pChip)) {
+		if (NotesManager.IsMissableNote(pChip)) {
 			if ((this.actCombo.nCurrentCombo[nPlayer] % 100 == 0 || this.actCombo.nCurrentCombo[nPlayer] == 50) && this.actCombo.nCurrentCombo[nPlayer] > 0) {
 				this.actComboBalloon.Start(this.actCombo.nCurrentCombo[nPlayer], nPlayer);
 			}
