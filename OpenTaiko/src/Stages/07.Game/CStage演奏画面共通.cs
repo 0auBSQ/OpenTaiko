@@ -525,29 +525,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		double screen_ratio = OpenTaiko.Skin.Resolution[0] / 1280.0;
 		return (int)(JPOSCROLLX[player] * screen_ratio);
 	}
-	public int[] NoteOriginX {
-		get {
-			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-				return new int[] {
-					OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * 0) + GetJPOSCROLLX(0),
-					OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * 1) + GetJPOSCROLLX(1),
-					OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * 2) + GetJPOSCROLLX(2),
-					OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * 3) + GetJPOSCROLLX(3),
-					OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * 4) + GetJPOSCROLLX(4)
-				};
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-				return new int[] {
-					OpenTaiko.Skin.nScrollField_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * 0) + GetJPOSCROLLX(0),
-					OpenTaiko.Skin.nScrollField_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * 1) + GetJPOSCROLLX(1),
-					OpenTaiko.Skin.nScrollField_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * 2) + GetJPOSCROLLX(2),
-					OpenTaiko.Skin.nScrollField_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * 3) + GetJPOSCROLLX(3)
-				};
-			} else {
-				return new int[] {
-					OpenTaiko.Skin.nScrollFieldX[0] + GetJPOSCROLLX(0),
-					OpenTaiko.Skin.nScrollFieldX[1] + GetJPOSCROLLX(1)
-				};
-			}
+
+	public int GetNoteOriginX(int iPlayer) {
+		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+			return OpenTaiko.Skin.nScrollField_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * iPlayer) + GetJPOSCROLLX(iPlayer);
+		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+			return OpenTaiko.Skin.nScrollField_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * iPlayer) + GetJPOSCROLLX(iPlayer);
+		} else {
+			return OpenTaiko.Skin.nScrollFieldX[iPlayer] + GetJPOSCROLLX(iPlayer);
 		}
 	}
 
@@ -556,29 +541,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		double screen_ratio = OpenTaiko.Skin.Resolution[1] / 720.0;
 		return (int)(JPOSCROLLY[player] * screen_ratio);
 	}
-	public int[] NoteOriginY {
-		get {
-			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-				return new int[] {
-					OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * 0) + GetJPOSCROLLY(0),
-					OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * 1) + GetJPOSCROLLY(1),
-					OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * 2) + GetJPOSCROLLY(2),
-					OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * 3) + GetJPOSCROLLY(3),
-					OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * 4) + GetJPOSCROLLY(4)
-				};
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-				return new int[] {
-					OpenTaiko.Skin.nScrollField_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * 0) + GetJPOSCROLLY(0),
-					OpenTaiko.Skin.nScrollField_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * 1) + GetJPOSCROLLY(1),
-					OpenTaiko.Skin.nScrollField_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * 2) + GetJPOSCROLLY(2),
-					OpenTaiko.Skin.nScrollField_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * 3) + GetJPOSCROLLY(3)
-				};
-			} else {
-				return new int[] {
-					OpenTaiko.Skin.nScrollFieldY[0] + GetJPOSCROLLY(0),
-					OpenTaiko.Skin.nScrollFieldY[1] + GetJPOSCROLLY(1)
-				};
-			}
+
+	public int GetNoteOriginY(int iPlayer) {
+		if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
+			return OpenTaiko.Skin.nScrollField_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * iPlayer) + GetJPOSCROLLY(iPlayer);
+		} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
+			return OpenTaiko.Skin.nScrollField_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * iPlayer) + GetJPOSCROLLY(iPlayer);
+		} else {
+			return OpenTaiko.Skin.nScrollFieldY[iPlayer] + GetJPOSCROLLY(iPlayer);
 		}
 	}
 

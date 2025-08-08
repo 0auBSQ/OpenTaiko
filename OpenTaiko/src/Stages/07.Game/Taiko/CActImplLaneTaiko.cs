@@ -630,8 +630,8 @@ internal class CActImplLaneTaiko : CActivity {
 			OpenTaiko.Tx.Judge_Frame.b加算合成 = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				OpenTaiko.Tx.Judge_Frame.t2D描画(
-					OpenTaiko.stageGameScreen.NoteOriginX[i],
-					OpenTaiko.stageGameScreen.NoteOriginY[i], new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+					OpenTaiko.stageGameScreen.GetNoteOriginX(i),
+					OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
 		}
 

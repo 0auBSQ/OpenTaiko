@@ -1399,7 +1399,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 
 				int x = pChip.nHorizontalChipDistance;
-				int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance; // either untouched (0/5) or unused (other) for #DIRECTION
+				int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance; // either untouched (0/5) or unused (other) for #DIRECTION
 
 				int xTemp = 0;
 				int yTemp = 0;
@@ -1411,41 +1411,41 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 				switch (pChip.nScrollDirection) {
 					case 0:
-						x += (NoteOriginX[nPlayer]);
+						x += (GetNoteOriginX(nPlayer));
 						break;
 					case 1:
-						x = (NoteOriginX[nPlayer]);
-						y = NoteOriginY[nPlayer] - xTemp;
+						x = (GetNoteOriginX(nPlayer));
+						y = GetNoteOriginY(nPlayer) - xTemp;
 						break;
 					case 2:
-						x = (NoteOriginX[nPlayer] + 3);
-						y = NoteOriginY[nPlayer] + xTemp;
+						x = (GetNoteOriginX(nPlayer) + 3);
+						y = GetNoteOriginY(nPlayer) + xTemp;
 						break;
 					case 3:
-						x += (NoteOriginX[nPlayer]);
-						y = NoteOriginY[nPlayer] - xTemp;
+						x += (GetNoteOriginX(nPlayer));
+						y = GetNoteOriginY(nPlayer) - xTemp;
 						break;
 					case 4:
-						x += (NoteOriginX[nPlayer]);
-						y = NoteOriginY[nPlayer] + xTemp;
+						x += (GetNoteOriginX(nPlayer));
+						y = GetNoteOriginY(nPlayer) + xTemp;
 						break;
 					case 5:
-						x = (NoteOriginX[nPlayer] + 10) - xTemp;
+						x = (GetNoteOriginX(nPlayer) + 10) - xTemp;
 						break;
 					case 6:
-						x = (NoteOriginX[nPlayer]) - xTemp;
-						y = NoteOriginY[nPlayer] - xTemp;
+						x = (GetNoteOriginX(nPlayer)) - xTemp;
+						y = GetNoteOriginY(nPlayer) - xTemp;
 						break;
 					case 7:
-						x = (NoteOriginX[nPlayer]) - xTemp;
-						y = NoteOriginY[nPlayer] + xTemp;
+						x = (GetNoteOriginX(nPlayer)) - xTemp;
+						y = GetNoteOriginY(nPlayer) + xTemp;
 						break;
 				}
 				#endregion
 
 				#region[ 両手待ち時 ]
 				if (pChip.eNoteState == ENoteState.Wait) {
-					x = (NoteOriginX[nPlayer]);
+					x = (GetNoteOriginX(nPlayer));
 				}
 				#endregion
 
@@ -1655,15 +1655,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					n先頭発声位置 = pChip.start.n発声時刻ms;
 			}
 
-			int x = NoteOriginX[nPlayer] + pChip.nHorizontalChipDistance;
-			int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance;
-			int x末端 = NoteOriginX[nPlayer] + pChip.end.nHorizontalChipDistance;
-			int y末端 = NoteOriginY[nPlayer] + pChip.end.nVerticalChipDistance;
+			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
+			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
+			int x末端 = GetNoteOriginX(nPlayer) + pChip.end.nHorizontalChipDistance;
+			int y末端 = GetNoteOriginY(nPlayer) + pChip.end.nVerticalChipDistance;
 
 			if (NotesManager.IsGenericBalloon(pChip)) {
 				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.end.n発声時刻ms) {
-					x = NoteOriginX[nPlayer];
-					y = NoteOriginY[nPlayer];
+					x = GetNoteOriginX(nPlayer);
+					y = GetNoteOriginY(nPlayer);
 				} else if (nowTime >= pChip.end.n発声時刻ms) {
 					x = x末端;
 					y = y末端;
@@ -1886,7 +1886,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		var head = new Vector2(xHead, yHead);
 		var end = new Vector2(xEnd, yEnd);
-		var origin = new Vector2(this.NoteOriginX[iPlayer], this.NoteOriginY[iPlayer]);
+		var origin = new Vector2(this.GetNoteOriginX(iPlayer), this.GetNoteOriginY(iPlayer));
 		float pos = NearestLineSegRelPos(head, end, origin);
 
 		Vector2 dr = Vector2.Lerp(new(dxHead, dyHead), new(dxEnd, dyEnd), pos);
@@ -1924,8 +1924,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
-		int x = NoteOriginX[nPlayer] + pChip.nHorizontalChipDistance;
-		int y = NoteOriginY[nPlayer] + pChip.nVerticalChipDistance;
+		int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
+		int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 
 		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
 			if (x >= 0 && x <= GameWindowSize.Width) {
