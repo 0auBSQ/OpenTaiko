@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0.87] - 2025-08-09 (Beta)
+
+- [Fix] note lane became transparent in training mode for charts with BGA/MOVIE (not played in training mode)
+- [Fix] #BARLINE ignored scroll mode
+- [Fix] fuze rolls were counted into bar roll length (beyond balloon hit count) for scoring and Dan-i exam monitoring
+- [Fix] dan-i monitoring for AdLib, Mine, & Fuze roll notes was broken because these notes were not counted in TJA parsing due to wrong note type checking conditions
+- [Fix] timing window of fuze roll was the same as bar rolls and not expectedly the same as regular balloons
+- [Fix] music played too early when users retry after music plays and then pause + resume before music plays (although was able to resync when the music should play)
+- [Fix] AI battle mode failed to use 2P layout due to the fix of 0.6.0.79
+- [Fix] setting duplicated key binds for the same key overrode the next key bind under cursor by stopping shifting out removed key binds
+- [Fix] hitting AdLibs at combo milestone retriggered combo milestone effects
+- [Fix] players' animation failed to exit max-soul state after retrying
+- [Fix] balloon/Kusu chara/puchi animation for charts with dense balloon-type notes, follow-up of 0.6.0.55
+- [Fix] player chara & puchi animation ignored play speed
+- [Fix] go-go judgemark fire, activated balloon, and number bubble for balloon and fuze rolls ignored JPosScroll
+
 ## [0.6.0.86] - 2025-08-07 (Beta)
 
 - [Fix] Fix Rainbow gauges flickering
