@@ -630,8 +630,8 @@ internal class CSkin : IDisposable {
 		InitializeSkinPathRoot();
 		ReloadSkinPaths();
 		PrepareReloadSkin();
-		FetchMenusAndModules();
 	}
+
 	public CSkin() {
 		CleanupModules();
 		lockBoxDefSkin = new object();
@@ -639,7 +639,6 @@ internal class CSkin : IDisposable {
 		bUseBoxDefSkin = true;
 		ReloadSkinPaths();
 		PrepareReloadSkin();
-		FetchMenusAndModules();
 	}
 	private string InitializeSkinPathRoot() {
 		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);

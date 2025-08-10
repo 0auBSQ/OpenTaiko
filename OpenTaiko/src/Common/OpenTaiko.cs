@@ -1658,6 +1658,7 @@ internal class OpenTaiko : Game {
 #endif
 		{
 			Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
+			Skin.FetchMenusAndModules();
 			OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName = OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true);  // 旧指定のSkinフォルダが消滅していた場合に備える
 
 			ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
@@ -2248,6 +2249,7 @@ internal class OpenTaiko : Game {
 		OpenTaiko.Skin.Dispose();
 		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
+		OpenTaiko.Skin.FetchMenusAndModules();
 
 		OpenTaiko.Tx.DisposeTexture();
 
