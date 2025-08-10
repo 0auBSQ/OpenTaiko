@@ -13,11 +13,15 @@ function draw()
 end
 
 function update()
-
+	if INPUT:Pressed("Cancel") == true or INPUT:KeyboardPressed("Escape") == true then
+		test = GetSaveFile(0)
+		debugLog(tostring(test.TotalPlaycount))
+		return Exit("title", nil)
+	end
 end
 
 function activate()
-
+	
 end
 
 function deactivate()

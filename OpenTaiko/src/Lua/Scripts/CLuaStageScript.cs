@@ -61,6 +61,10 @@ namespace OpenTaiko {
 			StageExitCallBack = cb;
 		}
 
+		public int ExitStage(string transition, string? name) {
+			return StageExitCallBack(transition, name);
+		}
+
 
 		// Handle resources independently in Lua stages, ultimately nameplate script and modal script no longer needing the old hardcoded lua script methods would be a good longer term goal
 		public CLuaStageScript(string dir, string name, string? texturesDir = null, string? soundsDir = null, bool loadAssets = false) : base(dir, texturesDir, soundsDir, loadAssets) {
@@ -76,7 +80,7 @@ namespace OpenTaiko {
 				lfOnDestroy = (LuaFunction)LuaScript["onDestroy"];
 
 				// Call "return Exit(transition)" in the Lua stage's update function to exit the stage
-				LuaScript["Exit"] = StageExitCallBack;
+				LuaScript["Exit"] = ExitStage;
 
 			} catch (Exception e) {
 				Crash(e);
