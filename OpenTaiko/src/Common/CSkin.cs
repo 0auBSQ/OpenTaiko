@@ -594,22 +594,52 @@ internal class CSkin : IDisposable {
 		}
 	}
 
+	#region [ Lua Stages and Custom Menus ]
+
+	public CMainMenuSettings MainMenuSettings;
+
+	public void CleanupModules() {
+		LuaStageWrapper.PropagateOnDestroy();
+		LuaStageWrapper.ResetLuaStagesDictionary();
+	}
+
+	public void FetchMenusAndModules() {
+		// Main Menu Settings
+		MainMenuSettings = new CMainMenuSettings();
+		MainMenuSettings.tReloadMenus();
+
+		// Lua Stages
+		string[] _modulesList = Directory.GetDirectories(CSkin.Path($"Modules/Stages"), "*", SearchOption.TopDirectoryOnly).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
+		foreach (string _module in _modulesList) {
+			LuaStageWrapper _lsw = new LuaStageWrapper(_module);
+		}
+
+		LuaStageWrapper.PropagateOnStart();
+	}
+
+	#endregion
+
 
 	// Constructor
 	public CSkin(string _strSkinSubfolderFullName, bool _bUseBoxDefSkin) {
+		CleanupModules();
 		lockBoxDefSkin = new object();
 		strSystemSkinSubfolderFullName = _strSkinSubfolderFullName;
 		bUseBoxDefSkin = _bUseBoxDefSkin;
 		InitializeSkinPathRoot();
 		ReloadSkinPaths();
 		PrepareReloadSkin();
+		FetchMenusAndModules();
 	}
 	public CSkin() {
+		CleanupModules();
 		lockBoxDefSkin = new object();
 		InitializeSkinPathRoot();
 		bUseBoxDefSkin = true;
 		ReloadSkinPaths();
 		PrepareReloadSkin();
+		FetchMenusAndModules();
 	}
 	private string InitializeSkinPathRoot() {
 		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);

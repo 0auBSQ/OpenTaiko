@@ -12,8 +12,14 @@ namespace OpenTaiko {
 		// Main loops 
 		private LuaFunction lfUpdate;
 		private LuaFunction lfDraw;
+		// Extra events
+		private LuaFunction lfOnStart;
+		private LuaFunction lfAfterSongEnum;
+		private LuaFunction lfOnDestroy;
 
-		private Func<string, int> StageExitCallBack;
+		private Func<string, string?, int> StageExitCallBack;
+
+		#region [CStage/CActivity events]
 
 		public void Update() {
 			RunLuaCode(lfUpdate);
@@ -31,7 +37,27 @@ namespace OpenTaiko {
 			RunLuaCode(lfDeactivate);
 		}
 
-		public void AttachExitCallBack(Func<string, int> cb) {
+		#endregion
+
+		#region [Extra events]
+
+		public void OnStart() {
+			RunLuaCode(lfOnStart);
+		}
+
+		public void AfterSongsEnum() {
+			RunLuaCode(lfAfterSongEnum);
+		}
+
+		public void OnDestroy() {
+			RunLuaCode(lfOnDestroy);
+		}
+
+		#endregion
+
+
+
+		public void AttachExitCallBack(Func<string, string?, int> cb) {
 			StageExitCallBack = cb;
 		}
 
@@ -45,6 +71,9 @@ namespace OpenTaiko {
 				lfDraw = (LuaFunction)LuaScript["draw"];
 				lfActivate = (LuaFunction)LuaScript["activate"];
 				lfDeactivate = (LuaFunction)LuaScript["deactivate"];
+				lfOnStart = (LuaFunction)LuaScript["onStart"];
+				lfAfterSongEnum = (LuaFunction)LuaScript["afterSongEnum"];
+				lfOnDestroy = (LuaFunction)LuaScript["onDestroy"];
 
 				// Call "return Exit(transition)" in the Lua stage's update function to exit the stage
 				LuaScript["Exit"] = StageExitCallBack;

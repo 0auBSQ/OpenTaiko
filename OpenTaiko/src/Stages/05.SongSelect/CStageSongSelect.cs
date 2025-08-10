@@ -1190,7 +1190,8 @@ internal class CStageSongSelect : CStage {
 		SongSelected,
 		CallOptions,
 		ConfigMenuOpened,
-		SkinChange
+		SkinChange,
+		JumpToLuaStage
 	}
 
 

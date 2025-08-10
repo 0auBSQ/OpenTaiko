@@ -523,6 +523,8 @@ internal class OpenTaiko : Game {
 
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
+				// Considering this is for the enum songs tab, is it really necessary to loop through stages?
+				// Moving the start of songs enumeration to the init section would be a much smarter choice imo, to refactor ASAP
 				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.Title:
 					case CStage.EStage.Config:
@@ -709,11 +711,28 @@ internal class OpenTaiko : Game {
 								OpenTaiko.latestSongSelect = stageSongSelect;
 								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
 								ConfigIni.nPlayerCount = 2;
-								ConfigIni.bAIBattleMode = true;
+								ConfigIni.bAIBattleMode = true; // Use this variable to check when to use the AI virtual save file instead of 2P save file?
 								ConfigIni.tInitializeAILevel();
+								// TODO: Add a special profile for AI, in which it is possible to force the character, puchi and nameplateinfo
+
 								//-----------------------------
 								#endregion
 								break;
+
+							case (int)CStageTitle.EReturnValue.LUASTAGE:
+								#region [ Transition to another Lua Stage ]
+								//-----------------------------
+								string _name = LuaStageWrapper.GetNextRequestedStageName();
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Lua Stage: {_name}");
+									this.tExecuteGarbageCollection();
+								}
+								break;
+								//-----------------------------
+								#endregion
 
 						}
 
@@ -1162,6 +1181,56 @@ internal class OpenTaiko : Game {
 							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
+						#endregion
+						break;
+
+					case CStage.EStage.CUSTOM:
+						#region [ Lua Stages ]
+						switch (this.nDrawLoopReturnValue) {
+							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+								#region [ Back to title screen ]
+								//-----------------------------
+								ChangeStage(stageTitle);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Title");
+
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
+								this.tExecuteGarbageCollection();
+								break;
+							//-----------------------------
+							#endregion
+
+							case (int)CStageSongSelect.EReturnValue.SongSelected:
+								#region [ Song selected ]
+								//-----------------------------
+								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
+								latestSongSelect = rCurrentStage;
+								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation(playCutScenes ? "■ Cut Scene" : "■ Song Loading");
+
+								this.tExecuteGarbageCollection();
+								break;
+							//-----------------------------
+							#endregion
+
+							case (int)CStageSongSelect.EReturnValue.JumpToLuaStage:
+								#region [ Transition to another Lua Stage ]
+								//-----------------------------
+								string _name = LuaStageWrapper.GetNextRequestedStageName();
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Lua Stage: {_name}");
+									this.tExecuteGarbageCollection();
+								}
+								break;
+								//-----------------------------
+								#endregion
+						}
 						#endregion
 						break;
 
