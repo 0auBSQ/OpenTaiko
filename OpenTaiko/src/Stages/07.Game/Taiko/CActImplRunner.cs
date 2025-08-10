@@ -114,7 +114,7 @@ internal class CActImplRunner : CActivity {
 					stRunners[i].b使用中 = false;
 				}
 				for (int n = stRunners[i].nOldValue; n < stRunners[i].ct進行.CurrentValue; n++) {
-					stRunners[i].fX += (float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[stRunners[i].nPlayer] / 18;
+					stRunners[i].fX += (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[stRunners[i].nPlayer]) / 18;
 					int Width = OpenTaiko.Skin.Resolution[0] / Ptn;
 					stRunners[i].nNowPtn = (int)stRunners[i].fX / Width;
 				}

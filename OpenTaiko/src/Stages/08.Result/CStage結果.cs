@@ -253,16 +253,10 @@ internal class CStage結果 : CStage {
 
 					// Unlock dan grade
 					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0]) {
-						/*
-						this.newGradeGranted = TJAPlayer3.NamePlateConfig.tUpdateDanTitle(TJAPlayer3.stage選曲.r確定された曲.strタイトル.Substring(0, 2),
-							clearValue % 2 == 0,
-							(clearValue - 1) / 2,
-							TJAPlayer3.SaveFile);
-						*/
+						string dan_title = OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags();
+						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 
-						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags().Substring(0, 2),
-							clearValue % 2 == 0,
-							(clearValue - 1) / 2);
+						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
 					}
 
 					#endregion

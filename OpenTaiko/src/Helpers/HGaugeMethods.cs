@@ -255,6 +255,7 @@ class HGaugeMethods {
 			rainbowTexture.vcScaleRatio.X = scale_x;
 			rainbowTexture.vcScaleRatio.Y = scale_y;
 
+			rainbowTexture.Opacity = 255;
 			rainbowTexture.t2D描画(rainbow_x, rainbow_y);
 		}
 

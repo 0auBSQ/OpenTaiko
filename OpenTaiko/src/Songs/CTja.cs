@@ -569,6 +569,7 @@ internal class CTja : CActivity {
 						cwav.rSound[i].Stop();
 					}
 				}
+				cwav.n一時停止時刻[i] = long.MinValue; // prevent unpause
 			}
 		}
 	}
@@ -876,7 +877,9 @@ internal class CTja : CActivity {
 	public void t全チップの再生再開() {
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused) {
+				// paused: pause >= play time (do resume)
+				// stopped: pause < play time (do not resume)
+				if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPaused && cwav.n一時停止時刻[i] >= cwav.n再生開始時刻[i]) {
 					cwav.rSound[i].Resume(cwav.n一時停止時刻[i] - cwav.n再生開始時刻[i]);
 					cwav.n再生開始時刻[i] += SoundManager.PlayTimer.SystemTimeMs - cwav.n一時停止時刻[i];
 				}
@@ -1981,8 +1984,7 @@ internal class CTja : CActivity {
 		} else if (command == "#MERGELANE") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xE3, 1));
 		} else if (command == "#BARLINE") {
-			var chip = this.NewEventChipAtDefCursor(0xE4, 1);
-			chip.dbSCROLL_Y = this.dbNowScrollY;
+			var chip = this.NewScrolledChipAtDefCursor(0xE4, 0, 1, this.n現在のコース);
 			chip.bHideBarLine = false;
 			this.listChip.Add(chip);
 			this.listBarLineChip.Add(chip);
@@ -2777,24 +2779,28 @@ internal class CTja : CActivity {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
 				if (this.n参照中の難易度 == (int)Difficulty.Dan) {
 					this.nDan_NotesCount[List_DanSongs.Count - 1]++;
-					if (NotesManager.IsADLIB(chip))
-						this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
-					else if (NotesManager.IsMine(chip))
-						this.nDan_MineCount[List_DanSongs.Count - 1]++;
 				}
 				if (IsEndedBranching) {
 					this.nノーツ数[3]++;
 				}
 			}
+		} else if (NotesManager.IsADLIB(chip)) {
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
+			}
+		} else if (NotesManager.IsMine(chip)) {
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
+				this.nDan_MineCount[List_DanSongs.Count - 1]++;
+			}
 		} else if (NotesManager.IsGenericBalloon(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
 				this.nDan_BalloonHitCount[List_DanSongs.Count - 1] += chip.nBalloon;
+				if (NotesManager.IsFuzeRoll(chip))
+					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		} else if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
 				this.nDan_BarRollCount[List_DanSongs.Count - 1]++;
-				if (NotesManager.IsFuzeRoll(chip))
-					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		}
 

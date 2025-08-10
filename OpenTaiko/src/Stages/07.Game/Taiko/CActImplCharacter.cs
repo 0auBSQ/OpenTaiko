@@ -48,25 +48,11 @@ internal class CActImplCharacter : CActivity {
 			if (OpenTaiko.Skin.Characters_Normal_Ptn[this.iCurrentCharacter[i]] != 0) ChangeAnime(i, Anime.Normal, true);
 			else ChangeAnime(i, Anime.None, true);
 
+			this.IsInKusudama = false;
 			this.b風船連打中[i] = false;
 			this.b演奏中[i] = false;
 
-			// CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(TJAPlayer3.Skin.Game_Chara_Balloon_FadeOut);
 			CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]]);
-
-			var tick = OpenTaiko.Skin.Characters_Balloon_Timer[this.iCurrentCharacter[i]];
-
-			var balloonBrokePtn = OpenTaiko.Skin.Characters_Balloon_Broke_Ptn[this.iCurrentCharacter[i]];
-			var balloonMissPtn = OpenTaiko.Skin.Characters_Balloon_Miss_Ptn[this.iCurrentCharacter[i]];
-
-			CharaAction_Balloon_FadeOut_StartMs[i] = new int[2];
-
-			CharaAction_Balloon_FadeOut_StartMs[i][0] = (balloonBrokePtn * tick) - OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]];
-			CharaAction_Balloon_FadeOut_StartMs[i][1] = (balloonMissPtn * tick) - OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]];
-
-			if (balloonBrokePtn > 1) CharaAction_Balloon_FadeOut_StartMs[i][0] /= balloonBrokePtn - 1;
-			if (balloonMissPtn > 1) CharaAction_Balloon_FadeOut_StartMs[i][1] /= balloonMissPtn - 1; // - 1はタイマー用
-
 			if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].CurrentValue = (int)CharaAction_Balloon_Delay[i].EndValue;
 		}
 
@@ -139,7 +125,7 @@ internal class CActImplCharacter : CActivity {
 
 			void updateNormal() {
 				if (!OpenTaiko.stageGameScreen.bPAUSE) {
-					nNowCharaCounter[i] += ((Math.Abs((float)OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime) / nCharaBeat[i];
+					nNowCharaCounter[i] += ((Math.Abs((float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i])) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime) / nCharaBeat[i];
 				}
 			}
 			void updateBalloon() {
@@ -502,10 +488,6 @@ internal class CActImplCharacter : CActivity {
 
 
 				if (eNowAnime[i] == Anime.Balloon_Broke) {
-					if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][0]) {
-						CharaAction_Balloon_FadeOut[i].Start();
-					}
-
 					if (OpenTaiko.Skin.Characters_Balloon_Broke_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
 						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
 						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
@@ -521,14 +503,9 @@ internal class CActImplCharacter : CActivity {
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
 					if (endAnime) {
-						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Balloon_Miss) {
-					if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][1]) {
-						CharaAction_Balloon_FadeOut[i].Start();
-					}
-
 					if (OpenTaiko.Skin.Characters_Balloon_Miss_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
 						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
 						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
@@ -544,7 +521,6 @@ internal class CActImplCharacter : CActivity {
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
 					if (endAnime) {
-						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Balloon_Breaking) {
@@ -561,9 +537,6 @@ internal class CActImplCharacter : CActivity {
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player: i);
 				} else if (eNowAnime[i] == Anime.Kusudama_Broke) {
-					if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][0]) {
-						CharaAction_Balloon_FadeOut[i].Start();
-					}
 					float kusuOutX = ((1.0f - MathF.Cos(Math.Min(1, nNowCharaCounter[i]) * MathF.PI)) * OpenTaiko.Skin.Resolution[0] / 2.0f) * resolutionScaleX;
 					float kusuOutY = (MathF.Sin(Math.Min(1, nNowCharaCounter[i]) * MathF.PI / 2) * OpenTaiko.Skin.Resolution[1] / 2.0f) * resolutionScaleY;
 
@@ -588,14 +561,9 @@ internal class CActImplCharacter : CActivity {
 					}
 
 					if (endAnime) {
-						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Kusudama_Miss) {
-					if (CharaAction_Balloon_FadeOut[i].Counter.IsStoped && nNowCharaFrame[i] > CharaAction_Balloon_FadeOut_StartMs[i][1]) {
-						CharaAction_Balloon_FadeOut[i].Start();
-					}
-
 					float kusuOutY = (Math.Max(Math.Min(1, nNowCharaCounter[i]) - 0.5f, 0) * OpenTaiko.Skin.Resolution[1] * 2) * resolutionScaleY;
 
 					if (OpenTaiko.Skin.Characters_Kusudama_Miss_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
@@ -616,7 +584,6 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuOutY, false, nowOpacity, true, player: i);
 
 					if (endAnime) {
-						this.b風船連打中[i] = false;
 						ReturnDefaultAnime(i, true);
 					}
 				} else if (eNowAnime[i] == Anime.Kusudama_Breaking) {
@@ -681,6 +648,15 @@ internal class CActImplCharacter : CActivity {
 
 
 	public void ReturnDefaultAnime(int player, bool resetCounter) {
+		if (this.IsInKusudama) {
+			ChangeAnime(player, Anime.Kusudama_Idle, resetCounter);
+			return;
+		}
+		if (this.b風船連打中[player]) {
+			ChangeAnime(player, Anime.Balloon_Breaking, resetCounter);
+			return;
+		}
+
 		if (OpenTaiko.stageGameScreen.bIsGOGOTIME[player] && OpenTaiko.Skin.Characters_GoGoTime_Ptn[this.iCurrentCharacter[player]] != 0) {
 			if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_GoGoTime_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
 				ChangeAnime(player, Anime.GoGoTime_Maxed, resetCounter);
@@ -882,16 +858,25 @@ internal class CActImplCharacter : CActivity {
 				nCharaBeat[player] = 0.5f;
 				break;
 		}
+
+		if (anime is Anime.Balloon_Broke or Anime.Balloon_Miss or Anime.Kusudama_Broke or Anime.Kusudama_Miss) {
+			CharaAction_Balloon_FadeOut[player].Start();
+			if (this.CharaAction_Balloon_Delay[player] != null) {
+				this.CharaAction_Balloon_Delay[player] = new CCounter(
+					0, OpenTaiko.Skin.Characters_Balloon_Delay[this.iCurrentCharacter[player]] - 1,
+					1,
+					OpenTaiko.Timer);
+			}
+		}
 	}
 
 	public CCounter[] CharaAction_Balloon_Delay = new CCounter[5];
 
 	public Animations.FadeOut[] CharaAction_Balloon_FadeOut = new Animations.FadeOut[5];
-	//private readonly int[] CharaAction_Balloon_FadeOut_StartMs = new int[5];
-	private readonly int[][] CharaAction_Balloon_FadeOut_StartMs = new int[5][];
 
 	//public bool[] bキャラクターアクション中 = new bool[5];
 
+	public bool IsInKusudama = false;
 	public bool[] b風船連打中 = new bool[5];
 	public bool[] b演奏中 = new bool[5];
 
