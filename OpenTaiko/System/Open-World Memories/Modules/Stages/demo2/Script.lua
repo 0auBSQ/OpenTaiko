@@ -1,4 +1,4 @@
-import ('System.Drawing')
+﻿import ('System.Drawing')
 
 local text = nil
 local textTex = nil
@@ -40,7 +40,7 @@ local function handleDecide()
 			sounds.Decide:Play()
 		end
 	elseif ssn.IsSong == true then
-		local success = ssn:Mount(3) -- for testing, go directly for oni and only 1P
+		local success = ssn:Mount(5) -- for testing, go directly for tower and only 1P
 		if success == true then
 			sounds.SongDecide:Play()
 			return true -- transition to song select if true
@@ -125,6 +125,7 @@ function afterSongEnum()
 	local lsls = GenerateSongListSettings()
 	-- Test options here
 	lsls.ModuloPagination = false
+	lsls.RootGenreFolder = "太鼓タワー"
 
 	-- Get song list 
 	songList = RequestSongList(lsls)

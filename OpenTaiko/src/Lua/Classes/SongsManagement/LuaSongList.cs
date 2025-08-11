@@ -7,7 +7,41 @@
 
 		public void ReloadSongList() {
 			_root = new LuaSongNodeRoot();
-			OpenTaiko.Songs管理.list曲ルート.ForEach((song) => {
+
+			var _scanningList = OpenTaiko.Songs管理.list曲ルート;
+
+			if (_settings.RootGenreFolder != null) {
+
+				#region [If a specific root genre folder is given, process a DFS to get the first potential root node found]
+
+				T? FindNode<T>(IEnumerable<T> roots, Func<T, bool> predicate, Func<T, IEnumerable<T>> childrenSelector) {
+					foreach (var node in roots) {
+						if (predicate(node))
+							return node;
+
+						var children = childrenSelector(node);
+						if (children != null) {
+							var found = FindNode(children, predicate, childrenSelector);
+							if (found != null)
+								return found;
+						}
+					}
+					return default;
+				}
+
+				var _found = FindNode(
+					_scanningList,
+					node => node.songGenre == _settings.RootGenreFolder && node.nodeType == CSongListNode.ENodeType.BOX,
+					node => node.childrenList
+				);
+
+				if (_found != null) _scanningList = _found.childrenList;
+
+				#endregion
+
+			}
+
+			_scanningList.ForEach((song) => {
 				LuaSongNode _node = new LuaSongNode(song, _root);
 				_root.AppendChild(_node);
 			});
