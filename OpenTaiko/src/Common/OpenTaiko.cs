@@ -1210,7 +1210,7 @@ internal class OpenTaiko : Game {
 							case (int)CStageSongSelect.EReturnValue.SongSelected:
 								#region [ Song selected ]
 								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
+								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage, true);
 								latestSongSelect = rCurrentStage;
 								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
 								Trace.TraceInformation("----------------------");
