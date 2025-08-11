@@ -167,7 +167,7 @@
 		"SETTINGS_GAME_BADCOUNT": "完美模式",
 		"SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
 		"SETTINGS_GAME_NOTELOCK": "锁定音符模式",
-		"SETTINGS_GAME_NOTELOCK_DESC": "切换是否将敲击空白处记为“不可”。",
+		"SETTINGS_GAME_NOTELOCK_DESC": "切换在谱面空白处敲击时是否判为“不可”。",
 		"SETTINGS_GAME_AILEVEL": "AI 等级",
 		"SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：禁用 AI\n— 1+：玩家 2 会变为 AI\n此选项会在玩家 2 的自动模式开启时禁用。",
 		"SETTINGS_GAME_NORMALGAUGE": "总是使用普通魂条",
@@ -181,7 +181,7 @@
 		"SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。\n不对气球生效。\n0 禁用自动连打，且最大值为每帧一次。",
 
 		"SETTINGS_GAME_NOINFO": "无信息模式",
-		"SETTINGS_GAME_NOINFO_DESC": "切换是否显示歌曲信息。\n打开会关闭歌曲信息显示，\n关闭会打开歌曲信息显示。",
+		"SETTINGS_GAME_NOINFO_DESC": "切换是否隐藏歌曲信息。\n打开会隐藏歌曲信息，\n关闭会显示歌曲信息。",
 		"SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量。\n范围：1—99999",
 		"SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
