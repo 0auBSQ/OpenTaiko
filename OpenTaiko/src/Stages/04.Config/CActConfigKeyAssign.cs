@@ -158,7 +158,7 @@ internal class CActConfigKeyAssign : CActivity {
 			}
 			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "Reset", this.n現在の選択行 == 0x10, 0.75f);
 			y += num5;
-			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "<< Returnto List", this.n現在の選択行 == 0x11, 0.75f);
+			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "<< Return to List", this.n現在の選択行 == 0x11, 0.75f);
 			y += num5;
 			if (this.bキー入力待ち && (OpenTaiko.Tx.Config_KeyAssign != null)) {
 				OpenTaiko.Tx.Config_KeyAssign.t2D描画(OpenTaiko.Skin.Config_KeyAssign[0], OpenTaiko.Skin.Config_KeyAssign[1]);

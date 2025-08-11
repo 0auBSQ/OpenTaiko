@@ -127,9 +127,14 @@ internal class CActImplBalloon : CActivity {
 				num_x = OpenTaiko.Skin.Game_Balloon_Balloon_Number_X[player];
 				num_y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Y[player];
 			}
-			//1P:0 2P:245
-			//if (CDTXMania.Tx.Chara_Balloon_Breaking != null && CDTXMania.ConfigIni.ShowChara)
-			//    CDTXMania.Tx.Chara_Balloon_Breaking.t2D描画(CDTXMania.app.Device, CDTXMania.Skin.Game_Chara_Balloon_X[player], CDTXMania.Skin.Game_Chara_Balloon_Y[player]);
+
+			x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
+			y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
+			frame_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
+			frame_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
+			num_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
+			num_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
+
 			for (int j = 0; j < 5; j++) {
 
 				if (n残り打数[j] < n連打数 && btype == EBalloonType.BALLOON) {
