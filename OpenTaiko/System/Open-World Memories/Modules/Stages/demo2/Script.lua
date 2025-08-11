@@ -17,7 +17,8 @@ local function refreshPage()
 	for i = -5,5 do
 		local node = songList:GetSongNodeAtOffset(i)
 		currentPage[i] = node
-		if i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, Color.FromArgb(255,242,207,1))
+		if node == nil then pageTexts[i] = nil
+		elseif i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, Color.FromArgb(255,242,207,1))
 		else pageTexts[i] = text:GetText(node.Title)
 		end
 	end
@@ -61,7 +62,10 @@ function draw()
 	end
 	if pageTexts ~= nil then
 		for i, tx in pairs(pageTexts) do
-			tx:Draw(100, 500+i*100)
+			-- can be nil if no modulo pagination
+			if tx ~= nil then 
+				tx:Draw(100, 500+i*100)
+			end
 		end
 	end
 end
@@ -119,6 +123,10 @@ end
 
 function afterSongEnum()
 	local lsls = GenerateSongListSettings()
+	-- Test options here
+	lsls.ModuloPagination = false
+
+	-- Get song list 
 	songList = RequestSongList(lsls)
 	refreshPage()
 end
