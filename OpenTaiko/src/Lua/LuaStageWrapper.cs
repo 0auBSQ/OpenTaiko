@@ -127,7 +127,7 @@
 		}
 
 		public override int Draw() {
-			lcStageScript?.Update();
+			if (this.eFadeOutReturnValue == CStageSongSelect.EReturnValue.Continuation) lcStageScript?.Update();
 			lcStageScript?.Draw();
 
 			// Menu exit fade out transition

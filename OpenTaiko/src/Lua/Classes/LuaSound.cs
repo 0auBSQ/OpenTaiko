@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
+﻿using FDK;
 
 namespace OpenTaiko {
 	public class LuaSound : IDisposable {
@@ -75,7 +70,7 @@ namespace OpenTaiko {
 
 		public LuaSound CreateSFX(string path) => CreateSound(path, ESoundGroup.SoundEffect);
 		public LuaSound CreateVoice(string path) => CreateSound(path, ESoundGroup.Voice);
-		public LuaSound CreateSong(string path) => CreateSound(path, ESoundGroup.SongPlayback);
+		public LuaSound CreateBGM(string path) => CreateSound(path, ESoundGroup.SongPlayback);
 		public LuaSound CreatePreview(string path) => CreateSound(path, ESoundGroup.SongPreview);
 		private LuaSound CreateSound(string path, ESoundGroup group) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
