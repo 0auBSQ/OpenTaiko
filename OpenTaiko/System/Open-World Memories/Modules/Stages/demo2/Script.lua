@@ -38,8 +38,15 @@ local function handleDecide()
 		if success == true then
 			sounds.Decide:Play()
 		end
+	elseif ssn.IsSong == true then
+		local success = ssn:Mount(3) -- for testing, go directly for oni and only 1P
+		if success == true then
+			sounds.SongDecide:Play()
+			return true -- transition to song select if true
+		end 
 	end
-	-- Handle play song here, no need to handle random button for this series of tests
+	-- any route note ending up to play a song return false
+	return false
 end
 
 local function handleFolderClose()
@@ -85,7 +92,10 @@ function update()
 		refreshPage()
 	end
 	if INPUT:Pressed("Decide") == true or INPUT:KeyboardPressed("Return") == true then
-		handleDecide()
+		local isPlayStarted = handleDecide()
+		if isPlayStarted == true then
+			return Exit("play", nil)
+		end 
 	end
 end
 

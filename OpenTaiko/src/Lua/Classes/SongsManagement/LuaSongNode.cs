@@ -227,6 +227,30 @@ namespace OpenTaiko {
 			if (recursive) _FetchChildren();
 		}
 
+		// Mount the song node so it gets played when transitioning to the gameplay screen
+		public bool Mount(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {
+			if (!IsSong || _node == null) return false;
+
+			int[] diffs = { p1diff, p2diff, p3diff, p4diff, p5diff };
+
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				// Difficulty out of bounds
+				if (diffs[i] < 0 || diffs[i] >= (int)Difficulty.Total) return false;
+
+				// Difficulty not found in chart
+				LuaSongChart? _chart = _charts.FirstOrDefault(x => (int)x.Difficulty == diffs[i]);
+				if (_chart == null) return false;
+
+				// Mount difficulty if valid
+				_chart.Select(i);
+			}
+
+			OpenTaiko.stageSongSelect.rChoosenSong = _node;
+			OpenTaiko.stageSongSelect.str確定された曲のジャンル = Genre ?? "???";
+
+			return true;
+		}
+
 		public LuaSongNode() {
 
 		}
