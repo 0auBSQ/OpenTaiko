@@ -7,7 +7,7 @@
 
 		public void ReloadSongList() {
 			_root = new LuaSongNodeRoot();
-			OpenTaiko.EnumSongs.Songs管理.list曲ルート.ForEach((song) => {
+			OpenTaiko.Songs管理.list曲ルート.ForEach((song) => {
 				LuaSongNode _node = new LuaSongNode(song, _root);
 				_root.AppendChild(_node);
 			});
@@ -20,7 +20,6 @@
 		public LuaSongList(LuaSongListSettings settings) {
 			_settings = settings;
 			ReloadSongList();
-			LuaSongListListeners.RegisterSongList(this);
 		}
 
 		private List<LuaSongNode> GetLeaves() {
@@ -66,6 +65,9 @@
 			return _currentPage.IndexOf(_node);
 		}
 
+		// This doesn't work as C# Lists are not directly handlable in Lua
+
+		/*
 		public List<LuaSongNode?> GetCurrentlyDisplayedPage(int before, int after) {
 			List<LuaSongNode?> _displayedPage = new List<LuaSongNode?>();
 
@@ -87,6 +89,25 @@
 
 			return _displayedPage;
 		}
+		*/
+
+		public LuaSongNode? GetSongNodeAtOffset(int offset) {
+			int _curidx = GetIndexInPage(_currentNode);
+			if (_curidx < 0) return null;
+
+			int _idx = _curidx + offset;
+
+			if (_settings.ModuloPagination == true) {
+				int _count = _currentPage.Count;
+				int _modidx = ((_idx % _count) + _count) % _count;
+				return _currentPage[_modidx];
+			} else if (_idx >= 0 && _idx < _currentPage.Count) return _currentPage[_idx];
+			return null;
+		}
+
+		public LuaSongNode? GetSelectedSongNode() {
+			return _currentNode;
+		}
 
 		public void Move(int offset) {
 			int _curidx = GetIndexInPage(_currentNode);
@@ -103,24 +124,28 @@
 			}
 		}
 
-		public void OpenFolder() {
-			if (_currentNode == null) return;
+		public bool OpenFolder() {
+			if (_currentNode == null) return false;
 
 			if (_currentNode.IsFolder && !_currentNode.Opened && _currentNode.ChildrenCount > 0) {
 				_currentNode.Opened = true;
 				_currentNode = _currentNode.Child(0);
 				_currentPage = GetCurrentPage();
+				return true;
 			}
+			return false;
 		}
 
-		public void CloseFolder() {
-			if (_currentNode == null) return;
+		public bool CloseFolder() {
+			if (_currentNode == null) return false;
 
 			if (!_currentNode.IsRoot && _currentNode.Parent.IsFolder && _currentNode.Parent.Opened) {
 				_currentNode = _currentNode.Parent;
 				_currentNode.Opened = false;
 				_currentPage = GetCurrentPage();
+				return true;
 			}
+			return false;
 		}
 	}
 }

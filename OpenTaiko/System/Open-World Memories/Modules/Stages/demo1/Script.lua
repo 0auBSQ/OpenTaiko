@@ -16,12 +16,12 @@ end
 
 function update()
 	if INPUT:Pressed("Cancel") == true or INPUT:KeyboardPressed("Escape") == true then
-		test = GetSaveFile(0)
+		local test = GetSaveFile(0)
 		debugLog(tostring(test.TotalPlaycount))
 		sounds.Cancel:Play()
 		return Exit("title", nil)
 	end
-	if INPUT:Pressed("Decide") == true or INPUT:KeyboardPressed("Return") == true then
+	if INPUT:KeyboardPressed("S") == true then
 		sounds.Skip:Play()
 		return Exit("stage", "demo2")
 	end

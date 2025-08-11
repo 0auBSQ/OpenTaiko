@@ -530,6 +530,8 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
+					case CStage.EStage.Heya:
+					case CStage.EStage.CUSTOM:
 						if (EnumSongs != null) {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
 							if (rCurrentStage.eStageID == CStage.EStage.Title &&
@@ -593,6 +595,9 @@ internal class OpenTaiko : Game {
 								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
 								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
 								EnumSongs.SongListEnumCompletelyDone();
+
+								// Propagate AfterSongEnum events to all lua stages
+								LuaStageWrapper.PropagateAfterSongEnumEvent();
 							}
 							#endregion
 						}

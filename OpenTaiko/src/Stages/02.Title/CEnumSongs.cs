@@ -361,8 +361,6 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			#region [Reload all lua song list objects]
 
-			LuaSongListListeners.ResetSongLists();
-
 			// Tests
 
 			//LuaSongListSettings _sts = LuaSongListSettings.Generate();
@@ -380,9 +378,6 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		lock (this) {
 			// state = DTXEnumState.Done;		// DoneにするのはCDTXMania.cs側にて。
 			state = DTXEnumState.Enumeratad;
-
-			// Propagate AfterSongEnum events to all lua stages
-			LuaStageWrapper.PropagateAfterSongEnumEvent();
 		}
 	}
 

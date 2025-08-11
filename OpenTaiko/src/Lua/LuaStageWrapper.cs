@@ -85,7 +85,6 @@
 			base.ChildActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
 		}
 
-		// TODO: Add a way to jump to any other lua stage? Ultimately replace by a string
 		private CStageSongSelect.EReturnValue _StringToReturnValue(string transition, string? moduleName = null) {
 			CStageSongSelect.EReturnValue _rv = transition switch {
 				"title" => CStageSongSelect.EReturnValue.BackToTitle,
