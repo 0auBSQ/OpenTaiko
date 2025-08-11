@@ -52,7 +52,7 @@
 		private List<LuaSongNode> GetCurrentPage() {
 			List<LuaSongNode> _page = new List<LuaSongNode>();
 
-			if (_settings.FlattenOpennedFolders == true) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
+			if (_settings.FlattenOpennedFolders == false) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
 			else _page = GetLeaves();
 
 			// Do the necessary post-process here (fe. adding random boxes, back boxes, etc)
