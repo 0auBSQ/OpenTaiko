@@ -14,6 +14,7 @@ class CMainMenuTab {
 	public bool implemented;
 	public CTexture barTex;
 	public CTexture barChara;
+	public string luaStageName;
 	public CStageTitle.EReturnValue rp;
 
 	public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CStageTitle.EReturnValue returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
@@ -29,11 +30,28 @@ class CMainMenuTab {
 
 		_1pRestricted = _1Ponly;
 		implemented = impl;
-		barTex = (modeSelect_Bar.Length > boxId) ? modeSelect_Bar[boxId] : null;
-		barChara = (modeSelect_Bar_Chara.Length > boxId) ? modeSelect_Bar_Chara[boxId] : null;
+
+		if (boxId < __MenuCount) {
+			barTex = (modeSelect_Bar.Length > boxId) ? modeSelect_Bar[boxId] : null;
+			barChara = (modeSelect_Bar_Chara.Length > boxId) ? modeSelect_Bar_Chara[boxId] : null;
+		} else {
+			int _idx = boxId - __MenuCount;
+			barTex = modeSelect_Bar[0];
+			barChara = modeSelect_Bar_Chara[0];
+			luaStageName = OpenTaiko.Skin.MainMenuSettings.data[_idx].LuaStageName;
+		}
 	}
 
 	private static string GetBoxText(int boxid, bool isTitle = true) {
+		// Handle Lua menus separately
+		if (boxid >= __MenuCount) {
+			int _idx = boxid - __MenuCount;
+
+			if (isTitle) return OpenTaiko.Skin.MainMenuSettings.data[_idx].StageName.GetString("[Unnamed stage]");
+			return OpenTaiko.Skin.MainMenuSettings.data[_idx].StageDescription.GetString("[No description]");
+		}
+
+
 		string append = isTitle ? "" : "_DESC";
 		switch (boxid) {
 			case 0:
@@ -69,18 +87,14 @@ class CMainMenuTab {
 	}
 
 	public static void tInitMenus(CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
-		// Proceed the boxes only once
+		int _setMenuCount = OpenTaiko.Skin.MainMenuSettings.data.Count;
 
-		if (__BoxesProcessed == false) {
-			__Menus = new CMainMenuTab[__MenuCount];
+		__Menus = new CMainMenuTab[__MenuCount + _setMenuCount];
 
-			// Removed to avoid having to reload the game when changing language
-			//__BoxesProcessed = true;
+		#region [Menu Colors]
 
-			#region [Menu Colors]
-
-			Color[] __MenuColors =
-			{
+		Color[] __MenuColors =
+		{
 				Color.FromArgb(233, 53, 71),
 				Color.FromArgb(71, 64, 135),
 				Color.FromArgb(255, 180, 42),
@@ -97,12 +111,12 @@ class CMainMenuTab {
 				Color.FromArgb(120, 104, 56), // Toolbox brown
 			};
 
-			#endregion
+		#endregion
 
-			#region [Return points]
+		#region [Return points]
 
-			CStageTitle.EReturnValue[] __rps =
-			{
+		CStageTitle.EReturnValue[] __rps =
+		{
 				CStageTitle.EReturnValue.GAMESTART,
 				CStageTitle.EReturnValue.DANGAMESTART,
 				CStageTitle.EReturnValue.TAIKOTOWERSSTART,
@@ -119,12 +133,12 @@ class CMainMenuTab {
 				CStageTitle.EReturnValue.TOOLBOX,
 			};
 
-			#endregion
+		#endregion
 
-			#region [Extra bools]
+		#region [Extra bools]
 
-			bool[] _1PRestricts =
-			{
+		bool[] _1PRestricts =
+		{
 				false,
 				true,
 				true,
@@ -141,9 +155,9 @@ class CMainMenuTab {
 				false,
 			};
 
-			// To edit while new features are implemented
-			bool[] _implemented =
-			{
+		// To edit while new features are implemented
+		bool[] _implemented =
+		{
 				true,
 				true,
 				true,
@@ -160,17 +174,25 @@ class CMainMenuTab {
 				false,
 			};
 
-			#endregion
+		#endregion
 
-			for (int i = 0; i < __MenuCount; i++) {
-				CStageTitle.EReturnValue _rp = (i >= __rps.Length) ? CStageTitle.EReturnValue.GAMESTART : __rps[i];
-				Color _mc = (i >= __MenuColors.Length) ? Color.White : __MenuColors[i];
-				bool _1pr = (i >= _1PRestricts.Length) ? false : _1PRestricts[i];
-				bool _impl = (i >= _implemented.Length) ? false : _implemented[i];
+		for (int i = 0; i < __MenuCount; i++) {
+			CStageTitle.EReturnValue _rp = (i >= __rps.Length) ? CStageTitle.EReturnValue.GAMESTART : __rps[i];
+			Color _mc = (i >= __MenuColors.Length) ? Color.White : __MenuColors[i];
+			bool _1pr = (i >= _1PRestricts.Length) ? false : _1PRestricts[i];
+			bool _impl = (i >= _implemented.Length) ? false : _implemented[i];
 
-				__Menus[i] = new CMainMenuTab(i, _mc, tpf, boxpf, _rp, _1pr, _impl, modeSelect_Bar, modeSelect_Bar_Chara);
+			__Menus[i] = new CMainMenuTab(i, _mc, tpf, boxpf, _rp, _1pr, _impl, modeSelect_Bar, modeSelect_Bar_Chara);
 
-			}
+		}
+
+		for (int i = 0; i < _setMenuCount; i++) {
+			int j = i + __MenuCount;
+			CStageTitle.EReturnValue _rp = CStageTitle.EReturnValue.LUASTAGE;
+			Color _mc = Color.FromName(OpenTaiko.Skin.MainMenuSettings.data[i].LEGACY_MenuBoxColor);
+			bool _1pr = OpenTaiko.Skin.MainMenuSettings.data[i].Restricted1P;
+			bool _impl = true;
+			__Menus[j] = new CMainMenuTab(j, _mc, tpf, boxpf, _rp, _1pr, _impl, modeSelect_Bar, modeSelect_Bar_Chara);
 		}
 
 	}

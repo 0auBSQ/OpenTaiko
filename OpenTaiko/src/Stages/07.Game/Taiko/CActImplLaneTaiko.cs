@@ -603,7 +603,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 
 
-		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo) {
+		if (OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && OpenTaiko.stageGameScreen.ShowVideo && !OpenTaiko.ConfigIni.bTokkunMode) {
 			if (OpenTaiko.Tx.Lane_Background_Main != null) OpenTaiko.Tx.Lane_Background_Main.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_AI != null) OpenTaiko.Tx.Lane_Background_AI.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) OpenTaiko.Tx.Lane_Background_Sub.Opacity = OpenTaiko.ConfigIni.nBGAlpha;
@@ -630,8 +630,8 @@ internal class CActImplLaneTaiko : CActivity {
 			OpenTaiko.Tx.Judge_Frame.b加算合成 = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				OpenTaiko.Tx.Judge_Frame.t2D描画(
-					OpenTaiko.stageGameScreen.NoteOriginX[i],
-					OpenTaiko.stageGameScreen.NoteOriginY[i], new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+					OpenTaiko.stageGameScreen.GetNoteOriginX(i),
+					OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
 		}
 
@@ -673,6 +673,9 @@ internal class CActImplLaneTaiko : CActivity {
 						x += OpenTaiko.Skin.Game_Effect_Fire_X[i];
 						y += OpenTaiko.Skin.Game_Effect_Fire_Y[i];
 					}
+
+					x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(i);
+					y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(i);
 
 					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.X = f倍率;
 					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.Y = f倍率;

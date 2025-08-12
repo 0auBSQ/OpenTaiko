@@ -1,0 +1,34 @@
+[
+	{
+		"StageName": {
+			"strings": {
+				"default": "My Lua Stage"
+			}	
+		},
+		"StageDescription": {
+			"strings": {
+				"default": "There is a first step to everything..."
+			}
+		},
+		"StageType": "Lua",
+		"LuaStageName": "demo1",
+		"Restricted1P": false,
+		"LEGACY_MenuBoxColor": "Lime"
+	},
+	{
+		"StageName": {
+			"strings": {
+				"default": "My Other Lua Stage"
+			}	
+		},
+		"StageDescription": {
+			"strings": {
+				"default": "There is a first step to everything..."
+			}
+		},
+		"StageType": "Lua",
+		"LuaStageName": "demo2",
+		"Restricted1P": true,
+		"LEGACY_MenuBoxColor": "Green"
+	}
+]

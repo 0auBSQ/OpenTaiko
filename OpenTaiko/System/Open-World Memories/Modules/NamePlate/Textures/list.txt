@@ -35,3 +35,12 @@
 34 - Status Full Combo
 35 - Status Perfect
 36 - Template
+37 - OpTk Chapter V
+38 - OpTk Secret 2
+39 - Clear Count
+40 - Full Combo Count
+41 - Perfect Count
+42 - Ryuto
+43 - OpTk Secret 1
+44 - OpTk Chapter VI
+45 - OpTk Chapter VI (Alternative)

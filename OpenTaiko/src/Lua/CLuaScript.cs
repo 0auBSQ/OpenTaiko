@@ -8,6 +8,27 @@ using NLua;
 namespace OpenTaiko;
 
 class CLuaScript : IDisposable {
+
+	#region [For the new Lua module methods]
+
+	public List<CTexture> TextureList = [];
+	public List<LuaSound> SoundList = [];
+	public List<LuaText> TextList = [];
+
+	public LuaSaveFile? GetLuaSaveFile(int player) {
+		if (player < 0 || player > OpenTaiko.MAX_PLAYERS) {
+			LogNotification.PopError($"Invalid player index in lua module, expected [0,{OpenTaiko.MAX_PLAYERS}]");
+			return null;
+		}
+		return new LuaSaveFile(OpenTaiko.SaveFileInstances[player]);
+	}
+
+	public LuaSongList RequestSongList(LuaSongListSettings lsls) {
+		return new LuaSongList(lsls);
+	}
+
+	#endregion
+
 	public static List<CLuaScript> listScripts { get; private set; } = new List<CLuaScript>();
 	public static void tReloadLanguage(string lang) {
 		foreach (var item in listScripts) {
@@ -182,6 +203,7 @@ class CLuaScript : IDisposable {
 			lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
 			lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
 
+			// Old Lua module API
 			LuaScript["loadConfig"] = LoadConfig;
 			LuaScript["loadTexture"] = LoadTexture;
 			LuaScript["loadSound"] = LoadSound;
@@ -195,6 +217,17 @@ class CLuaScript : IDisposable {
 			LuaScript["getLocalizedString"] = GetLocalizedString;
 			LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
 			LuaScript["debugLog"] = DebugLog;
+
+			// New Lua Module API
+			LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, dir);
+			LuaScript["SOUND"] = new LuaSoundFunc(SoundList, dir);
+			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
+			LuaScript["CONFIG"] = new LuaConfigFunc(dir);
+			LuaScript["INPUT"] = new LuaInputFunc();
+
+			LuaScript["GetSaveFile"] = GetLuaSaveFile;
+			LuaScript["RequestSongList"] = RequestSongList;
+			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
 
 
 			if (loadAssets) LoadAssets();
@@ -234,7 +267,7 @@ class CLuaScript : IDisposable {
 		listScripts.Remove(this);
 	}
 
-	private void Crash(Exception exception) {
+	protected void Crash(Exception exception) {
 		bCrashed = true;
 
 		LogNotification.PopError($"Lua Script Error: {exception.ToString()}");

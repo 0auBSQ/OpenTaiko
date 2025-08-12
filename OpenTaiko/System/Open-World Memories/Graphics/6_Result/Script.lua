@@ -14,8 +14,8 @@
 local bg_width = 1920
 local bg_height = 1080
 local bg_width_half = bg_width / 2
-local nokonX = 1212
-local nokonY = 582
+local nokonX = 1292
+local nokonY = 532
 
 -- Init Checks
 local bg_style = 0
@@ -191,7 +191,7 @@ function drawNokon()
     -- All Players Clear
     elseif nokon_style == 3 then
       func:SetRotation(math.sin(nokonResultCounter / (nokonFps / 4)) * 10, nokonTail)
-      func:DrawGraphCenter(1776, 1027, nokonTail)
+      func:DrawGraphCenter(1840, 970, nokonTail)
       if math.floor(nokonResultCounter) % 28 == 0 then
         func:DrawGraph(nokonX, nokonY, nokonFrames[4].."0.png")
       else
@@ -200,7 +200,7 @@ function drawNokon()
     -- Two or More Players Clear
     elseif nokon_style == 2 then
       func:SetRotation(math.sin(nokonResultCounter / (nokonFps / 4)) * 10, nokonTail)
-      func:DrawGraphCenter(1776, 1027, nokonTail)
+      func:DrawGraphCenter(1840, 970, nokonTail)
       if math.floor(nokonResultCounter) % 28 == 0 then
         func:DrawGraph(nokonX, nokonY, nokonFrames[3].."0.png")
       else

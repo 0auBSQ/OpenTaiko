@@ -1557,7 +1557,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.BoxFontName = CFontRenderer.DefaultFontName;
 		this.ApplyLoudnessMetadata = true;
 		this.bEnableCountdownTimer = true;
-		this.sLang = "ja";
+		this.sLang = "en";
 		this.nLayoutType = 1;
 
 		// 2018-08-28 twopointzero:
@@ -1781,20 +1781,14 @@ internal class CConfigIni : INotifyPropertyChanged {
 					continue;
 				}
 				for (int k = 0; k < 0x10; k++) {
-					if (this.KeyAssign[i][j][k].InputDevice != deviceType ||
-						this.KeyAssign[i][j][k].ID != nID ||
-						this.KeyAssign[i][j][k].Code != nCode) {
-						continue;
+					if (this.KeyAssign[i][j][k].InputDevice == deviceType
+						&& this.KeyAssign[i][j][k].ID == nID
+						&& this.KeyAssign[i][j][k].Code == nCode
+						) {
+						this.KeyAssign[i][j][k].InputDevice = EInputDevice.Unknown;
+						this.KeyAssign[i][j][k].ID = 0;
+						this.KeyAssign[i][j][k].Code = 0;
 					}
-
-					for (int m = k; m < 15; m++) {
-						this.KeyAssign[i][j][m] = this.KeyAssign[i][j][m + 1];
-					}
-
-					this.KeyAssign[i][j][15].InputDevice = EInputDevice.Unknown;
-					this.KeyAssign[i][j][15].ID = 0;
-					this.KeyAssign[i][j][15].Code = 0;
-					k--;
 				}
 			}
 		}

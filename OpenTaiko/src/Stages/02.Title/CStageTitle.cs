@@ -32,6 +32,9 @@ internal class CStageTitle : CStage {
 
 			SkipSaveFileStep();
 
+			// Init Menus
+			tReloadMenus();
+
 			usedMenus = new int[] {
 				0,
 				1,
@@ -52,15 +55,22 @@ internal class CStageTitle : CStage {
 				*/
 			};
 
+			#region [ Temporary way to include custom menus ]
+
+			List<int> _tmp = new List<int>(usedMenus);
+			for (int i = CMainMenuTab.__MenuCount; i < CMainMenuTab.__MenuCount + OpenTaiko.Skin.MainMenuSettings.data.Count; i++) {
+				_tmp.Add(i);
+			}
+			usedMenus = _tmp.ToArray();
+
+			#endregion
+
 			usedMenusCount = usedMenus.Length;
 
 			usedMenusPos = new int[usedMenusCount];
 			for (int i = 0; i < usedMenusCount; i++) {
 				usedMenusPos[i] = i + 1 - n現在の選択行モード選択;
 			}
-
-			// Init Menus
-			tReloadMenus();
 
 			this._idNextStageForced = null;
 
@@ -836,6 +846,9 @@ internal class CStageTitle : CStage {
 					}
 					base.ePhaseID = CStage.EPhase.Common_EXIT;
 
+					if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.LUASTAGE) {
+						LuaStageWrapper.TEMPORARY_ForceSetNextRequestedStage(CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].luaStageName);
+					}
 
 					// Select Menu here
 					return (int)(this._idNextStageForced ??
@@ -866,6 +879,7 @@ internal class CStageTitle : CStage {
 		PLAYERSTATS,
 		CHARTEDITOR,
 		TOOLBOX,
+		LUASTAGE
 	}
 
 

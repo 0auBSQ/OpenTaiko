@@ -3,12 +3,7 @@ local bgWidth_4 = 962
 local bgScrollX_1 = 0
 local bgScrollX_4 = 0
 local snowHeight = 276
-local sunX = -320
-local sunY = -320
-local sunRot = 0
-local snowSway_1 = 0
-local snowSway_2 = 0
-local snowSway_3 = 0
+local snowSway = 0
 local snowSwayFinal_1 = 0
 local snowSwayFinal_2 = 0
 local snowSwayFinal_3 = 0
@@ -30,7 +25,6 @@ function init()
     func:AddGraph("Snow1.png");
     func:AddGraph("Snow2.png");
     func:AddGraph("Snow3.png");
-    func:AddGraph("Sun.png");
 end
 
 function update()
@@ -44,11 +38,11 @@ function update()
         bgScrollX_4 = 0;
     end
 
-    snowSway_1 = snowSway_1 + (50 * deltaTime);
+    snowSway = snowSway + (50 * deltaTime);
 
-    snowSwayFinal_1 = 30 * math.sin((2 * snowSway_1) / 150);
-    snowSwayFinal_2 = 25 * math.sin((2 * snowSway_1) / 150);
-    snowSwayFinal_3 = 20 * math.sin((2 * snowSway_1) / 150);
+    snowSwayFinal_1 = 30 * math.sin((2 * snowSway) / 150);
+    snowSwayFinal_2 = 25 * math.sin((2 * snowSway) / 150);
+    snowSwayFinal_3 = 20 * math.sin((2 * snowSway) / 150);
 
     snowScrollY_1 = snowScrollY_1 + (60 * deltaTime);
     if snowScrollY_1 > snowHeight then
@@ -62,15 +56,11 @@ function update()
     if snowScrollY_3 > snowHeight then
         snowScrollY_3 = 0;
     end
-
-	sunRot = sunRot - (8 * deltaTime);
 end
 
 
 function draw()
     func:DrawGraph(0, 0, "Skybox.png");
-	  func:SetRotation(sunRot, "Sun.png");
-	  func:DrawGraph(sunX, sunY, "Sun.png");
     for i = 0, 4 do
         func:DrawGraph((i * bgWidth_1) - bgScrollX_1, 0, "Clouds.png");
     end

@@ -2,9 +2,6 @@ local bgWidth_1 = 1984
 local bgWidth_4 = 962
 local bgScrollX_1 = 0
 local bgScrollX_4 = 0
-local sunX = -320
-local sunY = -320
-local sunRot = 0
 
 local flowerScrollX_1 = 0
 local flowerScrollX_2 = 150
@@ -36,7 +33,6 @@ function init()
     func:AddGraph("Flower1.png");
     func:AddGraph("Flower2.png");
     func:AddGraph("Flower3.png");
-    func:AddGraph("Sun.png");
 end
 
 function update()
@@ -77,7 +73,6 @@ function update()
   flowerSway_3 = flowerSway_3 + (36 * deltaTime);
   flowerSwayFinal_3 = 40 * math.cos((5 * flowerSway_2) / 130) * math.sin((2 * flowerSway_2) / 130);
 
-  sunRot = sunRot - (8 * deltaTime);
   flowerRot1 = flowerRot1 + (28 * deltaTime);
   flowerRot2 = flowerRot2 + (40 * deltaTime);
   flowerRot3 = flowerRot3 + (50 * deltaTime);
@@ -86,8 +81,6 @@ end
 
 function draw()
     func:DrawGraph(0, 0, "Skybox.png");
-	func:SetRotation(sunRot, "Sun.png");
-	func:DrawGraph(sunX, sunY, "Sun.png");
     for i = 0, 4 do
         func:DrawGraph((i * bgWidth_1) - bgScrollX_1, 0, "Clouds.png");
     end

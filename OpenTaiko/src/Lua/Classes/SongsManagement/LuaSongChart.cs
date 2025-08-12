@@ -77,13 +77,13 @@
 
 		#endregion
 
-		public bool Select() {
+		public bool Select(int player, bool init = false) {
 			if (!NotNull) return false;
 
-			OpenTaiko.stageSongSelect.rChoosenSong = _parentListNode;
+			if (init) OpenTaiko.stageSongSelect.rChoosenSong = _parentListNode;
 			OpenTaiko.stageSongSelect.r確定されたスコア = _score;
-			OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty;
-			OpenTaiko.stageSongSelect.str確定された曲のジャンル = _parent.Genre;
+			OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player] = (int)Difficulty;
+			if (init) OpenTaiko.stageSongSelect.str確定された曲のジャンル = _parent.Genre;
 
 			return true;
 		}

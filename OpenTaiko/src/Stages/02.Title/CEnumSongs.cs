@@ -361,8 +361,6 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			#region [Reload all lua song list objects]
 
-			LuaSongListListeners.ResetSongLists();
-
 			// Tests
 
 			//LuaSongListSettings _sts = LuaSongListSettings.Generate();

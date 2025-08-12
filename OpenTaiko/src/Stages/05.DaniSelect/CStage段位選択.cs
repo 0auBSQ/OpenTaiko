@@ -25,7 +25,7 @@ class CStage段位選択 : CStage {
 		this.b選択した = false;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.継続;
+		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.Continuation;
 
 		ct待機 = new CCounter();
 		ctChara_In = new CCounter();

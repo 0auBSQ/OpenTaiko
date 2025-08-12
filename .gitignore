@@ -55,3 +55,12 @@
 
 /OpenTaiko Launcher
 /OpenTaiko Launcher/node_modules
+
+# Song folders
+/OpenTaiko/Songs/0*
+/OpenTaiko/Songs/C*
+/OpenTaiko/Songs/E*
+/OpenTaiko/Songs/L1*
+/OpenTaiko/Songs/L2*
+/OpenTaiko/Songs/L3*
+/OpenTaiko/Songs/S*
