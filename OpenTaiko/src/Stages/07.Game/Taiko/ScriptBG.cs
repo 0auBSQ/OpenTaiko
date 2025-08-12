@@ -142,6 +142,7 @@ class ScriptBG : IDisposable {
 		LuaScript["CONFIG"] = new LuaConfigFunc(path);
 		LuaScript["INPUT"] = new LuaInputFunc();
 		LuaScript["COLOR"] = new LuaColorFunc();
+		LuaScript["COUNTER"] = new LuaCounterFunc();
 
 
 		try {
