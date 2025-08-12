@@ -13,7 +13,7 @@ namespace OpenTaiko {
 			return _cUC?.tConditionMet(player, screen) ?? (true, "");
 		}
 
-		public LuaUnlockCondition(CUnlockCondition cUC) {
+		public LuaUnlockCondition(CUnlockCondition? cUC) {
 			this._cUC = cUC;
 		}
 

@@ -81,8 +81,6 @@
 		private List<LuaSongNode> GetRootPage() {
 			List<LuaSongNode> _page = _root?.Children ?? new List<LuaSongNode>();
 
-			// Do the necessary post-process here (fe. adding random boxes, back boxes, etc)
-
 			return _page;
 		}
 
@@ -92,7 +90,7 @@
 			if (_settings.FlattenOpennedFolders == false) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
 			else _page = GetLeaves();
 
-			// Do the necessary post-process here (fe. adding random boxes, back boxes, etc)
+			_page.RemoveAll(node => _settings.IsNodeExcludedAtExecution(node) == true);
 
 			return _page;
 		}

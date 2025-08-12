@@ -4,6 +4,7 @@ namespace OpenTaiko {
 	internal class LuaSongNode {
 		private CSongListNode? _node;
 		private List<LuaSongChart> _charts = new List<LuaSongChart>();
+		private LuaUnlockCondition _unlockCondition = new LuaUnlockCondition();
 		protected List<LuaSongNode> _children = new List<LuaSongNode>();
 		protected LuaSongNode? _parent;
 
@@ -68,6 +69,34 @@ namespace OpenTaiko {
 			get {
 				if (!IsFolder && !IsRoot) return 0;
 				return _children.Count;
+			}
+		}
+
+		public int SongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count((child) => child.IsSong);
+			}
+		}
+
+		public int RecursiveSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return SongCount + _children.Sum((child) => child.RecursiveSongCount);
+			}
+		}
+
+		public int VisibleSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count((child) => child.IsSong && child.HiddenIndex != DBSongUnlockables.EHiddenIndex.HIDDEN);
+			}
+		}
+
+		public int RecursiveVisibleSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return VisibleSongCount + _children.Sum((child) => child.RecursiveVisibleSongCount);
 			}
 		}
 
@@ -145,6 +174,34 @@ namespace OpenTaiko {
 			}
 		}
 
+
+		#endregion
+
+		#region [Unlockables]
+
+		public LuaUnlockCondition UnlockCondition {
+			get {
+				return _unlockCondition;
+			}
+		}
+
+		public bool IsLocked {
+			get {
+				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
+					return OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(_node);
+				}
+				return false;
+			}
+		}
+
+		public DBSongUnlockables.EHiddenIndex HiddenIndex {
+			get {
+				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
+					return OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(_node);
+				}
+				return DBSongUnlockables.EHiddenIndex.DISPLAYED;
+			}
+		}
 
 		#endregion
 
@@ -228,6 +285,9 @@ namespace OpenTaiko {
 
 		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
 			_node = node;
+			if (node.nodeType == CSongListNode.ENodeType.SCORE) {
+				_unlockCondition = new LuaUnlockCondition(OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node)?.unlockConditions ?? null);
+			}
 			_FetchCharts();
 			if (recursive) _FetchChildren(lsls);
 		}

@@ -65,9 +65,6 @@
 
 			// Exclude folders depending on the song list settings
 			if (node.nodeType == CSongListNode.ENodeType.BOX) {
-				if (this.HideEmptyFolders == true) {
-					// TODO: Add a function to check the number of hidden locked charts
-				}
 				if (this.ExcludedGenreFolders.Contains(node.songGenre)) return true;
 			}
 
@@ -79,6 +76,22 @@
 						if (node.nLevel[(int)diff] < 0) return true;
 					}
 				}
+			}
+
+			return false;
+		}
+
+		public bool IsNodeExcludedAtExecution(LuaSongNode node) {
+			// Hide folders that have no visible song
+			if (node.IsFolder) {
+				if (this.HideEmptyFolders == true) {
+					if (node.RecursiveVisibleSongCount == 0) return true;
+				}
+			}
+
+			// Hide locked hidden songs
+			if (node.IsSong) {
+				if (node.HiddenIndex == DBSongUnlockables.EHiddenIndex.HIDDEN) return true;
 			}
 
 			return false;
