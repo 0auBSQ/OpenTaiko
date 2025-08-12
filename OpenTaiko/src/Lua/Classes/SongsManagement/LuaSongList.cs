@@ -42,9 +42,12 @@
 			}
 
 			_scanningList.ForEach((song) => {
-				LuaSongNode _node = new LuaSongNode(song, _root);
-				_root.AppendChild(_node);
+				if (_settings.IsNodeExcludedAtGeneration(song) == false) {
+					LuaSongNode _node = new LuaSongNode(song, _root, true, _settings);
+					_root.AppendChild(_node);
+				}
 			});
+			_settings.AlterRootNodeWithRequestedNodes(_root);
 
 			_currentNode = null;
 			_currentPage = GetRootPage();
@@ -98,32 +101,6 @@
 			if (_node == null || _currentPage.Count == 0) return -1;
 			return _currentPage.IndexOf(_node);
 		}
-
-		// This doesn't work as C# Lists are not directly handlable in Lua
-
-		/*
-		public List<LuaSongNode?> GetCurrentlyDisplayedPage(int before, int after) {
-			List<LuaSongNode?> _displayedPage = new List<LuaSongNode?>();
-
-			int _curidx = GetIndexInPage(_currentNode);
-			if (_curidx < 0) return _displayedPage;
-
-			for (int i = -before; i <= after; i++) {
-				int _idx = _curidx + i;
-
-				if (_settings.ModuloPagination == true) {
-					int _count = _currentPage.Count;
-					int _modidx = ((_idx % _count) + _count) % _count;
-					_displayedPage.Add(_currentPage[_modidx]);
-				} else {
-					if (_idx >= 0 && _idx < _currentPage.Count) _displayedPage.Add(_currentPage[_idx]);
-					else _displayedPage.Add(null);
-				}
-			}
-
-			return _displayedPage;
-		}
-		*/
 
 		public LuaSongNode? GetSongNodeAtOffset(int offset) {
 			int _curidx = GetIndexInPage(_currentNode);

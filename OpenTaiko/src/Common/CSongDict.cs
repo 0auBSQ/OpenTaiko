@@ -74,13 +74,13 @@ internal class CSongDict {
 	#region [Extra methods]
 
 	// Generate a back button
-	public static CSongListNode tGenerateBackButton(CSongListNode parent, string path = "/", List<string> listStrBoxDef = null) {
+	public static CSongListNode tGenerateBackButton(CSongListNode parent, string? path = "/", List<string> listStrBoxDef = null) {
 		CSongListNode itemBack = new CSongListNode();
 		itemBack.nodeType = CSongListNode.ENodeType.BACKBOX;
 
 
 		// とじる
-		itemBack.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RETURN_PATH", path, path);
+		itemBack.ldTitle = (path == null) ? new CLocalizationData() : CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RETURN_PATH", path, path);
 
 		itemBack.BackColor = ColorTranslator.FromHtml("#513009");
 		itemBack.BoxColor = Color.White;
@@ -103,7 +103,7 @@ internal class CSongDict {
 		}
 
 		itemBack.strBreadcrumbs = (itemBack.rParentNode == null) ?
-			itemBack.ldTitle.GetString("") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("");
+			itemBack.ldTitle.GetString("BACKBOX") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("BACKBOX");
 
 		itemBack.score[0] = new CScore();
 		itemBack.score[0].ファイル情報.フォルダの絶対パス = "";
@@ -113,17 +113,17 @@ internal class CSongDict {
 		return (itemBack);
 	}
 
-	public static CSongListNode tGenerateRandomButton(CSongListNode parent, string path = "/") {
+	public static CSongListNode tGenerateRandomButton(CSongListNode? parent, string? path = "/") {
 		CSongListNode itemRandom = new CSongListNode();
 		itemRandom.nodeType = CSongListNode.ENodeType.RANDOM;
 
-		itemRandom.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
+		itemRandom.ldTitle = (path == null) ? new CLocalizationData() : CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
 
 		itemRandom.difficultiesCount = (int)Difficulty.Total;
 		itemRandom.rParentNode = parent;
 
 		itemRandom.strBreadcrumbs = (itemRandom.rParentNode == null) ?
-			itemRandom.ldTitle.GetString("") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("");
+			itemRandom.ldTitle.GetString("RANDOM") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("RANDOM");
 
 		itemRandom.score[0] = new CScore();
 
@@ -257,7 +257,7 @@ internal class CSongDict {
 				if (node != null) childList.Add(node);
 			}
 			// Check if Charter is listed in NOTESDESIGNER(x) command instead
-			else if (type == ETitleType.Charter) { 
+			else if (type == ETitleType.Charter) {
 				foreach (string charter in nodeT.strNotesDesigner) {
 					if (charter.Contains(text, StringComparison.InvariantCultureIgnoreCase)) {
 						var node = tReadaptChildNote(parent, nodeT);

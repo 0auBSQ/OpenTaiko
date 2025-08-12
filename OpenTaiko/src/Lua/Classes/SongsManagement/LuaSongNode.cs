@@ -158,6 +158,8 @@ namespace OpenTaiko {
 
 		public string? Title {
 			get {
+				if (IsRandom) return CLangManager.LangInstance.GetString("SONGSELECT_RANDOM_PATH", _parent?.Title ?? "/");
+				else if (IsReturn) return CLangManager.LangInstance.GetString("SONGSELECT_RETURN_PATH", _parent?.Title ?? "/");
 				return _node?.ldTitle.GetString("") ?? null;
 			}
 		}
@@ -212,19 +214,22 @@ namespace OpenTaiko {
 			}
 		}
 
-		private void _FetchChildren() {
+		private void _FetchChildren(LuaSongListSettings lsls) {
 			_children = new List<LuaSongNode>();
 
 			_node?.childrenList?.ForEach((child) => {
-				LuaSongNode _child = new LuaSongNode(child, this);
-				_children.Add(_child);
+				if (lsls.IsNodeExcludedAtGeneration(child) == false) {
+					LuaSongNode _child = new LuaSongNode(child, this, true, lsls);
+					_children.Add(_child);
+				}
 			});
+			lsls.AlterNodeListWithRequestedNodes(_node, _children, this);
 		}
 
-		public void AttachSongListNode(CSongListNode node, bool recursive = true) {
+		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
 			_node = node;
 			_FetchCharts();
-			if (recursive) _FetchChildren();
+			if (recursive) _FetchChildren(lsls);
 		}
 
 		// Mount the song node so it gets played when transitioning to the gameplay screen
@@ -255,8 +260,9 @@ namespace OpenTaiko {
 
 		}
 
-		public LuaSongNode(CSongListNode node, LuaSongNode? parent = null, bool recursive = true) {
-			AttachSongListNode(node, recursive);
+		public LuaSongNode(CSongListNode node, LuaSongNode? parent = null, bool recursive = true, LuaSongListSettings? lsls = null) {
+			LuaSongListSettings _settings = lsls ?? LuaSongListSettings.Generate();
+			AttachSongListNode(node, recursive, _settings);
 			this._parent = parent;
 		}
 	}
