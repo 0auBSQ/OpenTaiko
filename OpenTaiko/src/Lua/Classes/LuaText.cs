@@ -47,9 +47,11 @@ namespace OpenTaiko {
 			_fontRenderer = HPrivateFastFont.tInstantiateFont(name, size, fontstyle);
 		}
 
-		public LuaTexture GetText(string text, bool centered = false, int max_width = 99999, System.Drawing.Color? forecolor = null, System.Drawing.Color? backcolor = null) {
+		public LuaTexture GetText(string text, bool centered = false, int max_width = 99999, LuaColor? forecolor = null, LuaColor? backcolor = null) {
 			if (_fontRenderer == null) return new();
-			TitleTextureKey key = new(text, _fontRenderer, forecolor ?? Color.White, backcolor ?? Color.Black, max_width);
+			TitleTextureKey key = new(text, _fontRenderer,
+				Color.FromArgb(forecolor?.A ?? 0xFF, forecolor?.R ?? 0xFF, forecolor?.G ?? 0xFF, forecolor?.B ?? 0xFF),
+				Color.FromArgb(backcolor?.A ?? 0xFF, backcolor?.R ?? 0x00, backcolor?.G ?? 0x00, backcolor?.B ?? 0x00), max_width);
 
 			if (!_titles.TryGetValue(key, out var tex)) {
 				tex = new(TitleTextureKey.ResolveTitleTexture(key, false, centered));
@@ -57,9 +59,11 @@ namespace OpenTaiko {
 			}
 			return tex;
 		}
-		public LuaTexture GetVerticalText(string text, bool centered = false, int max_height = 99999, System.Drawing.Color? forecolor = null, System.Drawing.Color? backcolor = null) {
+		public LuaTexture GetVerticalText(string text, bool centered = false, int max_height = 99999, LuaColor? forecolor = null, LuaColor? backcolor = null) {
 			if (_fontRenderer == null) return new();
-			TitleTextureKey key = new(text, _fontRenderer, forecolor ?? Color.White, backcolor ?? Color.Black, max_height);
+			TitleTextureKey key = new(text, _fontRenderer,
+				Color.FromArgb(forecolor?.A ?? 0xFF, forecolor?.R ?? 0xFF, forecolor?.G ?? 0xFF, forecolor?.B ?? 0xFF),
+				Color.FromArgb(backcolor?.A ?? 0xFF, backcolor?.R ?? 0x00, backcolor?.G ?? 0x00, backcolor?.B ?? 0x00), max_height);
 
 			if (!_titles.TryGetValue(key, out var tex)) {
 				tex = new(TitleTextureKey.ResolveTitleTexture(key, true, centered));

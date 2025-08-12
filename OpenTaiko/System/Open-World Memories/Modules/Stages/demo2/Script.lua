@@ -1,6 +1,4 @@
-﻿import ('System.Drawing')
-
-local text = nil
+﻿local text = nil
 local textTex = nil
 
 local sounds = {}
@@ -18,7 +16,7 @@ local function refreshPage()
 		local node = songList:GetSongNodeAtOffset(i)
 		currentPage[i] = node
 		if node == nil then pageTexts[i] = nil
-		elseif i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, Color.FromArgb(255,242,207,1))
+		elseif i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
 		else pageTexts[i] = text:GetText(node.Title)
 		end
 	end

@@ -22,6 +22,8 @@ debug = nil
 while #package.searchers > 0 do
     table.remove(package.searchers);
 end
+
+import = function () end
 ");
 		}
 	}

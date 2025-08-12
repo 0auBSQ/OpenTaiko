@@ -174,8 +174,10 @@ class CLuaScript : IDisposable {
 		return CLangManager.LangInstance.GetString(key, args);
 	}
 
-	private TitleTextureKey CreateTitleTextureKey(string title, CCachedFontRenderer fontRenderer, int maxSize, Color? color = null, Color? edgeColor = null) {
-		return new TitleTextureKey(title, fontRenderer, color ?? Color.White, edgeColor ?? Color.Black, maxSize);
+	private TitleTextureKey CreateTitleTextureKey(string title, CCachedFontRenderer fontRenderer, int maxSize, LuaColor? color = null, LuaColor? edgeColor = null) {
+		return new TitleTextureKey(title, fontRenderer,
+				Color.FromArgb(color?.A ?? 0xFF, color?.R ?? 0xFF, color?.G ?? 0xFF, color?.B ?? 0xFF),
+				Color.FromArgb(edgeColor?.A ?? 0xFF, edgeColor?.R ?? 0x00, edgeColor?.G ?? 0x00, edgeColor?.B ?? 0x00), maxSize);
 	}
 
 	private CTexture GetTextTex(TitleTextureKey titleTextureKey, bool vertical, bool keepCenter) {
@@ -224,6 +226,7 @@ class CLuaScript : IDisposable {
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
 			LuaScript["CONFIG"] = new LuaConfigFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
+			LuaScript["COLOR"] = new LuaColorFunc();
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

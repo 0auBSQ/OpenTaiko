@@ -1,5 +1,3 @@
-import ('System.Drawing')
-
 local dan_types = { "Clear", "FC", "AP" }
 
 local config = nil
@@ -287,7 +285,7 @@ function setInfos(player, name, title, dan, data)
     else
         name_titlekey[player_lua] = createTitleTextureKey(name, font_name_full, 99999)
     end
-    title_titlekey[player_lua] = createTitleTextureKey(title, font_title, 99999, Color.FromArgb(0,0,0,1), Color.FromArgb(0,0,0,0))
+    title_titlekey[player_lua] = createTitleTextureKey(title, font_title, 99999, COLOR:CreateColorFromRGBA(0,0,0,255), COLOR:CreateColorFromRGBA(0,0,0,0))
     dantitle_titlekey[player_lua] = createTitleTextureKey(dan, font_title, 99999)
     dan_titlekey[player_lua] = createTitleTextureKey(dan, font_dan, 99999)
 end
