@@ -5,6 +5,8 @@ namespace OpenTaiko {
 		private CSongListNode? _node;
 		private List<LuaSongChart> _charts = new List<LuaSongChart>();
 		private LuaUnlockCondition _unlockCondition = new LuaUnlockCondition();
+		private string _rarity = "-";
+		private CLocalizationData? _unlockText = null;
 		protected List<LuaSongNode> _children = new List<LuaSongNode>();
 		protected LuaSongNode? _parent;
 
@@ -185,6 +187,13 @@ namespace OpenTaiko {
 			}
 		}
 
+		public string UnlockText {
+			get {
+				if (_unlockText != null) return _unlockText.GetString("");
+				return _unlockCondition.GetConditionMessage();
+			}
+		}
+
 		public bool IsLocked {
 			get {
 				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
@@ -200,6 +209,13 @@ namespace OpenTaiko {
 					return OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(_node);
 				}
 				return DBSongUnlockables.EHiddenIndex.DISPLAYED;
+			}
+		}
+
+		public string Rarity {
+			get {
+				// Folders, Back boxes, Random boxes have a rarity of "-" has they cannot be unlockables
+				return _rarity;
 			}
 		}
 
@@ -286,7 +302,11 @@ namespace OpenTaiko {
 		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
 			_node = node;
 			if (node.nodeType == CSongListNode.ENodeType.SCORE) {
-				_unlockCondition = new LuaUnlockCondition(OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node)?.unlockConditions ?? null);
+				var _unlockable = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node);
+				_unlockCondition = new LuaUnlockCondition(_unlockable?.unlockConditions ?? null);
+				// Songs without unlock conditions are Common by default
+				_rarity = _unlockable?.rarity ?? "Common";
+				_unlockText = _unlockable?.customUnlockText ?? null;
 			}
 			_FetchCharts();
 			if (recursive) _FetchChildren(lsls);
