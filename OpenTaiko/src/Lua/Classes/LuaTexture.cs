@@ -89,6 +89,10 @@ namespace OpenTaiko {
 		public void SetOpacity(float opacity) {
 			_texture?.tUpdateOpacity((int)(opacity * 255));
 		}
+		public void SetColor(LuaColor color) {
+			float toFloat(byte i) { return i / 255.0f; }
+			_texture?.tUpdateColor4(new(toFloat(color.R), toFloat(color.G), toFloat(color.B), 1f));
+		}
 		public void SetColor(float red, float green, float blue) {
 			_texture?.tUpdateColor4(new(red, green, blue, 1f));
 		}

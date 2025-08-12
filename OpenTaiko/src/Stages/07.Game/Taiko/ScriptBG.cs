@@ -141,6 +141,7 @@ class ScriptBG : IDisposable {
 		LuaScript["TEXT"] = new LuaTextFunc(TextList, path);
 		LuaScript["CONFIG"] = new LuaConfigFunc(path);
 		LuaScript["INPUT"] = new LuaInputFunc();
+		LuaScript["COLOR"] = new LuaColorFunc();
 
 
 		try {
