@@ -231,6 +231,7 @@ class CLuaScript : IDisposable {
 			LuaScript["COLOR"] = new LuaColorFunc();
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
+			LuaScript["CONFIG"] = new LuaConfigIniFunc();
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;
