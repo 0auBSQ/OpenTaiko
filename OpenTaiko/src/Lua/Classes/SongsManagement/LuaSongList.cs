@@ -101,6 +101,83 @@
 			return _currentPage.IndexOf(_node);
 		}
 
+		#region [(Public) Fetchers and search methods]
+
+		#region [(Private) Graph search algorithms]
+
+		private LuaSongNode? FindFirst(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null) {
+			if (root == null) return null;
+
+			LuaSongNode? DFS(LuaSongNode node) {
+				if (predicate(node) && node.IsSong)
+					return node;
+
+				foreach (var child in node.Children) {
+					var found = DFS(child);
+					if (found != null) return found;
+				}
+				return null;
+			}
+
+			return DFS(root);
+		}
+
+		private List<LuaSongNode> FindAll(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null) {
+			var results = new List<LuaSongNode>();
+			if (root == null) return results;
+
+			void DFS(LuaSongNode node) {
+				if (predicate(node) && node.IsSong)
+					results.Add(node);
+
+				foreach (var child in node.Children)
+					DFS(child);
+			}
+
+			DFS(root);
+			return results;
+		}
+
+		#endregion
+
+		public LuaSongNode? GetSongByUniqueId(string id) {
+			return this.FindFirst((node) => node.UniqueId == id, _root);
+		}
+
+		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null) {
+			List<LuaSongNode> _randomPool = new List<LuaSongNode>();
+
+			predicate ??= nd => true;
+			randomBoxLocation.Siblings.ForEach(node => {
+				if (node.IsSong && !node.IsLocked && predicate(node)) _randomPool.Add(node);
+				if (recursive == true && node.IsFolder) _randomPool.AddRange(FindAll(cnode => cnode.IsSong && !cnode.IsLocked && predicate(cnode), node));
+			});
+
+			if (_randomPool.Count == 0) return null;
+
+			Random _random = new Random();
+			int _randomIdx = _random.Next(_randomPool.Count);
+			return _randomPool[_randomIdx];
+		}
+
+		#region [Temporary, give a method to attach it to a folder instead?]
+
+		public List<LuaSongNode> SearchSongsByPredicate(Func<LuaSongNode, bool> predicate) {
+			return this.FindAll(predicate, _root);
+		}
+
+		// Placeholder for testing the predicate
+		public LuaSongNode? SearchFirstSongByPredicate(Func<LuaSongNode, bool> predicate) {
+			return this.FindFirst(predicate, _root);
+		}
+
+		#endregion
+
+
+		#endregion
+
+		#region [(Public) Folder navigation]
+
 		public LuaSongNode? GetSongNodeAtOffset(int offset) {
 			int _curidx = GetIndexInPage(_currentNode);
 			if (_curidx < 0) return null;
@@ -158,5 +235,7 @@
 			}
 			return false;
 		}
+
+		#endregion
 	}
 }

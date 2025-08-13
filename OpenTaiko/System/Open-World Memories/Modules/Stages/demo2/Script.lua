@@ -43,6 +43,15 @@ local function handleDecide()
 			sounds.SongDecide:Play()
 			return true -- transition to song select if true
 		end 
+	elseif ssn.IsRandom == true then
+		local rdNd = songList:GetRandomNodeInFolder(ssn)
+		if rdNd ~= nil then
+			local success = rdNd:Mount(5) -- for testing, go directly for tower and only 1P
+			if success == true then
+				sounds.SongDecide:Play()
+				return true -- transition to song select if true
+			end
+		end
 	end
 	-- any route note ending up to play a song return false
 	return false
@@ -100,6 +109,21 @@ function update()
 		if isPlayStarted == true then
 			return Exit("play", nil)
 		end 
+	end
+
+	-- Test
+	if INPUT:KeyboardPressed("P") then
+		local sNode = songList:SearchFirstSongByPredicate(function(node)
+		 	return node.Maker == "bol"
+		end)
+		-- local sNode = songList:GetSongByUniqueId("swtowerwttcSukima")
+		if sNode ~= nil then
+			local success = sNode:Mount(5)
+			if success == true then
+				sounds.SongDecide:Play()
+				return Exit("play", nil)
+			end 
+		end
 	end
 end
 
