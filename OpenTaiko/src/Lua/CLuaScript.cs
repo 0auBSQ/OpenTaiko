@@ -226,7 +226,7 @@ class CLuaScript : IDisposable {
 			LuaScript["SOUND"] = new LuaSoundFunc(SoundList, dir);
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
-			LuaScript["CONFIG"] = new LuaConfigFunc(dir);
+			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
 			LuaScript["COLOR"] = new LuaColorFunc();
 			LuaScript["COUNTER"] = new LuaCounterFunc();

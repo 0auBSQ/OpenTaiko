@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using FDK;
-using Newtonsoft.Json.Linq;
 using NLua;
 
 namespace OpenTaiko;
@@ -139,7 +137,7 @@ class ScriptBG : IDisposable {
 		LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, path);
 		LuaScript["SOUND"] = new LuaSoundFunc(SoundList, path);
 		LuaScript["TEXT"] = new LuaTextFunc(TextList, path);
-		LuaScript["CONFIG"] = new LuaConfigFunc(path);
+		LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(path);
 		LuaScript["INPUT"] = new LuaInputFunc();
 		LuaScript["COLOR"] = new LuaColorFunc();
 		LuaScript["COUNTER"] = new LuaCounterFunc();
