@@ -13,6 +13,7 @@ class CLuaScript : IDisposable {
 
 	public List<CTexture> TextureList = [];
 	public List<LuaSound> SoundList = [];
+	public List<CVideoDecoder> VideoList = [];
 	public List<LuaText> TextList = [];
 
 	public LuaSaveFile? GetLuaSaveFile(int player) {
@@ -223,6 +224,7 @@ class CLuaScript : IDisposable {
 			// New Lua Module API
 			LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, dir);
 			LuaScript["SOUND"] = new LuaSoundFunc(SoundList, dir);
+			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
 			LuaScript["CONFIG"] = new LuaConfigFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
