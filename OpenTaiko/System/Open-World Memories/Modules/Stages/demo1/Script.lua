@@ -53,6 +53,7 @@ function activate()
 	existing = false
 	test_counter = COUNTER:CreateCounter(0, 1.0, 1.0, test_counter_ended)
 
+	bg_video:Reset()
 	bg_video:Start()
 
 	sounds.BGM:Play()

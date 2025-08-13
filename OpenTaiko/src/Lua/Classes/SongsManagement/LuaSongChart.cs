@@ -21,6 +21,14 @@
 			}
 		}
 
+		#region [Player scores]
+
+		public LuaBestScoreInfo? GetPlayerBestScore(int save) {
+			return new LuaBestScoreInfo(this, save);
+		}
+
+		#endregion
+
 		#region [General metadata]
 
 		public int Level {

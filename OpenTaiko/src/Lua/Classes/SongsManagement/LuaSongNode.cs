@@ -221,6 +221,14 @@ namespace OpenTaiko {
 
 		#endregion
 
+		#region [Chart difficulties]
+
+		public LuaSongChart? GetChart(int diff) {
+			return _charts.FirstOrDefault(x => (int)x.Difficulty == diff);
+		}
+
+		#endregion
+
 		#region [General metadata]
 
 		public string? UniqueId {
