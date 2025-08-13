@@ -36,14 +36,28 @@ internal class CLuaNamePlateScript : CLuaScript {
 	public void DrawDan(int x, int y, int opacity, int danGrade, CTexture titleTex) {
 		if (!Available) return;
 
-		RunLuaCode(lfDrawDan, x, y, opacity, danGrade, titleTex);
+		LuaTexture _conv = new LuaTexture(titleTex);
+		RunLuaCode(lfDrawDan, x, y, opacity, danGrade, _conv);
+	}
+
+	public void DrawDan(int x, int y, int opacity, int danGrade, LuaTexture text) {
+		if (!Available) return;
+
+		RunLuaCode(lfDrawDan, x, y, opacity, danGrade, text);
 	}
 
 	// For My Room
 	public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture titleTex, int rarity, int nameplateId) {
 		if (!Available) return;
 
-		RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, titleTex, rarity, nameplateId);
+		LuaTexture _conv = new LuaTexture(titleTex);
+		RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, _conv, rarity, nameplateId);
+	}
+
+	public void DrawTitlePlate(int x, int y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
+		if (!Available) return;
+
+		RunLuaCode(lfDrawTitlePlate, x, y, opacity, type, text, rarity, nameplateId);
 	}
 
 	public void Update(params object[] args) {

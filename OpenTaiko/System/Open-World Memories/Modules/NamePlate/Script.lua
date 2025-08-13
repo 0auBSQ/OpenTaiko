@@ -423,9 +423,9 @@ function drawDan(o_x, o_y, opacity, type, titleTex)
     
     --Dan text
     if not(nodan[player_lua]) then
-        titleTex:tSetScale(math.min(config_font_dan_maxsize / titleTex.szTextureSize.Width, 1.0), 1.0)
-        titleTex.Opacity = opacity
-        titleTex:t2D_DisplayImage_AnchorCenter(x + config_text_dan_offset_x, y + config_text_dan_offset_y)
+        titleTex:SetScale(math.min(config_font_dan_maxsize / titleTex.Width, 1.0), 1.0)
+        titleTex:SetOpacity(opacity)
+        titleTex:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
     end
 end
 
@@ -461,9 +461,9 @@ function drawTitlePlate(o_x, o_y, opacity, titletype, titleTex, rarityInt, namep
 	implDrawPlayerRing(x, y, opacity, 1, 1)
 
 	--Title/Name text
-    titleTex:tSetScale(math.min(config_font_title_maxsize / titleTex.szTextureSize.Width, 1.0), 1.0)
-    titleTex.Opacity = opacity
-    titleTex:t2D_DisplayImage_AnchorCenter(x + config_text_title_offset_x, y + config_text_title_offset_y)
+    titleTex:SetScale(math.min(config_font_title_maxsize / titleTex.Width, 1.0), 1.0)
+    titleTex:SetOpacity(opacity)
+    titleTex:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
 end
 
 function update()

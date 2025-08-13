@@ -279,6 +279,8 @@ namespace OpenTaiko {
 
 		#endregion
 
+		#region [Tree structure internal methods]
+
 		private void _FetchCharts() {
 			_charts = new List<LuaSongChart>();
 
@@ -311,6 +313,8 @@ namespace OpenTaiko {
 			_FetchCharts();
 			if (recursive) _FetchChildren(lsls);
 		}
+
+		#endregion
 
 		// Mount the song node so it gets played when transitioning to the gameplay screen
 		public bool Mount(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {

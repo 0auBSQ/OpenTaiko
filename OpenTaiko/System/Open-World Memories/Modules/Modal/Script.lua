@@ -1,5 +1,3 @@
-import ('System.Drawing')
-
 -- Modal info
 local modal_current_type = 0
 local modal_current_rarity = 1
@@ -85,7 +83,7 @@ function registerNewModal(player, rarity, modal_type, modal_asset_informations, 
 	-- > modal_asset_visual_references: CLuaNamePlateScript
 	_modal_header = getLocalizedString("MODAL_TITLE_NAMEPLATE")
 	_modal_body = modal_asset_informations.Value.nameplateInfo.cld:GetString("")
-	ttk_modal_body = createTitleTextureKey(_modal_body, font_modal_plate, 99999, Color.FromArgb(0,0,0,1), Color.FromArgb(0,0,0,0))
+	ttk_modal_body = createTitleTextureKey(_modal_body, font_modal_plate, 99999, COLOR:CreateColorFromRGBA(0,0,0,255), COLOR:CreateColorFromRGBA(0,0,0,0))
 
 	elseif modal_type == 4 then
 	-- Song

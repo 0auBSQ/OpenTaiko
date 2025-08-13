@@ -91,6 +91,7 @@
 			else _page = GetLeaves();
 
 			_page.RemoveAll(node => _settings.IsNodeExcludedAtExecution(node) == true);
+			// TODO: Generate backboxes here instead of on generation to avoid weird gaps
 
 			return _page;
 		}
@@ -138,6 +139,7 @@
 
 			if (_currentNode.IsFolder && !_currentNode.Opened && _currentNode.ChildrenCount > 0) {
 				_currentNode.Opened = true;
+				// BETTER: Track index of the selected node before closing the folder to go back to it directly when reopening the folder?
 				_currentNode = _currentNode.Child(0);
 				_currentPage = GetCurrentPage();
 				return true;

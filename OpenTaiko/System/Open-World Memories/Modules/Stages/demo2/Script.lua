@@ -66,6 +66,8 @@ function draw()
 			end
 		end
 	end
+
+	NAMEPLATE:DrawPlayerNameplate(800, 100, 255, 0)
 end
 
 function update()
