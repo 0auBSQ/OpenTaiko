@@ -2,6 +2,7 @@
   "name" : {
 	"strings": {
 	  "default": "Electro",
+	  "es": "Electro",
 	  "ja": "エレクトロ",
 	  "ru": "Электро",
 	  "zh": "电子鼓"
