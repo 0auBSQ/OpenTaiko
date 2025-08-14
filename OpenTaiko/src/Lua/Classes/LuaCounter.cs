@@ -49,7 +49,7 @@ namespace OpenTaiko {
 			}
 
 			double nextValue = Value;
-			double add = 1.0f / Interval * OpenTaiko.FPS.DeltaTime;
+			double add = 1.0 / Interval * OpenTaiko.FPS.DeltaTime;
 			if (End > Begin) {
 				nextValue += add;
 			} else {
