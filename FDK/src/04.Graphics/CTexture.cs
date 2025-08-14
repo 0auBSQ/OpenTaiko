@@ -445,7 +445,7 @@ public class CTexture : IDisposable {
 				PixelFormat.Rgb => (int)InternalFormat.Rgb8,
 				_ => (int)InternalFormat.Rgba8
 			};
-			
+
 			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
 		} else {
 			// OpenGL ES allows unsized internal formats
@@ -467,28 +467,26 @@ public class CTexture : IDisposable {
 
 	public void MakeTexture(SKBitmap bitmap, bool b黒を透過する) {
 		try {
-			if (bitmap == null) {
+			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
-			}
 
-			unsafe {
-				fixed (void* data = bitmap.Pixels) {
-					if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+			if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+				unsafe {
+					fixed (void* data = bitmap.Pixels) {
 						Pointer = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
-					} else {
-						SKBitmap bm = bitmap.Copy();
-						Action createInstance = () => {
-							fixed (void* data2 = bitmap.Pixels) {
-								Pointer = GenTexture(data2, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
-							}
-							bm.Dispose();
-						};
-						Game.AsyncActions.Add(createInstance);
-						while (Game.AsyncActions.Contains(createInstance)) {
-
-						}
 					}
 				}
+			} else {
+				var asyncCopy = bitmap.Copy();
+				Action createInstance = () => {
+					unsafe {
+						fixed (void* data2 = asyncCopy.Pixels) {
+							Pointer = GenTexture(data2, (uint)asyncCopy.Width, (uint)asyncCopy.Height, PixelFormat.Bgra);
+						}
+					}
+					asyncCopy.Dispose();
+				};
+				Game.AsyncActions.Add(createInstance);
 			}
 
 			this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);
@@ -496,10 +494,10 @@ public class CTexture : IDisposable {
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
 		} catch {
 			this.Dispose();
-			// throw new CTextureCreateFailedException( string.Format( "テクスチャの生成に失敗しました。\n{0}", strファイル名 ) );
-			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n"));
+			throw new CTextureCreateFailedException("テクスチャの生成に失敗しました。\n");
 		}
 	}
+
 
 	public void tSetScale(float x, float y) {
 		vcScaleRatio.X = x;

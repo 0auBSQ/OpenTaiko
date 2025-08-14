@@ -15,6 +15,8 @@ class CLuaScript : IDisposable {
 	public List<LuaSound> SoundList = [];
 	public List<CVideoDecoder> VideoList = [];
 	public List<LuaText> TextList = [];
+	public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
+	public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
 
 	public LuaSaveFile? GetLuaSaveFile(int player) {
 		if (player < 0 || player > OpenTaiko.MAX_PLAYERS) {
@@ -222,8 +224,11 @@ class CLuaScript : IDisposable {
 			LuaScript["debugLog"] = DebugLog;
 
 			// New Lua Module API
-			LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, dir);
-			LuaScript["SOUND"] = new LuaSoundFunc(SoundList, dir);
+			var ltf = new LuaTextureFunc(TextureList, dir);
+			var lsf = new LuaSoundFunc(SoundList, dir);
+
+			LuaScript["TEXTURE"] = ltf;
+			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
 			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
@@ -232,6 +237,7 @@ class CLuaScript : IDisposable {
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
+			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

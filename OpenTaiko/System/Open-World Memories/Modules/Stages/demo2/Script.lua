@@ -7,6 +7,8 @@ local songList = nil
 local currentPage = {}
 local pageTexts = {}
 
+local currentBackground = 0
+
 
 local function refreshPage()
 	currentPage = {}
@@ -64,6 +66,8 @@ end
 
 
 function draw()
+	SHARED:GetSharedTexture("background"):Draw(0,0)
+
 	if textTex ~= nil then
 		textTex:Draw(400,400)
 	end
@@ -111,7 +115,7 @@ function update()
 		end 
 	end
 
-	-- Test
+	-- Test search song
 	if INPUT:KeyboardPressed("P") then
 		local sNode = songList:SearchFirstSongByPredicate(function(node)
 		 	return node.Maker == "bol"
@@ -125,6 +129,17 @@ function update()
 			end 
 		end
 	end
+
+	-- Test shared textures
+	if INPUT:KeyboardPressed("O") then
+		if currentBackground == 0 then
+			SHARED:SetSharedTexture("background", "Textures/bg1.png")
+			currentBackground = 1
+		else
+			SHARED:SetSharedTexture("background", "Textures/bg0.png")
+			currentBackground = 0
+		end
+	end 
 end
 
 function activate()
@@ -143,6 +158,8 @@ function onStart()
 	sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")
 	sounds.Decide = SOUND:CreateSFX("Sounds/Decide.ogg")
 	sounds.SongDecide = SOUND:CreateSFX("Sounds/SongDecide.ogg")
+
+	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 end 
 
 function afterSongEnum()
