@@ -185,7 +185,8 @@ function activate()
 end
 
 function deactivate()
-
+	local psnd = SHARED:GetSharedSound("presound")
+	psnd:Stop()
 end
 
 function onStart()

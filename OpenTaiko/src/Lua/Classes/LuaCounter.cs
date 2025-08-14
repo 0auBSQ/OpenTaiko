@@ -1,24 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Globalization;
 using NLua;
 
 namespace OpenTaiko {
 	public class LuaCounter {
-		public float Begin;
-		public float End;
-		public float Interval;
+		public double Begin;
+		public double End;
+		public double Interval;
 		private LuaFunction? lfEnded;
+		private List<Action<double>> lfListeners = [];
 
-		public float Value;
+		public double Value;
 
 		private bool Ticking;
 
-		public LuaCounter(float begin, float end, float interval, LuaFunction? ended = null) {
+		public LuaCounter(double begin, double end, double interval, LuaFunction? ended = null) {
 			Begin = begin;
 			End = end;
 			Interval = interval;
@@ -38,8 +32,14 @@ namespace OpenTaiko {
 			Value = 0;
 		}
 
+		public void Listen(Action<double> listener) {
+			lfListeners.Add(listener);
+		}
+
 		public void Tick() {
 			if (!Ticking || Value == End) return;
+
+
 
 			if (Interval == 0) {
 				Value = End;
@@ -48,8 +48,8 @@ namespace OpenTaiko {
 				return;
 			}
 
-			float nextValue = Value;
-			float add = 1.0f / Interval * (float)OpenTaiko.FPS.DeltaTime;
+			double nextValue = Value;
+			double add = 1.0f / Interval * OpenTaiko.FPS.DeltaTime;
 			if (End > Begin) {
 				nextValue += add;
 			} else {
@@ -64,9 +64,12 @@ namespace OpenTaiko {
 			}
 
 			Value = nextValue;
+
+			lfListeners.ForEach((listener) => listener(Value));
 		}
 
 		private void Ended() {
+			lfListeners.ForEach((listener) => listener(Value));
 			lfEnded?.Call();
 		}
 	}
@@ -74,7 +77,7 @@ namespace OpenTaiko {
 	public class LuaCounterFunc {
 		public LuaCounterFunc() { }
 
-		public LuaCounter CreateCounter(float begin, float end, float interval, LuaFunction? ended = null) {
+		public LuaCounter CreateCounter(double begin, double end, double interval, LuaFunction? ended = null) {
 			return new LuaCounter(begin, end, interval, ended);
 		}
 	}

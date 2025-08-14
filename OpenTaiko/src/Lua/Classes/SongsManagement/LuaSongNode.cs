@@ -231,23 +231,34 @@ namespace OpenTaiko {
 
 		#region [Media metadata]
 
+		private CScore? _GetFirstAvailableScore() {
+			if (_node == null || !IsSong) return null;
+			for (int i = 0; i < (int)Difficulty.Total; i++) {
+				if (_node.score[i] != null)
+					return _node.score[i];
+			}
+			return null;
+		}
+
 		public int DemoStart {
 			get {
-				return _node?.score[0]?.譜面情報.nデモBGMオフセット ?? 0;
+
+				return _GetFirstAvailableScore()?.譜面情報.nデモBGMオフセット ?? 0;
 			}
 		}
 
 		public string PreimagePath {
 			get {
-				var fPath = _node?.score[0]?.ファイル情報.フォルダの絶対パス ?? "";
-				var pPath = _node?.score[0]?.譜面情報.Preimage ?? "";
+				var score = _GetFirstAvailableScore();
+				var fPath = score?.ファイル情報.フォルダの絶対パス ?? "";
+				var pPath = score?.譜面情報.Preimage ?? "";
 				return ((!Path.IsPathRooted(pPath)) ? fPath : "") + pPath;
 			}
 		}
 
 		public string AudioPath {
 			get {
-				var score = _node?.score[0] ?? null;
+				var score = _GetFirstAvailableScore() ?? null;
 				if (score == null) return "";
 				return score.ファイル情報.フォルダの絶対パス + score.譜面情報.strBGMファイル名;
 			}
