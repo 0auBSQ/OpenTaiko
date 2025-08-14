@@ -194,6 +194,20 @@ internal class CSkin : IDisposable {
 			nPosition_NextPlayingSound = pan;
 		}
 
+		public void SetTimestamp(int ms) {
+			if (this.bNotLoadedYet) {
+				try {
+					tLoading();
+				} catch (Exception e) {
+					Trace.TraceError(e.ToString());
+					Trace.TraceError("例外が発生しましたが処理を継続します。 (17668977-4686-4aa7-b3f0-e0b9a44975b8)");
+					this.bNotLoadedYet = false;
+				}
+			}
+			this.rSound[0]?.tSetPositonToBegin(ms);
+			this.rSound[1]?.tSetPositonToBegin(ms);
+		}
+
 		public void tRemoveMixer() {
 			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectShow") {
 				for (int i = 0; i < 2; i++) {

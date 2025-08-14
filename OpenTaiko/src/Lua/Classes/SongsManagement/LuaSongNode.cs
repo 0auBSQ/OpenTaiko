@@ -229,6 +229,32 @@ namespace OpenTaiko {
 
 		#endregion
 
+		#region [Media metadata]
+
+		public int DemoStart {
+			get {
+				return _node?.score[0]?.譜面情報.nデモBGMオフセット ?? 0;
+			}
+		}
+
+		public string PreimagePath {
+			get {
+				var fPath = _node?.score[0]?.ファイル情報.フォルダの絶対パス ?? "";
+				var pPath = _node?.score[0]?.譜面情報.Preimage ?? "";
+				return ((!Path.IsPathRooted(pPath)) ? fPath : "") + pPath;
+			}
+		}
+
+		public string AudioPath {
+			get {
+				var score = _node?.score[0] ?? null;
+				if (score == null) return "";
+				return score.ファイル情報.フォルダの絶対パス + score.譜面情報.strBGMファイル名;
+			}
+		}
+
+		#endregion
+
 		#region [General metadata]
 
 		public string? UniqueId {

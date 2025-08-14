@@ -479,14 +479,17 @@ public class CTexture : IDisposable {
 			} else {
 				var asyncCopy = bitmap.Copy();
 				Action createInstance = () => {
-					unsafe {
-						fixed (void* data2 = asyncCopy.Pixels) {
-							Pointer = GenTexture(data2, (uint)asyncCopy.Width, (uint)asyncCopy.Height, PixelFormat.Bgra);
+					try {
+						unsafe {
+							fixed (void* data2 = asyncCopy.Pixels) {
+								Pointer = GenTexture(data2, (uint)asyncCopy.Width, (uint)asyncCopy.Height, PixelFormat.Bgra);
+							}
 						}
+					} finally {
+						asyncCopy.Dispose();
 					}
-					asyncCopy.Dispose();
 				};
-				Game.AsyncActions.Add(createInstance);
+				Game.AsyncActions.Enqueue(createInstance);
 			}
 
 			this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);

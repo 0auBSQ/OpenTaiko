@@ -38,6 +38,10 @@ namespace OpenTaiko {
 		public void SetPan(int panning) {
 			_sound?.SetPanning(panning);
 		}
+
+		public void SetTimestamp(int ms) {
+			_sound?.SetTimestamp(ms);
+		}
 		#endregion
 		#region Dispose
 		private bool _disposedValue;
@@ -72,8 +76,28 @@ namespace OpenTaiko {
 		public LuaSound CreateVoice(string path) => CreateSound(path, ESoundGroup.Voice);
 		public LuaSound CreateBGM(string path) => CreateSound(path, ESoundGroup.SongPlayback);
 		public LuaSound CreatePreview(string path) => CreateSound(path, ESoundGroup.SongPreview);
+		public LuaSound CreateSFXFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SoundEffect);
+		public LuaSound CreateVoiceFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.Voice);
+		public LuaSound CreateBGMFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPlayback);
+		public LuaSound CreatePreviewFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPreview);
 		private LuaSound CreateSound(string path, ESoundGroup group) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+
+			LuaSound sound = new();
+
+			try {
+				sound = new(full_path, group);
+				Sounds.Add(sound);
+			} catch (Exception e) {
+				LogNotification.PopError($"Lua Sound failed to load: {e}");
+				sound?.Dispose();
+				sound = new();
+			}
+			return sound;
+		}
+
+		private LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group) {
+			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaSound sound = new();
 

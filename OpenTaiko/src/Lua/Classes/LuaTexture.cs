@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
+﻿using FDK;
 
 namespace OpenTaiko {
 	public class LuaTexture : IDisposable {
@@ -158,9 +153,28 @@ namespace OpenTaiko {
 					luatex?.Dispose();
 					luatex = new();
 				}
-			}
-			else {
+			} else {
 				LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
+			}
+			return luatex;
+		}
+
+		public LuaTexture CreateTextureFromAbsolutePath(string path) {
+			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+
+			LuaTexture luatex = new();
+			if (File.Exists(full_path)) {
+				try {
+					var tex = OpenTaiko.tテクスチャの生成(full_path);
+					luatex = new LuaTexture(tex);
+					Textures.Add(tex);
+				} catch (Exception e) {
+					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
+					luatex?.Dispose();
+					luatex = new();
+				}
+			} else {
+				//LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
 			}
 			return luatex;
 		}

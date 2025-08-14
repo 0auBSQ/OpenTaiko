@@ -9,6 +9,34 @@ local pageTexts = {}
 
 local currentBackground = 0
 
+local function reloadPreimage(songNode)
+	if songNode.IsSong == true then 
+		SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+	else
+		SHARED:SetSharedTextureUsingAbsolutePath("preimage", '')
+	end
+end
+
+local function drawPreimage()
+	local tex = SHARED:GetSharedTexture("preimage")
+	if tex.Height > 0 and tex.Width > 0 then
+		local sH = 400 / tex.Height
+		local sW = 400 / tex.Width
+		tex:SetScale(sW, sH)
+		tex:Draw(800, 400)
+	end
+end
+
+local function playPreview(songNode)
+	local psnd = SHARED:GetSharedSound("presound")
+	psnd:Stop()
+	if songNode.IsSong == true then
+		SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
+			snd:Play()
+			snd:SetTimestamp(songNode.DemoStart)
+		end)
+	end
+end
 
 local function refreshPage()
 	currentPage = {}
@@ -20,6 +48,12 @@ local function refreshPage()
 		if node == nil then pageTexts[i] = nil
 		elseif i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
 		else pageTexts[i] = text:GetText(node.Title)
+		end
+
+		-- Assets reload for selected songs
+		if i == 0  and node ~= nil then
+			reloadPreimage(node)
+			playPreview(node)
 		end
 	end
 end
@@ -40,7 +74,8 @@ local function handleDecide()
 			sounds.Decide:Play()
 		end
 	elseif ssn.IsSong == true then
-		local success = ssn:Mount(5) -- for testing, go directly for tower and only 1P
+		local success = ssn:Mount(3)
+		-- local success = ssn:Mount(5) -- for testing, go directly for tower and only 1P
 		if success == true then
 			sounds.SongDecide:Play()
 			return true -- transition to song select if true
@@ -48,7 +83,8 @@ local function handleDecide()
 	elseif ssn.IsRandom == true then
 		local rdNd = songList:GetRandomNodeInFolder(ssn)
 		if rdNd ~= nil then
-			local success = rdNd:Mount(5) -- for testing, go directly for tower and only 1P
+			local success = rdNd:Mount(3)
+			-- local success = rdNd:Mount(5) -- for testing, go directly for tower and only 1P
 			if success == true then
 				sounds.SongDecide:Play()
 				return true -- transition to song select if true
@@ -67,6 +103,7 @@ end
 
 function draw()
 	SHARED:GetSharedTexture("background"):Draw(0,0)
+	drawPreimage()
 
 	if textTex ~= nil then
 		textTex:Draw(400,400)
@@ -122,7 +159,7 @@ function update()
 		end)
 		-- local sNode = songList:GetSongByUniqueId("swtowerwttcSukima")
 		if sNode ~= nil then
-			local success = sNode:Mount(5)
+			local success = sNode:Mount(3)
 			if success == true then
 				sounds.SongDecide:Play()
 				return Exit("play", nil)
@@ -166,7 +203,7 @@ function afterSongEnum()
 	local lsls = GenerateSongListSettings()
 	-- Test options here
 	lsls.ModuloPagination = false
-	lsls.RootGenreFolder = "太鼓タワー"
+	-- lsls.RootGenreFolder = "太鼓タワー"
 
 	-- Get song list 
 	songList = RequestSongList(lsls)

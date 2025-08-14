@@ -19,9 +19,9 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using FDK;
 using ImGuiNET;
 using Silk.NET.Core;
 using Silk.NET.GLFW;
@@ -85,7 +85,7 @@ public abstract class Game : IDisposable {
 #endif
 	}
 
-	public static List<Action> AsyncActions { get; private set; } = new();
+	public static ConcurrentQueue<Action> AsyncActions { get; private set; } = new ConcurrentQueue<Action>();
 
 	private string strIconFileName;
 
@@ -290,9 +290,9 @@ public abstract class Game : IDisposable {
 
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
 		if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland") {
-		    Silk.NET.Windowing.Sdl.SdlWindowing.Use();
+			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 		} else {
-		    Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
+			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
 		}
 
 		Window_ = Window.Create(options);
@@ -431,7 +431,7 @@ public abstract class Game : IDisposable {
 
 		if (!OperatingSystem.IsMacOS())
 			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
-		
+
 		Context.SwapInterval(VSync ? 1 : 0);
 
 		Initialize();
@@ -459,10 +459,21 @@ public abstract class Game : IDisposable {
 	public void Window_Render(double deltaTime) {
 		Camera = Matrix4X4<float>.Identity;
 
+		/*
 		if (AsyncActions.Count > 0) {
 			AsyncActions[0]?.Invoke();
 			AsyncActions.Remove(AsyncActions[0]);
 		}
+		*/
+
+		if (AsyncActions.TryDequeue(out var action)) {
+			try {
+				action();
+			} catch (Exception ex) {
+				Console.Error.WriteLine($"Error in async action: {ex}");
+			}
+		}
+
 		Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 		Draw();
