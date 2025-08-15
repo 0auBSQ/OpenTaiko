@@ -6,6 +6,9 @@ local sounds = {}
 local songList = nil
 local currentPage = {}
 local pageTexts = {}
+local genre_overlays = {}
+
+local bars = {}
 
 local currentBackground = 0
 
@@ -46,8 +49,16 @@ local function refreshPage()
 		local node = songList:GetSongNodeAtOffset(i)
 		currentPage[i] = node
 		if node == nil then pageTexts[i] = nil
-		elseif i == 0 then pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
-		else pageTexts[i] = text:GetText(node.Title)
+		elseif i == 0 then
+			pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
+			if genre_overlays[node.Genre] == nil then
+				genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
+			end
+		else
+			pageTexts[i] = text:GetText(node.Title)
+			if genre_overlays[node.Genre] == nil then
+				genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
+			end
 		end
 
 		-- Assets reload for selected songs
@@ -96,6 +107,7 @@ local function handleDecide()
 end
 
 local function handleFolderClose()
+	if songlist == nil then return Exit("title", nil) end
 	-- if no folder to close, trigger exit scene instead
 	return songList:CloseFolder()
 end
@@ -112,7 +124,20 @@ function draw()
 		for i, tx in pairs(pageTexts) do
 			-- can be nil if no modulo pagination
 			if tx ~= nil then 
-				tx:Draw(100, 500+i*100)
+				if currentPage[i].IsSong or currentPage[i].IsFolder then
+					if currentPage[i].IsLocked then
+						bars["locked"]:DrawAtAnchor(400,500+i*100,"Center")
+					else
+						bars["bar"]:SetColor(currentPage[i].BoxColor)
+						bars["bar"]:DrawAtAnchor(400,500+i*100,"Center")
+						genre_overlays[currentPage[i].Genre]:DrawAtAnchor(400,500+i*100,"Center")
+					end
+				elseif currentPage[i].IsRandom then
+					bars["random"]:DrawAtAnchor(400,500+i*100,"Center")
+				elseif currentPage[i].IsReturn then
+					bars["back"]:DrawAtAnchor(400,500+i*100,"Center")
+				end
+				tx:DrawAtAnchor(360, 500+i*100,"Center")
 			end
 		end
 	end
@@ -121,7 +146,29 @@ function draw()
 end
 
 function update()
-	if INPUT:Pressed("Cancel") == true or INPUT:KeyboardPressed("Escape") == true then
+	if INPUT:KeyboardPressed("S") then
+		sounds.Skip:Play()
+		return Exit("stage", "demo1")
+	end
+
+	-- Navigation
+	if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
+		sounds.Skip:Play()
+		songList:Move(1)
+		refreshPage()
+	end
+	if (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
+		sounds.Skip:Play()
+		songList:Move(-1)
+		refreshPage()
+	end
+	if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+		local isPlayStarted = handleDecide()
+		if isPlayStarted == true then
+			return Exit("play", nil)
+		end 
+	end
+	if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
 		local closeFolder = handleFolderClose()
 		if closeFolder == true then
 			refreshPage()
@@ -130,26 +177,6 @@ function update()
 			sounds.Cancel:Play()
 			return Exit("title", nil)
 		end
-	end
-	if INPUT:KeyboardPressed("S") == true then
-		sounds.Skip:Play()
-		return Exit("stage", "demo1")
-	end
-	if INPUT:KeyboardPressed("K") == true and songList ~= nil then
-		sounds.Skip:Play()
-		songList:Move(1)
-		refreshPage()
-	end
-	if INPUT:KeyboardPressed("D") == true and songList ~= nil then
-		sounds.Skip:Play()
-		songList:Move(-1)
-		refreshPage()
-	end
-	if INPUT:Pressed("Decide") == true or INPUT:KeyboardPressed("Return") == true then
-		local isPlayStarted = handleDecide()
-		if isPlayStarted == true then
-			return Exit("play", nil)
-		end 
 	end
 
 	-- Test search song
@@ -198,6 +225,12 @@ function onStart()
 	sounds.SongDecide = SOUND:CreateSFX("Sounds/SongDecide.ogg")
 
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
+	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
+	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
+	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
+	bars["locked"] = TEXTURE:CreateTexture("Textures/locked.png")
+
+	genre_overlays = {}
 end 
 
 function afterSongEnum()
@@ -217,5 +250,11 @@ function onDestroy()
 	end
 	for _, sound in pairs(sounds) do
 		sound:Dispose()
+	end
+	for _, bar in pairs(bars) do
+		bar:Dispose()
+	end
+	for _, overlay in pairs(genre_overlays) do
+		overlay:Dispose()
 	end
 end

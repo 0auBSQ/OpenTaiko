@@ -14,6 +14,7 @@ namespace OpenTaiko {
 		public byte A = 0xFF;
 
 		public LuaColor(byte r, byte g, byte b, byte a = 0xFF) { R = r; G = g; B = b; A = a; }
+		public LuaColor(Color color) { R = color.R; G = color.G; B = color.B; A = color.A; }
 	}
 
 	public class LuaColorFunc {
