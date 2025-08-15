@@ -10,6 +10,9 @@ local genre_overlays = {}
 
 local bars = {}
 
+local favoriteicon = nil
+local flashcounter = nil
+
 local currentBackground = 0
 
 local function reloadPreimage(songNode)
@@ -143,9 +146,15 @@ function draw()
 	end
 
 	NAMEPLATE:DrawPlayerNameplate(800, 100, 255, 0)
+
+	if favoriteicon ~= nil then
+		favoriteicon:Draw(1200, 400)
+	end
 end
 
 function update()
+	flashcounter:Tick()
+
 	if INPUT:KeyboardPressed("S") then
 		sounds.Skip:Play()
 		return Exit("stage", "demo1")
@@ -209,9 +218,20 @@ end
 function activate()
 	test = GetSaveFile(0)
 	-- textTex = text:GetText("You played " .. tostring(test.TotalPlaycount) .. " charts...")
+
+	flashcounter = COUNTER:CreateCounter(255, 0, -1 / 127)
+	flashcounter:SetBounce(true)
+	flashcounter:Listen(function (val)
+		if favoriteicon ~= nil then
+			favoriteicon:SetOpacity(val / 255)
+		end
+	end)
+	flashcounter:Start()
 end
 
 function deactivate()
+	flashcounter = COUNTER:EmptyCounter()
+
 	local psnd = SHARED:GetSharedSound("presound")
 	psnd:Stop()
 end
@@ -230,7 +250,11 @@ function onStart()
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
 	bars["locked"] = TEXTURE:CreateTexture("Textures/locked.png")
 
+	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
+
 	genre_overlays = {}
+
+	flashcounter = COUNTER:EmptyCounter()
 end 
 
 function afterSongEnum()
@@ -247,6 +271,9 @@ end
 function onDestroy()
 	if textTex ~= nil then
 		textTex:Dispose()
+	end
+	if favoriteicon ~= nil then
+		favoriteicon:Dispose()
 	end
 	for _, sound in pairs(sounds) do
 		sound:Dispose()
