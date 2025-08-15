@@ -158,21 +158,21 @@ namespace OpenTaiko {
 			}
 		}
 
-		public Color? ForeColor {
+		public LuaColor? ForeColor {
 			get {
-				return _node?.ForeColor ?? null;
+				return _node != null ? new(_node.ForeColor) : null;
 			}
 		}
 
-		public Color? BackColor {
+		public LuaColor? BackColor {
 			get {
-				return _node?.BackColor ?? null;
+				return _node != null ? new(_node.BackColor) : null;
 			}
 		}
 
-		public Color? BoxColor {
+		public LuaColor? BoxColor {
 			get {
-				return _node?.BoxColor ?? null;
+				return _node != null ? new(_node.BoxColor) : null;
 			}
 		}
 
