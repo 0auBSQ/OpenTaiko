@@ -269,8 +269,8 @@ function afterSongEnum()
 end
 
 function onDestroy()
-	if textTex ~= nil then
-		textTex:Dispose()
+	if text ~= nil then
+		text:Dispose()
 	end
 	if favoriteicon ~= nil then
 		favoriteicon:Dispose()
