@@ -239,6 +239,7 @@ class CLuaScript : IDisposable {
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
 			LuaScript["STORAGE"] = new LuaDataStorageFunc(dir);
+			LuaScript["I18N"] = new LuaI18NFunc();
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

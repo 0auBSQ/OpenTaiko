@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenTaiko;
 
 // https://github.com/Burtsev-Alexey/net-object-deep-copy/blob/master/ObjectExtensions.cs
 
@@ -275,4 +274,15 @@ namespace System {
 			}
 		}
 	}
+
+	public static class DirectoryUtils {
+		public static IEnumerable<string> SafeGetDirectories(string path, string searchPattern = "*", SearchOption option = SearchOption.TopDirectoryOnly) {
+			try {
+				return Directory.GetDirectories(path, searchPattern, option);
+			} catch (Exception) {
+				return Enumerable.Empty<string>();
+			}
+		}
+	}
+
 }

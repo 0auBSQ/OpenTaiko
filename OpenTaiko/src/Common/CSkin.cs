@@ -623,10 +623,15 @@ internal class CSkin : IDisposable {
 		MainMenuSettings.tReloadMenus();
 
 		// Lua Stages
-		string[] _modulesList = Directory.GetDirectories(CSkin.Path($"Modules/Stages"), "*", SearchOption.TopDirectoryOnly).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		string[] _modulesList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Stages")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		string[] _globalModulesList = DirectoryUtils.SafeGetDirectories($"Global/Stages").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 
 		foreach (string _module in _modulesList) {
-			LuaStageWrapper _lsw = new LuaStageWrapper(_module);
+			LuaStageWrapper _lsw = new LuaStageWrapper(_module, false);
+		}
+
+		foreach (string _module in _globalModulesList) {
+			LuaStageWrapper _lsw = new LuaStageWrapper(_module, true);
 		}
 
 		LuaStageWrapper.PropagateOnStart();

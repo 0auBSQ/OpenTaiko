@@ -73,11 +73,12 @@
 			lcStageScript?.Dispose();
 		}
 
-		public LuaStageWrapper(string name) {
+		public LuaStageWrapper(string name, bool isGlobal = false) {
 			base.eStageID = EStage.CUSTOM;
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
-			lcStageScript = new CLuaStageScript(CSkin.Path($"Modules/Stages/{name}"), name);
+			if (isGlobal == false) lcStageScript = new CLuaStageScript(CSkin.Path($"Modules/Stages/{name}"), name);
+			else lcStageScript = new CLuaStageScript(CSkin.Path($"Global/Stages/{name}"), $"[GLOBAL]{name}");
 			lcStageScript.AttachExitCallBack(RequestExitStage);
 
 			_allLuaStages.Add(name, this);
@@ -93,7 +94,7 @@
 				_ => CStageSongSelect.EReturnValue.BackToTitle
 			};
 
-			if (moduleName != null) _nextRequestedStage = moduleName;
+			if (moduleName != null && transition == "stage") _nextRequestedStage = moduleName;
 
 			return _rv;
 		}
