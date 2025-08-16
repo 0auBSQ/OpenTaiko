@@ -30,5 +30,21 @@
 		"LuaStageName": "demo2",
 		"Restricted1P": true,
 		"LEGACY_MenuBoxColor": "Green"
+	},
+	{
+		"StageName": {
+			"strings": {
+				"default": "Let's play with data"
+			}	
+		},
+		"StageDescription": {
+			"strings": {
+				"default": "Things are more interesting when permanent."
+			}
+		},
+		"StageType": "Lua",
+		"LuaStageName": "demo3",
+		"Restricted1P": false,
+		"LEGACY_MenuBoxColor": "Blue"
 	}
 ]

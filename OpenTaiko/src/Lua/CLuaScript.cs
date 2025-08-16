@@ -238,6 +238,7 @@ class CLuaScript : IDisposable {
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
+			LuaScript["STORAGE"] = new LuaDataStorageFunc(dir);
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

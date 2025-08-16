@@ -3,6 +3,7 @@
     <ProjectReference Include="..\FDK\FDK.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LightningDB" Version="0.18.1" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
