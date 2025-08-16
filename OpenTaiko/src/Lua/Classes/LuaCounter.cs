@@ -148,21 +148,32 @@ namespace OpenTaiko {
 		private void DoBounce(double value) {
 			double min = Math.Min(Begin, End);
 			double max = Math.Max(Begin, End);
-			double _value = value;
+			double length = max - min;
 
-			while (_value < min || _value > max) {
-				if (_value > max) {
-					double overshoot = _value - max;
-					_value = max - overshoot;
-					Interval *= -1;
-				} else if (_value < min) {
-					double overshoot = min - _value;
-					_value = min + overshoot;
-					Interval *= -1;
-				}
+			double shifted = value - min;
+			double period = 2 * length;
+
+			// Normalize into [0, 2*length)
+			double mod = shifted % period;
+			if (mod < 0) mod += period;
+
+			// Bounce fold
+			double folded;
+			bool bounced;
+			if (mod <= length) {
+				folded = mod;
+				bounced = false;
+			} else {
+				folded = period - mod;
+				bounced = true;
 			}
 
-			Value = value;
+			Value = min + folded;
+
+			// Flip sign if we landed in a reflected segment
+			if (bounced) {
+				Interval = -Interval;
+			}
 		}
 
 
