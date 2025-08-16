@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿/*
+using FDK;
 
 namespace OpenTaiko;
 
@@ -271,3 +272,5 @@ class CMenuCharacter {
 		}
 	}
 }
+
+*/

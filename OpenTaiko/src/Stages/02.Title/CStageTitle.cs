@@ -26,6 +26,11 @@ internal class CStageTitle : CStage {
 		Trace.TraceInformation("タイトルステージを活性化します。");
 		Trace.Indent();
 		try {
+			for (int i = 0; i < 5; i++) {
+				CCharacter character = CCharacter.GetCharacter(i);
+				character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
+			}
+
 			UnloadSaveFile();
 
 			this.PuchiChara.IdleAnimation();
@@ -198,28 +203,37 @@ internal class CStageTitle : CStage {
 						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)) {
 						// Hit 1P save
 						OpenTaiko.SaveFile = 0;
-						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 						this.ctSaveLoading.Start(0, 600, 1, OpenTaiko.Timer);
 						this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
-						for (int i = 0; i < 2; i++)
+						for (int i = 0; i < 5; i++) {
+							CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+							character.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_NORMAL);
+
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+						}
 					} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed2P) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed2P)) {
 						// Hit 2P save
 						OpenTaiko.SaveFile = 1;
-						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 						this.ctSaveLoading.Start(0, 600, 1, OpenTaiko.Timer);
 						this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
-						for (int i = 0; i < 2; i++)
+						for (int i = 0; i < 5; i++) {
+							CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+							character.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_NORMAL);
+
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+						}
 					} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.P)) // In case "P" is already binded to another pad
 					{
 						// Hit 1P save
 						OpenTaiko.SaveFile = 0;
-						CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
 						this.ctSaveLoading.Start(0, 600, 1, OpenTaiko.Timer);
 						this.ctSaveLoading.CurrentValue = (int)this.ctSaveLoading.EndValue;
-						for (int i = 0; i < 2; i++)
+						for (int i = 0; i < 5; i++) {
+							CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+							character.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_NORMAL);
+
 							OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+						}
 					}
 				}
 
@@ -322,13 +336,12 @@ internal class CStageTitle : CStage {
 
 				if (ctエントリーバー決定点滅.CurrentValue >= 1055) {
 					if (!bモード選択) {
-						/*
-						if (!TJAPlayer3.Skin.soundsanka.bPlayed)
-							TJAPlayer3.Skin.soundsanka.t再生する();
-						*/
 
-						if (OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile] != null && !OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile].bPlayed)
-							OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile]?.tPlay();
+						for (int i = 0; i < 5; i++) {
+							CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+							character.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_NORMAL);
+							character.PlayVoice(CCharacter.VOICE_TITLE_SANKA);
+						}
 
 						ctキャライン.Start(0, 180, 2, OpenTaiko.Timer);
 						ctBarAnimeIn.Start(0, 1295, 1, OpenTaiko.Timer);
@@ -343,6 +356,11 @@ internal class CStageTitle : CStage {
 
 			Background.Update();
 			Background.Draw();
+
+			for (int i = 0; i < 5; i++) {
+				CCharacter entryCharacter = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+				entryCharacter.Update(i);
+			}
 
 			//if (Title_Background != null)
 			//	Title_Background.t2D描画(0, 0);
@@ -464,7 +482,10 @@ internal class CStageTitle : CStage {
 			if (bプレイヤーエントリー) {
 				if (!this.bキャラカウンター初期化) {
 					//this.ctキャラエントリーループ = new CCounter(0, Chara_Entry.Length - 1, 1000 / 60, TJAPlayer3.Timer);
-					CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
+					for (int i = 0; i < 5; i++) {
+						CCharacter entryCharacter = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+						entryCharacter.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_JUMP);
+					}
 
 					this.bキャラカウンター初期化 = true;
 				}
@@ -496,12 +517,8 @@ internal class CStageTitle : CStage {
 				int puchi_x = chara_x + OpenTaiko.Skin.Adjustments_MenuPuchichara_X[0];
 				int puchi_y = chara_y + OpenTaiko.Skin.Adjustments_MenuPuchichara_Y[0];
 
-				CMenuCharacter.tMenuDisplayCharacter(
-					0,
-					chara_x,
-					chara_y,
-					CMenuCharacter.ECharacterAnimation.ENTRY, alpha
-				);
+				CCharacter character = CCharacter.GetCharacter(_actual);
+				character.Draw(0, chara_x, chara_y, 1.0f, 1.0f, alpha, Color4.White, false);
 
 				/*
                 CMenuCharacter.tMenuDisplayCharacter(
@@ -598,11 +615,8 @@ internal class CStageTitle : CStage {
 					int puchi_x = chara_x + OpenTaiko.Skin.Adjustments_MenuPuchichara_X[player];
 					int puchi_y = chara_y + OpenTaiko.Skin.Adjustments_MenuPuchichara_Y[player];
 
-					//Entry_Chara_Normal[ctキャラループ.n現在の値].t2D描画(-200 + CharaX, 341 - CharaY);
-					CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
-
-					//int puchi_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
-					//int puchi_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
+					CCharacter character = CCharacter.GetCharacter(player);
+					character.Draw(player, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, player % 2 == 1);
 
 					this.PuchiChara.On進行描画(puchi_x, puchi_y, false, player: player);
 				}
@@ -915,8 +929,9 @@ internal class CStageTitle : CStage {
 			OpenTaiko.Skin.SoundBanapas.bPlayed = true;
 			//TJAPlayer3.Skin.soundsanka.bPlayed = true;
 
-			if (OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile] != null)
-				OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile].bPlayed = true;
+
+			//if (OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile] != null)
+			///	OpenTaiko.Skin.voiceTitleSanka[OpenTaiko.SaveFile].bPlayed = true;
 		}
 	}
 
@@ -929,11 +944,11 @@ internal class CStageTitle : CStage {
 		this.ctエントリーバー点滅 = new CCounter(0, 510, 2, OpenTaiko.Timer);
 		this.ctエントリーバー決定点滅 = new CCounter();
 
-		//this.ctキャラエントリーループ = new CCounter();
-		CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY);
 		this.ctキャライン = new CCounter();
-		//this.ctキャラループ = new CCounter(0, Entry_Chara_Normal.Length - 1, 1000 / 30, TJAPlayer3.Timer);
-		CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.ENTRY_NORMAL);
+		for (int i = 0; i < 5; i++) {
+			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+			character.SetLoopAnimation(i, CCharacter.ANIM_ENTRY_NORMAL);
+		}
 
 
 		this.ctBarAnimeIn = new CCounter();

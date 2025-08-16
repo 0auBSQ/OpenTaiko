@@ -171,7 +171,10 @@ internal class CActResultParameterPanel : CActivity {
 			if (!ctゲージアニメ[i].IsTicked)
 				ctゲージアニメ[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
 			ctゲージアニメ[i].CurrentValue = (int)ctゲージアニメ[i].EndValue;
+
+			CheckClear(i);
 		}
+
 
 		OpenTaiko.Skin.soundGauge.tStop();
 	}
@@ -227,10 +230,8 @@ internal class CActResultParameterPanel : CActivity {
 		ctUIMove = new CCounter();
 
 		for (int i = 0; i < 5; i++) {
-			CResultCharacter.tMenuResetTimer(CResultCharacter.ECharacterResult.NORMAL);
-			CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.CLEAR);
-			CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.FAILED);
-			CResultCharacter.tDisableCounter(CResultCharacter.ECharacterResult.FAILED_IN);
+			CCharacter character = CCharacter.GetCharacter(i);
+			character.SetLoopAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
 		}
 
 		gaugeValues = new int[5];
@@ -704,6 +705,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					if (ctUIMove.EndValue != 1000 && OpenTaiko.Skin.Result_Use1PUI && is1P) ctUIMove = new CCounter(0, 1000, 0.5, OpenTaiko.Timer);
 
+					/*
 					if (OpenTaiko.stageResults.bClear[p]) {
 						if (!CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.CLEAR))
 							CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.CLEAR);
@@ -714,6 +716,7 @@ internal class CActResultParameterPanel : CActivity {
 								 && !CResultCharacter.tIsCounterProcessing(p, CResultCharacter.ECharacterResult.FAILED))
 							CResultCharacter.tMenuResetTimer(p, CResultCharacter.ECharacterResult.FAILED);
 					}
+					*/
 
 
 					#endregion
@@ -730,11 +733,14 @@ internal class CActResultParameterPanel : CActivity {
 				//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 				//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
 
-				int chara_x = namePlate_x[pos] - (OpenTaiko.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
+				//int chara_x = namePlate_x[pos] - (OpenTaiko.Skin.Characters_UseResult1P[_charaId] ? uioffset_x : 0) + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
+				int chara_x = namePlate_x[pos] + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
 				int chara_y = namePlate_y[pos];
 
 				int p1chara_x = is2PSide ? OpenTaiko.Skin.Resolution[0] / 2 : 0;
 				int p1chara_y = OpenTaiko.Skin.Resolution[1] - (int)(uioffset_value * OpenTaiko.Skin.Resolution[1]);
+
+				/*
 				float renderRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][0];
 				float renderRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[_charaId][1];
 
@@ -775,6 +781,9 @@ internal class CActResultParameterPanel : CActivity {
 					}
 				} else
 					CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.NORMAL, pos);
+				*/
+				OpenTaiko.Tx.Characters[_charaId].Update(p);
+				OpenTaiko.Tx.Characters[_charaId].Draw(p, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, pos % 2 == 1);
 
 				#endregion
 
@@ -945,13 +954,7 @@ internal class CActResultParameterPanel : CActivity {
 							speech_bubble_y + (int)(OpenTaiko.Skin.Result_Speech_Text_Offset[1] * scale));
 					}
 					if (!b音声再生[11]) {
-						if (OpenTaiko.stageResults.nクリア[p] >= 1) {
-							//TJAPlayer3.Skin.soundDonClear.t再生する();
-							OpenTaiko.Skin.voiceResultClearSuccess[OpenTaiko.GetActualPlayer(p)]?.tPlay();
-						} else {
-							//TJAPlayer3.Skin.soundDonFailed.t再生する();
-							OpenTaiko.Skin.voiceResultClearFailed[OpenTaiko.GetActualPlayer(p)]?.tPlay();
-						}
+						CheckClear(p);
 
 						if (p == nDrawnPlayers - 1)
 							b音声再生[11] = true;
@@ -1176,6 +1179,19 @@ internal class CActResultParameterPanel : CActivity {
 	private CCounter ctUIMove;
 
 	private int nNowAISection;
+
+	private void CheckClear(int player) {
+		if (OpenTaiko.stageResults.nクリア[player] >= 1) {
+			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARSUCCESS);
+			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_CLEAR);
+		} else {
+			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARFAILED);
+			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_FAILED);
+			character.PlayAnimation(player, CCharacter.ANIM_RESULT_FAILED_IN);
+		}
+	}
 
 	private void NextAISection() {
 		ctAISectionChange = new CCounter(0, 2000, 1, OpenTaiko.Timer);

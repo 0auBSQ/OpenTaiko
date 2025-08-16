@@ -26,6 +26,7 @@
     <Content Include=".init/**" CopyToOutputDirectory="PreserveNewest" />
     <None Remove="system\open-world memories\modules\modal\Config.json" />
     <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="CharaScript.lua" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

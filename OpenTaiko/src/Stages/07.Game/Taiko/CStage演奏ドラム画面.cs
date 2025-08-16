@@ -545,22 +545,17 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 						this.actEnd.Start();
 
-						int Character = this.actChara.iCurrentCharacter[i];
+						//int Character = this.actChara.iCurrentCharacter[i];
+						CCharacter character = CCharacter.GetCharacter(i);
 
 						if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
-								if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-									this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
-								}
+							if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
+								character.PlayAnimation(i, CCharacter.ANIM_GAME_10COMBO_MAX);
 							}
 						} else if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-							if (OpenTaiko.Skin.Characters_Become_Cleared_Ptn[Character] != 0) {
-								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Cleared, true); ;
-							}
+							character.PlayAnimation(i, CCharacter.ANIM_GAME_CLEARED);
 						} else {
-							if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
-								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
-							}
+							character.PlayAnimation(i, CCharacter.ANIM_GAME_FAILED);
 						}
 					}
 				}

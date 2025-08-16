@@ -32,7 +32,12 @@ class CStageHeya : CStage {
 		ctChara_In = new CCounter();
 		//ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
-		CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
+		for (int i = 0; i < 5; i++)
+		{
+			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+			character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
+			character.PlayAnimation(i, CCharacter.ANIM_MENU_NORMAL);
+		}
 
 		bInSongPlayed = false;
 
@@ -134,7 +139,7 @@ class CStageHeya : CStage {
 
 		#region [Character stuff]
 
-		iCharacterCount = OpenTaiko.Skin.Characters_Ptn;
+		iCharacterCount = OpenTaiko.Tx.Characters.Length;
 
 		ttkCharacterAuthors = new TitleTextureKey[iCharacterCount];
 		ttkCharacterNames = new TitleTextureKey[iCharacterCount];
@@ -219,21 +224,12 @@ class CStageHeya : CStage {
 
 		#region [Render field]
 
-		float renderRatioX = 1.0f;
-		float renderRatioY = 1.0f;
-
-		if (OpenTaiko.Skin.Characters_Resolution[iCharacterCurrent] != null) {
-			renderRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[iCharacterCurrent][0];
-			renderRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[iCharacterCurrent][1];
-		}
-
-		if (OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent] != null) {
-			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.X = renderRatioX;
-			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.Y = renderRatioY;
-		}
 		if (iCurrentMenu == CurrentMenu.Puchi || iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Heya_Render_Field?.t2D描画(0, 0);
 		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
-		if (iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
+		if (iCurrentMenu == CurrentMenu.Chara) {
+			OpenTaiko.Tx.Characters[iCharacterCurrent].DrawHeyaRender(0, 0);
+			//OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
+		}
 
 		#endregion
 
@@ -297,35 +293,21 @@ class CStageHeya : CStage {
 			for (int i = -(OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2); i < (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2) + 1; i++) {
 				int pos = (iCharacterCount * 5 + iCharacterCurrent + i) % iCharacterCount;
 
-				float charaRatioX = 1.0f;
-				float charaRatioY = 1.0f;
-
+				Color4 color;
 				if (i != 0) {
-					OpenTaiko.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
+					color = CConversion.ColorToColor4(Color.DarkGray);
 					OpenTaiko.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 					OpenTaiko.Tx.Heya_Lock?.tUpdateColor4(CConversion.ColorToColor4(Color.DarkGray));
 				} else {
-					OpenTaiko.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+					color = CConversion.ColorToColor4(Color.White);
 					OpenTaiko.Tx.Heya_Center_Menu_Box_Slot?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 					OpenTaiko.Tx.Heya_Lock?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 				}
 
 				var scroll = DrawBox_Slot(i + (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2));
 
-				if (OpenTaiko.Skin.Characters_Resolution[pos] != null) {
-					charaRatioX = OpenTaiko.Skin.Resolution[0] / (float)OpenTaiko.Skin.Characters_Resolution[pos][0];
-					charaRatioY = OpenTaiko.Skin.Resolution[1] / (float)OpenTaiko.Skin.Characters_Resolution[pos][1];
-				}
-
-				if (OpenTaiko.Tx.Characters_Heya_Preview[pos] != null) {
-					OpenTaiko.Tx.Characters_Heya_Preview[pos].vcScaleRatio.X = charaRatioX;
-					OpenTaiko.Tx.Characters_Heya_Preview[pos].vcScaleRatio.Y = charaRatioY;
-				}
-
-				OpenTaiko.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
-					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1]);
-
-				OpenTaiko.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
+				OpenTaiko.Tx.Characters[pos].DrawPreview(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
+					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1], 1.0f, 1.0f, 255, color);
 
 				#region [Database related values]
 
@@ -344,7 +326,7 @@ class CStageHeya : CStage {
 				}
 
 				if (OpenTaiko.Tx.Characters[pos].unlock != null
-					&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[pos]))
+					&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Tx.Characters[pos].dirName))
 					OpenTaiko.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(scroll.Item1, scroll.Item2);
 
 				#endregion
@@ -500,8 +482,6 @@ class CStageHeya : CStage {
 			CharaX = -200 + (float)Math.Sin(ctChara_In.CurrentValue / 2 * (Math.PI / 180)) * 200f;
 			CharaY = ((float)Math.Sin((90 + (ctChara_In.CurrentValue / 2)) * (Math.PI / 180)) * 150f);
 
-			//int _charaId = TJAPlayer3.NamePlateConfig.data.Character[TJAPlayer3.GetActualPlayer(0)];
-
 			//int chara_x = (int)(TJAPlayer3.Skin.Characters_Menu_X[_charaId][0] + (-200 + CharaX));
 			//int chara_y = (int)(TJAPlayer3.Skin.Characters_Menu_Y[_charaId][0] - CharaY);
 
@@ -514,7 +494,9 @@ class CStageHeya : CStage {
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].Opacity = ctChara_In.n現在の値 * 2;
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
-			CMenuCharacter.tMenuDisplayCharacter(0, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.NORMAL);
+			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(0));
+			character.Update(0);
+			character.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
 
 			#region [PuchiChara]
 
@@ -599,21 +581,23 @@ class CStageHeya : CStage {
 					OpenTaiko.Tx.ReloadCharacter(OpenTaiko.SaveFileInstances[iPlayer].data.Character, iCharacterCurrent, iPlayer);
 					OpenTaiko.SaveFileInstances[iPlayer].data.Character = iCharacterCurrent;
 
+					CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(0));
+
 					// Update the character
-					OpenTaiko.SaveFileInstances[iPlayer].tUpdateCharacterName(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent]);
+					OpenTaiko.SaveFileInstances[iPlayer].tUpdateCharacterName(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
 
 					// Welcome voice using Sanka
-					OpenTaiko.Skin.voiceTitleSanka[iPlayer]?.tPlay();
+					character.PlayVoice(CCharacter.VOICE_TITLE_SANKA);
 
-					CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
+					character.SetLoopAnimation(0, CCharacter.ANIM_MENU_NORMAL);
 
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
 					iCurrentMenu = CurrentMenu.ReturnToMenu;
 					this.tResetOpts();
 				} else if (ess == ESelectStatus.SUCCESS) {
-					OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Add(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent]);
-					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[iPlayer].data.SaveId, "unlocked_characters", OpenTaiko.Skin.Characters_DirName[iCharacterCurrent]);
+					OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Add(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
+					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[iPlayer].data.SaveId, "unlocked_characters", OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
 					if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockCH)
 						OpenTaiko.SaveFileInstances[iPlayer].tSpendCoins(OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.Values[0]);
 					else if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockAndComb || OpenTaiko.Tx.Characters[iCharacterCurrent].unlock is CUnlockOrComb)
@@ -780,7 +764,7 @@ class CStageHeya : CStage {
 				iTitleCurrent = plate.i + 1;
 		}
 
-		iCharacterCurrent = Math.Max(0, Math.Min(OpenTaiko.Skin.Characters_Ptn - 1, OpenTaiko.SaveFileInstances[iPlayer].data.Character));
+		iCharacterCurrent = Math.Max(0, Math.Min(OpenTaiko.Tx.Characters.Length - 1, OpenTaiko.SaveFileInstances[iPlayer].data.Character));
 
 		//iPuchiCharaCurrent = Math.Max(0, Math.Min(TJAPlayer3.Skin.Puchichara_Ptn - 1, TJAPlayer3.NamePlateConfig.data.PuchiChara[this.iPlayer]));
 		iPuchiCharaCurrent = PuchiChara.tGetPuchiCharaIndexByName(this.iPlayer);
@@ -870,7 +854,7 @@ class CStageHeya : CStage {
 		#region [Check unlockable]
 
 		if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock != null
-			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent])) {
+			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName)) {
 			string _cond = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMessage();
 			this.ttkInfoSection = new TitleTextureKey(_cond, this.pfHeyaFont, Color.White, Color.Black, 1000);
 		} else
@@ -882,7 +866,7 @@ class CStageHeya : CStage {
 		// Add "If unlocked" to select directly
 
 		if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock != null
-			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[iCharacterCurrent])) {
+			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName)) {
 			(bool, string?) response = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(OpenTaiko.SaveFile);
 			//TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
 			//new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });

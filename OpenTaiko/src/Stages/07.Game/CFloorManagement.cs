@@ -25,7 +25,7 @@ static internal class CFloorManagement {
 			CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDurationSpeedDependent + 1000, 1, OpenTaiko.Timer);
 			CFloorManagement.CurrentNumberOfLives--;
 			//TJAPlayer3.Skin.soundTowerMiss.t再生する();
-			OpenTaiko.Skin.voiceTowerMiss[OpenTaiko.SaveFile]?.tPlay();
+			CCharacter.GetCharacter(OpenTaiko.SaveFile).PlayVoice(CCharacter.VOICE_TOWER_MISS);
 		}
 	}
 

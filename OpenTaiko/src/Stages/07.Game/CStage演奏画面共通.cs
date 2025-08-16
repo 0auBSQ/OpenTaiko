@@ -769,6 +769,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private void UpdateCharaCounter(int nPlayer) {
 		ctChipAnime[nPlayer] = new CCounter(0, 3, CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * 1 / 4), SoundManager.PlayTimer);
 		OpenTaiko.stageGameScreen.PuchiChara.ChangeBPM(CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]));
+
+		CCharacter.GetCharacter(nPlayer).SetAnimationCyclesToBPM(nPlayer, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]);
 	}
 
 	public void AddMixer(CSound cs, bool _b演奏終了後も再生が続くチップである) {
@@ -1068,12 +1070,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		this.bCurrentlyDrumRoll[player] = true;
 		this.actChara.b風船連打中[player] = true;
+		CCharacter character = CCharacter.GetCharacter(player);
+
 		if (IsKusudama) {
 			this.actChara.IsInKusudama = true;
 			rollCount = pChip.nRollCount = ++nCurrentKusudamaRollCount;
 			balloon = nCurrentKusudamaCount;
 			if (nCurrentKusudamaCount > 0) {
-				actChara.ChangeAnime(player, CActImplCharacter.Anime.Kusudama_Breaking, true);
+				character.PlayAnimation(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (this.actBalloon.ct風船アニメ[i].IsUnEnded) {
 						this.actBalloon.ct風船アニメ[i] = new CCounter(0, 9, 14, OpenTaiko.Timer);
@@ -1084,7 +1089,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 		} else {
-			actChara.ChangeAnime(player, CActImplCharacter.Anime.Balloon_Breaking, true);
+			character.SetLoopAnimation(player, CCharacter.ANIM_GAME_BALLOON_BREAKING, false);
 
 
 			if (this.actBalloon.ct風船アニメ[player].IsUnEnded) {
@@ -1363,49 +1368,32 @@ internal abstract class CStage演奏画面共通 : CStage {
 			// ランナー(たたけたやつ)
 			this.actRunner.Start(nPlayer, false, pChip);
 
-			int Character = this.actChara.iCurrentCharacter[nPlayer];
+			CCharacter character = CCharacter.GetCharacter(nPlayer);
 
 			if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == false) {
-				if (OpenTaiko.Skin.Characters_Become_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Become_Maxed, true);
-				}
 				this.bIsAlreadyMaxed[nPlayer] = true;
+
+				actChara.ReturnDefaultAnime(nPlayer, true);
+				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
 			}
 			if (cleared && this.bIsAlreadyCleared[nPlayer] == false) {
-				if (OpenTaiko.Skin.Characters_Become_Cleared_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Become_Cleared, true);
-				}
 				this.bIsAlreadyCleared[nPlayer] = true;
+
+				actChara.ReturnDefaultAnime(nPlayer, true);
+				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
+
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
 			}
 		}
 
 		if (eJudgeResult == ENoteJudge.Poor || pChip.IsMissed || eJudgeResult == ENoteJudge.Bad) {
-			int Character = this.actChara.iCurrentCharacter[nPlayer];
+			CCharacter character = CCharacter.GetCharacter(nPlayer);
 
 			// ランナー(みすったやつ)
 			this.actRunner.Start(nPlayer, true, pChip);
-			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
-				this.bIsAlreadyMaxed[nPlayer] = false;
-				if (OpenTaiko.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.SoulOut, true);
-				}
-			} else if (!bIsGOGOTIME[nPlayer]) {
-				if (Chara_MissCount[nPlayer] == 1 - 1) {
-					if (OpenTaiko.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-						this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissIn, true);
-					}
-				} else if (Chara_MissCount[nPlayer] == 6 - 1) {
-					if (OpenTaiko.Skin.Characters_MissDownIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-						this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissDownIn, true);
-					}
-				}
-			}
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
-				if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.ClearOut, true);
-				}
+					character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 
 				switch (chara.effect.tGetGaugeType()) {
@@ -1436,12 +1424,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		void returnChara() {
-			int Character = this.actChara.iCurrentCharacter[nPlayer];
-			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
+			CCharacter character = CCharacter.GetCharacter(nPlayer);
+			if (!bIsGOGOTIME[nPlayer]) {
 				{
 					// 魂ゲージMAXではない
 					// ジャンプ_ノーマル
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Return, true);
+					character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_RETURN);
 					//this.actChara.キャラクター_アクション_10コンボ();
 				}
 			}
@@ -1479,10 +1467,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 					if (this.bIsMiss[nPlayer]) {
+						this.bIsMiss[nPlayer] = false;
+						actChara.ReturnDefaultAnime(nPlayer, true);
 						returnChara();
 					}
 
-					this.bIsMiss[nPlayer] = false;
 				}
 				break;
 			case ENoteJudge.Great:
@@ -1515,10 +1504,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
 					if (this.bIsMiss[nPlayer]) {
+						this.bIsMiss[nPlayer] = false;
+						actChara.ReturnDefaultAnime(nPlayer, true);
 						returnChara();
 					}
 
-					this.bIsMiss[nPlayer] = false;
 				}
 				break;
 			case ENoteJudge.Miss:
@@ -1554,6 +1544,21 @@ internal abstract class CStage演奏画面共通 : CStage {
 					AIRegisterInput(nPlayer, 0f);
 
 					this.bIsMiss[nPlayer] = true;
+
+					CCharacter character = CCharacter.GetCharacter(nPlayer);
+					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
+						this.bIsAlreadyMaxed[nPlayer] = false;
+							actChara.ReturnDefaultAnime(nPlayer, true);
+							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+					} else if (!bIsGOGOTIME[nPlayer]) {
+						if (Chara_MissCount[nPlayer] == 1) {
+							actChara.ReturnDefaultAnime(nPlayer, true);
+							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+						} else if (Chara_MissCount[nPlayer] == 6) {
+							actChara.ReturnDefaultAnime(nPlayer, true);
+							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+						}
+					}
 				}
 				break;
 			default:
@@ -1583,22 +1588,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (this.actCombo.nCurrentCombo[nPlayer] % 10 == 0 && this.actCombo.nCurrentCombo[nPlayer] > 0) {
 				//if (this.actChara.bキャラクターアクション中 == false)
 				//{
-				int Character = this.actChara.iCurrentCharacter[nPlayer];
+				CCharacter character = CCharacter.GetCharacter(nPlayer);
 				// Edit character values here
 				if (!pChip.bGOGOTIME) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
 				{
-					if (OpenTaiko.Skin.Characters_10Combo_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
+					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10) {
 						if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAXではない
 							// ジャンプ_ノーマル
-							this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Combo10, true);
+							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_10COMBO);
 						}
 					}
-					if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0 && this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
+					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max) {
 						if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAX
 							// ジャンプ_MAX
-							this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Combo10_Max, true);
+							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
 						}
 					}
 				}
@@ -2853,6 +2858,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						this.bIsGOGOTIME[nPlayer] = false;
+						if (!this.isRewinding)
+							actChara.ReturnDefaultAnime(nPlayer, true);
 					}
 					break;
 				#endregion
@@ -3633,7 +3640,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							actBalloon.KusuMiss();
 							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
 							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-								this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
+								actChara.KusuMiss();
 							}
 						}
 						nCurrentKusudamaRollCount = 0;
@@ -3643,7 +3650,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				} else {
 					if (!this.bPAUSE && !this.isRewinding) {
 						if (chip.nRollCount > 0) {
-							this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Miss, true);
+							CCharacter character = CCharacter.GetCharacter(iPlayer);
+							character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
 						}
 					}
 				}
@@ -3690,7 +3698,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			actBalloon.KusuBroke();
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				actChara.ChangeAnime(i, CActImplCharacter.Anime.Kusudama_Broke, true);
+				actChara.KusuSuccess();
 			}
 		} else {
 			//ﾊﾟｧｰﾝ
@@ -3702,9 +3710,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 			chip.bHit = true;
 			chip.IsHitted = true;
 			//this.b連打中 = false;
-			//this.actChara.b風船連打中 = false;
+			this.actChara.b風船連打中[iPlayer] = false;
 			chip.bVisible = false;
-			actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.Balloon_Broke, true);
+			this.actChara.ReturnDefaultAnime(iPlayer, true);
+			CCharacter character = CCharacter.GetCharacter(iPlayer);
+			character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_BALLOON_BROKE);
 			if (NotesManager.IsFuzeRoll(chip)) {
 				this.CChartScore[iPlayer].nMineAvoid++;
 				this.CSectionScore[iPlayer].nMineAvoid++;
@@ -3767,29 +3777,25 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public void StartGoGoTimeEffect(int iPlayer) {
-		int Character = this.actChara.iCurrentCharacter[iPlayer];
+		CCharacter character = CCharacter.GetCharacter(iPlayer);
+
+		actChara.ReturnDefaultAnime(iPlayer, true);
 
 		{
-			if (OpenTaiko.Skin.Characters_GoGoStart_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
-				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer) || OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] == 0)) {
+				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer))) {
 					// 魂ゲージMAXではない
 					// ゴーゴースタート_ノーマル
-					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart, true);
+					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
 					//this.actChara.キャラクター_アクション_10コンボ();
 				}
-			}
-			if (OpenTaiko.Skin.Characters_GoGoStart_Clear_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
 				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
-					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart_Clear, true);
+					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
 				}
-			}
-			if (OpenTaiko.Skin.Characters_GoGoStart_Maxed_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[iPlayer].IsEnded) {
 				if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
 					// 魂ゲージMAX
 					// ゴーゴースタート_MAX
-					this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.GoGoStart_Max, true);
+					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
 				}
-			}
 
 		}
 		OpenTaiko.stageGameScreen.actLaneTaiko.GOGOSTART();

@@ -13,7 +13,7 @@ namespace OpenTaiko {
 
 		public Dictionary<string, Dictionary<string, LuaTexture[]>> Sprites { get; private set; } = new();
 		public Dictionary<string, Dictionary<string, LuaSound>> Sounds { get; private set; } = new();
-		public Dictionary<string, object> Config { get; private set; } = new(); 
+		public Dictionary<string, object> Config { get; private set; } = new();
 
 		public LuaCharacter(string folder_name) {
 			FolderName = folder_name;

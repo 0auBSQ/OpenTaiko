@@ -187,7 +187,7 @@ class CLuaScript : IDisposable {
 		return TitleTextureKey.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
 	}
 
-	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) {
+	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true, string fallbackScript = "") {
 		strDir = dir;
 		strTexturesDir = texturesDir ?? $"{dir}/Textures";
 		strSounsdDir = soundsDir ?? $"{dir}/Sounds";
@@ -199,7 +199,12 @@ class CLuaScript : IDisposable {
 		LuaSecurity.Secure(LuaScript);
 
 		try {
-			LuaScript.DoFile($"{strDir}/Script.lua");
+			string scriptFilePath = $"{strDir}/Script.lua";
+			if (File.Exists(scriptFilePath)) {
+				LuaScript.DoFile($"{strDir}/Script.lua");
+			} else {
+				LuaScript.DoString(fallbackScript);
+			}
 
 			LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
 			LuaScript["fps"] = luaFPS;
@@ -232,11 +237,15 @@ class CLuaScript : IDisposable {
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
 			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
+			LuaScript["INILOADER"] = new LuaIniLoaderFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
+			LuaScript["SIZE"] = new LuaSizeFunc();
+			LuaScript["VECTOR2"] = new LuaVector2Func();
 			LuaScript["COLOR"] = new LuaColorFunc();
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
+			LuaScript["THEME"] = new LuaThemeFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
 			LuaScript["STORAGE"] = new LuaDataStorageFunc(dir);
 			LuaScript["I18N"] = new LuaI18NFunc();

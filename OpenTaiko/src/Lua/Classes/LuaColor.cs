@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Globalization;
+using FDK;
 
 namespace OpenTaiko {
 	public class LuaColor {
@@ -15,6 +16,7 @@ namespace OpenTaiko {
 
 		public LuaColor(byte r, byte g, byte b, byte a = 0xFF) { R = r; G = g; B = b; A = a; }
 		public LuaColor(Color color) { R = color.R; G = color.G; B = color.B; A = color.A; }
+		public LuaColor(Color4 color) { R = (byte)(color.Red * 255); G = (byte)(color.Green * 255); B = (byte)(color.Blue * 255); A = (byte)(color.Alpha * 255); }
 	}
 
 	public class LuaColorFunc {
