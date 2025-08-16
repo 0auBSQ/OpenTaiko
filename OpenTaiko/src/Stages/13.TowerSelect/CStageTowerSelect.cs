@@ -27,7 +27,7 @@ class CStageTowerSelect : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.Continuation;
+		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
 		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Tower);
 		tUpdateBarInfos();
@@ -80,11 +80,11 @@ class CStageTowerSelect : CStage {
 
 		#region [Input]
 
-		if (this.eフェードアウト完了時の戻り値 == CStageSongSelect.EReturnValue.Continuation) {
+		if (this.eフェードアウト完了時の戻り値 == EReturnValue.Continuation) {
 			int returnTitle() {
 				OpenTaiko.Skin.soundDecideSFX.tStop(); // cancel if played
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
-				this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.BackToTitle;
+				this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				return 0;
@@ -180,7 +180,7 @@ class CStageTowerSelect : CStage {
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 		OpenTaiko.stageSongSelect.str確定された曲のジャンル = Cursor.Item!.songGenre;
 		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.SongSelected;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}
@@ -219,7 +219,7 @@ class CStageTowerSelect : CStage {
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.SongSelected;
+		this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 		this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 		base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 
@@ -276,7 +276,7 @@ class CStageTowerSelect : CStage {
 	private CCachedFontRenderer pfTitleFont;
 	private CCachedFontRenderer pfSubTitleFont;
 
-	public CStageSongSelect.EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eフェードアウト完了時の戻り値;
 	public CActFIFOStart actFOtoNowLoading;
 	public CActFIFOBlack actFOtoTitle;
 	#endregion

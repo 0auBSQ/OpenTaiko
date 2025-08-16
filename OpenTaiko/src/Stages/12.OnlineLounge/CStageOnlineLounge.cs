@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Text;
 using FDK;
-using static OpenTaiko.CActSelect曲リスト;
 
 namespace OpenTaiko;
 

@@ -1259,16 +1259,6 @@ internal class CStageSongSelect : CStage {
 		}
 		return 0;
 	}
-	public enum EReturnValue : int {
-		Continuation,
-		BackToTitle,
-		PlayCutSceneIntro,
-		SongSelected,
-		CallOptions,
-		ConfigMenuOpened,
-		SkinChange
-	}
-
 
 	// その他
 

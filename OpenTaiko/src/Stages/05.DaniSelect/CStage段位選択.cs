@@ -25,7 +25,7 @@ class CStage段位選択 : CStage {
 		this.b選択した = false;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.Continuation;
+		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
 		ct待機 = new CCounter();
 		ctChara_In = new CCounter();
@@ -159,7 +159,7 @@ class CStage段位選択 : CStage {
 					if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 						OpenTaiko.Skin.soundDanSelectBGM.tStop();
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
-						this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.BackToTitle;
+						this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 						this.actFOtoTitle.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
@@ -293,7 +293,7 @@ class CStage段位選択 : CStage {
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
 		OpenTaiko.stageSongSelect.str確定された曲のジャンル = 段位リスト.Cursor.Item.songGenre;
 		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
-			this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.SongSelected;
+			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}
@@ -333,7 +333,7 @@ class CStage段位選択 : CStage {
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
-		this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.SongSelected;
+		this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 		this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 		base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 
@@ -356,7 +356,7 @@ class CStage段位選択 : CStage {
 
 	private PuchiChara PuchiChara;
 
-	public CStageSongSelect.EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eフェードアウト完了時の戻り値;
 
 	public CActFIFOStart actFOtoNowLoading;
 	public CActFIFOBlack actFOtoTitle;
