@@ -5,7 +5,7 @@
 
 		private static string BasePath {
 			get {
-				return $@"{Environment.SpecialFolder.ApplicationData}/OpenTaiko";
+				return $@"Global/ApplicationData";
 			}
 		}
 		public static string GetAbsoluteDataPath(string relPath) {

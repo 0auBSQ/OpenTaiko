@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace OpenTaiko {
+﻿namespace OpenTaiko {
 	internal class LuaSongNode {
 		private CSongListNode? _node;
 		private List<LuaSongChart> _charts = new List<LuaSongChart>();
@@ -383,6 +381,11 @@ namespace OpenTaiko {
 			OpenTaiko.stageSongSelect.str確定された曲のジャンル = Genre ?? "???";
 
 			return true;
+		}
+
+		public bool MountIfNotLocked(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {
+			if (IsLocked) return false;
+			return Mount(p1diff, p2diff, p3diff, p4diff, p5diff);
 		}
 
 		public LuaSongNode() {
