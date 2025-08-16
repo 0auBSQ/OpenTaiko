@@ -282,6 +282,10 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	public static LuaGlobalStores GlobalStores {
+		get;
+		private set;
+	}
 
 	public static int GetActualPlayer(int player) {
 		if (SaveFile == 0 || player > 1)
@@ -1737,6 +1741,12 @@ internal class OpenTaiko : Game {
 		#region [ Unlock factory initialisation ]
 
 		UnlockConditionFactory = new CUnlockConditionFactory();
+
+		#endregion
+
+		#region [ Lua global stores initialisation ]
+
+		GlobalStores = new LuaGlobalStores();
 
 		#endregion
 

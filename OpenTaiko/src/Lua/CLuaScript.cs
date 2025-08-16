@@ -15,8 +15,6 @@ class CLuaScript : IDisposable {
 	public List<LuaSound> SoundList = [];
 	public List<CVideoDecoder> VideoList = [];
 	public List<LuaText> TextList = [];
-	public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
-	public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
 
 	public LuaSaveFile? GetLuaSaveFile(int player) {
 		if (player < 0 || player > OpenTaiko.MAX_PLAYERS) {
@@ -237,7 +235,7 @@ class CLuaScript : IDisposable {
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
-			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
+			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, ltf, lsf, dir);
 			LuaScript["STORAGE"] = new LuaDataStorageFunc(dir);
 			LuaScript["I18N"] = new LuaI18NFunc();
 
