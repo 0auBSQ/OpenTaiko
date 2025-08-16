@@ -846,8 +846,8 @@ internal class CStageTitle : CStage {
 					}
 					base.ePhaseID = CStage.EPhase.Common_EXIT;
 
-					if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.LUASTAGE) {
-						LuaStageWrapper.TEMPORARY_ForceSetNextRequestedStage(CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].luaStageName);
+					if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.JumpToLuaStage) {
+						LuaStageWrapper.ForceSetNextRequestedStage(CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].luaStageName);
 					}
 
 					// Select Menu here
@@ -862,24 +862,6 @@ internal class CStageTitle : CStage {
 			}
 		}
 		return 0;
-	}
-	public enum EReturnValue {
-		継続 = 0,
-		GAMESTART,
-		DANGAMESTART,
-		TAIKOTOWERSSTART,
-		SHOPSTART,
-		BOUKENSTART,
-		HEYA,
-		CONFIG,
-		EXIT,
-		ONLINELOUNGE,
-		ENCYCLOPEDIA,
-		AIBATTLEMODE,
-		PLAYERSTATS,
-		CHARTEDITOR,
-		TOOLBOX,
-		LUASTAGE
 	}
 
 

@@ -135,7 +135,7 @@ class TextureLoader {
 		Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
 		Overlay = TxC(@$"Overlay.png");
 		Network_Connection = TxC(@$"Network_Connection.png");
-		Readme = TxC(@$"Readme.png");
+		// Readme = TxC(@$"Readme.png");
 		NamePlateBase = TxC(@$"NamePlate.png");
 		NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
 
