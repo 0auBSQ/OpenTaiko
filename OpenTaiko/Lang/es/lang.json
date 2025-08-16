@@ -129,13 +129,13 @@
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "El tiempo necesario antes de que se reproduzca\nprevia de una canción.\nDisminuir este valor puede hacer que previas\ncomiencen mientras aún se desplaza.\nPuedes especificar de 0 ms a 10000 ms.",
 
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Modo de Reproducción de Canción",
-		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Solo funciona en dispositivos de sonido\ncompatibles con la reproducción ASIO.\n- Tiene el menor retraso de entrada.\nWasapi:\n- Solo compatible con Windows.\n- Tiene el segundo menor retraso de entrada.\nBASS:\n- Compatible con todas las plataformas.\nNota: Sal de CONFIGURACIÓN para realizar los\n　 　   ajustes.",
+		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Solo funciona en dispositivos de sonido\ncompatibles con la reproducción ASIO.\n- Tiene el menor retraso de entrada.\nWasapi:\n- Solo compatible con Windows.\n- Tiene el segundo menor retraso de entrada.\nBASS:\n- Compatible con todas las plataformas.\nNota: Sal de CONFIGURACIÓN para realizar los\n           ajustes.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "Dispositivo de Reproducción de ASIO",
-		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Elige un dispositivo válido para habilitar modo de\nreproducción de ASIO.\n\nNota: Sal de CONFIGURACIÓN para realizar los\n　 　   ajustes.",
+		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Elige un dispositivo válido para habilitar modo de\nreproducción de ASIO.\n\nNota: Sal de CONFIGURACIÓN para realizar los\n           ajustes.",
 		"SETTINGS_SYSTEM_WASAPIBUFFER": "Tamaño de Búfer de WASAPI",
-		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Cambia el búfer de sonido para modo de\nreproducción de sonido de Wasapi.\nDeja el número más bajo posible evitando problemas\ncomo congelamiento de la canción y el tiempo\nincorrecto. Déjalo en 0 para usar un valor estimado,\no encuentra el valor correcto para ti a base de\nprueba y error.\nNota: Sal de CONFIGURACIÓN para realizar los\n　   　 ajustes.",
+		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Cambia el búfer de sonido para modo de\nreproducción de sonido de Wasapi.\nDeja el número más bajo posible evitando problemas\ncomo congelamiento de la canción y el tiempo\nincorrecto. Déjalo en 0 para usar un valor estimado,\no encuentra el valor correcto para ti a base de\nprueba y error.\nNota: Sal de CONFIGURACIÓN para realizar los\n           ajustes.",
 		"SETTINGS_SYSTEM_BASSBUFFER": "Tamaño de Búfer de Bass",
-		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Tamaño del búfer cuando se usan Bass:\nTamaño puede estar entre 0 ~ 99999ms.\nUn valor de 0 hará que el sistema operativo decida\nautomáticamente el tamaño.\nMenos el valor, menos retraso de audio hay, pero\ntambién puede causar audio anormal o crepitante.\n※ NOTA: Sal de CONFIGURACIÓN para realizar los\n　   　      ajustes.",
+		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Tamaño del búfer cuando se usan Bass:\nTamaño puede estar entre 0 ~ 99999ms.\nUn valor de 0 hará que el sistema operativo decida\nautomáticamente el tamaño.\nMenos el valor, menos retraso de audio hay, pero\ntambién puede causar audio anormal o crepitante.\n※ NOTA: Sal de CONFIGURACIÓN para realizar los\n                 ajustes.",
 		"SETTINGS_SYSTEM_OSTIMER": "Usar Temporizador del Sistema",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Activar esto hará notas se desplacen más\nsuavemente, pero podría hacer que la partitura se\ndesincronice con la canción.\nDesactivar esto evitará que la partitura se\ndesincronice con la canción, pero puede\nhacer que las notas fluctúen al desplazarse.",
 
