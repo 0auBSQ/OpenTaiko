@@ -180,10 +180,6 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStageTitle stageTitle {
-		get;
-		private set;
-	}
 	public static CStageコンフィグ stageConfig {
 		get;
 		private set;
@@ -530,7 +526,6 @@ internal class OpenTaiko : Game {
 				// Considering this is for the enum songs tab, is it really necessary to loop through stages?
 				// Moving the start of songs enumeration to the init section would be a much smarter choice imo, to refactor ASAP
 				switch (rCurrentStage.eStageID) {
-					case CStage.EStage.Title:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
@@ -635,132 +630,11 @@ internal class OpenTaiko : Game {
 						#endregion
 						break;
 
-					case CStage.EStage.Title:
-						#region [ *** ]
-						//-----------------------------
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.GAMESTART:
-								#region [ Song select ]
-								//-----------------------------
-								ChangeStage(stageSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Select");
-
-								OpenTaiko.latestSongSelect = stageSongSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.DANGAMESTART:
-								#region [ Dan song select ]
-								//-----------------------------
-								ChangeStage(stageDanSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Dan Select");
-
-								OpenTaiko.latestSongSelect = stageDanSongSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.TAIKOTOWERSSTART:
-								#region [ Tower song select ]
-								//-----------------------------
-								ChangeStage(stageTowerSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Tower Select");
-
-								OpenTaiko.latestSongSelect = stageTowerSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.HEYA:
-								#region [Heya menu]
-								//-----------------------------
-								ChangeStage(stageHeya);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Taiko Heya");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.ONLINELOUNGE:
-								#region [Online Lounge]
-								//-----------------------------
-								ChangeStage(stageOnlineLounge);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Online Lounge");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.CONFIG:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageConfig);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Config");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.EXIT:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageExit);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ End");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.AIBATTLEMODE:
-								#region [ Song select (with AI) ]
-								//-----------------------------
-								ChangeStage(stageSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ AI Battle Song Select");
-
-								OpenTaiko.latestSongSelect = stageSongSelect;
-								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
-								ConfigIni.nPlayerCount = 2;
-								ConfigIni.bAIBattleMode = true; // Use this variable to check when to use the AI virtual save file instead of 2P save file?
-								ConfigIni.tInitializeAILevel();
-								// TODO: Add a special profile for AI, in which it is possible to force the character, puchi and nameplateinfo
-
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.JumpToLuaStage:
-								#region [ Transition to another Lua Stage ]
-								//-----------------------------
-								string _name = LuaStageWrapper.GetNextRequestedStageName();
-								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
-								if (_stage != null) {
-									ChangeStage(_stage);
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation($"■ Lua Stage: {_name}");
-									this.tExecuteGarbageCollection();
-								}
-								break;
-								//-----------------------------
-								#endregion
-
-						}
-
-						//-----------------------------
-						#endregion
-						break;
-
 					case CStage.EStage.Config:
 						#region [ *** ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							switch (rPreviousStage.eStageID) {
-								// Hardcoded, this will transition back to the lua title screen in all cases
-								case CStage.EStage.Title:
 								case CStage.EStage.CUSTOM:
 									#region [ back to _title Lua stage, system error if not found ]
 									//-----------------------------
@@ -2075,7 +1949,6 @@ internal class OpenTaiko : Game {
 		rCurrentStage = null;
 		rPreviousStage = null;
 		stageStartup = new CStage起動();
-		stageTitle = new CStageTitle();
 		stageConfig = new CStageコンフィグ();
 		stageSongSelect = new CStageSongSelect();
 		stageDanSongSelect = new CStage段位選択();
@@ -2094,7 +1967,6 @@ internal class OpenTaiko : Game {
 		this.listTopLevelActivities.Add(actEnumSongs);
 		this.listTopLevelActivities.Add(actTextConsole);
 		this.listTopLevelActivities.Add(stageStartup);
-		this.listTopLevelActivities.Add(stageTitle);
 		this.listTopLevelActivities.Add(stageConfig);
 		this.listTopLevelActivities.Add(stageSongSelect);
 		this.listTopLevelActivities.Add(stageDanSongSelect);

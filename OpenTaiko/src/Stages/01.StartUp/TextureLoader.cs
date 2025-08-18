@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FDK;
+﻿using FDK;
 
 namespace OpenTaiko;
 
@@ -138,36 +137,6 @@ class TextureLoader {
 		// Readme = TxC(@$"Readme.png");
 		NamePlateBase = TxC(@$"NamePlate.png");
 		NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
-
-		#endregion
-
-		#region 1_タイトル画面
-		Entry_Bar = TxC(TITLE + @$"Entry_Bar.png");
-		Entry_Bar_Text = TxC(TITLE + @$"Entry_Bar_Text.png");
-
-		Banapas_Load[0] = TxC(TITLE + @$"Banapas_Load.png");
-		Banapas_Load[1] = TxC(TITLE + @$"Banapas_Load_Text.png");
-		Banapas_Load[2] = TxC(TITLE + @$"Banapas_Load_Anime.png");
-
-		Banapas_Load_Clear[0] = TxC(TITLE + @$"Banapas_Load_Clear.png");
-		Banapas_Load_Clear[1] = TxC(TITLE + @$"Banapas_Load_Clear_Anime.png");
-
-		Entry_Player[0] = TxC(TITLE + @$"Entry_Player.png");
-		Entry_Player[1] = TxC(TITLE + @$"Entry_Player_Select_Bar.png");
-		Entry_Player[2] = TxC(TITLE + @$"Entry_Player_Select.png");
-
-		ModeSelect_Bar = new CTexture[CMainMenuTab.__MenuCount + 1];
-		ModeSelect_Bar_Chara = new CTexture[CMainMenuTab.__MenuCount];
-
-		for (int i = 0; i < CMainMenuTab.__MenuCount; i++) {
-			ModeSelect_Bar[i] = TxC(TITLE + @$"ModeSelect_Bar_" + i.ToString() + ".png");
-		}
-
-		for (int i = 0; i < CMainMenuTab.__MenuCount; i++) {
-			ModeSelect_Bar_Chara[i] = TxC(TITLE + @$"ModeSelect_Bar_Chara_" + i.ToString() + ".png");
-		}
-
-		ModeSelect_Bar[CMainMenuTab.__MenuCount] = TxC(TITLE + @$"ModeSelect_Bar_Overlay.png");
 
 		#endregion
 
@@ -2239,8 +2208,7 @@ class TextureLoader {
 		}
 		listTexture.Clear();
 
-		foreach (CCharacter character in Characters)
-		{
+		foreach (CCharacter character in Characters) {
 			character.Dispose();
 		}
 
@@ -2271,22 +2239,6 @@ class TextureLoader {
 		Overlay,
 		Readme,
 		Network_Connection;
-
-	#endregion
-
-	#region 1_タイトル画面
-
-	public CTexture
-		//Title_Background,
-		Entry_Bar,
-		Entry_Bar_Text;
-
-	public CTexture[] Banapas_Load = new CTexture[3];
-	public CTexture[] Banapas_Load_Clear = new CTexture[2];
-	public CTexture[] Banapas_Load_Failure = new CTexture[2];
-	public CTexture[] Entry_Player = new CTexture[3];
-	public CTexture[] ModeSelect_Bar;
-	public CTexture[] ModeSelect_Bar_Chara;
 
 	#endregion
 
