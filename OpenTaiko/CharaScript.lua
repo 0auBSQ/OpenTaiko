@@ -629,9 +629,12 @@ function loadPreviewTextures()
 
 	for key, animation in pairs(animations) do
 		if animation.motion_length == 0 then
+			local fallback_animation = animations[animation.fallback_animation_name]
 			for i = 1, 5, 1 do
-				local fallback_animation = animations[animation.fallback_animation_name]
-				if fallback_animation ~= nil then
+
+				if fallback_animation == nil then
+					break
+				elseif fallback_animation.motion_length ~= 0 then
 					animation.textures = fallback_animation.textures
 					animation.motion = fallback_animation.motion
 					animation.motion_length = fallback_animation.motion_length
@@ -640,7 +643,10 @@ function loadPreviewTextures()
 					--animation.offset_mode = fallback_animation.offset_mode
 					--animation.scale = fallback_animation.scale
 					break
+				else
+					fallback_animation = animations[fallback_animation.fallback_animation_name]
 				end
+
 			end
 		end
 	end
