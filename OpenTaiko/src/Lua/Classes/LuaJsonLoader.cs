@@ -13,5 +13,13 @@ namespace OpenTaiko {
 			JsonNode jsonNode = JsonNode.Parse(stream);
 			return jsonNode;
 		}
+
+		public double ExtractNumber(JsonValue x) {
+			return (double)x;
+		}
+
+		public string ExtractText(JsonValue x) {
+			return (string)x;
+		}
 	}
 }

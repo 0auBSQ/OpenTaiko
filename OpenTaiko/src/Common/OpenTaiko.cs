@@ -282,6 +282,10 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	public static LuaGlobalStores GlobalStores {
+		get;
+		private set;
+	}
 
 	public static int GetActualPlayer(int player) {
 		if (SaveFile == 0 || player > 1)
@@ -533,10 +537,10 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Heya:
 					case CStage.EStage.CUSTOM:
 						if (EnumSongs != null) {
-							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if (rCurrentStage.eStageID == CStage.EStage.Title &&
+							#region [ Start the thread for song enumaration ]
+							if (rCurrentStage.eStageID == CStage.EStage.CUSTOM &&
 								rPreviousStage.eStageID == CStage.EStage.StartUp &&
-								this.nDrawLoopReturnValue == (int)CStageTitle.EReturnValue.継続 &&
+								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
 								!EnumSongs.IsSongListEnumStarted) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
@@ -613,14 +617,19 @@ internal class OpenTaiko : Game {
 						break;
 
 					case CStage.EStage.StartUp:
-						#region [ *** ]
+						#region [ Load _boot stage, system error if not found ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							ChangeStage(stageTitle);
-							Trace.TraceInformation("----------------------");
-							Trace.TraceInformation("■ Title");
-
-							this.tExecuteGarbageCollection();
+							LuaStageWrapper.ForceSetNextRequestedStage("_boot");
+							LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+							if (_stage != null) {
+								ChangeStage(_stage);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation($"■ Boot");
+								this.tExecuteGarbageCollection();
+							} else {
+								TriggerSystemError(CSystemError.Errno.ENO_BOOTNOTFOUND);
+							}
 						}
 						//-----------------------------
 						#endregion
@@ -630,7 +639,7 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageTitle.EReturnValue.GAMESTART:
+							case (int)EReturnValue.GAMESTART:
 								#region [ Song select ]
 								//-----------------------------
 								ChangeStage(stageSongSelect);
@@ -642,7 +651,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.DANGAMESTART:
+							case (int)EReturnValue.DANGAMESTART:
 								#region [ Dan song select ]
 								//-----------------------------
 								ChangeStage(stageDanSongSelect);
@@ -654,7 +663,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.TAIKOTOWERSSTART:
+							case (int)EReturnValue.TAIKOTOWERSSTART:
 								#region [ Tower song select ]
 								//-----------------------------
 								ChangeStage(stageTowerSelect);
@@ -666,7 +675,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.HEYA:
+							case (int)EReturnValue.HEYA:
 								#region [Heya menu]
 								//-----------------------------
 								ChangeStage(stageHeya);
@@ -676,7 +685,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.ONLINELOUNGE:
+							case (int)EReturnValue.ONLINELOUNGE:
 								#region [Online Lounge]
 								//-----------------------------
 								ChangeStage(stageOnlineLounge);
@@ -686,7 +695,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.CONFIG:
+							case (int)EReturnValue.CONFIG:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageConfig);
@@ -696,7 +705,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.EXIT:
+							case (int)EReturnValue.EXIT:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageExit);
@@ -706,7 +715,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.AIBATTLEMODE:
+							case (int)EReturnValue.AIBATTLEMODE:
 								#region [ Song select (with AI) ]
 								//-----------------------------
 								ChangeStage(stageSongSelect);
@@ -724,7 +733,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.LUASTAGE:
+							case (int)EReturnValue.JumpToLuaStage:
 								#region [ Transition to another Lua Stage ]
 								//-----------------------------
 								string _name = LuaStageWrapper.GetNextRequestedStageName();
@@ -750,15 +759,21 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							switch (rPreviousStage.eStageID) {
+								// Hardcoded, this will transition back to the lua title screen in all cases
 								case CStage.EStage.Title:
-									#region [ *** ]
+								case CStage.EStage.CUSTOM:
+									#region [ back to _title Lua stage, system error if not found ]
 									//-----------------------------
-									ChangeStage(stageTitle);
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Title");
-									stageTitle.tReloadMenus();
-
-									this.tExecuteGarbageCollection();
+									LuaStageWrapper.ForceSetNextRequestedStage("_title");
+									LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+									if (_stage != null) {
+										ChangeStage(_stage);
+										Trace.TraceInformation("----------------------");
+										Trace.TraceInformation($"■ Title");
+										this.tExecuteGarbageCollection();
+									} else {
+										TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+									}
 									break;
 								//-----------------------------
 								#endregion
@@ -785,12 +800,19 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -805,7 +827,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.PlayCutSceneIntro:
+							case (int)EReturnValue.PlayCutSceneIntro:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageCutScene);
@@ -820,7 +842,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageSongLoading);
@@ -835,7 +857,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.ConfigMenuOpened:
+							case (int)EReturnValue.ConfigMenuOpened:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageConfig);
@@ -850,7 +872,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SkinChange:
+							case (int)EReturnValue.SkinChange:
 
 								#region [ *** ]
 								//-----------------------------
@@ -871,12 +893,19 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.DanDojoSelect:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -886,7 +915,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
@@ -905,12 +934,19 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Heya:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -1143,12 +1179,19 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -1158,7 +1201,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
@@ -1192,12 +1235,19 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.CUSTOM:
 						#region [ Lua Stages ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ Back to title screen ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _tstage = LuaStageWrapper.GetNextRequestedStage();
+								if (_tstage != null) {
+									ChangeStage(_tstage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -1207,7 +1257,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ Song selected ]
 								//-----------------------------
 								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage, true);
@@ -1221,7 +1271,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.JumpToLuaStage:
+							case (int)EReturnValue.JumpToLuaStage:
 								#region [ Transition to another Lua Stage ]
 								//-----------------------------
 								string _name = LuaStageWrapper.GetNextRequestedStageName();
@@ -1231,9 +1281,108 @@ internal class OpenTaiko : Game {
 									Trace.TraceInformation("----------------------");
 									Trace.TraceInformation($"■ Lua Stage: {_name}");
 									this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_INVALIDSTAGENAME);
 								}
 								break;
+							//-----------------------------
+							#endregion
+
+							#region [ Legacy stage methods ]
+
+							case (int)EReturnValue.GAMESTART:
+								#region [ Song select ]
 								//-----------------------------
+								ChangeStage(stageSongSelect);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Song Select");
+
+								OpenTaiko.latestSongSelect = stageSongSelect;
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.DANGAMESTART:
+								#region [ Dan song select ]
+								//-----------------------------
+								ChangeStage(stageDanSongSelect);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Dan Select");
+
+								OpenTaiko.latestSongSelect = stageDanSongSelect;
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.TAIKOTOWERSSTART:
+								#region [ Tower song select ]
+								//-----------------------------
+								ChangeStage(stageTowerSelect);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Tower Select");
+
+								OpenTaiko.latestSongSelect = stageTowerSelect;
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.HEYA:
+								#region [Heya menu]
+								//-----------------------------
+								ChangeStage(stageHeya);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Taiko Heya");
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.ONLINELOUNGE:
+								#region [Online Lounge]
+								//-----------------------------
+								ChangeStage(stageOnlineLounge);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Online Lounge");
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.CONFIG:
+								#region [ *** ]
+								//-----------------------------
+								ChangeStage(stageConfig);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ Config");
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.EXIT:
+								#region [ *** ]
+								//-----------------------------
+								ChangeStage(stageExit);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ End");
+								//-----------------------------
+								#endregion
+								break;
+
+							case (int)EReturnValue.AIBATTLEMODE:
+								#region [ Song select (with AI) ]
+								//-----------------------------
+								ChangeStage(stageSongSelect);
+								Trace.TraceInformation("----------------------");
+								Trace.TraceInformation("■ AI Battle Song Select");
+
+								OpenTaiko.latestSongSelect = stageSongSelect;
+								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
+								ConfigIni.nPlayerCount = 2;
+								ConfigIni.bAIBattleMode = true; // Use this variable to check when to use the AI virtual save file instead of 2P save file?
+								ConfigIni.tInitializeAILevel();
+								// TODO: Add a special profile for AI, in which it is possible to force the character, puchi and nameplateinfo
+
+								//-----------------------------
+								#endregion
+								break;
 								#endregion
 						}
 						#endregion
@@ -1253,12 +1402,19 @@ internal class OpenTaiko : Game {
 					default:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
+								LuaStageWrapper.ForceSetNextRequestedStage("_title");
+								LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+								if (_stage != null) {
+									ChangeStage(_stage);
+									Trace.TraceInformation("----------------------");
+									Trace.TraceInformation($"■ Title");
+									//this.tExecuteGarbageCollection();
+								} else {
+									TriggerSystemError(CSystemError.Errno.ENO_TITLENOTFOUND);
+								}
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
@@ -1585,6 +1741,12 @@ internal class OpenTaiko : Game {
 		#region [ Unlock factory initialisation ]
 
 		UnlockConditionFactory = new CUnlockConditionFactory();
+
+		#endregion
+
+		#region [ Lua global stores initialisation ]
+
+		GlobalStores = new LuaGlobalStores();
 
 		#endregion
 

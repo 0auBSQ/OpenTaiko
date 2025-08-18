@@ -1,0 +1,51 @@
+{
+    "1": {
+        "StageName": {
+            "strings": {
+                "default": "My Lua Stage"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "There is a first step to everything..."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "demo1",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Lime"
+    },
+    "2": {
+        "StageName": {
+            "strings": {
+                "default": "My Other Lua Stage"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "There is a first step to everything..."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "demo2",
+        "Restricted1P": true,
+        "LEGACY_MenuBoxColor": "Green"
+    },
+    "3": {
+        "StageName": {
+            "strings": {
+                "default": "Let's play with data"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Things are more interesting when permanent."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "demo3",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Blue"
+    },
+    "count": 3
+}

@@ -18,14 +18,16 @@ internal class CSystemError : CStage {
 		ENO_PADINITFAILED = 3,
 		ENO_INPUTINITFAILED = 4,
 		ENO_SONGLISTINITFAILED = 5,
-		ENO_INVALIDSTAGENAME = 6
+		ENO_INVALIDSTAGENAME = 6,
+		ENO_BOOTNOTFOUND = 7,
+		ENO_TITLENOTFOUND = 8
 	};
 
 	public void LoadError(Errno errno) {
 		GameCrashed = true;
 
 		// Head with the error code
-		ErrorMessage = "\n\nError Code " + ((int)errno).ToString("0000") + "\n\n";
+		ErrorMessage = $"\n\nError Code {((int)errno).ToString("0000")} ({errno.ToString()})\n\n";
 		ErrorMessage += "An error has occured.\n\n";
 
 		switch (errno) {
@@ -66,11 +68,22 @@ internal class CSystemError : CStage {
 				}
 			case Errno.ENO_INVALIDSTAGENAME: {
 					ErrorMessage += "The requested stage name was not found.\n";
-					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
 					ErrorMessage += "If you are currently making a Lua module, please ensure that the requested Lua Stage name exists.";
 					break;
 				}
-
+			case Errno.ENO_BOOTNOTFOUND: {
+					ErrorMessage += "The boot stage was not found in the selected skin.\n";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
+					ErrorMessage += "If you are currently making a skin, please ensure that stage is present in your Modules/Stages/_boot folder.";
+					break;
+				}
+			case Errno.ENO_TITLENOTFOUND: {
+					ErrorMessage += "The title stage was not found in the selected skin.\n";
+					ErrorMessage += "Please ensure that your skin is compatible with your current OpenTaiko version.\n";
+					ErrorMessage += "If you are currently making a skin, please ensure that stage is present in your Modules/Stages/_title folder.";
+					break;
+				}
 		};
 
 		// Append a call to contact if necessary
@@ -104,7 +117,7 @@ internal class CSystemError : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (this._pfText != null) {
-				this._ttkText = new TitleTextureKey(ErrorMessage, this._pfText, Color.White, Color.Black, 1280);
+				this._ttkText = new TitleTextureKey(ErrorMessage, this._pfText, Color.White, Color.Black, 1920);
 				CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this._ttkText);
 				tmpTex.t2D描画(0, 0);
 			}

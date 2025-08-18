@@ -1212,7 +1212,6 @@ internal class CStageSongSelect : CStage {
 
 
 	// その他
-
 	#region [ private ]
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]

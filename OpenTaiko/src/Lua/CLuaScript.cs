@@ -246,7 +246,7 @@ class CLuaScript : IDisposable {
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
 			LuaScript["THEME"] = new LuaThemeFunc();
-			LuaScript["SHARED"] = new LuaSharedResourceFunc(SharedTextures, SharedSounds, ltf, lsf, dir);
+			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, ltf, lsf, dir);
 			LuaScript["STORAGE"] = new LuaDataStorageFunc(dir);
 			LuaScript["I18N"] = new LuaI18NFunc();
 			LuaScript["CHARACTER"] = new LuaCharacterFunc();

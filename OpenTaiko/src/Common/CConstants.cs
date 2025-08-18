@@ -363,9 +363,32 @@ public struct STDGBVALUE<T>         // indexはE楽器パートと一致させ�
 }
 
 public enum EReturnValue : int {
-	Continuation,
-	ReturnToTitle,
-	SongChoosen
+	Continuation = 0,
+	BackToTitle,
+	PlayCutSceneIntro,
+	SongSelected,
+	CallOptions,
+	ConfigMenuOpened,
+	SkinChange,
+	JumpToLuaStage,
+
+	// Legacy
+	GAMESTART,
+	DANGAMESTART,
+	TAIKOTOWERSSTART,
+	SHOPSTART,
+	BOUKENSTART,
+	HEYA,
+	CONFIG,
+	EXIT,
+	ONLINELOUNGE,
+	ENCYCLOPEDIA,
+	AIBATTLEMODE,
+	PLAYERSTATS,
+	CHARTEDITOR,
+	TOOLBOX,
+
+	Total
 }
 
 #region[Ver.K追加]

@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Text;
 using FDK;
-using static OpenTaiko.CActSelect曲リスト;
 
 namespace OpenTaiko;
 
@@ -342,7 +341,7 @@ class CStageOnlineLounge : CStage {
 				if (currentMenu == ECurrentMenu.MAIN) {
 					// Return to title screen
 					OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-					this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+					this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 					this.actFOtoTitle.tフェードアウト開始();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				} else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT) {
@@ -372,7 +371,7 @@ class CStageOnlineLounge : CStage {
 							// Quit
 							OpenTaiko.Skin.soundCancelSFX.tPlay();
 							OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-							this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+							this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 							this.actFOtoTitle.tフェードアウト開始();
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						} else {

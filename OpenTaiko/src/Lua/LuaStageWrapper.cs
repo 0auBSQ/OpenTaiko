@@ -7,8 +7,7 @@
 
 		#region [Setters]
 
-		// Necessary as long as the title screen is not Lua-ified, to deprecate as soon as possible
-		public static void TEMPORARY_ForceSetNextRequestedStage(string name) {
+		public static void ForceSetNextRequestedStage(string name) {
 			_nextRequestedStage = name;
 		}
 
@@ -86,15 +85,35 @@
 			base.ChildActivities.Add(this.actFOtoTitle = new CActFIFOBlack());
 		}
 
-		private CStageSongSelect.EReturnValue _StringToReturnValue(string transition, string? moduleName = null) {
-			CStageSongSelect.EReturnValue _rv = transition switch {
-				"title" => CStageSongSelect.EReturnValue.BackToTitle,
-				"play" => CStageSongSelect.EReturnValue.SongSelected,
-				"stage" => CStageSongSelect.EReturnValue.JumpToLuaStage,
-				_ => CStageSongSelect.EReturnValue.BackToTitle
+		private EReturnValue _StringToLegacyValue(string rv) {
+			return rv switch {
+				"gamestart" => EReturnValue.GAMESTART,
+				"dangamestart" => EReturnValue.DANGAMESTART,
+				"taikotowerstart" => EReturnValue.TAIKOTOWERSSTART,
+				"heya" => EReturnValue.HEYA,
+				"config" => EReturnValue.CONFIG,
+				"exit" => EReturnValue.EXIT,
+				"onlinelounge" => EReturnValue.ONLINELOUNGE,
+				"aibattlemode" => EReturnValue.AIBATTLEMODE,
+				_ => EReturnValue.BackToTitle
+			};
+		}
+
+		private EReturnValue _StringToReturnValue(string transition, string? moduleName = null) {
+			EReturnValue _rv = transition switch {
+				"title" => EReturnValue.BackToTitle,
+				"play" => EReturnValue.SongSelected,
+				"stage" => EReturnValue.JumpToLuaStage,
+				_ => EReturnValue.BackToTitle
 			};
 
-			if (moduleName != null && transition == "stage") _nextRequestedStage = moduleName;
+			if (moduleName != null) {
+				if (transition == "stage") {
+					_nextRequestedStage = moduleName;
+				} else if (transition == "legacy") {
+					return _StringToLegacyValue(moduleName);
+				}
+			}
 
 			return _rv;
 		}
@@ -113,7 +132,7 @@
 				return;
 
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
-			this.eFadeOutReturnValue = CStageSongSelect.EReturnValue.Continuation;
+			this.eFadeOutReturnValue = EReturnValue.Continuation;
 
 			lcStageScript?.Activate();
 
@@ -127,7 +146,7 @@
 		}
 
 		public override int Draw() {
-			if (this.eFadeOutReturnValue == CStageSongSelect.EReturnValue.Continuation) lcStageScript?.Update();
+			if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update();
 			lcStageScript?.Draw();
 
 			// Menu exit fade out transition
@@ -169,7 +188,7 @@
 		#region [Private]
 
 
-		public CStageSongSelect.EReturnValue eFadeOutReturnValue;
+		public EReturnValue eFadeOutReturnValue;
 		public CActFIFOBlack actFOtoTitle;
 
 		#endregion
