@@ -6,22 +6,22 @@ namespace OpenTaiko {
 			_keyValuePairs = keyValuePairs;
 		}
 
-		public int GetInt(string key) {
-			if (!_keyValuePairs.ContainsKey(key)) return 0;
+		public int GetInt(string key, int defaultValue) {
+			if (!_keyValuePairs.ContainsKey(key)) return defaultValue;
 
 			if (int.TryParse(_keyValuePairs[key], out int result)) return result;
 			return 0;
 		}
 
-		public double GetDouble(string key) {
-			if (!_keyValuePairs.ContainsKey(key)) return 0;
+		public double GetDouble(string key, double defaultValue) {
+			if (!_keyValuePairs.ContainsKey(key)) return defaultValue;
 
 			if (double.TryParse(_keyValuePairs[key], out double result)) return result;
 			return 0;
 		}
 
-		public string GetString(string key) {
-			if (!_keyValuePairs.ContainsKey(key)) return "";
+		public string GetString(string key, string defaultValue) {
+			if (!_keyValuePairs.ContainsKey(key)) return defaultValue;
 
 			return _keyValuePairs[key].ToString();
 		}

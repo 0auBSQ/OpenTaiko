@@ -370,22 +370,22 @@ internal class CActImplCharacter : CActivity {
 					chara_x = (OpenTaiko.Skin.Game_Chara_AI_X[i]);
 					chara_y = (OpenTaiko.Skin.Game_Chara_AI_Y[i]);
 
-					charaScale = 0.58f;
+					charaScale = 0.464f;
 				} else if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					chara_x = OpenTaiko.Skin.Game_Chara_X[i];
 					chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
 
-					charaScale = 1.0f;
+					charaScale = 0.8f;
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					chara_x = OpenTaiko.Skin.Game_Chara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
 					chara_y = OpenTaiko.Skin.Game_Chara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
 
-					charaScale = 0.58f;
+					charaScale = 0.464f;
 				} else {
 					chara_x = OpenTaiko.Skin.Game_Chara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
 					chara_y = OpenTaiko.Skin.Game_Chara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 
-					charaScale = 0.58f;
+					charaScale = 0.464f;
 				}
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
@@ -429,8 +429,8 @@ internal class CActImplCharacter : CActivity {
 				chara_y = OpenTaiko.Skin.Game_Chara_Balloon_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 			}
 
-			chara_x = OpenTaiko.Skin.Game_Chara_X[i];
-			chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
+			//chara_x = OpenTaiko.Skin.Game_Chara_X[i];
+			//chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
 
 			CCharacter.GetCharacter(i).Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
@@ -463,8 +463,8 @@ internal class CActImplCharacter : CActivity {
 
 				kusuX = 0;
 				kusuY = 0;
-				chara_x = OpenTaiko.Skin.Game_Chara_X[i];
-				chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
+				//chara_x = OpenTaiko.Skin.Game_Chara_X[i];
+				//chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
 
 				CCharacter.GetCharacter(i).Draw(i, chara_x + kusuX, chara_y + kusuY,
 				charaScale, charaScale, 255, Color4.White, false);

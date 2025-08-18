@@ -46,7 +46,7 @@ namespace OpenTaiko {
 		public int Height => _texture?.szTextureSize.Height ?? -1;
 		public int Width => _texture?.szTextureSize.Width ?? -1;
 		public LuaVector2 GetScale() {
-			return _texture != null ? new LuaVector2(_texture.szTextureSize.Width, _texture.szTextureSize.Height) : new LuaVector2(0, 0);
+			return _texture != null ? new LuaVector2(_texture.vcScaleRatio.X, _texture.vcScaleRatio.Y) : new LuaVector2(0, 0);
 		}
 		public float GetOpacity() {
 			return _texture?.Opacity / (float)255 ?? -1;
