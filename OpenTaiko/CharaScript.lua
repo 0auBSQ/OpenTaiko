@@ -166,8 +166,8 @@ CharacterAnimation = {
 
 local preview = nil
 local render = nil
-
 local animations = { }
+local voices = {}
 
 local interval = { 1, 1, 1, 1, 1 }
 
@@ -584,7 +584,14 @@ function loadPreviewTextures()
 	if STORAGE:FileExists("Render.png") then
 		render = TEXTURE:CreateTexture("Render.png")
 	end
+end
 
+
+function loadStoryTextures()
+end
+
+
+function loadGeneralTextures()
 	create_animation(CHARACTER.ANIM_GAME_NORMAL, "Normal", chara_config.game_motion_normal, chara_config.game_beat_normal, "", OFFSET_MODE_GAME, GAME_SCALE)
 	create_animation(CHARACTER.ANIM_GAME_CLEAR, "Clear", chara_config.game_motion_clear, chara_config.game_beat_clear, CHARACTER.ANIM_GAME_NORMAL, OFFSET_MODE_GAME, GAME_SCALE)
 	create_animation(CHARACTER.ANIM_GAME_MAX, "Clear_Max", chara_config.game_motion_clear_max, chara_config.game_beat_clear_max, CHARACTER.ANIM_GAME_CLEAR, OFFSET_MODE_GAME, GAME_SCALE)
@@ -650,26 +657,36 @@ function loadPreviewTextures()
 			end
 		end
 	end
-end
 
+	voices[CHARACTER.VOICE_END_FAILED] = SOUND:CreateVoice("Sounds/Clear/Failed.ogg")
+	voices[CHARACTER.VOICE_END_CLEAR] = SOUND:CreateVoice("Sounds/Clear/Clear.ogg")
+	voices[CHARACTER.VOICE_END_FULLCOMBO] = SOUND:CreateVoice("Sounds/Clear/FullCombo.ogg")
+	voices[CHARACTER.VOICE_END_ALLPERFECT] = SOUND:CreateVoice("Sounds/Clear/AllPerfect.ogg")
+	voices[CHARACTER.VOICE_END_AIBATTLE_WIN] = SOUND:CreateVoice("Sounds/Clear/AIBattle_Win.ogg")
+	voices[CHARACTER.VOICE_END_AIBATTLE_LOSE] = SOUND:CreateVoice("Sounds/Clear/AIBattle_Lose.ogg")
 
-function loadStoryTextures()
-end
+	voices[CHARACTER.VOICE_MENU_SONGSELECT] = SOUND:CreateVoice("Sounds/Menu/SongSelect.ogg")
+	voices[CHARACTER.VOICE_MENU_SONGDECIDE] = SOUND:CreateVoice("Sounds/Menu/SongDecide.ogg")
+	voices[CHARACTER.VOICE_MENU_SONGDECIDE_AI] = SOUND:CreateVoice("Sounds/Menu/SongDecide_AI.ogg")
+	voices[CHARACTER.VOICE_MENU_DIFFSELECT] = SOUND:CreateVoice("Sounds/Menu/DiffSelect.ogg")
+	voices[CHARACTER.VOICE_MENU_DANSELECTSTART] = SOUND:CreateVoice("Sounds/Menu/DanSelectStart.ogg")
+	voices[CHARACTER.VOICE_MENU_DANSELECTPROMPT] = SOUND:CreateVoice("Sounds/Menu/DanSelectPrompt.ogg")
+	voices[CHARACTER.VOICE_MENU_DANSELECTCONFIRM] = SOUND:CreateVoice("Sounds/Menu/DanSelectConfirm.ogg")
 
+	voices[CHARACTER.VOICE_TITLE_SANKA] = SOUND:CreateVoice("Sounds/Title/Sanka.ogg")
 
-function loadGeneralTextures()
+	voices[CHARACTER.VOICE_TOWER_MISS] = SOUND:CreateVoice("Sounds/Tower/Miss.ogg")
 
+	voices[CHARACTER.VOICE_RESULT_BESTSCORE] = SOUND:CreateVoice("Sounds/Result/BestScore.ogg")
+	voices[CHARACTER.VOICE_RESULT_CLEARFAILED] = SOUND:CreateVoice("Sounds/Result/ClearFailed.ogg")
+	voices[CHARACTER.VOICE_RESULT_CLEARSUCCESS] = SOUND:CreateVoice("Sounds/Result/ClearSuccess.ogg")
+	voices[CHARACTER.VOICE_RESULT_DANFAILED] = SOUND:CreateVoice("Sounds/Result/DanFailed.ogg")
+	voices[CHARACTER.VOICE_RESULT_DANREDPASS] = SOUND:CreateVoice("Sounds/Result/DanRedPass.ogg")
+	voices[CHARACTER.VOICE_RESULT_DANGOLDPASS] = SOUND:CreateVoice("Sounds/Result/DanGoldPass.ogg")
 end
 
 
 function disposePreviewTextures()
-	for key, value in pairs(animations) do
-		for j = 1, #value.textures, 1 do
-			value.textures[j]:Dispose()
-		end
-	end
-	animations = { }
-
 	if preview ~= nil then
 		preview:Dispose()
 	end
@@ -684,6 +701,19 @@ end
 
 
 function disposeGeneralTextures()
+	for key, value in pairs(animations) do
+		for j = 1, #value.textures, 1 do
+			value.textures[j]:Dispose()
+		end
+	end
+
+	for key, value in pairs(voices) do
+		value:Dispose()
+	end
+
+	animations = { }
+
+
 end
 
 
@@ -846,6 +876,10 @@ end
 
 
 function playVoice(voiceType)
+	local voice = voices[voiceType]
+	if voice ~= nil then
+		voice:Play()
+	end
 end
 
 

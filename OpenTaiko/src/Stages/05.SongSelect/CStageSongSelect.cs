@@ -952,9 +952,6 @@ internal class CStageSongSelect : CStage {
 															for (int i = 0; i < 5; i++) {
 																CCharacter character = CCharacter.GetCharacter(i);
 																character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
-																if (i < OpenTaiko.ConfigIni.nPlayerCount) {
-																	character.PlayVoice(CCharacter.VOICE_MENU_SONGDECIDE);
-																}
 															}
 														}
 													}

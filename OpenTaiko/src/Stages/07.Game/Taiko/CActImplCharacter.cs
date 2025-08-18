@@ -429,9 +429,6 @@ internal class CActImplCharacter : CActivity {
 				chara_y = OpenTaiko.Skin.Game_Chara_Balloon_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 			}
 
-			//chara_x = OpenTaiko.Skin.Game_Chara_X[i];
-			//chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
-
 			CCharacter.GetCharacter(i).Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
@@ -460,11 +457,6 @@ internal class CActImplCharacter : CActivity {
 				if (i % 2 == 0) {
 					kusuX *= -1;
 				}
-
-				kusuX = 0;
-				kusuY = 0;
-				//chara_x = OpenTaiko.Skin.Game_Chara_X[i];
-				//chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
 
 				CCharacter.GetCharacter(i).Draw(i, chara_x + kusuX, chara_y + kusuY,
 				charaScale, charaScale, 255, Color4.White, false);
