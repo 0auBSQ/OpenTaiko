@@ -70,7 +70,7 @@
 		"SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "切换全屏/窗口模式。",
 		"SETTINGS_SYSTEM_VSYNC": "垂直同步",
-		"SETTINGS_SYSTEM_VSYNC_DESC": "选择是否开启垂直同步。打开后帧率将上限为 60 FPS，\n音符卷动会更加顺畅，但输入延迟会增加。\n关闭后帧率将没有上限，减少输入延迟，但会使音符卷动\n更加不稳定。",
+		"SETTINGS_SYSTEM_VSYNC_DESC": "切换是否开启垂直同步。打开后帧率将上限为 60 FPS，\n音符卷动会更加顺畅，但输入延迟会增加。\n关闭后帧率将没有上限，减少输入延迟，但会使音符卷动\n更加不稳定。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "图像 API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "绘制方式：\n从 OpenGL、DirectX11、Vulkan，或 Metal 中选择。\nOpenGL 速度较慢，但稳定性和兼容性较好。\nDirectX11 较快且稳定，但只能在 Windows 上使用。\nVulkan 在 Linux 上速度最快。\nMetal 只能在 MacOS 上使用。\n\n该项设置将在重启 OpenTaiko 后生效。",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "异步贴图加载",
@@ -90,17 +90,17 @@
 		"SETTINGS_SYSTEM_BGA": "显示背景动画",
 		"SETTINGS_SYSTEM_BGA_DESC": "选择是否播放背景动画。",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "显示角色（Character）",
-		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "显示角色（Character）图片。",
+		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "切换是否显示角色（Character）。",
 		"SETTINGS_SYSTEM_DISPLAYDANCER": "显示舞者（Dancer）",
-		"SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "显示舞者（Dancer）图片。",
+		"SETTINGS_SYSTEM_DISPLAYDANCER_DESC": "切换游玩期间是否显示舞者（Dancer）图像。",
 		"SETTINGS_SYSTEM_DISPLAYMOB": "显示人群（Mob）",
-		"SETTINGS_SYSTEM_DISPLAYMOB_DESC": "显示人群（Mob）图片。",
+		"SETTINGS_SYSTEM_DISPLAYMOB_DESC": "切换当玩家魂条已满时是否显示人群（Mob）图像。",
 		"SETTINGS_SYSTEM_DISPLAYRUNNER": "显示跑者（Runner）",
-		"SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "显示跑者（Runner）图片。",
+		"SETTINGS_SYSTEM_DISPLAYRUNNER_DESC": "切换当敲击音符时是否显示跑过屏幕的跑者（Runner）\n图像。",
 		"SETTINGS_SYSTEM_DISPLAYFOOTER": "显示页脚（Footer）",
-		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "显示页脚（Footer）图片。",
-		"SETTINGS_SYSTEM_DISPLAYPUCHI": "显示迷你角色",
-		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "显示迷你角色图片。",
+		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "切换游玩期间是否显示页脚（Footer）图像。",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI": "绘制迷你角色",
+		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "显示迷你角色图像。",
 		"SETTINGS_SYSTEM_SIMPLEMODE": "简化模式",
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "通过游玩期间隐藏多数视觉火焰和效果简化描绘。",
 
@@ -109,7 +109,7 @@
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "播放歌曲",
-		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "选择是否播放音乐。",
+		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "切换是否播放音乐。",
 		"SETTINGS_SYSTEM_USESONGVOL": "应用音量（SONGVOL）元信息",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "切换是否使用 SONGVOL 元数据的部分无效选项。\n— 0—99：降低音量\n— 100+：没有任何作用",
 		"SETTINGS_SYSTEM_SEVOL": "音效音量",
@@ -155,7 +155,7 @@
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",
-		"SETTINGS_GAME_GLOBALOFFSET_DESC": "更改所有谱面的偏移量。\n设定范围：-999—999ms\n可设为负值以减少输入延迟。",
+		"SETTINGS_GAME_GLOBALOFFSET_DESC": "更改所有谱面的偏移量。\n设定范围：-999—999ms\n要减少输入延迟，可设为负值。",
 
 		"SETTINGS_GAME_CALIBRATION": "校准偏移量",
 		"SETTINGS_GAME_CALIBRATION_DESC": "校准您的偏移量。\n如果保存，将覆盖全局偏移量。",
@@ -167,9 +167,9 @@
 		"SETTINGS_GAME_BADCOUNT": "完美模式",
 		"SETTINGS_GAME_BADCOUNT_DESC": "选择打出多少个“不可”时会导致演奏失败。\n— 0：禁用此选项",
 		"SETTINGS_GAME_NOTELOCK": "锁定音符模式",
-		"SETTINGS_GAME_NOTELOCK_DESC": "切换是否会将空白处的敲击判断为“不可”。",
+		"SETTINGS_GAME_NOTELOCK_DESC": "切换在谱面空白处敲击时是否判为“不可”。",
 		"SETTINGS_GAME_AILEVEL": "AI 等级",
-		"SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：关闭\n— 1+：2P 会变为 AI\n此选项会在自动模式开启时禁用。",
+		"SETTINGS_GAME_AILEVEL_DESC": "决定 AI 的准确度。\n— 0：禁用 AI\n— 1+：玩家 2 会变为 AI\n此选项会在玩家 2 的自动模式开启时禁用。",
 		"SETTINGS_GAME_NORMALGAUGE": "总是使用普通魂条",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "强制总是使用普通魂条，无视角色的修改器。",
 
@@ -178,19 +178,19 @@
 		"SETTINGS_GAME_AUTOP2": "玩家 2 自动演奏",
 		"SETTINGS_GAME_AUTOP2_DESC": "切换玩家 2 是否自动演奏。",
 		"SETTINGS_GAME_AUTOROLL": "连打速度",
-		"SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。\n不对气球生效。\n0 关闭自动连打，最快每帧一次。",
+		"SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。\n不对气球生效。\n0 禁用自动连打，且最大值为每帧一次。",
 
 		"SETTINGS_GAME_NOINFO": "无信息模式",
-		"SETTINGS_GAME_NOINFO_DESC": "打开会关闭歌曲信息显示，\n关闭会打开歌曲信息显示。",
+		"SETTINGS_GAME_NOINFO_DESC": "切换是否隐藏歌曲信息。\n打开会隐藏歌曲信息，\n关闭会显示歌曲信息。",
 		"SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量。\n范围：1—99999",
 		"SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
 		"SETTINGS_GAME_SCOREDISPLAY_DESC": "在左下方显示良、可、不可数量。\n（仅在单人模式下生效）",
 		"SETTINGS_GAME_BRANCHANIME": "谱面分歧动画",
-		"SETTINGS_GAME_BRANCHANIME_DESC": "— TYPE-A：第二代\n— TYPE-B：第三代",
+		"SETTINGS_GAME_BRANCHANIME_DESC": "选择当谱面分歧时使用的动画组合。\n— TYPE-A：第二代\n— TYPE-B：第三代",
 
 		"SETTINGS_GAME_DEFAULTDIFF": "默认难度",
-		"SETTINGS_GAME_DEFAULTDIFF_DESC": "除非该选项被设为魔王（里）或在选择难度时\n在魔王（表）上按右方向键，魔王（里）难度不会显示。",
+		"SETTINGS_GAME_DEFAULTDIFF_DESC": "选择选曲期间的默认难度。\n如果未选择魔王（里），在一合适歌曲魔王（表）难度下\n按下右方向键之前，魔王（里）将不可见。",
 		"SETTINGS_GAME_EXEXTRAANIME": "表里谱面过渡效果",
 		"SETTINGS_GAME_EXEXTRAANIME_DESC": "播放由皮肤定义的表里谱面切换动画效果。",
 
@@ -206,12 +206,12 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "图片预览缓冲",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "图像预览缓冲",
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "移植 DTXMania 导致的无效设置，没有任何作用。",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "时间拉伸模式",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "此选项作用不明。\n增加 CPU 占用，且当歌曲播放速度低于 0.9 倍时可能会出\n现问题。",
 		"SETTINGS_SYSTEM_FASTRENDER": "快速渲染",
-		"SETTINGS_SYSTEM_FASTRENDER_DESC": "选择是否在加载歌曲时就开始渲染图片。",
+		"SETTINGS_SYSTEM_FASTRENDER_DESC": "选择是否在加载歌曲时就开始渲染图像。",
 		"SETTINGS_GAME_BRANCHGUIDE": "谱面分歧导引",
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "切换是否显示谱面分歧条件数值导引。\n自动演奏模式下此项不起作用。",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "大音符判断",
@@ -219,9 +219,9 @@
 		"SETTINGS_GAME_SURVIVAL": "生存模式",
 		"SETTINGS_GAME_SURVIVAL_DESC": "此模式不可用。\n此模式实现了一个类似 StepMania 的计时器系统，\n但部分代码缺失导致功能受限。",
 		"SETTINGS_GAME_SCOREMODE": "计分模式",
-		"SETTINGS_GAME_SCOREMODE_DESC": "— TYPE-A：第一代\n— TYPE-B：第二代\n— TYPE-C：第三代",
+		"SETTINGS_GAME_SCOREMODE_DESC": "选择用于决定得分的公式。\n— TYPE-A：第一代\n— TYPE-B：第二代\n— TYPE-C：第三代",
 		"SETTINGS_GAME_SHINUCHI": "真打模式",
-		"SETTINGS_GAME_SHINUCHI_DESC": "使所有音符得分相同，\n使用第四代公式。",
+		"SETTINGS_GAME_SHINUCHI_DESC": "使所有音符得分相同。\n使用第四代公式。",
 
 		// Key Assignment - System
 		"SETTINGS_KEYASSIGN_SYSTEM_CAPTURE": "截屏",
