@@ -981,7 +981,7 @@ class TextureLoader {
 
 		#region [Character count initialisations]
 
-		var charaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS);
+		/*
 		OpenTaiko.Skin.Characters_Ptn = charaDirs.Length;
 
 		Characters_Heya_Preview = new CTexture[OpenTaiko.Skin.Characters_Ptn];
@@ -1127,6 +1127,7 @@ class TextureLoader {
 		OpenTaiko.Skin.Characters_Motion_SoulOut = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_Motion_ClearOut = new int[OpenTaiko.Skin.Characters_Ptn][];
 		OpenTaiko.Skin.Characters_Motion_Return = new int[OpenTaiko.Skin.Characters_Ptn][];
+		*/
 		/*
         TJAPlayer3.Skin.Characters_Motion_Tower_Standing = new int[TJAPlayer3.Skin.Characters_Ptn][];
         TJAPlayer3.Skin.Characters_Motion_Tower_Climbing = new int[TJAPlayer3.Skin.Characters_Ptn][];
@@ -1138,6 +1139,7 @@ class TextureLoader {
         TJAPlayer3.Skin.Characters_Motion_Tower_Running_Tired = new int[TJAPlayer3.Skin.Characters_Ptn][];
         TJAPlayer3.Skin.Characters_Motion_Tower_Clear_Tired = new int[TJAPlayer3.Skin.Characters_Ptn][];
         */
+		/*
 		OpenTaiko.Skin.Characters_Beat_Normal = new float[OpenTaiko.Skin.Characters_Ptn];
 		OpenTaiko.Skin.Characters_Beat_Miss = new float[OpenTaiko.Skin.Characters_Ptn];
 		OpenTaiko.Skin.Characters_Beat_MissDown = new float[OpenTaiko.Skin.Characters_Ptn];
@@ -1176,19 +1178,34 @@ class TextureLoader {
 		OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration = new int[OpenTaiko.Skin.Characters_Ptn];
 		OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration = new int[OpenTaiko.Skin.Characters_Ptn];
 		OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration = new int[OpenTaiko.Skin.Characters_Ptn];
+		*/
 
+		/*
 		for (int i = 0; i < charaDirs.Length; i++) {
 			OpenTaiko.Skin.Characters_DirName[i] = System.IO.Path.GetFileName(charaDirs[i]);
 		}
+		*/
 
 		#endregion
 
+		string[] charaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS);
+
+		Characters = new CCharacter[charaDirs.Length];
+
+		string[] charaDirNames = new string[charaDirs.Length];
+		for (int i = 0; i < charaDirs.Length; i++) {
+			//Characters[i] = new CCharacterLegacy(charaDirs[i], i);
+			Characters[i] = new CCharacterLua(charaDirs[i], i);
+			charaDirNames[i] = Characters[i].dirName;
+		}
+
 		for (int i = 0; i < 5; i++) {
-			OpenTaiko.SaveFileInstances[i].tReindexCharacter(OpenTaiko.Skin.Characters_DirName);
+			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
 		}
 
 
+		/*
 		for (int i = 0; i < OpenTaiko.Skin.Characters_Ptn; i++) {
 			Characters_Heya_Preview[i] = TxCGlobal(CHARACTERS + OpenTaiko.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}0.png");
 			Characters_Heya_Render[i] = TxCGlobal(CHARACTERS + OpenTaiko.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Render.png");
@@ -1225,6 +1242,7 @@ class TextureLoader {
 
 			Characters[i] = new CCharacter(charaDirs[i], i);
 		}
+		*/
 
 
 		#endregion
@@ -1271,6 +1289,7 @@ class TextureLoader {
 			return new CSkin.CSystemSound(basePath + @$".wav", false, false, true, ESoundGroup.Voice);
 	}
 
+
 	public void ReloadCharacter(int old, int newC, int player, bool primary = false) {
 		if (old == newC)
 			return;
@@ -1283,8 +1302,11 @@ class TextureLoader {
 			(OpenTaiko.SaveFileInstances[4].data.Character != old || player == 4)) {
 			int i = old;
 
+			Characters[i].DisposeGeneralTextures();
+
 			#region [Dispose the previous character]
 
+			/*
 			for (int j = 0; j < OpenTaiko.Skin.Characters_Menu_Loop_Ptn[i]; j++)
 				Characters_Menu_Loop[i][j]?.Dispose();
 
@@ -1422,10 +1444,12 @@ class TextureLoader {
 
 			for (int j = 0; j < OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[i]; j++)
 				Characters_Tower_Clear_Tired[i][j]?.Dispose();
+			*/
+
 			#endregion
 		}
 
-		string charaPath = OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC];
+		//string charaPath = OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC];
 
 		if ((newC >= 0 &&
 			 OpenTaiko.SaveFileInstances[0].data.Character != newC &&
@@ -1435,10 +1459,15 @@ class TextureLoader {
 			 OpenTaiko.SaveFileInstances[4].data.Character != newC) || primary) {
 			int i = newC;
 
+			if (!Characters[i].bGeneralTextureLoaded) {
+				Characters[i].LoadGeneralTextures();
+			}
+
 			#region [Allocate the new character]
 
 			#region [Character individual values count initialisation]
 
+			/*
 			OpenTaiko.Skin.Characters_Normal_Ptn[i] = OpenTaiko.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}");
 			OpenTaiko.Skin.Characters_Normal_Missed_Ptn[i] = OpenTaiko.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}Miss{Path.DirectorySeparatorChar}");
 			OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[i] = OpenTaiko.t連番画像の枚数を数える(charaPath + @$"{Path.DirectorySeparatorChar}MissDown{Path.DirectorySeparatorChar}");
@@ -1532,11 +1561,13 @@ class TextureLoader {
 			Characters_Tower_Climbing_Tired[i] = new CTexture[OpenTaiko.Skin.Characters_Tower_Climbing_Tired_Ptn[i]];
 			Characters_Tower_Running_Tired[i] = new CTexture[OpenTaiko.Skin.Characters_Tower_Running_Tired_Ptn[i]];
 			Characters_Tower_Clear_Tired[i] = new CTexture[OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[i]];
+			*/
 
 			#endregion
 
 			#region [Characters asset loading]
 
+			/*
 			for (int j = 0; j < OpenTaiko.Skin.Characters_Menu_Loop_Ptn[i]; j++)
 				Characters_Menu_Loop[i][j] = TxCGlobal(CHARACTERS + OpenTaiko.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Menu_Loop{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
 
@@ -1674,6 +1705,7 @@ class TextureLoader {
 
 			for (int j = 0; j < OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[i]; j++)
 				Characters_Tower_Clear_Tired[i][j] = TxCGlobal(CHARACTERS + OpenTaiko.Skin.Characters_DirName[i] + @$"{Path.DirectorySeparatorChar}Tower_Char{Path.DirectorySeparatorChar}Clear_Tired{Path.DirectorySeparatorChar}" + j.ToString() + @$".png");
+			*/
 
 			#endregion
 
@@ -1681,6 +1713,7 @@ class TextureLoader {
 
 			#region [Default values]
 
+			/*
 			OpenTaiko.Skin.Characters_Menu_Offset[i] = new int[] { 0, 0 };
 			OpenTaiko.Skin.Characters_Result_Offset[i] = new int[] { 0, 0 };
 			OpenTaiko.Skin.Characters_X[i] = new int[] { 0, 0 };
@@ -1715,17 +1748,6 @@ class TextureLoader {
 			OpenTaiko.Skin.Characters_Motion_SoulOut[i] = CreateNumberedArrayFromInt(OpenTaiko.Skin.Characters_SoulOut_Ptn[i]);
 			OpenTaiko.Skin.Characters_Motion_ClearOut[i] = CreateNumberedArrayFromInt(OpenTaiko.Skin.Characters_ClearOut_Ptn[i]);
 			OpenTaiko.Skin.Characters_Motion_Return[i] = CreateNumberedArrayFromInt(OpenTaiko.Skin.Characters_Return_Ptn[i]);
-			/*
-            TJAPlayer3.Skin.Characters_Motion_Tower_Standing[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Standing_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Climbing[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Climbing_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Running[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Running_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Clear[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Clear_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Fail[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Fail_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Standing_Tired[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Standing_Tired_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Climbing_Tired[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Climbing_Tired_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Running_Tired[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Running_Tired_Ptn[i]);
-            TJAPlayer3.Skin.Characters_Motion_Tower_Clear_Tired[i] = CreateNumberedArrayFromInt(TJAPlayer3.Skin.Characters_Tower_Clear_Tired_Ptn[i]);
-            */
 			OpenTaiko.Skin.Characters_Beat_Normal[i] = 1;
 			OpenTaiko.Skin.Characters_Beat_Miss[i] = 1;
 			OpenTaiko.Skin.Characters_Beat_MissDown[i] = 1;
@@ -1764,9 +1786,11 @@ class TextureLoader {
 			OpenTaiko.Skin.Characters_Result_Clear_AnimationDuration[i] = 1000;
 			OpenTaiko.Skin.Characters_Result_Failed_In_AnimationDuration[i] = 1000;
 			OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[i] = 1000;
+			*/
 
 			#endregion
 
+			/*
 			var _str = "";
 			OpenTaiko.Skin.LoadSkinConfigFromFile(charaPath + @$"{Path.DirectorySeparatorChar}CharaConfig.txt", ref _str);
 
@@ -1983,51 +2007,6 @@ class TextureLoader {
 										OpenTaiko.Skin.Characters_Motion_Return[i] = CConversion.StringToIntArray(strParam);
 										break;
 									}
-								/*case "Game_Chara_Motion_Tower_Standing":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Standing[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Climbing":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Climbing[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Running":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Running[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Clear":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Clear[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Fail":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Fail[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Standing_Tired":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Standing_Tired[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Climbing_Tired":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Climbing_Tired[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Running_Tired":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Running_Tired[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }
-                                case "Game_Chara_Motion_Tower_Clear_Tired":
-                                {
-                                    TJAPlayer3.Skin.Characters_Motion_Tower_Clear_Tired[i] = CConversion.StringToIntArray(strParam);
-                                    break;
-                                }*/
 								case "Game_Chara_Beat_Normal": {
 										OpenTaiko.Skin.Characters_Beat_Normal[i] = float.Parse(strParam);
 										break;
@@ -2170,17 +2149,6 @@ class TextureLoader {
 										OpenTaiko.Skin.Characters_Result_Failed_AnimationDuration[i] = int.Parse(strParam);
 										break;
 									}
-								/*
-                                case "Chara_Result_SpeechText":
-                                {
-                                    string[] strSplit = strParam.Split(',');
-                                    for (int j = 0; j < 6; j++)
-                                    {
-                                        TJAPlayer3.Skin.Characters_Result_SpeechText[i][j] = strSplit[j];
-                                    }
-                                    break;
-                                }
-                                */
 								default: { break; }
 							}
 						}
@@ -2192,6 +2160,7 @@ class TextureLoader {
 					}
 				}
 			}
+			*/
 
 			#endregion
 
@@ -2204,6 +2173,7 @@ class TextureLoader {
 
 		#region [Dispose previously allocated sound effects]
 
+		/*
 		_skin.voiceClearFailed[player]?.Dispose();
 		_skin.voiceClearClear[player]?.Dispose();
 		_skin.voiceClearFullCombo[player]?.Dispose();
@@ -2225,11 +2195,13 @@ class TextureLoader {
 		_skin.voiceResultDanFailed[player]?.Dispose();
 		_skin.voiceResultDanRedPass[player]?.Dispose();
 		_skin.voiceResultDanGoldPass[player]?.Dispose();
+		*/
 
 		#endregion
 
 		#region [Allocate and load the new samples]
 
+		/*
 		_skin.voiceClearFailed[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Clear{Path.DirectorySeparatorChar}Failed");
 		_skin.voiceClearClear[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Clear{Path.DirectorySeparatorChar}Clear");
 		_skin.voiceClearFullCombo[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Clear{Path.DirectorySeparatorChar}FullCombo");
@@ -2251,6 +2223,7 @@ class TextureLoader {
 		_skin.voiceResultDanFailed[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Result{Path.DirectorySeparatorChar}DanFailed");
 		_skin.voiceResultDanRedPass[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Result{Path.DirectorySeparatorChar}DanRedPass");
 		_skin.voiceResultDanGoldPass[player] = VoiceSelectOggOrWav(charaPath + @$"{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Result{Path.DirectorySeparatorChar}DanGoldPass");
+		*/
 
 		#endregion
 
@@ -2265,6 +2238,11 @@ class TextureLoader {
 			texture = null;
 		}
 		listTexture.Clear();
+
+		foreach (CCharacter character in Characters)
+		{
+			character.Dispose();
+		}
 
 		//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 		{
@@ -2755,6 +2733,7 @@ Result_Mountain = new CTexture[4]*/;
 
 	#region [11_Characters]
 
+	/*
 	public CTexture[][] Characters_Normal,
 		Characters_Normal_Missed,
 		Characters_Normal_MissedDown,
@@ -2807,6 +2786,7 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Result_Failed_1P,
 		Characters_Result_Clear_2P,
 		Characters_Result_Failed_2P;
+	*/
 	public CCharacter[] Characters;
 
 	#endregion

@@ -3886,6 +3886,34 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
+							case "Game_Chara_AI_X": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_AI_X[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_AI_Y": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_AI_Y[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_4P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_4P[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_5P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_5P[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
 							case "Game_Chara_Balloon_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -3900,44 +3928,18 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
-							case nameof(Game_Chara_Balloon_Timer): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_Timer = int.Parse(strParam);
+							case "Game_Chara_Balloon_4P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_Balloon_4P[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
-							case nameof(Game_Chara_Balloon_Delay): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_Delay = int.Parse(strParam);
-									break;
-								}
-							case nameof(Game_Chara_Balloon_FadeOut): {
-									if (int.Parse(strParam) > 0)
-										Game_Chara_Balloon_FadeOut = int.Parse(strParam);
-									break;
-								}
-							// パターン数の設定はTextureLoader.csで反映されます。
-							case "Game_Chara_Motion_Normal": {
-									Game_Chara_Motion_Normal = strParam;
-									break;
-								}
-							case "Game_Chara_Motion_Clear": {
-									Game_Chara_Motion_Clear = strParam;
-									break;
-								}
-							case "Game_Chara_Motion_GoGo": {
-									Game_Chara_Motion_GoGo = strParam;
-									break;
-								}
-							case "Game_Chara_Beat_Normal": {
-									ParseInt32(value => Game_Chara_Beat_Normal = value);
-									break;
-								}
-							case "Game_Chara_Beat_Clear": {
-									ParseInt32(value => Game_Chara_Beat_Clear = value);
-									break;
-								}
-							case "Game_Chara_Beat_GoGo": {
-									ParseInt32(value => Game_Chara_Beat_GoGo = value);
+							case "Game_Chara_Balloon_5P": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 2; i++) {
+										Game_Chara_Balloon_5P[i] = int.Parse(strSplit[i]);
+									}
 									break;
 								}
 							#endregion
@@ -8433,29 +8435,16 @@ internal class CSkin : IDisposable {
 
 	public int[] Game_Chara_X = new int[] { 0, 0 };
 	public int[] Game_Chara_Y = new int[] { 0, 537 };
-	public int[] Game_Chara_Balloon_X = new int[] { 240, 240, 0, 0 };
-	public int[] Game_Chara_Balloon_Y = new int[] { 0, 297, 0, 0 };
-	public int Game_Chara_Ptn_Normal,
-		Game_Chara_Ptn_GoGo,
-		Game_Chara_Ptn_Clear,
-		Game_Chara_Ptn_10combo,
-		Game_Chara_Ptn_10combo_Max,
-		Game_Chara_Ptn_GoGoStart,
-		Game_Chara_Ptn_GoGoStart_Max,
-		Game_Chara_Ptn_ClearIn,
-		Game_Chara_Ptn_SoulIn,
-		Game_Chara_Ptn_Balloon_Breaking,
-		Game_Chara_Ptn_Balloon_Broke,
-		Game_Chara_Ptn_Balloon_Miss;
-	public string Game_Chara_Motion_Normal,
-		Game_Chara_Motion_Clear,
-		Game_Chara_Motion_GoGo = "0";
-	public int Game_Chara_Beat_Normal = 1;
-	public int Game_Chara_Beat_Clear = 2;
-	public int Game_Chara_Beat_GoGo = 2;
-	public int Game_Chara_Balloon_Timer = 28;
-	public int Game_Chara_Balloon_Delay = 500;
-	public int Game_Chara_Balloon_FadeOut = 84;
+	public int[] Game_Chara_AI_X = new int[] { 0, 0 };
+	public int[] Game_Chara_AI_Y = new int[] { 0, 537 };
+	public int[] Game_Chara_4P = new int[] { 0, 0 };
+	public int[] Game_Chara_5P = new int[] { 0, 537 };
+	public int[] Game_Chara_Balloon_X = new int[] { 240, 240 };
+	public int[] Game_Chara_Balloon_Y = new int[] { 0, 297 };
+	public int[] Game_Chara_Balloon_4P = new int[] { 0, 297 };
+	public int[] Game_Chara_Balloon_5P = new int[] { 0, 297 };
+	public int[] Game_Chara_Kusudama_X = new int[] { 240, 240, 240, 240, 240 };
+	public int[] Game_Chara_Kusudama_Y = new int[] { 0, 297, 297, 297, 297 };
 
 	#endregion
 

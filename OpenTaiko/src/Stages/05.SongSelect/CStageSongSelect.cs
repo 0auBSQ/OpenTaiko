@@ -255,20 +255,17 @@ internal class CStageSongSelect : CStage {
 			this.ct背景スクロール用タイマー = new CCounter(0, txGenreBack.szTextureSize.Width, 30, OpenTaiko.Timer);
 			this.ctOldBGScroll = new CCounter(0, txOldGenreBack.szTextureSize.Width, 30, OpenTaiko.Timer);
 
-			OpenTaiko.Skin.voiceMenuSongSelect[OpenTaiko.SaveFile]?.tPlay();
+			for (int i = 0; i < 5; i++) {
+				CCharacter character = CCharacter.GetCharacter(i);
+				character.SetLoopAnimation(i, CCharacter.ANIM_MENU_NORMAL);
+				character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
+				if (i < OpenTaiko.ConfigIni.nPlayerCount) {
+					character.PlayVoice(CCharacter.VOICE_MENU_SONGSELECT);
+				}
+			}
 
 			for (int i = 0; i < 2; i++)
 				this.ctキー反復用[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);
-
-			//ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-			CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
-
-			//ctChara_Select = new CCounter();
-			//ctChara_Jump[0] = new CCounter();
-			//ctChara_Jump[1] = new CCounter();
-
-			CMenuCharacter.tDisableCounter(CMenuCharacter.ECharacterAnimation.SELECT);
-			CMenuCharacter.tDisableCounter(CMenuCharacter.ECharacterAnimation.START);
 
 			ctBackgroundFade = new CCounter();
 			ctCreditAnime = new CCounter(0, 4500, 1, OpenTaiko.Timer);
@@ -549,7 +546,7 @@ internal class CStageSongSelect : CStage {
 			//if (this.ctChara_Select.b終了値に達してない)
 
 			for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++) {
-				CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[player];
+				//CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[player];
 
 				int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
 
@@ -565,6 +562,13 @@ internal class CStageSongSelect : CStage {
 				int puchi_x = chara_x + OpenTaiko.Skin.Adjustments_MenuPuchichara_X[player % 2];
 				int puchi_y = chara_y + OpenTaiko.Skin.Adjustments_MenuPuchichara_Y[player % 2];
 
+				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+
+				character.Update(player);
+				character.Draw(player, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, player % 2 == 1);
+				this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
+
+				/*
 				if (___cc != null && ___cc.IsUnEnded) {
 					CMenuCharacter.tMenuDisplayCharacter(player, chara_x, chara_y, CMenuCharacter.ECharacterAnimation.SELECT);
 
@@ -587,6 +591,7 @@ internal class CStageSongSelect : CStage {
 						this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
 					}
 				}
+				*/
 			}
 
 
@@ -739,8 +744,11 @@ internal class CStageSongSelect : CStage {
 							this.actSongList.ctBoxOpen.Start(200, 2700, 1.3f, OpenTaiko.Timer);
 							this.actSongList.bBoxOpen = true;
 
-							//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+							for (int i = 0; i < 5; i++)
+							{
+								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+							}
 
 							#endregion
 						} else if (this.actSongList.latestContext == eMenuContext.SearchByText) {
@@ -758,7 +766,11 @@ internal class CStageSongSelect : CStage {
 							this.actSongList.ctBoxOpen.Start(200, 2700, 1.3f, OpenTaiko.Timer);
 							this.actSongList.bBoxOpen = true;
 
-							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+							for (int i = 0; i < 5; i++)
+							{
+								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+							}
 							#endregion
 						} else if (this.actSongList.latestContext == eMenuContext.Random) {
 							#region [Trigger context box]
@@ -773,7 +785,11 @@ internal class CStageSongSelect : CStage {
 							this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 
 							//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-							CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+
+							for (int i = 0; i < 5; i++) {
+								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+							}
 
 							#endregion
 						}
@@ -801,8 +817,11 @@ internal class CStageSongSelect : CStage {
 								this.actSongList.ctBarFlash.Start(0, 2700, 1, OpenTaiko.Timer);
 								this.actSongList.ctBoxOpen.Start(200, 2700, 1.3f, OpenTaiko.Timer);
 								this.actSongList.bBoxClose = true;
-								//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-								CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+
+								for (int i = 0; i < 5; i++) {
+									CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+									character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+								}
 							}
 						}
 					#endregion
@@ -910,7 +929,13 @@ internal class CStageSongSelect : CStage {
 																	CFloorManagement.reinitialize(this.rNowSelectedSong.score[(int)Difficulty.Tower].譜面情報.nLife);
 
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
-																OpenTaiko.Skin.voiceMenuSongDecide[OpenTaiko.SaveFile]?.tPlay();
+																for (int i = 0; i < 5; i++) {
+																	CCharacter character = CCharacter.GetCharacter(i);
+																	character.SetLoopAnimation(i, CCharacter.ANIM_MENU_START, false);
+																	if (i < OpenTaiko.ConfigIni.nPlayerCount) {
+																		character.PlayVoice(CCharacter.VOICE_MENU_SONGDECIDE);
+																	}
+																}
 
 																this.t曲を選択する();
 															} else {
@@ -923,8 +948,11 @@ internal class CStageSongSelect : CStage {
 															this.actDifficultySelectionScreen.t選択画面初期化();
 															this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 															this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
-															//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-															CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+
+															for (int i = 0; i < 5; i++) {
+																CCharacter character = CCharacter.GetCharacter(i);
+																character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+															}
 														}
 													}
 												}
@@ -957,7 +985,10 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
 													this.actSongList.bBoxOpen = true;
 													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+													for (int i = 0; i < 5; i++) {
+														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+													}
 												}
 												break;
 											case CSongListNode.ENodeType.BACKBOX: {
@@ -969,7 +1000,10 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.ctBoxOpen.Start(200, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval * 1.3f, OpenTaiko.Timer);
 													this.actSongList.bBoxClose = true;
 													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+													for (int i = 0; i < 5; i++) {
+														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+													}
 												}
 												break;
 											case CSongListNode.ENodeType.RANDOM: {
@@ -982,22 +1016,10 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.ctBarFlash.Start(0, 2700, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 													this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 
-													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
-
-													/*
-													TJAPlayer3.Skin.sound決定音.t再生する();
-
-													this.act曲リスト.tMenuContextTrigger(eMenuContext.Random);
-													goto Decided;
-													*/
-
-													/*
-													this.t曲をランダム選択する();
-
-													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-													CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
-													*/
+													for (int i = 0; i < 5; i++) {
+														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+													}
 												}
 												break;
 										}
@@ -1038,7 +1060,10 @@ internal class CStageSongSelect : CStage {
 								if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 									//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-									CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+									for (int i = 0; i < 5; i++) {
+										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+										character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+									}
 
 									for (int i = 0; i < 7; i++) tカーソルスキップ(true);
 								}
@@ -1057,7 +1082,10 @@ internal class CStageSongSelect : CStage {
 								if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 									//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
-									CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.SELECT);
+									for (int i = 0; i < 5; i++) {
+										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+										character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+									}
 
 									for (int i = 0; i < 7; i++) tカーソルスキップ(false);
 								}
@@ -1136,21 +1164,6 @@ internal class CStageSongSelect : CStage {
 				OpenTaiko.Tx.SongSelect_Credit.t2D描画(0, 0);
 			}
 
-			for (int i = 0; i < 5; i++) {
-				CCounter ___cs = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.START)[i];
-
-				//if (this.ctChara_Jump[i].n現在の値 >= this.ctChara_Jump[i].n終了値)
-				if (___cs != null && ___cs.CurrentValue >= ___cs.EndValue) {
-					//this.ctChara_Jump[i].t停止();
-					___cs.Stop();
-
-					if (!this.actDifficultySelectionScreen.bIsDifficltSelect) {
-						//this.ctChara_Jump[i].n現在の値 = 0;
-						___cs.CurrentValue = 0;
-					}
-				}
-			}
-
 			this.actPlayOption.On進行描画(5, this.actDifficultySelectionScreen.bOption);
 
 			if (actNewHeya.IsOpend) actNewHeya.Draw();
@@ -1183,9 +1196,19 @@ internal class CStageSongSelect : CStage {
 		}
 		return 0;
 	}
+	public enum EReturnValue : int {
+		Continuation,
+		BackToTitle,
+		PlayCutSceneIntro,
+		SongSelected,
+		CallOptions,
+		ConfigMenuOpened,
+		SkinChange,
+		JumpToLuaStage
+	}
+
 
 	// その他
-
 	#region [ private ]
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]

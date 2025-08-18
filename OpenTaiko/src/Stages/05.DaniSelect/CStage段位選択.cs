@@ -31,7 +31,9 @@ class CStage段位選択 : CStage {
 		ctChara_In = new CCounter();
 
 		// ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-		CMenuCharacter.tMenuResetTimer(CMenuCharacter.ECharacterAnimation.NORMAL);
+		CCharacter character = CCharacter.GetCharacter(0);
+		character.SetLoopAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+		character.SetAnimationDuration(0, CCharacter.DEFAULT_DURATION);
 
 
 		bInSongPlayed = false;
@@ -144,7 +146,7 @@ class CStage段位選択 : CStage {
 		} else if (stamp == 6000) {
 			if (!ctChara_In.IsStarted) {
 				//TJAPlayer3.Skin.soundDanSelectStart.t再生する();
-				OpenTaiko.Skin.voiceMenuDanSelectStart[OpenTaiko.SaveFile]?.tPlay();
+				CCharacter.GetCharacter(0).PlayVoice(CCharacter.VOICE_MENU_DANSELECTSTART);
 				OpenTaiko.Skin.soundDanSelectBGM.tPlay();
 				ctChara_In.Start(0, 180, 1.25f, OpenTaiko.Timer);
 			}
@@ -181,7 +183,7 @@ class CStage段位選択 : CStage {
 						case CSongListNode.ENodeType.RANDOM: {
 								//this.t段位を選択する();
 								//TJAPlayer3.Skin.soundDanSongSelectCheck.t再生する();
-								OpenTaiko.Skin.voiceMenuDanSelectPrompt[OpenTaiko.SaveFile]?.tPlay();
+								CCharacter.GetCharacter(0).PlayVoice(CCharacter.VOICE_MENU_DANSELECTPROMPT);
 								this.bDifficultyIn = true;
 								this.段位挑戦選択画面.ctBarIn.Start(0, 255, 1, OpenTaiko.Timer);
 							}
@@ -228,11 +230,8 @@ class CStage段位選択 : CStage {
 				int chara_x = OpenTaiko.Skin.SongSelect_NamePlate_X[0] + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
 				int chara_y = OpenTaiko.Skin.SongSelect_NamePlate_Y[0];
 
-				CMenuCharacter.tMenuDisplayCharacter(
-					0,
-					chara_x,
-					chara_y,
-					CMenuCharacter.ECharacterAnimation.NORMAL);
+				CCharacter.GetCharacter(0).Update(0);
+				CCharacter.GetCharacter(0).Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
 
 				#region [PuchiChara]
 

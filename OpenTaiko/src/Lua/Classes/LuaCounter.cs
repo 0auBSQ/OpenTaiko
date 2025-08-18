@@ -41,12 +41,12 @@ namespace OpenTaiko {
 		}
 
 		public void SetLoop(bool loop) {
-			Loop = true;
+			Loop = loop;
 			Bounce = false;
 		}
 
 		public void SetBounce(bool bounce) {
-			Bounce = true;
+			Bounce = bounce;
 			Loop = false;
 		}
 

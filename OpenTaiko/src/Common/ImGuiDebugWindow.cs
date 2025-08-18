@@ -112,7 +112,7 @@ public static class ImGuiDebugWindow {
 			#endregion
 
 			ImGui.EndTabBar();
-			
+
 			ImGui.End();
 		}
 	}
@@ -432,11 +432,13 @@ public static class ImGuiDebugWindow {
 								OpenTaiko.Tx.ReloadCharacter(current_chara, chara, save);
 								OpenTaiko.SaveFileInstances[save].data.Character = chara;
 
-								OpenTaiko.SaveFileInstances[save].tUpdateCharacterName(OpenTaiko.Skin.Characters_DirName[chara]);
-								OpenTaiko.Skin.voiceTitleSanka[save]?.tPlay();
+								OpenTaiko.SaveFileInstances[save].tUpdateCharacterName(OpenTaiko.Tx.Characters[chara].dirName);
+								OpenTaiko.Tx.Characters[chara].PlayVoice(CCharacter.VOICE_TITLE_SANKA);
+								/*
 								foreach (var animation in Enum.GetValues<CMenuCharacter.ECharacterAnimation>()) {
 									CMenuCharacter.tMenuResetTimer(animation);
 								}
+								*/
 								OpenTaiko.SaveFileInstances[save].tApplyHeyaChanges();
 							}
 						}
