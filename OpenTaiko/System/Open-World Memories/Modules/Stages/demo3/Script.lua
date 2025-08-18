@@ -57,8 +57,8 @@ function update()
 end
 
 function activate()
-	localStore = STORAGE:OpenLocalDatabase("Databases/test.optkdb")
-	globalStore = STORAGE:OpenGlobalDatabase("TestSampleDatabases/testGlobal.optkdb")
+	localStore = DATABASE:OpenLocalDatabase("Databases/test.optkdb")
+	globalStore = DATABASE:OpenGlobalDatabase("TestSampleDatabases/testGlobal.optkdb")
 	
 	val1 = readInt(localStore)
 	val2 = readInt(globalStore)
