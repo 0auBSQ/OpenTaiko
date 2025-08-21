@@ -79,7 +79,7 @@ class CActSelect段位挑戦選択画面 : CActivity {
 						//TJAPlayer3.Skin.soundDanSongSelect.t再生する();
 						OpenTaiko.ConfigIni.bTokkunMode = false;
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
-						CCharacter.GetCharacter(OpenTaiko.SaveFile).PlayVoice(CCharacter.VOICE_MENU_DANSELECTCONFIRM);
+						CCharacter.GetCharacter(OpenTaiko.SaveFile).PlayVoice(0, CCharacter.VOICE_MENU_DANSELECTCONFIRM);
 						OpenTaiko.stageDanSongSelect.ct待機.Start(0, 3000, 1, OpenTaiko.Timer);
 					} else if (n現在の選択行 == 2) {
 						bOption = true;

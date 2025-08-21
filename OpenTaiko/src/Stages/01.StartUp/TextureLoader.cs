@@ -1263,15 +1263,10 @@ class TextureLoader {
 		if (old == newC)
 			return;
 
-		if (old >= 0 &&
-			(OpenTaiko.SaveFileInstances[0].data.Character != old || player == 0) &&
-			(OpenTaiko.SaveFileInstances[1].data.Character != old || player == 1) &&
-			(OpenTaiko.SaveFileInstances[2].data.Character != old || player == 2) &&
-			(OpenTaiko.SaveFileInstances[3].data.Character != old || player == 3) &&
-			(OpenTaiko.SaveFileInstances[4].data.Character != old || player == 4)) {
+		if (old >= 0 && OpenTaiko.SaveFileInstances[player].data.Character != old) {
 			int i = old;
 
-			Characters[i].DisposeGeneralTextures();
+			Characters[i].DisposeGeneralTextures(player);
 
 			#region [Dispose the previous character]
 
@@ -1421,15 +1416,11 @@ class TextureLoader {
 		//string charaPath = OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC];
 
 		if ((newC >= 0 &&
-			 OpenTaiko.SaveFileInstances[0].data.Character != newC &&
-			 OpenTaiko.SaveFileInstances[1].data.Character != newC &&
-			 OpenTaiko.SaveFileInstances[2].data.Character != newC &&
-			 OpenTaiko.SaveFileInstances[3].data.Character != newC &&
-			 OpenTaiko.SaveFileInstances[4].data.Character != newC) || primary) {
+			 OpenTaiko.SaveFileInstances[player].data.Character != newC || primary)) {
 			int i = newC;
 
-			if (!Characters[i].bGeneralTextureLoaded) {
-				Characters[i].LoadGeneralTextures();
+			if (!Characters[i].bGeneralTextureLoaded[player]) {
+				Characters[i].LoadGeneralTextures(player);
 			}
 
 			#region [Allocate the new character]

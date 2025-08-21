@@ -84,8 +84,8 @@ abstract class CCharacter : IDisposable {
 	public int _idx;
 	public string dirName;
 
-	public bool bGeneralTextureLoaded { get; private set; }
-	public bool bStoryTextureLoaded { get; private set; }
+	public bool[] bGeneralTextureLoaded { get; private set; } = new bool[5];
+	public bool[] bStoryTextureLoaded { get; private set; } = new bool[5];
 
 	public float GetEffectCoinMultiplier() {
 		float mult = 1f;
@@ -149,28 +149,43 @@ abstract class CCharacter : IDisposable {
 			unlock = null;
 	}
 
-	public virtual void LoadStoryTextures() {
-		bStoryTextureLoaded = true;
+	public virtual void LoadStoryTextures(int player) {
+		bStoryTextureLoaded[player] = true;
 	}
 
-	public virtual void LoadGeneralTextures() {
-		bGeneralTextureLoaded = true;
+	public virtual void LoadGeneralTextures(int player) {
+		bGeneralTextureLoaded[player] = true;
 	}
 
-	public virtual void DisposeStoryTextures() {
-		bStoryTextureLoaded = false;
+	public virtual void DisposeStoryTextures(int player) {
+		bStoryTextureLoaded[player] = false;
 	}
 
-	public virtual void DisposeGeneralTextures() {
-		bGeneralTextureLoaded = false;
+	public virtual void DisposeGeneralTextures(int player) {
+		bGeneralTextureLoaded[player] = false;
 	}
 
 	public virtual void Dispose() {
-		DisposeStoryTextures();
-		DisposeGeneralTextures();
+		for (int player = 0; player < 5; player++)
+		{
+			DisposeStoryTextures(player);
+			DisposeGeneralTextures(player);
+		}
+	}
+
+	public virtual void GameInit(int player) {
+
 	}
 
 	public virtual void Update(int player) {
+
+	}
+
+	public virtual void TowerNextFloor() {
+
+	}
+
+	public virtual void TowerFinish() {
 
 	}
 
@@ -186,6 +201,10 @@ abstract class CCharacter : IDisposable {
 
 	}
 
+	public virtual void DrawTower() {
+
+	}
+
 	public virtual void SetLoopAnimation(int player, string animationType, bool loop = true) {
 
 	}
@@ -194,7 +213,7 @@ abstract class CCharacter : IDisposable {
 
 	}
 
-	public virtual void PlayVoice(string voiceType) {
+	public virtual void PlayVoice(int player, string voiceType) {
 
 	}
 

@@ -140,7 +140,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				CCharacter character = CCharacter.GetCharacter(i);
-				character.PlayVoice(CCharacter.VOICE_MENU_DIFFSELECT);
+				character.PlayVoice(i, CCharacter.VOICE_MENU_DIFFSELECT);
 			}
 
 			base.IsFirstDraw = false;
@@ -255,9 +255,9 @@ internal class CActSelect難易度選択画面 : CActivity {
 									for (int i2 = 0; i2 < OpenTaiko.ConfigIni.nPlayerCount; i2++) {
 										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i2));
 										if (OpenTaiko.ConfigIni.bAIBattleMode) {
-											character.PlayVoice(CCharacter.VOICE_MENU_SONGDECIDE_AI);
+											character.PlayVoice(i2, CCharacter.VOICE_MENU_SONGDECIDE_AI);
 										} else {
-											character.PlayVoice(CCharacter.VOICE_MENU_SONGDECIDE);
+											character.PlayVoice(i2, CCharacter.VOICE_MENU_SONGDECIDE);
 										}
 										character.SetLoopAnimation(i2, CCharacter.ANIM_MENU_START, false);
 										if (OpenTaiko.ConfigIni.bAIBattleMode) {

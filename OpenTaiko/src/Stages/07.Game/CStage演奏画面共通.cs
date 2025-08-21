@@ -4084,6 +4084,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			nCurrentKusudamaRollCount = 0;
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+				character.GameInit(i);
+
 				this.Chara_MissCount[i] = 0;
 				this.bIsMiss[i] = false;
 				this.bUseBranch[i] = false;

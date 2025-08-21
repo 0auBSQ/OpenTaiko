@@ -1183,11 +1183,11 @@ internal class CActResultParameterPanel : CActivity {
 	private void CheckClear(int player) {
 		if (OpenTaiko.stageResults.nクリア[player] >= 1) {
 			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
-			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARSUCCESS);
+			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARSUCCESS);
 			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_CLEAR);
 		} else {
 			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
-			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARFAILED);
+			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARFAILED);
 			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_FAILED);
 			character.PlayAnimation(player, CCharacter.ANIM_RESULT_FAILED_IN);
 		}

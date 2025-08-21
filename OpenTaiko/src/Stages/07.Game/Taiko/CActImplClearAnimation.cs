@@ -545,7 +545,7 @@ internal class CActImplClearAnimation : CActivity {
 							this.soundFailed[i]?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							//OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FAILED);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FAILED);
 							break;
 						case EndMode.StageCleared:
 							ClearScript.PlayEndAnime(i);
@@ -553,7 +553,7 @@ internal class CActImplClearAnimation : CActivity {
 							this.soundClear[i]?.PlayStart();
 							//OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							//OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_CLEAR);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_CLEAR);
 							break;
 						case EndMode.StageFullCombo:
 							FullComboScript.PlayEndAnime(i);
@@ -561,7 +561,7 @@ internal class CActImplClearAnimation : CActivity {
 							this.soundFullCombo[i]?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							//OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FULLCOMBO);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FULLCOMBO);
 							break;
 						case EndMode.StagePerfectCombo:
 							PerfectComboScript.PlayEndAnime(i);
@@ -569,100 +569,100 @@ internal class CActImplClearAnimation : CActivity {
 							this.soundPerfectCombo[i]?.PlayStart();
 							//OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
 							//OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_ALLPERFECT);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_ALLPERFECT);
 							break;
 
 						case EndMode.AI_Lose:
 							AILoseScript.PlayEndAnime(i);
 							this.soundAILose?.PlayStart();
 							//OpenTaiko.Skin.voiceAILose[OpenTaiko.GetActualPlayer(1)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_AIBATTLE_LOSE);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_AIBATTLE_LOSE);
 							break;
 						case EndMode.AI_Win:
 							AIWinScript.PlayEndAnime(i);
 							this.soundAIWin?.PlayStart();
 							//OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_AIBATTLE_WIN);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_AIBATTLE_WIN);
 							break;
 						case EndMode.AI_Win_FullCombo:
 							AIWin_FullComboScript.PlayEndAnime(i);
 							this.soundAIWinFullCombo?.PlayStart();
 							//OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_AIBATTLE_WIN);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_AIBATTLE_WIN);
 							break;
 						case EndMode.AI_Win_Perfect:
 							AIWin_PerfectScript.PlayEndAnime(i);
 							this.soundAIWinPerfectCombo?.PlayStart();
 							//OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_AIBATTLE_WIN);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_AIBATTLE_WIN);
 							break;
 
 						case EndMode.Tower_Dropout:
 							Tower_DropoutScript.PlayEndAnime(i);
 							this.soundTowerDropout?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FAILED);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FAILED);
 							break;
 						case EndMode.Tower_TopReached_Pass:
 							Tower_TopReached_PassScript.PlayEndAnime(i);
 							this.soundTowerTopPass?.PlayStart();
 							//OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_CLEAR);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_CLEAR);
 							break;
 						case EndMode.Tower_TopReached_FullCombo:
 							Tower_TopReached_FullComboScript.PlayEndAnime(i);
 							this.soundTowerTopFC?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FULLCOMBO);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FULLCOMBO);
 							break;
 						case EndMode.Tower_TopReached_Perfect:
 							Tower_TopReached_PerfectScript.PlayEndAnime(i);
 							this.soundTowerTopPerfect?.PlayStart();
 							//OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_ALLPERFECT);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_ALLPERFECT);
 							break;
 
 						case EndMode.Dan_Fail:
 							Dan_FailScript.PlayEndAnime(i);
 							this.soundDanFailed?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FAILED);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FAILED);
 							break;
 						case EndMode.Dan_Red_Pass:
 							Dan_Red_PassScript.PlayEndAnime(i);
 							this.soundDanRedClear?.PlayStart();
 							//OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_CLEAR);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_CLEAR);
 							break;
 						case EndMode.Dan_Red_FullCombo:
 							Dan_Red_FullComboScript.PlayEndAnime(i);
 							this.soundDanRedFC?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FULLCOMBO);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FULLCOMBO);
 							break;
 						case EndMode.Dan_Red_Perfect:
 							Dan_Red_PerfectScript.PlayEndAnime(i);
 							this.soundDanRedPerfect?.PlayStart();
 							//OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_ALLPERFECT);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_ALLPERFECT);
 							break;
 						case EndMode.Dan_Gold_Pass:
 							Dan_Gold_PassScript.PlayEndAnime(i);
 							this.soundDanGoldClear?.PlayStart();
 							//OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_CLEAR);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_CLEAR);
 							break;
 						case EndMode.Dan_Gold_FullCombo:
 							Dan_Gold_FullComboScript.PlayEndAnime(i);
 							this.soundDanGoldFC?.PlayStart();
 							//OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_FULLCOMBO);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_FULLCOMBO);
 							break;
 						case EndMode.Dan_Gold_Perfect:
 							Dan_Gold_PerfectScript.PlayEndAnime(i);
 							this.soundDanGoldPerfect?.PlayStart();
 							//OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(CCharacter.VOICE_END_ALLPERFECT);
+							OpenTaiko.Tx.Characters[OpenTaiko.GetActualPlayer(i)].PlayVoice(i, CCharacter.VOICE_END_ALLPERFECT);
 							break;
 
 						default:

@@ -25,10 +25,14 @@ namespace OpenTaiko {
 		private LuaFunction lfDisposePreviewTextures;
 		private LuaFunction lfDisposeStoryTextures;
 		private LuaFunction lfDisposeGeneralTextures;
+		private LuaFunction lfGameInit;
 		private LuaFunction lfUpdate;
+		private LuaFunction lfTowerNextFloor;
+		private LuaFunction lfTowerFinish;
 		private LuaFunction lfDraw;
 		private LuaFunction lfDrawPreview;
 		private LuaFunction lfDrawHeyaRender;
+		private LuaFunction lfDrawTower;
 		private LuaFunction lfSetLoopAnimation;
 		private LuaFunction lfPlayAnimation;
 		private LuaFunction lfPlayVoice;
@@ -59,12 +63,24 @@ namespace OpenTaiko {
 			RunLuaCode(lfDisposeGeneralTextures);
 		}
 
-		public void Update(int player) {
-			RunLuaCode(lfUpdate, player);
+		public void GameInit() {
+			RunLuaCode(lfGameInit);
 		}
 
-		public void Draw(int player, float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
-			RunLuaCode(lfDraw, player, x, y, scaleX, scaleY, opacity, color, flipX);
+		public void Update() {
+			RunLuaCode(lfUpdate);
+		}
+
+		public void TowerNextFloor() {
+			RunLuaCode(lfTowerNextFloor);
+		}
+
+		public void TowerFinish() {
+			RunLuaCode(lfTowerFinish);
+		}
+
+		public void Draw(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
+			RunLuaCode(lfDraw, x, y, scaleX, scaleY, opacity, color, flipX);
 		}
 
 		public void DrawPreview(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
@@ -75,24 +91,28 @@ namespace OpenTaiko {
 			RunLuaCode(lfDrawHeyaRender, x, y, scaleX, scaleY, opacity, color, flipX);
 		}
 
-		public void SetLoopAnimation(int player, string animationType, bool loop = true) {
-			RunLuaCode(lfSetLoopAnimation, player, animationType, loop);
+		public void DrawTower() {
+			RunLuaCode(lfDrawTower);
 		}
 
-		public void PlayAnimation(int player, string animationType) {
-			RunLuaCode(lfPlayAnimation, player, animationType);
+		public void SetLoopAnimation(string animationType, bool loop = true) {
+			RunLuaCode(lfSetLoopAnimation, animationType, loop);
+		}
+
+		public void PlayAnimation(string animationType) {
+			RunLuaCode(lfPlayAnimation, animationType);
 		}
 
 		public void PlayVoice(string voiceType) {
 			RunLuaCode(lfPlayVoice, voiceType);
 		}
 
-		public void SetAnimationDuration(int player, double ms) {
-			RunLuaCode(lfSetAnimationDuration, player, ms);
+		public void SetAnimationDuration(double ms) {
+			RunLuaCode(lfSetAnimationDuration, ms);
 		}
 
-		public void SetAnimationCyclesToBPM(int player, double bpm) {
-			RunLuaCode(lfSetAnimationCyclesToBPM, player, bpm);
+		public void SetAnimationCyclesToBPM(double bpm) {
+			RunLuaCode(lfSetAnimationCyclesToBPM, bpm);
 		}
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
@@ -103,10 +123,14 @@ namespace OpenTaiko {
 				lfDisposePreviewTextures = (LuaFunction)LuaScript["disposePreviewTextures"];
 				lfDisposeStoryTextures = (LuaFunction)LuaScript["disposeStoryTextures"];
 				lfDisposeGeneralTextures = (LuaFunction)LuaScript["disposeGeneralTextures"];
+				lfGameInit = (LuaFunction)LuaScript["gameInit"];
 				lfUpdate = (LuaFunction)LuaScript["update"];
+				lfTowerNextFloor = (LuaFunction)LuaScript["towerNextFloor"];
+				lfTowerFinish = (LuaFunction)LuaScript["towerFinish"];
 				lfDraw = (LuaFunction)LuaScript["draw"];
 				lfDrawPreview = (LuaFunction)LuaScript["drawPreview"];
 				lfDrawHeyaRender = (LuaFunction)LuaScript["drawHeyaRender"];
+				lfDrawTower = (LuaFunction)LuaScript["drawTower"];
 				lfSetLoopAnimation = (LuaFunction)LuaScript["setLoopAnimation"];
 				lfPlayAnimation = (LuaFunction)LuaScript["playAnimation"];
 				lfPlayVoice = (LuaFunction)LuaScript["playVoice"];

@@ -260,7 +260,7 @@ internal class CStageSongSelect : CStage {
 				character.SetLoopAnimation(i, CCharacter.ANIM_MENU_NORMAL);
 				character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
 				if (i < OpenTaiko.ConfigIni.nPlayerCount) {
-					character.PlayVoice(CCharacter.VOICE_MENU_SONGSELECT);
+					character.PlayVoice(i, CCharacter.VOICE_MENU_SONGSELECT);
 				}
 			}
 
@@ -933,7 +933,7 @@ internal class CStageSongSelect : CStage {
 																	CCharacter character = CCharacter.GetCharacter(i);
 																	character.SetLoopAnimation(i, CCharacter.ANIM_MENU_START, false);
 																	if (i < OpenTaiko.ConfigIni.nPlayerCount) {
-																		character.PlayVoice(CCharacter.VOICE_MENU_SONGDECIDE);
+																		character.PlayVoice(i, CCharacter.VOICE_MENU_SONGDECIDE);
 																	}
 																}
 
