@@ -858,10 +858,6 @@ end
 function gameInit()
 	tower_ended = false
 
-	if tower_climb_counter ~= nil then
-		tower_climb_counter:SetLoop(true)
-	end
-
 	set_tower_animation(TOWER_CLIMB_STANDING)
 end
 
@@ -933,10 +929,6 @@ end
 
 function towerFinish()
 	tower_ended = true
-
-	if tower_climb_counter ~= nil then
-		tower_climb_counter:SetLoop(false)
-	end
 end
 
 
