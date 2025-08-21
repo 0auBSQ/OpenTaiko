@@ -3,6 +3,23 @@ local OFFSET_MODE_GAME_BALLOON = "game_balloon"
 local OFFSET_MODE_GAME_KUSUDAMA = "game_kusudama"
 local OFFSET_MODE_MENU = "menu"
 local OFFSET_MODE_RESULT = "result"
+
+local ANIM_TOWER_CLIMB_STANDING = "Standing"
+local ANIM_TOWER_CLIMB_STANDING_TIRED = "Standing_Tired"
+local ANIM_TOWER_CLIMB_CLIMBING = "Climbing"
+local ANIM_TOWER_CLIMB_CLIMBING_TIRED = "Climbing_Tired"
+local ANIM_TOWER_CLIMB_RUNNING = "Running"
+local ANIM_TOWER_CLIMB_RUNNING_TIRED = "Running_Tired"
+local ANIM_TOWER_CLIMB_CLEAR = "Clear"
+local ANIM_TOWER_CLIMB_CLEAR_TIRED = "Clear_Tired"
+local ANIM_TOWER_CLIMB_FAIL = "Fail"
+
+local TOWER_CLIMB_STANDING = "Standing"
+local TOWER_CLIMB_CLIMBING = "Climbing"
+local TOWER_CLIMB_RUNNING = "Running"
+local TOWER_CLIMB_CLEAR = "Clear"
+local TOWER_CLIMB_FAIL = "Fail"
+
 local GAME_SCALE = 1.25
 
 local chara_config = {
@@ -96,22 +113,33 @@ local chara_config = {
 	result_beat_clear = 1;
 	result_beat_failed_in = 1;
 	result_beat_failed = 1;
+
+	game_beat_tower_standing = 1;
+	game_beat_tower_standing_tired = 1;
+	game_beat_tower_fail = 1;
+	game_beat_tower_clear = 1;
+	game_beat_tower_clear_tired = 1;
+	game_beat_tower_clear_islooping = true;
+	game_beat_tower_clear_tired_islooping = true;
+	game_beat_tower_fail_islooping = true;
 }
 
-local current_loop_animation = { nil, nil, nil, nil, nil }
-local current_action_animation = { nil, nil, nil, nil, nil }
-local current_animation = { nil, nil, nil, nil, nil }
+local current_loop_animation = nil
+local current_action_animation = nil
+local current_animation = nil
+local current_tower_animation = nil
+local tower_ended = false
 
-local function counter_ended(lua_player_index)
-	if current_action_animation[lua_player_index] == nil then
+local function counter_ended()
+	if current_action_animation == nil then
 		return
 	end
 
-	current_action_animation[lua_player_index] = nil
+	current_action_animation = nil
 
-	local animation = current_loop_animation[lua_player_index]
+	local animation = current_loop_animation
 	if animation ~= nil then
-		local counter = animation.counter[lua_player_index]
+		local counter = animation.counter
 		counter:Reset()
 	end
 end
@@ -125,7 +153,7 @@ CharacterAnimation = {
 	fallback_animation_name = "";
 	offset_mode = "";
 	scale = 1.0;
-	counter = {};
+	counter = nil;
 
 	new = function(_id, _frames, _motion, _beat, _fallback_animation_name, _offset_mode, _scale)
 		local obj = {}
@@ -151,25 +179,53 @@ CharacterAnimation = {
 		obj.beat = _beat
 		obj.fallback_animation_name = _fallback_animation_name
 		obj.offset_mode = _offset_mode
-		obj.counter = { }
-		for i = 1, 5, 1 do
-			obj.counter[i] = COUNTER:CreateCounter(1, obj.motion_length + 1, 1.0 / math.max(obj.motion_length, 1),
-			function()
-				counter_ended(i)
-			end)
-		end
+		obj.counter = COUNTER:CreateCounter(1, obj.motion_length + 1, 1.0 / math.max(obj.motion_length, 1),
+		function()
+			counter_ended()
+		end)
 		obj.scale = _scale
 
 		return obj
 	end;
 }
 
+TowerCharaAnimation = {
+	id = "";
+	frames = {};
+	beat = 1.0;
+	counter = nil;
+	motion_length = 1;
+	loop = false;
+
+	new = function(_id, _frames, _beat,  _loop)
+		local obj = {}
+
+		obj.id = _id
+		obj.frames = _frames
+		obj.beat = _beat
+		obj.motion_length = #_frames
+		obj.counter = COUNTER:CreateCounter(1, obj.motion_length + 1, 1.0 / math.max(obj.motion_length, 1),
+		function()
+			counter_ended()
+		end)
+		obj.counter:SetLoop(_loop)
+		obj.loop = _loop
+
+		return obj
+	end
+}
+
 local preview = nil
 local render = nil
+local tower_chara_test = nil
 local animations = { }
+local tower_aniamtions = { }
 local voices = {}
 
-local interval = { 1, 1, 1, 1, 1 }
+local interval = 1
+local tower_climb_counter = nil
+local tower_climb_state = TOWER_CLIMB_STANDING
+local tower_climb_value = 0
 
 
 local function create_animation(id, dir_name, motion, beat, fallback_animation_name, offset_mode, _scale)
@@ -193,26 +249,30 @@ local function create_animation(id, dir_name, motion, beat, fallback_animation_n
 end
 
 
+local function create_tower_animation(id, dir_name, beat, loop)
+	local frames = { }
+
+	if STORAGE:DirectoryExists(dir_name) then
+		local files = STORAGE:GetFiles(dir_name, "*.png")
+
+		for i = 1, files.Length, 1 do
+			local file_path = dir_name.."/"..tostring(i - 1)..".png"
+			if STORAGE:FileExists(file_path) then
+				frames[i] = TEXTURE:CreateTexture(file_path)
+			else
+				break
+			end
+		end
+	end
+
+	tower_aniamtions[id] = TowerCharaAnimation.new(id, frames, beat, loop)
+end
+
+
 local function get_animation(animation_type)
 	local animation = animations[animation_type]
 
 	return animation
-
-	--if animation == nil then
-	--	return nil
-	--end
-
-	--for i = 1, 5, 1 do
-	--	if animation == nil then
-	--		return nil
-	--	elseif animation.motion_length ~= 0 then
-	--		return animation
-	--	elseif animation.fallback_animation_name ~= "" then
-	--		animation = animations[animation.fallback_animation_name]
-	--	else
-	--		return nil
-	--	end
-	--end
 end
 
 
@@ -222,6 +282,47 @@ local function csarray_to_motiontable(csarray)
 		luatable[i] = csarray[i - 1] + 1
 	end
 	return luatable
+end
+
+
+local function set_tower_animation(id)
+	current_tower_animation = tower_aniamtions[id]
+	local counter = current_tower_animation.counter
+
+	counter:Start()
+end
+
+
+local function tower_climb_state_change(state)
+	local is_tired = not((PLAYSTATE.CurrentNumberOfLives / PLAYSTATE.MaxNumberOfLives) >= 0.2 and not(PLAYSTATE.CurrentNumberOfLives == 1 and PLAYSTATE.MaxNumberOfLives ~= 1))
+
+	if state == TOWER_CLIMB_STANDING then
+		if is_tired and tower_aniamtions[ANIM_TOWER_CLIMB_STANDING_TIRED].motion_length ~= 0 then
+			set_tower_animation(ANIM_TOWER_CLIMB_STANDING_TIRED)
+		else
+			set_tower_animation(ANIM_TOWER_CLIMB_STANDING)
+		end
+	elseif state == TOWER_CLIMB_CLIMBING then
+		if is_tired and tower_aniamtions[ANIM_TOWER_CLIMB_CLIMBING_TIRED].motion_length ~= 0 then
+			set_tower_animation(ANIM_TOWER_CLIMB_CLIMBING_TIRED)
+		else
+			set_tower_animation(ANIM_TOWER_CLIMB_CLIMBING)
+		end
+	elseif state == TOWER_CLIMB_RUNNING then
+		if is_tired and tower_aniamtions[ANIM_TOWER_CLIMB_RUNNING_TIRED].motion_length ~= 0 then
+			set_tower_animation(ANIM_TOWER_CLIMB_RUNNING_TIRED)
+		else
+			set_tower_animation(ANIM_TOWER_CLIMB_RUNNING)
+		end
+	elseif state == TOWER_CLIMB_CLEAR then
+		if is_tired and tower_aniamtions[ANIM_TOWER_CLIMB_CLEAR_TIRED].motion_length ~= 0 then
+			set_tower_animation(ANIM_TOWER_CLIMB_CLEAR_TIRED)
+		else
+			set_tower_animation(ANIM_TOWER_CLIMB_CLEAR)
+		end
+	elseif state == TOWER_CLIMB_FAIL then
+		set_tower_animation(ANIM_TOWER_CLIMB_FAIL)
+	end
 end
 
 
@@ -249,6 +350,8 @@ local function load_chara_config()
 	if ini_heya_chara_render_offset.Length == 2 then
 		chara_config.heya_render_offset = VECTOR2:CreateVector2(ini_heya_chara_render_offset[0], ini_heya_chara_render_offset[1])
 	end
+
+	chara_config.use_result_1p = chara_config_ini:GetBool("Result_UseResult1P", chara_config.use_result_1p)
 
 	---Game+++++++++++++
 	local ini_game_offset = chara_config_ini:GetIntArray("Game_Offset")
@@ -475,6 +578,15 @@ local function load_chara_config()
 	chara_config.game_beat_kusudama_idle = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Idle", chara_config.game_beat_kusudama_idle)
 	chara_config.game_beat_kusudama_broke = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Broke", chara_config.game_beat_kusudama_broke)
 	chara_config.game_beat_kusudama_miss = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Miss", chara_config.game_beat_kusudama_miss)
+
+	chara_config.game_beat_tower_standing = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Standing", chara_config.game_beat_tower_standing)
+	chara_config.game_beat_tower_standing_tired = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Standing_Tired", chara_config.game_beat_tower_standing_tired)
+	chara_config.game_beat_tower_fail = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Fail", chara_config.game_beat_tower_fail)
+	chara_config.game_beat_tower_clear = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Clear", chara_config.game_beat_tower_clear)
+	chara_config.game_beat_tower_clear_tired = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Clear_Tired", chara_config.game_beat_tower_clear_tired)
+	chara_config.game_beat_tower_clear_islooping = chara_config_ini:GetBool("Game_Chara_Tower_Clear_IsLooping", chara_config.game_beat_tower_clear_islooping)
+	chara_config.game_beat_tower_clear_tired_islooping = chara_config_ini:GetBool("Game_Chara_Tower_Clear_Tired_IsLooping", chara_config.game_beat_tower_clear_tired_islooping)
+	chara_config.game_beat_tower_fail_islooping = chara_config_ini:GetBool("Game_Chara_Tower_Fail_IsLooping", chara_config.game_beat_tower_fail_islooping)
 	--+++++++++++++
 
 	---Menu+++++++++++++
@@ -584,6 +696,11 @@ function loadPreviewTextures()
 	if STORAGE:FileExists("Render.png") then
 		render = TEXTURE:CreateTexture("Render.png")
 	end
+	if STORAGE:FileExists("Tower_Char/Standing/0.png") then
+		tower_chara_test = TEXTURE:CreateTexture("Tower_Char/Standing/0.png")
+	end
+
+	tower_climb_counter = COUNTER:CreateCounter(0, 4.0, 1.0, nil)
 end
 
 
@@ -592,6 +709,8 @@ end
 
 
 function loadGeneralTextures()
+
+	--Character++++++++++++++
 	create_animation(CHARACTER.ANIM_GAME_NORMAL, "Normal", chara_config.game_motion_normal, chara_config.game_beat_normal, "", OFFSET_MODE_GAME, GAME_SCALE)
 	create_animation(CHARACTER.ANIM_GAME_CLEAR, "Clear", chara_config.game_motion_clear, chara_config.game_beat_clear, CHARACTER.ANIM_GAME_NORMAL, OFFSET_MODE_GAME, GAME_SCALE)
 	create_animation(CHARACTER.ANIM_GAME_MAX, "Clear_Max", chara_config.game_motion_clear_max, chara_config.game_beat_clear_max, CHARACTER.ANIM_GAME_CLEAR, OFFSET_MODE_GAME, GAME_SCALE)
@@ -657,6 +776,24 @@ function loadGeneralTextures()
 			end
 		end
 	end
+	--++++++++++++++++++++++
+
+	--TowerChara++++++++++++
+	create_tower_animation(ANIM_TOWER_CLIMB_STANDING, "Tower_Char/Standing", chara_config.game_beat_tower_standing, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_STANDING_TIRED, "Tower_Char/Standing_Tired", chara_config.game_beat_tower_standing_tired, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_CLIMBING, "Tower_Char/Climbing", 1, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_CLIMBING_TIRED, "Tower_Char/Climbing_Tired", 1, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_RUNNING, "Tower_Char/Running", 1, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_RUNNING_TIRED, "Tower_Char/Running_Tired", 1, true)
+	create_tower_animation(ANIM_TOWER_CLIMB_CLEAR, "Tower_Char/Clear", chara_config.game_beat_tower_clear, chara_config.game_beat_tower_clear_islooping)
+	create_tower_animation(ANIM_TOWER_CLIMB_CLEAR_TIRED, "Tower_Char/Clear_Tired", chara_config.game_beat_tower_clear_tired, chara_config.game_beat_tower_clear_tired_islooping)
+	create_tower_animation(ANIM_TOWER_CLIMB_FAIL, "Tower_Char/Fail", chara_config.game_beat_tower_fail, chara_config.game_beat_tower_fail_islooping)
+	--++++++++++++++++++++++
+
+
+
+
+
 
 	voices[CHARACTER.VOICE_END_FAILED] = SOUND:CreateVoice("Sounds/Clear/Failed.ogg")
 	voices[CHARACTER.VOICE_END_CLEAR] = SOUND:CreateVoice("Sounds/Clear/Clear.ogg")
@@ -693,6 +830,9 @@ function disposePreviewTextures()
 	if render ~= nil then
 		render:Dispose()
 	end
+	if tower_chara_test ~= nil then
+		tower_chara_test:Dispose()
+	end
 end
 
 
@@ -712,34 +852,95 @@ function disposeGeneralTextures()
 	end
 
 	animations = { }
-
-
 end
 
 
-function update(player)
-	local lua_player_index = player + 1
+function gameInit()
+	tower_ended = false
 
-	if current_action_animation[lua_player_index] ~= nil then
-		current_animation[lua_player_index] = current_action_animation[lua_player_index]
-	else
-		current_animation[lua_player_index] = current_loop_animation[lua_player_index]
+	if tower_climb_counter ~= nil then
+		tower_climb_counter:SetLoop(true)
 	end
 
-	local animation = current_animation[lua_player_index]
+	set_tower_animation(TOWER_CLIMB_STANDING)
+end
+
+
+function update()
+	if current_action_animation ~= nil then
+		current_animation = current_action_animation
+	else
+		current_animation = current_loop_animation
+	end
+
+	local animation = current_animation
 	if animation ~= nil then
-		local counter = animation.counter[lua_player_index]
+		local counter = animation.counter
 		local length = animation.motion_length
 
-		counter:SetInterval(interval[lua_player_index] * animation.beat / math.max(length, 1))
+		counter:SetInterval(interval * animation.beat / math.max(length, 1))
+		counter:Tick()
+	end
+
+	if tower_climb_counter ~= nil then
+		tower_climb_counter:SetInterval(interval)
+		tower_climb_counter:Tick()
+
+		local prev_tower_climb_state = tower_climb_state
+
+		if tower_climb_counter.Value < 2.0 then
+			tower_climb_value = tower_climb_counter.Value / 2.0
+			tower_climb_state = TOWER_CLIMB_CLIMBING
+		elseif tower_climb_counter.Value < 3.0 then
+			tower_climb_value = 1.0 - (tower_climb_counter.Value - 2.0)
+			tower_climb_state = TOWER_CLIMB_RUNNING
+		else
+			tower_climb_value = 0.0
+
+			if tower_ended then
+				if PLAYSTATE.CurrentNumberOfLives ~= 0 then
+					tower_climb_state = TOWER_CLIMB_CLEAR
+				else
+					tower_climb_state = TOWER_CLIMB_FAIL
+				end
+			else
+				tower_climb_state = TOWER_CLIMB_STANDING
+			end
+		end
+
+		if tower_climb_state ~= prev_tower_climb_state then
+			tower_climb_state_change(tower_climb_state)
+		end
+	end
+
+
+	if current_tower_animation ~= nil then
+		local counter = current_tower_animation.counter
+		local length = current_tower_animation.motion_length
+
+		counter:SetInterval(interval * current_tower_animation.beat / math.max(length, 1))
 		counter:Tick()
 	end
 end
 
 
-function draw(player, x, y, scaleX, scaleY, opacity, color, flipX)
-	local lua_player_index = player + 1
+function towerNextFloor()
+	if tower_climb_counter ~= nil then
+		tower_climb_counter:Start()
+	end
+end
 
+
+function towerFinish()
+	tower_ended = true
+
+	if tower_climb_counter ~= nil then
+		tower_climb_counter:SetLoop(false)
+	end
+end
+
+
+function draw(x, y, scaleX, scaleY, opacity, color, flipX)
 	if flipX then
 		scaleX = scaleX * -1
 	end
@@ -748,12 +949,11 @@ function draw(player, x, y, scaleX, scaleY, opacity, color, flipX)
 	local baseScale = theme_resolution.Y / chara_config.resolution.Y
 
 	local frame = preview
-	local animation = current_animation[lua_player_index]
+	local animation = current_animation
 
 	if animation ~= nil then
-
 		local length = animation.motion_length
-		local counter = animation.counter[lua_player_index]
+		local counter = animation.counter
 		local motion_index = math.floor(counter.Value)
 		motion_index = math.max(math.min(motion_index, length), 1)
 
@@ -845,32 +1045,51 @@ function drawHeyaRender(x, y, scaleX, scaleY, opacity, color, flipX)
 end
 
 
-function setLoopAnimation(player, animationType, loop)
-	local lua_player_index = player + 1
+function drawTower()
 
-	local next_loop_animation = get_animation(animationType)
-	if next_loop_animation ~= nil then
-		local counter = next_loop_animation.counter[lua_player_index]
+	if current_tower_animation ~= nil then
+		local counter = current_tower_animation.counter
+		local index = math.min(math.floor(counter.Value), current_tower_animation.motion_length)
+		local chara = current_tower_animation.frames[index]
 
-		counter:SetLoop(loop)
-		counter:Start()
+		local theme_resolution = THEME:GetResolution()
+		local baseScaleX = theme_resolution.X / 1920.0
+		local baseScaleY = theme_resolution.Y / 1080.0
 
-		current_loop_animation[lua_player_index] = next_loop_animation
+		if chara ~= nil then
+			local x = 885 * baseScaleX
+			local y = 972 * baseScaleY
+
+			x = x + (tower_climb_value * 450 * baseScaleX)
+
+			chara:DrawAtAnchor(x, y, "bottom")
+		end
 	end
 end
 
 
-function playAnimation(player, animationType)
-	local lua_player_index = player + 1
+function setLoopAnimation(animationType, loop)
+	local next_loop_animation = get_animation(animationType)
+	if next_loop_animation ~= nil then
+		local counter = next_loop_animation.counter
 
+		counter:SetLoop(loop)
+		counter:Start()
+
+		current_loop_animation = next_loop_animation
+	end
+end
+
+
+function playAnimation(animationType)
 	local next_animation = get_animation(animationType)
 	if next_animation ~= nil then
-		local counter = next_animation.counter[lua_player_index]
+		local counter = next_animation.counter
 
 		counter:SetLoop(false)
 		counter:Start()
 
-		current_action_animation[lua_player_index] = next_animation
+		current_action_animation = next_animation
 	end
 end
 
@@ -883,13 +1102,11 @@ function playVoice(voiceType)
 end
 
 
-function setAnimationDuration(player, ms)
-	local lua_player_index = player + 1
-	interval[lua_player_index] = ms / 1000.0
+function setAnimationDuration(ms)
+	interval = ms / 1000.0
 end
 
 
-function setAnimationCyclesToBPM(player, bpm)
-	local lua_player_index = player + 1
-	interval[lua_player_index] = (60.0 / math.abs(bpm))
+function setAnimationCyclesToBPM(bpm)
+	interval = (60.0 / math.abs(bpm))
 end

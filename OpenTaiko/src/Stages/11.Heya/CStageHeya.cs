@@ -587,9 +587,9 @@ class CStageHeya : CStage {
 					OpenTaiko.SaveFileInstances[iPlayer].tUpdateCharacterName(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
 
 					// Welcome voice using Sanka
-					character.PlayVoice(CCharacter.VOICE_TITLE_SANKA);
+					character.PlayVoice(iPlayer, CCharacter.VOICE_TITLE_SANKA);
 
-					character.SetLoopAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+					character.SetLoopAnimation(iPlayer, CCharacter.ANIM_MENU_NORMAL);
 
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 

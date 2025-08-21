@@ -251,6 +251,7 @@ class CLuaScript : IDisposable {
 			LuaScript["I18N"] = new LuaI18NFunc();
 			LuaScript["CHARACTER"] = new LuaCharacterFunc();
 			LuaScript["STORAGE"] = new LuaStorageFunc(dir);
+			LuaScript["PLAYSTATE"] = new LuaPlayStateFunc();
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

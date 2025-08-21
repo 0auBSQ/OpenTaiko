@@ -280,7 +280,7 @@ class CActNewHeya : CActivity {
 
 										// Welcome voice using Sanka
 										OpenTaiko.Skin.soundDecideSFX.tPlay();
-										CCharacter.GetCharacter(CurrentPlayer).PlayVoice(CCharacter.VOICE_TITLE_SANKA);
+										CCharacter.GetCharacter(CurrentPlayer).PlayVoice(CurrentPlayer, CCharacter.VOICE_TITLE_SANKA);
 
 										CCharacter.GetCharacter(CurrentPlayer).SetLoopAnimation(CurrentPlayer, CCharacter.ANIM_MENU_NORMAL);
 

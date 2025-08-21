@@ -6,6 +6,10 @@ namespace OpenTaiko {
 			_keyValuePairs = keyValuePairs;
 		}
 
+		public bool GetBool(string key, bool defaultValue) {
+			return GetInt(key, defaultValue ? 1 : 0) == 1;
+		}
+
 		public int GetInt(string key, int defaultValue) {
 			if (!_keyValuePairs.ContainsKey(key)) return defaultValue;
 

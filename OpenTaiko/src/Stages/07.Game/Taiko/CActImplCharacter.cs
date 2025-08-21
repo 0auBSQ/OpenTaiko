@@ -93,14 +93,14 @@ internal class CActImplCharacter : CActivity {
 			if (OpenTaiko.Tx.Characters.Length == 0)
 				break;
 
+			if (!OpenTaiko.stageGameScreen.bPAUSE) {
+				CCharacter.GetCharacter(i).Update(i);
+			}
+
 			// Blinking animation during invincibility frames
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				if (CFloorManagement.isBlinking() == true)
 					break;
-			}
-
-			if (!OpenTaiko.stageGameScreen.bPAUSE) {
-				CCharacter.GetCharacter(i).Update(i);
 			}
 
 			//CTexture nowChara = null;
