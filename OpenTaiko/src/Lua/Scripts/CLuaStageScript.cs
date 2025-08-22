@@ -21,8 +21,8 @@ namespace OpenTaiko {
 
 		#region [CStage/CActivity events]
 
-		public void Update() {
-			RunLuaCode(lfUpdate);
+		public void Update(long timestamp) {
+			RunLuaCode(lfUpdate, timestamp);
 		}
 
 		public void Draw() {

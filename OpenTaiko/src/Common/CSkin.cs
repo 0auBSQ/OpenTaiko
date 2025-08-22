@@ -194,6 +194,11 @@ internal class CSkin : IDisposable {
 			nPosition_NextPlayingSound = pan;
 		}
 
+		public void SetVolume(int vol) {
+			this.rSound[0]?.SetGain(vol);
+			this.rSound[1]?.SetGain(vol);
+		}
+
 		public void SetTimestamp(int ms) {
 			if (this.bNotLoadedYet) {
 				try {

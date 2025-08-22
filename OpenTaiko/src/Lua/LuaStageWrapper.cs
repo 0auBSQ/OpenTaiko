@@ -146,7 +146,7 @@
 		}
 
 		public override int Draw() {
-			if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update();
+			if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
 			lcStageScript?.Draw();
 
 			// Menu exit fade out transition

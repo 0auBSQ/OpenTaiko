@@ -42,6 +42,11 @@ namespace OpenTaiko {
 		public void SetTimestamp(int ms) {
 			_sound?.SetTimestamp(ms);
 		}
+
+		public void SetVolume(int vol) {
+			_sound?.SetVolume(vol);
+		}
+
 		#endregion
 		#region Dispose
 		private bool _disposedValue;
