@@ -2,9 +2,11 @@
 
 namespace OpenTaiko {
 	public static class LuaSecurity {
-		public static void Secure(Lua lua) {
+		public static void Secure(Lua lua, string directory) {
 
-			lua.DoString(@"
+			string normalizedDirectory = directory.Replace('\\', '/');
+
+			lua.DoString(@$"
 for k, _ in pairs(os) do
 	if k ~= ""time"" then
 	os[k] = nil
@@ -19,9 +21,10 @@ for k, _ in pairs(debug) do
 end
 debug = nil
 
-while #package.searchers > 0 do
-    table.remove(package.searchers);
-end
+package.path = ""{normalizedDirectory}/?.lua;""
+-- while #package.searchers > 0 do
+--     table.remove(package.searchers);
+-- end
 
 import = function () end
 ");

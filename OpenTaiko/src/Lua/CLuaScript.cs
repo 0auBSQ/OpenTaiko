@@ -196,7 +196,7 @@ class CLuaScript : IDisposable {
 		LuaScript = new Lua();
 		LuaScript.LoadCLRPackage();
 		LuaScript.State.Encoding = Encoding.UTF8;
-		LuaSecurity.Secure(LuaScript);
+		LuaSecurity.Secure(LuaScript, dir);
 
 		try {
 			string scriptFilePath = $"{strDir}/Script.lua";
