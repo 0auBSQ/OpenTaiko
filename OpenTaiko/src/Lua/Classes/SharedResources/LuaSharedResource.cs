@@ -8,6 +8,23 @@ namespace OpenTaiko {
 		private int _currentReloadId = 0;
 		private int _lastCompletedReloadId = 0;
 
+		public void Clear() {
+			lock (_lock) {
+				_resource?.Dispose();
+				_resource = new T();
+
+				foreach (var res in _pendingResources) {
+					try {
+						res.Dispose();
+					} catch { }
+				}
+				_pendingResources.Clear();
+
+				_currentReloadId = 0;
+				_lastCompletedReloadId = 0;
+			}
+		}
+
 		public void Reload(string path, Func<string, object?[], T> factory, Action<T>? onCreate, params object?[] args) {
 			int thisReloadId;
 
@@ -62,6 +79,14 @@ namespace OpenTaiko {
 			_luaTextureFunc = ltf;
 			_luaSoundFunc = lsf;
 			DirPath = dirPath;
+		}
+
+		public void ClearSharedTexture(string key) {
+			if (SharedTextures.ContainsKey(key)) SharedTextures[key].Clear();
+		}
+
+		public void ClearSharedSound(string key) {
+			if (SharedTextures.ContainsKey(key)) SharedSounds[key].Clear();
 		}
 
 		public LuaTexture GetSharedTexture(string key) {
