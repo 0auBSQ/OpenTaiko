@@ -1260,10 +1260,10 @@ class TextureLoader {
 
 
 	public void ReloadCharacter(int old, int newC, int player, bool primary = false) {
-		if (old == newC)
+		if (old == newC || (OpenTaiko.SaveFileInstances[player].data.Character == newC && !primary))
 			return;
 
-		if (old >= 0 && OpenTaiko.SaveFileInstances[player].data.Character != old) {
+		if (old >= 0 && !primary) {
 			int i = old;
 
 			Characters[i].DisposeGeneralTextures(player);
