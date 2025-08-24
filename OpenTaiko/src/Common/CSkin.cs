@@ -77,12 +77,28 @@ internal class CSkin : IDisposable {
 				}
 			}
 		}
-		public int n長さ_現在のサウンド {
-			get => this.nowSound?.TotalPlayTime ?? 0;
+		public double msTimeStamp_nowSound {
+			get {
+				double msTimeStamp = 0;
+				this.nowSound?.tGetPlayPositon(out var bytesTimeStamp, out msTimeStamp);
+				return msTimeStamp;
+			}
 		}
-		public int n長さ_次に鳴るサウンド {
-			get => nextSound?.TotalPlayTime ?? 0;
+		public double msTimeStamp_nextSound {
+			get {
+				double msTimeStamp = 0;
+				this.nextSound?.tGetPlayPositon(out var bytesTimeStamp, out msTimeStamp);
+				return msTimeStamp;
+			}
 		}
+		public double n長さ_現在のサウンド {
+			get => this.nowSound?.dbTotalPlayTime ?? 0;
+		}
+		public double n長さ_次に鳴るサウンド {
+			get => nextSound?.dbTotalPlayTime ?? 0;
+		}
+
+		public uint Pointer { get => this.rSound[0]?.Pointer ?? 0; }
 
 
 		/// <summary>

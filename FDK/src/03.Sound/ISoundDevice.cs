@@ -8,6 +8,7 @@ internal interface ISoundDevice : IDisposable {
 	long ElapsedTimeMs { get; }
 	long UpdateSystemTimeMs { get; }
 	CTimer SystemTimer { get; }
+	long nBytesPerSec { get; }
 
 	CSound tCreateSound(string strファイル名, ESoundGroup soundGroup);
 	void tCreateSound(string strファイル名, CSound sound);

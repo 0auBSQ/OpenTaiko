@@ -263,6 +263,8 @@ public class CSound : IDisposable {
 		SoundPosition = pan;
 	}
 
+	public uint Pointer { get => (uint)this._hBassStream; }
+
 	/// <summary>
 	/// <para>全インスタンスリスト。</para>
 	/// <para>～を作成する() で追加され、t解放する() or Dispose() で解放される。</para>
@@ -464,11 +466,13 @@ public class CSound : IDisposable {
 	public void tGetPlayPositon(out long positionByte, out double positionMs) {
 		if (this.IsBassSound) {
 			positionByte = BassMix.ChannelGetPosition(this.hBassStream);
-			positionMs = Bass.ChannelBytes2Seconds(this.hBassStream, positionByte);
-		} else {
-			positionByte = 0;
-			positionMs = 0.0;
+			if (positionByte != -1) {
+				positionMs = 1000 * Bass.ChannelBytes2Seconds(this.hBassStream, positionByte);
+				return;
+			}
 		}
+		positionByte = 0;
+		positionMs = 0.0;
 	}
 
 

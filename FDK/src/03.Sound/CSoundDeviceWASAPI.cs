@@ -36,6 +36,8 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		protected set;
 	}
 
+	public long nBytesPerSec { get; protected set; }
+
 	public enum EWASAPIMode { Exclusion, Share }
 
 	public int nMasterVolume {
@@ -315,7 +317,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 		var mixerInfo = Bass.ChannelGetInfo(this.hMixer);
 		long nミキサーの1サンプルあたりのバイト数 = mixerInfo.Channels * 4;  // 4 = sizeof(FLOAT)
-		this.nミキサーの1秒あたりのバイト数 = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
+		this.nBytesPerSec = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
 
 
 
@@ -404,13 +406,13 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
 		int n未再生バイト数 = BassWasapi.GetData(null, (int)DataFlags.Available);  // 誤差削減のため、必要となるギリギリ直前に取得する。
-		this.ElapsedTimeMs = (this.n累積転送バイト数 - n未再生バイト数) * 1000 / this.nミキサーの1秒あたりのバイト数;
+		this.ElapsedTimeMs = (this.n累積転送バイト数 - n未再生バイト数) * 1000 / this.nBytesPerSec;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
 
 		// 実出力遅延を更新。
 		// 未再生バイト数の平均値。
 
-		long n今回の遅延ms = n未再生バイト数 * 1000 / this.nミキサーの1秒あたりのバイト数;
+		long n今回の遅延ms = n未再生バイト数 * 1000 / this.nBytesPerSec;
 		this.OutputDelay = (this.b最初の実出力遅延算出) ? n今回の遅延ms : (this.OutputDelay + n今回の遅延ms) / 2;
 		this.b最初の実出力遅延算出 = false;
 
@@ -421,7 +423,6 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		return num;
 	}
 
-	private long nミキサーの1秒あたりのバイト数 = 0;
 	private long n累積転送バイト数 = 0;
 	private bool b最初の実出力遅延算出 = true;
 	private bool bIsBASSFree = true;
