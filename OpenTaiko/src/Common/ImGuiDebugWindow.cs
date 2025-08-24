@@ -825,7 +825,7 @@ public static class ImGuiDebugWindow {
 	}
 	private static long TextureListPopup(ScriptBG script, string label, string id) {
 		if (script == null) return 0;
-		return CTextureListPopup([.. script.Textures.Values, .. script.TextureList], label, id);
+		return CTextureListPopup(script.Textures.Values.Concat(script.TextureList), label, id);
 	}
 	private static void DrawForImGui(CTexture texture, int max_width, int max_height) {
 		DrawForImGui(texture, 0, 0,
