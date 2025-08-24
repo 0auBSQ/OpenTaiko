@@ -215,10 +215,10 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			try {
 				OpenTaiko.Skin.bgm起動画面.tPlay();
-				for (int i = 0; i < OpenTaiko.Skin.nシステムサウンド数; i++) {
-					if (!OpenTaiko.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+				foreach (var snd in OpenTaiko.Skin.listSystemSound) {
+					if (!snd.bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 					{
-						CSkin.CSystemSound cシステムサウンド = OpenTaiko.Skin[i];
+						CSkin.CSystemSound cシステムサウンド = snd;
 						if (cシステムサウンド.bCompact対象) {
 							try {
 								cシステムサウンド.tLoading();

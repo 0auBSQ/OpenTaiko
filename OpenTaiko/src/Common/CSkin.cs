@@ -381,170 +381,14 @@ internal class CSkin : IDisposable {
 	public CSystemSound soundKusudama = null;
 	public CSystemSound soundKusudamaMiss = null;
 
+	#region [ For disposing ]
+	public List<CSystemSound> listSystemSound = new();
+	#endregion
 
-	public readonly int nシステムサウンド数 = (int)Eシステムサウンド.Count;
-	public CSystemSound this[Eシステムサウンド sound] {
-		get {
-			switch (sound) {
-				case Eシステムサウンド.SOUNDカーソル移動音:
-					return this.soundカーソル移動音;
-
-				case Eシステムサウンド.SOUND決定音:
-					return this.soundDecideSFX;
-
-				case Eシステムサウンド.SOUND変更音:
-					return this.soundChangeSFX;
-
-				case Eシステムサウンド.SOUND取消音:
-					return this.soundCancelSFX;
-
-				case Eシステムサウンド.SOUND歓声音:
-					return this.sound歓声音;
-
-				case Eシステムサウンド.SOUNDステージ失敗音:
-					return this.soundSTAGEFAILED音;
-
-				case Eシステムサウンド.SOUNDゲーム開始音:
-					return this.soundゲーム開始音;
-
-				case Eシステムサウンド.SOUNDゲーム終了音:
-					return this.soundゲーム終了音;
-
-				case Eシステムサウンド.SOUNDステージクリア音:
-					return this.soundステージクリア音;
-
-				case Eシステムサウンド.SOUNDフルコンボ音:
-					return this.soundフルコンボ音;
-
-				case Eシステムサウンド.SOUND曲読込開始音:
-					return this.sound曲読込開始音;
-
-				case Eシステムサウンド.SOUNDタイトル音:
-					return this.bgmタイトル;
-
-				case Eシステムサウンド.BGM起動画面:
-					return this.bgm起動画面;
-
-				case Eシステムサウンド.BGMオプション画面:
-					return this.bgmオプション画面;
-
-				case Eシステムサウンド.BGMコンフィグ画面:
-					return this.bgmコンフィグ画面;
-
-				case Eシステムサウンド.BGM選曲画面:
-					return this.bgm選曲画面;
-
-				//case Eシステムサウンド.SOUND赤:
-				//    return this.soundRed;
-
-				//case Eシステムサウンド.SOUND青:
-				//    return this.soundBlue;
-
-				case Eシステムサウンド.SOUND風船:
-					return this.soundBalloon;
-
-				case Eシステムサウンド.SOUND曲決定音:
-					return this.sound曲決定音;
-
-				case Eシステムサウンド.SOUND成績発表:
-					return this.bgmリザルトイン音;
-
-				case Eシステムサウンド.SOUND特訓再生:
-					return this.sound特訓再生音;
-
-				case Eシステムサウンド.SOUND特訓停止:
-					return this.sound特訓停止音;
-
-				case Eシステムサウンド.sound特訓ジャンプポイント:
-					return this.soundTrainingToggleBookmarkSFX;
-
-				case Eシステムサウンド.sound特訓スキップ音:
-					return this.sound特訓スキップ音;
-
-				case Eシステムサウンド.SOUND特訓スクロール:
-					return this.soundTrainingModeScrollSFX;
-
-			}
-			throw new IndexOutOfRangeException();
-		}
-	}
-	public CSystemSound this[int index] {
-		get {
-			switch (index) {
-				case 0:
-					return this.soundカーソル移動音;
-
-				case 1:
-					return this.soundDecideSFX;
-
-				case 2:
-					return this.soundChangeSFX;
-
-				case 3:
-					return this.soundCancelSFX;
-
-				case 4:
-					return this.sound歓声音;
-
-				case 5:
-					return this.soundSTAGEFAILED音;
-
-				case 6:
-					return this.soundゲーム開始音;
-
-				case 7:
-					return this.soundゲーム終了音;
-
-				case 8:
-					return this.soundステージクリア音;
-
-				case 9:
-					return this.soundフルコンボ音;
-
-				case 10:
-					return this.sound曲読込開始音;
-
-				case 11:
-					return this.bgmタイトル;
-
-				case 12:
-					return this.bgm起動画面;
-
-				case 13:
-					return this.bgmオプション画面;
-
-				case 14:
-					return this.bgmコンフィグ画面;
-
-				case 15:
-					return this.bgm選曲画面;
-
-				case 16:
-					return this.soundBalloon;
-
-				case 17:
-					return this.sound曲決定音;
-
-				case 18:
-					return this.bgmリザルトイン音;
-
-				case 19:
-					return this.sound特訓再生音;
-
-				case 20:
-					return this.sound特訓停止音;
-
-				case 21:
-					return this.soundTrainingModeScrollSFX;
-
-				case 22:
-					return this.soundTrainingToggleBookmarkSFX;
-
-				case 23:
-					return this.sound特訓スキップ音;
-			}
-			throw new IndexOutOfRangeException();
-		}
+	internal CSystemSound SndCAbsolute(string FileName, bool bLoop, bool bExclusive, bool bCompact対象, ESoundGroup soundGroup) {
+		CSystemSound snd = new(FileName, bLoop, bExclusive, bCompact対象, soundGroup);
+		listSystemSound.Add(snd);
+		return snd;
 	}
 
 
@@ -683,91 +527,92 @@ internal class CSkin : IDisposable {
 				strBoxDefSkinSubfolderFullName
 		);
 
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (this[i] != null && this[i].bLoadedSuccessfuly) {
-				this[i].tStop();
-				this[i].Dispose();
+		foreach (var snd in this.listSystemSound) {
+			if (snd.bLoadedSuccessfuly) {
+				snd.tStop();
+				snd.Dispose();
 			}
 		}
+		this.listSystemSound.Clear();
 
-		this.soundカーソル移動音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundDecideSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundChangeSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundCancelSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound歓声音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundSTAGEFAILED音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundゲーム開始音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
-		this.soundゲーム終了音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
-		this.soundステージクリア音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundフルコンボ音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
-		this.sound曲読込開始音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
+		this.soundカーソル移動音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundDecideSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundChangeSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundCancelSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.sound歓声音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundSTAGEFAILED音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundゲーム開始音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
+		this.soundゲーム終了音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
+		this.soundステージクリア音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundフルコンボ音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
+		this.sound曲読込開始音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
 		//this.bgm選曲画面 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
 		//this.soundSongSelectChara = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
-		this.soundSkip = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.SoundBanapas = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundEntry = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Entry.ogg", true, false, false, ESoundGroup.Voice);
-		this.soundError = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Error.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundSkip = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.SoundBanapas = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Banapas.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundEntry = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Entry.ogg", true, false, false, ESoundGroup.Voice);
+		this.soundError = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Error.ogg", false, false, false, ESoundGroup.SoundEffect);
 		//this.soundsanka = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}sanka.ogg", false, false, false, ESoundGroup.Voice);
-		this.soundBomb = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundBomb = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Bomb.ogg", false, false, false, ESoundGroup.SoundEffect);
 
 		//this.soundRed               = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}dong.ogg",            false, false, true, ESoundType.SoundEffect );
 		//this.soundBlue              = new Cシステムサウンド( @$"Sounds{System.IO.Path.DirectorySeparatorChar}ka.ogg",              false, false, true, ESoundType.SoundEffect );
-		this.soundBalloon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundKusudama = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundKusudamaMiss = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound曲決定音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
-		this.soundSongDecide_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundBalloon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundKusudama = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundKusudamaMiss = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.sound曲決定音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundSongDecide_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
-		this.bgm起動画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmタイトルイン = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmタイトル = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmオプション画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmコンフィグ画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgm選曲画面イン = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgm選曲画面 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmSongSelect_AI_In = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmSongSelect_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルトイン音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルト音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmResultIn_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmResult_AI = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgm起動画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmタイトルイン = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmタイトル = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmオプション画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmコンフィグ画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgm選曲画面イン = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgm選曲画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmSongSelect_AI_In = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmSongSelect_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmリザルトイン音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmリザルト音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmResultIn_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmResult_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
 
-		this.bgmDanResult = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.bgmDanResult = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-		this.bgmTowerResult = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.bgmTowerResult = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}Tower_Result.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-		this.soundCrownIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundRankIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundCrownIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundRankIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.sound特訓再生音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓停止音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundTrainingModeScrollSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundTrainingToggleBookmarkSFX = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓スキップ音 = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundPon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundGauge = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.soundScoreDon = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.sound特訓再生音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.sound特訓停止音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingModeScrollSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingToggleBookmarkSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.sound特訓スキップ音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundPon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundGauge = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundScoreDon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.soundDanSongSelectIn = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundDanSongSelectIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}Dan_In.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.soundDanSelectBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundDanSongSelect = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundDanSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSelectBGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundDanSongSelect = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Dan{System.IO.Path.DirectorySeparatorChar}DanSongSelect.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.soundHeyaBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Heya{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundOnlineLoungeBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundEncyclopediaBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Encyclopedia{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundTowerSelectBGM = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundHeyaBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Heya{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundOnlineLoungeBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundEncyclopediaBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Encyclopedia{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
+		this.soundTowerSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
-		soundExToExtra = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
-		soundExtraToEx = new CSystemSound[1] { new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
+		soundExToExtra = new[] { SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
+		soundExtraToEx = new[] { SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExtraToEx.ogg", false, false, false, ESoundGroup.SoundEffect) }; // what to do with it lol
 
-		calibrationTick = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
+		calibrationTick = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Calibrate.ogg", false, false, false, ESoundGroup.SoundEffect);
 
 		soundModal = new CSystemSound[6];
 		for (int i = 0; i < soundModal.Length - 1; i++) {
-			soundModal[i] = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
+			soundModal[i] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
 		}
-		soundModal[soundModal.Length - 1] = new CSystemSound(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
+		soundModal[soundModal.Length - 1] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
 
 		ReloadSkin();
 		tReadSkinConfig();
@@ -777,10 +622,10 @@ internal class CSkin : IDisposable {
 	}
 
 	public void ReloadSkin() {
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (!this[i].bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+		foreach (var snd in this.listSystemSound) {
+			if (!snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 			{
-				CSystemSound cシステムサウンド = this[i];
+				CSystemSound cシステムサウンド = snd;
 				if (cシステムサウンド.bCompact対象) {
 					try {
 						cシステムサウンド.tLoading();
@@ -939,10 +784,10 @@ internal class CSkin : IDisposable {
 
 
 	public void tRemoveMixerAll() {
-		for (int i = 0; i < nシステムサウンド数; i++) {
-			if (this[i] != null && this[i].bLoadedSuccessfuly) {
-				this[i].tStop();
-				this[i].tRemoveMixer();
+		foreach (var snd in this.listSystemSound) {
+			if (snd.bLoadedSuccessfuly) {
+				snd.tStop();
+				snd.tRemoveMixer();
 			}
 		}
 
@@ -7577,8 +7422,9 @@ internal class CSkin : IDisposable {
 	//-----------------
 	public void Dispose() {
 		if (!this.bDisposed済み) {
-			for (int i = 0; i < this.nシステムサウンド数; i++)
-				this[i].Dispose();
+			foreach (var snd in this.listSystemSound)
+				snd.Dispose();
+			this.listSystemSound.Clear();
 
 			this.bDisposed済み = true;
 		}
