@@ -44,7 +44,7 @@ internal class CSkin : IDisposable {
 
 		public static CSkin.CSystemSound r最後に再生した排他システムサウンド;
 
-		private readonly ESoundGroup _soundGroup;
+		public ESoundGroup SoundGroup { get; private init; }
 
 		// フィールド、プロパティ
 
@@ -97,9 +97,20 @@ internal class CSkin : IDisposable {
 			this.bLoop = bLoop;
 			this.bExclusive = bExclusive;
 			this.bCompact対象 = bCompact対象;
-			_soundGroup = soundGroup;
+			SoundGroup = soundGroup;
 			this.bNotLoadedYet = true;
 			this.bPlayed = false;
+		}
+
+		public void UpdateSound(CSystemSound sound) {
+			if (sound.bDisposed)
+				return;
+			this.Dispose();
+			this.rSound = sound.rSound;
+			this.strFileName = sound.strFileName;
+
+			this.bLoadedSuccessfuly = sound.bLoadedSuccessfuly;
+			this.bDisposed = sound.bDisposed;
 		}
 
 
@@ -119,7 +130,7 @@ internal class CSkin : IDisposable {
 			for (int i = 0; i < 2; i++)     // 一旦Cloneを止めてASIO対応に専念
 			{
 				try {
-					this.rSound[i] = OpenTaiko.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), _soundGroup);
+					this.rSound[i] = OpenTaiko.SoundManager?.tCreateSound(CSkin.Path(this.strFileName), SoundGroup);
 				} catch {
 					this.rSound[i] = null;
 					throw;
