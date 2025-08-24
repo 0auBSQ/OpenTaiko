@@ -40,6 +40,10 @@ public class CSound : IDisposable {
 
 	#region [ DTXMania用拡張 ]
 
+	public double dbTotalPlayTime {
+		get;
+		private set;
+	}
 	public int TotalPlayTime {
 		get;
 		private set;
@@ -662,7 +666,8 @@ public class CSound : IDisposable {
 
 		// n総演奏時間の取得; DTXMania用に追加。
 		double seconds = Bass.ChannelBytes2Seconds(this._hBassStream, nBytes);
-		this.TotalPlayTime = (int)(seconds * 1000);
+		this.dbTotalPlayTime = seconds * 1000;
+		this.TotalPlayTime = (int)Math.Ceiling(this.dbTotalPlayTime);
 		//this.pos = 0;
 		this.hMixer = hMixer;
 		float freq = 0.0f;
