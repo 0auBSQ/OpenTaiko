@@ -155,6 +155,7 @@ internal class CSkin : IDisposable {
 				}
 			}
 			this.bLoadedSuccessfuly = true;
+			this.bDisposed = false;
 		}
 		public void tPlay() {
 			if (this.bNotLoadedYet) {
@@ -517,8 +518,8 @@ internal class CSkin : IDisposable {
 	/// Skin(Sounds)を再読込する準備をする(再生停止,Dispose,ファイル名再設定)。
 	/// あらかじめstrSkinSubfolderを適切に設定しておくこと。
 	/// その後、ReloadSkinPaths()を実行し、strSkinSubfolderの正当性を確認した上で、本メソッドを呼び出すこと。
-	/// 本メソッド呼び出し後に、ReloadSkin()を実行することで、システムサウンドを読み込み直す。
-	/// ReloadSkin()の内容は本メソッド内に含めないこと。起動時はReloadSkin()相当の処理をCEnumSongsで行っているため。
+	/// 本メソッド呼び出し後に、PreloadSystemSounds()を実行することで、システムサウンドを読み込み直す。
+	/// PreloadSystemSounds()の内容は本メソッド内に含めないこと。起動時はPreloadSystemSounds()相当の処理をCEnumSongsで行っているため。
 	/// </summary>
 	public void PrepareReloadSkin() {
 		Trace.TraceInformation("SkinPath設定: {0}",
@@ -527,13 +528,7 @@ internal class CSkin : IDisposable {
 				strBoxDefSkinSubfolderFullName
 		);
 
-		foreach (var snd in this.listSystemSound) {
-			if (snd.bLoadedSuccessfuly) {
-				snd.tStop();
-				snd.Dispose();
-			}
-		}
-		this.listSystemSound.Clear();
+		UnloadSystemSounds();
 
 		this.soundカーソル移動音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundDecideSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -614,14 +609,23 @@ internal class CSkin : IDisposable {
 		}
 		soundModal[soundModal.Length - 1] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		ReloadSkin();
 		tReadSkinConfig();
 
 		//hsHitSoundsInformations = new CHitSounds(Path(@$"Sounds{System.IO.Path.DirectorySeparatorChar}HitSounds{System.IO.Path.DirectorySeparatorChar}HitSounds.json"));
 		hsHitSoundsInformations = new CHitSounds(@$"Global{System.IO.Path.DirectorySeparatorChar}HitSounds");
 	}
 
-	public void ReloadSkin() {
+	public void UnloadSystemSounds() {
+		foreach (var snd in this.listSystemSound) {
+			if (snd.bLoadedSuccessfuly) {
+				snd.tStop();
+				snd.Dispose();
+			}
+		}
+		this.listSystemSound.Clear();
+	}
+
+	public void PreloadSystemSounds() {
 		foreach (var snd in this.listSystemSound) {
 			if (!snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 			{

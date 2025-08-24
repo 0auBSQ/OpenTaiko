@@ -2289,6 +2289,7 @@ internal class OpenTaiko : Game {
 		OpenTaiko.Skin.Dispose();
 		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
+		OpenTaiko.Skin.PreloadSystemSounds();
 		OpenTaiko.Skin.FetchMenusAndModules();
 
 		OpenTaiko.Tx.DisposeTexture();
