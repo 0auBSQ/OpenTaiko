@@ -528,6 +528,14 @@ internal class CSkin : IDisposable {
 				strBoxDefSkinSubfolderFullName
 		);
 
+		ReloadSystemSounds();
+		tReadSkinConfig();
+
+		//hsHitSoundsInformations = new CHitSounds(Path(@$"Sounds{System.IO.Path.DirectorySeparatorChar}HitSounds{System.IO.Path.DirectorySeparatorChar}HitSounds.json"));
+		hsHitSoundsInformations = new CHitSounds(@$"Global{System.IO.Path.DirectorySeparatorChar}HitSounds");
+	}
+
+	public void ReloadSystemSounds() {
 		UnloadSystemSounds();
 
 		this.soundカーソル移動音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -608,11 +616,6 @@ internal class CSkin : IDisposable {
 			soundModal[i] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}" + i.ToString() + ".ogg", false, false, false, ESoundGroup.SoundEffect);
 		}
 		soundModal[soundModal.Length - 1] = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Modals{System.IO.Path.DirectorySeparatorChar}Coin.ogg", false, false, false, ESoundGroup.SoundEffect);
-
-		tReadSkinConfig();
-
-		//hsHitSoundsInformations = new CHitSounds(Path(@$"Sounds{System.IO.Path.DirectorySeparatorChar}HitSounds{System.IO.Path.DirectorySeparatorChar}HitSounds.json"));
-		hsHitSoundsInformations = new CHitSounds(@$"Global{System.IO.Path.DirectorySeparatorChar}HitSounds");
 	}
 
 	public void UnloadSystemSounds() {
