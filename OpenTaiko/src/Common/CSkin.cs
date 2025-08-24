@@ -55,62 +55,33 @@ internal class CSkin : IDisposable {
 		public bool bLoadedSuccessfuly;
 		public bool bExclusive;
 		public string strFileName = "";
+		private CSound nowSound => this.rSound[1 - this.nNextPlayingSoundNumber];
+		private CSound nextSound => this.rSound[this.nNextPlayingSoundNumber];
 		public bool bIsPlaying {
-			get {
-				if (this.rSound[1 - this.nNextPlayingSoundNumber] == null)
-					return false;
-
-				return this.rSound[1 - this.nNextPlayingSoundNumber].IsPlaying;
-			}
+			get => this.nowSound?.IsPlaying ?? false;
 		}
 		public int nPosition_CurrentlyPlayingSound {
-			get {
-				return this.rSound[1 - this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
-			}
-			set {
-				this.rSound[1 - this.nNextPlayingSoundNumber]?.SetPanning(value);
-			}
+			get => this.nowSound?.SoundPosition ?? 0;
+			set => this.nowSound?.SetPanning(value);
 		}
 		public int nPosition_NextPlayingSound {
-			get {
-				return this.rSound[this.nNextPlayingSoundNumber]?.SoundPosition ?? 0;
-			}
-			set {
-				this.rSound[this.nNextPlayingSoundNumber]?.SetPanning(value);
-			}
+			get => nextSound?.SoundPosition ?? 0;
+			set => nextSound?.SetPanning(value);
 		}
 		public int nAutomationLevel_現在のサウンド {
-			get {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound == null)
-					return 0;
-
-				return sound.AutomationLevel;
-			}
+			get => this.nowSound?.AutomationLevel ?? 0;
 			set {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
+				CSound sound = this.nowSound;
 				if (sound != null) {
 					sound.AutomationLevel = value;
 				}
 			}
 		}
 		public int n長さ_現在のサウンド {
-			get {
-				CSound sound = this.rSound[1 - this.nNextPlayingSoundNumber];
-				if (sound == null) {
-					return 0;
-				}
-				return sound.TotalPlayTime;
-			}
+			get => this.nowSound?.TotalPlayTime ?? 0;
 		}
 		public int n長さ_次に鳴るサウンド {
-			get {
-				CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-				if (sound == null) {
-					return 0;
-				}
-				return sound.TotalPlayTime;
-			}
+			get => nextSound?.TotalPlayTime ?? 0;
 		}
 
 
@@ -173,9 +144,7 @@ internal class CSkin : IDisposable {
 
 				r最後に再生した排他システムサウンド = this;
 			}
-			CSound sound = this.rSound[this.nNextPlayingSoundNumber];
-			if (sound != null)
-				sound.PlayStart(this.bLoop);
+			this.nextSound?.PlayStart(this.bLoop);
 
 			this.bPlayed = true;
 			this.nNextPlayingSoundNumber = 1 - this.nNextPlayingSoundNumber;
