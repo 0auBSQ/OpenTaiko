@@ -11,6 +11,8 @@ public class CLocalizationData {
 		Strings = new Dictionary<string, string>();
 	}
 
+	public CLocalizationData(Dictionary<string, string> strings) { Strings = strings; }
+
 	public string[] GetAllStrings() {
 		return Strings.Values.ToArray();
 	}
