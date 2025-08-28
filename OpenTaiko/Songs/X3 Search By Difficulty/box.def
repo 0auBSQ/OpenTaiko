@@ -1,4 +1,5 @@
 ﻿#TITLE:Search by difficulty
+#TITLEES:Buscar por dificultad
 #TITLEJA:むずかしさから探す
 #TITLERU:Поиск по трудности
 #TITLEZH:按难易度等级搜索
@@ -7,6 +8,8 @@
 #BACKCOLOR:#213d18
 #BOXEXPLANATION1:Search and play songs that
 #BOXEXPLANATION2:fit your level !
+#BOXEXPLANATIONES1:¡Busca y juega canciones que
+#BOXEXPLANATIONES2:se ajusten a tu nivel!
 #BOXEXPLANATIONJA1:難易度やレベルで検索するよ
 #BOXEXPLANATIONJA2:とても便利!
 #BOXEXPLANATIONRU1:Ищите и играйте песни, которые
