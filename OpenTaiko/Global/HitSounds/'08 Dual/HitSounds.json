@@ -2,6 +2,7 @@
   "name" : {
 	"strings": {
 	  "default": "'08 Dual",
+	  "es": "'08 Dual",
 	  "ja": "'08デュアル",
 	  "ru": "'08 Двойной",
 	  "zh": "'08双鼓"
