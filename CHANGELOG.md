@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.89] - 2025-08-28 (Beta)
+
+- [i18n] Update Spanish and Chinese texts
+
 ## [0.6.0.88] - 2025-08-12 (Beta)
 
 - [i18n] Add Ch V & VI Nameplates & Unlockables Russian & Chinese Text
