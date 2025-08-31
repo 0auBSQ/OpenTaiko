@@ -43,6 +43,12 @@
 			}
 		}
 
+		public bool IsPlus {
+			get {
+				return _levelIcon == CTja.ELevelIcon.ePlus;
+			}
+		}
+
 		public Difficulty Difficulty {
 			get {
 				return _difficulty;

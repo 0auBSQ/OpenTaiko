@@ -501,21 +501,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public class CBRANCHSCORE {
 		// unused
 		public CBRANCHSCORE cBigNotes;//大音符分岐時の情報をまとめるため
-		// is reset
+
+		// is reset (CBranchScore)
 		public int nRoll; // with balloon hits, but should exclude them in branch condition for TaikoJiro compatibility
 		public int nGreat;
 		public int nGood;
 		public int nMiss;
-		// no reset
+		// no reset (CBranchScore)
 		public int nScore;
 		public int nADLIB;
 		public int nADLIBMiss;
 		public int nMine;
 		public int nMineAvoid;
+		// only used for dan-i
 		public int nBarRollPass;
 		public int nBalloonHitPass;
 		public double msBarRollPass;
-		// only used for dan-i
 		public int nHighestCombo;
 		public int nCombo;
 	}
@@ -1393,7 +1394,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actRunner.Start(nPlayer, true, pChip);
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
-					character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
+				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 
 				switch (chara.effect.tGetGaugeType()) {
@@ -1548,8 +1549,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					CCharacter character = CCharacter.GetCharacter(nPlayer);
 					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 						this.bIsAlreadyMaxed[nPlayer] = false;
-							actChara.ReturnDefaultAnime(nPlayer, true);
-							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+						actChara.ReturnDefaultAnime(nPlayer, true);
+						character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
 					} else if (!bIsGOGOTIME[nPlayer]) {
 						if (Chara_MissCount[nPlayer] == 1) {
 							actChara.ReturnDefaultAnime(nPlayer, true);
@@ -3782,20 +3783,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 		actChara.ReturnDefaultAnime(iPlayer, true);
 
 		{
-				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer))) {
-					// 魂ゲージMAXではない
-					// ゴーゴースタート_ノーマル
-					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
-					//this.actChara.キャラクター_アクション_10コンボ();
-				}
-				if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
-					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
-				}
-				if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
-					// 魂ゲージMAX
-					// ゴーゴースタート_MAX
-					character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
-				}
+			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer))) {
+				// 魂ゲージMAXではない
+				// ゴーゴースタート_ノーマル
+				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
+				//this.actChara.キャラクター_アクション_10コンボ();
+			}
+			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
+				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
+			}
+			if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
+				// 魂ゲージMAX
+				// ゴーゴースタート_MAX
+				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
+			}
 
 		}
 		OpenTaiko.stageGameScreen.actLaneTaiko.GOGOSTART();

@@ -190,7 +190,7 @@ internal class CTja : CActivity {
 	}
 
 	public enum ELevelIcon {
-		eMinus,
+		eMinus = 0,
 		eNone,
 		ePlus
 	}
@@ -1514,8 +1514,7 @@ internal class CTja : CActivity {
 		switch (ex) {
 			case IndexOutOfRangeException:
 				return "Too few arguments";
-			case FormatException:
-				{
+			case FormatException: {
 					string? expectedType = null;
 					if (ex.TargetSite?.Name == "ParseComplex") {
 						expectedType = "Complex Number";
