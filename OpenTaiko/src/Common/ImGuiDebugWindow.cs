@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -427,8 +426,7 @@ public static class ImGuiDebugWindow {
 					int current_chara = OpenTaiko.SaveFileInstances[save].data.Character;
 					if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.StartUp) {
 						ImGui.TextDisabled("Character selection unavailable during StartUp stage.");
-					}
-					else if (ImGui.BeginCombo($"Select Character###SELECT_CHARACTER{i}", OpenTaiko.Tx.Characters[current_chara].metadata.tGetName())) {
+					} else if (ImGui.BeginCombo($"Select Character###SELECT_CHARACTER{i}", OpenTaiko.Tx.Characters[current_chara].metadata.tGetName())) {
 						for (int chara = 0; chara < OpenTaiko.Tx.Characters.Length; chara++) {
 							if (ImGui.Selectable(OpenTaiko.Tx.Characters[chara].metadata.tGetName(), current_chara == chara)) {
 								OpenTaiko.Tx.ReloadCharacter(current_chara, chara, save);
@@ -487,7 +485,7 @@ public static class ImGuiDebugWindow {
 											for (int j = 0; j < song.DanSongs.Count; j++) {
 												var dan_song = song.DanSongs[j];
 												Vector4 is_hidden = dan_song.bTitleShow ? new(1, 0.5f, 1, 1) : new(1);
-												ImGui.TextColored(is_hidden, $"Song {j+1}: {dan_song.Title}{(dan_song.bTitleShow ? " (Hidden)" : "")}");
+												ImGui.TextColored(is_hidden, $"Song {j + 1}: {dan_song.Title}{(dan_song.bTitleShow ? " (Hidden)" : "")}");
 												ImGui.Indent();
 												ImGui.TextColored(is_hidden, $"Difficulty: {(Difficulty)dan_song.Difficulty}");
 												ImGui.TextColored(is_hidden, $"Level: {dan_song.Level}");
@@ -497,10 +495,9 @@ public static class ImGuiDebugWindow {
 													for (int i = 0; i < dan_song.Dan_C.Length; i++) {
 														if (dan_song.Dan_C[i] != null) {
 															var dan_c = dan_song.Dan_C[i];
-															ImGui.Text($"Exam {i+1}: {dan_c.ExamType} ({dan_c.ExamRange} - {dan_c.GetValue()[0]} - {dan_c.GetValue()[1]})");
-														}
-														else
-															ImGui.TextDisabled($"Exam {i+1}: null");
+															ImGui.Text($"Exam {i + 1}: {dan_c.ExamType} ({dan_c.ExamRange} - {dan_c.GetValue()[0]} - {dan_c.GetValue()[1]})");
+														} else
+															ImGui.TextDisabled($"Exam {i + 1}: null");
 													}
 													ImGui.TreePop();
 												}
@@ -518,8 +515,7 @@ public static class ImGuiDebugWindow {
 								}
 							}
 							ImGui.NewLine();
-						}
-						else {
+						} else {
 							ImGui.TextDisabled("Current Song is null. How is this possible...?");
 						}
 						ImGui.TreePop();
@@ -584,7 +580,7 @@ public static class ImGuiDebugWindow {
 					if (OpenTaiko.ConfigIni.bAIBattleMode) {
 						int level = OpenTaiko.ConfigIni.nAILevel - 1;
 						ImGui.TextColored(new(0.5f, 1, 1, 1), "AI Battle is Active.");
-						ImGui.Text("AI Level: " + (level+1));
+						ImGui.Text("AI Level: " + (level + 1));
 						ImGui.Indent();
 						ImGui.Text("Current AI Performance:");
 						ImGui.Text($"Good: {OpenTaiko.ConfigIni.apAIPerformances[level].nPerfectOdds}/1000 ({OpenTaiko.ConfigIni.apAIPerformances[level].nPerfectOdds / 10.0}％)");
@@ -881,7 +877,7 @@ public static class ImGuiDebugWindow {
 				.Concat(script.TextureList.Select(x => x._texture))
 				.Concat(script.TextList.SelectMany(x => x._titles.Values.Select(x => x._texture))),
 				label, id);
-		if (typeof(T) == typeof(CSystemSound))
+		if (typeof(T) == typeof(CSkin.CSystemSound))
 			return CResourceListPopup(resourceType, script.SoundList.Select(x => x._sound), label, id);
 		return 0;
 	}
