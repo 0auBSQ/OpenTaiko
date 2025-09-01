@@ -328,7 +328,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			if (NotesManager.IsGenericBalloon(_chip)) {
 				var msDuration = (_chip.end.n発声時刻ms - _chip.n発声時刻ms);
-				var expectedHits = (int)(msDuration / 1000 / 16.6f);
+				var expectedHits = (int)(16.6 * msDuration / 1000);
 				nBalloonHits += Math.Min(_chip.nBalloon, expectedHits);
 			}
 
