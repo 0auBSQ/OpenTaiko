@@ -8,7 +8,7 @@ using FDK;
 namespace OpenTaiko {
 	public class LuaVideo : IDisposable {
 		private CVideoDecoder? _video = null;
-		private CTexture? _tmpTex = null;
+		internal CTexture? _tmpTex = null;
 		internal HashSet<LuaVideo>? _disposeList = null;
 
 		public LuaVideo() {

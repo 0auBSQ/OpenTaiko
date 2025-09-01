@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -679,12 +680,15 @@ public static class ImGuiDebugWindow {
 			}
 			CResourceListPopup(resourceType, listTotal, $"Show {listTotalName}", "RESC_ALL");
 
+			if (typeof(T) == typeof(CTexture))
+				CResourceListPopup(resourceType, TitleTextureKey._titledictionary.Values, $"Show {nameof(TitleTextureKey._titledictionary)}", "RESC_TITLEDICTIONARY");
+
 			currentStageMemoryUsage = 0;
 
 			#region Script.lua Memory Usage
 			int index = 0;
 			foreach (CLuaScript luascript in CLuaScript.listScripts) {
-				currentStageMemoryUsage += CResourceListPopup(resourceType, luascript.listDisposables.OfType<T>(),
+				currentStageMemoryUsage += ResourceListPopup<T>(resourceType, luascript,
 					$"Module #{index}", $"MODULE{index++}_RESC");
 			}
 
@@ -874,7 +878,25 @@ public static class ImGuiDebugWindow {
 		if (script == null) return 0;
 		if (typeof(T) == typeof(CTexture))
 			return CResourceListPopup(resourceType, script.Textures.Values
-				.Concat(script.TextureList.Select(x => x._texture)), label, id);
+				.Concat(script.TextureList.Select(x => x._texture))
+				.Concat(script.TextList.SelectMany(x => x._titles.Values.Select(x => x._texture))),
+				label, id);
+		if (typeof(T) == typeof(CSystemSound))
+			return CResourceListPopup(resourceType, script.SoundList.Select(x => x._sound), label, id);
+		return 0;
+	}
+	private static long ResourceListPopup<T>(string resourceType, CLuaScript script, string label, string id) {
+		if (script == null) return 0;
+		if (typeof(T) == typeof(CTexture))
+			return CResourceListPopup(resourceType, script.listDisposables.OfType<CTexture>()
+				.Concat(script.TextureList.Select(x => x._texture))
+				.Concat(script.VideoList.Select(x => x._tmpTex))
+				.Concat(script.TextList.SelectMany(x => x._titles.Values.Select(x => x._texture))),
+				label, id);
+		if (typeof(T) == typeof(CSkin.CSystemSound))
+			return CResourceListPopup(resourceType,
+				script.listDisposables.OfType<LuaSound>()
+				.Concat(script.SoundList).Select(x => x._sound), label, id);
 		return 0;
 	}
 	private static void DrawForImGui(CTexture texture, int max_width, int max_height) {

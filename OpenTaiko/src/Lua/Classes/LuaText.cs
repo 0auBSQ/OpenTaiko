@@ -10,7 +10,7 @@ using System.IO;
 namespace OpenTaiko {
 	public class LuaText : IDisposable {
 		private CCachedFontRenderer? _fontRenderer;
-		private Dictionary<TitleTextureKey, LuaTexture> _titles = [];
+		internal Dictionary<TitleTextureKey, LuaTexture> _titles = [];
 		internal HashSet<LuaText>? _disposeList = null;
 
 		public LuaText() {

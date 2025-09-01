@@ -6,7 +6,7 @@ namespace OpenTaiko;
 public sealed class TitleTextureKey {
 
 	// Static
-	private static readonly Dictionary<TitleTextureKey, CTexture> _titledictionary
+	internal static readonly Dictionary<TitleTextureKey, CTexture> _titledictionary
 		= new Dictionary<TitleTextureKey, CTexture>();
 
 	public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey) {

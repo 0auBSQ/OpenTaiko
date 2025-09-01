@@ -2,7 +2,7 @@
 
 namespace OpenTaiko {
 	public class LuaSound : IDisposable {
-		private CSkin.CSystemSound? _sound;
+		internal CSkin.CSystemSound? _sound;
 		internal HashSet<LuaSound>? _disposeList = null;
 
 		public string Path { get; private set; } = "";
