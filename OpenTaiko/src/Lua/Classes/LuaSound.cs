@@ -3,6 +3,7 @@
 namespace OpenTaiko {
 	public class LuaSound : IDisposable {
 		private CSkin.CSystemSound? _sound;
+		internal HashSet<LuaSound>? _disposeList = null;
 
 		public string Path { get; private set; } = "";
 		public LuaSound() {
@@ -57,6 +58,7 @@ namespace OpenTaiko {
 				}
 				_sound?.Dispose();
 				_sound = null;
+				_disposeList?.Remove(this);
 
 				_disposedValue = true;
 			}
@@ -69,10 +71,10 @@ namespace OpenTaiko {
 		#endregion
 	}
 	public class LuaSoundFunc {
-		private List<LuaSound> Sounds;
+		private HashSet<LuaSound> Sounds;
 		private string DirPath;
 
-		public LuaSoundFunc(List<LuaSound> sounds, string dirPath) {
+		public LuaSoundFunc(HashSet<LuaSound> sounds, string dirPath) {
 			Sounds = sounds;
 			DirPath = dirPath;
 		}
@@ -93,6 +95,7 @@ namespace OpenTaiko {
 			try {
 				sound = new(full_path, group);
 				Sounds.Add(sound);
+				sound._disposeList = this.Sounds;
 			} catch (Exception e) {
 				LogNotification.PopError($"Lua Sound failed to load: {e}");
 				sound?.Dispose();
@@ -109,6 +112,7 @@ namespace OpenTaiko {
 			try {
 				sound = new(full_path, group);
 				Sounds.Add(sound);
+				sound._disposeList = this.Sounds;
 			} catch (Exception e) {
 				LogNotification.PopError($"Lua Sound failed to load: {e}");
 				sound?.Dispose();

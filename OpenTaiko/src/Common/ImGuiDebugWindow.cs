@@ -873,7 +873,8 @@ public static class ImGuiDebugWindow {
 	private static long ResourceListPopup<T>(string resourceType, ScriptBG script, string label, string id) {
 		if (script == null) return 0;
 		if (typeof(T) == typeof(CTexture))
-			return CResourceListPopup(resourceType, script.Textures.Values.Concat(script.TextureList), label, id);
+			return CResourceListPopup(resourceType, script.Textures.Values
+				.Concat(script.TextureList.Select(x => x._texture)), label, id);
 		return 0;
 	}
 	private static void DrawForImGui(CTexture texture, int max_width, int max_height) {

@@ -2,7 +2,8 @@
 
 namespace OpenTaiko {
 	public class LuaTexture : IDisposable {
-		private CTexture? _texture = null;
+		internal CTexture? _texture = null;
+		internal HashSet<LuaTexture>? _disposeList = null;
 		public uint Pointer => _texture != null ? _texture.Pointer : 0;
 
 		public LuaTexture() {
@@ -121,6 +122,7 @@ namespace OpenTaiko {
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				OpenTaiko.tDisposeSafely(ref _texture);
+				_disposeList?.Remove(this);
 				_disposedValue = true;
 			}
 		}
@@ -131,10 +133,10 @@ namespace OpenTaiko {
 		#endregion
 	}
 	public class LuaTextureFunc {
-		private List<CTexture> Textures;
+		private HashSet<LuaTexture> Textures;
 		private string DirPath;
 
-		public LuaTextureFunc(List<CTexture> textures, string dirPath) {
+		public LuaTextureFunc(HashSet<LuaTexture> textures, string dirPath) {
 			Textures = textures;
 			DirPath = dirPath;
 		}
@@ -147,7 +149,8 @@ namespace OpenTaiko {
 				try {
 					var tex = OpenTaiko.tテクスチャの生成(full_path);
 					luatex = new LuaTexture(tex);
-					Textures.Add(tex);
+					Textures.Add(luatex);
+					luatex._disposeList = this.Textures;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
 					luatex?.Dispose();
@@ -167,7 +170,8 @@ namespace OpenTaiko {
 				try {
 					var tex = OpenTaiko.tテクスチャの生成(full_path);
 					luatex = new LuaTexture(tex);
-					Textures.Add(tex);
+					Textures.Add(luatex);
+					luatex._disposeList = this.Textures;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
 					luatex?.Dispose();

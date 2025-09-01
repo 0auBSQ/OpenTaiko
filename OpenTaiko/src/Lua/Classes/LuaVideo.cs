@@ -9,6 +9,7 @@ namespace OpenTaiko {
 	public class LuaVideo : IDisposable {
 		private CVideoDecoder? _video = null;
 		private CTexture? _tmpTex = null;
+		internal HashSet<LuaVideo>? _disposeList = null;
 
 		public LuaVideo() {
 			_video = null;
@@ -83,6 +84,7 @@ namespace OpenTaiko {
 			if (!_disposedValue) {
 				OpenTaiko.tDisposeSafely(ref _video);
 				OpenTaiko.tDisposeSafely(ref _tmpTex);
+				_disposeList?.Remove(this);
 				_disposedValue = true;
 			}
 		}
@@ -93,10 +95,10 @@ namespace OpenTaiko {
 		#endregion
 	}
 	public class LuaVideoFunc {
-		private List<CVideoDecoder> Videos;
+		private HashSet<LuaVideo> Videos;
 		private string DirPath;
 
-		public LuaVideoFunc(List<CVideoDecoder> videos, string dirPath) {
+		public LuaVideoFunc(HashSet<LuaVideo> videos, string dirPath) {
 			Videos = videos;
 			DirPath = dirPath;
 		}
@@ -110,7 +112,8 @@ namespace OpenTaiko {
 					var vid = new CVideoDecoder(full_path);
 					vid.InitRead();
 					luavid = new LuaVideo(vid);
-					Videos.Add(vid);
+					Videos.Add(luavid);
+					luavid._disposeList = this.Videos;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Video failed to load: {e}");
 					luavid?.Dispose();

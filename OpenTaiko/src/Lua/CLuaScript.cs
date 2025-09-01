@@ -11,10 +11,10 @@ class CLuaScript : IDisposable {
 
 	#region [For the new Lua module methods]
 
-	public List<CTexture> TextureList = [];
-	public List<LuaSound> SoundList = [];
-	public List<CVideoDecoder> VideoList = [];
-	public List<LuaText> TextList = [];
+	public HashSet<LuaTexture> TextureList = [];
+	public HashSet<LuaSound> SoundList = [];
+	public HashSet<LuaVideo> VideoList = [];
+	public HashSet<LuaText> TextList = [];
 	public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
 	public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
 
@@ -283,10 +283,16 @@ class CLuaScript : IDisposable {
 	public void Dispose() {
 		if (bDisposed) return;
 
-		foreach (IDisposable disposable in listDisposables) {
-			disposable.Dispose();
+		void freeDisposableList<T>(ICollection<T> list) where T : IDisposable? {
+			foreach (var disposable in list)
+				disposable?.Dispose();
+			list.Clear();
 		}
-		listDisposables.Clear();
+		freeDisposableList(this.listDisposables);
+		freeDisposableList(this.TextureList);
+		freeDisposableList(this.SoundList);
+		freeDisposableList(this.VideoList);
+		freeDisposableList(this.TextList);
 
 		LuaScript.Dispose();
 
