@@ -349,13 +349,19 @@ public class CTexture : IDisposable {
 	}
 
 	public void UpdateTexture(CTexture texture, int width, int height) {
+		if (texture.bDispose完了済み)
+			return;
 		Pointer = texture.Pointer;
 		this.sz画像サイズ = new Size(width, height);
 		this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
 		this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
+
+		this.bDispose完了済み = texture.bDispose完了済み;
 	}
 
 	public void UpdateTexture(IntPtr texture, int width, int height, PixelFormat rgbaType) {
+		if (texture == 0)
+			return;
 		unsafe {
 			Game.Gl.DeleteTexture(Pointer); //解放
 			void* data = texture.ToPointer();
@@ -930,6 +936,7 @@ public class CTexture : IDisposable {
 	public void Dispose() {
 		if (!this.bDispose完了済み) {
 			Game.Gl.DeleteTexture(Pointer); //解放
+			this.Pointer = 0;
 
 			this.bDispose完了済み = true;
 		}

@@ -780,7 +780,7 @@ public static class ImGuiDebugWindow {
 				CTexture new_tex = new CTexture(reloadResourcePath, false);
 				texture.UpdateTexture(new_tex, new_tex.sz画像サイズ.Width, new_tex.sz画像サイズ.Height);
 			}
-			if (texture != null) {
+			if (texture != null && texture.Pointer != 0) {
 				if (ImGui.BeginCombo($"Texture Wrap Mode", texture.WrapMode.ToString())) {
 					foreach (var mode in Enum.GetValues<Silk.NET.OpenGLES.TextureWrapMode>().Distinct()) {
 						if (ImGui.Selectable(mode.ToString(), texture.WrapMode == mode)) {
@@ -795,7 +795,7 @@ public static class ImGuiDebugWindow {
 		}
 		if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNone)) {
 			if (ImGui.BeginItemTooltip()) {
-				if (texture != null) {
+				if (texture != null && texture.Pointer != 0) {
 					DrawForImGui(texture, 800, 800);
 					ImGui.Text("Pointer: " + texture.Pointer);
 					ImGui.Text("Size: x" + texture.szTextureSize.Width + ",y" + texture.szTextureSize.Height);
@@ -906,7 +906,7 @@ public static class ImGuiDebugWindow {
 	#region Helpers
 	private static float GetMemAllocationInMegabytes(long bytes) { return (float)bytes / (1024 * 1024); }
 	private static long GetResourceMemAllocation(CTexture? texture, long orDefault = 0) {
-		return texture != null ? (texture.szTextureSize.Width * texture.szTextureSize.Height * 4) : orDefault;
+		return (texture != null && texture.Pointer != 0) ? (texture.szTextureSize.Width * texture.szTextureSize.Height * 4) : orDefault;
 	}
 	private static Vector4 ColorToVector4(Color color) {
 		return new Vector4((float)color.R / 255, (float)color.G / 255, (float)color.B / 255, (float)color.A / 255);
