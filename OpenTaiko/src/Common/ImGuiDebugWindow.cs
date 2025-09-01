@@ -772,11 +772,11 @@ public static class ImGuiDebugWindow {
 	#endregion
 
 	#region ImGui Items
-	private static void CResourcePopup(CTexture texture, string label) {
+	private static void CResourcePopup(CTexture? texture, string label) {
 		if (ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.Framed)) {
-
+			ImGui.BeginDisabled(texture == null);
 			ImGui.InputText("Path", ref reloadResourcePath, 2048);
-			if (ImGui.Button($"Update via. Path###TEXTURE_UPDATE_{label}")) {
+			if (ImGui.Button($"Update via. Path###TEXTURE_UPDATE_{label}") && texture != null) {
 				CTexture new_tex = new CTexture(reloadResourcePath, false);
 				texture.UpdateTexture(new_tex, new_tex.sz画像サイズ.Width, new_tex.sz画像サイズ.Height);
 			}
@@ -790,6 +790,7 @@ public static class ImGuiDebugWindow {
 					ImGui.EndCombo();
 				}
 			}
+			ImGui.EndDisabled();
 
 			ImGui.TreePop();
 		}
@@ -809,21 +810,22 @@ public static class ImGuiDebugWindow {
 	}
 
 	private static uint lastPlayedSoundPointer = 0;
-	private static void CResourcePopup(CSkin.CSystemSound sound, string label) {
+	private static void CResourcePopup(CSkin.CSystemSound? sound, string label) {
 		if (ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.Framed)) {
-
+			ImGui.BeginDisabled(sound == null);
 			ImGui.InputText("Path", ref reloadResourcePath, 2048);
 			if (ImGui.Button($"Update via. Path###SOUND_UPDATE_{label}")) {
 				CSkin.CSystemSound new_snd = new(reloadResourcePath, sound.bLoop, sound.bExclusive, sound.bCompact対象, sound.SoundGroup);
 				sound.UpdateSound(new_snd);
 			}
+			ImGui.EndDisabled();
 
 			ImGui.TreePop();
 		}
 		if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNone)) {
 			bool shouldPlay = ImGui.IsItemHovered(ImGuiHoveredFlags.DelayNormal);
 			if (ImGui.BeginItemTooltip()) {
-				if (sound.bLoadedSuccessfuly) {
+				if (sound?.bLoadedSuccessfuly ?? false) {
 					DrawForImGui(sound, shouldPlay);
 					ImGui.Text($"Length: {sound.n長さ_現在のサウンド:0.###},{sound.n長さ_次に鳴るサウンド:0.###}");
 					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}", GetMemAllocationInMegabytes(GetResourceMemAllocation(sound))) + "MB");
@@ -832,14 +834,14 @@ public static class ImGuiDebugWindow {
 				}
 				ImGui.EndTooltip();
 			}
-		} else if (sound.Pointer == lastPlayedSoundPointer) {
+		} else if (sound?.Pointer == lastPlayedSoundPointer) {
 			if (sound.bIsPlaying) {
 				sound.tStop();
 				lastPlayedSoundPointer = 0;
 			}
 		}
 	}
-	private static long CResourceListPopup<T>(string resourceType, IEnumerable<T> resourceList, string label, string id) where T : IDisposable {
+	private static long CResourceListPopup<T>(string resourceType, IEnumerable<T> resourceList, string label, string id) where T : IDisposable? {
 		if (resourceList == null) return 0;
 
 		Action<IDisposable, string> popup =
