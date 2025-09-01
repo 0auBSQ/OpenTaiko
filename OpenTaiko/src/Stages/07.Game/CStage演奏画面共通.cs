@@ -640,6 +640,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CBRANCHSCORE[] CBranchScore = new CBRANCHSCORE[6];
 	public CBRANCHSCORE[] CChartScore = new CBRANCHSCORE[5];
 	public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[5];
+	public bool bPreviousPlayWasEndedNormally = false; // Necessary on story mode missions to see if the game has been quitted through the pause menu or not
 
 	public bool[] bIsGOGOTIME = new bool[5];
 	private bool[] bWasGOGOTIME = new bool[5]; // go-go time state before rewinding
@@ -4359,6 +4360,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public void t演奏中止() {
+		bPreviousPlayWasEndedNormally = false;
 		this.actFO.tフェードアウト開始();
 		base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;

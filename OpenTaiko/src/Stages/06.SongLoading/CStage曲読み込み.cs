@@ -163,6 +163,7 @@ internal class CStage曲読み込み : CStage {
 				this.sd読み込み音.tStopSound();
 				this.sd読み込み音.tDispose();
 			}
+			OpenTaiko.stageGameScreen.bPreviousPlayWasEndedNormally = false;
 			return (int)ESongLoadingScreenReturnValue.LoadCanceled;
 		}
 		#endregion

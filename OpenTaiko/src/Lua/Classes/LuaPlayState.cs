@@ -9,6 +9,14 @@ namespace OpenTaiko {
 		public int InvincibilityDuration => CFloorManagement.InvincibilityDuration;
 
 		// General
+		public bool WasPlayEndedNormally() {
+			return OpenTaiko.stageGameScreen.bPreviousPlayWasEndedNormally;
+		}
+
+		public bool WasPlayAborted() {
+			return !OpenTaiko.stageGameScreen.bPreviousPlayWasEndedNormally;
+		}
+
 		public int GetGoodCount(int player) {
 			return OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
 		}

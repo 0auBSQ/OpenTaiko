@@ -541,6 +541,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					actTokkun.tMatchWithTheChartDisplayPosition(true);
 				} else {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+						bPreviousPlayWasEndedNormally = true;
 						base.ePhaseID = CStage.EPhase.Game_EndStage;
 
 						this.actEnd.Start();
