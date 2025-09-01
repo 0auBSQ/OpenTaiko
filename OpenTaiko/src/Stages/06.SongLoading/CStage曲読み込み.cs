@@ -145,7 +145,7 @@ internal class CStage曲読み込み : CStage {
 			} else {
 				OpenTaiko.Skin.sound曲読込開始音.tPlay();
 				this.nBGM再生開始時刻 = SoundManager.PlayTimer.NowTimeMs;
-				this.nBGMの総再生時間ms = OpenTaiko.Skin.sound曲読込開始音.n長さ_現在のサウンド;
+				this.nBGMの総再生時間ms = (long)Math.Ceiling(OpenTaiko.Skin.sound曲読込開始音.n長さ_現在のサウンド);
 			}
 			//this.actFI.tフェードイン開始();							// #27787 2012.3.10 yyagi 曲読み込み画面のフェードインの省略
 			base.ePhaseID = CStage.EPhase.Common_FADEIN;

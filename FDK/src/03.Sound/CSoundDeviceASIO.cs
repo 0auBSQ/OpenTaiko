@@ -61,6 +61,8 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		protected set;
 	}
 
+	public long nBytesPerSec { get; protected set; }
+
 
 	// マスターボリュームの制御コードは、WASAPI/ASIOで全く同じ。
 	public int nMasterVolume {
@@ -253,7 +255,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		}
 		//long nミキサーの1サンプルあたりのバイト数 = /*mixerInfo.chans*/ 2 * nサンプルサイズbyte;
 		long nミキサーの1サンプルあたりのバイト数 = mixerInfo.Channels * nサンプルサイズbyte;
-		this.nミキサーの1秒あたりのバイト数 = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
+		this.nBytesPerSec = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
 
 
 		// 単純に、hMixerの音量をMasterVolumeとして制御しても、
@@ -365,7 +367,7 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 経過時間を更新。
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
-		this.ElapsedTimeMs = (this.n累積転送バイト数 * 1000 / this.nミキサーの1秒あたりのバイト数) - this.OutputDelay;
+		this.ElapsedTimeMs = (this.n累積転送バイト数 * 1000 / this.nBytesPerSec) - this.OutputDelay;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
 
 
@@ -375,7 +377,6 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		return num;
 	}
 
-	private long nミキサーの1秒あたりのバイト数 = 0;
 	private long n累積転送バイト数 = 0;
 	private bool bIsBASSFree = true;
 }

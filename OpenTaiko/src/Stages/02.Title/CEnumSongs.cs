@@ -215,27 +215,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			try {
 				OpenTaiko.Skin.bgm起動画面.tPlay();
-				for (int i = 0; i < OpenTaiko.Skin.nシステムサウンド数; i++) {
-					if (!OpenTaiko.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
-					{
-						CSkin.CSystemSound cシステムサウンド = OpenTaiko.Skin[i];
-						if (cシステムサウンド.bCompact対象) {
-							try {
-								cシステムサウンド.tLoading();
-								Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
-								//if ( ( cシステムサウンド == CDTXMania.Skin.bgm起動画面 ) && cシステムサウンド.b読み込み成功 )
-								//{
-								//	cシステムサウンド.t再生する();
-								//}
-							} catch (FileNotFoundException) {
-								Trace.TraceWarning("システムサウンドが存在しません。({0})", cシステムサウンド.strFileName);
-							} catch (Exception e) {
-								Trace.TraceWarning(e.ToString());
-								Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strFileName);
-							}
-						}
-					}
-				}
+				OpenTaiko.Skin.PreloadSystemSounds();
 				lock (OpenTaiko.stageStartup.list進行文字列) {
 					OpenTaiko.stageStartup.list進行文字列.Add("SYSTEM SOUND...OK");
 				}

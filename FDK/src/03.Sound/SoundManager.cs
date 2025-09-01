@@ -163,6 +163,7 @@ public class SoundManager   // : CSound
 		}
 	}
 
+	public static long nBytesPerSec => SoundDevice.nBytesPerSec;
 	#endregion
 
 

@@ -10,7 +10,8 @@ using System.IO;
 namespace OpenTaiko {
 	public class LuaText : IDisposable {
 		private CCachedFontRenderer? _fontRenderer;
-		private Dictionary<TitleTextureKey, LuaTexture> _titles = [];
+		internal Dictionary<TitleTextureKey, LuaTexture> _titles = [];
+		internal HashSet<LuaText>? _disposeList = null;
 
 		public LuaText() {
 			_fontRenderer = null;
@@ -84,6 +85,7 @@ namespace OpenTaiko {
 
 				_titles.Clear();
 				_fontRenderer?.Dispose();
+				_disposeList?.Remove(this);
 				_disposedValue = true;
 			}
 		}
@@ -95,10 +97,10 @@ namespace OpenTaiko {
 		#endregion
 	}
 	public class LuaTextFunc {
-		public List<LuaText> Texts;
+		public HashSet<LuaText> Texts;
 		public string DirPath;
 
-		public LuaTextFunc(List<LuaText> texts, string dirPath) {
+		public LuaTextFunc(HashSet<LuaText> texts, string dirPath) {
 			Texts = texts;
 			DirPath = dirPath;
 		}
@@ -109,6 +111,7 @@ namespace OpenTaiko {
 			try {
 				text = new(true, size, style);
 				Texts.Add(text);
+				text._disposeList = this.Texts;
 			}
 			catch (Exception e) {
 				LogNotification.PopError($"Lua Text failed to load: {e}");

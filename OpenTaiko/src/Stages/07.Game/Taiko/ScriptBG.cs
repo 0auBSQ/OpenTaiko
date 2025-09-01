@@ -111,9 +111,9 @@ class ScriptBGFunc {
 }
 class ScriptBG : IDisposable {
 	public Dictionary<string, CTexture> Textures = [];
-	public List<CTexture> TextureList = [];
-	public List<LuaSound> SoundList = [];
-	public List<LuaText> TextList = [];
+	public HashSet<LuaTexture> TextureList = [];
+	public HashSet<LuaSound> SoundList = [];
+	public HashSet<LuaText> TextList = [];
 
 	protected Lua? LuaScript;
 
@@ -172,31 +172,18 @@ class ScriptBG : IDisposable {
 		LuaScript = null;
 	}
 	public void Dispose() {
-		List<CTexture> texs = Textures.Values.ToList();
-		for (int i = 0; i < texs.Count; i++) {
-			var tex = texs[i];
-			OpenTaiko.tテクスチャの解放(ref tex);
-		}
-
-		for (int i = 0; i < TextureList.Count; i++) {
-			var luatex = TextureList[i];
-			OpenTaiko.tDisposeSafely(ref luatex);
-		}
-
-		for (int i = SoundList.Count - 1; i >= 0; i--) {
-			var sound = SoundList[i];
-			OpenTaiko.tDisposeSafely(ref sound);
-		}
-
-		for (int i = TextList.Count - 1; i >= 0; i--) {
-			var text = TextList[i];
-			OpenTaiko.tDisposeSafely(ref text);
-		}
-
+		foreach (var (key, tex) in this.Textures)
+			tex?.Dispose();
 		Textures.Clear();
-		TextureList.Clear();
-		SoundList.Clear();
-		TextList.Clear();
+
+		void freeDisposableList<T>(ICollection<T> list) where T : IDisposable? {
+			foreach (var disposable in list)
+				disposable?.Dispose();
+			list.Clear();
+		}
+		freeDisposableList(this.TextureList);
+		freeDisposableList(this.SoundList);
+		freeDisposableList(this.TextList);
 
 		LuaScript?.Dispose();
 

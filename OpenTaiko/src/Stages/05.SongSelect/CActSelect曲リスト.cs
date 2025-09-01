@@ -47,12 +47,12 @@ internal class CActSelect曲リスト : CActivity {
 		get;
 		private set;
 	}
-	public CSongListNode rPrevSelectedSong {
+	public CSongListNode? rPrevSelectedSong {
 		get;
 		private set;
 	}
-	private CSongListNode _rNowSelectedSong;
-	public CSongListNode rCurrentlySelectedSong {
+	private CSongListNode? _rNowSelectedSong;
+	public CSongListNode? rCurrentlySelectedSong {
 		get {
 			return _rNowSelectedSong;
 		}
@@ -66,7 +66,7 @@ internal class CActSelect曲リスト : CActivity {
 
 	public void ResetSongIndex() {
 		nSelectSongIndex = 0;
-		this.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート[nSelectSongIndex];
+		this.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート.ElementAtOrDefault(nSelectSongIndex);
 	}
 
 	public int nスクロールバー相対y座標 {

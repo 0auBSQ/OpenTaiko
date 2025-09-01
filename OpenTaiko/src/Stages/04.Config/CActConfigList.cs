@@ -1084,7 +1084,8 @@ internal class CActConfigList : CActivity {
 					this.iSystemASIODevice.n現在選択されている項目番号,
 					this.iSystemSoundTimerType.bON);
 				OpenTaiko.app.ShowWindowTitle();
-				OpenTaiko.Skin.ReloadSkin();// 音声の再読み込みをすることによって、音量の初期化を防ぐ
+				OpenTaiko.Skin.ReloadSystemSounds();
+				OpenTaiko.Skin.PreloadSystemSounds();
 			}
 		} else {
 			if (this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
