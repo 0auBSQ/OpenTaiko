@@ -192,6 +192,15 @@ namespace OpenTaiko {
 			return new LuaCounter(begin, end, interval, ended);
 		}
 
+		public LuaCounter CreateCounterDuration(double begin, double end, double seconds, LuaFunction? ended = null) {
+			if (seconds <= 0) return EmptyCounter();
+			if (begin == end) return EmptyCounter();
+
+			double interval = seconds / Math.Abs(end - begin);
+			return new LuaCounter(begin, end, interval, ended);
+		}
+
+
 		public LuaCounter EmptyCounter() {
 			return new LuaCounter();
 		}
