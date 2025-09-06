@@ -63,7 +63,7 @@ namespace OpenTaiko {
 					}
 					return dict;
 				case JTokenType.Integer:
-					return token.ToObject<int>();
+					return token.ToObject<long>();
 				case JTokenType.Float:
 					return token.ToObject<double>();
 				case JTokenType.String:

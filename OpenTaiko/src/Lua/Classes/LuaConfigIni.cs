@@ -66,14 +66,14 @@
 			}
 		}
 
-		public EGameType GetGameType(int player) {
-			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return EGameType.Taiko;
-			return OpenTaiko.ConfigIni.nGameType[player];
+		public int GetGameType(int player) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)EGameType.Taiko;
+			return (int)OpenTaiko.ConfigIni.nGameType[player];
 		}
 
-		public void SetGameType(int player, EGameType gt) {
+		public void SetGameType(int player, int gt) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
-			if (Enum.IsDefined(typeof(EGameType), gt)) OpenTaiko.ConfigIni.nGameType[player] = gt;
+			if (Enum.IsDefined(typeof(EGameType), (EGameType)gt)) OpenTaiko.ConfigIni.nGameType[player] = (EGameType)gt;
 		}
 
 		public int GetDefaultCourse(int player) {
@@ -140,34 +140,34 @@
 			OpenTaiko.ConfigIni.bAutoPlay[player] = isAuto;
 		}
 
-		public ERandomMode GetRandomMode(int player) {
-			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return ERandomMode.Off;
-			return OpenTaiko.ConfigIni.eRandom[player];
+		public int GetRandomMode(int player) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)ERandomMode.Off;
+			return (int)OpenTaiko.ConfigIni.eRandom[player];
 		}
 
-		public void SetRandomMode(int player, ERandomMode mode) {
+		public void SetRandomMode(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
-			if (Enum.IsDefined(typeof(ERandomMode), mode)) OpenTaiko.ConfigIni.eRandom[player] = mode;
+			if (Enum.IsDefined(typeof(ERandomMode), (ERandomMode)mode)) OpenTaiko.ConfigIni.eRandom[player] = (ERandomMode)mode;
 		}
 
-		public EFunMods GetFunMod(int player) {
-			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return EFunMods.None;
-			return OpenTaiko.ConfigIni.nFunMods[player];
+		public int GetFunMod(int player) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)EFunMods.None;
+			return (int)OpenTaiko.ConfigIni.nFunMods[player];
 		}
 
-		public void SetFunMod(int player, EFunMods mod) {
+		public void SetFunMod(int player, int mod) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
-			if (Enum.IsDefined(typeof(EFunMods), mod)) OpenTaiko.ConfigIni.nFunMods[player] = mod;
+			if (Enum.IsDefined(typeof(EFunMods), (EFunMods)mod)) OpenTaiko.ConfigIni.nFunMods[player] = (EFunMods)mod;
 		}
 
-		public EStealthMode GetStealthMode(int player) {
-			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return EStealthMode.Off;
-			return OpenTaiko.ConfigIni.eSTEALTH[player];
+		public int GetStealthMode(int player) {
+			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)EStealthMode.Off;
+			return (int)OpenTaiko.ConfigIni.eSTEALTH[player];
 		}
 
-		public void SetStealthMode(int player, EStealthMode mode) {
+		public void SetStealthMode(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
-			if (Enum.IsDefined(typeof(EStealthMode), mode)) OpenTaiko.ConfigIni.eSTEALTH[player] = mode;
+			if (Enum.IsDefined(typeof(EStealthMode), (EStealthMode)mode)) OpenTaiko.ConfigIni.eSTEALTH[player] = (EStealthMode)mode;
 		}
 
 		public int GetJusticeMode(int player) {
@@ -179,6 +179,32 @@
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			// 0: Off, 1: Just (Ok => Bad), 2: Safe (Bad => Ok)
 			OpenTaiko.ConfigIni.bJust[player] = Math.Clamp(mode, 0, 2);
+		}
+
+		public Int64 GetModsFlags(int player) {
+			byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+			_flags[0] = (byte)Math.Min(255, GetScrollSpeed(player));
+			_flags[1] = (byte)GetStealthMode(player);
+			_flags[2] = (byte)GetRandomMode(player);
+			_flags[3] = (byte)Math.Min(255, SongSpeed);
+			_flags[4] = (byte)GetTimingZone(player);
+			_flags[5] = (byte)GetJusticeMode(player);
+			_flags[7] = (byte)GetFunMod(player);
+
+			return BitConverter.ToInt64(_flags, 0);
+		}
+
+		public void SetModsFlags(int player, Int64 flags) {
+			byte[] _flags = BitConverter.GetBytes(flags);
+
+			SetScrollSpeed(player, _flags[0]);
+			SetStealthMode(player, _flags[1]);
+			SetRandomMode(player, _flags[2]);
+			SongSpeed = _flags[3];
+			SetTimingZone(player, _flags[4]);
+			SetJusticeMode(player, _flags[5]);
+			SetFunMod(player, _flags[7]);
 		}
 	}
 
