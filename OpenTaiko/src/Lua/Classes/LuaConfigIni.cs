@@ -181,7 +181,7 @@
 			OpenTaiko.ConfigIni.bJust[player] = Math.Clamp(mode, 0, 2);
 		}
 
-		public Int64 GetModsFlags(int player) {
+		public Int64 GetModFlags(int player) {
 			byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 			_flags[0] = (byte)Math.Min(255, GetScrollSpeed(player));
@@ -195,7 +195,7 @@
 			return BitConverter.ToInt64(_flags, 0);
 		}
 
-		public void SetModsFlags(int player, Int64 flags) {
+		public void SetModFlags(int player, Int64 flags) {
 			byte[] _flags = BitConverter.GetBytes(flags);
 
 			SetScrollSpeed(player, _flags[0]);
