@@ -8,7 +8,7 @@ namespace OpenTaiko {
 
 			lua.DoString(@$"
 for k, _ in pairs(os) do
-	if k ~= ""time"" then
+	if k ~= ""time"" and k ~= ""date"" then
 	os[k] = nil
 	end
 end

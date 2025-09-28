@@ -74,6 +74,21 @@
 
 		#endregion
 
+		#region [Unlockables]
+
+		public bool IsNameplateUnlocked(int id) {
+			return _sf.data.UnlockedNameplateIds.Contains(id);
+		}
+
+		public void UnlockNameplate(int id) {
+			if (!IsNameplateUnlocked(id)) {
+				_sf.data.UnlockedNameplateIds.Add(id);
+				DBSaves.RegisterUnlockedNameplate(_sf.data.SaveId, id);
+			}
+		}
+
+		#endregion
+
 		#region [Triggers and Counters]
 
 		public bool GetGlobalTrigger(string triggerName) {
