@@ -26,7 +26,11 @@ namespace OpenTaiko {
 		}
 
 		public CLocalizationData FromString(string _str) {
-			return JsonConvert.DeserializeObject<CLocalizationData>(_str) ?? new CLocalizationData();
+			var _strdct = JsonConvert.DeserializeObject<Dictionary<string, string>>(_str) ?? null;
+			if (_strdct != null) {
+				return new CLocalizationData(_strdct);
+			}
+			return new CLocalizationData();
 		}
 	}
 }

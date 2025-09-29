@@ -1,4 +1,6 @@
-﻿namespace OpenTaiko {
+﻿using Color = System.Drawing.Color;
+
+namespace OpenTaiko {
 	public class LuaNameplateFunc {
 
 		// TODO: Improve the nameplate accessors by using LuaNameplateInfo / LuaDanplateInfo
@@ -15,5 +17,14 @@
 		}
 
 		// TODO: Add getters to get nameplates from DBNameplateUnlockables for my room's gallery
+
+		public void DrawNameplateTitleById(int id, int x, int y, int opacity, LuaText font) {
+			DBNameplateUnlockables.NameplateUnlockable? _np = OpenTaiko.Databases.DBNameplateUnlockables.data?[id] ?? null;
+			if (_np != null) {
+				LuaTexture _tx = font.GetText(_np.nameplateInfo.cld.GetString(""), false, 1000, new LuaColor(Color.Black), new LuaColor(Color.Transparent));
+
+				DrawTitlePlate(x, y, opacity, _np.nameplateInfo.iType, _tx, HRarity.tRarityToLangInt(_np.rarity), id);
+			}
+		}
 	}
 }

@@ -72,6 +72,17 @@
 			}
 		}
 
+		public void SpendCoins(long price) {
+			_sf.data.Medals = Math.Max(0, _sf.data.Medals - price);
+			DBSaves.AlterCoinsAndTotalPlayCount(_sf.data.SaveId, -price, 0);
+		}
+
+		public void EarnCoins(long amount) {
+			_sf.data.Medals += amount;
+			_sf.data.TotalEarnedMedals += amount;
+			DBSaves.AlterCoinsAndTotalPlayCount(_sf.data.SaveId, amount, 0);
+		}
+
 		#endregion
 
 		#region [Unlockables]
