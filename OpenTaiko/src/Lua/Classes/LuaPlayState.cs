@@ -1,4 +1,4 @@
-namespace OpenTaiko {
+ï»¿namespace OpenTaiko {
 	public class LuaPlayStateFunc {
 
 		// Tower
@@ -88,7 +88,7 @@ namespace OpenTaiko {
 
 		// Dan
 		private Exam.Status ExamStatus() {
-			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.st‰‰‘t‹L˜^.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.stæ¼”å¥è¨˜éŒ².Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
 		}
 
 		public bool IsPass() {
