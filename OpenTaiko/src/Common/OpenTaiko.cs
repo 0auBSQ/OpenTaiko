@@ -1106,7 +1106,7 @@ internal class OpenTaiko : Game {
 			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
-					if (rCurrentStage.eStageID != CStage.EStage.Game) {
+					if (rCurrentStage.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
 						UnmountActivity(rCurrentStage);
 						RefreshSkin();
 						if (rCurrentStage.eStageID == CStage.EStage.CUSTOM) {
