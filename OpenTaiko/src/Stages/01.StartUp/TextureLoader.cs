@@ -2191,12 +2191,10 @@ class TextureLoader {
 	}
 
 	public void DisposeTexture() {
-		foreach (var tex in listTexture) {
-			var texture = tex;
-			OpenTaiko.tテクスチャの解放(ref texture);
-			texture?.Dispose();
-			texture = null;
-		}
+		// concurrent
+		var listTexture = Interlocked.Exchange(ref this.listTexture, []);
+		for (int i = 0; i < listTexture.Count; ++i)
+			listTexture.ElementAtOrDefault(i)?.Dispose();
 		listTexture.Clear();
 
 		foreach (CCharacter character in Characters) {
