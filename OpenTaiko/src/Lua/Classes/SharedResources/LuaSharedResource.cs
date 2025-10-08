@@ -4,9 +4,8 @@ namespace OpenTaiko {
 	public class LuaSharedResource<T> where T : class, IDisposable, new() {
 		private readonly object _lock = new();
 		private volatile T _resource = new();
-		private readonly List<T> _pendingResources = new();
-		private int _currentReloadId = 0;
-		private int _lastCompletedReloadId = 0;
+		private readonly HashSet<T> _pendingResources = new();
+		private Action? _reloadAction;
 
 		public void Clear() {
 			lock (_lock) {
@@ -19,44 +18,31 @@ namespace OpenTaiko {
 					} catch { }
 				}
 				_pendingResources.Clear();
-
-				_currentReloadId = 0;
-				_lastCompletedReloadId = 0;
 			}
 		}
 
 		public void Reload(string path, Func<string, object?[], T> factory, Action<T>? onCreate, params object?[] args) {
-			int thisReloadId;
-
 			lock (_lock) {
-				for (int i = _pendingResources.Count - 1; i >= 0; i--) {
-					if (!ReferenceEquals(_pendingResources[i], _resource)) {
-						_pendingResources[i].Dispose();
-						_pendingResources.RemoveAt(i);
-					}
+				if (_pendingResources.TryGetValue(this._resource, out var sharedResource)) {
+					sharedResource.Dispose();
+					_pendingResources.Remove(this._resource);
 				}
-
-				thisReloadId = ++_currentReloadId;
 			}
 
-			Task.Run(() => {
+			// update action
+			Interlocked.Exchange(ref this._reloadAction, () => {
 				var newResource = factory(path, args);
 
 				lock (_lock) {
-					if (thisReloadId > _lastCompletedReloadId) {
-						_resource = newResource;
-						_lastCompletedReloadId = thisReloadId;
-						if (onCreate != null) {
-							Action callbackOnMainThread = () => {
-								onCreate.Invoke(_resource);
-							};
-							Game.AsyncActions.Enqueue(callbackOnMainThread);
-						}
+					this._resource = newResource;
+					if (onCreate != null) {
+						Game.AsyncActions.Enqueue(() => onCreate.Invoke(newResource));
 					}
+					_pendingResources.Add(newResource);
 				}
-
-				_pendingResources.Add(newResource);
 			});
+			// consume action
+			Task.Run(() => Interlocked.Exchange(ref this._reloadAction, null)?.Invoke());
 		}
 
 		public void Reload(string path, Func<string, T> factory, Action<T>? onCreate) => Reload(path, (p, _) => factory(p), onCreate);
