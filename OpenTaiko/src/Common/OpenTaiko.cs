@@ -1107,8 +1107,16 @@ internal class OpenTaiko : Game {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
 					if (rCurrentStage.eStageID != CStage.EStage.Game) {
-						RefreshSkin();
 						UnmountActivity(rCurrentStage);
+						RefreshSkin();
+						if (rCurrentStage.eStageID == CStage.EStage.CUSTOM) {
+							LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+							if (_stage != null) {
+								UnmountAndChangeStage(_stage);
+							} else {
+								TriggerSystemError(CSystemError.Errno.ENO_INVALIDSTAGENAME);
+							}
+						}
 						MountActivity(rCurrentStage);
 					}
 				} else {
