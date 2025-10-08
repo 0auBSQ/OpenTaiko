@@ -65,6 +65,7 @@ namespace OpenTaiko {
 		public double GetPlaySpeed() {
 			return _video?.dbPlaySpeed ?? 1;
 		}
+		#endregion
 		#region Sets
 		public void SetPlayPosition(double position) {
 			_video?.Seek((long)(position * 1000.0));
@@ -78,7 +79,7 @@ namespace OpenTaiko {
 
 		#endregion
 
-
+		#region Dispose
 		private bool _disposedValue;
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
