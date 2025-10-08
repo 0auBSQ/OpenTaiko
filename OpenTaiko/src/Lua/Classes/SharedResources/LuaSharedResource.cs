@@ -99,104 +99,46 @@ namespace OpenTaiko {
 			return new LuaSound();
 		}
 
-		public void SetSharedTexture(string key, string path, Action<LuaTexture>? onCreate = null) {
+		internal void SetSharedTextureGeneric(string key, string path, Action<LuaTexture>? onCreate, Func<string, LuaTexture> factory) {
 			LuaSharedResource<LuaTexture> _sharedTexture;
 
 			if (SharedTextures.ContainsKey(key)) _sharedTexture = SharedTextures[key];
 			else _sharedTexture = new LuaSharedResource<LuaTexture>();
 
-			_sharedTexture.Reload(path, _luaTextureFunc.CreateTexture, onCreate);
+			_sharedTexture.Reload(path, factory, onCreate);
 			SharedTextures[key] = _sharedTexture;
 		}
 
-		public void SetSharedTextureUsingAbsolutePath(string key, string path, Action<LuaTexture>? onCreate = null) {
-			LuaSharedResource<LuaTexture> _sharedTexture;
+		public void SetSharedTexture(string key, string path, Action<LuaTexture>? onCreate = null)
+			=> SetSharedTextureGeneric(key, path, onCreate, (path) => _luaTextureFunc.CreateTexture(path, autoDispose: false));
+		public void SetSharedTextureUsingAbsolutePath(string key, string path, Action<LuaTexture>? onCreate = null)
+			=> SetSharedTextureGeneric(key, path, onCreate, (path) => _luaTextureFunc.CreateTextureFromAbsolutePath(path, autoDispose: false));
 
-			if (SharedTextures.ContainsKey(key)) _sharedTexture = SharedTextures[key];
-			else _sharedTexture = new LuaSharedResource<LuaTexture>();
-
-			_sharedTexture.Reload(path, _luaTextureFunc.CreateTextureFromAbsolutePath, onCreate);
-			SharedTextures[key] = _sharedTexture;
-		}
-
-		public void SetSharedSFX(string key, string path, Action<LuaSound>? onCreate = null) {
+		internal void SetSharedSoundGeneric(string key, string path, Action<LuaSound>? onCreate, Func<string, LuaSound> factory) {
 			LuaSharedResource<LuaSound> _sharedSound;
 
 			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
 			else _sharedSound = new LuaSharedResource<LuaSound>();
 
-			_sharedSound.Reload(path, _luaSoundFunc.CreateSFX, onCreate);
+			_sharedSound.Reload(path, factory, onCreate);
 			SharedSounds[key] = _sharedSound;
 		}
 
-		public void SetSharedBGM(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreateBGM, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedVoice(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreateVoice, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedPreview(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreatePreview, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedSFXUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreateSFXFromAbsolutePath, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedBGMUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreateBGMFromAbsolutePath, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedVoiceUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreateVoiceFromAbsolutePath, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
-
-		public void SetSharedPreviewUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null) {
-			LuaSharedResource<LuaSound> _sharedSound;
-
-			if (SharedSounds.ContainsKey(key)) _sharedSound = SharedSounds[key];
-			else _sharedSound = new LuaSharedResource<LuaSound>();
-
-			_sharedSound.Reload(path, _luaSoundFunc.CreatePreviewFromAbsolutePath, onCreate);
-			SharedSounds[key] = _sharedSound;
-		}
+		public void SetSharedSFX(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSound(path, ESoundGroup.SoundEffect, autoDispose: false));
+		public void SetSharedBGM(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSound(path, ESoundGroup.SongPlayback, autoDispose: false));
+		public void SetSharedVoice(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSound(path, ESoundGroup.Voice, autoDispose: false));
+		public void SetSharedPreview(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSound(path, ESoundGroup.SongPreview, autoDispose: false));
+		public void SetSharedSFXUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.SoundEffect, autoDispose: false));
+		public void SetSharedBGMUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.SongPlayback, autoDispose: false));
+		public void SetSharedVoiceUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.Voice, autoDispose: false));
+		public void SetSharedPreviewUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null)
+			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.SongPreview, autoDispose: false));
 	}
 }

@@ -141,8 +141,12 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		public LuaTexture CreateTexture(string path) {
-			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+		internal LuaTexture CreateTexture(string path, bool autoDispose)
+			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose);
+		public LuaTexture CreateTexture(string path) => CreateTexture(path, autoDispose: true);
+
+		internal LuaTexture CreateTextureFromAbsolutePath(string path, bool autoDispose) {
+			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaTexture luatex = new();
 			if (File.Exists(full_path)) {
@@ -150,7 +154,8 @@ namespace OpenTaiko {
 					var tex = OpenTaiko.tテクスチャの生成(full_path);
 					luatex = new LuaTexture(tex);
 					Textures.Add(luatex);
-					luatex._disposeList = this.Textures;
+					if (autoDispose)
+						luatex._disposeList = this.Textures;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
 					luatex?.Dispose();
@@ -161,27 +166,7 @@ namespace OpenTaiko {
 			}
 			return luatex;
 		}
-
-		public LuaTexture CreateTextureFromAbsolutePath(string path) {
-			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
-
-			LuaTexture luatex = new();
-			if (File.Exists(full_path)) {
-				try {
-					var tex = OpenTaiko.tテクスチャの生成(full_path);
-					luatex = new LuaTexture(tex);
-					Textures.Add(luatex);
-					luatex._disposeList = this.Textures;
-				} catch (Exception e) {
-					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
-					luatex?.Dispose();
-					luatex = new();
-				}
-			} else {
-				//LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
-			}
-			return luatex;
-		}
+		public LuaTexture CreateTextureFromAbsolutePath(string path) => CreateTextureFromAbsolutePath(path, autoDispose: true);
 
 		public bool Exists(string path) {
 			return File.Exists($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}");

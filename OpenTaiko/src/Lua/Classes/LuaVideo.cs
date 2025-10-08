@@ -103,7 +103,7 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		public LuaVideo CreateVideo(string path) {
+		internal LuaVideo CreateVideo(string path, bool autoDispose) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaVideo luavid = new();
@@ -113,7 +113,8 @@ namespace OpenTaiko {
 					vid.InitRead();
 					luavid = new LuaVideo(vid);
 					Videos.Add(luavid);
-					luavid._disposeList = this.Videos;
+					if (autoDispose)
+						luavid._disposeList = this.Videos;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Video failed to load: {e}");
 					luavid?.Dispose();
@@ -125,5 +126,7 @@ namespace OpenTaiko {
 			}
 			return luavid;
 		}
+
+		public LuaVideo CreateVideo(string path) => CreateVideo(path, autoDispose: true);
 	}
 }
