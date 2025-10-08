@@ -2728,7 +2728,7 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Result_Clear_2P,
 		Characters_Result_Failed_2P;
 	*/
-	public CCharacter[] Characters;
+	public CCharacter[] Characters = [];
 
 	#endregion
 
