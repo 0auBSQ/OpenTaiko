@@ -161,6 +161,8 @@ namespace OpenTaiko {
 					luatex?.Dispose();
 					luatex = new();
 				}
+			} else if (Path.Exists(full_path)) {
+				LogNotification.PopWarning($"Lua Texture failed to load because '{full_path}' is not a file.");
 			} else {
 				LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
 			}
