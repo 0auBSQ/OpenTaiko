@@ -2052,6 +2052,9 @@ internal class OpenTaiko : Game {
 
 		OpenTaiko.Tx.LoadTexture();
 
+		// Re-propagate AfterSongEnum events to all lua stages
+		if (EnumSongs.IsSongListEnumCompletelyDone)
+			LuaStageWrapper.PropagateAfterSongEnumEvent();
 		EnumSongs.Resume();
 
 		OpenTaiko.NamePlate.RefleshSkin();
