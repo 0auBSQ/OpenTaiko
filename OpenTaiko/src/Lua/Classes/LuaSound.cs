@@ -87,24 +87,10 @@ namespace OpenTaiko {
 		public LuaSound CreateVoiceFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.Voice);
 		public LuaSound CreateBGMFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPlayback);
 		public LuaSound CreatePreviewFromAbsolutePath(string path) => CreateSoundFromAbsolutePath(path, ESoundGroup.SongPreview);
-		private LuaSound CreateSound(string path, ESoundGroup group) {
-			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+		internal LuaSound CreateSound(string path, ESoundGroup group, bool autoDispose = true)
+			=> CreateSoundFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", group, autoDispose);
 
-			LuaSound sound = new();
-
-			try {
-				sound = new(full_path, group);
-				Sounds.Add(sound);
-				sound._disposeList = this.Sounds;
-			} catch (Exception e) {
-				LogNotification.PopError($"Lua Sound failed to load: {e}");
-				sound?.Dispose();
-				sound = new();
-			}
-			return sound;
-		}
-
-		private LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group) {
+		internal LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group, bool autoDispose = true) {
 			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaSound sound = new();
@@ -112,7 +98,8 @@ namespace OpenTaiko {
 			try {
 				sound = new(full_path, group);
 				Sounds.Add(sound);
-				sound._disposeList = this.Sounds;
+				if (autoDispose)
+					sound._disposeList = this.Sounds;
 			} catch (Exception e) {
 				LogNotification.PopError($"Lua Sound failed to load: {e}");
 				sound?.Dispose();

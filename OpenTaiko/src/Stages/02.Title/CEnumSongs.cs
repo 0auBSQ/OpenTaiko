@@ -138,7 +138,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Suspend() {
 		if (this.state != DTXEnumState.CompletelyDone &&
-			((thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.Background)) != 0)) {
+			((thDTXFileEnumerate?.ThreadState & (System.Threading.ThreadState.Background)) != 0)) {
 			// this.thDTXFileEnumerate.Suspend();		// obsoleteにつき使用中止
 			this.Songs管理.bIsSuspending = true;
 			this.state = DTXEnumState.Suspended;
@@ -170,10 +170,10 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		// 曲検索が一時中断されるまで待機
 		for (int i = 0; i < 10; i++) {
 			if (this.state == DTXEnumState.CompletelyDone ||
-				(thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.Background | System.Threading.ThreadState.Stopped)) != 0) {
+				(thDTXFileEnumerate?.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.Background | System.Threading.ThreadState.Stopped)) != 0) {
 				break;
 			}
-			Trace.TraceInformation("★曲データ検索スレッドの中断待ちです: {0}", this.thDTXFileEnumerate.ThreadState.ToString());
+			Trace.TraceInformation("★曲データ検索スレッドの中断待ちです: {0}", this.thDTXFileEnumerate?.ThreadState.ToString());
 			Thread.Sleep(500);
 		}
 

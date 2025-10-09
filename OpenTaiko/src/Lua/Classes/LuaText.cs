@@ -105,13 +105,14 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		public LuaText Create(int size, params string[] style) {
+		internal LuaText Create(int size, string[] style, bool autoDispose) {
 			LuaText text = new();
 
 			try {
 				text = new(true, size, style);
 				Texts.Add(text);
-				text._disposeList = this.Texts;
+				if (autoDispose)
+					text._disposeList = this.Texts;
 			}
 			catch (Exception e) {
 				LogNotification.PopError($"Lua Text failed to load: {e}");
@@ -121,5 +122,8 @@ namespace OpenTaiko {
 
 			return text;
 		}
+
+
+		public LuaText Create(int size, params string[] style) => Create(size, style, autoDispose: true);
 	}
 }

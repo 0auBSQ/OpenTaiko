@@ -1789,6 +1789,8 @@ internal class OpenTaiko : Game {
 				try {
 					actEnumSongs.DeActivate();
 					actEnumSongs = null;
+					EnumSongs.Suspend(); // stop thread to prevent using disposed resources
+					EnumSongs.WaitUntilSuspended();
 					Trace.TraceInformation("Enumeration of songs closed down successfully.");
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());

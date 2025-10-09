@@ -615,18 +615,22 @@ internal class CSkin : IDisposable {
 	}
 
 	public void UnloadSystemSounds() {
-		foreach (var snd in this.listSystemSound) {
-			if (snd.bLoadedSuccessfuly) {
+		// concurrent
+		var list = Interlocked.Exchange(ref this.listSystemSound, []);
+		for (int i = 0; i < list.Count; ++i) {
+			var snd = list.ElementAtOrDefault(i);
+			if (snd?.bLoadedSuccessfuly ?? false) {
 				snd.tStop();
 				snd.Dispose();
 			}
 		}
-		this.listSystemSound.Clear();
+		list.Clear();
 	}
 
 	public void PreloadSystemSounds() {
-		foreach (var snd in this.listSystemSound) {
-			if (!snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
+			var snd = this.listSystemSound.ElementAtOrDefault(i);
+			if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 			{
 				CSystemSound cシステムサウンド = snd;
 				if (cシステムサウンド.bCompact対象) {
@@ -787,8 +791,9 @@ internal class CSkin : IDisposable {
 
 
 	public void tRemoveMixerAll() {
-		foreach (var snd in this.listSystemSound) {
-			if (snd.bLoadedSuccessfuly) {
+		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
+			var snd = this.listSystemSound.ElementAtOrDefault(i);
+			if (snd?.bLoadedSuccessfuly ?? false) {
 				snd.tStop();
 				snd.tRemoveMixer();
 			}
@@ -7425,9 +7430,11 @@ internal class CSkin : IDisposable {
 	//-----------------
 	public void Dispose() {
 		if (!this.bDisposed済み) {
-			foreach (var snd in this.listSystemSound)
-				snd.Dispose();
-			this.listSystemSound.Clear();
+			// concurrent
+			var list = Interlocked.Exchange(ref this.listSystemSound, []);
+			for (int i = 0; i < list.Count; ++i)
+				list.ElementAtOrDefault(i)?.Dispose();
+			list.Clear();
 
 			this.bDisposed済み = true;
 		}

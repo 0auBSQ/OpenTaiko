@@ -65,6 +65,7 @@ namespace OpenTaiko {
 		public double GetPlaySpeed() {
 			return _video?.dbPlaySpeed ?? 1;
 		}
+		#endregion
 		#region Sets
 		public void SetPlayPosition(double position) {
 			_video?.Seek((long)(position * 1000.0));
@@ -78,7 +79,7 @@ namespace OpenTaiko {
 
 		#endregion
 
-
+		#region Dispose
 		private bool _disposedValue;
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
@@ -103,7 +104,7 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		public LuaVideo CreateVideo(string path) {
+		internal LuaVideo CreateVideo(string path, bool autoDispose) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaVideo luavid = new();
@@ -113,17 +114,23 @@ namespace OpenTaiko {
 					vid.InitRead();
 					luavid = new LuaVideo(vid);
 					Videos.Add(luavid);
-					luavid._disposeList = this.Videos;
+					if (autoDispose)
+						luavid._disposeList = this.Videos;
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Video failed to load: {e}");
 					luavid?.Dispose();
 					luavid = new();
 				}
 			}
+			else if (Path.Exists(full_path)) {
+				LogNotification.PopWarning($"Lua Video failed to load because '{full_path}' is not a file.");
+			}
 			else {
 				LogNotification.PopWarning($"Lua Video failed to load because the file located at '{full_path}' does not exist.");
 			}
 			return luavid;
 		}
+
+		public LuaVideo CreateVideo(string path) => CreateVideo(path, autoDispose: true);
 	}
 }
