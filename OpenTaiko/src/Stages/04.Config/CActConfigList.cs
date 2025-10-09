@@ -1038,7 +1038,7 @@ internal class CActConfigList : CActivity {
 		base.DeActivate();
 		#region [ Skin変更 ]
 		if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org) {
-			OpenTaiko.app.RefreshSkin();
+			OpenTaiko.app.EnterRefreshSkinStage(isSavedBeforeUpdate: true);
 		}
 		#endregion
 

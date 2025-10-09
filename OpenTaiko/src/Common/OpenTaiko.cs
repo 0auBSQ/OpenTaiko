@@ -378,6 +378,9 @@ internal class OpenTaiko : Game {
 		UnmountAndChangeStage(SystemError);
 	}
 
+	public void EnterRefreshSkinStage(bool isSavedBeforeUpdate = false) {
+		stageChangeSkin.SavePreviousStage(isSavedBeforeUpdate ? rCurrentStage : rPreviousStage);
+	}
 
 
 	#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
@@ -530,7 +533,8 @@ internal class OpenTaiko : Game {
 			// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
 
 			if (rCurrentStage != null) {
-				OpenTaiko.NamePlate?.lcNamePlate.Update();
+				if (rCurrentStage.eStageID is not CStage.EStage.ChangeSkin)
+					OpenTaiko.NamePlate?.lcNamePlate.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
 				CScoreIni scoreIni = null;
@@ -622,7 +626,9 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							switch (rPreviousStage.eStageID) {
+							// update target stage
+							switch (rPreviousStage?.eStageID) {
+								default:
 								case CStage.EStage.CUSTOM:
 									UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 									this.tExecuteGarbageCollection();
@@ -632,6 +638,9 @@ internal class OpenTaiko : Game {
 									UnmountAndChangeStage(stageSongSelect, "Song Select");
 									this.tExecuteGarbageCollection();
 									break;
+							}
+							if (stageChangeSkin.IsPreviousStageSaved) { // change skin
+								UnmountAndChangeStage(stageChangeSkin);
 							}
 							return;
 						}
@@ -930,8 +939,23 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							UnmountAndChangeStage(stageSongSelect, "Song Select");
-							this.tExecuteGarbageCollection();
+							if (stageChangeSkin.IsPreviousStageSaved) { // revert screen history
+								var prevStage = stageChangeSkin.SavedPreviousStage;
+								var backStage = rPreviousStage;
+								if (backStage.eStageID == CStage.EStage.CUSTOM) {
+									UnmountAndChangeLuaStageOrError(backStage.customStageName);
+								} else {
+									UnmountAndChangeStage(backStage);
+								}
+								if (prevStage?.eStageID == CStage.EStage.CUSTOM) { // prevent invalid reference
+									rPreviousStage = LuaStageWrapper.GetLuaStage(prevStage.customStageName);
+								} else {
+									rPreviousStage = prevStage;
+								}
+							} else { // old behavior
+								UnmountAndChangeStage(stageSongSelect, "Song Select");
+								this.tExecuteGarbageCollection();
+							}
 						}
 						//-----------------------------
 						#endregion
@@ -1054,7 +1078,7 @@ internal class OpenTaiko : Game {
 
 				actScanningLoudness?.Draw();
 
-				if (!ConfigIni.bTokkunMode && rCurrentStage.eStageID != CStage.EStage.CRASH) {
+				if (!ConfigIni.bTokkunMode && rCurrentStage.eStageID != CStage.EStage.CRASH && OpenTaiko.Skin != null) {
 					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
 					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
 
@@ -1107,17 +1131,8 @@ internal class OpenTaiko : Game {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
 					if (rCurrentStage.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
-						UnmountActivity(rCurrentStage);
-						RefreshSkin();
-						if (rCurrentStage.eStageID == CStage.EStage.CUSTOM) {
-							LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
-							if (_stage != null) {
-								UnmountAndChangeStage(_stage);
-							} else {
-								TriggerSystemError(CSystemError.Errno.ENO_INVALIDSTAGENAME);
-							}
-						}
-						MountActivity(rCurrentStage);
+						this.EnterRefreshSkinStage();
+						this.UnmountAndChangeStage(stageChangeSkin);
 					}
 				} else {
 					// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
@@ -2005,27 +2020,40 @@ internal class OpenTaiko : Game {
 	}
 
 	public void RefreshSkin() {
+		this.ChangeSkin();
+		this.LoadSkin();
+	}
+
+	public void ChangeSkin() {
 		Trace.TraceInformation("Skin Change:" + OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false));
 
 		OpenTaiko.actTextConsole.DeActivate();
 		actTextConsole.ReleaseManagedResource();
 		actTextConsole.ReleaseUnmanagedResource();
 
+		EnumSongs.Suspend(); // stop thread to prevent using disposed resources
+		EnumSongs.WaitUntilSuspended();
+
 		OpenTaiko.Skin.Dispose();
-		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
+
+		ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
+
+		OpenTaiko.actTextConsole.Activate();
+		actTextConsole.CreateManagedResource();
+		actTextConsole.CreateUnmanagedResource();
+	}
+
+	public void LoadSkin() {
 		OpenTaiko.Skin.PreloadSystemSounds();
 		OpenTaiko.Skin.FetchMenusAndModules();
 
 		OpenTaiko.Tx.DisposeTexture();
 
-		ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
-
 		OpenTaiko.Tx.LoadTexture();
 
-		OpenTaiko.actTextConsole.Activate();
-		actTextConsole.CreateManagedResource();
-		actTextConsole.CreateUnmanagedResource();
+		EnumSongs.Resume();
+
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();
