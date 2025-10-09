@@ -7600,7 +7600,7 @@ internal class CSkin : IDisposable {
 	#region Puchichara
 
 	public int Puchichara_Ptn;
-	public string[] Puchicharas_Name;
+	public string[] Puchicharas_Name = [];
 
 	#endregion
 

@@ -21,6 +21,7 @@ internal class CStageChangeSkin : CStage {
 		Trace.TraceInformation("スキン変更ステージを活性化します。");
 		Trace.Indent();
 		try {
+			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.Activate();
 			Trace.TraceInformation("スキン変更ステージの活性化を完了しました。");
 		} finally {
@@ -31,6 +32,10 @@ internal class CStageChangeSkin : CStage {
 		Trace.TraceInformation("スキン変更ステージを非活性化します。");
 		Trace.Indent();
 		try {
+			this.SavedPreviousStage = null;
+			this.IsPreviousStageSaved = false;
+			OpenTaiko.tDisposeSafely(ref Background);
+
 			base.DeActivate();
 			Trace.TraceInformation("スキン変更ステージの非活性化を完了しました。");
 		} finally {
@@ -50,14 +55,33 @@ internal class CStageChangeSkin : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
+				//スキン変更処理
+				void task() {
+					OpenTaiko.app.ChangeSkin();
+					var background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
+					background.Init();
+					this.Background = background;
+					OpenTaiko.app.LoadSkin();
+
+					this.ePhaseID = EPhase.Common_FADEOUT;
+				}
+
+				if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
+					Task.Run(task);
+				} else {
+					task();
+				}
+
 				base.IsFirstDraw = false;
 				return 0;
 			}
 
-			//スキン変更処理
-			OpenTaiko.app.RefreshSkin();
+			Background?.Update();
+			Background?.Draw();
 
-			return 1;
+			if (ePhaseID == EPhase.Common_FADEOUT) { // reload completed
+				return 1;
+			}
 		}
 		return 0;
 	}
@@ -76,4 +100,16 @@ internal class CStageChangeSkin : CStage {
 
 	//	CDTXMania.act文字コンソール.On活性化();
 	//}
+
+	public void SavePreviousStage(CStage? previousStage) {
+		this.SavedPreviousStage = previousStage;
+		this.IsPreviousStageSaved = true;
+	}
+
+	public CStage? SavedPreviousStage { get; private set; }
+	public bool IsPreviousStageSaved { get; private set; }
+
+	#region [ private ]
+	private ScriptBG? Background;
+	#endregion
 }
