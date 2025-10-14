@@ -15,8 +15,8 @@ class CLuaScript : IDisposable {
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];
 	public HashSet<LuaText> TextList = [];
-	public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
-	public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
+	//public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
+	//public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
 
 	public LuaSaveFile? GetLuaSaveFile(int player) {
 		if (player < 0 || player > OpenTaiko.MAX_PLAYERS) {
@@ -199,19 +199,8 @@ class CLuaScript : IDisposable {
 		LuaSecurity.Secure(LuaScript, dir);
 
 		try {
-			string scriptFilePath = $"{strDir}/Script.lua";
-			if (File.Exists(scriptFilePath)) {
-				LuaScript.DoFile($"{strDir}/Script.lua");
-			} else {
-				LuaScript.DoString(fallbackScript);
-			}
-
 			LuaScript["info"] = luaInfo = new CLuaInfo(strDir);
 			LuaScript["fps"] = luaFPS;
-
-
-			lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
-			lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
 
 			// Old Lua module API
 			LuaScript["loadConfig"] = LoadConfig;
@@ -258,6 +247,15 @@ class CLuaScript : IDisposable {
 			LuaScript["RequestSongList"] = RequestSongList;
 			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
 
+			string scriptFilePath = $"{strDir}/Script.lua";
+			if (File.Exists(scriptFilePath)) {
+				LuaScript.DoString(File.ReadAllText(scriptFilePath));
+			} else {
+				LuaScript.DoString(fallbackScript);
+			}
+
+			lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
+			lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
 
 			if (loadAssets) LoadAssets();
 

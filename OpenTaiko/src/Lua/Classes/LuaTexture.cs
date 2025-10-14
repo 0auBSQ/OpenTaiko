@@ -141,6 +141,7 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
+		public LuaTexture CreateTexture() => new();
 		internal LuaTexture CreateTexture(string path, bool autoDispose)
 			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose);
 		public LuaTexture CreateTexture(string path) => CreateTexture(path, autoDispose: true);

@@ -72,7 +72,7 @@
 			if (node.nodeType == CSongListNode.ENodeType.SCORE) {
 				if (this.MandatoryDifficultyList != null) {
 					foreach (Difficulty diff in this.MandatoryDifficultyList) {
-						if ((int)diff < 0 || diff >= Difficulty.Tower) continue;
+						if ((int)diff < 0 || diff >= Difficulty.Total) continue;
 						if (node.nLevel[(int)diff] < 0) return true;
 					}
 				}
