@@ -92,9 +92,9 @@ function activate()
     background = TEXTURE:CreateTexture("Textures/Background.png")
     sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg")
     sounds.BGM:SetLoop(true)
-    sounds.Decide = SOUND:CreateSFX("Sounds/Decide.ogg")
-    sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")
-    sounds.Move = SOUND:CreateSFX("Sounds/Move.ogg")
+    sounds.Decide = SHARED:GetSharedSound("Decide")
+    sounds.Cancel = SHARED:GetSharedSound("Cancel")
+    sounds.Move = SHARED:GetSharedSound("Move")
     sounds.BGM:Play()
     GenerateTTK()
 end
@@ -102,9 +102,10 @@ end
 function deactivate()
     if text ~= nil then text:Dispose() end
     if background ~= nil then background:Dispose() end
-    for _, sound in pairs(sounds) do
-        sound:Dispose()
-    end
+    if sounds.BGM ~= nil then sounds.BGM:Dispose() end
+    -- for _, sound in pairs(sounds) do
+    --     sound:Dispose()
+    -- end
 end
 
 function onStart()

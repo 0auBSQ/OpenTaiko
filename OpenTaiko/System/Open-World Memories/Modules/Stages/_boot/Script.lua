@@ -64,7 +64,11 @@ function deactivate()
 end
 
 function onStart()
-
+	SHARED:SetSharedSFX("Decide", "Sounds/Decide.ogg")
+	SHARED:SetSharedSFX("Move", "Sounds/Move.ogg")
+	SHARED:SetSharedSFX("Cancel", "Sounds/Cancel.ogg")
+	SHARED:SetSharedSFX("Skip", "Sounds/Skip.ogg")
+	SHARED:SetSharedSFX("SongDecide", "Sounds/SongDecide.ogg")
 end
 
 function afterSongEnum()
@@ -74,5 +78,9 @@ function afterSongEnum()
 end
 
 function onDestroy()
-	
+	SHARED:ClearSharedSound("Decide")
+	SHARED:ClearSharedSound("Move")
+	SHARED:ClearSharedSound("Cancel")
+	SHARED:ClearSharedSound("Skip")
+	SHARED:ClearSharedSound("SongDecide")
 end
