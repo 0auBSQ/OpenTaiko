@@ -20,6 +20,7 @@ namespace OpenTaiko {
 			Begin = 0;
 			End = 0;
 			Interval = 0;
+			Value = 0;
 
 			lfEnded = null;
 			Loop = false;
@@ -32,6 +33,7 @@ namespace OpenTaiko {
 			Begin = begin;
 			End = end;
 			Interval = interval;
+			Value = Begin;
 
 			lfEnded = ended;
 			Loop = false;

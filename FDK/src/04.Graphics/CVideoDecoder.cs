@@ -46,7 +46,7 @@ public unsafe class CVideoDecoder : IDisposable {
 				Trace.WriteLine("avcodec_open2 failed\n");
 
 			this.FrameSize = new Size(codec_context->width, codec_context->height);
-			this.Duration = (video_stream->avg_frame_rate.num / (double)video_stream->avg_frame_rate.den) * video_stream->nb_frames;
+			this.Duration = video_stream->nb_frames / (video_stream->avg_frame_rate.num / (double)video_stream->avg_frame_rate.den);
 			this.Framerate = video_stream->avg_frame_rate;
 
 			frameconv = new CFrameConverter(FrameSize, codec_context->pix_fmt);

@@ -16,7 +16,7 @@
 
 		#region [Node type]
 
-		public CSongListNode.ENodeType? NodeType {
+		private CSongListNode.ENodeType? NodeType {
 			get {
 				return _node?.nodeType ?? null;
 			}
@@ -254,6 +254,12 @@
 			}
 		}
 
+		public bool HasPreimage {
+			get {
+				return !string.IsNullOrEmpty(_GetFirstAvailableScore()?.譜面情報.Preimage ?? "");
+			}
+		}
+
 		public string AudioPath {
 			get {
 				var score = _GetFirstAvailableScore() ?? null;
@@ -301,6 +307,12 @@
 		public string[]? Charters {
 			get {
 				return _node?.strMaker.SplitByCommas() ?? null;
+			}
+		}
+
+		public int Side {
+			get {
+				return (int)(_node?.nSide ?? CTja.ESide.eEx);
 			}
 		}
 

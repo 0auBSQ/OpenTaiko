@@ -24,6 +24,7 @@ namespace OpenTaiko {
 		}
 		#endregion
 		#region Gets
+		public bool Loaded => _sound != null;
 		public bool IsPlaying => _sound != null ? _sound.bIsPlaying : false;
 		public bool GetLoop() {
 			return _sound != null ? _sound.bLoop : false;
