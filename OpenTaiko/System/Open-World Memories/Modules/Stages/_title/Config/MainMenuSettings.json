@@ -47,5 +47,85 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Blue"
     },
-    "count": 3
+	"4": {
+        "StageName": {
+            "strings": {
+                "default": "Let's do something else"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Is OpenTaiko actually a rhythm game?."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "isodemo",
+        "Restricted1P": true,
+        "LEGACY_MenuBoxColor": "Red"
+    },
+	"5": {
+        "StageName": {
+            "strings": {
+                "default": "Secret Vault"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "The master of the keys is awaiting..."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "secret_vault",
+        "Restricted1P": true,
+        "LEGACY_MenuBoxColor": "Purple"
+    },
+	"6": {
+        "StageName": {
+            "strings": {
+                "default": "OpenTaiko's General Store"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Waste your hardly earned coins for things you will never use!"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "coin_shop",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Cyan"
+    },
+	"7": {
+        "StageName": {
+            "strings": {
+                "default": "Taiko Towers"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "The Towers have been Towering all along"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "tower_select",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Orange"
+    },
+	"8": {
+        "StageName": {
+            "strings": {
+                "default": "Intro Nokon"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Be for real"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "intro_nokon",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Pink"
+    },
+    "count": 8
 }

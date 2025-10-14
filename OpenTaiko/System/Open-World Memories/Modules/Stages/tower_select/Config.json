@@ -1,0 +1,8 @@
+{
+	"move_speed": 0.2,
+	"hold_duration": 0.75,
+	"hold_speed":0.05,
+	
+	"ex_color":"FFFF9781",
+	"normal_color":"FFC8FF96"
+}
