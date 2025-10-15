@@ -15,12 +15,20 @@ local flashcounter = nil
 
 local currentBackground = 0
 
+local difficultySelection = false
+local diffIndex = {-2, -2, -2, -2, -2}
+
 local function reloadPreimage(songNode)
 	if songNode.IsSong == true then 
-		SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+		if songNode.HasPreimage then
+			SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+		else
+			SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
+		end
 	else
-		SHARED:SetSharedTextureUsingAbsolutePath("preimage", '')
+		SHARED:ClearSharedTexture("preimage")
 	end
+	SHARED:GetSharedTexture("preimage"):SetWrapMode("Border")
 end
 
 local function drawPreimage()
@@ -52,15 +60,19 @@ local function refreshPage()
 		local node = songList:GetSongNodeAtOffset(i)
 		currentPage[i] = node
 		if node == nil then pageTexts[i] = nil
-		elseif i == 0 then
-			pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
-			if genre_overlays[node.Genre] == nil then
-				genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
-			end
 		else
-			pageTexts[i] = text:GetText(node.Title)
+			if i == 0 then
+				pageTexts[i] = text:GetText(node.Title, false, 99999, COLOR:CreateColorFromARGB(255,242,207,1))
+			else
+				pageTexts[i] = text:GetText(node.Title)
+			end
+
 			if genre_overlays[node.Genre] == nil then
-				genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
+				if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
+					genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
+				else
+					genre_overlays[node.Genre] = TEXTURE:CreateTexture()
+				end
 			end
 		end
 
@@ -110,7 +122,7 @@ local function handleDecide()
 end
 
 local function handleFolderClose()
-	if songlist == nil then return Exit("title", nil) end
+	if songList == nil then return Exit("title", nil) end
 	-- if no folder to close, trigger exit scene instead
 	return songList:CloseFolder()
 end
@@ -219,6 +231,11 @@ function activate()
 	test = GetSaveFile(0)
 	-- textTex = text:GetText("You played " .. tostring(test.TotalPlaycount) .. " charts...")
 
+	sounds.Skip = SHARED:GetSharedSound("Skip")
+	sounds.Cancel = SHARED:GetSharedSound("Cancel")
+	sounds.Decide = SHARED:GetSharedSound("Decide")
+	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
+
 	flashcounter = COUNTER:CreateCounter(255, 0, -1 / 127)
 	flashcounter:SetBounce(true)
 	flashcounter:Listen(function (val)
@@ -238,11 +255,6 @@ end
 
 function onStart()
 	text = TEXT:Create(16)
-
-	sounds.Skip = SOUND:CreateSFX("Sounds/Skip.ogg")
-	sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")
-	sounds.Decide = SOUND:CreateSFX("Sounds/Decide.ogg")
-	sounds.SongDecide = SOUND:CreateSFX("Sounds/SongDecide.ogg")
 
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
@@ -275,9 +287,9 @@ function onDestroy()
 	if favoriteicon ~= nil then
 		favoriteicon:Dispose()
 	end
-	for _, sound in pairs(sounds) do
-		sound:Dispose()
-	end
+	-- for _, sound in pairs(sounds) do
+	-- 	sound:Dispose()
+	-- end
 	for _, bar in pairs(bars) do
 		bar:Dispose()
 	end

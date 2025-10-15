@@ -57,6 +57,7 @@ local nameplates_team_member = {291}
 
 local font_name_normal_size = nil
 local font_name_withtitle = nil
+local font_name_full = nil
 local font_title = nil
 local font_dan = nil
 local player_data = { nil, nil, nil, nil, nil }
