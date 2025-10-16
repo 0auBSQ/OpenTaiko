@@ -24,7 +24,7 @@
 		public bool HideEmptyFolders = true;
 
 		// If true, display openned folders as flatten and get all leaves instead of just the child folder
-		public bool FlattenOpennedFolders = true;
+		public bool FlattenOpenedFolders = true;
 
 		// If true, requested pages will cycle on overflow, else overflowing element will be set as null
 		public bool ModuloPagination = true;

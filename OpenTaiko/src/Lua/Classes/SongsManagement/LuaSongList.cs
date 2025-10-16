@@ -87,7 +87,7 @@
 		private List<LuaSongNode> GetCurrentPage() {
 			List<LuaSongNode> _page = new List<LuaSongNode>();
 
-			if (_settings.FlattenOpennedFolders == false) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
+			if (_settings.FlattenOpenedFolders == false) _page = _currentNode?.Siblings ?? new List<LuaSongNode>();
 			else _page = GetLeaves();
 
 			_page.RemoveAll(node => _settings.IsNodeExcludedAtExecution(node) == true);
