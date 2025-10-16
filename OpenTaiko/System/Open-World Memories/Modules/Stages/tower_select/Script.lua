@@ -297,7 +297,7 @@ function afterSongEnum()
     local settings = GenerateSongListSettings()
     settings.RootGenreFolder = "太鼓タワー"
     settings.MandatoryDifficultyList = {5}
-    settings.FlattenOpennedFolders = false
+    settings.FlattenOpenedFolders = false
     songlist = RequestSongList(settings)
     refresh()
 end
