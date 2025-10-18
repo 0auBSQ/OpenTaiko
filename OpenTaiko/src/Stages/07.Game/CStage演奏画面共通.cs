@@ -162,7 +162,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		this.bCurrentlyDrumRoll = new bool[] { false, false, false, false, false };
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
-		this.n分岐した回数 = new int[5];
+		this.idxLastBranchSection = new int[5];
 		this.Chara_MissCount = new int[5];
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];
@@ -642,7 +642,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CTja.ECourse[] nTargetBranch = new CTja.ECourse[5];
 	public double[] msTargetBranchTime = new double[5];
 	protected bool[] bBranchedChart = new bool[] { false, false, false, false, false };
-	protected int[] n分岐した回数 = new int[5];
+	protected int[] idxLastBranchSection = new int[5];
 
 	public bool[] b強制的に分岐させた = new bool[] { false, false, false, false, false };
 	public bool[] bLEVELHOLD = new bool[] { false, false, false, false, false };
@@ -2303,7 +2303,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.bUseBranch[0] = true;
 			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, 0);
 		}
-		this.t分岐処理(branch, 0, msBranchPoint);
+		this.t分岐処理(branch, 0, msBranchPoint, p判定枠に最も近いチップ?.idxBranchSection ?? this.idxLastBranchSection[0]);
 		OpenTaiko.stageGameScreen.ChangeBranch(branch, 0, msBranchPoint);
 		this.b強制的に分岐させた[0] = true;
 	}
@@ -3168,24 +3168,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				case 0xDE: //Judgeに応じたCourseを取得
 					if (!pChip.bHit) {
-						//分岐の種類はプレイヤー関係ないと思う
-						this.eBranch種類 = pChip.eBranchCondition;
-						this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
-						this.nBranch条件数値B = pChip.nBranchCondition2_Master;
+						if (pChip.idxBranchSection > this.idxLastBranchSection[nPlayer]) {
+							//分岐の種類はプレイヤー関係ないと思う
+							this.eBranch種類 = pChip.eBranchCondition;
+							this.nBranch条件数値A = pChip.nBranchCondition1_Professional;
+							this.nBranch条件数値B = pChip.nBranchCondition2_Master;
 
-						if (!this.bUseBranch[nPlayer]) {
-							this.bUseBranch[nPlayer] = true;
-							OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
-						}
+							if (!this.bUseBranch[nPlayer]) {
+								this.bUseBranch[nPlayer] = true;
+								OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, nPlayer);
+							}
 
-						if (!this.bLEVELHOLD[nPlayer]) {
-							CTja.ECourse targetBranch = this.tBranchJudge(nPlayer, pChip);
-							this.t分岐処理(targetBranch, nPlayer, (long)pChip.n分岐時刻ms);
-							OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer, pChip.n分岐時刻ms);
-							if (pChip.hasLevelHold[(int)targetBranch])
-								this.bLEVELHOLD[nPlayer] = true;
+							if (!this.bLEVELHOLD[nPlayer]) {
+								CTja.ECourse targetBranch = this.tBranchJudge(nPlayer, pChip);
+								this.t分岐処理(targetBranch, nPlayer, idxBranchSection: pChip.idxBranchSection);
+								OpenTaiko.stageGameScreen.ChangeBranch(targetBranch, nPlayer, pChip.n分岐時刻ms);
+								if (pChip.hasLevelHold[(int)targetBranch])
+									this.bLEVELHOLD[nPlayer] = true;
+							}
+							this.idxLastBranchSection[nPlayer] = pChip.idxBranchSection;
 						}
-						this.n分岐した回数[nPlayer]++;
 						pChip.bHit = true;
 					}
 					break;
@@ -3789,8 +3791,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		_ => 0,
 	};
 
-	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint) {
+	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint = double.MinValue, int idxBranchSection = -1) {
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;
+		bool isAfterBranchPoint(double ms, int idx)
+			=> (ms >= msBranchPoint && (idxBranchSection < 0 || idx >= idxBranchSection));
 
 		// For `#BRANCHSTART`, skip processing earlier defined notes and bar lines
 		for (int i = 0; i < dTX.listChip.Count; i++) {
@@ -3798,7 +3802,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			bool isBarLine = (chip.nChannelNo == 0x50);
 			bool isScrollable = (NotesManager.IsHittableNote(chip) || isBarLine || chip.nChannelNo == 0xE4);
 			bool isRollEnd = NotesManager.IsRollEnd(chip);
-			if (!(isScrollable && chip.n発声時刻ms >= msBranchPoint))
+			if (!(isScrollable && isAfterBranchPoint(chip.n発声時刻ms, chip.idxBranchSection)))
 				continue;
 
 			// real bar line is inserted per-branch even in common branch
@@ -3812,7 +3816,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					continue; // Currently treated as non-branch roll with the Normal branch end being the end; do not show the non-Normal end
 
 				chip.bVisible = true;
-				if (isRollEnd && chip.start.n発声時刻ms < msBranchPoint)
+				if (isRollEnd && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection))
 					chip.start.bVisible = true; // show roll head before branch point and made hittable if end is shown
 			} else {
 				// non-branched head + branched end
@@ -3821,7 +3825,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				chip.bVisible = false;
 				chip.eNoteState = ENoteState.None; // cancel input
-				if (isRollEnd && chip.start.n発声時刻ms < msBranchPoint)
+				if (isRollEnd && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection))
 					chip.start.bVisible = false; // hide hidable roll head before branch point if end is hide
 			}
 			
@@ -4037,11 +4041,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i];
 			this.bIsGOGOTIME[i] = false;
 			this.bBranchedChart[i] = false;
-			this.n分岐した回数[i] = 0;
+			this.idxLastBranchSection[i] = 0;
 			this.bUseBranch[i] = tja.bチップがある.Branch && !tja.bHIDDENBRANCH;
 
 			if (tja.bチップがある.Branch)
-				this.t分岐処理(CTja.ECourse.eNormal, i, double.MinValue);
+				this.t分岐処理(CTja.ECourse.eNormal, i);
 
 			this.actPlayInfo.dbBPM[i] = tja.BASEBPM;
 			this.UpdateCharaCounter(i);
