@@ -141,6 +141,24 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.RollEffectLevel = 0;
 	}
 
+	public static void ForEachTargetBranch(bool isEndedBranching, ECourse branch, Action<ECourse> action) {
+		// IsEndedBranchingがfalseで1回
+		// trueで3回だよ3回
+		if (!isEndedBranching) {
+			action(branch);
+		} else {
+			for (ECourse b = ECourse.eNormal; b <= ECourse.eMaster; ++b) {
+				action(b);
+			}
+		}
+	}
+
+	public void ForEachTargetBranch(Action<ECourse> action)
+		=> ForEachTargetBranch(this.IsEndedBranching, this.nBranch, action);
+
+	public bool IsForBranch(ECourse branch)
+		=> this.IsEndedBranching || this.nBranch == branch;
+
 	public CChip() {
 		this.nHorizontalChipDistance = 0;
 		this.nVerticalChipDistance = 0;
