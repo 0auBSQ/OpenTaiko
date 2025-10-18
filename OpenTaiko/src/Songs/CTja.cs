@@ -2480,6 +2480,9 @@ internal class CTja : CActivity {
 		this.listChip.Add(chipMovie);
 	}
 
+	private void ForEachCurrentBranch(Action<ECourse> action)
+		=> CChip.ForEachTargetBranch(this.IsEndedBranching, this.n現在のコース, action);
+
 	void t現在のチップ情報を記録する(bool bInPut) {
 		//2020.04.21 こうなってしまったのは仕方がないな。。
 		if (bInPut) {
@@ -2606,32 +2609,24 @@ internal class CTja : CActivity {
 			} else {
 				if (this.b小節線を挿入している == false) {
 					// 小節線にもやってあげないと
-					// IsEndedBranchingがfalseで1回
-					// trueで3回だよ3回
-					for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, Math.Max(1, n文字数), IsEndedBranching ? (ECourse)i : n現在のコース);
+					this.ForEachCurrentBranch((branch) => {
+						int iBranch = (int)branch;
+						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, Math.Max(1, n文字数), branch);
 						chip.n整数値 = this.n現在の小節数;
 						chip.n整数値_内部番号 = this.n現在の小節数;
 						chip.bHideBarLine = this.bBARLINECUE[0] == 1;
 						#region [ 作り直し ]
-						if (IsEndedBranching) {
-							if (this.IsBranchBarDraw[i])
-								chip.bBranch = true;
-						} else {
-							if (this.IsBranchBarDraw[(int)n現在のコース])
-								chip.bBranch = true;
-						}
+						if (this.IsBranchBarDraw[iBranch])
+							chip.bBranch = true;
 						#endregion
 
 						this.listChip.Add(chip);
 						this.listBarLineChip.Add(chip);
 
 						#region [ 作り直し ]
-						if (IsEndedBranching)
-							this.IsBranchBarDraw[i] = false;
-						else this.IsBranchBarDraw[(int)n現在のコース] = false;
+						this.IsBranchBarDraw[iBranch] = false;
 						#endregion
-					}
+					});
 
 
 					this.dbLastTime = this.dbNowTime;
@@ -2663,10 +2658,7 @@ internal class CTja : CActivity {
 					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
 
 					if (nObjectNum != 0) {
-						// IsEndedBranchingがfalseで1回
-						// trueで3回だよ3回
-						for (int i = 0; i < (IsEndedBranching == true ? 3 : 1); i++) {
-							ECourse branch = this.IsEndedBranching ? (ECourse)i : this.n現在のコース;
+						this.ForEachCurrentBranch((branch) => {
 							int iBranch = (int)branch;
 
 							// TODO: add judge-by-note-type methods to NotesManager
@@ -2674,7 +2666,7 @@ internal class CTja : CActivity {
 							if (this.nNowRollCountBranch[iBranch] >= 0) {
 								if (isRollHead) {
 									// repeated roll head; treated as blank
-									continue; // process this note symbol in the next branch
+									return; // process this note symbol in the next branch
 								}
 								if (nObjectNum != 8) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
@@ -2701,7 +2693,7 @@ internal class CTja : CActivity {
 							} else {
 								InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
 							}
-						}
+						});
 					}
 
 					if (IsEnabledFixSENote) IsEnabledFixSENote = false;
