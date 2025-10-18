@@ -2002,11 +2002,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			int dy = OpenTaiko.actTextConsole.fontHeight;
 			int y = (int)(176 * OpenTaiko.Skin.ScaleY - 3 * dy);
 
-			if (!(this.n分岐した回数[0] < tjaP1.listBRANCH.Count)) {
+			if (!(this.idxLastBranchSection[0] < tjaP1.listBRANCH.Count)) {
 				y += dy;
 				OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, strNext);
 			} else {
-				CChip branchJudgePoint = tjaP1.listBRANCH[this.n分岐した回数[0]];
+				CChip branchJudgePoint = tjaP1.listBRANCH[this.idxLastBranchSection[0]];
 
 				var branchCondType = branchJudgePoint.eBranchCondition;
 				double nowBranchCondScore = this.GetBranchConditionScore(0, branchCondType);

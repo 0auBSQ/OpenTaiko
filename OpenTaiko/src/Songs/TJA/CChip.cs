@@ -21,6 +21,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
 	public ECourse nBranch;
+	public int idxBranchSection;
 	public int nSenote;
 	public int nState;
 	public int nRollCount;

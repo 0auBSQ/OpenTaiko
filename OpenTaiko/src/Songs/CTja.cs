@@ -2059,6 +2059,7 @@ internal class CTja : CActivity {
 			chip.fNow_Measure_s = JudgeChipTime.chip?.fNow_Measure_s ?? 4;
 			chip.dbSCROLL = JudgeChipTime.chip?.dbSCROLL ?? 1;
 			chip.dbBPM = JudgeChipTime.chip?.dbBPM ?? this.listBPM[0].dbBPM値;
+			chip.idxBranchSection = this.listBRANCH.Count + 1; // will be inserted
 
 			chip.n分岐時刻ms = this.dbNowTime;
 			chip.eBranchCondition = e条件;
@@ -2781,6 +2782,7 @@ internal class CTja : CActivity {
 			nChannelNo = channelNo,
 			IsEndedBranching = this.IsEndedBranching,
 			nBranch = branch ?? this.n現在のコース,
+			idxBranchSection = this.listBRANCH.Count,
 			n発声位置 = (this.n現在の小節数 * 384),
 			dbBPM = this.dbNowBPM,
 			dbSCROLL = this.dbNowScroll,
