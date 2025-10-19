@@ -2427,46 +2427,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		};
 		double[] th16NowBeats = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time)).ToArray();
 
-		#region [update phase (bar lines' position)]
-		foreach (var pChip in dTX.listBarLineChip) {
-			if (!pChip.bVisible)
-				continue;
-
-			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
-		}
-		#endregion
-
-		#region [update phase (notes' position & auto judgement)]
-		foreach (var pChip in dTX.listNoteChip) {
-			if (!pChip.bVisible)
-				continue;
-
-			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
-
-			if (!this.bPAUSE && !this.isRewinding) {
-				if (!pChip.IsMissed && !pChip.bHit) {
-					if (NotesManager.IsMissableNote(pChip))//|| pChip.nチャンネル番号 == 0x9A )
-					{
-						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
-						if (pChip.n発声時刻ms <= n現在時刻ms) {
-							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
-								pChip.IsMissed = true;
-								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
-								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
-							}
-						}
-					}
-				} else if (NotesManager.IsGenericRoll(pChip)) {
-					if (pChip.end.n発声時刻ms <= n現在時刻ms) {
-						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
-							pChip.bHit = true;
-						}
-					}
-				}
-			}
-		}
-		#endregion
-
 		#region [update phase, process forward for correct order of non-note events]
 		for (; this.nCurrentTopChip[nPlayer] < dTX.listChip.Count; ++this.nCurrentTopChip[nPlayer]) {
 			CChip pChip = dTX.listChip[this.nCurrentTopChip[nPlayer]];
@@ -2533,21 +2493,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x16:
 				case 0x17:
 				case 0x19:
-				case 0x1D: {
-						if (!pChip.bProcessed) {
-							this.AddNowProcessingRollChip(nPlayer, pChip);
-						}
-						// draw later
-					}
-
+				case 0x1D:
+					// draw later
 					break;
-				case 0x18: {
-						if (!pChip.bProcessed) {
-							this.ProcessRollEnd(nPlayer, pChip, false);
-						}
-						// draw later
-					}
-
+				case 0x18:
+					// draw later
 					break;
 
 				case 0x1e:
@@ -2561,13 +2511,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#endregion
 				#region [ 20-2F: EmptySlot ]
 				case 0x20:
-				case 0x21: {
-						if (!pChip.bProcessed) {
-							this.AddNowProcessingRollChip(nPlayer, pChip);
-						}
-						// draw later
-					}
-
+				case 0x21:
+					// draw later
 					break;
 
 				case 0x22:
@@ -3307,6 +3252,55 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.StartGoGoTimeEffect(nPlayer);
 			}
 			this.bWasGOGOTIME[nPlayer] = this.bIsGOGOTIME[nPlayer];
+		}
+		#endregion
+
+		#region [update phase (bar lines' position)]
+		foreach (var pChip in dTX.listBarLineChip) {
+			if (!pChip.bVisible)
+				continue;
+
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
+		}
+		#endregion
+
+		#region [update phase (notes' position & auto judgement)]
+		foreach (var pChip in dTX.listNoteChip) {
+			if (NotesManager.IsGenericRoll(pChip) && pChip.n発声時刻ms <= n現在時刻ms) {
+				if (!pChip.bProcessed) {
+					if (NotesManager.IsRollEnd(pChip))
+						this.ProcessRollEnd(nPlayer, pChip, false);
+					else
+						this.AddNowProcessingRollChip(nPlayer, pChip);
+				}
+			}
+
+			if (!pChip.bVisible)
+				continue;
+
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], n現在時刻ms, th16NowBeats[(int)pChip.nBranch], scrollRate);
+
+			if (!this.bPAUSE && !this.isRewinding) {
+				if (!pChip.IsMissed && !pChip.bHit) {
+					if (NotesManager.IsMissableNote(pChip))//|| pChip.nチャンネル番号 == 0x9A )
+					{
+						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
+						if (pChip.n発声時刻ms <= n現在時刻ms) {
+							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
+								pChip.IsMissed = true;
+								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
+								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
+							}
+						}
+					}
+				} else if (NotesManager.IsGenericRoll(pChip)) {
+					if (pChip.end.n発声時刻ms <= n現在時刻ms) {
+						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
+							pChip.bHit = true;
+						}
+					}
+				}
+			}
 		}
 
 		if (!this.bPAUSE) {
