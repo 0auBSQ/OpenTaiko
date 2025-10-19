@@ -141,6 +141,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		base.Activate();
 		this.tパネル文字列の設定();
 		//this.演奏判定ライン座標();
+		this.bIsGOGOTIME_Branch = new bool[5, 3];
 		this.bIsGOGOTIME = new bool[] { false, false, false, false, false };
 		this.bWasGOGOTIME = new bool[] { false, false, false, false, false };
 		this.bIsMiss = new bool[] { false, false, false, false, false };
@@ -636,6 +637,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CBRANCHSCORE[] CSectionScore = new CBRANCHSCORE[5];
 	public bool bPreviousPlayWasEndedNormally = false; // Necessary on story mode missions to see if the game has been quitted through the pause menu or not
 
+	public bool[,] bIsGOGOTIME_Branch = new bool[5, 3]; // [iPlayer, iBranch]
 	public bool[] bIsGOGOTIME = new bool[5];
 	private bool[] bWasGOGOTIME = new bool[5]; // go-go time state before rewinding
 	public bool[] bIsMiss = new bool[5];
@@ -2788,17 +2790,23 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x9E: //ゴーゴータイム
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.bIsGOGOTIME[nPlayer] = true;
-						if (!this.isRewinding)
-							this.StartGoGoTimeEffect(nPlayer);
+						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)pChip.nBranch] = true);
+						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
+							this.bIsGOGOTIME[nPlayer] = true;
+							if (!this.isRewinding)
+								this.StartGoGoTimeEffect(nPlayer);
+						}
 					}
 					break;
 				case 0x9F: //ゴーゴータイム
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.bIsGOGOTIME[nPlayer] = false;
-						if (!this.isRewinding)
-							actChara.ReturnDefaultAnime(nPlayer, true);
+						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)pChip.nBranch] = false);
+						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
+							this.bIsGOGOTIME[nPlayer] = false;
+							if (!this.isRewinding)
+								actChara.ReturnDefaultAnime(nPlayer, true);
+						}
 					}
 					break;
 				#endregion
@@ -3295,6 +3303,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 
+		if (false /* Jiro1 */)
+			this.bIsGOGOTIME[nPlayer] = this.bIsGOGOTIME_Branch[nPlayer, (int)this.nTargetBranch[nPlayer]];
 		if (this.isRewinding) {
 			this.isRewinding = false;
 			if (this.bIsGOGOTIME[nPlayer] && this.bIsGOGOTIME[nPlayer] != this.bWasGOGOTIME[nPlayer]) {
@@ -4049,8 +4059,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 
-			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i];
-			this.bIsGOGOTIME[i] = false;
+			for (CTja.ECourse b = CTja.ECourse.eNormal; b <= CTja.ECourse.eMaster; ++b)
+				this.bIsGOGOTIME_Branch[i, (int)b] = false;
+			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i] = false;
 			this.bBranchedChart[i] = false;
 			this.idxLastBranchSection[i] = 0;
 			this.bUseBranch[i] = tja.bチップがある.Branch && !tja.bHIDDENBRANCH;

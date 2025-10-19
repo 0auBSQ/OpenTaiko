@@ -223,10 +223,14 @@ internal class CTja : CActivity {
 	}
 
 	public class CBranchScrollState {
+		public EScrollMode eScrollMode;
 		public double dbSCROLL;
 		public double dbSCROLLY;
+		public int nスクロール方向;
+		public int[] bBARLINECUE = [0, 0];
 		public double db移動待機時刻;
 		public double db出現時刻;
+		public bool bGOGOTIME;
 	}
 
 	/// <summary>
@@ -2574,19 +2578,27 @@ internal class CTja : CActivity {
 	private void SaveBranchScrollState() {
 		this.ForEachCurrentBranch(branch => {
 			var branchState = this.BranchScrollStates[(int)branch];
+			branchState.eScrollMode = this.eScrollMode;
 			branchState.dbSCROLL = this.dbNowScroll;
 			branchState.dbSCROLLY = this.dbNowScrollY;
+			branchState.nスクロール方向 = this.nスクロール方向;
+			Array.Copy(this.bBARLINECUE, branchState.bBARLINECUE, 2);
 			branchState.db移動待機時刻 = this.db移動待機時刻;
 			branchState.db出現時刻 = this.db出現時刻;
+			branchState.bGOGOTIME = this.bGOGOTIME;
 		});
 	}
 
 	private void RestoreBranchScrollState() { // only used when branched
 		var branchState = this.BranchScrollStates[(int)this.n現在のコース];
+		this.eScrollMode = branchState.eScrollMode;
 		this.dbNowScroll = branchState.dbSCROLL;
 		this.dbNowScrollY = branchState.dbSCROLLY;
+		this.nスクロール方向 = branchState.nスクロール方向;
+		Array.Copy(branchState.bBARLINECUE, this.bBARLINECUE, 2);
 		this.db移動待機時刻 = branchState.db移動待機時刻;
 		this.db出現時刻 = branchState.db出現時刻;
+		this.bGOGOTIME = branchState.bGOGOTIME;
 	}
 
 	/// <summary>
