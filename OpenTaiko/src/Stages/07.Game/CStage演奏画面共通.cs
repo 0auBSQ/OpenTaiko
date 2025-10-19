@@ -2561,8 +2561,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#endregion
 				#region [ 20-2F: EmptySlot ]
 				case 0x20:
-				case 0x21:
-					// draw later
+				case 0x21: {
+						if (!pChip.bProcessed) {
+							this.AddNowProcessingRollChip(nPlayer, pChip);
+						}
+						// draw later
+					}
+
 					break;
 
 				case 0x22:
