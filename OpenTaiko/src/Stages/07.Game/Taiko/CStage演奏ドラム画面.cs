@@ -1123,7 +1123,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, _gt);
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
 
-				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible);
+				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
 				if (chipNoHitRoll != null) {
 					chipNoHit = chipNoHitRoll;
 					e判定 = ENoteJudge.Perfect;
