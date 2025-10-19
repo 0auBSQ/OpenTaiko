@@ -2058,7 +2058,7 @@ internal class CTja : CActivity {
 			var chip = new CChip();
 			chip.nChannelNo = 0xDE;
 			chip.n発声時刻ms = (int)JudgeChipTime.msTime;
-			chip.n発声位置 = JudgeChipTime.chip?.n発声位置 ?? 0;
+			chip.n発声位置 = JudgeChipTime.th384MeasurePos;
 			chip.fNow_Measure_m = JudgeChipTime.chip?.fNow_Measure_m ?? 4;
 			chip.fNow_Measure_s = JudgeChipTime.chip?.fNow_Measure_s ?? 4;
 			chip.dbSCROLL = JudgeChipTime.chip?.dbSCROLL ?? 1;
@@ -2606,7 +2606,7 @@ internal class CTja : CActivity {
 	/// </summary>
 	/// <param name="delayForRoll"></param>
 	/// <returns></returns>
-	private (CChip? chip, double msTime) GetBranchJudgeChipTime(bool delayForRoll) {
+	private (CChip? chip, double msTime, int th384MeasurePos) GetBranchJudgeChipTime(bool delayForRoll) {
 		//2020.04.20 c一小節前の小節線情報を返すMethodを追加
 		//連打分岐時は現在の小節以降の連打の終わり部分の時刻を取得する
 		//--して取得しないとだめよ～ダメダメ💛
@@ -2615,7 +2615,7 @@ internal class CTja : CActivity {
 		// For charts starts with a branch, judge before the start of each song AND after the previous song
 		// TaikoJiro behavior: All roll bodies in the last measure count into judgement
 
-		(CChip chip, double msTime)?[] judgeChipTimes = [null, null, null];
+		(CChip chip, double msTime, int th384MeasurePos)?[] judgeChipTimes = [null, null, null];
 		CChip?[] lastRollEnds = [null, null, null];
 
 		if (delayForRoll) {
@@ -2623,7 +2623,7 @@ internal class CTja : CActivity {
 			for (int ib = 0; ib < 3; ++ib) {
 				if (this.nNowRollCountBranch[ib] >= 0) {
 					CChip head = this.listChip_Branch[ib][this.nNowRollCountBranch[ib]];
-					return (head, this.dbNowTime);
+					return (head, this.dbNowTime, this.n現在の小節数 * 384);
 				}
 			}
 		}
@@ -2635,11 +2635,11 @@ internal class CTja : CActivity {
 				// chips used as default judgement time
 				case 0x9B: // `#NEXTSONG`, cannot judge earlier
 					for (int ib = 0; ib < 3; ++ib)
-						judgeChipTimes[ib] ??= (chip, chip.n発声時刻ms + msDanNextSongDelay);
+						judgeChipTimes[ib] ??= (chip, chip.n発声時刻ms + msDanNextSongDelay, chip.n発声位置);
 					i = 0; // end searching
 					continue;
 				case 0x50: // real bar line
-					judgeChipTimes[(int)chip.nBranch] ??= (chip, chip.n発声時刻ms);
+					judgeChipTimes[(int)chip.nBranch] ??= (chip, chip.n発声時刻ms, chip.n発声位置);
 					if (judgeChipTimes.All(x => x != null))
 						i = 0; // end searching
 					continue;
@@ -2659,16 +2659,19 @@ internal class CTja : CActivity {
 		// use the most late judge time
 		var judgeChipTime = judgeChipTimes.Where(x => x != null).MaxBy(x => x!.Value.msTime);
 		// fallback: judge 4 beats before chart start
-		judgeChipTime ??= (null, 0 - Math.Abs(4 * 60000.0 / this.BASEBPM));
+		judgeChipTime ??= (null, 0 - Math.Abs(4 * 60000.0 / this.BASEBPM), 0);
 
 		if (delayForRoll) {
 			var lastRollEnd = lastRollEnds.Where(x => x != null).MaxBy(x => x!.n発声時刻ms);
 			if (lastRollEnd != null && lastRollEnd.n発声時刻ms > judgeChipTime.Value.msTime)
-				judgeChipTime = (lastRollEnd, lastRollEnd.n発声時刻ms); // judge at end of last roll
+				judgeChipTime = (lastRollEnd, lastRollEnd.n発声時刻ms, lastRollEnd.n発声位置); // judge at end of last roll
 		}
 
 		// prevent judging after branch point
-		return (judgeChipTime.Value.chip, Math.Min(judgeChipTime.Value.msTime, this.dbNowTime));
+		return (judgeChipTime.Value.chip,
+			Math.Min(judgeChipTime.Value.msTime, this.dbNowTime),
+			Math.Min(judgeChipTime.Value.th384MeasurePos, this.n現在の小節数 * 384)
+		);
 	}
 
 	private void WarnSplitLength(string name, string[] strArray, int minimumLength) {
