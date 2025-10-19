@@ -395,6 +395,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < this.chip現在処理中の連打チップ.Length; ++i) {
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;)
 				this.ProcessRollEnd(i, this.chip現在処理中の連打チップ[i][iChip], false);
+			this.chip現在処理中の連打チップ[i].Clear();
 		}
 
 		listWAV.Clear();
@@ -3279,7 +3280,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				if (!pChip.bProcessed) {
 					if (NotesManager.IsRollEnd(pChip))
 						this.ProcessRollEnd(nPlayer, pChip, false);
-					else
+					else if (pChip.bVisible)
 						this.AddNowProcessingRollChip(nPlayer, pChip);
 				}
 			}
@@ -3530,9 +3531,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private void AddNowProcessingRollChip(int iPlayer, CChip chip) {
 		//if( this.n現在のコース == pChip.nコース )
 		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip);
-		if (idx < 0) {
-			this.chip現在処理中の連打チップ[iPlayer].Insert(~idx, chip);
-		}
+		if (idx < 0)
+			idx = ~idx;
+		if (this.chip現在処理中の連打チップ[iPlayer].ElementAtOrDefault(idx) != chip)
+			this.chip現在処理中の連打チップ[iPlayer].Insert(idx, chip);
 		if (chip.bVisible && !chip.IsHitted) {
 			if (NotesManager.IsKusudama(chip)) {
 				nCurrentKusudamaRollCount = 0;
@@ -3573,7 +3575,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		if (!resetStates)
 			chip.bHit = true;
-		if (!chip.IsHitted) {
+		if (chip.bVisible && !chip.IsHitted) {
 			if (NotesManager.IsGenericBalloon(chip)) {
 				if (NotesManager.IsKusudama(chip)) {
 					if (iPlayer == 0) {
@@ -3700,6 +3702,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
+		this.UpdateRollStateAfterRemove(iPlayer);
+		if (resetStates || (!this.bPAUSE && !this.isRewinding)) {
+			chip.bProcessed = !resetStates;
+			chip.end.bProcessed = !resetStates;
+		}
+	}
+
+	private void UpdateRollStateAfterRemove(int iPlayer) {
 		if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible)) {
 			this.bCurrentlyDrumRoll[iPlayer] = false;
 			this.actChara.b風船連打中[iPlayer] = false;
@@ -3710,10 +3720,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actChara.IsInKusudama = false;
 		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsKusudama(x))) {
 			this.actChara.IsInKusudama = false;
-		}
-		if (resetStates || (!this.bPAUSE && !this.isRewinding)) {
-			chip.bProcessed = !resetStates;
-			chip.end.bProcessed = !resetStates;
 		}
 	}
 
@@ -3814,6 +3820,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			=> (ms >= msBranchPoint && (idxBranchSection < 0 || idx >= idxBranchSection));
 
 		// For `#BRANCHSTART`, skip processing earlier defined notes and bar lines
+		bool rollingNotesMadeHidden = false;
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			var chip = dTX.listChip[i];
 			bool isBarLine = (chip.nChannelNo == 0x50);
@@ -3833,8 +3840,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 					continue; // Currently treated as non-branch roll with the Normal branch end being the end; do not show the non-Normal end
 
 				chip.bVisible = true;
-				if (isRollEnd && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection))
+				if (isRollEnd && !chip.start.bHit && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection)) {
 					chip.start.bVisible = true; // show roll head before branch point and made hittable if end is shown
+					if (!chip.start.bProcessed)
+						this.AddNowProcessingRollChip(nPlayer, chip.start);
+				}
 			} else {
 				// non-branched head + branched end
 				if (isRollEnd && chip.start.IsEndedBranching)
@@ -3842,10 +3852,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				chip.bVisible = false;
 				chip.eNoteState = ENoteState.None; // cancel input
-				if (isRollEnd && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection))
+				if (isRollEnd && !isAfterBranchPoint(chip.start.n発声時刻ms, chip.start.idxBranchSection)) {
 					chip.start.bVisible = false; // hide hidable roll head before branch point if end is hide
+					rollingNotesMadeHidden = true;
+				}
 			}
-			
+
+		}
+		if (rollingNotesMadeHidden) {
+			this.UpdateRollStateAfterRemove(nPlayer);
+			this.actChara.ReturnDefaultAnime(nPlayer, false);
 		}
 	}
 
@@ -4084,6 +4100,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.ProcessRollEnd(i, chip, true);
 				chip.bProcessed = false;
 			}
+			this.chip現在処理中の連打チップ[i].Clear();
 			this.bCurrentlyDrumRoll[i] = false;
 			this.actChara.ReturnDefaultAnime(i, true);
 
