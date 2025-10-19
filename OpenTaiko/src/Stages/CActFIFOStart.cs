@@ -28,10 +28,15 @@ internal class CActFIFOStart : CActivity {
 			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
-		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
+			return;
+		}
+		if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
 		} else {
 			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
+		}
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(1000, i);
 		}
 	}
 	public void tフェードイン完了()     // #25406 2011.6.9 yyagi

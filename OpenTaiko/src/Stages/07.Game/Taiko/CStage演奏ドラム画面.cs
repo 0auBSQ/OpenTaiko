@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -32,7 +33,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ChildActivities.Add(this.actFI = new CActFIFOStart());
 		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
 		base.ChildActivities.Add(this.actFOClear = new CActFIFOResult());
-		base.ChildActivities.Add(this.actLane = new CActImplLane());
 		base.ChildActivities.Add(this.actEnd = new CActImplClearAnimation());
 		base.ChildActivities.Add(this.actDancer = new CActImplDancer());
 		base.ChildActivities.Add(this.actMtaiko = new CActImplMtaiko());
@@ -344,6 +344,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				base.ePhaseID = CStage.EPhase.Common_FADEIN;
 
 				this.actFI.tフェードイン開始();
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+					this.actLaneTaiko.BranchText_FadeIn(null, i);
+				}
 
 				// TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
 				base.IsFirstDraw = false;
@@ -599,7 +602,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public CActImplFireworks actChipFireD;
 
 	private CActImplPad actPad;
-	public CActImplLane actLane;
 	public CActImplMtaiko actMtaiko;
 	public CActImplLaneTaiko actLaneTaiko;
 	public CActImplClearAnimation actEnd;
@@ -649,15 +651,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	protected override ENoteJudge tチップのヒット処理(long nHitTime, CChip pChip, bool bCorrectLane) {
 		ENoteJudge eJudgeResult = tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Drums, bCorrectLane, 0);
 		// #24074 2011.01.23 add ikanick
-		if (pChip.nBranch == this.nCurrentBranch[0] && NotesManager.IsMissableNote(pChip) && pChip.bShow == true && eJudgeResult != ENoteJudge.Auto)
+		if (pChip.bVisible && NotesManager.IsMissableNote(pChip) && eJudgeResult != ENoteJudge.Auto)
 			this.actGame.t叩ききりまショー_判定から各数値を増加させる(eJudgeResult, (int)(nHitTime - pChip.n発声時刻ms));
 		return eJudgeResult;
 	}
 
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part) {
+	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part) {
 		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, 0, EInstrumentPad.Drums);
 	}
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse eCourse, EInstrumentPad part, int nLane) {
+	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane) {
 		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, EInstrumentPad.Drums);
 	}
 
@@ -1121,9 +1123,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, _gt);
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
 
-
-				if (this.chip現在処理中の連打チップ[nUsePlayer].Count > 0) {
-					chipNoHit = this.chip現在処理中の連打チップ[nUsePlayer][0];
+				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
+				if (chipNoHitRoll != null) {
+					chipNoHit = chipNoHitRoll;
 					e判定 = ENoteJudge.Perfect;
 				}
 
@@ -1324,7 +1326,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
 								// BAD or TIGHT 時の処理。
 				if (OpenTaiko.ConfigIni.bTight && !this.bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
-					this.tチップのヒット処理_BadならびにTight時のMiss(chipNoHit.nBranch, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
+					this.tチップのヒット処理_BadならびにTight時のMiss(null, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
 				//-----------------------------
 				#endregion
 			}
@@ -1918,9 +1920,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	}
 	protected override void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		if (pChip.nBranch != this.nCurrentBranch[nPlayer])
-			return;
-
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
@@ -1954,6 +1953,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			double msBarRollProgress = 0;
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;) {
 				var chkChip = this.chip現在処理中の連打チップ[i][iChip];
+				if (!chkChip.bVisible)
+					continue;
 				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
 				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
@@ -1991,6 +1992,54 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					this.actDan.Update();
 			}
 		}
+
+		#region [ Branch guide for P1 ]
+		//現在実験状態です。
+		//画像などが完成したらメソッドorクラスとして分離します。
+
+		if (OpenTaiko.ConfigIni.bBranchGuide && !OpenTaiko.ConfigIni.bAutoPlay[0]) {
+			string strNext = "BRANCH END";
+			CTja tjaP1 = OpenTaiko.TJA!;
+			int dy = OpenTaiko.actTextConsole.fontHeight;
+			int y = (int)(176 * OpenTaiko.Skin.ScaleY - 3 * dy);
+
+			if (!(this.idxLastBranchSection[0] < tjaP1.listBRANCH.Count)) {
+				y += dy;
+				OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, strNext);
+			} else {
+				CChip branchJudgePoint = tjaP1.listBRANCH[this.idxLastBranchSection[0]];
+
+				var branchCondType = branchJudgePoint.eBranchCondition;
+				double nowBranchCondScore = this.GetBranchConditionScore(0, branchCondType);
+				OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, nowBranchCondScore.ToString("##0.##"));
+
+				var nowTargetBranch = this.tBranchJudge(0, branchJudgePoint);
+				strNext = nowTargetBranch switch {
+					CTja.ECourse.eMaster => "MASTER",
+					CTja.ECourse.eExpert => "EXPERT",
+					CTja.ECourse.eNormal or _ => "NORMAL",
+				};
+				var (x, _) = OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, strNext);
+				if (this.bLEVELHOLD[0])
+					(x, _) = OpenTaiko.actTextConsole.Print(x, y, 0, CTextConsole.EFontType.White, "(LEVELHELD)");
+				if (this.b強制的に分岐させた[0])
+					(x, _) = OpenTaiko.actTextConsole.Print(x, y, 0, CTextConsole.EFontType.White, "(FORCED)");
+
+				int nMeasuresToNextBranch = branchJudgePoint.n発声位置 / 384 - (this.actPlayInfo.NowMeasure[0] + 1); // round down
+				OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, $"NEXT BRANCH:{nMeasuresToNextBranch,3} BARS");
+
+				y = (int)(362 * OpenTaiko.Skin.ScaleY);
+				if (branchCondType == CTja.EBranchConditionType.None) {
+					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, "NEXT BRANCH INFO:(KEEP)");
+				} else {
+					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White,
+						string.Create(CultureInfo.InvariantCulture,
+							$"NEXT BRANCH INFO:{CTja.EnumToTjaString(branchCondType)},{branchJudgePoint.nBranchCondition1_Professional},{branchJudgePoint.nBranchCondition2_Master}"));
+				}
+			}
+		}
+		#endregion
+
 		#region [ Treat big notes hit with a single hand ]
 		//常時イベントが発生しているメソッドのほうがいいんじゃないかという予想。
 		//CDTX.CChip chipNoHit = this.r指定時刻に一番近い未ヒットChip((int)CSound管理.rc演奏用タイマ.n現在時刻ms, 0);
@@ -2042,6 +2091,16 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		}
 
+	}
+
+	public void ChangeBranch(CTja.ECourse nAfter, int iPlayer, double msBranchPoint = double.MaxValue, bool stopAnime = false) {
+		this.nTargetBranch[iPlayer] = nAfter;
+		this.msTargetBranchTime[iPlayer] = msBranchPoint;
+		if (stopAnime)
+			this.nCurrentBranch[iPlayer] = nAfter;
+		var shownBranch = this.bUseBranch[iPlayer] ? nAfter : CTja.ECourse.eNormal;
+		this.actMtaiko.tBranchEvent(shownBranch, iPlayer, stopAnime: stopAnime);
+		this.actLaneTaiko.ChangeBranch(shownBranch, iPlayer, stopAnime: stopAnime);
 	}
 
 	private void t進行描画_リアルタイム判定数表示() {
