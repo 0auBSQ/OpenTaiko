@@ -2014,128 +2014,6 @@ internal abstract class CStage演奏画面共通 : CStage {
     */
 
 
-	protected CChip r指定時刻に一番近い未ヒットChip(long nTime, int nChannel, int n検索範囲時間ms, int nPlayer) {
-		//sw2.Start();
-		//Trace.TraceInformation( "nTime={0}, nChannel={1:x2}, 現在のTop={2}", nTime, nChannel,CDTXMania.DTX.listChip[ this.n現在のトップChip ].n発声時刻ms );
-
-		int nTimeDiff;
-		if (this.nCurrentTopChip[nPlayer] == -1)         // 演奏データとして1個もチップがない場合は
-		{
-			//sw2.Stop();
-			return null;
-		}
-		int count = listChip[nPlayer].Count;
-		int nIndex_NearestChip_Future = this.nCurrentTopChip[nPlayer];
-		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
-		if (this.nCurrentTopChip[nPlayer] >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
-		{
-			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
-		}
-		// int nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToFuture;
-		//			while ( nIndex_NearestChip_Future < count )	// 未来方向への検索
-		for (; nIndex_NearestChip_Future < count; nIndex_NearestChip_Future++) {
-			CChip chip = listChip[nPlayer][nIndex_NearestChip_Future];
-			if (!chip.bHit) {
-				if ((0x11 <= nChannel) && (nChannel <= 0x1F)) {
-					if ((chip.nChannelNo == nChannel) || (chip.nChannelNo == (nChannel + 0x20))) {
-						if (chip.n発声時刻ms > nTime) {
-							break;
-						}
-						nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-					}
-					continue;
-				}
-
-				//if ( ( ( 0xDE <= nChannel ) && ( nChannel <= 0xDF ) ) )
-				if (((0xDF == nChannel))) {
-					if (chip.nChannelNo == nChannel) {
-						if (chip.n発声時刻ms > nTime) {
-							break;
-						}
-						nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-					}
-				}
-
-				if (((0x50 == nChannel))) {
-					if (chip.nChannelNo == nChannel) {
-						if (chip.n発声時刻ms > nTime) {
-							break;
-						}
-						nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-					}
-				}
-
-			}
-			//				nIndex_NearestChip_Future++;
-		}
-
-		// Channel is always 50, following code is unreachable
-
-		int nIndex_NearestChip_Past = nIndex_InitialPositionSearchingToPast;
-		//			while ( nIndex_NearestChip_Past >= 0 )		// 過去方向への検索
-		for (; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past--) {
-			CChip chip = listChip[nPlayer][nIndex_NearestChip_Past];
-			if ((!chip.bHit) &&
-				(
-					(
-						((((nChannel >= 0x11) && (nChannel <= 0x14)) || nChannel == 0x1A || nChannel == 0x1B || nChannel == 0x1F) && (chip.nChannelNo == nChannel))
-					)
-					||
-					(
-						//	( ( ( nChannel >= 0xDE ) && ( nChannel <= 0xDF ) ) && ( chip.nチャンネル番号 == nChannel ) )
-						(((nChannel == 0xDF)) && (chip.nChannelNo == nChannel))
-					)
-					||
-					(
-						//	( ( ( nChannel >= 0xDE ) && ( nChannel <= 0xDF ) ) && ( chip.nチャンネル番号 == nChannel ) )
-						(((nChannel == 0x50)) && (chip.nChannelNo == nChannel))
-					)
-				)
-			   ) {
-				break;
-			}
-			//				nIndex_NearestChip_Past--;
-		}
-		if ((nIndex_NearestChip_Future >= count) && (nIndex_NearestChip_Past < 0))  // 検索対象が過去未来どちらにも見つからなかった場合
-		{
-			//sw2.Stop();
-			return null;
-		}
-		CChip nearestChip; // = null;	// 以下のifブロックのいずれかで必ずnearestChipには非nullが代入されるので、null初期化を削除
-		if (nIndex_NearestChip_Future >= count)                                         // 検索対象が未来方向には見つからなかった(しかし過去方向には見つかった)場合
-		{
-			nearestChip = listChip[nPlayer][nIndex_NearestChip_Past];
-			//				nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-		} else if (nIndex_NearestChip_Past < 0)                                             // 検索対象が過去方向には見つからなかった(しかし未来方向には見つかった)場合
-		{
-			nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
-			//				nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-		} else {
-			int nTimeDiff_Future = Math.Abs((int)(nTime - listChip[nPlayer][nIndex_NearestChip_Future].n発声時刻ms));
-			int nTimeDiff_Past = Math.Abs((int)(nTime - listChip[nPlayer][nIndex_NearestChip_Past].n発声時刻ms));
-
-			if (nChannel == 0xDF) //0xDFの場合は過去方向への検索をしない
-			{
-				return listChip[nPlayer][nIndex_NearestChip_Future];
-			}
-
-			if (nTimeDiff_Future < nTimeDiff_Past) {
-				nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
-				//					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-			} else {
-				nearestChip = listChip[nPlayer][nIndex_NearestChip_Past];
-				//					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-			}
-		}
-		nTimeDiff = Math.Abs((int)(nTime - nearestChip.n発声時刻ms));
-		if ((n検索範囲時間ms > 0) && (nTimeDiff > n検索範囲時間ms))                 // チップは見つかったが、検索範囲時間外だった場合
-		{
-			//sw2.Stop();
-			return null;
-		}
-		//sw2.Stop();
-		return nearestChip;
-	}
 	public bool r検索範囲内にチップがあるか調べる(long nTime, int n検索範囲時間ms, int nPlayer) {
 		for (int i = 0; i < listChip[nPlayer].Count; i++) {
 			CChip chip = listChip[nPlayer][i];
@@ -2400,10 +2278,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
 
-		if (this.r指定時刻に一番近い未ヒットChip((long)n現在時刻ms, 0x50, 1000000, nPlayer) == null) {
-			this.actChara.b演奏中[nPlayer] = false;
-		}
-
 		var scrollRate = this.GetScrollRate(nPlayer);
 
 		CConfigIni configIni = OpenTaiko.ConfigIni;
@@ -2568,8 +2442,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 								NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
 							}
 
-
-							this.actChara.b演奏中[nPlayer] = true;
 							if (this.actPlayInfo.NowMeasure[nPlayer] == 0) {
 								UpdateCharaCounter(nPlayer);
 							}

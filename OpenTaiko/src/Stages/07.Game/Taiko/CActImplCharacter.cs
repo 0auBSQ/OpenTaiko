@@ -50,7 +50,6 @@ internal class CActImplCharacter : CActivity {
 
 			this.IsInKusudama = false;
 			this.b風船連打中[i] = false;
-			this.b演奏中[i] = false;
 
 			CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]]);
 			if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].CurrentValue = (int)CharaAction_Balloon_Delay[i].EndValue;
@@ -878,7 +877,6 @@ internal class CActImplCharacter : CActivity {
 
 	public bool IsInKusudama = false;
 	public bool[] b風船連打中 = new bool[5];
-	public bool[] b演奏中 = new bool[5];
 
 	public int[] iCurrentCharacter = new int[5] { 0, 0, 0, 0, 0 };
 }
