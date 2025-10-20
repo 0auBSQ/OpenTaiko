@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.91] - 2025-10-20 (Beta)
+
+- [HotFix] Fix non-branched charts had no gauge increment nor damage due to the previous version
+
 ## [0.6.0.90] - 2025-10-19 (Beta)
 
 - [BugFix] - Fixed incorrect gauge increment or damage for notes near branching points
