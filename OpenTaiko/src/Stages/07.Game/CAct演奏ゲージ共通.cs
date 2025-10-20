@@ -23,7 +23,6 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < 3; i++) {
-			dbゲージ増加量[i] = new float[5];
 			for (int n = 0; n < 3; n++) {
 				dbゲージ増加量_Branch[i, n] = new float[5];
 			}
@@ -104,7 +103,6 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		}
 
 		//ゲージのMAXまでの最低コンボ数を計算
-		float dbGaugeMaxComboValue = 0;
 		float[] dbGaugeMaxComboValue_branch = new float[3];
 
 
@@ -148,13 +146,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 		#region [(Unbloated) Gauge max combo values]
 
-		if (this.DTX[nPlayer].bチップがある.Branch) {
-			dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (gaugeRate / 100.0f);
-			for (int i = 0; i < 3; i++) {
-				dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (gaugeRate / 100.0f);
-			}
-		} else {
-			dbGaugeMaxComboValue = this.DTX[nPlayer].nノーツ数[3] * (gaugeRate / 100.0f);
+		for (int i = 0; i < 3; i++) {
+			dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (gaugeRate / 100.0f);
 		}
 
 		#endregion
@@ -163,10 +156,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		if (nanidou == (int)Difficulty.Tower)
 			multiplicationFactor = 0f;
 
-		double nGaugeRankValue = 0D;
 		double[] nGaugeRankValue_branch = new double[] { 0D, 0D, 0D };
 
-		nGaugeRankValue = (10000.0f / dbGaugeMaxComboValue) * multiplicationFactor;
 		for (int i = 0; i < 3; i++) {
 			nGaugeRankValue_branch[i] = (10000.0f / dbGaugeMaxComboValue_branch[i]) * multiplicationFactor;
 		}
@@ -240,8 +231,6 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		0.5f, 1.0f, 1.5f
 	};
 
-	public float[][] dbゲージ増加量 = new float[3][];
-
 	//譜面レベル, 判定
 	public float[,][] dbゲージ増加量_Branch = new float[3, 3][];
 
@@ -276,30 +265,15 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 		switch (e今回の判定) {
 			case ENoteJudge.Perfect:
-			case ENoteJudge.Great: {
-					if (this.DTX[nPlayer].bチップがある.Branch) {
-						fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
-					} else
-						fDamage = this.dbゲージ増加量[0][nPlayer];
-				}
+			case ENoteJudge.Great:
+				fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
 				break;
-			case ENoteJudge.Good: {
-					if (this.DTX[nPlayer].bチップがある.Branch) {
-						fDamage = this.dbゲージ増加量_Branch[nコース, 1][nPlayer];
-					} else
-						fDamage = this.dbゲージ増加量[1][nPlayer];
-				}
+			case ENoteJudge.Good:
+				fDamage = this.dbゲージ増加量_Branch[nコース, 1][nPlayer];
 				break;
 			case ENoteJudge.Poor:
 			case ENoteJudge.Miss: {
-					if (this.DTX[nPlayer].bチップがある.Branch) {
-						fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
-					} else
-						fDamage = this.dbゲージ増加量[2][nPlayer];
-
-					if (fDamage >= 0) {
-						fDamage = -fDamage;
-					}
+					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
 
 					var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 
@@ -324,13 +298,9 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 
 
-			default: {
-					if (this.DTX[nPlayer].bチップがある.Branch) {
-						fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
-					} else
-						fDamage = this.dbゲージ増加量[0][nPlayer];
-					break;
-				}
+			default:
+				fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
+				break;
 
 
 		}
