@@ -169,7 +169,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 		#region [ Handling infinity cases ]
 		float fIsDontInfinty = 0.4f;//適当に0.4で
-		float[] fAddVolume = new float[] { 1.0f, 0.5f, dbDamageRate };
+		float[] fAddVolume = new float[] { 1.0f, 0.5f, -Math.Abs(dbDamageRate) };
 
 		for (int ib = 0; ib < 3; ++ib) {
 			if (!double.IsInfinity(nGaugeRankValue_branch[ib] / 100.0f)) { //値がInfintyかチェック
