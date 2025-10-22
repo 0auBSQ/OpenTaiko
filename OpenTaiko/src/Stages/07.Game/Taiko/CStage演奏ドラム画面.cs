@@ -807,7 +807,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				bool bHitted = false;
 
-				int nLane = 0;
+				int nLane = (int)PlayerLane.FlashType.Total;
 				int nHand = 0;
 				int nChannel = 0;
 
@@ -1105,11 +1105,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 							nLane = (int)PlayerLane.FlashType.Total;
 						}
 						break;
-					default: {
-							continue;
-						}
+					default:
 						break;
 				}
+
+				if (nLane == (int)PlayerLane.FlashType.Total)
+					break;
 
 				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
 				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
