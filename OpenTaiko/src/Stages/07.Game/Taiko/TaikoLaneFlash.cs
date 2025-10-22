@@ -42,24 +42,10 @@ public class PlayerLane {
 		Flash = new LaneFlash[(int)FlashType.Total];
 		var _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
-		for (int i = 0; i < (int)FlashType.Total; i++) {
-			switch (i) {
-				case (int)FlashType.Red:
-					Flash[i] = new LaneFlash(ref OpenTaiko.Tx.Lane_Red[(int)_gt], player);
-					break;
-				case (int)FlashType.Blue:
-					Flash[i] = new LaneFlash(ref OpenTaiko.Tx.Lane_Blue[(int)_gt], player);
-					break;
-				case (int)FlashType.Clap:
-					Flash[i] = new LaneFlash(ref OpenTaiko.Tx.Lane_Clap[(int)_gt], player);
-					break;
-				case (int)FlashType.Hit:
-					Flash[i] = new LaneFlash(ref OpenTaiko.Tx.Lane_Yellow, player);
-					break;
-				default:
-					break;
-			}
-		}
+		Flash[(int)FlashType.Red] = new LaneFlash(ref OpenTaiko.Tx.Lane_Red[(int)_gt], player);
+		Flash[(int)FlashType.Blue] = new LaneFlash(ref OpenTaiko.Tx.Lane_Blue[(int)_gt], player);
+		Flash[(int)FlashType.Clap] = new LaneFlash(ref OpenTaiko.Tx.Lane_Clap[(int)_gt], player);
+		Flash[(int)FlashType.Hit] = new LaneFlash(ref OpenTaiko.Tx.Lane_Yellow, player);
 	}
 	public void Start(FlashType flashType) {
 		if (flashType == FlashType.Total) return;
