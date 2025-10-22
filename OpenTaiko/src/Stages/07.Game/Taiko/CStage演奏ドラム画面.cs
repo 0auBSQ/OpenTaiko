@@ -870,6 +870,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 									chipNoHit.nProcessTime = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 									chipNoHit.eNoteState = ENoteState.Wait;
 									this.nStoredHit[nUsePlayer] = (int)nPadAs1P;
+									continue;
 								}
 							} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 								bool _isExpected = NotesManager.IsExpectedPadMultiHit((EPad)this.nStoredHit[nUsePlayer], nPadAs1P, chipNoHit, gameType);
