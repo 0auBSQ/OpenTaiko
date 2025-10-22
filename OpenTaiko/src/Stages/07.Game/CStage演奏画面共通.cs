@@ -161,7 +161,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 
-		this.bCurrentlyDrumRoll = new bool[] { false, false, false, false, false };
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.idxLastBranchSection = new int[5];
 		this.Chara_MissCount = new int[5];
@@ -651,10 +650,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool[] bLEVELHOLD = new bool[] { false, false, false, false, false };
 	protected int nListCount;
 
-	public bool[] bCurrentlyDrumRoll = new bool[] { false, false, false, false, false }; //奥の手
 	protected int[] nCurrentRollCount = new int[5];
 	public int[] Chara_MissCount;
-	protected ERollState eRollState;
 	protected bool[] ifp = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
 
@@ -929,8 +926,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected bool tRollProcess(CChip pChip, double dbProcess_time, int num, int sort, int Input, int nPlayer) {
 		if (dbProcess_time >= pChip.n発声時刻ms && dbProcess_time < pChip.end.n発声時刻ms) {
-			this.bCurrentlyDrumRoll[nPlayer] = true;
-
 			if (pChip.nRollCount == 0) //連打カウントが0の時
 			{
 				this.actRoll.b表示[nPlayer] = true;
@@ -956,11 +951,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				pChip.RollInputTime = new CCounter(0, 150, 1, OpenTaiko.Timer);
 				pChip.RollDelay?.Stop();
 			}
-
-			if (pChip.nChannelNo == 0x15)
-				this.eRollState = ERollState.Roll;
-			else
-				this.eRollState = ERollState.RollB;
 
 			pChip.nRollCount++;
 
@@ -1062,7 +1052,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return false;
 		}
 
-		this.bCurrentlyDrumRoll[player] = true;
 		this.actChara.b風船連打中[player] = true;
 		if (IsKusudama) {
 			this.actChara.IsInKusudama = true;
@@ -1090,9 +1079,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.actBalloon.ct風船アニメ[player] = new CCounter(0, 9, 14, OpenTaiko.Timer);
 			}
 		}
-
-		this.eRollState = ERollState.Balloon;
-
 
 
 		if (!IsKusudama) {
@@ -1225,7 +1211,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 				}
 				if (!bAutoPlay && !rollEffectHit) {
-					this.eRollState = ERollState.Roll;
 					this.tRollProcess(pChip, tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 1, nNowInput, 0, nPlayer);
 				}
 				//---------------------------
@@ -3423,7 +3408,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				actChara.KusuIn();
 				this.actChara.IsInKusudama = true;
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					this.bCurrentlyDrumRoll[i] = true;
 					this.actChara.b風船連打中[i] = true;
 				}
 			}
@@ -3570,12 +3554,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void UpdateRollStateAfterRemove(int iPlayer) {
-		if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible)) {
-			this.bCurrentlyDrumRoll[iPlayer] = false;
-			this.actChara.b風船連打中[iPlayer] = false;
-			this.actChara.IsInKusudama = false;
-			this.eRollState = ERollState.None;
-		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible && NotesManager.IsGenericBalloon(x))) {
+		if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => x.bVisible && NotesManager.IsGenericBalloon(x))) {
 			this.actChara.b風船連打中[iPlayer] = false;
 			this.actChara.IsInKusudama = false;
 		} else if (!this.chip現在処理中の連打チップ[iPlayer].Any(x => NotesManager.IsKusudama(x))) {
@@ -3962,7 +3941,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 				chip.bProcessed = false;
 			}
 			this.chip現在処理中の連打チップ[i].Clear();
-			this.bCurrentlyDrumRoll[i] = false;
 			this.actChara.ReturnDefaultAnime(i, true);
 
 			for (int iChip = 0; iChip < iPrevTopChip[i]; ++iChip) {

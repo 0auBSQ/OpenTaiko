@@ -897,6 +897,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					else if (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit)) {
 						if (NotesManager.IsExpectedPadRoll(nPadAs1P, chipNoHit, gameType)) {
 							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+							continue;
 						}
 					}
 					else if (NotesManager.IsADLIB(chipNoHit) || NotesManager.IsMine(chipNoHit)) {
@@ -908,7 +909,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 				//-----------------------------
 				// BAD or TIGHT 時の処理。
-				if (OpenTaiko.ConfigIni.bTight && !this.bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
+				if (OpenTaiko.ConfigIni.bTight)
 					this.tチップのヒット処理_BadならびにTight時のMiss(null, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
 				//-----------------------------
 				#endregion
