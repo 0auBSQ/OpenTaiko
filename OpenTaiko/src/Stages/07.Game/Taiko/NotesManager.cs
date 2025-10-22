@@ -82,34 +82,82 @@ class NotesManager {
 	#endregion
 
 	#region [Gameplay]
+	public static int GetPadPlayer(EPad nPad) => nPad switch {
+		EPad.LRed or EPad.RRed or EPad.LBlue or EPad.RBlue or EPad.Clap => 0,
+		EPad.LRed2P or EPad.RRed2P or EPad.LBlue2P or EPad.RBlue2P or EPad.Clap2P => 1,
+		EPad.LRed3P or EPad.RRed3P or EPad.LBlue3P or EPad.RBlue3P or EPad.Clap3P => 2,
+		EPad.LRed4P or EPad.RRed4P or EPad.LBlue4P or EPad.RBlue4P or EPad.Clap4P => 3,
+		EPad.LRed5P or EPad.RRed5P or EPad.LBlue5P or EPad.RBlue5P or EPad.Clap5P => 4,
+		_ => int.MaxValue, // invalid player
+	};
 
-	public static bool IsExpectedPad(int stored, int hit, CChip chip, EGameType gt) {
-		var inPad = (EPad)hit;
-		var onPad = (EPad)stored;
+	public static EPad PadTo1P(EPad pad) => pad switch {
+		EPad.LRed or EPad.LRed2P or EPad.LRed3P or EPad.LRed4P or EPad.LRed5P => EPad.LRed,
+		EPad.RRed or EPad.RRed2P or EPad.RRed3P or EPad.RRed4P or EPad.RRed5P => EPad.RRed,
+		EPad.LBlue or EPad.LBlue2P or EPad.LBlue3P or EPad.LBlue4P or EPad.LBlue5P => EPad.LBlue,
+		EPad.RBlue or EPad.RBlue2P or EPad.RBlue3P or EPad.RBlue4P or EPad.RBlue5P => EPad.RBlue,
+		EPad.Clap or EPad.Clap2P or EPad.Clap3P or EPad.Clap4P or EPad.Clap5P => EPad.Clap,
+		_ => pad,
+	};
 
+	public static PlayerLane.FlashType PadToLane(EPad pad, EGameType gameType) => PadTo1P(pad) switch {
+		EPad.LRed or EPad.RRed => PlayerLane.FlashType.Red,
+		EPad.LBlue or EPad.RBlue => PlayerLane.FlashType.Blue,
+		EPad.Clap when gameType is EGameType.Konga => PlayerLane.FlashType.Clap,
+		_ => PlayerLane.FlashType.Total,
+	};
+
+	public static int PadToHand(EPad pad) => (PadTo1P(pad) is EPad.RRed or EPad.RBlue) ? 1 : 0;
+
+	public static bool IsExpectedPadMissable(EPad hit, CChip chip, EGameType gt) {
+		bool acceptRed = IsSmallNote(chip, false) || IsBigDonTaiko(chip, gt) || IsSwapNote(chip, gt);
+		bool acceptBlue = IsSmallNote(chip, true) || IsBigKaTaiko(chip, gt) || IsSwapNote(chip, gt);
+		bool acceptClap = IsClapKonga(chip, gt);
+
+		return (acceptRed && hit is EPad.LRed or EPad.RRed)
+			|| (acceptBlue && hit is EPad.LBlue or EPad.RBlue)
+			|| (acceptClap && hit is EPad.Clap);
+	}
+
+	public static bool IsExpectedPadMultiHit(EPad stored, EPad hit, CChip chip, EGameType gt) {
 		if (chip == null) return false;
 
 		if (IsBigKaTaiko(chip, gt)) {
-			return (inPad == EPad.LBlue && onPad == EPad.RBlue)
-				   || (inPad == EPad.RBlue && onPad == EPad.LBlue);
+			return (hit == EPad.LBlue && stored == EPad.RBlue)
+				|| (hit == EPad.RBlue && stored == EPad.LBlue);
 		}
 
 		if (IsBigDonTaiko(chip, gt)) {
-			return (inPad == EPad.LRed && onPad == EPad.RRed)
-				   || (inPad == EPad.RRed && onPad == EPad.LRed);
+			return (hit == EPad.LRed && stored == EPad.RRed)
+				|| (hit == EPad.RRed && stored == EPad.LRed);
 		}
 
 		if (IsSwapNote(chip, gt)) {
-			bool hitBlue = inPad == EPad.LBlue || inPad == EPad.RBlue;
-			bool hitRed = inPad == EPad.LRed || inPad == EPad.RRed;
-			bool storedBlue = onPad == EPad.LBlue || onPad == EPad.RBlue;
-			bool storedRed = onPad == EPad.LRed || onPad == EPad.RRed;
+			bool hitBlue = hit == EPad.LBlue || hit == EPad.RBlue;
+			bool hitRed = hit == EPad.LRed || hit == EPad.RRed;
+			bool storedBlue = stored == EPad.LBlue || stored == EPad.RBlue;
+			bool storedRed = stored == EPad.LRed || stored == EPad.RRed;
 
 			return (storedRed && hitBlue)
-				   || (storedBlue && hitRed);
+				|| (storedBlue && hitRed);
 		}
 
 		return false;
+	}
+
+	public static bool IsExpectedPadRoll(EPad hit, CChip chip, EGameType gt) {
+		bool isBalloonType = IsGenericBalloon(chip);
+
+		bool acceptKongaRed = (IsSmallRoll(chip) || IsBigRoll(chip));
+		bool acceptKongaYellow = (IsYellowRoll(chip) || IsBigRoll(chip));
+
+		bool acceptRed = isBalloonType || (gt is not EGameType.Konga || acceptKongaRed);
+		bool acceptBlue = !isBalloonType && (gt is not EGameType.Konga || acceptKongaYellow);
+		bool acceptClap = IsClapRoll(chip) && gt == EGameType.Konga;
+
+		return (acceptRed && hit is EPad.LRed or EPad.RRed)
+			|| (acceptBlue && hit is EPad.LBlue or EPad.RBlue)
+			|| (acceptClap && hit is EPad.Clap);
 	}
 
 	#endregion

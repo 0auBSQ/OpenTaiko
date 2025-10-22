@@ -692,46 +692,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	private bool tドラムヒット処理(long nHitTime, EPad type, CChip pChip, bool b両手入力, int nPlayer) {
-		int nInput = 0;
-
-		switch (type) {
-			case EPad.LRed:
-			case EPad.RRed:
-			case EPad.LRed2P:
-			case EPad.RRed2P:
-			case EPad.LRed3P:
-			case EPad.RRed3P:
-			case EPad.LRed4P:
-			case EPad.RRed4P:
-			case EPad.LRed5P:
-			case EPad.RRed5P:
-				nInput = 0;
-				if (b両手入力)
-					nInput = 2;
-				break;
-			case EPad.LBlue:
-			case EPad.RBlue:
-			case EPad.LBlue2P:
-			case EPad.RBlue2P:
-			case EPad.LBlue3P:
-			case EPad.RBlue3P:
-			case EPad.LBlue4P:
-			case EPad.RBlue4P:
-			case EPad.LBlue5P:
-			case EPad.RBlue5P:
-				nInput = 1;
-				if (b両手入力)
-					nInput = 3;
-				break;
-			case EPad.Clap:
-			case EPad.Clap2P:
-			case EPad.Clap3P:
-			case EPad.Clap4P:
-			case EPad.Clap5P:
-				nInput = 4;
-				break;
-		}
-
+		int nInput = NotesManager.PadTo1P(type) switch {
+			EPad.LRed or EPad.RRed => b両手入力 ? 2 : 0,
+			EPad.LBlue or EPad.RBlue => b両手入力 ? 3 : 1,
+			EPad.Clap => 4,
+			_ => 0,
+		};
 
 		if (!(pChip != null && NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip))) {
 			return false;
@@ -787,10 +753,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
 
-		for (int nPad = 0; nPad < (int)EPad.Max; nPad++)        // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
+		for (EPad nPad = 0; nPad < EPad.Max; nPad++)        // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 		{
-			List<STInputEvent> listInputEvent = OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums, (EPad)nPad);
+			List<STInputEvent> listInputEvent = OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums, nPad);
 
 			if ((listInputEvent == null) || (listInputEvent.Count == 0))
 				continue;
@@ -801,324 +767,57 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!inputEvent.Pressed)
 					continue;
 
-				bool bHitted = false;
-
-				int nLane = (int)PlayerLane.FlashType.Total;
-				int nHand = 0;
-				int nChannel = 0;
-
-				//連打チップを検索してから通常音符検索
-				//連打チップの検索は、
-				//一番近くの連打音符を探す→時刻チェック
-				//発声 < 現在時刻 && 終わり > 現在時刻
-
 				//2015.03.19 kairera0467 Chipを1つにまとめて1つのレーン扱いにする。
 
-				bool isPad1P = (nPad >= 12 && nPad <= 15) || nPad == 32;
-				bool isPad2P = (nPad >= 16 && nPad <= 19) || nPad == 33;
-				bool isPad3P = (nPad >= 20 && nPad <= 23) || nPad == 34;
-				bool isPad4P = (nPad >= 24 && nPad <= 27) || nPad == 35;
-				bool isPad5P = (nPad >= 28 && nPad <= 31) || nPad == 36;
-
-				int nUsePlayer = 0;
-				if (isPad1P) {
-					nUsePlayer = 0;
-				} else if (isPad2P) {
-					nUsePlayer = 1;
-					if (OpenTaiko.ConfigIni.nPlayerCount < 2) //プレイ人数が2人以上でなければ入力をキャンセル
-						break;
-				} else if (isPad3P) {
-					nUsePlayer = 2;
-					if (OpenTaiko.ConfigIni.nPlayerCount < 3) //プレイ人数が3人以上でなければ入力をキャンセル
-						break;
-				} else if (isPad4P) {
-					nUsePlayer = 3;
-					if (OpenTaiko.ConfigIni.nPlayerCount < 4) //プレイ人数が4人以上でなければ入力をキャンセル
-						break;
-				} else if (isPad5P) {
-					nUsePlayer = 4;
-					if (OpenTaiko.ConfigIni.nPlayerCount < 5) //プレイ人数が5人以上でなければ入力をキャンセル
-						break;
+				int nUsePlayer = NotesManager.GetPadPlayer(nPad);
+				if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
+					|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]
+					|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
+					|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
+					) {
+					break; // cancel input
 				}
 
-				if (OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]) break;
-
-				if (!OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.bAutoPlay[0] && isPad1P)//2020.05.18 Mr-Ojii オート時の入力キャンセル
-					break;
-				else if ((OpenTaiko.ConfigIni.bAutoPlay[1] || OpenTaiko.ConfigIni.bAIBattleMode) && isPad2P)
-					break;
-				else if (OpenTaiko.ConfigIni.bAutoPlay[2] && isPad3P)
-					break;
-				else if (OpenTaiko.ConfigIni.bAutoPlay[3] && isPad4P)
-					break;
-				else if (OpenTaiko.ConfigIni.bAutoPlay[4] && isPad5P)
-					break;
-				//var padTo = nUsePlayer == 0 ? nPad - 12 : nPad - 12 - 4;
-				var padTo = nPad - 12;
-				padTo -= 4 * nUsePlayer;
-
-				var isDon = padTo < 2 ? true : false;
-
+				EPad nPadAs1P = NotesManager.PadTo1P(nPad);
 				CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
 
 				// convert input time (mixer space) to note time
 				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
 				long nTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
-				//int nPad09 = ( nPad == (int) Eパッド.HP ) ? (int) Eパッド.BD : nPad;		// #27029 2012.1.5 yyagi
 
-				CChip chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
+				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
 				ENoteJudge e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : ENoteJudge.Miss;
-
 				e判定 = AlterJudgement(nUsePlayer, e判定, false);
 
-				#region [ADLIB]
+				var gameType = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
+				PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
 
-				bool b太鼓音再生フラグ = true;
-				if (chipNoHit != null) {
-					if (NotesManager.IsADLIB(chipNoHit) && (e判定 == ENoteJudge.Perfect || e判定 == ENoteJudge.Good))
-						b太鼓音再生フラグ = false;
-					if (NotesManager.IsADLIB(chipNoHit) && (e判定 != ENoteJudge.Miss && e判定 != ENoteJudge.Poor))
-						this.soundAdlib[chipNoHit.nPlayerSide]?.PlayStart();
-				}
-
-				#endregion
-
-				#region [Visual effects]
-
-				switch (nPad) {
-					case 12:
-						nLane = 0;
-						nHand = 0;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[0]?.PlayStart();
-						}
-						break;
-					case 13:
-						nLane = 0;
-						nHand = 1;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[0]?.PlayStart();
-						}
-						break;
-					case 14:
-						nLane = 1;
-						nHand = 0;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[0]?.PlayStart();
-						break;
-					case 15:
-						nLane = 1;
-						nHand = 1;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[0]?.PlayStart();
-						break;
-					//以下2P
-					case 16:
-						nLane = 0;
-						nHand = 0;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[1]?.PlayStart();
-						}
-						break;
-					case 17:
-						nLane = 0;
-						nHand = 1;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[1]?.PlayStart();
-						}
-						break;
-					case 18:
-						nLane = 1;
-						nHand = 0;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[1]?.PlayStart();
-						break;
-					case 19:
-						nLane = 1;
-						nHand = 1;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[1]?.PlayStart();
-						break;
-					//以下3P
-					case 20:
-						nLane = 0;
-						nHand = 0;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[2]?.PlayStart();
-						}
-						break;
-					case 21:
-						nLane = 0;
-						nHand = 1;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[2]?.PlayStart();
-						}
-						break;
-					case 22:
-						nLane = 1;
-						nHand = 0;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[2]?.PlayStart();
-						break;
-					case 23:
-						nLane = 1;
-						nHand = 1;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[2]?.PlayStart();
-						break;
-					//以下4P
-					case 24:
-						nLane = 0;
-						nHand = 0;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[3]?.PlayStart();
-						}
-						break;
-					case 25:
-						nLane = 0;
-						nHand = 1;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[3]?.PlayStart();
-						}
-						break;
-					case 26:
-						nLane = 1;
-						nHand = 0;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[3]?.PlayStart();
-						break;
-					case 27:
-						nLane = 1;
-						nHand = 1;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[3]?.PlayStart();
-						break;
-					//以下5P
-					case 28:
-						nLane = 0;
-						nHand = 0;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[4]?.PlayStart();
-						}
-						break;
-					case 29:
-						nLane = 0;
-						nHand = 1;
-						nChannel = 0x11;
-						if (b太鼓音再生フラグ) {
-							this.soundRed[4]?.PlayStart();
-						}
-						break;
-					case 30:
-						nLane = 1;
-						nHand = 0;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[4]?.PlayStart();
-						break;
-					case 31:
-						nLane = 1;
-						nHand = 1;
-						nChannel = 0x12;
-						if (b太鼓音再生フラグ)
-							this.soundBlue[4]?.PlayStart();
-						break;
-					// Clap
-					case (int)EPad.Clap:
-						if (OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(0)] == EGameType.Konga) {
-							nLane = (int)PlayerLane.FlashType.Clap;
-							nHand = 0;
-							nChannel = 0x14;
-							if (b太鼓音再生フラグ) {
-								this.soundClap[0]?.PlayStart();
-							}
-						} else {
-							nLane = (int)PlayerLane.FlashType.Total;
-						}
-						break;
-					case (int)EPad.Clap2P:
-						if (OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(1)] == EGameType.Konga) {
-							nLane = (int)PlayerLane.FlashType.Clap;
-							nHand = 0;
-							nChannel = 0x14;
-							if (b太鼓音再生フラグ) {
-								this.soundClap[1]?.PlayStart();
-							}
-						} else {
-							nLane = (int)PlayerLane.FlashType.Total;
-						}
-						break;
-					case (int)EPad.Clap3P:
-						if (OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(1)] == EGameType.Konga) {
-							nLane = (int)PlayerLane.FlashType.Clap;
-							nHand = 0;
-							nChannel = 0x14;
-							if (b太鼓音再生フラグ) {
-								this.soundClap[2]?.PlayStart();
-							}
-						} else {
-							nLane = (int)PlayerLane.FlashType.Total;
-						}
-						break;
-					case (int)EPad.Clap4P:
-						if (OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(1)] == EGameType.Konga) {
-							nLane = (int)PlayerLane.FlashType.Clap;
-							nHand = 0;
-							nChannel = 0x14;
-							if (b太鼓音再生フラグ) {
-								this.soundClap[3]?.PlayStart();
-							}
-						} else {
-							nLane = (int)PlayerLane.FlashType.Total;
-						}
-						break;
-					case (int)EPad.Clap5P:
-						if (OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(1)] == EGameType.Konga) {
-							nLane = (int)PlayerLane.FlashType.Clap;
-							nHand = 0;
-							nChannel = 0x14;
-							if (b太鼓音再生フラグ) {
-								this.soundClap[4]?.PlayStart();
-							}
-						} else {
-							nLane = (int)PlayerLane.FlashType.Total;
-						}
-						break;
-					default:
-						break;
-				}
-
-				if (nLane == (int)PlayerLane.FlashType.Total)
+				if (nLane == PlayerLane.FlashType.Total)
 					break;
 
-				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start((PlayerLane.FlashType)nLane);
-				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
+				#region [Visual and sound effects]
+				int nHand = NotesManager.PadToHand(nPad);
+				(int nChannel, CSound? sound) = nLane switch {
+					PlayerLane.FlashType.Red => (0x11, this.soundRed[nUsePlayer]),
+					PlayerLane.FlashType.Blue => (0x12, this.soundBlue[nUsePlayer]),
+					PlayerLane.FlashType.Clap => (0x14, this.soundClap[nUsePlayer]),
+					_ => (0, null),
+				};
 
+				// ADLIB sound
+				if (NotesManager.IsADLIB(chipNoHit) && e判定 is not ENoteJudge.Miss or ENoteJudge.Poor)
+					sound = this.soundAdlib[nUsePlayer];
+
+				sound?.PlayStart();
+
+				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start(nLane);
+				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
 				#endregion
 
 				// Chip bools
-				EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
-				bool _isBigKaTaiko = NotesManager.IsBigKaTaiko(chipNoHit, _gt);
-				bool _isBigDonTaiko = NotesManager.IsBigDonTaiko(chipNoHit, _gt);
-				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, _gt);
-				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, _gt);
+				bool _isBigNoteTaiko = NotesManager.IsBigDonTaiko(chipNoHit, gameType) || NotesManager.IsBigKaTaiko(chipNoHit, gameType);
+				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, gameType);
+				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
 
 				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
 				if (chipNoHitRoll != null) {
@@ -1130,198 +829,80 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					break;
 				}
 
-				switch (((EPad)nPad)) {
-					case EPad.LRed:
-					case EPad.LRed2P:
-					case EPad.LRed3P:
-					case EPad.LRed4P:
-					case EPad.LRed5P:
-					case EPad.RRed:
-					case EPad.RRed2P:
-					case EPad.RRed3P:
-					case EPad.RRed4P:
-					case EPad.RRed5P:
-					case EPad.LBlue:
-					case EPad.LBlue2P:
-					case EPad.LBlue3P:
-					case EPad.LBlue4P:
-					case EPad.LBlue5P:
-					case EPad.RBlue:
-					case EPad.RBlue2P:
-					case EPad.RBlue3P:
-					case EPad.RBlue4P:
-					case EPad.RBlue5P: {
+				bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit);
+				bool isHitTypeExpected = NotesManager.IsExpectedPadMissable(nPadAs1P, chipNoHit, gameType);
 
-							// Regular notes
+				// Register to replay file
+				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)nPadAs1P);
 
-							#region [Fetch values]
 
-							// Flatten pads from 8 to 4
-							var _pad = (EPad)nPad;
-							if ((EPad)nPad == EPad.LRed2P) _pad = EPad.LRed;
-							if ((EPad)nPad == EPad.RRed2P) _pad = EPad.RRed;
-							if ((EPad)nPad == EPad.LBlue2P) _pad = EPad.LBlue;
-							if ((EPad)nPad == EPad.RBlue2P) _pad = EPad.RBlue;
+				if (e判定 != ENoteJudge.Miss) {
+					// Process small note & konga clap
+					if (_isSmallNote || _isClapKonga) {
+						if (isHitTypeExpected) {
+							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+							continue;
+						}
+					}
+					// Process big notes (judge big notes off)
+					else if (_isBigNoteTaiko && !OpenTaiko.ConfigIni.bJudgeBigNotes) {
+						if (isHitTypeExpected) {
+							this.nStoredHit[nUsePlayer] = 0;
+							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, true, nUsePlayer);
+							continue;
+						}
+					}
+					// Process big notes (judge big notes on)
+					else if ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga) {
+						if (isHitTypeExpected) {
+							CConfigIni.CTimingZones tz = this.GetTimingZones(nUsePlayer);
+							float time = chipNoHit.n発声時刻ms - (float)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+							int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
 
-							if ((EPad)nPad == EPad.LRed3P) _pad = EPad.LRed;
-							if ((EPad)nPad == EPad.RRed3P) _pad = EPad.RRed;
-							if ((EPad)nPad == EPad.LBlue3P) _pad = EPad.LBlue;
-							if ((EPad)nPad == EPad.RBlue3P) _pad = EPad.RBlue;
+							bool _timeBadOrLater = time <= tz.nBadZone;
 
-							if ((EPad)nPad == EPad.LRed4P) _pad = EPad.LRed;
-							if ((EPad)nPad == EPad.RRed4P) _pad = EPad.RRed;
-							if ((EPad)nPad == EPad.LBlue4P) _pad = EPad.LBlue;
-							if ((EPad)nPad == EPad.RBlue4P) _pad = EPad.RBlue;
+							if (chipNoHit.eNoteState == ENoteState.None) {
+								if (_timeBadOrLater) {
+									chipNoHit.nProcessTime = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+									chipNoHit.eNoteState = ENoteState.Wait;
+									this.nStoredHit[nUsePlayer] = (int)nPadAs1P;
+								}
+							} else if (chipNoHit.eNoteState == ENoteState.Wait) {
+								bool _isExpected = NotesManager.IsExpectedPadMultiHit((EPad)this.nStoredHit[nUsePlayer], nPadAs1P, chipNoHit, gameType);
+								var msWaitedTime = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) - chipNoHit.nProcessTime;
 
-							if ((EPad)nPad == EPad.LRed5P) _pad = EPad.LRed;
-							if ((EPad)nPad == EPad.RRed5P) _pad = EPad.RRed;
-							if ((EPad)nPad == EPad.LBlue5P) _pad = EPad.LBlue;
-							if ((EPad)nPad == EPad.RBlue5P) _pad = EPad.RBlue;
-
-							bool _isLeftPad = _pad == EPad.LRed || _pad == EPad.LBlue;
-							bool _isBlue = _pad == EPad.RBlue || _pad == EPad.LBlue;
-
-							int waitInstr = _isLeftPad ? 2 : 1;
-							int waitRec = waitInstr == 2 ? 1 : 2;
-
-							bool _isBigNoteTaiko = _isBlue ? _isBigKaTaiko : _isBigDonTaiko;
-							bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, _isBlue);
-
-							#endregion
-
-							// Register to replay file
-							OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)_pad);
-
-							// Process small note
-							if (e判定 != ENoteJudge.Miss && _isSmallNote) {
-								this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-								bHitted = true;
-							}
-
-							// Process big notes (judge big notes off)
-							if (e判定 != ENoteJudge.Miss && _isBigNoteTaiko && !OpenTaiko.ConfigIni.bJudgeBigNotes) {
-								this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
-								bHitted = true;
-								//this.nWaitButton = 0;
-								this.nStoredHit[nUsePlayer] = 0;
-								break;
-							}
-
-							// Process big notes (judge big notes on)
-							if (e判定 != ENoteJudge.Miss && ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga)) {
-								CConfigIni.CTimingZones tz = this.GetTimingZones(nUsePlayer);
-								float time = chipNoHit.n発声時刻ms - (float)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-								int nWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-
-								bool _timeBadOrLater = time <= tz.nBadZone;
-
-								if (chipNoHit.eNoteState == ENoteState.None) {
-									if (_timeBadOrLater) {
-										chipNoHit.nProcessTime = (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-										chipNoHit.eNoteState = ENoteState.Wait;
-										//this.nWaitButton = waitInstr;
-										this.nStoredHit[nUsePlayer] = (int)_pad;
-									}
-								} else if (chipNoHit.eNoteState == ENoteState.Wait) {
-
-									bool _isExpected = NotesManager.IsExpectedPad(this.nStoredHit[nUsePlayer], (int)_pad, chipNoHit, _gt);
-
-									// Double tap success
-									if (_isExpected && _timeBadOrLater && chipNoHit.nProcessTime
-										+ nWaitTime > (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
-										this.tドラムヒット処理(nTime, _pad, chipNoHit, true, nUsePlayer);
-										bHitted = true;
-										//this.nWaitButton = 0;
-										this.nStoredHit[nUsePlayer] = 0;
-									}
-
-									// Double tap failure
-									else if (!_isExpected || (_timeBadOrLater && chipNoHit.nProcessTime
-												 + nWaitTime < (int)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs))) {
-										if (!_isPinkKonga) {
-											this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-											bHitted = true;
-										}
-
-										//this.nWaitButton = 0;
-										this.nStoredHit[nUsePlayer] = 0;
+								// Double tap success
+								if (_isExpected && _timeBadOrLater && msWaitedTime < msMaxWaitTime) {
+									this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, true, nUsePlayer);
+									this.nStoredHit[nUsePlayer] = 0;
+									continue;
+								}
+								// Double tap failure
+								else if (!_isExpected || (_timeBadOrLater && msWaitedTime > msMaxWaitTime)) {
+									this.nStoredHit[nUsePlayer] = 0;
+									if (!_isPinkKonga) {
+										this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+										continue;
 									}
 								}
 							}
-
-							// Judge rolls
-							if (e判定 != ENoteJudge.Miss
-								&& NotesManager.IsGenericRoll(chipNoHit)
-								&& !NotesManager.IsRollEnd(chipNoHit)) {
-								bool _isBalloon = NotesManager.IsGenericBalloon(chipNoHit);
-								bool _isKusudama = NotesManager.IsKusudama(chipNoHit);
-								bool _isKongaRedRoll = (NotesManager.IsSmallRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.Taiko;
-
-								bool _isRedOnly = _isBalloon || _isKongaRedRoll || _isKusudama;
-
-								// To be added later
-								bool _isKongaPinkRoll = NotesManager.IsBigRoll(chipNoHit) && _gt == EGameType.Konga;
-
-								// To improve (array of functions ?)
-								bool _isBlueOnly = ((NotesManager.IsYellowRoll(chipNoHit) || NotesManager.IsBigRoll(chipNoHit)) || _gt == EGameType.Taiko)
-												   && !_isBalloon && !_isKusudama;
-
-								if ((_isRedOnly && !_isBlue) || (_isBlueOnly && _isBlue))
-									this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-							}
-
-							if (!bHitted)
-								break;
-							continue;
-
 						}
-
-					case EPad.Clap:
-					case EPad.Clap2P:
-					case EPad.Clap3P:
-					case EPad.Clap4P:
-					case EPad.Clap5P: {
-							var _pad = (EPad)nPad;
-
-							// Process konga clap
-							if (e判定 != ENoteJudge.Miss && _isClapKonga) {
-								this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-								bHitted = true;
-							}
-
-							// Judge rolls
-							if (e判定 != ENoteJudge.Miss
-								&& NotesManager.IsGenericRoll(chipNoHit)
-								&& !NotesManager.IsRollEnd(chipNoHit)) {
-								bool _isKongaClapRoll = NotesManager.IsClapRoll(chipNoHit) && _gt == EGameType.Konga;
-
-								if (_isKongaClapRoll)
-									this.tドラムヒット処理(nTime, _pad, chipNoHit, false, nUsePlayer);
-							}
-
-
-							if (!bHitted)
-								break;
-							continue;
+					}
+					// Judge rolls
+					else if (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit)) {
+						if (NotesManager.IsExpectedPadRoll(nPadAs1P, chipNoHit, gameType)) {
+							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
 						}
-
-				}
-
-
-				if (e判定 != ENoteJudge.Miss && NotesManager.IsADLIB(chipNoHit)) {
-					this.tドラムヒット処理(nTime, (EPad)nPad, chipNoHit, false, nUsePlayer);
-					bHitted = true;
-				}
-
-				if (e判定 != ENoteJudge.Miss && NotesManager.IsMine(chipNoHit)) {
-					this.tドラムヒット処理(nTime, (EPad)nPad, chipNoHit, false, nUsePlayer);
-					bHitted = true;
+					}
+					else if (NotesManager.IsADLIB(chipNoHit) || NotesManager.IsMine(chipNoHit)) {
+						this.tドラムヒット処理(nTime, nPad, chipNoHit, false, nUsePlayer);
+						continue;
+					}
 				}
 
 				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 				//-----------------------------
-				int pad = nPad; // 以下、nPad の代わりに pad を用いる。（成りすまし用）
-								// BAD or TIGHT 時の処理。
+				// BAD or TIGHT 時の処理。
 				if (OpenTaiko.ConfigIni.bTight && !this.bCurrentlyDrumRoll[nUsePlayer]) // 18/8/13 - 連打時にこれが発動すると困る!!! (AioiLight)
 					this.tチップのヒット処理_BadならびにTight時のMiss(null, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
 				//-----------------------------
