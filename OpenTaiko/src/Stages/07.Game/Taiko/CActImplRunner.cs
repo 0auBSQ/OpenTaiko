@@ -22,7 +22,7 @@ internal class CActImplRunner : CActivity {
 					break; // 2018.6.15 IMARER 無限ループが発生するので修正
 				}
 			}
-			if (pChip.nChannelNo < 0x15 || (pChip.nChannelNo >= 0x1A)) {
+			if (!(NotesManager.IsGenericRoll(pChip) || NotesManager.IsRollEnd(pChip))) {
 				if (!stRunners[Index].b使用中) {
 					stRunners[Index].b使用中 = true;
 					stRunners[Index].nPlayer = Player;
