@@ -13,7 +13,7 @@ internal class CActImplRunner : CActivity {
 		base.IsDeActivated = true;
 	}
 
-	public void Start(int Player, bool IsMiss, CChip pChip) {
+	public void Start(int Player, bool IsMiss, CChip? pChip) {
 		if (Runner != null && !OpenTaiko.ConfigIni.SimpleMode) {
 			while (stRunners[Index].b使用中) {
 				Index += 1;
