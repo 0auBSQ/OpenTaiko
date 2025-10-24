@@ -1322,20 +1322,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip.nChannelNo, eJudgeResult, nPlayer);
 				}
 			}
-
-
-
 		}
 
+		this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
+		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult);
+		this.UpdateComboMilestone(pChip, nPlayer);
+		this.AddScore(pChip, nPlayer, eJudgeResult);
 
+		return ENoteJudge.Auto;
+	}
+
+	private void UpdateGauge(CChip pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
 		if (NotesManager.IsMissableNote(pChip)) {
 			actGauge.Damage(screenmode, eJudgeResult, nPlayer, pChip.IsEndedBranching ? null : pChip.nBranch);
 		}
-
-
-
-
-
 
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 		bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
@@ -1415,7 +1415,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 		}
+	}
 
+	private void UpdateJudgeCount(CChip pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult) {
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -1542,9 +1544,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				break;
 		}
 		actDan.Update();
+	}
 
-		#region[ Combo voice ]
-
+	private void UpdateComboMilestone(CChip pChip, int nPlayer) {
 		if (NotesManager.IsMissableNote(pChip)) {
 			if ((this.actCombo.nCurrentCombo[nPlayer] % 100 == 0 || this.actCombo.nCurrentCombo[nPlayer] == 50) && this.actCombo.nCurrentCombo[nPlayer] > 0) {
 				this.actComboBalloon.Start(this.actCombo.nCurrentCombo[nPlayer], nPlayer);
@@ -1583,17 +1585,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 						}
 					}
 				}
-
-
 			}
 
 			this.t紙吹雪_開始();
 		}
-		#endregion
+	}
 
-
-
-
+	private void AddScore(CChip pChip, int nPlayer, ENoteJudge eJudgeResult) {
 		if ((eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
 			int nCombos = this.actCombo.nCurrentCombo[nPlayer];
 			long nInit = OpenTaiko.TJA.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer]];
@@ -1725,9 +1723,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CChartScore[nPlayer].nScore = __score;
 			this.CSectionScore[nPlayer].nScore = __score;
 		}
-
-
-		return ENoteJudge.Auto;
 	}
 
 	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part);
