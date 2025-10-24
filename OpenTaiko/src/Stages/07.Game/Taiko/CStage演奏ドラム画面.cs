@@ -656,13 +656,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		return eJudgeResult;
 	}
 
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part) {
-		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, 0, EInstrumentPad.Drums);
-	}
-	protected override void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane) {
-		this.tチップのヒット処理_BadならびにTight時のMiss(eCourse, part, nLane, EInstrumentPad.Drums);
-	}
-
 	private int ChannelNumToFlyNoteNum(CChip pChip, int nPlayer, bool b両手入力 = false, int nInput = 0) {
 		var _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 
@@ -910,7 +903,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				//-----------------------------
 				// BAD or TIGHT 時の処理。
 				if (OpenTaiko.ConfigIni.bTight)
-					this.tチップのヒット処理_BadならびにTight時のMiss(null, EInstrumentPad.Drums, 0, EInstrumentPad.Taiko);
+					this.tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad.Drums, e判定, nUsePlayer, null);
 				//-----------------------------
 				#endregion
 			}

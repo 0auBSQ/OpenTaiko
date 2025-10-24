@@ -1332,9 +1332,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return ENoteJudge.Auto;
 	}
 
-	private void UpdateGauge(CChip pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
-		if (NotesManager.IsMissableNote(pChip)) {
-			actGauge.Damage(screenmode, eJudgeResult, nPlayer, pChip.IsEndedBranching ? null : pChip.nBranch);
+	private void UpdateGauge(CChip? pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
+		if (pChip == null || NotesManager.IsMissableNote(pChip)) {
+			actGauge.Damage(screenmode, eJudgeResult, nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
 		}
 
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
@@ -1361,7 +1361,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 
-		if (eJudgeResult == ENoteJudge.Poor || pChip.IsMissed || eJudgeResult == ENoteJudge.Bad) {
+		if (eJudgeResult == ENoteJudge.Poor || eJudgeResult == ENoteJudge.Bad || (pChip?.IsMissed ?? eJudgeResult == ENoteJudge.Miss)) {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 
 			// ランナー(みすったやつ)
@@ -1417,7 +1417,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	private void UpdateJudgeCount(CChip pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult) {
+	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult) {
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -1436,27 +1436,30 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (NotesManager.IsGenericRoll(pChip) || NotesManager.IsADLIB(pChip))
 						break;
 
-					this.CBranchScore[nPlayer].nGreat++;
-					this.CChartScore[nPlayer].nGreat++;
-					this.CSectionScore[nPlayer].nGreat++;
 					this.Chara_MissCount[nPlayer] = 0;
 
-					if (nPlayer == 0)
-						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
-					this.actCombo.nCurrentCombo[nPlayer]++;
+					if (pChip != null) {
+						this.CBranchScore[nPlayer].nGreat++;
+						this.CChartScore[nPlayer].nGreat++;
+						this.CSectionScore[nPlayer].nGreat++;
 
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-						this.DanSongScore[actDan.NowShowingNumber].nGreat++;
-						this.tIncreaseComboDan(actDan.NowShowingNumber);
+						if (nPlayer == 0)
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
+						this.actCombo.nCurrentCombo[nPlayer]++;
+
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+							this.DanSongScore[actDan.NowShowingNumber].nGreat++;
+							this.tIncreaseComboDan(actDan.NowShowingNumber);
+						}
+
+						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+						} else {
+							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
+						}
+
+						AIRegisterInput(nPlayer, 1);
 					}
-
-					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-					} else {
-						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-					}
-
-					AIRegisterInput(nPlayer, 1);
 
 					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -1473,27 +1476,30 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (NotesManager.IsGenericRoll(pChip))
 						break;
 
-					this.CBranchScore[nPlayer].nGood++;
-					this.CChartScore[nPlayer].nGood++;
-					this.CSectionScore[nPlayer].nGood++;
 					this.Chara_MissCount[nPlayer] = 0;
 
-					if (nPlayer == 0)
-						(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
-					this.actCombo.nCurrentCombo[nPlayer]++;
+					if (pChip != null) {
+						this.CBranchScore[nPlayer].nGood++;
+						this.CChartScore[nPlayer].nGood++;
+						this.CSectionScore[nPlayer].nGood++;
 
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-						this.DanSongScore[actDan.NowShowingNumber].nGood++;
-						this.tIncreaseComboDan(actDan.NowShowingNumber);
+						if (nPlayer == 0)
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
+						this.actCombo.nCurrentCombo[nPlayer]++;
+
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+							this.DanSongScore[actDan.NowShowingNumber].nGood++;
+							this.tIncreaseComboDan(actDan.NowShowingNumber);
+						}
+
+						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
+							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
+						} else {
+							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
+						}
+
+						AIRegisterInput(nPlayer, 0.5f);
 					}
-
-					if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
-						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
-					} else {
-						this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 0;
-					}
-
-					AIRegisterInput(nPlayer, 0.5f);
 
 					OpenTaiko.stageGameScreen.actMtaiko.BackSymbolEvent(nPlayer);
 
@@ -1505,28 +1511,34 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				break;
 			case ENoteJudge.Miss:
-				if (pChip.IsMissed)
+				if (pChip?.IsMissed ?? true)
 					goto case ENoteJudge.Poor;
 				break;
 			case ENoteJudge.Poor:
 			case ENoteJudge.Bad: {
-					if (NotesManager.IsGenericRoll(pChip) || !(NotesManager.IsMissableNote(pChip) || bBombHit))
+					if (NotesManager.IsGenericRoll(pChip) || !(pChip == null || NotesManager.IsMissableNote(pChip) || bBombHit))
 						break;
 
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 						CFloorManagement.damage();
 
 					if (!bBombHit) {
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.DanSongScore[actDan.NowShowingNumber].nMiss++;
-
-						this.CBranchScore[nPlayer].nMiss++;
-						this.CChartScore[nPlayer].nMiss++;
-						this.CSectionScore[nPlayer].nMiss++;
 						this.Chara_MissCount[nPlayer]++;
+					}
 
-						if (nPlayer == 0)
-							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
+					if (pChip != null) {
+						if (!bBombHit) {
+							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+								this.DanSongScore[actDan.NowShowingNumber].nMiss++;
+
+							this.CBranchScore[nPlayer].nMiss++;
+							this.CChartScore[nPlayer].nMiss++;
+							this.CSectionScore[nPlayer].nMiss++;
+
+							if (nPlayer == 0)
+								(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
+						}
+						AIRegisterInput(nPlayer, 0f);
 					}
 
 					this.actCombo.nCurrentCombo[nPlayer] = 0;
@@ -1534,13 +1546,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 					this.actComboVoice.tReset(nPlayer);
 
-					AIRegisterInput(nPlayer, 0f);
 
 					this.bIsMiss[nPlayer] = true;
 				}
 				break;
 			default:
-				this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
+				if (pChip != null)
+					this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
 				break;
 		}
 		actDan.Update();
@@ -1725,17 +1737,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part);
-	protected abstract void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane);
-
-	protected void tチップのヒット処理_BadならびにTight時のMiss(CTja.ECourse? eCourse, EInstrumentPad part, int nLane, EInstrumentPad screenmode) {
-		// Something looks wrong with this (Notelock mode)
-		actGauge.Damage(screenmode, ENoteJudge.Miss, 0, eCourse);
-		this.actCombo.nCurrentCombo.P1 = 0;
-		this.actCombo.nCurrentCombo.P2 = 0;
-		this.actCombo.nCurrentCombo.P3 = 0;
-		this.actCombo.nCurrentCombo.P4 = 0;
-		this.actCombo.nCurrentCombo.P5 = 0;
+	protected void tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad screenmode, ENoteJudge eJudgeResult, int nPlayer, CTja.ECourse? eCourse) {
+		this.actJudgeString.Start(nPlayer, eJudgeResult);
+		this.UpdateGauge(null, screenmode, nPlayer, eJudgeResult);
+		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
 	}
 
 	protected CChip r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(long nTime, int nPlayer) {
