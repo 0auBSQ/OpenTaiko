@@ -26,7 +26,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nState;
 	public int nRollCount;
 	public int nBalloon;
-	public int nProcessTime;
+	public double msStoredHit = double.NegativeInfinity;
+	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
 	public ENoteState eNoteState;
 	public int nChannelNo;
