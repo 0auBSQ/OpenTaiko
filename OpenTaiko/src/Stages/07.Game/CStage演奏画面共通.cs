@@ -396,6 +396,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.ProcessRollEnd(i, this.chip現在処理中の連打チップ[i][iChip], false);
 			this.chip現在処理中の連打チップ[i].Clear();
 		}
+		for (int i = 0; i < this.chipNowProcessingMultiHitNotes.Length; ++i)
+			this.chipNowProcessingMultiHitNotes[i].Clear();
 
 		listWAV.Clear();
 		listWAV = null;
@@ -662,10 +664,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected int nWaitButton;
 
-	protected int[] nStoredHit;
 	private EGameType[] eFirstGameType;
 	protected bool[] bSplitLane;
 
+	public List<CChip>[] chipNowProcessingMultiHitNotes = [[], [], [], [], []]; // [iPlayer][idxNowProcessingMultiHitNotes]
 	private CChip? nowProcessingKusudama = null;
 	public List<CChip>[] chip現在処理中の連打チップ = [[], [], [], [], []]; // [iPlayer][idxNowProcessingRoll]
 	public double[] msCurrentBarRollProgress = [0, 0, 0, 0, 0]; // [iPlayer]
@@ -3147,7 +3149,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			if (!this.bPAUSE && !this.isRewinding) {
 				if (!pChip.IsMissed && !pChip.bHit) {
-					if (NotesManager.IsMissableNote(pChip))//|| pChip.nチャンネル番号 == 0x9A )
+					if (NotesManager.IsMissableNote(pChip) && pChip.eNoteState != ENoteState.Wait)
 					{
 						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
 						if (pChip.n発声時刻ms <= n現在時刻ms) {
@@ -3163,24 +3165,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 							pChip.bHit = true;
 						}
-					}
-				}
-			}
-		}
-
-		if (!this.bPAUSE) {
-			foreach (var cChipCurrentlyInProcess in chip現在処理中の連打チップ[nPlayer]) {
-				if (!cChipCurrentlyInProcess.bVisible || cChipCurrentlyInProcess.bHit)
-					continue;
-				//if( cChipCurrentlyInProcess.nチャンネル番号 >= 0x13 && cChipCurrentlyInProcess.nチャンネル番号 <= 0x15 )//|| pChip.nチャンネル番号 == 0x9A )
-				if (NotesManager.IsBigNote(cChipCurrentlyInProcess)) {
-					if ((cChipCurrentlyInProcess.n発声時刻ms - n現在時刻ms) < -CTja.GameDurationToTjaDuration(OpenTaiko.ConfigIni.nBigNoteWaitTimems)
-						&& (cChipCurrentlyInProcess.n発声時刻ms <= n現在時刻ms && cChipCurrentlyInProcess.end.n発声時刻ms >= n現在時刻ms))
-					//( ( chip現在処理中の連打チップ.nバーからのノーツ末端距離dot.Taiko < -500 ) && ( chip現在処理中の連打チップ.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && chip現在処理中の連打チップ.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
-					//( ( pChip.n発声時刻ms <= CSound管理.rc演奏用タイマ.n現在時刻ms && pChip.nノーツ終了時刻ms >= CSound管理.rc演奏用タイマ.n現在時刻ms ) ) )
-					{
-						if (bAutoPlay)
-							this.tチップのヒット処理(n現在時刻ms, cChipCurrentlyInProcess, EInstrumentPad.Taiko, false, 0, nPlayer);
 					}
 				}
 			}
@@ -3459,6 +3443,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						OpenTaiko.stageGameScreen.actChipFireD.Start(0x11, ENoteJudge.Mine, iPlayer);
 						actGauge.MineDamage(iPlayer);
 						OpenTaiko.Skin.soundBomb?.tPlay();
+						this.Chara_MissCount[iPlayer]++;
 						this.CChartScore[iPlayer].nMine++;
 						this.CSectionScore[iPlayer].nMine++;
 						this.CBranchScore[iPlayer].nMine++;
@@ -3855,7 +3840,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					chip.IsHitted = false;
 					chip.IsMissed = false;
 					chip.eNoteState = ENoteState.None;
-					chip.nProcessTime = 0;
+					chip.msStoredHit = double.NegativeInfinity;
+					chip.padStoredHit = EPad.Unknown;
 					chip.nRollCount = 0;
 					chip.nRollCount = 0;
 					chip.ResetRollEffect();
@@ -3957,6 +3943,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				if (!NotesManager.IsHittableNote(chip))
 					chip.bHit = false;
 			}
+
+			for (int iChip = this.chipNowProcessingMultiHitNotes[i].Count; iChip-- > 0;) {
+				var chip = this.chipNowProcessingMultiHitNotes[i][iChip];
+				if (chip.eNoteState == ENoteState.Wait)
+					chip.eNoteState = ENoteState.None;
+			}
+			this.chipNowProcessingMultiHitNotes[i].Clear();
 		}
 
 		foreach (var chip in this.objHandlers.Keys) {
@@ -3978,8 +3971,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		dtLastQueueOperation = DateTime.MinValue;
-
-		this.nStoredHit = new int[OpenTaiko.ConfigIni.nPlayerCount];
 	}
 
 	// returns the chip index at the target measure of the first player
