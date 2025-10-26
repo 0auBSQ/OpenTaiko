@@ -876,7 +876,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 									this.nStoredHit[nUsePlayer] = 0;
 									if (!_isPinkKonga) {
 										this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
-										continue;
 									}
 								}
 							}
