@@ -1522,9 +1522,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 						CFloorManagement.damage();
 
-					if (!bBombHit) {
-						this.Chara_MissCount[nPlayer]++;
-					}
+					this.Chara_MissCount[nPlayer]++;
 
 					if (pChip != null) {
 						if (!bBombHit) {
