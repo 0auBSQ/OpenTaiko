@@ -23,25 +23,14 @@ class NotesManager {
 		["B"] = 11, // Joint Big Ka (2P)
 		["C"] = 12, // Mine
 		["D"] = 13, // ProjectOutfox's Fuse roll
-		["E"] = 0, // Unused
 		["F"] = 15, // ADLib
 		["G"] = 0xF1, // Green (Purple) double hit note
 		["H"] = 16, // Konga clap roll | Taiko big roll
 		["I"] = 17, // Konga yellow roll | Taiko small roll
 	};
 
-	public static bool FastFlankedParsing(string s) {
-		if (s[0] >= '0' && s[0] <= '9')
-			return true;
-
-		for (int i = 0; i < s.Length; i++) {
-			if (GetNoteValueFromChar(s.Substring(i, 1)) == -1
-				&& s.Substring(i, 1) != ",")
-				return false;
-		}
-
-		return true;
-	}
+	public static bool IsLikelyNoteDataLine(string leftTrimmed)
+		=> char.IsAsciiDigit(leftTrimmed[0]) || (leftTrimmed[0] != '#' && !leftTrimmed.Contains(':'));
 
 	public static int GetNoteValueFromChar(string chr) {
 		if (NoteCorrespondanceDictionnary.ContainsKey(chr))

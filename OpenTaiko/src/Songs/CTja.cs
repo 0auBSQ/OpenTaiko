@@ -1271,23 +1271,16 @@ internal class CTja : CActivity {
 		string line = input.Trim();
 
 		if (nMode == 0) {
-			if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
-				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-					//A～Fで始まる命令が削除されない不具合の対策
-				} else {
-					return line;
-				}
+			if (!string.IsNullOrEmpty(line) && NotesManager.IsLikelyNoteDataLine(line)) {
+				return line;
 			}
 		} else if (nMode == 1) {
-			if (!string.IsNullOrEmpty(line) &&
-				(line.Substring(0, 1) == "#"
-					|| line.StartsWith("EXAM")
-					|| NotesManager.FastFlankedParsing(line))) {
-				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-					//A～Fで始まる命令が削除されない不具合の対策
-				} else {
-					return line;
-				}
+			if (!string.IsNullOrEmpty(line) && (
+				line.Substring(0, 1) == "#"
+				|| line.StartsWith("EXAM")
+				|| NotesManager.IsLikelyNoteDataLine(line)
+			)) {
+				return line;
 			}
 		}
 		return null;
