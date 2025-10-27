@@ -8,35 +8,64 @@ class NotesManager {
 
 	#region [Parsing]
 
-	public static Dictionary<string, int> NoteCorrespondanceDictionnary = new Dictionary<string, int>() {
-		["0"] = 0, // Empty
-		["1"] = 1, // Small Don (Taiko) | Red (right) hit (Konga)
-		["2"] = 2, // Small Ka (Taiko) | Yellow (left) hit (Konga)
-		["3"] = 3, // Big Don (Taiko) | Pink note (Konga)
-		["4"] = 4, // Big Ka (Taiko) | Clap (Konga)
-		["5"] = 5, // Small roll start | Konga red roll
-		["6"] = 6, // Big roll start | Konga pink roll
-		["7"] = 7, // Balloon
-		["8"] = 8, // Roll/Balloon end
-		["9"] = 9, // Kusudama
-		["A"] = 10, // Joint Big Don (2P)
-		["B"] = 11, // Joint Big Ka (2P)
-		["C"] = 12, // Mine
-		["D"] = 13, // ProjectOutfox's Fuse roll
-		["F"] = 15, // ADLib
-		["G"] = 0xF1, // Green (Purple) double hit note
-		["H"] = 16, // Konga clap roll | Taiko big roll
-		["I"] = 17, // Konga yellow roll | Taiko small roll
+	public enum ENoteType {
+		Empty = 0,
+		Don = 1, Po = 1,
+		Ka = 2, Pa = 2,
+		DonBig = 3, Double = 3,
+		KaBig = 4, Clap = 4,
+		Roll = 5, RollPo = 5,
+		RollBig = 6, RollDouble = 6,
+		Balloon = 7,
+		EndRoll = 8,
+		BalloonEx = 9,
+		DonHand = 0xA, DoubleHand = 0xA,
+		KaHand = 0xB, ClapHand = 0xB,
+		Bomb = 0xC,
+		BalloonFuze = 0xD,
+		Adlib = 0xF,
+		Kadon = 0xF1,
+		RollClap = 0x10,
+		RollPa = 0x11,
+		Unknown = -1,
+	}
+
+	public static Dictionary<string, ENoteType> CharToNoteType = new() {
+		["0"] = ENoteType.Empty, // Empty
+		["1"] = ENoteType.Don, // Small Don (Taiko) | Red (right) hit (Konga)
+		["2"] = ENoteType.Ka, // Small Ka (Taiko) | Yellow (left) hit (Konga)
+		["3"] = ENoteType.DonBig, // Big Don (Taiko) | Pink note (Konga)
+		["4"] = ENoteType.KaBig, // Big Ka (Taiko) | Clap (Konga)
+		["5"] = ENoteType.Roll, // Small roll start | Konga red roll
+		["6"] = ENoteType.RollBig, // Big roll start | Konga pink roll
+		["7"] = ENoteType.Balloon, // Balloon
+		["8"] = ENoteType.EndRoll, // Roll/Balloon end
+		["9"] = ENoteType.BalloonEx, // Kusudama
+		["A"] = ENoteType.DonHand, // Joint Big Don (2P)
+		["B"] = ENoteType.KaHand, // Joint Big Ka (2P)
+		["C"] = ENoteType.Bomb, // Mine
+		["D"] = ENoteType.BalloonFuze, // ProjectOutfox's Fuse roll
+		["F"] = ENoteType.Adlib, // ADLib
+		["G"] = ENoteType.Kadon, // Green (Purple) double hit note
+		["H"] = ENoteType.RollClap, // Konga clap roll | Taiko big roll
+		["I"] = ENoteType.RollPa, // Konga yellow roll | Taiko small roll
 	};
+
+	public static Dictionary<ENoteType, string> NoteTypeToChar = CharToNoteType.Select(x => (x.Value, x.Key)).ToDictionary();
 
 	public static bool IsLikelyNoteDataLine(string leftTrimmed)
 		=> char.IsAsciiDigit(leftTrimmed[0]) || (leftTrimmed[0] != '#' && !leftTrimmed.Contains(':'));
 
-	public static int GetNoteValueFromChar(string chr) {
-		if (NoteCorrespondanceDictionnary.ContainsKey(chr))
-			return NoteCorrespondanceDictionnary[chr];
-		return -1;
-	}
+	public static ENoteType GetNoteType(string chr)
+		=> CharToNoteType.GetValueOrDefault(chr, ENoteType.Unknown);
+	public static ENoteType GetNoteType(int channelNo)
+		=> Enum.IsDefined((ENoteType)(channelNo - 0x10)) ? (ENoteType)(channelNo - 0x10) : ENoteType.Unknown;
+	public static ENoteType GetNoteType(CChip? chip)
+		=> (chip != null) ? GetNoteType(chip.nChannelNo) : ENoteType.Unknown;
+
+	public static string? ToNoteChar(ENoteType nt)
+		=> NoteTypeToChar.GetValueOrDefault(nt);
+	public static int ToChannelNo(ENoteType nt) => 0x10 + (int)nt;
 
 	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll) {
@@ -153,150 +182,49 @@ class NotesManager {
 
 	#region [General]
 
-	public static bool IsCommonNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo >= 0x11 && chip.nChannelNo < 0x18;
-	}
-	public static bool IsMine(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1C;
-	}
-
-	public static bool IsDonNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x11 || chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A;
-	}
-
-	public static bool IsKaNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B;
-	}
-
-	public static bool IsSmallNote(CChip chip, bool blue) {
-		if (chip == null) return false;
-		return blue ? chip.nChannelNo == 0x12 : chip.nChannelNo == 0x11;
-	}
-
-	public static bool IsSmallNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x11;
-	}
-
-	public static bool IsBigNote(CChip chip) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1A || chip.nChannelNo == 0x1B);
-	}
-
-	public static bool IsBigKaTaiko(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Taiko;
-	}
-
-	public static bool IsBigDonTaiko(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A) && gt == EGameType.Taiko;
-	}
-
-	public static bool IsClapKonga(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Konga;
-	}
-
-	public static bool IsSwapNote(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (
-			IsKongaPink(chip, gt)                           // Konga Pink note
-			|| IsPurpleNote(chip)                       // Purple (Green) note
-		);
-	}
-
-	public static bool IsKongaPink(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		// Purple notes are treated as Pink in Konga
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A || IsPurpleNote(chip)) && gt == EGameType.Konga;
-	}
-	public static bool IsPurpleNote(CChip chip) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x101);
-	}
-
-	public static bool IsYellowRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x21;
-	}
-
-	public static bool IsClapRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x20;
-	}
-
-	public static bool IsKusudama(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x19;
-	}
-
-	public static bool IsFuzeRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1D;
-	}
-
-	public static bool IsRollEnd(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x18;
-	}
-
-	public static bool IsBalloon(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x17;
-	}
-
-	public static bool IsBigRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x16;
-	}
-
-	public static bool IsSmallRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x15;
-	}
-
-	public static bool IsADLIB(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1F;
-	}
-
-	public static bool IsRoll(CChip chip) {
-		if (chip == null) return false;
-		return IsBigRoll(chip) || IsSmallRoll(chip) || IsClapRoll(chip) || IsYellowRoll(chip);
-	}
-
-	public static bool IsGenericBalloon(CChip chip) {
-		if (chip == null) return false;
-		return IsBalloon(chip) || IsKusudama(chip) || IsFuzeRoll(chip);
-	}
-
-	public static bool IsGenericRoll(CChip chip) {
-		if (chip == null) return false;
-		return (0x15 <= chip.nChannelNo && chip.nChannelNo <= 0x19) ||
-			   (chip.nChannelNo == 0x20 || chip.nChannelNo == 0x21)
-			   || chip.nChannelNo == 0x1D;
-	}
-
-	public static bool IsMissableNote(CChip chip) {
-		if (chip == null) return false;
-		return (0x11 <= chip.nChannelNo && chip.nChannelNo <= 0x14)
-			   || chip.nChannelNo == 0x1A
-			   || chip.nChannelNo == 0x1B
-			   || chip.nChannelNo == 0x101;
-	}
-
-	public static bool IsHittableNote(CChip chip) {
-		if (chip == null) return false;
-		return IsMissableNote(chip)
-			   || IsGenericRoll(chip)
-			   || IsADLIB(chip)
-			   || IsMine(chip);
-	}
+	public static bool IsCommonNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.Roll or ENoteType.RollBig or ENoteType.Balloon;
+	public static bool IsMine(ENoteType nt) => nt is ENoteType.Bomb;
+	public static bool IsDonNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.DonBig or ENoteType.DonHand;
+	public static bool IsKaNote(ENoteType nt)
+		=> nt is ENoteType.Ka or ENoteType.KaBig or ENoteType.KaHand;
+	public static bool IsSmallNote(ENoteType nt, bool blue)
+		=> (nt, blue) is (ENoteType.Don, false) or (ENoteType.Ka, true);
+	public static bool IsSmallNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.Ka;
+	public static bool IsBigNote(ENoteType nt, EGameType gt)
+		=> (nt, gt) is (ENoteType.DonBig or ENoteType.DonHand or ENoteType.KaBig or ENoteType.KaHand, EGameType.Taiko);
+	public static bool IsBigKaTaiko(ENoteType nt, EGameType gt)
+		=> (nt, gt) is (ENoteType.KaBig or ENoteType.KaHand, EGameType.Taiko);
+	public static bool IsBigDonTaiko(ENoteType nt, EGameType gt)
+		=> (nt, gt) is (ENoteType.DonBig or ENoteType.DonHand, EGameType.Taiko);
+	public static bool IsClapKonga(ENoteType nt, EGameType gt)
+		=> (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
+	public static bool IsSwapNote(ENoteType nt, EGameType gt)
+		=> IsKongaPink(nt, gt) || IsPurpleNote(nt);
+	public static bool IsKongaPink(ENoteType nt, EGameType gt) // Purple notes are treated as Pink in Konga
+		=> (nt, gt) is (ENoteType.Double or ENoteType.DoubleHand or ENoteType.Kadon, EGameType.Konga);
+	public static bool IsPurpleNote(ENoteType nt) => nt is ENoteType.Kadon;
+	public static bool IsYellowRoll(ENoteType nt) => nt is ENoteType.RollPa;
+	public static bool IsClapRoll(ENoteType nt) => nt is ENoteType.RollClap;
+	public static bool IsKusudama(ENoteType nt) => nt is ENoteType.BalloonEx;
+	public static bool IsFuzeRoll(ENoteType nt) => nt is ENoteType.BalloonFuze;
+	public static bool IsRollEnd(ENoteType nt) => nt is ENoteType.EndRoll;
+	public static bool IsBalloon(ENoteType nt) => nt is ENoteType.Balloon;
+	public static bool IsBigRoll(ENoteType nt) => nt is ENoteType.RollBig;
+	public static bool IsSmallRoll(ENoteType nt) => nt is ENoteType.Roll;
+	public static bool IsADLIB(ENoteType nt) => nt is ENoteType.Adlib;
+	public static bool IsRoll(ENoteType nt)
+		=> IsBigRoll(nt) || IsSmallRoll(nt) || IsClapRoll(nt) || IsYellowRoll(nt);
+	public static bool IsGenericBalloon(ENoteType nt)
+		=> IsBalloon(nt) || IsKusudama(nt) || IsFuzeRoll(nt);
+	public static bool IsGenericRoll(ENoteType nt)
+		=> IsRoll(nt) || IsGenericBalloon(nt) || IsRollEnd(nt);
+	public static bool IsMissableNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.DonHand or ENoteType.KaHand or ENoteType.Kadon;
+	public static bool IsHittableNote(ENoteType nt)
+		=> IsMissableNote(nt) || IsGenericRoll(nt) || IsADLIB(nt) || IsMine(nt);
 
 	#endregion
 
