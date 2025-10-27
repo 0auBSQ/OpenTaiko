@@ -1635,7 +1635,7 @@ internal class CTja : CActivity {
 							: $"An unended roll is ended by #END."
 						);
 					}
-					InsertNoteAtDefCursor(8, 0, 1, branch);
+					InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, 0, 1, branch);
 				}
 			}
 
@@ -2733,28 +2733,27 @@ internal class CTja : CActivity {
 					}
 
 
-					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
+					var noteType = NotesManager.GetNoteType(InputText.Substring(n, 1));
 
-					if (nObjectNum != 0) {
+					if (noteType != NotesManager.ENoteType.Empty) {
 						this.ForEachCurrentBranch((branch) => {
 							int iBranch = (int)branch;
 
-							// TODO: add judge-by-note-type methods to NotesManager
-							bool isRollHead = (nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17;
+							bool isRollHead = NotesManager.IsGenericRoll(noteType) && !NotesManager.IsRollEnd(noteType);
 							if (this.nNowRollCountBranch[iBranch] >= 0) {
 								if (isRollHead) {
 									// repeated roll head; treated as blank
 									return; // process this note symbol in the next branch
 								}
-								if (nObjectNum != 8) {
+								if (noteType != NotesManager.ENoteType.EndRoll) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
 									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
 										this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
-											$"An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
-											: $"An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText}"
+											$"An unended roll is ended by a non-roll of type {noteType} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
+											: $"An unended roll is ended by a non-roll of type {noteType} at measure {this.n現在の小節数}. Input: {InputText}"
 										);
 									}
-									InsertNoteAtDefCursor(8, n, n文字数, branch);
+									InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, n, n文字数, branch);
 
 								}
 							}
@@ -2764,12 +2763,12 @@ internal class CTja : CActivity {
 								this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
 							}
 
-							if (nObjectNum < 0) {
+							if (noteType is NotesManager.ENoteType.Unknown) {
 								this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
 									$"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
 									: $"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
 							} else {
-								InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
+								InsertNoteAtDefCursor(noteType, n, n文字数, branch);
 							}
 						});
 					}
@@ -2817,16 +2816,16 @@ internal class CTja : CActivity {
 		return chip;
 	}
 
-	private void InsertNoteAtDefCursor(int noteType, int iDiv, int divsPerMeasure, ECourse branch) {
+	private void InsertNoteAtDefCursor(NotesManager.ENoteType noteType, int iDiv, int divsPerMeasure, ECourse branch) {
 		int iBranch = (int)branch;
 
-		CChip chip = this.NewScrolledChipAtDefCursor(0x10 + noteType, iDiv, divsPerMeasure, branch);
+		CChip chip = this.NewScrolledChipAtDefCursor(NotesManager.ToChannelNo(noteType), iDiv, divsPerMeasure, branch);
 		chip.IsMissed = false;
 		chip.bHit = false;
 		chip.bShow = true;
 		chip.bShowRoll = true;
 		chip.db発声位置 = this.dbNowTime;
-		chip.n整数値 = noteType;
+		chip.n整数値 = (int)noteType;
 		chip.n整数値_内部番号 = 1;
 		chip.nScrollDirection = this.nスクロール方向;
 		chip.n分岐回数 = 0; // unused; placeholder value
@@ -2880,17 +2879,17 @@ internal class CTja : CActivity {
 
 		#region[ 固定される種類のsenotesはここで設定しておく。 ]
 		chip.nSenote = noteType switch {
-			3 => 5,
-			4 => 6,
-			5 => 7,
-			6 => 0xA,
-			7 => 0xB,
-			8 => 0xC,
-			9 => 0xB,
-			0xA => 5,
-			0xB => 6,
-			0xD => 0xB,
-			0xF1 => 5,
+			NotesManager.ENoteType.DonBig => 5,
+			NotesManager.ENoteType.KaBig => 6,
+			NotesManager.ENoteType.Roll => 7,
+			NotesManager.ENoteType.RollBig => 0xA,
+			NotesManager.ENoteType.Balloon => 0xB,
+			NotesManager.ENoteType.EndRoll => 0xC,
+			NotesManager.ENoteType.BalloonEx => 0xB,
+			NotesManager.ENoteType.DonHand => 5,
+			NotesManager.ENoteType.KaHand => 6,
+			NotesManager.ENoteType.BalloonFuze => 0xB,
+			NotesManager.ENoteType.Kadon => 5,
 			_ => chip.nSenote,
 		};
 		#endregion
@@ -3536,14 +3535,6 @@ internal class CTja : CActivity {
 			return true;
 		else
 			return false;
-	}
-
-	/// <summary>
-	/// string型からint型に変換する。
-	/// TJAP2から持ってきた。
-	/// </summary>
-	private int CharConvertNote(string str) {
-		return (NotesManager.GetNoteValueFromChar(str));
 	}
 
 	private int strConvertCourse(string str) {

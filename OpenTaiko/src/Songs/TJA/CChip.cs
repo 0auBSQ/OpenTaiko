@@ -194,6 +194,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.dbSCROLL = 1.0;
 		this.dbSCROLL_Y = 0.0f;
 	}
+
+	public static implicit operator NotesManager.ENoteType(CChip? chip) => NotesManager.GetNoteType(chip);
+
 	public override string ToString() {
 
 		//2016.10.07 kairera0467 近日中に再編成予定
