@@ -319,7 +319,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 	}
 
-	public virtual void Start(int nLane, ENoteJudge judge, int player) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, int player) {
 	}
 
 	//-----------------

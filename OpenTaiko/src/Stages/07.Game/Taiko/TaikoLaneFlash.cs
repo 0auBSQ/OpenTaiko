@@ -27,9 +27,7 @@ internal class TaikoLaneFlash : CActivity {
 
 	public override int Draw() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			for (int j = 0; j < (int)FlashType.Total; j++) {
-				PlayerLane[i].Flash[j].Draw();
-			}
+			PlayerLane[i].Draw();
 		}
 		return base.Draw();
 	}
@@ -39,20 +37,27 @@ internal class TaikoLaneFlash : CActivity {
 }
 public class PlayerLane {
 	public PlayerLane(int player) {
-		Flash = new LaneFlash[(int)FlashType.Total];
-		var _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
-
-		Flash[(int)FlashType.Red] = new LaneFlash(ref OpenTaiko.Tx.Lane_Red[(int)_gt], player);
-		Flash[(int)FlashType.Blue] = new LaneFlash(ref OpenTaiko.Tx.Lane_Blue[(int)_gt], player);
-		Flash[(int)FlashType.Clap] = new LaneFlash(ref OpenTaiko.Tx.Lane_Clap[(int)_gt], player);
-		Flash[(int)FlashType.Hit] = new LaneFlash(ref OpenTaiko.Tx.Lane_Yellow, player);
+		Flash = new LaneFlash[2, (int)FlashType.Total];
+		for (EGameType gt = 0; gt <= EGameType.Konga; ++gt) {
+			Flash[(int)gt, (int)FlashType.Red] = new LaneFlash(ref OpenTaiko.Tx.Lane_Red[(int)gt], player);
+			Flash[(int)gt, (int)FlashType.Blue] = new LaneFlash(ref OpenTaiko.Tx.Lane_Blue[(int)gt], player);
+			Flash[(int)gt, (int)FlashType.Clap] = new LaneFlash(ref OpenTaiko.Tx.Lane_Clap[(int)gt], player);
+			Flash[(int)gt, (int)FlashType.Hit] = new LaneFlash(ref OpenTaiko.Tx.Lane_Yellow, player);
+		}
 	}
-	public void Start(FlashType flashType) {
+	public void Start(FlashType flashType, EGameType gameType) {
 		if (flashType == FlashType.Total) return;
-		Flash[(int)flashType].Start();
+		Flash[(int)gameType, (int)flashType].Start();
+	}
+	public void Draw() {
+		for (EGameType gt = 0; gt <= EGameType.Konga; ++gt) {
+			for (int j = 0; j < (int)FlashType.Total; j++) {
+				this.Flash[(int)gt, j].Draw();
+			}
+		}
 	}
 
-	public LaneFlash[] Flash;
+	public LaneFlash[,] Flash; // [gameType, flashType]
 
 	public enum FlashType {
 		Red,

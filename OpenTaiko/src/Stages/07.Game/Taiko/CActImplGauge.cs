@@ -18,28 +18,15 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 		base.IsDeActivated = true;
 	}
 
-	public override void Start(int nLane, ENoteJudge judge, int player) {
+	public override void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, int player) {
 		for (int j = 0; j < 32; j++) {
 			if (player == 0) {
 				if (!this.st花火状態[player][j].b使用中) {
 					this.st花火状態[player][j].ct進行 = new CCounter(0, 10, 20, OpenTaiko.Timer);
 					this.st花火状態[player][j].nPlayer = player;
-
-					switch (nLane) {
-						case 0x11:
-						case 0x12:
-						case 0x15:
-							this.st花火状態[player][j].isBig = false;
-							break;
-						case 0x13:
-						case 0x14:
-						case 0x16:
-						case 0x17:
-							this.st花火状態[player][j].isBig = true;
-							break;
-					}
 					this.st花火状態[player][j].nLane = nLane;
-
+					this.st花火状態[player][j].gameType = gameType;
+					this.st花火状態[player][j].isBig = NotesManager.IsBigNoteTaiko(nLane, gameType) || NotesManager.IsBigRollTaiko(nLane, gameType) || NotesManager.IsBalloon(nLane);
 					this.st花火状態[player][j].b使用中 = true;
 					break;
 				}
@@ -404,7 +391,8 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 		public bool isBig;
 		public bool b使用中;
 		public int nPlayer;
-		public int nLane;
+		public NotesManager.ENoteType nLane;
+		public EGameType gameType;
 	}
 	//-----------------
 	#endregion

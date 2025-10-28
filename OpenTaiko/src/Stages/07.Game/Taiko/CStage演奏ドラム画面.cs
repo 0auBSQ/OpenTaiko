@@ -652,44 +652,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		return eJudgeResult;
 	}
 
-	private int ChannelNumToFlyNoteNum(CChip pChip, int nPlayer, bool b両手入力 = false, int nInput = 0) {
-		var _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
-
-		int nFly = 0;
-		switch (pChip.nChannelNo) {
-			case 0x11:
-				nFly = 1;
-				break;
-			case 0x12:
-				nFly = 2;
-				break;
-			case 0x13:
-			case 0x1A:
-				nFly = b両手入力 ? 3 : 1;
-				break;
-			case 0x14:
-			case 0x1B:
-				nFly = (b両手入力 || _gt == EGameType.Konga) ? 4 : 2;
-				break;
-			case 0x1F:
-				nFly = nInput == 0 ? 1 : 2;
-				break;
-			case 0x101:
-				nFly = 5;
-				break;
-			default:
-				nFly = 1;
-				break;
-		}
-		return nFly;
-	}
-
 	private bool tドラムヒット処理(long nHitTime, EPad type, CChip pChip, bool b両手入力, int nPlayer) {
-		int nInput = NotesManager.PadTo1P(type) switch {
-			EPad.LRed or EPad.RRed => b両手入力 ? 2 : 0,
-			EPad.LBlue or EPad.RBlue => b両手入力 ? 3 : 1,
-			EPad.Clap => 4,
-			_ => 0,
+		var nInput = NotesManager.PadTo1P(type) switch {
+			EPad.LRed or EPad.RRed => b両手入力 ? NotesManager.EInputType.RedBig : NotesManager.EInputType.Red,
+			EPad.LBlue or EPad.RBlue => b両手入力 ? NotesManager.EInputType.BlueBig : NotesManager.EInputType.Blue,
+			EPad.Clap => NotesManager.EInputType.Clap,
+			_ => NotesManager.EInputType.Unknown,
 		};
 
 		if (!(pChip != null && NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip))) {
@@ -713,12 +681,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		this.tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Taiko, true, nInput, nPlayer);
 
 		if ((e判定 != ENoteJudge.Poor) && (e判定 != ENoteJudge.Miss)) {
-			OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip.nChannelNo, e判定, b両手入力, nPlayer);
-
-			int nFly = ChannelNumToFlyNoteNum(pChip, nPlayer, b両手入力, nInput);
-
-			this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
-			this.FlyingNotes.Start(nFly, nPlayer);
+			var gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+			bool isBigInput = b両手入力 || !OpenTaiko.ConfigIni.bJudgeBigNotes;
+			OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, e判定, isBigInput, nPlayer);
+			this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
+			this.FlyingNotes.Start(NotesManager.GetFlyNoteType(pChip, gt, isBigInput), gt, nPlayer);
 		}
 
 		return true;
@@ -790,11 +757,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				#region [Visual and sound effects]
 				int nHand = NotesManager.PadToHand(nPad);
-				(int nChannel, CSound? sound) = nLane switch {
-					PlayerLane.FlashType.Red => (0x11, this.soundRed[nUsePlayer]),
-					PlayerLane.FlashType.Blue => (0x12, this.soundBlue[nUsePlayer]),
-					PlayerLane.FlashType.Clap => (0x14, this.soundClap[nUsePlayer]),
-					_ => (0, null),
+				(NotesManager.ENoteType noteType, CSound? sound) = nLane switch {
+					PlayerLane.FlashType.Red => (NotesManager.ENoteType.Don, this.soundRed[nUsePlayer]),
+					PlayerLane.FlashType.Blue => (NotesManager.ENoteType.Ka, this.soundBlue[nUsePlayer]),
+					PlayerLane.FlashType.Clap => (NotesManager.ENoteType.Clap, this.soundClap[nUsePlayer]),
+					_ => (NotesManager.ENoteType.Empty, null),
 				};
 
 				// ADLIB sound
@@ -803,8 +770,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				sound?.PlayStart();
 
-				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start(nLane);
-				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(nChannel, nHand, nUsePlayer);
+				OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start(nLane, gameType);
+				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(noteType, gameType, nHand, nUsePlayer);
 				#endregion
 
 				// Chip bools
@@ -918,7 +885,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.t背景テクスチャの生成(DefaultBgFilename, bgrect, BgFilename);
 	}
 	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		int nLane = (int)PlayerLane.FlashType.Red;
 		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
@@ -937,22 +903,24 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					if (bAutoPlay && !this.bPAUSE && !NotesManager.IsMine(pChip)) {
 						pChip.bHit = true;
-						if (!NotesManager.IsADLIB(pChip)) // Provisional, to avoid crash on 0x101
-							this.FlyingNotes.Start(ChannelNumToFlyNoteNum(pChip, nPlayer), nPlayer);
 
-						//this.actChipFireTaiko.Start(pChip.nチャンネル番号 < 0x1A ? (pChip.nチャンネル番号 - 0x10) : (pChip.nチャンネル番号 - 0x17), nPlayer);
-						if (pChip.nChannelNo == 0x12 || pChip.nChannelNo == 0x14 || pChip.nChannelNo == 0x1B) nLane = (int)PlayerLane.FlashType.Blue;
+						var nInputAuto = NotesManager.EInputType.Red;
+						if (NotesManager.IsSmallBlue(pChip, _gt))
+							nInputAuto = NotesManager.EInputType.Blue;
+						else if (NotesManager.IsBigDonTaiko(pChip, _gt))
+							nInputAuto = OpenTaiko.ConfigIni.bJudgeBigNotes ? NotesManager.EInputType.RedBig : NotesManager.EInputType.Red;
+						else if (NotesManager.IsBigKaTaiko(pChip, _gt))
+							nInputAuto = OpenTaiko.ConfigIni.bJudgeBigNotes ? NotesManager.EInputType.BlueBig : NotesManager.EInputType.Blue;
+						else if (NotesManager.IsClapKonga(pChip, _gt))
+							nInputAuto = NotesManager.EInputType.Clap;
 
-						if (pChip.nChannelNo == 0x14 && _gt == EGameType.Konga) nLane = (int)PlayerLane.FlashType.Clap;
+						this.FlyingNotes.Start(NotesManager.GetFlyNoteType(pChip, _gt, true), _gt, nPlayer);
+						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(NotesManager.InputToLane(nInputAuto), _gt);
+						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, _gt);
 
-						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start((PlayerLane.FlashType)nLane);
-						OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit);
+						this.actMtaiko.tMtaikoEvent(pChip, _gt, this.nHand[nPlayer], nPlayer, isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
 
-						this.actMtaiko.tMtaikoEvent(pChip.nChannelNo, this.nHand[nPlayer], nPlayer);
-
-						int n大音符 = (pChip.nChannelNo == 0x11 || pChip.nChannelNo == 0x12 ? 2 : 0);
-
-						this.tチップのヒット処理(pChip.n発声時刻ms, pChip, EInstrumentPad.Taiko, true, nLane + n大音符, nPlayer, false);
+						this.tチップのヒット処理(pChip.n発声時刻ms, pChip, EInstrumentPad.Taiko, true, nInputAuto, nPlayer, false);
 						this.tサウンド再生(pChip, nPlayer);
 						return;
 					}
