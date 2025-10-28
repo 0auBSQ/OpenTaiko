@@ -842,7 +842,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 								if (_isExpected && _timeBadOrLater && msWaitedTime < msMaxWaitTime) {
 									chipNoHit.eNoteState = ENoteState.None;
 									chipNoHit.padStoredHit = EPad.Unknown;
-									this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, true, nUsePlayer);
+									this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPadAs1P, chipNoHit, true, nUsePlayer);
 									continue;
 								}
 								// Double tap failure
@@ -850,7 +850,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 									chipNoHit.eNoteState = ENoteState.None;
 									chipNoHit.padStoredHit = EPad.Unknown;
 									if (!_isPinkKonga) {
-										this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+										this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPadAs1P, chipNoHit, false, nUsePlayer);
 									}
 								}
 							}
