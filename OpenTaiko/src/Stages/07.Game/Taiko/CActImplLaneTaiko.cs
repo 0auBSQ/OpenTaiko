@@ -498,7 +498,7 @@ internal class CActImplLaneTaiko : CActivity {
 				//if( this.txアタックエフェクトLower != null )
 				{
 					//this.txアタックエフェクトLower.b加算合成 = true;
-					int n = this.st状態[i].nIsBig == 1 ? 520 : 0;
+					int n = this.st状態[i].IsBig ? 520 : 0;
 
 					float x = 0;
 					float y = 0;
@@ -522,7 +522,7 @@ internal class CActImplLaneTaiko : CActivity {
 						case ENoteJudge.Auto:
 							if (!OpenTaiko.ConfigIni.SimpleMode) {
 								//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
-								if (this.st状態[i].nIsBig == 1 && OpenTaiko.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
+								if (this.st状態[i].IsBig && OpenTaiko.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
 									OpenTaiko.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
 								else if (OpenTaiko.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
 									OpenTaiko.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
@@ -531,7 +531,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 						case ENoteJudge.Good:
 							//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
-							if (this.st状態[i].nIsBig == 1 && OpenTaiko.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue] != null)
+							if (this.st状態[i].IsBig && OpenTaiko.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue] != null)
 								OpenTaiko.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
 							else if (OpenTaiko.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue] != null)
 								OpenTaiko.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
@@ -548,7 +548,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	}
 
-	public virtual void Start(int nLane, ENoteJudge judge, bool b両手入力, int nPlayer) {
+	public virtual void Start(NotesManager.ENoteType Lane, EGameType gameType, ENoteJudge judge, bool b両手入力, int nPlayer) {
 		//2017.08.15 kairera0467 排他なので番地をそのまま各レーンの状態として扱う
 
 		//for( int n = 0; n < 1; n++ )
@@ -556,23 +556,7 @@ internal class CActImplLaneTaiko : CActivity {
 			this.st状態[nPlayer].ct進行 = new CCounter(0, 14, 20, OpenTaiko.Timer);
 			this.st状態[nPlayer].judge = judge;
 			this.st状態[nPlayer].nPlayer = nPlayer;
-
-			switch (nLane) {
-				case 0x11:
-				case 0x12:
-					this.st状態[nPlayer].nIsBig = 0;
-					break;
-				case 0x13:
-				case 0x14:
-				case 0x1A:
-				case 0x1B: {
-						if (b両手入力)
-							this.st状態[nPlayer].nIsBig = 1;
-						else
-							this.st状態[nPlayer].nIsBig = 0;
-					}
-					break;
-			}
+			this.st状態[nPlayer].IsBig = NotesManager.IsBigNoteTaiko(Lane, gameType) && b両手入力;
 		}
 	}
 
@@ -650,7 +634,7 @@ internal class CActImplLaneTaiko : CActivity {
 		public bool b使用中;
 		public CCounter ct進行;
 		public ENoteJudge judge;
-		public int nIsBig;
+		public bool IsBig;
 		public int n透明度;
 		public int nPlayer;
 	}

@@ -13,7 +13,7 @@ internal class CActImplChipEffects : CActivity {
 
 
 	// メソッド
-	public virtual void Start(int nPlayer, int Lane) {
+	public virtual void Start(int nPlayer, NotesManager.ENoteType Lane, EGameType gameType) {
 		if (OpenTaiko.Tx.Gauge_Soul_Explosion != null && OpenTaiko.ConfigIni.nPlayerCount <= 2 && !OpenTaiko.ConfigIni.bAIBattleMode) {
 			for (int i = 0; i < 128; i++) {
 				if (!st[i].b使用中) {
@@ -22,6 +22,7 @@ internal class CActImplChipEffects : CActivity {
 					st[i].ctChipEffect = new CCounter(0, 24, 17, OpenTaiko.Timer);
 					st[i].nプレイヤー = nPlayer;
 					st[i].Lane = Lane;
+					st[i].GameType = gameType;
 					break;
 				}
 			}
@@ -67,7 +68,8 @@ internal class CActImplChipEffects : CActivity {
 								st[i].nプレイヤー,
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[0],
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0],
-								st[i].Lane);
+								st[i].Lane,
+								st[i].GameType);
 						break;
 
 					case 1:
@@ -77,20 +79,26 @@ internal class CActImplChipEffects : CActivity {
 								st[i].nプレイヤー,
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[1],
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1],
-								st[i].Lane);
+								st[i].Lane,
+								st[i].GameType);
 						break;
 				}
 
 				if (OpenTaiko.Tx.ChipEffect != null) {
+					// TODO: Generate chip effect from note image?
+					int laneXOffset = NotesManager.IsPurpleNoteTaiko(st[i].Lane, st[i].GameType) ? (int)NotesManager.ENoteType.DonBig
+						: (st[i].GameType is EGameType.Konga || st[i].Lane > NotesManager.ENoteType.KaBig) ? (int)NotesManager.ENoteType.Don
+						: (int)st[i].Lane;
+
 					if (this.st[i].ctChipEffect.CurrentValue < 12) {
 						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
 						OpenTaiko.Tx.ChipEffect.Opacity = (int)(this.st[i].ctChipEffect.CurrentValue * (float)(225 / 11));
-						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					}
 					if (this.st[i].ctChipEffect.CurrentValue > 12 && this.st[i].ctChipEffect.CurrentValue < 24) {
 						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 						OpenTaiko.Tx.ChipEffect.Opacity = 255 - (int)((this.st[i].ctChipEffect.CurrentValue - 10) * (float)(255 / 14));
-						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(st[i].Lane * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					}
 				}
 
@@ -112,7 +120,8 @@ internal class CActImplChipEffects : CActivity {
 		public CCounter ct進行;
 		public CCounter ctChipEffect;
 		public int nプレイヤー;
-		public int Lane;
+		public NotesManager.ENoteType Lane;
+		public EGameType GameType;
 	}
 	private STチップエフェクト[] st = new STチップエフェクト[128];
 

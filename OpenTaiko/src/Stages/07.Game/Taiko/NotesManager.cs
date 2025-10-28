@@ -100,6 +100,22 @@ class NotesManager {
 	#endregion
 
 	#region [Gameplay]
+	public enum EInputType {
+		Red,
+		RedBig,
+		Blue, Yellow = Blue,
+		BlueBig,
+		Clap,
+		Unknown = -1,
+	}
+
+	public static PlayerLane.FlashType InputToLane(EInputType nInput) => nInput switch {
+		EInputType.Red or EInputType.RedBig => PlayerLane.FlashType.Red,
+		EInputType.Blue or EInputType.BlueBig => PlayerLane.FlashType.Blue,
+		EInputType.Clap => PlayerLane.FlashType.Clap,
+		_ => PlayerLane.FlashType.Total,
+	};
+
 	public static int GetPadPlayer(EPad nPad) => nPad switch {
 		EPad.LRed or EPad.RRed or EPad.LBlue or EPad.RBlue or EPad.Clap => 0,
 		EPad.LRed2P or EPad.RRed2P or EPad.LBlue2P or EPad.RBlue2P or EPad.Clap2P => 1,
@@ -234,17 +250,23 @@ class NotesManager {
 	public static int PxSplitLaneDistance => OpenTaiko.Skin.Game_Notes_Size[1] / 3;
 
 	// Flying notes
-	public static void DisplayNote(int player, int x, int y, int Lane) {
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+	public static ENoteType GetFlyNoteType(ENoteType nt, EGameType gt, bool isBigInput = false) => nt switch {
+		ENoteType.DonBig or ENoteType.DonHand => (isBigInput || gt == EGameType.Konga) ? ENoteType.DonBig : ENoteType.Don,
+		ENoteType.KaBig or ENoteType.KaHand => (isBigInput || gt == EGameType.Konga) ? ENoteType.KaBig : ENoteType.Ka,
+		ENoteType.Kadon => ENoteType.Kadon,
+		ENoteType.Adlib or ENoteType.Bomb => ENoteType.Empty,
+		_ => nt,
+	};
 
+	public static void DisplayNote(int player, int x, int y, ENoteType Lane, EGameType gt) {
 		switch (Lane) {
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-				OpenTaiko.Tx.Notes[(int)_gt]?.t2D中心基準描画(x, y, new Rectangle(Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			case ENoteType.Don:
+			case ENoteType.Ka:
+			case ENoteType.DonBig:
+			case ENoteType.KaBig:
+				OpenTaiko.Tx.Notes[(int)gt]?.t2D中心基準描画(x, y, new Rectangle((int)Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
-			case 5:
+			case ENoteType.Kadon:
 				OpenTaiko.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
 		}

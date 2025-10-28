@@ -18,13 +18,14 @@ internal class FireWorks : CActivity {
 	/// 大音符の花火エフェクト
 	/// </summary>
 	/// <param name="nLane"></param>
-	public virtual void Start(int nLane, int nPlayer, double x, double y) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, double x, double y) {
 		if (OpenTaiko.ConfigIni.SimpleMode) return;
 
 		for (int i = 0; i < 32; i++) {
 			if (!FireWork[i].IsUsing) {
 				FireWork[i].IsUsing = true;
 				FireWork[i].Lane = nLane;
+				FireWork[i].GameType = gameType;
 				FireWork[i].Player = nPlayer;
 				FireWork[i].X = x;
 				FireWork[i].Y = y;
@@ -79,7 +80,8 @@ internal class FireWorks : CActivity {
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]
 	private struct Status {
-		public int Lane;
+		public NotesManager.ENoteType Lane;
+		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
 		public CCounter Counter;

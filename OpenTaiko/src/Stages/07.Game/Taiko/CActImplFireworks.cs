@@ -18,7 +18,7 @@ internal class CActImplFireworks : CActivity {
 	/// 大音符の花火エフェクト
 	/// </summary>
 	/// <param name="nLane"></param>
-	public virtual void Start(int nLane, int nPlayer) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer) {
 		nY座標P2 = new int[] { 548, 612, 670, 712, 730, 780, 725, 690, 640 };
 		if (OpenTaiko.Tx.Effects_Hit_FireWorks != null && OpenTaiko.Tx.Effects_Hit_FireWorks != null) {
 			for (int i = 0; i < 9; i++) {
@@ -28,15 +28,6 @@ internal class CActImplFireworks : CActivity {
 						this.st大音符花火[j].ct進行 = new CCounter(0, 40, 18, OpenTaiko.Timer); // カウンタ
 						this.st大音符花火[j].fX = this.nX座標[i]; //X座標
 						this.st大音符花火[j].fY = nPlayer == 0 ? this.nY座標[i] : this.nY座標P2[i];
-
-						switch (nLane) {
-							case 0:
-								this.st大音符花火[j].nColor = 0;
-								break;
-							case 1:
-								this.st大音符花火[j].nColor = 1;
-								break;
-						}
 
 						switch (i) {
 							case 0:
@@ -86,7 +77,7 @@ internal class CActImplFireworks : CActivity {
 		}
 	}
 
-	public virtual void Start(int nLane, ENoteJudge judge, int player) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, bool isBigInput, int player) {
 		for (int j = 0; j < 3 * 4; j++) {
 			if (!this.st状態[j].b使用中)
 			//for( int n = 0; n < 1; n++ )
@@ -97,20 +88,12 @@ internal class CActImplFireworks : CActivity {
 				this.st状態[j].judge = judge;
 				this.st状態[j].nPlayer = player;
 				this.st状態_大[j].nPlayer = player;
-
-				switch (nLane) {
-					case 0x11:
-					case 0x12:
-						this.st状態[j].nIsBig = 0;
-						break;
-					case 0x13:
-					case 0x14:
-					case 0x1A:
-					case 0x1B:
-						this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
-						this.st状態_大[j].judge = judge;
-						this.st状態_大[j].nIsBig = 1;
-						break;
+				if (NotesManager.IsBigNoteTaiko(nLane, gameType) && isBigInput) {
+					this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
+					this.st状態_大[j].judge = judge;
+					this.st状態_大[j].IsBig = true;
+				} else {
+					this.st状態[j].IsBig = false;
 				}
 				break;
 			}
@@ -166,7 +149,7 @@ internal class CActImplFireworks : CActivity {
 						// (When performing calibration, reduce visual distraction
 						// and current judgment feedback near the judgment position.)
 						if (OpenTaiko.Tx.Effects_Hit_Explosion != null) {
-							int n = this.st状態[i].nIsBig == 1 ? (nHeight * 2) : 0;
+							int n = this.st状態[i].IsBig ? (nHeight * 2) : 0;
 
 							int nX = 0;
 							int nY = 0;
@@ -211,13 +194,14 @@ internal class CActImplFireworks : CActivity {
 					if (this.st状態_大[i].ct進行.IsEnded) {
 						this.st状態_大[i].ct進行.Stop();
 					}
-					if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1) {
+					if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].IsBig) {
 
 						switch (st状態_大[i].judge) {
 							case ENoteJudge.Perfect:
 							case ENoteJudge.Great:
-							case ENoteJudge.Auto:
-								if (this.st状態_大[i].nIsBig == 1 && !OpenTaiko.ConfigIni.SimpleMode) {
+							case ENoteJudge.Auto: // Great color
+							case ENoteJudge.Good: // OK color
+								if (this.st状態_大[i].IsBig && !OpenTaiko.ConfigIni.SimpleMode) {
 									//float fX = 415 - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Width * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X ) / 2.0f);
 									//float fY = TJAPlayer3.Skin.nJudgePointY[ this.st状態_大[ i ].nPlayer ] - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Height * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y ) / 2.0f);
 									//float fY = 257 - ((this.txアタックエフェクトUpper_big.sz画像サイズ.Height * this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y ) / 2.0f);
@@ -228,18 +212,6 @@ internal class CActImplFireworks : CActivity {
 									//this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y = f倍率;
 									//this.txアタックエフェクトUpper_big.n透明度 = (int)(255 * f倍率);
 									//this.txアタックエフェクトUpper_big.t2D描画( CDTXMania.app.Device, fX, fY );
-
-									/*
-                                    Matrix mat = Matrix.Identity;
-                                    mat *= Matrix.Scaling( f倍率, f倍率, f倍率 );
-                                    mat *= Matrix.Translation( TJAPlayer3.Skin.nScrollFieldX[0] - SampleFramework.GameWindowSize.Width / 2.0f, -(TJAPlayer3.Skin.nJudgePointY[ this.st状態[ i ].nPlayer ] - SampleFramework.GameWindowSize.Height / 2.0f), 0f );
-                                    //mat *= Matrix.Billboard( new Vector3( 15, 15, 15 ), new Vector3(0, 0, 0), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 0 ) );
-                                    //mat *= Matrix.Translation( 0f, 0f, 0f );
-
-
-                                    TJAPlayer3.Tx.Effects_Hit_Explosion_Big.Opacity = 255;
-                                    TJAPlayer3.Tx.Effects_Hit_Explosion_Big.t3D描画( mat );
-                                    */
 
 									float x = 0;
 									float y = 0;
@@ -260,13 +232,15 @@ internal class CActImplFireworks : CActivity {
 									x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
 									y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
 
+									if (st状態_大[i].judge is ENoteJudge.Good) // TODO: add Explosion_Big for 可/OK
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(4.0f, 4.0f, 4.0f, 1.0f); // HACK: made whiter
+									else
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
+
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
 								}
-								break;
-
-							case ENoteJudge.Good:
 								break;
 
 							case ENoteJudge.Miss:
@@ -378,7 +352,7 @@ internal class CActImplFireworks : CActivity {
 		public bool b使用中;
 		public CCounter ct進行;
 		public ENoteJudge judge;
-		public int nIsBig;
+		public bool IsBig;
 		public int n透明度;
 		public int nPlayer;
 	}
@@ -386,14 +360,13 @@ internal class CActImplFireworks : CActivity {
 	protected struct STSTATUS_B {
 		public CCounter ct進行;
 		public ENoteJudge judge;
-		public int nIsBig;
+		public bool IsBig;
 		public int n透明度;
 		public int nPlayer;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct ST大音符花火 {
-		public int nColor;
 		public bool b使用中;
 		public CCounter ct進行;
 		public int n前回のValue;
