@@ -58,7 +58,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nLag;                // 2011.2.1 yyagi
 	public double db発声時刻;
 	public double dbProcess_Time;
-	public int nPlayerSide;
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
 	public int nListPosition;
 	public bool IsFixedSENote;
