@@ -2831,7 +2831,6 @@ internal class CTja : CActivity {
 		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
-		chip.nPlayerSide = this.nPlayerSide;
 		chip.bGOGOTIME = this.bGOGOTIME;
 
 		if (NotesManager.IsKusudama(chip)) {

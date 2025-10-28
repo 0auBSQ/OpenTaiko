@@ -908,20 +908,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int index = pChip.nChannelNo;
 
 		if (index == 0x11 || index == 0x13 || index == 0x1A || index == 0x101) {
-			this.soundRed[pChip.nPlayerSide]?.PlayStart();
+			this.soundRed[nPlayer]?.PlayStart();
 			if ((index == 0x13 && _gt == EGameType.Konga) || index == 0x101) {
-				this.soundBlue[pChip.nPlayerSide]?.PlayStart();
+				this.soundBlue[nPlayer]?.PlayStart();
 			}
 		} else if (index == 0x12 || index == 0x14 || index == 0x1B) {
 			if (index == 0x14 && _gt == EGameType.Konga) {
-				this.soundClap[pChip.nPlayerSide]?.PlayStart();
+				this.soundClap[nPlayer]?.PlayStart();
 			} else {
-				this.soundBlue[pChip.nPlayerSide]?.PlayStart();
+				this.soundBlue[nPlayer]?.PlayStart();
 			}
 
 
 		} else if (index == 0x1F) {
-			this.soundAdlib[pChip.nPlayerSide]?.PlayStart();
+			this.soundAdlib[nPlayer]?.PlayStart();
 		}
 
 		if (this.nHand[nPlayer] == 0)
@@ -1007,13 +1007,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			//赤か青かの分岐
 			if (sort is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig) {
-				this.soundRed[pChip.nPlayerSide]?.PlayStart();
+				this.soundRed[nPlayer]?.PlayStart();
 				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.IsBigRollTaiko(pChip, _gt) ? NotesManager.ENoteType.DonBig : NotesManager.ENoteType.Don, _gt, nPlayer);
 			} else if (sort is NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig) {
-				this.soundBlue[pChip.nPlayerSide]?.PlayStart();
+				this.soundBlue[nPlayer]?.PlayStart();
 				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.IsBigRollTaiko(pChip, _gt) ? NotesManager.ENoteType.KaBig : NotesManager.ENoteType.Ka, _gt, nPlayer);
 			} else if (sort is NotesManager.EInputType.Clap) {
-				this.soundClap[pChip.nPlayerSide]?.PlayStart();
+				this.soundClap[nPlayer]?.PlayStart();
 				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.Clap, _gt, nPlayer);
 			}
 		} else {
@@ -1110,7 +1110,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.CChartScore[player].nScore = __score;
 		this.CSectionScore[player].nScore = __score;
 
-		this.soundRed[pChip.nPlayerSide]?.PlayStart();
+		this.soundRed[player]?.PlayStart();
 
 
 		if (balloon - rollCount <= 0) {

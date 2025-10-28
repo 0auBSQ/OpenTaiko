@@ -932,18 +932,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				else
 					pChip.bShow = true;
 
-
-				switch (nPlayer) {
-					case 0:
-						break;
-					case 1:
-						break;
-				}
-				switch (pChip.nPlayerSide) {
-					case 1:
-						break;
-				}
-
 				int x = pChip.nHorizontalChipDistance;
 				int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance; // either untouched (0/5) or unused (other) for #DIRECTION
 
