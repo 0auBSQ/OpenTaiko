@@ -747,10 +747,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				// convert input time (mixer space) to note time
 				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
-				long nTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
+				long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
 
-				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(nTime, nUsePlayer);
-				ENoteJudge e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(nTime, chipNoHit, nUsePlayer) : ENoteJudge.Miss;
+				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(msHitTjaTime, nUsePlayer);
+				ENoteJudge e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, chipNoHit, nUsePlayer) : ENoteJudge.Miss;
 				e判定 = AlterJudgement(nUsePlayer, e判定, false);
 
 				var gameType = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
@@ -796,14 +796,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool isHitTypeExpected = NotesManager.IsExpectedPadAnyHit(nPadAs1P, chipNoHit, gameType);
 
 				// Register to replay file
-				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)nPadAs1P);
+				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
 
 
 				if (e判定 != ENoteJudge.Miss) {
 					// Process small note (& konga clap)
 					if (_isSmallNote) {
 						if (isHitTypeExpected) {
-							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+							this.tドラムヒット処理(msHitTjaTime, nPadAs1P, chipNoHit, false, nUsePlayer);
 							continue;
 						}
 					}
@@ -812,7 +812,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						if (isHitTypeExpected) {
 							chipNoHit.eNoteState = ENoteState.None;
 							chipNoHit.padStoredHit = EPad.Unknown;
-							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, true, nUsePlayer);
+							this.tドラムヒット処理(msHitTjaTime, nPadAs1P, chipNoHit, true, nUsePlayer);
 							continue;
 						}
 					}
@@ -820,8 +820,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					else if ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga) {
 						if (isHitTypeExpected) {
 							CConfigIni.CTimingZones tz = this.GetTimingZones(nUsePlayer);
-							var time = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-							float dtime = chipNoHit.n発声時刻ms - (float)time;
+							float dtime = chipNoHit.n発声時刻ms - (float)msHitTjaTime;
 							int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
 
 							bool _timeBadOrLater = dtime <= tz.nBadZone;
@@ -829,14 +828,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 							if (chipNoHit.eNoteState == ENoteState.None) {
 								if (_timeBadOrLater) {
 									chipNoHit.eNoteState = ENoteState.Wait;
-									chipNoHit.msStoredHit = time;
+									chipNoHit.msStoredHit = msHitTjaTime;
 									chipNoHit.padStoredHit = nPadAs1P;
 									this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
 									continue;
 								}
 							} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 								bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPadAs1P, chipNoHit, gameType);
-								var msWaitedTime = time - chipNoHit.msStoredHit;
+								var msWaitedTime = msHitTjaTime - chipNoHit.msStoredHit;
 
 								// Double tap success
 								if (_isExpected && _timeBadOrLater && msWaitedTime < msMaxWaitTime) {
@@ -859,12 +858,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					// Judge rolls
 					else if (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit)) {
 						if (isHitTypeExpected) {
-							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
+							this.tドラムヒット処理(msHitTjaTime, nPadAs1P, chipNoHit, false, nUsePlayer);
 							continue;
 						}
 					}
 					else if (NotesManager.IsADLIB(chipNoHit) || NotesManager.IsMine(chipNoHit)) {
-						this.tドラムヒット処理(nTime, nPad, chipNoHit, false, nUsePlayer);
+						this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
 						continue;
 					}
 				}
