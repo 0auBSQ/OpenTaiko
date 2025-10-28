@@ -57,6 +57,7 @@ public class PlayerLane {
 	public enum FlashType {
 		Red,
 		Blue,
+		Yellow = Blue,
 		Clap,
 		Hit,
 		Total

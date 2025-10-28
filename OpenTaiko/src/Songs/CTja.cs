@@ -2883,7 +2883,9 @@ internal class CTja : CActivity {
 			NotesManager.ENoteType.DonBig => 5,
 			NotesManager.ENoteType.KaBig => 6,
 			NotesManager.ENoteType.Roll => 7,
+			NotesManager.ENoteType.RollPa => 7,
 			NotesManager.ENoteType.RollBig => 0xA,
+			NotesManager.ENoteType.RollClap => 0xA,
 			NotesManager.ENoteType.Balloon => 0xB,
 			NotesManager.ENoteType.EndRoll => 0xC,
 			NotesManager.ENoteType.BalloonEx => 0xB,
@@ -3623,7 +3625,7 @@ internal class CTja : CActivity {
 		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
-			if (NotesManager.IsCommonNote(chip)) {
+			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
 				list音符のみのリスト.Add(chip);
 			}
 		}
@@ -3652,7 +3654,7 @@ internal class CTja : CActivity {
 		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
-			if (NotesManager.IsCommonNote(chip)) {
+			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
 				list音符のみのリスト_Branch[(int)chip.nBranch].Add(chip);
 			}
 		}

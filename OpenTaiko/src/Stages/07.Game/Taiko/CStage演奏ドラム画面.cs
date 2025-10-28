@@ -812,8 +812,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#endregion
 
 				// Chip bools
-				bool _isBigNoteTaiko = NotesManager.IsBigDonTaiko(chipNoHit, gameType) || NotesManager.IsBigKaTaiko(chipNoHit, gameType);
-				bool _isClapKonga = NotesManager.IsClapKonga(chipNoHit, gameType);
+				bool _isBigNoteTaiko = NotesManager.IsBigNoteTaiko(chipNoHit, gameType);
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
 
 				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
@@ -826,16 +825,16 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					break;
 				}
 
-				bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit);
-				bool isHitTypeExpected = NotesManager.IsExpectedPadMissable(nPadAs1P, chipNoHit, gameType);
+				bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, gameType);
+				bool isHitTypeExpected = NotesManager.IsExpectedPadAnyHit(nPadAs1P, chipNoHit, gameType);
 
 				// Register to replay file
 				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(nTime, (byte)nPadAs1P);
 
 
 				if (e判定 != ENoteJudge.Miss) {
-					// Process small note & konga clap
-					if (_isSmallNote || _isClapKonga) {
+					// Process small note (& konga clap)
+					if (_isSmallNote) {
 						if (isHitTypeExpected) {
 							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
 							continue;
@@ -892,7 +891,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 					// Judge rolls
 					else if (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit)) {
-						if (NotesManager.IsExpectedPadRoll(nPadAs1P, chipNoHit, gameType)) {
+						if (isHitTypeExpected) {
 							this.tドラムヒット処理(nTime, nPadAs1P, chipNoHit, false, nUsePlayer);
 							continue;
 						}
@@ -1042,9 +1041,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long time = pChip.n発声時刻ms - __dbt;
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
-					if (NotesManager.IsDonNote(pChip)) {
+					if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt)) {
 						y -= OpenTaiko.Skin.Game_Notes_Size[1] / 3;
-					} else if (NotesManager.IsKaNote(pChip)) {
+					} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt)) {
 						y += OpenTaiko.Skin.Game_Notes_Size[1] / 3;
 					}
 				}
@@ -1254,15 +1253,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
-				if (OpenTaiko.ConfigIni.nGameType[nPlayer] == EGameType.Konga) {
-					if (NotesManager.IsClapRoll(pChip)) {
-					} else if (NotesManager.IsYellowRoll(pChip)) {
-						y += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-						y末端 += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-					} else if (NotesManager.IsRoll(pChip)) {
-						y -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-						y末端 -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-					}
+				if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
+					y -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
+					y末端 -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
+				} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
+					y += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
+					y末端 += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
 				}
 			}
 
@@ -1363,16 +1359,20 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端);
 
 						if (OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-							int _shift = NotesManager.IsBigRoll(pChip) ? 26 : 0;
 
 							if (!NotesManager.IsFuzeRoll(pChip)) {
+								int _shift = NotesManager.IsBigRollTaiko(pChip, _gt) ? 26 : 0;
+								int senote = pChip.nSenote;
+								if (senote == 0xA && _gt is EGameType.Konga) // DRUMROLL
+									senote = 7; // drumroll
+
 								if (pChip.bShowRoll) {
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = x末端 - x - 44 - _shift;
 									OpenTaiko.Tx.SENotes[(int)_gt].t2D描画(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = 1.0f;
 									OpenTaiko.Tx.SENotes[(int)_gt].t2D描画(x + 30 + _shift, y + nSenotesY, new Rectangle(0, 8 * _size[1], _60_cut, _size[1]));
 								}
-								OpenTaiko.Tx.SENotes[(int)_gt].t2D描画(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * pChip.nSenote, _size[0], _size[1]));
+								OpenTaiko.Tx.SENotes[(int)_gt].t2D描画(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * senote, _size[0], _size[1]));
 							} else {
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
 							}
