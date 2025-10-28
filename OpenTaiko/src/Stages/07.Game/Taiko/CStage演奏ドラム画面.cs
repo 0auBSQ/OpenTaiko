@@ -1038,9 +1038,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
 					if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt)) {
-						y -= OpenTaiko.Skin.Game_Notes_Size[1] / 3;
+						y -= NotesManager.PxSplitLaneDistance;
 					} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt)) {
-						y += OpenTaiko.Skin.Game_Notes_Size[1] / 3;
+						y += NotesManager.PxSplitLaneDistance;
 					}
 				}
 
@@ -1250,11 +1250,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
 				if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
-					y -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-					y末端 -= OpenTaiko.Skin.Game_Notes_Size[1] / 2;
+					y -= NotesManager.PxSplitLaneDistance;
+					y末端 -= NotesManager.PxSplitLaneDistance;
 				} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
-					y += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
-					y末端 += OpenTaiko.Skin.Game_Notes_Size[1] / 2;
+					y += NotesManager.PxSplitLaneDistance;
+					y末端 += NotesManager.PxSplitLaneDistance;
 				}
 			}
 

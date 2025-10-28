@@ -231,6 +231,8 @@ class NotesManager {
 
 	#region [Displayables]
 
+	public static int PxSplitLaneDistance => OpenTaiko.Skin.Game_Notes_Size[1] / 3;
+
 	// Flying notes
 	public static void DisplayNote(int player, int x, int y, int Lane) {
 		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
