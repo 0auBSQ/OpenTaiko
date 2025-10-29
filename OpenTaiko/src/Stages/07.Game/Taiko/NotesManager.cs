@@ -134,6 +134,13 @@ class NotesManager {
 		_ => pad,
 	};
 
+	public static EInputType PadToInputType(EPad pad, bool isBigInput = false) => PadTo1P(pad) switch {
+		EPad.LRed or EPad.RRed => isBigInput ? EInputType.RedBig : EInputType.Red,
+		EPad.LBlue or EPad.RBlue => isBigInput ? EInputType.BlueBig : EInputType.Blue,
+		EPad.Clap => EInputType.Clap,
+		_ => EInputType.Unknown,
+	};
+
 	public static PlayerLane.FlashType PadToLane(EPad pad, EGameType gameType) => PadTo1P(pad) switch {
 		EPad.LRed or EPad.RRed => PlayerLane.FlashType.Red,
 		EPad.LBlue or EPad.RBlue => PlayerLane.FlashType.Blue,
