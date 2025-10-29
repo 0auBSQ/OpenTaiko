@@ -1986,11 +1986,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#GAMETYPE") {
 			CChip chip = this.NewEventChipAtDefCursor(0xD8, 1);
-			chip.eGameType = argument switch {
-				"Taiko" => EGameType.Taiko,
-				"Bongo" or "Konga" => EGameType.Konga,
-				_ => chip.eGameType,
-			};
+			chip.eGameType = strConvertGameType(argument);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -3559,6 +3555,11 @@ internal class CTja : CActivity {
 		}
 		return 3;
 	}
+
+	private static EGameType strConvertGameType(string argument) => argument.ToLower() switch {
+		"bongo" or "konga" => EGameType.Konga,
+		"taiko" or _ => EGameType.Taiko,
+	};
 
 	/// <summary>
 	/// Lyricファイルのパースもどき
