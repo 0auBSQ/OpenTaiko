@@ -918,8 +918,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			else if (NotesManager.IsClapKonga(chip, gt))
 				nInputAuto = NotesManager.EInputType.Clap;
 
-			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(chip, gt, this.nHand[iPlayer], iPlayer, isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
 			this.AutoplaySwitchHand(iPlayer);
+			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(chip, gt, this.nHand[iPlayer], iPlayer, isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
 
 			this.tチップのヒット処理(chip.n発声時刻ms, chip, EInstrumentPad.Taiko, true, nInputAuto, iPlayer, isAutoplay: true);
 		}
