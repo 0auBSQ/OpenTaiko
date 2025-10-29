@@ -266,6 +266,7 @@ internal class CTja : CActivity {
 	public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
 	public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
 	public ESide SIDE;
+	public EGameType?[] GameType = new EGameType?[(int)Difficulty.Total];
 	public CSongUniqueID uniqueID;
 
 	// Tower lifes
@@ -3299,6 +3300,10 @@ internal class CTja : CActivity {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				//this.n参照中の難易度 = Convert.ToInt16( strCommandParam );
 				this.n参照中の難易度 = this.strConvertCourse(strCommandParam);
+			}
+		} else if (strCommandName.Equals("GAME")) {
+			if (!string.IsNullOrEmpty(strCommandParam)) {
+				this.GameType[this.n参照中の難易度] = strConvertGameType(strCommandParam);
 			}
 		} else if (strCommandName.Equals("HEADSCROLL")) {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
