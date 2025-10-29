@@ -749,8 +749,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
 				long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
 
+				// test judgement
+				ENoteJudge e判定 = ENoteJudge.Miss;
 				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(msHitTjaTime, nUsePlayer);
-				ENoteJudge e判定 = (chipNoHit != null) ? this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, chipNoHit, nUsePlayer) : ENoteJudge.Miss;
+				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
+				if (chipNoHitRoll != null)
+					chipNoHit = chipNoHitRoll;
+				if (chipNoHit != null)
+					e判定 = this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, chipNoHit, nUsePlayer);
 				e判定 = AlterJudgement(nUsePlayer, e判定, false);
 
 				var gameType = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
@@ -778,20 +784,13 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(noteType, gameType, nHand, nUsePlayer);
 				#endregion
 
-				// Chip bools
-				bool _isBigNoteTaiko = NotesManager.IsBigNoteTaiko(chipNoHit, gameType);
-				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
-
-				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
-				if (chipNoHitRoll != null) {
-					chipNoHit = chipNoHitRoll;
-					e判定 = ENoteJudge.Perfect;
-				}
-
 				if (chipNoHit == null) {
 					break;
 				}
 
+				// Chip bools
+				bool _isBigNoteTaiko = NotesManager.IsBigNoteTaiko(chipNoHit, gameType);
+				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
 				bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, gameType);
 				bool isHitTypeExpected = NotesManager.IsExpectedPadAnyHit(nPadAs1P, chipNoHit, gameType);
 
