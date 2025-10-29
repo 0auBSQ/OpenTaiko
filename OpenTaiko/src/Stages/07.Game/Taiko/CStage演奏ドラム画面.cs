@@ -749,6 +749,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
 				long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
 
+				// Register to replay file
+				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
+
 				// test judgement
 				ENoteJudge e判定 = ENoteJudge.Miss;
 				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(msHitTjaTime, nUsePlayer);
@@ -793,10 +796,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
 				bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, gameType);
 				bool isHitTypeExpected = NotesManager.IsExpectedPadAnyHit(nPadAs1P, chipNoHit, gameType);
-
-				// Register to replay file
-				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
-
 
 				if (e判定 != ENoteJudge.Miss) {
 					// Process small note (& konga clap)
