@@ -113,7 +113,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public int intFrame;
 
-	public EGameType eGameType;
+	public EGameType? eGameType;
 	//
 
 
