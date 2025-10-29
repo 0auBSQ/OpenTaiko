@@ -288,7 +288,7 @@ class NotesManager {
 			length = OpenTaiko.Skin.Game_Notes_Size[0];
 		}
 
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = OpenTaiko.stageGameScreen.eGameType[OpenTaiko.GetActualPlayer(player)];
 
 		int noteType = 1;
 		if (IsSmallBlue(chip, _gt)) noteType = 2;
@@ -320,7 +320,7 @@ class NotesManager {
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
 		Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = OpenTaiko.stageGameScreen.eGameType[OpenTaiko.GetActualPlayer(player)];
 
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 			return;
@@ -405,7 +405,7 @@ class NotesManager {
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
 			return;
 
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = OpenTaiko.stageGameScreen.eGameType[OpenTaiko.GetActualPlayer(player)];
 
 		if (IsMine(chip)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));

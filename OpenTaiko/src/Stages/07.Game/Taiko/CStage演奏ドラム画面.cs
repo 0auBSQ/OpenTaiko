@@ -725,7 +725,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (chipNoHit != null)
 					e判定 = this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, chipNoHit, nUsePlayer);
 
-				var gameType = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
+				var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
 				PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
 
 				if (nLane == PlayerLane.FlashType.Total)
@@ -844,7 +844,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.t背景テクスチャの生成(DefaultBgFilename, bgrect, BgFilename);
 	}
 	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+		EGameType _gt = this.eGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
 		#region[ 作り直したもの ]
@@ -1091,7 +1091,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		int n先頭発声位置 = 0;
 
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+		EGameType _gt = this.eGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
@@ -1505,7 +1505,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			var timeNow = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			for (int iChip = 0; iChip < this.chipNowProcessingMultiHitNotes[i].Count; ++iChip) {
 				CChip chipNoHit = this.chipNowProcessingMultiHitNotes[i][iChip];
-				EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(i)];
+				EGameType _gt = this.eGameType[OpenTaiko.GetActualPlayer(i)];
 				bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
 
 				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;

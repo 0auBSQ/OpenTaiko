@@ -167,7 +167,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];
 		this.JPOSCROLLY = new double[5];
-		eFirstGameType = new EGameType[5];
+		eGameType = new EGameType[5];
 		bSplitLane = new bool[5];
 
 
@@ -178,7 +178,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			actGauge.Init(OpenTaiko.ConfigIni.nRisky, i);                                  // #23559 2011.7.28 yyagi
-			eFirstGameType[i] = OpenTaiko.ConfigIni.nGameType[i];
 		}
 		this.nPolyphonicSounds = OpenTaiko.ConfigIni.nPoliphonicSounds;
 
@@ -384,7 +383,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < 5; i++) {
 			ctChipAnime[i] = null;
 			ctChipAnimeLag[i] = null;
-			OpenTaiko.ConfigIni.nGameType[i] = eFirstGameType[i];
 			bSplitLane[i] = false;
 			this.msCurrentBarRollProgress[i] = 0;
 		}
@@ -664,7 +662,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected int nWaitButton;
 
-	private EGameType[] eFirstGameType;
+	public EGameType[] eGameType;
 	protected bool[] bSplitLane;
 
 	public List<CChip>[] chipNowProcessingMultiHitNotes = [[], [], [], [], []]; // [iPlayer][idxNowProcessingMultiHitNotes]
@@ -1256,7 +1254,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				CLagLogger.Add(nPlayer, pChip);
 			}
 
-			EGameType gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+			EGameType gt = this.eGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 
 			if (NotesManager.IsRoll(pChip)) {
 				eJudgeResult = this.tRollProcess(pChip, gt, msHitTjaTime, nNowInput, nPlayer);
@@ -2922,7 +2920,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#region [ d8-d9: EXTENDED2 ]
 				case 0xd8:
 					if (!pChip.bHit) {
-						OpenTaiko.ConfigIni.nGameType[nPlayer] = pChip.eGameType;
+						this.eGameType[nPlayer] = pChip.eGameType;
 						pChip.bHit = true;
 					}
 					break;
@@ -3395,7 +3393,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				if (NotesManager.IsFuzeRoll(chip)) {
 					if (!this.bPAUSE && !this.isRewinding) {
-						EGameType gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(iPlayer)];
+						EGameType gt = this.eGameType[OpenTaiko.GetActualPlayer(iPlayer)];
 						this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
 						OpenTaiko.stageGameScreen.actLaneTaiko.Start(chip, gt, ENoteJudge.Bad, false, iPlayer);
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
@@ -3447,7 +3445,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.Skin.soundBalloon.tPlay();
 			if (!OpenTaiko.Skin.soundBalloon.bIsPlaying)
 				this.PlayHitNoteSound(iPlayer, input); // fallback sound
-			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(iPlayer)], iPlayer, isBalloon: true);
+			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, this.eGameType[OpenTaiko.GetActualPlayer(iPlayer)], iPlayer, isBalloon: true);
 			OpenTaiko.stageGameScreen.Rainbow.Start(iPlayer);
 			//CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
 			chip.bHit = true;
@@ -3870,6 +3868,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 
+			this.eGameType[i] = OpenTaiko.ConfigIni.nGameType[i];
+
 			for (CTja.ECourse b = CTja.ECourse.eNormal; b <= CTja.ECourse.eMaster; ++b)
 				this.bIsGOGOTIME_Branch[i, (int)b] = false;
 			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i] = false;
@@ -3887,7 +3887,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.JPOSCROLLX[i] = 0;
 			this.JPOSCROLLY[i] = 0;
 
-			OpenTaiko.ConfigIni.nGameType[i] = this.eFirstGameType[i];
 			this.bSplitLane[i] = false;
 			this.msCurrentBarRollProgress[i] = 0;
 
