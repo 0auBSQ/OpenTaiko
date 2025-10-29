@@ -353,6 +353,7 @@ internal class CTja : CActivity {
 	public double dbNowScrollY = 0.0; //2016.08.13 kairera0467 複素数スクロール
 	public double dbLastTime = 0.0; //直前の小節の開始時間
 	public double dbLastBMScrollTime = 0.0;
+	private EGameType? nowGameType = null;
 
 	public int[] bBARLINECUE = new int[2]; //命令を入れた次の小節の操作を実現するためのフラグ。0 = mainflag, 1 = cuetype
 	public bool b小節線を挿入している = false;
@@ -1986,11 +1987,8 @@ internal class CTja : CActivity {
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#GAMETYPE") {
-			CChip chip = this.NewEventChipAtDefCursor(0xD8, 1);
-			chip.eGameType = strConvertGameType(argument);
-
-			// チップを配置。
-			this.listChip.Add(chip);
+			this.nowGameType = strConvertGameType(argument);
+			this.listChip.Add(this.NewEventChipAtDefCursor(0xD8, 1));
 		} else if (command == "#SPLITLANE") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xD9, 1));
 		} else if (command == "#MERGELANE") {
@@ -2785,6 +2783,7 @@ internal class CTja : CActivity {
 	private CChip NewEventChipAtDefCursor(int channelNo, int argIndex = default, int argInt = default, double argDb = default, ECourse? branch = null)
 		=> new() {
 			nChannelNo = channelNo,
+			eGameType = this.nowGameType,
 			IsEndedBranching = this.IsEndedBranching,
 			nBranch = branch ?? this.n現在のコース,
 			idxBranchSection = this.listBRANCH.Count,
@@ -3303,7 +3302,7 @@ internal class CTja : CActivity {
 			}
 		} else if (strCommandName.Equals("GAME")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.GameType[this.n参照中の難易度] = strConvertGameType(strCommandParam);
+				this.nowGameType = this.GameType[this.n参照中の難易度] = strConvertGameType(strCommandParam);
 			}
 		} else if (strCommandName.Equals("HEADSCROLL")) {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
