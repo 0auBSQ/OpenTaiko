@@ -3868,7 +3868,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 
-			this.eGameType[i] = OpenTaiko.ConfigIni.nGameType[i];
+			this.eGameType[i] = tja.GameType[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]] ?? OpenTaiko.ConfigIni.nGameType[i];
 
 			for (CTja.ECourse b = CTja.ECourse.eNormal; b <= CTja.ECourse.eMaster; ++b)
 				this.bIsGOGOTIME_Branch[i, (int)b] = false;
