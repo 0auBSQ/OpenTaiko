@@ -249,8 +249,10 @@ class NotesManager {
 		=> IsRoll(nt) || IsGenericBalloon(nt) || IsRollEnd(nt);
 	public static bool IsMissableNote(ENoteType nt)
 		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.DonHand or ENoteType.KaHand or ENoteType.Kadon;
+	public static bool IsJudgedFromNearest(ENoteType nt)
+		=> IsADLIB(nt) || IsMine(nt);
 	public static bool IsHittableNote(ENoteType nt)
-		=> IsMissableNote(nt) || IsGenericRoll(nt) || IsADLIB(nt) || IsMine(nt);
+		=> IsMissableNote(nt) || IsGenericRoll(nt) || IsJudgedFromNearest(nt);
 
 	#endregion
 
