@@ -869,13 +869,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			int nDeltaTime = Math.Abs(pChip.nLag);
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip)) {
-				if (msTjaTime >= pChip.n発声時刻ms && msTjaTime < pChip.end.n発声時刻ms) {
-					return ENoteJudge.Perfect;
-				}
+				return (msTjaTime >= pChip.n発声時刻ms && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			} else if (NotesManager.IsGenericBalloon(pChip)) {
-				if (msTjaTime >= pChip.n発声時刻ms - 17 && msTjaTime < pChip.end.n発声時刻ms) {
-					return ENoteJudge.Perfect;
-				}
+				return (msTjaTime >= pChip.n発声時刻ms - 17 && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			}
 
 			int actual = OpenTaiko.GetActualPlayer(player);
