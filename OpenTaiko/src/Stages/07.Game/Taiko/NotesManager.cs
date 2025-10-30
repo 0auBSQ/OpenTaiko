@@ -190,11 +190,13 @@ class NotesManager {
 		_ => false,
 	};
 	public static bool IsAcceptRed(ENoteType nt, EGameType gt)
-		=> IsADLIB(nt) || IsMine(nt) || IsSwapNote(nt, gt) || IsRedRollKonga(nt, gt) || IsPinkRollKonga(nt, gt) || IsSmallRollTaiko(nt, gt) || IsBigRollTaiko(nt, gt) || IsGenericBalloon(nt)
+		=> IsADLIB(nt) || IsMine(nt) || IsSwapNote(nt, gt) || IsRedRollKonga(nt, gt) || IsPinkRollKonga(nt, gt) || IsSmallRollTaiko(nt, gt) || IsBigRollTaiko(nt, gt)
+			|| IsGenericBalloon(nt)
 			|| (nt, gt) is (ENoteType.Don or ENoteType.DonBig or ENoteType.DonHand, EGameType.Taiko)
 				or (ENoteType.Po, EGameType.Konga);
 	public static bool IsAcceptBlue(ENoteType nt, EGameType gt)
 		=> IsADLIB(nt) || IsMine(nt) || IsSwapNote(nt, gt) || IsYellowRollKonga(nt, gt) || IsPinkRollKonga(nt, gt) || IsSmallRollTaiko(nt, gt) || IsBigRollTaiko(nt, gt)
+			|| (IsGenericBalloon(nt) && gt is EGameType.Konga)
 			|| (nt, gt) is (ENoteType.Ka or ENoteType.KaBig or ENoteType.KaHand, EGameType.Taiko)
 				or (ENoteType.Pa, EGameType.Konga);
 	public static bool IsAcceptClap(ENoteType nt, EGameType gt)
