@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.6.0.92] - 2025-10-20 (Beta)
+
+- [HotFix] Fix gauge not decreasing correctly on miss due to the previous version
+
+## [0.6.0.91] - 2025-10-20 (Beta)
+
+- [HotFix] Fix non-branched charts had no gauge increment nor damage due to the previous version
+
+## [0.6.0.90] - 2025-10-19 (Beta)
+
+- [BugFix] - Fixed incorrect gauge increment or damage for notes near branching points
+- [BugFix] - Fixed gauge damage rate typo in branched charts causing wrong GOOD rate
+- [BugFix] - Fixed missing roll head processing for Bongo roll heads (I & H)
+- [BugFix] - Fixed missing or broken branch transition animations
+- [BugFix] - Fixed wrong color when branching to Normal with transparent background
+- [BugFix] - Fixed branch text not fading out and inconsistent positioning
+- [Enhancement] - Refined branch text animation with easing and resolution scaling
+- [BugFix] - Fixed wrong starting branch after branched charts in Dan-i or training mode
+- [BugFix] - Fixed missing initial branching animation for non-Normal HIDDENBRANCH charts
+- [BugFix] - Fixed branch text not displaying if #LEVELHOLD appears before first branch
+- [Feat] - Added branch text scroll animation into note lane
+- [Feat] - Unhid branch after training mode branch switch for HIDDENBRANCH charts
+- [Feat] - Ported and refined TJAP3(tpz)’s branch guide for non-autoplay P1
+- [BugFix] - Fixed incorrect CalcType.Quintic EaseInOut() easing calculation
+- [Feat] - Treated empty or unrecognized #BRANCHSTART as “keep current branch” for parsing safety
+- [BugFix] - Made branch requirement judgment consistent with TaikoJiro
+- [BugFix] - Fixed and refined branch judge point behavior and timing
+- [BugFix] - Fixed unended rolls caused by branched roll head + non-branched roll end
+- [BugFix] - Fixed incorrect branch change point timing and barline behavior
+- [BugFix] - Fixed all branches’ notes displaying before first branch
+- [Feat] - Made #BARLINE display per-branch
+- [BugFix] - Fixed wrong character animation speed and scroll position between branch points
+- [BugFix] - Replaced in-branch visibility check with CChip.bVisible
+- [BugFix] - Fixed #LEVELHOLD applying to all branches instead of only its own
+- [BugFix] - Improved TJA branch parsing correctness and missing definitions handling
+- [Enhancement] - Ensured consistent BPM, time signatures, and branch alignment
+- [Feat] - Handled branch changes by note definition order (Daijiro 2/3 behavior)
+- [Feat] - Made several commands (#BARLINEOFF/ON, #GOGOSTART/END, #NM/BM/HBSCROLL, #DIRECTION) work per-branch
+- [BugFix] - Fixed roll display and judgment across branches for re/disappearing rolls
+
+## [0.6.0.89] - 2025-08-28 (Beta)
+
+- [i18n] Update Spanish and Chinese texts
+
 ## [0.6.0.88] - 2025-08-12 (Beta)
 
 - [i18n] Add Ch V & VI Nameplates & Unlockables Russian & Chinese Text

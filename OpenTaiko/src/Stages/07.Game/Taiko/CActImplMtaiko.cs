@@ -240,6 +240,7 @@ internal class CActImplMtaiko : CActivity {
 				this.ctレベルアップダウン[i].Tick();
 				if (this.ctレベルアップダウン[i].IsEnded) {
 					this.ctレベルアップダウン[i].Stop();
+					this.Before[i] = this.After[i];
 				}
 			}
 			if ((this.ctレベルアップダウン[i].IsTicked && (OpenTaiko.Tx.Taiko_LevelUp != null && OpenTaiko.Tx.Taiko_LevelDown != null)) && !OpenTaiko.ConfigIni.bNoInfo) {
@@ -463,12 +464,17 @@ internal class CActImplMtaiko : CActivity {
 
 	}
 
-	public void tBranchEvent(CTja.ECourse Before, CTja.ECourse After, int player) {
-		if (After != Before)
+	public void tBranchEvent(CTja.ECourse After, int player, bool stopAnime = false) {
+		if (stopAnime) {
+			this.ctレベルアップダウン[player].Stop();
+			this.Before[player] = this.After[player] = After;
+			return;
+		}
+		if (After != this.After[player])
 			this.ctレベルアップダウン[player] = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 
+		this.Before[player] = this.After[player];
 		this.After[player] = After;
-		this.Before[player] = Before;
 	}
 
 
