@@ -674,7 +674,6 @@ internal class Dan_Cert : CActivity {
 				Counter_Wait = null;
 				Counter_Out = new CCounter(0, 90, 3, OpenTaiko.Timer);
 				Counter_Text = new CCounter(0, 2899, 1, OpenTaiko.Timer);
-				OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(1000, 0);
 			}
 		}
 		if (Counter_Text != null) {

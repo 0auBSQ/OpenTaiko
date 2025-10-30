@@ -60,7 +60,8 @@ internal class CActConfigList : CActivity {
 		}
 	}
 
-	private static string[] AvailableGraphicsDevices { get {
+	private static string[] AvailableGraphicsDevices {
+		get {
 			if (OperatingSystem.IsWindows()) return ["OpenGL", "DirectX11", "Vulkan"];
 			if (OperatingSystem.IsMacOS()) return ["OpenGL", "Metal"];
 			if (OperatingSystem.IsLinux()) return ["OpenGL", "Vulkan"];
@@ -376,6 +377,7 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI_DESC"));
 		this.list項目リスト.Add(this.ShinuchiMode);
 
+		// FIXME: This does nothing vvv
 		this.iTaikoBranchGuide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE"), OpenTaiko.ConfigIni.bBranchGuide,
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE_DESC"));
 		this.list項目リスト.Add(this.iTaikoBranchGuide);
@@ -618,13 +620,13 @@ internal class CActConfigList : CActivity {
 
 				prvFont?.Dispose();
 				OpenTaiko.stageConfig.ftフォント?.Dispose();
-				OpenTaiko.stageTitle.pfMenuTitle?.Dispose();
-				OpenTaiko.stageTitle.pfBoxText?.Dispose();
+				pfMenuTitle?.Dispose();
+				pfBoxText?.Dispose();
 
 				prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale);
 				OpenTaiko.stageConfig.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-				OpenTaiko.stageTitle.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[0]);
-				OpenTaiko.stageTitle.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[1]);
+				pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[0]);
+				pfBoxText = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[1]);
 
 				t項目リストの設定_System(refresh: false);
 				OpenTaiko.stageConfig.ReloadMenus();
@@ -1036,7 +1038,7 @@ internal class CActConfigList : CActivity {
 		base.DeActivate();
 		#region [ Skin変更 ]
 		if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org) {
-			OpenTaiko.app.RefreshSkin();
+			OpenTaiko.app.EnterRefreshSkinStage(isSavedBeforeUpdate: true);
 		}
 		#endregion
 
@@ -1082,10 +1084,10 @@ internal class CActConfigList : CActivity {
 					this.iSystemASIODevice.n現在選択されている項目番号,
 					this.iSystemSoundTimerType.bON);
 				OpenTaiko.app.ShowWindowTitle();
-				OpenTaiko.Skin.ReloadSkin();// 音声の再読み込みをすることによって、音量の初期化を防ぐ
+				OpenTaiko.Skin.ReloadSystemSounds();
+				OpenTaiko.Skin.PreloadSystemSounds();
 			}
-		}
-		else {
+		} else {
 			if (this.iSystemBassBufferSizeMs_initial != this.iSystemBassBufferSizeMs.n現在の値 ||
 				this.iSystemSoundTimerType_initial != this.iSystemSoundTimerType.GetIndex()) {
 				OpenTaiko.SoundManager.tInitialize(ESoundDeviceType.Bass,
@@ -1630,6 +1632,9 @@ internal class CActConfigList : CActivity {
 	private CItemBase iSystemReloadDTX;                 // #32081 2013.10.21 yyagi
 	private CItemBase iSystemHardReloadDTX;
 	private CItemBase isSystemImportingScore;
+
+	private CCachedFontRenderer pfMenuTitle;
+	private CCachedFontRenderer pfBoxText;
 
 	#region DBEUG
 	private CItemToggle debugImGui;

@@ -1,5 +1,4 @@
 ﻿#TITLE:Recently played songs
-#TITLEES:Canciones jugadas recientemente
 #TITLEJA:最近遊んだ曲
 #TITLERU:Недавно сыгранные песни
 #TITLEZH:最近游玩歌曲
@@ -7,11 +6,10 @@
 #FORECOLOR:#FFFFFF
 #BACKCOLOR:#164748
 #BOXEXPLANATION1:Play recently played songs !
-#BOXEXPLANATIONES1:¡Juega canciones jugadas recientemente!
 #BOXEXPLANATIONJA1:何回か前までの
 #BOXEXPLANATIONJA2:遊んだ曲が選べるよ
 #BOXEXPLANATIONJA3:お気に入りならお気に入り登録をしよう!
-#BOXEXPLANATIONRU1:Играйте недавно сыгранные песни!
+#BOXEXPLANATIONRU1:Играть недавно сыгранные песни!
 #BOXEXPLANATIONZH1:回顾最近游玩的歌曲！
 #BOXEXPLANATIONZH2:喜欢的话按左Ctrl键收藏至收藏夹！
 #BGTYPE:9

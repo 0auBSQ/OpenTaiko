@@ -618,19 +618,6 @@ public static class ImGuiDebugWindow {
 							ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]), $"Difficulty: {game_difficulty}");
 							ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
-							var db現在時刻ms = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-							double play_time = dtx.TjaTimeToRawTjaTimeNote(db現在時刻ms);
-							var play_bpm_points = new[] {
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eNormal),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
-							};
-							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStage演奏画面共通.GetNowPBMTime(bp, play_time)).ToArray();
-							for (int ib = 0; ib < 3; ++ib) {
-								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib] / 4:0.00} 16ths\n"
-									+ $" {play_bpm_points[ib]}\n");
-							}
-
 							ImGui.NewLine();
 
 							ImGui.Text("ID: " + dtx.uniqueID.data.id);

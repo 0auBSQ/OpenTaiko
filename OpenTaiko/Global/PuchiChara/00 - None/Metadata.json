@@ -2,7 +2,6 @@
 	"name" : {
 		"strings": {
 			"default": "None",
-			"es": "Nadie",
 			"ru": "Никто",
 			"zh": "不使用"
 		}
