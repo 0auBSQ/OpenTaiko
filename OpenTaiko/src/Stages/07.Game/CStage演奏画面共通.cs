@@ -1736,116 +1736,91 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
 	}
 
-	protected CChip r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(long nTime, int nPlayer) {
-		//sw2.Start();
+	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudge(long msTjaTime, int nPlayer) {
+		var (chip, judge) = GetChipToJudgeIgnoringRollBody(msTjaTime, nPlayer);
+		var chipRoll = this.chip現在処理中の連打チップ[nPlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
+		if (chipRoll != null) {
+			var judgeRoll = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chipRoll, nPlayer);
+			if (judgeRoll is not ENoteJudge.Miss)
+				(chip, judge) = (chipRoll, judgeRoll);
+		}
+		return (chip, judge);
+	}
 
-		int nTimeDiff;
+	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer) {
 		int count = listChip[nPlayer].Count;
 		if (count <= 0)         // 演奏データとして1個もチップがない場合は
-		{
-			//sw2.Stop();
-			return null;
-		}
+			return (null, ENoteJudge.Miss);
 
-		int nIndex_NearestChip_Future = this.nCurrentTopChip[nPlayer];
-		int nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future - 1; // exclude past from future
-		if (this.nCurrentTopChip[nPlayer] >= count)      // その時点で演奏すべきチップが既に全部無くなっていたら
-		{
-			nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToPast = count - 1;
-		}
+		int iTop = Math.Max(0, Math.Min(count, this.nCurrentTopChip[nPlayer]));
 
-
-		// int nIndex_NearestChip_Future = nIndex_InitialPositionSearchingToFuture;
-		//			while ( nIndex_NearestChip_Future < count )	// 未来方向への検索
-		for (; nIndex_NearestChip_Future < count; nIndex_NearestChip_Future++) {
-
-			if (nIndex_NearestChip_Future < 0)
+		#region [ search for the first future note chips ]
+		(CChip? chip, ENoteJudge judge) futureFirstUnhit = (null, ENoteJudge.Miss);
+		int iFutureFirst = count; // regardless of hit or unhit
+		for (int i = iTop; i < count; ++i) {
+			CChip chip = listChip[nPlayer][i];
+			if (!(chip.bVisible && chip.n発声時刻ms > msTjaTime && NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)))
 				continue;
-
-
-			CChip chip = listChip[nPlayer][nIndex_NearestChip_Future];
-			if (!chip.bHit && chip.bVisible) {
-				if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
-					if (chip.n発声時刻ms > nTime) {
-						break;
-					}
-					nIndex_InitialPositionSearchingToPast = nIndex_NearestChip_Future;
-					if (NotesManager.IsGenericRoll(chip) && !NotesManager.IsRollEnd(chip)) {
-						if (chip.end.n発声時刻ms > nTime) {
-							break;
-						}
-					}
-				}
-			}
-			//				nIndex_NearestChip_Future++;
-		}
-
-
-		int nIndex_NearestChip_Past = nIndex_InitialPositionSearchingToPast;
-		//			while ( nIndex_NearestChip_Past >= 0 )		// 過去方向への検索
-		for (; nIndex_NearestChip_Past >= 0; nIndex_NearestChip_Past--) {
-			CChip chip = listChip[nPlayer][nIndex_NearestChip_Past];
-			//if ( (!chip.bHit && chip.b可視 ) && ( (  0x93 <= chip.nチャンネル番号 ) && ( chip.nチャンネル番号 <= 0x99 ) ) )
-
-			if (chip.bVisible && !NotesManager.IsRollEnd(chip)
-				&& (!chip.bHit && NotesManager.IsHittableNote(chip) || chip.bProcessed && NotesManager.IsGenericRoll(chip))
-				) {
+			if (iFutureFirst >= count)
+				iFutureFirst = i;
+			var judge = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
+			if (judge is ENoteJudge.Miss) // not in judgement window or before a roll
+				break;
+			if (!chip.IsMissed && !chip.bHit) {
+				futureFirstUnhit = (chip, judge);
 				break;
 			}
-
-			//				nIndex_NearestChip_Past--;
 		}
-		if ((nIndex_NearestChip_Future >= count) && (nIndex_NearestChip_Past < 0))  // 検索対象が過去未来どちらにも見つからなかった場合
-		{
-			//sw2.Stop();
-			return null;
-		}
-		CChip nearestChip; // = null;	// 以下のifブロックのいずれかで必ずnearestChipには非nullが代入されるので、null初期化を削除
-		if (nIndex_NearestChip_Future >= count)                                         // 検索対象が未来方向には見つからなかった(しかし過去方向には見つかった)場合
-		{
-			nearestChip = listChip[nPlayer][nIndex_NearestChip_Past];
-			//				nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-		} else if (nIndex_NearestChip_Past < 0)                                             // 検索対象が過去方向には見つからなかった(しかし未来方向には見つかった)場合
-		{
-			nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
-			//				nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-		} else {
-			int nTimeDiff_Future = Math.Abs((int)(nTime - listChip[nPlayer][nIndex_NearestChip_Future].n発声時刻ms));
-			int nTimeDiff_Past = Math.Abs((int)(nTime - listChip[nPlayer][nIndex_NearestChip_Past].n発声時刻ms));
+		#endregion
 
-			if (nTimeDiff_Future < nTimeDiff_Past) {
-				if (!listChip[nPlayer][nIndex_NearestChip_Past].bHit
-					&& listChip[nPlayer][nIndex_NearestChip_Past].n発声時刻ms + 108 >= nTime
-					&& NotesManager.IsMissableNote(listChip[nPlayer][nIndex_NearestChip_Past])
-				   ) {
-					nearestChip = listChip[nPlayer][nIndex_NearestChip_Past];
-				} else
-					nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
-
-				//					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
-			} else {
-				nearestChip = listChip[nPlayer][nIndex_NearestChip_Past];
-				//					nTimeDiff = Math.Abs( (int) ( nTime - nearestChip.n発声時刻ms ) );
+		#region [ search for the first past note chips (ignore rolls) ]
+		(CChip? chip, ENoteJudge judge) pastFirstUnhit = (null, ENoteJudge.Miss);
+		(CChip? chip, ENoteJudge judge) pastFirstUnhitNotBad = (null, ENoteJudge.Miss);
+		for (int i = iFutureFirst; i-- > 0;) { // exclude past from future
+			CChip chip = listChip[nPlayer][i];
+			if (!chip.bVisible || !NotesManager.IsHittableNote(chip) || NotesManager.IsRollEnd(chip))
+				continue;
+			var judge = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
+			if (judge is ENoteJudge.Miss) // not in judgement window or after a roll
+				break;
+			if (!chip.IsMissed && !chip.bHit) {
+				pastFirstUnhit = (chip, judge);
+				if (NotesManager.IsJudgedFromNearest(chip))
+					break; // block search
+				if (judge is not ENoteJudge.Poor)
+					pastFirstUnhitNotBad = (chip, judge);
 			}
-
-			var __tmpchp = listChip[nPlayer][nIndex_NearestChip_Future];
-
-			//2015.11.5 kairera0467　連打音符の判定
-			if (NotesManager.IsGenericRoll(__tmpchp) && !NotesManager.IsRollEnd(__tmpchp)) {
-				if (listChip[nPlayer][nIndex_NearestChip_Future].n発声時刻ms <= nTime && listChip[nPlayer][nIndex_NearestChip_Future].end.n発声時刻ms >= nTime) {
-					nearestChip = listChip[nPlayer][nIndex_NearestChip_Future];
-				}
-			}
+			if (NotesManager.IsGenericRoll(chip)) // during a roll
+				break; // block search
 		}
-		nTimeDiff = Math.Abs((int)(nTime - nearestChip.n発声時刻ms));
-		int n検索範囲時間ms = 0;
-		if ((n検索範囲時間ms > 0) && (nTimeDiff > n検索範囲時間ms))                 // チップは見つかったが、検索範囲時間外だった場合
-		{
-			//sw2.Stop();
-			return null;
-		}
-		//sw2.Stop();
-		return nearestChip;
+		#endregion
+		// most past note is miss, BAD, or judged by nearest -> judge most past non-BAD note if exists
+		if (pastFirstUnhitNotBad.chip != null)
+			pastFirstUnhit = pastFirstUnhitNotBad;
+
+		#region [ choose the best judgement if not both are non-BAD ]
+		bool isPastNotMiss = pastFirstUnhit.judge is not ENoteJudge.Miss;
+		bool isFutureNotMiss = futureFirstUnhit.judge is not ENoteJudge.Miss;
+		if (!(isPastNotMiss && isFutureNotMiss))
+			return isFutureNotMiss ? futureFirstUnhit : pastFirstUnhit;
+
+		bool isPastNotBad = pastFirstUnhit.judge is not ENoteJudge.Poor || NotesManager.IsADLIB(pastFirstUnhit.chip) || NotesManager.IsMine(pastFirstUnhit.chip);
+		bool isFutureNotBad = futureFirstUnhit.judge is not ENoteJudge.Poor || NotesManager.IsADLIB(futureFirstUnhit.chip) || NotesManager.IsMine(futureFirstUnhit.chip);
+		if (!(isPastNotBad && isFutureNotBad))
+			return isFutureNotBad ? futureFirstUnhit : pastFirstUnhit;
+		#endregion
+
+		// for balloon-type head judgement window
+		if (NotesManager.IsGenericRoll(futureFirstUnhit.chip) && !NotesManager.IsRollEnd(futureFirstUnhit.chip))
+			return futureFirstUnhit;
+
+		if (!NotesManager.IsJudgedFromNearest(pastFirstUnhit.chip))
+			return pastFirstUnhit;
+
+		// past note is judged from nearest
+		int msTjaDTime_Future = Math.Abs((int)(msTjaTime - futureFirstUnhit.chip!.n発声時刻ms));
+		int msTjaDTime_Past = Math.Abs((int)(msTjaTime - pastFirstUnhit.chip!.n発声時刻ms));
+		return (msTjaDTime_Future < msTjaDTime_Past) ? futureFirstUnhit : pastFirstUnhit;
 	}
 
 	/// <summary>

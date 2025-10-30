@@ -721,14 +721,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
 
 				// test judgement
-				ENoteJudge e判定 = ENoteJudge.Miss;
-				CChip? chipNoHit = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する(msHitTjaTime, nUsePlayer);
-				var chipNoHitRoll = this.chip現在処理中の連打チップ[nUsePlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
-				if (chipNoHitRoll != null)
-					chipNoHit = chipNoHitRoll;
-				if (chipNoHit != null)
-					e判定 = this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, chipNoHit, nUsePlayer);
-
+				var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer);
 				var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
 				if (e判定 != ENoteJudge.Miss) {
 					e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPadAs1P, msHitTjaTime);
