@@ -2148,6 +2148,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void TrainingSwitchBranch(CTja.ECourse branch) {
+		if (!(OpenTaiko.ConfigIni.bTokkunMode || OpenTaiko.ConfigIni.bAutoPlay[0]))
+			return;
+
 		CTja tja = OpenTaiko.TJA!;
 		if (!tja.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
