@@ -1739,7 +1739,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudge(long msTjaTime, int nPlayer) {
 		var (chip, judge) = GetChipToJudgeIgnoringRollBody(msTjaTime, nPlayer);
 		var chipRoll = this.chip現在処理中の連打チップ[nPlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
-		if (chipRoll != null) {
+		if (chipRoll != null && ( // note is miss or past BAD, or roll is defined earlier -> judge roll if exists
+			chip == null || judge is ENoteJudge.Miss || ((chip.n発声時刻ms < msTjaTime && judge is ENoteJudge.Poor) && !(NotesManager.IsADLIB(chip) || NotesManager.IsMine(chip)))
+			|| chipRoll.n整数値_内部番号 < chip.n整数値_内部番号
+			)) {
 			var judgeRoll = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chipRoll, nPlayer);
 			if (judgeRoll is not ENoteJudge.Miss)
 				(chip, judge) = (chipRoll, judgeRoll);
@@ -1776,6 +1779,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#region [ search for the first past note chips (ignore rolls) ]
 		(CChip? chip, ENoteJudge judge) pastFirstUnhit = (null, ENoteJudge.Miss);
 		(CChip? chip, ENoteJudge judge) pastFirstUnhitNotBad = (null, ENoteJudge.Miss);
+		(CChip? chip, ENoteJudge judge) pastFirstUnhitRoll = (null, ENoteJudge.Miss);
 		for (int i = iFutureFirst; i-- > 0;) { // exclude past from future
 			CChip chip = listChip[nPlayer][i];
 			if (!chip.bVisible || !NotesManager.IsHittableNote(chip) || NotesManager.IsRollEnd(chip))
@@ -1784,25 +1788,37 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (judge is ENoteJudge.Miss) // not in judgement window or after a roll
 				break;
 			if (!chip.IsMissed && !chip.bHit) {
-				pastFirstUnhit = (chip, judge);
-				if (NotesManager.IsJudgedFromNearest(chip))
-					break; // block search
-				if (judge is not ENoteJudge.Poor)
-					pastFirstUnhitNotBad = (chip, judge);
+				if (NotesManager.IsGenericRoll(chip)) {
+					if (pastFirstUnhitRoll.chip == null || chip.n整数値_内部番号 < pastFirstUnhitRoll.chip.n整数値_内部番号)
+						pastFirstUnhitRoll = (chip, judge);
+				} else {
+					pastFirstUnhit = (chip, judge);
+					if (NotesManager.IsJudgedFromNearest(chip))
+						break; // block search
+					else if (judge is not ENoteJudge.Poor)
+						pastFirstUnhitNotBad = (chip, judge);
+				}
 			}
-			if (NotesManager.IsGenericRoll(chip)) // during a roll
-				break; // block search
 		}
 		#endregion
 		// most past note is miss, BAD, or judged by nearest -> judge most past non-BAD note if exists
 		if (pastFirstUnhitNotBad.chip != null)
 			pastFirstUnhit = pastFirstUnhitNotBad;
+		// past note is miss, BAD, or judged by nearest, or roll is defined earlier -> judge roll if exists
+		if (pastFirstUnhitRoll.chip != null && (pastFirstUnhit.chip == null || pastFirstUnhitNotBad.chip == null || pastFirstUnhitRoll.chip.n整数値_内部番号 < pastFirstUnhit.chip.n整数値_内部番号))
+			pastFirstUnhit = pastFirstUnhitRoll;
 
 		#region [ choose the best judgement if not both are non-BAD ]
 		bool isPastNotMiss = pastFirstUnhit.judge is not ENoteJudge.Miss;
 		bool isFutureNotMiss = futureFirstUnhit.judge is not ENoteJudge.Miss;
 		if (!(isPastNotMiss && isFutureNotMiss))
 			return isFutureNotMiss ? futureFirstUnhit : pastFirstUnhit;
+
+		// past note is roll, future note is not miss, note is within roll and defined earlier -> judge note
+		if (NotesManager.IsGenericRoll(pastFirstUnhit.chip) && !NotesManager.IsRollEnd(pastFirstUnhit.chip)
+			&& futureFirstUnhit.chip!.n発声時刻ms <= pastFirstUnhit.chip!.end.n発声時刻ms && (futureFirstUnhit.chip!.n整数値_内部番号 < pastFirstUnhit.chip!.n整数値_内部番号)
+			)
+			return futureFirstUnhit;
 
 		bool isPastNotBad = pastFirstUnhit.judge is not ENoteJudge.Poor || NotesManager.IsADLIB(pastFirstUnhit.chip) || NotesManager.IsMine(pastFirstUnhit.chip);
 		bool isFutureNotBad = futureFirstUnhit.judge is not ENoteJudge.Poor || NotesManager.IsADLIB(futureFirstUnhit.chip) || NotesManager.IsMine(futureFirstUnhit.chip);
@@ -1811,7 +1827,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#endregion
 
 		// for balloon-type head judgement window
-		if (NotesManager.IsGenericRoll(futureFirstUnhit.chip) && !NotesManager.IsRollEnd(futureFirstUnhit.chip))
+		if (NotesManager.IsGenericRoll(futureFirstUnhit.chip) && !NotesManager.IsRollEnd(futureFirstUnhit.chip)
+			&& (futureFirstUnhit.chip!.n整数値_内部番号 < pastFirstUnhit.chip!.n整数値_内部番号)
+			)
 			return futureFirstUnhit;
 
 		if (!NotesManager.IsJudgedFromNearest(pastFirstUnhit.chip))
@@ -3284,9 +3302,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private double GetScrollRate(int iPlayer)
 		=> (this.actScrollSpeed.dbConfigScrollSpeed[iPlayer] + 1.0) / 10.0;
 
+	private static Comparer<CChip> NowProcessingRollComparer = Comparer<CChip>.Create((a, b) => a.n整数値_内部番号.CompareTo(b.n整数値_内部番号));
 	private void AddNowProcessingRollChip(int iPlayer, CChip chip) {
 		//if( this.n現在のコース == pChip.nコース )
-		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip);
+		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip, NowProcessingRollComparer);
 		if (idx < 0)
 			idx = ~idx;
 		if (this.chip現在処理中の連打チップ[iPlayer].ElementAtOrDefault(idx) != chip)
