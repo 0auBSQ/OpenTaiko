@@ -4217,12 +4217,13 @@ internal class CTja : CActivity {
 	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
 		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
 
-	public int GetListChipIndexOfMeasure(int iMeasure1to) {
+	public int GetListChipIndexOfMeasure(int iMeasure1to, ECourse? branch = null) {
 		for (int i = 0; i < this.listChip.Count; i++) {
 			CChip pChip = this.listChip[i];
-			if ((iMeasure1to == 0) ? // initial song position
+			if (((iMeasure1to == 0) ? // initial song position
 				pChip.n発声時刻ms >= 0
 				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 == iMeasure1to)
+				&& (branch == null || pChip.IsForBranch(branch.Value)))
 				) {
 				return i;
 			}

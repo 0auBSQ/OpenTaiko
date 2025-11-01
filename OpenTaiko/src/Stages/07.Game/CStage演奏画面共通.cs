@@ -2154,22 +2154,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 		CTja tja = OpenTaiko.TJA!;
 		if (!tja.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
 
-		//listBRANCHを廃止したため強制分岐の開始値を
-		//rc演奏用タイマ.n現在時刻msから引っ張ることに
-
-		//判定枠に一番近いチップの情報を元に一小節分の値を計算する. 2020.04.21 akasoko26
-
-		var p判定枠に最も近いチップ = r指定時刻に一番近い未ヒットChipを過去方向優先で検索する((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 0);
+		// use last reached measure
+		var measure = tja.listChip.ElementAtOrDefault(tja.GetListChipIndexOfMeasure(this.actPlayInfo.NowMeasure[0], this.nCurrentBranch[0]));
 		double db一小節後 = 0.0;
-		if (p判定枠に最も近いチップ != null)
-			db一小節後 = ((15000.0 / p判定枠に最も近いチップ.dbBPM * (p判定枠に最も近いチップ.fNow_Measure_s / p判定枠に最も近いチップ.fNow_Measure_m)) * 16.0);
+		if (measure != null)
+			db一小節後 = Math.Max(0, ((15000.0 / measure.dbBPM * (measure.fNow_Measure_s / measure.fNow_Measure_m)) * 16.0));
 		double msBranchPoint = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) + db一小節後;
 
 		if (!this.bUseBranch[0]) {
 			this.bUseBranch[0] = true;
 			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(0, 0);
 		}
-		this.t分岐処理(branch, 0, msBranchPoint, p判定枠に最も近いチップ?.idxBranchSection ?? this.idxLastBranchSection[0]);
+		this.t分岐処理(branch, 0, msBranchPoint, measure?.idxBranchSection ?? this.idxLastBranchSection[0]);
 		OpenTaiko.stageGameScreen.ChangeBranch(branch, 0, msBranchPoint);
 		this.b強制的に分岐させた[0] = true;
 	}
