@@ -2822,7 +2822,7 @@ internal class CTja : CActivity {
 		chip.bShowRoll = true;
 		chip.db発声位置 = this.dbNowTime;
 		chip.n整数値 = (int)noteType;
-		chip.n整数値_内部番号 = 1;
+		chip.n整数値_内部番号 = this.listNoteChip.Count;
 		chip.nScrollDirection = this.nスクロール方向;
 		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
