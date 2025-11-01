@@ -342,7 +342,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			+ (int)(Math.Ceiling(16.6 * this.nRollTimeMs[player] / 1000 / 10) * 100 * 10));
 
 	public static double GetAddScoreGen4ShinUchi(int nSongNotes, int nSongBalloonHits, double msSongRollTime) {
-		if (nSongNotes == 0 && nSongBalloonHits == 0)
+		if (nSongNotes == 0)
 			return 1000000;
 		return (double)Math.Ceiling((decimal)(
 			1000000 - (nSongBalloonHits * 100) - (16.6 * msSongRollTime / 1000 * 100)
