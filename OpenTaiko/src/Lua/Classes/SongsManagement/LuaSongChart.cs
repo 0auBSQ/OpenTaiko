@@ -55,6 +55,12 @@
 			}
 		}
 
+		public int DifficultyAsInt {
+			get {
+				return (int)_difficulty;
+			}
+		}
+
 		public string NotesDesigner {
 			get {
 				return _notesDesigner;
@@ -89,7 +95,55 @@
 			}
 		}
 
+		public string? TowerType {
+			get {
+				return _chartInfo?.nTowerType ?? null;
+			}
+		}
+
 		#endregion
+
+		#region [Dan specific]
+
+		public int? DanTick {
+			get {
+				return _chartInfo?.nDanTick ?? null;
+			}
+		}
+
+		public LuaColor DanTickColor {
+			get {
+				LuaColorFunc lfc = new LuaColorFunc();
+				if (_chartInfo != null) {
+					CScore.ST譜面情報 _cinfo = (CScore.ST譜面情報)_chartInfo;
+					return lfc.CreateColorFromRGBA(_cinfo.cDanTickColor.R, _cinfo.cDanTickColor.G, _cinfo.cDanTickColor.B, _cinfo.cDanTickColor.A);
+				}
+				return lfc.CreateColorFromHex("#ffffff");
+			}
+		}
+
+		public LuaSongDanSong[] DanSongs {
+			get {
+				List<LuaSongDanSong> _ds = new List<LuaSongDanSong>();
+				foreach (CTja.DanSongs _danSong in _parentListNode?.DanSongs ?? new List<CTja.DanSongs>()) {
+					_ds.Add(new LuaSongDanSong(_danSong));
+				}
+				return _ds.ToArray();
+			}
+		}
+
+		public LuaSongDanExam[] DanExams {
+			get {
+				List<LuaSongDanExam> _de = new List<LuaSongDanExam>();
+				foreach (Dan_C _danC in _parentListNode?.Dan_C.ToList() ?? new List<Dan_C>()) {
+					_de.Add(new LuaSongDanExam(_danC));
+				}
+				return _de.ToArray();
+			}
+		}
+
+		#endregion
+
 
 		public bool Select(int player, bool init = false) {
 			if (!NotNull) return false;
