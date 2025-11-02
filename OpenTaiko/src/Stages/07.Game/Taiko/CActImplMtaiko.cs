@@ -389,7 +389,7 @@ internal class CActImplMtaiko : CActivity {
 			this.stパッド状態[nPlayer, 2 + (nHand == 0 ? 1 : 0)].n明るさ = 8;
 		} else if (NotesManager.IsPinkKonga(noteType, gameType)) {
 			this.stパッド状態[nPlayer, 0].n明るさ = 8;
-			this.stパッド状態[nPlayer, 2].n明るさ = 8;
+			this.stパッド状態[nPlayer, 3].n明るさ = 8;
 		} else if (NotesManager.IsAcceptRed(noteType, gameType)) {
 			this.stパッド状態[nPlayer, 2 + nHand].n明るさ = 8;
 		} else if (NotesManager.IsAcceptBlue(noteType, gameType)) {
