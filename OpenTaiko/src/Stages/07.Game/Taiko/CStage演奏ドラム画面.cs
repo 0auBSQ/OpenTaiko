@@ -716,32 +716,36 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				// Register to replay file
 				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
 
-				// test judgement
-				var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer);
-				var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
-				if (e判定 != ENoteJudge.Miss) {
-					e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPadAs1P, msHitTjaTime);
-					if (e判定 is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
-						gameType = chipNoHit?.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
-				}
-
-				// Visual and sound effects
-				PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
-				int nHand = NotesManager.PadToHand(nPad);
-				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(NotesManager.PadToInputType(nPadAs1P), nHand, nUsePlayer);
-
-				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
-				if (nLane is not PlayerLane.FlashType.Total && e判定 is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
-					this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPadAs1P));
-					this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPadAs1P), gameType);
-
-					// BAD or TIGHT 時の処理。
-					if (chipNoHit != null && OpenTaiko.ConfigIni.bTight)
-						this.tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad.Drums, e判定, nUsePlayer, null);
-				}
-				#endregion
+				this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
 			}
 		}
+	}
+
+	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime) {
+		// test judgement
+		var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer);
+		var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
+		if (e判定 != ENoteJudge.Miss) {
+			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime);
+			if (e判定 is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
+				gameType = chipNoHit?.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
+		}
+
+		// Visual and sound effects
+		PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
+		int nHand = NotesManager.PadToHand(nPad);
+		OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(NotesManager.PadToInputType(nPad), nHand, nUsePlayer);
+
+		#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
+		if (nLane is not PlayerLane.FlashType.Total && e判定 is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
+			this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPad));
+			this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPad), gameType);
+
+			// BAD or TIGHT 時の処理。
+			if (chipNoHit != null && OpenTaiko.ConfigIni.bTight)
+				this.tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad.Drums, e判定, nUsePlayer, null);
+		}
+		#endregion
 	}
 
 	private ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime) {
