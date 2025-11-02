@@ -900,6 +900,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#region[ 両手待ち時 ]
 				if (pChip.eNoteState == ENoteState.Wait) {
 					x = (GetNoteOriginX(nPlayer));
+					y = (GetNoteOriginY(nPlayer));
 				}
 				#endregion
 
