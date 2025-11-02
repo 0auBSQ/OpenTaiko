@@ -1787,14 +1787,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 		(CChip? chip, ENoteJudge judge) pastFirstUnhit = (null, ENoteJudge.Miss);
 		(CChip? chip, ENoteJudge judge) pastFirstUnhitNotBad = (null, ENoteJudge.Miss);
 		(CChip? chip, ENoteJudge judge) pastFirstUnhitRoll = (null, ENoteJudge.Miss);
+		var firstWaitingChip = this.chipNowProcessingMultiHitNotes[nPlayer].FirstOrDefault();
 		for (int i = iFutureFirst; i-- > 0;) { // exclude past from future
 			CChip chip = listChip[nPlayer][i];
 			if (!chip.bVisible || !NotesManager.IsHittableNote(chip) || NotesManager.IsRollEnd(chip))
 				continue;
-			var judge = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
-			if (judge is ENoteJudge.Miss) // not in judgement window or after a roll
+			var judge = (chip.eNoteState is ENoteState.Wait) ? ENoteJudge.Perfect : this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
+			if (judge is ENoteJudge.Miss && (firstWaitingChip == null || chip.n発声時刻ms < firstWaitingChip.n発声時刻ms)) // search over waiting notes
 				break;
-			if (!chip.IsMissed && !chip.bHit) {
+			if (!chip.IsMissed && !chip.bHit && judge is not ENoteJudge.Miss) { // in judgement window or during a roll
 				if (NotesManager.IsGenericRoll(chip)) {
 					if (pastFirstUnhitRoll.chip == null || chip.n整数値_内部番号 < pastFirstUnhitRoll.chip.n整数値_内部番号)
 						pastFirstUnhitRoll = (chip, judge);
