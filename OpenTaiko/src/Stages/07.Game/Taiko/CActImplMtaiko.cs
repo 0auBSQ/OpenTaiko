@@ -377,25 +377,25 @@ internal class CActImplMtaiko : CActivity {
 		return base.Draw();
 	}
 
-	public void tMtaikoEvent(NotesManager.ENoteType noteType, EGameType gameType, int nHand, int nPlayer, bool isBigInput = false) {
-		if (isBigInput && NotesManager.IsBigDonTaiko(noteType, gameType)) {
-			this.stパッド状態[nPlayer, 2].n明るさ = 8;
-			this.stパッド状態[nPlayer, 3].n明るさ = 8;
-		} else if (isBigInput && NotesManager.IsBigKaTaiko(noteType, gameType)) {
-			this.stパッド状態[nPlayer, 0].n明るさ = 8;
-			this.stパッド状態[nPlayer, 1].n明るさ = 8;
-		} else if (NotesManager.IsPurpleNoteTaiko(noteType, gameType)) {
-			this.stパッド状態[nPlayer, nHand].n明るさ = 8;
-			this.stパッド状態[nPlayer, 2 + (nHand == 0 ? 1 : 0)].n明るさ = 8;
-		} else if (NotesManager.IsPinkKonga(noteType, gameType)) {
-			this.stパッド状態[nPlayer, 0].n明るさ = 8;
-			this.stパッド状態[nPlayer, 3].n明るさ = 8;
-		} else if (NotesManager.IsAcceptRed(noteType, gameType)) {
-			this.stパッド状態[nPlayer, 2 + nHand].n明るさ = 8;
-		} else if (NotesManager.IsAcceptBlue(noteType, gameType)) {
-			this.stパッド状態[nPlayer, nHand].n明るさ = 8;
-		} else if (NotesManager.IsAcceptClap(noteType, gameType)) {
-			this.stパッド状態[nPlayer, 4].n明るさ = 8;
+	public void tMtaikoEvent(NotesManager.EInputType input, int nHand, int nPlayer) {
+		switch (input) {
+			case NotesManager.EInputType.Red:
+				this.stパッド状態[nPlayer, 2 + nHand].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.RedBig:
+				this.stパッド状態[nPlayer, 2].n明るさ = 8;
+				this.stパッド状態[nPlayer, 3].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.Blue:
+				this.stパッド状態[nPlayer, nHand].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.BlueBig:
+				this.stパッド状態[nPlayer, 0].n明るさ = 8;
+				this.stパッド状態[nPlayer, 1].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.Clap:
+				this.stパッド状態[nPlayer, 4].n明るさ = 8;
+				break;
 		}
 	}
 
