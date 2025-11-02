@@ -894,6 +894,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected abstract void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime);
+	protected abstract ENoteJudge JudgePadInput(int iPlayer, CChip? chip, EPad pad, long msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false);
 
 	public static EPad[] GetAutoInput(NotesManager.ENoteType noteType, EGameType gameType, int nHand, bool isBigInput = false) {
 		if (isBigInput && NotesManager.IsBigDonTaiko(noteType, gameType))
@@ -916,10 +917,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return [];
 	}
 
-	private bool CanAutoplayHit(CChip chip, long msTjaTime, int iPlayer) {
+	private bool CanAutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
 		if (this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, iPlayer) is ENoteJudge.Miss) // less costly check
 			return false;
-		var (chipToJudge, judge) = this.GetChipToJudge(msTjaTime, iPlayer);
+		var pads = GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
+		if (pads.Length == 0)
+			return false;
+		var (chipToJudge, judge) = this.GetChipToJudge(msTjaTime, iPlayer, pads[0]);
 		return (chipToJudge == chip && judge is not ENoteJudge.Miss);
 	}
 
@@ -930,7 +934,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private bool AutoplayTryHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!this.CanAutoplayHit(chip, msTjaTime, iPlayer))
+		if (!this.CanAutoplayHit(chip, msTjaTime, iPlayer, gt))
 			return false;
 		this.AutoplayDoHit(chip, msTjaTime, iPlayer, gt);
 		return true;
@@ -944,7 +948,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (!bAutoPlay)
 			return;
 
-		bool canHitNow = this.CanAutoplayHit(chip, msTjaTime, iPlayer);
+		bool canHitNow = this.CanAutoplayHit(chip, msTjaTime, iPlayer, gt);
 		if (chip.n発声時刻ms > msTjaTime) {
 			if (chip.eNoteState == ENoteState.None && canHitNow)
 				chip.msStoredHit = msTjaTime;
@@ -953,7 +957,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (chip.eNoteState == ENoteState.None && chip.msStoredHit < chip.n発声時刻ms) {
 			if (this.AutoplayTryHit(chip, chip.n発声時刻ms, iPlayer, gt)) // critical hit
 				return;
-			bool canHitEarly = this.CanAutoplayHit(chip, (long)chip.msStoredHit, iPlayer);
+			bool canHitEarly = this.CanAutoplayHit(chip, (long)chip.msStoredHit, iPlayer, gt);
 			if (canHitEarly && (!canHitNow || Math.Abs(chip.msStoredHit - chip.n発声時刻ms) < Math.Abs(msTjaTime - chip.n発声時刻ms))) {
 				this.AutoplayDoHit(chip, (long)chip.msStoredHit, iPlayer, gt); // early hit
 				return;
@@ -1760,21 +1764,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
 	}
 
-	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudge(long msTjaTime, int nPlayer) {
-		var (chip, judge) = GetChipToJudgeIgnoringRollBody(msTjaTime, nPlayer);
+	protected bool IsInputPadConsumedByChip(int nPlayer, CChip chip, EPad pad, long msTjaTime, ENoteJudge judge)
+		=> NotesManager.IsGenericBalloon(chip) || this.JudgePadInput(nPlayer, chip, pad, msTjaTime, judge, skipHit: true) is not ENoteJudge.Miss;
+
+	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudge(long msTjaTime, int nPlayer, EPad pad) {
+		var (chip, judge) = GetChipToJudgeIgnoringRollBody(msTjaTime, nPlayer, pad);
 		var chipRoll = this.chip現在処理中の連打チップ[nPlayer].FirstOrDefault(x => x.bVisible && !x.bHit);
 		if (chipRoll != null && ( // note is miss or past BAD, or roll is defined earlier -> judge roll if exists
 			chip == null || judge is ENoteJudge.Miss || ((chip.n発声時刻ms < msTjaTime && judge is ENoteJudge.Poor) && !(NotesManager.IsADLIB(chip) || NotesManager.IsMine(chip)))
 			|| chipRoll.n整数値_内部番号 < chip.n整数値_内部番号
 			)) {
 			var judgeRoll = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chipRoll, nPlayer);
-			if (judgeRoll is not ENoteJudge.Miss)
+			if (judgeRoll is not ENoteJudge.Miss && this.IsInputPadConsumedByChip(nPlayer, chipRoll, pad, msTjaTime, judgeRoll))
 				(chip, judge) = (chipRoll, judgeRoll);
 		}
 		return (chip, judge);
 	}
 
-	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer) {
+	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer, EPad pad) {
 		int count = listChip[nPlayer].Count;
 		if (count <= 0)         // 演奏データとして1個もチップがない場合は
 			return (null, ENoteJudge.Miss);
@@ -1797,7 +1804,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			var judge = this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
 			if (judge is ENoteJudge.Miss) // not in judgement window or before a roll
 				break;
-			if (!chip.IsMissed && !chip.bHit) {
+			if (!chip.IsMissed && !chip.bHit && this.IsInputPadConsumedByChip(nPlayer, chip, pad, msTjaTime, judge)) {
 				futureFirstUnhit = (chip, judge);
 				break;
 			}
@@ -1815,8 +1822,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				continue;
 			var judge = (chip.eNoteState is ENoteState.Wait) ? ENoteJudge.Perfect : this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, nPlayer);
 			if (judge is ENoteJudge.Miss && (firstWaitingChip == null || chip.n発声時刻ms < firstWaitingChip.n発声時刻ms)) // search over waiting notes
-				break;
-			if (!chip.IsMissed && !chip.bHit && judge is not ENoteJudge.Miss) { // in judgement window or during a roll
+				break; // not in judgement window or after a roll
+			if (!chip.IsMissed && !chip.bHit && this.IsInputPadConsumedByChip(nPlayer, chip, pad, msTjaTime, judge)) {
 				if (NotesManager.IsGenericRoll(chip)) {
 					if (pastFirstUnhitRoll.chip == null || chip.n整数値_内部番号 < pastFirstUnhitRoll.chip.n整数値_内部番号)
 						pastFirstUnhitRoll = (chip, judge);
@@ -1869,150 +1876,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int msTjaDTime_Past = Math.Abs((int)(msTjaTime - pastFirstUnhit.chip!.n発声時刻ms));
 		return (msTjaDTime_Future < msTjaDTime_Past) ? futureFirstUnhit : pastFirstUnhit;
 	}
-
-	/// <summary>
-	/// 最も判定枠に近いドンカツを返します。
-	/// </summary>
-	/// <param name="nowTime">判定時の時間。</param>
-	/// <param name="player">プレイヤー。</param>
-	/// <param name="don">ドンかどうか。</param>
-	/// <returns>最も判定枠に近いノーツ。</returns>
-	/*
-    protected CDTX.CChip GetChipOfNearest(long nowTime, int player, bool don)
-    {
-        var nearestChip = new CDTX.CChip();
-        var count = listChip[player].Count;
-        var chips = listChip[player];
-        var startPosision = NowProcessingChip[player];
-        CDTX.CChip pastChip; // 判定されるべき過去ノート
-        CDTX.CChip futureChip; // 判定されるべき未来ノート
-        var pastJudge = E判定.Miss;
-        var futureJudge = E判定.Miss;
-
-        bool GetDon(CDTX.CChip note)
-        {
-            return note.nチャンネル番号 == 0x11 || note.nチャンネル番号 == 0x13 || note.nチャンネル番号 == 0x1A || note.nチャンネル番号 == 0x1F;
-        }
-        bool GetKatsu(CDTX.CChip note)
-        {
-            return note.nチャンネル番号 == 0x12 || note.nチャンネル番号 == 0x14 || note.nチャンネル番号 == 0x1B || note.nチャンネル番号 == 0x1F;
-        }
-
-        if (count <= 0)
-        {
-            return null;
-        }
-
-        if (startPosision >= count)
-        {
-            startPosision -= 1;
-        }
-
-        #region 過去のノーツで、かつ可判定以上のノーツの決定
-        CDTX.CChip afterChip = null;
-        for (int pastNote = startPosision - 1; ; pastNote--)
-        {
-            if (pastNote < 0)
-            {
-                pastChip = afterChip != null ? afterChip : null; // afterChipに過去の判定があるかもしれないので
-                break;
-            }
-            var processingChip = chips[pastNote];
-            if (!processingChip.IsHitted && processingChip.nコース == n現在のコース[player]) // まだ判定されてない音符
-            {
-                if (don ? GetDon(processingChip) : GetKatsu(processingChip)) // 音符のチャンネルである
-                {
-                    var thisChipJudge = pastJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip, player);
-                    if (thisChipJudge != E判定.Miss)
-                    {
-                        // 判定が見過ごし不可ではない(=たたいて不可以上)
-                        // その前のノートがもしかしたら存在して、可以上の判定かもしれないからまだ処理を続行する。
-                        afterChip = processingChip;
-                        continue;
-                    }
-                    else
-                    {
-                        // 判定が不可だった
-                        // その前のノーツを過去で可以上のノート(つまり判定されるべきノート)とする。
-                        pastChip = afterChip;
-                        break; // 検索終わり
-                    }
-                }
-            }
-            if (processingChip.IsHitted && processingChip.nコース == n現在のコース[player]) // 連打
-            {
-                if ((0x15 <= processingChip.nチャンネル番号) && (processingChip.nチャンネル番号 <= 0x17))
-                {
-                    if (processingChip.nノーツ終了時刻ms > nowTime)
-                    {
-                        pastChip = processingChip;
-                        break;
-                    }
-                }
-            }
-        }
-        #endregion
-
-        #region 未来のノーツで、かつ可判定以上のノーツの決定
-        for (int futureNote = startPosision; ; futureNote++)
-        {
-            if (futureNote >= count)
-            {
-                futureChip = null;
-                break;
-            }
-            var processingChip = chips[futureNote];
-            if (!processingChip.IsHitted && processingChip.nコース == n現在のコース[player]) // まだ判定されてない音符
-            {
-                if (don ? GetDon(processingChip) : GetKatsu(processingChip)) // 音符のチャンネルである
-                {
-                    var thisChipJudge = futureJudge = e指定時刻からChipのJUDGEを返すImpl(nowTime, processingChip, player);
-                    if (thisChipJudge != E判定.Miss)
-                    {
-                        // 判定が見過ごし不可ではない(=たたいて不可以上)
-                        // そのノートを処理すべきなので、検索終わり。
-                        futureChip = processingChip;
-                        break; // 検索終わり
-                    }
-                    else
-                    {
-                        // 判定が不可だった
-                        // つまり未来に処理すべきノートはないので、検索終わり。
-                        futureChip = null; // 今処理中のノート
-                        break; // 検索終わり
-                    }
-                }
-            }
-        }
-        #endregion
-
-        #region 過去のノーツが見つかったらそれを返却、そうでなければ未来のノーツを返却
-        if ((pastJudge == E判定.Miss || pastJudge == E判定.Poor) && (futureJudge != E判定.Miss && futureJudge != E判定.Poor))
-        {
-            // 過去の判定が不可で、未来の判定が可以上なら未来を返却。
-            nearestChip = futureChip;
-        }
-        else if (futureChip == null && pastChip != null)
-        {
-            // 未来に処理するべきノートがなかったので、過去の処理すべきノートを返す。
-            nearestChip = pastChip;
-        }
-        else if (pastChip == null && futureChip != null)
-        {
-            // 過去の検索が該当なしだったので、未来のノートを返す。
-            nearestChip = futureChip;
-        }
-        else
-        {
-            // 基本的には過去のノートを返す。
-            nearestChip = pastChip;
-        }
-        #endregion
-
-        return nearestChip;
-    }
-    */
-
 
 	public bool r検索範囲内にチップがあるか調べる(long nTime, int n検索範囲時間ms, int nPlayer) {
 		for (int i = 0; i < listChip[nPlayer].Count; i++) {

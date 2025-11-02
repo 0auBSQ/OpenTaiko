@@ -699,8 +699,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!inputEvent.Pressed)
 					continue;
 
-				//2015.03.19 kairera0467 Chipを1つにまとめて1つのレーン扱いにする。
-
 				int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 				if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
 					|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]
@@ -727,7 +725,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime) {
 		// test judgement
-		var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer);
+		var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer, nPad);
 		var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
 		if (e判定 != ENoteJudge.Miss) {
 			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, e判定);
@@ -752,79 +750,46 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		#endregion
 	}
 
-	private ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge) {
+	protected override ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false) {
 		if (chipNoHit == null || rawJudge is ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
 		EGameType gameType = chipNoHit.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
 		PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
-		if (nLane == PlayerLane.FlashType.Total)
+		if (nLane == PlayerLane.FlashType.Total || !NotesManager.IsExpectedPadAnyHit(nPad, chipNoHit, gameType))
 			return ENoteJudge.Miss;
 
-		bool _isBigNoteTaiko = NotesManager.IsBigNoteTaiko(chipNoHit, gameType);
-		bool _isPinkKonga = NotesManager.IsSwapNote(chipNoHit, gameType);
-		bool _isSmallNote = NotesManager.IsSmallNote(chipNoHit, gameType);
-		bool isHitTypeExpected = NotesManager.IsExpectedPadAnyHit(nPad, chipNoHit, gameType);
-
-		// Process small note (& konga clap)
-		if (_isSmallNote) {
-			if (isHitTypeExpected) {
-				return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
-			}
-		}
-		// Process big notes (judge big notes off)
-		else if (_isBigNoteTaiko && !OpenTaiko.ConfigIni.bJudgeBigNotes) {
-			if (isHitTypeExpected) {
-				chipNoHit.eNoteState = ENoteState.None;
-				chipNoHit.padStoredHit = EPad.Unknown;
-				return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, true, nUsePlayer);
-			}
-		}
 		// Process big notes (judge big notes on)
-		else if ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga) {
-			if (isHitTypeExpected) {
-				float dtime = chipNoHit.n発声時刻ms - (float)msHitTjaTime;
-				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-
-				if (chipNoHit.eNoteState == ENoteState.None) {
-					if (rawJudge is ENoteJudge.Poor)
-						return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
+		bool _isBigNoteTaiko = NotesManager.IsBigNoteTaiko(chipNoHit, gameType);
+		if ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || NotesManager.IsSwapNote(chipNoHit, gameType)) {
+			if (chipNoHit.eNoteState == ENoteState.None) {
+				if (rawJudge is ENoteJudge.Poor)
+					return skipHit ? rawJudge : this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
+				if (!skipHit) {
 					chipNoHit.eNoteState = ENoteState.Wait;
 					chipNoHit.msStoredHit = msHitTjaTime;
 					chipNoHit.padStoredHit = nPad;
-					this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
-					return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
-				} else if (chipNoHit.eNoteState == ENoteState.Wait) {
-					bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
-					var msWaitedTime = msHitTjaTime - chipNoHit.msStoredHit;
-
-					// Double tap success
-					if (_isExpected && msWaitedTime < msMaxWaitTime) {
-						chipNoHit.eNoteState = ENoteState.None;
-						chipNoHit.padStoredHit = EPad.Unknown;
-						return this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPad, chipNoHit, true, nUsePlayer);
-					}
-					// Double tap failure
-					else if (!_isExpected) {
-						chipNoHit.eNoteState = ENoteState.None;
-						chipNoHit.padStoredHit = EPad.Unknown;
-						if (!_isPinkKonga) {
-							this.tドラムヒット処理((long)chipNoHit.msStoredHit, EPad.Unknown, chipNoHit, false, nUsePlayer);
-						}
-						return ENoteJudge.Miss;
-					}
+				}
+				this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
+				return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
+			} else if (chipNoHit.eNoteState == ENoteState.Wait) {
+				bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
+				var msWaitedTime = msHitTjaTime - chipNoHit.msStoredHit;
+				if (_isExpected && msWaitedTime < OpenTaiko.ConfigIni.nBigNoteWaitTimems) {
+					if (skipHit)
+						return ENoteJudge.Perfect;
+					chipNoHit.eNoteState = ENoteState.None;
+					chipNoHit.padStoredHit = EPad.Unknown;
+					return this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPad, chipNoHit, true, nUsePlayer);
 				}
 			}
+			return ENoteJudge.Miss;
 		}
-		// Judge rolls
-		else if (NotesManager.IsGenericRoll(chipNoHit) && !NotesManager.IsRollEnd(chipNoHit)) {
-			if (isHitTypeExpected)
-				return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
-		} else if (NotesManager.IsADLIB(chipNoHit) || NotesManager.IsMine(chipNoHit)) {
-			return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
-		}
-
-		return ENoteJudge.Miss;
+		if (skipHit)
+			return rawJudge;
+		chipNoHit.eNoteState = ENoteState.None;
+		chipNoHit.padStoredHit = EPad.Unknown;
+		return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, _isBigNoteTaiko, nUsePlayer);
 	}
 
 	protected override void t背景テクスチャの生成() {
