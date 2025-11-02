@@ -1059,14 +1059,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected ENoteJudge tRollProcess(CChip pChip, EGameType gt, double msHitTjaTime, NotesManager.EInputType sort, int nPlayer) {
 		if (msHitTjaTime >= pChip.n発声時刻ms && msHitTjaTime < pChip.end.n発声時刻ms) {
+			this.actRoll.b表示[nPlayer] = true;
 			if (pChip.nRollCount == 0) //連打カウントが0の時
-			{
-				this.actRoll.b表示[nPlayer] = true;
-				this.nCurrentRollCount[nPlayer] = 0;
 				this.actRoll.t枠表示時間延長(nPlayer, true);
-			} else {
+			else
 				this.actRoll.t枠表示時間延長(nPlayer, false);
-			}
 			if (this.actRoll.ct連打アニメ[nPlayer].IsUnEnded) {
 				this.actRoll.ct連打アニメ[nPlayer] = new CCounter(0, 9, 14, OpenTaiko.Timer);
 				this.actRoll.ct連打アニメ[nPlayer].CurrentValue = 1;
@@ -1085,12 +1082,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 				pChip.RollDelay?.Stop();
 			}
 
-			pChip.nRollCount++;
+			this.nCurrentRollCount[nPlayer] = ++pChip.nRollCount;
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				this.DanSongScore[actDan.NowShowingNumber].nRoll++;
-
-			this.nCurrentRollCount[nPlayer]++;
 
 			this.CBranchScore[nPlayer].nRoll++;
 			this.CChartScore[nPlayer].nRoll++;
