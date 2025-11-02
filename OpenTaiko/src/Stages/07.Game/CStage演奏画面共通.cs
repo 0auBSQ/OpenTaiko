@@ -1017,6 +1017,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected void PlayHitNoteSound(int iPlayer, NotesManager.EInputType input)
 		=> PlayHitNoteSound(iPlayer, input, NotesManager.ENoteType.Empty, 0);
 
+	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, NotesManager.ENoteType nt, EGameType gt, bool isAutoplay = false) {
+		if (isAutoplay) {
+			if (NotesManager.IsAcceptRed(nt, gt)) {
+				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Red, gt);
+				if (NotesManager.IsSwapNote(nt, gt)) {
+					this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Blue, gt);
+				}
+			} else if (NotesManager.IsAcceptBlue(nt, gt)) {
+				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Blue, gt);
+			} else if (NotesManager.IsAcceptClap(nt, gt)) {
+				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Clap, gt);
+			}
+			return;
+		}
+
+		this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(NotesManager.InputToLane(input), gt);
+	}
+	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, EGameType gt)
+		=> StartHitNoteLaneFlash(iPlayer, input, NotesManager.ENoteType.Empty, gt);
+
 	private void AutoplaySwitchHand(int iPlayer) {
 		if (this.nHand[iPlayer] == 0)
 			this.nHand[iPlayer]++;
@@ -1098,7 +1118,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CSectionScore[nPlayer].nScore = __score;
 
 			this.PlayHitNoteSound(nPlayer, sort);
-			this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(NotesManager.InputToLane(sort), gt);
+			this.StartHitNoteLaneFlash(nPlayer, sort, gt);
 			//赤か青かの分岐
 			if (sort is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig) {
 				OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.IsBigRollTaiko(pChip, gt) ? NotesManager.ENoteType.DonBig : NotesManager.ENoteType.Don, gt, nPlayer);
@@ -1196,7 +1216,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.CChartScore[player].nScore = __score;
 		this.CSectionScore[player].nScore = __score;
 
-		this.actTaikoLaneFlash.PlayerLane[player].Start(NotesManager.InputToLane(sort), gt);
+		this.StartHitNoteLaneFlash(player, sort, gt);
 		if (balloon - rollCount <= 0)
 			this.ProcessBalloonBroke(player, pChip, sort);
 		else
@@ -1263,7 +1283,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					this.soundAdlib[nPlayer]?.PlayStart();
-					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(NotesManager.InputToLane(nNowInput), gt);
+					this.StartHitNoteLaneFlash(nPlayer, nNowInput, pChip, gt, isAutoplay);
 					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
 					this.CChartScore[nPlayer].nADLIB++;
 					this.CSectionScore[nPlayer].nADLIB++;
@@ -1283,7 +1303,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					bBombHit = true;
 					eJudgeResult = ENoteJudge.Bad;
 					this.PlayHitNoteSound(nPlayer, nNowInput, pChip, gt, isAutoplay);
-					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(NotesManager.InputToLane(nNowInput), gt);
+					this.StartHitNoteLaneFlash(nPlayer, nNowInput, pChip, gt, isAutoplay);
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, ENoteJudge.Mine, false, nPlayer);
 					OpenTaiko.Skin.soundBomb?.tPlay();
@@ -1308,7 +1328,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actJudgeString.Start(nPlayer, (bAutoPlay && !OpenTaiko.ConfigIni.bAIBattleMode) ? ENoteJudge.Auto : eJudgeResult);
 					bool isBigInput = nNowInput is NotesManager.EInputType.RedBig or NotesManager.EInputType.BlueBig || !OpenTaiko.ConfigIni.bJudgeBigNotes;
 					this.PlayHitNoteSound(nPlayer, nNowInput, pChip, gt, isAutoplay);
-					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(NotesManager.InputToLane(nNowInput), gt);
+					this.StartHitNoteLaneFlash(nPlayer, nNowInput, pChip, gt, isAutoplay);
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
 					if (eJudgeResult is not ENoteJudge.Poor) {
