@@ -730,7 +730,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer);
 		var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
 		if (e判定 != ENoteJudge.Miss) {
-			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime);
+			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, e判定);
 			if (e判定 is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
 				gameType = chipNoHit?.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
 		}
@@ -752,8 +752,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		#endregion
 	}
 
-	private ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime) {
-		if (chipNoHit == null)
+	private ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge) {
+		if (chipNoHit == null || rawJudge is ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
 		EGameType gameType = chipNoHit.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
@@ -783,26 +783,23 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Process big notes (judge big notes on)
 		else if ((_isBigNoteTaiko && OpenTaiko.ConfigIni.bJudgeBigNotes) || _isPinkKonga) {
 			if (isHitTypeExpected) {
-				CConfigIni.CTimingZones tz = this.GetTimingZones(nUsePlayer);
 				float dtime = chipNoHit.n発声時刻ms - (float)msHitTjaTime;
 				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
 
-				bool _timeBadOrLater = dtime <= tz.nBadZone;
-
 				if (chipNoHit.eNoteState == ENoteState.None) {
-					if (_timeBadOrLater) {
-						chipNoHit.eNoteState = ENoteState.Wait;
-						chipNoHit.msStoredHit = msHitTjaTime;
-						chipNoHit.padStoredHit = nPad;
-						this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
-						return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
-					}
+					if (rawJudge is ENoteJudge.Poor)
+						return this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
+					chipNoHit.eNoteState = ENoteState.Wait;
+					chipNoHit.msStoredHit = msHitTjaTime;
+					chipNoHit.padStoredHit = nPad;
+					this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
+					return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
 				} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 					bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
 					var msWaitedTime = msHitTjaTime - chipNoHit.msStoredHit;
 
 					// Double tap success
-					if (_isExpected && _timeBadOrLater && msWaitedTime < msMaxWaitTime) {
+					if (_isExpected && msWaitedTime < msMaxWaitTime) {
 						chipNoHit.eNoteState = ENoteState.None;
 						chipNoHit.padStoredHit = EPad.Unknown;
 						return this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPad, chipNoHit, true, nUsePlayer);
