@@ -26,7 +26,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nState;
 	public int nRollCount;
 	public int nBalloon;
-	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last auto roll hit for rolls
+	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
 	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
 	public ENoteState eNoteState;
