@@ -893,6 +893,35 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return ENoteJudge.Miss;
 	}
 
+	public static (NotesManager.EInputType inputType, EPad[] pads) GetAutoInput(NotesManager.ENoteType noteType, EGameType gameType, int nHand, bool isBigInput = false) {
+		if (isBigInput && NotesManager.IsBigDonTaiko(noteType, gameType))
+			return (NotesManager.EInputType.RedBig, [EPad.LRed, EPad.RRed]);
+		if (isBigInput && NotesManager.IsBigKaTaiko(noteType, gameType))
+			return (NotesManager.EInputType.BlueBig, [EPad.LBlue, EPad.RBlue]);
+		if (NotesManager.IsPurpleNoteTaiko(noteType, gameType))
+			return (NotesManager.EInputType.Unknown, (nHand == 0) ? [EPad.LBlue, EPad.RRed] : [EPad.RBlue, EPad.LRed]);
+		if (NotesManager.IsPinkKonga(noteType, gameType))
+			return (NotesManager.EInputType.Unknown, [EPad.LBlue, EPad.RRed]);
+		if (NotesManager.IsAcceptRed(noteType, gameType)) {
+			if (gameType is EGameType.Konga && NotesManager.IsAcceptBlue(noteType, gameType))
+				return (nHand == 0) ? (NotesManager.EInputType.Blue, [EPad.LBlue]) : (NotesManager.EInputType.Red, [EPad.RRed]);
+			return (NotesManager.EInputType.Red, (nHand == 0) ? [EPad.LRed] : [EPad.RRed]);
+		}
+		if (NotesManager.IsAcceptBlue(noteType, gameType))
+			return (NotesManager.EInputType.Blue, (nHand == 0) ? [EPad.LBlue] : [EPad.RBlue]);
+		if (NotesManager.IsAcceptClap(noteType, gameType))
+			return (NotesManager.EInputType.Clap, [EPad.Clap]);
+		return (NotesManager.EInputType.Unknown, []);
+	}
+
+	private void AutoplayDoHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
+		this.AutoplaySwitchHand(iPlayer);
+		var (inputType, pads) = GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
+		foreach (var pad in pads)
+			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(NotesManager.PadToInputType(pad), NotesManager.PadToHand(pad), iPlayer);
+		this.tチップのヒット処理(msTjaTime, chip, EInstrumentPad.Taiko, true, inputType, iPlayer, isAutoplay: true);
+	}
+
 	protected void AutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
 		if (chip.bHit || chip.n発声時刻ms > msTjaTime) {
 			return;
@@ -901,21 +930,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		if (bAutoPlay && !this.bPAUSE && !NotesManager.IsMine(chip)) {
 			chip.bHit = true;
-
-			var nInputAuto = NotesManager.EInputType.Red;
-			if (NotesManager.IsSmallBlue(chip, gt))
-				nInputAuto = NotesManager.EInputType.Blue;
-			else if (NotesManager.IsBigDonTaiko(chip, gt))
-				nInputAuto = OpenTaiko.ConfigIni.bJudgeBigNotes ? NotesManager.EInputType.RedBig : NotesManager.EInputType.Red;
-			else if (NotesManager.IsBigKaTaiko(chip, gt))
-				nInputAuto = OpenTaiko.ConfigIni.bJudgeBigNotes ? NotesManager.EInputType.BlueBig : NotesManager.EInputType.Blue;
-			else if (NotesManager.IsClapKonga(chip, gt))
-				nInputAuto = NotesManager.EInputType.Clap;
-
-			this.AutoplaySwitchHand(iPlayer);
-			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(chip, gt, this.nHand[iPlayer], iPlayer, isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
-
-			this.tチップのヒット処理(chip.n発声時刻ms, chip, EInstrumentPad.Taiko, true, nInputAuto, iPlayer, isAutoplay: true);
+			this.AutoplayDoHit(chip, chip.n発声時刻ms, iPlayer, gt);
 		}
 	}
 
@@ -939,18 +954,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		double msPerRollTja = CTja.GameDurationToTjaDuration(1000.0 / rollSpeed);
 		if (msTjaTime > (pChip.n発声時刻ms + msPerRollTja * pChip.nRollCount)) {
-			var (nFly, nInputAuto) = (NotesManager.ENoteType.Don, NotesManager.EInputType.Red);
-			if (NotesManager.IsBigRollTaiko(pChip, gt))
-				(nFly, nInputAuto) = (NotesManager.ENoteType.DonBig, NotesManager.EInputType.RedBig);
-			else if (NotesManager.IsClapRollKonga(pChip, gt))
-				(nFly, nInputAuto) = (NotesManager.ENoteType.Clap, NotesManager.EInputType.Clap);
-			else if (NotesManager.IsYellowRollKonga(pChip, gt))
-				(nFly, nInputAuto) = (NotesManager.ENoteType.Pa, NotesManager.EInputType.Yellow);
-
-			this.AutoplaySwitchHand(iPlayer);
-			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(pChip, gt, this.nHand[iPlayer], iPlayer);
-
-			this.tチップのヒット処理(msTjaTime, pChip, EInstrumentPad.Taiko, true, nInputAuto, iPlayer, isAutoplay: true);
+			this.AutoplayDoHit(pChip, msTjaTime, iPlayer, gt);
 		}
 	}
 
@@ -984,21 +988,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 		int balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - pChip.n発声時刻ms) : 1000;
 
 		if (msTjaTime > (pChip.n発声時刻ms + (balloonDuration / (double)rollSpeed) * rollCount)) {
-			this.AutoplaySwitchHand(iPlayer);
-			OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(pChip, gt, this.nHand[iPlayer], iPlayer, OpenTaiko.ConfigIni.bJudgeBigNotes);
-
-			this.tチップのヒット処理(msTjaTime, pChip, EInstrumentPad.Taiko, true, NotesManager.EInputType.Red, iPlayer, isAutoplay: true);
+			this.AutoplayDoHit(pChip, msTjaTime, iPlayer, gt);
 		}
 	}
 
 	protected void PlayHitNoteSound(int iPlayer, NotesManager.EInputType input, NotesManager.ENoteType nt, EGameType gt, bool isAutoplay = false) {
 		if (isAutoplay) {
-			if (NotesManager.IsAcceptRed(nt, gt)) {
+			if (NotesManager.IsAcceptRed(nt, gt) && input is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig or NotesManager.EInputType.Unknown) {
 				this.soundRed[iPlayer]?.PlayStart();
 				if (NotesManager.IsSwapNote(nt, gt)) {
 					this.soundBlue[iPlayer]?.PlayStart();
 				}
-			} else if (NotesManager.IsAcceptBlue(nt, gt)) {
+			} else if (NotesManager.IsAcceptBlue(nt, gt) && input is NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig or NotesManager.EInputType.Unknown) {
 				this.soundBlue[iPlayer]?.PlayStart();
 			} else if (NotesManager.IsAcceptClap(nt, gt)) {
 				this.soundClap[iPlayer]?.PlayStart();
@@ -1019,12 +1020,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, NotesManager.ENoteType nt, EGameType gt, bool isAutoplay = false) {
 		if (isAutoplay) {
-			if (NotesManager.IsAcceptRed(nt, gt)) {
+			if (NotesManager.IsAcceptRed(nt, gt) && input is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig or NotesManager.EInputType.Unknown) {
 				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Red, gt);
 				if (NotesManager.IsSwapNote(nt, gt)) {
 					this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Blue, gt);
 				}
-			} else if (NotesManager.IsAcceptBlue(nt, gt)) {
+			} else if (NotesManager.IsAcceptBlue(nt, gt) && input is NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig or NotesManager.EInputType.Unknown) {
 				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Blue, gt);
 			} else if (NotesManager.IsAcceptClap(nt, gt)) {
 				this.actTaikoLaneFlash.PlayerLane[iPlayer].Start(PlayerLane.FlashType.Clap, gt);

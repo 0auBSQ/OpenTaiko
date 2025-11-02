@@ -732,13 +732,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				// Visual and sound effects
 				PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
 				int nHand = NotesManager.PadToHand(nPad);
-				var noteType = nLane switch {
-					PlayerLane.FlashType.Red => NotesManager.ENoteType.Don,
-					PlayerLane.FlashType.Blue => NotesManager.ENoteType.Ka,
-					PlayerLane.FlashType.Clap => NotesManager.ENoteType.Clap,
-					_ => NotesManager.ENoteType.Empty,
-				};
-				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(noteType, gameType, nHand, nUsePlayer);
+				OpenTaiko.stageGameScreen.actMtaiko.tMtaikoEvent(NotesManager.PadToInputType(nPadAs1P), nHand, nUsePlayer);
 
 				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 				if (nLane is not PlayerLane.FlashType.Total && e判定 is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
