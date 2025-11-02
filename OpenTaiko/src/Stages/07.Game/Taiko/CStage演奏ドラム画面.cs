@@ -739,7 +739,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 				if (nLane is not PlayerLane.FlashType.Total && e判定 is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
 					this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPadAs1P));
-					OpenTaiko.stageGameScreen.actTaikoLaneFlash.PlayerLane[nUsePlayer].Start(nLane, gameType);
+					this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPadAs1P), gameType);
 
 					// BAD or TIGHT 時の処理。
 					if (chipNoHit != null && OpenTaiko.ConfigIni.bTight)
