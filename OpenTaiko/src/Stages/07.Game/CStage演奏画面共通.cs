@@ -952,15 +952,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (this.bPAUSE != false || rollSpeed <= 0) {
 			return;
 		}
-		double msPerRollTja = CTja.GameDurationToTjaDuration(1000.0 / rollSpeed);
-		if (msTjaTime > (pChip.n発声時刻ms + msPerRollTja * pChip.nRollCount)) {
+		long msPerRollTja = (long)CTja.GameDurationToTjaDuration(1000.0 / rollSpeed);
+		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
 			this.AutoplayDoHit(pChip, msTjaTime, iPlayer, gt);
+			pChip.msStoredHit = msTjaTime;
 		}
 	}
 
 	protected void AutorollBalloon(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
 		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(iPlayer))];
+		if (!(bAutoPlay || puchichara.effect.Autoroll > 0))
+			return;
 
 		int rollCount = pChip.nRollCount;
 		int balloon = pChip.nBalloon;
@@ -983,12 +986,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (balloon == 0 || this.bPAUSE != false) {
 			return;
 		}
-		int rollSpeed = bAutoPlay ? balloon : puchichara.effect.Autoroll;
+		int rollSpeed = bAutoPlay ? (balloon - rollCount) : puchichara.effect.Autoroll;
 
-		int balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - pChip.n発声時刻ms) : 1000;
+		long balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - msTjaTime) : 1000;
 
-		if (msTjaTime > (pChip.n発声時刻ms + (balloonDuration / (double)rollSpeed) * rollCount)) {
+		long msPerRollTja = (long)(balloonDuration / (double)rollSpeed);
+		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
 			this.AutoplayDoHit(pChip, msTjaTime, iPlayer, gt);
+			pChip.msStoredHit = msTjaTime;
 		}
 	}
 
