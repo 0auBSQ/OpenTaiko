@@ -1027,7 +1027,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		int rollSpeed = bAutoPlay ? (balloon - rollCount) : puchichara.effect.Autoroll;
 
-		long balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - msTjaTime) : 1000;
+		long balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - msTjaTime) : (long)CTja.GameDurationToTjaDuration(1000);
 
 		long msPerRollTja = (long)(balloonDuration / (double)rollSpeed);
 		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
