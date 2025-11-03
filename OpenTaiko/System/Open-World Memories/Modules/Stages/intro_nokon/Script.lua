@@ -70,6 +70,20 @@ local prideModalCounter = nil
 -- Utility Functions
 ---------------------------------------
 
+local function startBGM()
+	-- Play BGM if available
+	if sounds.BGM ~= nil then
+			sounds.BGM:SetLoop(true)
+			sounds.BGM:Play()
+	end
+end
+
+local function stopBGM()
+	if sounds.BGM ~= nil then
+			sounds.BGM:Stop()
+	end
+end
+
 local function resetGame()
     currentRound = 1
     currentPlayerTurn = 1
@@ -389,10 +403,7 @@ local function grantKeyOfPride()
     showPrideModal = true
     state = "pride_modal"
 
-    -- Play special sound
-    if sounds.PrideKey ~= nil then
-        sounds.PrideKey:Play()
-    end
+    sounds.KeyGot:Play()
 end
 
 ---------------------------------------
@@ -414,7 +425,7 @@ local function handleCutscene1()
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") or
        INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         cutsceneSkipped = true
-        sounds.Decide:Play()
+        SHARED:GetSharedSound("Decide"):Play()
     end
 
     -- Auto-advance after counter ends or if skipped
@@ -422,19 +433,21 @@ local function handleCutscene1()
         state = "cutscene2"
         cutsceneCounter = nil
         cutsceneSkipped = false
+				startBGM()
     end
 end
 
 local function handleCutscene2()
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
         state = "player_select"
-        sounds.Decide:Play()
+        SHARED:GetSharedSound("Decide"):Play()
         selectedPlayerOption = 1 -- Reset player selection
 				return false
     end
 
 		if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
+				stopBGM()
 				return true
     end
 end
@@ -444,12 +457,12 @@ local function handlePlayerSelect()
 
     if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
         selectedPlayerOption = math.min(selectedPlayerOption + 1, 5)
-        sounds.Skip:Play()
+        SHARED:GetSharedSound("Skip"):Play()
     end
 
     if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
         selectedPlayerOption = math.max(selectedPlayerOption - 1, 1)
-        sounds.Skip:Play()
+        SHARED:GetSharedSound("Skip"):Play()
     end
 
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
@@ -468,14 +481,15 @@ local function handlePlayerSelect()
             numRounds = 5 -- Default
         end
 
-        sounds.Decide:Play()
+				stopBGM()
+        SHARED:GetSharedSound("Decide"):Play()
         selectedScopeOption = 1 -- Reset scope selection
         resetGame()
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         state = "cutscene2"
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
     end
 end
 
@@ -485,12 +499,12 @@ local function handleScopeSelect()
 
     if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
         selectedScopeOption = math.min(selectedScopeOption + 1, 3)
-        sounds.Skip:Play()
+        SHARED:GetSharedSound("Skip"):Play()
     end
 
     if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
         selectedScopeOption = math.max(selectedScopeOption - 1, 1)
-        sounds.Skip:Play()
+        SHARED:GetSharedSound("Skip"):Play()
     end
 
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
@@ -505,12 +519,13 @@ local function handleScopeSelect()
             state = "intro"
         end
 
-        sounds.Decide:Play()
+        SHARED:GetSharedSound("Decide"):Play()
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         state = "player_select"
-        sounds.Cancel:Play()
+				startBGM()
+        SHARED:GetSharedSound("Cancel"):Play()
     end
 end
 
@@ -557,7 +572,7 @@ local function handleGenreSelect()
     if #availableGenres == 0 then
         -- No genres available, skip to results
         state = "results"
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
         return
     end
 
@@ -568,7 +583,7 @@ local function handleGenreSelect()
             if selectedGenreIndex > #availableGenres then
                 selectedGenreIndex = 1
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:KeyboardPressed("LeftArrow") then
@@ -576,7 +591,7 @@ local function handleGenreSelect()
             if selectedGenreIndex < 1 then
                 selectedGenreIndex = #availableGenres
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") or INPUT:KeyboardPressed("Return") then
@@ -590,9 +605,9 @@ local function handleGenreSelect()
                     answerTimerCounter = nil
                     answeringPlayer = 0
                     previewStarted = false
-                    sounds.Decide:Play()
+                    SHARED:GetSharedSound("Decide"):Play()
                 else
-                    sounds.Cancel:Play()
+                    SHARED:GetSharedSound("Cancel"):Play()
                 end
             end
         end
@@ -602,7 +617,7 @@ local function handleGenreSelect()
             if selectedGenreIndex > #availableGenres then
                 selectedGenreIndex = 1
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:Pressed("LRed2P") or INPUT:Pressed("RRed2P") then
@@ -616,9 +631,9 @@ local function handleGenreSelect()
                     answerTimerCounter = nil
                     answeringPlayer = 0
                     previewStarted = false
-                    sounds.Decide:Play()
+                    SHARED:GetSharedSound("Decide"):Play()
                 else
-                    sounds.Cancel:Play()
+                    SHARED:GetSharedSound("Cancel"):Play()
                 end
             end
         end
@@ -628,7 +643,7 @@ local function handleGenreSelect()
             if selectedGenreIndex > #availableGenres then
                 selectedGenreIndex = 1
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:Pressed("LRed3P") or INPUT:Pressed("RRed3P") then
@@ -642,9 +657,9 @@ local function handleGenreSelect()
                     answerTimerCounter = nil
                     answeringPlayer = 0
                     previewStarted = false
-                    sounds.Decide:Play()
+                    SHARED:GetSharedSound("Decide"):Play()
                 else
-                    sounds.Cancel:Play()
+                    SHARED:GetSharedSound("Cancel"):Play()
                 end
             end
         end
@@ -654,7 +669,7 @@ local function handleGenreSelect()
             if selectedGenreIndex > #availableGenres then
                 selectedGenreIndex = 1
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:Pressed("LRed4P") or INPUT:Pressed("RRed4P") then
@@ -668,9 +683,9 @@ local function handleGenreSelect()
                     answerTimerCounter = nil
                     answeringPlayer = 0
                     previewStarted = false
-                    sounds.Decide:Play()
+                    SHARED:GetSharedSound("Decide"):Play()
                 else
-                    sounds.Cancel:Play()
+                    SHARED:GetSharedSound("Cancel"):Play()
                 end
             end
         end
@@ -680,7 +695,7 @@ local function handleGenreSelect()
             if selectedGenreIndex > #availableGenres then
                 selectedGenreIndex = 1
             end
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
 
         if INPUT:Pressed("LRed5P") or INPUT:Pressed("RRed5P") then
@@ -694,17 +709,12 @@ local function handleGenreSelect()
                     answerTimerCounter = nil
                     answeringPlayer = 0
                     previewStarted = false
-                    sounds.Decide:Play()
+                    SHARED:GetSharedSound("Decide"):Play()
                 else
-                    sounds.Cancel:Play()
+                    SHARED:GetSharedSound("Cancel"):Play()
                 end
             end
         end
-    end
-
-    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        state = "player_select"
-        sounds.Cancel:Play()
     end
 end
 
@@ -712,6 +722,7 @@ local function handleSongPlaying()
     if answerTimerCounter == nil then
         answerTimerCounter = COUNTER:CreateCounterDuration(0, 1, 1) -- 1 second delay before starting
         answerTimerCounter:Start()
+				sounds.Question:Play()
         previewStarted = false
     end
 
@@ -736,7 +747,7 @@ local function handleSongPlaying()
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         end
     else
         -- Multiplayer mode - check all players
@@ -745,31 +756,31 @@ local function handleSongPlaying()
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         elseif INPUT:Pressed("LRed2P") or INPUT:Pressed("RRed2P") then
             answeringPlayer = 2
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         elseif INPUT:Pressed("LRed3P") or INPUT:Pressed("RRed3P") then
             answeringPlayer = 3
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         elseif INPUT:Pressed("LRed4P") or INPUT:Pressed("RRed4P") then
             answeringPlayer = 4
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         elseif INPUT:Pressed("LRed5P") or INPUT:Pressed("RRed5P") then
             answeringPlayer = 5
             state = "answering"
             stopSongPreview()
             previewStarted = false
-            sounds.Decide:Play()
+            sounds.Answering:Play()
         end
     end
 
@@ -788,7 +799,7 @@ local function handleAnswering()
         if quizSongList ~= nil then
             quizSongList:Move(1)
             refreshQuizSongListCache()
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
     end
 
@@ -796,7 +807,7 @@ local function handleAnswering()
         if quizSongList ~= nil then
             quizSongList:Move(-1)
             refreshQuizSongListCache()
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
     end
 
@@ -806,12 +817,12 @@ local function handleAnswering()
         if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
             -- Correct answer!
             addScore(answeringPlayer, 10)
-            sounds.SongDecide:Play()
+            sounds.Right:Play()
             state = "answer_reveal"
         else
             -- Wrong answer
             addScore(answeringPlayer, -2) -- Penalty
-            sounds.Cancel:Play()
+            sounds.Wrong:Play()
             -- TODO: Allow other players to try?
             state = "answer_reveal"
         end
@@ -849,14 +860,15 @@ local function handleResults()
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
         state = "player_select"
-        sounds.Decide:Play()
+				startBGM()
+        SHARED:GetSharedSound("Decide"):Play()
 				return false
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
         return true
     end
 end
@@ -892,7 +904,7 @@ local function handleSoloRoundStart()
 				state = "solo_results"
 				answerTimerCounter = nil
         previewStarted = false
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
     end
 end
 
@@ -900,6 +912,7 @@ local function handleSoloPlaying()
     if answerTimerCounter == nil then
         answerTimerCounter = COUNTER:CreateCounterDuration(0, 1, 1) -- 1 second delay
         answerTimerCounter:Start()
+				sounds.Question:Play()
         previewStarted = false
     end
 
@@ -915,14 +928,14 @@ local function handleSoloPlaying()
 				stopSongPreview()
         previewStarted = false
 				state = "solo_answering"
-        sounds.Decide:Play()
+        sounds.Answering:Play()
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         stopSongPreview()
         previewStarted = false
         state = "solo_results"
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
     end
 end
 
@@ -933,7 +946,7 @@ local function handleSoloAnswering()
         if quizSongList ~= nil then
             quizSongList:Move(1)
             refreshQuizSongListCache()
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
     end
 
@@ -941,7 +954,7 @@ local function handleSoloAnswering()
         if quizSongList ~= nil then
             quizSongList:Move(-1)
             refreshQuizSongListCache()
-            sounds.Skip:Play()
+            SHARED:GetSharedSound("Skip"):Play()
         end
     end
 
@@ -952,7 +965,7 @@ local function handleSoloAnswering()
             -- Correct!
             soloScore = soloScore + 1
             stopSongPreview()
-            sounds.SongDecide:Play()
+            sounds.Right:Play()
 
             -- Brief celebration then next round
             cutsceneTimer = 0
@@ -960,8 +973,10 @@ local function handleSoloAnswering()
         else
             -- Wrong! Game over
             stopSongPreview()
-            sounds.Cancel:Play()
-            state = "solo_results"
+            sounds.Wrong:Play()
+
+						cutsceneTimer = 0
+            state = "solo_mistake"
         end
     end
 end
@@ -979,6 +994,21 @@ local function handleSoloCorrect()
         celebrationCounter = nil
         state = "solo_round_start"
     end
+end
+
+local function handleSoloMistake()
+	-- Brief fanfare but for loosers
+	if celebrationCounter == nil then
+			celebrationCounter = COUNTER:CreateCounterDuration(0, 1, 2) -- 2 seconds
+			celebrationCounter:Start()
+	end
+
+	celebrationCounter:Tick()
+
+	if celebrationCounter.Value >= 1 or INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+			celebrationCounter = nil
+			state = "solo_results"
+	end
 end
 
 local function handleSoloResults()
@@ -1004,7 +1034,8 @@ local function handleSoloResults()
         CONFIG.PlayerCount = originalPlayerCount
 				highScoreRegistered = false
         state = "player_select"
-        sounds.Decide:Play()
+				startBGM()
+        SHARED:GetSharedSound("Decide"):Play()
 				return false
     end
 
@@ -1012,7 +1043,7 @@ local function handleSoloResults()
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
 				highScoreRegistered = false
-        sounds.Cancel:Play()
+        SHARED:GetSharedSound("Cancel"):Play()
         return true
     end
 end
@@ -1023,7 +1054,7 @@ local function handlePrideModal()
 
         -- Show results
         state = "solo_results"
-        sounds.Decide:Play()
+        SHARED:GetSharedSound("Decide"):Play()
     end
 end
 
@@ -1207,6 +1238,12 @@ function draw()
             correctText:DrawAtAnchor(960, 540, "center")
         end
 
+		elseif state == "solo_mistake" then
+	      if text ~= nil then
+	          local correctText = text:GetText("Too Bad!")
+	          correctText:DrawAtAnchor(960, 540, "center")
+	      end
+
     elseif state == "solo_results" then
         if text ~= nil then
             local headerText = text:GetText("Game Over!")
@@ -1294,6 +1331,8 @@ function update()
         handleSoloAnswering()
     elseif state == "solo_correct" then
         handleSoloCorrect()
+		elseif state == "solo_mistake" then
+				handleSoloMistake()
     elseif state == "solo_results" then
         quitted = handleSoloResults()
     elseif state == "pride_modal" then
@@ -1315,12 +1354,6 @@ function activate()
     -- Load high scores
     loadHighScores()
 
-    -- Play BGM if available
-    if sounds.BGM ~= nil then
-        sounds.BGM:SetLoop(true)
-        sounds.BGM:Play()
-    end
-
     -- Start at appropriate state
     if songsEnumerated then
         state = "cutscene1"
@@ -1340,9 +1373,7 @@ function deactivate()
         end
     end
 
-    if sounds.BGM ~= nil then
-        sounds.BGM:Stop()
-    end
+		stopBGM()
 
     stopSongPreview()
 
@@ -1353,12 +1384,15 @@ function onStart()
     text = TEXT:Create(16)
 
     -- Load sounds
-    sounds.Skip = SOUND:CreateSFX("Sounds/Skip.ogg")
-    sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")
-    sounds.Decide = SOUND:CreateSFX("Sounds/Decide.ogg")
-    sounds.SongDecide = SOUND:CreateSFX("Sounds/SongDecide.ogg")
-    sounds.PrideKey = SOUND:CreateSFX("Sounds/PrideKey.ogg")
-    -- sounds.BGM = SOUND:CreateBGM("Sounds/QuizBGM.ogg")
+		sounds.Answering = SOUND:CreateSFX("Sounds/Answering.ogg")
+		sounds.Drumroll = SOUND:CreateSFX("Sounds/Drumroll.ogg")
+		sounds.KeyGot = SOUND:CreateSFX("Sounds/KeyGot.ogg")
+		sounds.Question = SOUND:CreateSFX("Sounds/Question.ogg")
+		sounds.ResultsMulti = SOUND:CreateSFX("Sounds/ResultsMulti.ogg")
+		sounds.ResultsSolo = SOUND:CreateSFX("Sounds/ResultsSolo.ogg")
+		sounds.Right = SOUND:CreateSFX("Sounds/Right.ogg")
+		sounds.Wrong = SOUND:CreateSFX("Sounds/Wrong.ogg")
+		sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg")
 
     -- Load textures
     -- textures["Background"] = TEXTURE:CreateTexture("Textures/QuizBackground.png")
