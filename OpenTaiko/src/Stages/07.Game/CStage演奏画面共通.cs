@@ -3281,6 +3281,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
 						actGauge.MineDamage(iPlayer);
 						OpenTaiko.Skin.soundBomb?.tPlay();
+						chip.bVisible = false;
 						this.Chara_MissCount[iPlayer]++;
 						this.CChartScore[iPlayer].nMine++;
 						this.CSectionScore[iPlayer].nMine++;
