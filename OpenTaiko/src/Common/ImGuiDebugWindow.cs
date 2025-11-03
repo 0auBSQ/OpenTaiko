@@ -78,7 +78,10 @@ public static class ImGuiDebugWindow {
 			memoryReadTimer = SoundManager.PlayTimer.SystemTimeMs;
 			Task.Factory.StartNew(() => {
 				using (Process process = Process.GetCurrentProcess()) {
-					pagedmemory = process.PagedMemorySize64;
+					if (OperatingSystem.IsWindows())
+						pagedmemory = process.PagedMemorySize64;
+					else
+						pagedmemory = process.WorkingSet64;
 				}
 			});
 		}

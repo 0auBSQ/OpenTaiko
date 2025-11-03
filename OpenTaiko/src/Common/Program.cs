@@ -42,7 +42,8 @@ internal class Program {
 	#endregion
 
 	[STAThread]
-	static void Main() {
+	static void Main(params string[] args) {
+		Console.WriteLine("Args: " + (args.Length > 0 ? string.Join(" ", args) : "(None)"));
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 		mutex二重起動防止用 = new Mutex(false, "DTXManiaMutex");
@@ -99,7 +100,7 @@ internal class Program {
 						fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
 					}
 
-					using (var mania = new OpenTaiko())
+					using (var mania = new OpenTaiko(args))
 						mania.Run();
 
 					Trace.WriteLine("");

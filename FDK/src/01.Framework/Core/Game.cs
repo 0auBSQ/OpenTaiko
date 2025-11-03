@@ -40,12 +40,20 @@ namespace FDK;
 public abstract class Game : IDisposable {
 	public static GL Gl { get; private set; }
 	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+	
+	private static string[] parameters;
+	private static string GetParameterValue(string parameter = "", string parameter_full = "") {
+		if (parameters.Length == 0) return "";
+		int index = parameters.Contains(parameter) || parameters.Contains(parameter_full)
+		? Array.FindIndex(parameters, x => x.Equals(parameter) || x.Equals(parameter_full))
+		: -1;
+		return index > -1 && parameters.Length > index ? parameters[index + 1] : "";
+	}
 
 	public static ImGuiController ImGuiController { get; private set; }
 	public static ImGuiIOPtr ImGuiIO { get; private set; }
 	private static CTexture ImGuiFontAtlas;
 
-	static string _test = "";
 	public static void InitImGuiController(IView window, IInputContext context) {
 		if (ImGuiController != null) return;
 
@@ -265,8 +273,9 @@ public abstract class Game : IDisposable {
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Game"/> class.
 	/// </summary>
-	protected Game(string iconFileName) {
+	protected Game(string iconFileName, params string[] args) {
 		strIconFileName = iconFileName;
+		parameters = args;
 
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
 		Configuration();
@@ -287,15 +296,27 @@ public abstract class Game : IDisposable {
 		options.WindowBorder = WindowBorder.Resizable;
 		options.Title = Text;
 
+		#region Override Windowing
+		string windowing_override = GetParameterValue("-w", "--windowing");
+		#endregion
 
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
-		if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland") {
+		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
+		|| windowing_override == "sdl") {
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
+			Console.WriteLine("SDL selected for Windowing");
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
+			Console.WriteLine("GLFW selected for Windowing");
 		}
 
-		Window_ = Window.Create(options);
+		try {
+			Window_ = Window.Create(options);
+		}
+		catch {
+			Console.WriteLine("The window failed to be created.\nYou can attempt to fix this by overriding the default windowing.\nTry launching OpenTaiko with args, using '-w glfw' to force GLFW or '-w sdl' to force SDL.");
+			throw;
+        }
 
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
@@ -416,7 +437,20 @@ public abstract class Game : IDisposable {
 
 			Context = Window_.GLContext;
 		} else {
-			Context = new AngleContext(GraphicsDeviceType_, Window_);
+			#region Override Platform
+			GraphicsDeviceType_ = GetParameterValue("-p", "--platform") switch {
+				"opengl" => AnglePlatformType.OpenGL,
+				"opengles" => AnglePlatformType.OpenGLES,
+				"d3d9" => AnglePlatformType.D3D9,
+				"d3d11" => AnglePlatformType.D3D11,
+				"vulkan" => AnglePlatformType.Vulkan,
+				"metal" => AnglePlatformType.Metal,
+				_ => GraphicsDeviceType_
+			};
+			Console.WriteLine("Platform set to " + GraphicsDeviceType_);
+			#endregion
+
+			Context = new AngleContext(GraphicsDeviceType_, Window_, GetParameterValue("-f", "--flag"));
 
 			Context.MakeCurrent();
 		}
