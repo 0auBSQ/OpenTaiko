@@ -14,6 +14,8 @@ local correctSongNode = nil
 local active = false
 local songsEnumerated = false
 
+local highScoreRegistered = false
+
 -- Game state machine
 local state = "waiting_enum" -- waiting_enum, cutscene1, cutscene2, player_select, scope_select, intro,
                                -- round_start, genre_select, song_playing, answering, answer_reveal,
@@ -385,7 +387,6 @@ local function grantKeyOfPride()
 
     -- Show modal
     showPrideModal = true
-    prideModalTimer = 0
     state = "pride_modal"
 
     -- Play special sound
@@ -984,10 +985,12 @@ local function handleSoloResults()
     -- Show final score and high scores
     local isNewHighScore, rank = checkIfNewHighScore(soloScore)
 
-    if isNewHighScore then
+    if isNewHighScore and highScoreRegistered == false then
         local playerName = save.Name
 				saveHighScore(soloScore, playerName)
 				loadHighScores()
+
+				highScoreRegistered = true
 
         -- Check if beat Nokon's score
         if checkIfBeatNokon(soloScore) then
@@ -999,6 +1002,7 @@ local function handleSoloResults()
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
+				highScoreRegistered = false
         state = "player_select"
         sounds.Decide:Play()
 				return false
@@ -1007,22 +1011,18 @@ local function handleSoloResults()
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
+				highScoreRegistered = false
         sounds.Cancel:Play()
         return true
     end
 end
 
 local function handlePrideModal()
-    prideModalTimer = prideModalTimer + 1
-
-    -- Auto-close after 5 seconds or on button press
-    if prideModalTimer > 300 or INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
         showPrideModal = false
-        prideModalTimer = 0
 
-        -- Return to results screen
-        CONFIG.PlayerCount = originalPlayerCount
-        state = "player_select"
+        -- Show results
+        state = "solo_results"
         sounds.Decide:Play()
     end
 end
