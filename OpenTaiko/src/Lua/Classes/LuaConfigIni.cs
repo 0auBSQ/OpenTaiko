@@ -15,7 +15,7 @@
 				return OpenTaiko.ConfigIni.nPlayerCount;
 			}
 			set {
-				if (value >= 0 && value < OpenTaiko.MAX_PLAYERS) {
+				if (value > 0 && value <= OpenTaiko.MAX_PLAYERS) {
 					OpenTaiko.ConfigIni.nPlayerCount = value;
 				}
 			}
