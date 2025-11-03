@@ -105,36 +105,36 @@
 
 		#region [(Private) Graph search algorithms]
 
-		private LuaSongNode? FindFirst(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null) {
+		private LuaSongNode? FindFirst(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null, bool onlySongs = true) {
 			if (root == null) return null;
 
-			LuaSongNode? DFS(LuaSongNode node) {
-				if (predicate(node) && node.IsSong)
+			LuaSongNode? DFS(LuaSongNode node, bool onlySongs) {
+				if (predicate(node) && (!onlySongs || node.IsSong))
 					return node;
 
 				foreach (var child in node.Children) {
-					var found = DFS(child);
+					var found = DFS(child, onlySongs);
 					if (found != null) return found;
 				}
 				return null;
 			}
 
-			return DFS(root);
+			return DFS(root, onlySongs);
 		}
 
-		private List<LuaSongNode> FindAll(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null) {
+		private List<LuaSongNode> FindAll(Func<LuaSongNode, bool> predicate, LuaSongNode? root = null, bool onlySongs = true) {
 			var results = new List<LuaSongNode>();
 			if (root == null) return results;
 
-			void DFS(LuaSongNode node) {
-				if (predicate(node) && node.IsSong)
+			void DFS(LuaSongNode node, bool onlySongs) {
+				if (predicate(node) && (!onlySongs || node.IsSong))
 					results.Add(node);
 
 				foreach (var child in node.Children)
-					DFS(child);
+					DFS(child, onlySongs);
 			}
 
-			DFS(root);
+			DFS(root, onlySongs);
 			return results;
 		}
 
@@ -163,12 +163,16 @@
 		#region [Temporary, give a method to attach it to a folder instead?]
 
 		public List<LuaSongNode> SearchSongsByPredicate(Func<LuaSongNode, bool> predicate) {
-			return this.FindAll(predicate, _root);
+			return this.FindAll(predicate, _root, true);
 		}
 
 		// Placeholder for testing the predicate
 		public LuaSongNode? SearchFirstSongByPredicate(Func<LuaSongNode, bool> predicate) {
-			return this.FindFirst(predicate, _root);
+			return this.FindFirst(predicate, _root, true);
+		}
+
+		public List<LuaSongNode> SearchNodesByPredicate(Func<LuaSongNode, bool> predicate) {
+			return this.FindAll(predicate, _root, false);
 		}
 
 		#endregion

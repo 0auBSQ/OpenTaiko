@@ -1,4 +1,6 @@
-﻿namespace OpenTaiko {
+﻿using NLua;
+
+namespace OpenTaiko {
 	internal class LuaSongListSettings {
 		// Settings class used to customize which songs to include in the given song lists
 
@@ -13,6 +15,12 @@
 
 		// Genre folders that are not displayed in the song select menu
 		public string[] ExcludedGenreFolders = [];
+
+		public void SetExcludedGenreFolders(object luaTable) {
+			if (luaTable is LuaTable table) {
+				ExcludedGenreFolders = table.Values.Cast<string>().ToArray();
+			}
+		}
 
 		// Generate the root node from a specific folder (given by Genre) instead of the list song root note (fe. Dan song select, Tower song select)
 		public string? RootGenreFolder = null;
