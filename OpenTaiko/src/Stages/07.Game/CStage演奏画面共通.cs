@@ -932,9 +932,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void AutoplayDoHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
-		this.AutoplaySwitchHand(iPlayer);
-		foreach (var pad in GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes))
-			this.ProcessPadInput(iPlayer, pad, msTjaTime);
+		if (!NotesManager.IsMine(chip) || this.CanAutoplayHitMine(iPlayer, true)) {
+			this.AutoplaySwitchHand(iPlayer);
+			foreach (var pad in GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes))
+				this.ProcessPadInput(iPlayer, pad, msTjaTime);
+		}
+		chip.msStoredHit = double.PositiveInfinity; // prevent further hit attempt (unless overridden)
 	}
 
 	private bool AutoplayTryHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
@@ -945,7 +948,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || NotesManager.IsMine(chip)) {
+		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msStoredHit > msTjaTime) {
 			return;
 		}
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1000,7 +1003,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutorollBalloon(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
+		if (!pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE || pChip.msStoredHit > msTjaTime)
 			return;
 
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1027,6 +1030,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		if (balloon == 0) {
+			return;
+		}
+		if (balloon == 1 && NotesManager.IsFuzeRoll(pChip) && this.CanAutoplayHitMine(iPlayer, true)) {
+			pChip.msStoredHit = double.PositiveInfinity; // prevent clearing fuze
 			return;
 		}
 		int rollSpeed = bAutoPlay ? (balloon - rollCount) : puchichara.effect.Autoroll;
@@ -4036,6 +4043,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 				return ENoteJudge.Good;
 		}
 		return judgement;
+	}
+
+	public bool CanAutoplayHitMine(int player, bool reroll) {
+		int AILevel = OpenTaiko.ConfigIni.nAILevel;
+		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) {
+			if (reroll)
+				nDice = OpenTaiko.Random.Next(1000);
+
+			if (nDice < OpenTaiko.ConfigIni.apAIPerformances[AILevel - 1].nMineHitOdds)
+				return true;
+		}
+		return false;
 	}
 
 	public void ReSetScore(int scoreInit, int scoreDiff, int iPlayer) {
