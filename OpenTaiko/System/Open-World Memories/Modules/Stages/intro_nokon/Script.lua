@@ -140,10 +140,10 @@ local function loadMainSongList()
         lsls.RootGenreFolder = "Custom Charts"
     elseif songScope == "OpTk" then
         -- Exclude custom charts and special folders
-        lsls:SetExcludedGenreFolders({"Custom Charts", "Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT"})
+        lsls:SetExcludedGenreFolders({"Custom Charts", "Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
     elseif songScope == "All" then
         -- Exclude only special system folders
-        lsls:SetExcludedGenreFolders({"Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT"})
+        lsls:SetExcludedGenreFolders({"Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
     end
 
     songList = RequestSongList(lsls)
@@ -173,7 +173,9 @@ local function selectRandomSongFromGenre(genreFolder)
         -- Solo mode: select from entire collection
         if songList == nil then return false end
 
-        currentSongNode = songList:GetRandomNodeInFolder(songList:GetSelectedSongNode(), true)
+        currentSongNode = songList:GetRandomNodeInFolder(songList:GetSelectedSongNode(), true, function(node)
+		        return songList:GetSelectedSongNode().Parent ~= node.Parent
+		    end)
         correctSongNode = currentSongNode
 
         if currentSongNode == nil or currentSongNode.IsSong == false then
@@ -372,6 +374,12 @@ local function handleCutscene2()
         state = "player_select"
         sounds.Decide:Play()
         selectedPlayerOption = 1 -- Reset player selection
+				return false
+    end
+
+		if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+        sounds.Cancel:Play()
+				return true
     end
 end
 
@@ -751,14 +759,6 @@ local function handleAnswering()
             state = "answer_reveal"
         end
     end
-
-    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        -- Give up answering
-        state = "song_playing"
-        answeringPlayer = 0
-        startSongPreview() -- Resume preview
-        sounds.Cancel:Play()
-    end
 end
 
 local function handleAnswerReveal()
@@ -793,13 +793,14 @@ local function handleResults()
         CONFIG.PlayerCount = originalPlayerCount
         state = "player_select"
         sounds.Decide:Play()
+				return false
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
         sounds.Cancel:Play()
-        return Exit("title", nil)
+        return true
     end
 end
 
@@ -830,7 +831,10 @@ local function handleSoloRoundStart()
 
         -- Wait a few seconds then start preview
     else
-        -- Failed, try again
+        -- Failed, jump to results
+				state = "solo_results"
+				answerTimerCounter = nil
+        previewStarted = false
         sounds.Cancel:Play()
     end
 end
@@ -851,8 +855,9 @@ local function handleSoloPlaying()
     end
 
 		if previewStarted and (INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return")) then
-        state = "solo_answering"
-        -- Keep preview playing
+				stopSongPreview()
+        previewStarted = false
+				state = "solo_answering"
         sounds.Decide:Play()
     end
 
@@ -902,12 +907,6 @@ local function handleSoloAnswering()
             state = "solo_results"
         end
     end
-
-    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        stopSongPreview()
-        state = "solo_results"
-        sounds.Cancel:Play()
-    end
 end
 
 local function handleSoloCorrect()
@@ -946,13 +945,14 @@ local function handleSoloResults()
         CONFIG.PlayerCount = originalPlayerCount
         state = "player_select"
         sounds.Decide:Play()
+				return false
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
         sounds.Cancel:Play()
-        return Exit("title", nil)
+        return true
     end
 end
 
@@ -1077,7 +1077,7 @@ function draw()
             for i = -5, 5 do
                 if currentPageCache[i] ~= nil then
                     local entry = currentPageCache[i]
-                    entry.text:DrawAtAnchor(960, 400 + i * 50, "center")
+                    entry.text:DrawAtAnchor(960, 600 + i * 50, "center")
                 end
             end
         end
@@ -1140,7 +1140,7 @@ function draw()
             for i = -5, 5 do
                 if currentPageCache[i] ~= nil then
                     local entry = currentPageCache[i]
-                    entry.text:DrawAtAnchor(960, 400 + i * 50, "center")
+                    entry.text:DrawAtAnchor(960, 600 + i * 50, "center")
                 end
             end
         end
@@ -1196,18 +1196,20 @@ function draw()
     -- Draw nameplates for all players
     if active then
         for i = 0, CONFIG.PlayerCount - 1 do
-            NAMEPLATE:DrawPlayerNameplate(20 + i * 300, 980, 255, i)
+            NAMEPLATE:DrawPlayerNameplate(20 + i * 400, 980, 255, i)
         end
     end
 end
 
 function update()
+		local quitted = false
+
     if state == "waiting_enum" then
         handleWaitingEnum()
     elseif state == "cutscene1" then
         handleCutscene1()
     elseif state == "cutscene2" then
-        handleCutscene2()
+        quitted = handleCutscene2()
     elseif state == "player_select" then
         handlePlayerSelect()
     elseif state == "scope_select" then
@@ -1225,7 +1227,7 @@ function update()
     elseif state == "answer_reveal" then
         handleAnswerReveal()
     elseif state == "results" then
-        handleResults()
+        quitted = handleResults()
     elseif state == "solo_intro" then
         handleSoloIntro()
     elseif state == "solo_round_start" then
@@ -1237,10 +1239,14 @@ function update()
     elseif state == "solo_correct" then
         handleSoloCorrect()
     elseif state == "solo_results" then
-        handleSoloResults()
+        quitted = handleSoloResults()
     elseif state == "pride_modal" then
         handlePrideModal()
     end
+
+		if quitted == true then
+			return Exit("title", nil)
+		end
 end
 
 function activate()
