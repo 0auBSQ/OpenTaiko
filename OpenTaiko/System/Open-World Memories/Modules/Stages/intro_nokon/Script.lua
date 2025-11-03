@@ -1,3 +1,5 @@
+local DBScores = require("DBControllers/dbScores")
+
 local text = nil
 local save = nil
 
@@ -29,7 +31,7 @@ local currentPlayerTurn = 1
 local playerScores = {}
 local soloScore = 0
 
--- High scores - TODO: Load from SQL database
+-- High scores
 -- Format: {name = "Player Name", score = 123}
 local bestScores = {
     {name = "Nokon", score = 100},
@@ -96,9 +98,64 @@ local function isSongValid(song)
     return chart ~= nil
 end
 
+local function limitGenresRandomly(genres)
+    local maxGenres = 5
+    local numGenres = #genres
+
+    -- Only proceed if the table has more than the maximum allowed elements
+    if numGenres > maxGenres then
+        -- 1. Perform a partial Fisher-Yates shuffle.
+        -- We only need to shuffle the first 5 positions to get 5 random, unique elements.
+        for i = 1, maxGenres do
+            -- Choose a random index 'j' from the unshuffled remainder of the table (from 'i' to 'numGenres')
+            -- math.random(a, b) returns a uniform integer between a and b, inclusive.
+            local j = math.random(i, numGenres)
+
+            -- Swap the element at the current position 'i' with the element at the random position 'j'
+            local temp = genres[i]
+            genres[i] = genres[j]
+            genres[j] = temp
+        end
+
+        -- 2. Create a new table containing only the first 5 elements (the random sample)
+        local newGenres = {}
+        for i = 1, maxGenres do
+            table.insert(newGenres, genres[i])
+        end
+
+        -- Return the new, limited table
+        return newGenres
+    end
+
+    -- If the table is 5 or less, return it as is
+    return genres
+end
+
 ---------------------------------------
 -- Utility Functions for C# Collections
 ---------------------------------------
+
+-- Clone a C# Dictionary into a Lua table safely
+local function cloneTable(t)
+	local copy = {}
+
+	-- Get enumerator from the dictionary
+	local enumerator = t:GetEnumerator()
+	while enumerator:MoveNext() do
+		local kvp = enumerator.Current
+		local key = kvp.Key
+		local value = kvp.Value
+
+		-- Recursively clone if it's another Dictionary
+		if value ~= nil and type(value) == "userdata" and value.GetEnumerator then
+			copy[key] = cloneTable(value)
+		else
+			copy[key] = value
+		end
+	end
+
+	return copy
+end
 
 local function csharpEnumerableToLuaArray(enumerable)
     local luaArray = {}
@@ -282,26 +339,24 @@ end
 ---------------------------------------
 
 local function loadHighScores()
-    -- TODO: Load from SQL database via your backend
-    -- This function will be called on activate()
-    -- bestScores should be populated here
+    -- Initialize the target table
+    bestScores = {}
+
+    -- Fetch scores and convert the C# enumerable to a Lua array
+    local rawScores = cloneTable(DBScores:GetScores())
+
+    -- Use ipairs to iterate over the array of score objects
+    for _, dbScore in ipairs(rawScores) do
+        -- Directly insert the formatted score into the bestScores table
+        table.insert(bestScores, {
+            name = dbScore.player,
+            score = dbScore.score
+        })
+    end
 end
 
 local function saveHighScore(score, playerName)
-    -- Insert score into bestScores array
-    table.insert(bestScores, {name = playerName, score = score})
-
-    -- Sort by score descending
-    table.sort(bestScores, function(a, b) return a.score > b.score end)
-
-    -- Keep only top 8
-    while #bestScores > 8 do
-        table.remove(bestScores)
-    end
-
-    -- TODO: Save to SQL database via your backend
-    -- PLACEHOLDER FOR SQL SAVE:
-    -- SaveQuizHighScore(playerName, score)
+		DBScores:RegisterScore(playerName, score)
 end
 
 local function checkIfNewHighScore(score)
@@ -486,7 +541,8 @@ local function handleRoundStart()
 
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") or roundStartCounter.Value >= 1 then
         -- Load available genres for selection
-        availableGenres = getAvailableGenres()
+        availableGenres = limitGenresRandomly(getAvailableGenres())
+
         selectedGenreIndex = 1
 
         state = "genre_select"
@@ -926,12 +982,12 @@ end
 
 local function handleSoloResults()
     -- Show final score and high scores
-
     local isNewHighScore, rank = checkIfNewHighScore(soloScore)
 
     if isNewHighScore then
         local playerName = save.Name
-        saveHighScore(soloScore, playerName)
+				saveHighScore(soloScore, playerName)
+				loadHighScores()
 
         -- Check if beat Nokon's score
         if checkIfBeatNokon(soloScore) then
@@ -1100,7 +1156,7 @@ function draw()
             headerText:DrawAtAnchor(960, 200, "center")
 
             -- DEBUG: Show why we got here
-            local debugText = text:GetText("Rounds completed: " .. (currentRound - 1) .. " / " .. numRounds)
+            local debugText = text:GetText("Rounds completed: " .. (currentRound) .. " / " .. numRounds)
             debugText:DrawAtAnchor(960, 250, "center")
 
             -- Sort and display scores
@@ -1196,7 +1252,7 @@ function draw()
     -- Draw nameplates for all players
     if active then
         for i = 0, CONFIG.PlayerCount - 1 do
-            NAMEPLATE:DrawPlayerNameplate(20 + i * 400, 980, 255, i)
+            NAMEPLATE:DrawPlayerNameplate(20 + i * 370, 980, 255, i)
         end
     end
 end
