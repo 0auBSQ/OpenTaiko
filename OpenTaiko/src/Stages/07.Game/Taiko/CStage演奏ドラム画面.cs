@@ -681,11 +681,18 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
 
-		for (EPad nPad = 0; nPad < EPad.Max; nPad++)        // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
+		for (EPad nPad = 0; nPad < EPad.Max; nPad++) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
-		{
-			List<STInputEvent> listInputEvent = OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums, nPad);
+			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
+			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
+				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]
+				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
+				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
+				) {
+				continue; // skip input
+			}
 
+			List<STInputEvent> listInputEvent = OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums, nPad);
 			if ((listInputEvent == null) || (listInputEvent.Count == 0))
 				continue;
 
@@ -695,25 +702,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!inputEvent.Pressed)
 					continue;
 
-				int nUsePlayer = NotesManager.GetPadPlayer(nPad);
-				if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
-					|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]
-					|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
-					|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
-					) {
-					break; // cancel input
-				}
-
-				EPad nPadAs1P = NotesManager.PadTo1P(nPad);
-				CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
-
 				// convert input time (mixer space) to note time
+				CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
 				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
 				long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
 
+				EPad nPadAs1P = NotesManager.PadTo1P(nPad);
 				// Register to replay file
 				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
-
 				this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
 			}
 		}
