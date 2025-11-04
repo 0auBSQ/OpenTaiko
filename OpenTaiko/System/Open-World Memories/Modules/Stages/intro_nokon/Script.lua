@@ -3,6 +3,8 @@ local DBScores = require("DBControllers/dbScores")
 local text = nil
 local save = nil
 
+local playerNames = {}
+
 local sounds = {}
 local textures = {}
 
@@ -32,6 +34,12 @@ local currentRound = 1
 local currentPlayerTurn = 1
 local playerScores = {}
 local soloScore = 0
+
+-- After the UI state variables section
+local maxScoreForRound = 10
+local currentScore = 10
+local scoreDropCounter = nil
+local playersWhoAnsweredWrong = {}
 
 -- High scores
 -- Format: {name = "Player Name", score = 123}
@@ -84,6 +92,18 @@ local function stopBGM()
 	end
 end
 
+local function calculateMaxScore(genreSongList)
+    if genreSongList == nil then return 10 end
+
+    local songCount = genreSongList.SongCount -- Count total songs in the genre
+    if songCount == 0 then return 10 end
+
+    local logScore = math.log(songCount) -- Natural logarithm (ln)
+    local roundedScore = math.ceil(logScore) * 10 -- Round up to nearest 10 * 10
+
+    return math.max(10, roundedScore) -- At least 10
+end
+
 local function resetGame()
     currentRound = 1
     currentPlayerTurn = 1
@@ -100,6 +120,12 @@ local function resetGame()
     celebrationCounter = nil
     prideModalCounter = nil
     previewStarted = false
+
+		-- Reset score drop
+    scoreDropCounter = nil
+    maxScoreForRound = 10
+    currentScore = 10
+    playersWhoAnsweredWrong = {}
 end
 
 local function getChart(song)
@@ -601,6 +627,12 @@ local function handleGenreSelect()
                 local success = selectRandomSongFromGenre(selectedGenre)
 
                 if success then
+										-- Calculate max score based on genre
+				            maxScoreForRound = calculateMaxScore(selectedGenre)
+				            currentScore = maxScoreForRound
+				            playersWhoAnsweredWrong = {}
+				            scoreDropCounter = nil
+
                     state = "song_playing"
                     answerTimerCounter = nil
                     answeringPlayer = 0
@@ -627,6 +659,12 @@ local function handleGenreSelect()
                 local success = selectRandomSongFromGenre(selectedGenre)
 
                 if success then
+										-- Calculate max score based on genre
+										maxScoreForRound = calculateMaxScore(selectedGenre)
+										currentScore = maxScoreForRound
+										playersWhoAnsweredWrong = {}
+										scoreDropCounter = nil
+
                     state = "song_playing"
                     answerTimerCounter = nil
                     answeringPlayer = 0
@@ -653,6 +691,12 @@ local function handleGenreSelect()
                 local success = selectRandomSongFromGenre(selectedGenre)
 
                 if success then
+										-- Calculate max score based on genre
+										maxScoreForRound = calculateMaxScore(selectedGenre)
+										currentScore = maxScoreForRound
+										playersWhoAnsweredWrong = {}
+										scoreDropCounter = nil
+
                     state = "song_playing"
                     answerTimerCounter = nil
                     answeringPlayer = 0
@@ -679,6 +723,12 @@ local function handleGenreSelect()
                 local success = selectRandomSongFromGenre(selectedGenre)
 
                 if success then
+										-- Calculate max score based on genre
+										maxScoreForRound = calculateMaxScore(selectedGenre)
+										currentScore = maxScoreForRound
+										playersWhoAnsweredWrong = {}
+										scoreDropCounter = nil
+
                     state = "song_playing"
                     answerTimerCounter = nil
                     answeringPlayer = 0
@@ -705,6 +755,12 @@ local function handleGenreSelect()
                 local success = selectRandomSongFromGenre(selectedGenre)
 
                 if success then
+										-- Calculate max score based on genre
+										maxScoreForRound = calculateMaxScore(selectedGenre)
+										currentScore = maxScoreForRound
+										playersWhoAnsweredWrong = {}
+										scoreDropCounter = nil
+
                     state = "song_playing"
                     answerTimerCounter = nil
                     answeringPlayer = 0
@@ -724,6 +780,7 @@ local function handleSongPlaying()
         answerTimerCounter:Start()
 				sounds.Question:Play()
         previewStarted = false
+				scoreDropCounter = nil
     end
 
     answerTimerCounter:Tick()
@@ -732,6 +789,9 @@ local function handleSongPlaying()
     if answerTimerCounter.Value >= 1 and previewStarted == false then
         startSongPreview()
         previewStarted = true
+				-- Initialize score drop counter
+        scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2) -- 2 seconds
+        scoreDropCounter:Start()
     end
 
     -- Don't allow answering until preview has started
@@ -739,92 +799,303 @@ local function handleSongPlaying()
         return
     end
 
-    -- Check for any player input to answer
-    if numPlayers == 1 then
-        -- Single player mode - check 1P controls
-        if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") then
-            answeringPlayer = 1
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
-        end
-    else
-        -- Multiplayer mode - check all players
-        if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") then
-            answeringPlayer = 1
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
-        elseif INPUT:Pressed("LRed2P") or INPUT:Pressed("RRed2P") then
-            answeringPlayer = 2
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
-        elseif INPUT:Pressed("LRed3P") or INPUT:Pressed("RRed3P") then
-            answeringPlayer = 3
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
-        elseif INPUT:Pressed("LRed4P") or INPUT:Pressed("RRed4P") then
-            answeringPlayer = 4
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
-        elseif INPUT:Pressed("LRed5P") or INPUT:Pressed("RRed5P") then
-            answeringPlayer = 5
-            state = "answering"
-            stopSongPreview()
-            previewStarted = false
-            sounds.Answering:Play()
+		-- Drop score every 2 seconds (10% of max)
+    if scoreDropCounter ~= nil then
+        scoreDropCounter:Tick()
+
+        if scoreDropCounter.Value >= 1 then
+            local scoreDrop = math.floor(maxScoreForRound * 0.1)
+            currentScore = math.max(0, currentScore - scoreDrop)
+
+            -- Reset counter for next drop
+            scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+            scoreDropCounter:Start()
+
+            -- If score reaches 0, end round with no points
+            if currentScore <= 0 then
+                stopSongPreview()
+                previewStarted = false
+                scoreDropCounter = nil
+                state = "answer_reveal"
+                sounds.Wrong:Play()
+                return
+            end
         end
     end
 
-    -- Optional: Timeout if no one answers
-    -- if answerTimer > 1800 then -- 30 seconds
-    --     state = "answer_reveal"
-    --     stopSongPreview()
-    --     previewStarted = false
-    -- end
+		-- Check for any player input to answer
+    -- Only allow players who haven't answered wrong yet
+		if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") then
+				if playersWhoAnsweredWrong[1] ~= true then
+						answeringPlayer = 1
+						state = "answering"
+						stopSongPreview()
+						previewStarted = false
+						scoreDropCounter = nil
+						sounds.Answering:Play()
+				end
+		elseif INPUT:Pressed("LRed2P") or INPUT:Pressed("RRed2P") then
+				if playersWhoAnsweredWrong[2] ~= true then
+						answeringPlayer = 2
+						state = "answering"
+						stopSongPreview()
+						previewStarted = false
+						scoreDropCounter = nil
+						sounds.Answering:Play()
+				end
+		elseif INPUT:Pressed("LRed3P") or INPUT:Pressed("RRed3P") then
+				if playersWhoAnsweredWrong[3] ~= true then
+						answeringPlayer = 3
+						state = "answering"
+						stopSongPreview()
+						previewStarted = false
+						scoreDropCounter = nil
+						sounds.Answering:Play()
+				end
+		elseif INPUT:Pressed("LRed4P") or INPUT:Pressed("RRed4P") then
+				if playersWhoAnsweredWrong[4] ~= true then
+						answeringPlayer = 4
+						state = "answering"
+						stopSongPreview()
+						previewStarted = false
+						scoreDropCounter = nil
+						sounds.Answering:Play()
+				end
+		elseif INPUT:Pressed("LRed5P") or INPUT:Pressed("RRed5P") then
+				if playersWhoAnsweredWrong[5] ~= true then
+						answeringPlayer = 5
+						state = "answering"
+						stopSongPreview()
+						previewStarted = false
+						scoreDropCounter = nil
+						sounds.Answering:Play()
+				end
+		end
 end
 
 local function handleAnswering()
-    -- Player navigates quiz song list
+    -- Player navigates quiz song list using their own controls
 
-    if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
-        if quizSongList ~= nil then
-            quizSongList:Move(1)
-            refreshQuizSongListCache()
-            SHARED:GetSharedSound("Skip"):Play()
+    -- Player 1
+    if answeringPlayer == 1 then
+        if INPUT:Pressed("LBlue") or INPUT:Pressed("RBlue") or INPUT:KeyboardPressed("RightArrow") then
+            if quizSongList ~= nil then
+                quizSongList:Move(1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
         end
-    end
 
-    if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
-        if quizSongList ~= nil then
-            quizSongList:Move(-1)
-            refreshQuizSongListCache()
-            SHARED:GetSharedSound("Skip"):Play()
+        if INPUT:KeyboardPressed("LeftArrow") then
+            if quizSongList ~= nil then
+                quizSongList:Move(-1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
         end
-    end
 
-    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-        local selectedSong = quizSongList:GetSelectedSongNode()
+        if INPUT:Pressed("LRed") or INPUT:Pressed("RRed") or INPUT:KeyboardPressed("Return") then
+            local selectedSong = quizSongList:GetSelectedSongNode()
 
-        if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
-            -- Correct answer!
-            addScore(answeringPlayer, 10)
-            sounds.Right:Play()
-            state = "answer_reveal"
-        else
-            -- Wrong answer
-            addScore(answeringPlayer, -2) -- Penalty
-            sounds.Wrong:Play()
-            -- TODO: Allow other players to try?
-            state = "answer_reveal"
+            if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
+                -- Correct answer!
+                addScore(answeringPlayer, currentScore)
+                sounds.Right:Play()
+                state = "answer_reveal"
+            else
+                -- Wrong answer
+                addScore(answeringPlayer, -10)
+                playersWhoAnsweredWrong[answeringPlayer] = true
+                sounds.Wrong:Play()
+
+                -- Resume song playing if other players can still answer
+                local allPlayersAnswered = true
+                for i = 1, numPlayers do
+                    if playersWhoAnsweredWrong[i] ~= true then
+                        allPlayersAnswered = false
+                        break
+                    end
+                end
+
+                if allPlayersAnswered or currentScore <= 0 then
+                    state = "answer_reveal"
+                else
+                    state = "song_playing"
+                    previewStarted = true -- Resume from where we left off
+                    startSongPreview()
+                    -- Reinitialize score drop counter
+                    scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+                    scoreDropCounter:Start()
+                end
+            end
+        end
+
+    -- Player 2
+    elseif answeringPlayer == 2 then
+        if INPUT:Pressed("LBlue2P") or INPUT:Pressed("RBlue2P") then
+            if quizSongList ~= nil then
+                quizSongList:Move(1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
+        end
+
+        if INPUT:Pressed("LRed2P") or INPUT:Pressed("RRed2P") then
+            local selectedSong = quizSongList:GetSelectedSongNode()
+
+            if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
+                addScore(answeringPlayer, currentScore)
+                sounds.Right:Play()
+                state = "answer_reveal"
+            else
+                addScore(answeringPlayer, -10)
+                playersWhoAnsweredWrong[answeringPlayer] = true
+                sounds.Wrong:Play()
+
+                local allPlayersAnswered = true
+                for i = 1, numPlayers do
+                    if playersWhoAnsweredWrong[i] ~= true then
+                        allPlayersAnswered = false
+                        break
+                    end
+                end
+
+                if allPlayersAnswered or currentScore <= 0 then
+                    state = "answer_reveal"
+                else
+                    state = "song_playing"
+                    previewStarted = true
+                    startSongPreview()
+                    scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+                    scoreDropCounter:Start()
+                end
+            end
+        end
+
+    -- Player 3
+    elseif answeringPlayer == 3 then
+        if INPUT:Pressed("LBlue3P") or INPUT:Pressed("RBlue3P") then
+            if quizSongList ~= nil then
+                quizSongList:Move(1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
+        end
+
+        if INPUT:Pressed("LRed3P") or INPUT:Pressed("RRed3P") then
+            local selectedSong = quizSongList:GetSelectedSongNode()
+
+            if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
+                addScore(answeringPlayer, currentScore)
+                sounds.Right:Play()
+                state = "answer_reveal"
+            else
+                addScore(answeringPlayer, -10)
+                playersWhoAnsweredWrong[answeringPlayer] = true
+                sounds.Wrong:Play()
+
+                local allPlayersAnswered = true
+                for i = 1, numPlayers do
+                    if playersWhoAnsweredWrong[i] ~= true then
+                        allPlayersAnswered = false
+                        break
+                    end
+                end
+
+                if allPlayersAnswered or currentScore <= 0 then
+                    state = "answer_reveal"
+                else
+                    state = "song_playing"
+                    previewStarted = true
+                    startSongPreview()
+                    scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+                    scoreDropCounter:Start()
+                end
+            end
+        end
+
+    -- Player 4
+    elseif answeringPlayer == 4 then
+        if INPUT:Pressed("LBlue4P") or INPUT:Pressed("RBlue4P") then
+            if quizSongList ~= nil then
+                quizSongList:Move(1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
+        end
+
+        if INPUT:Pressed("LRed4P") or INPUT:Pressed("RRed4P") then
+            local selectedSong = quizSongList:GetSelectedSongNode()
+
+            if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
+                addScore(answeringPlayer, currentScore)
+                sounds.Right:Play()
+                state = "answer_reveal"
+            else
+                addScore(answeringPlayer, -10)
+                playersWhoAnsweredWrong[answeringPlayer] = true
+                sounds.Wrong:Play()
+
+                local allPlayersAnswered = true
+                for i = 1, numPlayers do
+                    if playersWhoAnsweredWrong[i] ~= true then
+                        allPlayersAnswered = false
+                        break
+                    end
+                end
+
+                if allPlayersAnswered or currentScore <= 0 then
+                    state = "answer_reveal"
+                else
+                    state = "song_playing"
+                    previewStarted = true
+                    startSongPreview()
+                    scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+                    scoreDropCounter:Start()
+                end
+            end
+        end
+
+    -- Player 5
+    elseif answeringPlayer == 5 then
+        if INPUT:Pressed("LBlue5P") or INPUT:Pressed("RBlue5P") then
+            if quizSongList ~= nil then
+                quizSongList:Move(1)
+                refreshQuizSongListCache()
+                SHARED:GetSharedSound("Skip"):Play()
+            end
+        end
+
+        if INPUT:Pressed("LRed5P") or INPUT:Pressed("RRed5P") then
+            local selectedSong = quizSongList:GetSelectedSongNode()
+
+            if selectedSong ~= nil and selectedSong.UniqueId == correctSongNode.UniqueId then
+                addScore(answeringPlayer, currentScore)
+                sounds.Right:Play()
+                state = "answer_reveal"
+            else
+                addScore(answeringPlayer, -10)
+                playersWhoAnsweredWrong[answeringPlayer] = true
+                sounds.Wrong:Play()
+
+                local allPlayersAnswered = true
+                for i = 1, numPlayers do
+                    if playersWhoAnsweredWrong[i] ~= true then
+                        allPlayersAnswered = false
+                        break
+                    end
+                end
+
+                if allPlayersAnswered or currentScore <= 0 then
+                    state = "answer_reveal"
+                else
+                    state = "song_playing"
+                    previewStarted = true
+                    startSongPreview()
+                    scoreDropCounter = COUNTER:CreateCounterDuration(0, 1, 2)
+                    scoreDropCounter:Start()
+                end
+            end
         end
     end
 end
@@ -1141,7 +1412,7 @@ function draw()
 
             -- Draw genre list
             for i, genreNode in ipairs(availableGenres) do
-                local genreText = text:GetText(genreNode.Title, false, 99999,
+                local genreText = text:GetText(genreNode.Title .. " (" .. calculateMaxScore(genreNode) .. ")", false, 99999,
                     i == selectedGenreIndex and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil)
                 genreText:DrawAtAnchor(960, 350 + i * 50, "center")
             end
@@ -1153,6 +1424,10 @@ function draw()
             promptText:DrawAtAnchor(960, 400, "center")
             local hintText = text:GetText("Press DON to answer!")
             hintText:DrawAtAnchor(960, 500, "center")
+
+						-- Show current score
+        		local scoreText = text:GetText("Current Score: " .. currentScore .. " / " .. maxScoreForRound)
+        		scoreText:DrawAtAnchor(960, 550, "center")
         end
 
     elseif state == "answering" then
@@ -1176,7 +1451,7 @@ function draw()
 
             -- Show scores
             for i = 1, numPlayers do
-                local scoreText = text:GetText("P" .. i .. ": " .. playerScores[i])
+                local scoreText = text:GetText(playerNames[i] .. ": " .. playerScores[i])
                 scoreText:DrawAtAnchor(200 + i * 200, 600, "center")
             end
         end
@@ -1198,7 +1473,7 @@ function draw()
             table.sort(sortedPlayers, function(a, b) return a.score > b.score end)
 
             for rank, player in ipairs(sortedPlayers) do
-                local rankText = text:GetText(rank .. ". Player " .. player.index .. ": " .. player.score)
+                local rankText = text:GetText(rank .. ". " .. playerNames[player.index] .. ": " .. player.score)
                 rankText:DrawAtAnchor(960, 300 + rank * 50, "center")
             end
         end
@@ -1208,7 +1483,7 @@ function draw()
             local scoreText = text:GetText("Score: " .. soloScore)
             scoreText:DrawAtAnchor(960, 200, "center")
 
-            local genreText = text:GetText("Genre: " .. (currentSongNode and currentSongNode.Genre or "???"))
+            local genreText = text:GetText("Genre: " .. (currentSongNode and currentSongNode.Title or "???"))
             genreText:DrawAtAnchor(960, 400, "center")
 
             local promptText = text:GetText("Press DECIDE when ready to answer")
@@ -1346,6 +1621,10 @@ end
 
 function activate()
     save = GetSaveFile(0)
+		playerNames = {}
+		for i = 1, 5 do
+			playerNames[i] = GetSaveFile(i - 1).Name
+		end
     active = true
 
     -- Store original player count to restore later
