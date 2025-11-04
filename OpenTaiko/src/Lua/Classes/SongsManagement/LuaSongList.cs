@@ -10,7 +10,10 @@
 
 			var _scanningList = OpenTaiko.Songs管理.list曲ルート;
 
-			if (_settings.RootGenreFolder != null) {
+			if (_settings.RootGenreFolderNode != null) {
+				var _col = _settings.RootGenreFolderNode.INTERNAL_GetChildrenList(new CBlankClass());
+				if (_col != null) _scanningList = _col;
+			} else if (_settings.RootGenreFolder != null) {
 
 				#region [If a specific root genre folder is given, process a DFS to get the first potential root node found]
 

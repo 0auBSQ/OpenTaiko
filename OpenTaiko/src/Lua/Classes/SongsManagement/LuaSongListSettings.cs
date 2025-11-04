@@ -25,6 +25,9 @@ namespace OpenTaiko {
 		// Generate the root node from a specific folder (given by Genre) instead of the list song root note (fe. Dan song select, Tower song select)
 		public string? RootGenreFolder = null;
 
+		// The node version of RootGenreFolder, to use if there is a risk of having multiple folders with the same genre as a string, takes precedence over RootGenreFolder
+		public LuaSongNode? RootGenreFolderNode = null;
+
 		// If the chart doesn't have all the mandatory specified difficulties, the node is not included
 		public Difficulty[]? MandatoryDifficultyList = null;
 

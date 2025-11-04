@@ -261,7 +261,7 @@ local function selectRandomSongFromGenre(genreFolder)
         lsls.AppendMainRandomBox = false
         lsls.AppendSubRandomBoxes = false
         lsls.SubBackBoxFrequency = 0
-        lsls.RootGenreFolder = currentSongNode.Genre
+        lsls.RootGenreFolderNode = currentSongNode.Parent
 
         quizSongList = RequestSongList(lsls)
         refreshQuizSongListCache()
@@ -275,7 +275,7 @@ local function selectRandomSongFromGenre(genreFolder)
     lsls.AppendMainRandomBox = false
     lsls.AppendSubRandomBoxes = false
     lsls.SubBackBoxFrequency = 0
-    lsls.RootGenreFolder = genreFolder.Genre
+    lsls.RootGenreFolderNode = genreFolder
 
     local genreSongList = RequestSongList(lsls)
 

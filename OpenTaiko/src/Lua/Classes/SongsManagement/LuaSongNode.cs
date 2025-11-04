@@ -369,6 +369,12 @@
 			if (recursive) _FetchChildren(lsls);
 		}
 
+		// Should never be called from the Lua side, the objects are returned in a read only form for the LuaSongList Root node method
+		public List<CSongListNode>? INTERNAL_GetChildrenList(object requester) {
+			if (requester is CBlankClass) return _node?.childrenList;
+			return null;
+		}
+
 		#endregion
 
 		// Mount the song node so it gets played when transitioning to the gameplay screen
