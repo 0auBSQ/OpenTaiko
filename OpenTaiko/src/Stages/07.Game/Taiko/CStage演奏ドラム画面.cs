@@ -1916,9 +1916,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 	}
 	protected override void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		if (pChip.nBranch != this.nCurrentBranch[nPlayer])
-			return;
-
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
