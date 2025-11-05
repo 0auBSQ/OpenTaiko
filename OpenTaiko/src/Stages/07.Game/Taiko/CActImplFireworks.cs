@@ -18,7 +18,7 @@ internal class CActImplFireworks : CActivity {
 	/// 大音符の花火エフェクト
 	/// </summary>
 	/// <param name="nLane"></param>
-	public virtual void Start(int nLane, int nPlayer) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer) {
 		nY座標P2 = new int[] { 548, 612, 670, 712, 730, 780, 725, 690, 640 };
 		if (OpenTaiko.Tx.Effects_Hit_FireWorks != null && OpenTaiko.Tx.Effects_Hit_FireWorks != null) {
 			for (int i = 0; i < 9; i++) {
@@ -28,15 +28,6 @@ internal class CActImplFireworks : CActivity {
 						this.st大音符花火[j].ct進行 = new CCounter(0, 40, 18, OpenTaiko.Timer); // カウンタ
 						this.st大音符花火[j].fX = this.nX座標[i]; //X座標
 						this.st大音符花火[j].fY = nPlayer == 0 ? this.nY座標[i] : this.nY座標P2[i];
-
-						switch (nLane) {
-							case 0:
-								this.st大音符花火[j].nColor = 0;
-								break;
-							case 1:
-								this.st大音符花火[j].nColor = 1;
-								break;
-						}
 
 						switch (i) {
 							case 0:
@@ -86,7 +77,7 @@ internal class CActImplFireworks : CActivity {
 		}
 	}
 
-	public virtual void Start(int nLane, ENoteJudge judge, int player) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, bool isBigInput, int player) {
 		for (int j = 0; j < 3 * 4; j++) {
 			if (!this.st状態[j].b使用中)
 			//for( int n = 0; n < 1; n++ )
@@ -96,21 +87,13 @@ internal class CActImplFireworks : CActivity {
 				this.st状態[j].ct進行 = new CCounter(0, 6, 25, OpenTaiko.Timer);
 				this.st状態[j].judge = judge;
 				this.st状態[j].nPlayer = player;
-				this.st状態_大[j].nPlayer = player;
-
-				switch (nLane) {
-					case 0x11:
-					case 0x12:
-						this.st状態[j].nIsBig = 0;
-						break;
-					case 0x13:
-					case 0x14:
-					case 0x1A:
-					case 0x1B:
-						this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
-						this.st状態_大[j].judge = judge;
-						this.st状態_大[j].nIsBig = 1;
-						break;
+				if (NotesManager.IsBigNoteTaiko(nLane, gameType) && isBigInput) {
+					this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
+					this.st状態_大[j].judge = judge;
+					this.st状態_大[j].nPlayer = player;
+					this.st状態[j].IsBig = this.st状態_大[j].IsBig = true;
+				} else {
+					this.st状態[j].IsBig = false;
 				}
 				break;
 			}
@@ -155,46 +138,47 @@ internal class CActImplFireworks : CActivity {
 			int nBombWidth = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
 			int nBombHeight = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
 			for (int i = 0; i < 3 * 4; i++) {
-				if (this.st状態[i].b使用中) {
-					if (!this.st状態[i].ct進行.IsStoped) {
-						this.st状態[i].ct進行.Tick();
-						if (this.st状態[i].ct進行.IsEnded) {
-							this.st状態[i].ct進行.Stop();
-							this.st状態[i].b使用中 = false;
+				ref STSTATUS state = ref this.st状態[i];
+				if (state.b使用中) {
+					if (!state.ct進行.IsStoped) {
+						state.ct進行.Tick();
+						if (state.ct進行.IsEnded) {
+							state.ct進行.Stop();
+							state.b使用中 = false;
 						}
 
 						// (When performing calibration, reduce visual distraction
 						// and current judgment feedback near the judgment position.)
 						if (OpenTaiko.Tx.Effects_Hit_Explosion != null) {
-							int n = this.st状態[i].nIsBig == 1 ? (nHeight * 2) : 0;
+							int n = state.IsBig ? (nHeight * 2) : 0;
 
 							int nX = 0;
 							int nY = 0;
 
 							if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
-								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * state.nPlayer);
+								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * state.nPlayer);
 							} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
-								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * state.nPlayer);
+								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * state.nPlayer);
 							} else {
-								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
-								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+								nX = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[state.nPlayer];
+								nY = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[state.nPlayer];
 							}
-							nX += OpenTaiko.stageGameScreen.GetJPOSCROLLX(this.st状態[i].nPlayer);
-							nY += OpenTaiko.stageGameScreen.GetJPOSCROLLY(this.st状態[i].nPlayer);
+							nX += OpenTaiko.stageGameScreen.GetJPOSCROLLX(state.nPlayer);
+							nY += OpenTaiko.stageGameScreen.GetJPOSCROLLY(state.nPlayer);
 
 							switch (st状態[i].judge) {
 								case ENoteJudge.Perfect:
 								case ENoteJudge.Great:
 								case ENoteJudge.Auto:
-									if (!OpenTaiko.ConfigIni.SimpleMode) OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
+									if (!OpenTaiko.ConfigIni.SimpleMode) OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
 									break;
 								case ENoteJudge.Good:
-									OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
+									OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
 									break;
 								case ENoteJudge.Mine:
-									OpenTaiko.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(this.st状態[i].ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
+									OpenTaiko.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
 									break;
 								case ENoteJudge.Miss:
 								case ENoteJudge.Bad:
@@ -206,67 +190,59 @@ internal class CActImplFireworks : CActivity {
 			}
 
 			for (int i = 0; i < 3 * 4; i++) {
-				if (!this.st状態_大[i].ct進行.IsStoped) {
-					this.st状態_大[i].ct進行.Tick();
-					if (this.st状態_大[i].ct進行.IsEnded) {
-						this.st状態_大[i].ct進行.Stop();
+				ref STSTATUS_B state = ref this.st状態_大[i];
+				if (!state.ct進行.IsStoped) {
+					state.ct進行.Tick();
+					if (state.ct進行.IsEnded) {
+						state.ct進行.Stop();
 					}
-					if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && this.st状態_大[i].nIsBig == 1) {
+					if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && state.IsBig) {
 
-						switch (st状態_大[i].judge) {
+						switch (state.judge) {
 							case ENoteJudge.Perfect:
 							case ENoteJudge.Great:
-							case ENoteJudge.Auto:
-								if (this.st状態_大[i].nIsBig == 1 && !OpenTaiko.ConfigIni.SimpleMode) {
+							case ENoteJudge.Auto: // Great color
+							case ENoteJudge.Good: // OK color
+								if (state.IsBig && !OpenTaiko.ConfigIni.SimpleMode) {
 									//float fX = 415 - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Width * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.X ) / 2.0f);
 									//float fY = TJAPlayer3.Skin.nJudgePointY[ this.st状態_大[ i ].nPlayer ] - ((TJAPlayer3.Tx.Effects_Hit_Explosion_Big.sz画像サイズ.Height * TJAPlayer3.Tx.Effects_Hit_Explosion_Big.vc拡大縮小倍率.Y ) / 2.0f);
 									//float fY = 257 - ((this.txアタックエフェクトUpper_big.sz画像サイズ.Height * this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y ) / 2.0f);
 
 									////7
-									float f倍率 = 0.5f + ((this.st状態_大[i].ct進行.CurrentValue * 0.5f) / 10.0f);
+									float f倍率 = 0.5f + (state.ct進行.CurrentValue * 0.5f / 10.0f);
 									//this.txアタックエフェクトUpper_big.vc拡大縮小倍率.X = f倍率;
 									//this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y = f倍率;
 									//this.txアタックエフェクトUpper_big.n透明度 = (int)(255 * f倍率);
 									//this.txアタックエフェクトUpper_big.t2D描画( CDTXMania.app.Device, fX, fY );
 
-									/*
-                                    Matrix mat = Matrix.Identity;
-                                    mat *= Matrix.Scaling( f倍率, f倍率, f倍率 );
-                                    mat *= Matrix.Translation( TJAPlayer3.Skin.nScrollFieldX[0] - SampleFramework.GameWindowSize.Width / 2.0f, -(TJAPlayer3.Skin.nJudgePointY[ this.st状態[ i ].nPlayer ] - SampleFramework.GameWindowSize.Height / 2.0f), 0f );
-                                    //mat *= Matrix.Billboard( new Vector3( 15, 15, 15 ), new Vector3(0, 0, 0), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 0 ) );
-                                    //mat *= Matrix.Translation( 0f, 0f, 0f );
-
-
-                                    TJAPlayer3.Tx.Effects_Hit_Explosion_Big.Opacity = 255;
-                                    TJAPlayer3.Tx.Effects_Hit_Explosion_Big.t3D描画( mat );
-                                    */
-
 									float x = 0;
 									float y = 0;
 
 									if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * this.st状態[i].nPlayer);
-										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * this.st状態[i].nPlayer);
+										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * state.nPlayer);
+										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * state.nPlayer);
 									} else if (OpenTaiko.ConfigIni.nPlayerCount == 4 || OpenTaiko.ConfigIni.nPlayerCount == 3) {
-										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * this.st状態[i].nPlayer);
-										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * this.st状態[i].nPlayer);
+										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * state.nPlayer);
+										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * state.nPlayer);
 									} else {
-										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[this.st状態[i].nPlayer];
-										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[this.st状態[i].nPlayer];
+										x = OpenTaiko.Skin.Game_Effects_Hit_Explosion_X[state.nPlayer];
+										y = OpenTaiko.Skin.Game_Effects_Hit_Explosion_Y[state.nPlayer];
 									}
-									x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(this.st状態[i].nPlayer);
-									y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(this.st状態[i].nPlayer);
+									x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(state.nPlayer);
+									y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(state.nPlayer);
 
 									x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
 									y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
+
+									if (state.judge is ENoteJudge.Good) // TODO: add Explosion_Big for 可/OK
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(4.0f, 4.0f, 4.0f, 1.0f); // HACK: made whiter
+									else
+										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
 									OpenTaiko.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
 								}
-								break;
-
-							case ENoteJudge.Good:
 								break;
 
 							case ENoteJudge.Miss:
@@ -378,7 +354,7 @@ internal class CActImplFireworks : CActivity {
 		public bool b使用中;
 		public CCounter ct進行;
 		public ENoteJudge judge;
-		public int nIsBig;
+		public bool IsBig;
 		public int n透明度;
 		public int nPlayer;
 	}
@@ -386,14 +362,13 @@ internal class CActImplFireworks : CActivity {
 	protected struct STSTATUS_B {
 		public CCounter ct進行;
 		public ENoteJudge judge;
-		public int nIsBig;
+		public bool IsBig;
 		public int n透明度;
 		public int nPlayer;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct ST大音符花火 {
-		public int nColor;
 		public bool b使用中;
 		public CCounter ct進行;
 		public int n前回のValue;
