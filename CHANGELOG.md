@@ -1,5 +1,73 @@
 # Changelog
 
+## [0.6.0.93] - 2025-11-05 (Beta)
+
+- [Feat] Loosen note data line syntax for future compatibility (accept if starts with digit, reject if starts with `#` or contains `:`).
+- [Feat] Support forcing initial game type using `GAME:` (applies to all charts for a difficulty).
+- [Feat] Make notes’ `#GAMETYPE` fixed instead of changing at `#GAMETYPE`.
+- [Feat] Make input judgement skip notes not consuming the input color, allowing hitting nearby Ka+Don as Don+Ka.
+- [Feat] Prevent Clap inputs from triggering AdLibs, Mines, and empty BADs in Taiko mode.
+- [Feat] Allow using both Bongo drums (Po and Pa) to hit Bongo-mode balloon-type notes (autoroll also uses both).
+- [Feat] Give notes displayed over overlapped rolls higher judge priority, keeping earlier notes prioritized over later-defined rolls.
+- [Feat] Allow early BAD judgement for notes over overlapped rolls.
+- [Feat] Stop multi-hit notes from waiting for more hits if the first hit is already BAD.
+- [Feat] Make autoplay simulate game input instead of judging notes individually.
+- [Feat] Make autoroll hit Bongo D (Pink) rolls and Bongo balloon-type notes using Po & Pa alternatively.
+- [Feat] Make battle AI hit bombs and miss fuze rolls by AI level’s Mine judgement percentage.
+- [Feat] Hide fuze roll after it explodes.
+- [Enhancement] Autoplay uses Left Blue + Right Red for Bongo D (Pink) instead of Left Red.
+- [Fix] Regression 0.6.0.48 widened balloon-type notes’ head timing window (17ms) to BAD window.
+- [Fix] Regression 0.6.0.90 broke training mode branch switching availability check.
+- [Fix] Calculated gen-4 Shun-uchi score was too high due to limiting counted balloon-type hits to ≈0.06 hits/s (1/275.56x of expected speed).
+- [Fix] Crash when a chart had any <16.6 hit/s balloons but no missable notes (previously only crashed for ≈<0.06 hit/s balloons).
+- [Fix] Make `#GAMETYPE` argument case-insensitive.
+- [Fix] Past notes were judged from nearest to oldest (except for AdLib & Bomb).
+- [Fix] Ensure only AdLib & Bomb are judged from nearest to oldest.
+- [Fix] Give future non-BAD more priority over past BAD.
+- [Fix] Prevent missed notes from being judged.
+- [Fix] Hitting every big note with big note judgement or KaDon/(Pink)D gave an empty BAD in note lock mode.
+- [Fix] Multi-hit notes were not judged by the first hit.
+- [Fix] Multi-hit notes and roll-type notes ignored input timestamp.
+- [Fix] Ensure waiting multi-hit notes for past judgement are searched.
+- [Fix] Empty BAD behavior in Tight (note lock) mode broke all players’ combo and lacked stage failure, Tower damage, and Dan-i combo break.
+- [Fix] Single-hit big note closely followed by unhit notes was judged as miss.
+- [Fix] Prevent hitting a roll from being mistaken as hitting a multi-hit note.
+- [Fix] Balloon-type roll speed of puchi chara autoroll skill varied with song speed.
+- [Fix] Autoplay was not single-hitting big notes when big note judgement disabled.
+- [Fix] Autoplay used wrong hand for non-roll-type notes.
+- [Fix] Make autoroll independent of rolled count and fix only first autoplayer hit Kusudama.
+- [Fix] Game type (Taiko or Bongo) failed to reset when seeking within or exiting training mode.
+- [Fix] Replay did not record inputs after last note.
+- [Fix] Incorrect training mode branch switching point in empty measures (now uses last reached measure).
+- [Fix] Autoroll hit flash was always red even for colored Bongo rolls.
+- [Fix] Autoplay made big notes’ flying note small.
+- [Fix] Autoplay played drum sounds for wrong player.
+- [Fix] Ensure both lane flashes start when autoplay hits Purple or D (Pink) notes.
+- [Fix] Wrong `#SPLITLANE` offset amount of Bongo rolls.
+- [Fix] Bongo double and clap notes were not centered in `#SPLITLANE`.
+- [Fix] Bongo double roll placed into Po (red) lane in `#SPLITLANE`.
+- [Fix] SENotes calculation ignored Kusudama, Handed notes, Bomb, Adlib, and Konga rolls.
+- [Fix] SENotes for `I` and `H` defaulted to Don/Pon.
+- [Fix] Bongo double roll’s SENote was not small roll’s but Taiko big roll’s.
+- [Fix] Bongo clap roll’s flying note was Pa (Yellow).
+- [Fix] Prevent big note effects of Konga notes.
+- [Fix] Prevent flying notes from changing when `#GAMETYPE` changes.
+- [Fix] Hit flash colors were not adjusted to `#GAMETYPE` changes.
+- [Fix] Hitting or missing Fuze roll or Bongo rolls made character emit runners.
+- [Fix] Character’s miss animation did not play for BOOM judgement.
+- [Fix] Big variant of note explosion around judge mark was never used.
+- [Fix] Wrong roll counter number if multiple rolled bar rolls overlapped.
+- [Fix] Notes waiting for more hits were not aligned vertically to judge mark.
+- [Fix] Wrong flying note fade-out mask shape for Kadon and Konga notes.
+- [Fix] Prevent AdLib hits from emitting flying notes.
+- [Fix] Missing big note explosion around judge mark when hitting bigly OK.
+- [Fix] Big note effects played for small hits on big notes.
+- [Fix] Big roll’s flying notes lacked firework tail.
+- [Fix] Overlapped judge text and explosions rendered twice.
+- [Fix] Autoroll flying notes appeared doubled.
+- [Fix] Input sound played when balloon-type note clear sound played.
+- [Fix] Hitting balloon-type notes with real input played hit sound twice.
+
 ## [0.6.0.92] - 2025-10-20 (Beta)
 
 - [HotFix] Fix gauge not decreasing correctly on miss due to the previous version
