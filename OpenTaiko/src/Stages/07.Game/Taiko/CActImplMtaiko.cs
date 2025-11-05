@@ -17,7 +17,7 @@ internal class CActImplMtaiko : CActivity {
 		for (int i = 0; i < 25; i++) {
 			STパッド状態 stパッド状態 = new STパッド状態();
 			stパッド状態.n明るさ = 0;
-			this.stパッド状態[i] = stパッド状態;
+			this.stパッド状態[i / 5, i % 5] = stパッド状態;
 		}
 
 		this.ctレベルアップダウン = new CCounter[5];
@@ -58,8 +58,8 @@ internal class CActImplMtaiko : CActivity {
 		}
 		while ((num - this.nフラッシュ制御タイマ) >= 20) {
 			for (int j = 0; j < 25; j++) {
-				if (this.stパッド状態[j].n明るさ > 0) {
-					this.stパッド状態[j].n明るさ--;
+				if (this.stパッド状態[j / 5, j % 5].n明るさ > 0) {
+					this.stパッド状態[j / 5, j % 5].n明るさ--;
 				}
 			}
 			this.nフラッシュ制御タイマ += 20;
@@ -197,8 +197,7 @@ internal class CActImplMtaiko : CActivity {
 			}
 
 			int _actual = OpenTaiko.GetActualPlayer(i);
-			EGameType _gt = OpenTaiko.ConfigIni.nGameType[_actual];
-			int playerShift = i * 5;
+			EGameType _gt = OpenTaiko.stageGameScreen.eGameType[_actual];
 
 			// Drum base
 			OpenTaiko.Tx.Taiko_Base[(int)_gt]?.t2D描画(taiko_x, taiko_y);
@@ -206,10 +205,10 @@ internal class CActImplMtaiko : CActivity {
 			// Taiko hits
 			if (_gt == EGameType.Taiko) {
 				if (OpenTaiko.Tx.Taiko_Don_Left != null && OpenTaiko.Tx.Taiko_Don_Right != null && OpenTaiko.Tx.Taiko_Ka_Left != null && OpenTaiko.Tx.Taiko_Ka_Right != null) {
-					OpenTaiko.Tx.Taiko_Ka_Left.Opacity = getMTaikoOpacity(this.stパッド状態[playerShift].n明るさ);
-					OpenTaiko.Tx.Taiko_Ka_Right.Opacity = getMTaikoOpacity(this.stパッド状態[1 + playerShift].n明るさ);
-					OpenTaiko.Tx.Taiko_Don_Left.Opacity = getMTaikoOpacity(this.stパッド状態[2 + playerShift].n明るさ);
-					OpenTaiko.Tx.Taiko_Don_Right.Opacity = getMTaikoOpacity(this.stパッド状態[3 + playerShift].n明るさ);
+					OpenTaiko.Tx.Taiko_Ka_Left.Opacity = getMTaikoOpacity(this.stパッド状態[i, 0].n明るさ);
+					OpenTaiko.Tx.Taiko_Ka_Right.Opacity = getMTaikoOpacity(this.stパッド状態[i, 1].n明るさ);
+					OpenTaiko.Tx.Taiko_Don_Left.Opacity = getMTaikoOpacity(this.stパッド状態[i, 2].n明るさ);
+					OpenTaiko.Tx.Taiko_Don_Right.Opacity = getMTaikoOpacity(this.stパッド状態[i, 3].n明るさ);
 
 					OpenTaiko.Tx.Taiko_Ka_Left.t2D描画(taiko_x, taiko_y, new Rectangle(0, 0, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Height));
 					OpenTaiko.Tx.Taiko_Ka_Right.t2D描画(taiko_x + OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, taiko_y, new Rectangle(OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, 0, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Width / 2, OpenTaiko.Tx.Taiko_Ka_Right.szTextureSize.Height));
@@ -218,9 +217,9 @@ internal class CActImplMtaiko : CActivity {
 				}
 			} else if (_gt == EGameType.Konga) {
 				if (OpenTaiko.Tx.Taiko_Konga_Clap != null && OpenTaiko.Tx.Taiko_Konga_Don != null && OpenTaiko.Tx.Taiko_Konga_Ka != null) {
-					OpenTaiko.Tx.Taiko_Konga_Clap.Opacity = getMTaikoOpacity(this.stパッド状態[4 + playerShift].n明るさ);
-					OpenTaiko.Tx.Taiko_Konga_Don.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[2 + playerShift].n明るさ, this.stパッド状態[3 + playerShift].n明るさ));
-					OpenTaiko.Tx.Taiko_Konga_Ka.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[playerShift].n明るさ, this.stパッド状態[1 + playerShift].n明るさ));
+					OpenTaiko.Tx.Taiko_Konga_Clap.Opacity = getMTaikoOpacity(this.stパッド状態[i, 4].n明るさ);
+					OpenTaiko.Tx.Taiko_Konga_Don.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[i, 2].n明るさ, this.stパッド状態[i, 3].n明るさ));
+					OpenTaiko.Tx.Taiko_Konga_Ka.Opacity = getMTaikoOpacity(Math.Max(this.stパッド状態[i, 0].n明るさ, this.stパッド状態[i, 1].n明るさ));
 
 					OpenTaiko.Tx.Taiko_Konga_Ka.t2D描画(taiko_x, taiko_y);
 					OpenTaiko.Tx.Taiko_Konga_Don.t2D描画(taiko_x, taiko_y);
@@ -378,90 +377,26 @@ internal class CActImplMtaiko : CActivity {
 		return base.Draw();
 	}
 
-	public void tMtaikoEvent(int nChannel, int nHand, int nPlayer) {
-		CConfigIni configIni = OpenTaiko.ConfigIni;
-		bool bAutoPlay = configIni.bAutoPlay[nPlayer];
-		int playerShift = 5 * nPlayer;
-		var _gt = configIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
-
-		switch (nPlayer) {
-			case 1:
-				bAutoPlay = configIni.bAutoPlay[nPlayer] || OpenTaiko.ConfigIni.bAIBattleMode;
+	public void tMtaikoEvent(NotesManager.EInputType input, int nHand, int nPlayer) {
+		switch (input) {
+			case NotesManager.EInputType.Red:
+				this.stパッド状態[nPlayer, 2 + nHand].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.RedBig:
+				this.stパッド状態[nPlayer, 2].n明るさ = 8;
+				this.stパッド状態[nPlayer, 3].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.Blue:
+				this.stパッド状態[nPlayer, nHand].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.BlueBig:
+				this.stパッド状態[nPlayer, 0].n明るさ = 8;
+				this.stパッド状態[nPlayer, 1].n明るさ = 8;
+				break;
+			case NotesManager.EInputType.Clap:
+				this.stパッド状態[nPlayer, 4].n明るさ = 8;
 				break;
 		}
-
-		if (!bAutoPlay) {
-			switch (nChannel) {
-				case 0x11:
-				case 0x13:
-				case 0x15:
-				case 0x16:
-				case 0x17: {
-						this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
-					}
-					break;
-				case 0x12: {
-						this.stパッド状態[nHand + playerShift].n明るさ = 8;
-					}
-					break;
-				case 0x14: {
-						if (_gt == EGameType.Konga) {
-							this.stパッド状態[4 + playerShift].n明るさ = 8;
-						} else {
-							this.stパッド状態[nHand + playerShift].n明るさ = 8;
-						}
-					}
-					break;
-
-			}
-		} else {
-			switch (nChannel) {
-				case 0x11:
-				case 0x15:
-				case 0x16:
-				case 0x17:
-				case 0x1F: {
-						this.stパッド状態[2 + nHand + playerShift].n明るさ = 8;
-					}
-					break;
-
-				case 0x13:
-				case 0x1A: {
-						if (_gt == EGameType.Konga) {
-							this.stパッド状態[0 + playerShift].n明るさ = 8;
-							this.stパッド状態[2 + playerShift].n明るさ = 8;
-						} else {
-							this.stパッド状態[2 + playerShift].n明るさ = 8;
-							this.stパッド状態[3 + playerShift].n明るさ = 8;
-						}
-					}
-					break;
-
-				case 0x12: {
-						this.stパッド状態[nHand + playerShift].n明るさ = 8;
-					}
-					break;
-
-				case 0x14:
-				case 0x1B: {
-						if (_gt == EGameType.Konga) {
-							this.stパッド状態[4 + playerShift].n明るさ = 8;
-						} else {
-							this.stパッド状態[0 + playerShift].n明るさ = 8;
-							this.stパッド状態[1 + playerShift].n明るさ = 8;
-						}
-
-					}
-					break;
-
-				case 0x101: {
-						this.stパッド状態[nHand + playerShift].n明るさ = 8;
-						this.stパッド状態[2 + (nHand == 0 ? 1 : 0) + playerShift].n明るさ = 8;
-						break;
-					}
-			}
-		}
-
 	}
 
 	public void tBranchEvent(CTja.ECourse After, int player, bool stopAnime = false) {
@@ -561,7 +496,7 @@ internal class CActImplMtaiko : CActivity {
 	}
 
 	//太鼓
-	private STパッド状態[] stパッド状態 = new STパッド状態[5 * 5];
+	private STパッド状態[,] stパッド状態 = new STパッド状態[5, 5]; // [iPlayer, iPad]
 	private long nフラッシュ制御タイマ;
 
 	//private CTexture[] txコースシンボル = new CTexture[ 6 ];

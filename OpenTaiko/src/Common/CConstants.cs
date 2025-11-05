@@ -307,14 +307,6 @@ public enum ENoteState {
 	Bad
 }
 
-public enum ERollState {
-	None,
-	Roll,
-	RollB,
-	Balloon,
-	Potato
-}
-
 public enum EStealthMode {
 	Off = 0,
 	Doron = 1,

@@ -12,23 +12,24 @@ internal class FlyingNotes : CActivity {
 
 
 	// メソッド
-	public virtual void Start(int nLane, int nPlayer, bool isRoll = false) {
-		if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode) return;
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, bool isBalloon = false) {
+		if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode || nLane is NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown)
+			return;
 
-		if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
+		if (OpenTaiko.Tx.Notes[(int)gameType] != null) {
 			for (int i = 0; i < 128; i++) {
 				if (!Flying[i].IsUsing) {
 					// 初期化
 					Flying[i].IsUsing = true;
 					Flying[i].Lane = nLane;
+					Flying[i].GameType = gameType;
 					Flying[i].Player = nPlayer;
 					Flying[i].X = -100; //StartPointX[nPlayer];
 					Flying[i].Y = -100; //TJAPlayer3.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
 					Flying[i].StartPointX = StartPointX[nPlayer];
 					Flying[i].StartPointY = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
 					Flying[i].OldValue = 0;
-					Flying[i].IsRoll = isRoll;
+					Flying[i].IsRoll = isBalloon;
 					// 角度の決定
 					Flying[i].Height = Math.Abs(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]);
 					Flying[i].Width = (Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer])) / 2);
@@ -79,8 +80,8 @@ internal class FlyingNotes : CActivity {
 					if (Flying[i].Counter.IsEnded) {
 						Flying[i].Counter.Stop();
 						Flying[i].IsUsing = false;
-						OpenTaiko.stageGameScreen.actGauge.Start(Flying[i].Lane, ENoteJudge.Perfect, Flying[i].Player);
-						OpenTaiko.stageGameScreen.actChipEffects.Start(Flying[i].Player, Flying[i].Lane);
+						OpenTaiko.stageGameScreen.actGauge.Start(Flying[i].Lane, Flying[i].GameType, ENoteJudge.Perfect, Flying[i].Player);
+						OpenTaiko.stageGameScreen.actChipEffects.Start(Flying[i].Player, Flying[i].Lane, Flying[i].GameType);
 					}
 					for (int n = Flying[i].OldValue; n < Flying[i].Counter.CurrentValue; n += 16) {
 						int endX;
@@ -125,8 +126,8 @@ internal class FlyingNotes : CActivity {
 						}
 
 						if (n % OpenTaiko.Skin.Game_Effect_FireWorks_Timing == 0 && !Flying[i].IsRoll && Flying[i].Counter.CurrentValue > 18) {
-							if (Flying[i].Lane == 3 || Flying[i].Lane == 4) {
-								OpenTaiko.stageGameScreen.FireWorks.Start(Flying[i].Lane, Flying[i].Player, Flying[i].X, Flying[i].Y);
+							if (NotesManager.IsBigNoteTaiko(Flying[i].Lane, Flying[i].GameType)) {
+								OpenTaiko.stageGameScreen.FireWorks.Start(Flying[i].Lane, Flying[i].GameType, Flying[i].Player, Flying[i].X, Flying[i].Y);
 							}
 						}
 
@@ -145,25 +146,7 @@ internal class FlyingNotes : CActivity {
 					}
 					//Flying[i].OldValue = Flying[i].Counter.n現在の値;
 
-					NotesManager.DisplayNote(Flying[i].Player, (int)Flying[i].X, (int)Flying[i].Y, Flying[i].Lane);
-
-					/*
-                    EGameType _gt = TJAPlayer3.ConfigIni.nGameType[TJAPlayer3.GetActualPlayer(Flying[i].Player)];
-
-                    TJAPlayer3.Tx.Notes[(int)_gt]?.t2D中心基準描画((int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
-                    */
-
-					/*
-                    if (Flying[i].Player == 0)
-                    {
-
-                    }
-                    else if (Flying[i].Player == 1)
-                    {
-                        //
-                        TJAPlayer3.Tx.Notes?.t2D中心基準描画((int)Flying[i].X, (int)Flying[i].Y, new Rectangle(Flying[i].Lane * 130, 0, 130, 130));
-                    }
-                    */
+					NotesManager.DisplayNote(Flying[i].Player, (int)Flying[i].X, (int)Flying[i].Y, Flying[i].Lane, Flying[i].GameType);
 				}
 			}
 		}
@@ -176,7 +159,8 @@ internal class FlyingNotes : CActivity {
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct Status {
-		public int Lane;
+		public NotesManager.ENoteType Lane;
+		public EGameType GameType;
 		public int Player;
 		public bool IsUsing;
 		public CCounter Counter;

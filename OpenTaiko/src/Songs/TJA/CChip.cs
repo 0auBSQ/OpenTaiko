@@ -26,7 +26,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nState;
 	public int nRollCount;
 	public int nBalloon;
-	public int nProcessTime;
+	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
+	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
 	public ENoteState eNoteState;
 	public int nChannelNo;
@@ -57,7 +58,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nLag;                // 2011.2.1 yyagi
 	public double db発声時刻;
 	public double dbProcess_Time;
-	public int nPlayerSide;
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
 	public int nListPosition;
 	public bool IsFixedSENote;
@@ -113,7 +113,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public int intFrame;
 
-	public EGameType eGameType;
+	public EGameType? eGameType;
 	//
 
 
@@ -193,6 +193,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.dbSCROLL = 1.0;
 		this.dbSCROLL_Y = 0.0f;
 	}
+
+	public static implicit operator NotesManager.ENoteType(CChip? chip) => NotesManager.GetNoteType(chip);
+
 	public override string ToString() {
 
 		//2016.10.07 kairera0467 近日中に再編成予定

@@ -266,6 +266,7 @@ internal class CTja : CActivity {
 	public int[] LEVELtaiko = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
 	public ELevelIcon[] LEVELtaikoIcon = new ELevelIcon[(int)Difficulty.Total] { ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone, ELevelIcon.eNone };
 	public ESide SIDE;
+	public EGameType?[] GameType = new EGameType?[(int)Difficulty.Total];
 	public CSongUniqueID uniqueID;
 
 	// Tower lifes
@@ -352,6 +353,7 @@ internal class CTja : CActivity {
 	public double dbNowScrollY = 0.0; //2016.08.13 kairera0467 複素数スクロール
 	public double dbLastTime = 0.0; //直前の小節の開始時間
 	public double dbLastBMScrollTime = 0.0;
+	private EGameType? nowGameType = null;
 
 	public int[] bBARLINECUE = new int[2]; //命令を入れた次の小節の操作を実現するためのフラグ。0 = mainflag, 1 = cuetype
 	public bool b小節線を挿入している = false;
@@ -1271,23 +1273,16 @@ internal class CTja : CActivity {
 		string line = input.Trim();
 
 		if (nMode == 0) {
-			if (!string.IsNullOrEmpty(line) && NotesManager.FastFlankedParsing(line)) {
-				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-					//A～Fで始まる命令が削除されない不具合の対策
-				} else {
-					return line;
-				}
+			if (!string.IsNullOrEmpty(line) && NotesManager.IsLikelyNoteDataLine(line)) {
+				return line;
 			}
 		} else if (nMode == 1) {
-			if (!string.IsNullOrEmpty(line) &&
-				(line.Substring(0, 1) == "#"
-					|| line.StartsWith("EXAM")
-					|| NotesManager.FastFlankedParsing(line))) {
-				if (line.StartsWith("BALLOON") || line.StartsWith("BPM")) {
-					//A～Fで始まる命令が削除されない不具合の対策
-				} else {
-					return line;
-				}
+			if (!string.IsNullOrEmpty(line) && (
+				line.Substring(0, 1) == "#"
+				|| line.StartsWith("EXAM")
+				|| NotesManager.IsLikelyNoteDataLine(line)
+			)) {
+				return line;
 			}
 		}
 		return null;
@@ -1642,7 +1637,7 @@ internal class CTja : CActivity {
 							: $"An unended roll is ended by #END."
 						);
 					}
-					InsertNoteAtDefCursor(8, 0, 1, branch);
+					InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, 0, 1, branch);
 				}
 			}
 
@@ -1991,15 +1986,8 @@ internal class CTja : CActivity {
 			// チップを配置。
 			this.listChip.Add(chip);
 		} else if (command == "#GAMETYPE") {
-			CChip chip = this.NewEventChipAtDefCursor(0xD8, 1);
-			chip.eGameType = argument switch {
-				"Taiko" => EGameType.Taiko,
-				"Bongo" or "Konga" => EGameType.Konga,
-				_ => chip.eGameType,
-			};
-
-			// チップを配置。
-			this.listChip.Add(chip);
+			this.nowGameType = strConvertGameType(argument);
+			this.listChip.Add(this.NewEventChipAtDefCursor(0xD8, 1));
 		} else if (command == "#SPLITLANE") {
 			this.listChip.Add(this.NewEventChipAtDefCursor(0xD9, 1));
 		} else if (command == "#MERGELANE") {
@@ -2740,28 +2728,27 @@ internal class CTja : CActivity {
 					}
 
 
-					int nObjectNum = this.CharConvertNote(InputText.Substring(n, 1));
+					var noteType = NotesManager.GetNoteType(InputText.Substring(n, 1));
 
-					if (nObjectNum != 0) {
+					if (noteType != NotesManager.ENoteType.Empty) {
 						this.ForEachCurrentBranch((branch) => {
 							int iBranch = (int)branch;
 
-							// TODO: add judge-by-note-type methods to NotesManager
-							bool isRollHead = (nObjectNum >= 5 && nObjectNum <= 7) || nObjectNum == 9 || nObjectNum == 13 || nObjectNum == 16 || nObjectNum == 17;
+							bool isRollHead = NotesManager.IsGenericRoll(noteType) && !NotesManager.IsRollEnd(noteType);
 							if (this.nNowRollCountBranch[iBranch] >= 0) {
 								if (isRollHead) {
 									// repeated roll head; treated as blank
 									return; // process this note symbol in the next branch
 								}
-								if (nObjectNum != 8) {
+								if (noteType != NotesManager.ENoteType.EndRoll) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
 									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
 										this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
-											$"An unended roll is ended by a non-roll of type {nObjectNum} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
-											: $"An unended roll is ended by a non-roll of type {nObjectNum} at measure {this.n現在の小節数}. Input: {InputText}"
+											$"An unended roll is ended by a non-roll of type {noteType} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
+											: $"An unended roll is ended by a non-roll of type {noteType} at measure {this.n現在の小節数}. Input: {InputText}"
 										);
 									}
-									InsertNoteAtDefCursor(8, n, n文字数, branch);
+									InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, n, n文字数, branch);
 
 								}
 							}
@@ -2771,12 +2758,12 @@ internal class CTja : CActivity {
 								this.nNowRollCountBranch[iBranch] = listChip_Branch[iBranch].Count;
 							}
 
-							if (nObjectNum < 0) {
+							if (noteType is NotesManager.ENoteType.Unknown) {
 								this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
 									$"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
 									: $"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
 							} else {
-								InsertNoteAtDefCursor(nObjectNum, n, n文字数, branch);
+								InsertNoteAtDefCursor(noteType, n, n文字数, branch);
 							}
 						});
 					}
@@ -2795,6 +2782,7 @@ internal class CTja : CActivity {
 	private CChip NewEventChipAtDefCursor(int channelNo, int argIndex = default, int argInt = default, double argDb = default, ECourse? branch = null)
 		=> new() {
 			nChannelNo = channelNo,
+			eGameType = this.nowGameType,
 			IsEndedBranching = this.IsEndedBranching,
 			nBranch = branch ?? this.n現在のコース,
 			idxBranchSection = this.listBRANCH.Count,
@@ -2824,22 +2812,21 @@ internal class CTja : CActivity {
 		return chip;
 	}
 
-	private void InsertNoteAtDefCursor(int noteType, int iDiv, int divsPerMeasure, ECourse branch) {
+	private void InsertNoteAtDefCursor(NotesManager.ENoteType noteType, int iDiv, int divsPerMeasure, ECourse branch) {
 		int iBranch = (int)branch;
 
-		CChip chip = this.NewScrolledChipAtDefCursor(0x10 + noteType, iDiv, divsPerMeasure, branch);
+		CChip chip = this.NewScrolledChipAtDefCursor(NotesManager.ToChannelNo(noteType), iDiv, divsPerMeasure, branch);
 		chip.IsMissed = false;
 		chip.bHit = false;
 		chip.bShow = true;
 		chip.bShowRoll = true;
 		chip.db発声位置 = this.dbNowTime;
-		chip.n整数値 = noteType;
-		chip.n整数値_内部番号 = 1;
+		chip.n整数値 = (int)noteType;
+		chip.n整数値_内部番号 = this.listNoteChip.Count;
 		chip.nScrollDirection = this.nスクロール方向;
 		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
-		chip.nPlayerSide = this.nPlayerSide;
 		chip.bGOGOTIME = this.bGOGOTIME;
 
 		if (NotesManager.IsKusudama(chip)) {
@@ -2887,17 +2874,19 @@ internal class CTja : CActivity {
 
 		#region[ 固定される種類のsenotesはここで設定しておく。 ]
 		chip.nSenote = noteType switch {
-			3 => 5,
-			4 => 6,
-			5 => 7,
-			6 => 0xA,
-			7 => 0xB,
-			8 => 0xC,
-			9 => 0xB,
-			0xA => 5,
-			0xB => 6,
-			0xD => 0xB,
-			0xF1 => 5,
+			NotesManager.ENoteType.DonBig => 5,
+			NotesManager.ENoteType.KaBig => 6,
+			NotesManager.ENoteType.Roll => 7,
+			NotesManager.ENoteType.RollPa => 7,
+			NotesManager.ENoteType.RollBig => 0xA,
+			NotesManager.ENoteType.RollClap => 0xA,
+			NotesManager.ENoteType.Balloon => 0xB,
+			NotesManager.ENoteType.EndRoll => 0xC,
+			NotesManager.ENoteType.BalloonEx => 0xB,
+			NotesManager.ENoteType.DonHand => 5,
+			NotesManager.ENoteType.KaHand => 6,
+			NotesManager.ENoteType.BalloonFuze => 0xB,
+			NotesManager.ENoteType.Kadon => 5,
 			_ => chip.nSenote,
 		};
 		#endregion
@@ -3310,6 +3299,10 @@ internal class CTja : CActivity {
 				//this.n参照中の難易度 = Convert.ToInt16( strCommandParam );
 				this.n参照中の難易度 = this.strConvertCourse(strCommandParam);
 			}
+		} else if (strCommandName.Equals("GAME")) {
+			if (!string.IsNullOrEmpty(strCommandParam)) {
+				this.nowGameType = this.GameType[this.n参照中の難易度] = strConvertGameType(strCommandParam);
+			}
 		} else if (strCommandName.Equals("HEADSCROLL")) {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
@@ -3545,14 +3538,6 @@ internal class CTja : CActivity {
 			return false;
 	}
 
-	/// <summary>
-	/// string型からint型に変換する。
-	/// TJAP2から持ってきた。
-	/// </summary>
-	private int CharConvertNote(string str) {
-		return (NotesManager.GetNoteValueFromChar(str));
-	}
-
 	private int strConvertCourse(string str) {
 		//2016.08.24 kairera0467
 		//正規表現を使っているため、easyでもEASYでもOK。
@@ -3572,6 +3557,11 @@ internal class CTja : CActivity {
 		}
 		return 3;
 	}
+
+	private static EGameType strConvertGameType(string argument) => argument.ToLower() switch {
+		"bongo" or "konga" => EGameType.Konga,
+		"taiko" or _ => EGameType.Taiko,
+	};
 
 	/// <summary>
 	/// Lyricファイルのパースもどき
@@ -3637,7 +3627,7 @@ internal class CTja : CActivity {
 		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
-			if (NotesManager.IsCommonNote(chip)) {
+			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
 				list音符のみのリスト.Add(chip);
 			}
 		}
@@ -3666,7 +3656,7 @@ internal class CTja : CActivity {
 		int dkdkCount = 0;
 
 		foreach (CChip chip in this.listChip) {
-			if (NotesManager.IsCommonNote(chip)) {
+			if (NotesManager.IsHittableNote(chip) && !NotesManager.IsRollEnd(chip)) {
 				list音符のみのリスト_Branch[(int)chip.nBranch].Add(chip);
 			}
 		}
@@ -4225,12 +4215,13 @@ internal class CTja : CActivity {
 	public static double TjaBeatSpeedToGameBeatSpeed(double beatSpeed)
 		=> beatSpeed * OpenTaiko.ConfigIni.SongPlaybackSpeed;
 
-	public int GetListChipIndexOfMeasure(int iMeasure1to) {
+	public int GetListChipIndexOfMeasure(int iMeasure1to, ECourse? branch = null) {
 		for (int i = 0; i < this.listChip.Count; i++) {
 			CChip pChip = this.listChip[i];
-			if ((iMeasure1to == 0) ? // initial song position
+			if (((iMeasure1to == 0) ? // initial song position
 				pChip.n発声時刻ms >= 0
 				: (pChip.nChannelNo == 0x50 && pChip.n整数値_内部番号 == iMeasure1to)
+				&& (branch == null || pChip.IsForBranch(branch.Value)))
 				) {
 				return i;
 			}

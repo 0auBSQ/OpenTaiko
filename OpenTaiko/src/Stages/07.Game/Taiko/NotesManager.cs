@@ -8,46 +8,64 @@ class NotesManager {
 
 	#region [Parsing]
 
-	public static Dictionary<string, int> NoteCorrespondanceDictionnary = new Dictionary<string, int>() {
-		["0"] = 0, // Empty
-		["1"] = 1, // Small Don (Taiko) | Red (right) hit (Konga)
-		["2"] = 2, // Small Ka (Taiko) | Yellow (left) hit (Konga)
-		["3"] = 3, // Big Don (Taiko) | Pink note (Konga)
-		["4"] = 4, // Big Ka (Taiko) | Clap (Konga)
-		["5"] = 5, // Small roll start | Konga red roll
-		["6"] = 6, // Big roll start | Konga pink roll
-		["7"] = 7, // Balloon
-		["8"] = 8, // Roll/Balloon end
-		["9"] = 9, // Kusudama
-		["A"] = 10, // Joint Big Don (2P)
-		["B"] = 11, // Joint Big Ka (2P)
-		["C"] = 12, // Mine
-		["D"] = 13, // ProjectOutfox's Fuse roll
-		["E"] = 0, // Unused
-		["F"] = 15, // ADLib
-		["G"] = 0xF1, // Green (Purple) double hit note
-		["H"] = 16, // Konga clap roll | Taiko big roll
-		["I"] = 17, // Konga yellow roll | Taiko small roll
+	public enum ENoteType {
+		Empty = 0,
+		Don = 1, Po = 1,
+		Ka = 2, Pa = 2,
+		DonBig = 3, Double = 3,
+		KaBig = 4, Clap = 4,
+		Roll = 5, RollPo = 5,
+		RollBig = 6, RollDouble = 6,
+		Balloon = 7,
+		EndRoll = 8,
+		BalloonEx = 9,
+		DonHand = 0xA, DoubleHand = 0xA,
+		KaHand = 0xB, ClapHand = 0xB,
+		Bomb = 0xC,
+		BalloonFuze = 0xD,
+		Adlib = 0xF,
+		Kadon = 0xF1,
+		RollClap = 0x10,
+		RollPa = 0x11,
+		Unknown = -1,
+	}
+
+	public static Dictionary<string, ENoteType> CharToNoteType = new() {
+		["0"] = ENoteType.Empty, // Empty
+		["1"] = ENoteType.Don, // Small Don (Taiko) | Red (right) hit (Konga)
+		["2"] = ENoteType.Ka, // Small Ka (Taiko) | Yellow (left) hit (Konga)
+		["3"] = ENoteType.DonBig, // Big Don (Taiko) | Pink note (Konga)
+		["4"] = ENoteType.KaBig, // Big Ka (Taiko) | Clap (Konga)
+		["5"] = ENoteType.Roll, // Small roll start | Konga red roll
+		["6"] = ENoteType.RollBig, // Big roll start | Konga pink roll
+		["7"] = ENoteType.Balloon, // Balloon
+		["8"] = ENoteType.EndRoll, // Roll/Balloon end
+		["9"] = ENoteType.BalloonEx, // Kusudama
+		["A"] = ENoteType.DonHand, // Joint Big Don (2P)
+		["B"] = ENoteType.KaHand, // Joint Big Ka (2P)
+		["C"] = ENoteType.Bomb, // Mine
+		["D"] = ENoteType.BalloonFuze, // ProjectOutfox's Fuse roll
+		["F"] = ENoteType.Adlib, // ADLib
+		["G"] = ENoteType.Kadon, // Green (Purple) double hit note
+		["H"] = ENoteType.RollClap, // Konga clap roll | Taiko big roll
+		["I"] = ENoteType.RollPa, // Konga yellow roll | Taiko small roll
 	};
 
-	public static bool FastFlankedParsing(string s) {
-		if (s[0] >= '0' && s[0] <= '9')
-			return true;
+	public static Dictionary<ENoteType, string> NoteTypeToChar = CharToNoteType.Select(x => (x.Value, x.Key)).ToDictionary();
 
-		for (int i = 0; i < s.Length; i++) {
-			if (GetNoteValueFromChar(s.Substring(i, 1)) == -1
-				&& s.Substring(i, 1) != ",")
-				return false;
-		}
+	public static bool IsLikelyNoteDataLine(string leftTrimmed)
+		=> char.IsAsciiDigit(leftTrimmed[0]) || (leftTrimmed[0] != '#' && !leftTrimmed.Contains(':'));
 
-		return true;
-	}
+	public static ENoteType GetNoteType(string chr)
+		=> CharToNoteType.GetValueOrDefault(chr, ENoteType.Unknown);
+	public static ENoteType GetNoteType(int channelNo)
+		=> Enum.IsDefined((ENoteType)(channelNo - 0x10)) ? (ENoteType)(channelNo - 0x10) : ENoteType.Unknown;
+	public static ENoteType GetNoteType(CChip? chip)
+		=> (chip != null) ? GetNoteType(chip.nChannelNo) : ENoteType.Unknown;
 
-	public static int GetNoteValueFromChar(string chr) {
-		if (NoteCorrespondanceDictionnary.ContainsKey(chr))
-			return NoteCorrespondanceDictionnary[chr];
-		return -1;
-	}
+	public static string? ToNoteChar(ENoteType nt)
+		=> NoteTypeToChar.GetValueOrDefault(nt);
+	public static int ToChannelNo(ENoteType nt) => 0x10 + (int)nt;
 
 	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll) {
@@ -82,31 +100,79 @@ class NotesManager {
 	#endregion
 
 	#region [Gameplay]
+	public enum EInputType {
+		Red,
+		RedBig,
+		Blue, Yellow = Blue,
+		BlueBig,
+		Clap,
+		Unknown = -1,
+	}
 
-	public static bool IsExpectedPad(int stored, int hit, CChip chip, EGameType gt) {
-		var inPad = (EPad)hit;
-		var onPad = (EPad)stored;
+	public static PlayerLane.FlashType InputToLane(EInputType nInput) => nInput switch {
+		EInputType.Red or EInputType.RedBig => PlayerLane.FlashType.Red,
+		EInputType.Blue or EInputType.BlueBig => PlayerLane.FlashType.Blue,
+		EInputType.Clap => PlayerLane.FlashType.Clap,
+		_ => PlayerLane.FlashType.Total,
+	};
 
+	public static int GetPadPlayer(EPad nPad) => nPad switch {
+		EPad.LRed or EPad.RRed or EPad.LBlue or EPad.RBlue or EPad.Clap => 0,
+		EPad.LRed2P or EPad.RRed2P or EPad.LBlue2P or EPad.RBlue2P or EPad.Clap2P => 1,
+		EPad.LRed3P or EPad.RRed3P or EPad.LBlue3P or EPad.RBlue3P or EPad.Clap3P => 2,
+		EPad.LRed4P or EPad.RRed4P or EPad.LBlue4P or EPad.RBlue4P or EPad.Clap4P => 3,
+		EPad.LRed5P or EPad.RRed5P or EPad.LBlue5P or EPad.RBlue5P or EPad.Clap5P => 4,
+		_ => int.MaxValue, // invalid player
+	};
+
+	public static EPad PadTo1P(EPad pad) => pad switch {
+		EPad.LRed or EPad.LRed2P or EPad.LRed3P or EPad.LRed4P or EPad.LRed5P => EPad.LRed,
+		EPad.RRed or EPad.RRed2P or EPad.RRed3P or EPad.RRed4P or EPad.RRed5P => EPad.RRed,
+		EPad.LBlue or EPad.LBlue2P or EPad.LBlue3P or EPad.LBlue4P or EPad.LBlue5P => EPad.LBlue,
+		EPad.RBlue or EPad.RBlue2P or EPad.RBlue3P or EPad.RBlue4P or EPad.RBlue5P => EPad.RBlue,
+		EPad.Clap or EPad.Clap2P or EPad.Clap3P or EPad.Clap4P or EPad.Clap5P => EPad.Clap,
+		_ => pad,
+	};
+
+	public static EInputType PadToInputType(EPad pad, bool isBigInput = false) => PadTo1P(pad) switch {
+		EPad.LRed or EPad.RRed => isBigInput ? EInputType.RedBig : EInputType.Red,
+		EPad.LBlue or EPad.RBlue => isBigInput ? EInputType.BlueBig : EInputType.Blue,
+		EPad.Clap => EInputType.Clap,
+		_ => EInputType.Unknown,
+	};
+
+	public static PlayerLane.FlashType PadToLane(EPad pad, EGameType gameType) => PadTo1P(pad) switch {
+		EPad.LRed or EPad.RRed => PlayerLane.FlashType.Red,
+		EPad.LBlue or EPad.RBlue => PlayerLane.FlashType.Blue,
+		EPad.Clap when gameType is EGameType.Konga => PlayerLane.FlashType.Clap,
+		_ => PlayerLane.FlashType.Total,
+	};
+
+	public static int PadToHand(EPad pad) => (PadTo1P(pad) is EPad.RRed or EPad.RBlue) ? 1 : 0;
+
+	public static bool IsExpectedPadAnyHit(EPad hit, CChip chip, EGameType gt) => IsAcceptLane(chip, gt, PadToLane(hit, gt));
+
+	public static bool IsExpectedPadMultiHit(EPad stored, EPad hit, CChip chip, EGameType gt) {
 		if (chip == null) return false;
 
 		if (IsBigKaTaiko(chip, gt)) {
-			return (inPad == EPad.LBlue && onPad == EPad.RBlue)
-				   || (inPad == EPad.RBlue && onPad == EPad.LBlue);
+			return (hit == EPad.LBlue && stored == EPad.RBlue)
+				|| (hit == EPad.RBlue && stored == EPad.LBlue);
 		}
 
 		if (IsBigDonTaiko(chip, gt)) {
-			return (inPad == EPad.LRed && onPad == EPad.RRed)
-				   || (inPad == EPad.RRed && onPad == EPad.LRed);
+			return (hit == EPad.LRed && stored == EPad.RRed)
+				|| (hit == EPad.RRed && stored == EPad.LRed);
 		}
 
 		if (IsSwapNote(chip, gt)) {
-			bool hitBlue = inPad == EPad.LBlue || inPad == EPad.RBlue;
-			bool hitRed = inPad == EPad.LRed || inPad == EPad.RRed;
-			bool storedBlue = onPad == EPad.LBlue || onPad == EPad.RBlue;
-			bool storedRed = onPad == EPad.LRed || onPad == EPad.RRed;
+			bool hitBlue = hit == EPad.LBlue || hit == EPad.RBlue;
+			bool hitRed = hit == EPad.LRed || hit == EPad.RRed;
+			bool storedBlue = stored == EPad.LBlue || stored == EPad.RBlue;
+			bool storedRed = stored == EPad.LRed || stored == EPad.RRed;
 
 			return (storedRed && hitBlue)
-				   || (storedBlue && hitRed);
+				|| (storedBlue && hitRed);
 		}
 
 		return false;
@@ -116,167 +182,102 @@ class NotesManager {
 
 	#region [General]
 
-	public static bool IsCommonNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo >= 0x11 && chip.nChannelNo < 0x18;
-	}
-	public static bool IsMine(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1C;
-	}
-
-	public static bool IsDonNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x11 || chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A;
-	}
-
-	public static bool IsKaNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B;
-	}
-
-	public static bool IsSmallNote(CChip chip, bool blue) {
-		if (chip == null) return false;
-		return blue ? chip.nChannelNo == 0x12 : chip.nChannelNo == 0x11;
-	}
-
-	public static bool IsSmallNote(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x12 || chip.nChannelNo == 0x11;
-	}
-
-	public static bool IsBigNote(CChip chip) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1A || chip.nChannelNo == 0x1B);
-	}
-
-	public static bool IsBigKaTaiko(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Taiko;
-	}
-
-	public static bool IsBigDonTaiko(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A) && gt == EGameType.Taiko;
-	}
-
-	public static bool IsClapKonga(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x14 || chip.nChannelNo == 0x1B) && gt == EGameType.Konga;
-	}
-
-	public static bool IsSwapNote(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		return (
-			IsKongaPink(chip, gt)                           // Konga Pink note
-			|| IsPurpleNote(chip)                       // Purple (Green) note
-		);
-	}
-
-	public static bool IsKongaPink(CChip chip, EGameType gt) {
-		if (chip == null) return false;
-		// Purple notes are treated as Pink in Konga
-		return (chip.nChannelNo == 0x13 || chip.nChannelNo == 0x1A || IsPurpleNote(chip)) && gt == EGameType.Konga;
-	}
-	public static bool IsPurpleNote(CChip chip) {
-		if (chip == null) return false;
-		return (chip.nChannelNo == 0x101);
-	}
-
-	public static bool IsYellowRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x21;
-	}
-
-	public static bool IsClapRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x20;
-	}
-
-	public static bool IsKusudama(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x19;
-	}
-
-	public static bool IsFuzeRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1D;
-	}
-
-	public static bool IsRollEnd(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x18;
-	}
-
-	public static bool IsBalloon(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x17;
-	}
-
-	public static bool IsBigRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x16;
-	}
-
-	public static bool IsSmallRoll(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x15;
-	}
-
-	public static bool IsADLIB(CChip chip) {
-		if (chip == null) return false;
-		return chip.nChannelNo == 0x1F;
-	}
-
-	public static bool IsRoll(CChip chip) {
-		if (chip == null) return false;
-		return IsBigRoll(chip) || IsSmallRoll(chip) || IsClapRoll(chip) || IsYellowRoll(chip);
-	}
-
-	public static bool IsGenericBalloon(CChip chip) {
-		if (chip == null) return false;
-		return IsBalloon(chip) || IsKusudama(chip) || IsFuzeRoll(chip);
-	}
-
-	public static bool IsGenericRoll(CChip chip) {
-		if (chip == null) return false;
-		return (0x15 <= chip.nChannelNo && chip.nChannelNo <= 0x19) ||
-			   (chip.nChannelNo == 0x20 || chip.nChannelNo == 0x21)
-			   || chip.nChannelNo == 0x1D;
-	}
-
-	public static bool IsMissableNote(CChip chip) {
-		if (chip == null) return false;
-		return (0x11 <= chip.nChannelNo && chip.nChannelNo <= 0x14)
-			   || chip.nChannelNo == 0x1A
-			   || chip.nChannelNo == 0x1B
-			   || chip.nChannelNo == 0x101;
-	}
-
-	public static bool IsHittableNote(CChip chip) {
-		if (chip == null) return false;
-		return IsMissableNote(chip)
-			   || IsGenericRoll(chip)
-			   || IsADLIB(chip)
-			   || IsMine(chip);
-	}
+	public static bool IsAcceptLane(ENoteType nt, EGameType gt, PlayerLane.FlashType lane = PlayerLane.FlashType.Total) => lane switch {
+		PlayerLane.FlashType.Red => IsAcceptRed(nt, gt),
+		PlayerLane.FlashType.Blue => IsAcceptBlue(nt, gt),
+		PlayerLane.FlashType.Clap => IsAcceptClap(nt, gt),
+		PlayerLane.FlashType.Total => IsAcceptRed(nt, gt) || IsAcceptBlue(nt, gt) || IsAcceptClap(nt, gt),
+		_ => false,
+	};
+	public static bool IsAcceptRed(ENoteType nt, EGameType gt)
+		=> IsADLIB(nt) || IsMine(nt) || IsSwapNote(nt, gt) || IsRedRollKonga(nt, gt) || IsPinkRollKonga(nt, gt) || IsSmallRollTaiko(nt, gt) || IsBigRollTaiko(nt, gt)
+			|| IsGenericBalloon(nt)
+			|| (nt, gt) is (ENoteType.Don or ENoteType.DonBig or ENoteType.DonHand, EGameType.Taiko)
+				or (ENoteType.Po, EGameType.Konga);
+	public static bool IsAcceptBlue(ENoteType nt, EGameType gt)
+		=> IsADLIB(nt) || IsMine(nt) || IsSwapNote(nt, gt) || IsYellowRollKonga(nt, gt) || IsPinkRollKonga(nt, gt) || IsSmallRollTaiko(nt, gt) || IsBigRollTaiko(nt, gt)
+			|| (IsGenericBalloon(nt) && gt is EGameType.Konga)
+			|| (nt, gt) is (ENoteType.Ka or ENoteType.KaBig or ENoteType.KaHand, EGameType.Taiko)
+				or (ENoteType.Pa, EGameType.Konga);
+	public static bool IsAcceptClap(ENoteType nt, EGameType gt)
+		=> IsADLIB(nt) || IsMine(nt) || IsClapRollKonga(nt, gt)
+			|| (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
+	public static bool IsSmallNote(ENoteType nt, EGameType gt, PlayerLane.FlashType lane = PlayerLane.FlashType.Total)
+		=> IsSmallNoteTaiko(nt, gt, lane) || IsSmallNoteKonga(nt, gt, lane);
+	public static bool IsSmallRed(ENoteType nt, EGameType gt) => IsSmallNote(nt, gt, PlayerLane.FlashType.Red);
+	public static bool IsSmallBlue(ENoteType nt, EGameType gt) => IsSmallNote(nt, gt, PlayerLane.FlashType.Blue);
+	public static bool IsSmallClap(ENoteType nt, EGameType gt) => IsSmallNote(nt, gt, PlayerLane.FlashType.Clap);
+	public static bool IsSmallNoteTaiko(ENoteType nt, EGameType gt, PlayerLane.FlashType lane = PlayerLane.FlashType.Total)
+		=> gt is EGameType.Taiko
+			&& (nt, lane) is (ENoteType.Don, PlayerLane.FlashType.Red or PlayerLane.FlashType.Total)
+				or (ENoteType.Ka, PlayerLane.FlashType.Blue or PlayerLane.FlashType.Total);
+	public static bool IsSmallNoteKonga(ENoteType nt, EGameType gt, PlayerLane.FlashType lane = PlayerLane.FlashType.Total)
+		=> gt is EGameType.Konga
+			&& (nt, lane) is (ENoteType.Po, PlayerLane.FlashType.Red or PlayerLane.FlashType.Total)
+				or (ENoteType.Pa, PlayerLane.FlashType.Yellow or PlayerLane.FlashType.Total)
+				or (ENoteType.Clap or ENoteType.ClapHand, PlayerLane.FlashType.Clap or PlayerLane.FlashType.Total);
+	public static bool IsBigNoteTaiko(ENoteType nt, EGameType gt, PlayerLane.FlashType lane = PlayerLane.FlashType.Total)
+		=> gt is EGameType.Taiko
+			&& (nt, lane) is (ENoteType.DonBig or ENoteType.DonHand, PlayerLane.FlashType.Red or PlayerLane.FlashType.Total)
+				or (ENoteType.KaBig or ENoteType.KaHand, PlayerLane.FlashType.Blue or PlayerLane.FlashType.Total);
+	public static bool IsBigKaTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Blue);
+	public static bool IsBigDonTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Red);
+	public static bool IsClapKonga(ENoteType nt, EGameType gt)
+		=> (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
+	public static bool IsSwapNote(ENoteType nt, EGameType gt)
+		=> IsPinkKonga(nt, gt) || IsPurpleNoteTaiko(nt, gt);
+	public static bool IsPinkKonga(ENoteType nt, EGameType gt) // Purple notes are treated as Pink in Konga
+		=> (nt, gt) is (ENoteType.Double or ENoteType.DoubleHand or ENoteType.Kadon, EGameType.Konga);
+	public static bool IsPurpleNoteTaiko(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.Kadon, EGameType.Taiko);
+	public static bool IsBigRollTaiko(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.RollBig or ENoteType.RollClap, EGameType.Taiko);
+	public static bool IsSmallRollTaiko(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.Roll or ENoteType.RollPa, EGameType.Taiko);
+	public static bool IsRedRollKonga(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.RollPo, EGameType.Konga);
+	public static bool IsYellowRollKonga(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.RollPa, EGameType.Konga);
+	public static bool IsPinkRollKonga(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.RollDouble, EGameType.Konga);
+	public static bool IsClapRollKonga(ENoteType nt, EGameType gt) => (nt, gt) is (ENoteType.RollClap, EGameType.Konga);
+	public static bool IsBalloon(ENoteType nt) => nt is ENoteType.Balloon;
+	public static bool IsKusudama(ENoteType nt) => nt is ENoteType.BalloonEx;
+	public static bool IsFuzeRoll(ENoteType nt) => nt is ENoteType.BalloonFuze;
+	public static bool IsRollEnd(ENoteType nt) => nt is ENoteType.EndRoll;
+	public static bool IsADLIB(ENoteType nt) => nt is ENoteType.Adlib;
+	public static bool IsMine(ENoteType nt) => nt is ENoteType.Bomb;
+	public static bool IsRoll(ENoteType nt)
+		=> nt is ENoteType.Roll or ENoteType.RollBig or ENoteType.RollPa or ENoteType.RollClap;
+	public static bool IsGenericBalloon(ENoteType nt)
+		=> IsBalloon(nt) || IsKusudama(nt) || IsFuzeRoll(nt);
+	public static bool IsGenericRoll(ENoteType nt)
+		=> IsRoll(nt) || IsGenericBalloon(nt) || IsRollEnd(nt);
+	public static bool IsMissableNote(ENoteType nt)
+		=> nt is ENoteType.Don or ENoteType.Ka or ENoteType.DonBig or ENoteType.KaBig or ENoteType.DonHand or ENoteType.KaHand or ENoteType.Kadon;
+	public static bool IsJudgedFromNearest(ENoteType nt)
+		=> IsADLIB(nt) || IsMine(nt);
+	public static bool IsHittableNote(ENoteType nt)
+		=> IsMissableNote(nt) || IsGenericRoll(nt) || IsJudgedFromNearest(nt);
 
 	#endregion
 
 	#region [Displayables]
 
-	// Flying notes
-	public static void DisplayNote(int player, int x, int y, int Lane) {
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+	public static int PxSplitLaneDistance => OpenTaiko.Skin.Game_Notes_Size[1] / 3;
 
+	// Flying notes
+	public static ENoteType GetFlyNoteType(ENoteType nt, EGameType gt, bool isBigInput = false) => nt switch {
+		ENoteType.DonBig or ENoteType.DonHand => (isBigInput || gt == EGameType.Konga) ? ENoteType.DonBig : ENoteType.Don,
+		ENoteType.KaBig or ENoteType.KaHand => (isBigInput || gt == EGameType.Konga) ? ENoteType.KaBig : ENoteType.Ka,
+		ENoteType.Kadon => ENoteType.Kadon,
+		ENoteType.Adlib or ENoteType.Bomb => ENoteType.Empty,
+		_ => nt,
+	};
+
+	public static void DisplayNote(int player, int x, int y, ENoteType Lane, EGameType gt) {
 		switch (Lane) {
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-				OpenTaiko.Tx.Notes[(int)_gt]?.t2D中心基準描画(x, y, new Rectangle(Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			case ENoteType.Don:
+			case ENoteType.Ka:
+			case ENoteType.DonBig:
+			case ENoteType.KaBig:
+				OpenTaiko.Tx.Notes[(int)gt]?.t2D中心基準描画(x, y, new Rectangle((int)Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
-			case 5:
+			case ENoteType.Kadon:
 				OpenTaiko.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
 		}
@@ -291,18 +292,18 @@ class NotesManager {
 			length = OpenTaiko.Skin.Game_Notes_Size[0];
 		}
 
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 		int noteType = 1;
-		if (IsSmallNote(chip, true)) noteType = 2;
-		else if (IsBigDonTaiko(chip, _gt) || IsKongaPink(chip, _gt)) noteType = 3;
+		if (IsSmallBlue(chip, _gt)) noteType = 2;
+		else if (IsBigDonTaiko(chip, _gt) || IsPinkKonga(chip, _gt)) noteType = 3;
 		else if (IsBigKaTaiko(chip, _gt) || IsClapKonga(chip, _gt)) noteType = 4;
 		else if (IsBalloon(chip)) noteType = 11;
 
 		else if (IsMine(chip)) {
 			OpenTaiko.Tx.Note_Mine?.t2D描画(x, y);
 			return;
-		} else if (IsPurpleNote(chip)) {
+		} else if (IsPurpleNoteTaiko(chip, _gt)) {
 			OpenTaiko.Tx.Note_Swap?.t2D描画(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
 		} else if (IsKusudama(chip)) {
@@ -323,7 +324,7 @@ class NotesManager {
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
 		Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 			return;
@@ -338,14 +339,13 @@ class NotesManager {
 		float xHitNoteOffset = wImage / 2.0f;
 		float yHitNoteOffset = hImage / 2.0f;
 
-		if (IsSmallRoll(chip) || (_gt == EGameType.Taiko && IsYellowRoll(chip))) {
+		if (IsSmallRollTaiko(chip, _gt)) {
 			_offset = 0;
-		}
-		if (IsBigRoll(chip) || (_gt == EGameType.Taiko && IsClapRoll(chip))) {
+		} else if (IsBigRollTaiko(chip, _gt) || IsPinkRollKonga(chip, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 3;
-		} else if (IsClapRoll(chip) && _gt == EGameType.Konga) {
+		} else if (IsClapRollKonga(chip, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 11;
-		} else if (IsYellowRoll(chip) && _gt == EGameType.Konga) {
+		} else if (IsYellowRollKonga(chip, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 8;
 		} else if (IsFuzeRoll(chip)) {
 			_texarr = OpenTaiko.Tx.Note_FuseRoll;
@@ -409,11 +409,11 @@ class NotesManager {
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
 			return;
 
-		EGameType _gt = OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
 
 		if (IsMine(chip)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
-		} else if (IsPurpleNote(chip) && _gt != EGameType.Konga) {
+		} else if (IsPurpleNoteTaiko(chip, _gt)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else if (IsFuzeRoll(chip)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
