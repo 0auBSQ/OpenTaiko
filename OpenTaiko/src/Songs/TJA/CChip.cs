@@ -21,6 +21,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
 	public ECourse nBranch;
+	public int idxBranchSection;
 	public int nSenote;
 	public int nState;
 	public int nRollCount;
@@ -41,6 +42,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
 	public EBranchConditionType eBranchCondition;
+	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
@@ -139,6 +141,24 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.RollDelay = null;
 		this.RollEffectLevel = 0;
 	}
+
+	public static void ForEachTargetBranch(bool isEndedBranching, ECourse branch, Action<ECourse> action) {
+		// IsEndedBranchingがfalseで1回
+		// trueで3回だよ3回
+		if (!isEndedBranching) {
+			action(branch);
+		} else {
+			for (ECourse b = ECourse.eNormal; b <= ECourse.eMaster; ++b) {
+				action(b);
+			}
+		}
+	}
+
+	public void ForEachTargetBranch(Action<ECourse> action)
+		=> ForEachTargetBranch(this.IsEndedBranching, this.nBranch, action);
+
+	public bool IsForBranch(ECourse branch)
+		=> this.IsEndedBranching || this.nBranch == branch;
 
 	public CChip() {
 		this.nHorizontalChipDistance = 0;

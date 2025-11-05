@@ -377,7 +377,6 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_SHINUCHI_DESC"));
 		this.list項目リスト.Add(this.ShinuchiMode);
 
-		// FIXME: This does nothing vvv
 		this.iTaikoBranchGuide = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE"), OpenTaiko.ConfigIni.bBranchGuide,
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_BRANCHGUIDE_DESC"));
 		this.list項目リスト.Add(this.iTaikoBranchGuide);
