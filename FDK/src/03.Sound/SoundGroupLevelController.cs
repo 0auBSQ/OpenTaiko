@@ -33,11 +33,12 @@ namespace FDK;
 /// </summary>
 public sealed class SoundGroupLevelController {
 	private readonly Dictionary<ESoundGroup, int> _levelBySoundGroup = new Dictionary<ESoundGroup, int> {
-		[ESoundGroup.SoundEffect] = CSound.MaximumGroupLevel,
-		[ESoundGroup.Voice] = CSound.MaximumGroupLevel,
-		[ESoundGroup.SongPreview] = CSound.MaximumGroupLevel,
-		[ESoundGroup.SongPlayback] = CSound.MaximumGroupLevel,
-		[ESoundGroup.Unknown] = CSound.MaximumGroupLevel
+		[ESoundGroup.SoundEffect] = CSound.DefaultSoundEffectLevel,
+		[ESoundGroup.Voice] = CSound.DefaultVoiceLevel,
+		[ESoundGroup.SongPreview] = CSound.DefaultSongPreviewLevel,
+		[ESoundGroup.SongPlayback] = CSound.DefaultSongPlaybackLevel,
+		[ESoundGroup.Unknown] = CSound.MaximumGroupLevel,
+		[ESoundGroup.Master] = CSound.DefaultMasterLevel
 	};
 
 	private readonly ObservableCollection<CSound> _sounds;
@@ -59,10 +60,8 @@ public sealed class SoundGroupLevelController {
 
 		_levelBySoundGroup[soundGroup] = clampedLevel;
 
-		foreach (var sound in _sounds) {
-			if (sound.SoundGroup == soundGroup) {
-				SetLevel(sound);
-			}
+		foreach (var sound in soundGroup == ESoundGroup.Master ? _sounds : _sounds.Where(sound => sound.SoundGroup == soundGroup)) {
+			SetLevel(sound);
 		}
 
 		RaiseLevelChanged(soundGroup, clampedLevel);
@@ -81,7 +80,7 @@ public sealed class SoundGroupLevelController {
 	}
 
 	private void SetLevel(CSound sound) {
-		sound.GroupLevel = _levelBySoundGroup[sound.SoundGroup];
+		sound.GroupLevel = (int)(_levelBySoundGroup[sound.SoundGroup] * (_levelBySoundGroup[ESoundGroup.Master] / 100.0));
 	}
 
 	private void SoundsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {

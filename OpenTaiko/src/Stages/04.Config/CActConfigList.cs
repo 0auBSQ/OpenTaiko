@@ -179,6 +179,10 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_USESONGVOL_DESC"));
 		this.list項目リスト.Add(this.iSystemApplySongVol);
 
+		this.iSystemMasterLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_MASTERVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, OpenTaiko.ConfigIni.MasterLevel,
+			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_MASTERVOL_DESC"));
+		this.list項目リスト.Add(this.iSystemMasterLevel);
+
 		this.iSystemSoundEffectLevel = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SEVOL"), CSound.MinimumGroupLevel, CSound.MaximumGroupLevel, OpenTaiko.ConfigIni.SoundEffectLevel,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SEVOL_DESC"));
 		this.list項目リスト.Add(this.iSystemSoundEffectLevel);
@@ -1514,6 +1518,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iSystemApplyLoudnessMetadata;
 	private CItemInteger iSystemTargetLoudness;
 	private CItemToggle iSystemApplySongVol;
+	private CItemInteger iSystemMasterLevel;
 	private CItemInteger iSystemSoundEffectLevel;
 	private CItemInteger iSystemVoiceLevel;
 	private CItemInteger iSystemSongPreviewLevel;
@@ -1691,6 +1696,7 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.bDanTowerHide = this.iDanTowerHide.bON;
 
 		OpenTaiko.ConfigIni.ApplySongVol = this.iSystemApplySongVol.bON;
+		OpenTaiko.ConfigIni.MasterLevel = this.iSystemMasterLevel.n現在の値;
 		OpenTaiko.ConfigIni.SoundEffectLevel = this.iSystemSoundEffectLevel.n現在の値;
 		OpenTaiko.ConfigIni.VoiceLevel = this.iSystemVoiceLevel.n現在の値;
 		OpenTaiko.ConfigIni.SongPreviewLevel = this.iSystemSongPreviewLevel.n現在の値;

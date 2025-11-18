@@ -112,6 +112,9 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "切换是否播放音乐。",
 		"SETTINGS_SYSTEM_USESONGVOL": "应用音量（SONGVOL）元信息",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "切换是否使用 SONGVOL 元数据的部分无效选项。\n— 0—99：降低音量\n— 100+：没有任何作用",
+		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		// Please update the VOL keys below, a game restart is not required to save sound settings.
 		"SETTINGS_SYSTEM_SEVOL": "音效音量",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "调整“咚”“咔”音量。\n— 0：关闭敲击音效\n你必须在调整完成该项设置后重启游戏才能应用更改。",
 		"SETTINGS_SYSTEM_VOICEVOL": "语音音量",

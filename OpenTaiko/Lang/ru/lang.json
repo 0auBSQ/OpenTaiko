@@ -112,6 +112,9 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Определяет, будет ли воспроизводиться музыка.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Применить метаданные SONGVOL",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Это – частично избыточная настройка, который\nопределяет, будут ли использоваться метаданные\nSONGVOL.\nЗначения от 0 до 100 снижают громкость песни,\nно любые значения выше 100 ничего не делают.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		// Please update the VOL keys below, a game restart is not required to save sound settings.
 		"SETTINGS_SYSTEM_SEVOL": "Громкость эффекта звука",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nударами.\nЧтобы играть без звуковых ударов, установите это\nзначение равным 0.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Громкость голоса",

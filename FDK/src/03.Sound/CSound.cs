@@ -26,6 +26,7 @@ public class CSound : IDisposable {
 	public const int MinimumGroupLevel = 0;
 	public const int MaximumGroupLevel = 100;
 	public const int DefaultGroupLevel = 100;
+	public const int DefaultMasterLevel = 20;
 	public const int DefaultSoundEffectLevel = 80;
 	public const int DefaultVoiceLevel = 90;
 	public const int DefaultSongPreviewLevel = 90;
