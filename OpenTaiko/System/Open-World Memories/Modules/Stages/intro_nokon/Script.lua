@@ -1483,7 +1483,7 @@ function draw()
             local scoreText = text:GetText("Score: " .. soloScore)
             scoreText:DrawAtAnchor(960, 200, "center")
 
-            local genreText = text:GetText("Genre: " .. (currentSongNode and currentSongNode.Title or "???"))
+            local genreText = text:GetText("Genre: " .. (currentSongNode and currentSongNode.Genre or "???"))
             genreText:DrawAtAnchor(960, 400, "center")
 
             local promptText = text:GetText("Press DECIDE when ready to answer")
