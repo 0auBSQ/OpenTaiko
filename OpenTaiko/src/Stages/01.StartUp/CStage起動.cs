@@ -22,19 +22,6 @@ internal class CStage起動 : CStage {
 			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
 			Background.Init();
 
-			if (OpenTaiko.ConfigIsNew) {
-				langSelectFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.StartUp_LangSelect_FontSize);
-				langSelectTitle = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
-				langList = new CTexture[CLangManager.Languages.Length];
-				langListHighlighted = new CTexture[CLangManager.Languages.Length];
-
-				for (int i = 0; i < langList.Length; i++) {
-					langList[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
-					langListHighlighted[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
-				}
-				langSelectOffset = new int[2] { GameWindowSize.Width / 2, (GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
-			}
-
 			this.list進行文字列 = new List<string>();
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.Activate();
@@ -48,15 +35,6 @@ internal class CStage起動 : CStage {
 		Trace.Indent();
 		try {
 			OpenTaiko.tDisposeSafely(ref Background);
-
-			OpenTaiko.tDisposeSafely(ref langSelectFont);
-			OpenTaiko.tDisposeSafely(ref langSelectTitle);
-			if (langList != null) {
-				for (int i = 0; i < langList.Length; i++) {
-					OpenTaiko.tDisposeSafely(ref langList[i]);
-					OpenTaiko.tDisposeSafely(ref langListHighlighted[i]);
-				}
-			}
 
 			this.list進行文字列 = null;
 			if (es != null) {
@@ -180,35 +158,6 @@ internal class CStage起動 : CStage {
 				}
 				//-----------------
 				#endregion
-			} else if (OpenTaiko.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
-			{
-				HBlackBackdrop.Draw();
-
-				int x = langSelectOffset[0];
-				int y = langSelectOffset[1];
-
-				langSelectTitle.t2D中心基準描画(x, y);
-				y += langSelectTitle.szTextureSize.Height;
-
-				for (int i = 0; i < langList.Length; i++) {
-					if (i == langSelectIndex)
-						langListHighlighted[i].t2D中心基準描画(x, y);
-					else
-						langList[i].t2D中心基準描画(x, y);
-
-					y += langList[i].szTextureSize.Height;
-				}
-
-				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
-					langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
-					langSelectIndex = Math.Max(langSelectIndex - 1, 0);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
-					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
-					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
-					bLanguageSelected = true;
-				}
 			} else {
 				if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
 				{
@@ -231,15 +180,6 @@ internal class CStage起動 : CStage {
 	private ScriptBG Background;
 	private CEnumSongs es;
 	private bool bIsLoadingTextures;
-
-	private bool bLanguageSelected;
-	private int langSelectIndex = 0;
-
-	private CFontRenderer langSelectFont;
-	private CTexture langSelectTitle;
-	private CTexture[] langList;
-	private CTexture[] langListHighlighted;
-	private int[] langSelectOffset;
 
 #if false
 		private void t曲リストの構築()

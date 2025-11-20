@@ -60,7 +60,8 @@ public sealed class SoundGroupLevelController {
 
 		_levelBySoundGroup[soundGroup] = clampedLevel;
 
-		foreach (var sound in soundGroup == ESoundGroup.Master ? _sounds : _sounds.Where(sound => sound.SoundGroup == soundGroup)) {
+		// There's a rare chance that a null CSound slips into the `_sounds` list. Still not sure what is causing this.
+		foreach (var sound in soundGroup == ESoundGroup.Master ? _sounds.Where(sound => sound != null) : _sounds.Where(sound => sound != null && sound.SoundGroup == soundGroup)) {
 			SetLevel(sound);
 		}
 
