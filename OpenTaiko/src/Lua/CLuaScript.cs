@@ -95,7 +95,7 @@ class CLuaScript : IDisposable {
 		try {
 			if (luaFunction == null) return null;
 			var ret = luaFunction.Call(args);
-			LuaScript.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
+			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Collect, 0);
 			return ret;
 		} catch (Exception exception) {
 			Crash(exception);

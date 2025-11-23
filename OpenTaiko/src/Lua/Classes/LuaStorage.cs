@@ -1,5 +1,3 @@
-using FDK;
-
 namespace OpenTaiko {
 	public class LuaStorageFunc {
 		private string DirPath;

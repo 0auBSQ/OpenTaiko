@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using FDK;
 
 namespace OpenTaiko;
@@ -7,11 +6,10 @@ class CCharacterLua : CCharacter {
 	private CLuaCharacterScript[] Script = new CLuaCharacterScript[5];
 
 	public CCharacterLua(string path, int i) : base(path, i) {
-		for (int player = 0; player < 5; player++)
-		{
+		for (int player = 0; player < 5; player++) {
 			Script[player] = new CLuaCharacterScript(path, null, null, true);
-			Script[player].LoadPreviewTextures();
 		}
+		Script[0].LoadPreviewTextures();
 	}
 
 	public override void LoadStoryTextures(int player) {
@@ -37,9 +35,9 @@ class CCharacterLua : CCharacter {
 	public override void Dispose() {
 		base.Dispose();
 		for (int player = 0; player < 5; player++) {
-			Script[player].DisposePreviewTextures();
 			Script[player].Dispose();
 		}
+		Script[0].DisposePreviewTextures();
 	}
 
 	public override void GameInit(int player) {
