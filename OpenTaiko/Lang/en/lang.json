@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "English",
-	"Version": "0.6.0.72",
+	"Version": "0.6.0.73",
 	"Entries": {
 
 		// Common
@@ -112,14 +112,16 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Toggles whether music is played.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Apply SONGVOL Metadata",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "This is a partially redundant setting\nthat toggles whether SONGVOL metadata is used.\nValues between 0 and 100 will lower song volume,\nbut any values over 100 do nothing.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
 		"SETTINGS_SYSTEM_SEVOL": "Sound Effect Volume",
-		"SETTINGS_SYSTEM_SEVOL_DESC": "Adjust the volume of sounds related to don and ka.\nTo play without hitsounds, set this to 0.\nYou must restart the game after leaving config\nfor this setting to save.",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "Adjust the volume of sounds related to don and ka.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Voice Volume",
-		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Adjust the volume of sounds related to a character's voice.\nYou must restart the game after leaving config\nfor this setting to save.",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Adjust the volume of sounds related to a character's voice.",
 		"SETTINGS_SYSTEM_SONGVOL": "Song Playback Volume",
-		"SETTINGS_SYSTEM_SONGVOL_DESC": "Adjust the volume of song playback.\nYou must restart the game after leaving config\nfor this setting to save.",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "Adjust the volume of song playback.",
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "Song Preview Volume",
-		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Adjust the volume of song preview.\nYou must restart the game after leaving config\nfor this setting to save.",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Adjust the volume of song preview.",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Keyboard Volume Increment",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Specify how much the Increase Volume and Decrease\nVolume system keys change the volume.\nYou can specify from 1 to 20.",
 

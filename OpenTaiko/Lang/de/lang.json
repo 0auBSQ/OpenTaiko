@@ -112,6 +112,9 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Bestimmt, ob Musik abgespielt wird.",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL-Metadaten anwenden",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Dies ist eine teilweise redundante Einstellung,\ndie festlegt, ob SONGVOL-Metadaten verwendet werden.\nWerte zwischen 0 und 100 verringern die Lautstärke des Songs,\naber Werte über 100 bewirken nichts.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		// Please update the VOL keys below, a game restart is not required to save sound settings.
 		"SETTINGS_SYSTEM_SEVOL": "Soundeffekt-Lautstärke",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Passt die Lautstärke der Sounds für Don und Ka an.\nUm ohne Treffergeräusche zu spielen, setze dies auf 0.\nDu musst das Spiel nach dem Verlassen der Konfiguration neu starten,\ndamit diese Einstellung gespeichert wird.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Sprachlautstärke",

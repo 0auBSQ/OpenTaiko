@@ -1,5 +1,10 @@
-﻿namespace OpenTaiko {
+﻿using FDK;
+
+namespace OpenTaiko {
 	public class LuaConfigIniFunc {
+		public bool ConfigIsNew {
+			get => OpenTaiko.ConfigIsNew;
+		}
 
 		#region [General variables]
 
@@ -206,7 +211,30 @@
 			SetJusticeMode(player, _flags[5]);
 			SetFunMod(player, _flags[7]);
 		}
-	}
 
-	#endregion
+		#endregion
+
+		#region Volume
+		public int MasterVolume {
+			get { return OpenTaiko.ConfigIni.MasterLevel; }
+			set { OpenTaiko.ConfigIni.MasterLevel = Math.Clamp(value, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel); }
+		}
+		public int SoundEffectVolume {
+			get { return OpenTaiko.ConfigIni.SoundEffectLevel; }
+			set { OpenTaiko.ConfigIni.SoundEffectLevel = Math.Clamp(value, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel); }
+		}
+		public int VoiceVolume {
+			get { return OpenTaiko.ConfigIni.VoiceLevel; }
+			set { OpenTaiko.ConfigIni.VoiceLevel = Math.Clamp(value, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel); }
+		}
+		public int SongVolume {
+			get { return OpenTaiko.ConfigIni.SongPlaybackLevel; }
+			set { OpenTaiko.ConfigIni.SongPlaybackLevel = Math.Clamp(value, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel); }
+		}
+		public int PreviewVolume {
+			get { return OpenTaiko.ConfigIni.SongPreviewLevel; }
+			set { OpenTaiko.ConfigIni.SongPreviewLevel = Math.Clamp(value, CSound.MinimumGroupLevel, CSound.MaximumGroupLevel); }
+		}
+		#endregion
+	}
 }

@@ -7,9 +7,20 @@ internal interface ILang {
 static internal class CLangManager {
 	// Cheap factory-like design pattern
 
-	public static CLang LangInstance { get; private set; } = new CLang("en");
+	private static void InitializeLangs() {
+		foreach (string path in Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)) {
+			string id = Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), path);
+			_langs.Add(id, CLang.GetCLang(id));
+		}
+	}
+	public static CLang LangInstance {
+		get {
+			if (_langs.Count == 0) InitializeLangs();
+			return _langs[_langId];
+		}
+	}
 	public static void langAttach(string lang) {
-		LangInstance = CLang.GetCLang(lang);
+		_langId = lang;
 		CLuaScript.tReloadLanguage(lang);
 	}
 
@@ -25,23 +36,20 @@ static internal class CLangManager {
 		return Langcodes[idx];
 	}
 
-	// temporary garbage code
 	public static string[] Langcodes {
 		get {
-			if (_langCodes == null)
-				_langCodes = Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)
-					.Select(result => Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), result))
-					.ToArray();
-
-			return _langCodes;
+			return LanguageDict.Keys.ToArray();
 		}
 	}
 	public static string[] Languages {
 		get {
-			if (_languages == null)
-				_languages = Langcodes.Select(result => CLang.GetLanguage(result)).ToArray();
-
-			return _languages;
+			return LanguageDict.Values.ToArray();
+		}
+	}
+	public static Dictionary<string, string> LanguageDict {
+		get {
+			if (_langs.Count == 0) InitializeLangs();
+			return _langs.Values.Select(lang => new KeyValuePair<string, string>(lang.Id, lang.Language)).ToDictionary();
 		}
 	}
 
@@ -51,10 +59,9 @@ static internal class CLangManager {
 		CLocalizationData loc = new CLocalizationData();
 		loc.SetString("default", "?");
 
-		foreach (string lang in Langcodes) {
-			CLang _inst = CLang.GetCLang(lang);
-
-			loc.SetString(lang, _inst.GetString(key));
+		if (_langs.Count == 0) InitializeLangs();
+		foreach (var lang in _langs) {
+			loc.SetString(lang.Key, lang.Value.GetString(key));
 		}
 
 		_cachedLocs[key] = loc;
@@ -67,18 +74,17 @@ static internal class CLangManager {
 		CLocalizationData loc = new CLocalizationData();
 		loc.SetString("default", "?");
 
-		foreach (string lang in Langcodes) {
-			CLang _inst = CLang.GetCLang(lang);
-
-			loc.SetString(lang, _inst.GetString(key, values));
+		if (_langs.Count == 0) InitializeLangs();
+		foreach (var lang in _langs) {
+			loc.SetString(lang.Key, lang.Value.GetString(key, values));
 		}
 
 		_cachedLocs[key + keySalt] = loc;
 		return loc;
 	}
 
-	private static string[] _langCodes;
-	private static string[] _languages;
+	private static Dictionary<string, CLang> _langs = [];
+	private static string _langId = "en";
 
 	private static Dictionary<string, CLocalizationData> _cachedLocs = new Dictionary<string, CLocalizationData>();
 }

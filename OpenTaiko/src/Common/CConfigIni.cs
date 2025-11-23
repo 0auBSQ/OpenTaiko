@@ -1058,6 +1058,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 		set => SetProperty(ref _applySongVol, value, nameof(ApplySongVol));
 	}
 
+	private int _masterLevel;
+
+	public int MasterLevel {
+		get => _masterLevel;
+		set => SetProperty(ref _masterLevel, value, nameof(MasterLevel));
+	}
+
 	private int _soundEffectLevel;
 
 	public int SoundEffectLevel {
@@ -1578,6 +1585,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.TargetLoudness = -7.4;
 
 		this.ApplySongVol = false;
+		this.MasterLevel = CSound.DefaultMasterLevel;
 		this.SoundEffectLevel = CSound.DefaultSoundEffectLevel;
 		this.VoiceLevel = CSound.DefaultVoiceLevel;
 		this.SongPreviewLevel = CSound.DefaultSongPreviewLevel;
@@ -2101,6 +2109,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; .tjaファイルのSONGVOLヘッダを音源の音量に適用する (0:OFF, 1:ON)");
 		sw.WriteLine("; Apply SONGVOL (0:OFF, 1:ON)");
 		sw.WriteLine("{0}={1}", nameof(ApplySongVol), this.ApplySongVol ? 1 : 0);
+		sw.WriteLine();
+		sw.WriteLine($"; Master volume level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
+		sw.WriteLine("{0}={1}", nameof(MasterLevel), MasterLevel);
 		sw.WriteLine();
 		sw.WriteLine($"; 効果音の音量 ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
 		sw.WriteLine($"; Sound effect level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
@@ -2877,6 +2888,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case nameof(this.ApplySongVol):
 				this.ApplySongVol = CConversion.bONorOFF(value[0]);
+				break;
+			case nameof(this.MasterLevel):
+				this.MasterLevel = CConversion.ParseIntInRange(value, CSound.MinimumGroupLevel,
+					CSound.MaximumGroupLevel, this.MasterLevel);
 				break;
 			case nameof(this.SoundEffectLevel):
 				this.SoundEffectLevel = CConversion.ParseIntInRange(value, CSound.MinimumGroupLevel,
