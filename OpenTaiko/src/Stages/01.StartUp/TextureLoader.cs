@@ -1267,6 +1267,7 @@ class TextureLoader {
 			int i = old;
 
 			Characters[i].DisposeGeneralTextures(player);
+			OpenTaiko.SaveFileInstances[player].data.mountedCharacter = null;
 
 			#region [Dispose the previous character]
 
@@ -1421,6 +1422,7 @@ class TextureLoader {
 
 			if (!Characters[i].bGeneralTextureLoaded[player]) {
 				Characters[i].LoadGeneralTextures(player);
+				OpenTaiko.SaveFileInstances[player].data.mountedCharacter = ((CCharacterLua)Characters[i]).GetScript(player);
 			}
 
 			#region [Allocate the new character]

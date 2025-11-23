@@ -217,7 +217,6 @@ TowerCharaAnimation = {
 
 local preview = nil
 local render = nil
-local tower_chara_test = nil
 local animations = { }
 local tower_aniamtions = { }
 local voices = {}
@@ -696,9 +695,6 @@ function loadPreviewTextures()
 	if STORAGE:FileExists("Render.png") then
 		render = TEXTURE:CreateTexture("Render.png")
 	end
-	if STORAGE:FileExists("Tower_Char/Standing/0.png") then
-		tower_chara_test = TEXTURE:CreateTexture("Tower_Char/Standing/0.png")
-	end
 
 	tower_climb_counter = COUNTER:CreateCounter(0, 4.0, 1.0, nil)
 end
@@ -829,9 +825,6 @@ function disposePreviewTextures()
 	end
 	if render ~= nil then
 		render:Dispose()
-	end
-	if tower_chara_test ~= nil then
-		tower_chara_test:Dispose()
 	end
 end
 

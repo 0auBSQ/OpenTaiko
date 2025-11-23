@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FDK;
-using NLua;
+﻿using NLua;
 
 namespace OpenTaiko {
 	class CLuaCharacterScript : CLuaScript {
@@ -16,15 +10,13 @@ namespace OpenTaiko {
 			DefaultScript = streamReader.ReadToEnd();
 		}
 
-
-
-
-		private LuaFunction lfLoadPreviewTextures;
-		private LuaFunction lfLoadStoryTextures;
+		private LuaFunction lfLegacyLoadPreviewTextures;
 		private LuaFunction lfLoadGeneralTextures;
-		private LuaFunction lfDisposePreviewTextures;
-		private LuaFunction lfDisposeStoryTextures;
+		private LuaFunction lfLegacyDisposePreviewTextures;
 		private LuaFunction lfDisposeGeneralTextures;
+		private LuaFunction lfLoadIndividualAnimation;
+		private LuaFunction lfDisposeIndividualAnimation;
+		private LuaFunction lfGetAnimationInformation;
 		private LuaFunction lfGameInit;
 		private LuaFunction lfUpdate;
 		private LuaFunction lfTowerNextFloor;
@@ -39,24 +31,22 @@ namespace OpenTaiko {
 		private LuaFunction lfSetAnimationDuration;
 		private LuaFunction lfSetAnimationCyclesToBPM;
 
-		public void LoadPreviewTextures() {
-			RunLuaCode(lfLoadPreviewTextures);
-		}
+		private HashSet<string> _loadedIndividualAnimations = new HashSet<string>();
 
-		public void LoadStoryTextures() {
-			RunLuaCode(lfLoadStoryTextures);
+		#region [C# Linked methods]
+
+		// My Room exclusive, will be deprecated on the My Room update
+		public void LEGACY_LoadPreviewTextures() {
+			RunLuaCode(lfLegacyLoadPreviewTextures);
 		}
 
 		public void LoadGeneralTextures() {
 			RunLuaCode(lfLoadGeneralTextures);
 		}
 
-		public void DisposePreviewTextures() {
-			RunLuaCode(lfDisposePreviewTextures);
-		}
-
-		public void DisposeStoryTextures() {
-			RunLuaCode(lfDisposeStoryTextures);
+		// My Room exclusive, will be deprecated on the My Room update
+		public void LEGACY_DisposePreviewTextures() {
+			RunLuaCode(lfLegacyDisposePreviewTextures);
 		}
 
 		public void DisposeGeneralTextures() {
@@ -78,6 +68,27 @@ namespace OpenTaiko {
 		public void TowerFinish() {
 			RunLuaCode(lfTowerFinish);
 		}
+
+		#endregion
+
+		#region [Lua API exclusive extentions]
+
+		// Optional methods, but can be a big help for (for example) modulable custom game mode textures as long as the chara script is flexible enough
+		public void LoadIndividualAnimation(string name, params object[] args) {
+			RunLuaCode(lfLoadIndividualAnimation, name, args);
+			_loadedIndividualAnimations.Add(name);
+		}
+
+		public void DisposeIndividualAnimation(string name) {
+			RunLuaCode(lfDisposeIndividualAnimation, name);
+			_loadedIndividualAnimations.Remove(name);
+		}
+
+		public object[] GetAnimationInformation(string name) {
+			return RunLuaCode(lfGetAnimationInformation, name);
+		}
+
+		#endregion
 
 		public void Draw(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
 			RunLuaCode(lfDraw, x, y, scaleX, scaleY, opacity, color, flipX);
@@ -117,12 +128,14 @@ namespace OpenTaiko {
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
 			try {
-				lfLoadPreviewTextures = (LuaFunction)LuaScript["loadPreviewTextures"];
-				lfLoadStoryTextures = (LuaFunction)LuaScript["loadStoryTextures"];
+				// C# hardcoded animations
+				lfLegacyLoadPreviewTextures = (LuaFunction)LuaScript["loadPreviewTextures"];
 				lfLoadGeneralTextures = (LuaFunction)LuaScript["loadGeneralTextures"];
-				lfDisposePreviewTextures = (LuaFunction)LuaScript["disposePreviewTextures"];
-				lfDisposeStoryTextures = (LuaFunction)LuaScript["disposeStoryTextures"];
+				lfLegacyDisposePreviewTextures = (LuaFunction)LuaScript["disposePreviewTextures"];
 				lfDisposeGeneralTextures = (LuaFunction)LuaScript["disposeGeneralTextures"];
+				// Custom/additional animations
+				lfLoadIndividualAnimation = (LuaFunction)LuaScript["loadIndividualAnimation"];
+				lfDisposeIndividualAnimation = (LuaFunction)LuaScript["disposeIndividualAnimation"];
 				lfGameInit = (LuaFunction)LuaScript["gameInit"];
 				lfUpdate = (LuaFunction)LuaScript["update"];
 				lfTowerNextFloor = (LuaFunction)LuaScript["towerNextFloor"];

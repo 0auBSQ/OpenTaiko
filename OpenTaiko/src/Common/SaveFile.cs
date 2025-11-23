@@ -288,6 +288,10 @@ internal class SaveFile {
 		[JsonIgnore]
 		public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats();
 
+		// Never null once the _boot stage is active
+		[JsonIgnore]
+		public CLuaCharacterScript? mountedCharacter = null;
+
 		public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId) {
 			if (songSelectTableEntries.ContainsKey(uniqueId)) return songSelectTableEntries[uniqueId];
 			return new BestPlayRecords.CSongSelectTableEntry();

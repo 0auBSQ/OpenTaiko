@@ -1,6 +1,7 @@
 ﻿namespace OpenTaiko {
 	internal class LuaSaveFile {
 		private SaveFile _sf;
+		private int _mounted;
 
 		#region [Player Metadata]
 
@@ -120,8 +121,17 @@
 
 		#endregion
 
-		public LuaSaveFile(SaveFile sf) {
+		#region [Characters and Puchis]
+
+		public CLuaCharacterScript? GetCharacterScript() {
+			return _sf.data.mountedCharacter;
+		}
+
+		#endregion
+
+		public LuaSaveFile(SaveFile sf, int mountedPlayer) {
 			_sf = sf;
+			_mounted = mountedPlayer;
 		}
 	}
 }

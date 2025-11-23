@@ -23,7 +23,7 @@ class CLuaScript : IDisposable {
 			LogNotification.PopError($"Invalid player index in lua module, expected [0,{OpenTaiko.MAX_PLAYERS}]");
 			return null;
 		}
-		return new LuaSaveFile(OpenTaiko.SaveFileInstances[player]);
+		return new LuaSaveFile(OpenTaiko.SaveFileInstances[player], player);
 	}
 
 	public LuaSongList RequestSongList(LuaSongListSettings lsls) {

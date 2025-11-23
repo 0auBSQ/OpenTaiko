@@ -85,7 +85,6 @@ abstract class CCharacter : IDisposable {
 	public string dirName;
 
 	public bool[] bGeneralTextureLoaded { get; private set; } = new bool[5];
-	public bool[] bStoryTextureLoaded { get; private set; } = new bool[5];
 
 	public float GetEffectCoinMultiplier() {
 		float mult = 1f;
@@ -149,16 +148,8 @@ abstract class CCharacter : IDisposable {
 			unlock = null;
 	}
 
-	public virtual void LoadStoryTextures(int player) {
-		bStoryTextureLoaded[player] = true;
-	}
-
 	public virtual void LoadGeneralTextures(int player) {
 		bGeneralTextureLoaded[player] = true;
-	}
-
-	public virtual void DisposeStoryTextures(int player) {
-		bStoryTextureLoaded[player] = false;
 	}
 
 	public virtual void DisposeGeneralTextures(int player) {
@@ -166,9 +157,7 @@ abstract class CCharacter : IDisposable {
 	}
 
 	public virtual void Dispose() {
-		for (int player = 0; player < 5; player++)
-		{
-			DisposeStoryTextures(player);
+		for (int player = 0; player < 5; player++) {
 			DisposeGeneralTextures(player);
 		}
 	}

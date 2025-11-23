@@ -5,26 +5,18 @@ namespace OpenTaiko;
 class CCharacterLua : CCharacter {
 	private CLuaCharacterScript[] Script = new CLuaCharacterScript[5];
 
+	public CLuaCharacterScript GetScript(int player) => Script[player];
+
 	public CCharacterLua(string path, int i) : base(path, i) {
 		for (int player = 0; player < 5; player++) {
 			Script[player] = new CLuaCharacterScript(path, null, null, true);
 		}
-		Script[0].LoadPreviewTextures();
-	}
-
-	public override void LoadStoryTextures(int player) {
-		base.LoadStoryTextures(player);
-		Script[player].LoadStoryTextures();
+		Script[0].LEGACY_LoadPreviewTextures();
 	}
 
 	public override void LoadGeneralTextures(int player) {
 		base.LoadGeneralTextures(player);
 		Script[player].LoadGeneralTextures();
-	}
-
-	public override void DisposeStoryTextures(int player) {
-		base.DisposeStoryTextures(player);
-		Script[player].DisposeStoryTextures();
 	}
 
 	public override void DisposeGeneralTextures(int player) {
@@ -37,7 +29,7 @@ class CCharacterLua : CCharacter {
 		for (int player = 0; player < 5; player++) {
 			Script[player].Dispose();
 		}
-		Script[0].DisposePreviewTextures();
+		Script[0].LEGACY_DisposePreviewTextures();
 	}
 
 	public override void GameInit(int player) {
