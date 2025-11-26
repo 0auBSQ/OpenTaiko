@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Русский (Russian)",
-	"Version": "0.6.0.72",
+	"Version": "0.6.0.73",
 	"Entries": {
 
 		// Common
@@ -46,14 +46,14 @@
 		"SETTINGS_SYSTEM_LANGUAGE": "Язык системы",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Изменить отображаемый язык в игре и в меню.",
 		"SETTINGS_SYSTEM_PLAYERCOUNT": "Количество игроков",
-		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Выбрает, со сколькими игроками вы хотите играть.\nОдновременно могут быть активны до 5 игроков.",
+		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Выберет, со сколькими игроками вы хотите играть.\nОдновременно могут быть активны до 5 игроков.",
 		"SETTINGS_SYSTEM_RELOADSONG": "Перезагрузка песен",
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Перезагружает папки песен.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Перезагрузка песен (Жёсткая)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Удаляет существующую базу данных и\nперезагружает папки песен с нуля.",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Импортировать Score.ini файлы",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Импортировает Score.ini файлы в базу данных.\n\n<c.#f0ad4e>ВНИМАНИЕ\nСледующее передано не будет:\n- Завершение статусы\n- Модификаторы геймплея\n- Количества ударов\n   (Хорошо, OK, Плохо, Дроби, и т.д.)\n- Результаты за экзамен Дана",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Импортирует Score.ini файлы в базу данных.\n\n<c.#f0ad4e>ВНИМАНИЕ\nСледующее передано не будет:\n- Завершение статусы\n- Модификаторы геймплея\n- Количества ударов\n   (Хорошо, OK, Плохо, Дроби, и т.д.)\n- Результаты за экзамен Дана",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Поиск результатов...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
@@ -104,27 +104,26 @@
 		"SETTINGS_SYSTEM_SIMPLEMODE": "Режим просто",
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Упрощает рисование, скрывая большинство\nвизуальных бликов и эффектов во время геймплея.\n",
 
-		"SETTINGS_SYSTEM_SKIN": "Текущий интерфейс",
-		"SETTINGS_SYSTEM_SKIN_DESC": "Выбрать интерфейс для использования в\nсистемной папке.",
+		"SETTINGS_SYSTEM_SKIN": "Текущий скин",
+		"SETTINGS_SYSTEM_SKIN_DESC": "Выбрать скин для использования в папке\nSystem.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Переключение воспроизведения песни",
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Определяет, будет ли воспроизводиться музыка.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Применить метаданные SONGVOL",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Это – частично избыточная настройка, который\nопределяет, будут ли использоваться метаданные\nSONGVOL.\nЗначения от 0 до 100 снижают громкость песни,\nно любые значения выше 100 ничего не делают.",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
-		// Please update the VOL keys below, a game restart is not required to save sound settings.
+		"SETTINGS_SYSTEM_MASTERVOL": "Основная громкость",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Отрегулирует общую громкость программы.",
 		"SETTINGS_SYSTEM_SEVOL": "Громкость эффекта звука",
-		"SETTINGS_SYSTEM_SEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nударами.\nЧтобы играть без звуковых ударов, установите это\nзначение равным 0.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "Отрегулирует громкость звуков, связанных с\nударами.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Громкость голоса",
-		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Отрегулировает громкость звуков, связанных с\nголосом персонажа.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Отрегулирует громкость звуков, связанных с\nголосом персонажа.",
 		"SETTINGS_SYSTEM_SONGVOL": "Громкость воспроизведения песни",
-		"SETTINGS_SYSTEM_SONGVOL_DESC": "Отрегулировает громкость воспроизведения песни.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "Отрегулирует громкость воспроизведения песни.",
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "Громкость предварительного просмотра песни",
-		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Отрегулировает громкость предварительного\nпросмотра песни.\nВы должны перезапустить игру после выхода из\nконфигурации, чтобы сохранить эту настройку.",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Отрегулирует громкость предварительного\nпросмотра песни.",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Увеличение громкости клавиатуры",
-		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Указает, в какой степени системные клавиши\nувеличения и уменьшения громкости изменяют\nгромкость.\nВы можете указать значение от 1 до 20.",
+		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Укажет, в какой степени системные клавиши\nувеличения и уменьшения громкости изменяют\nгромкость.\nВы можете указать значение от 1 до 20.",
 
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Буфер предварительного воспроизведения песни",
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "Время, затраченное на воспроизведение песни\nво время геймплея.\nУменьшение этого значения может привести\nк слишком раннему воспроизведению песен.",
@@ -150,7 +149,7 @@
 		"SETTINGS_SYSTEM_DEBUGMODE": "Режим отладки",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Указать, включен ли режим отладки.\nЭто приведет к появлению дополнительной\nинформации в правом нижнем углу экрана.\nЭто отобразит вашу калибровку задержки\nдля воспроизведения без звуков удары.",
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT": "Автоматические снимки экрана",
-		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Выбрает, будут ли автоматически делаться\nснимок экрана результатов.\nЭто произойдет только тогда, когда будет\nдостигнут рекорд, который может не\nсоответствовать лучшему исполнению\nэтой песни.",
+		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Выберет, будут ли автоматически делаться\nснимок экрана результатов.\nЭто произойдет только тогда, когда будет\nдостигнут рекорд, который может не\nсоответствовать лучшему исполнению\nэтой песни.",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Богатое присутствие в Discord",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Выбрать, будет ли информация о песне\nпередаваться в Discord.",
 		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Режим буферизованного ввода",
@@ -161,47 +160,47 @@
 		"SETTINGS_GAME_GLOBALOFFSET_DESC": "Изменяет интерпретируемое значение OFFSET\nдля всех партитур.\nМожет быть установлен в диапазоне от -999 до\n999 мс.\nЧтобы уменьшить задержку ввода, установите\nзначение минус.",
 
 		"SETTINGS_GAME_CALIBRATION": "Откалибровать офсет",
-		"SETTINGS_GAME_CALIBRATION_DESC": "Откалибровает ваш офсет.\nГлобальный офсет будет перезаписан, если он\nбудет сохранен.",
+		"SETTINGS_GAME_CALIBRATION_DESC": "Откалибрует ваш офсет.\nГлобальный офсет будет перезаписан, если он\nбудет сохранен.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "ОФСЕТ: {0}",
 
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "Мертвая зона контроллеров",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Отрегулируйте значение мертвой зоны джойстика\nдля всех подключенных контроллеров. Оно может\nсоставлять от 10% до 90%.\n\nПосле сохранения подключите контроллер снова\nили перезапустите игру, чтобы применить\nизменения.",
 
 		"SETTINGS_GAME_BADCOUNT": "Режим Канпэки",
-		"SETTINGS_GAME_BADCOUNT_DESC": "Выбрает сколько «Плохо» позволяют раньше\nпесни автоматически проиграно.\nУстановите значение 0, чтобы выключить этот\nрежим.",
-		"SETTINGS_GAME_NOTELOCK": "Режим замока ноты",
+		"SETTINGS_GAME_BADCOUNT_DESC": "Выберет сколько «Плохо» позволяют раньше\nпесни автоматически проиграно.\nУстановите значение 0, чтобы выключить этот\nрежим.",
+		"SETTINGS_GAME_NOTELOCK": "Режим замка ноты",
 		"SETTINGS_GAME_NOTELOCK_DESC": "Указать, считается ли ударь в интервал между\nнотами – Плохо.",
 		"SETTINGS_GAME_AILEVEL": "Уровень ИИ",
 		"SETTINGS_GAME_AILEVEL_DESC": "Определяет, насколько точен ИИ.\nЕсли 0, то ИИ выключен.\nЕсли 1 или более, то И2 будет играть за ИИ.\nВыключен, если включен режим АВТО И2.",
 		"SETTINGS_GAME_NORMALGAUGE": "Всегда использовать нормальный датчик",
-		"SETTINGS_GAME_NORMALGAUGE_DESC": "Принудительно использовает нормальный датчик\nвсегда, независимо от модификаторов персонажа.",
+		"SETTINGS_GAME_NORMALGAUGE_DESC": "Принудительно использует нормальный датчик\nвсегда, независимо от модификаторов персонажа.",
 
 		"SETTINGS_GAME_AUTOP1": "Автоигра игрока 1",
 		"SETTINGS_GAME_AUTOP1_DESC": "Выбрать, будет ли игрок 1 играть автоматически.",
 		"SETTINGS_GAME_AUTOP2": "Автоигра игрока 2",
 		"SETTINGS_GAME_AUTOP2_DESC": "Выбрать, будет ли игрок 2 играть автоматически.",
 		"SETTINGS_GAME_AUTOROLL": "Скорость дроби",
-		"SETTINGS_GAME_AUTOROLL_DESC": "Когда автоигра включена, дроби будут ударить\nавтоматически столько раз в секунду. Не\nоказывает никакого воздействия на баллоне.\n0 выключает автоматический дробь, и\nмаксимальное значение составляет один\nудар за кадр.",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Когда автоигра включена, дроби будут ударить\nавтоматически столько раз в секунду.\nНе оказывает никакого воздействия на шарике.\n0 выключает автоматический дробь, и\nмаксимальное значение составляет один\nудар за кадр.",
 
 		"SETTINGS_GAME_NOINFO": "Режим отсутствия информации",
 		"SETTINGS_GAME_NOINFO_DESC": "Переключать, будет ли отображаться информация\nо песне.\nВключение (ON) эту настройки приведёт к\nвыключению информации о песне.\nВыключение (OFF) эту настройки будет доступна\nинформация о песне.\n",
 		"SETTINGS_GAME_COMBODISPLAY": "Минимальное комбо отображение",
-		"SETTINGS_GAME_COMBODISPLAY_DESC": "Выбрает начальный номер, под которым будет\nотображаться комбо.\nМожет быть задано в диапазоне от 1 до 99999.",
+		"SETTINGS_GAME_COMBODISPLAY_DESC": "Выберет начальный номер, под которым будет\nотображаться комбо.\nМожет быть задано в диапазоне от 1 до 99999.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Переключение отображения результатов",
 		"SETTINGS_GAME_SCOREDISPLAY_DESC": "Отображает текущие оценки Хорошо/OK/Плохо\nв левом нижнем углу.\n(Только для одиночной игры)",
 		"SETTINGS_GAME_BRANCHANIME": "Набор анимаций веток",
 		"SETTINGS_GAME_BRANCHANIME_DESC": "Изменяет набор анимаций, используемых при\nветвлении партитуры.\nTYPE-A: Поколение-2\nTYPE-B: Поколение-3\n",
 
 		"SETTINGS_GAME_DEFAULTDIFF": "Трудность дефолта",
-		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Выбрает трудность дефолта выбирается при\nвыборе песни.\nЕсли Экстра не выбрана, она не будет видна, пока\nне будет нажата клавиша со стрелкой вправо на\nЭкстрим подходящей песни.",
+		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Выберет трудность дефолта выбирается при\nвыборе песни.\nЕсли Экстра не выбрана, она не будет видна, пока\nне будет нажата клавиша со стрелкой вправо на\nЭкстрим подходящей песни.",
 		"SETTINGS_GAME_EXEXTRAANIME": "Переходы Экстрим/Экстра",
 		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Воспроизводите анимацию, заданную\nинтерфейсом, переключаясь между\nЭкстрим и Экстра.",
 
 		// Settings - Gameplay - Training Mode
-		"SETTINGS_TRAINING_SKIPCOUNT": "Количество пропуска меры",
-		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Количество меры, которые необходимо пропустить\nпри нажатии клавиши пропуска мер вперёд или\nназад в Режиме Тренировки.",
-		"SETTINGS_TRAINING_JUMPINTERVAL": "Временной интервал пропуска мер",
-		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Количество времени в миллисекундах,\nнеобходимое для многократного нажатия клавиш\nлевого или правого синего, чтобы перейти к меру,\nотмеченному в закладках, в режиме тренировки.",
+		"SETTINGS_TRAINING_SKIPCOUNT": "Количество пропуска такта",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Количество такта, которые необходимо пропустить\nпри нажатии клавиши пропуска тактов вперёд или\nназад в Режиме Тренировки.",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "Временной интервал пропуска тактов",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Количество времени в миллисекундах,\nнеобходимое для многократного нажатия клавиш\nлевого или правого синего, чтобы перейти к такту,\nотмеченному в закладках, в режиме тренировки.",
 
 		// Settings - Gameplay - Unlockables
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Игнорирование условий разблокировки песен",
@@ -338,34 +337,34 @@
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для установки ветки\nпартитуры на Эксперте.",
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Установка ветки на Мастере",
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для установки ветки\nпартитуры на Мастере.",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Перемещение меры вперёд",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения меры\nвперёд.",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Перемещение меры назад",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения меры\nназад.",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Пропуск мер вперёд",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска мер вперёд.",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Пропуск мер назад",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска мер назад.",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Прыжок к первой мере",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к первой\nмере.",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Прыжок к последней мере",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к последней\nмере.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Перемещение такта вперёд",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения такта\nвперёд.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Перемещение такта назад",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для перемещения такта\nназад.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Пропуск тактов вперёд",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска тактов\nвперёд.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Пропуск тактов назад",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для пропуска тактов\nназад.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Прыжок к первому такту",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к первому\nтакту.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Прыжок к последнему такту",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Назначение клавиши барабанов:\nНазначать любую кнопку для прыжка к последнему\nтакту.",
 
 		// Title Screen
 		"TITLE_MODE_TAIKO": "Режим Тайко",
-		"TITLE_MODE_DAN": "Дан-и Додзё",
-		"TITLE_MODE_TOWER": "Тайко Башни",
+		"TITLE_MODE_DAN": "Дан-и додзё",
+		"TITLE_MODE_TOWER": "Тайко башни",
 		"TITLE_MODE_SHOP": "Магазин",
-		"TITLE_MODE_STORY": "Тайко Приключения",
-		"TITLE_MODE_HEYA": "Моя Комната",
+		"TITLE_MODE_STORY": "Тайко приключения",
+		"TITLE_MODE_HEYA": "Моя комната",
 		"TITLE_MODE_SETTINGS": "Настройки",
 		"TITLE_MODE_EXIT": "Выход",
-		"TITLE_MODE_ONLINE": "Онлайн-Лаунж",
-		"TITLE_MODE_DOCUMENT": "Открытая Энциклопедия",
-		"TITLE_MODE_AI": "Режим Битвы ИИ",
-		"TITLE_MODE_STATS": "Статистика Игрока",
-		"TITLE_MODE_EDITOR": "Партитура Редактор",
-		"TITLE_MODE_TOOLS": "Открытый Набор Инструментов",
+		"TITLE_MODE_ONLINE": "Онлайн-лаунж",
+		"TITLE_MODE_DOCUMENT": "Открытая энциклопедия",
+		"TITLE_MODE_AI": "Режим битвы ИИ",
+		"TITLE_MODE_STATS": "Статистика игрока",
+		"TITLE_MODE_EDITOR": "Партитура редактор",
+		"TITLE_MODE_TOOLS": "Открытый набор инструментов",
 
 		"TITLE_MODE_TAIKO_DESC": "Играйте ваши любимые\nпесни в своём темпе!",
 		"TITLE_MODE_DAN_DESC": "Играйте в несколько партитурах подряд\nследующих сложных экзаменов,\nчтобы получить ранг ПРОПУСКА!",
@@ -402,21 +401,21 @@
 		// {2}: Maximum BPM
 		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Сделано: {0}",
+		"SONGSELECT_INFO_CHARTER": "Партитурадор: {0}",
 
 		"SONGSELECT_TEXTSEARCH_TITLE": "Название",
 		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Подзаголовок",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Создатель партитуры",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Партитурадор",
 
 		"SONGSELECT_QUICKCONFIG": "Быстрые настройки",
 		"SONGSELECT_QUICKCONFIG_MORE": "Более...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Монеты получены!",
-		"MODAL_TITLE_CHARA": "Новый Персонаж!",
-		"MODAL_TITLE_PUCHI": "Новый Пти-персонаж!",
-		"MODAL_TITLE_NAMEPLATE": "Новый Ранг!",
-		"MODAL_TITLE_SONG": "Новая Песня!",
+		"MODAL_TITLE_CHARA": "Новый персонаж!",
+		"MODAL_TITLE_PUCHI": "Новый пти-персонаж!",
+		"MODAL_TITLE_NAMEPLATE": "Новый ранг!",
+		"MODAL_TITLE_SONG": "Новая песня!",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
 		"MODAL_MESSAGE_COIN": "+{0} монет. (Общие: {1})",
@@ -481,12 +480,12 @@
 		// {0}: Percentage of mines
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Фактор бомба: {0}% нот, превращенные в бомбы в Тральщике",
 		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% баллонов, превращенные в дроби с взрывателем в Тральщике",
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Фактор взрыватели: {0}% шариков, превращенные в дроби с взрывателем в Тральщике",
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Все большие ноты становятся <c.#c800ff>Самоблокирующимися</c> нотами",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> ноты становятся видимыми",
 		// {0}: # of auto-rolls per second
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Автоматически <c.#ffff00>дробит</c> со скоростью {0} удар./с",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Разделяет</c> <c.#0088ff>Трассы</c>",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Разделяет</c> <c.#0088ff>трассы</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Множитель монет: x{0}",
 
@@ -564,12 +563,12 @@
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Играйте",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Играйте",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Получайте Помогавший Завершён на",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Получайте по крайней мере Помогавший Завершён на",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Получайте Помогавший завершён на",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Получайте по крайней мере Помогавший завершён на",
 		"UNLOCK_CONDITION_REQUIRE_CLEAR": "Получайте Завершён на",
 		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Получайте по крайней мере Завершён на",
-		"UNLOCK_CONDITION_REQUIRE_FC": "Получайте Полное Комбо на",
-		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Получайте по крайней мере Полное Комбо на",
+		"UNLOCK_CONDITION_REQUIRE_FC": "Получайте Полное комбо на",
+		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Получайте по крайней мере Полное комбо на",
 		"UNLOCK_CONDITION_REQUIRE_PERFECT": "Получайте Идеально на",
 		"UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Получайте Идеально на",
 
@@ -594,12 +593,12 @@
 		"MOD_SCOREMULTIPLY": "Множитель очков: {0}",
 		"MOD_COINMULTIPLY": "Множитель монет: {0}",
 
-		"MOD_SPEED": "Скорость",
+		"MOD_SPEED": "Скорость прокрутки",
 
 		"MOD_HIDE": "Невидимость",
 		"MOD_STEALTH": "Хитрость",
 
-		"MOD_FLIP": "Зеркальные ноты",
+		"MOD_FLIP": "Перевернутые ноты",
 
 		"MOD_RANDOM": "Случайность",
 		"MOD_RANDOM_SHUFFLE": "Шарканье",

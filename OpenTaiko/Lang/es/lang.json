@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Español (Spanish)",
-	"Version": "0.6.0.72",
+	"Version": "0.6.0.73",
 	"Entries": {
 
 		// Common
@@ -105,24 +105,23 @@
 		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifica dibujo ocultando la mayoría de los\ndestellos y efectos visuales durante jugabilidad.",
 
 		"SETTINGS_SYSTEM_SKIN": "Skin Actual",
-		"SETTINGS_SYSTEM_SKIN_DESC": "Elige un skin desde la carpeta de sistema.",
+		"SETTINGS_SYSTEM_SKIN_DESC": "Elige un skin desde la carpeta de System.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Alternar Reproducción de Canción",
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Alterna si música se reproduce.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Aplicar Metadatos de SONGVOL",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Esto es una configuración parcialmente redundante\nque alterna si se utilizan metadatos de SONGVOL.\nValores entre 0 y 100 reducirán el volumen de la\ncanción, pero valores superiores a 100 no hacen\nnada.",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
-		// Please update the VOL keys below, a game restart is not required to save sound settings.
+		"SETTINGS_SYSTEM_MASTERVOL": "Volumen Maestro",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Ajusta el volumen general del programa.",
 		"SETTINGS_SYSTEM_SEVOL": "Volumen de Efectos de Sonidos",
-		"SETTINGS_SYSTEM_SEVOL_DESC": "Ajusta volumen de sonidos relacionados con don y ka.\nPara jugar sin instrumento, configúralo en 0.\nDebes reiniciar el juego después de salir de la config\npara guardar esta opción.",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "Ajusta el volumen de sonidos relacionados con don y\nka.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Volumen de Voz",
-		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Ajusta volumen de sonidos relacionados con voz de\nun personaje.\nDebes reiniciar el juego después de salir de la config\npara guardar esta opción.",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "Ajusta el volumen de sonidos relacionados con voz de\nun personaje.",
 		"SETTINGS_SYSTEM_SONGVOL": "Volumen de Reproducción de Canción",
-		"SETTINGS_SYSTEM_SONGVOL_DESC": "Ajusta volumen de reproducción de la canción.\nDebes reiniciar el juego después de salir de la config\npara guardar esta opción.",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "Ajusta el volumen de reproducción de la canción.",
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "Volumen de Previa de Canción",
-		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Ajusta volumen de previa de la canción.\nDebes reiniciar el juego después de salir de la config\npara guardar esta opción.",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "Ajusta el volumen de previa de la canción.",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Aumento de Volumen de Teclado",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Especifica cuánto cambian el volumen las teclas del\nsistema Aumentar Volumen y Disminuir Volumen.\nPuedes especificar desde 1 a 20.",
 
@@ -174,7 +173,7 @@
 		"SETTINGS_GAME_AILEVEL": "Nivel de IA",
 		"SETTINGS_GAME_AILEVEL_DESC": "Determina que tan precisa la IA es.\nSi 0, IA está desactivado.\nSi 1 o más, el J2 jugará como IA.\nDesactivado si AUTO de J2 está ON.",
 		"SETTINGS_GAME_NORMALGAUGE": "Siempre Usar Indicador Normal",
-		"SETTINGS_GAME_NORMALGAUGE_DESC": "Forza el indicador normal se usa en todo momento,\nindependientemente de modificadores de un\npersonaje.",
+		"SETTINGS_GAME_NORMALGAUGE_DESC": "Fuerza el indicador normal se usa en todo momento,\nindependientemente de modificadores de un\npersonaje.",
 
 		"SETTINGS_GAME_AUTOP1": "Juego Auto de Jugador 1",
 		"SETTINGS_GAME_AUTOP1_DESC": "Activa si jugador 1 juega automáticamente.",
@@ -198,10 +197,10 @@
 		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Reproduzca una animación definida por el aspecto\nmientras cambia entre Extremo y Extra.",
 
 		// Settings - Gameplay - Training Mode
-		"SETTINGS_TRAINING_SKIPCOUNT": "Cantidad de Saltar Medidas",
-		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "El número de medida para saltar mientras presiona\nSaltar Medidas hacia Atrás o Adelante en Modo\nEntrenamiento.",
-		"SETTINGS_TRAINING_JUMPINTERVAL": "Intervalo de Tiempo de Saltar Medidas",
-		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "La cantidad de tiempo en milisegundos necesaria\npara tocar repetidamente las teclas Azules Izquierda\no Derecha saltar a una medida marcado en Modo\nEntrenamiento.",
+		"SETTINGS_TRAINING_SKIPCOUNT": "Cantidad de Saltar Compases",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "El número de compás para saltar mientras presiona\nSaltar Compases hacia Atrás o Adelante en Modo\nEntrenamiento.",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "Intervalo de Tiempo de Saltar Compases",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "La cantidad de tiempo en milisegundos necesaria\npara tocar repetidamente las teclas Azules Izquierda\no Derecha saltar a un compás marcado en Modo\nEntrenamiento.",
 
 		// Settings - Gameplay - Unlockables
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignorar Desbloqueables de Canciones",
@@ -338,18 +337,18 @@
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHEXPERT_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para establecer la rama de\nuna partitura en experto.",
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER": "Establecer Rama en Maestro",
 		"SETTINGS_KEYASSIGN_TRAINING_BRANCHMASTER_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para establecer la rama de\nuna partitura en maestro.",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Avanzar Medida",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para avanzar una medida.",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Retroceder Medida",
-		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para retroceder una medida.",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Saltar Medidas hacia Adelante",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar medidas hacia\nadelante.",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Saltar Medidas hacia Atrás",
-		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar medidas hacia\natrás.",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Saltar a Primera Medida",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar a la primera\nmedida.",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Saltar a Última Medida",
-		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar a la última\nmedida.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD": "Avanzar Compás",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEFORWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para avanzar un compás.",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD": "Retroceder Compás",
+		"SETTINGS_KEYASSIGN_TRAINING_MOVEBACKWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para retroceder un compás.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD": "Saltar Compases hacia Adelante",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPFORWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar compases hacia\nadelante.",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD": "Saltar Compases hacia Atrás",
+		"SETTINGS_KEYASSIGN_TRAINING_SKIPBACKWARD_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar compases hacia\natrás.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST": "Saltar al Primer Compás",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOFIRST_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar al primer\ncompás.",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Saltar al Último Compás",
+		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Asignación de tecla de tambor:\nAsigna cualquiera tecla para saltar al último\ncompás.",
 
 		// Title Screen
 		"TITLE_MODE_TAIKO": "Modo Taiko",

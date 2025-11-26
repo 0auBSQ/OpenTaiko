@@ -114,7 +114,6 @@
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": ".tjaファイルのSONGVOLヘッダを音源の音量に適用します。設定による音量調整を使用する場合はこの設定をOFFにしてください。",
 		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
 		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
-		// Please update the VOL keys below, a game restart is not required to save sound settings.
 		"SETTINGS_SYSTEM_SEVOL": "効果音音量",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "効果音の音量を調節します。",
 		"SETTINGS_SYSTEM_VOICEVOL": "ボイス音量",
