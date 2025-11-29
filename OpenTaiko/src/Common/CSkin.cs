@@ -3744,6 +3744,22 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
+							case "Game_Chara_Scale": {
+									Game_Chara_Scale = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_4P": {
+									Game_Chara_Scale_4P = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_5P": {
+									Game_Chara_Scale_5P = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Scale_AI": {
+									Game_Chara_Scale_AI = float.Parse(strParam);
+									break;
+								}
 							case "Game_Chara_AI_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -3987,6 +4003,10 @@ internal class CSkin : IDisposable {
 									for (int i = 0; i < 2; i++) {
 										Game_Taiko_Y[i] = int.Parse(strSplit[i]);
 									}
+									break;
+								}
+							case "Game_Taiko_VisibleExPlayerCount": {
+									Game_Taiko_VisibleExPlayerCount = CConversion.bONorOFF(strParam[0]);
 									break;
 								}
 							case "Game_Taiko_Combo_X": {
@@ -8298,10 +8318,14 @@ internal class CSkin : IDisposable {
 
 	public int[] Game_Chara_X = new int[] { 0, 0 };
 	public int[] Game_Chara_Y = new int[] { 0, 537 };
+	public float Game_Chara_Scale = 0.8f;
+	public float Game_Chara_Scale_4P = 0.4f;
+	public float Game_Chara_Scale_5P = 0.35f;
+	public float Game_Chara_Scale_AI = 0.464f;
 	public int[] Game_Chara_AI_X = new int[] { 0, 0 };
 	public int[] Game_Chara_AI_Y = new int[] { 0, 537 };
-	public int[] Game_Chara_4P = new int[] { 0, 0 };
-	public int[] Game_Chara_5P = new int[] { 0, 537 };
+	public int[] Game_Chara_4P = new int[] { 380, 276 };
+	public int[] Game_Chara_5P = new int[] { 380, 220 };
 	public int[] Game_Chara_Balloon_X = new int[] { 240, 240 };
 	public int[] Game_Chara_Balloon_Y = new int[] { 0, 297 };
 	public int[] Game_Chara_Balloon_4P = new int[] { 0, 297 };
@@ -8444,6 +8468,8 @@ internal class CSkin : IDisposable {
 
 	public int[] Game_Taiko_4P = new int[] { 205, 30 };
 	public int[] Game_Taiko_5P = new int[] { 205, 22 };
+
+	public bool Game_Taiko_VisibleExPlayerCount = true;
 
 	public int[] Game_Taiko_Combo_4P = new int[] { 267, 73 };
 	public int[] Game_Taiko_Combo_5P = new int[] { 267, 65 };

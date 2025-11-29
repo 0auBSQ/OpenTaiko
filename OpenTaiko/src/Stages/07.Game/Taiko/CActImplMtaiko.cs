@@ -127,6 +127,13 @@ internal class CActImplMtaiko : CActivity {
 
 			tex?.t2D描画(bg_x, bg_y);
 		}
+
+
+		// 3+-player mode character
+		if (OpenTaiko.ConfigIni.ShowChara && OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			OpenTaiko.stageGameScreen.actChara.Draw();
+		}
+
 		/*
         if (TJAPlayer3.stage選曲.n確定された曲の難易度[0] == (int)Difficulty.Dan)  // Dan-i Dojo
             TJAPlayer3.Tx.Taiko_Background[2]?.t2D描画(bg_x[0], bg_y[0]);
@@ -185,6 +192,11 @@ internal class CActImplMtaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			int taiko_x;
 			int taiko_y;
+
+			if (OpenTaiko.ConfigIni.nPlayerCount >= 3 && !OpenTaiko.Skin.Game_Taiko_VisibleExPlayerCount) {
+				break;
+			}
+
 			if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 				taiko_x = OpenTaiko.Skin.Game_Taiko_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
 				taiko_y = OpenTaiko.Skin.Game_Taiko_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);

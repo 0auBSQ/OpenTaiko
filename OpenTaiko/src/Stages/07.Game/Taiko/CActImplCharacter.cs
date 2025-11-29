@@ -369,22 +369,22 @@ internal class CActImplCharacter : CActivity {
 					chara_x = (OpenTaiko.Skin.Game_Chara_AI_X[i]);
 					chara_y = (OpenTaiko.Skin.Game_Chara_AI_Y[i]);
 
-					charaScale = 0.464f;
+					charaScale = OpenTaiko.Skin.Game_Chara_Scale_AI;
 				} else if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					chara_x = OpenTaiko.Skin.Game_Chara_X[i];
 					chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
 
-					charaScale = 0.8f;
+					charaScale = OpenTaiko.Skin.Game_Chara_Scale;
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					chara_x = OpenTaiko.Skin.Game_Chara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
 					chara_y = OpenTaiko.Skin.Game_Chara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i);
 
-					charaScale = 0.464f;
+					charaScale = OpenTaiko.Skin.Game_Chara_Scale_5P;
 				} else {
 					chara_x = OpenTaiko.Skin.Game_Chara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i);
 					chara_y = OpenTaiko.Skin.Game_Chara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 
-					charaScale = 0.464f;
+					charaScale = OpenTaiko.Skin.Game_Chara_Scale_4P;
 				}
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
