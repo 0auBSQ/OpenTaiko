@@ -1626,7 +1626,7 @@ internal class CTja : CActivity {
 			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
 			// prevent ending too early for some branches
-			this.GotoBranchEnd();
+			this.GotoBranchEnd(forced: true);
 
 			// TaikoJiro compatibility: #END ends unended rolls
 			for (int i = 0; i < 3; i++) {
@@ -2192,7 +2192,7 @@ internal class CTja : CActivity {
 			IsEnabledFixSENote = true;
 		} else if (command == "#NEXTSONG") {
 			// prevent branch section across songs
-			this.GotoBranchEnd();
+			this.GotoBranchEnd(forced: true);
 
 			var chip = this.NewEventChipAtDefCursor(0x9B, List_DanSongs.Count);
 			this.listChip.Add(chip);
@@ -2541,14 +2541,17 @@ internal class CTja : CActivity {
 		#endregion
 	}
 
-	private void GotoBranchEnd() {
+	private void GotoBranchEnd(bool forced = false) {
 		this.UpdateBranchEndPoint();
-		this.n現在の小節数 = this.cBranchEnd.nMeasureCount;
-		this.dbNowTime = this.cBranchEnd.dbTime;
-		this.dbNowBMScollTime = this.cBranchEnd.dbBMScollTime;
-		this.dbNowBPM = this.cBranchEnd.dbBPM;
-		this.fNow_Measure_s = this.cBranchEnd.fMeasure_s;
-		this.fNow_Measure_m = this.cBranchEnd.fMeasure_m;
+		// TJAP3/OOS: keep timing at the end of the last-defined branch
+		if (false /* not TJAP3/OOS */ || forced) {
+			this.n現在の小節数 = this.cBranchEnd.nMeasureCount;
+			this.dbNowTime = this.cBranchEnd.dbTime;
+			this.dbNowBMScollTime = this.cBranchEnd.dbBMScollTime;
+			this.dbNowBPM = this.cBranchEnd.dbBPM;
+			this.fNow_Measure_s = this.cBranchEnd.fMeasure_s;
+			this.fNow_Measure_m = this.cBranchEnd.fMeasure_m;
+		}
 
 		#region [ workaround: fix inconsistent BPM & beat position ]
 		// TODO: TaikoJiro 1 behavior: Make `#BPMCHANGE`s work cross-branch for notes' timing
