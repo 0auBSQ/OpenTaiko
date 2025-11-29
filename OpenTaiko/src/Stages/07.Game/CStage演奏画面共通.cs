@@ -72,9 +72,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		CChip endChip = null;
 		for (int i = 0; i < listChip[0].Count; i++) {
 			CChip chip = listChip[0][i];
-			if (endChip == null || (chip.n発声時刻ms > endChip.n発声時刻ms && chip.nChannelNo == 0x50)) {
+			if (endChip == null || (chip.n発声時刻ms > endChip.n発声時刻ms && chip.nChannelNo is 0x50 or 0xFF)) {
 				endChip = chip;
 			}
+			if (chip.nChannelNo == 0xFF)
+				break;
 		}
 
 		int battleSectionCount = 3 + ((endChip.n発声時刻ms * 2) / 100000);
@@ -654,7 +656,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected int[] nCurrentRollCount = new int[5];
 	public int[] Chara_MissCount;
-	protected bool[] ifp = { false, false, false, false, false };
+	protected bool[] isChartEnded = { false, false, false, false, false }; // last note of chart passed
+	protected bool[] isFinishedPlaying = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
 
 	protected int nタイマ番号;
@@ -1437,7 +1440,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				switch (chara.effect.tGetGaugeType()) {
 					case "Hard":
 					case "Extreme": {
-							ifp[nPlayer] = true;
+							isFinishedPlaying[nPlayer] = true;
 							isDeniedPlaying[nPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
 
 							bool allDeniedPlaying = true;
@@ -2953,18 +2956,21 @@ internal abstract class CStage演奏画面共通 : CStage {
 				#region[ ff: 譜面の強制終了 ]
 				//バグで譜面がとてつもないことになっているため、#ENDがきたらこれを差し込む。
 				case 0xFF:
-					if (!pChip.bHit) {
-						if (OpenTaiko.ConfigIni.bTokkunMode) {
-							foreach (CTja.CWAV cwav in OpenTaiko.TJA.listWAV.Values) {
-								for (int i = 0; i < nPolyphonicSounds; i++) {
-									if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPlaying) {
-										return false;
+					if (!this.bPAUSE && !pChip.bHit) { // prevent infinity pause in training mode
+						this.isChartEnded[nPlayer] = true;
+						if (pChip.n整数値 != 0) { // 0: last note past, 0xFF: song end
+							if (OpenTaiko.ConfigIni.bTokkunMode) {
+								foreach (CTja.CWAV cwav in OpenTaiko.TJA.listWAV.Values) {
+									for (int i = 0; i < nPolyphonicSounds; i++) {
+										if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPlaying) {
+											return false;
+										}
 									}
 								}
 							}
+							pChip.bHit = true;
+							return true;
 						}
-						pChip.bHit = true;
-						return true;
 					}
 					break;
 				#endregion
@@ -3713,7 +3719,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.CSectionScore[i] = new CBRANCHSCORE();
 
 				this.actComboVoice.tReset(i);
-				this.ifp[i] = false;
+				this.isChartEnded[i] = false;
+				this.isFinishedPlaying[i] = false;
 				this.isDeniedPlaying[i] = false;
 			}
 

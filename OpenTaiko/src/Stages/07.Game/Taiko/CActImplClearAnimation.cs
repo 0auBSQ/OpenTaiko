@@ -526,7 +526,7 @@ internal class CActImplClearAnimation : CActivity {
 		if (base.IsFirstDraw) {
 			base.IsFirstDraw = false;
 		}
-		if (this.ct進行メイン != null && (OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_FAILED || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
+		if (this.ct進行メイン != null && (OpenTaiko.stageGameScreen.ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_CLEAR_FadeOut)) {
 			this.ct進行メイン.Tick();
 
 			//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.灰, this.ct進行メイン.n現在の値.ToString() );

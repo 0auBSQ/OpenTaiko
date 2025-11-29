@@ -104,6 +104,7 @@ internal class CTja : CActivity {
 		public bool bIsDrumsSound = false;
 		public bool bIsSESound = false;
 		public bool bIsBGMSound = false;
+		public CChip? PlayChip = null;
 
 		public override string ToString() {
 			var sb = new StringBuilder(128);
@@ -620,6 +621,18 @@ internal class CTja : CActivity {
 
 					if (!OpenTaiko.ConfigIni.bDynamicBassMixerManagement) {
 						cwav.rSound[i].AddBassSoundFromMixer();
+					}
+
+					// force chart end for all players when the WAVE of last song ends
+					if (i == 0) {
+						var chipBgm = cwav.PlayChip;
+						bool isLastSongWave = (n参照中の難易度 == (int)Difficulty.Dan) ?
+							(this.List_DanSongs.Count > 0) && (cwav.n内部番号 == this.List_DanSongs.Last().Wave.n内部番号)
+							: (cwav.n内部番号 == 1);
+						if (chipBgm != null && isLastSongWave) {
+							for (int iPlayer = 0; iPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++iPlayer)
+								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.n発声位置 + cwav.rSound[i].TotalPlayTime, this.n現在の小節数, msFadeOutDelay: 0, sortListChip: true);
+						}
 					}
 
 					if (OpenTaiko.ConfigIni.bOutputCreationReleaseLog) {
@@ -1498,6 +1511,7 @@ internal class CTja : CActivity {
 						nNowReadLine++;
 						this.t入力_行解析譜面_V4(line);
 					}
+					this.EndChartDefinitionBody(); // handled here as #END might be missing
 				}
 
 				// Retrieve all the global exams (non individual) at the end
@@ -1625,37 +1639,7 @@ internal class CTja : CActivity {
 		if (command == "#START") {
 			InitializeChartDefinitionBody();
 		} else if (command == "#END") {
-			// prevent ending too early for some branches
-			this.GotoBranchEnd(forced: true);
-
-			// TaikoJiro compatibility: #END ends unended rolls
-			for (int i = 0; i < 3; i++) {
-				if (this.nNowRollCountBranch[i] >= 0) {
-					ECourse branch = (ECourse)i;
-					if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
-						this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
-							$"An unended roll in branch {branch} is ended by #END."
-							: $"An unended roll is ended by #END."
-						);
-					}
-					InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, 0, 1, branch);
-				}
-			}
-
-			//ためしに割り込む。
-			var chip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0xFF);
-			chip.n発声位置 = ((this.n現在の小節数 + 2) * 384);
-			chip.n発声時刻ms = (int)(this.dbNowTime + 1000); //2016.07.16 kairera0467 終了時から1秒後に設置するよう変更。
-														 // チップを配置。
-
-			if (n参照中の難易度 == (int)Difficulty.Dan) {
-				Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count);
-				if (List_DanSongs.Count > 0) {
-					this.pDan_LastChip[List_DanSongs.Count - 1] = this.FindLastHittableOrChip(chip);
-				}
-			}
-
-			this.listChip.Add(chip);
+			// handled at end of input
 		} else if (command == "#BPMCHANGE") {
 			double dbBPM = double.Parse(argument);
 			this.dbNowBPM = dbBPM;
@@ -2232,6 +2216,8 @@ internal class CTja : CActivity {
 			dansongs.Difficulty = (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7])) ? strConvertCourse(strArray[7]) : 3;
 			dansongs.bTitleShow = (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8])) ? bool.Parse(strArray[8]) : false;
 
+			var chipBgm = this.NewEventChipAtDefCursor(0x01, 1 + List_DanSongs.Count, 0x01);
+
 			dansongs.Wave = new CWAV {
 				n内部番号 = this.n内部番号WAV1to,
 				n表記上の番号 = this.n内部番号WAV1to,
@@ -2240,7 +2226,8 @@ internal class CTja : CActivity {
 				SongVol = this.SongVol,
 				SongLoudnessMetadata = this.SongLoudnessMetadata,
 				strファイル名 = CDTXCompanionFileFinder.FindFileName(this.strFolderPath, strFileName, dansongs.FileName),
-				strコメント文 = "TJA BGM"
+				strコメント文 = "TJA BGM",
+				PlayChip = chipBgm,
 			};
 			dansongs.Wave.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(dansongs.Wave.strファイル名);
 			List_DanSongs.Add(dansongs);
@@ -2258,7 +2245,7 @@ internal class CTja : CActivity {
 			bHasBranchDan[List_DanSongs.Count - 1] = false;
 
 			// チップを配置。
-			this.listChip.Add(this.NewEventChipAtDefCursor(0x01, 1 + List_DanSongs.Count, 0x01));
+			this.listChip.Add(chipBgm);
 		} else if (command == "#NMSCROLL") {
 			eScrollMode = EScrollMode.Normal;
 
@@ -2284,11 +2271,13 @@ internal class CTja : CActivity {
 		CChip[] lastChips = [chip, chip, chip];
 		bool[] lastIsHittables = [false, false, false];
 		for (int i = this.listChip.Count; i-- > 0;) {
-			CChip chipI = this.listChip[i];
+			CChip chipI = this.listChip[i].start;
+			if (chipI.n発声時刻ms > chip.n発声時刻ms)
+				continue;
 			chipI.ForEachTargetBranch(branch => {
 				int ibReal = (int)branch;
 				if (!lastIsHittables[ibReal]) {
-					lastChips[ibReal] = chipI;
+					lastChips[ibReal] = chipI.end;
 					lastIsHittables[ibReal] = NotesManager.IsHittableNote(chipI);
 				}
 			});
@@ -2296,7 +2285,7 @@ internal class CTja : CActivity {
 				break; // all are hittable or has reached the last `#NEXTSONG`
 		}
 		CChip lastChip = lastChips.MaxBy(chip => chip.n発声時刻ms)!;
-		return lastChip;
+		return (lastChip.n発声時刻ms > chip.n発声時刻ms) ? chip : lastChip;
 	}
 
 	private CBPM SetBPMPointAtDefCursor(ECourse branch) {
@@ -2479,7 +2468,10 @@ internal class CTja : CActivity {
 
 		// add music start chip
 		//#STARTと同時に鳴らすのはどうかと思うけどしゃーなしだな。
-		this.listChip.Add(this.NewEventChipAtDefCursor(0x01, 1, 0x01));
+		var chipBgm = this.NewEventChipAtDefCursor(0x01, 1, 0x01);
+		if (this.listWAV.TryGetValue(1, out var wavBgm))
+			wavBgm.PlayChip = chipBgm;
+		this.listChip.Add(chipBgm);
 
 		// add movie start chip
 		var chipMovie = this.NewEventChipAtDefCursor(0x54, 1, 0x01);
@@ -2487,6 +2479,60 @@ internal class CTja : CActivity {
 		this.listChip.Add(chipMovie);
 		// Prevent undefined position when `#N/#E/#M` appears without `#BRANCHSTART`
 		this.SaveBranchPoint();
+	}
+
+	private void EndChartDefinitionBody() {
+		// prevent ending too early for some branches
+		this.GotoBranchEnd(forced: true);
+
+		// TaikoJiro compatibility: #END ends unended rolls
+		for (int i = 0; i < 3; i++) {
+			if (this.nNowRollCountBranch[i] >= 0) {
+				ECourse branch = (ECourse)i;
+				if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
+					this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+						$"An unended roll in branch {branch} is ended by #END."
+						: $"An unended roll is ended by #END."
+					);
+				}
+				InsertNoteAtDefCursor(NotesManager.ENoteType.EndRoll, 0, 1, branch);
+			}
+		}
+
+		this.InsertEndOfChartChips(this.dbNowTime, this.n現在の小節数, msFadeOutDelay: 1000); //2016.07.16 kairera0467 終了時から1秒後に設置するよう変更。
+	}
+
+	private void InsertEndOfChartChips(double msTjaTimeRaw, int measurePos, int msFadeOutDelay, bool sortListChip = false) {
+		//ためしに割り込む。
+		// チップを配置。
+		var gameFadeOutChip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0xFF);
+		gameFadeOutChip.n発声位置 = ((measurePos + 2) * 384);
+		gameFadeOutChip.n発声時刻ms = (int)(msTjaTimeRaw + msFadeOutDelay);
+		this.InsertChipOrdered(gameFadeOutChip, sortListChip);
+
+		// last note before end of chart
+		var lastChip = this.FindLastHittableOrChip(gameFadeOutChip);
+		if (n参照中の難易度 == (int)Difficulty.Dan) {
+			Array.Resize(ref this.pDan_LastChip, List_DanSongs.Count);
+			if (List_DanSongs.Count > 0) {
+				this.pDan_LastChip[List_DanSongs.Count - 1] = lastChip;
+			}
+		}
+
+		var chartEndChip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0);
+		chartEndChip.n発声位置 = lastChip.n発声位置;
+		chartEndChip.n発声時刻ms = Math.Min(lastChip.n発声時刻ms + 2000, gameFadeOutChip.n発声時刻ms);
+		this.InsertChipOrdered(chartEndChip, sortListChip);
+	}
+
+	private void InsertChipOrdered(CChip gameFadeOutChip, bool sortListChip = false) {
+		int idx = this.listChip.Count;
+		if (sortListChip) {
+			idx = this.listChip.BinarySearch(gameFadeOutChip);
+			if (idx < 0)
+				idx = ~idx;
+		}
+		this.listChip.Insert(idx, gameFadeOutChip);
 	}
 
 	private void ForEachCurrentBranch(Action<ECourse> action)
