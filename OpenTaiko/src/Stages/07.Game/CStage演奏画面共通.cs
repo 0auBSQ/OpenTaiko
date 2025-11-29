@@ -866,9 +866,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		if (pChip != null) {
 			CTja tja = OpenTaiko.GetTJA(player)!;
-			pChip.nLag = (int)(msTjaTime - pChip.n発声時刻ms);
-			pChip.nLag = msDelta;
-			int nDeltaTime = Math.Abs(pChip.nLag);
+			int nDeltaTime = Math.Abs((int)(msTjaTime - pChip.n発声時刻ms));
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip)) {
 				return (msTjaTime >= pChip.n発声時刻ms && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
@@ -1291,6 +1289,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
 
 			if (!bAutoPlay && eJudgeResult != ENoteJudge.Miss) {
+				pChip.nLag = (int)(msHitTjaTime - pChip.n発声時刻ms);
 				CLagLogger.Add(nPlayer, pChip);
 			}
 

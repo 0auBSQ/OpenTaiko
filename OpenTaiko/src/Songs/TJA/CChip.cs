@@ -47,7 +47,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
-	public int n発声時刻ms { get => (int)db発声時刻ms; set => db発声時刻ms = value; }
+	private int _n発声時刻ms;
+	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
 	public double n分岐時刻ms;
 
 
@@ -177,7 +178,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.n発声時刻ms = 0;
 		this.db発声時刻ms = 0.0D;
 		this.fBMSCROLLTime = 0;
-		this.nLag = -999;
+		this.nLag = int.MinValue;
 		this.b演奏終了後も再生が続くチップである = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
