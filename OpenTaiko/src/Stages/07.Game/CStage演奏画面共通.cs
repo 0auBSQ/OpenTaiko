@@ -842,13 +842,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return _timingzonesAreEasy;
 	}
 
-	protected CConfigIni.CTimingZones GetTimingZones(int idxPlayerActual) {
+	protected CConfigIni.CTimingZones GetTimingZones(int idxPlayer) {
 		// To change later to adapt to Tower Ama-kuchi
 		//diff = Math.Min(diff, (int)Difficulty.Oni);
 
+		int idxPlayerActual = OpenTaiko.GetActualPlayer(idxPlayer);
 		int timingShift = OpenTaiko.ConfigIni.nTimingZones[idxPlayerActual];
 
-		bool _timingzonesAreEasy = tEasyTimeZones(idxPlayerActual);
+		bool _timingzonesAreEasy = tEasyTimeZones(idxPlayer);
 
 		return (_timingzonesAreEasy == true) ? OpenTaiko.ConfigIni.tzLevels[timingShift] : OpenTaiko.ConfigIni.tzLevels[2 + timingShift];
 	}
@@ -876,7 +877,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 
 			int actual = OpenTaiko.GetActualPlayer(player);
-			CConfigIni.CTimingZones tz = GetTimingZones(actual);
+			CConfigIni.CTimingZones tz = GetTimingZones(player);
 
 			if (nDeltaTime <= CTja.GameDurationToTjaDuration(tz.nGoodZone)) {
 				return ENoteJudge.Perfect;
