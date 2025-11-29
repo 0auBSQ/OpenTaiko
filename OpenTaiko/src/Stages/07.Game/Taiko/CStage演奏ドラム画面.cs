@@ -805,9 +805,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (pChip.bVisible) {
 			if (!pChip.bHit) {
 				long nPlayTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-				this.AutoplayHit(pChip, nPlayTime, nPlayer, _gt);
-				if (pChip.bHit)
-					return;
 
 				if (pChip.nノーツ出現時刻ms != 0 && (nPlayTime < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
 					pChip.bShow = false;
@@ -1253,12 +1250,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					}
 				}
-			}
-
-			if (pChip.n発声時刻ms <= nowTime && pChip.end.n発声時刻ms > nowTime) {
-				//時間内でかつ0x9Aじゃないならならヒット処理
-				if (!NotesManager.IsRollEnd(pChip))
-					this.Autoroll(pChip, nowTime, nPlayer, _gt);
 			}
 		}
 		#endregion

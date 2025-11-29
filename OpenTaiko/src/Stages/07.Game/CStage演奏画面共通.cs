@@ -3046,6 +3046,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (NotesManager.IsMissableNote(pChip) && pChip.eNoteState != ENoteState.Wait)
 					{
 						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
+						this.AutoplayHit(pChip, n現在時刻ms, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
 						if (pChip.n発声時刻ms <= n現在時刻ms) {
 							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
@@ -3053,11 +3054,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
 							}
 						}
-					}
-				} else if (NotesManager.IsGenericRoll(pChip)) {
-					if (pChip.end.n発声時刻ms <= n現在時刻ms) {
-						if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
-							pChip.bHit = true;
+					} else if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip)) {
+						if (pChip.end.n発声時刻ms <= n現在時刻ms) {
+							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
+								pChip.bHit = true;
+							}
+						} else if (pChip.n発声時刻ms <= n現在時刻ms) {
+							//時間内でかつ0x9Aじゃないならならヒット処理
+							this.Autoroll(pChip, n現在時刻ms, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
 						}
 					}
 				}
