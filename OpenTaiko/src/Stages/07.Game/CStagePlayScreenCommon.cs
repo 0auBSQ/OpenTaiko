@@ -2917,7 +2917,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)branch] = true);
-						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
+						if (tja.COMPAT is CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
 							this.bIsGOGOTIME[nPlayer] = true;
 							if (!this.isRewinding)
 								this.StartGoGoTimeEffect(nPlayer);
@@ -2928,7 +2928,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)branch] = false);
-						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
+						if (tja.COMPAT is CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
 							this.bIsGOGOTIME[nPlayer] = false;
 							if (!this.isRewinding)
 								actChara.ReturnDefaultAnime(nPlayer);
@@ -3380,7 +3380,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			}
 		}
 
-		if (false /* Jiro1 */)
+		if (tja.COMPAT is not (CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS))
 			this.bIsGOGOTIME[nPlayer] = this.bIsGOGOTIME_Branch[nPlayer, (int)this.nTargetBranch[nPlayer]];
 		if (this.isRewinding) {
 			this.isRewinding = false;

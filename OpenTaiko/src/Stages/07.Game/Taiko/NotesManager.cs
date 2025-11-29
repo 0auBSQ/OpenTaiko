@@ -114,8 +114,8 @@ class NotesManager {
 			_ => 0,
 		};
 
-	public static CChip GetVelocityRefChip(CChip chip)
-		=> (IsRollEnd(chip) && true /* TJAP3/OOS */) ? chip.start : chip; // && !StretchRoll
+	public static CChip GetVelocityRefChip(CChip chip, CTja.ETjaCompat compat)
+		=> (IsRollEnd(chip) && compat is CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS) ? chip.start : chip; // && !StretchRoll
 
 	#endregion
 

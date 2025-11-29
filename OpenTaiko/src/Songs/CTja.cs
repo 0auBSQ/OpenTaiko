@@ -235,6 +235,14 @@ internal class CTja : CActivity {
 			_ => throw new ArgumentOutOfRangeException(),
 		};
 
+	public enum ETjaCompat {
+		Jiro1 = 1,
+		Jiro2 = 2,
+		TMG = 4,
+		TJAP3 = 3,
+		OOS = 0, // sim default need to be 0
+	}
+
 	// Properties
 
 
@@ -289,6 +297,7 @@ internal class CTja : CActivity {
 	public int LEVEL;
 	public bool bLyrics;
 	public ESide SIDE = ESide.eBoth;
+	public ETjaCompat COMPAT = ETjaCompat.OOS;
 	public CSongUniqueID uniqueID;
 
 	public class QueryableCourseMetadata {
@@ -2161,7 +2170,7 @@ internal class CTja : CActivity {
 			for (int i = 0; i < 3; i++)
 				IsBranchBarDraw[i] = true;//3コース分の黄色小説線表示㋫ラブ
 
-			IsEndedBranching = true /* !Jiro1 */; // Treat the part before #N/E/M as common section
+			IsEndedBranching = (this.COMPAT is not ETjaCompat.Jiro1); // Treat the part before #N/E/M as common section
 			#endregion
 
 			// handle here for the correct dan-i song index
@@ -2714,7 +2723,7 @@ internal class CTja : CActivity {
 	private void UpdateBranchEndPoint() {
 		// TaikoJiro 1 behavior: use timing command from the first-defined branch
 		// TJAP3/OOS: use last-defined branch
-		if (true /* TJAP3/OOS */ || this.cBranchEnd.nMeasureCount == this.cBranchStart.nMeasureCount) { // first defined non-empty branch
+		if (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS || this.cBranchEnd.nMeasureCount == this.cBranchStart.nMeasureCount) { // first defined non-empty branch
 			this.cBranchEnd.fMeasure_s = this.fNow_Measure_s;
 			this.cBranchEnd.fMeasure_m = this.fNow_Measure_m;
 			this.cBranchEnd.dbBPM = this.dbNowBPM; // TODO: TaikoJiro 1 behavior: Make BPM work cross-branch
@@ -2753,7 +2762,7 @@ internal class CTja : CActivity {
 
 		this.UpdateBranchEndPoint();
 		// TJAP3/OOS: keep timing at the end of the last-defined branch
-		if (false /* not TJAP3/OOS */ || forced) {
+		if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS) || forced) {
 			this.nCurrentMeasureCount = this.cBranchEnd.nMeasureCount;
 			this.dbNowTime = this.cBranchEnd.dbTime;
 			this.dbNowBMScollTime = this.cBranchEnd.dbBMScollTime;
@@ -3791,6 +3800,15 @@ internal class CTja : CActivity {
 					}
 				}
 			}
+		} else if (strCommandName.Equals("COMPAT")) {
+			this.COMPAT = strCommandParam.ToLower() switch {
+				"jiro1" => ETjaCompat.Jiro1,
+				"jiro2" => ETjaCompat.Jiro2,
+				"tmg" => ETjaCompat.TMG,
+				"tjap3" => ETjaCompat.TJAP3,
+				"oos" => ETjaCompat.OOS,
+				_ => throw new ArgumentOutOfRangeException("strCompatMode"), // argument shown in AddCommandError()
+			};
 		} else {
 			var metadatas = (this.nowCourseScope == (int)Difficulty.Total) ? this.SongListCourseMetadata
 				: [this.SongListCourseMetadata[this.nowCourseScope]];
@@ -4512,7 +4530,7 @@ internal class CTja : CActivity {
 	}
 
 	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, double th16NowBeat, double scrollRate) {
-		CChip velocityRefChip = NotesManager.GetVelocityRefChip(chip);
+		CChip velocityRefChip = NotesManager.GetVelocityRefChip(chip, this.COMPAT);
 
 		double msDTime = chip.dbSoundTimems - msTjaNowTime;
 		double th16DBeat = chip.fBMSCROLLTime - th16NowBeat;
