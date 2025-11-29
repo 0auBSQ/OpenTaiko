@@ -1478,9 +1478,9 @@ internal class CTja : CActivity {
 						if (String.IsNullOrEmpty(line))
 							continue;
 						if (line.IndexOf(',', 0) == -1 && !String.IsNullOrEmpty(line)) {
-							divPerMeasure += line.Count(c => !char.IsWhiteSpace(c));
+							divPerMeasure += line.Count(char.IsAsciiLetterOrDigit);
 						} else {
-							this.divsPerMeasureAllBranches.Add(divPerMeasure + line.Count(c => !char.IsWhiteSpace(c)) - 1);
+							this.divsPerMeasureAllBranches.Add(divPerMeasure + line.Count(char.IsAsciiLetterOrDigit));
 							divPerMeasure = 0;
 						}
 					}
@@ -2751,7 +2751,8 @@ internal class CTja : CActivity {
 				}
 
 				for (int n = 0; n < InputText.Length; n++) {
-					if (InputText.Substring(n, 1) == ",") {
+					string inputChar = InputText.Substring(n, 1);
+					if (inputChar == ",") {
 						if (n文字数 == 0) {
 							this.dbLastTime = this.dbNowTime;
 							this.dbLastBMScrollTime = this.dbNowBMScollTime;
@@ -2763,16 +2764,15 @@ internal class CTja : CActivity {
 						this.b小節線を挿入している = false;
 						return;
 					}
-					if (string.IsNullOrWhiteSpace(InputText.Substring(n, 1))) {
+					if (string.IsNullOrWhiteSpace(inputChar)) {
 						continue; // skip whitespaces
 					}
-
-					if (InputText.Substring(0, 1) == "F") {
-						bool bTest = true;
+					if (!char.IsAsciiLetterOrDigit(inputChar[0])) {
+						this.AddWarn($"Invalid note symbol {inputChar} ignored at measure {this.n現在の小節数}. Input: {InputText}");
+						continue;
 					}
 
-
-					var noteType = NotesManager.GetNoteType(InputText.Substring(n, 1));
+					var noteType = NotesManager.GetNoteType(inputChar);
 
 					if (noteType != NotesManager.ENoteType.Empty) {
 						this.ForEachCurrentBranch((branch) => {
@@ -2804,8 +2804,8 @@ internal class CTja : CActivity {
 
 							if (noteType is NotesManager.ENoteType.Unknown) {
 								this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
-									$"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
-									: $"Unknown note symbol {InputText.Substring(n, 1)} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
+									$"Unknown note symbol {inputChar} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
+									: $"Unknown note symbol {inputChar} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
 							} else {
 								InsertNoteAtDefCursor(noteType, n, n文字数, branch);
 							}
