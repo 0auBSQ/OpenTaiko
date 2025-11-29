@@ -7,7 +7,6 @@ namespace OpenTaiko;
 internal class CAct演奏スコア共通 : CActivity {
 	// Properties
 
-	protected long[] nScoreIncrease;
 	protected double[] nCurrentRealScore;
 	protected long[] nCurrentlyDisplayedScore;
 	//protected CTexture txScore;
@@ -171,10 +170,7 @@ internal class CAct演奏スコア共通 : CActivity {
 	public void Set(double nScore, int player) {
 		if (this.nCurrentRealScore[player] != nScore) {
 			this.nCurrentRealScore[player] = nScore;
-			this.nScoreIncrease[player] = (long)(((double)(this.nCurrentRealScore[player] - this.nCurrentlyDisplayedScore[player])) / 20.0);
-			if (this.nScoreIncrease[player] < 1L) {
-				this.nScoreIncrease[player] = 1L;
-			}
+			this.nCurrentlyDisplayedScore[player] = (long)this.nCurrentRealScore[player];
 		}
 
 	}
@@ -239,7 +235,6 @@ internal class CAct演奏スコア共通 : CActivity {
 	public override void Activate() {
 		this.nCurrentlyDisplayedScore = new long[5] { 0L, 0L, 0L, 0L, 0L };
 		this.nCurrentRealScore = new double[5] { 0L, 0L, 0L, 0L, 0L };
-		this.nScoreIncrease = new long[5] { 0L, 0L, 0L, 0L, 0L };
 
 		for (int sc = 0; sc < 256; sc++) {
 			this.stScore[sc].b使用中 = false;
