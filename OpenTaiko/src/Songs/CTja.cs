@@ -3528,8 +3528,8 @@ internal class CTja : CActivity {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				this.bHIDDENBRANCH = true;
 			}
-		} else if (strCommandName.Equals("LYRICS") && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
+		} else if (strCommandName.Equals("LYRICS") || strCommandName.Equals("LYRICFILE")) {
+			if (!usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4 && !string.IsNullOrEmpty(strCommandParam)) {
 				string[] files = SplitComma(strCommandParam);
 				string[] filePaths = new string[files.Length];
 				for (int i = 0; i < files.Length; i++) {
@@ -3552,25 +3552,6 @@ internal class CTja : CActivity {
 							}
 						} catch (Exception e) {
 							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}: {e.Message}", e);
-						}
-					}
-				}
-			}
-		} else if (strCommandName.Equals("LYRICFILE") && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) {
-			if (!string.IsNullOrEmpty(strCommandParam)) {
-				string[] strFiles = SplitComma(strCommandParam);
-				string[] strFilePath = new string[strFiles.Length];
-				for (int index = 0; index < strFiles.Length; index++) {
-					strFilePath[index] = this.strFolderPath + strFiles[index];
-					if (File.Exists(strFilePath[index])) {
-						try {
-							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
-								this.LyricFileParser(strFilePath[index], index);
-							this.bLyrics = true;
-							this.usingLyricsFile = true;
-						} catch {
-							Console.WriteLine("lrcファイルNo.{0}の読み込みに失敗しましたが、", index);
-							Console.WriteLine("処理を続行します。");
 						}
 					}
 				}
