@@ -464,11 +464,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
 				this.t進行描画_スコア();
 
-			// 3+-player mode character
-			if (OpenTaiko.ConfigIni.ShowChara && OpenTaiko.ConfigIni.nPlayerCount > 2) {
-				this.actChara.Draw();
-			}
-
 			// note effects
 			this.Rainbow.Draw();
 			this.FireWorks.Draw();

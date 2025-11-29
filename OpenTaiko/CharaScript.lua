@@ -685,9 +685,9 @@ local function load_chara_config()
 	--+++++++++++++
 end
 
+load_chara_config()
 
 function loadPreviewTextures()
-	load_chara_config()
 
 	if STORAGE:FileExists("Normal/0.png") then
 		preview = TEXTURE:CreateTexture("Normal/0.png")
