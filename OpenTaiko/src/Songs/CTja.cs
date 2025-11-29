@@ -247,7 +247,7 @@ internal class CTja : CActivity {
 	}
 
 	public int nPlayerSide; //2017.08.14 kairera0467 引数で指定する
-	public bool bSession譜面を読み込む;
+	public bool bLoadChart;
 	public string ARTIST;
 	public string BACKGROUND;
 	public double BASEBPM;
@@ -528,22 +528,17 @@ internal class CTja : CActivity {
 
 		this.CutSceneOutros = new();
 	}
-	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int difficulty)
+	public CTja(string strファイル名, int difficulty = 0, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
 		: this() {
 		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, nBGMAdjust, 0, false, difficulty);
-	}
-	public CTja(string strファイル名, bool bヘッダのみ, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty)
-		: this() {
-		this.Activate();
-		this.t入力(strファイル名, bヘッダのみ, nBGMAdjust, nPlayerSide, bSession, difficulty);
+		this.t入力(strファイル名, difficulty, nPlayerSide, loadChart, nBGMAdjust);
 	}
 
 
 	// メソッド
 
 	public void tAVIの読み込み() {
-		if (!this.bHeaderOnly) {
+		if (this.bLoadChart) {
 			if (this.listVD != null) {
 				foreach (CVideoDecoder cvd in this.listVD.Values) {
 					cvd.InitRead();
@@ -931,8 +926,7 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void t入力(string file_name, bool header_only, int nBGMAdjust, int nPlayerSide, bool bSession, int difficulty) {
-		this.bHeaderOnly = header_only;
+	public void t入力(string file_name, int difficulty, int nPlayerSide, bool loadChart, int nBGMAdjust) {
 		this.strFullPath = Path.GetFullPath(file_name);
 		this.strFileName = Path.GetFileName(this.strFullPath);
 		this.strFolderPath = Path.GetDirectoryName(this.strFullPath) + Path.DirectorySeparatorChar;
@@ -942,15 +936,15 @@ internal class CTja : CActivity {
 
 		try {
 			this.nPlayerSide = nPlayerSide;
-			this.bSession譜面を読み込む = bSession;
-			this.tProcessAllText(CJudgeTextEncoding.ReadTextFile(file_name), nBGMAdjust, difficulty);
+			this.bLoadChart = loadChart;
+			this.tProcessAllText(CJudgeTextEncoding.ReadTextFile(file_name), difficulty, nBGMAdjust);
 		} catch (Exception ex) {
 			Trace.TraceError("Oh? It seems there was an error. Oh brother.");
 			Trace.TraceError(ex.ToString());
 			Trace.TraceError("An exception occurred, but processing will continue. (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void tProcessAllText(string str全入力文字列, int nBGMAdjust, int Difficulty) {
+	public void tProcessAllText(string str全入力文字列, int Difficulty, int nBGMAdjust) {
 		if (!string.IsNullOrEmpty(str全入力文字列)) {
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
@@ -982,7 +976,7 @@ internal class CTja : CActivity {
 			this.n無限管理BPM = null;
 			this.n無限管理PAN = null;
 			this.n無限管理SIZE = null;
-			if (!this.bHeaderOnly) {
+			if (this.bLoadChart) {
 				#region [ CWAV初期化 ]
 				foreach (CWAV cwav in this.listWAV.Values) {
 					if (cwav.nチップサイズ < 0) {
@@ -1845,8 +1839,8 @@ internal class CTja : CActivity {
 			chip.fObjX = float.Parse(args[1]);
 			chip.fObjY = float.Parse(args[2]);
 			var txPath = this.strFolderPath + args[3];
-			Trace.TraceInformation("" + this.bSession譜面を読み込む);
-			if (this.bSession譜面を読み込む) {
+			Trace.TraceInformation("" + this.bLoadChart);
+			if (this.bLoadChart) {
 				var obj = new CSongObject(chip.strObjName, chip.fObjX, chip.fObjY, txPath);
 				this.listObj.Add(args[0], obj);
 			}
@@ -1916,7 +1910,7 @@ internal class CTja : CActivity {
 				.Replace('\\', Path.DirectorySeparatorChar);
 			chip.strNewPath = this.strFolderPath + args[1];
 
-			if (this.bSession譜面を読み込む) {
+			if (this.bLoadChart) {
 				if (!this.listOriginalTextures.ContainsKey(chip.strTargetTxName)) {
 					OpenTaiko.Tx.trackedTextures.TryGetValue(chip.strTargetTxName, out CTexture oldTx);
 					this.listOriginalTextures.Add(chip.strTargetTxName, new CTexture(oldTx));
@@ -4159,7 +4153,6 @@ internal class CTja : CActivity {
 	// その他
 
 	#region [ private ]
-	private bool bHeaderOnly;
 	private Stack<bool> bstackIFからENDIFをスキップする;
 
 	private int n現在の行数;
