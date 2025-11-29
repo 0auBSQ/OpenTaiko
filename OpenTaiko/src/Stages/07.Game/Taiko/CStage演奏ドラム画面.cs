@@ -726,7 +726,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (e判定 != ENoteJudge.Miss) {
 			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, e判定);
 			if (e判定 is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
-				gameType = chipNoHit?.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
+				gameType = NotesManager.GetChipGameType(chipNoHit, nUsePlayer);
 		}
 
 		// Visual and sound effects
@@ -750,7 +750,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (chipNoHit == null || rawJudge is ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
-		EGameType gameType = chipNoHit.eGameType ?? OpenTaiko.ConfigIni.nGameType[nUsePlayer];
+		EGameType gameType = NotesManager.GetChipGameType(chipNoHit, nUsePlayer);
 		PlayerLane.FlashType nLane = NotesManager.PadToLane(nPad, gameType);
 		if (nLane == PlayerLane.FlashType.Total || !NotesManager.IsExpectedPadAnyHit(nPad, chipNoHit, gameType))
 			return ENoteJudge.Miss;
@@ -797,7 +797,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.t背景テクスチャの生成(DefaultBgFilename, bgrect, BgFilename);
 	}
 	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		EGameType _gt = pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
 		#region[ 作り直したもの ]
@@ -1045,7 +1045,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		int n先頭発声位置 = 0;
 
-		EGameType _gt = pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
@@ -1459,7 +1459,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			var timeNow = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			for (int iChip = 0; iChip < this.chipNowProcessingMultiHitNotes[i].Count; ++iChip) {
 				CChip chipNoHit = this.chipNowProcessingMultiHitNotes[i][iChip];
-				EGameType _gt = chipNoHit.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(i)];
+				EGameType _gt = NotesManager.GetChipGameType(chipNoHit, i);
 				bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
 
 				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;

@@ -1294,7 +1294,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				CLagLogger.Add(nPlayer, pChip);
 			}
 
-			EGameType gt = pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+			EGameType gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
 			if (NotesManager.IsRoll(pChip)) {
 				eJudgeResult = this.tRollProcess(pChip, gt, msHitTjaTime, nNowInput, nPlayer);
@@ -3290,7 +3290,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				if (NotesManager.IsFuzeRoll(chip)) {
 					if (!this.bPAUSE && !this.isRewinding) {
-						EGameType gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(iPlayer)];
+						EGameType gt = NotesManager.GetChipGameType(chip, iPlayer);
 						this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
 						OpenTaiko.stageGameScreen.actLaneTaiko.Start(chip, gt, ENoteJudge.Bad, false, iPlayer);
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
@@ -3343,7 +3343,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.Skin.soundBalloon.tPlay();
 			if (!OpenTaiko.Skin.soundBalloon.bIsPlaying)
 				this.PlayHitNoteSound(iPlayer, input); // fallback sound
-			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(iPlayer)], iPlayer, isBalloon: true);
+			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, NotesManager.GetChipGameType(chip, iPlayer), iPlayer, isBalloon: true);
 			OpenTaiko.stageGameScreen.Rainbow.Start(iPlayer);
 			//CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
 			chip.bHit = true;
