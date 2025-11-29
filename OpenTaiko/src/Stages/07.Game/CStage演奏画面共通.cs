@@ -191,7 +191,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bIsDirectSound = (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() == "DirectSound");
 		bUseOSTimer = OpenTaiko.ConfigIni.bUseOSTimer;
 		this.bPAUSE = false;
-		dbSongPlaybackSpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;
 		bValidScore = true;
 
 		#region [ 演奏開始前にmixer登録しておくべきサウンド(開幕してすぐに鳴らすことになるチップ音)を登録しておく ]
@@ -204,7 +203,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (listWAV.TryGetValue(pChip.n整数値_内部番号, out CTja.CWAV wc)) {
 						for (int i = 0; i < nPolyphonicSounds; i++) {
 							if (wc.rSound[i] != null) {
-								OpenTaiko.SoundManager.AddMixer(wc.rSound[i], dbSongPlaybackSpeed, pChip.b演奏終了後も再生が続くチップである);
+								OpenTaiko.SoundManager.AddMixer(wc.rSound[i], OpenTaiko.ConfigIni.SongPlaybackSpeed, pChip.b演奏終了後も再生が続くチップである);
 								//AddMixer( wc.rSound[ i ] );		// 最初はqueueを介さず直接ミキサー登録する
 							}
 						}
@@ -620,7 +619,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected volatile Queue<stmixer> queueMixerSound;      // #24820 2013.1.21 yyagi まずは単純にAdd/Removeを1個のキューでまとめて管理するやり方で設計する
 	protected DateTime dtLastQueueOperation;                //
 	protected bool bIsDirectSound;                          //
-	protected double dbSongPlaybackSpeed;
 	protected bool bValidScore;
 	//		protected bool bDTXVmode;
 	protected STDGBVALUE<bool> bReverse;
@@ -798,7 +796,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					dtLastQueueOperation = dtnow;
 					stmixer stm = queueMixerSound.Dequeue();
 					if (stm.bIsAdd) {
-						OpenTaiko.SoundManager.AddMixer(stm.csound, dbSongPlaybackSpeed, stm.b演奏終了後も再生が続くチップである);
+						OpenTaiko.SoundManager.AddMixer(stm.csound, OpenTaiko.ConfigIni.SongPlaybackSpeed, stm.b演奏終了後も再生が続くチップである);
 					} else {
 						OpenTaiko.SoundManager.RemoveMixer(stm.csound);
 					}
