@@ -43,6 +43,9 @@ internal class CSongListNode {
 	[JsonIgnore] public List<CSongListNode> randomList;     // tree links: rebuilt by enumeration, not cached
 	[JsonIgnore] public List<CSongListNode> childrenList;
 
+	public CTja.ETjaCompat Compat;
+	public bool isChangedCompat;
+
 	public int difficultiesCount; // 4~5 if AD
 
 	[JsonIgnore] public CSongListNode rParentNode;     // re-established from the enumeration context on load

@@ -192,7 +192,7 @@ namespace OpenTaiko {
 				string tjaExt = Path.GetExtension(tjaPath).ToLowerInvariant();
 				CTja src = tjaExt is ".optktci" or ".tci"
 					? new CTci(tjaPath).BuildCtja(diff)
-					: new CTja(tjaPath, diff, 0, loadChart: true);
+					: new CTja(tjaPath, internalNode.Compat, diff, 0, loadChart: true);
 
 				// BGM chip in source is the channel-0x01 chip that plays the audio.
 				CChip? srcBgmChip = src.listChip.FirstOrDefault(c => c.nChannelNo == 0x01);

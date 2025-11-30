@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using OpenTaiko.CSongListNodeComparers;
 
 namespace OpenTaiko;
@@ -159,7 +160,7 @@ internal class CSongManager {
 
 	// Parses a chart file into an unparented song node, without retaining the CTja object.
 	private CSongListNode? ParseUnparentedSongNode(string filePath) {
-		CTja dtx = new CTja(filePath);
+		CTja dtx = new CTja(filePath); // NOTICE: #COMPAT: from box.def is not applied here. Metadata relying on COMPAT might be inaccurate and might need to be avoided
 		CSongListNode? node = CreateUnparentedSongNode(dtx, filePath);
 		dtx.DeActivate();
 		return node;
@@ -354,6 +355,10 @@ internal class CSongManager {
 								value.BoxChara = value.rParentNode.BoxChara;
 								value.isChangedBoxChara = true;
 							}
+							if (value.rParentNode.isChangedCompat) {
+								value.Compat = value.rParentNode.Compat;
+								value.isChangedCompat = true;
+							}
 						}
 
 						this.nSearchSongNodeCount++;
@@ -457,6 +462,10 @@ internal class CSongManager {
 					cSongListNode.BoxChara = boxdef.BoxChara;
 					cSongListNode.isChangedBoxChara = true;
 				}
+				if (boxdef.IsChangedCompat) {
+					cSongListNode.Compat = boxdef.Compat;
+					cSongListNode.isChangedCompat = true;
+				}
 
 
 
@@ -524,6 +533,9 @@ internal class CSongManager {
 						}
 						if (cSongListNode.isChangedBoxChara) {
 							sb.Append(", BoxChara=" + cSongListNode.BoxChara.ToString());
+						}
+						if (cSongListNode.isChangedCompat) {
+							sb.Append(", Compat=" + cSongListNode.Compat.ToString());
 						}
 						Trace.TraceInformation(sb.ToString());
 					} finally {

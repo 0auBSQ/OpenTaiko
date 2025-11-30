@@ -293,6 +293,7 @@ internal class CStageSongLoading : CStage {
 
 					int playerCount = OpenTaiko.ConfigIni.nPlayerCount;
 					int[] chosenDiffs = new int[playerCount];
+					var compat = OpenTaiko.SongMount.rChoosenSong!.Compat;
 					for (int i = 0; i < playerCount; i++)
 						chosenDiffs[i] = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
 
@@ -334,7 +335,7 @@ internal class CStageSongLoading : CStage {
 						_dtxLoadTask = Task.Run(() => {
 							for (int i = 0; i < playerCount; i++) {
 								cts.Token.ThrowIfCancellationRequested();
-								captured[i] = new CTja(str, chosenDiffs[i], i, loadChart: true);
+								captured[i] = new CTja(str, compat, chosenDiffs[i], i, loadChart: true);
 							}
 						}, cts.Token);
 					}

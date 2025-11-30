@@ -611,9 +611,11 @@ internal class CTja : CActivity {
 
 		this.CutSceneOutros = new();
 	}
-	public CTja(string strFileName, int difficulty = 0, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
+	public CTja(string strFileName, ETjaCompat? compatMode = null, int difficulty = 0, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
 		: this() {
 		this.Activate(loadChart);
+		if (compatMode != null)
+			this.COMPAT = compatMode.Value; // default compat mode set by song folder
 		this.tInput(strFileName, difficulty, nPlayerSide, loadChart, nBGMAdjust);
 	}
 
@@ -3801,20 +3803,23 @@ internal class CTja : CActivity {
 				}
 			}
 		} else if (strCommandName.Equals("COMPAT")) {
-			this.COMPAT = strCommandParam.ToLower() switch {
-				"jiro1" => ETjaCompat.Jiro1,
-				"jiro2" => ETjaCompat.Jiro2,
-				"tmg" => ETjaCompat.TMG,
-				"tjap3" => ETjaCompat.TJAP3,
-				"oos" => ETjaCompat.OOS,
-				_ => throw new ArgumentOutOfRangeException("strCompatMode"), // argument shown in AddCommandError()
-			};
+			this.COMPAT = strConvertTjaCompat(strCommandParam);
 		} else {
 			var metadatas = (this.nowCourseScope == (int)Difficulty.Total) ? this.SongListCourseMetadata
 				: [this.SongListCourseMetadata[this.nowCourseScope]];
 			this.ParseQueryableCourseMetadata(metadatas, strCommandName, strCommandParam);
 		}
 	}
+
+	public static ETjaCompat strConvertTjaCompat(string strCommandParam) => strCommandParam.ToLower() switch {
+		"jiro1" => ETjaCompat.Jiro1,
+		"jiro2" => ETjaCompat.Jiro2,
+		"tmg" => ETjaCompat.TMG,
+		"tjap3" => ETjaCompat.TJAP3,
+		"oos" => ETjaCompat.OOS,
+		_ => throw new ArgumentOutOfRangeException("strCompatMode"), // argument shown in AddCommandError()
+	};
+
 	/// <summary>
 	/// 指定した文字が数値かを返すメソッド
 	/// </summary>
