@@ -1095,12 +1095,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			BgFilename = OpenTaiko.TJA.strBGIMAGE_PATH;
 		base.tBackgroundTextureCreate(DefaultBgFilename, bgrect, BgFilename);
 	}
-	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nPlayTime) {
+	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nPlayTime, double th16NowBeat, double th16NowBeatY) {
 		NotesManager.ENoteType nt = NotesManager.GetNoteType(pChip);
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
 		if (NotesManager.IsGenericRoll(nt)) {
-			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, nt, _gt);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, nt, _gt);
 			return;
 		}
 
@@ -1170,7 +1170,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 		#endregion
 	}
-	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime, NotesManager.ENoteType nt, EGameType _gt) {
+	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt) {
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1186,10 +1186,15 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			int yEnd = GetNoteOriginY(nPlayer) + pChip.end.nVerticalChipDistance;
 
 			if (NotesManager.IsGenericBalloon(nt)) {
-				if (nowTime >= pChip.nSoundTimems && nowTime < pChip.end.nSoundTimems) {
-					x = GetNoteOriginX(nPlayer);
+				if (msTjaNowTime >= pChip.nSoundTimems && msTjaNowTime < pChip.end.nSoundTimems) {
+					// TaikoJiro1 behavior: active balloons can still go right
+					if (!(tja.COMPAT is CTja.ETjaCompat.Jiro1 && pChip.nHorizontalChipDistance > 0 && !NotesManager.IsKusudama(pChip))) {
+						pChip.nHorizontalChipDistance = 0;
+						x = GetNoteOriginX(nPlayer);
+					}
+					pChip.nVerticalChipDistance = 0;
 					y = GetNoteOriginY(nPlayer);
-				} else if (nowTime >= pChip.end.nSoundTimems) {
+				} else if (msTjaNowTime >= pChip.end.nSoundTimems) {
 					x = xEnd;
 					y = yEnd;
 				}
@@ -1207,7 +1212,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			bool isBodyXInScreen = (Math.Min(x, xEnd) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, xEnd) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
 			if (pHasBar) {
-				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, nowTime);
+				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime, th16NowBeatX, th16NowBeatY);
 			}
 
 			#region[ HIDSUD & STEALTH ]
@@ -1271,7 +1276,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 								if (senote == 0xA && _gt is EGameType.Konga) // DRUMROLL
 									senote = 7; // drumroll
 
-								if (pChip.bShowRoll) {
+								if (pChip.canShowBody) {
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = xEnd - x - 44 - _shift;
 									OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = 1.0f;
@@ -1336,11 +1341,28 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	/// Detect and hide screen-obscuring rolls when any tips are out of screen
-	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, long nowTime) {
-		// display judging rolls
-		if (nowTime >= pChip.nSoundTimems && nowTime <= pChip.end.nSoundTimems) {
-			pChip.bShowRoll = true;
+	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY) {
+		// display judging and in-beat rolls
+		if (msTjaNowTime >= pChip.nSoundTimems && msTjaNowTime <= pChip.end.nSoundTimems) {
+			pChip.canShowBody = true;
 			return;
+		}
+		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
+			var (th16ChipBeatX, th16ChipBeatY) = (pChip.fBMSCROLLTime, pChip.fBMSCROLLTime);
+			var (th16ChipEndBeatX, th16ChipEndBeatY) = (pChip.end.fBMSCROLLTime, pChip.end.fBMSCROLLTime);
+			var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
+			if (compat is CTja.ETjaCompat.Jiro1) {
+				th16ChipBeatX += pChip.bpmPoint!.th16BeatDriftX;
+				th16ChipBeatY += pChip.bpmPoint!.th16BeatDriftY;
+				th16ChipEndBeatX += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftX;
+				th16ChipEndBeatY += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftY;
+			}
+			if ((th16NowBeatX >= th16ChipBeatX && th16NowBeatX <= th16ChipEndBeatX)
+					|| (th16NowBeatY >= th16ChipBeatY && th16NowBeatY <= th16ChipEndBeatY)
+					) {
+				pChip.canShowBody = true;
+				return;
+			}
 		}
 
 		// ignore already out-of-screen rolls
@@ -1355,7 +1377,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		bool endInScreen = (xEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && xEnd < OpenTaiko.Skin.Resolution[0])
 			&& (yEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[1] && yEnd < OpenTaiko.Skin.Resolution[1]);
 		if (headInScreen && endInScreen) {
-			pChip.bShowRoll = true;
+			pChip.canShowBody = true;
 			return;
 		}
 
@@ -1381,7 +1403,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		// If the nearest point is roll body, only orthogonal moves may prevent obscuring.
 		float drAway = (pos > 0 && pos < 1) ? Math.Abs(Vector2.Dot(dr, rollNorm)) : dr.Length();
 		bool canMoveAway = drAway >= drCanMoveAwayMin;
-		pChip.bShowRoll = canMoveAway;
+		pChip.canShowBody = canMoveAway;
 	}
 
 	private static float NearestLineSegRelPos(Vector2 head, Vector2 end, Vector2 target) {
@@ -1401,13 +1423,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	protected override void tProgressDraw_Chip_FillIn(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime) {
 
 	}
-	protected override void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime) {
+	protected override void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime, bool isBranched) {
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
 		int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
 		int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 
-		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
+		if ((pChip.bVisible && !pChip.bHideBarLine && pChip.canShowBody) && (OpenTaiko.Tx.Bar != null)) {
 			var width = OpenTaiko.Tx.Bar.szTextureSize.Width;
 			var height = OpenTaiko.Skin.Game_Notes_Size[1];
 			var maxRadius = width + height; // upper limit of Math.Hypot(width, height) and a close approximant because width is small
@@ -1415,7 +1437,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				float opacity = this.actFlashlight.NoteOpacity(nPlayer, x, y);
 				if (opacity <= 0f) return;
 				double theta = (pChip.dbSCROLL_Y == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
-				CTexture tex = (pChip.bBranch) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
+				CTexture tex = (isBranched) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
 				int savedOpacity = tex.Opacity;
 				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);
 				tex.fZAxisCenterRotate = (float)theta;

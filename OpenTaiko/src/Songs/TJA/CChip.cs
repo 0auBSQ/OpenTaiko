@@ -8,9 +8,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool bHit; // note is hit/broken or roll end is reached
 	public bool bVisible = true;
 	public bool bHideBarLine = true;
-	public bool bProcessed = false; // roll-type-only: roll is hit once (roll-head-only) or chip time is reached
+	public bool bProcessed = false; // roll-type: roll is hit once (roll-head-only) or chip time is reached; barline shown (Jiro1)
 	public bool bShow;
-	public bool bShowRoll;
+	public bool canShowBody = true; // not hidden by cutoff rules
 	public bool bBranch = false;
 	public double dbChipSizeRatio = 1.0;
 	public double dbDoubleValue;
@@ -60,6 +60,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int nIntValue;
 	public int nTextCount = 16;
 
+	public CBPM? bpmPoint;
 	public int nIntValue_InternalNumber;
 	public int nOpacity = 255;
 	public int nSoundPos;
@@ -358,34 +359,21 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	#region [ IComparable 実装 ]
 	//-----------------
 
-	private static readonly byte[] nPriority = new byte[] {
-			5, 5, 3, 7, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 5, //0x00
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x10
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x20
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x30
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x40
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x50 // preserve definition order of bar lines relative to notes
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x60
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x70
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x80
-			5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 9, 9, //0x90
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xA0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xB0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xC0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 6, 6, //0xD0 // required process order: notes -> 0xDE (branch animation) -> 0xDD (#SECTION)
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xE0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0xF0
-			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
-		};
+	// required process order: notes -> 0xDE (branch animation) -> 0xDD (#SECTION)
+	private static int nPriority(int channelNo) => channelNo switch {
+		0xDD => 7, // #SECTION
+		0xDE => 6, // branch animation
+		_ => 5,   // default
+	};
 
-	public static readonly int nChannelNoMostPrior = Array.IndexOf(nPriority, nPriority.Min());
-	public static readonly int nChannelNoLeastPrior = Array.IndexOf(nPriority, nPriority.Max());
+	public const int nChannelNoMostPrior = 0;
+	public const int nChannelNoLeastPrior = 0xDD; // #SECTION
 
 	public int CompareTo(CChip other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
 		// 位置が同じなら優先度で比較。
-		return (this.nSoundTimems, this.dbSoundTimems, nPriority[this.nChannelNo], this.idxDefine)
-			.CompareTo((other.nSoundTimems, other.dbSoundTimems, nPriority[other.nChannelNo], other.idxDefine));
+		return (this.nSoundTimems, this.dbSoundTimems, nPriority(this.nChannelNo), this.idxDefine)
+			.CompareTo((other.nSoundTimems, other.dbSoundTimems, nPriority(other.nChannelNo), other.idxDefine));
 	}
 	//-----------------
 	#endregion

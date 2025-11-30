@@ -160,7 +160,7 @@ internal class CSongManager {
 
 	// Parses a chart file into an unparented song node, without retaining the CTja object.
 	private CSongListNode? ParseUnparentedSongNode(string filePath) {
-		CTja dtx = new CTja(filePath); // NOTICE: #COMPAT: from box.def is not applied here. Metadata relying on COMPAT might be inaccurate and might need to be avoided
+		CTja dtx = new CTja(filePath);
 		CSongListNode? node = CreateUnparentedSongNode(dtx, filePath);
 		dtx.DeActivate();
 		return node;
@@ -1017,6 +1017,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		if (parent.isChangedBgType) { node.BgType = parent.BgType; node.isChangedBgType = true; }
 		if (parent.isChangedBoxType) { node.BoxType = parent.BoxType; node.isChangedBoxType = true; }
 		if (parent.isChangedBoxChara) { node.BoxChara = parent.BoxChara; node.isChangedBoxChara = true; }
+		if (parent.isChangedCompat) { node.Compat = parent.Compat; node.isChangedCompat = true; }
 		if (node.score[0] != null && parent.score[0] != null && string.IsNullOrEmpty(node.score[0].ChartInfo.Preimage))
 			node.score[0].ChartInfo.Preimage = parent.score[0].ChartInfo.Preimage;
 	}

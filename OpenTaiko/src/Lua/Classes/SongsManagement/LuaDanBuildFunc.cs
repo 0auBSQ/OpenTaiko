@@ -261,6 +261,7 @@ namespace OpenTaiko {
 					animBpmListIdx = output.listBPM.Count;
 					double th16AtAnimBpm = bmscrollAccum;   // th16 at nextsongTime+1.0
 					output.listBPM.Add(new CTja.CBPM {
+						point_type = CTja.EBPMPointType.InitBpm,
 						nInternalNumber = animBpmListIdx,
 						nNotationTopNumber = animBpmListIdx,
 						dbBPMValue = srcInitialBpm,
@@ -283,6 +284,7 @@ namespace OpenTaiko {
 					for (int ib = 0; ib < 3; ib++) {
 						double branchBpm = (ib < src.listBPM.Count) ? src.listBPM[ib].dbBPMValue : 120.0;
 						output.listBPM.Add(new CTja.CBPM {
+							point_type = CTja.EBPMPointType.InitBpm,
 							nInternalNumber = ib,
 							nNotationTopNumber = ib,
 							dbBPMValue = branchBpm,
@@ -309,14 +311,11 @@ namespace OpenTaiko {
 				for (int bi = 3; bi < src.listBPM.Count; bi++) {
 					var srcBpm = src.listBPM[bi];
 					int newIdx = output.listBPM.Count;
-					output.listBPM.Add(new CTja.CBPM {
-						nInternalNumber = newIdx,
-						nNotationTopNumber = srcBpm.nNotationTopNumber,
-						dbBPMValue = srcBpm.dbBPMValue,
-						bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset,
-						bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum,
-						bpm_change_course = srcBpm.bpm_change_course,
-					});
+					var bpm = srcBpm.Copy();
+					bpm.nInternalNumber = newIdx;
+					bpm.bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset;
+					bpm.bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum;
+					output.listBPM.Add(bpm);
 					bpmIdxMap[bi] = newIdx;
 				}
 

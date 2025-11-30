@@ -398,7 +398,7 @@ class NotesManager {
 		int savedOpacity = _texarr.Opacity;
 		if (opacity < 1f) _texarr.Opacity = (int)(savedOpacity * opacity);
 
-		if (chip.bShowRoll) {
+		if (chip.canShowBody) {
 			var theta = -Math.Atan2(yEnd - y, xEnd - x);
 
 			var dist = Math.Sqrt(Math.Pow(xEnd - x, 2) + Math.Pow(yEnd - y, 2));

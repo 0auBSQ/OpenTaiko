@@ -124,12 +124,12 @@ internal class CActImplBalloon : CActivity {
 				num_y = OpenTaiko.Skin.Game_Balloon_Balloon_Number_Y[player];
 			}
 
-			x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
-			y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
-			frame_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
-			frame_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
-			num_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player);
-			num_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player);
+			x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player) + chip.nHorizontalChipDistance;
+			y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player) + chip.nVerticalChipDistance;
+			frame_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player) + chip.nHorizontalChipDistance;
+			frame_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player) + chip.nVerticalChipDistance;
+			num_x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(player) + chip.nHorizontalChipDistance;
+			num_y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(player) + chip.nVerticalChipDistance;
 
 			for (int j = 0; j < 5; j++) {
 
