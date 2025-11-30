@@ -279,7 +279,7 @@ internal class CTja : CActivity {
 	public Color DANTICKCOLOR = Color.White;
 
 	public Dictionary<int, CVideoDecoder> listVD;
-	public Dictionary<int, CBPM> listBPM; // Initial 3 for each branch
+	public List<CBPM> listBPM; // Initial 3 for each branch
 	public List<CChip> listChip; // increasing time > chip priority > definition order
 	public List<CChip> listBarLineChip; // increasing definition order
 	public List<CChip> listNoteChip; // increasing definition order
@@ -954,7 +954,6 @@ internal class CTja : CActivity {
 				this.n無限管理SIZE[j] = -j;
 			}
 			this.n内部番号WAV1to = 1;
-			this.n内部番号BPM1to = 1;
 			this.bstackIFからENDIFをスキップする = new Stack<bool>();
 			this.bstackIFからENDIFをスキップする.Push(false);
 			this.n現在の乱数 = 0;
@@ -1107,7 +1106,7 @@ internal class CTja : CActivity {
 						{
 								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
-								if (this.listBPM.TryGetValue(chip.n整数値_内部番号, out CBPM cBPM)) {
+								if (this.listBPM.ElementAtOrDefault(chip.n整数値_内部番号) is CBPM cBPM) {
 									bpm = cBPM.dbBPM値;
 									this.dbNowBPM = bpm;
 								}
@@ -1250,7 +1249,7 @@ internal class CTja : CActivity {
 					foreach (CWAV cwav in this.listWAV.Values) {
 						Trace.TraceInformation(cwav.ToString());
 					}
-					foreach (CBPM cbpm3 in this.listBPM.Values) {
+					foreach (CBPM cbpm3 in this.listBPM) {
 						Trace.TraceInformation(cbpm3.ToString());
 					}
 					foreach (CChip chip in this.listChip) {
@@ -2283,16 +2282,15 @@ internal class CTja : CActivity {
 	}
 
 	private CBPM SetBPMPointAtDefCursor(ECourse branch) {
-		CBPM bpmPoint = this.listBPM[this.n内部番号BPM1to - 1] = new CBPM() {
-			n内部番号 = this.n内部番号BPM1to - 1,
+		CBPM bpmPoint = new CBPM() {
+			n内部番号 = this.listBPM.Count,
 			n表記上の番号 = this.listChip.Count,
 			dbBPM値 = this.dbNowBPM,
 			bpm_change_time = this.dbNowTime,
 			bpm_change_bmscroll_time = this.dbNowBMScollTime,
 			bpm_change_course = branch,
 		};
-
-		this.n内部番号BPM1to++;
+		this.listBPM.Add(bpmPoint);
 
 		return bpmPoint;
 	}
@@ -4047,7 +4045,7 @@ internal class CTja : CActivity {
 			}
 		}
 		this.listWAV = new Dictionary<int, CWAV>();
-		this.listBPM = new Dictionary<int, CBPM>();
+		this.listBPM = new();
 		this.listJPOSSCROLL = new List<CJPOSSCROLL>();
 		this.listVD = new Dictionary<int, CVideoDecoder>();
 		this.listChip = new List<CChip>();
@@ -4160,7 +4158,6 @@ internal class CTja : CActivity {
 
 	private int nPolyphonicSounds = 4;                          // #28228 2012.5.1 yyagi
 
-	private int n内部番号BPM1to;
 	private int n内部番号WAV1to;
 	private int[] n無限管理BPM;
 	private int[] n無限管理PAN;
