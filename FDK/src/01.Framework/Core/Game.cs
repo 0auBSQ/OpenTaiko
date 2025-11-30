@@ -484,7 +484,12 @@ public abstract class Game : IDisposable {
 	public void Window_Update(double deltaTime) {
 		double fps = 1.0f / deltaTime;
 		TimeMs = (long)(Window_.Time * 1000);
+		unsafe {
+			Silk.NET.SDL.Event sdlEvent;
+			while (Silk.NET.SDL.SdlProvider.SDL.Value.PollEvent(&sdlEvent) != 0) {
 
+			}
+		}
 		Update();
 
 		ImGuiController?.Update((float)deltaTime);

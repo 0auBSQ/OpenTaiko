@@ -441,33 +441,33 @@ internal class OpenTaiko : Game {
 		}
 
 		if (ConfigIsNew) {
-			GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+			GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 
 			if (OperatingSystem.IsWindows()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 				ConfigIni.nGraphicsDeviceType = 0;
 			}
 			// While we aren't able to support MacOS, this check is included just in case this changes.
 			else if (OperatingSystem.IsMacOS()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				GraphicsDeviceType_ = AnglePlatformType.Metal;
 				ConfigIni.nGraphicsDeviceType = 3;
 			} else if (OperatingSystem.IsLinux()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				GraphicsDeviceType_ = AnglePlatformType.Vulkan;
 				ConfigIni.nGraphicsDeviceType = 2;
 			}
 		} else {
 			switch (ConfigIni.nGraphicsDeviceType) {
 				case 0:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+					GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 					break;
 				case 1:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+					GraphicsDeviceType_ = AnglePlatformType.D3D11;
 					break;
 				case 2:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+					GraphicsDeviceType_ = AnglePlatformType.Vulkan;
 					break;
 				case 3:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+					GraphicsDeviceType_ = AnglePlatformType.Metal;
 					break;
 			}
 		}
