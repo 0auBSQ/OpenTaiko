@@ -1379,14 +1379,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					var rollCount = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaRollCount : chkChip.nRollCount;
 					if (!this.bPAUSE && !this.isRewinding && !NotesManager.IsFuzeRoll(chkChip))
 						chkChip.bShow = false;
-					this.actBalloon.On進行描画(
-						balloon,
-						balloon - rollCount,
-						i,
-						NotesManager.IsFuzeRoll(chkChip) ? CActImplBalloon.EBalloonType.FUSEROLL
-							: NotesManager.IsKusudama(chkChip) ? CActImplBalloon.EBalloonType.KUSUDAMA
-							: CActImplBalloon.EBalloonType.BALLOON
-					);
+					this.actBalloon.On進行描画(balloon, balloon - rollCount, i, chkChip);
 				}
 			}
 			if (msBarRollProgress != this.msCurrentBarRollProgress[i]) {
