@@ -67,24 +67,44 @@ class NotesManager {
 		=> NoteTypeToChar.GetValueOrDefault(nt);
 	public static int ToChannelNo(ENoteType nt) => (int)nt;
 
-	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+	public static double GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll) {
 			scroll = 1.0;
 		}
-		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
-		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
-		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
-		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
+		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+		return PxFromN4BeatsX(n4Beats);
 	}
 
-	public static int GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+	public static double PxFromN4BeatsX(double n4Beats) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		return n4Beats * pxPer4Beats * screenScale;
+	}
+
+	public static double N4BeatsFromPxX(double px) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		return px / pxPer4Beats / screenScale;
+	}
+
+	public static double GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
 			return 0;
 		}
+		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+		return PxFromN4BeatsY(n4Beats);
+	}
+
+	public static double PxFromN4BeatsY(double n4Beats) {
 		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
 		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
-		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
-		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
+		return n4Beats * pxPer4Beats * screenScale;
+	}
+
+	public static double N4BeatsFromPxY(double px) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
+		return px * pxPer4Beats * screenScale;
 	}
 
 	public static double getN4Beats(double msDTime, double th16DBeat, double bpm, EScrollMode eScrollMode)
