@@ -549,12 +549,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 						if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-								character.PlayAnimation(i, CCharacter.ANIM_GAME_10COMBO_MAX);
+								actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_10COMBO_MAX);
 							}
 						} else if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-							character.PlayAnimation(i, CCharacter.ANIM_GAME_CLEARED);
+							actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_CLEARED);
 						} else {
-							character.PlayAnimation(i, CCharacter.ANIM_GAME_FAILED);
+							actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_FAILED);
 						}
 					}
 				}

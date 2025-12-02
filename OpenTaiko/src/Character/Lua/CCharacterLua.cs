@@ -1,9 +1,26 @@
 using FDK;
+using Silk.NET.Maths;
 
 namespace OpenTaiko;
 
 class CCharacterLua : CCharacter {
 	private CLuaCharacterScript[] Script = new CLuaCharacterScript[5];
+
+	private Dictionary<string, int>[] animationLoadCounts = new Dictionary<string, int>[5] {
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>()
+	};
+
+	private Dictionary<string, int>[] voiceLoadCounts = new Dictionary<string, int>[5] {
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>(),
+		new Dictionary<string, int>()
+	};
 
 	public CLuaCharacterScript GetScript(int player) => Script[player];
 
@@ -11,90 +28,130 @@ class CCharacterLua : CCharacter {
 		for (int player = 0; player < 5; player++) {
 			Script[player] = new CLuaCharacterScript(path, null, null, true);
 		}
-		Script[0].LEGACY_LoadPreviewTextures();
-	}
-
-	public override void LoadGeneralTextures(int player) {
-		base.LoadGeneralTextures(player);
-		Script[player].LoadGeneralTextures();
-	}
-
-	public override void DisposeGeneralTextures(int player) {
-		base.DisposeGeneralTextures(player);
-		Script[player].DisposeGeneralTextures();
 	}
 
 	public override void Dispose() {
 		base.Dispose();
 		for (int player = 0; player < 5; player++) {
 			Script[player].Dispose();
+			voiceLoadCounts[player].Clear();
 		}
-		Script[0].LEGACY_DisposePreviewTextures();
 	}
 
-	public override void GameInit(int player) {
-		base.GameInit(player);
-		Script[player].GameInit();
+	public override void LoadAnimation(int player, string animationType) {
+		if (animationType == ANIM_NONE) return;
+		Dictionary<string, int> animationCounts = animationLoadCounts[player];
+		if (!animationCounts.ContainsKey(animationType)) animationCounts.Add(animationType, 0);
+
+		animationCounts[animationType]++;
+
+		if (animationCounts[animationType] == 1) {
+			ImplLoadAnimation(player, animationType);
+			bool avaiable = AvaiableAnimation(player, animationType, false);
+			if (!avaiable) {
+				animationCounts[animationType]--;
+
+				string alternative = GetAlternativeAnimation(animationType);
+				LoadAnimation(player, alternative);
+			}
+		}
+
 	}
 
-	public override void Update(int player) {
-		base.Update(player);
-		Script[player].Update();
+	public override void DisposeAnimation(int player, string animationType) {
+		if (animationType == ANIM_NONE) return;
+
+		bool avaiable = AvaiableAnimation(player, animationType, false);
+		if (!avaiable) {
+			string alternative = GetAlternativeAnimation(animationType);
+			DisposeAnimation(player, alternative);
+			return;
+		}
+
+		Dictionary<string, int> animationCounts = animationLoadCounts[player];
+		if (!animationCounts.ContainsKey(animationType)) animationCounts.Add(animationType, 1);
+
+		animationCounts[animationType]--;
+
+		if (animationCounts[animationType] == 0) {
+			ImplDisposeAnimation(player, animationType);
+			animationCounts.Remove(animationType);
+		}
 	}
 
-	public override void TowerNextFloor() {
-		base.TowerNextFloor();
-		Script[0].TowerNextFloor();
+	public override bool AvaiableAnimation(int player, string animationType, bool useAlternative = true) {
+		if (animationType == ANIM_NONE) return false;
+		for (int i = 0; i < 5; i++) {
+			bool avaiable = Script[player].AvaialbeAnimation(animationType);
+			if (avaiable) return true;
+			if (!useAlternative) return false;
+
+			animationType = GetAlternativeAnimation(animationType);
+		}
+		return false;
 	}
 
-	public override void TowerFinish() {
-		base.TowerFinish();
-		Script[0].TowerFinish();
+	public override void SetAnimationDuration(int player, string animationType, double duration) {
+		Script[player].SetAnimationDuration(GetAnimation(player, this, animationType), duration);
 	}
 
-	public override void Draw(int player, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
-		base.Draw(player, x, y, scaleX, scaleY, opacity, color, flipX);
-		Script[player].Draw(x, y, scaleX, scaleY, opacity, color != null ? new LuaColor(color) : new LuaColor(255, 255, 255, 255), flipX);
+	public override void ResetAnimationCounter(int player, string animationType) {
+		Script[player].ResetAnimationCounter(GetAnimation(player, this, animationType));
 	}
 
-	public override void DrawPreview(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
-		base.DrawPreview(x, y, scaleX, scaleY, opacity, color, flipX);
-		Script[0].DrawPreview(x, y, scaleX, scaleY, opacity, color != null ? new LuaColor(color) : new LuaColor(255, 255, 255, 255), flipX);
+	//voice-------------
+	public override void LoadVoice(int player, string voice) {
+		Dictionary<string, int> voiceCounts = voiceLoadCounts[player];
+		if (!voiceCounts.ContainsKey(voice)) voiceCounts.Add(voice, 0);
+
+		if (voiceCounts[voice] == 0) {
+			ImplLoadVoice(player, voice);
+		}
+
+		voiceCounts[voice]++;
 	}
 
-	public override void DrawHeyaRender(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
-		base.DrawHeyaRender(x, y, scaleX, scaleY, opacity, color, flipX);
-		Script[0].DrawHeyaRender(x, y, scaleX, scaleY, opacity, color != null ? new LuaColor(color) : new LuaColor(255, 255, 255, 255), flipX);
+	public override void DisposeVoice(int player, string voice) {
+		Dictionary<string, int> voiceCounts = voiceLoadCounts[player];
+		if (!voiceCounts.ContainsKey(voice)) voiceCounts.Add(voice, 0);
+
+		if (voiceCounts[voice] <= 0) return;
+		voiceCounts[voice]--;
+
+		if (voiceCounts[voice] == 0) {
+			ImplDisposeVoice(player, voice);
+			voiceCounts.Remove(voice);
+		}
 	}
 
-	public override void DrawTower() {
-		base.DrawTower();
-		Script[0].DrawTower();
+	public override bool Update(int player, string animationType, bool looping = true) {
+		return Script[player].Update(OpenTaiko.FPS.DeltaTime, GetAnimation(player, this, animationType), looping);
+	}
+
+	public override void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
+		Script[player].Draw(GetAnimation(player, this, animationType), x, y, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), flipX);
 	}
 
 
-	public override void SetLoopAnimation(int player, string animationType, bool loop = true) {
-		base.SetLoopAnimation(player, animationType, loop);
-		Script[player].SetLoopAnimation(animationType, loop);
+	private void ImplLoadAnimation(int player, string animationType) {
+		Script[player].LoadAnimation(animationType);
 	}
 
-	public override void PlayAnimation(int player, string animationType) {
-		base.PlayAnimation(player, animationType);
-		Script[player].PlayAnimation(animationType);
+	private void ImplDisposeAnimation(int player, string animationType) {
+		Script[player].DisposeAnimation(animationType);
 	}
 
-	public override void PlayVoice(int player, string voiceType) {
-		base.PlayVoice(player, voiceType);
-		Script[player].PlayVoice(voiceType);
+	public override void PlayVoice(int player, string voice) {
+		Script[player].PlayVoice(voice);
 	}
 
-	public override void SetAnimationDuration(int player, double ms) {
-		base.SetAnimationDuration(player, ms);
-		Script[player].SetAnimationDuration(ms);
+	private void ImplLoadVoice(int player, string voice) {
+		Script[player].LoadVoice(voice);
 	}
 
-	public override void SetAnimationCyclesToBPM(int player, double bpm) {
-		base.SetAnimationCyclesToBPM(player, bpm);
-		Script[player].SetAnimationCyclesToBPM(bpm);
+	private void ImplDisposeVoice(int player, string voice) {
+		Script[player].DisposeVoice(voice);
 	}
+
+	//------------------
 }

@@ -91,6 +91,20 @@ internal class CActImplBackground : CActivity {
 			IsDownNotFound = true;
 		}
 
+		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED);
+			CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_FAIL);
+
+			CCharacter.AddEssentialVoice(0, CCharacter.VOICE_TOWER_MISS);
+		}
+
 		this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_Tower_Font_TowerText);
 
 		/*
@@ -175,6 +189,20 @@ internal class CActImplBackground : CActivity {
 	public override void DeActivate() {
 		if (this.IsDeActivated)
 			return;
+
+		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_STANDING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED);
+			CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_GAME_TOWER_FAIL);
+
+			CCharacter.RemoveEssentialVoice(0, CCharacter.VOICE_TOWER_MISS);
+		}
 
 		OpenTaiko.tDisposeSafely(ref UpScript);
 		OpenTaiko.tDisposeSafely(ref DownScript);
@@ -419,14 +447,14 @@ internal class CActImplBackground : CActivity {
 
 			CCharacter character = CCharacter.GetCharacter(OpenTaiko.SaveFile);
 			float liveState = (CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives);
-			//bool ctIsTired = !(liveState >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
+			bool ctIsTired = !(liveState >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 
 			bool stageEnded = OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
 				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 				ctClimbDuration.Start(0, 1500, 120f / floorBPM, OpenTaiko.Timer);
-				character.TowerNextFloor();
+				//character.TowerNextFloor();
 				/*
 				ctStandingAnimation.Start(0, 1000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctClimbingAnimation.Start(0, 1000, (120000f / floorBPM) / OpenTaiko.Skin.Characters_Tower_Climbing_Ptn[currentCharacter], OpenTaiko.Timer);
@@ -439,8 +467,6 @@ internal class CActImplBackground : CActivity {
 
 			bool isClimbing = ctClimbDuration.CurrentValue > 0 && ctClimbDuration.CurrentValue < 1500;
 
-			character.DrawTower();
-
 			if (stageEnded && !TowerFinished && !isClimbing) {
 				//float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 				/*
@@ -448,9 +474,43 @@ internal class CActImplBackground : CActivity {
 				ctClearTiredAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Clear_Tired[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter], OpenTaiko.Timer);
 				ctFailAnimation.Start(0, 20000, (60000f / floorBPM) * OpenTaiko.Skin.Characters_Beat_Tower_Fail[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter], OpenTaiko.Timer);
 				*/
-				character.TowerFinish();
+				//character.TowerFinish();
 				TowerFinished = true;
 			}
+
+			float x = OpenTaiko.Skin.Game_Tower_Don[0];
+			float y = OpenTaiko.Skin.Game_Tower_Don[1];
+
+			string animation = CCharacter.ANIM_GAME_TOWER_STANDING;
+			if (isClimbing) {
+				if (ctClimbDuration.CurrentValue <= 1000) {
+					animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED : CCharacter.ANIM_GAME_TOWER_CLIMBING;
+
+					float value = ctClimbDuration.CurrentValue / 1000f;
+					x += value * OpenTaiko.Skin.Game_Tower_Don_Move[0];
+					y += value * OpenTaiko.Skin.Game_Tower_Don_Move[1];
+				} else if (ctClimbDuration.CurrentValue < 1500) {
+					animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED : CCharacter.ANIM_GAME_TOWER_RUNNING;
+
+					float value = (ctClimbDuration.CurrentValue - 1000) / 500f;
+					float returnValue = 1.0f - value;
+					x += returnValue * OpenTaiko.Skin.Game_Tower_Don_Move[0];
+					y += returnValue * OpenTaiko.Skin.Game_Tower_Don_Move[1];
+				}
+			} else if (stageEnded && CFloorManagement.CurrentNumberOfLives == 0) {
+				animation = CCharacter.ANIM_GAME_TOWER_FAIL;
+			} else if (stageEnded && CFloorManagement.CurrentNumberOfLives > 0) {
+				animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED : CCharacter.ANIM_GAME_TOWER_CLEAR;
+			} else if (!stageEnded) {
+				animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_STANDING_TIRED : CCharacter.ANIM_GAME_TOWER_STANDING;
+			}
+
+			character.SetAnimationCyclesFromBPM(0, animation, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+
+			if (!OpenTaiko.stageGameScreen.bPAUSE) {
+				character.Update(0, animation);
+			}
+			character.Draw(0, animation, x, y);
 
 			if (isClimbing) {
 				// Tired Climb

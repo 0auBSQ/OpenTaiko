@@ -436,7 +436,7 @@ public static class ImGuiDebugWindow {
 								OpenTaiko.SaveFileInstances[save].data.Character = chara;
 
 								OpenTaiko.SaveFileInstances[save].tUpdateCharacterName(OpenTaiko.Tx.Characters[chara].dirName);
-								OpenTaiko.Tx.Characters[chara].PlayVoice(chara, CCharacter.VOICE_TITLE_SANKA);
+								//OpenTaiko.Tx.Characters[chara].PlayVoice(0, CCharacter.VOICE_TITLE_SANKA);
 								/*
 								foreach (var animation in Enum.GetValues<CMenuCharacter.ECharacterAnimation>()) {
 									CMenuCharacter.tMenuResetTimer(animation);

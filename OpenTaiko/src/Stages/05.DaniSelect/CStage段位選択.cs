@@ -31,9 +31,12 @@ class CStage段位選択 : CStage {
 		ctChara_In = new CCounter();
 
 		// ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
+
+		CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+
 		CCharacter character = CCharacter.GetCharacter(0);
-		character.SetLoopAnimation(0, CCharacter.ANIM_MENU_NORMAL);
-		character.SetAnimationDuration(0, CCharacter.DEFAULT_DURATION);
+		characterController = new CCharacterController(0);
+		characterController.strLoopAnimation = CCharacter.ANIM_MENU_NORMAL;
 
 
 		bInSongPlayed = false;
@@ -43,21 +46,31 @@ class CStage段位選択 : CStage {
 		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.DANISELECT}Script.lua"));
 		Background.Init();
 
+		CCharacter.AddEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTSTART);
+		CCharacter.AddEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTPROMPT);
+
 		base.Activate();
 	}
 
 	public override void DeActivate() {
 		OpenTaiko.tDisposeSafely(ref Background);
 
+		CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+
+		CCharacter.RemoveEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTSTART);
+		CCharacter.RemoveEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTPROMPT);
+
 		base.DeActivate();
 	}
 
 	public override void CreateManagedResource() {
 
+
 		base.CreateManagedResource();
 	}
 
 	public override void ReleaseManagedResource() {
+
 
 		base.ReleaseManagedResource();
 	}
@@ -230,8 +243,9 @@ class CStage段位選択 : CStage {
 				int chara_x = OpenTaiko.Skin.SongSelect_NamePlate_X[0] + OpenTaiko.Tx.NamePlateBase.szTextureSize.Width / 2;
 				int chara_y = OpenTaiko.Skin.SongSelect_NamePlate_Y[0];
 
-				CCharacter.GetCharacter(OpenTaiko.SaveFile).Update(0);
-				CCharacter.GetCharacter(OpenTaiko.SaveFile).Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
+				characterController.dbDuration = CCharacter.DEFAULT_DURATION;
+				characterController.Update(0);
+				characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
 
 				#region [PuchiChara]
 
@@ -360,4 +374,6 @@ class CStage段位選択 : CStage {
 	public CActSelect段位リスト 段位リスト;
 	public CActSelect段位挑戦選択画面 段位挑戦選択画面;
 	public CActPlayOption actPlayOption;
+
+	private CCharacterController characterController;
 }

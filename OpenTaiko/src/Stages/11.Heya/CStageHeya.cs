@@ -1,4 +1,5 @@
 using FDK;
+using OpenTaiko.Animations;
 using Color = System.Drawing.Color;
 
 namespace OpenTaiko;
@@ -31,13 +32,7 @@ class CStageHeya : CStage {
 
 		ctChara_In = new CCounter();
 		//ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
-
-		for (int i = 0; i < 5; i++)
-		{
-			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-			character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
-			character.PlayAnimation(i, CCharacter.ANIM_MENU_NORMAL);
-		}
+		characterController = new CCharacterController(0);
 
 		bInSongPlayed = false;
 
@@ -165,11 +160,21 @@ class CStageHeya : CStage {
 		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.HEYA}Script.lua"));
 		Background.Init();
 
+		CCharacter.AddPreviewAnimation(CCharacter.ANIM_PREVIEW);
+		CCharacter.AddPreviewAnimation(CCharacter.ANIM_RENDER);
+		CCharacter.AddEssentialAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+		CCharacter.AddPreviewVoice(CCharacter.VOICE_TITLE_SANKA);
+
 		base.Activate();
 	}
 
 	public override void DeActivate() {
 		OpenTaiko.tDisposeSafely(ref Background);
+
+		CCharacter.RemovePreviewAnimation(CCharacter.ANIM_PREVIEW);
+		CCharacter.RemovePreviewAnimation(CCharacter.ANIM_RENDER);
+		CCharacter.RemoveEssentialAnimation(0, CCharacter.ANIM_MENU_NORMAL);
+		CCharacter.RemovePreviewVoice(CCharacter.VOICE_TITLE_SANKA);
 
 		base.DeActivate();
 	}
@@ -227,8 +232,10 @@ class CStageHeya : CStage {
 		if (iCurrentMenu == CurrentMenu.Puchi || iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Heya_Render_Field?.t2D描画(0, 0);
 		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
 		if (iCurrentMenu == CurrentMenu.Chara) {
-			OpenTaiko.Tx.Characters[iCharacterCurrent].DrawHeyaRender(0, 0);
-			//OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
+			string renderAnimation = CCharacter.ANIM_RENDER;
+			OpenTaiko.Tx.Characters[iCharacterCurrent].SetAnimationDuration(0, renderAnimation, CCharacter.DEFAULT_DURATION);
+			OpenTaiko.Tx.Characters[iCharacterCurrent].Update(0, renderAnimation);
+			OpenTaiko.Tx.Characters[iCharacterCurrent].Draw(0, renderAnimation, 0, 0);
 		}
 
 		#endregion
@@ -306,7 +313,7 @@ class CStageHeya : CStage {
 
 				var scroll = DrawBox_Slot(i + (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2));
 
-				OpenTaiko.Tx.Characters[pos].DrawPreview(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
+				OpenTaiko.Tx.Characters[pos].Draw(0, CCharacter.ANIM_PREVIEW, scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
 					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1], 1.0f, 1.0f, 255, color);
 
 				#region [Database related values]
@@ -494,9 +501,8 @@ class CStageHeya : CStage {
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].Opacity = ctChara_In.n現在の値 * 2;
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
-			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(0));
-			character.Update(0);
-			character.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
+			characterController.Update(0);
+			characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
 
 			#region [PuchiChara]
 
@@ -588,8 +594,6 @@ class CStageHeya : CStage {
 
 					// Welcome voice using Sanka
 					character.PlayVoice(iPlayer, CCharacter.VOICE_TITLE_SANKA);
-
-					character.SetLoopAnimation(iPlayer, CCharacter.ANIM_MENU_NORMAL);
 
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 
@@ -927,6 +931,7 @@ class CStageHeya : CStage {
 	#endregion
 
 	private ScriptBG Background;
+	private CCharacterController characterController;
 
 	private TitleTextureKey[] ttkMainMenuOpt;
 	private CCachedFontRenderer pfHeyaFont;

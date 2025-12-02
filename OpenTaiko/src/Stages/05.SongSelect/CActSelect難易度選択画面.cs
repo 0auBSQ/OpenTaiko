@@ -103,11 +103,23 @@ internal class CActSelect難易度選択画面 : CActivity {
 		ctBarAnime[3] = new CCounter();
 		ctBarAnime[4] = new CCounter();
 
+		for (int i = 0; i < 5; i++) {
+			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_MENU_DIFFSELECT);
+			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_MENU_SONGDECIDE);
+			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_MENU_SONGDECIDE_AI);
+		}
+
 		base.Activate();
 	}
 	public override void DeActivate() {
 		if (this.IsDeActivated)
 			return;
+
+		for (int i = 0; i < 5; i++) {
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_MENU_DIFFSELECT);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_MENU_SONGDECIDE);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_MENU_SONGDECIDE_AI);
+		}
 
 		ctBarAnime = null;
 
@@ -221,6 +233,9 @@ internal class CActSelect難易度選択画面 : CActivity {
 						if (n現在の選択行[i] == 0) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 							OpenTaiko.stageSongSelect.actSongList.ctBarOpen.Start(100, 260, 2, OpenTaiko.Timer);
+							for (int i2 = 0; i2 < OpenTaiko.ConfigIni.nPlayerCount; i2++) {
+								OpenTaiko.stageSongSelect.CharacterController[i2].strLoopAnimation = CCharacter.ANIM_MENU_NORMAL;
+							}
 							this.bIsDifficltSelect = false;
 						} else if (n現在の選択行[i] == 1) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
@@ -259,7 +274,10 @@ internal class CActSelect難易度選択画面 : CActivity {
 										} else {
 											character.PlayVoice(i2, CCharacter.VOICE_MENU_SONGDECIDE);
 										}
-										character.SetLoopAnimation(i2, CCharacter.ANIM_MENU_START, false);
+										OpenTaiko.stageSongSelect.CharacterController[i2].bLooping = false;
+										OpenTaiko.stageSongSelect.CharacterController[i2].strLoopAnimation = CCharacter.ANIM_MENU_START;
+										OpenTaiko.stageSongSelect.CharacterController[i2].ResetCounter(i2);
+
 										if (OpenTaiko.ConfigIni.bAIBattleMode) {
 											OpenTaiko.stageSongSelect.t曲を選択する(n現在の選択行[0] - 2, i2);
 										} else {
@@ -267,8 +285,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 										}
 									}
 								} else {
-									CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-									character.SetLoopAnimation(i, CCharacter.ANIM_MENU_WAIT);
+									OpenTaiko.stageSongSelect.CharacterController[i].strLoopAnimation = CCharacter.ANIM_MENU_WAIT;
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
 								}
 							}
@@ -277,6 +294,9 @@ internal class CActSelect難易度選択画面 : CActivity {
 					if (cancel) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.stageSongSelect.actSongList.ctBarOpen.Start(100, 260, 2, OpenTaiko.Timer);
+						for (int i2 = 0; i2 < OpenTaiko.ConfigIni.nPlayerCount; i2++) {
+							OpenTaiko.stageSongSelect.CharacterController[i2].strLoopAnimation = CCharacter.ANIM_MENU_NORMAL;
+						}
 						this.bIsDifficltSelect = false;
 					}
 				}

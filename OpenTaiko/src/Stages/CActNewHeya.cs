@@ -182,11 +182,15 @@ class CActNewHeya : CActivity {
 			ttkCharacterAuthors[i] = new TitleTextureKey(OpenTaiko.Tx.Characters[i].metadata.tGetAuthor(), this.MenuFont, Color.White, Color.Black, 1000);
 		}
 
+		CCharacter.AddPreviewAnimation(CCharacter.ANIM_PREVIEW);
+		CCharacter.AddPreviewVoice(CCharacter.VOICE_TITLE_SANKA);
 
 		base.Activate();
 	}
 
 	public override void DeActivate() {
+		CCharacter.RemovePreviewAnimation(CCharacter.ANIM_PREVIEW);
+		CCharacter.RemovePreviewVoice(CCharacter.VOICE_TITLE_SANKA);
 
 		base.DeActivate();
 	}
@@ -281,8 +285,6 @@ class CActNewHeya : CActivity {
 										// Welcome voice using Sanka
 										OpenTaiko.Skin.soundDecideSFX.tPlay();
 										CCharacter.GetCharacter(CurrentPlayer).PlayVoice(CurrentPlayer, CCharacter.VOICE_TITLE_SANKA);
-
-										CCharacter.GetCharacter(CurrentPlayer).SetLoopAnimation(CurrentPlayer, CCharacter.ANIM_MENU_NORMAL);
 
 										OpenTaiko.SaveFileInstances[CurrentPlayer].tApplyHeyaChanges();
 
@@ -426,7 +428,10 @@ class CActNewHeya : CActivity {
 								OpenTaiko.Tx.Characters_Heya_Preview[index]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 								*/
 
-								OpenTaiko.Tx.Characters[index].DrawPreview(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1]);
+								string animation = CCharacter.ANIM_PREVIEW;
+								OpenTaiko.Tx.Characters[index].SetAnimationDuration(0, animation, CCharacter.DEFAULT_DURATION);
+								OpenTaiko.Tx.Characters[index].Update(0, animation);
+								OpenTaiko.Tx.Characters[index].Draw(0, animation, x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1]);
 
 								if (ttkCharacterNames[index] != null) {
 									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterNames[index]);

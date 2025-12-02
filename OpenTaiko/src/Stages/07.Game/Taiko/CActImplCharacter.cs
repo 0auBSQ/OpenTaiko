@@ -16,7 +16,7 @@ internal class CActImplCharacter : CActivity {
 	}
 
 	public override void Activate() {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 
 			ctKusuIn = new();
 
@@ -24,9 +24,39 @@ internal class CActImplCharacter : CActivity {
 			int p = OpenTaiko.GetActualPlayer(i);
 
 			this.iCurrentCharacter[i] = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[p].data.Character, OpenTaiko.Tx.Characters.Length - 1));
+			CharacterControllers[i] = new CCharacterController(i);
 
-			CCharacter character = CCharacter.GetCharacter(i);
-			character.SetLoopAnimation(i, CCharacter.ANIM_GAME_NORMAL);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_NORMAL);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MAX);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_GOGO);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_GOGO_MAX);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MISS);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_DOWN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_10COMBO);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_10COMBO_MAX);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_CLEARED);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_FAILED);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR_OUT);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR_IN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MAX_OUT);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MAX_IN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_IN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_RETURN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART_MAX);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_BREAKING);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_BROKE);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_MISS);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_IDLE);
+
+			CharacterControllers[i].strLoopAnimation = CCharacter.ANIM_GAME_NORMAL;
+			CharacterControllers[i].bLooping = true;
 
 			this.IsInKusudama = false;
 			this.b風船連打中[i] = false;
@@ -39,7 +69,36 @@ internal class CActImplCharacter : CActivity {
 	}
 
 	public override void DeActivate() {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_NORMAL);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MAX);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_GOGO);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_GOGO_MAX);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MISS);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_DOWN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_10COMBO);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_10COMBO_MAX);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_CLEARED);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_FAILED);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR_OUT);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_CLEAR_IN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MAX_OUT);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MAX_IN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_IN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_RETURN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_GOGOSTART_MAX);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_BREAKING);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_BROKE);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_BALLOON_MISS);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_IDLE);
+
 			CharaAction_Balloon_FadeOut[i] = null;
 		}
 
@@ -93,8 +152,10 @@ internal class CActImplCharacter : CActivity {
 				break;
 
 			if (!OpenTaiko.stageGameScreen.bPAUSE) {
-				CCharacter.GetCharacter(i).Update(i);
+				CharacterControllers[i].dbDuration = 60000 / Math.Abs(CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]));
+				CharacterControllers[i].Update(i);
 			}
+				//CCharacter.GetCharacter(i).Update(i, animation);
 
 			// Blinking animation during invincibility frames
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
@@ -392,7 +453,8 @@ internal class CActImplCharacter : CActivity {
 					//chara_y -= nowChara.szTextureSize.Height * charaScale; // Center down
 				}
 
-				CCharacter.GetCharacter(i).Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
+				//CCharacter.GetCharacter(i).Draw(i, animation, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
+				CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
 			}
 
 
@@ -415,7 +477,7 @@ internal class CActImplCharacter : CActivity {
 
 			float chara_x;
 			float chara_y;
-			float charaScale = 1.0f;
+			float charaScale = OpenTaiko.Skin.Game_Chara_Balloon_Scale;
 
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 				chara_x = OpenTaiko.Skin.Game_Chara_Balloon_X[i];
@@ -428,7 +490,8 @@ internal class CActImplCharacter : CActivity {
 				chara_y = OpenTaiko.Skin.Game_Chara_Balloon_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i);
 			}
 
-			CCharacter.GetCharacter(i).Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
+			//CCharacter.GetCharacter(i).Draw(i, CCharacter.ANIM_GAME_BALLOON_BREAKING, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
+			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
@@ -438,7 +501,7 @@ internal class CActImplCharacter : CActivity {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				float chara_x = OpenTaiko.Skin.Game_Chara_Kusudama_X[i];
 				float chara_y = OpenTaiko.Skin.Game_Chara_Kusudama_Y[i];
-				float charaScale = 1.0f;
+				float charaScale = OpenTaiko.Skin.Game_Chara_Kusudama_Scale;
 
 				float kusuX;
 				float kusuY;
@@ -457,8 +520,8 @@ internal class CActImplCharacter : CActivity {
 					kusuX *= -1;
 				}
 
-				CCharacter.GetCharacter(i).Draw(i, chara_x + kusuX, chara_y + kusuY,
-				charaScale, charaScale, 255, Color4.White, false);
+				CharacterControllers[i].Draw(i, chara_x + kusuX, chara_y + kusuY,
+				charaScale, charaScale, 255, Color4.White, i % 2 == 1);
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuX,
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuY, false, 255, true, player: i);
@@ -670,34 +733,43 @@ internal class CActImplCharacter : CActivity {
 		CCharacter character = CCharacter.GetCharacter(player);
 
 		if (this.IsInKusudama) {
-			character.SetLoopAnimation(player, CCharacter.ANIM_GAME_KUSUDAMA_IDLE);
+			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
+			CharacterControllers[player].bLooping = true;
 			return;
 		}
 		if (this.b風船連打中[player]) {
-			character.SetLoopAnimation(player, CCharacter.ANIM_GAME_BALLOON_BREAKING);
+			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_BALLOON_BREAKING;
+			CharacterControllers[player].bLooping = false;
 			return;
 		}
 
 		if (OpenTaiko.stageGameScreen.bIsGOGOTIME[player]) {
 			if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player]) {
-				character.SetLoopAnimation(player, CCharacter.ANIM_GAME_GOGO_MAX);
+				CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_GOGO_MAX;
+				CharacterControllers[player].bLooping = true;
 			} else {
-				character.SetLoopAnimation(player, CCharacter.ANIM_GAME_GOGO);
+				CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_GOGO;
+				CharacterControllers[player].bLooping = true;
 			}
 		} else {
 			if (OpenTaiko.stageGameScreen.bIsMiss[player]) {
 				if (OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6) {
-					character.SetLoopAnimation(player, CCharacter.ANIM_GAME_MISS_DOWN);
+					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MISS_DOWN;
+					CharacterControllers[player].bLooping = true;
 				} else {
-					character.SetLoopAnimation(player, CCharacter.ANIM_GAME_MISS);
+					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MISS;
+					CharacterControllers[player].bLooping = true;
 				}
 			} else {
 				if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player]) {
-					character.SetLoopAnimation(player, CCharacter.ANIM_GAME_MAX);
+					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MAX;
+					CharacterControllers[player].bLooping = true;
 				} else if (OpenTaiko.stageGameScreen.bIsAlreadyCleared[player]) {
-					character.SetLoopAnimation(player, CCharacter.ANIM_GAME_CLEAR);
+					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_CLEAR;
+					CharacterControllers[player].bLooping = true;
 				} else {
-					character.SetLoopAnimation(player, CCharacter.ANIM_GAME_NORMAL);
+					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_NORMAL;
+					CharacterControllers[player].bLooping = true;
 				}
 			}
 		}
@@ -753,6 +825,7 @@ internal class CActImplCharacter : CActivity {
 	public CCounter ctKusuIn;
 	public CCounter? ctKusuMiss;
 	public CCounter? ctKusuSuccess;
+	public CCharacterController[] CharacterControllers = new CCharacterController[5];
 
 	private bool visibleKusuChara => IsInKusudama || ctKusuSuccess != null || ctKusuMiss != null;
 
@@ -762,7 +835,8 @@ internal class CActImplCharacter : CActivity {
 		ctKusuSuccess = null;
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter character = CCharacter.GetCharacter(i);
-			character.SetLoopAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_IDLE);
+			CharacterControllers[i].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
+			CharacterControllers[i].bLooping = true;
 		}
 	}
 
@@ -771,7 +845,7 @@ internal class CActImplCharacter : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter character = CCharacter.GetCharacter(i);
 			ReturnDefaultAnime(i, true);
-			character.PlayAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
+			CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
 		}
 	}
 
@@ -780,7 +854,7 @@ internal class CActImplCharacter : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter character = CCharacter.GetCharacter(i);
 			ReturnDefaultAnime(i, true);
-			character.PlayAnimation(i, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
+			CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
 		}
 	}
 

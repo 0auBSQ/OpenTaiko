@@ -764,8 +764,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private void UpdateCharaCounter(int nPlayer) {
 		ctChipAnime[nPlayer] = new CCounter(0, 3, CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer] * 1 / 4), SoundManager.PlayTimer);
 		OpenTaiko.stageGameScreen.PuchiChara.ChangeBPM(CTja.TjaDurationToGameDuration(60.0 / OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]));
-
-		CCharacter.GetCharacter(nPlayer).SetAnimationCyclesToBPM(nPlayer, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[nPlayer]);
 	}
 
 	public void AddMixer(CSound cs, bool _b演奏終了後も再生が続くチップである) {
@@ -1174,7 +1172,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			rollCount = pChip.nRollCount = ++nCurrentKusudamaRollCount;
 			balloon = nCurrentKusudamaCount;
 			if (nCurrentKusudamaCount > 0) {
-				character.PlayAnimation(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+				actChara.CharacterControllers[player].PlayAction(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
 
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (this.actBalloon.ct風船アニメ[i].IsUnEnded) {
@@ -1186,7 +1184,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 		} else {
-			character.SetLoopAnimation(player, CCharacter.ANIM_GAME_BALLOON_BREAKING, false);
+			actChara.CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_BALLOON_BREAKING;
+			actChara.CharacterControllers[player].ResetCounter(player);
+			actChara.CharacterControllers[player].bLooping = false;
 
 
 			if (this.actBalloon.ct風船アニメ[player].IsUnEnded) {
@@ -1387,13 +1387,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.bIsAlreadyMaxed[nPlayer] = true;
 
 				actChara.ReturnDefaultAnime(nPlayer, true);
-				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
+				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
 			}
 			if (cleared && this.bIsAlreadyCleared[nPlayer] == false) {
 				this.bIsAlreadyCleared[nPlayer] = true;
 
 				actChara.ReturnDefaultAnime(nPlayer, true);
-				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
+				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
 
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
 			}
@@ -1406,7 +1406,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.actRunner.Start(nPlayer, true, pChip);
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
-				character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
+				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 
 				switch (chara.effect.tGetGaugeType()) {
@@ -1444,7 +1444,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				{
 					// 魂ゲージMAXではない
 					// ジャンプ_ノーマル
-					character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_RETURN);
+					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_RETURN);
 					//this.actChara.キャラクター_アクション_10コンボ();
 				}
 			}
@@ -1573,14 +1573,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 						this.bIsAlreadyMaxed[nPlayer] = false;
 						actChara.ReturnDefaultAnime(nPlayer, true);
-						character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+						actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
 					} else if (!bIsGOGOTIME[nPlayer]) {
 						if (Chara_MissCount[nPlayer] == 1) {
 							actChara.ReturnDefaultAnime(nPlayer, true);
-							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
 						} else if (Chara_MissCount[nPlayer] == 6) {
 							actChara.ReturnDefaultAnime(nPlayer, true);
-							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
 						}
 					}
 				}
@@ -1621,14 +1621,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAXではない
 							// ジャンプ_ノーマル
-							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_10COMBO);
+							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_10COMBO);
 						}
 					}
 					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max) {
 						if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAX
 							// ジャンプ_MAX
-							character.PlayAnimation(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
+							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
 						}
 					}
 				}
@@ -3276,7 +3276,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!this.bPAUSE && !this.isRewinding) {
 						if (chip.nRollCount > 0) {
 							CCharacter character = CCharacter.GetCharacter(iPlayer);
-							character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
+							actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
 						}
 					}
 				}
@@ -3345,7 +3345,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			chip.bVisible = false;
 			this.actChara.ReturnDefaultAnime(iPlayer, true);
 			CCharacter character = CCharacter.GetCharacter(iPlayer);
-			character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_BALLOON_BROKE);
+			actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_BROKE);
 			if (NotesManager.IsFuzeRoll(chip)) {
 				this.CChartScore[iPlayer].nMineAvoid++;
 				this.CSectionScore[iPlayer].nMineAvoid++;
@@ -3415,16 +3415,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer))) {
 				// 魂ゲージMAXではない
 				// ゴーゴースタート_ノーマル
-				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
+				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
 				//this.actChara.キャラクター_アクション_10コンボ();
 			}
 			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
-				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
+				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
 			}
 			if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
 				// 魂ゲージMAX
 				// ゴーゴースタート_MAX
-				character.PlayAnimation(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
+				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
 			}
 
 		}
@@ -3654,7 +3654,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-				character.GameInit(i);
 
 				this.Chara_MissCount[i] = 0;
 				this.bIsMiss[i] = false;

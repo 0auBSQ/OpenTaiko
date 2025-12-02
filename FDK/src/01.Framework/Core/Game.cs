@@ -30,6 +30,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using Silk.NET.OpenGLES.Extensions.ImGui;
 using Silk.NET.Windowing;
+using Silk.NET.Windowing.Sdl;
 using SkiaSharp;
 
 namespace FDK;
@@ -301,22 +302,23 @@ public abstract class Game : IDisposable {
 		#endregion
 
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
-		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
-		|| windowing_override == "sdl") {
+		if (windowing_override == "sdl") {
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 			Console.WriteLine("SDL selected for Windowing");
-		} else {
+		} else if (windowing_override == "glfw") {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
 			Console.WriteLine("GLFW selected for Windowing");
+		} else {
+			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
+			Console.WriteLine("SDL selected for Windowing");
 		}
 
 		try {
 			Window_ = Window.Create(options);
-		}
-		catch {
+		} catch {
 			Console.WriteLine("The window failed to be created.\nYou can attempt to fix this by overriding the default windowing.\nTry launching OpenTaiko with args, using '-w glfw' to force GLFW or '-w sdl' to force SDL.");
 			throw;
-        }
+		}
 
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
@@ -485,9 +487,11 @@ public abstract class Game : IDisposable {
 		double fps = 1.0f / deltaTime;
 		TimeMs = (long)(Window_.Time * 1000);
 		unsafe {
-			Silk.NET.SDL.Event sdlEvent;
-			while (Silk.NET.SDL.SdlProvider.SDL.Value.PollEvent(&sdlEvent) != 0) {
+			if (SdlWindowing.IsViewSdl(Window_)) {
+				Silk.NET.SDL.Event sdlEvent;
+				while (Silk.NET.SDL.SdlProvider.SDL.Value.PollEvent(&sdlEvent) != 0) {
 
+				}
 			}
 		}
 		Update();

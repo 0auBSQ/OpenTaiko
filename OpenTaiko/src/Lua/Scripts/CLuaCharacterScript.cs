@@ -1,4 +1,5 @@
-﻿using NLua;
+﻿using FDK;
+using NLua;
 
 namespace OpenTaiko {
 	class CLuaCharacterScript : CLuaScript {
@@ -10,145 +11,81 @@ namespace OpenTaiko {
 			DefaultScript = streamReader.ReadToEnd();
 		}
 
-		private LuaFunction lfLegacyLoadPreviewTextures;
-		private LuaFunction lfLoadGeneralTextures;
-		private LuaFunction lfLegacyDisposePreviewTextures;
-		private LuaFunction lfDisposeGeneralTextures;
-		private LuaFunction lfLoadIndividualAnimation;
-		private LuaFunction lfDisposeIndividualAnimation;
-		private LuaFunction lfGetAnimationInformation;
-		private LuaFunction lfGameInit;
-		private LuaFunction lfUpdate;
-		private LuaFunction lfTowerNextFloor;
-		private LuaFunction lfTowerFinish;
-		private LuaFunction lfDraw;
-		private LuaFunction lfDrawPreview;
-		private LuaFunction lfDrawHeyaRender;
-		private LuaFunction lfDrawTower;
-		private LuaFunction lfSetLoopAnimation;
-		private LuaFunction lfPlayAnimation;
-		private LuaFunction lfPlayVoice;
+		private LuaFunction lfLoadAnimation;
+		private LuaFunction lfDisposeAnimation;
+		private LuaFunction lfAvaialbeAnimation;
 		private LuaFunction lfSetAnimationDuration;
-		private LuaFunction lfSetAnimationCyclesToBPM;
+		private LuaFunction lfResetAnimationCounter;
+		private LuaFunction lfUpdate;
+		private LuaFunction lfDraw;
 
-		private HashSet<string> _loadedIndividualAnimations = new HashSet<string>();
+		private LuaFunction lfLoadVoice;
+		private LuaFunction lfDisposeVoice;
+		private LuaFunction lfPlayVoice;
 
-		#region [C# Linked methods]
-
-		// My Room exclusive, will be deprecated on the My Room update
-		public void LEGACY_LoadPreviewTextures() {
-			RunLuaCode(lfLegacyLoadPreviewTextures);
+		public void LoadAnimation(string animationType) {
+			RunLuaCode(lfLoadAnimation, animationType);
 		}
 
-		public void LoadGeneralTextures() {
-			RunLuaCode(lfLoadGeneralTextures);
+		public void DisposeAnimation(string animationType) {
+			RunLuaCode(lfDisposeAnimation, animationType);
 		}
 
-		// My Room exclusive, will be deprecated on the My Room update
-		public void LEGACY_DisposePreviewTextures() {
-			RunLuaCode(lfLegacyDisposePreviewTextures);
+		public bool AvaialbeAnimation(string animationType) {
+			object[] result = RunLuaCode(lfAvaialbeAnimation, animationType);
+			if (result is not null && result.Length == 1 && result[0] is bool flag) {
+				return flag;
+			}
+			return false;
 		}
 
-		public void DisposeGeneralTextures() {
-			RunLuaCode(lfDisposeGeneralTextures);
+		public void SetAnimationDuration(string animationType, double duration) {
+			RunLuaCode(lfSetAnimationDuration, animationType, duration);
 		}
 
-		public void GameInit() {
-			RunLuaCode(lfGameInit);
+		public void ResetAnimationCounter(string animationType) {
+			RunLuaCode(lfResetAnimationCounter, animationType);
 		}
 
-		public void Update() {
-			RunLuaCode(lfUpdate);
+		public void LoadVoice(string voiceType) {
+			RunLuaCode(lfLoadVoice, voiceType);
 		}
 
-		public void TowerNextFloor() {
-			RunLuaCode(lfTowerNextFloor);
-		}
-
-		public void TowerFinish() {
-			RunLuaCode(lfTowerFinish);
-		}
-
-		#endregion
-
-		#region [Lua API exclusive extentions]
-
-		// Optional methods, but can be a big help for (for example) modulable custom game mode textures as long as the chara script is flexible enough
-		public void LoadIndividualAnimation(string name, params object[] args) {
-			RunLuaCode(lfLoadIndividualAnimation, name, args);
-			_loadedIndividualAnimations.Add(name);
-		}
-
-		public void DisposeIndividualAnimation(string name) {
-			RunLuaCode(lfDisposeIndividualAnimation, name);
-			_loadedIndividualAnimations.Remove(name);
-		}
-
-		public object[] GetAnimationInformation(string name) {
-			return RunLuaCode(lfGetAnimationInformation, name);
-		}
-
-		#endregion
-
-		public void Draw(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
-			RunLuaCode(lfDraw, x, y, scaleX, scaleY, opacity, color, flipX);
-		}
-
-		public void DrawPreview(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
-			RunLuaCode(lfDrawPreview, x, y, scaleX, scaleY, opacity, color, flipX);
-		}
-
-		public void DrawHeyaRender(float x, float y, float scaleX, float scaleY, int opacity, LuaColor color, bool flipX) {
-			RunLuaCode(lfDrawHeyaRender, x, y, scaleX, scaleY, opacity, color, flipX);
-		}
-
-		public void DrawTower() {
-			RunLuaCode(lfDrawTower);
-		}
-
-		public void SetLoopAnimation(string animationType, bool loop = true) {
-			RunLuaCode(lfSetLoopAnimation, animationType, loop);
-		}
-
-		public void PlayAnimation(string animationType) {
-			RunLuaCode(lfPlayAnimation, animationType);
+		public void DisposeVoice(string voiceType) {
+			RunLuaCode(lfDisposeVoice, voiceType);
 		}
 
 		public void PlayVoice(string voiceType) {
 			RunLuaCode(lfPlayVoice, voiceType);
 		}
 
-		public void SetAnimationDuration(double ms) {
-			RunLuaCode(lfSetAnimationDuration, ms);
+		public bool Update(double delta, string animationType, bool looping = true) {
+			if (animationType == CCharacter.ANIM_NONE) return false;
+			object[] result = RunLuaCode(lfUpdate, delta, animationType, looping);
+			if (result is not null && result.Length == 1 && result[0] is bool flag) {
+				return flag;
+			}
+			return false;
 		}
 
-		public void SetAnimationCyclesToBPM(double bpm) {
-			RunLuaCode(lfSetAnimationCyclesToBPM, bpm);
+		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false) {
+			if (animationType == CCharacter.ANIM_NONE) return;
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX);
 		}
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
 			try {
-				// C# hardcoded animations
-				lfLegacyLoadPreviewTextures = (LuaFunction)LuaScript["loadPreviewTextures"];
-				lfLoadGeneralTextures = (LuaFunction)LuaScript["loadGeneralTextures"];
-				lfLegacyDisposePreviewTextures = (LuaFunction)LuaScript["disposePreviewTextures"];
-				lfDisposeGeneralTextures = (LuaFunction)LuaScript["disposeGeneralTextures"];
-				// Custom/additional animations
-				lfLoadIndividualAnimation = (LuaFunction)LuaScript["loadIndividualAnimation"];
-				lfDisposeIndividualAnimation = (LuaFunction)LuaScript["disposeIndividualAnimation"];
-				lfGameInit = (LuaFunction)LuaScript["gameInit"];
-				lfUpdate = (LuaFunction)LuaScript["update"];
-				lfTowerNextFloor = (LuaFunction)LuaScript["towerNextFloor"];
-				lfTowerFinish = (LuaFunction)LuaScript["towerFinish"];
-				lfDraw = (LuaFunction)LuaScript["draw"];
-				lfDrawPreview = (LuaFunction)LuaScript["drawPreview"];
-				lfDrawHeyaRender = (LuaFunction)LuaScript["drawHeyaRender"];
-				lfDrawTower = (LuaFunction)LuaScript["drawTower"];
-				lfSetLoopAnimation = (LuaFunction)LuaScript["setLoopAnimation"];
-				lfPlayAnimation = (LuaFunction)LuaScript["playAnimation"];
-				lfPlayVoice = (LuaFunction)LuaScript["playVoice"];
+				lfLoadAnimation = (LuaFunction)LuaScript["loadAnimation"];
+				lfDisposeAnimation = (LuaFunction)LuaScript["disposeAnimation"];
+				lfAvaialbeAnimation = (LuaFunction)LuaScript["avaialbeAnimation"];
 				lfSetAnimationDuration = (LuaFunction)LuaScript["setAnimationDuration"];
-				lfSetAnimationCyclesToBPM = (LuaFunction)LuaScript["setAnimationCyclesToBPM"];
+				lfResetAnimationCounter = (LuaFunction)LuaScript["resetAnimationCounter"];
+				lfUpdate = (LuaFunction)LuaScript["update"];
+				lfDraw = (LuaFunction)LuaScript["draw"];
+
+				lfLoadVoice = (LuaFunction)LuaScript["loadVoice"];
+				lfDisposeVoice = (LuaFunction)LuaScript["disposeVoice"];
+				lfPlayVoice = (LuaFunction)LuaScript["playVoice"];
 			} catch (Exception e) {
 				Crash(e);
 			}

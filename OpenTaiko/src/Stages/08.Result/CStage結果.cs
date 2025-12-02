@@ -132,11 +132,6 @@ internal class CStage結果 : CStage {
 			this.ClearStatusesSaved = [0, 0, 0, 0, 0];
 			this.ScoreRanksSaved = [0, 0, 0, 0, 0];
 
-			for (int i = 0; i < 5; i++) {
-				CCharacter character = CCharacter.GetCharacter(i);
-				character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
-			}
-
 			{
 				#region [ 初期化 ]
 				//---------------------
