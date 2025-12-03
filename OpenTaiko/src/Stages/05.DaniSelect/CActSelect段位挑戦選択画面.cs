@@ -5,6 +5,8 @@ namespace OpenTaiko;
 
 class CActSelect段位挑戦選択画面 : CActivity {
 	public override void Activate() {
+		CCharacter.AddEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTCONFIRM);
+
 		ctBarIn = new CCounter();
 		ctBarOut = new CCounter();
 		ctBarOut.CurrentValue = 255;
@@ -15,14 +17,18 @@ class CActSelect段位挑戦選択画面 : CActivity {
 	}
 
 	public override void DeActivate() {
+		CCharacter.RemoveEssentialVoice(0, CCharacter.VOICE_MENU_DANSELECTCONFIRM);
+
 		base.DeActivate();
 	}
 
 	public override void CreateManagedResource() {
+
 		base.CreateManagedResource();
 	}
 
 	public override void ReleaseManagedResource() {
+
 		base.ReleaseManagedResource();
 	}
 

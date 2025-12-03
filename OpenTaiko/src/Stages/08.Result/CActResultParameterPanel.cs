@@ -201,7 +201,11 @@ internal class CActResultParameterPanel : CActivity {
 					OpenTaiko.Tx.Characters[_charaId].metadata.SpeechText[j].GetString(""),
 					pfSpeechText, Color.White, Color.Black, OpenTaiko.Skin.Result_Speech_Text_MaxWidth);
 			}
+
+			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARSUCCESS);
+			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARFAILED);
 		}
+
 
 		ctMainCounter = new CCounter(0, 50000, 1, OpenTaiko.Timer);
 
@@ -230,8 +234,17 @@ internal class CActResultParameterPanel : CActivity {
 		ctUIMove = new CCounter();
 
 		for (int i = 0; i < 5; i++) {
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED_IN);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED);
+			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_CLEAR);
+
 			CCharacter character = CCharacter.GetCharacter(i);
-			character.SetLoopAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
+			CCharacterController characterController = new CCharacterController(i);
+			characterController.strLoopAnimation = CCharacter.ANIM_RESULT_NORMAL;
+			characterController.ResetCounter(i);
+
+			this.characterController[i] = characterController;
 		}
 
 		gaugeValues = new int[5];
@@ -251,6 +264,16 @@ internal class CActResultParameterPanel : CActivity {
 	public override void DeActivate() {
 		if (this.ct表示用 != null) {
 			this.ct表示用 = null;
+		}
+
+		for (int i = 0; i < 5; i++) {
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED_IN);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED);
+			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_CLEAR);
+
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARSUCCESS);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARFAILED);
 		}
 
 		for (int i = 0; i < this.b音声再生.Length; i++) {
@@ -782,8 +805,9 @@ internal class CActResultParameterPanel : CActivity {
 				} else
 					CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.NORMAL, pos);
 				*/
-				OpenTaiko.Tx.Characters[_charaId].Update(p);
-				OpenTaiko.Tx.Characters[_charaId].Draw(p, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, pos % 2 == 1);
+
+				characterController[p].Update(p);
+				characterController[p].Draw(p, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, pos % 2 == 1);
 
 				#endregion
 
@@ -1166,6 +1190,7 @@ internal class CActResultParameterPanel : CActivity {
 	private readonly ST文字位置[] st小文字位置;
 	private readonly ST文字位置[] st大文字位置;
 	private ST文字位置[] stScoreFont;
+	private CCharacterController[] characterController = new CCharacterController[5];
 
 	private TitleTextureKey[] ttkAISection;
 
@@ -1184,12 +1209,16 @@ internal class CActResultParameterPanel : CActivity {
 		if (OpenTaiko.stageResults.nクリア[player] >= 1) {
 			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
 			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARSUCCESS);
-			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_CLEAR);
+
+			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_CLEAR;
+			characterController[player].ResetCounter(player);
 		} else {
 			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
 			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARFAILED);
-			character.SetLoopAnimation(player, CCharacter.ANIM_RESULT_FAILED);
-			character.PlayAnimation(player, CCharacter.ANIM_RESULT_FAILED_IN);
+
+			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_FAILED;
+			characterController[player].ResetCounter(player);
+			characterController[player].PlayAction(player, CCharacter.ANIM_RESULT_FAILED_IN);
 		}
 	}
 

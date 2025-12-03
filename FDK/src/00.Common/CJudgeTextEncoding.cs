@@ -36,7 +36,7 @@ public class CJudgeTextEncoding {
 	/// <returns></returns>
 	public static string ReadTextFile(string path) {
 		if (!File.Exists(path)) return null;
-		string str = null;
+		string? str = null;
 		FileInfo file = new FileInfo(path);
 
 		using (Hnx8.ReadJEnc.FileReader reader = new Hnx8.ReadJEnc.FileReader(file)) {
@@ -44,7 +44,7 @@ public class CJudgeTextEncoding {
 			str = reader.Text;
 		}
 
-		str = str.ReplaceLineEndings("\n");
+		str = str?.ReplaceLineEndings("\n");
 
 		return str;
 	}

@@ -256,9 +256,21 @@ internal class CStageSongSelect : CStage {
 			this.ctOldBGScroll = new CCounter(0, txOldGenreBack.szTextureSize.Width, 30, OpenTaiko.Timer);
 
 			for (int i = 0; i < 5; i++) {
+				CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_MENU_NORMAL);
+				CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_MENU_START);
+				CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_MENU_SELECT);
+				CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_MENU_WAIT);
+
+				CCharacter.AddEssentialVoice(i, CCharacter.VOICE_MENU_SONGSELECT);
+
+				CCharacterController characterController = new CCharacterController(i);
+				characterController.strLoopAnimation = CCharacter.ANIM_MENU_NORMAL;
+
+				CharacterController[i] = characterController;
+			}
+
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				CCharacter character = CCharacter.GetCharacter(i);
-				character.SetLoopAnimation(i, CCharacter.ANIM_MENU_NORMAL);
-				character.SetAnimationDuration(i, CCharacter.DEFAULT_DURATION);
 				if (i < OpenTaiko.ConfigIni.nPlayerCount) {
 					character.PlayVoice(i, CCharacter.VOICE_MENU_SONGSELECT);
 				}
@@ -315,6 +327,15 @@ internal class CStageSongSelect : CStage {
 		Trace.TraceInformation("選曲ステージを非活性化します。");
 		Trace.Indent();
 		try {
+			for (int i = 0; i < 5; i++) {
+				CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_MENU_NORMAL);
+				CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_MENU_START);
+				CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_MENU_SELECT);
+				CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_MENU_WAIT);
+
+				CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_MENU_SONGSELECT);
+			}
+
 			for (int i = 0; i < 2; i++) {
 				this.ctキー反復用[i] = null;
 			}
@@ -564,8 +585,8 @@ internal class CStageSongSelect : CStage {
 
 				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
 
-				character.Update(player);
-				character.Draw(player, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, player % 2 == 1);
+				CharacterController[player].Update(player);
+				CharacterController[player].Draw(player, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, player % 2 == 1);
 				this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
 
 				/*
@@ -746,8 +767,7 @@ internal class CStageSongSelect : CStage {
 
 							for (int i = 0; i < 5; i++)
 							{
-								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+								CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 							}
 
 							#endregion
@@ -768,8 +788,7 @@ internal class CStageSongSelect : CStage {
 
 							for (int i = 0; i < 5; i++)
 							{
-								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+								CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 							}
 							#endregion
 						} else if (this.actSongList.latestContext == eMenuContext.Random) {
@@ -787,8 +806,7 @@ internal class CStageSongSelect : CStage {
 							//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
 							for (int i = 0; i < 5; i++) {
-								CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-								character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+								CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 							}
 
 							#endregion
@@ -819,8 +837,7 @@ internal class CStageSongSelect : CStage {
 								this.actSongList.bBoxClose = true;
 
 								for (int i = 0; i < 5; i++) {
-									CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-									character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+									CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 								}
 							}
 						}
@@ -931,7 +948,8 @@ internal class CStageSongSelect : CStage {
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
 																for (int i = 0; i < 5; i++) {
 																	CCharacter character = CCharacter.GetCharacter(i);
-																	character.SetLoopAnimation(i, CCharacter.ANIM_MENU_START, false);
+																	CharacterController[i].bLooping = false;
+																	CharacterController[i].strLoopAnimation = CCharacter.ANIM_MENU_START;
 																	if (i < OpenTaiko.ConfigIni.nPlayerCount) {
 																		character.PlayVoice(i, CCharacter.VOICE_MENU_SONGDECIDE);
 																	}
@@ -950,8 +968,7 @@ internal class CStageSongSelect : CStage {
 															this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 
 															for (int i = 0; i < 5; i++) {
-																CCharacter character = CCharacter.GetCharacter(i);
-																character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+																CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 															}
 														}
 													}
@@ -986,8 +1003,7 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.bBoxOpen = true;
 													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 													for (int i = 0; i < 5; i++) {
-														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+														CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 													}
 												}
 												break;
@@ -1001,8 +1017,7 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.bBoxClose = true;
 													//this.ctChara_Select.t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Select.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 													for (int i = 0; i < 5; i++) {
-														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+														CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 													}
 												}
 												break;
@@ -1017,8 +1032,7 @@ internal class CStageSongSelect : CStage {
 													this.actSongList.ctDifficultyIn.Start(0, 3200, OpenTaiko.Skin.SongSelect_Box_Opening_Interval, OpenTaiko.Timer);
 
 													for (int i = 0; i < 5; i++) {
-														CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-														character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+														CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 													}
 												}
 												break;
@@ -1061,8 +1075,7 @@ internal class CStageSongSelect : CStage {
 									//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									for (int i = 0; i < 5; i++) {
-										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-										character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+										CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 									}
 
 									for (int i = 0; i < 7; i++) tカーソルスキップ(true);
@@ -1083,8 +1096,7 @@ internal class CStageSongSelect : CStage {
 									//this.ctChara_Jump[0].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									//this.ctChara_Jump[1].t開始(0, TJAPlayer3.Tx.SongSelect_Chara_Jump.Length + 8, 1000 / 45, TJAPlayer3.Timer);
 									for (int i = 0; i < 5; i++) {
-										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
-										character.PlayAnimation(i, CCharacter.ANIM_MENU_SELECT);
+										CharacterController[i].PlayAction(i, CCharacter.ANIM_MENU_SELECT);
 									}
 
 									for (int i = 0; i < 7; i++) tカーソルスキップ(false);
@@ -1305,6 +1317,7 @@ internal class CStageSongSelect : CStage {
 	//      private CTexture tx難易度名;
 	//      private CTexture tx下部テキスト;
 	private CCounter ctDiffSelect移動待ち;
+	public CCharacterController[] CharacterController = new CCharacterController[5];
 
 	private STNumber[] stSongNumber = new STNumber[10];
 	private STNumber[] stBoardNumber = new STNumber[10];

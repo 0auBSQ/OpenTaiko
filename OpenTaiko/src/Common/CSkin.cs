@@ -3760,6 +3760,14 @@ internal class CSkin : IDisposable {
 									Game_Chara_Scale_AI = float.Parse(strParam);
 									break;
 								}
+							case "Game_Chara_Balloon_Scale": {
+									Game_Chara_Balloon_Scale = float.Parse(strParam);
+									break;
+								}
+							case "Game_Chara_Kusudama_Scale": {
+									Game_Chara_Kusudama_Scale = float.Parse(strParam);
+									break;
+								}
 							case "Game_Chara_AI_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -3813,6 +3821,20 @@ internal class CSkin : IDisposable {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Game_Chara_Balloon_5P[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_Kusudama_X": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 5; i++) {
+										Game_Chara_Kusudama_X[i] = int.Parse(strSplit[i]);
+									}
+									break;
+								}
+							case "Game_Chara_Kusudama_Y": {
+									string[] strSplit = strParam.Split(',');
+									for (int i = 0; i < 5; i++) {
+										Game_Chara_Kusudama_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
@@ -8322,6 +8344,8 @@ internal class CSkin : IDisposable {
 	public float Game_Chara_Scale_4P = 0.4f;
 	public float Game_Chara_Scale_5P = 0.35f;
 	public float Game_Chara_Scale_AI = 0.464f;
+	public float Game_Chara_Balloon_Scale = 0.8f;
+	public float Game_Chara_Kusudama_Scale = 0.96f;
 	public int[] Game_Chara_AI_X = new int[] { 0, 0 };
 	public int[] Game_Chara_AI_Y = new int[] { 0, 537 };
 	public int[] Game_Chara_4P = new int[] { 380, 276 };

@@ -80,104 +80,6 @@ namespace OpenTaiko {
 
 			return sounds;
 		}
-		private Dictionary<string, object> LoadConfigFile(string file_path) {
-			// Default values pulled from TextureLoader.cs, for legacy support
-			Dictionary<string, object> chara_config = new() {
-				{"Chara_Resolution", new int[] {1280, 720}},
-				// positions
-				{"Heya_Chara_Render_Offset", new int[] {0, 0}},
-				{"Characters_Menu_Offset", new int[] {0, 0}},
-				{"Characters_Result_Offset", new int[] {0, 0}},
-				{"Game_Chara_X", new int[] {0, 0}},
-				{"Game_Chara_Y", new int[] {0, 537}},
-				{"Game_Chara_4P", new int[] {165, 68}},
-				{"Game_Chara_5P", new int[] {165, 40}},
-				{"Game_Chara_X_AI", new int[] {472, 602}},
-				{"Game_Chara_Y_AI", new int[] {152, 152}},
-				{"Game_Chara_Balloon_X", new int[] {240, 240, 0, 0}},
-				{"Game_Chara_Balloon_Y", new int[] {0, 297, 0, 0}},
-				{"Game_Chara_Balloon_4P", new int[] {0, -176}},
-				{"Game_Chara_Balloon_5P", new int[] {0, -168}},
-				{"Game_Chara_Kusudama_X", new int[] {290, 690, 90, 890, 490}},
-				{"Game_Chara_Kusudama_Y", new int[] {420, 420, 420, 420, 420}},
-				// keyframes
-				{"Game_Chara_Motion_Normal", new int[] {}},
-				{"Game_Chara_Motion_10Combo", new int[] {}},
-				{"Game_Chara_Motion_10Combo_Clear", new int[] {}},
-				{"Game_Chara_Motion_10Combo_Max", new int[] {}},
-				{"Game_Chara_Motion_Miss", new int[] {}},
-				{"Game_Chara_Motion_MissDown", new int[] {}},
-				{"Game_Chara_Motion_ClearIn", new int[] {}},
-				{"Game_Chara_Motion_Clear", new int[] {}},
-				{"Game_Chara_Motion_ClearMax", new int[] {}},
-				{"Game_Chara_Motion_MissIn", new int[] {}},
-				{"Game_Chara_Motion_MissDownIn", new int[] {}},
-				{"Game_Chara_Motion_GoGoStart", new int[] {}},
-				{"Game_Chara_Motion_GoGoStart_Clear", new int[] {}},
-				{"Game_Chara_Motion_GoGoStart_Max", new int[] {}},
-				{"Game_Chara_Motion_GoGo", new int[] {}},
-				{"Game_Chara_Motion_GoGo_Max", new int[] {}},
-				{"Game_Chara_Motion_SoulIn", new int[] {}},
-				{"Game_Chara_Motion_SoulOut", new int[] {}},
-				{"Game_Chara_Motion_ClearOut", new int[] {}},
-				{"Game_Chara_Motion_Return", new int[] {}},
-				{"Game_Chara_Motion_Tower_Standing", new int[] {}},
-				{"Game_Chara_Motion_Tower_Climbing", new int[] {}},
-				{"Game_Chara_Motion_Tower_Running", new int[] {}},
-				{"Game_Chara_Motion_Tower_Clear", new int[] {}},
-				{"Game_Chara_Motion_Tower_Fail", new int[] {}},
-				{"Game_Chara_Motion_Tower_Standing_Tired", new int[] {}},
-				{"Game_Chara_Motion_Tower_Climbing_Tired", new int[] {}},
-				{"Game_Chara_Motion_Tower_Running_Tired", new int[] {}},
-				{"Game_Chara_Motion_Tower_Clear_Tired", new int[] {}},
-				// beats
-				{"Game_Chara_Beat_Normal", 1.0f },
-				{"Game_Chara_Beat_10Combo", 1.5f },
-				{"Game_Chara_Beat_10ComboMax", 1.5f },
-				{"Game_Chara_Beat_Miss", 1.0f },
-				{"Game_Chara_Beat_MissIn", 1.5f },
-				{"Game_Chara_Beat_MissDown", 1.0f },
-				{"Game_Chara_Beat_MissDownIn", 1.5f },
-				{"Game_Chara_Beat_ClearIn", 1.5f },
-				{"Game_Chara_Beat_Clear", 2.0f },
-				{"Game_Chara_Beat_ClearMax", 1.5f },
-				{"Game_Chara_Beat_GoGoStart", 1.5f },
-				{"Game_Chara_Beat_GoGoStartClear", 1.5f },
-				{"Game_Chara_Beat_GoGoStartMax", 1.5f },
-				{"Game_Chara_Beat_GoGo", 2.0f },
-				{"Game_Chara_Beat_GoGoMax", 2.0f },
-				{"Game_Chara_Beat_SoulIn", 1.5f },
-				{"Game_Chara_Beat_SoulOut", 1.5f },
-				{"Game_Chara_Beat_ClearOut", 1.5f },
-				{"Game_Chara_Beat_Return", 1.5f },
-				{"Game_Chara_Beat_Tower_Standing", 1.0f },
-				{"Game_Chara_Beat_Tower_Standing_Tired", 1.0f },
-				{"Game_Chara_Beat_Tower_Fail", 1.0f },
-				{"Game_Chara_Beat_Tower_Clear", 1.0f },
-				{"Game_Chara_Beat_Tower_Clear_Tired", 1.0f },
-				// "booleans"
-				{"Result_UseResult1P", 0},
-				{"Game_Chara_Tower_Clear_IsLooping", 0},
-				{"Game_Chara_Tower_Clear_Tired_IsLooping", 0},
-				{"Game_Chara_Tower_Fail_IsLooping", 0},
-				// duration (ms)
-				{"Game_Chara_Balloon_Timer", 28},
-				{"Game_Chara_Balloon_Delay", 500},
-				{"Game_Chara_Balloon_FadeOut", 84},
-				{"Chara_Entry_AnimationDuration", 1000},
-				{"Chara_Normal_AnimationDuration", 1000},
-				{"Chara_Menu_Loop_AnimationDuration", 1000},
-				{"Chara_Menu_Select_AnimationDuration", 1000},
-				{"Chara_Menu_Start_AnimationDuration", 1000},
-				{"Chara_Menu_Wait_AnimationDuration", 1000},
-				{"Chara_Result_Normal_AnimationDuration", 1000},
-				{"Chara_Result_Clear_AnimationDuration", 1000},
-				{"Chara_Result_Failed_In_AnimationDuration", 1000},
-				{"Chara_Result_Failed_AnimationDuration", 1000},
-			};
-
-			return chara_config;
-		}
 
 		public bool LoadAnimationGroup(string category = "") {
 			try {
@@ -321,6 +223,8 @@ namespace OpenTaiko {
 	}
 	public class LuaCharacterFunc {
 		public LuaCharacterFunc() { }
+		public string ANIM_PREVIEW => CCharacter.ANIM_PREVIEW;
+		public string ANIM_RENDER => CCharacter.ANIM_RENDER;
 
 		public string ANIM_GAME_NORMAL => CCharacter.ANIM_GAME_NORMAL;
 		public string ANIM_GAME_CLEAR => CCharacter.ANIM_GAME_CLEAR;
@@ -350,6 +254,16 @@ namespace OpenTaiko {
 		public string ANIM_GAME_KUSUDAMA_BROKE => CCharacter.ANIM_GAME_KUSUDAMA_BROKE;
 		public string ANIM_GAME_KUSUDAMA_MISS => CCharacter.ANIM_GAME_KUSUDAMA_MISS;
 		public string ANIM_GAME_KUSUDAMA_IDLE => CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
+
+		public string ANIM_GAME_TOWER_STANDING = CCharacter.ANIM_GAME_TOWER_STANDING;
+		public string ANIM_GAME_TOWER_STANDING_TIRED = CCharacter.ANIM_GAME_TOWER_STANDING_TIRED;
+		public string ANIM_GAME_TOWER_CLIMBING = CCharacter.ANIM_GAME_TOWER_CLIMBING;
+		public string ANIM_GAME_TOWER_CLIMBING_TIRED = CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED;
+		public string ANIM_GAME_TOWER_RUNNING = CCharacter.ANIM_GAME_TOWER_RUNNING;
+		public string ANIM_GAME_TOWER_RUNNING_TIRED = CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED;
+		public string ANIM_GAME_TOWER_CLEAR = CCharacter.ANIM_GAME_TOWER_CLEAR;
+		public string ANIM_GAME_TOWER_CLEAR_TIRED = CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED;
+		public string ANIM_GAME_TOWER_FAIL = CCharacter.ANIM_GAME_TOWER_FAIL;
 
 		public string ANIM_MENU_WAIT => CCharacter.ANIM_MENU_WAIT;
 		public string ANIM_MENU_START => CCharacter.ANIM_MENU_START;
