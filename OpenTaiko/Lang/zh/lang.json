@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
 	"Language": "中文 (Chinese)",
-	"Version": "0.6.0.72",
+	"Version": "0.6.0.73",
 	"Entries": {
 
 		// Common
@@ -112,17 +112,16 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "切换是否播放音乐。",
 		"SETTINGS_SYSTEM_USESONGVOL": "应用音量（SONGVOL）元信息",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "切换是否使用 SONGVOL 元数据的部分无效选项。\n— 0—99：降低音量\n— 100+：没有任何作用",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
-		// Please update the VOL keys below, a game restart is not required to save sound settings.
+		"SETTINGS_SYSTEM_MASTERVOL": "主音量",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "调整程序的的整体音量。",
 		"SETTINGS_SYSTEM_SEVOL": "音效音量",
-		"SETTINGS_SYSTEM_SEVOL_DESC": "调整“咚”“咔”音量。\n— 0：关闭敲击音效\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+		"SETTINGS_SYSTEM_SEVOL_DESC": "调整“咚”“咔”音量。",
 		"SETTINGS_SYSTEM_VOICEVOL": "语音音量",
-		"SETTINGS_SYSTEM_VOICEVOL_DESC": "调整角色的语音音量。\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+		"SETTINGS_SYSTEM_VOICEVOL_DESC": "调整角色的语音音量。",
 		"SETTINGS_SYSTEM_SONGVOL": "歌曲播放音量",
-		"SETTINGS_SYSTEM_SONGVOL_DESC": "调整歌曲播放音量。\n你必须在调整完成该项设置后重启游戏才能应用更改。",
+		"SETTINGS_SYSTEM_SONGVOL_DESC": "调整歌曲播放音量。",
 		"SETTINGS_SYSTEM_SONGPREVIEWVOL": "歌曲预览音量",
-		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "调整歌曲预览音量。\n必须在调整完成该项设置后重启游戏才能应用更改。",
+		"SETTINGS_SYSTEM_SONGPREVIEWVOL_DESC": "调整歌曲预览音量。",
 		"SETTINGS_SYSTEM_VOLINCREMENT": "键盘音量增减幅度",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "控制每次按下调整音量按键时音量的增减幅度。\n更改范围：1—20",
 
@@ -369,7 +368,7 @@
 
 		"TITLE_MODE_TAIKO_DESC": "按照您自己的节奏演奏歌曲！",
 		"TITLE_MODE_DAN_DESC": "连续演奏多个谱面并通过挑战测试！",
-		"TITLE_MODE_TOWER_DESC": "在限定次机会内演奏长谱面并到达塔顶！",
+		"TITLE_MODE_TOWER_DESC": "在有限次机会内演奏长谱面并到达塔顶！",
 		"TITLE_MODE_SHOP_DESC": "使用游戏中获得的金币购买歌曲和角色！",
 		"TITLE_MODE_STORY_DESC": "克服各种障碍来获得新内容！",
 		"TITLE_MODE_HEYA_DESC": "更改名牌信息或角色外观！",
