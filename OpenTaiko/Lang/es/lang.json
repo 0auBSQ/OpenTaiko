@@ -45,7 +45,7 @@
 		// Settings - System
 		"SETTINGS_SYSTEM_LANGUAGE": "Idioma del sistema",
 		"SETTINGS_SYSTEM_LANGUAGE_DESC": "Cambia el idioma que se usa en el juego y dentro\nde los menús.",
-		"SETTINGS_SYSTEM_PLAYERCOUNT": "Cantidad de Jugadores",
+		"SETTINGS_SYSTEM_PLAYERCOUNT": "Cant. de Jugadores",
 		"SETTINGS_SYSTEM_PLAYERCOUNT_DESC": "Selecciona con cuántos jugadores quieres jugar.\nHasta 5 jugadores pueden jugar a la vez.",
 		"SETTINGS_SYSTEM_RELOADSONG": "Recargar Canciones",
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Recarga la carpeta de las canciones.",
@@ -216,7 +216,7 @@
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Activa una guía numérica que se muestra para\nver cuál rama se va a escoger.\nNo se muestra en modo auto.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Juicio de Nota Grande",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Alterna si las notas grandes recompensan ser\ngolpeadas con 2 teclas.\nSi está activado, usar 1 tecla provocará un retraso\nvisual antes de que desaparezcan.\nGolpes con 2 teclas otorgarán el doble de puntos.\nSi está desactivado, usar 1 tecla los golpeará como\nuna nota normal.\nAún se otorgarán puntos dobles.\nIntentar golpearlos con 2 teclas puede hacer que se\ngolpee la siguiente nota.",
-		"SETTINGS_GAME_SURVIVAL": "Modo de Supervivencia",
+		"SETTINGS_GAME_SURVIVAL": "Modo Supervivencia",
 		"SETTINGS_GAME_SURVIVAL_DESC": "Este modo está roto.\nImplementa un sistema medidor parecido a los\ncursos de StepMania, pero hay código faltante así\nque su funcionamiento es limitado.",
 		"SETTINGS_GAME_SCOREMODE": "Modo de Puntos",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Elige el método para calcular los puntos.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3\n",
@@ -591,7 +591,7 @@
 		"MOD_SCOREMULTIPLY": "Multiplicador de Puntos: {0}",
 		"MOD_COINMULTIPLY": "Multiplicador de Monedas: {0}",
 
-		"MOD_SPEED": "Velocidad de Desplazamiento",
+		"MOD_SPEED": "Vel. de Desplazamiento",
 
 		"MOD_HIDE": "Notas Invisibles",
 		"MOD_STEALTH": "Cauteloso",
@@ -622,7 +622,7 @@
 
 		"MOD_AUTO": "Auto",
 
-		"MOD_SONGSPEED": "Velocidad de la canción",
+		"MOD_SONGSPEED": "Vel. de la canción",
 		"SETTINGS_MOD_SONGSPEED_DESC": "Cambia la velocidad de la canción.\nSi la opción Modo de Estiramiento de Tiempo está\nactiva, pueden producirse problemas de sonido por\ndebajo de 0,9 veces la velocidad de reproducción.\nNota: También cambia el tono de las canciones.",
 
 		"MOD_HITSOUND": "Instrumento",
