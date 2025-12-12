@@ -70,7 +70,7 @@
 		"SETTINGS_SYSTEM_FULLSCREEN": "Modo de Pantalla Completa",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Alterna entre modo de ventana y pantalla completa.",
 		"SETTINGS_SYSTEM_VSYNC": "Modo de VSync",
-		"SETTINGS_SYSTEM_VSYNC_DESC": "Alterna si VSync es utilizado.\nActivarlo limitará los FPS a 60, suavizará el\ndesplazamiento de notas pero aumentará el retraso de\nentrada.\nDesactivarlo no limitará los FPS, disminuirá el\nretraso de entrada pero hará que el desplazamiento\nde nota parezca más inestable.",
+		"SETTINGS_SYSTEM_VSYNC_DESC": "Alterna si VSync es utilizado.\nActivarlo limitará los FPS a 60, suavizará el\ndesplazamiento de notas pero aumentará el \nretraso de entrada.\nDesactivarlo no limitará los FPS, disminuirá el\nretraso de entrada pero hará que el desplazamiento\nde nota parezca más inestable.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "API Gráfica",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Método de Renderizado:\nElige entre OpenGL, DirectX 11, Vulkan, o Metal.\nOpenGL es lento, pero compatible y estable.\nDirectX11 es rápido y estable, pero solo funciona\nen Windows.\nVulkan funciona más rápido en Linux.\nMetal solo funciona en MacOS.\n\nEsto tendrá efecto después de reiniciar el juego.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "Carga de Texturas Asíncronas",
@@ -78,7 +78,7 @@
 
 		"SETTINGS_SYSTEM_BGMOVIE": "Alternar Reproducción de Video",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Alterna si se utilizan videos de fondo.\nSi está habilitado y falta el video en una carpeta,\nel fondo aparecerá oscurecido.",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Modo de Visualización de Reproducción de Video",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Modo de reproducción de Video",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Cambia la forma en que se muestran videos en el\nfondo.",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Nada",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Pantalla Completa",
@@ -102,7 +102,7 @@
 		"SETTINGS_SYSTEM_DISPLAYPUCHI": "Mostrar Puchichara",
 		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Muestra imágenes del Puchichara.",
 		"SETTINGS_SYSTEM_SIMPLEMODE": "Modo Simple",
-		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifica el renderizado ocultando la mayoría de los\ndestellos y efectos visuales durante el juego.",
+		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifica el renderizado ocultando la mayoría de\nlosdestellos y efectos visuales durante el juego.",
 
 		"SETTINGS_SYSTEM_SKIN": "Skin Actual",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Elige una skin desde la carpeta de sistema.",
@@ -126,7 +126,7 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Búfer de Reproducción de Canción",
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "El tiempo necesario antes de la reproducción de la\ncanción durante el juego.\nDisminuir el valor puede hacer que las canciones se\nreproduzcan demasiado pronto.",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Búfer de Vista Previa de Canción",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "El tiempo necesario antes de que se reproduzca\nla vista previa de una canción.\nDisminuir este valor puede hacer que las vistas previas\ncomiencen mientras aún te desplazas.\nPuedes especificar de 0 ms a 10000 ms.",
+		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "El tiempo necesario antes de que se reproduzca\nla vista previa de una canción.\nDisminuir este valor puede hacer que las \nvistas previas comiencen mientras aún te desplazas.\nPuedes especificar de 0 ms a 10000 ms.",
 
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Modo de Reproducción de Canción",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Solo funciona en dispositivos de sonido\ncompatibles con la reproducción ASIO.\n- Tiene el menor retraso de entrada.\nWasapi:\n- Solo compatible con Windows.\n- Tiene el segundo menor retraso de entrada.\nBASS:\n- Compatible con todas las plataformas.\nNota: Sal de CONFIGURACIÓN para realizar los\n           ajustes.",
@@ -206,18 +206,18 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Búfer de Previsualización de Imágenes",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Búfer de Prev. de Imágenes",
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Esta es una configuración redundante traida de\nDTXMania.\nNo hace nada.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Modo de Estiramiento de Tiempo",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "No se está seguro de qué hace esta opción.\nUtiliza más potencia de CPU, y puede causar\nproblemas de sonido por debajo de 0,9 veces\nla velocidad de reproducción.",
 		"SETTINGS_SYSTEM_FASTRENDER": "Renderizado Rápido",
 		"SETTINGS_SYSTEM_FASTRENDER_DESC": "Alterna si las imágenes se procesan antes de cargar\nlas canciones.",
 		"SETTINGS_GAME_BRANCHGUIDE": "Guía de Rama",
-		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Activa una guía numérica que se muestra para ver cuál\nrama se va a escoger.\nNo se muestra en modo auto.",
+		"SETTINGS_GAME_BRANCHGUIDE_DESC": "Activa una guía numérica que se muestra para\nver cuál rama se va a escoger.\nNo se muestra en modo auto.",
 		"SETTINGS_GAME_BIGNOTEJUDGE": "Juicio de Nota Grande",
 		"SETTINGS_GAME_BIGNOTEJUDGE_DESC": "Alterna si las notas grandes recompensan ser\ngolpeadas con 2 teclas.\nSi está activado, usar 1 tecla provocará un retraso\nvisual antes de que desaparezcan.\nGolpes con 2 teclas otorgarán el doble de puntos.\nSi está desactivado, usar 1 tecla los golpeará como\nuna nota normal.\nAún se otorgarán puntos dobles.\nIntentar golpearlos con 2 teclas puede hacer que se\ngolpee la siguiente nota.",
 		"SETTINGS_GAME_SURVIVAL": "Modo de Supervivencia",
-		"SETTINGS_GAME_SURVIVAL_DESC": "Este modo está roto.\nImplementa un sistema medidor parecido a los cursos\nde StepMania, pero hay código faltante así\nque su funcionamiento es limitado.",
+		"SETTINGS_GAME_SURVIVAL_DESC": "Este modo está roto.\nImplementa un sistema medidor parecido a los\ncursos de StepMania, pero hay código faltante así\nque su funcionamiento es limitado.",
 		"SETTINGS_GAME_SCOREMODE": "Modo de Puntos",
 		"SETTINGS_GAME_SCOREMODE_DESC": "Elige el método para calcular los puntos.\nTYPE-A: Gen-1\nTYPE-B: Gen-2\nTYPE-C: Gen-3\n",
 		"SETTINGS_GAME_SHINUCHI": "Modo Shin'uchi",
@@ -365,7 +365,7 @@
 		"TITLE_MODE_TOOLS": "Abrir herramientas",
 
 		"TITLE_MODE_TAIKO_DESC": "¡Juega tus canciones\nfavoritas a tu gusto!",
-		"TITLE_MODE_DAN_DESC": "¡Juega varias partituras seguidas\nsiguiendo requisitos desafiantes\npara obtener un rango APROBADO!",
+		"TITLE_MODE_DAN_DESC": "¡Juega varias partituras seguidas\ncumpliendo condiciones desafiantes\npara obtener un rango APROBADO!",
 		"TITLE_MODE_TOWER_DESC": "¡Juega partituras largas con un\nnúmero de vidas limitado y llega\na la cima de la torre!",
 		"TITLE_MODE_SHOP_DESC": "¡Compra nuevas canciones, Puchicharas o personajes\nusando las medallas que ganaste en el juego!",
 		"TITLE_MODE_STORY_DESC": "¡Supera varios obstáculos y\ndesbloquea nuevo contenido!",
@@ -476,9 +476,9 @@
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "¡El medidor empieza lleno y se agota bruscamente en cada falla!\n¡Ten cuidado, si el valor del medidor llega a 0, tu partida está automáticamente perdida!",
 		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "¡El medidor empieza lleno y se agota bruscamente en cada falla!\nUn poder extraño parece reducir el margen de error por la canción...",
 		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Factor de Bomba: {0}% de notas se convirtieron a minas en Buscaminas",
+		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Factor de Bomba: {0}% de notas se convierten a minas en Buscaminas",
 		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Factor de Fusible: {0}% de globos se convirtieron a redobles de fusibles en Buscaminas",
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Factor de Fusible: {0}% de globos se convierten a redobles de fusibles en Buscaminas",
 		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Todas las notas grandes se vuelven notas de <c.#c800ff>Intercambio</c>",
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "Notas de <c.#c4ffe2>ADLib</c> se vuelven visibles",
 		// {0}: # of auto-rolls per second
