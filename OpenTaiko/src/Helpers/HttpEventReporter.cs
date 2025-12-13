@@ -92,11 +92,15 @@ internal class HttpEventReporter(string host, int port) {
         var tjaSummaries = Enumerable.Range(0, OpenTaiko.ConfigIni.nPlayerCount).Select(i => {
 			CTja? tja = OpenTaiko.GetTJA(i);
             if (tja is null) return null;
+            int difficultyInt = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
+            if (!Enum.IsDefined(typeof(Difficulty), difficultyInt)) return null;
+            string difficulty = ((Difficulty)difficultyInt).ToString();
 			string fullPath = tja.strFullPath;
             string tjaContent = File.ReadAllText(fullPath);
             return new {
                 player = i,
-                tjaContent
+                tjaContent,
+                difficulty
             };
         }).Where(n => n is not null);
 
