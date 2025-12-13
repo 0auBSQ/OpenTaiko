@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Diagnostics;
+using System.IO;
 
 namespace OpenTaiko;
 
@@ -88,9 +89,21 @@ internal class HttpEventReporter(string host, int port) {
 	}
 
     public void ReportGameplayStart() {
+        var tjaSummaries = Enumerable.Range(0, OpenTaiko.ConfigIni.nPlayerCount).Select(i => {
+			CTja? tja = OpenTaiko.GetTJA(i);
+            if (tja is null) return null;
+			string fullPath = tja.strFullPath;
+            string tjaContent = File.ReadAllText(fullPath);
+            return new {
+                player = i,
+                tjaContent
+            };
+        }).Where(n => n is not null);
+
         this.Broadcast(new {
-            type = "gameplay_start"
-        });
+            type = "gameplay_start",
+			tjaSummaries
+		});
     }
 
     private void Broadcast(object data) {
