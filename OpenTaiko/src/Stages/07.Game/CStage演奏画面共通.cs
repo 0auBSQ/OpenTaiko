@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 using FDK;
 using FDK.ExtensionMethods;
@@ -46,6 +46,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public double[] nAddScoreGen4ShinUchi_Dan = [];
 
 	public override void Activate() {
+		OpenTaiko.HttpEventReporter.ReportGameplayStart();
+
 		listChip = new List<CChip>[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
@@ -1448,6 +1450,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult) {
+		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, pChip);
+
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {

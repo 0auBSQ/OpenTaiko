@@ -297,6 +297,11 @@ internal class OpenTaiko : Game {
 
 	#endregion
 
+	public static HttpEventReporter HttpEventReporter {
+		get;
+		private set;
+	} = new HttpEventReporter("localhost", 2354);
+
 	// Constructor
 
 	public OpenTaiko(params string[] args) : base("OpenTaiko.ico", args) {
@@ -1499,7 +1504,6 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	private HttpEventReporter httpEventReporter = new HttpEventReporter("localhost", 2354);
 
 	private void tStartupProcess() {
 
@@ -1891,7 +1895,7 @@ internal class OpenTaiko : Game {
 		#endregion
 
 		// Set up the HTTP server.
-		this.httpEventReporter.StartListening();
+		OpenTaiko.HttpEventReporter.StartListening();
 
 		Trace.TraceInformation("Application successfully started.");
 
