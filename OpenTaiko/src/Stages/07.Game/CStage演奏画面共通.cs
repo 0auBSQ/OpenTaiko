@@ -3581,6 +3581,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public void t演奏やりなおし() {
+		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 		OpenTaiko.TJA.t全チップの再生停止とミキサーからの削除();
 		//this.actAVI.Stop();
 		foreach (var vd in OpenTaiko.TJA.listVD) {
