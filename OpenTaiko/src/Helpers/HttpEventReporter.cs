@@ -63,12 +63,13 @@ internal class HttpEventReporter(string host, int port) {
         Trace.TraceInformation("[HttpEventReporter] Client connected.");
     }
 
-    public void ReportNoteJudgement(ENoteJudge noteJudge, CChip? pChip) {
+    public void ReportNoteJudgement(ENoteJudge noteJudge, CChip? pChip, int? msDelta) {
         EGameType gameType = pChip?.eGameType ?? EGameType.Taiko;
         if (!NotesManager.IsRedOrBlue(pChip, gameType)) { return; }
         this.Broadcast(new {
             type = "judgement",
-            judgement = StringForSerailization(noteJudge)
+            judgement = StringForSerailization(noteJudge),
+            msDelta
         });
     }
 
