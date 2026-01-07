@@ -144,7 +144,16 @@ namespace OpenTaiko {
 			// Wrap into [min, max) robustly for arbitrary overshoot (positive or negative)
 			double relative = value - min;
 			double mod = ((relative % range) + range) % range; // [0, range)
+
+			// Calculate how many complete loops occurred
+			int loops = (int)Math.Abs(relative / range);
+
 			Value = min + mod;
+
+			// Call ended callback for each complete loop
+			for (int i = 0; i < loops; i++) {
+				lfEnded?.Call();
+			}
 		}
 
 		private void DoBounce(double value) {
@@ -158,6 +167,9 @@ namespace OpenTaiko {
 			// Normalize into [0, 2*length)
 			double mod = shifted % period;
 			if (mod < 0) mod += period;
+
+			// Calculate how many complete bounces occurred
+			int bounces = (int)Math.Abs(shifted / length);
 
 			// Bounce fold
 			double folded;
@@ -175,6 +187,11 @@ namespace OpenTaiko {
 			// Flip sign if we landed in a reflected segment
 			if (bounced) {
 				Interval = -Interval;
+			}
+
+			// Call ended callback for each complete bounce
+			for (int i = 0; i < bounces; i++) {
+				lfEnded?.Call();
 			}
 		}
 
