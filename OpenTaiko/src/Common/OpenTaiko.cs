@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -1499,6 +1499,8 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	private HttpEventReporter httpEventReporter = new HttpEventReporter("localhost", 2354);
+
 	private void tStartupProcess() {
 
 		// Load System error beforehand
@@ -1888,6 +1890,8 @@ internal class OpenTaiko : Game {
 		});
 		#endregion
 
+		// Set up the HTTP server.
+		this.httpEventReporter.StartListening();
 
 		Trace.TraceInformation("Application successfully started.");
 
