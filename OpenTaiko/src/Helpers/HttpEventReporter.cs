@@ -18,6 +18,7 @@ internal class HttpEventReporter(string host, int port) {
     private HttpListener? _listener;
     private readonly List<HttpListenerResponse> _clients = new();
     private readonly object _lockObj = new();
+    private Dictionary<int, Dictionary<int, int>> _noteOrdinalMappingByPlayer = new();
 
     public void StartListening() {
         if (this.started) return;
@@ -63,13 +64,22 @@ internal class HttpEventReporter(string host, int port) {
         Trace.TraceInformation("[HttpEventReporter] Client connected.");
     }
 
-    public void ReportNoteJudgement(ENoteJudge noteJudge, CChip? pChip, int? msDelta) {
-        EGameType gameType = pChip?.eGameType ?? EGameType.Taiko;
-        if (!NotesManager.IsRedOrBlue(pChip, gameType)) { return; }
+    public void ReportNoteJudgement(ENoteJudge noteJudge, int player, CChip? chip, int? msDelta) {
+        if (chip == null) return;
+        NotesManager.ENoteType noteType = NotesManager.GetNoteType(chip);
+        Dictionary<int, int> mappingForPlayer =
+            this._noteOrdinalMappingByPlayer.GetValueOrDefault(player, new());
+        int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.n整数値_内部番号)
+            ? mappingForPlayer[chip.n整数値_内部番号]
+            : null;
+        EGameType gameType = chip?.eGameType ?? EGameType.Taiko;
+        if (!NotesManager.IsRedOrBlue(chip, gameType)) { return; }
         this.Broadcast(new {
             type = "judgement",
             judgement = StringForSerailization(noteJudge),
-            msDelta
+            msDelta,
+            noteChar = NotesManager.ToNoteChar(noteType),
+            noteOrdinalByChar
         });
     }
 
@@ -90,9 +100,11 @@ internal class HttpEventReporter(string host, int port) {
 	}
 
     public void ReportGameplayStart() {
+        this._noteOrdinalMappingByPlayer = new();
         var tjaSummaries = Enumerable.Range(0, OpenTaiko.ConfigIni.nPlayerCount).Select(i => {
 			CTja? tja = OpenTaiko.GetTJA(i);
             if (tja is null) return null;
+            this.BuildNoteOrdinalMapping(i, tja);
             int difficultyInt = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
             if (!Enum.IsDefined(typeof(Difficulty), difficultyInt)) return null;
             string difficulty = ((Difficulty)difficultyInt).ToString();
@@ -109,6 +121,19 @@ internal class HttpEventReporter(string host, int port) {
             type = "gameplay_start",
 			tjaSummaries
 		});
+    }
+
+    private void BuildNoteOrdinalMapping(int player, CTja tja) {
+        Dictionary<int, int> mappingForPlayer = new();
+        this._noteOrdinalMappingByPlayer[player] = mappingForPlayer;
+        Dictionary<NotesManager.ENoteType, int> numNotesSeenByType = new();
+        foreach (CChip chip in tja.listNoteChip) {
+            NotesManager.ENoteType noteType = NotesManager.GetNoteType(chip);
+            numNotesSeenByType.TryGetValue(noteType, out int numNotes);
+            mappingForPlayer[chip.n整数値_内部番号] = numNotes;
+            numNotesSeenByType[noteType] = numNotes + 1;
+        }
+        List<CChip> noteChips = tja.listNoteChip;
     }
 
     private void Broadcast(object data) {

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using FDK;
 using FDK.ExtensionMethods;
@@ -1463,7 +1463,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, int? msDelta = null) {
-		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, pChip, msDelta);
+		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
 
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
