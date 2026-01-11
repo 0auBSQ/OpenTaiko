@@ -41,6 +41,27 @@ internal class HttpEventReporter(string host, int port) {
         });
     }
 
+    public void StopListening() {
+        if (!this.started) return;
+        this.started = false;
+
+        try {
+            this._listener?.Stop();
+            this._listener?.Close();
+        } catch (Exception ex) {
+            Trace.TraceError($"[HttpEventReporter] Stop error: {ex.Message}");
+        } finally {
+            this._listener = null;
+            lock (this._lockObj) {
+                foreach (var client in this._clients) {
+                    try { client.Close(); } catch { }
+                }
+                this._clients.Clear();
+            }
+            Trace.TraceInformation("[HttpEventReporter] Stopped listening.");
+        }
+    }
+
     private void HandleClient(HttpListenerContext context) {
         HttpListenerResponse response = context.Response;
         response.ContentType = "text/event-stream";

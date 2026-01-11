@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -1289,6 +1289,16 @@ internal class CConfigIni : INotifyPropertyChanged {
 	/// </summary>
 	public bool SendDiscordPlayingInformation;
 
+	/// <summary>
+	/// Enable game event broadcasting to external applications via HTTP.
+	/// </summary>
+	public bool bEnableGameEventBroadcasting;
+
+	/// <summary>
+	/// Port for game event broadcasting.
+	/// </summary>
+	public int nGameEventBroadcastingPort;
+
 	#region [ STRANGE ]
 
 	public STRANGE nHitRangeMs;
@@ -1734,6 +1744,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		SimpleMode = false;
 		MusicPreTimeMs = 2500; // 2.5 seconds
 		SendDiscordPlayingInformation = true;
+		bEnableGameEventBroadcasting = false;
+		nGameEventBroadcastingPort = 2354;
 
 		#region[ Ver.K追加 ]
 
@@ -2131,6 +2143,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; Discordに再生中の譜面情報を送信する(0:OFF, 1:ON)"); // #25399 2011.6.9 yyagi
 		sw.WriteLine("; Share Playing .tja file infomation on Discord."); //
 		sw.WriteLine("{0}={1}", nameof(SendDiscordPlayingInformation), SendDiscordPlayingInformation ? 1 : 0); //
+		sw.WriteLine();
+		sw.WriteLine("; Enable game event broadcasting to external applications via HTTP. (0:OFF, 1:ON)");
+		sw.WriteLine("{0}={1}", nameof(bEnableGameEventBroadcasting), bEnableGameEventBroadcasting ? 1 : 0);
+		sw.WriteLine();
+		sw.WriteLine("; Port for game event broadcasting.");
+		sw.WriteLine("{0}={1}", nameof(nGameEventBroadcastingPort), nGameEventBroadcastingPort);
 		sw.WriteLine();
 		sw.WriteLine("; 再生速度変更を、ピッチ変更で行うかどうか(0:ピッチ変更, 1:タイムストレッチ"); // #23664 2013.2.24 yyagi
 		sw.WriteLine("; (WASAPI/ASIO使用時のみ有効) ");
@@ -2895,6 +2913,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case nameof(this.SendDiscordPlayingInformation):
 				this.SendDiscordPlayingInformation = CConversion.bONorOFF(value[0]);
+				break;
+			case nameof(this.bEnableGameEventBroadcasting):
+				this.bEnableGameEventBroadcasting = CConversion.bONorOFF(value[0]);
+				break;
+			case nameof(this.nGameEventBroadcastingPort):
+				this.nGameEventBroadcastingPort = CConversion.ParseIntInRange(value, 0, 65535, this.nGameEventBroadcastingPort);
 				break;
 			case "TimeStretch":
 				this.bTimeStretch = CConversion.bONorOFF(value[0]);
