@@ -94,7 +94,7 @@ internal class HttpEventReporter(string host, int port) {
             ? mappingForPlayer[chip.n整数値_内部番号]
             : null;
         EGameType gameType = chip?.eGameType ?? EGameType.Taiko;
-        if (!NotesManager.IsRedOrBlue(chip, gameType)) { return; }
+        if (!NotesManager.IsGenericRoll(chip, gameType)) { return; }
         this.Broadcast(new {
             type = "judgement",
             judgement = StringForSerailization(noteJudge),
