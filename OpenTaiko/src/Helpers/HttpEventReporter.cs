@@ -93,7 +93,7 @@ internal class HttpEventReporter(string host, int port) {
         int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.n整数値_内部番号)
             ? mappingForPlayer[chip.n整数値_内部番号]
             : null;
-        if (!NotesManager.IsGenericRoll(noteType)) { return; }
+        if (!(NotesManager.IsHittableNote(chip) && !NotesManager.IsGenericRoll(chip))) { return; }
         this.Broadcast(new {
             type = "judgement",
             judgement = StringForSerailization(noteJudge),
