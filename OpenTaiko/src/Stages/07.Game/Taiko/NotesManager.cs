@@ -222,8 +222,6 @@ class NotesManager {
 				or (ENoteType.KaBig or ENoteType.KaHand, PlayerLane.FlashType.Blue or PlayerLane.FlashType.Total);
 	public static bool IsBigKaTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Blue);
 	public static bool IsBigDonTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Red);
-	public static bool IsRedOrBlue(ENoteType nt, EGameType gt) =>
-		IsSmallRed(nt, gt) || IsSmallBlue(nt, gt) || IsBigDonTaiko(nt, gt) || IsBigKaTaiko(nt, gt);
 	public static bool IsClapKonga(ENoteType nt, EGameType gt)
 		=> (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
 	public static bool IsSwapNote(ENoteType nt, EGameType gt)
