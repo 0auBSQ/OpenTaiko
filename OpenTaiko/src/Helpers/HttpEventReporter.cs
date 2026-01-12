@@ -93,7 +93,7 @@ internal class HttpEventReporter(string host, int port) {
         int? noteOrdinalByChar = mappingForPlayer.ContainsKey(chip.n整数値_内部番号)
             ? mappingForPlayer[chip.n整数値_内部番号]
             : null;
-        EGameType gameType = chip?.eGameType ?? EGameType.Taiko;
+        EGameType gameType = chip?.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
         if (!NotesManager.IsGenericRoll(chip, gameType)) { return; }
         this.Broadcast(new {
             type = "judgement",
