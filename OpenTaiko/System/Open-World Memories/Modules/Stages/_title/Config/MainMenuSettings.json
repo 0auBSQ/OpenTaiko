@@ -127,5 +127,37 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Pink"
     },
-    "count": 8
+    "9": {
+        "StageName": {
+            "strings": {
+                "default": "song_select_nameplate"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Testing nameplate graphics for dream song select"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "song_select_nameplate",
+        "Restricted1P": true,
+        "LEGACY_MenuBoxColor": "Red"
+    },
+    "10": {
+        "StageName": {
+            "strings": {
+                "default": "song_select"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Testing dream song select"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "song_select",
+        "Restricted1P": true,
+        "LEGACY_MenuBoxColor": "Red"
+    },
+    "count": 10
 }
