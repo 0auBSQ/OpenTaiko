@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.95] - 2026-01-18 (Beta)
+
+- [Feat] Basic support for broadcasting game events to external processes
+
 ## [0.6.0.94] - 2025-12-12 (Beta)
 
 - [i18n] Update spanish translations
