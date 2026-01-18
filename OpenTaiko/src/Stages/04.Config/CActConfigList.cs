@@ -211,6 +211,14 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DISCORDRPC_DESC"));
 		list項目リスト.Add(SendDiscordPlayingInformation);
 
+		this.iSystemGameEventBroadcasting = new CItemToggle("Game Event Broadcasting", OpenTaiko.ConfigIni.bEnableGameEventBroadcasting,
+			"Enable broadcasting game events via HTTP.");
+		this.list項目リスト.Add(this.iSystemGameEventBroadcasting);
+
+		this.iSystemGameEventBroadcastingPort = new CItemInteger("Broadcasting Port", 0, 65535, OpenTaiko.ConfigIni.nGameEventBroadcastingPort,
+			"Port number for game event broadcasting.");
+		this.list項目リスト.Add(this.iSystemGameEventBroadcastingPort);
+
 		this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT"), OpenTaiko.ConfigIni.bBufferedInputs,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT_DESC"));
 		this.list項目リスト.Add(this.iSystemBufferedInput);
@@ -1630,6 +1638,8 @@ internal class CActConfigList : CActivity {
 	private CItemBase iSystemReloadDTX;                 // #32081 2013.10.21 yyagi
 	private CItemBase iSystemHardReloadDTX;
 	private CItemBase isSystemImportingScore;
+	private CItemToggle iSystemGameEventBroadcasting;
+	private CItemInteger iSystemGameEventBroadcastingPort;
 
 	#region DBEUG
 	private CItemToggle debugImGui;
@@ -1697,6 +1707,22 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.bOutputLogs = this.iLogOutputLog.bON;
 		OpenTaiko.ConfigIni.bIsAutoResultCapture = this.iSystemAutoResultCapture.bON;                  // #25399 2011.6.9 yyagi
 		OpenTaiko.ConfigIni.SendDiscordPlayingInformation = this.SendDiscordPlayingInformation.bON;
+
+		bool bBroadcastingEnabledChanged = OpenTaiko.ConfigIni.bEnableGameEventBroadcasting != this.iSystemGameEventBroadcasting.bON;
+		bool nBroadcastingPortChanged = OpenTaiko.ConfigIni.nGameEventBroadcastingPort != this.iSystemGameEventBroadcastingPort.n現在の値;
+
+		OpenTaiko.ConfigIni.bEnableGameEventBroadcasting = this.iSystemGameEventBroadcasting.bON;
+		OpenTaiko.ConfigIni.nGameEventBroadcastingPort = this.iSystemGameEventBroadcastingPort.n現在の値;
+
+		if (bBroadcastingEnabledChanged || nBroadcastingPortChanged) {
+			if (OpenTaiko.HttpEventReporter != null) {
+				OpenTaiko.HttpEventReporter.StopListening();
+			}
+			OpenTaiko.HttpEventReporter = new HttpEventReporter("localhost", OpenTaiko.ConfigIni.nGameEventBroadcastingPort);
+			if (OpenTaiko.ConfigIni.bEnableGameEventBroadcasting) {
+				OpenTaiko.HttpEventReporter.StartListening();
+			}
+		}
 
 		OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                                      // #23559 2011.7.27 yyagi
 

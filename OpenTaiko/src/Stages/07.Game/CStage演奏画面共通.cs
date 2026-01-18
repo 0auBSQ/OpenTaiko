@@ -46,6 +46,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public double[] nAddScoreGen4ShinUchi_Dan = [];
 
 	public override void Activate() {
+		OpenTaiko.HttpEventReporter.ReportGameplayStart();
+
 		listChip = new List<CChip>[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
@@ -805,7 +807,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	internal ENoteJudge e指定時刻からChipのJUDGEを返す(long nTime, CChip pChip, int player = 0) {
-		var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player);
+		var e判定 = e指定時刻からChipのJUDGEを返すImpl(nTime, pChip, player).noteJudge;
 		return e判定;
 	}
 
@@ -857,11 +859,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.DanSongScore[danSong].nHighestCombo = this.DanSongScore[danSong].nCombo;
 	}
 
-	private ENoteJudge e指定時刻からChipのJUDGEを返すImpl(long msTjaTime, CChip pChip, int player = 0) {
+	private record NoteJudgeWithOffset(ENoteJudge noteJudge, int? msDelta);
+
+	private ENoteJudge evaluateNodeJudge(long msTjaTime, int msDelta, CChip pChip, int player = 0) {
 
 		if (pChip != null) {
 			CTja tja = OpenTaiko.GetTJA(player)!;
 			pChip.nLag = (int)(msTjaTime - pChip.n発声時刻ms);
+			pChip.nLag = msDelta;
 			int nDeltaTime = Math.Abs(pChip.nLag);
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip)) {
@@ -891,6 +896,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		}
 		return ENoteJudge.Miss;
+	}
+
+	private NoteJudgeWithOffset e指定時刻からChipのJUDGEを返すImpl(long msTjaTime, CChip pChip, int player = 0) {
+		if (pChip == null) return new NoteJudgeWithOffset(ENoteJudge.Miss, null);
+		int msDelta = (int)(msTjaTime - pChip.n発声時刻ms);
+		return new NoteJudgeWithOffset(
+			evaluateNodeJudge(msTjaTime, msDelta, pChip, player),
+			msDelta
+		);
 	}
 
 	protected abstract void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime);
@@ -1266,6 +1280,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		ENoteJudge eJudgeResult = ENoteJudge.Auto;
+		int? msDelta = e指定時刻からChipのJUDGEを返すImpl(msHitTjaTime, pChip, nPlayer).msDelta;
 		{
 			//連打が短すぎると発声されない
 			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, pChip, nPlayer) : ENoteJudge.Miss;
@@ -1355,7 +1370,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
-		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult);
+		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, msDelta);
 		this.UpdateComboMilestone(pChip, nPlayer);
 		this.AddScore(pChip, nPlayer, eJudgeResult);
 
@@ -1447,7 +1462,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult) {
+	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, int? msDelta = null) {
+		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
+
 		void returnChara() {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 			if (OpenTaiko.Skin.Characters_Return_Ptn[Character] != 0 && !bIsGOGOTIME[nPlayer] && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -3577,6 +3594,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public void t演奏やりなおし() {
+		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 		OpenTaiko.TJA.t全チップの再生停止とミキサーからの削除();
 		//this.actAVI.Stop();
 		foreach (var vd in OpenTaiko.TJA.listVD) {
