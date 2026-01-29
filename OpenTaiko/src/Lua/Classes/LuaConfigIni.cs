@@ -108,8 +108,8 @@ namespace OpenTaiko {
 				return OpenTaiko.ConfigIni.nSongSpeed;
 			}
 			set {
-				// Set between 5 (0.25x) and 400 (20x) when saved at exit
-				OpenTaiko.ConfigIni.nSongSpeed = Math.Max(1, value);
+				// Set between 2 (0.1x) and 200 (10x) when saved at exit
+				OpenTaiko.ConfigIni.nSongSpeed = Math.Clamp(value, CConfigIni.MinimumSongSpeed, CConfigIni.MaximumSongSpeed);
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace OpenTaiko {
 		public void SetScrollSpeed(int player, int speed) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			// 0 => x0.1, +0.1 per unit
-			OpenTaiko.ConfigIni.nScrollSpeed[player] = Math.Max(0, speed);
+			OpenTaiko.ConfigIni.nScrollSpeed[player] = Math.Clamp(speed, CConfigIni.MinimumScrollSpeed, CConfigIni.MaximumScrollSpeed);
 		}
 
 		public int GetTimingZone(int player) {
@@ -145,12 +145,12 @@ namespace OpenTaiko {
 			OpenTaiko.ConfigIni.bAutoPlay[player] = isAuto;
 		}
 
-		public int GetRandomMode(int player) {
+		public int GetRandomMod(int player) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)ERandomMode.Off;
 			return (int)OpenTaiko.ConfigIni.eRandom[player];
 		}
 
-		public void SetRandomMode(int player, int mode) {
+		public void SetRandomMod(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			if (Enum.IsDefined(typeof(ERandomMode), (ERandomMode)mode)) OpenTaiko.ConfigIni.eRandom[player] = (ERandomMode)mode;
 		}
@@ -165,22 +165,22 @@ namespace OpenTaiko {
 			if (Enum.IsDefined(typeof(EFunMods), (EFunMods)mod)) OpenTaiko.ConfigIni.nFunMods[player] = (EFunMods)mod;
 		}
 
-		public int GetStealthMode(int player) {
+		public int GetStealthMod(int player) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return (int)EStealthMode.Off;
 			return (int)OpenTaiko.ConfigIni.eSTEALTH[player];
 		}
 
-		public void SetStealthMode(int player, int mode) {
+		public void SetStealthMod(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			if (Enum.IsDefined(typeof(EStealthMode), (EStealthMode)mode)) OpenTaiko.ConfigIni.eSTEALTH[player] = (EStealthMode)mode;
 		}
 
-		public int GetJusticeMode(int player) {
+		public int GetJusticeMod(int player) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return 0;
 			return OpenTaiko.ConfigIni.bJust[player];
 		}
 
-		public void SetJusticeMode(int player, int mode) {
+		public void SetJusticeMod(int player, int mode) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return;
 			// 0: Off, 1: Just (Ok => Bad), 2: Safe (Bad => Ok)
 			OpenTaiko.ConfigIni.bJust[player] = Math.Clamp(mode, 0, 2);
@@ -190,11 +190,11 @@ namespace OpenTaiko {
 			byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 			_flags[0] = (byte)Math.Min(255, GetScrollSpeed(player));
-			_flags[1] = (byte)GetStealthMode(player);
-			_flags[2] = (byte)GetRandomMode(player);
+			_flags[1] = (byte)GetStealthMod(player);
+			_flags[2] = (byte)GetRandomMod(player);
 			_flags[3] = (byte)Math.Min(255, SongSpeed);
 			_flags[4] = (byte)GetTimingZone(player);
-			_flags[5] = (byte)GetJusticeMode(player);
+			_flags[5] = (byte)GetJusticeMod(player);
 			_flags[7] = (byte)GetFunMod(player);
 
 			return BitConverter.ToInt64(_flags, 0);
@@ -204,11 +204,11 @@ namespace OpenTaiko {
 			byte[] _flags = BitConverter.GetBytes(flags);
 
 			SetScrollSpeed(player, _flags[0]);
-			SetStealthMode(player, _flags[1]);
-			SetRandomMode(player, _flags[2]);
+			SetStealthMod(player, _flags[1]);
+			SetRandomMod(player, _flags[2]);
 			SongSpeed = _flags[3];
 			SetTimingZone(player, _flags[4]);
-			SetJusticeMode(player, _flags[5]);
+			SetJusticeMod(player, _flags[5]);
 			SetFunMod(player, _flags[7]);
 		}
 

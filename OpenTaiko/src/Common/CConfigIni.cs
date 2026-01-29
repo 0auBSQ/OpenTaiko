@@ -12,6 +12,11 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private const int MaximumKeyboardSoundLevelIncrement = 20;
 	private const int DefaultKeyboardSoundLevelIncrement = 5;
 
+	public static readonly int MinimumSongSpeed = 2;
+	public static readonly int MaximumSongSpeed = 200;
+	public static readonly int MinimumScrollSpeed = 0;
+	public static readonly int MaximumScrollSpeed = 99;
+
 	// Class
 
 	#region [ CKeyAssign ]
@@ -3080,23 +3085,23 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "DrumsScrollSpeed":
 			case "DrumsScrollSpeed1P":
 				this.nScrollSpeed[0] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[0]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[0]);
 				break;
 			case "DrumsScrollSpeed2P":
 				this.nScrollSpeed[1] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[1]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[1]);
 				break;
 			case "DrumsScrollSpeed3P":
 				this.nScrollSpeed[2] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[2]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[2]);
 				break;
 			case "DrumsScrollSpeed4P":
 				this.nScrollSpeed[3] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[3]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[3]);
 				break;
 			case "DrumsScrollSpeed5P":
 				this.nScrollSpeed[4] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[4]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[4]);
 				break;
 			case "TimingZones1P":
 				this.nTimingZones[0] =
@@ -3238,7 +3243,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "PlaySpeed":
 				this.nSongSpeed =
-					CConversion.ParseIntInRange(value, 5, 400, this.nSongSpeed);
+					CConversion.ParseIntInRange(value, MinimumSongSpeed, MaximumSongSpeed, this.nSongSpeed);
 				break;
 			case "PlaySpeedNotEqualOneNoSound":
 				this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(value[0]);

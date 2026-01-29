@@ -16,38 +16,24 @@ namespace OpenTaiko {
 		}
 
 		#region Sound
-		public void Play() {
-			_sound?.tPlay();
-		}
-		public void Stop() {
-			_sound?.tStop();
-		}
+		public void Play() => _sound?.tPlay();
+		public void Stop() => _sound?.tStop();
 		#endregion
 		#region Gets
 		public bool Loaded => _sound != null;
-		public bool IsPlaying => _sound != null ? _sound.bIsPlaying : false;
-		public bool GetLoop() {
-			return _sound != null ? _sound.bLoop : false;
-		}
-		public int GetPan() {
-			return _sound != null ? _sound.nPosition_CurrentlyPlayingSound : 0;
-		}
+		public bool IsPlaying => _sound?.bIsPlaying ?? false;
+		public bool GetLoop() => _sound?.bLoop ?? false;
+		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
 		#endregion
 		#region Sets
 		public void SetLoop(bool loop) {
 			if (_sound != null) _sound.bLoop = loop;
 		}
-		public void SetPan(int panning) {
-			_sound?.SetPanning(panning);
-		}
+		public void SetPan(int panning) => _sound?.SetPanning(panning);
 
-		public void SetTimestamp(int ms) {
-			_sound?.SetTimestamp(ms);
-		}
+		public void SetTimestamp(int ms) => _sound?.SetTimestamp(ms);
 
-		public void SetVolume(int vol) {
-			_sound?.SetVolume(vol);
-		}
+		public void SetVolume(int vol) => _sound?.SetVolume(vol);
 
 		#endregion
 		#region Dispose

@@ -166,7 +166,7 @@ class CActImplTrainingMode : CActivity {
 			}
 			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed)) {
 				if (this.bTrainingPAUSE) {
-					if (OpenTaiko.ConfigIni.nSongSpeed > 6) {
+					if (OpenTaiko.ConfigIni.nSongSpeed > CConfigIni.MinimumSongSpeed + 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed - 2;
 						this.tMatchWithTheChartDisplayPosition(false);
 					}
@@ -174,7 +174,7 @@ class CActImplTrainingMode : CActivity {
 			}
 			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed)) {
 				if (this.bTrainingPAUSE) {
-					if (OpenTaiko.ConfigIni.nSongSpeed < 399) {
+					if (OpenTaiko.ConfigIni.nSongSpeed < CConfigIni.MaximumSongSpeed - 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed + 2;
 						this.tMatchWithTheChartDisplayPosition(false);
 					}

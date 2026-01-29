@@ -194,7 +194,7 @@ function poolItems()
 			-- a nothing is picked (can happen to have days with 6 small slots)
 			bigItem = nil
 		else
-			bigItem.LocalizedName = I18N:FromString(bigItem.Name):GetString("")
+			bigItem.LocalizedName = LANG:FromString(bigItem.Name):GetString("")
 			bigItem.NameTx = text:GetText(bigItem.LocalizedName, true, 380)
 			bigItem.SoldOut = false
 			if entryHasicon(bigItem) then
@@ -228,7 +228,7 @@ function poolItems()
 			debugLog("Pool " .. poolSize .. " - " .. roll)
 			local chosen = pickFromPool(pool, poolSize, roll)
 			normalItems[n] = deepcopy(chosen)
-			normalItems[n].LocalizedName = I18N:FromString(normalItems[n].Name):GetString("")
+			normalItems[n].LocalizedName = LANG:FromString(normalItems[n].Name):GetString("")
 			normalItems[n].NameTx = text:GetText(normalItems[n].LocalizedName, true, 380)
 			normalItems[n].SoldOut = false
 			if entryHasicon(chosen) then

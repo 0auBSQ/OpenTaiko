@@ -39,11 +39,11 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 		#region [ 共通 Target/AutoMode/AutoLane ]
 		#endregion
 		#region [ 個別 ScrollSpeed ]
-		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), 0, 1999, OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile],
+		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), CConfigIni.MinimumScrollSpeed, CConfigIni.MaximumScrollSpeed, OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile],
 			""));
 		#endregion
 		#region [ 共通 Dark/Risky/PlaySpeed ]
-		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), 5, 400, OpenTaiko.ConfigIni.nSongSpeed,
+		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SONGSPEED"), CConfigIni.MinimumSongSpeed, CConfigIni.MaximumSongSpeed, OpenTaiko.ConfigIni.nSongSpeed,
 			""));
 		#endregion
 		#region [ 個別 Sud/Hid ]
