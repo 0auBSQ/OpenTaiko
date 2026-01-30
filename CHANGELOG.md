@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.96] - 2026-01-30 (Beta)
+
+- [Chore] Add unlock conditions for Chapter 6 and Project Pentjet songs
+- [Chore] Add unlock conditions for Nep05, Nep08, Nep09
+- [Chore] DISCARDED_DISRUPTION now also requires clearing Zealous Seeker to unlock
+
 ## [0.6.0.95] - 2026-01-18 (Beta)
 
 - [Feat] Basic support for broadcasting game events to external processes
