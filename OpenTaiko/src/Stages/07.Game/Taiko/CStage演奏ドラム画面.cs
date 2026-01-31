@@ -655,10 +655,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	protected override void ドラムスクロール速度アップ() {
-		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Min(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] + 1, 1999);
+		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Min(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] + 1, CConfigIni.MaximumScrollSpeed);
 	}
 	protected override void ドラムスクロール速度ダウン() {
-		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Max(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] - 1, 0);
+		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Max(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] - 1, CConfigIni.MinimumScrollSpeed);
 	}
 
 	private void t進行描画_チップファイアD() {

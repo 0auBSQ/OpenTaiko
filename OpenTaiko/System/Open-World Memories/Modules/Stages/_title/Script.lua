@@ -22,12 +22,12 @@ local function GenerateTTK()
         local color = COLOR:CreateColorFromARGB(255, 255, 255, 255)
         if i == currentMenu then color = COLOR:CreateColorFromARGB(255, 242, 207, 1) end
         if i <= #defaultMenus then
-			local ls = I18N:GetInternalTranslatedString(localizedMenus[i])
+			local ls = LANG:GetString(localizedMenus[i])
             ttkArr[i] = text:GetText(ls, false, 99999, color)
         else
 			local stnb = string.format("%.0f", i - #defaultMenus)
             local sn = luaMenus[stnb]["StageName"]
-            local ldt = I18N:AsLocalizationData(sn)
+            local ldt = LANG:AsLocalizationData(sn)
             ttkArr[i] = text:GetText(ldt:GetString(""), false, 99999, color)
         end
     end

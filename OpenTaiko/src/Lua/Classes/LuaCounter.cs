@@ -52,10 +52,6 @@ namespace OpenTaiko {
 			Loop = false;
 		}
 
-		public void SetInterval(double interval) {
-			Interval = interval;
-		}
-
 		public void Start() {
 			Reset();
 			Ticking = true;
