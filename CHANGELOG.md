@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.97] - 2026-02-01 (Beta)
+
+- [Fix] Fix some wrong song unlock conditions
+
 ## [0.6.0.96] - 2026-01-30 (Beta)
 
 - [Chore] Add unlock conditions for Chapter 6 and Project Pentjet songs
