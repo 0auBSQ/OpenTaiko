@@ -1,1 +1,10 @@
-﻿{"name":{"strings":{"default":"Clap"}}}
+﻿{
+	"name": {
+		"strings": {
+			"default": "Clap",
+			"es": "Aplauso",
+			"ru": "Хлопанье",
+			"zh": "拍手"
+		}
+	}
+}
