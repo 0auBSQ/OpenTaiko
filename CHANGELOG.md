@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.98] - 2026-02-08 (Beta)
+
+- [Hitsounds] Update the Taiko hitsounds
+- [Hitsounds] Add Bol and Clap histsounds
+
 ## [0.6.0.97] - 2026-02-01 (Beta)
 
 - [Fix] Fix some wrong song unlock conditions
