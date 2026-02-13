@@ -3,6 +3,22 @@
 # OpenTaiko Installation Script - Linux version
 # Does not require OpenTaiko Hub
 
+# Dependency check
+dependencies=(curl jq unzip git pgrep)
+missing=()
+
+for cmd in "${dependencies[@]}"; do
+    if ! command -v "$cmd" &> /dev/null; then
+        missing+=("$cmd")
+    fi
+done
+
+if [ ${#missing[@]} -ne 0 ]; then
+    echo "Error: The following programs are not installed: ${missing[*]}"
+    echo "Please install them using your package manager (e.g., sudo apt install ${missing[*]})"
+    exit 1
+fi
+
 echo "Starting OpenTaiko installation..."
 
 current_dir=$(pwd)
