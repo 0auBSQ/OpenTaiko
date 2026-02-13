@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0.99] - 2026-02-13 (Beta)
+
+- [Chore] Change the unlock conditions for Assimilation
+- [Chore] Add unlock conditions for the Touhou Arrangements Vol.2 folder
+
 ## [0.6.0.98] - 2026-02-08 (Beta)
 
 - [Hitsounds] Update the Taiko hitsounds
