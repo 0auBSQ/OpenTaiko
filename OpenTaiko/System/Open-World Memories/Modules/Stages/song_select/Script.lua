@@ -16,9 +16,11 @@ local bars = {}
 local bgtx = {}
 
 local favoriteicon = nil
-local flashcounter = nil
+
+local ctx = {}
 
 local currentBackground = 0
+local backgroundScrollX = 0
 
 local difficultySelection = false
 local diffIndex = {-2, -2, -2, -2, -2}
@@ -152,7 +154,8 @@ end
 
 
 function draw()
-	SHARED:GetSharedTexture("background"):Draw(0,0)
+	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX,0)
+	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX+1920,0)
 
 	-- Song info
 	if currentPage[0].IsSong then
@@ -240,7 +243,9 @@ function draw()
 end
 
 function update()
-	flashcounter:Tick()
+	for k, counter in pairs(ctx) do
+        counter:Tick()
+    end
 
 	if INPUT:KeyboardPressed("S") then
 		sounds.Skip:Play()
@@ -312,18 +317,18 @@ function activate()
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
-	flashcounter = COUNTER:CreateCounter(255, 0, -1 / 127)
-	flashcounter:SetBounce(true)
-	flashcounter:Listen(function (val)
-		if favoriteicon ~= nil then
-			favoriteicon:SetOpacity(val / 255)
-		end
+	ctx["background"] = COUNTER:CreateCounter(1920, 0, 1 / 48)
+	ctx["background"]:SetLoop(true)
+	ctx["background"]:Listen(function (val)
+		backgroundScrollX = val
 	end)
-	flashcounter:Start()
+	ctx["background"]:Start()
 end
 
 function deactivate()
-	flashcounter = COUNTER:EmptyCounter()
+	for k, counter in pairs(ctx) do
+        counter = COUNTER:EmptyCounter()
+    end
 
 	local psnd = SHARED:GetSharedSound("presound")
 	psnd:Stop()
@@ -350,8 +355,6 @@ function onStart()
 	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
 
 	genre_overlays = {}
-
-	flashcounter = COUNTER:EmptyCounter()
 
 end 
 
