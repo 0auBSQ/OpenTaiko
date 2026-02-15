@@ -43,6 +43,12 @@ local HEADER_OFFSET_X = 1780
 local HEADER_BOX_TEXT_OFFSET_X = 250
 local HEADER_BOX_TEXT_OFFSET_Y = 12
 
+local NAMEPLATE_BOX_FOLDED_SIZE_Y = 182
+local NAMEPLATE_BOX_START_X = 0
+local NAMEPLATE_BOX_SPACING_X = 384
+local NAMEPLATE_OFFSET_X = 27
+local NAMEPLATE_OFFSET_Y = 37
+
 local function reloadPreimage(songNode)
 	if songNode.IsSong == true then 
 		if songNode.HasPreimage then
@@ -239,7 +245,15 @@ function draw()
 		textMenuState:DrawAtAnchor(270,65,"Center")
 	end
 
-	NAMEPLATE:DrawPlayerNameplate(0, 1000, 255, 0)
+	-- Nameplates space
+	local playerCount = CONFIG.PlayerCount
+	for i = 1, playerCount, 1 do
+		local xpos = NAMEPLATE_BOX_START_X + (i - 1) * NAMEPLATE_BOX_SPACING_X
+		local ypos = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
+		bgtx["nameplate_info"]:Draw(xpos, ypos)
+		NAMEPLATE:DrawPlayerNameplate(xpos+NAMEPLATE_OFFSET_X, ypos+NAMEPLATE_OFFSET_Y, 255, i - 1)
+	end
+
 end
 
 function update()
@@ -345,6 +359,7 @@ function onStart()
 	bgtx["header"] = TEXTURE:CreateTexture("Textures/bg_header.png")
 	bgtx["header-box"] = TEXTURE:CreateTexture("Textures/bg_header-box.png")
 	bgtx["header-arrow"] = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")
+	bgtx["nameplate_info"] = TEXTURE:CreateTexture("Textures/nameplate_info.png")
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
 	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
