@@ -221,13 +221,6 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Fix line endings for bash script
-        run: |
-          # Convert CRLF to LF for the bash script
-          $content = Get-Content -Path "special/linux_installer_standalone.bash" -Raw
-          $content = $content -replace "`r`n", "`n"
-          [System.IO.File]::WriteAllText("special/linux_installer_standalone.bash", $content, [System.Text.UTF8Encoding]::new($false))
-
       - name: Upload All Builds for the Latest Release
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
@@ -236,3 +229,4 @@ jobs:
           tag_name: ${{ env.versionLast }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
+
