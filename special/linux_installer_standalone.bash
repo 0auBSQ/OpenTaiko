@@ -167,4 +167,3 @@ EOF
 echo "OpenTaiko installation complete!"
 echo "Your custom Vulkan launcher has been created at: $launcher"
 echo "You can launch your game either from that file or use an standard application launcher"
-
