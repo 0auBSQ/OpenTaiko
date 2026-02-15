@@ -24,7 +24,7 @@ local difficultySelection = false
 local diffIndex = {-2, -2, -2, -2, -2}
 
 -- UI constants
-local SONGLIST_ORIGIN_X = 700
+local SONGLIST_ORIGIN_X = 660
 local SONGLIST_ORIGIN_Y = 500
 local SONGLIST_OFFSET_X = 45
 local SONGLIST_OFFSET_Y = 120
@@ -36,6 +36,10 @@ local PREIMAGE_ORIGIN_X = 1276
 local PREIMAGE_ORIGIN_Y = 146
 local PREIMAGE_SIZE_X = 500
 local PREIMAGE_SIZE_Y = 500
+
+local HEADER_OFFSET_X = 1780
+local HEADER_BOX_TEXT_OFFSET_X = 250
+local HEADER_BOX_TEXT_OFFSET_Y = 12
 
 local function reloadPreimage(songNode)
 	if songNode.IsSong == true then 
@@ -190,6 +194,38 @@ function draw()
 		end
 	end
 
+	-- Folder Path
+	bgtx["header"]:Draw(0, 0)
+	local ssn = songList:GetSelectedSongNode()
+
+	if ssn ~= nil then
+		local pathStack = {}
+		local currentNode = ssn.Parent
+
+		-- Traverse up the tree
+		while currentNode ~= nil do
+			-- The root node as a Title of nil
+			local _tx = "/"
+			if currentNode.Title ~= nil then
+				_tx = currentNode.Title
+			end
+			local textobj = text:GetText(_tx, false, 270)
+			table.insert(pathStack, textobj)
+			currentNode = currentNode.Parent
+		end
+
+		local xpos = HEADER_OFFSET_X
+
+		for i, title in ipairs(pathStack) do
+			bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
+			title:DrawAtAnchor(xpos-bgtx["header-box"].Width+HEADER_BOX_TEXT_OFFSET_X, HEADER_BOX_TEXT_OFFSET_Y+bgtx["header-box"].Height/2, "center")
+			if i ~= #pathStack then
+				bgtx["header-arrow"]:DrawAtAnchor(xpos-bgtx["header-box"].Width, 0, "topright")
+			end
+			xpos = xpos - bgtx["header-box"].Width - bgtx["header-arrow"].Width
+		end
+	end
+
 	-- if favoriteicon ~= nil then
 	-- 	favoriteicon:Draw(1200, 400)
 	-- end
@@ -301,6 +337,9 @@ function onStart()
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 	bgtx["overlay"] = TEXTURE:CreateTexture("Textures/bg_overlay.png")
 	bgtx["songinfo"] = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
+	bgtx["header"] = TEXTURE:CreateTexture("Textures/bg_header.png")
+	bgtx["header-box"] = TEXTURE:CreateTexture("Textures/bg_header-box.png")
+	bgtx["header-arrow"] = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
 	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
