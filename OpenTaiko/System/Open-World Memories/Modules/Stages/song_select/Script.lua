@@ -22,6 +22,8 @@ local ctx = {}
 local currentBackground = 0
 local backgroundScrollX = 0
 
+local difficultyFade4 = 0
+
 local difficultySelection = false
 local diffIndex = {-2, -2, -2, -2, -2}
 
@@ -32,7 +34,15 @@ local SONGLIST_OFFSET_X = 45
 local SONGLIST_OFFSET_Y = 120
 local SONGLIST_TEXT_OFFSET_X = -65
 local SONGLIST_TEXT_OFFSET_Y = 15
-local SONGLIST_SELECTED_X_DIFF = 20
+local SONGLIST_SELECTED_X_DIFF = 50
+
+local SONGINFO_DIFFICULTIES_ORIGIN_X = 1790
+local SONGINFO_DIFFICULTIES_ORIGIN_Y = 154
+local SONGINFO_DIFFICULTIES_GAP_Y = 130
+local SONGINFO_HASVIDEO_ORIGIN_X = 1064
+local SONGINFO_HASVIDEO_ORIGIN_Y = 257
+local SONGINFO_EXPLICIT_ORIGIN_X = 1266
+local SONGINFO_EXPLICIT_ORIGIN_Y = 151
 
 local PREIMAGE_ORIGIN_X = 1276
 local PREIMAGE_ORIGIN_Y = 146
@@ -113,6 +123,11 @@ local function refreshPage()
 			playPreview(node)
 		end
 	end
+
+	-- Reset the Extra fade counter
+	if ctx["extreme_fade"] then
+		ctx["extreme_fade"]:Start()
+	end
 end
 
 local function handleDecide()
@@ -163,9 +178,36 @@ function draw()
 	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX,0)
 	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX+1920,0)
 
+	local ssn = songList:GetSelectedSongNode()
+
 	-- Song info
-	if currentPage[0].IsSong then
+	if ssn ~= nil and ssn.IsSong then
 		bgtx["songinfo"]:DrawAtAnchor(1920,0,"topright")
+		if ssn.HasVideo then
+			bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X,SONGINFO_HASVIDEO_ORIGIN_Y)
+		end
+		if ssn.Explicit then
+			bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
+		end
+		-- difficultyFade4
+		for i = 0, 4, 1 do
+			local chart = ssn:GetChart(i)
+			local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X
+			local ypos = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y*math.min(i, 3)
+			if ssn:GetChart(3) ~= nil and i == 4 then
+				if chart ~= nil then
+					bgtx["sinfo_difficulties_4"]:SetOpacity(difficultyFade4/255)
+					bgtx["sinfo_difficulties_4"]:Draw(xpos,ypos)
+					bgtx["sinfo_difficulties_4"]:SetOpacity(1)
+				end
+			elseif chart == nil then
+				if ssn:GetChart(4) == nil or i ~= 3 then
+					bgtx["sinfo_difficulties_missing"]:Draw(xpos,ypos)
+				end
+			else
+				bgtx["sinfo_difficulties_"..i]:Draw(xpos,ypos)
+			end
+		end
 	end
 	
 	drawPreimage()
@@ -205,8 +247,6 @@ function draw()
 
 	-- Folder Path
 	bgtx["header"]:Draw(0, 0)
-	local ssn = songList:GetSelectedSongNode()
-
 	if ssn ~= nil then
 		local pathStack = {}
 		local currentNode = ssn.Parent
@@ -331,12 +371,29 @@ function activate()
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
+	-- Background scroll counter
 	ctx["background"] = COUNTER:CreateCounter(1920, 0, 1 / 48)
 	ctx["background"]:SetLoop(true)
 	ctx["background"]:Listen(function (val)
 		backgroundScrollX = val
 	end)
 	ctx["background"]:Start()
+
+	-- Extra icon fade counter
+	ctx["extreme_fade"] = COUNTER:CreateCounter(2000, 0, 1 / 400)
+	ctx["extreme_fade"]:SetLoop(true)
+	ctx["extreme_fade"]:Listen(function (val)
+		if val >= 1000 and val <= 1745 then
+			difficultyFade4 = 255
+		elseif val > 745 and val < 1000 then
+			difficultyFade4 = math.max(0, math.min(255, val - 745))
+		elseif val > 1745 and val < 2000 then
+			difficultyFade4 = math.max(0, math.min(255, 2000 - val))
+		else
+			difficultyFade4 = 0
+		end
+	end)
+	ctx["extreme_fade"]:Start()
 end
 
 function deactivate()
@@ -360,6 +417,12 @@ function onStart()
 	bgtx["header-box"] = TEXTURE:CreateTexture("Textures/bg_header-box.png")
 	bgtx["header-arrow"] = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")
 	bgtx["nameplate_info"] = TEXTURE:CreateTexture("Textures/nameplate_info.png")
+	bgtx["sinfo_video"] = TEXTURE:CreateTexture("Textures/sinfo_video.png")
+	bgtx["sinfo_explicit"] = TEXTURE:CreateTexture("Textures/sinfo_explicit.png")
+	bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
+	for i = 0, 4, 1 do
+		bgtx["sinfo_difficulties_"..i] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_"..i..".png")
+	end
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
 	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
@@ -401,6 +464,9 @@ function onDestroy()
 	-- end
 	for _, bar in pairs(bars) do
 		bar:Dispose()
+	end
+	for _, bg in pairs(bgtx) do
+		bg:Dispose()
 	end
 	for _, overlay in pairs(genre_overlays) do
 		overlay:Dispose()
