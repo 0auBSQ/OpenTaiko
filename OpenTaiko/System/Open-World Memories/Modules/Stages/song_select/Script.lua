@@ -189,7 +189,6 @@ function draw()
 		if ssn.Explicit then
 			bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
 		end
-		-- difficultyFade4
 		for i = 0, 4, 1 do
 			local chart = ssn:GetChart(i)
 			local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X
@@ -237,12 +236,12 @@ function draw()
 					bars["back"]:DrawAtAnchor(xpos,ypos,"center")
 				end
 				tx:DrawAtAnchor(xpos+SONGLIST_TEXT_OFFSET_X, ypos+SONGLIST_TEXT_OFFSET_Y,"center")
-				if i == 0 then
-					bars["selected"]:DrawAtAnchor(xpos,ypos,"center")
-					bars["selected-arrows"]:DrawAtAnchor(xpos,ypos,"center")
-				end
 			end
 		end
+		local x0 = SONGLIST_ORIGIN_X+SONGLIST_SELECTED_X_DIFF
+		local y0 = SONGLIST_ORIGIN_Y
+		bars["selected"]:DrawAtAnchor(x0,y0,"center")
+		bars["selected-arrows"]:DrawAtAnchor(x0,y0,"center")
 	end
 
 	-- Folder Path
@@ -394,6 +393,17 @@ function activate()
 		end
 	end)
 	ctx["extreme_fade"]:Start()
+
+	-- Select Box Scale Animation (1.0 to 1.02)
+	ctx["selectbox_animation"] = COUNTER:CreateCounter(2000, 0, 1 / 600)
+	ctx["selectbox_animation"]:SetLoop(true)
+	ctx["selectbox_animation"]:Listen(function(val)
+		if bars["selected"] then
+			local n = 1.01 + (math.sin(val * (math.pi * 2 / 2000)) * 0.01)
+			bars["selected"]:SetScale(n, n)
+		end
+	end)
+	ctx["selectbox_animation"]:Start()
 end
 
 function deactivate()
