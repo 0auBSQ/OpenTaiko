@@ -13,6 +13,7 @@ local pageTexts = {}
 local genre_overlays = {}
 
 local bars = {}
+local bgtx = {}
 
 local favoriteicon = nil
 local flashcounter = nil
@@ -21,6 +22,20 @@ local currentBackground = 0
 
 local difficultySelection = false
 local diffIndex = {-2, -2, -2, -2, -2}
+
+-- UI constants
+local SONGLIST_ORIGIN_X = 700
+local SONGLIST_ORIGIN_Y = 500
+local SONGLIST_OFFSET_X = 45
+local SONGLIST_OFFSET_Y = 120
+local SONGLIST_TEXT_OFFSET_X = -65
+local SONGLIST_TEXT_OFFSET_Y = 15
+local SONGLIST_SELECTED_X_DIFF = 20
+
+local PREIMAGE_ORIGIN_X = 1276
+local PREIMAGE_ORIGIN_Y = 146
+local PREIMAGE_SIZE_X = 500
+local PREIMAGE_SIZE_Y = 500
 
 local function reloadPreimage(songNode)
 	if songNode.IsSong == true then 
@@ -38,10 +53,10 @@ end
 local function drawPreimage()
 	local tex = SHARED:GetSharedTexture("preimage")
 	if tex.Height > 0 and tex.Width > 0 then
-		local sH = 500 / tex.Height
-		local sW = 500 / tex.Width
+		local sH = PREIMAGE_SIZE_X / tex.Height
+		local sW = PREIMAGE_SIZE_Y / tex.Width
 		tex:SetScale(sW, sH)
-		tex:Draw(1080, 200)
+		tex:Draw(PREIMAGE_ORIGIN_X, PREIMAGE_ORIGIN_Y)
 	end
 end
 
@@ -134,26 +149,43 @@ end
 
 function draw()
 	SHARED:GetSharedTexture("background"):Draw(0,0)
+
+	-- Song info
+	if currentPage[0].IsSong then
+		bgtx["songinfo"]:DrawAtAnchor(1920,0,"topright")
+	end
+	
 	drawPreimage()
 
+	-- Song List
 	if pageTexts ~= nil then
 		for i, tx in pairs(pageTexts) do
+			local xpos = SONGLIST_ORIGIN_X+i*SONGLIST_OFFSET_X
+			local ypos = SONGLIST_ORIGIN_Y+i*SONGLIST_OFFSET_Y
+			-- shift the box if selected to highlight it
+			if i == 0 then
+				xpos = xpos + SONGLIST_SELECTED_X_DIFF
+			end
 			-- can be nil if no modulo pagination
 			if tx ~= nil then 
 				if currentPage[i].IsSong or currentPage[i].IsFolder then
 					if currentPage[i].IsLocked then
-						bars["locked"]:DrawAtAnchor(750+i*45,500+i*120,"Center")
+						bars["locked"]:DrawAtAnchor(xpos,ypos,"center")
 					else
 						bars["bar"]:SetColor(currentPage[i].BoxColor)
-						bars["bar"]:DrawAtAnchor(750+i*45,500+i*120,"Center")
-						genre_overlays[currentPage[i].Genre]:DrawAtAnchor(750+i*45,500+i*120,"Center")
+						bars["bar"]:DrawAtAnchor(xpos,ypos,"center")
+						genre_overlays[currentPage[i].Genre]:DrawAtAnchor(xpos,ypos,"center")
 					end
 				elseif currentPage[i].IsRandom then
-					bars["random"]:DrawAtAnchor(750+i*45,500+i*120,"Center")
+					bars["random"]:DrawAtAnchor(xpos,ypos,"center")
 				elseif currentPage[i].IsReturn then
-					bars["back"]:DrawAtAnchor(750+i*45,500+i*120,"Center")
+					bars["back"]:DrawAtAnchor(xpos,ypos,"center")
 				end
-				tx:DrawAtAnchor(685+i*45, 515+i*120,"Center")
+				tx:DrawAtAnchor(xpos+SONGLIST_TEXT_OFFSET_X, ypos+SONGLIST_TEXT_OFFSET_Y,"center")
+				if i == 0 then
+					bars["selected"]:DrawAtAnchor(xpos,ypos,"center")
+					bars["selected-arrows"]:DrawAtAnchor(xpos,ypos,"center")
+				end
 			end
 		end
 	end
@@ -162,7 +194,7 @@ function draw()
 	-- 	favoriteicon:Draw(1200, 400)
 	-- end
 
-	bgOverlay:Draw(0, 0)
+	bgtx["overlay"]:Draw(0, 0)
 
 	if textMenuState ~= nil then
 		textMenuState:DrawAtAnchor(270,65,"Center")
@@ -267,11 +299,14 @@ function onStart()
 	textLarge = TEXT:Create(42)
 	
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
-	bgOverlay = TEXTURE:CreateTexture("Textures/bg_overlay.png")
+	bgtx["overlay"] = TEXTURE:CreateTexture("Textures/bg_overlay.png")
+	bgtx["songinfo"] = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
 	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
 	bars["locked"] = TEXTURE:CreateTexture("Textures/locked.png")
+	bars["selected"] = TEXTURE:CreateTexture("Textures/selected.png")
+	bars["selected-arrows"] = TEXTURE:CreateTexture("Textures/selected-arrows.png")
 
 	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
 
