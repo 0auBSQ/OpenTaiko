@@ -107,11 +107,7 @@ jobs:
 
           :commit for ($c = 0; $c -lt $env:nMessages; ++$c) {
               # (Re-)read CHANGELOG.md content as (re-)split lines
-              $changelog = Get-Content -Path $changelogPath
-              # Ensure list type for []-indexing
-              if ($changelog.Count -eq 1) {
-                  $changelog = , $changelog
-              }
+              $changelog = @(Get-Content -Path $changelogPath)
 
               # Read the message as individual items
               $commitBody = Get-Content -Path ($env:messagePathPrefix + $c) | Select-Object -Skip 1
