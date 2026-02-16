@@ -52,6 +52,18 @@ local SONGINFO_HASVIDEO_ORIGIN_X = 1064
 local SONGINFO_HASVIDEO_ORIGIN_Y = 257
 local SONGINFO_EXPLICIT_ORIGIN_X = 1266
 local SONGINFO_EXPLICIT_ORIGIN_Y = 151
+local SONGINFO_SUBTITLE_ORIGIN_X = 1536
+local SONGINFO_SUBTITLE_ORIGIN_Y = 689
+local SONGINFO_SUBTITLE_MWIDTH = 530
+local SONGINFO_BPM_ORIGIN_X = 1780
+local SONGINFO_BPM_ORIGIN_Y = 877
+local SONGINFO_BPM_MWIDTH = 240
+local SONGINFO_CHARTER_ORIGIN_X = 1216
+local SONGINFO_CHARTER_ORIGIN_Y = 750
+local SONGINFO_CHARTER_MWIDTH = 512
+local SONGINFO_LENGTH_ORIGIN_X = 1216
+local SONGINFO_LENGTH_ORIGIN_Y = 806
+local SONGINFO_LENGTH_MWIDTH = 420
 
 local PREIMAGE_ORIGIN_X = 1276
 local PREIMAGE_ORIGIN_Y = 146
@@ -67,6 +79,15 @@ local NAMEPLATE_BOX_START_X = 0
 local NAMEPLATE_BOX_SPACING_X = 384
 local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
+
+local function formatNumber(n, decimals)
+    local s = string.format("%."..decimals.."f", n)
+    -- remove trailing zeros
+    s = s:gsub("0+$", "")
+    -- remove trailing dot if needed
+    s = s:gsub("%.$", "")
+    return s
+end
 
 -- Used for difficulty number on song bars, no texture/number if nil
 local function getSongNodeFocusChart(songNode)
@@ -85,8 +106,10 @@ end
 
 local function calculateNumberWidth(nb, txstr)
     local str = tostring(nb)
-    local totalWidth = 0
+    
+    local cursorX = 0
     local prevWidth = 0
+    local lastWidth = 0
     
     for i = 1, #str do
         local digit = string.sub(str, i, i)
@@ -95,20 +118,22 @@ local function calculateNumberWidth(nb, txstr)
         if tex then
             local w = tex.Width
             
-            if i == 1 then
-                totalWidth = w
-            else
-                -- overlap offset (50%)
-                totalWidth = totalWidth + (prevWidth * 0.5)
+            if i > 1 then
+                cursorX = cursorX + (prevWidth * 0.5)
             end
+            
             prevWidth = w
+            lastWidth = w
         end
     end
-    return totalWidth
+    
+    return cursorX + lastWidth
 end
 
-local function drawNumberCentered(nb, txstr, x, y, color)
-	color = color or COLOR:CreateColorFromHex("ffffffff")
+local function drawNumberCentered(nb, txstr, x, y, color, opacity)
+	local white = COLOR:CreateColorFromHex("ffffffff")
+	color = color or white
+	opacity = opacity or 1
 
     local str = tostring(nb)
     local totalWidth = calculateNumberWidth(nb, txstr)
@@ -128,7 +153,10 @@ local function drawNumberCentered(nb, txstr, x, y, color)
                 cursorX = cursorX + (prevWidth * 0.5)
             end
 			tex:SetColor(color)
+			tex:SetOpacity(opacity)
             tex:DrawAtAnchor(cursorX + (w / 2), y, "center")
+			tex:SetOpacity(1)
+			tex:SetColor(white)
             prevWidth = w
         end
     end
@@ -282,12 +310,14 @@ function draw()
 	-- Song info
 	if ssn ~= nil and ssn.IsSong then
 		bgtx["songinfo"]:DrawAtAnchor(1920,0,"topright")
+		-- Side tags (Left)
 		if ssn.HasVideo then
 			bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X,SONGINFO_HASVIDEO_ORIGIN_Y)
 		end
 		if ssn.Explicit then
 			bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
 		end
+		-- Difficulties (Right)
 		for i = 0, 4, 1 do
 			local chart = ssn:GetChart(i)
 			local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X
@@ -297,6 +327,12 @@ function draw()
 					bgtx["sinfo_difficulties_4"]:SetOpacity(difficultyFade4/255)
 					bgtx["sinfo_difficulties_4"]:Draw(xpos,ypos)
 					bgtx["sinfo_difficulties_4"]:SetOpacity(1)
+					drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_4"].Width/2, ypos+bgtx["sinfo_difficulties_4"].Height/2,nil,difficultyFade4/255)
+					if chart.IsPlus then
+						bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(difficultyFade4/255)
+						bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
+						bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(1)
+					end
 				end
 			elseif chart == nil then
 				if ssn:GetChart(4) == nil or i ~= 3 then
@@ -304,7 +340,34 @@ function draw()
 				end
 			else
 				bgtx["sinfo_difficulties_"..i]:Draw(xpos,ypos)
+				drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_"..i].Width/2, ypos+bgtx["sinfo_difficulties_"..i].Height/2)
+				if chart.IsPlus then
+					bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
+				end
 			end
+		end
+		-- Metadata (Down)
+		local focusedChart = getSongNodeFocusChart(ssn)
+		local subtitleTx = textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
+		local charterTx = textSmall:GetText("Chart - "..ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
+		local lengthTx = textSmall:GetText("Length - 2:00 (tmp)", false, SONGINFO_LENGTH_MWIDTH)
+		subtitleTx:DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
+		charterTx:Draw(SONGINFO_CHARTER_ORIGIN_X, SONGINFO_CHARTER_ORIGIN_Y)
+		lengthTx:Draw(SONGINFO_LENGTH_ORIGIN_X, SONGINFO_LENGTH_ORIGIN_Y)
+		if focusedChart ~= nil then
+			local mult = CONFIG.SongSpeed / 20
+			local bpmText = formatNumber(focusedChart.BaseBPM*mult,3)
+			if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
+				bpmText = bpmText.." ("..formatNumber(focusedChart.MinBPM*mult,3).."-"..formatNumber(focusedChart.MaxBPM*mult,3)..")"
+			end
+			local color = "FFFFFFFF"
+			if mult < 1 then
+				color = "ff95ccff"
+			elseif mult > 1 then
+				color = "ffff9ec3"
+			end
+			local bpmTx = text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(color))
+			bpmTx:DrawAtAnchor(SONGINFO_BPM_ORIGIN_X, SONGINFO_BPM_ORIGIN_Y, "center")
 		end
 	end
 	
@@ -553,12 +616,13 @@ function onStart()
 	bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
 	for i = 0, 4, 1 do
 		bgtx["sinfo_difficulties_"..i] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_"..i..".png")
-	end
-	for i = 0, 9, 1 do
-		bgtx["levellabels"..i] = TEXTURE:CreateTexture("Textures/BarLevel/"..i..".png")
+		-- Only the 0 for now as they're all monocolor, replace by the new one once new diff textures ready
+		bgtx["sinfo_difficulties_"..i.."_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_0_plus.png")
 	end
 	for i = 0, 9, 1 do
 		bgtx["levellabelsborder"..i] = TEXTURE:CreateTexture("Textures/BarLevelBorder/"..i..".png")
+		bgtx["levellabels"..i] = TEXTURE:CreateTexture("Textures/BarLevel/"..i..".png")
+		bgtx["sinfo_level"..i] = TEXTURE:CreateTexture("Textures/SinfoLevel/"..i..".png")
 	end
 
 	-- Song list textures

@@ -79,6 +79,24 @@
 			}
 		}
 
+		public double? BaseBPM {
+			get {
+				return _chartInfo?.BaseBpm ?? null;
+			}
+		}
+
+		public double? MinBPM {
+			get {
+				return _chartInfo?.MinBpm ?? null;
+			}
+		}
+
+		public double? MaxBPM {
+			get {
+				return _chartInfo?.MaxBpm ?? null;
+			}
+		}
+
 		#endregion
 
 		#region [Tower specific]
