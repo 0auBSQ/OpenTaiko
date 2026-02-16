@@ -229,4 +229,3 @@ jobs:
           tag_name: ${{ env.versionLast }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
-          
