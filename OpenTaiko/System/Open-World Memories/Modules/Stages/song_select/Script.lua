@@ -406,7 +406,8 @@ function update()
 
 	if INPUT:KeyboardPressed("S") then
 		sounds.Skip:Play()
-		return Exit("stage", "demo1")
+		CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
+		-- return Exit("stage", "demo1")
 	end
 
 	-- Navigation
