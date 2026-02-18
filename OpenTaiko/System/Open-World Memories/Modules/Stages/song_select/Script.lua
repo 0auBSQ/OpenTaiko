@@ -23,10 +23,26 @@ local ctx = {}
 local currentBackground = 0
 local backgroundScrollX = 0
 
+local songSelectShift = 0
+local songSelectElemOpacity = 255
+
 local levelLabelFrame = 0
 local difficultyFade4 = 0
 
 local arrowsDistance = 0
+
+-- Screens/Statuses
+
+--- songselect | pretransition | transition | difficultyselect
+local activeScreen = "songselect"
+local songSelectModes = { songselect = true, pretransition = true, transition = true }
+local difficultySelectModes = { difficultyselect = true, transition = true }
+
+--- none | inputinfo | playerinfo | quicksettings | unlockconfirm | unlockanim | modselect
+local activeModal = "none"
+
+-- To-play song info 
+local selectedSongNode = nil
 
 -- ???
 local difficultySelection = false
@@ -80,6 +96,18 @@ local NAMEPLATE_BOX_SPACING_X = 384
 local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
 
+-- Add counter helper
+local function startCounter(key, startVal, endVal, interval, mode, updateCallback, onFinish)
+    local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
+    if mode == "loop" then c:SetLoop(true)
+    elseif mode == "bounce" then c:SetBounce(true) end
+    if updateCallback then c:Listen(updateCallback) end
+    c:Start()
+    ctx[key] = c
+    return c
+end
+
+-- BPM number helper (up to 3 digits for decimal)
 local function formatNumber(n, decimals)
     local s = string.format("%."..decimals.."f", n)
     -- remove trailing zeros
@@ -205,13 +233,13 @@ local function drawPreimage()
 		local sH = PREIMAGE_SIZE_X / tex.Height
 		local sW = PREIMAGE_SIZE_Y / tex.Width
 		tex:SetScale(sW, sH)
-		tex:Draw(PREIMAGE_ORIGIN_X, PREIMAGE_ORIGIN_Y)
+		tex:Draw(PREIMAGE_ORIGIN_X-songSelectShift, PREIMAGE_ORIGIN_Y)
 	end
 end
 
 local function playPreview(songNode)
-	local psnd = SHARED:GetSharedSound("presound")
-	psnd:Stop()
+	--local psnd = SHARED:GetSharedSound("presound")
+	SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
 	if songNode.IsSong == true then
 		SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
 			snd:Play()
@@ -257,7 +285,7 @@ local function refreshPage()
 	end
 end
 
-local function handleDecide()
+local function handleDecideSongSelect()
 	local ssn = songList:GetSelectedSongNode()
 
 	if ssn.IsFolder == true then
@@ -273,25 +301,17 @@ local function handleDecide()
 			sounds.Cancel:Play()
 		end
 	elseif ssn.IsSong == true then
-		local success = ssn:Mount(3)
-		-- local success = ssn:Mount(5) -- for testing, go directly for tower and only 1P
-		if success == true then
-			sounds.SongDecide:Play()
-			return true -- transition to song select if true
-		end 
+		sounds.SongDecide:Play()
+		return ssn
 	elseif ssn.IsRandom == true then
 		local rdNd = songList:GetRandomNodeInFolder(ssn)
 		if rdNd ~= nil then
-			local success = rdNd:Mount(3)
-			-- local success = rdNd:Mount(5) -- for testing, go directly for tower and only 1P
-			if success == true then
-				sounds.SongDecide:Play()
-				return true -- transition to song select if true
-			end
+			sounds.SongDecide:Play()
+			return rdNd
 		end
 	end
-	-- any route note ending up to play a song return false
-	return false
+	-- any route note ending up to play a song return no selected node
+	return nil
 end
 
 local function handleFolderClose()
@@ -302,164 +322,190 @@ end
 
 
 function draw()
+	-- Background draw 
 	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX,0)
 	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX+1920,0)
 
 	local ssn = songList:GetSelectedSongNode()
 
-	-- Song info
-	if ssn ~= nil and ssn.IsSong then
-		bgtx["songinfo"]:DrawAtAnchor(1920,0,"topright")
-		-- Side tags (Left)
-		if ssn.HasVideo then
-			bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X,SONGINFO_HASVIDEO_ORIGIN_Y)
-		end
-		if ssn.Explicit then
-			bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
-		end
-		-- Difficulties (Right)
-		for i = 0, 4, 1 do
-			local chart = ssn:GetChart(i)
-			local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X
-			local ypos = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y*math.min(i, 3)
-			if ssn:GetChart(3) ~= nil and i == 4 then
-				if chart ~= nil then
-					bgtx["sinfo_difficulties_4"]:SetOpacity(difficultyFade4/255)
-					bgtx["sinfo_difficulties_4"]:Draw(xpos,ypos)
-					bgtx["sinfo_difficulties_4"]:SetOpacity(1)
-					drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_4"].Width/2, ypos+bgtx["sinfo_difficulties_4"].Height/2,nil,difficultyFade4/255)
+	if difficultySelectModes[activeScreen] then
+		bgtx["difficultyselect"]:Draw(1920-songSelectShift, 0)
+
+	end
+
+	-- Not an elseif, both display during the transition
+	if songSelectModes[activeScreen] then
+
+		-- Song info
+		if ssn ~= nil and ssn.IsSong then
+			bgtx["songinfo"]:DrawAtAnchor(1920-songSelectShift,0,"topright")
+			-- Side tags (Left)
+			if ssn.HasVideo then
+				bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X-songSelectShift,SONGINFO_HASVIDEO_ORIGIN_Y)
+			end
+			if ssn.Explicit then
+				bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X-songSelectShift,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
+			end
+			-- Difficulties (Right)
+			for i = 0, 4, 1 do
+				local chart = ssn:GetChart(i)
+				local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X-songSelectShift
+				local ypos = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y*math.min(i, 3)
+				if ssn:GetChart(3) ~= nil and i == 4 then
+					if chart ~= nil then
+						bgtx["sinfo_difficulties_4"]:SetOpacity(difficultyFade4/255)
+						bgtx["sinfo_difficulties_4"]:Draw(xpos,ypos)
+						bgtx["sinfo_difficulties_4"]:SetOpacity(1)
+						drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_4"].Width/2, ypos+bgtx["sinfo_difficulties_4"].Height/2,nil,difficultyFade4/255)
+						if chart.IsPlus then
+							bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(difficultyFade4/255)
+							bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
+							bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(1)
+						end
+					end
+				elseif chart == nil then
+					if ssn:GetChart(4) == nil or i ~= 3 then
+						bgtx["sinfo_difficulties_missing"]:Draw(xpos,ypos)
+					end
+				else
+					bgtx["sinfo_difficulties_"..i]:Draw(xpos,ypos)
+					drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_"..i].Width/2, ypos+bgtx["sinfo_difficulties_"..i].Height/2)
 					if chart.IsPlus then
-						bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(difficultyFade4/255)
 						bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
-						bgtx["sinfo_difficulties_"..i.."_plus"]:SetOpacity(1)
 					end
 				end
-			elseif chart == nil then
-				if ssn:GetChart(4) == nil or i ~= 3 then
-					bgtx["sinfo_difficulties_missing"]:Draw(xpos,ypos)
+			end
+			-- Metadata (Down)
+			local focusedChart = getSongNodeFocusChart(ssn)
+			local subtitleTx = textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
+			local charterTx = textSmall:GetText("Chart - "..ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
+			local lengthTx = textSmall:GetText("Length - 2:00 (tmp)", false, SONGINFO_LENGTH_MWIDTH)
+			subtitleTx:DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X-songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
+			charterTx:Draw(SONGINFO_CHARTER_ORIGIN_X-songSelectShift, SONGINFO_CHARTER_ORIGIN_Y)
+			lengthTx:Draw(SONGINFO_LENGTH_ORIGIN_X-songSelectShift, SONGINFO_LENGTH_ORIGIN_Y)
+			if focusedChart ~= nil then
+				local mult = CONFIG.SongSpeed / 20
+				local bpmText = formatNumber(focusedChart.BaseBPM*mult,3)
+				if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
+					bpmText = bpmText.." ("..formatNumber(focusedChart.MinBPM*mult,3).."-"..formatNumber(focusedChart.MaxBPM*mult,3)..")"
 				end
-			else
-				bgtx["sinfo_difficulties_"..i]:Draw(xpos,ypos)
-				drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_"..i].Width/2, ypos+bgtx["sinfo_difficulties_"..i].Height/2)
-				if chart.IsPlus then
-					bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
+				local color = "FFFFFFFF"
+				if mult < 1 then
+					color = "ff95ccff"
+				elseif mult > 1 then
+					color = "ffff9ec3"
 				end
+				local bpmTx = text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(color))
+				bpmTx:DrawAtAnchor(SONGINFO_BPM_ORIGIN_X-songSelectShift, SONGINFO_BPM_ORIGIN_Y, "center")
 			end
 		end
-		-- Metadata (Down)
-		local focusedChart = getSongNodeFocusChart(ssn)
-		local subtitleTx = textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
-		local charterTx = textSmall:GetText("Chart - "..ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
-		local lengthTx = textSmall:GetText("Length - 2:00 (tmp)", false, SONGINFO_LENGTH_MWIDTH)
-		subtitleTx:DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
-		charterTx:Draw(SONGINFO_CHARTER_ORIGIN_X, SONGINFO_CHARTER_ORIGIN_Y)
-		lengthTx:Draw(SONGINFO_LENGTH_ORIGIN_X, SONGINFO_LENGTH_ORIGIN_Y)
-		if focusedChart ~= nil then
-			local mult = CONFIG.SongSpeed / 20
-			local bpmText = formatNumber(focusedChart.BaseBPM*mult,3)
-			if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
-				bpmText = bpmText.." ("..formatNumber(focusedChart.MinBPM*mult,3).."-"..formatNumber(focusedChart.MaxBPM*mult,3)..")"
-			end
-			local color = "FFFFFFFF"
-			if mult < 1 then
-				color = "ff95ccff"
-			elseif mult > 1 then
-				color = "ffff9ec3"
-			end
-			local bpmTx = text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(color))
-			bpmTx:DrawAtAnchor(SONGINFO_BPM_ORIGIN_X, SONGINFO_BPM_ORIGIN_Y, "center")
-		end
-	end
-	
-	drawPreimage()
+		
+		drawPreimage()
 
-	-- Song List
-	if pageTexts ~= nil then
-		for i, tx in pairs(pageTexts) do
-			local xpos = SONGLIST_ORIGIN_X+i*SONGLIST_OFFSET_X
-			local ypos = SONGLIST_ORIGIN_Y+i*SONGLIST_OFFSET_Y
-			-- shift the box if selected to highlight it
-			if i == 0 then
-				xpos = xpos + SONGLIST_SELECTED_X_DIFF
-			end
-			-- can be nil if no modulo pagination
-			if tx ~= nil then 
-				if currentPage[i].IsSong or currentPage[i].IsFolder then
-					if currentPage[i].IsLocked then
-						bars["locked"]:DrawAtAnchor(xpos,ypos,"center")
-					else
-						bars["bar"]:SetColor(currentPage[i].BoxColor)
-						bars["bar"]:DrawAtAnchor(xpos,ypos,"center")
-						genre_overlays[currentPage[i].Genre]:DrawAtAnchor(xpos,ypos,"center")
+		-- Song List
+		if pageTexts ~= nil then
+			for i, tx in pairs(pageTexts) do
+				local xpos = SONGLIST_ORIGIN_X+i*SONGLIST_OFFSET_X-songSelectShift
+				local ypos = SONGLIST_ORIGIN_Y+i*SONGLIST_OFFSET_Y
+				-- shift the box if selected to highlight it
+				if i == 0 then
+					xpos = xpos + SONGLIST_SELECTED_X_DIFF
+				end
+				-- can be nil if no modulo pagination
+				if tx ~= nil then 
+					if currentPage[i].IsSong or currentPage[i].IsFolder then
+						if currentPage[i].IsLocked then
+							bars["locked"]:DrawAtAnchor(xpos,ypos,"center")
+						else
+							bars["bar"]:SetColor(currentPage[i].BoxColor)
+							bars["bar"]:DrawAtAnchor(xpos,ypos,"center")
+							genre_overlays[currentPage[i].Genre]:DrawAtAnchor(xpos,ypos,"center")
+						end
+						-- TODO: Don't show if locked AND grayed/blurred
+						drawLevelTag(currentPage[i],xpos+SONGBAR_LABEL_X_OFFSET,ypos)
+					elseif currentPage[i].IsRandom then
+						bars["random"]:DrawAtAnchor(xpos,ypos,"center")
+					elseif currentPage[i].IsReturn then
+						bars["back"]:DrawAtAnchor(xpos,ypos,"center")
 					end
-					-- TODO: Don't show if locked AND grayed/blurred
-					drawLevelTag(currentPage[i],xpos+SONGBAR_LABEL_X_OFFSET,ypos)
-				elseif currentPage[i].IsRandom then
-					bars["random"]:DrawAtAnchor(xpos,ypos,"center")
-				elseif currentPage[i].IsReturn then
-					bars["back"]:DrawAtAnchor(xpos,ypos,"center")
+					tx:DrawAtAnchor(xpos+SONGLIST_TEXT_OFFSET_X, ypos+SONGLIST_TEXT_OFFSET_Y,"center")
 				end
-				tx:DrawAtAnchor(xpos+SONGLIST_TEXT_OFFSET_X, ypos+SONGLIST_TEXT_OFFSET_Y,"center")
 			end
-		end
-		local x0 = SONGLIST_ORIGIN_X+SONGLIST_SELECTED_X_DIFF
-		local y0 = SONGLIST_ORIGIN_Y
-		bars["selected"]:DrawAtAnchor(x0,y0,"center")
-		local xlshift = arrowsDistance * math.cos(7*math.pi/12)
-		local ylshift = arrowsDistance * math.sin(7*math.pi/12)
-		bars["selected-arrow-l"]:DrawAtAnchor(x0-SONGLIST_SELECTED_ARROW_GAP/2+xlshift,y0-ylshift,"left")
-		bars["selected-arrow-r"]:DrawAtAnchor(x0+SONGLIST_SELECTED_ARROW_GAP/2-xlshift,y0+ylshift,"right")
-	end
-
-	-- Folder Path
-	bgtx["header"]:Draw(0, 0)
-	if ssn ~= nil then
-		local pathStack = {}
-		local currentNode = ssn.Parent
-
-		-- Traverse up the tree
-		while currentNode ~= nil do
-			-- The root node as a Title of nil
-			local _tx = "/"
-			if currentNode.Title ~= nil then
-				_tx = currentNode.Title
-			end
-			local textobj = text:GetText(_tx, false, 270)
-			table.insert(pathStack, textobj)
-			currentNode = currentNode.Parent
+			local x0 = SONGLIST_ORIGIN_X+SONGLIST_SELECTED_X_DIFF-songSelectShift
+			local y0 = SONGLIST_ORIGIN_Y
+			bars["selected"]:DrawAtAnchor(x0,y0,"center")
+			local xlshift = arrowsDistance * math.cos(7*math.pi/12)
+			local ylshift = arrowsDistance * math.sin(7*math.pi/12)
+			bars["selected-arrow-l"]:DrawAtAnchor(x0-SONGLIST_SELECTED_ARROW_GAP/2+xlshift,y0-ylshift,"left")
+			bars["selected-arrow-r"]:DrawAtAnchor(x0+SONGLIST_SELECTED_ARROW_GAP/2-xlshift,y0+ylshift,"right")
 		end
 
-		local xpos = HEADER_OFFSET_X
+		-- Folder Path
+		local opacityNorm = songSelectElemOpacity/255
+		bgtx["header"]:SetOpacity(opacityNorm)
+		bgtx["header"]:Draw(0, 0)
+		if ssn ~= nil then
+			local pathStack = {}
+			local currentNode = ssn.Parent
 
-		for i, title in ipairs(pathStack) do
-			bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
-			title:DrawAtAnchor(xpos-bgtx["header-box"].Width+HEADER_BOX_TEXT_OFFSET_X, HEADER_BOX_TEXT_OFFSET_Y+bgtx["header-box"].Height/2, "center")
-			if i ~= #pathStack then
-				bgtx["header-arrow"]:DrawAtAnchor(xpos-bgtx["header-box"].Width, 0, "topright")
+			-- Traverse up the tree
+			while currentNode ~= nil do
+				-- The root node as a Title of nil
+				local _tx = "/"
+				if currentNode.Title ~= nil then
+					_tx = currentNode.Title
+				end
+				local textobj = text:GetText(_tx, false, 270)
+				table.insert(pathStack, textobj)
+				currentNode = currentNode.Parent
 			end
-			xpos = xpos - bgtx["header-box"].Width - bgtx["header-arrow"].Width
+
+			local xpos = HEADER_OFFSET_X
+
+			for i, title in ipairs(pathStack) do
+				bgtx["header-box"]:SetOpacity(opacityNorm)
+				bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
+				title:SetOpacity(opacityNorm)
+				title:DrawAtAnchor(xpos-bgtx["header-box"].Width+HEADER_BOX_TEXT_OFFSET_X, HEADER_BOX_TEXT_OFFSET_Y+bgtx["header-box"].Height/2, "center")
+				bgtx["header-arrow"]:SetOpacity(opacityNorm)
+				if i ~= #pathStack then
+					bgtx["header-arrow"]:DrawAtAnchor(xpos-bgtx["header-box"].Width, 0, "topright")
+				end
+				xpos = xpos - bgtx["header-box"].Width - bgtx["header-arrow"].Width
+			end
+		end
+
+		-- if favoriteicon ~= nil then
+		-- 	favoriteicon:Draw(1200, 400)
+		-- end
+		bgtx["overlay"]:SetOpacity(opacityNorm)
+		bgtx["overlay"]:Draw(0, 0)
+
+		if textMenuState ~= nil then
+			textMenuState:SetOpacity(opacityNorm)
+			textMenuState:DrawAtAnchor(270,65,"Center")
+		end
+
+		-- Nameplates space
+		local playerCount = CONFIG.PlayerCount
+		bgtx["nameplate_info"]:SetOpacity(opacityNorm)
+		for i = 1, playerCount, 1 do
+			local xpos = NAMEPLATE_BOX_START_X + (i - 1) * NAMEPLATE_BOX_SPACING_X
+			local ypos = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
+			bgtx["nameplate_info"]:Draw(xpos, ypos)
+			NAMEPLATE:DrawPlayerNameplate(xpos+NAMEPLATE_OFFSET_X, ypos+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, i - 1)
 		end
 	end
 
-	-- if favoriteicon ~= nil then
-	-- 	favoriteicon:Draw(1200, 400)
-	-- end
+end
 
-	bgtx["overlay"]:Draw(0, 0)
-
-	if textMenuState ~= nil then
-		textMenuState:DrawAtAnchor(270,65,"Center")
-	end
-
-	-- Nameplates space
-	local playerCount = CONFIG.PlayerCount
-	for i = 1, playerCount, 1 do
-		local xpos = NAMEPLATE_BOX_START_X + (i - 1) * NAMEPLATE_BOX_SPACING_X
-		local ypos = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
-		bgtx["nameplate_info"]:Draw(xpos, ypos)
-		NAMEPLATE:DrawPlayerNameplate(xpos+NAMEPLATE_OFFSET_X, ypos+NAMEPLATE_OFFSET_Y, 255, i - 1)
-	end
-
+local function updateTransitionVisuals(val)
+    songSelectShift = val
+    
+    -- Fade from 255 (at 0) to 0 (at 960)
+    -- Formula: 255 - (current_val * ratio)
+    local opacity = 255 - (val * (255 / 960))
+    songSelectElemOpacity = math.max(0, math.min(255, opacity))
 end
 
 function update()
@@ -467,41 +513,66 @@ function update()
         counter:Tick()
     end
 
-	if INPUT:KeyboardPressed("S") then
-		sounds.Skip:Play()
-		CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
-		-- return Exit("stage", "demo1")
-	end
+	if activeScreen == "songselect" then
+		selectedSongNode = nil
 
-	-- Navigation
-	if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
-		sounds.Skip:Play()
-		songList:Move(1)
-		refreshPage()
-	end
-	if (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
-		sounds.Skip:Play()
-		songList:Move(-1)
-		refreshPage()
-	end
-	if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-		local isPlayStarted = handleDecide()
-		if isPlayStarted == true then
-			return Exit("play", nil)
-		end 
-	end
-	if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-		local closeFolder = handleFolderClose()
-		if closeFolder == true then
-			refreshPage()
-			sounds.Decide:Play()
-		else
-			sounds.Cancel:Play()
-			return Exit("title", nil)
+		if INPUT:KeyboardPressed("S") then
+			sounds.Skip:Play()
+			CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
+			-- return Exit("stage", "demo1")
 		end
+
+		-- Navigation
+		if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
+			sounds.Skip:Play()
+			songList:Move(1)
+			refreshPage()
+		elseif (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
+			sounds.Skip:Play()
+			songList:Move(-1)
+			refreshPage()
+		elseif INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+			-- Select song and move to difficulty select if applicable
+			selectedSongNode = handleDecideSongSelect()
+			-- if isPlayStarted == true then
+			--	return Exit("play", nil)
+			-- end 
+		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+			-- Close folder 
+			local closeFolder = handleFolderClose()
+			if closeFolder == true then
+				refreshPage()
+				sounds.Decide:Play()
+			else
+				sounds.Cancel:Play()
+				return Exit("title", nil)
+			end
+		end
+
+		-- Transition to difficulty select if a screen was selected
+		if selectedSongNode ~= nil then
+			-- TODO? implement pretransition for songs having one
+			activeScreen = "transition"
+			startCounter("screen_transition", 0, 1920, 0.5/1920, "none", updateTransitionVisuals, function() 
+				activeScreen = "difficultyselect" 
+			end)
+		end
+
+	elseif activeScreen == "difficultyselect" then
+
+		-- Placeholder quit method
+		if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+			sounds.Decide:Play()
+			activeScreen = "transition"
+			startCounter("screen_transition", 1920, 0, -0.5/1920, "none", updateTransitionVisuals, function() 
+            	activeScreen = "songselect" 
+        	end)
+		end
+
 	end
 
 	-- Test search song
+	--[[
 	if INPUT:KeyboardPressed("P") then
 		local sNode = songList:SearchFirstSongByPredicate(function(node)
 		 	return node.Maker == "bol"
@@ -514,6 +585,17 @@ function update()
 				return Exit("play", nil)
 			end 
 		end
+	end
+	]]
+
+	if INPUT:KeyboardPressed("Q") then
+		sounds.Skip:Play()
+		CONFIG.SongSpeed = CONFIG.SongSpeed - 1
+	end
+
+	if INPUT:KeyboardPressed("W") then
+		sounds.Skip:Play()
+		CONFIG.SongSpeed = CONFIG.SongSpeed + 1
 	end
 
 	-- Test shared textures
@@ -537,56 +619,35 @@ function activate()
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
-	-- Background scroll counter
-	ctx["background"] = COUNTER:CreateCounter(1920, 0, 1 / 48)
-	ctx["background"]:SetLoop(true)
-	ctx["background"]:Listen(function (val)
-		backgroundScrollX = val
-	end)
-	ctx["background"]:Start()
+	-- Background Scroll
+    startCounter("background", 1920, 0, 1/48, "loop", function(val) 
+        backgroundScrollX = val 
+    end)
 
-	-- Extra icon fade counter
-	ctx["extreme_fade"] = COUNTER:CreateCounter(2000, 0, 1 / 400)
-	ctx["extreme_fade"]:SetLoop(true)
-	ctx["extreme_fade"]:Listen(function (val)
-		if val >= 1000 and val <= 1745 then
-			difficultyFade4 = 255
-		elseif val > 745 and val < 1000 then
-			difficultyFade4 = math.max(0, math.min(255, val - 745))
-		elseif val > 1745 and val < 2000 then
-			difficultyFade4 = math.max(0, math.min(255, 2000 - val))
-		else
-			difficultyFade4 = 0
-		end
-	end)
-	ctx["extreme_fade"]:Start()
+    -- Extreme Icon Fade
+    startCounter("extreme_fade", 2000, 0, 1/400, "loop", function(val)
+        local fadeIn = val - 745
+    	local fadeOut = 2000 - val
+    	difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
+    end)
 
-	-- Select Box Scale Animation (1.0 to 1.02)
-	ctx["selectbox_animation"] = COUNTER:CreateCounter(2000, 0, 1 / 600)
-	ctx["selectbox_animation"]:SetLoop(true)
-	ctx["selectbox_animation"]:Listen(function(val)
-		if bars["selected"] then
-			local n = 1.01 + (math.sin(val * (math.pi * 2 / 2000)) * 0.01)
-			bars["selected"]:SetScale(n, n)
-		end
-	end)
-	ctx["selectbox_animation"]:Start()
+    -- Select Box Animation
+    startCounter("selectbox_animation", 2000, 0, 1/600, "loop", function(val)
+        if bars["selected"] then
+            local n = 1.01 + (math.sin(val * (math.pi * 2 / 2000)) * 0.01)
+            bars["selected"]:SetScale(n, n)
+        end
+    end)
 
-	-- Arrows animation
-	ctx["arrows_animation"] = COUNTER:CreateCounter(10, 0, 1 / 10)
-	ctx["arrows_animation"]:SetBounce(true)
-	ctx["arrows_animation"]:Listen(function(val)
-		arrowsDistance = val
-	end)
-	ctx["arrows_animation"]:Start()
+    -- Arrows Bounce
+    startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
+        arrowsDistance = val
+    end)
 
-	-- Special leveltag animation
-	ctx["leveltag_animation"] = COUNTER:CreateCounter(SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0, 1 / SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT*2)
-	ctx["leveltag_animation"]:SetLoop(true)
-	ctx["leveltag_animation"]:Listen(function(val)
-		levelLabelFrame = math.floor(val)
-	end)
-	ctx["leveltag_animation"]:Start()
+    -- Level Tag Animation
+    startCounter("leveltag_animation", SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0, 1/SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT*2, "loop", function(val)
+        levelLabelFrame = math.floor(val)
+    end)
 end
 
 function deactivate()
@@ -607,6 +668,7 @@ function onStart()
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 	bgtx["overlay"] = TEXTURE:CreateTexture("Textures/bg_overlay.png")
 	bgtx["songinfo"] = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
+	bgtx["difficultyselect"] = TEXTURE:CreateTexture("Textures/bg_difficultyselect.png")
 	bgtx["header"] = TEXTURE:CreateTexture("Textures/bg_header.png")
 	bgtx["header-box"] = TEXTURE:CreateTexture("Textures/bg_header-box.png")
 	bgtx["header-arrow"] = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")

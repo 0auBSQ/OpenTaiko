@@ -3,53 +3,41 @@
 namespace OpenTaiko {
 	public class LuaSharedResource<T> where T : class, IDisposable, new() {
 		private readonly object _lock = new();
-		private volatile T _resource = new();
-		private readonly HashSet<T> _pendingResources = new();
-		private Action? _reloadAction;
+		private T _resource = new();
+		private volatile int _version = 0;
 
 		public void Clear() {
-			lock (_lock) {
-				_resource?.Dispose();
+			Game.AsyncActions.Enqueue(() => {
+				_resource.Dispose();
 				_resource = new T();
-
-				foreach (var res in _pendingResources) {
-					try {
-						res.Dispose();
-					} catch { }
-				}
-				_pendingResources.Clear();
-			}
-		}
-
-		public void Reload(string path, Func<string, object?[], T> factory, Action<T>? onCreate, params object?[] args) {
-			lock (_lock) {
-				if (_pendingResources.TryGetValue(this._resource, out var sharedResource)) {
-					sharedResource.Dispose();
-					_pendingResources.Remove(this._resource);
-				}
-			}
-
-			// update action
-			Interlocked.Exchange(ref this._reloadAction, () => {
-				var newResource = factory(path, args);
-
-				lock (_lock) {
-					this._resource = newResource;
-					if (onCreate != null) {
-						Game.AsyncActions.Enqueue(() => onCreate.Invoke(newResource));
-					}
-					_pendingResources.Add(newResource);
-				}
+				_version++;
 			});
-			// consume action
-			Task.Run(() => Interlocked.Exchange(ref this._reloadAction, null)?.Invoke());
 		}
 
-		public void Reload(string path, Func<string, T> factory, Action<T>? onCreate) => Reload(path, (p, _) => factory(p), onCreate);
+		public void Reload(string path, Func<string, T> factory, Action<T>? onCreate) {
+			int capturedVersion;
+			lock (_lock) {
+				capturedVersion = ++_version;
+			}
 
-		public T Get() {
-			return _resource;
+			Task.Run(() => {
+				var newResource = factory(path);
+
+				Game.AsyncActions.Enqueue(() => {
+					if (_version != capturedVersion) {
+						try { newResource.Dispose(); } catch { }
+						return;
+					}
+
+					_resource.Dispose();
+					_resource = newResource;
+					_version++;
+					onCreate?.Invoke(newResource);
+				});
+			});
 		}
+
+		public T Get() => _resource;
 	}
 
 	public class LuaSharedResourceFunc {
