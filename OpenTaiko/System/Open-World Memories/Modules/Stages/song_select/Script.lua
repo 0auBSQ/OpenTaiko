@@ -2,9 +2,6 @@
 local text = nil
 local textLarge = nil
 
-local textMenuState = nil
-local textTex = nil
-
 local sounds = {}
 
 local songList = nil
@@ -17,6 +14,8 @@ local bgtx = {}
 
 local favoriteicon = nil
 
+local highlightedPlayer = 0
+
 -- Animations and counters
 local ctx = {}
 
@@ -25,6 +24,7 @@ local backgroundScrollX = 0
 
 local songSelectShift = 0
 local songSelectElemOpacity = 255
+local difficultySelectElemOpacity = 0
 
 local levelLabelFrame = 0
 local difficultyFade4 = 0
@@ -91,10 +91,35 @@ local HEADER_BOX_TEXT_OFFSET_X = 250
 local HEADER_BOX_TEXT_OFFSET_Y = 12
 
 local NAMEPLATE_BOX_FOLDED_SIZE_Y = 182
+local NAMEPLATE_SECONDARY_OFFSET_Y = 81
 local NAMEPLATE_BOX_START_X = 0
 local NAMEPLATE_BOX_SPACING_X = 384
 local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
+
+local DIFFSELECT_CHARA_ORIG_X_35P = 1250
+local DIFFSELECT_CHARA_ORIG_Y_35P = 470
+local DIFFSELECT_CHARA_GAP_X_35P = 332
+local DIFFSELECT_CHARA_GAP_Y_35P = 457
+local DIFFSELECT_CHARA_SCALE_35P = 0.5
+local DIFFSELECT_CHARA_ORIG_X_12P = 1250
+local DIFFSELECT_CHARA_ORIG_Y_12P = 760
+local DIFFSELECT_CHARA_GAP_X_12P = 518
+local DIFFSELECT_CHARA_SCALE_12P = 1
+
+-- Chara helper
+local function drawCharaPlaceholder(x, y, scalex, scaley, opacity)
+	bgtx["placeholder_chara"]:SetScale(scalex, scaley)
+	bgtx["placeholder_chara"]:SetOpacity(opacity)
+	bgtx["placeholder_chara"]:DrawAtAnchor(x, y, "bottom")
+	bgtx["placeholder_chara"]:SetScale(1,1)
+	bgtx["placeholder_chara"]:SetOpacity(1)
+end
+
+local function drawCharaWithNameplate(player, x, y, scalex, scaley, opacity)
+	drawCharaPlaceholder(x+bgtx["nameplate_info"].Width/2-NAMEPLATE_OFFSET_X, y, scalex, scaley, opacity)
+	NAMEPLATE:DrawPlayerNameplate(x, y, opacity*255, player)
+end
 
 -- Add counter helper
 local function startCounter(key, startVal, endVal, interval, mode, updateCallback, onFinish)
@@ -329,12 +354,63 @@ function draw()
 	local ssn = songList:GetSelectedSongNode()
 
 	if difficultySelectModes[activeScreen] then
+		local opacityNorm = difficultySelectElemOpacity/255
+
 		bgtx["difficultyselect"]:Draw(1920-songSelectShift, 0)
+		bgtx["header"]:Draw(1920-songSelectShift, 0)
+
+		bgtx["overlay_difficulty"]:SetOpacity(opacityNorm)
+		bgtx["overlay_difficulty"]:DrawAtAnchor(1920, 0, "TopRight")
+
+		-- Song metadata
+		if selectedSongNode ~= nil then
+			local titleTx = textLarge:GetText(selectedSongNode.Title, false, 1280)
+			local subtitleTx = text:GetText(selectedSongNode.Subtitle, false, 1280)
+			titleTx:SetOpacity(opacityNorm)
+			titleTx:Draw(1926 - songSelectShift, 0)
+			subtitleTx:SetOpacity(opacityNorm)
+			subtitleTx:Draw(1926 - songSelectShift, 67)
+		end
+
+		-- Display the characters, nameplate and their info
+		do
+			local p = CONFIG.PlayerCount
+			local is35 = p > 2
+
+			-- Assign base values based on player count
+			local ox = is35 and DIFFSELECT_CHARA_ORIG_X_35P or DIFFSELECT_CHARA_ORIG_X_12P
+			local oy = is35 and DIFFSELECT_CHARA_ORIG_Y_35P or DIFFSELECT_CHARA_ORIG_Y_12P
+			local gx = is35 and DIFFSELECT_CHARA_GAP_X_35P or DIFFSELECT_CHARA_GAP_X_12P
+			local gy = is35 and DIFFSELECT_CHARA_GAP_Y_35P or 0
+			local s  = is35 and DIFFSELECT_CHARA_SCALE_35P or DIFFSELECT_CHARA_SCALE_12P
+
+			-- Characters in the 1st row (1P->1, 2P->2, 3P->2, 4P->2, 5P->3)
+			local r1Count = (p == 5 and 3) or (p > 2 and 2) or p 
+
+			for i = 0, p - 1 do
+				local isRow2 = i >= r1Count
+				local r = isRow2 and 1 or 0                    -- 0 for row 1, 1 for row 2
+				local cols = isRow2 and (p - r1Count) or r1Count -- Total characters in current row
+				local colIdx = isRow2 and (i - r1Count) or i     -- Character's index within its row
+				
+				local x = ox + (colIdx - (cols - 1) / 2) * gx
+				local y = oy + r * gy
+				
+				drawCharaWithNameplate(i, x, y, -s, s, opacityNorm)
+				-- TODO: Display modicons, selected status and selected diff here
+			end
+		end
 
 	end
 
 	-- Not an elseif, both display during the transition
 	if songSelectModes[activeScreen] then
+		local opacityNorm = songSelectElemOpacity/255
+
+		-- Random info
+		if ssn ~= nil and ssn.IsRandom then
+			bgtx["randominfo"]:DrawAtAnchor(1920-songSelectShift,0,"topright")
+		end
 
 		-- Song info
 		if ssn ~= nil and ssn.IsSong then
@@ -441,9 +517,7 @@ function draw()
 		end
 
 		-- Folder Path
-		local opacityNorm = songSelectElemOpacity/255
-		bgtx["header"]:SetOpacity(opacityNorm)
-		bgtx["header"]:Draw(0, 0)
+		bgtx["header"]:Draw(-songSelectShift, 0)
 		if ssn ~= nil then
 			local pathStack = {}
 			local currentNode = ssn.Parent
@@ -460,7 +534,7 @@ function draw()
 				currentNode = currentNode.Parent
 			end
 
-			local xpos = HEADER_OFFSET_X
+			local xpos = HEADER_OFFSET_X-songSelectShift
 
 			for i, title in ipairs(pathStack) do
 				bgtx["header-box"]:SetOpacity(opacityNorm)
@@ -475,25 +549,34 @@ function draw()
 			end
 		end
 
-		-- if favoriteicon ~= nil then
-		-- 	favoriteicon:Draw(1200, 400)
-		-- end
 		bgtx["overlay"]:SetOpacity(opacityNorm)
 		bgtx["overlay"]:Draw(0, 0)
 
-		if textMenuState ~= nil then
-			textMenuState:SetOpacity(opacityNorm)
-			textMenuState:DrawAtAnchor(270,65,"Center")
-		end
-
 		-- Nameplates space
 		local playerCount = CONFIG.PlayerCount
+		highlightedPlayer = highlightedPlayer % CONFIG.PlayerCount
+
 		bgtx["nameplate_info"]:SetOpacity(opacityNorm)
-		for i = 1, playerCount, 1 do
-			local xpos = NAMEPLATE_BOX_START_X + (i - 1) * NAMEPLATE_BOX_SPACING_X
-			local ypos = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
-			bgtx["nameplate_info"]:Draw(xpos, ypos)
-			NAMEPLATE:DrawPlayerNameplate(xpos+NAMEPLATE_OFFSET_X, ypos+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, i - 1)
+		do
+			local x0 = NAMEPLATE_BOX_START_X
+			local y0 = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
+			bgtx["nameplate_info"]:Draw(x0, y0)
+			-- TODO: Draw clear numbers here for the given 1P difficulty
+			drawCharaPlaceholder(x0+bgtx["nameplate_info"].Width/2, y0+NAMEPLATE_OFFSET_Y, 0.7, 0.7, opacityNorm)
+			NAMEPLATE:DrawPlayerNameplate(x0+NAMEPLATE_OFFSET_X, y0+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, highlightedPlayer)
+		end
+		
+		for i = 1, playerCount - 1, 1 do
+			local j = i
+			if j - 1 >= highlightedPlayer then
+				j = j + 1
+			end
+			local xpos = NAMEPLATE_BOX_START_X + i * NAMEPLATE_BOX_SPACING_X
+			local ypos = 1080 - NAMEPLATE_SECONDARY_OFFSET_Y
+			bgtx["placeholder_portrait"]:SetOpacity(opacityNorm)
+			bgtx["placeholder_portrait"]:DrawAtAnchor(xpos+bgtx["nameplate_info"].Width/2, ypos, "bottom")
+			bgtx["placeholder_portrait"]:SetOpacity(1)
+			NAMEPLATE:DrawPlayerNameplate(xpos+NAMEPLATE_OFFSET_X, ypos, songSelectElemOpacity, j - 1)
 		end
 	end
 
@@ -506,6 +589,8 @@ local function updateTransitionVisuals(val)
     -- Formula: 255 - (current_val * ratio)
     local opacity = 255 - (val * (255 / 960))
     songSelectElemOpacity = math.max(0, math.min(255, opacity))
+	local diffOpacity = (val - 960) * (255 / 960)
+	difficultySelectElemOpacity = math.max(0, math.min(255, diffOpacity))
 end
 
 function update()
@@ -520,6 +605,11 @@ function update()
 			sounds.Skip:Play()
 			CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
 			-- return Exit("stage", "demo1")
+		end
+
+		if INPUT:KeyboardPressed("P") then
+			sounds.Skip:Play()
+			highlightedPlayer = (highlightedPlayer + 1) % CONFIG.PlayerCount
 		end
 
 		-- Navigation
@@ -588,6 +678,11 @@ function update()
 	end
 	]]
 
+	if INPUT:KeyboardPressed("L") then
+		sounds.Skip:Play()
+		CONFIG.PlayerCount = 1 + (CONFIG.PlayerCount % 5)
+	end
+
 	if INPUT:KeyboardPressed("Q") then
 		sounds.Skip:Play()
 		CONFIG.SongSpeed = CONFIG.SongSpeed - 1
@@ -611,9 +706,6 @@ function update()
 end
 
 function activate()
-	textMenuState = textLarge:GetText("Select a song!")
-	-- textTex = textSmall:GetText("You've played " .. tostring(test.TotalPlaycount) .. " charts.\nHow many more will you play?")
-
 	sounds.Skip = SHARED:GetSharedSound("Skip")
 	sounds.Cancel = SHARED:GetSharedSound("Cancel")
 	sounds.Decide = SHARED:GetSharedSound("Decide")
@@ -662,12 +754,14 @@ end
 function onStart()
 	textSmall = TEXT:Create(18)
 	text = TEXT:Create(28)
-	textLarge = TEXT:Create(42)
+	textLarge = TEXT:Create(40)
 	
 	-- General textures
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 	bgtx["overlay"] = TEXTURE:CreateTexture("Textures/bg_overlay.png")
+	bgtx["overlay_difficulty"] = TEXTURE:CreateTexture("Textures/bg_overlay_difficulty.png")
 	bgtx["songinfo"] = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
+	bgtx["randominfo"] = TEXTURE:CreateTexture("Textures/bg_randominfo.png")
 	bgtx["difficultyselect"] = TEXTURE:CreateTexture("Textures/bg_difficultyselect.png")
 	bgtx["header"] = TEXTURE:CreateTexture("Textures/bg_header.png")
 	bgtx["header-box"] = TEXTURE:CreateTexture("Textures/bg_header-box.png")
@@ -686,6 +780,10 @@ function onStart()
 		bgtx["levellabels"..i] = TEXTURE:CreateTexture("Textures/BarLevel/"..i..".png")
 		bgtx["sinfo_level"..i] = TEXTURE:CreateTexture("Textures/SinfoLevel/"..i..".png")
 	end
+
+	-- Placeholders
+	bgtx["placeholder_chara"] = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
+	bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
 	-- Song list textures
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
