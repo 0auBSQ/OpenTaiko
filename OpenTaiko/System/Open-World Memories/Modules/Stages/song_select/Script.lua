@@ -45,7 +45,7 @@ local activeModal = "none"
 local selectedSongNode = nil
 
 -- Difficulty select variables
-local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), difficulty (int)}
+local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), difficulty (int), charter (string)}
 local diffIndex = {0, 0, 0, 0, 0}
 local diffSelected = {false, false, false, false, false}
 
@@ -103,19 +103,22 @@ local DIFFSELECT_CHARA_ORIG_Y_35P = 470
 local DIFFSELECT_CHARA_GAP_X_35P = 332
 local DIFFSELECT_CHARA_GAP_Y_35P = 457
 local DIFFSELECT_CHARA_SCALE_35P = 0.5
-local DIFFSELECT_CHARA_ORIG_X_12P = 1250
+local DIFFSELECT_CHARA_ORIG_X_12P = 1300
 local DIFFSELECT_CHARA_ORIG_Y_12P = 760
-local DIFFSELECT_CHARA_GAP_X_12P = 518
-local DIFFSELECT_CHARA_SCALE_12P = 1
+local DIFFSELECT_CHARA_GAP_X_12P = 468
+local DIFFSELECT_CHARA_SCALE_12P = 0.8
 
 local DIFFSELECT_SMALL_BAR_X = {678, 718}
 local DIFFSELECT_SMALL_BAR_Y = {821, 1036}
 local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET = 156
 local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION = -6 -- Difference with 162
 local DIFFSELECT_BIG_BAR_ORIG_X = 676
-local DIFFSELECT_BIG_BAR_ORIG_Y = 319
+local DIFFSELECT_BIG_BAR_ORIG_Y = 309
 local DIFFSELECT_BIG_BAR_GAP_X = 3
-local DIFFSELECT_BIG_BAR_GAP_Y = 167
+local DIFFSELECT_BIG_BAR_GAP_Y = 180
+local DIFFSELECT_NOTESDESIGNER_OFFSET_Y = -10
+local DIFFSELECT_LEVEL_BAR_X = 480
+local DIFFSELECT_LEVEL_BAR_Y = 187
 
 -- Chara helper
 local function drawCharaPlaceholder(x, y, scalex, scaley, opacity)
@@ -230,6 +233,7 @@ end
 -- 0-7 bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
 -- 1-7 bars["difficultybarlevel"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff"..i..".png")
 local function drawDifficultyBar(index, barinfo)
+	-- Draw difficulty bar with player frames
 	local xshift = 1920 - songSelectShift
 	local tex = bars["difficultybar7"]
 	if barinfo.vault == false then
@@ -251,6 +255,38 @@ local function drawDifficultyBar(index, barinfo)
 		end
 	end
 	tex:DrawAtAnchor(xpos, ypos, "bottomright")
+	-- Notes designer
+	local nd = textSmall:GetText("Charter - "..barinfo.charter, false, 1000)
+	nd:DrawAtAnchor(xpos, ypos+DIFFSELECT_NOTESDESIGNER_OFFSET_Y, "topright")
+	-- Level bar 
+	local xbar = xpos - tex.Width + DIFFSELECT_LEVEL_BAR_X
+	local ybar = ypos - tex.Height + DIFFSELECT_LEVEL_BAR_Y
+	local bartx = bars["difficultybarlevel5"]
+	if barinfo.vault == false then
+		bartx = bars["difficultybarlevel"..(math.min(3, barinfo.difficulty) + 1)]
+		if barinfo.level > 10 then
+			bartx = bars["difficultybarlevel6"]
+		end
+	end
+	bartx:DrawRect(
+		xbar, 
+		ybar, 
+		0, 
+		0, 
+		bartx.Width * (math.min(10, barinfo.level) / 10), 
+		bartx.Height
+	)
+	if barinfo.level > 10 then
+		local bartxanim = bars["difficultybarlevel7"]
+		bartxanim:DrawRect(
+			xbar, 
+			ybar, 
+			0, 
+			bartx.Height*levelLabelFrame, 
+			bartx.Width * (math.min(3, barinfo.level-10) / 3), 
+			bartx.Height
+		)
+	end
 end
 
 local function drawDiffSelectBar(index, barinfo)
@@ -668,6 +704,7 @@ local function loadDiffBars(ssn)
 				vault = isVault,
 				level = chart.Level,
 				isplus = chart.IsPlus,
+				charter = chart.NotesDesigner,
 				difficulty = i
 			}
 			table.insert(diffBars, df)
