@@ -44,9 +44,10 @@ local activeModal = "none"
 -- To-play song info 
 local selectedSongNode = nil
 
--- ???
-local difficultySelection = false
-local diffIndex = {-2, -2, -2, -2, -2}
+-- Difficulty select variables
+local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), difficulty (int)}
+local diffIndex = {0, 0, 0, 0, 0}
+local diffSelected = {false, false, false, false, false}
 
 -- UI constants
 local SONGLIST_ORIGIN_X = 660
@@ -106,6 +107,15 @@ local DIFFSELECT_CHARA_ORIG_X_12P = 1250
 local DIFFSELECT_CHARA_ORIG_Y_12P = 760
 local DIFFSELECT_CHARA_GAP_X_12P = 518
 local DIFFSELECT_CHARA_SCALE_12P = 1
+
+local DIFFSELECT_SMALL_BAR_X = {678, 718}
+local DIFFSELECT_SMALL_BAR_Y = {821, 1036}
+local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET = 156
+local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION = -6 -- Difference with 162
+local DIFFSELECT_BIG_BAR_ORIG_X = 676
+local DIFFSELECT_BIG_BAR_ORIG_Y = 319
+local DIFFSELECT_BIG_BAR_GAP_X = 3
+local DIFFSELECT_BIG_BAR_GAP_Y = 167
 
 -- Chara helper
 local function drawCharaPlaceholder(x, y, scalex, scaley, opacity)
@@ -215,6 +225,59 @@ local function drawNumberCentered(nb, txstr, x, y, color, opacity)
     end
 end
 
+-- Difficulty select draw helpers
+-- 1-5 bars["difficultybarselect"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P"..i..".png")
+-- 0-7 bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
+-- 1-7 bars["difficultybarlevel"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff"..i..".png")
+local function drawDifficultyBar(index, barinfo)
+	local xshift = 1920 - songSelectShift
+	local tex = bars["difficultybar7"]
+	if barinfo.vault == false then
+		tex = bars["difficultybar"..(barinfo.difficulty + 2)]
+	end
+	local xpos = DIFFSELECT_BIG_BAR_ORIG_X + (index-2)*DIFFSELECT_BIG_BAR_GAP_X + xshift
+	local ypos = DIFFSELECT_BIG_BAR_ORIG_Y + (index-2)*DIFFSELECT_BIG_BAR_GAP_Y
+	for i = 1, CONFIG.PlayerCount, 1 do
+		if diffIndex[i] == index then
+			bars["difficultybarselect"..i]:DrawRectAtAnchor(
+				xpos, 
+				ypos+DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION, 
+				0,
+				0,
+				bars["difficultybarselect"..i].Width,
+				DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET, 
+				"bottomright"
+			)
+		end
+	end
+	tex:DrawAtAnchor(xpos, ypos, "bottomright")
+end
+
+local function drawDiffSelectBar(index, barinfo)
+	local xshift = 1920 - songSelectShift
+	if index < 2 then
+		local xpos = DIFFSELECT_SMALL_BAR_X[index + 1] + xshift
+		local ypos = DIFFSELECT_SMALL_BAR_Y[index + 1]
+		for i = 1, CONFIG.PlayerCount, 1 do
+			if diffIndex[i] == index then
+				bars["difficultybarselect"..i]:DrawRectAtAnchor(
+					xpos,
+					ypos, 
+					0,
+					DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
+					bars["difficultybarselect"..i].Width,
+					bars["difficultybarselect"..i].Height-DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET, 
+					"bottomleft"
+				)
+			end
+		end
+		bars["difficultybar"..index]:DrawAtAnchor(xpos, ypos, "bottomleft")
+	else
+		drawDifficultyBar(index, barinfo)
+	end
+end
+
+-- Song select draw helpers
 local function drawLevelTag(songNode, x, y)
 	local chart = getSongNodeFocusChart(songNode)
 	if chart == nil then
@@ -370,6 +433,15 @@ function draw()
 			titleTx:Draw(1926 - songSelectShift, 0)
 			subtitleTx:SetOpacity(opacityNorm)
 			subtitleTx:Draw(1926 - songSelectShift, 67)
+
+			-- Draw difficulty bars + return/options
+			for i = 0, 1+#diffBars, 1 do
+				local barinfo = nil
+				if i >= 2 then
+					barinfo = diffBars[i-1]
+				end
+				drawDiffSelectBar(i, barinfo)
+			end
 		end
 
 		-- Display the characters, nameplate and their info
@@ -400,7 +472,6 @@ function draw()
 				-- TODO: Display modicons, selected status and selected diff here
 			end
 		end
-
 	end
 
 	-- Not an elseif, both display during the transition
@@ -582,6 +653,28 @@ function draw()
 
 end
 
+local function loadDiffBars(ssn)
+	diffBars = {}
+
+	local startDiff = 0
+	local isVault = ssn.Genre == "Secret Vault"
+	if isVault then
+		startDiff = 3
+	end
+	for i = startDiff, 4, 1 do
+		local chart = ssn:GetChart(i)
+		if chart ~= nil then
+			local df = {
+				vault = isVault,
+				level = chart.Level,
+				isplus = chart.IsPlus,
+				difficulty = i
+			}
+			table.insert(diffBars, df)
+		end
+	end
+end
+
 local function updateTransitionVisuals(val)
     songSelectShift = val
     
@@ -641,9 +734,13 @@ function update()
 
 		-- Transition to difficulty select if a screen was selected
 		if selectedSongNode ~= nil then
+			loadDiffBars(selectedSongNode)
+
 			-- TODO? implement pretransition for songs having one
 			activeScreen = "transition"
 			startCounter("screen_transition", 0, 1920, 0.5/1920, "none", updateTransitionVisuals, function() 
+				diffIndex = {0, 0, 0, 0, 0}
+				diffSelected = {false, false, false, false, false}
 				activeScreen = "difficultyselect" 
 			end)
 		end
@@ -651,7 +748,15 @@ function update()
 	elseif activeScreen == "difficultyselect" then
 
 		-- Placeholder quit method
-		if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+		if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) then
+			sounds.Skip:Play()
+			-- Placeholder to try in 1P
+			diffIndex[1] = (diffIndex[1] + 1) % (2 + #diffBars)
+		elseif (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) then
+			sounds.Skip:Play()
+			-- Placeholder to try in 1P
+			diffIndex[1] = (diffIndex[1] - 1) % (2 + #diffBars)
+		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
 			sounds.Decide:Play()
 			activeScreen = "transition"
 			startCounter("screen_transition", 1920, 0, -0.5/1920, "none", updateTransitionVisuals, function() 
@@ -705,11 +810,20 @@ function update()
 	end 
 end
 
+local function resetToSongSelect()
+	songSelectElemOpacity = 255
+	difficultySelectElemOpacity = 255
+	activeScreen = "songselect"
+end
+
 function activate()
 	sounds.Skip = SHARED:GetSharedSound("Skip")
 	sounds.Cancel = SHARED:GetSharedSound("Cancel")
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
+
+	-- Set the song select on song select screen
+	resetToSongSelect()
 
 	-- Background Scroll
     startCounter("background", 1920, 0, 1/48, "loop", function(val) 
@@ -797,6 +911,15 @@ function onStart()
 	bars["levellabelsplus"] = TEXTURE:CreateTexture("Textures/bar_levelbgplus.png")
 	bars["levellabelsfire"] = TEXTURE:CreateTexture("Textures/bar_levelbgfire.png")
 	bars["levellabelsstorm"] = TEXTURE:CreateTexture("Textures/bar_levelbgstorm.png")
+	for i = 1, 5, 1 do
+		bars["difficultybarselect"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P"..i..".png")
+	end
+	for i = 0, 7, 1 do
+		bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
+	end
+	for i = 1, 7, 1 do
+		bars["difficultybarlevel"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff"..i..".png")
+	end
 
 	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
 
