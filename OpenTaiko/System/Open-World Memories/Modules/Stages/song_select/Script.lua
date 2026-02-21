@@ -49,6 +49,50 @@ local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), diffic
 local diffIndex = {0, 0, 0, 0, 0}
 local diffSelected = {false, false, false, false, false}
 
+-- Inputs for each player
+local inputSets = {
+	{
+		right = "RightChange",
+		left = "LeftChange",
+		decide1 = "Decide",
+		decide2 = "Decide",
+		cancel = "Cancel",
+		auto = "ToggleAutoP1"
+	},
+	{
+		right = "RBlue2P",
+		left = "LBlue2P",
+		decide1 = "RRed2P",
+		decide2 = "LRed2P",
+		cancel = nil,
+		auto = "ToggleAutoP2"
+	},
+	{
+		right = "RBlue3P",
+		left = "LBlue3P",
+		decide1 = "RRed3P",
+		decide2 = "LRed3P",
+		cancel = nil,
+		auto = nil
+	},
+	{
+		right = "RBlue4P",
+		left = "LBlue4P",
+		decide1 = "RRed4P",
+		decide2 = "LRed4P",
+		cancel = nil,
+		auto = nil
+	},
+	{
+		right = "RBlue5P",
+		left = "LBlue5P",
+		decide1 = "RRed5P",
+		decide2 = "LRed5P",
+		cancel = nil,
+		auto = nil
+	},
+}
+
 -- UI constants
 local SONGLIST_ORIGIN_X = 660
 local SONGLIST_ORIGIN_Y = 500
@@ -760,21 +804,20 @@ function update()
 			highlightedPlayer = (highlightedPlayer + 1) % CONFIG.PlayerCount
 		end
 
+		local inpset = inputSets[highlightedPlayer + 1]
+		
 		-- Navigation
-		if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
+		if (INPUT:Pressed(inpset.right) or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
 			sounds.Skip:Play()
 			songList:Move(1)
 			refreshPage()
-		elseif (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
+		elseif (INPUT:Pressed(inpset.left) or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
 			sounds.Skip:Play()
 			songList:Move(-1)
 			refreshPage()
-		elseif INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+		elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) or INPUT:KeyboardPressed("Return") then
 			-- Select song and move to difficulty select if applicable
 			selectedSongNode = handleDecideSongSelect()
-			-- if isPlayStarted == true then
-			--	return Exit("play", nil)
-			-- end 
 		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
 			-- Close folder 
 			local closeFolder = handleFolderClose()
@@ -801,24 +844,64 @@ function update()
 		end
 
 	elseif activeScreen == "difficultyselect" then
+		local allDiffsSelected = true
+		local canceled = false
 
-		-- Placeholder quit method
-		if (INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")) then
-			sounds.Skip:Play()
-			-- Placeholder to try in 1P
-			diffIndex[1] = (diffIndex[1] + 1) % (2 + #diffBars)
-		elseif (INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow")) then
-			sounds.Skip:Play()
-			-- Placeholder to try in 1P
-			diffIndex[1] = (diffIndex[1] - 1) % (2 + #diffBars)
-		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+		for i = 1, CONFIG.PlayerCount, 1 do
+			local inpset = inputSets[i]
+
+			if diffSelected[i] == false then
+				if INPUT:Pressed(inpset.right) then
+					sounds.Skip:Play()
+					diffIndex[i] = (diffIndex[i] + 1) % (2 + #diffBars)
+				elseif INPUT:Pressed(inpset.left) then
+					sounds.Skip:Play()
+					diffIndex[i] = (diffIndex[i] - 1) % (2 + #diffBars)
+				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) then
+					if diffIndex[i] == 0 then
+						sounds.Cancel:Play()
+						canceled = true
+					elseif diffIndex[i] > 1 then
+						sounds.Decide:Play()
+						diffSelected[i] = true
+					end
+				elseif INPUT:Pressed(inpset.cancel) then
+					sounds.Cancel:Play()
+					if diffSelected[i] == true then
+						diffSelected[i] = false
+					else
+						canceled = true
+					end
+				end
+			end
+
+			if diffSelected[i] == false then
+				allDiffsSelected = false
+			end
+		end 
+		
+		-- Back to song select
+		if canceled or INPUT:KeyboardPressed("Escape") then
 			sounds.Decide:Play()
 			activeScreen = "transition"
 			startCounter("screen_transition", 1920, 0, -0.5/1920, "none", updateTransitionVisuals, function() 
             	activeScreen = "songselect" 
         	end)
+		elseif allDiffsSelected == true then
+			-- No need to check for player count, the lua api handles it 
+			local success = selectedSongNode:Mount(
+				(diffIndex[1] >= 2) and diffBars[diffIndex[1] - 1].difficulty or 0,
+				(diffIndex[2] >= 2) and diffBars[diffIndex[2] - 1].difficulty or 0,
+				(diffIndex[3] >= 2) and diffBars[diffIndex[3] - 1].difficulty or 0,
+				(diffIndex[4] >= 2) and diffBars[diffIndex[4] - 1].difficulty or 0,
+				(diffIndex[5] >= 2) and diffBars[diffIndex[5] - 1].difficulty or 0
+			)
+			if success then
+				return Exit("play", nil)
+			else
+				diffSelected = {false, false, false, false, false}
+			end
 		end
-
 	end
 
 	-- Test search song
@@ -867,7 +950,8 @@ end
 
 local function resetToSongSelect()
 	songSelectElemOpacity = 255
-	difficultySelectElemOpacity = 255
+	difficultySelectElemOpacity = 0
+	songSelectShift = 0
 	activeScreen = "songselect"
 end
 
