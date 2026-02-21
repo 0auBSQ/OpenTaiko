@@ -107,11 +107,7 @@ jobs:
 
           :commit for ($c = 0; $c -lt $env:nMessages; ++$c) {
               # (Re-)read CHANGELOG.md content as (re-)split lines
-              $changelog = Get-Content -Path $changelogPath
-              # Ensure list type for []-indexing
-              if ($changelog.Count -eq 1) {
-                  $changelog = , $changelog
-              }
+              $changelog = @(Get-Content -Path $changelogPath)
 
               # Read the message as individual items
               $commitBody = Get-Content -Path ($env:messagePathPrefix + $c) | Select-Object -Skip 1
@@ -228,7 +224,7 @@ jobs:
       - name: Upload All Builds for the Latest Release
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
-          file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip"
+          file: "OpenTaiko.Win.x64.zip;OpenTaiko.Linux.x64.zip;special/linux_installer_standalone.bash"
           overwrite: true
           tag_name: ${{ env.versionLast }}
           draft: false
