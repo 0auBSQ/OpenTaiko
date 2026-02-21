@@ -119,6 +119,15 @@ local DIFFSELECT_BIG_BAR_GAP_Y = 180
 local DIFFSELECT_NOTESDESIGNER_OFFSET_Y = -10
 local DIFFSELECT_LEVEL_BAR_X = 480
 local DIFFSELECT_LEVEL_BAR_Y = 187
+local DIFFSELECT_LEVEL_NB_OFF_X = -226
+local DIFFSELECT_LEVEL_NB_OFF_Y = -115
+local DIFFSELECT_LEVEL_COLORS = {
+	COLOR:CreateColorFromHex("FF65A9F7"),
+	COLOR:CreateColorFromHex("FF8FF5A9"),
+	COLOR:CreateColorFromHex("FFE6DA76"),
+	COLOR:CreateColorFromHex("FFF39898"),
+	COLOR:CreateColorFromHex("FFCD7EE6")
+}
 
 -- Chara helper
 local function drawCharaPlaceholder(x, y, scalex, scaley, opacity)
@@ -287,6 +296,15 @@ local function drawDifficultyBar(index, barinfo)
 			bartx.Height
 		)
 	end
+	-- Level number
+	local xlvnb = xpos+DIFFSELECT_LEVEL_NB_OFF_X
+	local ylvnb = ypos+DIFFSELECT_LEVEL_NB_OFF_Y
+	drawNumberCentered(barinfo.level, "diffsel_level", xlvnb, ylvnb)
+	local lvnbcol = COLOR:CreateColorFromHex("FFB9B9B9")
+	if barinfo.vault == false then
+		lvnbcol = DIFFSELECT_LEVEL_COLORS[barinfo.difficulty + 1]
+	end
+	drawNumberCentered(barinfo.level, "diffsel_levelcol", xlvnb, ylvnb, lvnbcol)
 end
 
 local function drawDiffSelectBar(index, barinfo)
@@ -930,6 +948,8 @@ function onStart()
 		bgtx["levellabelsborder"..i] = TEXTURE:CreateTexture("Textures/BarLevelBorder/"..i..".png")
 		bgtx["levellabels"..i] = TEXTURE:CreateTexture("Textures/BarLevel/"..i..".png")
 		bgtx["sinfo_level"..i] = TEXTURE:CreateTexture("Textures/SinfoLevel/"..i..".png")
+		bgtx["diffsel_level"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Level/"..i..".png")
+		bgtx["diffsel_levelcol"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/"..i..".png")
 	end
 
 	-- Placeholders
