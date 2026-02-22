@@ -601,6 +601,7 @@ internal class OpenTaiko : Game {
 
 								// Propagate AfterSongEnum events to all lua stages
 								LuaStageWrapper.PropagateAfterSongEnumEvent();
+								LuaActivityWrapper.PropagateAfterSongEnumEvent();
 							}
 							#endregion
 						}
@@ -2055,8 +2056,10 @@ internal class OpenTaiko : Game {
 		OpenTaiko.Tx.LoadTexture();
 
 		// Re-propagate AfterSongEnum events to all lua stages
-		if (EnumSongs.IsSongListEnumCompletelyDone)
+		if (EnumSongs.IsSongListEnumCompletelyDone) {
 			LuaStageWrapper.PropagateAfterSongEnumEvent();
+			LuaActivityWrapper.PropagateAfterSongEnumEvent();
+		}
 		EnumSongs.Resume();
 
 		OpenTaiko.NamePlate.RefleshSkin();

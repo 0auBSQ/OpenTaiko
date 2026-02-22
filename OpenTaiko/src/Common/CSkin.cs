@@ -461,6 +461,8 @@ internal class CSkin : IDisposable {
 	public void CleanupModules() {
 		LuaStageWrapper.PropagateOnDestroy();
 		LuaStageWrapper.ResetLuaStagesDictionary();
+		LuaActivityWrapper.PropagateOnDestroy();
+		LuaActivityWrapper.ResetLuaActivityDictionary();
 	}
 
 	public void FetchMenusAndModules() {
@@ -481,6 +483,20 @@ internal class CSkin : IDisposable {
 		}
 
 		LuaStageWrapper.PropagateOnStart();
+
+		// Lua Activities
+		string[] _actList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Activities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		string[] _globalActList = DirectoryUtils.SafeGetDirectories($"Global/Activities").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+
+		foreach (string _act in _actList) {
+			LuaActivityWrapper _law = new LuaActivityWrapper(_act, false);
+		}
+
+		foreach (string _act in _globalActList) {
+			LuaActivityWrapper _law = new LuaActivityWrapper(_act, true);
+		}
+
+		LuaActivityWrapper.PropagateOnStart();
 	}
 
 	#endregion

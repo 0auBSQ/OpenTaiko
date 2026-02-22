@@ -167,18 +167,18 @@
 		#region [Events not present on CStage/CActivity]
 
 		// Executes **Just after** loading the skin, once the readme notice appears, also executes everytime the skin is reloaded
-		public void OnStart() {
+		private void OnStart() {
 			lcStageScript?.OnStart();
 		}
 
 
 		// Executes everytime songs enum is done, including soft/hard reload and at start, **Even** if the stage is not activated
-		public void AfterSongsEnum() {
+		private void AfterSongsEnum() {
 			lcStageScript?.AfterSongsEnum();
 		}
 
 		// Executes before skin change, in order to deallocate any ressources carried by the skin's Lua modules
-		public void OnDestroy() {
+		private void OnDestroy() {
 			lcStageScript?.OnDestroy();
 		}
 
