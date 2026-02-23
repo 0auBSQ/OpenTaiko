@@ -63,19 +63,23 @@
 
 		#region [Events]
 
-		public object[]? Activate(object[] args) {
+		public bool IsActive {
+			get => lcActScript?.IsActive() ?? false;
+		}
+
+		public object[]? Activate(params object[] args) {
 			return lcActScript?.Activate(args);
 		}
 
-		public object[]? Deactivate(object[] args) {
+		public object[]? Deactivate(params object[] args) {
 			return lcActScript?.Deactivate(args);
 		}
 
-		public object[]? Draw(object[] args) {
+		public object[]? Draw(params object[] args) {
 			return lcActScript?.Draw(args);
 		}
 
-		public object[]? Update(object[] args) {
+		public object[]? Update(params object[] args) {
 			return lcActScript?.Update(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond, args);
 		}
 

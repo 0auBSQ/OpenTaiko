@@ -16,6 +16,9 @@ local favoriteicon = nil
 
 local highlightedPlayer = 0
 
+-- Activities
+local act = {}
+
 -- Animations and counters
 local ctx = {}
 
@@ -749,6 +752,10 @@ function draw()
 		end
 	end
 
+	-- Execute all activities draw calls at the end (modals, mod select, pretransitions, etc)
+	for _, at in pairs(act) do
+		at:Draw()
+	end
 end
 
 local function loadDiffBars(ssn)
@@ -789,6 +796,19 @@ function update()
 	for k, counter in pairs(ctx) do
         counter:Tick()
     end
+
+	-- Execute all activities update calls at the beginning (modals, mod select, pretransitions, etc)
+	local activeModal = false
+	for _, at in pairs(act) do
+		at:Update()
+		if at.IsActive then
+			activeModal = true
+		end
+	end
+
+	if activeModal == true then
+		return
+	end
 
 	if activeScreen == "songselect" then
 		selectedSongNode = nil
@@ -836,9 +856,9 @@ function update()
 
 			-- TODO? implement pretransition for songs having one
 			activeScreen = "transition"
+			diffIndex = {0, 0, 0, 0, 0}
+			diffSelected = {false, false, false, false, false}
 			startCounter("screen_transition", 0, 1920, 0.5/1920, "none", updateTransitionVisuals, function() 
-				diffIndex = {0, 0, 0, 0, 0}
-				diffSelected = {false, false, false, false, false}
 				activeScreen = "difficultyselect" 
 			end)
 		end
@@ -858,9 +878,15 @@ function update()
 					sounds.Skip:Play()
 					diffIndex[i] = (diffIndex[i] - 1) % (2 + #diffBars)
 				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) then
+					-- Return
 					if diffIndex[i] == 0 then
 						sounds.Cancel:Play()
 						canceled = true
+					-- Options
+					elseif diffIndex[i] == 1 then
+						act["mod_select_dialog"]:Activate(i)
+						return
+					-- Select difficulty
 					elseif diffIndex[i] > 1 then
 						sounds.Decide:Play()
 						diffSelected[i] = true
@@ -956,6 +982,11 @@ local function resetToSongSelect()
 end
 
 function activate()
+	local activities = {"mod_select_dialog"}
+	for _, at in ipairs(activities) do
+		act[at] = ACTIVITY:GetActivity(at)
+	end
+
 	sounds.Skip = SHARED:GetSharedSound("Skip")
 	sounds.Cancel = SHARED:GetSharedSound("Cancel")
 	sounds.Decide = SHARED:GetSharedSound("Decide")
@@ -1087,6 +1118,12 @@ end
 function onDestroy()
 	if text ~= nil then
 		text:Dispose()
+	end
+	if textSmall ~= nil then
+		textSmall:Dispose()
+	end
+	if textLarge ~= nil then
+		textLarge:Dispose()
 	end
 	if favoriteicon ~= nil then
 		favoriteicon:Dispose()

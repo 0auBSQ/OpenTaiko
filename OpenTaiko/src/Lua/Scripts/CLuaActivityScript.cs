@@ -18,21 +18,29 @@ namespace OpenTaiko {
 		private LuaFunction lfAfterSongEnum;
 		private LuaFunction lfOnDestroy;
 
+		private bool _active = false;
+
 		#region [CStage/CActivity events]
 
-		public object[]? Update(long timestamp, object[] args) {
+		public bool IsActive() {
+			return _active;
+		}
+
+		public object[]? Update(long timestamp, params object[] args) {
 			return RunLuaCode(lfUpdate, timestamp, args);
 		}
 
-		public object[]? Draw(object[] args) {
+		public object[]? Draw(params object[] args) {
 			return RunLuaCode(lfDraw, args);
 		}
 
-		public object[]? Activate(object[] args) {
+		public object[]? Activate(params object[] args) {
+			_active = true;
 			return RunLuaCode(lfActivate, args);
 		}
 
-		public object[]? Deactivate(object[] args) {
+		public object[]? Deactivate(params object[] args) {
+			_active = false;
 			return RunLuaCode(lfDeactivate, args);
 		}
 
@@ -66,6 +74,8 @@ namespace OpenTaiko {
 				lfOnStart = (LuaFunction)LuaScript["onStart"];
 				lfAfterSongEnum = (LuaFunction)LuaScript["afterSongEnum"];
 				lfOnDestroy = (LuaFunction)LuaScript["onDestroy"];
+
+				LuaScript["DEACTIVATE"] = Deactivate;
 
 			} catch (Exception e) {
 				Crash(e);
