@@ -134,6 +134,8 @@ local PREIMAGE_ORIGIN_Y = 146
 local PREIMAGE_SIZE_X = 500
 local PREIMAGE_SIZE_Y = 500
 
+local PREVIEW_THROTTLE_MS = 200
+
 local HEADER_OFFSET_X = 1780
 local HEADER_BOX_TEXT_OFFSET_X = 250
 local HEADER_BOX_TEXT_OFFSET_Y = 12
@@ -404,25 +406,33 @@ local function drawLevelTag(songNode, x, y)
 end
 
 local function reloadPreimage(songNode)
-	if songNode.IsSong == true then 
-		if songNode.HasPreimage then
-			SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
-		else
-			SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
-		end
+	SHARED:ClearSharedTexture("preimage")
+	if songNode.IsSong == true then
+		startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+			if songNode.HasPreimage then
+				SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+			else
+				SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
+			end
+		end)
 	else
-		SHARED:ClearSharedTexture("preimage")
+		ctx["throttle_preimage"] = COUNTER:EmptyCounter()
 	end
 	SHARED:GetSharedTexture("preimage"):SetWrapMode("Border")
 end
 
 local function drawPreimage()
-	local tex = SHARED:GetSharedTexture("preimage")
-	if tex.Height > 0 and tex.Width > 0 then
-		local sH = PREIMAGE_SIZE_X / tex.Height
-		local sW = PREIMAGE_SIZE_Y / tex.Width
-		tex:SetScale(sW, sH)
-		tex:Draw(PREIMAGE_ORIGIN_X-songSelectShift, PREIMAGE_ORIGIN_Y)
+	local node = songList:GetSongNodeAtOffset(0)
+	if node.IsSong == true then
+		bgtx["preimage_load"]:Draw(PREIMAGE_ORIGIN_X-songSelectShift, PREIMAGE_ORIGIN_Y)
+		bgtx["load"]:DrawAtAnchor(PREIMAGE_ORIGIN_X-songSelectShift+PREIMAGE_SIZE_X/2, PREIMAGE_ORIGIN_Y+PREIMAGE_SIZE_Y/2, "center")
+		local tex = SHARED:GetSharedTexture("preimage")
+		if tex.Height > 0 and tex.Width > 0 then
+			local sH = PREIMAGE_SIZE_X / tex.Height
+			local sW = PREIMAGE_SIZE_Y / tex.Width
+			tex:SetScale(sW, sH)
+			tex:Draw(PREIMAGE_ORIGIN_X-songSelectShift, PREIMAGE_ORIGIN_Y)
+		end
 	end
 end
 
@@ -430,10 +440,14 @@ local function playPreview(songNode)
 	--local psnd = SHARED:GetSharedSound("presound")
 	SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
 	if songNode.IsSong == true then
-		SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
-			snd:Play()
-			snd:SetTimestamp(songNode.DemoStart)
+		startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+			SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
+				snd:Play()
+				snd:SetTimestamp(songNode.DemoStart)
+			end)
 		end)
+	else
+		ctx["throttle_presound"] = COUNTER:EmptyCounter()
 	end
 end
 
@@ -1024,6 +1038,13 @@ function activate()
     startCounter("leveltag_animation", SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0, 1/SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT*2, "loop", function(val)
         levelLabelFrame = math.floor(val)
     end)
+
+	-- Load loop
+	startCounter("load_animation", 0, 360, 2/300, "loop", function(val)
+        if bgtx["load"] ~= nil then
+			bgtx["load"]:SetRotation(val)
+		end
+    end)
 end
 
 function deactivate()
@@ -1042,6 +1063,8 @@ function onStart()
 	
 	-- General textures
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
+	bgtx["load"] = TEXTURE:CreateTexture("Textures/load.png")
+	bgtx["preimage_load"] = TEXTURE:CreateTexture("Textures/preimage_load.png")
 	bgtx["overlay"] = TEXTURE:CreateTexture("Textures/bg_overlay.png")
 	bgtx["overlay_difficulty"] = TEXTURE:CreateTexture("Textures/bg_overlay_difficulty.png")
 	bgtx["songinfo"] = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
