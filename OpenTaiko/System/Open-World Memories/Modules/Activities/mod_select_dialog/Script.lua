@@ -34,21 +34,65 @@ local ctx = {}
 local bgpos = 1080
 local bgtlop = 0
 
+-- Inputs for each player
+local inputSets = {
+	{
+		right = "RightChange",
+		left = "LeftChange",
+		decide1 = "Decide",
+		decide2 = "Decide",
+		cancel = "Cancel",
+		auto = "ToggleAutoP1"
+	},
+	{
+		right = "RBlue2P",
+		left = "LBlue2P",
+		decide1 = "RRed2P",
+		decide2 = "LRed2P",
+		cancel = nil,
+		auto = "ToggleAutoP2"
+	},
+	{
+		right = "RBlue3P",
+		left = "LBlue3P",
+		decide1 = "RRed3P",
+		decide2 = "LRed3P",
+		cancel = nil,
+		auto = nil
+	},
+	{
+		right = "RBlue4P",
+		left = "LBlue4P",
+		decide1 = "RRed4P",
+		decide2 = "LRed4P",
+		cancel = nil,
+		auto = nil
+	},
+	{
+		right = "RBlue5P",
+		left = "LBlue5P",
+		decide1 = "RRed5P",
+		decide2 = "LRed5P",
+		cancel = nil,
+		auto = nil
+	},
+}
+
 -- ============================================================
 -- UI Layout Constants
 -- ============================================================
-local MENU_TITLE_X          = 200    -- X of the "Mod Select" title
+local MENU_TITLE_X          = 80    -- X of the "Mod Select" title
 local MENU_TITLE_Y          = 60     -- Y of the title
 local MENU_ORIGIN_Y         = 150    -- Y of the first option row
 local MENU_OPTION_SPACING_Y = 82     -- Vertical gap between option rows
-local MENU_LABEL_X          = 200    -- X of the option name label
-local MENU_CHOICES_ORIGIN_X = 560    -- X where choices/values start
+local MENU_LABEL_X          = 80    -- X of the option name label
+local MENU_CHOICES_ORIGIN_X = 440    -- X where choices/values start
 local MENU_CHOICE_SPACING_X = 155    -- Horizontal gap between individual choices
 local MENU_FOOTER_Y         = 835    -- Y of the OK / Cancel row
-local MENU_OK_X             = 700    -- X of the OK button
-local MENU_CANCEL_X         = 900    -- X of the Cancel button
+local MENU_OK_X             = 580    -- X of the OK button
+local MENU_CANCEL_X         = 780    -- X of the Cancel button
 local MENU_DESC_Y           = 950    -- Y of the description line at the bottom
-local MENU_DESC_X           = 200    -- X of the description line
+local MENU_DESC_X           = 80    -- X of the description line
 
 -- ============================================================
 -- Color palette (hex strings for COLOR:CreateColorFromHex)
@@ -277,6 +321,9 @@ function draw()
     tx["bg"]:SetOpacity(bgtlop / 255)
     tx["bg"]:Draw(0, bgpos)
 
+    tx["player"..player]:SetOpacity(bgtlop / 255)
+    tx["player"..player]:DrawAtAnchor(1920,1080+bgpos,"bottomright")
+
     if bgtlop == 0 then return end
     local alpha = bgtlop / 255
 
@@ -372,19 +419,21 @@ function update()
 
     if reactive == false then return end
 
+    local inputs = inputSets[player+1]
+
     if editingOption == false then
         -- --------------------------------------------------------
         -- Step 1 – navigate the list
         -- --------------------------------------------------------
-        if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
+        if INPUT:Pressed(inputs.right) or INPUT:KeyboardPressed("RightArrow") then
             sounds.Skip:Play()
             selectedIndex = (selectedIndex + 1) % TOTAL_ITEMS
 
-        elseif INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
+        elseif INPUT:Pressed(inputs.left) or INPUT:KeyboardPressed("LeftArrow") then
             sounds.Skip:Play()
             selectedIndex = (selectedIndex - 1 + TOTAL_ITEMS) % TOTAL_ITEMS
 
-        elseif INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+        elseif INPUT:Pressed(inputs.decide1) or INPUT:Pressed(inputs.decide2) or INPUT:KeyboardPressed("Return") then
             if selectedIndex == OK_INDEX then
                 sounds.Decide:Play()
                 reactive = false
@@ -406,7 +455,7 @@ function update()
                 editingOption = true
             end
 
-        elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+        elseif INPUT:Pressed(inputs.cancel) or INPUT:KeyboardPressed("Escape") then
             -- Escape from menu without saving
             sounds.Cancel:Play()
             reactive = false
@@ -424,19 +473,19 @@ function update()
 
         if opt.type == "scroll" then
             -- Left/right move value by 1, clamped to [min, max]
-            if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
+            if INPUT:Pressed(inputs.right) or INPUT:KeyboardPressed("RightArrow") then
                 sounds.Skip:Play()
                 opt.value = math.min(opt.max, opt.value + 1)
 
-            elseif INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
+            elseif INPUT:Pressed(inputs.left) or INPUT:KeyboardPressed("LeftArrow") then
                 sounds.Skip:Play()
                 opt.value = math.max(opt.min, opt.value - 1)
 
-            elseif INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+            elseif INPUT:Pressed(inputs.decide1) or INPUT:Pressed(inputs.decide2) or INPUT:KeyboardPressed("Return") then
                 sounds.Decide:Play()
                 editingOption = false
 
-            elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+            elseif INPUT:Pressed(inputs.cancel) or INPUT:KeyboardPressed("Escape") then
                 sounds.Cancel:Play()
                 editingOption = false
             end
@@ -445,19 +494,19 @@ function update()
             -- Left/right cycle through choices (modulo)
             local choiceCount = #opt.choices
 
-            if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
+            if INPUT:Pressed(inputs.right) or INPUT:KeyboardPressed("RightArrow") then
                 sounds.Skip:Play()
                 opt.value = (opt.value + 1) % choiceCount
 
-            elseif INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
+            elseif INPUT:Pressed(inputs.left) or INPUT:KeyboardPressed("LeftArrow") then
                 sounds.Skip:Play()
                 opt.value = (opt.value - 1 + choiceCount) % choiceCount
 
-            elseif INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
+            elseif INPUT:Pressed(inputs.decide1) or INPUT:Pressed(inputs.decide2) or INPUT:KeyboardPressed("Return") then
                 sounds.Decide:Play()
                 editingOption = false
 
-            elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+            elseif INPUT:Pressed(inputs.cancel) or INPUT:KeyboardPressed("Escape") then
                 sounds.Cancel:Play()
                 editingOption = false
             end
@@ -501,6 +550,9 @@ function onStart()
 
     tx["bg"]     = TEXTURE:CreateTexture("Textures/Background.png")
     tx["bgtile"] = TEXTURE:CreateTexture("Textures/BgTile.png")
+    for i = 1, 5, 1 do
+		tx["player"..(i-1)] = TEXTURE:CreateTexture("Textures/"..i.."P.png")
+	end
 end
 
 function onDestroy()

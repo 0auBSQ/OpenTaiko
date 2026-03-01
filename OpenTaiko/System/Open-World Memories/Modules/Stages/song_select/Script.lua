@@ -871,13 +871,13 @@ function update()
 			local inpset = inputSets[i]
 
 			if diffSelected[i] == false then
-				if INPUT:Pressed(inpset.right) then
+				if INPUT:Pressed(inpset.right) or (i == 1 and INPUT:KeyboardPressed("RightArrow")) then
 					sounds.Skip:Play()
 					diffIndex[i] = (diffIndex[i] + 1) % (2 + #diffBars)
-				elseif INPUT:Pressed(inpset.left) then
+				elseif INPUT:Pressed(inpset.left) or (i == 1 and INPUT:KeyboardPressed("LeftArrow")) then
 					sounds.Skip:Play()
 					diffIndex[i] = (diffIndex[i] - 1) % (2 + #diffBars)
-				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) then
+				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) or (i == 1 and INPUT:KeyboardPressed("Return")) then
 					-- Return
 					if diffIndex[i] == 0 then
 						sounds.Cancel:Play()
@@ -891,7 +891,7 @@ function update()
 						sounds.Decide:Play()
 						diffSelected[i] = true
 					end
-				elseif INPUT:Pressed(inpset.cancel) then
+				elseif INPUT:Pressed(inpset.cancel) or (i == 1 and INPUT:KeyboardPressed("Escape")) then
 					sounds.Cancel:Play()
 					if diffSelected[i] == true then
 						diffSelected[i] = false
