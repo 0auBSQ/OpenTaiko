@@ -34,6 +34,17 @@ local difficultyFade4 = 0
 
 local arrowsDistance = 0
 
+-- -1/1 to 0 when moving
+local selectBoxDist = 0
+
+local BOX_SCROLL_SECONDS = 0.06
+
+-- Hold scroll state
+local holdDir = 0  -- currently held direction: -1, 0, or 1
+
+local HOLD_DELAY_SECONDS  = 0.16
+local HOLD_REPEAT_SECONDS = 0.06
+
 -- Screens/Statuses
 
 --- songselect | pretransition | transition | difficultyselect
@@ -437,7 +448,6 @@ local function drawPreimage()
 end
 
 local function playPreview(songNode)
-	--local psnd = SHARED:GetSharedSound("presound")
 	SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
 	if songNode.IsSong == true then
 		startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
@@ -476,7 +486,7 @@ local function refreshPage()
 		end
 
 		-- Assets reload for selected songs
-		if i == 0  and node ~= nil then
+		if i == 0 and node ~= nil then
 			reloadPreimage(node)
 			playPreview(node)
 		end
@@ -513,7 +523,7 @@ local function handleDecideSongSelect()
 			return rdNd
 		end
 	end
-	-- any route note ending up to play a song return no selected node
+	-- any route not ending up to play a song returns no selected node
 	return nil
 end
 
@@ -523,6 +533,48 @@ local function handleFolderClose()
 	return songList:CloseFolder()
 end
 
+-- ============================================================
+-- Hold scroll helpers
+-- ============================================================
+
+local startRepeat
+
+local function stopHold()
+	holdDir = 0
+	ctx["hold_delay"]  = COUNTER:EmptyCounter()
+	ctx["hold_repeat"] = COUNTER:EmptyCounter()
+	startRepeat = function() end
+end
+
+local function doMove(dir)
+	sounds.Skip:Play()
+	songList:Move(dir)
+	refreshPage()
+	startCounter("scroll_box_anim", dir, 0, dir > 0 and -BOX_SCROLL_SECONDS or BOX_SCROLL_SECONDS, "none", function(val)
+		selectBoxDist = val
+	end)
+end
+
+local function startHold(dir)
+	holdDir = dir
+	ctx["hold_delay"]  = COUNTER:EmptyCounter()
+	ctx["hold_repeat"] = COUNTER:EmptyCounter()
+	startRepeat = function()
+		startCounter("hold_repeat", 0, 1, HOLD_REPEAT_SECONDS, "none", nil, function()
+			if holdDir ~= 0 then
+				doMove(holdDir)
+				startRepeat()
+			end
+		end)
+	end
+	startCounter("hold_delay", 0, 1, HOLD_DELAY_SECONDS, "none", nil, function()
+		if holdDir ~= 0 then
+			startRepeat()
+		end
+	end)
+end
+
+-- ============================================================
 
 function draw()
 	-- Background draw 
@@ -667,8 +719,8 @@ function draw()
 		-- Song List
 		if pageTexts ~= nil then
 			for i, tx in pairs(pageTexts) do
-				local xpos = SONGLIST_ORIGIN_X+i*SONGLIST_OFFSET_X-songSelectShift
-				local ypos = SONGLIST_ORIGIN_Y+i*SONGLIST_OFFSET_Y
+				local xpos = SONGLIST_ORIGIN_X+(i+selectBoxDist)*SONGLIST_OFFSET_X-songSelectShift
+				local ypos = SONGLIST_ORIGIN_Y+(i+selectBoxDist)*SONGLIST_OFFSET_Y
 				-- shift the box if selected to highlight it
 				if i == 0 then
 					xpos = xpos + SONGLIST_SELECTED_X_DIFF
@@ -710,7 +762,7 @@ function draw()
 
 			-- Traverse up the tree
 			while currentNode ~= nil do
-				-- The root node as a Title of nil
+				-- The root node has a Title of nil
 				local _tx = "/"
 				if currentNode.Title ~= nil then
 					_tx = currentNode.Title
@@ -768,7 +820,9 @@ function draw()
 
 	-- Execute all activities draw calls at the end (modals, mod select, pretransitions, etc)
 	for _, at in pairs(act) do
-		at:Draw()
+		if at.IsActive then
+			at:Draw()
+		end
 	end
 end
 
@@ -814,8 +868,8 @@ function update()
 	-- Execute all activities update calls at the beginning (modals, mod select, pretransitions, etc)
 	local activeModal = false
 	for _, at in pairs(act) do
-		at:Update()
 		if at.IsActive then
+			at:Update()
 			activeModal = true
 		end
 	end
@@ -830,7 +884,6 @@ function update()
 		if INPUT:KeyboardPressed("S") then
 			sounds.Skip:Play()
 			CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
-			-- return Exit("stage", "demo1")
 		end
 
 		if INPUT:KeyboardPressed("P") then
@@ -840,20 +893,25 @@ function update()
 
 		local inpset = inputSets[highlightedPlayer + 1]
 		
+		-- Release detection: check every frame if the held direction is still physically pressed
+		if holdDir == 1 and not INPUT:Pressing(inpset.right) and not INPUT:KeyboardPressing("RightArrow") then
+			stopHold()
+		elseif holdDir == -1 and not INPUT:Pressing(inpset.left) and not INPUT:KeyboardPressing("LeftArrow") then
+			stopHold()
+		end
+
 		-- Navigation
 		if (INPUT:Pressed(inpset.right) or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
-			sounds.Skip:Play()
-			songList:Move(1)
-			refreshPage()
+			doMove(1)
+			startHold(1)
 		elseif (INPUT:Pressed(inpset.left) or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
-			sounds.Skip:Play()
-			songList:Move(-1)
-			refreshPage()
+			doMove(-1)
+			startHold(-1)
 		elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) or INPUT:KeyboardPressed("Return") then
-			-- Select song and move to difficulty select if applicable
+			stopHold()
 			selectedSongNode = handleDecideSongSelect()
-		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-			-- Close folder 
+		elseif (inpset.cancel ~= nil and INPUT:Pressed(inpset.cancel)) or INPUT:KeyboardPressed("Escape") then
+			stopHold()
 			local closeFolder = handleFolderClose()
 			if closeFolder == true then
 				refreshPage()
@@ -864,9 +922,11 @@ function update()
 			end
 		end
 
-		-- Transition to difficulty select if a screen was selected
+		-- Transition to difficulty select if a song was selected
 		if selectedSongNode ~= nil then
 			loadDiffBars(selectedSongNode)
+
+			stopHold()
 
 			-- TODO? implement pretransition for songs having one
 			activeScreen = "transition"
@@ -1049,7 +1109,7 @@ end
 
 function deactivate()
 	for k, counter in pairs(ctx) do
-        counter = COUNTER:EmptyCounter()
+        ctx[k] = COUNTER:EmptyCounter()
     end
 
 	local psnd = SHARED:GetSharedSound("presound")
@@ -1119,7 +1179,6 @@ function onStart()
 	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
 
 	genre_overlays = {}
-
 end 
 
 function afterSongEnum()
