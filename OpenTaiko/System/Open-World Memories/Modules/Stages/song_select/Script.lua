@@ -884,7 +884,7 @@ function update()
 						canceled = true
 					-- Options
 					elseif diffIndex[i] == 1 then
-						act["mod_select_dialog"]:Activate(i)
+						act["mod_select_dialog"]:Activate(i - 1)
 						return
 					-- Select difficulty
 					elseif diffIndex[i] > 1 then
