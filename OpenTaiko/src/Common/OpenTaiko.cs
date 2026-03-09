@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -296,6 +296,11 @@ internal class OpenTaiko : Game {
 	}
 
 	#endregion
+
+	public static HttpEventReporter? HttpEventReporter {
+		get;
+		set;
+	}
 
 	// Constructor
 
@@ -1362,6 +1367,7 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+
 	private void tStartupProcess() {
 
 		// Load System error beforehand
@@ -1749,6 +1755,21 @@ internal class OpenTaiko : Game {
 				LargeImageText = OpenTaiko.LargeImageText,
 			}
 		});
+		#endregion
+
+		// Set up the HTTP server.
+		OpenTaiko.HttpEventReporter = new HttpEventReporter("localhost", OpenTaiko.ConfigIni.nGameEventBroadcastingPort);
+		if (OpenTaiko.ConfigIni.bEnableGameEventBroadcasting)
+			OpenTaiko.HttpEventReporter.StartListening();
+
+		Trace.TraceInformation("Application successfully started.");
+
+		#region [ Move to Startup Stage ]
+		//---------------------
+		ChangeStage(stageStartup);
+		Trace.TraceInformation("----------------------");
+		Trace.TraceInformation("■ Startup");
+		//---------------------
 		#endregion
 
 		// Fetch the skin modules first once the base is fully loaded
