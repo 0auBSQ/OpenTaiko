@@ -261,7 +261,10 @@ internal class CStageTitle : CStage {
 
 
 				if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
-					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+					) {
 					if (bプレイヤーエントリー && this.ctSaveLoaded.IsEnded) {
 						if (n現在の選択行プレイヤーエントリー == 0 || n現在の選択行プレイヤーエントリー == 2) {
 							if (!bプレイヤーエントリー決定) {

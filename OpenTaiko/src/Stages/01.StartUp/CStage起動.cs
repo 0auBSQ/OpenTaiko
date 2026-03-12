@@ -203,7 +203,11 @@ internal class CStage起動 : CStage {
 					langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 					langSelectIndex = Math.Max(langSelectIndex - 1, 0);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+				} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+					) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
@@ -217,7 +221,11 @@ internal class CStage起動 : CStage {
 				}
 
 				if (ePhaseID == EPhase.Startup_Complete) {
-					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+						) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						return 1;
 					}
