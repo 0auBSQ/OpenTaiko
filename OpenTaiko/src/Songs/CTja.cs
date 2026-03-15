@@ -2866,7 +2866,6 @@ internal class CTja : CActivity {
 		chip.n整数値 = (int)noteType;
 		chip.n整数値_内部番号 = this.listNoteChip.Count;
 		chip.nScrollDirection = this.nスクロール方向;
-		chip.n分岐回数 = 0; // unused; placeholder value
 		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
 		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
 		chip.bGOGOTIME = this.bGOGOTIME;

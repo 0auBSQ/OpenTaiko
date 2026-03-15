@@ -23,7 +23,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public ECourse nBranch;
 	public int idxBranchSection;
 	public int nSenote;
-	public int nState;
 	public int nRollCount;
 	public int nBalloon;
 	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
@@ -55,12 +54,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double db発声時刻ms;
 	public int nノーツ出現時刻ms;
 	public int nノーツ移動開始時刻ms;
-	public int n分岐回数;
 	public int nLag;                // 2011.2.1 yyagi
-	public double db発声時刻;
-	public double dbProcess_Time;
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
-	public int nListPosition;
 	public bool IsFixedSENote;
 	public bool IsHitted = false;
 	public bool IsMissed = false;
