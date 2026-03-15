@@ -947,7 +947,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 			foreach (var pad in GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes))
 				this.ProcessPadInput(iPlayer, pad, msTjaTime);
 		}
-		chip.msStoredHit = double.PositiveInfinity; // prevent further hit attempt (unless overridden)
+		// prevent further hit attempt (unless overridden)
+		chip.eNoteState = ENoteState.None;
+		chip.msStoredHit = double.PositiveInfinity;
 	}
 
 	private bool AutoplayTryHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
@@ -979,7 +981,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.AutoplayDoHit(chip, (long)chip.msStoredHit, iPlayer, gt); // early hit
 				return;
 			}
-			chip.msStoredHit = msTjaTime; // attempted
+			// mark as attempted
+			chip.eNoteState = ENoteState.None;
+			chip.msStoredHit = msTjaTime;
 		}
 		if (canHitNow) // late hit
 			this.AutoplayDoHit(chip, msTjaTime, iPlayer, gt);
@@ -1007,8 +1011,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		long msPerRollTja = (long)CTja.GameDurationToTjaDuration(1000.0 / rollSpeed);
 		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
-			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt))
+			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt)) {
+				pChip.eNoteState = ENoteState.None;
 				pChip.msStoredHit = msTjaTime;
+			}
 		}
 	}
 
@@ -1043,6 +1049,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 		}
 		if (balloon == 1 && NotesManager.IsFuzeRoll(pChip) && this.CanAutoplayHitMine(iPlayer, true)) {
+			pChip.eNoteState = ENoteState.None;
 			pChip.msStoredHit = double.PositiveInfinity; // prevent clearing fuze
 			return;
 		}
@@ -1052,8 +1059,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		long msPerRollTja = (long)(balloonDuration / (double)rollSpeed);
 		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
-			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt))
+			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt)) {
+				pChip.eNoteState = ENoteState.None;
 				pChip.msStoredHit = msTjaTime;
+			}
 		}
 	}
 
