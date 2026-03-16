@@ -1168,13 +1168,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					if (pChip.RollInputTime != null && pChip.RollInputTime.IsEnded) {
 						pChip.RollInputTime.Stop();
 						pChip.RollInputTime.CurrentValue = 0;
-						pChip.RollDelay = new CCounter(0, 1, 1, OpenTaiko.Timer);
-					}
-
-					if (pChip.RollDelay != null && pChip.RollDelay.IsEnded && pChip.RollEffectLevel > 0) {
-						pChip.RollEffectLevel--;
-						pChip.RollDelay = new CCounter(0, 1, 1, OpenTaiko.Timer);
-						pChip.RollDelay.CurrentValue = 0;
+						pChip.RollDelay = new CCounter(-pChip.RollEffectLevel, 0, 1000 / 60.0, OpenTaiko.Timer);
+					} else if (pChip.RollDelay != null && pChip.RollDelay.IsTicked && pChip.RollEffectLevel > 0) {
+						pChip.RollEffectLevel = -pChip.RollDelay.CurrentValue;
 					}
 
 					float f減少するカラー = 1.0f - ((0.95f / 100) * pChip.RollEffectLevel);
