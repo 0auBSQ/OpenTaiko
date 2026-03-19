@@ -2690,6 +2690,7 @@ internal class CTja : CActivity {
 		var judgeChipTime = judgeChipTimes.Where(x => x != null).MaxBy(x => x!.Value.msTime);
 		// fallback: judge 4 beats before chart start
 		judgeChipTime ??= (null, 0 - Math.Abs(4 * 60000.0 / this.BASEBPM), 0);
+		var judgeChipTimeMin = judgeChipTime;
 
 		if (delayForRoll) {
 			var lastRollEnd = lastRollEnds.Where(x => x != null).MaxBy(x => x!.n発声時刻ms);
@@ -2697,10 +2698,10 @@ internal class CTja : CActivity {
 				judgeChipTime = (lastRollEnd, lastRollEnd.n発声時刻ms, lastRollEnd.n発声位置); // judge at end of last roll
 		}
 
-		// prevent judging after branch point
+		// judging at or after last measure, and (if possible) at or before branch point
 		return (judgeChipTime.Value.chip,
-			Math.Min(judgeChipTime.Value.msTime, this.dbNowTime),
-			Math.Min(judgeChipTime.Value.th384MeasurePos, this.n現在の小節数 * 384)
+			Math.Max(judgeChipTimeMin.Value.msTime, Math.Min(judgeChipTime.Value.msTime, this.dbNowTime)),
+			Math.Max(judgeChipTimeMin.Value.th384MeasurePos, Math.Min(judgeChipTime.Value.th384MeasurePos, this.n現在の小節数 * 384))
 		);
 	}
 
