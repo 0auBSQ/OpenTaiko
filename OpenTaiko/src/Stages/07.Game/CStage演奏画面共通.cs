@@ -1948,7 +1948,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 
-		if ((!this.bPAUSE && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED)) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
+		if (!this.bPAUSE && !this.IsStageFailed()) {
 			this.t入力処理_ドラム();
 
 			CTja tja = OpenTaiko.TJA;
@@ -2042,7 +2042,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.ConfigIni.bAutoPlay[1] = !OpenTaiko.ConfigIni.bAutoPlay[1];
 		}
 #endif
-		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && ((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED)) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
+		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageFailed()) {
 			if (keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) { // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {    // DownArrow (scrollspeed down)
@@ -2100,11 +2100,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
+	public bool IsStageFailed() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
 
 	protected bool t進行描画_AVI() {
-		if (((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED) || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut))
-			&& (this.actAVI?.rVD.bPlaying ?? false)
-			) {
+		if (this.IsStageFailed() && (this.actAVI?.rVD.bPlaying ?? false)) {
 			this.actAVI.Pause(); // paused but still shown
 		}
 		if (OpenTaiko.ConfigIni.bEnableAVI) {
@@ -2115,10 +2114,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 	protected void t進行描画_STAGEFAILED() {
 		// Transition for failed games
-		if (((base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED)
-			 || (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut))
-			&& ((this.actStageFailed.Draw() != 0)
-				&& (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut))) {
+		if (!this.IsStageFailed())
+			return;
+		if ((this.actStageFailed.Draw() != 0) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
 			} else {
@@ -2130,8 +2128,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
+
 	protected void t進行描画_パネル文字列() {
-		if ((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
+		if (!this.IsStageFailed()) {
 			this.actPanel.Draw();
 		}
 	}
@@ -2146,7 +2145,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_ゲージ() {
-		if ((((base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)))) {
+		if (!this.IsStageFailed()) {
 			this.actGauge.Draw();
 		}
 	}
@@ -2158,9 +2157,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected bool t進行描画_チップ(EInstrumentPad ePlayMode, int nPlayer) {
-		bool drawOnly = (base.ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut)
-			|| (this.nCurrentTopChip[nPlayer] == -1)
-			|| IsDanFailed;
+		bool drawOnly = this.IsStageFailed() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
@@ -3964,7 +3961,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public void t演奏中止() {
 		this.actFO.tフェードアウト開始();
-		base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+		base.ePhaseID = this.IsStageFailed() ? CStage.EPhase.Game_STAGE_FAILED_FadeOut : CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
 	}
 
