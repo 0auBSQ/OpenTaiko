@@ -187,12 +187,11 @@ public static class ImGuiDebugWindow {
 							break;
 						case InputDeviceType.MidiIn:
 							var midiin = (CInputMIDI)device;
-							//for (int i = 0; i < midiin.InputEvents.Count; i++) {
-							//	if (midiin.InputEvents[i].Pressed) { ImGui.Text(midiin.InputEvents[i].nKey + " Pressed!"); }
-							//	if (midiin.KeyPressing(i)) { ImGui.Text("Pressing!"); }
-							//	if (midiin.InputEvents[i].Released) { ImGui.Text(midiin.InputEvents[i].nKey + " Released!"); }
-							//}
-							ImGui.TextColored(new Vector4(1, 0, 0, 1), "MIDI input polling is currently disabled.");
+							for (int i = 0; i < midiin.ButtonStates.Length; i++) {
+								if (midiin.KeyPressed(i)) { ImGui.Text(CInputMIDI.GetButtonName(i) + " Pressed!"); }
+								if (midiin.KeyPressing(i)) { ImGui.Text(CInputMIDI.GetButtonName(i) + " Pressing!"); }
+								if (midiin.KeyPressed(i)) { ImGui.Text(CInputMIDI.GetButtonName(i) + " Released!"); }
+							}
 							break;
 					}
 					ImGui.TreePop();

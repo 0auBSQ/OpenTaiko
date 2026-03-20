@@ -1,11 +1,15 @@
-﻿namespace FDK;
+﻿using Commons.Music.Midi;
+
+namespace FDK;
 
 public interface IInputDevice : IDisposable {
 	// Properties
 
-	Silk.NET.Input.IInputDevice Device {
-		get;
-	}
+	// Default implement. Need to implement either Device or DeviceMidi.
+	object DeviceGeneric => ((object?)Device ?? DeviceMidi)!;
+	Silk.NET.Input.IInputDevice? Device { get => null; }
+	IMidiPortDetails? DeviceMidi { get => null; }
+
 	InputDeviceType CurrentType {
 		get;
 	}

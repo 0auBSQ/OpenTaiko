@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
+using Commons.Music.Midi;
 
 namespace FDK;
 
@@ -81,6 +82,16 @@ public class CInputManager : IDisposable {
 			this.InputDevices.Add(new CInputGamepad(gamepad, Deadzone));
 		}
 		#endregion
+		#region [ Enumerate MIDI device ]
+		try {
+			foreach (var (v, i) in MidiAccessManager.Default.Inputs.Select((v, i) => (v, i))) {
+				var midiIn = MidiAccessManager.Default.OpenInputAsync(v.Id).Result;
+				this.InputDevices.Add(new CInputMIDI(midiIn, i));
+			}
+		} catch (Exception e) {
+			Trace.TraceError(e.ToString());
+		}
+		#endregion
 		Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
 		for (int i = 0; i < InputDevices.Count; i++) {
 			try {
@@ -125,7 +136,12 @@ public class CInputManager : IDisposable {
 		else {
 			for (int i = InputDevices.Count; i-- > 0;) {
 				var inputdevice = InputDevices[i];
-				if (!inputdevice.Device.IsConnected) {
+				var isClosed = inputdevice.DeviceGeneric switch {
+					Silk.NET.Input.IInputDevice deviceSilk => !deviceSilk.IsConnected,
+					IMidiInput deviceMidi => deviceMidi.Connection is MidiPortConnectionState.Closed,
+					_ => true,
+				};
+				if (isClosed) {
 					Trace.TraceInformation($"An input device was disconnected. Device name: {inputdevice.Name} / Index: {inputdevice.ID} / Device Type: {inputdevice.CurrentType}");
 					inputdevice.Dispose();
 					this.InputDevices.Remove(inputdevice);
@@ -178,7 +194,7 @@ public class CInputManager : IDisposable {
 		return null;
 	}
 	public void SetUseBufferInput(bool useBufferInput) {
-		lock (this.objMidiIn排他用) {
+		lock (this.lockInputDevices) {
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)
 			{
 				IInputDevice device = this.InputDevices[i];
@@ -187,7 +203,7 @@ public class CInputManager : IDisposable {
 		}
 	}
 	public void Polling() {
-		lock (this.objMidiIn排他用) {
+		lock (this.lockInputDevices) {
 			//				foreach( IInputDevice device in this.list入力デバイス )
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)    // #24016 2011.1.6 yyagi: change not to use "foreach" to avoid InvalidOperation exception by Remove().
 			{
@@ -213,15 +229,11 @@ public class CInputManager : IDisposable {
 		if (!this.bDisposed済み) {
 			if (disposeManagedObjects) {
 				foreach (IInputDevice device in this.InputDevices) {
-					CInputMIDI tmidi = device as CInputMIDI;
-					if (tmidi != null) {
-						Trace.TraceInformation("MIDI In: [{0}] を停止しました。", new object[] { tmidi.ID });
-					}
+					if (device is CInputMIDI tmidi)
+						Trace.TraceInformation($"MIDI In: [{tmidi.ID}] has been stopped.");
+					device.Dispose();
 				}
-				foreach (IInputDevice device2 in this.InputDevices) {
-					device2.Dispose();
-				}
-				lock (this.objMidiIn排他用) {
+				lock (this.lockInputDevices) {
 					this.InputDevices.Clear();
 				}
 
@@ -246,8 +258,7 @@ public class CInputManager : IDisposable {
 	private IInputDevice _Keyboard;
 	private IInputDevice _Mouse;
 	private bool bDisposed済み;
-	private List<uint> listHMIDIIN = new List<uint>(8);
-	private object objMidiIn排他用 = new object();
+	private object lockInputDevices = new object();
 	//private CTimer timer;
 
 	//-----------------

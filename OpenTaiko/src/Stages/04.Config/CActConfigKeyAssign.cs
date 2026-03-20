@@ -222,7 +222,7 @@ internal class CActConfigKeyAssign : CActivity {
 		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, str, b強調, 0.75f);
 	}
 	private void tアサインコードの描画_MidiIn(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. MidiIn #{1} code.{2}", line, nID, nCode), b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. MidiIn #{1} {2}", line, nID, CInputMIDI.GetButtonName(nCode)), b強調, 0.75f);
 	}
 	private void tアサインコードの描画_Mouse(int line, int x, int y, int nID, int nCode, bool b強調) {
 		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Mouse Button{1}", line, nCode), b強調, 0.75f);
@@ -296,9 +296,9 @@ internal class CActConfigKeyAssign : CActivity {
 		return false;
 	}
 	private bool tキーチェックとアサイン_MidiIn() {
-		foreach (IInputDevice device in OpenTaiko.InputManager.InputDevices) {
+		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.MidiIn) {
-				for (int i = 0; i < 0x100; i++) {
+				for (int i = 0; i < device.ButtonStates.Length; i++) {
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(EInputDevice.MIDIInput, device.ID, i, this.pad);
