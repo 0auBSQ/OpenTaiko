@@ -874,10 +874,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 			#endregion
 		}
 
-		public bool KeyIsPressed(STKEYASSIGN[] pad) {
-			if (OpenTaiko.InputManager == null) return false; // Input initialisation failed/not reached
-			return OpenTaiko.InputManager.Keyboard.KeyPressed(pad.ToList().ConvertAll<int>(key => key.Code));
-		}
+		public bool KeyIsPressed(STKEYASSIGN[] pads)
+			=> (OpenTaiko.InputManager != null)
+				&& pads.Any(pad => OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)?.KeyPressed(pad.Code) ?? false);
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STKEYASSIGN {
