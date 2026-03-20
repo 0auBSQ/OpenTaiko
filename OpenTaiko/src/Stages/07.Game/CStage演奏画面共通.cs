@@ -2101,6 +2101,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public bool IsStageFailed() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
+	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 
 	protected bool t進行描画_AVI() {
 		if (this.IsStageFailed() && (this.actAVI?.rVD.bPlaying ?? false)) {
@@ -3961,7 +3962,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public void t演奏中止() {
 		this.actFO.tフェードアウト開始();
-		base.ePhaseID = this.IsStageFailed() ? CStage.EPhase.Game_STAGE_FAILED_FadeOut : CStage.EPhase.Common_FADEOUT;
+		base.ePhaseID = (this.IsStageFailed() || this.IsStageCompleted()) ?
+			CStage.EPhase.Game_STAGE_FAILED_FadeOut // keep end-of-chart animation
+			: CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
 	}
 

@@ -416,7 +416,7 @@ internal class CActImplBackground : CActivity {
 
 			bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 
-			bool stageEnded = OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
+			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || CFloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
 				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
