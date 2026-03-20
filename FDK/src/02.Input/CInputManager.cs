@@ -17,34 +17,8 @@ public class CInputManager : IDisposable {
 		get;
 		private set;
 	}
-	public IInputDevice Keyboard {
-		get {
-			if (this._Keyboard != null) {
-				return this._Keyboard;
-			}
-			foreach (IInputDevice device in this.InputDevices) {
-				if (device.CurrentType == InputDeviceType.Keyboard) {
-					this._Keyboard = device;
-					return device;
-				}
-			}
-			return null;
-		}
-	}
-	public IInputDevice Mouse {
-		get {
-			if (this._Mouse != null) {
-				return this._Mouse;
-			}
-			foreach (IInputDevice device in this.InputDevices) {
-				if (device.CurrentType == InputDeviceType.Mouse) {
-					this._Mouse = device;
-					return device;
-				}
-			}
-			return null;
-		}
-	}
+	public IInputDevice? Keyboard => this._Keyboard ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Keyboard);
+	public IInputDevice? Mouse => this._Mouse ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Mouse);
 	public float Deadzone = 0.5f;
 
 
@@ -153,46 +127,17 @@ public class CInputManager : IDisposable {
 
 	// メソッド
 
-	public IInputDevice Joystick(int ID) {
-		foreach (IInputDevice device in this.InputDevices) {
-			if ((device.CurrentType == InputDeviceType.Joystick) && (device.ID == ID)) {
-				return device;
-			}
-		}
-		return null;
-	}
-	public IInputDevice Joystick(string GUID) {
-		foreach (IInputDevice device in this.InputDevices) {
-			if ((device.CurrentType == InputDeviceType.Joystick) && device.GUID.Equals(GUID)) {
-				return device;
-			}
-		}
-		return null;
-	}
-	public IInputDevice Gamepad(int ID) {
-		foreach (IInputDevice device in this.InputDevices) {
-			if ((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == ID)) {
-				return device;
-			}
-		}
-		return null;
-	}
-	public IInputDevice Gamepad(string GUID) {
-		foreach (IInputDevice device in this.InputDevices) {
-			if ((device.CurrentType == InputDeviceType.Gamepad) && device.GUID.Equals(GUID)) {
-				return device;
-			}
-		}
-		return null;
-	}
-	public IInputDevice MidiIn(int ID) {
-		foreach (IInputDevice device in this.InputDevices) {
-			if ((device.CurrentType == InputDeviceType.MidiIn) && (device.ID == ID)) {
-				return device;
-			}
-		}
-		return null;
-	}
+	public IInputDevice? FindDevice(InputDeviceType type, int ID)
+		=> InputDevices.FirstOrDefault(device => (device.CurrentType == type) && (device.ID == ID));
+	public IInputDevice? FindDevice(InputDeviceType type, string GUID)
+		=> InputDevices.FirstOrDefault(device => (device.CurrentType == type) && device.GUID.Equals(GUID));
+	public IInputDevice? Joystick(int ID) => FindDevice(InputDeviceType.Joystick, ID);
+	public IInputDevice? Joystick(string GUID) => FindDevice(InputDeviceType.Joystick, GUID);
+	public IInputDevice? Gamepad(int ID) => FindDevice(InputDeviceType.Gamepad, ID);
+	public IInputDevice? Gamepad(string GUID) => FindDevice(InputDeviceType.Gamepad, GUID);
+	public IInputDevice? MidiIn(int ID) => FindDevice(InputDeviceType.MidiIn, ID);
+	public IInputDevice? MidiIn(string GUID) => FindDevice(InputDeviceType.MidiIn, GUID);
+
 	public void SetUseBufferInput(bool useBufferInput) {
 		lock (this.lockInputDevices) {
 			for (int i = this.InputDevices.Count - 1; i >= 0; i--)
@@ -255,8 +200,8 @@ public class CInputManager : IDisposable {
 	#region [ private ]
 	//-----------------
 	private IInputContext Context;
-	private IInputDevice _Keyboard;
-	private IInputDevice _Mouse;
+	private IInputDevice? _Keyboard;
+	private IInputDevice? _Mouse;
 	private bool bDisposed済み;
 	private object lockInputDevices = new object();
 	//private CTimer timer;
