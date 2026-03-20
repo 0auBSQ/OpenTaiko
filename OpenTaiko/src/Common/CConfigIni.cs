@@ -881,11 +881,11 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STKEYASSIGN {
-			public EInputDevice InputDevice;
+			public InputDeviceType InputDevice;
 			public int ID;
 			public int Code;
 
-			public STKEYASSIGN(EInputDevice DeviceType, int nID, int nCode) {
+			public STKEYASSIGN(InputDeviceType DeviceType, int nID, int nCode) {
 				this.InputDevice = DeviceType;
 				this.ID = nID;
 				this.Code = nCode;
@@ -1212,7 +1212,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 				for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
 					for (int k = 0; k < 0x10; k++) {
-						if ((this.KeyAssign[i][j][k].InputDevice == EInputDevice.Keyboard) &&
+						if ((this.KeyAssign[i][j][k].InputDevice == InputDeviceType.Keyboard) &&
 							(this.KeyAssign[i][j][k].Code == (int)SlimDXKeys.Key.Return)) {
 							return false;
 						}
@@ -1769,7 +1769,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	// メソッド
 
-	public void RemoveDuplicateKeyAssignments(EInputDevice deviceType, int nID, int nCode, EKeyConfigPad pad) {
+	public void RemoveDuplicateKeyAssignments(InputDeviceType deviceType, int nID, int nCode, EKeyConfigPad pad) {
 		bool isMenu = pad is EKeyConfigPad.Decide or EKeyConfigPad.RightChange or EKeyConfigPad.LeftChange;
 		for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
 			// Do not restrict duplicate keybinds for System controls
@@ -1785,7 +1785,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 						&& this.KeyAssign[i][j][k].ID == nID
 						&& this.KeyAssign[i][j][k].Code == nCode
 						) {
-						this.KeyAssign[i][j][k].InputDevice = EInputDevice.Unknown;
+						this.KeyAssign[i][j][k].InputDevice = InputDeviceType.Unknown;
 						this.KeyAssign[i][j][k].ID = 0;
 						this.KeyAssign[i][j][k].Code = 0;
 					}
@@ -3617,7 +3617,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
 				this.KeyAssign[i][j] = new CKeyAssign.STKEYASSIGN[16];
 				for (int k = 0; k < 16; k++) {
-					this.KeyAssign[i][j][k] = new CKeyAssign.STKEYASSIGN(EInputDevice.Unknown, 0, 0);
+					this.KeyAssign[i][j][k] = new CKeyAssign.STKEYASSIGN(InputDeviceType.Unknown, 0, 0);
 				}
 			}
 		}
@@ -3626,7 +3626,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void WriteKeyAssignment(StreamWriter sw, CKeyAssign.STKEYASSIGN[] assign) {
 		bool flag = true;
 		for (int i = 0; i < 0x10; i++) {
-			if (assign[i].InputDevice == EInputDevice.Unknown) {
+			if (assign[i].InputDevice == InputDeviceType.Unknown) {
 				continue;
 			}
 
@@ -3636,23 +3636,23 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 			flag = false;
 			switch (assign[i].InputDevice) {
-				case EInputDevice.Keyboard:
+				case InputDeviceType.Keyboard:
 					sw.Write('K');
 					break;
 
-				case EInputDevice.MIDIInput:
+				case InputDeviceType.MidiIn:
 					sw.Write('M');
 					break;
 
-				case EInputDevice.Joypad:
+				case InputDeviceType.Joystick:
 					sw.Write('J');
 					break;
 
-				case EInputDevice.Gamepad:
+				case InputDeviceType.Gamepad:
 					sw.Write('G');
 					break;
 
-				case EInputDevice.Mouse:
+				case InputDeviceType.Mouse:
 					sw.Write('N');
 					break;
 			}
@@ -3665,34 +3665,34 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void ReadAndSetKey(string keyDescription, CKeyAssign.STKEYASSIGN[] assign) {
 		string[] strArray = keyDescription.Split(new char[] { ',' });
 		for (int i = 0; (i < strArray.Length) && (i < 0x10); i++) {
-			EInputDevice eInputDevice;
+			InputDeviceType eInputDevice;
 			int id;
 			int code;
 			string str = strArray[i].Trim().ToUpper();
 			if (str.Length >= 3) {
-				eInputDevice = EInputDevice.Unknown;
+				eInputDevice = InputDeviceType.Unknown;
 				switch (str[0]) {
 					case 'J':
-						eInputDevice = EInputDevice.Joypad;
+						eInputDevice = InputDeviceType.Joystick;
 						break;
 
 					case 'G':
-						eInputDevice = EInputDevice.Gamepad;
+						eInputDevice = InputDeviceType.Gamepad;
 						break;
 
 					case 'K':
-						eInputDevice = EInputDevice.Keyboard;
+						eInputDevice = InputDeviceType.Keyboard;
 						break;
 
 					case 'L':
 						continue;
 
 					case 'M':
-						eInputDevice = EInputDevice.MIDIInput;
+						eInputDevice = InputDeviceType.MidiIn;
 						break;
 
 					case 'N':
-						eInputDevice = EInputDevice.Mouse;
+						eInputDevice = InputDeviceType.Mouse;
 						break;
 				}
 			} else {

@@ -254,14 +254,6 @@ public enum EKeyConfigPart  // : E楽器パート
 	Unknown = EInstrumentPad.Unknown
 }
 
-internal enum EInputDevice {
-	Keyboard = 0,
-	MIDIInput = 1,
-	Joypad = 2,
-	Mouse = 3,
-	Gamepad = 4,
-	Unknown = -1
-}
 public enum ENoteJudge {
 	Perfect = 0,
 	Great = 1,

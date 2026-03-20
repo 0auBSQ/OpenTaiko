@@ -7,5 +7,5 @@ public enum InputDeviceType {
 	Joystick,
 	Gamepad,
 	MidiIn,
-	Unknown
+	Unknown = -1,
 }

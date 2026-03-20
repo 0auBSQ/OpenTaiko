@@ -43,35 +43,35 @@ public class CPad {
 			foreach (STInputEvent event2 in device.InputEvents) {
 				for (int i = 0; i < stkeyassignArray.Length; i++) {
 					switch (stkeyassignArray[i].InputDevice) {
-						case EInputDevice.Keyboard:
+						case InputDeviceType.Keyboard:
 							if ((device.CurrentType == InputDeviceType.Keyboard) && (event2.nKey == stkeyassignArray[i].Code)) {
 								list.Add(event2);
 								this.detectedDevice.Keyboard = true;
 							}
 							break;
 
-						case EInputDevice.MIDIInput:
+						case InputDeviceType.MidiIn:
 							if (((device.CurrentType == InputDeviceType.MidiIn) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
 								list.Add(event2);
 								this.detectedDevice.MIDIIN = true;
 							}
 							break;
 
-						case EInputDevice.Joypad:
+						case InputDeviceType.Joystick:
 							if (((device.CurrentType == InputDeviceType.Joystick) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
 								list.Add(event2);
 								this.detectedDevice.Joypad = true;
 							}
 							break;
 
-						case EInputDevice.Gamepad:
+						case InputDeviceType.Gamepad:
 							if (((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
 								list.Add(event2);
 								this.detectedDevice.Gamepad = true;
 							}
 							break;
 
-						case EInputDevice.Mouse:
+						case InputDeviceType.Mouse:
 							if ((device.CurrentType == InputDeviceType.Mouse) && (event2.nKey == stkeyassignArray[i].Code)) {
 								list.Add(event2);
 								this.detectedDevice.Mouse = true;
@@ -92,14 +92,14 @@ public class CPad {
 		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 		for (int i = 0; i < stkeyassignArray.Length; i++) {
 			switch (stkeyassignArray[i].InputDevice) {
-				case EInputDevice.Keyboard:
+				case InputDeviceType.Keyboard:
 					if (!this.inputManager.Keyboard.KeyPressed(stkeyassignArray[i].Code))
 						break;
 
 					this.detectedDevice.Keyboard = true;
 					return true;
 
-				case EInputDevice.MIDIInput: {
+				case InputDeviceType.MidiIn: {
 						IInputDevice device2 = this.inputManager.MidiIn(stkeyassignArray[i].ID);
 						if (device2 == null || !device2.KeyPressed(stkeyassignArray[i].Code))
 							break;
@@ -107,7 +107,7 @@ public class CPad {
 						this.detectedDevice.MIDIIN = true;
 						return true;
 					}
-				case EInputDevice.Joypad: {
+				case InputDeviceType.Joystick: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
 							break;
 
@@ -118,7 +118,7 @@ public class CPad {
 						this.detectedDevice.Joypad = true;
 						return true;
 					}
-				case EInputDevice.Gamepad: {
+				case InputDeviceType.Gamepad: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
 							break;
 
@@ -129,7 +129,7 @@ public class CPad {
 						this.detectedDevice.Gamepad = true;
 						return true;
 					}
-				case EInputDevice.Mouse:
+				case InputDeviceType.Mouse:
 					if (!this.inputManager.Mouse.KeyPressed(stkeyassignArray[i].Code))
 						break;
 
@@ -159,14 +159,14 @@ public class CPad {
 		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 		for (int i = 0; i < stkeyassignArray.Length; i++) {
 			switch (stkeyassignArray[i].InputDevice) {
-				case EInputDevice.Keyboard:
+				case InputDeviceType.Keyboard:
 					if (!this.inputManager.Keyboard.KeyPressing(stkeyassignArray[i].Code)) {
 						break;
 					}
 					this.detectedDevice.Keyboard = true;
 					return true;
 
-				case EInputDevice.Joypad: {
+				case InputDeviceType.Joystick: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
 							break;
 						}
@@ -178,7 +178,7 @@ public class CPad {
 						return true;
 					}
 
-				case EInputDevice.Gamepad: {
+				case InputDeviceType.Gamepad: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
 							break;
 						}
@@ -189,7 +189,7 @@ public class CPad {
 						this.detectedDevice.Gamepad = true;
 						return true;
 					}
-				case EInputDevice.Mouse:
+				case InputDeviceType.Mouse:
 					if (!this.inputManager.Mouse.KeyPressing(stkeyassignArray[i].Code)) {
 						break;
 					}
