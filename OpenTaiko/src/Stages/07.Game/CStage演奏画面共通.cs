@@ -656,7 +656,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool[] isChartEnded = { false, false, false, false, false }; // last note of chart passed
 	protected bool[] isFinishedPlaying = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
-	protected enum EStageAbort { None, StageFailed, KanpekiFailed, Max = KanpekiFailed };
+
+	public enum EStageAbort {
+		None,
+		FailedFlow,
+		FailedStop,
+		FailedStopSkipResult,
+		Max = FailedStopSkipResult
+	};
 	protected EStageAbort[] stageAbortType = { EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None };
 
 	protected int nタイマ番号;
@@ -2083,16 +2090,19 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public virtual void SetStageFailed(int iPlayer, bool kanpeki = false) {
+	public virtual void SetStageFailed(int iPlayer, EStageAbort failType = EStageAbort.FailedFlow) {
 		if (OpenTaiko.ConfigIni.bTokkunMode)
 			return;
 		isFinishedPlaying[iPlayer] = true;
 		isDeniedPlaying[iPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
-		var failType = kanpeki ? EStageAbort.KanpekiFailed : EStageAbort.StageFailed;
-		if (stageAbortType[iPlayer] < failType)
+		if (stageAbortType[iPlayer] < failType) {
+			if (stageAbortType[iPlayer] < EStageAbort.FailedStop && failType >= EStageAbort.FailedStop)
+				msFailedStopSystemTime = SoundManager.PlayTimer.NowTimeMs;
 			stageAbortType[iPlayer] = failType;
+		}
 	}
 	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
+	public bool IsFailStopped() => stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min() >= EStageAbort.FailedStop;
 	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
@@ -2138,7 +2148,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected bool t進行描画_チップ(EInstrumentPad ePlayMode, int nPlayer) {
-		bool drawOnly = this.IsStageAborted() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
+		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 

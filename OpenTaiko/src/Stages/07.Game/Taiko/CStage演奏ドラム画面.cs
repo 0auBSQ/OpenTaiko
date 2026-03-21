@@ -324,11 +324,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ReleaseManagedResource();
 	}
 
-	public override void SetStageFailed(int iPlayer, bool kanpekiFail = false) {
+	public override void SetStageFailed(int iPlayer, EStageAbort failType = EStageAbort.FailedFlow) {
 		if (OpenTaiko.ConfigIni.bTokkunMode)
 			return;
 		var becomeStageFailed = (this.stageAbortType[iPlayer] == EStageAbort.None);
-		base.SetStageFailed(iPlayer, kanpekiFail);
+		base.SetStageFailed(iPlayer, failType);
 		if (becomeStageFailed) {
 			int Character = this.actChara.iCurrentCharacter[iPlayer];
 			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
@@ -370,13 +370,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 					if (this.stageAbortType[i] == EStageAbort.Max)
 						continue;
-					bool kanpekiFail = OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i);
-					if (kanpekiFail
-						|| this.actGame.st叩ききりまショー.ct残り時間.IsEnded
-						|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)
-						) {
-						this.SetStageFailed(i, kanpekiFail);
-					}
+					EStageAbort failType = (OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i)) ? EStageAbort.FailedStopSkipResult
+						: (this.actGame.st叩ききりまショー.ct残り時間.IsEnded
+							|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
+						: EStageAbort.None;
+					if (failType > this.stageAbortType[i])
+						this.SetStageFailed(i, failType);
 				}
 			}
 
@@ -546,22 +545,20 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			bool bIsFinishedPlaying = true;
 			bool bIsChartEnded = true;
-			bool bIsStageFailed = true;
-			bool bIsKanpekiFailed = true;
+			EStageAbort minAbortType = EStageAbort.Max;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (!isFinishedPlaying[i]) bIsFinishedPlaying = false;
 				if (!isChartEnded[i]) bIsChartEnded = false;
-				if (stageAbortType[i] == EStageAbort.None) bIsStageFailed = false;
-				if (stageAbortType[i] < EStageAbort.KanpekiFailed) bIsKanpekiFailed = false;
+				if (stageAbortType[i] < minAbortType) minAbortType = stageAbortType[i];
 			}
 
 			// Transition for failed games
-			if (bIsStageFailed || this.IsStageAborted()) {
+			if ((minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
 				if (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
 					if (bIsFinishedEndAnime) {
-						if (bIsKanpekiFailed) {
+						if (minAbortType >= EStageAbort.FailedStopSkipResult) {
 							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
 						} else {
 							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
