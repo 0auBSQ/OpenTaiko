@@ -12,7 +12,6 @@ class HGaugeMethods {
 	}
 
 	public static float BombDamage = 4f;
-	public static float FuserollDamage = 4f;
 	public static float HardGaugeFillRatio = 1f;
 	public static float ExtremeGaugeFillRatio = 1f;
 

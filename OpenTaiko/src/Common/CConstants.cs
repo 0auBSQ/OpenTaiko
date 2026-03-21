@@ -260,10 +260,10 @@ public enum ENoteJudge {
 	Good = 2,
 	Poor = 3,
 	Miss = 4,
-	Bad = 5,
+	Bad = 5, // only used for bomb hit
 	Auto = 6,
 	ADLIB = 7,
-	Mine = 8,
+	Mine = 8, // only for judgement text
 }
 internal enum EJudgeTextDisplayPosition {
 	OFF,

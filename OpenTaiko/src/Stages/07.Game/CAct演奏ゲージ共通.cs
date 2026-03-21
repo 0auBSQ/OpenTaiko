@@ -259,10 +259,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 	public void MineDamage(int nPlayer) {
 		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.BombDamage);
-	}
-
-	public void FuseDamage(int nPlayer) {
-		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
+		if (this.bRisky)
+			this.nRiskyTimes[nPlayer]--;
 	}
 
 	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {

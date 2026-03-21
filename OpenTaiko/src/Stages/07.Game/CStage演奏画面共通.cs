@@ -1355,7 +1355,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, ENoteJudge.Mine, false, nPlayer);
 					OpenTaiko.Skin.soundBomb?.tPlay();
-					actGauge.MineDamage(nPlayer);
 					this.CChartScore[nPlayer].nMine++;
 					this.CSectionScore[nPlayer].nMine++;
 					this.CBranchScore[nPlayer].nMine++;
@@ -1396,7 +1395,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private void UpdateGauge(CChip? pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
-		if (pChip == null || NotesManager.IsMissableNote(pChip)) {
+		if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
+			actGauge.MineDamage(nPlayer);
+		} else if (pChip == null || NotesManager.IsMissableNote(pChip)) {
 			actGauge.Damage(screenmode, eJudgeResult, nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
 		}
 
@@ -3302,7 +3303,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
 						OpenTaiko.stageGameScreen.actLaneTaiko.Start(chip, gt, ENoteJudge.Bad, false, iPlayer);
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
-						actGauge.MineDamage(iPlayer);
 						OpenTaiko.Skin.soundBomb?.tPlay();
 						chip.bVisible = false;
 						this.Chara_MissCount[iPlayer]++;
@@ -3318,6 +3318,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 							this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
 						this.actComboVoice.tReset(iPlayer);
 						this.bIsMiss[iPlayer] = true;
+
+						UpdateGauge(chip, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Bad);
 					}
 				}
 			}
