@@ -542,22 +542,46 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			// Transition for failed games
 			if (bIsStageFailed || this.IsStageAborted()) {
-				if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+				if (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut) {
+					// do nothing
+				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
+					if (bIsFinishedEndAnime) {
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
+						} else {
+							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
+						}
+						base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
+						this.actFO.tフェードアウト開始();
+					}
+				} else {
 					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
 					OpenTaiko.TJA.tStopAllChips();
-				} else if (bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_STAGE_FAILED) {
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-						this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
-					} else {
-						this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
-					}
-					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
-					this.actFO.tフェードアウト開始();
 				}
 			}
 			// Transition for completed games:
 			// 演奏終了→演出表示→フェードアウト
-			else if ((bIsChartEnded || bIsFinishedPlaying) && base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+			else if (base.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut) {
+				// do nothing
+			} else if (base.ePhaseID == EPhase.Game_EndStage) {
+				if (bIsFinishedEndAnime) {
+					this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
+					base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
+					this.actFOClear.tフェードアウト開始();
+				}
+			} else if (base.ePhaseID == CStage.EPhase.Game_EndChart) {
+				if (bIsFinishedPlaying) {
+					if (OpenTaiko.ConfigIni.bTokkunMode) {
+						bIsFinishedPlaying = false;
+						OpenTaiko.Skin.sound特訓停止音.tPlay();
+						actTokkun.tPausePlay();
+
+						actTokkun.tMatchWithTheChartDisplayPosition(true);
+					} else {
+						base.ePhaseID = CStage.EPhase.Game_EndStage;
+					}
+				}
+			} else if (bIsChartEnded || bIsFinishedPlaying) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						int Character = this.actChara.iCurrentCharacter[i];
@@ -582,20 +606,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;
-			} else if (bIsFinishedPlaying && base.ePhaseID == CStage.EPhase.Game_EndChart) {
-				if (OpenTaiko.ConfigIni.bTokkunMode) {
-					bIsFinishedPlaying = false;
-					OpenTaiko.Skin.sound特訓停止音.tPlay();
-					actTokkun.tPausePlay();
-
-					actTokkun.tMatchWithTheChartDisplayPosition(true);
-				} else {
-					base.ePhaseID = CStage.EPhase.Game_EndStage;
-				}
-			} else if (bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_EndStage) {
-				this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
-				base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
-				this.actFOClear.tフェードアウト開始();
 			}
 
 			if (bIsFinishedFadeout) {
