@@ -29,7 +29,7 @@ internal class CActImplClearAnimation : CActivity {
 
 		// モードの決定。クリア失敗・フルコンボも事前に作っとく。
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			if (CFloorManagement.CurrentNumberOfLives > 0) {
+			if (!OpenTaiko.stageGameScreen.IsStageFailed() && CFloorManagement.CurrentNumberOfLives > 0) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.Tower_TopReached_Perfect;
@@ -41,7 +41,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+			if (!OpenTaiko.stageGameScreen.IsStageFailed() && !Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
 
@@ -61,7 +61,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Dan_Fail;
 			}
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			if (OpenTaiko.stageGameScreen.bIsAIBattleWin) {
+			if (!OpenTaiko.stageGameScreen.IsStageFailed() && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.AI_Win_Perfect;
@@ -77,7 +77,7 @@ internal class CActImplClearAnimation : CActivity {
 			// ここでフルコンボフラグをチェックするが現時点ではない。
 			// 今の段階では魂ゲージ80%以上でチェック。
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
+				if (!OpenTaiko.stageGameScreen.IsStageFailed() && HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 					if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[i].nMine == 0)
 					//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 					{

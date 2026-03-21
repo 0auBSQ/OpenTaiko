@@ -352,9 +352,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				 || this.actGame.st叩ききりまショー.ct残り時間.IsEnded
 				 || (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0))
 				&& (base.ePhaseID == CStage.EPhase.Common_NORMAL)) {
-				this.actEnd.Start();
-				OpenTaiko.TJA.tStopAllChips();
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
+				OpenTaiko.TJA.tStopAllChips();
+				this.actEnd.Start();
 			}
 
 			bool BGA_Shown = OpenTaiko.ConfigIni.bEnableAVI && OpenTaiko.TJA.listVD.Count > 0 && ShowVideo;
