@@ -592,13 +592,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						int Character = this.actChara.iCurrentCharacter[i];
 
-						if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
+						bool isTower = (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
+						if (isTower ? (CFloorManagement.CurrentNumberOfLives >= CFloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
-								if (HGaugeMethods.UNSAFE_IsRainbow(i)) {
-									this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
-								}
+								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
 							}
-						} else if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
+						} else if (isTower ? (CFloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 							if (OpenTaiko.Skin.Characters_Become_Cleared_Ptn[Character] != 0) {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Cleared, true); ;
 							}
