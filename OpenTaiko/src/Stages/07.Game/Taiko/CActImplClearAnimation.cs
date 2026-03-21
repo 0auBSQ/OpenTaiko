@@ -12,12 +12,12 @@ internal class CActImplClearAnimation : CActivity {
 		base.IsDeActivated = true;
 	}
 
-	public void Start() {
+	public void Start(int iPlayer) {
 		// this.ct進行メイン = new CCounter(0, 500, 1000 / 60, TJAPlayer3.Timer);
 
-		bSongsPlayed = false;
+		bSoundPlayed[iPlayer] = false;
 
-		this.ct進行メイン = new CCounter(0, 300, 22, OpenTaiko.Timer);
+		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
 
 		/*
         this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -29,7 +29,7 @@ internal class CActImplClearAnimation : CActivity {
 
 		// モードの決定。クリア失敗・フルコンボも事前に作っとく。
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			if (!OpenTaiko.stageGameScreen.IsStageFailed() && CFloorManagement.CurrentNumberOfLives > 0) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && CFloorManagement.CurrentNumberOfLives > 0) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.Tower_TopReached_Perfect;
@@ -41,7 +41,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!OpenTaiko.stageGameScreen.IsStageFailed() && !Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && !Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
 
@@ -61,7 +61,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Dan_Fail;
 			}
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			if (!OpenTaiko.stageGameScreen.IsStageFailed() && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.AI_Win_Perfect;
@@ -76,24 +76,22 @@ internal class CActImplClearAnimation : CActivity {
 			// 通常のモード。
 			// ここでフルコンボフラグをチェックするが現時点ではない。
 			// 今の段階では魂ゲージ80%以上でチェック。
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (!OpenTaiko.stageGameScreen.IsStageFailed() && HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-					if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[i].nMine == 0)
-					//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
+				if (OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMine == 0)
+				//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
+				{
+					if (OpenTaiko.stageGameScreen.CChartScore[iPlayer].nGood == 0)
+					//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
 					{
-						if (OpenTaiko.stageGameScreen.CChartScore[i].nGood == 0)
-						//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Great == 0)
-						{
-							this.Mode[i] = EndMode.StagePerfectCombo;
-						} else {
-							this.Mode[i] = EndMode.StageFullCombo;
-						}
+						this.Mode[iPlayer] = EndMode.StagePerfectCombo;
 					} else {
-						this.Mode[i] = EndMode.StageCleared;
+						this.Mode[iPlayer] = EndMode.StageFullCombo;
 					}
 				} else {
-					this.Mode[i] = EndMode.StageFailed;
+					this.Mode[iPlayer] = EndMode.StageCleared;
 				}
+			} else {
+				this.Mode[iPlayer] = EndMode.StageFailed;
 			}
 		}
 	}
@@ -188,7 +186,8 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public override void DeActivate() {
-		this.ct進行メイン = null;
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i)
+			this.ct進行メイン[i] = null;
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript.Dispose();
@@ -526,223 +525,218 @@ internal class CActImplClearAnimation : CActivity {
 		if (base.IsFirstDraw) {
 			base.IsFirstDraw = false;
 		}
-		if (this.ct進行メイン != null && (OpenTaiko.stageGameScreen.IsStageFailed() || OpenTaiko.stageGameScreen.IsStageCompleted())) {
-			this.ct進行メイン.Tick();
+		int ret = 1;
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
+			if (this.Draw(i) == 0)
+				ret = 0;
+		return ret;
+	}
+	protected int Draw(int iPlayer) {
+		if (this.ct進行メイン[iPlayer] != null) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
+				return 0;
 
-			//CDTXMania.act文字コンソール.tPrint( 0, 0, C文字コンソール.Eフォント種別.灰, this.ct進行メイン.n現在の値.ToString() );
-			//仮置き
+			this.ct進行メイン[iPlayer].Tick();
 
-			if (!bSongsPlayed) {
-				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
+			if (!bSoundPlayed[iPlayer]) {
+				int pan = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][iPlayer];
 
-					int pan = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
-
-					switch (this.Mode[i]) {
-						case EndMode.StageFailed:
-							FailedScript.PlayEndAnime(i);
-							this.soundFailed[i]?.SetPanning(pan);
-							this.soundFailed[i]?.PlayStart();
-							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
-							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.StageCleared:
-							ClearScript.PlayEndAnime(i);
-							this.soundClear[i]?.SetPanning(pan);
-							this.soundClear[i]?.PlayStart();
-							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
-							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.StageFullCombo:
-							FullComboScript.PlayEndAnime(i);
-							this.soundFullCombo[i]?.SetPanning(pan);
-							this.soundFullCombo[i]?.PlayStart();
-							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
-							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.StagePerfectCombo:
-							PerfectComboScript.PlayEndAnime(i);
-							this.soundPerfectCombo[i]?.SetPanning(pan);
-							this.soundPerfectCombo[i]?.PlayStart();
-							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.SetPanning(pan);
-							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-
-						case EndMode.AI_Lose:
-							AILoseScript.PlayEndAnime(i);
-							this.soundAILose?.PlayStart();
-							OpenTaiko.Skin.voiceAILose[OpenTaiko.GetActualPlayer(1)]?.tPlay();
-							break;
-						case EndMode.AI_Win:
-							AIWinScript.PlayEndAnime(i);
-							this.soundAIWin?.PlayStart();
-							OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.AI_Win_FullCombo:
-							AIWin_FullComboScript.PlayEndAnime(i);
-							this.soundAIWinFullCombo?.PlayStart();
-							OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.AI_Win_Perfect:
-							AIWin_PerfectScript.PlayEndAnime(i);
-							this.soundAIWinPerfectCombo?.PlayStart();
-							OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-
-						case EndMode.Tower_Dropout:
-							Tower_DropoutScript.PlayEndAnime(i);
-							this.soundTowerDropout?.PlayStart();
-							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Tower_TopReached_Pass:
-							Tower_TopReached_PassScript.PlayEndAnime(i);
-							this.soundTowerTopPass?.PlayStart();
-							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Tower_TopReached_FullCombo:
-							Tower_TopReached_FullComboScript.PlayEndAnime(i);
-							this.soundTowerTopFC?.PlayStart();
-							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Tower_TopReached_Perfect:
-							Tower_TopReached_PerfectScript.PlayEndAnime(i);
-							this.soundTowerTopPerfect?.PlayStart();
-							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-
-						case EndMode.Dan_Fail:
-							Dan_FailScript.PlayEndAnime(i);
-							this.soundDanFailed?.PlayStart();
-							OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Red_Pass:
-							Dan_Red_PassScript.PlayEndAnime(i);
-							this.soundDanRedClear?.PlayStart();
-							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Red_FullCombo:
-							Dan_Red_FullComboScript.PlayEndAnime(i);
-							this.soundDanRedFC?.PlayStart();
-							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Red_Perfect:
-							Dan_Red_PerfectScript.PlayEndAnime(i);
-							this.soundDanRedPerfect?.PlayStart();
-							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Gold_Pass:
-							Dan_Gold_PassScript.PlayEndAnime(i);
-							this.soundDanGoldClear?.PlayStart();
-							OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Gold_FullCombo:
-							Dan_Gold_FullComboScript.PlayEndAnime(i);
-							this.soundDanGoldFC?.PlayStart();
-							OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-						case EndMode.Dan_Gold_Perfect:
-							Dan_Gold_PerfectScript.PlayEndAnime(i);
-							this.soundDanGoldPerfect?.PlayStart();
-							OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(i)]?.tPlay();
-							break;
-
-						default:
-							break;
-					}
-				}
-
-				bSongsPlayed = true;
-			}
-
-
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
-
-				switch (this.Mode[i]) {
+				switch (this.Mode[iPlayer]) {
 					case EndMode.StageFailed:
-						this.showEndEffect_Failed(i);
+						FailedScript.PlayEndAnime(iPlayer);
+						this.soundFailed[iPlayer]?.SetPanning(pan);
+						this.soundFailed[iPlayer]?.PlayStart();
+						OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(iPlayer)]?.SetPanning(pan);
+						OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.StageCleared:
-						this.showEndEffect_Clear(i);
+						ClearScript.PlayEndAnime(iPlayer);
+						this.soundClear[iPlayer]?.SetPanning(pan);
+						this.soundClear[iPlayer]?.PlayStart();
+						OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(iPlayer)]?.SetPanning(pan);
+						OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.StageFullCombo:
-						this.showEndEffect_FullCombo(i);
+						FullComboScript.PlayEndAnime(iPlayer);
+						this.soundFullCombo[iPlayer]?.SetPanning(pan);
+						this.soundFullCombo[iPlayer]?.PlayStart();
+						OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(iPlayer)]?.SetPanning(pan);
+						OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.StagePerfectCombo:
-						this.showEndEffect_PerfectCombo(i);
+						PerfectComboScript.PlayEndAnime(iPlayer);
+						this.soundPerfectCombo[iPlayer]?.SetPanning(pan);
+						this.soundPerfectCombo[iPlayer]?.PlayStart();
+						OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(iPlayer)]?.SetPanning(pan);
+						OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 
-					case EndMode.AI_Win:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWinScript.Update(i);
-						AIWinScript.Draw(i);
-						break;
 					case EndMode.AI_Lose:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) AILoseScript.Update(i);
-						AILoseScript.Draw(i);
+						AILoseScript.PlayEndAnime(iPlayer);
+						this.soundAILose?.PlayStart();
+						OpenTaiko.Skin.voiceAILose[OpenTaiko.GetActualPlayer(1)]?.tPlay();
+						break;
+					case EndMode.AI_Win:
+						AIWinScript.PlayEndAnime(iPlayer);
+						this.soundAIWin?.PlayStart();
+						OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.AI_Win_FullCombo:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_FullComboScript.Update(i);
-						AIWin_FullComboScript.Draw(i);
+						AIWin_FullComboScript.PlayEndAnime(iPlayer);
+						this.soundAIWinFullCombo?.PlayStart();
+						OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.AI_Win_Perfect:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_PerfectScript.Update(i);
-						AIWin_PerfectScript.Draw(i);
+						AIWin_PerfectScript.PlayEndAnime(iPlayer);
+						this.soundAIWinPerfectCombo?.PlayStart();
+						OpenTaiko.Skin.voiceAIWin[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 
 					case EndMode.Tower_Dropout:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_DropoutScript.Update(i);
-						Tower_DropoutScript.Draw(i);
+						Tower_DropoutScript.PlayEndAnime(iPlayer);
+						this.soundTowerDropout?.PlayStart();
+						OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Tower_TopReached_Pass:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PassScript.Update(i);
-						Tower_TopReached_PassScript.Draw(i);
+						Tower_TopReached_PassScript.PlayEndAnime(iPlayer);
+						this.soundTowerTopPass?.PlayStart();
+						OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Tower_TopReached_FullCombo:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_FullComboScript.Update(i);
-						Tower_TopReached_FullComboScript.Draw(i);
+						Tower_TopReached_FullComboScript.PlayEndAnime(iPlayer);
+						this.soundTowerTopFC?.PlayStart();
+						OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Tower_TopReached_Perfect:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PerfectScript.Update(i);
-						Tower_TopReached_PerfectScript.Draw(i);
+						Tower_TopReached_PerfectScript.PlayEndAnime(iPlayer);
+						this.soundTowerTopPerfect?.PlayStart();
+						OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 
 					case EndMode.Dan_Fail:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_FailScript.Update(i);
-						Dan_FailScript.Draw(i);
+						Dan_FailScript.PlayEndAnime(iPlayer);
+						this.soundDanFailed?.PlayStart();
+						OpenTaiko.Skin.voiceClearFailed[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Red_Pass:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PassScript.Update(i);
-						Dan_Red_PassScript.Draw(i);
+						Dan_Red_PassScript.PlayEndAnime(iPlayer);
+						this.soundDanRedClear?.PlayStart();
+						OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Red_FullCombo:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_FullComboScript.Update(i);
-						Dan_Red_FullComboScript.Draw(i);
+						Dan_Red_FullComboScript.PlayEndAnime(iPlayer);
+						this.soundDanRedFC?.PlayStart();
+						OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Red_Perfect:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PerfectScript.Update(i);
-						Dan_Red_PerfectScript.Draw(i);
+						Dan_Red_PerfectScript.PlayEndAnime(iPlayer);
+						this.soundDanRedPerfect?.PlayStart();
+						OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Gold_Pass:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PassScript.Update(i);
-						Dan_Gold_PassScript.Draw(i);
+						Dan_Gold_PassScript.PlayEndAnime(iPlayer);
+						this.soundDanGoldClear?.PlayStart();
+						OpenTaiko.Skin.voiceClearClear[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Gold_FullCombo:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_FullComboScript.Update(i);
-						Dan_Gold_FullComboScript.Draw(i);
+						Dan_Gold_FullComboScript.PlayEndAnime(iPlayer);
+						this.soundDanGoldFC?.PlayStart();
+						OpenTaiko.Skin.voiceClearFullCombo[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
 					case EndMode.Dan_Gold_Perfect:
-						if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PerfectScript.Update(i);
-						Dan_Gold_PerfectScript.Draw(i);
+						Dan_Gold_PerfectScript.PlayEndAnime(iPlayer);
+						this.soundDanGoldPerfect?.PlayStart();
+						OpenTaiko.Skin.voiceClearAllPerfect[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
 						break;
+
 					default:
 						break;
 				}
 
+				bSoundPlayed[iPlayer] = true;
 			}
 
+			switch (this.Mode[iPlayer]) {
+				case EndMode.StageFailed:
+					this.showEndEffect_Failed(iPlayer);
+					break;
+				case EndMode.StageCleared:
+					this.showEndEffect_Clear(iPlayer);
+					break;
+				case EndMode.StageFullCombo:
+					this.showEndEffect_FullCombo(iPlayer);
+					break;
+				case EndMode.StagePerfectCombo:
+					this.showEndEffect_PerfectCombo(iPlayer);
+					break;
 
+				case EndMode.AI_Win:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) AIWinScript.Update(iPlayer);
+					AIWinScript.Draw(iPlayer);
+					break;
+				case EndMode.AI_Lose:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) AILoseScript.Update(iPlayer);
+					AILoseScript.Draw(iPlayer);
+					break;
+				case EndMode.AI_Win_FullCombo:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_FullComboScript.Update(iPlayer);
+					AIWin_FullComboScript.Draw(iPlayer);
+					break;
+				case EndMode.AI_Win_Perfect:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) AIWin_PerfectScript.Update(iPlayer);
+					AIWin_PerfectScript.Draw(iPlayer);
+					break;
 
-			if (this.ct進行メイン.IsEnded) {
+				case EndMode.Tower_Dropout:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_DropoutScript.Update(iPlayer);
+					Tower_DropoutScript.Draw(iPlayer);
+					break;
+				case EndMode.Tower_TopReached_Pass:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PassScript.Update(iPlayer);
+					Tower_TopReached_PassScript.Draw(iPlayer);
+					break;
+				case EndMode.Tower_TopReached_FullCombo:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_FullComboScript.Update(iPlayer);
+					Tower_TopReached_FullComboScript.Draw(iPlayer);
+					break;
+				case EndMode.Tower_TopReached_Perfect:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Tower_TopReached_PerfectScript.Update(iPlayer);
+					Tower_TopReached_PerfectScript.Draw(iPlayer);
+					break;
+
+				case EndMode.Dan_Fail:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_FailScript.Update(iPlayer);
+					Dan_FailScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Red_Pass:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PassScript.Update(iPlayer);
+					Dan_Red_PassScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Red_FullCombo:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_FullComboScript.Update(iPlayer);
+					Dan_Red_FullComboScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Red_Perfect:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Red_PerfectScript.Update(iPlayer);
+					Dan_Red_PerfectScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Gold_Pass:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PassScript.Update(iPlayer);
+					Dan_Gold_PassScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Gold_FullCombo:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_FullComboScript.Update(iPlayer);
+					Dan_Gold_FullComboScript.Draw(iPlayer);
+					break;
+				case EndMode.Dan_Gold_Perfect:
+					if (!OpenTaiko.stageGameScreen.bPAUSE) Dan_Gold_PerfectScript.Update(iPlayer);
+					Dan_Gold_PerfectScript.Draw(iPlayer);
+					break;
+				default:
+					break;
+			}
+
+			if (this.ct進行メイン[iPlayer].IsEnded) {
 				return 1;
 			}
 		}
@@ -781,8 +775,8 @@ internal class CActImplClearAnimation : CActivity {
 
 	bool b再生済み;
 	bool bリザルトボイス再生済み;
-	bool bSongsPlayed = false;
-	CCounter ct進行メイン;
+	bool[] bSoundPlayed = new bool[OpenTaiko.MAX_PLAYERS];
+	CCounter[] ct進行メイン = new CCounter[OpenTaiko.MAX_PLAYERS];
 
 	/*
     CCounter ctEnd_ClearFailed;

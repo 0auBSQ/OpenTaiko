@@ -656,6 +656,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool[] isChartEnded = { false, false, false, false, false }; // last note of chart passed
 	protected bool[] isFinishedPlaying = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
+	protected bool[] isStageFailed = { false, false, false, false, false };
 
 	protected int nタイマ番号;
 	protected int n現在の音符の顔番号;
@@ -1445,26 +1446,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				switch (chara.effect.tGetGaugeType()) {
 					case "Hard":
-					case "Extreme": {
-							isFinishedPlaying[nPlayer] = true;
-							isDeniedPlaying[nPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
-
-							bool allDeniedPlaying = true;
-							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-								if (!isDeniedPlaying[p]) {
-									allDeniedPlaying = false;
-									break;
-								}
-							}
-							if (allDeniedPlaying) {
-								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-									OpenTaiko.GetTJA(p)!.tStopAllChips(); // Stop playing song
-								}
-							}
-
-							// Stop timer : Pauses the whole game (to remove once is denied playing will work)
-							//CSound管理.rc演奏用タイマ.t一時停止();
-						}
+					case "Extreme":
+						OpenTaiko.stageGameScreen.SetStageFailed(nPlayer);
 						break;
 				}
 			}
@@ -1947,7 +1930,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 
-		if (!this.bPAUSE && !this.IsStageFailed()) {
+		if (!this.bPAUSE && !this.IsStageAborted()) {
 			this.t入力処理_ドラム();
 
 			CTja tja = OpenTaiko.TJA;
@@ -2041,7 +2024,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.ConfigIni.bAutoPlay[1] = !OpenTaiko.ConfigIni.bAutoPlay[1];
 		}
 #endif
-		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageFailed()) {
+		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageAborted()) {
 			if (keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) { // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {    // DownArrow (scrollspeed down)
@@ -2099,11 +2082,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public bool IsStageFailed() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
+	public virtual void SetStageFailed(int iPlayer) {
+		isFinishedPlaying[iPlayer] = true;
+		isDeniedPlaying[iPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
+		isStageFailed[iPlayer] = true;
+	}
+	public bool IsStageFailed(int iPlayer) => isStageFailed[iPlayer];
+	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
 	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 
 	protected bool t進行描画_AVI() {
-		if (this.IsStageFailed() && (this.actAVI?.rVD.bPlaying ?? false)) {
+		if (this.IsStageAborted() && (this.actAVI?.rVD.bPlaying ?? false)) {
 			this.actAVI.Pause(); // paused but still shown
 		}
 		if (OpenTaiko.ConfigIni.bEnableAVI) {
@@ -2115,7 +2104,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_パネル文字列() {
-		if (!this.IsStageFailed()) {
+		if (!this.IsStageAborted()) {
 			this.actPanel.Draw();
 		}
 	}
@@ -2130,7 +2119,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_ゲージ() {
-		if (!this.IsStageFailed()) {
+		if (!this.IsStageAborted()) {
 			this.actGauge.Draw();
 		}
 	}
@@ -2142,7 +2131,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected bool t進行描画_チップ(EInstrumentPad ePlayMode, int nPlayer) {
-		bool drawOnly = this.IsStageFailed() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
+		bool drawOnly = this.IsStageAborted() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
@@ -3712,6 +3701,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.isChartEnded[i] = false;
 				this.isFinishedPlaying[i] = false;
 				this.isDeniedPlaying[i] = false;
+				this.isStageFailed[i] = false;
 			}
 
 			this.tBranchReset(-1);
@@ -3946,7 +3936,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public void t演奏中止() {
 		this.actFO.tフェードアウト開始();
-		base.ePhaseID = (this.IsStageFailed() || this.IsStageCompleted()) ?
+		base.ePhaseID = (this.IsStageAborted() || this.IsStageCompleted()) ?
 			CStage.EPhase.Game_STAGE_FAILED_FadeOut // keep end-of-chart animation
 			: CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
