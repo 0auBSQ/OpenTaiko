@@ -24,8 +24,8 @@ internal static class KeyboardSoundGroupLevelControlHandler {
 		SoundGroupLevelController soundGroupLevelController,
 		CSkin skin,
 		bool isSongPreview) {
-		bool isAdjustmentPositive = OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SongVolIncrease);
-		bool isAdjustmentNegative = OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SongVolDecrease);
+		bool isAdjustmentPositive = OpenTaiko.ConfigIni.KeyAssign.System.SongVolIncrease.IsPressed();
+		bool isAdjustmentNegative = OpenTaiko.ConfigIni.KeyAssign.System.SongVolDecrease.IsPressed();
 
 		if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 

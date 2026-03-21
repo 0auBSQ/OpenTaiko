@@ -251,6 +251,7 @@ public enum EKeyConfigPart  // : E楽器パート
 	Bass = EInstrumentPad.Bass,
 	Taiko = EInstrumentPad.Taiko,
 	System,
+	Total,
 	Unknown = EInstrumentPad.Unknown
 }
 

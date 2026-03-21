@@ -1958,14 +1958,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			// Tokkun only
 			else if (OpenTaiko.ConfigIni.bTokkunMode &&
-					 OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseScrollSpeed)) {  // UpArrow(scrollspeed up)
+					 OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseScrollSpeed.IsPressed()) {  // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (OpenTaiko.ConfigIni.bTokkunMode &&
-					   OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseScrollSpeed)) {  // DownArrow (scrollspeed down)
+					   OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseScrollSpeed.IsPressed()) {  // DownArrow (scrollspeed down)
 				ドラムスクロール速度ダウン();
 			}
 			// Debug mode
-			else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.DisplayDebug)) {   // del (debug info)
+			else if (OpenTaiko.ConfigIni.KeyAssign.System.DisplayDebug.IsPressed()) {   // del (debug info)
 				OpenTaiko.ConfigIni.bDisplayDebugInfo = !OpenTaiko.ConfigIni.bDisplayDebugInfo;
 			}
 
@@ -1994,22 +1994,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actPauseMenu.tActivatePopupMenu(0);
 				}
 				// this.t演奏中止();
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal)) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eNormal);
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert)) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eExpert);
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster)) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eMaster);
 			}
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.DisplayHits)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.System.DisplayHits.IsPressed()) {
 				if (OpenTaiko.ConfigIni.bJudgeCountDisplay == false)
 					OpenTaiko.ConfigIni.bJudgeCountDisplay = true;
 				else
 					OpenTaiko.ConfigIni.bJudgeCountDisplay = false;
 			}
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.CycleVideoDisplayMode)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.System.CycleVideoDisplayMode.IsPressed()) {
 				switch (OpenTaiko.ConfigIni.eClipDispType) {
 					case EClipDispType.Off:
 						OpenTaiko.ConfigIni.eClipDispType = EClipDispType.BackgroundOnly;
@@ -2026,7 +2026,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 
-			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingToggleAuto)) {
+			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingToggleAuto.IsPressed()) {
 				OpenTaiko.ConfigIni.bAutoPlay[0] = !OpenTaiko.ConfigIni.bAutoPlay[0];
 			}
 		}
@@ -2042,7 +2042,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				ドラムスクロール速度アップ();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {    // DownArrow (scrollspeed down)
 				ドラムスクロール速度ダウン();
-			} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.DisplayDebug)) {   // del (debug info)
+			} else if (OpenTaiko.ConfigIni.KeyAssign.System.DisplayDebug.IsPressed()) {   // del (debug info)
 				OpenTaiko.ConfigIni.bDisplayDebugInfo = !OpenTaiko.ConfigIni.bDisplayDebugInfo;
 			} else if ((keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))) {   // escape (exit)
 				SoundManager.PlayTimer.Resume();

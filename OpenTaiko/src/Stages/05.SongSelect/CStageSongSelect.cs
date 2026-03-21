@@ -818,19 +818,19 @@ internal class CStageSongSelect : CStage {
 					}
 					#endregion
 					#region [ F2 Quick Config ]
-					if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.QuickConfig)) {
+					if (OpenTaiko.ConfigIni.KeyAssign.System.QuickConfig.IsPressed()) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
 						this.actQuickConfig.tActivatePopupMenu(EInstrumentPad.Drums);
 					}
 					#endregion
 					#region [ F3 1P AUTO ]
-					if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.ToggleAutoP1)) {
+					if (OpenTaiko.ConfigIni.KeyAssign.System.ToggleAutoP1.IsPressed()) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
 						CUtility.ToggleBoolian(ref OpenTaiko.ConfigIni.bAutoPlay[0]);
 					}
 					#endregion
 					#region [ F4 2P AUTO ]
-					if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.ToggleAutoP2)) {
+					if (OpenTaiko.ConfigIni.KeyAssign.System.ToggleAutoP2.IsPressed()) {
 						if (OpenTaiko.ConfigIni.nPlayerCount > 1) {
 							OpenTaiko.Skin.soundChangeSFX.tPlay();
 							CUtility.ToggleBoolian(ref OpenTaiko.ConfigIni.bAutoPlay[1]);
@@ -845,7 +845,7 @@ internal class CStageSongSelect : CStage {
 					}
 					#endregion
 					#region [ F7 TokkunMode ]
-					if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.ToggleTrainingMode)) {
+					if (OpenTaiko.ConfigIni.KeyAssign.System.ToggleTrainingMode.IsPressed()) {
 						if (OpenTaiko.ConfigIni.nPlayerCount < 2) {
 							OpenTaiko.Skin.soundChangeSFX.tPlay();
 							CUtility.ToggleBoolian(ref OpenTaiko.ConfigIni.bTokkunMode);
@@ -853,7 +853,7 @@ internal class CStageSongSelect : CStage {
 					}
 					#endregion
 					#region [ F9 New Heya ]
-					if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.NewHeya)) {
+					if (OpenTaiko.ConfigIni.KeyAssign.System.NewHeya.IsPressed()) {
 						actNewHeya.Open();
 					}
 					#endregion
@@ -1079,7 +1079,7 @@ internal class CStageSongSelect : CStage {
                         */
 						#endregion
 						#region [ BDx2: 簡易CONFIG ]
-						if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.SortSongs)) {
+						if (OpenTaiko.ConfigIni.KeyAssign.System.SortSongs.IsPressed()) {
 							OpenTaiko.Skin.soundChangeSFX.tPlay();
 							this.actSortSongs.tActivatePopupMenu(EInstrumentPad.Drums, ref this.actSongList);
 						}

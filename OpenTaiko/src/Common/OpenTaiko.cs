@@ -1254,7 +1254,7 @@ internal class OpenTaiko : Game {
 				}
 			}
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.System.Capture.IsPressed()) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
 					if (rCurrentStage.eStageID != CStage.EStage.Game) {

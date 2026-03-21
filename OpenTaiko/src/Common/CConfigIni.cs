@@ -7,6 +7,12 @@ using FDK.ExtensionMethods;
 
 namespace OpenTaiko;
 
+internal static class StKeyAssignExtension {
+	public static bool IsPressed(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads)
+		=> (OpenTaiko.InputManager != null)
+			&& pads.Any(pad => OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)?.KeyPressed(pad.Code) ?? false);
+}
+
 internal class CConfigIni : INotifyPropertyChanged {
 	private const int MinimumKeyboardSoundLevelIncrement = 1;
 	private const int MaximumKeyboardSoundLevelIncrement = 20;
@@ -18,865 +24,110 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public class CKeyAssign {
 		public class CKeyAssignPad {
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] HH {
-				get { return this.padHH_R; }
-				set { this.padHH_R = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] R {
-				get { return this.padHH_R; }
-				set { this.padHH_R = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] SD {
-				get { return this.padSD_G; }
-				set { this.padSD_G = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] G {
-				get { return this.padSD_G; }
-				set { this.padSD_G = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] BD {
-				get { return this.padBD_B; }
-				set { this.padBD_B = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] B {
-				get { return this.padBD_B; }
-				set { this.padBD_B = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] HT {
-				get { return this.padHT_Pick; }
-				set { this.padHT_Pick = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Pick {
-				get { return this.padHT_Pick; }
-				set { this.padHT_Pick = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LT {
-				get { return this.padLT_Wail; }
-				set { this.padLT_Wail = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Wail {
-				get { return this.padLT_Wail; }
-				set { this.padLT_Wail = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] FT {
-				get { return this.padFT_Cancel; }
-				set { this.padFT_Cancel = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Cancel {
-				get { return this.padFT_Cancel; }
-				set { this.padFT_Cancel = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] CY {
-				get { return this.padCY_Decide; }
-				set { this.padCY_Decide = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Decide {
-				get { return this.padCY_Decide; }
-				set { this.padCY_Decide = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] HHO {
-				get { return this.padHHO; }
-				set { this.padHHO = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RD {
-				get { return this.padRD; }
-				set { this.padRD = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LC {
-				get { return this.padLC; }
-				set { this.padLC = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LP {
-				get { return this.padLP; }
-				set { this.padLP = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LBD {
-				get { return this.padLBD; }
-				set { this.padLBD = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed {
-				get { return this.padLRed; }
-				set { this.padLRed = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed {
-				get { return this.padRRed; }
-				set { this.padRRed = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue {
-				get { return this.padLBlue; }
-				set { this.padLBlue = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue {
-				get { return this.padRBlue; }
-				set { this.padRBlue = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed2P {
-				get { return this.padLRed2P; }
-				set { this.padLRed2P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed2P {
-				get { return this.padRRed2P; }
-				set { this.padRRed2P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue2P {
-				get { return this.padLBlue2P; }
-				set { this.padLBlue2P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue2P {
-				get { return this.padRBlue2P; }
-				set { this.padRBlue2P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed3P {
-				get { return this.padLRed3P; }
-				set { this.padLRed3P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed3P {
-				get { return this.padRRed3P; }
-				set { this.padRRed3P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue3P {
-				get { return this.padLBlue3P; }
-				set { this.padLBlue3P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue3P {
-				get { return this.padRBlue3P; }
-				set { this.padRBlue3P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed4P {
-				get { return this.padLRed4P; }
-				set { this.padLRed4P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed4P {
-				get { return this.padRRed4P; }
-				set { this.padRRed4P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue4P {
-				get { return this.padLBlue4P; }
-				set { this.padLBlue4P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue4P {
-				get { return this.padRBlue4P; }
-				set { this.padRBlue4P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftRed5P {
-				get { return this.padLRed5P; }
-				set { this.padLRed5P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightRed5P {
-				get { return this.padRRed5P; }
-				set { this.padRRed5P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftBlue5P {
-				get { return this.padLBlue5P; }
-				set { this.padLBlue5P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightBlue5P {
-				get { return this.padRBlue5P; }
-				set { this.padRBlue5P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap {
-				get { return this.padClap; }
-				set { this.padClap = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap2P {
-				get { return this.padClap2P; }
-				set { this.padClap2P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap3P {
-				get { return this.padClap3P; }
-				set { this.padClap3P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap4P {
-				get { return this.padClap4P; }
-				set { this.padClap4P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Clap5P {
-				get { return this.padClap5P; }
-				set { this.padClap5P = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] LeftChange {
-				get { return this.padLeftChange; }
-				set { this.padLeftChange = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] RightChange {
-				get { return this.padRightChange; }
-				set { this.padRightChange = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] Capture {
-				get { return this.padCapture; }
-				set { this.padCapture = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolIncrease {
-				get { return this.padSongVolIncrease; }
-				set { this.padSongVolIncrease = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] SongVolDecrease {
-				get { return this.padSongVolDecrease; }
-				set { this.padSongVolDecrease = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayHits {
-				get { return this.padDisplayHits; }
-				set { this.padDisplayHits = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] DisplayDebug {
-				get { return this.padDisplayDebug; }
-				set { this.padDisplayDebug = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] QuickConfig {
-				get { return this.padQuickConfig; }
-				set { this.padQuickConfig = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] NewHeya {
-				get { return this.padNewHeya; }
-				set { this.padNewHeya = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] SortSongs {
-				get { return this.padSortSongs; }
-				set { this.padSortSongs = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP1 {
-				get { return this.padToggleAutoP1; }
-				set { this.padToggleAutoP1 = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleAutoP2 {
-				get { return this.padToggleAutoP2; }
-				set { this.padToggleAutoP2 = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] ToggleTrainingMode {
-				get { return this.padToggleTrainingMode; }
-				set { this.padToggleTrainingMode = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] CycleVideoDisplayMode {
-				get { return this.padCycleVideoDisplayMode; }
-				set { this.padCycleVideoDisplayMode = value; }
-			}
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] this[int index] {
-				get {
-					switch (index) {
-						case (int)EKeyConfigPad.HH:
-							return this.padHH_R;
-
-						case (int)EKeyConfigPad.SD:
-							return this.padSD_G;
-
-						case (int)EKeyConfigPad.BD:
-							return this.padBD_B;
-
-						case (int)EKeyConfigPad.HT:
-							return this.padHT_Pick;
-
-						case (int)EKeyConfigPad.LT:
-							return this.padLT_Wail;
-
-						case (int)EKeyConfigPad.FT:
-							return this.padFT_Cancel;
-
-						case (int)EKeyConfigPad.CY:
-							return this.padCY_Decide;
-
-						case (int)EKeyConfigPad.HHO:
-							return this.padHHO;
+			private readonly STKEYASSIGN[][] pads = new STKEYASSIGN[(int)EKeyConfigPad.Max][];
+			public STKEYASSIGN[] this[int index] { get => pads[index]; internal set => pads[index] = value; }
 
-						case (int)EKeyConfigPad.RD:
-							return this.padRD;
+			public STKEYASSIGN[] Cancel => pads[(int)EKeyConfigPad.Cancel];
 
-						case (int)EKeyConfigPad.LC:
-							return this.padLC;
+			public STKEYASSIGN[] Decide => pads[(int)EKeyConfigPad.Decide];
 
-						case (int)EKeyConfigPad.LP: // #27029 2012.1.4 from
-							return this.padLP; //
+			public STKEYASSIGN[] LeftRed => pads[(int)EKeyConfigPad.LRed];
 
-						case (int)EKeyConfigPad.LBD: // #27029 2012.1.4 from
-							return this.padLBD; //
+			public STKEYASSIGN[] RightRed => pads[(int)EKeyConfigPad.RRed];
 
-						case (int)EKeyConfigPad.LRed:
-							return this.padLRed;
+			public STKEYASSIGN[] LeftBlue => pads[(int)EKeyConfigPad.LBlue];
 
-						case (int)EKeyConfigPad.RRed:
-							return this.padRRed;
+			public STKEYASSIGN[] RightBlue => pads[(int)EKeyConfigPad.RBlue];
 
-						case (int)EKeyConfigPad.LBlue:
-							return this.padLBlue;
+			public STKEYASSIGN[] LeftRed2P => pads[(int)EKeyConfigPad.LRed2P];
 
-						case (int)EKeyConfigPad.RBlue:
-							return this.padRBlue;
+			public STKEYASSIGN[] RightRed2P => pads[(int)EKeyConfigPad.RRed2P];
 
-						case (int)EKeyConfigPad.LRed2P:
-							return this.padLRed2P;
+			public STKEYASSIGN[] LeftBlue2P => pads[(int)EKeyConfigPad.LBlue2P];
 
-						case (int)EKeyConfigPad.RRed2P:
-							return this.padRRed2P;
+			public STKEYASSIGN[] RightBlue2P => pads[(int)EKeyConfigPad.RBlue2P];
 
-						case (int)EKeyConfigPad.LBlue2P:
-							return this.padLBlue2P;
+			public STKEYASSIGN[] LeftRed3P => pads[(int)EKeyConfigPad.LRed3P];
 
-						case (int)EKeyConfigPad.RBlue2P:
-							return this.padRBlue2P;
+			public STKEYASSIGN[] RightRed3P => pads[(int)EKeyConfigPad.RRed3P];
 
-						case (int)EKeyConfigPad.LRed3P:
-							return this.padLRed3P;
+			public STKEYASSIGN[] LeftBlue3P => pads[(int)EKeyConfigPad.LBlue3P];
 
-						case (int)EKeyConfigPad.RRed3P:
-							return this.padRRed3P;
+			public STKEYASSIGN[] RightBlue3P => pads[(int)EKeyConfigPad.RBlue3P];
 
-						case (int)EKeyConfigPad.LBlue3P:
-							return this.padLBlue3P;
+			public STKEYASSIGN[] LeftRed4P => pads[(int)EKeyConfigPad.LRed4P];
 
-						case (int)EKeyConfigPad.RBlue3P:
-							return this.padRBlue3P;
+			public STKEYASSIGN[] RightRed4P => pads[(int)EKeyConfigPad.RRed4P];
 
-						case (int)EKeyConfigPad.LRed4P:
-							return this.padLRed4P;
+			public STKEYASSIGN[] LeftBlue4P => pads[(int)EKeyConfigPad.LBlue4P];
 
-						case (int)EKeyConfigPad.RRed4P:
-							return this.padRRed4P;
+			public STKEYASSIGN[] RightBlue4P => pads[(int)EKeyConfigPad.RBlue4P];
 
-						case (int)EKeyConfigPad.LBlue4P:
-							return this.padLBlue4P;
+			public STKEYASSIGN[] LeftRed5P => pads[(int)EKeyConfigPad.LRed5P];
 
-						case (int)EKeyConfigPad.RBlue4P:
-							return this.padRBlue4P;
+			public STKEYASSIGN[] RightRed5P => pads[(int)EKeyConfigPad.RRed5P];
 
-						case (int)EKeyConfigPad.LRed5P:
-							return this.padLRed5P;
+			public STKEYASSIGN[] LeftBlue5P => pads[(int)EKeyConfigPad.LBlue5P];
 
-						case (int)EKeyConfigPad.RRed5P:
-							return this.padRRed5P;
+			public STKEYASSIGN[] RightBlue5P => pads[(int)EKeyConfigPad.RBlue5P];
 
-						case (int)EKeyConfigPad.LBlue5P:
-							return this.padLBlue5P;
+			public STKEYASSIGN[] Clap => pads[(int)EKeyConfigPad.Clap];
 
-						case (int)EKeyConfigPad.RBlue5P:
-							return this.padRBlue5P;
+			public STKEYASSIGN[] Clap2P => pads[(int)EKeyConfigPad.Clap2P];
 
-						case (int)EKeyConfigPad.Clap:
-							return this.padClap;
+			public STKEYASSIGN[] Clap3P => pads[(int)EKeyConfigPad.Clap3P];
 
-						case (int)EKeyConfigPad.Clap2P:
-							return this.padClap2P;
+			public STKEYASSIGN[] Clap4P => pads[(int)EKeyConfigPad.Clap4P];
 
-						case (int)EKeyConfigPad.Clap3P:
-							return this.padClap3P;
+			public STKEYASSIGN[] Clap5P => pads[(int)EKeyConfigPad.Clap5P];
 
-						case (int)EKeyConfigPad.Clap4P:
-							return this.padClap4P;
+			public STKEYASSIGN[] LeftChange => pads[(int)EKeyConfigPad.LeftChange];
 
-						case (int)EKeyConfigPad.Clap5P:
-							return this.padClap5P;
+			public STKEYASSIGN[] RightChange => pads[(int)EKeyConfigPad.RightChange];
 
-						case (int)EKeyConfigPad.LeftChange:
-							return this.padLeftChange;
+			public STKEYASSIGN[] Capture => pads[(int)EKeyConfigPad.Capture];
 
-						case (int)EKeyConfigPad.RightChange:
-							return this.padRightChange;
+			public STKEYASSIGN[] SongVolIncrease => pads[(int)EKeyConfigPad.SongVolumeIncrease];
 
-						case (int)EKeyConfigPad.Capture:
-							return this.padCapture;
+			public STKEYASSIGN[] SongVolDecrease => pads[(int)EKeyConfigPad.SongVolumeDecrease];
 
-						case (int)EKeyConfigPad.SongVolumeIncrease:
-							return this.padSongVolIncrease;
+			public STKEYASSIGN[] DisplayHits => pads[(int)EKeyConfigPad.DisplayHits];
 
-						case (int)EKeyConfigPad.SongVolumeDecrease:
-							return this.padSongVolDecrease;
+			public STKEYASSIGN[] DisplayDebug => pads[(int)EKeyConfigPad.DisplayDebug];
 
-						case (int)EKeyConfigPad.DisplayHits:
-							return this.padDisplayHits;
+			public STKEYASSIGN[] QuickConfig => pads[(int)EKeyConfigPad.QuickConfig];
 
-						case (int)EKeyConfigPad.DisplayDebug:
-							return this.padDisplayDebug;
+			public STKEYASSIGN[] NewHeya => pads[(int)EKeyConfigPad.NewHeya];
 
-						case (int)EKeyConfigPad.QuickConfig:
-							return this.padQuickConfig;
+			public STKEYASSIGN[] SortSongs => pads[(int)EKeyConfigPad.SortSongs];
 
-						case (int)EKeyConfigPad.NewHeya:
-							return this.padNewHeya;
+			public STKEYASSIGN[] ToggleAutoP1 => pads[(int)EKeyConfigPad.ToggleAutoP1];
 
-						case (int)EKeyConfigPad.SortSongs:
-							return this.padSortSongs;
+			public STKEYASSIGN[] ToggleAutoP2 => pads[(int)EKeyConfigPad.ToggleAutoP2];
 
-						case (int)EKeyConfigPad.ToggleAutoP1:
-							return this.padToggleAutoP1;
+			public STKEYASSIGN[] ToggleTrainingMode => pads[(int)EKeyConfigPad.ToggleTrainingMode];
 
-						case (int)EKeyConfigPad.ToggleAutoP2:
-							return this.padToggleAutoP2;
+			public STKEYASSIGN[] CycleVideoDisplayMode => pads[(int)EKeyConfigPad.CycleVideoDisplayMode];
+			public STKEYASSIGN[] TrainingIncreaseScrollSpeed => pads[(int)EKeyConfigPad.TrainingIncreaseScrollSpeed];
+			public STKEYASSIGN[] TrainingDecreaseScrollSpeed => pads[(int)EKeyConfigPad.TrainingDecreaseScrollSpeed];
+			public STKEYASSIGN[] TrainingToggleAuto => pads[(int)EKeyConfigPad.TrainingToggleAuto];
+			public STKEYASSIGN[] TrainingBranchNormal => pads[(int)EKeyConfigPad.TrainingBranchNormal];
+			public STKEYASSIGN[] TrainingBranchExpert => pads[(int)EKeyConfigPad.TrainingBranchExpert];
+			public STKEYASSIGN[] TrainingBranchMaster => pads[(int)EKeyConfigPad.TrainingBranchMaster];
+			public STKEYASSIGN[] TrainingPause => pads[(int)EKeyConfigPad.TrainingPause];
+			public STKEYASSIGN[] TrainingBookmark => pads[(int)EKeyConfigPad.TrainingBookmark];
+			public STKEYASSIGN[] TrainingMoveForwardMeasure => pads[(int)EKeyConfigPad.TrainingMoveForwardMeasure];
+			public STKEYASSIGN[] TrainingMoveBackMeasure => pads[(int)EKeyConfigPad.TrainingMoveBackMeasure];
+			public STKEYASSIGN[] TrainingSkipForwardMeasure => pads[(int)EKeyConfigPad.TrainingSkipForwardMeasure];
+			public STKEYASSIGN[] TrainingSkipBackMeasure => pads[(int)EKeyConfigPad.TrainingSkipBackMeasure];
+			public STKEYASSIGN[] TrainingIncreaseSongSpeed => pads[(int)EKeyConfigPad.TrainingIncreaseSongSpeed];
+			public STKEYASSIGN[] TrainingDecreaseSongSpeed => pads[(int)EKeyConfigPad.TrainingDecreaseSongSpeed];
+			public STKEYASSIGN[] TrainingJumpToFirstMeasure => pads[(int)EKeyConfigPad.TrainingJumpToFirstMeasure];
 
-						case (int)EKeyConfigPad.ToggleTrainingMode:
-							return this.padToggleTrainingMode;
-
-						case (int)EKeyConfigPad.CycleVideoDisplayMode:
-							return this.padCycleVideoDisplayMode;
-
-						case (int)EKeyConfigPad.TrainingIncreaseScrollSpeed:
-							return this.TrainingIncreaseScrollSpeed;
-
-						case (int)EKeyConfigPad.TrainingIncreaseSongSpeed:
-							return this.TrainingIncreaseSongSpeed;
-
-						case (int)EKeyConfigPad.TrainingDecreaseSongSpeed:
-							return this.TrainingDecreaseSongSpeed;
-
-						case (int)EKeyConfigPad.TrainingDecreaseScrollSpeed:
-							return this.TrainingDecreaseScrollSpeed;
-
-						case (int)EKeyConfigPad.TrainingToggleAuto:
-							return this.TrainingToggleAuto;
-
-						case (int)EKeyConfigPad.TrainingBranchNormal:
-							return this.TrainingBranchNormal;
-
-						case (int)EKeyConfigPad.TrainingBranchExpert:
-							return this.TrainingBranchExpert;
-
-						case (int)EKeyConfigPad.TrainingBranchMaster:
-							return this.TrainingBranchMaster;
-
-						case (int)EKeyConfigPad.TrainingPause:
-							return this.TrainingPause;
-
-						case (int)EKeyConfigPad.TrainingBookmark:
-							return this.TrainingBookmark;
-
-						case (int)EKeyConfigPad.TrainingMoveForwardMeasure:
-							return this.TrainingMoveForwardMeasure;
-
-						case (int)EKeyConfigPad.TrainingMoveBackMeasure:
-							return this.TrainingMoveBackMeasure;
-
-						case (int)EKeyConfigPad.TrainingSkipForwardMeasure:
-							return this.TrainingSkipForwardMeasure;
-
-						case (int)EKeyConfigPad.TrainingSkipBackMeasure:
-							return this.TrainingSkipBackMeasure;
-
-						case (int)EKeyConfigPad.TrainingJumpToFirstMeasure:
-							return this.TrainingJumpToFirstMeasure;
-
-						case (int)EKeyConfigPad.TrainingJumpToLastMeasure:
-							return this.TrainingJumpToLastMeasure;
-					}
-
-					throw new IndexOutOfRangeException();
-				}
-				set {
-					switch (index) {
-						case (int)EKeyConfigPad.HH:
-							this.padHH_R = value;
-							return;
-
-						case (int)EKeyConfigPad.SD:
-							this.padSD_G = value;
-							return;
-
-						case (int)EKeyConfigPad.BD:
-							this.padBD_B = value;
-							return;
-
-						case (int)EKeyConfigPad.Pick:
-							this.padHT_Pick = value;
-							return;
-
-						case (int)EKeyConfigPad.LT:
-							this.padLT_Wail = value;
-							return;
-
-						case (int)EKeyConfigPad.FT:
-							this.padFT_Cancel = value;
-							return;
-
-						case (int)EKeyConfigPad.CY:
-							this.padCY_Decide = value;
-							return;
-
-						case (int)EKeyConfigPad.HHO:
-							this.padHHO = value;
-							return;
-
-						case (int)EKeyConfigPad.RD:
-							this.padRD = value;
-							return;
-
-						case (int)EKeyConfigPad.LC:
-							this.padLC = value;
-							return;
-
-						case (int)EKeyConfigPad.LP:
-							this.padLP = value;
-							return;
-
-						case (int)EKeyConfigPad.LBD:
-							this.padLBD = value;
-							return;
-
-						case (int)EKeyConfigPad.LRed:
-							this.padLRed = value;
-							return;
-
-						case (int)EKeyConfigPad.RRed:
-							this.padRRed = value;
-							return;
-
-						case (int)EKeyConfigPad.LBlue:
-							this.padLBlue = value;
-							return;
-
-						case (int)EKeyConfigPad.RBlue:
-							this.padRBlue = value;
-							return;
-
-						case (int)EKeyConfigPad.LRed2P:
-							this.padLRed2P = value;
-							return;
-
-						case (int)EKeyConfigPad.RRed2P:
-							this.padRRed2P = value;
-							return;
-
-						case (int)EKeyConfigPad.LBlue2P:
-							this.padLBlue2P = value;
-							return;
-
-						case (int)EKeyConfigPad.RBlue2P:
-							this.padRBlue2P = value;
-							return;
-
-						case (int)EKeyConfigPad.LRed3P:
-							this.padLRed3P = value;
-							return;
-
-						case (int)EKeyConfigPad.RRed3P:
-							this.padRRed3P = value;
-							return;
-
-						case (int)EKeyConfigPad.LBlue3P:
-							this.padLBlue3P = value;
-							return;
-
-						case (int)EKeyConfigPad.RBlue3P:
-							this.padRBlue3P = value;
-							return;
-
-						case (int)EKeyConfigPad.LRed4P:
-							this.padLRed4P = value;
-							return;
-
-						case (int)EKeyConfigPad.RRed4P:
-							this.padRRed4P = value;
-							return;
-
-						case (int)EKeyConfigPad.LBlue4P:
-							this.padLBlue4P = value;
-							return;
-
-						case (int)EKeyConfigPad.RBlue4P:
-							this.padRBlue4P = value;
-							return;
-
-						case (int)EKeyConfigPad.LRed5P:
-							this.padLRed5P = value;
-							return;
-
-						case (int)EKeyConfigPad.RRed5P:
-							this.padRRed5P = value;
-							return;
-
-						case (int)EKeyConfigPad.LBlue5P:
-							this.padLBlue5P = value;
-							return;
-
-						case (int)EKeyConfigPad.RBlue5P:
-							this.padRBlue5P = value;
-							return;
-
-						case (int)EKeyConfigPad.Clap:
-							this.padClap = value;
-							return;
-
-						case (int)EKeyConfigPad.Clap2P:
-							this.padClap2P = value;
-							return;
-
-						case (int)EKeyConfigPad.Clap3P:
-							this.padClap3P = value;
-							return;
-
-						case (int)EKeyConfigPad.Clap4P:
-							this.padClap4P = value;
-							return;
-
-						case (int)EKeyConfigPad.Clap5P:
-							this.padClap5P = value;
-							return;
-
-						case (int)EKeyConfigPad.LeftChange:
-							this.padLeftChange = value;
-							return;
-
-						case (int)EKeyConfigPad.RightChange:
-							this.padRightChange = value;
-							return;
-
-						case (int)EKeyConfigPad.Capture:
-							this.padCapture = value;
-							return;
-
-						case (int)EKeyConfigPad.SongVolumeIncrease:
-							this.padSongVolIncrease = value;
-							return;
-
-						case (int)EKeyConfigPad.SongVolumeDecrease:
-							this.padSongVolDecrease = value;
-							return;
-
-						case (int)EKeyConfigPad.DisplayHits:
-							this.padDisplayHits = value;
-							return;
-
-						case (int)EKeyConfigPad.DisplayDebug:
-							this.padDisplayDebug = value;
-							return;
-
-						case (int)EKeyConfigPad.QuickConfig:
-							this.padQuickConfig = value;
-							return;
-
-						case (int)EKeyConfigPad.NewHeya:
-							this.padNewHeya = value;
-							return;
-
-						case (int)EKeyConfigPad.SortSongs:
-							this.padSortSongs = value;
-							return;
-
-						case (int)EKeyConfigPad.ToggleAutoP1:
-							this.padToggleAutoP1 = value;
-							return;
-
-						case (int)EKeyConfigPad.ToggleAutoP2:
-							this.padToggleAutoP2 = value;
-							return;
-
-						case (int)EKeyConfigPad.ToggleTrainingMode:
-							this.padToggleTrainingMode = value;
-							return;
-
-						case (int)EKeyConfigPad.CycleVideoDisplayMode:
-							this.padCycleVideoDisplayMode = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingIncreaseScrollSpeed:
-							this.TrainingIncreaseScrollSpeed = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingDecreaseScrollSpeed:
-							this.TrainingDecreaseScrollSpeed = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingIncreaseSongSpeed:
-							this.TrainingIncreaseSongSpeed = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingDecreaseSongSpeed:
-							this.TrainingDecreaseSongSpeed = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingToggleAuto:
-							this.TrainingToggleAuto = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingBranchNormal:
-							this.TrainingBranchNormal = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingBranchExpert:
-							this.TrainingBranchExpert = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingBranchMaster:
-							this.TrainingBranchMaster = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingPause:
-							this.TrainingPause = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingBookmark:
-							this.TrainingBookmark = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingMoveForwardMeasure:
-							this.TrainingMoveForwardMeasure = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingMoveBackMeasure:
-							this.TrainingMoveBackMeasure = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingSkipForwardMeasure:
-							this.TrainingSkipForwardMeasure = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingSkipBackMeasure:
-							this.TrainingSkipBackMeasure = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingJumpToFirstMeasure:
-							this.TrainingJumpToFirstMeasure = value;
-							return;
-
-						case (int)EKeyConfigPad.TrainingJumpToLastMeasure:
-							this.TrainingJumpToLastMeasure = value;
-							return;
-					}
-
-					throw new IndexOutOfRangeException();
-				}
-			}
-
-			#region [ private ]
-
-			//-----------------
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padBD_B;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padCY_Decide;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padFT_Cancel;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padHH_R;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padHHO;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padHT_Pick;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLC;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLT_Wail;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRD;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padSD_G;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLP;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBD;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed2P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue2P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed2P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue2P;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed3P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue3P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed3P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue3P;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed4P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue4P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed4P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue4P;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLRed5P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLBlue5P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRRed5P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRBlue5P;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap2P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap3P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap4P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padClap5P;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padLeftChange;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padRightChange;
-
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padCapture;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolIncrease;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padSongVolDecrease;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayHits;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padDisplayDebug;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padQuickConfig;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padNewHeya;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padSortSongs;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP1;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleAutoP2;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padToggleTrainingMode;
-			private CConfigIni.CKeyAssign.STKEYASSIGN[] padCycleVideoDisplayMode;
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingIncreaseScrollSpeed;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingDecreaseScrollSpeed;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingToggleAuto;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchNormal;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchExpert;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBranchMaster;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingPause;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingBookmark;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingMoveForwardMeasure;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingMoveBackMeasure;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingSkipForwardMeasure;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingSkipBackMeasure;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingIncreaseSongSpeed;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingDecreaseSongSpeed;
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingJumpToFirstMeasure;
-
-			public CConfigIni.CKeyAssign.STKEYASSIGN[] TrainingJumpToLastMeasure;
-			//-----------------
-
-			#endregion
+			public STKEYASSIGN[] TrainingJumpToLastMeasure => pads[(int)EKeyConfigPad.TrainingJumpToLastMeasure];
 		}
 
-		public bool KeyIsPressed(STKEYASSIGN[] pads)
-			=> (OpenTaiko.InputManager != null)
-				&& pads.Any(pad => OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)?.KeyPressed(pad.Code) ?? false);
+		public bool KeyIsPressed(STKEYASSIGN[] pads) => pads.IsPressed();
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STKEYASSIGN {
@@ -891,59 +142,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 			}
 		}
 
-		public CKeyAssignPad Bass = new CKeyAssignPad();
-		public CKeyAssignPad Drums = new CKeyAssignPad();
-		public CKeyAssignPad Guitar = new CKeyAssignPad();
-		public CKeyAssignPad Taiko = new CKeyAssignPad();
-		public CKeyAssignPad System = new CKeyAssignPad();
-
-		public CKeyAssignPad this[int index] {
-			get {
-				switch (index) {
-					case (int)EKeyConfigPart.Drums:
-						return this.Drums;
-
-					case (int)EKeyConfigPart.Guitar:
-						return this.Guitar;
-
-					case (int)EKeyConfigPart.Bass:
-						return this.Bass;
-
-					case (int)EKeyConfigPart.Taiko:
-						return this.Taiko;
-
-					case (int)EKeyConfigPart.System:
-						return this.System;
-				}
-
-				throw new IndexOutOfRangeException();
-			}
-			set {
-				switch (index) {
-					case (int)EKeyConfigPart.Drums:
-						this.Drums = value;
-						return;
-
-					case (int)EKeyConfigPart.Guitar:
-						this.Guitar = value;
-						return;
-
-					case (int)EKeyConfigPart.Bass:
-						this.Bass = value;
-						return;
-
-					case (int)EKeyConfigPart.Taiko:
-						this.Taiko = value;
-						return;
-
-					case (int)EKeyConfigPart.System:
-						this.System = value;
-						return;
-				}
-
-				throw new IndexOutOfRangeException();
-			}
-		}
+		private readonly CKeyAssignPad[] padSets = Enumerable.Range(0, (int)EKeyConfigPart.Total).Select(i => new CKeyAssignPad()).ToArray();
+		public CKeyAssignPad this[int index] { get => padSets[index]; internal set => padSets[index] = value; }
+		public CKeyAssignPad Bass => padSets[(int)EKeyConfigPart.Bass];
+		public CKeyAssignPad Drums => padSets[(int)EKeyConfigPart.Drums];
+		public CKeyAssignPad Guitar => padSets[(int)EKeyConfigPart.Guitar];
+		public CKeyAssignPad Taiko => padSets[(int)EKeyConfigPart.Taiko];
+		public CKeyAssignPad System => padSets[(int)EKeyConfigPart.System];
 	}
 
 	#endregion
