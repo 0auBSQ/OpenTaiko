@@ -820,50 +820,23 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				else
 					pChip.bShow = true;
 
-				int x = pChip.nHorizontalChipDistance;
-				int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance; // either untouched (0/5) or unused (other) for #DIRECTION
+				int dx = pChip.nHorizontalChipDistance;
+				int dy = pChip.nVerticalChipDistance;
+				(dx, var dy_) = pChip.nScrollDirection switch {
+					1 => (0, -dx), // ↓
+					2 => (0, dx), // ↑
+					3 => (dx, -dx), // ↙
+					4 => (dx, +dx), // ↖
+					5 => (-dx, 0), // →
+					6 => (-dx, -dx), // ↘
+					7 => (-dx, dx), // ↗
+					0 or _ => (dx, dy), // ←
+				};
+				if (dy == 0) // TJAP3 behavior: vertical scrolling of non-real `#SCROLL` is kept
+					dy = dy_;
 
-				int xTemp = 0;
-				int yTemp = 0;
-
-				#region[ スクロール方向変更 ]
-				if (pChip.nScrollDirection != 0) {
-					xTemp = x;
-					yTemp = y;
-				}
-				switch (pChip.nScrollDirection) {
-					case 0:
-						x += (GetNoteOriginX(nPlayer));
-						break;
-					case 1:
-						x = (GetNoteOriginX(nPlayer));
-						y = GetNoteOriginY(nPlayer) - xTemp;
-						break;
-					case 2:
-						x = (GetNoteOriginX(nPlayer) + 3);
-						y = GetNoteOriginY(nPlayer) + xTemp;
-						break;
-					case 3:
-						x += (GetNoteOriginX(nPlayer));
-						y = GetNoteOriginY(nPlayer) - xTemp;
-						break;
-					case 4:
-						x += (GetNoteOriginX(nPlayer));
-						y = GetNoteOriginY(nPlayer) + xTemp;
-						break;
-					case 5:
-						x = (GetNoteOriginX(nPlayer) + 10) - xTemp;
-						break;
-					case 6:
-						x = (GetNoteOriginX(nPlayer)) - xTemp;
-						y = GetNoteOriginY(nPlayer) - xTemp;
-						break;
-					case 7:
-						x = (GetNoteOriginX(nPlayer)) - xTemp;
-						y = GetNoteOriginY(nPlayer) + xTemp;
-						break;
-				}
-				#endregion
+				int x = GetNoteOriginX(nPlayer) + dx;
+				int y = GetNoteOriginY(nPlayer) + dy;
 
 				#region[ 両手待ち時 ]
 				if (pChip.eNoteState == ENoteState.Wait) {
