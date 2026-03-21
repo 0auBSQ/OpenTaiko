@@ -270,12 +270,6 @@ internal class CActImplBackground : CActivity {
 					#endregion
 
 					#region [Life number]
-
-					if (CFloorManagement.MaxNumberOfLives <= 0) {
-						CFloorManagement.MaxNumberOfLives = 5;
-						CFloorManagement.CurrentNumberOfLives = 5;
-					}
-
 					string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
 
 					len = lifeStr.Length;
