@@ -666,6 +666,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	};
 	protected EStageAbort[] stageAbortType = { EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None };
 
+	protected long msFailedStopSystemTime;
+
 	protected int nタイマ番号;
 	protected int n現在の音符の顔番号;
 
@@ -2154,8 +2156,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
-
-		var n現在時刻ms = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+		var n現在時刻ms = (long)tja.GameTimeToTjaTime(this.IsFailStopped() ? this.msFailedStopSystemTime : SoundManager.PlayTimer.NowTimeMs);
 
 		NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
 
@@ -3080,7 +3081,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			switch (pChip.nChannelNo) {
 				case 0x50: // 小節線
 				case 0xe4: // #BARLINE
-					this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer);
+					this.t進行描画_チップ_小節線(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
 					break;
 			}
 		}
@@ -3090,9 +3091,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
 			CChip pChip = dTX.listNoteChip[iChip];
 			if (NotesManager.IsGenericRoll(pChip))
-				this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer);
+				this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
 			else
-				this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer);
+				this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
 		}
 		#endregion
 
@@ -3972,13 +3973,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	}
 
-	protected abstract void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip);
-	protected abstract void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip);
-	protected abstract void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer);
-	protected abstract void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer);
+	protected abstract void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
+	protected abstract void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
+	protected abstract void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);
+	protected abstract void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);
 
-	protected abstract void t進行描画_チップ_フィルイン(CConfigIni configIni, ref CTja dTX, ref CChip pChip);
-	protected abstract void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer);
+	protected abstract void t進行描画_チップ_フィルイン(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
+	protected abstract void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);
 	protected void t進行描画_チップアニメ() {
 		for (int i = 0; i < 5; i++) {
 			ctChipAnime[i].TickLoopDB();

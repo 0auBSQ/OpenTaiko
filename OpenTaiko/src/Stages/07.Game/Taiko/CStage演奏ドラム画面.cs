@@ -513,7 +513,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			// LYRIC[S/FILE]: & #LYRIC
 
-			if (OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
+			if (!this.IsFailStopped()
+				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+				) {
 				this.actPanel.t歌詞テクスチャを生成する(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
 			}
 
@@ -841,16 +843,13 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			BgFilename = OpenTaiko.TJA.strBGIMAGE_PATH;
 		base.t背景テクスチャの生成(DefaultBgFilename, bgrect, BgFilename);
 	}
-	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
+	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nPlayTime) {
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
-		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 
 		#region[ 作り直したもの ]
 
 		if (pChip.bVisible) {
 			if (!pChip.bHit) {
-				long nPlayTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-
 				if (pChip.nノーツ出現時刻ms != 0 && (nPlayTime < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
 					pChip.bShow = false;
 				else
@@ -1035,11 +1034,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 		#endregion
 	}
-	protected override void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
+	protected override void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime) {
 		int nSenotesX = 0;
 		int nSenotesY = 0;
-		long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 
 		switch (OpenTaiko.ConfigIni.nPlayerCount) {
 			case 1:
@@ -1328,15 +1325,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		return Math.Clamp(dHeadProj, 0f, len) / len;
 	}
 
-	protected override void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip) {
+	protected override void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime) {
 	}
-	protected override void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip) {
+	protected override void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime) {
 	}
-	protected override void t進行描画_チップ_フィルイン(CConfigIni configIni, ref CTja dTX, ref CChip pChip) {
+	protected override void t進行描画_チップ_フィルイン(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime) {
 
 	}
-	protected override void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer) {
-		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
+	protected override void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime) {
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
 		int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
