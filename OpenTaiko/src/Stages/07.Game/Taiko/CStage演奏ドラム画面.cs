@@ -332,6 +332,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
 				this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.ClearOut, true);
 			}
+			CFloorManagement.CurrentNumberOfLives = 0; // prevent clear
 			this.actEnd.Start(iPlayer);
 		}
 	}
