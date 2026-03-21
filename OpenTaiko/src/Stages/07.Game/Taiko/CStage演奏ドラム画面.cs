@@ -538,7 +538,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			// handle retry states here
-			this.actPauseMenu.Draw();
+			this.actPauseMenu.Update();
 
 			// Layer: Gameplay complete animation and fading out
 
@@ -619,6 +619,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;
 			}
+
+			// draw above anything
+			this.actPauseMenu.Draw();
 
 			if (bIsFinishedFadeout) {
 				Debug.WriteLine("Total On進行描画=" + sw.ElapsedMilliseconds + "ms");

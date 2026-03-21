@@ -1106,8 +1106,8 @@ internal class CStageSongSelect : CStage {
 					OpenTaiko.InputManager.Keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, true);
 				#endregion
 
-				this.actSortSongs.Draw();
-				this.actQuickConfig.Draw();
+				this.actSortSongs.Update();
+				this.actQuickConfig.Update();
 			}
 
 			#endregion
@@ -1155,6 +1155,7 @@ internal class CStageSongSelect : CStage {
 
 			if (actNewHeya.IsOpend) actNewHeya.Draw();
 
+			var ret = 0;
 			switch (base.ePhaseID) {
 				case CStage.EPhase.Common_FADEIN:
 					if (this.actFIFO.Draw() != 0) {
@@ -1166,7 +1167,8 @@ internal class CStageSongSelect : CStage {
 					if (this.actFIFO.Draw() == 0) {
 						break;
 					}
-					return (int)this.eフェードアウト完了時の戻り値;
+					ret = (int)this.eフェードアウト完了時の戻り値;
+					break;
 
 				case CStage.EPhase.SongSelect_FadeInFromResults:
 					if (this.actFIfrom結果画面.Draw() != 0) {
@@ -1178,8 +1180,15 @@ internal class CStageSongSelect : CStage {
 					if (this.actFOtoNowLoading.Draw() == 0) {
 						break;
 					}
-					return (int)this.eフェードアウト完了時の戻り値;
+					ret = (int)this.eフェードアウト完了時の戻り値;
+					break;
 			}
+
+			// draw above anything
+			this.actSortSongs.Draw();
+			this.actQuickConfig.Draw();
+
+			return ret;
 		}
 		return 0;
 	}

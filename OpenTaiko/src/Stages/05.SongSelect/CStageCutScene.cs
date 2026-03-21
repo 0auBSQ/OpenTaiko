@@ -163,6 +163,7 @@ class CStageCutScene : CStage {
 		#endregion
 
 		this.KeyInput();
+		this.actPauseMenu.Update();
 
 		if ((this.rVD == null || this.rVD.bFinishPlaying) && this.iCutScene < this.cutScenes!.Count) {
 			while (++this.iCutScene < this.cutScenes!.Count) {
@@ -176,7 +177,6 @@ class CStageCutScene : CStage {
 		}
 
 		this.actAVI.Draw();
-		this.actPauseMenu.Draw();
 
 		if (base.ePhaseID == EPhase.Common_NORMAL && !(this.iCutScene < this.cutScenes!.Count)) {
 			base.ePhaseID = EPhase.Common_FADEOUT;
@@ -193,6 +193,7 @@ class CStageCutScene : CStage {
 			}
 		}
 
+		var ret = 0;
 		#region [ Fading in/out transition ]
 		switch (base.ePhaseID) {
 			case CStage.EPhase.Common_FADEOUT:
@@ -203,11 +204,15 @@ class CStageCutScene : CStage {
 				if (fadeOutDrawResult == 0) {
 					break;
 				}
-				return (int)this.ReturnValueAfterFadingOut;
+				ret = (int)this.ReturnValueAfterFadingOut;
+				break;
 		}
 		#endregion
 
-		return 0;
+		// draw above anything
+		this.actPauseMenu.Draw();
+
+		return ret;
 	}
 
 	private bool LoadCutSceneAVI(CTja.CutSceneDef cutScene) {

@@ -47,7 +47,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	//	base.tDeativatePopupMenu();
 	//}
 
-	public override void t進行描画sub() {
+	public override void UpdateSub() {
 		if (this.bやり直しを選択した) {
 			if (!sw.IsRunning)
 				this.sw = Stopwatch.StartNew();
