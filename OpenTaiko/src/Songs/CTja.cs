@@ -626,7 +626,7 @@ internal class CTja : CActivity {
 							: (cwav.n内部番号 == 1);
 						if (chipBgm != null && isLastSongWave) {
 							for (int iPlayer = 0; iPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++iPlayer)
-								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.n発声位置 + cwav.rSound[i].TotalPlayTime, this.n現在の小節数, msFadeOutDelay: 0, sortListChip: true);
+								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.n発声時刻ms + cwav.rSound[i].TotalPlayTime, this.n現在の小節数, msFadeOutDelay: 0, sortListChip: true);
 						}
 					}
 
