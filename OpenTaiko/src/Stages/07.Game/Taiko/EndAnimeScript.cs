@@ -6,6 +6,13 @@ class EndAnimeScript : ScriptBG {
 	private LuaFunction LuaPlayEndAnime;
 
 	public EndAnimeScript(string filePath) : base(filePath) {
+		this.Init();
+	}
+	public EndAnimeScript(params string[] filePaths) : base(filePaths) {
+		this.Init();
+	}
+
+	private new void Init() {
 		if (LuaScript != null) {
 			LuaPlayEndAnime = LuaScript.GetFunction("playEndAnime");
 		}

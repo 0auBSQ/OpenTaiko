@@ -121,6 +121,19 @@ class ScriptBG : IDisposable {
 	protected LuaFunction LuaDraw;
 
 	public ScriptBG(string filePath) {
+		this.Init(filePath);
+	}
+
+	// script fallback list
+	public ScriptBG(params string[] filePaths) {
+		foreach (var filePath in filePaths) {
+			this.Init(filePath);
+			if (this.Exists())
+				return;
+		}
+	}
+
+	private void Init(string filePath) {
 		Textures = new Dictionary<string, CTexture>();
 
 		if (!File.Exists(filePath)) return;
