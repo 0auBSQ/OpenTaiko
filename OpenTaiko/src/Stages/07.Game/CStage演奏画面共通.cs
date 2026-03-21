@@ -565,7 +565,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CAct演奏パネル文字列 actPanel;
 	public CAct演奏演奏情報 actPlayInfo;
 	public CAct演奏スコア共通 actScore;
-	public CAct演奏ステージ失敗 actStageFailed;
 	protected CActTaikoScrollSpeed actScrollSpeed;
 	protected CActImplRoll actRoll;
 	public CActImplBalloon actBalloon;
@@ -2112,21 +2111,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return true;
 		}
 		return false;
-	}
-	protected void t進行描画_STAGEFAILED() {
-		// Transition for failed games
-		if (!this.IsStageFailed())
-			return;
-		if ((this.actStageFailed.Draw() != 0) && (base.ePhaseID != CStage.EPhase.Game_STAGE_FAILED_FadeOut)) {
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
-			} else {
-				this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
-
-			}
-			base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
-			this.actFO.tフェードアウト開始();
-		}
 	}
 
 

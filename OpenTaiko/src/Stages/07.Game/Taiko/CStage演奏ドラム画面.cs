@@ -27,7 +27,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ChildActivities.Add(this.actScrollSpeed = new CActTaikoScrollSpeed());
 		base.ChildActivities.Add(this.actAVI = new CAct演奏AVI());
 		base.ChildActivities.Add(this.actPanel = new CAct演奏パネル文字列());
-		base.ChildActivities.Add(this.actStageFailed = new CAct演奏ステージ失敗());
 		base.ChildActivities.Add(this.actPlayInfo = new CAct演奏演奏情報());
 		//base.list子Activities.Add( this.actFI = new CActFIFOBlack() );
 		base.ChildActivities.Add(this.actFI = new CActFIFOStart());
@@ -353,7 +352,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				 || this.actGame.st叩ききりまショー.ct残り時間.IsEnded
 				 || (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0))
 				&& (base.ePhaseID == CStage.EPhase.Common_NORMAL)) {
-				this.actStageFailed.Start();
 				this.actEnd.Start();
 				OpenTaiko.TJA.tStopAllChips();
 				base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED;
@@ -507,9 +505,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.t全体制御メソッド();
 
-			//this.actEnd.On進行描画();
-			this.t進行描画_STAGEFAILED();
-
 			this.ScoreRank.Draw();
 
 			// Layer: Interactive elements
@@ -533,8 +528,21 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (!isChartEnded[i]) bIsChartEnded = false;
 			}
 
-			//演奏終了→演出表示→フェードアウト
-			if ((bIsChartEnded || bIsFinishedPlaying) && base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+			// Transition for failed games
+			if (this.IsStageFailed()) {
+				if (bIsFinishedEndAnime && base.ePhaseID == EPhase.Game_STAGE_FAILED) {
+					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+						this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
+					} else {
+						this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
+					}
+					base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
+					this.actFO.tフェードアウト開始();
+				}
+			}
+			// Transition for completed games:
+			// 演奏終了→演出表示→フェードアウト
+			else if ((bIsChartEnded || bIsFinishedPlaying) && base.ePhaseID == CStage.EPhase.Common_NORMAL) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						int Character = this.actChara.iCurrentCharacter[i];
