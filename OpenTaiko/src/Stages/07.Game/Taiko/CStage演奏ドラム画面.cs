@@ -327,8 +327,13 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public override void SetStageFailed(int iPlayer) {
 		var becomeStageFailed = !this.isStageFailed[iPlayer];
 		base.SetStageFailed(iPlayer);
-		if (becomeStageFailed)
+		if (becomeStageFailed) {
+			int Character = this.actChara.iCurrentCharacter[iPlayer];
+			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
+				this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.ClearOut, true);
+			}
 			this.actEnd.Start(iPlayer);
+		}
 	}
 	public override int Draw() {
 		base.sw.Start();
