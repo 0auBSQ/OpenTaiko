@@ -787,7 +787,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPad), gameType);
 
 			// BAD or TIGHT 時の処理。
-			if (chipNoHit != null && OpenTaiko.ConfigIni.bTight)
+			if (e判定 is ENoteJudge.Miss && OpenTaiko.ConfigIni.bTight)
 				this.tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad.Drums, e判定, nUsePlayer, null);
 		}
 		#endregion
