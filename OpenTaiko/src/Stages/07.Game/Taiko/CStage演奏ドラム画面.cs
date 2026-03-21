@@ -324,9 +324,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ReleaseManagedResource();
 	}
 
-	public override void SetStageFailed(int iPlayer) {
-		var becomeStageFailed = !this.isStageFailed[iPlayer];
-		base.SetStageFailed(iPlayer);
+	public override void SetStageFailed(int iPlayer, bool kanpekiFail = false) {
+		if (OpenTaiko.ConfigIni.bTokkunMode)
+			return;
+		var becomeStageFailed = (this.stageAbortType[iPlayer] == EStageAbort.None);
+		base.SetStageFailed(iPlayer, kanpekiFail);
 		if (becomeStageFailed) {
 			int Character = this.actChara.iCurrentCharacter[iPlayer];
 			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
@@ -364,14 +366,17 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			// stage-fail check
 			bool isTower = (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
 
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
-				if (this.isStageFailed[i])
-					continue;
-				if (OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i)
-					|| this.actGame.st叩ききりまショー.ct残り時間.IsEnded
-					|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)
-					) {
-					this.SetStageFailed(i);
+			if (!OpenTaiko.ConfigIni.bTokkunMode) {
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+					if (this.stageAbortType[i] == EStageAbort.Max)
+						continue;
+					bool kanpekiFail = OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i);
+					if (kanpekiFail
+						|| this.actGame.st叩ききりまショー.ct残り時間.IsEnded
+						|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)
+						) {
+						this.SetStageFailed(i, kanpekiFail);
+					}
 				}
 			}
 
@@ -542,10 +547,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			bool bIsFinishedPlaying = true;
 			bool bIsChartEnded = true;
 			bool bIsStageFailed = true;
+			bool bIsKanpekiFailed = true;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (!isFinishedPlaying[i]) bIsFinishedPlaying = false;
 				if (!isChartEnded[i]) bIsChartEnded = false;
-				if (!isStageFailed[i]) bIsStageFailed = false;
+				if (stageAbortType[i] == EStageAbort.None) bIsStageFailed = false;
+				if (stageAbortType[i] < EStageAbort.KanpekiFailed) bIsKanpekiFailed = false;
 			}
 
 			// Transition for failed games
@@ -554,10 +561,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
 					if (bIsFinishedEndAnime) {
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
-						} else {
+						if (bIsKanpekiFailed) {
 							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageFailed;
+						} else {
+							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
 						}
 						base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
 						this.actFO.tフェードアウト開始();
@@ -607,7 +614,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
 							}
 						}
-						if (!this.isStageFailed[i])
+						if (this.stageAbortType[i] == EStageAbort.None)
 							this.actEnd.Start(i);
 					}
 				}

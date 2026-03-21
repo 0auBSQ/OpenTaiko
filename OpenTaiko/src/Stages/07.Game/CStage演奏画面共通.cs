@@ -656,7 +656,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool[] isChartEnded = { false, false, false, false, false }; // last note of chart passed
 	protected bool[] isFinishedPlaying = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
-	protected bool[] isStageFailed = { false, false, false, false, false };
+	protected enum EStageAbort { None, StageFailed, KanpekiFailed, Max = KanpekiFailed };
+	protected EStageAbort[] stageAbortType = { EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None, EStageAbort.None };
 
 	protected int nタイマ番号;
 	protected int n現在の音符の顔番号;
@@ -2082,12 +2083,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	public virtual void SetStageFailed(int iPlayer) {
+	public virtual void SetStageFailed(int iPlayer, bool kanpeki = false) {
+		if (OpenTaiko.ConfigIni.bTokkunMode)
+			return;
 		isFinishedPlaying[iPlayer] = true;
 		isDeniedPlaying[iPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
-		isStageFailed[iPlayer] = true;
+		var failType = kanpeki ? EStageAbort.KanpekiFailed : EStageAbort.StageFailed;
+		if (stageAbortType[iPlayer] < failType)
+			stageAbortType[iPlayer] = failType;
 	}
-	public bool IsStageFailed(int iPlayer) => isStageFailed[iPlayer];
+	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
 	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
@@ -3703,7 +3708,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.isChartEnded[i] = false;
 				this.isFinishedPlaying[i] = false;
 				this.isDeniedPlaying[i] = false;
-				this.isStageFailed[i] = false;
+				this.stageAbortType[i] = EStageAbort.None;
 			}
 
 			this.tBranchReset(-1);
