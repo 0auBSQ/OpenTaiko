@@ -2209,7 +2209,7 @@ internal class CTja : CActivity {
 			dansongs.Difficulty = (strArray.Length > 7 && !string.IsNullOrWhiteSpace(strArray[7])) ? strConvertCourse(strArray[7]) : 3;
 			dansongs.bTitleShow = (strArray.Length > 8 && !string.IsNullOrWhiteSpace(strArray[8])) ? bool.Parse(strArray[8]) : false;
 
-			var chipBgm = this.NewEventChipAtDefCursor(0x01, 1 + List_DanSongs.Count, 0x01);
+			var chipBgm = this.NewEventChipAtDefCursor(0x01, this.n内部番号WAV1to, 0x01);
 
 			dansongs.Wave = new CWAV {
 				n内部番号 = this.n内部番号WAV1to,
