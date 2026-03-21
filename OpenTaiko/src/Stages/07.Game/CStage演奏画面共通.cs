@@ -2088,6 +2088,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		isStageFailed[iPlayer] = true;
 	}
 	public bool IsStageFailed(int iPlayer) => isStageFailed[iPlayer];
+	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
+	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
 	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 

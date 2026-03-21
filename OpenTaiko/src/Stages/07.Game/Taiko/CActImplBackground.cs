@@ -233,8 +233,13 @@ internal class CActImplBackground : CActivity {
 
 					#region [Floor number]
 
-					if (CFloorManagement.CurrentNumberOfLives > 0)
+					if (CFloorManagement.CurrentNumberOfLives > 0) {
 						CFloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
+						if (!(OpenTaiko.stageGameScreen.IsChartEnded(0) || OpenTaiko.stageGameScreen.IsFinishedPlaying(0))) {
+							if (CFloorManagement.LastRegisteredFloor >= maxFloor)
+								CFloorManagement.LastRegisteredFloor = maxFloor - 1;
+						}
+					}
 
 					string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
@@ -534,6 +539,8 @@ internal class CActImplBackground : CActivity {
 
 		return base.Draw();
 	}
+
+	public bool IsFinishedTowerClimbing() => ctClimbDuration?.IsEnded ?? true;
 
 	#region[ private ]
 	//-----------------

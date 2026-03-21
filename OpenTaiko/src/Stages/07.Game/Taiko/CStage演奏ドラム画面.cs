@@ -362,12 +362,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 			#endregion
 			// stage-fail check
+			bool isTower = (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
+
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 				if (this.isStageFailed[i])
 					continue;
 				if (OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i)
 					|| this.actGame.st叩ききりまショー.ct残り時間.IsEnded
-					|| (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower && CFloorManagement.CurrentNumberOfLives <= 0)
+					|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)
 					) {
 					this.SetStageFailed(i);
 				}
@@ -587,12 +589,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						base.ePhaseID = CStage.EPhase.Game_EndStage;
 					}
 				}
-			} else if (bIsChartEnded || bIsFinishedPlaying) {
+			} else if ((bIsChartEnded || bIsFinishedPlaying) && (!isTower || this.actBackground.IsFinishedTowerClimbing())) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						int Character = this.actChara.iCurrentCharacter[i];
 
-						bool isTower = (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
 						if (isTower ? (CFloorManagement.CurrentNumberOfLives >= CFloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
