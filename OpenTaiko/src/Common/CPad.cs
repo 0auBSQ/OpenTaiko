@@ -14,10 +14,31 @@ public class CPad {
 		public bool Joypad;
 		public bool Gamepad;
 		public bool Mouse;
+		public bool this[InputDeviceType type] {
+			get => type switch {
+				InputDeviceType.Keyboard => Keyboard,
+				InputDeviceType.Mouse => Mouse,
+				InputDeviceType.Joystick => Joypad,
+				InputDeviceType.Gamepad => Gamepad,
+				InputDeviceType.MidiIn => MIDIIN,
+				_ => throw new IndexOutOfRangeException(),
+			};
+			set {
+				switch (type) {
+					case InputDeviceType.Keyboard: Keyboard = value; break;
+					case InputDeviceType.Mouse: Mouse = value; break;
+					case InputDeviceType.Joystick: Joypad = value; break;
+					case InputDeviceType.Gamepad: Gamepad = value; break;
+					case InputDeviceType.MidiIn: MIDIIN = value; break;
+					default: throw new IndexOutOfRangeException();
+				}
+			}
+		}
 		public void Clear() {
 			this.Keyboard = false;
 			this.MIDIIN = false;
 			this.Joypad = false;
+			this.Gamepad = false;
 			this.Mouse = false;
 		}
 	}
@@ -42,41 +63,12 @@ public class CPad {
 
 			foreach (STInputEvent event2 in device.InputEvents) {
 				for (int i = 0; i < stkeyassignArray.Length; i++) {
-					switch (stkeyassignArray[i].InputDevice) {
-						case InputDeviceType.Keyboard:
-							if ((device.CurrentType == InputDeviceType.Keyboard) && (event2.nKey == stkeyassignArray[i].Code)) {
-								list.Add(event2);
-								this.detectedDevice.Keyboard = true;
-							}
-							break;
-
-						case InputDeviceType.MidiIn:
-							if (((device.CurrentType == InputDeviceType.MidiIn) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-								list.Add(event2);
-								this.detectedDevice.MIDIIN = true;
-							}
-							break;
-
-						case InputDeviceType.Joystick:
-							if (((device.CurrentType == InputDeviceType.Joystick) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-								list.Add(event2);
-								this.detectedDevice.Joypad = true;
-							}
-							break;
-
-						case InputDeviceType.Gamepad:
-							if (((device.CurrentType == InputDeviceType.Gamepad) && (device.ID == stkeyassignArray[i].ID)) && (event2.nKey == stkeyassignArray[i].Code)) {
-								list.Add(event2);
-								this.detectedDevice.Gamepad = true;
-							}
-							break;
-
-						case InputDeviceType.Mouse:
-							if ((device.CurrentType == InputDeviceType.Mouse) && (event2.nKey == stkeyassignArray[i].Code)) {
-								list.Add(event2);
-								this.detectedDevice.Mouse = true;
-							}
-							break;
+					if ((device.CurrentType == stkeyassignArray[i].InputDevice)
+						&& (device.ID == stkeyassignArray[i].ID)
+						&& (event2.nKey == stkeyassignArray[i].Code)
+						) {
+						list.Add(event2);
+						this.detectedDevice[stkeyassignArray[i].InputDevice] = true;
 					}
 				}
 			}
@@ -84,61 +76,21 @@ public class CPad {
 		return list;
 	}
 
-	public bool bPressed(EInstrumentPad part, EPad pad) {
+	public bool HasInput(EInstrumentPad part, EPad pad, Func<IInputDevice?, int, bool> predicate) {
 		if (part == EInstrumentPad.Unknown) {
 			return false;
 		}
 
-		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
-		for (int i = 0; i < stkeyassignArray.Length; i++) {
-			switch (stkeyassignArray[i].InputDevice) {
-				case InputDeviceType.Keyboard:
-					if (!this.inputManager.Keyboard.KeyPressed(stkeyassignArray[i].Code))
-						break;
-
-					this.detectedDevice.Keyboard = true;
-					return true;
-
-				case InputDeviceType.MidiIn: {
-						IInputDevice device2 = this.inputManager.MidiIn(stkeyassignArray[i].ID);
-						if (device2 == null || !device2.KeyPressed(stkeyassignArray[i].Code))
-							break;
-
-						this.detectedDevice.MIDIIN = true;
-						return true;
-					}
-				case InputDeviceType.Joystick: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
-							break;
-
-						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
-						if (device == null || !device.KeyPressed(stkeyassignArray[i].Code))
-							break;
-
-						this.detectedDevice.Joypad = true;
-						return true;
-					}
-				case InputDeviceType.Gamepad: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
-							break;
-
-						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
-						if (device == null || !device.KeyPressed(stkeyassignArray[i].Code))
-							break;
-
-						this.detectedDevice.Gamepad = true;
-						return true;
-					}
-				case InputDeviceType.Mouse:
-					if (!this.inputManager.Mouse.KeyPressed(stkeyassignArray[i].Code))
-						break;
-
-					this.detectedDevice.Mouse = true;
-					return true;
-			}
+		var device = this.rConfigIni.KeyAssign[(int)part][(int)pad].GetDevice(predicate);
+		if (device != null && (device.CurrentType >= 0 && device.CurrentType < InputDeviceType.Total)) {
+			this.detectedDevice[device.CurrentType] = true;
+			return true;
 		}
 		return false;
 	}
+
+	public bool bPressed(EInstrumentPad part, EPad pad)
+		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressed(keyCode) ?? false);
 
 	public bool bPressedDGB(EPad pad) {
 		if (!this.bPressed(EInstrumentPad.Drums, pad) && !this.bPressed(EInstrumentPad.Guitar, pad)) {
@@ -151,54 +103,8 @@ public class CPad {
 		return this.bPressed(EInstrumentPad.Guitar, pad) || this.bPressed(EInstrumentPad.Bass, pad);
 	}
 
-	public bool IsPressing(EInstrumentPad part, EPad pad) {
-		if (part == EInstrumentPad.Unknown) {
-			return false;
-		}
-
-		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
-		for (int i = 0; i < stkeyassignArray.Length; i++) {
-			switch (stkeyassignArray[i].InputDevice) {
-				case InputDeviceType.Keyboard:
-					if (!this.inputManager.Keyboard.KeyPressing(stkeyassignArray[i].Code)) {
-						break;
-					}
-					this.detectedDevice.Keyboard = true;
-					return true;
-
-				case InputDeviceType.Joystick: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
-							break;
-						}
-						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
-						if (device == null || !device.KeyPressing(stkeyassignArray[i].Code)) {
-							break;
-						}
-						this.detectedDevice.Joypad = true;
-						return true;
-					}
-
-				case InputDeviceType.Gamepad: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
-							break;
-						}
-						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
-						if (device == null || !device.KeyPressing(stkeyassignArray[i].Code)) {
-							break;
-						}
-						this.detectedDevice.Gamepad = true;
-						return true;
-					}
-				case InputDeviceType.Mouse:
-					if (!this.inputManager.Mouse.KeyPressing(stkeyassignArray[i].Code)) {
-						break;
-					}
-					this.detectedDevice.Mouse = true;
-					return true;
-			}
-		}
-		return false;
-	}
+	public bool IsPressing(EInstrumentPad part, EPad pad)
+		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressing(keyCode) ?? false);
 
 	public bool IsPressingGB(EPad pad) {
 		return this.IsPressing(EInstrumentPad.Guitar, pad) || this.IsPressing(EInstrumentPad.Bass, pad);

@@ -8,6 +8,11 @@ using FDK.ExtensionMethods;
 namespace OpenTaiko;
 
 internal static class StKeyAssignExtension {
+	public static IInputDevice? GetDevice(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads, Func<IInputDevice?, int, bool> predicate)
+		=> (OpenTaiko.InputManager == null) ? null
+			: pads.Select(pad => (pad, device: OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)))
+				.FirstOrDefault(pd => predicate(pd.device, pd.pad.Code)).device;
+	public static IInputDevice? GetDevice(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads) => pads.GetDevice((device, keyCode) => true);
 	public static bool IsPressed(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads)
 		=> (OpenTaiko.InputManager != null)
 			&& pads.Any(pad => OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)?.KeyPressed(pad.Code) ?? false);
