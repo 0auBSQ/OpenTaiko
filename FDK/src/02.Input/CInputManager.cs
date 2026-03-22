@@ -187,6 +187,34 @@ public class CInputManager : IDisposable {
 			this.bDisposed済み = true;
 		}
 	}
+
+	// stablize device index
+	public void SetID(Dictionary<int, string>[] stableIdToGuid) {
+		foreach (IInputDevice device in this.InputDevices) {
+			if (device.CurrentType is InputDeviceType.Keyboard or InputDeviceType.Mouse)
+				continue; // only support one device
+			var idToGuid = stableIdToGuid[(int)device.CurrentType];
+			if (!idToGuid.ContainsValue(device.GUID)) {
+				int key = 0;
+				while (idToGuid.ContainsKey(key)) {
+					key++;
+				}
+				idToGuid.Add(key, device.GUID);
+			}
+		}
+		foreach (IInputDevice device in this.InputDevices) {
+			if (device.CurrentType is InputDeviceType.Keyboard or InputDeviceType.Mouse)
+				continue; // only support one device
+			var idToGuid = stableIdToGuid[(int)device.CurrentType];
+			foreach (var (id, guid) in idToGuid) {
+				if (device.GUID.Equals(guid)) {
+					device.ID = id;
+					break;
+				}
+			}
+		}
+	}
+
 	~CInputManager() {
 		this.Dispose(false);
 		GC.KeepAlive(this);

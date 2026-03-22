@@ -14,7 +14,6 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 
 	// メソッド
 
-	public void SetID(int nID) => this.ID = nID;
 	public virtual int GetVelocity(int index) => 0;
 	protected virtual void SetVelocity(int index, int velocity) { }
 
@@ -23,7 +22,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public Silk.NET.Input.IInputDevice? Device { get; protected set; }
 	public InputDeviceType CurrentType { get; protected set; }
 	public string GUID { get; protected set; }
-	public int ID { get; protected set; }
+	public int ID { get; set; }
 	public string Name { get; protected set; }
 	public List<STInputEvent> InputEvents { get; protected set; }
 	public string strDeviceName { get; set; }

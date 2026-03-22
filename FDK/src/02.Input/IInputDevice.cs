@@ -17,7 +17,7 @@ public interface IInputDevice : IDisposable {
 		get;
 	}
 	int ID {
-		get;
+		get; set;
 	}
 	string Name {
 		get;

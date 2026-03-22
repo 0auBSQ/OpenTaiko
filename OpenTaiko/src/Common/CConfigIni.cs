@@ -213,8 +213,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public int nWindowBaseYPosition;
 	public int nWindowWidth; // #23510 2010.10.31 yyagi add
 	public int nWindowHeight; // #23510 2010.10.31 yyagi add
-	public Dictionary<int, string> dicJoystick;
-	public Dictionary<int, string> dicGamepad;
+	public Dictionary<int, string>[] StableIdToGuid; // [iDeviceType][iID]
+	public Dictionary<int, string> dicJoystick => StableIdToGuid[(int)InputDeviceType.Joystick];
+	public Dictionary<int, string> dicGamepad => StableIdToGuid[(int)InputDeviceType.Gamepad];
 	public ERandomMode[] eRandom;
 	public CKeyAssign KeyAssign;
 	public int nMsSleepUnfocused; // #23568 2010.11.04 ikanick add
@@ -829,8 +830,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.nHitRangeMs.Good = 75;
 		this.nHitRangeMs.Poor = 108;
 		this.ConfigIniFileName = "";
-		this.dicJoystick = new Dictionary<int, string>(10);
-		this.dicGamepad = new Dictionary<int, string>(10);
+		this.StableIdToGuid = new Dictionary<int, string>[(int)InputDeviceType.Total];
+		for (int i = 0; i < this.StableIdToGuid.Length; ++i)
+			this.StableIdToGuid[i] = new Dictionary<int, string>(10);
 
 		this.sectionProcess = new Dictionary<ESectionType, Action<string, string>>() {
 			{ ESectionType.System, this.ProcessSystemSection },
@@ -1591,12 +1593,19 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		sw.WriteLine("[GUID]");
 		sw.WriteLine();
-		foreach (KeyValuePair<int, string> pair in this.dicJoystick) {
-			sw.WriteLine("JoystickID={0},{1}", pair.Key, pair.Value);
-		}
-
-		foreach (KeyValuePair<int, string> pair in this.dicGamepad) {
-			sw.WriteLine("GamepadID={0},{1}", pair.Key, pair.Value);
+		for (InputDeviceType type = 0; type < InputDeviceType.Total; ++type) {
+			foreach (var (id, guid) in this.StableIdToGuid[(int)type]) {
+				var typename = type switch {
+					// InputDeviceType.Keyboard => "KeyboardID", // only support one device
+					// InputDeviceType.Mouse => "MouseID",
+					InputDeviceType.Joystick => "JoystickID",
+					InputDeviceType.Gamepad => "GamepadID",
+					InputDeviceType.MidiIn => "MidiInID",
+					_ => null,
+				};
+				if (typename != null && CConversion.TryConvertToBase36Char(id, out char base36ID))
+					sw.WriteLine("{0}={1},{2}", typename, base36ID, guid);
+			}
 		}
 
 		#endregion
@@ -2537,14 +2546,16 @@ internal class CConfigIni : INotifyPropertyChanged {
 	}
 
 	private void ProcessGuidSection(string key, string value) {
-		switch (key) {
-			case "JoystickID":
-				this.GetJoystickID(value);
-				break;
-			case "GamepadID":
-				this.GetGamepadID(value);
-				break;
-		}
+		InputDeviceType type = key switch {
+			// "KeyboardID" => InputDeviceType.Keyboard, // only support one device
+			// "MouseID" => InputDeviceType.Mouse,
+			"JoystickID" => InputDeviceType.Joystick,
+			"GamepadID" => InputDeviceType.Gamepad,
+			"MidiInID" => InputDeviceType.MidiIn,
+			_ => InputDeviceType.Unknown,
+		};
+		if (type != InputDeviceType.Unknown)
+			this.GetDeviceID(type, value);
 	}
 
 	private void ProcessDrumKeyAssignmentSection(string key, string value) {
@@ -2795,24 +2806,14 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private bool bConfigIniFileExists;
 	private string ConfigIniFileName;
 
-	private void GetJoystickID(string keyDescription) {
-		string[] strArray = keyDescription.Split(new char[] { ',' });
-		if (strArray.Length < 2 || !int.TryParse(strArray[0], out int result) || result < 0 || result > 9) {
+	private void GetDeviceID(InputDeviceType type, string IdAndGuid) {
+		string[] strArray = IdAndGuid.Split(',', 2);
+		if (strArray.Length < 2 || !CConversion.TryParseBase36Char(strArray[0][0], out int result)) {
 			return;
 		}
 
-		this.dicJoystick.Remove(result);
-		this.dicJoystick.Add(result, strArray[1]);
-	}
-
-	private void GetGamepadID(string keyDescription) {
-		string[] strArray = keyDescription.Split(new char[] { ',' });
-		if (strArray.Length < 2 || !int.TryParse(strArray[0], out int result) || result < 0 || result > 9) {
-			return;
-		}
-
-		this.dicGamepad.Remove(result);
-		this.dicGamepad.Add(result, strArray[1]);
+		this.StableIdToGuid[(int)type].Remove(result);
+		this.StableIdToGuid[(int)type].Add(result, strArray[1]);
 	}
 
 	private void ClearAllKeyAssignments() {
@@ -2861,8 +2862,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 					break;
 			}
 
-			sw.Write("{0}{1}", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".Substring(assign[i].ID, 1),
-				assign[i].Code); // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
+			if (!CConversion.TryConvertToBase36Char(assign[i].ID, out char charID))
+				continue; // cannot save in correct format
+			sw.Write("{0}{1}", charID, assign[i].Code); // #24166 2011.1.15 yyagi: to support ID > 10, change 2nd character from Decimal to 36-numeral system. (e.g. J1023 -> JA23)
 		}
 	}
 
@@ -2903,8 +2905,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				continue;
 			}
 
-			id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".IndexOf(str[1]);
-			if (((id >= 0) && int.TryParse(str.Substring(2), out code)) && ((code >= 0) && (code <= 0xff))) {
+			if (CConversion.TryParseBase36Char(str[1], out id)
+				&& int.TryParse(str.Substring(2), out code) && ((code >= 0) && (code <= 0xff))
+				) {
 				assign[i].InputDevice = eInputDevice;
 				assign[i].ID = id;
 				assign[i].Code = code;
