@@ -21,6 +21,10 @@ class ScriptBGFunc {
 	public void AddGraph(string fileName) {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
+		if (this.Textures.TryGetValue(fileName, out var texToFree)) {
+			this.Textures.Remove(fileName);
+			OpenTaiko.tテクスチャの解放(ref texToFree);
+		}
 		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
 	}
 	public void DrawGraph(double x, double y, string fileName) {
