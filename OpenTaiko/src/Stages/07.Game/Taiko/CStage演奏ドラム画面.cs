@@ -1355,7 +1355,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		int t = (int)SoundManager.PlayTimer.NowTimeMs;
 		//CDTXMania.act文字コンソール.tPrint( 0, 16, C文字コンソール.Eフォント種別.白, t.ToString() );
 
-		this.actBalloon.tDrawKusudama();
+		this.actBalloon.tDrawKusudama(this.actTokkun.bTrainingPAUSE);
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
@@ -1385,7 +1385,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					var rollCount = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaRollCount : chkChip.nRollCount;
 					if (!this.bPAUSE && !this.isRewinding && !NotesManager.IsFuzeRoll(chkChip))
 						chkChip.bShow = false;
-					this.actBalloon.On進行描画(balloon, balloon - rollCount, i, chkChip);
+					this.actBalloon.On進行描画(balloon, balloon - rollCount, i, chkChip, this.actTokkun.bTrainingPAUSE);
 				}
 			}
 			if (msBarRollProgress != this.msCurrentBarRollProgress[i]) {

@@ -64,16 +64,16 @@ internal class CActImplBalloon : CActivity {
 
 	public bool KusudamaIsActive { get; private set; } = false;
 
-	public void tDrawKusudama() {
+	public void tDrawKusudama(bool isTrainingPaused) {
 		if (!OpenTaiko.stageGameScreen.bPAUSE) {
 			KusudamaScript.Update();
 		}
-		if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
+		if (!(OpenTaiko.ConfigIni.bTokkunMode && isTrainingPaused)) {
 			KusudamaScript.Draw();
 		}
 	}
 
-	public int On進行描画(int n連打ノルマ, int n連打数, int player, CChip chip) {
+	public int On進行描画(int n連打ノルマ, int n連打数, int player, CChip chip, bool isTrainingPaused) {
 		this.ct風船ふきだしアニメ.TickLoop();
 		this.ct風船アニメ[player].Tick();
 
@@ -154,7 +154,7 @@ internal class CActImplBalloon : CActivity {
                 if (TJAPlayer3.Tx.Kusudama != null)
                     TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                     */
-				if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
+				if (!(OpenTaiko.ConfigIni.bTokkunMode && isTrainingPaused))
 					this.tKusudamaNumber(n連打数);
 			}
 
