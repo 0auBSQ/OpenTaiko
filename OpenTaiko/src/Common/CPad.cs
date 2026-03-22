@@ -108,6 +108,14 @@ public class CPad {
 	}
 	public void InvalidateInputToPadCache() => inputToPadCacheValid = false;
 
+	public bool IsUsedByPlayer(InputDeviceType device, int id, int key, int iPlayer) {
+		var pads = this.InputToPads(device, id, key);
+		return pads.Any(pad => NotesManager.GetPadPlayer(pad) == iPlayer);
+	}
+
+	internal bool IsUsedByPlayer(ref CConfigIni.CKeyAssign.STKEYASSIGN keyAssign, int iPlayer)
+		=> IsUsedByPlayer(keyAssign.InputDevice, keyAssign.ID, keyAssign.Code, iPlayer);
+
 	#region [ private ]
 	//-----------------
 	private CConfigIni rConfigIni;

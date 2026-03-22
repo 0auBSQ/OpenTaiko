@@ -93,7 +93,7 @@ class CActImplTrainingMode : CActivity {
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0)) {
 				if (this.bTrainingPAUSE) {
 					OpenTaiko.Skin.sound特訓再生音.tPlay();
 					this.tResumePlay();
@@ -200,7 +200,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark.IsPressed())
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0))
 				this.tToggleBookmarkAtTheCurrentPosition();
 
 			if (this.bCurrentlyScrolling) {

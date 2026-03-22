@@ -8,14 +8,22 @@ using FDK.ExtensionMethods;
 namespace OpenTaiko;
 
 internal static class StKeyAssignExtension {
+	private static IInputDevice? GetDevice(this CConfigIni.CKeyAssign.STKEYASSIGN pad)
+		=> OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID);
 	public static IInputDevice? GetDevice(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads, Func<IInputDevice?, int, bool> predicate)
 		=> (OpenTaiko.InputManager == null) ? null
-			: pads.Select(pad => (pad, device: OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)))
+			: pads.Select(pad => (pad, device: pad.GetDevice()))
 				.FirstOrDefault(pd => predicate(pd.device, pd.pad.Code)).device;
 	public static IInputDevice? GetDevice(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads) => pads.GetDevice((device, keyCode) => true);
+
+	private static bool IsPressed(this CConfigIni.CKeyAssign.STKEYASSIGN pad)
+		=> pad.GetDevice()?.KeyPressed(pad.Code) ?? false;
 	public static bool IsPressed(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads)
 		=> (OpenTaiko.InputManager != null)
-			&& pads.Any(pad => OpenTaiko.InputManager.FindDevice(pad.InputDevice, pad.ID)?.KeyPressed(pad.Code) ?? false);
+			&& pads.Any(pad => pad.IsPressed());
+	public static bool IsPressedExcludePlayer(this CConfigIni.CKeyAssign.STKEYASSIGN[] pads, int? iPlayer)
+		=> (OpenTaiko.InputManager != null)
+			&& pads.Any(pad => ((iPlayer == null) || !OpenTaiko.Pad.IsUsedByPlayer(ref pad, iPlayer.Value)) && pad.IsPressed());
 }
 
 internal class CConfigIni : INotifyPropertyChanged {
