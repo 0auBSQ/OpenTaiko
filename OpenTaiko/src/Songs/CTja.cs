@@ -1007,8 +1007,7 @@ internal class CTja : CActivity {
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
 
-				List<STLYRIC> tmplistlyric = new List<STLYRIC>();
-				int BGM番号 = 0;
+				List<STLYRIC> tmplistlyric = new List<STLYRIC>(this.listLyric2);
 
 
 				// Chip post-process:
@@ -1027,17 +1026,16 @@ internal class CTja : CActivity {
 
 								#region[listlyric2の時間合わせ]
 								for (int ind = 0; ind < listLyric2.Count; ind++) {
-									if (listLyric2[ind].index == BGM番号) {
+									// has #NEXTSONG -> skip WAVE: (if exist)
+									bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
+									if (listLyric2[ind].index + (skipWave ? 2 : 1) == chip.n整数値_内部番号) {
 										STLYRIC lyrictmp = this.listLyric2[ind];
 
 										lyrictmp.Time += chip.n発声時刻ms;
 
-										tmplistlyric.Add(lyrictmp);
+										tmplistlyric[ind] = lyrictmp;
 									}
 								}
-
-
-								BGM番号++;
 								#endregion
 								continue;
 							}
@@ -3532,7 +3530,7 @@ internal class CTja : CActivity {
 							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 								if (filePaths[i].EndsWith(".vtt")) {
 									using (VTTParser parser = new VTTParser()) {
-										this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], 0, 0));
+										this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i, 0));
 									}
 									this.bLyrics = true;
 									this.usingLyricsFile = true;
