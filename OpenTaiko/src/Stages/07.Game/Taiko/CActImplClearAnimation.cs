@@ -97,7 +97,6 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public override void Activate() {
-		this.bリザルトボイス再生済み = false;
 		this.Mode = new EndMode[5];
 
 		var origindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.END}");
@@ -146,6 +145,13 @@ internal class CActImplClearAnimation : CActivity {
 			PerfectComboScript = new EndAnimeScript($@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
 		}
 
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			this.soundClear[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
+			this.soundFailed[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
+			this.soundFullCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
+			this.soundPerfectCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
+		}
+
 		this.InitScripts();
 
 		base.Activate();
@@ -182,6 +188,31 @@ internal class CActImplClearAnimation : CActivity {
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i)
 			this.ct進行メイン[i] = null;
 
+		this.soundTowerDropout?.tDispose();
+		this.soundTowerTopPass?.tDispose();
+		this.soundTowerTopFC?.tDispose();
+		this.soundTowerTopPerfect?.tDispose();
+
+		this.soundDanFailed?.tDispose();
+		this.soundDanRedClear?.tDispose();
+		this.soundDanRedFC?.tDispose();
+		this.soundDanRedPerfect?.tDispose();
+		this.soundDanGoldClear?.tDispose();
+		this.soundDanGoldFC?.tDispose();
+		this.soundDanGoldPerfect?.tDispose();
+
+		this.soundAILose?.tDispose();
+		this.soundAIWin?.tDispose();
+		this.soundAIWinFullCombo?.tDispose();
+		this.soundAIWinPerfectCombo?.tDispose();
+
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
+			this.soundClear[i]?.tDispose();
+			this.soundFailed[i]?.tDispose();
+			this.soundFullCombo[i]?.tDispose();
+			this.soundPerfectCombo[i]?.tDispose();
+		}
+
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript.Dispose();
 			Tower_TopReached_PassScript.Dispose();
@@ -210,64 +241,6 @@ internal class CActImplClearAnimation : CActivity {
 		base.DeActivate();
 	}
 
-	public override void CreateManagedResource() {
-		this.b再生済み = false;
-
-		this.soundTowerDropout = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
-		this.soundTowerTopPass = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
-		this.soundTowerTopFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
-		this.soundTowerTopPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
-
-		this.soundDanFailed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanRedClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanRedFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_FullCombo.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanRedPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Perfect.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanGoldClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Pass.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanGoldFC = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_FullCombo.ogg"), ESoundGroup.SoundEffect);
-		this.soundDanGoldPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
-
-		this.soundAILose = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
-		this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
-		this.soundAIWinFullCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
-		this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
-		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
-			this.soundClear[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Clear.ogg"), ESoundGroup.SoundEffect);
-			this.soundFailed[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Failed.ogg"), ESoundGroup.SoundEffect);
-			this.soundFullCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}FullCombo.ogg"), ESoundGroup.SoundEffect);
-			this.soundPerfectCombo[i] = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AllPerfect.ogg"), ESoundGroup.SoundEffect);
-		}
-
-		base.CreateManagedResource();
-	}
-
-	public override void ReleaseManagedResource() {
-		this.soundTowerDropout?.tDispose();
-		this.soundTowerTopPass?.tDispose();
-		this.soundTowerTopFC?.tDispose();
-		this.soundTowerTopPerfect?.tDispose();
-
-		this.soundDanFailed?.tDispose();
-		this.soundDanRedClear?.tDispose();
-		this.soundDanRedFC?.tDispose();
-		this.soundDanRedPerfect?.tDispose();
-		this.soundDanGoldClear?.tDispose();
-		this.soundDanGoldFC?.tDispose();
-		this.soundDanGoldPerfect?.tDispose();
-
-		this.soundAILose?.tDispose();
-		this.soundAIWin?.tDispose();
-		this.soundAIWinFullCombo?.tDispose();
-		this.soundAIWinPerfectCombo?.tDispose();
-
-		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
-			this.soundClear[i]?.tDispose();
-			this.soundFailed[i]?.tDispose();
-			this.soundFullCombo[i]?.tDispose();
-			this.soundPerfectCombo[i]?.tDispose();
-		}
-
-		base.ReleaseManagedResource();
-	}
 
 	public override int Draw() {
 		if (base.IsFirstDraw) {
@@ -363,10 +336,6 @@ internal class CActImplClearAnimation : CActivity {
 	public EndAnimeScript Dan_Gold_FullComboScript { get; private set; }
 	public EndAnimeScript Dan_Gold_PerfectScript { get; private set; }
 
-
-
-	bool b再生済み;
-	bool bリザルトボイス再生済み;
 	bool[] bSoundPlayed = new bool[OpenTaiko.MAX_PLAYERS];
 	CCounter[] ct進行メイン = new CCounter[OpenTaiko.MAX_PLAYERS];
 
@@ -424,7 +393,9 @@ internal class CActImplClearAnimation : CActivity {
 		Dan_Red_Perfect,
 		Dan_Gold_Pass,
 		Dan_Gold_FullCombo,
-		Dan_Gold_Perfect
+		Dan_Gold_Perfect,
+
+		Total,
 	}
 
 	//-----------------
