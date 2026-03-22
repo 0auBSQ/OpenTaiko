@@ -735,7 +735,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
 
-		for (EPad nPad = 0; nPad < EPad.Max; nPad++) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
+		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
@@ -746,26 +746,20 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				continue; // skip input
 			}
 
-			List<STInputEvent> listInputEvent = OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums, nPad);
-			if ((listInputEvent == null) || (listInputEvent.Count == 0))
-				continue;
-
 			this.t入力メソッド記憶(EInstrumentPad.Drums);
 
-			foreach (STInputEvent inputEvent in listInputEvent) {
-				if (!inputEvent.Pressed)
-					continue;
+			if (!inputEvent.Pressed)
+				continue;
 
-				// convert input time (mixer space) to note time
-				CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
-				long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
-				long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
+			// convert input time (mixer space) to note time
+			CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
+			long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
+			long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
 
-				EPad nPadAs1P = NotesManager.PadTo1P(nPad);
-				// Register to replay file
-				OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
-				this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
-			}
+			EPad nPadAs1P = NotesManager.PadTo1P(nPad);
+			// Register to replay file
+			OpenTaiko.ReplayInstances[nUsePlayer]?.tRegisterInput(msHitTjaTime, (byte)nPadAs1P);
+			this.ProcessPadInput(nUsePlayer, nPadAs1P, msHitTjaTime);
 		}
 	}
 

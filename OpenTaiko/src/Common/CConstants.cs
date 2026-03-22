@@ -242,6 +242,7 @@ public enum EInstrumentPad      // ここを修正するときは、セットで
 	Guitar = 1,
 	Bass = 2,
 	Taiko = 3,
+	Total,
 	Unknown = 99
 }
 public enum EKeyConfigPart  // : E楽器パート

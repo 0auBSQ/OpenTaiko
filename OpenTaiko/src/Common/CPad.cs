@@ -51,10 +51,9 @@ public class CPad {
 	}
 
 	// Methods
-	public List<STInputEvent> GetEvents(EInstrumentPad part, EPad pad) {
-		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
-		List<STInputEvent> list = new List<STInputEvent>();
-
+	public List<(EPad pad, STInputEvent inputEvent, int order)> GetEvents(EInstrumentPad part) {
+		var stkeyassignArray = this.rConfigIni.KeyAssign[(int)part];
+		List<(EPad pad, STInputEvent inputEvent, int order)> list = new();
 		// すべての入力デバイスについて…
 		foreach (IInputDevice device in this.inputManager.InputDevices) {
 			if (device.InputEvents == null || device.InputEvents.Count == 0) {
@@ -62,15 +61,12 @@ public class CPad {
 			}
 
 			foreach (STInputEvent event2 in device.InputEvents) {
-				for (int i = 0; i < stkeyassignArray.Length; i++) {
-					if ((device.CurrentType == stkeyassignArray[i].InputDevice)
-						&& (device.ID == stkeyassignArray[i].ID)
-						&& (event2.nKey == stkeyassignArray[i].Code)
-						) {
-						list.Add(event2);
-						this.detectedDevice[stkeyassignArray[i].InputDevice] = true;
-					}
-				}
+				var pads = this.InputToPads(device.CurrentType, device.ID, event2.nKey);
+				if (pads.Count <= 0)
+					continue;
+				this.detectedDevice[device.CurrentType] = true;
+				foreach (EPad pad in pads)
+					list.Add((pad, event2, list.Count));
 			}
 		}
 		return list;
@@ -109,11 +105,43 @@ public class CPad {
 	public bool IsPressingGB(EPad pad) {
 		return this.IsPressing(EInstrumentPad.Guitar, pad) || this.IsPressing(EInstrumentPad.Bass, pad);
 	}
+	public void InvalidateInputToPadCache() => inputToPadCacheValid = false;
 
 	#region [ private ]
 	//-----------------
 	private CConfigIni rConfigIni;
 	private CInputManager inputManager;
+
+	private readonly Dictionary<(InputDeviceType type, int id, int key), SortedSet<EPad>> inputToPadCache = new();
+	private bool inputToPadCacheValid = false;
+
+	private SortedSet<EPad> InputToPads(InputDeviceType type, int id, int key) {
+		var cacheKey = (type, id, key);
+		if (!this.inputToPadCacheValid)
+			this.RebuildInputToPadCache();
+		if (this.inputToPadCache.TryGetValue(cacheKey, out var res))
+			return res;
+		return [];
+	}
+
+	private void RebuildInputToPadCache() {
+		this.inputToPadCache.Clear();
+		for (EInstrumentPad part = 0; part < EInstrumentPad.Total; ++part) {
+			for (EPad pad = 0; pad < EPad.Max; ++pad) {
+				var keyAssigns = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+				for (int i = 0; i < keyAssigns.Length; ++i) {
+					if (keyAssigns[i].InputDevice == InputDeviceType.Unknown)
+						continue;
+					var cacheKey = (keyAssigns[i].InputDevice, keyAssigns[i].ID, keyAssigns[i].Code);
+					if (!this.inputToPadCache.TryGetValue(cacheKey, out var pads)) {
+						pads = [];
+						this.inputToPadCache.Add(cacheKey, pads);
+					}
+					pads.Add(pad);
+				}
+			}
+		}
+	}
 	//-----------------
 	#endregion
 }

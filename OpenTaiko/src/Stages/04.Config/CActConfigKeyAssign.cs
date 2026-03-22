@@ -37,6 +37,7 @@ internal class CActConfigKeyAssign : CActivity {
 						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].InputDevice = this.structReset用KeyAssign[i].InputDevice;
 						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].ID = this.structReset用KeyAssign[i].ID;
 						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].Code = this.structReset用KeyAssign[i].Code;
+						OpenTaiko.Pad.InvalidateInputToPadCache();
 					}
 					return;
 
@@ -95,6 +96,7 @@ internal class CActConfigKeyAssign : CActivity {
 					this.bキー入力待ち = false;
 					OpenTaiko.InputManager.Polling();
 				} else if ((this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn()) || (this.tキーチェックとアサイン_Joypad() || tキーチェックとアサイン_Gamepad() || this.tキーチェックとアサイン_Mouse())) {
+					OpenTaiko.Pad.InvalidateInputToPadCache();
 					this.bキー入力待ち = false;
 					OpenTaiko.InputManager.Polling();
 				}
@@ -103,6 +105,7 @@ internal class CActConfigKeyAssign : CActivity {
 				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Unknown;
 				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
 				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = 0;
+				OpenTaiko.Pad.InvalidateInputToPadCache();
 			}
 			if (OpenTaiko.Tx.Menu_Highlight != null) {
 				int num = OpenTaiko.Skin.Config_KeyAssign_Move;

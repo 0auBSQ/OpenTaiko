@@ -222,7 +222,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public Dictionary<int, string> dicJoystick => StableIdToGuid[(int)InputDeviceType.Joystick];
 	public Dictionary<int, string> dicGamepad => StableIdToGuid[(int)InputDeviceType.Gamepad];
 	public ERandomMode[] eRandom;
+
+	/// <summary>
+	/// Notice: Call OpenTaiko.Pad.InvalidateInputToPadCache() after any value is changed.
+	/// </summary>
 	public CKeyAssign KeyAssign;
+
 	public int nMsSleepUnfocused; // #23568 2010.11.04 ikanick add
 	public int nMsSleepPerFrame; // #xxxxx 2011.11.27 yyagi add
 	public int nSongSpeed;
@@ -2918,6 +2923,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				assign[i].Code = code;
 			}
 		}
+		OpenTaiko.Pad?.InvalidateInputToPadCache();
 	}
 
 	private void SetDefaultKeyAssignments() {
