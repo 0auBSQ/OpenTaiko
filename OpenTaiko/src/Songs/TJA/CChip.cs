@@ -21,6 +21,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
 	public ECourse nBranch;
+	public int idxDefine = -1;
 	public int idxBranchSection;
 	public int nSenote;
 	public int nRollCount;
@@ -329,38 +330,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
 
 	public int CompareTo(CChip other) {
-		// まずは位置で比較。
-
-		//BGMチップだけ発声位置
-		//if( this.nチャンネル番号 == 0x01 || this.nチャンネル番号 == 0x02 )
-		//{
-		//    if( this.n発声位置 < other.n発声位置 )
-		//        return -1;
-
-		//    if( this.n発声位置 > other.n発声位置 )
-		//        return 1;
-		//}
-
-		//if( this.n発声位置 < other.n発声位置 )
-		//    return -1;
-
-		//if( this.n発声位置 > other.n発声位置 )
-		//    return 1;
-
 		//譜面解析メソッドV4では発声時刻msで比較する。
-		var n発声時刻msCompareToResult = 0;
-		n発声時刻msCompareToResult = this.n発声時刻ms.CompareTo(other.n発声時刻ms);
-		if (n発声時刻msCompareToResult != 0) {
-			return n発声時刻msCompareToResult;
-		}
-
-		n発声時刻msCompareToResult = this.db発声時刻ms.CompareTo(other.db発声時刻ms);
-		if (n発声時刻msCompareToResult != 0) {
-			return n発声時刻msCompareToResult;
-		}
-
 		// 位置が同じなら優先度で比較。
-		return n優先度[this.nChannelNo].CompareTo(n優先度[other.nChannelNo]);
+		return (this.n発声時刻ms, this.db発声時刻ms, n優先度[this.nChannelNo], this.idxDefine)
+			.CompareTo((other.n発声時刻ms, other.db発声時刻ms, n優先度[other.nChannelNo], other.idxDefine));
 	}
 	//-----------------
 	#endregion

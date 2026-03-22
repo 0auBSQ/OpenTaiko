@@ -365,6 +365,7 @@ internal class CTja : CActivity {
 
 	public List<SKBitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
 	public List<STLYRIC> listLyric2;
+	public List<int> IdxLyric2AtSongEnds;
 
 	//public Dictionary<double, CChip> kusudaMAP = new Dictionary<double, CChip>();
 
@@ -994,7 +995,7 @@ internal class CTja : CActivity {
 				}
 				#endregion
 				if (this.listChip.Count > 0) {
-					this.listChip = this.listChip.OrderBy(x => x).ToList();
+					this.listChip.Sort();
 					// 高速化のためにはこれを削りたいが、listChipの最後がn発声位置の終端である必要があるので、
 					// 保守性確保を優先してここでのソートは残しておく
 					// なお、093時点では、このソートを削除しても動作するようにはしてある。
@@ -1002,12 +1003,12 @@ internal class CTja : CActivity {
 					// これにより、数ms程度ながらここでのソートも高速化されている。
 				}
 				if (this.listBRANCH.Count > 0) {
-					this.listBRANCH = this.listBRANCH.OrderBy(x => x).ToList();
+					this.listBRANCH.Sort();
 				}
 				#region [ 発声時刻の計算 ]
 				double bpm = this.BASEBPM;
 
-				List<STLYRIC> tmplistlyric = new List<STLYRIC>(this.listLyric2);
+				long[] origListLyricTime = this.listLyric2.Select(x => x.Time).ToArray();
 
 
 				// Chip post-process:
@@ -1025,16 +1026,15 @@ internal class CTja : CActivity {
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 
 								#region[listlyric2の時間合わせ]
-								for (int ind = 0; ind < listLyric2.Count; ind++) {
-									// has #NEXTSONG -> skip WAVE: (if exist)
-									bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
-									if (listLyric2[ind].index + (skipWave ? 2 : 1) == chip.n整数値_内部番号) {
-										STLYRIC lyrictmp = this.listLyric2[ind];
-
-										lyrictmp.Time += chip.n発声時刻ms;
-
-										tmplistlyric[ind] = lyrictmp;
-									}
+								// has #NEXTSONG -> skip WAVE: (if exist)
+								bool skipWave = (this.strBGM_PATH != null) && (List_DanSongs.Count > 0);
+								int lyricFileIndex = chip.n整数値_内部番号 - (skipWave ? 2 : 1);
+								int idxStart = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex - 1);
+								int idxEnd = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex);
+								for (int ind = idxStart; ind < idxEnd; ind++) {
+									STLYRIC lyrictmp = this.listLyric2[ind];
+									lyrictmp.Time = origListLyricTime[ind] + chip.n発声時刻ms;
+									this.listLyric2[ind] = lyrictmp;
 								}
 								#endregion
 								continue;
@@ -1201,8 +1201,7 @@ internal class CTja : CActivity {
 				#endregion
 
 				#region[listlyricを時間順に並び替え。]
-				this.listLyric2 = tmplistlyric;
-				this.listLyric2 = this.listLyric2.OrderBy(x => x.Time).ToList();
+				this.listLyric2.Sort((lhs, rhs) => (lhs.Time, lhs.index).CompareTo((rhs.Time, rhs.index)));
 				#endregion
 
 				this.nBGMAdjust = 0;
@@ -2020,6 +2019,7 @@ internal class CTja : CActivity {
 			var JudgeChipTime = this.GetBranchJudgeChipTime(e条件 == EBranchConditionType.Drumroll);
 
 			var chip = new CChip();
+			chip.idxDefine = this.listChip.Count;
 			chip.nChannelNo = 0xDE;
 			chip.n発声時刻ms = (int)JudgeChipTime.msTime;
 			chip.n発声位置 = JudgeChipTime.th384MeasurePos;
@@ -2826,6 +2826,7 @@ internal class CTja : CActivity {
 			eGameType = this.nowGameType,
 			IsEndedBranching = this.IsEndedBranching,
 			nBranch = branch ?? this.n現在のコース,
+			idxDefine = this.listChip.Count,
 			idxBranchSection = this.listBRANCH.Count,
 			n発声位置 = (this.n現在の小節数 * 384),
 			dbBPM = this.dbNowBPM,
@@ -3530,15 +3531,16 @@ internal class CTja : CActivity {
 							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 								if (filePaths[i].EndsWith(".vtt")) {
 									using (VTTParser parser = new VTTParser()) {
-										this.listLyric2.AddRange(parser.ParseVTTFile(filePaths[i], i, 0));
+										parser.ParseVTTFile(this.listLyric2, filePaths[i], 0);
 									}
-									this.bLyrics = true;
-									this.usingLyricsFile = true;
 								} else if (filePaths[i].EndsWith(".lrc")) {
-									this.LyricFileParser(filePaths[i], i);
-									this.bLyrics = true;
-									this.usingLyricsFile = true;
+									this.LyricFileParser(this.listLyric2, filePaths[i]);
+								} else {
+									continue;
 								}
+								this.IdxLyric2AtSongEnds.Add(this.listLyric2.Count);
+								this.bLyrics = true;
+								this.usingLyricsFile = true;
 							}
 						} catch (Exception e) {
 							this.AddWarn($"{strCommandName}: Something went wrong while parsing a lyric file at {filePaths[i]}: {e.Message}", e);
@@ -3590,7 +3592,7 @@ internal class CTja : CActivity {
 	/// 自力で作ったので、うまくパースしてくれないかも
 	/// </summary>
 	/// <param name="strFilePath">lrcファイルのパス</param>
-	private void LyricFileParser(string strFilePath, int ordnumber)//lrcファイルのパース用
+	private void LyricFileParser(List<STLYRIC> lrclist, string strFilePath)//lrcファイルのパース用
 	{
 		string str = CJudgeTextEncoding.ReadTextFile(strFilePath);
 		Regex timeRegex = new Regex(@"^(\[)(\d{2})(:)(\d{2})([:.])(\d{2})(\])", RegexOptions.Multiline | RegexOptions.Compiled);
@@ -3622,8 +3624,8 @@ internal class CTja : CActivity {
 						stlrc.Text = line;
 						stlrc.TextTex = this.pf歌詞フォント.DrawText(line, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30);
 						stlrc.Time = list[listindex];
-						stlrc.index = ordnumber;
-						this.listLyric2.Add(stlrc);
+						stlrc.index = lrclist.Count;
+						lrclist.Add(stlrc);
 					}
 				}
 			}
@@ -3977,10 +3979,12 @@ internal class CTja : CActivity {
 			}
 		}
 
-		listChip.AddRange(listAddMixerChannel);
-		listChip.AddRange(listRemoveMixerChannel);
-		listChip.AddRange(listRemoveTiming);
-		listChip = listChip.OrderBy(x => x).ToList();
+		this.listChip.EnsureCapacity(this.listChip.Count + listAddMixerChannel.Count + listRemoveMixerChannel.Count + listRemoveTiming.Count);
+		foreach (var chip in listAddMixerChannel.Concat(listRemoveMixerChannel).Concat(listRemoveTiming)) {
+			chip.idxDefine = this.listChip.Count;
+			this.listChip.Add(chip);
+		}
+		listChip.Sort();
 	}
 	private void DebugOut_CChipList(List<CChip> c) {
 		for (int i = 0; i < c.Count; i++) {
@@ -4059,6 +4063,7 @@ internal class CTja : CActivity {
 		this.divsPerMeasureAllBranches = new List<int>();
 		this.listLyric = new List<SKBitmap>();
 		this.listLyric2 = new List<STLYRIC>();
+		this.IdxLyric2AtSongEnds = new();
 		this.List_DanSongs = new List<DanSongs>();
 		this.listObj = new Dictionary<string, CSongObject>();
 		this.listTextures = new Dictionary<string, CTexture>();
@@ -4097,6 +4102,7 @@ internal class CTja : CActivity {
 
 		this.listLyric?.Clear();
 		this.listLyric2?.Clear();
+		this.IdxLyric2AtSongEnds.Clear();
 
 		if (this.listObj != null) {
 			foreach (KeyValuePair<string, CSongObject> pair in this.listObj) {
