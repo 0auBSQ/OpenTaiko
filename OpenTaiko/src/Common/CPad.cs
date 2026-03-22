@@ -69,6 +69,7 @@ public class CPad {
 					list.Add((pad, event2, list.Count));
 			}
 		}
+		list.Sort((lhs, rhs) => (lhs.inputEvent.nTimeStamp, lhs.order).CompareTo((rhs.inputEvent.nTimeStamp, rhs.order)));
 		return list;
 	}
 
