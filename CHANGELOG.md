@@ -1,5 +1,64 @@
 # Changelog
 
+## [0.6.0.100] - 2026-03-22 (Beta)
+
+- [Fix] Refine gameplay time point and fix related issues (after climbed to tower top in tower mode, 2 seconds after last note, 1 second after `#END`, 0 seconds after music ends)
+- [Fix] Stop aligning branch end (except at end of song) in TJAP3 or OOS compatibility mode
+- [Fix] Prevent branch judge point before last measure (or `#NEXTSONG`, or 4 beats before chart start)
+- [Fix] Every player now has individual lives in Kanpeki mode
+- [Enhancement] Make mid-song fail animation play per player, and stop chart right when all players have failed [WARNING: skinners might need to update `<skin>/Graphics/5_Game/9_End/ClearFailed/Script.lua`]
+- [Enhancement] Missing end-of-play animation/sounds now fallbacks to red-pass (for Dan-i mode) or regular chart's animation/sounds
+- [Fix] Non-keyboard devices could not use some menus due to `CKeyAssign.KeyIsPressed()` could only detect keyboard inputs (0auBSQ/OpenTaiko#908)
+- [Feat] Reimplement MIDI input using managed-midi, using TJAPlayer3-f's implementation as reference (0auBSQ/OpenTaiko#612)
+- [Enhancement] Remember up to 36 (from 10) input devices per device type (Keyboard and Mouse remain not remembered)
+- [Fix] Ensure gameplay inputs are processed in event timestamp order
+- [Fix] In training mode, prevent pausing or (un)set bookmark during playing when the keybind is also player's game input (0auBSQ/OpenTaiko#903)
+- [Fix] Prevent wrong judgement window due to wrongly using "actual player index"
+- [Fix] Autoplay could only properly hit 1 note per frame, could miss when game lags, and could not handle multi-hit note misses properly
+- [Fix] Displayed score became less than real score when exceeding 256 score increases in a frame
+- [Fix] Played song speed was old one when first playing after adjusting song speed in training mode
+- [Fix] Crashes on selecting undefined difficulties (`LEVEL` before `COURSE`), again
+- [Fix] Towers with missing or negative `LIFE:` immediately failed player while having 5 lives (unless using Pause -> Retry)
+- [Fix] Kanpeki fail in tower chart at top floor could be judged as pass
+- [Fix] Disable Kanpeki mode in training mode
+- [Fix] Adlib and bomb were neither hit by autoplay nor missed and broke Dan-i condition monitoring
+- [Fix] Bomb and fuze roll did not trigger hard gauges and Kanpeki mode failure
+- [Fix] Tight (notelock) mode did not give BAD for empty hits since 0.6.0.93
+- [Fix] Lyrics from `#LYRICS` appeared at wrong time in Dan-i mode
+- [Fix] Make TJA `LYRICFILE:` alias of `LYRICS:`
+- [Fix] Warn and ignore bad characters from TJA note data, for handling ill-formed comment (ignore if not digit nor letter)
+- [Fix] `box.def` parsing trimmed too many characters for values and allow omitting of colon (`:`)
+- [Fix] Calling `AddGraph()` in BG Lua Script twice with same filepath caused exception
+- [Fix] All BG Lua script errors are now logged and shown on screen
+- [Fix] Force big note firework for balloon's flying note
+- [Fix] AI battle section progression bar was negative before chart start
+- [Fix] Bad note position precision for extremely big/small SCROLL combined with small/big BPM values
+- [Fix] Clearing fuzeroll lacked character animation
+- [Fix] Roll redness fading out speed depended on framerate
+- [Fix] Notes and bar lines now continue at end of song and stop when failed in tower/Dan-i/Kanpeki failure, instead of simply disappearing
+- [Fix] Balloon's and fuze's remaining pop count was semi-transparent after non-balloon roll count fading out
+- [Fix] Revert `#DIRECTION` behavior to TJAP3 (keep vertical scrolling of non-real `#SCROLL`), accidentally changed in v0.6.0.56
+- [Fix] Characters now play clear-out + miss-down animation when failed mid-song
+- [Fix] Bugs related to song end or mid-song failure animation
+- [Fix] Wrong character animation played when finishing tower
+- [Fix] Draw pop select menu on top, above fading in/out
+- [Fix] Opened Kusudama is now shown when pause menu is open
+- [Optimize] Minor optimizing for note-count-heavy charts:
+- [Optimize] Pre-build name-to-index lookup dictionary for puchi charas
+- [Optimize] Cache double-to-integer converted chip time
+- [Optimize] Only update `chip.nLag` when the note is actually judged
+- [Optimize] Make `enum NoteType` values same as channelNo to reduce conversions
+- [Optimize] Skip chip post processing of TJA parsing if is for song enumeration
+- [Optimize] Make `listBPM` an actual List instead of a Dictionary (due to legacy DTX parsing)
+- [Optimize] Only query all input devices for gameplay once instead of `EPad.Max` (38) times
+- [Optimize] Replace `OrderBy()` with in-place sort stabilized by index to eliminate temporary list
+- [Optimize] song-end animation could load twice or unused sound resources by only (un)loading at (De)`Activate()`
+- [Chore] Extract and use `NotesManager.GetChipGameType()`
+- [Chore] Remove unused fields in `CChip`
+- [Chore] Simplify input device querying
+- [Chore] Merge `enum EInputDevice` into FDK's `enum InputDeviceType`
+- [Chore] Simplify key assignment defining and accessing
+
 ## [0.6.0.99] - 2026-02-13 (Beta)
 
 - [Chore] Change the unlock conditions for Assimilation
