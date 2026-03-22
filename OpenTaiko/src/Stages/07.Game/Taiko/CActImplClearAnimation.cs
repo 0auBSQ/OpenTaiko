@@ -104,16 +104,9 @@ internal class CActImplClearAnimation : CActivity {
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript = new EndAnimeScript($@"{origindir}Tower_Dropout{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			Tower_DropoutScript.Init();
-
 			Tower_TopReached_PassScript = new EndAnimeScript($@"{origindir}Tower_TopReached_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_PassScript.Init();
-
 			Tower_TopReached_FullComboScript = new EndAnimeScript($@"{origindir}Tower_TopReached_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_FullComboScript.Init();
-
 			Tower_TopReached_PerfectScript = new EndAnimeScript($@"{origindir}Tower_TopReached_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_PerfectScript.Init();
 
 			this.soundTowerDropout = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
 			this.soundTowerTopPass = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
@@ -121,25 +114,12 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundTowerTopPerfect = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			Dan_FailScript = new EndAnimeScript($@"{origindir}Dan_Fail{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			Dan_FailScript.Init();
-
 			Dan_Red_PassScript = new EndAnimeScript($@"{origindir}Dan_Red_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_PassScript.Init();
-
 			Dan_Red_FullComboScript = new EndAnimeScript($@"{origindir}Dan_Red_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_FullComboScript.Init();
-
 			Dan_Red_PerfectScript = new EndAnimeScript($@"{origindir}Dan_Red_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_PerfectScript.Init();
-
 			Dan_Gold_PassScript = new EndAnimeScript($@"{origindir}Dan_Gold_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_PassScript.Init();
-
 			Dan_Gold_FullComboScript = new EndAnimeScript($@"{origindir}Dan_Gold_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_FullComboScript.Init();
-
 			Dan_Gold_PerfectScript = new EndAnimeScript($@"{origindir}Dan_Gold_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_PerfectScript.Init();
 
 			this.soundDanFailed = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
 			this.soundDanRedClear = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
@@ -151,16 +131,9 @@ internal class CActImplClearAnimation : CActivity {
 
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			AILoseScript = new EndAnimeScript($@"{origindir}AI_Lose{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			AILoseScript.Init();
-
 			AIWinScript = new EndAnimeScript($@"{origindir}AI_Win{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			AIWinScript.Init();
-
 			AIWin_FullComboScript = new EndAnimeScript($@"{origindir}AI_Win_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			AIWin_FullComboScript.Init();
-
 			AIWin_PerfectScript = new EndAnimeScript($@"{origindir}AI_Win_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			AIWin_PerfectScript.Init();
 
 			this.soundAILose = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWin = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
@@ -168,20 +141,41 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundAIWinPerfectCombo = OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
 		} else {
 			FailedScript = new EndAnimeScript($@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");//ClearFailed
-			FailedScript.Init();
-
 			ClearScript = new EndAnimeScript($@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			ClearScript.Init();
-
 			FullComboScript = new EndAnimeScript($@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			FullComboScript.Init();
-
 			PerfectComboScript = new EndAnimeScript($@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			PerfectComboScript.Init();
 		}
 
+		this.InitScripts();
 
 		base.Activate();
+	}
+
+	public void InitScripts() {
+		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			Tower_DropoutScript.Init();
+			Tower_TopReached_PassScript.Init();
+			Tower_TopReached_FullComboScript.Init();
+			Tower_TopReached_PerfectScript.Init();
+		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			Dan_FailScript.Init();
+			Dan_Red_PassScript.Init();
+			Dan_Red_FullComboScript.Init();
+			Dan_Red_PerfectScript.Init();
+			Dan_Gold_PassScript.Init();
+			Dan_Gold_FullComboScript.Init();
+			Dan_Gold_PerfectScript.Init();
+		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {;
+			AILoseScript.Init();
+			AIWinScript.Init();
+			AIWin_FullComboScript.Init();
+			AIWin_PerfectScript.Init();
+		} else {
+			FailedScript.Init();
+			ClearScript.Init();
+			FullComboScript.Init();
+			PerfectComboScript.Init();
+		}
 	}
 
 	public override void DeActivate() {

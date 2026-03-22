@@ -19,8 +19,8 @@ local textureCount = 1
 local frameRate = 24
 
 function playEndAnime(player)
-    animeCounter = { 0, 0, 0, 0, 0 }
-    nowFrame = { 0, 0, 0, 0, 0 }
+    animeCounter[player + 1] = 0
+    nowFrame[player + 1] = 0
 end
 
 function init()

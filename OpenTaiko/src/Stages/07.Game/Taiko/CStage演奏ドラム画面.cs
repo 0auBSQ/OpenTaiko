@@ -220,6 +220,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					actBackground.ClearIn(i);
 				}
 			}
+
+			// reset failure status if recorded
+			this.actEnd.InitScripts();
 		}
 
 		if (b演奏状態) {
