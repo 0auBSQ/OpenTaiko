@@ -450,7 +450,7 @@ internal class CStage結果 : CStage {
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					int diff = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
-					int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[diff].譜面情報.nレベル[diff];
+					int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[diff]?.譜面情報.nレベル[diff] ?? -1;
 
 					diffModifier = Math.Max(1, Math.Min(3, diff));
 

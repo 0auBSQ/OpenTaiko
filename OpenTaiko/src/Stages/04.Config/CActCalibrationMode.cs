@@ -77,7 +77,7 @@ internal class CActCalibrationMode : CActivity {
 			Stop();
 
 			return 0;
-		} else if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Cancel) ||
+		} else if (OpenTaiko.ConfigIni.KeyAssign.System.Cancel.IsPressed() ||
 				   OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 			Stop();

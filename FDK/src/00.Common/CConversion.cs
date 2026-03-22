@@ -73,98 +73,85 @@ public class CConversion {
 		return num;
 	}
 
-	public static int HexStringToInt(string strNum) {
-		if (strNum.Length < 2)
-			return -1;
-
-		int digit2 = HexChars.IndexOf(strNum[0]);
-		if (digit2 < 0)
-			return -1;
-
-		if (digit2 >= 16)
-			digit2 -= (16 - 10);        // A,B,C... -> 1,2,3...
-
-		int digit1 = HexChars.IndexOf(strNum[1]);
-		if (digit1 < 0)
-			return -1;
-
-		if (digit1 >= 16)
-			digit1 -= (16 - 10);
-
-		return digit2 * 16 + digit1;
+	private static bool TryParseHexChar(char num, out int digit) {
+		digit = HexChars.IndexOf(num);
+		if (digit < 0)
+			return false;
+		// treat lower case as upper case
+		if (digit >= 0x10)
+			digit -= (0x10 - 10);
+		return true;
 	}
 
-	public static int Base36StringToInt(string strNum) {
-		if (strNum.Length < 2)
-			return -1;
-
-		int digit2 = Base36Chars.IndexOf(strNum[0]);
-		if (digit2 < 0)
-			return -1;
-
-		if (digit2 >= 36)
-			digit2 -= (36 - 10);        // A,B,C... -> 1,2,3...
-
-		int digit1 = Base36Chars.IndexOf(strNum[1]);
-		if (digit1 < 0)
-			return -1;
-
-		if (digit1 >= 36)
-			digit1 -= (36 - 10);
-
-		return digit2 * 36 + digit1;
+	public static bool TryParseBase36Char(char num, out int digit) {
+		digit = Base36Chars.IndexOf(num);
+		if (digit < 0)
+			return false;
+		// treat lower case as upper case
+		if (digit >= 36)
+			digit -= (36 - 10);
+		return true;
 	}
 
-	public static int ParseSectionNumber(string strNum) {
-		if (strNum.Length >= 3) {
-			int digit3 = Base36Chars.IndexOf(strNum[0]);
-			if (digit3 < 0)
-				return -1;
+	public static int HexStringToInt(string strNum) =>
+		(strNum.Length >= 2
+			&& TryParseHexChar(strNum[0], out int digit2)
+			&& TryParseHexChar(strNum[1], out int digit1)
+		) ? digit2 * 0x10 + digit1
+		: -1;
 
-			if (digit3 >= 36)                                   // 3桁目は36進数
-				digit3 -= (36 - 10);
+	public static int Base36StringToInt(string strNum) =>
+		(strNum.Length >= 2
+			&& TryParseBase36Char(strNum[0], out int digit2)
+			&& TryParseBase36Char(strNum[1], out int digit1)
+		) ? digit2 * 36 + digit1
+		: -1;
 
-			int digit2 = HexChars.IndexOf(strNum[1]);  // 2桁目は10進数
-			if ((digit2 < 0) || (digit2 > 9))
-				return -1;
+	public static int ParseSectionNumber(string strNum) =>
+		(strNum.Length >= 3
+			&& TryParseBase36Char(strNum[0], out int digit3)
+			&& TryParseHexChar(strNum[1], out int digit2)
+			&& TryParseHexChar(strNum[2], out int digit1)
+		) ? digit3 * 100 + digit2 * 10 + digit1
+		: -1;
 
-			int digit1 = HexChars.IndexOf(strNum[2]);  // 1桁目も10進数
-			if ((digit1 >= 0) && (digit1 <= 9))
-				return digit3 * 100 + digit2 * 10 + digit1;
+	public static bool TryConvertToHexChar(int num, out char digit) {
+		if (num >= 0 && num < 0x10) {
+			digit = HexChars[num];
+			return true;
 		}
-		return -1;
+		digit = '\0';
+		return false;
 	}
 
-	public static string SectionNumberToString(int num) {
-		if ((num < 0) || (num >= 3600)) // 3600 == Z99 + 1
-			return "000";
-
-		int digit4 = num / 100;
-		int digit2 = (num % 100) / 10;
-		int digit1 = (num % 100) % 10;
-		char ch3 = Base36Chars[digit4];
-		char ch2 = HexChars[digit2];
-		char ch1 = HexChars[digit1];
-		return (ch3.ToString() + ch2.ToString() + ch1.ToString());
+	public static bool TryConvertToBase36Char(int num, out char digit) {
+		if (num >= 0 && num < 36) {
+			digit = Base36Chars[num];
+			return true;
+		}
+		digit = '\0';
+		return false;
 	}
 
-	public static string IntToHexString(int num) {
-		if ((num < 0) || (num >= 0x100))
-			return "00";
+	public static string SectionNumberToString(int num) =>
+		(TryConvertToBase36Char(num / 100, out char ch3)
+			&& TryConvertToHexChar((num % 100) / 10, out char ch2)
+			&& TryConvertToHexChar((num % 100) % 10, out char ch1)
+		) ? (ch3.ToString() + ch2.ToString() + ch1.ToString())
+		: "000";
 
-		char ch2 = HexChars[num / 0x10];
-		char ch1 = HexChars[num % 0x10];
-		return (ch2.ToString() + ch1.ToString());
-	}
+	public static string IntToHexString(int num) =>
+		(TryConvertToHexChar(num / 0x10, out char ch2)
+			&& TryConvertToHexChar(num % 0x10, out char ch1)
+		) ? (ch2.ToString() + ch1.ToString())
+		: "00";
 
-	public static string IntToBase36String(int num) {
-		if ((num < 0) || (num >= 36 * 36))
-			return "00";
 
-		char ch2 = Base36Chars[num / 36];
-		char ch1 = Base36Chars[num % 36];
-		return (ch2.ToString() + ch1.ToString());
-	}
+	public static string IntToBase36String(int num) =>
+		(TryConvertToBase36Char(num / 36, out char ch2)
+			&& TryConvertToBase36Char(num % 36, out char ch1)
+		) ? (ch2.ToString() + ch1.ToString())
+		: "00";
 
 	public static int[] StringToIntArray(string str) {
 		//0,1,2 ...の形式で書かれたstringをint配列に変換する。

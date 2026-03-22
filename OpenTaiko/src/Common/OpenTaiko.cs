@@ -1254,7 +1254,7 @@ internal class OpenTaiko : Game {
 				}
 			}
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.System.Capture.IsPressed()) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
 					if (rCurrentStage.eStageID != CStage.EStage.Game) {
@@ -1669,40 +1669,7 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
-			foreach (IInputDevice device in InputManager.InputDevices) {
-				if ((device.CurrentType == InputDeviceType.Joystick) && !ConfigIni.dicJoystick.ContainsValue(device.GUID)) {
-					int key = 0;
-					while (ConfigIni.dicJoystick.ContainsKey(key)) {
-						key++;
-					}
-					ConfigIni.dicJoystick.Add(key, device.GUID);
-				} else if ((device.CurrentType == InputDeviceType.Gamepad) && !ConfigIni.dicGamepad.ContainsValue(device.GUID)) {
-					int key = 0;
-					while (ConfigIni.dicGamepad.ContainsKey(key)) {
-						key++;
-					}
-					ConfigIni.dicGamepad.Add(key, device.GUID);
-				}
-			}
-			foreach (IInputDevice device2 in InputManager.InputDevices) {
-				if (device2.CurrentType == InputDeviceType.Joystick) {
-					foreach (KeyValuePair<int, string> pair in ConfigIni.dicJoystick) {
-						if (device2.GUID.Equals(pair.Value)) {
-							((CInputJoystick)device2).SetID(pair.Key);
-							break;
-						}
-					}
-					continue;
-				} else if (device2.CurrentType == InputDeviceType.Gamepad) {
-					foreach (KeyValuePair<int, string> pair in ConfigIni.dicGamepad) {
-						if (device2.GUID.Equals(pair.Value)) {
-							((CInputGamepad)device2).SetID(pair.Key);
-							break;
-						}
-					}
-					continue;
-				}
-			}
+			InputManager.SetID(ConfigIni.StableIdToGuid);
 			Trace.TraceInformation("DirectInput has been initialized.");
 		} catch (Exception exception2) {
 			Trace.TraceError("DirectInput and MIDI input failed to initialize.");

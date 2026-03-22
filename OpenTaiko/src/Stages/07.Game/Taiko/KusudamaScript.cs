@@ -27,6 +27,7 @@ internal class KusudamaScript : ScriptBG {
 		try {
 			LuaKusuIn.Call();
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 
@@ -35,6 +36,7 @@ internal class KusudamaScript : ScriptBG {
 		try {
 			LuaKusuBroke.Call();
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 
@@ -43,6 +45,7 @@ internal class KusudamaScript : ScriptBG {
 		try {
 			LuaKusuMiss.Call();
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 }

@@ -19,21 +19,30 @@ local textureCount = 32
 local frameRate = 24
 
 local allfailed = false
+local failed = { false, false, false, false, false }
 
 local templateMoyai_y = -1080
 
 function playEndAnime(player)
-    animeCounter = { 0, 0, 0, 0, 0 }
-    nowFrame = { 0, 0, 0, 0, 0 }
-    
-    if player == 0 then
-        allfailed = true
-    elseif isClear[player] then
-        allfailed = false
+    animeCounter[player + 1] = 0
+    nowFrame[player + 1] = 0
+    templateMoyai_y = -1080
+
+    -- must failed if reach here
+    failed[player + 1] = true
+    allfailed = true
+    for i = 1, 5 do
+        if not failed[i] then
+            allfailed = false
+            break
+        end
     end
 end
 
 function init()
+    -- reset for properly tracking all-failed status
+    allfailed = false
+    failed = { false, false, false, false, false }
 
     if playerCount <= 2 then
         y = { 216, 480, 0, 0, 0 }
@@ -58,7 +67,13 @@ function update(player)
 
     nowFrame[player + 1] = slideInFrame[player + 1] + fallFrame[player + 1]
 
-    if animeCounter[player + 1] > 1.1 and player == 0 then
+    -- only descend if all-failed
+    if player == 0 then
+        for i = 1, 5 do
+            if not (animeCounter[i] > 1.1) then
+                return
+            end
+        end
         templateMoyai_y = math.min(templateMoyai_y + (deltaTime * 5120), 0)
     end
 

@@ -94,7 +94,6 @@ internal class CActImplScore : CAct演奏スコア共通 {
 						}
 
 						if (!stScore[i].bAddEnd) {
-							this.nCurrentlyDisplayedScore[this.stScore[i].nPlayer] += (long)this.stScore[i].nAddScore;
 							stScore[i].bAddEnd = true;
 							if (ct点数アニメタイマ[stScore[i].nPlayer].IsUnEnded) {
 								this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);

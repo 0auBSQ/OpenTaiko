@@ -55,19 +55,25 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		get;
 		private set;
 	}
-	public int nRiskyTimes                      // 残Miss回数
+	public int[] nRiskyTimes                    // 残Miss回数
 	{
 		get;
 		private set;
+	} = new int [OpenTaiko.MAX_PLAYERS];
+	public bool IsFailed() {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
+			if (!IsFailed(i))
+				return false;
+		return true;
 	}
-	public bool IsFailed(EInstrumentPad part)   // 閉店状態になったかどうか
+	public bool IsFailed(int iPlayer)   // 閉店状態になったかどうか
 	{
 		if (bRisky) {
-			return (nRiskyTimes <= 0);
+			return (nRiskyTimes[iPlayer] <= 0);
 		}
-		return this.db現在のゲージ値[(int)part] <= GAUGE_MIN;
+		return this.db現在のゲージ値[iPlayer] <= GAUGE_MIN;
 	}
-	public bool IsDanger(EInstrumentPad part)   // DANGERかどうか
+	public bool IsDanger(int iPlayer)   // DANGERかどうか
 	{
 		if (bRisky) {
 			switch (nRiskyTimes_Initial) {
@@ -75,12 +81,12 @@ internal class CAct演奏ゲージ共通 : CActivity {
 					return false;
 				case 2:
 				case 3:
-					return (nRiskyTimes <= 1);
+					return (nRiskyTimes[iPlayer] <= 1);
 				default:
-					return (nRiskyTimes <= 2);
+					return (nRiskyTimes[iPlayer] <= 2);
 			}
 		}
-		return (this.db現在のゲージ値[(int)part] <= GAUGE_DANGER);
+		return (this.db現在のゲージ値[iPlayer] <= GAUGE_DANGER);
 	}
 
 	/// <summary>
@@ -108,7 +114,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 		if (nRiskyTimes_InitialVal > 0) {
 			this.bRisky = true;
-			this.nRiskyTimes = OpenTaiko.ConfigIni.nRisky;
+			this.nRiskyTimes[nPlayer] = OpenTaiko.ConfigIni.nRisky;
 			this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
 		}
 
@@ -253,10 +259,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 	public void MineDamage(int nPlayer) {
 		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.BombDamage);
-	}
-
-	public void FuseDamage(int nPlayer) {
-		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.FuserollDamage);
+		if (this.bRisky)
+			this.nRiskyTimes[nPlayer]--;
 	}
 
 	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
@@ -290,7 +294,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 					}
 
 					if (this.bRisky) {
-						this.nRiskyTimes--;
+						this.nRiskyTimes[nPlayer]--;
 					}
 				}
 

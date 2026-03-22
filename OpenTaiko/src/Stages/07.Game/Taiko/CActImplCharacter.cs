@@ -656,23 +656,24 @@ internal class CActImplCharacter : CActivity {
 			return;
 		}
 
-		if (OpenTaiko.stageGameScreen.bIsGOGOTIME[player] && OpenTaiko.Skin.Characters_GoGoTime_Ptn[this.iCurrentCharacter[player]] != 0) {
+		bool isStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(player);
+		if (!isStageFailed && OpenTaiko.stageGameScreen.bIsGOGOTIME[player] && OpenTaiko.Skin.Characters_GoGoTime_Ptn[this.iCurrentCharacter[player]] != 0) {
 			if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_GoGoTime_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
 				ChangeAnime(player, Anime.GoGoTime_Maxed, resetCounter);
 			} else {
 				ChangeAnime(player, Anime.GoGoTime, resetCounter);
 			}
 		} else {
-			if (OpenTaiko.stageGameScreen.bIsMiss[player] && OpenTaiko.Skin.Characters_Normal_Missed_Ptn[this.iCurrentCharacter[player]] != 0) {
-				if (OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6 && OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[this.iCurrentCharacter[player]] != 0) {
+			if (isStageFailed && OpenTaiko.stageGameScreen.bIsMiss[player] && OpenTaiko.Skin.Characters_Normal_Missed_Ptn[this.iCurrentCharacter[player]] != 0) {
+				if (isStageFailed || OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6 && OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[this.iCurrentCharacter[player]] != 0) {
 					ChangeAnime(player, Anime.MissDown, resetCounter);
 				} else {
 					ChangeAnime(player, Anime.Miss, resetCounter);
 				}
 			} else {
-				if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_Normal_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
+				if (!isStageFailed && OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_Normal_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
 					ChangeAnime(player, Anime.Maxed, resetCounter);
-				} else if (OpenTaiko.stageGameScreen.bIsAlreadyCleared[player] && OpenTaiko.Skin.Characters_Normal_Cleared_Ptn[this.iCurrentCharacter[player]] != 0) {
+				} else if (!isStageFailed && OpenTaiko.stageGameScreen.bIsAlreadyCleared[player] && OpenTaiko.Skin.Characters_Normal_Cleared_Ptn[this.iCurrentCharacter[player]] != 0) {
 					ChangeAnime(player, Anime.Cleared, resetCounter);
 				} else if (OpenTaiko.Skin.Characters_Normal_Ptn[this.iCurrentCharacter[player]] != 0) {
 					ChangeAnime(player, Anime.Normal, resetCounter);

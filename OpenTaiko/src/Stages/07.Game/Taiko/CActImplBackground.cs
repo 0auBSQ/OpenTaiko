@@ -233,8 +233,13 @@ internal class CActImplBackground : CActivity {
 
 					#region [Floor number]
 
-					if (CFloorManagement.CurrentNumberOfLives > 0)
+					if (CFloorManagement.CurrentNumberOfLives > 0) {
 						CFloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
+						if (!(OpenTaiko.stageGameScreen.IsChartEnded(0) || OpenTaiko.stageGameScreen.IsFinishedPlaying(0))) {
+							if (CFloorManagement.LastRegisteredFloor >= maxFloor)
+								CFloorManagement.LastRegisteredFloor = maxFloor - 1;
+						}
+					}
 
 					string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
 
@@ -270,12 +275,6 @@ internal class CActImplBackground : CActivity {
 					#endregion
 
 					#region [Life number]
-
-					if (CFloorManagement.MaxNumberOfLives <= 0) {
-						CFloorManagement.MaxNumberOfLives = 5;
-						CFloorManagement.CurrentNumberOfLives = 5;
-					}
-
 					string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
 
 					len = lifeStr.Length;
@@ -416,7 +415,7 @@ internal class CActImplBackground : CActivity {
 
 			bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 
-			bool stageEnded = OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_EndStage || OpenTaiko.stageGameScreen.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut || CFloorManagement.CurrentNumberOfLives == 0;
+			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || CFloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
 				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
@@ -540,6 +539,8 @@ internal class CActImplBackground : CActivity {
 
 		return base.Draw();
 	}
+
+	public bool IsFinishedTowerClimbing() => ctClimbDuration?.IsEnded ?? true;
 
 	#region[ private ]
 	//-----------------

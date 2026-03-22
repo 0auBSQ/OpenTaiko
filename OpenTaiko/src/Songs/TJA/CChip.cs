@@ -21,9 +21,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double dbSCROLL;
 	public double dbSCROLL_Y;
 	public ECourse nBranch;
+	public int idxDefine = -1;
 	public int idxBranchSection;
 	public int nSenote;
-	public int nState;
 	public int nRollCount;
 	public int nBalloon;
 	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
@@ -47,19 +47,16 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
-	public int n発声時刻ms { get => (int)db発声時刻ms; set => db発声時刻ms = value; }
+	private int _n発声時刻ms;
+	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
 	public double n分岐時刻ms;
 
 
 	public double db発声時刻ms;
 	public int nノーツ出現時刻ms;
 	public int nノーツ移動開始時刻ms;
-	public int n分岐回数;
 	public int nLag;                // 2011.2.1 yyagi
-	public double db発声時刻;
-	public double dbProcess_Time;
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
-	public int nListPosition;
 	public bool IsFixedSENote;
 	public bool IsHitted = false;
 	public bool IsMissed = false;
@@ -177,7 +174,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.n発声時刻ms = 0;
 		this.db発声時刻ms = 0.0D;
 		this.fBMSCROLLTime = 0;
-		this.nLag = -999;
+		this.nLag = int.MinValue;
 		this.b演奏終了後も再生が続くチップである = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
@@ -333,38 +330,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
 
 	public int CompareTo(CChip other) {
-		// まずは位置で比較。
-
-		//BGMチップだけ発声位置
-		//if( this.nチャンネル番号 == 0x01 || this.nチャンネル番号 == 0x02 )
-		//{
-		//    if( this.n発声位置 < other.n発声位置 )
-		//        return -1;
-
-		//    if( this.n発声位置 > other.n発声位置 )
-		//        return 1;
-		//}
-
-		//if( this.n発声位置 < other.n発声位置 )
-		//    return -1;
-
-		//if( this.n発声位置 > other.n発声位置 )
-		//    return 1;
-
 		//譜面解析メソッドV4では発声時刻msで比較する。
-		var n発声時刻msCompareToResult = 0;
-		n発声時刻msCompareToResult = this.n発声時刻ms.CompareTo(other.n発声時刻ms);
-		if (n発声時刻msCompareToResult != 0) {
-			return n発声時刻msCompareToResult;
-		}
-
-		n発声時刻msCompareToResult = this.db発声時刻ms.CompareTo(other.db発声時刻ms);
-		if (n発声時刻msCompareToResult != 0) {
-			return n発声時刻msCompareToResult;
-		}
-
 		// 位置が同じなら優先度で比較。
-		return n優先度[this.nChannelNo].CompareTo(n優先度[other.nChannelNo]);
+		return (this.n発声時刻ms, this.db発声時刻ms, n優先度[this.nChannelNo], this.idxDefine)
+			.CompareTo((other.n発声時刻ms, other.db発声時刻ms, n優先度[other.nChannelNo], other.idxDefine));
 	}
 	//-----------------
 	#endregion

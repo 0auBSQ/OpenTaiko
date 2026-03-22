@@ -8,25 +8,25 @@ class NotesManager {
 
 	#region [Parsing]
 
-	public enum ENoteType {
-		Empty = 0,
-		Don = 1, Po = 1,
-		Ka = 2, Pa = 2,
-		DonBig = 3, Double = 3,
-		KaBig = 4, Clap = 4,
-		Roll = 5, RollPo = 5,
-		RollBig = 6, RollDouble = 6,
-		Balloon = 7,
-		EndRoll = 8,
-		BalloonEx = 9,
-		DonHand = 0xA, DoubleHand = 0xA,
-		KaHand = 0xB, ClapHand = 0xB,
-		Bomb = 0xC,
-		BalloonFuze = 0xD,
-		Adlib = 0xF,
-		Kadon = 0xF1,
-		RollClap = 0x10,
-		RollPa = 0x11,
+	public enum ENoteType { // same value as channelNo
+		Empty = 0x0,
+		Don = 0x11, Po = 0x11,
+		Ka = 0x12, Pa = 0x12,
+		DonBig = 0x13, Double = 0x13,
+		KaBig = 0x14, Clap = 0x14,
+		Roll = 0x15, RollPo = 0x15,
+		RollBig = 0x16, RollDouble = 0x16,
+		Balloon = 0x17,
+		EndRoll = 0x18,
+		BalloonEx = 0x19,
+		DonHand = 0x1A, DoubleHand = 0x1A,
+		KaHand = 0x1B, ClapHand = 0x1B,
+		Bomb = 0x1C,
+		BalloonFuze = 0x1D,
+		Adlib = 0x1F,
+		Kadon = 0x101,
+		RollClap = 0x20,
+		RollPa = 0x21,
 		Unknown = -1,
 	}
 
@@ -59,32 +59,52 @@ class NotesManager {
 	public static ENoteType GetNoteType(string chr)
 		=> CharToNoteType.GetValueOrDefault(chr, ENoteType.Unknown);
 	public static ENoteType GetNoteType(int channelNo)
-		=> Enum.IsDefined((ENoteType)(channelNo - 0x10)) ? (ENoteType)(channelNo - 0x10) : ENoteType.Unknown;
+		=> (ENoteType)channelNo;
 	public static ENoteType GetNoteType(CChip? chip)
-		=> (chip != null) ? GetNoteType(chip.nChannelNo) : ENoteType.Unknown;
+		=> (chip != null) ? (ENoteType)chip.nChannelNo : ENoteType.Unknown;
 
 	public static string? ToNoteChar(ENoteType nt)
 		=> NoteTypeToChar.GetValueOrDefault(nt);
-	public static int ToChannelNo(ENoteType nt) => 0x10 + (int)nt;
+	public static int ToChannelNo(ENoteType nt) => (int)nt;
 
-	public static int GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+	public static double GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll) {
 			scroll = 1.0;
 		}
-		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
-		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
-		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
-		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
+		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+		return PxFromN4BeatsX(n4Beats);
 	}
 
-	public static int GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
+	public static double PxFromN4BeatsX(double n4Beats) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		return n4Beats * pxPer4Beats * screenScale;
+	}
+
+	public static double N4BeatsFromPxX(double px) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
+		return px / pxPer4Beats / screenScale;
+	}
+
+	public static double GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
 			return 0;
 		}
+		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+		return PxFromN4BeatsY(n4Beats);
+	}
+
+	public static double PxFromN4BeatsY(double n4Beats) {
 		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
 		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
-		double n4Beats = getN4Beats(msDTime, th16DBeat, bpm, eScrollMode);
-		return (int)(n4Beats * pxPer4Beats * scroll * screenScale);
+		return n4Beats * pxPer4Beats * screenScale;
+	}
+
+	public static double N4BeatsFromPxY(double px) {
+		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
+		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
+		return px * pxPer4Beats * screenScale;
 	}
 
 	public static double getN4Beats(double msDTime, double th16DBeat, double bpm, EScrollMode eScrollMode)
@@ -178,6 +198,8 @@ class NotesManager {
 		return false;
 	}
 
+	public static EGameType GetChipGameType(CChip pChip, int nPlayer)
+		=> pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
 	#endregion
 
 	#region [General]
@@ -259,6 +281,13 @@ class NotesManager {
 	#region [Displayables]
 
 	public static int PxSplitLaneDistance => OpenTaiko.Skin.Game_Notes_Size[1] / 3;
+	public static int NoteTextureColumnFast(ENoteType nt) => (int)nt - 0x10;
+	public static int NoteTextureColumn(ENoteType nt, EGameType _gt)
+		=> IsSmallBlue(nt, _gt) ? 2
+			: (IsBigDonTaiko(nt, _gt) || IsPinkKonga(nt, _gt)) ? 3
+			: (IsBigKaTaiko(nt, _gt) || IsClapKonga(nt, _gt)) ? 4
+			: IsBalloon(nt) ? 11
+			: 1;
 
 	// Flying notes
 	public static ENoteType GetFlyNoteType(ENoteType nt, EGameType gt, bool isBigInput = false) => nt switch {
@@ -275,7 +304,7 @@ class NotesManager {
 			case ENoteType.Ka:
 			case ENoteType.DonBig:
 			case ENoteType.KaBig:
-				OpenTaiko.Tx.Notes[(int)gt]?.t2D中心基準描画(x, y, new Rectangle((int)Lane * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Notes[(int)gt]?.t2D中心基準描画(x, y, new Rectangle(NoteTextureColumnFast(Lane) * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
 			case ENoteType.Kadon:
 				OpenTaiko.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
@@ -292,15 +321,9 @@ class NotesManager {
 			length = OpenTaiko.Skin.Game_Notes_Size[0];
 		}
 
-		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = GetChipGameType(chip, player);
 
-		int noteType = 1;
-		if (IsSmallBlue(chip, _gt)) noteType = 2;
-		else if (IsBigDonTaiko(chip, _gt) || IsPinkKonga(chip, _gt)) noteType = 3;
-		else if (IsBigKaTaiko(chip, _gt) || IsClapKonga(chip, _gt)) noteType = 4;
-		else if (IsBalloon(chip)) noteType = 11;
-
-		else if (IsMine(chip)) {
+		if (IsMine(chip)) {
 			OpenTaiko.Tx.Note_Mine?.t2D描画(x, y);
 			return;
 		} else if (IsPurpleNoteTaiko(chip, _gt)) {
@@ -318,13 +341,14 @@ class NotesManager {
 			return;
 		}
 
+		int noteType = NoteTextureColumn(chip, _gt);
 		OpenTaiko.Tx.Notes[(int)_gt]?.t2D描画(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 	}
 
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
 		Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
-		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = GetChipGameType(chip, player);
 
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
 			return;
@@ -409,7 +433,7 @@ class NotesManager {
 		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
 			return;
 
-		EGameType _gt = chip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(player)];
+		EGameType _gt = GetChipGameType(chip, player);
 
 		if (IsMine(chip)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));

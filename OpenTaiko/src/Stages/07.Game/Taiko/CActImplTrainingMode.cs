@@ -93,7 +93,7 @@ class CActImplTrainingMode : CActivity {
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0)) {
 				if (this.bTrainingPAUSE) {
 					OpenTaiko.Skin.sound特訓再生音.tPlay();
 					this.tResumePlay();
@@ -102,7 +102,7 @@ class CActImplTrainingMode : CActivity {
 					this.tPausePlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure += OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure > this.nMeasureCount)
@@ -112,7 +112,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure -= OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure <= 0)
@@ -122,7 +122,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure++;
@@ -143,7 +143,7 @@ class CActImplTrainingMode : CActivity {
 
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure--;
@@ -164,7 +164,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (OpenTaiko.ConfigIni.nSongSpeed > 6) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed - 2;
@@ -172,7 +172,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (OpenTaiko.ConfigIni.nSongSpeed < 399) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed + 2;
@@ -180,7 +180,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure = 1;
@@ -190,7 +190,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure = this.nMeasureCount;
@@ -200,7 +200,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark))
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0))
 				this.tToggleBookmarkAtTheCurrentPosition();
 
 			if (this.bCurrentlyScrolling) {

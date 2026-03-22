@@ -25,12 +25,8 @@ class PuchiChara : CActivity {
 
 	public static int tGetPuchiCharaIndexByName(int p) {
 		var _pc = OpenTaiko.SaveFileInstances[p].data.PuchiChara;
-		var _pcs = OpenTaiko.Skin.Puchicharas_Name;
-		int puriChar = 0;
-		if (_pcs.Contains(_pc))
-			puriChar = _pcs.ToList().IndexOf(_pc);
-
-		return puriChar;
+		var _pcs = OpenTaiko.Skin.Puchicharas_NameToIndex;
+		return _pcs.GetValueOrDefault(_pc, 0);
 	}
 
 	public void ChangeBPM(double secPerBeat) {

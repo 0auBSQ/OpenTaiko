@@ -79,10 +79,6 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 	//	base.tDeativatePopupMenu();
 	//}
 
-	public override void t進行描画sub() {
-
-	}
-
 	public override void tEnter押下Main(int nSortOrder) {
 		switch (n現在の選択行) {
 			case (int)EOrder.ScrollSpeed:

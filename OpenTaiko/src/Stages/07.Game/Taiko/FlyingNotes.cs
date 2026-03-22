@@ -12,7 +12,7 @@ internal class FlyingNotes : CActivity {
 
 
 	// メソッド
-	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, bool isBalloon = false) {
+	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer, bool? forceFirework = null) {
 		if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode || nLane is NotesManager.ENoteType.Empty or NotesManager.ENoteType.Unknown)
 			return;
 
@@ -29,7 +29,7 @@ internal class FlyingNotes : CActivity {
 					Flying[i].StartPointX = StartPointX[nPlayer];
 					Flying[i].StartPointY = OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer];
 					Flying[i].OldValue = 0;
-					Flying[i].IsRoll = isBalloon;
+					Flying[i].ForceFirework = forceFirework; // for balloons; no firework for big roll in some style (not followed)
 					// 角度の決定
 					Flying[i].Height = Math.Abs(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[nPlayer] - OpenTaiko.Skin.Game_Effect_FlyingNotes_StartPoint_Y[nPlayer]);
 					Flying[i].Width = (Math.Abs((OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[nPlayer] - StartPointX[nPlayer])) / 2);
@@ -125,8 +125,8 @@ internal class FlyingNotes : CActivity {
 						} else {
 						}
 
-						if (n % OpenTaiko.Skin.Game_Effect_FireWorks_Timing == 0 && !Flying[i].IsRoll && Flying[i].Counter.CurrentValue > 18) {
-							if (NotesManager.IsBigNoteTaiko(Flying[i].Lane, Flying[i].GameType)) {
+						if (n % OpenTaiko.Skin.Game_Effect_FireWorks_Timing == 0 && Flying[i].Counter.CurrentValue > 18) {
+							if (Flying[i].ForceFirework ?? NotesManager.IsBigNoteTaiko(Flying[i].Lane, Flying[i].GameType)) {
 								OpenTaiko.stageGameScreen.FireWorks.Start(Flying[i].Lane, Flying[i].GameType, Flying[i].Player, Flying[i].X, Flying[i].Y);
 							}
 						}
@@ -171,7 +171,7 @@ internal class FlyingNotes : CActivity {
 		public int Width;
 		public double IncreaseX;
 		public double IncreaseY;
-		public bool IsRoll;
+		public bool? ForceFirework;
 		public int StartPointX;
 		public int StartPointY;
 		public double Theta;

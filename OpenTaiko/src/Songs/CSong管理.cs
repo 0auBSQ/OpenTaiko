@@ -187,7 +187,7 @@ internal class CSongs管理 {
 
 						this.n検索された曲ノード数++;
 					} else {
-						CTja dtx = new CTja(filePath, false, 0, 0);
+						CTja dtx = new CTja(filePath);
 						CSongListNode c曲リストノード = new CSongListNode();
 						c曲リストノード.nodeType = CSongListNode.ENodeType.SCORE;
 

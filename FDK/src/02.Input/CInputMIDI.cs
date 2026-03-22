@@ -1,104 +1,74 @@
-﻿namespace FDK;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
+using Commons.Music.Midi;
 
-public class CInputMIDI : IInputDevice, IDisposable {
+namespace FDK;
+
+public class CInputMIDI : CInputButtonsBase, IInputDevice, IDisposable {
 	// Properties
 
-	public IntPtr MidiInPtr;
 	public List<STInputEvent> EventBuffers;
+	protected int[] velocities;
+
+	public override int GetVelocity(int index) => velocities[index];
+	protected override void SetVelocity(int index, int velocity) => velocities[index] = velocity;
 
 	// Constructor
 
-	public CInputMIDI(uint nID) {
-		this.Device = null;
-		this.MidiInPtr = IntPtr.Zero;
-		this.EventBuffers = new List<STInputEvent>(32);
-		this.InputEvents = [];
+	public CInputMIDI(IMidiInput midiIn, int index) : base(128) {
+		this.DeviceMidi = midiIn;
 		this.CurrentType = InputDeviceType.MidiIn;
-		this.GUID = "";
-		this.ID = (int)nID;
-		this.Name = "";
-		this.strDeviceName = "";    // CInput管理で初期化する
+		this.GUID = midiIn.Details.Id;
+		this.ID = index;
+		this.Name = midiIn.Details.Name;
+		this.velocities = new int[this.ButtonStates.Length];
+
+		midiIn.MessageReceived += MidiIn_MessageReceived;
 	}
 
 
 	// メソッド
 
-	public void tメッセージからMIDI信号のみ受信(uint wMsg, IntPtr dwInstance, IntPtr dwParam1, IntPtr dwParam2, long n受信システム時刻) {
-		/*
-		if (wMsg == CWin32.MIM_DATA)
-		{
-			int nMIDIevent = (int)dwParam1 & 0xF0;
-			int nPara1 = ((int)dwParam1 >> 8) & 0xFF;
-			int nPara2 = ((int)dwParam1 >> 16) & 0xFF;
-			int nPara3 = ((int)dwParam2 >> 8) & 0xFF;
-			int nPara4 = ((int)dwParam2 >> 16) & 0xFF;
-
-			// Trace.TraceInformation( "MIDIevent={0:X2} para1={1:X2} para2={2:X2}", nMIDIevent, nPara1, nPara2 ,nPara3,nPara4);
-
-			if ((nMIDIevent == 0x90) && (nPara2 != 0))      // Note ON
-			{
-				STInputEvent item = new STInputEvent();
-				item.nKey = nPara1;
-				item.b押された = true;
-				item.nTimeStamp = n受信システム時刻;
-				item.nVelocity = nPara2;
-				this.listEventBuffer.Add(item);
+	private void MidiIn_MessageReceived(object? sender, MidiReceivedEventArgs? ev) {
+		try {
+			foreach (var msg in MidiEvent.Convert(ev!.Data, ev.Start, ev.Length)) {
+				// ignore channel for now
+				switch (msg.EventType) {
+					case MidiEvent.NoteOn:
+						if (msg.Lsb > 0) {
+							this.ButtonUp(msg.Msb); // in case of missing note off or from another channel
+							this.ButtonDown(msg.Msb, msg.Lsb);
+							break;
+						}
+						goto case MidiEvent.NoteOff;
+					case MidiEvent.NoteOff:
+						this.ButtonUp(msg.Msb);
+						break;
+				}
 			}
-			//else if ( ( nMIDIevent == 0xB0 ) && ( nPara1 == 4 ) )	// Ctrl Chg #04: Foot Controller
-			//{
-			//	STInputEvent item = new STInputEvent();
-			//	item.nKey = nPara1;
-			//	item.b押された = true;
-			//	item.nTimeStamp = n受信システム時刻;
-			//	item.nVelocity = nPara2;
-			//	this.listEventBuffer.Add( item );
-			//}
+		} catch (Exception e) {
+			Trace.TraceError(e.ToString());
 		}
-		*/
 	}
+
+	public static readonly ImmutableArray<string> KeyNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+	public static string GetButtonName(int index) => $"{KeyNames[index % 12]}{index / 12 - 1}[{index}]";
 
 	#region [ IInputDevice 実装 ]
 	//-----------------
-	public Silk.NET.Input.IInputDevice Device { get; private set; }
-	public InputDeviceType CurrentType { get; private set; }
-	public string GUID { get; private set; }
-	public int ID { get; private set; }
-	public string Name { get; private set; }
-	public List<STInputEvent> InputEvents { get; private set; }
-	public string strDeviceName { get; set; }
-	public bool useBufferInput { get; set; }
+	public object DeviceGeneric { get => DeviceMidi; }
+	public IMidiInput DeviceMidi { get; private set; }
 
-	public void Polling() {
-		// always buffered input
-		// this.list入力イベント = new List<STInputEvent>( 32 );
-		this.InputEvents.Clear();                                // #xxxxx 2012.6.11 yyagi; To optimize, I removed new();
-		(this.InputEvents, this.EventBuffers) = (this.EventBuffers, this.InputEvents); // swap buffer
-	}
-	public bool KeyPressed(int nKey) {
-		foreach (STInputEvent event2 in this.InputEvents) {
-			if ((event2.nKey == nKey) && event2.Pressed) {
-				return true;
-			}
-		}
-		return false;
-	}
-	public bool KeyPressing(int nKey) {
-		return false;
-	}
-	public bool KeyReleased(int nKey) {
-		return false;
-	}
-	public bool KeyReleasing(int nKey) {
-		return false;
-	}
 	//-----------------
 	#endregion
 
 	#region [ IDisposable 実装 ]
 	//-----------------
-	public void Dispose() {
-		this.EventBuffers.Clear();
-		this.InputEvents.Clear();
+	public override void Dispose() {
+		if (!this.IsDisposed) {
+			this.DeviceMidi?.Dispose();
+			base.Dispose();
+		}
 	}
 	//-----------------
 	#endregion
