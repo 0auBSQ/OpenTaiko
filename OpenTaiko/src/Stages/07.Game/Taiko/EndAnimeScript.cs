@@ -28,6 +28,7 @@ class EndAnimeScript : ScriptBG {
 		try {
 			LuaPlayEndAnime.Call(player);
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 
@@ -50,8 +51,7 @@ class EndAnimeScript : ScriptBG {
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
 			if (!OpenTaiko.stageGameScreen.bPAUSE) LuaUpdate.Call(player);
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			this.Crash(ex);
 		}
 	}
 	public new void Draw(int player) {
@@ -59,8 +59,7 @@ class EndAnimeScript : ScriptBG {
 		try {
 			LuaDraw.Call(player);
 		} catch (Exception ex) {
-			LuaScript.Dispose();
-			LuaScript = null;
+			this.Crash(ex);
 		}
 	}
 }

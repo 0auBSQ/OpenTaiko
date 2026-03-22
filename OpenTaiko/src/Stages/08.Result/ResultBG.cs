@@ -21,6 +21,7 @@ class ResultBG : ScriptBG {
 		try {
 			LuaSkipAnimation.Call();
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 }

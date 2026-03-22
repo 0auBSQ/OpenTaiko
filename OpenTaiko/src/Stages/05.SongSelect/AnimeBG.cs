@@ -19,6 +19,7 @@ internal class AnimeBG : ScriptBG {
 		try {
 			LuaPlayAnimation.Call();
 		} catch (Exception ex) {
+			this.Crash(ex);
 		}
 	}
 }
