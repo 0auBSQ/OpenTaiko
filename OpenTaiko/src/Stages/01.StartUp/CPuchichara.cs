@@ -13,8 +13,8 @@ class CPuchichara {
 	public CUnlockCondition? unlock;
 	public string _path;
 
-	public float GetEffectCoinMultiplier()
-		=> effect.GetCoinMultiplier(HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity));
+	public float GetEffectCoinMultiplier(bool allPurpleEnabled = true, bool autorollEnabled = true, bool showAdlibEnabled = true, bool splitLaneEnabled = true)
+		=> effect.GetCoinMultiplier(HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity), allPurpleEnabled, autorollEnabled, showAdlibEnabled, splitLaneEnabled);
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
 		int player = OpenTaiko.GetActualPlayer(_player);

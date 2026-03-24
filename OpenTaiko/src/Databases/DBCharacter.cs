@@ -10,8 +10,8 @@ class DBCharacter {
 			FuseRollFactor = 0;
 		}
 
-		public float GetCoinMultiplier(float multRarity) {
-			if (!OpenTaiko.ConfigIni.bForceNormalGauge)
+		public float GetCoinMultiplier(float multRarity, bool gaugeEnabled = true, bool bombFactorEnabled = true, bool fuseRollFactorEnabled = true) {
+			if (gaugeEnabled)
 				multRarity *= HGaugeMethods.GetCoinMultiplier(Gauge);
 
 			return multRarity;

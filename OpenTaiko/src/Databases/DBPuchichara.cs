@@ -11,9 +11,9 @@ class DBPuchichara {
 			SplitLane = false;
 		}
 
-		public float GetCoinMultiplier(float multRarity) {
-			if (Autoroll > 0) multRarity *= 0f;
-			if (ShowAdlib == true) multRarity *= 0.9f;
+		public float GetCoinMultiplier(float multRarity, bool allPurpleEnabled = true, bool autorollEnabled = true, bool showAdlibEnabled = true, bool splitLaneEnabled = true) {
+			if (autorollEnabled && Autoroll > 0) multRarity *= 0f;
+			if (showAdlibEnabled && ShowAdlib == true) multRarity *= 0.9f;
 			return multRarity;
 		}
 
