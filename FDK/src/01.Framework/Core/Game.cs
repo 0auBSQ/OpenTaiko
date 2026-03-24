@@ -246,6 +246,16 @@ public abstract class Game : IDisposable {
 
 	public static Matrix4X4<float> Camera;
 
+	private static Color4 _borderColor = new Color4(0f, 0f, 0f, 1f);
+	public static Color4 BorderColor {
+		get => _borderColor;
+		set {
+			if (value != _borderColor)
+				Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
+			_borderColor = value;
+		}
+	}
+
 	public static float ScreenAspect {
 		get {
 			return (float)GameWindowSize.Width / GameWindowSize.Height;
@@ -492,6 +502,7 @@ public abstract class Game : IDisposable {
 
 	public void Window_Render(double deltaTime) {
 		Camera = Matrix4X4<float>.Identity;
+		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
 
 		if (AsyncActions.Count > 0) {
 			AsyncActions[0]?.Invoke();

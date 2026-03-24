@@ -1768,7 +1768,7 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xB2, 1);
 
 			string[] args = argument.Split(',');
-			chip.borderColor = new Color4(1f, float.Parse(args[0]) / 255, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255);
+			chip.borderColor = new Color4(float.Parse(args[0]) / 255, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -1855,7 +1855,7 @@ internal class CTja : CActivity {
 
 			string[] args = argument.Split(',');
 			chip.strObjName = args[0];
-			chip.borderColor = new Color4(1f, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255);
+			chip.borderColor = new Color4(float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
