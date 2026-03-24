@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.102] - 2026-03-24 (Beta)
+
+- [Fix] 0.6.0.101 made Pause -> Resume made chart jumped to song start due to the main timer was not reset correctly
+
 ## [0.6.0.101] - 2026-03-24 (Beta)
 
 - [Optimize] Skip texture loading when calling AddGraph() in BG Lua Script multiple times with same filepath
