@@ -2065,15 +2065,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actAVI.Pause();
 	}
 
-	public void Resume(int? msStartGameTime = null) {
+	public void Resume(long? msStartGameTime = null) {
 		OpenTaiko.TJA.t全チップの再生再開();
 		OpenTaiko.Timer.Resume();
-		OpenTaiko.Timer.Reset();                           // これでPAUSE解除されるので、3行先の再開()は不要
-		if (msStartGameTime != null)
-			OpenTaiko.Timer.NowTimeMs = msStartGameTime.Value;  // Debug表示のTime: 表記を正しくするために必要
+		msStartGameTime ??= OpenTaiko.Timer.NowTimeMs; // target time defaults to pre-pause time
+		OpenTaiko.Timer.Reset(); // reset internal pause timer
+		OpenTaiko.Timer.NowTimeMs = msStartGameTime.Value; // jump to target time
 		SoundManager.PlayTimer.Resume();
 		SoundManager.PlayTimer.Reset();
-		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
+		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs; // sync with game time
 
 		this.actAVI.Resume();
 		this.actPanel.Start();
