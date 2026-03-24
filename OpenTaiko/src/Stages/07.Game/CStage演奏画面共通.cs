@@ -2530,7 +2530,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xb0: //camera horizontal scaling start
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, CTja.TjaDurationToGameDuration(1), OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xa1: //camera vertical move end
@@ -2557,7 +2557,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xb8: //set camera y scale
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+						this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 0, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xb9: //reset camera
@@ -2612,7 +2612,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 
 						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj))
-							objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+							objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, pChip.fObjTimeMs, CTja.TjaDurationToGameDuration(1), OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 					}
 					break;
 				case 0xbf: //object animation end
@@ -2644,7 +2644,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 
 						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
-							this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 1, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
+							this.objHandlers[GetObjHandlerKeys(pChip)[0]] = (pChip, new CCounter(0, 0, 0, OpenTaiko.Timer), GetObjHandlerSetter(pChip));
 						}
 					}
 					break;
@@ -2693,7 +2693,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
-							pChip.obj.tStartAnimation(pChip.dbAnimInterval, false);
+							pChip.obj.tStartAnimation(CTja.TjaDurationToGameDuration(pChip.dbAnimInterval), false);
 						}
 					}
 					break;
@@ -2701,7 +2701,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
-							pChip.obj.tStartAnimation(pChip.dbAnimInterval, true);
+							pChip.obj.tStartAnimation(CTja.TjaDurationToGameDuration(pChip.dbAnimInterval), true);
 						}
 					}
 					break;
