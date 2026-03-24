@@ -10,20 +10,16 @@ class DBCharacter {
 			FuseRollFactor = 0;
 		}
 
-		public float GetCoinMultiplier() {
-			float mult = 1f;
+		public float GetCoinMultiplier(float multRarity) {
+			if (!OpenTaiko.ConfigIni.bForceNormalGauge)
+				multRarity *= HGaugeMethods.GetCoinMultiplier(Gauge);
 
-			if (Gauge == "Hard" && !OpenTaiko.ConfigIni.bForceNormalGauge) mult *= 1.5f;
-			if (Gauge == "Extreme" && !OpenTaiko.ConfigIni.bForceNormalGauge) mult *= 1.8f;
-
-			return mult;
+			return multRarity;
 		}
 
 		public string tGetGaugeType() {
-			return IsForceNormalGauge() ? "Normal" : Gauge;
+			return HGaugeMethods.IsForceNormalGauge() ? "Normal" : Gauge;
 		}
-
-		private static bool IsForceNormalGauge() => OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
 
 		[JsonProperty("gauge")]
 		public string Gauge;

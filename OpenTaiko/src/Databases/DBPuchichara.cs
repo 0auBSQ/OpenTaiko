@@ -11,11 +11,10 @@ class DBPuchichara {
 			SplitLane = false;
 		}
 
-		public float GetCoinMultiplier() {
-			float mult = 1f;
-			if (Autoroll > 0) mult *= 0f;
-			if (ShowAdlib == true) mult *= 0.9f;
-			return mult;
+		public float GetCoinMultiplier(float multRarity) {
+			if (Autoroll > 0) multRarity *= 0f;
+			if (ShowAdlib == true) multRarity *= 0.9f;
+			return multRarity;
 		}
 
 		[JsonProperty("allpurple")]

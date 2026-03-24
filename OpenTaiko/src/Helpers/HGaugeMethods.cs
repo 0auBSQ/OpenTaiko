@@ -147,6 +147,13 @@ class HGaugeMethods {
 		return false;
 	}
 
+	public static float GetCoinMultiplier(EGaugeType type) => type switch {
+		EGaugeType.HARD => 1.5f,
+		EGaugeType.EXTREME => 1.8f,
+		_ => 1.0f,
+	};
+
+	public static float GetCoinMultiplier(string gaugeType) => GetCoinMultiplier(tGetGaugeTypeEnum(gaugeType));
 	#endregion
 
 	#region [Displayables]

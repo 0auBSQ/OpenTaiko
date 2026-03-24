@@ -55,7 +55,7 @@ class CHeyaDisplayAssetInformations {
 		if (fuseFactor < 10) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"{fuseFactor}")}\n";
 		else if (fuseFactor < 25) description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"<c.#b474c4>{fuseFactor}</c>")}\n";
 		else description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR").SafeFormat($"<c.#7c009c>{fuseFactor}</c>")}\n";
-		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(character.effect.GetCoinMultiplier())}\n";
+		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(character.GetEffectCoinMultiplier())}\n";
 
 
 		if (ttkDescription is null || ttkDescription.str != description) {
@@ -81,7 +81,7 @@ class CHeyaDisplayAssetInformations {
 		if (puchi.effect.ShowAdlib) description += CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_SHOWADLIB") + "\n";
 		if (puchi.effect.Autoroll > 0) description += CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_AUTOROLL", puchi.effect.Autoroll) + "\n";
 		if (puchi.effect.SplitLane) description += CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_EFFECTS_SPLITLANE") + "\n";
-		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(puchi.effect.GetCoinMultiplier())}\n";
+		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_COIN_MULTIPLIER").SafeFormat(puchi.GetEffectCoinMultiplier())}\n";
 
 		if (ttkDescription is null || ttkDescription.str != description) {
 			ttkDescription = new TitleTextureKey(description, pf, Color.White, Color.Black, 1000);
