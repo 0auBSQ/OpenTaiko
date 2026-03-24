@@ -20,9 +20,10 @@ class DBCharacter {
 		}
 
 		public string tGetGaugeType() {
-			return OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5 ? "Normal" : Gauge;
+			return IsForceNormalGauge() ? "Normal" : Gauge;
 		}
 
+		private static bool IsForceNormalGauge() => OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
 
 		[JsonProperty("gauge")]
 		public string Gauge;

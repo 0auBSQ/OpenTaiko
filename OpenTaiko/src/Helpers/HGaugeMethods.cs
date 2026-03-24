@@ -119,6 +119,9 @@ class HGaugeMethods {
 		return norma;
 	}
 
+	public static bool IsForceNormalGauge()
+		=> OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
+
 	public static EGaugeType tGetGaugeTypeEnum(string gaugeType) {
 		EGaugeType gt = EGaugeType.NORMAL;
 
@@ -127,6 +130,12 @@ class HGaugeMethods {
 
 		return gt;
 	}
+	public static EGaugeType tGetGaugeTypeEnum(CCharacter? chara)
+		=> (chara == null) ? EGaugeType.NORMAL : tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+	public static EGaugeType? tGetGaugeTypeEnum(CTja? tja) => tja?.forceGauge;
+	public static EGaugeType tGetGaugeTypeEnum(int player)
+		=> tGetGaugeTypeEnum(OpenTaiko.GetTJA(player))
+			?? tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character]);
 
 	public static bool tNormaCheck(Difficulty diff, int level, EGaugeType gaugeType, float percentObtained, float killZonePercent) {
 		float percent = Math.Min(100f, Math.Max(0f, percentObtained));
@@ -404,25 +413,22 @@ class HGaugeMethods {
 	#region [Unsafe methods]
 
 	public static bool UNSAFE_FastNormaCheck(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		return tNormaCheck(
 			(Difficulty)_dif,
 			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1,
-			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
+			tGetGaugeTypeEnum(player),
 			(float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
 		);
 	}
 
 	public static bool UNSAFE_IsRainbow(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		if (tGetGaugeTypeEnum(chara.effect.tGetGaugeType()) != EGaugeType.NORMAL) return false;
+		if (tGetGaugeTypeEnum(player) != EGaugeType.NORMAL) return false;
 		return (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player] >= 100f;
 	}
 
 	public static float UNSAFE_KillZonePercent(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Total hits and perfect hits
@@ -437,13 +443,12 @@ class HGaugeMethods {
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
 			level,
-			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
+			tGetGaugeTypeEnum(player),
 			perfectHits,
 			totalHits);
 	}
 
 	public static void UNSAFE_DrawGaugeFast(int player, int opacity, int rainbowTextureIndex, int soulFlameIndex) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
@@ -537,7 +542,7 @@ class HGaugeMethods {
 		float currentPercent = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player];
 
 		// Gauge type
-		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
 
 		// Textures
 		int _4pGaugeIDX = (OpenTaiko.ConfigIni.nPlayerCount >= 3) ? 1 : 0;
@@ -583,7 +588,6 @@ class HGaugeMethods {
 	}
 
 	public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
@@ -594,7 +598,7 @@ class HGaugeMethods {
 		int totalHits = dtx.nノーツ数[3];
 
 		// Gauge type
-		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
 
 		// Current percent
 		float currentPercent = segmentsDisplayed * 2f;

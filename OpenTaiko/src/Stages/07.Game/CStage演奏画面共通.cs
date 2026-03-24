@@ -1408,7 +1408,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 		bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
 
 		bool isIncrease = eJudgeResult is not (ENoteJudge.Poor or ENoteJudge.Bad or ENoteJudge.Miss) || eJudgeResult is ENoteJudge.Auto;
@@ -1465,9 +1464,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 
-				switch (chara.effect.tGetGaugeType()) {
-					case "Hard":
-					case "Extreme":
+				switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
+					case HGaugeMethods.EGaugeType.HARD:
+					case HGaugeMethods.EGaugeType.EXTREME:
 						OpenTaiko.stageGameScreen.SetStageFailed(nPlayer);
 						break;
 				}
@@ -3710,14 +3709,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 				OpenTaiko.GetTJA(i)?.tInitLocalStores(i);
 
-				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character];
-				switch (chara.effect.tGetGaugeType()) {
+				switch (HGaugeMethods.tGetGaugeTypeEnum(i)) {
 					default:
-					case "Normal":
+					case HGaugeMethods.EGaugeType.NORMAL:
 						bIsAlreadyMaxed[i] = bIsAlreadyCleared[i] = false;
 						break;
-					case "Hard":
-					case "Extreme":
+					case HGaugeMethods.EGaugeType.HARD:
+					case HGaugeMethods.EGaugeType.EXTREME:
 						bIsAlreadyCleared[i] = true;
 						bIsAlreadyMaxed[i] = false;
 						break;

@@ -96,14 +96,13 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	public void Init(int nRiskyTimes_InitialVal, int nPlayer)       // ゲージ初期化
 	{
 		//ダメージ値の計算
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-		switch (chara.effect.tGetGaugeType()) {
+		switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 			default:
-			case "Normal":
+			case HGaugeMethods.EGaugeType.NORMAL:
 				this.db現在のゲージ値[nPlayer] = 0;
 				break;
-			case "Hard":
-			case "Extreme":
+			case HGaugeMethods.EGaugeType.HARD:
+			case HGaugeMethods.EGaugeType.EXTREME:
 				this.db現在のゲージ値[nPlayer] = 100;
 				break;
 		}
@@ -207,10 +206,10 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			}
 		}
 
-		float gaugeFillRatio = chara.effect.tGetGaugeType() switch {
-			"Hard" => HGaugeMethods.HardGaugeFillRatio,
-			"Extreme" => HGaugeMethods.ExtremeGaugeFillRatio,
-			"Normal" or _ => 1.0f,
+		float gaugeFillRatio = HGaugeMethods.tGetGaugeTypeEnum(nPlayer) switch {
+			HGaugeMethods.EGaugeType.HARD => HGaugeMethods.HardGaugeFillRatio,
+			HGaugeMethods.EGaugeType.EXTREME => HGaugeMethods.ExtremeGaugeFillRatio,
+			HGaugeMethods.EGaugeType.NORMAL or _ => 1.0f,
 		};
 		if (gaugeFillRatio != 1) {
 			for (int ib = 0; ib < 3; ++ib) {
@@ -279,16 +278,14 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			case ENoteJudge.Miss: {
 					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
 
-					var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-
 					int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
 					int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
-					switch (chara.effect.tGetGaugeType()) {
-						case "Hard":
+					switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
+						case HGaugeMethods.EGaugeType.HARD:
 							fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);
 							break;
-						case "Extreme":
+						case HGaugeMethods.EGaugeType.EXTREME:
 							fDamage = -HGaugeMethods.tExtremeGaugeGetDamage((Difficulty)nanidou, level);
 							break;
 					}

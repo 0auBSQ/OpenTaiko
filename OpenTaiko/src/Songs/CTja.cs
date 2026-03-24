@@ -439,6 +439,16 @@ internal class CTja : CActivity {
 	public CutSceneDef? CutSceneIntro;
 	public List<CutSceneDef> CutSceneOutros = [];
 
+	public static HGaugeMethods.EGaugeType? strConvertForceGauge(string str) => str.ToLower() switch {
+		"none" => null,
+		"normal" => HGaugeMethods.EGaugeType.NORMAL,
+		"hard" => HGaugeMethods.EGaugeType.HARD,
+		"extreme" => HGaugeMethods.EGaugeType.EXTREME,
+		_ => throw new ArgumentOutOfRangeException(),
+	};
+
+	public HGaugeMethods.EGaugeType? forceGauge = null;
+
 	#endregion
 
 	#region [Triggers and Counters]
@@ -3070,6 +3080,8 @@ internal class CTja : CActivity {
 				this.nScoreDiff[this.n参照中の難易度] = Convert.ToInt16(strCommandParam);
 				this.b配点が指定されている[1, this.n参照中の難易度] = true;
 			}
+		} else if (strCommandName.Equals(".FORCEGAUGE")) {
+			this.forceGauge = strConvertForceGauge(strCommandParam);
 		}
 	}
 
