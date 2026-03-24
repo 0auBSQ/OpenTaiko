@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0.101] - 2026-03-24 (Beta)
+
+- [Optimize] Skip texture loading when calling AddGraph() in BG Lua Script multiple times with same filepath
+- [Chore] Allow tDisposeSafely() to handle CSound and (was handled by t安全にDisposeする() (lit. tDisposeSafely)) Array
+- [Optimize] Only unload song-end/fail animations for non-in-use game modes after exiting gameplay screen
+- [Fix] Prevent gameplay from starting/resuming when status reset is not complete
+- [Fix] "Character doesn't miss" when missed in gameplay
+- [Fix] Allow gameplay to continue when hard/Kanpeki failed in AI battle mode
+
 ## [0.6.0.100] - 2026-03-22 (Beta)
 
 - [Fix] Refine gameplay time point and fix related issues (after climbed to tower top in tower mode, 2 seconds after last note, 1 second after `#END`, 0 seconds after music ends)
