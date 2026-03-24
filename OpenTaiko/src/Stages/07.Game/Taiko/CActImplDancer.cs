@@ -104,9 +104,9 @@ internal class CActImplDancer : CActivity {
 		//this.ct踊り子モーション = null;
 
 		for (int i = 0; i < nDancerCount; i++) {
-			OpenTaiko.t安全にDisposeする(ref Dancer_In[i]);
-			OpenTaiko.t安全にDisposeする(ref Dancer_Out[i]);
-			OpenTaiko.t安全にDisposeする(ref Dancer[i]);
+			OpenTaiko.tDisposeSafely(ref Dancer_In[i]);
+			OpenTaiko.tDisposeSafely(ref Dancer_Out[i]);
+			OpenTaiko.tDisposeSafely(ref Dancer[i]);
 		}
 
 		base.DeActivate();
