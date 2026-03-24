@@ -2586,10 +2586,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.x = pChip.fObjX;
-							obj.y = pChip.fObjY;
-							obj.isVisible = true;
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.x = pChip.fObjX;
+							pChip.obj.y = pChip.fObjY;
+							pChip.obj.isVisible = true;
 						}
 					}
 					break;
@@ -2597,8 +2597,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.isVisible = false;
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.isVisible = false;
 						}
 					}
 					break;
@@ -2629,8 +2629,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					if (!pChip.bHit) {
 						pChip.bHit = true;
 
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.color = pChip.borderColor;
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.color = pChip.borderColor;
 						}
 					}
 					break;
@@ -2692,32 +2692,32 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xd4: //start object animation
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.tStartAnimation(pChip.dbAnimInterval, false);
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.tStartAnimation(pChip.dbAnimInterval, false);
 						}
 					}
 					break;
 				case 0xd5: //start object animation (looping)
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.tStartAnimation(pChip.dbAnimInterval, true);
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.tStartAnimation(pChip.dbAnimInterval, true);
 						}
 					}
 					break;
 				case 0xd6: //end object animation
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.tStopAnimation();
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.tStopAnimation();
 						}
 					}
 					break;
 				case 0xd7: //set object frame
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						if (dTX.listObj.TryGetValue(pChip.strObjName, out CSongObject? obj)) {
-							obj.frame = pChip.intFrame;
+						if (dTX.listObj.TryGetValue(pChip.strObjName, out pChip.obj)) {
+							pChip.obj.frame = pChip.intFrame;
 						}
 					}
 					break;
@@ -3668,6 +3668,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		} else {
 			ShowVideo = false;
 		}
+
+		this.actPanel.t歌詞テクスチャを削除する();
 
 		dtLastQueueOperation = DateTime.MinValue;
 	}
