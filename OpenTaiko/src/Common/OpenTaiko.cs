@@ -508,19 +508,47 @@ internal class OpenTaiko : Game {
 			SoundManager.PlayTimer?.Update();
 			FPS?.Update();
 
-			if (BeatScaling != null) {
-				BeatScaling.Tick();
-				float value = MathF.Sin((BeatScaling.CurrentValue / 1000.0f) * MathF.PI / 2.0f);
-				float scale = 1.0f + ((1.0f - value) / 40.0f);
-				Camera *= Matrix4X4.CreateScale(scale, scale, 1.0f);
-				if (BeatScaling.CurrentValue == BeatScaling.EndValue) BeatScaling = null;
-			}
-
 			// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
 
 			if (rCurrentStage != null) {
+				// set up camera before drawing main UI
+				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
+					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
+					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
+
+					Camera = Matrix4X4<float>.Identity;
+
+					Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
+
+					Camera *= Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f) *
+							  Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
+							  Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f);
+
+					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
+
+					if (BeatScaling != null) {
+						BeatScaling.Tick();
+						float value = MathF.Sin((BeatScaling.CurrentValue / 1000.0f) * MathF.PI / 2.0f);
+						float scale = 1.0f + ((1.0f - value) / 40.0f);
+						Camera *= Matrix4X4.CreateScale(scale, scale, 1.0f);
+						if (BeatScaling.CurrentValue == BeatScaling.EndValue) BeatScaling = null;
+					}
+				}
+
 				OpenTaiko.NamePlate?.lcNamePlate.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
+
+				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
+					if (OpenTaiko.TJA != null) {
+						//object rendering
+						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
+							pair.Value.tDraw();
+						}
+					}
+				}
+
+				// draw the remaining elements normally
+				Camera = Matrix4X4<float>.Identity;
 
 				CScoreIni scoreIni = null;
 
@@ -1204,28 +1232,6 @@ internal class OpenTaiko : Game {
 				}
 
 				actScanningLoudness?.Draw();
-
-				if (!ConfigIni.bTokkunMode && rCurrentStage.eStageID != CStage.EStage.CRASH) {
-					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
-					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
-
-					Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
-
-					Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
-							  Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
-							  Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
-
-					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
-
-					if (OpenTaiko.TJA != null) {
-						//object rendering
-						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
-							pair.Value.tDraw();
-						}
-					}
-
-					Camera = Matrix4X4<float>.Identity;
-				}
 
 				if (rCurrentStage != null
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
