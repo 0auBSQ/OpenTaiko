@@ -176,8 +176,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public override void Activate() {
 		LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: false);
 
-		base.Activate();
-
 		this.ct手つなぎ = new CCounter(0, 60, 20, OpenTaiko.Timer);
 
 		// When performing calibration, reduce audio distraction from user input.
@@ -206,6 +204,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (this.soundAdlib[i] != null) this.soundAdlib[i].SoundPosition = _panning;
 			if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
 		}
+
+		base.Activate(); // to unpause at end
 	}
 
 	public override void t数値の初期化(bool b演奏記録, bool b演奏状態) {
@@ -337,8 +337,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
 				this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.ClearOut, true);
 			}
+			this.actGauge.db現在のゲージ値[iPlayer] = 0; // for indicate life failure in AI mode
+			this.UpdateGauge(null, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
 			CFloorManagement.CurrentNumberOfLives = 0; // prevent clear
-			this.actEnd.Start(iPlayer);
+			if (!OpenTaiko.ConfigIni.bAIBattleMode)
+				this.actEnd.Start(iPlayer);
 		}
 	}
 	public override int Draw() {
@@ -558,7 +561,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			// Transition for failed games
-			if ((minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
+			if (!OpenTaiko.ConfigIni.bAIBattleMode && ((minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted())) {
 				if (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
@@ -616,7 +619,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
 							}
 						}
-						if (this.stageAbortType[i] == EStageAbort.None)
+						if (OpenTaiko.ConfigIni.bAIBattleMode || (this.stageAbortType[i] == EStageAbort.None))
 							this.actEnd.Start(i);
 					}
 				}
@@ -742,7 +745,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
-				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer]
+				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageAborted()
 				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
 				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
 				) {
@@ -794,6 +797,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	protected override ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false) {
+		if (this.IsStageAborted()) // deny judgement
+			return ENoteJudge.Miss;
+
 		if (chipNoHit == null || rawJudge is ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
@@ -1480,13 +1486,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {
 			if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
-
-				SoundManager.PlayTimer.Pause();
-				OpenTaiko.Timer.Pause();
-				OpenTaiko.TJA.t全チップの再生一時停止();
-				this.actAVI.Pause();
-
-				this.bPAUSE = true;
+				this.Pause();
 				this.actPauseMenu.tActivatePopupMenu(0);
 			}
 

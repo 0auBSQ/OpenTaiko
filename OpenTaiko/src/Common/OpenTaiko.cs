@@ -1401,27 +1401,24 @@ internal class OpenTaiko : Game {
 	}
 
 	/// <summary>プロパティ、インデクサには ref は使用できないので注意。</summary>
-	public static void tDisposeSafely<T>(ref T obj) {
-		if (obj == null)
-			return;
+	public static void tDisposeSafely(ref CSound? obj) {
+		obj?.tDispose();
+		obj = null;
+	}
 
-		var d = obj as IDisposable;
-
-		if (d != null)
-			d.Dispose();
-
+	public static void tDisposeSafely<T>(ref T? obj) {
+		(obj as IDisposable)?.Dispose();
 		obj = default(T);
 	}
 
-	public static void t安全にDisposeする<T>(ref T[] array) where T : class, IDisposable //2020.08.01 Mr-Ojii twopointzero氏のソースコードをもとに追加
+	public static void tDisposeSafely<T>(ref T?[] array) where T : class, IDisposable //2020.08.01 Mr-Ojii twopointzero氏のソースコードをもとに追加
 	{
 		if (array == null) {
 			return;
 		}
 
 		for (var i = 0; i < array.Length; i++) {
-			array[i]?.Dispose();
-			array[i] = null;
+			tDisposeSafely(ref array[i]);
 		}
 	}
 
