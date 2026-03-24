@@ -538,15 +538,6 @@ internal class OpenTaiko : Game {
 				OpenTaiko.NamePlate?.lcNamePlate.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
-				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
-					if (OpenTaiko.TJA != null) {
-						//object rendering
-						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
-							pair.Value.tDraw();
-						}
-					}
-				}
-
 				// draw the remaining elements normally
 				Camera = Matrix4X4<float>.Identity;
 

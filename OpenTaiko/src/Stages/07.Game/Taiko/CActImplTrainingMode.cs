@@ -227,14 +227,6 @@ class CActImplTrainingMode : CActivity {
 
 		}
 
-		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-		var percentage = double.Clamp(current / length, 0, 1);
-
-		var currentWhite = (double)(this.n最終演奏位置ms);
-		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
-
-		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
-		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
 		if (OpenTaiko.Tx.Tokkun_GoGoPoint != null) {
 			foreach (int xpos in gogoXList) {
 				OpenTaiko.Tx.Tokkun_GoGoPoint.t2D描画(xpos + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_GoGoPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_GoGoPoint_Y);
@@ -255,6 +247,8 @@ class CActImplTrainingMode : CActivity {
 	}
 
 	public int On進行描画_背景() {
+		CTja tja = OpenTaiko.TJA!;
+
 		if (this.ctBackgroundScrollTimer != null) {
 			this.ctBackgroundScrollTimer.TickLoop();
 
@@ -269,6 +263,16 @@ class CActImplTrainingMode : CActivity {
 
 		if (OpenTaiko.Tx.Tokkun_DownBG != null) OpenTaiko.Tx.Tokkun_DownBG.t2D描画(OpenTaiko.Skin.Game_Training_DownBG[0], OpenTaiko.Skin.Game_Training_DownBG[1]);
 		if (OpenTaiko.Tx.Tokkun_BigTaiko != null) OpenTaiko.Tx.Tokkun_BigTaiko.t2D描画(OpenTaiko.Skin.Game_Training_BigTaiko[0], OpenTaiko.Skin.Game_Training_BigTaiko[1]);
+
+		// make the progress bar part of background to reduce obscuring vertical scrolling notes
+		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+		var percentage = double.Clamp(current / length, 0, 1);
+
+		var currentWhite = (double)(this.n最終演奏位置ms);
+		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
+
+		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
+		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
 
 		return base.Draw();
 	}

@@ -479,8 +479,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.GoGoSplash.Draw();
 			this.t進行描画_リアルタイム判定数表示();
-			if (OpenTaiko.ConfigIni.bTokkunMode)
-				this.actTokkun.On進行描画_小節_速度();
 
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.t進行描画_コンボ();
@@ -515,18 +513,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (!OpenTaiko.ConfigIni.bNoInfo)
 				this.t進行描画_判定文字列1_通常位置指定の場合();
 
-			this.t進行描画_演奏情報();
-
-			// LYRIC[S/FILE]: & #LYRIC
-
-			if (!this.IsFailStopped()
-				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
-				) {
-				this.actPanel.t歌詞テクスチャを生成する(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
-			}
-
-			this.actPanel.t歌詞テクスチャを描画する();
-
 			actChara.OnDraw_Balloon();
 
 			// Floor voice
@@ -537,11 +523,28 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.ScoreRank.Draw();
 
+			// object rendering
+			if (!OpenTaiko.ConfigIni.bTokkunMode) {
+				foreach (var (key, obj) in OpenTaiko.TJA.listObj)
+					obj.tDraw();
+			}
+
 			// Layer: Interactive elements
 
 			if (OpenTaiko.ConfigIni.bTokkunMode) {
+				this.actTokkun.On進行描画_小節_速度();
 				actTokkun.Draw();
 			}
+
+			// LYRIC[S/FILE]: & #LYRIC
+
+			if (!this.IsFailStopped()
+				&& OpenTaiko.TJA.listLyric2.Count > ShownLyric2 && OpenTaiko.TJA.listLyric2[ShownLyric2].Time < (long)OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
+				) {
+				this.actPanel.t歌詞テクスチャを生成する(OpenTaiko.TJA.listLyric2[ShownLyric2++].TextTex);
+			}
+
+			this.actPanel.t歌詞テクスチャを描画する();
 
 			// handle retry states here
 			this.actPauseMenu.Update();
@@ -625,6 +628,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;
 			}
+
+			this.t進行描画_演奏情報();
 
 			// draw above anything
 			this.actPauseMenu.Draw();
