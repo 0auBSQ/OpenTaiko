@@ -664,8 +664,8 @@ internal class CActImplCharacter : CActivity {
 				ChangeAnime(player, Anime.GoGoTime, resetCounter);
 			}
 		} else {
-			if (isStageFailed && OpenTaiko.stageGameScreen.bIsMiss[player] && OpenTaiko.Skin.Characters_Normal_Missed_Ptn[this.iCurrentCharacter[player]] != 0) {
-				if (isStageFailed || OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6 && OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[this.iCurrentCharacter[player]] != 0) {
+			if ((isStageFailed || OpenTaiko.stageGameScreen.bIsMiss[player]) && OpenTaiko.Skin.Characters_Normal_Missed_Ptn[this.iCurrentCharacter[player]] != 0) {
+				if ((isStageFailed || OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6) && OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[this.iCurrentCharacter[player]] != 0) {
 					ChangeAnime(player, Anime.MissDown, resetCounter);
 				} else {
 					ChangeAnime(player, Anime.Miss, resetCounter);
