@@ -190,7 +190,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 		queueMixerSound = new Queue<stmixer>(64);
 		bIsDirectSound = (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() == "DirectSound");
 		bUseOSTimer = OpenTaiko.ConfigIni.bUseOSTimer;
-		this.bPAUSE = false;
 		bValidScore = true;
 
 		#region [ 演奏開始前にmixer登録しておくべきサウンド(開幕してすぐに鳴らすことになるチップ音)を登録しておく ]
@@ -239,6 +238,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		this.nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // reset for new chart
 		this.t数値の初期化(true, true);
+
+		this.bPAUSE = false;
 	}
 
 	private void CalculateGen4ShinUchiScoreParameters() {
@@ -1984,13 +1985,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			else if ((base.ePhaseID == CStage.EPhase.Common_NORMAL) && (keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressedGB(EPad.FT)) && !this.actPauseMenu.bIsActivePopupMenu) {    // escape (exit)
 				if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
-
-					SoundManager.PlayTimer.Pause();
-					OpenTaiko.Timer.Pause();
-					OpenTaiko.TJA.t全チップの再生一時停止();
-					this.actAVI.Pause();
-
-					this.bPAUSE = true;
+					this.Pause();
 					this.actPauseMenu.tActivatePopupMenu(0);
 				}
 				// this.t演奏中止();
@@ -2045,8 +2040,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			} else if (OpenTaiko.ConfigIni.KeyAssign.System.DisplayDebug.IsPressed()) {   // del (debug info)
 				OpenTaiko.ConfigIni.bDisplayDebugInfo = !OpenTaiko.ConfigIni.bDisplayDebugInfo;
 			} else if ((keyboard.KeyPressed((int)SlimDXKeys.Key.Escape))) {   // escape (exit)
-				SoundManager.PlayTimer.Resume();
-				OpenTaiko.Timer.Resume();
 				this.t演奏中止();
 			}
 		}
@@ -2055,6 +2048,29 @@ internal abstract class CStage演奏画面共通 : CStage {
 		KeyboardSoundGroupLevelControlHandler.Handle(
 			keyboard, OpenTaiko.SoundGroupLevelController, OpenTaiko.Skin, false);
 		#endregion
+	}
+
+	public void Pause() {
+		this.bPAUSE = true;
+		SoundManager.PlayTimer.Pause();
+		OpenTaiko.Timer.Pause();
+		OpenTaiko.TJA.t全チップの再生一時停止();
+		this.actAVI.Pause();
+	}
+
+	public void Resume(int? msStartGameTime = null) {
+		OpenTaiko.TJA.t全チップの再生再開();
+		OpenTaiko.Timer.Resume();
+		OpenTaiko.Timer.Reset();                           // これでPAUSE解除されるので、3行先の再開()は不要
+		if (msStartGameTime != null)
+			OpenTaiko.Timer.NowTimeMs = msStartGameTime.Value;  // Debug表示のTime: 表記を正しくするために必要
+		SoundManager.PlayTimer.Resume();
+		SoundManager.PlayTimer.Reset();
+		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
+
+		this.actAVI.Resume();
+		this.actPanel.Start();
+		this.bPAUSE = false;                                // システムがPAUSE状態だったら、強制解除
 	}
 
 	private void TrainingSwitchBranch(CTja.ECourse branch) {
@@ -3616,13 +3632,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actPanel.t歌詞テクスチャを削除する();
 		var cleared = (bool[])bIsAlreadyCleared.Clone();
 		this.t数値の初期化(true, true);
-		this.t演奏位置の変更(0);
+		var (idxStartChip, msStartGameTime) = this.t演奏位置の変更(0);
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (!bIsAlreadyCleared[i] && cleared[i]) {
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(i);
 			}
 		}
-		this.bPAUSE = false;
+		this.Resume(msStartGameTime);
 	}
 
 	public void t停止() {
@@ -3845,11 +3861,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	// returns the chip index at the target measure of the first player
-	public int t演奏位置の変更(int nStartBar) {
+	public (int idxChip, int msStartGameTime) t演奏位置の変更(int nStartBar) {
 		// まず全サウンドオフにする
 		OpenTaiko.TJA.tStopAllChips();
 		this.actAVI.Stop();
-		if (OpenTaiko.TJA == null) return 0; //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
+		if (OpenTaiko.TJA == null) return (0, 0); //CDTXがnullの場合はプレイヤーが居ないのでその場で処理終了
 
 		#region [ 再生開始小節の変更 ]
 		//nStartBar++;									// +1が必要
@@ -3933,7 +3949,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 				}
 			}
-			#endregion
+		#endregion
 		}
 		#region [ PAUSEしていたサウンドを一斉に再生再開する(ただしタイマを止めているので、ここではまだ再生開始しない) ]
 
@@ -3943,21 +3959,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		#endregion
 		pausedCSound.Clear();
-		#region [ タイマを再開して、PAUSEから復帰する ]
-		SoundManager.PlayTimer.NowTimeMs = nStartTime;
-		OpenTaiko.Timer.Reset();                       // これでPAUSE解除されるので、3行先の再開()は不要
-		OpenTaiko.Timer.NowTimeMs = nStartTime;              // Debug表示のTime: 表記を正しくするために必要
-		SoundManager.PlayTimer.Resume();
-		//CDTXMania.Timer.t再開();
-		this.bPAUSE = false;                                // システムがPAUSE状態だったら、強制解除
-		this.actPanel.Start();
-		#endregion
+		this.Resume(nStartTime);
 		#endregion
 
-		return iTargetChip;
+		return (iTargetChip, nStartTime);
 	}
 
 	public void t演奏中止() {
+		// resume for playing fading out
+		SoundManager.PlayTimer.Resume();
+		OpenTaiko.Timer.Resume();
 		this.actFO.tフェードアウト開始();
 		base.ePhaseID = (this.IsStageAborted() || this.IsStageCompleted()) ?
 			CStage.EPhase.Game_STAGE_FAILED_FadeOut // keep end-of-chart animation

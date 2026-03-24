@@ -176,8 +176,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public override void Activate() {
 		LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: false);
 
-		base.Activate();
-
 		this.ct手つなぎ = new CCounter(0, 60, 20, OpenTaiko.Timer);
 
 		// When performing calibration, reduce audio distraction from user input.
@@ -206,6 +204,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (this.soundAdlib[i] != null) this.soundAdlib[i].SoundPosition = _panning;
 			if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
 		}
+
+		base.Activate(); // to unpause at end
 	}
 
 	public override void t数値の初期化(bool b演奏記録, bool b演奏状態) {
@@ -1480,13 +1480,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {
 			if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
-
-				SoundManager.PlayTimer.Pause();
-				OpenTaiko.Timer.Pause();
-				OpenTaiko.TJA.t全チップの再生一時停止();
-				this.actAVI.Pause();
-
-				this.bPAUSE = true;
+				this.Pause();
 				this.actPauseMenu.tActivatePopupMenu(0);
 			}
 

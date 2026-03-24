@@ -325,7 +325,8 @@ class CActImplTrainingMode : CActivity {
 		this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 
 		OpenTaiko.stageGameScreen.Activate();
-		SoundManager.PlayTimer.Pause();
+		OpenTaiko.stageGameScreen.Pause();
+		OpenTaiko.Timer.Resume(); // to continue animation 
 
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			CChip pChip = dTX.listChip[i];
@@ -337,8 +338,6 @@ class CActImplTrainingMode : CActivity {
 			}
 		}
 
-		OpenTaiko.TJA.t全チップの再生一時停止();
-		OpenTaiko.stageGameScreen.bPAUSE = true;
 		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 		this.bTrainingPAUSE = true;
 
@@ -356,7 +355,7 @@ class CActImplTrainingMode : CActivity {
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
+		var (n演奏開始Chip, msStartGameTime) = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
 
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
 
@@ -377,6 +376,7 @@ class CActImplTrainingMode : CActivity {
 			chip.bShow = false;
 		}
 
+		OpenTaiko.stageGameScreen.Resume(msStartGameTime);
 		this.bTrainingPAUSE = false;
 	}
 
