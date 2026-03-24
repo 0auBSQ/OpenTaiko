@@ -268,7 +268,8 @@ internal class CActImplClearAnimation : CActivity {
 	}
 	protected int Draw(int iPlayer) {
 		if (this.ct進行メイン[iPlayer] != null) {
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
+			bool playerStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(iPlayer);
+			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
 				return 0;
 
 			this.ct進行メイン[iPlayer].Tick();

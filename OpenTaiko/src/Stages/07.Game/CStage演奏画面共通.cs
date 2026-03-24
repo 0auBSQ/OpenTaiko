@@ -1397,23 +1397,28 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return eJudgeResult;
 	}
 
-	private void UpdateGauge(CChip? pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
-		if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
-			actGauge.MineDamage(nPlayer);
-		} else if (pChip == null || NotesManager.IsMissableNote(pChip)) {
-			actGauge.Damage(screenmode, eJudgeResult, nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
+	// Note: use ENoteJudge.Auto to simply update gauge status
+	protected void UpdateGauge(CChip? pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
+		bool hasFailed = this.IsStageFailed(nPlayer);
+		if (!hasFailed) { // prevent gauge change if song aborted
+			if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
+				actGauge.MineDamage(nPlayer);
+			} else if (pChip == null || NotesManager.IsMissableNote(pChip)) {
+				actGauge.Damage(screenmode, eJudgeResult, nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
+			}
 		}
 
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
 		bool cleared = HGaugeMethods.UNSAFE_FastNormaCheck(nPlayer);
 
-		bool isIncrease = eJudgeResult is not (ENoteJudge.Poor or ENoteJudge.Bad or ENoteJudge.Miss);
-		bool isDecrease = (eJudgeResult is ENoteJudge.Poor or ENoteJudge.Bad
+		bool isIncrease = eJudgeResult is not (ENoteJudge.Poor or ENoteJudge.Bad or ENoteJudge.Miss) || eJudgeResult is ENoteJudge.Auto;
+		bool isDecrease = (eJudgeResult is ENoteJudge.Poor or ENoteJudge.Bad || eJudgeResult is ENoteJudge.Auto
 			|| ((pChip != null) ? (pChip.IsMissed && NotesManager.IsMissableNote(pChip)) : eJudgeResult is ENoteJudge.Miss));
 
 		if (isIncrease) {
 			// ランナー(たたけたやつ)
-			this.actRunner.Start(nPlayer, false, pChip);
+			if (eJudgeResult is not ENoteJudge.Auto)
+				this.actRunner.Start(nPlayer, false, pChip);
 
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 
@@ -1430,11 +1435,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.bIsAlreadyCleared[nPlayer] = true;
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
 			}
-		} else if (isDecrease) {
+		}
+		if (isDecrease) {
 			int Character = this.actChara.iCurrentCharacter[nPlayer];
 
 			// ランナー(みすったやつ)
-			this.actRunner.Start(nPlayer, true, pChip);
+			if (eJudgeResult is not ENoteJudge.Auto)
+				this.actRunner.Start(nPlayer, true, pChip);
 			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 				this.bIsAlreadyMaxed[nPlayer] = false;
 				if (OpenTaiko.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -2114,8 +2121,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public virtual void SetStageFailed(int iPlayer, EStageAbort failType = EStageAbort.FailedFlow) {
 		if (OpenTaiko.ConfigIni.bTokkunMode)
 			return;
-		isFinishedPlaying[iPlayer] = true;
-		isDeniedPlaying[iPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
+		if (!OpenTaiko.ConfigIni.bAIBattleMode) { // allowing play to end in AI battle mode
+			isFinishedPlaying[iPlayer] = true;
+			isDeniedPlaying[iPlayer] = true; // Prevents the player to ever be able to hit the drum, without freezing the whole game
+		}
 		if (stageAbortType[iPlayer] < failType) {
 			if (stageAbortType[iPlayer] < EStageAbort.FailedStop && failType >= EStageAbort.FailedStop)
 				msFailedStopSystemTime = SoundManager.PlayTimer.NowTimeMs;
@@ -2123,7 +2132,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
-	public bool IsFailStopped() => stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min() >= EStageAbort.FailedStop;
+	public bool IsFailStopped() => !OpenTaiko.ConfigIni.bAIBattleMode && stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min() >= EStageAbort.FailedStop;
 	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
