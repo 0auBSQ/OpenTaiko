@@ -373,7 +373,7 @@ internal class CTja : CActivity {
 
 	private int[] listBalloon_Branch_数値管理;
 
-	public string scenePreset;
+	public string[] scenePresets = [];
 
 	public bool[] b譜面が存在する = new bool[(int)Difficulty.Total];
 
@@ -1598,7 +1598,7 @@ internal class CTja : CActivity {
 		this.AddWarn($"Bad {command} arguments: [{argument}]: {GetTjaErrorReason(ex)}", ex);
 	}
 
-	private string[] SplitComma(string input) {
+	public static string[] SplitComma(string input) {
 		var result = new List<string>();
 		var workingIndex = 0;
 		for (int i = 0; i < input.Length; i++) {
@@ -3370,7 +3370,7 @@ internal class CTja : CActivity {
 			}
 		} else if (strCommandName.Equals("SCENEPRESET")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.scenePreset = strCommandParam;
+				this.scenePresets = SplitComma(strCommandParam);
 			}
 		} else if (strCommandName.Equals("DEMOSTART")) {
 			//2015.04.10 kairera0467
