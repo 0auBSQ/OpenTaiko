@@ -376,9 +376,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 					if (this.stageAbortType[i] == EStageAbort.Max)
 						continue;
-					EStageAbort failType = (OpenTaiko.ConfigIni.nRisky != 0 && this.actGauge.IsFailed(i)) ? EStageAbort.FailedStopSkipResult
+					EStageAbort failType = this.actGauge.IsRiskyFailed(i) ? EStageAbort.FailedStopSkipResult
 						: (this.actGame.st叩ききりまショー.ct残り時間.IsEnded
 							|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
+						: this.actGauge.IsRiskyMineFailed(i) ? EStageAbort.FailedFlow
 						: EStageAbort.None;
 					if (failType > this.stageAbortType[i])
 						this.SetStageFailed(i, failType);

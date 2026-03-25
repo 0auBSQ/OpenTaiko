@@ -11,7 +11,6 @@ class HGaugeMethods {
 		EXTREME
 	}
 
-	public static float BombDamage = 4f;
 	public static float HardGaugeFillRatio = 1f;
 	public static float ExtremeGaugeFillRatio = 1f;
 
@@ -65,31 +64,30 @@ class HGaugeMethods {
 
 	#region [General calculation]
 
-	public static float tHardGaugeGetDamage(Difficulty diff, int level) {
+	public static float tGaugeGetValue(Dictionary<Difficulty, float> diffToValue, Difficulty diff, Dictionary<int, float> levelExtraToValue, int level) {
 		float damage = 6.5f;
 
-		if (DifficultyToHardGaugeDamage.ContainsKey(diff))
-			damage = DifficultyToHardGaugeDamage[diff];
+		if (diffToValue.TryGetValue(diff, out var damage_))
+			damage = damage_;
 
 		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToHardGaugeDamage.ContainsKey(levelCaped))
-			damage = LevelExtraToHardGaugeDamage[levelCaped];
+		if (levelExtraToValue.TryGetValue(levelCaped, out damage_))
+			damage = damage_;
 
 		return damage;
 	}
 
-	public static float tExtremeGaugeGetDamage(Difficulty diff, int level) {
-		float damage = 6.5f;
+	public static float tHardGaugeGetDamage(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToHardGaugeDamage, diff, LevelExtraToHardGaugeDamage, level);
 
-		if (DifficultyToExtremeGaugeDamage.ContainsKey(diff))
-			damage = DifficultyToExtremeGaugeDamage[diff];
+	public static float tExtremeGaugeGetDamage(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToExtremeGaugeDamage, diff, LevelExtraToExtremeGaugeDamage, level);
 
-		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToExtremeGaugeDamage.ContainsKey(levelCaped))
-			damage = LevelExtraToExtremeGaugeDamage[levelCaped];
-
-		return damage;
-	}
+	public static float tHardGaugeGetDamage(Difficulty diff, int level, EGaugeType gaugeType) => gaugeType switch {
+		EGaugeType.HARD => tHardGaugeGetDamage(diff, level),
+		EGaugeType.EXTREME => tExtremeGaugeGetDamage(diff, level),
+		EGaugeType.NORMAL or _ => 0, // not determined here
+	};
 
 	public static float tHardGaugeGetKillscreenRatio(Difficulty diff, int level, EGaugeType gaugeType, int perfectHits, int totalNotes) {
 		if (gaugeType != EGaugeType.EXTREME) return 0f;
@@ -106,18 +104,8 @@ class HGaugeMethods {
 		return percent < 100f - ((100f - tHardGaugeGetKillscreenRatio(diff, level, gaugeType, perfectHits, totalNotes)) * 0.7f);
 	}
 
-	public static float tGetCurrentGaugeNorma(Difficulty diff, int level) {
-		float norma = 80f;
-
-		if (DifficultyToNorma.ContainsKey(diff))
-			norma = DifficultyToNorma[diff];
-
-		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToNorma.ContainsKey(levelCaped))
-			norma = LevelExtraToNorma[levelCaped];
-
-		return norma;
-	}
+	public static float tGetCurrentGaugeNorma(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToNorma, diff, LevelExtraToNorma, level);
 
 	public static bool IsForceNormalGauge()
 		=> OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
@@ -139,9 +127,9 @@ class HGaugeMethods {
 
 	public static bool tNormaCheck(Difficulty diff, int level, EGaugeType gaugeType, float percentObtained, float killZonePercent) {
 		float percent = Math.Min(100f, Math.Max(0f, percentObtained));
-		float norma = tGetCurrentGaugeNorma(diff, level);
-
 		if ((gaugeType == EGaugeType.HARD || gaugeType == EGaugeType.EXTREME) && percent > killZonePercent) return true;
+
+		float norma = tGetCurrentGaugeNorma(diff, level);
 		if (gaugeType == EGaugeType.NORMAL && percent >= norma) return true;
 
 		return false;

@@ -450,6 +450,22 @@ internal class CTja : CActivity {
 
 	public HGaugeMethods.EGaugeType? forceGauge = null;
 
+	public enum EBoomRule {
+		Scal,
+		Ratio,
+		Fatal,
+	}
+
+	public static EBoomRule strConvertBoomRule(string str) => str.ToLower() switch {
+		"scal" => EBoomRule.Scal,
+		"ratio" => EBoomRule.Ratio,
+		"fatal" => EBoomRule.Fatal,
+		_ => throw new ArgumentOutOfRangeException(),
+	};
+
+	public EBoomRule boomRule = EBoomRule.Scal;
+	public float boomRuleValue = 4f;
+
 	#endregion
 
 	#region [Triggers and Counters]
@@ -3066,6 +3082,15 @@ internal class CTja : CActivity {
 			}
 		} else if (strCommandName.Equals(".FORCEGAUGE")) {
 			this.forceGauge = strConvertForceGauge(strCommandParam);
+		} else if (strCommandName.Equals(".BOOMRULE")) {
+			string[] args = strCommandParam.Split(',');
+			this.boomRule = strConvertBoomRule(args[0]);
+			this.boomRuleValue = (args.Length > 1) ? float.Parse(args[1]) : (this.boomRule switch {
+				EBoomRule.Scal => 4f,
+				EBoomRule.Ratio => 1f,
+				EBoomRule.Fatal => 1,
+				_ => throw new ArgumentOutOfRangeException(),
+			});
 		}
 	}
 
