@@ -359,12 +359,14 @@ internal class OpenTaiko : Game {
 		rCurrentStage = Stage;
 	}
 
-	public void TriggerSystemError(CSystemError.Errno errno) {
-		SystemError.LoadError(errno);
+	public void TriggerSystemError(CSystemError.Errno errno, Exception? exception = null, string? message = null) {
+		if (exception != null)
+			Trace.TraceError(exception.ToString());
+		if (message != null)
+			Trace.TraceError(message);
+		SystemError.LoadError(errno, exception, message);
 		ChangeStage(SystemError);
 	}
-
-
 
 	// メソッド
 
@@ -466,6 +468,11 @@ internal class OpenTaiko : Game {
 		Framerate = 0;
 
 		base.Configuration();
+	}
+
+	protected override void InitializeLog() {
+		base.InitializeLog();
+		tStartupLog();
 	}
 
 	protected override void Initialize() {
@@ -1498,64 +1505,75 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	private static CTraceLogListener? FileLogListener = null;
+
+	private static void tStartupLog() {
+		Trace.AutoFlush = true;
+		try {
+			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
+		} catch (System.UnauthorizedAccessException e)            // #24481 2011.2.20 yyagi
+		{
+			// still has console logging
+			Trace.TraceError(e.ToString());
+			int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
+			string[] mes_writeErr = {
+				"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
+				"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
+			};
+			Trace.WriteLine(mes_writeErr);
+		}
+	}
 
 	private void tStartupProcess() {
+		#region [ Error message interface initialisation ]
+		try {
+			// Load System error beforehand
+			this.listTopLevelActivities = new List<CActivity>();
+			SystemError = new CSystemError();
+			this.listTopLevelActivities.Add(SystemError);
 
-		// Load System error beforehand
-		this.listTopLevelActivities = new List<CActivity>();
-		SystemError = new CSystemError();
-		this.listTopLevelActivities.Add(SystemError);
-
-		VisualLogManager = new CVisualLogManager();
-
-		#region [ Unlock factory initialisation ]
-
-		UnlockConditionFactory = new CUnlockConditionFactory();
-
+			VisualLogManager = new CVisualLogManager();
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
+			Trace.TraceError("Error message interface initialization falied.");
+		}
 		#endregion
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
+		try {
+			UnlockConditionFactory = new CUnlockConditionFactory();
 
-		// Port <= 0.5.4 NamePlate.json to Pre 0.6.0 b1 Saves\
-		NamePlateConfig = new NamePlateConfig();
-		NamePlateConfig.tNamePlateConfig();
+			// Port <= 0.5.4 NamePlate.json to Pre 0.6.0 b1 Saves\
+			NamePlateConfig = new NamePlateConfig();
+			NamePlateConfig.tNamePlateConfig();
 
-		Favorites = new Favorites();
-		Favorites.tFavorites();
+			Favorites = new Favorites();
+			Favorites.tFavorites();
 
-		RecentlyPlayedSongs = new RecentlyPlayedSongs();
-		RecentlyPlayedSongs.tRecentlyPlayedSongs();
+			RecentlyPlayedSongs = new RecentlyPlayedSongs();
+			RecentlyPlayedSongs.tRecentlyPlayedSongs();
 
-		Databases = new Databases();
-		Databases.tDatabases();
+			Databases = new Databases();
+			Databases.tDatabases();
 
-		if (!File.Exists("Saves.db3")) {
-			File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
+			if (!File.Exists("Saves.db3")) {
+				File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
+			}
+			// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
+			SaveFileInstances = DBSaves.FetchSaveInstances();
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
+			Trace.TraceError("Config.ini and databases loading falied.");
 		}
-		// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
-		SaveFileInstances = DBSaves.FetchSaveInstances();
 
 		//---------------------
 		#endregion
 
-		#region [ Log output initialisation ]
+		#region [ Log output config initialisation ]
 		//---------------------
-		Trace.AutoFlush = true;
-		if (ConfigIni.bOutputLogs) {
-			try {
-				Trace.Listeners.Add(new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
-			} catch (System.UnauthorizedAccessException)            // #24481 2011.2.20 yyagi
-			{
-				int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
-				string[] mes_writeErr = {
-					"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
-					"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
-				};
-				ConfigIni.bOutputLogs = false;
-				Trace.WriteLine(mes_writeErr);
-				// Environment.Exit(1);
-			}
+		if (!ConfigIni.bOutputLogs) {
+			Trace.Listeners.Remove(FileLogListener);
 		}
 		Trace.WriteLine("");
 		Trace.WriteLine("Welcome to OpenTaiko! Starting log...");
@@ -1665,9 +1683,10 @@ internal class OpenTaiko : Game {
 			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
 			InputManager.SetID(ConfigIni.StableIdToGuid);
 			Trace.TraceInformation("DirectInput has been initialized.");
-		} catch (Exception exception2) {
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
 			Trace.TraceError("DirectInput and MIDI input failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_INPUTINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_INPUTINITFAILED, ex);
 			return;
 			//throw;
 		} finally {
@@ -1683,10 +1702,10 @@ internal class OpenTaiko : Game {
 		try {
 			Pad = new CPad(ConfigIni, InputManager);
 			Trace.TraceInformation("Pad has been initialized.");
-		} catch (Exception exception3) {
-			Trace.TraceError(exception3.ToString());
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
 			Trace.TraceError("Pad failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_PADINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_PADINITFAILED, ex);
 			return;
 		} finally {
 			Trace.Unindent();
@@ -1758,7 +1777,8 @@ internal class OpenTaiko : Game {
 			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
 			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
 		} catch (Exception e) {
-			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE);
+			Trace.TraceError(e.ToString());
+			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
 			return;
 			// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 		} finally {
@@ -1780,7 +1800,7 @@ internal class OpenTaiko : Game {
 		} catch (Exception e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Song list failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_SONGLISTINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_SONGLISTINITFAILED, e);
 			return;
 		} finally {
 			Trace.Unindent();

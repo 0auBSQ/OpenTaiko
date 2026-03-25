@@ -39,7 +39,9 @@ public class CInputManager : IDisposable {
 		try {
 			cinputkeyboard = new CInputKeyboard(Context.Keyboards[0]);
 			cinputmouse = new CInputMouse(Context.Mice[0]);
-		} catch {
+		} catch (Exception ex) {
+			Trace.TraceWarning(ex.ToString());
+			Trace.TraceWarning("Error adding keyboard and mouse.");
 		}
 		if (cinputkeyboard != null) {
 			this.InputDevices.Add(cinputkeyboard);
@@ -63,14 +65,18 @@ public class CInputManager : IDisposable {
 				this.InputDevices.Add(new CInputMIDI(midiIn, i));
 			}
 		} catch (Exception e) {
-			Trace.TraceError(e.ToString());
+			Trace.TraceWarning(e.ToString());
+			Trace.TraceWarning("Error adding MIDI input devices.");
 		}
 		#endregion
 		Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
 		for (int i = 0; i < InputDevices.Count; i++) {
 			try {
 				Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + " - " + InputDevices[i].Name + ")");
-			} catch { }
+			} catch (Exception ex) {
+				Trace.TraceWarning(ex.ToString());
+				Trace.TraceWarning("Error logging input devices.");
+			}
 		}
 
 		Game.InitImGuiController(window, Context);
@@ -157,6 +163,8 @@ public class CInputManager : IDisposable {
 					device.Polling();
 				} catch (Exception e)                                      // #24016 2011.1.6 yyagi: catch exception for unplugging USB joystick, and remove the device object from the polling items.
 				{
+					Trace.TraceWarning($"Error polling input device {i}.");
+					Trace.TraceWarning(e.ToString());
 					//this.InputDevices.Remove(device);
 					//device.Dispose();
 					//Trace.TraceError("tポーリング時に対象deviceが抜かれており例外発生。同deviceをポーリング対象からRemoveしました。");

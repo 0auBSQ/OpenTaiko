@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 
@@ -18,7 +19,8 @@ internal class DBSaves {
 				DBSavesAutoupdate.HandleSavesDBAutoupdates(SavesDBConnection);
 			}
 			return SavesDBConnection;
-		} catch {
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
 			LogNotification.PopError(_DBNotFoundError);
 			return null;
 		}

@@ -19,6 +19,7 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using FDK;
@@ -284,6 +285,13 @@ public abstract class Game : IDisposable {
 	/// Initializes a new instance of the <see cref="Game"/> class.
 	/// </summary>
 	protected Game(string iconFileName, params string[] args) {
+		try {
+			this.InitializeLog();
+		} catch (Exception ex) {
+			Console.WriteLine(ex.ToString());
+			Console.WriteLine("Error initializing log.");
+		}
+
 		strIconFileName = iconFileName;
 		parameters = args;
 
@@ -314,17 +322,18 @@ public abstract class Game : IDisposable {
 		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
 		|| windowing_override == "sdl") {
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
-			Console.WriteLine("SDL selected for Windowing");
+			Trace.TraceInformation("SDL selected for Windowing");
 		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
-			Console.WriteLine("GLFW selected for Windowing");
+			Trace.TraceInformation("GLFW selected for Windowing");
 		}
 
 		try {
 			Window_ = Window.Create(options);
 		}
-		catch {
-			Console.WriteLine("The window failed to be created.\nYou can attempt to fix this by overriding the default windowing.\nTry launching OpenTaiko with args, using '-w glfw' to force GLFW or '-w sdl' to force SDL.");
+		catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
+			Trace.TraceError("The window failed to be created.\nYou can attempt to fix this by overriding the default windowing.\nTry launching OpenTaiko with args, using '-w glfw' to force GLFW or '-w sdl' to force SDL.");
 			throw;
         }
 
@@ -400,6 +409,10 @@ public abstract class Game : IDisposable {
 	}
 
 	protected virtual void Configuration() {
+
+	}
+
+	protected virtual void InitializeLog() {
 
 	}
 

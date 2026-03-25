@@ -217,7 +217,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool bTight;
 	public bool bIncludeSubfoldersOnRandomSelect;
-	public bool bOutputLogs;
+	public bool bOutputLogs; // For ensuring complete log messages, output is enabled before reading Config.ini
 	public bool bDisplayDebugInfo;
 	public bool bEnableVSync;
 	public bool bFullScreen;

@@ -20,7 +20,7 @@ internal class CSystemError : CStage {
 		ENO_SONGLISTINITFAILED = 5
 	};
 
-	public void LoadError(Errno errno) {
+	public void LoadError(Errno errno, Exception? exception = null, string? message = null) {
 		GameCrashed = true;
 
 		// Head with the error code
@@ -30,11 +30,15 @@ internal class CSystemError : CStage {
 		switch (errno) {
 			default:
 			case Errno.ENO_UNKNOWN: {
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += message;
 					ErrorMessage += "Please try restarting OpenTaiko.";
 					break;
 				}
 			case Errno.ENO_NOAUDIODEVICE: {
 					ErrorMessage += "No audio device was found.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please ensure that you have an active audio output display on your machine.\n";
 					ErrorMessage += "Additionally, check if your speakers or headset are not turned off.\n";
 					ErrorMessage += "If this does not resolve the issue, please try the troubleshooting feature on your OS.";
@@ -42,6 +46,8 @@ internal class CSystemError : CStage {
 				}
 			case Errno.ENO_SKINNOTFOUND: {
 					ErrorMessage += "No compatible skin was found.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please ensure that you have a compatible skin within your System folder.\n";
 					ErrorMessage += "If you have not installed a skin, please do so through the OpenTaiko Hub (Skins tab).\n";
 					ErrorMessage += "If this does not resolve the issue, please try updating your skins through the OpenTaiko Hub.\n";
@@ -49,17 +55,23 @@ internal class CSystemError : CStage {
 				}
 			case Errno.ENO_PADINITFAILED: {
 					ErrorMessage += "The pad initialisation failed.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please try the troubleshooting feature on your OS.";
 					break;
 				}
 			case Errno.ENO_INPUTINITFAILED: {
 					ErrorMessage += "The input device initialisation failed.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please ensure that you are not using a faulty input device when launching the game.\n";
 					ErrorMessage += "If the device seems to work on other tasks, please try the troubleshooting feature on your OS.";
 					break;
 				}
 			case Errno.ENO_SONGLISTINITFAILED: {
 					ErrorMessage += "The song list initialisation failed.\n";
+					if (!string.IsNullOrEmpty(message))
+						ErrorMessage += "Additional message: " + message;
 					ErrorMessage += "Please try removing the songlist.db file within your OpenTaiko folder.";
 					break;
 				}
@@ -68,6 +80,9 @@ internal class CSystemError : CStage {
 
 		// Append a call to contact if necessary
 		ErrorMessage += "\nIf the error persists, please contact us through the links provided on the OpenTaiko Hub.";
+
+		if (exception != null)
+			ErrorMessage += "\n\nException: " + exception.ToString();
 	}
 
 	// Constructor
