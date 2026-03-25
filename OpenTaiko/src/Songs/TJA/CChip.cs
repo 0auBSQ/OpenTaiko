@@ -53,8 +53,13 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 	public double db発声時刻ms;
-	public int nノーツ出現時刻ms;
-	public int nノーツ移動開始時刻ms;
+
+	// for #SUDDEN
+	public double msShowOffset = double.PositiveInfinity;
+	public double msMoveOffset = double.PositiveInfinity;
+	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
+	public double th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
+
 	public int nLag;                // 2011.2.1 yyagi
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
 	public bool IsFixedSENote;

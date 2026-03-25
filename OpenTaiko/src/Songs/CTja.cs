@@ -396,8 +396,9 @@ internal class CTja : CActivity {
 	public string strBGIMAGE_PATH;
 	public string strBGVIDEO_PATH;
 
-	public double db出現時刻;
-	public double db移動待機時刻;
+	// In TJA notation but scaled to ms
+	public double msSuddenShowOffset = 0;
+	public double msSuddenMoveOffset = 0;
 
 	public string strBGM_PATH;
 	public int SongVol;
@@ -1201,6 +1202,20 @@ internal class CTja : CActivity {
 								continue;
 							}
 						default: {
+								// query using raw tja time
+								// pre-calculated HBScroll beat distance when the note should move
+								if (NotesManager.IsHittableNote(chip)
+									&& chip.msMoveOffset < float.PositiveInfinity
+									&& chip.eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll
+									) {
+									var msMoveTime = chip.n発声時刻ms - chip.msMoveOffset;
+									var bpmDefMove = CStage演奏画面共通.GetNowPBPMPoint(this, msMoveTime, chip.nBranch);
+									var th16BeatMove = CStage演奏画面共通.GetNowPBMTime(bpmDefMove, msMoveTime);
+									var bpmDef = CStage演奏画面共通.GetNowPBPMPoint(this, chip.n発声時刻ms, chip.nBranch);
+									var th16Beat = CStage演奏画面共通.GetNowPBMTime(bpmDef, chip.n発声時刻ms);
+									chip.th16DBeatPreMove = th16Beat - th16BeatMove;
+								}
+
 								if (this.isOFFSET_Negative)
 									chip.n発声時刻ms += this.msOFFSET_Abs;
 								chip.dbBPM = this.dbNowBPM;
@@ -2089,14 +2104,13 @@ internal class CTja : CActivity {
 			WarnSplitLength("#SUDDEN", strArray, 2);
 			double db出現時刻 = Convert.ToDouble(strArray[0]);
 			double db移動待機時刻 = Convert.ToDouble(strArray[1]);
-			this.db出現時刻 = db出現時刻;
-			this.db移動待機時刻 = db移動待機時刻;
+			this.msSuddenShowOffset = 1000 * db出現時刻;
+			this.msSuddenMoveOffset = 1000 * db移動待機時刻;
 
 			//チップ追加して割り込んでみる。
 			var chip = this.NewEventChipAtDefCursor(0xF3, 0);
 			chip.n発声位置 -= 1;
-			chip.nノーツ出現時刻ms = (int)this.db出現時刻;
-			chip.nノーツ移動開始時刻ms = (int)this.db移動待機時刻;
+			this.SetChipSudden(chip);
 
 			// チップを配置。
 
@@ -2584,8 +2598,8 @@ internal class CTja : CActivity {
 			branchState.dbSCROLLY = this.dbNowScrollY;
 			branchState.nスクロール方向 = this.nスクロール方向;
 			Array.Copy(this.bBARLINECUE, branchState.bBARLINECUE, 2);
-			branchState.db移動待機時刻 = this.db移動待機時刻;
-			branchState.db出現時刻 = this.db出現時刻;
+			branchState.db移動待機時刻 = this.msSuddenMoveOffset;
+			branchState.db出現時刻 = this.msSuddenShowOffset;
 			branchState.bGOGOTIME = this.bGOGOTIME;
 		});
 	}
@@ -2597,8 +2611,8 @@ internal class CTja : CActivity {
 		this.dbNowScrollY = branchState.dbSCROLLY;
 		this.nスクロール方向 = branchState.nスクロール方向;
 		Array.Copy(branchState.bBARLINECUE, this.bBARLINECUE, 2);
-		this.db移動待機時刻 = branchState.db移動待機時刻;
-		this.db出現時刻 = branchState.db出現時刻;
+		this.msSuddenMoveOffset = branchState.db移動待機時刻;
+		this.msSuddenShowOffset = branchState.db出現時刻;
 		this.bGOGOTIME = branchState.bGOGOTIME;
 	}
 
@@ -2793,6 +2807,14 @@ internal class CTja : CActivity {
 		}
 	}
 
+	private void SetChipSudden(CChip chip) {
+		bool isNonDefaultShowOffset = (Math.Abs((int)this.msSuddenShowOffset) >= 1);
+		bool isNonDefaultMoveOffset = (Math.Abs((int)this.msSuddenMoveOffset) >= 1);
+		chip.msShowOffset = (isNonDefaultShowOffset ? this.msSuddenShowOffset : double.PositiveInfinity);
+		chip.msMoveOffset = (isNonDefaultMoveOffset ? (int)this.msSuddenMoveOffset : double.PositiveInfinity); // TJAP3 compat
+		chip.IsSuddenHideRoll = (isNonDefaultShowOffset && !isNonDefaultMoveOffset);
+	}
+
 	private CChip NewEventChipAtDefCursor(int channelNo, int argIndex = default, int argInt = default, double argDb = default, ECourse? branch = null)
 		=> new() {
 			nChannelNo = channelNo,
@@ -2839,8 +2861,7 @@ internal class CTja : CActivity {
 		chip.n整数値 = (int)noteType;
 		chip.n整数値_内部番号 = this.listNoteChip.Count;
 		chip.nScrollDirection = this.nスクロール方向;
-		chip.nノーツ出現時刻ms = (int)(this.db出現時刻 * 1000.0);
-		chip.nノーツ移動開始時刻ms = (int)(this.db移動待機時刻 * 1000.0);
+		this.SetChipSudden(chip);
 		chip.bGOGOTIME = this.bGOGOTIME;
 
 		if (NotesManager.IsKusudama(chip)) {
@@ -2871,8 +2892,8 @@ internal class CTja : CActivity {
 			chip.start = chipHead;
 			chipHead.end = chip;
 
-			chip.nノーツ出現時刻ms = chipHead.nノーツ出現時刻ms;
-			chip.nノーツ移動開始時刻ms = chipHead.nノーツ移動開始時刻ms;
+			chip.msShowOffset = chipHead.msShowOffset;
+			chip.msMoveOffset = chipHead.msMoveOffset;
 
 			// treat branched head + non-branched end = branched head + end
 			if (!chipHead.IsEndedBranching)
@@ -4236,12 +4257,24 @@ internal class CTja : CActivity {
 		double msDTime = chip.db発声時刻ms - msTjaNowTime;
 		double th16DBeat = chip.fBMSCROLLTime - th16NowBeat;
 
+		chip.bShow = !(NotesManager.IsGenericRoll(chip) && velocityRefChip.IsSuddenHideRoll)
+			&& (msTjaNowTime >= velocityRefChip.n発声時刻ms - velocityRefChip.msShowOffset);
+
+		// In TJAP3, #SUDDEN only affects horizontal scroll
+		double msDTimeMove = msDTime;
+		double th16DBeatMove = th16DBeat;
+		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.n発声時刻ms - velocityRefChip.msMoveOffset) {
+			msDTimeMove = (int)velocityRefChip.msMoveOffset + (chip.n発声時刻ms - velocityRefChip.n発声時刻ms);
+			th16DBeatMove = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
+		}
+
 		bool forceNMScroll = false;
 		EScrollMode scrollModeForced = forceNMScroll ? EScrollMode.Normal : velocityRefChip.eScrollMode;
 
 		double scrollSpeed = ((scrollModeForced == EScrollMode.BMScroll) ? 1.0 : velocityRefChip.dbSCROLL) * scrollRate;
 		double scrollSpeed_Y = ((scrollModeForced == EScrollMode.BMScroll) ? 0.0 : velocityRefChip.dbSCROLL_Y) * scrollRate;
-		chip.nHorizontalChipDistance = (int)NotesManager.GetNoteX(msDTime, th16DBeat, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
+		chip.nHorizontalChipDistance = (int)NotesManager.GetNoteX(msDTimeMove, th16DBeatMove, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
 		chip.nVerticalChipDistance = (int)NotesManager.GetNoteY(msDTime, th16DBeat, velocityRefChip.dbBPM, scrollSpeed_Y, scrollModeForced);
+
 	}
 }

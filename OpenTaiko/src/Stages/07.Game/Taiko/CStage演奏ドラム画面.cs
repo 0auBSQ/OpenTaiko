@@ -861,11 +861,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		if (pChip.bVisible) {
 			if (!pChip.bHit) {
-				if (pChip.nノーツ出現時刻ms != 0 && (nPlayTime < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
-					pChip.bShow = false;
-				else
-					pChip.bShow = true;
-
 				int dx = pChip.nHorizontalChipDistance;
 				int dy = pChip.nVerticalChipDistance;
 				(dx, var dy_) = pChip.nScrollDirection switch {
@@ -1066,8 +1061,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				break;
 		}
 
-		int n先頭発声位置 = 0;
-
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
 		// 2016.11.2 kairera0467
@@ -1078,22 +1071,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		#region[ 作り直したもの ]
 		if (pChip.bVisible) {
 			bool pHasBar = (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip));
-
-			if (NotesManager.IsGenericRoll(pChip)) {
-				if (pChip.nノーツ出現時刻ms != 0 && (nowTime < pChip.n発声時刻ms - pChip.nノーツ出現時刻ms))
-					pChip.bShow = false;
-				else if (pChip.nノーツ出現時刻ms != 0 && pChip.nノーツ移動開始時刻ms != 0)
-					pChip.bShow = true;
-			}
-			if (NotesManager.IsRollEnd(pChip)) {
-				if (pChip.nノーツ出現時刻ms != 0 && (nowTime < n先頭発声位置 - pChip.nノーツ出現時刻ms))
-					pChip.bShow = false;
-				else
-					pChip.bShow = true;
-
-				if (pChip.nノーツ移動開始時刻ms != 0)
-					n先頭発声位置 = pChip.start.n発声時刻ms;
-			}
 
 			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
 			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
