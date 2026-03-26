@@ -64,8 +64,15 @@ internal class CTja : CActivity {
 		None,
 		Accuracy,
 		Drumroll,
+		Drumroll_Big,
 		Score,
-		Accuracy_BigNotesOnly
+		Accuracy_Good_Big,
+		Accuracy_Good,
+		Accuracy_OK_Big,
+		Accuracy_OK,
+		Accuracy_Bad,
+		Balloon,
+		Kusudama
 	}
 
 	public static string EnumToTjaString(EBranchConditionType type) => type switch {
@@ -2011,8 +2018,15 @@ internal class CTja : CActivity {
 
 					e条件 = strCond switch {
 						"r" => EBranchConditionType.Drumroll,
+						"rb" => EBranchConditionType.Drumroll_Big,
 						"s" => EBranchConditionType.Score,
-						"d" => EBranchConditionType.Accuracy_BigNotesOnly,
+						"d" or "gb" => EBranchConditionType.Accuracy_Good_Big,
+						"g" => EBranchConditionType.Accuracy_Good,
+						"ob" => EBranchConditionType.Accuracy_OK_Big,
+						"o" => EBranchConditionType.Accuracy_OK,
+						"b" => EBranchConditionType.Accuracy_Bad,
+						"bl" => EBranchConditionType.Balloon,
+						"ks" => EBranchConditionType.Kusudama,
 						"p" or _ => EBranchConditionType.Accuracy, // traditional format with unrecognized condition: p
 					};
 				} catch (FormatException ex) {

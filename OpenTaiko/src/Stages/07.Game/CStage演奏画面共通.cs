@@ -492,6 +492,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		public int nGreat;
 		public int nGood;
 		public int nMiss;
+		public int nBalloon;
+		public int nKusudama;
 		// no reset
 		public int nScore;
 		public int nADLIB;
@@ -1225,6 +1227,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		//分岐のための処理。実装してない。
 
 		//赤か青かの分岐
+		if (IsKusudama)
+			this.CBranchScore[player].nKusudama++;
+		else
+			this.CBranchScore[player].nBalloon++;
 
 		long nAddScore = 0;
 
@@ -3310,6 +3316,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.CBranchScore[player].nGood = 0;
 			this.CBranchScore[player].nMiss = 0;
 			this.CBranchScore[player].nRoll = 0;
+			this.CBranchScore[player].nBalloon = 0;
+			this.CBranchScore[player].nKusudama = 0;
 		} else {
 			for (int i = 0; i < CBranchScore.Length; i++) {
 				this.CBranchScore[i].cBigNotes.nGreat = 0;
@@ -3321,6 +3329,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.CBranchScore[i].nGood = 0;
 				this.CBranchScore[i].nMiss = 0;
 				this.CBranchScore[i].nRoll = 0;
+				this.CBranchScore[i].nBalloon = 0;
+				this.CBranchScore[i].nKusudama = 0;
 			}
 		}
 	}
@@ -3340,12 +3350,23 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		double dbRate = GetBranchConditionScore(branchScore, pChip.eBranchCondition);
 
-		if (dbRate >= pChip.nBranchCondition2_Master) {
-			return CTja.ECourse.eMaster;
-		} else if (dbRate >= pChip.nBranchCondition1_Professional) {
-			return CTja.ECourse.eExpert;
-		} else {
-			return CTja.ECourse.eNormal;
+		switch (pChip.eBranchCondition) {
+			default:
+				if (dbRate >= pChip.nBranchCondition2_Master) {
+					return CTja.ECourse.eMaster;
+				} else if (dbRate >= pChip.nBranchCondition1_Professional) {
+					return CTja.ECourse.eExpert;
+				} else {
+					return CTja.ECourse.eNormal;
+				}
+			case CTja.EBranchConditionType.Accuracy_Bad:
+				if (dbRate < pChip.nBranchCondition2_Master) {
+					return CTja.ECourse.eMaster;
+				} else if (dbRate < pChip.nBranchCondition1_Professional) {
+					return CTja.ECourse.eExpert;
+				} else {
+					return CTja.ECourse.eNormal;
+				}
 		}
 	}
 
@@ -3355,13 +3376,20 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public static double GetBranchConditionScore(CBRANCHSCORE branchScore, CTja.EBranchConditionType type)
-		=> GetBranchConditionScore(branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, type);
+		=> GetBranchConditionScore(branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, branchScore.nBalloon, branchScore.nKusudama, type);
 
-	public static double GetBranchConditionScore(CBRANCHSCORE branchScoreBig, int score, int nRolls, int nGreats, int nOks, int nBads, CTja.EBranchConditionType type) => type switch {
+	public static double GetBranchConditionScore(CBRANCHSCORE branchScoreBig, int score, int nRolls, int nGreats, int nOks, int nBads, int n風船に入れた打数, int nくすだまに入れた打数, CTja.EBranchConditionType type) => type switch {
 		CTja.EBranchConditionType.Accuracy => (nGreats + nOks + nBads == 0) ? 0 : (nGreats + nOks * 0.5) / (nGreats + nOks + nBads) * 100.0,
 		CTja.EBranchConditionType.Score => score,
 		CTja.EBranchConditionType.Drumroll => nRolls,
-		CTja.EBranchConditionType.Accuracy_BigNotesOnly => branchScoreBig.nGreat,
+		CTja.EBranchConditionType.Drumroll_Big => branchScoreBig.nRoll,
+		CTja.EBranchConditionType.Accuracy_Good_Big => branchScoreBig.nGreat,
+		CTja.EBranchConditionType.Accuracy_Good => nGreats,
+		CTja.EBranchConditionType.Accuracy_OK_Big => branchScoreBig.nGood,
+		CTja.EBranchConditionType.Accuracy_OK => nOks,
+		CTja.EBranchConditionType.Accuracy_Bad => nBads,
+		CTja.EBranchConditionType.Balloon => n風船に入れた打数,
+		CTja.EBranchConditionType.Kusudama => nくすだまに入れた打数,
 		_ => 0,
 	};
 
