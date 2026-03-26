@@ -78,8 +78,15 @@ internal class CTja : CActivity {
 	public static string EnumToTjaString(EBranchConditionType type) => type switch {
 		EBranchConditionType.Accuracy => "p",
 		EBranchConditionType.Drumroll => "r",
+		EBranchConditionType.Drumroll_Big => "rb",
 		EBranchConditionType.Score => "s",
-		EBranchConditionType.Accuracy_BigNotesOnly => "d",
+		EBranchConditionType.JudgePerfect_Big => "gb",
+		EBranchConditionType.JudgePerfect => "g",
+		EBranchConditionType.JudgeOK_Big => "ob",
+		EBranchConditionType.JudgeOK => "o",
+		EBranchConditionType.JudgeBad => "b",
+		EBranchConditionType.Balloon => "bl",
+		EBranchConditionType.BalloonEx => "ks",
 		EBranchConditionType.None or _ => "",
 	};
 
