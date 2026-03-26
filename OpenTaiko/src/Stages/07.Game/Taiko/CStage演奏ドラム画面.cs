@@ -1403,8 +1403,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			} else {
 				CChip branchJudgePoint = tjaP1.listBRANCH[this.idxLastBranchSection[0]];
 
-				var branchCondType = branchJudgePoint.eBranchCondition;
-				double nowBranchCondScore = this.GetBranchConditionScore(0, branchCondType);
+				var branchCond = branchJudgePoint.eBranchCondition;
+				double nowBranchCondScore = this.GetBranchConditionScore(0, branchCond);
 				OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, nowBranchCondScore.ToString("##0.##"));
 
 				var nowTargetBranch = this.tBranchJudge(0, branchJudgePoint);
@@ -1423,12 +1423,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				OpenTaiko.actTextConsole.Print(0, y += dy, CTextConsole.EFontType.White, $"NEXT BRANCH:{nMeasuresToNextBranch,3} BARS");
 
 				y = (int)(362 * OpenTaiko.Skin.ScaleY);
-				if (branchCondType == CTja.EBranchConditionType.None) {
+				if (branchCond.type == Exam.Type.None) {
 					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White, "NEXT BRANCH INFO:(KEEP)");
 				} else {
 					OpenTaiko.actTextConsole.Print(0, y, CTextConsole.EFontType.White,
 						string.Create(CultureInfo.InvariantCulture,
-							$"NEXT BRANCH INFO:{CTja.EnumToTjaString(branchCondType)},{branchJudgePoint.nBranchCondition1_Professional},{branchJudgePoint.nBranchCondition2_Master}"));
+							$"NEXT BRANCH INFO:{CTja.EnumToTjaString(branchCond.type, branchCond.big)},{branchJudgePoint.nBranchCondition1_Professional},{branchJudgePoint.nBranchCondition2_Master}"));
 				}
 			}
 		}

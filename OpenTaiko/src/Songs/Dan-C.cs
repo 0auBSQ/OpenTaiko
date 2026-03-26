@@ -203,6 +203,10 @@ public static class Exam {
 		JudgeADLIB,
 		JudgeMine,
 		Total,
+		// for branch conditions
+		None = Total,
+		BalloonHits,
+		TotalBranch,
 	}
 
 	/// <summary>

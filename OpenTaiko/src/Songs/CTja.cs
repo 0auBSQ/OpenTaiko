@@ -60,34 +60,25 @@ internal class CTja : CActivity {
 		}
 	}
 
-	public enum EBranchConditionType {
-		None,
-		Accuracy,
-		Roll,
-		Roll_Big,
-		Score,
-		JudgePerfect_Big,
-		JudgePerfect,
-		JudgeOK_Big,
-		JudgeOK,
-		JudgeBad,
-		BalloonReg,
-		BalloonEx
+	public enum EBranchCondBig {
+		Both,
+		RegOnly,
+		BigOnly,
 	}
 
-	public static string EnumToTjaString(EBranchConditionType type) => type switch {
-		EBranchConditionType.Accuracy => "p",
-		EBranchConditionType.Roll => "r",
-		EBranchConditionType.Roll_Big => "rb",
-		EBranchConditionType.Score => "s",
-		EBranchConditionType.JudgePerfect_Big => "gb",
-		EBranchConditionType.JudgePerfect => "g",
-		EBranchConditionType.JudgeOK_Big => "ob",
-		EBranchConditionType.JudgeOK => "o",
-		EBranchConditionType.JudgeBad => "b",
-		EBranchConditionType.BalloonReg => "bl",
-		EBranchConditionType.BalloonEx => "ks",
-		EBranchConditionType.None or _ => "",
+	public static string EnumToTjaString(Exam.Type type, EBranchCondBig big) => (type, big) switch {
+		(Exam.Type.Accuracy, EBranchCondBig.Both) => "p",
+		(Exam.Type.Roll, EBranchCondBig.Both) => "r",
+		(Exam.Type.Roll, EBranchCondBig.BigOnly) => "rb",
+		(Exam.Type.Score, EBranchCondBig.Both) => "s",
+		(Exam.Type.JudgePerfect, EBranchCondBig.BigOnly) => "gb",
+		(Exam.Type.JudgePerfect, EBranchCondBig.Both) => "g",
+		(Exam.Type.JudgeGood, EBranchCondBig.BigOnly) => "ob",
+		(Exam.Type.JudgeGood, EBranchCondBig.Both) => "o",
+		(Exam.Type.JudgeBad, EBranchCondBig.Both) => "b",
+		(Exam.Type.BalloonHits, EBranchCondBig.RegOnly) => "bl",
+		(Exam.Type.BalloonHits, EBranchCondBig.BigOnly) => "ks",
+		(Exam.Type.None, _) or _ => "",
 	};
 
 	public class CWAV : IDisposable {
@@ -2014,7 +2005,9 @@ internal class CTja : CActivity {
 				argument = argument.Insert(1, ",");
 			#endregion
 
-			var e条件 = EBranchConditionType.None; // empty or unrecognized argument format: none
+			// empty or unrecognized argument format: none
+			var (eType, eBig) = (Exam.Type.None, EBranchCondBig.Both);
+			var eRange = Exam.Range.More;
 
 			var branchStartArgumentMatch = BranchStartArgumentRegex.Match(argument);
 			if (!string.IsNullOrWhiteSpace(argument)) {
@@ -2023,18 +2016,23 @@ internal class CTja : CActivity {
 					nNum[0] = Convert.ToDouble(branchStartArgumentMatch.Groups[2].Value);
 					nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
 
-					e条件 = strCond switch {
-						"r" => EBranchConditionType.Roll,
-						"rb" => EBranchConditionType.Roll_Big,
-						"s" => EBranchConditionType.Score,
-						"d" or "gb" => EBranchConditionType.JudgePerfect_Big,
-						"g" => EBranchConditionType.JudgePerfect,
-						"ob" => EBranchConditionType.JudgeOK_Big,
-						"o" => EBranchConditionType.JudgeOK,
-						"b" => EBranchConditionType.JudgeBad,
-						"bl" => EBranchConditionType.BalloonReg,
-						"ks" => EBranchConditionType.BalloonEx,
-						"p" or _ => EBranchConditionType.Accuracy, // traditional format with unrecognized condition: p
+					(eType, eBig) = strCond switch {
+						"r" => (Exam.Type.Roll, EBranchCondBig.Both),
+						"rb" => (Exam.Type.Roll, EBranchCondBig.BigOnly),
+						"s" => (Exam.Type.Score, EBranchCondBig.Both),
+						"d" or "gb" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
+						"g" => (Exam.Type.JudgePerfect, EBranchCondBig.Both),
+						"ob" => (Exam.Type.JudgeGood, EBranchCondBig.BigOnly),
+						"o" => (Exam.Type.JudgeGood, EBranchCondBig.Both),
+						"b" => (Exam.Type.JudgeBad, EBranchCondBig.Both),
+						"bl" => (Exam.Type.BalloonHits, EBranchCondBig.RegOnly),
+						"ks" => (Exam.Type.BalloonHits, EBranchCondBig.BigOnly),
+						"p" or _ => (Exam.Type.Accuracy, EBranchCondBig.Both), // traditional format with unrecognized condition: p
+					};
+
+					eRange = strCond switch {
+						"b" => Exam.Range.Less,
+						_ => Exam.Range.More,
 					};
 				} catch (FormatException ex) {
 					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
@@ -2042,7 +2040,7 @@ internal class CTja : CActivity {
 			}
 
 			#region [ 一小節前の分岐開始Chip ]
-			bool isGenericRollCond = e条件 is EBranchConditionType.Roll or EBranchConditionType.Roll_Big or EBranchConditionType.BalloonReg or EBranchConditionType.BalloonEx;
+			bool isGenericRollCond = eType is Exam.Type.Roll or Exam.Type.BalloonHits;
 			var JudgeChipTime = this.GetBranchJudgeChipTime(isGenericRollCond);
 
 			var chip = new CChip();
@@ -2057,7 +2055,8 @@ internal class CTja : CActivity {
 			chip.idxBranchSection = this.listBRANCH.Count + 1; // will be inserted
 
 			chip.n分岐時刻ms = this.dbNowTime;
-			chip.eBranchCondition = e条件;
+			chip.eBranchCondition = (eType, eBig);
+			chip.eBranchConditionRange = eRange;
 			chip.nBranchCondition1_Professional = nNum[0];// listに追加していたが仕様を変更。
 			chip.nBranchCondition2_Master = nNum[1];// ""
 			chip.hasLevelHold = new bool[3];

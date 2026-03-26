@@ -42,7 +42,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int n発声位置;
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
-	public EBranchConditionType eBranchCondition;
+	public (Exam.Type type, EBranchCondBig big) eBranchCondition;
+	public Exam.Range eBranchConditionRange;
 	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
