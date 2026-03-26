@@ -157,12 +157,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, i, stopAnime: true);
 		}
 
-		for (int i = 0; i < CBranchScore.Length; i++) {
+		for (int i = 0; i < CBranchScore.Length; i++)
 			this.CBranchScore[i] = new CBRANCHSCORE();
-
-			//大音符分岐時の情報をまとめるため
-			this.CBranchScore[i].cBigNotes = new CBRANCHSCORE();
-		}
 
 
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
@@ -480,20 +476,29 @@ internal abstract class CStage演奏画面共通 : CStage {
 		internal bool b演奏終了後も再生が続くチップである;
 	};
 
-	/// <summary>
-	/// 分岐用のスコアをまとめるクラス。
-	/// .2020.04.21.akasoko26
-	/// </summary>
-	public class CBRANCHSCORE {
-		// unused
-		public CBRANCHSCORE cBigNotes;//大音符分岐時の情報をまとめるため
+	public class CBRANCHSCORE_Biggable {
 		// is reset
 		public int nRoll; // with balloon hits, but should exclude them in branch condition for TaikoJiro compatibility
 		public int nGreat;
 		public int nGood;
 		public int nMiss;
 		public int nBalloon;
-		public int nKusudama;
+
+		public void Reset() {
+			nGreat = 0;
+			nGood = 0;
+			nMiss = 0;
+			nRoll = 0;
+			nBalloon = 0;
+		}
+	}
+
+	/// <summary>
+	/// 分岐用のスコアをまとめるクラス。
+	/// .2020.04.21.akasoko26
+	/// </summary>
+	public class CBRANCHSCORE : CBRANCHSCORE_Biggable {
+		public CBRANCHSCORE_Biggable bigOnly = new();
 		// no reset
 		public int nScore;
 		public int nADLIB;
@@ -506,6 +511,33 @@ internal abstract class CStage演奏画面共通 : CStage {
 		// only used for dan-i
 		public int nHighestCombo;
 		public int nCombo;
+
+		public CBRANCHSCORE_Biggable GetBiggable(bool forBigOnly) => forBigOnly ? this.bigOnly : this;
+
+		public new void Reset() {
+			base.Reset();
+			bigOnly.Reset();
+		}
+
+		public double GetBranchConditionScore(CTja.EBranchConditionType type) => type switch {
+			CTja.EBranchConditionType.Accuracy => (nGreat + nGood + nMiss == 0) ? 0 : (nGreat + nGood * 0.5) / (nGreat + nGood + nMiss) * 100.0,
+			CTja.EBranchConditionType.Score => nScore,
+			CTja.EBranchConditionType.Roll => nRoll,
+			CTja.EBranchConditionType.Roll_Big => bigOnly.nRoll,
+			CTja.EBranchConditionType.JudgePerfect_Big => bigOnly.nGreat,
+			CTja.EBranchConditionType.JudgePerfect => nGreat,
+			CTja.EBranchConditionType.JudgeOK_Big => bigOnly.nGood,
+			CTja.EBranchConditionType.JudgeOK => nGood,
+			CTja.EBranchConditionType.JudgeBad => nMiss,
+			CTja.EBranchConditionType.BalloonReg => nBalloon - bigOnly.nBalloon,
+			CTja.EBranchConditionType.BalloonEx => bigOnly.nBalloon,
+			_ => 0,
+		};
+	}
+
+	public static void ForEachBiggable(bool isBig, Action<bool> action) {
+		for (int iBig = 0, maxBig = isBig ? 1 : 0; iBig <= maxBig; ++iBig)
+			action(iBig > 0);
 	}
 
 	public double[] JPOSCROLLX = new double[5];
@@ -1112,14 +1144,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 				pChip.RollDelay?.Stop();
 			}
 
+			bool isBig = NotesManager.IsBigRollTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
+
 			this.nCurrentRollCount[nPlayer] = ++pChip.nRollCount;
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-				this.DanSongScore[actDan.NowShowingNumber].nRoll++;
+			ForEachBiggable(isBig, forBigOnly => {
+				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+					this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nRoll++;
 
-			this.CBranchScore[nPlayer].nRoll++;
-			this.CChartScore[nPlayer].nRoll++;
-			this.CSectionScore[nPlayer].nRoll++;
+				this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nRoll++;
+				this.CChartScore[nPlayer].GetBiggable(forBigOnly).nRoll++;
+				this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nRoll++;
+			});
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) this.actRollChara.Start(nPlayer);
 
@@ -1129,14 +1165,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (!OpenTaiko.ConfigIni.ShinuchiMode) {
 				// 旧配点・旧筐体配点
 				if (this.scoreMode[nPlayer] == 0 || this.scoreMode[nPlayer] == 1) {
-					if (pChip.nChannelNo == 0x15)
+					if (!isBig)
 						nAddScore = 300L;
 					else
 						nAddScore = 360L;
 				}
 				// 新配点
 				else {
-					if (pChip.nChannelNo == 0x15)
+					if (!isBig)
 						nAddScore = 100L;
 					else
 						nAddScore = 200L;
@@ -1218,19 +1254,23 @@ internal abstract class CStage演奏画面共通 : CStage {
 			rollCount = ++pChip.nRollCount;
 		}
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			this.DanSongScore[actDan.NowShowingNumber].nRoll++;
-		this.CBranchScore[player].nRoll++;
-		this.CChartScore[player].nRoll++; //  成績発表の連打数に風船を含めるように (AioiLight)
-		this.CSectionScore[player].nRoll++;
+		ForEachBiggable(IsKusudama, forBigOnly => {
+			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nRoll++;
+				this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nBalloon++;
+			}
+			this.CBranchScore[player].GetBiggable(forBigOnly).nRoll++;
+			this.CChartScore[player].GetBiggable(forBigOnly).nRoll++; //  成績発表の連打数に風船を含めるように (AioiLight)
+			this.CSectionScore[player].GetBiggable(forBigOnly).nRoll++;
+
+			this.CBranchScore[player].GetBiggable(forBigOnly).nBalloon++;
+			this.CChartScore[player].GetBiggable(forBigOnly).nBalloon++;
+			this.CSectionScore[player].GetBiggable(forBigOnly).nBalloon++;
+		});
 
 		//分岐のための処理。実装してない。
 
 		//赤か青かの分岐
-		if (IsKusudama)
-			this.CBranchScore[player].nKusudama++;
-		else
-			this.CBranchScore[player].nBalloon++;
 
 		long nAddScore = 0;
 
@@ -1491,18 +1531,21 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.Chara_MissCount[nPlayer] = 0;
 
 					if (pChip != null) {
-						this.CBranchScore[nPlayer].nGreat++;
-						this.CChartScore[nPlayer].nGreat++;
-						this.CSectionScore[nPlayer].nGreat++;
+						bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
+						ForEachBiggable(isBig, forBigOnly => {
+							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+								this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nGreat++;
+							this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
+							this.CChartScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
+							this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nGreat++;
+						});
 
 						if (nPlayer == 0)
 							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-							this.DanSongScore[actDan.NowShowingNumber].nGreat++;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.tIncreaseComboDan(actDan.NowShowingNumber);
-						}
 
 						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
 							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
@@ -1531,18 +1574,21 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.Chara_MissCount[nPlayer] = 0;
 
 					if (pChip != null) {
-						this.CBranchScore[nPlayer].nGood++;
-						this.CChartScore[nPlayer].nGood++;
-						this.CSectionScore[nPlayer].nGood++;
+						bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
+						ForEachBiggable(isBig, forBigOnly => {
+							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+								this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nGood++;
+							this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nGood++;
+							this.CChartScore[nPlayer].GetBiggable(forBigOnly).nGood++;
+							this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nGood++;
+						});
 
 						if (nPlayer == 0)
 							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-							this.DanSongScore[actDan.NowShowingNumber].nGood++;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.tIncreaseComboDan(actDan.NowShowingNumber);
-						}
 
 						if (this.actCombo.ctComboAddCounter[nPlayer].IsUnEnded) {
 							this.actCombo.ctComboAddCounter[nPlayer].CurrentValue = 1;
@@ -1578,12 +1624,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 					if (pChip != null) {
 						if (!bBombHit) {
-							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-								this.DanSongScore[actDan.NowShowingNumber].nMiss++;
-
-							this.CBranchScore[nPlayer].nMiss++;
-							this.CChartScore[nPlayer].nMiss++;
-							this.CSectionScore[nPlayer].nMiss++;
+							bool isBig = NotesManager.IsBigNoteTaiko(pChip, NotesManager.GetChipGameType(pChip, nPlayer));
+							ForEachBiggable(isBig, forBigOnly => {
+								if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+									this.DanSongScore[actDan.NowShowingNumber].GetBiggable(forBigOnly).nMiss++;
+								this.CBranchScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
+								this.CChartScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
+								this.CSectionScore[nPlayer].GetBiggable(forBigOnly).nMiss++;
+							});
 
 							if (nPlayer == 0)
 								(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
@@ -3307,30 +3355,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public void tBranchReset(int player) {
 		if (player != -1) {
-			this.CBranchScore[player].cBigNotes.nGreat = 0;
-			this.CBranchScore[player].cBigNotes.nGood = 0;
-			this.CBranchScore[player].cBigNotes.nMiss = 0;
-			this.CBranchScore[player].cBigNotes.nRoll = 0;
-
-			this.CBranchScore[player].nGreat = 0;
-			this.CBranchScore[player].nGood = 0;
-			this.CBranchScore[player].nMiss = 0;
-			this.CBranchScore[player].nRoll = 0;
-			this.CBranchScore[player].nBalloon = 0;
-			this.CBranchScore[player].nKusudama = 0;
+			this.CBranchScore[player].Reset();
 		} else {
 			for (int i = 0; i < CBranchScore.Length; i++) {
-				this.CBranchScore[i].cBigNotes.nGreat = 0;
-				this.CBranchScore[i].cBigNotes.nGood = 0;
-				this.CBranchScore[i].cBigNotes.nMiss = 0;
-				this.CBranchScore[i].cBigNotes.nRoll = 0;
-
-				this.CBranchScore[i].nGreat = 0;
-				this.CBranchScore[i].nGood = 0;
-				this.CBranchScore[i].nMiss = 0;
-				this.CBranchScore[i].nRoll = 0;
-				this.CBranchScore[i].nBalloon = 0;
-				this.CBranchScore[i].nKusudama = 0;
+				this.CBranchScore[i].Reset();
 			}
 		}
 	}
@@ -3348,7 +3376,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (pChip.eBranchCondition == CTja.EBranchConditionType.None)
 			return this.nTargetBranch[nPlayer]; // keep current branch
 
-		double dbRate = GetBranchConditionScore(branchScore, pChip.eBranchCondition);
+		double dbRate = branchScore.GetBranchConditionScore(pChip.eBranchCondition);
 
 		switch (pChip.eBranchCondition) {
 			default:
@@ -3359,7 +3387,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				} else {
 					return CTja.ECourse.eNormal;
 				}
-			case CTja.EBranchConditionType.Accuracy_Bad:
+			case CTja.EBranchConditionType.JudgeBad:
 				if (dbRate < pChip.nBranchCondition2_Master) {
 					return CTja.ECourse.eMaster;
 				} else if (dbRate < pChip.nBranchCondition1_Professional) {
@@ -3372,26 +3400,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public double GetBranchConditionScore(int nPlayer, CTja.EBranchConditionType type) {
 		CBRANCHSCORE branchScore = this.CBranchScore[OpenTaiko.ConfigIni.bAIBattleMode ? 0 : nPlayer];
-		return GetBranchConditionScore(branchScore, type);
+		return branchScore.GetBranchConditionScore(type);
 	}
-
-	public static double GetBranchConditionScore(CBRANCHSCORE branchScore, CTja.EBranchConditionType type)
-		=> GetBranchConditionScore(branchScore.cBigNotes, branchScore.nScore, branchScore.nRoll, branchScore.nGreat, branchScore.nGood, branchScore.nMiss, branchScore.nBalloon, branchScore.nKusudama, type);
-
-	public static double GetBranchConditionScore(CBRANCHSCORE branchScoreBig, int score, int nRolls, int nGreats, int nOks, int nBads, int n風船に入れた打数, int nくすだまに入れた打数, CTja.EBranchConditionType type) => type switch {
-		CTja.EBranchConditionType.Accuracy => (nGreats + nOks + nBads == 0) ? 0 : (nGreats + nOks * 0.5) / (nGreats + nOks + nBads) * 100.0,
-		CTja.EBranchConditionType.Score => score,
-		CTja.EBranchConditionType.Drumroll => nRolls,
-		CTja.EBranchConditionType.Drumroll_Big => branchScoreBig.nRoll,
-		CTja.EBranchConditionType.Accuracy_Good_Big => branchScoreBig.nGreat,
-		CTja.EBranchConditionType.Accuracy_Good => nGreats,
-		CTja.EBranchConditionType.Accuracy_OK_Big => branchScoreBig.nGood,
-		CTja.EBranchConditionType.Accuracy_OK => nOks,
-		CTja.EBranchConditionType.Accuracy_Bad => nBads,
-		CTja.EBranchConditionType.Balloon => n風船に入れた打数,
-		CTja.EBranchConditionType.Kusudama => nくすだまに入れた打数,
-		_ => 0,
-	};
 
 	public void t分岐処理(CTja.ECourse branch, int nPlayer, double msBranchPoint = double.MinValue, int idxBranchSection = -1) {
 		CTja dTX = OpenTaiko.GetTJA(nPlayer)!;

@@ -63,29 +63,29 @@ internal class CTja : CActivity {
 	public enum EBranchConditionType {
 		None,
 		Accuracy,
-		Drumroll,
-		Drumroll_Big,
+		Roll,
+		Roll_Big,
 		Score,
-		Accuracy_Good_Big,
-		Accuracy_Good,
-		Accuracy_OK_Big,
-		Accuracy_OK,
-		Accuracy_Bad,
-		Balloon,
-		Kusudama
+		JudgePerfect_Big,
+		JudgePerfect,
+		JudgeOK_Big,
+		JudgeOK,
+		JudgeBad,
+		BalloonReg,
+		BalloonEx
 	}
 
 	public static string EnumToTjaString(EBranchConditionType type) => type switch {
 		EBranchConditionType.Accuracy => "p",
-		EBranchConditionType.Drumroll => "r",
-		EBranchConditionType.Drumroll_Big => "rb",
+		EBranchConditionType.Roll => "r",
+		EBranchConditionType.Roll_Big => "rb",
 		EBranchConditionType.Score => "s",
 		EBranchConditionType.JudgePerfect_Big => "gb",
 		EBranchConditionType.JudgePerfect => "g",
 		EBranchConditionType.JudgeOK_Big => "ob",
 		EBranchConditionType.JudgeOK => "o",
 		EBranchConditionType.JudgeBad => "b",
-		EBranchConditionType.Balloon => "bl",
+		EBranchConditionType.BalloonReg => "bl",
 		EBranchConditionType.BalloonEx => "ks",
 		EBranchConditionType.None or _ => "",
 	};
@@ -2024,16 +2024,16 @@ internal class CTja : CActivity {
 					nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
 
 					e条件 = strCond switch {
-						"r" => EBranchConditionType.Drumroll,
-						"rb" => EBranchConditionType.Drumroll_Big,
+						"r" => EBranchConditionType.Roll,
+						"rb" => EBranchConditionType.Roll_Big,
 						"s" => EBranchConditionType.Score,
-						"d" or "gb" => EBranchConditionType.Accuracy_Good_Big,
-						"g" => EBranchConditionType.Accuracy_Good,
-						"ob" => EBranchConditionType.Accuracy_OK_Big,
-						"o" => EBranchConditionType.Accuracy_OK,
-						"b" => EBranchConditionType.Accuracy_Bad,
-						"bl" => EBranchConditionType.Balloon,
-						"ks" => EBranchConditionType.Kusudama,
+						"d" or "gb" => EBranchConditionType.JudgePerfect_Big,
+						"g" => EBranchConditionType.JudgePerfect,
+						"ob" => EBranchConditionType.JudgeOK_Big,
+						"o" => EBranchConditionType.JudgeOK,
+						"b" => EBranchConditionType.JudgeBad,
+						"bl" => EBranchConditionType.BalloonReg,
+						"ks" => EBranchConditionType.BalloonEx,
 						"p" or _ => EBranchConditionType.Accuracy, // traditional format with unrecognized condition: p
 					};
 				} catch (FormatException ex) {
@@ -2042,7 +2042,7 @@ internal class CTja : CActivity {
 			}
 
 			#region [ 一小節前の分岐開始Chip ]
-			var JudgeChipTime = this.GetBranchJudgeChipTime(e条件 == EBranchConditionType.Drumroll);
+			var JudgeChipTime = this.GetBranchJudgeChipTime(e条件 == EBranchConditionType.Roll);
 
 			var chip = new CChip();
 			chip.idxDefine = this.listChip.Count;
