@@ -2042,7 +2042,8 @@ internal class CTja : CActivity {
 			}
 
 			#region [ 一小節前の分岐開始Chip ]
-			var JudgeChipTime = this.GetBranchJudgeChipTime(e条件 == EBranchConditionType.Roll);
+			bool isGenericRollCond = e条件 is EBranchConditionType.Roll or EBranchConditionType.Roll_Big or EBranchConditionType.BalloonReg or EBranchConditionType.BalloonEx;
+			var JudgeChipTime = this.GetBranchJudgeChipTime(isGenericRollCond);
 
 			var chip = new CChip();
 			chip.idxDefine = this.listChip.Count;
