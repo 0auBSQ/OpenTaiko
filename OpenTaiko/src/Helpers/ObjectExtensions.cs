@@ -218,59 +218,29 @@ namespace System {
 			return filteredParts;
 		}
 
+		private static readonly Regex ComplexComponentDelimRegex = new Regex(@"(?<=[^e\s])\s*(?=[+-])|(?<=[^e\s])\s+(?=[^e\s])", RegexOptions.IgnoreCase);
+
 		public static double[] ParseComplex(this string input) {
 			try {
-				// Removing all spaces from the input for easier processing
-				var str = input.Replace(" ", "").ToLower();
+				double[] ri = [0, 0];
+				int idxRI = 0;
 
-				double real = 0;
-				double imaginary = 0;
-
-				// If the input contains 'i', we need to handle the imaginary part
-				if (str.Contains("i")) {
-					// Special cases for 'i', '-i', '1+i', '1-i'
-					if (str == "i") {
-						imaginary = 1;
-					} else if (str == "-i") {
-						imaginary = -1;
-					} else {
-						// Remove 'i' for further processing
-						str = str.Replace("i", "");
-
-						// Check if input ends with '+' or '-', meaning it was something like '1+i' or '1-i'
-						if (str.EndsWith("+") || str.EndsWith("-")) {
-							real = double.Parse(str.TrimEnd('+', '-'), CultureInfo.InvariantCulture);
-							imaginary = str.EndsWith("+") ? 1 : -1;
-						} else {
-							// Split the input into real and imaginary parts
-							string[] parts = str.Split(new[] { '+', '-' }, StringSplitOptions.RemoveEmptyEntries);
-
-							// If starts by - (fix for -1+3i, etc)
-							double factor = str.StartsWith("-") ? -1 : 1;
-
-							if (str.Contains("+")) {
-								real = double.Parse(parts[0], CultureInfo.InvariantCulture);
-								imaginary = double.Parse(parts[1], CultureInfo.InvariantCulture);
-							} else if (str.LastIndexOf('-') > 0) // handling cases like "1-2i"
-								{
-								real = double.Parse(parts[0], CultureInfo.InvariantCulture);
-								imaginary = -double.Parse(parts[1], CultureInfo.InvariantCulture);
-							} else if (str.StartsWith("-")) {
-								imaginary = -double.Parse(parts[0], CultureInfo.InvariantCulture);
-							} else {
-								imaginary = double.Parse(parts[0], CultureInfo.InvariantCulture);
-							}
-
-							real *= factor;
-						}
+				var parts = ComplexComponentDelimRegex.Split(input);
+				if (parts[0].EndsWith('i'))
+					idxRI = 1;
+				for (int i = 0, n = Math.Min(2 - idxRI, parts.Length); i < n; ++i) {
+					var part = parts[i];
+					part = part.Replace(" ", "");
+					if (idxRI + i == 1 && part.EndsWith('i')) {
+						part = part.TrimEnd('i');
+						if (part.Length == 0 || part[part.Length - 1] is '+' or '-') // +i/-i/i
+							part += '1';
 					}
-				} else {
-					// If there is no 'i', it is purely a real number
-					real = double.Parse(str, CultureInfo.InvariantCulture);
+					ri[idxRI + i] = double.Parse(part, CultureInfo.InvariantCulture);
 				}
 
-				return new double[] { real, imaginary };
-			} catch (FormatException ex) {
+				return ri;
+			} catch (Exception ex) {
 				throw new FormatException($"The input string '{input}' was not in a correct format.", ex);
 			}
 		}
