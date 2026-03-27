@@ -229,6 +229,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.IsDanFailed = false;
 
 		this.objHandlers = new();
+		this.bCustomDoron = new bool[5];
 
 		this.t背景テクスチャの生成();
 
@@ -2634,13 +2635,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0xba: //enable doron
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						bCustomDoron = true;
+						bCustomDoron[nPlayer] = true;
 					}
 					break;
 				case 0xbb: //disable doron
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						bCustomDoron = false;
+						bCustomDoron[nPlayer] = false;
 					}
 					break;
 				case 0xbc: //add object
@@ -3696,6 +3697,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					chip.eNoteState = ENoteState.None;
 			}
 			this.chipNowProcessingMultiHitNotes[i].Clear();
+
+			this.bCustomDoron[i] = false;
 		}
 
 		this.objHandlers.Clear();
@@ -3969,7 +3972,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	#region [EXTENDED COMMANDS]
 	private Dictionary<string, (CChip chip, CCounter counter, Action<float> setter)> objHandlers;
 
-	public bool bCustomDoron = false;
+	public bool[] bCustomDoron;
 	private bool bConfigUpdated = false;
 	#endregion
 }
