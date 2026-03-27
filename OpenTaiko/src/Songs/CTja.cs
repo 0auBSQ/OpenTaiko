@@ -3233,6 +3233,9 @@ internal class CTja : CActivity {
 		}
 	}
 
+	// group 1: decimal places, group 2: exponential
+	private static readonly Regex DecimalPlaceRegex = new Regex(@"[+-]?\d*(?:\.(\d+))?(?:e([+-]?\d+))?", RegexOptions.IgnoreCase);
+
 	private void ParseGlobalHeader(string strCommandName, string strCommandParam) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
@@ -3255,11 +3258,14 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals("LEVEL")) {
 			var level_dec = strCommandParam.ParseReal();
 			var level = Math.Max(0, (int)level_dec);
-			if (strCommandParam != level.ToString()) {
-				var parts = level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.');
-				if (parts.Length > 1) {
-					int frac_part = Int32.Parse(parts[1]);
-					this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+			// detect decimal places small than 1
+			var matchFrac = DecimalPlaceRegex.Match(strCommandParam);
+			if (matchFrac != null && matchFrac.Success) {
+				int decimalPlaces = matchFrac.Groups[1].Length;
+				int exponential = (matchFrac.Groups[2].Length > 0) ? int.Parse(matchFrac.Groups[2].ValueSpan) : 0;
+				if (exponential - decimalPlaces < 0) {
+					double frac_part = level_dec % 1; // threshold is 2's division, can compare directly; otherwise needs decimal comparison
+					this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 0.5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
 				}
 			}
 			this.LEVEL.Drums = (int)level;
