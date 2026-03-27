@@ -2847,10 +2847,10 @@ internal class CTja : CActivity {
 	}
 
 	private void SetChipSudden(CChip chip) {
-		bool isNonDefaultShowOffset = (Math.Abs((int)this.msSuddenShowOffset) >= 1);
-		bool isNonDefaultMoveOffset = (Math.Abs((int)this.msSuddenMoveOffset) >= 1);
+		bool isNonDefaultShowOffset = (Math.Abs(Math.Truncate(this.msSuddenShowOffset)) >= 1);
+		bool isNonDefaultMoveOffset = (Math.Abs(Math.Truncate(this.msSuddenMoveOffset)) >= 1);
 		chip.msShowOffset = (isNonDefaultShowOffset ? this.msSuddenShowOffset : double.PositiveInfinity);
-		chip.msMoveOffset = (isNonDefaultMoveOffset ? (int)this.msSuddenMoveOffset : double.PositiveInfinity); // TJAP3 compat
+		chip.msMoveOffset = (isNonDefaultMoveOffset ? Math.Truncate(this.msSuddenMoveOffset) : double.PositiveInfinity); // TJAP3 compat
 		chip.IsSuddenHideRoll = (isNonDefaultShowOffset && !isNonDefaultMoveOffset);
 	}
 
