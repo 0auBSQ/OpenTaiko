@@ -313,8 +313,8 @@ class NotesManager {
 	}
 
 	// Regular display
-	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1) {
-		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
+	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1, EStealthMode hiddenMode = EStealthMode.Off) {
+		if (hiddenMode >= EStealthMode.Doron)
 			return;
 
 		if (length == -1) {
@@ -347,11 +347,12 @@ class NotesManager {
 
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
-		Color4 normalColor, Color4 effectedColor, int x末端, int y末端) {
-		EGameType _gt = GetChipGameType(chip, player);
-
-		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] != EStealthMode.Off || !chip.bShow)
+		Color4 normalColor, Color4 effectedColor, int x末端, int y末端, EStealthMode hiddenMode = EStealthMode.Off
+		) {
+		if (hiddenMode >= EStealthMode.Doron)
 			return;
+
+		EGameType _gt = GetChipGameType(chip, player);
 
 		int _offset = 0;
 		var _texarr = OpenTaiko.Tx.Notes[(int)_gt];
@@ -429,8 +430,8 @@ class NotesManager {
 	}
 
 	// SENotes
-	public static void DisplaySENotes(int player, int x, int y, CChip chip) {
-		if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(player)] == EStealthMode.Stealth)
+	public static void DisplaySENotes(int player, int x, int y, CChip chip, EStealthMode hiddenMode = EStealthMode.Off) {
+		if (hiddenMode >= EStealthMode.Stealth)
 			return;
 
 		EGameType _gt = GetChipGameType(chip, player);

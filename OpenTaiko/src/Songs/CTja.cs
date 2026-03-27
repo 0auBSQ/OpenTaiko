@@ -2896,6 +2896,7 @@ internal class CTja : CActivity {
 		chip.bHit = false;
 		chip.bShow = true;
 		chip.bShowRoll = true;
+		chip.bShowSudden = true;
 		chip.db発声位置 = this.dbNowTime;
 		chip.n整数値 = (int)noteType;
 		chip.n整数値_内部番号 = this.listNoteChip.Count;
@@ -4314,7 +4315,7 @@ internal class CTja : CActivity {
 		double msDTime = chip.db発声時刻ms - msTjaNowTime;
 		double th16DBeat = chip.fBMSCROLLTime - th16NowBeat;
 
-		chip.bShow = !(NotesManager.IsGenericRoll(chip) && velocityRefChip.IsSuddenHideRoll)
+		chip.bShowSudden = !(NotesManager.IsGenericRoll(chip) && velocityRefChip.IsSuddenHideRoll)
 			&& (msTjaNowTime >= velocityRefChip.n発声時刻ms - velocityRefChip.msShowOffset);
 
 		// In TJAP3, #SUDDEN only affects horizontal scroll

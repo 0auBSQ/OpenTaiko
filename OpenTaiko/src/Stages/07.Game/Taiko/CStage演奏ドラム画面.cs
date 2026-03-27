@@ -888,9 +888,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#endregion
 
 				#region[ HIDSUD & STEALTH ]
-				if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stageGameScreen.bCustomDoron[nPlayer]) {
-					pChip.bShow = false;
-				}
+				EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)];
+				if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
+					hiddenMode = EStealthMode.Stealth;
+				if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])
+					hiddenMode = EStealthMode.Doron;
 				#endregion
 
 				long __dbt = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
@@ -987,8 +989,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 							case 0x14:
 							case 0x1C:
 							case 0x101: {
-									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-									NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
+									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
+									NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 
 									//TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
 									break;
@@ -998,7 +1000,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 							case 0x1B: {
 									int moveX = (int)(fHand * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
 									int moveY = (int)(fHand * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
-									if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Off && pChip.bShow) {
+									if (hiddenMode < EStealthMode.Doron) {
 										if (nPlayer != OpenTaiko.ConfigIni.nPlayerCount - 1) {
 											//上から下
 											OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
@@ -1017,14 +1019,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 												x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX,
 												y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
 										}
-										NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
-										NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
+										NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
+										NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 									}
 									break;
 								}
 
 							case 0x1F: {
-									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9);
+									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
 								}
 								break;
 							default: {
@@ -1104,11 +1106,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			#region[ HIDSUD & STEALTH ]
-
-			if (OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)] == EStealthMode.Stealth || OpenTaiko.stageGameScreen.bCustomDoron[nPlayer]) {
-				pChip.bShow = false;
-			}
-
+			EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)];
+			if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
+				hiddenMode = EStealthMode.Stealth;
+			if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])
+				hiddenMode = EStealthMode.Doron;
 			#endregion
 
 			//if( CDTXMania.ConfigIni.eScrollMode != EScrollMode.Normal )
@@ -1188,9 +1190,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					int _78_cut = 78 * _size[0] / 136;
 
 					if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
-						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端);
+						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端, hiddenMode);
 
-						if (OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+						if (hiddenMode < EStealthMode.Stealth && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
 
 							if (!NotesManager.IsFuzeRoll(pChip)) {
 								int _shift = NotesManager.IsBigRollTaiko(pChip, _gt) ? 26 : 0;
@@ -1214,19 +1216,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 
 					if (NotesManager.IsBalloon(pChip) || NotesManager.IsKusudama(pChip)) {
-						if (pChip.bShow) {
-							NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2);
-							NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
-
-							/*
-                            if (TJAPlayer3.ConfigIni.eSTEALTH != Eステルスモード.DORON)
-                                TJAPlayer3.Tx.Notes[(int)_gt].t2D描画(x, y, new Rectangle(1430, num9, 260, 130));
-                            */
-
-							//TJAPlayer3.Tx.SENotes.t2D描画(x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
-						}
+						NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
+						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 					}
-					if (NotesManager.IsRollEnd(pChip)) {
+					if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(pChip)) {
 						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
 						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
 							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;

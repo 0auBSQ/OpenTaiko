@@ -56,6 +56,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double db発声時刻ms;
 
 	// for #SUDDEN
+	public bool bShowSudden;
 	public double msShowOffset = double.PositiveInfinity;
 	public double msMoveOffset = double.PositiveInfinity;
 	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
