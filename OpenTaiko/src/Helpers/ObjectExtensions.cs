@@ -218,6 +218,17 @@ namespace System {
 			return filteredParts;
 		}
 
+		private static readonly Regex InfRegex = new Regex(@"inf(?:inity)?", RegexOptions.IgnoreCase);
+
+		public static string NormalizeInf(this string input)
+			=> InfRegex.Replace(input, "Infinity");
+
+		public static float ParseRealF(this string input)
+			=> float.Parse(NormalizeInf(input));
+
+		public static double ParseReal(this string input)
+			=> double.Parse(NormalizeInf(input));
+
 		private static readonly Regex ComplexComponentDelimRegex = new Regex(@"(?<=[^e\s])\s*(?=[+-])|(?<=[^e\s])\s+(?=[^e\s])", RegexOptions.IgnoreCase);
 
 		public static double[] ParseComplex(this string input) {
@@ -230,7 +241,7 @@ namespace System {
 					idxRI = 1;
 				for (int i = 0, n = Math.Min(2 - idxRI, parts.Length); i < n; ++i) {
 					var part = parts[i];
-					part = part.Replace(" ", "");
+					part = part.NormalizeInf().Replace(" ", "");
 					if (idxRI + i == 1 && part.EndsWith('i')) {
 						part = part.TrimEnd('i');
 						if (part.Length == 0 || part[part.Length - 1] is '+' or '-') // +i/-i/i

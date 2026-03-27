@@ -1679,7 +1679,7 @@ internal class CTja : CActivity {
 		} else if (command == "#END") {
 			// handled at end of input
 		} else if (command == "#BPMCHANGE") {
-			double dbBPM = double.Parse(argument);
+			double dbBPM = argument.ParseReal();
 			this.dbNowBPM = dbBPM;
 
 			if (dbBPM > MaxBPM) {
@@ -1701,7 +1701,7 @@ internal class CTja : CActivity {
 			if (argument.IndexOf('i') != -1)
 				this.tParsedComplexNumber(argument, ref dbComplexNum);
 			else
-				dbComplexNum[0] = double.Parse(argument);
+				dbComplexNum[0] = argument.ParseReal();
 
 			this.dbNowScroll = dbComplexNum[0];
 			this.dbNowScrollY = dbComplexNum[1];
@@ -1720,8 +1720,8 @@ internal class CTja : CActivity {
 			WarnSplitLength("#MEASURE subsplit", strArray, 2);
 
 			double[] dbLength = new double[2];
-			dbLength[0] = Convert.ToDouble(strArray[0]);
-			dbLength[1] = Convert.ToDouble(strArray[1]);
+			dbLength[0] = strArray[0].ParseReal();
+			dbLength[1] = strArray[1].ParseReal();
 
 			double db小節長倍率 = dbLength[0] / dbLength[1];
 			this.fNow_Measure_m = (float)dbLength[1];
@@ -1729,7 +1729,7 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(this.NewEventChipAtDefCursor(0x02, 1, argDb: db小節長倍率));
 		} else if (command == "#DELAY") {
-			double nDELAY = double.Parse(argument);
+			double nDELAY = argument.ParseReal();
 			nDELAY *= 1000;
 
 			//チップ追加して割り込んでみる。
@@ -1753,7 +1753,7 @@ internal class CTja : CActivity {
 			int index = (10 * int.Parse(listvdIndex[0].ToString())) + int.Parse(listvdIndex[1].ToString()) + 2;
 
 			var chip = this.NewEventChipAtDefCursor(0x54, index, index);
-			chip.VideoStartTimeMs = (int)(float.Parse(bgaStartTime) * 1000);
+			chip.VideoStartTimeMs = (int)(bgaStartTime.ParseRealF() * 1000);
 			this.listChip.Add(chip);
 		} else if (command == "#BGAOFF") {
 			int index = (10 * int.Parse(argument[0].ToString())) + int.Parse(argument[1].ToString()) + 2;
@@ -1806,7 +1806,7 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(0xB2, 1);
 
 			string[] args = argument.Split(',');
-			chip.borderColor = new Color4(float.Parse(args[0]) / 255, float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, 1f);
+			chip.borderColor = new Color4(args[0].ParseRealF() / 255, args[1].ParseRealF() / 255, args[2].ParseRealF() / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -1844,8 +1844,8 @@ internal class CTja : CActivity {
 			string[] args = argumentFull.Split(',');
 
 			chip.strObjName = args[0];
-			chip.fObjX = float.Parse(args[1]);
-			chip.fObjY = float.Parse(args[2]);
+			chip.fObjX = args[1].ParseRealF();
+			chip.fObjY = args[2].ParseRealF();
 			var txPath = this.strFolderPath + args[3];
 			Trace.TraceInformation("" + this.bLoadChart);
 			if (this.bLoadChart) {
@@ -1893,7 +1893,7 @@ internal class CTja : CActivity {
 
 			string[] args = argument.Split(',');
 			chip.strObjName = args[0];
-			chip.borderColor = new Color4(float.Parse(args[1]) / 255, float.Parse(args[2]) / 255, float.Parse(args[3]) / 255, 1f);
+			chip.borderColor = new Color4(args[1].ParseRealF() / 255, args[2].ParseRealF() / 255, args[3].ParseRealF() / 255, 1f);
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -1946,7 +1946,7 @@ internal class CTja : CActivity {
 
 			string[] args = argument.Split(',');
 			chip.strObjName = args[0];
-			chip.dbAnimInterval = double.Parse(args[1]);
+			chip.dbAnimInterval = args[1].ParseReal();
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -1955,7 +1955,7 @@ internal class CTja : CActivity {
 
 			string[] args = argument.Split(',');
 			chip.strObjName = args[0];
-			chip.dbAnimInterval = double.Parse(args[1]);
+			chip.dbAnimInterval = args[1].ParseReal();
 
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -2008,8 +2008,8 @@ internal class CTja : CActivity {
 				var arguments = argument.Split(',', StringSplitOptions.TrimEntries);
 				try {
 					strCond = arguments[0];
-					nNum[0] = Convert.ToDouble(arguments[1]);
-					nNum[1] = Convert.ToDouble(arguments[2]);
+					nNum[0] = arguments[1].ParseReal();
+					nNum[1] = arguments[2].ParseReal();
 
 					// only check first character for case
 					bool isUpper = char.IsUpper(strCond[0]);
@@ -2127,7 +2127,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 			this.bLyrics = true;
 		} else if (command == "#DIRECTION") {
-			double dbSCROLL = Convert.ToDouble(argument);
+			double dbSCROLL = argument.ParseReal();
 			this.nスクロール方向 = (int)dbSCROLL;
 
 			//チップ追加して割り込んでみる。
@@ -2141,8 +2141,8 @@ internal class CTja : CActivity {
 		} else if (command == "#SUDDEN") {
 			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#SUDDEN", strArray, 2);
-			double db出現時刻 = Convert.ToDouble(strArray[0]);
-			double db移動待機時刻 = Convert.ToDouble(strArray[1]);
+			double db出現時刻 = strArray[0].ParseReal();
+			double db移動待機時刻 = strArray[1].ParseReal();
 			this.msSuddenShowOffset = 1000 * db出現時刻;
 			this.msSuddenMoveOffset = 1000 * db移動待機時刻;
 
@@ -2157,7 +2157,7 @@ internal class CTja : CActivity {
 		} else if (command == "#JPOSSCROLL") {
 			var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			WarnSplitLength("#JPOSSCROLL", strArray, 2);
-			double msMoveDt = double.Max(0, 1000 * Convert.ToDouble(strArray[0]));
+			double msMoveDt = double.Max(0, 1000 * strArray[0].ParseReal());
 			double pxMoveDx = 0;
 			double pxMoveDy = 0;
 			if (strArray[1].IndexOf('i') != -1) {
@@ -2166,7 +2166,7 @@ internal class CTja : CActivity {
 				pxMoveDx = dbComplexNum[0];
 				pxMoveDy = dbComplexNum[1];
 			} else
-				pxMoveDx = Convert.ToDouble(strArray[1]);
+				pxMoveDx = strArray[1].ParseReal();
 
 
 			int n移動方向 = (strArray.Length >= 3) ? Convert.ToInt32(strArray[2]) : 0;
@@ -2323,7 +2323,7 @@ internal class CTja : CActivity {
 	private void ParseArgCamSetCommand(string command, string argument, int channelNo, CChip? camChip, string commandEnd) {
 		if (camChip == null) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
-			chip.fObjStart = chip.fObjEnd = float.Parse(argument);
+			chip.fObjStart = chip.fObjEnd = argument.ParseRealF();
 			chip.strObjEaseType = "IN_OUT";
 			// チップを配置。
 			this.listChip.Add(chip);
@@ -2341,8 +2341,8 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 
 			string[] args = argument.Split(',');
-			chip.fObjStart = float.Parse(args[0]);
-			chip.fObjEnd = float.Parse(args[1]);
+			chip.fObjStart = args[0].ParseRealF();
+			chip.fObjEnd = args[1].ParseRealF();
 			chip.strObjEaseType = args[2];
 			chip.objCalcType = TjaArgToEasingCalcType(args[3]);
 
@@ -2382,8 +2382,8 @@ internal class CTja : CActivity {
 		if (!currentObjAnimations.ContainsKey($"{animationKey}_{name}")) {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 			chip.strObjName = args[0];
-			chip.fObjStart = float.Parse(args[1]);
-			chip.fObjEnd = float.Parse(args[1]);
+			chip.fObjStart = args[1].ParseRealF();
+			chip.fObjEnd = args[1].ParseRealF();
 			chip.strObjEaseType = "IN_OUT";
 
 			// チップを配置。
@@ -2402,8 +2402,8 @@ internal class CTja : CActivity {
 			//arguments: <start value>,<end value>,<easing type>,<calc type>
 			var chip = this.NewEventChipAtDefCursor(channelNo, 0);
 			chip.strObjName = args[0];
-			chip.fObjStart = float.Parse(args[1]);
-			chip.fObjEnd = float.Parse(args[2]);
+			chip.fObjStart = args[1].ParseRealF();
+			chip.fObjEnd = args[2].ParseRealF();
 			chip.strObjEaseType = args[3];
 			chip.objCalcType = TjaArgToEasingCalcType(args[4]);
 
@@ -3108,7 +3108,7 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals(".BOOMRULE")) {
 			string[] args = strCommandParam.Split(',');
 			this.boomRule = strConvertBoomRule(args[0]);
-			this.boomRuleValue = (args.Length > 1) ? float.Parse(args[1]) : (this.boomRule switch {
+			this.boomRuleValue = (args.Length > 1) ? args[1].ParseRealF() : (this.boomRule switch {
 				EBoomRule.Scal => 4f,
 				EBoomRule.Ratio => 1f,
 				EBoomRule.Fatal => 1,
@@ -3269,14 +3269,14 @@ internal class CTja : CActivity {
 			this.NOTESDESIGNER[this.n参照中の難易度] = strCommandParam;
 		} else if (strCommandName.Equals("LIFE")) {
 			// LIFE here
-			var life = (int)Convert.ToDouble(strCommandParam);
+			var life = (int)strCommandParam.ParseReal();
 			this.LIFE = life;
 		} else if (strCommandName.Equals("PREIMAGE")) {
 			this.PREIMAGE = strCommandParam;
 		} else if (strCommandName.Equals("TOWERTYPE")) {
 			this.TOWERTYPE = strCommandParam;
 		} else if (strCommandName.Equals("DANTICK")) {
-			var tick = (int)Convert.ToDouble(strCommandParam);
+			var tick = (int)strCommandParam.ParseReal();
 			this.DANTICK = tick;
 		} else if (strCommandName.Equals("DANTICKCOLOR")) {
 			var tickcolor = ColorTranslator.FromHtml(strCommandParam);
@@ -3285,7 +3285,7 @@ internal class CTja : CActivity {
 			if (strCommandParam.IndexOf(",") != -1)
 				strCommandParam = strCommandParam.Replace(',', '.');
 
-			double dbBPM = Convert.ToDouble(strCommandParam);
+			double dbBPM = strCommandParam.ParseReal();
 			this.BPM = dbBPM;
 			this.BASEBPM = dbBPM;
 			this.MinBPM = dbBPM;
@@ -3321,14 +3321,14 @@ internal class CTja : CActivity {
 				}
 			}
 		} else if (strCommandName.Equals("OFFSET") && !string.IsNullOrEmpty(strCommandParam)) {
-			this.msOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.msOFFSET_Abs = (int)(strCommandParam.ParseReal() * 1000);
 			this.isOFFSET_Negative = this.msOFFSET_Abs < 0 ? true : false;
 
 			if (this.isOFFSET_Negative == true)
 				this.msOFFSET_Abs = this.msOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 															//tbOFFSET.Text = strCommandParam;
 		} else if (strCommandName.Equals("MOVIEOFFSET")) {
-			this.msMOVIEOFFSET_Abs = (int)(Convert.ToDouble(strCommandParam) * 1000);
+			this.msMOVIEOFFSET_Abs = (int)(strCommandParam.ParseReal() * 1000);
 			this.isMOVIEOFFSET_Negative = this.msMOVIEOFFSET_Abs < 0 ? true : false;
 
 			if (this.isMOVIEOFFSET_Negative == true)
@@ -3395,7 +3395,7 @@ internal class CTja : CActivity {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
 
-			this.dbScrollSpeed = Convert.ToDouble(strCommandParam);
+			this.dbScrollSpeed = strCommandParam.ParseReal();
 		} else if (strCommandName.Equals("GENRE")) {
 			//2015.03.28 kairera0467
 			//ジャンルの定義。DTXから入力もできるが、tjaからも入力できるようにする。
@@ -3429,7 +3429,7 @@ internal class CTja : CActivity {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				int nOFFSETms;
 				try {
-					nOFFSETms = (int)(Convert.ToDouble(strCommandParam) * 1000.0);
+					nOFFSETms = (int)(strCommandParam.ParseReal() * 1000.0);
 				} catch {
 					nOFFSETms = 0;
 				}
