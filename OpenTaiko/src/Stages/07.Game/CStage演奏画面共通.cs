@@ -906,7 +906,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		if (pChip != null) {
 			CTja tja = OpenTaiko.GetTJA(player)!;
-			int nDeltaTime = Math.Abs((int)(msTjaTime - pChip.n発声時刻ms));
+			double nDeltaTime = Math.Abs(Math.Truncate(msTjaTime - pChip.db発声時刻ms));
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
 			if (NotesManager.IsRoll(pChip)) {
 				return (msTjaTime >= pChip.n発声時刻ms && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
