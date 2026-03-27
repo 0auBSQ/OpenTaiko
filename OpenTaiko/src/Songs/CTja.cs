@@ -1997,15 +1997,8 @@ internal class CTja : CActivity {
 			double[] nNum = new double[2];
 
 			//名前と条件Aの間に,が無いと正常に動作しなくなる.2020.04.23.akasoko26
-			#region [ 名前と条件Aの間に,が無いと正常に動作しなくなる ]
-			//空白を削除する。
-			argument = Regex.Replace(argument, @"\s", "");
-			//2文字目が,か数値かをチェック
-			var IsNumber = bIsNumber(argument[1]);
-			//IsNumber == true であったら,が無いということなので,を2文字目にぶち込む・・・
-			if (IsNumber)
-				argument = argument.Insert(1, ",");
-			#endregion
+			// insert comma (,) between condition type and value if not exists
+			argument = Regex.Replace(argument, @"(?<=^\s*[a-zA-Z]+)\s*(?=\d)", ",");
 
 			// empty or unrecognized argument format: none
 			var (eType, eBig) = (Exam.Type.None, EBranchCondBig.Both);
@@ -2034,13 +2027,14 @@ internal class CTja : CActivity {
 						// uniqsub extensions, renamed to dan-i type
 						"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
 						"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
-						// traditional format with unrecognized condition: p
-						_ => (Exam.Type.Accuracy, EBranchCondBig.Both),
+						// unrecognized condition
+						_ => throw new ArgumentOutOfRangeException("strCond"),
 					};
 
 					eRange = ((arguments.Length > 3) ? arguments[3] : "") switch {
 						"l" => Exam.Range.Less,
-						"m" or _ => Exam.Range.More,
+						"m" or "" => Exam.Range.More,
+						_ => throw new ArgumentOutOfRangeException("strRange"),
 					};
 				} catch (FormatException ex) {
 					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
