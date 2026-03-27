@@ -3253,11 +3253,14 @@ internal class CTja : CActivity {
 			string _lang = strCommandName.Substring(8).ToLowerInvariant();
 			this.SUBTITLE.SetString(_lang, strCommandParam);
 		} else if (strCommandName.Equals("LEVEL")) {
-			var level_dec = Convert.ToDouble(strCommandParam);
-			var level = (int)level_dec;
+			var level_dec = strCommandParam.ParseReal();
+			var level = Math.Max(0, (int)level_dec);
 			if (strCommandParam != level.ToString()) {
-				int frac_part = Int32.Parse(level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.')[1]);
-				this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+				var parts = level_dec.ToString("0.0", CultureInfo.InvariantCulture).Split('.');
+				if (parts.Length > 1) {
+					int frac_part = Int32.Parse(parts[1]);
+					this.LEVELtaikoIcon[this.n参照中の難易度] = (frac_part >= 5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+				}
 			}
 			this.LEVEL.Drums = (int)level;
 			this.LEVEL.Taiko = (int)level;
