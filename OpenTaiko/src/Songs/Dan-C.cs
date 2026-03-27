@@ -205,6 +205,7 @@ public static class Exam {
 		Total,
 		// for branch conditions
 		None = Total,
+		PercentPerfect,
 		BalloonHits,
 		TotalBranch,
 	}

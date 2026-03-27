@@ -494,10 +494,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		public double GetScore(Exam.Type type) => type switch {
 			Exam.Type.Accuracy => (nGreat + nGood + nMiss == 0) ? 0 : (nGreat + nGood * 0.5) / (nGreat + nGood + nMiss) * 100.0,
-			Exam.Type.Roll => nRoll,
+			Exam.Type.PercentPerfect => (nGreat + nGood + nMiss == 0) ? 0 : (nGreat) / (nGreat + nGood + nMiss) * 100.0,
 			Exam.Type.JudgePerfect => nGreat,
 			Exam.Type.JudgeGood => nGood,
 			Exam.Type.JudgeBad => nMiss,
+			Exam.Type.Roll => nRoll,
 			Exam.Type.BalloonHits => nBalloon,
 			_ => 0,
 		};

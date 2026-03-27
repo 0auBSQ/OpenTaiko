@@ -66,20 +66,25 @@ internal class CTja : CActivity {
 		BigOnly,
 	}
 
-	public static string EnumToTjaString(Exam.Type type, EBranchCondBig big) => (type, big) switch {
-		(Exam.Type.Accuracy, EBranchCondBig.Both) => "p",
-		(Exam.Type.Roll, EBranchCondBig.Both) => "r",
-		(Exam.Type.Roll, EBranchCondBig.BigOnly) => "rb",
-		(Exam.Type.Score, EBranchCondBig.Both) => "s",
-		(Exam.Type.JudgePerfect, EBranchCondBig.BigOnly) => "gb",
-		(Exam.Type.JudgePerfect, EBranchCondBig.Both) => "g",
-		(Exam.Type.JudgeGood, EBranchCondBig.BigOnly) => "ob",
-		(Exam.Type.JudgeGood, EBranchCondBig.Both) => "o",
-		(Exam.Type.JudgeBad, EBranchCondBig.Both) => "b",
-		(Exam.Type.BalloonHits, EBranchCondBig.RegOnly) => "bl",
-		(Exam.Type.BalloonHits, EBranchCondBig.BigOnly) => "ks",
-		(Exam.Type.None, _) or _ => "",
+	public static string EnumToTjaString(string type, EBranchCondBig big) => big switch {
+		EBranchCondBig.RegOnly => $"{type.ToLower()}-{type.ToUpper()}",
+		EBranchCondBig.BigOnly => type.ToUpper(),
+		EBranchCondBig.Both or _ => type.ToLower(),
 	};
+
+	public static string EnumToTjaString(Exam.Type type, EBranchCondBig big) => EnumToTjaString(type switch {
+		Exam.Type.Accuracy => "p",
+		Exam.Type.PercentPerfect => "pp",
+		Exam.Type.JudgeBad => "jb",
+		Exam.Type.Roll => "r",
+		Exam.Type.BalloonHits => "rb",
+		Exam.Type.Score => "s",
+		// uniqsub extensions, renamed to dan-i type
+		Exam.Type.JudgePerfect => "jp",
+		Exam.Type.JudgeGood => "jg",
+		// non-traditional syntax
+		Exam.Type.None or _ => "",
+	}, big);
 
 	public class CWAV : IDisposable {
 		public bool bBGMとして使う;
@@ -1570,9 +1575,6 @@ internal class CTja : CActivity {
 	private static readonly Regex CommandAndArgumentRegex =
 		new Regex(@"^(#[A-Z]+)(?:\s?)(.+?)?$", RegexOptions.Compiled);
 
-	private static readonly Regex BranchStartArgumentRegex =
-		new Regex(@"^([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)$", RegexOptions.Compiled);
-
 	private static readonly Regex FormatExceptionMessageRegex =
 		new Regex(@"^The input string '(.*)' was not in a correct format.$", RegexOptions.Compiled);
 
@@ -2009,30 +2011,36 @@ internal class CTja : CActivity {
 			var (eType, eBig) = (Exam.Type.None, EBranchCondBig.Both);
 			var eRange = Exam.Range.More;
 
-			var branchStartArgumentMatch = BranchStartArgumentRegex.Match(argument);
 			if (!string.IsNullOrWhiteSpace(argument)) {
+				var arguments = argument.Split(',', StringSplitOptions.TrimEntries);
 				try {
-					strCond = branchStartArgumentMatch.Groups[1].Value;
-					nNum[0] = Convert.ToDouble(branchStartArgumentMatch.Groups[2].Value);
-					nNum[1] = Convert.ToDouble(branchStartArgumentMatch.Groups[3].Value);
+					strCond = arguments[0];
+					nNum[0] = Convert.ToDouble(arguments[1]);
+					nNum[1] = Convert.ToDouble(arguments[2]);
 
-					(eType, eBig) = strCond switch {
-						"r" => (Exam.Type.Roll, EBranchCondBig.Both),
-						"rb" => (Exam.Type.Roll, EBranchCondBig.BigOnly),
-						"s" => (Exam.Type.Score, EBranchCondBig.Both),
-						"d" or "gb" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
-						"g" => (Exam.Type.JudgePerfect, EBranchCondBig.Both),
-						"ob" => (Exam.Type.JudgeGood, EBranchCondBig.BigOnly),
-						"o" => (Exam.Type.JudgeGood, EBranchCondBig.Both),
-						"b" => (Exam.Type.JudgeBad, EBranchCondBig.Both),
-						"bl" => (Exam.Type.BalloonHits, EBranchCondBig.RegOnly),
-						"ks" => (Exam.Type.BalloonHits, EBranchCondBig.BigOnly),
-						"p" or _ => (Exam.Type.Accuracy, EBranchCondBig.Both), // traditional format with unrecognized condition: p
+					// only check first character for case
+					bool isUpper = char.IsUpper(strCond[0]);
+					var bigOnlyIfUpper = isUpper ? EBranchCondBig.BigOnly : EBranchCondBig.Both;
+
+					(eType, eBig) = strCond.ToLower() switch {
+						"p" => (Exam.Type.Accuracy, bigOnlyIfUpper), // lower p: traditional condition
+						"pp" => (Exam.Type.PercentPerfect, bigOnlyIfUpper),
+						"jb" => (Exam.Type.JudgeBad, bigOnlyIfUpper),
+						"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
+						"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
+						"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
+						// TJAP2fPC extensions, Akasoko modification
+						"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
+						// uniqsub extensions, renamed to dan-i type
+						"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
+						"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
+						// traditional format with unrecognized condition: p
+						_ => (Exam.Type.Accuracy, EBranchCondBig.Both),
 					};
 
-					eRange = strCond switch {
-						"b" => Exam.Range.Less,
-						_ => Exam.Range.More,
+					eRange = ((arguments.Length > 3) ? arguments[3] : "") switch {
+						"l" => Exam.Range.Less,
+						"m" or _ => Exam.Range.More,
 					};
 				} catch (FormatException ex) {
 					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
