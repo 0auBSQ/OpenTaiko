@@ -25,10 +25,9 @@ namespace OpenTaiko;
 ///    relevant section/subsection combination.
 ///    Non-sheets (header sections) have the best rank.
 /// 4. Determine the best-ranked sheet. Pre-COURSE: sheets have worst ranks if current difficulty is Oni, or otherwise skipped entirely.
-/// 5. Remove sheets other than the best-ranked, keeping non-sheets
-/// 6. Remove top-level STYLE-type sections which no longer contain a sheet
-/// 7. From supported STYLE-type sections, remove non-sheet subsections beyond
-///    the selected sheet, to reduce risk of incorrect command processing.
+/// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
+/// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
+/// 7. Remove all sections beyond the selected sheet
 /// 8. Reassemble the string
 /// </summary>
 public static class CDTXStyleExtractor {
@@ -175,9 +174,9 @@ public static class CDTXStyleExtractor {
 			return (strTJAGlobal ?? "") + (strTJACourse ?? "");
 		}
 
-		RemoveSheetsOtherThanTheBestRanked(sections, bestPostCourseRank, bestRank);
-		RemoveRecognizedStyleSectionsWithoutSheets(sections);
-		RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(sections);
+		var (idxSection, idxSubSection) = MarkSkippedSheetsOtherThanTheBestRanked(sections, bestPostCourseRank, bestRank);
+		MarkSkippedRecognizedStyleSectionsWithoutSheets(sections);
+		RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(sections, idxSection, idxSubSection);
 		return Reassemble(sections);
 	}
 
@@ -224,6 +223,7 @@ public static class CDTXStyleExtractor {
 		public readonly string OriginalRawValue;
 
 		public List<SubSection> SubSections = [];
+		public bool Skipped;
 
 		public Section(bool isPostCourse, SectionKind sectionKind, string originalRawValue) {
 			IsPostCourse = isPostCourse;
@@ -280,6 +280,7 @@ public static class CDTXStyleExtractor {
 		public readonly string OriginalRawValue;
 
 		public int Rank;
+		public bool Skipped;
 
 		public SubSection(SubSectionKind subSectionKind, string originalRawValue) {
 			SubSectionKind = subSectionKind;
@@ -311,56 +312,53 @@ public static class CDTXStyleExtractor {
 			.Min(pss => (pss.post ? 0 : 1, pss.ss.Rank));
 	}
 
-	// 5. Remove sheets other than the best-ranked, keeping non-sheets
-	private static void RemoveSheetsOtherThanTheBestRanked(IList<Section> sections, int bestPostCourseRank, int bestRank) {
+	// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
+	private static (int idxSection, int idxSubSection) MarkSkippedSheetsOtherThanTheBestRanked(IList<Section> sections, int bestPostCourseRank, int bestRank) {
 		// We can safely remove based on > bestRank because the subsection types
 		// which are never removed always have a Rank value of 0.
 
 		foreach (var section in sections) {
 			var postCourseRank = section.IsPostCourse ? 0 : 1;
-			section.SubSections.RemoveAll(o => (o.Rank != 0) && (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0);
+			foreach (var o in section.SubSections.Where(o => (o.Rank != 0) && (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0))
+				o.Skipped = true;
 		}
 
 		// If there was a tie for the best sheet,
 		// take the first and remove the rest.
-		var extraBestRankedSheets = sections
-			.SelectMany(s => s.SubSections.Select(ss => (s, ss)))
-			.Where(sSs => sSs.ss.Rank == bestRank)
-			.Skip(1);
+		var bestRankedSheets = sections
+			.SelectMany((s, i) => s.SubSections.Select((ss, j) => (s, i, ss, j)))
+			.Where(sissj => sissj.ss.Rank == bestRank);
 
-		foreach (var (s, ss) in extraBestRankedSheets) {
-			s.SubSections.Remove(ss);
-		}
+		var firstBestRangedSheet = bestRankedSheets.First();
+
+		var extraRankedSheets = bestRankedSheets.Skip(1);
+		foreach (var (s, i, ss, j) in extraRankedSheets)
+			ss.Skipped = true;
+
+		return (firstBestRangedSheet.i, firstBestRangedSheet.j);
 	}
 
-	// 6. Remove top-level STYLE-type sections which no longer contain a sheet
-	private static void RemoveRecognizedStyleSectionsWithoutSheets(List<Section> sections) {
+	// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
+	private static void MarkSkippedRecognizedStyleSectionsWithoutSheets(List<Section> sections) {
 		// Note that we dare not remove SectionKind.StyleUnrecognized instances without sheets.
 		// The reason is because there are plenty of .tja files with weird STYLE: header values
 		// and which are located very early in the file. Removing those sections would remove
 		// important information, and was one of the problems with the years-old splitting code
 		// which was replaced in late summer 2018 and which is now being overhauled in early fall 2018.
 
-		sections.RemoveAll(o =>
+		foreach (var section in sections.Where(o =>
 			(o.SectionKind == SectionKind.StyleSingle || o.SectionKind == SectionKind.StyleDouble) &&
-			o.SubSections.Count(subSection => subSection.SubSectionKind == SubSectionKind.NonSheet) == o.SubSections.Count);
+			o.SubSections.Count(subSection => subSection.SubSectionKind == SubSectionKind.NonSheet) == o.SubSections.Count)
+			) {
+			section.Skipped = true;
+		}
 	}
 
-	// 7. From supported STYLE-type sections, remove non-sheet subsections beyond
-	//    the selected sheet, to reduce risk of incorrect command processing.
-	private static void RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(List<Section> sections) {
-		foreach (var section in sections) {
-			if (section.SectionKind == SectionKind.StyleSingle || section.SectionKind == SectionKind.StyleDouble) {
-				var subSections = section.SubSections;
-
-				var lastIndex = subSections.FindIndex(o => o.SubSectionKind != SubSectionKind.NonSheet);
-				var removalIndex = lastIndex + 1;
-
-				if (lastIndex != -1 && removalIndex < subSections.Count) {
-					subSections.RemoveRange(removalIndex, subSections.Count - removalIndex);
-				}
-			}
-		}
+	// 7. Remove all sections beyond the selected sheet
+	private static void RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(List<Section> sections, int idxSectionSelected, int idxSubSectionSelected) {
+		sections.RemoveRange(idxSectionSelected + 1, sections.Count - 1 - idxSectionSelected);
+		var subSections = sections[idxSectionSelected].SubSections;
+		subSections.RemoveRange(idxSubSectionSelected + 1, subSections.Count - 1 - idxSubSectionSelected);
 	}
 
 	// 8. Reassemble the string
@@ -368,8 +366,11 @@ public static class CDTXStyleExtractor {
 		var sb = new StringBuilder();
 
 		foreach (var section in sections) {
-			foreach (var subSection in section.SubSections) {
-				sb.Append(subSection.OriginalRawValue);
+			if (!section.Skipped) {
+				foreach (var subSection in section.SubSections) {
+					if (!subSection.Skipped)
+						sb.Append(subSection.OriginalRawValue);
+				}
 			}
 		}
 
