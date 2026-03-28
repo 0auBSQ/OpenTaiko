@@ -3160,6 +3160,15 @@ internal class CTja : CActivity {
 					this.bHIDDENBRANCH[course] = true;
 				});
 			}
+		} else if (strCommandName.StartsWith("NOTESDESIGNER")) {
+			string strDiff = strCommandName.Substring("NOTESDESIGNER".Length);
+			if (this.nowCourseScope != (int)Difficulty.Total) { // after COURSE:, ignore diff and apply to current difficulty
+				this.NOTESDESIGNER[this.nowCourseScope] = strCommandParam;
+			} else if (strDiff != "") { // before COURSE:, with diff, set target difficulty's default
+				this.NOTESDESIGNER[int.Parse(strDiff)] = strCommandParam;
+			} else { // before COURSE:, no diff, set all difficulties' default
+				this.ForEachCurrentCourseScope(difficulty => this.NOTESDESIGNER[difficulty] = strCommandParam);
+			}
 		}
 	}
 
@@ -3323,8 +3332,6 @@ internal class CTja : CActivity {
 			this.LEVEL.Drums = (int)level;
 			this.LEVEL.Taiko = (int)level;
 			this.ForEachCurrentCourseScope(difficulty => this.LEVELtaiko[difficulty] = (int)level);
-		} else if (strCommandName.StartsWith("NOTESDESIGNER")) {
-			this.ForEachCurrentCourseScope(difficulty => this.NOTESDESIGNER[difficulty] = strCommandParam);
 		} else if (strCommandName.Equals("PREIMAGE")) {
 			this.PREIMAGE = strCommandParam;
 		} else if (strCommandName.Equals("BPM")) {
