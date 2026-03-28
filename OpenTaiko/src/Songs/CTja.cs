@@ -1651,22 +1651,29 @@ internal class CTja : CActivity {
 		return result.ToArray();
 	}
 
-	private void TryParseCommand(string InputText) {
+	private static bool TokenizeCommand(string InputText, out string command, out string argumentFull, out string argument) {
 		#region [Split comma and arguments values]
 		var match = CommandAndArgumentRegex.Match(InputText);
 		if (!match.Success) {
-			return;
+			command = argumentFull = argument = "";
+			return false;
 		}
 
-		var command = match.Groups[1].Value;
+		command = match.Groups[1].Value;
 		var argumentMatchGroup = match.Groups[2];
-		var argumentFull = argumentMatchGroup.Success ? argumentMatchGroup.Value : "";
+		argumentFull = argumentMatchGroup.Success ? argumentMatchGroup.Value : "";
 
 		// For handling arguments ending in a ` `-or-`,`-containing string, use argumentFull
 
 		//命令の最後に,が残ってしまっているときの対応
-		var argument = argumentFull.TrimEnd([',', ' ']);
+		argument = argumentFull.TrimEnd([',', ' ']);
+		return true;
 		#endregion
+	}
+
+	private void TryParseCommand(string InputText) {
+		if (!TokenizeCommand(InputText, out string command, out string argumentFull, out string argument))
+			return;
 
 		try {
 			this.ParseCommand(command, argument, argumentFull);
@@ -3215,11 +3222,14 @@ internal class CTja : CActivity {
 	}
 
 	private void TryParseGlobalHeader(string InputText) {
-		if (InputText.StartsWith("#BRANCHSTART")) {
-			//2015.08.18 kairera0467
-			//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
-			//Lengthのチェックをされる前ににif文を入れています。
-			this.bHasBranch[this.n参照中の難易度] = true;
+		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
+			if (command == "#BRANCHSTART") {
+				//2015.08.18 kairera0467
+				//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
+				//Lengthのチェックをされる前ににif文を入れています。
+				this.bHasBranch[this.n参照中の難易度] = true;
+			}
+			return;
 		}
 
 		//やべー。先頭にコメント行あったらやばいやん。
