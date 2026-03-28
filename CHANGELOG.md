@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.6.0.103] - 2026-03-28 (Beta)
+
+- [Feat] New TJA header `.FORCEGAUGE:`, which forces the gauge type for the player-side
+- [Feat] New TJA header `.BOOMRULE:`, which specifies the gauge penalty of the BOOM judgement for the player-side
+- [Feat] Multi-value `SCENEPRESET:` (separated by comma (`,`)) for TJA and box.def to randomly use one of specified scenes
+- [Feat] Add new branch condition rules and ranges (based on (0auBSQ/OpenTaiko#807))
+- [Feat] Rotate barlines according to scroll direction like in TaikoJiro2
+- [Feat] Support reading `inf` and `infinity` (case-insensitive) in TJA as `Infinity`
+- [Enhance] TJA `#BRANCHSTART:` Allow omitting comma (,) between multi-letter condition type and value, and reject unknown type or range
+- [Enhance] Make the following header per-player-side: `GAME:`, `HIDDENBRANCH:`, `SIDE:`, `LIFE:`, `TOWERTYPE:`, `DANTICK:`, `DANTICKCOLOR:` (specifying them before the first `COURSE:` sets the default value of all difficulties)
+- [Enhance] Make TJA NOTESDESIGNER headers per-player-side and respect difficulty number if defined before the first `COURSE:` in TJA
+- [Enhance] Adjust gameplay stack order to be debug texts > fading-in/out > lyrics > training UI > OBJ > notes > background and training bar (from top layer to bottom layer)
+- [Enhance] Make log more complete (Allow logging to file before reading Config.ini, log exception in some empty catches, set up inner exceptions in nested throws)
+- [Fix] Big note branch score was not tracked
+- [Fix] Game crashed when the played OBJ command contains non-registered obj name
+- [Fix] Eased value for OBJ command was truncated to int
+- [Fix] Not all OBJ/CAM command states were reset properly on retry
+- [Fix] CAM commands failed to apply to the main screen
+- [Fix] `#BORDERCOLOR` command had no effects
+- [Fix] Lyrics and OBJs could not hide when retry or rewind
+- [Fix] OBJ & CAM commands did not respect play speed
+- [Fix] `#SUDDEN` move offset had no effects
+- [Fix] `#ENABLEDORON` & `#DISABLEDORON` were not per-player and did not reset after retrying gameplay
+- [Fix] `#SUDDEN` could not hide SENote and `#ENABLE`/`DISABLEDORON`, `#SUDDEN`, note hidden upon hit, & balloon appear during popping interfered with each other
+- [Fix] TJA `#SCROLL` could not parse number containing Infinity successfully
+- [Fix] TJA `#SUDDEN` could not handle Infinity values
+- [Fix] `#DELAY Infinity` crashed the game
+- [Fix] Could not select difficulties with `LEVEL:Infinity` or negative value (needs hard reloading song list)
+- [Fix] `LEVEL:10.45` displayed as 10+, `LEVEL:12.95` as 12(-) (for examples) due to unintended rounding
+- [Fix] COURSE-scope headers ignored the default scope before the first `COURSE:`, broken some charts made for TaikoJiro
+- [Fix] Invalid commands starting with `#BRANCHSTART` made the difficulty treated as branched chart
+- [Fix] Pre-COURSE LEVEL: broke difficulty available test (0auBSQ/OpenTaiko#625) (needs hard reloading)
+- [Fix] Per-player-side headers beyond selected player-side chart not ignored, broke per-player-side BALLOON and other headers
+- [Fix] Displayed puchi/character coin multiplier did not include rarity multiplier in Heya
+- [Optimize] Stop processing finished or truncated OBJ/CAM commands
+- [Chore] Decompose `EBranchConditionType` into `Exam.Type`, `EBranchCondBig`, & `Exam.Range`
+- [Chore] Simplify CAM command handling during gameplay
+- [Chore] Fix `CLang.GetExamName()` matched exam type by raw int and would break if Exam.Type changes
+
 ## [0.6.0.102] - 2026-03-24 (Beta)
 
 - [Fix] 0.6.0.101 made Pause -> Resume made chart jumped to song start due to the main timer was not reset correctly
