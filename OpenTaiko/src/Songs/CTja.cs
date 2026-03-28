@@ -1405,15 +1405,16 @@ internal class CTja : CActivity {
 	/// <param name="strTJA"></param>
 	/// <returns>各コースの譜面(string[5])</returns>
 	private string[] tコースで譜面を分割する(string strTJA) {
-		string[] strCourseTJA = new string[(int)Difficulty.Total];
+		string[] strCourseTJA = new string[(int)Difficulty.Total + 1]; // last for global
 
 		string[] courseSections = CourseSplitRegex.Split(strTJA);
-		if (courseSections.Length > 1) {
-			//tja内に「COURSE」があればここを使う。
-			for (int n = 1; n < courseSections.Length; n++) {
-				if (string.IsNullOrEmpty(courseSections[n]))
-					continue;
+		//tja内に「COURSE」があればここを使う。
+		for (int n = 0; n < courseSections.Length; n++) {
+			if (string.IsNullOrEmpty(courseSections[n]))
+				continue;
 
+			int nCourse = (int)Difficulty.Total;
+			if (n > 0) {
 				// courseSections[n] (n > 1) starts with `COURSE` + `:`
 				int valueStart = courseSections[n].IndexOf(':') + 1;
 
@@ -1422,13 +1423,12 @@ internal class CTja : CActivity {
 					eol = courseSections[n].Length;
 
 				string strCourse = courseSections[n].Substring(valueStart, eol - valueStart);
-				int nCourse = this.strConvertCourse(strCourse);
-				if (nCourse != -1) {
-					strCourseTJA[nCourse] = courseSections[n];
-				}
+				int nCourseConverted = this.strConvertCourse(strCourse);
+				if (nCourseConverted >= 0)
+					nCourse = nCourseConverted;
 			}
-		} else {
-			strCourseTJA[3] = strTJA;
+			strCourseTJA[nCourse] ??= "";
+			strCourseTJA[nCourse] += courseSections[n];
 		}
 
 		return strCourseTJA;
@@ -1460,18 +1460,23 @@ internal class CTja : CActivity {
 
 			int n読み込むコース = 3;
 			int n譜面数 = 0; //2017.07.22 kairera0467 tjaに含まれる譜面の数
-			bool b新処理 = false;
 
 			//まずはコースごとに譜面を分割。
 			var strSplitした譜面 = this.tコースで譜面を分割する(strInput);
-			string strTest = "";
+			string globalCourse = strSplitした譜面[(int)Difficulty.Total];
+			bool hasGlobalCourse = !string.IsNullOrEmpty(globalCourse);
 			//存在するかのフラグ作成。
-			for (int i = 0; i < strSplitした譜面.Length; i++) {
+			for (int i = 0; i < (int)Difficulty.Total; i++) {
 				if (!String.IsNullOrEmpty(strSplitした譜面[i])) {
 					this.b譜面が存在する[i] = true;
 					n譜面数++;
 				} else
 					this.b譜面が存在する[i] = false;
+			}
+			// Oni: fallback to global course if empty
+			if (!this.b譜面が存在する[(int)Difficulty.Oni] && hasGlobalCourse) {
+				this.b譜面が存在する[(int)Difficulty.Oni] = true;
+				++n譜面数;
 			}
 
 			#region[ 読み込ませるコースを決定 ]
@@ -1493,7 +1498,8 @@ internal class CTja : CActivity {
 
 			//指定したコースの譜面の命令を消去する。
 			var strCourse = strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
-				strSplitした譜面[n読み込むコース],
+				globalCourse, strSplitした譜面[n読み込むコース],
+				(Difficulty)n読み込むコース,
 				(OpenTaiko.ConfigIni.nPlayerCount > 1 && !OpenTaiko.ConfigIni.bAIBattleMode) ? (this.nPlayerSide + 1) : 0,
 				this.strFullPath);
 
