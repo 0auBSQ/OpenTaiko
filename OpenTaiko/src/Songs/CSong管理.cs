@@ -545,7 +545,7 @@ internal class CSongs管理 {
 					c曲リストノード.score[i].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
 					c曲リストノード.score[i].譜面情報.strサブタイトル = cdtx.SUBTITLE.GetString("");
 					for (int k = 0; k < (int)Difficulty.Total; k++) {
-						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[k];
+						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH[k] ? false : cdtx.bHasBranch[k];
 						c曲リストノード.score[i].譜面情報.nレベル[k] = cdtx.LEVELtaiko[k];
 						c曲リストノード.score[i].譜面情報.nLevelIcon[k] = cdtx.LEVELtaikoIcon[k];
 					}
