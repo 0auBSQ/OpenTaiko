@@ -318,7 +318,7 @@ public static class CDTXStyleExtractor {
 
 		foreach (var section in sections) {
 			var postCourseRank = section.IsPostCourse ? 0 : 1;
-			section.SubSections.RemoveAll(o => (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0);
+			section.SubSections.RemoveAll(o => (o.Rank != 0) && (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0);
 		}
 
 		// If there was a tie for the best sheet,
