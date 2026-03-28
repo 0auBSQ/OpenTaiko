@@ -88,7 +88,7 @@ internal class CSongListNode {
 
 	// In-game visuals
 
-	public string strScenePreset = null;
+	public string strScenePresets; // includes commas
 
 	#region [ OpenTaiko-Exclusive TJA Extension Data ]
 

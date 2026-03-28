@@ -60,34 +60,28 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		get;
 		private set;
 	} = new int [OpenTaiko.MAX_PLAYERS];
-	public bool IsFailed() {
+
+	public bool IsRiskyMine(int iPlayer) => this.DTX[iPlayer].boomRule is CTja.EBoomRule.Fatal;
+	public int[] timesRiskyMine
+	{
+		get;
+		private set;
+	} = new int[OpenTaiko.MAX_PLAYERS];
+
+	public bool IsRiskyFailed() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
-			if (!IsFailed(i))
+			if (!IsRiskyFailed(i))
 				return false;
 		return true;
 	}
-	public bool IsFailed(int iPlayer)   // 閉店状態になったかどうか
-	{
-		if (bRisky) {
-			return (nRiskyTimes[iPlayer] <= 0);
-		}
-		return this.db現在のゲージ値[iPlayer] <= GAUGE_MIN;
-	}
-	public bool IsDanger(int iPlayer)   // DANGERかどうか
-	{
-		if (bRisky) {
-			switch (nRiskyTimes_Initial) {
-				case 1:
-					return false;
-				case 2:
-				case 3:
-					return (nRiskyTimes[iPlayer] <= 1);
-				default:
-					return (nRiskyTimes[iPlayer] <= 2);
-			}
-		}
-		return (this.db現在のゲージ値[iPlayer] <= GAUGE_DANGER);
-	}
+	public bool IsRiskyFailed(int iPlayer) => bRisky && nRiskyTimes[iPlayer] <= 0;   // 閉店状態になったかどうか
+	public bool IsRiskyDanger(int iPlayer) => bRisky && nRiskyTimes_Initial switch {  // DANGERかどうか
+		1 => false,
+		2 or 3 => (nRiskyTimes[iPlayer] <= 1),
+		_ => (nRiskyTimes[iPlayer] <= 2),
+	};
+
+	public bool IsRiskyMineFailed(int iPlayer) => IsRiskyMine(iPlayer) && timesRiskyMine[iPlayer] <= 0;
 
 	/// <summary>
 	/// ゲージの初期化
@@ -96,14 +90,13 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	public void Init(int nRiskyTimes_InitialVal, int nPlayer)       // ゲージ初期化
 	{
 		//ダメージ値の計算
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-		switch (chara.effect.tGetGaugeType()) {
+		switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 			default:
-			case "Normal":
+			case HGaugeMethods.EGaugeType.NORMAL:
 				this.db現在のゲージ値[nPlayer] = 0;
 				break;
-			case "Hard":
-			case "Extreme":
+			case HGaugeMethods.EGaugeType.HARD:
+			case HGaugeMethods.EGaugeType.EXTREME:
 				this.db現在のゲージ値[nPlayer] = 100;
 				break;
 		}
@@ -117,6 +110,9 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			this.nRiskyTimes[nPlayer] = OpenTaiko.ConfigIni.nRisky;
 			this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
 		}
+
+		if (this.IsRiskyMine(nPlayer))
+			this.timesRiskyMine[nPlayer] = Math.Max(1, (int)this.DTX[nPlayer].boomRuleValue);
 
 		float gaugeRate = 0f;
 		float dbDamageRate = 2.0f;
@@ -207,10 +203,10 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			}
 		}
 
-		float gaugeFillRatio = chara.effect.tGetGaugeType() switch {
-			"Hard" => HGaugeMethods.HardGaugeFillRatio,
-			"Extreme" => HGaugeMethods.ExtremeGaugeFillRatio,
-			"Normal" or _ => 1.0f,
+		float gaugeFillRatio = HGaugeMethods.tGetGaugeTypeEnum(nPlayer) switch {
+			HGaugeMethods.EGaugeType.HARD => HGaugeMethods.HardGaugeFillRatio,
+			HGaugeMethods.EGaugeType.EXTREME => HGaugeMethods.ExtremeGaugeFillRatio,
+			HGaugeMethods.EGaugeType.NORMAL or _ => 1.0f,
 		};
 		if (gaugeFillRatio != 1) {
 			for (int ib = 0; ib < 3; ++ib) {
@@ -255,12 +251,29 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	#endregion
 #endif
 
+	public void MineDamage(int nPlayer, CTja.ECourse? chipBranch = null) {
+		CTja tja = this.DTX[nPlayer];
+		int iBranch = (int)(chipBranch ?? OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer]);
 
+		float fDamage;
+		switch (tja.boomRule) {
+			default:
+			case CTja.EBoomRule.Scal:
+				fDamage = -Math.Abs(tja.boomRuleValue);
+				break;
+			case CTja.EBoomRule.Ratio:
+				fDamage = -Math.Abs(tja.boomRuleValue * this.dbゲージ増加量_Branch[iBranch, 0][nPlayer]);
+				break;
+			case CTja.EBoomRule.Fatal:
+				fDamage = 0; // or use another default value?
+				this.timesRiskyMine[nPlayer]--;
+				break;
+		}
 
-	public void MineDamage(int nPlayer) {
-		this.db現在のゲージ値[nPlayer] = Math.Max(0, this.db現在のゲージ値[nPlayer] - HGaugeMethods.BombDamage);
 		if (this.bRisky)
 			this.nRiskyTimes[nPlayer]--;
+
+		this.Damage(nPlayer, fDamage);
 	}
 
 	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
@@ -279,16 +292,14 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			case ENoteJudge.Miss: {
 					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
 
-					var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(nPlayer)].data.Character];
-
 					int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
 					int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
-					switch (chara.effect.tGetGaugeType()) {
-						case "Hard":
+					switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
+						case HGaugeMethods.EGaugeType.HARD:
 							fDamage = -HGaugeMethods.tHardGaugeGetDamage((Difficulty)nanidou, level);
 							break;
-						case "Extreme":
+						case HGaugeMethods.EGaugeType.EXTREME:
 							fDamage = -HGaugeMethods.tExtremeGaugeGetDamage((Difficulty)nanidou, level);
 							break;
 					}
@@ -305,12 +316,12 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			default:
 				fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
 				break;
-
-
 		}
 
+		this.Damage(nPlayer, fDamage);
+	}
 
-
+	public void Damage(int nPlayer, float fDamage) {
 		this.db現在のゲージ値[nPlayer] = Math.Round(this.db現在のゲージ値[nPlayer] + fDamage, 5, MidpointRounding.ToEven);
 
 		if (this.db現在のゲージ値[nPlayer] >= 100.0)

@@ -11,7 +11,6 @@ class HGaugeMethods {
 		EXTREME
 	}
 
-	public static float BombDamage = 4f;
 	public static float HardGaugeFillRatio = 1f;
 	public static float ExtremeGaugeFillRatio = 1f;
 
@@ -65,31 +64,30 @@ class HGaugeMethods {
 
 	#region [General calculation]
 
-	public static float tHardGaugeGetDamage(Difficulty diff, int level) {
+	public static float tGaugeGetValue(Dictionary<Difficulty, float> diffToValue, Difficulty diff, Dictionary<int, float> levelExtraToValue, int level) {
 		float damage = 6.5f;
 
-		if (DifficultyToHardGaugeDamage.ContainsKey(diff))
-			damage = DifficultyToHardGaugeDamage[diff];
+		if (diffToValue.TryGetValue(diff, out var damage_))
+			damage = damage_;
 
 		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToHardGaugeDamage.ContainsKey(levelCaped))
-			damage = LevelExtraToHardGaugeDamage[levelCaped];
+		if (levelExtraToValue.TryGetValue(levelCaped, out damage_))
+			damage = damage_;
 
 		return damage;
 	}
 
-	public static float tExtremeGaugeGetDamage(Difficulty diff, int level) {
-		float damage = 6.5f;
+	public static float tHardGaugeGetDamage(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToHardGaugeDamage, diff, LevelExtraToHardGaugeDamage, level);
 
-		if (DifficultyToExtremeGaugeDamage.ContainsKey(diff))
-			damage = DifficultyToExtremeGaugeDamage[diff];
+	public static float tExtremeGaugeGetDamage(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToExtremeGaugeDamage, diff, LevelExtraToExtremeGaugeDamage, level);
 
-		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToExtremeGaugeDamage.ContainsKey(levelCaped))
-			damage = LevelExtraToExtremeGaugeDamage[levelCaped];
-
-		return damage;
-	}
+	public static float tHardGaugeGetDamage(Difficulty diff, int level, EGaugeType gaugeType) => gaugeType switch {
+		EGaugeType.HARD => tHardGaugeGetDamage(diff, level),
+		EGaugeType.EXTREME => tExtremeGaugeGetDamage(diff, level),
+		EGaugeType.NORMAL or _ => 0, // not determined here
+	};
 
 	public static float tHardGaugeGetKillscreenRatio(Difficulty diff, int level, EGaugeType gaugeType, int perfectHits, int totalNotes) {
 		if (gaugeType != EGaugeType.EXTREME) return 0f;
@@ -106,18 +104,11 @@ class HGaugeMethods {
 		return percent < 100f - ((100f - tHardGaugeGetKillscreenRatio(diff, level, gaugeType, perfectHits, totalNotes)) * 0.7f);
 	}
 
-	public static float tGetCurrentGaugeNorma(Difficulty diff, int level) {
-		float norma = 80f;
+	public static float tGetCurrentGaugeNorma(Difficulty diff, int level)
+		=> tGaugeGetValue(DifficultyToNorma, diff, LevelExtraToNorma, level);
 
-		if (DifficultyToNorma.ContainsKey(diff))
-			norma = DifficultyToNorma[diff];
-
-		int levelCaped = Math.Min(13, level);
-		if (LevelExtraToNorma.ContainsKey(levelCaped))
-			norma = LevelExtraToNorma[levelCaped];
-
-		return norma;
-	}
+	public static bool IsForceNormalGauge()
+		=> OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
 
 	public static EGaugeType tGetGaugeTypeEnum(string gaugeType) {
 		EGaugeType gt = EGaugeType.NORMAL;
@@ -127,17 +118,30 @@ class HGaugeMethods {
 
 		return gt;
 	}
+	public static EGaugeType tGetGaugeTypeEnum(CCharacter? chara)
+		=> (chara == null) ? EGaugeType.NORMAL : tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+	public static EGaugeType? tGetGaugeTypeEnum(CTja? tja) => tja?.forceGauge;
+	public static EGaugeType tGetGaugeTypeEnum(int player)
+		=> tGetGaugeTypeEnum(OpenTaiko.GetTJA(player))
+			?? tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character]);
 
 	public static bool tNormaCheck(Difficulty diff, int level, EGaugeType gaugeType, float percentObtained, float killZonePercent) {
 		float percent = Math.Min(100f, Math.Max(0f, percentObtained));
-		float norma = tGetCurrentGaugeNorma(diff, level);
-
 		if ((gaugeType == EGaugeType.HARD || gaugeType == EGaugeType.EXTREME) && percent > killZonePercent) return true;
+
+		float norma = tGetCurrentGaugeNorma(diff, level);
 		if (gaugeType == EGaugeType.NORMAL && percent >= norma) return true;
 
 		return false;
 	}
 
+	public static float GetCoinMultiplier(EGaugeType type) => type switch {
+		EGaugeType.HARD => 1.5f,
+		EGaugeType.EXTREME => 1.8f,
+		_ => 1.0f,
+	};
+
+	public static float GetCoinMultiplier(string gaugeType) => GetCoinMultiplier(tGetGaugeTypeEnum(gaugeType));
 	#endregion
 
 	#region [Displayables]
@@ -404,25 +408,22 @@ class HGaugeMethods {
 	#region [Unsafe methods]
 
 	public static bool UNSAFE_FastNormaCheck(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
 		return tNormaCheck(
 			(Difficulty)_dif,
 			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1,
-			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
+			tGetGaugeTypeEnum(player),
 			(float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
 		);
 	}
 
 	public static bool UNSAFE_IsRainbow(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-		if (tGetGaugeTypeEnum(chara.effect.tGetGaugeType()) != EGaugeType.NORMAL) return false;
+		if (tGetGaugeTypeEnum(player) != EGaugeType.NORMAL) return false;
 		return (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player] >= 100f;
 	}
 
 	public static float UNSAFE_KillZonePercent(int player) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Total hits and perfect hits
@@ -437,13 +438,12 @@ class HGaugeMethods {
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
 			level,
-			tGetGaugeTypeEnum(chara.effect.tGetGaugeType()),
+			tGetGaugeTypeEnum(player),
 			perfectHits,
 			totalHits);
 	}
 
 	public static void UNSAFE_DrawGaugeFast(int player, int opacity, int rainbowTextureIndex, int soulFlameIndex) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
@@ -537,7 +537,7 @@ class HGaugeMethods {
 		float currentPercent = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player];
 
 		// Gauge type
-		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
 
 		// Textures
 		int _4pGaugeIDX = (OpenTaiko.ConfigIni.nPlayerCount >= 3) ? 1 : 0;
@@ -583,7 +583,6 @@ class HGaugeMethods {
 	}
 
 	public static void UNSAFE_DrawResultGaugeFast(int player, int shiftPos, int pos, int segmentsDisplayed, int rainbowTextureIndex, int soulFlameIndex, int uioffset_x) {
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 		CTja dtx = OpenTaiko.GetTJA(player)!;
 
 		// Set box
@@ -594,7 +593,7 @@ class HGaugeMethods {
 		int totalHits = dtx.nノーツ数[3];
 
 		// Gauge type
-		EGaugeType gaugeType = tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
 
 		// Current percent
 		float currentPercent = segmentsDisplayed * 2f;

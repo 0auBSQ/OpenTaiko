@@ -7,14 +7,10 @@ class CCharacter {
 	public string _path;
 	public int _idx;
 
-	public float GetEffectCoinMultiplier() {
-		float mult = 1f;
-
-		mult *= HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity);
-		mult *= effect.GetCoinMultiplier();
-
-		return mult;
-	}
+	public float GetEffectCoinMultiplier(bool gaugeEnabled, bool bombFactorEnabled = true, bool fuseRollFactorEnabled = true)
+		=> effect.GetCoinMultiplier(HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity), gaugeEnabled, bombFactorEnabled, fuseRollFactorEnabled);
+	public float GetEffectCoinMultiplier()
+		=> GetEffectCoinMultiplier(!OpenTaiko.ConfigIni.bForceNormalGauge);
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
 		int player = OpenTaiko.GetActualPlayer(_player);

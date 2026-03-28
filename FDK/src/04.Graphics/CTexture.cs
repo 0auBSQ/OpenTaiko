@@ -386,9 +386,9 @@ public class CTexture : IDisposable {
 			this.sz画像サイズ = new Size(n幅, n高さ);
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
 			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
-		} catch {
+		} catch (Exception ex) {
 			this.Dispose();
-			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n({0}x{1}, {2})", n幅, n高さ));
+			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n({0}x{1}, {2})", n幅, n高さ), innerException: ex);
 		}
 	}
 
@@ -485,10 +485,10 @@ public class CTexture : IDisposable {
 			this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);
 			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
-		} catch {
+		} catch (Exception ex) {
 			this.Dispose();
 			// throw new CTextureCreateFailedException( string.Format( "テクスチャの生成に失敗しました。\n{0}", strファイル名 ) );
-			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n"));
+			throw new CTextureCreateFailedException(string.Format("テクスチャの生成に失敗しました。\n"), innerException: ex);
 		}
 	}
 

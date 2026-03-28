@@ -42,7 +42,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int n発声位置;
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
-	public EBranchConditionType eBranchCondition;
+	public (Exam.Type type, EBranchCondBig big) eBranchCondition;
+	public Exam.Range eBranchConditionRange;
 	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
@@ -53,8 +54,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 	public double db発声時刻ms;
-	public int nノーツ出現時刻ms;
-	public int nノーツ移動開始時刻ms;
+
+	// for #SUDDEN
+	public bool bShowSudden;
+	public double msShowOffset = double.PositiveInfinity;
+	public double msMoveOffset = double.PositiveInfinity;
+	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
+	public double th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
+
 	public int nLag;                // 2011.2.1 yyagi
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
 	public bool IsFixedSENote;
@@ -66,26 +73,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 	//EXTENDED COMMANDS
-	public int fCamTimeMs;
-	public string strCamEaseType;
-	public Easing.CalcType fCamMoveType;
-
-	public float fCamScrollStartX;
-	public float fCamScrollStartY;
-	public float fCamScrollEndX;
-	public float fCamScrollEndY;
-
-	public float fCamRotationStart;
-	public float fCamRotationEnd;
-
-	public float fCamZoomStart;
-	public float fCamZoomEnd;
-
-	public float fCamScaleStartX;
-	public float fCamScaleStartY;
-	public float fCamScaleEndX;
-	public float fCamScaleEndY;
-
 	public Color4 borderColor;
 
 	public int fObjTimeMs;
@@ -99,7 +86,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public float fObjStart;
 	public float fObjEnd;
 
-	public CSongObject obj;
+	public CSongObject? obj;
 
 	public string strTargetTxName;
 	public string strNewPath;

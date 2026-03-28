@@ -365,8 +365,9 @@ internal class CStage結果 : CStage {
 				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
 				var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
 
-
-				return chara.GetEffectCoinMultiplier() * puchichara.GetEffectCoinMultiplier();
+				return HGaugeMethods.GetCoinMultiplier(HGaugeMethods.tGetGaugeTypeEnum(player))
+					* chara.GetEffectCoinMultiplier(gaugeEnabled: false)
+					* puchichara.GetEffectCoinMultiplier();
 			}
 
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {

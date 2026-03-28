@@ -3,12 +3,12 @@
 namespace OpenTaiko;
 
 static class Easing {
-	public static int EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
+	public static float EaseIn(CCounter counter, float startPoint, float endPoint, CalcType type) {
 		double CounterValue = counter.CurrentValue / (double)(int)counter.EndValue;
 		return EaseIn(CounterValue, startPoint, endPoint, type);
 	}
 
-	public static int EaseIn(double CounterValue, float startPoint, float endPoint, CalcType type) {
+	public static float EaseIn(double CounterValue, float startPoint, float endPoint, CalcType type) {
 		float Sa = endPoint - startPoint;
 		double Value = 0;
 
@@ -42,15 +42,15 @@ static class Easing {
 				break;
 		}
 
-		return (int)Value;
+		return (float)Value;
 	}
 
-	public static int EaseOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
+	public static float EaseOut(CCounter counter, float startPoint, float endPoint, CalcType type) {
 		double CounterValue = counter.CurrentValue / (double)(int)counter.EndValue;
 		return EaseOut(CounterValue, startPoint, endPoint, type);
 	}
 
-	public static int EaseOut(double CounterValue, float startPoint, float endPoint, CalcType type) {
+	public static float EaseOut(double CounterValue, float startPoint, float endPoint, CalcType type) {
 		float Sa = endPoint - startPoint;
 		double Value = 0;
 
@@ -89,7 +89,7 @@ static class Easing {
 				break;
 		}
 
-		return (int)Value;
+		return (float)Value;
 	}
 
 	public static float EaseInOut(CCounter counter, float startPoint, float endPoint, CalcType type) {

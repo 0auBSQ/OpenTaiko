@@ -154,7 +154,7 @@ internal class CSongs管理 {
 						value.rParentNode = node親;
 
 						if (value.rParentNode != null) {
-							value.strScenePreset = value.rParentNode.strScenePreset;
+							value.strScenePresets = value.rParentNode.strScenePresets;
 							if (value.rParentNode.IsChangedForeColor) {
 								value.ForeColor = value.rParentNode.ForeColor;
 								value.IsChangedForeColor = true;
@@ -230,7 +230,7 @@ internal class CSongs管理 {
 								if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 
 								if (c曲リストノード.rParentNode != null) {
-									c曲リストノード.strScenePreset = c曲リストノード.rParentNode.strScenePreset;
+									c曲リストノード.strScenePresets = c曲リストノード.rParentNode.strScenePresets;
 									if (c曲リストノード.rParentNode.IsChangedForeColor) {
 										c曲リストノード.ForeColor = c曲リストノード.rParentNode.ForeColor;
 										c曲リストノード.IsChangedForeColor = true;
@@ -355,7 +355,7 @@ internal class CSongs管理 {
 				c曲リストノード.nodeType = CSongListNode.ENodeType.BOX;
 				c曲リストノード.ldTitle = boxdef.Title;
 				c曲リストノード.songGenre = boxdef.Genre;
-				c曲リストノード.strScenePreset = boxdef.ScenePreset;
+				c曲リストノード.strScenePresets = boxdef.ScenePreset;
 				c曲リストノード.strSelectBGPath = infoDir.FullName + Path.DirectorySeparatorChar + boxdef.SelectBG;
 				if (!File.Exists(c曲リストノード.strSelectBGPath)) c曲リストノード.strSelectBGPath = null;
 
@@ -545,7 +545,7 @@ internal class CSongs管理 {
 					c曲リストノード.score[i].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
 					c曲リストノード.score[i].譜面情報.strサブタイトル = cdtx.SUBTITLE.GetString("");
 					for (int k = 0; k < (int)Difficulty.Total; k++) {
-						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH ? false : cdtx.bHasBranch[k];
+						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH[k] ? false : cdtx.bHasBranch[k];
 						c曲リストノード.score[i].譜面情報.nレベル[k] = cdtx.LEVELtaiko[k];
 						c曲リストノード.score[i].譜面情報.nLevelIcon[k] = cdtx.LEVELtaikoIcon[k];
 					}
