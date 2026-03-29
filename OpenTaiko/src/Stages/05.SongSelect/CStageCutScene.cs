@@ -82,11 +82,30 @@ class CStageCutScene : CStage {
 			this.mode = ECutSceneMode.Outro;
 			this.cutScenes = (selectedSong.CutSceneOutros != null) ? [.. selectedSong.CutSceneOutros] : [];
 		}
-		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x, selectedSong));
+		this.cutScenes.RemoveAll(x => !this.JudgeRequirement(x, selectedSong, true));
 		return this.cutScenes.Count > 0;
 	}
 
-	private bool JudgeRequirement(CTja.CutSceneDef cutScene, CSongListNode? songInfo = null) {
+	public void RegisterMetOutros() {
+		var selectedSong = OpenTaiko.stageSongSelect.rChoosenSong;
+		var oldMode = this.mode;
+		this.mode = ECutSceneMode.Outro;
+		if (selectedSong.CutSceneOutros != null) {
+			foreach (var cutscene in selectedSong.CutSceneOutros) {
+				string fileName = Path.GetFileName(cutscene.FullPath);
+				string _gTriggerName = $".regcutscene_{selectedSong?.tGetUniqueId() ?? ""}_{this.mode.ToString()}_{fileName}".EscapeSingleQuotes();
+				string _gTriggerMetName = $".metcutscene_{selectedSong?.tGetUniqueId() ?? ""}_{this.mode.ToString()}_{fileName}".EscapeSingleQuotes();
+
+				if (OpenTaiko.PrimarySaveFile.tGetGlobalTrigger(_gTriggerName) == true
+					|| this.JudgeRequirement(cutscene, selectedSong, false) == true) {
+					OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerMetName, true);
+				}
+			}
+		}
+		this.mode = oldMode;
+	}
+
+	private bool JudgeRequirement(CTja.CutSceneDef cutScene, CSongListNode? songInfo = null, bool sideEffect = true) {
 		string fileName = Path.GetFileName(cutScene.FullPath);
 		string _gTriggerName = $".regcutscene_{songInfo?.tGetUniqueId() ?? ""}_{this.mode.ToString()}_{fileName}".EscapeSingleQuotes();
 
@@ -115,7 +134,7 @@ class CStageCutScene : CStage {
 			if (!met) {
 				if (cutScene.RepeatMode == CTja.ECutSceneRepeatMode.UntilFirstUnmet) {
 					// First Unmet => Does not play AND disable its future plays
-					OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
+					if (sideEffect == true) OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
 				}
 				return false;
 			}
@@ -123,7 +142,7 @@ class CStageCutScene : CStage {
 
 		if (cutScene.RepeatMode == CTja.ECutSceneRepeatMode.FirstMet) {
 			// First Met => Does play but disable future plays
-			OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
+			if (sideEffect == true) OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(_gTriggerName, true);
 		}
 		return true;
 	}

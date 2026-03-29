@@ -280,6 +280,10 @@ internal class CTja : CActivity {
 	public EGameType?[] GameType = new EGameType?[(int)Difficulty.Total];
 	public CSongUniqueID uniqueID;
 
+	// Custom metadata handlers
+	public Dictionary<string, string> customMetadataGScope = new Dictionary<string, string>();
+	public Dictionary<string, string>[] customMetadataCScope = Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new Dictionary<string, string>()).ToArray();
+
 	// Tower lifes
 	public int LIFE;
 
@@ -499,6 +503,8 @@ internal class CTja : CActivity {
 	public CLocalTriggers LocalTriggers = new CLocalTriggers();
 
 	#endregion
+
+
 
 
 #if TEST_NOTEOFFMODE
@@ -1598,8 +1604,7 @@ internal class CTja : CActivity {
 		switch (ex) {
 			case IndexOutOfRangeException:
 				return "Too few arguments";
-			case FormatException:
-				{
+			case FormatException: {
 					string? expectedType = null;
 					if (ex.TargetSite?.Name == "ParseComplex") {
 						expectedType = "Complex Number";
@@ -2045,7 +2050,7 @@ internal class CTja : CActivity {
 						"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
 						"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
 						"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
-						// TJAP2fPC extensions, Akasoko modification
+																	   // TJAP2fPC extensions, Akasoko modification
 						"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
 						// uniqsub extensions, renamed to dan-i type
 						"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
@@ -3076,6 +3081,14 @@ internal class CTja : CActivity {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
+		// Add chart scope custom commands to dictionnary, including those having a set behaviour
+		// NOTE: Doesn't include global scope commands, to access them use the appropriate Lua API accessor
+		if (strCommandName.StartsWith(".")) {
+			if (this.nowCourseScope != (int)Difficulty.Total) {
+				customMetadataCScope[this.nowCourseScope].Add(strCommandName, strCommandParam);
+			}
+		}
+
 		if (strCommandName.Equals("SIDE")) {
 			if (!string.IsNullOrEmpty(strCommandParam) && strCommandParam.Equals("Normal"))
 				this.SIDE = ESide.eNormal;
@@ -3299,6 +3312,14 @@ internal class CTja : CActivity {
 	private void ParseGlobalHeader(string strCommandName, string strCommandParam) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
+		}
+
+		// Add global scope custom commands to dictionnary, including those having a set behaviour
+		// NOTE: Only includes custom commands that are before ANY COURSE: metadata
+		if (strCommandName.StartsWith(".")) {
+			if (this.nowCourseScope == (int)Difficulty.Total) {
+				customMetadataGScope.Add(strCommandName, strCommandParam);
+			}
 		}
 
 		//パラメータを分別、そこから割り当てていきます。

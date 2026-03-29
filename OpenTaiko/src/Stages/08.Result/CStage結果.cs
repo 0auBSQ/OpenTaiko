@@ -548,6 +548,12 @@ internal class CStage結果 : CStage {
 
 			#endregion
 
+			#region [Set triggers for the cutscenes that will be met]
+
+			OpenTaiko.stageCutScene.RegisterMetOutros();
+
+			#endregion
+
 			#region [Replay files generation]
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {

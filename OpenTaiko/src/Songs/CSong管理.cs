@@ -207,6 +207,10 @@ internal class CSongs管理 {
 								c曲リストノード.bExplicit = dtx.EXPLICIT;
 								c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
 
+								// Shallow copy, works well because dict<string, string> but wouldn't if dict<string, T>
+								c曲リストノード.customMetadataGScope = new Dictionary<string, string>(dtx.customMetadataGScope);
+								c曲リストノード.customMetadataCScope = dtx.customMetadataCScope.Select(dict => new Dictionary<string, string>(dict)).ToArray();
+
 								c曲リストノード.DanSongs = new();
 								if (dtx.List_DanSongs != null) {
 									for (int i = 0; i < dtx.List_DanSongs.Count; i++) {
