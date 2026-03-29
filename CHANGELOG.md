@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0.104] - 2026-03-29 (Beta)
+
+- [Feat] Getting a cutscene now sets a global trigger on results screen activation to be usable in unlockables (retroactive for cutscenes that play only once)
+- [Chore] Keep a dictionary of all custom metadata (starting by .) in a chart for future usage in 0.6.1
+- [Chore] Unlock conditions for and soar through the universe (ch6) and cocoa break (Dashy's Depictions)
+
 ## [0.6.0.103] - 2026-03-28 (Beta)
 
 - [Feat] New TJA header `.FORCEGAUGE:`, which forces the gauge type for the player-side
