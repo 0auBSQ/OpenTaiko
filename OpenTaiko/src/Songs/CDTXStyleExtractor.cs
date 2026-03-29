@@ -25,10 +25,10 @@ namespace OpenTaiko;
 ///    relevant section/subsection combination.
 ///    Non-sheets (header sections) have the best rank.
 /// 4. Determine the best-ranked sheet. Pre-COURSE: sheets have worst ranks if current difficulty is Oni, or otherwise skipped entirely.
-/// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
+/// 5. Select and return the best-ranked sheet and its immediate header (contains #HBSCROLL and on), mark all sheets to be skipped from upper headers
 /// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
 /// 7. Remove all sections beyond the selected sheet
-/// 8. Reassemble the string
+/// 8. Reassemble the upper header string
 /// </summary>
 public static class CDTXStyleExtractor {
 	// The sections are splitted right before the header or command for the section kind,
@@ -145,7 +145,7 @@ public static class CDTXStyleExtractor {
 			},
 		};
 
-	public static string tセッション譜面がある(string strTJAGlobal, string strTJACourse, Difficulty difficulty, int seqNo, string strファイル名の絶対パス) {
+	public static (string upperHeaders, string sheet) tセッション譜面がある(string strTJAGlobal, string strTJACourse, Difficulty difficulty, int seqNo, string strファイル名の絶対パス) {
 		void TraceError(string subMessage) {
 			Trace.TraceError(FormatTraceMessage(subMessage));
 		}
@@ -157,7 +157,7 @@ public static class CDTXStyleExtractor {
 		//入力された譜面がnullでないかチェック。
 		if (string.IsNullOrEmpty(strTJAGlobal) && string.IsNullOrEmpty(strTJACourse)) {
 			TraceError("is returning its input value early due to null or empty strTJA.");
-			return "";
+			return ("", "");
 		}
 		strTJAGlobal ??= "";
 		strTJACourse ??= "";
@@ -171,13 +171,13 @@ public static class CDTXStyleExtractor {
 			(bestPostCourseRank, bestRank) = GetBestRank(difficulty, sections);
 		} catch (Exception) {
 			TraceError("is returning its input value early due to an inability to determine the best rank. This can occur if a course contains no #START.");
-			return (strTJAGlobal ?? "") + (strTJACourse ?? "");
+			return ("", (strTJAGlobal ?? "") + (strTJACourse ?? ""));
 		}
 
-		var (idxSection, idxSubSection) = MarkSkippedSheetsOtherThanTheBestRanked(sections, bestPostCourseRank, bestRank);
+		var (idxSection, idxSubSection, sheet) = SelectBestRankedSheet(sections, bestPostCourseRank, bestRank);
 		MarkSkippedRecognizedStyleSectionsWithoutSheets(sections);
 		RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(sections, idxSection, idxSubSection);
-		return Reassemble(sections);
+		return (ReassembleUpperHeaders(sections), sheet);
 	}
 
 	// 1. Break the string up into top-level sections of the following types, recording pre- or post- COURSE:
@@ -312,14 +312,14 @@ public static class CDTXStyleExtractor {
 			.Min(pss => (pss.post ? 0 : 1, pss.ss.Rank));
 	}
 
-	// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
-	private static (int idxSection, int idxSubSection) MarkSkippedSheetsOtherThanTheBestRanked(IList<Section> sections, int bestPostCourseRank, int bestRank) {
+	// 5. Select and return the best-ranked sheet and its immediate header (contains #HBSCROLL and on), mark all sheets to be skipped from upper headers
+	private static (int idxSection, int idxSubSection, string section) SelectBestRankedSheet(IList<Section> sections, int bestPostCourseRank, int bestRank) {
 		// We can safely remove based on > bestRank because the subsection types
 		// which are never removed always have a Rank value of 0.
 
 		foreach (var section in sections) {
 			var postCourseRank = section.IsPostCourse ? 0 : 1;
-			foreach (var o in section.SubSections.Where(o => (o.Rank != 0) && (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0))
+			foreach (var o in section.SubSections.Where(o => (o.Rank != 0)))
 				o.Skipped = true;
 		}
 
@@ -329,13 +329,11 @@ public static class CDTXStyleExtractor {
 			.SelectMany((s, i) => s.SubSections.Select((ss, j) => (s, i, ss, j)))
 			.Where(sissj => sissj.ss.Rank == bestRank);
 
-		var firstBestRangedSheet = bestRankedSheets.First();
-
-		var extraRankedSheets = bestRankedSheets.Skip(1);
-		foreach (var (s, i, ss, j) in extraRankedSheets)
-			ss.Skipped = true;
-
-		return (firstBestRangedSheet.i, firstBestRangedSheet.j);
+		var (s, i, ss, j) = bestRankedSheets.First();
+		string sheet = ss.OriginalRawValue;
+		if (j > 0) // has immediate header
+			sheet = s.SubSections[j - 1].OriginalRawValue + sheet;
+		return (i, j, sheet);
 	}
 
 	// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
@@ -361,8 +359,8 @@ public static class CDTXStyleExtractor {
 		subSections.RemoveRange(idxSubSectionSelected + 1, subSections.Count - 1 - idxSubSectionSelected);
 	}
 
-	// 8. Reassemble the string
-	private static string Reassemble(List<Section> sections) {
+	// 8. Reassemble the upper header string
+	private static string ReassembleUpperHeaders(List<Section> sections) {
 		var sb = new StringBuilder();
 
 		foreach (var section in sections) {

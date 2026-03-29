@@ -1504,7 +1504,7 @@ internal class CTja : CActivity {
 			#endregion
 
 			//指定したコースの譜面の命令を消去する。
-			var strCourse = strSplitした譜面[n読み込むコース] = CDTXStyleExtractor.tセッション譜面がある(
+			var (strUpperHeaders, strCourse) = CDTXStyleExtractor.tセッション譜面がある(
 				globalCourse, strSplitした譜面[n読み込むコース],
 				(Difficulty)n読み込むコース,
 				(OpenTaiko.ConfigIni.nPlayerCount > 1 && !OpenTaiko.ConfigIni.bAIBattleMode) ? (this.nPlayerSide + 1) : 0,
@@ -1522,11 +1522,12 @@ internal class CTja : CActivity {
 						this.listBalloon_Branch_数値管理[i] = 0;
 				}
 
-				{
-					using StringReader reader = new(strCourse);
+
+				foreach ((string part, bool allowCommands) in new []{ (strUpperHeaders, false), (strCourse, true) }) {
+					using StringReader reader = new(part);
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						if (!String.IsNullOrEmpty(line)) {
-							this.TryParsePlayerSideHeader(line);
+							this.TryParsePlayerSideHeader(line, allowCommands);
 						}
 					}
 				}
@@ -3032,20 +3033,19 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private void TryParsePlayerSideHeader(string InputText) {
+	private void TryParsePlayerSideHeader(string InputText, bool allowCommands) {
 		// pre-#START commands
-		if (OpenTaiko.actEnumSongs != null && OpenTaiko.actEnumSongs.IsDeActivated) {
-			if (InputText.Equals("#NMSCROLL")) {
+		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
+			if (!allowCommands)
+				return; // might be from previous player-sides, ignore
+			if (command == "#NMSCROLL") {
 				eScrollMode = EScrollMode.Normal;
-				return;
-			} else if (InputText.Equals("#HBSCROLL")) {
+			} else if (command == "#HBSCROLL") {
 				eScrollMode = EScrollMode.HBScroll;
-				return;
-			}
-			if (InputText.Equals("#BMSCROLL")) {
+			} else if (command == "#BMSCROLL") {
 				eScrollMode = EScrollMode.BMScroll;
-				return;
 			}
+			return;
 		}
 
 		string[] strArray = InputText.Split(new char[] { ':' }, 2);
