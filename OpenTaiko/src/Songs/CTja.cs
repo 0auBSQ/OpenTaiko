@@ -329,7 +329,6 @@ internal class CTja : CActivity {
 	public CLocalizationData SUBTITLE = new CLocalizationData();
 	public CLocalizationData TITLE = new CLocalizationData();
 	public double dbDTXVPlaySpeed;
-	public double dbScrollSpeed;
 	public int nデモBGMオフセット;
 
 	private int n現在の小節数 = 1;
@@ -2481,9 +2480,7 @@ internal class CTja : CActivity {
 
 
 		// add initial SCROLL chip
-		var chipInitScroll = this.NewEventChipAtDefCursor(0x9D, argInt: 0x00);
-		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
-		this.listChip.Add(chipInitScroll);
+		this.listChip.Add(this.NewEventChipAtDefCursor(0x9D, argInt: 0x00));
 
 		// apply initial BPM
 		for (int ib = 0; ib < 3; ++ib) {
@@ -3437,7 +3434,8 @@ internal class CTja : CActivity {
 			//新定義:初期スクロール速度設定(というよりこのシステムに合わせるには必須。)
 			//どうしても一番最初に1小節挿入されるから、こうするしかなかったんだ___
 
-			this.dbScrollSpeed = strCommandParam.ParseReal();
+			this.dbNowScroll = strCommandParam.ParseReal();
+			this.dbNowScrollY = 0;
 		} else if (strCommandName.Equals("GENRE")) {
 			//2015.03.28 kairera0467
 			//ジャンルの定義。DTXから入力もできるが、tjaからも入力できるようにする。
