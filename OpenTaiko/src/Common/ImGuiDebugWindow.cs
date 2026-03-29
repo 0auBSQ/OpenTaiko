@@ -568,7 +568,7 @@ public static class ImGuiDebugWindow {
 						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
 							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
-							var dtx = OpenTaiko.GetTJA(i);
+							var dtx = OpenTaiko.GetTJA(i)!;
 
 							switch (game_difficulty) {
 								case Difficulty.Dan:
@@ -585,7 +585,14 @@ public static class ImGuiDebugWindow {
 									break;
 
 							}
-							ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]), $"Difficulty: {game_difficulty}");
+							var levelIcon = dtx.PlayerSideMetadata.LEVELtaikoIcon switch {
+								CTja.ELevelIcon.eMinus => "-",
+								CTja.ELevelIcon.ePlus => "+",
+								CTja.ELevelIcon.eNone or _ => "",
+							};
+
+							ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]),
+								$"Difficulty: {game_difficulty} {dtx.PlayerSideMetadata.LEVELtaiko}{levelIcon}");
 							ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
 							var db現在時刻ms = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
@@ -628,6 +635,16 @@ public static class ImGuiDebugWindow {
 									   " / Expert: " + dtx.nノーツ数_Branch[1] +
 									   " / Master: " + dtx.nノーツ数_Branch[2]);
 							ImGui.Unindent();
+
+
+							if (dtx.PlayerSideMetadata.CustomMetadata.Count > 0) {
+								if (ImGui.TreeNodeEx($"Player-side custom metadata ({dtx.PlayerSideMetadata.CustomMetadata.Count})###GAME_PLAYERSIDE_CUSTOM_METADATA_LIST_{i}")) {
+									foreach (var (key, value) in dtx.PlayerSideMetadata.CustomMetadata) {
+										ImGui.Text($"{key}:{value}");
+									}
+									ImGui.TreePop();
+								}
+							}
 
 							ImGui.TreePop();
 						}
