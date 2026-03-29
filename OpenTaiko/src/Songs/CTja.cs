@@ -283,6 +283,7 @@ internal class CTja : CActivity {
 	// Custom metadata handlers
 	public Dictionary<string, string> customMetadataGScope = new Dictionary<string, string>();
 	public Dictionary<string, string>[] customMetadataCScope = Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new Dictionary<string, string>()).ToArray();
+	public Dictionary<string, string> customMetadataPlayerSide = new Dictionary<string, string>();
 
 	// Tower lifes
 	public int LIFE;
@@ -3081,12 +3082,9 @@ internal class CTja : CActivity {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
-		// Add chart scope custom commands to dictionnary, including those having a set behaviour
-		// NOTE: Doesn't include global scope commands, to access them use the appropriate Lua API accessor
+		// Add current player-side custom headers to dictionary, including those having a set behaviour
 		if (strCommandName.StartsWith(".")) {
-			if (this.nowCourseScope != (int)Difficulty.Total) {
-				customMetadataCScope[this.nowCourseScope].Add(strCommandName, strCommandParam);
-			}
+			customMetadataPlayerSide[strCommandName] = strCommandParam;
 		}
 
 		if (strCommandName.Equals("SIDE")) {
@@ -3275,6 +3273,7 @@ internal class CTja : CActivity {
 		listBalloon = listTmp;
 	}
 
+	// Parsing (file-)global and COURSE-global headers
 	private void TryParseGlobalHeader(string InputText) {
 		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
 			if (command == "#START") {
@@ -3314,11 +3313,14 @@ internal class CTja : CActivity {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
-		// Add global scope custom commands to dictionnary, including those having a set behaviour
-		// NOTE: Only includes custom commands that are before ANY COURSE: metadata
+		// Add file-/course-global scope custom headers to dictionary, including those having a set behaviour
 		if (strCommandName.StartsWith(".")) {
 			if (this.nowCourseScope == (int)Difficulty.Total) {
-				customMetadataGScope.Add(strCommandName, strCommandParam);
+				// NOTE: Only includes custom headers that are before ANY COURSE: metadata
+				customMetadataGScope[strCommandName] = strCommandParam;
+			} else {
+				// NOTE: Doesn't include (file-)global scope headers, to access them use the appropriate Lua API accessor
+				customMetadataCScope[this.nowCourseScope][strCommandName] = strCommandParam;
 			}
 		}
 
