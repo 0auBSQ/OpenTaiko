@@ -202,14 +202,14 @@ internal class CSongs管理 {
 								c曲リストノード.ldTitle = dtx.TITLE;
 								c曲リストノード.ldSubtitle = dtx.SUBTITLE;
 								c曲リストノード.strMaker = dtx.MAKER;
-								c曲リストノード.strNotesDesigner = dtx.NOTESDESIGNER.Select(x => x.Equals("") ? c曲リストノード.strMaker : x).ToArray();
+								c曲リストノード.strNotesDesigner = dtx.SongListCourseMetadata.Select(m => m.NOTESDESIGNER.Equals("") ? c曲リストノード.strMaker : m.NOTESDESIGNER).ToArray();
 								c曲リストノード.nSide = dtx.SIDE;
 								c曲リストノード.bExplicit = dtx.EXPLICIT;
 								c曲リストノード.bMovie = !string.IsNullOrEmpty(dtx.strBGVIDEO_PATH);
 
 								// Shallow copy, works well because dict<string, string> but wouldn't if dict<string, T>
-								c曲リストノード.customMetadataGScope = new Dictionary<string, string>(dtx.customMetadataGScope);
-								c曲リストノード.customMetadataCScope = dtx.customMetadataCScope.Select(dict => new Dictionary<string, string>(dict)).ToArray();
+								c曲リストノード.customMetadataGScope = new Dictionary<string, string>(dtx.GlobalCustomMetadata);
+								c曲リストノード.customMetadataCScope = dtx.SongListCourseMetadata.Select(meta => new Dictionary<string, string>(meta.CustomMetadata)).ToArray();
 
 								c曲リストノード.DanSongs = new();
 								if (dtx.List_DanSongs != null) {
@@ -306,8 +306,8 @@ internal class CSongs管理 {
 								}
 
 
-								c曲リストノード.nLevel = dtx.LEVELtaiko;
-								c曲リストノード.nLevelIcon = dtx.LEVELtaikoIcon;
+								c曲リストノード.nLevel = dtx.SongListCourseMetadata.Select(m => m.LEVELtaiko).ToArray();
+								c曲リストノード.nLevelIcon = dtx.SongListCourseMetadata.Select(m => m.LEVELtaikoIcon).ToArray();
 								c曲リストノード.uniqueId = dtx.uniqueID;
 
 								c曲リストノード.CutSceneIntro = dtx.CutSceneIntro;
@@ -549,9 +549,9 @@ internal class CSongs管理 {
 					c曲リストノード.score[i].譜面情報.nデモBGMオフセット = cdtx.nデモBGMオフセット;
 					c曲リストノード.score[i].譜面情報.strサブタイトル = cdtx.SUBTITLE.GetString("");
 					for (int k = 0; k < (int)Difficulty.Total; k++) {
-						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.bHIDDENBRANCH[k] ? false : cdtx.bHasBranch[k];
-						c曲リストノード.score[i].譜面情報.nレベル[k] = cdtx.LEVELtaiko[k];
-						c曲リストノード.score[i].譜面情報.nLevelIcon[k] = cdtx.LEVELtaikoIcon[k];
+						c曲リストノード.score[i].譜面情報.b譜面分岐[k] = cdtx.SongListCourseMetadata[k].bHIDDENBRANCH ? false : cdtx.SongListCourseMetadata[k].bHasBranch;
+						c曲リストノード.score[i].譜面情報.nレベル[k] = cdtx.SongListCourseMetadata[k].LEVELtaiko;
+						c曲リストノード.score[i].譜面情報.nLevelIcon[k] = cdtx.SongListCourseMetadata[k].LEVELtaikoIcon;
 					}
 
 					// Tower Lives

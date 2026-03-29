@@ -199,10 +199,6 @@ internal class CTja : CActivity {
 
 	// 構造体
 
-	public struct STチップがある {
-		public bool Drums;
-		public bool Branch;
-	}
 	public enum ECourse {
 		eNormal,
 		eExpert,
@@ -264,26 +260,40 @@ internal class CTja : CActivity {
 	public double BPM;
 	public double MinBPM;
 	public double MaxBPM;
-	public STチップがある bチップがある;
 	public string COMMENT;
 	public string GENRE;
 	public string MAKER;
-	public string[] NOTESDESIGNER = Enumerable.Repeat("", (int)Difficulty.Total).ToArray();
 	public bool EXPLICIT;
 	public string SELECTBG;
 	public bool HIDDENLEVEL;
 	public STDGBVALUE<int> LEVEL;
 	public bool bLyrics;
-	public int[] LEVELtaiko = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
-	public ELevelIcon[] LEVELtaikoIcon = Enumerable.Repeat(ELevelIcon.eNone, (int)Difficulty.Total).ToArray();
 	public ESide SIDE;
-	public EGameType?[] GameType = new EGameType?[(int)Difficulty.Total];
 	public CSongUniqueID uniqueID;
 
-	// Custom metadata handlers
-	public Dictionary<string, string> customMetadataGScope = new Dictionary<string, string>();
-	public Dictionary<string, string>[] customMetadataCScope = Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new Dictionary<string, string>()).ToArray();
-	public Dictionary<string, string> customMetadataPlayerSide = new Dictionary<string, string>();
+	public class QueryableCourseMetadata {
+		public string NOTESDESIGNER = "";
+		public int LEVELtaiko = -1;
+		public ELevelIcon LEVELtaikoIcon = ELevelIcon.eNone;
+		public EGameType? GameType;
+
+		public bool bHasBranch = false;
+		public bool bHIDDENBRANCH = false; //2016.04.01 kairera0467 選曲画面上、譜面分岐開始前まで譜面分岐の表示を隠す
+
+		public int nScoreMode = -1;
+		// TODO: Calculate the proper score automatically
+		public int[] nScoreInit = [300, 1000]; // { non-Shin-uchi, Shin-uchi }
+		public int nScoreDiff = 120;
+		public bool[] bScorePointAssigned = [false, false, false]; // { non-Shin-uchi init, Shin-uchi, non-Shin-uchi diff }
+
+		// Custom metadata handlers
+		public Dictionary<string, string> CustomMetadata = new Dictionary<string, string>();
+	};
+
+	public Dictionary<string, string> GlobalCustomMetadata = new Dictionary<string, string>();
+
+	public QueryableCourseMetadata[] SongListCourseMetadata = Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new QueryableCourseMetadata()).ToArray();
+	public QueryableCourseMetadata PlayerSideMetadata = new QueryableCourseMetadata();
 
 	// Tower lifes
 	public int LIFE;
@@ -335,8 +345,6 @@ internal class CTja : CActivity {
 	private double dbNowBPM = 120.0;
 	private int nDELAY = 0;
 
-	public bool[] bHasBranch = new bool[(int)Difficulty.Total] { false, false, false, false, false, false, false };
-
 	public bool[] bHasBranchDan = new bool[1] { false };
 
 	//分岐関連
@@ -370,11 +378,6 @@ internal class CTja : CActivity {
 				action(i);
 		}
 	}
-
-	public int nScoreMode = -1;
-	public int[,] nScoreInit = new int[2, (int)Difficulty.Total]; //[ x, y ] x=通常or真打 y=コース
-	public int[] nScoreDiff = new int[(int)Difficulty.Total]; //[y]
-	public bool[,] b配点が指定されている = new bool[3, (int)Difficulty.Total]; //2017.06.04 kairera0467 [ x, y ] x=通常(Init)or真打orDiff y=コース
 
 	public float fNow_Measure_s = 4.0f;
 	public float fNow_Measure_m = 4.0f;
@@ -434,7 +437,6 @@ internal class CTja : CActivity {
 	public int SongVol;
 	public LoudnessMetadata? SongLoudnessMetadata;
 
-	public bool[] bHIDDENBRANCH = new bool[(int)Difficulty.Total]; //2016.04.01 kairera0467 選曲画面上、譜面分岐開始前まで譜面分岐の表示を隠す
 	public bool bGOGOTIME; //2018.03.11 kairera0467
 
 	public bool[] IsBranchBarDraw = new bool[4]; // 仕様変更により、黄色lineの表示法を変更.2020.04.21.akasoko26
@@ -522,7 +524,6 @@ internal class CTja : CActivity {
 		this.SUBTITLE.SetString("default", "");
 		this.ARTIST = "";
 		this.COMMENT = "";
-		this.SIDE = ESide.eEx;
 		this.PANEL = "";
 		this.GENRE = "";
 		this.MAKER = "";
@@ -540,7 +541,6 @@ internal class CTja : CActivity {
 		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
 		stdgbvalue.Drums = 0;
 		this.LEVEL = stdgbvalue;
-		this.bチップがある = new STチップがある();
 		this.strFileName = "";
 		this.strFolderPath = "";
 		this.strFullPath = "";
@@ -556,16 +556,6 @@ internal class CTja : CActivity {
 		this.nBGMAdjust = 0;
 		this.nPolyphonicSounds = OpenTaiko.ConfigIni.nPoliphonicSounds;
 		this.dbDTXVPlaySpeed = 1.0f;
-
-		//this.nScoreModeTmp = 1;
-		for (int y = 0; y < (int)Difficulty.Total; y++) {
-			this.nScoreInit[0, y] = 300;
-			this.nScoreInit[1, y] = 1000;
-			this.nScoreDiff[y] = 120;
-			this.b配点が指定されている[0, y] = false;
-			this.b配点が指定されている[1, y] = false;
-			this.b配点が指定されている[2, y] = false;
-		}
 
 		this.SongVol = CSound.DefaultSongVol;
 		this.SongLoudnessMetadata = null;
@@ -1307,7 +1297,7 @@ internal class CTja : CActivity {
 				}
 				#endregion
 				#region[ seNotes計算 ]
-				if (this.bチップがある.Branch)
+				if (this.PlayerSideMetadata.bHasBranch)
 					this.tSetSenotes_branch();
 				else
 					this.tSetSenotes();
@@ -1490,9 +1480,9 @@ internal class CTja : CActivity {
 			for (int i = 0; i < (int)Difficulty.Total; i++) {
 				if (this.b譜面が存在する[i]) {
 					n譜面数++;
-					this.LEVELtaiko[i] = Math.Max(0, this.LEVELtaiko[i]);
+					this.SongListCourseMetadata[i].LEVELtaiko = Math.Max(0, this.SongListCourseMetadata[i].LEVELtaiko);
 				} else {
-					this.LEVELtaiko[i] = -1;
+					this.SongListCourseMetadata[i].LEVELtaiko = -1;
 				}
 			}
 
@@ -2018,7 +2008,7 @@ internal class CTja : CActivity {
 		} else if (command == "#BRANCHSTART") {
 			//分岐:分岐スタート
 			#region [ 譜面分岐のパース方法を作り直し ]
-			this.bチップがある.Branch = true;
+			this.PlayerSideMetadata.bHasBranch = true;
 			this.GotoBranchEnd();
 
 			//条件数値。
@@ -2489,6 +2479,7 @@ internal class CTja : CActivity {
 		this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
 		this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
+
 		// add initial SCROLL chip
 		var chipInitScroll = this.NewEventChipAtDefCursor(0x9D, argInt: 0x00);
 		chipInitScroll.dbSCROLL = this.dbScrollSpeed;
@@ -2534,8 +2525,8 @@ internal class CTja : CActivity {
 		for (int i = 0; i < 3; i++) {
 			if (this.nNowRollCountBranch[i] >= 0) {
 				ECourse branch = (ECourse)i;
-				if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
-					this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+				if (branch == ECourse.eNormal || this.PlayerSideMetadata.bHasBranch) {
+					this.AddWarn(this.PlayerSideMetadata.bHasBranch ?
 						$"An unended roll in branch {branch} is ended by #END."
 						: $"An unended roll is ended by #END."
 					);
@@ -2838,8 +2829,8 @@ internal class CTja : CActivity {
 								}
 								if (noteType != NotesManager.ENoteType.EndRoll) {
 									// TaikoJiro compatibility: A non-roll ends an unended roll
-									if (branch == ECourse.eNormal || this.bHasBranch[this.n参照中の難易度]) {
-										this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+									if (branch == ECourse.eNormal || this.PlayerSideMetadata.bHasBranch) {
+										this.AddWarn(this.PlayerSideMetadata.bHasBranch ?
 											$"An unended roll is ended by a non-roll of type {noteType} in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
 											: $"An unended roll is ended by a non-roll of type {noteType} at measure {this.n現在の小節数}. Input: {InputText}"
 										);
@@ -2855,7 +2846,7 @@ internal class CTja : CActivity {
 							}
 
 							if (noteType is NotesManager.ENoteType.Unknown) {
-								this.AddWarn(this.bHasBranch[this.n参照中の難易度] ?
+								this.AddWarn(this.PlayerSideMetadata.bHasBranch ?
 									$"Unknown note symbol {inputChar} treated as a non-roll blank in branch {branch} at measure {this.n現在の小節数}. Input: {InputText}"
 									: $"Unknown note symbol {inputChar} treated as a non-roll blank at measure {this.n現在の小節数}. Input: {InputText}");
 							} else {
@@ -3082,9 +3073,11 @@ internal class CTja : CActivity {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
+		// note: at this stage, this.nowCourseScope != Difficulty.Total
+
 		// Add current player-side custom headers to dictionary, including those having a set behaviour
 		if (strCommandName.StartsWith(".")) {
-			customMetadataPlayerSide[strCommandName] = strCommandParam;
+			this.PlayerSideMetadata.CustomMetadata[strCommandName] = strCommandParam;
 		}
 
 		if (strCommandName.Equals("SIDE")) {
@@ -3121,64 +3114,88 @@ internal class CTja : CActivity {
 				_ => throw new ArgumentOutOfRangeException(),
 			});
 		} else {
-			this.ParsePerPlayerSideHeadersForAllDiffQuery(strCommandName, strCommandParam);
+			this.ParseQueryableCourseMetadata([this.PlayerSideMetadata], strCommandName, strCommandParam);
 		}
 	}
 
 	// The score headers contains all difficulties and needed to be parsed for global header as well
-	private void ParsePerPlayerSideHeadersForAllDiffQuery(string strCommandName, string strCommandParam) {
+	private void ParseQueryableCourseMetadata(IEnumerable<QueryableCourseMetadata> metadatas, string strCommandName, string strCommandParam) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
 
 		if (strCommandName.Equals("GAME")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.ForEachCurrentCourseScope(difficulty => this.nowGameType = this.GameType[difficulty] = strConvertGameType(strCommandParam));
+				foreach (var metadata in metadatas) {
+					metadata.GameType = strConvertGameType(strCommandParam);
+					if (metadatas.FirstOrDefault() == this.PlayerSideMetadata)
+						this.nowGameType = metadata.GameType;
+				}
 			}
+		} else if (strCommandName.Equals("LEVEL")) {
+			var level_dec = strCommandParam.ParseReal();
+			var level = Math.Max(0, (int)level_dec);
+			// detect decimal places small than 1
+			var matchFrac = DecimalPlaceRegex.Match(strCommandParam);
+			if (matchFrac != null && matchFrac.Success) {
+				int decimalPlaces = matchFrac.Groups[1].Length;
+				int exponential = (matchFrac.Groups[2].Length > 0) ? int.Parse(matchFrac.Groups[2].ValueSpan) : 0;
+				if (exponential - decimalPlaces < 0) {
+					double frac_part = level_dec % 1; // threshold is 2's division, can compare directly; otherwise needs decimal comparison
+					var icon = (frac_part >= 0.5) ? ELevelIcon.ePlus : ELevelIcon.eMinus;
+					foreach (var metadata in metadatas)
+						metadata.LEVELtaikoIcon = icon;
+				}
+			}
+			this.LEVEL.Drums = (int)level;
+			this.LEVEL.Taiko = (int)level;
+			foreach (var metadata in metadatas)
+				metadata.LEVELtaiko = (int)level;
 		} else if (strCommandName.Equals("SCOREMODE")) {
-			ParseOptionalInt16(value => this.nScoreMode = value);
+			ParseOptionalInt16(value => {
+				foreach (var metadata in metadatas)
+					metadata.nScoreMode = value;
+			});
 		} else if (strCommandName.Equals("SCOREINIT")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				string[] scoreinit = strCommandParam.Split(',');
 
 				this.ParseOptionalInt16("SCOREINIT first value", scoreinit[0], value => {
-					this.ForEachCurrentCourseScope(difficulty => {
-						this.nScoreInit[0, difficulty] = value;
-						this.b配点が指定されている[0, difficulty] = true;
-					});
+					foreach (var metadata in metadatas) {
+						metadata.nScoreInit[0] = value;
+						metadata.bScorePointAssigned[0] = true;
+					}
 				});
 
 				if (scoreinit.Length == 2) {
 					this.ParseOptionalInt16("SCOREINIT second value", scoreinit[1], value => {
-						this.ForEachCurrentCourseScope(difficulty => {
-							this.nScoreInit[1, difficulty] = value;
-							this.b配点が指定されている[2, difficulty] = true;
-						});
+						foreach (var metadata in metadatas) {
+							metadata.nScoreInit[1] = value;
+							metadata.bScorePointAssigned[2] = true;
+						}
 					});
 				}
 			}
 		} else if (strCommandName.Equals("SCOREDIFF")) {
 			ParseOptionalInt16(value => {
-				this.ForEachCurrentCourseScope(course => {
-					this.nScoreDiff[course] = value;
-					this.b配点が指定されている[1, course] = true;
-				});
+				foreach (var metadata in metadatas) {
+					metadata.nScoreDiff = value;
+					metadata.bScorePointAssigned[1] = true;
+				}
 			});
 		} else if (strCommandName.Equals("HIDDENBRANCH")) {
 			//2016.04.01 kairera0467 パラメーターは
 			if (!string.IsNullOrEmpty(strCommandParam)) {
-				this.ForEachCurrentCourseScope(course => {
-					this.bHIDDENBRANCH[course] = true;
-				});
+				foreach (var metadata in metadatas)
+					metadata.bHIDDENBRANCH = true;
 			}
 		} else if (strCommandName.StartsWith("NOTESDESIGNER")) {
 			string strDiff = strCommandName.Substring("NOTESDESIGNER".Length);
-			if (this.nowCourseScope != (int)Difficulty.Total) { // after COURSE:, ignore diff and apply to current difficulty
-				this.NOTESDESIGNER[this.nowCourseScope] = strCommandParam;
-			} else if (strDiff != "") { // before COURSE:, with diff, set target difficulty's default
-				this.NOTESDESIGNER[int.Parse(strDiff)] = strCommandParam;
-			} else { // before COURSE:, no diff, set all difficulties' default
-				this.ForEachCurrentCourseScope(difficulty => this.NOTESDESIGNER[difficulty] = strCommandParam);
+			if (this.nowCourseScope == (int)Difficulty.Total && strDiff != "") { // before COURSE:, with diff, set target difficulty's default
+				this.SongListCourseMetadata[int.Parse(strDiff)].NOTESDESIGNER = strCommandParam;
+			} else { // after COURSE:, ignore diff and apply to current difficulty
+				foreach (var metadata in metadatas)
+					metadata.NOTESDESIGNER = strCommandParam;
 			}
 		}
 	}
@@ -3282,7 +3299,7 @@ internal class CTja : CActivity {
 				//2015.08.18 kairera0467
 				//本来はヘッダ命令ではありませんが、難易度ごとに違う項目なのでここで読み込ませます。
 				//Lengthのチェックをされる前ににif文を入れています。
-				this.bHasBranch[this.n参照中の難易度] = true;
+				this.SongListCourseMetadata[this.n参照中の難易度].bHasBranch = true;
 			}
 			return;
 		}
@@ -3317,10 +3334,10 @@ internal class CTja : CActivity {
 		if (strCommandName.StartsWith(".")) {
 			if (this.nowCourseScope == (int)Difficulty.Total) {
 				// NOTE: Only includes custom headers that are before ANY COURSE: metadata
-				customMetadataGScope[strCommandName] = strCommandParam;
+				this.GlobalCustomMetadata[strCommandName] = strCommandParam;
 			} else {
 				// NOTE: Doesn't include (file-)global scope headers, to access them use the appropriate Lua API accessor
-				customMetadataCScope[this.nowCourseScope][strCommandName] = strCommandParam;
+				this.SongListCourseMetadata[this.nowCourseScope].CustomMetadata[strCommandName] = strCommandParam;
 			}
 		}
 
@@ -3338,23 +3355,6 @@ internal class CTja : CActivity {
 		} else if (strCommandName.StartsWith("SUBTITLE")) {
 			string _lang = strCommandName.Substring(8).ToLowerInvariant();
 			this.SUBTITLE.SetString(_lang, strCommandParam);
-		} else if (strCommandName.Equals("LEVEL")) {
-			var level_dec = strCommandParam.ParseReal();
-			var level = Math.Max(0, (int)level_dec);
-			// detect decimal places small than 1
-			var matchFrac = DecimalPlaceRegex.Match(strCommandParam);
-			if (matchFrac != null && matchFrac.Success) {
-				int decimalPlaces = matchFrac.Groups[1].Length;
-				int exponential = (matchFrac.Groups[2].Length > 0) ? int.Parse(matchFrac.Groups[2].ValueSpan) : 0;
-				if (exponential - decimalPlaces < 0) {
-					double frac_part = level_dec % 1; // threshold is 2's division, can compare directly; otherwise needs decimal comparison
-
-					this.ForEachCurrentCourseScope(course => this.LEVELtaikoIcon[course] = (frac_part >= 0.5) ? ELevelIcon.ePlus : ELevelIcon.eMinus);
-				}
-			}
-			this.LEVEL.Drums = (int)level;
-			this.LEVEL.Taiko = (int)level;
-			this.ForEachCurrentCourseScope(difficulty => this.LEVELtaiko[difficulty] = (int)level);
 		} else if (strCommandName.Equals("PREIMAGE")) {
 			this.PREIMAGE = strCommandParam;
 		} else if (strCommandName.Equals("BPM")) {
@@ -3630,7 +3630,9 @@ internal class CTja : CActivity {
 				}
 			}
 		} else {
-			this.ParsePerPlayerSideHeadersForAllDiffQuery(strCommandName, strCommandParam);
+			var metadatas = (this.nowCourseScope == (int)Difficulty.Total) ? this.SongListCourseMetadata
+				: [this.SongListCourseMetadata[this.nowCourseScope]];
+			this.ParseQueryableCourseMetadata(metadatas, strCommandName, strCommandParam);
 		}
 	}
 	/// <summary>

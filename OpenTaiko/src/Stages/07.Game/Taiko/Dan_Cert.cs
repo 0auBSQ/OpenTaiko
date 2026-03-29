@@ -229,7 +229,7 @@ internal class Dan_Cert : CActivity {
 			nMineMax = OpenTaiko.TJA.nDan_MineCount.Sum(),
 
 			lastChip = !(OpenTaiko.TJA.pDan_LastChip.Length > 0) ? null : OpenTaiko.TJA.pDan_LastChip[OpenTaiko.TJA.pDan_LastChip.Length - 1],
-			hasBranch = OpenTaiko.TJA.bチップがある.Branch,
+			hasBranch = OpenTaiko.TJA.PlayerSideMetadata.bHasBranch,
 		};
 		total.nNotesRemainMax = this.notesremain = total.GetUpdatedNNotesRemainMax();
 		return total;

@@ -263,7 +263,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja _dtx = OpenTaiko.GetTJA(i)!;
 
-			this.scoreMode[i] = (_dtx.nScoreMode >= 0) ? _dtx.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+			this.scoreMode[i] = (_dtx.PlayerSideMetadata.nScoreMode >= 0) ? _dtx.PlayerSideMetadata.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
 
 			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
 				for (int j = 0; j < balloonChips[i].Count; j++) {
@@ -286,7 +286,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 
-			var _list = (_dtx.bチップがある.Branch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
+			var _list = (_dtx.PlayerSideMetadata.bHasBranch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
 			CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount[i], out this.nBalloonHitCount[i], out this.nRollTimeMs[i]);
 			this.nAddScoreGen4ShinUchi[i] = GetAddScoreGen4ShinUchi(this.nNoteCount[i], this.nBalloonHitCount[i], this.nRollTimeMs[i]);
 		}
@@ -299,9 +299,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nAddScoreGen4ShinUchi_Dan = new double[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
 
 		CTja tja = OpenTaiko.GetTJA(0)!;
-		this.scoreMode[0] = (tja.nScoreMode >= 0) ? tja.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
+		this.scoreMode[0] = (tja.PlayerSideMetadata.nScoreMode >= 0) ? tja.PlayerSideMetadata.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
 
-		var _list = (tja.bチップがある.Branch) ? tja.listChip_Branch[2] : tja.listChip;
+		var _list = (tja.PlayerSideMetadata.bHasBranch) ? tja.listChip_Branch[2] : tja.listChip;
 		for (int iNextSongChip = 0, iNextSongChipNext; iNextSongChip >= 0; iNextSongChip = iNextSongChipNext) {
 			iNextSongChipNext = _list.FindIndex(iNextSongChip + 1, chip => (chip.nChannelNo == 0x9B));
 			CChip nextSongChip = _list[iNextSongChip];
@@ -1712,8 +1712,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private void AddScore(CChip pChip, int nPlayer, ENoteJudge eJudgeResult) {
 		if ((eJudgeResult != ENoteJudge.Miss) && (eJudgeResult != ENoteJudge.Bad) && (eJudgeResult != ENoteJudge.Poor) && (NotesManager.IsMissableNote(pChip))) {
 			int nCombos = this.actCombo.nCurrentCombo[nPlayer];
-			long nInit = OpenTaiko.TJA.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer]];
-			long nDiff = OpenTaiko.TJA.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer]];
+			long nInit = OpenTaiko.TJA.PlayerSideMetadata.nScoreInit[0];
+			long nDiff = OpenTaiko.TJA.PlayerSideMetadata.nScoreDiff;
 			long nAddScore = 0;
 
 			if (OpenTaiko.ConfigIni.ShinuchiMode)  //2016.07.04 kairera0467 真打モード。
@@ -2133,7 +2133,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 
 		CTja tja = OpenTaiko.TJA!;
-		if (!tja.bHasBranch[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]]) return;
+		if (!tja.PlayerSideMetadata.bHasBranch) return;
 
 		// use last reached measure
 		var measure = tja.listChip.ElementAtOrDefault(tja.GetListChipIndexOfMeasure(this.actPlayInfo.NowMeasure[0], this.nCurrentBranch[0]));
@@ -2242,7 +2242,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (nPlayer == 1)
 			bAutoPlay = bAutoPlay || OpenTaiko.ConfigIni.bAIBattleMode;
 
-		if (dTX.bチップがある.Branch && n現在時刻ms >= this.msTargetBranchTime[nPlayer]) {
+		if (dTX.PlayerSideMetadata.bHasBranch && n現在時刻ms >= this.msTargetBranchTime[nPlayer]) {
 			this.nCurrentBranch[nPlayer] = this.nTargetBranch[nPlayer];
 			this.msTargetBranchTime[nPlayer] = double.MaxValue;
 		}
@@ -3622,7 +3622,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 				CTja tja = OpenTaiko.GetTJA(i)!;
-				this.ReSetScore(tja.nScoreInit[0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]], tja.nScoreDiff[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]], i);
+				this.ReSetScore(tja.PlayerSideMetadata.nScoreInit[0], tja.PlayerSideMetadata.nScoreDiff, i);
 			}
 			this.nHand = new int[] { 0, 0, 0, 0, 0 };
 		}
@@ -3654,16 +3654,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 
-			this.eGameType[i] = tja.GameType[tja.nInstanceDifficulty] ?? OpenTaiko.ConfigIni.nGameType[i];
+			this.eGameType[i] = tja.PlayerSideMetadata.GameType ?? OpenTaiko.ConfigIni.nGameType[i];
 
 			for (CTja.ECourse b = CTja.ECourse.eNormal; b <= CTja.ECourse.eMaster; ++b)
 				this.bIsGOGOTIME_Branch[i, (int)b] = false;
 			this.bWasGOGOTIME[i] = this.bIsGOGOTIME[i] = false;
 			this.bBranchedChart[i] = false;
 			this.idxLastBranchSection[i] = 0;
-			this.bUseBranch[i] = tja.bチップがある.Branch && !tja.bHIDDENBRANCH[tja.nInstanceDifficulty];
+			this.bUseBranch[i] = tja.PlayerSideMetadata.bHasBranch && !tja.PlayerSideMetadata.bHIDDENBRANCH;
 
-			if (tja.bチップがある.Branch)
+			if (tja.PlayerSideMetadata.bHasBranch)
 				this.t分岐処理(CTja.ECourse.eNormal, i);
 
 			this.actPlayInfo.dbBPM[i] = tja.BASEBPM;

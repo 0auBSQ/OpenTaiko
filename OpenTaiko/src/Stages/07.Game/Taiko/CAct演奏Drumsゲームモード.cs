@@ -248,7 +248,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 			};
 
 			//★10の場合超激辛モードになる。
-			if (OpenTaiko.TJA.LEVELtaiko[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]] >= 10) {
+			if (OpenTaiko.TJA.PlayerSideMetadata.LEVELtaiko >= 10) {
 				#region[ 超激辛 ]
 				this.st叩ききりまショー.b超激辛 = true;
 
