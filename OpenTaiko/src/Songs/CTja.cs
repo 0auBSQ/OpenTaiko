@@ -230,6 +230,7 @@ internal class CTja : CActivity {
 	}
 
 	public class CBranchScrollState {
+		public EGameType? eGameType;
 		public EScrollMode eScrollMode;
 		public double dbSCROLL;
 		public double dbSCROLLY;
@@ -2649,6 +2650,7 @@ internal class CTja : CActivity {
 	private void SaveBranchScrollState() {
 		this.ForEachCurrentBranch(branch => {
 			var branchState = this.BranchScrollStates[(int)branch];
+			branchState.eGameType = this.nowGameType;
 			branchState.eScrollMode = this.eScrollMode;
 			branchState.dbSCROLL = this.dbNowScroll;
 			branchState.dbSCROLLY = this.dbNowScrollY;
@@ -2662,6 +2664,7 @@ internal class CTja : CActivity {
 
 	private void RestoreBranchScrollState() { // only used when branched
 		var branchState = this.BranchScrollStates[(int)this.n現在のコース];
+		this.nowGameType = branchState.eGameType;
 		this.eScrollMode = branchState.eScrollMode;
 		this.dbNowScroll = branchState.dbSCROLL;
 		this.dbNowScrollY = branchState.dbSCROLLY;
