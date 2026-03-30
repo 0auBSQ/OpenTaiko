@@ -164,7 +164,7 @@ internal class Dan_Cert : CActivity {
 				Exam.Type.JudgeBad => score.judges!.nMiss,
 				Exam.Type.JudgeADLIB => score.judges!.nADLIB,
 				Exam.Type.JudgeMine => score.judges!.nMine,
-				Exam.Type.Score => OpenTaiko.stageGameScreen.actScore.GetScore(0),
+				Exam.Type.Score => OpenTaiko.stageGameScreen.actScore.Get(0),
 				Exam.Type.Roll => score.judges!.nRoll,
 				Exam.Type.Hit => score.judges!.nGreat + score.judges.nGood + score.judges.nRoll,
 				Exam.Type.Combo => score.nHighestCombo,

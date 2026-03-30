@@ -1236,8 +1236,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			else this.actScore.Add(nAddScore, nPlayer);
 
 
-			// Refresh scores after roll hits as well
-			int __score = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+			int __score = (int)(this.actScore.Get(nPlayer));
 			this.CBranchScore[nPlayer].nScore = __score;
 			this.CChartScore[nPlayer].nScore = __score;
 			this.CSectionScore[nPlayer].nScore = __score;
@@ -1343,8 +1342,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		this.actScore.Add(nAddScore, player);
 
-		// Refresh scores after roll hits as well
-		int __score = (int)(this.actScore.GetScore(player) + nAddScore);
+		int __score = (int)(this.actScore.Get(player));
 		this.CBranchScore[player].nScore = __score;
 		this.CChartScore[player].nScore = __score;
 		this.CSectionScore[player].nScore = __score;
@@ -1878,8 +1876,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.actScore.Add(nAddScore, nPlayer);
 			}
 
-			//キーを押したときにスコア情報 + nAddScoreを置き換える様に
-			int __score = (int)(this.actScore.GetScore(nPlayer) + nAddScore);
+			int __score = (int)(this.actScore.Get(nPlayer));
 			this.CBranchScore[nPlayer].nScore = __score;
 			this.CChartScore[nPlayer].nScore = __score;
 			this.CSectionScore[nPlayer].nScore = __score;

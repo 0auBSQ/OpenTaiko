@@ -486,7 +486,7 @@ internal class CStage結果 : CStage {
 					double scoreRankModifier = srModifiers[0] * diffModifier;
 
 					for (int j = 1; j < 8; j++) {
-						if (OpenTaiko.stageGameScreen.actScore.GetScore(i) >= OpenTaiko.stageGameScreen.ScoreRank.ScoreRank[i][j - 1])
+						if (OpenTaiko.stageGameScreen.actScore.Get(i) >= OpenTaiko.stageGameScreen.ScoreRank.ScoreRank[i][j - 1])
 							scoreRankModifier = srModifiers[j] * diffModifier;
 					}
 
@@ -636,7 +636,7 @@ internal class CStage結果 : CStage {
 				this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
 				Background.Init();
