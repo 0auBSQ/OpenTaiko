@@ -53,6 +53,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
 		}
 		this.ReduceMultiplayerNotes(chip => NotesManager.IsKusudama(chip), OpenTaiko.ConfigIni.nPlayerCount);
+		this.ReduceMultiplayerNotes(chip => NotesManager.IsJointedNote(chip), 2);
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			this.CalculateGen4ShinUchiScoreParameters_Dan();
