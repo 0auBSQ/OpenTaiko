@@ -1365,8 +1365,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				if (chkChip.n発声時刻ms <= (int)nowTime
 					&& chkChip.end.n発声時刻ms + 500 >= (int)nowTime
 					) {
-					var balloon = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaCount : chkChip.nBalloon;
-					var rollCount = NotesManager.IsKusudama(chkChip) ? nCurrentKusudamaRollCount : chkChip.nRollCount;
+					var balloon = NotesManager.IsKusudama(chkChip) ? chkChip.KusudamaCount : chkChip.nBalloon;
+					var rollCount = NotesManager.IsKusudama(chkChip) ? chkChip.KusudamaRollCount : chkChip.nRollCount;
 					if (!this.bPAUSE && !this.isRewinding && !NotesManager.IsFuzeRoll(chkChip))
 						chkChip.bShow = false;
 					this.actBalloon.On進行描画(balloon, balloon - rollCount, i, chkChip, this.actTokkun.bTrainingPAUSE);

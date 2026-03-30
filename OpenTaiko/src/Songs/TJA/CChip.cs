@@ -24,8 +24,28 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int idxDefine = -1;
 	public int idxBranchSection;
 	public int nSenote;
-	public int nRollCount;
-	public int nBalloon;
+	public int nRollCount; // Kusudama: total roll count stored in end
+	public int nBalloon; // Kusudama: total hits stored in end
+
+	public CChip? FirstMultiLink {
+		get {
+			if (multiLink != null) {
+				for (int p = 0; p < multiLink.GetLength(0); ++p) {
+					for (int b = 0; b < multiLink.GetLength(1); ++b) {
+						var head = multiLink[p, b];
+						if (head?.bVisible ?? false)
+							return head;
+					}
+				}
+			}
+			return null;
+		}
+	}
+
+	public CChip KusudamaEnd => FirstMultiLink?.end ?? end;
+	public int KusudamaRollCount { get => KusudamaEnd.nRollCount; set => KusudamaEnd.nRollCount = value; }
+	public int KusudamaCount { get => KusudamaEnd.nBalloon; set => KusudamaEnd.nBalloon = value; }
+
 	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
 	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
@@ -71,6 +91,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public CChip start;
 	public CChip end;
 
+	public CChip?[,]? multiLink; // [iPlayer, iBranch]
 
 	//EXTENDED COMMANDS
 	public Color4 borderColor;

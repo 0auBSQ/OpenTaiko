@@ -295,8 +295,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 				for (int i = fromPlayer; i < n; ++i) {
 					for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
 						var note = matchedNotes[i, b];
-						if (note != null)
+						if (note != null) {
 							note.nChannelNo = NotesManager.ToChannelNo(NotesManager.MultiplayerReducedType(note));
+							note.multiLink = null;
+						}
 					}
 				}
 			}
@@ -313,6 +315,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						matchFrom = i + 1;
 						break;
 					}
+					note.multiLink = matchedNotes;
 					isBranchless = note.IsEndedBranching;
 				}
 			}
@@ -419,8 +422,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			bSplitLane[i] = false;
 			this.msCurrentBarRollProgress[i] = 0;
 		}
-
-		this.nowProcessingKusudama = null;
 
 		for (int i = 0; i < this.chip現在処理中の連打チップ.Length; ++i) {
 			for (int iChip = this.chip現在処理中の連打チップ[i].Count; iChip-- > 0;)
@@ -755,7 +756,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool[] bSplitLane;
 
 	public List<CChip>[] chipNowProcessingMultiHitNotes = [[], [], [], [], []]; // [iPlayer][idxNowProcessingMultiHitNotes]
-	private CChip? nowProcessingKusudama = null;
 	public List<CChip>[] chip現在処理中の連打チップ = [[], [], [], [], []]; // [iPlayer][idxNowProcessingRoll]
 	public double[] msCurrentBarRollProgress = [0, 0, 0, 0, 0]; // [iPlayer]
 
@@ -771,8 +771,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected Stopwatch sw;     // 2011.6.13 最適化検討用のストップウォッチ
 	public int ListDan_Number;
 	private bool IsDanFailed;
-	protected int nCurrentKusudamaRollCount;
-	protected int nCurrentKusudamaCount;
 
 	private float _AIBattleState;
 	private Queue<float>[] _AIBattleStateBatch;
@@ -1125,8 +1123,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				balloon = km[ts].nBalloon;
 			}
 			*/
-			rollCount = nCurrentKusudamaRollCount;
-			balloon = nCurrentKusudamaCount;
+			rollCount = pChip.KusudamaRollCount;
+			balloon = pChip.KusudamaCount;
 
 		}
 
@@ -1277,9 +1275,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actChara.b風船連打中[player] = true;
 		if (IsKusudama) {
 			this.actChara.IsInKusudama = true;
-			rollCount = pChip.nRollCount = ++nCurrentKusudamaRollCount;
-			balloon = nCurrentKusudamaCount;
-			if (nCurrentKusudamaCount > 0) {
+			rollCount = pChip.nRollCount = ++pChip.KusudamaRollCount;
+			balloon = pChip.KusudamaCount;
+			if (pChip.KusudamaRollCount > 0) {
 				actChara.ChangeAnime(player, CActImplCharacter.Anime.Kusudama_Breaking, true);
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (this.actBalloon.ct風船アニメ[i].IsUnEnded) {
@@ -1407,7 +1405,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			} else if (NotesManager.IsGenericBalloon(pChip)) {
 				if (!pChip.bProcessed) // hit during pre-note window
 					this.AddNowProcessingRollChip(nPlayer, pChip);
-				if (!NotesManager.IsKusudama(pChip) || nCurrentKusudamaCount > 0)
+				if (!NotesManager.IsKusudama(pChip) || pChip.KusudamaCount > 0)
 					eJudgeResult = this.tBalloonProcess(pChip, gt, msHitTjaTime, nNowInput, nPlayer);
 				else
 					eJudgeResult = ENoteJudge.Miss;
@@ -3181,15 +3179,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private void AddNowProcessingRollChip(int iPlayer, CChip chip) {
 		//if( this.n現在のコース == pChip.nコース )
+		bool alreadyProcessing = false;
 		int idx = this.chip現在処理中の連打チップ[iPlayer].BinarySearch(chip, NowProcessingRollComparer);
 		if (idx < 0)
 			idx = ~idx;
-		if (this.chip現在処理中の連打チップ[iPlayer].ElementAtOrDefault(idx) != chip)
+		if (ReferenceEquals(this.chip現在処理中の連打チップ[iPlayer].ElementAtOrDefault(idx), chip))
+			alreadyProcessing = true;
+		else
 			this.chip現在処理中の連打チップ[iPlayer].Insert(idx, chip);
 		if (chip.bVisible && !chip.IsHitted) {
-			if (NotesManager.IsKusudama(chip)) {
-				nCurrentKusudamaRollCount = 0;
-				nCurrentKusudamaCount += chip.nBalloon;
+			if (NotesManager.IsKusudama(chip) && !alreadyProcessing) {
+				chip.KusudamaCount += chip.nBalloon;
 			}
 			if (!this.bPAUSE && !this.isRewinding) {
 				this.ProcessRollHeadEffects(iPlayer, chip);
@@ -3205,12 +3205,18 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 		chip.bProcessed = true;
 		if (NotesManager.IsKusudama(chip)) {
-			if (this.nowProcessingKusudama == null && iPlayer == 0) {
-				this.nowProcessingKusudama = chip;
+			if (iPlayer == 0) {
 				actBalloon.KusuIn();
 				actChara.KusuIn();
 				this.actChara.IsInKusudama = true;
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+					if (chip.multiLink != null) {
+						for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+							var linkedChip = chip.multiLink[i, b];
+							if (!ReferenceEquals(linkedChip, chip) && (linkedChip?.bVisible ?? false))
+								this.AddNowProcessingRollChip(i, linkedChip);
+						}
+					}
 					this.actChara.b風船連打中[i] = true;
 				}
 			}
@@ -3229,16 +3235,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (NotesManager.IsGenericBalloon(chip)) {
 				if (NotesManager.IsKusudama(chip)) {
 					if (iPlayer == 0) {
-						if (!this.bPAUSE && !this.isRewinding && actBalloon.KusudamaIsActive) {
+						if (!this.bPAUSE && !this.isRewinding) {
 							actBalloon.KusuMiss();
 							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
 							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+								if (chip.multiLink != null) {
+									for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+										var linkedChip = chip.multiLink[p, b];
+										if (!ReferenceEquals(linkedChip, chip) && (linkedChip?.bVisible ?? false))
+											this.ProcessRollEnd(p, linkedChip, resetStates);
+									}
+								}
 								this.actChara.ChangeAnime(p, CActImplCharacter.Anime.Kusudama_Miss, true);
 							}
 						}
-						nCurrentKusudamaRollCount = 0;
-						nCurrentKusudamaCount = 0;
-						this.nowProcessingKusudama = null;
+						chip.KusudamaRollCount = 0;
+						chip.KusudamaCount = 0;
 					}
 				} else {
 					if (!this.bPAUSE && !this.isRewinding) {
@@ -3284,18 +3296,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 
 		if (NotesManager.IsKusudama(chip)) {
-			OpenTaiko.Skin.soundKusudama.tPlay();
-			if (!OpenTaiko.Skin.soundKusudama.bIsPlaying)
-				this.PlayHitNoteSound(iPlayer, input); // fallback sound
+			if (input != NotesManager.EInputType.Unknown) { // finished from this player
+				OpenTaiko.Skin.soundKusudama.tPlay();
+				if (!OpenTaiko.Skin.soundKusudama.bIsPlaying)
+					this.PlayHitNoteSound(iPlayer, input); // fallback sound
+				actBalloon.KusuBroke();
+				chip.KusudamaRollCount = 0;
+				chip.KusudamaCount = 0;
+			}
 			chip.bHit = true;
 			chip.IsHitted = true;
 			chip.bVisible = false;
-			nCurrentKusudamaRollCount = 0;
-			nCurrentKusudamaCount = 0;
-			this.nowProcessingKusudama = null;
 
-			actBalloon.KusuBroke();
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				if (chip.multiLink != null) {
+					for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+						var linkedChip = chip.multiLink[i, b];
+						if (!ReferenceEquals(linkedChip, chip) && (linkedChip?.bVisible ?? false))
+							this.ProcessBalloonBroke(i, linkedChip, NotesManager.EInputType.Unknown);
+					}
+				}
 				actChara.ChangeAnime(i, CActImplCharacter.Anime.Kusudama_Broke, true);
 			}
 		} else {
@@ -3605,9 +3625,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 			_AIBattleStateBatch = new Queue<float>[] { new Queue<float>(), new Queue<float>() };
 			bIsAIBattleWin = false;
 
-			nCurrentKusudamaCount = 0;
-			nCurrentKusudamaRollCount = 0;
-
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				this.Chara_MissCount[i] = 0;
 				this.bIsMiss[i] = false;
@@ -3644,7 +3661,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					chip.msStoredHit = double.NegativeInfinity;
 					chip.padStoredHit = EPad.Unknown;
 					chip.nRollCount = 0;
-					chip.nRollCount = 0;
+					if (NotesManager.IsRollEnd(chip.end))
+						chip.end.nBalloon = 0; // Kusudama balloon count
 					chip.ResetRollEffect();
 				}
 				#endregion
