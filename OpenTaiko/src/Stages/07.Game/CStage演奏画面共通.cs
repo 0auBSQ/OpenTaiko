@@ -1331,6 +1331,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				nAddScore = 360L;
 			else
 				nAddScore = 300L;
+		} else if (IsKusudama && OpenTaiko.ConfigIni.nPlayerCount > 1) {
+			nAddScore = Math.Max(1, (long)Math.Floor(10.0 / OpenTaiko.ConfigIni.nPlayerCount)) * 10;
 		} else {
 			nAddScore = 100L;
 		}
