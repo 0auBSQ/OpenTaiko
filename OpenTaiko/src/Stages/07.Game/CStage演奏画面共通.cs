@@ -52,6 +52,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
 		}
+		this.ReduceMultiplayerNotes(chip => NotesManager.IsKusudama(chip), OpenTaiko.ConfigIni.nPlayerCount);
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			this.CalculateGen4ShinUchiScoreParameters_Dan();
@@ -239,52 +240,96 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bPAUSE = false;
 	}
 
-	private void CalculateGen4ShinUchiScoreParameters() {
-		List<CChip>[] balloonChips = new List<CChip>[5];
+	private void ReduceMultiplayerNotes(Func<CChip, bool> isTargetNoteF, int minNeighbors = 2) {
+		// build filtered lists (already sorted)
+		List<CChip>[,] targetNotes = new List<CChip>[OpenTaiko.ConfigIni.nPlayerCount, 3]; // [iPlayer, iBranch]
 
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+			for (CTja.ECourse b = 0; b <= CTja.ECourse.eMaster; ++b)
+				targetNotes[i, (int)b] = listChip[i].Where(chip => isTargetNoteF(chip) && chip.IsForBranch(b)).ToList();
+		}
+
+		// n-way merge, to find every almost-simultaneous note across all players and all branches
+		int[,] idxNotes = new int[OpenTaiko.ConfigIni.nPlayerCount, 3]; // [iPlayer, iBranch]
+		for (;;) {
+			// find min of current index
+			CChip? min = null;
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+				for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+					var now = targetNotes[i, b].ElementAtOrDefault(idxNotes[i, b]);
+					if (now != null && (min == null || now.db発声時刻ms < min.db発声時刻ms))
+						min = now;
+				}
+			}
+			if (min == null) // all end reached
+				break;
+
+			// match against min
+			const int msMatchErrorLimit = 100;
+			CChip?[,] matchedNotes = new CChip?[OpenTaiko.ConfigIni.nPlayerCount, 3]; // [iPlayer, iBranch]
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+				for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+					// find same note (in case of simultaneous branched and branchless notes) or first best match
+					double msErrorMin = msMatchErrorLimit;
+					for (int ic = idxNotes[i, b]; ic < targetNotes[i, b].Count; ++ic) {
+						var now = targetNotes[i, b][ic];
+						if (now.db発声時刻ms >= min!.db発声時刻ms + msMatchErrorLimit)
+							break; // would not match further
+						double msError = Math.Max(Math.Abs(now.db発声時刻ms - min.db発声時刻ms), Math.Abs(now.end.db発声時刻ms - min.end.db発声時刻ms));
+						if (ReferenceEquals(now, min) || msError < msErrorMin) {
+							msErrorMin = msError;
+							idxNotes[i, b] = ic;
+							++idxNotes[i, b]; // exclude from future match
+							matchedNotes[i, b] = now;
+						}
+					}
+				}
+			}
+
+			// scan for matched multiplayer neighbors
+			void matchBreak(int fromPlayer, int breakPlayer) {
+				if (minNeighbors <= 1 || breakPlayer - fromPlayer >= minNeighbors)
+					return; // enough neighbors
+				// not enough neighbors, downgrade
+				int n = Math.Min(breakPlayer + 1, OpenTaiko.ConfigIni.nPlayerCount);
+				for (int i = fromPlayer; i < n; ++i) {
+					for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+						var note = matchedNotes[i, b];
+						if (note != null)
+							note.nChannelNo = NotesManager.ToChannelNo(NotesManager.MultiplayerReducedType(note));
+					}
+				}
+			}
+
+			int matchFrom = 0;
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
+				bool? isBranchless = null;
+				for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
+					var note = matchedNotes[i, b];
+					// Reject if lacking matching note in any branch
+					// Matching both branched and branchless notes is considered as lacking branched note
+					if (note == null || (isBranchless != null && note.IsEndedBranching != isBranchless)) {
+						matchBreak(matchFrom, i);
+						matchFrom = i + 1;
+						break;
+					}
+					isBranchless = note.IsEndedBranching;
+				}
+			}
+			matchBreak(matchFrom, OpenTaiko.ConfigIni.nPlayerCount);
+		}
+	}
+
+	private void CalculateGen4ShinUchiScoreParameters() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CTja _dtx = OpenTaiko.GetTJA(i)!;
+
 			this.nNoteCount[i] = 0;
 			this.nBalloonHitCount[i] = 0;
 			this.nRollTimeMs[i] = 0;
 			this.nAddScoreGen4ShinUchi[i] = 0;
 
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				balloonChips[i] = new();
-				for (int j = 0; j < listChip[i].Count; j++) {
-					var chip = listChip[i][j];
-
-					if (NotesManager.IsGenericBalloon(chip)) {
-						balloonChips[i].Add(chip);
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CTja _dtx = OpenTaiko.GetTJA(i)!;
-
 			this.scoreMode[i] = (_dtx.PlayerSideMetadata.nScoreMode >= 0) ? _dtx.PlayerSideMetadata.nScoreMode : OpenTaiko.ConfigIni.nScoreMode;
-
-			if (OpenTaiko.ConfigIni.nPlayerCount >= 2) {
-				for (int j = 0; j < balloonChips[i].Count; j++) {
-					var chip = balloonChips[i][j];
-					if (NotesManager.IsKusudama(chip)) {
-						for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
-							if (p == i) continue;
-							var chip2 = balloonChips[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-
-							if (chip2 == null) {
-								var chip3 = listChip[p].Find(x => Math.Abs(x.db発声時刻ms - chip.db発声時刻ms) < 100);
-								if (!NotesManager.IsKusudama(chip3)) {
-									chip.nChannelNo = 0x17;
-								}
-							} else if (!NotesManager.IsKusudama(chip2)) {
-								chip.nChannelNo = 0x17;
-							}
-						}
-					}
-				}
-			}
 
 			var _list = (_dtx.PlayerSideMetadata.bHasBranch) ? _dtx.listChip_Branch[2] : _dtx.listChip;
 			CountGen4ShinUchiScoreNotes(_list, out this.nNoteCount[i], out this.nBalloonHitCount[i], out this.nRollTimeMs[i]);

@@ -63,6 +63,13 @@ class NotesManager {
 	public static ENoteType GetNoteType(CChip? chip)
 		=> (chip != null) ? (ENoteType)chip.nChannelNo : ENoteType.Unknown;
 
+	public static ENoteType MultiplayerReducedType(ENoteType nt) => nt switch {
+		ENoteType.BalloonEx => ENoteType.Balloon,
+		ENoteType.DonHand => ENoteType.DonBig,
+		ENoteType.KaHand => ENoteType.KaBig,
+		_ => nt,
+	};
+
 	public static string? ToNoteChar(ENoteType nt)
 		=> NoteTypeToChar.GetValueOrDefault(nt);
 	public static int ToChannelNo(ENoteType nt) => (int)nt;

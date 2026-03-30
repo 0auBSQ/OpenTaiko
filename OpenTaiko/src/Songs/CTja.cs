@@ -2920,14 +2920,6 @@ internal class CTja : CActivity {
 		this.SetChipSudden(chip);
 		chip.bGOGOTIME = this.bGOGOTIME;
 
-		if (NotesManager.IsKusudama(chip)) {
-			if (IsEndedBranching) {
-			} else {
-				// Balloon in branches
-				chip.nChannelNo = 0x19;
-			}
-		}
-
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
 			var listBalloon = this.listBalloon_Branch[iBranch];
