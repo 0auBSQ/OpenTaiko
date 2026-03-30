@@ -70,8 +70,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double fBMSCROLLTime;
 	private int _n発声時刻ms;
 	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
-	public double n分岐時刻ms;
 
+	public double n分岐時刻ms = double.PositiveInfinity; // Kusudama bonus border
+	public double msKusudamaBonusBorder { get => n分岐時刻ms; set => n分岐時刻ms = value; }
 
 	public double db発声時刻ms;
 

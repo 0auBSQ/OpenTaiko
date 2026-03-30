@@ -1325,31 +1325,28 @@ internal abstract class CStage演奏画面共通 : CStage {
 		long nAddScore = 0;
 
 		if (!OpenTaiko.ConfigIni.ShinuchiMode) {
-			if (pChip.bGOGOTIME) {
-				if (balloon == rollCount)
-					nAddScore = 6000L;
-				else
-					nAddScore = 360L;
-			} else {
-				if (balloon == rollCount)
-					nAddScore = 5000L;
-				else
-					nAddScore = 300L;
-			}
+			if (balloon == rollCount)
+				nAddScore = 0; // add later
+			else if (pChip.bGOGOTIME)
+				nAddScore = 360L;
+			else
+				nAddScore = 300L;
 		} else {
 			nAddScore = 100L;
 		}
 
-		this.actScore.Add(nAddScore, player);
+		if (nAddScore != 0) {
+			this.actScore.Add(nAddScore, player);
 
-		int __score = (int)(this.actScore.Get(player));
-		this.CBranchScore[player].nScore = __score;
-		this.CChartScore[player].nScore = __score;
-		this.CSectionScore[player].nScore = __score;
+			int __score = (int)(this.actScore.Get(player));
+			this.CBranchScore[player].nScore = __score;
+			this.CChartScore[player].nScore = __score;
+			this.CSectionScore[player].nScore = __score;
+		}
 
 		this.StartHitNoteLaneFlash(player, sort, gt);
 		if (balloon - rollCount <= 0)
-			this.ProcessBalloonBroke(player, pChip, sort);
+			this.ProcessBalloonBroke(player, pChip, msHitTjaTime, sort);
 		else
 			this.PlayHitNoteSound(player, sort);
 		return ENoteJudge.Perfect;
@@ -3286,11 +3283,29 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.RemoveNowProcessingRollChip(iPlayer, chip, resetStates);
 	}
 
-	public void ProcessBalloonBroke(int iPlayer, CChip chip, NotesManager.EInputType input) {
+	public void ProcessBalloonBroke(int iPlayer, CChip chip, double msHitTjaTime, NotesManager.EInputType input) {
 		if (NotesManager.IsRollEnd(chip))
 			chip = chip.start;
 		if (!NotesManager.IsGenericBalloon(chip))
 			return;
+
+		if (!OpenTaiko.ConfigIni.ShinuchiMode) {
+			bool pastKusudamaBorder = NotesManager.IsKusudama(chip) && (msHitTjaTime >= chip.msKusudamaBonusBorder);
+
+			long nAddScore = 0;
+			if (chip.bGOGOTIME) {
+				nAddScore = (pastKusudamaBorder ? 1200L : 6000L);
+			} else {
+				nAddScore = (pastKusudamaBorder ? 1000L : 5000L);
+			}
+
+			this.actScore.Add(nAddScore, iPlayer);
+
+			int __score = (int)(this.actScore.Get(iPlayer));
+			this.CBranchScore[iPlayer].nScore = __score;
+			this.CChartScore[iPlayer].nScore = __score;
+			this.CSectionScore[iPlayer].nScore = __score;
+		}
 
 		if (NotesManager.IsKusudama(chip)) {
 			if (input != NotesManager.EInputType.Unknown) { // finished from this player
@@ -3310,7 +3325,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
 						var linkedChip = chip.multiLink[i, b];
 						if (!ReferenceEquals(linkedChip, chip) && (linkedChip?.bVisible ?? false))
-							this.ProcessBalloonBroke(i, linkedChip, NotesManager.EInputType.Unknown);
+							this.ProcessBalloonBroke(i, linkedChip, msHitTjaTime, NotesManager.EInputType.Unknown);
 					}
 				}
 				actChara.ChangeAnime(i, CActImplCharacter.Anime.Kusudama_Broke, true);

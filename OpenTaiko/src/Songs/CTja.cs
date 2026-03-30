@@ -2820,7 +2820,10 @@ internal class CTja : CActivity {
 							bool isRollHead = NotesManager.IsGenericRoll(noteType) && !NotesManager.IsRollEnd(noteType);
 							if (this.nNowRollCountBranch[iBranch] >= 0) {
 								if (isRollHead) {
-									// repeated roll head; treated as blank
+									// repeated roll head; treated as blank and set Kusudama bonus border
+									CChip chipHead = this.listChip_Branch[iBranch][this.nNowRollCountBranch[iBranch]];
+									if (NotesManager.IsKusudama(chipHead))
+										chipHead.msKusudamaBonusBorder = this.dbNowTime;
 									return; // process this note symbol in the next branch
 								}
 								if (noteType != NotesManager.ENoteType.EndRoll) {
@@ -2942,6 +2945,10 @@ internal class CTja : CActivity {
 
 			chip.msShowOffset = chipHead.msShowOffset;
 			chip.msMoveOffset = chipHead.msMoveOffset;
+
+			// TaikoJiro behavior: Default special balloon bonus border
+			if (NotesManager.IsKusudama(chipHead) && !(chipHead.msKusudamaBonusBorder < double.PositiveInfinity))
+				chipHead.msKusudamaBonusBorder = double.Lerp(chipHead.db発声時刻ms, chip.db発声時刻ms, 0.6);
 
 			// treat branched head + non-branched end = branched head + end
 			if (!chipHead.IsEndedBranching)
