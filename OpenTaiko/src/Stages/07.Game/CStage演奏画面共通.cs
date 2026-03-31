@@ -52,8 +52,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			listChip[i] = OpenTaiko.GetTJA(i)!.listChip;
 		}
-		this.ReduceMultiplayerNotes(chip => NotesManager.IsKusudama(chip), OpenTaiko.ConfigIni.nPlayerCount);
-		this.ReduceMultiplayerNotes(chip => NotesManager.IsJointedNote(chip), 2);
+		this.ReduceMultiplayerNotes(
+			chip => NotesManager.IsKusudama(chip),
+			chip => chip.nChannelNo = NotesManager.ToChannelNo(NotesManager.ENoteType.BalloonEx),
+			OpenTaiko.ConfigIni.nPlayerCount);
+		this.ReduceMultiplayerNotes(chip => chip.IsPartnerNote, chip => chip.IsPartnerNote = false, 2);
 
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			this.CalculateGen4ShinUchiScoreParameters_Dan();
@@ -241,7 +244,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bPAUSE = false;
 	}
 
-	private void ReduceMultiplayerNotes(Func<CChip, bool> isTargetNoteF, int minNeighbors = 2) {
+	private void ReduceMultiplayerNotes(Func<CChip, bool> isTargetNoteF, Action<CChip> reduceF, int minNeighbors = 2) {
 		// build filtered lists (already sorted)
 		List<CChip>[,] targetNotes = new List<CChip>[OpenTaiko.ConfigIni.nPlayerCount, 3]; // [iPlayer, iBranch]
 
@@ -297,7 +300,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
 						var note = matchedNotes[i, b];
 						if (note != null) {
-							note.nChannelNo = NotesManager.ToChannelNo(NotesManager.MultiplayerReducedType(note));
+							reduceF(note);
 							note.multiLink = null;
 						}
 					}

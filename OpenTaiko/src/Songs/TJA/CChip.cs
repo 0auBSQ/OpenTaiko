@@ -89,6 +89,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool IsHitted = false;
 	public bool IsMissed = false;
 
+	public bool IsPartnerNote = false;
+
 	public CChip start;
 	public CChip end;
 

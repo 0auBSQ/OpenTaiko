@@ -445,6 +445,7 @@ internal class CTja : CActivity {
 
 	public bool IsEnabledFixSENote;
 	public int FixSENote;
+	public bool IsEnabledPartnerNote;
 	public GaugeIncreaseMode GaugeIncreaseMode;
 
 	#region [ EXTENDED VARiABLES ]
@@ -2207,6 +2208,8 @@ internal class CTja : CActivity {
 		} else if (command == "#SENOTECHANGE") {
 			FixSENote = int.Parse(argument);
 			IsEnabledFixSENote = true;
+		} else if (command == "#PARTNERNOTE") {
+			IsEnabledPartnerNote = true;
 		} else if (command == "#NEXTSONG") {
 			// prevent branch section across songs
 			this.GotoBranchEnd(forced: true);
@@ -2856,6 +2859,9 @@ internal class CTja : CActivity {
 
 					if (IsEnabledFixSENote) IsEnabledFixSENote = false;
 
+					if (this.IsEnabledPartnerNote)
+						this.IsEnabledFixSENote = false;
+
 					this.dbLastTime = this.dbNowTime;
 					this.dbLastBMScrollTime = this.dbNowBMScollTime;
 					this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / n文字数));
@@ -2922,6 +2928,7 @@ internal class CTja : CActivity {
 		chip.nScrollDirection = this.nスクロール方向;
 		this.SetChipSudden(chip);
 		chip.bGOGOTIME = this.bGOGOTIME;
+		chip.IsPartnerNote = (NotesManager.IsJointedNote(chip) || this.IsEnabledPartnerNote);
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26

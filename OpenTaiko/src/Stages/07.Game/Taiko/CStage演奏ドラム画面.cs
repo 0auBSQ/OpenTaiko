@@ -976,65 +976,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						this.ct手つなぎ.TickLoop();
 						float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
 
-
-						//x = ( x ) - ( ( int ) ( (TJAPlayer3.Skin.Game_Note_Size[0] * pChip.dbチップサイズ倍率 ) / 2.0 ) );
-
-						//TJAPlayer3.Tx.Notes[(int)_gt].b加算合成 = false;
-						//TJAPlayer3.Tx.SENotes.b加算合成 = false;
-
-						switch (pChip.nChannelNo) {
-							case 0x11:
-							case 0x12:
-							case 0x13:
-							case 0x14:
-							case 0x1C:
-							case 0x101: {
-									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
-									NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
-
-									//TJAPlayer3.Tx.SENotes[(int)_gt]?.t2D描画(device, x - 2, y + nSenotesY, new Rectangle(0, 30 * pChip.nSenote, 136, 30));
-									break;
-								}
-
-							case 0x1A:
-							case 0x1B: {
-									int moveX = (int)(fHand * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
-									int moveY = (int)(fHand * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
-									if (hiddenMode < EStealthMode.Doron) {
-										if (nPlayer != OpenTaiko.ConfigIni.nPlayerCount - 1) {
-											//上から下
-											OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
-												x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
-												y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
-											OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
-												x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
-												y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
-										}
-										if (nPlayer != 0) {
-											//下から上
-											OpenTaiko.Tx.Notes_Arm?.t2D描画(
-												x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,
-												y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
-											OpenTaiko.Tx.Notes_Arm?.t2D描画(
-												x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX,
-												y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
-										}
-										NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
-										NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
-									}
-									break;
-								}
-
-							case 0x1F: {
-									NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
-								}
-								break;
-							default: {
-								}
-								break;
-
+						if (NotesManager.IsHittableNote(pChip)) {
+							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
+							NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
+							if (!NotesManager.IsADLIB(pChip))
+								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 						}
-						//CDTXMania.act文字コンソール.tPrint( x + 60, y + 160, C文字コンソール.Eフォント種別.白, pChip.nPlayerSide.ToString() );
 					}
 				}
 			}
@@ -1189,7 +1136,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					int _58_cut = 58 * _size[0] / 136;
 					int _78_cut = 78 * _size[0] / 136;
 
+					this.ct手つなぎ.TickLoop();
+					float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
+
 					if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端, hiddenMode);
 
 						if (hiddenMode < EStealthMode.Stealth && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
@@ -1216,6 +1167,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 
 					if (NotesManager.IsBalloon(pChip) || NotesManager.IsKusudama(pChip)) {
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
 						NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 					}

@@ -63,13 +63,6 @@ class NotesManager {
 	public static ENoteType GetNoteType(CChip? chip)
 		=> (chip != null) ? (ENoteType)chip.nChannelNo : ENoteType.Unknown;
 
-	public static ENoteType MultiplayerReducedType(ENoteType nt) => nt switch {
-		ENoteType.BalloonEx => ENoteType.Balloon,
-		ENoteType.DonHand => ENoteType.DonBig,
-		ENoteType.KaHand => ENoteType.KaBig,
-		_ => nt,
-	};
-
 	public static string? ToNoteChar(ENoteType nt)
 		=> NoteTypeToChar.GetValueOrDefault(nt);
 	public static int ToChannelNo(ENoteType nt) => (int)nt;
@@ -457,6 +450,41 @@ class NotesManager {
 		}
 	}
 
+	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveAmount, EStealthMode hiddenMode = EStealthMode.Off) {
+		if (!chip.IsPartnerNote || (hiddenMode >= EStealthMode.Doron))
+			return;
+
+		int moveX = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
+		int moveY = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
+
+		if (IsADLIB(chip)) {
+			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
+			if (!puchichara.effect.ShowAdlib)
+				return;
+			OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(50);
+		}
+
+		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1) {
+			//上から下
+			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
+			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
+		}
+		if (player != 0) {
+			//下から上
+			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
+			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
+		}
+
+		OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(255);
+	}
 
 	#endregion
 
