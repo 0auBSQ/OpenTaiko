@@ -1503,7 +1503,8 @@ internal class CTja : CActivity {
 			var (strUpperHeaders, strCourse) = CDTXStyleExtractor.tセッション譜面がある(
 				globalCourse, strSplitした譜面[n読み込むコース],
 				(Difficulty)n読み込むコース,
-				(OpenTaiko.ConfigIni.nPlayerCount > 1 && !OpenTaiko.ConfigIni.bAIBattleMode) ? (this.nPlayerSide + 1) : 0,
+				OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount,
+				this.nPlayerSide,
 				this.strFullPath);
 
 			//ここで1行の文字数をカウント。配列にして返す。
