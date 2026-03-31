@@ -218,7 +218,10 @@ public static class CDTXStyleExtractor {
 	}
 
 	private sealed class Section {
+		public static int GetPostCourseRank(bool isPostCourse) => isPostCourse ? 0 : 1;
+
 		public readonly bool IsPostCourse;
+		public int PostCourseRank => GetPostCourseRank(IsPostCourse);
 		public readonly SectionKind SectionKind;
 		public readonly string OriginalRawValue;
 
@@ -309,7 +312,7 @@ public static class CDTXStyleExtractor {
 		return sections
 			.SelectMany(s => s.SubSections.Select(ss => (post: s.IsPostCourse, ss)))
 			.Where(pss => (pss.post || (difficulty == Difficulty.Oni)) && pss.ss.SubSectionKind != SubSectionKind.NonSheet)
-			.Min(pss => (pss.post ? 0 : 1, pss.ss.Rank));
+			.Min(pss => (Section.GetPostCourseRank(pss.post), pss.ss.Rank));
 	}
 
 	// 5. Select and return the best-ranked sheet and its immediate header (contains #HBSCROLL and on), mark all sheets to be skipped from upper headers
@@ -318,7 +321,6 @@ public static class CDTXStyleExtractor {
 		// which are never removed always have a Rank value of 0.
 
 		foreach (var section in sections) {
-			var postCourseRank = section.IsPostCourse ? 0 : 1;
 			foreach (var o in section.SubSections.Where(o => (o.Rank != 0)))
 				o.Skipped = true;
 		}
@@ -327,7 +329,7 @@ public static class CDTXStyleExtractor {
 		// take the first and remove the rest.
 		var bestRankedSheets = sections
 			.SelectMany((s, i) => s.SubSections.Select((ss, j) => (s, i, ss, j)))
-			.Where(sissj => sissj.ss.Rank == bestRank);
+			.Where(sissj => sissj.s.PostCourseRank == bestPostCourseRank && sissj.ss.Rank == bestRank);
 
 		var (s, i, ss, j) = bestRankedSheets.First();
 		string sheet = ss.OriginalRawValue;
