@@ -13,7 +13,8 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public void Start(int iPlayer) {
-		// this.ct進行メイン = new CCounter(0, 500, 1000 / 60, TJAPlayer3.Timer);
+		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1) // skip animation for AI
+			return;
 
 		bSoundPlayed[iPlayer] = false;
 
@@ -261,12 +262,13 @@ internal class CActImplClearAnimation : CActivity {
 			base.IsFirstDraw = false;
 		}
 		int ret = 1;
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
-			if (this.Draw(i) == 0)
+		int nDrawnPlayers = OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount;
+		for (int i = 0; i < nDrawnPlayers; ++i)
+			if (this.Draw(i, nDrawnPlayers) == 0)
 				ret = 0;
 		return ret;
 	}
-	protected int Draw(int iPlayer) {
+	protected int Draw(int iPlayer, int nDrawnPlayers) {
 		if (this.ct進行メイン[iPlayer] != null) {
 			bool playerStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(iPlayer);
 			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
@@ -302,7 +304,7 @@ internal class CActImplClearAnimation : CActivity {
 			};
 
 			if (!bSoundPlayed[iPlayer]) {
-				int pan = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][iPlayer];
+				int pan = OpenTaiko.ConfigIni.nPanning[nDrawnPlayers - 1][iPlayer];
 				script?.PlayEndAnime(iPlayer);
 				sound?.SetPanning(pan);
 				sound?.PlayStart();
