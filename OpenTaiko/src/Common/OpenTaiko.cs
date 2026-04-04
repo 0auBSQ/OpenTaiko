@@ -241,7 +241,7 @@ internal class OpenTaiko : Game {
 	public static string strEXEのあるフォルダ {
 		get;
 		private set;
-	}
+	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
 	public static CTimer Timer {
 		get;
 		private set;
@@ -406,13 +406,6 @@ internal class OpenTaiko : Game {
 
 
 	protected override void Configuration() {
-		#region [ strEXEのあるフォルダを決定する ]
-		//-----------------
-		strEXEのあるフォルダ = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
-		// END #23629 2010.11.13 from
-		//-----------------
-		#endregion
-
 		ConfigIni = new CConfigIni();
 
 		string path = strEXEのあるフォルダ + "Config.ini";
