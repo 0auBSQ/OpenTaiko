@@ -1084,7 +1084,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutorollRoll(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
 			return;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
 		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(iPlayer))];
@@ -1106,7 +1106,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutorollBalloon(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE || pChip.msStoredHit > msTjaTime)
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE || pChip.msStoredHit > msTjaTime)
 			return;
 
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
