@@ -565,7 +565,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			// Transition for failed games
-			if (!OpenTaiko.ConfigIni.bAIBattleMode && ((minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted())) {
+			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
 				if (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
@@ -623,8 +623,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
 							}
 						}
-						if (OpenTaiko.ConfigIni.bAIBattleMode || (this.stageAbortType[i] == EStageAbort.None))
-							this.actEnd.Start(i);
+						this.actEnd.Start(i);
 					}
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;

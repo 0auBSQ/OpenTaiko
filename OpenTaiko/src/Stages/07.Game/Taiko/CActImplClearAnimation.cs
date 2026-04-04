@@ -16,9 +16,11 @@ internal class CActImplClearAnimation : CActivity {
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1) // skip animation for AI
 			return;
 
-		bSoundPlayed[iPlayer] = false;
+		if (this.ct進行メイン[iPlayer] != null) // prevent replaying animation
+			return;
 
 		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
+		bSoundPlayed[iPlayer] = false;
 
 		/*
         this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -160,6 +162,11 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public void InitScripts() {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i) {
+			this.bSoundPlayed[i] = false;
+			this.ct進行メイン[i] = null;
+		}
+
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript?.Init();
 			Tower_TopReached_PassScript?.Init();
