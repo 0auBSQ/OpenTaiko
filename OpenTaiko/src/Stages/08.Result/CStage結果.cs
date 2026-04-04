@@ -347,7 +347,7 @@ internal class CStage結果 : CStage {
 
 			double dAccuracyRate = Math.Pow((50 * this.st演奏記録.Drums.nOkCount + 100 * this.st演奏記録.Drums.nGoodCount) / (double)(100 * nTotalHits), 3);
 
-			int diffModifier;
+			double diffModifier;
 			float starRate;
 			float redStarRate;
 
@@ -373,7 +373,7 @@ internal class CStage結果 : CStage {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				diffModifier = 3;
 
-				int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower];
+				int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower]);
 
 				starRate = Math.Min(10, stars) / 2;
 				redStarRate = Math.Max(0, stars - 10) * 4;
@@ -428,9 +428,10 @@ internal class CStage結果 : CStage {
 				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
 					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i] != null) {
 						int diff = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Difficulty;
-						int stars = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Level;
+						int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Level);
 
-						diffModifier = Math.Max(1, Math.Min(3, diff));
+						//diffModifier = Math.Max(1, Math.Min(3, diff));
+						diffModifier = Math.Max(2.0, Math.Min(2.0 + (diff * 0.25), 3.0));
 
 						starRate = Math.Min(10, stars) / 2;
 						redStarRate = Math.Max(0, stars - 10) * 4;
@@ -451,18 +452,19 @@ internal class CStage結果 : CStage {
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					int diff = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
-					int stars = OpenTaiko.stageSongSelect.rChoosenSong.score[diff]?.譜面情報.nレベル[diff] ?? -1;
+					int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.score[diff]?.譜面情報.nレベル[diff] ?? -1);
 
-					diffModifier = Math.Max(1, Math.Min(3, diff));
+					//diffModifier = Math.Max(1, Math.Min(3, diff));
+					diffModifier = Math.Max(2.0, Math.Min(2.0 + (diff * 0.25), 3.0));
 
 					starRate = Math.Min(10, stars) / 2;
 					redStarRate = Math.Max(0, stars - 10) * 4;
 
 					#region [Clear modifier]
 
-					int[] modifiers = { -1, 0, 2, 3 };
+					double[] modifiers = { -1, 0, 2, 3 };
 
-					int clearModifier = modifiers[0];
+					double clearModifier = modifiers[0];
 
 					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 						clearModifier = modifiers[1] * diffModifier;
@@ -477,11 +479,11 @@ internal class CStage結果 : CStage {
 
 					#region [Score rank modifier]
 
-					int[] srModifiers = { 0, 0, 0, 0, 1, 1, 2, 3 };
+					double[] srModifiers = { 0, 0, 0, 0, 1, 1, 2, 3 };
 
 					// int s = TJAPlayer3.stage演奏ドラム画面.ScoreRank.ScoreRank[1];
 
-					int scoreRankModifier = srModifiers[0] * diffModifier;
+					double scoreRankModifier = srModifiers[0] * diffModifier;
 
 					for (int j = 1; j < 8; j++) {
 						if (OpenTaiko.stageGameScreen.actScore.GetScore(i) >= OpenTaiko.stageGameScreen.ScoreRank.ScoreRank[i][j - 1])
@@ -497,7 +499,7 @@ internal class CStage結果 : CStage {
 					if (clearModifier < 0)
 						this.nEarnedMedalsCount[i] = 5;
 					else {
-						this.nEarnedMedalsCount[i] = 5 + (int)((diffModifier * (starRate + redStarRate)) * dAccuracyRate) + clearModifier + scoreRankModifier;
+						this.nEarnedMedalsCount[i] = (int)(5 + (int)((diffModifier * (starRate + redStarRate)) * dAccuracyRate) + clearModifier + scoreRankModifier);
 						this.nEarnedMedalsCount[i] = Math.Max(5, (int)(this.nEarnedMedalsCount[i] * modMultipliers[i] * getCoinMul(i)));
 					}
 				}
