@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0.105] - 2026-04-04 (Beta)
+
+- [Enhancement] Increase the amount of coins obtained in Easy, Normal, Hard difficulties
+- [Enhancement] Cap the level to 13 and the song speed to x2 in the coins calculation formula
+- [Enhancement] Add the possibility to unlock Stormrider's Bolt and linebreak via coins to prevent a too long grind for the events
+- [Enhancement] Make one of the unlock condition texts for the April Fools 2026 event clearer
+- [Chore] Change the unlock condition for Another Reality from Full Combo Neptune's Lullaby to 200 Coins
+
 ## [0.6.0.104] - 2026-03-29 (Beta)
 
 - [Feat] Getting a cutscene now sets a global trigger on results screen activation to be usable in unlockables (retroactive for cutscenes that play only once)
