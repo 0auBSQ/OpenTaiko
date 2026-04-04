@@ -464,8 +464,8 @@ class NotesManager {
 			OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(50);
 		}
 
-		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1) {
-			//上から下
+		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1 && chip.multiLink?[player + 1, 0] != null) {
+			//downward link
 			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
@@ -473,8 +473,8 @@ class NotesManager {
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
 		}
-		if (player != 0) {
-			//下から上
+		if (player != 0 && chip.multiLink?[player - 1, 0] != null) {
+			//upward link
 			OpenTaiko.Tx.Notes_Arm?.t2D描画(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
