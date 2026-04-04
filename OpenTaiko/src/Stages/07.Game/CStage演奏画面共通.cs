@@ -1364,6 +1364,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[nPlayer];
 		bool bBombHit = false;
+		bool isDeniedJudgeCount = this.isDeniedPlaying[nPlayer] || this.IsStageAborted();
 
 		switch (nPlayer) {
 			case 1:
@@ -1421,12 +1422,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.soundAdlib[nPlayer]?.PlayStart();
 					this.StartHitNoteLaneFlash(nPlayer, nNowInput, gt);
 					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
-					this.CChartScore[nPlayer].nADLIB++;
-					this.CSectionScore[nPlayer].nADLIB++;
-					this.CBranchScore[nPlayer].nADLIB++;
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
-				} else if (pChip.IsMissed) {
+					if (!isDeniedJudgeCount) {
+						this.CChartScore[nPlayer].nADLIB++;
+						this.CSectionScore[nPlayer].nADLIB++;
+						this.CBranchScore[nPlayer].nADLIB++;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.DanSongScore[actDan.NowShowingNumber].nADLIB++;
+					}
+				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nADLIBMiss++;
 					this.CSectionScore[nPlayer].nADLIBMiss++;
 					this.CBranchScore[nPlayer].nADLIBMiss++;
@@ -1443,12 +1446,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, ENoteJudge.Mine, false, nPlayer);
 					OpenTaiko.Skin.soundBomb?.tPlay();
-					this.CChartScore[nPlayer].nMine++;
-					this.CSectionScore[nPlayer].nMine++;
-					this.CBranchScore[nPlayer].nMine++;
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-						this.DanSongScore[actDan.NowShowingNumber].nMine++;
-				} else if (pChip.IsMissed) {
+					if (!isDeniedJudgeCount) {
+						this.CChartScore[nPlayer].nMine++;
+						this.CSectionScore[nPlayer].nMine++;
+						this.CBranchScore[nPlayer].nMine++;
+						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+							this.DanSongScore[actDan.NowShowingNumber].nMine++;
+					}
+				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
 					this.CSectionScore[nPlayer].nMineAvoid++;
 					this.CBranchScore[nPlayer].nMineAvoid++;
@@ -1475,7 +1480,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		this.UpdateGauge(pChip, screenmode, nPlayer, eJudgeResult);
-		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, msDelta);
+		if (!isDeniedJudgeCount)
+			this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, msDelta);
 		this.UpdateComboMilestone(pChip, nPlayer);
 		this.AddScore(pChip, nPlayer, eJudgeResult);
 
@@ -3275,13 +3281,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 						OpenTaiko.Skin.soundBomb?.tPlay();
 						chip.bVisible = false;
 						this.Chara_MissCount[iPlayer]++;
-						this.CChartScore[iPlayer].nMine++;
-						this.CSectionScore[iPlayer].nMine++;
-						this.CBranchScore[iPlayer].nMine++;
+						if (!(this.isDeniedPlaying[iPlayer] || this.IsStageAborted())) {
+							this.CChartScore[iPlayer].nMine++;
+							this.CSectionScore[iPlayer].nMine++;
+							this.CBranchScore[iPlayer].nMine++;
+							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+								this.DanSongScore[actDan.NowShowingNumber].nMine++;
+						}
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 							CFloorManagement.damage();
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-							this.DanSongScore[actDan.NowShowingNumber].nMine++;
 						this.actCombo.nCurrentCombo[iPlayer] = 0;
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.DanSongScore[actDan.NowShowingNumber].nCombo = 0;
