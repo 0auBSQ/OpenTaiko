@@ -105,8 +105,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		float[] dbGaugeMaxComboValue_branch = new float[3];
 
 
-		if (nRiskyTimes_InitialVal > 0) {
-			this.bRisky = true;
+		this.bRisky = (nRiskyTimes_InitialVal > 0);
+		if (bRisky) {
 			this.nRiskyTimes[nPlayer] = OpenTaiko.ConfigIni.nRisky;
 			this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
 		}
