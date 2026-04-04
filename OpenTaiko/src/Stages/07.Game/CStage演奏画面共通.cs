@@ -2432,16 +2432,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 						if (!this.bPAUSE && !pChip.bHit) { // can't update while paused
 														   //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
-							if (NowAIBattleSectionTime >= NowAIBattleSection.Length && NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
-								PassAIBattleSection();
-
-								NowAIBattleSectionCount++;
-
-								if (AIBattleSections.Count > NowAIBattleSectionCount) {
-									NowAIBattleSectionTime = 0;
-								}
-								NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
-							}
+							if (NowAIBattleSectionTime >= NowAIBattleSection.Length)
+								this.UpdateAIBattleSection(nPlayer, n現在時刻ms);
 
 							if (this.actPlayInfo.NowMeasure[nPlayer] == 0) {
 								UpdateCharaCounter(nPlayer);
@@ -2965,6 +2957,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				//バグで譜面がとてつもないことになっているため、#ENDがきたらこれを差し込む。
 				case 0xFF:
 					if (!this.bPAUSE && !pChip.bHit) { // prevent infinity pause in training mode
+						while (AIBattleSections.Count > NowAIBattleSectionCount) // end all AI battle sections
+							this.UpdateAIBattleSection(nPlayer, n現在時刻ms);
 						this.isChartEnded[nPlayer] = true;
 						if (pChip.n整数値 != 0) { // 0: last note past, 0xFF: song end
 							if (OpenTaiko.ConfigIni.bTokkunMode) {
@@ -3134,6 +3128,19 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#endregion
 
 		return false;
+	}
+
+	private void UpdateAIBattleSection(int nPlayer, long n現在時刻ms) {
+		if (NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
+			PassAIBattleSection();
+
+			NowAIBattleSectionCount++;
+
+			if (AIBattleSections.Count > NowAIBattleSectionCount) {
+				NowAIBattleSectionTime = 0;
+			}
+			NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
+		}
 	}
 
 	private double GetScrollRate(int iPlayer)
