@@ -78,6 +78,7 @@ public class CInputManager : IDisposable {
 				Trace.TraceWarning("Error logging input devices.");
 			}
 		}
+		this.SetUseBufferInput(useBufferedInput);
 
 		Game.InitImGuiController(window, Context);
 	}
