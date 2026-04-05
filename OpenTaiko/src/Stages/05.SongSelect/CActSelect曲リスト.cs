@@ -66,7 +66,7 @@ internal class CActSelect曲リスト : CActivity {
 
 	public void ResetSongIndex() {
 		nSelectSongIndex = 0;
-		this.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート[nSelectSongIndex];
+		this.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート.ElementAtOrDefault(nSelectSongIndex);
 	}
 
 	public int nスクロールバー相対y座標 {

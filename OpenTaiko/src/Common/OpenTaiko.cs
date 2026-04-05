@@ -604,7 +604,7 @@ internal class OpenTaiko : Game {
 
 							#region [ 曲検索が完了したら、実際の曲リストに反映する ]
 							// CStage選曲.On活性化() に回した方がいいかな？
-							if (EnumSongs.IsSongListEnumerated) {
+							if (EnumSongs.state is CEnumSongs.DTXEnumState.Enumeratad or CEnumSongs.DTXEnumState.Canceled) {
 								actEnumSongs.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									actEnumSongs.ReleaseManagedResource();
@@ -612,9 +612,11 @@ internal class OpenTaiko : Game {
 								}
 								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
 
-								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
-								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
-								EnumSongs.SongListEnumCompletelyDone();
+								if (EnumSongs.IsSongListEnumerated) {
+									bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
+									OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
+									EnumSongs.SongListEnumCompletelyDone();
+								}
 							}
 							#endregion
 						}

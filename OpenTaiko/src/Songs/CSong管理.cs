@@ -30,6 +30,7 @@ internal class CSongs管理 {
 	public List<CSongListNode> list曲ルート_Dan = new List<CSongListNode>();          // 起動時にフォルダ検索して構築されるlist
 	public List<CSongListNode> list曲ルート_Tower = new List<CSongListNode>();          // 起動時にフォルダ検索して構築されるlist
 	public static List<FDK.CTexture> listCustomBGs = new List<FDK.CTexture>();
+	public bool bIsCanceled { get; set; }
 	public bool bIsSuspending                           // 外部スレッドから、内部スレッドのsuspendを指示する時にtrueにする
 	{                                                   // 再開時は、これをfalseにしてから、次のautoReset.Set()を実行する
 		get;
@@ -874,6 +875,8 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 	/// 検索を中断_スローダウンする
 	/// </summary>
 	private void SlowOrSuspendSearchTask() {
+		if (this.bIsCanceled)
+			throw new OperationCanceledException();
 		if (this.bIsSuspending)     // #27060 中断要求があったら、解除要求が来るまで待機
 		{
 			AutoReset.WaitOne();
