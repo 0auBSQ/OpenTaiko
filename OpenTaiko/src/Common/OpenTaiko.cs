@@ -99,6 +99,10 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CFPS FPSInput {
+		get;
+		private set;
+	}
 	public static CInputManager InputManager {
 		get;
 		private set;
@@ -496,8 +500,13 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
+	protected override void Events() {
+		base.Events();
+		FPSInput?.Update();
+	}
 	protected override void Update() {
 		InputManager?.Polling();
+		FPSInput?.Update(); // events polled before Update() is called
 	}
 	protected override void Draw() {
 #if !DEBUG
@@ -1642,6 +1651,7 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			FPS = new CFPS();
+			FPSInput = new CFPS();
 			Trace.TraceInformation("FPS counter initialized.");
 		} finally {
 			Trace.Unindent();
@@ -2074,9 +2084,7 @@ internal class OpenTaiko : Game {
 			Trace.TraceInformation("Ending FPS counter...");
 			Trace.Indent();
 			try {
-				if (FPS != null) {
-					FPS = null;
-				}
+				FPSInput = FPS = null;
 				Trace.TraceInformation("FPS counter terminated.");
 			} finally {
 				Trace.Unindent();

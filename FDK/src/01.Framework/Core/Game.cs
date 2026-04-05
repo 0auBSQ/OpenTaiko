@@ -96,6 +96,9 @@ public abstract class Game : IDisposable {
 
 	public static List<Action> AsyncActions { get; private set; } = new();
 
+	public Thread thInput { get; private set; }
+	private CancellationTokenSource thInputCancel;
+
 	private string strIconFileName;
 
 	protected string _Text = "";
@@ -434,6 +437,10 @@ public abstract class Game : IDisposable {
 
 	}
 
+	protected virtual void Events() {
+		Window_.DoEvents();
+	}
+
 	protected virtual void Update() {
 
 	}
@@ -494,6 +501,31 @@ public abstract class Game : IDisposable {
 
 		Initialize();
 		LoadContent();
+
+		try {
+			this.thInputCancel = new CancellationTokenSource();
+			ThreadStart thInputFunc = new (async () => {
+				using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(1));
+				while (!this.thInputCancel.IsCancellationRequested) { // ensure alive
+					try {
+						while (await timer.WaitForNextTickAsync(this.thInputCancel.Token))
+							this.Events();
+					} finally {
+						if (this.thInputCancel.IsCancellationRequested)
+							Trace.TraceInformation("Input thread terminated.");
+					}
+				}
+			});
+			this.thInput = new Thread(thInputFunc) {
+				Name = "InputThread",
+				IsBackground = true,
+			};
+			this.thInput.Start();
+			Trace.TraceInformation("Input thread started.");
+		} catch (Exception ex) {
+			Trace.TraceWarning(ex.ToString());
+			Trace.TraceWarning("Input thread failed to start. Fell back to poll input per draw frame.");
+		}
 	}
 
 	public void Window_Closing() {
@@ -502,6 +534,8 @@ public abstract class Game : IDisposable {
 		UnloadContent();
 		OnExiting();
 
+		this.thInputCancel.Cancel();
+		this.thInputCancel.Dispose();
 		Context.Dispose();
 	}
 
