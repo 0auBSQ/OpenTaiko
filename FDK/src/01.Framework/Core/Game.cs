@@ -302,23 +302,22 @@ public abstract class Game : IDisposable {
 		#endregion
 
 		// Use SDL on Linux with Wayland, otherwise use GLFW for everything else
-		if (windowing_override == "sdl") {
+		if ((OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") == "wayland" && windowing_override != "glfw")
+		|| windowing_override == "sdl") {
 			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
 			Console.WriteLine("SDL selected for Windowing");
-		} else if (windowing_override == "glfw") {
+		} else {
 			Silk.NET.Windowing.Glfw.GlfwWindowing.Use();
 			Console.WriteLine("GLFW selected for Windowing");
-		} else {
-			Silk.NET.Windowing.Sdl.SdlWindowing.Use();
-			Console.WriteLine("SDL selected for Windowing");
 		}
 
 		try {
 			Window_ = Window.Create(options);
-		} catch {
+		}
+		catch {
 			Console.WriteLine("The window failed to be created.\nYou can attempt to fix this by overriding the default windowing.\nTry launching OpenTaiko with args, using '-w glfw' to force GLFW or '-w sdl' to force SDL.");
 			throw;
-		}
+        }
 
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
