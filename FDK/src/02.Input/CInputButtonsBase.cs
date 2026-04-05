@@ -26,39 +26,32 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public string Name { get; protected set; }
 	public List<STInputEvent> InputEvents { get; protected set; }
 	public string strDeviceName { get; set; }
-	public bool useBufferInput { get; set; }
 
 	public void Polling() {
 		// clear previous input buffer
 		InputEvents.Clear();
-		// update per-frame button state, also fill the new input buffer for non-buffered input
-		// for buffered input, the input buffer has already been filled.
+		// update per-frame button state
+		// the input buffer has already been filled.
 		for (int i = 0; i < ButtonStates.Length; i++) {
 			// Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-			this.ProcessButtonState(i, SoundManager.PlayTimer.SystemTimeMs, this.GetVelocity(i));
+			this.ProcessButtonState(i, this.GetVelocity(i));
 		}
 		// swap input buffer
 		(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
 	}
 
-	protected void ProcessButtonState(int idxBtn, long msTimestamp, int velocity = 0) {
+	protected void ProcessButtonState(int idxBtn, int velocity = 0) {
 		if (ButtonStates[idxBtn].isPressed) {
 			if (ButtonStates[idxBtn].state >= 1) {
 				ButtonStates[idxBtn].state = 2;
 			} else {
 				ButtonStates[idxBtn].state = 1;
-				if (!this.useBufferInput) {
-					this.AddPressedEvent(idxBtn, msTimestamp, velocity);
-				}
 			}
 		} else {
 			if (ButtonStates[idxBtn].state <= -1) {
 				ButtonStates[idxBtn].state = -2;
 			} else {
 				ButtonStates[idxBtn].state = -1;
-				if (!this.useBufferInput) {
-					this.AddReleasedEvent(idxBtn, msTimestamp);
-				}
 			}
 		}
 	}
@@ -82,7 +75,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		});
 
 	protected void ButtonDown(int idxBtn, int velocity = 0) {
-		if (this.useBufferInput && !this.ButtonStates[idxBtn].isPressed) {
+		if (!this.ButtonStates[idxBtn].isPressed) {
 			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
 		}
 		this.ButtonStates[idxBtn].isPressed = true;
@@ -90,7 +83,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	}
 
 	protected void ButtonUp(int idxBtn) {
-		if (this.useBufferInput && this.ButtonStates[idxBtn].isPressed) {
+		if (this.ButtonStates[idxBtn].isPressed) {
 			this.AddReleasedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime());
 		}
 		this.ButtonStates[idxBtn].isPressed = false;

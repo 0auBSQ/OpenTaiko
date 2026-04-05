@@ -25,7 +25,6 @@ public interface IInputDevice : IDisposable {
 	List<STInputEvent> InputEvents {
 		get;
 	}
-	bool useBufferInput { get; set; }
 
 
 	// メソッドインターフェース

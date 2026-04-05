@@ -78,7 +78,6 @@ public class CInputManager : IDisposable {
 				Trace.TraceWarning("Error logging input devices.");
 			}
 		}
-		this.SetUseBufferInput(useBufferedInput);
 
 		Game.InitImGuiController(window, Context);
 	}
@@ -145,15 +144,6 @@ public class CInputManager : IDisposable {
 	public IInputDevice? MidiIn(int ID) => FindDevice(InputDeviceType.MidiIn, ID);
 	public IInputDevice? MidiIn(string GUID) => FindDevice(InputDeviceType.MidiIn, GUID);
 
-	public void SetUseBufferInput(bool useBufferInput) {
-		lock (this.lockInputDevices) {
-			for (int i = this.InputDevices.Count - 1; i >= 0; i--)
-			{
-				IInputDevice device = this.InputDevices[i];
-				device.useBufferInput = useBufferInput;
-			}
-		}
-	}
 	public void Polling() {
 		lock (this.lockInputDevices) {
 			//				foreach( IInputDevice device in this.list入力デバイス )
