@@ -4323,6 +4323,11 @@ internal class CTja : CActivity {
 	public static double TjaDurationToGameDuration(double duration)
 		=> duration / OpenTaiko.ConfigIni.SongPlaybackSpeed;
 
+	public static CConfigIni.CTimingZones GameDurationToTjaDuration(CConfigIni.CTimingZones zone) => new(
+		(int)GameDurationToTjaDuration(zone.nGoodZone),
+		(int)GameDurationToTjaDuration(zone.nOkZone),
+		(int)GameDurationToTjaDuration(zone.nBadZone));
+
 	// BeatSpeed (including BPM) is the reciprocal of time duration per beat.
 	public static double GameBeatSpeedToTjaBeatSpeed(double beatSpeed)
 		=> beatSpeed / OpenTaiko.ConfigIni.SongPlaybackSpeed;
@@ -4349,8 +4354,8 @@ internal class CTja : CActivity {
 		double msDTime = chip.db発声時刻ms - msTjaNowTime;
 		double th16DBeat = chip.fBMSCROLLTime - th16NowBeat;
 
-		chip.bShowSudden = !(NotesManager.IsGenericRoll(chip) && velocityRefChip.IsSuddenHideRoll)
-			&& (msTjaNowTime >= velocityRefChip.n発声時刻ms - velocityRefChip.msShowOffset);
+		chip.bShowSudden = (!(velocityRefChip.IsSuddenHideRoll && NotesManager.IsGenericRoll(chip))
+			&& (msTjaNowTime >= velocityRefChip.n発声時刻ms - velocityRefChip.msShowOffset));
 
 		// In TJAP3, #SUDDEN only affects horizontal scroll
 		double msDTimeMove = msDTime;

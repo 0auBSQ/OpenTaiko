@@ -855,7 +855,13 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.t背景テクスチャの生成(DefaultBgFilename, bgrect, BgFilename);
 	}
 	protected override void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nPlayTime) {
+		NotesManager.ENoteType nt = NotesManager.GetNoteType(pChip);
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
+
+		if (NotesManager.IsGenericRoll(nt)) {
+			this.t進行描画_チップ_Taiko連打(configIni, ref tja, ref pChip, nPlayer, nPlayTime, nt, _gt);
+			return;
+		}
 
 		#region[ 作り直したもの ]
 
@@ -898,9 +904,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long time = pChip.n発声時刻ms - __dbt;
 
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
-					if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt)) {
+					if (NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsAcceptBlue(nt, _gt)) {
 						y -= NotesManager.PxSplitLaneDistance;
-					} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt)) {
+					} else if (NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsAcceptRed(nt, _gt)) {
 						y += NotesManager.PxSplitLaneDistance;
 					}
 				}
@@ -975,10 +981,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						this.ct手つなぎ.TickLoop();
 						float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
 
-						if (NotesManager.IsHittableNote(pChip)) {
+						if (NotesManager.IsHittableNote(nt)) {
 							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
 							NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
-							if (!NotesManager.IsADLIB(pChip))
+							if (!NotesManager.IsADLIB(nt))
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 						}
 					}
@@ -989,7 +995,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 		#endregion
 	}
-	protected override void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime) {
+	protected override void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime, NotesManager.ENoteType nt, EGameType _gt) {
 		int nSenotesX = 0;
 		int nSenotesY = 0;
 
@@ -1010,8 +1016,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				break;
 		}
 
-		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
-
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1019,14 +1023,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		#region[ 作り直したもの ]
 		if (pChip.bVisible) {
-			bool pHasBar = (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip));
+			bool pHasBar = (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt));
 
 			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
 			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 			int x末端 = GetNoteOriginX(nPlayer) + pChip.end.nHorizontalChipDistance;
 			int y末端 = GetNoteOriginY(nPlayer) + pChip.end.nVerticalChipDistance;
 
-			if (NotesManager.IsGenericBalloon(pChip)) {
+			if (NotesManager.IsGenericBalloon(nt)) {
 				if (nowTime >= pChip.n発声時刻ms && nowTime < pChip.end.n発声時刻ms) {
 					x = GetNoteOriginX(nPlayer);
 					y = GetNoteOriginY(nPlayer);
@@ -1037,10 +1041,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
-				if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
+				if (NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsGenericBalloon(nt)) {
 					y -= NotesManager.PxSplitLaneDistance;
 					y末端 -= NotesManager.PxSplitLaneDistance;
-				} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
+				} else if (NotesManager.IsAcceptBlue(nt, _gt) && !NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsGenericBalloon(nt)) {
 					y += NotesManager.PxSplitLaneDistance;
 					y末端 += NotesManager.PxSplitLaneDistance;
 				}
@@ -1138,14 +1142,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					this.ct手つなぎ.TickLoop();
 					float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
 
-					if (NotesManager.IsRoll(pChip) || NotesManager.IsFuzeRoll(pChip)) {
+					if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
 						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端, hiddenMode);
 
 						if (hiddenMode < EStealthMode.Stealth && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
 
-							if (!NotesManager.IsFuzeRoll(pChip)) {
-								int _shift = NotesManager.IsBigRollTaiko(pChip, _gt) ? 26 : 0;
+							if (!NotesManager.IsFuzeRoll(nt)) {
+								int _shift = NotesManager.IsBigRollTaiko(nt, _gt) ? 26 : 0;
 								int senote = pChip.nSenote;
 								if (senote == 0xA && _gt is EGameType.Konga) // DRUMROLL
 									senote = 7; // drumroll
@@ -1165,12 +1169,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 					}
 
-					if (NotesManager.IsBalloon(pChip) || NotesManager.IsKusudama(pChip)) {
+					if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
 						NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 					}
-					if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(pChip)) {
+					if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(nt)) {
 						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
 						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
 							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
@@ -1399,10 +1403,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 					chipNoHit.eNoteState = ENoteState.None;
 				}
-				if (chipNoHit.eNoteState != ENoteState.Wait)
-					this.chipNowProcessingMultiHitNotes[i].RemoveAt(iChip--);
 			}
 
+			this.chipNowProcessingMultiHitNotes[i].RemoveAll(chip => chip.eNoteState != ENoteState.Wait);
 		}
 
 		#endregion

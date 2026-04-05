@@ -172,6 +172,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];
 		this.JPOSCROLLY = new double[5];
+		this.timingZones = new CConfigIni.CTimingZones[5];
 		eGameType = new EGameType[5];
 		bSplitLane = new bool[5];
 
@@ -756,6 +757,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected int nWaitButton;
 
+	protected CConfigIni.CTimingZones[] timingZones;
 	public EGameType[] eGameType;
 	protected bool[] bSplitLane;
 
@@ -948,49 +950,50 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.DanSongScore[danSong].nHighestCombo = this.DanSongScore[danSong].nCombo;
 	}
 
-	private record NoteJudgeWithOffset(ENoteJudge noteJudge, int? msDelta);
+	private record struct NoteJudgeWithOffset(ENoteJudge noteJudge, int? msDelta);
 
 	private ENoteJudge evaluateNodeJudge(long msTjaTime, int msDelta, CChip pChip, int player = 0) {
 
-		if (pChip != null) {
-			CTja tja = OpenTaiko.GetTJA(player)!;
-			double nDeltaTime = Math.Abs(Math.Truncate(msTjaTime - pChip.db発声時刻ms));
+		if (pChip == null) {
+			return ENoteJudge.Miss;
+		} else {
 			//Debug.WriteLine("nAbsTime=" + (nTime - pChip.n発声時刻ms) + ", nDeltaTime=" + (nTime - pChip.n発声時刻ms));
-			if (NotesManager.IsRoll(pChip)) {
+			var nt = NotesManager.GetNoteType(pChip);
+			if (NotesManager.IsRoll(nt)) {
 				return (msTjaTime >= pChip.n発声時刻ms && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
-			} else if (NotesManager.IsGenericBalloon(pChip)) {
+			} else if (NotesManager.IsGenericBalloon(nt)) {
 				return (msTjaTime >= pChip.n発声時刻ms - 17 && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			}
+			if (msDelta <= 0) // fast judge for autoplay
+				return ENoteJudge.Perfect;
+
+			CConfigIni.CTimingZones tz = this.timingZones[player];
+
+			if (msDelta > tz.nBadZone) // fast judge for miss
+				return ENoteJudge.Miss;
+			if (msDelta <= tz.nGoodZone)
+				return ENoteJudge.Perfect;
 
 			int actual = OpenTaiko.GetActualPlayer(player);
-			CConfigIni.CTimingZones tz = GetTimingZones(player);
 
-			if (nDeltaTime <= CTja.GameDurationToTjaDuration(tz.nGoodZone)) {
-				return ENoteJudge.Perfect;
-			}
-			if (nDeltaTime <= CTja.GameDurationToTjaDuration(tz.nOkZone)) {
+			if (msDelta <= tz.nOkZone) {
 				if (OpenTaiko.ConfigIni.bJust[actual] == 1 && NotesManager.IsMissableNote(pChip)) // Just
 					return ENoteJudge.Poor;
 				return ENoteJudge.Good;
 			}
 
-
-			if (nDeltaTime <= CTja.GameDurationToTjaDuration(tz.nBadZone)) {
-				if (OpenTaiko.ConfigIni.bJust[actual] == 2 || !NotesManager.IsMissableNote(pChip)) // Safe
-					return ENoteJudge.Good;
-				return ENoteJudge.Poor;
-			}
-
+			if (OpenTaiko.ConfigIni.bJust[actual] == 2 || !NotesManager.IsMissableNote(pChip)) // Safe
+				return ENoteJudge.Good;
+			return ENoteJudge.Poor;
 		}
-		return ENoteJudge.Miss;
 	}
 
 	private NoteJudgeWithOffset e指定時刻からChipのJUDGEを返すImpl(long msTjaTime, CChip pChip, int player = 0) {
 		if (pChip == null) return new NoteJudgeWithOffset(ENoteJudge.Miss, null);
-		int msDelta = (int)(msTjaTime - pChip.n発声時刻ms);
+		int msDelta = (int)Math.Abs(msTjaTime - pChip.db発声時刻ms);
 		return new NoteJudgeWithOffset(
 			evaluateNodeJudge(msTjaTime, msDelta, pChip, player),
-			msDelta
+			(int)msDelta
 		);
 	}
 
@@ -1386,7 +1389,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 
 		ENoteJudge eJudgeResult = ENoteJudge.Auto;
-		int? msDelta = e指定時刻からChipのJUDGEを返すImpl(msHitTjaTime, pChip, nPlayer).msDelta;
+		int msDelta = e指定時刻からChipのJUDGEを返すImpl(msHitTjaTime, pChip, nPlayer).msDelta!.Value;
 		{
 			//連打が短すぎると発声されない
 			eJudgeResult = (bCorrectLane && !pChip.IsMissed) ? this.e指定時刻からChipのJUDGEを返す(msHitTjaTime, pChip, nPlayer) : ENoteJudge.Miss;
@@ -1396,7 +1399,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			eJudgeResult = AlterJudgement(nPlayer, eJudgeResult, true);
 
 			if (!bAutoPlay && eJudgeResult != ENoteJudge.Miss) {
-				pChip.nLag = (int)(msHitTjaTime - pChip.n発声時刻ms);
+				pChip.nLag = msDelta;
 				CLagLogger.Add(nPlayer, pChip);
 			}
 
@@ -1923,9 +1926,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#region [ search for the first future note chips ]
 		// search backward for the top chip at given time
 		int iTop = Math.Max(0, Math.Min(count, this.nCurrentTopChip[nPlayer]));
-		for (; iTop - 1 >= 0 && iTop - 1 < count; --iTop)
-			if (msTjaTime >= this.listChip[nPlayer][iTop - 1].n発声時刻ms) // chip is played
-				break;
+		if ((iTop < count) && (msTjaTime < this.listChip[nPlayer][iTop].n発声時刻ms)) {
+			CChip searchChip = new() { n発声時刻ms = (int)msTjaTime, db発声時刻ms = double.PositiveInfinity }; // chip is played until this
+			iTop = this.listChip[nPlayer].BinarySearch(0, iTop, searchChip, Comparer<CChip>.Default);
+			if (iTop < 0)
+				iTop = ~iTop;
+		}
 
 		(CChip? chip, ENoteJudge judge) futureFirstUnhit = (null, ENoteJudge.Miss);
 		int iFutureFirst = count; // regardless of hit or unhit
@@ -2560,6 +2566,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 							// Play next song here
 							this.actDan.Start(this.ListDan_Number);
+							this.timingZones[nPlayer] = CTja.GameDurationToTjaDuration(this.GetTimingZones(nPlayer));
 						} else {
 							actDan.FirstSectionAnime = true;
 						}
@@ -3102,10 +3109,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		#region [draw phase (note), backward for correct stack order]
 		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
 			CChip pChip = dTX.listNoteChip[iChip];
-			if (NotesManager.IsGenericRoll(pChip))
-				this.t進行描画_チップ_Taiko連打(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
-			else
-				this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
+			this.t進行描画_チップ_Taiko(configIni, ref dTX, ref pChip, nPlayer, n現在時刻ms);
 		}
 		#endregion
 
@@ -3769,6 +3773,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.JPOSCROLLX[i] = 0;
 			this.JPOSCROLLY[i] = 0;
 
+			this.timingZones[i] = CTja.GameDurationToTjaDuration(this.GetTimingZones(i));
 			this.bSplitLane[i] = false;
 			this.msCurrentBarRollProgress[i] = 0;
 
@@ -3938,7 +3943,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected abstract void t進行描画_チップ_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void t進行描画_チップ本体_ドラムス(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void t進行描画_チップ_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);
-	protected abstract void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);
+	protected abstract void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime, NotesManager.ENoteType nt, EGameType _gt);
 
 	protected abstract void t進行描画_チップ_フィルイン(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void t進行描画_チップ_小節線(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, long nowTime);

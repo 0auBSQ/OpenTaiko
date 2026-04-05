@@ -106,7 +106,7 @@ internal class Dan_Cert : CActivity {
 			this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
 		}
 
-		NowCymbolShowingNumber = 0;
+		NowCymbolShowingNumber = NowShowingNumber = 0;
 		bExamChangeCheck = false;
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
