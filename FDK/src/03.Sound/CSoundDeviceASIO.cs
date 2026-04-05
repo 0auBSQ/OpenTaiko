@@ -52,7 +52,15 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		get;
 		protected set;
 	}
+	public double dbElapsedTimeMs {
+		get;
+		protected set;
+	}
 	public long UpdateSystemTimeMs {
+		get;
+		protected set;
+	}
+	public double dbUpdateSystemTimeMs {
 		get;
 		protected set;
 	}
@@ -365,8 +373,10 @@ internal class CSoundDeviceASIO : ISoundDevice {
 		// 経過時間を更新。
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
-		this.ElapsedTimeMs = (this.n累積転送バイト数 * 1000 / this.nミキサーの1秒あたりのバイト数) - this.OutputDelay;
+		this.dbElapsedTimeMs = (this.n累積転送バイト数 * 1000.0 / this.nミキサーの1秒あたりのバイト数) - this.OutputDelay;
+		this.ElapsedTimeMs = (long)this.dbElapsedTimeMs;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
+		this.dbUpdateSystemTimeMs = this.SystemTimer.SystemTimeMs_Double;
 
 
 		// 経過時間を更新後に、今回分の累積転送バイト数を反映。

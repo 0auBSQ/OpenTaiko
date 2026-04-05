@@ -16,19 +16,21 @@ public class CTimer : CTimerBase {
 
 
 	public override long SystemTimeMs {
-		get {
-			switch (this.CurrentTimerType) {
-				case TimerType.PerformanceCounter:
-					return performanceTimer?.ElapsedMilliseconds ?? 0;
+		get => this.CurrentTimerType switch {
+			TimerType.PerformanceCounter => performanceTimer?.ElapsedMilliseconds ?? 0,
+			TimerType.MultiMedia => Game.TimeMs,
+			TimerType.GetTickCount => (long)Environment.TickCount,
+			_ => 0,
+		};
+	}
 
-				case TimerType.MultiMedia:
-					return Game.TimeMs;
-
-				case TimerType.GetTickCount:
-					return (long)Environment.TickCount;
-			}
-			return 0;
-		}
+	public override double SystemTimeMs_Double {
+		get => this.CurrentTimerType switch {
+			TimerType.PerformanceCounter => performanceTimer?.Elapsed.TotalMilliseconds ?? 0,
+			TimerType.MultiMedia => Game.dbTimeMs,
+			TimerType.GetTickCount => Environment.TickCount,
+			_ => 0,
+		};
 	}
 
 	public CTimer(TimerType timerType)

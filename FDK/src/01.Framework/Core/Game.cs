@@ -243,6 +243,7 @@ public abstract class Game : IDisposable {
 		});
 	}
 
+	public static double dbTimeMs;
 	public static long TimeMs;
 
 	public static Matrix4X4<float> Camera;
@@ -506,6 +507,7 @@ public abstract class Game : IDisposable {
 
 	public void Window_Update(double deltaTime) {
 		double fps = 1.0f / deltaTime;
+		dbTimeMs = Window_.Time * 1000;
 		TimeMs = (long)(Window_.Time * 1000);
 
 		Update();

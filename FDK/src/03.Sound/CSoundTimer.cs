@@ -44,6 +44,27 @@ public class CSoundTimer : CTimerBase {
 		}
 	}
 
+	public override double SystemTimeMs_Double {
+		get {
+			if (this.Device.SoundDeviceType == ESoundDeviceType.Bass ||
+				this.Device.SoundDeviceType == ESoundDeviceType.ExclusiveWASAPI ||
+				this.Device.SoundDeviceType == ESoundDeviceType.SharedWASAPI ||
+				this.Device.SoundDeviceType == ESoundDeviceType.ASIO) {
+				if (this.Device.UpdateSystemTimeMs == CTimer.UnusedNum) {
+					return this.Device.dbElapsedTimeMs;
+				} else {
+					if (FDK.SoundManager.bUseOSTimer) {
+						return Game.dbTimeMs;
+					} else {
+						return this.Device.dbElapsedTimeMs
+							   + (this.Device.SystemTimer.SystemTimeMs_Double - this.Device.dbUpdateSystemTimeMs);
+					}
+				}
+			}
+			return CTimerBase.UnusedNum;
+		}
+	}
+
 	internal CSoundTimer(ISoundDevice device) {
 		this.Device = device;
 		ctDInputTimer = new CTimer(CTimer.TimerType.PerformanceCounter);
