@@ -16,14 +16,8 @@ internal static class CLagLogger {
 			return;
 		}
 
-		switch (pChip.nChannelNo) {
-			case 0x15:
-			case 0x16:
-			case 0x17:
-			case 0x18:
-			case 0x1F:
-				return;
-		}
+		if (!NotesManager.IsGenericRoll(pChip))
+			return;
 
 		var pChipNLag = pChip.nLag;
 
