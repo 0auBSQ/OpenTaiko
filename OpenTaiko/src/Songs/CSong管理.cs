@@ -80,11 +80,10 @@ internal class CSongs管理 {
 			var flatten = OpenTaiko.stageSongSelect.actSongList.flattenList(downloadBox.childrenList);
 
 			// Works because flattenList creates a new List
-			for (int i = 0; i < downloadBox.childrenList.Count; i++) {
-				CSongDict.tRemoveSongNode(downloadBox.childrenList[i].uniqueId);
-				downloadBox.childrenList.Remove(downloadBox.childrenList[i]);
-				i--;
+			foreach (var note in downloadBox.childrenList) {
+				CSongDict.tRemoveSongNode(note.uniqueId);
 			}
+			downloadBox.childrenList.Clear();
 
 
 			var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
