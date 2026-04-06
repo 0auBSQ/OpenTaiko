@@ -457,6 +457,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			this.actDan.Draw();
 
 			// Layer: notes & bar lines
+			this.ct手つなぎ.TickLoop();
+
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
 				bool btmp = this.t進行描画_チップ(EInstrumentPad.Drums, i);
@@ -900,9 +902,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					hiddenMode = EStealthMode.Doron;
 				#endregion
 
-				long __dbt = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-				long time = pChip.n発声時刻ms - __dbt;
-
 				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
 					if (NotesManager.IsAcceptRed(nt, _gt) && !NotesManager.IsAcceptBlue(nt, _gt)) {
 						y -= NotesManager.PxSplitLaneDistance;
@@ -911,111 +910,27 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					}
 				}
 
-				if (time < 0) {
+				if (pChip.n発声時刻ms < nPlayTime) {
 					this.actGame.st叩ききりまショー.b最初のチップが叩かれた = true;
 				}
 
 				if (x > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && x < OpenTaiko.Skin.Resolution[0]) {
 					if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
-						//int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
-						int num9 = 0;
-						if (OpenTaiko.Skin.Game_Notes_Anime && !OpenTaiko.ConfigIni.SimpleMode) {
-							if (this.actCombo.nCurrentCombo[nPlayer] >= 300 && ctChipAnimeLag[nPlayer].IsEnded) {
-								//num9 = ctChipAnime[nPlayer].n現在の値 != 0 ? 260 : 0;
-								if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-									num9 = OpenTaiko.Skin.Game_Notes_Size[1] * 2;
-								} else {
-									num9 = 0;
-								}
-							} else if (this.actCombo.nCurrentCombo[nPlayer] >= 300 && !ctChipAnimeLag[nPlayer].IsEnded) {
-								//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-								if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-									num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-								} else {
-									num9 = 0;
-								}
-							} else if (this.actCombo.nCurrentCombo[nPlayer] >= 150) {
-								//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-								if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-									num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-								} else {
-									num9 = 0;
-								}
-							} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50 && ctChipAnimeLag[nPlayer].IsEnded) {
-								//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-								if ((int)ctChipAnime[nPlayer].CurrentValue <= 1) {
-									num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-								} else {
-									num9 = 0;
-								}
-							} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50 && !ctChipAnimeLag[nPlayer].IsEnded) {
-								//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-								num9 = 0;
-							} else {
-								num9 = 0;
-							}
-						}
-
-
-
-						int nSenotesX = 0;
-						int nSenotesY = 0;
-
-						switch (OpenTaiko.ConfigIni.nPlayerCount) {
-							case 1:
-							case 2:
-								nSenotesX = OpenTaiko.Skin.nSENotesX[nPlayer];
-								nSenotesY = OpenTaiko.Skin.nSENotesY[nPlayer];
-								break;
-							case 3:
-							case 4:
-								nSenotesX = OpenTaiko.Skin.nSENotes_4P[0];
-								nSenotesY = OpenTaiko.Skin.nSENotes_4P[1];
-								break;
-							case 5:
-								nSenotesX = OpenTaiko.Skin.nSENotes_5P[0];
-								nSenotesY = OpenTaiko.Skin.nSENotes_5P[1];
-								break;
-						}
-
-						this.ct手つなぎ.TickLoop();
-						float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
-
+						int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
+						var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 						if (NotesManager.IsHittableNote(nt)) {
-							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
-							NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, hiddenMode: hiddenMode);
+							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ct手つなぎ.CurrentValue, hiddenMode: hiddenMode);
+							NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, hiddenMode: hiddenMode);
 							if (!NotesManager.IsADLIB(nt))
 								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
 						}
 					}
 				}
 			}
-		} else {
-			return;
 		}
 		#endregion
 	}
 	protected override void t進行描画_チップ_Taiko連打(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime, NotesManager.ENoteType nt, EGameType _gt) {
-		int nSenotesX = 0;
-		int nSenotesY = 0;
-
-		switch (OpenTaiko.ConfigIni.nPlayerCount) {
-			case 1:
-			case 2:
-				nSenotesX = OpenTaiko.Skin.nSENotesX[nPlayer];
-				nSenotesY = OpenTaiko.Skin.nSENotesY[nPlayer];
-				break;
-			case 3:
-			case 4:
-				nSenotesX = OpenTaiko.Skin.nSENotes_4P[0];
-				nSenotesY = OpenTaiko.Skin.nSENotes_4P[1];
-				break;
-			case 5:
-				nSenotesX = OpenTaiko.Skin.nSENotes_5P[0];
-				nSenotesY = OpenTaiko.Skin.nSENotes_5P[1];
-				break;
-		}
-
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1063,75 +978,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				hiddenMode = EStealthMode.Doron;
 			#endregion
 
-			//if( CDTXMania.ConfigIni.eScrollMode != EScrollMode.Normal )
-			//x -= 10;
-
 			if (isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
-					//int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? this.ctチップ模様アニメ.Drums.n現在の値 * 130 : 0;
-					//int num9 = this.actCombo.n現在のコンボ数.Drums >= 50 ? base.n現在の音符の顔番号 * 130 : 0;
-					int num9 = 0;
-					//if( this.actCombo.n現在のコンボ数[ nPlayer ] >= 300 )
-					//{
-					//    num9 = base.n現在の音符の顔番号 != 0 ? 260 : 0;
-					//}
-					//else if( this.actCombo.n現在のコンボ数[ nPlayer ] >= 50 )
-					//{
-					//    num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-					//}
-					if (OpenTaiko.Skin.Game_Notes_Anime && !OpenTaiko.ConfigIni.SimpleMode) {
-						if (this.actCombo.nCurrentCombo[nPlayer] >= 300 && ctChipAnimeLag[nPlayer].IsEnded) {
-							//num9 = ctChipAnime[nPlayer].db現在の値 != 0 ? 260 : 0;
-							if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-								num9 = OpenTaiko.Skin.Game_Notes_Size[1] * 2;
-							} else {
-								num9 = 0;
-							}
-						} else if (this.actCombo.nCurrentCombo[nPlayer] >= 300 && !ctChipAnimeLag[nPlayer].IsEnded) {
-							//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-							if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-								num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-							} else {
-								num9 = 0;
-							}
-						} else if (this.actCombo.nCurrentCombo[nPlayer] >= 150) {
-							//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-							if ((int)ctChipAnime[nPlayer].CurrentValue == 1 || (int)ctChipAnime[nPlayer].CurrentValue == 3) {
-								num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-							} else {
-								num9 = 0;
-							}
-						} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50 && ctChipAnimeLag[nPlayer].IsEnded) {
-							//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-							if ((int)ctChipAnime[nPlayer].CurrentValue <= 1) {
-								num9 = OpenTaiko.Skin.Game_Notes_Size[1];
-							} else {
-								num9 = 0;
-							}
-						} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50 && !ctChipAnimeLag[nPlayer].IsEnded) {
-							//num9 = base.n現在の音符の顔番号 != 0 ? base.n現在の音符の顔番号 * 130 : 0;
-							num9 = 0;
-						} else {
-							num9 = 0;
-						}
-					}
-
-					//kairera0467氏 の TJAPlayer2forPC のコードを参考にし、打数に応じて色を変える(打数の変更以外はほとんどそのまんま) ろみゅ～？ 2018/8/20
-					pChip.RollInputTime?.Tick();
-					pChip.RollDelay?.Tick();
-
-					if (pChip.RollInputTime != null && pChip.RollInputTime.IsEnded) {
-						pChip.RollInputTime.Stop();
-						pChip.RollInputTime.CurrentValue = 0;
-						pChip.RollDelay = new CCounter(-pChip.RollEffectLevel, 0, 1000 / 60.0, OpenTaiko.Timer);
-					} else if (pChip.RollDelay != null && pChip.RollDelay.IsTicked && pChip.RollEffectLevel > 0) {
-						pChip.RollEffectLevel = -pChip.RollDelay.CurrentValue;
-					}
-
-					float f減少するカラー = 1.0f - ((0.95f / 100) * pChip.RollEffectLevel);
-					var effectedColor = new Color4(1.0f, f減少するカラー, f減少するカラー, 1f);
-					var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
-					//float f末端ノーツのテクスチャ位置調整 = 65f;
+					int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
 
 					//136, 30
 					var _size = OpenTaiko.Skin.Game_SENote_Size;
@@ -1139,15 +988,30 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					int _58_cut = 58 * _size[0] / 136;
 					int _78_cut = 78 * _size[0] / 136;
 
-					this.ct手つなぎ.TickLoop();
-					float fHand = (this.ct手つなぎ.CurrentValue < 30 ? this.ct手つなぎ.CurrentValue : 60 - this.ct手つなぎ.CurrentValue) / 30.0f;
+					var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 
 					if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
-						NotesManager.DisplayRoll(nPlayer, x, y, pChip, num9, normalColor, effectedColor, x末端, y末端, hiddenMode);
+						if (NotesManager.IsRoll(nt)) {
+							//kairera0467氏 の TJAPlayer2forPC のコードを参考にし、打数に応じて色を変える(打数の変更以外はほとんどそのまんま) ろみゅ～？ 2018/8/20
+							pChip.RollInputTime?.Tick();
+							pChip.RollDelay?.Tick();
+
+							if (pChip.RollInputTime != null && pChip.RollInputTime.IsEnded) {
+								pChip.RollInputTime.Stop();
+								pChip.RollInputTime.CurrentValue = 0;
+								pChip.RollDelay = new CCounter(-pChip.RollEffectLevel, 0, 1000 / 60.0, OpenTaiko.Timer);
+							} else if (pChip.RollDelay != null && pChip.RollDelay.IsTicked && pChip.RollEffectLevel > 0) {
+								pChip.RollEffectLevel = -pChip.RollDelay.CurrentValue;
+							}
+						}
+						float f減少するカラー = 1.0f - ((0.95f / 100) * pChip.RollEffectLevel);
+						var effectedColor = new Color4(1.0f, f減少するカラー, f減少するカラー, 1f);
+						var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
+
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ct手つなぎ.CurrentValue, hiddenMode: hiddenMode);
+						NotesManager.DisplayRoll(nPlayer, x, y, pChip, pxFaceTxOffset, normalColor, effectedColor, x末端, y末端, hiddenMode);
 
 						if (hiddenMode < EStealthMode.Stealth && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-
 							if (!NotesManager.IsFuzeRoll(nt)) {
 								int _shift = NotesManager.IsBigRollTaiko(nt, _gt) ? 26 : 0;
 								int senote = pChip.nSenote;
@@ -1167,32 +1031,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 						}
 
-					}
-
-					if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, fHand, hiddenMode: hiddenMode);
-						NotesManager.DisplayNote(nPlayer, x, y, pChip, num9, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
+					} else if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ct手つなぎ.CurrentValue, hiddenMode: hiddenMode);
+						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
-					}
-					if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(nt)) {
+					} else if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(nt)) {
 						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
 						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
 							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
-						int n = 0;
-						switch (pChip.start.nChannelNo) {
-							case 0x15:
-								n = 910;
-								break;
-							case 0x16:
-								n = 1300;
-								break;
-							default:
-								n = 910;
-								break;
-						}
 						if (!NotesManager.IsGenericBalloon(pChip.start)) {
-							//if( CDTXMania.ConfigIni.eSTEALTH != Eステルスモード.DORON )
-							//    CDTXMania.Tx.Notes.t2D描画( CDTXMania.app.Device, x, y, new Rectangle( n, num9, 130, 130 ) );//大音符:1170
 							OpenTaiko.Tx.SENotes[(int)_gt]?.t2D描画(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
 						}
 
@@ -1201,6 +1048,35 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 		}
 		#endregion
+	}
+
+	public int GetPxFaceTextureOffset(int nPlayer) {
+		int pxFaceTxOffset = 0;
+		if (OpenTaiko.Skin.Game_Notes_Anime && !OpenTaiko.ConfigIni.SimpleMode) {
+			if (this.actCombo.nCurrentCombo[nPlayer] >= 300) {
+				if ((int)ctChipAnime[nPlayer].CurrentValue % 2 == 1) {
+					pxFaceTxOffset = ctChipAnimeLag[nPlayer].IsEnded ? (OpenTaiko.Skin.Game_Notes_Size[1] * 2) : OpenTaiko.Skin.Game_Notes_Size[1];
+				} else {
+					pxFaceTxOffset = 0;
+				}
+			} else if (this.actCombo.nCurrentCombo[nPlayer] >= 150) {
+				if ((int)ctChipAnime[nPlayer].CurrentValue % 2 == 1) {
+					pxFaceTxOffset = OpenTaiko.Skin.Game_Notes_Size[1];
+				} else {
+					pxFaceTxOffset = 0;
+				}
+			} else if (this.actCombo.nCurrentCombo[nPlayer] >= 50) {
+				if ((int)ctChipAnime[nPlayer].CurrentValue <= 1) {
+					pxFaceTxOffset = ctChipAnimeLag[nPlayer].IsEnded ? OpenTaiko.Skin.Game_Notes_Size[1] : 0;
+				} else {
+					pxFaceTxOffset = 0;
+				}
+			} else {
+				pxFaceTxOffset = 0;
+			}
+		}
+
+		return pxFaceTxOffset;
 	}
 
 	/// Detect and hide screen-obscuring rolls when any tips are out of screen

@@ -433,6 +433,13 @@ class NotesManager {
 	}
 
 	// SENotes
+
+	public static (int x, int y) GetSENotesPos(int nPlayer) => OpenTaiko.ConfigIni.nPlayerCount switch {
+		<= 2 => (OpenTaiko.Skin.nSENotesX[nPlayer], OpenTaiko.Skin.nSENotesY[nPlayer]),
+		3 or 4 => (OpenTaiko.Skin.nSENotes_4P[0], OpenTaiko.Skin.nSENotes_4P[1]),
+		>= 5 => (OpenTaiko.Skin.nSENotes_5P[0], OpenTaiko.Skin.nSENotes_5P[1]),
+	};
+
 	public static void DisplaySENotes(int player, int x, int y, CChip chip, EStealthMode hiddenMode = EStealthMode.Off) {
 		if (hiddenMode >= EStealthMode.Stealth)
 			return;
@@ -453,10 +460,11 @@ class NotesManager {
 		}
 	}
 
-	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveAmount, EStealthMode hiddenMode = EStealthMode.Off) {
+	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveCounterValue, EStealthMode hiddenMode = EStealthMode.Off) {
 		if (!chip.IsPartnerNote || (hiddenMode >= EStealthMode.Doron))
 			return;
 
+		float moveAmount = (moveCounterValue < 30 ? moveCounterValue : 60 - moveCounterValue) / 30.0f;
 		int moveX = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
 		int moveY = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
 
