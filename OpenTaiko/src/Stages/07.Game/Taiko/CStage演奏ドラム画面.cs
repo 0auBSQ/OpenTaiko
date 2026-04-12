@@ -333,10 +333,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		var becomeStageFailed = (this.stageAbortType[iPlayer] == EStageAbort.None);
 		base.SetStageFailed(iPlayer, failType);
 		if (becomeStageFailed) {
-			int Character = this.actChara.iCurrentCharacter[iPlayer];
-			if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
-				this.actChara.ChangeAnime(iPlayer, CActImplCharacter.Anime.ClearOut, true);
-			}
+			this.actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 			this.actGauge.db現在のゲージ値[iPlayer] = 0; // for indicate life failure in AI mode
 			this.UpdateGauge(null, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
 			CFloorManagement.CurrentNumberOfLives = 0; // prevent clear
@@ -603,20 +600,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			} else if ((bIsChartEnded || bIsFinishedPlaying) && (!isTower || this.actBackground.IsFinishedTowerClimbing())) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						int Character = this.actChara.iCurrentCharacter[i];
-
 						if (isTower ? (CFloorManagement.CurrentNumberOfLives >= CFloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
-							if (OpenTaiko.Skin.Characters_10Combo_Maxed_Ptn[Character] != 0) {
-								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Combo10_Max, true);
-							}
+							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_10COMBO_MAX);
 						} else if (isTower ? (CFloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-							if (OpenTaiko.Skin.Characters_Become_Cleared_Ptn[Character] != 0) {
-								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.Cleared, true); ;
-							}
+							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_CLEARED);
 						} else {
-							if (OpenTaiko.Skin.Characters_ClearOut_Ptn[Character] != 0) {
-								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
-							}
+							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_FAILED);
 						}
 						if (OpenTaiko.ConfigIni.bAIBattleMode || (this.stageAbortType[i] == EStageAbort.None))
 							this.actEnd.Start(i);

@@ -3408,7 +3408,6 @@ internal class CTja : CActivity {
 			if (this.isMOVIEOFFSET_Negative == true)
 				this.msMOVIEOFFSET_Abs = this.msMOVIEOFFSET_Abs * -1; //OFFSETは秒を加算するので、必ず正の数にすること。
 																	  //tbOFFSET.Text = strCommandParam;
-		}
 		} else if (strCommandName.Equals("GAUGEINCR")) {
 			if (!string.IsNullOrEmpty(strCommandParam)) {
 				GaugeIncreaseMode = strCommandParam.ToLower() switch {
@@ -3610,9 +3609,7 @@ internal class CTja : CActivity {
 						try {
 							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
 								if (filePaths[i].EndsWith(".vtt")) {
-								using (VTTParser parser = new VTTParser()) {
-										parser.ParseVTTFile(this.listLyric2, filePaths[i], 0);
-									}
+									new VTTParser().ParseVTTFile(this.listLyric2, filePaths[i], 0);
 								} else if (filePaths[i].EndsWith(".lrc")) {
 									this.LyricFileParser(this.listLyric2, filePaths[i]);
 								} else {

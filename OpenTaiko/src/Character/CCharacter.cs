@@ -296,11 +296,11 @@ abstract class CCharacter : IDisposable {
 	public int _idx;
 	public string dirName;
 
-	public float GetEffectCoinMultiplier() {
+	public float GetEffectCoinMultiplier(bool gaugeEnabled = true) {
 		float mult = 1f;
 
 		mult *= HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity);
-		mult *= effect.GetCoinMultiplier();
+		mult *= effect.GetCoinMultiplier(1f, gaugeEnabled: gaugeEnabled);
 
 		return mult;
 	}

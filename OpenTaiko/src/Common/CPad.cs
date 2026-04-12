@@ -129,13 +129,13 @@ public class CPad {
 		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 		for (int i = 0; i < stkeyassignArray.Length; i++) {
 			switch (stkeyassignArray[i].InputDevice) {
-				case EInputDevice.Keyboard:
+				case InputDeviceType.Keyboard:
 					if (!this.inputManager.Keyboard.KeyReleasing(stkeyassignArray[i].Code)) {
 						return false;
 					}
 					break;
 
-				case EInputDevice.Joypad: {
+				case InputDeviceType.Joystick: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) break;
 						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
 						if (device == null) break;
@@ -145,7 +145,7 @@ public class CPad {
 						break;
 					}
 
-				case EInputDevice.Gamepad: {
+				case InputDeviceType.Gamepad: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
 							break;
 						}
@@ -156,7 +156,7 @@ public class CPad {
 
 						break;
 					}
-				case EInputDevice.Mouse:
+				case InputDeviceType.Mouse:
 					if (!this.inputManager.Mouse.KeyReleasing(stkeyassignArray[i].Code)) {
 						return false;
 					}
@@ -175,19 +175,19 @@ public class CPad {
 		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 		for (int i = 0; i < stkeyassignArray.Length; i++) {
 			switch (stkeyassignArray[i].InputDevice) {
-				case EInputDevice.Keyboard:
+				case InputDeviceType.Keyboard:
 					if (this.inputManager.Keyboard.KeyReleased(stkeyassignArray[i].Code))
 						return true;
 					break;
 
-				case EInputDevice.MIDIInput: {
+				case InputDeviceType.MidiIn: {
 						IInputDevice device2 = this.inputManager.MidiIn(stkeyassignArray[i].ID);
 						if (device2 == null) break;
 						if (device2.KeyReleased(stkeyassignArray[i].Code))
 							return true;
 						break;
 					}
-				case EInputDevice.Joypad: {
+				case InputDeviceType.Joystick: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
 							break;
 
@@ -197,7 +197,7 @@ public class CPad {
 							return true;
 						break;
 					}
-				case EInputDevice.Gamepad: {
+				case InputDeviceType.Gamepad: {
 						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
 							break;
 
@@ -207,7 +207,7 @@ public class CPad {
 							return true;
 						break;
 					}
-				case EInputDevice.Mouse:
+				case InputDeviceType.Mouse:
 					if (this.inputManager.Mouse.KeyReleased(stkeyassignArray[i].Code))
 						return true;
 					break;

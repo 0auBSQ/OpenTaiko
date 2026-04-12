@@ -1491,18 +1491,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.actRunner.Start(nPlayer, true, pChip);
 			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 				this.bIsAlreadyMaxed[nPlayer] = false;
-				if (OpenTaiko.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.SoulOut, true);
-				}
+				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
 			} else if (!bIsGOGOTIME[nPlayer]) {
 				if (Chara_MissCount[nPlayer] == 1 - 1) {
-					if (OpenTaiko.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-						this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissIn, true);
-					}
+					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
 				} else if (Chara_MissCount[nPlayer] == 6 - 1) {
-					if (OpenTaiko.Skin.Characters_MissDownIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
-						this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.MissDownIn, true);
-					}
+					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
 				}
 			}
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
