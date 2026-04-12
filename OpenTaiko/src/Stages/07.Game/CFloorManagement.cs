@@ -9,6 +9,11 @@ static internal class CFloorManagement {
 		CFloorManagement.MaxNumberOfLives = life;
 		CFloorManagement.CurrentNumberOfLives = life;
 		CFloorManagement.InvincibilityFrames = null;
+
+		if (CFloorManagement.MaxNumberOfLives <= 0) {
+			CFloorManagement.MaxNumberOfLives = 5;
+			CFloorManagement.CurrentNumberOfLives = 5;
+		}
 	}
 
 	public static void reload() {

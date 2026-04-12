@@ -86,9 +86,9 @@ internal class CActImplChipEffects : CActivity {
 
 				if (OpenTaiko.Tx.ChipEffect != null) {
 					// TODO: Generate chip effect from note image?
-					int laneXOffset = NotesManager.IsPurpleNoteTaiko(st[i].Lane, st[i].GameType) ? (int)NotesManager.ENoteType.DonBig
-						: (st[i].GameType is EGameType.Konga || st[i].Lane > NotesManager.ENoteType.KaBig) ? (int)NotesManager.ENoteType.Don
-						: (int)st[i].Lane;
+					int laneXOffset = NotesManager.IsPurpleNoteTaiko(st[i].Lane, st[i].GameType) ? NotesManager.NoteTextureColumnFast(NotesManager.ENoteType.DonBig)
+						: (st[i].GameType is EGameType.Konga || st[i].Lane > NotesManager.ENoteType.KaBig) ? NotesManager.NoteTextureColumnFast(NotesManager.ENoteType.Don)
+						: NotesManager.NoteTextureColumnFast(st[i].Lane);
 
 					if (this.st[i].ctChipEffect.CurrentValue < 12) {
 						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);

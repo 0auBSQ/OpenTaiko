@@ -5,16 +5,10 @@ namespace OpenTaiko;
 class CSongObject {
 	public CSongObject(string name, float x, float y, string path) {
 		this.name = path;
-		this.isVisible = false;
 
 		this.x = x;
 		this.y = y;
-		this.rotation = 0f;
-		this.opacity = 255;
-		this.xScale = 1.0f;
-		this.yScale = 1.0f;
-		this.color = new Color4(1f, 1f, 1f, 1f);
-		this.frame = 0;
+		this.ResetStates();
 
 		FileAttributes attr = File.GetAttributes(path);
 
@@ -24,6 +18,17 @@ class CSongObject {
 			textures = new CTexture[1];
 			textures[0] = OpenTaiko.Tx.TxCSong(path);
 		}
+	}
+
+	public void ResetStates() {
+		this.isVisible = false;
+		this.rotation = 0f;
+		this.opacity = 255;
+		this.xScale = 1.0f;
+		this.yScale = 1.0f;
+		this.color = new Color4(1f, 1f, 1f, 1f);
+		this.frame = 0;
+		this.tStopAnimation();
 	}
 
 	public void tStartAnimation(double animInterval, bool loop) {

@@ -308,8 +308,7 @@ class CSongReplay {
 		 * - 1 : Hard
 		 * - 2 : Extreme
 		 */
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[actualPlayer].data.Character];
-		GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
+		GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(storedPlayer);
 		// Gauge fill value
 		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[storedPlayer];
 		// Generation timestamp (in ticks)

@@ -242,6 +242,7 @@ public enum EInstrumentPad      // ここを修正するときは、セットで
 	Guitar = 1,
 	Bass = 2,
 	Taiko = 3,
+	Total,
 	Unknown = 99
 }
 public enum EKeyConfigPart  // : E楽器パート
@@ -251,27 +252,20 @@ public enum EKeyConfigPart  // : E楽器パート
 	Bass = EInstrumentPad.Bass,
 	Taiko = EInstrumentPad.Taiko,
 	System,
+	Total,
 	Unknown = EInstrumentPad.Unknown
 }
 
-internal enum EInputDevice {
-	Keyboard = 0,
-	MIDIInput = 1,
-	Joypad = 2,
-	Mouse = 3,
-	Gamepad = 4,
-	Unknown = -1
-}
 public enum ENoteJudge {
 	Perfect = 0,
 	Great = 1,
 	Good = 2,
 	Poor = 3,
 	Miss = 4,
-	Bad = 5,
+	Bad = 5, // only used for bomb hit
 	Auto = 6,
 	ADLIB = 7,
-	Mine = 8,
+	Mine = 8, // only for judgement text
 }
 internal enum EJudgeTextDisplayPosition {
 	OFF,

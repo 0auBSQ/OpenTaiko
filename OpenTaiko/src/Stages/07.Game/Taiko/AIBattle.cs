@@ -54,7 +54,7 @@ class AIBattle : CStage {
 		var nowSection = OpenTaiko.stageGameScreen.NowAIBattleSection;
 
 		float nowLength = OpenTaiko.stageGameScreen.NowAIBattleSectionTime / (float)nowSection.Length;
-		nowLength = Math.Min(nowLength, 1.0f);
+		nowLength = Math.Clamp(nowLength, 0, 1.0f);
 
 		if (nowLength < 0.75) {
 			drawBar(OpenTaiko.Tx.AIBattle_SectionTime_Bar_Normal, nowLength);

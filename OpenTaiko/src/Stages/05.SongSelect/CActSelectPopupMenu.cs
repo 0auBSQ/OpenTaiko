@@ -136,6 +136,8 @@ internal class CActSelectPopupMenu : CActivity {
 	/// </summary>
 	public virtual void tCancel() {
 	}
+	public virtual void UpdateSub() {
+	}
 	/// <summary>
 	/// 追加の描画処理。必要に応じて、継承先で記述する。
 	/// </summary>
@@ -212,7 +214,7 @@ internal class CActSelectPopupMenu : CActivity {
 		base.ReleaseManagedResource();
 	}
 
-	public override int Draw() {
+	public int Update() {
 		if (!base.IsDeActivated && this.bIsActivePopupMenu) {
 			if (this.bキー入力待ち) {
 				#region [ Shift-F1: CONFIG画面 ]
@@ -268,6 +270,13 @@ internal class CActSelectPopupMenu : CActivity {
 					#endregion
 				}
 			}
+			UpdateSub();
+		}
+		return 0;
+	}
+
+	public override int Draw() {
+		if (!base.IsDeActivated && this.bIsActivePopupMenu) {
 			#region [ ポップアップメニュー 背景描画 ]
 			if (OpenTaiko.Tx.Menu_Title != null) {
 				OpenTaiko.Tx.Menu_Title.t2D描画(OpenTaiko.Skin.PopupMenu_Menu_Title[0], OpenTaiko.Skin.PopupMenu_Menu_Title[1]);

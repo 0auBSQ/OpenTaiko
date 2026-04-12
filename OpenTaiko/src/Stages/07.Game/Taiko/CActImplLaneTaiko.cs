@@ -128,7 +128,7 @@ internal class CActImplLaneTaiko : CActivity {
 			var ctFadeIn = this.stBranch[i].ctFadeIn;
 			if (ctFadeIn?.IsUnEnded ?? false) {
 				ctFadeIn.Tick();
-				this.stBranch[i].dxFadeIn = Easing.EaseOut(ctFadeIn, (float)(OpenTaiko.Skin.ScaleY * 100), 0, Easing.CalcType.Back);
+				this.stBranch[i].dxFadeIn = (int)Easing.EaseOut(ctFadeIn, (float)(OpenTaiko.Skin.ScaleY * 100), 0, Easing.CalcType.Back);
 				if (ctFadeIn.IsEnded) {
 					this.stBranch[i].dxFadeIn = 0;
 				}

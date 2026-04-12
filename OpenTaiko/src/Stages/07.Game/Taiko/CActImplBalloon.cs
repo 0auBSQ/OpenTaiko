@@ -62,24 +62,18 @@ internal class CActImplBalloon : CActivity {
 		KusudamaIsActive = false;
 	}
 
-	public enum EBalloonType {
-		BALLOON,
-		KUSUDAMA,
-		FUSEROLL
-	}
-
 	public bool KusudamaIsActive { get; private set; } = false;
 
-	public void tDrawKusudama() {
+	public void tDrawKusudama(bool isTrainingPaused) {
 		if (!OpenTaiko.stageGameScreen.bPAUSE) {
 			KusudamaScript.Update();
 		}
-		if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode)) {
+		if (!(OpenTaiko.ConfigIni.bTokkunMode && isTrainingPaused)) {
 			KusudamaScript.Draw();
 		}
 	}
 
-	public int On進行描画(int n連打ノルマ, int n連打数, int player, EBalloonType btype) {
+	public int On進行描画(int n連打ノルマ, int n連打数, int player, CChip chip, bool isTrainingPaused) {
 		this.ct風船ふきだしアニメ.TickLoop();
 		this.ct風船アニメ[player].Tick();
 
@@ -137,7 +131,7 @@ internal class CActImplBalloon : CActivity {
 
 			for (int j = 0; j < 5; j++) {
 
-				if (n残り打数[j] < n連打数 && btype == EBalloonType.BALLOON) {
+				if (n残り打数[j] < n連打数 && NotesManager.GetNoteType(chip) is NotesManager.ENoteType.Balloon or NotesManager.ENoteType.BalloonFuze) {
 					if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
 						OpenTaiko.Tx.Balloon_Breaking[j].t2D描画(x + (this.ct風船ふきだしアニメ.CurrentValue == 1 ? 3 : 0), y);
 					break;
@@ -145,22 +139,22 @@ internal class CActImplBalloon : CActivity {
 			}
 			//1P:31 2P:329
 
-			if (btype == EBalloonType.BALLOON) {
+			if (NotesManager.GetNoteType(chip) is NotesManager.ENoteType.Balloon) {
 				if (OpenTaiko.Tx.Balloon_Balloon != null)
 					OpenTaiko.Tx.Balloon_Balloon.t2D描画(frame_x, frame_y);
 				this.t文字表示(num_x, num_y, n連打数, player);
-			} else if (btype == EBalloonType.FUSEROLL) {
+			} else if (NotesManager.GetNoteType(chip) is NotesManager.ENoteType.BalloonFuze) {
 				if (OpenTaiko.Tx.Fuse_Balloon != null)
 					OpenTaiko.Tx.Fuse_Balloon.t2D描画(frame_x, frame_y);
 				this.tFuseNumber(num_x, num_y, n連打数, player);
-			} else if (btype == EBalloonType.KUSUDAMA && player == 0) {
+			} else if (NotesManager.GetNoteType(chip) is NotesManager.ENoteType.BalloonEx && player == 0) {
 				/*
                 if (TJAPlayer3.Tx.Kusudama_Back != null)
                     TJAPlayer3.Tx.Kusudama_Back.t2D描画(0, 0);
                 if (TJAPlayer3.Tx.Kusudama != null)
                     TJAPlayer3.Tx.Kusudama.t2D描画(0, 0);
                     */
-				if (!(OpenTaiko.stageGameScreen.bPAUSE && OpenTaiko.ConfigIni.bTokkunMode))
+				if (!(OpenTaiko.ConfigIni.bTokkunMode && isTrainingPaused))
 					this.tKusudamaNumber(n連打数);
 			}
 

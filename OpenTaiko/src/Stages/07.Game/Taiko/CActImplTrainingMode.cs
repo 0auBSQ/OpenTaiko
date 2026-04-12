@@ -93,7 +93,7 @@ class CActImplTrainingMode : CActivity {
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0)) {
 				if (this.bTrainingPAUSE) {
 					OpenTaiko.Skin.sound特訓再生音.tPlay();
 					this.tResumePlay();
@@ -102,7 +102,7 @@ class CActImplTrainingMode : CActivity {
 					this.tPausePlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure += OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure > this.nMeasureCount)
@@ -112,7 +112,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure -= OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure <= 0)
@@ -122,7 +122,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure++;
@@ -143,7 +143,7 @@ class CActImplTrainingMode : CActivity {
 
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure--;
@@ -164,7 +164,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (OpenTaiko.ConfigIni.nSongSpeed > CConfigIni.MinimumSongSpeed + 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed - 2;
@@ -172,7 +172,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (OpenTaiko.ConfigIni.nSongSpeed < CConfigIni.MaximumSongSpeed - 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed + 2;
@@ -180,7 +180,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure = 1;
@@ -190,7 +190,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure = this.nMeasureCount;
@@ -200,11 +200,11 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark))
+			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0))
 				this.tToggleBookmarkAtTheCurrentPosition();
 
 			if (this.bCurrentlyScrolling) {
-				int msTargetTime = Easing.EaseOut(this.ctScrollCounter, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
+				int msTargetTime = (int)Easing.EaseOut(this.ctScrollCounter, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
 
 				this.ctScrollCounter.Tick();
 
@@ -227,14 +227,6 @@ class CActImplTrainingMode : CActivity {
 
 		}
 
-		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-		var percentage = double.Clamp(current / length, 0, 1);
-
-		var currentWhite = (double)(this.n最終演奏位置ms);
-		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
-
-		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
-		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
 		if (OpenTaiko.Tx.Tokkun_GoGoPoint != null) {
 			foreach (int xpos in gogoXList) {
 				OpenTaiko.Tx.Tokkun_GoGoPoint.t2D描画(xpos + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_GoGoPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_GoGoPoint_Y);
@@ -255,6 +247,8 @@ class CActImplTrainingMode : CActivity {
 	}
 
 	public int On進行描画_背景() {
+		CTja tja = OpenTaiko.TJA!;
+
 		if (this.ctBackgroundScrollTimer != null) {
 			this.ctBackgroundScrollTimer.TickLoop();
 
@@ -269,6 +263,16 @@ class CActImplTrainingMode : CActivity {
 
 		if (OpenTaiko.Tx.Tokkun_DownBG != null) OpenTaiko.Tx.Tokkun_DownBG.t2D描画(OpenTaiko.Skin.Game_Training_DownBG[0], OpenTaiko.Skin.Game_Training_DownBG[1]);
 		if (OpenTaiko.Tx.Tokkun_BigTaiko != null) OpenTaiko.Tx.Tokkun_BigTaiko.t2D描画(OpenTaiko.Skin.Game_Training_BigTaiko[0], OpenTaiko.Skin.Game_Training_BigTaiko[1]);
+
+		// make the progress bar part of background to reduce obscuring vertical scrolling notes
+		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+		var percentage = double.Clamp(current / length, 0, 1);
+
+		var currentWhite = (double)(this.n最終演奏位置ms);
+		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
+
+		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
+		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
 
 		return base.Draw();
 	}
@@ -325,7 +329,8 @@ class CActImplTrainingMode : CActivity {
 		this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
 
 		OpenTaiko.stageGameScreen.Activate();
-		SoundManager.PlayTimer.Pause();
+		OpenTaiko.stageGameScreen.Pause();
+		OpenTaiko.Timer.Resume(); // to continue animation 
 
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			CChip pChip = dTX.listChip[i];
@@ -337,8 +342,6 @@ class CActImplTrainingMode : CActivity {
 			}
 		}
 
-		OpenTaiko.TJA.t全チップの再生一時停止();
-		OpenTaiko.stageGameScreen.bPAUSE = true;
 		OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] = this.nCurrentMeasure;
 		this.bTrainingPAUSE = true;
 
@@ -356,7 +359,7 @@ class CActImplTrainingMode : CActivity {
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		int n演奏開始Chip = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
+		var (n演奏開始Chip, msStartGameTime) = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
 
 		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
 
@@ -377,6 +380,7 @@ class CActImplTrainingMode : CActivity {
 			chip.bShow = false;
 		}
 
+		OpenTaiko.stageGameScreen.Resume(msStartGameTime);
 		this.bTrainingPAUSE = false;
 	}
 

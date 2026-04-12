@@ -88,6 +88,9 @@ internal class CActImplRoll : CActivity {
 
 				OpenTaiko.Tx.Balloon_Roll?.t2D描画(OpenTaiko.Skin.Game_Balloon_Roll_Frame_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Frame_Y[player], new RectangleF(0 + bNowRollAnime * width, 0, width, height));
 				this.t文字表示(OpenTaiko.Skin.Game_Balloon_Roll_Number_X[player], OpenTaiko.Skin.Game_Balloon_Roll_Number_Y[player], n連打数, player);
+
+				// reset opacity for balloon's and fuze roll's pop count
+				OpenTaiko.Tx.Balloon_Number_Roll.Opacity = 255;
 			}
 		}
 

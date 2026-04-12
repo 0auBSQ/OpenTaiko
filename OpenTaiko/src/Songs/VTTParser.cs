@@ -46,14 +46,14 @@ public class VTTParser {
 
 	public VTTParser() { }
 
-	internal List<STLYRIC> ParseVTTFile(string filepath, int order, long offset) {
-		List<STLYRIC> lrclist = new List<STLYRIC>();
+	// note: List<STLYRIC> is List of actual value, appending it to another list will copy alot
+	internal void ParseVTTFile(List<STLYRIC> lrclist, string filepath, long offset) {
 		List<string> lines = File.ReadAllLines(filepath).ToList();
 
 		#region Header data
 		if (!lines[0].StartsWith("WEBVTT")) {
 			Trace.TraceWarning("Aborting VTT parse at {0}. WebVTT header does not start with \"WEBVTT\".", filepath);
-			return lrclist;
+			return;
 		}
 		#endregion
 
@@ -80,7 +80,7 @@ public class VTTParser {
 				if (languageMatch.Success) {
 					if (!(languageMatch.Groups[1].Value.ToLower() == CLangManager.fetchLang())) {
 						Trace.TraceWarning("Aborting VTT parse at {0}. WebVTT header language does not match user's selected language.", filepath);
-						return lrclist;
+						return;
 					}
 				}
 				Match offsetMatch = regexOffset.Match(lines[i]);
@@ -97,7 +97,7 @@ public class VTTParser {
 				if (String.IsNullOrEmpty(lines[i])) {
 					if (!ignoreLyrics && lyricData.Count != 0) {
 						lyricData.RemoveAll(empty => String.IsNullOrEmpty(empty.Text));
-						lrclist.Add(CreateLyric(lyricData, order));
+						lrclist.Add(CreateLyric(lyricData, lrclist.Count));
 					}
 
 					lyricData = new List<LyricData>();
@@ -117,7 +117,7 @@ public class VTTParser {
 					lyricData = new List<LyricData>(); // Prevents chapters from being included by mistake
 
 					if (start > endTime && endTime != -1) {
-						lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
+						lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, lrclist.Count));
 						// If new start timestamp is greater than old end timestamp,
 						// it is assumed there is a gap in-between displaying lyrics.
 					}
@@ -317,10 +317,10 @@ public class VTTParser {
 		// Add last lyric to list
 		if (lyricData.Count > 0) {
 			lyricData.RemoveAll(empty => String.IsNullOrEmpty(empty.Text));
-			lrclist.Add(CreateLyric(lyricData, order));
+			lrclist.Add(CreateLyric(lyricData, lrclist.Count));
 		}
-		lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, order));
-		return lrclist;
+		lrclist.Add(CreateLyric(new List<LyricData>() { new LyricData() { timestamp = endTime + offset } }, lrclist.Count));
+		return;
 
 	}
 	internal bool TryParseTimestamp(string input, out long startTime, out long endTime) {

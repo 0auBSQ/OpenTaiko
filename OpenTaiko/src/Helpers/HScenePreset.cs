@@ -1,7 +1,7 @@
 namespace OpenTaiko;
 
 class HScenePreset {
-	public static DBSkinPreset.SkinScene GetBGPreset() {
+	public static DBSkinPreset.SkinScene? GetBGPreset() {
 		string presetSection = "";
 		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			presetSection = "Tower";
@@ -36,20 +36,26 @@ class HScenePreset {
 		if (!string.IsNullOrWhiteSpace(ImGuiDebugWindow.OverrideBGPreset))
 			return _ps.TryGetValue(ImGuiDebugWindow.OverrideBGPreset, out var value) ? value : null;
 #endif
-		if (sectionIsValid && _ps.TryGetValue(OpenTaiko.TJA?.scenePreset ?? OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset ?? "", out var result_song)) {
-			return result_song;
-		}
-		else if (sectionIsValid && _ps.TryGetValue(OpenTaiko.stageSongSelect.rChoosenSong.strScenePreset ?? "", out var result_box)) {
-			return result_box;
-		}
-		else if (sectionIsValid && _ps.TryGetValue("", out var result_fallback)) {
-			return result_fallback;
-		}
-		else if (sectionIsValid) {
-			Random rand = new Random();
-			return _ps.ElementAt(rand.Next(0, _ps.Count)).Value;
+		if (!sectionIsValid)
+			return null;
+
+		Random? rand = null;
+		foreach (var list in new string[][]{
+			OpenTaiko.TJA?.scenePresets ?? [], // song tja
+			CTja.SplitComma(OpenTaiko.stageSongSelect.rChoosenSong.strScenePresets ?? ""), // box.def
+			[""], // fallback
+			}) {
+			var options = list.Select(k => _ps.GetValueOrDefault(k)).Where(k => k != null).ToArray();
+			if (options.Length <= 0)
+				continue;
+
+			// random among specified scenes
+			rand = new Random();
+			return options.ElementAt(rand.Next(0, options.Length));
 		}
 
-		return null;
+		// random among all scenes
+		rand ??= new Random();
+		return _ps.ElementAt(rand.Next(0, _ps.Count)).Value;
 	}
 }

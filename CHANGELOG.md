@@ -1,5 +1,130 @@
 # Changelog
 
+## [0.6.0.105] - 2026-04-04 (Beta)
+
+- [Enhancement] Increase the amount of coins obtained in Easy, Normal, Hard difficulties
+- [Enhancement] Cap the level to 13 and the song speed to x2 in the coins calculation formula
+- [Enhancement] Add the possibility to unlock Stormrider's Bolt and linebreak via coins to prevent a too long grind for the events
+- [Enhancement] Make one of the unlock condition texts for the April Fools 2026 event clearer
+- [Chore] Change the unlock condition for Another Reality from Full Combo Neptune's Lullaby to 200 Coins
+
+## [0.6.0.104] - 2026-03-29 (Beta)
+
+- [Feat] Getting a cutscene now sets a global trigger on results screen activation to be usable in unlockables (retroactive for cutscenes that play only once)
+- [Chore] Keep a dictionary of all custom metadata (starting by .) in a chart for future usage in 0.6.1
+- [Chore] Unlock conditions for and soar through the universe (ch6) and cocoa break (Dashy's Depictions)
+
+## [0.6.0.103] - 2026-03-28 (Beta)
+
+- [Feat] New TJA header `.FORCEGAUGE:`, which forces the gauge type for the player-side
+- [Feat] New TJA header `.BOOMRULE:`, which specifies the gauge penalty of the BOOM judgement for the player-side
+- [Feat] Multi-value `SCENEPRESET:` (separated by comma (`,`)) for TJA and box.def to randomly use one of specified scenes
+- [Feat] Add new branch condition rules and ranges (based on (0auBSQ/OpenTaiko#807))
+- [Feat] Rotate barlines according to scroll direction like in TaikoJiro2
+- [Feat] Support reading `inf` and `infinity` (case-insensitive) in TJA as `Infinity`
+- [Enhance] TJA `#BRANCHSTART:` Allow omitting comma (,) between multi-letter condition type and value, and reject unknown type or range
+- [Enhance] Make the following header per-player-side: `GAME:`, `HIDDENBRANCH:`, `SIDE:`, `LIFE:`, `TOWERTYPE:`, `DANTICK:`, `DANTICKCOLOR:` (specifying them before the first `COURSE:` sets the default value of all difficulties)
+- [Enhance] Make TJA NOTESDESIGNER headers per-player-side and respect difficulty number if defined before the first `COURSE:` in TJA
+- [Enhance] Adjust gameplay stack order to be debug texts > fading-in/out > lyrics > training UI > OBJ > notes > background and training bar (from top layer to bottom layer)
+- [Enhance] Make log more complete (Allow logging to file before reading Config.ini, log exception in some empty catches, set up inner exceptions in nested throws)
+- [Fix] Big note branch score was not tracked
+- [Fix] Game crashed when the played OBJ command contains non-registered obj name
+- [Fix] Eased value for OBJ command was truncated to int
+- [Fix] Not all OBJ/CAM command states were reset properly on retry
+- [Fix] CAM commands failed to apply to the main screen
+- [Fix] `#BORDERCOLOR` command had no effects
+- [Fix] Lyrics and OBJs could not hide when retry or rewind
+- [Fix] OBJ & CAM commands did not respect play speed
+- [Fix] `#SUDDEN` move offset had no effects
+- [Fix] `#ENABLEDORON` & `#DISABLEDORON` were not per-player and did not reset after retrying gameplay
+- [Fix] `#SUDDEN` could not hide SENote and `#ENABLE`/`DISABLEDORON`, `#SUDDEN`, note hidden upon hit, & balloon appear during popping interfered with each other
+- [Fix] TJA `#SCROLL` could not parse number containing Infinity successfully
+- [Fix] TJA `#SUDDEN` could not handle Infinity values
+- [Fix] `#DELAY Infinity` crashed the game
+- [Fix] Could not select difficulties with `LEVEL:Infinity` or negative value (needs hard reloading song list)
+- [Fix] `LEVEL:10.45` displayed as 10+, `LEVEL:12.95` as 12(-) (for examples) due to unintended rounding
+- [Fix] COURSE-scope headers ignored the default scope before the first `COURSE:`, broken some charts made for TaikoJiro
+- [Fix] Invalid commands starting with `#BRANCHSTART` made the difficulty treated as branched chart
+- [Fix] Pre-COURSE LEVEL: broke difficulty available test (0auBSQ/OpenTaiko#625) (needs hard reloading)
+- [Fix] Per-player-side headers beyond selected player-side chart not ignored, broke per-player-side BALLOON and other headers
+- [Fix] Displayed puchi/character coin multiplier did not include rarity multiplier in Heya
+- [Optimize] Stop processing finished or truncated OBJ/CAM commands
+- [Chore] Decompose `EBranchConditionType` into `Exam.Type`, `EBranchCondBig`, & `Exam.Range`
+- [Chore] Simplify CAM command handling during gameplay
+- [Chore] Fix `CLang.GetExamName()` matched exam type by raw int and would break if Exam.Type changes
+
+## [0.6.0.102] - 2026-03-24 (Beta)
+
+- [Fix] 0.6.0.101 made Pause -> Resume made chart jumped to song start due to the main timer was not reset correctly
+
+## [0.6.0.101] - 2026-03-24 (Beta)
+
+- [Optimize] Skip texture loading when calling AddGraph() in BG Lua Script multiple times with same filepath
+- [Chore] Allow tDisposeSafely() to handle CSound and (was handled by t安全にDisposeする() (lit. tDisposeSafely)) Array
+- [Optimize] Only unload song-end/fail animations for non-in-use game modes after exiting gameplay screen
+- [Fix] Prevent gameplay from starting/resuming when status reset is not complete
+- [Fix] "Character doesn't miss" when missed in gameplay
+- [Fix] Allow gameplay to continue when hard/Kanpeki failed in AI battle mode
+
+## [0.6.0.100] - 2026-03-22 (Beta)
+
+- [Fix] Refine gameplay time point and fix related issues (after climbed to tower top in tower mode, 2 seconds after last note, 1 second after `#END`, 0 seconds after music ends)
+- [Fix] Stop aligning branch end (except at end of song) in TJAP3 or OOS compatibility mode
+- [Fix] Prevent branch judge point before last measure (or `#NEXTSONG`, or 4 beats before chart start)
+- [Fix] Every player now has individual lives in Kanpeki mode
+- [Enhancement] Make mid-song fail animation play per player, and stop chart right when all players have failed [WARNING: skinners might need to update `<skin>/Graphics/5_Game/9_End/ClearFailed/Script.lua`]
+- [Enhancement] Missing end-of-play animation/sounds now fallbacks to red-pass (for Dan-i mode) or regular chart's animation/sounds
+- [Fix] Non-keyboard devices could not use some menus due to `CKeyAssign.KeyIsPressed()` could only detect keyboard inputs (0auBSQ/OpenTaiko#908)
+- [Feat] Reimplement MIDI input using managed-midi, using TJAPlayer3-f's implementation as reference (0auBSQ/OpenTaiko#612)
+- [Enhancement] Remember up to 36 (from 10) input devices per device type (Keyboard and Mouse remain not remembered)
+- [Fix] Ensure gameplay inputs are processed in event timestamp order
+- [Fix] In training mode, prevent pausing or (un)set bookmark during playing when the keybind is also player's game input (0auBSQ/OpenTaiko#903)
+- [Fix] Prevent wrong judgement window due to wrongly using "actual player index"
+- [Fix] Autoplay could only properly hit 1 note per frame, could miss when game lags, and could not handle multi-hit note misses properly
+- [Fix] Displayed score became less than real score when exceeding 256 score increases in a frame
+- [Fix] Played song speed was old one when first playing after adjusting song speed in training mode
+- [Fix] Crashes on selecting undefined difficulties (`LEVEL` before `COURSE`), again
+- [Fix] Towers with missing or negative `LIFE:` immediately failed player while having 5 lives (unless using Pause -> Retry)
+- [Fix] Kanpeki fail in tower chart at top floor could be judged as pass
+- [Fix] Disable Kanpeki mode in training mode
+- [Fix] Adlib and bomb were neither hit by autoplay nor missed and broke Dan-i condition monitoring
+- [Fix] Bomb and fuze roll did not trigger hard gauges and Kanpeki mode failure
+- [Fix] Tight (notelock) mode did not give BAD for empty hits since 0.6.0.93
+- [Fix] Lyrics from `#LYRICS` appeared at wrong time in Dan-i mode
+- [Fix] Make TJA `LYRICFILE:` alias of `LYRICS:`
+- [Fix] Warn and ignore bad characters from TJA note data, for handling ill-formed comment (ignore if not digit nor letter)
+- [Fix] `box.def` parsing trimmed too many characters for values and allow omitting of colon (`:`)
+- [Fix] Calling `AddGraph()` in BG Lua Script twice with same filepath caused exception
+- [Fix] All BG Lua script errors are now logged and shown on screen
+- [Fix] Force big note firework for balloon's flying note
+- [Fix] AI battle section progression bar was negative before chart start
+- [Fix] Bad note position precision for extremely big/small SCROLL combined with small/big BPM values
+- [Fix] Clearing fuzeroll lacked character animation
+- [Fix] Roll redness fading out speed depended on framerate
+- [Fix] Notes and bar lines now continue at end of song and stop when failed in tower/Dan-i/Kanpeki failure, instead of simply disappearing
+- [Fix] Balloon's and fuze's remaining pop count was semi-transparent after non-balloon roll count fading out
+- [Fix] Revert `#DIRECTION` behavior to TJAP3 (keep vertical scrolling of non-real `#SCROLL`), accidentally changed in v0.6.0.56
+- [Fix] Characters now play clear-out + miss-down animation when failed mid-song
+- [Fix] Bugs related to song end or mid-song failure animation
+- [Fix] Wrong character animation played when finishing tower
+- [Fix] Draw pop select menu on top, above fading in/out
+- [Fix] Opened Kusudama is now shown when pause menu is open
+- [Optimize] Minor optimizing for note-count-heavy charts:
+- [Optimize] Pre-build name-to-index lookup dictionary for puchi charas
+- [Optimize] Cache double-to-integer converted chip time
+- [Optimize] Only update `chip.nLag` when the note is actually judged
+- [Optimize] Make `enum NoteType` values same as channelNo to reduce conversions
+- [Optimize] Skip chip post processing of TJA parsing if is for song enumeration
+- [Optimize] Make `listBPM` an actual List instead of a Dictionary (due to legacy DTX parsing)
+- [Optimize] Only query all input devices for gameplay once instead of `EPad.Max` (38) times
+- [Optimize] Replace `OrderBy()` with in-place sort stabilized by index to eliminate temporary list
+- [Optimize] song-end animation could load twice or unused sound resources by only (un)loading at (De)`Activate()`
+- [Chore] Extract and use `NotesManager.GetChipGameType()`
+- [Chore] Remove unused fields in `CChip`
+- [Chore] Simplify input device querying
+- [Chore] Merge `enum EInputDevice` into FDK's `enum InputDeviceType`
+- [Chore] Simplify key assignment defining and accessing
+
 ## [0.6.0.99] - 2026-02-13 (Beta)
 
 - [Chore] Change the unlock conditions for Assimilation

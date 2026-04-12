@@ -22,6 +22,8 @@ class ScriptBGFunc {
 	public void AddGraph(string fileName) {
 		string trueFileName = fileName.Replace('/', Path.DirectorySeparatorChar);
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
+		if (this.Textures.ContainsKey(fileName)) // already loaded
+			return;
 		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
 		Textures[fileName]?.SetTextureWrapMode(Silk.NET.OpenGLES.TextureWrapMode.Repeat);
 	}
@@ -126,6 +128,22 @@ class ScriptBG : IDisposable {
 	protected LuaFunction? LuaDraw;
 
 	public ScriptBG(string filePath) {
+		this.Init(filePath);
+	}
+
+	// script fallback list
+	public ScriptBG(params string[] filePaths) {
+		foreach (var filePath in filePaths) {
+			this.Init(filePath);
+			if (this.Exists())
+				return;
+		}
+	}
+
+	private void Init(string filePath) {
+		Textures = new Dictionary<string, CTexture>();
+
+
 		if (!File.Exists(filePath)) return;
 
 		LuaScript = new Lua();
@@ -166,7 +184,7 @@ class ScriptBG : IDisposable {
 	public bool Exists() {
 		return LuaScript != null;
 	}
-	private void Crash(Exception exception) {
+	protected void Crash(Exception exception) {
 		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
 		LuaScript?.Dispose();
 		LuaScript = null;

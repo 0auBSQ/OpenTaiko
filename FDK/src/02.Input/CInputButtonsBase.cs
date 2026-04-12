@@ -14,14 +14,15 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 
 	// メソッド
 
-	public void SetID(int nID) => this.ID = nID;
+	public virtual int GetVelocity(int index) => 0;
+	protected virtual void SetVelocity(int index, int velocity) { }
 
 	#region [ IInputDevice 実装 ]
 	//-----------------
-	public Silk.NET.Input.IInputDevice Device { get; protected set; }
+	public Silk.NET.Input.IInputDevice? Device { get; protected set; }
 	public InputDeviceType CurrentType { get; protected set; }
 	public string GUID { get; protected set; }
-	public int ID { get; protected set; }
+	public int ID { get; set; }
 	public string Name { get; protected set; }
 	public List<STInputEvent> InputEvents { get; protected set; }
 	public string strDeviceName { get; set; }
@@ -34,20 +35,20 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		// for buffered input, the input buffer has already been filled.
 		for (int i = 0; i < ButtonStates.Length; i++) {
 			// Use the same timer used in gameplay to prevent desyncs between BGM/chart and input.
-			this.ProcessButtonState(i, SoundManager.PlayTimer.SystemTimeMs);
+			this.ProcessButtonState(i, SoundManager.PlayTimer.SystemTimeMs, this.GetVelocity(i));
 		}
 		// swap input buffer
 		(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
 	}
 
-	protected void ProcessButtonState(int idxBtn, long msTimestamp) {
+	protected void ProcessButtonState(int idxBtn, long msTimestamp, int velocity = 0) {
 		if (ButtonStates[idxBtn].isPressed) {
 			if (ButtonStates[idxBtn].state >= 1) {
 				ButtonStates[idxBtn].state = 2;
 			} else {
 				ButtonStates[idxBtn].state = 1;
 				if (!this.useBufferInput) {
-					this.AddPressedEvent(idxBtn, msTimestamp);
+					this.AddPressedEvent(idxBtn, msTimestamp, velocity);
 				}
 			}
 		} else {
@@ -71,20 +72,21 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 			nVelocity = 0,
 		});
 
-	protected void AddPressedEvent(int idxBtn, long msTimestamp)
+	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0)
 		=> this.EventBuffer.Add(new STInputEvent() {
 			nKey = idxBtn,
 			Pressed = true,
 			Released = false,
 			nTimeStamp = msTimestamp,
-			nVelocity = 0,
+			nVelocity = velocity,
 		});
 
-	protected void ButtonDown(int idxBtn) {
+	protected void ButtonDown(int idxBtn, int velocity = 0) {
 		if (this.useBufferInput && !this.ButtonStates[idxBtn].isPressed) {
-			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime());
+			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
 		}
 		this.ButtonStates[idxBtn].isPressed = true;
+		this.SetVelocity(idxBtn, velocity);
 	}
 
 	protected void ButtonUp(int idxBtn) {
@@ -111,7 +113,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 
 	#region [ IDisposable 実装 ]
 	//-----------------
-	public void Dispose() {
+	public virtual void Dispose() {
 		if (!this.IsDisposed) {
 			this.InputEvents.Clear();
 			this.EventBuffer.Clear();
@@ -128,7 +130,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	//-----------------
 	public List<STInputEvent> EventBuffer;
 	public (bool isPressed, int state)[] ButtonStates { get; protected set; }
-	private bool IsDisposed;
+	protected bool IsDisposed;
 	//-----------------
 	#endregion
 }

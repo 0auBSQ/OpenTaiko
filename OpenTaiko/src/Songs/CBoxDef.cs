@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenTaiko;
 
@@ -49,6 +50,8 @@ internal class CBoxDef {
 	}
 
 	// メソッド
+	private static readonly Regex KeyAndValueRegex =
+		new Regex(@"^[ \t]*(#[A-Z0-9]+)(?::\s?|\s)(.+?)?$", RegexOptions.Compiled);
 
 	public void t読み込み(string boxdefファイル名) {
 		StreamReader reader = new StreamReader(boxdefファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
@@ -56,64 +59,67 @@ internal class CBoxDef {
 		while ((str = reader.ReadLine()) != null) {
 			if (str.Length != 0) {
 				try {
-					char[] ignoreCharsWoColon = new char[] { ' ', '\t' };
+					var match = KeyAndValueRegex.Match(str);
 
-					str = str.TrimStart(ignoreCharsWoColon);
-					if ((str[0] == '#') && (str[0] != ';')) {
-						if (str.IndexOf(';') != -1) {
-							str = str.Substring(0, str.IndexOf(';'));
+					var key = match.Groups[1].Value;
+					var argumentMatchGroup = match.Groups[2];
+					var valueFull = argumentMatchGroup.Success ? argumentMatchGroup.Value : "";
+
+					// For handling arguments ending in a ` `-or-`,`-containing string, use argumentFull
+
+					//命令の最後に,が残ってしまっているときの対応
+					var value = valueFull.TrimStart([' ', '\t']).TrimEnd([',', ' ', '\t']);
+
+					if (match.Success) {
+						if (value.IndexOf(';') != -1) {
+							value = value.Substring(0, value.IndexOf(';'));
 						}
-
-						char[] ignoreChars = new char[] { ':', ' ', '\t' };
 
 						var split = str.Split(':');
 						if (split.Length == 2) {
-							string key = split[0];
-							string value = split[1];
-
 							if (key == "#TITLE") {
-								this.Title.SetString("default", value.Trim(ignoreChars));
+								this.Title.SetString("default", valueFull);
 							} else if (key.StartsWith("#TITLE")) {
 								string _lang = key.Substring(6).ToLowerInvariant();
-								this.Title.SetString(_lang, value.Trim(ignoreChars));
+								this.Title.SetString(_lang, valueFull);
 							} else if (key == "#GENRE") {
-								this.Genre = value.Trim(ignoreChars);
+								this.Genre = valueFull;
 							} else if (key == "#SELECTBG") {
-								this.SelectBG = value.Trim(ignoreChars);
+								this.SelectBG = value;
 							} else if (key == "#FONTCOLOR") {
-								this.Color = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								this.Color = ColorTranslator.FromHtml(value);
 							} else if (key == "#FORECOLOR") {
-								this.ForeColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								this.ForeColor = ColorTranslator.FromHtml(value);
 								IsChangedForeColor = true;
 							} else if (key == "#BACKCOLOR") {
-								this.BackColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								this.BackColor = ColorTranslator.FromHtml(value);
 								IsChangedBackColor = true;
 							} else if (key == "#BOXCOLOR") {
-								this.BoxColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								this.BoxColor = ColorTranslator.FromHtml(value);
 								IsChangedBoxColor = true;
 							} else if (key == "#BGCOLOR") {
-								this.BgColor = ColorTranslator.FromHtml(value.Trim(ignoreChars));
+								this.BgColor = ColorTranslator.FromHtml(value);
 								IsChangedBgColor = true;
 							} else if (key == "#BGTYPE") {
-								this.BgType = value.Trim(ignoreChars);
+								this.BgType = value;
 								IsChangedBgType = true;
 							} else if (key == "#BOXTYPE") {
-								this.BoxType = value.Trim(ignoreChars);
+								this.BoxType = value;
 								IsChangedBoxType = true;
 							} else if (key == "#BOXCHARA") {
-								this.BoxChara = value.Trim(ignoreChars);
+								this.BoxChara = value;
 								IsChangedBoxChara = true;
 							} else if (key == "#SCENEPRESET") {
-								this.ScenePreset = value.Trim(ignoreChars);
+								this.ScenePreset = value;
 							} else if (key == "#DEFAULTPREIMAGE") {
-								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, value.Trim(ignoreChars));
+								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, value);
 							} else {
 								for (int i = 0; i < 3; i++) {
 									if (key == "#BOXEXPLANATION" + (i + 1).ToString()) {
-										this.strBoxText[i].SetString("default", value.Trim(ignoreChars));
+										this.strBoxText[i].SetString("default", valueFull);
 									} else if (key.StartsWith("#BOXEXPLANATION") && key.EndsWith((i + 1).ToString())) {
 										string _lang = key.Substring(15)[..^1].ToLowerInvariant();
-										this.strBoxText[i].SetString(_lang, value.Trim(ignoreChars));
+										this.strBoxText[i].SetString(_lang, valueFull);
 									}
 								}
 							}

@@ -743,30 +743,29 @@ internal class CActImplCharacter : CActivity {
 			return;
 		}
 
-		if (OpenTaiko.stageGameScreen.bIsGOGOTIME[player]) {
-			if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player]) {
-				CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_GOGO_MAX;
-				CharacterControllers[player].bLooping = true;
+		bool isStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(player);
+		if (!isStageFailed && OpenTaiko.stageGameScreen.bIsGOGOTIME[player] && OpenTaiko.Skin.Characters_GoGoTime_Ptn[this.iCurrentCharacter[player]] != 0) {
+			if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_GoGoTime_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
+				ChangeAnime(player, Anime.GoGoTime_Maxed, resetCounter);
 			} else {
 				CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_GOGO;
 				CharacterControllers[player].bLooping = true;
 			}
 		} else {
-			if (OpenTaiko.stageGameScreen.bIsMiss[player]) {
-				if (OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6) {
-					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MISS_DOWN;
-					CharacterControllers[player].bLooping = true;
+			if ((isStageFailed || OpenTaiko.stageGameScreen.bIsMiss[player]) && OpenTaiko.Skin.Characters_Normal_Missed_Ptn[this.iCurrentCharacter[player]] != 0) {
+				if ((isStageFailed || OpenTaiko.stageGameScreen.Chara_MissCount[player] >= 6) && OpenTaiko.Skin.Characters_Normal_MissedDown_Ptn[this.iCurrentCharacter[player]] != 0) {
+					ChangeAnime(player, Anime.MissDown, resetCounter);
 				} else {
 					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MISS;
 					CharacterControllers[player].bLooping = true;
 				}
 			} else {
-				if (OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player]) {
-					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_MAX;
-					CharacterControllers[player].bLooping = true;
-				} else if (OpenTaiko.stageGameScreen.bIsAlreadyCleared[player]) {
-					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_CLEAR;
-					CharacterControllers[player].bLooping = true;
+				if (!isStageFailed && OpenTaiko.stageGameScreen.bIsAlreadyMaxed[player] && OpenTaiko.Skin.Characters_Normal_Maxed_Ptn[this.iCurrentCharacter[player]] != 0) {
+					ChangeAnime(player, Anime.Maxed, resetCounter);
+				} else if (!isStageFailed && OpenTaiko.stageGameScreen.bIsAlreadyCleared[player] && OpenTaiko.Skin.Characters_Normal_Cleared_Ptn[this.iCurrentCharacter[player]] != 0) {
+					ChangeAnime(player, Anime.Cleared, resetCounter);
+				} else if (OpenTaiko.Skin.Characters_Normal_Ptn[this.iCurrentCharacter[player]] != 0) {
+					ChangeAnime(player, Anime.Normal, resetCounter);
 				} else {
 					CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_NORMAL;
 					CharacterControllers[player].bLooping = true;

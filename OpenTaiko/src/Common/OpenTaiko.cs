@@ -378,14 +378,19 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public void TriggerSystemError(CSystemError.Errno errno) {
-		SystemError.LoadError(errno);
+	public void TriggerSystemError(CSystemError.Errno errno, Exception? exception = null, string? message = null) {
+		if (exception != null)
+			Trace.TraceError(exception.ToString());
+		if (message != null)
+			Trace.TraceError(message);
+		SystemError.LoadError(errno, exception, message);
 		UnmountAndChangeStage(SystemError);
 	}
 
 	public void EnterRefreshSkinStage(bool isSavedBeforeUpdate = false) {
 		stageChangeSkin.SavePreviousStage(isSavedBeforeUpdate ? rCurrentStage : rPreviousStage);
 	}
+
 
 
 	#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
@@ -487,6 +492,11 @@ internal class OpenTaiko : Game {
 		base.Configuration();
 	}
 
+	protected override void InitializeLog() {
+		base.InitializeLog();
+		tStartupLog();
+	}
+
 	protected override void Initialize() {
 		this.tStartupProcess();
 	}
@@ -527,20 +537,45 @@ internal class OpenTaiko : Game {
 			SoundManager.PlayTimer?.Update();
 			FPS?.Update();
 
-			if (BeatScaling != null) {
-				BeatScaling.Tick();
-				float value = MathF.Sin((BeatScaling.CurrentValue / 1000.0f) * MathF.PI / 2.0f);
-				float scale = 1.0f + ((1.0f - value) / 40.0f);
-				Camera *= Matrix4X4.CreateScale(scale, scale, 1.0f);
-				if (BeatScaling.CurrentValue == BeatScaling.EndValue) BeatScaling = null;
-			}
-
 			// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
 
 			if (rCurrentStage != null) {
-				if (rCurrentStage.eStageID is not CStage.EStage.ChangeSkin)
-					OpenTaiko.NamePlate?.lcNamePlate.Update();
+				// set up camera before drawing main UI
+				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
+					float screen_ratiox = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[0] / 1280.0f : 1.0f;
+					float screen_ratioy = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[1] / 720.0f : 1.0f;
+
+					Camera = Matrix4X4<float>.Identity;
+
+					Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
+
+					Camera *= Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f) *
+							  Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
+							  Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f);
+
+					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
+
+					if (BeatScaling != null) {
+						BeatScaling.Tick();
+						float value = MathF.Sin((BeatScaling.CurrentValue / 1000.0f) * MathF.PI / 2.0f);
+						float scale = 1.0f + ((1.0f - value) / 40.0f);
+						Camera *= Matrix4X4.CreateScale(scale, scale, 1.0f);
+						if (BeatScaling.CurrentValue == BeatScaling.EndValue) BeatScaling = null;
+					}
+				}
+
+				OpenTaiko.NamePlate?.lcNamePlate.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
+
+				if (OpenTaiko.TJA != null) {
+					//object rendering
+					foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
+						pair.Value.tDraw();
+					}
+				}
+
+				// draw the remaining elements normally
+				Camera = Matrix4X4<float>.Identity;
 
 				CScoreIni scoreIni = null;
 
@@ -548,8 +583,7 @@ internal class OpenTaiko : Game {
 
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
-				// Considering this is for the enum songs tab, is it really necessary to loop through stages?
-				// Moving the start of songs enumeration to the init section would be a much smarter choice imo, to refactor ASAP
+
 				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
@@ -1084,28 +1118,6 @@ internal class OpenTaiko : Game {
 
 				actScanningLoudness?.Draw();
 
-				if (!ConfigIni.bTokkunMode && rCurrentStage.eStageID != CStage.EStage.CRASH && OpenTaiko.Skin != null) {
-					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
-					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
-
-					Camera *= Matrix4X4.CreateScale(fCamXScale, fCamYScale, 1f);
-
-					Camera *= Matrix4X4.CreateScale(1.0f / ScreenAspect, 1.0f, 1.0f) *
-							  Matrix4X4.CreateRotationZ(CConversion.DegreeToRadian(fCamRotation)) *
-							  Matrix4X4.CreateScale(1.0f * ScreenAspect, 1.0f, 1.0f);
-
-					Camera *= Matrix4X4.CreateTranslation(fCamXOffset / 1280, fCamYOffset / 720, 1f);
-
-					if (OpenTaiko.TJA != null) {
-						//object rendering
-						foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
-							pair.Value.tDraw();
-						}
-					}
-
-					Camera = Matrix4X4<float>.Identity;
-				}
-
 				if (rCurrentStage != null
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
@@ -1133,7 +1145,7 @@ internal class OpenTaiko : Game {
 				}
 			}
 
-			if (OpenTaiko.ConfigIni.KeyAssign.KeyIsPressed(OpenTaiko.ConfigIni.KeyAssign.System.Capture)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.System.Capture.IsPressed()) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
 					if (rCurrentStage.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
@@ -1264,27 +1276,24 @@ internal class OpenTaiko : Game {
 	}
 
 	/// <summary>プロパティ、インデクサには ref は使用できないので注意。</summary>
-	public static void tDisposeSafely<T>(ref T obj) {
-		if (obj == null)
-			return;
+	public static void tDisposeSafely(ref CSound? obj) {
+		obj?.tDispose();
+		obj = null;
+	}
 
-		var d = obj as IDisposable;
-
-		if (d != null)
-			d.Dispose();
-
+	public static void tDisposeSafely<T>(ref T? obj) {
+		(obj as IDisposable)?.Dispose();
 		obj = default(T);
 	}
 
-	public static void t安全にDisposeする<T>(ref T[] array) where T : class, IDisposable //2020.08.01 Mr-Ojii twopointzero氏のソースコードをもとに追加
+	public static void tDisposeSafely<T>(ref T?[] array) where T : class, IDisposable //2020.08.01 Mr-Ojii twopointzero氏のソースコードをもとに追加
 	{
 		if (array == null) {
 			return;
 		}
 
 		for (var i = 0; i < array.Length; i++) {
-			array[i]?.Dispose();
-			array[i] = null;
+			tDisposeSafely(ref array[i]);
 		}
 	}
 
@@ -1367,70 +1376,81 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	private static CTraceLogListener? FileLogListener = null;
+
+	private static void tStartupLog() {
+		Trace.AutoFlush = true;
+		try {
+			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
+		} catch (System.UnauthorizedAccessException e)            // #24481 2011.2.20 yyagi
+		{
+			// still has console logging
+			Trace.TraceError(e.ToString());
+			int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
+			string[] mes_writeErr = {
+				"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
+				"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
+			};
+			Trace.WriteLine(mes_writeErr);
+		}
+	}
 
 	private void tStartupProcess() {
+		#region [ Error message interface initialisation ]
+		try {
+			// Load System error beforehand
+			this.listTopLevelActivities = new List<CActivity>();
+			SystemError = new CSystemError();
+			this.listTopLevelActivities.Add(SystemError);
 
-		// Load System error beforehand
-		this.listTopLevelActivities = new List<CActivity>();
-		SystemError = new CSystemError();
-		this.listTopLevelActivities.Add(SystemError);
+			VisualLogManager = new CVisualLogManager();
 
-		VisualLogManager = new CVisualLogManager();
+			#region [ Lua global stores initialisation ]
 
-		#region [ Unlock factory initialisation ]
+			GlobalStores = new LuaGlobalStores();
 
-		UnlockConditionFactory = new CUnlockConditionFactory();
-
-		#endregion
-
-		#region [ Lua global stores initialisation ]
-
-		GlobalStores = new LuaGlobalStores();
-
+			#endregion
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
+			Trace.TraceError("Error message interface initialization falied.");
+		}
 		#endregion
 
 		#region [ Read Config.ini and Database files ]
 		//---------------------
+		try {
+			UnlockConditionFactory = new CUnlockConditionFactory();
 
-		// Port <= 0.5.4 NamePlate.json to Pre 0.6.0 b1 Saves\
-		NamePlateConfig = new NamePlateConfig();
-		NamePlateConfig.tNamePlateConfig();
+			// Port <= 0.5.4 NamePlate.json to Pre 0.6.0 b1 Saves\
+			NamePlateConfig = new NamePlateConfig();
+			NamePlateConfig.tNamePlateConfig();
 
-		Favorites = new Favorites();
-		Favorites.tFavorites();
+			Favorites = new Favorites();
+			Favorites.tFavorites();
 
-		RecentlyPlayedSongs = new RecentlyPlayedSongs();
-		RecentlyPlayedSongs.tRecentlyPlayedSongs();
+			RecentlyPlayedSongs = new RecentlyPlayedSongs();
+			RecentlyPlayedSongs.tRecentlyPlayedSongs();
 
-		Databases = new Databases();
-		Databases.tDatabases();
+			Databases = new Databases();
+			Databases.tDatabases();
 
-		if (!File.Exists("Saves.db3")) {
-			File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
+			if (!File.Exists("Saves.db3")) {
+				File.Copy(@$".init{Path.DirectorySeparatorChar}Saves.db3", "Saves.db3");
+			}
+			// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
+			SaveFileInstances = DBSaves.FetchSaveInstances();
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
+			Trace.TraceError("Config.ini and databases loading falied.");
 		}
-		// Add a condition here (if old Saves\ format save files exist) to port them to database (?)
-		SaveFileInstances = DBSaves.FetchSaveInstances();
 
 		//---------------------
 		#endregion
 
-		#region [ Log output initialisation ]
+		#region [ Log output config initialisation ]
 		//---------------------
-		Trace.AutoFlush = true;
-		if (ConfigIni.bOutputLogs) {
-			try {
-				Trace.Listeners.Add(new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
-			} catch (System.UnauthorizedAccessException)            // #24481 2011.2.20 yyagi
-			{
-				int c = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
-				string[] mes_writeErr = {
-					"OpenTaiko.logへの書き込みができませんでした。書き込みできるようにしてから、再度起動してください。",
-					"Failed to write OpenTaiko.log. Please set your device to READ/WRITE and try again."
-				};
-				ConfigIni.bOutputLogs = false;
-				Trace.WriteLine(mes_writeErr);
-				// Environment.Exit(1);
-			}
+		if (!ConfigIni.bOutputLogs) {
+			Trace.Listeners.Remove(FileLogListener);
 		}
 		Trace.WriteLine("");
 		Trace.WriteLine("Welcome to OpenTaiko! Starting log...");
@@ -1538,44 +1558,12 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
-			foreach (IInputDevice device in InputManager.InputDevices) {
-				if ((device.CurrentType == InputDeviceType.Joystick) && !ConfigIni.dicJoystick.ContainsValue(device.GUID)) {
-					int key = 0;
-					while (ConfigIni.dicJoystick.ContainsKey(key)) {
-						key++;
-					}
-					ConfigIni.dicJoystick.Add(key, device.GUID);
-				} else if ((device.CurrentType == InputDeviceType.Gamepad) && !ConfigIni.dicGamepad.ContainsValue(device.GUID)) {
-					int key = 0;
-					while (ConfigIni.dicGamepad.ContainsKey(key)) {
-						key++;
-					}
-					ConfigIni.dicGamepad.Add(key, device.GUID);
-				}
-			}
-			foreach (IInputDevice device2 in InputManager.InputDevices) {
-				if (device2.CurrentType == InputDeviceType.Joystick) {
-					foreach (KeyValuePair<int, string> pair in ConfigIni.dicJoystick) {
-						if (device2.GUID.Equals(pair.Value)) {
-							((CInputJoystick)device2).SetID(pair.Key);
-							break;
-						}
-					}
-					continue;
-				} else if (device2.CurrentType == InputDeviceType.Gamepad) {
-					foreach (KeyValuePair<int, string> pair in ConfigIni.dicGamepad) {
-						if (device2.GUID.Equals(pair.Value)) {
-							((CInputGamepad)device2).SetID(pair.Key);
-							break;
-						}
-					}
-					continue;
-				}
-			}
+			InputManager.SetID(ConfigIni.StableIdToGuid);
 			Trace.TraceInformation("DirectInput has been initialized.");
-		} catch (Exception exception2) {
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
 			Trace.TraceError("DirectInput and MIDI input failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_INPUTINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_INPUTINITFAILED, ex);
 			return;
 			//throw;
 		} finally {
@@ -1591,10 +1579,10 @@ internal class OpenTaiko : Game {
 		try {
 			Pad = new CPad(ConfigIni, InputManager);
 			Trace.TraceInformation("Pad has been initialized.");
-		} catch (Exception exception3) {
-			Trace.TraceError(exception3.ToString());
+		} catch (Exception ex) {
+			Trace.TraceError(ex.ToString());
 			Trace.TraceError("Pad failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_PADINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_PADINITFAILED, ex);
 			return;
 		} finally {
 			Trace.Unindent();
@@ -1662,7 +1650,8 @@ internal class OpenTaiko : Game {
 			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
 			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
 		} catch (Exception e) {
-			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE);
+			Trace.TraceError(e.ToString());
+			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
 			return;
 			// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 		} finally {
@@ -1684,7 +1673,7 @@ internal class OpenTaiko : Game {
 		} catch (Exception e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Song list failed to initialize.");
-			TriggerSystemError(CSystemError.Errno.ENO_SONGLISTINITFAILED);
+			TriggerSystemError(CSystemError.Errno.ENO_SONGLISTINITFAILED, e);
 			return;
 		} finally {
 			Trace.Unindent();
@@ -2100,6 +2089,16 @@ internal class OpenTaiko : Game {
 	public static float fCamXScale = 1.0f;
 	public static float fCamYScale = 1.0f;
 
-	public static Color4 borderColor = new Color4(1f, 0f, 0f, 0f);
+	public static Color4 borderColor { get => Game.BorderColor; set => Game.BorderColor = value; }
+
+	public static void ResetCameraStates() {
+		fCamXOffset = 0;
+		fCamYOffset = 0;
+		fCamZoomFactor = 1.0f;
+		fCamRotation = 0;
+		fCamXScale = 1.0f;
+		fCamYScale = 1.0f;
+		borderColor = new Color4(0f, 0f, 0f, 1f);
+	}
 	#endregion
 }

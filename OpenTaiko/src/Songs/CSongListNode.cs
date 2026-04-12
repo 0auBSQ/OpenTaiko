@@ -62,6 +62,10 @@ internal class CSongListNode {
 	public int[] nLevel = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
 	public CTja.ELevelIcon[] nLevelIcon = new CTja.ELevelIcon[(int)Difficulty.Total] { CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone };
 
+	// Custom metadata handlers
+	public Dictionary<string, string> customMetadataGScope = new Dictionary<string, string>();
+	public Dictionary<string, string>[] customMetadataCScope = Enumerable.Range(0, (int)Difficulty.Total).Select(_ => new Dictionary<string, string>()).ToArray();
+
 	// Branches
 	public bool bBranch = false;
 
@@ -88,7 +92,7 @@ internal class CSongListNode {
 
 	// In-game visuals
 
-	public string strScenePreset = null;
+	public string strScenePresets; // includes commas
 
 	#region [ OpenTaiko-Exclusive TJA Extension Data ]
 

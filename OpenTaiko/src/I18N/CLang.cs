@@ -65,55 +65,55 @@ internal class CLang {
 		return (Entries.TryGetValue(key, out string? value)) ? value.SafeFormat(values) : InvalidKey.SafeFormat(key);
 	}
 
-	public string GetDifficulty(int diff) {
+	public string GetDifficulty(Difficulty diff) {
 		switch (diff) {
-			case -1:
+			case (Difficulty)(-1):
 				return GetString("DIFF_ANY");
-			case (int)Difficulty.Easy:
+			case Difficulty.Easy:
 				return GetString("DIFF_EASY");
-			case (int)Difficulty.Normal:
+			case Difficulty.Normal:
 				return GetString("DIFF_NORMAL");
-			case (int)Difficulty.Hard:
+			case Difficulty.Hard:
 				return GetString("DIFF_HARD");
-			case (int)Difficulty.Oni:
+			case Difficulty.Oni:
 				return GetString("DIFF_EX");
-			case (int)Difficulty.Edit:
+			case Difficulty.Edit:
 				return GetString("DIFF_EXTRA");
-			case (int)Difficulty.Tower:
+			case Difficulty.Tower:
 				return GetString("DIFF_TOWER");
-			case (int)Difficulty.Dan:
+			case Difficulty.Dan:
 				return GetString("DIFF_DAN");
 			default:
 				return GetString("DIFF_UNKNOWN");
 		}
 	}
-	public string GetDifficulty(Difficulty diff) { return GetDifficulty((int)diff); }
-	public string GetExamName(int exam) {
+	public string GetDifficulty(int diff) { return GetDifficulty((Difficulty)diff); }
+	public string GetExamName(Exam.Type exam) {
 		switch (exam) {
-			case 0:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_SOUL");
-			case 1:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_GOOD");
-			case 2:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_OK");
-			case 3:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_BAD");
-			case 4:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_SCORE");
-			case 5:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ROLL");
-			case 6:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_HIT");
-			case 7:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_COMBO");
-			case 8:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ACCURACY");
-			case 9:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ADLIB");
-			case 10:
-				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_BOMB");
 			default:
-				goto case 0;
+			case Exam.Type.Gauge:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_SOUL");
+			case Exam.Type.JudgePerfect:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_GOOD");
+			case Exam.Type.JudgeGood:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_OK");
+			case Exam.Type.JudgeBad:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_BAD");
+			case Exam.Type.Score:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_SCORE");
+			case Exam.Type.Roll:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ROLL");
+			case Exam.Type.Hit:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_HIT");
+			case Exam.Type.Combo:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_COMBO");
+			case Exam.Type.Accuracy:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ACCURACY");
+			case Exam.Type.JudgeADLIB:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_ADLIB");
+			case Exam.Type.JudgeMine:
+				return CLangManager.LangInstance.GetString("DAN_CONDITION_NAME_BOMB");
 		}
 	}
+	public string GetExamName(int exam) { return GetExamName((Exam.Type)exam); }
 }

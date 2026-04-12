@@ -87,6 +87,7 @@ public class SoundManager   // : CSound
 	///// </summary>
 	//public static bool bIsMP3DecodeByWindowsCodec = false;
 
+	// unused (for debugging only?)
 	public static int nMixing = 0;
 	public int GetMixingStreams() {
 		return nMixing;

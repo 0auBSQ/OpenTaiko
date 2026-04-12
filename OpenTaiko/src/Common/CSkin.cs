@@ -7668,6 +7668,8 @@ internal class CSkin : IDisposable {
 
 	public int Puchichara_Ptn;
 	public string[] Puchicharas_Name = [];
+	public Dictionary<string, int> Puchicharas_NameToIndex = [];
+
 
 	#endregion
 

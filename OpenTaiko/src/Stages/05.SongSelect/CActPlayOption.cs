@@ -664,7 +664,7 @@ internal class CActPlayOption : CActivity {
 	}
 
 	public float tGetSongSpeedFactor(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int actual = 0) {
-		var _compare = ((isMenu) ? (nSongSpeed + 5) * 2 : OpenTaiko.ConfigIni.nSongSpeed) / 20f;
+		var _compare = Math.Min(2.0, ((isMenu) ? (nSongSpeed + 5) * 2 : OpenTaiko.ConfigIni.nSongSpeed) / 20f);
 
 		if (ebt == EBalancingType.SCORE || _compare <= 1f)
 			return Math.Min(1f, (float)Math.Pow(_compare, 1.3));
