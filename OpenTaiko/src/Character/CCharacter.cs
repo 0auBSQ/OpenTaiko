@@ -322,9 +322,7 @@ abstract class CCharacter : IDisposable {
 					new Modal(
 						Modal.EModalType.Character,
 						HRarity.tRarityToModalInt(metadata.Rarity),
-						this,
-						null
-					//OpenTaiko.Tx.Characters_Heya_Render[_idx]
+						new LuaCharacter(dirName)
 					),
 					_player);
 

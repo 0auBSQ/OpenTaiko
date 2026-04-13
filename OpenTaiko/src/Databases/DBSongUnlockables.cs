@@ -96,8 +96,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 						new Modal(
 							Modal.EModalType.Song,
 							HRarity.tRarityToModalInt(item.Value.rarity),
-							_node,
-							OpenTaiko.stageSongSelect.actPreimageパネル.tGenerateAndGetPreimage
+							new LuaSongNode(_node)
 						),
 						_player);
 

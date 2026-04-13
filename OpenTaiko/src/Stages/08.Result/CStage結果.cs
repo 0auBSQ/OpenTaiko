@@ -1394,12 +1394,20 @@ internal class CStage結果 : CStage {
 
 					#endregion
 				}
+				// When Lua finishes the last modal it self-deactivates; advance to song select.
+				if (OpenTaiko.ModalManager.AllModalsDone) {
+					OpenTaiko.ModalManager.AllModalsDone = false;
+					actFO.tフェードアウト開始();
+					tPostprocessing();
+					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					this.eフェードアウト完了時の戻り値 = E戻り値.完了;
+				}
+
 				if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
 					  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
 					 || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
 						 || (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
 							 || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
-
 
 					#region [ Skip animations ]
 
@@ -1416,24 +1424,17 @@ internal class CStage結果 : CStage {
 					#endregion
 
 					else {
-
+						// Animations done — trigger first modal pop or exit when nothing queued.
+						// Subsequent modals are advanced automatically by the Lua script (see CModalManager.Draw).
 						bool _modalsProcessed = OpenTaiko.ModalManager.InputManagement();
-
-						if (_modalsProcessed == true) {
+						if (_modalsProcessed) {
 							#region [ Return to song select screen ]
-
 							actFO.tフェードアウト開始();
-
 							tPostprocessing();
-
-							{
-								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-								this.eフェードアウト完了時の戻り値 = E戻り値.完了;
-							}
-
+							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+							this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 							#endregion
 						}
-
 					}
 				}
 

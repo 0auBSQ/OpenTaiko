@@ -30,6 +30,7 @@ namespace OpenTaiko {
 
 		public string FolderName => Character?.dirName ?? "";
 		public string FullPath => Character?._path ?? "";
+		public string DisplayName => Character?.metadata?.tGetName() ?? FolderName;
 
 		#region [Animation]
 

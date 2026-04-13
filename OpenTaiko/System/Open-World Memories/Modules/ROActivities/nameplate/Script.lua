@@ -394,21 +394,8 @@ function onStart()
 end
 
 function activate() end
-function deactivate() end
-
-function update()
-	titleplate_counter = titleplate_counter + (3.3 * fps.deltaTime)
-	if titleplate_counter >= 1 then titleplate_counter = 0 end
-
-	namePlateEffect_counter = namePlateEffect_counter + (60 * fps.deltaTime)
-	if namePlateEffect_counter >= 120 then namePlateEffect_counter = 0 end
-end
-
--- ────────────────────────────────────────────────────────────────────────────
--- Exported functions (called from C# via Call())
--- ────────────────────────────────────────────────────────────────────────────
-
-function setInfos(player, name, title, dan, data)
+-- activate(player, name, title, dan, data) — replaces setInfos; stores player info for draw
+function activate(player, name, title, dan, data)
 	local player_lua = player + 1
 	player_data[player_lua] = data
 
@@ -421,142 +408,146 @@ function setInfos(player, name, title, dan, data)
 	dan_short_text[player_lua] = dan
 end
 
-function draw(x, y, opacity, player, side)
-	local player_lua = player + 1
-	local side_lua   = side + 1
-	local data       = player_data[player_lua]
-	if data == nil then return end
+function deactivate() end
 
-	local rarityInt   = data.TitleRarityInt
-	local nameplateId = data.TitleId
-	local op          = toOpacity(opacity)
+function update()
+	titleplate_counter = titleplate_counter + (3.3 * fps.deltaTime)
+	if titleplate_counter >= 1 then titleplate_counter = 0 end
 
-	-- White background
-	base:SetOpacity(op)
-	base:Draw(x, y)
+	namePlateEffect_counter = namePlateEffect_counter + (60 * fps.deltaTime)
+	if namePlateEffect_counter >= 120 then namePlateEffect_counter = 0 end
+end
 
-	-- Upper (title) plate
-	local titleplate_index = data.TitleType + 1
-	if not notitle[player_lua] then
-		implDrawTitlePlate(x, y, opacity, titleplate_index)
-	elseif not nodan[player_lua] then
-		drawDanTitlePlate(x, y, opacity, data.DanType + 1)
-	end
+-- draw(mode, ...) — unified draw entry point.
+--   mode 0: full player nameplate  → draw(0, x, y, opacity, player, side)
+--   mode 1: dan plate only         → draw(1, x, y, opacity, danType, titleTex)
+--   mode 2: title plate only       → draw(2, x, y, opacity, titletype, titleTex, rarityInt, nameplateId)
+function draw(mode, ...)
+	local args = {...}
 
-	-- Rarity stars
-	implDrawRarityStars(x, y, opacity, rarityInt)
+	if mode == 0 then
+		-- ── Full player nameplate ──
+		local x, y, opacity, player, side = args[1], args[2], args[3], args[4], args[5]
+		local player_lua = player + 1
+		local side_lua   = side + 1
+		local data       = player_data[player_lua]
+		if data == nil then return end
 
-	-- Badges
-	implDrawBadges(x, y, opacity, nameplateId)
+		local rarityInt   = data.TitleRarityInt
+		local nameplateId = data.TitleId
+		local op          = toOpacity(opacity)
 
-	-- Dan background plate
-	if not nodan[player_lua] and not notitle[player_lua] then
+		base:SetOpacity(op)
+		base:Draw(x, y)
+
+		local titleplate_index = data.TitleType + 1
+		if not notitle[player_lua] then
+			implDrawTitlePlate(x, y, opacity, titleplate_index)
+		elseif not nodan[player_lua] then
+			drawDanTitlePlate(x, y, opacity, data.DanType + 1)
+		end
+
+		implDrawRarityStars(x, y, opacity, rarityInt)
+		implDrawBadges(x, y, opacity, nameplateId)
+
+		if not nodan[player_lua] and not notitle[player_lua] then
+			dan_base:SetOpacity(op)
+			dan_base:Draw(x, y)
+			dan_gradation[data.DanType + 1]:SetOpacity(op)
+			dan_gradation[data.DanType + 1]:Draw(x, y)
+		end
+
+		implDrawTitleEffect(x, y, titleplate_index)
+		implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
+
+		if not nodan[player_lua] and not notitle[player_lua] then
+			local tx_dan = font_dan:GetText(dan_text[player_lua], false, 99999)
+			tx_dan:SetScale(math.min(config_font_dan_maxsize / tx_dan.Width, 1.0), 1.0)
+			tx_dan:SetOpacity(op)
+			tx_dan:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
+		end
+
+		if not nodan[player_lua] and notitle[player_lua] then
+			local tx_title = font_title:GetText(dan_short_text[player_lua], false, 99999)
+			tx_title:SetScale(math.min(config_font_name_normal_maxsize / tx_title.Width, 1.0), 1.0)
+			tx_title:SetOpacity(op)
+			tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+
+			local tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
+			tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
+			tx_name:SetOpacity(op)
+			tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+		elseif notitle[player_lua] then
+			local tx_name = font_name_normal_size:GetText(name_text[player_lua], false, 99999)
+			tx_name:SetScale(math.min(config_font_name_normal_maxsize / tx_name.Width, 1.0), 1.0)
+			tx_name:SetOpacity(op)
+			tx_name:DrawAtAnchor(x + config_text_name_normal_offset_x, y + config_text_name_normal_offset_y, "center")
+		else
+			local tx_title = font_title:GetText(title_text[player_lua], false, 99999, title_fg, title_bg)
+			tx_title:SetScale(math.min(config_font_title_maxsize / tx_title.Width, 1.0), 1.0)
+			tx_title:SetOpacity(op)
+			tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+
+			local tx_name
+			if nodan[player_lua] then
+				tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
+				tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+			else
+				tx_name = font_name_full:GetText(name_text[player_lua], false, 99999)
+				tx_name:SetScale(math.min(config_font_name_full_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:DrawAtAnchor(x + config_text_name_full_offset_x, y + config_text_name_full_offset_y, "center")
+			end
+			tx_name:SetOpacity(op)
+		end
+
+	elseif mode == 1 then
+		-- ── Dan plate only ──
+		local o_x, o_y, opacity, danType, titleTex = args[1], args[2], args[3], args[4], args[5]
+		local x  = o_x - 180
+		local y  = o_y + 5
+		local op = toOpacity(opacity)
+
+		base:SetOpacity(op)
+		base:Draw(x, y)
+
 		dan_base:SetOpacity(op)
 		dan_base:Draw(x, y)
-		dan_gradation[data.DanType + 1]:SetOpacity(op)
-		dan_gradation[data.DanType + 1]:Draw(x, y)
-	end
+		dan_gradation[danType + 1]:SetOpacity(op)
+		dan_gradation[danType + 1]:Draw(x, y)
 
-	-- Glow effect
-	implDrawTitleEffect(x, y, titleplate_index)
+		implDrawPlayerRing(x, y, opacity, 1, 1)
 
-	-- Player ring
-	implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
-
-	-- Dan text
-	if not nodan[player_lua] and not notitle[player_lua] then
-		local tx_dan = font_dan:GetText(dan_text[player_lua], false, 99999)
-		tx_dan:SetScale(math.min(config_font_dan_maxsize / tx_dan.Width, 1.0), 1.0)
-		tx_dan:SetOpacity(op)
-		tx_dan:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
-	end
-
-	-- Name / title text
-	if not nodan[player_lua] and notitle[player_lua] then
-		-- Dan only layout: show dan string as title, name below
-		local tx_title = font_title:GetText(dan_short_text[player_lua], false, 99999)
-		tx_title:SetScale(math.min(config_font_name_normal_maxsize / tx_title.Width, 1.0), 1.0)
-		tx_title:SetOpacity(op)
-		tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
-
-		local tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
-		tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
-		tx_name:SetOpacity(op)
-		tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
-	elseif notitle[player_lua] then
-		-- No title, no dan: only name
-		local tx_name = font_name_normal_size:GetText(name_text[player_lua], false, 99999)
-		tx_name:SetScale(math.min(config_font_name_normal_maxsize / tx_name.Width, 1.0), 1.0)
-		tx_name:SetOpacity(op)
-		tx_name:DrawAtAnchor(x + config_text_name_normal_offset_x, y + config_text_name_normal_offset_y, "center")
-	else
-		-- Full layout: title + name (+ dan handled above)
-		local tx_title = font_title:GetText(title_text[player_lua], false, 99999, title_fg, title_bg)
-		tx_title:SetScale(math.min(config_font_title_maxsize / tx_title.Width, 1.0), 1.0)
-		tx_title:SetOpacity(op)
-		tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
-
-		local tx_name
-		if nodan[player_lua] then
-			tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
-			tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
-			tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
-		else
-			tx_name = font_name_full:GetText(name_text[player_lua], false, 99999)
-			tx_name:SetScale(math.min(config_font_name_full_maxsize / tx_name.Width, 1.0), 1.0)
-			tx_name:DrawAtAnchor(x + config_text_name_full_offset_x, y + config_text_name_full_offset_y, "center")
+		if titleTex ~= nil then
+			titleTex:SetScale(math.min(config_font_dan_maxsize / titleTex.Width, 1.0), 1.0)
+			titleTex:SetOpacity(op)
+			titleTex:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
 		end
-		tx_name:SetOpacity(op)
+
+	elseif mode == 2 then
+		-- ── Title plate only ──
+		local o_x, o_y, opacity, titletype, titleTex, rarityInt, nameplateId =
+			args[1], args[2], args[3], args[4], args[5], args[6], args[7]
+		local x  = o_x - 180
+		local y  = o_y + 5
+		local op = toOpacity(opacity)
+
+		base:SetOpacity(op)
+		base:Draw(x, y)
+
+		implDrawTitlePlate(x, y, opacity, titletype + 1)
+		implDrawRarityStars(x, y, opacity, rarityInt)
+		implDrawBadges(x, y, opacity, nameplateId)
+		implDrawTitleEffect(x, y, titletype + 1)
+
+		implDrawPlayerRing(x, y, opacity, 1, 1)
+
+		if titleTex ~= nil then
+			titleTex:SetScale(math.min(config_font_title_maxsize / titleTex.Width, 1.0), 1.0)
+			titleTex:SetOpacity(op)
+			titleTex:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+		end
 	end
-end
-
-function drawDan(o_x, o_y, opacity, danType, titleTex)
-	local x  = o_x - 180
-	local y  = o_y + 5
-	local op = toOpacity(opacity)
-
-	base:SetOpacity(op)
-	base:Draw(x, y)
-
-	dan_base:SetOpacity(op)
-	dan_base:Draw(x, y)
-	dan_gradation[danType + 1]:SetOpacity(op)
-	dan_gradation[danType + 1]:Draw(x, y)
-
-	implDrawPlayerRing(x, y, opacity, 1, 1)
-
-	if titleTex ~= nil then
-		titleTex:SetScale(math.min(config_font_dan_maxsize / titleTex.Width, 1.0), 1.0)
-		titleTex:SetOpacity(op)
-		titleTex:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
-	end
-end
-
-function drawTitlePlate(o_x, o_y, opacity, titletype, titleTex, rarityInt, nameplateId)
-	local x  = o_x - 180
-	local y  = o_y + 5
-	local op = toOpacity(opacity)
-
-	base:SetOpacity(op)
-	base:Draw(x, y)
-
-	implDrawTitlePlate(x, y, opacity, titletype + 1)
-	implDrawRarityStars(x, y, opacity, rarityInt)
-	implDrawBadges(x, y, opacity, nameplateId)
-	implDrawTitleEffect(x, y, titletype + 1)
-
-	implDrawPlayerRing(x, y, opacity, 1, 1)
-
-	if titleTex ~= nil then
-		titleTex:SetScale(math.min(config_font_title_maxsize / titleTex.Width, 1.0), 1.0)
-		titleTex:SetOpacity(op)
-		titleTex:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
-	end
-end
-
-function getCharaOffset()
-	if base == nil then return 0 end
-	return math.floor(base.Width / 2)
 end
 
 function reloadLanguage(lang) end

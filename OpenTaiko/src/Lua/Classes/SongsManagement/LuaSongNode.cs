@@ -245,6 +245,13 @@
 
 		#region [Media metadata]
 
+		/// <summary>Loads the song's preimage from disk and returns it wrapped in a LuaTexture, or null if none.</summary>
+		public LuaTexture? GetPreimage() {
+			if (!HasPreimage) return null;
+			var tex = OpenTaiko.Tx.TxCAbsolute(PreimagePath);
+			return tex != null ? new LuaTexture(tex) : null;
+		}
+
 		private CScore? _GetFirstAvailableScore() {
 			if (_node == null || !IsSong) return null;
 			for (int i = 0; i < (int)Difficulty.Total; i++) {

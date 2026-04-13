@@ -1,5 +1,5 @@
 ﻿namespace OpenTaiko {
-	internal class LuaNameplateInfo {
+	public class LuaNameplateInfo {
 		private DBNameplateUnlockables.NameplateUnlockable _npu;
 		private LuaUnlockCondition _lUC;
 		private int _id;
@@ -32,7 +32,7 @@
 
 		#endregion
 
-		public LuaNameplateInfo(DBNameplateUnlockables.NameplateUnlockable npu, int id) {
+		internal LuaNameplateInfo(DBNameplateUnlockables.NameplateUnlockable npu, int id) {
 			this._npu = npu;
 			this._lUC = new LuaUnlockCondition(npu.unlockConditions);
 			this._id = id;

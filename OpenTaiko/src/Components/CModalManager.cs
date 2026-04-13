@@ -4,14 +4,13 @@ internal class CModalManager {
 	public ModalQueue rModalQueue { get; private set; }
 	private Modal? displayedModals;
 
-	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("modal");
+	/// <summary>
+	/// Set to true by <see cref="Draw"/> after the last queued modal is dismissed by the
+	/// Lua script. The result screen polls this every frame to trigger the fade-out.
+	/// </summary>
+	public bool AllModalsDone { get; set; } = false;
 
-	/// <summary>Returns true when the modal animation has finished (or no modal script exists).</summary>
-	private bool AnimationFinished() {
-		var result = Script?.Call("isAnimationFinished");
-		if (result == null || result.Length == 0) return true;
-		return (bool)result[0];
-	}
+	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("modal");
 
 	// Called by the skin system on skin refresh — ROActivities are managed by the skin loader.
 	public void RefleshSkin() { }
@@ -19,39 +18,46 @@ internal class CModalManager {
 	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
 		object[] newParams = new object[] { player, rarity, (int)modalType };
 		if (args != null) newParams = newParams.Concat((object[])args).ToArray();
-		Script?.Call("registerNewModal", newParams);
+		Script?.Activate(newParams);
 	}
 
+	/// <summary>
+	/// Called every frame. Updates and draws the active modal.
+	/// When the Lua script self-deactivates (player confirmed), automatically pops the next
+	/// queued modal or sets <see cref="AllModalsDone"/> when the queue is exhausted.
+	/// </summary>
 	public void Draw() {
-		if (displayedModals != null) {
-			Script?.Update();
-			Script?.Draw();
-		}
-	}
+		if (displayedModals == null) return;
 
-	public bool Input() {
-		if (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-			|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
-			return InputManagement();
-		}
-		return false;
-	}
+		Script?.Update();
+		Script?.Draw();
 
-	public bool InputManagement() {
-		if (AnimationFinished()) {
+		// Lua called DEACTIVATE() after detecting input — advance the queue
+		if (!(Script?.IsActive ?? true)) {
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
-
-			if (!rModalQueue.tAreBothQueuesEmpty()
-				&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
-					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
+			if (!rModalQueue.tAreBothQueuesEmpty()) {
 				displayedModals = rModalQueue.tPopModalInOrder();
-			} else if (OpenTaiko.ConfigIni.nPlayerCount == 1 || rModalQueue.tAreBothQueuesEmpty()) {
-				if (!rModalQueue.tAreBothQueuesEmpty())
-					LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
+			} else {
 				displayedModals = null;
-				return true;
+				AllModalsDone = true;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Called from the result screen inside its input gate.
+	/// Pops the first modal on the initial input press, or returns true immediately
+	/// when no modals were ever queued.
+	/// Subsequent modal advancement is handled by Lua via <see cref="Draw"/>.
+	/// </summary>
+	public bool InputManagement() {
+		if (displayedModals != null) return false; // Lua is handling the current modal
+
+		if (rModalQueue.tAreBothQueuesEmpty()) return true; // Nothing queued — exit results
+
+		// First modal: triggered by the result screen's existing input gate
+		OpenTaiko.Skin.soundDecideSFX.tPlay();
+		displayedModals = rModalQueue.tPopModalInOrder();
 		return false;
 	}
 

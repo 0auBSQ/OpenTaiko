@@ -5,6 +5,11 @@ namespace OpenTaiko;
 class CNamePlate {
 	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("nameplate");
 
+	// Draw modes passed as first arg to the Lua draw(mode, ...) function
+	private const int DrawModeFull  = 0;
+	private const int DrawModeDan   = 1;
+	private const int DrawModeTitle = 2;
+
 	public void RefleshSkin() {
 		for (int player = 0; player < 5; player++) {
 			tNamePlateRefreshTitles(player);
@@ -42,9 +47,9 @@ class CNamePlate {
 		bIsPrevAI[player] = isAI;
 
 		if (OpenTaiko.SaveFileInstances[player].data.DanGold)
-			Script?.Call("setInfos", player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
+			Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
 		else
-			Script?.Call("setInfos", player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
+			Script?.Activate(player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
 	}
 
 	public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255) {
@@ -62,12 +67,12 @@ class CNamePlate {
 
 	/// <summary>Draws the full nameplate for a player slot.</summary>
 	public void Draw(int x, int y, int opacity, int player, int side) {
-		Script?.Call("draw", x, y, opacity, player, side);
+		Script?.Draw(DrawModeFull, x, y, opacity, player, side);
 	}
 
 	/// <summary>Draws only the dan plate (used in My Room gallery).</summary>
 	public void DrawDan(int x, int y, int opacity, int danGrade, LuaTexture text) {
-		Script?.Call("drawDan", x, y, opacity, danGrade, text);
+		Script?.Draw(DrawModeDan, x, y, opacity, danGrade, text);
 	}
 
 	/// <inheritdoc cref="DrawDan(int,int,int,int,LuaTexture)"/>
@@ -76,7 +81,7 @@ class CNamePlate {
 
 	/// <summary>Draws only the title plate (used in My Room gallery and modal).</summary>
 	public void DrawTitlePlate(int x, int y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
-		Script?.Call("drawTitlePlate", x, y, opacity, type, text, rarity, nameplateId);
+		Script?.Draw(DrawModeTitle, x, y, opacity, type, text, rarity, nameplateId);
 	}
 
 	/// <inheritdoc cref="DrawTitlePlate(int,int,int,int,LuaTexture,int,int)"/>

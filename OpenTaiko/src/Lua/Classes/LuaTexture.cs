@@ -82,6 +82,7 @@ namespace OpenTaiko {
 		public void SetScale(float scale_x, float scale_y) {
 			_texture?.tSetScale(scale_x, scale_y);
 		}
+
 		public void SetOpacity(float opacity) {
 			_texture?.tUpdateOpacity((int)(opacity * 255));
 		}
