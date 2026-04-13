@@ -963,6 +963,7 @@ class TextureLoader {
 		for (int i = 0; i < 5; i++) {
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
+			PlayerCharacters[i] = new LuaCharacter(i);
 		}
 
 
@@ -1570,6 +1571,7 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Result_Failed_2P;
 	*/
 	public CCharacterLua[] Characters = [];
+	public LuaCharacter[] PlayerCharacters = new LuaCharacter[5];
 
 	#endregion
 

@@ -92,7 +92,7 @@ local chara_config = {
 	resolution = VECTOR2:CreateVector2(1280, 720);
 	legacy_mode = true;
 	heya_render_offset = VECTOR2:CreateVector2(0, 0);
-	menu_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1; };
+	menu_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1.0; };
 	menu_motion_normal = nil;
 	menu_motion_wait = nil;
 	menu_motion_start = nil;
@@ -526,6 +526,8 @@ local function load_config()
 		chara_config.menu_offset.pos = VECTOR2:CreateVector2(ini_menu_offset[0], ini_menu_offset[1])
 	end
 
+	chara_config.menu_offset.v1_scale = chara_config_ini:GetDouble("Menu_Chara_Scale", chara_config.menu_offset.v1_scale)
+
 	local ini_menu_motion_normal = chara_config_ini:GetIntArray("Menu_Chara_Motion_Loop")
 	if ini_menu_motion_normal.Length >= 1 then
 		chara_config.menu_motion_normal = csarray_to_motiontable(ini_menu_motion_normal)
@@ -680,9 +682,9 @@ local animation_motions = {
 	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = chara_config.game_motion_balloon_broke;
 	[CHARACTER.ANIM_GAME_BALLOON_MISS] = chara_config.game_motion_balloon_miss;
 	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = chara_config.game_motion_kusudama_breaking;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_motion_kusudama_idle;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_motion_kusudama_broke;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_motion_kusudama_miss;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_motion_kusudama_broke;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_motion_kusudama_miss;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_motion_kusudama_idle;
 
 	[CHARACTER.ANIM_GAME_TOWER_STANDING] = chara_config.game_motion_tower_standing;
 	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = chara_config.game_motion_tower_standing_tired;
@@ -733,9 +735,9 @@ local animation_beats = {
 	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = chara_config.game_beat_balloon_broke;
 	[CHARACTER.ANIM_GAME_BALLOON_MISS] = chara_config.game_beat_balloon_miss;
 	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = chara_config.game_beat_kusudama_breaking;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_beat_kusudama_idle;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_beat_kusudama_broke;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_beat_kusudama_miss;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_beat_kusudama_broke;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_beat_kusudama_miss;
+	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_beat_kusudama_idle;
 
 	[CHARACTER.ANIM_GAME_TOWER_STANDING] = chara_config.game_beat_tower_standing;
 	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = chara_config.game_beat_tower_standing_tired;
@@ -851,14 +853,15 @@ local function create_animation(animationType)
 				return self.value >= 1
 			end
 		end
-		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX)
+		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX, overrideOffset, anchor)
 			local frame = self.frames[self.frame_index]
 			if flipX then
 				scaleX = -scaleX
 			end
 
-			local offsetX = self.offset.pos.X
-			local offsetY = self.offset.pos.Y
+			local offset = overrideOffset or self.offset
+			local offsetX = offset.pos.X
+			local offsetY = offset.pos.Y
 
 			local theme_resolution = THEME:GetResolution()
 			local baseScale = theme_resolution.Y / chara_config.resolution.Y
@@ -866,34 +869,42 @@ local function create_animation(animationType)
 			scaleY = scaleY * baseScale
 
 			if chara_config.legacy_mode then
-				scaleX = scaleX * self.offset.v1_scale
-				scaleY = scaleY * self.offset.v1_scale
+				scaleX = scaleX * offset.v1_scale
+				scaleY = scaleY * offset.v1_scale
 			end
 
 			offsetX = offsetX * (theme_resolution.X / chara_config.resolution.X)
 			offsetY = offsetY * (theme_resolution.Y / chara_config.resolution.Y)
 
 			if frame ~= nil then
-				if chara_config.legacy_mode then
-					if self.offset.mode == OFFSET_MODE_GAME then
-						offsetX = offsetX + (((frame.Width / 2.0) - (0.13020833333 * chara_config.resolution.X)) * scaleX)
-						offsetY = offsetY + ((frame.Height - (0.25555555555 * chara_config.resolution.Y)) * scaleY)
-					elseif self.offset.mode == OFFSET_MODE_GAME_BALLOON then
-						offsetX = offsetX + (((frame.Width / 2.0) - (0.27216666666 * chara_config.resolution.X)) * scaleX)
-						offsetY = offsetY + ((frame.Height - (0.26296296296 * chara_config.resolution.Y)) * scaleY)
-					elseif self.offset.mode == OFFSET_MODE_GAME_KUSUDAMA then
-						offsetX = offsetX + (((frame.Width / 2.0) - (0.2555 * chara_config.resolution.X)) * scaleX)
-						offsetY = offsetY + ((frame.Height - (0.2555 * chara_config.resolution.Y)) * scaleY)
+				if anchor ~= nil then
+					-- Anchor mode: skip legacy frame-size offset; (x,y) is the anchor point directly
+					frame:SetScale(scaleX, scaleY)
+					frame:SetOpacity(opacity / 255.0)
+					frame:SetColor(color)
+					frame:DrawAtAnchor(x + offsetX, y + offsetY, anchor)
+				else
+					if chara_config.legacy_mode then
+						if offset.mode == OFFSET_MODE_GAME then
+							offsetX = offsetX + (((frame.Width / 2.0) - (0.13020833333 * chara_config.resolution.X)) * scaleX)
+							offsetY = offsetY + ((frame.Height - (0.25555555555 * chara_config.resolution.Y)) * scaleY)
+						elseif offset.mode == OFFSET_MODE_GAME_BALLOON then
+							offsetX = offsetX + (((frame.Width / 2.0) - (0.27216666666 * chara_config.resolution.X)) * scaleX)
+							offsetY = offsetY + ((frame.Height - (0.26296296296 * chara_config.resolution.Y)) * scaleY)
+						elseif offset.mode == OFFSET_MODE_GAME_KUSUDAMA then
+							offsetX = offsetX + (((frame.Width / 2.0) - (0.2555 * chara_config.resolution.X)) * scaleX)
+							offsetY = offsetY + ((frame.Height - (0.2555 * chara_config.resolution.Y)) * scaleY)
+						elseif offset.mode == OFFSET_MODE_MENU then
+							offsetX = offsetX + (((frame.Width / 2.0) - (0.13020833333 * chara_config.resolution.X)) * scaleX)
+							offsetY = offsetY + ((frame.Height - (0.25555555555 * chara_config.resolution.Y)) * scaleY)
+						end
 					end
+
+					frame:SetScale(scaleX, scaleY)
+					frame:SetOpacity(opacity / 255.0)
+					frame:SetColor(color)
+					frame:DrawAtAnchor(x + offsetX, y + offsetY, "bottom")
 				end
-
-				x = x + offsetX
-				y = y + offsetY
-
-				frame:SetScale(scaleX, scaleY)
-				frame:SetOpacity(opacity / 255.0)
-				frame:SetColor(color)
-				frame:DrawAtAnchor(x, y, "bottom")
 			end
 		end
 		animation_data.dispose = function(self)
@@ -922,7 +933,6 @@ local function create_preview()
 		if flipX then
 			scaleX = -scaleX
 		end
-
 		local theme_resolution = THEME:GetResolution()
 		local baseScale = theme_resolution.Y / chara_config.resolution.Y
 		scaleX = scaleX * baseScale
@@ -955,7 +965,6 @@ local function create_render()
 		if flipX then
 			scaleX = -scaleX
 		end
-
 		local offsetX = chara_config.heya_render_offset.X
 		local offsetY = chara_config.heya_render_offset.Y
 
@@ -1114,13 +1123,17 @@ function update(delta, animationType, looping)
 	end
 end
 
-function draw(animationType, x, y, scaleX, scaleY, opacity, color, flipX)
+function draw(animationType, x, y, scaleX, scaleY, opacity, color, flipX, contextType, anchor)
 	if not avaialbeAnimation(animationType) then
 		return
 	end
 
 	local animation = animationdata_array[animationType]
 	if animation ~= nil then
-		animation:draw(x, y, scaleX, scaleY, opacity, color, flipX)
+		local overrideOffset = nil
+		if contextType ~= nil and contextType ~= animationType then
+			overrideOffset = animation_offsets[contextType]
+		end
+		animation:draw(x, y, scaleX, scaleY, opacity, color, flipX, overrideOffset, anchor)
 	end
 end

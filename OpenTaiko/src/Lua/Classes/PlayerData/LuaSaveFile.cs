@@ -127,6 +127,34 @@
 			return _sf.data.mountedCharacter;
 		}
 
+		public LuaCharacter GetCharacter() {
+			return OpenTaiko.Tx.PlayerCharacters[_mounted];
+		}
+
+		public string CharacterName {
+			get {
+				int idx = Math.Max(0, Math.Min(_sf.data.Character, OpenTaiko.Tx.Characters.Length - 1));
+				return OpenTaiko.Tx.Characters[idx].dirName;
+			}
+		}
+
+		/// <summary>
+		/// Changes the player's character to the one with the given directory name.
+		/// Returns false without making any change if the character name is not found.
+		/// Returns true immediately (no-op) if the character is already set.
+		/// </summary>
+		public bool ChangeCharacter(string name) {
+			int newIdx = Array.FindIndex(OpenTaiko.Tx.Characters, c => c.dirName == name);
+			if (newIdx < 0) return false;
+			int oldIdx = _sf.data.Character;
+			if (oldIdx == newIdx) return true;
+			OpenTaiko.Tx.ReloadCharacter(oldIdx, newIdx, _mounted);
+			_sf.data.Character = newIdx;
+			_sf.tUpdateCharacterName(OpenTaiko.Tx.Characters[newIdx].dirName);
+			_sf.tApplyHeyaChanges();
+			return true;
+		}
+
 		#endregion
 
 		public LuaSaveFile(SaveFile sf, int mountedPlayer) {

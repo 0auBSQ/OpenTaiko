@@ -68,9 +68,14 @@ namespace OpenTaiko {
 			return false;
 		}
 
-		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false) {
+		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false, string? contextType = null) {
 			if (animationType == CCharacter.ANIM_NONE) return;
-			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX);
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX, contextType);
+		}
+
+		public void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false, string? contextType = null) {
+			if (animationType == CCharacter.ANIM_NONE) return;
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX, contextType, anchor);
 		}
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {

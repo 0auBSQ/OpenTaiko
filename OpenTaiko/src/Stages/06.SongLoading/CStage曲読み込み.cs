@@ -288,8 +288,14 @@ internal class CStage曲読み込み : CStage {
 			} else {
 				#region [Ensou loading screen]
 
-				if (OpenTaiko.Tx.SongLoading_BgWait != null) OpenTaiko.Tx.SongLoading_BgWait.t2D描画(0, 0);
-				if (OpenTaiko.Tx.SongLoading_Chara != null) OpenTaiko.Tx.SongLoading_Chara.t2D描画(0, 0);
+				if (OpenTaiko.Tx.SongLoading_BgWait != null) {
+					OpenTaiko.Tx.SongLoading_BgWait.Opacity = 255;
+					OpenTaiko.Tx.SongLoading_BgWait.t2D描画(0, 0);
+				}
+				if (OpenTaiko.Tx.SongLoading_Chara != null) {
+					OpenTaiko.Tx.SongLoading_Chara.Opacity = 255;
+					OpenTaiko.Tx.SongLoading_Chara.t2D描画(0, 0);
+				}
 
 				drawPlate();
 

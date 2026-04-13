@@ -190,16 +190,17 @@ local DIFFSELECT_LEVEL_COLORS = {
 }
 
 -- Chara helper
-local function drawCharaPlaceholder(x, y, scalex, scaley, opacity)
-	bgtx["placeholder_chara"]:SetScale(scalex, scaley)
-	bgtx["placeholder_chara"]:SetOpacity(opacity)
-	bgtx["placeholder_chara"]:DrawAtAnchor(x, y, "bottom")
-	bgtx["placeholder_chara"]:SetScale(1,1)
-	bgtx["placeholder_chara"]:SetOpacity(1)
+local function drawPlayerChara(player, x, y, scaleX, scaleY, opacity, flipX)
+	local chara = GetSaveFile(player):GetCharacter()
+	if chara ~= nil and chara.IsValid then
+		chara:Update(CHARACTER.ANIM_MENU_NORMAL, true)
+		local effectiveScaleX = (flipX or false) and -scaleX or scaleX
+		chara:DrawAtAnchor(x, y, CHARACTER.ANIM_MENU_NORMAL, "bottom", effectiveScaleX, scaleY, math.floor(opacity * 255))
+	end
 end
 
-local function drawCharaWithNameplate(player, x, y, scalex, scaley, opacity)
-	drawCharaPlaceholder(x+bgtx["nameplate_info"].Width/2-NAMEPLATE_OFFSET_X, y, scalex, scaley, opacity)
+local function drawCharaWithNameplate(player, x, y, scaleX, scaleY, opacity, flipX)
+	drawPlayerChara(player, x + bgtx["nameplate_info"].Width/2 - NAMEPLATE_OFFSET_X, y, scaleX, scaleY, opacity, flipX)
 	NAMEPLATE:DrawPlayerNameplate(x, y, opacity*255, player)
 end
 
@@ -635,7 +636,7 @@ function draw()
 				local x = ox + (colIdx - (cols - 1) / 2) * gx
 				local y = oy + r * gy
 				
-				drawCharaWithNameplate(i, x, y, -s, s, opacityNorm)
+				drawCharaWithNameplate(i, x, y, s, s, opacityNorm, true)
 				-- TODO: Display modicons, selected status and selected diff here
 			end
 		end
@@ -800,7 +801,7 @@ function draw()
 			local y0 = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
 			bgtx["nameplate_info"]:Draw(x0, y0)
 			-- TODO: Draw clear numbers here for the given 1P difficulty
-			drawCharaPlaceholder(x0+bgtx["nameplate_info"].Width/2, y0+NAMEPLATE_OFFSET_Y, 0.7, 0.7, opacityNorm)
+			drawPlayerChara(highlightedPlayer, x0+bgtx["nameplate_info"].Width/2, y0, 1.0, 1.0, opacityNorm, false)
 			NAMEPLATE:DrawPlayerNameplate(x0+NAMEPLATE_OFFSET_X, y0+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, highlightedPlayer)
 		end
 		
@@ -1105,6 +1106,14 @@ function activate()
 			bgtx["load"]:SetRotation(val)
 		end
     end)
+
+	-- Load character animations for all players
+	for p = 0, 4, 1 do
+		local chara = GetSaveFile(p):GetCharacter()
+		if chara ~= nil and chara.IsValid then
+			chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
+		end
+	end
 end
 
 function deactivate()
@@ -1114,6 +1123,14 @@ function deactivate()
 
 	local psnd = SHARED:GetSharedSound("presound")
 	psnd:Stop()
+
+	-- Dispose character animations for all players
+	for p = 0, 4, 1 do
+		local chara = GetSaveFile(p):GetCharacter()
+		if chara ~= nil and chara.IsValid then
+			chara:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL)
+		end
+	end
 end
 
 function onStart()

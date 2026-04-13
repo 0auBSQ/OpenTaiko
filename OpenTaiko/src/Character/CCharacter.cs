@@ -105,6 +105,8 @@ abstract class CCharacter : IDisposable {
 		{ ANIM_GAME_TOWER_CLEAR_TIRED, ANIM_GAME_TOWER_CLEAR },
 		{ ANIM_GAME_TOWER_FAIL, ANIM_GAME_TOWER_STANDING_TIRED },
 
+		{ ANIM_GAME_KUSUDAMA_IDLE, ANIM_GAME_NORMAL },
+
 		{ ANIM_MENU_WAIT, ANIM_GAME_GOGO},
 		{ ANIM_MENU_START, ANIM_GAME_10COMBO },
 		{ ANIM_MENU_NORMAL, ANIM_GAME_NORMAL},
@@ -368,6 +370,10 @@ abstract class CCharacter : IDisposable {
 
 	public virtual void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
 
+	}
+
+	public virtual void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
+		Draw(player, animationType, x, y, scaleX, scaleY, opacity, color, flipX);
 	}
 
 	public virtual void LoadAnimation(int player, string voice) {

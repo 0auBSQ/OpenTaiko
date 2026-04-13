@@ -227,6 +227,22 @@
 
 		#endregion
 
+		#region [Custom commands]
+
+		/// <summary>Gets a global-scope custom command value (commands starting with "." placed before any COURSE header).</summary>
+		public string? GetCustomCommand(string key) {
+			if (_node == null) return null;
+			_node.customMetadataGScope.TryGetValue(key, out string? value);
+			return value;
+		}
+
+		/// <summary>Returns all global-scope custom commands as a Lua-accessible table (Dictionary).</summary>
+		public Dictionary<string, string>? GetCustomCommands() {
+			return _node?.customMetadataGScope;
+		}
+
+		#endregion
+
 		#region [Media metadata]
 
 		private CScore? _GetFirstAvailableScore() {

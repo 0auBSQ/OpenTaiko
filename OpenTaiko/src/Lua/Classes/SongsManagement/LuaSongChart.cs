@@ -8,6 +8,7 @@
 		private CScore.ST譜面情報? _chartInfo;
 		private LuaSongNode? _parent;
 		private CSongListNode? _parentListNode;
+		private Dictionary<string, string> _customCommands = new();
 
 		public bool NotNull {
 			get {
@@ -163,6 +164,21 @@
 		#endregion
 
 
+		#region [Custom commands]
+
+		/// <summary>Gets a chart-scope custom command value (commands starting with "." placed inside this chart's COURSE block).</summary>
+		public string? GetCustomCommand(string key) {
+			_customCommands.TryGetValue(key, out string? value);
+			return value;
+		}
+
+		/// <summary>Returns all chart-scope custom commands as a Lua-accessible table (Dictionary).</summary>
+		public Dictionary<string, string> GetCustomCommands() {
+			return _customCommands;
+		}
+
+		#endregion
+
 		public bool Select(int player, bool init = false) {
 			if (!NotNull) return false;
 
@@ -184,6 +200,8 @@
 				_score = _from.score[_chart];
 				_parent = parent;
 				_parentListNode = _from;
+				if (_chart >= 0 && _chart < _from.customMetadataCScope.Length)
+					_customCommands = _from.customMetadataCScope[_chart];
 			}
 		}
 	}

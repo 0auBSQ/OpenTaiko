@@ -422,7 +422,7 @@ internal class CActImplCharacter : CActivity {
 
 			float charaScale = 1.0f;
 
-			if (!b風船連打中[i] && !visibleKusuChara) {
+			if (!b風船連打中[i] && !visibleKusuChara && !IsPlayingBalloonAction(i)) {
 				bool flipX = OpenTaiko.ConfigIni.bAIBattleMode ? (i == 1) : false;
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
@@ -470,9 +470,14 @@ internal class CActImplCharacter : CActivity {
 		return base.Draw();
 	}
 
+	private bool IsPlayingBalloonAction(int i) {
+		string? action = CharacterControllers[i].strActionAnimation;
+		return action == CCharacter.ANIM_GAME_BALLOON_BROKE || action == CCharacter.ANIM_GAME_BALLOON_MISS;
+	}
+
 	public void OnDraw_Balloon() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!b風船連打中[i]) continue;
+			if (!b風船連打中[i] && !IsPlayingBalloonAction(i)) continue;
 
 			float chara_x;
 			float chara_y;

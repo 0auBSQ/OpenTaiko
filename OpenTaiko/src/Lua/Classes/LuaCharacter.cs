@@ -1,228 +1,144 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using FDK;
-
 namespace OpenTaiko {
+	/// <summary>
+	/// Lua-side wrapper around a <see cref="CCharacter"/> instance.
+	/// <para>
+	/// Two modes:<br/>
+	/// - <b>Player-bound</b>: constructed with a player index; the underlying <see cref="CCharacter"/>
+	///   is resolved dynamically via <see cref="CCharacter.GetCharacter"/> so it stays correct after
+	///   character changes. The 5 permanent per-player instances live in <see cref="TextureLoader.PlayerCharacters"/>.<br/>
+	/// - <b>Name-bound</b>: constructed with a character folder name; owns a dedicated
+	///   <see cref="CCharacterLua"/> and should be disposed when no longer needed.
+	///   All operations use player slot 0 internally.
+	/// </para>
+	/// </summary>
 	public class LuaCharacter : IDisposable {
-		public string FolderName { get; private set; }
-		public string FullPath { get; private set; }
+		// Player-bound mode (-1 means not player-bound)
+		private readonly int _player;
 
-		public Dictionary<string, Dictionary<string, LuaTexture[]>> Sprites { get; private set; } = new();
-		public Dictionary<string, Dictionary<string, LuaSound>> Sounds { get; private set; } = new();
-		public Dictionary<string, object> Config { get; private set; } = new();
+		// Name-bound mode (non-null means we own this instance)
+		private CCharacterLua? _ownedCharacter;
 
-		public LuaCharacter(string folder_name) {
-			FolderName = folder_name;
-			FullPath = Path.Combine(OpenTaiko.strEXEのあるフォルダ, TextureLoader.GLOBAL, TextureLoader.CHARACTERS, FolderName);
+		private CCharacter? Character => _player >= 0
+			? CCharacter.GetCharacter(_player)
+			: _ownedCharacter;
+
+		// Slot used for all CCharacter calls in name-bound mode
+		// NOTE: I'd like CCharacter.Draw to not have a player number ideally, will think about how to design this
+		private int Slot => _player >= 0 ? _player : 0;
+
+		public bool IsValid => Character != null;
+
+		public string FolderName => Character?.dirName ?? "";
+		public string FullPath => Character?._path ?? "";
+
+		#region [Animation]
+
+		public void Draw(float x, float y, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
+			Character?.Draw(Slot, animation, x, y, scaleX, scaleY, opacity, null, false);
 		}
 
-		public void LoadCharacter() {
-			#region Initialize
-			// Textures
-			string[] directories = Directory.GetDirectories(FullPath, "*", SearchOption.TopDirectoryOnly).Where(item => !item.EndsWith("Sounds")).ToArray();
-
-			// Sounds
-			string sound_path = Path.Combine(FullPath, "Sounds");
-			string[] sound_dirs = Directory.GetDirectories(sound_path, "*", SearchOption.TopDirectoryOnly);
-
-			// Config
-			string config_path = Path.Combine(FullPath, "CharaConfig.txt");
-			#endregion
-
-			// Textures
-			foreach (string dir in directories) {
-				string[] files = Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
-				string name = Path.GetRelativePath(FullPath, dir);
-
-				if (files.Length > 0)
-					LoadAnimationGroup(name);
-				else
-					LoadAnimation(name, "");
-			}
-
-			// Sounds
-			LoadSoundGroup();
-			foreach (string dir in sound_dirs) {
-				string name = Path.GetRelativePath(sound_path, dir);
-				LoadSoundGroup(name);
-			}
+		public void DrawAtAnchor(float x, float y, string animation, string anchor = "bottom", float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
+			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, scaleX, scaleY, opacity, null, false);
 		}
 
-		#region Load/Unload
-		private LuaTexture[] LoadLuaTextureArray(string file_path) {
-			int count = OpenTaiko.t連番画像の枚数を数える(file_path + Path.DirectorySeparatorChar);
-			LuaTexture[] textures = new LuaTexture[count];
-
-			for (int i = 0; i < count; i++) {
-				try {
-					textures[i] = new(new CTexture(file_path + Path.DirectorySeparatorChar + $"{i}.png", false));
-				} catch {
-					textures[i] = new();
-				}
-			}
-			return textures;
-		}
-		private Dictionary<string, LuaSound> LoadLuaSoundDict(string file_path) {
-			Dictionary<string, LuaSound> sounds = [];
-			string[] files = Directory.GetFiles(file_path)
-				.Where(item => item.ToLower().EndsWith(".ogg") || item.ToLower().EndsWith(".wav"))
-				.ToArray();
-
-			foreach (string file in files) {
-				string name = Path.GetFileNameWithoutExtension(file);
-				if (sounds.ContainsKey(name)) continue;
-				sounds.Add(name, new(file, ESoundGroup.Voice));
-			}
-
-			return sounds;
+		public bool Update(string animation, bool looping = true) {
+			return Character?.Update(Slot, animation, looping) ?? false;
 		}
 
-		public bool LoadAnimationGroup(string category = "") {
-			try {
-				if (category == "Sounds") return false;
-				if (string.IsNullOrWhiteSpace(category)) category = "";
-
-				string path = FullPath;
-				if (!string.IsNullOrWhiteSpace(category)) path = Path.Combine(FullPath, category);
-				var dirs = Directory.GetDirectories(path, "*", SearchOption.TopDirectoryOnly).Where(dir => !dir.EndsWith("Sounds"));
-
-				return dirs.All(dir => LoadAnimation(Path.GetRelativePath(path, dir), category));
-			} catch { return false; }
-		}
-		public bool LoadAnimation(string name, string category = "") {
-			try {
-				if (category == "Sounds") return false;
-				if (string.IsNullOrWhiteSpace(category)) category = "";
-				Sprites.TryAdd(category, new());
-
-				string path = Path.Combine(FullPath, name);
-				if (!string.IsNullOrWhiteSpace(category)) {
-					path = Path.Combine(FullPath, category, name);
-				}
-
-				if (Sprites[category].ContainsKey(name)) {
-					UnloadAnimation(name, category);
-					Sprites[category][name] = LoadLuaTextureArray(path);
-				} else
-					Sprites[category].Add(name, LoadLuaTextureArray(path));
-
-				return true;
-			} catch { return false; }
-		}
-		public bool LoadSoundGroup(string category = "") {
-			try {
-				if (string.IsNullOrWhiteSpace(category)) category = "";
-				Sounds.TryAdd(category, new());
-
-				string path = Path.Combine(FullPath, "Sounds");
-				if (!string.IsNullOrWhiteSpace(category)) path = Path.Combine(FullPath, "Sounds", category);
-
-				UnloadSoundGroup(category);
-				Sounds[category] = LoadLuaSoundDict(path);
-
-				return true;
-			} catch { return false; }
-		}
-		public bool LoadSound(string name, string category = "") {
-			try {
-				if (string.IsNullOrWhiteSpace(category)) category = "";
-				Sounds.TryAdd(category, new());
-
-				string path = Path.Combine(FullPath, "Sounds", name);
-				if (!string.IsNullOrWhiteSpace(category)) {
-					path = Path.Combine(FullPath, "Sounds", category, name);
-				}
-
-				string filename = File.Exists(path + ".ogg") ? path + ".ogg" : path + ".wav";
-				if (Sounds[category].ContainsKey(name)) {
-					UnloadSound(name, category);
-					Sounds[category][name] = new(filename, ESoundGroup.Voice);
-				} else
-					Sounds[category].Add(name, new(filename, ESoundGroup.Voice));
-
-				return true;
-			} catch { return false; }
+		public void LoadAnimation(string animation) {
+			Character?.LoadAnimation(Slot, animation);
 		}
 
-		public void UnloadAnimationGroup(string category = "") {
-			if (string.IsNullOrWhiteSpace(category)) category = "";
-
-			if (Sprites.ContainsKey(category)) {
-				foreach (string key in Sprites[category].Keys) {
-					UnloadAnimation(key, category);
-				}
-			}
+		public void DisposeAnimation(string animation) {
+			Character?.DisposeAnimation(Slot, animation);
 		}
-		public void UnloadAnimation(string name, string category = "") {
-			if (string.IsNullOrWhiteSpace(category)) category = "";
 
-			if (Sprites.TryGetValue(category, out var sprite_sub)) {
-				if (sprite_sub.TryGetValue(name, out var textures)) {
-					foreach (var tex in textures) tex?.Dispose();
-				}
-			}
+		public bool AvailableAnimation(string animation) {
+			return Character?.AvaiableAnimation(Slot, animation) ?? false;
 		}
-		public void UnloadSoundGroup(string category = "") {
-			if (string.IsNullOrWhiteSpace(category)) category = "";
 
-			if (Sounds.ContainsKey(category)) {
-				foreach (string key in Sounds[category].Keys) {
-					UnloadSound(key, category);
-				}
-			}
+		public void SetAnimationDuration(string animation, double duration) {
+			Character?.SetAnimationDuration(Slot, animation, duration);
 		}
-		public void UnloadSound(string name, string category = "") {
-			if (string.IsNullOrWhiteSpace(category)) category = "";
 
-			if (Sounds.TryGetValue(category, out var sound_sub)) {
-				if (sound_sub.TryGetValue(name, out var sound)) {
-					sound?.Dispose();
-				}
-			}
+		public void SetAnimationCyclesFromBPM(string animation, double bpm) {
+			Character?.SetAnimationCyclesFromBPM(Slot, animation, bpm);
 		}
+
+		public void ResetAnimationCounter(string animation) {
+			Character?.ResetAnimationCounter(Slot, animation);
+		}
+
 		#endregion
 
-		#region Dispose
-		private bool _disposedValue;
-		protected virtual void Dispose(bool disposing) {
-			if (!_disposedValue) {
+		#region [Voice]
 
-				foreach (var animation in Sprites) {
-					UnloadAnimationGroup(animation.Key);
-				}
-				foreach (var sounds in Sounds) {
-					UnloadSoundGroup(sounds.Key);
-				}
+		public void LoadVoice(string voice) {
+			Character?.LoadVoice(Slot, voice);
+		}
 
-				if (disposing) {
-					for (int i = Sprites.Count - 1; i >= 0; i--) {
-						var key = Sprites.ElementAt(i).Key;
-						Sprites[key].Clear();
-					}
-					Sprites.Clear();
+		public void DisposeVoice(string voice) {
+			Character?.DisposeVoice(Slot, voice);
+		}
 
-					for (int i = Sounds.Count - 1; i >= 0; i--) {
-						var key = Sounds.ElementAt(i).Key;
-						Sounds[key].Clear();
-					}
-					Sounds.Clear();
-				}
+		public void PlayVoice(string voice) {
+			Character?.PlayVoice(Slot, voice);
+		}
 
-				_disposedValue = true;
+		#endregion
+
+		#region [Constructors]
+
+		/// <summary>Player-bound constructor. The character resolves dynamically from the player's save data.</summary>
+		public LuaCharacter(int player) {
+			_player = player;
+			_ownedCharacter = null;
+		}
+
+		/// <summary>
+		/// Name-bound constructor. Tries to build a standalone <see cref="CCharacterLua"/> for the
+		/// given character folder name. Check <see cref="IsValid"/> before use.
+		/// Call <see cref="Dispose"/> when done.
+		/// </summary>
+		public LuaCharacter(string characterName) {
+			_player = -1;
+			string path = Path.Combine(
+				OpenTaiko.strEXEのあるフォルダ,
+				TextureLoader.GLOBAL,
+				TextureLoader.CHARACTERS,
+				characterName);
+			try {
+				if (Directory.Exists(path))
+					_ownedCharacter = new CCharacterLua(path, -1);
+			} catch {
+				_ownedCharacter = null;
 			}
 		}
+
+		#endregion
+
+		#region [Dispose]
+
+		private bool _disposed = false;
+
 		public void Dispose() {
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
+			if (_disposed) return;
+			_disposed = true;
+			// Only dispose characters we own (name-bound mode)
+			_ownedCharacter?.Dispose();
+			_ownedCharacter = null;
 		}
+
 		#endregion
 	}
+
 	public class LuaCharacterFunc {
 		public LuaCharacterFunc() { }
+
+		public LuaCharacter CreateCharacter(string characterName) {
+			return new LuaCharacter(characterName);
+		}
+
 		public string ANIM_PREVIEW => CCharacter.ANIM_PREVIEW;
 		public string ANIM_RENDER => CCharacter.ANIM_RENDER;
 
@@ -255,15 +171,15 @@ namespace OpenTaiko {
 		public string ANIM_GAME_KUSUDAMA_MISS => CCharacter.ANIM_GAME_KUSUDAMA_MISS;
 		public string ANIM_GAME_KUSUDAMA_IDLE => CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
 
-		public string ANIM_GAME_TOWER_STANDING = CCharacter.ANIM_GAME_TOWER_STANDING;
-		public string ANIM_GAME_TOWER_STANDING_TIRED = CCharacter.ANIM_GAME_TOWER_STANDING_TIRED;
-		public string ANIM_GAME_TOWER_CLIMBING = CCharacter.ANIM_GAME_TOWER_CLIMBING;
-		public string ANIM_GAME_TOWER_CLIMBING_TIRED = CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED;
-		public string ANIM_GAME_TOWER_RUNNING = CCharacter.ANIM_GAME_TOWER_RUNNING;
-		public string ANIM_GAME_TOWER_RUNNING_TIRED = CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED;
-		public string ANIM_GAME_TOWER_CLEAR = CCharacter.ANIM_GAME_TOWER_CLEAR;
-		public string ANIM_GAME_TOWER_CLEAR_TIRED = CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED;
-		public string ANIM_GAME_TOWER_FAIL = CCharacter.ANIM_GAME_TOWER_FAIL;
+		public string ANIM_GAME_TOWER_STANDING => CCharacter.ANIM_GAME_TOWER_STANDING;
+		public string ANIM_GAME_TOWER_STANDING_TIRED => CCharacter.ANIM_GAME_TOWER_STANDING_TIRED;
+		public string ANIM_GAME_TOWER_CLIMBING => CCharacter.ANIM_GAME_TOWER_CLIMBING;
+		public string ANIM_GAME_TOWER_CLIMBING_TIRED => CCharacter.ANIM_GAME_TOWER_CLIMBING_TIRED;
+		public string ANIM_GAME_TOWER_RUNNING => CCharacter.ANIM_GAME_TOWER_RUNNING;
+		public string ANIM_GAME_TOWER_RUNNING_TIRED => CCharacter.ANIM_GAME_TOWER_RUNNING_TIRED;
+		public string ANIM_GAME_TOWER_CLEAR => CCharacter.ANIM_GAME_TOWER_CLEAR;
+		public string ANIM_GAME_TOWER_CLEAR_TIRED => CCharacter.ANIM_GAME_TOWER_CLEAR_TIRED;
+		public string ANIM_GAME_TOWER_FAIL => CCharacter.ANIM_GAME_TOWER_FAIL;
 
 		public string ANIM_MENU_WAIT => CCharacter.ANIM_MENU_WAIT;
 		public string ANIM_MENU_START => CCharacter.ANIM_MENU_START;
