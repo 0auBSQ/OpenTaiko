@@ -86,4 +86,39 @@ namespace OpenTaiko {
 			return new LuaDataStorage(full_path);
 		}
 	}
+
+	/// <summary>
+	/// Read-only view of <see cref="LuaDataStorage"/>. <see cref="Write"/> is a no-op that logs an error.
+	/// Used inside ROActivity scripts to prevent persistent writes.
+	/// </summary>
+	public class LuaRODataStorage : LuaDataStorage {
+		public LuaRODataStorage(string path) : base(path) { }
+
+		private static void BlockWrite(string method) =>
+			LogNotification.PopError($"[ROActivity] '{method}' is a write operation and is not allowed in a read-only module.");
+
+		public new void Write(string key, string value) => BlockWrite("DATABASE.Write");
+	}
+
+	/// <summary>
+	/// Variant of <see cref="LuaDataStorageFunc"/> that returns <see cref="LuaRODataStorage"/> instances.
+	/// Registered as the <c>DATABASE</c> global inside ROActivity scripts.
+	/// </summary>
+	public class LuaRODataStorageFunc : LuaDataStorageFunc {
+		private string DirPath;
+
+		public LuaRODataStorageFunc(string dirPath) : base(dirPath) {
+			DirPath = dirPath;
+		}
+
+		public new LuaRODataStorage OpenLocalDatabase(string path) {
+			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+			return new LuaRODataStorage(full_path);
+		}
+
+		public new LuaRODataStorage OpenGlobalDatabase(string path) {
+			string full_path = DataPath.GetAbsoluteDataPath($@"LMDB/{path}");
+			return new LuaRODataStorage(full_path);
+		}
+	}
 }

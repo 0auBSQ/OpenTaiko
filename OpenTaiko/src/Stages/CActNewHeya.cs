@@ -539,7 +539,7 @@ class CActNewHeya : CActivity {
 
 								tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[0], y + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[1]);
 
-								OpenTaiko.NamePlate.lcNamePlate.DrawTitlePlate(x, y, 255, iType, tmpTex, rarity, id);
+								OpenTaiko.NamePlate.DrawTitlePlate(x, y, 255, iType, tmpTex, rarity, id);
 
 							}
 							break;
@@ -572,7 +572,7 @@ class CActNewHeya : CActivity {
 									danGrade = OpenTaiko.SaveFileInstances[CurrentPlayer].data.DanTitles[this.ttkDanTitles[index].str].clearStatus;
 								}
 
-								OpenTaiko.NamePlate.lcNamePlate.DrawDan(x, y, 255, danGrade, tmpTex);
+								OpenTaiko.NamePlate.DrawDan(x, y, 255, danGrade, tmpTex);
 
 								/*
 								TJAPlayer3.NamePlate.tNamePlateDisplayNamePlateBase(

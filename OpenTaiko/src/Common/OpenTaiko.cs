@@ -564,7 +564,7 @@ internal class OpenTaiko : Game {
 					}
 				}
 
-				OpenTaiko.NamePlate?.lcNamePlate.Update();
+				OpenTaiko.NamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
 				if (OpenTaiko.TJA != null) {
@@ -1763,6 +1763,8 @@ internal class OpenTaiko : Game {
 
 		// Fetch the skin modules first once the base is fully loaded
 		Skin.FetchMenusAndModules();
+		OpenTaiko.NamePlate.RefleshSkin();
+		OpenTaiko.ModalManager.RefleshSkin();
 
 		Trace.TraceInformation("Application successfully started.");
 

@@ -85,7 +85,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 							Modal.EModalType.Title,
 							HRarity.tRarityToModalInt(item.Value.rarity),
 							item,
-							OpenTaiko.NamePlate.lcNamePlate
+							OpenTaiko.NamePlate
 						),
 						_player);
 

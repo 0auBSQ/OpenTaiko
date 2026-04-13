@@ -1,27 +1,31 @@
-﻿namespace OpenTaiko;
-internal class CModalManager {
+namespace OpenTaiko;
 
-	public CLuaModalScript? lcModal { get; private set; }
-	public ModalQueue rModalQueue {
-		get;
-		private set;
-	}
+internal class CModalManager {
+	public ModalQueue rModalQueue { get; private set; }
 	private Modal? displayedModals;
 
-	public void RefleshSkin() {
-		lcModal?.Dispose();
-		lcModal = new CLuaModalScript(CSkin.Path("Modules/Modal"));
+	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("modal");
 
+	/// <summary>Returns true when the modal animation has finished (or no modal script exists).</summary>
+	private bool AnimationFinished() {
+		var result = Script?.Call("isAnimationFinished");
+		if (result == null || result.Length == 0) return true;
+		return (bool)result[0];
 	}
 
+	// Called by the skin system on skin refresh — ROActivities are managed by the skin loader.
+	public void RefleshSkin() { }
+
 	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
-		lcModal?.RegisterNewModal(player, rarity, modalType, args);
+		object[] newParams = new object[] { player, rarity, (int)modalType };
+		if (args != null) newParams = newParams.Concat((object[])args).ToArray();
+		Script?.Call("registerNewModal", newParams);
 	}
 
 	public void Draw() {
 		if (displayedModals != null) {
-			lcModal?.Update();
-			lcModal?.Draw();
+			Script?.Update();
+			Script?.Draw();
 		}
 	}
 
@@ -34,20 +38,16 @@ internal class CModalManager {
 	}
 
 	public bool InputManagement() {
-		if ((OpenTaiko.ModalManager.lcModal?.AnimationFinished() ?? true)) {
-			OpenTaiko.Skin.soundDecideSFX.tPlay(); // Include in module?
+		if (AnimationFinished()) {
+			OpenTaiko.Skin.soundDecideSFX.tPlay();
 
 			if (!rModalQueue.tAreBothQueuesEmpty()
 				&& (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
 					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
 				displayedModals = rModalQueue.tPopModalInOrder();
-
-
 			} else if (OpenTaiko.ConfigIni.nPlayerCount == 1 || rModalQueue.tAreBothQueuesEmpty()) {
-
 				if (!rModalQueue.tAreBothQueuesEmpty())
 					LogNotification.PopError("Unexpected Error: Exited results screen with remaining modals, this is likely due to a Lua script issue.");
-
 				displayedModals = null;
 				return true;
 			}
@@ -58,9 +58,5 @@ internal class CModalManager {
 	public CModalManager() {
 		rModalQueue = new ModalQueue();
 		displayedModals = null;
-		lcModal = null;
 	}
-
-
-
 }

@@ -376,7 +376,7 @@ class CStageHeya : CStage {
 
                 tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
                 */
-				OpenTaiko.NamePlate.lcNamePlate.DrawDan(scroll.Item1, scroll.Item2, 255, danGrade, tmpTex);
+				OpenTaiko.NamePlate.DrawDan(scroll.Item1, scroll.Item2, 255, danGrade, tmpTex);
 
 			}
 		}
@@ -424,7 +424,7 @@ class CStageHeya : CStage {
 
                 }
                 */
-				OpenTaiko.NamePlate.lcNamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex, _rarity, _titleid);
+				OpenTaiko.NamePlate.DrawTitlePlate(scroll.Item1, scroll.Item2, 255, iType, tmpTex, _rarity, _titleid);
 
 				//tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[0], scroll.Item2 + TJAPlayer3.Skin.Heya_Side_Menu_Font_Offset[1]);
 
