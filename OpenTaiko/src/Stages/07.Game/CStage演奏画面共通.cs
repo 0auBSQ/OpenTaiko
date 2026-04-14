@@ -3216,7 +3216,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				} else {
 					if (!this.bPAUSE && !this.isRewinding) {
 						if (chip.nRollCount > 0) {
-							CCharacter character = CCharacter.GetCharacter(iPlayer);
+							actChara.b風船連打中[iPlayer] = false;
+							actChara.ReturnDefaultAnime(iPlayer, true);
 							actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
 						}
 					}

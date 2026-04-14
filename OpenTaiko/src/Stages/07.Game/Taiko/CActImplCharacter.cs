@@ -458,7 +458,7 @@ internal class CActImplCharacter : CActivity {
 			}
 
 
-			if ((this.b風船連打中[i] != true) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			if ((!b風船連打中[i] && !IsPlayingBalloonAction(i)) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
 				if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
