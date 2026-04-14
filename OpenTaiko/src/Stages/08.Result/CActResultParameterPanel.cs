@@ -193,7 +193,7 @@ internal class CActResultParameterPanel : CActivity {
 		for (int i = 0; i < 5; i++) {
 			ttkSpeechText[i] = new TitleTextureKey[6];
 
-			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[i].data.Character;
 
 			for (int j = 0; j < 6; j++) {
 				// { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" }
@@ -751,7 +751,7 @@ internal class CActResultParameterPanel : CActivity {
 
 				#region [Character Animations]
 
-				int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(p)].data.Character;
+				int _charaId = OpenTaiko.SaveFileInstances[p].data.Character;
 
 				//int chara_x = TJAPlayer3.Skin.Characters_Result_X[_charaId][pos];
 				//int chara_y = TJAPlayer3.Skin.Characters_Result_Y[_charaId][pos];
@@ -1207,13 +1207,13 @@ internal class CActResultParameterPanel : CActivity {
 
 	private void CheckClear(int player) {
 		if (OpenTaiko.stageResults.nクリア[player] >= 1) {
-			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+			CCharacter character = CCharacter.GetCharacter(player);
 			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARSUCCESS);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_CLEAR;
 			characterController[player].ResetCounter(player);
 		} else {
-			CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+			CCharacter character = CCharacter.GetCharacter(player);
 			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARFAILED);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_FAILED;

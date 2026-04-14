@@ -444,7 +444,7 @@ internal class CActImplBackground : CActivity {
 
 			#region [Climbing don]
 
-			CCharacter character = CCharacter.GetCharacter(OpenTaiko.SaveFile);
+			CCharacter character = CCharacter.GetCharacter(0);
 			float liveState = (CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives);
 			bool ctIsTired = !(liveState >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
 

@@ -241,8 +241,8 @@ class ScriptBG : IDisposable {
 
 			if (OpenTaiko.Tx.Puchichara != null && OpenTaiko.Tx.Characters != null) {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					raritiesP[i] = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(i))].metadata.Rarity;
-					raritiesC[i] = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character].metadata.Rarity;
+					raritiesP[i] = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(i)].metadata.Rarity;
+					raritiesC[i] = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[i].data.Character].metadata.Rarity;
 				}
 			}
 

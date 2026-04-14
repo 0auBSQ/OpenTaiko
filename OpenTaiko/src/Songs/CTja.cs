@@ -723,8 +723,8 @@ internal class CTja : CActivity {
 	public void tApplyFunMods(int player = 0) {
 		Random rnd = new System.Random();
 
-		var eFun = OpenTaiko.ConfigIni.nFunMods[OpenTaiko.GetActualPlayer(player)];
-		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
+		var eFun = OpenTaiko.ConfigIni.nFunMods[player];
+		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character];
 
 		var bombFactor = Math.Max(1, Math.Min(100, chara.effect.BombFactor));
 		var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
@@ -769,7 +769,7 @@ internal class CTja : CActivity {
 		//2016.02.11 kairera0467
 		Random rnd = new System.Random();
 
-		var eRandom = OpenTaiko.ConfigIni.eRandom[OpenTaiko.GetActualPlayer(player)];
+		var eRandom = OpenTaiko.ConfigIni.eRandom[player];
 
 		switch (eRandom) {
 			case ERandomMode.Mirror:
@@ -869,7 +869,7 @@ internal class CTja : CActivity {
 				break;
 		}
 
-		if (OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayerSide))].effect.AllPurple) {
+		if (OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayerSide)].effect.AllPurple) {
 			foreach (var chip in this.listChip) {
 				if (chip.nChannelNo is 0x13 or 0x1A or 0x14 or 0x1B) {
 					chip.nChannelNo = 0x101;

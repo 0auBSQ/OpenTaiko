@@ -26,7 +26,7 @@ class CNamePlate {
 	}
 
 	public void tNamePlateRefreshTitles(int player) {
-		int actualPlayer = OpenTaiko.GetActualPlayer(player);
+		int actualPlayer = player;
 
 		string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
@@ -54,7 +54,7 @@ class CNamePlate {
 
 	public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255) {
 		int basePlayer = player;
-		player = OpenTaiko.GetActualPlayer(player);
+		player = player;
 
 		bool isAI = OpenTaiko.ConfigIni.bAIBattleMode && basePlayer == 1;
 		if (bIsPrevAI[basePlayer] != isAI) {

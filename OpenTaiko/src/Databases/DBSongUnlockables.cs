@@ -76,7 +76,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = OpenTaiko.GetActualPlayer(_player);
+		int player = _player;
 		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedSongs;
 		bool _edited = false;
 
@@ -112,7 +112,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 
 	public bool tIsSongLocked(CSongListNode? song) {
 		if (song == null || OpenTaiko.ConfigIni.bIgnoreSongUnlockables) return false;
-		return !OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Contains(song.tGetUniqueId())
+		return !OpenTaiko.SaveFileInstances[0].data.UnlockedSongs.Contains(song.tGetUniqueId())
 			   && data.ContainsKey(song.tGetUniqueId());
 	}
 

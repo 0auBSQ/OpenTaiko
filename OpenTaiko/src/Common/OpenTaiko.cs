@@ -252,16 +252,9 @@ internal class OpenTaiko : Game {
 	}
 	public static DiscordRpcClient DiscordClient;
 
-	// 0 : 1P, 1 : 2P
-	public static int SaveFile = 0;
-
 	public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
-	public static SaveFile PrimarySaveFile {
-		get {
-			return SaveFileInstances[SaveFile];
-		}
-	}
+	public static SaveFile PrimarySaveFile => SaveFileInstances[0];
 
 	// 0 : Hidari, 1 : Migi (1P only)
 	public static int PlayerSide = 0;
@@ -281,14 +274,6 @@ internal class OpenTaiko : Game {
 	public static LuaGlobalStores GlobalStores {
 		get;
 		private set;
-	}
-
-	public static int GetActualPlayer(int player) {
-		if (SaveFile == 0 || player > 1)
-			return player;
-		if (player == 0)
-			return 1;
-		return 0;
 	}
 
 	public static bool P1IsBlue() {
@@ -1712,7 +1697,6 @@ internal class OpenTaiko : Game {
 		stageChangeSkin = new CStageChangeSkin();
 		stageExit = new CStage終了();
 		NamePlate = new CNamePlate();
-		SaveFile = 0;
 
 		this.listTopLevelActivities.Add(actEnumSongs);
 		this.listTopLevelActivities.Add(actTextConsole);

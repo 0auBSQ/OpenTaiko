@@ -27,7 +27,7 @@ internal class DBSaves {
 	}
 
 	public static Int64 GetPlayerSaveId(int player) {
-		return OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.SaveId;
+		return OpenTaiko.SaveFileInstances[player].data.SaveId;
 	}
 
 	#region [Unlocked Dan Titles]
@@ -386,7 +386,7 @@ internal class DBSaves {
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return false;
 
-		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
+		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[player].data;
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
 		var choosenSong = OpenTaiko.stageSongSelect.rChoosenSong;
 		var choosenDifficulty = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];

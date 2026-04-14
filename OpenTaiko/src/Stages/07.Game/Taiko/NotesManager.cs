@@ -199,7 +199,7 @@ class NotesManager {
 	}
 
 	public static EGameType GetChipGameType(CChip pChip, int nPlayer)
-		=> pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[OpenTaiko.GetActualPlayer(nPlayer)];
+		=> pChip.eGameType ?? OpenTaiko.ConfigIni.nGameType[nPlayer];
 	#endregion
 
 	#region [General]
@@ -333,7 +333,7 @@ class NotesManager {
 			OpenTaiko.Tx.Note_Kusu?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
 		} else if (IsADLIB(chip)) {
-			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
+			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
 			if (puchichara.effect.ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
 				OpenTaiko.Tx.Note_Adlib?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));

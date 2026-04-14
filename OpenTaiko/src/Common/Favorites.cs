@@ -12,15 +12,15 @@ internal class Favorites {
 
 	public void tToggleFavorite(string chartID) {
 		if (tIsFavorite(chartID))
-			data.favorites[OpenTaiko.SaveFile].Remove(chartID);
+			data.favorites[0].Remove(chartID);
 		else
-			data.favorites[OpenTaiko.SaveFile].Add(chartID);
+			data.favorites[0].Add(chartID);
 
 		tSaveFile();
 	}
 
 	public bool tIsFavorite(string chartID) {
-		return (data.favorites[OpenTaiko.SaveFile].Contains(chartID));
+		return (data.favorites[0].Contains(chartID));
 	}
 
 

@@ -67,7 +67,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = OpenTaiko.GetActualPlayer(_player);
+		int player = _player;
 		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedNameplateIds;
 		bool _edited = false;
 

@@ -725,7 +725,7 @@ class CActSelect段位リスト : CStage {
 						stバー情報[i].cDanTickColor = song.score[6].譜面情報.cDanTickColor;
 
 						//stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
-						var TableEntry = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.tGetSongSelectTableEntry(song.tGetUniqueId());
+						var TableEntry = OpenTaiko.SaveFileInstances[0].data.tGetSongSelectTableEntry(song.tGetUniqueId());
 						stバー情報[i].clearGrade = TableEntry.ClearStatuses[(int)Difficulty.Dan];
 
 						string barCenter = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";

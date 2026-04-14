@@ -41,7 +41,7 @@ class CStageHeya : CStage {
 		ScrollCounter = new CCounter(0, 1000, 0.15f, OpenTaiko.Timer);
 
 		// 1P, configure later for default 2P
-		iPlayer = OpenTaiko.SaveFile;
+		iPlayer = 0;
 
 		#region [Main menu]
 
@@ -589,7 +589,7 @@ class CStageHeya : CStage {
 					OpenTaiko.Tx.ReloadCharacter(OpenTaiko.SaveFileInstances[iPlayer].data.Character, iCharacterCurrent, iPlayer);
 					OpenTaiko.SaveFileInstances[iPlayer].data.Character = iCharacterCurrent;
 
-					CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(0));
+					CCharacter character = CCharacter.GetCharacter(0);
 
 					// Update the character
 					OpenTaiko.SaveFileInstances[iPlayer].tUpdateCharacterName(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
@@ -873,7 +873,7 @@ class CStageHeya : CStage {
 
 		if (OpenTaiko.Tx.Characters[iCharacterCurrent].unlock != null
 			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName)) {
-			(bool, string?) response = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(OpenTaiko.SaveFile);
+			(bool, string?) response = OpenTaiko.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(0);
 			//TJAPlayer3.Tx.Characters[iCharacterCurrent].unlock.tConditionMet(
 			//new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 
@@ -911,7 +911,7 @@ class CStageHeya : CStage {
 
 		if (OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock != null
 			&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[iPuchiCharaCurrent])) {
-			(bool, string?) response = OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMet(OpenTaiko.SaveFile);
+			(bool, string?) response = OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].unlock.tConditionMet(0);
 			//tConditionMet(
 			//new int[] { TJAPlayer3.SaveFileInstances[TJAPlayer3.SaveFile].data.Medals });
 

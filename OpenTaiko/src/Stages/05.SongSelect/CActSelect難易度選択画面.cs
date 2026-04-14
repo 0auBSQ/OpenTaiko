@@ -268,7 +268,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 									}
 
 									for (int i2 = 0; i2 < OpenTaiko.ConfigIni.nPlayerCount; i2++) {
-										CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i2));
+										CCharacter character = CCharacter.GetCharacter(i2);
 										if (OpenTaiko.ConfigIni.bAIBattleMode) {
 											character.PlayVoice(i2, CCharacter.VOICE_MENU_SONGDECIDE_AI);
 										} else {
@@ -391,7 +391,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;
 
-				int p = OpenTaiko.GetActualPlayer(j);
+				int p = j;
 
 				CScore.ST譜面情報 idx = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報;
 

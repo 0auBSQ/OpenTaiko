@@ -439,7 +439,7 @@ internal class CActPlayOption : CActivity {
 	}
 
 	public void Init(int player) {
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		#region [ Speed ]
 
@@ -550,7 +550,7 @@ internal class CActPlayOption : CActivity {
 	}
 
 	public void Decision(int player) {
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		#region [ Speed ]
 
@@ -701,7 +701,7 @@ internal class CActPlayOption : CActivity {
 
 	public float tGetModMultiplier(EBalancingType ebt = EBalancingType.SCORE, bool isMenu = false, int player = 0) {
 		float factor = 1f;
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		//factor *= tGetScrollSpeedFactor(ebt, isMenu, actual);
 		factor *= tGetSongSpeedFactor(ebt, isMenu, actual);

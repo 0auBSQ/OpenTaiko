@@ -174,7 +174,7 @@ internal class CSongDict {
 	public static List<CSongListNode> tFetchFavoriteFolder(CSongListNode parent) {
 		List<CSongListNode> childList = new List<CSongListNode>();
 
-		foreach (string id in OpenTaiko.Favorites.data.favorites[OpenTaiko.SaveFile]) {
+		foreach (string id in OpenTaiko.Favorites.data.favorites[0]) {
 			var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 			if (node != null) {
 				childList.Add(node);
@@ -195,7 +195,7 @@ internal class CSongDict {
 	public static List<CSongListNode> tFetchRecentlyPlayedSongsFolder(CSongListNode parent) {
 		List<CSongListNode> childList = new List<CSongListNode>();
 
-		foreach (string id in OpenTaiko.RecentlyPlayedSongs.data.recentlyplayedsongs[OpenTaiko.SaveFile].Reverse()) {
+		foreach (string id in OpenTaiko.RecentlyPlayedSongs.data.recentlyplayedsongs[0].Reverse()) {
 			var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 			if (node != null) {
 				childList.Add(node);
@@ -304,7 +304,7 @@ internal class CSongDict {
 	public static void tRefreshScoreTables() {
 		for (int pl = 0; pl < 5; pl++) {
 			CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
-			var BestPlayStats = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(pl)].data.bestPlaysStats;
+			var BestPlayStats = OpenTaiko.SaveFileInstances[pl].data.bestPlaysStats;
 
 			for (int s = 0; s <= (int)Difficulty.Edit + 1; s++) {
 				CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];

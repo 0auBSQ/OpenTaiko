@@ -21,7 +21,7 @@ internal class CActImplCharacter : CActivity {
 			ctKusuIn = new();
 
 			// Currently used character
-			int p = OpenTaiko.GetActualPlayer(i);
+			int p = i;
 
 			this.iCurrentCharacter[i] = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[p].data.Character, OpenTaiko.Tx.Characters.Length - 1));
 			CharacterControllers[i] = new CCharacterController(i);

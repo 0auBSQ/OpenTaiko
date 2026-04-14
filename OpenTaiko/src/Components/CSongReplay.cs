@@ -234,7 +234,7 @@ class CSongReplay {
 
 	public void tResultsRegisterReplayInformations(int Coins, int Clear, int SRank) {
 		// Actual player (Used for saved informations)
-		int actualPlayer = OpenTaiko.GetActualPlayer(storedPlayer);
+		int actualPlayer = storedPlayer;
 
 		// Game mode
 		switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {

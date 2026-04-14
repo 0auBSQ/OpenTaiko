@@ -1054,10 +1054,10 @@ internal class CActConfigList : CActivity {
 		#endregion
 
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
-			int id = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.TitleId;
+			int id = OpenTaiko.SaveFileInstances[i].data.TitleId;
 			if (id > 0) {
 				var title = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
-				OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Title = title.nameplateInfo.cld.GetString("");
+				OpenTaiko.SaveFileInstances[i].data.Title = title.nameplateInfo.cld.GetString("");
 			}
 			OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
 		}

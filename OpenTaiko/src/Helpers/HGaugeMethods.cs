@@ -123,7 +123,7 @@ class HGaugeMethods {
 	public static EGaugeType? tGetGaugeTypeEnum(CTja? tja) => tja?.forceGauge;
 	public static EGaugeType tGetGaugeTypeEnum(int player)
 		=> tGetGaugeTypeEnum(OpenTaiko.GetTJA(player))
-			?? tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character]);
+			?? tGetGaugeTypeEnum(OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character]);
 
 	public static bool tNormaCheck(Difficulty diff, int level, EGaugeType gaugeType, float percentObtained, float killZonePercent) {
 		float percent = Math.Min(100f, Math.Max(0f, percentObtained));

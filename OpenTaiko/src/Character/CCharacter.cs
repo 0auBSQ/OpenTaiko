@@ -141,7 +141,7 @@ abstract class CCharacter : IDisposable {
 	};
 
 	public static CCharacter GetCharacter(int player) {
-		int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 		return OpenTaiko.Tx.Characters[_charaId];
 	}
 
@@ -308,7 +308,7 @@ abstract class CCharacter : IDisposable {
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = OpenTaiko.GetActualPlayer(_player);
+		int player = _player;
 		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedCharacters;
 		bool _edited = false;
 

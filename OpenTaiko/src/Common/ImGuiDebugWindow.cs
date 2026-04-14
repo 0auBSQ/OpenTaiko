@@ -241,7 +241,7 @@ public static class ImGuiDebugWindow {
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (ImGui.TreeNodeEx($"Player {i + 1}###TREE_PROFILE_{i}", ImGuiTreeNodeFlags.Framed | ImGuiTreeNodeFlags.DefaultOpen)) {
-					int save = i == 0 ? OpenTaiko.SaveFile : i;
+					int save = i == 0 ? 0 : i;
 
 					if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
 						ImGui.TextColored(new System.Numerics.Vector4(0.4f, 0.8f, 1.0f, 1.0f), "2P is occupied. AI Battle is active.");

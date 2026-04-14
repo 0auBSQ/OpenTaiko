@@ -216,7 +216,7 @@ class CActNewHeya : CActivity {
 								OpenTaiko.Skin.soundCancelSFX.tPlay();
 								break;
 							default: {
-									CurrentPlayer = OpenTaiko.GetActualPlayer(CurrentIndex - 1);
+									CurrentPlayer = CurrentIndex - 1;
 									SetState(SelectableInfo.ModeSelect);
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
 								}
@@ -593,7 +593,7 @@ class CActNewHeya : CActivity {
 		OpenTaiko.Tx.NewHeya_Close.t2D描画(0, 0);
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			OpenTaiko.Tx.NewHeya_PlayerPlate[OpenTaiko.GetActualPlayer(i)].t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[i], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[i]);
+			OpenTaiko.Tx.NewHeya_PlayerPlate[i].t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[i], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[i]);
 		}
 
 		for (int i = 0; i < 5; i++) {

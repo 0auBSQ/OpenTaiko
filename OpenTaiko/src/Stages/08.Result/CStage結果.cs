@@ -256,7 +256,7 @@ internal class CStage結果 : CStage {
 						string dan_title = OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags();
 						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 
-						this.newGradeGranted = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
+						this.newGradeGranted = OpenTaiko.SaveFileInstances[0].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
 					}
 
 					#endregion
@@ -362,8 +362,8 @@ internal class CStage結果 : CStage {
 			};
 
 			float getCoinMul(int player) {
-				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character];
-				var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
+				var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character];
+				var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
 
 				return HGaugeMethods.GetCoinMultiplier(HGaugeMethods.tGetGaugeTypeEnum(player))
 					* chara.GetEffectCoinMultiplier(gaugeEnabled: false)
@@ -515,7 +515,7 @@ internal class CStage結果 : CStage {
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1)
 					this.nEarnedMedalsCount[i] = 0;
 
-				var _sf = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)];
+				var _sf = OpenTaiko.SaveFileInstances[i];
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 0) {
 					_sf.tRegisterAIBattleModePlay(bClear[0]);
@@ -580,7 +580,7 @@ internal class CStage結果 : CStage {
 							Modal.EModalType.Coin,
 							0,
 							(long)this.nEarnedMedalsCount[i],
-							OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Medals
+							OpenTaiko.SaveFileInstances[i].data.Medals
 						),
 						i);
 

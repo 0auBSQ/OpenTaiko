@@ -53,7 +53,7 @@ class PuchiChara : CActivity {
 		SineCounter.TickLoopDB();
 		SineCounterIdle.TickLoop();
 
-		int p = OpenTaiko.GetActualPlayer(player);
+		int p = player;
 
 		if (inGame)
 			sineY = (double)SineCounter.CurrentValue;

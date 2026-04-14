@@ -888,7 +888,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		// To change later to adapt to Tower Ama-kuchi
 		//diff = Math.Min(diff, (int)Difficulty.Oni);
 
-		int idxPlayerActual = OpenTaiko.GetActualPlayer(idxPlayer);
+		int idxPlayerActual = idxPlayer;
 		int timingShift = OpenTaiko.ConfigIni.nTimingZones[idxPlayerActual];
 
 		bool _timingzonesAreEasy = tEasyTimeZones(idxPlayer);
@@ -916,7 +916,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				return (msTjaTime >= pChip.n発声時刻ms - 17 && msTjaTime < pChip.end.n発声時刻ms) ? ENoteJudge.Perfect : ENoteJudge.Miss;
 			}
 
-			int actual = OpenTaiko.GetActualPlayer(player);
+			int actual = player;
 			CConfigIni.CTimingZones tz = GetTimingZones(player);
 
 			if (nDeltaTime <= CTja.GameDurationToTjaDuration(tz.nGoodZone)) {
@@ -1041,7 +1041,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (!pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
 			return;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
-		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(iPlayer))];
+		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(iPlayer)];
 
 		int rollSpeed = bAutoPlay ? OpenTaiko.ConfigIni.nRollsPerSec : puchichara.effect.Autoroll;
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1)
@@ -1064,7 +1064,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
-		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(iPlayer))];
+		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(iPlayer)];
 		if (!(bAutoPlay || puchichara.effect.Autoroll > 0))
 			return;
 
@@ -3582,7 +3582,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			nCurrentKusudamaRollCount = 0;
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(i));
+				CCharacter character = CCharacter.GetCharacter(i);
 
 				this.Chara_MissCount[i] = 0;
 				this.bIsMiss[i] = false;

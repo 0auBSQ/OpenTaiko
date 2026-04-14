@@ -189,7 +189,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Instead, we want them focused on the sounds of their keyboard, tatacon,
 		// other controller, etc. and the sounds of the input calibration audio file.
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			int actual = OpenTaiko.GetActualPlayer(i);
+			int actual = i;
 
 			var hs = OpenTaiko.Skin.hsHitSoundsInformations;
 
@@ -710,10 +710,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	protected override void ドラムスクロール速度アップ() {
-		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Min(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] + 1, CConfigIni.MaximumScrollSpeed);
+		OpenTaiko.ConfigIni.nScrollSpeed[0] = Math.Min(OpenTaiko.ConfigIni.nScrollSpeed[0] + 1, CConfigIni.MaximumScrollSpeed);
 	}
 	protected override void ドラムスクロール速度ダウン() {
-		OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = Math.Max(OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] - 1, CConfigIni.MinimumScrollSpeed);
+		OpenTaiko.ConfigIni.nScrollSpeed[0] = Math.Max(OpenTaiko.ConfigIni.nScrollSpeed[0] - 1, CConfigIni.MinimumScrollSpeed);
 	}
 
 	private void t進行描画_チップファイアD() {
@@ -762,7 +762,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime) {
 		// test judgement
 		var (chipNoHit, e判定) = GetChipToJudge(msHitTjaTime, nUsePlayer, nPad);
-		var gameType = this.eGameType[OpenTaiko.GetActualPlayer(nUsePlayer)];
+		var gameType = this.eGameType[nUsePlayer];
 		if (e判定 != ENoteJudge.Miss) {
 			e判定 = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, e判定);
 			if (e判定 is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
@@ -872,7 +872,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				#endregion
 
 				#region[ HIDSUD & STEALTH ]
-				EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)];
+				EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[nPlayer];
 				if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
 					hiddenMode = EStealthMode.Stealth;
 				if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])
@@ -882,7 +882,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				long __dbt = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				long time = pChip.n発声時刻ms - __dbt;
 
-				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
+				if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayer)].effect.SplitLane) {
 					if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt)) {
 						y -= NotesManager.PxSplitLaneDistance;
 					} else if (NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsAcceptRed(pChip, _gt)) {
@@ -1074,7 +1074,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 			}
 
-			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(nPlayer))].effect.SplitLane) {
+			if (bSplitLane[nPlayer] || OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(nPlayer)].effect.SplitLane) {
 				if (NotesManager.IsAcceptRed(pChip, _gt) && !NotesManager.IsAcceptBlue(pChip, _gt) && !NotesManager.IsGenericBalloon(pChip)) {
 					y -= NotesManager.PxSplitLaneDistance;
 					y末端 -= NotesManager.PxSplitLaneDistance;
@@ -1090,7 +1090,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 
 			#region[ HIDSUD & STEALTH ]
-			EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.GetActualPlayer(nPlayer)];
+			EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[nPlayer];
 			if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
 				hiddenMode = EStealthMode.Stealth;
 			if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])

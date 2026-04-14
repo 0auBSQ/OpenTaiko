@@ -569,7 +569,7 @@ internal class CStageSongSelect : CStage {
 			for (int player = 0; player < OpenTaiko.ConfigIni.nPlayerCount; player++) {
 				//CCounter ___cc = CMenuCharacter._getReferenceCounter(CMenuCharacter.ECharacterAnimation.SELECT)[player];
 
-				int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+				int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 
 				//int chara_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player];
 				//int chara_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player];
@@ -583,7 +583,7 @@ internal class CStageSongSelect : CStage {
 				int puchi_x = chara_x + OpenTaiko.Skin.Adjustments_MenuPuchichara_X[player % 2];
 				int puchi_y = chara_y + OpenTaiko.Skin.Adjustments_MenuPuchichara_Y[player % 2];
 
-				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
+				CCharacter character = CCharacter.GetCharacter(player);
 
 				CharacterController[player].Update(player);
 				CharacterController[player].Draw(player, chara_x, chara_y, (player % 2 == 1) ? -1.0f : 1.0f, 1.0f, 255, Color4.White);
@@ -654,7 +654,7 @@ internal class CStageSongSelect : CStage {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;
 
-				int p = OpenTaiko.GetActualPlayer(i);
+				int p = i;
 
 				OpenTaiko.Tx.SongSelect_Table[currentPads[i]]?.t2D描画(OpenTaiko.Skin.SongSelect_Table_X[i], OpenTaiko.Skin.SongSelect_Table_Y[i]);
 
@@ -679,7 +679,7 @@ internal class CStageSongSelect : CStage {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;
 
-				int p = OpenTaiko.GetActualPlayer(i);
+				int p = i;
 
 				if (OpenTaiko.SaveFileInstances[p].data.Medals >= 0)
 					tBoardNumberDraw(OpenTaiko.Skin.SongSelect_BoardNumber_X[i][11], OpenTaiko.Skin.SongSelect_BoardNumber_Y[i][11], (int)OpenTaiko.SaveFileInstances[p].data.Medals);
@@ -911,7 +911,7 @@ internal class CStageSongSelect : CStage {
 														var SongToUnlock = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(this.rNowSelectedSong);
 
 														if (SongToUnlock != null) {
-															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMet(OpenTaiko.SaveFile, CUnlockCondition.EScreen.SongSelect);
+															(bool, string?) response = SongToUnlock.unlockConditions.tConditionMet(0, CUnlockCondition.EScreen.SongSelect);
 
 															Color responseColor = (response.Item1) ? Color.Lime : Color.Red;
 															if (actSongList.ttkNowUnlockConditionText is not null) {
@@ -922,16 +922,16 @@ internal class CStageSongSelect : CStage {
 															}
 
 															if (response.Item1) {
-																OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.UnlockedSongs.Add(this.rNowSelectedSong?.tGetUniqueId() ?? "");
+																OpenTaiko.SaveFileInstances[0].data.UnlockedSongs.Add(this.rNowSelectedSong?.tGetUniqueId() ?? "");
 																DBSaves.RegisterStringUnlockedAsset(
-																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.SaveId,
+																	OpenTaiko.SaveFileInstances[0].data.SaveId,
 																	"unlocked_songs",
 																	this.rNowSelectedSong?.tGetUniqueId() ?? ""                     // Can't be null in this context
 																);
 																if (SongToUnlock.unlockConditions is CUnlockCM)
-																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
+																	OpenTaiko.SaveFileInstances[0].tSpendCoins(SongToUnlock.unlockConditions.Values[0]);
 																else if (SongToUnlock.unlockConditions is CUnlockAndComb || SongToUnlock.unlockConditions is CUnlockOrComb)
-																	OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].tSpendCoins(SongToUnlock.unlockConditions.CoinStack);
+																	OpenTaiko.SaveFileInstances[0].tSpendCoins(SongToUnlock.unlockConditions.CoinStack);
 																// Play modal animation here ?
 															} else
 																OpenTaiko.Skin.soundError.tPlay();

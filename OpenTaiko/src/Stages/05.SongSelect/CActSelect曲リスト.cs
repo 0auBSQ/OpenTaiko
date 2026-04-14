@@ -385,7 +385,7 @@ internal class CActSelect曲リスト : CActivity {
 				this.stバー情報[index].nクリア[i] = new int[5];
 				this.stバー情報[index].nスコアランク[i] = new int[5];
 
-				int ap = OpenTaiko.GetActualPlayer(i);
+				int ap = i;
 				//var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 
 				var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());
@@ -523,7 +523,7 @@ internal class CActSelect曲リスト : CActivity {
 				this.stバー情報[index].nクリア[i] = new int[5];
 				this.stバー情報[index].nスコアランク[i] = new int[5];
 
-				int ap = OpenTaiko.GetActualPlayer(i);
+				int ap = i;
 				//var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 				var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());
 
@@ -1449,7 +1449,7 @@ internal class CActSelect曲リスト : CActivity {
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 							if (i >= 2) continue;
 
-							int ap = OpenTaiko.GetActualPlayer(i);
+							int ap = i;
 
 							var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
 
@@ -1469,7 +1469,7 @@ internal class CActSelect曲リスト : CActivity {
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 							if (i >= 2) continue;
 
-							int ap = OpenTaiko.GetActualPlayer(i);
+							int ap = i;
 							var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(rCurrentlySelectedSong.tGetUniqueId());
 
 							int[] clear = TableEntry.ClearStatuses;
@@ -1487,7 +1487,7 @@ internal class CActSelect曲リスト : CActivity {
 						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 							if (i >= 2) continue;
 
-							int ap = OpenTaiko.GetActualPlayer(i);
+							int ap = i;
 							var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(OpenTaiko.stageSongSelect.rNowSelectedSong.tGetUniqueId());
 
 							int[] クリア = TableEntry.ClearStatuses;
@@ -2709,7 +2709,7 @@ internal class CActSelect曲リスト : CActivity {
 				this.stバー情報[i].nスコアランク[d] = new int[5];
 
 				if (this.stバー情報[i].eバー種別 == Eバー種別.Score) {
-					int ap = OpenTaiko.GetActualPlayer(d);
+					int ap = d;
 					//var sr = song.arスコア[n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)];
 
 					var TableEntry = OpenTaiko.SaveFileInstances[ap].data.tGetSongSelectTableEntry(song.tGetUniqueId());

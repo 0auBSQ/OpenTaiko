@@ -15,7 +15,7 @@ class ModIcons {
 
 	static public void tDisplayMods(int x, int y, int player) {
 		// +30 x/y
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		for (int i = 0; i < 8; i++) {
 			__methods[i](x + OpenTaiko.Skin.ModIcons_OffsetX[i], y + OpenTaiko.Skin.ModIcons_OffsetY[i], actual, player);
@@ -26,7 +26,7 @@ class ModIcons {
 		if (OpenTaiko.Tx.Mod_None != null)
 			OpenTaiko.Tx.Mod_None.Opacity = 0;
 
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		for (int i = 0; i < 8; i++) {
 			__methods[i](x + OpenTaiko.Skin.ModIcons_OffsetX_Menu[i], y + OpenTaiko.Skin.ModIcons_OffsetY_Menu[i], actual, player);
@@ -141,7 +141,7 @@ class ModIcons {
 	#region [Mod flags]
 
 	static public bool tPlayIsStock(int player) {
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		if (OpenTaiko.ConfigIni.nFunMods[actual] != EFunMods.None) return false;
 		if (OpenTaiko.ConfigIni.bJust[actual] != 0) return false;
@@ -155,7 +155,7 @@ class ModIcons {
 	}
 	static public Int64 tModsToPlayModsFlags(int player) {
 		byte[] _flags = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
-		int actual = OpenTaiko.GetActualPlayer(player);
+		int actual = player;
 
 		_flags[0] = (byte)Math.Min(255, OpenTaiko.ConfigIni.nScrollSpeed[actual]);
 		_flags[1] = (byte)OpenTaiko.ConfigIni.eSTEALTH[actual];

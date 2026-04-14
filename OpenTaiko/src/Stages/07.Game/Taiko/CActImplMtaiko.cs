@@ -208,7 +208,7 @@ internal class CActImplMtaiko : CActivity {
 				taiko_y = OpenTaiko.Skin.Game_Taiko_Y[i];
 			}
 
-			int _actual = OpenTaiko.GetActualPlayer(i);
+			int _actual = i;
 			EGameType _gt = OpenTaiko.stageGameScreen.eGameType[_actual];
 
 			// Drum base

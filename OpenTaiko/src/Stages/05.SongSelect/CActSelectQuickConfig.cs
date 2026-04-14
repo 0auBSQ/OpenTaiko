@@ -39,7 +39,7 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 		#region [ 共通 Target/AutoMode/AutoLane ]
 		#endregion
 		#region [ 個別 ScrollSpeed ]
-		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), CConfigIni.MinimumScrollSpeed, CConfigIni.MaximumScrollSpeed, OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile],
+		l.Add(new CItemInteger(CLangManager.LangInstance.GetString("MOD_SPEED"), CConfigIni.MinimumScrollSpeed, CConfigIni.MaximumScrollSpeed, OpenTaiko.ConfigIni.nScrollSpeed[0],
 			""));
 		#endregion
 		#region [ 共通 Dark/Risky/PlaySpeed ]
@@ -47,10 +47,10 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 			""));
 		#endregion
 		#region [ 個別 Sud/Hid ]
-		l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_RANDOM"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eRandom[OpenTaiko.SaveFile],
+		l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_RANDOM"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eRandom[0],
 			"",
 			new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_RANDOM"), CLangManager.LangInstance.GetString("MOD_FLIP"), "SUPER", "HYPER" }));
-		l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_HIDE"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile],
+		l.Add(new CItemList(CLangManager.LangInstance.GetString("MOD_HIDE"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eSTEALTH[0],
 			"",
 			new string[] { CLangManager.LangInstance.GetString("MOD_SWITCH_OFF"), CLangManager.LangInstance.GetString("MOD_HIDE"), CLangManager.LangInstance.GetString("MOD_STEALTH") }));
 		l.Add(new CItemList(CLangManager.LangInstance.GetString("SETTINGS_GAME_SURVIVAL"), CItemBase.EPanelType.Normal, (int)OpenTaiko.ConfigIni.eGameMode,
@@ -82,17 +82,17 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 	public override void tEnter押下Main(int nSortOrder) {
 		switch (n現在の選択行) {
 			case (int)EOrder.ScrollSpeed:
-				OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = (int)GetObj現在値((int)EOrder.ScrollSpeed);
+				OpenTaiko.ConfigIni.nScrollSpeed[0] = (int)GetObj現在値((int)EOrder.ScrollSpeed);
 				break;
 
 			case (int)EOrder.PlaySpeed:
 				OpenTaiko.ConfigIni.nSongSpeed = (int)GetObj現在値((int)EOrder.PlaySpeed);
 				break;
 			case (int)EOrder.Random:
-				OpenTaiko.ConfigIni.eRandom[OpenTaiko.SaveFile] = (ERandomMode)GetIndex((int)EOrder.Random);
+				OpenTaiko.ConfigIni.eRandom[0] = (ERandomMode)GetIndex((int)EOrder.Random);
 				break;
 			case (int)EOrder.Stealth:
-				OpenTaiko.ConfigIni.eSTEALTH[OpenTaiko.SaveFile] = (EStealthMode)GetIndex((int)EOrder.Stealth);
+				OpenTaiko.ConfigIni.eSTEALTH[0] = (EStealthMode)GetIndex((int)EOrder.Stealth);
 				break;
 			case (int)EOrder.GameMode:
 				EGame game = EGame.Off;

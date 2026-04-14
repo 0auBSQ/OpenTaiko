@@ -59,7 +59,7 @@ internal class CAct演奏Combo音声 : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region [Combo voices]
 
-			int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character;
+			int _charaId = OpenTaiko.SaveFileInstances[i].data.Character;
 
 			var currentDir = ($@"{OpenTaiko.strEXEのあるフォルダ}Global{Path.DirectorySeparatorChar}Characters{Path.DirectorySeparatorChar}{OpenTaiko.Tx.Characters[_charaId].dirName}{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Combo{Path.DirectorySeparatorChar}");
 			if (Directory.Exists(currentDir)) {

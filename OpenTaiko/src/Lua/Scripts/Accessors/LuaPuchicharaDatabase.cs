@@ -41,7 +41,7 @@ namespace OpenTaiko {
 		/// or nil if the player's selection cannot be resolved.
 		/// </summary>
 		public LuaPuchichara? GetPlayerPuchichara(int player) {
-			int idx = PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player));
+			int idx = PuchiChara.tGetPuchiCharaIndexByName(player);
 			return GetByIndex(idx);
 		}
 
