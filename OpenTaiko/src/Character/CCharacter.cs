@@ -366,13 +366,17 @@ abstract class CCharacter : IDisposable {
 		return false;
 	}
 
-	public virtual void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
+	public virtual void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
 
 	}
 
-	public virtual void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
-		Draw(player, animationType, x, y, scaleX, scaleY, opacity, color, flipX);
+	public virtual void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
+		Draw(player, animationType, x, y, scaleX, scaleY, opacity, color, rotation, blendMode, wrapMode);
 	}
+
+	public virtual LuaVector2 GetDrawSize(int player, string animationType) => new LuaVector2(0, 0);
+
+	public virtual (float x, float y) GetHeyaRenderOffset(int player) => (0f, 0f);
 
 	public virtual void LoadAnimation(int player, string voice) {
 

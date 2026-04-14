@@ -128,9 +128,9 @@ function activate(player, rarity, modal_type, modal_asset_informations, modal_as
 		modal_current_info:LoadAnimation(CHARACTER.ANIM_RENDER)
 
 	elseif modal_type == 2 then
-		-- Puchichara (legacy CPuchichara)
+		-- Puchichara (LuaPuchichara)
 		header_str = LANG:GetString("MODAL_TITLE_PUCHI")
-		body_str   = modal_current_info.metadata:tGetName()
+		body_str   = modal_current_info.Name
 
 	elseif modal_type == 3 then
 		-- Nameplate (LuaNameplateInfo)

@@ -233,9 +233,11 @@ class CStageHeya : CStage {
 		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
 		if (iCurrentMenu == CurrentMenu.Chara) {
 			string renderAnimation = CCharacter.ANIM_RENDER;
-			OpenTaiko.Tx.Characters[iCharacterCurrent].SetAnimationDuration(0, renderAnimation, CCharacter.DEFAULT_DURATION);
-			OpenTaiko.Tx.Characters[iCharacterCurrent].Update(0, renderAnimation);
-			OpenTaiko.Tx.Characters[iCharacterCurrent].Draw(0, renderAnimation, 0, 0);
+			var chara = OpenTaiko.Tx.Characters[iCharacterCurrent];
+			var (offsetX, offsetY) = chara.GetHeyaRenderOffset(0);
+			chara.SetAnimationDuration(0, renderAnimation, CCharacter.DEFAULT_DURATION);
+			chara.Update(0, renderAnimation);
+			chara.Draw(0, renderAnimation, offsetX, offsetY);
 		}
 
 		#endregion
@@ -502,7 +504,7 @@ class CStageHeya : CStage {
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
 			characterController.Update(0);
-			characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
+			characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
 
 			#region [PuchiChara]
 

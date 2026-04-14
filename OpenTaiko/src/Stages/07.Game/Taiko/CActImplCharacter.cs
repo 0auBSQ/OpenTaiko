@@ -423,7 +423,8 @@ internal class CActImplCharacter : CActivity {
 			float charaScale = 1.0f;
 
 			if (!b風船連打中[i] && !visibleKusuChara && !IsPlayingBalloonAction(i)) {
-				bool flipX = OpenTaiko.ConfigIni.bAIBattleMode ? (i == 1) : false;
+				// P2 in AI battle mode is mirrored — encode as negative scaleX instead of a flipX flag.
+				bool _mirrorP2 = OpenTaiko.ConfigIni.bAIBattleMode && (i == 1);
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
 					chara_x = (OpenTaiko.Skin.Game_Chara_AI_X[i]);
@@ -453,7 +454,7 @@ internal class CActImplCharacter : CActivity {
 				}
 
 				//CCharacter.GetCharacter(i).Draw(i, animation, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
-				CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
+				CharacterControllers[i].Draw(i, chara_x, chara_y, _mirrorP2 ? -charaScale : charaScale, charaScale, 255, Color4.White);
 			}
 
 
@@ -495,7 +496,7 @@ internal class CActImplCharacter : CActivity {
 			}
 
 			//CCharacter.GetCharacter(i).Draw(i, CCharacter.ANIM_GAME_BALLOON_BREAKING, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
-			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
+			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
@@ -525,7 +526,7 @@ internal class CActImplCharacter : CActivity {
 				}
 
 				CharacterControllers[i].Draw(i, chara_x + kusuX, chara_y + kusuY,
-				charaScale, charaScale, 255, Color4.White, i % 2 == 1);
+				(i % 2 == 1) ? -charaScale : charaScale, charaScale, 255, Color4.White);
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuX,
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuY, false, 255, true, player: i);

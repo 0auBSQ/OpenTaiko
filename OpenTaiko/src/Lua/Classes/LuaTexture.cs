@@ -133,6 +133,7 @@ namespace OpenTaiko {
 		}
 		#endregion
 	}
+
 	public class LuaTextureFunc {
 		private HashSet<LuaTexture> Textures;
 		private string DirPath;

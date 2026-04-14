@@ -245,7 +245,7 @@ class CStage段位選択 : CStage {
 
 				characterController.dbDuration = CCharacter.DEFAULT_DURATION;
 				characterController.Update(0);
-				characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, false);
+				characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
 
 				#region [PuchiChara]
 

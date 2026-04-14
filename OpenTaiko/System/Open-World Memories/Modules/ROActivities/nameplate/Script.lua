@@ -492,13 +492,14 @@ function draw(mode, ...)
 			if nodan[player_lua] then
 				tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
 				tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:SetOpacity(op)
 				tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
 			else
 				tx_name = font_name_full:GetText(name_text[player_lua], false, 99999)
 				tx_name:SetScale(math.min(config_font_name_full_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:SetOpacity(op)
 				tx_name:DrawAtAnchor(x + config_text_name_full_offset_x, y + config_text_name_full_offset_y, "center")
 			end
-			tx_name:SetOpacity(op)
 		end
 
 	elseif mode == 1 then

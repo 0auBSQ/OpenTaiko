@@ -807,7 +807,7 @@ internal class CActResultParameterPanel : CActivity {
 				*/
 
 				characterController[p].Update(p);
-				characterController[p].Draw(p, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, pos % 2 == 1);
+				characterController[p].Draw(p, chara_x, chara_y, (pos % 2 == 1) ? -1.0f : 1.0f, 1.0f, 255, Color4.White);
 
 				#endregion
 

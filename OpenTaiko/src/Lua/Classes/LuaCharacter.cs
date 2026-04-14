@@ -1,3 +1,5 @@
+using FDK;
+
 namespace OpenTaiko {
 	/// <summary>
 	/// Lua-side wrapper around a <see cref="CCharacter"/> instance.
@@ -32,14 +34,75 @@ namespace OpenTaiko {
 		public string FullPath => Character?._path ?? "";
 		public string DisplayName => Character?.metadata?.tGetName() ?? FolderName;
 
+		// ── Character-scope visual state ─────────────────────────────────────────
+		// All values are applied just before each draw call; frame textures are
+		// restored afterwards (opacity→1, rotation→0, blendMode→"normal") so they
+		// stay clean for other users.
+
+		private int   _opacity   = 255;
+		private float _scaleX    = 1f;
+		private float _scaleY    = 1f;
+		private float _colorR    = 1f;
+		private float _colorG    = 1f;
+		private float _colorB    = 1f;
+		private float _rotation  = 0f;
+		private string _blendMode = "normal";
+		private string _wrapMode  = "edge";
+
+		// ── Setters ──────────────────────────────────────────────────────────────
+
+		/// <summary>Sets draw opacity (0.0 = transparent, 1.0 = opaque). Multiplied with per-call opacity.</summary>
+		public void SetOpacity(float opacity)                  => _opacity   = Math.Clamp((int)(opacity * 255), 0, 255);
+		/// <summary>Sets scale applied before every draw call. Use negative X to mirror horizontally.</summary>
+		public void SetScale(float scaleX, float scaleY)       { _scaleX = scaleX; _scaleY = scaleY; }
+		/// <summary>Sets RGB colour tint (0.0–1.0 per channel).</summary>
+		public void SetColor(LuaColor color)                   { _colorR = color.R / 255f; _colorG = color.G / 255f; _colorB = color.B / 255f; }
+		/// <inheritdoc cref="SetColor(LuaColor)"/>
+		public void SetColor(float r, float g, float b)        { _colorR = r; _colorG = g; _colorB = b; }
+		/// <summary>Sets rotation in degrees.</summary>
+		public void SetRotation(float degrees)                 => _rotation  = degrees;
+		/// <summary>Sets blend mode: "normal", "add", "multi", "sub", "screen".</summary>
+		public void SetBlendMode(string mode)                  => _blendMode = mode;
+		/// <summary>Sets texture wrap mode: "edge", "border", "repeat", "mirror".</summary>
+		public void SetWrapMode(string mode)                   => _wrapMode  = mode;
+
+		// ── Getters ──────────────────────────────────────────────────────────────
+
+		public LuaVector2 GetScale()                           => new(_scaleX, _scaleY);
+		public (float Red, float Green, float Blue) GetColor() => (_colorR, _colorG, _colorB);
+		public float  GetRotation()                            => _rotation;
+		public string GetBlendMode()                           => _blendMode;
+		public string GetWrapMode()                            => _wrapMode;
+
+		// ── Helpers ──────────────────────────────────────────────────────────────
+
+		/// <summary>Combines the stored opacity with a per-call opacity (multiplicative).</summary>
+		private int BlendOpacity(int callOpacity) => (int)Math.Round(_opacity * (callOpacity / 255.0));
+
+		private Color4 StoredColor() => new(_colorR, _colorG, _colorB, 1f);
+
 		#region [Animation]
 
 		public void Draw(float x, float y, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.Draw(Slot, animation, x, y, scaleX, scaleY, opacity, null, false);
+			Character?.Draw(Slot, animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode);
 		}
 
 		public void DrawAtAnchor(float x, float y, string animation, string anchor = "bottom", float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, scaleX, scaleY, opacity, null, false);
+			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), null, null, 0f, 0f, _rotation, _blendMode, _wrapMode);
+		}
+
+		/// <summary>Draws the character using the top-left corner of a layout rect as the origin.</summary>
+		public void DrawRect(float rect_x, float rect_y, float rect_w, float rect_h, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
+			Character?.Draw(Slot, animation, rect_x, rect_y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode);
+		}
+
+		/// <summary>
+		/// Draws the character clipped to a rect whose top-left is at (<paramref name="x"/>, <paramref name="y"/>).
+		/// Scale, colour, rotation and blend mode come from the stored character state (set via SetXxx methods).
+		/// The caller is responsible for computing the exact draw position.
+		/// </summary>
+		public void DrawRectAtAnchor(float x, float y, float clip_w, float clip_h, string animation, int opacity = 255, float clipX = 0f, float clipY = 0f) {
+			Character?.DrawAtAnchor(Slot, animation, x, y, "topleft", _scaleX, _scaleY, BlendOpacity(opacity), StoredColor(), clip_w, clip_h, clipX, clipY, _rotation, _blendMode, _wrapMode);
 		}
 
 		public bool Update(string animation, bool looping = true) {
@@ -68,6 +131,11 @@ namespace OpenTaiko {
 
 		public void ResetAnimationCounter(string animation) {
 			Character?.ResetAnimationCounter(Slot, animation);
+		}
+
+		/// <summary>Returns the drawn dimensions of the current animation frame scaled to the theme resolution. Returns (X=0, Y=0) if unavailable.</summary>
+		public LuaVector2 GetAnimationSize(string animation) {
+			return Character?.GetDrawSize(Slot, animation) ?? new LuaVector2(0, 0);
 		}
 
 		#endregion
@@ -138,6 +206,12 @@ namespace OpenTaiko {
 
 		public LuaCharacter CreateCharacter(string characterName) {
 			return new LuaCharacter(characterName);
+		}
+
+		/// <summary>Returns a player-bound <see cref="LuaCharacter"/> for the given 0-based player index.
+		/// The object resolves the active character dynamically and does not need to be disposed.</summary>
+		public LuaCharacter GetPlayerCharacter(int player) {
+			return new LuaCharacter(player);
 		}
 
 		public string ANIM_PREVIEW => CCharacter.ANIM_PREVIEW;

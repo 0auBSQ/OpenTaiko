@@ -239,6 +239,7 @@ class CLuaScript : IDisposable {
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, ltf, lsf, dir);
 			LuaScript["DATABASE"] = new LuaDataStorageFunc(dir);
 			LuaScript["CHARACTER"] = new LuaCharacterFunc();
+			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
 			LuaScript["STORAGE"] = new LuaStorageFunc(dir);
 			LuaScript["PLAYSTATE"] = new LuaPlayStateFunc();
 			LuaScript["SQL"] = new LuaSQLFunc(dir);

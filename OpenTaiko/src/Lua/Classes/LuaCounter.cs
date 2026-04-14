@@ -8,7 +8,42 @@ namespace OpenTaiko {
 		private LuaFunction? lfEnded;
 		private List<Action<double>> lfListeners = [];
 
-		public double Value;
+		// Raw linear value tracked internally; Value getter applies easing when set
+		private double _rawValue;
+		private HEasingMethods.EEaseType? _easeType = null;
+		private HEasingMethods.EEaseFunction? _easeFunction = null;
+
+		public double Value {
+			get {
+				if (_easeType == null || _easeFunction == null || Begin == End)
+					return _rawValue;
+				double rawRatio = Math.Clamp(Math.Abs(_rawValue - Begin) / Math.Abs(End - Begin), 0.0, 1.0);
+				double easedRatio = HEasingMethods.tCalculateEaseNorm(_easeType.Value, _easeFunction.Value, rawRatio);
+				return Begin + easedRatio * (End - Begin);
+			}
+			set { _rawValue = value; }
+		}
+
+		/// <summary>
+		/// Applies an easing curve to the value returned from Lua.
+		/// The internal counter still advances linearly; only the getter output is curved.
+		/// <para>
+		/// <paramref name="type"/>: IN, OUT, INOUT, OUTIN<br/>
+		/// <paramref name="function"/>: LINEAR, SINE, QUAD, CUBIC, QUART, QUINT, EXPO, CIRC, ELASTIC, BACK, BOUNCE
+		/// </para>
+		/// </summary>
+		public void SetEasing(string type, string function) {
+			if (Enum.TryParse<HEasingMethods.EEaseType>(type, true, out var et))
+				_easeType = et;
+			if (Enum.TryParse<HEasingMethods.EEaseFunction>(function, true, out var ef))
+				_easeFunction = ef;
+		}
+
+		/// <summary>Removes any easing applied by <see cref="SetEasing"/>.</summary>
+		public void ClearEasing() {
+			_easeType = null;
+			_easeFunction = null;
+		}
 
 		private bool Ticking;
 
@@ -90,7 +125,7 @@ namespace OpenTaiko {
 
 			FixIntegrity();
 
-			double nextValue = Value;
+			double nextValue = _rawValue;
 			double add = 1.0 / Interval * OpenTaiko.FPS.DeltaTime;
 
 			nextValue += add;

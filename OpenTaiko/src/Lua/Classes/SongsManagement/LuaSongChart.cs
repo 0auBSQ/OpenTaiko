@@ -179,13 +179,17 @@
 
 		#endregion
 
-		public bool Select(int player, bool init = false) {
+		public bool Select(int player) {
 			if (!NotNull) return false;
 
-			if (init) OpenTaiko.stageSongSelect.rChoosenSong = _parentListNode;
+			// Player 0 owns the global song-selection state; always sync it so song loading
+			// never receives a null rChoosenSong regardless of whether Mount() was called.
+			if (player == 0) {
+				OpenTaiko.stageSongSelect.rChoosenSong = _parentListNode;
+				OpenTaiko.stageSongSelect.str確定された曲のジャンル = _parent.Genre ?? "???";
+			}
 			OpenTaiko.stageSongSelect.r確定されたスコア = _score;
 			OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player] = (int)Difficulty;
-			if (init) OpenTaiko.stageSongSelect.str確定された曲のジャンル = _parent.Genre;
 
 			return true;
 		}

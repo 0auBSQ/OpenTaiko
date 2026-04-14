@@ -56,8 +56,10 @@ public class CStage : CActivity {
 		SongSelect_FadeOutToCourseSelect, //2016.10.20 kairera0467
 		SongSelect_FadeOutToNowLoading,
 		SongLoading_LoadDTXFile,
+		SongLoading_WaitDTXLoaded,
 		SongLoading_WaitToLoadWAVFile,
 		SongLoading_LoadWAVFile,
+		SongLoading_WaitWAVLoaded,
 		SongLoading_LoadBMPFile,
 		SongLoading_WaitForSoundSystemBGM,
 		Game_STAGE_FAILED,

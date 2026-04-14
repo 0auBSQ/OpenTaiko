@@ -586,7 +586,7 @@ internal class CStageSongSelect : CStage {
 				CCharacter character = CCharacter.GetCharacter(OpenTaiko.GetActualPlayer(player));
 
 				CharacterController[player].Update(player);
-				CharacterController[player].Draw(player, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White, player % 2 == 1);
+				CharacterController[player].Draw(player, chara_x, chara_y, (player % 2 == 1) ? -1.0f : 1.0f, 1.0f, 255, Color4.White);
 				this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, player);
 
 				/*

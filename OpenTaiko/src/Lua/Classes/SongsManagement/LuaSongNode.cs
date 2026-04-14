@@ -381,7 +381,7 @@
 
 		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
 			_node = node;
-			if (node.nodeType == CSongListNode.ENodeType.SCORE) {
+			if (node != null && node.nodeType == CSongListNode.ENodeType.SCORE) {
 				var _unlockable = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node);
 				_unlockCondition = new LuaUnlockCondition(_unlockable?.unlockConditions ?? null);
 				// Songs without unlock conditions are Common by default

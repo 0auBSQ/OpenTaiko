@@ -128,16 +128,25 @@ class CCharacterLua : CCharacter {
 		return Script[player].Update(OpenTaiko.FPS.DeltaTime, GetAnimation(player, this, animationType), looping);
 	}
 
-	public override void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
+	public override void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
 		string resolvedAnimation = GetAnimation(player, this, animationType);
 		string? contextType = (resolvedAnimation != animationType) ? animationType : null;
-		Script[player].Draw(resolvedAnimation, x, y, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), flipX, contextType);
+		Script[player].Draw(resolvedAnimation, x, y, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), contextType, rotation, blendMode, wrapMode);
 	}
 
-	public override void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, bool flipX = false) {
+	public override void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
 		string resolvedAnimation = GetAnimation(player, this, animationType);
 		string? contextType = (resolvedAnimation != animationType) ? animationType : null;
-		Script[player].DrawAtAnchor(resolvedAnimation, x, y, anchor, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), flipX, contextType);
+		Script[player].DrawAtAnchor(resolvedAnimation, x, y, anchor, scaleX, scaleY, opacity, new LuaColor(color ?? Color4.White), contextType, clipW, clipH, clipX, clipY, rotation, blendMode, wrapMode);
+	}
+
+	public override LuaVector2 GetDrawSize(int player, string animationType) {
+		string resolvedAnimation = GetAnimation(player, this, animationType);
+		return Script[player].GetDrawSize(resolvedAnimation);
+	}
+
+	public override (float x, float y) GetHeyaRenderOffset(int player) {
+		return Script[player].GetHeyaRenderOffset();
 	}
 
 

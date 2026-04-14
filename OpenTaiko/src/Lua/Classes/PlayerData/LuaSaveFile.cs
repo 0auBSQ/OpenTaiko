@@ -155,6 +155,12 @@
 			return true;
 		}
 
+		public LuaPuchichara? GetPuchichara() =>
+			OpenTaiko.Tx?.LuaPuchicharaDb?.GetPlayerPuchichara(_mounted);
+
+		public bool IsPuchicharaUnlocked(string folderName) =>
+			_sf.data.UnlockedPuchicharas.Contains(folderName);
+
 		#endregion
 
 		public LuaSaveFile(SaveFile sf, int mountedPlayer) {

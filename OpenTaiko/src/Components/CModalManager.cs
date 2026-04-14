@@ -17,7 +17,16 @@ internal class CModalManager {
 
 	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
 		object[] newParams = new object[] { player, rarity, (int)modalType };
-		if (args != null) newParams = newParams.Concat((object[])args).ToArray();
+		if (args != null) {
+			var wrappedArgs = new object?[args.Length];
+			for (int i = 0; i < args.Length; i++) {
+				if (args[i] is CPuchichara p)
+					wrappedArgs[i] = OpenTaiko.Tx?.LuaPuchicharaDb?.GetByName(Path.GetFileName(p._path)) ?? (object?)p;
+				else
+					wrappedArgs[i] = args[i];
+			}
+			newParams = [.. newParams, .. wrappedArgs];
+		}
 		Script?.Activate(newParams);
 	}
 

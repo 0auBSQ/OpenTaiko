@@ -707,6 +707,8 @@ class TextureLoader {
 			OpenTaiko.Skin.Puchicharas_Name[i] = System.IO.Path.GetFileName(puchicharaDirs[i]);
 		}
 		OpenTaiko.Skin.Puchicharas_NameToIndex = OpenTaiko.Skin.Puchicharas_Name.Select((val, idx) => (val, idx)).ToDictionary();
+		LuaPuchicharaDb?.Dispose();
+		LuaPuchicharaDb = new LuaPuchicharaDatabase(Puchichara);
 
 		///TJAPlayer3.Skin.Puchichara_Ptn = 5 * Math.Max(1, (PuchiChara.szテクスチャサイズ.Height / 256));
 
@@ -1043,6 +1045,9 @@ class TextureLoader {
 			character.Dispose();
 		}
 
+		LuaPuchicharaDb?.Dispose();
+		LuaPuchicharaDb = null;
+
 		//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 		{
 			foreach (var act in OpenTaiko.app.listTopLevelActivities) {
@@ -1359,6 +1364,7 @@ class TextureLoader {
 	#region PuchiChara
 
 	public CPuchichara[] Puchichara;
+	public LuaPuchicharaDatabase? LuaPuchicharaDb;
 
 	#endregion
 	#region Training

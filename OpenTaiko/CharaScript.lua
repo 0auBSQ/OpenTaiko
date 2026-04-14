@@ -775,7 +775,7 @@ local AnimationData = {
 			update = function(self, delta, looping)
 				return false
 			end;
-			draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX)
+			draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 			end;
 			dispose = function(self)
 			end;
@@ -853,11 +853,8 @@ local function create_animation(animationType)
 				return self.value >= 1
 			end
 		end
-		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX, overrideOffset, anchor)
+		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 			local frame = self.frames[self.frame_index]
-			if flipX then
-				scaleX = -scaleX
-			end
 
 			local offset = overrideOffset or self.offset
 			local offsetX = offset.pos.X
@@ -877,12 +874,26 @@ local function create_animation(animationType)
 			offsetY = offsetY * (theme_resolution.Y / chara_config.resolution.Y)
 
 			if frame ~= nil then
+				frame:SetScale(scaleX, scaleY)
+				frame:SetOpacity(opacity / 255.0)
+				frame:SetColor(color)
+				if rotation and rotation ~= 0 then frame:SetRotation(rotation) end
+				if blendMode then frame:SetBlendMode(blendMode) end
+				if wrapMode then frame:SetWrapMode(wrapMode) end
 				if anchor ~= nil then
 					-- Anchor mode: skip legacy frame-size offset; (x,y) is the anchor point directly
-					frame:SetScale(scaleX, scaleY)
-					frame:SetOpacity(opacity / 255.0)
-					frame:SetColor(color)
-					frame:DrawAtAnchor(x + offsetX, y + offsetY, anchor)
+					if clip_w ~= nil and clip_w > 0 then
+						-- Caller supplies crop values in theme-pixel units; divide by scale to get source pixels.
+						local abs_sx = math.abs(scaleX)
+						local abs_sy = math.abs(scaleY)
+						local src_x = math.floor((clip_x or 0) / abs_sx)
+						local src_y = math.floor((clip_y or 0) / abs_sy)
+						local src_w = math.ceil(clip_w / abs_sx)
+						local src_h = math.ceil((clip_h ~= nil and clip_h > 0) and clip_h / abs_sy or frame.Height)
+						frame:DrawRectAtAnchor(x + offsetX, y + offsetY, src_x, src_y, src_w, src_h, anchor)
+					else
+						frame:DrawAtAnchor(x + offsetX, y + offsetY, anchor)
+					end
 				else
 					if chara_config.legacy_mode then
 						if offset.mode == OFFSET_MODE_GAME then
@@ -900,11 +911,11 @@ local function create_animation(animationType)
 						end
 					end
 
-					frame:SetScale(scaleX, scaleY)
-					frame:SetOpacity(opacity / 255.0)
-					frame:SetColor(color)
 					frame:DrawAtAnchor(x + offsetX, y + offsetY, "bottom")
 				end
+				frame:SetOpacity(1.0)
+				frame:SetRotation(0)
+				frame:SetBlendMode("normal")
 			end
 		end
 		animation_data.dispose = function(self)
@@ -929,10 +940,7 @@ local function create_preview()
 	end
 	animation_data.preview = preview
 
-	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX)
-		if flipX then
-			scaleX = -scaleX
-		end
+	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 		local theme_resolution = THEME:GetResolution()
 		local baseScale = theme_resolution.Y / chara_config.resolution.Y
 		scaleX = scaleX * baseScale
@@ -943,7 +951,13 @@ local function create_preview()
 			frame:SetScale(scaleX, scaleY)
 			frame:SetOpacity(opacity / 255.0)
 			frame:SetColor(color)
+			if rotation and rotation ~= 0 then frame:SetRotation(rotation) end
+			if blendMode then frame:SetBlendMode(blendMode) end
+			if wrapMode then frame:SetWrapMode(wrapMode) end
 			frame:DrawAtAnchor(x, y, "center")
+			frame:SetOpacity(1.0)
+			frame:SetRotation(0)
+			frame:SetBlendMode("normal")
 		end
 	end
 	animation_data.dispose = function(self)
@@ -961,28 +975,36 @@ local function create_render()
 		animation_data.render = TEXTURE:CreateTexture("Render.png")
 	end
 
-	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, flipX)
-		if flipX then
-			scaleX = -scaleX
-		end
-		local offsetX = chara_config.heya_render_offset.X
-		local offsetY = chara_config.heya_render_offset.Y
-
+	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 		local theme_resolution = THEME:GetResolution()
 		local baseScale = theme_resolution.Y / chara_config.resolution.Y
 		scaleX = scaleX * baseScale
 		scaleY = scaleY * baseScale
-		offsetX = offsetX * (theme_resolution.X / chara_config.resolution.X)
-		offsetY = offsetY * (theme_resolution.Y / chara_config.resolution.Y)
 
 		local frame = self.render
 		if frame ~= nil then
-			x = x + offsetX
-			y = y + offsetY
 			frame:SetScale(scaleX, scaleY)
 			frame:SetOpacity(opacity / 255.0)
 			frame:SetColor(color)
-			frame:Draw(x, y)
+			if rotation and rotation ~= 0 then frame:SetRotation(rotation) end
+			if blendMode then frame:SetBlendMode(blendMode) end
+			if wrapMode then frame:SetWrapMode(wrapMode) end
+			if clip_w ~= nil and clip_w > 0 then
+				-- The caller supplies all four crop values in theme-pixel units.
+				-- Divide by the combined scale to obtain source-texture pixel coordinates.
+				local abs_sx = math.abs(scaleX)
+				local abs_sy = math.abs(scaleY)
+				local src_x = math.floor((clip_x or 0) / abs_sx)
+				local src_y = math.floor((clip_y or 0) / abs_sy)
+				local src_w = math.ceil(clip_w / abs_sx)
+				local src_h = math.ceil((clip_h ~= nil and clip_h > 0) and clip_h / abs_sy or frame.Height)
+				frame:DrawRectAtAnchor(x, y, src_x, src_y, src_w, src_h, "topleft")
+			else
+				frame:Draw(x, y)
+			end
+			frame:SetOpacity(1.0)
+			frame:SetRotation(0)
+			frame:SetBlendMode("normal")
 		end
 	end
 	animation_data.dispose = function(self)
@@ -1123,7 +1145,7 @@ function update(delta, animationType, looping)
 	end
 end
 
-function draw(animationType, x, y, scaleX, scaleY, opacity, color, flipX, contextType, anchor)
+function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 	if not avaialbeAnimation(animationType) then
 		return
 	end
@@ -1134,6 +1156,41 @@ function draw(animationType, x, y, scaleX, scaleY, opacity, color, flipX, contex
 		if contextType ~= nil and contextType ~= animationType then
 			overrideOffset = animation_offsets[contextType]
 		end
-		animation:draw(x, y, scaleX, scaleY, opacity, color, flipX, overrideOffset, anchor)
+		animation:draw(x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
 	end
+end
+
+-- Returns the drawn dimensions (W, H) of the current animation frame scaled to the theme resolution.
+-- Handles both regular animations (.frames) and the render animation (.render).
+function getDrawSize(animationType)
+	if not avaialbeAnimation(animationType) then
+		return 0, 0
+	end
+	local animation = animationdata_array[animationType]
+	if animation == nil then return 0, 0 end
+
+	local theme_resolution = THEME:GetResolution()
+	local baseScale = theme_resolution.Y / chara_config.resolution.Y
+
+	local frame = nil
+	if animation.render ~= nil then
+		-- ANIM_RENDER stores the texture in .render instead of .frames
+		frame = animation.render
+	elseif animation.frames ~= nil then
+		local fi = animation.frame_index
+		if fi == nil or fi == 0 then fi = 1 end
+		frame = animation.frames[fi]
+	end
+
+	if frame == nil then return 0, 0 end
+	return frame.Width * baseScale, frame.Height * baseScale
+end
+
+-- Returns the heya render offset in theme pixels (already scaled to the current resolution).
+-- Called by C# (CStageHeya) so the offset can be applied on the C# side.
+function getHeyaRenderOffset()
+	local theme_resolution = THEME:GetResolution()
+	local scaledX = chara_config.heya_render_offset.X * (theme_resolution.X / chara_config.resolution.X)
+	local scaledY = chara_config.heya_render_offset.Y * (theme_resolution.Y / chara_config.resolution.Y)
+	return scaledX, scaledY
 end

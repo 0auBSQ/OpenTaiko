@@ -18,6 +18,8 @@ namespace OpenTaiko {
 		private LuaFunction lfResetAnimationCounter;
 		private LuaFunction lfUpdate;
 		private LuaFunction lfDraw;
+		private LuaFunction? lfGetDrawSize;
+		private LuaFunction? lfGetHeyaRenderOffset;
 
 		private LuaFunction lfLoadVoice;
 		private LuaFunction lfDisposeVoice;
@@ -68,14 +70,36 @@ namespace OpenTaiko {
 			return false;
 		}
 
-		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false, string? contextType = null) {
+		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
 			if (animationType == CCharacter.ANIM_NONE) return;
-			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX, contextType);
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, (object?)null, (object?)null, (object?)null, (object?)null, (object?)null, rotation, (object?)blendMode, (object?)wrapMode);
 		}
 
-		public void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, bool flipX = false, string? contextType = null) {
+		public void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
 			if (animationType == CCharacter.ANIM_NONE) return;
-			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), flipX, contextType, anchor);
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, anchor, (object?)clipW, (object?)clipH, (object)clipX, (object)clipY, rotation, (object?)blendMode, (object?)wrapMode);
+		}
+
+		public LuaVector2 GetDrawSize(string animationType) {
+			if (lfGetDrawSize == null) return new LuaVector2(0, 0);
+			object[] result = RunLuaCode(lfGetDrawSize, animationType);
+			if (result != null && result.Length >= 2) {
+				double w = result[0] is double dw ? dw : 0;
+				double h = result[1] is double dh ? dh : 0;
+				return new LuaVector2(w, h);
+			}
+			return new LuaVector2(0, 0);
+		}
+
+		public (float x, float y) GetHeyaRenderOffset() {
+			if (lfGetHeyaRenderOffset == null) return (0f, 0f);
+			object[] result = RunLuaCode(lfGetHeyaRenderOffset);
+			if (result != null && result.Length >= 2) {
+				float x = result[0] is double dx ? (float)dx : 0f;
+				float y = result[1] is double dy ? (float)dy : 0f;
+				return (x, y);
+			}
+			return (0f, 0f);
 		}
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
@@ -87,6 +111,8 @@ namespace OpenTaiko {
 				lfResetAnimationCounter = (LuaFunction)LuaScript["resetAnimationCounter"];
 				lfUpdate = (LuaFunction)LuaScript["update"];
 				lfDraw = (LuaFunction)LuaScript["draw"];
+				lfGetDrawSize = LuaScript["getDrawSize"] as LuaFunction;
+				lfGetHeyaRenderOffset = LuaScript["getHeyaRenderOffset"] as LuaFunction;
 
 				lfLoadVoice = (LuaFunction)LuaScript["loadVoice"];
 				lfDisposeVoice = (LuaFunction)LuaScript["disposeVoice"];

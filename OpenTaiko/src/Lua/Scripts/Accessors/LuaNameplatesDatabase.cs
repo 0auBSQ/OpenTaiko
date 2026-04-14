@@ -3,7 +3,7 @@ using NLua;
 namespace OpenTaiko {
 	/// <summary>
 	/// Lua-accessible database of all nameplate unlockables.
-	/// Exposed as the <c>NAMEPLATES</c> global in every Lua script.
+	/// Exposed as the <c>NAMEPLATESLIST</c> global in every Lua script.
 	/// </summary>
 	public class LuaNameplatesDatabase {
 		/// <summary>Returns the nameplate with the given ID, or nil if not found.</summary>
