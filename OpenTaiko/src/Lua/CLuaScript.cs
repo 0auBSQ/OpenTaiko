@@ -240,6 +240,7 @@ class CLuaScript : IDisposable {
 			LuaScript["DATABASE"] = new LuaDataStorageFunc(dir);
 			LuaScript["CHARACTER"] = new LuaCharacterFunc();
 			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
+			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
 			LuaScript["STORAGE"] = new LuaStorageFunc(dir);
 			LuaScript["PLAYSTATE"] = new LuaPlayStateFunc();
 			LuaScript["SQL"] = new LuaSQLFunc(dir);

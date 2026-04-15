@@ -119,6 +119,7 @@ internal class CStageコンフィグ : CStage {
 		string[] strMenuItem = {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM"),
 			CLangManager.LangInstance.GetString("SETTINGS_GAME"),
+			CLangManager.LangInstance.GetString("SETTINGS_THEME"),
 			CLangManager.LangInstance.GetString("SETTINGS_EXIT")
 		};
 
@@ -403,18 +404,21 @@ internal class CStageコンフィグ : CStage {
 						OpenTaiko.stageConfig.tアサイン完了通知();
 						return 0;
 					}
-					if (!this.actList.bIsKeyAssignSelected && !this.actList.bIsFocusingParameter)   // #24525 2011.3.15 yyagi, #32059 2013.9.17 yyagi
+					bool wasEditingStringInput = this.actList.bIsFocusingParameter;
+					if (!this.actList.bIsKeyAssignSelected && !wasEditingStringInput)   // #24525 2011.3.15 yyagi, #32059 2013.9.17 yyagi
 					{
 						this.bメニューにフォーカス中 = true;
 					}
-					this.t説明文パネルに現在選択されているメニューの説明を描画する();
+					// Only reset the description panel when not simply cancelling a string text input.
+					if (!wasEditingStringInput)
+						this.t説明文パネルに現在選択されているメニューの説明を描画する();
 					this.actList.tEsc押下();                              // #24525 2011.3.15 yyagi ESC押下時の右メニュー描画用
 				} else {
 					this.actFIFO.tフェードアウト開始();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				}
 			} else if ((OpenTaiko.Pad.bPressedDGB(EPad.CY) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD)) || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC) || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
-				if (this.n現在のメニュー番号 == 2) {
+				if (this.n現在のメニュー番号 == 3) {
 					// Exit
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					this.actFIFO.tフェードアウト開始();
@@ -550,7 +554,7 @@ internal class CStageコンフィグ : CStage {
 			}
 		} else {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在のメニュー番号 = (this.n現在のメニュー番号 + 1) % 3;
+			this.n現在のメニュー番号 = (this.n現在のメニュー番号 + 1) % 4;
 			switch (this.n現在のメニュー番号) {
 				case 0:
 					this.actList.t項目リストの設定_System();
@@ -561,6 +565,10 @@ internal class CStageコンフィグ : CStage {
 					break;
 
 				case 2:
+					this.actList.t項目リストの設定_Theme();
+					break;
+
+				case 3:
 					this.actList.t項目リストの設定_Exit();
 					break;
 			}
@@ -580,7 +588,7 @@ internal class CStageコンフィグ : CStage {
 			}
 		} else {
 			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 3) % 3;
+			this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 4) % 4;
 			switch (this.n現在のメニュー番号) {
 				case 0:
 					this.actList.t項目リストの設定_System();
@@ -591,6 +599,10 @@ internal class CStageコンフィグ : CStage {
 					break;
 
 				case 2:
+					this.actList.t項目リストの設定_Theme();
+					break;
+
+				case 3:
 					this.actList.t項目リストの設定_Exit();
 					break;
 			}
@@ -608,6 +620,9 @@ internal class CStageコンフィグ : CStage {
 					text = CLangManager.LangInstance.GetString("SETTINGS_GAME_DESC");
 					break;
 				case 2:
+					text = CLangManager.LangInstance.GetString("SETTINGS_THEME_DESC");
+					break;
+				case 3:
 					text = CLangManager.LangInstance.GetString("SETTINGS_EXIT_DESC");
 					break;
 			}

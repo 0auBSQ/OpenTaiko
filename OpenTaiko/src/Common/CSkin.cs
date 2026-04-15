@@ -894,6 +894,10 @@ internal class CSkin : IDisposable {
 									this.Skin_Version = strParam;
 									break;
 								}
+							case "DefaultLocale": {
+									this.Skin_DefaultLocale = strParam;
+									break;
+								}
 							case "Creator": {
 									this.Skin_Creator = strParam;
 									break;
@@ -1326,14 +1330,14 @@ internal class CSkin : IDisposable {
 								}
 							case "Config_Item_X": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
+									for (int i = 0; i < Math.Min(strSplit.Length, Config_Item_X.Length); i++) {
 										Config_Item_X[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
 							case "Config_Item_Y": {
 									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 3; i++) {
+									for (int i = 0; i < Math.Min(strSplit.Length, Config_Item_Y.Length); i++) {
 										Config_Item_Y[i] = int.Parse(strSplit[i]);
 									}
 									break;
@@ -7623,6 +7627,11 @@ internal class CSkin : IDisposable {
 	public string Skin_Name = "Unknown";
 	public string Skin_Version = "Unknown";
 	public string Skin_Creator = "Unknown";
+	/// <summary>
+	/// Locale id used as the fallback when the active game language has no skin locale file.
+	/// Set via <c>DefaultLocale=</c> in SkinConfig.ini; defaults to "en".
+	/// </summary>
+	public string Skin_DefaultLocale = "en";
 	public int[] Resolution = new int[] { 1280, 720 };
 	public double ScaleX => Resolution[0] / 1280.0;
 	public double ScaleY => Resolution[1] / 720.0;
@@ -7640,8 +7649,8 @@ internal class CSkin : IDisposable {
 	public int[] Config_Arrow_Focus_X = new int[] { 552, 552 };
 	public int[] Config_Arrow_Focus_Y = new int[] { 279, 381 };
 
-	public int[] Config_Item_X = new int[] { 282, 282, 282 };
-	public int[] Config_Item_Y = new int[] { 153, 192, 231 };
+	public int[] Config_Item_X = new int[] { 282, 282, 282, 282 };
+	public int[] Config_Item_Y = new int[] { 153, 192, 231, 270 };
 	public int Config_Item_Width = 100;
 	public int[] Config_Item_Font_Offset = new int[] { 0, 8 };
 

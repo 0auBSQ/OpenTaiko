@@ -968,6 +968,10 @@ class TextureLoader {
 			PlayerCharacters[i] = new LuaCharacter(i);
 		}
 
+		LuaCharacterDb?.Dispose();
+		LuaCharacterDb = new LuaCharacterDatabase(Characters);
+
+		OpenTaiko.Databases?.LoadThemeSettings();
 
 		#endregion
 
@@ -1047,6 +1051,9 @@ class TextureLoader {
 
 		LuaPuchicharaDb?.Dispose();
 		LuaPuchicharaDb = null;
+
+		LuaCharacterDb?.Dispose();
+		LuaCharacterDb = null;
 
 		//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 		{
@@ -1578,6 +1585,7 @@ Result_Mountain = new CTexture[4]*/;
 	*/
 	public CCharacterLua[] Characters = [];
 	public LuaCharacter[] PlayerCharacters = new LuaCharacter[5];
+	public LuaCharacterDatabase? LuaCharacterDb;
 
 	#endregion
 

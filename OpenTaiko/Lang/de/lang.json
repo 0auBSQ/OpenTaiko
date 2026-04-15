@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "Einstellungen für das gesamte System",
 		"SETTINGS_GAME": "Gameplay Optionen",
 		"SETTINGS_GAME_DESC": "Einstellungen für die Schlagzeuge.",
+		"SETTINGS_THEME": "Thema-Einstellungen",
+		"SETTINGS_THEME_DESC": "Einstellungen speziell für das aktuelle Skin.\nDefiniert durch ThemeSettings.json im Skin-Ordner.",
 		"SETTINGS_EXIT": "Verlassen",
 		"SETTINGS_EXIT_DESC": "Speichere die Einstellungen und verlasse das KONFIGURATIONS-Menü.",
 

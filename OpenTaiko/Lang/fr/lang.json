@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "Settings for the overall system.",
 		"SETTINGS_GAME": "Options de jeu",
 		"SETTINGS_GAME_DESC": "Settings to play the drums.",
+		"SETTINGS_THEME": "Paramètres du thème",
+		"SETTINGS_THEME_DESC": "Paramètres propres au skin actuel.\nDéfinis dans ThemeSettings.json dans le dossier du skin.",
 		"SETTINGS_EXIT": "Quitter",
 		"SETTINGS_EXIT_DESC": "Save the settings and exit from CONFIGURATION menu.",
 

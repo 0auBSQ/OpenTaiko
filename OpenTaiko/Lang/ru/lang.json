@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "Настройки для общих системы.",
 		"SETTINGS_GAME": "Настройки геймплея",
 		"SETTINGS_GAME_DESC": "Настройки для игры на барабанах.",
+		"SETTINGS_THEME": "Настройки темы",
+		"SETTINGS_THEME_DESC": "Настройки, специфичные для текущего скина.\nОпределяются в ThemeSettings.json в папке скина.",
 		"SETTINGS_EXIT": "Выход",
 		"SETTINGS_EXIT_DESC": "Сохранить настройки и выход из меню\nКОНФИГУРАЦИИ.",
 

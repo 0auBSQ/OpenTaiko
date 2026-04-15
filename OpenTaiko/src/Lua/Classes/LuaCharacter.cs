@@ -17,8 +17,10 @@ namespace OpenTaiko {
 		// Player-bound mode (-1 means not player-bound)
 		private readonly int _player;
 
-		// Name-bound mode (non-null means we own this instance)
+		// Name-bound mode (non-null means we reference this instance)
 		private CCharacterLua? _ownedCharacter;
+		// False for non-owning wrappers — Dispose() will not destroy the underlying character.
+		private readonly bool _ownsCharacter;
 
 		private CCharacter? Character => _player >= 0
 			? CCharacter.GetCharacter(_player)
@@ -162,6 +164,7 @@ namespace OpenTaiko {
 		public LuaCharacter(int player) {
 			_player = player;
 			_ownedCharacter = null;
+			_ownsCharacter = false;
 		}
 
 		/// <summary>
@@ -171,6 +174,7 @@ namespace OpenTaiko {
 		/// </summary>
 		public LuaCharacter(string characterName) {
 			_player = -1;
+			_ownsCharacter = true;
 			string path = Path.Combine(
 				OpenTaiko.strEXEのあるフォルダ,
 				TextureLoader.GLOBAL,
@@ -184,6 +188,17 @@ namespace OpenTaiko {
 			}
 		}
 
+		/// <summary>
+		/// Non-owning constructor. Wraps an existing <see cref="CCharacterLua"/> without taking
+		/// ownership — <see cref="Dispose"/> will not destroy the underlying character.
+		/// Uses player slot 0 for all draw operations.
+		/// </summary>
+		internal LuaCharacter(CCharacterLua character) {
+			_player = -1;
+			_ownedCharacter = character;
+			_ownsCharacter = false;
+		}
+
 		#endregion
 
 		#region [Dispose]
@@ -193,8 +208,8 @@ namespace OpenTaiko {
 		public void Dispose() {
 			if (_disposed) return;
 			_disposed = true;
-			// Only dispose characters we own (name-bound mode)
-			_ownedCharacter?.Dispose();
+			if (_ownsCharacter)
+				_ownedCharacter?.Dispose();
 			_ownedCharacter = null;
 		}
 

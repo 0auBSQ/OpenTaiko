@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "系统整体设置。",
 		"SETTINGS_GAME": "游戏选项",
 		"SETTINGS_GAME_DESC": "敲鼓相关设置。",
+		"SETTINGS_THEME": "主题设置",
+		"SETTINGS_THEME_DESC": "当前皮肤特有的设置。\n在皮肤文件夹的ThemeSettings.json中定义。",
 		"SETTINGS_EXIT": "退出",
 		"SETTINGS_EXIT_DESC": "保存设定并退出设置菜单。",
 

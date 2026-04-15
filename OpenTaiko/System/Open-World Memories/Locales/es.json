@@ -1,0 +1,15 @@
+{
+    // Archivo de localización — Español
+    "Entries": {
+
+        // Escena del visor de configuración del tema
+        "VIEWER_TITLE":     "Visor de configuración del tema",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Alcance",
+        "VIEWER_COL_TYPE":  "Tipo",
+        "VIEWER_COL_VALUE": "Valor",
+        "VIEWER_HINT_SCROLL": "arriba/abajo para desplazar   Cancelar para salir",
+        "VIEWER_HINT_EXIT":   "Cancelar para salir"
+
+    }
+}

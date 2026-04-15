@@ -1,0 +1,15 @@
+{
+    // Locale-Datei — Deutsch
+    "Entries": {
+
+        // Themeneinstell-Anzeige-Stage
+        "VIEWER_TITLE":     "Themeneinstellungs-Anzeige",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Bereich",
+        "VIEWER_COL_TYPE":  "Typ",
+        "VIEWER_COL_VALUE": "Wert",
+        "VIEWER_HINT_SCROLL": "oben/unten scrollen   Abbrechen zum Beenden",
+        "VIEWER_HINT_EXIT":   "Abbrechen zum Beenden"
+
+    }
+}

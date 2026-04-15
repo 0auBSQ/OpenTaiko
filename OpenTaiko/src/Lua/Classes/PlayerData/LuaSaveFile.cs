@@ -123,10 +123,6 @@
 
 		#region [Characters and Puchis]
 
-		public CLuaCharacterScript? GetCharacterScript() {
-			return _sf.data.mountedCharacter;
-		}
-
 		public LuaCharacter GetCharacter() {
 			return OpenTaiko.Tx.PlayerCharacters[_mounted];
 		}
@@ -160,6 +156,55 @@
 
 		public bool IsPuchicharaUnlocked(string folderName) =>
 			_sf.data.UnlockedPuchicharas.Contains(folderName);
+
+		public void UnlockPuchichara(string folderName) {
+			if (!IsPuchicharaUnlocked(folderName)) {
+				_sf.data.UnlockedPuchicharas.Add(folderName);
+				DBSaves.RegisterStringUnlockedAsset(_sf.data.SaveId, "unlocked_puchicharas", folderName);
+				_sf.tApplyHeyaChanges();
+			}
+		}
+
+		public void ChangePuchichara(string folderName) {
+			if (_sf.data.PuchiChara == folderName) return;
+			_sf.data.PuchiChara = folderName;
+			_sf.tApplyHeyaChanges();
+		}
+
+		public bool IsCharacterUnlocked(string dirName) {
+			if (_sf.data.UnlockedCharacters.Contains(dirName)) return true;
+			// The currently equipped character is always accessible even if not in the unlocked list.
+			var chars = OpenTaiko.Tx?.Characters;
+			if (chars != null) {
+				int idx = _sf.data.Character;
+				if (idx >= 0 && idx < chars.Length && chars[idx]?.dirName == dirName) return true;
+			}
+			return false;
+		}
+
+		public void UnlockCharacter(string dirName) {
+			if (!IsCharacterUnlocked(dirName)) {
+				_sf.data.UnlockedCharacters.Add(dirName);
+				DBSaves.RegisterStringUnlockedAsset(_sf.data.SaveId, "unlocked_characters", dirName);
+				_sf.tApplyHeyaChanges();
+			}
+		}
+
+		public void ChangeNameplate(int id) {
+			if (_sf.data.TitleId == id) return;
+			_sf.data.TitleId = id;
+			if (OpenTaiko.Databases.DBNameplateUnlockables.data.TryGetValue((Int64)id, out var nameplate)) {
+				_sf.data.Title = nameplate.nameplateInfo.cld.GetString("");
+				_sf.data.TitleType = nameplate.nameplateInfo.iType;
+				_sf.data.TitleRarityInt = HRarity.tRarityToLangInt(nameplate.rarity);
+			} else {
+				_sf.data.Title = "";
+				_sf.data.TitleType = 0;
+				_sf.data.TitleRarityInt = 1;
+			}
+			OpenTaiko.NamePlate?.tNamePlateRefreshTitles(_mounted);
+			_sf.tApplyHeyaChanges();
+		}
 
 		#endregion
 

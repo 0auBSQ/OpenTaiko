@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "システムに関係する項目を設定します。",
 		"SETTINGS_GAME": "ゲームプレイ設定",
 		"SETTINGS_GAME_DESC": "ドラムの演奏に関する項目を設定します。",
+		"SETTINGS_THEME": "テーマ設定",
+		"SETTINGS_THEME_DESC": "現在のスキン固有の設定です。\nスキンフォルダのThemeSettings.jsonで定義されます。",
 		"SETTINGS_EXIT": "出る",
 		"SETTINGS_EXIT_DESC": "設定を保存し、コンフィグ画面を終了します。",
 

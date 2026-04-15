@@ -25,7 +25,7 @@ namespace OpenTaiko {
 		public string FolderName { get; }
 
 		/// <summary>Exposes the unlock condition to Lua.</summary>
-		internal LuaUnlockCondition UnlockCondition { get; }
+		public LuaUnlockCondition UnlockCondition { get; }
 
 		private readonly DBPuchichara.PuchicharaData _metadata;
 

@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "전체 시스템 설정입니다.",
 		"SETTINGS_GAME": "게임 플레이 옵션",
 		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다.",
+		"SETTINGS_THEME": "테마 설정",
+		"SETTINGS_THEME_DESC": "현재 스킨에 특화된 설정입니다.\n스킨 폴더의 ThemeSettings.json에서 정의됩니다.",
 		"SETTINGS_EXIT": "나가기",
 		"SETTINGS_EXIT_DESC": "저장하고 나가기.",
 

@@ -1,0 +1,15 @@
+{
+    // Fichier de locale — Français
+    "Entries": {
+
+        // Étape Visionneuse de paramètres de thème
+        "VIEWER_TITLE":     "Visionneuse des paramètres du thème",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Portée",
+        "VIEWER_COL_TYPE":  "Type",
+        "VIEWER_COL_VALUE": "Valeur",
+        "VIEWER_HINT_SCROLL": "haut/bas pour défiler   Annuler pour quitter",
+        "VIEWER_HINT_EXIT":   "Annuler pour quitter"
+
+    }
+}

@@ -159,5 +159,37 @@
         "Restricted1P": true,
         "LEGACY_MenuBoxColor": "Red"
     },
-    "count": 10
+	"11": {
+        "StageName": {
+            "strings": {
+                "default": "mini_heya"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Unlock and equip characters, puchichara and nameplates!"
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "character_shop",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Yellow"
+    },
+    "12": {
+        "StageName": {
+            "strings": {
+                "default": "theme_settings_debug"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Read-only viewer for all skin-specific settings defined in ThemeSettings.json."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "theme_settings_test",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Lime"
+    },
+    "count": 12
 }

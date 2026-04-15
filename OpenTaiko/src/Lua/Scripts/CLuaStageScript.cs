@@ -30,6 +30,9 @@ namespace OpenTaiko {
 		}
 
 		public void Activate() {
+			// Refresh globals that are populated by TextureLoader after script construction.
+			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
+			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
 			RunLuaCode(lfActivate);
 		}
 

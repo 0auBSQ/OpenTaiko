@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "Instellingen voor het hele systeem.",
 		"SETTINGS_GAME": "Gameplay Opties",
 		"SETTINGS_GAME_DESC": "Instellingen voor het drummen.",
+		"SETTINGS_THEME": "Thema-instellingen",
+		"SETTINGS_THEME_DESC": "Instellingen specifiek voor de huidige skin.\nGedefinieerd in ThemeSettings.json in de skin-map.",
 		"SETTINGS_EXIT": "Verlaat",
 		"SETTINGS_EXIT_DESC": "Sla de instellingen op en verlaat het CONFIGURATION menu.",
 

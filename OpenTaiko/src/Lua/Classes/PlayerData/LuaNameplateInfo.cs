@@ -30,6 +30,8 @@
 			}
 		}
 
+		public LuaUnlockCondition UnlockCondition => _lUC;
+
 		#endregion
 
 		internal LuaNameplateInfo(DBNameplateUnlockables.NameplateUnlockable npu, int id) {

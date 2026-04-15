@@ -27,7 +27,7 @@ internal class CActConfigList : CActivity {
 	public bool b現在選択されている項目はReturnToMenuである {
 		get {
 			CItemBase currentItem = this.list項目リスト[this.n現在の選択項目];
-			if (currentItem == this.iSystemReturnToMenu || currentItem == this.iDrumsReturnToMenu) {
+			if (currentItem == this.iSystemReturnToMenu || currentItem == this.iDrumsReturnToMenu || currentItem == this.iThemeReturnToMenu) {
 				return true;
 			} else {
 				return false;
@@ -450,6 +450,82 @@ internal class CActConfigList : CActivity {
 
 	#endregion
 
+	// Theme-specific settings
+	#region [ t項目リストの設定_Theme() ]
+
+	public void t項目リストの設定_Theme() {
+		this.tConfigIniへ記録する();
+		this.list項目リスト.Clear();
+		themeItems.Clear();
+		themeStringInput = null;
+		activeThemeStringId = null;
+
+		this.iThemeReturnToMenu = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN"), CItemBase.EPanelType.Other,
+			CLangManager.LangInstance.GetString("SETTINGS_MENU_RETURN_DESC"));
+		this.list項目リスト.Add(this.iThemeReturnToMenu);
+
+		var db = OpenTaiko.Databases?.DBThemeSettings;
+		if (db != null) {
+			foreach (var def in db.Definitions) {
+				CItemBase item = CreateThemeItem(def, db);
+				if (item != null) {
+					themeItems[def.Id] = item;
+					this.list項目リスト.Add(item);
+				}
+			}
+		}
+
+		OnListMenuの初期化();
+		this.n現在の選択項目 = 0;
+		this.eメニュー種別 = Eメニュー種別.Theme;
+	}
+
+	private CItemBase? CreateThemeItem(CThemeSettingDef def, DBThemeSettings db) {
+		// For save-scoped settings, use the first loaded save's SaveId as representative.
+		long repSaveId = OpenTaiko.SaveFileInstances[0]?.data?.SaveId ?? 0L;
+		string stored = def.IsSaveScoped
+			? db.GetSettingForSave(def.Id, repSaveId)
+			: db.GetSetting(def.Id);
+
+		string label = def.Label.GetString(def.Id);
+		string desc = def.Description.GetString("");
+
+		switch (def.Type.ToLowerInvariant()) {
+			case "bool": {
+					bool val = stored == "1" || string.Equals(stored, "true", StringComparison.OrdinalIgnoreCase);
+					return new CItemToggle(label, val, desc);
+				}
+			case "int": {
+					int val = int.TryParse(stored, out int v) ? v : def.DefaultInt;
+					return new CItemInteger(label, (int)def.Min, (int)def.Max, val, desc);
+				}
+			case "double": {
+					// Store/display as integer (implicit 2-decimal fixed-point).
+					// E.g. Min=0.0, Max=5.0, step=0.01 → range 0–500 displayed as 0.00–5.00
+					int scale = 100;
+					int minI = (int)Math.Round(def.Min * scale);
+					int maxI = (int)Math.Round(def.Max * scale);
+					double dval = double.TryParse(stored,
+						System.Globalization.NumberStyles.Any,
+						System.Globalization.CultureInfo.InvariantCulture,
+						out double dv) ? dv : def.DefaultDouble;
+					return new CItemInteger(label, minI, maxI, (int)Math.Round(dval * scale), desc);
+				}
+			case "enum": {
+					if (def.Options == null || def.Options.Length == 0) return null;
+					int idx = Math.Max(0, Array.IndexOf(def.Options, stored));
+					return new CItemList(label, CItemList.EPanelType.Normal, idx, desc, def.Options);
+				}
+			case "string": {
+					return new CItemString(label, stored, desc);
+				}
+			default:
+				return null;
+		}
+	}
+
+	#endregion
+
 
 	/// <summary>
 	/// ESC押下時の右メニュー描画
@@ -457,6 +533,12 @@ internal class CActConfigList : CActivity {
 	public void tEsc押下() {
 		if (this.b要素値にフォーカス中)       // #32059 2013.9.17 add yyagi
 		{
+			// Discard string text input: restore the value to what it was before editing.
+			if (activeThemeStringId != null &&
+				themeItems.TryGetValue(activeThemeStringId, out var si) && si is CItemString cis)
+				cis.Value = _stringInputOriginalValue;
+			themeStringInput = null;
+			activeThemeStringId = null;
 			this.b要素値にフォーカス中 = false;
 		}
 
@@ -475,7 +557,25 @@ internal class CActConfigList : CActivity {
 	public void tEnter押下() {
 		OpenTaiko.Skin.soundDecideSFX.tPlay();
 		if (this.b要素値にフォーカス中) {
+			// The draw phase already committed the value via real-time update.
+			// Just clean up in case ImGui did not fire (e.g. pad-only confirm with no ImGui capture).
+			themeStringInput = null;
+			activeThemeStringId = null;
 			this.b要素値にフォーカス中 = false;
+		} else if (this.list項目リスト[this.n現在の選択項目] is CItemString strItem) {
+			// If the draw phase committed this exact frame, consume the flag and do not reopen.
+			if (_stringInputJustCommitted) {
+				_stringInputJustCommitted = false;
+			} else {
+				// Open a CTextInput for string theme settings.
+				activeThemeStringId = themeItems
+					.FirstOrDefault(kv => kv.Value == strItem).Key;
+				if (activeThemeStringId != null) {
+					_stringInputOriginalValue = strItem.Value;
+					themeStringInput = new CTextInput(strItem.Value, 256);
+					this.b要素値にフォーカス中 = true;
+				}
+			}
 		} else if (this.list項目リスト[this.n現在の選択項目].e種別 == CItemBase.E種別.整数) {
 			this.b要素値にフォーカス中 = true;
 		}
@@ -1237,6 +1337,25 @@ internal class CActConfigList : CActivity {
 			this.ct三角矢印アニメ.TickLoop();
 		//-----------------
 		#endregion
+
+		#region [ Theme string input update ]
+		//-----------------
+		if (themeStringInput != null && this.b要素値にフォーカス中 && activeThemeStringId != null) {
+			// Update the CItemString value in real time so the panel reflects live typing.
+			if (themeItems.TryGetValue(activeThemeStringId, out var liveItem) && liveItem is CItemString liveCis)
+				liveCis.Value = themeStringInput.Text;
+
+			if (themeStringInput.Update()) {
+				// Enter confirmed — the value is already up-to-date from the live update above.
+				themeStringInput = null;
+				activeThemeStringId = null;
+				this.b要素値にフォーカス中 = false;
+				_stringInputJustCommitted = true;
+			}
+		}
+		//-----------------
+		#endregion
+
 		// 描画
 
 		#region [ 計11個の項目パネルを描画する。]
@@ -1374,7 +1493,7 @@ internal class CActConfigList : CActivity {
 					object o = this.list項目リスト[nItem].obj現在値();
 					stm.strParam = (o == null) ? "" : o.ToString();
 
-					using (var bmpStr = prvFont.DrawText(strParam, Color.White, Color.Black, null, 30)) {
+					using (var bmpStr = prvFont.DrawText(stm.strParam, Color.White, Color.Black, null, 30)) {
 						stm.txParam = OpenTaiko.tテクスチャの生成(bmpStr, false);
 					}
 
@@ -1432,6 +1551,7 @@ internal class CActConfigList : CActivity {
 	private enum Eメニュー種別 {
 		System,
 		Drums,
+		Theme,
 		KeyAssignSystem,        // #24609 2011.4.12 yyagi: 画面キャプチャキーのアサイン
 		KeyAssignDrums,
 		KeyAssignTraining,
@@ -1598,6 +1718,16 @@ internal class CActConfigList : CActivity {
 	private CItemInteger iLayoutType;
 
 	private CItemBase iDrumsReturnToMenu;
+	private CItemBase iThemeReturnToMenu;
+	// Maps setting-id → CItemBase (CItemToggle / CItemInteger / CItemList / CItemString)
+	private Dictionary<string, CItemBase> themeItems = new();
+	private CTextInput? themeStringInput;
+	private string? activeThemeStringId;
+	// Set to true in the draw phase when the string input is committed via Enter (ImGui).
+	// Consumed by tEnter押下() on the same frame to prevent immediately reopening the input.
+	private bool _stringInputJustCommitted;
+	// Value of the CItemString before the text input was opened — restored on Esc cancel.
+	private string _stringInputOriginalValue = "";
 	private CItemInteger iDrumsScrollSpeed;
 	private CItemToggle iDrumsTight;
 	private CItemToggle iTaikoAutoPlay;
@@ -1682,6 +1812,10 @@ internal class CActConfigList : CActivity {
 
 			case Eメニュー種別.Drums:
 				this.tConfigIniへ記録する_Drums();
+				return;
+
+			case Eメニュー種別.Theme:
+				this.tConfigIniへ記録する_Theme();
 				return;
 		}
 	}
@@ -1799,6 +1933,34 @@ internal class CActConfigList : CActivity {
 
 		OpenTaiko.ConfigIni.TokkunSkipMeasures = this.TokkunSkipCount.n現在の値;
 		OpenTaiko.ConfigIni.TokkunMashInterval = this.TokkunMashInterval.n現在の値;
+	}
+	private void tConfigIniへ記録する_Theme() {
+		var db = OpenTaiko.Databases?.DBThemeSettings;
+		if (db == null) return;
+
+		foreach (var def in db.Definitions) {
+			if (!themeItems.TryGetValue(def.Id, out var item)) continue;
+
+			string valueStr = item switch {
+				CItemToggle t => t.bON ? "1" : "0",
+				CItemInteger i when string.Equals(def.Type, "double", StringComparison.OrdinalIgnoreCase)
+					=> (i.n現在の値 / 100.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
+				CItemInteger i => i.n現在の値.ToString(),
+				CItemList l => def.Options[l.n現在選択されている項目番号],
+				CItemString s => s.Value,
+				_ => def.Default
+			};
+
+			if (def.IsSaveScoped) {
+				// Save for all currently loaded saves.
+				foreach (var sf in OpenTaiko.SaveFileInstances) {
+					if (sf?.data != null)
+						db.SetSettingForSave(def.Id, sf.data.SaveId, valueStr);
+				}
+			} else {
+				db.SetSetting(def.Id, valueStr);
+			}
+		}
 	}
 	//-----------------
 	#endregion
