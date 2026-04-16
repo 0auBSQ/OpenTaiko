@@ -24,7 +24,7 @@ class PuchiChara : CActivity {
 	}
 
 	public static int tGetPuchiCharaIndexByName(int p) {
-		var _pc = OpenTaiko.SaveFileInstances[p].data.PuchiChara;
+		var _pc = CVirtualSlotManager.GetPuchicharaName(p);
 		var _pcs = OpenTaiko.Skin.Puchicharas_NameToIndex;
 		return _pcs.GetValueOrDefault(_pc, 0);
 	}

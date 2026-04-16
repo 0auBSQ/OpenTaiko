@@ -427,10 +427,10 @@ internal class CActImplCharacter : CActivity {
 				bool _mirrorP2 = OpenTaiko.ConfigIni.bAIBattleMode && (i == 1);
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
-					chara_x = (OpenTaiko.Skin.Game_Chara_AI_X[i]);
-					chara_y = (OpenTaiko.Skin.Game_Chara_AI_Y[i]);
-
 					charaScale = OpenTaiko.Skin.Game_Chara_Scale_AI;
+					var aiPos = CCharacter.GetCharacter(i).GetAIBattlePosition(i, charaScale);
+					chara_x = aiPos?.x ?? OpenTaiko.Skin.Game_Chara_AI_X[i];
+					chara_y = aiPos?.y ?? OpenTaiko.Skin.Game_Chara_AI_Y[i];
 				} else if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					chara_x = OpenTaiko.Skin.Game_Chara_X[i];
 					chara_y = OpenTaiko.Skin.Game_Chara_Y[i];
@@ -450,7 +450,10 @@ internal class CActImplCharacter : CActivity {
 
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
 					chara_x += OpenTaiko.Skin.Game_AIBattle_CharaMove * OpenTaiko.stageGameScreen.AIBattleState;
-					//chara_y -= nowChara.szTextureSize.Height * charaScale; // Center down
+					// CharaConfig.txt / skin AI X values are left-edge (old system used TOP-LEFT anchor).
+					// Lua draw always uses "bottom" anchor (center-X), so shift right by half rendered width.
+					float spriteW = (float)CCharacter.GetCharacter(i).GetDrawSize(i, CCharacter.ANIM_GAME_NORMAL).X;
+					chara_x += spriteW * charaScale / 2.0f;
 				}
 
 				//CCharacter.GetCharacter(i).Draw(i, animation, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);

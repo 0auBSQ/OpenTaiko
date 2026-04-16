@@ -972,6 +972,7 @@ class TextureLoader {
 		LuaCharacterDb = new LuaCharacterDatabase(Characters);
 
 		OpenTaiko.Databases?.LoadThemeSettings();
+		CVirtualSlotManager.Initialize();
 
 		#endregion
 
@@ -1036,6 +1037,20 @@ class TextureLoader {
 			CCharacter.CharaLoad(player, Characters[i]);
 			OpenTaiko.SaveFileInstances[player].data.mountedCharacter = ((CCharacterLua)Characters[i]).GetScript(player);
 		}
+	}
+
+	/// <summary>
+	/// Swaps the character animations loaded for a player slot without touching any
+	/// save-file data.  Used by the virtual slot system when mounting or unmounting.
+	/// Unlike <see cref="ReloadCharacter"/>, this never modifies
+	/// <c>SaveFileInstances[player].data</c>.
+	/// </summary>
+	public void SwapCharacterAnimations(int oldIdx, int newIdx, int player) {
+		if (oldIdx == newIdx) return;
+		if (oldIdx >= 0)
+			CCharacter.CharaUnload(player, Characters[oldIdx]);
+		if (newIdx >= 0)
+			CCharacter.CharaLoad(player, Characters[newIdx]);
 	}
 
 	public void DisposeTexture() {

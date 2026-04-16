@@ -36,20 +36,70 @@ class CNamePlate {
 
 		bool isAI = OpenTaiko.ConfigIni.bAIBattleMode && player == 1;
 		if (isAI) {
-			name  = CLangManager.LangInstance.GetString("AI_NAME");
-			title = CLangManager.LangInstance.GetString("AI_TITLE");
-			dan   = stages[Math.Max(0, OpenTaiko.ConfigIni.nAILevel - 1)] + "面";
+			// Name: display name from the AI character's metadata.
+			int aiCharaIdx = CVirtualSlotManager.FindCharacterIndexByName(CVirtualSlotManager.AI.CharacterFolderName);
+			name = OpenTaiko.Tx?.Characters?[aiCharaIdx]?.metadata?.tGetName()
+			       ?? CLangManager.LangInstance.GetString("AI_NAME");
+
+			dan = stages[Math.Max(0, OpenTaiko.ConfigIni.nAILevel - 1)] + "面";
+
+			// The AI virtual slot owns a permanent SaveFile.Data (VirtualData) whose
+			// title/rarity/type fields were pre-set to nameplate #66 by RefreshAINameplate().
+			// Lua stores VirtualData by reference, so updates here are visible in draw().
+			var aiVData = CVirtualSlotManager.AI.VirtualData;
+			title           = aiVData.Title;
+			aiVData.Name    = name;
+			aiVData.Dan     = dan;
+
+			Script?.Activate(player, name, title, dan, aiVData);
 		} else {
-			name  = OpenTaiko.SaveFileInstances[actualPlayer].data.Name;
-			title = OpenTaiko.SaveFileInstances[actualPlayer].data.Title;
-			dan   = OpenTaiko.SaveFileInstances[actualPlayer].data.Dan;
+			// Check for a virtual-slot or cross-player mount override.
+			string? mount = CVirtualSlotManager.GetMount(player);
+			CVirtualSlotData? vslot = mount != null ? CVirtualSlotManager.GetVirtualData(mount) : null;
+
+			if (vslot != null) {
+				name  = vslot.NameplatePlayerName;
+				title = vslot.NameplateTitle;
+				dan   = vslot.NameplateDan;
+
+				// Keep VirtualData.Name/Dan in sync so draw() reads the right values.
+				vslot.VirtualData.Name = name;
+				vslot.VirtualData.Dan  = dan;
+
+				bIsPrevAI[player] = isAI;
+				Script?.Activate(player, name, title, dan, vslot.VirtualData);
+				return;
+			} else {
+				// Use the player's real save file (possibly redirected to another slot).
+				var overrideData = CVirtualSlotManager.GetNameplateOverride(player);
+				SaveFile.Data data;
+				if (overrideData.HasValue) {
+					// Cross-player redirect (e.g. "2P" mounted to player 3).
+					// The override values come from the source save file — just use it directly.
+					int srcPlayer = 0;
+					// Re-parse to get the source player index for the real data object.
+					if (mount != null && mount.Length == 2 && mount[1] == 'P' && char.IsDigit(mount[0]))
+						srcPlayer = mount[0] - '1';
+					data = OpenTaiko.SaveFileInstances[srcPlayer].data;
+					name  = data.Name;
+					title = data.Title;
+					dan   = data.Dan;
+				} else {
+					data  = OpenTaiko.SaveFileInstances[actualPlayer].data;
+					name  = data.Name;
+					title = data.Title;
+					dan   = data.Dan;
+				}
+
+				bIsPrevAI[player] = isAI;
+				if (data.DanGold)
+					Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", data);
+				else
+					Script?.Activate(player, name, title, dan, data);
+				return;
+			}
 		}
 		bIsPrevAI[player] = isAI;
-
-		if (OpenTaiko.SaveFileInstances[player].data.DanGold)
-			Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
-		else
-			Script?.Activate(player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
 	}
 
 	public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255) {

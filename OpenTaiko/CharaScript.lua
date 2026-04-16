@@ -259,6 +259,15 @@ local function load_config()
 		chara_config.game_offset.pos.Y = ini_game_chara_y[0]
 	end
 
+	-- Per-player AI battle positions (Game_Chara_X_AI / Game_Chara_Y_AI).
+	-- When both are present, they override the skin's Game_Chara_AI_X/Y for this character.
+	local ini_ai_x = chara_config_ini:GetIntArray("Game_Chara_X_AI")
+	local ini_ai_y = chara_config_ini:GetIntArray("Game_Chara_Y_AI")
+	if ini_ai_x.Length >= 1 and ini_ai_y.Length >= 1 then
+		chara_config.ai_positions_x = ini_ai_x
+		chara_config.ai_positions_y = ini_ai_y
+	end
+
 	local ini_game_balloon_offset = chara_config_ini:GetIntArray("Game_Chara_Balloon_Offset")
 	if ini_game_balloon_offset.Length == 2 then
 		chara_config.game_balloon_offset.pos = VECTOR2:CreateVector2(ini_game_balloon_offset[0], ini_game_balloon_offset[1])
@@ -905,9 +914,10 @@ local function create_animation(animationType)
 						elseif offset.mode == OFFSET_MODE_GAME_KUSUDAMA then
 							offsetX = offsetX + (((frame.Width / 2.0) - (0.2555 * chara_config.resolution.X)) * scaleX)
 							offsetY = offsetY + ((frame.Height - (0.2555 * chara_config.resolution.Y)) * scaleY)
-						elseif offset.mode == OFFSET_MODE_MENU then
-							offsetX = offsetX + (((frame.Width / 2.0) - (0.13020833333 * chara_config.resolution.X)) * scaleX)
-							offsetY = offsetY + ((frame.Height - (0.25555555555 * chara_config.resolution.Y)) * scaleY)
+						-- OFFSET_MODE_MENU: no extra frame-size correction.
+						-- The old CMenuCharacter applied only Characters_Menu_Offset directly
+						-- without frame-dimension adjustments, so menu positioning is already
+						-- correct with just the scaled menu_offset — no additional correction needed.
 						end
 					end
 
@@ -1193,4 +1203,41 @@ function getHeyaRenderOffset()
 	local scaledX = chara_config.heya_render_offset.X * (theme_resolution.X / chara_config.resolution.X)
 	local scaledY = chara_config.heya_render_offset.Y * (theme_resolution.Y / chara_config.resolution.Y)
 	return scaledX, scaledY
+end
+
+-- Returns the AI battle base position (theme pixels) for the given 0-based player index,
+-- pre-adjusted so that when draw() adds game_offset (and the legacy correction, if any)
+-- the net result equals the configured value.
+-- charaScale: the C#-side scale applied to the character (Game_Chara_Scale_AI).
+-- Returns nil when Game_Chara_X_AI / Game_Chara_Y_AI are absent in CharaConfig.txt.
+function getAIBattlePosition(player, charaScale)
+	if chara_config.ai_positions_x == nil or chara_config.ai_positions_y == nil then
+		return nil
+	end
+	if chara_config.ai_positions_x.Length <= player or chara_config.ai_positions_y.Length <= player then
+		return nil
+	end
+	charaScale = charaScale or 1.0
+	local theme_resolution = THEME:GetResolution()
+	local rx = theme_resolution.X / chara_config.resolution.X
+	local ry = theme_resolution.Y / chara_config.resolution.Y
+	-- Desired final position in theme pixels.
+	local final_x = chara_config.ai_positions_x[player] * rx
+	local final_y = chara_config.ai_positions_y[player] * ry
+	-- draw() will add game_offset (scaled), so subtract it here so the net equals final.
+	local offset_x = chara_config.game_offset.pos.X * rx
+	local offset_y = chara_config.game_offset.pos.Y * ry
+	-- In legacy mode, draw() also adds a frame-size Y correction for GAME animations:
+	--   (frame.Height - 0.2555 * char_res.Y) * scaleY
+	-- where scaleY = charaScale * baseScale and baseScale = theme_res.Y / char_res.Y.
+	-- Simplified: (h - 0.2555 * theme_res.Y) * charaScale  (h = getDrawSize().Y = frame.Height * baseScale)
+	-- Subtract it here so the net bottom still equals final_y.
+	if chara_config.legacy_mode then
+		local w, h = getDrawSize(CHARACTER.ANIM_GAME_NORMAL)
+		if h > 0 then
+			local legacy_y = (h - 0.25555555555 * theme_resolution.Y) * charaScale
+			offset_y = offset_y + legacy_y
+		end
+	end
+	return final_x - offset_x, final_y - offset_y
 end

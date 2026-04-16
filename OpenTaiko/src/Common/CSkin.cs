@@ -3800,14 +3800,16 @@ internal class CSkin : IDisposable {
 									Game_Chara_Kusudama_Scale = float.Parse(strParam);
 									break;
 								}
-							case "Game_Chara_AI_X": {
+							case "Game_Chara_AI_X":
+							case "Game_Chara_X_AI": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Game_Chara_AI_X[i] = int.Parse(strSplit[i]);
 									}
 									break;
 								}
-							case "Game_Chara_AI_Y": {
+							case "Game_Chara_AI_Y":
+							case "Game_Chara_Y_AI": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Game_Chara_AI_Y[i] = int.Parse(strSplit[i]);

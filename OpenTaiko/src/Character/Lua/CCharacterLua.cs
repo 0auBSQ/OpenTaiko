@@ -149,6 +149,10 @@ class CCharacterLua : CCharacter {
 		return Script[player].GetHeyaRenderOffset();
 	}
 
+	public override (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) {
+		return Script[player].GetAIBattlePosition(player, charaScale);
+	}
+
 
 	private void ImplLoadAnimation(int player, string animationType) {
 		Script[player].LoadAnimation(animationType);

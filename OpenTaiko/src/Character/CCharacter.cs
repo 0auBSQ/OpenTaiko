@@ -141,7 +141,7 @@ abstract class CCharacter : IDisposable {
 	};
 
 	public static CCharacter GetCharacter(int player) {
-		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
+		int _charaId = CVirtualSlotManager.GetCharacterIndex(player);
 		return OpenTaiko.Tx.Characters[_charaId];
 	}
 
@@ -377,6 +377,13 @@ abstract class CCharacter : IDisposable {
 	public virtual LuaVector2 GetDrawSize(int player, string animationType) => new LuaVector2(0, 0);
 
 	public virtual (float x, float y) GetHeyaRenderOffset(int player) => (0f, 0f);
+
+	/// <summary>
+	/// Returns the character-specific AI battle base position (theme pixels) for
+	/// <paramref name="player"/> (0-based), or <c>null</c> if the character defers to
+	/// the skin's <c>Game_Chara_AI_X/Y</c> defaults.
+	/// </summary>
+	public virtual (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) => null;
 
 	public virtual void LoadAnimation(int player, string voice) {
 

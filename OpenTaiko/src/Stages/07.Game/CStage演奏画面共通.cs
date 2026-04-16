@@ -779,6 +779,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		actAIBattle.BatchAnimeCounter.CurrentValue = 0;
 		_AIBattleState = 0;
+		OpenTaiko.NamePlate?.tNamePlateRefreshTitles(1);
 
 		for (int i = 0; i < 5; i++) {
 			this.CSectionScore[i] = new CBRANCHSCORE();

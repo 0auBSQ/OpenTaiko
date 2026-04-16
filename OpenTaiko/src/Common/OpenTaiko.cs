@@ -680,15 +680,16 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
+								if (ConfigIni.bAIBattleMode == true) {
+									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
+									ConfigIni.bAIBattleMode = false;
+									CVirtualSlotManager.MountSlot(2, "2P");
+								}
+
 								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 
 								CSongSelectSongManager.stopSong();
 								CSongSelectSongManager.enable();
-
-								if (ConfigIni.bAIBattleMode == true) {
-									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
-									ConfigIni.bAIBattleMode = false;
-								}
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1054,13 +1055,15 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.AIBATTLEMODE:
 								#region [ Song select (with AI) ]
 								//-----------------------------
-								UnmountAndChangeStage(stageSongSelect, "AI Battle Song Select");
-								OpenTaiko.latestSongSelect = stageSongSelect;
+								// Mount the AI slot BEFORE activating the song select stage so its
+								// activate() sees the correct character for player 2 from the start.
 								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
 								ConfigIni.nPlayerCount = 2;
-								ConfigIni.bAIBattleMode = true; // Use this variable to check when to use the AI virtual save file instead of 2P save file?
+								ConfigIni.bAIBattleMode = true;
 								ConfigIni.tInitializeAILevel();
-								// TODO: Add a special profile for AI, in which it is possible to force the character, puchi and nameplateinfo
+								CVirtualSlotManager.MountSlot(2, "AI");
+								UnmountAndChangeStage(stageSongSelect, "AI Battle Song Select");
+								OpenTaiko.latestSongSelect = stageSongSelect;
 
 								//-----------------------------
 								#endregion

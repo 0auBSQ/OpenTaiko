@@ -20,6 +20,7 @@ namespace OpenTaiko {
 		private LuaFunction lfDraw;
 		private LuaFunction? lfGetDrawSize;
 		private LuaFunction? lfGetHeyaRenderOffset;
+	private LuaFunction? lfGetAIBattlePosition;
 
 		private LuaFunction lfLoadVoice;
 		private LuaFunction lfDisposeVoice;
@@ -91,7 +92,15 @@ namespace OpenTaiko {
 			return new LuaVector2(0, 0);
 		}
 
-		public (float x, float y) GetHeyaRenderOffset() {
+		public (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) {
+		if (lfGetAIBattlePosition == null) return null;
+		object[] result = RunLuaCode(lfGetAIBattlePosition, player, (double)charaScale);
+		if (result != null && result.Length >= 2 && result[0] is double x && result[1] is double y)
+			return ((float)x, (float)y);
+		return null;
+	}
+
+	public (float x, float y) GetHeyaRenderOffset() {
 			if (lfGetHeyaRenderOffset == null) return (0f, 0f);
 			object[] result = RunLuaCode(lfGetHeyaRenderOffset);
 			if (result != null && result.Length >= 2) {
@@ -112,7 +121,8 @@ namespace OpenTaiko {
 				lfUpdate = (LuaFunction)LuaScript["update"];
 				lfDraw = (LuaFunction)LuaScript["draw"];
 				lfGetDrawSize = LuaScript["getDrawSize"] as LuaFunction;
-				lfGetHeyaRenderOffset = LuaScript["getHeyaRenderOffset"] as LuaFunction;
+				lfGetHeyaRenderOffset    = LuaScript["getHeyaRenderOffset"]    as LuaFunction;
+			lfGetAIBattlePosition    = LuaScript["getAIBattlePosition"]    as LuaFunction;
 
 				lfLoadVoice = (LuaFunction)LuaScript["loadVoice"];
 				lfDisposeVoice = (LuaFunction)LuaScript["disposeVoice"];
