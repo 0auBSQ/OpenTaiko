@@ -182,7 +182,6 @@ class CStageTowerSelect : CStage {
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 		OpenTaiko.stageSongSelect.str確定された曲のジャンル = Cursor.Item!.songGenre;
 		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
-			CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nLife);
 			this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
@@ -217,7 +216,6 @@ class CStageTowerSelect : CStage {
 		OpenTaiko.stageSongSelect.rChoosenSong = song.randomList[randomSongIndex];
 		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
-		CFloorManagement.reinitialize(OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nLife);
 		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
 		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.songGenre;
 

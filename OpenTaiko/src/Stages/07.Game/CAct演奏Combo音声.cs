@@ -26,7 +26,7 @@ internal class CAct演奏Combo音声 : CActivity {
 		if (FloorIndex[0] < ListFloor[0].Count) {
 
 			var index = ListFloor[0][FloorIndex[0]];
-			if (CFloorManagement.LastRegisteredFloor == index.nCombo) {
+			if (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor == index.nCombo) {
 				index.soundComboVoice.PlayStart();
 				FloorIndex[0]++;
 			}

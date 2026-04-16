@@ -59,7 +59,7 @@ internal class CStage結果 : CStage {
 
 	public int GetTowerScoreRank() {
 		int tmpClear = 0;
-		double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
+		double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 		// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
 		bool[] conditions =
@@ -68,7 +68,7 @@ internal class CStage結果 : CStage {
 			progress >= 0.25,
 			progress >= 0.5,
 			progress >= 0.75,
-			progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
+			progress == 1 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0,
 			OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0,
 			OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0
 		};
@@ -380,7 +380,7 @@ internal class CStage結果 : CStage {
 
 				int maxFloors = OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nTotalFloor;
 
-				double floorRate = Math.Pow(CFloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
+				double floorRate = Math.Pow(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
 				double lengthBonus = Math.Max(1, maxFloors / 140.0);
 
 				#region [Clear modifier]
@@ -633,9 +633,9 @@ internal class CStage結果 : CStage {
 				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
 				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48, Color.White, Color.Black, 700);
 				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkReachedFloor = new TitleTextureKey(CFloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
+				this.ttkReachedFloor = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
-				this.ttkRemaningLifes = new TitleTextureKey(CFloorManagement.CurrentNumberOfLives.ToString() + " / " + CFloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
+				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));

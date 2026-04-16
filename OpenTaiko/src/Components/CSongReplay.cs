@@ -266,8 +266,8 @@ class CSongReplay {
 		CoinValue = (short)Coins;
 		// Tower parameters
 		if (GameMode == 2) {
-			ReachedFloor = CFloorManagement.LastRegisteredFloor;
-			RemainingLives = CFloorManagement.CurrentNumberOfLives;
+			ReachedFloor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
+			RemainingLives = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives;
 		}
 		// Clear status
 		ClearStatus = (byte)Clear;

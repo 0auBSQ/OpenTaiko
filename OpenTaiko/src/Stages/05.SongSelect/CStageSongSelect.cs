@@ -990,10 +990,6 @@ internal class CStageSongSelect : CStage {
 													} else {
 														if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
 															if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
-																// Init tower variables
-																if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
-																	CFloorManagement.reinitialize(this.rNowSelectedSong.score[(int)Difficulty.Tower].譜面情報.nLife);
-
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
 																OpenTaiko.Skin.voiceMenuSongDecide[OpenTaiko.SaveFile]?.tPlay();
 

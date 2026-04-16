@@ -409,7 +409,7 @@ internal class DBSaves {
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
-			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = CFloorManagement.LastRegisteredFloor;
+			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
 			if (choosenDifficulty == (int)Difficulty.Dan) {
 				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
 					for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
