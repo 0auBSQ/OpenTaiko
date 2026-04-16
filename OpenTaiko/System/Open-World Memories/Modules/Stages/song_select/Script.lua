@@ -58,8 +58,14 @@ local difficultySelectModes = { difficultyselect = true, transition = true }
 --- none | inputinfo | playerinfo | quicksettings | unlockconfirm | unlockanim | modselect
 local activeModal = "none"
 
--- To-play song info 
+-- To-play song info
 local selectedSongNode = nil
+
+-- Preview state
+local previewDemoStartRaw = 0  -- raw DemoStart from the song node (audio-file ms, speed-independent)
+local previewDemoStart = 0     -- previewDemoStartRaw / speed, compensated for tSetPositonToBegin's internal multiply
+local previewDurationMs = 0
+local previewLoaded = false
 
 -- Difficulty select variables
 local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), difficulty (int), charter (string)}
@@ -217,6 +223,15 @@ local function startCounter(key, startVal, endVal, interval, mode, updateCallbac
     c:Start()
     ctx[key] = c
     return c
+end
+
+-- Duration helper: converts milliseconds to "m:ss" string
+local function formatDuration(ms)
+	if ms <= 0 then return "?:??" end
+	local totalSec = math.floor(ms / 1000)
+	local m = math.floor(totalSec / 60)
+	local s = totalSec % 60
+	return string.format("%d:%02d", m, s)
 end
 
 -- BPM number helper (up to 3 digits for decimal)
@@ -453,12 +468,25 @@ local function drawPreimage()
 end
 
 local function playPreview(songNode)
+	previewLoaded = false
+	previewDurationMs = 0
+	previewDemoStartRaw = 0
+	previewDemoStart = 0
 	SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
 	if songNode.IsSong == true then
 		startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+			local demoStart = songNode.DemoStart
 			SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
+				local speed = CONFIG.SongSpeed / 20
+				snd:SetSpeed(speed)
 				snd:Play()
-				snd:SetTimestamp(songNode.DemoStart)
+				-- tSetPositonToBegin multiplies ms by PlaySpeed internally, so divide here to land at the correct audio position
+				snd:SetTimestamp(math.floor(demoStart / speed))
+				-- TODO: Dan songs combine multiple audio files; duration will be 0 for them.
+				previewDurationMs = snd:GetDurationMs()
+				previewDemoStartRaw = demoStart
+				previewDemoStart = math.floor(demoStart / speed)
+				previewLoaded = true
 			end)
 		end)
 	else
@@ -700,7 +728,7 @@ function draw()
 			local focusedChart = getSongNodeFocusChart(ssn)
 			local subtitleTx = textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
 			local charterTx = textSmall:GetText("Chart - "..ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
-			local lengthTx = textSmall:GetText("Length - 2:00 (tmp)", false, SONGINFO_LENGTH_MWIDTH)
+			local lengthTx = textSmall:GetText("Length - "..formatDuration(previewDurationMs), false, SONGINFO_LENGTH_MWIDTH)
 			subtitleTx:DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X-songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
 			charterTx:Draw(SONGINFO_CHARTER_ORIGIN_X-songSelectShift, SONGINFO_CHARTER_ORIGIN_Y)
 			lengthTx:Draw(SONGINFO_LENGTH_ORIGIN_X-songSelectShift, SONGINFO_LENGTH_ORIGIN_Y)
@@ -871,6 +899,15 @@ function update()
 	for k, counter in pairs(ctx) do
         counter:Tick()
     end
+
+	-- Loop preview from demostart when playback ends
+	if previewLoaded then
+		local psnd = SHARED:GetSharedSound("presound")
+		if psnd.Loaded and not psnd.IsPlaying then
+			psnd:Play()
+			psnd:SetTimestamp(previewDemoStart)
+		end
+	end
 
 	-- Execute all activities update calls at the beginning (modals, mod select, pretransitions, etc)
 	local activeModal = false
@@ -1054,11 +1091,17 @@ function update()
 	if INPUT:KeyboardPressed("Q") then
 		sounds.Skip:Play()
 		CONFIG.SongSpeed = CONFIG.SongSpeed - 1
+		local speed = CONFIG.SongSpeed / 20
+		SHARED:GetSharedSound("presound"):SetSpeed(speed)
+		if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
 	end
 
 	if INPUT:KeyboardPressed("W") then
 		sounds.Skip:Play()
 		CONFIG.SongSpeed = CONFIG.SongSpeed + 1
+		local speed = CONFIG.SongSpeed / 20
+		SHARED:GetSharedSound("presound"):SetSpeed(speed)
+		if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
 	end
 
 	-- Test shared textures
@@ -1096,6 +1139,11 @@ function activate()
 
 	-- Set the song select on song select screen
 	resetToSongSelect()
+
+	-- If returning to song select after a play, refresh the page to play the preview
+	if songList ~= nil then
+		refreshPage()
+	end
 
 	-- Background Scroll
     startCounter("background", 1920, 0, 1/48, "loop", function(val) 

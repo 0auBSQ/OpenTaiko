@@ -98,6 +98,24 @@ public class CSound : IDisposable {
 			}
 		}
 	}
+
+	/// <summary>
+	/// Sets playback speed on whichever BASS stream is currently connected to the mixer.
+	/// Unlike setting <see cref="PlaySpeed"/> directly, this works even when the sound
+	/// was initially added to the mixer at 1.0x speed (i.e. via <c>_hBassStream</c>).
+	/// Uses frequency scaling, so pitch shifts with speed — acceptable for preview audio.
+	/// </summary>
+	public void SetSpeedWhilePlaying(double speed) {
+		_PlaySpeed = speed;
+		IsNormalSpeed = (speed == 1.000);
+		if (IsBassSound && nオリジナルの周波数 != 0) {
+			// Find which stream is actually connected to the mixer and apply there.
+			int streamInMixer = BassMix.ChannelGetMixer(_hBassStream) != 0
+				? _hBassStream
+				: (BassMix.ChannelGetMixer(_hTempoStream) != 0 ? _hTempoStream : hBassStream);
+			Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Frequency, (float)(_Frequency * speed * nオリジナルの周波数));
+		}
+	}
 	#endregion
 
 	public bool b速度上げすぎ問題 = false;
@@ -271,10 +289,13 @@ public class CSound : IDisposable {
 	/// <para>～を作成する() で追加され、t解放する() or Dispose() で解放される。</para>
 	/// </summary>
 	public static readonly ObservableCollection<CSound> SoundInstances = new ObservableCollection<CSound>();
+	private static readonly object _soundInstancesLock = new object();
 
 	public static void ShowAllCSoundFiles() {
+		CSound[] snapshot;
+		lock (_soundInstancesLock) { snapshot = SoundInstances.ToArray(); }
 		int i = 0;
-		foreach (CSound cs in SoundInstances) {
+		foreach (CSound cs in snapshot) {
 			Debug.WriteLine(i++.ToString("d3") + ": " + Path.GetFileName(cs.FileName));
 		}
 	}
@@ -478,19 +499,22 @@ public class CSound : IDisposable {
 
 
 	public static void tResetAllSound() {
-		foreach (var sound in CSound.SoundInstances) {
+		CSound[] snapshot;
+		lock (_soundInstancesLock) { snapshot = CSound.SoundInstances.ToArray(); }
+		foreach (var sound in snapshot) {
 			sound.tDispose(false);
 		}
 	}
 	internal static void tReloadSound(ISoundDevice device) {
-		if (CSound.SoundInstances.Count == 0)
-			return;
+		CSound[] sounds;
+		lock (_soundInstancesLock) {
+			if (CSound.SoundInstances.Count == 0)
+				return;
 
-
-		// サウンドを再生する際にインスタンスリストも更新されるので、配列にコピーを取っておき、リストはクリアする。
-
-		var sounds = CSound.SoundInstances.ToArray();
-		CSound.SoundInstances.Clear();
+			// サウンドを再生する際にインスタンスリストも更新されるので、配列にコピーを取っておき、リストはクリアする。
+			sounds = CSound.SoundInstances.ToArray();
+			CSound.SoundInstances.Clear();
+		}
 
 
 		// 配列に基づいて個々のサウンドを作成する。
@@ -554,7 +578,8 @@ public class CSound : IDisposable {
 				//{
 				//    Debug.WriteLine( "FAILED to remove CSound.listインスタンス: Count=" + CSound.listインスタンス.Count + ", filename=" + Path.GetFileName( this.strファイル名 ) );
 				//}
-				bool b = CSound.SoundInstances.Remove(this);    // これだと、Clone()したサウンドのremoveに失敗する
+				bool b;
+				lock (_soundInstancesLock) { b = CSound.SoundInstances.Remove(this); }  // これだと、Clone()したサウンドのremoveに失敗する
 				if (!b) {
 					Debug.WriteLine("FAILED to remove CSound.listインスタンス: Count=" + CSound.SoundInstances.Count + ", filename=" + Path.GetFileName(this.FileName));
 				}
@@ -684,7 +709,7 @@ public class CSound : IDisposable {
 
 		// インスタンスリストに登録。
 
-		CSound.SoundInstances.Add(this);
+		lock (_soundInstancesLock) { CSound.SoundInstances.Add(this); }
 	}
 	//-----------------
 

@@ -24,6 +24,10 @@ namespace OpenTaiko {
 		public bool IsPlaying => _sound?.bIsPlaying ?? false;
 		public bool GetLoop() => _sound?.bLoop ?? false;
 		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
+		/// <summary>Returns the total duration of the sound in milliseconds, or 0 if not loaded.</summary>
+		public int GetDurationMs() => (int)(_sound?.n長さ_現在のサウンド ?? 0);
+		/// <summary>Returns the current playback position in milliseconds.</summary>
+		public int GetTimestampMs() => (int)(_sound?.msTimeStamp_nowSound ?? 0);
 		#endregion
 		#region Sets
 		public void SetLoop(bool loop) {
@@ -34,6 +38,9 @@ namespace OpenTaiko {
 		public void SetTimestamp(int ms) => _sound?.SetTimestamp(ms);
 
 		public void SetVolume(int vol) => _sound?.SetVolume(vol);
+
+		/// <summary>Sets the playback speed multiplier (1.0 = normal).</summary>
+		public void SetSpeed(double speed) => _sound?.SetSpeed(speed);
 
 		#endregion
 		#region Dispose

@@ -196,6 +196,11 @@ internal class CSkin : IDisposable {
 			this.rSound[1]?.SetGain(vol);
 		}
 
+		public void SetSpeed(double speed) {
+			if (this.rSound[0] != null) this.rSound[0].SetSpeedWhilePlaying(speed);
+			if (this.rSound[1] != null) this.rSound[1].SetSpeedWhilePlaying(speed);
+		}
+
 		public void SetTimestamp(int ms) {
 			if (this.bNotLoadedYet) {
 				try {
