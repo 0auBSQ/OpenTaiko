@@ -238,6 +238,11 @@ internal class SaveFile {
 		[JsonIgnore]
 		public int AIBattleModeWins = 0;
 
+		/// <summary>Folder name of the selected hitsound set (e.g. "Taiko").
+		/// Stored per save-file so every player can have their own hitsounds.</summary>
+		[JsonIgnore]
+		public string SelectedHitsounds = "Taiko";
+
 		[JsonProperty("character")]
 		public int Character = 0;
 

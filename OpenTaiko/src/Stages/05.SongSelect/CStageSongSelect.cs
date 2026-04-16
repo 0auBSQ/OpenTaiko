@@ -504,7 +504,9 @@ internal class CStageSongSelect : CStage {
 			#region[Modicons]
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				ModIcons.tDisplayModsMenu(OpenTaiko.Skin.SongSelect_ModIcons_X[i], OpenTaiko.Skin.SongSelect_ModIcons_Y[i], i);
+				var _ro = LuaROActivityWrapper.GetROActivity("modicons");
+				if (_ro != null && !_ro.IsActive) _ro.Activate();
+				_ro?.Draw(OpenTaiko.Skin.SongSelect_ModIcons_X[i], OpenTaiko.Skin.SongSelect_ModIcons_Y[i], i, "menu");
 			}
 
 			int dyGameMode = OpenTaiko.actTextConsole.fontHeight;
@@ -941,10 +943,6 @@ internal class CStageSongSelect : CStage {
 													} else {
 														if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
 															if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
-																// Init tower variables
-																if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
-																	CFloorManagement.reinitialize(this.rNowSelectedSong.score[(int)Difficulty.Tower].譜面情報.nLife);
-
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
 																for (int i = 0; i < 5; i++) {
 																	CCharacter character = CCharacter.GetCharacter(i);

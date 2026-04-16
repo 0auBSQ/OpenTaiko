@@ -334,7 +334,9 @@ internal class CActImplMtaiko : CActivity {
 				couse_symbol_y = OpenTaiko.Skin.Game_CourseSymbol_Y[i];
 			}
 
-			ModIcons.tDisplayMods(modIcons_x, modIcons_y, i);
+			var _ro = LuaROActivityWrapper.GetROActivity("modicons");
+			if (_ro != null && !_ro.IsActive) _ro.Activate();
+			_ro?.Draw(modIcons_x, modIcons_y, i, "game");
 
 			if (OpenTaiko.Tx.Couse_Symbol[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]] != null) {
 				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(

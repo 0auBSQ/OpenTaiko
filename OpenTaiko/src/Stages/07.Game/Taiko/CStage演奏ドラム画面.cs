@@ -336,7 +336,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			this.actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 			this.actGauge.db現在のゲージ値[iPlayer] = 0; // for indicate life failure in AI mode
 			this.UpdateGauge(null, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
-			CFloorManagement.CurrentNumberOfLives = 0; // prevent clear
+			OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives = 0; // prevent clear
 			if (!OpenTaiko.ConfigIni.bAIBattleMode)
 				this.actEnd.Start(iPlayer);
 		}
@@ -375,7 +375,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						continue;
 					EStageAbort failType = this.actGauge.IsRiskyFailed(i) ? EStageAbort.FailedStopSkipResult
 						: (this.actGame.st叩ききりまショー.ct残り時間.IsEnded
-							|| (isTower && CFloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
+							|| (isTower && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives <= 0)) ? EStageAbort.FailedStop
 						: this.actGauge.IsRiskyMineFailed(i) ? EStageAbort.FailedFlow
 						: EStageAbort.None;
 					if (failType > this.stageAbortType[i])
@@ -600,9 +600,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			} else if ((bIsChartEnded || bIsFinishedPlaying) && (!isTower || this.actBackground.IsFinishedTowerClimbing())) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						if (isTower ? (CFloorManagement.CurrentNumberOfLives >= CFloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
+						if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives >= OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
 							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_10COMBO_MAX);
-						} else if (isTower ? (CFloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
+						} else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_CLEARED);
 						} else {
 							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_FAILED);

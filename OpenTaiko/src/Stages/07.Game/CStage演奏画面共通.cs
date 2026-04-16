@@ -45,8 +45,16 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public double[] nRollTimeMs_Dan = [];
 	public double[] nAddScoreGen4ShinUchi_Dan = [];
 
+	/// <summary>Per-session Tower mode state. Always non-null during gameplay.</summary>
+	public CFloorManagement FloorManagement { get; private set; } = new CFloorManagement(5);
+
 	public override void Activate() {
 		OpenTaiko.HttpEventReporter.ReportGameplayStart();
+
+		// Initialize tower-mode life from the song node so the correct value is
+		// always used regardless of what happened in the selection screens.
+		int towerLife = OpenTaiko.stageSongSelect.r確定されたスコア?.譜面情報.nLife ?? 5;
+		FloorManagement = new CFloorManagement(towerLife);
 
 		listChip = new List<CChip>[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -1628,7 +1636,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						break;
 
 					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-						CFloorManagement.damage();
+						FloorManagement.damage();
 
 					this.Chara_MissCount[nPlayer]++;
 
@@ -3236,7 +3244,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.CSectionScore[iPlayer].nMine++;
 						this.CBranchScore[iPlayer].nMine++;
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
-							CFloorManagement.damage();
+							FloorManagement.damage();
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.DanSongScore[actDan.NowShowingNumber].nMine++;
 						this.actCombo.nCurrentCombo[iPlayer] = 0;
@@ -3663,7 +3671,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		NowAIBattleSectionCount = 0;
 		NowAIBattleSectionTime = 0;
 
-		CFloorManagement.reload();
+		FloorManagement.reload();
 
 		for (int i = 0; i < AIBattleSections.Count; i++) {
 			AIBattleSections[i].End = AIBattleSection.EndType.None;

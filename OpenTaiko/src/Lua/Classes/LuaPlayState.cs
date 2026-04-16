@@ -2,11 +2,11 @@
 	public class LuaPlayStateFunc {
 
 		// Tower
-		public int LastRegisteredFloor => CFloorManagement.LastRegisteredFloor;
-		public int MaxNumberOfLives => CFloorManagement.MaxNumberOfLives;
-		public int CurrentNumberOfLives => CFloorManagement.CurrentNumberOfLives;
-		public double InvincibilityDurationSpeedDependent => CFloorManagement.InvincibilityDurationSpeedDependent;
-		public int InvincibilityDuration => CFloorManagement.InvincibilityDuration;
+		public int LastRegisteredFloor => OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
+		public int MaxNumberOfLives => OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives;
+		public int CurrentNumberOfLives => OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives;
+		public double InvincibilityDurationSpeedDependent => OpenTaiko.stageGameScreen.FloorManagement.InvincibilityDurationSpeedDependent;
+		public int InvincibilityDuration => OpenTaiko.stageGameScreen.FloorManagement.InvincibilityDuration;
 
 		// General
 		public bool WasPlayEndedNormally() {

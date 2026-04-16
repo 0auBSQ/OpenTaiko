@@ -1,64 +1,70 @@
-﻿using FDK;
+using FDK;
 
 namespace OpenTaiko;
 
-// Small static class which refers to the Tower mode important informations
-static internal class CFloorManagement {
-	public static void reinitialize(int life) {
-		CFloorManagement.LastRegisteredFloor = 1;
-		CFloorManagement.MaxNumberOfLives = life;
-		CFloorManagement.CurrentNumberOfLives = life;
-		CFloorManagement.InvincibilityFrames = null;
+// Tracks Tower mode state for a single gameplay session.
+// Owned by CStage演奏画面共通 and initialized in Activate().
+internal class CFloorManagement {
+	public CFloorManagement(int life) {
+		reinitialize(life);
+	}
 
-		if (CFloorManagement.MaxNumberOfLives <= 0) {
-			CFloorManagement.MaxNumberOfLives = 5;
-			CFloorManagement.CurrentNumberOfLives = 5;
+	public void reinitialize(int life) {
+		LastRegisteredFloor = 1;
+		MaxNumberOfLives = life;
+		CurrentNumberOfLives = life;
+		InvincibilityFrames = null;
+
+		if (MaxNumberOfLives <= 0) {
+			MaxNumberOfLives = 5;
+			CurrentNumberOfLives = 5;
 		}
 	}
 
-	public static void reload() {
-		CFloorManagement.LastRegisteredFloor = 1;
-		CFloorManagement.CurrentNumberOfLives = CFloorManagement.MaxNumberOfLives;
-		CFloorManagement.InvincibilityFrames = null;
+	public void reload() {
+		LastRegisteredFloor = 1;
+		CurrentNumberOfLives = MaxNumberOfLives;
+		InvincibilityFrames = null;
 	}
 
-	public static void damage() {
-		if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDurationSpeedDependent)
+	public void damage() {
+		if (InvincibilityFrames != null && InvincibilityFrames.CurrentValue < InvincibilityDurationSpeedDependent)
 			return;
 
-		if (CFloorManagement.CurrentNumberOfLives > 0) {
-			CFloorManagement.InvincibilityFrames = new CCounter(0, CFloorManagement.InvincibilityDurationSpeedDependent + 1000, 1, OpenTaiko.Timer);
-			CFloorManagement.CurrentNumberOfLives--;
+		if (CurrentNumberOfLives > 0) {
+			InvincibilityFrames = new CCounter(0, InvincibilityDurationSpeedDependent + 1000, 1, OpenTaiko.Timer);
+			CurrentNumberOfLives--;
 			//TJAPlayer3.Skin.soundTowerMiss.t再生する();
 			CCharacter.GetCharacter(0).PlayVoice(0, CCharacter.VOICE_TOWER_MISS);
 		}
 	}
 
-	public static bool isBlinking() {
-		if (CFloorManagement.InvincibilityFrames == null || CFloorManagement.InvincibilityFrames.CurrentValue >= CFloorManagement.InvincibilityDurationSpeedDependent)
+	public bool isBlinking() {
+		if (InvincibilityFrames == null || InvincibilityFrames.CurrentValue >= InvincibilityDurationSpeedDependent)
 			return false;
 
-		if (CFloorManagement.InvincibilityFrames.CurrentValue % 200 > 100)
+		if (InvincibilityFrames.CurrentValue % 200 > 100)
 			return false;
 
 		return true;
 	}
 
-	public static void loopFrames() {
-		if (CFloorManagement.InvincibilityFrames != null)
-			CFloorManagement.InvincibilityFrames.Tick();
+	public void loopFrames() {
+		if (InvincibilityFrames != null)
+			InvincibilityFrames.Tick();
 	}
 
-	public static int LastRegisteredFloor = 1;
-	public static int MaxNumberOfLives = 5;
-	public static int CurrentNumberOfLives = 5;
+	public int LastRegisteredFloor = 1;
+	public int MaxNumberOfLives = 5;
+	public int CurrentNumberOfLives = 5;
 
-	// prevents one from playing in 7.65x or so speed and passing the life challenge easily.
-	public static double InvincibilityDurationSpeedDependent {
+	// Divides by song speed so the wall-clock window shrinks at high speeds,
+	// preventing cheese by skipping fewer notes when using speed mods.
+	public double InvincibilityDurationSpeedDependent {
 		get => CTja.TjaDurationToGameDuration(InvincibilityDuration);
 	}
 
 	// ms
-	public static readonly int InvincibilityDuration = 2000;
-	public static CCounter InvincibilityFrames = null;
+	public readonly int InvincibilityDuration = 2000;
+	public CCounter? InvincibilityFrames = null;
 }

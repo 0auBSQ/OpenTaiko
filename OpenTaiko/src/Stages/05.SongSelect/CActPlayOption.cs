@@ -535,7 +535,8 @@ internal class CActPlayOption : CActivity {
 
 		#region [ Hitsounds ]
 
-		nOtoiro = Math.Min(txOtoiro.Length - 1, OpenTaiko.ConfigIni.nHitSounds[actual]);
+		string _hsFolder = OpenTaiko.SaveFileInstances[actual].data.SelectedHitsounds;
+		nOtoiro = Math.Min(txOtoiro.Length - 1, hsInfo.GetIndexByFolderName(_hsFolder));
 
 		#endregion
 
@@ -641,6 +642,9 @@ internal class CActPlayOption : CActivity {
 		#region [ Hitsounds ]
 
 		OpenTaiko.ConfigIni.nHitSounds[actual] = nOtoiro;
+		string _newHsFolder = hsInfo.GetFolderName(nOtoiro);
+		OpenTaiko.SaveFileInstances[actual].data.SelectedHitsounds = _newHsFolder;
+		DBSaves.SetSelectedHitsounds(OpenTaiko.SaveFileInstances[actual].data.SaveId, _newHsFolder);
 		hsInfo.tReloadHitSounds(nOtoiro, actual);
 
 		#endregion

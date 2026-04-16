@@ -159,7 +159,7 @@ internal class CActImplCharacter : CActivity {
 
 			// Blinking animation during invincibility frames
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				if (CFloorManagement.isBlinking() == true)
+				if (OpenTaiko.stageGameScreen.FloorManagement.isBlinking() == true)
 					break;
 			}
 

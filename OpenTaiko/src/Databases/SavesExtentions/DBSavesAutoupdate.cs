@@ -14,6 +14,12 @@ namespace OpenTaiko {
 				AddActiveCountersTable(connection);
 				SetDBVersion(connection, "v0.6.0.70");
 			}
+
+			// 0.6.1.0 - Per-save hitsound selection
+			if (VersionComparer.CompareVersions(version, "v0.6.1.0") < 0) {
+				AddSelectedHitsoundsColumn(connection);
+				SetDBVersion(connection, "v0.6.1.0");
+			}
 		}
 
 		#region [DB Version]
@@ -60,6 +66,18 @@ namespace OpenTaiko {
 				FOREIGN KEY("SaveId") REFERENCES "saves"("SaveId"),
 				PRIMARY KEY("EntryId" AUTOINCREMENT)
 			);
+			""";
+			command.ExecuteNonQuery();
+		}
+
+		#endregion
+
+		#region [0.6.1.0 - Hitsounds per save]
+
+		private static void AddSelectedHitsoundsColumn(SqliteConnection connection) {
+			var command = connection.CreateCommand();
+			command.CommandText = """
+			ALTER TABLE saves ADD COLUMN SelectedHitsounds TEXT NOT NULL DEFAULT 'Taiko';
 			""";
 			command.ExecuteNonQuery();
 		}

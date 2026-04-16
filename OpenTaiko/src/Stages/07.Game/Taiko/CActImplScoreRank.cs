@@ -177,7 +177,7 @@ class CActImplScoreRank : CActivity {
 				} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = CFloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
+					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 					bool[] conditions =
 					{
@@ -185,7 +185,7 @@ class CActImplScoreRank : CActivity {
 						progress >= 0.25,
 						progress >= 0.5,
 						progress >= 0.75,
-						progress == 1 && CFloorManagement.CurrentNumberOfLives > 0,
+						progress == 1 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0,
 						OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0,
 						OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0
 					};

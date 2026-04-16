@@ -19,6 +19,9 @@ local highlightedPlayer = 0
 -- Activities
 local act = {}
 
+-- ROActivities
+local modicons_ro = nil
+
 -- Animations and counters
 local ctx = {}
 
@@ -157,6 +160,7 @@ local NAMEPLATE_BOX_START_X = 0
 local NAMEPLATE_BOX_SPACING_X = 384
 local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
+local NAMEPLATE_HEIGHT = 81   -- height of the nameplate base texture (330×81)
 
 local DIFFSELECT_CHARA_ORIG_X_35P = 1250
 local DIFFSELECT_CHARA_ORIG_Y_35P = 470
@@ -637,7 +641,9 @@ function draw()
 				local y = oy + r * gy
 				
 				drawCharaWithNameplate(i, x, y, s, s, opacityNorm, true)
-				-- TODO: Display modicons, selected status and selected diff here
+				if modicons_ro ~= nil then
+					modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + 4, i)
+				end
 			end
 		end
 	end
@@ -801,10 +807,10 @@ function draw()
 			local y0 = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
 			bgtx["nameplate_info"]:Draw(x0, y0)
 			-- TODO: Draw clear numbers here for the given 1P difficulty
-			drawPlayerChara(highlightedPlayer, x0+bgtx["nameplate_info"].Width/2, y0, 1.0, 1.0, opacityNorm, false)
+			drawPlayerChara(highlightedPlayer, x0+bgtx["nameplate_info"].Width/2, y0+NAMEPLATE_OFFSET_Y, 1.0, 1.0, opacityNorm, false)
 			NAMEPLATE:DrawPlayerNameplate(x0+NAMEPLATE_OFFSET_X, y0+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, highlightedPlayer)
 		end
-		
+
 		for i = 1, playerCount - 1, 1 do
 			local j = i
 			if j - 1 >= highlightedPlayer then
@@ -890,6 +896,15 @@ function update()
 		if INPUT:KeyboardPressed("P") then
 			sounds.Skip:Play()
 			highlightedPlayer = (highlightedPlayer + 1) % CONFIG.PlayerCount
+		end
+
+		if INPUT:KeyboardPressed("F3") then
+			sounds.Decide:Play()
+			CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+		end
+		if INPUT:KeyboardPressed("F4") and CONFIG.PlayerCount >= 2 then
+			sounds.Decide:Play()
+			CONFIG:SetAutoStatus(1, not CONFIG:GetAutoStatus(1))
 		end
 
 		local inpset = inputSets[highlightedPlayer + 1]
@@ -981,6 +996,15 @@ function update()
 			end
 		end 
 		
+		if INPUT:KeyboardPressed("F3") then
+			sounds.Decide:Play()
+			CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+		end
+		if INPUT:KeyboardPressed("F4") and CONFIG.PlayerCount >= 2 then
+			sounds.Decide:Play()
+			CONFIG:SetAutoStatus(1, not CONFIG:GetAutoStatus(1))
+		end
+
 		-- Back to song select
 		if canceled or INPUT:KeyboardPressed("Escape") then
 			sounds.Decide:Play()
@@ -1061,6 +1085,9 @@ function activate()
 	for _, at in ipairs(activities) do
 		act[at] = ACTIVITY:GetActivity(at)
 	end
+
+	modicons_ro = ROACTIVITY:GetROActivity("modicons")
+	if modicons_ro ~= nil then modicons_ro:Activate() end
 
 	sounds.Skip = SHARED:GetSharedSound("Skip")
 	sounds.Cancel = SHARED:GetSharedSound("Cancel")

@@ -165,6 +165,7 @@ internal class DBSaves {
 			sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
 			sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
 			sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
+			sf.data.SelectedHitsounds = reader["SelectedHitsounds"] as string ?? "Taiko";
 			sf.tInitSaveFile();
 			sf.tLoadUnlockables();
 
@@ -196,6 +197,17 @@ internal class DBSaves {
 
 		var command = connection.CreateCommand();
 		command.CommandText = @$"UPDATE saves SET AIBattleModePlaycount = AIBattleModePlaycount + 1, AIBattleModeWins = AIBattleModeWins + {AIBattleWinsDelta} WHERE SaveId = {SaveId};";
+		command.ExecuteNonQuery();
+	}
+
+	public static void SetSelectedHitsounds(Int64 SaveId, string hitsoundName) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		command.CommandText = $"""
+		UPDATE saves SET SelectedHitsounds = '{hitsoundName.EscapeSingleQuotes()}' WHERE SaveId = {SaveId};
+		""";
 		command.ExecuteNonQuery();
 	}
 
@@ -409,7 +421,7 @@ internal class DBSaves {
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
-			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = CFloorManagement.LastRegisteredFloor;
+			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
 			if (choosenDifficulty == (int)Difficulty.Dan) {
 				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
 					for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {

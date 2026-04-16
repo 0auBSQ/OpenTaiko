@@ -101,6 +101,27 @@
 
 		#endregion
 
+		#region [Hitsounds]
+
+		/// <summary>The folder name of this player's selected hitsound set (e.g. "Taiko").</summary>
+		public string SelectedHitsounds {
+			get => _sf.data.SelectedHitsounds;
+			set {
+				if (_sf.data.SelectedHitsounds == value) return;
+				_sf.data.SelectedHitsounds = value;
+				DBSaves.SetSelectedHitsounds(_sf.data.SaveId, value);
+
+				// Apply immediately if the hitsounds are loaded
+				var hs = OpenTaiko.Skin.hsHitSoundsInformations;
+				if (hs != null) {
+					int idx = hs.GetIndexByFolderName(value);
+					hs.tReloadHitSounds(idx, _mounted);
+				}
+			}
+		}
+
+		#endregion
+
 		#region [Triggers and Counters]
 
 		public bool GetGlobalTrigger(string triggerName) {

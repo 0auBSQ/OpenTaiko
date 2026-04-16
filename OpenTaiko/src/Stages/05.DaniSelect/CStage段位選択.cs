@@ -165,7 +165,9 @@ class CStage段位選択 : CStage {
 			}
 
 			OpenTaiko.NamePlate.tNamePlateDraw(OpenTaiko.Skin.SongSelect_NamePlate_X[0], OpenTaiko.Skin.SongSelect_NamePlate_Y[0], 0);
-			ModIcons.tDisplayModsMenu(OpenTaiko.Skin.SongSelect_ModIcons_X[0], OpenTaiko.Skin.SongSelect_ModIcons_Y[0], 0); ;
+			var _ro = LuaROActivityWrapper.GetROActivity("modicons");
+			if (_ro != null && !_ro.IsActive) _ro.Activate();
+			_ro?.Draw(OpenTaiko.Skin.SongSelect_ModIcons_X[0], OpenTaiko.Skin.SongSelect_ModIcons_Y[0], 0, "menu");
 
 			#region [ キー関連 ]
 

@@ -8,12 +8,12 @@
 local save = nil
 local modal = nil
 
--- Current screen: "main" | "character" | "puchichara" | "nameplate"
+-- Current screen: "main" | "character" | "puchichara" | "nameplate" | "hitsounds"
 local currentScreen = "main"
 
--- Main menu: 1=Character, 2=Puchichara, 3=Nameplate
+-- Main menu: 1=Character, 2=Puchichara, 3=Nameplate, 4=Hitsounds
 local mainIdx = 1
-local MAIN_OPTIONS = { "Character", "Puchichara", "Nameplate" }
+local MAIN_OPTIONS = { "Character", "Puchichara", "Nameplate", "Hitsounds" }
 
 -- Sub-menu selection index (0-based)
 local subIdx = 0
@@ -22,6 +22,7 @@ local subIdx = 0
 local characterList = {}
 local puchiList = {}
 local nameplateList = {}
+local hitsoundList = {}
 
 -- Tracks which character entries have had ANIM_MENU_NORMAL loaded (FolderName → entry).
 -- Populated lazily during draw; all disposed in deactivate().
@@ -111,6 +112,18 @@ local function buildNameplateList()
         local entry = NAMEPLATESLIST:GetByIndex(i)
         if entry ~= nil then
             nameplateList[#nameplateList + 1] = entry
+        end
+    end
+end
+
+---@diagnostic disable-next-line: undefined-global
+local function buildHitsoundList()
+    hitsoundList = {}
+    local count = HITSOUNDSLIST.Count
+    for i = 0, count - 1 do
+        local entry = HITSOUNDSLIST:GetByIndex(i) ---@diagnostic disable-line: undefined-global
+        if entry ~= nil then
+            hitsoundList[#hitsoundList + 1] = entry
         end
     end
 end
@@ -417,6 +430,26 @@ local function drawNameplateVertical()
     end
 end
 
+local function drawHitsoundItem(dataIdx, cx, cy, isSelected)
+    local entry = hitsoundList[dataIdx + 1]
+    if entry == nil then return end
+
+    local isActive = (save.SelectedHitsounds == entry.FolderName)
+    local nameColor = isSelected and getYellowColor() or getWhiteColor()
+    local nameTx = font:GetText(entry.DisplayName, false, ITEM_SLOT_W, nameColor)
+    nameTx:DrawAtAnchor(cx, cy, "center")
+
+    if isActive then
+        local badgeTx = font:GetText("[ Active ]", false, ITEM_SLOT_W, getYellowColor())
+        badgeTx:DrawAtAnchor(cx, cy + 28, "top")
+    end
+
+    if isSelected and not isActive then
+        local hintTx = font:GetText("Press Enter to activate", false, ITEM_SLOT_W * 2)
+        hintTx:DrawAtAnchor(cx, cy + 28, "top")
+    end
+end
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- draw()
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -464,6 +497,15 @@ function draw()
 
         local hintTx = font:GetText("[Up/Down] Browse   [Enter] Unlock/Equip   [P] Force unlock   [Esc] Back", false, 1500)
         hintTx:DrawAtAnchor(960, 980, "top")
+
+    elseif currentScreen == "hitsounds" then
+        local title = font:GetText(MAIN_OPTIONS[4], false, 600, getYellowColor())
+        title:DrawAtAnchor(960, 80, "top")
+
+        drawItemList(#hitsoundList, subIdx, drawHitsoundItem)
+
+        local hintTx = font:GetText("[Left/Right] Browse   [Enter] Activate   [Esc] Back", false, 1500)
+        hintTx:DrawAtAnchor(960, 980, "top")
     end
 
     -- Modal drawn on top
@@ -506,8 +548,18 @@ function update()
                 currentScreen = "character"
             elseif mainIdx == 2 then
                 currentScreen = "puchichara"
-            else
+            elseif mainIdx == 3 then
                 currentScreen = "nameplate"
+            else
+                currentScreen = "hitsounds"
+                -- Pre-select the currently active hitsound
+                local active = save.SelectedHitsounds ---@diagnostic disable-line: undefined-field, need-check-nil
+                for i, entry in ipairs(hitsoundList) do
+                    if entry.FolderName == active then
+                        subIdx = i - 1
+                        break
+                    end
+                end
             end
         end
 
@@ -595,6 +647,34 @@ function update()
         if INPUT:KeyboardPressed("P") and #nameplateList > 0 then
             tryUnlockNameplate(nameplateList[subIdx + 1], true)
         end
+
+    elseif currentScreen == "hitsounds" then
+        if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
+            if sounds.Cancel ~= nil then sounds.Cancel:Play() end
+            currentScreen = "main"
+            return
+        end
+
+        if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
+            if sounds.Move ~= nil then sounds.Move:Play() end
+            if #hitsoundList > 0 then
+                subIdx = modWrap(subIdx + 1, #hitsoundList)
+            end
+        end
+        if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
+            if sounds.Move ~= nil then sounds.Move:Play() end
+            if #hitsoundList > 0 then
+                subIdx = modWrap(subIdx - 1, #hitsoundList)
+            end
+        end
+
+        if (INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return")) and #hitsoundList > 0 then
+            local entry = hitsoundList[subIdx + 1]
+            if entry ~= nil then
+                save.SelectedHitsounds = entry.FolderName ---@diagnostic disable-line: inject-field
+                if sounds.Decide ~= nil then sounds.Decide:Play() end
+            end
+        end
     end
 end
 
@@ -618,6 +698,7 @@ function activate()
     buildCharacterList()
     buildPuchiList()
     buildNameplateList()
+    buildHitsoundList()
     -- Character animations are loaded lazily in drawCharacterItem via ensureCharaAnimLoaded.
 end
 
