@@ -117,7 +117,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		float gaugeRate = 0f;
 		float dbDamageRate = 2.0f;
 
-		int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
+		int nanidou = OpenTaiko.SongMount.nChoosenSongDifficulty[nPlayer];
 
 		switch (this.DTX[nPlayer].LEVELtaiko[nanidou]) {
 			case 0:
@@ -292,7 +292,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			case ENoteJudge.Miss: {
 					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
 
-					int nanidou = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[nPlayer];
+					int nanidou = OpenTaiko.SongMount.nChoosenSongDifficulty[nPlayer];
 					int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
 
 					switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {

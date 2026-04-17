@@ -19,4 +19,14 @@ internal class CSongMount {
 			_rCurrentlySelectedSong = value;
 		}
 	}
+
+	// Chosen song state (set when the player confirms a song)
+	public int[] nChoosenSongDifficulty = new int[5];
+	public string? strChosenSongGenre { get; set; }
+	public CScore? rChosenScore { get; set; }
+	public CSongListNode? rChoosenSong { get; set; }
+
+	// Current selection state (updated live during song select navigation)
+	public int nCurrentSongDifficulty { get; set; }
+	public CScore? rCurrentScore => rCurrentlySelectedSong?.score[nCurrentSongDifficulty];
 }

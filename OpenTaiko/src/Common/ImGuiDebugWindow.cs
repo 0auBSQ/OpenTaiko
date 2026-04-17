@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 using System.Reflection;
@@ -595,7 +595,7 @@ public static class ImGuiDebugWindow {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
-							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
+							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.SongMount.nChoosenSongDifficulty[i]);
 							var dtx = OpenTaiko.GetTJA(i);
 							if (dtx == null) {
 								ImGui.TreePop();
@@ -720,7 +720,7 @@ public static class ImGuiDebugWindow {
 						"Kusudama", "RESC_LUA_KUSUDAMA");
 
 					#region Endings
-					switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+					switch ((Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
 						case Difficulty.Tower:
 							currentStageMemoryUsage += popup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
 								"Tower Dropout", "RESC_LUA_TOWERDROPOUT");

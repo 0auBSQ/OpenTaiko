@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using DiscordRPC;
@@ -59,7 +59,7 @@ internal class CStage結果 : CStage {
 
 	public int GetTowerScoreRank() {
 		int tmpClear = 0;
-		double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
+		double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 		// Clear badges : 10% (E), 25% (D), 50% (C), 75% (B), Clear (A), FC (S), DFC (X)
 		bool[] conditions =
@@ -145,7 +145,7 @@ internal class CStage結果 : CStage {
 				#region [ Results calculus ]
 				//---------------------
 
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 					for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
 						var ccf = OpenTaiko.stageGameScreen.CChartScore[p];
 
@@ -191,13 +191,13 @@ internal class CStage結果 : CStage {
 
 
 
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 					// Regular (Ensou game) Score and Score Rank saves
 
 					#region [Regular saves]
 
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						int diff = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
+						int diff = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
 
 						ClearStatus_Replay[i] = this.nクリア[i];
 						ScoreRank_Replay[i] = this.nスコアランク[i];
@@ -205,7 +205,7 @@ internal class CStage結果 : CStage {
 
 					#endregion
 
-				} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 					/* == Specific format for DaniDoujou charts ==
 					 **
 					 ** Higher is better, takes the Clear0 spot (Usually the spot allocated for Kantan Clear crowns)
@@ -219,7 +219,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 
 					int clearValue = 0;
 
@@ -253,7 +253,7 @@ internal class CStage結果 : CStage {
 
 					// Unlock dan grade
 					if (clearValue > 0 && !OpenTaiko.ConfigIni.bAutoPlay[0]) {
-						string dan_title = OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("").RemoveTags();
+						string dan_title = OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("").RemoveTags();
 						if (dan_title.Length > 2) dan_title = dan_title.Substring(0, 2);
 
 						this.newGradeGranted = OpenTaiko.SaveFileInstances[0].tUpdateDanTitle(dan_title, clearValue % 2 == 0, (clearValue - 1) / 2);
@@ -261,7 +261,7 @@ internal class CStage結果 : CStage {
 
 					#endregion
 
-				} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					// Clear if top reached, then FC or DFC like any regular chart
 					// Score Rank cointains highest reached floor
 
@@ -302,14 +302,14 @@ internal class CStage結果 : CStage {
 					"+"
 				};
 
-				int level = OpenTaiko.stageSongSelect.rChoosenSong.nLevel[diff];
-				CTja.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
+				int level = OpenTaiko.SongMount.rChoosenSong.nLevel[diff];
+				CTja.ELevelIcon levelIcon = OpenTaiko.SongMount.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
 
-			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("")
-				+ diffToString(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("")
+				+ diffToString(OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "";
 
 			// Byte count must be used instead of String.Length.
 			// The byte count is what Discord is concerned with. Some chars are greater than one byte.
@@ -370,15 +370,15 @@ internal class CStage結果 : CStage {
 					* puchichara.GetEffectCoinMultiplier();
 			}
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				diffModifier = 3;
 
-				int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower]);
+				int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nレベル[(int)Difficulty.Tower]);
 
 				starRate = Math.Min(10, stars) / 2;
 				redStarRate = Math.Max(0, stars - 10) * 4;
 
-				int maxFloors = OpenTaiko.stageSongSelect.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nTotalFloor;
+				int maxFloors = OpenTaiko.SongMount.rChoosenSong.score[(int)Difficulty.Tower].譜面情報.nTotalFloor;
 
 				double floorRate = Math.Pow(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / (double)maxFloors, 2);
 				double lengthBonus = Math.Max(1, maxFloors / 140.0);
@@ -399,12 +399,12 @@ internal class CStage結果 : CStage {
 				// this.nEarnedMedalsCount[0] = stars;
 				this.nEarnedMedalsCount[0] = 5 + (int)((diffModifier * (starRate + redStarRate)) * (floorRate * lengthBonus)) + clearModifier;
 				this.nEarnedMedalsCount[0] = Math.Max(5, (int)(this.nEarnedMedalsCount[0] * modMultipliers[0] * getCoinMul(0)));
-			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				int partialScore = 0;
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -425,10 +425,10 @@ internal class CStage結果 : CStage {
 
 				#region [Partial scores]
 
-				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i] != null) {
-						int diff = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Difficulty;
-						int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Level);
+				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+					if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i] != null) {
+						int diff = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Difficulty;
+						int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Level);
 
 						//diffModifier = Math.Max(1, Math.Min(3, diff));
 						diffModifier = Math.Max(2.0, Math.Min(2.0 + (diff * 0.25), 3.0));
@@ -451,8 +451,8 @@ internal class CStage結果 : CStage {
 				}
 			} else {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					int diff = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
-					int stars = Math.Min(13, OpenTaiko.stageSongSelect.rChoosenSong.score[diff]?.譜面情報.nレベル[diff] ?? -1);
+					int diff = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
+					int stars = Math.Min(13, OpenTaiko.SongMount.rChoosenSong.score[diff]?.譜面情報.nレベル[diff] ?? -1);
 
 					//diffModifier = Math.Max(1, Math.Min(3, diff));
 					diffModifier = Math.Max(2.0, Math.Min(2.0 + (diff * 0.25), 3.0));
@@ -629,15 +629,15 @@ internal class CStage結果 : CStage {
 			b音声再生 = false;
 			this.EndAnime = false;
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				this.ttkMaxFloors = new TitleTextureKey("/" + OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor.ToString() + CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText48, Color.Black, Color.Transparent, 700);
 				this.ttkToutatsu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText48, Color.White, Color.Black, 700);
 				this.ttkTen = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE_INITIAL"), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkReachedFloor = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString(), pfTowerText72, Color.Orange, Color.Black, 700);
 				this.ttkScore = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_SCORE"), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.GetScore(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
-			} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
 				Background.Init();
 			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
@@ -649,12 +649,12 @@ internal class CStage結果 : CStage {
 				Background.Init();
 			}
 
-			this.ttkDanTitles = new TitleTextureKey[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+			this.ttkDanTitles = new TitleTextureKey[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 
-			for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-				this.ttkDanTitles[i] = new TitleTextureKey(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].bTitleShow
+			for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+				this.ttkDanTitles[i] = new TitleTextureKey(OpenTaiko.SongMount.rChoosenSong.DanSongs[i].bTitleShow
 						? "???"
-						: OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Title,
+						: OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Title,
 					pfDanTitles,
 					Color.White,
 					Color.Black,
@@ -665,7 +665,7 @@ internal class CStage結果 : CStage {
 			Trace.Unindent();
 		}
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower)
 			bgmResultIn.tPlay();
 	}
 	public override void DeActivate() {
@@ -694,11 +694,11 @@ internal class CStage結果 : CStage {
 	}
 	public override void ReleaseManagedResource() {
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			OpenTaiko.tDisposeSafely(ref pfTowerText);
 			OpenTaiko.tDisposeSafely(ref pfTowerText48);
 			OpenTaiko.tDisposeSafely(ref pfTowerText72);
-		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			OpenTaiko.tDisposeSafely(ref pfDanTitles);
 		}
 
@@ -737,7 +737,7 @@ internal class CStage結果 : CStage {
 			Background?.Update();
 			Background?.Draw();
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 				#region [Ensou game result screen]
 
 				if (!b音声再生 && !bgmResultIn.bIsPlaying) {
@@ -1019,12 +1019,12 @@ internal class CStage結果 : CStage {
 				#endregion
 
 			} else {
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 					double screen_ratio_x = OpenTaiko.Skin.Resolution[0] / 1280.0;
 
 					#region [Counter processings]
 
-					int songCount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count;
+					int songCount = OpenTaiko.SongMount.rChoosenSong.DanSongs.Count;
 
 					/*
 					 **	1600 => Dan plate
@@ -1108,7 +1108,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1206,7 +1206,7 @@ internal class CStage結果 : CStage {
 						int xFactor = 0;
 						float yFactor = 1f;
 
-						int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTowerType);
+						int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTowerType);
 
 						if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn_Result)
 							currentTowerType = 0;
@@ -1303,7 +1303,7 @@ internal class CStage結果 : CStage {
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;
 
 				int pos = i;
-				if (OpenTaiko.P1IsBlue() && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower)
+				if (OpenTaiko.P1IsBlue() && OpenTaiko.SongMount.nChoosenSongDifficulty[0] < (int)Difficulty.Tower)
 					pos = 1;
 
 				int namePlate_x;
@@ -1413,11 +1413,11 @@ internal class CStage結果 : CStage {
 
 					#region [ Skip animations ]
 
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
+					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] < (int)Difficulty.Tower
 						&& this.actParameterPanel.ctMainCounter.CurrentValue < this.actParameterPanel.MountainAppearValue) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						this.actParameterPanel.tSkipResultAnimations();
-					} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
+					} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
 							   && (ctPhase1 != null && ctPhase1.IsUnEnded)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						ctPhase1.CurrentValue = (int)ctPhase1.EndValue;
@@ -1445,7 +1445,7 @@ internal class CStage結果 : CStage {
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
 					OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 						#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
 						if (ctPhase1 != null && ctPhase1.IsEnded && (ctPhase2 == null || ctPhase2.IsEnded)) {
@@ -1509,7 +1509,7 @@ internal class CStage結果 : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, true, offset);
 
 		#endregion
 	}
@@ -1537,7 +1537,7 @@ internal class CStage結果 : CStage {
 		int baseY = 100 + 183 * i;
 		*/
 
-		var song = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i];
+		var song = OpenTaiko.SongMount.rChoosenSong.DanSongs[i];
 
 		// TJAPlayer3.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(scroll + 377, 180 + i * 73, new Rectangle(song.Difficulty * 53, 0, 53, 53));
 
@@ -1600,7 +1600,7 @@ internal class CStage結果 : CStage {
 		if (!bAddedToRecentlyPlayedSongs) {
 			// Song added to recently added songs here
 
-			OpenTaiko.RecentlyPlayedSongs.tAddChart(OpenTaiko.stageSongSelect.rChoosenSong.uniqueId.data.id);
+			OpenTaiko.RecentlyPlayedSongs.tAddChart(OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id);
 
 			bAddedToRecentlyPlayedSongs = true;
 		}
@@ -1659,7 +1659,7 @@ internal class CStage結果 : CStage {
 		ctDanSongInfoChange.CurrentValue = 0;
 
 		nNowDanSongInfo++;
-		if (nNowDanSongInfo >= Math.Ceiling(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count / 3.0)) {
+		if (nNowDanSongInfo >= Math.Ceiling(OpenTaiko.SongMount.rChoosenSong.DanSongs.Count / 3.0)) {
 			nNowDanSongInfo = 0;
 		}
 	}

@@ -88,7 +88,7 @@ internal class CActImplMtaiko : CActivity {
 
 			switch (i) {
 				case 0: {
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 							tex = OpenTaiko.Tx.Taiko_Background[2];
 						} else if (OpenTaiko.ConfigIni.bTokkunMode) {
 							if (OpenTaiko.P1IsBlue())
@@ -338,8 +338,8 @@ internal class CActImplMtaiko : CActivity {
 			if (_ro != null && !_ro.IsActive) _ro.Activate();
 			_ro?.Draw(modIcons_x, modIcons_y, i, "game");
 
-			if (OpenTaiko.Tx.Couse_Symbol[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]] != null) {
-				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
+			if (OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null) {
+				OpenTaiko.Tx.Couse_Symbol[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2D描画(
 					couse_symbol_x,
 					couse_symbol_y
 				);
@@ -449,11 +449,11 @@ internal class CActImplMtaiko : CActivity {
 			}
 
 
-			if (OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]] != null) {
+			if (OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null) {
 				int originX = 0;
 				int originY = 0;
-				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Width;
-				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Height;
+				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
+				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
 
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					originX = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_5P[0];
@@ -467,17 +467,17 @@ internal class CActImplMtaiko : CActivity {
 					height = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_4P[3];
 				}
 
-				OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
+				OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2D描画(
 					couse_symbol_x,
 					couse_symbol_y,
 					new System.Drawing.RectangleF(originX, originY, width, height));
 			}
 
-			if (OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]] != null && !OpenTaiko.ConfigIni.SimpleMode) {
+			if (OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]] != null && !OpenTaiko.ConfigIni.SimpleMode) {
 				int originX = 0;
 				int originY = 0;
-				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Width;
-				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].szTextureSize.Height;
+				int width = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Width;
+				int height = OpenTaiko.Tx.Couse_Symbol_Back[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].szTextureSize.Height;
 
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 					originX = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_5P[0];
@@ -491,8 +491,8 @@ internal class CActImplMtaiko : CActivity {
 					height = OpenTaiko.Skin.Game_CourseSymbol_Back_Rect_4P[3];
 				}
 
-				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
-				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]].t2D描画(
+				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].Opacity = 255 - (int)((ctSymbolFlash[i].CurrentValue / 1000.0) * 255);
+				OpenTaiko.Tx.Couse_Symbol_Back_Flash[OpenTaiko.SongMount.nChoosenSongDifficulty[i]].t2D描画(
 					couse_symbol_x,
 					couse_symbol_y,
 					new System.Drawing.RectangleF(originX, originY, width, height));

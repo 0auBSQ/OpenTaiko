@@ -11,11 +11,11 @@ internal class CActFIFOStart : CActivity {
 		this.mode = EFIFOMode.FadeOut;
 
 		OpenTaiko.Skin.soundDanSelectBGM.tStop();
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			this.counter = new CCounter(skipDelay ? 1000 : 0, 1255, 1, OpenTaiko.Timer);
 		else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			this.counter = new CCounter(skipDelay ? 2000 : 0, 5500, 1, OpenTaiko.Timer);
-		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
+		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
 			this.counter = new CCounter(skipDelay ? 1000 : 0, 3580, 1, OpenTaiko.Timer);
 		} else {
 			this.counter = new CCounter(skipDelay ? 2580 : 0, 3580, 1, OpenTaiko.Timer);
@@ -24,7 +24,7 @@ internal class CActFIFOStart : CActivity {
 	public void tフェードイン開始() {
 		this.mode = EFIFOMode.FadeIn;
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
@@ -61,7 +61,7 @@ internal class CActFIFOStart : CActivity {
 		}
 		this.counter.Tick();
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
 			if (OpenTaiko.Tx.Tile_Black != null) {
 				OpenTaiko.Tx.Tile_Black.Opacity = this.mode == EFIFOMode.FadeOut ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
 				for (int i = 0; i <= (GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++)      // #23510 2010.10.31 yyagi: change "clientSize.Width" to "640" to fix FIFO drawing size

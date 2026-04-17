@@ -670,7 +670,7 @@ function draw()
 				
 				drawCharaWithNameplate(i, x, y, s, s, opacityNorm, true)
 				if modicons_ro ~= nil then
-					modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + 4, i)
+					modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + 4, i, nil, difficultySelectElemOpacity)
 				end
 			end
 		end

@@ -98,30 +98,6 @@ internal class CStageSongSelect : CStage {
 			return this.actSongList.bスクロール中;
 		}
 	}
-	public int[] nChoosenSongDifficulty = new int[5];
-
-	public string str確定された曲のジャンル {
-		get;
-		set;
-	}
-	public CScore r確定されたスコア {
-		get;
-		set;
-	}
-	public CSongListNode rChoosenSong {
-		get;
-		set;
-	}
-	public int n現在選択中の曲の難易度 {
-		get {
-			return this.actSongList.n現在選択中の曲の現在の難易度レベル;
-		}
-	}
-	public CScore r現在選択中のスコア {
-		get {
-			return this.actSongList.r現在選択中のスコア;
-		}
-	}
 	// コンストラクタ
 	public CStageSongSelect() {
 		base.eStageID = CStage.EStage.SongSelect;
@@ -206,7 +182,7 @@ internal class CStageSongSelect : CStage {
 		//---------------------
 		if (OpenTaiko.app != null) {
 			var c曲リストノード = OpenTaiko.SongMount.rCurrentlySelectedSong;
-			var cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
+			var cスコア = OpenTaiko.SongMount.rCurrentScore;
 
 			if (c曲リストノード != null && cスコア != null && c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) {
 				string str選択曲ファイル名 = cスコア.ファイル情報.ファイルの絶対パス;
@@ -231,7 +207,7 @@ internal class CStageSongSelect : CStage {
 		Trace.TraceInformation("選曲ステージを活性化します。");
 		Trace.Indent();
 		try {
-			nChoosenSongDifficulty = new int[5];
+			OpenTaiko.SongMount.nChoosenSongDifficulty = new int[5];
 			this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
 			// BGM played
@@ -434,9 +410,9 @@ internal class CStageSongSelect : CStage {
 					if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.GRAYED) {
 						OpenTaiko.Tx.SongSelect_Song_Panel[4]?.t2D描画(0, 0);
 					} else {
-						if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+						if (OpenTaiko.SongMount.nCurrentSongDifficulty == (int)Difficulty.Dan)
 							OpenTaiko.Tx.SongSelect_Song_Panel[2]?.t2D描画(0, 0);
-						else if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Tower)
+						else if (OpenTaiko.SongMount.nCurrentSongDifficulty == (int)Difficulty.Tower)
 							OpenTaiko.Tx.SongSelect_Song_Panel[3]?.t2D描画(0, 0);
 						else
 							OpenTaiko.Tx.SongSelect_Song_Panel[1]?.t2D描画(0, 0);
@@ -469,9 +445,9 @@ internal class CStageSongSelect : CStage {
 
 					if (HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
 						actSongInfo.Draw();
-						if (this.n現在選択中の曲の難易度 == (int)Difficulty.Dan) {
+						if (OpenTaiko.SongMount.nCurrentSongDifficulty == (int)Difficulty.Dan) {
 							actDanInfo.Draw();
-						} else if (this.n現在選択中の曲の難易度 == (int)Difficulty.Tower) {
+						} else if (OpenTaiko.SongMount.nCurrentSongDifficulty == (int)Difficulty.Tower) {
 							actTowerInfo.Draw();
 						} else {
 						}
@@ -685,7 +661,7 @@ internal class CStageSongSelect : CStage {
 
 						OpenTaiko.Tx.SongSelect_High_Score?.t2D中心基準描画(OpenTaiko.Skin.SongSelect_High_Score_X[i], OpenTaiko.Skin.SongSelect_High_Score_Y[i]);
 
-						if (this.n現在選択中の曲の難易度 > (int)Difficulty.Edit)
+						if (OpenTaiko.SongMount.nCurrentSongDifficulty > (int)Difficulty.Edit)
 							table = 0;
 						else if (currentPads[i] <= (int)Difficulty.Edit)
 							table = currentPads[i];
@@ -695,7 +671,7 @@ internal class CStageSongSelect : CStage {
 						var TableEntry = OpenTaiko.SaveFileInstances[p].data.tGetSongSelectTableEntry(OpenTaiko.SongMount.rCurrentlySelectedSong.tGetUniqueId());
 						displayedScore = TableEntry.HighScore[table];
 
-						if (this.n現在選択中の曲の難易度 <= (int)Difficulty.Edit) {
+						if (OpenTaiko.SongMount.nCurrentSongDifficulty <= (int)Difficulty.Edit) {
 							CTexture __tex = (OpenTaiko.Tx.SongSelect_Difficulty_Cymbol == null) ? OpenTaiko.Tx.Dani_Difficulty_Cymbol : OpenTaiko.Tx.SongSelect_Difficulty_Cymbol;
 							int width = __tex.sz画像サイズ.Width / 5;
 							int height = __tex.sz画像サイズ.Height;
@@ -920,7 +896,7 @@ internal class CStageSongSelect : CStage {
 															OpenTaiko.Skin.soundError.tPlay();
 														}
 													} else {
-														if (this.n現在選択中の曲の難易度 >= (int)Difficulty.Tower) {
+														if (OpenTaiko.SongMount.nCurrentSongDifficulty >= (int)Difficulty.Tower) {
 															if (OpenTaiko.ConfigIni.nPlayerCount == 1 && !OpenTaiko.ConfigIni.bTokkunMode) {
 																OpenTaiko.Skin.soundDecideSFX.tPlay();
 																for (int i = 0; i < 5; i++) {
@@ -1523,9 +1499,9 @@ internal class CStageSongSelect : CStage {
 	}
 
 	private int tGetRandomSongDifficulty(int contextDiff) {
-		var song = this.rChoosenSong;
+		var song = OpenTaiko.SongMount.rChoosenSong;
 
-		int baseDiff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(this.rChoosenSong);
+		int baseDiff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong);
 
 		if (contextDiff >= 0) {
 			if (contextDiff < (int)Difficulty.Oni)
@@ -1589,13 +1565,13 @@ internal class CStageSongSelect : CStage {
 		this.t曲を選択する(this.actSongList.n現在選択中の曲の現在の難易度レベル, 0);
 	}
 	public void t曲を選択する(int nCurrentLevel, int player) {
-		this.rChoosenSong = OpenTaiko.SongMount.rCurrentlySelectedSong;
-		this.r確定されたスコア = this.actSongList.r現在選択中のスコア;
+		OpenTaiko.SongMount.rChoosenSong = OpenTaiko.SongMount.rCurrentlySelectedSong;
+		OpenTaiko.SongMount.rChosenScore = this.actSongList.r現在選択中のスコア;
 
-		this.nChoosenSongDifficulty[player] = nCurrentLevel;
-		this.str確定された曲のジャンル = this.rChoosenSong.songGenre;
+		OpenTaiko.SongMount.nChoosenSongDifficulty[player] = nCurrentLevel;
+		OpenTaiko.SongMount.strChosenSongGenre = OpenTaiko.SongMount.rChoosenSong.songGenre;
 
-		if ((this.rChoosenSong != null) && (this.r確定されたスコア != null)) {
+		if ((OpenTaiko.SongMount.rChoosenSong != null) && (OpenTaiko.SongMount.rChosenScore != null)) {
 			if (OpenTaiko.stageCutScene.LoadCutScenes(this)) {
 				this.FadeToCutSceneIntro();
 			} else {

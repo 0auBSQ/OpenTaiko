@@ -418,8 +418,8 @@
 				_chart.Select(i);
 			}
 
-			OpenTaiko.stageSongSelect.rChoosenSong = _node;
-			OpenTaiko.stageSongSelect.str確定された曲のジャンル = Genre ?? "???";
+			OpenTaiko.SongMount.rChoosenSong = _node;
+			OpenTaiko.SongMount.strChosenSongGenre = Genre ?? "???";
 
 			return true;
 		}

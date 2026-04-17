@@ -42,12 +42,12 @@ internal class Dan_Cert : CActivity {
 				ExamChange[i] = false;
 
 			for (int j = 0; j < CExamInfo.cMaxExam; j++) {
-				if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[0].Dan_C[j] != null) {
-					Challenge[j] = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
-					if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null
-						&& OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
+				if (OpenTaiko.SongMount.rChoosenSong.DanSongs[0].Dan_C[j] != null) {
+					Challenge[j] = OpenTaiko.SongMount.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
+					if (OpenTaiko.SongMount.rChoosenSong.DanSongs[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null
+						&& OpenTaiko.SongMount.rChoosenSong.DanSongs.Count > 1) // Individual exams, not counted if dan is only a single song
 					{
-						OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = 0;
+						OpenTaiko.SongMount.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j].Amount = 0;
 						ExamChange[j] = true;
 					}
 				}
@@ -81,9 +81,9 @@ internal class Dan_Cert : CActivity {
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (OpenTaiko.TJA.Dan_C[i] != null) Challenge[i] = new Dan_C(OpenTaiko.TJA.Dan_C[i]);
 
-			for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; j++) {
-				if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i] != null) {
-					OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i] = new Dan_C(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[j].Dan_C[i]);
+			for (int j = 0; j < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; j++) {
+				if (OpenTaiko.SongMount.rChoosenSong.DanSongs[j].Dan_C[i] != null) {
+					OpenTaiko.SongMount.rChoosenSong.DanSongs[j].Dan_C[i] = new Dan_C(OpenTaiko.SongMount.rChoosenSong.DanSongs[j].Dan_C[i]);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ internal class Dan_Cert : CActivity {
 		// 始点を決定する。
 		// ExamCount = 0;
 
-		songsnotesremain = new int[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		songsnotesremain = new int[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 		this.ct虹アニメ = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn - 1, 30, OpenTaiko.Timer);
 		this.ct虹透明度 = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
 
@@ -118,9 +118,9 @@ internal class Dan_Cert : CActivity {
 			Status[i].ctGaugeFlashLoop.EndValue = 1000;
 		}
 
-		IsEnded = new bool[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count];
+		IsEnded = new bool[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
 
 		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
 
@@ -151,7 +151,7 @@ internal class Dan_Cert : CActivity {
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
 			if (Challenge[i] == null || !Challenge[i].ExamIsEnable) continue;
-			if (ExamChange[i] && Challenge[i] != OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i]) continue;
+			if (ExamChange[i] && Challenge[i] != OpenTaiko.SongMount.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[i]) continue;
 
 			var oldReachedStatus = Challenge[i].ReachStatus;
 			var isChangedAmount = false;
@@ -601,7 +601,7 @@ internal class Dan_Cert : CActivity {
 	}
 
 	public override int Draw() {
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) return base.Draw();
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) return base.Draw();
 		Counter_In?.Tick();
 		Counter_Wait?.Tick();
 		Counter_Out?.Tick();
@@ -615,7 +615,7 @@ internal class Dan_Cert : CActivity {
 
 		OpenTaiko.Tx.DanC_Background?.t2D描画(0, 0);
 
-		DrawExam(this.Challenge, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+		DrawExam(this.Challenge, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 
 		// 幕のアニメーション
 		if (Counter_In != null) {
@@ -652,10 +652,10 @@ internal class Dan_Cert : CActivity {
 								ExamChange[i] = false;
 
 							for (int j = 0; j < CExamInfo.cMaxExam; j++) {
-								if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[0].Dan_C[j] != null) {
-									if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null) //個別の条件がありますよー
+								if (OpenTaiko.SongMount.rChoosenSong.DanSongs[0].Dan_C[j] != null) {
+									if (OpenTaiko.SongMount.rChoosenSong.DanSongs[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count - 1].Dan_C[j] != null) //個別の条件がありますよー
 									{
-										Challenge[j] = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
+										Challenge[j] = OpenTaiko.SongMount.rChoosenSong.DanSongs[NowShowingNumber].Dan_C[j];
 										ExamChange[j] = true;
 									}
 								}

@@ -237,7 +237,7 @@ class CSongReplay {
 		int actualPlayer = storedPlayer;
 
 		// Game mode
-		switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+		switch (OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
 			case (int)Difficulty.Dan:
 				GameMode = 1;
 				break;
@@ -318,9 +318,9 @@ class CSongReplay {
 		CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
-		ChartUniqueID = OpenTaiko.stageSongSelect.rChoosenSong.uniqueId.data.id;
-		ChartDifficulty = (byte)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[storedPlayer];
-		ChartLevel = (byte)Math.Min(255, OpenTaiko.stageSongSelect.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
+		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
+		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
+		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
 		// Replay Checksum (Calculate at the end)

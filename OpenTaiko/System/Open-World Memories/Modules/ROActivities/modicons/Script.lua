@@ -39,8 +39,11 @@ local LOW_HS_THRESHOLDS = {8, 7, 6, 5, 4, 3, 2, 1, 0}
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
 
-local function drawIcon(icon, x, y)
-    if icon ~= nil then icon:Draw(x, y) end
+local function drawIcon(icon, x, y, alpha)
+    if icon == nil then return end
+    if alpha ~= nil then icon:SetOpacity(alpha / 255) end
+    icon:Draw(x, y)
+    if alpha ~= nil then icon:SetOpacity(1) end
 end
 
 local function getHsIcon(player)
@@ -72,60 +75,61 @@ function deactivate() _isActive = false end
 -- x, y   : top-left anchor for slot 1
 -- player : 0-based player index
 -- layout : "menu" (default, single row) | "game" (2×4 grid)
-function draw(x, y, player, layout)
+-- alpha  : opacity 0-255 (default 255)
+function draw(x, y, player, layout, alpha)
     if not _isActive then return end
 
     local ox = (layout == "game") and OFFSET_X_GAME or OFFSET_X_MENU
     local oy = (layout == "game") and OFFSET_Y_GAME or OFFSET_Y_MENU
 
     -- Slot 1: Scroll speed (HS / slow HS)
-    drawIcon(getHsIcon(player), x + ox[1], y + oy[1])
+    drawIcon(getHsIcon(player), x + ox[1], y + oy[1], alpha)
 
     -- Slot 2: Doron / Stealth
     local stealth = CONFIG:GetStealthMod(player)
-    if     stealth == 1 then drawIcon(tx["Doron"],   x + ox[2], y + oy[2])
-    elseif stealth == 2 then drawIcon(tx["Stealth"], x + ox[2], y + oy[2])
-    else                     drawIcon(tx["None"],    x + ox[2], y + oy[2])
+    if     stealth == 1 then drawIcon(tx["Doron"],   x + ox[2], y + oy[2], alpha)
+    elseif stealth == 2 then drawIcon(tx["Stealth"], x + ox[2], y + oy[2], alpha)
+    else                     drawIcon(tx["None"],    x + ox[2], y + oy[2], alpha)
     end
 
     -- Slot 3: Random / Mirror / Super / Hyper
     local random = CONFIG:GetRandomMod(player)
-    if     random == 1 then drawIcon(tx["Mirror"], x + ox[3], y + oy[3])
-    elseif random == 2 then drawIcon(tx["Random"], x + ox[3], y + oy[3])
-    elseif random == 3 then drawIcon(tx["Super"],  x + ox[3], y + oy[3])
-    elseif random == 4 then drawIcon(tx["Hyper"],  x + ox[3], y + oy[3])
-    else                    drawIcon(tx["None"],   x + ox[3], y + oy[3])
+    if     random == 1 then drawIcon(tx["Mirror"], x + ox[3], y + oy[3], alpha)
+    elseif random == 2 then drawIcon(tx["Random"], x + ox[3], y + oy[3], alpha)
+    elseif random == 3 then drawIcon(tx["Super"],  x + ox[3], y + oy[3], alpha)
+    elseif random == 4 then drawIcon(tx["Hyper"],  x + ox[3], y + oy[3], alpha)
+    else                    drawIcon(tx["None"],   x + ox[3], y + oy[3], alpha)
     end
 
     -- Slot 4: Fun Mod
     local fun = CONFIG:GetFunMod(player)
-    if fun > 0 then drawIcon(tx["Fun_" .. fun], x + ox[4], y + oy[4])
-    else            drawIcon(tx["None"],        x + ox[4], y + oy[4])
+    if fun > 0 then drawIcon(tx["Fun_" .. fun], x + ox[4], y + oy[4], alpha)
+    else            drawIcon(tx["None"],        x + ox[4], y + oy[4], alpha)
     end
 
     -- Slot 5: Just / Safe
     local just = CONFIG:GetJusticeMod(player)
-    if     just == 1 then drawIcon(tx["Just"], x + ox[5], y + oy[5])
-    elseif just == 2 then drawIcon(tx["Safe"], x + ox[5], y + oy[5])
-    else                  drawIcon(tx["None"], x + ox[5], y + oy[5])
+    if     just == 1 then drawIcon(tx["Just"], x + ox[5], y + oy[5], alpha)
+    elseif just == 2 then drawIcon(tx["Safe"], x + ox[5], y + oy[5], alpha)
+    else                  drawIcon(tx["None"], x + ox[5], y + oy[5], alpha)
     end
 
     -- Slot 6: Timing zone  (2 = Normal → no icon)
     local timing = CONFIG:GetTimingZone(player)
-    if timing ~= 2 then drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6])
-    else                drawIcon(tx["None"],               x + ox[6], y + oy[6])
+    if timing ~= 2 then drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
+    else                drawIcon(tx["None"],               x + ox[6], y + oy[6], alpha)
     end
 
     -- Slot 7: Song speed  (20 = 1.0× → no icon)
     local songSpeed = CONFIG.SongSpeed
-    if     songSpeed > 20 then drawIcon(tx["SongSpeed_1"], x + ox[7], y + oy[7])
-    elseif songSpeed < 20 then drawIcon(tx["SongSpeed_0"], x + ox[7], y + oy[7])
-    else                       drawIcon(tx["None"],        x + ox[7], y + oy[7])
+    if     songSpeed > 20 then drawIcon(tx["SongSpeed_1"], x + ox[7], y + oy[7], alpha)
+    elseif songSpeed < 20 then drawIcon(tx["SongSpeed_0"], x + ox[7], y + oy[7], alpha)
+    else                       drawIcon(tx["None"],        x + ox[7], y + oy[7], alpha)
     end
 
     -- Slot 8: Auto
-    if CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"], x + ox[8], y + oy[8])
-    else                                 drawIcon(tx["None"], x + ox[8], y + oy[8])
+    if CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"], x + ox[8], y + oy[8], alpha)
+    else                                 drawIcon(tx["None"], x + ox[8], y + oy[8], alpha)
     end
 end
 

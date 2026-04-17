@@ -88,7 +88,7 @@
 
 		// Dan
 		private Exam.Status ExamStatus() {
-			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, OpenTaiko.stageSongSelect.rChoosenSong.DanSongs);
+			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 		}
 
 		public bool IsPass() {

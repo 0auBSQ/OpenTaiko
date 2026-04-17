@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Diagnostics;
@@ -125,7 +125,7 @@ internal class HttpEventReporter(string host, int port) {
 			CTja? tja = OpenTaiko.GetTJA(i);
             if (tja is null) return null;
             this.BuildNoteOrdinalMapping(i, tja);
-            int difficultyInt = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
+            int difficultyInt = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
             if (!Enum.IsDefined(typeof(Difficulty), difficultyInt)) return null;
             string difficulty = ((Difficulty)difficultyInt).ToString();
 			string fullPath = tja.strFullPath;

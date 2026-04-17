@@ -32,15 +32,15 @@ internal class CStage曲読み込み : CStage {
 				this.sd読み込み音 = null;
 			}
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5 || OpenTaiko.ConfigIni.nPlayerCount != 1) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= 5 || OpenTaiko.ConfigIni.nPlayerCount != 1) {
 				OpenTaiko.ConfigIni.bTokkunMode = false;
 			}
 
-			string strDTXファイルパス = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
+			string strDTXファイルパス = OpenTaiko.SongMount.rChosenScore.ファイル情報.ファイルの絶対パス;
 
 			var strフォルダ名 = Path.GetDirectoryName(strDTXファイルパス) + Path.DirectorySeparatorChar;
 
-			var 譜面情報 = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報;
+			var 譜面情報 = OpenTaiko.SongMount.rChosenScore.譜面情報;
 			this.str曲タイトル = 譜面情報.タイトル;
 			this.strサブタイトル = 譜面情報.strサブタイトル;
 
@@ -48,9 +48,9 @@ internal class CStage曲読み込み : CStage {
 
 
 			float wait = 600f;
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				wait = 1000f;
-			else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				wait = 1200f;
 
 			this.ct待機 = new CCounter(0, wait, 5, OpenTaiko.Timer);
@@ -91,8 +91,8 @@ internal class CStage曲読み込み : CStage {
 			}
 
 			Script?.Activate(
-				new LuaSongNode(OpenTaiko.stageSongSelect.rChoosenSong, null, false),
-				OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]);
+				new LuaSongNode(OpenTaiko.SongMount.rChoosenSong, null, false),
+				OpenTaiko.SongMount.nChoosenSongDifficulty[0]);
 
 			_activateTime = DateTime.Now;
 			base.Activate();
@@ -151,7 +151,7 @@ internal class CStage曲読み込み : CStage {
 		#region [ 初めての進行描画 ]
 		//-----------------------------
 		if (base.IsFirstDraw) {
-			CScore cスコア1 = OpenTaiko.stageSongSelect.r確定されたスコア;
+			CScore cスコア1 = OpenTaiko.SongMount.rChosenScore;
 			if (this.sd読み込み音 != null) {
 				if (OpenTaiko.Skin.sound曲読込開始音.bExclusive && (CSkin.CSystemSound.r最後に再生した排他システムサウンド != null)) {
 					CSkin.CSystemSound.r最後に再生した排他システムサウンド.tStop();
@@ -183,7 +183,7 @@ internal class CStage曲読み込み : CStage {
 		}
 		#endregion
 
-		bool isDan   = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
+		bool isDan   = OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
 		bool isAI    = OpenTaiko.ConfigIni.bAIBattleMode;
 
 		void drawPlate() {
@@ -200,7 +200,7 @@ internal class CStage曲読み込み : CStage {
 			}
 
 			if (this.txタイトル != null) {
-				int nサブタイトル補正 = string.IsNullOrEmpty(OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報.strサブタイトル) ? 15 : 0;
+				int nサブタイトル補正 = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.譜面情報.strサブタイトル) ? 15 : 0;
 				this.txタイトル.Opacity = 255;
 				if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txタイトル.t2D描画(OpenTaiko.Skin.SongLoading_Title_X, OpenTaiko.Skin.SongLoading_Title_Y - (this.txタイトル.sz画像サイズ.Height / 2) + nサブタイトル補正);
@@ -236,7 +236,7 @@ internal class CStage曲読み込み : CStage {
 			}
 
 			if (this.txタイトル != null) {
-				int nサブタイトル補正 = string.IsNullOrEmpty(OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報.strサブタイトル) ? 15 : 0;
+				int nサブタイトル補正 = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.譜面情報.strサブタイトル) ? 15 : 0;
 				this.txタイトル.Opacity = 255;
 				if (OpenTaiko.Skin.SongLoading_Title_ReferencePoint == CSkin.ReferencePoint.Left) {
 					this.txタイトル.t2D描画(OpenTaiko.Skin.SongLoading_Title_X_AI, OpenTaiko.Skin.SongLoading_Title_Y_AI - (this.txタイトル.sz画像サイズ.Height / 2) + nサブタイトル補正);
@@ -298,7 +298,7 @@ internal class CStage曲読み込み : CStage {
 
 			case CStage.EPhase.SongLoading_LoadDTXFile: {
 					timeBeginLoad = DateTime.Now;
-					str = OpenTaiko.stageSongSelect.r確定されたスコア.ファイル情報.ファイルの絶対パス;
+					str = OpenTaiko.SongMount.rChosenScore.ファイル情報.ファイルの絶対パス;
 
 					if ((OpenTaiko.TJA != null) && OpenTaiko.TJA.IsActivated)
 						OpenTaiko.TJA.DeActivate();
@@ -306,7 +306,7 @@ internal class CStage曲読み込み : CStage {
 					int playerCount = OpenTaiko.ConfigIni.nPlayerCount;
 					int[] chosenDiffs = new int[playerCount];
 					for (int i = 0; i < playerCount; i++)
-						chosenDiffs[i] = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i];
+						chosenDiffs[i] = OpenTaiko.SongMount.nChoosenSongDifficulty[i];
 
 					_loadCts     = new CancellationTokenSource();
 					_loadedTjas  = new CTja[playerCount];
@@ -349,7 +349,7 @@ internal class CStage曲読み込み : CStage {
 
 					// 段位認定モード用。
 					#region [dan setup]
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan && OpenTaiko.TJA.List_DanSongs != null) {
+					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan && OpenTaiko.TJA.List_DanSongs != null) {
 						var titleForeColor = OpenTaiko.Skin.Game_DanC_Title_ForeColor;
 						var titleBackColor = OpenTaiko.Skin.Game_DanC_Title_BackColor;
 						var subtitleForeColor = OpenTaiko.Skin.Game_DanC_SubTitle_ForeColor;

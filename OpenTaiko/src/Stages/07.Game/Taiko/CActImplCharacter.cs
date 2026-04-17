@@ -158,7 +158,7 @@ internal class CActImplCharacter : CActivity {
 			//CCharacter.GetCharacter(i).Update(i, animation);
 
 			// Blinking animation during invincibility frames
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				if (OpenTaiko.stageGameScreen.FloorManagement.isBlinking() == true)
 					break;
 			}
@@ -500,7 +500,7 @@ internal class CActImplCharacter : CActivity {
 
 			//CCharacter.GetCharacter(i).Draw(i, CCharacter.ANIM_GAME_BALLOON_BREAKING, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
 			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White);
-			if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
+			if (OpenTaiko.ConfigIni.nPlayerCount <= 2 && !IsInKusudama)
 				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 					OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player: i);

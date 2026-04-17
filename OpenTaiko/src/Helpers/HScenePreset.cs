@@ -1,11 +1,11 @@
-namespace OpenTaiko;
+﻿namespace OpenTaiko;
 
 class HScenePreset {
 	public static DBSkinPreset.SkinScene? GetBGPreset() {
 		string presetSection = "";
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			presetSection = "Tower";
-		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			presetSection = "Dan";
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			presetSection = "AI";
@@ -42,7 +42,7 @@ class HScenePreset {
 		Random? rand = null;
 		foreach (var list in new string[][]{
 			OpenTaiko.TJA?.scenePresets ?? [], // song tja
-			CTja.SplitComma(OpenTaiko.stageSongSelect.rChoosenSong.strScenePresets ?? ""), // box.def
+			CTja.SplitComma(OpenTaiko.SongMount.rChoosenSong.strScenePresets ?? ""), // box.def
 			[""], // fallback
 			}) {
 			var options = list.Select(k => _ps.GetValueOrDefault(k)).Where(k => k != null).ToArray();

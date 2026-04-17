@@ -327,7 +327,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		int nDrawnPlayers = OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount;
 		int nLayoutPlayers = OpenTaiko.ConfigIni.bAIBattleMode ? 2 : OpenTaiko.ConfigIni.nPlayerCount;
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 			int[] namePlate_x = new int[5];
 			int[] namePlate_y = new int[5];
 
@@ -419,7 +419,7 @@ internal class CActResultParameterPanel : CActivity {
 					}
 
 					OpenTaiko.Tx.Result_Diff_Bar.t2D描画(bar_x, bar_y,
-						new RectangleF(0, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i] * OpenTaiko.Skin.Result_DifficultyBar_Size[1], OpenTaiko.Skin.Result_DifficultyBar_Size[0], OpenTaiko.Skin.Result_DifficultyBar_Size[1]));
+						new RectangleF(0, OpenTaiko.SongMount.nChoosenSongDifficulty[i] * OpenTaiko.Skin.Result_DifficultyBar_Size[1], OpenTaiko.Skin.Result_DifficultyBar_Size[0], OpenTaiko.Skin.Result_DifficultyBar_Size[1]));
 
 					_frame.t2D描画(gauge_base_x, gauge_base_y);
 					_frame.vcScaleRatio.X = 1.0f;
@@ -1013,7 +1013,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_ScoreRankEffect.vcScaleRatio.Y = 1f;
 						}
 
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageResults.nスコアランク[p] > 0) {
+						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageResults.nスコアランク[p] > 0) {
 							int CurrentFlash = 0;
 							int[] FlashTimes = { 1500, 1540, 1580, 1620, 1660, 1700, 1740, 1780 };
 
@@ -1075,7 +1075,7 @@ internal class CActResultParameterPanel : CActivity {
 
 						int ClearType = OpenTaiko.stageResults.nクリア[p] - 1;
 
-						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)(Difficulty.Dan) && ClearType >= 0) {
+						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)(Difficulty.Dan) && ClearType >= 0) {
 							int CurrentFlash = 0;
 							int[] FlashTimes = { 2000, 2040, 2080, 2120, 2160, 2200, 2240, 2280 };
 

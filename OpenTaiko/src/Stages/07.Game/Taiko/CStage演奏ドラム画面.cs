@@ -244,15 +244,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					"+"
 				};
 
-				int level = OpenTaiko.stageSongSelect.rChoosenSong.nLevel[diff];
-				CTja.ELevelIcon levelIcon = OpenTaiko.stageSongSelect.rChoosenSong.nLevelIcon[diff];
+				int level = OpenTaiko.SongMount.rChoosenSong.nLevel[diff];
+				CTja.ELevelIcon levelIcon = OpenTaiko.SongMount.rChoosenSong.nLevelIcon[diff];
 
 				return (diffArr[Math.Min(diff, 6)] + "Lv." + level + diffArrIcon[(int)levelIcon]);
 			}
 
 			// Discord Presence の更新
-			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("")
-																				 + diffToString(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "";
+			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("")
+																				 + diffToString(OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "";
 
 			// Byte count must be used instead of String.Length.
 			// The byte count is what Discord is concerned with. Some chars are greater than one byte.
@@ -262,7 +262,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				details = Encoding.UTF8.GetString(details_byte);
 			}
 
-			var difficultyName = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]).ToString();
+			var difficultyName = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.SongMount.nChoosenSongDifficulty[0]).ToString();
 
 			OpenTaiko.DiscordClient?.SetPresence(new RichPresence() {
 				Details = details,
@@ -270,7 +270,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				Timestamps = new Timestamps(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(OpenTaiko.TJA.TjaTimeToGameTime(OpenTaiko.TJA.listChip[OpenTaiko.TJA.listChip.Count - 1].n発声時刻ms))),
 				Assets = new Assets() {
 					SmallImageKey = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? difficultyName.ToLower() : "",
-					SmallImageText = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) : "",
+					SmallImageText = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? String.Format("COURSE:{0} ({1})", difficultyName, OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "",
 					LargeImageKey = OpenTaiko.LargeImageKey,
 					LargeImageText = OpenTaiko.LargeImageText,
 				}
@@ -367,7 +367,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 			#endregion
 			// stage-fail check
-			bool isTower = (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
+			bool isTower = (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower);
 
 			if (!OpenTaiko.ConfigIni.bTokkunMode) {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
@@ -509,7 +509,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			actChara.OnDraw_Balloon();
 
 			// Floor voice
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 				this.actComboVoice.tPlayFloorSound();
 
 			this.t全体制御メソッド();
