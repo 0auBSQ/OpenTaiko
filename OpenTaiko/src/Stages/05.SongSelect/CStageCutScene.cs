@@ -70,8 +70,8 @@ class CStageCutScene : CStage {
 		this.actAVI.Stop(); // only skip one video
 	}
 
-	public bool LoadCutScenes(CStage stageLast) {
-		var selectedSong = OpenTaiko.stageSongSelect.rChoosenSong;
+	public bool LoadCutScenes(CStage stageLast, bool isLuaStageIntro = false) {
+		var selectedSong = OpenTaiko.SongMount.rChoosenSong;
 		if (stageLast == OpenTaiko.stageSongSelect
 			|| stageLast == OpenTaiko.stageDanSongSelect
 			|| stageLast == OpenTaiko.stageTowerSelect
@@ -87,7 +87,7 @@ class CStageCutScene : CStage {
 	}
 
 	public void RegisterMetOutros() {
-		var selectedSong = OpenTaiko.stageSongSelect.rChoosenSong;
+		var selectedSong = OpenTaiko.SongMount.rChoosenSong;
 		var oldMode = this.mode;
 		this.mode = ECutSceneMode.Outro;
 		if (selectedSong.CutSceneOutros != null) {

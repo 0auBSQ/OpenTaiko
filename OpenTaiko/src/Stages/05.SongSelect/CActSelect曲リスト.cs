@@ -26,21 +26,12 @@ internal class CActSelect曲リスト : CActivity {
 			return Math.Sin(value * Math.PI / 2.0);
 		}
 	}
+	private int _nCurrentAnchorDifficultyLevel;
 	public int n現在のアンカ難易度レベル {
-		get;
-		private set;
-	}
-	public int n現在選択中の曲の現在の難易度レベル {
-		get {
-			return this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
-		}
-	}
-	public CScore r現在選択中のスコア {
-		get {
-			if (OpenTaiko.SongMount.rCurrentlySelectedSong != null) {
-				return OpenTaiko.SongMount.rCurrentlySelectedSong.score[this.n現在選択中の曲の現在の難易度レベル];
-			}
-			return null;
+		get => _nCurrentAnchorDifficultyLevel;
+		private set {
+			_nCurrentAnchorDifficultyLevel = value;
+			OpenTaiko.SongMount.nCurrentSongDifficulty = n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
 		}
 	}
 	public int nSelectSongIndex {
@@ -1594,11 +1585,11 @@ internal class CActSelect曲リスト : CActivity {
 
 						if (OpenTaiko.Tx.SongSelect_Frame_Score != null && HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED) {
 							// 難易度がTower、Danではない
-							if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 != (int)Difficulty.Dan) {
+							if (OpenTaiko.SongMount.nCurrentSongDifficulty != (int)Difficulty.Tower && OpenTaiko.SongMount.nCurrentSongDifficulty != (int)Difficulty.Dan) {
 								#region [Display difficulty boxes]
 
-								bool uraExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
-								bool omoteExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
+								bool uraExists = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
+								bool omoteExists = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
 
 								for (int i = 0; i < (int)Difficulty.Edit + 1; i++) {
 									if (ctBarOpen.CurrentValue >= 100 || OpenTaiko.Skin.SongSelect_Shorten_Frame_Fade) {
@@ -1617,7 +1608,7 @@ internal class CActSelect曲リスト : CActivity {
 										// avaliable : bool (Chart exists)
 										#region [Gray box if stage isn't avaliable]
 
-										bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
+										bool avaliable = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i] >= 0;
 
 										if (avaliable)
 											OpenTaiko.Tx.SongSelect_Frame_Score[0].color4 = new Color4(1f, 1f, 1f, 1f);
@@ -1681,16 +1672,16 @@ internal class CActSelect曲リスト : CActivity {
 
 										if (avaliable) {
 											t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
-												OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i],
+												OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i],
 												i,
-												OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[i]
+												OpenTaiko.SongMount.rCurrentScore.譜面情報.nLevelIcon[i]
 											);
 
 											if (OpenTaiko.Tx.SongSelect_Level != null) {
 												int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
 												int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
 
-												for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i]; i2++) {
+												for (int i2 = 0; i2 < OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i]; i2++) {
 													OpenTaiko.Tx.SongSelect_Level.t2D描画(
 														OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
 														OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),
@@ -1698,7 +1689,7 @@ internal class CActSelect曲リスト : CActivity {
 												}
 											}
 
-											if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.b譜面分岐[i]) {
+											if (OpenTaiko.SongMount.rCurrentScore.譜面情報.b譜面分岐[i]) {
 												OpenTaiko.Tx.SongSelect_Branch?.tUpdateOpacity(OpenTaiko.Tx.SongSelect_Frame_Score[0].Opacity);
 												OpenTaiko.Tx.SongSelect_Branch?.t2D描画(
 
@@ -1721,7 +1712,7 @@ internal class CActSelect曲リスト : CActivity {
 								#region [Check if Dan or Tower]
 
 								int diff = 5;
-								if (OpenTaiko.stageSongSelect.n現在選択中の曲の難易度 == (int)Difficulty.Dan)
+								if (OpenTaiko.SongMount.nCurrentSongDifficulty == (int)Difficulty.Dan)
 									diff = 6;
 
 								#endregion
@@ -1729,7 +1720,7 @@ internal class CActSelect曲リスト : CActivity {
 								// avaliable : bool (Chart exists)
 								#region [Gray box if stage isn't avaliable]
 
-								bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff] >= 0;
+								bool avaliable = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[diff] >= 0;
 
 								if (avaliable)
 									OpenTaiko.Tx.SongSelect_Frame_Score[1].color4 = new Color4(1f, 1f, 1f, 1f);
@@ -1776,9 +1767,9 @@ internal class CActSelect曲リスト : CActivity {
 
 								if (avaliable) {
 									t小文字表示(OpenTaiko.Skin.SongSelect_Level_Number_X[displayingDiff], OpenTaiko.Skin.SongSelect_Level_Number_Y[displayingDiff],
-										OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff],
+										OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[diff],
 										diff,
-										OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[diff]
+										OpenTaiko.SongMount.rCurrentScore.譜面情報.nLevelIcon[diff]
 									);
 
 									if (diff == 5) {
@@ -1798,7 +1789,7 @@ internal class CActSelect曲リスト : CActivity {
 										int level_width = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Width / 7;
 										int level_height = OpenTaiko.Tx.SongSelect_Level.szTextureSize.Height;
 
-										for (int i2 = 0; i2 < OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[diff]; i2++) {
+										for (int i2 = 0; i2 < OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[diff]; i2++) {
 											OpenTaiko.Tx.SongSelect_Level?.t2D描画(
 												OpenTaiko.Skin.SongSelect_Level_X[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[0] * i2),
 												OpenTaiko.Skin.SongSelect_Level_Y[displayingDiff] + (OpenTaiko.Skin.SongSelect_Level_Move[1] * i2),

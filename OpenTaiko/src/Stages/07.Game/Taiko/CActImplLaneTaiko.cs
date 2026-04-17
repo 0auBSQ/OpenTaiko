@@ -206,7 +206,7 @@ internal class CActImplLaneTaiko : CActivity {
 								tex = OpenTaiko.Tx.Taiko_Frame[3];
 							} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 								tex = OpenTaiko.Tx.Taiko_Frame[5];
-							} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+							} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 								tex = OpenTaiko.Tx.Taiko_Frame[2];
 							} else if (OpenTaiko.ConfigIni.nPlayerCount > 2) {
 								tex = OpenTaiko.Tx.Taiko_Frame[6];
@@ -563,7 +563,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public void GOGOSTART() {
 		this.ctゴーゴー = new CCounter(0, 17, 18, OpenTaiko.Timer);
-		if (OpenTaiko.ConfigIni.nPlayerCount == 1 && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) OpenTaiko.stageGameScreen.GoGoSplash.StartSplash();
+		if (OpenTaiko.ConfigIni.nPlayerCount == 1 && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) OpenTaiko.stageGameScreen.GoGoSplash.StartSplash();
 	}
 
 

@@ -107,11 +107,11 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
             */
 
 			// No gauge if tower
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.ConfigIni.bTokkunMode)
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.ConfigIni.bTokkunMode)
 				return 0;
 
 
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 				#region [Regular gauges]
 
 				// Flash opacity
@@ -159,7 +159,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 				#region [Gauge base]
 
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 					if (OpenTaiko.P1IsBlue()) {
 						OpenTaiko.Tx.Gauge_Dan[4]?.t2D描画(gauge_x[0], gauge_y[0],
 							new Rectangle(OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3]));
@@ -200,7 +200,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 						y = gauge_y[0];
 					}
 
-					if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 						if (OpenTaiko.P1IsBlue())
 							OpenTaiko.Tx.Gauge_Dan[5]?.t2D描画(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 						else
@@ -240,7 +240,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.X = scale;
 							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.Y = scale;
 
-							bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
+							bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
 
 
 							OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].Opacity = 255;

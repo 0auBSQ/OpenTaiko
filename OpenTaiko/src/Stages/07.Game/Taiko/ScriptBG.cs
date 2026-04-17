@@ -259,8 +259,8 @@ class ScriptBG : IDisposable {
 		try {
 			float currentFloorPositionMax140 = 0;
 
-			if (OpenTaiko.stageSongSelect.rChoosenSong != null && OpenTaiko.stageSongSelect.rChoosenSong.score[5] != null) {
-				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
+			if (OpenTaiko.SongMount.rChoosenSong != null && OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -268,7 +268,7 @@ class ScriptBG : IDisposable {
 			double timestamp = -1.0;
 
 			if (OpenTaiko.TJA != null) {
-				double msTimeOffset = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay;
+				double msTimeOffset = OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 0 : -CTja.msDanNextSongDelay;
 				// Due to the fact that all Dans use DELAY to offset instead of OFFSET, Dan offset can't be properly synced. ¯\_(ツ)_/¯
 
 				timestamp = (OpenTaiko.TJA.RawTjaTimeToDefTime(

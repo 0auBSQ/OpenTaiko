@@ -288,11 +288,11 @@ class CStage段位選択 : CStage {
 
 	public void t段位を選択する() {
 		this.b選択した = true;
-		OpenTaiko.stageSongSelect.rChoosenSong = 段位リスト.Cursor.Item!;
-		OpenTaiko.stageSongSelect.r確定されたスコア = 段位リスト.Cursor.Item.score[(int)Difficulty.Dan];
-		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = 段位リスト.Cursor.Item.songGenre;
-		if ((OpenTaiko.stageSongSelect.rChoosenSong != null) && (OpenTaiko.stageSongSelect.r確定されたスコア != null)) {
+		OpenTaiko.SongMount.rChoosenSong = 段位リスト.Cursor.Item!;
+		OpenTaiko.SongMount.rChosenScore = 段位リスト.Cursor.Item.score[(int)Difficulty.Dan];
+		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
+		OpenTaiko.SongMount.strChosenSongGenre = 段位リスト.Cursor.Item.songGenre;
+		if ((OpenTaiko.SongMount.rChoosenSong != null) && (OpenTaiko.SongMount.rChosenScore != null)) {
 			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
@@ -325,11 +325,11 @@ class CStage段位選択 : CStage {
 		}
 
 		// Third assignment
-		OpenTaiko.stageSongSelect.rChoosenSong = song.randomList[randomSongIndex];
-		OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
+		OpenTaiko.SongMount.rChoosenSong = song.randomList[randomSongIndex];
+		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
 
-		OpenTaiko.stageSongSelect.r確定されたスコア = OpenTaiko.stageSongSelect.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.stageSongSelect.rChoosenSong)];
-		OpenTaiko.stageSongSelect.str確定された曲のジャンル = OpenTaiko.stageSongSelect.rChoosenSong.songGenre;
+		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong)];
+		OpenTaiko.SongMount.strChosenSongGenre = OpenTaiko.SongMount.rChoosenSong.songGenre;
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 

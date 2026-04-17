@@ -14,7 +14,7 @@ internal class CActImplDancer : CActivity {
 	public override void Activate() {
 		//this.ct踊り子モーション = new CCounter();
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			return;
 
 		var preset = HScenePreset.GetBGPreset();
@@ -98,7 +98,7 @@ internal class CActImplDancer : CActivity {
 	}
 
 	public override void DeActivate() {
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 			return;
 
 		//this.ct踊り子モーション = null;
@@ -125,7 +125,7 @@ internal class CActImplDancer : CActivity {
 			this.IsFirstDraw = true;
 		}
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (OpenTaiko.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0) {
 				if (!OpenTaiko.stageGameScreen.bPAUSE)
 					nNowDancerCounter += Math.Abs((float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;

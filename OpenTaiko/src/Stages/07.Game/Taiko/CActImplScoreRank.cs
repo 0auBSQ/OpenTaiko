@@ -119,12 +119,12 @@ class CActImplScoreRank : CActivity {
 	}
 
 	public override int Draw() {
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			float x = 0;
 			float y = 0;
 
 			for (int i = 0; i < 7; i++) {
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 
 					for (int player = 0; player < 5; player++) {
 						#region [Ensou score ranks]
@@ -174,10 +174,10 @@ class CActImplScoreRank : CActivity {
 						x = 0;
 					}
 					#endregion
-				} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor);
+					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor);
 
 					bool[] conditions =
 					{

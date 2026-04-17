@@ -13,7 +13,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	private void CAct演奏PauseMenuMain() {
 		this.bEsc有効 = false;
 		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
-		for (int nConfSet = 0; nConfSet < (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++) {
+		for (int nConfSet = 0; nConfSet < (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++) {
 			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
 			for (int nInst = 0; nInst < 3; nInst++) {
 				lci[nConfSet].Add(null);                                        // Drum/Guitar/Bassで3つ分、枠を作っておく
@@ -28,7 +28,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 		#region [ 共通 SET切り替え/More/Return ]
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_EXIT"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 		#endregion
 
@@ -69,7 +69,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 				break;
 
 			case (int)EOrder.Redoing:
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					goto case (int)EOrder.Return;
 				this.bやり直しを選択した = true;
 				CActSelectPopupMenu.b選択した = true;

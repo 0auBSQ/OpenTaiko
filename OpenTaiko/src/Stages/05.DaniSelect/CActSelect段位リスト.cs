@@ -286,9 +286,9 @@ class CActSelect段位リスト : CStage {
 			int danTick = 0;
 			Color danTickColor = Color.White;
 
-			if (OpenTaiko.stageSongSelect.r確定されたスコア != null) {
-				danTick = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報.nDanTick;
-				danTickColor = OpenTaiko.stageSongSelect.r確定されたスコア.譜面情報.cDanTickColor;
+			if (OpenTaiko.SongMount.rChosenScore != null) {
+				danTick = OpenTaiko.SongMount.rChosenScore.譜面情報.nDanTick;
+				danTickColor = OpenTaiko.SongMount.rChosenScore.譜面情報.cDanTickColor;
 			}
 			if (songNode != null) {
 				STバー情報 stNode = (STバー情報)songNode;
@@ -322,8 +322,8 @@ class CActSelect段位リスト : CStage {
 
 			string titleTmp = "";
 
-			if (OpenTaiko.stageSongSelect.r確定されたスコア != null)
-				titleTmp = OpenTaiko.stageSongSelect.rChoosenSong.ldTitle.GetString("");
+			if (OpenTaiko.SongMount.rChosenScore != null)
+				titleTmp = OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("");
 			if (songNode != null) {
 				STバー情報 stNode = (STバー情報)songNode;
 
