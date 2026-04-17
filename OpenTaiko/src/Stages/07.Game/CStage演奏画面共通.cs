@@ -673,6 +673,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public AIBattle actAIBattle;
 	public CActImplTrainingMode actTokkun;
 	public bool bPAUSE;
+	// Tracks time since last Resume() to enforce a 1-second anti-buffering cooldown on pause re-open.
+	// Initialized with a high elapsed value so the first pause is never blocked.
+	private System.Diagnostics.Stopwatch _pauseCooldown = System.Diagnostics.Stopwatch.StartNew();
 	public bool[] bIsAlreadyCleared;
 	public bool[] bIsAlreadyMaxed;
 	protected bool b演奏にMIDI入力を使った;
@@ -2118,9 +2121,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 			else if (keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
 				if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
-					OpenTaiko.Skin.soundChangeSFX.tPlay();
-					this.Pause();
-					this.actPauseMenu.tActivatePopupMenu(0);
+					long cooldownRemaining = 1000 - _pauseCooldown.ElapsedMilliseconds;
+					if (cooldownRemaining > 0) {
+						LogNotification.PopInfo($"Pause on cooldown. Please wait {cooldownRemaining / 1000.0:F1}s.");
+					} else {
+						OpenTaiko.Skin.soundChangeSFX.tPlay();
+						this.Pause();
+						this.actPauseMenu.tActivatePopupMenu(0);
+					}
 				}
 				// this.t演奏中止();
 			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal.IsPressed()) {
@@ -2205,6 +2213,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actAVI.Resume();
 		this.actPanel.Start();
 		this.bPAUSE = false;                                // システムがPAUSE状態だったら、強制解除
+		_pauseCooldown.Restart();
 	}
 
 	private void TrainingSwitchBranch(CTja.ECourse branch) {

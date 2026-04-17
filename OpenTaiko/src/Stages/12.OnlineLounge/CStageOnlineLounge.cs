@@ -342,7 +342,7 @@ class CStageOnlineLounge : CStage {
 						// Return to title screen
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
 						OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-						this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+						this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 						this.actFOtoTitle.tフェードアウト開始();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
@@ -376,7 +376,7 @@ class CStageOnlineLounge : CStage {
 							if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 								OpenTaiko.Skin.soundCancelSFX.tPlay();
 								OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-								this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+								this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 								this.actFOtoTitle.tフェードアウト開始();
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							}

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using FDK;
 
 namespace OpenTaiko;
@@ -134,7 +134,7 @@ internal class CActSelectPresound : CActivity {
 	}
 	private void tプレビューサウンドの作成() {
 		CScore cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
-		var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.rNowSelectedSong);
+		var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.SongMount.rCurrentlySelectedSong);
 		if ((cスコア != null)
 			&& !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
 			&& OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
