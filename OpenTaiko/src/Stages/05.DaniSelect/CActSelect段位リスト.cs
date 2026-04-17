@@ -44,7 +44,24 @@ class CActSelect段位リスト : CStage {
 			this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
 		}
 
+		currentFolder = null;
 		listSongs = OpenTaiko.Songs管理.list曲ルート_Dan;
+		// initialize cursors
+		if (this.NowSelectedItems.Count == 0)
+			this.NowSelectedItems.Add(0);
+		// re-enter folders
+		for (int i = 1; i < this.NowSelectedItems.Count; ++i) {
+			var idx = this.NowSelectedItems[i - 1];
+			var idxChild = this.NowSelectedItems[i];
+			CSongListNode? node = listSongs.ElementAtOrDefault(idx);
+			if (node?.nodeType != CSongListNode.ENodeType.BOX) {
+				// invalid folder
+				this.NowSelectedItems.RemoveRange(i, this.NowSelectedItems.Count - i);
+				break;
+			}
+			currentFolder = node;
+			listSongs = node.childrenList;
+		}
 		tUpdateSongs();
 
 		base.Activate();
@@ -236,7 +253,12 @@ class CActSelect段位リスト : CStage {
 	private CCounter ctDanTick;
 
 	private CCounter ctDaniMoveAnime;
-	public int n現在の選択行;
+
+	public List<int> NowSelectedItems = [0]; // last is for item including closed folder, others are for open parents folders
+	public int n現在の選択行 {
+		get => Math.Max(0, Math.Min(NowSelectedItems[NowSelectedItems.Count - 1], listSongs.Count - 1));
+		set => NowSelectedItems[NowSelectedItems.Count - 1] = value;
+	}
 
 	private bool bLeftMove;
 
@@ -247,7 +269,8 @@ class CActSelect段位リスト : CStage {
 	private CStageSongSelect.STNumber[] stSoulNumber = new CStageSongSelect.STNumber[10];
 	private CStageSongSelect.STNumber[] stExamNumber = new CStageSongSelect.STNumber[10];
 
-	public List<CSongListNode> listSongs;
+	public CSongListNode? currentFolder = null;
+	public List<CSongListNode> listSongs = [];
 	public STバー情報[] stバー情報;
 
 	public struct STバー情報 {
@@ -265,9 +288,9 @@ class CActSelect段位リスト : CStage {
 		public Color cDanTickColor;
 	}
 
-	public CSongListNode currentBar {
+	public CSongListNode? currentBar {
 		get {
-			return listSongs[n現在の選択行];
+			return listSongs.ElementAtOrDefault(n現在の選択行);
 		}
 	}
 
@@ -683,14 +706,19 @@ class CActSelect段位リスト : CStage {
 	}
 
 	public void tOpenFolder(CSongListNode song) {
+		currentFolder = song;
 		listSongs = song.childrenList;
-		n現在の選択行 = 0;
+		NowSelectedItems.Add(0);
 		tUpdateSongs();
 	}
 
-	public void tCloseFolder(CSongListNode song) {
-		listSongs = song.rParentNode.rParentNode.childrenList;
-		n現在の選択行 = 0;
+	public void tCloseFolder() {
+		if (currentFolder == null)
+			return;
+		currentFolder = currentFolder.rParentNode;
+		listSongs = currentFolder.childrenList;
+		if (NowSelectedItems.Count > 1)
+			NowSelectedItems.RemoveAt(this.NowSelectedItems.Count - 1);
 		tUpdateSongs();
 	}
 

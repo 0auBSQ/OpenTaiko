@@ -176,7 +176,7 @@ class CStage段位選択 : CStage {
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
-					switch (段位リスト.currentBar.nodeType) {
+					switch (段位リスト.currentBar?.nodeType ?? CSongListNode.ENodeType.BACKBOX) {
 						case CSongListNode.ENodeType.SCORE:
 						case CSongListNode.ENodeType.RANDOM: {
 								//this.t段位を選択する();
@@ -188,15 +188,15 @@ class CStage段位選択 : CStage {
 							break;
 						case CSongListNode.ENodeType.BOX: {
 								OpenTaiko.Skin.soundDecideSFX.tPlay();
-								段位リスト.tOpenFolder(段位リスト.currentBar);
+								段位リスト.tOpenFolder(段位リスト.currentBar!);
 							}
 							break;
 						case CSongListNode.ENodeType.BACKBOX: {
-								if (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentBar.rParentNode) && 段位リスト.currentBar.rParentNode.songGenre == "段位道場") {
+								if (段位リスト.currentFolder == null || (OpenTaiko.Songs管理.list曲ルート.Contains(段位リスト.currentFolder) && 段位リスト.currentFolder.songGenre == "段位道場")) {
 									return returnTitle();
 								} else {
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
-									段位リスト.tCloseFolder(段位リスト.currentBar);
+									段位リスト.tCloseFolder();
 								}
 							}
 							break;
@@ -205,7 +205,6 @@ class CStage段位選択 : CStage {
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
-					this.段位リスト.n現在の選択行 = 0;
 					return returnTitle();
 				}
 			}
@@ -253,8 +252,8 @@ class CStage段位選択 : CStage {
 		this.actPlayOption.On進行描画(1, [this.段位挑戦選択画面.bOption]);
 
 		if (ct待機.CurrentValue >= 3000) {
-			if (段位リスト.currentBar.nodeType == CSongListNode.ENodeType.RANDOM) {
-				if (!tSelectSongRandomly()) {
+			if (段位リスト.currentBar == null || 段位リスト.currentBar.nodeType == CSongListNode.ENodeType.RANDOM) {
+				if (段位リスト.currentBar == null || !tSelectSongRandomly()) {
 					bDifficultyIn = false;
 					b選択した = false;
 					OpenTaiko.Skin.soundError.tPlay();
@@ -302,7 +301,7 @@ class CStage段位選択 : CStage {
 	private bool tSelectSongRandomly() {
 		this.b選択した = true;
 		var mandatoryDiffs = new List<int>();
-		CSongListNode song = 段位リスト.currentBar;
+		CSongListNode song = 段位リスト.currentBar!;
 
 		List<CSongListNode> songs = new List<CSongListNode>();
 		OpenTaiko.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true);
