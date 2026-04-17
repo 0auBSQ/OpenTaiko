@@ -1,0 +1,2 @@
+# Prevent line end changes from breaking scripts. https://github.com/actions/checkout/issues/135
+* -text
