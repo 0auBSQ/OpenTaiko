@@ -672,8 +672,6 @@ internal class CActConfigList : CActivity {
 			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.System, EKeyConfigPad.DisplayDebug);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemQuickConfig) {
 			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.System, EKeyConfigPad.QuickConfig);
-		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemNewHeya) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.System, EKeyConfigPad.NewHeya);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemSortSongs) {
 			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.System, EKeyConfigPad.SortSongs);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignSystemToggleAutoP1) {
@@ -868,9 +866,6 @@ internal class CActConfigList : CActivity {
 		this.iKeyAssignSystemQuickConfig = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG"),
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC"));
 		this.list項目リスト.Add(this.iKeyAssignSystemQuickConfig);
-		this.iKeyAssignSystemNewHeya = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA"),
-			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC"));
-		this.list項目リスト.Add(this.iKeyAssignSystemNewHeya);
 		this.iKeyAssignSystemSortSongs = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_SONGSORT"),
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC"));
 		this.list項目リスト.Add(this.iKeyAssignSystemSortSongs);
@@ -1576,7 +1571,6 @@ internal class CActConfigList : CActivity {
 	private CItemBase iKeyAssignSystemDisplayHit;
 	private CItemBase iKeyAssignSystemDisplayDebug;
 	private CItemBase iKeyAssignSystemQuickConfig;
-	private CItemBase iKeyAssignSystemNewHeya;
 	private CItemBase iKeyAssignSystemSortSongs;
 	private CItemBase iKeyAssignSystemToggleAutoP1;
 	private CItemBase iKeyAssignSystemToggleAutoP2;

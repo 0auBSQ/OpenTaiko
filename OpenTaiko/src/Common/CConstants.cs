@@ -152,7 +152,6 @@ public enum EKeyConfigPad       // #24609 キーコンフィグで使うenum。c
 	DisplayDebug,
 	#region [Song Select only]
 	QuickConfig,
-	NewHeya,
 	SortSongs,
 	ToggleAutoP1,
 	ToggleAutoP2,

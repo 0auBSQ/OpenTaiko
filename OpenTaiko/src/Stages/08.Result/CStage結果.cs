@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using DiscordRPC;
@@ -1387,7 +1387,7 @@ internal class CStage結果 : CStage {
 					actFO.tフェードアウト開始();
 
 					if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-						if (OpenTaiko.stageSongSelect.rNowSelectedSong.rParentNode != null)
+						if (OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode != null)
 							OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
 
 					tPostprocessing();

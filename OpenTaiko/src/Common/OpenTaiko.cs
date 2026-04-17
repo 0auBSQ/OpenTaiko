@@ -184,6 +184,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CSongMount SongMount {
+		get;
+		private set;
+	}
+
 	public static CStageSongSelect stageSongSelect {
 		get;
 		private set;
@@ -1688,6 +1693,7 @@ internal class OpenTaiko : Game {
 		rPreviousStage = null;
 		stageStartup = new CStage起動();
 		stageConfig = new CStageコンフィグ();
+		SongMount = new CSongMount();
 		stageSongSelect = new CStageSongSelect();
 		stageDanSongSelect = new CStage段位選択();
 		stageHeya = new CStageHeya();

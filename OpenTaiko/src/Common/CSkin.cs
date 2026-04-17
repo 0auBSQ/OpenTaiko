@@ -2650,105 +2650,6 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
-							case "SongSelect_NewHeya_Close_Select": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Close_Select[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_PlayerPlate_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_PlayerPlate_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_PlayerPlate_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_PlayerPlate_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_X": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_ModeBar_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_Y": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 5; i++) {
-										SongSelect_NewHeya_ModeBar_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_ModeBar_Font_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_ModeBar_Font_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Count": {
-									SongSelect_NewHeya_Box_Count = int.Parse(strParam);
-									break;
-								}
-							case "SongSelect_NewHeya_Box_X": {
-									string[] strSplit = strParam.Split(',');
-									SongSelect_NewHeya_Box_X = new int[SongSelect_NewHeya_Box_Count];
-									for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++) {
-										SongSelect_NewHeya_Box_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Y": {
-									string[] strSplit = strParam.Split(',');
-									SongSelect_NewHeya_Box_Y = new int[SongSelect_NewHeya_Box_Count];
-									for (int i = 0; i < SongSelect_NewHeya_Box_Count; i++) {
-										SongSelect_NewHeya_Box_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Chara_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Chara_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Name_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Name_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Box_Author_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Box_Author_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_Lock_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_Lock_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "SongSelect_NewHeya_InfoSection_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										SongSelect_NewHeya_InfoSection_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-
-
 							case "SongSelect_ForeColor_JPOP": {
 									SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml(strParam);
 									break;
@@ -8172,25 +8073,6 @@ internal class CSkin : IDisposable {
 	public int[] SongSelect_Option_ModMults2_X = new int[] { 108, 1096 };
 	public int[] SongSelect_Option_ModMults2_Y = new int[] { 52, 52 };
 
-
-	public int[] SongSelect_NewHeya_Close_Select = new int[] { 0, 0 };
-
-	public int[] SongSelect_NewHeya_PlayerPlate_X = new int[] { 0, 256, 513, 770, 1026 };
-	public int[] SongSelect_NewHeya_PlayerPlate_Y = new int[] { 66, 66, 66, 66, 66 };
-
-	public int[] SongSelect_NewHeya_ModeBar_X = new int[] { 0, 256, 513, 770, 1026 };
-	public int[] SongSelect_NewHeya_ModeBar_Y = new int[] { 200, 200, 200, 200, 200 };
-	public int[] SongSelect_NewHeya_ModeBar_Font_Offset = new int[] { 128, 33 };
-
-
-	public int SongSelect_NewHeya_Box_Count = 7;
-	public int[] SongSelect_NewHeya_Box_X = new int[] { -424, -120, 184, 488, 792, 1096, 1400 };
-	public int[] SongSelect_NewHeya_Box_Y = new int[] { 273, 273, 273, 273, 273, 273, 273 };
-	public int[] SongSelect_NewHeya_Box_Chara_Offset = new int[] { 152, 200 };
-	public int[] SongSelect_NewHeya_Box_Name_Offset = new int[] { 152, 386 };
-	public int[] SongSelect_NewHeya_Box_Author_Offset = new int[] { 152, 413 };
-	public int[] SongSelect_NewHeya_Lock_Offset = new int[] { 0, 73 };
-	public int[] SongSelect_NewHeya_InfoSection_Offset = new int[] { 152, 206 };
 
 	public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
 	public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");

@@ -115,8 +115,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 			public STKEYASSIGN[] QuickConfig => pads[(int)EKeyConfigPad.QuickConfig];
 
-			public STKEYASSIGN[] NewHeya => pads[(int)EKeyConfigPad.NewHeya];
-
 			public STKEYASSIGN[] SortSongs => pads[(int)EKeyConfigPad.SortSongs];
 
 			public STKEYASSIGN[] ToggleAutoP1 => pads[(int)EKeyConfigPad.ToggleAutoP1];
@@ -1790,9 +1788,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.Write("QuickConfig=");
 		this.WriteKeyAssignment(sw, this.KeyAssign.System.QuickConfig);
 		sw.WriteLine();
-		sw.Write("NewHeya=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.System.NewHeya);
-		sw.WriteLine();
+
 		sw.Write("SortSongs=");
 		this.WriteKeyAssignment(sw, this.KeyAssign.System.SortSongs);
 		sw.WriteLine();
@@ -2714,10 +2710,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 					this.ReadAndSetKey(value, this.KeyAssign.System.QuickConfig);
 					break;
 				}
-			case "NewHeya": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.NewHeya);
-					break;
-				}
 			case "SortSongs": {
 					this.ReadAndSetKey(value, this.KeyAssign.System.SortSongs);
 					break;
@@ -2996,7 +2988,6 @@ SongVolumeDecrease=K0115
 DisplayHits=K057
 DisplayDebug=K049
 QuickConfig=K055
-NewHeya=K062
 SortSongs=K0126
 ToggleAutoP1=K056
 ToggleAutoP2=K057

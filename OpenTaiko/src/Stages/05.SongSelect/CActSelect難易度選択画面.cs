@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using FDK;
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
@@ -76,8 +76,8 @@ internal class CActSelect難易度選択画面 : CActivity {
 	}
 
 	public void t選択画面初期化() {
-		this.txTitle = OpenTaiko.tテクスチャの生成(pfTitle.DrawText(OpenTaiko.stageSongSelect.rNowSelectedSong.ldTitle.GetString(""), Color.White, Color.Black, null, 30));
-		this.txSubTitle = OpenTaiko.tテクスチャの生成(pfSubTitle.DrawText(OpenTaiko.stageSongSelect.rNowSelectedSong.ldSubtitle.GetString(""), Color.White, Color.Black, null, 30));
+		this.txTitle = OpenTaiko.tテクスチャの生成(pfTitle.DrawText(OpenTaiko.SongMount.rCurrentlySelectedSong.ldTitle.GetString(""), Color.White, Color.Black, null, 30));
+		this.txSubTitle = OpenTaiko.tテクスチャの生成(pfSubTitle.DrawText(OpenTaiko.SongMount.rCurrentlySelectedSong.ldSubtitle.GetString(""), Color.White, Color.Black, null, 30));
 
 		this.n現在の選択行 = new int[5];
 		this.bSelect[0] = false;
@@ -311,7 +311,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 
 		// int boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
-		var difficulty_back = HGenreBar.tGetGenreBar(OpenTaiko.stageSongSelect.rNowSelectedSong.BoxType, OpenTaiko.Tx.Difficulty_Back);
+		var difficulty_back = HGenreBar.tGetGenreBar(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxType, OpenTaiko.Tx.Difficulty_Back);
 
 
 		difficulty_back.Opacity =
@@ -324,7 +324,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 		OpenTaiko.Tx.SongSelect_ScoreRank.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Star.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 
-		difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.stageSongSelect.rNowSelectedSong.BoxColor);
+		difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxColor);
 
 		difficulty_back.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Difficulty_Back[0], OpenTaiko.Skin.SongSelect_Difficulty_Back[1]);
 
@@ -397,7 +397,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 				//var GPInfo = TJAPlayer3.stageSongSelect.r現在選択中のスコア.GPInfo[p];
 
-				var TableEntry = OpenTaiko.SaveFileInstances[p].data.tGetSongSelectTableEntry(OpenTaiko.stageSongSelect.rNowSelectedSong.tGetUniqueId());
+				var TableEntry = OpenTaiko.SaveFileInstances[p].data.tGetSongSelectTableEntry(OpenTaiko.SongMount.rCurrentlySelectedSong.tGetUniqueId());
 
 				//Difficulty_Crown.t2D描画(445 + screenPos * 144, 284, new RectangleF(idx.nクリア[i] * 24.5f, 0, 24.5f, 26));
 

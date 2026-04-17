@@ -1,4 +1,4 @@
-﻿using FDK;
+using FDK;
 
 namespace OpenTaiko;
 
@@ -155,7 +155,7 @@ internal class CActSelectPreimageパネル : CActivity {
 				this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = num4 * bestRatio;
 				this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = num4 * bestRatio;
 
-				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong);
+				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
 				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
 					this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = true;

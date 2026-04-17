@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using FDK;
 
 // Minimalist menu class to use for custom menus
@@ -39,11 +39,11 @@ class CActSelectSongInfo : CStage {
 	}
 
 	public override int Draw() {
-		if (OpenTaiko.stageSongSelect.rNowSelectedSong != null && OpenTaiko.stageSongSelect.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
+		if (OpenTaiko.SongMount.rCurrentlySelectedSong != null && OpenTaiko.SongMount.rCurrentlySelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 			int[] bpms = new int[3] {
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.BaseBpm,
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MinBpm,
-				(int)OpenTaiko.stageSongSelect.rNowSelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.stageSongSelect.rNowSelectedSong)].譜面情報.MaxBpm
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.BaseBpm,
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.MinBpm,
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.MaxBpm
 			};
 			for (int i = 0; i < 3; i++) {
 				tBPMNumberDraw(OpenTaiko.Skin.SongSelect_Bpm_X[i], OpenTaiko.Skin.SongSelect_Bpm_Y[i], bpms[i]);
@@ -55,9 +55,9 @@ class CActSelectSongInfo : CStage {
 			if (OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM != null && OpenTaiko.Skin.SongSelect_BPM_Text_Show) {
 				TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_BPM_Text[0], OpenTaiko.Skin.SongSelect_BPM_Text[1]);
 			}
-			if (OpenTaiko.stageSongSelect.rNowSelectedSong.bExplicit)
+			if (OpenTaiko.SongMount.rCurrentlySelectedSong.bExplicit)
 				OpenTaiko.Tx.SongSelect_Explicit?.t2D描画(OpenTaiko.Skin.SongSelect_Explicit[0], OpenTaiko.Skin.SongSelect_Explicit[1]);
-			if (OpenTaiko.stageSongSelect.rNowSelectedSong.bMovie)
+			if (OpenTaiko.SongMount.rCurrentlySelectedSong.bMovie)
 				OpenTaiko.Tx.SongSelect_Movie?.t2D描画(OpenTaiko.Skin.SongSelect_Movie[0], OpenTaiko.Skin.SongSelect_Movie[1]);
 		}
 

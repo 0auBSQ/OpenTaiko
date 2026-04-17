@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using FDK;
 
 // Minimalist menu class to use for custom menus
@@ -41,8 +41,8 @@ class CActSelectTowerInfo : CStage {
 	}
 
 	public override int Draw() {
-		if (OpenTaiko.stageSongSelect.rNowSelectedSong.score[5] != null)
-			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.stageSongSelect.rNowSelectedSong.score[5].譜面情報.nTotalFloor);
+		if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[5] != null)
+			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].譜面情報.nTotalFloor);
 
 		return 0;
 	}
