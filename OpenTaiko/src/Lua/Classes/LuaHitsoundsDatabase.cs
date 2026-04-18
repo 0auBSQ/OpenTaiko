@@ -41,5 +41,11 @@ namespace OpenTaiko {
 
 		/// <summary>The localised display name of this hitsound set.</summary>
 		public string DisplayName => _hs.names[_index]?.GetString("???") ?? FolderName;
+
+		/// <summary>Absolute path of the Don ("dong") sound file for this hitsound set.</summary>
+		public string DonPath => _hs.GetDonPath(_index);
+
+		/// <summary>Absolute path of the Ka sound file for this hitsound set.</summary>
+		public string KaPath => _hs.GetKaPath(_index);
 	}
 }

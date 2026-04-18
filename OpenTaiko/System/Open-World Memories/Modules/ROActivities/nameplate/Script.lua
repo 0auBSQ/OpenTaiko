@@ -525,6 +525,88 @@ function draw(mode, ...)
 			titleTex:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
 		end
 
+	elseif mode == 3 then
+		-- ── Full player nameplate with title override (for preview / selection UIs) ──
+		-- Player name and dan grade come from player_data[]; title text, type, rarity and
+		-- nameplate id are supplied directly so the caller can preview any nameplate without
+		-- modifying the save file.
+		-- draw(3, x, y, opacity, player, side, titleText, titleType, rarityInt, nameplateId)
+		local x, y, opacity, player, side, titleText, titleType, rarityInt, nameplateId =
+			args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9]
+		local player_lua = player + 1
+		local side_lua   = side + 1
+		local data       = player_data[player_lua]
+		if data == nil then return end
+
+		local _notitle = (titleText == nil or titleText == "")
+		local _nodan   = nodan[player_lua]
+		local op       = toOpacity(opacity)
+		local titleplate_index = (titleType or 0) + 1
+
+		base:SetOpacity(op)
+		base:Draw(x, y)
+
+		if not _notitle then
+			implDrawTitlePlate(x, y, opacity, titleplate_index)
+		elseif not _nodan then
+			drawDanTitlePlate(x, y, opacity, data.DanType + 1)
+		end
+
+		implDrawRarityStars(x, y, opacity, rarityInt or 1)
+		implDrawBadges(x, y, opacity, nameplateId or -1)
+
+		if not _nodan and not _notitle then
+			dan_base:SetOpacity(op)
+			dan_base:Draw(x, y)
+			dan_gradation[data.DanType + 1]:SetOpacity(op)
+			dan_gradation[data.DanType + 1]:Draw(x, y)
+		end
+
+		implDrawTitleEffect(x, y, titleplate_index)
+		implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
+
+		if not _nodan and not _notitle then
+			local tx_dan = font_dan:GetText(dan_text[player_lua], false, 99999)
+			tx_dan:SetScale(math.min(config_font_dan_maxsize / tx_dan.Width, 1.0), 1.0)
+			tx_dan:SetOpacity(op)
+			tx_dan:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
+		end
+
+		if not _nodan and _notitle then
+			local tx_title = font_title:GetText(dan_short_text[player_lua], false, 99999)
+			tx_title:SetScale(math.min(config_font_name_normal_maxsize / tx_title.Width, 1.0), 1.0)
+			tx_title:SetOpacity(op)
+			tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+
+			local tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
+			tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
+			tx_name:SetOpacity(op)
+			tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+		elseif _notitle then
+			local tx_name = font_name_normal_size:GetText(name_text[player_lua], false, 99999)
+			tx_name:SetScale(math.min(config_font_name_normal_maxsize / tx_name.Width, 1.0), 1.0)
+			tx_name:SetOpacity(op)
+			tx_name:DrawAtAnchor(x + config_text_name_normal_offset_x, y + config_text_name_normal_offset_y, "center")
+		else
+			local tx_title = font_title:GetText(titleText, false, 99999, title_fg, title_bg)
+			tx_title:SetScale(math.min(config_font_title_maxsize / tx_title.Width, 1.0), 1.0)
+			tx_title:SetOpacity(op)
+			tx_title:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+
+			local tx_name
+			if _nodan then
+				tx_name = font_name_withtitle:GetText(name_text[player_lua], false, 99999)
+				tx_name:SetScale(math.min(config_font_name_withtitle_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:SetOpacity(op)
+				tx_name:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+			else
+				tx_name = font_name_full:GetText(name_text[player_lua], false, 99999)
+				tx_name:SetScale(math.min(config_font_name_full_maxsize / tx_name.Width, 1.0), 1.0)
+				tx_name:SetOpacity(op)
+				tx_name:DrawAtAnchor(x + config_text_name_full_offset_x, y + config_text_name_full_offset_y, "center")
+			end
+		end
+
 	elseif mode == 2 then
 		-- ── Title plate only ──
 		local o_x, o_y, opacity, titletype, titleTex, rarityInt, nameplateId =

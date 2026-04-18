@@ -36,6 +36,9 @@ namespace OpenTaiko {
 
 		public object[]? Activate(params object[] args) {
 			_active = true;
+			// Refresh globals populated by TextureLoader after script construction (mirrors CLuaStageScript).
+			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
+			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
 			return RunLuaCode(lfActivate, args);
 		}
 

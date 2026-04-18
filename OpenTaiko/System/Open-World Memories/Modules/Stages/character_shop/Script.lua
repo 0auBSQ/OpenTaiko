@@ -160,8 +160,8 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 local function tryUnlockCharacter(entry, force)
-    if save:IsCharacterUnlocked(entry.FolderName) then
-        -- Already unlocked — just equip
+    if save:IsCharacterUnlocked(entry.FolderName) or not entry.UnlockCondition.HasCondition then
+        -- Already unlocked (or available by default) — just equip
         save:ChangeCharacter(entry.FolderName)
         if sounds.Decide ~= nil then sounds.Decide:Play() end
         return
@@ -189,8 +189,8 @@ local function tryUnlockCharacter(entry, force)
 end
 
 local function tryUnlockPuchi(entry, force)
-    if save:IsPuchicharaUnlocked(entry.FolderName) then
-        -- Already unlocked — just equip
+    if save:IsPuchicharaUnlocked(entry.FolderName) or not entry.UnlockCondition.HasCondition then
+        -- Already unlocked (or available by default) — just equip
         save:ChangePuchichara(entry.FolderName)
         if sounds.Decide ~= nil then sounds.Decide:Play() end
         return
@@ -218,8 +218,8 @@ local function tryUnlockPuchi(entry, force)
 end
 
 local function tryUnlockNameplate(entry, force)
-    if save:IsNameplateUnlocked(entry.Id) then
-        -- Already unlocked — just equip
+    if save:IsNameplateUnlocked(entry.Id) or not entry.UnlockCondition.HasCondition then
+        -- Already unlocked (or available by default) — just equip
         save:ChangeNameplate(entry.Id)
         if sounds.Decide ~= nil then sounds.Decide:Play() end
         return
@@ -275,7 +275,7 @@ local function drawCharacterItem(dataIdx, cx, cy, isSelected)
 
     ensureCharaAnimLoaded(entry)
 
-    local locked = not save:IsCharacterUnlocked(entry.FolderName)
+    local locked = not save:IsCharacterUnlocked(entry.FolderName) and entry.UnlockCondition.HasCondition
     local isEquipped = (save.CharacterName == entry.FolderName)
     local color = locked and getGrayColor() or getWhiteColor()
     local scale = isSelected and 1.2 or 0.9
@@ -320,7 +320,7 @@ local function drawPuchiItem(dataIdx, cx, cy, isSelected)
     local entry = puchiList[dataIdx + 1]
     if entry == nil then return end
 
-    local locked = not save:IsPuchicharaUnlocked(entry.FolderName)
+    local locked = not save:IsPuchicharaUnlocked(entry.FolderName) and entry.UnlockCondition.HasCondition
     local equippedPuchi = save:GetPuchichara()
     local isEquipped = (equippedPuchi ~= nil and equippedPuchi.FolderName == entry.FolderName)
     local scale = isSelected and 1.2 or 0.9
@@ -377,7 +377,7 @@ local function drawNameplateRow(dataIdx, rowY, isSelected)
     local entry = nameplateList[dataIdx + 1]
     if entry == nil then return end
 
-    local locked     = not save:IsNameplateUnlocked(entry.Id)
+    local locked     = not save:IsNameplateUnlocked(entry.Id) and entry.UnlockCondition.HasCondition
     local isEquipped = (save.NameplateInfo ~= nil and save.NameplateInfo.Id == entry.Id)
     local opacity    = locked and 130 or 255
     local scale      = isSelected and 1.05 or 0.82

@@ -31,6 +31,20 @@ class CHitSounds {
 
 	public int Count => data?.Length ?? 0;
 
+	/// <summary>Returns the absolute path of the Don ("dong") sound for the hitsound set at the given index.</summary>
+	public string GetDonPath(int index) {
+		if (data == null || index < 0 || index >= data.Length) return string.Empty;
+		string p = Path.Combine(data[index].path, "dong");
+		return File.Exists(p + ".ogg") ? p + ".ogg" : p + ".wav";
+	}
+
+	/// <summary>Returns the absolute path of the Ka sound for the hitsound set at the given index.</summary>
+	public string GetKaPath(int index) {
+		if (data == null || index < 0 || index >= data.Length) return string.Empty;
+		string p = Path.Combine(data[index].path, "ka");
+		return File.Exists(p + ".ogg") ? p + ".ogg" : p + ".wav";
+	}
+
 	/// <summary>Returns the folder name of the hitsound set at the given index.</summary>
 	public string GetFolderName(int index) {
 		if (data == null || index < 0 || index >= data.Length) return string.Empty;

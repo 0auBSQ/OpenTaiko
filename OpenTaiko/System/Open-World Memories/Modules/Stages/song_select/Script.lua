@@ -58,6 +58,12 @@ local difficultySelectModes = { difficultyselect = true, transition = true }
 --- none | inputinfo | playerinfo | quicksettings | unlockconfirm | unlockanim | modselect
 local activeModal = "none"
 
+-- Tracks whether the customize dialog was active on the previous frame so we can detect when it closes.
+local wasCustomizeActive = false
+
+-- Puchichara floating sine animation
+local puchiSineY = 0
+
 -- To-play song info
 local selectedSongNode = nil
 
@@ -168,6 +174,9 @@ local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
 local NAMEPLATE_HEIGHT = 81   -- height of the nameplate base texture (330×81)
 
+local PUCHI_OFFSET_X = 60   -- horizontal offset of puchichara from the character centre (px)
+local PUCHI_FLOAT_AMP = 8   -- sine float amplitude (px)
+
 local DIFFSELECT_CHARA_ORIG_X_35P = 1250
 local DIFFSELECT_CHARA_ORIG_Y_35P = 470
 local DIFFSELECT_CHARA_GAP_X_35P = 332
@@ -178,8 +187,8 @@ local DIFFSELECT_CHARA_ORIG_Y_12P = 760
 local DIFFSELECT_CHARA_GAP_X_12P = 468
 local DIFFSELECT_CHARA_SCALE_12P = 0.8
 
-local DIFFSELECT_SMALL_BAR_X = {678, 718}
-local DIFFSELECT_SMALL_BAR_Y = {821, 1036}
+local DIFFSELECT_SMALL_BAR_X = {678, 718, 758}
+local DIFFSELECT_SMALL_BAR_Y = {721, 900, 1079}
 local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET = 156
 local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION = -6 -- Difference with 162
 local DIFFSELECT_BIG_BAR_ORIG_X = 676
@@ -207,6 +216,18 @@ local function drawPlayerChara(player, x, y, scaleX, scaleY, opacity, flipX)
 		local effectiveScaleX = (flipX or false) and -scaleX or scaleX
 		chara:DrawAtAnchor(x, y, CHARACTER.ANIM_MENU_NORMAL, "bottom", effectiveScaleX, scaleY, math.floor(opacity * 255))
 	end
+end
+
+local function drawPlayerPuchi(player, x, y, scaleX, scaleY, opacity)
+	local puchi = GetSaveFile(player):GetPuchichara()
+	if puchi == nil or puchi.tx == nil or not puchi.tx.Loaded then return end
+	local frameW = math.floor(puchi.tx.Width / 2)
+	local frameH = puchi.tx.Height
+	puchi.tx:SetScale(scaleX, scaleY)
+	puchi.tx:SetOpacity(opacity)
+	puchi.tx:DrawRectAtAnchor(x, y, 0, 0, frameW, frameH, "bottom")
+	puchi.tx:SetOpacity(1)
+	puchi.tx:SetScale(1, 1)
 end
 
 local function drawCharaWithNameplate(player, x, y, scaleX, scaleY, opacity, flipX)
@@ -328,8 +349,8 @@ local function drawDifficultyBar(index, barinfo)
 	if barinfo.vault == false then
 		tex = bars["difficultybar"..(barinfo.difficulty + 2)]
 	end
-	local xpos = DIFFSELECT_BIG_BAR_ORIG_X + (index-2)*DIFFSELECT_BIG_BAR_GAP_X + xshift
-	local ypos = DIFFSELECT_BIG_BAR_ORIG_Y + (index-2)*DIFFSELECT_BIG_BAR_GAP_Y
+	local xpos = DIFFSELECT_BIG_BAR_ORIG_X + (index-3)*DIFFSELECT_BIG_BAR_GAP_X + xshift
+	local ypos = DIFFSELECT_BIG_BAR_ORIG_Y + (index-3)*DIFFSELECT_BIG_BAR_GAP_Y
 	for i = 1, CONFIG.PlayerCount, 1 do
 		if diffIndex[i] == index then
 			bars["difficultybarselect"..i]:DrawRectAtAnchor(
@@ -389,23 +410,23 @@ end
 
 local function drawDiffSelectBar(index, barinfo)
 	local xshift = 1920 - songSelectShift
-	if index < 2 then
+	if index < 3 then
 		local xpos = DIFFSELECT_SMALL_BAR_X[index + 1] + xshift
 		local ypos = DIFFSELECT_SMALL_BAR_Y[index + 1]
 		for i = 1, CONFIG.PlayerCount, 1 do
 			if diffIndex[i] == index then
 				bars["difficultybarselect"..i]:DrawRectAtAnchor(
 					xpos,
-					ypos, 
+					ypos,
 					0,
 					DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
 					bars["difficultybarselect"..i].Width,
-					bars["difficultybarselect"..i].Height-DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET, 
+					bars["difficultybarselect"..i].Height-DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
 					"bottomleft"
 				)
 			end
 		end
-		bars["difficultybar"..index]:DrawAtAnchor(xpos, ypos, "bottomleft")
+		bars["smallbar"..index]:DrawAtAnchor(xpos, ypos, "bottomleft")
 	else
 		drawDifficultyBar(index, barinfo)
 	end
@@ -634,11 +655,11 @@ function draw()
 			subtitleTx:SetOpacity(opacityNorm)
 			subtitleTx:Draw(1926 - songSelectShift, 67)
 
-			-- Draw difficulty bars + return/options
-			for i = 0, 1+#diffBars, 1 do
+			-- Draw difficulty bars + return/customize/options
+			for i = 0, 2+#diffBars, 1 do
 				local barinfo = nil
-				if i >= 2 then
-					barinfo = diffBars[i-1]
+				if i >= 3 then
+					barinfo = diffBars[i-2]
 				end
 				drawDiffSelectBar(i, barinfo)
 			end
@@ -669,6 +690,8 @@ function draw()
 				local y = oy + r * gy
 				
 				drawCharaWithNameplate(i, x, y, s, s, opacityNorm, true)
+				local charaX = x + bgtx["nameplate_info"].Width/2 - NAMEPLATE_OFFSET_X
+				drawPlayerPuchi(i, charaX - PUCHI_OFFSET_X * s, y + puchiSineY * s, s, s, opacityNorm)
 				if modicons_ro ~= nil then
 					modicons_ro:Draw(x, y + NAMEPLATE_HEIGHT + 4, i, nil, difficultySelectElemOpacity)
 				end
@@ -835,7 +858,9 @@ function draw()
 			local y0 = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
 			bgtx["nameplate_info"]:Draw(x0, y0)
 			-- TODO: Draw clear numbers here for the given 1P difficulty
-			drawPlayerChara(highlightedPlayer, x0+bgtx["nameplate_info"].Width/2, y0+NAMEPLATE_OFFSET_Y, 1.0, 1.0, opacityNorm, false)
+			local ssCharaX = x0 + bgtx["nameplate_info"].Width/2
+			drawPlayerChara(highlightedPlayer, ssCharaX, y0+NAMEPLATE_OFFSET_Y, 1.0, 1.0, opacityNorm, false)
+			drawPlayerPuchi(highlightedPlayer, ssCharaX - PUCHI_OFFSET_X, y0+NAMEPLATE_OFFSET_Y + puchiSineY, 1.0, 1.0, opacityNorm)
 			NAMEPLATE:DrawPlayerNameplate(x0+NAMEPLATE_OFFSET_X, y0+NAMEPLATE_OFFSET_Y, songSelectElemOpacity, highlightedPlayer)
 		end
 
@@ -917,6 +942,24 @@ function update()
 			activeModal = true
 		end
 	end
+
+	-- When customize_dialog closes, reload the character animation for every player so that a
+	-- newly-selected character (which was swapped in by ChangeCharacter) is actually rendered.
+	local isCustomizeActive = act["customize_dialog"] ~= nil and act["customize_dialog"].IsActive
+	if wasCustomizeActive and not isCustomizeActive then
+		-- Guard with AvailableAnimation so we never double-increment the ref-count:
+		-- LoadAnimation is reference-counted; calling it a second time without a matching
+		-- DisposeAnimation would leak. Only load if the animation is not already active.
+		for p = 0, 4, 1 do
+			local chara = GetSaveFile(p):GetCharacter()
+			if chara ~= nil and chara.IsValid then
+				if not chara:AvailableAnimation(CHARACTER.ANIM_MENU_NORMAL) then
+					chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
+				end
+			end
+		end
+	end
+	wasCustomizeActive = isCustomizeActive
 
 	if activeModal == true then
 		return
@@ -1000,21 +1043,25 @@ function update()
 			if diffSelected[i] == false then
 				if INPUT:Pressed(inpset.right) or (i == 1 and INPUT:KeyboardPressed("RightArrow")) then
 					sounds.Skip:Play()
-					diffIndex[i] = (diffIndex[i] + 1) % (2 + #diffBars)
+					diffIndex[i] = (diffIndex[i] + 1) % (3 + #diffBars)
 				elseif INPUT:Pressed(inpset.left) or (i == 1 and INPUT:KeyboardPressed("LeftArrow")) then
 					sounds.Skip:Play()
-					diffIndex[i] = (diffIndex[i] - 1) % (2 + #diffBars)
+					diffIndex[i] = (diffIndex[i] - 1) % (3 + #diffBars)
 				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) or (i == 1 and INPUT:KeyboardPressed("Return")) then
 					-- Return
 					if diffIndex[i] == 0 then
 						sounds.Cancel:Play()
 						canceled = true
-					-- Options
+					-- Customize
 					elseif diffIndex[i] == 1 then
+						act["customize_dialog"]:Activate(i - 1)
+						return
+					-- Options
+					elseif diffIndex[i] == 2 then
 						act["mod_select_dialog"]:Activate(i - 1)
 						return
 					-- Select difficulty
-					elseif diffIndex[i] > 1 then
+					elseif diffIndex[i] > 2 then
 						sounds.Decide:Play()
 						diffSelected[i] = true
 					end
@@ -1052,11 +1099,11 @@ function update()
 		elseif allDiffsSelected == true then
 			-- No need to check for player count, the lua api handles it 
 			local success = selectedSongNode:Mount(
-				(diffIndex[1] >= 2) and diffBars[diffIndex[1] - 1].difficulty or 0,
-				(diffIndex[2] >= 2) and diffBars[diffIndex[2] - 1].difficulty or 0,
-				(diffIndex[3] >= 2) and diffBars[diffIndex[3] - 1].difficulty or 0,
-				(diffIndex[4] >= 2) and diffBars[diffIndex[4] - 1].difficulty or 0,
-				(diffIndex[5] >= 2) and diffBars[diffIndex[5] - 1].difficulty or 0
+				(diffIndex[1] >= 3) and diffBars[diffIndex[1] - 2].difficulty or 0,
+				(diffIndex[2] >= 3) and diffBars[diffIndex[2] - 2].difficulty or 0,
+				(diffIndex[3] >= 3) and diffBars[diffIndex[3] - 2].difficulty or 0,
+				(diffIndex[4] >= 3) and diffBars[diffIndex[4] - 2].difficulty or 0,
+				(diffIndex[5] >= 3) and diffBars[diffIndex[5] - 2].difficulty or 0
 			)
 			if success then
 				return Exit("play", nil)
@@ -1124,7 +1171,7 @@ local function resetToSongSelect()
 end
 
 function activate()
-	local activities = {"mod_select_dialog"}
+	local activities = {"mod_select_dialog", "customize_dialog"}
 	for _, at in ipairs(activities) do
 		act[at] = ACTIVITY:GetActivity(at)
 	end
@@ -1181,6 +1228,11 @@ function activate()
 			bgtx["load"]:SetRotation(val)
 		end
     end)
+
+	-- Puchichara floating sine animation
+	startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)
+		puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
+	end)
 
 	-- Load character animations for all players
 	for p = 0, 4, 1 do
@@ -1261,9 +1313,14 @@ function onStart()
 	for i = 1, 5, 1 do
 		bars["difficultybarselect"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P"..i..".png")
 	end
-	for i = 0, 7, 1 do
+	-- Actual difficulty bar textures (indices 2-7: Easy→Ura + Vault)
+	for i = 2, 7, 1 do
 		bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
 	end
+	-- Small navigation bars: 0=Return, 1=Customize, 2=Options
+	bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
+	bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
+	bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
 	for i = 1, 7, 1 do
 		bars["difficultybarlevel"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff"..i..".png")
 	end
