@@ -14,26 +14,29 @@ local reactive = false
 local player   = 0
 local save     = nil
 
--- Current sub-screen: "main" | "character" | "puchichara" | "nameplate" | "hitsounds"
+-- Current sub-screen
+-- "main" | "character" | "puchichara" | "nameplate_title" | "dan_title" | "player_name" | "hitsounds"
 local currentScreen = "main"
 
--- Main-menu cursor (1-based).  1-4 = categories, 5 = OK, 6 = Cancel.
+-- Main-menu cursor (1-based).  1-6 = categories, 7 = OK, 8 = Cancel.
 local mainIdx    = 1
-local MAIN_LABELS = { "Character", "Puchichara", "Nameplate", "Hitsounds" }
-local MAIN_COUNT  = 6   -- 4 categories + OK + Cancel
-local OK_IDX      = 5
-local CANCEL_IDX  = 6
+local MAIN_LABELS = { "Character", "Puchichara", "Nameplate title", "Dan title", "Player name", "Hitsounds" }
+local MAIN_COUNT  = 8   -- 6 categories + OK + Cancel
+local OK_IDX      = 7
+local CANCEL_IDX  = 8
 
 -- Item lists (only available items, built on activate)
 local characterList  = {}
 local puchiList      = {}
 local nameplateList  = {}
+local danList        = {}
 local hitsoundList   = {}
 
 -- Selection indices inside each list (0-based, wrapping)
 local charSubIdx  = 0
 local puchiSubIdx = 0
 local npSubIdx    = 0
+local danSubIdx   = 0
 local hsSubIdx    = 0
 
 -- Character animation preview:
@@ -47,7 +50,13 @@ local loadedCharaInst  = nil
 local savedCharSubIdx  = 0
 local savedPuchiSubIdx = 0
 local savedNpSubIdx    = 0
+local savedDanSubIdx   = 0
 local savedHsSubIdx    = 0
+
+-- Player name staging
+local stagedPlayerName = ""
+local savedPlayerName  = ""
+local playerNameInput  = nil   -- LuaTextInput, alive only while "player_name" screen is open
 
 -- Puchichara sine-float animation
 local sineY = 0
@@ -185,6 +194,14 @@ local function buildHitsoundList()
     end
 end
 
+local function buildDanList()
+    danList = {}
+    for i = 0, save.DanTitleCount - 1 do
+        local e = save:GetDanTitleByIndex(i)
+        if e ~= nil then danList[#danList + 1] = e end
+    end
+end
+
 -- ─── Character preview instance management ────────────────────────────────────
 -- Each preview character is a freshly-created LuaCharacter (via CHARACTER:CreateCharacter)
 -- that is fully owned and isolated from the shared instances used by song_select.
@@ -252,12 +269,22 @@ local function findHsSubIdx()
     return 0
 end
 
+local function findDanSubIdx()
+    local currentDan = save.DanplateInfo.Title
+    for i, e in ipairs(danList) do
+        if e.Title == currentDan then return i - 1 end
+    end
+    return 0
+end
+
 -- ─── Apply pending changes on OK ──────────────────────────────────────────────
 
 local function applyChanges()
     if #characterList  > 0 then save:ChangeCharacter(characterList[charSubIdx + 1].FolderName) end
     if #puchiList      > 0 then save:ChangePuchichara(puchiList[puchiSubIdx + 1].FolderName)   end
     if #nameplateList  > 0 then save:ChangeNameplate(nameplateList[npSubIdx + 1].Id)            end
+    if #danList        > 0 then save:ChangeDan(danList[danSubIdx + 1].Title)                    end
+    if stagedPlayerName ~= "" then save:ChangeName(stagedPlayerName)                            end
     if #hitsoundList   > 0 then save.SelectedHitsounds = hitsoundList[hsSubIdx + 1].FolderName  end
 end
 
@@ -292,16 +319,28 @@ local function drawPreview(alpha)
         )
     end
 
-    -- ── Nameplate — draw the selected nameplate with the player's real name/dan grade.
-    --   Uses nameplate ROActivity draw mode 3: full nameplate with title overridden by args. ──
-    local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
-    if npEntry ~= nil then
-        ROACTIVITY:GetROActivity("nameplate"):Draw(
-            3, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0,
-            npEntry.Title, npEntry.Type, rarityToLangInt(npEntry.Rarity), npEntry.Id
-        )
+    -- ── Nameplate — mode depends on which sub-screen is active. ──
+    local np = ROACTIVITY:GetROActivity("nameplate")
+    if currentScreen == "dan_title" and #danList > 0 then
+        -- Mode 4: full nameplate with the browsed dan entry
+        local de = danList[danSubIdx + 1]
+        if de ~= nil then
+            np:Draw(4, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0, de.Title, de.ClearStatus, stagedPlayerName)
+        else
+            NAMEPLATE:DrawPlayerNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player)
+        end
+    elseif currentScreen == "player_name" then
+        -- Mode 5: full nameplate with the staged player name
+        np:Draw(5, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0, stagedPlayerName)
     else
-        NAMEPLATE:DrawPlayerNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player)
+        -- Mode 3: full nameplate with the browsed nameplate title
+        local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
+        if npEntry ~= nil then
+            np:Draw(3, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0,
+                npEntry.Title, npEntry.Type, rarityToLangInt(npEntry.Rarity), npEntry.Id, stagedPlayerName)
+        else
+            NAMEPLATE:DrawPlayerNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player)
+        end
     end
 
     -- ── Puchichara (floating sine) ──
@@ -418,6 +457,25 @@ local function drawHitsoundList(alpha)
     end
 end
 
+-- Vertical dan-title list — each row shows the dan plate for that entry.
+local function drawDanTitleList(alpha)
+    if #danList == 0 then return end
+    for slot = -NP_HALF_VIS, NP_HALF_VIS do
+        local dataIdx    = modWrap(danSubIdx + slot, #danList)
+        local entry      = danList[dataIdx + 1]
+        if entry ~= nil then
+            local rowY       = NP_LIST_CY + slot * NP_ROW_H
+            local isSelected = (slot == 0)
+            local opacity    = math.floor((isSelected and alpha or alpha * 0.5) * 255)
+            local nx         = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
+            ROACTIVITY:GetROActivity("nameplate"):Draw(
+                4, nx, rowY - 30, opacity, player, 0,
+                entry.Title, entry.ClearStatus, stagedPlayerName
+            )
+        end
+    end
+end
+
 -- Vertical nameplate list — each row shows the full in-game nameplate
 -- (player name, dan grade, nameplate style) for a specific nameplate entry.
 local function drawNameplateList(alpha)
@@ -432,7 +490,7 @@ local function drawNameplateList(alpha)
             local nx         = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
             ROACTIVITY:GetROActivity("nameplate"):Draw(
                 3, nx, rowY - 30, opacity, player, 0,
-                entry.Title, entry.Type, rarityToLangInt(entry.Rarity), entry.Id
+                entry.Title, entry.Type, rarityToLangInt(entry.Rarity), entry.Id, stagedPlayerName
             )
         end
     end
@@ -520,11 +578,33 @@ function draw()
             drawHorizList(puchiList, puchiSubIdx, alpha, drawPuchiItem)
         end
 
-    elseif currentScreen == "nameplate" then
-        local ttl = text:GetText("Nameplate", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
+    elseif currentScreen == "nameplate_title" then
+        local ttl = text:GetText("Nameplate title", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
 
         drawNameplateList(alpha)
+
+    elseif currentScreen == "dan_title" then
+        local ttl = text:GetText("Dan title", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+
+        if #danList == 0 then
+            local e = textSmall:GetText("No dan titles available.", false, 600)
+            e:SetOpacity(alpha) ; e:DrawAtAnchor(MENU_CX, NP_LIST_CY, "center")
+        else
+            drawDanTitleList(alpha)
+        end
+
+    elseif currentScreen == "player_name" then
+        local ttl = text:GetText("Player name", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+
+        local displayText = playerNameInput ~= nil and playerNameInput.DisplayText or stagedPlayerName
+        local nameTx = text:GetText(displayText, false, 700)
+        nameTx:SetOpacity(alpha) ; nameTx:DrawAtAnchor(MENU_CX, 500, "center")
+
+        local hint = textSmall:GetText("Enter: confirm   Esc: cancel", false, 700)
+        hint:SetOpacity(alpha) ; hint:DrawAtAnchor(MENU_CX, 950, "top")
 
     elseif currentScreen == "hitsounds" then
         local ttl = text:GetText("Hitsounds", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
@@ -576,8 +656,14 @@ function update()
             elseif mainIdx == CANCEL_IDX then sounds.Cancel:Play() ; exitDialog(false)
             elseif mainIdx == 1 then sounds.Decide:Play() ; savedCharSubIdx  = charSubIdx  ; currentScreen = "character"
             elseif mainIdx == 2 then sounds.Decide:Play() ; savedPuchiSubIdx = puchiSubIdx ; currentScreen = "puchichara"
-            elseif mainIdx == 3 then sounds.Decide:Play() ; savedNpSubIdx    = npSubIdx    ; currentScreen = "nameplate"
-            elseif mainIdx == 4 then sounds.Decide:Play() ; savedHsSubIdx    = hsSubIdx    ; currentScreen = "hitsounds"
+            elseif mainIdx == 3 then sounds.Decide:Play() ; savedNpSubIdx    = npSubIdx    ; currentScreen = "nameplate_title"
+            elseif mainIdx == 4 then sounds.Decide:Play() ; savedDanSubIdx   = danSubIdx   ; currentScreen = "dan_title"
+            elseif mainIdx == 5 then
+                sounds.Decide:Play()
+                savedPlayerName = stagedPlayerName
+                playerNameInput = INPUT:CreateTextInput(stagedPlayerName, 64)
+                currentScreen   = "player_name"
+            elseif mainIdx == 6 then sounds.Decide:Play() ; savedHsSubIdx    = hsSubIdx    ; currentScreen = "hitsounds"
             end
         elseif cancel() then
             sounds.Cancel:Play()
@@ -617,8 +703,8 @@ function update()
             sounds.Cancel:Play() ; puchiSubIdx = savedPuchiSubIdx ; currentScreen = "main"
         end
 
-    -- ── Nameplate ─────────────────────────────────────────────────────────────
-    elseif currentScreen == "nameplate" then
+    -- ── Nameplate title ───────────────────────────────────────────────────────
+    elseif currentScreen == "nameplate_title" then
         if down() and #nameplateList > 0 then
             sounds.Skip:Play() ; npSubIdx = modWrap(npSubIdx + 1, #nameplateList)
         elseif up() and #nameplateList > 0 then
@@ -627,6 +713,35 @@ function update()
             sounds.Decide:Play() ; currentScreen = "main"
         elseif cancel() then
             sounds.Cancel:Play() ; npSubIdx = savedNpSubIdx ; currentScreen = "main"
+        end
+
+    -- ── Dan title ─────────────────────────────────────────────────────────────
+    elseif currentScreen == "dan_title" then
+        if down() and #danList > 0 then
+            sounds.Skip:Play() ; danSubIdx = modWrap(danSubIdx + 1, #danList)
+        elseif up() and #danList > 0 then
+            sounds.Skip:Play() ; danSubIdx = modWrap(danSubIdx - 1, #danList)
+        elseif decide() then
+            sounds.Decide:Play() ; currentScreen = "main"
+        elseif cancel() then
+            sounds.Cancel:Play() ; danSubIdx = savedDanSubIdx ; currentScreen = "main"
+        end
+
+    -- ── Player name ───────────────────────────────────────────────────────────
+    elseif currentScreen == "player_name" then
+        if playerNameInput ~= nil then
+            local confirmed = playerNameInput:Update()
+            stagedPlayerName = playerNameInput.Text
+            if confirmed then
+                sounds.Decide:Play()
+                playerNameInput:Dispose() ; playerNameInput = nil
+                currentScreen = "main"
+            elseif INPUT:KeyboardPressed("Escape") then
+                sounds.Cancel:Play()
+                stagedPlayerName = savedPlayerName
+                playerNameInput:Dispose() ; playerNameInput = nil
+                currentScreen = "main"
+            end
         end
 
     -- ── Hitsounds ─────────────────────────────────────────────────────────────
@@ -653,13 +768,18 @@ function activate(pl)
     buildCharacterList()
     buildPuchiList()
     buildNameplateList()
+    buildDanList()
     buildHitsoundList()
 
     -- Initialise selection at the currently equipped item
     charSubIdx  = findCharSubIdx()
     puchiSubIdx = findPuchiSubIdx()
     npSubIdx    = findNpSubIdx()
+    danSubIdx   = findDanSubIdx()
     hsSubIdx    = findHsSubIdx()
+
+    -- Initialise staged player name
+    stagedPlayerName = save.Name
 
     -- Create a fresh, owned preview character instance (independent of song_select)
     loadedCharaEntry = nil
@@ -700,6 +820,9 @@ function deactivate()
     -- Stop and dispose any in-progress hitsound preview
     stopHitsoundPreview()
 
+    -- Dispose the player name text input if the screen was left open
+    if playerNameInput ~= nil then playerNameInput:Dispose() ; playerNameInput = nil end
+
     -- Dispose the owned preview character instance (no effect on song_select)
     disposePreviewCharacter()
 
@@ -712,6 +835,7 @@ function deactivate()
     characterList = {}
     puchiList     = {}
     nameplateList = {}
+    danList       = {}
     hitsoundList  = {}
 end
 

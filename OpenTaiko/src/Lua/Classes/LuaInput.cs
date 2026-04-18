@@ -101,6 +101,18 @@ namespace OpenTaiko {
 			}
 			return false;
 		}
+
+		// Text input
+		/// <summary>
+		/// Creates a text-input widget pre-filled with <paramref name="initialText"/>.
+		/// Call <see cref="LuaTextInput.Update"/> each frame inside <c>update()</c>; it returns
+		/// <c>true</c> when the user presses Enter to confirm.
+		/// Draw <see cref="LuaTextInput.DisplayText"/> in your Lua UI to show the live text.
+		/// </summary>
+		public LuaTextInput CreateTextInput(string initialText, int maxLength = 64) {
+			return new LuaTextInput(initialText ?? "", maxLength);
+		}
+
 		// Mouse inputs
 
 		// Due to the way the surface scales in non-native resolutions,

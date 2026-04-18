@@ -211,6 +211,53 @@
 			}
 		}
 
+		// ── Dan title ──────────────────────────────────────────────────────────────
+
+		/// <summary>Number of available dan titles (always ≥ 1 for the default "新人").</summary>
+		public int DanTitleCount => 1 + (_sf.data.DanTitles?.Count ?? 0);
+
+		/// <summary>Returns the dan-title entry at the given 0-based index, or <c>null</c> if out of range.
+		/// Index 0 is always the default "新人" entry.</summary>
+		public LuaDanTitleEntry? GetDanTitleByIndex(int index) {
+			if (index == 0) return new LuaDanTitleEntry("新人", false, 0);
+			var titles = _sf.data.DanTitles;
+			if (titles == null) return null;
+			int i = 1;
+			foreach (var (k, v) in titles) {
+				if (i == index) return new LuaDanTitleEntry(k, v.isGold, v.clearStatus);
+				i++;
+			}
+			return null;
+		}
+
+		/// <summary>The currently active dan-title string.</summary>
+		public string SelectedDan => _sf.data.Dan;
+
+		/// <summary>Sets the player's active dan title and persists the change.</summary>
+		public void ChangeDan(string title) {
+			bool isGold = false;
+			int  cs     = 0;
+			if (_sf.data.DanTitles != null && _sf.data.DanTitles.TryGetValue(title, out var dt)) {
+				isGold = dt.isGold;
+				cs     = dt.clearStatus;
+			}
+			_sf.data.Dan     = title;
+			_sf.data.DanGold = isGold;
+			_sf.data.DanType = cs;
+			OpenTaiko.NamePlate?.tNamePlateRefreshTitles(_mounted);
+			_sf.tApplyHeyaChanges();
+		}
+
+		// ── Player name ────────────────────────────────────────────────────────────
+
+		/// <summary>Changes the player's displayed name and persists the change.</summary>
+		public void ChangeName(string name) {
+			if (string.IsNullOrEmpty(name) || _sf.data.Name == name) return;
+			_sf.data.Name = name;
+			OpenTaiko.NamePlate?.tNamePlateRefreshTitles(_mounted);
+			_sf.tApplyHeyaChanges();
+		}
+
 		public void ChangeNameplate(int id) {
 			if (_sf.data.TitleId == id) return;
 			_sf.data.TitleId = id;
