@@ -575,6 +575,11 @@ function update()
     end
     if any_activity_active then return end
 
+    -- F3 toggles Auto for P1 in any state
+    if INPUT:KeyboardPressed("F3") then
+        CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+    end
+
     -- Puchi sine bob
     if puchi_sine_counter ~= nil then
         puchi_sine_counter:Tick()
@@ -880,6 +885,7 @@ function draw()
         NAMEPLATE:DrawPlayerNameplate(NP_X, NP_Y, 255, 0)
         drawPlayerChara(NP_X + 140, NP_Y - 6,            1.0)
         drawPlayerPuchi(NP_X + 220, NP_Y + puchi_sine_y, 1.0)
+        if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y - 50, 0, "menu", 255) end
         return
     end
 
@@ -982,6 +988,7 @@ function draw()
     NAMEPLATE:DrawPlayerNameplate(NP_X, NP_Y, 255, 0)
     drawPlayerChara(NP_X + 140, NP_Y - 6,            1.0)
     drawPlayerPuchi(NP_X + 220, NP_Y + puchi_sine_y,  1.0)
+    if modicons_ro ~= nil then modicons_ro:Draw(NP_X, NP_Y - 50, 0, "menu", 255) end
 
     -- ── CONFIRM DIALOG ───────────────────────────────────────────────────────
     if state == "confirm" then
@@ -1026,11 +1033,6 @@ function draw()
                 btn:DrawAtAnchor(btn_x, btn_y, "center")
                 btn_x = btn_x + btn.Width + btn_gap
             end
-        end
-
-        -- Mod icons for P1
-        if modicons_ro ~= nil then
-            modicons_ro:Draw(NP_X, NP_Y - 50, 0, "menu", 255)
         end
     end
 
