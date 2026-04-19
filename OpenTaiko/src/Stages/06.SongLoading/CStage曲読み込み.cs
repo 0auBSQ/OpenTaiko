@@ -90,9 +90,23 @@ internal class CStage曲読み込み : CStage {
 				this.txサブタイトル = null;
 			}
 
+			int _danTick = 0, _danR = 255, _danG = 255, _danB = 255;
+			string _danTitle = "";
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
+					&& OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null) {
+				var _bi = OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.n現在の選択行];
+				_danTick  = _bi.nDanTick;
+				_danR     = (int)_bi.cDanTickColor.R;
+				_danG     = (int)_bi.cDanTickColor.G;
+				_danB     = (int)_bi.cDanTickColor.B;
+				_danTitle = _bi.ttkタイトル[_bi.ttkタイトル.Length - 1].str;
+			}
 			Script?.Activate(
 				new LuaSongNode(OpenTaiko.SongMount.rChoosenSong, null, false),
-				OpenTaiko.SongMount.nChoosenSongDifficulty[0]);
+				OpenTaiko.SongMount.nChoosenSongDifficulty[0],
+				_danTick, _danR, _danG, _danB, _danTitle,
+				OpenTaiko.Skin.SongLoading_DanPlate[0],
+				OpenTaiko.Skin.SongLoading_DanPlate[1]);
 
 			_activateTime = DateTime.Now;
 			base.Activate();
@@ -264,15 +278,6 @@ internal class CStage曲読み込み : CStage {
 		Script?.Draw();
 
 		if (isDan) {
-			CTexture dp = (OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null)
-				? OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.n現在の選択行].txDanPlate
-				: null;
-
-			CActSelect段位リスト.tDisplayDanPlate(dp,
-				null,
-				OpenTaiko.Skin.SongLoading_DanPlate[0],
-				OpenTaiko.Skin.SongLoading_DanPlate[1]);
-
 			if (OpenTaiko.Tx.Tile_Black != null) {
 				OpenTaiko.Tx.Tile_Black.Opacity = (int)(ct待機.CurrentValue <= 51 ? (255 - ct待機.CurrentValue / 0.2f) : (this.ct待機.CurrentValue - 949) / 0.2);
 				for (int i = 0; i <= (GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++) {

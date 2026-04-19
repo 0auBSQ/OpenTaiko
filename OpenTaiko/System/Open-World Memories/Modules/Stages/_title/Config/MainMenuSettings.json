@@ -191,5 +191,21 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Lime"
     },
-    "count": 12
+    "13": {
+        "StageName": {
+            "strings": {
+                "default": "dan_plate_test"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Visual test for the danplate ROActivity."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "dan_plate_test",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Lime"
+    },
+    "count": 13
 }

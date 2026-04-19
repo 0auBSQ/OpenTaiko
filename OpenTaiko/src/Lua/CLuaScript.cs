@@ -214,7 +214,6 @@ class CLuaScript : IDisposable {
 			LuaScript["getNumArray"] = getNumArray;
 			LuaScript["getTextArray"] = getTextArray;
 			LuaScript["getLocalizedString"] = GetLocalizedString;
-			LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
 			LuaScript["debugLog"] = DebugLog;
 
 			// New Lua Module API

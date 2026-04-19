@@ -313,8 +313,6 @@ class TextureLoader {
 		//Dani_Dan_In = TxC(DANISELECT + "Dan_In.png");
 		//Dani_Dan_Text = TxC(DANISELECT + "Dan_Text.png");
 
-		Dani_DanPlates = TxC(DANISELECT + "DanPlates.png");
-		Dani_DanPlates_Back = TxC(DANISELECT + "DanPlates_Back.png");
 		Dani_DanIcon = TxC(DANISELECT + "DanIcon.png");
 		Dani_DanIcon_Fade = TxC(DANISELECT + "DanIcon_Fade.png");
 		Dani_DanSides = TxC(DANISELECT + "DanSides.png");
@@ -1198,8 +1196,6 @@ class TextureLoader {
 	//public CTexture Dani_Dan_In;
 	//public CTexture Dani_Dan_Text;
 
-	public CTexture Dani_DanPlates;
-	public CTexture Dani_DanPlates_Back;
 	public CTexture Dani_DanIcon;
 	public CTexture Dani_DanIcon_Fade;
 	public CTexture Dani_DanSides;

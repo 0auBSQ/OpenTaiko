@@ -609,8 +609,6 @@ internal class CStage結果 : CStage {
 			this.ctPhase3 = null;
 			examsShift = 0;
 
-			Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
-
 			base.Activate();
 
 
@@ -679,8 +677,6 @@ internal class CStage結果 : CStage {
 		if (this.ct登場用 != null) {
 			this.ct登場用 = null;
 		}
-		Dan_Plate?.Dispose();
-
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
@@ -1060,14 +1056,17 @@ internal class CStage結果 : CStage {
 
 					// To add : Animation at 1 sec
 
-					Dan_Plate?.t2D中心基準描画(138, 220);
-
 					int plateOffset = Math.Max(0, 1600 - ctPhase1.CurrentValue) * 2;
 
-					CActSelect段位リスト.tDisplayDanPlate(Dan_Plate,
-						null,
-						138,
-						220 - plateOffset);
+					var _score = OpenTaiko.SongMount.rChosenScore;
+					LuaROActivityWrapper.GetROActivity("danplate")?.Draw(
+						138, 220 - plateOffset, 255,
+						_score?.譜面情報.nDanTick ?? 0,
+						(int)(_score?.譜面情報.cDanTickColor.R ?? 255),
+						(int)(_score?.譜面情報.cDanTickColor.G ?? 255),
+						(int)(_score?.譜面情報.cDanTickColor.B ?? 255),
+						OpenTaiko.SongMount.rChoosenSong?.ldTitle.GetString("") ?? ""
+					);
 
 					#endregion
 
@@ -1694,7 +1693,6 @@ internal class CStage結果 : CStage {
 	private int[] WorksTimeStamp = { 1000, 2000, 3000 };
 
 	// Dan informations
-	private CTexture Dan_Plate;
 	private TitleTextureKey[] ttkDanTitles;
 	private CCachedFontRenderer pfDanTitles;
 	private CCounter ctPhase1; // Info display

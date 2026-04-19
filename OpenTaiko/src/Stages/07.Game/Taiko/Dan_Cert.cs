@@ -122,8 +122,6 @@ internal class Dan_Cert : CActivity {
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) IsAnimating = true;
 
-		Dan_Plate = OpenTaiko.tテクスチャの生成(Path.GetDirectoryName(OpenTaiko.TJA.strFullPath) + @$"{Path.DirectorySeparatorChar}Dan_Plate.png");
-
 		base.Activate();
 	}
 
@@ -581,8 +579,6 @@ internal class Dan_Cert : CActivity {
 
 		OpenTaiko.tDisposeSafely(ref this.pfExamFont);
 
-		Dan_Plate?.Dispose();
-
 		base.DeActivate();
 	}
 
@@ -725,10 +721,17 @@ internal class Dan_Cert : CActivity {
 
 		#region [Dan Plate]
 
-		CActSelect段位リスト.tDisplayDanPlate(Dan_Plate,
-			null,
+		var _score = OpenTaiko.SongMount.rChosenScore;
+		LuaROActivityWrapper.GetROActivity("danplate")?.Draw(
 			OpenTaiko.Skin.Game_DanC_Dan_Plate[0],
-			OpenTaiko.Skin.Game_DanC_Dan_Plate[1]);
+			OpenTaiko.Skin.Game_DanC_Dan_Plate[1],
+			255,
+			_score?.譜面情報.nDanTick ?? 0,
+			(int)(_score?.譜面情報.cDanTickColor.R ?? 255),
+			(int)(_score?.譜面情報.cDanTickColor.G ?? 255),
+			(int)(_score?.譜面情報.cDanTickColor.B ?? 255),
+			OpenTaiko.SongMount.rChoosenSong?.ldTitle.GetString("") ?? ""
+		);
 
 		#endregion
 
@@ -1319,7 +1322,6 @@ internal class Dan_Cert : CActivity {
 	private bool[] ExamChange = new bool[CExamInfo.cMaxExam];
 	private int ExamCount;
 	private ChallengeStatus[] Status = new ChallengeStatus[CExamInfo.cMaxExam];
-	private CTexture Dan_Plate;
 	private bool[] IsEnded;
 	public bool FirstSectionAnime;
 

@@ -257,7 +257,6 @@ class CActSelect段位リスト : CStage {
 		public CSongListNode.ENodeType eノード種別;
 		public List<CTja.DanSongs> List_DanSongs;
 		public CTexture txBarCenter;
-		public CTexture txDanPlate;
 
 		// Extra parameters
 		public int clearGrade;
@@ -271,76 +270,15 @@ class CActSelect段位リスト : CStage {
 		}
 	}
 
-	static CCachedFontRenderer pfDanPlateTitle = null;
 	static CCachedFontRenderer pfDanIconTitle = null;
 
 	private Dictionary<string, CTexture> BarTexCache = new Dictionary<string, CTexture>();
 
 	public static void RefleshSkin() {
-		OpenTaiko.tDisposeSafely(ref pfDanPlateTitle);
 		OpenTaiko.tDisposeSafely(ref pfDanIconTitle);
 	}
 
-	public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y) {
-		if (givenPlate != null) {
-			givenPlate.Opacity = 255;
-			givenPlate.t2D中心基準描画(x, y);
-		} else {
-			// Default Dan Plate
-
-			int danTick = 0;
-			Color danTickColor = Color.White;
-
-			if (OpenTaiko.SongMount.rChosenScore != null) {
-				danTick = OpenTaiko.SongMount.rChosenScore.譜面情報.nDanTick;
-				danTickColor = OpenTaiko.SongMount.rChosenScore.譜面情報.cDanTickColor;
-			}
-			if (songNode != null) {
-				STバー情報 stNode = (STバー情報)songNode;
-
-				danTick = stNode.nDanTick;
-				danTickColor = stNode.cDanTickColor;
-			}
-
-
-			int unit = OpenTaiko.Tx.Dani_DanPlates.szTextureSize.Width / 6;
-
-			if (OpenTaiko.Tx.Dani_DanPlates != null) {
-				OpenTaiko.Tx.Dani_DanPlates.Opacity = 255;
-				OpenTaiko.Tx.Dani_DanPlates.color4 = CConversion.ColorToColor4(danTickColor);
-			}
-			OpenTaiko.Tx.Dani_DanPlates_Back?.t2D中心基準描画(x, y, new Rectangle(
-				unit * danTick,
-				0,
-				unit,
-				OpenTaiko.Tx.Dani_DanPlates_Back.szTextureSize.Height
-			));
-			OpenTaiko.Tx.Dani_DanPlates?.t2D中心基準描画(x, y, new Rectangle(
-				unit * danTick,
-				0,
-				unit,
-				OpenTaiko.Tx.Dani_DanPlates.szTextureSize.Height
-			));
-
-			if (pfDanPlateTitle == null)
-				pfDanPlateTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.DaniSelect_DanPlateTitle_Size);
-
-			string titleTmp = "";
-
-			if (OpenTaiko.SongMount.rChosenScore != null)
-				titleTmp = OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("");
-			if (songNode != null) {
-				STバー情報 stNode = (STバー情報)songNode;
-
-				titleTmp = stNode.ttkタイトル[stNode.ttkタイトル.Length - 1].str;
-			}
-
-			TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.TrimStringWithTags(2), pfDanPlateTitle, Color.White, Color.Black, 1000);
-			TitleTextureKey.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(x + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[1]);
-		}
-	}
-
-	public static void tDisplayDanIcon(int count, float x, float y, int opacity, float scale, bool showFade = false) {
+public static void tDisplayDanIcon(int count, float x, float y, int opacity, float scale, bool showFade = false) {
 		if (pfDanIconTitle == null)
 			pfDanIconTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.DaniSelect_DanIconTitle_Size);
 
@@ -416,7 +354,15 @@ class CActSelect段位リスト : CStage {
 						));
 					}
 
-					CActSelect段位リスト.tDisplayDanPlate(stバー情報[currentSong].txDanPlate, stバー情報[currentSong], (int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanPlate[0], OpenTaiko.Skin.DaniSelect_DanPlate[1]);
+					var _bi = stバー情報[currentSong];
+					LuaROActivityWrapper.GetROActivity("danplate")?.Draw(
+						(int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanPlate[0],
+						OpenTaiko.Skin.DaniSelect_DanPlate[1],
+						255,
+						_bi.nDanTick,
+						(int)_bi.cDanTickColor.R, (int)_bi.cDanTickColor.G, (int)_bi.cDanTickColor.B,
+						_bi.ttkタイトル[_bi.ttkタイトル.Length - 1].str
+					);
 
 					#endregion
 
@@ -736,13 +682,6 @@ class CActSelect段位リスト : CStage {
 							BarTexCache.Add(barCenter, stバー情報[i].txBarCenter);
 						}
 
-						string danPlate = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Dan_Plate.png";
-						if (BarTexCache.TryGetValue(danPlate, out CTexture texture2)) {
-							stバー情報[i].txDanPlate = texture2;
-						} else {
-							stバー情報[i].txDanPlate = OpenTaiko.tテクスチャの生成(danPlate);
-							BarTexCache.Add(danPlate, stバー情報[i].txDanPlate);
-						}
 					}
 					break;
 				case CSongListNode.ENodeType.BOX: {

@@ -30,6 +30,15 @@ local slide_infos  = {}   -- { counter, delay, elapsed, started }
 -- Dan background vertical scroll (pixels, positive = scrolled up)
 local dan_scroll_y = 0
 
+-- Dan plate data (populated from activate args when mode == "dan")
+local dan_tick    = 0
+local dan_r       = 255
+local dan_g       = 255
+local dan_b       = 255
+local dan_title   = ""
+local dan_plate_x = 0
+local dan_plate_y = 0
+
 -- Slide animation tuning
 local SLIDE_DURATION = 0.35   -- seconds for each character to slide into place
 local SLIDE_STAGGER  = 0.28   -- seconds between consecutive character entrances
@@ -50,8 +59,8 @@ function onStart()
 	tx_bg_tower  = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_Tower.png")
 end
 
--- activate(node: LuaSongNode, chosen_diff: int)
-function activate(_, chosen_diff)
+-- activate(node, chosen_diff, dan_tick, dan_r, dan_g, dan_b, dan_title, plate_x, plate_y)
+function activate(_, chosen_diff, tick, r, g, b, title, plate_x, plate_y)
 	player_count = CONFIG.PlayerCount
 	local res    = THEME:GetResolution()
 	res_w        = res.X
@@ -70,6 +79,15 @@ function activate(_, chosen_diff)
 	else
 		mode = "normal"
 	end
+
+	-- Store dan plate data (used in draw when mode == "dan")
+	dan_tick    = tick    or 0
+	dan_r       = r       or 255
+	dan_g       = g       or 255
+	dan_b       = b       or 255
+	dan_title   = title   or ""
+	dan_plate_x = plate_x or 0
+	dan_plate_y = plate_y or 0
 
 	-- Set up character slide-in (normal mode only)
 	characters  = {}
@@ -154,6 +172,10 @@ function draw()
 	if mode == "dan" then
 		if tx_bg_dan ~= nil then
 			tx_bg_dan:Draw(0, -dan_scroll_y)
+		end
+		local danplate = ROACTIVITY:GetROActivity("danplate")
+		if danplate ~= nil then
+			danplate:Draw(dan_plate_x, dan_plate_y, 255, dan_tick, dan_r, dan_g, dan_b, dan_title)
 		end
 
 	elseif mode == "tower" then

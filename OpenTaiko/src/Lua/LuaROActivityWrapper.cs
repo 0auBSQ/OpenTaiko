@@ -84,5 +84,6 @@ namespace OpenTaiko {
 		private void OnDestroy() => lcActScript?.OnDestroy();
 
 		#endregion
+
 	}
 }
