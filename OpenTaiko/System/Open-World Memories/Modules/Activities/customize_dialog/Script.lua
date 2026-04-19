@@ -305,6 +305,23 @@ end
 --   nameplate at                 (PREVIEW_NP_X,    PREVIEW_BASE_Y)   ← same Y
 --   puchichara floating at       (PREVIEW_PUCHI_X, PREVIEW_PUCHI_BASE + sineY)
 
+-- Draws a full nameplate using all currently staged values (title, dan, name).
+-- Used for the right-panel preview and list rows so every sub-screen reflects every staged change.
+local function drawAllStagedNameplate(x, y, opacity)
+    local np      = ROACTIVITY:GetROActivity("nameplate")
+    local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
+    local danEntry = #danList      > 0 and danList[danSubIdx + 1]      or nil
+    if npEntry ~= nil then
+        np:Draw(6, x, y, opacity, player, 0,
+            npEntry.Title, npEntry.Type, rarityToLangInt(npEntry.Rarity), npEntry.Id,
+            danEntry ~= nil and danEntry.Title       or nil,
+            danEntry ~= nil and danEntry.ClearStatus or nil,
+            stagedPlayerName)
+    else
+        NAMEPLATE:DrawPlayerNameplate(x, y, opacity, player)
+    end
+end
+
 local function drawPreview(alpha)
     local opacity = math.floor(alpha * 255)
 
@@ -319,29 +336,8 @@ local function drawPreview(alpha)
         )
     end
 
-    -- ── Nameplate — mode depends on which sub-screen is active. ──
-    local np = ROACTIVITY:GetROActivity("nameplate")
-    if currentScreen == "dan_title" and #danList > 0 then
-        -- Mode 4: full nameplate with the browsed dan entry
-        local de = danList[danSubIdx + 1]
-        if de ~= nil then
-            np:Draw(4, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0, de.Title, de.ClearStatus, stagedPlayerName)
-        else
-            NAMEPLATE:DrawPlayerNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player)
-        end
-    elseif currentScreen == "player_name" then
-        -- Mode 5: full nameplate with the staged player name
-        np:Draw(5, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0, stagedPlayerName)
-    else
-        -- Mode 3: full nameplate with the browsed nameplate title
-        local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
-        if npEntry ~= nil then
-            np:Draw(3, PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player, 0,
-                npEntry.Title, npEntry.Type, rarityToLangInt(npEntry.Rarity), npEntry.Id, stagedPlayerName)
-        else
-            NAMEPLATE:DrawPlayerNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity, player)
-        end
-    end
+    -- ── Nameplate — always reflects all staged values regardless of sub-screen. ──
+    drawAllStagedNameplate(PREVIEW_NP_X, PREVIEW_BASE_Y, opacity)
 
     -- ── Puchichara (floating sine) ──
     if #puchiList > 0 then
@@ -457,41 +453,47 @@ local function drawHitsoundList(alpha)
     end
 end
 
--- Vertical dan-title list — each row shows the dan plate for that entry.
+-- Vertical dan-title list — each row shows this row's dan with all other staged values.
 local function drawDanTitleList(alpha)
     if #danList == 0 then return end
+    local npEntry = #nameplateList > 0 and nameplateList[npSubIdx + 1] or nil
+    local np = ROACTIVITY:GetROActivity("nameplate")
     for slot = -NP_HALF_VIS, NP_HALF_VIS do
         local dataIdx    = modWrap(danSubIdx + slot, #danList)
         local entry      = danList[dataIdx + 1]
         if entry ~= nil then
-            local rowY       = NP_LIST_CY + slot * NP_ROW_H
-            local isSelected = (slot == 0)
-            local opacity    = math.floor((isSelected and alpha or alpha * 0.5) * 255)
-            local nx         = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
-            ROACTIVITY:GetROActivity("nameplate"):Draw(
-                4, nx, rowY - 30, opacity, player, 0,
-                entry.Title, entry.ClearStatus, stagedPlayerName
-            )
+            local rowY    = NP_LIST_CY + slot * NP_ROW_H
+            local opacity = math.floor(((slot == 0) and alpha or alpha * 0.5) * 255)
+            local nx      = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
+            if npEntry ~= nil then
+                np:Draw(6, nx, rowY - 30, opacity, player, 0,
+                    npEntry.Title, npEntry.Type, rarityToLangInt(npEntry.Rarity), npEntry.Id,
+                    entry.Title, entry.ClearStatus, stagedPlayerName)
+            else
+                np:Draw(4, nx, rowY - 30, opacity, player, 0,
+                    entry.Title, entry.ClearStatus, stagedPlayerName)
+            end
         end
     end
 end
 
--- Vertical nameplate list — each row shows the full in-game nameplate
--- (player name, dan grade, nameplate style) for a specific nameplate entry.
+-- Vertical nameplate list — each row shows this row's nameplate title with all other staged values.
 local function drawNameplateList(alpha)
     if #nameplateList == 0 then return end
+    local danEntry = #danList > 0 and danList[danSubIdx + 1] or nil
+    local np = ROACTIVITY:GetROActivity("nameplate")
     for slot = -NP_HALF_VIS, NP_HALF_VIS do
         local dataIdx    = modWrap(npSubIdx + slot, #nameplateList)
         local entry      = nameplateList[dataIdx + 1]
         if entry ~= nil then
-            local rowY       = NP_LIST_CY + slot * NP_ROW_H
-            local isSelected = (slot == 0)
-            local opacity    = math.floor((isSelected and alpha or alpha * 0.5) * 255)
-            local nx         = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
-            ROACTIVITY:GetROActivity("nameplate"):Draw(
-                3, nx, rowY - 30, opacity, player, 0,
-                entry.Title, entry.Type, rarityToLangInt(entry.Rarity), entry.Id, stagedPlayerName
-            )
+            local rowY    = NP_LIST_CY + slot * NP_ROW_H
+            local opacity = math.floor(((slot == 0) and alpha or alpha * 0.5) * 255)
+            local nx      = NP_LIST_CX - math.floor(NP_PLATE_W / 2)
+            np:Draw(6, nx, rowY - 30, opacity, player, 0,
+                entry.Title, entry.Type, rarityToLangInt(entry.Rarity), entry.Id,
+                danEntry ~= nil and danEntry.Title       or nil,
+                danEntry ~= nil and danEntry.ClearStatus or nil,
+                stagedPlayerName)
         end
     end
 end

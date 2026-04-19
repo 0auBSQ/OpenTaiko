@@ -512,6 +512,7 @@ end
 --   mode 3: full nameplate, title override           → draw(3, x, y, opacity, player, side, titleText, titleType, rarityInt, nameplateId[, playerNameOverride])
 --   mode 4: full nameplate, dan override             → draw(4, x, y, opacity, player, side, danText, danGrade[, playerNameOverride])
 --   mode 5: full nameplate, player-name override     → draw(5, x, y, opacity, player, side, playerName)
+--   mode 6: full nameplate, all overrides            → draw(6, x, y, opacity, player, side, titleText, titleType, rarityInt, nameplateId, danText, danGrade, playerName)
 function draw(mode, ...)
 	local args = {...}
 
@@ -564,6 +565,13 @@ function draw(mode, ...)
 			args[1], args[2], args[3], args[4], args[5], args[6]
 		implDrawFullNameplate(x, y, opacity, player + 1, side + 1,
 			nil, nil, nil, nil, nil, nil, playerName)
+
+	elseif mode == 6 then
+		-- All overrides: title + dan + player name simultaneously.
+		local x, y, opacity, player, side, titleText, titleType, rarityInt, nameplateId, danText, danGrade, playerName =
+			args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12]
+		implDrawFullNameplate(x, y, opacity, player + 1, side + 1,
+			titleText, titleType, rarityInt, nameplateId, danText, danGrade, playerName)
 
 	elseif mode == 2 then
 		-- ── Title plate only ──
