@@ -112,6 +112,14 @@ namespace OpenTaiko {
 			return new LuaSongListSettings();
 		}
 
+		public void SetMandatoryDifficultyList(object luaTable) {
+			if (luaTable is LuaTable table) {
+				MandatoryDifficultyList = table.Values.Cast<long>()
+					.Select(v => (Difficulty)(int)v)
+					.ToArray();
+			}
+		}
+
 		public LuaSongListSettings() {
 
 		}

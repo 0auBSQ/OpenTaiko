@@ -207,5 +207,21 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Lime"
     },
-    "count": 13
+    "14": {
+        "StageName": {
+            "strings": {
+                "default": "dan_select"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Dan song select stage."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "dan_select",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Orange"
+    },
+    "count": 14
 }

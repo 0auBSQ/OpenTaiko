@@ -60,7 +60,7 @@ function onStart()
 end
 
 -- activate(node, chosen_diff, dan_tick, dan_r, dan_g, dan_b, dan_title, plate_x, plate_y)
-function activate(_, chosen_diff, tick, r, g, b, title, plate_x, plate_y)
+function activate(node, chosen_diff, tick, r, g, b, title, plate_x, plate_y)
 	player_count = CONFIG.PlayerCount
 	local res    = THEME:GetResolution()
 	res_w        = res.X
@@ -80,12 +80,32 @@ function activate(_, chosen_diff, tick, r, g, b, title, plate_x, plate_y)
 		mode = "normal"
 	end
 
-	-- Store dan plate data (used in draw when mode == "dan")
-	dan_tick    = tick    or 0
-	dan_r       = r       or 255
-	dan_g       = g       or 255
-	dan_b       = b       or 255
-	dan_title   = title   or ""
+	-- Store dan plate data (used in draw when mode == "dan").
+	-- Read directly from the node's chart so both the Lua and legacy C# dan select
+	-- paths work correctly (the C# path may pass empty/zero values when stageDanSongSelect
+	-- is not populated, e.g. when using the Lua dan_select stage).
+	if node ~= nil and node.IsSong then
+		local chart = node:GetChart(DIFF_DAN)
+		if chart ~= nil then
+			dan_tick = chart.DanTick or 0
+			local c  = chart.DanTickColor
+			if c ~= nil then
+				dan_r = c.R ; dan_g = c.G ; dan_b = c.B
+			else
+				dan_r = 255 ; dan_g = 255 ; dan_b = 255
+			end
+		else
+			dan_tick = 0 ; dan_r = 255 ; dan_g = 255 ; dan_b = 255
+		end
+		dan_title = node.Title or ""
+	else
+		-- Fallback: use args passed by C# (legacy path)
+		dan_tick  = tick  or 0
+		dan_r     = r     or 255
+		dan_g     = g     or 255
+		dan_b     = b     or 255
+		dan_title = title or ""
+	end
 	dan_plate_x = plate_x or 0
 	dan_plate_y = plate_y or 0
 
