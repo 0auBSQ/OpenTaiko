@@ -192,30 +192,16 @@ namespace OpenTaiko {
 				// at the song boundary so character/puchichara animations run at the right speed.
 				double srcInitialBpm = src.listBPM.Count > 0 ? src.listBPM[0].dbBPM値 : 120.0;
 
-				// Anchor the shift on the first note in the source chart (not the BGM chip).
-				// This ensures the first note always lands at `accum` in the Dan chart,
-				// matching the real TJA Dan parser where notes start exactly
-				// msDanNextSongDelay + MusicPreTimeMs after each #NEXTSONG marker.
-				//
-				// Why not anchor on srcBgmTimeDb?
-				//   • Negative OFFSET (common): BGM chip is before notes; using it would push
-				//     notes past `accum` by msOFFSET_Abs ms → correct for audio sync but the
-				//     inter-song gap becomes inconsistent.
-				//   • Positive OFFSET: BGM chip is AFTER notes; using
-				//     it would place the earliest notes before `accum` (into the transition gap)
-				//     causing them to appear on screen too early and out of sync with audio.
-				//
-				// With firstNoteTimeDb as anchor:
-				//   • The first note always hits the screen at `accum`.
-				//   • For negative OFFSET: the BGM chip falls into the transition gap
-				//     (accum - msOFFSET_Abs), giving the player the song's intro music.
-				//   • For positive OFFSET: the BGM chip fires after `accum`, so the first
-				//     notes play in silence — the same behaviour as the standalone chart.
-				double firstNoteTimeDb = (src.listNoteChip.Count > 0)
-					? src.listNoteChip.Min(c => c.db発声時刻ms)
-					: srcBgmTimeDb;
-
-				double offsetDb = accum - firstNoteTimeDb;
+				// Anchor the shift on time 0 in the source — where #START would be.
+				// This means:
+				//   • Every chip keeps its original position relative to the chart start.
+				//   • Empty bars at the beginning are included in the Dan (they scroll past
+				//     after the door opens rather than being silently removed).
+				//   • The BGM always fires at srcBgmTimeDb + accum ≥ accum, so it never
+				//     starts before the song-boundary gate (no bleed into the previous song).
+				//   • Audio/note sync is identical to standalone play — the relationship
+				//     between the BGM chip and all note chips is left untouched.
+				double offsetDb = accum;   // anchor = time 0 (start of chart)
 				int offsetMs = (int)Math.Round(offsetDb);
 
 				// ── Populate listBPM ───────────────────────────────────────────────
@@ -350,32 +336,13 @@ namespace OpenTaiko {
 				bgmChip.nChannelNo = 0x01;
 				bgmChip.n整数値 = wavId;
 				bgmChip.n整数値_内部番号 = wavId;
-				// BGM chip fires at srcBgmTimeDb shifted into Dan time.
-				// For negative OFFSET: this is before `accum` (intro music during the gap).
-				// For positive OFFSET: this is after `accum` (silence until BGM kicks in).
+				// BGM chip fires at srcBgmTimeDb + accum.
+				// Since srcBgmTimeDb ≥ 0 and accum > nextsongTime, the BGM always fires
+				// after the song-boundary gate — it can never bleed into the previous song.
+				// Negative OFFSET (common): srcBgmTimeDb > 0, BGM fires after the first note.
+				// Zero OFFSET:             srcBgmTimeDb = 0, BGM fires exactly at accum.
+				// Positive OFFSET:         srcBgmTimeDb = 0, first note after BGM start.
 				double bgmChipTimeDb = srcBgmTimeDb + offsetDb;
-
-				// If the shifted BGM chip would fire before nextsongTime (the song-boundary
-				// marker), the audio would play during the PREVIOUS song's playback.  This
-				// happens when a chart has a large gap between the BGM and the first note
-				// (many empty bars or a very large OFFSET value).
-				//
-				// Fix: clamp the chip to nextsongTime so the audio never starts before the
-				// transition, then tell the audio system to begin playback at an initial seek
-				// position so the first note still aligns with the correct position in the
-				// audio file.  The seek position is:
-				//
-				//   nInitialSeekMs = (firstNoteTimeDb − srcBgmTimeDb) − (accum − nextsongTime)
-				//
-				// which ensures that at Dan time `accum` the audio is exactly
-				// (firstNoteTimeDb − srcBgmTimeDb) ms from the start of the file — the same
-				// offset a standalone play-through of the chart would have.
-				long bgmInitialSeekMs = 0;
-				if (bgmChipTimeDb < nextsongTime) {
-					bgmInitialSeekMs = (long)Math.Round((firstNoteTimeDb - srcBgmTimeDb) - (accum - nextsongTime));
-					bgmInitialSeekMs = Math.Max(0L, bgmInitialSeekMs);
-					bgmChipTimeDb = nextsongTime;
-				}
 				bgmChip.n発声時刻ms = (int)Math.Round(bgmChipTimeDb);
 				bgmChip.db発声時刻ms = bgmChipTimeDb;
 				bgmChip.start = bgmChip;
@@ -390,7 +357,6 @@ namespace OpenTaiko {
 					strコメント文 = $"DanBuilder BGM [{si + 1}]",
 					PlayChip = bgmChip,
 					SongVol = CSound.DefaultSongVol,
-					nInitialSeekMs = bgmInitialSeekMs,
 				};
 				cwav.listこのWAVを使用するチャンネル番号の集合.Add(0x01);
 				if (!string.IsNullOrEmpty(absoluteBgmPath))
@@ -547,13 +513,12 @@ namespace OpenTaiko {
 
 				// ── Advance time accumulator ───────────────────────────────────
 				// The 0x9B for song N+1 fires right after the last chip of song N.
-				// Because we anchored the shift on firstNoteTimeDb, the last chip of
-				// song N in the Dan is at (srcLastTimeDb + offsetDb), which equals
-				// accum + (srcLastTimeDb - firstNoteTimeDb).
+				// Anchoring on time 0, the last chip of song N in the Dan is at
+				// srcLastTimeDb + accum, so the next boundary is accum + srcLastTimeDb.
 				double srcLastTimeDb = src.listChip.Count > 0
 					? src.listChip.Max(c => c.db発声時刻ms)
 					: srcBgmTimeDb;
-				double srcDuration = srcLastTimeDb - firstNoteTimeDb;
+				double srcDuration = srcLastTimeDb;   // anchor = time 0
 				nextsongTime = accum + srcDuration;
 				accum = nextsongTime + CTja.msDanNextSongDelay + OpenTaiko.ConfigIni.MusicPreTimeMs;
 
