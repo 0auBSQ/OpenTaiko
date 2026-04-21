@@ -249,6 +249,7 @@ class CLuaScript : IDisposable {
 			LuaScript["MODICONS"] = new LuaModIconsFunc();
 			LuaScript["HITSOUNDSLIST"] = new LuaHitsoundsDatabase();
 			LuaScript["VIRTUALSLOTS"] = new LuaVirtualSlotManager();
+			LuaScript["DANBUILDER"] = new LuaDanBuildFunc();
 
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;

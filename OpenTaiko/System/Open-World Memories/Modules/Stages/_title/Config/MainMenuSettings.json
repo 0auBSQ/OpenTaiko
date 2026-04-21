@@ -223,5 +223,21 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Orange"
     },
-    "count": 14
+    "15": {
+        "StageName": {
+            "strings": {
+                "default": "dan_builder_test"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Build a custom Dan from any songs and launch it."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "dan_builder_test",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Cyan"
+    },
+    "count": 15
 }

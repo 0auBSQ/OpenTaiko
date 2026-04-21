@@ -115,6 +115,14 @@ internal class CTja : CActivity {
 		public bool bIsSESound = false;
 		public bool bIsBGMSound = false;
 		public CChip? PlayChip = null;
+		/// <summary>
+		/// When non-zero, the audio file is seeked to this position (ms) at the moment
+		/// playback begins.  Used by the Dan builder to skip silence at the start of
+		/// songs that have a large OFFSET (firstNoteTimeDb ≫ srcBgmTimeDb), so the
+		/// BGM chip can be clamped to nextsongTime while the audio remains in sync
+		/// with the note chips.
+		/// </summary>
+		public long nInitialSeekMs = 0;
 
 		public override string ToString() {
 			var sb = new StringBuilder(128);
@@ -307,6 +315,13 @@ internal class CTja : CActivity {
 	public const int n最大音数 = 4;
 	public const int n小節の解像度 = 384;
 	public const double msDanNextSongDelay = 6200.0;
+
+	/// <summary>
+	/// Sentinel file path placed in <c>SongMount.rChosenScore.ファイル情報.ファイルの絶対パス</c>
+	/// when the song loading stage should use <see cref="OpenTaiko.DanBuilderPrebuiltTja"/> instead
+	/// of reading a TJA file from disk.
+	/// </summary>
+	public const string DanBuilderSentinelPath = "::dan_builder::";
 	public string PANEL;
 	public string PATH_WAV;
 	public string PREIMAGE;
@@ -618,10 +633,14 @@ internal class CTja : CActivity {
 					long nCurrentTime = SoundManager.PlayTimer.SystemTimeMs;
 					if (nCurrentTime > wc.n再生開始時刻[i]) {
 						long nAbsTimeFromStartPlaying = nCurrentTime - wc.n再生開始時刻[i];
+						// nInitialSeekMs: added by the Dan builder when the BGM chip is
+						// clamped forward in time (to avoid playing during a previous song).
+						// Seeking ahead by this amount keeps the audio in sync with the notes.
+						long nSeekMs = nAbsTimeFromStartPlaying + wc.nInitialSeekMs;
 						// WASAPI/ASIO用↓
 						if (!OpenTaiko.stageGameScreen.bPAUSE) {
-							if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nAbsTimeFromStartPlaying);
-							else wc.rSound[i].tSetPositonToBegin(nAbsTimeFromStartPlaying);
+							if (wc.rSound[i].IsPaused) wc.rSound[i].Resume(nSeekMs);
+							else wc.rSound[i].tSetPositonToBegin(nSeekMs);
 						} else {
 							wc.rSound[i].Pause();
 						}

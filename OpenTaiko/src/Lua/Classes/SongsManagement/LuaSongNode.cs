@@ -392,6 +392,9 @@
 			if (recursive) _FetchChildren(lsls);
 		}
 
+		/// <summary>Internal accessor for C#-side code (e.g. LuaDanBuildFunc). Not exposed to Lua.</summary>
+		internal CSongListNode? InternalNode => _node;
+
 		// Should never be called from the Lua side, the objects are returned in a read only form for the LuaSongList Root node method
 		public List<CSongListNode>? INTERNAL_GetChildrenList(object requester) {
 			if (requester is CBlankClass) return _node?.childrenList;

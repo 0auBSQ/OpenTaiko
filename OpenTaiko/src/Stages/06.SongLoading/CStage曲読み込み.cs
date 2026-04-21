@@ -317,12 +317,23 @@ internal class CStage曲読み込み : CStage {
 					_loadedTjas  = new CTja[playerCount];
 					var cts      = _loadCts;
 					var captured = _loadedTjas;
-					_dtxLoadTask = Task.Run(() => {
-						for (int i = 0; i < playerCount; i++) {
-							cts.Token.ThrowIfCancellationRequested();
-							captured[i] = new CTja(str, chosenDiffs[i], i, loadChart: true);
-						}
-					}, cts.Token);
+
+					// DanBuilder: if a pre-built CTja was supplied, use it directly (no file read).
+					var prebuilt = OpenTaiko.DanBuilderPrebuiltTja;
+					if (prebuilt != null) {
+						OpenTaiko.DanBuilderPrebuiltTja = null;
+						_dtxLoadTask = Task.Run(() => {
+							for (int i = 0; i < playerCount; i++)
+								captured[i] = prebuilt;
+						}, cts.Token);
+					} else {
+						_dtxLoadTask = Task.Run(() => {
+							for (int i = 0; i < playerCount; i++) {
+								cts.Token.ThrowIfCancellationRequested();
+								captured[i] = new CTja(str, chosenDiffs[i], i, loadChart: true);
+							}
+						}, cts.Token);
+					}
 
 					base.ePhaseID = CStage.EPhase.SongLoading_WaitDTXLoaded;
 					return (int)ESongLoadingScreenReturnValue.Continue;

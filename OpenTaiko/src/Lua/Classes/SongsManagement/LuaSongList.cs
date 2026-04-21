@@ -104,7 +104,10 @@
 			return _currentPage.IndexOf(_node);
 		}
 
-		#region [(Public) Fetchers and search methods]
+		/// <summary>Returns the root <see cref="LuaSongNode"/> of the song tree.</summary>
+	public LuaSongNode? GetRoot() => _root;
+
+	#region [(Public) Fetchers and search methods]
 
 		#region [(Private) Graph search algorithms]
 

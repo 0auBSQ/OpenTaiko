@@ -318,6 +318,8 @@ class CSongReplay {
 		CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
+		// DanBuilder charts have no persistent uniqueId; skip replay recording for them.
+		if (OpenTaiko.SongMount.rChoosenSong.uniqueId == null) return;
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
 		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);

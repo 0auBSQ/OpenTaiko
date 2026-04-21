@@ -405,6 +405,9 @@ internal class DBSaves {
 		var chartScore = OpenTaiko.stageGameScreen.CChartScore[player];
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
+		// Do not register plays for DanBuilder charts (no persistent unique ID)
+		if (choosenSong.uniqueId == null) return false;
+
 		// Do not register the play if Dan/Tower and any mod is ON
 		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return false;
 

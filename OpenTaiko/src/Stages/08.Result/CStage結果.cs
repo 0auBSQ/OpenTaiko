@@ -1597,7 +1597,8 @@ internal class CStage結果 : CStage {
 	public void tPostprocessing() {
 
 		if (!bAddedToRecentlyPlayedSongs) {
-			// Song added to recently added songs here
+			// DanBuilder charts have no persistent uniqueId; skip recently-played tracking.
+			if (OpenTaiko.SongMount.rChoosenSong.uniqueId == null) return;
 
 			OpenTaiko.RecentlyPlayedSongs.tAddChart(OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id);
 

@@ -64,6 +64,13 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	/// <summary>
+	/// When non-null, the song-loading stage will use this pre-built <see cref="CTja"/> instead of
+	/// reading from <c>SongMount.rChosenScore.ファイル情報.ファイルの絶対パス</c>.
+	/// Consumed (set back to null) immediately after the handoff so it is used only once.
+	/// </summary>
+	public static CTja? DanBuilderPrebuiltTja = null;
+
 	#region [DTX instances]
 	public static CTja? TJA { // only for P1
 		get => tja[0];
