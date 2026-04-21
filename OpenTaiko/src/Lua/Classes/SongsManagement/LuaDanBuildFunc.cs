@@ -163,6 +163,10 @@ namespace OpenTaiko {
 			// music starts after the full pre-delay.
 			double nextsongTime = 0.0;
 			double accum = nextsongTime + CTja.msDanNextSongDelay + OpenTaiko.ConfigIni.MusicPreTimeMs;
+			// Tracks the accumulated 16th-beat count (same unit as bpm_change_bmscroll_time and
+			// fBMSCROLLTime) at the start of each song's content window (time = accum).
+			// Needed so HBSCROLL/BMSCROLL note positions are kept consistent across songs.
+			double bmscrollAccum = 0.0;
 
 			// listBPM[0..2] must always be present as per-branch initial BPM sentinels
 			// (GetNowPBPMPoint starts with last_match = (int)branch which indexes into [0..2]).
@@ -204,6 +208,67 @@ namespace OpenTaiko {
 				double offsetDb = accum;   // anchor = time 0 (start of chart)
 				int offsetMs = (int)Math.Round(offsetDb);
 
+				// OFFSET compensation for HBSCROLL/BMSCROLL.
+				//
+				// CTja sets fBMSCROLLTime and bpm_change_time from dbNowBMScollTime / dbNowTime
+				// BEFORE the OFFSET adjustment is applied to chip.n発声時刻ms. For a source song
+				// with OFFSET = -X (isOFFSET_Negative=true), note chips receive
+				//   chip.n発声時刻ms += X   (default case in the second-pass loop)
+				// but fBMSCROLLTime and bpm_change_time remain at raw chart time (before the +X).
+				//
+				// In the Dan output there is no OFFSET, so play_time = game_time. At hit time
+				//   play_time_out = chip.n発声時刻ms_src + X + accum
+				// while the output BPM entry (copied with bpm_change_time = srcBpm.bpm_change_time + accum)
+				// is "active" from (srcBpm.bpm_change_time + accum), which is X ms too early.
+				// This shifts th16NowBeat high by X*BPM/15000, making th16DBeat negative →
+				// notes appear X ms visually early in every song.
+				//
+				// Fix: add srcBpmOffset = RawTjaTimeToTjaTimeNote(0) to:
+				//   • bmscrollAccum (which anchors fBMSCROLLTime offsets for this song's chips)
+				//   • bpm_change_time of source BPM entries so they fire at the correct play_time
+				// For positive OFFSET or no OFFSET, srcBpmOffset = 0 → no change in behaviour.
+				double srcBpmOffset = src.RawTjaTimeToTjaTimeNote(0.0);   // = msOFFSET_Abs for OFFSET<0, else 0
+
+				// ── Set up bmscrollAccum at time=accum+srcBpmOffset for this song ──────
+				// bmscrollAccum is the accumulated 16th-beat count at the point in Dan time
+				// corresponding to source chart time 0 (i.e. Dan play_time = accum + srcBpmOffset).
+				// It offsets both bpm_change_bmscroll_time (source BPM entries) and fBMSCROLLTime
+				// (chips) so that note visual positions are correct in the Dan context.
+				//
+				// CRITICAL ORDER REQUIREMENT:
+				// GetNowPBPMPoint scans listBPM by index, using the NEXT same-branch
+				// entry's bpm_change_time for its beforeEnd check. Source BPM entries
+				// fire at accum+srcBpmOffset+srcTime (large). The 0x9C animation entry fires at
+				// nextsongTime+1 (small). If source entries appear before the 0x9C
+				// entry in listBPM, then bpm_next = the 0x9C entry (earlier time),
+				// making beforeEnd = (play_time < nextsongTime+1) which is false for
+				// all play times during the song → source BPM changes are NEVER found.
+				//
+				// Fix: add the 0x9C listBPM entry HERE (before source entries) so the
+				// list is in chronological order. The chip is emitted later.
+				int animBpmListIdx = -1;   // listBPM index of the 0x9C entry; -1 = si==0
+				if (si == 0) {
+					// Sentinels: bpm_change_time=0, bpm_change_bmscroll_time=0.
+					// At Dan play_time = accum + srcBpmOffset: th16 = (accum+srcBpmOffset)*BPM/15000.
+					bmscrollAccum = (accum + srcBpmOffset) * srcInitialBpm / 15000.0;
+				} else {
+					// bmscrollAccum = th16 at nextsongTime+1.0 (from end of si-1).
+					animBpmListIdx = output.listBPM.Count;
+					double th16AtAnimBpm = bmscrollAccum;   // th16 at nextsongTime+1.0
+					output.listBPM.Add(new CTja.CBPM {
+						n内部番号 = animBpmListIdx,
+						n表記上の番号 = animBpmListIdx,
+						dbBPM値 = srcInitialBpm,
+						bpm_change_time = songBoundaryTime + 1.0,
+						bpm_change_bmscroll_time = th16AtAnimBpm,
+						bpm_change_course = CTja.ECourse.eNormal,
+					});
+					// Advance bmscrollAccum from nextsongTime+1 to accum+srcBpmOffset so that
+					// source BPM entries and chips receive the correct 16th-beat offset.
+					bmscrollAccum += (accum + srcBpmOffset - (songBoundaryTime + 1.0)) * srcInitialBpm / 15000.0;
+					// bmscrollAccum is now th16 at accum+srcBpmOffset ✓
+				}
+
 				// ── Populate listBPM ───────────────────────────────────────────────
 				// Build a source-index → output-index map for remapping BPM chips later.
 				var bpmIdxMap = new Dictionary<int, int>();
@@ -231,10 +296,11 @@ namespace OpenTaiko {
 				}
 
 				// Copy actual BPM-change entries (index 3+) with the time offset applied.
-				// IMPORTANT: bpm_change_bmscroll_time is in 16th-beat units (not ms) for HBSCROLL,
-				// so adding offsetDb (ms) to it would corrupt HBSCROLL note positions. Instead we
-				// derive it from bpm_change_time (which IS in ms) so the Dan always uses normal-
-				// scroll positioning regardless of the source chart's scroll mode.
+				// bpm_change_time is shifted by offsetDb + srcBpmOffset: offsetDb places the entry in
+				// Dan absolute time, and srcBpmOffset corrects for the source OFFSET so the entry fires
+				// at the same Dan play_time as the chips that reference it (chips have n発声時刻ms already
+				// adjusted by msOFFSET_Abs, but bpm_change_time in the source is in raw chart time).
+				// bpm_change_bmscroll_time is shifted by bmscrollAccum (at th16-at-(accum+srcBpmOffset)).
 				for (int bi = 3; bi < src.listBPM.Count; bi++) {
 					var srcBpm = src.listBPM[bi];
 					int newIdx = output.listBPM.Count;
@@ -242,8 +308,8 @@ namespace OpenTaiko {
 						n内部番号 = newIdx,
 						n表記上の番号 = srcBpm.n表記上の番号,
 						dbBPM値 = srcBpm.dbBPM値,
-						bpm_change_time = srcBpm.bpm_change_time + offsetDb,
-						bpm_change_bmscroll_time = srcBpm.bpm_change_time + offsetDb,
+						bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset,
+						bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum,
 						bpm_change_course = srcBpm.bpm_change_course,
 					});
 					bpmIdxMap[bi] = newIdx;
@@ -294,26 +360,14 @@ namespace OpenTaiko {
 					output.listChip_Branch[ib].Add(nextsongChip);
 
 				// ── 0x9C animation-BPM chip for this song's transition ─────────────
-				// Character and puchichara animations are driven by the 0x9C chip's BPM.
-				// Without a chip at each song boundary the animation system keeps using the
-				// previous song's BPM throughout the transition gap, making the dons/kats
-				// appear to walk at the wrong speed. We emit one 1 ms after the 0x9B gate
-				// so it fires during the transition window before any notes arrive.
-				// (Not needed for the very first song — the initial listBPM[0] value covers it.)
-				if (si > 0) {
-					int animBpmIdx = output.listBPM.Count;
-					output.listBPM.Add(new CTja.CBPM {
-						n内部番号 = animBpmIdx,
-						n表記上の番号 = animBpmIdx,
-						dbBPM値 = srcInitialBpm,
-						bpm_change_time = songBoundaryTime + 1.0,
-						bpm_change_bmscroll_time = songBoundaryTime + 1.0,
-						bpm_change_course = CTja.ECourse.eNormal,
-					});
+				// The listBPM entry was already emitted before the source BPM entries loop
+				// (stored in animBpmListIdx) to ensure chronological listBPM ordering.
+				// Here we only emit the chip that references it.
+				if (animBpmListIdx >= 0) {
 					var animBpmChip = new CChip();
 					animBpmChip.t初期化();
 					animBpmChip.nChannelNo = 0x9C;
-					animBpmChip.n整数値_内部番号 = animBpmIdx;
+					animBpmChip.n整数値_内部番号 = animBpmListIdx;
 					animBpmChip.n発声時刻ms = (int)Math.Round(songBoundaryTime + 1.0);
 					animBpmChip.db発声時刻ms = songBoundaryTime + 1.0;
 					animBpmChip.start = animBpmChip;
@@ -379,6 +433,9 @@ namespace OpenTaiko {
 					var newChip = (CChip)srcChip.Clone();
 					newChip.n発声時刻ms = srcChip.n発声時刻ms + offsetMs; // setter updates db too
 					newChip.db発声時刻ms = srcChip.db発声時刻ms + offsetDb;  // restore double precision
+					// Shift HBSCROLL/BMSCROLL position: fBMSCROLLTime is in the same 16th-beat
+					// units as bpm_change_bmscroll_time, so add bmscrollAccum (not offsetDb).
+					newChip.fBMSCROLLTime = srcChip.fBMSCROLLTime + bmscrollAccum;
 
 					// Remap BPM-referencing chips (0x08 = extended BPM, 0x9C = animation BPM)
 					// so they point to the correct entries in the output listBPM table.
@@ -521,6 +578,30 @@ namespace OpenTaiko {
 				double srcDuration = srcLastTimeDb;   // anchor = time 0
 				nextsongTime = accum + srcDuration;
 				accum = nextsongTime + CTja.msDanNextSongDelay + OpenTaiko.ConfigIni.MusicPreTimeMs;
+
+				// Advance bmscrollAccum to th16 at nextsongTime+1.0, ready for the next
+				// iteration's 0x9C block. We use the source's last BPM entry (in source-
+				// frame raw-ms/16th-beats) to compute how far th16 advanced through this song.
+				//
+				// srcLastTimeDb includes msOFFSET_Abs for negative OFFSET (chip.n発声時刻ms
+				// was adjusted in the source's second pass). bpm_change_time is in raw chart
+				// time (no OFFSET adjustment). We subtract srcBpmOffset so the subtraction
+				// (srcLastRawTimeDb - lastSrcBpm.bpm_change_time) is purely in raw chart time.
+				//
+				// bmscrollAccum is currently at th16(accum+srcBpmOffset) (chips anchor).
+				// srcEndBmscroll_raw = th16 elapsed from raw time 0 to raw time srcLastRawTimeDb
+				//                    = lastSrcBpm.bpm_change_bmscroll_time + (srcLastRawTimeDb - bpm_change_time) * BPM/15000
+				// th16 at nextsongTime = bmscrollAccum + srcEndBmscroll_raw
+				// th16 at nextsongTime+1 = that + 1ms * lastBPM/15000
+				if (si < _songs.Count - 1) {
+					var lastSrcBpm = src.listBPM.Count > 0
+						? (src.listBPM.MaxBy(b => b.bpm_change_time) ?? src.listBPM[0])
+						: src.listBPM[0];
+					double srcLastRawTimeDb = srcLastTimeDb - srcBpmOffset;   // strip OFFSET → raw chart time
+					double srcEndBmscroll = lastSrcBpm.bpm_change_bmscroll_time
+						+ (srcLastRawTimeDb - lastSrcBpm.bpm_change_time) * lastSrcBpm.dbBPM値 / 15000.0;
+					bmscrollAccum = bmscrollAccum + srcEndBmscroll + 1.0 * lastSrcBpm.dbBPM値 / 15000.0;
+				}
 
 				// ── Inter-song gimmick resets ─────────────────────────────────────
 				// Placed 1 ms after nextsongTime (the 0x9B boundary chip), so they
