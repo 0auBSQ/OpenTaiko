@@ -1,9 +1,25 @@
-﻿local textSmall = nil
+-- song_select_core Activity
+-- Core song-select logic shared by regular_song_select, ai_battle_song_select,
+-- and training_song_select.
+--
+-- activate(config) parameters (all optional, nil = default):
+--   config.allowPlayerCount  (bool)   true by default — allow L key to cycle player count
+--   config.lockedPlayerCount (int)    nil by default  — forces CONFIG.PlayerCount to this value
+--   config.mountAISlotToP2   (bool)   false by default — mounts the AI virtual slot onto spot 2
+--
+-- update() return values:
+--   "play"   — a song was successfully mounted, parent stage should Exit("play")
+--   "cancel" — user backed out entirely, parent stage should decide where to go
+--   nil      — still running, no action needed
+
+local textSmall = nil
 local text = nil
 local textLarge = nil
 
 local sounds = {}
 
+-- The song list is kept alive across activate/deactivate cycles so all three
+-- song-select stages see the same list (and the same current position).
 local songList = nil
 local currentPage = {}
 local pageTexts = {}
@@ -16,8 +32,8 @@ local favoriteicon = nil
 
 local highlightedPlayer = 0
 
--- Activities
-local act = {}
+-- Inner activities (dialogs opened from within song select)
+local act_inner = {}
 
 -- ROActivities
 local modicons_ro = nil
@@ -43,22 +59,17 @@ local selectBoxDist = 0
 local BOX_SCROLL_SECONDS = 0.06
 
 -- Hold scroll state
-local holdDir = 0  -- currently held direction: -1, 0, or 1
-
+local holdDir = 0
 local HOLD_DELAY_SECONDS  = 0.16
 local HOLD_REPEAT_SECONDS = 0.06
 
 -- Screens/Statuses
-
 --- songselect | pretransition | transition | difficultyselect
 local activeScreen = "songselect"
 local songSelectModes = { songselect = true, pretransition = true, transition = true }
 local difficultySelectModes = { difficultyselect = true, transition = true }
 
---- none | inputinfo | playerinfo | quicksettings | unlockconfirm | unlockanim | modselect
-local activeModal = "none"
-
--- Tracks whether the customize dialog was active on the previous frame so we can detect when it closes.
+-- Tracks whether the customize dialog was active on the previous frame
 local wasCustomizeActive = false
 
 -- Puchichara floating sine animation
@@ -68,15 +79,21 @@ local puchiSineY = 0
 local selectedSongNode = nil
 
 -- Preview state
-local previewDemoStartRaw = 0  -- raw DemoStart from the song node (audio-file ms, speed-independent)
-local previewDemoStart = 0     -- previewDemoStartRaw / speed, compensated for tSetPositonToBegin's internal multiply
+local previewDemoStartRaw = 0
+local previewDemoStart = 0
 local previewDurationMs = 0
 local previewLoaded = false
 
 -- Difficulty select variables
-local diffBars = {} -- list of {vault (bool), level (int), isplus (bool), difficulty (int), charter (string)}
+local diffBars = {}
 local diffIndex = {0, 0, 0, 0, 0}
 local diffSelected = {false, false, false, false, false}
+
+-- Config set on each activate() call
+local activeConfig = {}
+-- Last signal returned by update(); used so deactivate() knows whether we're heading to play
+local lastSignal = nil
+
 
 -- Inputs for each player
 local inputSets = {
@@ -172,10 +189,10 @@ local NAMEPLATE_BOX_START_X = 0
 local NAMEPLATE_BOX_SPACING_X = 384
 local NAMEPLATE_OFFSET_X = 27
 local NAMEPLATE_OFFSET_Y = 37
-local NAMEPLATE_HEIGHT = 81   -- height of the nameplate base texture (330×81)
+local NAMEPLATE_HEIGHT = 81
 
-local PUCHI_OFFSET_X = 60   -- horizontal offset of puchichara from the character centre (px)
-local PUCHI_FLOAT_AMP = 8   -- sine float amplitude (px)
+local PUCHI_OFFSET_X = 60
+local PUCHI_FLOAT_AMP = 8
 
 local DIFFSELECT_CHARA_ORIG_X_35P = 1250
 local DIFFSELECT_CHARA_ORIG_Y_35P = 470
@@ -190,7 +207,7 @@ local DIFFSELECT_CHARA_SCALE_12P = 0.8
 local DIFFSELECT_SMALL_BAR_X = {678, 718, 758}
 local DIFFSELECT_SMALL_BAR_Y = {721, 900, 1079}
 local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET = 156
-local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION = -6 -- Difference with 162
+local DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION = -6
 local DIFFSELECT_BIG_BAR_ORIG_X = 676
 local DIFFSELECT_BIG_BAR_ORIG_Y = 309
 local DIFFSELECT_BIG_BAR_GAP_X = 3
@@ -208,7 +225,10 @@ local DIFFSELECT_LEVEL_COLORS = {
 	COLOR:CreateColorFromHex("FFCD7EE6")
 }
 
--- Chara helper
+-- ============================================================
+-- Helper functions
+-- ============================================================
+
 local function drawPlayerChara(player, x, y, scaleX, scaleY, opacity, flipX)
 	local chara = GetSaveFile(player):GetCharacter()
 	if chara ~= nil and chara.IsValid then
@@ -235,18 +255,16 @@ local function drawCharaWithNameplate(player, x, y, scaleX, scaleY, opacity, fli
 	NAMEPLATE:DrawPlayerNameplate(x, y, opacity*255, player)
 end
 
--- Add counter helper
 local function startCounter(key, startVal, endVal, interval, mode, updateCallback, onFinish)
-    local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
-    if mode == "loop" then c:SetLoop(true)
-    elseif mode == "bounce" then c:SetBounce(true) end
-    if updateCallback then c:Listen(updateCallback) end
-    c:Start()
-    ctx[key] = c
-    return c
+	local c = COUNTER:CreateCounter(startVal, endVal, interval, onFinish)
+	if mode == "loop" then c:SetLoop(true)
+	elseif mode == "bounce" then c:SetBounce(true) end
+	if updateCallback then c:Listen(updateCallback) end
+	c:Start()
+	ctx[key] = c
+	return c
 end
 
--- Duration helper: converts milliseconds to "m:ss" string
 local function formatDuration(ms)
 	if ms <= 0 then return "?:??" end
 	local totalSec = math.floor(ms / 1000)
@@ -255,21 +273,15 @@ local function formatDuration(ms)
 	return string.format("%d:%02d", m, s)
 end
 
--- BPM number helper (up to 3 digits for decimal)
 local function formatNumber(n, decimals)
-    local s = string.format("%."..decimals.."f", n)
-    -- remove trailing zeros
-    s = s:gsub("0+$", "")
-    -- remove trailing dot if needed
-    s = s:gsub("%.$", "")
-    return s
+	local s = string.format("%."..decimals.."f", n)
+	s = s:gsub("0+$", "")
+	s = s:gsub("%.$", "")
+	return s
 end
 
--- Used for difficulty number on song bars, no texture/number if nil
 local function getSongNodeFocusChart(songNode)
-	if songNode.IsSong ~= true then
-		return nil
-	end
+	if songNode.IsSong ~= true then return nil end
 	local default = math.min(4, CONFIG:GetDefaultCourse(0))
 	local chart = songNode:GetChart(default)
 	local i = 4
@@ -281,69 +293,48 @@ local function getSongNodeFocusChart(songNode)
 end
 
 local function calculateNumberWidth(nb, txstr)
-    local str = tostring(nb)
-    
-    local cursorX = 0
-    local prevWidth = 0
-    local lastWidth = 0
-    
-    for i = 1, #str do
-        local digit = string.sub(str, i, i)
-        local tex = bgtx[txstr .. digit]
-        
-        if tex then
-            local w = tex.Width
-            
-            if i > 1 then
-                cursorX = cursorX + (prevWidth * 0.5)
-            end
-            
-            prevWidth = w
-            lastWidth = w
-        end
-    end
-    
-    return cursorX + lastWidth
+	local str = tostring(nb)
+	local cursorX = 0
+	local prevWidth = 0
+	local lastWidth = 0
+	for i = 1, #str do
+		local digit = string.sub(str, i, i)
+		local tex = bgtx[txstr .. digit]
+		if tex then
+			local w = tex.Width
+			if i > 1 then cursorX = cursorX + (prevWidth * 0.5) end
+			prevWidth = w
+			lastWidth = w
+		end
+	end
+	return cursorX + lastWidth
 end
 
 local function drawNumberCentered(nb, txstr, x, y, color, opacity)
 	local white = COLOR:CreateColorFromHex("ffffffff")
 	color = color or white
 	opacity = opacity or 1
-
-    local str = tostring(nb)
-    local totalWidth = calculateNumberWidth(nb, txstr)
-    
-    local cursorX = x - (totalWidth / 2)
-    local prevWidth = 0
-    
-    for i = 1, #str do
-        local digit = string.sub(str, i, i)
-        local tex = bgtx[txstr .. digit]
-        
-        if tex then
-            local w = tex.Width
-            if i == 1 then
-            else
-                -- overlap offset (50%)
-                cursorX = cursorX + (prevWidth * 0.5)
-            end
+	local str = tostring(nb)
+	local totalWidth = calculateNumberWidth(nb, txstr)
+	local cursorX = x - (totalWidth / 2)
+	local prevWidth = 0
+	for i = 1, #str do
+		local digit = string.sub(str, i, i)
+		local tex = bgtx[txstr .. digit]
+		if tex then
+			local w = tex.Width
+			if i > 1 then cursorX = cursorX + (prevWidth * 0.5) end
 			tex:SetColor(color)
 			tex:SetOpacity(opacity)
-            tex:DrawAtAnchor(cursorX + (w / 2), y, "center")
+			tex:DrawAtAnchor(cursorX + (w / 2), y, "center")
 			tex:SetOpacity(1)
 			tex:SetColor(white)
-            prevWidth = w
-        end
-    end
+			prevWidth = w
+		end
+	end
 end
 
--- Difficulty select draw helpers
--- 1-5 bars["difficultybarselect"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P"..i..".png")
--- 0-7 bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
--- 1-7 bars["difficultybarlevel"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff"..i..".png")
 local function drawDifficultyBar(index, barinfo)
-	-- Draw difficulty bar with player frames
 	local xshift = 1920 - songSelectShift
 	local tex = bars["difficultybar7"]
 	if barinfo.vault == false then
@@ -352,59 +343,38 @@ local function drawDifficultyBar(index, barinfo)
 	local xpos = DIFFSELECT_BIG_BAR_ORIG_X + (index-3)*DIFFSELECT_BIG_BAR_GAP_X + xshift
 	local ypos = DIFFSELECT_BIG_BAR_ORIG_Y + (index-3)*DIFFSELECT_BIG_BAR_GAP_Y
 	for i = 1, CONFIG.PlayerCount, 1 do
-		if diffIndex[i] == index then
+		if diffIndex[i] == index and not (activeConfig.mountAISlotToP2 and i == 2) then
 			bars["difficultybarselect"..i]:DrawRectAtAnchor(
-				xpos, 
-				ypos+DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION, 
-				0,
-				0,
+				xpos,
+				ypos+DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET_CORRECTION,
+				0, 0,
 				bars["difficultybarselect"..i].Width,
-				DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET, 
+				DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
 				"bottomright"
 			)
 		end
 	end
 	tex:DrawAtAnchor(xpos, ypos, "bottomright")
-	-- Notes designer
 	local nd = textSmall:GetText("Charter - "..barinfo.charter, false, 1000)
 	nd:DrawAtAnchor(xpos, ypos+DIFFSELECT_NOTESDESIGNER_OFFSET_Y, "topright")
-	-- Level bar 
 	local xbar = xpos - tex.Width + DIFFSELECT_LEVEL_BAR_X
 	local ybar = ypos - tex.Height + DIFFSELECT_LEVEL_BAR_Y
 	local bartx = bars["difficultybarlevel5"]
 	if barinfo.vault == false then
 		bartx = bars["difficultybarlevel"..(math.min(3, barinfo.difficulty) + 1)]
-		if barinfo.level > 10 then
-			bartx = bars["difficultybarlevel6"]
-		end
+		if barinfo.level > 10 then bartx = bars["difficultybarlevel6"] end
 	end
-	bartx:DrawRect(
-		xbar, 
-		ybar, 
-		0, 
-		0, 
-		bartx.Width * (math.min(10, barinfo.level) / 10), 
-		bartx.Height
-	)
+	bartx:DrawRect(xbar, ybar, 0, 0, bartx.Width * (math.min(10, barinfo.level) / 10), bartx.Height)
 	if barinfo.level > 10 then
 		local bartxanim = bars["difficultybarlevel7"]
-		bartxanim:DrawRect(
-			xbar, 
-			ybar, 
-			0, 
-			bartx.Height*levelLabelFrame, 
-			bartx.Width * (math.min(3, barinfo.level-10) / 3), 
-			bartx.Height
-		)
+		bartxanim:DrawRect(xbar, ybar, 0, bartx.Height*levelLabelFrame,
+			bartx.Width * (math.min(3, barinfo.level-10) / 3), bartx.Height)
 	end
-	-- Level number
 	local xlvnb = xpos+DIFFSELECT_LEVEL_NB_OFF_X
 	local ylvnb = ypos+DIFFSELECT_LEVEL_NB_OFF_Y
 	drawNumberCentered(barinfo.level, "diffsel_level", xlvnb, ylvnb)
 	local lvnbcol = COLOR:CreateColorFromHex("FFB9B9B9")
-	if barinfo.vault == false then
-		lvnbcol = DIFFSELECT_LEVEL_COLORS[barinfo.difficulty + 1]
-	end
+	if barinfo.vault == false then lvnbcol = DIFFSELECT_LEVEL_COLORS[barinfo.difficulty + 1] end
 	drawNumberCentered(barinfo.level, "diffsel_levelcol", xlvnb, ylvnb, lvnbcol)
 end
 
@@ -414,11 +384,9 @@ local function drawDiffSelectBar(index, barinfo)
 		local xpos = DIFFSELECT_SMALL_BAR_X[index + 1] + xshift
 		local ypos = DIFFSELECT_SMALL_BAR_Y[index + 1]
 		for i = 1, CONFIG.PlayerCount, 1 do
-			if diffIndex[i] == index then
+			if diffIndex[i] == index and not (activeConfig.mountAISlotToP2 and i == 2) then
 				bars["difficultybarselect"..i]:DrawRectAtAnchor(
-					xpos,
-					ypos,
-					0,
+					xpos, ypos, 0,
 					DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
 					bars["difficultybarselect"..i].Width,
 					bars["difficultybarselect"..i].Height-DIFFSELECT_SMALL_BAR_SELECT_Y_OFFSET,
@@ -432,12 +400,9 @@ local function drawDiffSelectBar(index, barinfo)
 	end
 end
 
--- Song select draw helpers
 local function drawLevelTag(songNode, x, y)
 	local chart = getSongNodeFocusChart(songNode)
-	if chart == nil then
-		return nil
-	end
+	if chart == nil then return nil end
 	local level = chart.Level
 	local difficulty = chart.DifficultyAsInt
 	local labelH = bars["levellabels"].Height/5
@@ -497,13 +462,11 @@ local function playPreview(songNode)
 	if songNode.IsSong == true then
 		startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
 			local demoStart = songNode.DemoStart
-			SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function (snd)
+			SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
 				local speed = CONFIG.SongSpeed / 20
 				snd:SetSpeed(speed)
 				snd:Play()
-				-- tSetPositonToBegin multiplies ms by PlaySpeed internally, so divide here to land at the correct audio position
 				snd:SetTimestamp(math.floor(demoStart / speed))
-				-- TODO: Dan songs combine multiple audio files; duration will be 0 for them.
 				previewDurationMs = snd:GetDurationMs()
 				previewDemoStartRaw = demoStart
 				previewDemoStart = math.floor(demoStart / speed)
@@ -539,17 +502,13 @@ local function refreshPage()
 			end
 		end
 
-		-- Assets reload for selected songs
 		if i == 0 and node ~= nil then
 			reloadPreimage(node)
 			playPreview(node)
 		end
 	end
 
-	-- Reset the Extra fade counter
-	if ctx["extreme_fade"] then
-		ctx["extreme_fade"]:Start()
-	end
+	if ctx["extreme_fade"] then ctx["extreme_fade"]:Start() end
 end
 
 local function handleDecideSongSelect()
@@ -558,15 +517,11 @@ local function handleDecideSongSelect()
 	if ssn.IsFolder == true then
 		local success = songList:OpenFolder()
 		refreshPage()
-		if success == true then
-			sounds.Decide:Play()
-		end
+		if success == true then sounds.Decide:Play() end
 	elseif ssn.IsReturn == true then
 		local success = songList:CloseFolder()
 		refreshPage()
-		if success == true then
-			sounds.Cancel:Play()
-		end
+		if success == true then sounds.Cancel:Play() end
 	elseif ssn.IsSong == true then
 		sounds.SongDecide:Play()
 		return ssn
@@ -577,13 +532,12 @@ local function handleDecideSongSelect()
 			return rdNd
 		end
 	end
-	-- any route not ending up to play a song returns no selected node
 	return nil
 end
 
+-- Returns false if there is no folder to close (caller should exit to parent stage)
 local function handleFolderClose()
-	if songList == nil then return Exit("title", nil) end
-	-- if no folder to close, trigger exit scene instead
+	if songList == nil then return false end
 	return songList:CloseFolder()
 end
 
@@ -622,18 +576,57 @@ local function startHold(dir)
 		end)
 	end
 	startCounter("hold_delay", 0, 1, HOLD_DELAY_SECONDS, "none", nil, function()
-		if holdDir ~= 0 then
-			startRepeat()
-		end
+		if holdDir ~= 0 then startRepeat() end
 	end)
 end
 
 -- ============================================================
 
-function draw()
-	-- Background draw 
-	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX,0)
-	SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX+1920,0)
+local function loadDiffBars(ssn)
+	diffBars = {}
+	local startDiff = 0
+	local isVault = ssn.Genre == "Secret Vault"
+	if isVault then startDiff = 3 end
+	for i = startDiff, 4, 1 do
+		local chart = ssn:GetChart(i)
+		if chart ~= nil then
+			table.insert(diffBars, {
+				vault = isVault,
+				level = chart.Level,
+				isplus = chart.IsPlus,
+				charter = chart.NotesDesigner,
+				difficulty = i
+			})
+		end
+	end
+end
+
+local function updateTransitionVisuals(val)
+	songSelectShift = val
+	local opacity = 255 - (val * (255 / 960))
+	songSelectElemOpacity = math.max(0, math.min(255, opacity))
+	local diffOpacity = (val - 960) * (255 / 960)
+	difficultySelectElemOpacity = math.max(0, math.min(255, diffOpacity))
+end
+
+local function resetToSongSelect()
+	songSelectElemOpacity = 255
+	difficultySelectElemOpacity = 0
+	songSelectShift = 0
+	activeScreen = "songselect"
+end
+
+-- ============================================================
+-- Activity lifecycle
+-- ============================================================
+
+function draw(mode)
+	if mode ~= "no_bg" then
+		-- Scrolling background (texture set by parent stage or defaulted in activate)
+		SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX, 0)
+		SHARED:GetSharedTexture("background"):Draw(-backgroundScrollX+1920, 0)
+	end
+	if mode == "bg_only" then return end
 
 	local ssn = songList:GetSelectedSongNode()
 
@@ -646,7 +639,6 @@ function draw()
 		bgtx["overlay_difficulty"]:SetOpacity(opacityNorm)
 		bgtx["overlay_difficulty"]:DrawAtAnchor(1920, 0, "TopRight")
 
-		-- Song metadata
 		if selectedSongNode ~= nil then
 			local titleTx = textLarge:GetText(selectedSongNode.Title, false, 1280)
 			local subtitleTx = text:GetText(selectedSongNode.Subtitle, false, 1280)
@@ -655,40 +647,30 @@ function draw()
 			subtitleTx:SetOpacity(opacityNorm)
 			subtitleTx:Draw(1926 - songSelectShift, 67)
 
-			-- Draw difficulty bars + return/customize/options
 			for i = 0, 2+#diffBars, 1 do
 				local barinfo = nil
-				if i >= 3 then
-					barinfo = diffBars[i-2]
-				end
+				if i >= 3 then barinfo = diffBars[i-2] end
 				drawDiffSelectBar(i, barinfo)
 			end
 		end
 
-		-- Display the characters, nameplate and their info
 		do
 			local p = CONFIG.PlayerCount
 			local is35 = p > 2
-
-			-- Assign base values based on player count
 			local ox = is35 and DIFFSELECT_CHARA_ORIG_X_35P or DIFFSELECT_CHARA_ORIG_X_12P
 			local oy = is35 and DIFFSELECT_CHARA_ORIG_Y_35P or DIFFSELECT_CHARA_ORIG_Y_12P
 			local gx = is35 and DIFFSELECT_CHARA_GAP_X_35P or DIFFSELECT_CHARA_GAP_X_12P
 			local gy = is35 and DIFFSELECT_CHARA_GAP_Y_35P or 0
 			local s  = is35 and DIFFSELECT_CHARA_SCALE_35P or DIFFSELECT_CHARA_SCALE_12P
-
-			-- Characters in the 1st row (1P->1, 2P->2, 3P->2, 4P->2, 5P->3)
-			local r1Count = (p == 5 and 3) or (p > 2 and 2) or p 
+			local r1Count = (p == 5 and 3) or (p > 2 and 2) or p
 
 			for i = 0, p - 1 do
 				local isRow2 = i >= r1Count
-				local r = isRow2 and 1 or 0                    -- 0 for row 1, 1 for row 2
-				local cols = isRow2 and (p - r1Count) or r1Count -- Total characters in current row
-				local colIdx = isRow2 and (i - r1Count) or i     -- Character's index within its row
-				
+				local r = isRow2 and 1 or 0
+				local cols = isRow2 and (p - r1Count) or r1Count
+				local colIdx = isRow2 and (i - r1Count) or i
 				local x = ox + (colIdx - (cols - 1) / 2) * gx
 				local y = oy + r * gy
-				
 				drawCharaWithNameplate(i, x, y, s, s, opacityNorm, true)
 				local charaX = x + bgtx["nameplate_info"].Width/2 - NAMEPLATE_OFFSET_X
 				drawPlayerPuchi(i, charaX - PUCHI_OFFSET_X * s, y + puchiSineY * s, s, s, opacityNorm)
@@ -697,28 +679,47 @@ function draw()
 				end
 			end
 		end
+
+		-- AI level slider display (AI battle only)
+		if activeConfig.mountAISlotToP2 then
+			local xshift = 1920 - songSelectShift
+			local cx = 1490 + xshift
+			local labelTx = textSmall:GetText("Starting AI Level", false, 400)
+			labelTx:SetOpacity(opacityNorm)
+			labelTx:DrawAtAnchor(cx, 940, "center")
+			local levelTx = text:GetText(tostring(CONFIG.AILevel), false, 200)
+			levelTx:SetOpacity(opacityNorm)
+			levelTx:DrawAtAnchor(cx, 980, "center")
+			-- Animated bound arrows; hidden at level extremes to show clamp
+			local ax = arrowsDistance
+			if CONFIG.AILevel > 1 then
+				local arrowL = textSmall:GetText("◀", false, 60)
+				arrowL:SetOpacity(opacityNorm)
+				arrowL:DrawAtAnchor(cx - 55 - ax, 980, "right")
+			end
+			if CONFIG.AILevel < 10 then
+				local arrowR = textSmall:GetText("▶", false, 60)
+				arrowR:SetOpacity(opacityNorm)
+				arrowR:DrawAtAnchor(cx + 55 + ax, 980, "left")
+			end
+		end
 	end
 
-	-- Not an elseif, both display during the transition
 	if songSelectModes[activeScreen] then
 		local opacityNorm = songSelectElemOpacity/255
 
-		-- Random info
 		if ssn ~= nil and ssn.IsRandom then
 			bgtx["randominfo"]:DrawAtAnchor(1920-songSelectShift,0,"topright")
 		end
 
-		-- Song info
 		if ssn ~= nil and ssn.IsSong then
 			bgtx["songinfo"]:DrawAtAnchor(1920-songSelectShift,0,"topright")
-			-- Side tags (Left)
 			if ssn.HasVideo then
 				bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X-songSelectShift,SONGINFO_HASVIDEO_ORIGIN_Y)
 			end
 			if ssn.Explicit then
 				bgtx["sinfo_explicit"]:DrawAtAnchor(SONGINFO_EXPLICIT_ORIGIN_X-songSelectShift,SONGINFO_EXPLICIT_ORIGIN_Y,"topright")
 			end
-			-- Difficulties (Right)
 			for i = 0, 4, 1 do
 				local chart = ssn:GetChart(i)
 				local xpos = SONGINFO_DIFFICULTIES_ORIGIN_X-songSelectShift
@@ -742,12 +743,9 @@ function draw()
 				else
 					bgtx["sinfo_difficulties_"..i]:Draw(xpos,ypos)
 					drawNumberCentered(chart.Level, "sinfo_level", xpos+bgtx["sinfo_difficulties_"..i].Width/2, ypos+bgtx["sinfo_difficulties_"..i].Height/2)
-					if chart.IsPlus then
-						bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos)
-					end
+					if chart.IsPlus then bgtx["sinfo_difficulties_"..i.."_plus"]:Draw(xpos,ypos) end
 				end
 			end
-			-- Metadata (Down)
 			local focusedChart = getSongNodeFocusChart(ssn)
 			local subtitleTx = textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
 			local charterTx = textSmall:GetText("Chart - "..ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
@@ -762,29 +760,21 @@ function draw()
 					bpmText = bpmText.." ("..formatNumber(focusedChart.MinBPM*mult,3).."-"..formatNumber(focusedChart.MaxBPM*mult,3)..")"
 				end
 				local color = "FFFFFFFF"
-				if mult < 1 then
-					color = "ff95ccff"
-				elseif mult > 1 then
-					color = "ffff9ec3"
-				end
+				if mult < 1 then color = "ff95ccff"
+				elseif mult > 1 then color = "ffff9ec3" end
 				local bpmTx = text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(color))
 				bpmTx:DrawAtAnchor(SONGINFO_BPM_ORIGIN_X-songSelectShift, SONGINFO_BPM_ORIGIN_Y, "center")
 			end
 		end
-		
+
 		drawPreimage()
 
-		-- Song List
 		if pageTexts ~= nil then
 			for i, tx in pairs(pageTexts) do
 				local xpos = SONGLIST_ORIGIN_X+(i+selectBoxDist)*SONGLIST_OFFSET_X-songSelectShift
 				local ypos = SONGLIST_ORIGIN_Y+(i+selectBoxDist)*SONGLIST_OFFSET_Y
-				-- shift the box if selected to highlight it
-				if i == 0 then
-					xpos = xpos + SONGLIST_SELECTED_X_DIFF
-				end
-				-- can be nil if no modulo pagination
-				if tx ~= nil then 
+				if i == 0 then xpos = xpos + SONGLIST_SELECTED_X_DIFF end
+				if tx ~= nil then
 					if currentPage[i].IsSong or currentPage[i].IsFolder then
 						if currentPage[i].IsLocked then
 							bars["locked"]:DrawAtAnchor(xpos,ypos,"center")
@@ -793,7 +783,6 @@ function draw()
 							bars["bar"]:DrawAtAnchor(xpos,ypos,"center")
 							genre_overlays[currentPage[i].Genre]:DrawAtAnchor(xpos,ypos,"center")
 						end
-						-- TODO: Don't show if locked AND grayed/blurred
 						drawLevelTag(currentPage[i],xpos+SONGBAR_LABEL_X_OFFSET,ypos)
 					elseif currentPage[i].IsRandom then
 						bars["random"]:DrawAtAnchor(xpos,ypos,"center")
@@ -812,26 +801,17 @@ function draw()
 			bars["selected-arrow-r"]:DrawAtAnchor(x0+SONGLIST_SELECTED_ARROW_GAP/2-xlshift,y0+ylshift,"right")
 		end
 
-		-- Folder Path
 		bgtx["header"]:Draw(-songSelectShift, 0)
 		if ssn ~= nil then
 			local pathStack = {}
 			local currentNode = ssn.Parent
-
-			-- Traverse up the tree
 			while currentNode ~= nil do
-				-- The root node has a Title of nil
 				local _tx = "/"
-				if currentNode.Title ~= nil then
-					_tx = currentNode.Title
-				end
-				local textobj = text:GetText(_tx, false, 270)
-				table.insert(pathStack, textobj)
+				if currentNode.Title ~= nil then _tx = currentNode.Title end
+				table.insert(pathStack, text:GetText(_tx, false, 270))
 				currentNode = currentNode.Parent
 			end
-
 			local xpos = HEADER_OFFSET_X-songSelectShift
-
 			for i, title in ipairs(pathStack) do
 				bgtx["header-box"]:SetOpacity(opacityNorm)
 				bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
@@ -848,7 +828,6 @@ function draw()
 		bgtx["overlay"]:SetOpacity(opacityNorm)
 		bgtx["overlay"]:Draw(0, 0)
 
-		-- Nameplates space
 		local playerCount = CONFIG.PlayerCount
 		highlightedPlayer = highlightedPlayer % CONFIG.PlayerCount
 
@@ -857,7 +836,6 @@ function draw()
 			local x0 = NAMEPLATE_BOX_START_X
 			local y0 = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
 			bgtx["nameplate_info"]:Draw(x0, y0)
-			-- TODO: Draw clear numbers here for the given 1P difficulty
 			local ssCharaX = x0 + bgtx["nameplate_info"].Width/2
 			drawPlayerChara(highlightedPlayer, ssCharaX, y0+NAMEPLATE_OFFSET_Y, 1.0, 1.0, opacityNorm, false)
 			drawPlayerPuchi(highlightedPlayer, ssCharaX - PUCHI_OFFSET_X, y0+NAMEPLATE_OFFSET_Y + puchiSineY, 1.0, 1.0, opacityNorm)
@@ -866,9 +844,7 @@ function draw()
 
 		for i = 1, playerCount - 1, 1 do
 			local j = i
-			if j - 1 >= highlightedPlayer then
-				j = j + 1
-			end
+			if j - 1 >= highlightedPlayer then j = j + 1 end
 			local xpos = NAMEPLATE_BOX_START_X + i * NAMEPLATE_BOX_SPACING_X
 			local ypos = 1080 - NAMEPLATE_SECONDARY_OFFSET_Y
 			bgtx["placeholder_portrait"]:SetOpacity(opacityNorm)
@@ -878,54 +854,16 @@ function draw()
 		end
 	end
 
-	-- Execute all activities draw calls at the end (modals, mod select, pretransitions, etc)
-	for _, at in pairs(act) do
-		if at.IsActive then
-			at:Draw()
-		end
+	-- Inner activity draw calls (dialogs, mod select, etc.)
+	for _, at in pairs(act_inner) do
+		if at.IsActive then at:Draw() end
 	end
-end
-
-local function loadDiffBars(ssn)
-	diffBars = {}
-
-	local startDiff = 0
-	local isVault = ssn.Genre == "Secret Vault"
-	if isVault then
-		startDiff = 3
-	end
-	for i = startDiff, 4, 1 do
-		local chart = ssn:GetChart(i)
-		if chart ~= nil then
-			local df = {
-				vault = isVault,
-				level = chart.Level,
-				isplus = chart.IsPlus,
-				charter = chart.NotesDesigner,
-				difficulty = i
-			}
-			table.insert(diffBars, df)
-		end
-	end
-end
-
-local function updateTransitionVisuals(val)
-    songSelectShift = val
-    
-    -- Fade from 255 (at 0) to 0 (at 960)
-    -- Formula: 255 - (current_val * ratio)
-    local opacity = 255 - (val * (255 / 960))
-    songSelectElemOpacity = math.max(0, math.min(255, opacity))
-	local diffOpacity = (val - 960) * (255 / 960)
-	difficultySelectElemOpacity = math.max(0, math.min(255, diffOpacity))
 end
 
 function update()
-	for k, counter in pairs(ctx) do
-        counter:Tick()
-    end
+	for k, counter in pairs(ctx) do counter:Tick() end
 
-	-- Loop preview from demostart when playback ends
+	-- Loop preview
 	if previewLoaded then
 		local psnd = SHARED:GetSharedSound("presound")
 		if psnd.Loaded and not psnd.IsPlaying then
@@ -934,22 +872,18 @@ function update()
 		end
 	end
 
-	-- Execute all activities update calls at the beginning (modals, mod select, pretransitions, etc)
-	local activeModal = false
-	for _, at in pairs(act) do
+	-- Inner activity updates (dialogs, mod select, etc.)
+	local hasActiveInnerModal = false
+	for _, at in pairs(act_inner) do
 		if at.IsActive then
 			at:Update()
-			activeModal = true
+			hasActiveInnerModal = true
 		end
 	end
 
-	-- When customize_dialog closes, reload the character animation for every player so that a
-	-- newly-selected character (which was swapped in by ChangeCharacter) is actually rendered.
-	local isCustomizeActive = act["customize_dialog"] ~= nil and act["customize_dialog"].IsActive
+	-- Reload character animations when customize_dialog closes
+	local isCustomizeActive = act_inner["customize_dialog"] ~= nil and act_inner["customize_dialog"].IsActive
 	if wasCustomizeActive and not isCustomizeActive then
-		-- Guard with AvailableAnimation so we never double-increment the ref-count:
-		-- LoadAnimation is reference-counted; calling it a second time without a matching
-		-- DisposeAnimation would leak. Only load if the animation is not already active.
 		for p = 0, 4, 1 do
 			local chara = GetSaveFile(p):GetCharacter()
 			if chara ~= nil and chara.IsValid then
@@ -961,9 +895,7 @@ function update()
 	end
 	wasCustomizeActive = isCustomizeActive
 
-	if activeModal == true then
-		return
-	end
+	if hasActiveInnerModal then return nil end
 
 	if activeScreen == "songselect" then
 		selectedSongNode = nil
@@ -973,7 +905,7 @@ function update()
 			CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
 		end
 
-		if INPUT:KeyboardPressed("P") then
+		if INPUT:KeyboardPressed("P") and not activeConfig.mountAISlotToP2 then
 			sounds.Skip:Play()
 			highlightedPlayer = (highlightedPlayer + 1) % CONFIG.PlayerCount
 		end
@@ -988,15 +920,13 @@ function update()
 		end
 
 		local inpset = inputSets[highlightedPlayer + 1]
-		
-		-- Release detection: check every frame if the held direction is still physically pressed
+
 		if holdDir == 1 and not INPUT:Pressing(inpset.right) and not INPUT:KeyboardPressing("RightArrow") then
 			stopHold()
 		elseif holdDir == -1 and not INPUT:Pressing(inpset.left) and not INPUT:KeyboardPressing("LeftArrow") then
 			stopHold()
 		end
 
-		-- Navigation
 		if (INPUT:Pressed(inpset.right) or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
 			doMove(1)
 			startHold(1)
@@ -1014,22 +944,62 @@ function update()
 				sounds.Decide:Play()
 			else
 				sounds.Cancel:Play()
-				return Exit("title", nil)
+				return "cancel"
 			end
 		end
 
-		-- Transition to difficulty select if a song was selected
+		-- Player count cycling (only when allowed by config)
+		if activeConfig.allowPlayerCount ~= false then
+			if INPUT:KeyboardPressed("L") then
+				sounds.Skip:Play()
+				CONFIG.PlayerCount = 1 + (CONFIG.PlayerCount % 5)
+			end
+		end
+
+		if INPUT:KeyboardPressed("Q") then
+			sounds.Skip:Play()
+			CONFIG.SongSpeed = CONFIG.SongSpeed - 1
+			local speed = CONFIG.SongSpeed / 20
+			SHARED:GetSharedSound("presound"):SetSpeed(speed)
+			if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
+		end
+
+		if INPUT:KeyboardPressed("W") then
+			sounds.Skip:Play()
+			CONFIG.SongSpeed = CONFIG.SongSpeed + 1
+			local speed = CONFIG.SongSpeed / 20
+			SHARED:GetSharedSound("presound"):SetSpeed(speed)
+			if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
+		end
+
+		if INPUT:KeyboardPressed("O") then
+			if currentBackground == 0 then
+				SHARED:SetSharedTexture("background", "Textures/bg1.png")
+				currentBackground = 1
+			else
+				SHARED:SetSharedTexture("background", "Textures/bg0.png")
+				currentBackground = 0
+			end
+		end
+
+		-- Enforce locked player count after any input
+		if activeConfig.lockedPlayerCount ~= nil then
+			CONFIG.PlayerCount = activeConfig.lockedPlayerCount
+		end
+
+		-- In AI battle, keep spotlight fixed on 1P
+		if activeConfig.mountAISlotToP2 then
+			highlightedPlayer = 0
+		end
+
 		if selectedSongNode ~= nil then
 			loadDiffBars(selectedSongNode)
-
 			stopHold()
-
-			-- TODO? implement pretransition for songs having one
 			activeScreen = "transition"
 			diffIndex = {0, 0, 0, 0, 0}
 			diffSelected = {false, false, false, false, false}
-			startCounter("screen_transition", 0, 1920, 0.5/1920, "none", updateTransitionVisuals, function() 
-				activeScreen = "difficultyselect" 
+			startCounter("screen_transition", 0, 1920, 0.5/1920, "none", updateTransitionVisuals, function()
+				activeScreen = "difficultyselect"
 			end)
 		end
 
@@ -1038,6 +1008,11 @@ function update()
 		local canceled = false
 
 		for i = 1, CONFIG.PlayerCount, 1 do
+			-- In AI battle: player 2 (AI) automatically mirrors player 1's selection
+			if activeConfig.mountAISlotToP2 and i == 2 then
+				diffIndex[2]   = diffIndex[1]
+				diffSelected[2] = diffSelected[1]
+			else
 			local inpset = inputSets[i]
 
 			if diffSelected[i] == false then
@@ -1048,19 +1023,15 @@ function update()
 					sounds.Skip:Play()
 					diffIndex[i] = (diffIndex[i] - 1) % (3 + #diffBars)
 				elseif INPUT:Pressed(inpset.decide1) or INPUT:Pressed(inpset.decide2) or (i == 1 and INPUT:KeyboardPressed("Return")) then
-					-- Return
 					if diffIndex[i] == 0 then
 						sounds.Cancel:Play()
 						canceled = true
-					-- Customize
 					elseif diffIndex[i] == 1 then
-						act["customize_dialog"]:Activate(i - 1)
-						return
-					-- Options
+						act_inner["customize_dialog"]:Activate(i - 1)
+						return nil
 					elseif diffIndex[i] == 2 then
-						act["mod_select_dialog"]:Activate(i - 1)
-						return
-					-- Select difficulty
+						act_inner["mod_select_dialog"]:Activate(i - 1)
+						return nil
 					elseif diffIndex[i] > 2 then
 						sounds.Decide:Play()
 						diffSelected[i] = true
@@ -1073,13 +1044,12 @@ function update()
 						canceled = true
 					end
 				end
-			end
+			end -- if diffSelected[i] == false
+			end -- else: normal player input
 
-			if diffSelected[i] == false then
-				allDiffsSelected = false
-			end
-		end 
-		
+			if diffSelected[i] == false then allDiffsSelected = false end
+		end
+
 		if INPUT:KeyboardPressed("F3") then
 			sounds.Decide:Play()
 			CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
@@ -1089,15 +1059,13 @@ function update()
 			CONFIG:SetAutoStatus(1, not CONFIG:GetAutoStatus(1))
 		end
 
-		-- Back to song select
 		if canceled or INPUT:KeyboardPressed("Escape") then
 			sounds.Decide:Play()
 			activeScreen = "transition"
-			startCounter("screen_transition", 1920, 0, -0.5/1920, "none", updateTransitionVisuals, function() 
-            	activeScreen = "songselect" 
-        	end)
+			startCounter("screen_transition", 1920, 0, -0.5/1920, "none", updateTransitionVisuals, function()
+				activeScreen = "songselect"
+			end)
 		elseif allDiffsSelected == true then
-			-- No need to check for player count, the lua api handles it 
 			local success = selectedSongNode:Mount(
 				(diffIndex[1] >= 3) and diffBars[diffIndex[1] - 2].difficulty or 0,
 				(diffIndex[2] >= 3) and diffBars[diffIndex[2] - 2].difficulty or 0,
@@ -1106,135 +1074,107 @@ function update()
 				(diffIndex[5] >= 3) and diffBars[diffIndex[5] - 2].difficulty or 0
 			)
 			if success then
-				return Exit("play", nil)
+				lastSignal = "play"
+				return "play"
 			else
 				diffSelected = {false, false, false, false, false}
 			end
 		end
-	end
 
-	-- Test search song
-	--[[
-	if INPUT:KeyboardPressed("P") then
-		local sNode = songList:SearchFirstSongByPredicate(function(node)
-		 	return node.Maker == "bol"
-		end)
-		-- local sNode = songList:GetSongByUniqueId("swtowerwttcSukima")
-		if sNode ~= nil then
-			local success = sNode:Mount(3)
-			if success == true then
-				sounds.SongDecide:Play()
-				return Exit("play", nil)
-			end 
+		-- AI level slider: 2P blue drums adjust starting AI level (AI battle only)
+		if activeConfig.mountAISlotToP2 then
+			if INPUT:Pressed("LBlue2P") and CONFIG.AILevel > 1 then
+				CONFIG.AILevel = CONFIG.AILevel - 1
+				sounds.Skip:Play()
+			elseif INPUT:Pressed("RBlue2P") and CONFIG.AILevel < 10 then
+				CONFIG.AILevel = CONFIG.AILevel + 1
+				sounds.Skip:Play()
+			end
 		end
 	end
-	]]
 
-	if INPUT:KeyboardPressed("L") then
-		sounds.Skip:Play()
-		CONFIG.PlayerCount = 1 + (CONFIG.PlayerCount % 5)
-	end
-
-	if INPUT:KeyboardPressed("Q") then
-		sounds.Skip:Play()
-		CONFIG.SongSpeed = CONFIG.SongSpeed - 1
-		local speed = CONFIG.SongSpeed / 20
-		SHARED:GetSharedSound("presound"):SetSpeed(speed)
-		if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
-	end
-
-	if INPUT:KeyboardPressed("W") then
-		sounds.Skip:Play()
-		CONFIG.SongSpeed = CONFIG.SongSpeed + 1
-		local speed = CONFIG.SongSpeed / 20
-		SHARED:GetSharedSound("presound"):SetSpeed(speed)
-		if previewDemoStartRaw > 0 then previewDemoStart = math.floor(previewDemoStartRaw / speed) end
-	end
-
-	-- Test shared textures
-	if INPUT:KeyboardPressed("O") then
-		if currentBackground == 0 then
-			SHARED:SetSharedTexture("background", "Textures/bg1.png")
-			currentBackground = 1
-		else
-			SHARED:SetSharedTexture("background", "Textures/bg0.png")
-			currentBackground = 0
-		end
-	end 
+	return nil
 end
 
-local function resetToSongSelect()
-	songSelectElemOpacity = 255
-	difficultySelectElemOpacity = 0
-	songSelectShift = 0
-	activeScreen = "songselect"
-end
+-- activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
+--   allowPlayerCount  : false to disable the L-key player count toggle (nil = true = allowed)
+--   lockedPlayerCount : number to force CONFIG.PlayerCount each frame (nil = no lock)
+--   mountAISlotToP2   : true to mount the AI virtual slot onto spot 2 (nil/false = no)
+function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
+	activeConfig = {
+		allowPlayerCount  = allowPlayerCount,
+		lockedPlayerCount = lockedPlayerCount,
+		mountAISlotToP2   = mountAISlotToP2 == true,
+	}
 
-function activate()
+	-- Force player count if locked
+	if activeConfig.lockedPlayerCount ~= nil then
+		CONFIG.PlayerCount = math.tointeger(activeConfig.lockedPlayerCount)
+	end
+
+	-- Mount the AI virtual slot onto player spot 2
+	if activeConfig.mountAISlotToP2 then
+		VIRTUALSLOTS:MountSlot(2, "AI")
+	end
+
+	-- Inner activities (dialog modals)
 	local activities = {"mod_select_dialog", "customize_dialog"}
 	for _, at in ipairs(activities) do
-		act[at] = ACTIVITY:GetActivity(at)
+		act_inner[at] = ACTIVITY:GetActivity(at)
 	end
 
 	modicons_ro = ROACTIVITY:GetROActivity("modicons")
 	if modicons_ro ~= nil then modicons_ro:Activate() end
 
-	sounds.Skip = SHARED:GetSharedSound("Skip")
-	sounds.Cancel = SHARED:GetSharedSound("Cancel")
-	sounds.Decide = SHARED:GetSharedSound("Decide")
+	sounds.Skip     = SHARED:GetSharedSound("Skip")
+	sounds.Cancel   = SHARED:GetSharedSound("Cancel")
+	sounds.Decide   = SHARED:GetSharedSound("Decide")
 	sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
-	-- Set the song select on song select screen
 	resetToSongSelect()
 
-	-- If returning to song select after a play, refresh the page to play the preview
-	if songList ~= nil then
-		refreshPage()
-	end
+	-- Restore default background; parent stage may override this after activate() returns
+	currentBackground = 0
+	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 
-	-- Background Scroll
-    startCounter("background", 1920, 0, 1/48, "loop", function(val) 
-        backgroundScrollX = val 
-    end)
+	-- Refresh page display if we already have a song list (returning from a play)
+	if songList ~= nil then refreshPage() end
 
-    -- Extreme Icon Fade
-    startCounter("extreme_fade", 2000, 0, 1/400, "loop", function(val)
-        local fadeIn = val - 745
-    	local fadeOut = 2000 - val
-    	difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
-    end)
+	-- Counters
+	startCounter("background", 1920, 0, 1/48, "loop", function(val)
+		backgroundScrollX = val
+	end)
 
-    -- Select Box Animation
-    startCounter("selectbox_animation", 2000, 0, 1/600, "loop", function(val)
-        if bars["selected"] then
-            local n = 1.01 + (math.sin(val * (math.pi * 2 / 2000)) * 0.01)
-            bars["selected"]:SetScale(n, n)
-        end
-    end)
+	startCounter("extreme_fade", 2000, 0, 1/400, "loop", function(val)
+		local fadeIn = val - 745
+		local fadeOut = 2000 - val
+		difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
+	end)
 
-    -- Arrows Bounce
-    startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
-        arrowsDistance = val
-    end)
-
-    -- Level Tag Animation
-    startCounter("leveltag_animation", SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0, 1/SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT*2, "loop", function(val)
-        levelLabelFrame = math.floor(val)
-    end)
-
-	-- Load loop
-	startCounter("load_animation", 0, 360, 2/300, "loop", function(val)
-        if bgtx["load"] ~= nil then
-			bgtx["load"]:SetRotation(val)
+	startCounter("selectbox_animation", 2000, 0, 1/600, "loop", function(val)
+		if bars["selected"] then
+			local n = 1.01 + (math.sin(val * (math.pi * 2 / 2000)) * 0.01)
+			bars["selected"]:SetScale(n, n)
 		end
-    end)
+	end)
 
-	-- Puchichara floating sine animation
+	startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
+		arrowsDistance = val
+	end)
+
+	startCounter("leveltag_animation", SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT, 0,
+		1/SONGBAR_LEVEL_EX_ANIMATION_FRAMECOUNT*2, "loop", function(val)
+		levelLabelFrame = math.floor(val)
+	end)
+
+	startCounter("load_animation", 0, 360, 2/300, "loop", function(val)
+		if bgtx["load"] ~= nil then bgtx["load"]:SetRotation(val) end
+	end)
+
 	startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)
 		puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
 	end)
 
-	-- Load character animations for all players
 	for p = 0, 4, 1 do
 		local chara = GetSaveFile(p):GetCharacter()
 		if chara ~= nil and chara.IsValid then
@@ -1244,14 +1184,19 @@ function activate()
 end
 
 function deactivate()
-	for k, counter in pairs(ctx) do
-        ctx[k] = COUNTER:EmptyCounter()
-    end
+	-- Restore AI slot mount only when not heading to a play (preserve it for gameplay)
+	if activeConfig.mountAISlotToP2 and lastSignal ~= "play" then
+		VIRTUALSLOTS:MountSlot(2, "2P")
+	end
+	lastSignal = nil
 
-	local psnd = SHARED:GetSharedSound("presound")
-	psnd:Stop()
+	-- Clear all counters
+	for k, _ in pairs(ctx) do
+		ctx[k] = COUNTER:EmptyCounter()
+	end
 
-	-- Dispose character animations for all players
+	SHARED:GetSharedSound("presound"):Stop()
+
 	for p = 0, 4, 1 do
 		local chara = GetSaveFile(p):GetCharacter()
 		if chara ~= nil and chara.IsValid then
@@ -1264,8 +1209,7 @@ function onStart()
 	textSmall = TEXT:Create(18)
 	text = TEXT:Create(28)
 	textLarge = TEXT:Create(40)
-	
-	-- General textures
+
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 	bgtx["load"] = TEXTURE:CreateTexture("Textures/load.png")
 	bgtx["preimage_load"] = TEXTURE:CreateTexture("Textures/preimage_load.png")
@@ -1283,7 +1227,6 @@ function onStart()
 	bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
 	for i = 0, 4, 1 do
 		bgtx["sinfo_difficulties_"..i] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_"..i..".png")
-		-- Only the 0 for now as they're all monocolor, replace by the new one once new diff textures ready
 		bgtx["sinfo_difficulties_"..i.."_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_0_plus.png")
 	end
 	for i = 0, 9, 1 do
@@ -1294,11 +1237,9 @@ function onStart()
 		bgtx["diffsel_levelcol"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/"..i..".png")
 	end
 
-	-- Placeholders
 	bgtx["placeholder_chara"] = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
 	bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
-	-- Song list textures
 	bars["bar"] = TEXTURE:CreateTexture("Textures/bar.png")
 	bars["random"] = TEXTURE:CreateTexture("Textures/random.png")
 	bars["back"] = TEXTURE:CreateTexture("Textures/back.png")
@@ -1313,11 +1254,9 @@ function onStart()
 	for i = 1, 5, 1 do
 		bars["difficultybarselect"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P"..i..".png")
 	end
-	-- Actual difficulty bar textures (indices 2-7: Easy→Ura + Vault)
 	for i = 2, 7, 1 do
 		bars["difficultybar"..i] = TEXTURE:CreateTexture("Textures/DifficultyBars/"..i..".png")
 	end
-	-- Small navigation bars: 0=Return, 1=Customize, 2=Options
 	bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
 	bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
 	bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
@@ -1326,49 +1265,25 @@ function onStart()
 	end
 
 	favoriteicon = TEXTURE:CreateTexture("Textures/fav.png")
-
 	genre_overlays = {}
-end 
+end
 
 function afterSongEnum()
 	local lsls = GenerateSongListSettings()
-
 	lsls:SetExcludedGenreFolders({"段位道場", "太鼓タワー"})
-
 	lsls.ModuloPagination = false
 	lsls.HideEmptyFolders = true
 	lsls.FlattenOpenedFolders = false
-	
-	-- lsls.RootGenreFolder = "太鼓タワー"
-
-	-- Get song list 
 	songList = RequestSongList(lsls)
 	refreshPage()
 end
 
 function onDestroy()
-	if text ~= nil then
-		text:Dispose()
-	end
-	if textSmall ~= nil then
-		textSmall:Dispose()
-	end
-	if textLarge ~= nil then
-		textLarge:Dispose()
-	end
-	if favoriteicon ~= nil then
-		favoriteicon:Dispose()
-	end
-	-- for _, sound in pairs(sounds) do
-	-- 	sound:Dispose()
-	-- end
-	for _, bar in pairs(bars) do
-		bar:Dispose()
-	end
-	for _, bg in pairs(bgtx) do
-		bg:Dispose()
-	end
-	for _, overlay in pairs(genre_overlays) do
-		overlay:Dispose()
-	end
+	if text ~= nil then text:Dispose() end
+	if textSmall ~= nil then textSmall:Dispose() end
+	if textLarge ~= nil then textLarge:Dispose() end
+	if favoriteicon ~= nil then favoriteicon:Dispose() end
+	for _, bar in pairs(bars) do bar:Dispose() end
+	for _, bg in pairs(bgtx) do bg:Dispose() end
+	for _, overlay in pairs(genre_overlays) do overlay:Dispose() end
 end

@@ -287,7 +287,6 @@ internal class CStage曲読み込み : CStage {
 				}
 			}
 		} else if (isAI) {
-			OpenTaiko.ConfigIni.tInitializeAILevel();
 			drawPlate_AI();
 		} else {
 			drawPlate();

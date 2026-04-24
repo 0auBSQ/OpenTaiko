@@ -143,23 +143,7 @@
         "Restricted1P": true,
         "LEGACY_MenuBoxColor": "Red"
     },
-    "10": {
-        "StageName": {
-            "strings": {
-                "default": "song_select"
-            }
-        },
-        "StageDescription": {
-            "strings": {
-                "default": "Testing dream song select"
-            }
-        },
-        "StageType": "Lua",
-        "LuaStageName": "song_select",
-        "Restricted1P": true,
-        "LEGACY_MenuBoxColor": "Red"
-    },
-	"11": {
+	"10": {
         "StageName": {
             "strings": {
                 "default": "mini_heya"
@@ -175,7 +159,7 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Yellow"
     },
-    "12": {
+    "11": {
         "StageName": {
             "strings": {
                 "default": "theme_settings_debug"
@@ -191,7 +175,7 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Lime"
     },
-    "13": {
+    "12": {
         "StageName": {
             "strings": {
                 "default": "dan_plate_test"
@@ -207,7 +191,7 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Lime"
     },
-    "14": {
+    "13": {
         "StageName": {
             "strings": {
                 "default": "dan_select"
@@ -223,7 +207,7 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Orange"
     },
-    "15": {
+    "14": {
         "StageName": {
             "strings": {
                 "default": "dan_builder_test"
@@ -239,5 +223,53 @@
         "Restricted1P": false,
         "LEGACY_MenuBoxColor": "Cyan"
     },
-    "count": 15
+    "15": {
+        "StageName": {
+            "strings": {
+                "default": "regular_song_select"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Song select (activity-based)."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "regular_song_select",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Red"
+    },
+    "16": {
+        "StageName": {
+            "strings": {
+                "default": "ai_battle_song_select"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Song select for AI battle mode."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "ai_battle_song_select",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Blue"
+    },
+    "17": {
+        "StageName": {
+            "strings": {
+                "default": "training_song_select"
+            }
+        },
+        "StageDescription": {
+            "strings": {
+                "default": "Song select with training mode always on."
+            }
+        },
+        "StageType": "Lua",
+        "LuaStageName": "training_song_select",
+        "Restricted1P": false,
+        "LEGACY_MenuBoxColor": "Green"
+    },
+    "count": 17
 }

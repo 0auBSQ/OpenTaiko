@@ -54,6 +54,7 @@ local dan_plategradation = { }
 
 local players = { }
 local players_blue = nil
+local players_ai   = nil
 
 local title_plates = { { } }
 local title_plate_star_big = { }
@@ -261,7 +262,10 @@ local function implDrawTitlePlate(x, y, opacity, titleTexIndex)
 end
 
 local function implDrawPlayerRing(x, y, opacity, player_lua, side_lua)
-	if player_lua == 1 and side_lua == 2 then
+	if CONFIG.IsAIBattleMode and player_lua == 2 then
+		players_ai:SetOpacity(toOpacity(opacity))
+		players_ai:Draw(x, y)
+	elseif player_lua == 1 and side_lua == 2 then
 		players_blue:SetOpacity(toOpacity(opacity))
 		players_blue:Draw(x, y)
 	else
@@ -338,6 +342,7 @@ function onStart()
 		players[i] = TEXTURE:CreateTexture(TEXTURES_DIR .. tostring(i) .. "P.png")
 	end
 	players_blue = TEXTURE:CreateTexture(TEXTURES_DIR .. "1P_Blue.png")
+	players_ai   = TEXTURE:CreateTexture(TEXTURES_DIR .. "AI.png")
 
 	-- Title plates
 	for i = 1, #config_titletypes do
@@ -431,6 +436,14 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 	local nameplateId = nameplateIdOvr ~= nil and nameplateIdOvr or (data.TitleId or -1)
 	local danText     = danTextOvr     ~= nil and danTextOvr     or dan_text[player_lua]
 	local danShortTxt = danTextOvr     ~= nil and danTextOvr     or dan_short_text[player_lua]
+	-- In AI battle the dan reflects the current AI level, which may change during song select.
+	-- Read it live so the nameplate stays in sync without any cross-state refresh.
+	if CONFIG.IsAIBattleMode and player_lua == 2 then
+		local stages = {"初", "二", "三", "四", "五", "六", "七", "八", "九", "極"}
+		local aiDan = stages[math.max(1, math.min(10, CONFIG.AILevel))] .. "面"
+		danText     = aiDan
+		danShortTxt = aiDan
+	end
 	local danGradeIdx = danGradeOvr    ~= nil
 	                    and math.max(1, math.min(3, danGradeOvr + 1))
 	                    or  (data.DanType + 1)
