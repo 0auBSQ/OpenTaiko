@@ -305,7 +305,7 @@ internal class CStage曲読み込み : CStage {
 			OpenTaiko.Tx.SongLoading_Bg_Dan.t2D描画(0, 0 - (ct待機.CurrentValue <= 600 ? ct待機.CurrentValue / 10f : 60));
 
 			CTexture dp = (OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null)
-				? OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.n現在の選択行].txDanPlate
+				? OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.Cursor.IdxItem].txDanPlate
 				: null;
 
 			CActSelect段位リスト.tDisplayDanPlate(dp,

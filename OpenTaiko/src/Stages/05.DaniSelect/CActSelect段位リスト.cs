@@ -7,6 +7,8 @@ namespace OpenTaiko;
 
 class CActSelect段位リスト : CStage {
 	public CActSelect段位リスト() {
+		this.Cursor = new() { UpdateInfo = () => this.tUpdateSongs() };
+
 		for (int i = 0; i < 10; i++) {
 			stLevel[i].ch = i.ToString().ToCharArray()[0];
 			stLevel[i].pt = new Point(i * 14, 0);
@@ -44,24 +46,7 @@ class CActSelect段位リスト : CStage {
 			this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
 		}
 
-		currentFolder = null;
-		listSongs = OpenTaiko.Songs管理.list曲ルート_Dan;
-		// initialize cursors
-		if (this.NowSelectedItems.Count == 0)
-			this.NowSelectedItems.Add(0);
-		// re-enter folders
-		for (int i = 1; i < this.NowSelectedItems.Count; ++i) {
-			var idx = this.NowSelectedItems[i - 1];
-			var idxChild = this.NowSelectedItems[i];
-			CSongListNode? node = listSongs.ElementAtOrDefault(idx);
-			if (node?.nodeType != CSongListNode.ENodeType.BOX) {
-				// invalid folder
-				this.NowSelectedItems.RemoveRange(i, this.NowSelectedItems.Count - i);
-				break;
-			}
-			currentFolder = node;
-			listSongs = node.childrenList;
-		}
+		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Dan);
 		tUpdateSongs();
 
 		base.Activate();
@@ -115,9 +100,9 @@ class CActSelect段位リスト : CStage {
 
 			tDrawDanSelectedLevel(Anime);
 
-			if (bLeftMove && n現在の選択行 - 1 >= 0)
+			if (bLeftMove && this.Cursor.IdxItem - 1 >= 0)
 				tDrawDanSelectedLevel(Anime, -1);
-			if (!bLeftMove && n現在の選択行 + 1 <= stバー情報.Length - 1)
+			if (!bLeftMove && this.Cursor.IdxItem + 1 <= stバー情報.Length - 1)
 				tDrawDanSelectedLevel(Anime, 1);
 		}
 
@@ -127,9 +112,9 @@ class CActSelect段位リスト : CStage {
 
 		if (ctDaniMoveAnime.CurrentValue == 90) {
 			if (bLeftMove) {
-				this.n現在の選択行 -= n現在の選択行 - 1 >= 0 ? 1 : 0;
+				this.Cursor.IdxItem -= Cursor.IdxItem - 1 >= 0 ? 1 : 0;
 			} else {
-				this.n現在の選択行 += n現在の選択行 + 1 < this.stバー情報.Length ? 1 : 0;
+				this.Cursor.IdxItem += Cursor.IdxItem + 1 < this.stバー情報.Length ? 1 : 0;
 			}
 			ctDaniMoveAnime.Stop();
 			ctDaniMoveAnime.CurrentValue = 0;
@@ -155,7 +140,7 @@ class CActSelect段位リスト : CStage {
 			if (ctDaniIn.CurrentValue < 5000 + (idx + 13) * 33)
 				break;
 
-			int currentSong = n現在の選択行 + idx;
+			int currentSong = Cursor.IdxItem + idx;
 
 			if (currentSong < 0)
 				continue;
@@ -254,12 +239,6 @@ class CActSelect段位リスト : CStage {
 
 	private CCounter ctDaniMoveAnime;
 
-	public List<int> NowSelectedItems = [0]; // last is for item including closed folder, others are for open parents folders
-	public int n現在の選択行 {
-		get => Math.Max(0, Math.Min(NowSelectedItems[NowSelectedItems.Count - 1], listSongs.Count - 1));
-		set => NowSelectedItems[NowSelectedItems.Count - 1] = value;
-	}
-
 	private bool bLeftMove;
 
 	private CCachedFontRenderer pfDanFolder, pfDanFolderDesc, pfDanSong, pfExamFont;
@@ -269,8 +248,7 @@ class CActSelect段位リスト : CStage {
 	private CStageSongSelect.STNumber[] stSoulNumber = new CStageSongSelect.STNumber[10];
 	private CStageSongSelect.STNumber[] stExamNumber = new CStageSongSelect.STNumber[10];
 
-	public CSongListNode? currentFolder = null;
-	public List<CSongListNode> listSongs = [];
+	public SongSelectCursor Cursor;
 	public STバー情報[] stバー情報;
 
 	public struct STバー情報 {
@@ -286,12 +264,6 @@ class CActSelect段位リスト : CStage {
 		public int clearGrade;
 		public int nDanTick;
 		public Color cDanTickColor;
-	}
-
-	public CSongListNode? currentBar {
-		get {
-			return listSongs.ElementAtOrDefault(n現在の選択行);
-		}
 	}
 
 	static CCachedFontRenderer pfDanPlateTitle = null;
@@ -404,7 +376,7 @@ class CActSelect段位リスト : CStage {
 
 	private void tDrawDanSelectedLevel(float Anime, int modifier = 0) {
 		int scroll = OpenTaiko.Skin.Resolution[0] * modifier;
-		int currentSong = Math.Clamp(n現在の選択行 + modifier, 0, stバー情報.Length - 1);
+		int currentSong = Math.Clamp(Cursor.IdxItem + modifier, 0, stバー情報.Length - 1);
 		bool over4 = false;
 
 		switch (stバー情報[currentSong].eノード種別) {
@@ -705,39 +677,22 @@ class CActSelect段位リスト : CStage {
 		}
 	}
 
-	public void tOpenFolder(CSongListNode song) {
-		currentFolder = song;
-		listSongs = song.childrenList;
-		NowSelectedItems.Add(0);
-		tUpdateSongs();
-	}
-
-	public void tCloseFolder() {
-		if (currentFolder == null)
-			return;
-		currentFolder = currentFolder.rParentNode;
-		listSongs = currentFolder.childrenList;
-		if (NowSelectedItems.Count > 1)
-			NowSelectedItems.RemoveAt(this.NowSelectedItems.Count - 1);
-		tUpdateSongs();
-	}
-
 	private void tUpdateSongs() {
-		stバー情報 = new STバー情報[listSongs.Count];
+		stバー情報 = new STバー情報[Cursor.Items.Count];
 		this.tバーの初期化();
 	}
 
 	private void tバーの初期化() {
 		for (int i = 0; i < stバー情報.Length; i++) {
-			var song = listSongs[i];
+			var song = Cursor.Items[i];
 
 			stバー情報[i].eノード種別 = song.nodeType;
 			switch (song.nodeType) {
 				case CSongListNode.ENodeType.SCORE: {
-						stバー情報[i].ttkタイトル = new TitleTextureKey[listSongs[i].DanSongs.Count + 1];
-						stバー情報[i].n曲難易度 = new int[listSongs[i].DanSongs.Count];
-						stバー情報[i].n曲レベル = new int[listSongs[i].DanSongs.Count];
-						for (int j = 0; j < listSongs[i].DanSongs.Count; j++) {
+						stバー情報[i].ttkタイトル = new TitleTextureKey[Cursor.Items[i].DanSongs.Count + 1];
+						stバー情報[i].n曲難易度 = new int[Cursor.Items[i].DanSongs.Count];
+						stバー情報[i].n曲レベル = new int[Cursor.Items[i].DanSongs.Count];
+						for (int j = 0; j < Cursor.Items[i].DanSongs.Count; j++) {
 							stバー情報[i].ttkタイトル[j] = new TitleTextureKey(song.DanSongs[j].bTitleShow ? "???" : song.DanSongs[j].Title, pfDanSong, Color.White, Color.Black, 700);
 							stバー情報[i].n曲難易度[j] = song.DanSongs[j].Difficulty;
 							stバー情報[i].n曲レベル[j] = song.DanSongs[j].Level;
@@ -747,7 +702,7 @@ class CActSelect段位リスト : CStage {
 						// Two char header, will be used for grade unlocking too
 						string tmp = song.ldTitle.GetString("").TrimStringWithTags(2);
 
-						stバー情報[i].ttkタイトル[listSongs[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
+						stバー情報[i].ttkタイトル[Cursor.Items[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
 						stバー情報[i].nDanTick = song.score[6].譜面情報.nDanTick;
 						stバー情報[i].cDanTickColor = song.score[6].譜面情報.cDanTickColor;
@@ -804,7 +759,7 @@ class CActSelect段位リスト : CStage {
 	}
 
 	public void t右に移動() {
-		if (n現在の選択行 < stバー情報.Length - 1) {
+		if (Cursor.IdxItem < stバー情報.Length - 1) {
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
 			this.bLeftMove = false;
 			this.ctDaniMoveAnime.Start(0, 90, 2f, OpenTaiko.Timer);
@@ -812,7 +767,7 @@ class CActSelect段位リスト : CStage {
 	}
 
 	public void t左に移動() {
-		if (n現在の選択行 > 0) {
+		if (Cursor.IdxItem > 0) {
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
 			this.bLeftMove = true;
 			this.ctDaniMoveAnime.Start(0, 90, 2f, OpenTaiko.Timer);

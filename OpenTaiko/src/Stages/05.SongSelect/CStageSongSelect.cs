@@ -74,6 +74,62 @@ static internal class CSongSelectSongManager {
 
 #endregion
 
+internal class SongSelectCursor {
+	public void Activate(List<CSongListNode> rootList) {
+		Folder = null;
+		Items = rootList;
+		// initialize cursors
+		if (this.IdxesPath.Count == 0)
+			this.IdxesPath.Add(0);
+		// re-enter folders
+		for (int i = 1; i < this.IdxesPath.Count; ++i) {
+			var idx = this.IdxesPath[i - 1];
+			var idxChild = this.IdxesPath[i];
+			CSongListNode? node = Items.ElementAtOrDefault(idx);
+			if (node?.nodeType != CSongListNode.ENodeType.BOX) {
+				// invalid folder
+				this.IdxesPath.RemoveRange(i, this.IdxesPath.Count - i);
+				break;
+			}
+			Folder = node;
+			Items = node.childrenList;
+		}
+		this.UpdateInfo?.Invoke();
+	}
+
+	public void tOpenFolder(CSongListNode song) {
+		Folder = song;
+		Items = song.childrenList;
+		IdxesPath.Add(0);
+		this.UpdateInfo?.Invoke();
+	}
+
+	public void tCloseFolder() {
+		if (Folder == null)
+			return;
+		Folder = Folder.rParentNode;
+		Items = Folder.childrenList;
+		if (IdxesPath.Count > 1)
+			IdxesPath.RemoveAt(this.IdxesPath.Count - 1);
+		this.UpdateInfo?.Invoke();
+	}
+
+	public bool IsInRootFolder(string rootGenreName)
+		=> this.Folder == null || (OpenTaiko.Songs管理.list曲ルート.Contains(this.Folder) && this.Folder.songGenre == rootGenreName);
+
+	public int IdxItem {
+		get => Math.Max(0, Math.Min(IdxesPath[IdxesPath.Count - 1], Items.Count - 1));
+		set => IdxesPath[IdxesPath.Count - 1] = value;
+	}
+	public CSongListNode? Item => Items.ElementAtOrDefault(IdxItem);
+
+	private List<int> IdxesPath = [0]; // last is for item including closed folder, others are for open parents folders
+	public CSongListNode? Folder { get; private set; }  = null;
+	public List<CSongListNode> Items { get; private set; } = [];
+
+	public required Action? UpdateInfo { get; init; } = null;
+}
+
 internal class CStageSongSelect : CStage {
 	// Properties
 	public int nスクロールバー相対y座標 {
