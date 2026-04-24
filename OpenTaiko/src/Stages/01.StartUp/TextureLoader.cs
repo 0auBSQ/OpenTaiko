@@ -1192,6 +1192,11 @@ class TextureLoader {
 		for (int i = 0; i < 5; i++) {
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(OpenTaiko.Skin.Characters_DirName);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
+
+			// If the saved puchichara folder no longer exists, fall back to index 0.
+			string puchi = OpenTaiko.SaveFileInstances[i].data.PuchiChara;
+			if (OpenTaiko.Skin.Puchicharas_Name.Length > 0 && !OpenTaiko.Skin.Puchicharas_NameToIndex.ContainsKey(puchi))
+				OpenTaiko.SaveFileInstances[i].data.PuchiChara = OpenTaiko.Skin.Puchicharas_Name[0];
 		}
 
 

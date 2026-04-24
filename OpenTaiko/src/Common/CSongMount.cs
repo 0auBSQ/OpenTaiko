@@ -28,5 +28,18 @@ internal class CSongMount {
 
 	// Current selection state (updated live during song select navigation)
 	public int nCurrentSongDifficulty { get; set; }
-	public CScore? rCurrentScore => rCurrentlySelectedSong?.score[nCurrentSongDifficulty];
+	public CScore? rCurrentScore {
+		get {
+			if (rCurrentlySelectedSong == null) return null;
+			var direct = rCurrentlySelectedSong.score[nCurrentSongDifficulty];
+			if (direct != null) return direct;
+			// The anchored difficulty has no chart for this song; find the nearest non-null score.
+			for (int i = 1; i < rCurrentlySelectedSong.score.Length; i++) {
+				int candidate = (nCurrentSongDifficulty + i) % rCurrentlySelectedSong.score.Length;
+				var s = rCurrentlySelectedSong.score[candidate];
+				if (s != null) return s;
+			}
+			return null;
+		}
+	}
 }
