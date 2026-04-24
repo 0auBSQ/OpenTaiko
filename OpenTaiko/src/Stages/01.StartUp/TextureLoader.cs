@@ -951,6 +951,11 @@ class TextureLoader {
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
 			PlayerCharacters[i] = new LuaCharacter(i);
+
+			// If the saved puchichara folder no longer exists, fall back to index 0.
+			string puchi = OpenTaiko.SaveFileInstances[i].data.PuchiChara;
+			if (OpenTaiko.Skin.Puchicharas_Name.Length > 0 && !OpenTaiko.Skin.Puchicharas_NameToIndex.ContainsKey(puchi))
+				OpenTaiko.SaveFileInstances[i].data.PuchiChara = OpenTaiko.Skin.Puchicharas_Name[0];
 		}
 
 		LuaCharacterDb?.Dispose();

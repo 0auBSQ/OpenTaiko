@@ -176,9 +176,12 @@ internal class SaveFile {
 	public void tReindexCharacter(string[] characterNamesList) {
 		string character = this.data.CharacterName;
 
-		if (characterNamesList.Contains(character))
+		if (characterNamesList.Contains(character)) {
 			this.data.Character = characterNamesList.ToList().IndexOf(character);
-
+		} else {
+			// Character folder no longer exists on disk — fall back to index 0 (None).
+			this.data.Character = 0;
+		}
 	}
 
 	public void tUpdateCharacterName(string newChara) {
