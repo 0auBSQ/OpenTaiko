@@ -27,7 +27,9 @@ internal class CSongs管理 {
 	}
 	public Dictionary<string, CSongListNode> listSongsDB;                   // songs.dbから構築されるlist
 	public List<CSongListNode> list曲ルート;         // 起動時にフォルダ検索して構築されるlist
+	public HashSet<CSongListNode> SongRootsDan = [];
 	public List<CSongListNode> list曲ルート_Dan = new List<CSongListNode>();          // 起動時にフォルダ検索して構築されるlist
+	public HashSet<CSongListNode> SongRootsTower = [];
 	public List<CSongListNode> list曲ルート_Tower = new List<CSongListNode>();          // 起動時にフォルダ検索して構築されるlist
 	public static List<FDK.CTexture> listCustomBGs = new List<FDK.CTexture>();
 	public bool bIsCanceled { get; set; }
@@ -616,6 +618,24 @@ internal class CSongs管理 {
 
 	#region [ 曲リストへ後処理を適用する ]
 	//-----------------
+	public static int DistanceFromRoots(CSongListNode? node, HashSet<CSongListNode>? roots = null) {
+		int dist = 0;
+		for (; node != null; node = node.rParentNode, ++dist) {
+			if (roots != null && roots.Contains(node))
+				return dist;
+		}
+		if (roots == null) // from the root song folder
+			return dist;
+		return -1; // negative for unreachable
+	}
+
+	private void ResetSongRoots() {
+		this.SongRootsDan = [];
+		this.list曲ルート_Dan = [];
+		this.SongRootsTower = [];
+		this.list曲ルート_Tower = [];
+	}
+
 	public void tSongListPostprocessing() {
 		listStrBoxDefSkinSubfolderFullName = new List<string>();
 		if (OpenTaiko.Skin.strBoxDefSkinSubfolders != null) {
@@ -624,6 +644,7 @@ internal class CSongs管理 {
 			}
 		}
 
+		this.ResetSongRoots();
 		this.tSongListPostprocessing(this.list曲ルート);
 
 		for (int p = 0; p < list曲ルート.Count; p++) {
@@ -636,14 +657,20 @@ internal class CSongs管理 {
 					}
 
 					// Add to dojo
-					list曲ルート_Dan = c曲リストノード.childrenList;
+					if (DistanceFromRoots(c曲リストノード, this.SongRootsDan) < 0) {
+						this.SongRootsDan.Add(c曲リストノード);
+						list曲ルート_Dan.AddRange(c曲リストノード.childrenList);
+					}
 				} else if (c曲リストノード.songGenre == "太鼓タワー") {
 					if (OpenTaiko.ConfigIni.bDanTowerHide) {
 						list曲ルート.Remove(c曲リストノード);
 						p--;
 					}
 
-					list曲ルート_Tower = c曲リストノード.childrenList;
+					if (DistanceFromRoots(c曲リストノード, this.SongRootsTower) < 0) {
+						this.SongRootsTower.Add(c曲リストノード);
+						list曲ルート_Tower.AddRange(c曲リストノード.childrenList);
+					}
 				} else {
 					for (int i = 0; i < c曲リストノード.childrenList.Count; i++) {
 						if (c曲リストノード.childrenList[i].score[6] != null) {
