@@ -26,6 +26,7 @@ internal class CSongs管理 {
 		set;
 	}
 	public Dictionary<string, CSongListNode> listSongsDB;                   // songs.dbから構築されるlist
+	public CSongListNode? SongRootDownload = null;
 	public List<CSongListNode> list曲ルート;         // 起動時にフォルダ検索して構築されるlist
 	public HashSet<CSongListNode> SongRootsDan = [];
 	public List<CSongListNode> list曲ルート_Dan = new List<CSongListNode>();          // 起動時にフォルダ検索して構築されるlist
@@ -67,23 +68,15 @@ internal class CSongs管理 {
 	//-----------------
 
 	public void UpdateDownloadBox() {
-
-		CSongListNode downloadBox = null;
-		for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
-			if (OpenTaiko.Songs管理.list曲ルート[i].songGenre == "Download") {
-				downloadBox = OpenTaiko.Songs管理.list曲ルート[i];
-				if (downloadBox.rParentNode != null) downloadBox = downloadBox.rParentNode;
-			}
-
-		}
+		CSongListNode? downloadBox = OpenTaiko.Songs管理.SongRootDownload;
 
 		if (downloadBox != null && downloadBox.childrenList != null) {
 
 			var flatten = OpenTaiko.stageSongSelect.actSongList.flattenList(downloadBox.childrenList);
 
 			// Works because flattenList creates a new List
-			foreach (var note in downloadBox.childrenList) {
-				CSongDict.tRemoveSongNode(note.uniqueId);
+			foreach (var node in downloadBox.childrenList) {
+				CSongDict.tRemoveSongNode(node.uniqueId);
 			}
 			downloadBox.childrenList.Clear();
 
@@ -91,12 +84,6 @@ internal class CSongs管理 {
 			var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
 
 			if (flatten.Count > 0) {
-				int index = list曲ルート.IndexOf(flatten[0]);
-				if (!list曲ルート.Contains(downloadBox)) {
-					this.list曲ルート = this.list曲ルート.Except(flatten).ToList();
-					list曲ルート.Insert(index, downloadBox);
-				}
-
 				t曲を検索してリストを作成する(path, true, downloadBox.childrenList, downloadBox);
 				this.tSongListPostprocessing(downloadBox.childrenList, $"/{downloadBox.ldTitle.GetString("")}/");
 				downloadBox.childrenList.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.ldTitle.GetString("")}/"));
@@ -630,6 +617,7 @@ internal class CSongs管理 {
 	}
 
 	private void ResetSongRoots() {
+		this.SongRootDownload = null;
 		this.SongRootsDan = [];
 		this.list曲ルート_Dan = [];
 		this.SongRootsTower = [];
@@ -671,6 +659,10 @@ internal class CSongs管理 {
 						this.SongRootsTower.Add(c曲リストノード);
 						list曲ルート_Tower.AddRange(c曲リストノード.childrenList);
 					}
+				} else if (c曲リストノード.songGenre == "Download") {
+					// use the closest from the root song folder
+					if (this.SongRootDownload == null || DistanceFromRoots(c曲リストノード) < DistanceFromRoots(this.SongRootDownload))
+						this.SongRootDownload = c曲リストノード;
 				} else {
 					for (int i = 0; i < c曲リストノード.childrenList.Count; i++) {
 						if (c曲リストノード.childrenList[i].score[6] != null) {
