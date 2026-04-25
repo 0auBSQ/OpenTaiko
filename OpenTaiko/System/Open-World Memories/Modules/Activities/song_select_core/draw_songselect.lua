@@ -45,6 +45,8 @@ local HEADER_OFFSET_X         = 1780
 local HEADER_BOX_TEXT_OFFSET_X = 250
 local HEADER_BOX_TEXT_OFFSET_Y = 12
 
+local BARLEFT_X_OFFSET             = -67   -- pixels left of bar.png topleft
+
 local NAMEPLATE_BOX_FOLDED_SIZE_Y  = 182
 local NAMEPLATE_SECONDARY_OFFSET_Y = 81
 local NAMEPLATE_BOX_START_X        = 0
@@ -103,6 +105,48 @@ local function drawLevelTag(songNode, x, y)
     G.drawNumberCentered(level, "levellabels", x, y)
     if chart.IsPlus == true then
         G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
+    end
+end
+
+local function drawBarleft(node, xpos, ypos)
+    local barW = G.bars["bar"].Width
+    local barH = G.bars["bar"].Height
+    local lx   = xpos - barW / 2 + BARLEFT_X_OFFSET
+    local ly   = ypos - barH / 2
+
+    G.bars["barleft"]:Draw(lx, ly)
+
+    local chart = getSongNodeFocusChart(node)
+    if chart == nil then
+        G.bars["scorerank_none"]:Draw(lx, ly)
+        G.bars["clearstatus_none"]:Draw(lx, ly)
+        return
+    end
+
+    local info   = chart:GetPlayerBestScore(G.highlightedPlayer)
+    local played = info.HasBeenPlayed
+    local cs     = info.ClearStatus
+    local sr     = info.ScoreRank
+
+    -- cs stored: 0=never played/failed, 1=assisted, 2=clear, 3=FC, 4=perfect.
+    if not played then
+        G.bars["clearstatus_none"]:Draw(lx, ly)
+        G.bars["scorerank_none"]:Draw(lx, ly)
+    elseif cs == 0 then
+        -- Played but failed
+        G.bars["clearstatus_m1"]:Draw(lx, ly)
+        if sr == 0 then
+            G.bars["scorerank_m1"]:Draw(lx, ly)
+        else
+            G.bars["scorerank_" .. (sr - 1)]:Draw(lx, ly)
+        end
+    else
+        G.bars["clearstatus_" .. (cs - 1)]:Draw(lx, ly)
+        if sr == 0 then
+            G.bars["scorerank_m1"]:Draw(lx, ly)
+        else
+            G.bars["scorerank_" .. (sr - 1)]:Draw(lx, ly)
+        end
     end
 end
 
@@ -214,6 +258,7 @@ function M.drawPanel()
                         G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
                         G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
                     end
+                    if node.IsSong then drawBarleft(node, xpos, ypos) end
                     drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
                 elseif node.IsRandom then
                     G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
@@ -230,8 +275,17 @@ function M.drawPanel()
         local ax     = G.arrowsDistance
         local xlshift = ax * math.cos(7 * math.pi / 12)
         local ylshift = ax * math.sin(7 * math.pi / 12)
-        G.bars["selected"]:DrawAtAnchor(x0, y0, "center")
-        G.bars["selected-arrow-l"]:DrawAtAnchor(x0 - SONGLIST_SELECTED_ARROW_GAP/2 + xlshift, y0 - ylshift, "left")
+        local isSong = ssn ~= nil and ssn.IsSong
+        if isSong then
+            -- selectedlarge covers bar + barleft; align its right edge with selected's right edge
+            local largeCenterX = x0 - (G.bars["selectedlarge"].Width - G.bars["selected"].Width) / 2
+            G.bars["selectedlarge"]:DrawAtAnchor(largeCenterX, y0, "center")
+        else
+            G.bars["selected"]:DrawAtAnchor(x0, y0, "center")
+        end
+        -- Left arrow shifts 67px further left when a song is selected to clear barleft
+        local arrowLOffset = isSong and BARLEFT_X_OFFSET or 0
+        G.bars["selected-arrow-l"]:DrawAtAnchor(x0 - SONGLIST_SELECTED_ARROW_GAP/2 + xlshift + arrowLOffset, y0 - ylshift, "left")
         G.bars["selected-arrow-r"]:DrawAtAnchor(x0 + SONGLIST_SELECTED_ARROW_GAP/2 - xlshift, y0 + ylshift, "right")
     end
 

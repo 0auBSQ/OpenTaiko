@@ -83,8 +83,12 @@ function M.applySort()
     local function getChart(node)
         if not node.IsSong then return nil end
         local c = node:GetChart(displayedDiff)
+        -- Oni/Edit: if one is missing prefer the other before falling back further
+        if c == nil and displayedDiff == 4 then c = node:GetChart(3) end
+        if c == nil and displayedDiff == 3 then c = node:GetChart(4) end
+        -- General fallback: prefer harder difficulties
         if c == nil then
-            for d = 0, 4 do c = node:GetChart(d); if c ~= nil then break end end
+            for d = 4, 0, -1 do c = node:GetChart(d); if c ~= nil then break end end
         end
         return c
     end
@@ -100,18 +104,7 @@ function M.applySort()
             p = (node.Subtitle or ""):lower()
             s = origPos[node] or 0
         elseif methodIdx0 == 3 then                    -- level (+0.5 for IsPlus), 2nd=filepath
-            -- For Oni(3)/Edit(4): if the displayed diff is missing, try the other one
-            local c
-            if not node.IsSong then
-                c = nil
-            elseif displayedDiff == 3 then
-                c = node:GetChart(3); if c == nil then c = node:GetChart(4) end
-            elseif displayedDiff == 4 then
-                c = node:GetChart(4); if c == nil then c = node:GetChart(3) end
-            else
-                c = getChart(node)
-            end
-            if c == nil then c = getChart(node) end    -- final fallback
+            local c    = getChart(node)
             local lvl  = c and c.Level or -1
             local plus = (c ~= nil and c.IsPlus) and 0.5 or 0
             p = lvl + plus

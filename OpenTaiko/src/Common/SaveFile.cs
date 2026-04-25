@@ -368,6 +368,7 @@ internal class SaveFile {
 				songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
 				songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
 				songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
+				songSelectTableEntries[key].PlayedDifficulties[(int)bestPlay.ChartDifficulty] = true;
 			}
 
 			bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);

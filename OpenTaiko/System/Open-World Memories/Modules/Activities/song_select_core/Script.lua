@@ -235,6 +235,7 @@ function onStart()
     G.bars["back"]             = TEXTURE:CreateTexture("Textures/back.png")
     G.bars["locked"]           = TEXTURE:CreateTexture("Textures/locked.png")
     G.bars["selected"]         = TEXTURE:CreateTexture("Textures/selected.png")
+    G.bars["selectedlarge"]    = TEXTURE:CreateTexture("Textures/selectedlarge.png")
     G.bars["selected-arrow-l"] = TEXTURE:CreateTexture("Textures/selected-arrow-l.png")
     G.bars["selected-arrow-r"] = TEXTURE:CreateTexture("Textures/selected-arrow-r.png")
     G.bars["levellabels"]      = TEXTURE:CreateTexture("Textures/bar_levelbg.png")
@@ -252,6 +253,18 @@ function onStart()
     G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
     for i = 1, 7 do
         G.bars["difficultybarlevel" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff" .. i .. ".png")
+    end
+
+    G.bars["barleft"]          = TEXTURE:CreateTexture("Textures/barleft.png")
+    G.bars["scorerank_none"]   = TEXTURE:CreateTexture("Textures/ScoreRank/None.png")
+    G.bars["scorerank_m1"]     = TEXTURE:CreateTexture("Textures/ScoreRank/-1.png")
+    for i = 0, 6 do
+        G.bars["scorerank_" .. i] = TEXTURE:CreateTexture("Textures/ScoreRank/" .. i .. ".png")
+    end
+    G.bars["clearstatus_none"] = TEXTURE:CreateTexture("Textures/ClearStatus/None.png")
+    G.bars["clearstatus_m1"]   = TEXTURE:CreateTexture("Textures/ClearStatus/-1.png")
+    for i = 0, 3 do
+        G.bars["clearstatus_" .. i] = TEXTURE:CreateTexture("Textures/ClearStatus/" .. i .. ".png")
     end
 
     G.favoriteicon  = TEXTURE:CreateTexture("Textures/fav.png")
@@ -309,10 +322,9 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
         G.difficultyFade4 = math.max(0, math.min(255, fadeIn, fadeOut))
     end)
     G.startCounter("selectbox_animation", 2000, 0, 1/600, "loop", function(val)
-        if G.bars["selected"] then
-            local n = 1.01 + math.sin(val * (math.pi * 2 / 2000)) * 0.01
-            G.bars["selected"]:SetScale(n, n)
-        end
+        local n = 1.01 + math.sin(val * (math.pi * 2 / 2000)) * 0.01
+        if G.bars["selected"]      then G.bars["selected"]:SetScale(n, n)      end
+        if G.bars["selectedlarge"] then G.bars["selectedlarge"]:SetScale(n, n) end
     end)
     G.startCounter("arrows_animation", 10, 0, 1/10, "bounce", function(val)
         G.arrowsDistance = val
