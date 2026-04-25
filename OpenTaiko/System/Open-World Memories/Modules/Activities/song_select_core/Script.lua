@@ -94,6 +94,14 @@ local activeConfig = {}
 -- Last signal returned by update(); used so deactivate() knows whether we're heading to play
 local lastSignal = nil
 
+-- Sort state
+-- originalOrders[folderNode] = {node1, node2, ...}  (captured once per folder, never mutated)
+local originalOrders      = {}
+-- Tracks when sort_search_dialog transitions from active → inactive so we can re-sort
+local wasSortDialogActive = false
+-- Forward declaration so helpers defined before the sort block can call it
+local applySort
+
 
 -- Inputs for each player
 local inputSets = {
@@ -478,7 +486,7 @@ local function playPreview(songNode)
 	end
 end
 
-local function refreshPage()
+local function refreshPage(skipMedia)
 	currentPage = {}
 	pageTexts = {}
 
@@ -502,7 +510,7 @@ local function refreshPage()
 			end
 		end
 
-		if i == 0 and node ~= nil then
+		if i == 0 and node ~= nil and not skipMedia then
 			reloadPreimage(node)
 			playPreview(node)
 		end
@@ -516,12 +524,18 @@ local function handleDecideSongSelect()
 
 	if ssn.IsFolder == true then
 		local success = songList:OpenFolder()
+		if success == true then
+			applySort()
+			sounds.Decide:Play()
+		end
 		refreshPage()
-		if success == true then sounds.Decide:Play() end
 	elseif ssn.IsReturn == true then
 		local success = songList:CloseFolder()
+		if success == true then
+			applySort()
+			sounds.Cancel:Play()
+		end
 		refreshPage()
-		if success == true then sounds.Cancel:Play() end
 	elseif ssn.IsSong == true then
 		sounds.SongDecide:Play()
 		return ssn
@@ -614,6 +628,194 @@ local function resetToSongSelect()
 	difficultySelectElemOpacity = 0
 	songSelectShift = 0
 	activeScreen = "songselect"
+end
+
+-- ============================================================
+-- Sorting
+-- ============================================================
+
+local SORT_METHOD_KEY = "ss_sort_method"
+local SORT_DIR_KEY    = "ss_sort_dir"
+
+-- Capture the children of folderNode into originalOrders if not already done.
+-- Must be called while the list is in its unmodified (original) order.
+local function captureOriginalOrder(folderNode)
+	if originalOrders[folderNode] ~= nil then return end
+	local children = folderNode.Children
+	local snap = {}
+	for i = 0, children.Count - 1 do
+		snap[i + 1] = children[i]
+	end
+	originalOrders[folderNode] = snap
+end
+
+-- Apply the highlighted player's saved sort to the current folder.
+applySort = function()
+	if songList == nil then return end
+	local ssn = songList:GetSelectedSongNode()
+	if ssn == nil or ssn.IsRoot then return end
+
+	local folderNode = ssn.Parent
+	if folderNode == nil then return end
+
+	-- Capture once (before any mutation)
+	captureOriginalOrder(folderNode)
+	local orig = originalOrders[folderNode]
+
+	-- Read sort state for the highlighted player
+	local save       = GetSaveFile(highlightedPlayer)
+	local methodIdx0 = math.floor(save:GetGlobalCounter(SORT_METHOD_KEY) + 0.5)
+	local dirIdx     = math.floor(save:GetGlobalCounter(SORT_DIR_KEY)    + 0.5)
+	if methodIdx0 < 0 or methodIdx0 > 6 then methodIdx0 = 0 end
+	if dirIdx < 0 or dirIdx > 2         then dirIdx     = 1 end
+	if dirIdx == 0 then methodIdx0 = 0; dirIdx = 1 end  -- OFF → filepath ASC
+
+	local children = folderNode.Children
+
+	-- filepath ASC: restore original order exactly
+	if methodIdx0 == 0 and dirIdx == 1 then
+		children:Clear()
+		for _, node in ipairs(orig) do children:Add(node) end
+		return
+	end
+
+	-- Separate special nodes (back/random) from sortable nodes
+	local regular  = {}
+	local backs    = {}
+	local randoms  = {}
+	local origPos  = {}   -- node → 1-based index in orig (for filepath secondary sort)
+	for idx, node in ipairs(orig) do
+		origPos[node] = idx
+		if node.IsReturn then
+			backs[#backs + 1] = node
+		elseif node.IsRandom then
+			randoms[#randoms + 1] = node
+		else
+			regular[#regular + 1] = node
+		end
+	end
+
+	-- Deduce back-box frequency from original captured order
+	local backFreq = 7
+	if #backs > 0 then
+		-- First back box is at position 0 in orig; second at backFreq+1, etc.
+		-- Find the gap between first and second back box
+		local firstBack, secondBack = -1, -1
+		for idx, node in ipairs(orig) do
+			if node.IsReturn then
+				if firstBack == -1 then firstBack = idx
+				elseif secondBack == -1 then secondBack = idx; break end
+			end
+		end
+		if firstBack ~= -1 and secondBack ~= -1 then
+			backFreq = secondBack - firstBack - 1
+		end
+	end
+
+	-- Build sort keys for every regular node (compute once, sort from table)
+	local displayedDiff = CONFIG:GetDefaultCourse(0)
+
+	local function getChart(node)
+		if not node.IsSong then return nil end
+		local c = node:GetChart(displayedDiff)
+		if c == nil then
+			for d = 0, 4 do
+				c = node:GetChart(d)
+				if c ~= nil then break end
+			end
+		end
+		return c
+	end
+
+	local primary   = {}
+	local secondary = {}
+	local tertiary  = {}   -- always filepath ASC (origPos); used by methods 4/5/6
+
+	for _, node in ipairs(regular) do
+		local p, s, t = 0, 0, origPos[node] or 0
+		if methodIdx0 == 1 then        -- title (case-insensitive), 2nd=filepath
+			p = (node.Title or ""):lower()
+			s = origPos[node] or 0
+		elseif methodIdx0 == 2 then    -- subtitle (case-insensitive), 2nd=filepath
+			p = (node.Subtitle or ""):lower()
+			s = origPos[node] or 0
+		elseif methodIdx0 == 3 then    -- level (+0.5 for IsPlus), 2nd=filepath
+			-- For Oni(3)/Edit(4): if the displayed diff is missing, fall back to the other one
+			local c
+			if not node.IsSong then
+				c = nil
+			elseif displayedDiff == 3 then
+				c = node:GetChart(3); if c == nil then c = node:GetChart(4) end
+			elseif displayedDiff == 4 then
+				c = node:GetChart(4); if c == nil then c = node:GetChart(3) end
+			else
+				c = getChart(node)
+			end
+			if c == nil then c = getChart(node) end  -- final fallback for any diff
+			local lvl = c and c.Level or -1
+			local plus = (c ~= nil and c.IsPlus) and 0.5 or 0
+			p = lvl + plus
+			s = origPos[node] or 0
+		elseif methodIdx0 == 4 then    -- bpm, 2nd=level, 3rd=filepath
+			local c = getChart(node)
+			p = c and (c.BaseBPM or -1) or -1
+			local c2 = getChart(node)
+			s = c2 and c2.Level or -1
+			t = origPos[node] or 0
+		elseif methodIdx0 == 5 then    -- best score, 2nd=level, 3rd=filepath
+			local c = getChart(node)
+			if c ~= nil and node.IsSong then
+				local info = c:GetPlayerBestScore(highlightedPlayer)
+				p = info and info.HighScore or 0
+			else p = -1 end
+			local c2 = getChart(node)
+			s = c2 and c2.Level or -1
+			t = origPos[node] or 0
+		elseif methodIdx0 == 6 then    -- clear status, 2nd=best score, 3rd=filepath
+			local c = getChart(node)
+			if c ~= nil and node.IsSong then
+				local info = c:GetPlayerBestScore(highlightedPlayer)
+				p = info and info.ClearStatus or 0
+				s = info and info.HighScore  or 0
+			else p = -1; s = -1 end
+			t = origPos[node] or 0
+		end
+		primary[node]   = p
+		secondary[node] = s
+		tertiary[node]  = t
+	end
+
+	local desc = (dirIdx == 2)
+	table.sort(regular, function(a, b)
+		local pa, pb = primary[a],   primary[b]
+		local sa, sb = secondary[a], secondary[b]
+		local ta, tb = tertiary[a],  tertiary[b]
+		if pa ~= pb then
+			if desc then return pa > pb else return pa < pb end
+		end
+		if sa ~= sb then
+			if desc then return sa > sb else return sa < sb end
+		end
+		-- tertiary (filepath) is always ASC regardless of direction
+		if ta ~= tb then return ta < tb end
+		return false
+	end)
+
+	-- Rebuild children: sorted regular nodes, then re-insert back boxes at intervals
+	children:Clear()
+	for _, node in ipairs(regular) do children:Add(node) end
+
+	-- Re-insert back boxes: at positions 0, backFreq+1, 2*(backFreq+1), …
+	local step = backFreq + 1
+	for bi, back in ipairs(backs) do
+		local pos = (bi - 1) * step
+		if pos <= children.Count then
+			children:Insert(pos, back)
+		end
+	end
+
+	-- Random boxes at the very end
+	for _, rand in ipairs(randoms) do children:Add(rand) end
 end
 
 -- ============================================================
@@ -895,6 +1097,14 @@ function update()
 	end
 	wasCustomizeActive = isCustomizeActive
 
+	-- Re-apply sort when sort_search_dialog closes
+	local isSortDialogActive = act_inner["sort_search_dialog"] ~= nil and act_inner["sort_search_dialog"].IsActive
+	if wasSortDialogActive and not isSortDialogActive then
+		applySort()
+		refreshPage(true)
+	end
+	wasSortDialogActive = isSortDialogActive
+
 	if hasActiveInnerModal then return nil end
 
 	if activeScreen == "songselect" then
@@ -903,11 +1113,18 @@ function update()
 		if INPUT:KeyboardPressed("S") then
 			sounds.Skip:Play()
 			CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
+			applySort()
+			refreshPage(true)
 		end
 
 		if INPUT:KeyboardPressed("P") and not activeConfig.mountAISlotToP2 then
 			sounds.Skip:Play()
+			local prevPlayer = highlightedPlayer
 			highlightedPlayer = (highlightedPlayer + 1) % CONFIG.PlayerCount
+			if highlightedPlayer ~= prevPlayer then
+				applySort()
+				refreshPage(true)
+			end
 		end
 
 		if INPUT:KeyboardPressed("F3") then
@@ -927,7 +1144,18 @@ function update()
 			stopHold()
 		end
 
-		if (INPUT:Pressed(inpset.right) or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
+		if INPUT:KeyboardPressed("Space") then
+			-- Space toggles the sort dialog (does not exit/close folder)
+			stopHold()
+			local sd = act_inner["sort_search_dialog"]
+			if sd ~= nil then
+				if sd.IsActive then
+					sd:Deactivate()
+				else
+					sd:Activate(highlightedPlayer)
+				end
+			end
+		elseif (INPUT:Pressed(inpset.right) or INPUT:KeyboardPressed("RightArrow")) and songList ~= nil then
 			doMove(1)
 			startHold(1)
 		elseif (INPUT:Pressed(inpset.left) or INPUT:KeyboardPressed("LeftArrow")) and songList ~= nil then
@@ -940,6 +1168,7 @@ function update()
 			stopHold()
 			local closeFolder = handleFolderClose()
 			if closeFolder == true then
+				applySort()
 				refreshPage()
 				sounds.Decide:Play()
 			else
@@ -1118,7 +1347,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
 	end
 
 	-- Inner activities (dialog modals)
-	local activities = {"mod_select_dialog", "customize_dialog"}
+	local activities = {"mod_select_dialog", "customize_dialog", "sort_search_dialog"}
 	for _, at in ipairs(activities) do
 		act_inner[at] = ACTIVITY:GetActivity(at)
 	end
@@ -1138,7 +1367,10 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
 	SHARED:SetSharedTexture("background", "Textures/bg0.png")
 
 	-- Refresh page display if we already have a song list (returning from a play)
-	if songList ~= nil then refreshPage() end
+	if songList ~= nil then
+		applySort()
+		refreshPage()
+	end
 
 	-- Counters
 	startCounter("background", 1920, 0, 1/48, "loop", function(val)
@@ -1275,6 +1507,8 @@ function afterSongEnum()
 	lsls.HideEmptyFolders = true
 	lsls.FlattenOpenedFolders = false
 	songList = RequestSongList(lsls)
+	originalOrders = {}  -- reset captures whenever the song list is rebuilt
+	applySort()
 	refreshPage()
 end
 
