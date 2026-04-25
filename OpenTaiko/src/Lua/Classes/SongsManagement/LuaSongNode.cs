@@ -359,6 +359,11 @@
 
 		#region [Tree structure internal methods]
 
+		/// <summary>Appends a child node to this node's children list. For internal C# use only (virtual folder construction).</summary>
+		internal void AppendChildInternal(LuaSongNode child) {
+			_children.Add(child);
+		}
+
 		private void _FetchCharts() {
 			_charts = new List<LuaSongChart>();
 

@@ -43,16 +43,26 @@ namespace OpenTaiko {
 	public class LuaSharedResourceFunc {
 		private Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures;
 		private Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds;
+		private Dictionary<string, string> SharedStrings;
 		private LuaTextureFunc _luaTextureFunc;
 		private LuaSoundFunc _luaSoundFunc;
 		private string DirPath;
 
-		public LuaSharedResourceFunc(Dictionary<string, LuaSharedResource<LuaTexture>> st, Dictionary<string, LuaSharedResource<LuaSound>> ss, LuaTextureFunc ltf, LuaSoundFunc lsf, string dirPath) {
+		public LuaSharedResourceFunc(Dictionary<string, LuaSharedResource<LuaTexture>> st, Dictionary<string, LuaSharedResource<LuaSound>> ss, Dictionary<string, string> strs, LuaTextureFunc ltf, LuaSoundFunc lsf, string dirPath) {
 			SharedTextures = st;
 			SharedSounds = ss;
+			SharedStrings = strs;
 			_luaTextureFunc = ltf;
 			_luaSoundFunc = lsf;
 			DirPath = dirPath;
+		}
+
+		public void SetSharedString(string key, string value) {
+			SharedStrings[key] = value;
+		}
+
+		public string GetSharedString(string key) {
+			return SharedStrings.TryGetValue(key, out var val) ? val : "";
 		}
 
 		public void ClearSharedTexture(string key) {
@@ -114,5 +124,6 @@ namespace OpenTaiko {
 			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.Voice, autoDispose: false));
 		public void SetSharedPreviewUsingAbsolutePath(string key, string path, Action<LuaSound>? onCreate = null)
 			=> SetSharedSoundGeneric(key, path, onCreate, (path) => _luaSoundFunc.CreateSoundFromAbsolutePath(path, ESoundGroup.SongPreview, autoDispose: false));
+
 	}
 }

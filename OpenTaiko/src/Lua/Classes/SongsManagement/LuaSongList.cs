@@ -1,9 +1,14 @@
-﻿namespace OpenTaiko {
+﻿using NLua;
+
+namespace OpenTaiko {
 	internal class LuaSongList {
 		private LuaSongNodeRoot? _root;
 		private List<LuaSongNode> _currentPage = new List<LuaSongNode>();
 		private LuaSongNode? _currentNode = null;
 		private LuaSongListSettings _settings;
+
+		// Cursor saved before entering a virtual folder; restored by CloseFolder().
+		private LuaSongNode? _preVirtualFolderNode = null;
 
 		public void ReloadSongList() {
 			_root = new LuaSongNodeRoot();
@@ -241,9 +246,82 @@
 				_currentNode = _currentNode.Parent;
 				_currentNode.Opened = false;
 				_currentPage = GetCurrentPage();
+
+				// If the closed folder is not part of the real page (virtual folder scenario),
+				// restore the cursor to where it was before OpenVirtualFolder was called.
+				if (GetIndexInPage(_currentNode) < 0) {
+					_currentNode = (_preVirtualFolderNode != null && GetIndexInPage(_preVirtualFolderNode) >= 0)
+						? _preVirtualFolderNode
+						: (_currentPage.Count > 0 ? _currentPage[0] : null);
+					_preVirtualFolderNode = null;
+				}
+
 				return true;
 			}
 			return false;
+		}
+
+		/// <summary>
+		/// Opens a virtual folder populated with a Lua table of song nodes.
+		/// Back boxes (one at start, then one every <paramref name="backBoxFrequency"/> songs) and
+		/// a random box at the end are created automatically with <paramref name="title"/> as the folder name.
+		/// <paramref name="baseFolder"/> is set as the virtual folder's parent (one-sided — not added to its children).
+		/// The cursor position before this call is saved and restored when <see cref="CloseFolder"/> exits the virtual folder.
+		/// </summary>
+		public bool OpenVirtualFolder(LuaSongNode? baseFolder, object songTableObj, string title) {
+			// Collect song nodes from the Lua table (array, keys 1…n)
+			var songs = new List<LuaSongNode>();
+			if (songTableObj is LuaTable table) {
+				int i = 1;
+				while (true) {
+					var val = table[i];
+					if (val == null) break;
+					if (val is LuaSongNode sn) songs.Add(sn);
+					i++;
+				}
+			}
+			if (songs.Count == 0) return false;
+
+			// Create the virtual folder CSongListNode
+			var cFolder = new CSongListNode { nodeType = CSongListNode.ENodeType.BOX };
+			cFolder.ldTitle.SetString("default", title);
+			cFolder.childrenList = new List<CSongListNode>();
+			var virtualFolder = new LuaSongNode(cFolder, baseFolder, false, _settings);
+
+			// Helper: fresh back box — its Title will be "Return ({title})" because _parent = virtualFolder
+			LuaSongNode MakeBack() {
+				var cBack = new CSongListNode { nodeType = CSongListNode.ENodeType.BACKBOX };
+				return new LuaSongNode(cBack, virtualFolder, false, _settings);
+			}
+
+			int backBoxFrequency = _settings.SubBackBoxFrequency;
+
+			// Back box at the start
+			virtualFolder.AppendChildInternal(MakeBack());
+
+			// Songs, with a back box inserted after every SubBackBoxFrequency songs
+			int songCount = 0;
+			foreach (var song in songs) {
+				// Re-wrap so _parent = virtualFolder → Siblings returns the virtual page
+				var rewrapped = new LuaSongNode(song.InternalNode, virtualFolder, false, _settings);
+				virtualFolder.AppendChildInternal(rewrapped);
+				songCount++;
+				if (backBoxFrequency > 0 && songCount % backBoxFrequency == 0)
+					virtualFolder.AppendChildInternal(MakeBack());
+			}
+
+			// Random box at the end
+			var cRandom = new CSongListNode { nodeType = CSongListNode.ENodeType.RANDOM };
+			virtualFolder.AppendChildInternal(new LuaSongNode(cRandom, virtualFolder, false, _settings));
+
+			// Save current cursor so CloseFolder() can restore it
+			_preVirtualFolderNode = _currentNode;
+
+			// Navigate into the virtual folder
+			virtualFolder.Opened = true;
+			_currentNode = virtualFolder.Child(0);
+			_currentPage = _currentNode.Siblings;   // = virtualFolder.Children directly
+			return true;
 		}
 
 		#endregion
