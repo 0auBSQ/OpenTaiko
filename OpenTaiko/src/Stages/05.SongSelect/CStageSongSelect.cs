@@ -79,51 +79,80 @@ internal class SongSelectCursor {
 		Folder = null;
 		Items = rootList;
 		// initialize cursors
-		if (this.IdxesPath.Count == 0)
+		if (this.IdxesPath.Count == 0) {
 			this.IdxesPath.Add(0);
+			this.PathDepth = 0;
+		}
 		// re-enter folders
-		for (int i = 1; i < this.IdxesPath.Count; ++i) {
-			var idx = this.IdxesPath[i - 1];
-			var idxChild = this.IdxesPath[i];
+		for (int i = 0; i < Math.Min(this.IdxesPath.Count - 1, this.PathDepth); ++i) {
+			var idx = this.IdxesPath[i];
+			var idxChild = this.IdxesPath[i + 1];
 			CSongListNode? node = Items.ElementAtOrDefault(idx);
 			if (node?.nodeType != CSongListNode.ENodeType.BOX) {
 				// invalid folder
-				this.IdxesPath.RemoveRange(i, this.IdxesPath.Count - i);
+				this.IdxesPath.RemoveRange(i + 1, this.IdxesPath.Count - (i + 1));
+				this.PathDepth = i;
 				break;
 			}
 			Folder = node;
 			Items = node.childrenList;
 		}
+		IdxItem = IdxesPath[PathDepth];
 		this.UpdateInfo?.Invoke();
 	}
 
+	public void tSelectItem() {
+		if (IdxItem != IdxesPath[PathDepth]) {
+			this.tForgetInnerFolders();
+			IdxesPath[PathDepth] = IdxItem;
+		}
+	}
+
 	public void tOpenFolder(CSongListNode song) {
+		tSelectItem();
 		Folder = song;
 		Items = song.childrenList;
-		IdxesPath.Add(0);
+		++PathDepthRaw; // raw value to check range
+		while (PathDepthRaw >= IdxesPath.Count)
+			IdxesPath.Add(0);
+		IdxItem = IdxesPath[PathDepthRaw];
 		this.UpdateInfo?.Invoke();
+	}
+
+	public void tForgetInnerFolders() {
+		IdxesPath.RemoveRange(PathDepthRaw + 1, IdxesPath.Count - (PathDepthRaw + 1));
 	}
 
 	public void tCloseFolder() {
 		if (Folder == null)
 			return;
+		IdxesPath[PathDepth] = IdxItem;
 		Folder = Folder.rParentNode;
 		Items = Folder.childrenList;
 		if (IdxesPath.Count > 1)
-			IdxesPath.RemoveAt(this.IdxesPath.Count - 1);
+			--PathDepth;
+		IdxItem = IdxesPath[PathDepth];
 		this.UpdateInfo?.Invoke();
 	}
 
 	public bool IsInRootFolder(string rootGenreName)
 		=> this.Folder == null || (OpenTaiko.Songs管理.list曲ルート.Contains(this.Folder) && this.Folder.songGenre == rootGenreName);
 
+	public int IdxItemRaw = 0;
 	public int IdxItem {
-		get => Math.Max(0, Math.Min(IdxesPath[IdxesPath.Count - 1], Items.Count - 1));
-		set => IdxesPath[IdxesPath.Count - 1] = value;
+		get => Math.Max(0, Math.Min(IdxItemRaw, Items.Count - 1));
+		set => IdxItemRaw = value;
 	}
 	public CSongListNode? Item => Items.ElementAtOrDefault(IdxItem);
 
-	private List<int> IdxesPath = [0]; // last is for item including closed folder, others are for open parents folders
+	private List<int> IdxesPath = []; // [< PathDepth]: Open parent folders; [PathDepth]: Item including closed folder; [> PathDepth] Remembered inner folders
+
+	private int PathDepthRaw = 0;
+	private int PathDepth {
+		get => Math.Max(0, Math.Min(PathDepthRaw, IdxesPath.Count - 1));
+		set => PathDepthRaw = value;
+	}
+
 	public CSongListNode? Folder { get; private set; }  = null;
 	public List<CSongListNode> Items { get; private set; } = [];
 

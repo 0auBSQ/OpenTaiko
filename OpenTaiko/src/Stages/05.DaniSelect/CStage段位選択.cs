@@ -176,6 +176,7 @@ class CStage段位選択 : CStage {
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+					段位リスト.Cursor.tSelectItem();
 					switch (段位リスト.Cursor.Item?.nodeType ?? CSongListNode.ENodeType.BACKBOX) {
 						case CSongListNode.ENodeType.SCORE:
 						case CSongListNode.ENodeType.RANDOM: {

@@ -118,6 +118,7 @@ class CStageTowerSelect : CStage {
 
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
+				Cursor.tSelectItem();
 				switch (Cursor.Item?.nodeType ?? CSongListNode.ENodeType.BACKBOX) {
 					case CSongListNode.ENodeType.SCORE:
 						tSelectSong();
