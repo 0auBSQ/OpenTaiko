@@ -510,6 +510,8 @@ public abstract class Game : IDisposable {
 					try {
 						while (await timer.WaitForNextTickAsync(this.thInputCancel.Token))
 							this.Events();
+					} catch (OperationCanceledException) {
+						// ignore
 					} finally {
 						if (this.thInputCancel.IsCancellationRequested)
 							Trace.TraceInformation("Input thread terminated.");
