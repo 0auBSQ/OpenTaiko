@@ -6,7 +6,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	// Constructor
 
 	public CInputButtonsBase(int nButtonStates) {
-		this.ButtonStates = new (bool, int)[nButtonStates];
+		this.ButtonStates = Enumerable.Range(0, nButtonStates).Select(_ => (false, -2)).ToArray();
 		this.EventBuffer = new List<STInputEvent>(nButtonStates);
 		this.InputEvents = [];
 	}
@@ -40,6 +40,8 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
 	}
 
+	// 0 (temporary): press started this frame, 1: press starts, 2: press continues
+	// -1: release starts, -2: release continues, -3: press starts & ends
 	protected void ProcessButtonState(int idxBtn, int velocity = 0) {
 		if (ButtonStates[idxBtn].isPressed) {
 			if (ButtonStates[idxBtn].state >= 1) {
@@ -50,6 +52,8 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		} else {
 			if (ButtonStates[idxBtn].state <= -1) {
 				ButtonStates[idxBtn].state = -2;
+			} else if (ButtonStates[idxBtn].state == 0) {
+				ButtonStates[idxBtn].state = -3;
 			} else {
 				ButtonStates[idxBtn].state = -1;
 			}
@@ -77,6 +81,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	protected void ButtonDown(int idxBtn, int velocity = 0) {
 		if (!this.ButtonStates[idxBtn].isPressed) {
 			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
+			this.ButtonStates[idxBtn].state = 0;
 		}
 		this.ButtonStates[idxBtn].isPressed = true;
 		this.SetVelocity(idxBtn, velocity);
@@ -90,13 +95,13 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	}
 
 	public bool KeyPressed(int nButton) {
-		return ButtonStates[nButton].state == 1;
+		return ButtonStates[nButton].state is 1 or -3;
 	}
 	public bool KeyPressing(int nButton) {
 		return ButtonStates[nButton].state >= 1;
 	}
 	public bool KeyReleased(int nButton) {
-		return ButtonStates[nButton].state == -1;
+		return ButtonStates[nButton].state is -1 or -3;
 	}
 	public bool KeyReleasing(int nButton) {
 		return ButtonStates[nButton].state <= -1;
