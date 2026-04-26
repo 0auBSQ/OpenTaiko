@@ -277,7 +277,7 @@ internal class Dan_Cert : CActivity {
 		bool isAfterLastNote = (!score.hasBranch && score.nNotesRemainMax <= 0);
 		// 音源が終了したやつの分岐。
 		CChip? lastChip = score.lastChip;
-		bool isAfterLastChip = (lastChip == null)
+		bool isAfterLastChip = forceFinalJudge || (lastChip == null)
 			|| ((NotesManager.IsHittableNote(lastChip) && lastChip.bVisible) ?
 				(NotesManager.IsGenericRoll(lastChip)) ? lastChip.end.bProcessed : (lastChip.bHit || lastChip.IsMissed)
 				: lastChip.n発声時刻ms <= OpenTaiko.TJA.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)
@@ -290,7 +290,7 @@ internal class Dan_Cert : CActivity {
 			return (clearStatus != Exam.Status.Success); // return false for further checking reach status
 		}
 
-		if ((isAfterLastChip || forceFinalJudge) && doFinalJudge(dan_C))
+		if (isAfterLastChip && doFinalJudge(dan_C))
 			return;
 
 		if (dan_C.ReachStatus == Exam.ReachStatus.Failure)
