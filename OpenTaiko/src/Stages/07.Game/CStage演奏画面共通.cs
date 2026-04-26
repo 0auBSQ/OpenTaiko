@@ -998,9 +998,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	private NoteJudgeWithOffset e指定時刻からChipのJUDGEを返すImpl(long msTjaTime, CChip pChip, int player = 0) {
 		if (pChip == null) return new NoteJudgeWithOffset(ENoteJudge.Miss, null);
-		int msDelta = (int)Math.Abs(msTjaTime - pChip.db発声時刻ms);
+		var msDelta = msTjaTime - pChip.db発声時刻ms;
 		return new NoteJudgeWithOffset(
-			evaluateNodeJudge(msTjaTime, msDelta, pChip, player),
+			evaluateNodeJudge(msTjaTime, (int)Math.Abs(msDelta), pChip, player),
 			(int)msDelta
 		);
 	}
