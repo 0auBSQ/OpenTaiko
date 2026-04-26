@@ -625,7 +625,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 								this.actChara.ChangeAnime(i, CActImplCharacter.Anime.ClearOut, true);
 							}
 						}
-						this.actEnd.Start(i);
+						this.actEnd.Start(i, endOfPlay: true);
 					}
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;

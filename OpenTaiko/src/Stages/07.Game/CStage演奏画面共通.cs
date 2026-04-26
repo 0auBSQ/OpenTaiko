@@ -2566,7 +2566,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.actPanel.t歌詞テクスチャを削除する();
 						this.actDan.Update();
 						if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
-							if (Dan_Cert.GetFailedAllChallenges(this.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+							if (this.actDan.GetFailedAllChallenges(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 								IsDanFailed = true;
 								return true;

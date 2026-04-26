@@ -140,7 +140,7 @@ internal class Dan_Cert : CActivity {
 		public int GetUpdatedNNotesRemainMax() => nNotesMax - GetUpdatedNNotesPast();
 	}
 
-	public void Update(bool resetFlash = false) {
+	public void Update(bool resetFlash = false, bool forceFinalJudge = false) {
 		DanExamScore? individual = null;
 		DanExamScore? total = null;
 
@@ -182,7 +182,7 @@ internal class Dan_Cert : CActivity {
 					Status[i].Timer_Amount = new CCounter(0, 11, 12, OpenTaiko.Timer);
 				}
 			}
-			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i]);
+			this.UpdateReachStatus(NowShowingNumber, i, score, ExamChange[i], forceFinalJudge: forceFinalJudge);
 			if (Challenge[i].ReachStatus != oldReachedStatus && oldReachedStatus != Exam.ReachStatus.Unknown) {
 				if (Challenge[i].ReachStatus == Exam.ReachStatus.Failure) {
 					Sound_Failed?.PlayStart();
@@ -265,7 +265,7 @@ internal class Dan_Cert : CActivity {
 		_ => 0, // no flashing
 	};
 
-	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score, bool isIndividualExam) {
+	private void UpdateReachStatus(int iSong, int iExam, DanExamScore score, bool isIndividualExam, bool forceFinalJudge = false) {
 		// 条件の達成見込みがあるかどうか判断する。
 		var dan_C = this.Challenge[iExam];
 
@@ -290,7 +290,7 @@ internal class Dan_Cert : CActivity {
 			return (clearStatus != Exam.Status.Success); // return false for further checking reach status
 		}
 
-		if (isAfterLastChip && doFinalJudge(dan_C))
+		if ((isAfterLastChip || forceFinalJudge) && doFinalJudge(dan_C))
 			return;
 
 		if (dan_C.ReachStatus == Exam.ReachStatus.Failure)
@@ -1256,12 +1256,19 @@ internal class Dan_Cert : CActivity {
 		return false;
 	}
 
+	public bool GetFailedAllChallenges(List<CTja.DanSongs> danSongs) {
+		this.Update(); // prevent desynced result
+		return GetFailedAllChallenges(this.GetExam(), danSongs);
+	}
+
 	/// <summary>
 	/// n個の条件で段位認定モードのステータスを返します。
 	/// </summary>
 	/// <param name="dan_C">条件。</param>
 	/// <returns>ExamStatus。</returns>
-	public Exam.Status GetResultExamStatus(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs) {
+	public Exam.Status GetResultExamStatus(ReadOnlySpan<Dan_C> dan_C, List<CTja.DanSongs> danSongs, bool forceFinalJudge = false) {
+		this.Update(forceFinalJudge: forceFinalJudge); // prevent desynced result
+
 		var status = Exam.Status.Better_Success;
 
 		for (int i = 0; i < CExamInfo.cMaxExam; i++) {

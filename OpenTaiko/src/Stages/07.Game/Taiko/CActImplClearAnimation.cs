@@ -12,15 +12,12 @@ internal class CActImplClearAnimation : CActivity {
 		base.IsDeActivated = true;
 	}
 
-	public void Start(int iPlayer) {
+	public void Start(int iPlayer, bool endOfPlay = false) {
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1) // skip animation for AI
 			return;
 
 		if (this.ct進行メイン[iPlayer] != null) // prevent replaying animation
 			return;
-
-		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
-		bSoundPlayed[iPlayer] = false;
 
 		/*
         this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -44,9 +41,13 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && !Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted())
+				&& !OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)
+				) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
+				if (!endOfPlay)
+					return; // cancel mis-judged failed
 
 				bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
 
@@ -97,6 +98,9 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[iPlayer] = EndMode.StageFailed;
 			}
 		}
+
+		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
+		bSoundPlayed[iPlayer] = false;
 	}
 
 	public override void Activate() {
