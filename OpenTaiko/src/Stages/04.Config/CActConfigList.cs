@@ -684,7 +684,6 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 				OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 				OpenTaiko.actEnumSongs.Activate();
-				OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemHardReloadDTX)              // #32081 2013.10.21 yyagi
 			{
 				if (OpenTaiko.EnumSongs.IsEnumerating) {
@@ -696,7 +695,6 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 				OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 				OpenTaiko.actEnumSongs.Activate();
-				OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
 				// Running in a separate thread so the game doesn't freeze
 				ScoreIniImportThread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);

@@ -64,11 +64,6 @@ internal class CActSelect曲リスト : CActivity {
 
 	public TitleTextureKey? ttkNowUnlockConditionText = null;
 
-	public void ResetSongIndex() {
-		nSelectSongIndex = 0;
-		this.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート.ElementAtOrDefault(nSelectSongIndex);
-	}
-
 	public int nスクロールバー相対y座標 {
 		get;
 		private set;
@@ -146,7 +141,8 @@ internal class CActSelect曲リスト : CActivity {
 		return (songList == null) ? null : songList[songList.Count - 1];
 	}
 
-	private List<CSongListNode> GetSongListWithinMe(CSongListNode song) {
+	private List<CSongListNode>? GetSongListWithinMe(CSongListNode? song = null) {
+		song ??= this.rCurrentlySelectedSong;
 		if (song.rParentNode == null)                   // root階層のノートだったら
 		{
 			return OpenTaiko.Songs管理.list曲ルート; // rootのリストを返す
@@ -168,7 +164,7 @@ internal class CActSelect曲リスト : CActivity {
 	/// <param name="eInst">ソート基準とする楽器</param>
 	/// <param name="order">-1=降順, 1=昇順</param>
 	public void t曲リストのソート(DGSortFunc sf, int order, params object[] p) {
-		List<CSongListNode> songList = GetSongListWithinMe(this.rCurrentlySelectedSong);
+		List<CSongListNode>? songList = this.GetSongListWithinMe();
 		if (songList == null) {
 			// 何もしない;
 		} else {
@@ -200,7 +196,9 @@ internal class CActSelect曲リスト : CActivity {
 		this.ttkSelectedSongBPM = null;
 	}
 
-	public bool tOpenBOX() {
+	public bool tOpenBOX(CSongListNode? node = null) {
+		bool isFromCurrent = (node == null);
+		node ??= this.rCurrentlySelectedSong;
 		//Trace.TraceInformation( "box enter" );
 		//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) );
 		//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
@@ -210,12 +208,12 @@ internal class CActSelect曲リスト : CActivity {
 		//Trace.TraceInformation( "Skin指定: " + CSkin.GetSkinName( this.r現在選択中の曲.strSkinPath ) );
 		//Trace.TraceInformation( "Skinpath: " + this.r現在選択中の曲.strSkinPath );
 		bool ret = false;
-		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(this.rCurrentlySelectedSong.strSkinPath)
+		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(node.strSkinPath)
 			&& CSkin.bUseBoxDefSkin) {
 			ret = true;
 			// BOXに入るときは、スキン変更発生時のみboxdefスキン設定の更新を行う
 			OpenTaiko.Skin.SetCurrentSkinSubfolderFullName(
-				OpenTaiko.Skin.GetSkinSubfolderFullNameFromSkinName(CSkin.GetSkinName(this.rCurrentlySelectedSong.strSkinPath)), false);
+				OpenTaiko.Skin.GetSkinSubfolderFullNameFromSkinName(CSkin.GetSkinName(node.strSkinPath)), false);
 		}
 
 		//Trace.TraceInformation( "Skin変更: " + CSkin.GetSkinName( CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) ) );
@@ -227,21 +225,19 @@ internal class CActSelect曲リスト : CActivity {
 
 		// INFO: This null check is added due to `list子リスト` might be null during rapid sorting
 		//		Despite what editor tell you here it is possible to be null
-		if (rCurrentlySelectedSong != null &&
-			rCurrentlySelectedSong.childrenList != null &&
-			rCurrentlySelectedSong.childrenList.Count != 1) {
+		if (node != null && node.childrenList != null && node.childrenList.Count != 1) {
 			if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
-				this.rCurrentlySelectedSong = this.rCurrentlySelectedSong.childrenList[0];
+				if (isFromCurrent)
+					this.rCurrentlySelectedSong = node.childrenList[0]; // save to history
 				nSelectSongIndex = 0;
-				tChangeSong(this.rCurrentlySelectedSong.rParentNode.Openindex);
+				tChangeSong(node.Openindex);
 			} else {
 				//実際には親フォルダを消さないように変更
-
-				this.rCurrentlySelectedSong.bIsOpenFolder = true;
+				node.bIsOpenFolder = true;
 
 				// Previous index
-				int n回数 = this.rCurrentlySelectedSong.Openindex;
-				if (this.rCurrentlySelectedSong.Openindex >= this.rCurrentlySelectedSong.childrenList.Count())
+				int n回数 = node.Openindex;
+				if (!isFromCurrent || node.Openindex >= node.childrenList.Count())
 					n回数 = 0;
 
 				tChangeSong(n回数);
@@ -284,15 +280,15 @@ internal class CActSelect曲リスト : CActivity {
 				var parent = this.rCurrentlySelectedSong = this.rCurrentlySelectedSong.rParentNode;
 				parent.Openindex = nSelectSongIndex;
 				parent.bIsOpenFolder = false;
-				var nowList = parent.rParentNode?.childrenList ?? OpenTaiko.Songs管理.list曲ルート;
-				tChangeSong(nowList.IndexOf(parent) - nSelectSongIndex);
+				tChangeSong(GetSongListWithinMe(parent)!.IndexOf(parent) - nSelectSongIndex);
 			}
 		} else {
 			// Reindex the parent node
-			if (this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder)
+			if (this.rCurrentlySelectedSong.rParentNode?.bIsOpenFolder ?? false) {
 				this.rCurrentlySelectedSong.rParentNode.Openindex = this.rCurrentlySelectedSong.rParentNode.childrenList.IndexOf(this.rCurrentlySelectedSong);
-			this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
-			tChangeSong(-this.rCurrentlySelectedSong.rParentNode.Openindex);
+				this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
+				tChangeSong(-this.rCurrentlySelectedSong.rParentNode.Openindex);
+			}
 
 
 		}
@@ -304,21 +300,20 @@ internal class CActSelect曲リスト : CActivity {
 		return ret;
 	}
 
-
-	public static (CSongListNode? node, int index) GetFromFlattenList(List<CSongListNode> list, bool useOpenFlag = false, int index = -1, bool wrap = true) {
+	public static (CSongListNode? node, int index) GetFromFlattenList(List<CSongListNode> list, bool useOpenFlag = false, int index = -1, bool wrap = true, CSongListNode? node = null) {
 		int nowIndex = 0;
 		for (int i = 0; i < list.Count; i++) {
 			var e = list[i];
 			if (!useOpenFlag || !e.bIsOpenFolder) {
-				if (nowIndex == index)
+				if (nowIndex == index || (node != null && e == node))
 					return (e, nowIndex);
 				++nowIndex;
 			}
 
 			if (e.nodeType == CSongListNode.ENodeType.BOX && (!useOpenFlag || e.bIsOpenFolder)) {
-				var (node, idx) = GetFromFlattenList(e.childrenList, useOpenFlag, index - nowIndex, wrap: false);
-				if (node != null)
-					return (node, nowIndex + idx);
+				var (n, idx) = GetFromFlattenList(e.childrenList, useOpenFlag, index - nowIndex, wrap: false, node: node);
+				if (n != null)
+					return (n, nowIndex + idx);
 				nowIndex += idx;
 			}
 		}
@@ -329,7 +324,7 @@ internal class CActSelect曲リスト : CActivity {
 			index %= nowIndex;
 			if (index < 0)
 				index += nowIndex;
-			return GetFromFlattenList(list, useOpenFlag, index);
+			return GetFromFlattenList(list, useOpenFlag, index, wrap: false, node: node);
 		}
 		return (null, nowIndex);
 	}
@@ -713,20 +708,39 @@ internal class CActSelect曲リスト : CActivity {
 
 			if (this.rCurrentlySelectedSong != null)            // r現在選択中の曲==null とは、「最初songlist.dbが無かった or 検索したが1曲もない」
 			{
-				this.rCurrentlySelectedSong = searchCurrentBreadcrumbsPosition(OpenTaiko.Songs管理.list曲ルート, this.rCurrentlySelectedSong.strBreadcrumbs);
-				if (bRemakeSongTitleBar)                    // 選曲画面以外に居るときには再構成しない (非活性化しているときに実行すると例外となる)
-				{
-					this.t現在選択中の曲を元に曲バーを再構成する();
+				CSongListNode? node = searchCurrentBreadcrumbsPosition(OpenTaiko.Songs管理.list曲ルート, this.rCurrentlySelectedSong.strBreadcrumbs);
+				if (node != null) {
+					// Mark parent folders as open and fix the indexes
+					for (var n = node; n != null; n = n.rParentNode) {
+						var index = OpenTaiko.ConfigIni.TJAP3FolderMode ? this.GetSongListWithinMe(n)!.IndexOf(n)
+							: GetFromFlattenList(this.GetSongListWithinMe(n)!, useOpenFlag: true, wrap: false, node: node).index;
+						if (n.rParentNode != null) {
+							n.rParentNode.bIsOpenFolder = true;
+							n.rParentNode.Openindex = index;
+						}
+					}
+					// Properly reopen folder
+					this.nSelectSongIndex = OpenTaiko.ConfigIni.TJAP3FolderMode ? 0
+						: GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, useOpenFlag: true, wrap: false, node: node).index;
+					if (node.rParentNode != null)
+						this.tOpenBOX(node.rParentNode);
+					this.rPrevSelectedSong = this.rCurrentlySelectedSong = node;
+					if (bRemakeSongTitleBar)                    // 選曲画面以外に居るときには再構成しない (非活性化しているときに実行すると例外となる)
+					{
+						this.t現在選択中の曲を元に曲バーを再構成する();
+					}
+					return;
 				}
-				return;
 			}
 		}
-		if (this.IsActivated) {
+		// invalid old song entry
+		bool wasActivated = this.IsActivated;
+		if (wasActivated)
 			this.DeActivate();
-			this.rCurrentlySelectedSong = null;
-			this.nSelectSongIndex = 0;
+		this.rCurrentlySelectedSong = null;
+		this.nSelectSongIndex = 0;
+		if (wasActivated)
 			this.Activate();
-		}
 	}
 
 
@@ -737,14 +751,17 @@ internal class CActSelect曲リスト : CActivity {
 	/// <param name="ln">検索対象のList</param>
 	/// <param name="bc">検索するパンくずリスト(文字列)</param>
 	/// <returns></returns>
-	private CSongListNode searchCurrentBreadcrumbsPosition(List<CSongListNode> ln, string bc) {
+	private CSongListNode? searchCurrentBreadcrumbsPosition(List<CSongListNode> ln, string bc) {
 		foreach (CSongListNode n in ln) {
+			if (!bc.StartsWith(n.strBreadcrumbs)) // fast check for parent path
+				continue;
 			if (n.strBreadcrumbs == bc) {
 				return n;
 			} else if (n.childrenList != null && n.childrenList.Count > 0)  // 子リストが存在するなら、再帰で探す
 			{
-				CSongListNode r = searchCurrentBreadcrumbsPosition(n.childrenList, bc);
-				if (r != null) return r;
+				var r = searchCurrentBreadcrumbsPosition(n.childrenList, bc);
+				if (r != null)
+					return r;
 			}
 		}
 		return null;
@@ -2636,8 +2653,8 @@ internal class CActSelect曲リスト : CActivity {
 	private void tChangeSong(int change) {
 		int index = nSelectSongIndex + change;
 
-		if (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) {
-			List<CSongListNode> list = rCurrentlySelectedSong.rParentNode.childrenList;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
+			var list = this.GetSongListWithinMe()!;
 			while (index >= list.Count) {
 				index -= list.Count;
 			}
@@ -2663,8 +2680,8 @@ internal class CActSelect曲リスト : CActivity {
 		if (rCurrentlySelectedSong == null) return null;
 
 		int index = nSelectSongIndex + change;
-		if (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) {
-			List<CSongListNode> list = rCurrentlySelectedSong.rParentNode.childrenList;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
+			var list = this.GetSongListWithinMe()!;
 			if (list.Count <= 0) return null;
 
 
