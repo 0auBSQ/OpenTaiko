@@ -63,6 +63,12 @@ local special_chance = 0
 local speech_text = "Speech/en/0.png"
 
 function playEndAnime(player)
+	animeCounter = 0
+	
+	dan_in_move = 0
+	dan_first_in_move = 0
+	dan_second_in_move = 0
+	dan_in_slam = 0
 end
 
 function clearIn(player)
