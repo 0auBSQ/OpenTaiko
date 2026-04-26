@@ -287,8 +287,8 @@ internal class CActSelect曲リスト : CActivity {
 			}
 		} else {
 			// Reindex the parent node
-			List<CSongListNode> currentSongList = flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-			this.rCurrentlySelectedSong.rParentNode.Openindex = currentSongList.IndexOf(this.rCurrentlySelectedSong) - currentSongList.IndexOf(this.rCurrentlySelectedSong.rParentNode.childrenList[0]);
+			if (this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder)
+				this.rCurrentlySelectedSong.rParentNode.Openindex = this.rCurrentlySelectedSong.rParentNode.childrenList.IndexOf(this.rCurrentlySelectedSong);
 			this.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
 			tChangeSong(-this.rCurrentlySelectedSong.rParentNode.Openindex);
 
@@ -303,21 +303,33 @@ internal class CActSelect曲リスト : CActivity {
 	}
 
 
-	public List<CSongListNode> flattenList(List<CSongListNode> list, bool useOpenFlag = false) {
-		List<CSongListNode> ret = new List<CSongListNode>();
-
-		//foreach (var e in list)
+	public static (CSongListNode? node, int index) GetFromFlattenList(List<CSongListNode> list, bool useOpenFlag = false, int index = -1, bool wrap = true) {
+		int nowIndex = 0;
 		for (int i = 0; i < list.Count; i++) {
 			var e = list[i];
-			if (!useOpenFlag || !e.bIsOpenFolder) ret.Add(e);
+			if (!useOpenFlag || !e.bIsOpenFolder) {
+				if (nowIndex == index)
+					return (e, nowIndex);
+				++nowIndex;
+			}
 
-			if (e.nodeType == CSongListNode.ENodeType.BOX &&
-				(!useOpenFlag || e.bIsOpenFolder)) {
-				ret.AddRange(flattenList(e.childrenList, useOpenFlag));
+			if (e.nodeType == CSongListNode.ENodeType.BOX && (!useOpenFlag || e.bIsOpenFolder)) {
+				var (node, idx) = GetFromFlattenList(e.childrenList, useOpenFlag, index - nowIndex, wrap: false);
+				if (node != null)
+					return (node, nowIndex + idx);
+				nowIndex += idx;
 			}
 		}
-
-		return (ret);
+		if (nowIndex == 0)
+			return (null, 0); // empty list, nothing to get
+		if (wrap) {
+			// try wrap and find again
+			index %= nowIndex;
+			if (index < 0)
+				index += nowIndex;
+			return GetFromFlattenList(list, useOpenFlag, index);
+		}
+		return (null, nowIndex);
 	}
 
 	public void t現在選択中の曲を元に曲バーを再構成する() {
@@ -2620,18 +2632,21 @@ internal class CActSelect曲リスト : CActivity {
 		return Eバー種別.Other;
 	}
 	private void tChangeSong(int change) {
-		List<CSongListNode> list = (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) ? rCurrentlySelectedSong.rParentNode.childrenList : flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-
 		int index = nSelectSongIndex + change;
 
-		while (index >= list.Count) {
-			index -= list.Count;
-		}
-		while (index < 0) {
-			index += list.Count;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) {
+			List<CSongListNode> list = rCurrentlySelectedSong.rParentNode.childrenList;
+			while (index >= list.Count) {
+				index -= list.Count;
+			}
+			while (index < 0) {
+				index += list.Count;
+			}
+			rCurrentlySelectedSong = list[index];
+		} else {
+			(rCurrentlySelectedSong, index) = GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, true, index);
 		}
 		nSelectSongIndex = index;
-		rCurrentlySelectedSong = list[index];
 
 		var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(rCurrentlySelectedSong);
 		if (IsSongLocked) {
@@ -2642,25 +2657,26 @@ internal class CActSelect曲リスト : CActivity {
 			}
 		}
 	}
-	public CSongListNode rGetSideSong(int change) {
+	public CSongListNode? rGetSideSong(int change) {
 		if (rCurrentlySelectedSong == null) return null;
 
-		List<CSongListNode> list = (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) ? rCurrentlySelectedSong.rParentNode.childrenList : flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-
-		if (list.Count <= 0) return null;
-
 		int index = nSelectSongIndex + change;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode && rCurrentlySelectedSong.rParentNode != null) {
+			List<CSongListNode> list = rCurrentlySelectedSong.rParentNode.childrenList;
+			if (list.Count <= 0) return null;
 
-		while (index >= list.Count) {
-			index -= list.Count;
+
+			while (index >= list.Count) {
+				index -= list.Count;
+			}
+			while (index < 0) {
+				index += list.Count;
+			}
+
+			return list[index];
 		}
-		while (index < 0) {
-			index += list.Count;
-		}
 
-		var _sideNode = list[index];
-
-		return _sideNode;
+		return GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, true, index).node;
 	}
 
 	public void tバーの初期化() {

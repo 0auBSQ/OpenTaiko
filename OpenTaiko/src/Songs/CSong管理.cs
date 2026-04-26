@@ -72,9 +72,8 @@ internal class CSongs管理 {
 
 		if (downloadBox != null && downloadBox.childrenList != null) {
 
-			var flatten = OpenTaiko.stageSongSelect.actSongList.flattenList(downloadBox.childrenList);
+			var (lastNode, count) = CActSelect曲リスト.GetFromFlattenList(downloadBox.childrenList);
 
-			// Works because flattenList creates a new List
 			foreach (var node in downloadBox.childrenList) {
 				CSongDict.tRemoveSongNode(node.uniqueId);
 			}
@@ -83,7 +82,7 @@ internal class CSongs管理 {
 
 			var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
 
-			if (flatten.Count > 0) {
+			if (count > 0) {
 				t曲を検索してリストを作成する(path, true, downloadBox.childrenList, downloadBox);
 				this.tSongListPostprocessing(downloadBox.childrenList, $"/{downloadBox.ldTitle.GetString("")}/");
 				downloadBox.childrenList.Insert(0, CSongDict.tGenerateBackButton(downloadBox, $"/{downloadBox.ldTitle.GetString("")}/"));
