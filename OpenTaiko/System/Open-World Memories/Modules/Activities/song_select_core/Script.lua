@@ -13,11 +13,12 @@
 --   "cancel" — user backed out entirely, parent stage should decide where to go
 --   nil      — still running, no action needed
 
-local Sort   = require("sort")
-local Nav    = require("navigation")
-local Diff   = require("diffselect")
-local DrawSS = require("draw_songselect")
-local Search = require("search")
+local Sort    = require("sort")
+local Nav     = require("navigation")
+local Diff    = require("diffselect")
+local DrawSS  = require("draw_songselect")
+local Search  = require("search")
+local Unlocks = require("unlockables")
 
 -- ── Shared state (G) ─────────────────────────────────────────────────────────
 -- All modules receive a reference to this table via their init() call.
@@ -64,8 +65,9 @@ local G = {
     difficultySelectModes = { difficultyselect = true, transition = true },
 
     -- Dialog-close tracking
-    wasCustomizeActive  = false,
-    wasSortDialogActive = false,
+    wasCustomizeActive      = false,
+    wasSortDialogActive     = false,
+    wasConfirmDialogActive  = false,
 
     -- (search state is managed entirely by LuaSongList:OpenVirtualFolder / CloseFolder)
 
@@ -188,10 +190,14 @@ Nav.init(G)
 Diff.init(G)
 DrawSS.init(G)
 Search.init(G)
+Unlocks.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
 -- without needing a direct reference to Sort.
 G.applySort = function() Sort.applySort() end
+
+-- Expose Unlocks through G so draw_songselect and navigation can reach it.
+G.unlocks = Unlocks
 
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
@@ -255,6 +261,8 @@ function onStart()
         G.bars["difficultybarlevel" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff" .. i .. ".png")
     end
 
+    Unlocks.loadTextures()
+
     G.bars["barleft"]          = TEXTURE:CreateTexture("Textures/barleft.png")
     G.bars["scorerank_none"]   = TEXTURE:CreateTexture("Textures/ScoreRank/None.png")
     G.bars["scorerank_m1"]     = TEXTURE:CreateTexture("Textures/ScoreRank/-1.png")
@@ -285,7 +293,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
         VIRTUALSLOTS:MountSlot(2, "AI")
     end
 
-    local activities = {"mod_select_dialog", "customize_dialog", "sort_search_dialog"}
+    local activities = {"mod_select_dialog", "customize_dialog", "sort_search_dialog", "confirm_dialog"}
     for _, at in ipairs(activities) do
         G.act_inner[at] = ACTIVITY:GetActivity(at)
     end
@@ -447,6 +455,16 @@ function update()
         end
     end
     G.wasSortDialogActive = isSortDialogActive
+
+    -- Handle confirm_dialog close: refresh so a newly-unlocked song shows correctly.
+    local isConfirmDialogActive = G.act_inner["confirm_dialog"] ~= nil and G.act_inner["confirm_dialog"].IsActive
+    if G.wasConfirmDialogActive and not isConfirmDialogActive then
+        Nav.refreshPage(true)
+    end
+    G.wasConfirmDialogActive = isConfirmDialogActive
+
+    -- Advance unlock-related animations.
+    Unlocks.tick()
 
     if hasActiveInnerModal then return nil end
 

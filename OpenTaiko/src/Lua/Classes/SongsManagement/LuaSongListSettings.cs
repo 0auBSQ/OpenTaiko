@@ -102,7 +102,7 @@ namespace OpenTaiko {
 
 			// Hide locked hidden songs
 			if (node.IsSong) {
-				if (node.HiddenIndex == DBSongUnlockables.EHiddenIndex.HIDDEN) return true;
+				if (node.HiddenIndex == (int)DBSongUnlockables.EHiddenIndex.HIDDEN) return true;
 			}
 
 			return false;

@@ -89,7 +89,7 @@
 		public int VisibleSongCount {
 			get {
 				if (!IsFolder && !IsRoot) return 0;
-				return _children.Count((child) => child.IsSong && child.HiddenIndex != DBSongUnlockables.EHiddenIndex.HIDDEN);
+				return _children.Count((child) => child.IsSong && child.HiddenIndex != (int)DBSongUnlockables.EHiddenIndex.HIDDEN);
 			}
 		}
 
@@ -201,12 +201,12 @@
 			}
 		}
 
-		public DBSongUnlockables.EHiddenIndex HiddenIndex {
+		public int HiddenIndex {
 			get {
 				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
-					return OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(_node);
+					return (int)OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(_node);
 				}
-				return DBSongUnlockables.EHiddenIndex.DISPLAYED;
+				return (int)DBSongUnlockables.EHiddenIndex.DISPLAYED;
 			}
 		}
 

@@ -35,6 +35,11 @@ local function playPreview(songNode)
     G.previewDemoStart    = 0
     SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
     if songNode.IsSong == true then
+        -- Suppress audio preview for GRAYED/BLURED locked songs
+        if G.unlocks ~= nil and G.unlocks.suppressPreview(songNode) then
+            G.ctx["throttle_presound"] = COUNTER:EmptyCounter()
+            return
+        end
         G.startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
             local demoStart = songNode.DemoStart
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
@@ -112,6 +117,10 @@ local function handleDecideSongSelect(Sort)
         if success then Sort.applySort(); G.sounds.Cancel:Play() end
         M.refreshPage()
     elseif ssn.IsSong == true then
+        if ssn.IsLocked and G.unlocks ~= nil then
+            G.unlocks.onDecideLocked(G.highlightedPlayer, ssn)
+            return nil
+        end
         G.sounds.SongDecide:Play()
         return ssn
     elseif ssn.IsRandom == true then

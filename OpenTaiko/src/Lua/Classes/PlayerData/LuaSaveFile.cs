@@ -99,6 +99,17 @@
 			}
 		}
 
+		public bool IsSongUnlocked(string uniqueId) {
+			return _sf.data.UnlockedSongs.Contains(uniqueId);
+		}
+
+		public void UnlockSong(string uniqueId) {
+			if (!IsSongUnlocked(uniqueId)) {
+				_sf.data.UnlockedSongs.Add(uniqueId);
+				DBSaves.RegisterStringUnlockedAsset(_sf.data.SaveId, "unlocked_songs", uniqueId);
+			}
+		}
+
 		#endregion
 
 		#region [Hitsounds]

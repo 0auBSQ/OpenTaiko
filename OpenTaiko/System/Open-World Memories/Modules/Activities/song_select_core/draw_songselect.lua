@@ -252,20 +252,42 @@ function M.drawPanel()
                 local node = G.currentPage[i]
                 if node.IsSong or node.IsFolder then
                     if node.IsLocked then
-                        G.bars["locked"]:DrawAtAnchor(xpos, ypos, "center")
+                        -- Draw the HiddenIndex-appropriate bar (GRAYED/BLURED both use bar_1);
+                        -- DISPLAYED locked songs fall through to the normal bar below.
+                        if not G.unlocks.drawLockedBar(node, xpos, ypos) then
+                            G.bars["bar"]:SetColor(node.BoxColor)
+                            G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+                            G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
+                        end
+                        local hi = node.IsSong and node.HiddenIndex or 0
+                        -- Title area content (over bar, under lock icon):
+                        -- BLURED → static.png with GL noise; others → normal title text.
+                        if hi == 2 then
+                            G.unlocks.drawBluredStatic(xpos, ypos)
+                        else
+                            tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
+                        end
+                        -- Lock icon on top of title area
+                        G.unlocks.drawLockIcon(node, xpos, ypos)
+                        -- Level tag: only DISPLAYED locked songs (hi == 0)
+                        if node.IsSong and hi == 0 then
+                            drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+                        end
                     else
                         G.bars["bar"]:SetColor(node.BoxColor)
                         G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
                         G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
+                        if node.IsSong then drawBarleft(node, xpos, ypos) end
+                        drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+                        tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
                     end
-                    if node.IsSong then drawBarleft(node, xpos, ypos) end
-                    drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
                 elseif node.IsRandom then
                     G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
+                    tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
                 elseif node.IsReturn then
                     G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
+                    tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
                 end
-                tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
             end
         end
 
@@ -276,15 +298,16 @@ function M.drawPanel()
         local xlshift = ax * math.cos(7 * math.pi / 12)
         local ylshift = ax * math.sin(7 * math.pi / 12)
         local isSong = ssn ~= nil and ssn.IsSong
-        if isSong then
+        local isUnlockedSong = isSong and (ssn.IsLocked ~= true)
+        if isUnlockedSong then
             -- selectedlarge covers bar + barleft; align its right edge with selected's right edge
             local largeCenterX = x0 - (G.bars["selectedlarge"].Width - G.bars["selected"].Width) / 2
             G.bars["selectedlarge"]:DrawAtAnchor(largeCenterX, y0, "center")
         else
             G.bars["selected"]:DrawAtAnchor(x0, y0, "center")
         end
-        -- Left arrow shifts 67px further left when a song is selected to clear barleft
-        local arrowLOffset = isSong and BARLEFT_X_OFFSET or 0
+        -- Left arrow shifts 67px further left when an unlocked song is selected to clear barleft
+        local arrowLOffset = isUnlockedSong and BARLEFT_X_OFFSET or 0
         G.bars["selected-arrow-l"]:DrawAtAnchor(x0 - SONGLIST_SELECTED_ARROW_GAP/2 + xlshift + arrowLOffset, y0 - ylshift, "left")
         G.bars["selected-arrow-r"]:DrawAtAnchor(x0 + SONGLIST_SELECTED_ARROW_GAP/2 - xlshift, y0 + ylshift, "right")
     end
@@ -319,6 +342,9 @@ function M.drawPanel()
     -- Overlay
     G.bgtx["overlay"]:SetOpacity(opacityNorm)
     G.bgtx["overlay"]:Draw(0, 0)
+
+    -- Unlock conditions panel (shown when a locked song is highlighted)
+    G.unlocks.drawCondsPanel()
 
     -- Nameplates
     local playerCount = CONFIG.PlayerCount

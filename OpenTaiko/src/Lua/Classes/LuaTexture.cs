@@ -117,6 +117,9 @@ namespace OpenTaiko {
 				};
 			}
 		}
+		public void SetUseNoiseEffect(bool useNoiseEffect) {
+			if (_texture != null) _texture.bUseNoiseEffect = useNoiseEffect;
+		}
 		#endregion
 		#region Dispose
 		private bool _disposedValue;
