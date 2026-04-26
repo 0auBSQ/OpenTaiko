@@ -16,8 +16,7 @@ internal class CActImplClearAnimation : CActivity {
 		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1) // skip animation for AI
 			return;
 
-		if (this.ct進行メイン[iPlayer] != null) // prevent replaying animation
-			return;
+		var lastMode = this.Mode[iPlayer];
 
 		/*
         this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -46,20 +45,19 @@ internal class CActImplClearAnimation : CActivity {
 				) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
-				if (!endOfPlay)
-					return; // cancel mis-judged failed
+				if (!endOfPlay) {
+					this.Mode[0] = EndMode.Total; // cancel mis-judged failed
+				} else {
+					bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
 
-				bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.stageSongSelect.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
-
-				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
-					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
-						this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
-					else
-						this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
-				} else
-					this.Mode[0] = bgold ? EndMode.Dan_Gold_Pass : EndMode.Dan_Red_Pass;
-
-
+					if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
+						if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
+							this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
+						else
+							this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
+					} else
+						this.Mode[0] = bgold ? EndMode.Dan_Gold_Pass : EndMode.Dan_Red_Pass;
+				}
 			} else {
 				// 段位認定モード、クリア失敗
 				this.Mode[0] = EndMode.Dan_Fail;
@@ -99,7 +97,13 @@ internal class CActImplClearAnimation : CActivity {
 			}
 		}
 
-		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
+		if (this.Mode[iPlayer] == lastMode) // prevent replaying animation
+			return;
+
+		if (this.Mode[iPlayer] == EndMode.Total)
+			this.ct進行メイン[iPlayer] = null;
+		else
+			this.ct進行メイン[iPlayer] ??= new CCounter(0, 300, 22, OpenTaiko.Timer);
 		bSoundPlayed[iPlayer] = false;
 	}
 
@@ -167,6 +171,7 @@ internal class CActImplClearAnimation : CActivity {
 
 	public void InitScripts() {
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i) {
+			this.Mode[i] = EndMode.Total;
 			this.bSoundPlayed[i] = false;
 			this.ct進行メイン[i] = null;
 		}

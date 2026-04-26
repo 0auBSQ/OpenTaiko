@@ -557,14 +557,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			bool bIsFinishedEndAnime = this.actEnd.Draw() == 1 ? true : false;
 			bool bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();
 
-			bool bIsFinishedPlaying = true;
-			bool bIsChartEnded = true;
-			EStageAbort minAbortType = EStageAbort.Max;
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (!isFinishedPlaying[i]) bIsFinishedPlaying = false;
-				if (!isChartEnded[i]) bIsChartEnded = false;
-				if (stageAbortType[i] < minAbortType) minAbortType = stageAbortType[i];
-			}
+			bool bIsFinishedPlaying = this.IsFinishedPlaying();
+			bool bIsChartEnded = this.IsChartEnded();
+			EStageAbort minAbortType = this.MinStageAbortType;
 
 			// Transition for failed games
 			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
@@ -607,7 +602,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						base.ePhaseID = CStage.EPhase.Game_EndStage;
 					}
 				}
-			} else if ((bIsChartEnded || bIsFinishedPlaying) && (!isTower || this.actBackground.IsFinishedTowerClimbing())) {
+			} else if (this.IsEndOfPlay(bIsChartEnded, bIsFinishedPlaying)) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						int Character = this.actChara.iCurrentCharacter[i];
@@ -652,6 +647,15 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.sw.Stop();
 		return 0;
 	}
+
+	protected override void UpdateClearAnimation(int iPlayer) {
+		base.UpdateClearAnimation(iPlayer);
+		this.actEnd.Start(iPlayer, endOfPlay: true);
+	}
+
+	public override bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
+		=> base.IsEndOfPlay(isChartEnded, isFinishedPlaying)
+			&& (!(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) || this.actBackground.IsFinishedTowerClimbing());
 
 	// その他
 
@@ -1207,6 +1211,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				this.msCurrentBarRollProgress[i] = msBarRollProgress;
 				if (i == 0)
 					this.actDan.Update();
+				if (this.IsChartEnded())
+					this.UpdateClearAnimation(i);
 			}
 		}
 

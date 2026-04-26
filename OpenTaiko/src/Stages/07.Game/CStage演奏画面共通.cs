@@ -1463,6 +1463,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.CBranchScore[nPlayer].nMine++;
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.DanSongScore[actDan.NowShowingNumber].nMine++;
+
+						if (this.IsChartEnded())
+							this.UpdateClearAnimation(nPlayer);
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
@@ -1515,6 +1518,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool isIncrease = eJudgeResult is not (ENoteJudge.Poor or ENoteJudge.Bad or ENoteJudge.Miss) || eJudgeResult is ENoteJudge.Auto;
 		bool isDecrease = (eJudgeResult is ENoteJudge.Poor or ENoteJudge.Bad || eJudgeResult is ENoteJudge.Auto
 			|| ((pChip != null) ? (pChip.IsMissed && NotesManager.IsMissableNote(pChip)) : eJudgeResult is ENoteJudge.Miss));
+		bool? isEndOfPlay = null;
 
 		if (isIncrease) {
 			// ランナー(たたけたやつ)
@@ -1528,6 +1532,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.Become_Maxed, true);
 				}
 				this.bIsAlreadyMaxed[nPlayer] = true;
+				if (isEndOfPlay ??= this.IsEndOfPlay())
+					this.UpdateClearAnimation(nPlayer);
 			}
 			if (cleared && this.bIsAlreadyCleared[nPlayer] == false) {
 				if (OpenTaiko.Skin.Characters_Become_Cleared_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -1535,6 +1541,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 				this.bIsAlreadyCleared[nPlayer] = true;
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
+				if (isEndOfPlay ??= this.IsEndOfPlay())
+					this.UpdateClearAnimation(nPlayer);
 			}
 		}
 		if (isDecrease) {
@@ -1548,6 +1556,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				if (OpenTaiko.Skin.Characters_SoulOut_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
 					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.SoulOut, true);
 				}
+				if (isEndOfPlay ??= this.IsEndOfPlay())
+					this.UpdateClearAnimation(nPlayer);
 			} else if (!bIsGOGOTIME[nPlayer]) {
 				if (Chara_MissCount[nPlayer] == 1 - 1) {
 					if (OpenTaiko.Skin.Characters_MissIn_Ptn[Character] != 0 && actChara.CharaAction_Balloon_Delay[nPlayer].IsEnded) {
@@ -1565,6 +1575,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.actChara.ChangeAnime(nPlayer, CActImplCharacter.Anime.ClearOut, true);
 				}
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
+				if (isEndOfPlay ??= this.IsEndOfPlay())
+					this.UpdateClearAnimation(nPlayer);
 
 				switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 					case HGaugeMethods.EGaugeType.HARD:
@@ -1575,6 +1587,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 		}
 	}
+
+	protected virtual void UpdateClearAnimation(int iPlayer) { }
 
 	private void UpdateJudgeCount(CChip? pChip, int nPlayer, bool bAutoPlay, bool bBombHit, ENoteJudge eJudgeResult, int? msDelta = null) {
 		OpenTaiko.HttpEventReporter.ReportNoteJudgement(eJudgeResult, nPlayer, pChip, msDelta);
@@ -1723,6 +1737,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 				break;
 		}
 		actDan.Update();
+		if (this.IsChartEnded())
+			this.UpdateClearAnimation(nPlayer);
 	}
 
 	private void UpdateComboMilestone(CChip pChip, int nPlayer) {
@@ -2243,9 +2259,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
-	public bool IsFailStopped() => !OpenTaiko.ConfigIni.bAIBattleMode && stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min() >= EStageAbort.FailedStop;
+	public EStageAbort MinStageAbortType => stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min();
+	public bool IsFailStopped() => !OpenTaiko.ConfigIni.bAIBattleMode && MinStageAbortType >= EStageAbort.FailedStop;
+	public bool IsChartEnded() => isChartEnded.Take(OpenTaiko.ConfigIni.nPlayerCount).All(x => x);
 	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
+	public bool IsFinishedPlaying() => isFinishedPlaying.Take(OpenTaiko.ConfigIni.nPlayerCount).All(x => x);
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
+	public virtual bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
+		=> (isChartEnded ?? IsChartEnded()) || (isFinishedPlaying ?? IsFinishedPlaying());
 	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
 	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
 
@@ -2330,6 +2351,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 				if (dTX.pDan_LastChip.Contains(pChip)) {
 					this.actDan.Update();
+					if (this.IsChartEnded())
+						this.UpdateClearAnimation(nPlayer);
 				}
 			}
 
@@ -2561,6 +2584,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.ListDan_Number = pChip.n整数値_内部番号;
 						this.actPanel.t歌詞テクスチャを削除する();
 						this.actDan.Update();
+						if (this.IsChartEnded())
+							this.UpdateClearAnimation(nPlayer);
 						if (ListDan_Number != 0 && actDan.FirstSectionAnime) {
 							if (this.actDan.GetFailedAllChallenges(OpenTaiko.stageSongSelect.rChoosenSong.DanSongs)) {
 								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
@@ -3295,6 +3320,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 							this.CBranchScore[iPlayer].nMine++;
 							if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 								this.DanSongScore[actDan.NowShowingNumber].nMine++;
+
+							if (this.IsChartEnded())
+								this.UpdateClearAnimation(iPlayer);
 						}
 						if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
 							FloorManagement.damage();
@@ -3414,6 +3442,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.DanSongScore[actDan.NowShowingNumber].msBarRollPass += msRollLength;
 			}
 			this.actDan.Update();
+			if (this.IsChartEnded())
+				this.UpdateClearAnimation(iPlayer);
 		}
 
 		this.chip現在処理中の連打チップ[iPlayer].Remove(chip);
