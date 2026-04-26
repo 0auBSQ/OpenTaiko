@@ -10,6 +10,8 @@ namespace OpenTaiko {
 		}
 
 		public override (bool, string?) tConditionMet(int player, EScreen screen = EScreen.MyRoom) {
+			if (screen == EScreen.Internal) return (false, "");
+
 			if (this.Values.Length == this.RequiredArgCount) {
 				int _medals = (int)OpenTaiko.SaveFileInstances[player].data.Medals;
 
