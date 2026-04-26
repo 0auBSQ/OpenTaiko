@@ -2262,9 +2262,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_パネル文字列() {
-		if (!this.IsStageAborted()) {
-			this.actPanel.Draw();
-		}
+		this.actPanel.Draw();
 	}
 	protected void tパネル文字列の設定() {
 		var panelString = string.IsNullOrEmpty(OpenTaiko.TJA.PANEL) ? OpenTaiko.TJA.TITLE.GetString("") : OpenTaiko.TJA.PANEL;
@@ -2277,9 +2275,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 
 	protected void t進行描画_ゲージ() {
-		if (!this.IsStageAborted()) {
-			this.actGauge.Draw();
-		}
+		this.actGauge.Draw();
 	}
 	protected void t進行描画_コンボ() {
 		this.actCombo.Draw();
