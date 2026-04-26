@@ -156,11 +156,13 @@ class CStage段位選択 : CStage {
 
 			if (!this.段位リスト.bスクロール中 && !b選択した && !bDifficultyIn) {
 				int returnTitle() {
-					OpenTaiko.Skin.soundDanSelectBGM.tStop();
-					OpenTaiko.Skin.soundCancelSFX.tPlay();
-					this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.BackToTitle;
-					this.actFOtoTitle.tフェードアウト開始();
-					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
+						OpenTaiko.Skin.soundDanSelectBGM.tStop();
+						OpenTaiko.Skin.soundCancelSFX.tPlay();
+						this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.BackToTitle;
+						this.actFOtoTitle.tフェードアウト開始();
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					}
 					return 0;
 				}
 
@@ -194,7 +196,7 @@ class CStage段位選択 : CStage {
 							break;
 						case CSongListNode.ENodeType.BACKBOX: {
 								if (段位リスト.Cursor.IsInRootFolder("段位道場")) {
-									return returnTitle();
+									returnTitle();
 								} else {
 									OpenTaiko.Skin.soundDecideSFX.tPlay();
 									段位リスト.Cursor.tCloseFolder();
@@ -206,7 +208,7 @@ class CStage段位選択 : CStage {
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
-					return returnTitle();
+					returnTitle();
 				}
 			}
 

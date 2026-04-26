@@ -2062,7 +2062,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 
-		if (!this.bPAUSE && !this.IsStageAborted()) {
+		if (!this.bPAUSE && !this.IsStageAborted() && this.ePhaseID != EPhase.Common_FADEOUT) {
 			this.t入力処理_ドラム();
 
 			CTja tja = OpenTaiko.TJA;
@@ -2100,7 +2100,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			*/
 
-			else if ((base.ePhaseID == CStage.EPhase.Common_NORMAL) && (keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressedGB(EPad.FT)) && !this.actPauseMenu.bIsActivePopupMenu) {    // escape (exit)
+			else if (keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
 				if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 					this.Pause();
@@ -2150,7 +2150,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.ConfigIni.bAutoPlay[1] = !OpenTaiko.ConfigIni.bAutoPlay[1];
 		}
 #endif
-		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageAborted()) {
+		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageAborted() && this.ePhaseID != EPhase.Common_FADEOUT) {
 			if (keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) { // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {    // DownArrow (scrollspeed down)

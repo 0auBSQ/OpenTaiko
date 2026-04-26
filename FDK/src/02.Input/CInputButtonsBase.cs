@@ -40,8 +40,8 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 		(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
 	}
 
-	// 0 (temporary): press started this frame, 1: press starts, 2: press continues
-	// -1: release starts, -2: release continues, -3: press starts & ends
+	// 0 (temporary): press start this frame, 1: press start, 2: press continue
+	// -1: release start, -2: release continue, -3: press start & end
 	protected void ProcessButtonState(int idxBtn, int velocity = 0) {
 		if (ButtonStates[idxBtn].isPressed) {
 			if (ButtonStates[idxBtn].state >= 1) {

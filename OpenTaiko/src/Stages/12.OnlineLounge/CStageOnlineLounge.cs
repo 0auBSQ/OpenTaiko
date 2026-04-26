@@ -337,26 +337,30 @@ class CStageOnlineLounge : CStage {
 
 				#region [Fast return (Escape)]
 
-				OpenTaiko.Skin.soundCancelSFX.tPlay();
-
 				if (currentMenu == ECurrentMenu.MAIN) {
-					// Return to title screen
-					OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-					this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
-					this.actFOtoTitle.tフェードアウト開始();
-					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-				} else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT) {
-					// Return to base menu
-					currentMenu = ECurrentMenu.MAIN;
-				} else if (currentMenu == ECurrentMenu.CDN_OPTION) {
-					// Return to CDN select menu
-					currentMenu = ECurrentMenu.CDN_SELECT;
-				} else if (currentMenu == ECurrentMenu.CDN_SONGS || currentMenu == ECurrentMenu.CDN_CHARACTERS || currentMenu == ECurrentMenu.CDN_PUCHICHARAS) {
-					// Return to CDN select option
-					currentMenu = ECurrentMenu.CDN_OPTION;
-				}
+					if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
+						// Return to title screen
+						OpenTaiko.Skin.soundCancelSFX.tPlay();
+						OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
+						this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+						this.actFOtoTitle.tフェードアウト開始();
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+					}
+				} else {
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
+					if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT) {
+						// Return to base menu
+						currentMenu = ECurrentMenu.MAIN;
+					} else if (currentMenu == ECurrentMenu.CDN_OPTION) {
+						// Return to CDN select menu
+						currentMenu = ECurrentMenu.CDN_SELECT;
+					} else if (currentMenu == ECurrentMenu.CDN_SONGS || currentMenu == ECurrentMenu.CDN_CHARACTERS || currentMenu == ECurrentMenu.CDN_PUCHICHARAS) {
+						// Return to CDN select option
+						currentMenu = ECurrentMenu.CDN_OPTION;
+					}
 
-				return 0;
+					return 0;
+				}
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
@@ -367,15 +371,17 @@ class CStageOnlineLounge : CStage {
 				if (currentMenu == ECurrentMenu.MAIN) {
 					if (mainMenu[mainMenuIndex] == ECurrentMenu.CDN_SELECT || !IsDownloading) {
 						// Base menu
-						currentMenu = mainMenu[mainMenuIndex];
-						if (currentMenu == ECurrentMenu.RETURN) {
+						if (mainMenu[mainMenuIndex] == ECurrentMenu.RETURN) {
 							// Quit
-							OpenTaiko.Skin.soundCancelSFX.tPlay();
-							OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-							this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
-							this.actFOtoTitle.tフェードアウト開始();
-							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+							if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
+								OpenTaiko.Skin.soundCancelSFX.tPlay();
+								OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
+								this.eフェードアウト完了時の戻り値 = EReturnValue.ReturnToTitle;
+								this.actFOtoTitle.tフェードアウト開始();
+								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+							}
 						} else {
+							currentMenu = mainMenu[mainMenuIndex];
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 						}
 					} else {

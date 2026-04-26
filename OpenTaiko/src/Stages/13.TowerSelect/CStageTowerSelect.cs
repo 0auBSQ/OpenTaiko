@@ -82,6 +82,7 @@ class CStageTowerSelect : CStage {
 
 		if (this.eフェードアウト完了時の戻り値 == CStageSongSelect.EReturnValue.継続) {
 			int returnTitle() {
+				OpenTaiko.Skin.soundDecideSFX.tStop(); // cancel if played
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				this.eフェードアウト完了時の戻り値 = CStageSongSelect.EReturnValue.BackToTitle;
 				this.actFOtoTitle.tフェードアウト開始();
@@ -107,10 +108,7 @@ class CStageTowerSelect : CStage {
 					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 				#region [Fast return (Escape)]
-
-				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				returnTitle();
-
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
