@@ -133,9 +133,10 @@ function M.applySort()
     end
 
     -- Split regular into unlocked and locked before sorting
+    -- Vault locked songs are treated like BLURED for placement purposes.
     local unlocked, locked_nodes = {}, {}
     for _, node in ipairs(regular) do
-        if node.IsSong and node.IsLocked then
+        if (node.IsSong and node.IsLocked) or (G.unlocks ~= nil and G.unlocks.isVaultLocked(node)) then
             locked_nodes[#locked_nodes + 1] = node
         else
             unlocked[#unlocked + 1] = node
@@ -153,11 +154,19 @@ function M.applySort()
         return false
     end)
 
-    -- Locked songs always go at the bottom, sorted by HiddenIndex ascending
+    -- Locked songs always go at the bottom: grouped by effective HiddenIndex ascending,
+    -- then sorted by the same primary/secondary/tertiary keys within each group.
     table.sort(locked_nodes, function(a, b)
-        local ha, hb = a.HiddenIndex, b.HiddenIndex
+        local ha = G.unlocks ~= nil and G.unlocks.effectiveHiddenIndex(a) or (a.HiddenIndex or 0)
+        local hb = G.unlocks ~= nil and G.unlocks.effectiveHiddenIndex(b) or (b.HiddenIndex or 0)
         if ha ~= hb then return ha < hb end
-        return (origPos[a] or 0) < (origPos[b] or 0)
+        local pa, pb = primary[a],   primary[b]
+        local sa, sb = secondary[a], secondary[b]
+        local ta, tb = tertiary[a],  tertiary[b]
+        if pa ~= pb then if desc then return pa > pb else return pa < pb end end
+        if sa ~= sb then if desc then return sa > sb else return sa < sb end end
+        if ta ~= tb then return ta < tb end
+        return false
     end)
 
     -- Rebuild children list: unlocked first, then locked

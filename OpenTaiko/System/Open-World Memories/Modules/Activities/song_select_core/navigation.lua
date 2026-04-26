@@ -117,6 +117,10 @@ local function handleDecideSongSelect(Sort)
         if success then Sort.applySort(); G.sounds.Cancel:Play() end
         M.refreshPage()
     elseif ssn.IsSong == true then
+        if G.unlocks ~= nil and G.unlocks.isVaultLocked(ssn) then
+            G.unlocks.onDecideVaultLocked(G.highlightedPlayer, ssn)
+            return nil
+        end
         if ssn.IsLocked and G.unlocks ~= nil then
             G.unlocks.onDecideLocked(G.highlightedPlayer, ssn)
             return nil

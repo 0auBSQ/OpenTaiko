@@ -153,7 +153,7 @@ end
 local function drawPreimage()
     local node = G.songList:GetSongNodeAtOffset(0)
     if node == nil or node.IsSong ~= true then return end
-    if node.IsLocked and node.HiddenIndex >= 2 then return end
+    if G.unlocks.effectiveHiddenIndex(node) >= 2 then return end
     G.bgtx["preimage_load"]:Draw(PREIMAGE_ORIGIN_X - G.songSelectShift, PREIMAGE_ORIGIN_Y)
     G.bgtx["load"]:DrawAtAnchor(
         PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
@@ -177,8 +177,8 @@ function M.drawPanel()
     end
 
     if ssn ~= nil and ssn.IsSong then
-        local ssnHI = ssn.IsLocked and ssn.HiddenIndex or 0
-        -- BLURED: skip the song info panel entirely
+        local ssnHI = G.unlocks.effectiveHiddenIndex(ssn)
+        -- BLURED / vault locked: skip the song info panel entirely
         if ssnHI < 2 then
             G.bgtx["songinfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
             if ssn.HasVideo then
@@ -258,7 +258,11 @@ function M.drawPanel()
             if tx ~= nil then
                 local node = G.currentPage[i]
                 if node.IsSong or node.IsFolder then
-                    if node.IsLocked then
+                    if node.IsSong and G.unlocks.isVaultLocked(node) then
+                        -- Secret Vault locked: vault bar + vault lock icon, no title, no level tag
+                        G.unlocks.drawVaultBar(node, xpos, ypos)
+                        G.unlocks.drawVaultLockIcon(node, xpos, ypos)
+                    elseif node.IsLocked then
                         -- Draw the HiddenIndex-appropriate bar (GRAYED/BLURED both use bar_1);
                         -- DISPLAYED locked songs fall through to the normal bar below.
                         if not G.unlocks.drawLockedBar(node, xpos, ypos) then
@@ -305,7 +309,7 @@ function M.drawPanel()
         local xlshift = ax * math.cos(7 * math.pi / 12)
         local ylshift = ax * math.sin(7 * math.pi / 12)
         local isSong = ssn ~= nil and ssn.IsSong
-        local isUnlockedSong = isSong and (ssn.IsLocked ~= true)
+        local isUnlockedSong = isSong and (ssn.IsLocked ~= true) and not G.unlocks.isVaultLocked(ssn)
         if isUnlockedSong then
             -- selectedlarge covers bar + barleft; align its right edge with selected's right edge
             local largeCenterX = x0 - (G.bars["selectedlarge"].Width - G.bars["selected"].Width) / 2
@@ -352,6 +356,7 @@ function M.drawPanel()
 
     -- Unlock conditions panel (shown when a locked song is highlighted)
     G.unlocks.drawCondsPanel()
+    G.unlocks.drawVaultCondsPanel()
 
     -- Nameplates
     local playerCount = CONFIG.PlayerCount
