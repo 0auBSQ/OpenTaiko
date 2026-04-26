@@ -281,9 +281,11 @@ internal class CActSelect曲リスト : CActivity {
 
 		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
 			if (this.rCurrentlySelectedSong.rParentNode != null) {
-				this.rCurrentlySelectedSong = this.rCurrentlySelectedSong.rParentNode;
-				this.rCurrentlySelectedSong.Openindex = nSelectSongIndex;
-				tChangeSong(OpenTaiko.Songs管理.list曲ルート.IndexOf(this.rCurrentlySelectedSong) - nSelectSongIndex);
+				var parent = this.rCurrentlySelectedSong = this.rCurrentlySelectedSong.rParentNode;
+				parent.Openindex = nSelectSongIndex;
+				parent.bIsOpenFolder = false;
+				var nowList = parent.rParentNode?.childrenList ?? OpenTaiko.Songs管理.list曲ルート;
+				tChangeSong(nowList.IndexOf(parent) - nSelectSongIndex);
 			}
 		} else {
 			// Reindex the parent node
