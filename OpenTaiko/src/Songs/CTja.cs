@@ -678,7 +678,7 @@ internal class CTja : CActivity {
 					}
 
 					// force chart end for all players when the WAVE of last song ends
-					if (i == 0) {
+					if (i == 0 && cwav.rSound[i] != null) {
 						var chipBgm = cwav.PlayChip;
 						bool isLastSongWave = (n参照中の難易度 == (int)Difficulty.Dan) ?
 							(this.List_DanSongs.Count > 0) && (cwav.n内部番号 == this.List_DanSongs.Last().Wave.n内部番号)
