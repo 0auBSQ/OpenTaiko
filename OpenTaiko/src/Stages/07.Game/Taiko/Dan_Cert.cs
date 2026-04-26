@@ -533,12 +533,12 @@ internal class Dan_Cert : CActivity {
 			return; // keep danger status
 
 		Exam.ReachStatus getGenericSuccessStatusLess(Dan_C dan_C, double amountMax, double amountRemainMax, Exam.Status status)
-			=> ((amountMax < 0) ? 0 : 100 * amountRemainMax / amountMax) switch {
-				_ when isAfterLastChip => Exam.ReachStatus.High, // and if not better success // no white blinking at exam end
-				>= 10 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
-				>= 5 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
-				_ => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Nearer_Better_Success : Exam.ReachStatus.Nearer_Success,
-			};
+			=> isAfterLastChip ? Exam.ReachStatus.Success_Or_Better // not better success if reached here // no white blinking at exam end
+				: ((amountMax < 0) ? 0 : 100 * amountRemainMax / amountMax) switch {
+					>= 10 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Success_Or_Better : Exam.ReachStatus.High,
+					>= 5 => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Near_Better_Success : Exam.ReachStatus.Near_Success,
+					_ => (status == Exam.Status.Better_Success) ? Exam.ReachStatus.Nearer_Better_Success : Exam.ReachStatus.Nearer_Success,
+				};
 
 		dan_C.ReachStatus = (dan_C.ExamRange != Exam.Range.Less) ?
 			dan_C.GetAmountToPercent() switch {
@@ -553,8 +553,8 @@ internal class Dan_Cert : CActivity {
 				},
 			}
 			: dan_C.GetAmountToPercent() switch {
-				< 20 => Exam.ReachStatus.Danger,
-				< 30 => Exam.ReachStatus.Low,
+				< 20 when !isAfterLastChip => Exam.ReachStatus.Danger,
+				< 30 when !isAfterLastChip => Exam.ReachStatus.Low,
 				_ => getGenericSuccessStatusLess(dan_C, amountMax, amountRemainMax, dan_C.GetExamStatus())
 			};
 
