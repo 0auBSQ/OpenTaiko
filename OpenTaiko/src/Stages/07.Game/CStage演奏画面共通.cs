@@ -934,7 +934,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 		// Diff = Tower and SIDE is Normal
 		if (diff == (int)Difficulty.Tower) {
-			_timingzonesAreEasy = OpenTaiko.stageSongSelect.rChoosenSong.nSide == CTja.ESide.eNormal;
+			_timingzonesAreEasy = OpenTaiko.GetTJA(nPlayer)!.SIDE == CTja.ESide.eNormal;
 		}
 
 		return _timingzonesAreEasy;

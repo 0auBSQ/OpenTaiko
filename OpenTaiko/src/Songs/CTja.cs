@@ -213,8 +213,17 @@ internal class CTja : CActivity {
 
 	public enum ESide {
 		eNormal,
-		eEx
+		eEx,
+		eBoth,
 	}
+
+	public static ESide strConvertSide(string str)
+		=> (int.TryParse(str, out int res) && Enum.IsDefined(typeof(ESide), res)) ? (ESide)res : str.ToLower() switch {
+			"normal" => ESide.eNormal,
+			"ex" or "extra" => ESide.eEx,
+			"both" => ESide.eBoth,
+			_ => throw new ArgumentOutOfRangeException(),
+		};
 
 	// Properties
 
@@ -269,7 +278,7 @@ internal class CTja : CActivity {
 	public bool HIDDENLEVEL;
 	public STDGBVALUE<int> LEVEL;
 	public bool bLyrics;
-	public ESide SIDE;
+	public ESide SIDE = ESide.eBoth;
 	public CSongUniqueID uniqueID;
 
 	public class QueryableCourseMetadata {
@@ -3083,8 +3092,7 @@ internal class CTja : CActivity {
 		}
 
 		if (strCommandName.Equals("SIDE")) {
-			if (!string.IsNullOrEmpty(strCommandParam) && strCommandParam.Equals("Normal"))
-				this.SIDE = ESide.eNormal;
+			this.SIDE = strConvertSide(strCommandParam);
 		} else if (strCommandName.Equals("LIFE")) {
 			var life = (int)strCommandParam.ParseReal();
 			this.LIFE = life;
