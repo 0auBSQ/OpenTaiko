@@ -456,9 +456,11 @@ function update()
     end
     G.wasSortDialogActive = isSortDialogActive
 
-    -- Handle confirm_dialog close: refresh so a newly-unlocked song shows correctly.
+    -- Handle confirm_dialog close: re-sort so the newly-unlocked song moves out of
+    -- the locked section, then refresh the page.
     local isConfirmDialogActive = G.act_inner["confirm_dialog"] ~= nil and G.act_inner["confirm_dialog"].IsActive
     if G.wasConfirmDialogActive and not isConfirmDialogActive then
+        G.applySort()
         Nav.refreshPage(true)
     end
     G.wasConfirmDialogActive = isConfirmDialogActive

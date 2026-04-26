@@ -47,13 +47,6 @@ function M.applySort()
 
     local children = folderNode.Children
 
-    -- filepath ASC: restore original order
-    if methodIdx0 == 0 and dirIdx == 1 then
-        children:Clear()
-        for _, node in ipairs(orig) do children:Add(node) end
-        return
-    end
-
     -- Separate special nodes from sortable regular nodes
     local regular, backs, randoms, origPos = {}, {}, {}, {}
     for idx, node in ipairs(orig) do
@@ -63,6 +56,7 @@ function M.applySort()
         else                       regular[#regular + 1]  = node
         end
     end
+
 
     -- Deduce back-box spacing from original positions
     local backFreq = 7
@@ -138,8 +132,18 @@ function M.applySort()
         tertiary[node]  = t
     end
 
+    -- Split regular into unlocked and locked before sorting
+    local unlocked, locked_nodes = {}, {}
+    for _, node in ipairs(regular) do
+        if node.IsSong and node.IsLocked then
+            locked_nodes[#locked_nodes + 1] = node
+        else
+            unlocked[#unlocked + 1] = node
+        end
+    end
+
     local desc = (dirIdx == 2)
-    table.sort(regular, function(a, b)
+    table.sort(unlocked, function(a, b)
         local pa, pb = primary[a],   primary[b]
         local sa, sb = secondary[a], secondary[b]
         local ta, tb = tertiary[a],  tertiary[b]
@@ -149,9 +153,17 @@ function M.applySort()
         return false
     end)
 
-    -- Rebuild children list
+    -- Locked songs always go at the bottom, sorted by HiddenIndex ascending
+    table.sort(locked_nodes, function(a, b)
+        local ha, hb = a.HiddenIndex, b.HiddenIndex
+        if ha ~= hb then return ha < hb end
+        return (origPos[a] or 0) < (origPos[b] or 0)
+    end)
+
+    -- Rebuild children list: unlocked first, then locked
     children:Clear()
-    for _, node in ipairs(regular) do children:Add(node) end
+    for _, node in ipairs(unlocked)      do children:Add(node) end
+    for _, node in ipairs(locked_nodes)  do children:Add(node) end
 
     -- Re-insert back boxes at original spacing
     local step = backFreq + 1

@@ -96,11 +96,16 @@ function M.drawCondsPanel()
     if condText == nil or condText == "" then return end
 
     local tx = G.text:GetText(condText, false, 806)
+    local origScaleX = tx:GetScale().X
+    if tx.Height > 380 then
+        tx:SetScale(origScaleX, 380 / tx.Height)
+    end
     if flashColor ~= nil then
         tx:SetColor(flashColor)
     end
     tx:Draw(350, 605)
     tx:SetColor(COLOR:CreateColorFromHex("ffffffff"))
+    tx:SetScale(origScaleX, 1)
 end
 
 -- ── Tick ──────────────────────────────────────────────────────────────────────

@@ -153,6 +153,7 @@ end
 local function drawPreimage()
     local node = G.songList:GetSongNodeAtOffset(0)
     if node == nil or node.IsSong ~= true then return end
+    if node.IsLocked and node.HiddenIndex >= 2 then return end
     G.bgtx["preimage_load"]:Draw(PREIMAGE_ORIGIN_X - G.songSelectShift, PREIMAGE_ORIGIN_Y)
     G.bgtx["load"]:DrawAtAnchor(
         PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
@@ -176,67 +177,73 @@ function M.drawPanel()
     end
 
     if ssn ~= nil and ssn.IsSong then
-        G.bgtx["songinfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
-        if ssn.HasVideo then
-            G.bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X - G.songSelectShift, SONGINFO_HASVIDEO_ORIGIN_Y)
-        end
-        if ssn.Explicit then
-            G.bgtx["sinfo_explicit"]:DrawAtAnchor(
-                SONGINFO_EXPLICIT_ORIGIN_X - G.songSelectShift, SONGINFO_EXPLICIT_ORIGIN_Y, "topright")
-        end
+        local ssnHI = ssn.IsLocked and ssn.HiddenIndex or 0
+        -- BLURED: skip the song info panel entirely
+        if ssnHI < 2 then
+            G.bgtx["songinfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
+            if ssn.HasVideo then
+                G.bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X - G.songSelectShift, SONGINFO_HASVIDEO_ORIGIN_Y)
+            end
+            if ssn.Explicit then
+                G.bgtx["sinfo_explicit"]:DrawAtAnchor(
+                    SONGINFO_EXPLICIT_ORIGIN_X - G.songSelectShift, SONGINFO_EXPLICIT_ORIGIN_Y, "topright")
+            end
 
-        -- Difficulty icons in song info
-        for i = 0, 4 do
-            local chart = ssn:GetChart(i)
-            local xpos  = SONGINFO_DIFFICULTIES_ORIGIN_X - G.songSelectShift
-            local ypos  = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y * math.min(i, 3)
-            if ssn:GetChart(3) ~= nil and i == 4 then
-                if chart ~= nil then
-                    G.bgtx["sinfo_difficulties_4"]:SetOpacity(G.difficultyFade4 / 255)
-                    G.bgtx["sinfo_difficulties_4"]:Draw(xpos, ypos)
-                    G.bgtx["sinfo_difficulties_4"]:SetOpacity(1)
-                    G.drawNumberCentered(chart.Level, "sinfo_level",
-                        xpos + G.bgtx["sinfo_difficulties_4"].Width / 2,
-                        ypos + G.bgtx["sinfo_difficulties_4"].Height / 2,
-                        nil, G.difficultyFade4 / 255)
-                    if chart.IsPlus then
-                        G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(G.difficultyFade4 / 255)
-                        G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
-                        G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(1)
+            -- Difficulty icons: hidden for GRAYED and above
+            if ssnHI == 0 then
+                for i = 0, 4 do
+                    local chart = ssn:GetChart(i)
+                    local xpos  = SONGINFO_DIFFICULTIES_ORIGIN_X - G.songSelectShift
+                    local ypos  = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y * math.min(i, 3)
+                    if ssn:GetChart(3) ~= nil and i == 4 then
+                        if chart ~= nil then
+                            G.bgtx["sinfo_difficulties_4"]:SetOpacity(G.difficultyFade4 / 255)
+                            G.bgtx["sinfo_difficulties_4"]:Draw(xpos, ypos)
+                            G.bgtx["sinfo_difficulties_4"]:SetOpacity(1)
+                            G.drawNumberCentered(chart.Level, "sinfo_level",
+                                xpos + G.bgtx["sinfo_difficulties_4"].Width / 2,
+                                ypos + G.bgtx["sinfo_difficulties_4"].Height / 2,
+                                nil, G.difficultyFade4 / 255)
+                            if chart.IsPlus then
+                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(G.difficultyFade4 / 255)
+                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
+                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(1)
+                            end
+                        end
+                    elseif chart == nil then
+                        if ssn:GetChart(4) == nil or i ~= 3 then
+                            G.bgtx["sinfo_difficulties_missing"]:Draw(xpos, ypos)
+                        end
+                    else
+                        G.bgtx["sinfo_difficulties_" .. i]:Draw(xpos, ypos)
+                        G.drawNumberCentered(chart.Level, "sinfo_level",
+                            xpos + G.bgtx["sinfo_difficulties_" .. i].Width / 2,
+                            ypos + G.bgtx["sinfo_difficulties_" .. i].Height / 2)
+                        if chart.IsPlus then G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos) end
                     end
                 end
-            elseif chart == nil then
-                if ssn:GetChart(4) == nil or i ~= 3 then
-                    G.bgtx["sinfo_difficulties_missing"]:Draw(xpos, ypos)
+            end
+
+            local focusedChart = getSongNodeFocusChart(ssn)
+            G.textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
+                :DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
+            G.textSmall:GetText("Chart - " .. ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
+                :Draw(SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y)
+            G.textSmall:GetText("Length - " .. formatDuration(G.previewDurationMs), false, SONGINFO_LENGTH_MWIDTH)
+                :Draw(SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y)
+
+            if focusedChart ~= nil then
+                local mult    = CONFIG.SongSpeed / 20
+                local bpmText = formatNumber(focusedChart.BaseBPM * mult, 3)
+                if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
+                    bpmText = bpmText .. " (" .. formatNumber(focusedChart.MinBPM * mult, 3)
+                           .. "-" .. formatNumber(focusedChart.MaxBPM * mult, 3) .. ")"
                 end
-            else
-                G.bgtx["sinfo_difficulties_" .. i]:Draw(xpos, ypos)
-                G.drawNumberCentered(chart.Level, "sinfo_level",
-                    xpos + G.bgtx["sinfo_difficulties_" .. i].Width / 2,
-                    ypos + G.bgtx["sinfo_difficulties_" .. i].Height / 2)
-                if chart.IsPlus then G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos) end
+                local col = "FFFFFFFF"
+                if mult < 1 then col = "ff95ccff" elseif mult > 1 then col = "ffff9ec3" end
+                G.text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(col))
+                    :DrawAtAnchor(SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y, "center")
             end
-        end
-
-        local focusedChart = getSongNodeFocusChart(ssn)
-        G.textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
-            :DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
-        G.textSmall:GetText("Chart - " .. ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
-            :Draw(SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y)
-        G.textSmall:GetText("Length - " .. formatDuration(G.previewDurationMs), false, SONGINFO_LENGTH_MWIDTH)
-            :Draw(SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y)
-
-        if focusedChart ~= nil then
-            local mult    = CONFIG.SongSpeed / 20
-            local bpmText = formatNumber(focusedChart.BaseBPM * mult, 3)
-            if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
-                bpmText = bpmText .. " (" .. formatNumber(focusedChart.MinBPM * mult, 3)
-                       .. "-" .. formatNumber(focusedChart.MaxBPM * mult, 3) .. ")"
-            end
-            local col = "FFFFFFFF"
-            if mult < 1 then col = "ff95ccff" elseif mult > 1 then col = "ffff9ec3" end
-            G.text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(col))
-                :DrawAtAnchor(SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y, "center")
         end
     end
 

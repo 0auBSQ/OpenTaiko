@@ -36,6 +36,7 @@ local function buildPredicate(params)
 
     return function(node)
         if not node.IsSong then return false end
+        if node.IsLocked then return false end
         if titlePat    ~= "" and not (node.Title    or ""):lower():find(titlePat,    1, true) then return false end
         if subtitlePat ~= "" and not (node.Subtitle or ""):lower():find(subtitlePat, 1, true) then return false end
 
