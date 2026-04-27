@@ -836,16 +836,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 			if (OpenTaiko.ConfigIni.nAILevel > 1)
 				OpenTaiko.ConfigIni.nAILevel--;
 		}
-		actAIBattle.BatchAnimeCounter.CurrentValue = 0;
-		_AIBattleState = 0;
-
-		for (int i = 0; i < 5; i++) {
-			this.CSectionScore[i] = new CBRANCHSCORE();
-		}
 
 		int clearCount = 0;
-		for (int i = 0; i < OpenTaiko.stageGameScreen.AIBattleSections.Count; i++) {
-			if (OpenTaiko.stageGameScreen.AIBattleSections[i].End == CStage演奏画面共通.AIBattleSection.EndType.Clear) {
+		for (int i = 0; i < this.AIBattleSections.Count; i++) {
+			if (this.AIBattleSections[i].End == AIBattleSection.EndType.Clear) {
 				clearCount++;
 			}
 		}
@@ -2480,8 +2474,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 						if (!this.bPAUSE && !pChip.bHit) { // can't update while paused
 														   //if (nPlayer == 0) TJAPlayer3.BeatScaling = new CCounter(0, 1000, 120.0 / pChip.dbBPM / 2.0, TJAPlayer3.Timer);
-							if (NowAIBattleSectionTime >= NowAIBattleSection.Length)
-								this.UpdateAIBattleSection(nPlayer, n現在時刻ms);
+							this.UpdateAIBattleSection(nPlayer, n現在時刻ms);
 
 							if (this.actPlayInfo.NowMeasure[nPlayer] == 0) {
 								UpdateCharaCounter(nPlayer);
@@ -3008,8 +3001,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				//バグで譜面がとてつもないことになっているため、#ENDがきたらこれを差し込む。
 				case 0xFF:
 					if (!this.bPAUSE && !pChip.bHit) { // prevent infinity pause in training mode
-						while (AIBattleSections.Count > NowAIBattleSectionCount) // end all AI battle sections
-							this.UpdateAIBattleSection(nPlayer, n現在時刻ms);
+						this.UpdateAIBattleSection(nPlayer, n現在時刻ms, endOfPlay: true);
 						this.isChartEnded[nPlayer] = true;
 						if (pChip.n整数値 != 0) { // 0: last note past, 0xFF: song end
 							if (OpenTaiko.ConfigIni.bTokkunMode) {
@@ -3178,16 +3170,26 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return false;
 	}
 
-	private void UpdateAIBattleSection(int nPlayer, long n現在時刻ms) {
-		if (NowAIBattleSection.End == AIBattleSection.EndType.None && nPlayer == 0) {
-			PassAIBattleSection();
+	private void UpdateAIBattleSection(int nPlayer, long n現在時刻ms, bool endOfPlay = false) {
+		if (nPlayer != 0)
+			return;
+		bool anySectionPassed = false;
+		while (AIBattleSections.Count > NowAIBattleSectionCount && (endOfPlay || NowAIBattleSectionTime >= NowAIBattleSection.Length)) {
+			if (NowAIBattleSection.End == AIBattleSection.EndType.None)
+				PassAIBattleSection();
+
+			actAIBattle.BatchAnimeCounter.CurrentValue = 0;
+			_AIBattleState = 0;
 
 			NowAIBattleSectionCount++;
+			anySectionPassed = true;
 
-			if (AIBattleSections.Count > NowAIBattleSectionCount) {
-				NowAIBattleSectionTime = 0;
-			}
 			NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
+		}
+		if (anySectionPassed && AIBattleSections.Count > NowAIBattleSectionCount) {
+			for (int i = 0; i < 5; i++) {
+				this.CSectionScore[i] = new CBRANCHSCORE();
+			}
 		}
 	}
 
