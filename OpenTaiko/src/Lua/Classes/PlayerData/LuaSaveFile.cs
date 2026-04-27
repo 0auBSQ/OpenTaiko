@@ -151,6 +151,18 @@
 			_sf.tSetGlobalCounter(counterName, counterValue);
 		}
 
+		/// <summary>
+		/// Returns the number of charts cleared at exactly <paramref name="clearStatus"/>
+		/// for <paramref name="difficulty"/> (0=Easy…4=Edit).
+		/// clearStatus: 0=None, 1=Assisted, 2=Clear, 3=FC, 4=Perfect.
+		/// </summary>
+		public int GetClearStatusCount(int difficulty, int clearStatus) {
+			if (difficulty < 0 || difficulty >= (int)Difficulty.Total) return 0;
+			var table = _sf.data.bestPlaysStats?.ClearStatuses?[difficulty];
+			if (table == null || clearStatus < 0 || clearStatus >= table.Length) return 0;
+			return table[clearStatus];
+		}
+
 		#endregion
 
 		#region [Characters and Puchis]

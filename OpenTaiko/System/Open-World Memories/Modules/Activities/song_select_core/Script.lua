@@ -26,7 +26,7 @@ local Unlocks = require("unlockables")
 
 local G = {
     -- Fonts
-    text = nil, textSmall = nil, textLarge = nil,
+    text = nil, textSmall = nil, textLarge = nil, textStats = nil,
 
     -- Sounds
     sounds = {},
@@ -38,6 +38,7 @@ local G = {
     -- Textures
     bars = {}, bgtx = {},
     favoriteicon = nil,
+    portraits = {},
 
     -- Player
     highlightedPlayer = 0,
@@ -72,12 +73,13 @@ local G = {
     -- (search state is managed entirely by LuaSongList:OpenVirtualFolder / CloseFolder)
 
     -- Preview state
-    puchiSineY        = 0,
-    selectedSongNode  = nil,
+    puchiSineY          = 0,
+    selectedSongNode    = nil,
     previewDemoStartRaw = 0,
     previewDemoStart    = 0,
     previewDurationMs   = 0,
     previewLoaded       = false,
+    previewLoopCooldown = false,
 
     -- Difficulty select
     diffBars     = {},
@@ -205,6 +207,7 @@ function onStart()
     G.text      = TEXT:Create(28)
     G.textSmall = TEXT:Create(18)
     G.textLarge = TEXT:Create(40)
+    G.textStats = TEXT:Create(24)
 
     SHARED:SetSharedTexture("background", "Textures/bg0.png")
 
@@ -349,9 +352,14 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
         G.puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
     end)
 
+    G.portraits = {}
     for p = 0, 4 do
         local chara = GetSaveFile(p):GetCharacter()
-        if chara ~= nil and chara.IsValid then chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end
+        if chara ~= nil and chara.IsValid then
+            chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
+            local portraitPath = chara.FullPath .. "/Portrait.png"
+            G.portraits[p] = TEXTURE:CreateTextureFromAbsolutePath(portraitPath)
+        end
     end
 end
 
@@ -368,7 +376,9 @@ function deactivate()
     for p = 0, 4 do
         local chara = GetSaveFile(p):GetCharacter()
         if chara ~= nil and chara.IsValid then chara:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end
+        if G.portraits[p] ~= nil then G.portraits[p]:Dispose(); G.portraits[p] = nil end
     end
+    G.portraits = {}
 end
 
 function afterSongEnum()
@@ -387,6 +397,7 @@ function onDestroy()
     if G.text      ~= nil then G.text:Dispose()      end
     if G.textSmall ~= nil then G.textSmall:Dispose()  end
     if G.textLarge ~= nil then G.textLarge:Dispose()  end
+    if G.textStats ~= nil then G.textStats:Dispose()  end
     if G.favoriteicon ~= nil then G.favoriteicon:Dispose() end
     for _, bar     in pairs(G.bars)          do bar:Dispose()     end
     for _, bg      in pairs(G.bgtx)          do bg:Dispose()      end
@@ -395,7 +406,25 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────────
 
+local function drawWaitScreen(msg)
+    -- Black fill
+    local black = COLOR:CreateColorFromHex("ff000000")
+    local white = COLOR:CreateColorFromHex("ffffffff")
+    local tx = G.textLarge:GetText(msg, false, 1600, white)
+    tx:DrawAtAnchor(960, 540, "center")
+end
+
 function draw(mode)
+    -- Loading / no-songs guard: black screen with status message.
+    if IsSongsEnumerating() then
+        drawWaitScreen("Loading songs, please wait...")
+        return
+    end
+    if G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then
+        drawWaitScreen("No song found.")
+        return
+    end
+
     if mode ~= "no_bg" then
         SHARED:GetSharedTexture("background"):Draw(-G.backgroundScrollX, 0)
         SHARED:GetSharedTexture("background"):Draw(-G.backgroundScrollX + 1920, 0)
@@ -415,11 +444,25 @@ end
 function update()
     for _, c in pairs(G.ctx) do c:Tick() end
 
-    -- Loop preview sound
-    if G.previewLoaded then
+    -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
+    if IsSongsEnumerating() or G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then
+        if INPUT:KeyboardPressed("Escape") or INPUT:Pressed("Cancel") then
+            G.sounds.Cancel:Play()
+            return "cancel"
+        end
+        return nil
+    end
+
+    -- Loop preview sound; cooldown prevents double-seek on the same restart.
+    if G.previewLoaded and not G.previewLoopCooldown then
         local psnd = SHARED:GetSharedSound("presound")
         if psnd.Loaded and not psnd.IsPlaying then
-            psnd:Play(); psnd:SetTimestamp(G.previewDemoStart)
+            G.previewLoopCooldown = true
+            psnd:Play()
+            psnd:SetTimestamp(G.previewDemoStart)
+            G.startCounter("preview_loop_cooldown", 0, 1, 0.5, "none", nil, function()
+                G.previewLoopCooldown = false
+            end)
         end
     end
 
@@ -441,6 +484,8 @@ function update()
                 if not chara:AvailableAnimation(CHARACTER.ANIM_MENU_NORMAL) then
                     chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL)
                 end
+                if G.portraits[p] ~= nil then G.portraits[p]:Dispose() end
+                G.portraits[p] = TEXTURE:CreateTextureFromAbsolutePath(chara.FullPath .. "/Portrait.png")
             end
         end
     end

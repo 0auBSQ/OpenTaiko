@@ -364,23 +364,50 @@ function M.drawPanel()
 
     G.bgtx["nameplate_info"]:SetOpacity(opacityNorm)
     do
-        local x0     = NAMEPLATE_BOX_START_X
-        local y0     = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
+        local x0       = NAMEPLATE_BOX_START_X
+        local y0       = 1080 - NAMEPLATE_BOX_FOLDED_SIZE_Y
         local ssCharaX = x0 + G.bgtx["nameplate_info"].Width / 2
         G.bgtx["nameplate_info"]:Draw(x0, y0)
         G.drawPlayerChara(G.highlightedPlayer, ssCharaX, y0 + NAMEPLATE_OFFSET_Y, 1, 1, opacityNorm, false)
         G.drawPlayerPuchi(G.highlightedPlayer, ssCharaX - PUCHI_OFFSET_X, y0 + NAMEPLATE_OFFSET_Y + G.puchiSineY, 1, 1, opacityNorm)
         NAMEPLATE:DrawPlayerNameplate(x0 + NAMEPLATE_OFFSET_X, y0 + NAMEPLATE_OFFSET_Y, G.songSelectElemOpacity, G.highlightedPlayer)
+
+        -- Perfect / FC / Clear counts for the highlighted player at the displayed difficulty
+        if G.textStats ~= nil then
+            local diff    = math.min(4, CONFIG:GetDefaultCourse(0))
+            local sav     = GetSaveFile(G.highlightedPlayer)
+            local white   = COLOR:CreateColorFromHex("ffffffff")
+            local nPerfect = sav:GetClearStatusCount(diff, 4)
+            local nFC      = sav:GetClearStatusCount(diff, 3)
+            local nClear   = sav:GetClearStatusCount(diff, 2)
+            local function drawStat(n, x)
+                local tx = G.textStats:GetText(tostring(n), false, 99999, white)
+                tx:SetOpacity(opacityNorm)
+                tx:DrawAtAnchor(x, 1058, "center")
+                tx:SetOpacity(1)
+            end
+            drawStat(nPerfect, 95)
+            drawStat(nFC,     212)
+            drawStat(nClear,  329)
+        end
     end
 
     for i = 1, playerCount - 1 do
         local j    = i
         if j - 1 >= G.highlightedPlayer then j = j + 1 end
-        local xpos = NAMEPLATE_BOX_START_X + i * NAMEPLATE_BOX_SPACING_X
-        local ypos = 1080 - NAMEPLATE_SECONDARY_OFFSET_Y
+        local xpos    = NAMEPLATE_BOX_START_X + i * NAMEPLATE_BOX_SPACING_X
+        local ypos    = 1080 - NAMEPLATE_SECONDARY_OFFSET_Y
+        local portCx  = xpos + G.bgtx["nameplate_info"].Width / 2
         G.bgtx["placeholder_portrait"]:SetOpacity(opacityNorm)
-        G.bgtx["placeholder_portrait"]:DrawAtAnchor(xpos + G.bgtx["nameplate_info"].Width / 2, ypos, "bottom")
+        G.bgtx["placeholder_portrait"]:DrawAtAnchor(portCx, ypos, "bottom")
         G.bgtx["placeholder_portrait"]:SetOpacity(1)
+        -- Draw Portrait.png over the placeholder if it loaded for this player slot
+        local portrait = G.portraits ~= nil and G.portraits[j - 1]
+        if portrait ~= nil and portrait.Loaded then
+            portrait:SetOpacity(opacityNorm)
+            portrait:DrawAtAnchor(portCx, ypos, "bottom")
+            portrait:SetOpacity(1)
+        end
         NAMEPLATE:DrawPlayerNameplate(xpos + NAMEPLATE_OFFSET_X, ypos, G.songSelectElemOpacity, j - 1)
     end
 end

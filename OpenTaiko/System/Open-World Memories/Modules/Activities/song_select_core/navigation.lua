@@ -29,10 +29,11 @@ local function reloadPreimage(songNode)
 end
 
 local function playPreview(songNode)
-    G.previewLoaded       = false
-    G.previewDurationMs   = 0
-    G.previewDemoStartRaw = 0
-    G.previewDemoStart    = 0
+    G.previewLoaded         = false
+    G.previewDurationMs     = 0
+    G.previewDemoStartRaw   = 0
+    G.previewDemoStart      = 0
+    G.previewLoopCooldown   = false
     SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
     if songNode.IsSong == true then
         -- Suppress audio preview for GRAYED/BLURED locked songs

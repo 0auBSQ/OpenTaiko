@@ -254,6 +254,7 @@ class CLuaScript : IDisposable {
 			LuaScript["GetSaveFile"] = GetLuaSaveFile;
 			LuaScript["RequestSongList"] = RequestSongList;
 			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
+			LuaScript["IsSongsEnumerating"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsEnumerating ?? false);
 
 			string scriptFilePath = $"{strDir}/Script.lua";
 			if (File.Exists(scriptFilePath)) {
