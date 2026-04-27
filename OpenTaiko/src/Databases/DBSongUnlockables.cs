@@ -4,6 +4,7 @@ using static OpenTaiko.DBSongUnlockables;
 
 namespace OpenTaiko;
 
+
 internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>> {
 	/* DISPLAYED : Song displayed in song select, only a lock appearing on the side, audio preview plays
 	 * GRAYED : Box grayed, song preview does not play
@@ -108,6 +109,31 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 
 		if (_edited)
 			OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
+	}
+
+	/// <summary>
+	/// Reads Unlock.json from <paramref name="folderPath"/> and registers the entry in
+	/// <see cref="data"/> under <paramref name="uniqueId"/> if it is not already present.
+	/// Safe to call repeatedly — the DB entry always takes priority and subsequent calls
+	/// for the same id are no-ops.
+	/// </summary>
+	public void tTryRegisterLocalUnlock(string uniqueId, string folderPath) {
+		if (string.IsNullOrEmpty(uniqueId) || data.ContainsKey(uniqueId)) return;
+
+		string jsonPath = Path.Combine(folderPath, "Unlock.json");
+		if (!File.Exists(jsonPath)) return;
+
+		UnlockJson? raw = ConfigManager.GetConfig<UnlockJson>(jsonPath);
+		if (raw == null) return;
+
+		SongUnlockable su = new SongUnlockable();
+		su.hiddenIndex = (EHiddenIndex)Math.Clamp(raw.HiddenIndex, 0, 3);
+		su.rarity = string.IsNullOrWhiteSpace(raw.Rarity) ? "Common" : raw.Rarity;
+		su.unlockConditions = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonRaw(
+			new CUnlockConditionFactory.UnlockConditionJsonRaw(raw.Condition, raw.Values, raw.Type, raw.References));
+		su.customUnlockText = raw.CustomUnlockText ?? new CLocalizationData();
+
+		data[uniqueId] = su;
 	}
 
 	public bool tIsSongLocked(CSongListNode? song) {

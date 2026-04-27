@@ -387,6 +387,15 @@
 		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
 			_node = node;
 			if (node != null && node.nodeType == CSongListNode.ENodeType.SCORE) {
+				// Register a local Unlock.json (if present) before querying the DB,
+				// so that the per-song file integrates transparently with the unlock system.
+				string? folderPath = null;
+				for (int i = 0; i < node.score.Length; i++) {
+					if (node.score[i] != null) { folderPath = node.score[i].ファイル情報.フォルダの絶対パス; break; }
+				}
+				if (folderPath != null)
+					OpenTaiko.Databases.DBSongUnlockables.tTryRegisterLocalUnlock(node.tGetUniqueId(), folderPath);
+
 				var _unlockable = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node);
 				_unlockCondition = new LuaUnlockCondition(_unlockable?.unlockConditions ?? null);
 				// Songs without unlock conditions are Common by default
