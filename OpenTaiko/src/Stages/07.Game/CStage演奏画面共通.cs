@@ -1466,6 +1466,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.CBranchScore[nPlayer].nMine++;
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.DanSongScore[actDan.NowShowingNumber].nMine++;
+						this.AIRegisterInput(nPlayer, 0f);
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
@@ -1473,6 +1474,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					this.CBranchScore[nPlayer].nMineAvoid++;
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 						this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
+					this.AIRegisterInput(nPlayer, 1f);
 				}
 			} else {
 				if (eJudgeResult != ENoteJudge.Miss) {
@@ -3325,6 +3327,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							this.CBranchScore[iPlayer].nMine++;
 							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 								this.DanSongScore[actDan.NowShowingNumber].nMine++;
+							this.AIRegisterInput(iPlayer, 0f);
 
 							this.actDan.Update();
 							if (this.IsChartEnded())
@@ -3413,6 +3416,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.CBranchScore[iPlayer].nMineAvoid++;
 				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 					this.DanSongScore[actDan.NowShowingNumber].nMineAvoid++;
+				this.AIRegisterInput(iPlayer, 1f);
 			}
 		}
 		this.RemoveNowProcessingRollChip(iPlayer, chip, false);
