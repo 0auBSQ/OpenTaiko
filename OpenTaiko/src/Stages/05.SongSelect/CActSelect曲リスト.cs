@@ -220,6 +220,7 @@ internal class CActSelect曲リスト : CActivity {
 
 		this.t現在選択中の曲を元に曲バーを再構成する();
 		this.t選択曲が変更された(false);                                 // #27648 項目数変更を反映させる
+		OpenTaiko.stageSongSelect.tNotifySelectedSongChange();
 		this.b選択曲が変更された = true;
 
 		return ret;
@@ -649,7 +650,8 @@ internal class CActSelect曲リスト : CActivity {
 						: GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, useOpenFlag: true, wrap: false, node: node).index;
 					if (node.rParentNode != null)
 						this.tOpenBOX(node.rParentNode);
-					OpenTaiko.SongMount.rCurrentlySelectedSong = OpenTaiko.SongMount.rCurrentlySelectedSong = node; // assign twice to flush history
+					OpenTaiko.SongMount.rCurrentlySelectedSong = null; // refresh history
+					OpenTaiko.SongMount.rCurrentlySelectedSong = node;
 					if (bRemakeSongTitleBar)                    // 選曲画面以外に居るときには再構成しない (非活性化しているときに実行すると例外となる)
 					{
 						this.t現在選択中の曲を元に曲バーを再構成する();
