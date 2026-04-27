@@ -170,6 +170,18 @@ class ScriptBG : IDisposable {
 	public bool Exists() {
 		return LuaScript != null;
 	}
+
+	protected object[]? RunLuaCode(LuaFunction luaFunction, params object[] args) {
+		if (LuaScript == null)
+			return null;
+		try {
+			return luaFunction.Call(args);
+		} catch (Exception exception) {
+			Crash(exception);
+		}
+		return null;
+	}
+
 	protected void Crash(Exception exception) {
 		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
 		Trace.TraceError(exception.StackTrace);
@@ -199,22 +211,8 @@ class ScriptBG : IDisposable {
 		LuaDraw?.Dispose();
 	}
 
-	public void ClearIn(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaClearIn.Call(player);
-		} catch (Exception ex) {
-			Crash(ex);
-		}
-	}
-	public void ClearOut(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaClearOut.Call(player);
-		} catch (Exception ex) {
-			Crash(ex);
-		}
-	}
+	public void ClearIn(int player) => RunLuaCode(LuaClearIn, player);
+	public void ClearOut(int player) => RunLuaCode(LuaClearOut, player);
 	public void Init() {
 		if (LuaScript == null) return;
 		try {
@@ -298,12 +296,5 @@ class ScriptBG : IDisposable {
 			Crash(ex);
 		}
 	}
-	public void Draw() {
-		if (LuaScript == null) return;
-		try {
-			LuaDraw.Call();
-		} catch (Exception ex) {
-			Crash(ex);
-		}
-	}
+	public void Draw() => RunLuaCode(LuaDraw);
 }

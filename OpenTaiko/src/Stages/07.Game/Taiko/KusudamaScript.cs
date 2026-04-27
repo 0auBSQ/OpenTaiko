@@ -22,30 +22,7 @@ internal class KusudamaScript : ScriptBG {
 		LuaKusuMiss?.Dispose();
 	}
 
-	public void KusuIn() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuIn.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
-
-	public void KusuBroke() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuBroke.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
-
-	public void KusuMiss() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuMiss.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void KusuIn() => RunLuaCode(LuaKusuIn);
+	public void KusuBroke() => RunLuaCode(LuaKusuBroke);
+	public void KusuMiss() => RunLuaCode(LuaKusuMiss);
 }

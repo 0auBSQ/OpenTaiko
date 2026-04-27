@@ -14,12 +14,5 @@ internal class AnimeBG : ScriptBG {
 		LuaPlayAnimation?.Dispose();
 	}
 
-	public void PlayAnimation() {
-		if (LuaScript == null) return;
-		try {
-			LuaPlayAnimation.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void PlayAnimation() => RunLuaCode(LuaPlayAnimation);
 }

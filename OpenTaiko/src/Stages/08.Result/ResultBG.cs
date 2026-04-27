@@ -16,12 +16,5 @@ class ResultBG : ScriptBG {
 		LuaSkipAnimation?.Dispose();
 	}
 
-	public void SkipAnimation() {
-		if (LuaScript == null) return;
-		try {
-			LuaSkipAnimation.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void SkipAnimation() => RunLuaCode(LuaSkipAnimation);
 }

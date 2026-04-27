@@ -23,14 +23,7 @@ class EndAnimeScript : ScriptBG {
 		LuaPlayEndAnime?.Dispose();
 	}
 
-	public void PlayEndAnime(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaPlayEndAnime.Call(player);
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void PlayEndAnime(int player) => RunLuaCode(LuaPlayEndAnime, player);
 
 	public new void Update(int player) {
 		if (LuaScript == null) return;
@@ -54,12 +47,5 @@ class EndAnimeScript : ScriptBG {
 			this.Crash(ex);
 		}
 	}
-	public new void Draw(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaDraw.Call(player);
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public new void Draw(int player) => RunLuaCode(LuaDraw, player);
 }
