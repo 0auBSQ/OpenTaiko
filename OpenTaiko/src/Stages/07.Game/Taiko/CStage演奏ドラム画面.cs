@@ -1293,16 +1293,6 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		#endregion
 
 		//string strNull = "Found";
-
-		if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {
-			if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
-				this.Pause();
-				this.actPauseMenu.tActivatePopupMenu(0);
-			}
-
-		}
-
 	}
 
 	public void ChangeBranch(CTja.ECourse nAfter, int iPlayer, double msBranchPoint = double.MaxValue, bool stopAnime = false) {

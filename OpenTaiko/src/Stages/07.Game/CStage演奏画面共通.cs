@@ -2118,8 +2118,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				ChangeInputAdjustTimeInPlaying( keyboard, +1 );
 			}
 			*/
-
-			else if (keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
+			else if (keyboard.KeyPressed([(int)SlimDXKeys.Key.Escape, (int)SlimDXKeys.Key.F1]) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
 				if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 					long cooldownRemaining = 1000 - _pauseCooldown.ElapsedMilliseconds;
 					if (cooldownRemaining > 0) {
