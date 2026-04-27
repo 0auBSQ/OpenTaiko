@@ -27,6 +27,7 @@ class CLuaScript : IDisposable {
 
 
 	public string strDir { get; private set; }
+	public string strScriptShort { get; private set; }
 	public string strTexturesDir { get; private set; }
 	public string strSounsdDir { get; private set; }
 
@@ -79,7 +80,8 @@ class CLuaScript : IDisposable {
 	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
 		try {
 			if (luaFunction.Func == null) {
-				LogNotification.PopWarning($"{this.GetType().Name} Warning: Function [{luaFunction.Name}] is called but undefined");
+				LogNotification.PopWarning($"{this.GetType().Name} Warning: [{this.strScriptShort}] Function [{luaFunction.Name}] is called but undefined");
+				Trace.TraceWarning($"Full script path: {this.strDir}/Script.Lua");
 				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
 				luaFunction.LoadNoop(LuaScript); // silence further warnings
 				return null;
@@ -177,6 +179,7 @@ class CLuaScript : IDisposable {
 
 	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) {
 		strDir = dir;
+		strScriptShort = Path.Join(Path.GetFileName(Path.GetDirectoryName(strDir)), "Script.lua");
 		strTexturesDir = texturesDir ?? $"{dir}/Textures";
 		strSounsdDir = soundsDir ?? $"{dir}/Sounds";
 
@@ -252,6 +255,7 @@ class CLuaScript : IDisposable {
 		bCrashed = true;
 
 		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
+		Trace.TraceError($"Full script path: {this.strDir}/Script.Lua");
 		Trace.TraceError(exception.StackTrace);
 	}
 }

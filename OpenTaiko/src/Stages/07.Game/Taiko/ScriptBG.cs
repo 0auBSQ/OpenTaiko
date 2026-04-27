@@ -114,6 +114,8 @@ class ScriptBG : IDisposable {
 	public Dictionary<string, CTexture> Textures;
 
 	protected Lua LuaScript;
+	protected string FilePath;
+	protected string FilePathShort;
 
 	protected NamedLuaFunction LuaSetConstValues = new("setConstValues");
 	protected NamedLuaFunction LuaUpdateValues = new("updateValues");
@@ -137,6 +139,8 @@ class ScriptBG : IDisposable {
 	}
 
 	private void Init(string filePath) {
+		this.FilePath = filePath;
+		this.FilePathShort = Path.Join(Path.GetFileName(Path.GetDirectoryName(filePath)), Path.GetFileName(filePath));
 		Textures = new Dictionary<string, CTexture>();
 
 		if (!File.Exists(filePath)) return;
@@ -152,7 +156,7 @@ class ScriptBG : IDisposable {
 			using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8)) {
 				using (var stream = new StreamReader(filePath, Encoding.UTF8)) {
 					var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
-					LuaScript.DoString(text);
+					LuaScript.DoString(text, this.FilePathShort);
 				}
 			}
 
@@ -176,7 +180,8 @@ class ScriptBG : IDisposable {
 			return null;
 		try {
 			if (luaFunction.Func == null) {
-				LogNotification.PopWarning($"{this.GetType().Name} Warning: Function [{luaFunction.Name}] is called but undefined");
+				LogNotification.PopWarning($"{this.GetType().Name} Warning: [{this.FilePathShort}] Function [{luaFunction.Name}] is called but undefined");
+				Trace.TraceWarning($"Full script path: {this.FilePath}");
 				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
 				luaFunction.LoadNoop(LuaScript); // silence further warnings
 				return null;
@@ -189,7 +194,8 @@ class ScriptBG : IDisposable {
 	}
 
 	protected void Crash(Exception exception) {
-		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
+		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
+		Trace.TraceError($"Full script path: {this.FilePath}");
 		Trace.TraceError(exception.StackTrace);
 		LuaScript?.Dispose();
 		LuaScript = null;
