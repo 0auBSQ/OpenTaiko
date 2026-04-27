@@ -26,14 +26,7 @@ internal class CActSelect曲リスト : CActivity {
 			return Math.Sin(value * Math.PI / 2.0);
 		}
 	}
-	private int _nCurrentAnchorDifficultyLevel;
-	public int n現在のアンカ難易度レベル {
-		get => _nCurrentAnchorDifficultyLevel;
-		private set {
-			_nCurrentAnchorDifficultyLevel = value;
-			OpenTaiko.SongMount.nCurrentSongDifficulty = n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
-		}
-	}
+
 	public int nSelectSongIndex {
 		get;
 		private set;
@@ -57,58 +50,13 @@ internal class CActSelect曲リスト : CActivity {
 		this.nSelectSongIndex = 0;
 		OpenTaiko.SongMount.rCurrentlySelectedSong = null;
 
-		this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, OpenTaiko.ConfigIni.nDefaultCourse);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = Math.Min((int)Difficulty.Edit, OpenTaiko.ConfigIni.nDefaultCourse);
 		base.IsDeActivated = true;
 		this.bIsEnumeratingSongs = false;
 	}
 
 
 	// メソッド
-
-	// Closest level
-	public int n現在のアンカ難易度レベルに最も近い難易度レベルを返す(CSongListNode song) {
-		// 事前チェック。
-
-		if (song == null)
-			return this.n現在のアンカ難易度レベル;  // 曲がまったくないよ
-
-		if (song.score[this.n現在のアンカ難易度レベル] != null)
-			return this.n現在のアンカ難易度レベル;  // 難易度ぴったりの曲があったよ
-
-		if ((song.nodeType == CSongListNode.ENodeType.BOX) || (song.nodeType == CSongListNode.ENodeType.BACKBOX))
-			return 0;                               // BOX と BACKBOX は関係無いよ
-
-
-		// 現在のアンカレベルから、難易度上向きに検索開始。
-
-		int n最も近いレベル = this.n現在のアンカ難易度レベル;
-
-		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			if (song.score[n最も近いレベル] != null)
-				break;  // 曲があった。
-
-			n最も近いレベル = (n最も近いレベル + 1) % (int)Difficulty.Total;  // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
-		}
-
-
-		// 見つかった曲がアンカより下のレベルだった場合……
-		// アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
-
-		if (n最も近いレベル < this.n現在のアンカ難易度レベル) {
-			// 現在のアンカレベルから、難易度下向きに検索開始。
-
-			n最も近いレベル = this.n現在のアンカ難易度レベル;
-
-			for (int i = 0; i < (int)Difficulty.Total; i++) {
-				if (song.score[n最も近いレベル] != null)
-					break;  // 曲があった。
-
-				n最も近いレベル = ((n最も近いレベル - 1) + (int)Difficulty.Total) % (int)Difficulty.Total;    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
-			}
-		}
-
-		return n最も近いレベル;
-	}
 	public CSongListNode r指定された曲が存在するリストの先頭の曲(CSongListNode song) {
 		List<CSongListNode> songList = GetSongListWithinMe(song);
 		return (songList == null) ? null : songList[0];
@@ -399,7 +347,7 @@ internal class CActSelect曲リスト : CActivity {
 			// 新しく最下部に表示されるパネル用のスキル値を取得。
 
 			for (int i = 0; i < 3; i++)
-				this.stバー情報[index].nスキル値[i] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[i];
+				this.stバー情報[index].nスキル値[i] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[i];
 
 
 			// 1行(100カウント)移動完了。
@@ -535,7 +483,7 @@ internal class CActSelect曲リスト : CActivity {
 			// 新しく最上部に表示されるパネル用のスキル値を取得。
 
 			for (int i = 0; i < 3; i++)
-				this.stバー情報[index].nスキル値[i] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[i];
+				this.stバー情報[index].nスキル値[i] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[i];
 
 
 			this.t選択曲が変更された(false);             // スクロールバー用に今何番目を選択しているかを更新
@@ -591,11 +539,11 @@ internal class CActSelect曲リスト : CActivity {
 
 		// 難易度レベルを＋１し、現在選曲中のスコアを変更する。
 
-		this.n現在のアンカ難易度レベル = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
 		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			this.n現在のアンカ難易度レベル = (this.n現在のアンカ難易度レベル + 1) % (int)Difficulty.Total;  // ５以上になったら０に戻る。
-			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[this.n現在のアンカ難易度レベル] != null)  // 曲が存在してるならここで終了。存在してないなら次のレベルへGo。
+			OpenTaiko.SongMount.nCurrentAnchorDifficulty = (OpenTaiko.SongMount.nCurrentAnchorDifficulty + 1) % (int)Difficulty.Total;  // ５以上になったら０に戻る。
+			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.SongMount.nCurrentAnchorDifficulty] != null)  // 曲が存在してるならここで終了。存在してないなら次のレベルへGo。
 				break;
 		}
 
@@ -607,7 +555,7 @@ internal class CActSelect曲リスト : CActivity {
 			var song = this.rGetSideSong(i);
 			int index = (i + OpenTaiko.Skin.SongSelect_Bar_Count) % OpenTaiko.Skin.SongSelect_Bar_Count;
 			for (int m = 0; m < 3; m++) {
-				this.stバー情報[index].nスキル値[m] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[m];
+				this.stバー情報[index].nスキル値[m] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[m];
 			}
 		}
 
@@ -627,19 +575,19 @@ internal class CActSelect曲リスト : CActivity {
 
 		// 難易度レベルを＋１し、現在選曲中のスコアを変更する。
 
-		this.n現在のアンカ難易度レベル = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
-		this.n現在のアンカ難易度レベル--;
-		if (this.n現在のアンカ難易度レベル < 0) // 0より下になったら4に戻す。
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty--;
+		if (OpenTaiko.SongMount.nCurrentAnchorDifficulty < 0) // 0より下になったら4に戻す。
 		{
-			this.n現在のアンカ難易度レベル = 4;
+			OpenTaiko.SongMount.nCurrentAnchorDifficulty = 4;
 		}
 
 		//2016.08.13 kairera0467 かんたん譜面が無い譜面(ふつう、むずかしいのみ)で、難易度を最上位に戻せない不具合の修正。
 		bool bLabel0NotFound = true;
-		for (int i = this.n現在のアンカ難易度レベル; i >= 0; i--) {
+		for (int i = OpenTaiko.SongMount.nCurrentAnchorDifficulty; i >= 0; i--) {
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[i] != null) {
-				this.n現在のアンカ難易度レベル = i;
+				OpenTaiko.SongMount.nCurrentAnchorDifficulty = i;
 				bLabel0NotFound = false;
 				break;
 			}
@@ -647,7 +595,7 @@ internal class CActSelect曲リスト : CActivity {
 		if (bLabel0NotFound) {
 			for (int i = 4; i >= 0; i--) {
 				if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[i] != null) {
-					this.n現在のアンカ難易度レベル = i;
+					OpenTaiko.SongMount.nCurrentAnchorDifficulty = i;
 					break;
 				}
 			}
@@ -660,7 +608,7 @@ internal class CActSelect曲リスト : CActivity {
 			CSongListNode song = this.rGetSideSong(i);
 			int index = (i + OpenTaiko.Skin.SongSelect_Bar_Count) % OpenTaiko.Skin.SongSelect_Bar_Count;
 			for (int m = 0; m < 3; m++) {
-				this.stバー情報[index].nスキル値[m] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[m];
+				this.stバー情報[index].nスキル値[m] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[m];
 			}
 		}
 
@@ -2739,7 +2687,7 @@ internal class CActSelect曲リスト : CActivity {
 
 
 			for (int j = 0; j < 3; j++)
-				this.stバー情報[i].nスキル値[j] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[j];
+				this.stバー情報[i].nスキル値[j] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[j];
 
 			this.stバー情報[i].ttkタイトル = this.ttkGenerateSongNameTexture(this.stバー情報[i].strタイトル文字列, this.stバー情報[i].ForeColor, this.stバー情報[i].BackColor, stバー情報[i].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
 		}
@@ -3118,7 +3066,7 @@ internal class CActSelect曲リスト : CActivity {
 	}
 
 	public int tFetchDifficulty(CSongListNode song) {
-		var closest = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
+		var closest = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song);
 		int defaultTable = Math.Max(0, Math.Min((int)Difficulty.Edit + 1, OpenTaiko.ConfigIni.nDefaultCourse));
 
 		if (song.score[defaultTable] == null)

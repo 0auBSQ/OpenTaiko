@@ -272,7 +272,7 @@ internal class CStageSongSelect : CStage {
 
 			if (c曲リストノード != null && cスコア != null && c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) {
 				string str選択曲ファイル名 = cスコア.ファイル情報.ファイルの絶対パス;
-				int n曲番号inブロック = OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+				int n曲番号inブロック = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 			}
 		}
 		//---------------------
@@ -710,7 +710,7 @@ internal class CStageSongSelect : CStage {
 				var song = OpenTaiko.SongMount.rCurrentlySelectedSong;
 
 				if (song != null && song.nodeType == CSongListNode.ENodeType.SCORE) {
-					var closest = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
+					var closest = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song);
 					var score = song.score[closest];
 
 					if (score != null) {
@@ -1558,7 +1558,7 @@ internal class CStageSongSelect : CStage {
 	private int tGetRandomSongDifficulty(int contextDiff) {
 		var song = OpenTaiko.SongMount.rChoosenSong;
 
-		int baseDiff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong);
+		int baseDiff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rChoosenSong);
 
 		if (contextDiff >= 0) {
 			if (contextDiff < (int)Difficulty.Oni)
@@ -1660,7 +1660,7 @@ internal class CStageSongSelect : CStage {
 			foreach (CSongListNode c曲リストノード in OpenTaiko.Songs管理.list曲ルート) {
 				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
-					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+					int diff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 					if (diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present
 						var score = c曲リストノード.score[diff];
@@ -1695,7 +1695,7 @@ internal class CStageSongSelect : CStage {
 			foreach (CSongListNode c曲リストノード in r親.childrenList) {
 				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
-					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+					int diff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 
 					if (dan ? diff == (int)difficulty : diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present

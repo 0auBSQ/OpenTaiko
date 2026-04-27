@@ -328,7 +328,7 @@ class CStage段位選択 : CStage {
 		OpenTaiko.SongMount.rChoosenSong = song.randomList[randomSongIndex];
 		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
 
-		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong)];
+		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rChoosenSong.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rChoosenSong)];
 		OpenTaiko.SongMount.strChosenSongGenre = OpenTaiko.SongMount.rChoosenSong.songGenre;
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
