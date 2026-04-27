@@ -3,15 +3,13 @@
 namespace OpenTaiko;
 
 internal class AnimeBG : ScriptBG {
-	private LuaFunction LuaPlayAnimation;
+	private NamedLuaFunction LuaPlayAnimation = new("playAnime");
 	public AnimeBG(string filePath) : base(filePath) {
-		if (LuaScript != null) {
-			LuaPlayAnimation = LuaScript.GetFunction("playAnime");
-		}
+		LuaPlayAnimation.Load(LuaScript);
 	}
 	public new void Dispose() {
 		base.Dispose();
-		LuaPlayAnimation?.Dispose();
+		LuaPlayAnimation.Dispose();
 	}
 
 	public void PlayAnimation() => RunLuaCode(LuaPlayAnimation);

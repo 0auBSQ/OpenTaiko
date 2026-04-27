@@ -115,13 +115,13 @@ class ScriptBG : IDisposable {
 
 	protected Lua LuaScript;
 
-	protected LuaFunction LuaSetConstValues;
-	protected LuaFunction LuaUpdateValues;
-	protected LuaFunction LuaClearIn;
-	protected LuaFunction LuaClearOut;
-	protected LuaFunction LuaInit;
-	protected LuaFunction LuaUpdate;
-	protected LuaFunction LuaDraw;
+	protected NamedLuaFunction LuaSetConstValues = new("setConstValues");
+	protected NamedLuaFunction LuaUpdateValues = new("updateValues");
+	protected NamedLuaFunction LuaClearIn = new("clearIn");
+	protected NamedLuaFunction LuaClearOut = new("clearOut");
+	protected NamedLuaFunction LuaInit = new("init");
+	protected NamedLuaFunction LuaUpdate = new("update");
+	protected NamedLuaFunction LuaDraw = new("draw");
 
 	public ScriptBG(string filePath) {
 		this.Init(filePath);
@@ -156,13 +156,13 @@ class ScriptBG : IDisposable {
 				}
 			}
 
-			LuaSetConstValues = LuaScript.GetFunction("setConstValues");
-			LuaUpdateValues = LuaScript.GetFunction("updateValues");
-			LuaClearIn = LuaScript.GetFunction("clearIn");
-			LuaClearOut = LuaScript.GetFunction("clearOut");
-			LuaInit = LuaScript.GetFunction("init");
-			LuaUpdate = LuaScript.GetFunction("update");
-			LuaDraw = LuaScript.GetFunction("draw");
+			LuaSetConstValues.Load(LuaScript);
+			LuaUpdateValues.Load(LuaScript);
+			LuaClearIn.Load(LuaScript);
+			LuaClearOut.Load(LuaScript);
+			LuaInit.Load(LuaScript);
+			LuaUpdate.Load(LuaScript);
+			LuaDraw.Load(LuaScript);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -171,11 +171,17 @@ class ScriptBG : IDisposable {
 		return LuaScript != null;
 	}
 
-	protected object[]? RunLuaCode(LuaFunction luaFunction, params object[] args) {
+	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
 		if (LuaScript == null)
 			return null;
 		try {
-			return luaFunction.Call(args);
+			if (luaFunction.Func == null) {
+				LogNotification.PopWarning($"{this.GetType().Name} Warning: Function [{luaFunction.Name}] is called but undefined");
+				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
+				luaFunction.LoadNoop(LuaScript); // silence further warnings
+				return null;
+			}
+			return luaFunction.Func.Call(args);
 		} catch (Exception exception) {
 			Crash(exception);
 		}
@@ -202,13 +208,13 @@ class ScriptBG : IDisposable {
 
 		LuaScript?.Dispose();
 
-		LuaSetConstValues?.Dispose();
-		LuaUpdateValues?.Dispose();
-		LuaClearIn?.Dispose();
-		LuaClearOut?.Dispose();
-		LuaInit?.Dispose();
-		LuaUpdate?.Dispose();
-		LuaDraw?.Dispose();
+		LuaSetConstValues.Dispose();
+		LuaUpdateValues.Dispose();
+		LuaClearIn.Dispose();
+		LuaClearOut.Dispose();
+		LuaInit.Dispose();
+		LuaUpdate.Dispose();
+		LuaDraw.Dispose();
 	}
 
 	public void ClearIn(int player) => RunLuaCode(LuaClearIn, player);
@@ -228,7 +234,7 @@ class ScriptBG : IDisposable {
 			}
 
 			// Initialisation
-			LuaSetConstValues.Call(OpenTaiko.ConfigIni.nPlayerCount,
+			RunLuaCode(LuaSetConstValues, OpenTaiko.ConfigIni.nPlayerCount,
 				OpenTaiko.P1IsBlue(),
 				OpenTaiko.ConfigIni.sLang,
 				OpenTaiko.ConfigIni.SimpleMode,
@@ -236,7 +242,7 @@ class ScriptBG : IDisposable {
 				raritiesC
 			);
 
-			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+			RunLuaCode(LuaUpdateValues, OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				0,
@@ -248,7 +254,7 @@ class ScriptBG : IDisposable {
 				-1
 			);
 
-			LuaInit.Call();
+			RunLuaCode(LuaInit);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -277,7 +283,7 @@ class ScriptBG : IDisposable {
 				) + msTimeOffset) / 1000.0;
 			}
 
-			LuaUpdateValues.Call(OpenTaiko.FPS.DeltaTime,
+			RunLuaCode(LuaUpdateValues, OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				(double)currentFloorPositionMax140,
@@ -291,7 +297,7 @@ class ScriptBG : IDisposable {
             LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
             LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-			LuaUpdate.Call();
+			RunLuaCode(LuaUpdate);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
