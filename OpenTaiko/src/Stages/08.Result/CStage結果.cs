@@ -219,7 +219,7 @@ internal class CStage結果 : CStage {
 
 					#region [Dan scores]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+					Exam.Status examStatus = GetResultExamStatus();
 
 					int clearValue = 0;
 
@@ -404,7 +404,7 @@ internal class CStage結果 : CStage {
 
 				#region [Clear and Goukaku modifier]
 
-				Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+				Exam.Status examStatus = GetResultExamStatus();
 
 				int clearModifier = -1;
 				int goukakuModifier = 0;
@@ -527,7 +527,7 @@ internal class CStage結果 : CStage {
 				if (!OpenTaiko.ConfigIni.bAutoPlay[i]
 					&& !(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)) {
 					int _cs = -1;
-					if (HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
+					if (!OpenTaiko.stageGameScreen.IsStageFailed(i) && HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
 						_cs = 0;
 						if (OpenTaiko.stageGameScreen.CChartScore[i].nMiss == 0) {
 							_cs = 1;
@@ -1108,7 +1108,7 @@ internal class CStage結果 : CStage {
 
 					#region [PassLogo]
 
-					Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+					Exam.Status examStatus = this.GetResultExamStatus();
 
 					int unitsBeforeAppearance = Math.Max(0, 8200 + 300 * songCount - ctPhase1.CurrentValue);
 
@@ -1640,11 +1640,18 @@ internal class CStage結果 : CStage {
 						clearCount++;
 					}
 				}
-				return new bool[] { clearCount >= OpenTaiko.stageGameScreen.AIBattleSections.Count / 2.0, false };
+				return new bool[] { !OpenTaiko.stageGameScreen.IsStageFailed(0) && clearCount >= OpenTaiko.stageGameScreen.AIBattleSections.Count / 2.0, false };
 			} else {
-				return new bool[] { OpenTaiko.stageGameScreen.bIsAlreadyCleared[0], OpenTaiko.stageGameScreen.bIsAlreadyCleared[1], OpenTaiko.stageGameScreen.bIsAlreadyCleared[2], OpenTaiko.stageGameScreen.bIsAlreadyCleared[3], OpenTaiko.stageGameScreen.bIsAlreadyCleared[4] };
+				return OpenTaiko.stageGameScreen.bIsAlreadyCleared.Select((x, i) => !OpenTaiko.stageGameScreen.IsStageFailed(i) && x).ToArray();
 			}
 		}
+	}
+
+	public Exam.Status GetResultExamStatus() {
+		Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+		if (OpenTaiko.stageGameScreen.IsStageFailed(0))
+			examStatus = Exam.Status.Failure;
+		return examStatus;
 	}
 
 	private CCounter ctDanSongInfoChange;

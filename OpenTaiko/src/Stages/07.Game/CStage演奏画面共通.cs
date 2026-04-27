@@ -849,7 +849,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				clearCount++;
 			}
 		}
-		bIsAIBattleWin = clearCount >= OpenTaiko.stageGameScreen.AIBattleSections.Count / 2.0;
+		bIsAIBattleWin = !(this.IsStageFailed(0) || this.IsStageAborted()) && clearCount >= this.AIBattleSections.Count / 2.0;
 	}
 
 	private void AIRegisterInput(int nPlayer, float move) {
