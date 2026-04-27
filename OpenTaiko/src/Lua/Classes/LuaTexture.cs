@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿using System.Diagnostics;
+using FDK;
 
 namespace OpenTaiko {
 	public class LuaTexture : IDisposable {
@@ -168,9 +169,9 @@ namespace OpenTaiko {
 					luatex = new();
 				}
 			} else if (Path.Exists(full_path)) {
-				LogNotification.PopWarning($"Lua Texture failed to load because '{full_path}' is not a file.");
+				Trace.TraceWarning($"Lua Texture: '{full_path}' exists but is not a file.");
 			} else {
-				LogNotification.PopWarning($"Lua Texture failed to load because the file located at '{full_path}' does not exist.");
+				Trace.TraceWarning($"Lua Texture: '{full_path}' not found, returning empty texture.");
 			}
 			return luatex;
 		}
