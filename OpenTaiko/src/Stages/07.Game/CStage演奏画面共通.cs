@@ -1466,9 +1466,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.CBranchScore[nPlayer].nMine++;
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 							this.DanSongScore[actDan.NowShowingNumber].nMine++;
-
-						if (this.IsChartEnded())
-							this.UpdateClearAnimation(nPlayer);
 					}
 				} else if (!isDeniedJudgeCount && pChip.IsMissed) {
 					this.CChartScore[nPlayer].nMineAvoid++;
@@ -3329,6 +3326,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 								this.DanSongScore[actDan.NowShowingNumber].nMine++;
 
+							this.actDan.Update();
 							if (this.IsChartEnded())
 								this.UpdateClearAnimation(iPlayer);
 						}
