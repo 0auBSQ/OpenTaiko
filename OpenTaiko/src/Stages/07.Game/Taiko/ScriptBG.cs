@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using FDK;
 using NLua;
 
@@ -171,6 +172,7 @@ class ScriptBG : IDisposable {
 	}
 	protected void Crash(Exception exception) {
 		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
+		Trace.TraceError(exception.StackTrace);
 		LuaScript?.Dispose();
 		LuaScript = null;
 	}

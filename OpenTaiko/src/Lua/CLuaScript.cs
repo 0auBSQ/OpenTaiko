@@ -238,5 +238,6 @@ class CLuaScript : IDisposable {
 		bCrashed = true;
 
 		LogNotification.PopError($"Lua Script Error: {exception.ToString()}");
+		Trace.TraceError(exception.StackTrace);
 	}
 }
