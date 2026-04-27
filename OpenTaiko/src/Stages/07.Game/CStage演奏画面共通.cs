@@ -1033,6 +1033,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private bool CanAutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted())
+			return false;
 		if (this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, iPlayer) is ENoteJudge.Miss) // less costly check
 			return false;
 		var pads = GetAutoInput(chip, gt, this.nHand[iPlayer], isBigInput: OpenTaiko.ConfigIni.bJudgeBigNotes);
@@ -4079,6 +4081,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public bool CanAutoplayHitMine(int player, bool reroll) {
+		if (this.isDeniedPlaying[player] || this.IsStageAborted())
+			return false;
 		int AILevel = OpenTaiko.ConfigIni.nAILevel;
 		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) {
 			if (reroll)
