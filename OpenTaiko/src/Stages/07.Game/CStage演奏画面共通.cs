@@ -1505,7 +1505,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool hasFailed = this.IsStageFailed(nPlayer);
 		if (!hasFailed) { // prevent gauge change if song aborted
 			if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
-				actGauge.MineDamage(nPlayer);
+				actGauge.MineDamage(nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
 			} else if (pChip == null || NotesManager.IsMissableNote(pChip)) {
 				actGauge.Damage(screenmode, eJudgeResult, nPlayer, (pChip == null || pChip.IsEndedBranching) ? null : pChip.nBranch);
 			}
