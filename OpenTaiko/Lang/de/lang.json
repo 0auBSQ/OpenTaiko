@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Song Ordner neu laden.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Songs neu laden (Hartes Neuladen)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Leeren des vorhandenen Caches und\nSong Ordner von Grund auf neu laden.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " Die Titelliste wird geladen.\n         Bitte warten...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importiere Score.ini Dateien",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importiert Score.ini Dateien in die Datenbank.\n\n<c.#f0ad4e>WARNUNG\nFolgendes wird nicht übertragen:\n- Freischalt Status\n- Gameplay-Modifikatoren\n- Anzahl der Treffer (Gut, Ok, Übel, Trommelrolle, etc.)\n- Dan-Prüfungsergebnisse",

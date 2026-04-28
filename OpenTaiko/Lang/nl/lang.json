@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Herlaad de folder voor nummers.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Nummers Herladen (Hard Herladen)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Wist de opgeslagen cache en \nherlaadt de Nummers map vanaf nul.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " De liedjeslijst wordt nu geladen.\n         Even geduld alstublieft...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importeer Score.ini",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importeert Score.ini-bestanden naar de database.\n\n<c.#f0ad4e>WAARSCHUWING\nHet volgende wordt niet overgedragen:\n- Clear-statussen\n- Gameplay-modificatoren\n- Aantal treffers (Good, Ok, Bad, Drumroll, etc.)\n- Dan-examenscores",

@@ -2191,6 +2191,8 @@ internal class OpenTaiko : Game {
 		OpenTaiko.actTextConsole.Activate();
 		actTextConsole.CreateManagedResource();
 		actTextConsole.CreateUnmanagedResource();
+
+		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();

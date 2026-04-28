@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Перезагружает папки песен.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Перезагрузка песен (Жёсткая)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Удаляет существующую базу данных и\nперезагружает папки песен с нуля.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " Список песен загружается.\n         Пожалуйста, подождите...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Импортировать Score.ini файлы",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Импортировает Score.ini файлы в базу данных.\n\n<c.#f0ad4e>ВНИМАНИЕ\nСледующее передано не будет:\n- Завершение статусы\n- Модификаторы геймплея\n- Количества ударов\n   (Хорошо, OK, Плохо, Дроби, и т.д.)\n- Результаты за экзамен Дана",

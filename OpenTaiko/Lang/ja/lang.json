@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "曲データの一覧情報を取得し直します。",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "キャッシュをクリアして曲データ再読み込み",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "キャッシュをクリアして曲データの一覧情報を取得し直します。",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": "     曲データの一覧を\n       取得しています。\n   しばらくお待ちください。",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",

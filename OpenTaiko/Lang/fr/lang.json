@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Met à jour et récupère les\nmodifications effectuées sur\nla liste de sons.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Vider le cache et recharger les sons",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Supprime le fichier de base\nde données et recharge les sons.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " La liste des chansons est en cours de chargement.\n         Veuillez patienter...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",

@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描歌曲文件夹并加载歌曲。",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "重新加载歌曲（硬重新加载）",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "清除既有缓存并从空白重新扫描歌曲文件夹并加载歌曲。",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " 歌曲列表加载中。\n         请稍后……",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "导入 Score.ini 文件",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "导入 Score.ini 文件到数据库中。\n\n<c.#f0ad4e>警告\n下列内容将不会迁移：\n— 过关状态\n— 游玩修改器\n— 击打数（良、可、不可、连打等）\n— 段位测验成绩",

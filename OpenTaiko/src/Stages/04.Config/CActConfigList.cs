@@ -630,6 +630,7 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.stageConfig.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 				OpenTaiko.stageTitle.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[0]);
 				OpenTaiko.stageTitle.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[1]);
+				OpenTaiko.actEnumSongs.RefreshSkin(OpenTaiko.EnumSongs.IsEnumerating);
 
 				t項目リストの設定_System(refresh: false);
 				OpenTaiko.stageConfig.ReloadMenus();

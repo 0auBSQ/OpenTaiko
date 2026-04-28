@@ -67,22 +67,12 @@ internal class CActEnumSongs : CActivity {
 		//}
 
 		try {
-			CCachedFontRenderer ftMessage = new CCachedFontRenderer(CFontRenderer.DefaultFontName, 40, CCachedFontRenderer.FontStyle.Bold);
-			string[] strMessage =
-			{
-				"     曲データの一覧を\n       取得しています。\n   しばらくお待ちください。",
-				" Now enumerating songs.\n         Please wait..."
-			};
-			int ci = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? 0 : 1;
-			if ((strMessage != null) && (strMessage.Length > 0)) {
-				SKBitmap image = ftMessage.DrawText(strMessage[ci], Color.White);
-				this.txMessage = new CTexture(image);
-				this.txMessage.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f);
-				image.Dispose();
-				OpenTaiko.tDisposeSafely(ref ftMessage);
-			} else {
-				this.txMessage = null;
-			}
+			CCachedFontRenderer ftMessage = new CCachedFontRenderer(CLangManager.LangInstance.FontName, 40, CCachedFontRenderer.FontStyle.Bold);
+			SKBitmap image = ftMessage.DrawText(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RELOADSONG_STATUS"), Color.White);
+			this.txMessage = new CTexture(image);
+			this.txMessage.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f);
+			image.Dispose();
+			OpenTaiko.tDisposeSafely(ref ftMessage);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError("テクスチャの生成に失敗しました。(txMessage)");
 			Trace.TraceError(e.ToString());
@@ -116,6 +106,15 @@ internal class CActEnumSongs : CActivity {
 		return 0;
 	}
 
+	public void RefreshSkin(bool isEnumerating) {
+		this.DeActivate();
+		this.ReleaseManagedResource();
+		this.ReleaseUnmanagedResource();
+		if (isEnumerating)
+			this.Activate();
+		this.CreateManagedResource();
+		this.CreateUnmanagedResource();
+	}
 
 	private CCounter ctNowEnumeratingSongs;
 	//private CTexture txNowEnumeratingSongs = null;

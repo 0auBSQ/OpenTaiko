@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Recarga la carpeta de las canciones.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Recargar Canciones (Recarga Forzada)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Borra el caché existente y recarga la carpeta de las\ncanciones desde cero.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " La lista de canciones se está cargando.\n         Por favor, espere...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importar Archivos de Score.ini",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importa archivos de Score.ini a la base de datos.\n\n<c.#f0ad4e>ADVERTENCIA\nLos siguientes no serán transferidos:\n- Estados de Completados\n- Modificadores de jugabilidad\n- # de golpes (Bien, Vale, Mal, Redobles, etcétera)\n- Puntos del examen Dan",
