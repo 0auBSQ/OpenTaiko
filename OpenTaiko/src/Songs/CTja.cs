@@ -359,7 +359,7 @@ internal class CTja : CActivity {
 	//分岐関連
 	private ECourse n現在のコース = ECourse.eNormal;
 
-	public int[] nノーツ数 = new int[4]; //3:共通
+	public int nノーツ数_Common = 0;
 
 	public int[] nDan_NotesCount = new int[1];
 	public int[] nDan_AdLibCount = new int[1];
@@ -367,7 +367,7 @@ internal class CTja : CActivity {
 	public int[] nDan_BalloonHitCount = new int[1];
 	public int[] nDan_BarRollCount = new int[1];
 
-	public int[] nノーツ数_Branch = new int[4]; //
+	public int[] nノーツ数_Branch = new int[3]; // [iBranch], including common
 	public CChip[] pDan_LastChip;
 
 	private List<int> divsPerMeasureAllBranches; // [iMeasureAllBranches]
@@ -3008,7 +3008,7 @@ internal class CTja : CActivity {
 					this.nDan_NotesCount[List_DanSongs.Count - 1]++;
 				}
 				if (IsEndedBranching) {
-					this.nノーツ数[3]++;
+					this.nノーツ数_Common++;
 				}
 			}
 		} else if (NotesManager.IsADLIB(chip)) {

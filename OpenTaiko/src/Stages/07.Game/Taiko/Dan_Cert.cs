@@ -222,7 +222,7 @@ internal class Dan_Cert : CActivity {
 			nHighestCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[0],
 			msBarRollMax = OpenTaiko.stageGameScreen.nRollTimeMs_Dan.Sum(),
 
-			nNotesMax = OpenTaiko.TJA!.nノーツ数[3],
+			nNotesMax = OpenTaiko.TJA!.nノーツ数_Common,
 			nBarRollMax = OpenTaiko.TJA.nDan_BarRollCount.Sum(),
 			nBalloonHitMax = OpenTaiko.TJA.nDan_BalloonHitCount.Sum(),
 			nAdLibMax = OpenTaiko.TJA.nDan_AdLibCount.Sum(),

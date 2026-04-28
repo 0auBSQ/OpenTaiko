@@ -428,7 +428,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Difficulty
 		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
@@ -520,7 +520,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Scale
 		float scale = 1.0f;
@@ -590,7 +590,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Gauge type
 		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
