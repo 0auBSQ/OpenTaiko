@@ -63,6 +63,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Hide Dan/Tower",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Hide Dan and Tower charts in the\nTaiko Mode menu.\nNote: Reload songs to make this setting\ntake effect.",

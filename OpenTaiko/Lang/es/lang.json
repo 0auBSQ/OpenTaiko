@@ -63,6 +63,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Procesamiento de {0} partituras...\n<c.#0bb000>{1} de {2} importado(s)</c> (<c.#f0ad4e>{3} saltado(s)</c> / <c.#b00000>{4} error(es)</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Actualizando las puntuaciones de {0} jugadores...\n<c.#0bb000>{1} de {2} actualizados/c> (<c.#b00000>{3} falló</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Ocultar Dans/Torres",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Oculta partituras de Dans y Torres en el menú de\nModo Taiko.\nNota: Recarga las canciones para aplicar los cambios.",

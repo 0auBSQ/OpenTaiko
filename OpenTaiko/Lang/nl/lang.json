@@ -63,6 +63,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Verwerken van {0} scores...\n<c.#0bb000>{1} van {2} geïmporteerd</c> (<c.#f0ad4e>{3} overgeslagen</c> / <c.#b00000>{4} mislukt</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Scores van {0} spelers worden vernieuwd...\n<c.#0bb000>{1} van {2} vernieuwd/c> (<c.#b00000>{3} mislukt</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Toren Verbergen",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Verberg de Dan en Toren nummers\nin de Taiko Modus.\nOpmerking: Herlaad de nummers\nom dit te activeren.",

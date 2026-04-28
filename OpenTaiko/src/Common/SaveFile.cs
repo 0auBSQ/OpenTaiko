@@ -19,15 +19,17 @@ internal class SaveFile {
 	}
 
 	public void tInitSaveFile() {
-		// Best plays
-		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
-		data.tFactorizeBestPlays();
+		lock (this) {
+			// Best plays
+			data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+			data.tFactorizeBestPlays();
 
-		// Global triggers
-		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+			// Global triggers
+			data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
 
-		// Global counters
-		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+			// Global counters
+			data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+		}
 	}
 
 	public void tLoadUnlockables() {
