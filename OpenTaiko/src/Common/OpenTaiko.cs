@@ -2176,6 +2176,8 @@ internal class OpenTaiko : Game {
 		actTextConsole.ReleaseManagedResource();
 		actTextConsole.ReleaseUnmanagedResource();
 
+		stageGameScreen.actEnd.ReleaseManagedResource(); // force release due to lazy release
+
 		OpenTaiko.Skin.Dispose();
 		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
