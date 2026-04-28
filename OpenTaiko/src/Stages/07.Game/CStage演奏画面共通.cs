@@ -2643,7 +2643,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x9E: //ゴーゴータイム
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)pChip.nBranch] = true);
+						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)branch] = true);
 						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
 							this.bIsGOGOTIME[nPlayer] = true;
 							if (!this.isRewinding)
@@ -2654,7 +2654,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				case 0x9F: //ゴーゴータイム
 					if (!pChip.bHit) {
 						pChip.bHit = true;
-						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)pChip.nBranch] = false);
+						pChip.ForEachTargetBranch(branch => this.bIsGOGOTIME_Branch[nPlayer, (int)branch] = false);
 						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
 							this.bIsGOGOTIME[nPlayer] = false;
 						}
