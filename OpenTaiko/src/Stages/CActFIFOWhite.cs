@@ -2,44 +2,17 @@
 
 namespace OpenTaiko;
 
-internal class CActFIFOWhite : CActivity {
+internal class CActFIFOWhite : CActFIFOBase {
 	// メソッド
 
-	public void tフェードアウト開始() {
-		this.mode = EFIFOMode.FadeOut;
-		this.counter = new CCounter(0, 100, 3, OpenTaiko.Timer);
-	}
-	public void tフェードイン開始() {
-		this.mode = EFIFOMode.FadeIn;
-		this.counter = new CCounter(0, 100, 3, OpenTaiko.Timer);
-	}
-	public void tフェードイン完了()     // #25406 2011.6.9 yyagi
-	{
-		this.counter.CurrentValue = (int)this.counter.EndValue;
-	}
+	public override void tフェードアウト開始(int? start = null, int? end = null, int? interval = null)
+		=> base.tフェードアウト開始(start ?? 0, end ?? 100, interval ?? 3);
+	public override void tフェードイン開始(int? start = null, int? end = null, int? interval = null)
+		=> base.tフェードイン開始(start ?? 0, end ?? 100, interval ?? 3);
 
 	// CActivity 実装
 
-	public override void DeActivate() {
-		if (!base.IsDeActivated) {
-			//CDTXMania.tテクスチャの解放( ref this.tx白タイル64x64 );
-			base.DeActivate();
-		}
-	}
-	public override void CreateManagedResource() {
-		//this.tx白タイル64x64 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\Tile white 64x64.png" ), false );
-		base.CreateManagedResource();
-	}
-
-	public override void ReleaseUnmanagedResource() {
-		base.ReleaseUnmanagedResource();
-	}
-	public override int Draw() {
-		if (base.IsDeActivated || (this.counter == null)) {
-			return 0;
-		}
-		this.counter.Tick();
-
+	public override int DrawSub() {
 		// Size clientSize = CDTXMania.app.Window.ClientSize;	// #23510 2010.10.31 yyagi: delete as of no one use this any longer.
 		if (OpenTaiko.Tx.Tile_Black != null) {
 			OpenTaiko.Tx.Tile_Black.Opacity = (this.mode == EFIFOMode.FadeIn) ? (((100 - this.counter.CurrentValue) * 0xff) / 100) : ((this.counter.CurrentValue * 0xff) / 100);
@@ -51,20 +24,6 @@ internal class CActFIFOWhite : CActivity {
 				}
 			}
 		}
-		if (this.counter.CurrentValue != 100) {
-			return 0;
-		}
-		return 1;
+		return 0;
 	}
-
-
-	// その他
-
-	#region [ private ]
-	//-----------------
-	private CCounter counter;
-	private EFIFOMode mode;
-	//private CTexture tx白タイル64x64;
-	//-----------------
-	#endregion
 }
