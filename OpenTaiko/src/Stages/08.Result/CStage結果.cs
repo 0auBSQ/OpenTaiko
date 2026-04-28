@@ -150,7 +150,7 @@ internal class CStage結果 : CStage {
 						var ccf = OpenTaiko.stageGameScreen.CChartScore[p];
 
 						this.nクリア[p] = 0;
-						if (HGaugeMethods.UNSAFE_FastNormaCheck(p)) {
+						if (!OpenTaiko.stageGameScreen.IsStageFailed(p) && HGaugeMethods.UNSAFE_FastNormaCheck(p)) {
 							this.nクリア[p] = 2;
 							if (ccf.nMiss == 0 && ccf.nMine == 0) {
 								this.nクリア[p] = 3;
