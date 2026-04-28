@@ -647,7 +647,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public CAct演奏Combo共通 actCombo;
 	//protected CActFIFOBlack actFI;
 	public CActFIFOStart actFI;
-	protected CActFIFOBlack actFO;
+	protected CActFIFOBase actFO;
+	protected CActFIFOBlack actFOBlack;
 	protected CActFIFOResult actFOClear;
 	public CAct演奏ゲージ共通 actGauge;
 
@@ -2073,10 +2074,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected abstract void ドラムスクロール速度ダウン();
 	protected void tキー入力() {
 		// Inputs
+		if (this.IsQuittingStage())
+			return;
 
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 
-		if (!this.bPAUSE && !this.IsStageAborted() && this.ePhaseID != EPhase.Common_FADEOUT) {
+		if (!this.bPAUSE) {
 			this.t入力処理_ドラム();
 
 			CTja tja = OpenTaiko.TJA;
@@ -2168,7 +2171,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			OpenTaiko.ConfigIni.bAutoPlay[1] = !OpenTaiko.ConfigIni.bAutoPlay[1];
 		}
 #endif
-		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE && !this.IsStageAborted() && this.ePhaseID != EPhase.Common_FADEOUT) {
+		if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE) {
 			if (keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow)) { // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow)) {    // DownArrow (scrollspeed down)
@@ -2263,6 +2266,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 	public bool IsStageFailed(int iPlayer) => stageAbortType[iPlayer] != EStageAbort.None;
 	public EStageAbort MinStageAbortType => stageAbortType.Take(OpenTaiko.ConfigIni.nPlayerCount).Min();
+	public bool IsStageFailed() => MinStageAbortType != EStageAbort.None;
 	public bool IsFailStopped() => !OpenTaiko.ConfigIni.bAIBattleMode && MinStageAbortType >= EStageAbort.FailedStop;
 	public bool IsChartEnded() => isChartEnded.Take(OpenTaiko.ConfigIni.nPlayerCount).All(x => x);
 	public bool IsChartEnded(int iPlayer) => isChartEnded[iPlayer];
@@ -2270,8 +2274,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public virtual bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
 		=> (isChartEnded ?? IsChartEnded()) || (isFinishedPlaying ?? IsFinishedPlaying());
-	public bool IsStageAborted() => ePhaseID is CStage.EPhase.Game_STAGE_FAILED or CStage.EPhase.Game_STAGE_FAILED_FadeOut;
-	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
+	public bool IsStageAborted()
+		=> ePhaseID == CStage.EPhase.Game_STAGE_FAILED || ((ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) && IsStageFailed());
+	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut;
+	public bool IsQuittingStage() => ePhaseID is CStage.EPhase.Common_FADEOUT or CStage.EPhase.Game_EndStage_Quit_FadeOut;
 
 	protected bool t進行描画_AVI() {
 		if (this.IsStageAborted() && (this.actAVI?.rVD.bPlaying ?? false)) {
@@ -3973,9 +3979,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 		// resume for playing fading out
 		SoundManager.PlayTimer.Resume();
 		OpenTaiko.Timer.Resume();
+		if (this.IsQuittingStage())
+			return;
+		this.actFO = this.actFOBlack;
 		this.actFO.tフェードアウト開始();
 		base.ePhaseID = (this.IsStageAborted() || this.IsStageCompleted()) ?
-			CStage.EPhase.Game_STAGE_FAILED_FadeOut // keep end-of-chart animation
+			CStage.EPhase.Game_EndStage_Quit_FadeOut // keep end-of-chart animation
 			: CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
 	}
@@ -4011,17 +4020,12 @@ internal abstract class CStage演奏画面共通 : CStage {
 				break;
 
 			case CStage.EPhase.Common_FADEOUT:
-			case CStage.EPhase.Game_STAGE_FAILED_FadeOut:
+			case CStage.EPhase.Game_EndStage_Quit_FadeOut:
+			case CStage.EPhase.Game_EndStage_FadeOut:
 				if (this.actFO.Draw() != 0) {
 					return true;
 				}
 				break;
-
-			case CStage.EPhase.Game_STAGE_CLEAR_FadeOut:
-				if (this.actFOClear.Draw() == 0) {
-					break;
-				}
-				return true;
 
 		}
 		return false;

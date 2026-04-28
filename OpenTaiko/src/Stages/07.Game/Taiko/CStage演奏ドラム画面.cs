@@ -30,7 +30,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		base.ChildActivities.Add(this.actPlayInfo = new CAct演奏演奏情報());
 		//base.list子Activities.Add( this.actFI = new CActFIFOBlack() );
 		base.ChildActivities.Add(this.actFI = new CActFIFOStart());
-		base.ChildActivities.Add(this.actFO = new CActFIFOBlack());
+		base.ChildActivities.Add(this.actFOBlack = new CActFIFOBlack());
 		base.ChildActivities.Add(this.actFOClear = new CActFIFOResult());
 		base.ChildActivities.Add(this.actEnd = new CActImplClearAnimation());
 		base.ChildActivities.Add(this.actDancer = new CActImplDancer());
@@ -563,7 +563,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			// Transition for failed games
 			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
-				if (base.ePhaseID == CStage.EPhase.Game_STAGE_FAILED_FadeOut) {
+				if (base.ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
 					if (bIsFinishedEndAnime) {
@@ -572,7 +572,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						} else {
 							this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
 						}
-						base.ePhaseID = CStage.EPhase.Game_STAGE_FAILED_FadeOut;
+						base.ePhaseID = CStage.EPhase.Game_EndStage_FadeOut;
+						this.actFO = this.actFOBlack;
 						this.actFO.tフェードアウト開始();
 					}
 				} else {
@@ -582,13 +583,14 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			}
 			// Transition for completed games:
 			// 演奏終了→演出表示→フェードアウト
-			else if (base.ePhaseID == CStage.EPhase.Game_STAGE_CLEAR_FadeOut) {
+			else if (base.ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) {
 				// do nothing
 			} else if (base.ePhaseID == EPhase.Game_EndStage) {
 				if (bIsFinishedEndAnime) {
 					this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.StageCleared;
-					base.ePhaseID = CStage.EPhase.Game_STAGE_CLEAR_FadeOut;
-					this.actFOClear.tフェードアウト開始();
+					base.ePhaseID = CStage.EPhase.Game_EndStage_FadeOut;
+					this.actFO = this.actFOClear;
+					this.actFO.tフェードアウト開始();
 				}
 			} else if (base.ePhaseID == CStage.EPhase.Game_EndChart) {
 				if (bIsFinishedPlaying) {
