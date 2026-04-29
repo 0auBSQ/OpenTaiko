@@ -2615,6 +2615,8 @@ internal class CTja : CActivity {
 	}
 
 	private void SwitchBranch(ECourse branch) {
+		this.ResetNoteSymbolOneShotCommands(endOfSection: true);
+
 		#region [ 記録した情報をNow~に適応 ]
 		this.UpdateBranchEndPoint();
 		this.SaveBranchScrollState();
@@ -2631,6 +2633,8 @@ internal class CTja : CActivity {
 	}
 
 	private void GotoBranchEnd(bool forced = false) {
+		this.ResetNoteSymbolOneShotCommands(endOfSection: true);
+
 		this.UpdateBranchEndPoint();
 		// TJAP3/OOS: keep timing at the end of the last-defined branch
 		if (false /* not TJAP3/OOS */ || forced) {
@@ -2867,7 +2871,7 @@ internal class CTja : CActivity {
 						});
 					}
 
-					this.IsEnabledFixSENote = this.IsEnabledPartnerNote = false;
+					this.ResetNoteSymbolOneShotCommands();
 
 					this.dbLastTime = this.dbNowTime;
 					this.dbLastBMScrollTime = this.dbNowBMScollTime;
@@ -2876,6 +2880,19 @@ internal class CTja : CActivity {
 				}
 			}
 		}
+	}
+
+	private void ResetNoteSymbolOneShotCommands(bool endOfSection = false) {
+		if (endOfSection) {
+			foreach (var (v, cmd) in new[] {
+				(this.IsEnabledFixSENote, "#SENOTECHANGE"),
+				(this.IsEnabledPartnerNote, "#PARTNERNOTE"),
+				}) {
+				if (v)
+					this.AddWarn($"{cmd} is missing a following note symbol before switching branch or song, {(this.IsEndedBranching ? "" : $"in branch {this.n現在のコース} ")}at measure {this.n現在の小節数}.");
+			}
+		}
+		this.IsEnabledFixSENote = this.IsEnabledPartnerNote = false;
 	}
 
 	private void SetChipSudden(CChip chip) {
