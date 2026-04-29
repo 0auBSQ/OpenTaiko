@@ -346,7 +346,7 @@ public static class CDTXStyleExtractor {
 
 		var (s, i, ss, j) = bestRankedSheets.First();
 		string sheet = ss.OriginalRawValue;
-		if (j > 0) // has immediate header
+		if (j > 0 && s.SubSections[j - 1].SubSectionKind == SubSectionKind.NonSheet) // has immediate header
 			sheet = s.SubSections[j - 1].OriginalRawValue + sheet;
 		return (i, j, sheet);
 	}
