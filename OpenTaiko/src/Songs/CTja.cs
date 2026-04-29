@@ -2867,10 +2867,7 @@ internal class CTja : CActivity {
 						});
 					}
 
-					if (IsEnabledFixSENote) IsEnabledFixSENote = false;
-
-					if (this.IsEnabledPartnerNote)
-						this.IsEnabledFixSENote = false;
+					this.IsEnabledFixSENote = this.IsEnabledPartnerNote = false;
 
 					this.dbLastTime = this.dbNowTime;
 					this.dbLastBMScrollTime = this.dbNowBMScollTime;
