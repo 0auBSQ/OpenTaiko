@@ -21,7 +21,7 @@ public class CInputMouse : CInputButtonsBase, IInputDevice, IDisposable {
 		mouse.MouseMove += Mouse_MouseMove;
 	}
 
-	public (bool isPressed, int state)[] MouseStates => this.ButtonStates;
+	public (uint isPressed, int state)[] MouseStates => this.ButtonStates;
 
 	private void Mouse_Click(IMouse mouse, MouseButton mouseButton, Vector2 vector2) {
 

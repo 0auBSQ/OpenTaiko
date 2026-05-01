@@ -6,7 +6,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	// Constructor
 
 	public CInputButtonsBase(int nButtonStates) {
-		this.ButtonStates = Enumerable.Range(0, nButtonStates).Select(_ => (false, -2)).ToArray();
+		this.ButtonStates = Enumerable.Range(0, nButtonStates).Select(_ => (0U, -2)).ToArray();
 		this.EventBuffer = new List<STInputEvent>(nButtonStates);
 		this.InputEvents = [];
 	}
@@ -37,74 +37,86 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 			this.ProcessButtonState(i, this.GetVelocity(i));
 		}
 		// swap input buffer
-		(this.InputEvents, this.EventBuffer) = (this.EventBuffer, this.InputEvents);
+		this.InputEvents = Interlocked.Exchange(ref this.EventBuffer, this.InputEvents);
 	}
 
 	// 0 (temporary): press start this frame, 1: press start, 2: press continue
 	// -1: release start, -2: release continue, -3: press start & end
 	protected void ProcessButtonState(int idxBtn, int velocity = 0) {
-		if (ButtonStates[idxBtn].isPressed) {
-			if (ButtonStates[idxBtn].state >= 1) {
-				ButtonStates[idxBtn].state = 2;
+		lock (this.ButtonStates) { // update thread, concurrent with input thread
+			var isPressed = Volatile.Read(ref ButtonStates[idxBtn].isPressed);
+			var state = Volatile.Read(ref ButtonStates[idxBtn].state);
+			if (isPressed != 0) {
+				if (state >= 1) {
+					Volatile.Write(ref ButtonStates[idxBtn].state, 2);
+				} else {
+					Volatile.Write(ref ButtonStates[idxBtn].state, 1);
+				}
 			} else {
-				ButtonStates[idxBtn].state = 1;
-			}
-		} else {
-			if (ButtonStates[idxBtn].state <= -1) {
-				ButtonStates[idxBtn].state = -2;
-			} else if (ButtonStates[idxBtn].state == 0) {
-				ButtonStates[idxBtn].state = -3;
-			} else {
-				ButtonStates[idxBtn].state = -1;
+				if (state <= -1) {
+					Volatile.Write(ref ButtonStates[idxBtn].state, -2);
+				} else if (state == 0) {
+					Volatile.Write(ref ButtonStates[idxBtn].state, -3);
+				} else {
+					Volatile.Write(ref ButtonStates[idxBtn].state, -1);
+				}
 			}
 		}
 	}
 
-	protected void AddReleasedEvent(int idxBtn, long msTImestamp)
-		=> this.EventBuffer.Add(new STInputEvent() {
-			nKey = idxBtn,
-			Pressed = false,
-			Released = true,
-			nTimeStamp = msTImestamp,
-			nVelocity = 0,
-		});
+	protected void AddReleasedEvent(int idxBtn, long msTImestamp) {
+		lock (this.EventBuffer) { // update thread and input thread
+			this.EventBuffer.Add(new STInputEvent() {
+				nKey = idxBtn,
+				Pressed = false,
+				Released = true,
+				nTimeStamp = msTImestamp,
+				nVelocity = 0,
+			});
+		}
+	}
 
-	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0)
-		=> this.EventBuffer.Add(new STInputEvent() {
-			nKey = idxBtn,
-			Pressed = true,
-			Released = false,
-			nTimeStamp = msTimestamp,
-			nVelocity = velocity,
-		});
+	protected void AddPressedEvent(int idxBtn, long msTimestamp, int velocity = 0) {
+		lock (this.EventBuffer) { // update thread and input thread
+			this.EventBuffer.Add(new STInputEvent() {
+				nKey = idxBtn,
+				Pressed = true,
+				Released = false,
+				nTimeStamp = msTimestamp,
+				nVelocity = velocity,
+			});
+		}
+	}
 
 	protected void ButtonDown(int idxBtn, int velocity = 0) {
-		if (!this.ButtonStates[idxBtn].isPressed) {
-			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
-			this.ButtonStates[idxBtn].state = 0;
+		uint isPressed;
+		lock (this.ButtonStates) { // update thread and input thread
+			isPressed = Interlocked.Exchange(ref this.ButtonStates[idxBtn].isPressed, 1U);
+			if (isPressed == 0)
+				Volatile.Write(ref ButtonStates[idxBtn].state, 0);
 		}
-		this.ButtonStates[idxBtn].isPressed = true;
+		if (isPressed == 0)
+			this.AddPressedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime(), velocity);
 		this.SetVelocity(idxBtn, velocity);
 	}
 
 	protected void ButtonUp(int idxBtn) {
-		if (this.ButtonStates[idxBtn].isPressed) {
+		var isPressed = Interlocked.Exchange(ref this.ButtonStates[idxBtn].isPressed, 0U);
+		if (isPressed != 0)
 			this.AddReleasedEvent(idxBtn, SoundManager.PlayTimer.msGetPreciseNowSoundTimerTime());
-		}
-		this.ButtonStates[idxBtn].isPressed = false;
 	}
 
 	public bool KeyPressed(int nButton) {
-		return ButtonStates[nButton].state is 1 or -3;
+		return Volatile.Read(ref ButtonStates[nButton].state) is 1 or -3;
 	}
 	public bool KeyPressing(int nButton) {
-		return ButtonStates[nButton].state >= 1;
+		return Volatile.Read(ref ButtonStates[nButton].state) >= 1;
 	}
 	public bool KeyReleased(int nButton) {
-		return ButtonStates[nButton].state is -1 or -3;
+		return Volatile.Read(ref ButtonStates[nButton].state) is -1 or -3;
 	}
 	public bool KeyReleasing(int nButton) {
-		return ButtonStates[nButton].state <= -1;
+		return Volatile.Read(ref ButtonStates[nButton].state) <= -1;
 	}
 	//-----------------
 	#endregion
@@ -114,7 +126,8 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	public virtual void Dispose() {
 		if (!this.IsDisposed) {
 			this.InputEvents.Clear();
-			this.EventBuffer.Clear();
+			lock (this.EventBuffer) // update thread and input thread
+				this.EventBuffer.Clear();
 			this.IsDisposed = true;
 		}
 	}
@@ -127,7 +140,7 @@ public abstract class CInputButtonsBase : IInputDevice, IDisposable {
 	#region [ private ]
 	//-----------------
 	public List<STInputEvent> EventBuffer;
-	public (bool isPressed, int state)[] ButtonStates { get; protected set; }
+	public (uint isPressed, int state)[] ButtonStates { get; protected set; }
 	protected bool IsDisposed;
 	//-----------------
 	#endregion
