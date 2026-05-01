@@ -64,14 +64,15 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		get;
 		private set;
 	}
-	private enum DTXEnumState {
-		None,
+	public enum DTXEnumState {
+		Canceled = -1,
+		None = 0,
 		Ongoing,
 		Suspended,
 		Enumeratad,             // 探索完了、現在の曲リストに未反映
 		CompletelyDone          // 探索完了、現在の曲リストに反映完了
 	}
-	private DTXEnumState state = DTXEnumState.None;
+	public DTXEnumState state { get; private set; } = DTXEnumState.None;
 
 
 	/// <summary>
@@ -127,10 +128,10 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	}
 
 	private void HardReloadSongList() {
-		this.t曲リストの構築2(true);
+		this.ReloadSongList(true);
 	}
 	private void ReloadSongList() {
-		this.t曲リストの構築2(false);
+		this.ReloadSongList(false);
 	}
 
 	/// <summary>
@@ -184,12 +185,20 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Abort() {
 		if (thDTXFileEnumerate != null) {
-			thDTXFileEnumerate.Abort();
-			thDTXFileEnumerate = null;
-			this.state = DTXEnumState.None;
+			this.Songs管理.bIsCanceled = true;
+			this.state = DTXEnumState.Canceled;
+			try {
+				thDTXFileEnumerate.Join();
+			} catch (Exception ex) {
+				Trace.TraceWarning(ex.ToString());
+				Trace.TraceWarning("Error terminating song list loading thread; continue anyway.");
+			}
+			// wait until enum thread terminated
 
-			this.Songs管理 = null;                    // Songs管理を再初期化する (途中まで作った曲リストの最後に、一から重複して追記することにならないようにする。)
+			// Songs管理を再初期化する (途中まで作った曲リストの最後に、一から重複して追記することにならないようにする。)
+			thDTXFileEnumerate = null;
 			this.Songs管理 = new CSongs管理();
+			this.state = DTXEnumState.None;
 		}
 	}
 
@@ -261,7 +270,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 起動してタイトル画面に遷移した後にバックグラウンドで発生させる曲検索
 	/// #27060 2012.2.6 yyagi
 	/// </summary>
-	private void t曲リストの構築2(bool hard_reload = false) {
+	private void ReloadSongList(bool hard_reload = false) {
 		// ！注意！
 		// 本メソッドは別スレッドで動作するが、プラグイン側でカレントディレクトリを変更しても大丈夫なように、
 		// すべてのファイルアクセスは「絶対パス」で行うこと。(2010.9.16)
@@ -301,6 +310,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 								try {
 									this.Songs管理.t曲を検索してリストを作成する(path, true);
+								} catch (OperationCanceledException) {
+									throw; // forward cancellation
 								} catch (Exception e) {
 									Trace.TraceError(e.ToString());
 									Trace.TraceError("例外が発生しましたが処理を継続します。 (105fd674-e722-4a4e-bd9a-e6f82ac0b1d3)");
@@ -364,6 +375,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			try {
 				this.Songs管理.tSongListPostprocessing();
+			} catch (OperationCanceledException) {
+				throw; // forward cancellation
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
 				Trace.TraceError("例外が発生しましたが処理を継続します。 (6480ffa0-1cc1-40d4-9cc9-aceeecd0264b)");
@@ -389,7 +402,12 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			//-----------------------------
 			#endregion
 			//				}
-
+		} catch (OperationCanceledException) { // canceled
+			lock (this) {
+				state = DTXEnumState.Canceled;
+			}
+			Trace.TraceInformation("Song list enumeration canceled.");
+			return;
 		} finally {
 			//				base.eフェーズID = CStage.Eフェーズ.起動7_完了;
 			TimeSpan span = (TimeSpan)(DateTime.Now - now);

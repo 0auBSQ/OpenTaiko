@@ -214,13 +214,8 @@ internal class CStage起動 : CStage {
 				{
 					OpenTaiko.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
 
-					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
-						OpenTaiko.Skin.soundDecideSFX.tPlay();
-						return 1;
-					}
+					return 1;
 				}
-
-				OpenTaiko.Tx.Readme.t2D描画(0, 0);
 			}
 
 		}

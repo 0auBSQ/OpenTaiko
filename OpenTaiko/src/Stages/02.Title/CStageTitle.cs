@@ -851,23 +851,6 @@ internal class CStageTitle : CStage {
 		}
 		return 0;
 	}
-	public enum EReturnValue {
-		継続 = 0,
-		GAMESTART,
-		DANGAMESTART,
-		TAIKOTOWERSSTART,
-		SHOPSTART,
-		BOUKENSTART,
-		HEYA,
-		CONFIG,
-		EXIT,
-		ONLINELOUNGE,
-		ENCYCLOPEDIA,
-		AIBATTLEMODE,
-		PLAYERSTATS,
-		CHARTEDITOR,
-		TOOLBOX,
-	}
 
 
 	// その他

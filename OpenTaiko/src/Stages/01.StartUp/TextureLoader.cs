@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using FDK;
 
 namespace OpenTaiko;
@@ -135,7 +136,7 @@ class TextureLoader {
 		Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
 		Overlay = TxC(@$"Overlay.png");
 		Network_Connection = TxC(@$"Network_Connection.png");
-		Readme = TxC(@$"Readme.png");
+		// Readme = TxC(@$"Readme.png");
 		NamePlateBase = TxC(@$"NamePlate.png");
 		NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
 
@@ -420,6 +421,10 @@ class TextureLoader {
 		Judge_Meter = TxC(GAME + @$"Judge_Meter.png");
 		Bar = TxC(GAME + @$"Bar.png");
 		Bar_Branch = TxC(GAME + @$"Bar_Branch.png");
+
+		Vector2 judgeDiff = new(OpenTaiko.Skin.Game_Judge_X[1] - OpenTaiko.Skin.Game_Judge_X[0], OpenTaiko.Skin.Game_Judge_Y[1] - OpenTaiko.Skin.Game_Judge_Y[0]);
+		OpenTaiko.Skin.Init_Game_Notes_Arm_Configs(CSkin.ToVector2(Notes_Arm.szTextureSize), CSkin.ToVector2(OpenTaiko.Skin.Game_Notes_Size), judgeDiff,
+			(float)OpenTaiko.Skin.ScaleY * new Vector2(35, 0), (float)OpenTaiko.Skin.ScaleY * 8);
 
 		var _presetsDefs = CSkin.Path(BASE + GAME + BACKGROUND + @$"Presets.json");
 		if (File.Exists(_presetsDefs))
@@ -1187,6 +1192,11 @@ class TextureLoader {
 		for (int i = 0; i < 5; i++) {
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(OpenTaiko.Skin.Characters_DirName);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
+
+			// If the saved puchichara folder no longer exists, fall back to index 0.
+			string puchi = OpenTaiko.SaveFileInstances[i].data.PuchiChara;
+			if (OpenTaiko.Skin.Puchicharas_Name.Length > 0 && !OpenTaiko.Skin.Puchicharas_NameToIndex.ContainsKey(puchi))
+				OpenTaiko.SaveFileInstances[i].data.PuchiChara = OpenTaiko.Skin.Puchicharas_Name[0];
 		}
 
 

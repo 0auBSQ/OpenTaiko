@@ -4,20 +4,20 @@ using NLua;
 namespace OpenTaiko;
 
 internal class CLuaNamePlateScript : CLuaScript {
-	private LuaFunction lfGetCharaOffset;
-	private LuaFunction lfSetInfos;
-	private LuaFunction lfDrawDan;
-	private LuaFunction lfDrawTitlePlate;
-	private LuaFunction lfUpdate;
-	private LuaFunction lfDraw;
+	private NamedLuaFunction lfGetCharaOffset = new("getCharaOffset");
+	private NamedLuaFunction lfSetInfos = new("setInfos");
+	private NamedLuaFunction lfDrawDan = new("drawDan");
+	private NamedLuaFunction lfDrawTitlePlate = new("drawTitlePlate");
+	private NamedLuaFunction lfUpdate = new("update");
+	private NamedLuaFunction lfDraw = new("draw");
 
 	public CLuaNamePlateScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
-		lfGetCharaOffset = (LuaFunction)LuaScript["getCharaOffset"];
-		lfSetInfos = (LuaFunction)LuaScript["setInfos"];
-		lfDrawDan = (LuaFunction)LuaScript["drawDan"];
-		lfDrawTitlePlate = (LuaFunction)LuaScript["drawTitlePlate"];
-		lfUpdate = (LuaFunction)LuaScript["update"];
-		lfDraw = (LuaFunction)LuaScript["draw"];
+		lfGetCharaOffset.Load(LuaScript);
+		lfSetInfos.Load(LuaScript);
+		lfDrawDan.Load(LuaScript);
+		lfDrawTitlePlate.Load(LuaScript);
+		lfUpdate.Load(LuaScript);
+		lfDraw.Load(LuaScript);
 	}
 
 	public int GetCharaOffset() {

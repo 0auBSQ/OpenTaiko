@@ -7,6 +7,15 @@ using NLua;
 
 namespace OpenTaiko;
 
+public record struct NamedLuaFunction(string Name, LuaFunction? Func = null) : IDisposable {
+	public void Load(Lua? lua) => Func = lua?[Name] as LuaFunction;
+	public void LoadNoop(Lua? lua) => Func = lua?.DoString("return function(...) end")?[0] as LuaFunction;
+	public void Dispose() {
+		Func?.Dispose();
+		Func = null;
+	}
+}
+
 class CLuaScript : IDisposable {
 	public static List<CLuaScript> listScripts { get; private set; } = new List<CLuaScript>();
 	public static void tReloadLanguage(string lang) {
@@ -18,6 +27,7 @@ class CLuaScript : IDisposable {
 
 
 	public string strDir { get; private set; }
+	public string strScriptShort { get; private set; }
 	public string strTexturesDir { get; private set; }
 	public string strSounsdDir { get; private set; }
 
@@ -27,8 +37,8 @@ class CLuaScript : IDisposable {
 
 	protected Lua LuaScript { get; private set; }
 
-	private LuaFunction lfLoadAssets;
-	private LuaFunction lfReloadLanguage;
+	private NamedLuaFunction lfLoadAssets = new("loadAssets");
+	private NamedLuaFunction lfReloadLanguage = new("reloadLanguage");
 
 	private CLuaInfo luaInfo;
 	private CLuaFps luaFPS = new CLuaFps();
@@ -67,16 +77,22 @@ class CLuaScript : IDisposable {
 		return array;
 	}
 
-	protected object[] RunLuaCode(LuaFunction luaFunction, params object[] args) {
+	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
 		try {
-			if (luaFunction == null) return null;
-			var ret = luaFunction.Call(args);
+			if (luaFunction.Func == null) {
+				LogNotification.PopWarning($"{this.GetType().Name} Warning: [{this.strScriptShort}] Function [{luaFunction.Name}] is called but undefined");
+				Trace.TraceWarning($"Full script path: {this.strDir}/Script.Lua");
+				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
+				luaFunction.LoadNoop(LuaScript); // silence further warnings
+				return null;
+			}
+			var ret = luaFunction.Func.Call(args);
 			LuaScript.State.GarbageCollector(KeraLua.LuaGC.Collect, 0);
 			return ret;
 		} catch (Exception exception) {
 			Crash(exception);
 		}
-		return new object[0];
+		return null;
 	}
 
 	private JsonNode LoadConfig(string name) {
@@ -163,6 +179,7 @@ class CLuaScript : IDisposable {
 
 	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) {
 		strDir = dir;
+		strScriptShort = Path.Join(Path.GetFileName(Path.GetDirectoryName(strDir)), "Script.lua");
 		strTexturesDir = texturesDir ?? $"{dir}/Textures";
 		strSounsdDir = soundsDir ?? $"{dir}/Sounds";
 
@@ -179,8 +196,8 @@ class CLuaScript : IDisposable {
 			LuaScript["fps"] = luaFPS;
 
 
-			lfLoadAssets = (LuaFunction)LuaScript["loadAssets"];
-			lfReloadLanguage = (LuaFunction)LuaScript["reloadLanguage"];
+			lfLoadAssets.Load(LuaScript);
+			lfReloadLanguage.Load(LuaScript);
 
 			LuaScript["loadConfig"] = LoadConfig;
 			LuaScript["loadTexture"] = LoadTexture;
@@ -234,9 +251,11 @@ class CLuaScript : IDisposable {
 		listScripts.Remove(this);
 	}
 
-	private void Crash(Exception exception) {
+	protected void Crash(Exception exception) {
 		bCrashed = true;
 
-		LogNotification.PopError($"Lua Script Error: {exception.ToString()}");
+		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
+		Trace.TraceError($"Full script path: {this.strDir}/Script.Lua");
+		Trace.TraceError(exception.StackTrace);
 	}
 }

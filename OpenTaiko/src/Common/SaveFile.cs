@@ -19,15 +19,17 @@ internal class SaveFile {
 	}
 
 	public void tInitSaveFile() {
-		// Best plays
-		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
-		data.tFactorizeBestPlays();
+		lock (this) {
+			// Best plays
+			data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+			data.tFactorizeBestPlays();
 
-		// Global triggers
-		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+			// Global triggers
+			data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
 
-		// Global counters
-		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+			// Global counters
+			data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+		}
 	}
 
 	public void tLoadUnlockables() {
@@ -176,9 +178,12 @@ internal class SaveFile {
 	public void tReindexCharacter(string[] characterNamesList) {
 		string character = this.data.CharacterName;
 
-		if (characterNamesList.Contains(character))
+		if (characterNamesList.Contains(character)) {
 			this.data.Character = characterNamesList.ToList().IndexOf(character);
-
+		} else {
+			// Character folder no longer exists on disk — fall back to index 0 (None).
+			this.data.Character = 0;
+		}
 	}
 
 	public void tUpdateCharacterName(string newChara) {

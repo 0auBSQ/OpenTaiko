@@ -20,7 +20,7 @@ internal class CActSelectPreimageパネル : CActivity {
 		this.strCurrentFilename = "";
 		this.bNewPreimageLoaded = false;
 		this.txPreimage = null;
-		this.tUpdatePreimage(OpenTaiko.stageSongSelect.r現在選択中のスコア);
+		this.tUpdatePreimage(OpenTaiko.SongMount.rCurrentScore);
 		base.Activate();
 	}
 	public override void DeActivate() {
@@ -48,7 +48,7 @@ internal class CActSelectPreimageパネル : CActivity {
 			if ((!OpenTaiko.stageSongSelect.bCurrentlyScrolling && (this.ctDelayedDisplay != null)) && this.ctDelayedDisplay.IsTicked) {
 				this.ctDelayedDisplay.Tick();
 				if ((this.ctDelayedDisplay.CurrentValue >= 0) && this.bNewPreimageStillLoading) {
-					this.tUpdatePreimage(OpenTaiko.stageSongSelect.r現在選択中のスコア);
+					this.tUpdatePreimage(OpenTaiko.SongMount.rCurrentScore);
 					OpenTaiko.Timer.Update();
 					this.ctDelayedDisplay.msNowTime = OpenTaiko.Timer.NowTimeMs;
 					this.bNewPreimageLoaded = true;
@@ -155,7 +155,7 @@ internal class CActSelectPreimageパネル : CActivity {
 				this.rCurrentlyDisplayedPreimage.vcScaleRatio.X = num4 * bestRatio;
 				this.rCurrentlyDisplayedPreimage.vcScaleRatio.Y = num4 * bestRatio;
 
-				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong);
+				var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
 				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
 					this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = true;

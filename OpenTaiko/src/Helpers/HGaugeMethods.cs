@@ -108,7 +108,7 @@ class HGaugeMethods {
 		=> tGaugeGetValue(DifficultyToNorma, diff, LevelExtraToNorma, level);
 
 	public static bool IsForceNormalGauge()
-		=> OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] >= 5;
+		=> OpenTaiko.ConfigIni.bForceNormalGauge || OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= 5;
 
 	public static EGaugeType tGetGaugeTypeEnum(string gaugeType) {
 		EGaugeType gt = EGaugeType.NORMAL;
@@ -408,10 +408,10 @@ class HGaugeMethods {
 	#region [Unsafe methods]
 
 	public static bool UNSAFE_FastNormaCheck(int player) {
-		var _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+		var _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		return tNormaCheck(
 			(Difficulty)_dif,
-			OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1,
+			OpenTaiko.SongMount.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1,
 			tGetGaugeTypeEnum(player),
 			(float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player],
 			UNSAFE_KillZonePercent(player)
@@ -428,12 +428,12 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Difficulty
-		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
+		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
 
 		return tHardGaugeGetKillscreenRatio(
 			difficulty,
@@ -520,7 +520,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Scale
 		float scale = 1.0f;
@@ -529,9 +529,9 @@ class HGaugeMethods {
 		}
 
 		// Difficulty
-		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
+		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
 
 		// Current percent
 		float currentPercent = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[player];
@@ -590,7 +590,7 @@ class HGaugeMethods {
 
 		// Total hits and perfect hits
 		int perfectHits = OpenTaiko.stageGameScreen.CChartScore[player].nGreat;
-		int totalHits = dtx.nノーツ数[3];
+		int totalHits = dtx.nノーツ数_Common;
 
 		// Gauge type
 		EGaugeType gaugeType = tGetGaugeTypeEnum(player);
@@ -605,9 +605,9 @@ class HGaugeMethods {
 		}
 
 		// Difficulty
-		int _dif = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+		int _dif = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		Difficulty difficulty = (Difficulty)_dif;
-		int level = OpenTaiko.stageSongSelect.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
+		int level = OpenTaiko.SongMount.rChoosenSong.score[_dif]?.譜面情報.nレベル[_dif] ?? -1;
 
 		int gauge_x;
 		int gauge_y;

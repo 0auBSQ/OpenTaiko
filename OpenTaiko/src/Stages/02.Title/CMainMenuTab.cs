@@ -14,9 +14,10 @@ class CMainMenuTab {
 	public bool implemented;
 	public CTexture barTex;
 	public CTexture barChara;
-	public CStageTitle.EReturnValue rp;
+	public string luaStageName;
+	public EReturnValue rp;
 
-	public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, CStageTitle.EReturnValue returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
+	public CMainMenuTab(int boxId, Color col, CCachedFontRenderer tpf, CCachedFontRenderer boxpf, EReturnValue returnPoint, bool _1Ponly, bool impl, CTexture[] modeSelect_Bar, CTexture[] modeSelect_Bar_Chara) {
 		string title = GetBoxText(boxId);
 
 		ttkTitle = new TitleTextureKey(title, tpf, Color.White, col, 1280, Color.Black);
@@ -101,22 +102,22 @@ class CMainMenuTab {
 
 			#region [Return points]
 
-			CStageTitle.EReturnValue[] __rps =
-			{
-				CStageTitle.EReturnValue.GAMESTART,
-				CStageTitle.EReturnValue.DANGAMESTART,
-				CStageTitle.EReturnValue.TAIKOTOWERSSTART,
-				CStageTitle.EReturnValue.SHOPSTART,
-				CStageTitle.EReturnValue.BOUKENSTART,
-				CStageTitle.EReturnValue.HEYA,
-				CStageTitle.EReturnValue.CONFIG,
-				CStageTitle.EReturnValue.EXIT,
-				CStageTitle.EReturnValue.ONLINELOUNGE,
-				CStageTitle.EReturnValue.ENCYCLOPEDIA,
-				CStageTitle.EReturnValue.AIBATTLEMODE,
-				CStageTitle.EReturnValue.PLAYERSTATS,
-				CStageTitle.EReturnValue.CHARTEDITOR,
-				CStageTitle.EReturnValue.TOOLBOX,
+		EReturnValue[] __rps =
+		{
+				EReturnValue.GAMESTART,
+				EReturnValue.DANGAMESTART,
+				EReturnValue.TAIKOTOWERSSTART,
+				EReturnValue.SHOPSTART,
+				EReturnValue.BOUKENSTART,
+				EReturnValue.HEYA,
+				EReturnValue.CONFIG,
+				EReturnValue.EXIT,
+				EReturnValue.ONLINELOUNGE,
+				EReturnValue.ENCYCLOPEDIA,
+				EReturnValue.AIBATTLEMODE,
+				EReturnValue.PLAYERSTATS,
+				EReturnValue.CHARTEDITOR,
+				EReturnValue.TOOLBOX,
 			};
 
 			#endregion
@@ -162,11 +163,11 @@ class CMainMenuTab {
 
 			#endregion
 
-			for (int i = 0; i < __MenuCount; i++) {
-				CStageTitle.EReturnValue _rp = (i >= __rps.Length) ? CStageTitle.EReturnValue.GAMESTART : __rps[i];
-				Color _mc = (i >= __MenuColors.Length) ? Color.White : __MenuColors[i];
-				bool _1pr = (i >= _1PRestricts.Length) ? false : _1PRestricts[i];
-				bool _impl = (i >= _implemented.Length) ? false : _implemented[i];
+		for (int i = 0; i < __MenuCount; i++) {
+			EReturnValue _rp = (i >= __rps.Length) ? EReturnValue.GAMESTART : __rps[i];
+			Color _mc = (i >= __MenuColors.Length) ? Color.White : __MenuColors[i];
+			bool _1pr = (i >= _1PRestricts.Length) ? false : _1PRestricts[i];
+			bool _impl = (i >= _implemented.Length) ? false : _implemented[i];
 
 				__Menus[i] = new CMainMenuTab(i, _mc, tpf, boxpf, _rp, _1pr, _impl, modeSelect_Bar, modeSelect_Bar_Chara);
 

@@ -100,7 +100,7 @@ public static class ImGuiDebugWindow {
 			ImGui.Separator();
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
 			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
-			ImGui.Text($"FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS.NowFPS : "???")}");
+			ImGui.Text($"Draw FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS?.NowFPS : "???")}, Input FPS: {(OpenTaiko.FPSInput != null ? OpenTaiko.FPSInput?.NowFPS : "???")}");
 			ImGui.Text("Current Stage: " + OpenTaiko.rCurrentStage.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.rCurrentStage.eStageID).ToString() + ")");
 			#endregion
 
@@ -438,8 +438,8 @@ public static class ImGuiDebugWindow {
 					System.Numerics.Vector4 diff = new System.Numerics.Vector4(0.5f, 1, 0.5f, 1);
 
 					if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongSelect && ImGui.TreeNodeEx("Current Song", ImGuiTreeNodeFlags.Framed)) {
-						if (OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong != null) {
-							CSongListNode song = OpenTaiko.stageSongSelect.actSongList.rCurrentlySelectedSong;
+						if (OpenTaiko.SongMount.rCurrentlySelectedSong != null) {
+							CSongListNode song = OpenTaiko.SongMount.rCurrentlySelectedSong;
 
 							ImGui.Text($"Index: {OpenTaiko.stageSongSelect.actSongList.nSelectSongIndex}");
 							ImGui.Text($"Open Index: {song.Openindex}");
@@ -567,8 +567,12 @@ public static class ImGuiDebugWindow {
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						if (ImGui.TreeNodeEx($"Player {i + 1}###GAME_CHART_{i}", ImGuiTreeNodeFlags.Framed)) {
 
-							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.stageSongSelect.nChoosenSongDifficulty[i]);
+							Difficulty game_difficulty = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.SongMount.nChoosenSongDifficulty[i]);
 							var dtx = OpenTaiko.GetTJA(i);
+							if (dtx == null) {
+								ImGui.TreePop();
+								continue;
+							}
 
 							switch (game_difficulty) {
 								case Difficulty.Dan:
@@ -578,14 +582,21 @@ public static class ImGuiDebugWindow {
 									ImGui.SeparatorText("Tower Mode");
 									ImGui.Text("Side: " + dtx.SIDE);
 									ImGui.Text("Life: " + dtx.LIFE);
-									ImGui.Text("Floor Count: " + OpenTaiko.stageSongSelect.rNowSelectedSong.score[5].譜面情報.nTotalFloor);
+									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].譜面情報.nTotalFloor);
 									break;
 								default:
 									ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
 									break;
 
 							}
-							ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]), $"Difficulty: {game_difficulty}");
+							var levelIcon = dtx.PlayerSideMetadata.LEVELtaikoIcon switch {
+								CTja.ELevelIcon.eMinus => "-",
+								CTja.ELevelIcon.ePlus => "+",
+								CTja.ELevelIcon.eNone or _ => "",
+							};
+
+							ImGui.TextColored(ColorToVector4(OpenTaiko.Skin.SongSelect_Difficulty_Colors[(int)game_difficulty]),
+								$"Difficulty: {game_difficulty} {dtx.PlayerSideMetadata.LEVELtaiko}{levelIcon}");
 							ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
 							var db現在時刻ms = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
@@ -628,6 +639,16 @@ public static class ImGuiDebugWindow {
 									   " / Expert: " + dtx.nノーツ数_Branch[1] +
 									   " / Master: " + dtx.nノーツ数_Branch[2]);
 							ImGui.Unindent();
+
+
+							if (dtx.PlayerSideMetadata.CustomMetadata.Count > 0) {
+								if (ImGui.TreeNodeEx($"Player-side custom metadata ({dtx.PlayerSideMetadata.CustomMetadata.Count})###GAME_PLAYERSIDE_CUSTOM_METADATA_LIST_{i}")) {
+									foreach (var (key, value) in dtx.PlayerSideMetadata.CustomMetadata) {
+										ImGui.Text($"{key}:{value}");
+									}
+									ImGui.TreePop();
+								}
+							}
 
 							ImGui.TreePop();
 						}
@@ -682,7 +703,7 @@ public static class ImGuiDebugWindow {
 						"Kusudama", "TEXTURE_LUA_KUSUDAMA");
 
 					#region Endings
-					switch ((Difficulty)OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+					switch ((Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
 						case Difficulty.Tower:
 							currentStageMemoryUsage += CTextureListPopup(OpenTaiko.stageGameScreen.actEnd.Tower_DropoutScript,
 								"Tower Dropout", "TEXTURE_LUA_TOWERDROPOUT");

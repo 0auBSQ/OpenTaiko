@@ -388,8 +388,8 @@ internal class DBSaves {
 
 		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
-		var choosenSong = OpenTaiko.stageSongSelect.rChoosenSong;
-		var choosenDifficulty = OpenTaiko.stageSongSelect.nChoosenSongDifficulty[player];
+		var choosenSong = OpenTaiko.SongMount.rChoosenSong;
+		var choosenDifficulty = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		var chartScore = OpenTaiko.stageGameScreen.CChartScore[player];
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
 
@@ -409,12 +409,12 @@ internal class DBSaves {
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
-			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = CFloorManagement.LastRegisteredFloor;
+			if (choosenDifficulty == (int)Difficulty.Tower) currentPlay.TowerBestFloor = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor;
 			if (choosenDifficulty == (int)Difficulty.Dan) {
-				for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-					for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
-						if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
-							int amount = OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].Amount;
+				for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+					for (int j = 0; j < OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
+						if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
+							int amount = OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].Amount;
 							danResults[j].Add(amount);
 						}
 					}
@@ -465,18 +465,18 @@ internal class DBSaves {
 						JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam6"]) ?? new List<int> { -1 },
 						JsonConvert.DeserializeObject<List<int>>((string)reader["DanExam7"]) ?? new List<int> { -1 }
 					};
-					for (int i = 0; i < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs.Count; i++) {
-						for (int j = 0; j < OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
-							if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
+					for (int i = 0; i < OpenTaiko.SongMount.rChoosenSong.DanSongs.Count; i++) {
+						for (int j = 0; j < OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C.Length; j++) {
+							if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j] != null) {
 								int amount = danResults[j][i];
 
 								if (i < oldDanResults[j].Count) {
 									int current = oldDanResults[j][i];
 									if (current == -1) {
 										danResults[j][i] = amount;
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.More) {
+									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.More) {
 										danResults[j][i] = Math.Max(amount, current);
-									} else if (OpenTaiko.stageSongSelect.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.Less) {
+									} else if (OpenTaiko.SongMount.rChoosenSong.DanSongs[i].Dan_C[j].ExamRange == Exam.Range.Less) {
 										danResults[j][i] = Math.Min(amount, current);
 									}
 								}

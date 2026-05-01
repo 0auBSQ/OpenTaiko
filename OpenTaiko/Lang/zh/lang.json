@@ -51,6 +51,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "重新扫描歌曲文件夹并加载歌曲。",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "重新加载歌曲（硬重新加载）",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "清除既有缓存并从空白重新扫描歌曲文件夹并加载歌曲。",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " 歌曲列表加载中。\n         请稍后……",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "导入 Score.ini 文件",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "导入 Score.ini 文件到数据库中。\n\n<c.#f0ad4e>警告\n下列内容将不会迁移：\n— 过关状态\n— 游玩修改器\n— 击打数（良、可、不可、连打等）\n— 段位测验成绩",
@@ -62,6 +63,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "正在处理 {0} 份成绩……\n<c.#0bb000>{1} ／ {2} 已处理</c>（<c.#f0ad4e>{3} 跳过</c> ／ <c.#b00000>{4} 失败</c>）\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "正在刷新 {0} 位玩家的分数...\n<c.#0bb000>{1} ／ {2} 位玩家已刷新</c> (<c.#b00000>{3} 个玩家刷新失败</c>)\n\n{4}：{5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。\n重新加载歌曲以使此选项生效。",

@@ -38,7 +38,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 				}
 			}
 		} else if (n現在の選択行[player] >= 5) {
-			if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[4] < 0 || OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[3] < 0)
+			if (OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[4] < 0 || OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[3] < 0)
 				return;
 
 			if (nスイッチカウント < 0) {
@@ -76,8 +76,8 @@ internal class CActSelect難易度選択画面 : CActivity {
 	}
 
 	public void t選択画面初期化() {
-		this.txTitle = OpenTaiko.tテクスチャの生成(pfTitle.DrawText(OpenTaiko.stageSongSelect.rNowSelectedSong.ldTitle.GetString(""), Color.White, Color.Black, null, 30));
-		this.txSubTitle = OpenTaiko.tテクスチャの生成(pfSubTitle.DrawText(OpenTaiko.stageSongSelect.rNowSelectedSong.ldSubtitle.GetString(""), Color.White, Color.Black, null, 30));
+		this.txTitle = OpenTaiko.tテクスチャの生成(pfTitle.DrawText(OpenTaiko.SongMount.rCurrentlySelectedSong.ldTitle.GetString(""), Color.White, Color.Black, null, 30));
+		this.txSubTitle = OpenTaiko.tテクスチャの生成(pfSubTitle.DrawText(OpenTaiko.SongMount.rCurrentlySelectedSong.ldSubtitle.GetString(""), Color.White, Color.Black, null, 30));
 
 		this.n現在の選択行 = new int[5];
 		this.bSelect[0] = false;
@@ -86,7 +86,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 		this.bSelect[3] = false;
 		this.bSelect[4] = false;
 
-		this.b裏譜面 = (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0 && OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] < 0);
+		this.b裏譜面 = (OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Edit] >= 0 && OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Oni] < 0);
 
 		this.IsFirstDraw = true;
 	}
@@ -150,8 +150,8 @@ internal class CActSelect難易度選択画面 : CActivity {
 			ctBarAnime[i].Tick();
 		}
 
-		bool uraExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
-		bool omoteExists = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
+		bool uraExists = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Edit] >= 0;
+		bool omoteExists = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[(int)Difficulty.Oni] >= 0;
 
 		#region [ キー入力 ]
 
@@ -223,7 +223,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 							bOption[i] = true;
 						} else {
-							if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[n現在の選択行[i] - 2] >= 0) {
+							if (OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[n現在の選択行[i] - 2] >= 0) {
 								//TJAPlayer3.stage選曲.ctChara_Jump[0].t開始(0, SongSelect_Chara_Jump.Length - 1, 1000 / 45, TJAPlayer3.Timer);
 
 
@@ -286,7 +286,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 
 		// int boxType = nStrジャンルtoNum(TJAPlayer3.stage選曲.r現在選択中の曲.strジャンル);
-		var difficulty_back = HGenreBar.tGetGenreBar(OpenTaiko.stageSongSelect.rNowSelectedSong.BoxType, OpenTaiko.Tx.Difficulty_Back);
+		var difficulty_back = HGenreBar.tGetGenreBar(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxType, OpenTaiko.Tx.Difficulty_Back);
 
 
 		difficulty_back.Opacity =
@@ -299,7 +299,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 		OpenTaiko.Tx.SongSelect_ScoreRank.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Star.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 
-		difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.stageSongSelect.rNowSelectedSong.BoxColor);
+		difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxColor);
 
 		difficulty_back.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Difficulty_Back[0], OpenTaiko.Skin.SongSelect_Difficulty_Back[1]);
 
@@ -340,8 +340,8 @@ internal class CActSelect難易度選択画面 : CActivity {
 				continue;
 
 			int screenPos = Math.Min((int)Difficulty.Oni, i);
-			int level = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i];
-			bool avaliable = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i] >= 0;
+			int level = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i];
+			bool avaliable = OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i] >= 0;
 
 			if (avaliable)
 				OpenTaiko.Tx.Difficulty_Bar.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -368,11 +368,11 @@ internal class CActSelect難易度選択画面 : CActivity {
 
 				int p = OpenTaiko.GetActualPlayer(j);
 
-				CScore.ST譜面情報 idx = OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報;
+				CScore.ST譜面情報 idx = OpenTaiko.SongMount.rCurrentScore.譜面情報;
 
 				//var GPInfo = TJAPlayer3.stageSongSelect.r現在選択中のスコア.GPInfo[p];
 
-				var TableEntry = OpenTaiko.SaveFileInstances[p].data.tGetSongSelectTableEntry(OpenTaiko.stageSongSelect.rNowSelectedSong.tGetUniqueId());
+				var TableEntry = OpenTaiko.SaveFileInstances[p].data.tGetSongSelectTableEntry(OpenTaiko.SongMount.rCurrentlySelectedSong.tGetUniqueId());
 
 				//Difficulty_Crown.t2D描画(445 + screenPos * 144, 284, new RectangleF(idx.nクリア[i] * 24.5f, 0, 24.5f, 26));
 
@@ -399,11 +399,11 @@ internal class CActSelect難易度選択画面 : CActivity {
 			}
 
 			if (level >= 0 && (!(i >= (int)Difficulty.Oni && exextraAnimation > 0)))
-				t小文字表示(OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nレベル[i],
+				t小文字表示(OpenTaiko.SongMount.rCurrentScore.譜面情報.nレベル[i],
 					OpenTaiko.Skin.SongSelect_Difficulty_Number_X[i],
 					OpenTaiko.Skin.SongSelect_Difficulty_Number_Y[i],
 					i,
-					OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nLevelIcon[i]
+					OpenTaiko.SongMount.rCurrentScore.譜面情報.nLevelIcon[i]
 				);
 
 			if (!(i >= (int)Difficulty.Oni && exextraAnimation > 0)) {
@@ -419,7 +419,7 @@ internal class CActSelect難易度選択画面 : CActivity {
 				}
 			}
 
-			if (OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.b譜面分岐[i])
+			if (OpenTaiko.SongMount.rCurrentScore.譜面情報.b譜面分岐[i])
 				OpenTaiko.Tx.SongSelect_Branch_Text?.t2D描画(
 
 					OpenTaiko.Skin.SongSelect_Difficulty_Bar_X[i + 2] + OpenTaiko.Skin.SongSelect_Branch_Text_Offset[0],

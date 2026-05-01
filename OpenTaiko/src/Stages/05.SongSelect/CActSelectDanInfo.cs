@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using FDK;
 
 // Minimalist menu class to use for custom menus
@@ -57,11 +57,11 @@ class CActSelectDanInfo : CStage {
 		}
 
 		if (OpenTaiko.Skin.SongSelect_DanInfo_Show) {
-			for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-				var dan = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i];
+			for (int i = 0; i < OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count; i++) {
+				var dan = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[i];
 				int songIndex = i / 3;
 				int opacity = 255;
-				if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
+				if (OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count > 3) {
 					if (nNowSongIndex == songIndex) {
 						opacity = ctStepFade.CurrentValue;
 					} else if (nPrevSongIndex == songIndex) {
@@ -97,23 +97,23 @@ class CActSelectDanInfo : CStage {
 
 			for (int j = 0; j < CExamInfo.cMaxExam; j++) {
 				int index = j;
-				Dan_C danc0 = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
+				Dan_C danc0 = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[0].Dan_C[j];
 
 				if (danc0 != null) {
 					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.ExamType]).t2D中心基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
 				}
 
-				if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
-					Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[0].Dan_C[j];
+				if (OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {
+					Dan_C danc = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[0].Dan_C[j];
 					if (danc != null) {
 						OpenTaiko.stageDanSongSelect.段位リスト.tExamDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_X[0], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Y[index], danc.GetValue()[0], danc.ExamRange, OpenTaiko.Skin.SongSelect_DanInfo_Exam_Value_Scale);
 					}
 				} else {
-					for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-						Dan_C danc = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i].Dan_C[j];
+					for (int i = 0; i < OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count; i++) {
+						Dan_C danc = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[i].Dan_C[j];
 						if (danc != null) {
 							int opacity = 255;
-							if (OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count > 3) {
+							if (OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count > 3) {
 								if (nNowSongIndex == i / 3) {
 									opacity = ctStepFade.CurrentValue;
 								} else if (nPrevSongIndex == i / 3) {
@@ -136,11 +136,11 @@ class CActSelectDanInfo : CStage {
 	}
 
 	public void UpdateSong() {
-		if (OpenTaiko.stageSongSelect.rNowSelectedSong == null || OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs == null) return;
+		if (OpenTaiko.SongMount.rCurrentlySelectedSong == null || OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs == null) return;
 
-		ttkTitles = new TitleTextureKey[OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count];
-		for (int i = 0; i < OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count; i++) {
-			var dan = OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs[i];
+		ttkTitles = new TitleTextureKey[OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count];
+		for (int i = 0; i < OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count; i++) {
+			var dan = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[i];
 			ttkTitles[i] = new TitleTextureKey(dan.bTitleShow ? "???" : dan.Title, pfTitleFont, Color.Black, Color.Transparent, 700);
 		}
 	}
@@ -160,7 +160,7 @@ class CActSelectDanInfo : CStage {
 
 	private void tNextStep() {
 		nPrevSongIndex = nNowSongIndex;
-		nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(OpenTaiko.stageSongSelect.rNowSelectedSong.DanSongs.Count / 3.0);
+		nNowSongIndex = (nNowSongIndex + 1) % (int)Math.Ceiling(OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count / 3.0);
 		ctStepFade = new CCounter(0, 255, 1, OpenTaiko.Timer);
 	}
 

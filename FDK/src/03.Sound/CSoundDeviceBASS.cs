@@ -26,7 +26,15 @@ public class CSoundDeviceBASS : ISoundDevice {
 		get;
 		protected set;
 	}
+	public double dbElapsedTimeMs {
+		get;
+		protected set;
+	}
 	public long UpdateSystemTimeMs {
+		get;
+		protected set;
+	}
+	public double dbUpdateSystemTimeMs {
 		get;
 		protected set;
 	}
@@ -203,8 +211,10 @@ public class CSoundDeviceBASS : ISoundDevice {
 		// 経過時間を更新。
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
-		this.ElapsedTimeMs = (this.TotalByteCount * 1000 / this.Mixer_BytesPerSec) - this.OutputDelay;
+		this.dbElapsedTimeMs = (this.TotalByteCount * 1000.0 / this.Mixer_BytesPerSec) - this.OutputDelay;
+		this.ElapsedTimeMs = (long)this.dbElapsedTimeMs;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
+		this.dbUpdateSystemTimeMs = this.SystemTimer.SystemTimeMs_Double;
 
 
 		// 経過時間を更新後に、今回分の累積転送バイト数を反映。

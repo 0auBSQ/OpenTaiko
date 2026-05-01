@@ -244,6 +244,7 @@ class NotesManager {
 				or (ENoteType.KaBig or ENoteType.KaHand, PlayerLane.FlashType.Blue or PlayerLane.FlashType.Total);
 	public static bool IsBigKaTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Blue);
 	public static bool IsBigDonTaiko(ENoteType nt, EGameType gt) => IsBigNoteTaiko(nt, gt, PlayerLane.FlashType.Red);
+	public static bool IsJointedNote(ENoteType nt) => nt is ENoteType.DonHand or ENoteType.KaHand;
 	public static bool IsClapKonga(ENoteType nt, EGameType gt)
 		=> (nt, gt) is (ENoteType.Clap or ENoteType.ClapHand, EGameType.Konga);
 	public static bool IsSwapNote(ENoteType nt, EGameType gt)
@@ -321,18 +322,19 @@ class NotesManager {
 			length = OpenTaiko.Skin.Game_Notes_Size[0];
 		}
 
+		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
 
-		if (IsMine(chip)) {
+		if (IsMine(nt)) {
 			OpenTaiko.Tx.Note_Mine?.t2D描画(x, y);
 			return;
-		} else if (IsPurpleNoteTaiko(chip, _gt)) {
+		} else if (IsPurpleNoteTaiko(nt, _gt)) {
 			OpenTaiko.Tx.Note_Swap?.t2D描画(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
-		} else if (IsKusudama(chip)) {
+		} else if (IsKusudama(nt)) {
 			OpenTaiko.Tx.Note_Kusu?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
-		} else if (IsADLIB(chip)) {
+		} else if (IsADLIB(nt)) {
 			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
 			if (puchichara.effect.ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
@@ -352,6 +354,7 @@ class NotesManager {
 		if (hiddenMode >= EStealthMode.Doron)
 			return;
 
+		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
 
 		int _offset = 0;
@@ -364,15 +367,15 @@ class NotesManager {
 		float xHitNoteOffset = wImage / 2.0f;
 		float yHitNoteOffset = hImage / 2.0f;
 
-		if (IsSmallRollTaiko(chip, _gt)) {
+		if (IsSmallRollTaiko(nt, _gt)) {
 			_offset = 0;
-		} else if (IsBigRollTaiko(chip, _gt) || IsPinkRollKonga(chip, _gt)) {
+		} else if (IsBigRollTaiko(nt, _gt) || IsPinkRollKonga(nt, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 3;
-		} else if (IsClapRollKonga(chip, _gt)) {
+		} else if (IsClapRollKonga(nt, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 11;
-		} else if (IsYellowRollKonga(chip, _gt)) {
+		} else if (IsYellowRollKonga(nt, _gt)) {
 			_offset = OpenTaiko.Skin.Game_Notes_Size[0] * 8;
-		} else if (IsFuzeRoll(chip)) {
+		} else if (IsFuzeRoll(nt)) {
 			_texarr = OpenTaiko.Tx.Note_FuseRoll;
 			_offset = -rollOrigin;
 		}
@@ -430,25 +433,69 @@ class NotesManager {
 	}
 
 	// SENotes
+
+	public static (int x, int y) GetSENotesPos(int nPlayer) => OpenTaiko.ConfigIni.nPlayerCount switch {
+		<= 2 => (OpenTaiko.Skin.nSENotesX[nPlayer], OpenTaiko.Skin.nSENotesY[nPlayer]),
+		3 or 4 => (OpenTaiko.Skin.nSENotes_4P[0], OpenTaiko.Skin.nSENotes_4P[1]),
+		>= 5 => (OpenTaiko.Skin.nSENotes_5P[0], OpenTaiko.Skin.nSENotes_5P[1]),
+	};
+
 	public static void DisplaySENotes(int player, int x, int y, CChip chip, EStealthMode hiddenMode = EStealthMode.Off) {
 		if (hiddenMode >= EStealthMode.Stealth)
 			return;
 
+		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
 
-		if (IsMine(chip)) {
+		if (IsMine(nt)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
-		} else if (IsPurpleNoteTaiko(chip, _gt)) {
+		} else if (IsPurpleNoteTaiko(nt, _gt)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
-		} else if (IsFuzeRoll(chip)) {
+		} else if (IsFuzeRoll(nt)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
-		} else if (IsKusudama(chip)) {
+		} else if (IsKusudama(nt)) {
 			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 3, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else {
 			OpenTaiko.Tx.SENotes[(int)_gt]?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * chip.nSenote, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		}
 	}
 
+	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveCounterValue, EStealthMode hiddenMode = EStealthMode.Off) {
+		if (!chip.IsPartnerNote || (hiddenMode >= EStealthMode.Doron))
+			return;
+
+		float moveAmount = (moveCounterValue < 30 ? moveCounterValue : 60 - moveCounterValue) / 30.0f;
+		int moveX = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);
+		int moveY = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[1]);
+
+		if (IsADLIB(chip)) {
+			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(player))];
+			if (!puchichara.effect.ShowAdlib)
+				return;
+			OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(50);
+		}
+
+		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1 && chip.multiLink?[player + 1, 0] != null) {
+			//downward link
+			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
+			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
+		}
+		if (player != 0 && chip.multiLink?[player - 1, 0] != null) {
+			//upward link
+			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
+			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX,
+				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
+		}
+
+		OpenTaiko.Tx.Notes_Arm?.tUpdateOpacity(255);
+	}
 
 	#endregion
 

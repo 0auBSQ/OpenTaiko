@@ -45,9 +45,9 @@ internal class CActImplBackground : CActivity {
 
 		var bgOrigindir = CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BACKGROUND}");
 		var preset = HScenePreset.GetBGPreset();
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			bgOrigindir += "Tower";
-		} else if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
+		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			bgOrigindir += "Dan";
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
 			bgOrigindir += "AI";
@@ -210,12 +210,12 @@ internal class CActImplBackground : CActivity {
 		if (!IsUpNotFound) {
 			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update();
 			UpScript?.Draw();
-			if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				#region [Tower animations variables]
 
-				this.bFloorChanged = CFloorManagement.LastRegisteredFloor > 0 && (CFloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
+				this.bFloorChanged = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor > 0 && (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
 
-				int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -224,24 +224,24 @@ internal class CActImplBackground : CActivity {
 
 				#region [Tower background informations]
 
-				if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
 					TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
 
 					this.ct炎.TickLoop();
-					CFloorManagement.loopFrames();
+					OpenTaiko.stageGameScreen.FloorManagement.loopFrames();
 
 					#region [Floor number]
 
-					if (CFloorManagement.CurrentNumberOfLives > 0) {
-						CFloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
+					if (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
+						OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
 						if (!(OpenTaiko.stageGameScreen.IsChartEnded(0) || OpenTaiko.stageGameScreen.IsFinishedPlaying(0))) {
-							if (CFloorManagement.LastRegisteredFloor >= maxFloor)
-								CFloorManagement.LastRegisteredFloor = maxFloor - 1;
+							if (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor >= maxFloor)
+								OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = maxFloor - 1;
 						}
 					}
 
-					string floorStr = CFloorManagement.LastRegisteredFloor.ToString();
+					string floorStr = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString();
 
 					int len = floorStr.Length;
 
@@ -275,12 +275,12 @@ internal class CActImplBackground : CActivity {
 					#endregion
 
 					#region [Life number]
-					string lifeStr = CFloorManagement.CurrentNumberOfLives.ToString();
+					string lifeStr = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString();
 
 					len = lifeStr.Length;
 
-					bool lifeSpecialCase = CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1;
-					float lifeRatio = CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives;
+					bool lifeSpecialCase = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1;
+					float lifeRatio = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives;
 
 					Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f, 1f)
 						: ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f, 1f)
@@ -314,14 +314,14 @@ internal class CActImplBackground : CActivity {
 		#region [Lower background]
 
 
-		if (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			int maxFloor = OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTotalFloor;
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
 			int nightTime = Math.Max(140, maxFloor / 2);
 
-			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.stageSongSelect.rChoosenSong.score[5].譜面情報.nTowerType);
+			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTowerType);
 
 			if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
 				currentTowerType = 0;
@@ -413,9 +413,10 @@ internal class CActImplBackground : CActivity {
 
 			#region [Climbing don]
 
-			bool ctIsTired = !((CFloorManagement.CurrentNumberOfLives / (float)CFloorManagement.MaxNumberOfLives) >= 0.2f && !(CFloorManagement.CurrentNumberOfLives == 1 && CFloorManagement.MaxNumberOfLives != 1));
+			float liveState = (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives);
+			bool ctIsTired = !(liveState >= 0.2f && !(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1));
 
-			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || CFloorManagement.CurrentNumberOfLives == 0;
+			bool stageEnded = OpenTaiko.stageGameScreen.IsStageCompleted() || OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0;
 
 			if (bFloorChanged == true) {
 				float floorBPM = (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
@@ -469,21 +470,21 @@ internal class CActImplBackground : CActivity {
 				}
 			} else {
 				// Fail
-				if (OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives == 0) {
+				if (OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] > 0 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 0) {
 					int animChar = OpenTaiko.Skin.Characters_Tower_Fail_IsLooping[currentCharacter] ?
 						ctFailAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] :
 						Math.Min(ctFailAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Fail_Ptn[currentCharacter] - 1);
 					OpenTaiko.Tx.Characters_Tower_Fail[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]);
 				}
 				// Tired Clear
-				else if (ctIsTired && stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
+				else if (ctIsTired && stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] > 0 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
 					int animChar = OpenTaiko.Skin.Characters_Tower_Clear_Tired_IsLooping[currentCharacter] ?
 						ctClearTiredAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] :
 						Math.Min(ctClearTiredAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Clear_Tired_Ptn[currentCharacter] - 1);
 					OpenTaiko.Tx.Characters_Tower_Clear_Tired[currentCharacter][animChar]?.t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Game_Tower_Don[0], OpenTaiko.Skin.Game_Tower_Don[1]);
 				}
 				// Clear
-				else if (stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] > 0 && CFloorManagement.CurrentNumberOfLives > 0) {
+				else if (stageEnded && OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] > 0 && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
 					int animChar = OpenTaiko.Skin.Characters_Tower_Clear_IsLooping[currentCharacter] ?
 						ctClearAnimation.CurrentValue % OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] :
 						Math.Min(ctClearAnimation.CurrentValue, OpenTaiko.Skin.Characters_Tower_Clear_Ptn[currentCharacter] - 1);
@@ -506,9 +507,9 @@ internal class CActImplBackground : CActivity {
 
 			#region [Miss icon]
 
-			if (CFloorManagement.InvincibilityFrames != null && CFloorManagement.InvincibilityFrames.CurrentValue < CFloorManagement.InvincibilityDurationSpeedDependent) {
+			if (OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames != null && OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue < OpenTaiko.stageGameScreen.FloorManagement.InvincibilityDurationSpeedDependent) {
 				if (OpenTaiko.Tx.Tower_Miss != null)
-					OpenTaiko.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - CFloorManagement.InvincibilityFrames.CurrentValue);
+					OpenTaiko.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue);
 				OpenTaiko.Tx.Tower_Miss?.t2D下中央基準描画(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
 			}
 
@@ -527,7 +528,7 @@ internal class CActImplBackground : CActivity {
 			ctFailAnimation?.Tick();
 
 			#endregion
-		} else if (!OpenTaiko.stageGameScreen.isMultiPlay && OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
+		} else if (!OpenTaiko.stageGameScreen.isMultiPlay && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (!IsDownNotFound) {
 				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update();
 				DownScript?.Draw();

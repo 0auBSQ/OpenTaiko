@@ -99,6 +99,10 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CFPS FPSInput {
+		get;
+		private set;
+	}
 	public static CInputManager InputManager {
 		get;
 		private set;
@@ -188,6 +192,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CSongMount SongMount {
+		get;
+		private set;
+	}
+
 	public static CStageSongSelect stageSongSelect {
 		get;
 		private set;
@@ -241,7 +250,7 @@ internal class OpenTaiko : Game {
 	public static string strEXEのあるフォルダ {
 		get;
 		private set;
-	}
+	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
 	public static CTimer Timer {
 		get;
 		private set;
@@ -406,13 +415,6 @@ internal class OpenTaiko : Game {
 
 
 	protected override void Configuration() {
-		#region [ strEXEのあるフォルダを決定する ]
-		//-----------------
-		strEXEのあるフォルダ = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
-		// END #23629 2010.11.13 from
-		//-----------------
-		#endregion
-
 		ConfigIni = new CConfigIni();
 
 		string path = strEXEのあるフォルダ + "Config.ini";
@@ -503,8 +505,13 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
+	protected override void Events() {
+		base.Events();
+		FPSInput?.Update();
+	}
 	protected override void Update() {
 		InputManager?.Polling();
+		FPSInput?.Update(); // events polled before Update() is called
 	}
 	protected override void Draw() {
 #if !DEBUG
@@ -563,7 +570,7 @@ internal class OpenTaiko : Game {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
 							if (rCurrentStage.eStageID == CStage.EStage.Title &&
 								rPreviousStage.eStageID == CStage.EStage.StartUp &&
-								this.nDrawLoopReturnValue == (int)CStageTitle.EReturnValue.継続 &&
+								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
 								!EnumSongs.IsSongListEnumStarted) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
@@ -611,7 +618,7 @@ internal class OpenTaiko : Game {
 
 							#region [ 曲検索が完了したら、実際の曲リストに反映する ]
 							// CStage選曲.On活性化() に回した方がいいかな？
-							if (EnumSongs.IsSongListEnumerated) {
+							if (EnumSongs.state is CEnumSongs.DTXEnumState.Enumeratad or CEnumSongs.DTXEnumState.Canceled) {
 								actEnumSongs.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
 									actEnumSongs.ReleaseManagedResource();
@@ -619,9 +626,11 @@ internal class OpenTaiko : Game {
 								}
 								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
 
-								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
-								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
-								EnumSongs.SongListEnumCompletelyDone();
+								if (EnumSongs.IsSongListEnumerated) {
+									bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
+									OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
+									EnumSongs.SongListEnumCompletelyDone();
+								}
 							}
 							#endregion
 						}
@@ -654,7 +663,7 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageTitle.EReturnValue.GAMESTART:
+							case (int)EReturnValue.GAMESTART:
 								#region [ Song select ]
 								//-----------------------------
 								ChangeStage(stageSongSelect);
@@ -666,7 +675,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.DANGAMESTART:
+							case (int)EReturnValue.DANGAMESTART:
 								#region [ Dan song select ]
 								//-----------------------------
 								ChangeStage(stageDanSongSelect);
@@ -678,7 +687,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.TAIKOTOWERSSTART:
+							case (int)EReturnValue.TAIKOTOWERSSTART:
 								#region [ Tower song select ]
 								//-----------------------------
 								ChangeStage(stageTowerSelect);
@@ -690,7 +699,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.HEYA:
+							case (int)EReturnValue.HEYA:
 								#region [Heya menu]
 								//-----------------------------
 								ChangeStage(stageHeya);
@@ -700,7 +709,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.ONLINELOUNGE:
+							case (int)EReturnValue.ONLINELOUNGE:
 								#region [Online Lounge]
 								//-----------------------------
 								ChangeStage(stageOnlineLounge);
@@ -710,7 +719,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.CONFIG:
+							case (int)EReturnValue.CONFIG:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageConfig);
@@ -720,7 +729,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.EXIT:
+							case (int)EReturnValue.EXIT:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageExit);
@@ -730,7 +739,7 @@ internal class OpenTaiko : Game {
 								#endregion
 								break;
 
-							case (int)CStageTitle.EReturnValue.AIBATTLEMODE:
+							case (int)EReturnValue.AIBATTLEMODE:
 								#region [ Song select (with AI) ]
 								//-----------------------------
 								ChangeStage(stageSongSelect);
@@ -792,7 +801,7 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -812,7 +821,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.PlayCutSceneIntro:
+							case (int)EReturnValue.PlayCutSceneIntro:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageCutScene);
@@ -827,7 +836,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageSongLoading);
@@ -842,7 +851,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.ConfigMenuOpened:
+							case (int)EReturnValue.ConfigMenuOpened:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageConfig);
@@ -857,7 +866,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SkinChange:
+							case (int)EReturnValue.SkinChange:
 
 								#region [ *** ]
 								//-----------------------------
@@ -878,7 +887,7 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.DanDojoSelect:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -893,7 +902,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
@@ -912,7 +921,7 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.Heya:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -1150,7 +1159,7 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.TaikoTowers:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -1165,7 +1174,7 @@ internal class OpenTaiko : Game {
 							//-----------------------------
 							#endregion
 
-							case (int)CStageSongSelect.EReturnValue.SongSelected:
+							case (int)EReturnValue.SongSelected:
 								#region [ *** ]
 								//-----------------------------
 								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
@@ -1210,7 +1219,7 @@ internal class OpenTaiko : Game {
 					default:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
-							case (int)CStageSongSelect.EReturnValue.BackToTitle:
+							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
 								ChangeStage(stageTitle);
@@ -1647,6 +1656,7 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			FPS = new CFPS();
+			FPSInput = new CFPS();
 			Trace.TraceInformation("FPS counter initialized.");
 		} finally {
 			Trace.Unindent();
@@ -1828,6 +1838,7 @@ internal class OpenTaiko : Game {
 		stageStartup = new CStage起動();
 		stageTitle = new CStageTitle();
 		stageConfig = new CStageコンフィグ();
+		SongMount = new CSongMount();
 		stageSongSelect = new CStageSongSelect();
 		stageDanSongSelect = new CStage段位選択();
 		stageHeya = new CStageHeya();
@@ -2079,9 +2090,7 @@ internal class OpenTaiko : Game {
 			Trace.TraceInformation("Ending FPS counter...");
 			Trace.Indent();
 			try {
-				if (FPS != null) {
-					FPS = null;
-				}
+				FPSInput = FPS = null;
 				Trace.TraceInformation("FPS counter terminated.");
 			} finally {
 				Trace.Unindent();
@@ -2167,6 +2176,8 @@ internal class OpenTaiko : Game {
 		actTextConsole.ReleaseManagedResource();
 		actTextConsole.ReleaseUnmanagedResource();
 
+		stageGameScreen.actEnd.ReleaseManagedResource(); // force release due to lazy release
+
 		OpenTaiko.Skin.Dispose();
 		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
@@ -2180,6 +2191,8 @@ internal class OpenTaiko : Game {
 		OpenTaiko.actTextConsole.Activate();
 		actTextConsole.CreateManagedResource();
 		actTextConsole.CreateUnmanagedResource();
+
+		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();

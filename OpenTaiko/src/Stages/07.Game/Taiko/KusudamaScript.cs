@@ -3,49 +3,24 @@ using NLua;
 namespace OpenTaiko;
 
 internal class KusudamaScript : ScriptBG {
-	private LuaFunction LuaKusuIn;
-	private LuaFunction LuaKusuBroke;
-	private LuaFunction LuaKusuMiss;
+	private NamedLuaFunction LuaKusuIn = new("kusuIn");
+	private NamedLuaFunction LuaKusuBroke = new("kusuBroke");
+	private NamedLuaFunction LuaKusuMiss = new("kusuMiss");
 
 	public KusudamaScript(string filePath) : base(filePath) {
-		if (LuaScript != null) {
-			LuaKusuIn = LuaScript.GetFunction("kusuIn");
-			LuaKusuBroke = LuaScript.GetFunction("kusuBroke");
-			LuaKusuMiss = LuaScript.GetFunction("kusuMiss");
-		}
+		LuaKusuIn.Load(LuaScript);
+		LuaKusuBroke.Load(LuaScript);
+		LuaKusuMiss.Load(LuaScript);
 	}
 
 	public new void Dispose() {
 		base.Dispose();
-		LuaKusuIn?.Dispose();
-		LuaKusuBroke?.Dispose();
-		LuaKusuMiss?.Dispose();
+		LuaKusuIn.Dispose();
+		LuaKusuBroke.Dispose();
+		LuaKusuMiss.Dispose();
 	}
 
-	public void KusuIn() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuIn.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
-
-	public void KusuBroke() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuBroke.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
-
-	public void KusuMiss() {
-		if (LuaScript == null) return;
-		try {
-			LuaKusuMiss.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void KusuIn() => RunLuaCode(LuaKusuIn);
+	public void KusuBroke() => RunLuaCode(LuaKusuBroke);
+	public void KusuMiss() => RunLuaCode(LuaKusuMiss);
 }

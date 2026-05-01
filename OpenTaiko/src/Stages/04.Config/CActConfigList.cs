@@ -219,9 +219,6 @@ internal class CActConfigList : CActivity {
 			"Port number for game event broadcasting.");
 		this.list項目リスト.Add(this.iSystemGameEventBroadcastingPort);
 
-		this.iSystemBufferedInput = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT"), OpenTaiko.ConfigIni.bBufferedInputs,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BUFFEREDINPUT_DESC"));
-		this.list項目リスト.Add(this.iSystemBufferedInput);
 		this.iLogOutputLog = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG"), OpenTaiko.ConfigIni.bOutputLogs,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_LOG_DESC"));
 		this.list項目リスト.Add(this.iLogOutputLog);
@@ -633,6 +630,7 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.stageConfig.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 				OpenTaiko.stageTitle.pfMenuTitle = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[0]);
 				OpenTaiko.stageTitle.pfBoxText = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Title_ModeSelect_Title_Scale[1]);
+				OpenTaiko.actEnumSongs.RefreshSkin(OpenTaiko.EnumSongs.IsEnumerating);
 
 				t項目リストの設定_System(refresh: false);
 				OpenTaiko.stageConfig.ReloadMenus();
@@ -687,7 +685,6 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 				OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 				OpenTaiko.actEnumSongs.Activate();
-				OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemHardReloadDTX)              // #32081 2013.10.21 yyagi
 			{
 				if (OpenTaiko.EnumSongs.IsEnumerating) {
@@ -699,7 +696,6 @@ internal class CActConfigList : CActivity {
 				OpenTaiko.EnumSongs.ChangeEnumeratePriority(ThreadPriority.Normal);
 				OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 = true;
 				OpenTaiko.actEnumSongs.Activate();
-				OpenTaiko.stageSongSelect.actSongList.ResetSongIndex();
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.isSystemImportingScore) {
 				// Running in a separate thread so the game doesn't freeze
 				ScoreIniImportThread = new Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3);
@@ -1542,7 +1538,6 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iSystemVSyncWait;
 	private CItemToggle iSystemAutoResultCapture;       // #25399 2011.6.9 yyagi
 	private CItemToggle SendDiscordPlayingInformation;
-	private CItemToggle iSystemBufferedInput;
 	private CItemInteger iSystemRisky;                  // #23559 2011.7.27 yyagi
 	private CItemList iSystemSoundType;                 // #24820 2013.1.3 yyagi
 
@@ -1684,8 +1679,6 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
 		OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
-		OpenTaiko.ConfigIni.bBufferedInputs = this.iSystemBufferedInput.bON;
-		OpenTaiko.InputManager?.SetUseBufferInput(OpenTaiko.ConfigIni.bBufferedInputs);
 		OpenTaiko.ConfigIni.bEnableAVI = this.iSystemAVI.bON;
 		OpenTaiko.ConfigIni.eClipDispType = (EClipDispType)this.iSystemAVIDisplayMode.n現在選択されている項目番号;
 		OpenTaiko.ConfigIni.bEnableBGA = this.iSystemBGA.bON;

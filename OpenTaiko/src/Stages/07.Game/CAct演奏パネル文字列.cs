@@ -68,7 +68,7 @@ internal class CAct演奏パネル文字列 : CActivity {
 					SKBitmap bmpDiff;
 					string strDiff = "";
 					if (OpenTaiko.Skin.eDiffDispMode == EDifficultyDisplayType.TextOnNthSong) {
-						switch (OpenTaiko.stageSongSelect.nChoosenSongDifficulty[0]) {
+						switch (OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
 							case 0:
 								strDiff = "かんたん ";
 								break;

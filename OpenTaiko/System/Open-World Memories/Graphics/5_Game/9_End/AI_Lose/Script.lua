@@ -34,6 +34,7 @@ function playEndAnime(player)
 end
 
 function init()
+	animeCounter = 0
     func:AddGraph("Assets.png")
 end
 

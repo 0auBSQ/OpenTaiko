@@ -60,7 +60,7 @@ internal class CActSelect演奏履歴パネル : CActivity {
 		base.IsDeActivated = true;
 	}
 	public void t選択曲が変更された() {
-		CScore cスコア = OpenTaiko.stageSongSelect.r現在選択中のスコア;
+		CScore cスコア = OpenTaiko.SongMount.rCurrentScore;
 		if ((cスコア != null) && !OpenTaiko.stageSongSelect.bCurrentlyScrolling) {
 			try {
 				foreach (var item in tx文字列パネル) {
@@ -130,12 +130,12 @@ internal class CActSelect演奏履歴パネル : CActivity {
 			this.ct登場アニメ用.Tick();
 			int x = 980;
 			int y = 350;
-			if (OpenTaiko.stageSongSelect.r現在選択中のスコア != null && this.ct登場アニメ用.CurrentValue >= 2000 && OpenTaiko.stageSongSelect.rNowSelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
+			if (OpenTaiko.SongMount.rCurrentScore != null && this.ct登場アニメ用.CurrentValue >= 2000 && OpenTaiko.SongMount.rCurrentlySelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 				//CDTXMania.Tx.SongSelect_ScoreWindow_Text.n透明度 = ct登場アニメ用.n現在の値 - 1745;
-				if (OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度] != null) {
+				if (OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.SongMount.nCurrentSongDifficulty] != null) {
 					//CDTXMania.Tx.SongSelect_ScoreWindow[CDTXMania.stage選曲.n現在選択中の曲の難易度].n透明度 = ct登場アニメ用.n現在の値 - 1745;
-					OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度].t2D描画(x, y);
-					this.t小文字表示(x + 56, y + 160, string.Format("{0,7:######0}", OpenTaiko.stageSongSelect.r現在選択中のスコア.譜面情報.nハイスコア[OpenTaiko.stageSongSelect.n現在選択中の曲の難易度].ToString()));
+					OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.SongMount.nCurrentSongDifficulty].t2D描画(x, y);
+					this.t小文字表示(x + 56, y + 160, string.Format("{0,7:######0}", OpenTaiko.SongMount.rCurrentScore.譜面情報.nハイスコア[OpenTaiko.SongMount.nCurrentSongDifficulty].ToString()));
 					OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2D描画(x + 236, y + 166, new Rectangle(0, 36, 32, 30));
 				}
 			}
