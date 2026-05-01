@@ -849,22 +849,18 @@ internal class CActImplCharacter : CActivity {
 		}
 	}
 
-	public void KusuMiss() {
+	public void KusuMiss(int iPlayer) {
 		ctKusuMiss = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CCharacter character = CCharacter.GetCharacter(i);
-			ReturnDefaultAnime(i, true);
-			CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
-		}
+		CCharacter character = CCharacter.GetCharacter(iPlayer);
+		ReturnDefaultAnime(iPlayer, true);
+		CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
 	}
 
-	public void KusuSuccess() {
+	public void KusuSuccess(int iPlayer) {
 		ctKusuSuccess = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			CCharacter character = CCharacter.GetCharacter(i);
-			ReturnDefaultAnime(i, true);
-			CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
-		}
+		CCharacter character = CCharacter.GetCharacter(iPlayer);
+		ReturnDefaultAnime(iPlayer, true);
+		CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
 	}
 
 	/*

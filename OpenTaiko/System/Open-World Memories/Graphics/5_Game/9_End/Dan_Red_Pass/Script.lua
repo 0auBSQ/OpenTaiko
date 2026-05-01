@@ -38,6 +38,7 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
+    animeTimer = 0
 end
 
 function init()

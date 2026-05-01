@@ -27,7 +27,15 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		get;
 		protected set;
 	}
+	public double dbElapsedTimeMs {
+		get;
+		protected set;
+	}
 	public long UpdateSystemTimeMs {
+		get;
+		protected set;
+	}
+	public double dbUpdateSystemTimeMs {
 		get;
 		protected set;
 	}
@@ -406,8 +414,10 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
 		int n未再生バイト数 = BassWasapi.GetData(null, (int)DataFlags.Available);  // 誤差削減のため、必要となるギリギリ直前に取得する。
-		this.ElapsedTimeMs = (this.n累積転送バイト数 - n未再生バイト数) * 1000 / this.nBytesPerSec;
+		this.dbElapsedTimeMs = (this.n累積転送バイト数 - n未再生バイト数) * 1000.0 / this.nBytesPerSec;
+		this.ElapsedTimeMs = (long)this.dbElapsedTimeMs;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
+		this.dbUpdateSystemTimeMs = this.SystemTimer.SystemTimeMs_Double;
 
 		// 実出力遅延を更新。
 		// 未再生バイト数の平均値。

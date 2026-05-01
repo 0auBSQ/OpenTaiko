@@ -6,7 +6,9 @@ internal interface ISoundDevice : IDisposable {
 	long OutputDelay { get; }
 	long BufferSize { get; }
 	long ElapsedTimeMs { get; }
+	double dbElapsedTimeMs { get; }
 	long UpdateSystemTimeMs { get; }
+	double dbUpdateSystemTimeMs { get; }
 	CTimer SystemTimer { get; }
 	long nBytesPerSec { get; }
 

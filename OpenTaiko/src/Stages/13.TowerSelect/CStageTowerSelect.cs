@@ -10,6 +10,7 @@ class CStageTowerSelect : CStage {
 	public CStageTowerSelect() {
 		base.eStageID = EStage.TaikoTowers;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
+		this.Cursor = new() { UpdateInfo = () => this.tUpdateBarInfos() };
 
 		// Load CActivity objects here
 		// base.list子Activities.Add(this.act = new CAct());
@@ -28,9 +29,7 @@ class CStageTowerSelect : CStage {
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
 
-		if (listSongs == null)
-			listSongs = OpenTaiko.Songs管理.list曲ルート_Tower;
-
+		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Tower);
 		tUpdateBarInfos();
 
 		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERSELECT}Script.lua"));
@@ -70,7 +69,7 @@ class CStageTowerSelect : CStage {
 		Background.Draw();
 
 		for (int i = 0; i < OpenTaiko.Skin.TowerSelect_Bar_Count; i++) {
-			int currentSong = nCurrentSongIndex + i - ((OpenTaiko.Skin.TowerSelect_Bar_Count - 1) / 2);
+			int currentSong = Cursor.IdxItem + i - ((OpenTaiko.Skin.TowerSelect_Bar_Count - 1) / 2);
 			if (currentSong < 0 || currentSong >= BarInfos.Length) continue;
 			var bar = BarInfos[currentSong];
 
@@ -83,6 +82,7 @@ class CStageTowerSelect : CStage {
 
 		if (this.eフェードアウト完了時の戻り値 == EReturnValue.Continuation) {
 			int returnTitle() {
+				OpenTaiko.Skin.soundDecideSFX.tStop(); // cancel if played
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 				this.actFOtoTitle.tフェードアウト開始();
@@ -94,24 +94,21 @@ class CStageTowerSelect : CStage {
 				OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
-				if (nCurrentSongIndex < BarInfos.Length - 1) {
-					nCurrentSongIndex++;
+				if (Cursor.IdxItem < BarInfos.Length - 1) {
+					Cursor.IdxItem++;
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
 					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 
-				if (nCurrentSongIndex > 0) {
-					nCurrentSongIndex--;
+				if (Cursor.IdxItem > 0) {
+					Cursor.IdxItem--;
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
 
 				#region [Fast return (Escape)]
-
-				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				returnTitle();
-
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
@@ -119,7 +116,8 @@ class CStageTowerSelect : CStage {
 
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 
-				switch (currentSong.nodeType) {
+				Cursor.tSelectItem();
+				switch (Cursor.Item?.nodeType ?? CSongListNode.ENodeType.BACKBOX) {
 					case CSongListNode.ENodeType.SCORE:
 						tSelectSong();
 						break;
@@ -127,13 +125,13 @@ class CStageTowerSelect : CStage {
 						tSelectSongRandomly();
 						break;
 					case CSongListNode.ENodeType.BOX:
-						tOpenFolder(currentSong);
+						Cursor.tOpenFolder(Cursor.Item!);
 						break;
 					case CSongListNode.ENodeType.BACKBOX: {
-							if (OpenTaiko.Songs管理.list曲ルート.Contains(currentSong.rParentNode) && currentSong.rParentNode.songGenre == "太鼓タワー") {
+							if (this.Cursor.IsInRootFolder("太鼓タワー")) {
 								returnTitle();
 							} else {
-								tCloseFolder(currentSong);
+								Cursor.tCloseFolder();
 							}
 						}
 						break;
@@ -177,10 +175,10 @@ class CStageTowerSelect : CStage {
 
 	public void tSelectSong() {
 		OpenTaiko.ConfigIni.bTokkunMode = false;
-		OpenTaiko.SongMount.rChoosenSong = listSongs[nCurrentSongIndex];
-		OpenTaiko.SongMount.rChosenScore = listSongs[nCurrentSongIndex].score[(int)Difficulty.Tower];
+		OpenTaiko.SongMount.rChoosenSong = Cursor.Item!;
+		OpenTaiko.SongMount.rChosenScore = Cursor.Item!.score[(int)Difficulty.Tower];
 		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
-		OpenTaiko.SongMount.strChosenSongGenre = listSongs[nCurrentSongIndex].songGenre;
+		OpenTaiko.SongMount.strChosenSongGenre = Cursor.Item!.songGenre;
 		if ((OpenTaiko.SongMount.rChoosenSong != null) && (OpenTaiko.SongMount.rChosenScore != null)) {
 			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
 			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
@@ -192,7 +190,7 @@ class CStageTowerSelect : CStage {
 
 	private bool tSelectSongRandomly() {
 		var mandatoryDiffs = new List<int>();
-		CSongListNode song = currentSong;
+		CSongListNode song = Cursor.Item!;
 
 		List<CSongListNode> songs = new List<CSongListNode>();
 		OpenTaiko.stageSongSelect.t指定された曲の子リストの曲を列挙する_孫リスト含む(song.rParentNode, ref songs, ref mandatoryDiffs, true, Difficulty.Tower);
@@ -216,7 +214,7 @@ class CStageTowerSelect : CStage {
 		OpenTaiko.SongMount.rChoosenSong = song.randomList[randomSongIndex];
 		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 
-		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rChoosenSong.score[OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong)];
+		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rChoosenSong.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rChoosenSong)];
 		OpenTaiko.SongMount.strChosenSongGenre = OpenTaiko.SongMount.rChoosenSong.songGenre;
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
@@ -251,27 +249,15 @@ class CStageTowerSelect : CStage {
 	}
 
 	private void tUpdateBarInfos() {
-		BarInfos = new BarInfo[listSongs.Count];
+		BarInfos = new BarInfo[Cursor.Items.Count];
 		tSetBarInfos();
-	}
-
-	private void tOpenFolder(CSongListNode song) {
-		nCurrentSongIndex = 0;
-		listSongs = song.childrenList;
-		tUpdateBarInfos();
-	}
-
-	private void tCloseFolder(CSongListNode song) {
-		nCurrentSongIndex = 0;
-		listSongs = song.rParentNode.rParentNode.childrenList;
-		tUpdateBarInfos();
 	}
 
 	private void tSetBarInfos() {
 		for (int i = 0; i < BarInfos.Length; i++) {
 			BarInfos[i] = new BarInfo();
 			BarInfo bar = BarInfos[i];
-			CSongListNode song = listSongs[i];
+			CSongListNode song = Cursor.Items[i];
 
 			bar.strTitle = song.ldTitle.GetString("");
 			bar.strSubTitle = song.ldSubtitle.GetString("");
@@ -282,8 +268,8 @@ class CStageTowerSelect : CStage {
 		}
 	}
 
+	private SongSelectCursor Cursor;
 	private BarInfo[] BarInfos;
-	private List<CSongListNode> listSongs;
 
 	private ScriptBG Background;
 
@@ -293,13 +279,5 @@ class CStageTowerSelect : CStage {
 	public EReturnValue eフェードアウト完了時の戻り値;
 	public CActFIFOStart actFOtoNowLoading;
 	public CActFIFOBlack actFOtoTitle;
-
-	private int nCurrentSongIndex;
-	private CSongListNode currentSong {
-		get {
-			return listSongs[nCurrentSongIndex];
-		}
-	}
-
 	#endregion
 }

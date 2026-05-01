@@ -106,6 +106,10 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CFPS FPSInput {
+		get;
+		private set;
+	}
 	public static CInputManager InputManager {
 		get;
 		private set;
@@ -249,7 +253,7 @@ internal class OpenTaiko : Game {
 	public static string strEXEのあるフォルダ {
 		get;
 		private set;
-	}
+	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
 	public static CTimer Timer {
 		get;
 		private set;
@@ -425,13 +429,6 @@ internal class OpenTaiko : Game {
 
 
 	protected override void Configuration() {
-		#region [ strEXEのあるフォルダを決定する ]
-		//-----------------
-		strEXEのあるフォルダ = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
-		// END #23629 2010.11.13 from
-		//-----------------
-		#endregion
-
 		ConfigIni = new CConfigIni();
 
 		string path = strEXEのあるフォルダ + "Config.ini";
@@ -522,8 +519,13 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
+	protected override void Events() {
+		base.Events();
+		FPSInput?.Update();
+	}
 	protected override void Update() {
 		InputManager?.Polling();
+		FPSInput?.Update(); // events polled before Update() is called
 	}
 	protected override void Draw() {
 #if !DEBUG
@@ -627,10 +629,11 @@ internal class OpenTaiko : Game {
 
 							#region [ 曲検索が完了したら、実際の曲リストに反映する ]
 							// CStage選曲.On活性化() に回した方がいいかな？
-							if (EnumSongs.IsSongListEnumerated) {
+							if (EnumSongs.state is CEnumSongs.DTXEnumState.Enumeratad or CEnumSongs.DTXEnumState.Canceled) {
 								UnmountActivity(actEnumSongs);
 								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
 
+								if (EnumSongs.IsSongListEnumerated) {
 								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
 								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
 								EnumSongs.SongListEnumCompletelyDone();
@@ -638,6 +641,7 @@ internal class OpenTaiko : Game {
 								// Propagate AfterSongEnum events to all lua stages
 								LuaStageWrapper.PropagateAfterSongEnumEvent();
 								LuaActivityWrapper.PropagateAfterSongEnumEvent();
+							}
 							}
 							#endregion
 						}
@@ -692,16 +696,16 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
+								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
+
+								CSongSelectSongManager.stopSong();
+								CSongSelectSongManager.enable();
+
 								if (ConfigIni.bAIBattleMode == true) {
 									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
 									ConfigIni.bAIBattleMode = false;
 									CVirtualSlotManager.MountSlot(2, "2P");
 								}
-
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1525,6 +1529,7 @@ internal class OpenTaiko : Game {
 		Trace.Indent();
 		try {
 			FPS = new CFPS();
+			FPSInput = new CFPS();
 			Trace.TraceInformation("FPS counter initialized.");
 		} finally {
 			Trace.Unindent();
@@ -1958,9 +1963,7 @@ internal class OpenTaiko : Game {
 			Trace.TraceInformation("Ending FPS counter...");
 			Trace.Indent();
 			try {
-				if (FPS != null) {
-					FPS = null;
-				}
+				FPSInput = FPS = null;
 				Trace.TraceInformation("FPS counter terminated.");
 			} finally {
 				Trace.Unindent();
@@ -2050,6 +2053,8 @@ internal class OpenTaiko : Game {
 		EnumSongs.Suspend(); // stop thread to prevent using disposed resources
 		EnumSongs.WaitUntilSuspended();
 
+		stageGameScreen.actEnd.ReleaseManagedResource(); // force release due to lazy release
+
 		OpenTaiko.Skin.Dispose();
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
 
@@ -2075,6 +2080,7 @@ internal class OpenTaiko : Game {
 		}
 		EnumSongs.Resume();
 
+		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();

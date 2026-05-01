@@ -542,10 +542,14 @@ class CStageHeya : CStage {
 
 			// Return to main menu
 			if (iCurrentMenu == CurrentMenu.ReturnToMenu && iMainMenuCurrent == 0) {
+				if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 				OpenTaiko.Skin.soundHeyaBGM.tStop();
 				this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+				} else {
+					ess = ESelectStatus.NONE;
+				}
 			} else if (iCurrentMenu == CurrentMenu.ReturnToMenu) {
 				iCurrentMenu = (CurrentMenu)iMainMenuCurrent - 1;
 
@@ -661,28 +665,28 @@ class CStageHeya : CStage {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 			else if (ess == ESelectStatus.FAILED)
 				OpenTaiko.Skin.soundError.tPlay();
-			else
+			else if (ess == ESelectStatus.SUCCESS)
 				OpenTaiko.Skin.SoundBanapas.tPlay(); // To change with a more appropriate sfx sooner or later
 
 			#endregion
 		} else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
 					 OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel))) {
 
-			OpenTaiko.Skin.soundCancelSFX.tPlay();
-
 			if (iCurrentMenu == CurrentMenu.ReturnToMenu) {
+				if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
 				OpenTaiko.Skin.soundHeyaBGM.tStop();
 				this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
 				this.actFOtoTitle.tフェードアウト開始();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+				}
 			} else {
+				OpenTaiko.Skin.soundCancelSFX.tPlay();
 				iCurrentMenu = CurrentMenu.ReturnToMenu;
 				this.ttkInfoSection = null;
 				this.tResetOpts();
-			}
-
-
 			return 0;
+			}
 		} else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
 			OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
 			OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
@@ -848,6 +852,7 @@ class CStageHeya : CStage {
 	 *  SELECTED : Selection succeed
 	 */
 	private enum ESelectStatus {
+		NONE,
 		FAILED,
 		SUCCESS,
 		SELECTED

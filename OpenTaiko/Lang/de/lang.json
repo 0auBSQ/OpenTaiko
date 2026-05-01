@@ -53,6 +53,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Song Ordner neu laden.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Songs neu laden (Hartes Neuladen)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Leeren des vorhandenen Caches und\nSong Ordner von Grund auf neu laden.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " Die Titelliste wird geladen.\n         Bitte warten...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importiere Score.ini Dateien",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importiert Score.ini Dateien in die Datenbank.\n\n<c.#f0ad4e>WARNUNG\nFolgendes wird nicht übertragen:\n- Freischalt Status\n- Gameplay-Modifikatoren\n- Anzahl der Treffer (Gut, Ok, Übel, Trommelrolle, etc.)\n- Dan-Prüfungsergebnisse",
@@ -64,6 +65,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Verarbeite {0} Ergebnisse...\n<c.#0bb000>{1} von {2} importiert</c> (<c.#f0ad4e>{3} übersprungen</c> / <c.#b00000>{4} fehlgeschlagen</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Aktualisiere die Ergebnisse von {0} Spielern...\n<c.#0bb000>{1} von {2} aktualisiert/c> (<c.#b00000>{3} fehlgeschlagen</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Turm ausblenden",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Blendet Dan and Tower-Charts aus\nim Taiko-Modus Menü.\nHinweis: Leider neu laden, um diese\n     Einstellung wirksam zu machen.",

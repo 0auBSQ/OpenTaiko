@@ -11,20 +11,20 @@ namespace OpenTaiko {
 			DefaultScript = streamReader.ReadToEnd();
 		}
 
-		private LuaFunction lfLoadAnimation;
-		private LuaFunction lfDisposeAnimation;
-		private LuaFunction lfAvaialbeAnimation;
-		private LuaFunction lfSetAnimationDuration;
-		private LuaFunction lfResetAnimationCounter;
-		private LuaFunction lfUpdate;
-		private LuaFunction lfDraw;
-		private LuaFunction? lfGetDrawSize;
-		private LuaFunction? lfGetHeyaRenderOffset;
-	private LuaFunction? lfGetAIBattlePosition;
+		private NamedLuaFunction lfLoadAnimation = new("loadAnimation");
+		private NamedLuaFunction lfDisposeAnimation = new("disposeAnimation");
+		private NamedLuaFunction lfAvaialbeAnimation = new("avaialbeAnimation");
+		private NamedLuaFunction lfSetAnimationDuration = new("setAnimationDuration");
+		private NamedLuaFunction lfResetAnimationCounter = new("resetAnimationCounter");
+		private NamedLuaFunction lfUpdate = new("update");
+		private NamedLuaFunction lfDraw = new("draw");
+		private NamedLuaFunction lfGetDrawSize = new("getDrawSize");
+		private NamedLuaFunction lfGetHeyaRenderOffset = new("getHeyaRenderOffset");
+		private NamedLuaFunction lfGetAIBattlePosition = new("getAIBattlePosition");
 
-		private LuaFunction lfLoadVoice;
-		private LuaFunction lfDisposeVoice;
-		private LuaFunction lfPlayVoice;
+		private NamedLuaFunction lfLoadVoice = new("loadVoice");
+		private NamedLuaFunction lfDisposeVoice = new("disposeVoice");
+		private NamedLuaFunction lfPlayVoice = new("playVoice");
 
 		public void LoadAnimation(string animationType) {
 			RunLuaCode(lfLoadAnimation, animationType);
@@ -35,7 +35,7 @@ namespace OpenTaiko {
 		}
 
 		public bool AvaialbeAnimation(string animationType) {
-			object[] result = RunLuaCode(lfAvaialbeAnimation, animationType);
+			object[] result = RunLuaCode(lfAvaialbeAnimation, animationType) ?? [];
 			if (result is not null && result.Length == 1 && result[0] is bool flag) {
 				return flag;
 			}
@@ -64,7 +64,7 @@ namespace OpenTaiko {
 
 		public bool Update(double delta, string animationType, bool looping = true) {
 			if (animationType == CCharacter.ANIM_NONE) return false;
-			object[] result = RunLuaCode(lfUpdate, delta, animationType, looping);
+			object[] result = RunLuaCode(lfUpdate, delta, animationType, looping) ?? [];
 			if (result is not null && result.Length == 1 && result[0] is bool flag) {
 				return flag;
 			}
@@ -82,8 +82,7 @@ namespace OpenTaiko {
 		}
 
 		public LuaVector2 GetDrawSize(string animationType) {
-			if (lfGetDrawSize == null) return new LuaVector2(0, 0);
-			object[] result = RunLuaCode(lfGetDrawSize, animationType);
+			object[] result = RunLuaCode(lfGetDrawSize, animationType) ?? [];
 			if (result != null && result.Length >= 2) {
 				double w = result[0] is double dw ? dw : 0;
 				double h = result[1] is double dh ? dh : 0;
@@ -93,16 +92,14 @@ namespace OpenTaiko {
 		}
 
 		public (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) {
-		if (lfGetAIBattlePosition == null) return null;
-		object[] result = RunLuaCode(lfGetAIBattlePosition, player, (double)charaScale);
-		if (result != null && result.Length >= 2 && result[0] is double x && result[1] is double y)
-			return ((float)x, (float)y);
-		return null;
-	}
+			object[] result = RunLuaCode(lfGetAIBattlePosition, player, (double)charaScale) ?? [];
+			if (result != null && result.Length >= 2 && result[0] is double x && result[1] is double y)
+				return ((float)x, (float)y);
+			return null;
+		}
 
-	public (float x, float y) GetHeyaRenderOffset() {
-			if (lfGetHeyaRenderOffset == null) return (0f, 0f);
-			object[] result = RunLuaCode(lfGetHeyaRenderOffset);
+		public (float x, float y) GetHeyaRenderOffset() {
+			object[] result = RunLuaCode(lfGetHeyaRenderOffset) ?? [];
 			if (result != null && result.Length >= 2) {
 				float x = result[0] is double dx ? (float)dx : 0f;
 				float y = result[1] is double dy ? (float)dy : 0f;
@@ -113,20 +110,19 @@ namespace OpenTaiko {
 
 		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
 			try {
-				lfLoadAnimation = (LuaFunction)LuaScript["loadAnimation"];
-				lfDisposeAnimation = (LuaFunction)LuaScript["disposeAnimation"];
-				lfAvaialbeAnimation = (LuaFunction)LuaScript["avaialbeAnimation"];
-				lfSetAnimationDuration = (LuaFunction)LuaScript["setAnimationDuration"];
-				lfResetAnimationCounter = (LuaFunction)LuaScript["resetAnimationCounter"];
-				lfUpdate = (LuaFunction)LuaScript["update"];
-				lfDraw = (LuaFunction)LuaScript["draw"];
-				lfGetDrawSize = LuaScript["getDrawSize"] as LuaFunction;
-				lfGetHeyaRenderOffset    = LuaScript["getHeyaRenderOffset"]    as LuaFunction;
-			lfGetAIBattlePosition    = LuaScript["getAIBattlePosition"]    as LuaFunction;
+				lfLoadAnimation.Load(LuaScript);
+				lfDisposeAnimation.Load(LuaScript);
+				lfAvaialbeAnimation.Load(LuaScript);
+				lfSetAnimationDuration.Load(LuaScript);
+				lfResetAnimationCounter.Load(LuaScript);
+				lfUpdate.Load(LuaScript);
+				lfDraw.Load(LuaScript);
+				lfGetDrawSize.Load(LuaScript);
+				lfGetHeyaRenderOffset.Load(LuaScript);
+				lfGetAIBattlePosition.Load(LuaScript);
 
-				lfLoadVoice = (LuaFunction)LuaScript["loadVoice"];
-				lfDisposeVoice = (LuaFunction)LuaScript["disposeVoice"];
-				lfPlayVoice = (LuaFunction)LuaScript["playVoice"];
+				lfDisposeVoice.Load(LuaScript);
+				lfPlayVoice.Load(LuaScript);
 			} catch (Exception e) {
 				Crash(e);
 			}

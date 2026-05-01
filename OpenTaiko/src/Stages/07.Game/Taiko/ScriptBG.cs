@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using FDK;
 using NLua;
 
@@ -118,14 +119,16 @@ class ScriptBG : IDisposable {
 	public HashSet<LuaText> TextList = [];
 
 	protected Lua? LuaScript;
+	protected string FilePath;
+	protected string FilePathShort;
 
-	protected LuaFunction? LuaSetConstValues;
-	protected LuaFunction? LuaUpdateValues;
-	protected LuaFunction? LuaClearIn;
-	protected LuaFunction? LuaClearOut;
-	protected LuaFunction? LuaInit;
-	protected LuaFunction? LuaUpdate;
-	protected LuaFunction? LuaDraw;
+	protected NamedLuaFunction LuaSetConstValues = new("setConstValues");
+	protected NamedLuaFunction LuaUpdateValues = new("updateValues");
+	protected NamedLuaFunction LuaClearIn = new("clearIn");
+	protected NamedLuaFunction LuaClearOut = new("clearOut");
+	protected NamedLuaFunction LuaInit = new("init");
+	protected NamedLuaFunction LuaUpdate = new("update");
+	protected NamedLuaFunction LuaDraw = new("draw");
 
 	public ScriptBG(string filePath) {
 		this.Init(filePath);
@@ -141,6 +144,8 @@ class ScriptBG : IDisposable {
 	}
 
 	private void Init(string filePath) {
+		this.FilePath = filePath;
+		this.FilePathShort = Path.Join(Path.GetFileName(Path.GetDirectoryName(filePath)), Path.GetFileName(filePath));
 		Textures = new Dictionary<string, CTexture>();
 
 
@@ -166,17 +171,17 @@ class ScriptBG : IDisposable {
 			using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8)) {
 				using (var stream = new StreamReader(filePath, Encoding.UTF8)) {
 					var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
-					LuaScript.DoString(text);
+					LuaScript.DoString(text, this.FilePathShort);
 				}
 			}
 
-			LuaSetConstValues = LuaScript.GetFunction("setConstValues");
-			LuaUpdateValues = LuaScript.GetFunction("updateValues");
-			LuaClearIn = LuaScript.GetFunction("clearIn");
-			LuaClearOut = LuaScript.GetFunction("clearOut");
-			LuaInit = LuaScript.GetFunction("init");
-			LuaUpdate = LuaScript.GetFunction("update");
-			LuaDraw = LuaScript.GetFunction("draw");
+			LuaSetConstValues.Load(LuaScript);
+			LuaUpdateValues.Load(LuaScript);
+			LuaClearIn.Load(LuaScript);
+			LuaClearOut.Load(LuaScript);
+			LuaInit.Load(LuaScript);
+			LuaUpdate.Load(LuaScript);
+			LuaDraw.Load(LuaScript);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -184,8 +189,29 @@ class ScriptBG : IDisposable {
 	public bool Exists() {
 		return LuaScript != null;
 	}
+
+	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
+		if (LuaScript == null)
+			return null;
+		try {
+			if (luaFunction.Func == null) {
+				LogNotification.PopWarning($"{this.GetType().Name} Warning: [{this.FilePathShort}] Function [{luaFunction.Name}] is called but undefined");
+				Trace.TraceWarning($"Full script path: {this.FilePath}");
+				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
+				luaFunction.LoadNoop(LuaScript); // silence further warnings
+				return null;
+			}
+			return luaFunction.Func.Call(args);
+		} catch (Exception exception) {
+			Crash(exception);
+		}
+		return null;
+	}
+
 	protected void Crash(Exception exception) {
-		LogNotification.PopError($"Lua ScriptBG Error: {exception.ToString()}");
+		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
+		Trace.TraceError($"Full script path: {this.FilePath}");
+		Trace.TraceError(exception.StackTrace);
 		LuaScript?.Dispose();
 		LuaScript = null;
 	}
@@ -205,33 +231,17 @@ class ScriptBG : IDisposable {
 
 		LuaScript?.Dispose();
 
-		LuaSetConstValues?.Dispose();
-		LuaUpdateValues?.Dispose();
-		LuaClearIn?.Dispose();
-		LuaClearOut?.Dispose();
-		LuaInit?.Dispose();
-		LuaUpdate?.Dispose();
-		LuaDraw?.Dispose();
+		LuaSetConstValues.Dispose();
+		LuaUpdateValues.Dispose();
+		LuaClearIn.Dispose();
+		LuaClearOut.Dispose();
+		LuaInit.Dispose();
+		LuaUpdate.Dispose();
+		LuaDraw.Dispose();
 	}
 
-	public void ClearIn(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaClearIn?.Call(player);
-		} catch (Exception ex) {
-			//LuaClearIn = null;
-			Crash(ex);
-		}
-	}
-	public void ClearOut(int player) {
-		if (LuaScript == null) return;
-		try {
-			LuaClearOut?.Call(player);
-		} catch (Exception ex) {
-			//LuaClearOut = null;
-			Crash(ex);
-		}
-	}
+	public void ClearIn(int player) => RunLuaCode(LuaClearIn, player);
+	public void ClearOut(int player) => RunLuaCode(LuaClearOut, player);
 	public void Init() {
 		if (LuaScript == null) return;
 		try {
@@ -247,7 +257,7 @@ class ScriptBG : IDisposable {
 			}
 
 			// Initialisation
-			LuaSetConstValues?.Call(OpenTaiko.ConfigIni.nPlayerCount,
+			RunLuaCode(LuaSetConstValues, OpenTaiko.ConfigIni.nPlayerCount,
 				OpenTaiko.P1IsBlue(),
 				OpenTaiko.ConfigIni.sLang,
 				OpenTaiko.ConfigIni.SimpleMode,
@@ -255,7 +265,7 @@ class ScriptBG : IDisposable {
 				raritiesC
 			);
 
-			LuaUpdateValues?.Call(OpenTaiko.FPS.DeltaTime,
+			RunLuaCode(LuaUpdateValues, OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				0,
@@ -267,7 +277,7 @@ class ScriptBG : IDisposable {
 				-1
 			);
 
-			LuaInit?.Call();
+			RunLuaCode(LuaInit);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
@@ -296,7 +306,7 @@ class ScriptBG : IDisposable {
 				) + msTimeOffset) / 1000.0;
 			}
 
-			LuaUpdateValues?.Call(OpenTaiko.FPS.DeltaTime,
+			RunLuaCode(LuaUpdateValues, OpenTaiko.FPS.DeltaTime,
 				OpenTaiko.FPS.NowFPS,
 				OpenTaiko.stageGameScreen.bIsAlreadyCleared,
 				(double)currentFloorPositionMax140,
@@ -310,17 +320,10 @@ class ScriptBG : IDisposable {
             LuaScript.SetObjectToPath("deltaTime", TJAPlayer3.FPS.DeltaTime);
             LuaScript.SetObjectToPath("isClear", TJAPlayer3.stage演奏ドラム画面.bIsAlreadyCleared);
             LuaScript.SetObjectToPath("towerNightOpacity", (double)(255 * currentFloorPositionMax140));*/
-			LuaUpdate?.Call();
+			RunLuaCode(LuaUpdate);
 		} catch (Exception ex) {
 			Crash(ex);
 		}
 	}
-	public void Draw() {
-		if (LuaScript == null) return;
-		try {
-			LuaDraw?.Call();
-		} catch (Exception ex) {
-			Crash(ex);
-		}
-	}
+	public void Draw() => RunLuaCode(LuaDraw);
 }

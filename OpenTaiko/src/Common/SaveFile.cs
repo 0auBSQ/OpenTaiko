@@ -19,6 +19,7 @@ internal class SaveFile {
 	}
 
 	public void tInitSaveFile() {
+		lock (this) {
 		// Best plays
 		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
 		data.tFactorizeBestPlays();
@@ -28,6 +29,7 @@ internal class SaveFile {
 
 		// Global counters
 		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+	}
 	}
 
 	public void tLoadUnlockables() {

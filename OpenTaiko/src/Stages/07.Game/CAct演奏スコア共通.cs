@@ -39,7 +39,7 @@ internal class CAct演奏スコア共通 : CActivity {
 	private ST文字位置[] stFont;
 
 
-	public long GetScore(int player) {
+	public long GetDisplayedScore(int player) {
 		return nCurrentlyDisplayedScore[player];
 	}
 

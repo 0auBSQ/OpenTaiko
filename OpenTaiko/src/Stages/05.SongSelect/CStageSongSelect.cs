@@ -74,6 +74,91 @@ static internal class CSongSelectSongManager {
 
 #endregion
 
+internal class SongSelectCursor {
+	public void Activate(List<CSongListNode> rootList) {
+		Folder = null;
+		Items = rootList;
+		// initialize cursors
+		if (this.IdxesPath.Count == 0) {
+			this.IdxesPath.Add(0);
+			this.PathDepth = 0;
+		}
+		// re-enter folders
+		for (int i = 0; i < Math.Min(this.IdxesPath.Count - 1, this.PathDepth); ++i) {
+			var idx = this.IdxesPath[i];
+			var idxChild = this.IdxesPath[i + 1];
+			CSongListNode? node = Items.ElementAtOrDefault(idx);
+			if (node?.nodeType != CSongListNode.ENodeType.BOX) {
+				// invalid folder
+				this.IdxesPath.RemoveRange(i + 1, this.IdxesPath.Count - (i + 1));
+				this.PathDepth = i;
+				break;
+			}
+			Folder = node;
+			Items = node.childrenList;
+		}
+		IdxItem = IdxesPath[PathDepth];
+		this.UpdateInfo?.Invoke();
+	}
+
+	public void tSelectItem() {
+		if (IdxItem != IdxesPath[PathDepth]) {
+			this.tForgetInnerFolders();
+			IdxesPath[PathDepth] = IdxItem;
+		}
+	}
+
+	public void tOpenFolder(CSongListNode song) {
+		tSelectItem();
+		Folder = song;
+		Items = song.childrenList;
+		++PathDepthRaw; // raw value to check range
+		while (PathDepthRaw >= IdxesPath.Count)
+			IdxesPath.Add(0);
+		IdxItem = IdxesPath[PathDepthRaw];
+		this.UpdateInfo?.Invoke();
+	}
+
+	public void tForgetInnerFolders() {
+		IdxesPath.RemoveRange(PathDepthRaw + 1, IdxesPath.Count - (PathDepthRaw + 1));
+	}
+
+	public void tCloseFolder() {
+		if (Folder == null)
+			return;
+		IdxesPath[PathDepth] = IdxItem;
+		Folder = Folder.rParentNode;
+		Items = Folder.childrenList;
+		if (IdxesPath.Count > 1)
+			--PathDepth;
+		IdxItem = IdxesPath[PathDepth];
+		this.UpdateInfo?.Invoke();
+	}
+
+	public bool IsInRootFolder(string rootGenreName)
+		=> this.Folder == null || (OpenTaiko.Songs管理.list曲ルート.Contains(this.Folder) && this.Folder.songGenre == rootGenreName);
+
+	public int IdxItemRaw = 0;
+	public int IdxItem {
+		get => Math.Max(0, Math.Min(IdxItemRaw, Items.Count - 1));
+		set => IdxItemRaw = value;
+	}
+	public CSongListNode? Item => Items.ElementAtOrDefault(IdxItem);
+
+	private List<int> IdxesPath = []; // [< PathDepth]: Open parent folders; [PathDepth]: Item including closed folder; [> PathDepth] Remembered inner folders
+
+	private int PathDepthRaw = 0;
+	private int PathDepth {
+		get => Math.Max(0, Math.Min(PathDepthRaw, IdxesPath.Count - 1));
+		set => PathDepthRaw = value;
+	}
+
+	public CSongListNode? Folder { get; private set; }  = null;
+	public List<CSongListNode> Items { get; private set; } = [];
+
+	public required Action? UpdateInfo { get; init; } = null;
+}
+
 internal class CStageSongSelect : CStage {
 	// Properties
 	public int nスクロールバー相対y座標 {
@@ -186,7 +271,7 @@ internal class CStageSongSelect : CStage {
 
 			if (c曲リストノード != null && cスコア != null && c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) {
 				string str選択曲ファイル名 = cスコア.ファイル情報.ファイルの絶対パス;
-				int n曲番号inブロック = OpenTaiko.stageSongSelect.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+				int n曲番号inブロック = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 			}
 		}
 		//---------------------
@@ -652,7 +737,7 @@ internal class CStageSongSelect : CStage {
 				var song = OpenTaiko.SongMount.rCurrentlySelectedSong;
 
 				if (song != null && song.nodeType == CSongListNode.ENodeType.SCORE) {
-					var closest = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
+					var closest = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song);
 					var score = song.score[closest];
 
 					if (score != null) {
@@ -1169,17 +1254,6 @@ internal class CStageSongSelect : CStage {
 		}
 		return 0;
 	}
-	public enum EReturnValue : int {
-		Continuation,
-		BackToTitle,
-		PlayCutSceneIntro,
-		SongSelected,
-		CallOptions,
-		ConfigMenuOpened,
-		SkinChange,
-		JumpToLuaStage
-	}
-
 
 	// その他
 	#region [ private ]
@@ -1501,7 +1575,7 @@ internal class CStageSongSelect : CStage {
 	private int tGetRandomSongDifficulty(int contextDiff) {
 		var song = OpenTaiko.SongMount.rChoosenSong;
 
-		int baseDiff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rChoosenSong);
+		int baseDiff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rChoosenSong);
 
 		if (contextDiff >= 0) {
 			if (contextDiff < (int)Difficulty.Oni)
@@ -1562,11 +1636,11 @@ internal class CStageSongSelect : CStage {
 		tNotifySelectedSongChange();
 	}
 	private void t曲を選択する() {
-		this.t曲を選択する(this.actSongList.n現在選択中の曲の現在の難易度レベル, 0);
+		this.t曲を選択する(OpenTaiko.SongMount.nCurrentSongDifficulty, 0);
 	}
 	public void t曲を選択する(int nCurrentLevel, int player) {
 		OpenTaiko.SongMount.rChoosenSong = OpenTaiko.SongMount.rCurrentlySelectedSong;
-		OpenTaiko.SongMount.rChosenScore = this.actSongList.r現在選択中のスコア;
+		OpenTaiko.SongMount.rChosenScore = OpenTaiko.SongMount.rCurrentScore;
 
 		OpenTaiko.SongMount.nChoosenSongDifficulty[player] = nCurrentLevel;
 		OpenTaiko.SongMount.strChosenSongGenre = OpenTaiko.SongMount.rChoosenSong.songGenre;
@@ -1603,7 +1677,7 @@ internal class CStageSongSelect : CStage {
 			foreach (CSongListNode c曲リストノード in OpenTaiko.Songs管理.list曲ルート) {
 				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
-					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+					int diff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 					if (diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present
 						var score = c曲リストノード.score[diff];
@@ -1638,7 +1712,7 @@ internal class CStageSongSelect : CStage {
 			foreach (CSongListNode c曲リストノード in r親.childrenList) {
 				if ((c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE) || (c曲リストノード.nodeType == CSongListNode.ENodeType.SCORE_MIDI)) {
 					// Don't add Dan/Tower charts for Random
-					int diff = this.actSongList.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(c曲リストノード);
+					int diff = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(c曲リストノード);
 
 					if (dan ? diff == (int)difficulty : diff < (int)Difficulty.Tower) {
 						// Check if mandatory diffs are present
