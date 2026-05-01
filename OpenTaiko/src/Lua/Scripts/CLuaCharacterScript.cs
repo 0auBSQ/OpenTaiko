@@ -108,7 +108,7 @@ namespace OpenTaiko {
 			return (0f, 0f);
 		}
 
-		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets, DefaultScript) {
+		public CLuaCharacterScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, false, DefaultScript) {
 			try {
 				lfLoadAnimation.Load(LuaScript);
 				lfDisposeAnimation.Load(LuaScript);
