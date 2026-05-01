@@ -8,15 +8,15 @@ namespace OpenTaiko {
 		internal string _activityName;
 
 		// Activation / Deactivation (when met/unmet)
-		private LuaFunction lfActivate;
-		private LuaFunction lfDeactivate;
+		private NamedLuaFunction lfActivate = new("activate");
+		private NamedLuaFunction lfDeactivate = new("deactivate");
 		// Main loops 
-		private LuaFunction lfUpdate;
-		private LuaFunction lfDraw;
+		private NamedLuaFunction lfUpdate = new("update");
+		private NamedLuaFunction lfDraw = new("draw");
 		// Extra events
-		private LuaFunction lfOnStart;
-		private LuaFunction lfAfterSongEnum;
-		private LuaFunction lfOnDestroy;
+		private NamedLuaFunction lfOnStart = new("onStart");
+		private NamedLuaFunction lfAfterSongEnum = new("afterSongEnum");
+		private NamedLuaFunction lfOnDestroy = new("onDestroy");
 
 		private bool _active = false;
 
@@ -70,13 +70,13 @@ namespace OpenTaiko {
 			_activityName = name;
 
 			try {
-				lfUpdate = (LuaFunction)LuaScript["update"];
-				lfDraw = (LuaFunction)LuaScript["draw"];
-				lfActivate = (LuaFunction)LuaScript["activate"];
-				lfDeactivate = (LuaFunction)LuaScript["deactivate"];
-				lfOnStart = (LuaFunction)LuaScript["onStart"];
-				lfAfterSongEnum = (LuaFunction)LuaScript["afterSongEnum"];
-				lfOnDestroy = (LuaFunction)LuaScript["onDestroy"];
+				lfUpdate.Load(LuaScript);
+				lfDraw.Load(LuaScript);
+				lfActivate.Load(LuaScript);
+				lfDeactivate.Load(LuaScript);
+				lfOnStart.Load(LuaScript);
+				lfAfterSongEnum.Load(LuaScript);
+				lfOnDestroy.Load(LuaScript);
 
 				LuaScript["DEACTIVATE"] = Deactivate;
 

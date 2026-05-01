@@ -24,9 +24,32 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int idxDefine = -1;
 	public int idxBranchSection;
 	public int nSenote;
-	public int nRollCount;
-	public int nBalloon;
-	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
+	public int nRollCount; // Kusudama: total roll count stored in end
+	public int nBalloon; // Kusudama: total hits stored in end
+
+	public CChip? FirstMultiLink {
+		get {
+			if (multiLink != null) {
+				for (int p = 0; p < multiLink.GetLength(0); ++p) {
+					for (int b = 0; b < multiLink.GetLength(1); ++b) {
+						var head = multiLink[p, b];
+						if (head?.bVisible ?? false)
+							return head;
+					}
+				}
+			}
+			return null;
+		}
+	}
+
+	public CChip KusudamaEnd => FirstMultiLink?.end ?? end;
+	public int KusudamaRollCount { get => KusudamaEnd.nRollCount; set => KusudamaEnd.nRollCount = value; }
+	public int KusudamaCount { get => KusudamaEnd.nBalloon; set => KusudamaEnd.nBalloon = value; }
+
+	private double _msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
+	public double msFirstMultiHit { get => _msStoredHit; set { _msStoredHit = value; eNoteState = ENoteState.Wait; } } // multi-hit notes
+	public double msAutoLastHit { get => _msStoredHit; set { _msStoredHit = value; eNoteState = ENoteState.None; } } // autoplay / autoroll
+
 	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
 	public ENoteState eNoteState;
@@ -50,8 +73,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double fBMSCROLLTime;
 	private int _n発声時刻ms;
 	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
-	public double n分岐時刻ms;
 
+	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
+	public double n分岐時刻ms { get => _msBorder; set => _msBorder = value; } // Branch judge chip
+	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
 	public double db発声時刻ms;
 
@@ -68,9 +93,12 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool IsHitted = false;
 	public bool IsMissed = false;
 
-	public CChip start;
-	public CChip end;
+	public bool IsPartnerNote = false;
 
+	public CChip start; // defaults to this, never null
+	public CChip end; // defaults to this, never null
+
+	public CChip?[,]? multiLink; // [iPlayer, iBranch]
 
 	//EXTENDED COMMANDS
 	public Color4 borderColor;

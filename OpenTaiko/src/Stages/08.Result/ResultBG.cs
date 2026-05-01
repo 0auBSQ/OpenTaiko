@@ -3,25 +3,16 @@
 namespace OpenTaiko;
 
 class ResultBG : ScriptBG {
-	private LuaFunction LuaSkipAnimation;
+	private NamedLuaFunction LuaSkipAnimation = new("skipAnime");
 
 	public ResultBG(string filePath) : base(filePath) {
-		if (LuaScript != null) {
-			LuaSkipAnimation = LuaScript.GetFunction("skipAnime");
-		}
+		LuaSkipAnimation.Load(LuaScript);
 	}
 
 	public new void Dispose() {
 		base.Dispose();
-		LuaSkipAnimation?.Dispose();
+		LuaSkipAnimation.Dispose();
 	}
 
-	public void SkipAnimation() {
-		if (LuaScript == null) return;
-		try {
-			LuaSkipAnimation.Call();
-		} catch (Exception ex) {
-			this.Crash(ex);
-		}
-	}
+	public void SkipAnimation() => RunLuaCode(LuaSkipAnimation);
 }

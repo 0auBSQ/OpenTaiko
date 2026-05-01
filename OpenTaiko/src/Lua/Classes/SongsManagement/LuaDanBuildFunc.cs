@@ -552,8 +552,8 @@ namespace OpenTaiko {
 					FileName = absoluteBgmPath,
 					Level = internalNode.nLevel[diff],
 					Difficulty = diff,
-					ScoreInit = src.nScoreInit[0, diff],
-					ScoreDiff = src.nScoreDiff[diff],
+					ScoreInit = src.PlayerSideMetadata.nScoreInit[0],
+					ScoreDiff = src.PlayerSideMetadata.nScoreDiff,
 					bTitleShow = false,
 					Wave = cwav,
 				};
@@ -678,11 +678,12 @@ namespace OpenTaiko {
 			output.nノーツ数_Branch[0] = totalDanNotes;
 			output.nノーツ数_Branch[1] = totalDanNotes;
 			output.nノーツ数_Branch[2] = totalDanNotes;
-			// nノーツ数[3] is the total missable-note count for the whole Dan chart.
+			// nノーツ数_Common is the total missable-note count for the whole Dan chart.
 			// GetTotalExamScore() reads this as nNotesMax for global exams; if it stays 0,
 			// amountRemainMax == 0 at game start → doFinalJudge fires immediately with
 			// gauge=0% → Failure before the player hits a single note.
-			output.nノーツ数[3] = totalDanNotes;
+			// NOTE: is the lower bound of total missable-note count for branched Dan
+			output.nノーツ数_Common = totalDanNotes;
 
 			// Add the two end-of-chart sentinel chips that the engine uses to know the Dan is done.
 			//   0xFF with n整数値=0    → sets isChartEnded[player] = true, continues chip loop

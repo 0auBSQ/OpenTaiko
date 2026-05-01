@@ -1,4 +1,6 @@
-﻿using FDK;
+﻿using System.Diagnostics;
+using System.Numerics;
+using FDK;
 
 namespace OpenTaiko;
 
@@ -374,6 +376,10 @@ class TextureLoader {
 		Judge_Meter = TxC(GAME + @$"Judge_Meter.png");
 		Bar = TxC(GAME + @$"Bar.png");
 		Bar_Branch = TxC(GAME + @$"Bar_Branch.png");
+
+		Vector2 judgeDiff = new(OpenTaiko.Skin.Game_Judge_X[1] - OpenTaiko.Skin.Game_Judge_X[0], OpenTaiko.Skin.Game_Judge_Y[1] - OpenTaiko.Skin.Game_Judge_Y[0]);
+		OpenTaiko.Skin.Init_Game_Notes_Arm_Configs(CSkin.ToVector2(Notes_Arm.szTextureSize), CSkin.ToVector2(OpenTaiko.Skin.Game_Notes_Size), judgeDiff,
+			(float)OpenTaiko.Skin.ScaleY * new Vector2(35, 0), (float)OpenTaiko.Skin.ScaleY * 8);
 
 		var _presetsDefs = CSkin.Path(BASE + GAME + BACKGROUND + @$"Presets.json");
 		if (File.Exists(_presetsDefs))

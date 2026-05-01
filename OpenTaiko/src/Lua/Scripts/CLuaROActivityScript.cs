@@ -33,7 +33,8 @@ namespace OpenTaiko {
 		/// Returns null if the function does not exist or the script has crashed.
 		/// </summary>
 		public object[]? CallFunction(string name, params object[] args) {
-			var func = LuaScript[name] as LuaFunction;
+			NamedLuaFunction func = new(name);
+			func.Load(LuaScript);
 			return RunLuaCode(func, args);
 		}
 	}

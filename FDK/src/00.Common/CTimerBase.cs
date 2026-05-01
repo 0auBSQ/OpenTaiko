@@ -11,9 +11,8 @@ public abstract class CTimerBase : IDisposable {
 	public abstract long SystemTimeMs {
 		get;
 	}
-	public double SystemTimeMs_Double {
-		get;
-		set;
+	public virtual double SystemTimeMs_Double {
+		get => SystemTimeMs; // default implementation
 	}
 	public abstract void Dispose();
 
@@ -80,8 +79,8 @@ public abstract class CTimerBase : IDisposable {
 
 	public void Reset() {
 		this.Update();
-		this.PrevResetTimeMs = this.UpdateSystemTime;
-		this.PauseSystemTimeMs = this.UpdateSystemTime;
+		this.PauseSystemTimeMs = this.PrevResetTimeMs = this.UpdateSystemTime;
+		this.PauseSystemTimeMs_Double = this.PrevResetTimeMs_Double = this.UpdateSystemTime_Double;
 		this.StopCount = 0;
 	}
 	public void Pause() {

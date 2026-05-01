@@ -12,12 +12,11 @@ internal class CActImplClearAnimation : CActivity {
 		base.IsDeActivated = true;
 	}
 
-	public void Start(int iPlayer) {
-		// this.ct進行メイン = new CCounter(0, 500, 1000 / 60, TJAPlayer3.Timer);
+	public void Start(int iPlayer, bool endOfPlay = false) {
+		if (OpenTaiko.ConfigIni.bAIBattleMode && iPlayer == 1) // skip animation for AI
+			return;
 
-		bSoundPlayed[iPlayer] = false;
-
-		this.ct進行メイン[iPlayer] = new CCounter(0, 300, 22, OpenTaiko.Timer);
+		var lastMode = this.Mode[iPlayer];
 
 		/*
         this.ctEnd_ClearFailed = new CCounter(0, 69, 30, TJAPlayer3.Timer);
@@ -29,7 +28,7 @@ internal class CActImplClearAnimation : CActivity {
 
 		// モードの決定。クリア失敗・フルコンボも事前に作っとく。
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.Tower_TopReached_Perfect;
@@ -41,27 +40,30 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && !Dan_Cert.GetFailedAllChallenges(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong.DanSongs)) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast())
+				&& !OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong.DanSongs)
+				) {
 				// 段位認定モード、クリア成功
 				// this.Mode[0] = EndMode.StageCleared;
+				if (!endOfPlay) {
+					this.Mode[0] = EndMode.Total; // cancel mis-judged failed
+				} else {
+					bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
 
-				bool bgold = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageGameScreen.actDan.GetExam(), OpenTaiko.SongMount.rChoosenSong.DanSongs) == Exam.Status.Better_Success;
-
-				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
-					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
-						this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
-					else
-						this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
-				} else
-					this.Mode[0] = bgold ? EndMode.Dan_Gold_Pass : EndMode.Dan_Red_Pass;
-
-
+					if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
+						if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
+							this.Mode[0] = bgold ? EndMode.Dan_Gold_Perfect : EndMode.Dan_Red_Perfect;
+						else
+							this.Mode[0] = bgold ? EndMode.Dan_Gold_FullCombo : EndMode.Dan_Red_FullCombo;
+					} else
+						this.Mode[0] = bgold ? EndMode.Dan_Gold_Pass : EndMode.Dan_Red_Pass;
+				}
 			} else {
 				// 段位認定モード、クリア失敗
 				this.Mode[0] = EndMode.Dan_Fail;
 			}
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.AI_Win_Perfect;
@@ -76,7 +78,7 @@ internal class CActImplClearAnimation : CActivity {
 			// 通常のモード。
 			// ここでフルコンボフラグをチェックするが現時点ではない。
 			// 今の段階では魂ゲージ80%以上でチェック。
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
 				if (OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMine == 0)
 				//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 				{
@@ -94,6 +96,15 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[iPlayer] = EndMode.StageFailed;
 			}
 		}
+
+		if (this.Mode[iPlayer] == lastMode) // prevent replaying animation
+			return;
+
+		if (this.Mode[iPlayer] == EndMode.Total)
+			this.ct進行メイン[iPlayer] = null;
+		else
+			this.ct進行メイン[iPlayer] ??= new CCounter(0, 300, 22, OpenTaiko.Timer);
+		bSoundPlayed[iPlayer] = false;
 	}
 
 	public override void Activate() {
@@ -159,6 +170,12 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public void InitScripts() {
+		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i) {
+			this.Mode[i] = EndMode.Total;
+			this.bSoundPlayed[i] = false;
+			this.ct進行メイン[i] = null;
+		}
+
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript?.Init();
 			Tower_TopReached_PassScript?.Init();
@@ -268,15 +285,16 @@ internal class CActImplClearAnimation : CActivity {
 			base.IsFirstDraw = false;
 		}
 		int ret = 1;
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i)
-			if (this.Draw(i) == 0)
+		int nDrawnPlayers = OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount;
+		for (int i = 0; i < nDrawnPlayers; ++i)
+			if (this.Draw(i, nDrawnPlayers) == 0)
 				ret = 0;
 		return ret;
 	}
-	protected int Draw(int iPlayer) {
+	protected int Draw(int iPlayer, int nDrawnPlayers) {
 		if (this.ct進行メイン[iPlayer] != null) {
 			bool playerStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(iPlayer);
-			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
+			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageFailed_Fast() || OpenTaiko.stageGameScreen.IsStageCompleted()))
 				return 0;
 
 			this.ct進行メイン[iPlayer].Tick();
@@ -309,7 +327,7 @@ internal class CActImplClearAnimation : CActivity {
 			};
 
 			if (!bSoundPlayed[iPlayer]) {
-				int pan = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][iPlayer];
+				int pan = OpenTaiko.ConfigIni.nPanning[nDrawnPlayers - 1][iPlayer];
 				script?.PlayEndAnime(iPlayer);
 				sound?.SetPanning(pan);
 				sound?.PlayStart();

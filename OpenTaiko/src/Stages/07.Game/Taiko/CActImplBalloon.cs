@@ -131,7 +131,7 @@ internal class CActImplBalloon : CActivity {
 
 			for (int j = 0; j < 5; j++) {
 
-				if (n残り打数[j] < n連打数 && NotesManager.GetNoteType(chip) is NotesManager.ENoteType.Balloon or NotesManager.ENoteType.BalloonFuze) {
+				if (n残り打数[j] < n連打数 && NotesManager.GetNoteType(chip) is NotesManager.ENoteType.Balloon) {
 					if (OpenTaiko.Tx.Balloon_Breaking[j] != null)
 						OpenTaiko.Tx.Balloon_Breaking[j].t2D描画(x + (this.ct風船ふきだしアニメ.CurrentValue == 1 ? 3 : 0), y);
 					break;

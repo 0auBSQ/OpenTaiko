@@ -89,7 +89,7 @@ class CSongReplay {
 		IndividualADLibCount[songNo] = OpenTaiko.stageGameScreen.DanSongScore[songNo].nADLIB;
 		danAccumulatedScore = 0;
 		for (int acc = 0; acc < songNo; acc++) danAccumulatedScore += IndividualScore[acc];
-		IndividualScore[songNo] = (int)OpenTaiko.stageGameScreen.actScore.GetScore(0) - danAccumulatedScore;
+		IndividualScore[songNo] = (int)OpenTaiko.stageGameScreen.actScore.Get(0) - danAccumulatedScore;
 	}
 
 	#endregion
@@ -319,7 +319,7 @@ class CSongReplay {
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
 		// DanBuilder charts have no persistent uniqueId; skip replay recording for them.
-		if (OpenTaiko.SongMount.rChoosenSong.uniqueId == null) return;
+		if (OpenTaiko.SongMount.rChoosenSong?.uniqueId == null) return;
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
 		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);

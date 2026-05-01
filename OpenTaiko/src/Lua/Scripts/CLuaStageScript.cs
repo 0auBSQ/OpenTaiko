@@ -7,15 +7,15 @@ namespace OpenTaiko {
 		internal string _stageName;
 
 		// Activation / Deactivation (when met/unmet)
-		private LuaFunction lfActivate;
-		private LuaFunction lfDeactivate;
+		private NamedLuaFunction lfActivate = new("activate");
+		private NamedLuaFunction lfDeactivate = new("deactivate");
 		// Main loops 
-		private LuaFunction lfUpdate;
-		private LuaFunction lfDraw;
+		private NamedLuaFunction lfUpdate = new("update");
+		private NamedLuaFunction lfDraw = new("draw");
 		// Extra events
-		private LuaFunction lfOnStart;
-		private LuaFunction lfAfterSongEnum;
-		private LuaFunction lfOnDestroy;
+		private NamedLuaFunction lfOnStart = new("onStart");
+		private NamedLuaFunction lfAfterSongEnum = new("afterSongEnum");
+		private NamedLuaFunction lfOnDestroy = new("onDestroy");
 
 		private Func<string, string?, int> StageExitCallBack;
 
@@ -74,13 +74,13 @@ namespace OpenTaiko {
 			_stageName = name;
 
 			try {
-				lfUpdate = (LuaFunction)LuaScript["update"];
-				lfDraw = (LuaFunction)LuaScript["draw"];
-				lfActivate = (LuaFunction)LuaScript["activate"];
-				lfDeactivate = (LuaFunction)LuaScript["deactivate"];
-				lfOnStart = (LuaFunction)LuaScript["onStart"];
-				lfAfterSongEnum = (LuaFunction)LuaScript["afterSongEnum"];
-				lfOnDestroy = (LuaFunction)LuaScript["onDestroy"];
+				lfUpdate.Load(LuaScript);
+				lfDraw.Load(LuaScript);
+				lfActivate.Load(LuaScript);
+				lfDeactivate.Load(LuaScript);
+				lfOnStart.Load(LuaScript);
+				lfAfterSongEnum.Load(LuaScript);
+				lfOnDestroy.Load(LuaScript);
 
 				// Call "return Exit(transition)" in the Lua stage's update function to exit the stage
 				LuaScript["Exit"] = ExitStage;

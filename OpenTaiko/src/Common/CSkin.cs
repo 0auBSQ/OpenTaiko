@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.Numerics;
 using System.Text;
 using FDK;
 
@@ -8226,12 +8227,53 @@ internal class CSkin : IDisposable {
 	public int[] Game_SENote_Size = new int[] { 136, 30 };
 	public int Game_Notes_Interval = 960;
 
-	public int[] Game_Notes_Arm_Offset_Left_X = new int[] { 25, 25 };
-	public int[] Game_Notes_Arm_Offset_Right_X = new int[] { 60, 60 };
+	// placeholder values
+	public int[] Game_Notes_Arm_Offset_Left_X = new int[] { int.MinValue, int.MinValue }; // 25, 25 
+	public int[] Game_Notes_Arm_Offset_Right_X = new int[] { int.MinValue, int.MinValue }; // 60, 60
 
-	public int[] Game_Notes_Arm_Offset_Left_Y = new int[] { 74, -44 };
-	public int[] Game_Notes_Arm_Offset_Right_Y = new int[] { 104, -14 };
-	public int[] Game_Notes_Arm_Move = new int[] { 0, 30 };
+	public int[] Game_Notes_Arm_Offset_Left_Y = new int[] { int.MinValue, int.MinValue }; // 74, -44
+	public int[] Game_Notes_Arm_Offset_Right_Y = new int[] { int.MinValue, int.MinValue }; // 104, -14 
+	public int[] Game_Notes_Arm_Move = new int[] { int.MinValue, int.MinValue }; // 0, 30 
+
+	// SimpleStyle (720p): Game_Notes_Arm_Size = [38, 66], ArmsBetween = [35, 0], ArmOverlapH = 8
+	public static Vector2 ToVector2(int[] xy) => new(xy[0], xy[1]);
+	public static Vector2 ToVector2(Size sz) => new(sz.Width, sz.Height);
+
+	public void Init_Game_Notes_Arm_Configs(Vector2 Arm_Size, Vector2 Notes_Size, Vector2 Game_Judge_Diff, Vector2 ArmsBetween, float ArmOverlapH) {
+		// calculate arm move from given configs
+		static float? getMove(int configLeft, int configRight, float argsBetween) {
+			if (configLeft != int.MinValue && configRight != int.MinValue)
+				return configRight - configLeft - argsBetween;
+			return null;
+		}
+		static float[] getMoves(int[] configLeft, int[] configRight, float argsBetween)
+			=> configLeft.Zip(configRight).Select(x => getMove(x.First, x.Second, argsBetween)).Where(x => x != null).Select(x => x!.Value).ToArray();
+
+		var xs = getMoves(Game_Notes_Arm_Offset_Left_X, Game_Notes_Arm_Offset_Right_X, ArmsBetween.X);
+		var ys = getMoves(Game_Notes_Arm_Offset_Left_Y, Game_Notes_Arm_Offset_Right_Y, ArmsBetween.Y);
+		Vector2 Move = new((xs.Length > 0) ? xs.Average() : float.Ceiling(Game_Judge_Diff.X / 6f),
+			(ys.Length > 0) ? ys.Average() : float.Ceiling(Game_Judge_Diff.Y / 6f));
+
+		static void assignToEmpty(int[] config, float[] values) {
+			for (int i = 0; i < config.Length; ++i) {
+				if (config[i] == int.MinValue)
+					config[i] = (int)Math.Round(values[i]);
+			}
+		}
+		assignToEmpty(Game_Notes_Arm_Move, [Move.X, Move.Y]);
+		Move = ToVector2(Game_Notes_Arm_Move);
+
+		// calculate display offsets
+		var ArmToCenter = Game_Judge_Diff - new Vector2(0, 2 * Arm_Size.Y - ArmOverlapH);
+		var LeftDown = -ArmsBetween / 2 - Move / 2 + ArmToCenter / 2 - new Vector2(Arm_Size.X / 2, 0) - -Notes_Size / 2;
+		var LeftUp = -ArmsBetween / 2 - Move / 2 - ArmToCenter / 2 - new Vector2(Arm_Size.X / 2, Arm_Size.Y) - -Notes_Size / 2;
+		var RightDown = ArmsBetween / 2 + Move / 2 + ArmToCenter / 2 - new Vector2(Arm_Size.X / 2, 0) - -Notes_Size / 2;
+		var RightUp = ArmsBetween / 2 + Move / 2 - ArmToCenter / 2 - new Vector2(Arm_Size.X / 2, Arm_Size.Y) - -Notes_Size / 2;
+		assignToEmpty(Game_Notes_Arm_Offset_Left_X, [LeftDown.X, LeftUp.X]);
+		assignToEmpty(Game_Notes_Arm_Offset_Left_Y, [LeftDown.Y, LeftUp.Y]);
+		assignToEmpty(Game_Notes_Arm_Offset_Right_X, [RightDown.X, RightUp.X]);
+		assignToEmpty(Game_Notes_Arm_Offset_Right_Y, [RightDown.Y, RightUp.Y]);
+	}
 
 	public int[] Game_Judge_X = new int[] { 364, 364 };
 	public int[] Game_Judge_Y = new int[] { 152, 328 };

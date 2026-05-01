@@ -2,6 +2,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
+using SheetRank = (int tier, int style, int side);
+
 namespace OpenTaiko;
 
 /// <summary>
@@ -12,23 +14,23 @@ namespace OpenTaiko;
 /// 1. Break the string up into top-level sections of the following types, recording pre- or post- COURSE:
 ///   a) STYLE Single
 ///   b) STYLE Double/Couple
-///   c) STYLE unrecognized
-///   d) non-STYLE
+///   c) STYLE N
+///   d) STYLE unrecognized
+///   e) non-STYLE
 /// 2. Within the top-level sections, break each up into sub-sections of the following types:
-///   a) sheet START P1
-///   b) sheet START P2
-///   c) sheet START bare
-///   d) sheet START unrecognized
-///   e) non-sheet
-/// 3. For the current seqNo, rank the found sheets
-///    using a per-seqNo set of rankings for each
+///   a) sheet START PN
+///   b) sheet START bare
+///   c) sheet START unrecognized
+///   d) non-sheet
+/// 3. For the current playerCount and playerSide, rank the found sheets
+///    using a per-playerCount and per-playerSide set of rankings for each
 ///    relevant section/subsection combination.
 ///    Non-sheets (header sections) have the best rank.
 /// 4. Determine the best-ranked sheet. Pre-COURSE: sheets have worst ranks if current difficulty is Oni, or otherwise skipped entirely.
-/// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
+/// 5. Select and return the best-ranked sheet and its immediate header (contains #HBSCROLL and on), mark all sheets to be skipped from upper headers
 /// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
 /// 7. Remove all sections beyond the selected sheet
-/// 8. Reassemble the string
+/// 8. Reassemble the upper header string
 /// </summary>
 public static class CDTXStyleExtractor {
 	// The sections are splitted right before the header or command for the section kind,
@@ -47,144 +49,154 @@ public static class CDTXStyleExtractor {
 	private const string StylePrefixRegexPattern = @"^STYLE\s*:";
 	private const string SheetStartPrefixRegexPattern = @"^#START";
 
-	private static readonly string StyleSingleSectionRegexMatchPattern =
-		$"{StylePrefixRegexPattern}\\s*(?:Single|1)";
+	private static int strConvertStyle(string argument) => argument.ToLower() switch {
+		"single" => 1,
+		"double" or "couple" => 2,
+		_ => int.Parse(argument),
+	};
 
-	private static readonly string StyleDoubleSectionRegexMatchPattern =
-		$"{StylePrefixRegexPattern}\\s*(?:Double|Couple|2)";
+	private static readonly string StyleSectionRegexMatchPattern =
+		$@"{StylePrefixRegexPattern}\s*(\w+|\d+)";
 
 	private static readonly string SheetStartBareRegexMatchPattern =
 		$"{SheetStartPrefixRegexPattern}$";
 
-	private static readonly string SheetStartP1RegexMatchPattern =
-		$"{SheetStartPrefixRegexPattern}\\s*P1";
+	private static readonly string SheetStartPnRegexMatchPattern =
+		$@"{SheetStartPrefixRegexPattern}\s*P(\d+)";
 
-	private static readonly string SheetStartP2RegexMatchPattern =
-		$"{SheetStartPrefixRegexPattern}\\s*P2";
+	private static readonly Regex SectionSplitRegex = new Regex($@"(?={StylePrefixRegexPattern})", StyleSectionSplitRegexOptions);
+	private static readonly Regex SubSectionSplitRegex = new Regex($@"(?={SheetStartPrefixRegexPattern})|(?<=^#END\n)", StyleSectionSplitRegexOptions);
 
-	private static readonly Regex SectionSplitRegex = new Regex($"(?={StylePrefixRegexPattern})", StyleSectionSplitRegexOptions);
-	private static readonly Regex SubSectionSplitRegex = new Regex($"(?={SheetStartPrefixRegexPattern})|(?<=^#END\\n)", StyleSectionSplitRegexOptions);
-
-	private static readonly Regex StyleSingleSectionMatchRegex = new Regex(StyleSingleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
-	private static readonly Regex StyleDoubleSectionMatchRegex = new Regex(StyleDoubleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex StyleNSectionMatchRegex = new Regex(StyleSectionRegexMatchPattern, StyleGetSectionKindRegexOptions);
 	private static readonly Regex StyleUnrecognizedSectionMatchRegex = new Regex(StylePrefixRegexPattern, StyleGetSectionKindRegexOptions);
 
 	private static readonly Regex SheetStartBareMatchRegex = new Regex(SheetStartBareRegexMatchPattern, StyleGetSectionKindRegexOptions);
-	private static readonly Regex SheetStartP1MatchRegex = new Regex(SheetStartP1RegexMatchPattern, StyleGetSectionKindRegexOptions);
-	private static readonly Regex SheetStartP2MatchRegex = new Regex(SheetStartP2RegexMatchPattern, StyleGetSectionKindRegexOptions);
+	private static readonly Regex SheetStartPnMatchRegex = new Regex(SheetStartPnRegexMatchPattern, StyleGetSectionKindRegexOptions);
 	private static readonly Regex SheetStartUnrecognizedMatchRegex = new Regex(SheetStartPrefixRegexPattern, StyleGetSectionKindRegexOptions);
 
-	private static readonly IDictionary<SectionKindAndSubSectionKind, int>[]
-		SeqNoSheetRanksBySectionKindAndSubSectionKind =
-		{
-			// seqNo 0
-			new Dictionary<SectionKindAndSubSectionKind, int>
-			{
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartBare)] = 1,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP1)] = 2,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized)] = 3,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartBare)] = 4,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP1)] = 5,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartUnrecognized)] = 6,
+	private static Func<SectionKind, SubSectionKind, SheetRank> GetRanker(int playerCount, int playerSide)
+		=> (playerCount <= 1) ? (sk, ssk) => (sk, ssk) switch {
+			// Non-sheets have best rank
+			(_, <= SubSectionKind.NonSheet) => (0, 0, 0),
 
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartBare)] = 7,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartUnrecognized)] = 8,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP1)] = 9,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP1)] = 10,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartBare)] = 11,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartUnrecognized)] = 12,
+			// equal or less player count, correct player side
+			(SectionKind.StyleSingle, SubSectionKind.SheetStartBare) => (1, 0, 0),
+			(SectionKind.StyleSingle, SubSectionKind.SheetStartP1) => (2, 0, 0),
+			(SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized) => (3, 0, 0),
+			(SectionKind.NonStyle, SubSectionKind.SheetStartBare) => (4, 0, 0),
+			(SectionKind.NonStyle, SubSectionKind.SheetStartP1) => (5, 0, 0),
+			(SectionKind.NonStyle, SubSectionKind.SheetStartUnrecognized) => (6, 0, 0),
 
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP2)] = 13,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP2)] = 14,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP2)] = 15,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP2)] = 16,
-			},
-			// seqNo 1
-			new Dictionary<SectionKindAndSubSectionKind, int>
-			{
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP1)] = 1,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP1)] = 2,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP1)] = 3,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP1)] = 4,
+			// more player count (less is better), equal or earlier player side (more is better)
+			(<= SectionKind.StyleUnrecognized, SubSectionKind.SheetStartBare) => (7, 0, 0),
+			(<= SectionKind.StyleUnrecognized, SubSectionKind.SheetStartUnrecognized) => (8, 0, 0),
+			(<= SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP1) => (9, 0, 0),
+			(>= SectionKind.StyleDouble, SubSectionKind.SheetStartP1) => (10, (int)sk, 0),
+			(>= SectionKind.StyleDouble, SubSectionKind.SheetStartBare) => (11, (int)sk, 0),
+			(>= SectionKind.StyleDouble, SubSectionKind.SheetStartUnrecognized) => (12, (int)sk, 0),
 
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartBare)] = 5,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartUnrecognized)] = 6,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartBare)] = 7,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartUnrecognized)] = 8,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartBare)] = 9,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized)] = 10,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartBare)] = 11,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartUnrecognized)] = 12,
+			// equal or less player count (more is better), equal or earlier player side (more is better) or unspecified or later player side (less is better)
+			(SectionKind.StyleSingle, >= SubSectionKind.SheetStartP2) => (13, 1, (int)ssk),
+			(SectionKind.NonStyle, >= SubSectionKind.SheetStartP2) => (14, 1, (int)ssk),
+			(<= SectionKind.StyleUnrecognized, >= SubSectionKind.SheetStartP2) => (15, 1, (int)ssk),
 
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP2)] = 13,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP2)] = 14,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP2)] = 15,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP2)] = 16,
-			},
-			// seqNo 2
-			new Dictionary<SectionKindAndSubSectionKind, int>
-			{
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP2)] = 1,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP2)] = 2,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP2)] = 3,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP2)] = 4,
+			// more player count (less is better), unspecified or later player side (less is better)
+			(>= SectionKind.StyleDouble, >= SubSectionKind.SheetStartP2) => (16, (int)sk, (int)ssk),
+		}
+		: (sk, ssk) => (sk, ssk) switch {
+			// Non-sheets have best rank
+			(_, <= SubSectionKind.NonSheet) => (0, 0, 0),
 
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartUnrecognized)] = 5,
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartBare)] = 6,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartUnrecognized)] = 7,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartBare)] = 8,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized)] = 9,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartBare)] = 10,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartUnrecognized)] = 11,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartBare)] = 12,
+			// equal or less player count (more is better), correct player side
+			(>= SectionKind.StyleSingle, >= SubSectionKind.SheetStartP1)
+				when (int)sk == playerCount && (int)ssk == playerSide % (int)sk + 1 => (1, 0, 0),
+			(SectionKind.StyleUnrecognized, >= SubSectionKind.SheetStartP1)
+				when (int)ssk == playerSide + 1 => (2, 0, 0),
+			(SectionKind.NonStyle, >= SubSectionKind.SheetStartP1)
+				when (int)ssk == playerSide + 1 => (3, 0, 0),
+			(>= SectionKind.StyleSingle, >= SubSectionKind.SheetStartP1)
+				when (int)sk < playerCount && (int)ssk == playerSide % (int)sk + 1 => (4, -(int)sk, 0),
 
-				[new(SectionKind.StyleDouble, SubSectionKind.SheetStartP1)] = 13,
-				[new(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartP1)] = 14,
-				[new(SectionKind.NonStyle, SubSectionKind.SheetStartP1)] = 15,
-				[new(SectionKind.StyleSingle, SubSectionKind.SheetStartP1)] = 16,
-			},
+			// equal or less player count (more is better), unspecified player side
+			(>= SectionKind.StyleSingle, SubSectionKind.SheetStartBare)
+				when (int)sk == playerCount => (5, 0, 0),
+			(>= SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized)
+				when (int)sk == playerCount => (6, 0, 0),
+			(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartBare) => (7, 0, 0),
+			(SectionKind.StyleUnrecognized, SubSectionKind.SheetStartUnrecognized) => (8, 0, 0),
+			(>= SectionKind.StyleSingle, SubSectionKind.SheetStartBare)
+				when (int)sk < playerCount => (9, -(int)sk, 0),
+			(>= SectionKind.StyleSingle, SubSectionKind.SheetStartUnrecognized)
+				when (int)sk < playerCount => (10, -(int)sk, 0),
+			(<= SectionKind.NonStyle, SubSectionKind.SheetStartBare) => (11, 0, 0),
+			(<= SectionKind.NonStyle, SubSectionKind.SheetStartUnrecognized) => (12, 0, 0),
+
+			// equal or less player count (more is better), equal or earlier player side (more is better) or unspecified or later player side (less is better)
+			(>= SectionKind.StyleSingle, >= SubSectionKind.SheetStartP1)
+				when (int)sk == playerCount && (int)ssk <= playerSide + 1 => (13, 0, -(int)ssk),
+			(>= SectionKind.StyleSingle, _)
+				when (int)sk == playerCount => (13, 1, (int)ssk),
+			(SectionKind.StyleUnrecognized, >= SubSectionKind.SheetStartP1)
+				when (int)ssk <= playerSide + 1 => (14, 0, -(int)ssk),
+			(SectionKind.StyleUnrecognized, _) => (14, 1, (int)ssk),
+			(<= SectionKind.NonStyle, >= SubSectionKind.SheetStartP1)
+				when (int)ssk <= playerSide + 1 => (15, 0, -(int)ssk),
+			(<= SectionKind.NonStyle, _) => (15, 1, (int)ssk),
+			(>= SectionKind.StyleSingle, >= SubSectionKind.SheetStartP1)
+				when (int)sk < playerCount && (int)ssk <= playerSide + 1 => (16, -(int)sk, -(int)ssk),
+			(>= SectionKind.StyleSingle, _)
+				when (int)sk < playerCount => (17, -(int)sk, (int)ssk),
+
+			// more player count (less is better), equal or earlier player side (more is better) or unspecified or later player side (less is better)
+			(>= SectionKind.StyleSingle, >= SubSectionKind.SheetStartP1)
+				when (int)ssk <= playerSide + 1 => (18, (int)sk, -(int)ssk),
+			(>= SectionKind.StyleSingle, _) => (19, (int)sk, (int)ssk),
 		};
 
-	public static string tセッション譜面がある(string strTJAGlobal, string strTJACourse, Difficulty difficulty, int seqNo, string strファイル名の絶対パス) {
+	public static (string upperHeaders, string sheet) tセッション譜面がある(
+		string strTJAGlobal, string strTJACourse, Difficulty difficulty, int playerCount, int playerSide, string strファイル名の絶対パス
+		) {
 		void TraceError(string subMessage) {
 			Trace.TraceError(FormatTraceMessage(subMessage));
 		}
 
 		string FormatTraceMessage(string subMessage) {
-			return $"{nameof(CDTXStyleExtractor)} {subMessage} (seqNo={seqNo}, {strファイル名の絶対パス})";
+			return $"{nameof(CDTXStyleExtractor)} {subMessage} (playerCount={playerCount}, playerSide={playerSide}, {strファイル名の絶対パス})";
 		}
 
 		//入力された譜面がnullでないかチェック。
 		if (string.IsNullOrEmpty(strTJAGlobal) && string.IsNullOrEmpty(strTJACourse)) {
 			TraceError("is returning its input value early due to null or empty strTJA.");
-			return "";
+			return ("", "");
 		}
 		strTJAGlobal ??= "";
 		strTJACourse ??= "";
 
 		var sections = GetSections(strTJAGlobal, strTJACourse);
 		SubdivideSectionsIntoSubSections(sections);
-		RankSheets(seqNo, sections);
+		RankSheets(playerCount, playerSide, sections);
 
-		int bestPostCourseRank, bestRank;
+		int bestPostCourseRank;
+		SheetRank bestRank;
 		try {
 			(bestPostCourseRank, bestRank) = GetBestRank(difficulty, sections);
 		} catch (Exception) {
 			TraceError("is returning its input value early due to an inability to determine the best rank. This can occur if a course contains no #START.");
-			return (strTJAGlobal ?? "") + (strTJACourse ?? "");
+			return ("", (strTJAGlobal ?? "") + (strTJACourse ?? ""));
 		}
 
-		var (idxSection, idxSubSection) = MarkSkippedSheetsOtherThanTheBestRanked(sections, bestPostCourseRank, bestRank);
+		var (idxSection, idxSubSection, sheet) = SelectBestRankedSheet(sections, bestPostCourseRank, bestRank);
 		MarkSkippedRecognizedStyleSectionsWithoutSheets(sections);
 		RemoveStyleSectionSubSectionsBeyondTheSelectedSheet(sections, idxSection, idxSubSection);
-		return Reassemble(sections);
+		return (ReassembleUpperHeaders(sections), sheet);
 	}
 
 	// 1. Break the string up into top-level sections of the following types, recording pre- or post- COURSE:
 	//   a) STYLE Single
 	//   b) STYLE Double/Couple
-	//   c) STYLE unrecognized
-	//   d) non-STYLE
+	//   c) STYLE N
+	//   d) STYLE unrecognized
+	//   e) non-STYLE
 	private static List<Section> GetSections(string strTJAGlobal, string strTJACourse) {
 		return SectionSplitRegex.Split(strTJAGlobal)
 			.Select(style => new Section(false, GetSectionKind(style), style))
@@ -195,12 +207,13 @@ public static class CDTXStyleExtractor {
 	}
 
 	private static SectionKind GetSectionKind(string section) {
-		if (StyleSingleSectionMatchRegex.IsMatch(section)) {
-			return SectionKind.StyleSingle;
-		}
-
-		if (StyleDoubleSectionMatchRegex.IsMatch(section)) {
-			return SectionKind.StyleDouble;
+		var match = StyleNSectionMatchRegex.Match(section);
+		if (match.Success) {
+			try {
+				return (SectionKind)strConvertStyle(match.Groups[1].Value);
+			} catch (FormatException) {
+				return SectionKind.StyleUnrecognized;
+			}
 		}
 
 		if (StyleUnrecognizedSectionMatchRegex.IsMatch(section)) {
@@ -211,14 +224,18 @@ public static class CDTXStyleExtractor {
 	}
 
 	private enum SectionKind {
-		StyleSingle,
-		StyleDouble,
-		StyleUnrecognized,
-		NonStyle
+		NonStyle = -1,
+		StyleUnrecognized = 0,
+		StyleSingle = 1,
+		StyleDouble = 2,
+		// StyleN = N, ...
 	}
 
 	private sealed class Section {
+		public static int GetPostCourseRank(bool isPostCourse) => isPostCourse ? 0 : 1;
+
 		public readonly bool IsPostCourse;
+		public int PostCourseRank => GetPostCourseRank(IsPostCourse);
 		public readonly SectionKind SectionKind;
 		public readonly string OriginalRawValue;
 
@@ -233,11 +250,10 @@ public static class CDTXStyleExtractor {
 	}
 
 	// 2. Within the top-level sections, break each up into sub-sections of the following types:
-	//   a) sheet START P1
-	//   b) sheet START P2
-	//   c) sheet START bare
-	//   d) sheet START unrecognized
-	//   e) non-sheet
+	//   a) sheet START PN
+	//   b) sheet START bare
+	//   c) sheet START unrecognized
+	//   d) non-sheet
 	private static void SubdivideSectionsIntoSubSections(IEnumerable<Section> sections) {
 		foreach (var section in sections) {
 			section.SubSections = SubSectionSplitRegex
@@ -248,16 +264,17 @@ public static class CDTXStyleExtractor {
 	}
 
 	private static SubSectionKind GetSubsectionKind(string subsection) {
+		var match = SheetStartPnMatchRegex.Match(subsection);
+		if (match.Success) {
+			try {
+				return (SubSectionKind)int.Parse(match.Groups[1].Value);
+			} catch (FormatException) {
+				return SubSectionKind.SheetStartUnrecognized;
+			}
+		}
+
 		if (SheetStartBareMatchRegex.IsMatch(subsection)) {
 			return SubSectionKind.SheetStartBare;
-		}
-
-		if (SheetStartP1MatchRegex.IsMatch(subsection)) {
-			return SubSectionKind.SheetStartP1;
-		}
-
-		if (SheetStartP2MatchRegex.IsMatch(subsection)) {
-			return SubSectionKind.SheetStartP2;
 		}
 
 		if (SheetStartUnrecognizedMatchRegex.IsMatch(subsection)) {
@@ -268,18 +285,19 @@ public static class CDTXStyleExtractor {
 	}
 
 	private enum SubSectionKind {
-		SheetStartP1,
-		SheetStartP2,
-		SheetStartBare,
-		SheetStartUnrecognized,
-		NonSheet
+		NonSheet = -2,
+		SheetStartBare = -1,
+		SheetStartUnrecognized = 0,
+		SheetStartP1 = 1,
+		SheetStartP2 = 2,
+		// SheetStartPN = N, ...
 	}
 
 	private sealed class SubSection {
 		public readonly SubSectionKind SubSectionKind;
 		public readonly string OriginalRawValue;
 
-		public int Rank;
+		public SheetRank Rank;
 		public bool Skipped;
 
 		public SubSection(SubSectionKind subSectionKind, string originalRawValue) {
@@ -288,38 +306,35 @@ public static class CDTXStyleExtractor {
 		}
 	}
 
-	// 3. For the current seqNo, rank the found sheets
-	//    using a per-seqNo set of rankings for each
+	// 3. For the current playerCount and playerSide, rank the found sheets
+	//    using a per-playerCount and per-playerSide set of rankings for each
 	//    relevant section/subsection combination.
 	//    Non-sheets (header sections) have the best rank.
-	private static void RankSheets(int seqNo, IList<Section> sections) {
-		var sheetRanksBySectionKindAndSubSectionKind = SeqNoSheetRanksBySectionKindAndSubSectionKind[((seqNo - 1) % 2) + 1];
+	private static void RankSheets(int playerCount, int playerSide, IList<Section> sections) {
+		var ranker = GetRanker(playerCount, playerSide);
 		foreach (var section in sections) {
 			foreach (var subSection in section.SubSections) {
 				if (subSection.SubSectionKind != SubSectionKind.NonSheet)
-					subSection.Rank = sheetRanksBySectionKindAndSubSectionKind[new(section.SectionKind, subSection.SubSectionKind)];
+					subSection.Rank = ranker(section.SectionKind, subSection.SubSectionKind);
 			}
 		}
 	}
 
-	private readonly record struct SectionKindAndSubSectionKind(SectionKind SectionKind, SubSectionKind SubSectionKind);
-
 	// 4. Determine the best-ranked sheet. Pre-COURSE: sheets have worst ranks if current difficulty is Oni, or otherwise skipped entirely.
-	private static (int postCourseRank, int rank) GetBestRank(Difficulty difficulty, IList<Section> sections) {
+	private static (int postCourseRank, SheetRank rank) GetBestRank(Difficulty difficulty, IList<Section> sections) {
 		return sections
 			.SelectMany(s => s.SubSections.Select(ss => (post: s.IsPostCourse, ss)))
 			.Where(pss => (pss.post || (difficulty == Difficulty.Oni)) && pss.ss.SubSectionKind != SubSectionKind.NonSheet)
-			.Min(pss => (pss.post ? 0 : 1, pss.ss.Rank));
+			.Min(pss => (Section.GetPostCourseRank(pss.post), pss.ss.Rank));
 	}
 
-	// 5. Mark sheets other than the best-ranked to be skipped, keeping non-sheets
-	private static (int idxSection, int idxSubSection) MarkSkippedSheetsOtherThanTheBestRanked(IList<Section> sections, int bestPostCourseRank, int bestRank) {
+	// 5. Select and return the best-ranked sheet and its immediate header (contains #HBSCROLL and on), mark all sheets to be skipped from upper headers
+	private static (int idxSection, int idxSubSection, string section) SelectBestRankedSheet(IList<Section> sections, int bestPostCourseRank, SheetRank bestRank) {
 		// We can safely remove based on > bestRank because the subsection types
 		// which are never removed always have a Rank value of 0.
 
 		foreach (var section in sections) {
-			var postCourseRank = section.IsPostCourse ? 0 : 1;
-			foreach (var o in section.SubSections.Where(o => (o.Rank != 0) && (postCourseRank, o.Rank).CompareTo((bestPostCourseRank, bestRank)) > 0))
+			foreach (var o in section.SubSections.Where(o => o.SubSectionKind != SubSectionKind.NonSheet))
 				o.Skipped = true;
 		}
 
@@ -327,15 +342,13 @@ public static class CDTXStyleExtractor {
 		// take the first and remove the rest.
 		var bestRankedSheets = sections
 			.SelectMany((s, i) => s.SubSections.Select((ss, j) => (s, i, ss, j)))
-			.Where(sissj => sissj.ss.Rank == bestRank);
+			.Where(sissj => sissj.s.PostCourseRank == bestPostCourseRank && sissj.ss.Rank == bestRank);
 
-		var firstBestRangedSheet = bestRankedSheets.First();
-
-		var extraRankedSheets = bestRankedSheets.Skip(1);
-		foreach (var (s, i, ss, j) in extraRankedSheets)
-			ss.Skipped = true;
-
-		return (firstBestRangedSheet.i, firstBestRangedSheet.j);
+		var (s, i, ss, j) = bestRankedSheets.First();
+		string sheet = ss.OriginalRawValue;
+		if (j > 0 && s.SubSections[j - 1].SubSectionKind == SubSectionKind.NonSheet) // has immediate header
+			sheet = s.SubSections[j - 1].OriginalRawValue + sheet;
+		return (i, j, sheet);
 	}
 
 	// 6. Mark top-level STYLE-type sections which no longer contain a sheet to be skipped
@@ -361,8 +374,8 @@ public static class CDTXStyleExtractor {
 		subSections.RemoveRange(idxSubSectionSelected + 1, subSections.Count - 1 - idxSubSectionSelected);
 	}
 
-	// 8. Reassemble the string
-	private static string Reassemble(List<Section> sections) {
+	// 8. Reassemble the upper header string
+	private static string ReassembleUpperHeaders(List<Section> sections) {
 		var sb = new StringBuilder();
 
 		foreach (var section in sections) {

@@ -53,6 +53,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "Перезагружает папки песен.",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "Перезагрузка песен (Жёсткая)",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Удаляет существующую базу данных и\nперезагружает папки песен с нуля.",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " Список песен загружается.\n         Пожалуйста, подождите...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Импортировать Score.ini файлы",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Импортирует Score.ini файлы в базу данных.\n\n<c.#f0ad4e>ВНИМАНИЕ\nСледующее передано не будет:\n- Завершение статусы\n- Модификаторы геймплея\n- Количества ударов\n   (Хорошо, OK, Плохо, Дроби, и т.д.)\n- Результаты за экзамен Дана",
@@ -64,6 +65,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Обработка {0} результата/ов...\n<c.#0bb000>{1} из {2} импортировано</c> (<c.#f0ad4e>{3} пропущено</c> / <c.#b00000>{4} неудачно</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Обновление результатов {0} игрока/ов...\n<c.#0bb000>{1} из {2} обновлено/c> (<c.#b00000>{3} не удалось</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "Спрятать Дан и Башни",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Скрыт партитуры Дан и Башен в меню Режима\nТайко.\nПримечание: Перезагрузите песни, чтобы\nнастройки вступили в силу.",

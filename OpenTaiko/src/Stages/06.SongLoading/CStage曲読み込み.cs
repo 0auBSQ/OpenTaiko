@@ -83,6 +83,7 @@ internal class CStage曲読み込み : CStage {
 					this.txサブタイトル = null;
 				}
 
+				_activateTime = DateTime.Now;
 			} catch (CTextureCreateFailedException e) {
 				Trace.TraceError(e.ToString());
 				Trace.TraceError("テクスチャの生成に失敗しました。({0})", new object[] { this.strSTAGEFILE });
@@ -94,7 +95,7 @@ internal class CStage曲読み込み : CStage {
 			string _danTitle = "";
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
 					&& OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null) {
-				var _bi = OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.n現在の選択行];
+				var _bi = OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.Cursor.IdxItem];
 				_danTick  = _bi.nDanTick;
 				_danR     = (int)_bi.cDanTickColor.R;
 				_danG     = (int)_bi.cDanTickColor.G;

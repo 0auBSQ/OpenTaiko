@@ -11,18 +11,16 @@ internal class CActImplJudgeText : CActivity {
 	}
 
 	public override void Activate() {
-		JudgeAnimes = new List<JudgeAnime>[5];
+		JudgeAnimes = new Queue<JudgeAnime>[5];
 		for (int i = 0; i < 5; i++) {
-			JudgeAnimes[i] = new List<JudgeAnime>();
+			JudgeAnimes[i] = [];
 		}
 		base.Activate();
 	}
 
 	public override void DeActivate() {
 		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < JudgeAnimes[i].Count; j++) {
-				JudgeAnimes[i][j] = null;
-			}
+			JudgeAnimes[i].Clear();
 		}
 		base.DeActivate();
 	}
@@ -31,12 +29,12 @@ internal class CActImplJudgeText : CActivity {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			for (int j = 0; j < 5; j++) {
-				for (int i = 0; i < JudgeAnimes[j].Count; i++) {
-					var judgeC = JudgeAnimes[j][i];
-					if (judgeC.counter.CurrentValue == judgeC.counter.EndValue) {
-						JudgeAnimes[j].RemoveAt(i--);
-						continue;
-					}
+				while (JudgeAnimes[j].TryPeek(out var judgeC)) {
+					if (judgeC.counter.CurrentValue != judgeC.counter.EndValue)
+						break;
+					JudgeAnimes[j].Dequeue();
+				}
+				foreach (var judgeC in JudgeAnimes[j]) {
 					judgeC.counter.Tick();
 
 					if (OpenTaiko.Tx.Judge != null) {
@@ -86,7 +84,7 @@ internal class CActImplJudgeText : CActivity {
 		int height = OpenTaiko.Tx.Judge.szTextureSize.Height / 5;
 		judgeAnime.rc = new Rectangle(0, (int)njudge * height, OpenTaiko.Tx.Judge.szTextureSize.Width, height);
 
-		JudgeAnimes[player].Add(judgeAnime);
+		JudgeAnimes[player].Enqueue(judgeAnime);
 	}
 
 	// その他
@@ -104,7 +102,7 @@ internal class CActImplJudgeText : CActivity {
 		[ENoteJudge.Mine] = 4,
 	};
 
-	private List<JudgeAnime>[] JudgeAnimes = new List<JudgeAnime>[5];
+	private Queue<JudgeAnime>[] JudgeAnimes = new Queue<JudgeAnime>[5];
 	private class JudgeAnime {
 		public ENoteJudge Judge;
 		public Rectangle rc;

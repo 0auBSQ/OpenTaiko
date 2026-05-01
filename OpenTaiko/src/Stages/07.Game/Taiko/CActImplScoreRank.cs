@@ -130,7 +130,7 @@ class CActImplScoreRank : CActivity {
 						#region [Ensou score ranks]
 
 						counter[player][i].Tick();
-						if (OpenTaiko.stageGameScreen.actScore.GetScore(player) >= ScoreRank[player][i]) {
+						if (OpenTaiko.stageGameScreen.actScore.Get(player) >= ScoreRank[player][i]) {
 							displayScoreRank(i, player, x, y);
 
 							#region [Legacy]

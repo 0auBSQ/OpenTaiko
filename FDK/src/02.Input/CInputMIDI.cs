@@ -10,8 +10,9 @@ public class CInputMIDI : CInputButtonsBase, IInputDevice, IDisposable {
 	public List<STInputEvent> EventBuffers;
 	protected int[] velocities;
 
-	public override int GetVelocity(int index) => velocities[index];
-	protected override void SetVelocity(int index, int velocity) => velocities[index] = velocity;
+	// update thread and input thread
+	public override int GetVelocity(int index) => Volatile.Read(ref velocities[index]);
+	protected override void SetVelocity(int index, int velocity) => Interlocked.Exchange(ref velocities[index], velocity);
 
 	// Constructor
 

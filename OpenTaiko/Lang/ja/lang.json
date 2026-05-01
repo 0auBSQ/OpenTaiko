@@ -53,6 +53,7 @@
 		"SETTINGS_SYSTEM_RELOADSONG_DESC": "曲データの一覧情報を取得し直します。",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE": "キャッシュをクリアして曲データ再読み込み",
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "キャッシュをクリアして曲データの一覧情報を取得し直します。",
+		"SETTINGS_SYSTEM_RELOADSONG_STATUS": "     曲データの一覧を\n       取得しています。\n   しばらくお待ちください。",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
@@ -64,6 +65,13 @@
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
 		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		// {0}: Total # of players to be processed
+		// {1}: # of players whose scores are successfully refreshed
+		// {2}: # of players currently processed
+		// {3}: # of players whose scores failed to import due to an error
+		// {4}: ID of the current player being processed.
+		// {5}: Name of the current player being processed.
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_HIDEDANTOWER": "段・タワー譜面省略",
 		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "演奏選曲画面にタワー及び\n段の譜面を省略設定です。\nONに設けると別々の画面\nにしか表示されていません。\n※ 設定は譜面の再読み込み時\n  に有効になります。",

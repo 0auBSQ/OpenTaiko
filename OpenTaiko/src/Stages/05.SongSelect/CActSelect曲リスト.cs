@@ -26,37 +26,12 @@ internal class CActSelect曲リスト : CActivity {
 			return Math.Sin(value * Math.PI / 2.0);
 		}
 	}
-	private int _nCurrentAnchorDifficultyLevel;
-	public int n現在のアンカ難易度レベル {
-		get => _nCurrentAnchorDifficultyLevel;
-		private set {
-			_nCurrentAnchorDifficultyLevel = value;
-			OpenTaiko.SongMount.nCurrentSongDifficulty = n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
-		}
-	}
-	public int n現在選択中の曲の現在の難易度レベル {
-		get {
-			return this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
-		}
-	}
-	public CScore r現在選択中のスコア {
-		get {
-			if (OpenTaiko.SongMount.rCurrentlySelectedSong != null) {
-				return OpenTaiko.SongMount.rCurrentlySelectedSong.score[this.n現在選択中の曲の現在の難易度レベル];
-			}
-			return null;
-		}
-	}
+
 	public int nSelectSongIndex {
 		get;
 		private set;
 	}
 	public TitleTextureKey? ttkNowUnlockConditionText = null;
-
-	public void ResetSongIndex() {
-		nSelectSongIndex = 0;
-		OpenTaiko.SongMount.rCurrentlySelectedSong = OpenTaiko.Songs管理.list曲ルート.ElementAtOrDefault(nSelectSongIndex);
-	}
 
 	public int nスクロールバー相対y座標 {
 		get;
@@ -74,58 +49,13 @@ internal class CActSelect曲リスト : CActivity {
 		this.nSelectSongIndex = 0;
 		OpenTaiko.SongMount.rCurrentlySelectedSong = null;
 
-		this.n現在のアンカ難易度レベル = Math.Min((int)Difficulty.Edit, OpenTaiko.ConfigIni.nDefaultCourse);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = Math.Min((int)Difficulty.Edit, OpenTaiko.ConfigIni.nDefaultCourse);
 		base.IsDeActivated = true;
 		this.bIsEnumeratingSongs = false;
 	}
 
 
 	// メソッド
-
-	// Closest level
-	public int n現在のアンカ難易度レベルに最も近い難易度レベルを返す(CSongListNode song) {
-		// 事前チェック。
-
-		if (song == null)
-			return this.n現在のアンカ難易度レベル;  // 曲がまったくないよ
-
-		if (song.score[this.n現在のアンカ難易度レベル] != null)
-			return this.n現在のアンカ難易度レベル;  // 難易度ぴったりの曲があったよ
-
-		if ((song.nodeType == CSongListNode.ENodeType.BOX) || (song.nodeType == CSongListNode.ENodeType.BACKBOX))
-			return 0;                               // BOX と BACKBOX は関係無いよ
-
-
-		// 現在のアンカレベルから、難易度上向きに検索開始。
-
-		int n最も近いレベル = this.n現在のアンカ難易度レベル;
-
-		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			if (song.score[n最も近いレベル] != null)
-				break;  // 曲があった。
-
-			n最も近いレベル = (n最も近いレベル + 1) % (int)Difficulty.Total;  // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
-		}
-
-
-		// 見つかった曲がアンカより下のレベルだった場合……
-		// アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
-
-		if (n最も近いレベル < this.n現在のアンカ難易度レベル) {
-			// 現在のアンカレベルから、難易度下向きに検索開始。
-
-			n最も近いレベル = this.n現在のアンカ難易度レベル;
-
-			for (int i = 0; i < (int)Difficulty.Total; i++) {
-				if (song.score[n最も近いレベル] != null)
-					break;  // 曲があった。
-
-				n最も近いレベル = ((n最も近いレベル - 1) + (int)Difficulty.Total) % (int)Difficulty.Total;    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
-			}
-		}
-
-		return n最も近いレベル;
-	}
 	public CSongListNode r指定された曲が存在するリストの先頭の曲(CSongListNode song) {
 		List<CSongListNode> songList = GetSongListWithinMe(song);
 		return (songList == null) ? null : songList[0];
@@ -135,7 +65,8 @@ internal class CActSelect曲リスト : CActivity {
 		return (songList == null) ? null : songList[songList.Count - 1];
 	}
 
-	private List<CSongListNode> GetSongListWithinMe(CSongListNode song) {
+	private List<CSongListNode>? GetSongListWithinMe(CSongListNode? song = null) {
+		song ??= OpenTaiko.SongMount.rCurrentlySelectedSong;
 		if (song.rParentNode == null)                   // root階層のノートだったら
 		{
 			return OpenTaiko.Songs管理.list曲ルート; // rootのリストを返す
@@ -157,7 +88,7 @@ internal class CActSelect曲リスト : CActivity {
 	/// <param name="eInst">ソート基準とする楽器</param>
 	/// <param name="order">-1=降順, 1=昇順</param>
 	public void t曲リストのソート(DGSortFunc sf, int order, params object[] p) {
-		List<CSongListNode> songList = GetSongListWithinMe(OpenTaiko.SongMount.rCurrentlySelectedSong);
+		List<CSongListNode>? songList = this.GetSongListWithinMe();
 		if (songList == null) {
 			// 何もしない;
 		} else {
@@ -189,7 +120,9 @@ internal class CActSelect曲リスト : CActivity {
 		this.ttkSelectedSongBPM = null;
 	}
 
-	public bool tOpenBOX() {
+	public bool tOpenBOX(CSongListNode? node = null) {
+		bool isFromCurrent = (node == null);
+		node ??= OpenTaiko.SongMount.rCurrentlySelectedSong;
 		//Trace.TraceInformation( "box enter" );
 		//Trace.TraceInformation( "Skin現在Current : " + CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) );
 		//Trace.TraceInformation( "Skin現在System  : " + CSkin.strSystemSkinSubfolderFullName );
@@ -199,12 +132,12 @@ internal class CActSelect曲リスト : CActivity {
 		//Trace.TraceInformation( "Skin指定: " + CSkin.GetSkinName( this.r現在選択中の曲.strSkinPath ) );
 		//Trace.TraceInformation( "Skinpath: " + this.r現在選択中の曲.strSkinPath );
 		bool ret = false;
-		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(OpenTaiko.SongMount.rCurrentlySelectedSong.strSkinPath)
+		if (CSkin.GetSkinName(OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false)) != CSkin.GetSkinName(node.strSkinPath)
 			&& CSkin.bUseBoxDefSkin) {
 			ret = true;
 			// BOXに入るときは、スキン変更発生時のみboxdefスキン設定の更新を行う
 			OpenTaiko.Skin.SetCurrentSkinSubfolderFullName(
-				OpenTaiko.Skin.GetSkinSubfolderFullNameFromSkinName(CSkin.GetSkinName(OpenTaiko.SongMount.rCurrentlySelectedSong.strSkinPath)), false);
+				OpenTaiko.Skin.GetSkinSubfolderFullNameFromSkinName(CSkin.GetSkinName(node.strSkinPath)), false);
 		}
 
 		//Trace.TraceInformation( "Skin変更: " + CSkin.GetSkinName( CDTXMania.Skin.GetCurrentSkinSubfolderFullName(false) ) );
@@ -216,21 +149,19 @@ internal class CActSelect曲リスト : CActivity {
 
 		// INFO: This null check is added due to `list子リスト` might be null during rapid sorting
 		//		Despite what editor tell you here it is possible to be null
-		if (OpenTaiko.SongMount.rCurrentlySelectedSong != null &&
-			OpenTaiko.SongMount.rCurrentlySelectedSong.childrenList != null &&
-			OpenTaiko.SongMount.rCurrentlySelectedSong.childrenList.Count != 1) {
+		if (node != null && node.childrenList != null && node.childrenList.Count != 1) {
 			if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
-				OpenTaiko.SongMount.rCurrentlySelectedSong = OpenTaiko.SongMount.rCurrentlySelectedSong.childrenList[0];
+				if (isFromCurrent)
+					OpenTaiko.SongMount.rCurrentlySelectedSong = node.childrenList[0]; // save to history
 				nSelectSongIndex = 0;
-				tChangeSong(OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.Openindex);
+				tChangeSong(node.Openindex);
 			} else {
 				//実際には親フォルダを消さないように変更
-
-				OpenTaiko.SongMount.rCurrentlySelectedSong.bIsOpenFolder = true;
+				node.bIsOpenFolder = true;
 
 				// Previous index
-				int n回数 = OpenTaiko.SongMount.rCurrentlySelectedSong.Openindex;
-				if (OpenTaiko.SongMount.rCurrentlySelectedSong.Openindex >= OpenTaiko.SongMount.rCurrentlySelectedSong.childrenList.Count())
+				int n回数 = node.Openindex;
+				if (!isFromCurrent || node.Openindex >= node.childrenList.Count())
 					n回数 = 0;
 
 				tChangeSong(n回数);
@@ -270,43 +201,57 @@ internal class CActSelect曲リスト : CActivity {
 
 		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode != null) {
-				OpenTaiko.SongMount.rCurrentlySelectedSong = OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode;
-				OpenTaiko.SongMount.rCurrentlySelectedSong.Openindex = nSelectSongIndex;
-				tChangeSong(OpenTaiko.Songs管理.list曲ルート.IndexOf(OpenTaiko.SongMount.rCurrentlySelectedSong) - nSelectSongIndex);
+				var parent = OpenTaiko.SongMount.rCurrentlySelectedSong = OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode;
+				parent.Openindex = nSelectSongIndex;
+				parent.bIsOpenFolder = false;
+				tChangeSong(GetSongListWithinMe(parent)!.IndexOf(parent) - nSelectSongIndex);
 			}
 		} else {
 			// Reindex the parent node
-			List<CSongListNode> currentSongList = flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-			OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.Openindex = currentSongList.IndexOf(OpenTaiko.SongMount.rCurrentlySelectedSong) - currentSongList.IndexOf(OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.childrenList[0]);
-			OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
-			tChangeSong(-OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.Openindex);
+			if (OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode?.bIsOpenFolder ?? false) {
+				OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.Openindex = OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.childrenList.IndexOf(OpenTaiko.SongMount.rCurrentlySelectedSong);
+				OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.bIsOpenFolder = false;
+				tChangeSong(-OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.Openindex);
+			}
 
 
 		}
 
 		this.t現在選択中の曲を元に曲バーを再構成する();
 		this.t選択曲が変更された(false);                                 // #27648 項目数変更を反映させる
+		OpenTaiko.stageSongSelect.tNotifySelectedSongChange();
 		this.b選択曲が変更された = true;
 
 		return ret;
 	}
 
-
-	public List<CSongListNode> flattenList(List<CSongListNode> list, bool useOpenFlag = false) {
-		List<CSongListNode> ret = new List<CSongListNode>();
-
-		//foreach (var e in list)
+	public static (CSongListNode? node, int index) GetFromFlattenList(List<CSongListNode> list, bool useOpenFlag = false, int index = -1, bool wrap = true, CSongListNode? node = null) {
+		int nowIndex = 0;
 		for (int i = 0; i < list.Count; i++) {
 			var e = list[i];
-			if (!useOpenFlag || !e.bIsOpenFolder) ret.Add(e);
-
-			if (e.nodeType == CSongListNode.ENodeType.BOX &&
-				(!useOpenFlag || e.bIsOpenFolder)) {
-				ret.AddRange(flattenList(e.childrenList, useOpenFlag));
-			}
+			if (!useOpenFlag || !e.bIsOpenFolder) {
+				if (nowIndex == index || (node != null && e == node))
+					return (e, nowIndex);
+				++nowIndex;
 		}
 
-		return (ret);
+			if (e.nodeType == CSongListNode.ENodeType.BOX && (!useOpenFlag || e.bIsOpenFolder)) {
+				var (n, idx) = GetFromFlattenList(e.childrenList, useOpenFlag, index - nowIndex, wrap: false, node: node);
+				if (n != null)
+					return (n, nowIndex + idx);
+				nowIndex += idx;
+			}
+		}
+		if (nowIndex == 0)
+			return (null, 0); // empty list, nothing to get
+		if (wrap) {
+			// try wrap and find again
+			index %= nowIndex;
+			if (index < 0)
+				index += nowIndex;
+			return GetFromFlattenList(list, useOpenFlag, index, wrap: false, node: node);
+		}
+		return (null, nowIndex);
 	}
 
 	public void t現在選択中の曲を元に曲バーを再構成する() {
@@ -402,7 +347,7 @@ internal class CActSelect曲リスト : CActivity {
 			// 新しく最下部に表示されるパネル用のスキル値を取得。
 
 			for (int i = 0; i < 3; i++)
-				this.stバー情報[index].nスキル値[i] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[i];
+				this.stバー情報[index].nスキル値[i] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[i];
 
 
 			// 1行(100カウント)移動完了。
@@ -538,7 +483,7 @@ internal class CActSelect曲リスト : CActivity {
 			// 新しく最上部に表示されるパネル用のスキル値を取得。
 
 			for (int i = 0; i < 3; i++)
-				this.stバー情報[index].nスキル値[i] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[i];
+				this.stバー情報[index].nスキル値[i] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[i];
 
 
 			this.t選択曲が変更された(false);             // スクロールバー用に今何番目を選択しているかを更新
@@ -594,11 +539,11 @@ internal class CActSelect曲リスト : CActivity {
 
 		// 難易度レベルを＋１し、現在選曲中のスコアを変更する。
 
-		this.n現在のアンカ難易度レベル = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
 		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			this.n現在のアンカ難易度レベル = (this.n現在のアンカ難易度レベル + 1) % (int)Difficulty.Total;  // ５以上になったら０に戻る。
-			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[this.n現在のアンカ難易度レベル] != null)  // 曲が存在してるならここで終了。存在してないなら次のレベルへGo。
+			OpenTaiko.SongMount.nCurrentAnchorDifficulty = (OpenTaiko.SongMount.nCurrentAnchorDifficulty + 1) % (int)Difficulty.Total;  // ５以上になったら０に戻る。
+			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.SongMount.nCurrentAnchorDifficulty] != null)  // 曲が存在してるならここで終了。存在してないなら次のレベルへGo。
 				break;
 		}
 
@@ -610,7 +555,7 @@ internal class CActSelect曲リスト : CActivity {
 			var song = this.rGetSideSong(i);
 			int index = (i + OpenTaiko.Skin.SongSelect_Bar_Count) % OpenTaiko.Skin.SongSelect_Bar_Count;
 			for (int m = 0; m < 3; m++) {
-				this.stバー情報[index].nスキル値[m] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[m];
+				this.stバー情報[index].nスキル値[m] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[m];
 			}
 		}
 
@@ -630,19 +575,19 @@ internal class CActSelect曲リスト : CActivity {
 
 		// 難易度レベルを＋１し、現在選曲中のスコアを変更する。
 
-		this.n現在のアンカ難易度レベル = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(OpenTaiko.SongMount.rCurrentlySelectedSong);
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(OpenTaiko.SongMount.rCurrentlySelectedSong);
 
-		this.n現在のアンカ難易度レベル--;
-		if (this.n現在のアンカ難易度レベル < 0) // 0より下になったら4に戻す。
+		OpenTaiko.SongMount.nCurrentAnchorDifficulty--;
+		if (OpenTaiko.SongMount.nCurrentAnchorDifficulty < 0) // 0より下になったら4に戻す。
 		{
-			this.n現在のアンカ難易度レベル = 4;
+			OpenTaiko.SongMount.nCurrentAnchorDifficulty = 4;
 		}
 
 		//2016.08.13 kairera0467 かんたん譜面が無い譜面(ふつう、むずかしいのみ)で、難易度を最上位に戻せない不具合の修正。
 		bool bLabel0NotFound = true;
-		for (int i = this.n現在のアンカ難易度レベル; i >= 0; i--) {
+		for (int i = OpenTaiko.SongMount.nCurrentAnchorDifficulty; i >= 0; i--) {
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[i] != null) {
-				this.n現在のアンカ難易度レベル = i;
+				OpenTaiko.SongMount.nCurrentAnchorDifficulty = i;
 				bLabel0NotFound = false;
 				break;
 			}
@@ -650,7 +595,7 @@ internal class CActSelect曲リスト : CActivity {
 		if (bLabel0NotFound) {
 			for (int i = 4; i >= 0; i--) {
 				if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[i] != null) {
-					this.n現在のアンカ難易度レベル = i;
+					OpenTaiko.SongMount.nCurrentAnchorDifficulty = i;
 					break;
 				}
 			}
@@ -663,7 +608,7 @@ internal class CActSelect曲リスト : CActivity {
 			CSongListNode song = this.rGetSideSong(i);
 			int index = (i + OpenTaiko.Skin.SongSelect_Bar_Count) % OpenTaiko.Skin.SongSelect_Bar_Count;
 			for (int m = 0; m < 3; m++) {
-				this.stバー情報[index].nスキル値[m] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[m];
+				this.stバー情報[index].nスキル値[m] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[m];
 			}
 		}
 
@@ -688,7 +633,25 @@ internal class CActSelect曲リスト : CActivity {
 
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong != null)            // r現在選択中の曲==null とは、「最初songlist.dbが無かった or 検索したが1曲もない」
 			{
-				OpenTaiko.SongMount.rCurrentlySelectedSong = searchCurrentBreadcrumbsPosition(OpenTaiko.Songs管理.list曲ルート, OpenTaiko.SongMount.rCurrentlySelectedSong.strBreadcrumbs);
+				CSongListNode? node = searchCurrentBreadcrumbsPosition(OpenTaiko.Songs管理.list曲ルート, OpenTaiko.SongMount.rCurrentlySelectedSong.strBreadcrumbs);
+				if (node != null) {
+					// Mark parent folders as open and fix the indexes
+					for (var n = node; n != null; n = n.rParentNode) {
+						var index = OpenTaiko.ConfigIni.TJAP3FolderMode ? this.GetSongListWithinMe(n)!.IndexOf(n)
+							: GetFromFlattenList(this.GetSongListWithinMe(n)!, useOpenFlag: true, wrap: false, node: node).index;
+						if (n.rParentNode != null) {
+							n.rParentNode.bIsOpenFolder = true;
+							n.rParentNode.Openindex = index;
+						}
+					}
+					// Properly reopen folder
+					this.nSelectSongIndex = OpenTaiko.ConfigIni.TJAP3FolderMode ? 0
+						: GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, useOpenFlag: true, wrap: false, node: node).index;
+					if (node.rParentNode != null)
+						this.tOpenBOX(node.rParentNode);
+					OpenTaiko.SongMount.rCurrentlySelectedSong = null; // refresh history
+					OpenTaiko.SongMount.rCurrentlySelectedSong = node;
+				}
 				if (bRemakeSongTitleBar)                    // 選曲画面以外に居るときには再構成しない (非活性化しているときに実行すると例外となる)
 				{
 					this.t現在選択中の曲を元に曲バーを再構成する();
@@ -696,12 +659,14 @@ internal class CActSelect曲リスト : CActivity {
 				return;
 			}
 		}
-		if (this.IsActivated) {
+		// invalid old song entry
+		bool wasActivated = this.IsActivated;
+		if (wasActivated)
 			this.DeActivate();
-			OpenTaiko.SongMount.rCurrentlySelectedSong = null;
-			this.nSelectSongIndex = 0;
+		OpenTaiko.SongMount.rCurrentlySelectedSong = null;
+		this.nSelectSongIndex = 0;
+		if (wasActivated)
 			this.Activate();
-		}
 	}
 
 
@@ -712,14 +677,17 @@ internal class CActSelect曲リスト : CActivity {
 	/// <param name="ln">検索対象のList</param>
 	/// <param name="bc">検索するパンくずリスト(文字列)</param>
 	/// <returns></returns>
-	private CSongListNode searchCurrentBreadcrumbsPosition(List<CSongListNode> ln, string bc) {
+	private CSongListNode? searchCurrentBreadcrumbsPosition(List<CSongListNode> ln, string bc) {
 		foreach (CSongListNode n in ln) {
+			if (!bc.StartsWith(n.strBreadcrumbs)) // fast check for parent path
+				continue;
 			if (n.strBreadcrumbs == bc) {
 				return n;
 			} else if (n.childrenList != null && n.childrenList.Count > 0)  // 子リストが存在するなら、再帰で探す
 			{
-				CSongListNode r = searchCurrentBreadcrumbsPosition(n.childrenList, bc);
-				if (r != null) return r;
+				var r = searchCurrentBreadcrumbsPosition(n.childrenList, bc);
+				if (r != null)
+					return r;
 			}
 		}
 		return null;
@@ -2609,18 +2577,21 @@ internal class CActSelect曲リスト : CActivity {
 		return Eバー種別.Other;
 	}
 	private void tChangeSong(int change) {
-		List<CSongListNode> list = (OpenTaiko.ConfigIni.TJAP3FolderMode && OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode != null) ? OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.childrenList : flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-
 		int index = nSelectSongIndex + change;
 
-		while (index >= list.Count) {
-			index -= list.Count;
-		}
-		while (index < 0) {
-			index += list.Count;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
+			var list = this.GetSongListWithinMe()!;
+			while (index >= list.Count) {
+				index -= list.Count;
+			}
+			while (index < 0) {
+				index += list.Count;
+			}
+			OpenTaiko.SongMount.rCurrentlySelectedSong = list[index];
+		} else {
+			(OpenTaiko.SongMount.rCurrentlySelectedSong, index) = GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, true, index);
 		}
 		nSelectSongIndex = index;
-		OpenTaiko.SongMount.rCurrentlySelectedSong = list[index];
 
 		var IsSongLocked = OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(OpenTaiko.SongMount.rCurrentlySelectedSong);
 		if (IsSongLocked) {
@@ -2634,22 +2605,23 @@ internal class CActSelect曲リスト : CActivity {
 	public CSongListNode rGetSideSong(int change) {
 		if (OpenTaiko.SongMount.rCurrentlySelectedSong == null) return null;
 
-		List<CSongListNode> list = (OpenTaiko.ConfigIni.TJAP3FolderMode && OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode != null) ? OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode.childrenList : flattenList(OpenTaiko.Songs管理.list曲ルート, true);
-
-		if (list.Count <= 0) return null;
-
 		int index = nSelectSongIndex + change;
+		if (OpenTaiko.ConfigIni.TJAP3FolderMode) {
+			var list = this.GetSongListWithinMe()!;
+			if (list.Count <= 0) return null;
 
-		while (index >= list.Count) {
-			index -= list.Count;
+
+			while (index >= list.Count) {
+				index -= list.Count;
+			}
+			while (index < 0) {
+				index += list.Count;
+			}
+
+			return list[index];
 		}
-		while (index < 0) {
-			index += list.Count;
-		}
 
-		var _sideNode = list[index];
-
-		return _sideNode;
+		return GetFromFlattenList(OpenTaiko.Songs管理.list曲ルート, true, index).node;
 	}
 
 	public void tバーの初期化() {
@@ -2716,7 +2688,7 @@ internal class CActSelect曲リスト : CActivity {
 
 
 			for (int j = 0; j < 3; j++)
-				this.stバー情報[i].nスキル値[j] = (int)song.score[this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song)].譜面情報.最大スキル[j];
+				this.stバー情報[i].nスキル値[j] = (int)song.score[OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song)].譜面情報.最大スキル[j];
 
 			this.stバー情報[i].ttkタイトル = this.ttkGenerateSongNameTexture(this.stバー情報[i].strタイトル文字列, this.stバー情報[i].ForeColor, this.stバー情報[i].BackColor, stバー情報[i].eバー種別 == Eバー種別.Box ? this.pfBoxName : this.pfMusicName);
 		}
@@ -3095,7 +3067,7 @@ internal class CActSelect曲リスト : CActivity {
 	}
 
 	public int tFetchDifficulty(CSongListNode song) {
-		var closest = this.n現在のアンカ難易度レベルに最も近い難易度レベルを返す(song);
+		var closest = OpenTaiko.SongMount.FindClosestDifficultyToAnchor(song);
 		int defaultTable = Math.Max(0, Math.Min((int)Difficulty.Edit + 1, OpenTaiko.ConfigIni.nDefaultCourse));
 
 		if (song.score[defaultTable] == null)

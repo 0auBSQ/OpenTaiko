@@ -3,64 +3,44 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CActFIFOStart : CActivity {
+internal class CActFIFOStart : CActFIFOBase {
 	// メソッド
 
-	public void tフェードアウト開始() => tフェードアウト開始(false);
-	public void tフェードアウト開始(bool skipDelay) {
-		this.mode = EFIFOMode.FadeOut;
-
+	public override void tフェードアウト開始(int? start = null, int? end = null, int? interval = null)
+		=> tフェードアウト開始(false, start, end, interval);
+	public void tフェードアウト開始(bool skipDelay, int? start = null, int? end = null, int? interval = null) {
 		OpenTaiko.Skin.soundDanSelectBGM.tStop();
+
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			this.counter = new CCounter(skipDelay ? 1000 : 0, 1255, 1, OpenTaiko.Timer);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 1000 : 0), end ?? 1255, interval ?? 1);
 		else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			this.counter = new CCounter(skipDelay ? 2000 : 0, 5500, 1, OpenTaiko.Timer);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 2000 : 0), end ?? 5500, interval ?? 1);
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
-			this.counter = new CCounter(skipDelay ? 1000 : 0, 3580, 1, OpenTaiko.Timer);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 1000 : 0), end ?? 3580, interval ?? 1);
 		} else {
-			this.counter = new CCounter(skipDelay ? 2580 : 0, 3580, 1, OpenTaiko.Timer);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 2580 : 0), end ?? 3580, interval ?? 1);
 		}
 	}
-	public void tフェードイン開始() {
-		this.mode = EFIFOMode.FadeIn;
 
+	public override void tフェードイン開始(int? start = null, int? end = null, int? interval = null) {
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			this.counter = new CCounter(0, 255, 1, OpenTaiko.Timer);
+			base.StartFadeInCounter(start ?? 0, end ?? 255, interval ?? 1);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
 			return;
 		}
 		if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
+			base.StartFadeInCounter(start ?? 0, end ?? 3580, interval ?? 1);
 		} else {
-			this.counter = new CCounter(0, 3580, 1, OpenTaiko.Timer);
+			base.StartFadeInCounter(start ?? 0, end ?? 3580, interval ?? 1);
 		}
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(1000, i);
 		}
 	}
-	public void tフェードイン完了()     // #25406 2011.6.9 yyagi
-	{
-		this.counter.CurrentValue = (int)this.counter.EndValue;
-	}
 
 	// CActivity 実装
-
-	public override void DeActivate() {
-		//CDTXMania.tテクスチャの解放( ref this.tx幕 );
-		base.DeActivate();
-	}
-	public override void CreateManagedResource() {
-		//this.tx幕 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\6_FO.png" ) );
-		//	this.tx幕2 = CDTXMania.tテクスチャの生成( CSkin.Path( @"Graphics\6_FI.png" ) );
-		base.CreateManagedResource();
-	}
-	public override int Draw() {
-		if (base.IsDeActivated || (this.counter == null)) {
-			return 0;
-		}
-		this.counter.Tick();
-
+	public override int DrawSub() {
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
 			if (OpenTaiko.Tx.Tile_Black != null) {
 				OpenTaiko.Tx.Tile_Black.Opacity = this.mode == EFIFOMode.FadeOut ? -1000 + counter.CurrentValue : 255 - counter.CurrentValue;
@@ -157,17 +137,7 @@ internal class CActFIFOStart : CActivity {
 				}
 			}
 		}
-
-		if (this.mode == EFIFOMode.FadeOut) {
-			if (this.counter.CurrentValue != this.counter.EndValue) {
-				return 0;
-			}
-		} else if (this.mode == EFIFOMode.FadeIn) {
-			if (this.counter.CurrentValue != this.counter.EndValue) {
-				return 0;
-			}
-		}
-		return 1;
+		return 0;
 	}
 
 	private void DrawBack(CTexture ShowTex, double time, double max, double end, bool IsExit) {
@@ -228,16 +198,4 @@ internal class CActFIFOStart : CActivity {
 		//左キャラ
 		OpenTaiko.Tx.SongLoading_Chara.t2D描画(SizeXHarf + OpenTaiko.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 	}
-
-	// その他
-
-	#region [ private ]
-	//-----------------
-	private CCounter counter;
-	private CCounter ct待機;
-	private EFIFOMode mode;
-	//private CTexture tx幕;
-	//private CTexture tx幕2;
-	//-----------------
-	#endregion
 }

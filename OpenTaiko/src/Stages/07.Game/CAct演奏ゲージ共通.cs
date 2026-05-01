@@ -105,8 +105,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		float[] dbGaugeMaxComboValue_branch = new float[3];
 
 
-		if (nRiskyTimes_InitialVal > 0) {
-			this.bRisky = true;
+		this.bRisky = (nRiskyTimes_InitialVal > 0);
+		if (bRisky) {
 			this.nRiskyTimes[nPlayer] = OpenTaiko.ConfigIni.nRisky;
 			this.nRiskyTimes_Initial = OpenTaiko.ConfigIni.nRisky;
 		}
@@ -117,9 +117,9 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		float gaugeRate = 0f;
 		float dbDamageRate = 2.0f;
 
-		int nanidou = OpenTaiko.SongMount.nChoosenSongDifficulty[nPlayer];
+		int nanidou = this.DTX[nPlayer].nInstanceDifficulty;
 
-		switch (this.DTX[nPlayer].LEVELtaiko[nanidou]) {
+		switch (this.DTX[nPlayer].PlayerSideMetadata.LEVELtaiko) {
 			case 0:
 			case 1:
 			case 2:
@@ -292,8 +292,8 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			case ENoteJudge.Miss: {
 					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
 
-					int nanidou = OpenTaiko.SongMount.nChoosenSongDifficulty[nPlayer];
-					int level = this.DTX[nPlayer].LEVELtaiko[nanidou];
+					int level = this.DTX[nPlayer].PlayerSideMetadata.LEVELtaiko;
+					int nanidou = this.DTX[nPlayer].nInstanceDifficulty;
 
 					switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 						case HGaugeMethods.EGaugeType.HARD:

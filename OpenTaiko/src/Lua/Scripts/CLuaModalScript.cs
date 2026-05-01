@@ -3,23 +3,23 @@
 namespace OpenTaiko;
 
 internal class CLuaModalScript : CLuaScript {
-	private LuaFunction lfRegisterModal;
-	private LuaFunction lfAnimationFinished;
-	private LuaFunction lfUpdate;
-	private LuaFunction lfDraw;
+	private NamedLuaFunction lfRegisterModal = new("registerNewModal");
+	private NamedLuaFunction lfAnimationFinished = new("isAnimationFinished");
+	private NamedLuaFunction lfUpdate = new("update");
+	private NamedLuaFunction lfDraw = new("draw");
 
 	public CLuaModalScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
 
-		lfRegisterModal = (LuaFunction)LuaScript["registerNewModal"];
-		lfAnimationFinished = (LuaFunction)LuaScript["isAnimationFinished"];
-		lfUpdate = (LuaFunction)LuaScript["update"];
-		lfDraw = (LuaFunction)LuaScript["draw"];
+		lfRegisterModal.Load(LuaScript);
+		lfAnimationFinished.Load(LuaScript);
+		lfUpdate.Load(LuaScript);
+		lfDraw.Load(LuaScript);
 	}
 
 	// Function to retrieve if the currently playing modal animation (etc) finished playing, allowing to send the next modal
 	public bool AnimationFinished() {
 		if (!Available) return false;
-		bool result = (bool)RunLuaCode(lfAnimationFinished)[0];
+		bool result = (bool?)RunLuaCode(lfAnimationFinished)?[0] ?? true;
 		return result;
 	}
 

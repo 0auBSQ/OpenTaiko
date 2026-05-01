@@ -36,8 +36,8 @@ public class CFPS {
 		this.ChangedFPS = false;
 
 		const long INTERVAL = 1000;
-		this.DeltaTime = (this.FPSTimer.NowTimeMs - this.PrevFrameTime) / 1000.0;
-		PrevFrameTime = this.FPSTimer.NowTimeMs;
+		this.DeltaTime = (this.FPSTimer.NowTimeMs_Double - this.PrevFrameTime) / 1000.0;
+		PrevFrameTime = this.FPSTimer.NowTimeMs_Double;
 		while ((this.FPSTimer.NowTimeMs - this.BeginTime) >= INTERVAL) {
 			this.NowFPS = this.CoreFPS;
 			this.CoreFPS = 0;
@@ -54,7 +54,7 @@ public class CFPS {
 	//-----------------
 	private CTimer FPSTimer;
 	private long BeginTime;
-	private long PrevFrameTime;
+	private double PrevFrameTime;
 	private int CoreFPS;
 	//-----------------
 	#endregion

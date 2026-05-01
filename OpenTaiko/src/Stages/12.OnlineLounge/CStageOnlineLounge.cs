@@ -336,15 +336,18 @@ class CStageOnlineLounge : CStage {
 
 				#region [Fast return (Escape)]
 
-				OpenTaiko.Skin.soundCancelSFX.tPlay();
-
 				if (currentMenu == ECurrentMenu.MAIN) {
+					if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 					// Return to title screen
+						OpenTaiko.Skin.soundCancelSFX.tPlay();
 					OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
 					this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 					this.actFOtoTitle.tフェードアウト開始();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-				} else if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT) {
+					}
+				} else {
+					OpenTaiko.Skin.soundCancelSFX.tPlay();
+					if (currentMenu == ECurrentMenu.CDN_SELECT || currentMenu == ECurrentMenu.MULTI_SELECT) {
 					// Return to base menu
 					currentMenu = ECurrentMenu.MAIN;
 				} else if (currentMenu == ECurrentMenu.CDN_OPTION) {
@@ -356,6 +359,7 @@ class CStageOnlineLounge : CStage {
 				}
 
 				return 0;
+				}
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
@@ -366,15 +370,17 @@ class CStageOnlineLounge : CStage {
 				if (currentMenu == ECurrentMenu.MAIN) {
 					if (mainMenu[mainMenuIndex] == ECurrentMenu.CDN_SELECT || !IsDownloading) {
 						// Base menu
-						currentMenu = mainMenu[mainMenuIndex];
-						if (currentMenu == ECurrentMenu.RETURN) {
+						if (mainMenu[mainMenuIndex] == ECurrentMenu.RETURN) {
 							// Quit
+							if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 							OpenTaiko.Skin.soundCancelSFX.tPlay();
 							OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
 							this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
 							this.actFOtoTitle.tフェードアウト開始();
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+							}
 						} else {
+							currentMenu = mainMenu[mainMenuIndex];
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
 						}
 					} else {
@@ -537,17 +543,10 @@ class CStageOnlineLounge : CStage {
 				wc.Dispose();
 			}
 
-			// Fetch closest Download folder node
-			CSongListNode downloadBox = null;
-			for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
-				if (OpenTaiko.Songs管理.list曲ルート[i].songGenre == "Download") {
-					downloadBox = OpenTaiko.Songs管理.list曲ルート[i];
-					if (downloadBox.rParentNode != null) downloadBox = downloadBox.rParentNode;
-					break;
-				}
-			}
+			// Get the download folder root
+			CSongListNode? downloadBox = OpenTaiko.Songs管理.SongRootDownload;
 
-			// If there is at least one download folder, transfer the zip contents in it
+			// If the download folder exists, transfer the zip contents in it
 			if (downloadBox != null) {
 				var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
 				var genredPath = $@"{path}{Path.DirectorySeparatorChar}{song.Genre.genre}{Path.DirectorySeparatorChar}";
