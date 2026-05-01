@@ -155,13 +155,13 @@ namespace OpenTaiko {
 			return this.FindFirst((node) => node.UniqueId == id, _root);
 		}
 
-		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null) {
+		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null, bool includeLocked = false) {
 			List<LuaSongNode> _randomPool = new List<LuaSongNode>();
 
 			predicate ??= nd => true;
 			randomBoxLocation.Siblings.ForEach(node => {
-				if (node.IsSong && !node.IsLocked && predicate(node)) _randomPool.Add(node);
-				if (recursive == true && node.IsFolder) _randomPool.AddRange(FindAll(cnode => cnode.IsSong && !cnode.IsLocked && predicate(cnode), node));
+				if (node.IsSong && (includeLocked || !node.IsLocked) && predicate(node)) _randomPool.Add(node);
+				if (recursive == true && node.IsFolder) _randomPool.AddRange(FindAll(cnode => cnode.IsSong && (includeLocked || !cnode.IsLocked) && predicate(cnode), node));
 			});
 
 			if (_randomPool.Count == 0) return null;

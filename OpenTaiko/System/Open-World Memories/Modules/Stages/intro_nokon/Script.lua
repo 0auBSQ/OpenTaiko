@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter
 local DBScores  = require("DBControllers/dbScores")
 local Opening   = require("opening")
 local Setup     = require("setup")
@@ -124,7 +124,7 @@ local function selectRandomSongFromGenre(genreFolder)
         if songList == nil then return false end
         currentSongNode = songList:GetRandomNodeInFolder(songList:GetSelectedSongNode(), true, function(node)
             return songList:GetSelectedSongNode().Parent ~= node.Parent
-        end)
+        end, true)
         if currentSongNode == nil or currentSongNode.IsSong == false then return false end
         local lsls = GenerateSongListSettings()
         lsls.ModuloPagination     = false
@@ -147,7 +147,7 @@ local function selectRandomSongFromGenre(genreFolder)
     local genreSongList = RequestSongList(lsls)
     if genreSongList == nil then return false end
 
-    currentSongNode = genreSongList:GetRandomNodeInFolder(genreSongList:GetSelectedSongNode(), true)
+    currentSongNode = genreSongList:GetRandomNodeInFolder(genreSongList:GetSelectedSongNode(), true, nil, true)
     if currentSongNode == nil or currentSongNode.IsSong == false then return false end
 
     quizSongList = genreSongList
