@@ -58,6 +58,38 @@ local pageCache = {}
 -- Endurance end-of-game data
 local highScores = {}
 
+-- ── Per-player input sets ─────────────────────────────────────────────────────
+
+local INPUT_SETS = {
+    { right = "RightChange", left = "LeftChange", decide1 = "Decide",  decide2 = "Decide"  },
+    { right = "RBlue2P",     left = "LBlue2P",    decide1 = "RRed2P",  decide2 = "LRed2P"  },
+    { right = "RBlue3P",     left = "LBlue3P",    decide1 = "RRed3P",  decide2 = "LRed3P"  },
+    { right = "RBlue4P",     left = "LBlue4P",    decide1 = "RRed4P",  decide2 = "LRed4P"  },
+    { right = "RBlue5P",     left = "LBlue5P",    decide1 = "RRed5P",  decide2 = "LRed5P"  },
+}
+
+-- Enter = universal decide for any player; Escape = universal cancel.
+local function pDecide(p)
+    local inp = INPUT_SETS[p]
+    if inp == nil then return false end
+    return INPUT:Pressed(inp.decide1) or INPUT:Pressed(inp.decide2)
+        or INPUT:KeyboardPressed("Return")
+end
+
+local function pRight(p)
+    local inp = INPUT_SETS[p]
+    if inp == nil then return false end
+    return INPUT:Pressed(inp.right)
+        or (p == 1 and INPUT:KeyboardPressed("RightArrow"))
+end
+
+local function pLeft(p)
+    local inp = INPUT_SETS[p]
+    if inp == nil then return false end
+    return INPUT:Pressed(inp.left)
+        or (p == 1 and INPUT:KeyboardPressed("LeftArrow"))
+end
+
 -- ── Helpers ───────────────────────────────────────────────────────────────────
 
 local function pick(t)
@@ -203,7 +235,7 @@ eStartTurn = function()
 
     local sel = utils.getSelectedSong()
     correctUniqueId = sel and sel.UniqueId or nil
-    Stage.setBlackboard(sel and sel.Genre or "???")
+    Stage.setBlackboard(genre.Title or "???")
     utils.playSound("Question")  -- play when the genre name appears on the blackboard
     setState("e_genre")
 
@@ -537,15 +569,16 @@ function M.update()
     -- ── VS ────────────────────────────────────────────────────────────────────
 
     elseif state == "vs_genre" then
-        if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
+        local tp = vsTurnPlayer()
+        if pRight(tp) then
             vsGenreIdx = math.min(vsGenreIdx + 1, #vsGenres)
             if M._vsRebuildGenre then M._vsRebuildGenre() end
             SHARED:GetSharedSound("Skip"):Play()
-        elseif INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
+        elseif pLeft(tp) then
             vsGenreIdx = math.max(vsGenreIdx - 1, 1)
             if M._vsRebuildGenre then M._vsRebuildGenre() end
             SHARED:GetSharedSound("Skip"):Play()
-        elseif decide then
+        elseif pDecide(tp) then
             local genre = vsGenres[vsGenreIdx]
             Stage.setGenreList(nil, nil)
             Stage.setChip(nil)
@@ -554,11 +587,11 @@ function M.update()
 
             local sel = utils.getSelectedSong()
             correctUniqueId = sel and sel.UniqueId or nil
-            vsMaxScore  = utils.calculateMaxScore(genre)
+            vsMaxScore   = utils.calculateMaxScore(genre)
             vsRoundScore = vsMaxScore
-            vsDenied    = {}
+            vsDenied     = {}
 
-            Stage.setBlackboard(sel and sel.Genre or "???")
+            Stage.setBlackboard(genre.Title or "???")
             setState("vs_pregame")
             startWait(1, function()
                 utils.startPreview()
@@ -584,18 +617,12 @@ function M.update()
         end
         if vsAllDenied() then vsEvalFail(); return nil end
 
-        -- Buzz-in
+        -- Buzz-in: each player uses their own decide buttons
         for p = 1, numPlayers do
-            local buzzed = false
-            if p == 1 then buzzed = decide end
-            if p == 2 then buzzed = INPUT:Pressed("RRed2P") end
-            if p == 3 then buzzed = INPUT:Pressed("RRed3P") end
-            if p == 4 then buzzed = INPUT:Pressed("RRed4P") end
-            if p == 5 then buzzed = INPUT:Pressed("RRed5P") end
-            if buzzed and not vsDenied[p] then
-                vsScoreDropCtr = nil
+            if pDecide(p) and not vsDenied[p] then
+                vsScoreDropCtr    = nil
                 vsAnsweringPlayer = p
-                vsBuzzScore = vsRoundScore
+                vsBuzzScore       = vsRoundScore
                 utils.stopPreview()
                 utils.playSound("Answering")
                 Stage.setPlayerPressing(p, true)
@@ -609,22 +636,23 @@ function M.update()
         end
 
     elseif state == "vs_answer" then
-        if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then moveList(1)
-        elseif INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then moveList(-1)
+        local ap = vsAnsweringPlayer
+        if pRight(ap) then moveList(1)
+        elseif pLeft(ap) then moveList(-1)
         end
-        if clockMs <= 0 or decide then
+        if clockMs <= 0 or pDecide(ap) then
             stopClock()
-            Stage.setPlayerPressing(vsAnsweringPlayer, false)
+            Stage.setPlayerPressing(ap, false)
             Stage.setSongList(nil, nil)
             local sel = utils.getQuizList() and utils.getQuizList():GetSelectedSongNode()
             if sel and correctUniqueId and sel.UniqueId == correctUniqueId then
-                vsEvalWin(vsAnsweringPlayer, vsBuzzScore)
+                vsEvalWin(ap, vsBuzzScore)
             else
                 -- Wrong: deny player, fixed 10-point penalty; also reduce prize pool
-                vsDenied[vsAnsweringPlayer] = true
-                Stage.setPlayerDenied(vsAnsweringPlayer, true)
-                scores[vsAnsweringPlayer] = math.max(0, (scores[vsAnsweringPlayer] or 0) - 10)
-                Stage.setScore(vsAnsweringPlayer, scores[vsAnsweringPlayer])
+                vsDenied[ap] = true
+                Stage.setPlayerDenied(ap, true)
+                scores[ap] = math.max(0, (scores[ap] or 0) - 10)
+                Stage.setScore(ap, scores[ap])
                 utils.playSound("Wrong")
                 local drop = math.max(1, math.floor(vsMaxScore * 0.1))
                 vsRoundScore = math.max(0, vsRoundScore - drop)
