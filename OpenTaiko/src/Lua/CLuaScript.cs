@@ -105,6 +105,9 @@ class CLuaScript : IDisposable {
 	protected object[]? RunLuaCode(NamedLuaFunction luaFunction, params object[] args) {
 		try {
 			if (luaFunction.Func == null) {
+				// To prevent lag
+				return null;
+
 				Trace.TraceWarning($"{this.GetType().Name} Warning: [{this.strScriptShort}] Function [{luaFunction.Name}] is called but undefined");
 				Trace.TraceWarning($"Full script path: {this.strScriptPath}");
 				Trace.TraceWarning(new StackTrace(new StackFrame(1, true)).ToString());
