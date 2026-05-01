@@ -1,5 +1,94 @@
 # Changelog
 
+## [0.6.0.106] - 2026-05-01 (Beta)
+
+- [Fix] Custom metadata handling:
+- [Fix] Course-global metadata (`.FORCEGAUGE`, `.BOOMRULE`) ignored non-selected difficulties and headers past the selected player-side
+- [Fix] Respecifying custom metadata caused exception and prevented setting metadata, notably for overriding pre-`COURSE:` headers in individual COURSEs and for each player-side under same difficulty
+- [Fix] Separate (actual in-game) player-side custom metadata from (on song list) course-global metadata
+- [Fix] Separate and fix issues of (on song list) COURSE-global metadata and (in-game) player-side metadata:
+- [Fix] Misjudging branched chart for deduplicating unended roll or unknown note warning
+- [Fix] Make in-game LEVEL: use the value set for each player-side as in TaikoJiro (affects gauge difficulty and Discord gameplay status), making "deceptive star rating" work (0auBSQ/OpenTaiko#625)
+- [Fix] `#NM`/`BM`/`HBSCROLL` before `#START` affects next player-sides' charts
+- [Optimize+Enhance] Improve Kusudama multiplay matching:
+- [Optimize] Speed up multiplay Kusudama matching
+- [Enhance] Allow Kusudamas if in single play or if put almost consistently in branched section
+- [Enhance] Downgrade Kusudama to balloon if length does not almost match
+- [Enhance] Prevent multiple Kusudamas from matching to a single Kusudama and not downgrading to balloons
+- [Fix+] Multiplayer Kusudama handling (+ details)
+- [Fix] Properly handle overlapped Kusudamas as individual notes instead of accumulate pop count
+- [Fix] P2+ character(s) could not return to default animation after Kusudama clear or fail
+- [Enhance] Implement non-shin-uchi Potato (Kusudama) clear bonus (0auBSQ/OpenTaiko#297) (reduced bonus past bonus border, all players gain score when clear)
+- [Enhance] Reduce score per Kusudama hit in multiplayer: 1: 100pts, 2: 50pts, 3: 30pts, 4-5: 20pts
+- [Feat] Initial `#PARTNERNOTE` command support (0auBSQ/OpenTaiko#827) (only display notes' "hand"/link, if having neighbors)
+- [Fix] Wrongly selected first pre-`COURSE:` (Oni) charts matching current player-side when the intended chart (possible not Oni) is defined after `COURSE:`
+- [Feat] Support multiplayer chart beyond `STYLE:2` (accessible up to `STYLE:5` in game)
+- [Fix] 0.6.0.103 broke log file output due to wrong initializing order, cause found by _griefsyndrome & stephen-huan (0auBSQ/OpenTaiko#917)
+- [Fix] 0.6.0.103 made AI battle song-end animation played for AI
+- [Fix] 0.6.0.103 caused abnormal long fading out when exiting AI battle after song-end animation has been played
+- [Fix] AI battle sections were not finished and counted as failed when song ends before `#END`
+- [Fix] Recorded high score included last scored hit twice
+- [Fix] Gameplay failed immediately at start and notes seemed to be in `#SCROLL 0` after disabling Kanpeki mode after Kanpeki fail
+- [Fix] Autorolls were not disabled when failed mid-song
+- [Enhance] Stop counting judgements after failed mid-song
+- [Optimize] Major optimizing for note-count-heavy charts:
+- [Fix] Buffered input was never enabled until reloading Config.ini
+- [DeFeat] Remove the option to disable buffered input (now always enabled) to simplify input handling
+- [Feat] Allow finer input timestamp than draw FPS by polling input in a separate thread (period >= 1ms)
+- [Chore] Fix (unused) `CLagLogger` was not excluding Bongo rolls
+- [Fix] Report note hit offset was always positive
+- [Fix] Mid-branch `#GAMETYPE` affected notes from other branches
+- [Fix] Dan-i could give wrong result in result screen due to notes after song-end animation plays
+- [Feat] prevent pause (<kbd>Esc</kbd> and <kbd>F1</kbd>) buffering (back-ported from 0.6.1)
+- [Fix] Fuseroll explodes did not update Dan-i states immediately
+- [Feat] Penalize Boom judgement as BAD in AI battle mode
+- [Fix] Autoplay could still play hit-types notes after mid-song failure
+- [Fix] Prevent mid-song failure from being treated in result screen and from being recorded as clear
+- [Fix] Reloading song list in setting while song list is enumerating crashed the game, due to: 1. using no longer implemented `Thread.Abort()`; 2. resetting song index when song list is empty
+- [Optimize] Speed up `OnlineLounge` song list update by avoiding removing list elements in middle
+- [Feat] Properly remember cursor position in Dan-i and tower select menu (0auBSQ/OpenTaiko#664)
+- [Feat] Remember cursor position in last entered descendant folders in Dan-i and tower selection screen
+- [Fix] Dan-i and tower song select menu missed songs if a dan-i/tower root `box.def`'s song genre matches the keyword or if multiple dan-i/tower roots exist
+- [Fix] Online song downloaded to wrong folder if the download folder is not placed in the root song folder
+- [Enhance] Smoothen the animations in the song loading screen using async loading (back-ported from 0.6.1)
+- [Perf] Stop creating a temporary list of the entire expanded song list every time the cursor moves in song select menu
+- [Fix] Closing nested folder misplaced the selection cursor in TJAP3 folder mode (only show items in current folder)
+- [Fix] Reloading song list or <kbd>Esc</kbd> at result screen made song selection cursor jump to the root song folder
+- [Fix] Prevent desynced song state when closing song folder or reloading song list
+- [Fix] Best scores database was not reloaded after running Import Score.ini Files command (0auBSQ/OpenTaiko#681)
+- [Fix] `#GOGOSTART`/`END` in non-branched sections failed to set per-branch go-go state (for planned Jiro1 mode)
+- [Fix] `.BOOMRULE:Ratio`: Branched bombs & fuzerolls used wrong branch for gauge penalty at-or-after branch judge point and before actual branch point
+- [Enhance] Log C# stack trace for Lua errors
+- [Chore] Simplify simple Lua function calling using `RunLuaCode` for `ScriptBG`
+- [Fix] Calling missing Lua function now only emit a readable warning instead of hard error
+- [Enhance] Refine Lua errors by properly including (simplified) script file path and class name
+- [Fix] Pressing and releasing a key within 1 frame was ignored except for (now always buffered) gameplay input
+- [Fix] <kbd>Esc</kbd> issues: Spamming <kbd>Esc</kbd> restart exit animation in gameplay quit, dan-i select (also fix characters flicking), my room, online lounge (also fix "Return to main menu" hid menu); fix tower exit sound overlapped with menu sound
+- [Chore] Prevent caught exception for inserting implicit `#END` at music end if music does not exist or failed to load
+- [Fix] (Puchi) Character index out-of-range crashes (backported from 0.6.1)
+- [DeFeat] Remove the readme screen requiring <kbd>Enter</kbd> (backported from 0.6.1)
+- [Fix] File-global header `HEADSCROLL:` had no effects
+- [Chore] Show in-game `LEVEL:` and custom headers in `ImGui` debug window > Stage
+- [Fix] Extra regular balloon was drawn above currently rolling Fuze roll
+- [Enhance] Better Partner note display: Downgrade to non-Partner note if no neighbors (0auBSQ/OpenTaiko#829)
+- [Enhance] Better Partner note display: Hide hands/links to non-neighbors
+- [Chore] Simplify note drawing and update hands/links counter per frame, not per note
+- [Fix] Frame-interval-dependent animations were inaccurate due to loss of sub-ms precision (character, dancer, Lua scripts using `DeltaTime`)
+- [Fix] Partner note's links/hands misaligned by default except for SimpleStyle (720p)
+- [Fix] built-in dev skin: Playing dan-i consecutively made dan-i end animation only play properly for the first time
+- [Fix] Song title and gauge disappeared after failing mid-song or quitting song after song-end animation plays
+- [Feat] Update/cancel song-end/mid-song-fail animation when clear/dan-i status changes
+- [Fix] Red-passed less-type dan-i gauges failed to update to red-pass colors at end of play
+- [Fix] Section score cleared after last AI battle section
+- [Fix] Song-end/mid-song-fail animation failed to refresh on skin reload until played in different game mode (regular, Dan-i, Tower, & AI battle) (0auBSQ/OpenTaiko#914)
+- [i18n] Localize the "Now enumerating songs. Please wait..." message
+- [Chore] Fix line end broke scripts for Linux (0auBSQ/OpenTaiko#916)
+- [Chore] Fix install-dotnet-sdk.sh did not install .NET 8.0 required by current OpenTaiko, but installed .NET 7.0 instead
+- [Chore] replace singleton for floormanagement by play-scope instance (0.6.1)
+- [Chore] move some important variables out of `CStageSongSelect` (0.6.1)
+- [Chore] move currently selected song out of the song select class. (0.6.1)
+- [Chore] Make `CActFIFO*` classes all derived from abstract `CActFIFOBase` (new)
+
 ## [0.6.0.105] - 2026-04-04 (Beta)
 
 - [Enhancement] Increase the amount of coins obtained in Easy, Normal, Hard difficulties
