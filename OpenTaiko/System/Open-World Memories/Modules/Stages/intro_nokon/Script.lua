@@ -1,11 +1,14 @@
 local DBScores = require("DBControllers/dbScores")
+local Opening  = require("opening")
+local Setup    = require("setup")
 
-local text = nil
-local save = nil
+local text  = nil
+local texts = {}   -- text renderers for sub-screens (title, label)
+local save  = nil
 
 local playerNames = {}
 
-local sounds = {}
+local sounds   = {}
 local textures = {}
 
 local songList = nil
@@ -19,7 +22,7 @@ local songsEnumerated = false
 local highScoreRegistered = false
 
 -- Game state machine
-local state = "waiting_enum" -- waiting_enum, cutscene1, cutscene2, player_select, scope_select, intro,
+local state = "waiting_enum" -- waiting_enum, opening, setup, intro,
                                -- round_start, genre_select, song_playing, answering, answer_reveal,
                                -- results, solo_playing, solo_answering, solo_correct, solo_results, pride_modal
 
@@ -55,8 +58,6 @@ local bestScores = {
 }
 
 -- UI state variables
-local selectedPlayerOption = 1
-local selectedScopeOption = 1
 local selectedGenreIndex = 1
 local answerTimer = 0
 local answeringPlayer = 0
@@ -64,9 +65,8 @@ local availableGenres = {}
 local currentPageCache = {}
 local previewStarted = false
 
--- Cutscene
+-- Cutscene (kept for intro / round screens only)
 local cutsceneCounter = nil
-local cutsceneSkipped = false
 
 -- Timers using LuaCounters
 local roundStartCounter = nil
@@ -77,14 +77,6 @@ local prideModalCounter = nil
 ---------------------------------------
 -- Utility Functions
 ---------------------------------------
-
-local function startBGM()
-	-- Play BGM if available
-	if sounds.BGM ~= nil then
-			sounds.BGM:SetLoop(true)
-			sounds.BGM:Play()
-	end
-end
 
 local function stopBGM()
 	if sounds.BGM ~= nil then
@@ -440,119 +432,40 @@ local function handleWaitingEnum()
     -- Just wait, afterSongEnum will handle transition
 end
 
-local function handleCutscene1()
-    if cutsceneCounter == nil then
-        cutsceneCounter = COUNTER:CreateCounterDuration(0, 1, 5) -- 5 seconds
-        cutsceneCounter:Start()
+local function handleOpening()
+    local result = Opening.update()
+    if result == "start" then
+        state = "setup"
+        Setup.reset()
+    elseif result == "back" then
+        return true  -- exit to _title
     end
-
-    cutsceneCounter:Tick()
-
-    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") or
-       INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        cutsceneSkipped = true
-        SHARED:GetSharedSound("Decide"):Play()
-    end
-
-    -- Auto-advance after counter ends or if skipped
-    if cutsceneCounter.Value >= 1 or cutsceneSkipped then
-        state = "cutscene2"
-        cutsceneCounter = nil
-        cutsceneSkipped = false
-				startBGM()
-    end
+    return false
 end
 
-local function handleCutscene2()
-    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-        state = "player_select"
-        SHARED:GetSharedSound("Decide"):Play()
-        selectedPlayerOption = 1 -- Reset player selection
-				return false
-    end
-
-		if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        SHARED:GetSharedSound("Cancel"):Play()
-				stopBGM()
-				return true
-    end
-end
-
-local function handlePlayerSelect()
-    -- Select number of players (1-5) and rounds (for multiplayer)
-
-    if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
-        selectedPlayerOption = math.min(selectedPlayerOption + 1, 5)
-        SHARED:GetSharedSound("Skip"):Play()
-    end
-
-    if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
-        selectedPlayerOption = math.max(selectedPlayerOption - 1, 1)
-        SHARED:GetSharedSound("Skip"):Play()
-    end
-
-    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-        numPlayers = selectedPlayerOption
-
-        -- Set player count in config
+local function handleSetup()
+    local result = Setup.update()
+    if result == "back" then
+        Opening.resetToMenu()
+        state = "opening"
+    elseif result ~= nil then
+        -- result = {mode, players, songs}
+        numPlayers = result.players
+        songScope  = result.songs
         CONFIG.PlayerCount = numPlayers
-
-        if numPlayers == 1 then
-            -- Solo play, skip round selection
-            state = "scope_select"
-            numRounds = 999 -- Endless
-        else
-            -- TODO: Add round selection screen
-            state = "scope_select"
-            numRounds = 5 -- Default
-        end
-
-				stopBGM()
-        SHARED:GetSharedSound("Decide"):Play()
-        selectedScopeOption = 1 -- Reset scope selection
-        resetGame()
-    end
-
-    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        state = "cutscene2"
-        SHARED:GetSharedSound("Cancel"):Play()
-    end
-end
-
-local function handleScopeSelect()
-    -- Select song scope: OpTk, Customs, or All
-    local scopes = {"OpTk", "Customs", "All"}
-
-    if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") then
-        selectedScopeOption = math.min(selectedScopeOption + 1, 3)
-        SHARED:GetSharedSound("Skip"):Play()
-    end
-
-    if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
-        selectedScopeOption = math.max(selectedScopeOption - 1, 1)
-        SHARED:GetSharedSound("Skip"):Play()
-    end
-
-    if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-        songScope = scopes[selectedScopeOption]
-
-        -- Reload song list with new scope
         loadMainSongList()
-
-        if numPlayers == 1 then
+        resetGame()
+        stopBGM()
+        SHARED:GetSharedSound("Decide"):Play()
+        if result.mode == "Endurance" then
+            numRounds = 999
             state = "solo_intro"
         else
+            numRounds = 5
             state = "intro"
         end
-
-        SHARED:GetSharedSound("Decide"):Play()
     end
-
-    if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        state = "player_select"
-				startBGM()
-        SHARED:GetSharedSound("Cancel"):Play()
-    end
+    return false
 end
 
 local function handleIntro()
@@ -1128,12 +1041,11 @@ local function handleResults()
     -- Show final scores and winner
 
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
-        -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
-        state = "player_select"
-				startBGM()
+        state = "setup"
+        Setup.reset()
         SHARED:GetSharedSound("Decide"):Play()
-				return false
+        return false
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
@@ -1303,11 +1215,11 @@ local function handleSoloResults()
     if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
         -- Reset player count to original
         CONFIG.PlayerCount = originalPlayerCount
-				highScoreRegistered = false
-        state = "player_select"
-				startBGM()
+        highScoreRegistered = false
+        state = "setup"
+        Setup.reset()
         SHARED:GetSharedSound("Decide"):Play()
-				return false
+        return false
     end
 
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
@@ -1338,54 +1250,15 @@ function draw()
     -- textures["Background"]:Draw(0, 0)
 
     if state == "waiting_enum" then
-        -- Show loading message
         if text ~= nil then
-            local loadingText = text:GetText("Loading songs...")
-            loadingText:DrawAtAnchor(960, 540, "center")
+            text:GetText("Loading songs..."):DrawAtAnchor(960, 540, "center")
         end
 
-    elseif state == "cutscene1" then
-        -- Draw intro cutscene
-        if text ~= nil then
-            local cutsceneText = text:GetText("Intro Nokon Cutscene")
-            cutsceneText:DrawAtAnchor(960, 540, "center")
-            local skipText = text:GetText("Press any button to skip")
-            skipText:DrawAtAnchor(960, 600, "center")
-        end
+    elseif state == "opening" then
+        Opening.draw()
 
-    elseif state == "cutscene2" then
-        -- Draw title screen
-        if text ~= nil then
-            local titleText = text:GetText("MUSIC QUIZ MODE")
-            titleText:DrawAtAnchor(960, 400, "center")
-            local startText = text:GetText("Press DECIDE to start")
-            startText:DrawAtAnchor(960, 600, "center")
-        end
-
-    elseif state == "player_select" then
-        if text ~= nil then
-            local headerText = text:GetText("Select Number of Players")
-            headerText:DrawAtAnchor(960, 300, "center")
-
-            for i = 1, 5 do
-                local playerText = text:GetText(i .. " Player" .. (i > 1 and "s" or ""), false, 99999,
-                    i == selectedPlayerOption and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil)
-                playerText:DrawAtAnchor(960, 400 + i * 50, "center")
-            end
-        end
-
-    elseif state == "scope_select" then
-        if text ~= nil then
-            local headerText = text:GetText("Select Song Scope")
-            headerText:DrawAtAnchor(960, 300, "center")
-
-            local scopes = {"OpTk", "Customs", "All"}
-            for i, scope in ipairs(scopes) do
-                local scopeText = text:GetText(scope, false, 99999,
-                    i == selectedScopeOption and COLOR:CreateColorFromARGB(255, 242, 207, 1) or nil)
-                scopeText:DrawAtAnchor(960, 400 + i * 50, "center")
-            end
-        end
+    elseif state == "setup" then
+        Setup.draw()
 
     elseif state == "intro" or state == "solo_intro" then
         if text ~= nil then
@@ -1561,8 +1434,8 @@ function draw()
         end
     end
 
-    -- Draw nameplates for all players
-    if active then
+    -- Draw nameplates for all players (not during the opening sequence)
+    if active and state ~= "opening" and state ~= "setup" then
         for i = 0, CONFIG.PlayerCount - 1 do
             NAMEPLATE:DrawPlayerNameplate(20 + i * 370, 980, 255, i)
         end
@@ -1574,14 +1447,10 @@ function update()
 
     if state == "waiting_enum" then
         handleWaitingEnum()
-    elseif state == "cutscene1" then
-        handleCutscene1()
-    elseif state == "cutscene2" then
-        quitted = handleCutscene2()
-    elseif state == "player_select" then
-        handlePlayerSelect()
-    elseif state == "scope_select" then
-        handleScopeSelect()
+    elseif state == "opening" then
+        quitted = handleOpening()
+    elseif state == "setup" then
+        quitted = handleSetup()
     elseif state == "intro" then
         handleIntro()
     elseif state == "round_start" then
@@ -1621,21 +1490,18 @@ end
 
 function activate()
     save = GetSaveFile(0)
-		playerNames = {}
-		for i = 1, 5 do
-			playerNames[i] = GetSaveFile(i - 1).Name
-		end
+    playerNames = {}
+    for i = 1, 5 do
+        playerNames[i] = GetSaveFile(i - 1).Name
+    end
     active = true
 
-    -- Store original player count to restore later
     originalPlayerCount = CONFIG.PlayerCount
-
-    -- Load high scores
     loadHighScores()
 
-    -- Start at appropriate state
     if songsEnumerated then
-        state = "cutscene1"
+        state = "opening"
+        Opening.reset()
     else
         state = "waiting_enum"
     end
@@ -1645,64 +1511,74 @@ function deactivate()
     -- Reset player count to original
     CONFIG.PlayerCount = originalPlayerCount
 
-    -- Cleanup
-    for _, v in pairs(textures) do
-        if v ~= nil then
-            v:Dispose()
-        end
-    end
-
-		stopBGM()
-
+    stopBGM()
     stopSongPreview()
-
     active = false
 end
 
 function onStart()
     text = TEXT:Create(16)
 
-    -- Load sounds
-		sounds.Answering = SOUND:CreateSFX("Sounds/Answering.ogg")
-		sounds.Drumroll = SOUND:CreateSFX("Sounds/Drumroll.ogg")
-		sounds.KeyGot = SOUND:CreateSFX("Sounds/KeyGot.ogg")
-		sounds.Question = SOUND:CreateSFX("Sounds/Question.ogg")
-		sounds.ResultsMulti = SOUND:CreateSFX("Sounds/ResultsMulti.ogg")
-		sounds.ResultsSolo = SOUND:CreateSFX("Sounds/ResultsSolo.ogg")
-		sounds.Right = SOUND:CreateSFX("Sounds/Right.ogg")
-		sounds.Wrong = SOUND:CreateSFX("Sounds/Wrong.ogg")
-		sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg")
+    -- Sounds
+    sounds.BGM          = SOUND:CreateBGM("Sounds/BGM.ogg")
+    sounds.CurtainOpen  = SOUND:CreateSFX("Sounds/CurtainOpen.ogg")
+    sounds.Answering    = SOUND:CreateSFX("Sounds/Answering.ogg")
+    sounds.Drumroll     = SOUND:CreateSFX("Sounds/Drumroll.ogg")
+    sounds.KeyGot       = SOUND:CreateSFX("Sounds/KeyGot.ogg")
+    sounds.Question     = SOUND:CreateSFX("Sounds/Question.ogg")
+    sounds.ResultsMulti = SOUND:CreateSFX("Sounds/ResultsMulti.ogg")
+    sounds.ResultsSolo  = SOUND:CreateSFX("Sounds/ResultsSolo.ogg")
+    sounds.Right        = SOUND:CreateSFX("Sounds/Right.ogg")
+    sounds.Wrong        = SOUND:CreateSFX("Sounds/Wrong.ogg")
 
-    -- Load textures
-    -- textures["Background"] = TEXTURE:CreateTexture("Textures/QuizBackground.png")
-    -- textures["ModalBg"] = TEXTURE:CreateTexture("Textures/ModalBackground.png")
-    -- textures["PrideKey"] = TEXTURE:CreateTexture("Textures/PrideKey.png")
+    -- Opening textures
+    textures["Curtain"]     = TEXTURE:CreateTexture("Textures/Curtain.png")
+    textures["CurtainOpen"] = TEXTURE:CreateTexture("Textures/Curtain_Open.png")
+    textures["Background"]  = TEXTURE:CreateTexture("Textures/Background.png")
+    textures["Light"]       = TEXTURE:CreateTexture("Textures/Light.png")
+    textures["Logo"]        = TEXTURE:CreateTexture("Textures/Logo.png")
+    textures["Nokon2"]      = TEXTURE:CreateTexture("Textures/Nokon2.png")
+    textures["Start"]       = TEXTURE:CreateTexture("Textures/Start.png")
+    textures["Back"]        = TEXTURE:CreateTexture("Textures/Back.png")
+
+    -- Setup textures
+    textures["mode_endurance"]  = TEXTURE:CreateTexture("Textures/Options/GameMode/Endurance.png")
+    textures["mode_vs"]         = TEXTURE:CreateTexture("Textures/Options/GameMode/VS.png")
+    for i = 1, 5 do
+        textures["player_" .. i] = TEXTURE:CreateTexture("Textures/Options/PlayerCount/" .. i .. ".png")
+    end
+    textures["songs_optk"]      = TEXTURE:CreateTexture("Textures/Options/SongType/OpTk.png")
+    textures["songs_custom"]    = TEXTURE:CreateTexture("Textures/Options/SongType/Custom.png")
+    textures["songs_all"]       = TEXTURE:CreateTexture("Textures/Options/SongType/All.png")
+    textures["go"]              = TEXTURE:CreateTexture("Textures/Go.png")
+
+    -- Text renderers
+    texts.title = TEXT:Create(36)
+    texts.label = TEXT:Create(22)
+
+    Opening.init(textures, sounds)
+    Setup.init(textures, sounds, texts)
 end
 
 function afterSongEnum()
     songsEnumerated = true
     loadMainSongList()
 
-    -- If already active, transition from waiting screen
     if active and state == "waiting_enum" then
-        state = "cutscene1"
+        state = "opening"
+        Opening.reset()
     end
 end
 
 function onDestroy()
-    if text ~= nil then
-        text:Dispose()
-    end
+    if text ~= nil then text:Dispose() end
+    for _, t in pairs(texts) do if t ~= nil then t:Dispose() end end
 
     for _, sound in pairs(sounds) do
-        if sound ~= nil then
-            sound:Dispose()
-        end
+        if sound ~= nil then sound:Dispose() end
     end
 
     for _, texture in pairs(textures) do
-        if texture ~= nil then
-            texture:Dispose()
-        end
+        if texture ~= nil then texture:Dispose() end
     end
 end
