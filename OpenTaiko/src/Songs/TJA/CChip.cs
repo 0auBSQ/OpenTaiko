@@ -46,7 +46,10 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int KusudamaRollCount { get => KusudamaEnd.nRollCount; set => KusudamaEnd.nRollCount = value; }
 	public int KusudamaCount { get => KusudamaEnd.nBalloon; set => KusudamaEnd.nBalloon = value; }
 
-	public double msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
+	private double _msStoredHit = double.NegativeInfinity; // first hit of multi-hit notes, or last attempted autoplay hit, or last auto roll hit for rolls
+	public double msFirstMultiHit { get => _msStoredHit; set { _msStoredHit = value; eNoteState = ENoteState.Wait; } } // multi-hit notes
+	public double msAutoLastHit { get => _msStoredHit; set { _msStoredHit = value; eNoteState = ENoteState.None; } } // autoplay / autoroll
+
 	public EPad padStoredHit = EPad.Unknown;
 	public int nScrollDirection;
 	public ENoteState eNoteState;
@@ -71,8 +74,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	private int _n発声時刻ms;
 	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
 
-	public double n分岐時刻ms = double.PositiveInfinity; // Kusudama bonus border
-	public double msKusudamaBonusBorder { get => n分岐時刻ms; set => n分岐時刻ms = value; }
+	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
+	public double n分岐時刻ms { get => _msBorder; set => _msBorder = value; } // Branch judge chip
+	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
 	public double db発声時刻ms;
 
@@ -91,8 +95,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public bool IsPartnerNote = false;
 
-	public CChip start;
-	public CChip end;
+	public CChip start; // defaults to this, never null
+	public CChip end; // defaults to this, never null
 
 	public CChip?[,]? multiLink; // [iPlayer, iBranch]
 

@@ -12,27 +12,27 @@ internal class CActFIFOStart : CActFIFOBase {
 		OpenTaiko.Skin.soundDanSelectBGM.tStop();
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
-			base.tフェードアウト開始(start ?? (skipDelay ? 1000 : 0), end ?? 1255, interval ?? 1);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 1000 : 0), end ?? 1255, interval ?? 1);
 		else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			base.tフェードアウト開始(start ?? (skipDelay ? 2000 : 0), end ?? 5500, interval ?? 1);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 2000 : 0), end ?? 5500, interval ?? 1);
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] >= (int)Difficulty.Tower) {
-			base.tフェードアウト開始(start ?? (skipDelay ? 1000 : 0), end ?? 3580, interval ?? 1);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 1000 : 0), end ?? 3580, interval ?? 1);
 		} else {
-			base.tフェードアウト開始(start ?? (skipDelay ? 2580 : 0), end ?? 3580, interval ?? 1);
+			base.StartFadeOutCounter(start ?? (skipDelay ? 2580 : 0), end ?? 3580, interval ?? 1);
 		}
 	}
 
 	public override void tフェードイン開始(int? start = null, int? end = null, int? interval = null) {
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			base.tフェードイン開始(start ?? 0, end ?? 255, interval ?? 1);
+			base.StartFadeInCounter(start ?? 0, end ?? 255, interval ?? 1);
 
 			OpenTaiko.stageGameScreen.actDan.Start(OpenTaiko.stageGameScreen.ListDan_Number);
 			return;
 		}
 		if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			base.tフェードイン開始(start ?? 0, end ?? 3580, interval ?? 1);
+			base.StartFadeInCounter(start ?? 0, end ?? 3580, interval ?? 1);
 		} else {
-			base.tフェードイン開始(start ?? 0, end ?? 3580, interval ?? 1);
+			base.StartFadeInCounter(start ?? 0, end ?? 3580, interval ?? 1);
 		}
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; ++i) {
 			OpenTaiko.stageGameScreen.actLaneTaiko.BranchText_FadeIn(1000, i);

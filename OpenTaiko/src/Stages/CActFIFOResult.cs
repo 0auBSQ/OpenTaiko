@@ -6,9 +6,9 @@ internal class CActFIFOResult : CActFIFOBase {
 	// メソッド
 
 	public override void tフェードアウト開始(int? start = null, int? end = null, int? interval = null)
-		=> base.tフェードアウト開始(start ?? 0, end ?? 100, interval ?? 30);
+		=> base.StartFadeOutCounter(start ?? 0, end ?? 100, interval ?? 30);
 	public override void tフェードイン開始(int? start = null, int? end = null, int? interval = null)
-		=> base.tフェードイン開始(start ?? 0, end ?? 300, interval ?? 2);
+		=> base.StartFadeInCounter(start ?? 0, end ?? 300, interval ?? 2);
 
 	// CActivity 実装
 

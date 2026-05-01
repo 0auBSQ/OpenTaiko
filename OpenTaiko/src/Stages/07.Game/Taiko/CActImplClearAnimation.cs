@@ -28,7 +28,7 @@ internal class CActImplClearAnimation : CActivity {
 
 		// モードの決定。クリア失敗・フルコンボも事前に作っとく。
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.Tower_TopReached_Perfect;
@@ -40,7 +40,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Tower_Dropout;
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			// 段位認定モード。
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted())
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast())
 				&& !OpenTaiko.stageGameScreen.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong.DanSongs)
 				) {
 				// 段位認定モード、クリア成功
@@ -63,7 +63,7 @@ internal class CActImplClearAnimation : CActivity {
 				this.Mode[0] = EndMode.Dan_Fail;
 			}
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && OpenTaiko.stageGameScreen.bIsAIBattleWin) {
 				if (OpenTaiko.stageGameScreen.CChartScore[0].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[0].nMine == 0) {
 					if (OpenTaiko.stageGameScreen.CChartScore[0].nGood == 0)
 						this.Mode[0] = EndMode.AI_Win_Perfect;
@@ -78,7 +78,7 @@ internal class CActImplClearAnimation : CActivity {
 			// 通常のモード。
 			// ここでフルコンボフラグをチェックするが現時点ではない。
 			// 今の段階では魂ゲージ80%以上でチェック。
-			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageAborted()) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
+			if (!(OpenTaiko.stageGameScreen.IsStageFailed(iPlayer) || OpenTaiko.stageGameScreen.IsStageFailed_Fast()) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
 				if (OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMiss == 0 && OpenTaiko.stageGameScreen.CChartScore[iPlayer].nMine == 0)
 				//if (TJAPlayer3.stage演奏ドラム画面.nヒット数_Auto含まない.Drums.Miss == 0)
 				{
@@ -287,7 +287,7 @@ internal class CActImplClearAnimation : CActivity {
 	protected int Draw(int iPlayer, int nDrawnPlayers) {
 		if (this.ct進行メイン[iPlayer] != null) {
 			bool playerStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(iPlayer);
-			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageAborted() || OpenTaiko.stageGameScreen.IsStageCompleted()))
+			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageFailed_Fast() || OpenTaiko.stageGameScreen.IsStageCompleted()))
 				return 0;
 
 			this.ct進行メイン[iPlayer].Tick();

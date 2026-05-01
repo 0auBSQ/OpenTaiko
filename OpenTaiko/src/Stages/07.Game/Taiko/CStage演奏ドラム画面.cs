@@ -562,7 +562,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			EStageAbort minAbortType = this.MinStageAbortType;
 
 			// Transition for failed games
-			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageAborted()) {
+			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageFailed_Fast()) {
 				if (base.ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {
@@ -758,7 +758,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
-				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageAborted()
+				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
 				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
 				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
 				) {
@@ -810,7 +810,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 
 	protected override ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false) {
-		if (this.IsStageAborted()) // deny judgement
+		if (this.IsStageFailed_Fast()) // deny judgement
 			return ENoteJudge.Miss;
 
 		if (chipNoHit == null || rawJudge is ENoteJudge.Miss)
@@ -829,20 +829,20 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 					return skipHit ? rawJudge : this.tドラムヒット処理(msHitTjaTime, nPad, chipNoHit, false, nUsePlayer);
 				if (!skipHit) {
 					chipNoHit.eNoteState = ENoteState.Wait;
-					chipNoHit.msStoredHit = msHitTjaTime;
+					chipNoHit.msFirstMultiHit = msHitTjaTime;
 					chipNoHit.padStoredHit = nPad;
 				}
 				this.chipNowProcessingMultiHitNotes[nUsePlayer].Add(chipNoHit);
 				return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
 			} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 				bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
-				var msWaitedTime = msHitTjaTime - chipNoHit.msStoredHit;
+				var msWaitedTime = msHitTjaTime - chipNoHit.msFirstMultiHit;
 				if (_isExpected && msWaitedTime < OpenTaiko.ConfigIni.nBigNoteWaitTimems) {
 					if (skipHit)
 						return ENoteJudge.Perfect;
 					chipNoHit.eNoteState = ENoteState.None;
 					chipNoHit.padStoredHit = EPad.Unknown;
-					return this.tドラムヒット処理((long)chipNoHit.msStoredHit, nPad, chipNoHit, true, nUsePlayer);
+					return this.tドラムヒット処理((long)chipNoHit.msFirstMultiHit, nPad, chipNoHit, true, nUsePlayer);
 				}
 			}
 			return ENoteJudge.Miss;
@@ -1277,10 +1277,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
 
 				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-				var msWaitedTime = timeNow - (float)chipNoHit.msStoredHit;
+				var msWaitedTime = timeNow - (float)chipNoHit.msFirstMultiHit;
 				if (chipNoHit.eNoteState == ENoteState.Wait && msWaitedTime >= msMaxWaitTime) {
 					if (!_isSwapNote) {
-						this.tドラムヒット処理((long)chipNoHit.msStoredHit, EPad.Unknown, chipNoHit, false, i);
+						this.tドラムヒット処理((long)chipNoHit.msFirstMultiHit, EPad.Unknown, chipNoHit, false, i);
 						chipNoHit.padStoredHit = EPad.Unknown;
 						chipNoHit.bHit = true;
 						chipNoHit.IsHitted = true;

@@ -291,8 +291,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						double msError = Math.Max(Math.Abs(now.db発声時刻ms - min.db発声時刻ms), Math.Abs(now.end.db発声時刻ms - min.end.db発声時刻ms));
 						if (ReferenceEquals(now, min) || msError < msErrorMin) {
 							msErrorMin = msError;
-							idxNotes[i, b] = ic;
-							++idxNotes[i, b]; // exclude from future match
+							idxNotes[i, b] = ic + 1; // exclude from future match, leave previous matches unmatched
 							matchedNotes[i, b] = now;
 						}
 					}
@@ -844,7 +843,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				clearCount++;
 			}
 		}
-		bIsAIBattleWin = !(this.IsStageFailed(0) || this.IsStageAborted()) && clearCount >= this.AIBattleSections.Count / 2.0;
+		bIsAIBattleWin = !(this.IsStageFailed(0) || this.IsStageFailed_Fast()) && clearCount >= this.AIBattleSections.Count / 2.0;
 	}
 
 	private void AIRegisterInput(int nPlayer, float move) {
@@ -1028,7 +1027,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	private bool CanAutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted())
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast())
 			return false;
 		if (this.e指定時刻からChipのJUDGEを返す(msTjaTime, chip, iPlayer) is ENoteJudge.Miss) // less costly check
 			return false;
@@ -1046,8 +1045,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.ProcessPadInput(iPlayer, pad, msTjaTime);
 		}
 		// prevent further hit attempt (unless overridden)
-		chip.eNoteState = ENoteState.None;
-		chip.msStoredHit = double.PositiveInfinity;
+		chip.msAutoLastHit = double.PositiveInfinity;
 	}
 
 	private bool AutoplayTryHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
@@ -1058,7 +1056,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutoplayHit(CChip chip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msStoredHit > msTjaTime) {
+		if (!chip.bVisible || chip.IsMissed || chip.bHit || this.bPAUSE || chip.msAutoLastHit > msTjaTime) {
 			return;
 		}
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1068,20 +1066,19 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool canHitNow = this.CanAutoplayHit(chip, msTjaTime, iPlayer, gt);
 		if (chip.n発声時刻ms > msTjaTime) {
 			if (chip.eNoteState == ENoteState.None && canHitNow)
-				chip.msStoredHit = msTjaTime;
+				chip.msAutoLastHit = msTjaTime;
 			return;
 		}
-		if (chip.eNoteState == ENoteState.None && chip.msStoredHit < chip.n発声時刻ms) {
+		if (chip.eNoteState == ENoteState.None && chip.msAutoLastHit < chip.n発声時刻ms) {
 			if (this.AutoplayTryHit(chip, chip.n発声時刻ms, iPlayer, gt)) // critical hit
 				return;
-			bool canHitEarly = this.CanAutoplayHit(chip, (long)chip.msStoredHit, iPlayer, gt);
-			if (canHitEarly && (!canHitNow || Math.Abs(chip.msStoredHit - chip.n発声時刻ms) < Math.Abs(msTjaTime - chip.n発声時刻ms))) {
-				this.AutoplayDoHit(chip, (long)chip.msStoredHit, iPlayer, gt); // early hit
+			bool canHitEarly = this.CanAutoplayHit(chip, (long)chip.msAutoLastHit, iPlayer, gt);
+			if (canHitEarly && (!canHitNow || Math.Abs(chip.msAutoLastHit - chip.n発声時刻ms) < Math.Abs(msTjaTime - chip.n発声時刻ms))) {
+				this.AutoplayDoHit(chip, (long)chip.msAutoLastHit, iPlayer, gt); // early hit
 				return;
 			}
 			// mark as attempted
-			chip.eNoteState = ENoteState.None;
-			chip.msStoredHit = msTjaTime;
+			chip.msAutoLastHit = msTjaTime;
 		}
 		if (canHitNow) // late hit
 			this.AutoplayDoHit(chip, msTjaTime, iPlayer, gt);
@@ -1095,7 +1092,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void AutorollRoll(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE)
 			return;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
 		var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(iPlayer))];
@@ -1108,16 +1105,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 		}
 		long msPerRollTja = (long)CTja.GameDurationToTjaDuration(1000.0 / rollSpeed);
-		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
+		if (msTjaTime >= pChip.msAutoLastHit + msPerRollTja) {
 			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt)) {
-				pChip.eNoteState = ENoteState.None;
-				pChip.msStoredHit = msTjaTime;
+				pChip.msAutoLastHit = msTjaTime;
 			}
 		}
 	}
 
 	protected void AutorollBalloon(CChip pChip, long msTjaTime, int iPlayer, EGameType gt) {
-		if (this.isDeniedPlaying[iPlayer] || this.IsStageAborted() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE || pChip.msStoredHit > msTjaTime)
+		if (this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast() || !pChip.bVisible || pChip.IsMissed || pChip.bHit || this.bPAUSE || pChip.msAutoLastHit > msTjaTime)
 			return;
 
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[iPlayer] || (iPlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode);
@@ -1147,8 +1143,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 		}
 		if (balloon == 1 && NotesManager.IsFuzeRoll(pChip) && this.CanAutoplayHitMine(iPlayer, true)) {
-			pChip.eNoteState = ENoteState.None;
-			pChip.msStoredHit = double.PositiveInfinity; // prevent clearing fuze
+			pChip.msAutoLastHit = double.PositiveInfinity; // prevent clearing fuze
 			return;
 		}
 		int rollSpeed = bAutoPlay ? (balloon - rollCount) : puchichara.effect.Autoroll;
@@ -1156,10 +1151,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		long balloonDuration = bAutoPlay ? (pChip.end.n発声時刻ms - msTjaTime) : (long)CTja.GameDurationToTjaDuration(1000);
 
 		long msPerRollTja = (long)(balloonDuration / (double)rollSpeed);
-		if (msTjaTime >= pChip.msStoredHit + msPerRollTja) {
+		if (msTjaTime >= pChip.msAutoLastHit + msPerRollTja) {
 			if (this.AutoplayTryHit(pChip, msTjaTime, iPlayer, gt)) {
-				pChip.eNoteState = ENoteState.None;
-				pChip.msStoredHit = msTjaTime;
+				pChip.msAutoLastHit = msTjaTime;
 			}
 		}
 	}
@@ -1375,7 +1369,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
 		bool bAutoPlay = OpenTaiko.ConfigIni.bAutoPlay[nPlayer];
 		bool bBombHit = false;
-		bool isDeniedJudgeCount = this.isDeniedPlaying[nPlayer] || this.IsStageAborted();
+		bool isDeniedJudgeCount = this.isDeniedPlaying[nPlayer] || this.IsStageFailed_Fast();
 
 		switch (nPlayer) {
 			case 1:
@@ -2274,13 +2268,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 	public bool IsFinishedPlaying(int iPlayer) => isFinishedPlaying[iPlayer];
 	public virtual bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
 		=> (isChartEnded ?? IsChartEnded()) || (isFinishedPlaying ?? IsFinishedPlaying());
-	public bool IsStageAborted()
+	public bool IsStageFailed_Fast()
 		=> ePhaseID == CStage.EPhase.Game_STAGE_FAILED || ((ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) && IsStageFailed());
 	public bool IsStageCompleted() => ePhaseID is CStage.EPhase.Game_EndChart or CStage.EPhase.Game_EndStage or CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut;
 	public bool IsQuittingStage() => ePhaseID is CStage.EPhase.Common_FADEOUT or CStage.EPhase.Game_EndStage_Quit_FadeOut;
 
 	protected bool t進行描画_AVI() {
-		if (this.IsStageAborted() && (this.actAVI?.rVD.bPlaying ?? false)) {
+		if (this.IsStageFailed_Fast() && (this.actAVI?.rVD.bPlaying ?? false)) {
 			this.actAVI.Pause(); // paused but still shown
 		}
 		if (OpenTaiko.ConfigIni.bEnableAVI) {
@@ -3331,7 +3325,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						OpenTaiko.Skin.soundBomb?.tPlay();
 						chip.bVisible = false;
 						this.Chara_MissCount[iPlayer]++;
-						if (!(this.isDeniedPlaying[iPlayer] || this.IsStageAborted())) {
+						if (!(this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast())) {
 							this.CChartScore[iPlayer].nMine++;
 							this.CSectionScore[iPlayer].nMine++;
 							this.CBranchScore[iPlayer].nMine++;
@@ -3749,7 +3743,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 					chip.IsHitted = false;
 					chip.IsMissed = false;
 					chip.eNoteState = ENoteState.None;
-					chip.msStoredHit = double.NegativeInfinity;
+					chip.msAutoLastHit = double.NegativeInfinity;
 					chip.padStoredHit = EPad.Unknown;
 					chip.nRollCount = 0;
 					if (NotesManager.IsRollEnd(chip.end))
@@ -3983,7 +3977,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 			return;
 		this.actFO = this.actFOBlack;
 		this.actFO.tフェードアウト開始();
-		base.ePhaseID = (this.IsStageAborted() || this.IsStageCompleted()) ?
+		base.ePhaseID = (this.IsStageFailed_Fast() || this.IsStageCompleted()) ?
 			CStage.EPhase.Game_EndStage_Quit_FadeOut // keep end-of-chart animation
 			: CStage.EPhase.Common_FADEOUT;
 		this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.PerformanceInterrupted;
@@ -4087,7 +4081,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	public bool CanAutoplayHitMine(int player, bool reroll) {
-		if (this.isDeniedPlaying[player] || this.IsStageAborted())
+		if (this.isDeniedPlaying[player] || this.IsStageFailed_Fast())
 			return false;
 		int AILevel = OpenTaiko.ConfigIni.nAILevel;
 		if (OpenTaiko.ConfigIni.bAIBattleMode && player == 1) {
