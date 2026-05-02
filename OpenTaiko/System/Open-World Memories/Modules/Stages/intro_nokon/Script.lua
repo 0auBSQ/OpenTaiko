@@ -155,20 +155,26 @@ local function selectRandomSongFromGenre(genreFolder)
     return true
 end
 
+local previewCancelled = false
+
 local function startSongPreview()
     if currentSongNode == nil then return end
+    previewCancelled = false
     local psnd = SHARED:GetSharedSound("quiz_preview")
     psnd:Stop()
     if currentSongNode.IsSong == true then
         SHARED:SetSharedPreviewUsingAbsolutePath("quiz_preview", currentSongNode.AudioPath, function(snd)
-            snd:Play()
-            snd:SetTimestamp(currentSongNode.DemoStart)
-            snd:SetLoop(true)
+            if not previewCancelled then
+                snd:Play()
+                snd:SetTimestamp(currentSongNode.DemoStart)
+                snd:SetLoop(true)
+            end
         end)
     end
 end
 
 local function stopSongPreview()
+    previewCancelled = true
     SHARED:GetSharedSound("quiz_preview"):Stop()
 end
 

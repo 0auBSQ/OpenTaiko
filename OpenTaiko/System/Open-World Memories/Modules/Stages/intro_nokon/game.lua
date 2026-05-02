@@ -571,11 +571,11 @@ function M.update()
     elseif state == "vs_genre" then
         local tp = vsTurnPlayer()
         if pRight(tp) then
-            vsGenreIdx = math.min(vsGenreIdx + 1, #vsGenres)
+            vsGenreIdx = (vsGenreIdx % #vsGenres) + 1
             if M._vsRebuildGenre then M._vsRebuildGenre() end
             SHARED:GetSharedSound("Skip"):Play()
         elseif pLeft(tp) then
-            vsGenreIdx = math.max(vsGenreIdx - 1, 1)
+            vsGenreIdx = ((vsGenreIdx - 2 + #vsGenres) % #vsGenres) + 1
             if M._vsRebuildGenre then M._vsRebuildGenre() end
             SHARED:GetSharedSound("Skip"):Play()
         elseif pDecide(tp) then
@@ -662,7 +662,6 @@ function M.update()
                     vsEvalFail()
                 else
                     utils.startPreview()
-                    utils.playSound("Question")
                     vsScoreDropCtr = COUNTER:CreateCounterDuration(0, 1, 2)
                     vsScoreDropCtr:Start()
                     setState("vs_listen")

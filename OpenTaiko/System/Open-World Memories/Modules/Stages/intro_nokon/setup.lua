@@ -55,7 +55,7 @@ local function makeRolls()
                 { key = "songs_custom", value = "Custom" },
                 { key = "songs_all",    value = "All"    },
             },
-            selectedIdx = 3,   -- default: All
+            selectedIdx = 1,   -- default: OpTk
             animCounter = nil, animFromIdx = nil, animToIdx = nil,
         },
     }
