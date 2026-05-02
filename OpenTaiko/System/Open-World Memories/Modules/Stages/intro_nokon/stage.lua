@@ -100,8 +100,8 @@ local function lazyColors()
     PLAYER_COLORS = {
         col("ffee3333"),  -- P1 Red
         col("ff3355ee"),  -- P2 Blue
-        col("ff33bb44"),  -- P3 Green
-        col("ffbbbb00"),  -- P4 Yellow
+        col("ffbbbb00"),  -- P3 Yellow
+        col("ff33bb44"),  -- P4 Green
         col("ffbb33bb"),  -- P5 Magenta
     }
 end
