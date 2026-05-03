@@ -43,6 +43,16 @@ namespace OpenTaiko {
 		// If true, when moving within the song folder the cursor will loop through the page in case of overflow, else the cursor will focus the last element on both sides
 		public bool ModuloMovement = true;
 
+		// If true, songs with HiddenIndex == HIDDEN are excluded from the list (default matches legacy behaviour)
+		public bool ExcludeHiddenSongs = true;
+
+		// If true, locked songs are excluded from the list entirely (navigation will never land on them)
+		public bool ExcludeLockedSongs = false;
+
+		// If true, the unlock system is ignored for this list: locked songs are treated as unlocked
+		// (overrides ExcludeLockedSongs and suppresses the IsLocked filter in GetRandomNodeInFolder)
+		public bool IgnoreUnlockables = false;
+
 
 		public void AlterRootNodeWithRequestedNodes(LuaSongNodeRoot root) {
 			if (this.AppendMainRandomBox == true) {
@@ -100,9 +110,12 @@ namespace OpenTaiko {
 				}
 			}
 
-			// Hide locked hidden songs
 			if (node.IsSong) {
-				if (node.HiddenIndex == (int)DBSongUnlockables.EHiddenIndex.HIDDEN) return true;
+				// Hide songs that are fully hidden in the unlock system
+				if (this.ExcludeHiddenSongs && node.HiddenIndex == (int)DBSongUnlockables.EHiddenIndex.HIDDEN) return true;
+
+				// Exclude locked songs when requested, unless the unlock system is ignored for this list
+				if (this.ExcludeLockedSongs && !this.IgnoreUnlockables && node.IsLocked) return true;
 			}
 
 			return false;

@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter, inject-field
 local DBScores  = require("DBControllers/dbScores")
 local Opening   = require("opening")
 local Setup     = require("setup")
@@ -86,10 +86,11 @@ end
 
 local function loadMainSongList()
     local lsls = GenerateSongListSettings()
-    lsls.ModuloPagination    = false
-    lsls.AppendMainRandomBox = false
+    lsls.ModuloPagination     = false
+    lsls.AppendMainRandomBox  = false
     lsls.AppendSubRandomBoxes = false
-    lsls.SubBackBoxFrequency = 0
+    lsls.SubBackBoxFrequency  = 0
+    lsls.ExcludeLockedSongs   = true
 
     if songScope == "Customs" then
         lsls.RootGenreFolder = "Custom Charts"
@@ -124,13 +125,14 @@ local function selectRandomSongFromGenre(genreFolder)
         if songList == nil then return false end
         currentSongNode = songList:GetRandomNodeInFolder(songList:GetSelectedSongNode(), true, function(node)
             return songList:GetSelectedSongNode().Parent ~= node.Parent
-        end, true)
+        end)
         if currentSongNode == nil or currentSongNode.IsSong == false then return false end
         local lsls = GenerateSongListSettings()
         lsls.ModuloPagination     = false
         lsls.AppendMainRandomBox  = false
         lsls.AppendSubRandomBoxes = false
         lsls.SubBackBoxFrequency  = 0
+        lsls.ExcludeLockedSongs   = true
         lsls.RootGenreFolderNode  = currentSongNode.Parent
         quizSongList = RequestSongList(lsls)
         refreshQuizSongListCache()
@@ -142,12 +144,13 @@ local function selectRandomSongFromGenre(genreFolder)
     lsls.AppendMainRandomBox  = false
     lsls.AppendSubRandomBoxes = false
     lsls.SubBackBoxFrequency  = 0
+    lsls.ExcludeLockedSongs   = true
     lsls.RootGenreFolderNode  = genreFolder
 
     local genreSongList = RequestSongList(lsls)
     if genreSongList == nil then return false end
 
-    currentSongNode = genreSongList:GetRandomNodeInFolder(genreSongList:GetSelectedSongNode(), true, nil, true)
+    currentSongNode = genreSongList:GetRandomNodeInFolder(genreSongList:GetSelectedSongNode(), true)
     if currentSongNode == nil or currentSongNode.IsSong == false then return false end
 
     quizSongList = genreSongList

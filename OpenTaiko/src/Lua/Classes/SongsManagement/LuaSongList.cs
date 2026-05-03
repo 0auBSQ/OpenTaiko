@@ -60,6 +60,11 @@ namespace OpenTaiko {
 			_currentNode = null;
 			_currentPage = GetRootPage();
 			if (_currentPage.Count > 0) _currentNode = _currentPage[0];
+			// Apply execution-time filters (ExcludeLockedSongs, ExcludeHiddenSongs, HideEmptyFolders…)
+			// so that Move() and GetSongNodeAtOffset() never expose excluded nodes.
+			_currentPage = GetCurrentPage();
+			if (_currentPage.Count > 0 && (_currentNode == null || !_currentPage.Contains(_currentNode)))
+				_currentNode = _currentPage[0];
 		}
 
 		public LuaSongList(LuaSongListSettings settings) {
@@ -155,13 +160,14 @@ namespace OpenTaiko {
 			return this.FindFirst((node) => node.UniqueId == id, _root);
 		}
 
-		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null, bool includeLocked = false) {
+		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null) {
 			List<LuaSongNode> _randomPool = new List<LuaSongNode>();
+			bool includeAllLocked = _settings.IgnoreUnlockables;
 
 			predicate ??= nd => true;
 			randomBoxLocation.Siblings.ForEach(node => {
-				if (node.IsSong && (includeLocked || !node.IsLocked) && predicate(node)) _randomPool.Add(node);
-				if (recursive == true && node.IsFolder) _randomPool.AddRange(FindAll(cnode => cnode.IsSong && (includeLocked || !cnode.IsLocked) && predicate(cnode), node));
+				if (node.IsSong && (includeAllLocked || !node.IsLocked) && predicate(node)) _randomPool.Add(node);
+				if (recursive == true && node.IsFolder) _randomPool.AddRange(FindAll(cnode => cnode.IsSong && (includeAllLocked || !cnode.IsLocked) && predicate(cnode), node));
 			});
 
 			if (_randomPool.Count == 0) return null;
