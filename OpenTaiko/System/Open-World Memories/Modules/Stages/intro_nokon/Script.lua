@@ -385,6 +385,12 @@ function onStart()
         stopSound         = function(name) if sounds[name] then sounds[name]:Stop() end end,
         saveHighScore     = saveHighScore,
         getHighScores     = loadHighScores,
+        grantPrideKey     = function()
+            local sf = GetSaveFile(0)
+            if sf and sf:GetGlobalTrigger(".vault_key_obtained_pride") ~= true then
+                sf:SetGlobalTrigger(".vault_key_obtained_pride", true)
+            end
+        end,
     }
 
     Opening.init(textures, sounds)

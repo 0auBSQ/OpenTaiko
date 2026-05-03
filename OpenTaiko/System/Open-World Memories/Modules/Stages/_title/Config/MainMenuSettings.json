@@ -75,7 +75,7 @@
             }
         },
         "StageType": "Lua",
-        "LuaStageName": "secret_vault",
+        "LuaStageName": "secret_vault_rw",
         "Restricted1P": true,
         "LEGACY_MenuBoxColor": "Purple"
     },

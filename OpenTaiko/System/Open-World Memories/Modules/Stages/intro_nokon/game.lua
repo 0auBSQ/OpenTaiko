@@ -294,6 +294,7 @@ local function eEvalFail()
         Stage.setShowFail(false)
         curtainCloseTo(function()
             utils.playSound("ResultsSolo")
+            if (scores[1] or 0) > 100 then utils.grantPrideKey() end
             utils.saveHighScore(scores[1] or 0, playerNames[1] or "Player 1")
             highScores = utils.getHighScores()
             setState("e_gameover")
