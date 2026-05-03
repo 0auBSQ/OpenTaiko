@@ -166,7 +166,7 @@ local function startSongPreview()
         SHARED:SetSharedPreviewUsingAbsolutePath("quiz_preview", currentSongNode.AudioPath, function(snd)
             if not previewCancelled then
                 snd:Play()
-                snd:SetTimestamp(currentSongNode.DemoStart)
+                -- snd:SetTimestamp(currentSongNode.DemoStart)
                 snd:SetLoop(true)
             end
         end)
