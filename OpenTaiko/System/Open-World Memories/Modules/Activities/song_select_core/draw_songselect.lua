@@ -215,10 +215,11 @@ function M.drawPanel()
                                 xpos + difftx.Width / 2,
                                 ypos + difftx.Height / 2,
                                 nil, G.difficultyFade4 / 255)
-                            if chart.IsPlus and not isVaultSong then
-                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(G.difficultyFade4 / 255)
-                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
-                                G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(1)
+                            if chart.IsPlus then
+                                local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
+                                plustx:SetOpacity(G.difficultyFade4 / 255)
+                                plustx:Draw(xpos, ypos)
+                                plustx:SetOpacity(1)
                             end
                         end
                     elseif chart == nil then
@@ -232,8 +233,9 @@ function M.drawPanel()
                         G.drawNumberCentered(chart.Level, "sinfo_level",
                             xpos + difftx.Width / 2,
                             ypos + difftx.Height / 2)
-                        if chart.IsPlus and not isVaultSong then
-                            G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
+                        if chart.IsPlus then
+                            local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
+                            plustx:Draw(xpos, ypos)
                         end
                     end
                 end
