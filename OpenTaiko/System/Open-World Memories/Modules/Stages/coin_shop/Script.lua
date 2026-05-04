@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field, param-type-mismatch
 local DBItems = require("DBControllers/dbItems")
 
 local save = nil
@@ -21,6 +22,7 @@ local normalItems = {}
 -- Confirm screen
 local toBuyItem = nil
 local toBuyItemIcon = nil
+local toBuySlot = 0   -- 1‥6 = normal slot, SLOT_BIG = big item
 local confirmIdx = 0
 
 -- Rerolls
@@ -28,6 +30,29 @@ local executedRerolls = 0
 
 -- Current Screen
 local currentScreen = "shop"
+
+-- Daily shop persistence
+local shopDB           = nil
+local currentFreezeKey = 0
+local soldOutMask      = 0   -- bitmask: bits 0‥5 = normalItems[1‥6], bit 6 = bigItem
+
+local SLOT_BIG = 7   -- bit index 6 in the bitmask
+
+-- ── Helpers ───────────────────────────────────────────────────────────────────
+
+local function getJstFreezeKey()
+	-- UTC+9; "!" forces UTC interpretation in os.date so we can add the offset manually
+	local jst = os.date("!*t", os.time() + 9 * 3600)
+	return jst.year * 10000 + jst.month * 100 + jst.day
+end
+
+local function isSoldOut(mask, slot)
+	return ((mask >> (slot - 1)) & 1) == 1
+end
+
+local function markSoldOut(mask, slot)
+	return mask | (1 << (slot - 1))
+end
 
 -- Clone a C# Dictionary into a Lua table safely
 local function cloneTable(t)
@@ -95,14 +120,14 @@ local function drawNumberColor(x, y, str, color, centered)
 	end
 end
 
-function isUnique(entry)
+local function isUnique(entry)
 	if entry.Type == "counterable" then
 		return false
 	end
 	return true
 end
 
-function isOwned(entry)
+local function isOwned(entry)
 	if entry.Type == "triggerable" then
 		return save:GetGlobalTrigger(entry.RefText)
 	end
@@ -112,7 +137,7 @@ function isOwned(entry)
 	return false
 end
 
-function isEntryIncluded(entry)
+local function isEntryIncluded(entry)
 	if entry.Condition ~= nil then
 		return save:GetGlobalTrigger(entry.Condition)
 	end
@@ -122,17 +147,58 @@ function isEntryIncluded(entry)
 	return true
 end
 
-function entryHasicon(entry)
+local function entryHasicon(entry)
 	if entry.Type == "nameplate" then
 		return false
 	end
 	return true
 end
 
+-- ── Item pool cache ───────────────────────────────────────────────────────────
+
 local _cachedPools = nil
 
-function poolItems()
+local function ensureCachedPools()
+	if _cachedPools == nil then
+		_cachedPools = {
+			normal = cloneTable(DBItems:GetItems("regular")),
+			big    = cloneTable(DBItems:GetItems("major"))
+		}
+	end
+end
+
+local function findItemByCode(code)
+	if code == nil or code == "" then return nil end
+	ensureCachedPools()
+	for _, pool in pairs(_cachedPools) do
+		for i = 1, #pool do
+			if pool[i].Code == code then return pool[i] end
+		end
+	end
+	return nil
+end
+
+local function setupItem(entry, iconIdx)
+	if entry == nil then return nil end
+	local item = deepcopy(entry)
+	item.LocalizedName = LANG:FromString(item.Name):GetString("")
+	item.NameTx = text:GetText(item.LocalizedName, true, 380)
+	item.SoldOut = false
+	if entryHasicon(item) then
+		icons[iconIdx] = TEXTURE:CreateTexture("Textures/Icons/"..item.Code..".png")
+	else
+		icons[iconIdx] = nil
+	end
+	return item
+end
+
+-- ── Shop generation ───────────────────────────────────────────────────────────
+
+local function poolItems()
 	math.randomseed(os.time() + tonumber(tostring({}):sub(8), 16))
+
+	ensureCachedPools()
+	local _pools = _cachedPools
 
 	local itemPools = {
 		normal = {},
@@ -143,16 +209,6 @@ function poolItems()
 		normal = 0,
 		big = 0
 	}
-
-
-	if _cachedPools == nil then
-		_cachedPools = {
-			normal = cloneTable(DBItems:GetItems("regular")),
-			big = cloneTable(DBItems:GetItems("major"))
-		}
-	end
-	local _pools = _cachedPools
-
 
 	for pool, entries in pairs(_pools) do
 		local _count = #entries
@@ -169,12 +225,8 @@ function poolItems()
 
 	debugLog(poolSizes["normal"] .. " - " .. poolSizes["big"])
 
-	-- TODO: Use freeze key to freeze each day shop in a module storage
-	local now = os.date("*t")
-	local freezeKey = now.year * 10000 + now.month * 100 + now.day
-
 	-- helper to roll from weighted pool
-	local function pickFromPool(pool, poolSize, roll)
+	local function pickFromPool(pool, roll)
 		local chosen = nil
 		local lastKey = -1
 		for key, e in pairs(pool) do
@@ -189,19 +241,12 @@ function poolItems()
 	-- pick big item
 	if poolSizes.big > 0 then
 		local roll = math.random(0, poolSizes.big - 1)
-		bigItem = pickFromPool(itemPools.big, poolSizes.big, roll)
+		bigItem = pickFromPool(itemPools.big, roll)
 		if bigItem.Type == "empty" then
 			-- a nothing is picked (can happen to have days with 6 small slots)
 			bigItem = nil
 		else
-			bigItem.LocalizedName = LANG:FromString(bigItem.Name):GetString("")
-			bigItem.NameTx = text:GetText(bigItem.LocalizedName, true, 380)
-			bigItem.SoldOut = false
-			if entryHasicon(bigItem) then
-				icons[5] = TEXTURE:CreateTexture("Textures/Icons/"..bigItem.Code..".png")
-			else
-				icons[5] = nil
-			end
+			bigItem = setupItem(bigItem, 5)
 		end
 	else
 		bigItem = nil
@@ -226,17 +271,8 @@ function poolItems()
 		else
 			local roll = math.random(0, poolSize - 1)
 			debugLog("Pool " .. poolSize .. " - " .. roll)
-			local chosen = pickFromPool(pool, poolSize, roll)
-			normalItems[n] = deepcopy(chosen)
-			normalItems[n].LocalizedName = LANG:FromString(normalItems[n].Name):GetString("")
-			normalItems[n].NameTx = text:GetText(normalItems[n].LocalizedName, true, 380)
-			normalItems[n].SoldOut = false
-			if entryHasicon(chosen) then
-				icons[n] = TEXTURE:CreateTexture("Textures/Icons/"..chosen.Code..".png")
-			else
-				icons[n] = nil
-			end
-
+			local chosen = pickFromPool(pool, roll)
+			normalItems[n] = setupItem(chosen, n)
 
 			if chosen and isUnique(chosen) then
 				-- rebuild pool without this entry
@@ -256,12 +292,48 @@ function poolItems()
 
 	debugLog("Big: " .. tostring(bigItem and bigItem.LocalizedName or "nil"))
 	debugLog("Normal count: " .. tostring(#normalItems))
-	for k,v in pairs(normalItems) do
+	for _, v in pairs(normalItems) do
 		debugLog(v.LocalizedName .. " (" .. v.Code .. ")")
 	end
 end
 
-function drawPrice(x, y, price)
+-- ── Persistence helpers ───────────────────────────────────────────────────────
+
+local DB_PREFIX = ""   -- set in activate() from save.SaveId so each save file has its own shop state
+
+local function storeShopState(db)
+	db:Write(DB_PREFIX .. "day",     tostring(currentFreezeKey))
+	db:Write(DB_PREFIX .. "rerolls", tostring(executedRerolls))
+	db:Write(DB_PREFIX .. "soldout", tostring(soldOutMask))
+	db:Write(DB_PREFIX .. "big",     bigItem and bigItem.Code or "")
+	for i = 1, 6 do
+		db:Write(DB_PREFIX .. "n" .. i, normalItems[i] and normalItems[i].Code or "")
+	end
+end
+
+local function loadShopState(db)
+	soldOutMask = tonumber(db:Read(DB_PREFIX .. "soldout") or "0") or 0
+
+	bigItem = setupItem(findItemByCode(db:Read(DB_PREFIX .. "big")), 5)
+
+	normalItems = {}
+	for i = 1, 6 do
+		normalItems[i] = setupItem(findItemByCode(db:Read(DB_PREFIX .. "n" .. i)), i)
+	end
+
+	-- Apply soldout flags from saved mask
+	if bigItem and isSoldOut(soldOutMask, SLOT_BIG) then bigItem.SoldOut = true end
+	for i = 1, 6 do
+		if normalItems[i] and isSoldOut(soldOutMask, i) then normalItems[i].SoldOut = true end
+	end
+
+	layoutSize = bigItem and 5 or 6
+	executedRerolls = tonumber(db:Read(DB_PREFIX .. "rerolls") or "0") or 0
+end
+
+-- ── Draw ──────────────────────────────────────────────────────────────────────
+
+local function drawPrice(x, y, price)
 	local color = COLOR:CreateColorFromHex("FFFFFFFF")
 	if price > save.Coins then
 		color = COLOR:CreateColorFromHex("FFFF0000")
@@ -269,13 +341,13 @@ function drawPrice(x, y, price)
 	drawNumberColor(x, y, tostring(price), color, true)
 end
 
-function drawPriceWithTag(x, y, price)
+local function drawPriceWithTag(x, y, price)
 	textures["PriceBox"]:Draw(x, y)
 	drawPrice(x+166, y+26, price)
 end
 
 function draw()
-	textures["Bg"]:Draw(0, 0)
+	textures["Bg"]:Draw(0,0)
 
 	-- Normal items
 	for i, v in ipairs(normalItems) do
@@ -378,6 +450,8 @@ function draw()
 	NAMEPLATE:DrawPlayerNameplate(20, 980, 255, 0)
 end
 
+-- ── Navigation ────────────────────────────────────────────────────────────────
+
 -- Build the custom cycle order
 local function buildCycle()
   local cycle = {}
@@ -434,7 +508,12 @@ local function purchaseItem(item)
 	end
 	save:SpendCoins(item.Price)
 	toBuyItem.SoldOut = true
+	-- Persist the sold-out state
+	soldOutMask = markSoldOut(soldOutMask, toBuySlot)
+	shopDB:Write(DB_PREFIX .. "soldout", tostring(soldOutMask))
 end
+
+-- ── Update ────────────────────────────────────────────────────────────────────
 
 function update()
 	if currentScreen == "confirm" or currentScreen == "refresh" then
@@ -453,7 +532,9 @@ function update()
 				sounds.Buy:Play()
 				save:SpendCoins(rerollPrice)
 				executedRerolls = executedRerolls + 1
+				soldOutMask = 0
 				poolItems()
+				storeShopState(shopDB)
 			end
 			currentScreen = "shop"
 		end
@@ -488,9 +569,12 @@ function update()
 					if bigItem ~= nil and selectedItem >= #normalItems then
 						toBuyItem = bigItem
 						toBuyItemIcon = icons[5]
+						toBuySlot = SLOT_BIG
 					else
-						toBuyItem = normalItems[selectedItem + 1]
-						toBuyItemIcon = icons[selectedItem + 1]
+						local slotIdx = selectedItem + 1
+						toBuyItem = normalItems[slotIdx]
+						toBuyItemIcon = icons[slotIdx]
+						toBuySlot = slotIdx
 					end
 
 					if toBuyItem ~= nil and toBuyItem.SoldOut == false and toBuyItem.Price <= save.Coins then
@@ -504,6 +588,7 @@ function update()
 	end
 end
 
+-- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function activate()
 	save = GetSaveFile(0)
@@ -536,9 +621,22 @@ function activate()
 	selectedItem = -2
 	currentScreen = "shop"
 
+	-- Open persistent DB for this module, keyed per save file
+	DB_PREFIX = tostring(save.SaveId) .. "_"
+	shopDB = DATABASE:OpenLocalDatabase("shop_state")
+	currentFreezeKey = getJstFreezeKey()
+
 	-- Either pool or get the frozen shop on opening
-	executedRerolls = 0
-	poolItems()
+	local storedDay = tonumber(shopDB:Read(DB_PREFIX .. "day") or "0") or 0
+
+	if storedDay ~= currentFreezeKey then
+		executedRerolls = 0
+		soldOutMask = 0
+		poolItems()
+		storeShopState(shopDB)
+	else
+		loadShopState(shopDB)
+	end
 
 	sounds.BGM:SetLoop(true)
 	sounds.BGM:Play()
@@ -559,6 +657,9 @@ function deactivate()
 	-- 	v:Dispose()
 	-- end
 	-- TxTextChar = {}
+
+	if shopDB then shopDB:Dispose() end
+	shopDB = nil
 
 	sounds.BGM:Stop()
 end
