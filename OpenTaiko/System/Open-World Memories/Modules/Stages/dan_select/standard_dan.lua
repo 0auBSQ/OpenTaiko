@@ -1,6 +1,7 @@
 -- standard_dan.lua  —  Standard Dan Challenge sub-module for dan_select
 
 local M = {}
+local ContentsDrawer = require("standard_dan_contents_draw")
 
 -- ── Constants ────────────────────────────────────────────────────────────────
 
@@ -97,6 +98,15 @@ local puchi_sine_y          = 0.0
 local puchi_sine_counter    = nil
 
 -- ── Internals ─────────────────────────────────────────────────────────────────
+
+local function _build_dan_songs(chart)
+    if chart == nil or chart.DanSongs == nil then return {} end
+    local ds = {}
+    for i = 0, chart.DanSongs.Length - 1 do
+        ds[i + 1] = chart.DanSongs[i]
+    end
+    return ds
+end
 
 local function _refresh_page()
     page_nodes = {}
@@ -252,6 +262,8 @@ local function _load_resources()
         font_hdr_title = TEXT:Create(HDR_TITLE_FONT,  "regular")
         font_hdr_sub   = TEXT:Create(HDR_SUB_FONT,    "regular")
     end
+
+    ContentsDrawer.load()
 end
 
 local function _unload_resources()
@@ -282,6 +294,8 @@ local function _unload_resources()
     modicons_ro = nil
     for k in pairs(act) do act[k] = nil end
     for k in pairs(act_was_active) do act_was_active[k] = nil end
+
+    ContentsDrawer.unload()
 end
 
 local function _reset_anim_state()
@@ -347,6 +361,7 @@ function M.destroy()
     if font_bar_title ~= nil then font_bar_title:Dispose() ; font_bar_title = nil end
     if font_hdr_title ~= nil then font_hdr_title:Dispose() ; font_hdr_title = nil end
     if font_hdr_sub   ~= nil then font_hdr_sub:Dispose()   ; font_hdr_sub   = nil end
+    ContentsDrawer.destroy()
 end
 
 -- Returns: nil (continue) | "back" (return to 3-way menu) | "play" (exit to play)
@@ -374,6 +389,19 @@ function M.update(dt)
     if puchi_sine_counter ~= nil then
         puchi_sine_counter:Tick()
         puchi_sine_y = math.sin(puchi_sine_counter.Value * math.pi / 180) * PUCHI_FLOAT_AMP
+    end
+
+    -- Tick contents drawer scroll
+    do
+        local upd_node = _song_list ~= nil and _song_list:GetSelectedSongNode() or nil
+        local upd_count = 0
+        if upd_node ~= nil and upd_node.IsSong then
+            local chart = upd_node:GetChart(DIFF_DAN)
+            if chart ~= nil and chart.DanSongs ~= nil then
+                upd_count = chart.DanSongs.Length
+            end
+        end
+        ContentsDrawer.update(dt, upd_count)
     end
 
     if any_active then return nil end
@@ -505,10 +533,15 @@ function M.draw()
     -- Content panels
     if content_slide_dir ~= 0 and content_slide_counter ~= nil
             and prev_sel_node ~= nil and prev_sel_node.IsSong then
-        _draw_content(prev_sel_node, content_slide_y - content_slide_from)
+        local prev_off = content_slide_y - content_slide_from
+        _draw_content(prev_sel_node, prev_off)
+        local prev_chart = prev_sel_node:GetChart(DIFF_DAN)
+        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + prev_off, _build_dan_songs(prev_chart))
     end
     if sel_node ~= nil and sel_node.IsSong then
         _draw_content(sel_node, content_slide_y)
+        local chart = sel_node:GetChart(DIFF_DAN)
+        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + content_slide_y, _build_dan_songs(chart))
     end
 
     -- Dan plate
