@@ -175,6 +175,13 @@ local function buildPredicate(params)
 
     return function(node)
         if not node.IsSong then return false end
+        if node.IsLocked then return false end
+        -- Exclude vault songs when vault is not opened or the song itself is not yet unlocked
+        if node.Genre == "Secret Vault" then
+            local sf = GetSaveFile(0)
+            if not sf:GetGlobalTrigger(".vault_opened") then return false end
+            if not sf:GetGlobalTrigger(".vault_song_unlocked_" .. (node.UniqueId or "")) then return false end
+        end
         if titlePat    ~= "" and not (node.Title    or ""):lower():find(titlePat,    1, true) then return false end
         if subtitlePat ~= "" and not (node.Subtitle or ""):lower():find(subtitlePat, 1, true) then return false end
 

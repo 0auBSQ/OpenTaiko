@@ -110,6 +110,11 @@ local function handleDecideSongSelect(Sort)
     local ssn = G.songList:GetSelectedSongNode()
 
     if ssn.IsFolder == true then
+        -- Block opening a locked vault folder (same feedback as a locked song)
+        if G.unlocks ~= nil and G.unlocks.isVaultFolder(ssn) then
+            G.unlocks.onDecideVaultFolder(G.highlightedPlayer, ssn)
+            return nil
+        end
         local success = G.songList:OpenFolder()
         if success then Sort.applySort(); G.sounds.Decide:Play() end
         M.refreshPage()
@@ -253,15 +258,6 @@ function M.handleSongSelectInput(Sort, Diff)
         local spd = CONFIG.SongSpeed / 20
         SHARED:GetSharedSound("presound"):SetSpeed(spd)
         if G.previewDemoStartRaw > 0 then G.previewDemoStart = math.floor(G.previewDemoStartRaw / spd) end
-    end
-
-    -- Background cycle
-    if INPUT:KeyboardPressed("O") then
-        if G.currentBackground == 0 then
-            SHARED:SetSharedTexture("background", "Textures/bg1.png"); G.currentBackground = 1
-        else
-            SHARED:SetSharedTexture("background", "Textures/bg0.png"); G.currentBackground = 0
-        end
     end
 
     -- Player count

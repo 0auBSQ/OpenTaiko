@@ -92,8 +92,13 @@ local function drawLevelTag(songNode, x, y)
     local difficulty = chart.DifficultyAsInt
     local labelH     = G.bars["levellabels"].Height / 5
     local labelW     = G.bars["levellabels"].Width
+    local isVault    = songNode.Genre == "Secret Vault"
 
-    if difficulty < 3 or level <= 10 then
+    if isVault then
+        -- Vault songs: animated strip (same frame counter as storm), always-on gray border
+        G.bars["levellabelsvault"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
+        G.drawNumberCentered(level, "levellabelsborder", x, y, COLOR:CreateColorFromHex("ff808080"))
+    elseif difficulty < 3 or level <= 10 then
         G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
     elseif difficulty == 3 then
         G.bars["levellabelsfire"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
@@ -104,7 +109,11 @@ local function drawLevelTag(songNode, x, y)
     end
     G.drawNumberCentered(level, "levellabels", x, y)
     if chart.IsPlus == true then
-        G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
+        if isVault then
+            G.bars["levellabelsplusvault"]:DrawAtAnchor(x, y, "center")
+        else
+            G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
+        end
     end
 end
 
@@ -191,35 +200,41 @@ function M.drawPanel()
 
             -- Difficulty icons: hidden for GRAYED and above
             if ssnHI == 0 then
+                local isVaultSong = ssn.Genre == "Secret Vault"
                 for i = 0, 4 do
                     local chart = ssn:GetChart(i)
                     local xpos  = SONGINFO_DIFFICULTIES_ORIGIN_X - G.songSelectShift
                     local ypos  = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y * math.min(i, 3)
                     if ssn:GetChart(3) ~= nil and i == 4 then
                         if chart ~= nil then
-                            G.bgtx["sinfo_difficulties_4"]:SetOpacity(G.difficultyFade4 / 255)
-                            G.bgtx["sinfo_difficulties_4"]:Draw(xpos, ypos)
-                            G.bgtx["sinfo_difficulties_4"]:SetOpacity(1)
+                            local difftx = isVaultSong and G.bgtx["sinfo_difficulties_vault"] or G.bgtx["sinfo_difficulties_4"]
+                            difftx:SetOpacity(G.difficultyFade4 / 255)
+                            difftx:Draw(xpos, ypos)
+                            difftx:SetOpacity(1)
                             G.drawNumberCentered(chart.Level, "sinfo_level",
-                                xpos + G.bgtx["sinfo_difficulties_4"].Width / 2,
-                                ypos + G.bgtx["sinfo_difficulties_4"].Height / 2,
+                                xpos + difftx.Width / 2,
+                                ypos + difftx.Height / 2,
                                 nil, G.difficultyFade4 / 255)
-                            if chart.IsPlus then
+                            if chart.IsPlus and not isVaultSong then
                                 G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(G.difficultyFade4 / 255)
                                 G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
                                 G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:SetOpacity(1)
                             end
                         end
                     elseif chart == nil then
-                        if ssn:GetChart(4) == nil or i ~= 3 then
+                        -- Vault songs: never show the "missing" indicator
+                        if not isVaultSong and (ssn:GetChart(4) == nil or i ~= 3) then
                             G.bgtx["sinfo_difficulties_missing"]:Draw(xpos, ypos)
                         end
                     else
-                        G.bgtx["sinfo_difficulties_" .. i]:Draw(xpos, ypos)
+                        local difftx = isVaultSong and G.bgtx["sinfo_difficulties_vault"] or G.bgtx["sinfo_difficulties_" .. i]
+                        difftx:Draw(xpos, ypos)
                         G.drawNumberCentered(chart.Level, "sinfo_level",
-                            xpos + G.bgtx["sinfo_difficulties_" .. i].Width / 2,
-                            ypos + G.bgtx["sinfo_difficulties_" .. i].Height / 2)
-                        if chart.IsPlus then G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos) end
+                            xpos + difftx.Width / 2,
+                            ypos + difftx.Height / 2)
+                        if chart.IsPlus and not isVaultSong then
+                            G.bgtx["sinfo_difficulties_" .. i .. "_plus"]:Draw(xpos, ypos)
+                        end
                     end
                 end
             end
@@ -259,9 +274,15 @@ function M.drawPanel()
                 local node = G.currentPage[i]
                 if node.IsSong or node.IsFolder then
                     if node.IsSong and G.unlocks.isVaultLocked(node) then
-                        -- Secret Vault locked: vault bar + vault lock icon, no title, no level tag
+                        -- Secret Vault locked song: vault bar + vault lock icon, no title, no level tag
                         G.unlocks.drawVaultBar(node, xpos, ypos)
                         G.unlocks.drawVaultLockIcon(node, xpos, ypos)
+                    elseif node.IsFolder and G.unlocks.isVaultFolder(node) then
+                        -- Secret Vault folder (locked): normal bar, blurred glitch, lockF overlay, no title
+                        G.bars["bar"]:SetColor(node.BoxColor)
+                        G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+                        G.unlocks.drawBluredStatic(xpos, ypos)
+                        G.unlocks.drawVaultFolderLock(node, xpos, ypos)
                     elseif node.IsLocked then
                         -- Draw the HiddenIndex-appropriate bar (GRAYED/BLURED both use bar_1);
                         -- DISPLAYED locked songs fall through to the normal bar below.

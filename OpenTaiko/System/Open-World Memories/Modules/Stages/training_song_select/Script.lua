@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- training_song_select
 -- Song select for training mode.
 -- Player count is locked to 1P.
@@ -15,6 +16,8 @@ function activate()
 	exitingToPlay = false
 	CONFIG.IsTrainingMode = true
 	act:Activate(false, 1)  -- no player count toggle, locked to 1P, no AI slot
+	-- Override the background with the training-specific scrolling BG
+	SHARED:SetSharedTexture("background", "Textures/BG.png")
 end
 
 function deactivate()

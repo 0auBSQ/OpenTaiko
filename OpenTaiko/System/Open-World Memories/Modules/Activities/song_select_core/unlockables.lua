@@ -41,6 +41,7 @@ function M.loadTextures()
     G.bars["vault_lock0"] = TEXTURE:CreateTexture("Textures/Unlockables/Vault/lock0.png")
     G.bars["vault_lock1"] = TEXTURE:CreateTexture("Textures/Unlockables/Vault/lock1.png")
     G.bars["vault_lock2"] = TEXTURE:CreateTexture("Textures/Unlockables/Vault/lock2.png")
+    G.bars["vault_lockF"] = TEXTURE:CreateTexture("Textures/Unlockables/Vault/lockF.png")
 end
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
@@ -52,11 +53,28 @@ end
 
 -- ── Secret Vault ──────────────────────────────────────────────────────────────
 
--- Returns true when the node is a Secret Vault song that has not yet been unlocked.
+-- Returns true when the node is a Secret Vault song that should be treated as locked:
+-- either the vault itself has not been opened, or this song's individual trigger is not set.
 function M.isVaultLocked(node)
     if node == nil or not node.IsSong then return false end
     if node.Genre ~= "Secret Vault" then return false end
-    return not GetSaveFile(0):GetGlobalTrigger(".vault_song_unlocked_" .. (node.UniqueId or ""))
+    local sf = GetSaveFile(0)
+    if not sf:GetGlobalTrigger(".vault_opened") then return true end
+    return not sf:GetGlobalTrigger(".vault_song_unlocked_" .. (node.UniqueId or ""))
+end
+
+-- Returns true when the node is a Secret Vault folder and the vault has not been opened yet.
+function M.isVaultFolder(node)
+    if node == nil or not node.IsFolder then return false end
+    if node.Genre ~= "Secret Vault" then return false end
+    return not GetSaveFile(0):GetGlobalTrigger(".vault_opened")
+end
+
+-- Draw lockF.png centered over the folder bar.
+function M.drawVaultFolderLock(node, xpos, ypos)
+    if G.bars["vault_lockF"] then
+        G.bars["vault_lockF"]:DrawAtAnchor(xpos, ypos, "center")
+    end
 end
 
 -- Effective hidden index for vault songs (treated as BLURED for sort/search purposes).
@@ -165,13 +183,18 @@ function M.drawCondsPanel()
     drawCondText(condText)
 end
 
--- Draw condsbox.png and the vault message for the currently selected vault-locked song.
+-- Draw condsbox.png and the vault message for the currently selected vault-locked song or vault folder.
 function M.drawVaultCondsPanel()
     local ssn = G.songList:GetSelectedSongNode()
-    if ssn == nil or not M.isVaultLocked(ssn) then return end
+    if ssn == nil then return end
 
-    G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
-    drawCondText("Get this song in the Secret Vault menu")
+    if M.isVaultLocked(ssn) then
+        G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
+        drawCondText("Get this song in the Secret Vault menu")
+    elseif M.isVaultFolder(ssn) then
+        G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
+        drawCondText("4 keys is what you need...")
+    end
 end
 
 -- ── Tick ──────────────────────────────────────────────────────────────────────
@@ -209,6 +232,13 @@ end
 -- Called when the player presses Decide on a vault-locked song.
 -- Always flashes the vault message (no purchase possible from here).
 function M.onDecideVaultLocked(player, node)
+    G.sounds.Cancel:Play()
+    startFlash()
+    return "flashed"
+end
+
+-- Called when the player presses Decide on a locked vault folder.
+function M.onDecideVaultFolder(player, node)
     G.sounds.Cancel:Play()
     startFlash()
     return "flashed"

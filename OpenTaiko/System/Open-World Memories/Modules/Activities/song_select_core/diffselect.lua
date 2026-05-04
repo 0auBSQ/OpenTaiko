@@ -65,6 +65,7 @@ function M.loadDiffBars(ssn)
                 isplus     = chart.IsPlus,
                 charter    = chart.NotesDesigner,
                 difficulty = i,
+                vaultName  = isVault and chart:GetCustomCommand(".VAULT_NAME") or nil,
             })
         end
     end
@@ -108,6 +109,14 @@ local function drawDifficultyBar(index, barinfo)
     tex:DrawAtAnchor(xpos, ypos, "bottomright")
     local nd = G.textSmall:GetText("Charter - " .. barinfo.charter, false, 1000)
     nd:DrawAtAnchor(xpos, ypos + DIFFSELECT_NOTESDESIGNER_OFFSET_Y, "topright")
+
+    -- Vault chart: custom name (.VAULT_NAME) centered at (316, 216) from the bar's top-left
+    if barinfo.vault and barinfo.vaultName ~= nil and barinfo.vaultName ~= "" then
+        local black     = COLOR:CreateColorFromARGB(255, 0, 0, 0)
+        local noOutline = COLOR:CreateColorFromARGB(0, 0, 0, 0)
+        local nameTx = G.textStats:GetText(barinfo.vaultName, false, 260, black, noOutline)
+        nameTx:DrawAtAnchor(xpos - tex.Width + 316, ypos - tex.Height + 216, "center")
+    end
 
     local xbar  = xpos - tex.Width + DIFFSELECT_LEVEL_BAR_X
     local ybar  = ypos - tex.Height + DIFFSELECT_LEVEL_BAR_Y
