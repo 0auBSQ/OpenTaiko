@@ -153,11 +153,11 @@ local function buildChestPool(idx)
     local pool = {}
 
     -- snap (nothing)
-    local snapW = (idx == 3) and 50 or 20
+    local snapW = (idx == 3) and 55 or 35
     table.insert(pool, {w = snapW, type = "snap"})
 
     -- coins
-    local coinW    = (idx == 2) and 35 or 30
+    local coinW    = (idx == 2) and 25 or 20
     local coinMin  = ({20, 100, 200})[idx]
     local coinMax  = ({50, 200, 500})[idx]
     table.insert(pool, {w = coinW, type = "coins", min = coinMin, max = coinMax})
@@ -169,11 +169,11 @@ local function buildChestPool(idx)
     -- nameplate
     local uNp = getUnobtainedNameplates(idx)
     if #uNp > 0 then
-        table.insert(pool, {w = 10, type = "nameplate", pool = uNp})
+        table.insert(pool, {w = 15, type = "nameplate", pool = uNp})
     end
 
     -- song
-    local songW = (idx == 3) and 10 or 30
+    local songW = (idx == 3) and 10 or 20
     local uSongs = getUnobtainedSongs(idx)
     if #uSongs > 0 then
         table.insert(pool, {w = songW, type = "song", pool = uSongs})
