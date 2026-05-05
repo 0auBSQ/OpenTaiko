@@ -19,6 +19,7 @@ local Diff    = require("diffselect")
 local DrawSS  = require("draw_songselect")
 local Search  = require("search")
 local Unlocks = require("unlockables")
+local Favs    = require("favorites")
 
 -- ── Shared state (G) ─────────────────────────────────────────────────────────
 -- All modules receive a reference to this table via their init() call.
@@ -193,6 +194,7 @@ Diff.init(G)
 DrawSS.init(G)
 Search.init(G)
 Unlocks.init(G)
+Favs.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
 -- without needing a direct reference to Sort.
@@ -284,6 +286,9 @@ function onStart()
 
     G.favoriteicon  = TEXTURE:CreateTexture("Textures/fav.png")
     G.genre_overlays = {}
+
+    Favs.loadDB()
+    G.favs = Favs
 end
 
 function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)

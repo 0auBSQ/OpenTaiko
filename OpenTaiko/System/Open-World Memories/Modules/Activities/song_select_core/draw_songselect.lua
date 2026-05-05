@@ -117,6 +117,17 @@ local function drawLevelTag(songNode, x, y)
     end
 end
 
+-- Draw fav.png at x=39 y=80 relative to bar.png top-left (without anchor).
+local function drawFavIcon(node, xpos, ypos)
+    if not node.IsSong or node.UniqueId == nil then return end
+    if G.favs == nil or G.favoriteicon == nil then return end
+    local saveId = GetSaveFile(G.highlightedPlayer).SaveId
+    if not G.favs.isFavorite(saveId, node.UniqueId) then return end
+    local bar_tl_x = xpos - G.bars["bar"].Width  / 2
+    local bar_tl_y = ypos - G.bars["bar"].Height / 2
+    G.favoriteicon:Draw(bar_tl_x + 39, bar_tl_y + 80)
+end
+
 local function drawBarleft(node, xpos, ypos)
     local barW = G.bars["bar"].Width
     local barH = G.bars["bar"].Height
@@ -311,6 +322,7 @@ function M.drawPanel()
                         G.bars["bar"]:SetColor(node.BoxColor)
                         G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
                         G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
+                        drawFavIcon(node, xpos, ypos)
                         if node.IsSong then drawBarleft(node, xpos, ypos) end
                         drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
                         tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
@@ -322,6 +334,7 @@ function M.drawPanel()
                     G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
                     tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
                 end
+
             end
         end
 

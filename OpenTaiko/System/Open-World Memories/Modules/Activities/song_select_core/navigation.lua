@@ -244,6 +244,22 @@ function M.handleSongSelectInput(Sort, Diff)
         end
     end
 
+    -- Favorites: toggle on selected song (song node, not locked, not vault-locked)
+    if (INPUT:KeyboardPressed("LeftControl") or INPUT:KeyboardPressed("RightControl")) and G.favs ~= nil then
+        local ssn = G.songList ~= nil and G.songList:GetSelectedSongNode() or nil
+        if ssn ~= nil and ssn.IsSong and not ssn.IsLocked
+                and (G.unlocks == nil or not G.unlocks.isVaultLocked(ssn)) then
+            local saveId = GetSaveFile(G.highlightedPlayer).SaveId
+            G.favs.toggleFavorite(saveId, ssn.UniqueId)
+            G.sounds.Decide:Play()
+        end
+    end
+
+    -- Favorites folder: open snapshot virtual folder for the highlighted player
+    if INPUT:KeyboardPressed("O") and G.favs ~= nil then
+        G.favs.openFavoritesFolder(G.highlightedPlayer)
+    end
+
     -- Song speed
     if INPUT:KeyboardPressed("Q") then
         G.sounds.Skip:Play()
