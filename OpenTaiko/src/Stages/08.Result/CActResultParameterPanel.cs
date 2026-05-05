@@ -167,7 +167,7 @@ internal class CActResultParameterPanel : CActivity {
 			b音声再生[i] = true;
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (!ctゲージアニメ[i].IsTicked)
 				ctゲージアニメ[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
 			ctゲージアニメ[i].CurrentValue = (int)ctゲージアニメ[i].EndValue;
@@ -190,7 +190,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			ttkSpeechText[i] = new TitleTextureKey[6];
 
 			int _charaId = OpenTaiko.SaveFileInstances[i].data.Character;
@@ -233,7 +233,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		ctUIMove = new CCounter();
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
 			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED_IN);
 			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED);
@@ -266,7 +266,7 @@ internal class CActResultParameterPanel : CActivity {
 			this.ct表示用 = null;
 		}
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_NORMAL);
 			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED_IN);
 			CCharacter.RemoveEssentialAnimation(i, CCharacter.ANIM_RESULT_FAILED);
