@@ -108,6 +108,15 @@ local function _build_dan_songs(chart)
     return ds
 end
 
+local function _build_dan_exams(chart)
+    if chart == nil or chart.DanExams == nil then return {} end
+    local de = {}
+    for i = 0, chart.DanExams.Length - 1 do
+        de[i + 1] = chart.DanExams[i]
+    end
+    return de
+end
+
 local function _refresh_page()
     page_nodes = {}
     if _song_list == nil then return end
@@ -533,15 +542,17 @@ function M.draw()
     -- Content panels
     if content_slide_dir ~= 0 and content_slide_counter ~= nil
             and prev_sel_node ~= nil and prev_sel_node.IsSong then
-        local prev_off = content_slide_y - content_slide_from
+        local prev_off   = content_slide_y - content_slide_from
         _draw_content(prev_sel_node, prev_off)
         local prev_chart = prev_sel_node:GetChart(DIFF_DAN)
-        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + prev_off, _build_dan_songs(prev_chart))
+        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + prev_off,
+            _build_dan_songs(prev_chart), _build_dan_exams(prev_chart))
     end
     if sel_node ~= nil and sel_node.IsSong then
         _draw_content(sel_node, content_slide_y)
         local chart = sel_node:GetChart(DIFF_DAN)
-        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + content_slide_y, _build_dan_songs(chart))
+        ContentsDrawer.draw(CONTENT_X, CONTENT_Y + content_slide_y,
+            _build_dan_songs(chart), _build_dan_exams(chart))
     end
 
     -- Dan plate

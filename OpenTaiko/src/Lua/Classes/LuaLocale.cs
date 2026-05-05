@@ -26,6 +26,9 @@ namespace OpenTaiko {
 			return CLangManager.LanguageDict;
 		}
 
+		/// <summary>Returns the localized exam condition name for the given Exam.Type integer.</summary>
+		public string GetExamName(int typeAsInt) => CLangManager.LangInstance.GetExamName(typeAsInt);
+
 		// I18N
 
 		private Dictionary<string, string> _ConvertToStringDict(Dictionary<string, object> dict) {

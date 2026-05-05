@@ -1,36 +1,19 @@
-﻿namespace OpenTaiko {
+namespace OpenTaiko {
 	internal class LuaSongDanExam {
-		private Dan_C _dcInfo;
+		private Dan_C? _dcInfo;
 
-		public LuaSongDanExam(Dan_C _dc) {
+		public LuaSongDanExam(Dan_C? _dc) {
 			_dcInfo = _dc;
 		}
 
 		#region [Exam metadata]
 
-		public int RedValue {
-			get {
-				return _dcInfo.GetValue()[0];
-			}
-		}
+		public bool IsSet => _dcInfo != null && _dcInfo.ExamIsEnable;
 
-		public int GoldValue {
-			get {
-				return _dcInfo.GetValue()[1];
-			}
-		}
-
-		public int TypeAsInt {
-			get {
-				return (int)_dcInfo.ExamType;
-			}
-		}
-
-		public int RangeAsInt {
-			get {
-				return (int)_dcInfo.ExamRange;
-			}
-		}
+		public int RedValue  => _dcInfo?.GetValue()[0] ?? 0;
+		public int GoldValue => _dcInfo?.GetValue()[1] ?? 0;
+		public int TypeAsInt => _dcInfo != null ? (int)_dcInfo.ExamType  : 0;
+		public int RangeAsInt => _dcInfo != null ? (int)_dcInfo.ExamRange : 0;
 
 		#endregion
 	}

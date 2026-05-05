@@ -1,13 +1,14 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- standard_dan_contents_draw.lua
 -- Draws the per-song detail bars (DanSong, ordinal stamp, difficulty stamp,
--- level, title, genre) inside Contents.png for the standard dan select.
+-- level, title, genre) and the exam panel (gauge + 2×3 grid) inside
+-- Contents.png for the standard dan select.
 --
 -- Public API:
---   M.load()                       — create textures/fonts (call from _load_resources)
---   M.unload()                     — dispose (call from _unload_resources)
---   M.update(dt, song_count)       — advance scroll counter for ≥4-song dans
---   M.draw(abs_x, abs_y, dan_songs) — draw all bars; abs_x/y = Contents.png top-left in screen coords
+--   M.load()                                  — create textures/fonts (call from _load_resources)
+--   M.unload()                                — dispose (call from _unload_resources)
+--   M.update(dt, song_count)                  — advance scroll counter for ≥4-song dans
+--   M.draw(abs_x, abs_y, dan_songs, dan_exams) — draw all bars + exam panel
 
 local M = {}
 
@@ -35,6 +36,33 @@ local SUB_REL_X     = 250  ; local SUB_REL_Y      = 72  ; local SUB_MAX_W      =
 -- Scroll speed (pixels per second, bars move up)
 local SCROLL_SPEED = 35.0
 
+-- Gauge drawing (EXAM1), position relative to Contents.png, without anchor
+local GAUGE_X = 421
+local GAUGE_Y = 335
+
+-- Exam grid top-left, relative to Contents.png, without anchor
+local EXAM_GRID_X = 36
+local EXAM_GRID_Y = 369
+
+-- Positions within each DanExam bar (relative to its own top-left)
+local EXAM_NAME_REL_X    = 0   -- ExamName.png
+local EXAM_NAME_REL_Y    = 0
+local EXAM_RANGE_REL_X   = 0   -- ExamRange.png
+local EXAM_RANGE_REL_Y   = 63
+local EXAM_TXT_NAME_CX   = 110 -- exam name text, center-x
+local EXAM_TXT_NAME_CY   = 35  -- exam name text, center-y
+local EXAM_TXT_RANGE_CX  = 110 -- exam range text, center-x
+local EXAM_TXT_RANGE_CY  = 98  -- exam range text, center-y
+local EXAM_TXT_MAX_W     = 220
+
+-- Outline colours for exam elements (dark brown for name; red/blue for range)
+local EXAM_NAME_OUTLINE   = {101,  67,  33}  -- dark brown (SaddleBrown-ish)
+local EXAM_RANGE_MORE_COL = {139,   0,   0}  -- dark red
+local EXAM_RANGE_LESS_COL = {  0,   0, 100}  -- dark blue
+
+-- Range display strings (RangeAsInt: 0=More, 1=Less)
+local EXAM_RANGE_STRINGS  = {"or More", "Less than"}
+
 -- Ordinal stamp colours (1 = 1st … ≥10 all use Black)
 local STAMP_COLORS = {
     {255,   0,   0},   -- 1st  Red
@@ -60,14 +88,22 @@ local DIFF_OUTLINE = {
 
 -- ── Module state ──────────────────────────────────────────────────────────────
 
-local tx_dan_song = nil
-local tx_nb       = nil
-local tx_diff     = {}   -- [0..4]
+local tx_dan_song  = nil
+local tx_nb        = nil
+local tx_diff      = {}   -- [0..4]
 
-local font_title  = nil  -- title text
-local font_sub    = nil  -- subtitle text
-local font_nb     = nil  -- ordinal label
-local font_level  = nil  -- star-level number
+local tx_gauge     = nil  -- Gauge.png
+local tx_exam_name = nil  -- ExamName.png overlay
+local tx_exam_rng  = nil  -- ExamRange.png overlay
+local tx_exam      = nil  -- DanExam.png (half-width)
+local tx_exam_long = nil  -- DanExamLong.png (full-width)
+
+local font_title      = nil  -- title text
+local font_sub        = nil  -- subtitle / genre text
+local font_nb         = nil  -- ordinal label
+local font_level      = nil  -- star-level number
+local font_exam_name  = nil  -- exam condition name
+local font_exam_range = nil  -- exam range label
 
 local scroll_y    = 0.0  -- current scroll pixel offset (≥4-song mode)
 
@@ -157,34 +193,48 @@ end
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function M.load()
-    tx_dan_song = TEXTURE:CreateTexture(TX .. "DanSong.png")
-    tx_nb       = TEXTURE:CreateTexture(TX .. "DanSongNb.png")
+    tx_dan_song  = TEXTURE:CreateTexture(TX .. "DanSong.png")
+    tx_nb        = TEXTURE:CreateTexture(TX .. "DanSongNb.png")
     for i = 0, 4 do
         tx_diff[i] = TEXTURE:CreateTexture(TX .. "DanSongDiff_" .. i .. ".png")
     end
+    tx_gauge     = TEXTURE:CreateTexture(TX .. "Gauge.png")
+    tx_exam_name = TEXTURE:CreateTexture(TX .. "ExamName.png")
+    tx_exam_rng  = TEXTURE:CreateTexture(TX .. "ExamRange.png")
+    tx_exam      = TEXTURE:CreateTexture(TX .. "DanExam.png")
+    tx_exam_long = TEXTURE:CreateTexture(TX .. "DanExamLong.png")
     if font_title == nil then
-        font_title = TEXT:Create(28, "regular")
-        font_sub   = TEXT:Create(20, "regular")
-        font_nb    = TEXT:Create(22, "regular")
-        font_level = TEXT:Create(22, "regular")
+        font_title      = TEXT:Create(28, "regular")
+        font_sub        = TEXT:Create(20, "regular")
+        font_nb         = TEXT:Create(22, "regular")
+        font_level      = TEXT:Create(22, "regular")
+        font_exam_name  = TEXT:Create(20, "regular")
+        font_exam_range = TEXT:Create(18, "regular")
     end
     scroll_y = 0.0
 end
 
 function M.unload()
     local function sd(t) if t ~= nil then t:Dispose() end end
-    sd(tx_dan_song) ; tx_dan_song = nil
-    sd(tx_nb)       ; tx_nb       = nil
+    sd(tx_dan_song)  ; tx_dan_song  = nil
+    sd(tx_nb)        ; tx_nb        = nil
     for i = 0, 4 do sd(tx_diff[i]) ; tx_diff[i] = nil end
+    sd(tx_gauge)     ; tx_gauge     = nil
+    sd(tx_exam_name) ; tx_exam_name = nil
+    sd(tx_exam_rng)  ; tx_exam_rng  = nil
+    sd(tx_exam)      ; tx_exam      = nil
+    sd(tx_exam_long) ; tx_exam_long = nil
     -- fonts are preserved across load/unload cycles (destroyed in M.destroy)
 end
 
 function M.destroy()
     local function sd(t) if t ~= nil then t:Dispose() end end
-    sd(font_title) ; font_title = nil
-    sd(font_sub)   ; font_sub   = nil
-    sd(font_nb)    ; font_nb    = nil
-    sd(font_level) ; font_level = nil
+    sd(font_title)      ; font_title      = nil
+    sd(font_sub)        ; font_sub        = nil
+    sd(font_nb)         ; font_nb         = nil
+    sd(font_level)      ; font_level      = nil
+    sd(font_exam_name)  ; font_exam_name  = nil
+    sd(font_exam_range) ; font_exam_range = nil
 end
 
 -- ── Update ─────────────────────────────────────────────────────────────────────
@@ -262,10 +312,121 @@ local function drawBar(song_idx, ds, bar_rel_x, bar_rel_y, abs_x, abs_y)
     end
 end
 
+-- ── Exam drawing ──────────────────────────────────────────────────────────────
+
+-- Draw the overlays and text labels inside one DanExam bar.
+-- bar_x, bar_y = top-left of the exam bar in screen space.
+local function drawExamBar(exam, bar_x, bar_y)
+    local white      = COLOR:CreateColorFromARGB(255, 255, 255, 255)
+    local is_more    = (exam.RangeAsInt == 0)
+    local rc         = is_more and EXAM_RANGE_MORE_COL or EXAM_RANGE_LESS_COL
+    local rng_color  = COLOR:CreateColorFromARGB(255, rc[1], rc[2], rc[3])
+
+    -- ExamName.png (always white)
+    if tx_exam_name ~= nil then
+        tx_exam_name:Draw(bar_x + EXAM_NAME_REL_X, bar_y + EXAM_NAME_REL_Y)
+    end
+
+    -- ExamRange.png (red for More, blue for Less)
+    if tx_exam_rng ~= nil then
+        tx_exam_rng:SetColor(rng_color)
+        tx_exam_rng:Draw(bar_x + EXAM_RANGE_REL_X, bar_y + EXAM_RANGE_REL_Y)
+        tx_exam_rng:SetColor(white)
+    end
+
+    -- Exam condition name (e.g. "Good count"), dark-brown outline
+    local db_outline = COLOR:CreateColorFromARGB(255,
+        EXAM_NAME_OUTLINE[1], EXAM_NAME_OUTLINE[2], EXAM_NAME_OUTLINE[3])
+    local exam_name  = LANG:GetExamName(exam.TypeAsInt)
+    if font_exam_name ~= nil and exam_name ~= nil and exam_name ~= "" then
+        local nt = font_exam_name:GetText(exam_name, false, EXAM_TXT_MAX_W, white, db_outline)
+        if nt ~= nil then
+            nt:DrawAtAnchor(bar_x + EXAM_TXT_NAME_CX, bar_y + EXAM_TXT_NAME_CY, "center")
+        end
+    end
+
+    -- Exam range text ("or More" / "Less than"), matching outline colour
+    local range_str = is_more and EXAM_RANGE_STRINGS[1] or EXAM_RANGE_STRINGS[2]
+    if font_exam_range ~= nil then
+        local rt = font_exam_range:GetText(range_str, false, EXAM_TXT_MAX_W, white, rng_color)
+        if rt ~= nil then
+            rt:DrawAtAnchor(bar_x + EXAM_TXT_RANGE_CX, bar_y + EXAM_TXT_RANGE_CY, "center")
+        end
+    end
+end
+
+-- Draw the full exam panel (gauge + 2×3 grid) for a given set of exams.
+-- dan_exams: 1-indexed Lua table; [1]=EXAM1(gauge), [2..7]=EXAM2..7 (grid)
+local function drawExams(dan_exams, abs_x, abs_y)
+    if dan_exams == nil then return end
+
+    local white     = COLOR:CreateColorFromARGB(255, 255, 255, 255)
+    local yellow    = COLOR:CreateColorFromARGB(255, 255, 220,   0)
+    local red_fill  = COLOR:CreateColorFromARGB(255, 200,   0,   0)
+
+    -- ── Gauge (EXAM1) ─────────────────────────────────────────────────────────
+    local gauge_exam = dan_exams[1]
+    if tx_gauge ~= nil and gauge_exam ~= nil and gauge_exam.IsSet then
+        local gx = abs_x + GAUGE_X
+        local gy = abs_y + GAUGE_Y
+        local gw = tx_gauge.Width
+        local gh = tx_gauge.Height
+
+        -- Full gauge in yellow
+        tx_gauge:SetColor(yellow)
+        tx_gauge:Draw(gx, gy)
+        tx_gauge:SetColor(white)
+
+        -- Left portion up to redValue% drawn in red on top
+        local red_w = math.floor(gw * gauge_exam.RedValue / 100)
+        if red_w > 0 then
+            tx_gauge:SetColor(red_fill)
+            tx_gauge:DrawRect(gx, gy, 0, 0, red_w, gh)
+            tx_gauge:SetColor(white)
+        end
+    end
+
+    -- ── Exam 2×3 grid (EXAM2–EXAM7) ──────────────────────────────────────────
+    -- Grid layout (column-first):
+    --   Row 0: col0 = EXAM2 [2], col1 = EXAM5 [5]
+    --   Row 1: col0 = EXAM3 [3], col1 = EXAM6 [6]
+    --   Row 2: col0 = EXAM4 [4], col1 = EXAM7 [7]
+    -- Rows with two exams use DanExam.png (half-width); rows with only one use DanExamLong.png.
+    local exam_h = (tx_exam ~= nil and tx_exam.Height > 0) and tx_exam.Height or 80
+    local exam_w = (tx_exam ~= nil and tx_exam.Width  > 0) and tx_exam.Width  or 230
+
+    for row = 0, 2 do
+        local c0 = dan_exams[row + 2]   -- EXAM2..4
+        local c1 = dan_exams[row + 5]   -- EXAM5..7
+        local c0set = c0 ~= nil and c0.IsSet
+        local c1set = c1 ~= nil and c1.IsSet
+
+        if not c0set and not c1set then
+            -- nothing in this row
+        elseif c0set and c1set then
+            -- both columns → half-width bars
+            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + 1)
+            local bx0   = abs_x + EXAM_GRID_X
+            local bx1   = bx0 + exam_w + 1
+            if tx_exam ~= nil then tx_exam:Draw(bx0, row_y) end
+            drawExamBar(c0, bx0, row_y)
+            if tx_exam ~= nil then tx_exam:Draw(bx1, row_y) end
+            drawExamBar(c1, bx1, row_y)
+        else
+            -- col0 only → full-width bar
+            local row_y = abs_y + EXAM_GRID_Y + row * (exam_h + 1)
+            local bx0   = abs_x + EXAM_GRID_X
+            if tx_exam_long ~= nil then tx_exam_long:Draw(bx0, row_y) end
+            drawExamBar(c0, bx0, row_y)
+        end
+    end
+end
+
 -- Main draw entry point.
 -- abs_x, abs_y  : screen-space top-left of Contents.png (CONTENT_X, CONTENT_Y + slide)
--- dan_songs     : Lua table (1-indexed) of LuaSongDanSong objects
-function M.draw(abs_x, abs_y, dan_songs)
+-- dan_songs     : 1-indexed Lua table of LuaSongDanSong objects
+-- dan_exams     : 1-indexed Lua table of LuaSongDanExam objects ([1]=EXAM1 … [7]=EXAM7)
+function M.draw(abs_x, abs_y, dan_songs, dan_exams)
     if dan_songs == nil then return end
     local song_count = #dan_songs
     if song_count == 0 then return end
@@ -302,6 +463,9 @@ function M.draw(abs_x, abs_y, dan_songs)
             end
         end
     end
+
+    -- ── Exam panel (gauge + grid) ─────────────────────────────────────────────
+    drawExams(dan_exams, abs_x, abs_y)
 end
 
 return M
