@@ -68,7 +68,7 @@
 
 		public bool IsAssistedClear(int player) {
 			if (!IsClear(player)) return false;
-			return OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player) < 1f;
+			return CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, player) < 1f;
 		}
 
 		public bool IsFullCombo(int player) {

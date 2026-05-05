@@ -93,15 +93,6 @@ internal class CStage曲読み込み : CStage {
 
 			int _danTick = 0, _danR = 255, _danG = 255, _danB = 255;
 			string _danTitle = "";
-			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan
-					&& OpenTaiko.stageDanSongSelect.段位リスト.stバー情報 != null) {
-				var _bi = OpenTaiko.stageDanSongSelect.段位リスト.stバー情報[OpenTaiko.stageDanSongSelect.段位リスト.Cursor.IdxItem];
-				_danTick  = _bi.nDanTick;
-				_danR     = (int)_bi.cDanTickColor.R;
-				_danG     = (int)_bi.cDanTickColor.G;
-				_danB     = (int)_bi.cDanTickColor.B;
-				_danTitle = _bi.ttkタイトル[_bi.ttkタイトル.Length - 1].str;
-			}
 			Script?.Activate(
 				new LuaSongNode(OpenTaiko.SongMount.rChoosenSong, null, false),
 				OpenTaiko.SongMount.nChoosenSongDifficulty[0],

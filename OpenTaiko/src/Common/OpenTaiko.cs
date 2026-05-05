@@ -200,25 +200,12 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStageSongSelect stageSongSelect {
-		get;
-		private set;
-	}
-	public static CStage段位選択 stageDanSongSelect {
-		get;
-		private set;
-	}
 	public static CStageHeya stageHeya {
 		get;
 		private set;
 	}
 
 	public static CStageOnlineLounge stageOnlineLounge {
-		get;
-		private set;
-	}
-
-	public static CStageTowerSelect stageTowerSelect {
 		get;
 		private set;
 	}
@@ -596,7 +583,6 @@ internal class OpenTaiko : Game {
 								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
 								!EnumSongs.IsSongListEnumStarted) {
 								MountActivity(actEnumSongs);
-								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = true;
 								EnumSongs.Init();   // 取得した曲数を、新インスタンスにも与える
 								EnumSongs.StartEnumFromDisk();      // 曲検索スレッドの起動_開始
 							}
@@ -631,11 +617,9 @@ internal class OpenTaiko : Game {
 							// CStage選曲.On活性化() に回した方がいいかな？
 							if (EnumSongs.state is CEnumSongs.DTXEnumState.Enumeratad or CEnumSongs.DTXEnumState.Canceled) {
 								UnmountActivity(actEnumSongs);
-								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
 
 								if (EnumSongs.IsSongListEnumerated) {
-								bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
-								OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
+								OpenTaiko.Songs管理 = EnumSongs.Songs管理;
 								EnumSongs.SongListEnumCompletelyDone();
 
 								// Propagate AfterSongEnum events to all lua stages
@@ -675,10 +659,6 @@ internal class OpenTaiko : Game {
 									this.tExecuteGarbageCollection();
 									break;
 
-								case CStage.EStage.SongSelect:
-									UnmountAndChangeStage(stageSongSelect, "Song Select");
-									this.tExecuteGarbageCollection();
-									break;
 							}
 							if (stageChangeSkin.IsPreviousStageSaved) { // change skin
 								UnmountAndChangeStage(stageChangeSkin);
@@ -689,106 +669,6 @@ internal class OpenTaiko : Game {
 						#endregion
 						break;
 
-					case CStage.EStage.SongSelect:
-						#region [ *** ]
-						//-----------------------------
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								if (ConfigIni.bAIBattleMode == true) {
-									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
-									ConfigIni.bAIBattleMode = false;
-									CVirtualSlotManager.MountSlot(2, "2P");
-								}
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.PlayCutSceneIntro:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeStage(stageCutScene, "Cut Scene");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeStage(stageSongLoading, "Song Loading");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.ConfigMenuOpened:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeStage(stageConfig, "Config");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SkinChange:
-								UnmountAndChangeStage(stageChangeSkin, "Skin Change");
-								break;
-						}
-						//-----------------------------
-						#endregion
-						break;
-
-					case CStage.EStage.DanDojoSelect:
-						#region [ *** ]
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
-								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
-								UnmountAndChangeStage(playCutScenes ? stageCutScene : stageSongLoading, playCutScenes ? "Cut Scene" : "Song Loading");
-
-								this.tExecuteGarbageCollection();
-								break;
-								//-----------------------------
-								#endregion
-						}
-						#endregion
-						break;
-
 					case CStage.EStage.Heya:
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
@@ -796,9 +676,6 @@ internal class OpenTaiko : Game {
 								#region [ *** ]
 								//-----------------------------
 								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -900,7 +777,7 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								UnmountAndChangeStage(stageSongSelect, "Song Select");
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
@@ -948,36 +825,6 @@ internal class OpenTaiko : Game {
 						break;
 
 
-					case CStage.EStage.TaikoTowers:
-						#region [ *** ]
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
-								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
-								UnmountAndChangeStage(playCutScenes ? stageCutScene : stageSongLoading, playCutScenes ? "Cut Scene" : "Song Loading");
-								latestSongSelect = stageTowerSelect;
-								this.tExecuteGarbageCollection();
-								break;
-								//-----------------------------
-								#endregion
-						}
-						#endregion
-						break;
-
 					case CStage.EStage.ChangeSkin:
 						#region [ *** ]
 						//-----------------------------
@@ -995,8 +842,8 @@ internal class OpenTaiko : Game {
 								} else {
 									rPreviousStage = prevStage;
 								}
-							} else { // old behavior
-								UnmountAndChangeStage(stageSongSelect, "Song Select");
+							} else { // old behavior: return to title
+								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 								this.tExecuteGarbageCollection();
 							}
 						}
@@ -1011,9 +858,6 @@ internal class OpenTaiko : Game {
 								#region [ Back to title screen ]
 								//-----------------------------
 								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1036,23 +880,6 @@ internal class OpenTaiko : Game {
 								this.tExecuteGarbageCollection();
 								break;
 
-							#region [ Legacy stage methods ]
-
-							case (int)EReturnValue.GAMESTART:
-								UnmountAndChangeStage(stageSongSelect, "Song Select");
-								OpenTaiko.latestSongSelect = stageSongSelect;
-								break;
-
-							case (int)EReturnValue.DANGAMESTART:
-								UnmountAndChangeStage(stageDanSongSelect, "Dan Select");
-								OpenTaiko.latestSongSelect = stageDanSongSelect;
-								break;
-
-							case (int)EReturnValue.TAIKOTOWERSSTART:
-								UnmountAndChangeStage(stageTowerSelect, "Tower Select");
-								OpenTaiko.latestSongSelect = stageTowerSelect;
-								break;
-
 							case (int)EReturnValue.HEYA:
 								UnmountAndChangeStage(stageHeya, "Taiko Heya");
 								break;
@@ -1068,24 +895,6 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.EXIT:
 								UnmountAndChangeStage(stageExit, "End");
 								break;
-
-							case (int)EReturnValue.AIBATTLEMODE:
-								#region [ Song select (with AI) ]
-								//-----------------------------
-								// Mount the AI slot BEFORE activating the song select stage so its
-								// activate() sees the correct character for player 2 from the start.
-								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
-								ConfigIni.nPlayerCount = 2;
-								ConfigIni.bAIBattleMode = true;
-								ConfigIni.tInitializeAILevel();
-								CVirtualSlotManager.MountSlot(2, "AI");
-								UnmountAndChangeStage(stageSongSelect, "AI Battle Song Select");
-								OpenTaiko.latestSongSelect = stageSongSelect;
-
-								//-----------------------------
-								#endregion
-								break;
-								#endregion
 						}
 						#endregion
 						break;
@@ -1108,9 +917,6 @@ internal class OpenTaiko : Game {
 								#region [ *** ]
 								//-----------------------------
 								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1208,7 +1014,6 @@ internal class OpenTaiko : Game {
 	private void NextSongSelectStage(CStage fromStage) {
 		ChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 		rPreviousStage = fromStage;
-		stageSongSelect.NowSong++;
 		this.tExecuteGarbageCollection();
 	}
 
@@ -1223,6 +1028,9 @@ internal class OpenTaiko : Game {
 		if (app == null) {
 			return null;
 		}
+#if DEBUG
+		Trace.TraceInformation($"[ALLOC_TEX] {fileName}");
+#endif
 		try {
 			return new CTexture(fileName, b黒を透過する);
 		} catch (CTextureCreateFailedException e) {
@@ -1707,11 +1515,8 @@ internal class OpenTaiko : Game {
 		stageStartup = new CStage起動();
 		stageConfig = new CStageコンフィグ();
 		SongMount = new CSongMount();
-		stageSongSelect = new CStageSongSelect();
-		stageDanSongSelect = new CStage段位選択();
 		stageHeya = new CStageHeya();
 		stageOnlineLounge = new CStageOnlineLounge();
-		stageTowerSelect = new CStageTowerSelect();
 		stageCutScene = new CStageCutScene();
 		stageSongLoading = new CStage曲読み込み();
 		stageGameScreen = new CStage演奏ドラム画面();
@@ -1724,11 +1529,8 @@ internal class OpenTaiko : Game {
 		this.listTopLevelActivities.Add(actTextConsole);
 		this.listTopLevelActivities.Add(stageStartup);
 		this.listTopLevelActivities.Add(stageConfig);
-		this.listTopLevelActivities.Add(stageSongSelect);
-		this.listTopLevelActivities.Add(stageDanSongSelect);
 		this.listTopLevelActivities.Add(stageHeya);
 		this.listTopLevelActivities.Add(stageOnlineLounge);
-		this.listTopLevelActivities.Add(stageTowerSelect);
 		this.listTopLevelActivities.Add(stageSongLoading);
 		this.listTopLevelActivities.Add(stageGameScreen);
 		this.listTopLevelActivities.Add(stageResults);
@@ -2084,7 +1886,6 @@ internal class OpenTaiko : Game {
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();
-		CActSelect段位リスト.RefleshSkin();
 	}
 	#endregion
 

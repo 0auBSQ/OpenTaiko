@@ -72,11 +72,7 @@ class CStageCutScene : CStage {
 
 	public bool LoadCutScenes(CStage stageLast, bool isLuaStageIntro = false) {
 		var selectedSong = OpenTaiko.SongMount.rChoosenSong;
-		if (stageLast == OpenTaiko.stageSongSelect
-			|| stageLast == OpenTaiko.stageDanSongSelect
-			|| stageLast == OpenTaiko.stageTowerSelect
-			|| isLuaStageIntro
-			) {
+		if (isLuaStageIntro) {
 			this.mode = ECutSceneMode.Intro;
 			this.cutScenes = (selectedSong.CutSceneIntro != null) ? [selectedSong.CutSceneIntro] : [];
 		} else {

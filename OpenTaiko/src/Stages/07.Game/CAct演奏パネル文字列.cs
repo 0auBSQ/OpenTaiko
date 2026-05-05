@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using FDK;
 using SkiaSharp;
-using static OpenTaiko.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 
 namespace OpenTaiko;

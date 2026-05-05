@@ -1,5 +1,4 @@
 ﻿using FDK;
-using static OpenTaiko.CActSelect曲リスト;
 using Color = System.Drawing.Color;
 using Rectangle = System.Drawing.Rectangle;
 

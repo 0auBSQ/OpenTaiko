@@ -88,14 +88,10 @@
 
 		private EReturnValue _StringToLegacyValue(string rv) {
 			return rv switch {
-				"gamestart" => EReturnValue.GAMESTART,
-				"dangamestart" => EReturnValue.DANGAMESTART,
-				"taikotowerstart" => EReturnValue.TAIKOTOWERSSTART,
 				"heya" => EReturnValue.HEYA,
 				"config" => EReturnValue.CONFIG,
 				"exit" => EReturnValue.EXIT,
 				"onlinelounge" => EReturnValue.ONLINELOUNGE,
-				"aibattlemode" => EReturnValue.AIBATTLEMODE,
 				_ => EReturnValue.BackToTitle
 			};
 		}

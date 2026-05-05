@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿using System.Diagnostics;
+using FDK;
 
 namespace OpenTaiko {
 	public class LuaSound : IDisposable {
@@ -86,6 +87,9 @@ namespace OpenTaiko {
 
 		internal LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group, bool autoDispose = true) {
 			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+#if DEBUG
+			Trace.TraceInformation($"[ALLOC_SND] {full_path}");
+#endif
 
 			LuaSound sound = new();
 

@@ -121,11 +121,11 @@ internal class CStage結果 : CStage {
 
 			bool[] assistedClear =
 			{
-				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 0) < 1f),
-				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 1) < 1f),
-				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 2) < 1f),
-				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 3) < 1f),
-				(OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, 4) < 1f)
+				(CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 0) < 1f),
+				(CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 1) < 1f),
+				(CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 2) < 1f),
+				(CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 3) < 1f),
+				(CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, 4) < 1f)
 			};
 
 			this.IsScoreValid = [false, false, false, false, false];
@@ -354,11 +354,11 @@ internal class CStage結果 : CStage {
 
 			float[] modMultipliers =
 			{
-				OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 0),
-				OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 1),
-				OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 2),
-				OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 3),
-				OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.COINS, false, 4)
+				CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.COINS, 0),
+				CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.COINS, 1),
+				CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.COINS, 2),
+				CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.COINS, 3),
+				CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.COINS, 4)
 			};
 
 			float getCoinMul(int player) {
@@ -601,8 +601,6 @@ internal class CStage結果 : CStage {
 			}
 
 			#endregion
-
-			OpenTaiko.stageSongSelect.actSongList.bFirstCrownLoad = false;
 
 			this.ctPhase1 = null;
 			this.ctPhase2 = null;
@@ -1385,10 +1383,6 @@ internal class CStage結果 : CStage {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					actFO.tフェードアウト開始();
 
-					if (OpenTaiko.latestSongSelect == OpenTaiko.stageSongSelect)// TJAPlayer3.stage選曲.n確定された曲の難易度[0] != (int)Difficulty.Dan)
-						if (OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode != null)
-							OpenTaiko.stageSongSelect.actSongList.tCloseBOX();
-
 					tPostprocessing();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					this.eフェードアウト完了時の戻り値 = E戻り値.完了;
@@ -1518,6 +1512,18 @@ internal class CStage結果 : CStage {
 
 	#region [Dan result individual song information]
 
+	private static void DrawDanLevelNumber(float x, float y, int num) {
+		var tx = OpenTaiko.Tx.Dani_Level_Number;
+		float width = tx.sz画像サイズ.Width / 10.0f;
+		float height = tx.sz画像サイズ.Height;
+		int[] nums = CConversion.SeparateDigits(num);
+		for (int j = 0; j < nums.Length; j++) {
+			float _x = x - ((OpenTaiko.Skin.DaniSelect_Level_Number_Interval[0] * j) + width / 2);
+			float _y = y - (OpenTaiko.Skin.DaniSelect_Level_Number_Interval[1] * j - width / 2);
+			tx.t2D描画(_x, _y, new System.Drawing.RectangleF(width * nums[j], 0, width, height));
+		}
+	}
+
 	private void ftDanDisplaySongInfo(int i, int offset = 0) {
 		int drawPos = i % 3;
 		int nowIndex = (i / 3);
@@ -1554,7 +1560,7 @@ internal class CStage結果 : CStage {
 		OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 
 		OpenTaiko.Tx.Dani_Level_Number.Opacity = opacity;
-		OpenTaiko.stageDanSongSelect.段位リスト.tLevelNumberDraw(OpenTaiko.Skin.DanResult_Level_Number_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
+		DrawDanLevelNumber(OpenTaiko.Skin.DanResult_Level_Number_X[drawPos] + offset, OpenTaiko.Skin.DanResult_Level_Number_Y[drawPos], song.Level);
 		OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
 		int[] scoresArr =

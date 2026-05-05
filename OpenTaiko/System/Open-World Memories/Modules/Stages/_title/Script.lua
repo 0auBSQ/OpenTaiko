@@ -3,8 +3,8 @@ local ttkArr = {}
 local background = nil
 local sounds = {}
 local currentMenu = 1
-local defaultMenus = {"gamestart", "aibattlemode", "dangamestart", "taikotowerstart", "heya", "onlinelounge", "config", "exit"}
-local localizedMenus = {"TITLE_MODE_TAIKO", "TITLE_MODE_AI", "TITLE_MODE_DAN", "TITLE_MODE_TOWER", "TITLE_MODE_HEYA", "TITLE_MODE_ONLINE", "TITLE_MODE_SETTINGS", "TITLE_MODE_EXIT"}
+local defaultMenus = {"heya", "onlinelounge", "config", "exit"}
+local localizedMenus = {"TITLE_MODE_HEYA", "TITLE_MODE_ONLINE", "TITLE_MODE_SETTINGS", "TITLE_MODE_EXIT"}
 local luaMenus = {}
 
 local function JsonNum(num)

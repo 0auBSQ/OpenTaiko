@@ -185,7 +185,7 @@ internal class CAct演奏スコア共通 : CActivity {
 
 		double rev = 1.0;
 
-		delta = (long)(delta * OpenTaiko.stageSongSelect.actPlayOption.tGetModMultiplier(CActPlayOption.EBalancingType.SCORE, false, player));
+		delta = (long)(delta * CModBalancing.tGetModMultiplier(CModBalancing.EBalancingType.SCORE, player));
 
 		this.ctTimer = new CCounter(0, 400, 1, OpenTaiko.Timer);
 
