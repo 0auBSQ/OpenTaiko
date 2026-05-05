@@ -163,6 +163,16 @@
 			return table[clearStatus];
 		}
 
+		/// <summary>Returns the Dan best play record for <paramref name="node"/> for default (no-mod) plays.</summary>
+		public LuaDanBestPlay GetDanBestPlay(LuaSongNode? node) {
+			string? uid = node?.UniqueId;
+			if (uid == null) return new LuaDanBestPlay();
+			string key = uid + ((int)Difficulty.Dan).ToString() + "8925478921";
+			return _sf.data.bestPlays.TryGetValue(key, out var record)
+				? new LuaDanBestPlay(record)
+				: new LuaDanBestPlay();
+		}
+
 		#endregion
 
 		#region [Characters and Puchis]

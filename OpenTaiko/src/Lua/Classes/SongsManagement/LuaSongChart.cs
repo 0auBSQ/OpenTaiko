@@ -161,6 +161,19 @@
 			}
 		}
 
+		/// <summary>Returns the per-song exam for a given song and exam slot.
+		/// Both <paramref name="songIdx"/> and <paramref name="examSlot"/> are 1-based.
+		/// Returns an exam with IsSet=false when no per-song exam exists for that combination.</summary>
+		public LuaSongDanExam GetSongExam(int songIdx, int examSlot) {
+			int si = songIdx - 1;
+			int ei = examSlot - 1;
+			var songs = _parentListNode?.DanSongs;
+			if (songs == null || si < 0 || si >= songs.Count) return new LuaSongDanExam(null);
+			var danC = songs[si].Dan_C;
+			if (ei < 0 || ei >= danC.Length) return new LuaSongDanExam(null);
+			return new LuaSongDanExam(danC[ei]);
+		}
+
 		#endregion
 
 

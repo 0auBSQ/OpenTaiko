@@ -117,6 +117,19 @@ local function _build_dan_exams(chart)
     return de
 end
 
+-- dan_song_exams[si][slot] = LuaSongDanExam for song si (1-based), exam slot slot (1-based).
+local function _build_dan_song_exams(chart, song_count)
+    if chart == nil then return {} end
+    local t = {}
+    for si = 1, song_count do
+        t[si] = {}
+        for slot = 1, 7 do
+            t[si][slot] = chart:GetSongExam(si, slot)
+        end
+    end
+    return t
+end
+
 local function _refresh_page()
     page_nodes = {}
     if _song_list == nil then return end
@@ -544,15 +557,21 @@ function M.draw()
             and prev_sel_node ~= nil and prev_sel_node.IsSong then
         local prev_off   = content_slide_y - content_slide_from
         _draw_content(prev_sel_node, prev_off)
-        local prev_chart = prev_sel_node:GetChart(DIFF_DAN)
+        local prev_chart  = prev_sel_node:GetChart(DIFF_DAN)
+        local prev_songs  = _build_dan_songs(prev_chart)
         ContentsDrawer.draw(CONTENT_X, CONTENT_Y + prev_off,
-            _build_dan_songs(prev_chart), _build_dan_exams(prev_chart))
+            prev_songs, _build_dan_exams(prev_chart),
+            _build_dan_song_exams(prev_chart, #prev_songs),
+            GetSaveFile(0):GetDanBestPlay(prev_sel_node))
     end
     if sel_node ~= nil and sel_node.IsSong then
         _draw_content(sel_node, content_slide_y)
-        local chart = sel_node:GetChart(DIFF_DAN)
+        local chart      = sel_node:GetChart(DIFF_DAN)
+        local dan_songs  = _build_dan_songs(chart)
         ContentsDrawer.draw(CONTENT_X, CONTENT_Y + content_slide_y,
-            _build_dan_songs(chart), _build_dan_exams(chart))
+            dan_songs, _build_dan_exams(chart),
+            _build_dan_song_exams(chart, #dan_songs),
+            GetSaveFile(0):GetDanBestPlay(sel_node))
     end
 
     -- Dan plate
