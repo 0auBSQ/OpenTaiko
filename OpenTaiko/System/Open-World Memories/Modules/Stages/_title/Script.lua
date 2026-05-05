@@ -272,9 +272,6 @@ function onStart()
 
     sounds.BGM    = SOUND:CreateBGM("Sounds/BGM.ogg")
     sounds.BGM:SetLoop(true)
-    sounds.Decide = SHARED:GetSharedSound("Decide")
-    sounds.Cancel = SHARED:GetSharedSound("Cancel")
-    sounds.Move   = SHARED:GetSharedSound("Move")
 end
 
 function activate()
@@ -285,6 +282,9 @@ function activate()
     inPrompt  = false
     promptCnt = math.max(1, math.min(5, CONFIG.PlayerCount or 1))
     holdDir   = 0
+    sounds.Decide = SHARED:GetSharedSound("Decide")
+    sounds.Cancel = SHARED:GetSharedSound("Cancel")
+    sounds.Move   = SHARED:GetSharedSound("Move")
     if sounds.BGM ~= nil then sounds.BGM:Play() end
 end
 

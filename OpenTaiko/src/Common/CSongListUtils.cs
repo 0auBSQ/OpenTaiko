@@ -67,14 +67,14 @@ internal class CActSelect段位リスト {
 		OpenTaiko.Tx.Dani_DanIcon.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(scale, scale, 1.0f);
 		OpenTaiko.Tx.Dani_DanIcon.Opacity = opacity;
 		OpenTaiko.Tx.Dani_DanIcon.color4 = CConversion.ColorToColor4(OpenTaiko.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, OpenTaiko.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
-		OpenTaiko.Tx.Dani_DanIcon.t2D拡大率考慮描画(CTexture.RefPnt.Left, x, y);
+		OpenTaiko.Tx.Dani_DanIcon.t2D拡大率考慮描画(CTexture.RefPnt.Center, x, y);
 		OpenTaiko.Tx.Dani_DanIcon.Opacity = 255;
 
 		var ttx = TitleTextureKey.ResolveTitleTexture(ttkTmp);
 		if (ttx != null) {
 			ttx.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(scale, scale, 1.0f);
 			ttx.Opacity = opacity;
-			ttx.t2D拡大率考慮描画(CTexture.RefPnt.Left, x + ((OpenTaiko.Tx.Dani_DanIcon.szTextureSize.Width) * scale), y);
+			ttx.t2D拡大率考慮描画(CTexture.RefPnt.Center, x + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[1]);
 			ttx.Opacity = 255;
 			ttx.vcScaleRatio = new Silk.NET.Maths.Vector3D<float>(1.0f, 1.0f, 1.0f);
 		}
