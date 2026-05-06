@@ -82,6 +82,23 @@ public static class PaletteManager {
 	public static PaletteGradientEntry? GetSlot(int slot)               => slot is >= 0 and < 5 ? _slots[slot] : null;
 
 	/// <summary>
+	/// Returns the palette for the given player spot (0-based), resolving virtual slot mounts.
+	/// Returns null when the spot is occupied by an AI or virtual slot (which has no save-backed palette).
+	/// </summary>
+	public static PaletteGradientEntry? GetEffectivePalette(int playerSpot) {
+		if (playerSpot is < 0 or >= 5) return null;
+		string? mount = CVirtualSlotManager.GetMount(playerSpot);
+		if (mount == null) return _slots[playerSpot];
+		// Redirected to another save slot ("1P"–"5P")
+		if (mount.Length == 2 && mount[1] == 'P' && char.IsDigit(mount[0])) {
+			int n = mount[0] - '0';
+			if (n >= 1 && n <= 5) return _slots[n - 1];
+		}
+		// AI or V1-V5: no palette
+		return null;
+	}
+
+	/// <summary>
 	/// Reads the saved palette index from the player's save file, parses the character's
 	/// Palettes.json, and sets the palette slot. Call this before constructing
 	/// <see cref="TextureLoader.PlayerCharacters"/>[player] so the constructor picks it up.

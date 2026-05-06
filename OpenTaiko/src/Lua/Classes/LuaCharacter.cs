@@ -108,10 +108,11 @@ namespace OpenTaiko {
 		#region [Animation]
 
 		// Resolve the gradient for this draw call:
-		// - player-bound: use _paletteEntry if set, otherwise the player's palette slot
+		// - player-bound: resolve dynamically through the virtual slot system (save-scoped)
 		// - name-bound (_player < 0): only use _paletteEntry; never bleed a slot from another player
-		private LuaGradientMap? DrawGradient =>
-			_paletteEntry?.LuaMap ?? (_player >= 0 ? PaletteManager.GetSlot(_player)?.LuaMap : null);
+		private LuaGradientMap? DrawGradient => _player >= 0
+			? PaletteManager.GetEffectivePalette(_player)?.LuaMap
+			: _paletteEntry?.LuaMap;
 
 		public void Draw(float x, float y, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
 			Character?.Draw(Slot, animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
@@ -264,7 +265,7 @@ namespace OpenTaiko {
 		/// Use with <c>GRADIENT:SetActive</c>/<c>GRADIENT:ClearActive</c> to apply the palette to arbitrary textures.
 		/// </summary>
 		public LuaGradientMap? GetPlayerGradientMap(int player) {
-			return PaletteManager.GetSlot(player)?.LuaMap;
+			return PaletteManager.GetEffectivePalette(player)?.LuaMap;
 		}
 
 		public string ANIM_PREVIEW => CCharacter.ANIM_PREVIEW;
