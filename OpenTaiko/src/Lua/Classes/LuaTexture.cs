@@ -121,6 +121,12 @@ namespace OpenTaiko {
 		public void SetUseNoiseEffect(bool useNoiseEffect) {
 			if (_texture != null) _texture.bUseNoiseEffect = useNoiseEffect;
 		}
+		/// <summary>Permanently assigns a gradient map to this texture instance.</summary>
+		public void SetGradientMap(LuaGradientMap gm) {
+			if (_texture != null) _texture.SetGradientMap(gm._gradientMap?.TextureId ?? 0, gm.BlendStrength);
+		}
+		/// <summary>Removes the per-instance gradient map.</summary>
+		public void ClearGradientMap() => _texture?.ClearGradientMap();
 		#endregion
 		#region Dispose
 		private bool _disposedValue;

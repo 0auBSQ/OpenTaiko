@@ -65,6 +65,8 @@ public class CTexture : IDisposable {
 
 	private static int NoiseEffectID;
 	private static int TimeID;
+	private static int GradientMapSamplerID;
+	private static int GradientBlendID;
 
 	/// <summary>
 	/// 描画に使用する共通のバッファを作成
@@ -94,14 +96,16 @@ public class CTexture : IDisposable {
                 }"
 			,
 			@"#version 100
-                precision mediump float;
+                precision highp float;
 
                 uniform vec4 color;
                 uniform sampler2D texture1;
+                uniform sampler2D gradientMap;
                 uniform vec4 textureRect;
                 uniform vec2 scale;
                 uniform int noteMode;
 				uniform int useNoiseEffect;
+				uniform float gradientBlend;
 				uniform float time;
 
                 varying vec2 texcoord;
@@ -125,7 +129,16 @@ public class CTexture : IDisposable {
                         rect = vec2(textureRect.xy + (texcoord * textureRect.zw));
                     }
 
-					vec4 texColor = texture2D(texture1, rect) * color;
+					vec4 rawColor = texture2D(texture1, rect);
+
+					if (gradientBlend > 0.0) {
+						vec3 straight = rawColor.a > 0.001 ? rawColor.rgb / rawColor.a : vec3(0.0);
+						float luma = dot(straight, vec3(0.299, 0.587, 0.114));
+						vec4 mapped = texture2D(gradientMap, vec2(luma, 0.5));
+						rawColor = vec4(mix(straight, mapped.rgb, gradientBlend), rawColor.a * mapped.a);
+					}
+
+					vec4 texColor = rawColor * color;
 
 					if (useNoiseEffect == 1) {
 						float n = randomGrayscale(rect);
@@ -147,6 +160,14 @@ public class CTexture : IDisposable {
 		NoteModeID = Game.Gl.GetUniformLocation(ShaderProgram, "noteMode"); //テクスチャの切り抜きの座標と大きさ
 		NoiseEffectID = Game.Gl.GetUniformLocation(ShaderProgram, "useNoiseEffect");
 		TimeID = Game.Gl.GetUniformLocation(ShaderProgram, "time");
+		GradientMapSamplerID = Game.Gl.GetUniformLocation(ShaderProgram, "gradientMap");
+		GradientBlendID = Game.Gl.GetUniformLocation(ShaderProgram, "gradientBlend");
+
+		// Bind sampler uniforms to fixed texture units (persists for the program's lifetime).
+		// texture1 stays on unit 0 (the default); gradientMap uses unit 1.
+		Game.Gl.UseProgram(ShaderProgram);
+		Game.Gl.Uniform1(Game.Gl.GetUniformLocation(ShaderProgram, "texture1"), 0);
+		Game.Gl.Uniform1(GradientMapSamplerID, 1);
 
 		//------
 
@@ -251,6 +272,20 @@ public class CTexture : IDisposable {
 	}
 
 	// Properties
+
+	/// <summary>
+	/// When non-zero, applied as the gradient map for every draw call until reset to 0.
+	/// Takes priority over per-instance <see cref="SetGradientMap"/>.
+	/// </summary>
+	public static uint ActiveGradientMapId = 0;
+	public static float ActiveGradientMapBlend = 1.0f;
+
+	private uint _gradientMapTextureId = 0;
+	private float _gradientMapBlend = 1.0f;
+	/// <summary>Assigns a permanent gradient map to this texture instance.</summary>
+	public void SetGradientMap(uint textureId, float blend = 1.0f) { _gradientMapTextureId = textureId; _gradientMapBlend = blend; }
+	/// <summary>Removes the per-instance gradient map.</summary>
+	public void ClearGradientMap() { _gradientMapTextureId = 0; _gradientMapBlend = 1.0f; }
 
 	public bool bUseNoiseEffect {
 		get;
@@ -738,7 +773,19 @@ public class CTexture : IDisposable {
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		Game.Gl.ActiveTexture(TextureUnit.Texture0);
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
+
+		uint _gmId = ActiveGradientMapId != 0 ? ActiveGradientMapId : _gradientMapTextureId;
+		float _gmBlend = ActiveGradientMapId != 0 ? ActiveGradientMapBlend : _gradientMapBlend;
+		if (_gmId != 0) {
+			Game.Gl.ActiveTexture(TextureUnit.Texture1);
+			Game.Gl.BindTexture(TextureTarget.Texture2D, _gmId);
+			Game.Gl.ActiveTexture(TextureUnit.Texture0);
+			Game.Gl.Uniform1(GradientBlendID, _gmBlend);
+		} else {
+			Game.Gl.Uniform1(GradientBlendID, 0.0f);
+		}
 
 		//MVPを設定----
 		unsafe {
@@ -874,7 +921,19 @@ public class CTexture : IDisposable {
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		Game.Gl.ActiveTexture(TextureUnit.Texture0);
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
+
+		uint _gmIdSong = ActiveGradientMapId != 0 ? ActiveGradientMapId : _gradientMapTextureId;
+		float _gmBlendSong = ActiveGradientMapId != 0 ? ActiveGradientMapBlend : _gradientMapBlend;
+		if (_gmIdSong != 0) {
+			Game.Gl.ActiveTexture(TextureUnit.Texture1);
+			Game.Gl.BindTexture(TextureTarget.Texture2D, _gmIdSong);
+			Game.Gl.ActiveTexture(TextureUnit.Texture0);
+			Game.Gl.Uniform1(GradientBlendID, _gmBlendSong);
+		} else {
+			Game.Gl.Uniform1(GradientBlendID, 0.0f);
+		}
 
 		//MVPを設定----
 		unsafe {
