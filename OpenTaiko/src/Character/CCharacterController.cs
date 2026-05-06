@@ -52,7 +52,7 @@ namespace OpenTaiko {
 
 		public void Draw(int player, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			character.Draw(player, strCurrentAnimation, x, y, scaleX, scaleY, opacity, color);
+			character.Draw(player, strCurrentAnimation, x, y, scaleX, scaleY, opacity, color, gradientMap: PaletteManager.GetSlot(player)?.LuaMap);
 		}
 	}
 }

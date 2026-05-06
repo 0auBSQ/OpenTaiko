@@ -542,6 +542,13 @@ internal class CStage結果 : CStage {
 						this.ClearStatusesSaved[i] = clearStatuses[i];
 						this.ScoreRanksSaved[i] = scoreRanks[i];
 					}
+
+					// Track per-character play count for palette unlock gating.
+					string charFolder = OpenTaiko.Tx.Characters[_sf.data.Character]?.dirName ?? "";
+					if (!string.IsNullOrEmpty(charFolder)) {
+						string key = ".character_playcount_" + charFolder;
+						_sf.tSetGlobalCounter(key, _sf.tGetGlobalCounter(key) + 1);
+					}
 				}
 			}
 

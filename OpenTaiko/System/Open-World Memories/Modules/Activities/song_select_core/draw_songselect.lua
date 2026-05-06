@@ -440,9 +440,12 @@ function M.drawPanel()
         -- Draw Portrait.png over the placeholder if it loaded for this player slot
         local portrait = G.portraits ~= nil and G.portraits[j - 1]
         if portrait ~= nil and portrait.Loaded then
+            local gm = CHARACTER:GetPlayerGradientMap(j - 1)
+            if gm ~= nil then GRADIENT:SetActive(gm) end
             portrait:SetOpacity(opacityNorm)
             portrait:DrawAtAnchor(portCx, ypos, "bottom")
             portrait:SetOpacity(1)
+            if gm ~= nil then GRADIENT:ClearActive() end
         end
         NAMEPLATE:DrawPlayerNameplate(xpos + NAMEPLATE_OFFSET_X, ypos, G.songSelectElemOpacity, j - 1)
     end

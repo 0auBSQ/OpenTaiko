@@ -795,6 +795,7 @@ class TextureLoader {
 		for (int i = 0; i < 5; i++) {
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
+			PaletteManager.RestoreFromSave(i);
 			PlayerCharacters[i] = new LuaCharacter(i);
 
 			// If the saved puchichara folder no longer exists, fall back to index 0.

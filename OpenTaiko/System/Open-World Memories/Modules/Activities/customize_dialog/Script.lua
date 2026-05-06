@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global  -- globals injected at runtime
+---@diagnostic disable: undefined-global, undefined-field  -- globals / C# methods injected at runtime
 
 -- customize_dialog/Script.lua
 -- Per-player dialog (activated from the difficulty select screen) that lets a
@@ -18,12 +18,12 @@ local save     = nil
 -- "main" | "character" | "puchichara" | "nameplate_title" | "dan_title" | "player_name" | "hitsounds"
 local currentScreen = "main"
 
--- Main-menu cursor (1-based).  1-6 = categories, 7 = OK, 8 = Cancel.
+-- Main-menu cursor (1-based).  1-7 = categories, 8 = OK, 9 = Cancel.
 local mainIdx    = 1
-local MAIN_LABELS = { "Character", "Puchichara", "Nameplate title", "Dan title", "Player name", "Hitsounds" }
-local MAIN_COUNT  = 8   -- 6 categories + OK + Cancel
-local OK_IDX      = 7
-local CANCEL_IDX  = 8
+local MAIN_LABELS = { "Character", "Palette", "Puchichara", "Nameplate title", "Dan title", "Player name", "Hitsounds" }
+local MAIN_COUNT  = 9   -- 7 categories + OK + Cancel
+local OK_IDX      = 8
+local CANCEL_IDX  = 9
 
 -- Item lists (only available items, built on activate)
 local characterList  = {}
@@ -64,6 +64,14 @@ local sineY = 0
 -- Hitsound preview sounds (loaded on demand, disposed on each navigation / deactivate)
 local hsPreviewDon = nil
 local hsPreviewKa  = nil
+
+-- Palette data for the currently previewed character
+-- Each entry: { name, plays, gradient? }  (gradient is nil for the Default/no-effect palette)
+local paletteList          = {}
+local paletteSubIdx        = 0
+local savedPaletteSubIdx   = 0
+local palFlashColor        = nil   -- nil = white; non-nil = animated red→white (same as song_select_core)
+local currentPaletteFolder = ""   -- folder name the palette list was built for
 
 -- Slide-in transition
 local bgpos  = 1080
@@ -202,6 +210,81 @@ local function buildDanList()
     end
 end
 
+-- ─── Palette helpers ──────────────────────────────────────────────────────────
+
+local function disposePaletteGradients()
+    if loadedCharaInst ~= nil then loadedCharaInst:ClearPaletteGradient() end
+    paletteList = {}
+end
+
+-- Safe key access for JSON-parsed C# dictionaries — uses JSONLOADER:JsonGet (no throw).
+local function jsGet(dict, key, default)
+    local v = JSONLOADER:JsonGet(dict, key)
+    return v ~= nil and v or default
+end
+
+-- Converts a JSON-parsed stops dictionary into a Lua table for character:SetPaletteGradient.
+local function stopsDataToLuaTable(rawStops)
+    local t = {}
+    for j = 1, rawStops.Count do
+        local s = rawStops[j]
+        local alpha = JSONLOADER:JsonGet(s, 5)
+        t[j] = { s[1], s[2], s[3], s[4] }
+        if alpha ~= nil then t[j][5] = alpha end
+    end
+    return t
+end
+
+local function buildPaletteList()
+    disposePaletteGradients()
+    currentPaletteFolder = ""
+    paletteList = { { name = "Default", plays = 0, blend = 0, luaStops = nil } }
+
+    if loadedCharaInst == nil or not loadedCharaInst.IsValid then return end
+    currentPaletteFolder = loadedCharaInst.FolderName
+
+    local rawData = JSONLOADER:JsonParseFileAny(loadedCharaInst.FullPath .. "/Palettes.json")
+    if rawData == nil then return end  -- no file → only Default
+
+    paletteList = {}
+    for i = 1, rawData.Count do
+        local e        = rawData[i]
+        local name     = tostring(jsGet(e, "name", "Palette " .. i))
+        local plays    = math.floor(tonumber(tostring(jsGet(e, "plays", 0))) or 0)
+        local blend    = tonumber(tostring(jsGet(e, "blend", 0))) or 0.0
+        local rawStops = jsGet(e, "stops", nil)
+        local luaStops = nil
+        if rawStops ~= nil and rawStops.Count >= 2 then
+            luaStops = stopsDataToLuaTable(rawStops)
+        end
+        paletteList[i] = { name = name, plays = plays, blend = blend, luaStops = luaStops }
+    end
+    if #paletteList == 0 then
+        paletteList = { { name = "Default", plays = 0, blend = 0, luaStops = nil } }
+    end
+end
+
+local function getCharPlayCount()
+    if currentPaletteFolder == "" or save == nil then return 0 end
+    return math.floor(save:GetGlobalCounter(".character_playcount_" .. currentPaletteFolder) or 0)
+end
+
+local function isPaletteUnlocked(palette)
+    return palette.plays <= 0 or getCharPlayCount() >= palette.plays
+end
+
+-- Stores the currently selected palette gradient on the preview character so that
+-- drawing code can retrieve it with character:GetPaletteGradient().
+local function applyPreviewPalette()
+    if loadedCharaInst == nil then return end
+    local p = paletteList[paletteSubIdx + 1]
+    if p ~= nil and p.luaStops ~= nil then
+        loadedCharaInst:SetPaletteGradient(p.luaStops, p.blend)
+    else
+        loadedCharaInst:ClearPaletteGradient()
+    end
+end
+
 -- ─── Character preview instance management ────────────────────────────────────
 -- Each preview character is a freshly-created LuaCharacter (via CHARACTER:CreateCharacter)
 -- that is fully owned and isolated from the shared instances used by song_select.
@@ -231,6 +314,16 @@ local function swapPreviewCharacter(newEntry)
 
     loadedCharaEntry = newEntry
     loadedCharaInst  = newInst
+
+    -- Rebuild palette list for the new character and restore saved selection
+    buildPaletteList()
+    if currentPaletteFolder ~= "" then
+        local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
+        paletteSubIdx = math.max(0, math.min(savedIdx, #paletteList - 1))
+    else
+        paletteSubIdx = 0
+    end
+    applyPreviewPalette()
 end
 
 -- ─── Find initial sub-indices (currently equipped items) ─────────────────────
@@ -286,6 +379,23 @@ local function applyChanges()
     if #danList        > 0 then save:ChangeDan(danList[danSubIdx + 1].Title)                    end
     if stagedPlayerName ~= "" then save:ChangeName(stagedPlayerName)                            end
     if #hitsoundList   > 0 then save.SelectedHitsounds = hitsoundList[hsSubIdx + 1].FolderName  end
+    -- Persist selected palette index for the current character
+    if currentPaletteFolder ~= "" then
+        save:SetGlobalCounter(".character_palette_" .. currentPaletteFolder, paletteSubIdx)
+    end
+    -- Push palette into the global PaletteManager slot AND update the long-lived PlayerCharacters instance.
+    -- Using save:GetCharacter() gives the same persistent LuaCharacter(player) used everywhere else,
+    -- so _paletteEntry is refreshed for the LuaCharacter.ApplyPalette() path too.
+    local pBound = save:GetCharacter()
+    if pBound ~= nil then
+        local p = paletteList[paletteSubIdx + 1]
+        if p ~= nil and p.luaStops ~= nil then
+            pBound:SetPaletteGradient(p.luaStops, p.blend)
+        else
+            pBound:ClearPaletteGradient()
+        end
+    end
+    -- NOTE: .character_playcount_[folder] is incremented by the result stage at song end.
 end
 
 -- ─── Background draw ──────────────────────────────────────────────────────────
@@ -558,6 +668,43 @@ function draw()
         desc:SetOpacity(alpha)
         desc:DrawAtAnchor(MENU_CX, 950, "top")
 
+    elseif currentScreen == "palette" then
+        local ttl = text:GetText("Palette", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
+        ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
+
+        local playCount          = getCharPlayCount()
+        local selUnlocked        = true
+        local selRemaining       = 0
+        for slot = -NP_HALF_VIS, NP_HALF_VIS do
+            local dataIdx = modWrap(paletteSubIdx + slot, #paletteList)
+            local p       = paletteList[dataIdx + 1]
+            if p ~= nil then
+                local rowY     = NP_LIST_CY + slot * NP_ROW_H
+                local isSel    = (slot == 0)
+                local unlocked = isPaletteUnlocked(p)
+                if isSel then
+                    selUnlocked  = unlocked
+                    selRemaining = unlocked and 0 or ((p.plays or 0) - playCount)
+                end
+                local rowAlpha = isSel and alpha or alpha * 0.5
+                local col      = isSel and COLOR:CreateColorFromHex(COL_YELLOW) or COLOR:CreateColorFromHex(COL_WHITE)
+                local namTx    = text:GetText(p.name, false, 500, col)
+                namTx:SetOpacity(rowAlpha)
+                namTx:DrawAtAnchor(MENU_CX, rowY, "center")
+            end
+        end
+
+        -- Lock message at the bottom, below the last visible row
+        if not selUnlocked then
+            local msgCol = palFlashColor or COLOR:CreateColorFromHex("FFAAAAAA")
+            local s = selRemaining == 1 and "" or "s"
+            local msg = textSmall:GetText(
+                "Play " .. selRemaining .. " more time" .. s .. " with this character to unlock",
+                false, 700, msgCol)
+            msg:SetOpacity(alpha)
+            msg:DrawAtAnchor(MENU_CX, NP_LIST_CY + NP_HALF_VIS * NP_ROW_H + 20, "top")
+        end
+
     elseif currentScreen == "character" then
         local ttl = text:GetText("Character", false, 400, COLOR:CreateColorFromHex(COL_YELLOW))
         ttl:SetOpacity(alpha) ; ttl:DrawAtAnchor(MENU_CX, MENU_TITLE_Y + 40, "top")
@@ -656,16 +803,17 @@ function update()
         elseif decide() then
             if     mainIdx == OK_IDX     then sounds.Decide:Play() ; exitDialog(true)
             elseif mainIdx == CANCEL_IDX then sounds.Cancel:Play() ; exitDialog(false)
-            elseif mainIdx == 1 then sounds.Decide:Play() ; savedCharSubIdx  = charSubIdx  ; currentScreen = "character"
-            elseif mainIdx == 2 then sounds.Decide:Play() ; savedPuchiSubIdx = puchiSubIdx ; currentScreen = "puchichara"
-            elseif mainIdx == 3 then sounds.Decide:Play() ; savedNpSubIdx    = npSubIdx    ; currentScreen = "nameplate_title"
-            elseif mainIdx == 4 then sounds.Decide:Play() ; savedDanSubIdx   = danSubIdx   ; currentScreen = "dan_title"
-            elseif mainIdx == 5 then
+            elseif mainIdx == 1 then sounds.Decide:Play() ; savedCharSubIdx    = charSubIdx    ; currentScreen = "character"
+            elseif mainIdx == 2 then sounds.Decide:Play() ; savedPaletteSubIdx = paletteSubIdx ; currentScreen = "palette"
+            elseif mainIdx == 3 then sounds.Decide:Play() ; savedPuchiSubIdx   = puchiSubIdx   ; currentScreen = "puchichara"
+            elseif mainIdx == 4 then sounds.Decide:Play() ; savedNpSubIdx      = npSubIdx      ; currentScreen = "nameplate_title"
+            elseif mainIdx == 5 then sounds.Decide:Play() ; savedDanSubIdx     = danSubIdx     ; currentScreen = "dan_title"
+            elseif mainIdx == 6 then
                 sounds.Decide:Play()
                 savedPlayerName = stagedPlayerName
                 playerNameInput = INPUT:CreateTextInput(stagedPlayerName, 64)
                 currentScreen   = "player_name"
-            elseif mainIdx == 6 then sounds.Decide:Play() ; savedHsSubIdx    = hsSubIdx    ; currentScreen = "hitsounds"
+            elseif mainIdx == 7 then sounds.Decide:Play() ; savedHsSubIdx = hsSubIdx ; currentScreen = "hitsounds"
             end
         elseif cancel() then
             sounds.Cancel:Play()
@@ -690,6 +838,35 @@ function update()
             sounds.Cancel:Play()
             charSubIdx = savedCharSubIdx
             swapPreviewCharacter(characterList[charSubIdx + 1])
+            currentScreen = "main"
+        end
+
+    -- ── Palette ───────────────────────────────────────────────────────────────
+    elseif currentScreen == "palette" then
+        if down() and #paletteList > 0 then
+            sounds.Skip:Play()
+            paletteSubIdx = modWrap(paletteSubIdx + 1, #paletteList)
+            applyPreviewPalette()
+        elseif up() and #paletteList > 0 then
+            sounds.Skip:Play()
+            paletteSubIdx = modWrap(paletteSubIdx - 1, #paletteList)
+            applyPreviewPalette()
+        elseif decide() then
+            local p = paletteList[paletteSubIdx + 1]
+            if p ~= nil and not isPaletteUnlocked(p) then
+                startCounter("palFlash", 0, 255, 1/510, "none", function(val)
+                    palFlashColor = COLOR:CreateColorFromARGB(255, 255, math.floor(val), math.floor(val))
+                end, function()
+                    palFlashColor = nil
+                end)
+            else
+                sounds.Decide:Play() ; currentScreen = "main"
+            end
+        elseif cancel() then
+            sounds.Cancel:Play()
+            paletteSubIdx = savedPaletteSubIdx
+            palFlashColor = nil
+            applyPreviewPalette()
             currentScreen = "main"
         end
 
@@ -796,6 +973,16 @@ function activate(pl)
         end
     end
 
+    -- Build palette list for the initial character and restore saved selection
+    buildPaletteList()
+    if currentPaletteFolder ~= "" then
+        local savedIdx = math.floor(save:GetGlobalCounter(".character_palette_" .. currentPaletteFolder) or 0)
+        paletteSubIdx = math.max(0, math.min(savedIdx, #paletteList - 1))
+    else
+        paletteSubIdx = 0
+    end
+    applyPreviewPalette()
+
     currentScreen = "main"
     mainIdx       = 1
 
@@ -824,6 +1011,12 @@ function deactivate()
 
     -- Dispose the player name text input if the screen was left open
     if playerNameInput ~= nil then playerNameInput:Dispose() ; playerNameInput = nil end
+
+    -- Dispose palette gradients before the character instance (gradients reference GPU textures)
+    disposePaletteGradients()
+    paletteSubIdx        = 0
+    palFlashColor        = nil
+    currentPaletteFolder = ""
 
     -- Dispose the owned preview character instance (no effect on song_select)
     disposePreviewCharacter()

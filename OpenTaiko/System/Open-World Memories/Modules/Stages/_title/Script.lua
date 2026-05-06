@@ -127,7 +127,7 @@ local function buildMenus()
     m[#m + 1] = dbgEntry("Dan Plate Test (Debug)",     "Shows multiple dan plates with different styling.",         "dan_plate_test")
     m[#m + 1] = dbgEntry("Dan Builder Test (Debug)",   "A minimalist random Dan player.",                          "dan_builder_test")
     m[#m + 1] = dbgEntry("Character Shop (Debug)",     "A minimalist My Room reproduction.",                       "character_shop")
-    m[#m + 1] = dbgEntry("Gradient Map Test (Debug)",  "Shows P1 character with 3 different colour palettes.",     "_test_gradient")
+    m[#m + 1] = dbgEntry("Gradient Map Test (Debug)",  "Shows P1 character with 3 different colour palettes.",     "test_gradient")
 
     return m
 end

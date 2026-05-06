@@ -1155,7 +1155,7 @@ function update(delta, animationType, looping)
 	end
 end
 
-function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, gradientMap)
 	if not avaialbeAnimation(animationType) then
 		return
 	end
@@ -1166,7 +1166,9 @@ function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, 
 		if contextType ~= nil and contextType ~= animationType then
 			overrideOffset = animation_offsets[contextType]
 		end
+		if gradientMap ~= nil then GRADIENT:SetActive(gradientMap) end
 		animation:draw(x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+		if gradientMap ~= nil then GRADIENT:ClearActive() end
 	end
 end
 

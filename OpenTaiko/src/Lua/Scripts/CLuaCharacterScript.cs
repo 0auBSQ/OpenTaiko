@@ -71,14 +71,14 @@ namespace OpenTaiko {
 			return false;
 		}
 
-		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
+		public void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
 			if (animationType == CCharacter.ANIM_NONE) return;
-			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, (object?)null, (object?)null, (object?)null, (object?)null, (object?)null, rotation, (object?)blendMode, (object?)wrapMode);
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, (object?)null, (object?)null, (object?)null, (object?)null, (object?)null, rotation, (object?)blendMode, (object?)wrapMode, (object?)gradientMap);
 		}
 
-		public void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null) {
+		public void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, LuaColor? color = null, string? contextType = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
 			if (animationType == CCharacter.ANIM_NONE) return;
-			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, anchor, (object?)clipW, (object?)clipH, (object)clipX, (object)clipY, rotation, (object?)blendMode, (object?)wrapMode);
+			RunLuaCode(lfDraw, animationType, x, y, scaleX, scaleY, opacity, color ?? new LuaColor(255, 255, 255), contextType, anchor, (object?)clipW, (object?)clipH, (object)clipX, (object)clipY, rotation, (object?)blendMode, (object?)wrapMode, (object?)gradientMap);
 		}
 
 		public LuaVector2 GetDrawSize(string animationType) {

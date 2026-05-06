@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, undefined-field
+
 local sounds = {}
 
 local video = nil
@@ -312,5 +314,5 @@ function onDestroy()
 	SHARED:ClearSharedSound("Skip")
 	SHARED:ClearSharedSound("SongDecide")
 
-	database:Dispose()
+	if database ~= nil then database:Dispose() end
 end

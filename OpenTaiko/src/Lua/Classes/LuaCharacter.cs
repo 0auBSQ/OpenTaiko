@@ -1,4 +1,5 @@
 using FDK;
+using NLua;
 
 namespace OpenTaiko {
 	/// <summary>
@@ -51,6 +52,27 @@ namespace OpenTaiko {
 		private string _blendMode = "normal";
 		private string _wrapMode  = "edge";
 
+		// Non-owning reference into PaletteManager's global cache.
+		private PaletteGradientEntry? _paletteEntry;
+
+		public void SetPaletteGradient(LuaTable? stops, float blend = 1.0f) {
+			_paletteEntry = null;
+			if (stops == null) {
+				if (_player >= 0) PaletteManager.SetSlot(_player, null);
+				return;
+			}
+			var list = PaletteManager.ParseLuaStops(stops);
+			if (list.Count < 2) return;
+			_paletteEntry = PaletteManager.GetOrCreate(PaletteManager.BuildCacheKey(list, blend), list, blend);
+			if (_player >= 0) PaletteManager.SetSlot(_player, _paletteEntry);
+		}
+
+		public void ClearPaletteGradient() {
+			_paletteEntry = null;
+			if (_player >= 0) PaletteManager.SetSlot(_player, null);
+		}
+
+
 		// ── Setters ──────────────────────────────────────────────────────────────
 
 		/// <summary>Sets draw opacity (0.0 = transparent, 1.0 = opaque). Multiplied with per-call opacity.</summary>
@@ -85,17 +107,23 @@ namespace OpenTaiko {
 
 		#region [Animation]
 
+		// Resolve the gradient for this draw call:
+		// - player-bound: use _paletteEntry if set, otherwise the player's palette slot
+		// - name-bound (_player < 0): only use _paletteEntry; never bleed a slot from another player
+		private LuaGradientMap? DrawGradient =>
+			_paletteEntry?.LuaMap ?? (_player >= 0 ? PaletteManager.GetSlot(_player)?.LuaMap : null);
+
 		public void Draw(float x, float y, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.Draw(Slot, animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode);
+			Character?.Draw(Slot, animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		public void DrawAtAnchor(float x, float y, string animation, string anchor = "bottom", float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), null, null, 0f, 0f, _rotation, _blendMode, _wrapMode);
+			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), null, null, 0f, 0f, _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		/// <summary>Draws the character using the top-left corner of a layout rect as the origin.</summary>
 		public void DrawRect(float rect_x, float rect_y, float rect_w, float rect_h, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.Draw(Slot, animation, rect_x, rect_y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode);
+			Character?.Draw(Slot, animation, rect_x, rect_y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		/// <summary>
@@ -104,7 +132,7 @@ namespace OpenTaiko {
 		/// The caller is responsible for computing the exact draw position.
 		/// </summary>
 		public void DrawRectAtAnchor(float x, float y, float clip_w, float clip_h, string animation, int opacity = 255, float clipX = 0f, float clipY = 0f) {
-			Character?.DrawAtAnchor(Slot, animation, x, y, "topleft", _scaleX, _scaleY, BlendOpacity(opacity), StoredColor(), clip_w, clip_h, clipX, clipY, _rotation, _blendMode, _wrapMode);
+			Character?.DrawAtAnchor(Slot, animation, x, y, "topleft", _scaleX, _scaleY, BlendOpacity(opacity), StoredColor(), clip_w, clip_h, clipX, clipY, _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		public bool Update(string animation, bool looping = true) {
@@ -165,6 +193,7 @@ namespace OpenTaiko {
 			_player = player;
 			_ownedCharacter = null;
 			_ownsCharacter = false;
+			_paletteEntry = PaletteManager.GetSlot(player);  // restore any previously set palette
 		}
 
 		/// <summary>
@@ -208,6 +237,7 @@ namespace OpenTaiko {
 		public void Dispose() {
 			if (_disposed) return;
 			_disposed = true;
+			_paletteEntry = null;  // cached globally, not owned — never disposed here
 			if (_ownsCharacter)
 				_ownedCharacter?.Dispose();
 			_ownedCharacter = null;
@@ -227,6 +257,14 @@ namespace OpenTaiko {
 		/// The object resolves the active character dynamically and does not need to be disposed.</summary>
 		public LuaCharacter GetPlayerCharacter(int player) {
 			return new LuaCharacter(player);
+		}
+
+		/// <summary>
+		/// Returns the active palette gradient map for the given player slot, or null if no palette is set.
+		/// Use with <c>GRADIENT:SetActive</c>/<c>GRADIENT:ClearActive</c> to apply the palette to arbitrary textures.
+		/// </summary>
+		public LuaGradientMap? GetPlayerGradientMap(int player) {
+			return PaletteManager.GetSlot(player)?.LuaMap;
 		}
 
 		public string ANIM_PREVIEW => CCharacter.ANIM_PREVIEW;

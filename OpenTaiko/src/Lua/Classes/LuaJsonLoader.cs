@@ -32,6 +32,43 @@ namespace OpenTaiko {
 			return ToDictionary(token);
 		}
 
+		/// <summary>
+		/// Like <see cref="JsonParseFile"/> but works for JSON files whose root is an array as well as
+		/// an object.  Returns null if the file does not exist or is empty.
+		/// Arrays become 1-indexed <c>Dictionary&lt;int, object&gt;</c>; objects become
+		/// <c>Dictionary&lt;string, object&gt;</c> — matching the existing conversion rules.
+		/// </summary>
+		/// <summary>
+		/// Safe key lookup for a JSON-parsed dictionary. Returns null for missing keys instead of
+		/// throwing <see cref="KeyNotFoundException"/>. Accepts both string-keyed and int-keyed
+		/// dictionaries as produced by <see cref="JsonParseFileAny"/>.
+		/// </summary>
+		public object? JsonGet(object? dict, object? key) {
+			if (dict is Dictionary<string, object> sd && key is string sk) {
+				sd.TryGetValue(sk, out var sv);
+				return sv;
+			}
+			if (dict is Dictionary<int, object> id) {
+				int ik = key switch {
+					long l  => (int)l,
+					int  i  => i,
+					double d => (int)d,
+					_ => -1
+				};
+				if (ik >= 0) { id.TryGetValue(ik, out var iv); return iv; }
+			}
+			return null;
+		}
+
+		public object? JsonParseFileAny(string name) {
+			string fullPath = Path.IsPathRooted(name) ? name : Path.Combine(DirPath, name);
+			if (!File.Exists(fullPath)) return null;
+			string json = File.ReadAllText(fullPath);
+			if (string.IsNullOrWhiteSpace(json)) return null;
+			var token = JToken.Parse(json);
+			return ConvertToken(token);
+		}
+
 		public Dictionary<string, object> JsonParseString(string json) {
 			if (string.IsNullOrWhiteSpace(json))
 				return new Dictionary<string, object>();
