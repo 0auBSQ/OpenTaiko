@@ -219,7 +219,8 @@ local _challenge_level = 1
 local _practice_level  = 1
 local _in_challenge    = false   -- true  = we just exited to play (challenge)
 local _in_practice     = false   -- true  = we just exited to play (practice)
-local _song_list_cache = nil
+local _song_list_cache    = nil
+local _missing_song_count = nil   -- nil = not yet validated; >=0 after first check
 
 -- Challenge-mode preview (pre-rolled songs + speed slider)
 local _preview_songs   = nil    -- { {color, node, entry}, ... } for blue/green/red
@@ -256,6 +257,49 @@ local function _get_song_list()
     lsls.FlattenOpenedFolders = true
     _song_list_cache = RequestSongList(lsls)
     return _song_list_cache
+end
+
+-- ── Pool validation ──────────────────────────────────────────────────────────
+
+local function _count_missing_songs()
+    local pools = _load_pools()
+    if pools == nil then return 0 end
+
+    local lsls = GenerateSongListSettings()
+    lsls.AppendMainRandomBox  = false
+    lsls.AppendSubRandomBoxes = false
+    lsls.FlattenOpenedFolders = true
+    lsls.ExcludeHiddenSongs   = false
+    local sl = RequestSongList(lsls)
+
+    local diff_names = { [0] = "Easy", [1] = "Normal", [2] = "Hard", [3] = "Oni", [4] = "Edit" }
+
+    local seen    = {}
+    local missing = 0
+    for _, pool in pairs(pools) do
+        for _, color in ipairs({ "blue", "green", "red", "purple" }) do
+            local entries = pool[color]
+            if entries ~= nil then
+                for _, entry in ipairs(entries) do
+                    local key = (entry.id or "") .. "\0" .. tostring(entry.diff)
+                    if not seen[key] then
+                        seen[key] = true
+                        local node  = sl:GetSongByUniqueId(entry.id)
+                        local diff  = diff_names[entry.diff] or tostring(entry.diff)
+                        if node == nil then
+                            debugLog("[Pagoda] Missing song – id: " .. tostring(entry.id) .. "  diff: " .. diff)
+                            missing = missing + 1
+                        elseif node:GetChart(entry.diff) == nil then
+                            local title = node.Title or entry.id
+                            debugLog("[Pagoda] Missing difficulty – \"" .. title .. "\"  id: " .. tostring(entry.id) .. "  diff: " .. diff)
+                            missing = missing + 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return missing
 end
 
 -- ── Persistence helpers ───────────────────────────────────────────────────────
@@ -483,12 +527,21 @@ end
 -- Called when the player selects Pagoda from the 3-way menu
 function M.enter(shared)
     _callbacks    = shared
-    _pagoda_state = "main_menu"
-    _menu_sel     = 1
     _btn_timer    = 0.15
     _status_msg   = ""
     _status_timer = 0.0
     _ensure_fonts()
+
+    if _missing_song_count == nil then
+        _missing_song_count = _count_missing_songs()
+    end
+
+    if _missing_song_count > 0 then
+        _pagoda_state = "missing_songs"
+    else
+        _pagoda_state = "main_menu"
+        _menu_sel     = 1
+    end
 
     local chara = GetSaveFile(0):GetCharacter()
     if chara ~= nil and chara.IsValid then chara:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end
@@ -553,8 +606,9 @@ function M.on_return(shared)
 end
 
 function M.afterSongEnum()
-    _song_list_cache = nil
-    _pools_cache     = nil
+    _song_list_cache    = nil
+    _pools_cache        = nil
+    _missing_song_count = nil
     _clear_preview()
 end
 
@@ -584,6 +638,12 @@ function M.update(dt)
     local down_p = INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("DownArrow")
     local ok_p   = INPUT:Pressed("Decide")      or INPUT:KeyboardPressed("Return")
     local back_p = INPUT:Pressed("Cancel")      or INPUT:KeyboardPressed("Escape")
+
+    -- ── MISSING SONGS ──────────────────────────────────────────────────────────
+    if _pagoda_state == "missing_songs" then
+        if ok_p or back_p then return "back" end
+        return nil
+    end
 
     -- ── MAIN MENU ──────────────────────────────────────────────────────────────
     if _pagoda_state == "main_menu" then
@@ -772,8 +832,15 @@ function M.draw()
 
     local base_y = res_h / 2
 
+    -- ── MISSING SONGS ──────────────────────────────────────────────────────────
+    if _pagoda_state == "missing_songs" then
+        _font_body:GetText("Some songs are missing to play this game mode",    false, 900, C_FAIL):DrawAtAnchor(cx, base_y - 40,  "center")
+        _font_body:GetText("Please update the OpenTaiko soundtrack and try again", false, 900, C_WHITE):DrawAtAnchor(cx, base_y + 20, "center")
+        _font_hint:GetText("(Missing song count: " .. tostring(_missing_song_count) .. ")", false, 600, C_DIM):DrawAtAnchor(cx, base_y + 80, "center")
+        _font_hint:GetText("Press any button to go back", false, 600, C_DIM):DrawAtAnchor(cx, base_y + 130, "center")
+
     -- ── MAIN MENU ──────────────────────────────────────────────────────────────
-    if _pagoda_state == "main_menu" then
+    elseif _pagoda_state == "main_menu" then
         _font_title:GetText("Pagoda of the Unknown", false, 800, C_WHITE):DrawAtAnchor(cx, base_y - 150, "center")
 
         local hl = _highest_level()
