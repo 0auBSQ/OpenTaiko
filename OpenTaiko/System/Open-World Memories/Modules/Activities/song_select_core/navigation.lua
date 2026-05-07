@@ -134,7 +134,9 @@ local function handleDecideSongSelect(Sort)
         G.sounds.SongDecide:Play()
         return ssn
     elseif ssn.IsRandom == true then
-        local rdNd = G.songList:GetRandomNodeInFolder(ssn)
+        local rdNd = G.songList:GetRandomNodeInFolder(ssn, true, function(node)
+            return G.unlocks == nil or not G.unlocks.isVaultLocked(node)
+        end)
         if rdNd ~= nil then G.sounds.SongDecide:Play(); return rdNd end
     end
     return nil
