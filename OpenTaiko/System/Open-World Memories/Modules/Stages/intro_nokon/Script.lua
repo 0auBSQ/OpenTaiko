@@ -92,7 +92,7 @@ local function loadMainSongList()
     lsls.SubBackBoxFrequency  = 0
     lsls.ExcludeLockedSongs   = true
 
-    if songScope == "Customs" then
+    if songScope == "Custom" then
         lsls.RootGenreFolder = "Custom Charts"
     elseif songScope == "OpTk" then
         lsls:SetExcludedGenreFolders({"Custom Charts", "Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
