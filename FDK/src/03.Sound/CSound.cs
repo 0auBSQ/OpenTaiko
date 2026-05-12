@@ -6,6 +6,7 @@ using FDK.ExtensionMethods;
 using ManagedBass;
 using ManagedBass.Fx;
 using ManagedBass.Mix;
+using ManagedBass.Opus;
 
 
 namespace FDK;
@@ -658,7 +659,10 @@ public class CSound : IDisposable {
 
 		// BASSファイルストリームを作成。
 
-		this._hBassStream = Bass.CreateStream(strファイル名, 0, 0, flags);
+		bool isOpus = string.Equals(Path.GetExtension(strファイル名), ".opus", StringComparison.OrdinalIgnoreCase);
+		this._hBassStream = isOpus
+			? BassOpus.CreateStream(strファイル名, 0, 0, flags)
+			: Bass.CreateStream(strファイル名, 0, 0, flags);
 		if (this._hBassStream == 0)
 			throw new Exception(string.Format("サウンドストリームの生成に失敗しました。(BASS_StreamCreateFile)[{0}]", Bass.LastError.ToString()));
 
