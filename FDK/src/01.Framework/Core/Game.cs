@@ -280,10 +280,30 @@ public abstract class Game : IDisposable {
 		//GetError();
 	}
 
-	private RawImage GetIconData(string fileName) {
-		SKCodec codec = SKCodec.Create(fileName);
-		using SKBitmap bitmap = SKBitmap.Decode(codec, new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Rgba8888));
-		return new RawImage(bitmap.Width, bitmap.Height, bitmap.GetPixelSpan().ToArray());
+	[DllImport("user32.dll")] private static extern nint SendMessage(nint h, uint msg, nuint w, nint l);
+	[DllImport("user32.dll")] private static extern nint SetClassLongPtr(nint h, int idx, nint val);
+
+	// glfwSetWindowIcon sets ICON_SMALL (title bar) and ICON_BIG, but never ICON_SMALL2.
+	// Windows 10/11 taskbar reads ICON_SMALL2 for the button icon — sync it here.
+	private static void SyncTaskbarIcon(nint hwnd) {
+		nint hIcon = SendMessage(hwnd, 0x007F /* WM_GETICON */, 1 /* ICON_BIG */, 0);
+		if (hIcon == 0) return;
+		SendMessage(hwnd, 0x0080 /* WM_SETICON */, 2 /* ICON_SMALL2 */, hIcon);
+		SetClassLongPtr(hwnd, -14 /* GCLP_HICON */, hIcon);
+	}
+
+	private RawImage? GetIconData(string fileName) {
+		try {
+			string path = Path.IsPathRooted(fileName) ? fileName : Path.Combine(AppContext.BaseDirectory, fileName);
+			using var src = SKBitmap.Decode(path);
+			if (src == null) return null;
+			using var rgba = src.Copy(SKColorType.Rgba8888);
+			if (rgba == null) return null;
+			return new RawImage(rgba.Width, rgba.Height, rgba.Bytes);
+		} catch (Exception ex) {
+			Trace.TraceWarning($"[GetIconData] {ex.Message}");
+			return null;
+		}
 	}
 
 	/// <summary>
@@ -460,7 +480,12 @@ public abstract class Game : IDisposable {
 
 
 	public void Window_Load() {
-		Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
+		var icon = GetIconData(strIconFileName);
+		if (icon.HasValue) {
+			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icon.Value));
+			if (OperatingSystem.IsWindows() && Window_.Native?.Win32 is { } w && w.Hwnd != 0)
+				SyncTaskbarIcon(w.Hwnd);
+		}
 
 		if (OperatingSystem.IsMacOS()) {
 			if (Window_.GLContext == null) {
