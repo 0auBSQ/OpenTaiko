@@ -2679,10 +2679,6 @@ internal class CSkin : IDisposable {
 									SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml(strParam);
 									break;
 								}
-							case nameof(SongSelect_ForeColor_Namco): {
-									SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
 							case "SongSelect_BackColor_JPOP": {
 									SongSelect_BackColor_JPOP = ColorTranslator.FromHtml(strParam);
 									break;
@@ -2709,10 +2705,6 @@ internal class CSkin : IDisposable {
 								}
 							case "SongSelect_BackColor_GameMusic": {
 									SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case nameof(SongSelect_BackColor_Namco): {
-									SongSelect_BackColor_Namco = ColorTranslator.FromHtml(strParam);
 									break;
 								}
 							case nameof(SongSelect_CorrectionX_Chara): {
@@ -8082,7 +8074,6 @@ internal class CSkin : IDisposable {
 	public Color SongSelect_ForeColor_Variety = ColorTranslator.FromHtml("#FFFFFF");
 	public Color SongSelect_ForeColor_Classic = ColorTranslator.FromHtml("#FFFFFF");
 	public Color SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Namco = ColorTranslator.FromHtml("#FFFFFF");
 	public Color SongSelect_BackColor_JPOP = ColorTranslator.FromHtml("#01455B");
 	public Color SongSelect_BackColor_Anime = ColorTranslator.FromHtml("#99001F");
 	public Color SongSelect_BackColor_VOCALOID = ColorTranslator.FromHtml("#5B6278");
@@ -8090,7 +8081,6 @@ internal class CSkin : IDisposable {
 	public Color SongSelect_BackColor_Variety = ColorTranslator.FromHtml("#366600");
 	public Color SongSelect_BackColor_Classic = ColorTranslator.FromHtml("#875600");
 	public Color SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml("#412080");
-	public Color SongSelect_BackColor_Namco = ColorTranslator.FromHtml("#980E00");
 
 	public string[] SongSelect_CorrectionX_Chara = { "ここにX座標を補正したい文字をカンマで区切って記入" };
 	public string[] SongSelect_CorrectionY_Chara = { "ここにY座標を補正したい文字をカンマで区切って記入" };

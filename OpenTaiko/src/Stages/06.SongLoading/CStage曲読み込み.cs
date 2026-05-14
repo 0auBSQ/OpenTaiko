@@ -311,11 +311,32 @@ internal class CStage曲読み込み : CStage {
 
 					// DanBuilder: if a pre-built CTja was supplied, use it directly (no file read).
 					var prebuilt = OpenTaiko.DanBuilderPrebuiltTja;
+					string strExt = Path.GetExtension(str).ToLowerInvariant();
 					if (prebuilt != null) {
 						OpenTaiko.DanBuilderPrebuiltTja = null;
 						_dtxLoadTask = Task.Run(() => {
 							for (int i = 0; i < playerCount; i++)
 								captured[i] = prebuilt;
+						}, cts.Token);
+					} else if (strExt is ".optktcm" or ".tcm") {
+						// TCM dan course: build merged CTja from referenced songs.
+						var capturedStr = str;
+						_dtxLoadTask = Task.Run(() => {
+							var tcm = new CTcm(capturedStr);
+							var built = tcm.BuildDanCtja();
+							for (int i = 0; i < playerCount; i++)
+								captured[i] = built;
+						}, cts.Token);
+					} else if (strExt is ".optktci" or ".tci") {
+						// TCI individual song: build CTja from osu course.
+						var capturedStr = str;
+						var capturedDiffs = chosenDiffs;
+						_dtxLoadTask = Task.Run(() => {
+							var tci = new CTci(capturedStr);
+							for (int i = 0; i < playerCount; i++) {
+								cts.Token.ThrowIfCancellationRequested();
+								captured[i] = tci.BuildCtja(capturedDiffs[i]);
+							}
 						}, cts.Token);
 					} else {
 						_dtxLoadTask = Task.Run(() => {

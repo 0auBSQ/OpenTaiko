@@ -91,9 +91,11 @@ internal class CSongs管理 {
 
 	}
 	public void t曲を検索してリストを作成する(string str基点フォルダ, bool b子BOXへ再帰する) {
-		this.t曲を検索してリストを作成する(str基点フォルダ, b子BOXへ再帰する, this.list曲ルート, null);
+		var deferredTcm = new List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)>();
+		this.t曲を検索してリストを作成する(str基点フォルダ, b子BOXへ再帰する, this.list曲ルート, null, deferredTcm);
+		this.ProcessDeferredTcm(deferredTcm);
 	}
-	private void t曲を検索してリストを作成する(string str基点フォルダ, bool b子BOXへ再帰する, List<CSongListNode> listノードリスト, CSongListNode node親) {
+	private void t曲を検索してリストを作成する(string str基点フォルダ, bool b子BOXへ再帰する, List<CSongListNode> listノードリスト, CSongListNode node親, List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)>? deferredTcm = null) {
 		if (!str基点フォルダ.EndsWith(Path.DirectorySeparatorChar))
 			str基点フォルダ = str基点フォルダ + Path.DirectorySeparatorChar;
 
@@ -285,11 +287,7 @@ internal class CSongs管理 {
 										c曲リストノード.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic;
 										c曲リストノード.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic;
 										break;
-									case 7:
-										c曲リストノード.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Namco;
-										c曲リストノード.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Namco;
-										break;
-									default:
+								default:
 										break;
 								}
 
@@ -326,6 +324,39 @@ internal class CSongs管理 {
 						}
 					}
 					#endregion
+				} else if (strExt.Equals(".optktci") || strExt.Equals(".tci")) {
+					string filePath = str基点フォルダ + fileinfo.Name;
+					using SHA1 tciHash = SHA1.Create();
+					using var tciFs = File.OpenRead(filePath);
+					byte[] tciRawHash = tciHash.ComputeHash(tciFs);
+					string tciHashStr = string.Concat(tciRawHash.Select(b => b.ToString("X2")));
+
+					if (listSongsDB.TryGetValue(filePath + tciHashStr, out CSongListNode tciCached)) {
+						this.n検索されたスコア数++;
+						listノードリスト.Add(tciCached);
+						CSongDict.tAddSongNode(tciCached.uniqueId, tciCached);
+						tciCached.rParentNode = node親;
+						ApplyParentSettings(tciCached, node親);
+						this.n検索された曲ノード数++;
+					} else {
+						CTci tci = new CTci(filePath);
+						if (tci.Courses.Count > 0) {
+							CSongListNode tciNode = tci.BuildSongListNode();
+							tciNode.rParentNode = node親;
+							tciNode.strBreadcrumbs = (tciNode.rParentNode == null)
+								? filePath : tciNode.rParentNode.strBreadcrumbs + " > " + filePath;
+							ApplyParentSettings(tciNode, node親);
+							ApplyGenreColors(tciNode);
+							CSongDict.tAddSongNode(tciNode.uniqueId, tciNode);
+							if (!listSongsDB.ContainsKey(filePath + tciHashStr))
+								listSongsDB.Add(filePath + tciHashStr, tciNode);
+							listノードリスト.Add(tciNode);
+							this.n検索されたスコア数++;
+							this.n検索された曲ノード数++;
+						}
+					}
+				} else if ((strExt.Equals(".optktcm") || strExt.Equals(".tcm")) && deferredTcm != null) {
+					deferredTcm.Add((str基点フォルダ + fileinfo.Name, listノードリスト, node親));
 				}
 			}
 		} finally {
@@ -416,11 +447,7 @@ internal class CSongs管理 {
 						c曲リストノード.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic;
 						c曲リストノード.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic;
 						break;
-					case 7:
-						c曲リストノード.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Namco;
-						c曲リストノード.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Namco;
-						break;
-					default:
+				default:
 						break;
 				}
 
@@ -489,7 +516,7 @@ internal class CSongs管理 {
 					}
 				}
 				if (b子BOXへ再帰する) {
-					this.t曲を検索してリストを作成する(infoDir.FullName + Path.DirectorySeparatorChar, b子BOXへ再帰する, c曲リストノード.childrenList, c曲リストノード);
+					this.t曲を検索してリストを作成する(infoDir.FullName + Path.DirectorySeparatorChar, b子BOXへ再帰する, c曲リストノード.childrenList, c曲リストノード, deferredTcm);
 				}
 			}
 			//-----------------------------
@@ -498,7 +525,7 @@ internal class CSongs管理 {
 			#region [ c.通常フォルダの場合 ]
 			//-----------------------------
 			else {
-				this.t曲を検索してリストを作成する(infoDir.FullName + Path.DirectorySeparatorChar, b子BOXへ再帰する, listノードリスト, node親);
+				this.t曲を検索してリストを作成する(infoDir.FullName + Path.DirectorySeparatorChar, b子BOXへ再帰する, listノードリスト, node親, deferredTcm);
 			}
 			//-----------------------------
 			#endregion
@@ -907,4 +934,69 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 	//-----------------
 	#endregion
+
+	private void ProcessDeferredTcm(List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)> deferred) {
+		foreach (var (filePath, nodeList, parent) in deferred) {
+			SlowOrSuspendSearchTask();
+			try {
+				using SHA1 tcmHash = SHA1.Create();
+				using var tcmFs = File.OpenRead(filePath);
+				byte[] tcmRawHash = tcmHash.ComputeHash(tcmFs);
+				string tcmHashStr = string.Concat(tcmRawHash.Select(b => b.ToString("X2")));
+
+				if (listSongsDB.TryGetValue(filePath + tcmHashStr, out CSongListNode tcmCached)) {
+					this.n検索されたスコア数++;
+					nodeList.Add(tcmCached);
+					CSongDict.tAddSongNode(tcmCached.uniqueId, tcmCached);
+					tcmCached.rParentNode = parent;
+					ApplyParentSettings(tcmCached, parent);
+					this.n検索された曲ノード数++;
+				} else {
+					CTcm tcm = new CTcm(filePath);
+					CSongListNode? tcmNode = tcm.BuildSongListNode();
+					if (tcmNode != null) {
+						tcmNode.rParentNode = parent;
+						tcmNode.strBreadcrumbs = (tcmNode.rParentNode == null)
+							? filePath : tcmNode.rParentNode.strBreadcrumbs + " > " + filePath;
+						ApplyParentSettings(tcmNode, parent);
+						ApplyGenreColors(tcmNode);
+						CSongDict.tAddSongNode(tcmNode.uniqueId, tcmNode);
+						if (!listSongsDB.ContainsKey(filePath + tcmHashStr))
+							listSongsDB.Add(filePath + tcmHashStr, tcmNode);
+						nodeList.Add(tcmNode);
+						this.n検索されたスコア数++;
+						this.n検索された曲ノード数++;
+					}
+				}
+			} catch (Exception ex) {
+				Trace.TraceError($"[CSongs管理] Failed to process TCM file '{filePath}': {ex}");
+			}
+		}
+	}
+
+	private static void ApplyParentSettings(CSongListNode node, CSongListNode? parent) {
+		if (parent == null) return;
+		node.strScenePresets = parent.strScenePresets;
+		if (parent.IsChangedForeColor) { node.ForeColor = parent.ForeColor; node.IsChangedForeColor = true; }
+		if (parent.IsChangedBackColor) { node.BackColor = parent.BackColor; node.IsChangedBackColor = true; }
+		if (parent.isChangedBoxColor) { node.BoxColor = parent.BoxColor; node.isChangedBoxColor = true; }
+		if (parent.isChangedBgColor) { node.BgColor = parent.BgColor; node.isChangedBgColor = true; }
+		if (parent.isChangedBgType) { node.BgType = parent.BgType; node.isChangedBgType = true; }
+		if (parent.isChangedBoxType) { node.BoxType = parent.BoxType; node.isChangedBoxType = true; }
+		if (parent.isChangedBoxChara) { node.BoxChara = parent.BoxChara; node.isChangedBoxChara = true; }
+		if (node.score[0] != null && parent.score[0] != null && string.IsNullOrEmpty(node.score[0].譜面情報.Preimage))
+			node.score[0].譜面情報.Preimage = parent.score[0].譜面情報.Preimage;
+	}
+
+	private static void ApplyGenreColors(CSongListNode node) {
+		switch (CStrジャンルtoNum.ForAC15(node.songGenre)) {
+			case 0: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_JPOP; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_JPOP; break;
+			case 1: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Anime; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Anime; break;
+			case 2: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_VOCALOID; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_VOCALOID; break;
+			case 3: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Children; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Children; break;
+			case 4: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Variety; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Variety; break;
+			case 5: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Classic; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Classic; break;
+			case 6: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic; break;
+			}
+	}
 }

@@ -123,6 +123,8 @@ namespace OpenTaiko {
 		/// Constructs a <see cref="CTja"/> whose chip lists, WAV map, DanSongs list,
 		/// and exam arrays are assembled entirely in memory from the source songs.
 		/// </summary>
+		internal CTja BuildDanCtjaInternal() => BuildDanCtja();
+
 		private CTja BuildDanCtja() {
 			var output = new CTja();
 			output.Activate();
@@ -768,17 +770,17 @@ namespace OpenTaiko {
 				lessThan ? Exam.Range.Less : Exam.Range.More
 			);
 
-		private static Exam.Type ExamTypeFromString(string type) => type switch {
-			"jp" => Exam.Type.JudgePerfect,
-			"jg" => Exam.Type.JudgeGood,
-			"jb" => Exam.Type.JudgeBad,
-			"s" => Exam.Type.Score,
-			"r" => Exam.Type.Roll,
-			"h" => Exam.Type.Hit,
-			"c" => Exam.Type.Combo,
-			"a" => Exam.Type.Accuracy,
-			"ja" => Exam.Type.JudgeADLIB,
-			"jm" => Exam.Type.JudgeMine,
+		private static Exam.Type ExamTypeFromString(string type) => type.ToLowerInvariant() switch {
+			"judgeperfect" or "jp" => Exam.Type.JudgePerfect,
+			"judgegood"    or "jg" => Exam.Type.JudgeGood,
+			"judgebad"     or "jb" => Exam.Type.JudgeBad,
+			"score"        or "s"  => Exam.Type.Score,
+			"roll"         or "r"  => Exam.Type.Roll,
+			"hit"          or "h"  => Exam.Type.Hit,
+			"combo"        or "c"  => Exam.Type.Combo,
+			"accuracy"     or "a"  => Exam.Type.Accuracy,
+			"judgeadlib"   or "ja" => Exam.Type.JudgeADLIB,
+			"judgemine"    or "jm" => Exam.Type.JudgeMine,
 			_ => Exam.Type.Gauge,
 		};
 
