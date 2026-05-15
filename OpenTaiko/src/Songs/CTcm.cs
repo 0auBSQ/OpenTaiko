@@ -124,8 +124,18 @@ internal class CTcm {
 		node.difficultiesCount = 1;
 
 		var danC = new Dan_C[CExamInfo.cMaxExam];
-		for (int i = 0; i < CExamInfo.cMaxExam; i++)
-			if (GlobalExams[i] != null) danC[i] = GlobalExams[i]!;
+		for (int i = 0; i < CExamInfo.cMaxExam; i++) {
+			if (GlobalExams[i] != null) {
+				danC[i] = GlobalExams[i]!;
+			} else {
+				// For per-chart exams the Lua select screen still needs a non-null node-level
+				// Dan_C entry so the exam bar renders. Use the first available per-chart exam
+				// as the representative value (type/range/values shown in the bar header).
+				var perChart = PerChartExams[i];
+				if (perChart != null)
+					danC[i] = perChart.FirstOrDefault(e => e != null)!;
+			}
+		}
 		node.Dan_C = danC;
 
 		var score = new CScore();
