@@ -189,7 +189,10 @@ namespace OpenTaiko {
 				if (!File.Exists(tjaPath)) continue;
 
 				// ── Parse source song ──────────────────────────────────────────
-				var src = new CTja(tjaPath, diff, 0, loadChart: true);
+				string tjaExt = Path.GetExtension(tjaPath).ToLowerInvariant();
+				CTja src = tjaExt is ".optktci" or ".tci"
+					? new CTci(tjaPath).BuildCtja(diff)
+					: new CTja(tjaPath, diff, 0, loadChart: true);
 
 				// BGM chip in source is the channel-0x01 chip that plays the audio.
 				CChip? srcBgmChip = src.listChip.FirstOrDefault(c => c.nChannelNo == 0x01);

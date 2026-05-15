@@ -28,6 +28,18 @@ internal class COsu {
 	private readonly List<(int OffsetMs, double SvMult)> _svPoints = new();
 	public IReadOnlyList<(int OffsetMs, double SvMult)> SvPoints => _svPoints;
 
+	// osu! taiko balloon (swell) hit count formula from TaikoBeatmapConverter.
+	// hitMultiplier = DifficultyRange(OD, 3, 5, 7.5) * 1.65
+	public int GetBalloonHits(int durationMs) {
+		double hitsPerSec = OsuDifficultyRange(OverallDifficulty, 3.0, 5.0, 7.5) * 1.65;
+		return Math.Max(1, (int)(durationMs / 1000.0 * hitsPerSec));
+	}
+
+	private static double OsuDifficultyRange(double od, double min, double mid, double max) {
+		if (od <= 5) return mid + (mid - min) * (od - 5) / 5;
+		return mid + (max - mid) * (od - 5) / 5;
+	}
+
 	public double GetBPMAt(int timeMs) {
 		double result = 120.0;
 		foreach (var tp in TimingPoints) {

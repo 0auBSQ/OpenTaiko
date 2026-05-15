@@ -320,6 +320,8 @@ internal class CTci {
 		foreach (var note in osu.Notes) {
 			var chip = MakeChip(note.ChannelNo, note.TimeMs, 0);
 			ApplyChipState(chip, osu, note.TimeMs);
+			if (note.ChannelNo == 0x17 && note.Duration > 0)
+				chip.nBalloon = osu.GetBalloonHits(note.Duration);
 			bool isRollStart = note.ChannelNo is 0x15 or 0x16 or 0x17;
 			bool isRollEnd   = note.ChannelNo == 0x18;
 
