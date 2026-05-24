@@ -59,27 +59,19 @@ internal class CAct演奏Combo音声 : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region [Combo voices]
 
-			int _charaId = OpenTaiko.SaveFileInstances[i].data.Character;
+			string charaPath = CCharacter.GetCharacter(i)._path;
 
-			var currentDir = ($@"{OpenTaiko.strEXEのあるフォルダ}Global{Path.DirectorySeparatorChar}Characters{Path.DirectorySeparatorChar}{OpenTaiko.Tx.Characters[_charaId].dirName}{Path.DirectorySeparatorChar}Sounds{Path.DirectorySeparatorChar}Combo{Path.DirectorySeparatorChar}");
+			var currentDir = Path.Combine(charaPath, "Sounds", "Combo") + Path.DirectorySeparatorChar;
 			if (Directory.Exists(currentDir)) {
 				foreach (var item in Directory.GetFiles(currentDir)) {
+					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;
 					comboVoice.strFilePath = item;
 					comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
-					/*
-                    if (TJAPlayer3.ConfigIni.nPlayerCount >= 2) //2020.05.06 Mr-Ojii 左右に出したかったから追加。
-                    {
-                        if (i == 0)
-                            comboVoice.soundComboVoice.n位置 = -100;
-                        else
-                            comboVoice.soundComboVoice.n位置 = 100;
-                    }
-                    */
 					comboVoice.soundComboVoice.SoundPosition = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
-					comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
+					comboVoice.nCombo = threshold;
 					ListCombo[i].Add(comboVoice);
 				}
 				if (ListCombo[i].Count > 0) {
@@ -91,15 +83,16 @@ internal class CAct演奏Combo音声 : CActivity {
 
 			#region [Floor voices]
 
-			currentDir = ($@"{OpenTaiko.strEXEのあるフォルダ}Global\Characters\{OpenTaiko.Tx.Characters[_charaId].dirName}\Sounds\Tower_Combo\");
-			if (Directory.Exists(currentDir)) {
-				foreach (var item in Directory.GetFiles(currentDir)) {
+			var floorDir = Path.Combine(charaPath, "Sounds", "Tower_Combo") + Path.DirectorySeparatorChar;
+			if (Directory.Exists(floorDir)) {
+				foreach (var item in Directory.GetFiles(floorDir)) {
+					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
 					var comboVoice = new CComboVoice();
 					comboVoice.bFileFound = true;
 					comboVoice.nPlayer = i;
 					comboVoice.strFilePath = item;
 					comboVoice.soundComboVoice = OpenTaiko.SoundManager.tCreateSound(item, ESoundGroup.Voice);
-					comboVoice.nCombo = int.Parse(Path.GetFileNameWithoutExtension(item));
+					comboVoice.nCombo = threshold;
 					ListFloor[i].Add(comboVoice);
 				}
 				if (ListFloor[i].Count > 0) {

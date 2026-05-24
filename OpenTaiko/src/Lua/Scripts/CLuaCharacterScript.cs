@@ -121,6 +121,7 @@ namespace OpenTaiko {
 				lfGetHeyaRenderOffset.Load(LuaScript);
 				lfGetAIBattlePosition.Load(LuaScript);
 
+				lfLoadVoice.Load(LuaScript);
 				lfDisposeVoice.Load(LuaScript);
 				lfPlayVoice.Load(LuaScript);
 			} catch (Exception e) {
