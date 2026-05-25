@@ -4,9 +4,13 @@
 
 local M = {}
 
-local tx     = {}   -- shared textures (allocated in Script.lua)
-local sounds = {}   -- shared sounds
-local txts   = {}   -- text renderers: txts.title, txts.label
+local tx         = {}   -- shared textures (allocated in Script.lua)
+local sounds     = {}   -- shared sounds
+local txts       = {}   -- text renderers: txts.title, txts.label
+local countSongs = nil  -- function(scope) -> int, injected from Script.lua
+
+local errorMsg   = nil
+local errorTimer = nil
 
 -- ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -175,18 +179,45 @@ local function buildResult()
     }
 end
 
+local function showError(msg)
+    errorMsg   = msg
+    errorTimer = COUNTER:CreateCounterDuration(0, 1, 5)
+    errorTimer:Start()
+end
+
+local function validateAndStart()
+    if countSongs == nil then startGo(); return end
+    local cfg   = buildResult()
+    local count = countSongs(cfg.songs)
+    local ok    = true
+    if cfg.mode == "Endurance" then
+        -- 1-song is the egg mode (allowed); 0 or 2–4 songs are not enough
+        if count == 0 or (count >= 2 and count <= 4) then ok = false end
+    else -- VS
+        if count < 5 then ok = false end
+    end
+    if ok then
+        startGo()
+    else
+        showError("The game can only be started if there are at least 5 available songs.")
+    end
+end
+
 -- ── Init / lifecycle ──────────────────────────────────────────────────────────
 
-function M.init(t, snd, txt)
-    tx     = t
-    sounds = snd
-    txts   = txt
+function M.init(t, snd, txt, countFn)
+    tx         = t
+    sounds     = snd
+    txts       = txt
+    countSongs = countFn
 end
 
 function M.reset()
     rolls      = makeRolls()
     activeRoll = 1
     stopGo()
+    errorMsg   = nil
+    errorTimer = nil
 
     -- Resume BGM if needed (e.g. returning from game results)
     if not sounds.BGM.IsPlaying then
@@ -265,6 +296,12 @@ function M.draw()
         tx["go"]:Draw(1428, 504)
         tx["go"]:SetOpacity(1)
     end
+
+    -- Error message (bottom of screen, red)
+    if errorMsg ~= nil and txts.label then
+        local ec = COLOR:CreateColorFromARGB(255, 255, 80, 80)
+        txts.label:GetText(errorMsg, false, 1600, ec):DrawAtAnchor(960, 1000, "center")
+    end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -283,10 +320,28 @@ function M.update()
     -- Tick Go bounce counter
     if goCounter then goCounter:Tick() end
 
+    -- Tick error timer; any input dismisses the error early
+    if errorTimer ~= nil then
+        errorTimer:Tick()
+        if errorTimer.Value >= 1 then
+            errorMsg   = nil
+            errorTimer = nil
+        end
+    end
+
     local pressDecide = INPUT:Pressed("Decide")  or INPUT:KeyboardPressed("Return")
     local pressCancel = INPUT:Pressed("Cancel")  or INPUT:KeyboardPressed("Escape")
     local pressRight  = INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow")
     local pressLeft   = INPUT:Pressed("LeftChange")  or INPUT:KeyboardPressed("LeftArrow")
+
+    -- While an error is displayed, consume all input to dismiss it
+    if errorMsg ~= nil then
+        if pressDecide or pressCancel or pressRight or pressLeft then
+            errorMsg   = nil
+            errorTimer = nil
+        end
+        return nil
+    end
 
     -- Go confirmation overlay
     if showGo then
@@ -311,7 +366,7 @@ function M.update()
             activeRoll = activeRoll + 1
             SHARED:GetSharedSound("Decide"):Play()
         else
-            startGo()
+            validateAndStart()
         end
     elseif pressCancel then
         if activeRoll == 1 then

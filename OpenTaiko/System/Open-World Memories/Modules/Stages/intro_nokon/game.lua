@@ -58,6 +58,9 @@ local pageCache = {}
 -- Endurance end-of-game data
 local highScores = {}
 
+-- Single-song egg mode (Endurance with exactly 1 song in scope)
+local singleSongMode = false
+
 -- ── Per-player input sets ─────────────────────────────────────────────────────
 
 local INPUT_SETS = {
@@ -268,9 +271,19 @@ local function eEvalCorrect()
     scores[1] = (scores[1] or 0) + 1
     Stage.setScore(1, scores[1])
     setState("e_correct")
+    local line
+    if singleSongMode and scores[1] >= 100 then
+        line = pick({
+            "Do you feel smart? How will you save your score Scherlock?",
+            "Are you enjoying the game? Perfect, because you are here forever!",
+            "You did beat my score? Wait until you reach the results first...",
+            "...",
+        })
+    else
+        line = pick({"Splendiferous!", "Greeeeeeat!", "Good answer!", "Very for real!", "Sheeeeeeeesh!"})
+    end
     showDialogue({
-        { text = pick({"Splendiferous!", "Greeeeeeat!", "Good answer!", "Very for real!", "Sheeeeeeeesh!"}),
-          onConfirm = function() Stage.setSpotlight(1, false) end },
+        { text = line, onConfirm = function() Stage.setSpotlight(1, false) end },
     }, function() eStartTurn() end, 0)
 end
 
@@ -438,16 +451,17 @@ function M.init(stageRef, dialogueRef, utilsRef, txtsRef)
 end
 
 function M.start(config)
-    gameMode    = config.mode    or "Endurance"
-    numPlayers  = config.players or 1
-    playerNames = config.names   or {}
-    totalRounds = gameMode == "Endurance" and 999 or 5
-    currentRound = 1
-    scores       = {}
+    gameMode       = config.mode    or "Endurance"
+    numPlayers     = config.players or 1
+    playerNames    = config.names   or {}
+    singleSongMode = config.singleSong or false
+    totalRounds    = gameMode == "Endurance" and 999 or 5
+    currentRound   = 1
+    scores         = {}
     for i = 1, 5 do scores[i] = 0 end
     vsDenied = {}
 
-    utils.loadSongList(config.songs)
+    utils.loadSongList(config.songs, singleSongMode)
     Stage.reset(numPlayers)  -- starts with curtain closed
     for i = 1, numPlayers do Stage.setScore(i, 0) end
 

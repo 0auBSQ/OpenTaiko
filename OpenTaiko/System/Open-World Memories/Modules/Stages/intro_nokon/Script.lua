@@ -25,9 +25,37 @@ local songsEnumerated = false
 local state = "waiting_enum"
 
 local songScope           = "All"
+local singleSongMode      = false
 local originalPlayerCount = 1
 local currentPageCache    = {}
 local pendingConfig       = nil
+
+-- ── OpTk genre detection ──────────────────────────────────────────────────────
+
+local OPTK_DIRECT_GENRES = {
+    "Classical Arrangements",
+    "OpenTaiko Headquarters",
+    "Rainy Memories",
+    "Dashy's Secrets",
+    "Deceiver's Defiances",
+}
+local OPTK_COLLAB_PARENTS = { "Collaborations", "Collaborations and Events" }
+
+local function isOpTkGenre(node)
+    local title = node.Genre or ""
+    if title:sub(1, 17) == "OpenTaiko Chapter" then return true end
+    for _, g in ipairs(OPTK_DIRECT_GENRES) do
+        if title == g then return true end
+    end
+    local parent = node.Parent
+    if parent ~= nil then
+        local pt = parent.Genre or ""
+        for _, pf in ipairs(OPTK_COLLAB_PARENTS) do
+            if pt == pf then return true end
+        end
+    end
+    return false
+end
 
 ---------------------------------------
 -- Utility Functions
@@ -91,15 +119,7 @@ local function loadMainSongList()
     lsls.AppendSubRandomBoxes = false
     lsls.SubBackBoxFrequency  = 0
     lsls.ExcludeLockedSongs   = true
-
-    if songScope == "Custom" then
-        lsls.RootGenreFolder = "Custom Charts"
-    elseif songScope == "OpTk" then
-        lsls:SetExcludedGenreFolders({"Custom Charts", "Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
-    else -- "All"
-        lsls:SetExcludedGenreFolders({"Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
-    end
-
+    lsls:SetExcludedGenreFolders({"Download", "段位道場", "太鼓タワー", "Favorite", "最近遊んだ曲", "SearchD", "SearchT", "Secret Vault"})
     songList = RequestSongList(lsls)
 end
 
@@ -181,14 +201,66 @@ local function stopSongPreview()
     SHARED:GetSharedSound("quiz_preview"):Stop()
 end
 
+-- Build a table mapping each flat genre folder node → count of unlocked songs.
+local function buildUnlockedCountByGenre()
+    local counts = {}
+    local songs = csharpEnumerableToLuaArray(songList:SearchSongsByPredicate(function(node)
+        return not node.IsLocked
+    end))
+    for _, song in ipairs(songs) do
+        local parent = song.Parent
+        if parent ~= nil then
+            counts[parent] = (counts[parent] or 0) + 1
+        end
+    end
+    return counts
+end
+
 local function getAvailableGenres()
     if songList == nil then return {} end
+    local minSongs = singleSongMode and 1 or 2
+
+    local unlockedCount = buildUnlockedCountByGenre()
+
+    -- Flat genre folders: all direct children are songs (ChildrenCount == SongCount),
+    -- and at least minSongs of them are unlocked.
     local genresCSharp = songList:SearchNodesByPredicate(function(node)
         return node.IsFolder == true and
                node.ChildrenCount == node.SongCount and
-               node.SongCount > 0
+               (unlockedCount[node] or 0) >= minSongs
     end)
-    return csharpEnumerableToLuaArray(genresCSharp)
+    local all = csharpEnumerableToLuaArray(genresCSharp)
+    if songScope == "All" then return all end
+    local filtered = {}
+    for _, g in ipairs(all) do
+        local optk = isOpTkGenre(g)
+        if (songScope == "OpTk" and optk) or (songScope == "Custom" and not optk) then
+            filtered[#filtered + 1] = g
+        end
+    end
+    return filtered
+end
+
+-- Count unlocked songs for a scope (includes single-song folders, for setup validation).
+local function countSongsInScope(scope)
+    if songList == nil then return 0 end
+    local unlockedCount = buildUnlockedCountByGenre()
+    local genresCSharp = songList:SearchNodesByPredicate(function(node)
+        return node.IsFolder == true and
+               node.ChildrenCount == node.SongCount and
+               (unlockedCount[node] or 0) > 0
+    end)
+    local total = 0
+    local enumerator = genresCSharp:GetEnumerator()
+    while enumerator:MoveNext() do
+        local g = enumerator.Current
+        local optk = isOpTkGenre(g)
+        local match = scope == "All" or
+                      (scope == "OpTk"   and optk) or
+                      (scope == "Custom" and not optk)
+        if match then total = total + (unlockedCount[g] or 0) end
+    end
+    return total
 end
 
 ---------------------------------------
@@ -221,7 +293,8 @@ local function handleSetup()
         CONFIG.PlayerCount = result.players
         local names = {}
         for i = 1, result.players do names[i] = playerNames[i] end
-        pendingConfig = { mode = result.mode, players = result.players, songs = result.songs, names = names }
+        local singleSong = result.mode == "Endurance" and countSongsInScope(result.songs) == 1
+        pendingConfig = { mode = result.mode, players = result.players, songs = result.songs, names = names, singleSong = singleSong }
         -- Always close the curtain over the setup screen before starting.
         -- forceOpenCurtain resets position in case a previous game left it closed.
         Stage.forceOpenCurtain()
@@ -369,8 +442,9 @@ function onStart()
 
     -- Utils table injected into Game module
     local utils = {
-        loadSongList = function(songs)
-            songScope = songs
+        loadSongList = function(songs, isSingleSong)
+            songScope    = songs
+            singleSongMode = isSingleSong or false
             loadMainSongList()
         end,
         selectRandomSong  = function(genre) return selectRandomSongFromGenre(genre) end,
@@ -397,7 +471,7 @@ function onStart()
     }
 
     Opening.init(textures, sounds)
-    Setup.init(textures, sounds, texts)
+    Setup.init(textures, sounds, texts, countSongsInScope)
     Dialogue.init(textures, texts)
     Stage.init(textures, sounds, texts)
     Game.init(Stage, Dialogue, utils, texts)
