@@ -294,7 +294,7 @@ local function handleSetup()
         local names = {}
         for i = 1, result.players do names[i] = playerNames[i] end
         local singleSong = result.mode == "Endurance" and countSongsInScope(result.songs) == 1
-        pendingConfig = { mode = result.mode, players = result.players, songs = result.songs, names = names, singleSong = singleSong }
+        pendingConfig = { mode = result.mode, players = result.players, songs = result.songs, names = names, singleSong = singleSong, rounds = result.rounds }
         -- Always close the curtain over the setup screen before starting.
         -- forceOpenCurtain resets position in case a previous game left it closed.
         Stage.forceOpenCurtain()

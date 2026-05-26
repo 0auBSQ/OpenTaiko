@@ -455,7 +455,7 @@ function M.start(config)
     numPlayers     = config.players or 1
     playerNames    = config.names   or {}
     singleSongMode = config.singleSong or false
-    totalRounds    = gameMode == "Endurance" and 999 or 5
+    totalRounds    = gameMode == "Endurance" and 999 or (config.rounds or 5)
     currentRound   = 1
     scores         = {}
     for i = 1, 5 do scores[i] = 0 end

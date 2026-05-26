@@ -71,6 +71,10 @@ local showGo     = false
 local goOpacity  = 255
 local goCounter  = nil
 
+local showRounds = false
+local roundCount = 0
+local roundStep  = 1
+
 -- ── Helpers ───────────────────────────────────────────────────────────────────
 
 local function col(hex) return COLOR:CreateColorFromHex(hex) end
@@ -172,11 +176,25 @@ local function stopGo()
 end
 
 local function buildResult()
+    local mode = rolls[1].items[rolls[1].selectedIdx].value
     return {
-        mode    = rolls[1].items[rolls[1].selectedIdx].value,
+        mode    = mode,
         players = rolls[2].items[rolls[2].selectedIdx].value,
         songs   = rolls[3].items[rolls[3].selectedIdx].value,
+        rounds  = (mode == "VS") and roundCount or nil,
     }
+end
+
+local function enterRoundsStep()
+    local players = rolls[2].items[rolls[2].selectedIdx].value
+    roundStep  = players
+    roundCount = players * 2
+    showRounds = true
+    SHARED:GetSharedSound("Decide"):Play()
+end
+
+local function exitRoundsStep()
+    showRounds = false
 end
 
 local function showError(msg)
@@ -216,6 +234,9 @@ function M.reset()
     rolls      = makeRolls()
     activeRoll = 1
     stopGo()
+    showRounds = false
+    roundCount = 0
+    roundStep  = 1
     errorMsg   = nil
     errorTimer = nil
 
@@ -285,9 +306,34 @@ function M.draw()
         tt:Draw(30, 45)
     end
 
-    -- All 3 rolls (active one highlighted)
+    -- All 3 rolls (active highlighting suppressed during rounds step)
     for r = 1, 3 do
-        drawRoll(r, r == activeRoll)
+        drawRoll(r, r == activeRoll and not showRounds)
+    end
+
+    -- Rounds selection panel (VS only, after Songs)
+    if showRounds then
+        -- Full-screen dark overlay drawn over the rolls
+        local bgt = tx["bgtile"]
+        if bgt ~= nil then
+            local res = THEME:GetResolution()
+            bgt:SetOpacity(0.75)
+            for rx = 0, math.ceil(res.X / math.max(1, bgt.Width)) - 1 do
+                for ry = 0, math.ceil(res.Y / math.max(1, bgt.Height)) - 1 do
+                    bgt:Draw(rx * bgt.Width, ry * bgt.Height)
+                end
+            end
+            bgt:SetOpacity(1)
+        end
+        if txts.title then
+            txts.title:GetText("Round Count", false, 800, col(GOLD)):DrawAtAnchor(960, 430, "center")
+        end
+        if txts.label then
+            local canDec = roundCount > roundStep
+            local arrow_l = canDec and "◀   " or "      "
+            txts.label:GetText(arrow_l .. tostring(roundCount) .. "   ▶", false, 600, col(WHITE))
+                :DrawAtAnchor(960, 560, "center")
+        end
     end
 
     -- Go.png with bounce opacity (confirms everything is set)
@@ -343,6 +389,26 @@ function M.update()
         return nil
     end
 
+    -- Rounds selection step (VS only, between Songs and Go)
+    if showRounds then
+        if pressRight then
+            roundCount = roundCount + roundStep
+            SHARED:GetSharedSound("Skip"):Play()
+        elseif pressLeft then
+            if roundCount > roundStep then
+                roundCount = roundCount - roundStep
+                SHARED:GetSharedSound("Skip"):Play()
+            end
+        elseif pressDecide then
+            exitRoundsStep()
+            validateAndStart()
+        elseif pressCancel then
+            exitRoundsStep()
+            SHARED:GetSharedSound("Cancel"):Play()
+        end
+        return nil
+    end
+
     -- Go confirmation overlay
     if showGo then
         if pressDecide then
@@ -366,7 +432,12 @@ function M.update()
             activeRoll = activeRoll + 1
             SHARED:GetSharedSound("Decide"):Play()
         else
-            validateAndStart()
+            local mode = rolls[1].items[rolls[1].selectedIdx].value
+            if mode == "VS" then
+                enterRoundsStep()
+            else
+                validateAndStart()
+            end
         end
     elseif pressCancel then
         if activeRoll == 1 then
