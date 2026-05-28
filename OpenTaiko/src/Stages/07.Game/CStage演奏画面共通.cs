@@ -1640,9 +1640,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
-					// #GIANTNOTE: perfect hit activates ok trigger
-					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
-						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
+					// #GIANTNOTE: Perfect (良) = good grade — activates good trigger; if link=true also ok trigger
+					if (pChip != null) {
+						if (!string.IsNullOrEmpty(pChip.GiantNoteGoodTrigger))
+							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteGoodTrigger, "1");
+						if (pChip.GiantNoteLink && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
+							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
+					}
 				}
 				break;
 			case ENoteJudge.Great:
@@ -1686,13 +1690,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
-					// #GIANTNOTE: good hit activates good trigger; if link=true also activates ok trigger
-					if (pChip != null) {
-						if (!string.IsNullOrEmpty(pChip.GiantNoteGoodTrigger))
-							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteGoodTrigger, "1");
-						if (pChip.GiantNoteLink && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
-							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
-					}
+					// #GIANTNOTE: Great/Good (可) = ok grade — activates ok trigger only
+					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
+						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
 				}
 				break;
 			case ENoteJudge.Miss:

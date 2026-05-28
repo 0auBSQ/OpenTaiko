@@ -25,11 +25,17 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 	private List<CItemBase> MakeListCItemBase(int nConfigSet, int nInst) {
 		List<CItemBase> l = new List<CItemBase>();
+		menuActions.Clear();
 
 		#region [ 共通 SET切り替え/More/Return ]
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && !OpenTaiko.SongMount.bIsAfterSongJump) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+		menuActions.Add(EOrder.Continue);
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && !OpenTaiko.SongMount.bIsAfterSongJump) {
+			l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+			menuActions.Add(EOrder.Redoing);
+		}
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_EXIT"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
+		menuActions.Add(EOrder.Return);
 		#endregion
 
 		return l;
@@ -61,26 +67,22 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	}
 
 	public override void tEnter押下Main(int nSortOrder) {
-		switch (n現在の選択行) {
-			case (int)EOrder.Continue:
+		if (n現在の選択行 < 0 || n現在の選択行 >= menuActions.Count)
+			return;
+		switch (menuActions[n現在の選択行]) {
+			case EOrder.Continue:
 				OpenTaiko.stageGameScreen.Resume();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
 				break;
-
-			case (int)EOrder.Redoing:
-				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan || OpenTaiko.SongMount.bIsAfterSongJump)
-					goto case (int)EOrder.Return;
+			case EOrder.Redoing:
 				this.bやり直しを選択した = true;
 				CActSelectPopupMenu.b選択した = true;
 				break;
-
-			case (int)EOrder.Return:
+			case EOrder.Return:
 				OpenTaiko.stageGameScreen.t演奏中止();
 				CActSelectPopupMenu.b選択した = true;
 				this.tDeativatePopupMenu();
-				break;
-			default:
 				break;
 		}
 	}
@@ -117,6 +119,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	private int nCurrentTarget = 0;
 	private int nCurrentConfigSet = 0;
 	private List<List<List<CItemBase>>> lci;
+	private List<EOrder> menuActions = new();
 	private enum EOrder : int {
 		Continue,
 		Redoing,

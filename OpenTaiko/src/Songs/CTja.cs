@@ -2289,21 +2289,21 @@ internal class CTja : CActivity {
 			PendingGiantNoteGoodTrigger = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null;
 			PendingGiantNoteLink = parts.Length > 2 && parts[2].ToLower() == "true";
 		} else if (command == "#STOREC") {
-			var colonIdx = argument.IndexOf(':');
-			if (colonIdx >= 0) {
+			var commaIdx = argument.IndexOf(',');
+			if (commaIdx >= 0) {
 				var chip = this.NewEventChipAtDefCursor(0xEA);
-				chip.StoreCKey = argument[..colonIdx].Trim();
-				chip.StoreCExpression = argument[(colonIdx + 1)..].Trim();
+				chip.StoreCKey = argument[..commaIdx].Trim();
+				chip.StoreCExpression = argument[(commaIdx + 1)..].Trim();
 				chip.CommandIfTrigger = PendingCommandIfTrigger;
 				PendingCommandIfTrigger = null;
 				this.listChip.Add(chip);
 			}
 		} else if (command == "#STORET") {
-			var colonIdx = argument.IndexOf(':');
-			if (colonIdx >= 0) {
+			var commaIdx = argument.IndexOf(',');
+			if (commaIdx >= 0) {
 				var chip = this.NewEventChipAtDefCursor(0xEB);
-				chip.StoreTKey = argument[..colonIdx].Trim();
-				chip.StoreTExpression = argument[(colonIdx + 1)..].Trim();
+				chip.StoreTKey = argument[..commaIdx].Trim();
+				chip.StoreTExpression = argument[(commaIdx + 1)..].Trim();
 				chip.CommandIfTrigger = PendingCommandIfTrigger;
 				PendingCommandIfTrigger = null;
 				this.listChip.Add(chip);
