@@ -383,6 +383,8 @@ internal class CTja : CActivity {
 	public int[] nDan_BarRollCount = new int[1];
 
 	public int[] nノーツ数_Branch = new int[3]; // [iBranch], including common
+	public int nTotalAdLib;
+	public int nTotalMine;
 	public CChip[] pDan_LastChip;
 
 	private List<int> divsPerMeasureAllBranches; // [iMeasureAllBranches]
@@ -470,6 +472,12 @@ internal class CTja : CActivity {
 	public bool IsEnabledFixSENote;
 	public int FixSENote;
 	public bool IsEnabledPartnerNote;
+	public bool IsEnabledNoteIf;
+	public string? PendingNoteIfTrigger;
+	public bool IsEnabledGiantNote;
+	public string? PendingGiantNoteOkTrigger;
+	public string? PendingGiantNoteMissTrigger;
+	public string? PendingCommandIfTrigger;
 	public GaugeIncreaseMode GaugeIncreaseMode;
 
 	#region [ EXTENDED VARiABLES ]
@@ -993,11 +1001,13 @@ internal class CTja : CActivity {
 		}
 	}
 	public void tStopAllChips() {
+		if (this.listWAV == null) return;
 		foreach (CWAV cwav in this.listWAV.Values) {
 			this.tWavの再生停止(cwav.n内部番号);
 		}
 	}
 	public void t全チップの再生停止とミキサーからの削除() {
+		if (this.listWAV == null) return;
 		foreach (CWAV cwav in this.listWAV.Values) {
 			this.tWavの再生停止(cwav.n内部番号, true);
 		}
@@ -2047,40 +2057,64 @@ internal class CTja : CActivity {
 
 			// empty or unrecognized argument format: none
 			var (eType, eBig) = (Exam.Type.None, EBranchCondBig.Both);
-			var eRange = Exam.Range.More;
+			var eRange = CTExprRange.MoreOrEqual;
 
+			string? pendingLcKey = null, pendingLt1Key = null, pendingLt2Key = null;
 			if (!string.IsNullOrWhiteSpace(argument)) {
 				var arguments = argument.Split(',', StringSplitOptions.TrimEntries);
 				try {
 					strCond = arguments[0];
-					nNum[0] = arguments[1].ParseReal();
-					nNum[1] = arguments[2].ParseReal();
 
-					// only check first character for case
-					bool isUpper = char.IsUpper(strCond[0]);
-					var bigOnlyIfUpper = isUpper ? EBranchCondBig.BigOnly : EBranchCondBig.Both;
+					if (strCond.StartsWith("lc:", StringComparison.OrdinalIgnoreCase) && arguments.Length >= 3) {
+						// Local counter branch: #BRANCHSTART lc:key,v1,v2[,op]
+						pendingLcKey = strCond[3..].Trim();
+						nNum[0] = arguments[1].ParseReal();
+						nNum[1] = arguments[2].ParseReal();
+						(eType, eBig) = (Exam.Type.LocalCounter, EBranchCondBig.Both);
+						eRange = arguments.Length > 3 ? arguments[3] switch {
+							"<"  or "l"  => CTExprRange.Less,
+							">"          => CTExprRange.More,
+							"==" or "eq" => CTExprRange.Equal,
+							"!=" or "ne" => CTExprRange.NotEqual,
+							"<=" or "le" => CTExprRange.LessOrEqual,
+							">=" or "m" or "me" or "" => CTExprRange.MoreOrEqual,
+							_ => CTExprRange.MoreOrEqual,
+						} : CTExprRange.MoreOrEqual;
+					} else if (strCond.Equals("lt", StringComparison.OrdinalIgnoreCase)) {
+						// Local trigger branch: #BRANCHSTART lt,expertTrigger,masterTrigger
+						pendingLt1Key = arguments.Length > 1 ? arguments[1] : "";
+						pendingLt2Key = arguments.Length > 2 ? arguments[2] : "";
+						(eType, eBig) = (Exam.Type.LocalTrigger, EBranchCondBig.Both);
+					} else {
+						nNum[0] = arguments[1].ParseReal();
+						nNum[1] = arguments[2].ParseReal();
 
-					(eType, eBig) = strCond.ToLower() switch {
-						"p" => (Exam.Type.Accuracy, bigOnlyIfUpper), // lower p: traditional condition
-						"pp" => (Exam.Type.PercentPerfect, bigOnlyIfUpper),
-						"jb" => (Exam.Type.JudgeBad, bigOnlyIfUpper),
-						"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
-						"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
-						"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
-																	   // TJAP2fPC extensions, Akasoko modification
-						"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
-						// uniqsub extensions, renamed to dan-i type
-						"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
-						"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
-						// unrecognized condition
-						_ => throw new ArgumentOutOfRangeException("strCond"),
-					};
+						// only check first character for case
+						bool isUpper = char.IsUpper(strCond[0]);
+						var bigOnlyIfUpper = isUpper ? EBranchCondBig.BigOnly : EBranchCondBig.Both;
 
-					eRange = ((arguments.Length > 3) ? arguments[3] : "") switch {
-						"l" => Exam.Range.Less,
-						"m" or "" => Exam.Range.More,
-						_ => throw new ArgumentOutOfRangeException("strRange"),
-					};
+						(eType, eBig) = strCond.ToLower() switch {
+							"p" => (Exam.Type.Accuracy, bigOnlyIfUpper), // lower p: traditional condition
+							"pp" => (Exam.Type.PercentPerfect, bigOnlyIfUpper),
+							"jb" => (Exam.Type.JudgeBad, bigOnlyIfUpper),
+							"r" => (Exam.Type.Roll, bigOnlyIfUpper), // lower r: traditional condition
+							"rb" => (Exam.Type.BalloonHits, bigOnlyIfUpper),
+							"s" => (Exam.Type.Score, EBranchCondBig.Both), // traditional condition (case-insensive)
+																		   // TJAP2fPC extensions, Akasoko modification
+							"d" => (Exam.Type.JudgePerfect, EBranchCondBig.BigOnly),
+							// uniqsub extensions, renamed to dan-i type
+							"jp" => (Exam.Type.JudgePerfect, bigOnlyIfUpper),
+							"jg" => (Exam.Type.JudgeGood, bigOnlyIfUpper),
+							// unrecognized condition
+							_ => throw new ArgumentOutOfRangeException("strCond"),
+						};
+
+						eRange = ((arguments.Length > 3) ? arguments[3] : "") switch {
+							"l" => CTExprRange.Less,
+							"m" or "" => CTExprRange.MoreOrEqual,
+							_ => throw new ArgumentOutOfRangeException("strRange"),
+						};
+					}
 				} catch (FormatException ex) {
 					this.AddCommandError(command, argument, $"{GetTjaErrorReason(ex)}; treated as \"keep current branch\" condition", ex);
 				}
@@ -2107,6 +2141,9 @@ internal class CTja : CActivity {
 			chip.nBranchCondition1_Professional = nNum[0];// listに追加していたが仕様を変更。
 			chip.nBranchCondition2_Master = nNum[1];// ""
 			chip.hasLevelHold = new bool[3];
+			chip.BranchLcKey = pendingLcKey;
+			chip.BranchLt1Key = pendingLt1Key;
+			chip.BranchLt2Key = pendingLt2Key;
 			this.listChip.Add(chip);
 			this.listBRANCH.Add(chip);
 			cBranchStart.chipBranchStart = chip;
@@ -2239,6 +2276,56 @@ internal class CTja : CActivity {
 			IsEnabledFixSENote = true;
 		} else if (command == "#PARTNERNOTE") {
 			IsEnabledPartnerNote = true;
+		} else if (command == "#COMMANDIF") {
+			PendingCommandIfTrigger = argument.Trim();
+		} else if (command == "#NOTEIF") {
+			IsEnabledNoteIf = true;
+			PendingNoteIfTrigger = argument.Trim();
+		} else if (command == "#GIANTNOTE") {
+			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			IsEnabledGiantNote = true;
+			PendingGiantNoteOkTrigger = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : null;
+			PendingGiantNoteMissTrigger = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null;
+		} else if (command == "#STOREC") {
+			var colonIdx = argument.IndexOf(':');
+			if (colonIdx >= 0) {
+				var chip = this.NewEventChipAtDefCursor(0xEA);
+				chip.StoreCKey = argument[..colonIdx].Trim();
+				chip.StoreCExpression = argument[(colonIdx + 1)..].Trim();
+				chip.CommandIfTrigger = PendingCommandIfTrigger;
+				PendingCommandIfTrigger = null;
+				this.listChip.Add(chip);
+			}
+		} else if (command == "#STORET") {
+			var colonIdx = argument.IndexOf(':');
+			if (colonIdx >= 0) {
+				var chip = this.NewEventChipAtDefCursor(0xEB);
+				chip.StoreTKey = argument[..colonIdx].Trim();
+				chip.StoreTExpression = argument[(colonIdx + 1)..].Trim();
+				chip.CommandIfTrigger = PendingCommandIfTrigger;
+				PendingCommandIfTrigger = null;
+				this.listChip.Add(chip);
+			}
+		} else if (command == "#ELEVATEC") {
+			var chip = this.NewEventChipAtDefCursor(0xEC);
+			chip.ElevateCKey = argument.Trim();
+			chip.CommandIfTrigger = PendingCommandIfTrigger;
+			PendingCommandIfTrigger = null;
+			this.listChip.Add(chip);
+		} else if (command == "#ELEVATET") {
+			var chip = this.NewEventChipAtDefCursor(0xED);
+			chip.ElevateTKey = argument.Trim();
+			chip.CommandIfTrigger = PendingCommandIfTrigger;
+			PendingCommandIfTrigger = null;
+			this.listChip.Add(chip);
+		} else if (command == "#SONGJUMP") {
+			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			var chip = this.NewEventChipAtDefCursor(0xEE);
+			chip.SongJumpUniqueId = parts.Length > 0 ? parts[0] : "";
+			chip.SongJumpDifficulty = parts.Length > 1 ? strConvertCourse(parts[1]) : 3;
+			chip.CommandIfTrigger = PendingCommandIfTrigger;
+			PendingCommandIfTrigger = null;
+			this.listChip.Add(chip);
 		} else if (command == "#NEXTSONG") {
 			// prevent branch section across songs
 			this.GotoBranchEnd(forced: true);
@@ -2906,12 +2993,15 @@ internal class CTja : CActivity {
 			foreach (var (v, cmd) in new[] {
 				(this.IsEnabledFixSENote, "#SENOTECHANGE"),
 				(this.IsEnabledPartnerNote, "#PARTNERNOTE"),
+				(this.IsEnabledNoteIf, "#NOTEIF"),
+				(this.IsEnabledGiantNote, "#GIANTNOTE"),
 				}) {
 				if (v)
 					this.AddWarn($"{cmd} is missing a following note symbol before switching branch or song, {(this.IsEndedBranching ? "" : $"in branch {this.n現在のコース} ")}at measure {this.n現在の小節数}.");
 			}
 		}
-		this.IsEnabledFixSENote = this.IsEnabledPartnerNote = false;
+		this.IsEnabledFixSENote = this.IsEnabledPartnerNote = this.IsEnabledNoteIf = this.IsEnabledGiantNote = false;
+		this.PendingNoteIfTrigger = this.PendingGiantNoteOkTrigger = this.PendingGiantNoteMissTrigger = null;
 	}
 
 	private void SetChipSudden(CChip chip) {
@@ -2972,6 +3062,10 @@ internal class CTja : CActivity {
 		this.SetChipSudden(chip);
 		chip.bGOGOTIME = this.bGOGOTIME;
 		chip.IsPartnerNote = (NotesManager.IsJointedNote(chip) || this.IsEnabledPartnerNote);
+		chip.IsGiantNote = this.IsEnabledGiantNote;
+		chip.NoteIfTrigger = this.IsEnabledNoteIf ? this.PendingNoteIfTrigger : null;
+		chip.GiantNoteOkTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteOkTrigger : null;
+		chip.GiantNoteMissTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteMissTrigger : null;
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
@@ -3045,12 +3139,16 @@ internal class CTja : CActivity {
 				}
 			}
 		} else if (NotesManager.IsADLIB(chip)) {
-			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
+				this.nTotalAdLib++;
+				if (this.n参照中の難易度 == (int)Difficulty.Dan)
+					this.nDan_AdLibCount[List_DanSongs.Count - 1]++;
 			}
 		} else if (NotesManager.IsMine(chip)) {
-			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {
-				this.nDan_MineCount[List_DanSongs.Count - 1]++;
+			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster)) {
+				this.nTotalMine++;
+				if (this.n参照中の難易度 == (int)Difficulty.Dan)
+					this.nDan_MineCount[List_DanSongs.Count - 1]++;
 			}
 		} else if (NotesManager.IsGenericBalloon(chip)) {
 			if (branch == (IsEndedBranching ? ECourse.eNormal : ECourse.eMaster) && this.n参照中の難易度 == (int)Difficulty.Dan) {

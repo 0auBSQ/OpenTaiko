@@ -718,6 +718,7 @@ internal class OpenTaiko : Game {
 									TJA.ReleaseUnmanagedResource();
 								}
 
+								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								break;
 							}
@@ -762,6 +763,7 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
+								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 
 								this.tExecuteGarbageCollection();
@@ -777,6 +779,7 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
+								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 								break;
@@ -793,6 +796,20 @@ internal class OpenTaiko : Game {
 								stageGameScreen.t演奏結果を格納する(out c演奏記録_Drums);
 								stageResults.st演奏記録.Drums = c演奏記録_Drums;
 								UnmountAndChangeStage(stageResults, "Results");
+								break;
+								//-----------------------------
+								#endregion
+
+							case (int)EGameplayScreenReturnValue.SongJump:
+								#region [ Song jump (skip results, load new song) ]
+								//-----------------------------
+								SongMount.bSongJumpPending = false;
+								TJA?.t全チップの再生停止とミキサーからの削除();
+								TJA?.DeActivate();
+								TJA?.ReleaseManagedResource();
+								TJA?.ReleaseUnmanagedResource();
+								UnmountAndChangeStage(stageSongLoading, "Song Loading");
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -817,6 +834,7 @@ internal class OpenTaiko : Game {
 								//-----------------------------
 								this.ChangeStage(stageCutScene, "Cut Scene");
 							} else {
+								SongMount.bIsAfterSongJump = false;
 								this.NextSongSelectStage(rCurrentStage);
 							}
 						}

@@ -175,6 +175,12 @@ internal class CActImplClearAnimation : CActivity {
 			this.bSoundPlayed[i] = false;
 			this.ct進行メイン[i] = null;
 		}
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			this.soundFailed[i]?.tStopSound();
+			this.soundClear[i]?.tStopSound();
+			this.soundFullCombo[i]?.tStopSound();
+			this.soundPerfectCombo[i]?.tStopSound();
+		}
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 			Tower_DropoutScript?.Init();

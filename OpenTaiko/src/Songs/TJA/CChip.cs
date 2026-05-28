@@ -66,7 +66,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
 	public (Exam.Type type, EBranchCondBig big) eBranchCondition;
-	public Exam.Range eBranchConditionRange;
+	public CTExprRange eBranchConditionRange;
 	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
@@ -94,6 +94,42 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool IsMissed = false;
 
 	public bool IsPartnerNote = false;
+	public bool IsGiantNote = false;
+
+	// #STOREC chip (channel 0xEA)
+	public string? StoreCKey;
+	public string? StoreCExpression;
+
+	// #STORET chip (channel 0xEB)
+	public string? StoreTKey;
+	public string? StoreTExpression;
+
+	// #ELEVATEC chip (channel 0xEC)
+	public string? ElevateCKey;
+
+	// #ELEVATET chip (channel 0xED)
+	public string? ElevateTKey;
+
+	// #SONGJUMP chip (channel 0xEE)
+	public string? SongJumpUniqueId;
+	public int SongJumpDifficulty;
+
+	// #COMMANDIF — gates any command chip on a local trigger
+	public string? CommandIfTrigger;
+
+	// #NOTEIF — note is skipped (not missed) if trigger is false when note time arrives
+	public string? NoteIfTrigger;
+
+	// #GIANTNOTE — triggers activated on note hit result
+	public string? GiantNoteOkTrigger;
+	public string? GiantNoteMissTrigger;
+
+	// #BRANCHSTART lc: — local counter branch thresholds stored in existing nBranchCondition fields
+	public string? BranchLcKey;
+
+	// #BRANCHSTART lt — local trigger keys for expert/master branches
+	public string? BranchLt1Key;
+	public string? BranchLt2Key;
 
 	public CChip start; // defaults to this, never null
 	public CChip end; // defaults to this, never null

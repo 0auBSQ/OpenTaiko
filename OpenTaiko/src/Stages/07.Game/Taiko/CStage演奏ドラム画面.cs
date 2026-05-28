@@ -546,6 +546,8 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			// Layer: Gameplay complete animation and fading out
 
+			if (OpenTaiko.SongMount.bSongJumpPending)
+				this.actEnd.InitScripts();
 			bool bIsFinishedEndAnime = this.actEnd.Draw() == 1 ? true : false;
 			bool bIsFinishedFadeout = this.t進行描画_フェードイン_アウト();
 
@@ -553,8 +555,16 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			bool bIsChartEnded = this.IsChartEnded();
 			EStageAbort minAbortType = this.MinStageAbortType;
 
+			// Song jump takes priority over all phase transitions
+			if (OpenTaiko.SongMount.bSongJumpPending &&
+				base.ePhaseID is not (CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut)) {
+				this.eフェードアウト完了時の戻り値 = EGameplayScreenReturnValue.SongJump;
+				base.ePhaseID = CStage.EPhase.Game_EndStage_FadeOut;
+				this.actFO = this.actFOBlack;
+				this.actFO.tフェードアウト開始();
+			}
 			// Transition for failed games
-			if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageFailed_Fast()) {
+			else if ((!OpenTaiko.ConfigIni.bAIBattleMode && minAbortType >= EStageAbort.FailedFlow) || this.IsStageFailed_Fast()) {
 				if (base.ePhaseID is CStage.EPhase.Game_EndStage_FadeOut or CStage.EPhase.Game_EndStage_Quit_FadeOut) {
 					// do nothing
 				} else if (base.ePhaseID == EPhase.Game_STAGE_FAILED) {

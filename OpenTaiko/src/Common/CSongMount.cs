@@ -40,6 +40,9 @@ internal class CSongMount {
 	public int nCurrentSongDifficulty { get; set; }
 	public CScore? rCurrentScore => rCurrentlySelectedSong?.score[nCurrentSongDifficulty]; // require difficulty to be valid to not silence desyncing of other status
 
+	public bool bSongJumpPending { get; set; }
+	public bool bIsAfterSongJump { get; set; }
+
 
 	// Closest level
 	public static int FindClosestDifficulty(CSongListNode? song, int difficulty) {

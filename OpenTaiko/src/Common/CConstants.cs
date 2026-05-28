@@ -284,7 +284,8 @@ internal enum EGameplayScreenReturnValue {
 	StageFailed,
 	StageCleared,
 	ReloadAndReplay,
-	Replay
+	Replay,
+	SongJump,
 }
 internal enum ESongLoadingScreenReturnValue {
 	Continue = 0,

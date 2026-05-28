@@ -208,6 +208,9 @@ public static class Exam {
 		PercentPerfect,
 		BalloonHits,
 		TotalBranch,
+		// for local counter / trigger branch conditions
+		LocalCounter,
+		LocalTrigger,
 	}
 
 	/// <summary>

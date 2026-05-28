@@ -28,7 +28,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 		#region [ 共通 SET切り替え/More/Return ]
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && !OpenTaiko.SongMount.bIsAfterSongJump) l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
 		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_EXIT"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
 		#endregion
 
@@ -69,7 +69,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 				break;
 
 			case (int)EOrder.Redoing:
-				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
+				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan || OpenTaiko.SongMount.bIsAfterSongJump)
 					goto case (int)EOrder.Return;
 				this.bやり直しを選択した = true;
 				CActSelectPopupMenu.b選択した = true;

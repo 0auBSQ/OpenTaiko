@@ -1640,6 +1640,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
+					// #GIANTNOTE: activate ok trigger on perfect hit
+					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
+						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
 				}
 				break;
 			case ENoteJudge.Great:
@@ -1683,6 +1686,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
+					// #GIANTNOTE: activate ok trigger on great/good hit
+					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
+						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
 				}
 				break;
 			case ENoteJudge.Miss:
@@ -1738,6 +1744,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
 						}
 					}
+
+					// #GIANTNOTE: activate miss trigger on miss/bad
+					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteMissTrigger))
+						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteMissTrigger, "1");
 				}
 				break;
 			default:
@@ -3002,6 +3012,55 @@ internal abstract class CStage演奏画面共通 : CStage {
 						pChip.bHit = true;
 					}
 					break;
+				case 0xEA: // #STOREC
+					if (!pChip.bHit) {
+						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.StoreCKey) && !string.IsNullOrEmpty(pChip.StoreCExpression))
+							dTX.LocalCounters.Store(pChip.StoreCKey, pChip.StoreCExpression);
+						pChip.bHit = true;
+					}
+					break;
+				case 0xEB: // #STORET
+					if (!pChip.bHit) {
+						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.StoreTKey) && !string.IsNullOrEmpty(pChip.StoreTExpression))
+							dTX.LocalTriggers.Store(pChip.StoreTKey, pChip.StoreTExpression);
+						pChip.bHit = true;
+					}
+					break;
+				case 0xEC: // #ELEVATEC
+					if (!pChip.bHit) {
+						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.ElevateCKey))
+							dTX.LocalCounters.Elevate(pChip.ElevateCKey);
+						pChip.bHit = true;
+					}
+					break;
+				case 0xED: // #ELEVATET
+					if (!pChip.bHit) {
+						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.ElevateTKey))
+							dTX.LocalTriggers.Elevate(pChip.ElevateTKey);
+						pChip.bHit = true;
+					}
+					break;
+				case 0xEE: // #SONGJUMP
+					if (!pChip.bHit) {
+						if (IsCommandIfMet(pChip, dTX) && !string.IsNullOrEmpty(pChip.SongJumpUniqueId)) {
+							var targetNode = CSongDict.tGetNodeFromID(pChip.SongJumpUniqueId);
+						if (targetNode != null) {
+								int jumpDiff = CSongMount.FindClosestDifficulty(targetNode, pChip.SongJumpDifficulty);
+								OpenTaiko.SongMount.rChoosenSong = targetNode;
+								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++)
+									OpenTaiko.SongMount.nChoosenSongDifficulty[p] = jumpDiff;
+								OpenTaiko.SongMount.rChosenScore = targetNode.score[jumpDiff];
+								OpenTaiko.SongMount.bIsAfterSongJump = true;
+								OpenTaiko.SongMount.bSongJumpPending = true;
+								for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+									OpenTaiko.GetTJA(p)?.tStopAllChips();
+									this.isChartEnded[p] = true;
+								}
+							}
+						}
+						pChip.bHit = true;
+					}
+					break;
 				#endregion
 				#region[ f1: 歌詞 ]
 				case 0xF1:
@@ -3130,7 +3189,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 						if (!NotesManager.IsMine(pChip))
 							this.AutoplayHit(pChip, n現在時刻ms, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
 						if (pChip.n発声時刻ms <= n現在時刻ms) {
-							if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
+							if (!this.IsNoteIfMet(pChip, nPlayer)) {
+								pChip.bHit = true; // skip silently — trigger condition not met
+							} else if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
 								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
 								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
@@ -3548,27 +3609,44 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (pChip.eBranchCondition.type == Exam.Type.None)
 			return this.nTargetBranch[nPlayer]; // keep current branch
 
+		// Local counter branch (#BRANCHSTART lc:key,v1,v2[,op])
+		if (pChip.eBranchCondition.type == Exam.Type.LocalCounter) {
+			CTja? tja = OpenTaiko.GetTJA(nPlayer);
+			if (tja == null || string.IsNullOrEmpty(pChip.BranchLcKey))
+				return this.nTargetBranch[nPlayer];
+			double val = tja.LocalCounters.Get(pChip.BranchLcKey);
+			if (CTExprRangeHelper.Compare(val, pChip.nBranchCondition2_Master,       pChip.eBranchConditionRange)) return CTja.ECourse.eMaster;
+			if (CTExprRangeHelper.Compare(val, pChip.nBranchCondition1_Professional, pChip.eBranchConditionRange)) return CTja.ECourse.eExpert;
+			return CTja.ECourse.eNormal;
+		}
+
+		// Local trigger branch (#BRANCHSTART lt,expertTrigger,masterTrigger)
+		if (pChip.eBranchCondition.type == Exam.Type.LocalTrigger) {
+			CTja? tja = OpenTaiko.GetTJA(nPlayer);
+			if (tja == null) return this.nTargetBranch[nPlayer];
+			bool t2 = !string.IsNullOrEmpty(pChip.BranchLt2Key) && tja.LocalTriggers.Get(pChip.BranchLt2Key);
+			bool t1 = !string.IsNullOrEmpty(pChip.BranchLt1Key) && tja.LocalTriggers.Get(pChip.BranchLt1Key);
+			if (t2) return CTja.ECourse.eMaster;
+			if (t1) return CTja.ECourse.eExpert;
+			return CTja.ECourse.eNormal;
+		}
+
 		double dbRate = branchScore.GetScore(pChip.eBranchCondition);
 
-		switch (pChip.eBranchConditionRange) {
-			default:
-			case Exam.Range.More:
-				if (dbRate >= pChip.nBranchCondition2_Master) {
-					return CTja.ECourse.eMaster;
-				} else if (dbRate >= pChip.nBranchCondition1_Professional) {
-					return CTja.ECourse.eExpert;
-				} else {
-					return CTja.ECourse.eNormal;
-				}
-			case Exam.Range.Less:
-				if (dbRate < pChip.nBranchCondition2_Master) {
-					return CTja.ECourse.eMaster;
-				} else if (dbRate < pChip.nBranchCondition1_Professional) {
-					return CTja.ECourse.eExpert;
-				} else {
-					return CTja.ECourse.eNormal;
-				}
-		}
+		if (CTExprRangeHelper.Compare(dbRate, pChip.nBranchCondition2_Master,       pChip.eBranchConditionRange)) return CTja.ECourse.eMaster;
+		if (CTExprRangeHelper.Compare(dbRate, pChip.nBranchCondition1_Professional, pChip.eBranchConditionRange)) return CTja.ECourse.eExpert;
+		return CTja.ECourse.eNormal;
+	}
+
+	private static bool IsCommandIfMet(CChip chip, CTja tja) {
+		if (string.IsNullOrEmpty(chip.CommandIfTrigger)) return true;
+		return tja.LocalTriggers.Get(chip.CommandIfTrigger);
+	}
+
+	private bool IsNoteIfMet(CChip chip, int nPlayer) {
+		if (string.IsNullOrEmpty(chip.NoteIfTrigger)) return true;
+		CTja? tja = OpenTaiko.GetTJA(nPlayer);
+		return tja == null || tja.LocalTriggers.Get(chip.NoteIfTrigger);
 	}
 
 	public double GetBranchConditionScore(int nPlayer, (Exam.Type, CTja.EBranchCondBig) cond) {
