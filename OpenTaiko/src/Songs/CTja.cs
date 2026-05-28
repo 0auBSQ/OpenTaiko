@@ -476,7 +476,8 @@ internal class CTja : CActivity {
 	public string? PendingNoteIfTrigger;
 	public bool IsEnabledGiantNote;
 	public string? PendingGiantNoteOkTrigger;
-	public string? PendingGiantNoteMissTrigger;
+	public string? PendingGiantNoteGoodTrigger;
+	public bool PendingGiantNoteLink;
 	public string? PendingCommandIfTrigger;
 	public GaugeIncreaseMode GaugeIncreaseMode;
 
@@ -2282,10 +2283,11 @@ internal class CTja : CActivity {
 			IsEnabledNoteIf = true;
 			PendingNoteIfTrigger = argument.Trim();
 		} else if (command == "#GIANTNOTE") {
-			var parts = argument.Split(',', 2, StringSplitOptions.TrimEntries);
+			var parts = argument.Split(',', 3, StringSplitOptions.TrimEntries);
 			IsEnabledGiantNote = true;
 			PendingGiantNoteOkTrigger = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : null;
-			PendingGiantNoteMissTrigger = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null;
+			PendingGiantNoteGoodTrigger = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null;
+			PendingGiantNoteLink = parts.Length > 2 && parts[2].ToLower() == "true";
 		} else if (command == "#STOREC") {
 			var colonIdx = argument.IndexOf(':');
 			if (colonIdx >= 0) {
@@ -3001,7 +3003,8 @@ internal class CTja : CActivity {
 			}
 		}
 		this.IsEnabledFixSENote = this.IsEnabledPartnerNote = this.IsEnabledNoteIf = this.IsEnabledGiantNote = false;
-		this.PendingNoteIfTrigger = this.PendingGiantNoteOkTrigger = this.PendingGiantNoteMissTrigger = null;
+		this.PendingNoteIfTrigger = this.PendingGiantNoteOkTrigger = this.PendingGiantNoteGoodTrigger = null;
+		this.PendingGiantNoteLink = false;
 	}
 
 	private void SetChipSudden(CChip chip) {
@@ -3065,7 +3068,8 @@ internal class CTja : CActivity {
 		chip.IsGiantNote = this.IsEnabledGiantNote;
 		chip.NoteIfTrigger = this.IsEnabledNoteIf ? this.PendingNoteIfTrigger : null;
 		chip.GiantNoteOkTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteOkTrigger : null;
-		chip.GiantNoteMissTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteMissTrigger : null;
+		chip.GiantNoteGoodTrigger = this.IsEnabledGiantNote ? this.PendingGiantNoteGoodTrigger : null;
+		chip.GiantNoteLink = this.IsEnabledGiantNote && this.PendingGiantNoteLink;
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26

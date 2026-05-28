@@ -1640,7 +1640,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
-					// #GIANTNOTE: activate ok trigger on perfect hit
+					// #GIANTNOTE: perfect hit activates ok trigger
 					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
 						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
 				}
@@ -1686,9 +1686,13 @@ internal abstract class CStage演奏画面共通 : CStage {
 						returnChara();
 					}
 
-					// #GIANTNOTE: activate ok trigger on great/good hit
-					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
-						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
+					// #GIANTNOTE: good hit activates good trigger; if link=true also activates ok trigger
+					if (pChip != null) {
+						if (!string.IsNullOrEmpty(pChip.GiantNoteGoodTrigger))
+							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteGoodTrigger, "1");
+						if (pChip.GiantNoteLink && !string.IsNullOrEmpty(pChip.GiantNoteOkTrigger))
+							OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteOkTrigger, "1");
+					}
 				}
 				break;
 			case ENoteJudge.Miss:
@@ -1745,9 +1749,6 @@ internal abstract class CStage演奏画面共通 : CStage {
 						}
 					}
 
-					// #GIANTNOTE: activate miss trigger on miss/bad
-					if (pChip != null && !string.IsNullOrEmpty(pChip.GiantNoteMissTrigger))
-						OpenTaiko.GetTJA(nPlayer)?.LocalTriggers.Store(pChip.GiantNoteMissTrigger, "1");
 				}
 				break;
 			default:

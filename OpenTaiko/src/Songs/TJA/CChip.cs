@@ -122,7 +122,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	// #GIANTNOTE — triggers activated on note hit result
 	public string? GiantNoteOkTrigger;
-	public string? GiantNoteMissTrigger;
+	public string? GiantNoteGoodTrigger;
+	public bool GiantNoteLink;
 
 	// #BRANCHSTART lc: — local counter branch thresholds stored in existing nBranchCondition fields
 	public string? BranchLcKey;
