@@ -159,8 +159,8 @@ function onStart()
         tx["HS_slow_" .. i] = TEXTURE:CreateTexture("Textures/Mods/HS/slow/" .. i .. ".png")
     end
 
-    -- Fun: 1=Avalanche, 2=Minesweeper
-    for i = 1, 2 do
+    -- Fun: 1=Avalanche, 2=Minesweeper, 3=DynamicBeat
+    for i = 1, 3 do
         tx["Fun_" .. i] = TEXTURE:CreateTexture("Textures/Mods/Fun/" .. i .. ".png")
     end
 

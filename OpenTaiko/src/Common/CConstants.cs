@@ -227,6 +227,7 @@ public enum EFunMods {
 	None,
 	Avalanche,
 	Minesweeper,
+	DynamicBeat,
 	Total,
 }
 

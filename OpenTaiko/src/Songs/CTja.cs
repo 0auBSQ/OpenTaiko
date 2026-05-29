@@ -783,6 +783,7 @@ internal class CTja : CActivity {
 					chip.dbSCROLL *= (n + 50) / (double)100;
 				}
 				break;
+			case EFunMods.DynamicBeat:
 			case EFunMods.None:
 			default:
 				break;
@@ -955,6 +956,16 @@ internal class CTja : CActivity {
 			}
 		}
 	}
+	public void tUpdateDynamicBeatSpeed(double newSpeed) {
+		if (this.listWAV == null) return;
+		foreach (CWAV cwav in this.listWAV.Values) {
+			for (int i = 0; i < nPolyphonicSounds; i++) {
+				if (cwav.rSound[i] != null && cwav.rSound[i].IsPlaying)
+					cwav.rSound[i].SetSpeedWhilePlaying(newSpeed);
+			}
+		}
+	}
+
 	public void t各自動再生音チップの再生時刻を変更する(int nBGMAdjustの増減値) {
 		this.nBGMAdjust += nBGMAdjustの増減値;
 

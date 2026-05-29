@@ -767,7 +767,10 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			// convert input time (mixer space) to note time
 			CTja tja = OpenTaiko.GetTJA(nUsePlayer)!;
 			long msInputMixer = SoundManager.PlayTimer.SystemTimeToGameTime(inputEvent.nTimeStamp);
-			long msHitTjaTime = (long)tja.GameTimeToTjaTime(msInputMixer + nInputAdjustTimeMs);
+			long rawInputGameTime = msInputMixer + nInputAdjustTimeMs;
+			long msHitTjaTime = OpenTaiko.ConfigIni.nFunMods[nUsePlayer] == EFunMods.DynamicBeat
+				? (long)(tja.GameTimeToTjaTime(rawInputGameTime) * dbDynamicBeatFactor + dbDynBeatTjaOffset)
+				: (long)tja.GameTimeToTjaTime(rawInputGameTime);
 
 			EPad nPadAs1P = NotesManager.PadTo1P(nPad);
 			// Register to replay file

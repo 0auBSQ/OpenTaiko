@@ -191,9 +191,10 @@ local OPTION_DEFS = {
         desc = "Add some goofiness to your play!",
         type = "multi",
         choices = {
-            { label = "None",        color = COL_WHITE, desc = "No fun mod active." },
-            { label = "Avalanche",   color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
-            { label = "Minesweeper", color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
+            { label = "None",         color = COL_WHITE, desc = "No fun mod active." },
+            { label = "Avalanche",    color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
+            { label = "Minesweeper",  color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
+            { label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players." },
         }
     },
 }

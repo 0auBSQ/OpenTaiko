@@ -177,6 +177,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.nCurrentRollCount = new int[] { 0, 0, 0, 0, 0 };
 		this.idxLastBranchSection = new int[5];
 		this.Chara_MissCount = new int[5];
+		dbDynamicBeatFactor   = 1.0;
+		dbDynBeatTjaOffset    = 0.0;
+		msDynBeatRawGameTime  = 0;
+		msDynBeatSectionStart = 0;
+		for (int i = 0; i < 5; i++) {
+			nDynBeatSectionPerfects[i] = 0;
+			nDynBeatSectionBads[i]     = 0;
+			nDynBeatSectionNotes[i]    = 0;
+		}
+		// If any player has DynamicBeat, force it for all players
+		bool anyDynBeat = false;
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat) { anyDynBeat = true; break; }
+		}
+		if (anyDynBeat) {
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
+				OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.DynamicBeat;
+		}
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];
 		this.JPOSCROLLY = new double[5];
@@ -749,6 +767,15 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	protected int[] nCurrentRollCount = new int[5];
 	public int[] Chara_MissCount;
+
+	// Dynamic Beat mode state (shared across all players)
+	protected double dbDynamicBeatFactor    = 1.0;
+	protected double dbDynBeatTjaOffset     = 0.0; // TJA-time continuity offset when factor changes mid-song (double for precision)
+	protected long   msDynBeatRawGameTime   = 0;   // rawGameTime captured at the start of the current frame's chip processing
+	protected long   msDynBeatSectionStart  = 0;
+	protected int[]  nDynBeatSectionPerfects = new int[5];
+	protected int[]  nDynBeatSectionBads     = new int[5];
+	protected int[]  nDynBeatSectionNotes    = new int[5];
 	protected bool[] isChartEnded = { false, false, false, false, false }; // last note of chart passed
 	protected bool[] isFinishedPlaying = { false, false, false, false, false };
 	protected bool[] isDeniedPlaying = { false, false, false, false, false };
@@ -1496,6 +1523,23 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.UpdateJudgeCount(pChip, nPlayer, bAutoPlay, bBombHit, eJudgeResult, msDelta);
 		this.UpdateComboMilestone(pChip, nPlayer);
 		this.AddScore(pChip, nPlayer, eJudgeResult);
+
+		// Dynamic Beat: immediate and section tracking
+		if (!isDeniedJudgeCount && OpenTaiko.ConfigIni.nFunMods[nPlayer] == EFunMods.DynamicBeat) {
+			bool isAdLib = pChip != null && NotesManager.IsADLIB(pChip);
+			bool isMine  = pChip != null && NotesManager.IsMine(pChip);
+			if (isAdLib && eJudgeResult != ENoteJudge.Miss) {
+				ApplyDynamicBeatFactor(+0.01);
+			} else if (isMine && bBombHit) {
+				ApplyDynamicBeatFactor(-0.05);
+			} else if (pChip != null && NotesManager.IsMissableNote(pChip)) {
+				nDynBeatSectionNotes[nPlayer]++;
+				if (eJudgeResult == ENoteJudge.Perfect)
+					nDynBeatSectionPerfects[nPlayer]++;
+				else if (eJudgeResult == ENoteJudge.Miss)
+					nDynBeatSectionBads[nPlayer]++;
+			}
+		}
 
 		return eJudgeResult;
 	}
@@ -2339,11 +2383,25 @@ internal abstract class CStage演奏画面共通 : CStage {
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
-		var n現在時刻ms = (long)tja.GameTimeToTjaTime(this.IsFailStopped() ? this.msFailedStopSystemTime : SoundManager.PlayTimer.NowTimeMs);
+		bool isDynBeat = OpenTaiko.ConfigIni.nFunMods[nPlayer] == EFunMods.DynamicBeat;
+		long rawGameTime = this.IsFailStopped() ? this.msFailedStopSystemTime : SoundManager.PlayTimer.NowTimeMs;
+		// Store for ApplyDynamicBeatFactor so the offset is computed against the same time used here
+		if (nPlayer == 0) msDynBeatRawGameTime = rawGameTime;
+		long n現在時刻ms = isDynBeat
+			? (long)(tja.GameTimeToTjaTime(rawGameTime) * dbDynamicBeatFactor + dbDynBeatTjaOffset)
+			: (long)tja.GameTimeToTjaTime(rawGameTime);
 
 		NowAIBattleSectionTime = (int)n現在時刻ms - NowAIBattleSection.StartTime;
 
 		var scrollRate = this.GetScrollRate(nPlayer);
+
+		// Dynamic Beat: tick section timer and evaluate every 2 seconds (player 0 drives the shared timer)
+		if (!drawOnly && !this.bPAUSE && isDynBeat && nPlayer == 0) {
+			if (msDynBeatSectionStart == 0)
+				msDynBeatSectionStart = rawGameTime;
+			else if (rawGameTime - msDynBeatSectionStart >= 2000)
+				EvaluateDynamicBeat();
+		}
 
 		CConfigIni configIni = OpenTaiko.ConfigIni;
 
@@ -3277,6 +3335,56 @@ internal abstract class CStage演奏画面共通 : CStage {
 	private double GetScrollRate(int iPlayer)
 		=> (this.actScrollSpeed.dbConfigScrollSpeed[iPlayer] + 1.0) / 10.0;
 
+	private static double GetDynamicBeatAccelerationThreshold(double factor) => factor switch {
+		< 1.05 => 50.0,
+		< 1.10 => 70.0,
+		< 1.20 => 80.0,
+		< 1.30 => 90.0,
+		< 1.40 => 92.0,
+		< 1.50 => 95.0,
+		_      => 98.0
+	};
+
+	protected void ApplyDynamicBeatFactor(double delta) {
+		int playerCount = Math.Max(1, OpenTaiko.ConfigIni.nPlayerCount);
+		double newFactor = Math.Max(1.0, dbDynamicBeatFactor + delta / playerCount);
+		if (newFactor == dbDynamicBeatFactor) return;
+		// Offset must cancel the jump that multiplying by the new factor would introduce.
+		// n現在時刻ms = GameTimeToTjaTime(rawGameTime) * F + offset
+		// For continuity: offset -= GameTimeToTjaTime(rawGameTime) * (newF - oldF)
+		// Using rawGameTime * SongPlaybackSpeed here would be WRONG because GameTimeToTjaTime
+		// also subtracts MusicPreTimeMs (~2500ms), causing a large jump per factor change.
+		double tjaBase = OpenTaiko.GetTJA(0)?.GameTimeToTjaTime(msDynBeatRawGameTime)
+		                 ?? (msDynBeatRawGameTime * OpenTaiko.ConfigIni.SongPlaybackSpeed);
+		dbDynBeatTjaOffset -= tjaBase * (newFactor - dbDynamicBeatFactor);
+		dbDynamicBeatFactor = newFactor;
+		OpenTaiko.TJA?.tUpdateDynamicBeatSpeed(OpenTaiko.ConfigIni.SongPlaybackSpeed * newFactor);
+	}
+
+	private void EvaluateDynamicBeat() {
+		int totalNotes = 0, totalPerfects = 0, totalBads = 0;
+		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+			totalNotes    += nDynBeatSectionNotes[p];
+			totalPerfects += nDynBeatSectionPerfects[p];
+			totalBads     += nDynBeatSectionBads[p];
+		}
+		if (totalNotes > 0) {
+			if (totalBads > 0) {
+				ApplyDynamicBeatFactor(-0.05);
+			} else {
+				double accuracy = totalPerfects / (double)totalNotes * 100.0;
+				if (accuracy >= GetDynamicBeatAccelerationThreshold(dbDynamicBeatFactor))
+					ApplyDynamicBeatFactor(+0.05);
+			}
+		}
+		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+			nDynBeatSectionPerfects[p] = 0;
+			nDynBeatSectionBads[p]     = 0;
+			nDynBeatSectionNotes[p]    = 0;
+		}
+		msDynBeatSectionStart = SoundManager.PlayTimer.NowTimeMs;
+	}
+
 	private static Comparer<CChip> NowProcessingRollComparer = Comparer<CChip>.Create((a, b) => a.n整数値_内部番号.CompareTo(b.n整数値_内部番号));
 
 	private static Action<float> GetObjHandlerSetter(CChip chip)
@@ -3429,6 +3537,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.bIsMiss[iPlayer] = true;
 
 						UpdateGauge(chip, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Bad);
+						if (OpenTaiko.ConfigIni.nFunMods[iPlayer] == EFunMods.DynamicBeat)
+							ApplyDynamicBeatFactor(-0.05);
 					}
 				}
 			}
@@ -3807,6 +3917,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		if (b演奏状態) {
 			_AIBattleStateBatch = new Queue<float>[] { new Queue<float>(), new Queue<float>() };
 			bIsAIBattleWin = false;
+			this.dbDynamicBeatFactor   = 1.0;
+			this.dbDynBeatTjaOffset    = 0.0;
+			this.msDynBeatRawGameTime  = 0;
+			this.msDynBeatSectionStart = 0;
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				CCharacter character = CCharacter.GetCharacter(i);
@@ -3814,6 +3928,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 				this.Chara_MissCount[i] = 0;
 				this.bIsMiss[i] = false;
 				this.bUseBranch[i] = false;
+				this.nDynBeatSectionPerfects[i] = 0;
+				this.nDynBeatSectionBads[i]     = 0;
+				this.nDynBeatSectionNotes[i]    = 0;
 				this.bLEVELHOLD[i] = false;
 				this.b強制的に分岐させた[i] = false;
 				OpenTaiko.stageGameScreen.ChangeBranch(CTja.ECourse.eNormal, i, stopAnime: true);
