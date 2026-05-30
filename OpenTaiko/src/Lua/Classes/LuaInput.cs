@@ -137,6 +137,38 @@ namespace OpenTaiko {
 		public double GetMouseX() => MouseSurfacePosition().x;
 		/// <summary>Mouse Y in game-surface coordinates (0..surface height). -1 if no mouse.</summary>
 		public double GetMouseY() => MouseSurfacePosition().y;
+		/// <summary>Mouse position as two values: local x, y = INPUT:GetMouseXY()</summary>
+		public (double, double) GetMouseXY() => MouseSurfacePosition();
+
+		// ── Free-look helpers ────────────────────────────────────────────────────────
+		private int _pmx, _pmy;
+		private bool _havePrev;
+
+		/// <summary>Lock+hide the cursor for free-look (or restore it). Resets the delta baseline.</summary>
+		public void SetMouseLocked(bool locked) {
+			var m = MouseDevice; if (m == null) return;
+			m.SetCursorLocked(locked);
+			_pmx = m.Position.x; _pmy = m.Position.y; _havePrev = true;
+		}
+
+		/// <summary>Raw mouse movement since the last call (window pixels): local dx, dy = INPUT:GetMouseDelta()</summary>
+		public (double, double) GetMouseDelta() {
+			var m = MouseDevice; if (m == null) return (0, 0);
+			int cx = m.Position.x, cy = m.Position.y;
+			if (!_havePrev) { _pmx = cx; _pmy = cy; _havePrev = true; return (0, 0); }
+			double dx = cx - _pmx, dy = cy - _pmy;
+			_pmx = cx; _pmy = cy;
+			return (dx, dy);
+		}
+
+		/// <summary>Wheel movement since the last call: local dx, dy = INPUT:GetScrollDelta().
+		/// dy is positive when scrolling up/away. Reading resets the accumulator.</summary>
+		public (double, double) GetScrollDelta() {
+			var m = MouseDevice; if (m == null) return (0, 0);
+			double x = m.ScrollAccumX, y = m.ScrollAccumY;
+			m.ScrollAccumX = 0; m.ScrollAccumY = 0;
+			return (x, y);
+		}
 
 		/// <summary>True when the mouse is within the rendered surface (not on a letterbox border).</summary>
 		public bool IsMouseInside() {

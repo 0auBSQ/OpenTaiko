@@ -34,7 +34,7 @@ namespace OpenTaiko {
 
 		public LuaVector4 Clone() => new(X, Y, Z, W);
 		public void Set(double x, double y, double z, double w) { X = x; Y = y; Z = z; W = w; }
-		public double Unpack(out double y, out double z, out double w) { y = Y; z = Z; w = W; return X; }
+		public (double, double, double, double) Unpack() => (X, Y, Z, W);
 		public override string ToString() => $"({X}, {Y}, {Z}, {W})";
 	}
 

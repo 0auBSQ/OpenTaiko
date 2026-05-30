@@ -33,7 +33,7 @@ namespace OpenTaiko {
 
 		public LuaVector2 Clone() => new(X, Y);
 		public void Set(double x, double y) { X = x; Y = y; }
-		public double Unpack(out double y) { y = Y; return X; }          // local x, y = v:Unpack()
+		public (double, double) Unpack() => (X, Y);                       // local x, y = v:Unpack()
 		public override string ToString() => $"({X}, {Y})";
 	}
 

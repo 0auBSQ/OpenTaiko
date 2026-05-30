@@ -15,9 +15,9 @@ namespace OpenTaiko {
 		internal CTexture? _texture = null;
 		internal HashSet<LuaCanvas>? _disposeList = null;
 
-		private byte[] _buf;          // RGBA, top-left origin
-		private readonly int _w;
-		private readonly int _h;
+		internal byte[] _buf;         // RGBA, top-left origin
+		internal readonly int _w;
+		internal readonly int _h;
 		private bool _dirty;
 		// dirty rectangle (inclusive) so Upload only sends the changed region
 		private int _dx0, _dy0, _dx1, _dy1;
@@ -37,7 +37,7 @@ namespace OpenTaiko {
 			Upload();                              // allocate the GL texture up front
 		}
 
-		private void MarkDirty(int x0, int y0, int x1, int y1) {
+		internal void MarkDirty(int x0, int y0, int x1, int y1) {
 			if (!_dirty) {
 				_dx0 = x0; _dy0 = y0; _dx1 = x1; _dy1 = y1; _dirty = true;
 			} else {

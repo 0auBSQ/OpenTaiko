@@ -22,6 +22,7 @@ class CLuaScript : IDisposable {
 
 	public HashSet<LuaTexture> TextureList = [];
 	public HashSet<LuaCanvas> CanvasList = [];
+	public HashSet<Lua3DScene> Scene3DList = [];
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];
 	public HashSet<LuaText> TextList = [];
@@ -245,6 +246,7 @@ class CLuaScript : IDisposable {
 
 			LuaScript["TEXTURE"] = ltf;
 			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
+			LuaScript["SCENE3D"] = new Lua3DSceneFunc(Scene3DList);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
@@ -260,6 +262,7 @@ class CLuaScript : IDisposable {
 			LuaScript["MATRIX3"] = new LuaMatrix3Func();
 			LuaScript["MATRIX4"] = new LuaMatrix4Func();
 			LuaScript["MATRIX"] = new LuaMatrixFunc();
+			LuaScript["QUATERNION"] = new LuaQuaternionFunc();
 			LuaScript["COLOR"] = new LuaColorFunc();
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
@@ -330,6 +333,7 @@ class CLuaScript : IDisposable {
 		freeDisposableList(this.listDisposables);
 		freeDisposableList(this.TextureList);
 		freeDisposableList(this.CanvasList);
+		freeDisposableList(this.Scene3DList);
 		freeDisposableList(this.SoundList);
 		freeDisposableList(this.VideoList);
 		freeDisposableList(this.TextList);
