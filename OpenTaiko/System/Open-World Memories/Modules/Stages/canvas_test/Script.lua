@@ -15,6 +15,7 @@
 local SURF_W, SURF_H = 1920, 1080
 
 local paper       = nil   -- the drawing sheet (full-surface LuaCanvas)
+local baseCanvas  = nil   -- offscreen layer holding actions baked in past the undo cap
 local cursor      = nil   -- small overlay canvas for the brush outline
 local renderPaths = {}    -- 1-based list of every character's Render.png path
 local renderCount = 0
@@ -44,6 +45,7 @@ local STAMP_SPIN = 120.0       -- deg/sec while an arrow is held
 local actions      = {}
 local redoActions  = {}
 local currentStroke = nil      -- the stroke being drawn while a brush button is held
+local UNDO_CAP     = 10         -- keep at most this many undoable actions (older ones bake in)
 
 -- draw-colour palette (number keys 1-8)
 local PALETTE = {
@@ -122,40 +124,46 @@ local function currentStamp() return stampTexAt(stampIdx) end
 
 -- ── Undo / redo (action list) ───────────────────────────────────────────────────
 
--- Draw a single action onto the sheet (does not upload — callers batch the upload).
-local function applyAction(a)
+-- Draw a single action onto a target canvas (does not upload — callers batch the upload).
+local function applyAction(target, a)
     if a.kind == "clear" then
-        paper:Clear(255, 255, 255, 255)
+        target:Clear(255, 255, 255, 255)
     elseif a.kind == "stamp" then
         local st = stampTexAt(a.idx)
         if st ~= nil then
             -- rotation negated so the paste matches the on-screen preview (screen Y flipped)
-            paper:PasteTextureTransformed(st, a.x, a.y, a.scale, -a.rot, "center")
+            target:PasteTextureTransformed(st, a.x, a.y, a.scale, -a.rot, "center")
         end
     elseif a.kind == "stroke" then
         local p, n = a.pts, #a.pts
         if n >= 4 then
             for i = 1, n - 3, 2 do
-                paper:StrokeLine(floor(p[i]), floor(p[i + 1]), floor(p[i + 2]), floor(p[i + 3]),
+                target:StrokeLine(floor(p[i]), floor(p[i + 1]), floor(p[i + 2]), floor(p[i + 3]),
                     a.size, a.r, a.g, a.b, 255)
             end
         elseif n == 2 then
-            paper:StrokeLine(floor(p[1]), floor(p[2]), floor(p[1]), floor(p[2]), a.size, a.r, a.g, a.b, 255)
+            target:StrokeLine(floor(p[1]), floor(p[2]), floor(p[1]), floor(p[2]), a.size, a.r, a.g, a.b, 255)
         end
     end
 end
 
--- Replay every action onto a blank sheet (used by undo).
+-- Replay the baked base layer + the live actions onto the sheet (used by undo).
 local function rebuild()
-    paper:Clear(255, 255, 255, 255)
-    for i = 1, #actions do applyAction(actions[i]) end
+    paper:CopyFrom(baseCanvas)
+    for i = 1, #actions do applyAction(paper, actions[i]) end
     paper:Upload()
 end
 
--- Register a freshly-finished action (clears the redo branch).
+-- Register a freshly-finished action (clears the redo branch). When the undo list grows
+-- past the cap, the oldest action is permanently baked into the base layer so undo stays
+-- cheap (it only ever replays UNDO_CAP actions) while older work is preserved.
 local function pushAction(a)
     actions[#actions + 1] = a
     redoActions = {}
+    while #actions > UNDO_CAP do
+        applyAction(baseCanvas, actions[1])
+        table.remove(actions, 1)
+    end
 end
 
 local function undo()
@@ -170,14 +178,14 @@ local function redo()
     local a = redoActions[#redoActions]
     redoActions[#redoActions] = nil
     actions[#actions + 1] = a
-    applyAction(a)   -- additive on top of the current sheet; clear is absolute either way
+    applyAction(paper, a)   -- additive on top of the current sheet; clear is absolute either way
     paper:Upload()
 end
 
 local function clearSheet()
     local a = { kind = "clear" }
     pushAction(a)
-    applyAction(a)
+    applyAction(paper, a)
     paper:Upload()
 end
 
@@ -189,8 +197,9 @@ function onStart()
     if SURF_W <= 0 then SURF_W = 1920 end
     if SURF_H <= 0 then SURF_H = 1080 end
 
-    paper  = CANVAS:CreateCanvas(SURF_W, SURF_H)
-    cursor = CANVAS:CreateCanvas(CURSOR_BOX, CURSOR_BOX)
+    paper      = CANVAS:CreateCanvas(SURF_W, SURF_H)
+    baseCanvas = CANVAS:CreateCanvas(SURF_W, SURF_H)   -- offscreen; never drawn, only copied
+    cursor     = CANVAS:CreateCanvas(CURSOR_BOX, CURSOR_BOX)
 
     fontMid   = TEXT:Create(24)
     fontSmall = TEXT:Create(18)
@@ -199,6 +208,7 @@ end
 function activate()
     paper:Clear(255, 255, 255, 255)
     paper:Upload()
+    baseCanvas:Clear(255, 255, 255, 255)   -- offscreen base starts blank (no upload needed)
     refreshCursor()
     buildStampList()
     actions, redoActions, currentStroke = {}, {}, nil
@@ -325,7 +335,7 @@ function update(ts)
             local a = { kind = "stamp", x = floor(mMouseX), y = floor(mMouseY),
                         scale = stampScale, rot = stampRot, idx = stampIdx }
             pushAction(a)
-            applyAction(a)
+            applyAction(paper, a)
             paper:Upload()
         end
     else

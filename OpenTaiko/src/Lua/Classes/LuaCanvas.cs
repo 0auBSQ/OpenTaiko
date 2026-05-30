@@ -190,6 +190,14 @@ namespace OpenTaiko {
 		/// <summary>Fill the whole canvas with a colour (r,g,b,a 0-255).</summary>
 		public void Clear(int r, int g, int b, int a) => FillRect(0, 0, _w, _h, r, g, b, a);
 
+		/// <summary>Copy another same-size canvas's pixels into this one (marks the whole canvas
+		/// dirty; the caller uploads). Used for undo: a "base" layer of baked-in edits.</summary>
+		public void CopyFrom(LuaCanvas other) {
+			if (other == null || other._buf.Length != _buf.Length) return;
+			Array.Copy(other._buf, _buf, _buf.Length);
+			MarkDirty(0, 0, _w - 1, _h - 1);
+		}
+
 		/// <summary>Reset the whole canvas to transparent.</summary>
 		public void ClearTransparent() {
 			Array.Clear(_buf, 0, _buf.Length);

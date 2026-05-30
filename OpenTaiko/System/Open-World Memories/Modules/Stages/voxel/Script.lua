@@ -22,6 +22,12 @@ local NEAR      = 0.06
 local MOUSE_SENS = 0.16          -- deg per mouse pixel
 local ARROW_TURN = 90.0          -- deg/sec for arrow-key look
 
+-- view distance + fog (chunks past RENDER_DIST are culled; terrain fades to fog over
+-- [FOG_START, FOG_END] so the cull boundary isn't a hard pop). Lower RENDER_DIST = faster.
+local RENDER_DIST = 60.0
+local FOG_START   = 38.0
+local FOG_END     = 60.0
+
 -- physics
 local GRAV       = 28.0
 local JUMP_VEL   = 8.6
@@ -73,7 +79,8 @@ local vox = {}
 local CHUNK = 16
 local ncx = floor((WX + CHUNK - 1) / CHUNK)
 local ncz = floor((WZ + CHUNK - 1) / CHUNK)
-local chunks = {}   -- [cz*ncx+cx+1] = { op={6 dir buckets}, nop={6 counts}, wq, nWq, cx, cz }
+local chunks = {}   -- [cz*ncx+cx+1] = { ci, cx, cz, minX,maxX,minZ,maxZ, cenX,cenZ }
+                    -- (geometry lives in the scene's batches: tex id ci*8+dir, water id ci)
 
 -- player
 local feetX, feetY, feetZ = WX / 2, 24, WZ / 2
@@ -161,6 +168,7 @@ local function isSelectable(b) return b ~= AIR and b ~= WATER end
 local skyTop = {}     -- [x*WZ+z+1] = lowest y that still sees the sky (everything >= it is lit)
 local torchLight = {} -- [(y*WZ+z)*WX+x+1] = 0..TORCH_MAX
 local torches = {}    -- [packed idx] = {x,y,z} of each torch, for the slim-post render pass
+local torchesDirty = false   -- set when a torch is added/removed → rebuild the torch object
 local _lq, _lqv = {}, {}   -- reused BFS queues (packed index / value)
 
 local function recomputeSkyColumn(x, z)
@@ -454,29 +462,41 @@ end
 
 local _mask = {}   -- scratch face mask, reused across meshChunk calls
 
--- Mesh one chunk column (X,Z in [c*CHUNK, ..), full Y) into its own quad lists.
--- Each block's visible faces are emitted by the chunk that owns the block, so the
--- union of all chunks is identical to meshing the whole world at once.
 -- light → brightness multiplier (ambient floor so nothing is pure black)
 local function liteMul(l) return LIGHT_AMB + (1 - LIGHT_AMB) * (l / LIGHT_MAX) end
 
+-- Mesh one chunk column (X,Z in [c*CHUNK, ..), full Y) straight into the scene's geometry
+-- batches: one textured batch per face direction (id = ci*8 + di) plus one flat batch for
+-- water (id = ci). The geometry then lives in C# and is drawn per frame with one call per
+-- bucket — no per-quad Lua↔C# traffic on the hot path.
 local function meshChunk(cx, cz)
     local ci = cz * ncx + cx + 1
-    local ch = chunks[ci]
-    if not ch then
-        ch = { op = { {}, {}, {}, {}, {}, {} }, nop = { 0, 0, 0, 0, 0, 0 },
-               wq = {}, nWq = 0, cx = cx, cz = cz }
-        chunks[ci] = ch
-    end
-    local wq = ch.wq
-    local nWq = 0
-    local mask = _mask
-    -- per-axis world bounds for this chunk: axis 1=X, 2=Y, 3=Z
     local loX, hiX = cx * CHUNK, min((cx + 1) * CHUNK, WX)
     local loZ, hiZ = cz * CHUNK, min((cz + 1) * CHUNK, WZ)
+    local ch = chunks[ci]
+    if not ch then
+        -- first time: create this chunk's retained objects (6 face directions + water).
+        -- Bounds (chunk AABB) + face normals let the scene cull & order them internally.
+        ch = { objTex = {} }
+        chunks[ci] = ch
+        for di = 1, 6 do
+            local id = scene:NewObject()
+            local cfg = DIRS[di]
+            scene:ObjSetNormal(id, cfg[5], cfg[6], cfg[7])
+            scene:ObjSetPass(id, 0, 0, 0, 0, 255)
+            scene:ObjSetBounds(id, loX, 0, loZ, hiX, WY, hiZ)
+            ch.objTex[di] = id
+        end
+        ch.objWater = scene:NewObject()
+        scene:ObjSetPass(ch.objWater, 1, WATER_R, WATER_G, WATER_B, WATER_A)
+        scene:ObjSetBounds(ch.objWater, loX, 0, loZ, hiX, WY, hiZ)
+    end
+    local objWater = ch.objWater
+    scene:ObjBegin(objWater)
+    local mask = _mask
     local lo = { loX, 0, loZ }
     local hi = { hiX, WY, hiZ }
-    local nb1, nb2, nb3 = 0, 0, 0   -- scratch for the lit neighbour cell coords
+    local nb1, nb2, nb3 = 0, 0, 0            -- scratch for the lit neighbour cell coords
     for di = 1, 6 do
         local cfg = DIRS[di]
         local da, sign, pa, qa = cfg[1], cfg[2], cfg[3], cfg[4]
@@ -485,8 +505,8 @@ local function meshChunk(cx, cz)
         local pLo, pHi = lo[pa], hi[pa]
         local qLo, qHi = lo[qa], hi[qa]
         local qSpan = qHi - qLo
-        local bucket = ch.op[di]
-        local nd = 0
+        local objT = ch.objTex[di]
+        scene:ObjBegin(objT)
         for dd = ddLo, ddHi - 1 do
             for p = pLo, pHi - 1 do
                 local b0 = (p - pLo) * qSpan - qLo
@@ -539,25 +559,19 @@ local function meshChunk(cx, cz)
                         local x2, y2, z2 = cw(da, planePos, pa, p + pw, qa, q + qh)
                         local x3, y3, z3 = cw(da, planePos, pa, p, qa, q + qh)
                         if val < 0 then
-                            nWq = nWq + 1
-                            wq[nWq] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3 }
+                            scene:ObjAddQuadFlat(objWater, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3)
                         else
                             local texId = val // 32
                             local lite = val - texId * 32
-                            nd = nd + 1
-                            bucket[nd] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3, pw, qh, texId, shade * liteMul(lite) }
+                            scene:ObjAddQuadTex(objT, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
+                                texId, pw, qh, shade * liteMul(lite))
                         end
                         q = q + qh
                     end
                 end
             end
         end
-        for i = nd + 1, ch.nop[di] do bucket[i] = nil end
-        ch.nop[di] = nd
     end
-    -- drop water quads left over from a previously larger mesh, commit the count
-    for i = nWq + 1, ch.nWq do wq[i] = nil end
-    ch.nWq = nWq
 end
 
 -- Full (re)mesh of every chunk — used once at startup.
@@ -600,8 +614,8 @@ local function setBlock(x, y, z, newType)
     recomputeSkyColumn(x, z)
     local nowSolid = isSolid(newType)
     local tIdx = (y * WZ + z) * WX + x + 1
-    if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil end
-    if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z } end
+    if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil; torchesDirty = true end
+    if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z }; torchesDirty = true end
 
     local lightTouched = false
     if torchCount > 0 or old == TORCH or newType == TORCH then
@@ -745,97 +759,35 @@ local function drawCrosshair()
     scene:DrawLine(cx, cy - 8, cx, cy + 8, 255, 255, 255)
 end
 
-local function drawBucket(bucket, n)
-    for i = 1, n do
-        local f = bucket[i]
-        scene:FillQuadWorldTex(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
-            f[15], f[13], f[14], f[16], 255)
-    end
-end
-
--- Torches render as a slim emissive post (centred in the cell) rather than a full cube.
+-- Torches are a single retained object: slim emissive posts (one per torch), rebuilt only
+-- when a torch is added/removed. Opaque pass, so the scene draws them before water.
 local TORCH_HW = 0.09   -- half-width of the post
 local TORCH_H  = 0.62   -- post height
-local function drawTorches()
-    local sh = 1.0   -- emissive: always full brightness
+local torchObj = nil
+local function rebuildTorches()
+    if torchObj == nil then return end
+    scene:ObjBegin(torchObj)
     for _, t in pairs(torches) do
         local x, y, z = t[1], t[2], t[3]
         local cxp, czp = x + 0.5, z + 0.5
         local x0, x1 = cxp - TORCH_HW, cxp + TORCH_HW
         local z0, z1 = czp - TORCH_HW, czp + TORCH_HW
         local y0, y1 = y, y + TORCH_H
-        scene:FillQuadWorldTex(x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0, T_TORCH, 1, 1, sh, 255) -- -Z
-        scene:FillQuadWorldTex(x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1, T_TORCH, 1, 1, sh, 255) -- +Z
-        scene:FillQuadWorldTex(x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, T_TORCH, 1, 1, sh, 255) -- -X
-        scene:FillQuadWorldTex(x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, T_TORCH, 1, 1, sh, 255) -- +X
-        scene:FillQuadWorldTex(x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, T_TORCH, 1, 1, sh, 255) -- top
+        scene:ObjAddQuadTex(torchObj, x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0, T_TORCH, 1, 1, 1.0) -- -Z
+        scene:ObjAddQuadTex(torchObj, x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1, T_TORCH, 1, 1, 1.0) -- +Z
+        scene:ObjAddQuadTex(torchObj, x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, T_TORCH, 1, 1, 1.0) -- -X
+        scene:ObjAddQuadTex(torchObj, x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, T_TORCH, 1, 1, 1.0) -- +X
+        scene:ObjAddQuadTex(torchObj, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, T_TORCH, 1, 1, 1.0) -- top
     end
 end
 
-local renderOrder = {}   -- reused list of visible chunks, sorted near→far each frame
-
+-- Per frame: fill the sky background, let the scene render every object (cull/sort/raster
+-- all internal now), then the 2D overlays on top.
 local function renderFrame()
+    if torchesDirty then rebuildTorches(); torchesDirty = false end
     drawSky()
-    scene:ClearDepth()
     scene:SetCameraPosition(camX, camY, camZ)
-    local cxm, cym, czm = camX, camY, camZ
-    local fgx, fgy, fgz = Fx, Fy, Fz
-    local nChunks = ncx * ncz
-    local CHR = sqrt((CHUNK * 0.5) ^ 2 * 2 + (WY * 0.5) ^ 2)   -- chunk bounding radius
-
-    -- Cull chunks fully behind the camera, record visible ones with their distance.
-    local no = 0
-    for ci = 1, nChunks do
-        local ch = chunks[ci]
-        if ch then
-            local minX = ch.cx * CHUNK; local maxX = min((ch.cx + 1) * CHUNK, WX)
-            local minZ = ch.cz * CHUNK; local maxZ = min((ch.cz + 1) * CHUNK, WZ)
-            local vxn = (minX + maxX) * 0.5 - cxm
-            local vyn = WY * 0.5 - cym
-            local vzn = (minZ + maxZ) * 0.5 - czm
-            if fgx * vxn + fgy * vyn + fgz * vzn >= -CHR then
-                no = no + 1
-                renderOrder[no] = ch
-                ch._d = vxn * vxn + vyn * vyn + vzn * vzn
-                ch._minX = minX; ch._maxX = maxX; ch._minZ = minZ; ch._maxZ = maxZ
-            end
-        end
-    end
-    -- front-to-back (near first) — fewer overdrawn texels behind solid faces
-    for i = 2, no do
-        local v = renderOrder[i]; local d = v._d; local j = i - 1
-        while j >= 1 and renderOrder[j]._d > d do renderOrder[j + 1] = renderOrder[j]; j = j - 1 end
-        renderOrder[j + 1] = v
-    end
-
-    -- Opaque pass with per-direction bucket masking: a whole face direction is skipped
-    -- when the camera sits on its back side relative to the chunk (true back-face culling
-    -- by orientation, à la the article — no per-quad test).
-    for oi = 1, no do
-        local ch = renderOrder[oi]
-        local op, nop = ch.op, ch.nop
-        if cxm > ch._minX then drawBucket(op[1], nop[1]) end   -- +X
-        if cxm < ch._maxX then drawBucket(op[2], nop[2]) end   -- -X
-        if cym > 0        then drawBucket(op[3], nop[3]) end   -- +Y
-        if cym < WY       then drawBucket(op[4], nop[4]) end   -- -Y
-        if czm > ch._minZ then drawBucket(op[5], nop[5]) end   -- +Z
-        if czm < ch._maxZ then drawBucket(op[6], nop[6]) end   -- -Z
-    end
-
-    -- Slim torch posts (opaque, before water so water blends over them).
-    if torchCount > 0 then drawTorches() end
-
-    -- Water pass, far→near (alpha blends over the terrain and writes no depth).
-    for oi = no, 1, -1 do
-        local ch = renderOrder[oi]
-        local wq, nWq = ch.wq, ch.nWq
-        for i = 1, nWq do
-            local f = wq[i]
-            scene:FillQuadWorld(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
-                WATER_R, WATER_G, WATER_B, WATER_A)
-        end
-    end
-
+    scene:Render()
     drawSelection()
     drawCrosshair()
     scene:Upload()
@@ -855,8 +807,12 @@ function onStart()
 
     scene:SetCameraFov(FOV)
     scene:SetCameraNear(NEAR)
+    scene:SetRenderDistance(RENDER_DIST)
+    scene:SetFog(true, SKY_HOR_R, SKY_HOR_G, SKY_HOR_B, FOG_START, FOG_END)
     registerTextures()
     buildHotbarIcons()
+    torchObj = scene:NewObject()                      -- one retained object for all torches
+    scene:ObjSetPass(torchObj, 0, 0, 0, 0, 255)       -- opaque (drawn before water)
     generateWorld()
     initLight()
     greedyMesh()
