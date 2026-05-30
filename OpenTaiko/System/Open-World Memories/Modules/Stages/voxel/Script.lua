@@ -37,12 +37,19 @@ local SWIM_UP    = 4.2
 local WATER_MOVE = 0.6
 local WATER_DRAG = 0.86
 
-local WX, WY, WZ = 64, 40, 64
+local WX, WY, WZ = 128, 40, 128
 local SEA_LEVEL  = 14
 local SEED       = 1337
 
-local AIR, GRASS, DIRT, STONE, SAND, WATER, WOOD, LEAVES = 0, 1, 2, 3, 4, 5, 6, 7
+local AIR, GRASS, DIRT, STONE, SAND, WATER, WOOD, LEAVES, TORCH, BEDROCK = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 local T_GRASS_TOP, T_GRASS_SIDE, T_DIRT, T_STONE, T_SAND, T_LOG_TOP, T_LOG_SIDE, T_LEAVES = 1, 2, 3, 4, 5, 6, 7, 8
+local T_TORCH, T_BEDROCK = 9, 10
+
+-- lighting
+local LIGHT_MAX   = 15       -- full skylight
+local TORCH_MAX   = 13       -- torch emission level
+local LIGHT_AMB   = 0.34     -- minimum brightness multiplier in full darkness
+local SKY_FALLOFF = 3        -- skylight lost per block of vertical cover (0 = hard shadow)
 
 local SKY_TOP_R, SKY_TOP_G, SKY_TOP_B = 70, 130, 225
 local SKY_HOR_R, SKY_HOR_G, SKY_HOR_B = 200, 225, 255
@@ -66,7 +73,7 @@ local vox = {}
 local CHUNK = 16
 local ncx = floor((WX + CHUNK - 1) / CHUNK)
 local ncz = floor((WZ + CHUNK - 1) / CHUNK)
-local chunks = {}   -- [cz*ncx + cx + 1] = { mq = {}, wq = {}, nMq = 0, nWq = 0 }
+local chunks = {}   -- [cz*ncx+cx+1] = { op={6 dir buckets}, nop={6 counts}, wq, nWq, cx, cz }
 
 -- player
 local feetX, feetY, feetZ = WX / 2, 24, WZ / 2
@@ -74,6 +81,8 @@ local vx, vy, vz = 0, 0, 0
 local onGround = false
 local camX, camY, camZ = 0, 0, 0
 local yaw, pitch = 45.0, -18.0
+local spawnX, spawnY, spawnZ = WX / 2, 24, WZ / 2   -- starting spot (Reset position)
+local spawnYaw, spawnPitch = 45.0, -18.0
 -- camera basis mirrored from the scene (forward + right's horizontal components,
 -- the only parts Lua needs for movement / picking / face-culling)
 local Fx, Fy, Fz = 0, 0, 1
@@ -85,16 +94,18 @@ local hasSel = false
 local selX, selY, selZ = 0, 0, 0
 local selNx, selNy, selNz = 0, 1, 0
 
--- hotbar: the placeable block types, the held index, and break auto-repeat timer
-local hotbar = { GRASS, DIRT, STONE, SAND, WOOD, LEAVES }
+-- hotbar: the placeable block types (bedrock is intentionally absent), the held index,
+-- and the break/place auto-repeat timers
+local hotbar = { GRASS, DIRT, STONE, SAND, WOOD, LEAVES, TORCH }
 local heldIdx = 1
 local hotbarIcons = {}            -- [i] = LuaCanvas preview of hotbar[i]
-local BREAK_INTERVAL = 0.16       -- seconds between breaks while the button is held
+local EDIT_INTERVAL = 0.16        -- seconds between edits while a mouse button is held
 local breakTimer = 0
+local placeTimer = 0
 
 -- pause menu
 local paused = false
-local menuItems = { "Resume", "Quit" }
+local menuItems = { "Resume", "Reset position", "Quit" }
 local menuSel = 1
 
 local lastTs = 0
@@ -132,6 +143,129 @@ local function setVox(x, y, z, b)
     vox[(y * WZ + z) * WX + x + 1] = b
 end
 
+-- ════════════════════════════════════════════════════════════════════════════════
+-- Block predicates + lighting
+-- ════════════════════════════════════════════════════════════════════════════════
+
+-- Solid for collision AND for blocking light/sky. Water and torches are non-solid.
+local function isSolid(b) return b ~= AIR and b ~= WATER and b ~= TORCH end
+-- A face is drawn when the neighbour is see-through (air, water or a torch).
+local function isTransparent(b) return b == AIR or b == WATER or b == TORCH end
+-- Targetable by the crosshair (so torches can be broken, water/air cannot).
+local function isSelectable(b) return b ~= AIR and b ~= WATER end
+
+-- Lighting = max(vertical skylight, torch block-light). Skylight is a cheap per-column
+-- value (a cell is lit by sky only if nothing solid is above it in its column), so
+-- tunnels and overhangs go dark. Torch light is a proper flood fill with occlusion,
+-- updated incrementally so placing/removing a torch is cheap.
+local skyTop = {}     -- [x*WZ+z+1] = lowest y that still sees the sky (everything >= it is lit)
+local torchLight = {} -- [(y*WZ+z)*WX+x+1] = 0..TORCH_MAX
+local torches = {}    -- [packed idx] = {x,y,z} of each torch, for the slim-post render pass
+local _lq, _lqv = {}, {}   -- reused BFS queues (packed index / value)
+
+local function recomputeSkyColumn(x, z)
+    local top = 0
+    for y = WY - 1, 0, -1 do
+        if isSolid(getVox(x, y, z)) then top = y + 1; break end
+    end
+    skyTop[x * WZ + z + 1] = top
+end
+
+local function skyAt(x, y, z)
+    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return 0 end
+    local top = skyTop[x * WZ + z + 1] or 0
+    if y >= top then return LIGHT_MAX end
+    -- gradual falloff with depth of cover, so a block just under another isn't pitch black
+    local v = LIGHT_MAX - (top - y) * SKY_FALLOFF
+    return v > 0 and v or 0
+end
+local function torchAt(x, y, z)
+    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return 0 end
+    return torchLight[(y * WZ + z) * WX + x + 1] or 0
+end
+-- Combined 0..LIGHT_MAX light reaching a (transparent) cell.
+local function lightAt(x, y, z)
+    local s = skyAt(x, y, z)
+    local t = torchAt(x, y, z)
+    return s >= t and s or t
+end
+
+-- Flood the torch light outward from every seed already written into _lq[1..qn].
+local function propagateTorch(qn)
+    local head = 1
+    while head <= qn do
+        local i = _lq[head]; head = head + 1
+        local cl = torchLight[i] or 0
+        if cl > 1 then
+            local t = i - 1
+            local x = t % WX; t = (t - x) // WX
+            local z = t % WZ; local y = (t - z) // WZ
+            local nl = cl - 1
+            local function spread(nx, ny, nz)
+                if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
+                if isSolid(getVox(nx, ny, nz)) then return end
+                local ni = (ny * WZ + nz) * WX + nx + 1
+                if (torchLight[ni] or 0) < nl then torchLight[ni] = nl; qn = qn + 1; _lq[qn] = ni end
+            end
+            spread(x - 1, y, z); spread(x + 1, y, z)
+            spread(x, y - 1, z); spread(x, y + 1, z)
+            spread(x, y, z - 1); spread(x, y, z + 1)
+        end
+    end
+end
+
+local function addTorchLight(x, y, z, level)
+    local i0 = (y * WZ + z) * WX + x + 1
+    if (torchLight[i0] or 0) >= level then return end
+    torchLight[i0] = level
+    _lq[1] = i0
+    propagateTorch(1)
+end
+
+local function removeTorchLight(x, y, z)
+    local i0 = (y * WZ + z) * WX + x + 1
+    local startVal = torchLight[i0] or 0
+    if startVal == 0 then return end
+    torchLight[i0] = 0
+    local qn = 1; _lq[1] = i0; _lqv[1] = startVal
+    local relight, rn = {}, 0
+    local head = 1
+    while head <= qn do
+        local i = _lq[head]; local val = _lqv[head]; head = head + 1
+        local t = i - 1
+        local x2 = t % WX; t = (t - x2) // WX
+        local z2 = t % WZ; local y2 = (t - z2) // WZ
+        local function visit(nx, ny, nz)
+            if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
+            if isSolid(getVox(nx, ny, nz)) then return end
+            local ni = (ny * WZ + nz) * WX + nx + 1
+            local nv = torchLight[ni] or 0
+            if nv ~= 0 and nv < val then
+                torchLight[ni] = 0; qn = qn + 1; _lq[qn] = ni; _lqv[qn] = nv
+            elseif nv >= val then
+                rn = rn + 1; relight[rn] = ni   -- still lit by another source → re-seed
+            end
+        end
+        visit(x2 - 1, y2, z2); visit(x2 + 1, y2, z2)
+        visit(x2, y2 - 1, z2); visit(x2, y2 + 1, z2)
+        visit(x2, y2, z2 - 1); visit(x2, y2, z2 + 1)
+    end
+    -- re-propagate from the surviving sources
+    if rn > 0 then
+        for k = 1, rn do _lq[k] = relight[k] end
+        propagateTorch(rn)
+    end
+end
+
+local function initLight()
+    skyTop = {}
+    for x = 0, WX - 1 do for z = 0, WZ - 1 do recomputeSkyColumn(x, z) end end
+    torchLight = {}
+    for y = 0, WY - 1 do for z = 0, WZ - 1 do for x = 0, WX - 1 do
+        if getVox(x, y, z) == TORCH then addTorchLight(x, y, z, TORCH_MAX) end
+    end end end
+end
+
 local function plantTree(x, z, groundY)
     local th = 4 + floor(hash2(x, z, 31) * 3)
     for i = 1, th do setVox(x, groundY + i, z, WOOD) end
@@ -157,7 +291,8 @@ local function generateWorld()
             local beach = (h <= SEA_LEVEL + 1)
             for y = 0, h do
                 local b
-                if y == h then b = beach and SAND or GRASS
+                if y == 0 then b = BEDROCK              -- unbreakable floor
+                elseif y == h then b = beach and SAND or GRASS
                 elseif y >= h - 3 then b = beach and SAND or DIRT
                 else b = STONE end
                 setVox(x, y, z, b)
@@ -231,6 +366,30 @@ local function registerTextures()
         lt[v * 16 + u + 1] = packc(165 + ring + n, 125 + ring + n, 78 + ring + n)
     end end
     reg(T_LOG_TOP, lt)
+    local bd = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local n = (hash2(u, v, 13) - 0.5) * 2 * 26
+        local blot = hash2(u + 5, v + 5, 71) < 0.22 and -28 or 0
+        bd[v * 16 + u + 1] = packc(58 + n + blot, 58 + n + blot, 64 + n + blot)
+    end end
+    reg(T_BEDROCK, bd)
+    -- torch: a full-width vertical post — flame at the top, wooden stick below (the post
+    -- geometry is slim, so the whole texture is the visible stick/flame).
+    local tc = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local r, g, b
+        if v <= 5 then                                   -- flame (top)
+            local fn = (hash2(u, v, 88) - 0.5) * 50
+            local core = (v <= 2) and 60 or 0
+            r, g, b = 255, 170 + fn + core, 30 + fn
+        else                                             -- wooden stick
+            local sn = (hash2(u, v, 19) - 0.5) * 18
+            local grain = (u % 5 == 0) and -16 or 0
+            r, g, b = 122 + sn + grain, 82 + sn + grain, 44 + sn + grain
+        end
+        tc[v * 16 + u + 1] = packc(r, g, b)
+    end end
+    reg(T_TORCH, tc)
 end
 
 -- Representative face texture for a block's hotbar icon.
@@ -240,7 +399,9 @@ local function iconTexId(b)
     elseif b == STONE then return T_STONE
     elseif b == SAND then return T_SAND
     elseif b == WOOD then return T_LOG_SIDE
-    elseif b == LEAVES then return T_LEAVES end
+    elseif b == LEAVES then return T_LEAVES
+    elseif b == TORCH then return T_TORCH
+    elseif b == BEDROCK then return T_BEDROCK end
     return T_DIRT
 end
 
@@ -271,7 +432,9 @@ local function texIdFor(b, di)
     elseif b == STONE then return T_STONE
     elseif b == SAND then return T_SAND
     elseif b == WOOD then if di == 3 or di == 4 then return T_LOG_TOP else return T_LOG_SIDE end
-    elseif b == LEAVES then return T_LEAVES end
+    elseif b == LEAVES then return T_LEAVES
+    elseif b == TORCH then return T_TORCH
+    elseif b == BEDROCK then return T_BEDROCK end
     return 0
 end
 
@@ -294,41 +457,60 @@ local _mask = {}   -- scratch face mask, reused across meshChunk calls
 -- Mesh one chunk column (X,Z in [c*CHUNK, ..), full Y) into its own quad lists.
 -- Each block's visible faces are emitted by the chunk that owns the block, so the
 -- union of all chunks is identical to meshing the whole world at once.
+-- light → brightness multiplier (ambient floor so nothing is pure black)
+local function liteMul(l) return LIGHT_AMB + (1 - LIGHT_AMB) * (l / LIGHT_MAX) end
+
 local function meshChunk(cx, cz)
     local ci = cz * ncx + cx + 1
     local ch = chunks[ci]
-    if not ch then ch = { mq = {}, wq = {}, nMq = 0, nWq = 0 }; chunks[ci] = ch end
-    local mq, wq = ch.mq, ch.wq
-    local nMq, nWq = 0, 0
+    if not ch then
+        ch = { op = { {}, {}, {}, {}, {}, {} }, nop = { 0, 0, 0, 0, 0, 0 },
+               wq = {}, nWq = 0, cx = cx, cz = cz }
+        chunks[ci] = ch
+    end
+    local wq = ch.wq
+    local nWq = 0
     local mask = _mask
     -- per-axis world bounds for this chunk: axis 1=X, 2=Y, 3=Z
     local loX, hiX = cx * CHUNK, min((cx + 1) * CHUNK, WX)
     local loZ, hiZ = cz * CHUNK, min((cz + 1) * CHUNK, WZ)
     local lo = { loX, 0, loZ }
     local hi = { hiX, WY, hiZ }
+    local nb1, nb2, nb3 = 0, 0, 0   -- scratch for the lit neighbour cell coords
     for di = 1, 6 do
         local cfg = DIRS[di]
         local da, sign, pa, qa = cfg[1], cfg[2], cfg[3], cfg[4]
-        local nx, ny, nz, shade = cfg[5], cfg[6], cfg[7], cfg[8]
+        local shade = cfg[8]
         local ddLo, ddHi = lo[da], hi[da]
         local pLo, pHi = lo[pa], hi[pa]
         local qLo, qHi = lo[qa], hi[qa]
         local qSpan = qHi - qLo
+        local bucket = ch.op[di]
+        local nd = 0
         for dd = ddLo, ddHi - 1 do
             for p = pLo, pHi - 1 do
                 local b0 = (p - pLo) * qSpan - qLo
                 for q = qLo, qHi - 1 do
                     local b = voxAt(da, dd, pa, p, qa, q)
-                    local key = 0
-                    if b ~= AIR then
+                    -- mask value: 0 none, -1 water, else texId*32 + light (so greedy only
+                    -- merges faces that share BOTH texture and light level). Torches are not
+                    -- meshed here — they're drawn separately as a slim post.
+                    local val = 0
+                    if b ~= AIR and b ~= TORCH then
                         local nb = voxAt(da, dd + sign, pa, p, qa, q)
-                        if nb == AIR or nb == WATER then
+                        if isTransparent(nb) then
                             if b == WATER then
-                                if di == 3 and nb == AIR then key = -1 end
-                            else key = texIdFor(b, di) end
+                                if di == 3 and nb == AIR then val = -1 end
+                            else
+                                nb1 = 0; nb2 = 0; nb3 = 0
+                                if da == 1 then nb1 = dd + sign elseif da == 2 then nb2 = dd + sign else nb3 = dd + sign end
+                                if pa == 1 then nb1 = p elseif pa == 2 then nb2 = p else nb3 = p end
+                                if qa == 1 then nb1 = q elseif qa == 2 then nb2 = q else nb3 = q end
+                                val = texIdFor(b, di) * 32 + lightAt(nb1, nb2, nb3)
+                            end
                         end
                     end
-                    mask[b0 + q + 1] = key
+                    mask[b0 + q + 1] = val
                 end
             end
             local planePos = dd + (sign > 0 and 1 or 0)
@@ -336,33 +518,46 @@ local function meshChunk(cx, cz)
                 local b0 = (p - pLo) * qSpan - qLo
                 local q = qLo
                 while q < qHi do
-                    local key = mask[b0 + q + 1]
-                    if key == 0 then q = q + 1
+                    local val = mask[b0 + q + 1]
+                    if val == 0 then q = q + 1
                     else
-                        local qh, pw = 1, 1
-                        mask[b0 + q + 1] = 0
+                        -- greedy rectangle merge: grow along q, then along p, over equal vals
+                        local qh = 1
+                        while q + qh < qHi and mask[b0 + q + qh + 1] == val do qh = qh + 1 end
+                        local pw = 1; local grow = true
+                        while p + pw < pHi and grow do
+                            local b2 = (p + pw - pLo) * qSpan - qLo
+                            for qq = q, q + qh - 1 do if mask[b2 + qq + 1] ~= val then grow = false; break end end
+                            if grow then pw = pw + 1 end
+                        end
+                        for pp = p, p + pw - 1 do
+                            local bc = (pp - pLo) * qSpan - qLo
+                            for qq = q, q + qh - 1 do mask[bc + qq + 1] = 0 end
+                        end
                         local x0, y0, z0 = cw(da, planePos, pa, p, qa, q)
                         local x1, y1, z1 = cw(da, planePos, pa, p + pw, qa, q)
                         local x2, y2, z2 = cw(da, planePos, pa, p + pw, qa, q + qh)
                         local x3, y3, z3 = cw(da, planePos, pa, p, qa, q + qh)
-                        local ccx, ccy, ccz = cw(da, planePos, pa, p + pw * 0.5, qa, q + qh * 0.5)
-                        if key < 0 then
+                        if val < 0 then
                             nWq = nWq + 1
-                            wq[nWq] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3, ccx,ccy,ccz, nx,ny,nz }
+                            wq[nWq] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3 }
                         else
-                            nMq = nMq + 1
-                            mq[nMq] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3, pw, qh, key, shade, ccx,ccy,ccz, nx,ny,nz }
+                            local texId = val // 32
+                            local lite = val - texId * 32
+                            nd = nd + 1
+                            bucket[nd] = { x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3, pw, qh, texId, shade * liteMul(lite) }
                         end
                         q = q + qh
                     end
                 end
             end
         end
+        for i = nd + 1, ch.nop[di] do bucket[i] = nil end
+        ch.nop[di] = nd
     end
-    -- drop quads left over from a previously larger mesh, then commit the new counts
-    for i = nMq + 1, ch.nMq do mq[i] = nil end
+    -- drop water quads left over from a previously larger mesh, commit the count
     for i = nWq + 1, ch.nWq do wq[i] = nil end
-    ch.nMq = nMq; ch.nWq = nWq
+    ch.nWq = nWq
 end
 
 -- Full (re)mesh of every chunk — used once at startup.
@@ -385,6 +580,55 @@ local function remeshAt(x, y, z)
     mark(x, z); mark(x - 1, z); mark(x + 1, z); mark(x, z - 1); mark(x, z + 1)
 end
 
+-- Remesh every chunk overlapping a world X/Z box (used when torch light changes,
+-- which can reach up to TORCH_MAX blocks away).
+local function remeshBox(x0, z0, x1, z1)
+    local cx0 = max(0, floor(x0 / CHUNK)); local cx1 = min(ncx - 1, floor(x1 / CHUNK))
+    local cz0 = max(0, floor(z0 / CHUNK)); local cz1 = min(ncz - 1, floor(z1 / CHUNK))
+    for cz = cz0, cz1 do for cx = cx0, cx1 do meshChunk(cx, cz) end end
+end
+
+local torchCount = 0   -- when 0 we skip all torch-light work (the common, fast path)
+
+-- The one entry point for editing a voxel: updates the block, the column's skylight and
+-- the torch-light field, then remeshes only the chunks that can have changed.
+local function setBlock(x, y, z, newType)
+    local old = getVox(x, y, z)
+    if old == newType then return end
+    local wasSolid = isSolid(old)
+    setVox(x, y, z, newType)
+    recomputeSkyColumn(x, z)
+    local nowSolid = isSolid(newType)
+    local tIdx = (y * WZ + z) * WX + x + 1
+    if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil end
+    if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z } end
+
+    local lightTouched = false
+    if torchCount > 0 or old == TORCH or newType == TORCH then
+        if old == TORCH then removeTorchLight(x, y, z); lightTouched = true end
+        if (not wasSolid) and nowSolid and torchAt(x, y, z) > 0 then
+            removeTorchLight(x, y, z); lightTouched = true              -- new block casts a shadow
+        elseif wasSolid and (not nowSolid) then
+            local qn = 0                                               -- opening lets light flow in
+            local function seed(nx, ny, nz)
+                if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
+                if isSolid(getVox(nx, ny, nz)) then return end
+                if torchAt(nx, ny, nz) > 0 then qn = qn + 1; _lq[qn] = (ny * WZ + nz) * WX + nx + 1 end
+            end
+            seed(x - 1, y, z); seed(x + 1, y, z); seed(x, y - 1, z)
+            seed(x, y + 1, z); seed(x, y, z - 1); seed(x, y, z + 1)
+            if qn > 0 then propagateTorch(qn); lightTouched = true end
+        end
+        if newType == TORCH then addTorchLight(x, y, z, TORCH_MAX); lightTouched = true end
+    end
+
+    if lightTouched then
+        remeshBox(x - TORCH_MAX, z - TORCH_MAX, x + TORCH_MAX, z + TORCH_MAX)
+    else
+        remeshAt(x, y, z)
+    end
+end
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- Camera + projection helpers
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -405,8 +649,6 @@ end
 -- ════════════════════════════════════════════════════════════════════════════════
 -- Collision + physics
 -- ════════════════════════════════════════════════════════════════════════════════
-
-local function isSolid(b) return b ~= AIR and b ~= WATER end
 
 local function aabbSolid(minx, miny, minz, maxx, maxy, maxz)
     for X = floor(minx), floor(maxx) do
@@ -441,14 +683,14 @@ local function pickBlock()
     local tMaxZ = dz > 0 and (iz + 1 - oz) / dz or (dz < 0 and (iz - oz) / dz or 1e30)
     -- face normal of the entered face (points back toward the ray origin)
     local fnx, fny, fnz = 0, 1, 0
-    if isSolid(getVox(ix, iy, iz)) then return ix, iy, iz, fnx, fny, fnz end
+    if isSelectable(getVox(ix, iy, iz)) then return ix, iy, iz, fnx, fny, fnz end
     for _ = 1, 64 do
         local t
         if tMaxX < tMaxY and tMaxX < tMaxZ then t = tMaxX; ix = ix + stepX; tMaxX = tMaxX + tDX; fnx, fny, fnz = -stepX, 0, 0
         elseif tMaxY < tMaxZ then t = tMaxY; iy = iy + stepY; tMaxY = tMaxY + tDY; fnx, fny, fnz = 0, -stepY, 0
         else t = tMaxZ; iz = iz + stepZ; tMaxZ = tMaxZ + tDZ; fnx, fny, fnz = 0, 0, -stepZ end
         if t > REACH then return nil end
-        if isSolid(getVox(ix, iy, iz)) then return ix, iy, iz, fnx, fny, fnz end
+        if isSelectable(getVox(ix, iy, iz)) then return ix, iy, iz, fnx, fny, fnz end
     end
     return nil
 end
@@ -503,6 +745,35 @@ local function drawCrosshair()
     scene:DrawLine(cx, cy - 8, cx, cy + 8, 255, 255, 255)
 end
 
+local function drawBucket(bucket, n)
+    for i = 1, n do
+        local f = bucket[i]
+        scene:FillQuadWorldTex(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
+            f[15], f[13], f[14], f[16], 255)
+    end
+end
+
+-- Torches render as a slim emissive post (centred in the cell) rather than a full cube.
+local TORCH_HW = 0.09   -- half-width of the post
+local TORCH_H  = 0.62   -- post height
+local function drawTorches()
+    local sh = 1.0   -- emissive: always full brightness
+    for _, t in pairs(torches) do
+        local x, y, z = t[1], t[2], t[3]
+        local cxp, czp = x + 0.5, z + 0.5
+        local x0, x1 = cxp - TORCH_HW, cxp + TORCH_HW
+        local z0, z1 = czp - TORCH_HW, czp + TORCH_HW
+        local y0, y1 = y, y + TORCH_H
+        scene:FillQuadWorldTex(x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0, T_TORCH, 1, 1, sh, 255) -- -Z
+        scene:FillQuadWorldTex(x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1, T_TORCH, 1, 1, sh, 255) -- +Z
+        scene:FillQuadWorldTex(x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, T_TORCH, 1, 1, sh, 255) -- -X
+        scene:FillQuadWorldTex(x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, T_TORCH, 1, 1, sh, 255) -- +X
+        scene:FillQuadWorldTex(x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, T_TORCH, 1, 1, sh, 255) -- top
+    end
+end
+
+local renderOrder = {}   -- reused list of visible chunks, sorted near→far each frame
+
 local function renderFrame()
     drawSky()
     scene:ClearDepth()
@@ -510,35 +781,58 @@ local function renderFrame()
     local cxm, cym, czm = camX, camY, camZ
     local fgx, fgy, fgz = Fx, Fy, Fz
     local nChunks = ncx * ncz
+    local CHR = sqrt((CHUNK * 0.5) ^ 2 * 2 + (WY * 0.5) ^ 2)   -- chunk bounding radius
 
-    -- Opaque pass over every chunk first, then the water pass — water alpha must blend
-    -- over already-drawn terrain, so all opaque faces have to land before any water.
+    -- Cull chunks fully behind the camera, record visible ones with their distance.
+    local no = 0
     for ci = 1, nChunks do
         local ch = chunks[ci]
         if ch then
-            local mq, nMq = ch.mq, ch.nMq
-            for i = 1, nMq do
-                local f = mq[i]
-                local dxc = cxm - f[17]; local dyc = cym - f[18]; local dzc = czm - f[19]
-                if f[20] * dxc + f[21] * dyc + f[22] * dzc > 0 and (fgx * dxc + fgy * dyc + fgz * dzc) <= 0.5 then
-                    scene:FillQuadWorldTex(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
-                        f[15], f[13], f[14], f[16], 255)
-                end
+            local minX = ch.cx * CHUNK; local maxX = min((ch.cx + 1) * CHUNK, WX)
+            local minZ = ch.cz * CHUNK; local maxZ = min((ch.cz + 1) * CHUNK, WZ)
+            local vxn = (minX + maxX) * 0.5 - cxm
+            local vyn = WY * 0.5 - cym
+            local vzn = (minZ + maxZ) * 0.5 - czm
+            if fgx * vxn + fgy * vyn + fgz * vzn >= -CHR then
+                no = no + 1
+                renderOrder[no] = ch
+                ch._d = vxn * vxn + vyn * vyn + vzn * vzn
+                ch._minX = minX; ch._maxX = maxX; ch._minZ = minZ; ch._maxZ = maxZ
             end
         end
     end
-    for ci = 1, nChunks do
-        local ch = chunks[ci]
-        if ch then
-            local wq, nWq = ch.wq, ch.nWq
-            for i = 1, nWq do
-                local f = wq[i]
-                local dxc = cxm - f[13]; local dyc = cym - f[14]; local dzc = czm - f[15]
-                if f[16] * dxc + f[17] * dyc + f[18] * dzc > 0 and (fgx * dxc + fgy * dyc + fgz * dzc) <= 0.5 then
-                    scene:FillQuadWorld(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
-                        WATER_R, WATER_G, WATER_B, WATER_A)
-                end
-            end
+    -- front-to-back (near first) — fewer overdrawn texels behind solid faces
+    for i = 2, no do
+        local v = renderOrder[i]; local d = v._d; local j = i - 1
+        while j >= 1 and renderOrder[j]._d > d do renderOrder[j + 1] = renderOrder[j]; j = j - 1 end
+        renderOrder[j + 1] = v
+    end
+
+    -- Opaque pass with per-direction bucket masking: a whole face direction is skipped
+    -- when the camera sits on its back side relative to the chunk (true back-face culling
+    -- by orientation, à la the article — no per-quad test).
+    for oi = 1, no do
+        local ch = renderOrder[oi]
+        local op, nop = ch.op, ch.nop
+        if cxm > ch._minX then drawBucket(op[1], nop[1]) end   -- +X
+        if cxm < ch._maxX then drawBucket(op[2], nop[2]) end   -- -X
+        if cym > 0        then drawBucket(op[3], nop[3]) end   -- +Y
+        if cym < WY       then drawBucket(op[4], nop[4]) end   -- -Y
+        if czm > ch._minZ then drawBucket(op[5], nop[5]) end   -- +Z
+        if czm < ch._maxZ then drawBucket(op[6], nop[6]) end   -- -Z
+    end
+
+    -- Slim torch posts (opaque, before water so water blends over them).
+    if torchCount > 0 then drawTorches() end
+
+    -- Water pass, far→near (alpha blends over the terrain and writes no depth).
+    for oi = no, 1, -1 do
+        local ch = renderOrder[oi]
+        local wq, nWq = ch.wq, ch.nWq
+        for i = 1, nWq do
+            local f = wq[i]
+            scene:FillQuadWorld(f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11], f[12],
+                WATER_R, WATER_G, WATER_B, WATER_A)
         end
     end
 
@@ -564,9 +858,21 @@ function onStart()
     registerTextures()
     buildHotbarIcons()
     generateWorld()
+    initLight()
     greedyMesh()
     local gh = terrainHeight(floor(feetX), floor(feetZ))
     feetY = max(gh + 1, SEA_LEVEL + 1)
+    spawnX, spawnY, spawnZ = feetX, feetY, feetZ
+    spawnYaw, spawnPitch = yaw, pitch
+    rebuildBasis()
+end
+
+-- Return the player to the starting spot (used by the pause menu's Reset position).
+local function resetPosition()
+    feetX, feetY, feetZ = spawnX, spawnY, spawnZ
+    vx, vy, vz = 0, 0, 0
+    yaw, pitch = spawnYaw, spawnPitch
+    camX, camY, camZ = feetX, feetY + EYE, feetZ
     rebuildBasis()
 end
 
@@ -590,7 +896,7 @@ local function kd(k) return INPUT:KeyboardPressing(k) end
 local function kp(k) return INPUT:KeyboardPressed(k) end
 
 -- pause-menu button rects in surface (1920×1080) coords: {cx, cy, w, h}
-local MENU_RECTS = { { 960, 470, 360, 72 }, { 960, 560, 360, 72 } }
+local MENU_RECTS = { { 960, 452, 380, 72 }, { 960, 540, 380, 72 }, { 960, 628, 380, 72 } }
 
 local function updateGame(dt)
     -- look: mouse delta + arrow keys
@@ -656,6 +962,11 @@ local function updateGame(dt)
         feetY = ny; onGround = false
     end
 
+    -- keep the player inside the world bounds (WX/WY/WZ are the map size, set at the top)
+    if feetX < PW then feetX = PW; vx = 0 elseif feetX > WX - PW then feetX = WX - PW; vx = 0 end
+    if feetZ < PW then feetZ = PW; vz = 0 elseif feetZ > WZ - PW then feetZ = WZ - PW; vz = 0 end
+    if feetY < 0 then feetY = 0; vy = 0 end
+
     camX, camY, camZ = feetX, feetY + EYE, feetZ
 
     -- hotbar selection via mouse wheel
@@ -669,29 +980,35 @@ local function updateGame(dt)
     local bx, by, bz, fnx, fny, fnz = pickBlock()
     if bx then hasSel = true; selX = bx; selY = by; selZ = bz; selNx = fnx; selNy = fny; selNz = fnz else hasSel = false end
 
-    -- break (hold to repeat, only remeshing the affected chunks)
+    -- break (hold to repeat). Bedrock is unbreakable.
     if hasSel and INPUT:MousePressing("Left") then
         breakTimer = breakTimer - dt
         if INPUT:MousePressed("Left") or breakTimer <= 0 then
-            setVox(selX, selY, selZ, AIR)
-            remeshAt(selX, selY, selZ)
-            breakTimer = BREAK_INTERVAL
+            if getVox(selX, selY, selZ) ~= BEDROCK then setBlock(selX, selY, selZ, AIR) end
+            breakTimer = EDIT_INTERVAL
             hasSel = false   -- re-picked next frame; keeps digging into the block behind
         end
     else
         breakTimer = 0
     end
 
-    -- place the held block against the targeted face (right click)
-    if hasSel and INPUT:MousePressed("Right") then
-        local px, py, pz = selX + selNx, selY + selNy, selZ + selNz
-        local hitsPlayer = (feetX + PW > px) and (feetX - PW < px + 1)
-            and (feetY + PH > py) and (feetY < py + 1)
-            and (feetZ + PW > pz) and (feetZ - PW < pz + 1)
-        if getVox(px, py, pz) == AIR and not hitsPlayer then
-            setVox(px, py, pz, hotbar[heldIdx])
-            remeshAt(px, py, pz)
+    -- place the held block against the targeted face (hold to repeat).
+    if hasSel and INPUT:MousePressing("Right") then
+        placeTimer = placeTimer - dt
+        if INPUT:MousePressed("Right") or placeTimer <= 0 then
+            local px, py, pz = selX + selNx, selY + selNy, selZ + selNz
+            local b = hotbar[heldIdx]
+            -- torches are non-solid, so they may sit where the player stands; solids may not
+            local hitsPlayer = b ~= TORCH
+                and (feetX + PW > px) and (feetX - PW < px + 1)
+                and (feetY + PH > py) and (feetY < py + 1)
+                and (feetZ + PW > pz) and (feetZ - PW < pz + 1)
+            if getVox(px, py, pz) == AIR and not hitsPlayer then setBlock(px, py, pz, b) end
+            placeTimer = EDIT_INTERVAL
+            hasSel = false
         end
+    else
+        placeTimer = 0
     end
 
     renderFrame()
@@ -699,6 +1016,9 @@ end
 
 local function menuActivate(idx)
     if menuItems[idx] == "Resume" then
+        paused = false; INPUT:SetMouseLocked(true)
+    elseif menuItems[idx] == "Reset position" then
+        resetPosition()
         paused = false; INPUT:SetMouseLocked(true)
     elseif menuItems[idx] == "Quit" then
         INPUT:SetMouseLocked(false)
@@ -756,7 +1076,7 @@ local function txt(font, str, r, g, b)
 end
 
 local BLOCK_NAMES = { [GRASS] = "Grass", [DIRT] = "Dirt", [STONE] = "Stone",
-                      [SAND] = "Sand", [WOOD] = "Wood", [LEAVES] = "Leaves" }
+                      [SAND] = "Sand", [WOOD] = "Wood", [LEAVES] = "Leaves", [TORCH] = "Torch" }
 
 -- Held-block widget in the bottom-left: ‹ icon ›, with the block name under it.
 local function drawHotbar()

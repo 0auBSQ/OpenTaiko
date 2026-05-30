@@ -506,6 +506,37 @@ public class CTexture : IDisposable {
 	}
 
 	/// <summary>
+	/// Reads this texture's pixels back from the GPU as a top-left-origin RGBA byte buffer
+	/// (length = Width*Height*4). Attaches the texture to a temporary framebuffer and uses
+	/// glReadPixels. Returns null if the texture isn't allocated. Main-thread only (GL calls);
+	/// note this forces a GPU sync, so use it for one-off operations, not per frame.
+	/// </summary>
+	public byte[]? ReadPixelsRGBA(out int width, out int height) {
+		width = this.sz画像サイズ.Width;
+		height = this.sz画像サイズ.Height;
+		if (Pointer == 0 || width <= 0 || height <= 0) return null;
+		byte[] px = new byte[width * height * 4];
+		// remember the currently-bound framebuffer so we restore the engine's render target
+		uint prevFbo = (uint)Game.Gl.GetInteger(GLEnum.FramebufferBinding);
+		uint fbo = Game.Gl.GenFramebuffer();
+		Game.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+		Game.Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer,
+			FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, Pointer, 0);
+		bool ok = Game.Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) == GLEnum.FramebufferComplete;
+		if (ok) {
+			unsafe {
+				fixed (byte* p = px) {
+					Game.Gl.ReadPixels(0, 0, (uint)width, (uint)height,
+						PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+				}
+			}
+		}
+		Game.Gl.BindFramebuffer(FramebufferTarget.Framebuffer, prevFbo);
+		Game.Gl.DeleteFramebuffer(fbo);
+		return ok ? px : null;
+	}
+
+	/// <summary>
 	/// <para>指定されたビットマップオブジェクトから Managed テクスチャを作成する。</para>
 	/// <para>テクスチャのサイズは、BITMAP画像のサイズ以上、かつ、D3D9デバイスで生成可能な最小のサイズに自動的に調節される。
 	/// その際、テクスチャの調節後のサイズにあわせた画像の拡大縮小は行わない。</para>

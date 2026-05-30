@@ -115,6 +115,78 @@ namespace OpenTaiko {
 			}
 		}
 
+		/// <summary>
+		/// Paste a <see cref="LuaTexture"/> onto the canvas with its top-left at (x, y),
+		/// alpha-blended over the existing pixels. Pixels falling outside the canvas are
+		/// ignored. Reads the texture back from the GPU (one-off cost), so avoid per-frame use.
+		/// </summary>
+		public void PasteTexture(LuaTexture tex, int x, int y) {
+			PasteTextureTransformed(tex, x, y, 1f, 0f, "topleft");
+		}
+
+		/// <summary>
+		/// Paste a <see cref="LuaTexture"/> onto the canvas scaled by <paramref name="scale"/> and
+		/// rotated by <paramref name="rotationDeg"/> (clockwise). When <paramref name="anchor"/> is
+		/// "center" the texture's centre lands at (x, y); otherwise its top-left does. Alpha-blended;
+		/// out-of-canvas pixels are ignored. The sampling is nearest-neighbour (keeps pixel art crisp).
+		/// </summary>
+		public void PasteTextureTransformed(LuaTexture tex, int x, int y, float scale, float rotationDeg, string anchor) {
+			if (tex?._texture == null || scale <= 0f) return;
+			byte[]? src = tex.GetCachedPixels(out int sw, out int sh);
+			if (src == null || sw <= 0 || sh <= 0) return;
+
+			bool center = (anchor ?? "").ToLower() == "center";
+			// placement origin in canvas space the source is positioned around
+			double ox = x, oy = y;
+			// source pivot (the point that maps to (ox,oy))
+			double pvx = center ? sw * 0.5 : 0.0;
+			double pvy = center ? sh * 0.5 : 0.0;
+
+			double rad = rotationDeg * Math.PI / 180.0;
+			double cs = Math.Cos(rad), sn = Math.Sin(rad);
+
+			// destination bounding box: transform the 4 source corners
+			double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
+			void corner(double u, double v) {
+				double rx = (u - pvx) * scale, ry = (v - pvy) * scale;
+				double dx = ox + (rx * cs - ry * sn);
+				double dy = oy + (rx * sn + ry * cs);
+				if (dx < minX) minX = dx; if (dx > maxX) maxX = dx;
+				if (dy < minY) minY = dy; if (dy > maxY) maxY = dy;
+			}
+			corner(0, 0); corner(sw, 0); corner(0, sh); corner(sw, sh);
+
+			int bx0 = Math.Max(0, (int)Math.Floor(minX)), by0 = Math.Max(0, (int)Math.Floor(minY));
+			int bx1 = Math.Min(_w - 1, (int)Math.Ceiling(maxX)), by1 = Math.Min(_h - 1, (int)Math.Ceiling(maxY));
+			if (bx1 < bx0 || by1 < by0) return;
+
+			double inv = 1.0 / scale;
+			for (int py = by0; py <= by1; py++) {
+				for (int px = bx0; px <= bx1; px++) {
+					// inverse transform dest → source
+					double ddx = (px + 0.5) - ox, ddy = (py + 0.5) - oy;
+					double ux = (ddx * cs + ddy * sn) * inv + pvx;
+					double uy = (-ddx * sn + ddy * cs) * inv + pvy;
+					int su = (int)Math.Floor(ux), sv = (int)Math.Floor(uy);
+					if ((uint)su >= (uint)sw || (uint)sv >= (uint)sh) continue;
+					int so = (sv * sw + su) * 4;
+					int sa = src[so + 3];
+					if (sa == 0) continue;
+					int o = (py * _w + px) * 4;
+					if (sa >= 255) {
+						_buf[o] = src[so]; _buf[o + 1] = src[so + 1]; _buf[o + 2] = src[so + 2]; _buf[o + 3] = 255;
+					} else {
+						double a = sa / 255.0, ia = 1.0 - a;
+						_buf[o]     = (byte)(src[so]     * a + _buf[o]     * ia);
+						_buf[o + 1] = (byte)(src[so + 1] * a + _buf[o + 1] * ia);
+						_buf[o + 2] = (byte)(src[so + 2] * a + _buf[o + 2] * ia);
+						_buf[o + 3] = (byte)Math.Min(255, sa + _buf[o + 3] * ia);
+					}
+				}
+			}
+			MarkDirty(bx0, by0, bx1, by1);
+		}
+
 		/// <summary>Fill the whole canvas with a colour (r,g,b,a 0-255).</summary>
 		public void Clear(int r, int g, int b, int a) => FillRect(0, 0, _w, _h, r, g, b, a);
 

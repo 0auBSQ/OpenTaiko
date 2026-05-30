@@ -122,6 +122,23 @@ namespace OpenTaiko {
 			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
 		}
 
+		/// <summary>
+		/// Register a texture for the rasterizer from an existing <see cref="LuaTexture"/> by
+		/// reading its pixels back from the GPU (alpha is dropped — the rasterizer treats textures
+		/// as opaque). One-off cost; call at load time, not per frame.
+		/// </summary>
+		public void RegisterTextureFromImage(int id, LuaTexture tex) {
+			if (tex?._texture == null) return;
+			byte[]? rgba = tex.GetCachedPixels(out int w, out int h);
+			if (rgba == null || w <= 0 || h <= 0) return;
+			var px = new int[w * h];
+			for (int i = 0; i < px.Length; i++) {
+				int o = i * 4;
+				px[i] = (rgba[o] << 16) | (rgba[o + 1] << 8) | rgba[o + 2];
+			}
+			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
+		}
+
 		/// <summary>2D line in the colour buffer (screen pixels), drawn on top (no depth).</summary>
 		public void DrawLine(int x0, int y0, int x1, int y1, int r, int g, int b) {
 			byte br = CB(r), bg = CB(g), bb = CB(b);

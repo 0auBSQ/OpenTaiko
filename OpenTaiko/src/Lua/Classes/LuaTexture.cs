@@ -7,6 +7,18 @@ namespace OpenTaiko {
 		internal HashSet<LuaTexture>? _disposeList = null;
 		public uint Pointer => _texture != null ? _texture.Pointer : 0;
 
+		// One-time GPU→CPU readback cache (a texture's pixels rarely change). Consumers
+		// that composite this texture on the CPU (LuaCanvas paste, Lua3DScene register)
+		// use this so a repeated paste/stamp does not hammer glReadPixels every call.
+		private byte[]? _pixCache;
+		private int _pcW, _pcH;
+		internal byte[]? GetCachedPixels(out int w, out int h) {
+			if (_pixCache != null) { w = _pcW; h = _pcH; return _pixCache; }
+			_pixCache = _texture?.ReadPixelsRGBA(out _pcW, out _pcH);
+			w = _pcW; h = _pcH;
+			return _pixCache;
+		}
+
 		public LuaTexture() {
 			_texture = null;
 		}
