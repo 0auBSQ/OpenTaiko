@@ -27,6 +27,7 @@ local ARROW_TURN = 90.0          -- deg/sec for arrow-key look
 local RENDER_DIST = 60.0
 local FOG_START   = 38.0
 local FOG_END     = 60.0
+local THREADS     = 4            -- rasterizer threads (screen split into this many row bands)
 
 -- physics
 local GRAV       = 28.0
@@ -43,13 +44,43 @@ local SWIM_UP    = 4.2
 local WATER_MOVE = 0.6
 local WATER_DRAG = 0.86
 
-local WX, WY, WZ = 128, 40, 128
-local SEA_LEVEL  = 14
+local WX, WY, WZ = 256, 128, 256
+local SEA_LEVEL  = 64
 local SEED       = 1337
 
 local AIR, GRASS, DIRT, STONE, SAND, WATER, WOOD, LEAVES, TORCH, BEDROCK = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-local T_GRASS_TOP, T_GRASS_SIDE, T_DIRT, T_STONE, T_SAND, T_LOG_TOP, T_LOG_SIDE, T_LEAVES = 1, 2, 3, 4, 5, 6, 7, 8
-local T_TORCH, T_BEDROCK = 9, 10
+local SNOW, GLASS, COPPER_DIRT = 10, 11, 42   -- COPPER_DIRT: copper showing in the dirt layer
+
+-- texture ids in one table (keeps the chunk under Lua's 200-locals limit)
+local TX = { grasstop = 1, grassside = 2, dirt = 3, stone = 4, sand = 5, logtop = 6,
+             logside = 7, leaves = 8, torch = 9, bedrock = 10, snow = 11, glass = 12,
+             snowside = 28, copperdirt = 44 }
+local GLASS_A = 120   -- glass transparency (0..255)
+
+-- Ores & gems live in one table (so we stay under Lua's 200-locals-per-chunk limit). Each:
+-- ore block id+tex+name, refined "Block of X" id (bid) + tex (btex), speckle colour {r,g,b}
+-- (+ col2 for two-tone), optional ore base colour, gem flag, depth band [yMin,yMax], vein rate
+-- (veins ≈ rate*WX*WZ) and vein size range. "dirt" = also sprinkles into the dirt layer.
+-- Values are flavourful, not geologically accurate.
+local ORE_DEFS = {
+    { name = "Copper",      id = 12, tex = 13, bid = 27, btex = 29, col = {184,115,51},  yMin = 24, yMax = 92, rate = 0.038,  smin = 10, smax = 20 },
+    { name = "Zinc",        id = 13, tex = 14, bid = 28, btex = 30, col = {150,165,180}, yMin = 18, yMax = 80, rate = 0.035,  smin = 10, smax = 20 },
+    { name = "Iron",        id = 14, tex = 15, bid = 29, btex = 31, col = {184,138,110}, yMin = 10, yMax = 72, rate = 0.034,  smin = 9,  smax = 18 },
+    { name = "Tin",         id = 15, tex = 16, bid = 30, btex = 32, col = {196,198,205}, yMin = 14, yMax = 76, rate = 0.032,  smin = 9,  smax = 18 },
+    { name = "Silver",      id = 16, tex = 17, bid = 31, btex = 33, col = {222,222,232}, yMin = 8,  yMax = 46, rate = 0.014,  smin = 7,  smax = 14 },
+    { name = "Gold",        id = 17, tex = 18, bid = 32, btex = 34, col = {232,192,60},  yMin = 5,  yMax = 36, rate = 0.0095, smin = 6,  smax = 12 },
+    { name = "Platinum",    id = 18, tex = 19, bid = 33, btex = 35, col = {205,210,220}, yMin = 3,  yMax = 26, rate = 0.0050, smin = 5,  smax = 10 },
+    { name = "Mithril",     id = 19, tex = 20, bid = 34, btex = 36, col = {90,220,214},  yMin = 2,  yMax = 18, rate = 0.0032, smin = 4,  smax = 9 },
+    { name = "OpenTaikium", id = 20, tex = 21, bid = 35, btex = 37, col = {220,40,55}, col2 = {45,80,225}, yMin = 1, yMax = 14, rate = 0.0015, smin = 4, smax = 8 },
+    { name = "Copium",      id = 21, tex = 22, bid = 36, btex = 38, col = {20,120,44},   yMin = 1,  yMax = 42, rate = 0.0070, smin = 5,  smax = 10 },
+    { name = "Sapphire", gem = true, id = 22, tex = 23, bid = 37, btex = 39, col = {45,95,225},   yMin = 5,  yMax = 42, rate = 0.0060,  smin = 2, smax = 5 },
+    { name = "Ruby",     gem = true, id = 23, tex = 24, bid = 38, btex = 40, col = {214,45,66},   yMin = 5,  yMax = 42, rate = 0.0060,  smin = 2, smax = 5 },
+    { name = "Emerald",  gem = true, id = 24, tex = 25, bid = 39, btex = 41, col = {34,194,96},   yMin = 8,  yMax = 46, rate = 0.0042,  smin = 2, smax = 5 },
+    { name = "Quartz",   gem = true, id = 25, tex = 26, bid = 40, btex = 42, col = {236,222,228}, yMin = 10, yMax = 70, rate = 0.0140,  smin = 3, smax = 6 },
+    { name = "Diamond",  gem = true, id = 26, tex = 27, bid = 41, btex = 43, col = {150,232,242}, yMin = 2,  yMax = 18, rate = 0.0024,  smin = 2, smax = 5 },
+}
+local oreTexOf = {}   -- [blockId] = textureId (ore blocks AND refined "Block of X"), for texIdFor
+for _, m in ipairs(ORE_DEFS) do oreTexOf[m.id] = m.tex; oreTexOf[m.bid] = m.btex end
 
 -- lighting
 local LIGHT_MAX   = 15       -- full skylight
@@ -83,7 +114,7 @@ local chunks = {}   -- [cz*ncx+cx+1] = { ci, cx, cz, minX,maxX,minZ,maxZ, cenX,c
                     -- (geometry lives in the scene's batches: tex id ci*8+dir, water id ci)
 
 -- player
-local feetX, feetY, feetZ = WX / 2, 24, WZ / 2
+local feetX, feetY, feetZ = WX / 2, 76, WZ / 2
 local vx, vy, vz = 0, 0, 0
 local onGround = false
 local camX, camY, camZ = 0, 0, 0
@@ -103,7 +134,10 @@ local selNx, selNy, selNz = 0, 1, 0
 
 -- hotbar: the placeable block types (bedrock is intentionally absent), the held index,
 -- and the break/place auto-repeat timers
-local hotbar = { GRASS, DIRT, STONE, SAND, WOOD, LEAVES, TORCH }
+local hotbar = { GRASS, DIRT, STONE, SAND, WOOD, LEAVES, TORCH, GLASS, SNOW }
+for _, m in ipairs(ORE_DEFS) do hotbar[#hotbar + 1] = m.id end    -- ore/gem blocks
+hotbar[#hotbar + 1] = COPPER_DIRT                                 -- copper-in-dirt variant
+for _, m in ipairs(ORE_DEFS) do hotbar[#hotbar + 1] = m.bid end   -- refined "Block of X"
 local heldIdx = 1
 local hotbarIcons = {}            -- [i] = LuaCanvas preview of hotbar[i]
 local EDIT_INTERVAL = 0.16        -- seconds between edits while a mouse button is held
@@ -136,9 +170,15 @@ local function vnoise(x, z)
     local b = v01 + (v11 - v01) * sx
     return a + (b - a) * sz
 end
+-- Terrain spans from TERRAIN_BELOW blocks under sea level (valley floors / lake beds) up to
+-- TERRAIN_ABOVE blocks over it (hilltops), so it always straddles SEA_LEVEL whatever it's set to.
+local TERRAIN_BELOW = 14
+local TERRAIN_ABOVE = 30
 local function terrainHeight(x, z)
     local n = vnoise(x * 0.045, z * 0.045) * 1.0 + vnoise(x * 0.11, z * 0.11) * 0.45 + vnoise(x * 0.23, z * 0.23) * 0.22
-    return floor(6 + (n / 1.67) * 26)
+    local h = floor((SEA_LEVEL - TERRAIN_BELOW) + (n / 1.67) * (TERRAIN_BELOW + TERRAIN_ABOVE))
+    if h > WY - 10 then h = WY - 10 end   -- leave headroom for trees
+    return h
 end
 
 local function getVox(x, y, z)
@@ -154,11 +194,13 @@ end
 -- Block predicates + lighting
 -- ════════════════════════════════════════════════════════════════════════════════
 
--- Solid for collision AND for blocking light/sky. Water and torches are non-solid.
+-- Solid for collision. Air, water and torches are walk-through; glass is solid (you bump it).
 local function isSolid(b) return b ~= AIR and b ~= WATER and b ~= TORCH end
--- A face is drawn when the neighbour is see-through (air, water or a torch).
-local function isTransparent(b) return b == AIR or b == WATER or b == TORCH end
--- Targetable by the crosshair (so torches can be broken, water/air cannot).
+-- Blocks skylight / torch light. Same as solid but glass lets light through.
+local function blocksLight(b) return b ~= AIR and b ~= WATER and b ~= TORCH and b ~= GLASS end
+-- A face is drawn when the neighbour is see-through (air, water, torch or glass).
+local function isTransparent(b) return b == AIR or b == WATER or b == TORCH or b == GLASS end
+-- Targetable by the crosshair (so torches/glass can be broken, water/air cannot).
 local function isSelectable(b) return b ~= AIR and b ~= WATER end
 
 -- Lighting = max(vertical skylight, torch block-light). Skylight is a cheap per-column
@@ -174,7 +216,7 @@ local _lq, _lqv = {}, {}   -- reused BFS queues (packed index / value)
 local function recomputeSkyColumn(x, z)
     local top = 0
     for y = WY - 1, 0, -1 do
-        if isSolid(getVox(x, y, z)) then top = y + 1; break end
+        if blocksLight(getVox(x, y, z)) then top = y + 1; break end
     end
     skyTop[x * WZ + z + 1] = top
 end
@@ -211,7 +253,7 @@ local function propagateTorch(qn)
             local nl = cl - 1
             local function spread(nx, ny, nz)
                 if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
-                if isSolid(getVox(nx, ny, nz)) then return end
+                if blocksLight(getVox(nx, ny, nz)) then return end
                 local ni = (ny * WZ + nz) * WX + nx + 1
                 if (torchLight[ni] or 0) < nl then torchLight[ni] = nl; qn = qn + 1; _lq[qn] = ni end
             end
@@ -245,7 +287,7 @@ local function removeTorchLight(x, y, z)
         local z2 = t % WZ; local y2 = (t - z2) // WZ
         local function visit(nx, ny, nz)
             if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
-            if isSolid(getVox(nx, ny, nz)) then return end
+            if blocksLight(getVox(nx, ny, nz)) then return end
             local ni = (ny * WZ + nz) * WX + nx + 1
             local nv = torchLight[ni] or 0
             if nv ~= 0 and nv < val then
@@ -274,23 +316,29 @@ local function initLight()
     end end end
 end
 
+-- Plant a tree on the grass block at (x, groundY): trunk sits directly on the grass,
+-- with a rounded leaf canopy. Sizes/jitter use math.random (organic, no noise banding).
 local function plantTree(x, z, groundY)
-    local th = 4 + floor(hash2(x, z, 31) * 3)
+    local th = 4 + math.random(0, 2)             -- trunk height 4..6
     for i = 1, th do setVox(x, groundY + i, z, WOOD) end
     local topY = groundY + th
-    for dy = -1, 2 do
-        local r = (dy <= 0) and 2 or 1
+    for dy = -2, 2 do
         local cy = topY + dy
+        local r = (dy <= -1) and 2 or (dy <= 1 and 2 or 1)
         for dx = -r, r do for dz = -r, r do
-            if abs(dx) + abs(dz) <= r + 1 and getVox(x + dx, cy, z + dz) == AIR then
+            if dx * dx + dz * dz <= r * r + 1 and getVox(x + dx, cy, z + dz) == AIR then
                 setVox(x + dx, cy, z + dz, LEAVES)
             end
         end end
     end
-    setVox(x, topY + 3, z, LEAVES)
+    setVox(x, topY + 2, z, LEAVES)               -- crown tip
 end
 
 local function generateWorld()
+    -- Snow caps higher up; bare rock on the highest peaks (no grass/dirt over them).
+    local SNOW_LEVEL = SEA_LEVEL + 18
+    local STONE_PEAK = SEA_LEVEL + 26
+    math.randomseed(SEED)
     vox = {}
     for i = 1, WX * WY * WZ do vox[i] = AIR end
     for x = 0, WX - 1 do
@@ -299,19 +347,56 @@ local function generateWorld()
             local beach = (h <= SEA_LEVEL + 1)
             for y = 0, h do
                 local b
-                if y == 0 then b = BEDROCK              -- unbreakable floor
-                elseif y == h then b = beach and SAND or GRASS
-                elseif y >= h - 3 then b = beach and SAND or DIRT
-                else b = STONE end
+                if y == 0 then b = BEDROCK                         -- unbreakable floor
+                elseif y < h - 3 then b = STONE
+                elseif y == h then                                 -- surface block by elevation
+                    if beach then b = SAND
+                    elseif h >= STONE_PEAK then b = STONE
+                    elseif h >= SNOW_LEVEL then b = SNOW
+                    else b = GRASS end
+                else                                               -- subsurface cap
+                    if beach then b = SAND
+                    elseif h >= STONE_PEAK then b = STONE
+                    else
+                        b = DIRT
+                        if math.random() < 0.02 then b = COPPER_DIRT end -- copper occasionally in the dirt layer
+                    end
+                end
                 setVox(x, y, z, b)
             end
             for y = h + 1, SEA_LEVEL do setVox(x, y, z, WATER) end
         end
     end
+    -- Ore + gem veins: random-walk clusters that replace stone, within each material's
+    -- depth band. Vein count scales with map area.
+    for _, m in ipairs(ORE_DEFS) do
+        local veins = floor(m.rate * WX * WZ)
+        for _ = 1, veins do
+            local x, y, z = math.random(1, WX - 2), math.random(m.yMin, m.yMax), math.random(1, WZ - 2)
+            for _ = 1, math.random(m.smin, m.smax) do
+                if x >= 1 and x < WX - 1 and y >= 1 and y < WY - 1 and z >= 1 and z < WZ - 1 then
+                    if getVox(x, y, z) == STONE then setVox(x, y, z, m.id) end
+                else break end
+                local d = math.random(6)
+                if d == 1 then x = x + 1 elseif d == 2 then x = x - 1
+                elseif d == 3 then y = y + 1 elseif d == 4 then y = y - 1
+                elseif d == 5 then z = z + 1 else z = z - 1 end
+            end
+        end
+    end
+    -- Trees: scatter on real grass surfaces (math.random = organic, no lines), spaced out.
+    local function surfaceY(x, z)
+        for y = WY - 1, 1, -1 do if isSolid(getVox(x, y, z)) then return y end end
+        return 0
+    end
     for x = 2, WX - 3 do for z = 2, WZ - 3 do
-        local h = terrainHeight(x, z)
-        if h > SEA_LEVEL + 1 and h < WY - 8 and getVox(x, h, z) == GRASS then
-            if hash2(x, z, 9991) < 0.018 then plantTree(x, h, z) end
+        if math.random() < 0.020 then
+            local y = surfaceY(x, z)
+            if getVox(x, y, z) == GRASS and y < SNOW_LEVEL
+               and getVox(x - 1, y + 1, z) ~= WOOD and getVox(x + 1, y + 1, z) ~= WOOD
+               and getVox(x, y + 1, z - 1) ~= WOOD and getVox(x, y + 1, z + 1) ~= WOOD then
+                plantTree(x, z, y)
+            end
         end
     end end
 end
@@ -334,20 +419,88 @@ local function texFlat(r, g, b, amp, salt)
     end end
     return t
 end
+-- Ore/gem texture over a base (stone, or m.base). Ores: fine scattered dots plus a few short
+-- random-walk veins that link some of them into organic chunks. Gems: a faceted central
+-- crystal (4 facets + a sparkle) with a couple of tiny chips.
+local function texMineral(m, salt)
+    local bc = m.base or {122, 122, 128}
+    local bright = m.gem and 30 or 0
+    local t = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local sn = (hash2(u + 11, v - 9, salt) - 0.5) * 2 * 22
+        t[v * 16 + u + 1] = packc(bc[1] + sn, bc[2] + sn, bc[3] + sn)
+    end end
+    local function pix(x, y, col, extra)
+        if x < 0 or x > 15 or y < 0 or y > 15 then return end
+        local hn = (hash2(x, y, salt + 57) - 0.5) * 22 + (extra or 0)
+        t[y * 16 + x + 1] = packc(col[1] + hn + bright, col[2] + hn + bright, col[3] + hn + bright)
+    end
+    if m.gem then
+        local cx, cy = 7, 8                                    -- faceted central crystal (diamond)
+        for v = 3, 13 do
+            local hw = 5 - floor(abs(v - 8) * 0.85)
+            if hw >= 0 then
+                for u = cx - hw, cx + hw do
+                    local facet = (u <= cx and v <= cy) and 22 or (u > cx and v <= cy) and 6
+                        or (u <= cx and v > cy) and -8 or -22
+                    pix(u, v, m.col, facet)
+                end
+            end
+        end
+        pix(cx - 1, 5, m.col, 64)                             -- sparkle
+        for k = 1, 3 do                                        -- a couple of tiny chips
+            pix(1 + floor(hash2(k, 7, salt) * 14), 1 + floor(hash2(k, 13, salt) * 14), m.col)
+        end
+    else
+        for v = 0, 15 do for u = 0, 15 do                      -- fine scattered dots
+            if hash2(u, v, salt + 131) < 0.10 then
+                pix(u, v, (m.col2 and hash2(u, v, salt + 260) < 0.5) and m.col2 or m.col)
+            end
+        end end
+        for k = 1, 4 do                                        -- short veins linking some dots
+            local x, y = 2 + floor(hash2(k, 11, salt) * 12), 2 + floor(hash2(k, 17, salt) * 12)
+            local col = (m.col2 and k % 2 == 0) and m.col2 or m.col
+            for s = 0, 4 + floor(hash2(k, 23, salt) * 5) do
+                pix(x, y, col)
+                local d = floor(hash2(x + y * 16, s + 1, salt + 5) * 4)
+                if d == 0 then x = x + 1 elseif d == 1 then x = x - 1 elseif d == 2 then y = y + 1 else y = y - 1 end
+                if x < 0 then x = 0 elseif x > 15 then x = 15 end
+                if y < 0 then y = 0 elseif y > 15 then y = 15 end
+            end
+        end
+    end
+    return t
+end
+-- Refined "Block of X": a beveled, metallic-looking solid — bright top/left edge, dark
+-- bottom/right, diagonal sheen. OpenTaikium's block is red on the top half, blue on the bottom.
+local function texSolid(m, salt)
+    local c1, c2 = m.col, m.col2 or m.col
+    local t = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local c = m.col2 and (v < 8 and c1 or c2) or c1
+        local n = (hash2(u + salt, v - salt, salt) - 0.5) * 2 * 8
+        local sheen = (u + v < 13) and 24 or (u + v > 17 and -24 or 0)
+        local r, g, b = c[1] + n + 16 + sheen, c[2] + n + 16 + sheen, c[3] + n + 16 + sheen
+        if u == 0 or v == 0 then r, g, b = r + 36, g + 36, b + 36        -- highlight frame
+        elseif u == 15 or v == 15 then r, g, b = r - 40, g - 40, b - 40 end -- shadow frame
+        t[v * 16 + u + 1] = packc(r, g, b)
+    end end
+    return t
+end
 local texPix = {}   -- [texId] = packed-RGB pixel table (kept for hotbar icon previews)
 local function registerTextures()
     local function reg(id, t) texPix[id] = t; scene:RegisterTexture(id, t, 16, 16) end
-    reg(T_GRASS_TOP, texFlat(96, 152, 60, 22, 3))
-    reg(T_DIRT, texFlat(134, 96, 67, 20, 7))
-    reg(T_STONE, texFlat(122, 122, 128, 22, 11))
-    reg(T_SAND, texFlat(214, 201, 146, 16, 17))
+    reg(TX.grasstop, texFlat(96, 152, 60, 22, 3))
+    reg(TX.dirt, texFlat(134, 96, 67, 20, 7))
+    reg(TX.stone, texFlat(122, 122, 128, 22, 11))
+    reg(TX.sand, texFlat(214, 201, 146, 16, 17))
     local leaves = {}
     for v = 0, 15 do for u = 0, 15 do
         local n = (hash2(u, v, 23) - 0.5) * 40
         local dark = hash2(u, v, 41) < 0.18 and -26 or 0
         leaves[v * 16 + u + 1] = packc(60 + n + dark, 118 + n + dark, 46 + n + dark)
     end end
-    reg(T_LEAVES, leaves)
+    reg(TX.leaves, leaves)
     local gs = {}
     for v = 0, 15 do for u = 0, 15 do
         local n = (hash2(u + 3, v - 3, 3) - 0.5) * 2 * 20
@@ -358,14 +511,14 @@ local function registerTextures()
             gs[v * 16 + u + 1] = packc(134 + n, 96 + n, 67 + n)
         end
     end end
-    reg(T_GRASS_SIDE, gs)
+    reg(TX.grassside, gs)
     local lsd = {}
     for v = 0, 15 do for u = 0, 15 do
         local streak = (u % 4 == 0) and -22 or 0
         local n = (hash2(u, v, 5) - 0.5) * 16
         lsd[v * 16 + u + 1] = packc(120 + n + streak, 85 + n + streak, 50 + n + streak)
     end end
-    reg(T_LOG_SIDE, lsd)
+    reg(TX.logside, lsd)
     local lt = {}
     for v = 0, 15 do for u = 0, 15 do
         local d = sqrt((u - 7.5) ^ 2 + (v - 7.5) ^ 2)
@@ -373,14 +526,14 @@ local function registerTextures()
         local n = (hash2(u, v, 9) - 0.5) * 10
         lt[v * 16 + u + 1] = packc(165 + ring + n, 125 + ring + n, 78 + ring + n)
     end end
-    reg(T_LOG_TOP, lt)
+    reg(TX.logtop, lt)
     local bd = {}
     for v = 0, 15 do for u = 0, 15 do
         local n = (hash2(u, v, 13) - 0.5) * 2 * 26
         local blot = hash2(u + 5, v + 5, 71) < 0.22 and -28 or 0
         bd[v * 16 + u + 1] = packc(58 + n + blot, 58 + n + blot, 64 + n + blot)
     end end
-    reg(T_BEDROCK, bd)
+    reg(TX.bedrock, bd)
     -- torch: a full-width vertical post — flame at the top, wooden stick below (the post
     -- geometry is slim, so the whole texture is the visible stick/flame).
     local tc = {}
@@ -397,20 +550,52 @@ local function registerTextures()
         end
         tc[v * 16 + u + 1] = packc(r, g, b)
     end end
-    reg(T_TORCH, tc)
+    reg(TX.torch, tc)
+    reg(TX.snow, texFlat(238, 244, 252, 9, 31))
+    -- glass: light frame so panes read as panes; the see-through comes from the object alpha.
+    local gl = {}
+    for v = 0, 15 do for u = 0, 15 do
+        if u == 0 or u == 15 or v == 0 or v == 15 then
+            gl[v * 16 + u + 1] = packc(176, 202, 214)
+        else
+            local n = (hash2(u, v, 44) - 0.5) * 10
+            gl[v * 16 + u + 1] = packc(206 + n, 228 + n, 236 + n)
+        end
+    end end
+    reg(TX.glass, gl)
+    -- snow side: dirt with a snowy top band (like the grass side) so snow blocks look capped
+    local ss = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local n = (hash2(u + 3, v - 3, 3) - 0.5) * 2 * 18
+        if v <= 3 then
+            local edge = (v == 3) and -16 or 0
+            ss[v * 16 + u + 1] = packc(232 + n + edge, 238 + n + edge, 248 + n + edge)
+        else
+            ss[v * 16 + u + 1] = packc(134 + n, 96 + n, 67 + n)
+        end
+    end end
+    reg(TX.snowside, ss)
+    reg(TX.copperdirt, texMineral({ col = {184,115,51}, base = {134,96,67} }, 999))  -- copper in dirt
+    for _, m in ipairs(ORE_DEFS) do
+        reg(m.tex, texMineral(m, m.id))        -- ore in the ground
+        reg(m.btex, texSolid(m, m.id + 100))   -- refined "Block of X"
+    end
 end
 
 -- Representative face texture for a block's hotbar icon.
 local function iconTexId(b)
-    if b == GRASS then return T_GRASS_SIDE
-    elseif b == DIRT then return T_DIRT
-    elseif b == STONE then return T_STONE
-    elseif b == SAND then return T_SAND
-    elseif b == WOOD then return T_LOG_SIDE
-    elseif b == LEAVES then return T_LEAVES
-    elseif b == TORCH then return T_TORCH
-    elseif b == BEDROCK then return T_BEDROCK end
-    return T_DIRT
+    if b == GRASS then return TX.grassside
+    elseif b == DIRT then return TX.dirt
+    elseif b == STONE then return TX.stone
+    elseif b == SAND then return TX.sand
+    elseif b == WOOD then return TX.logside
+    elseif b == LEAVES then return TX.leaves
+    elseif b == TORCH then return TX.torch
+    elseif b == BEDROCK then return TX.bedrock
+    elseif b == SNOW then return TX.snow
+    elseif b == GLASS then return TX.glass
+    elseif b == COPPER_DIRT then return TX.copperdirt end
+    return oreTexOf[b] or TX.dirt
 end
 
 -- Build a 16×16 canvas preview for each hotbar block from its stored pixel table.
@@ -435,15 +620,19 @@ local DIRS = {
 
 local function texIdFor(b, di)
     if b == GRASS then
-        if di == 3 then return T_GRASS_TOP elseif di == 4 then return T_DIRT else return T_GRASS_SIDE end
-    elseif b == DIRT then return T_DIRT
-    elseif b == STONE then return T_STONE
-    elseif b == SAND then return T_SAND
-    elseif b == WOOD then if di == 3 or di == 4 then return T_LOG_TOP else return T_LOG_SIDE end
-    elseif b == LEAVES then return T_LEAVES
-    elseif b == TORCH then return T_TORCH
-    elseif b == BEDROCK then return T_BEDROCK end
-    return 0
+        if di == 3 then return TX.grasstop elseif di == 4 then return TX.dirt else return TX.grassside end
+    elseif b == DIRT then return TX.dirt
+    elseif b == STONE then return TX.stone
+    elseif b == SAND then return TX.sand
+    elseif b == WOOD then if di == 3 or di == 4 then return TX.logtop else return TX.logside end
+    elseif b == LEAVES then return TX.leaves
+    elseif b == TORCH then return TX.torch
+    elseif b == BEDROCK then return TX.bedrock
+    elseif b == SNOW then
+        if di == 3 then return TX.snow elseif di == 4 then return TX.dirt else return TX.snowside end
+    elseif b == GLASS then return TX.glass
+    elseif b == COPPER_DIRT then return TX.copperdirt end
+    return oreTexOf[b] or 0
 end
 
 local function cw(da, dv, pa, pval, qa, qval)
@@ -490,9 +679,13 @@ local function meshChunk(cx, cz)
         ch.objWater = scene:NewObject()
         scene:ObjSetPass(ch.objWater, 1, WATER_R, WATER_G, WATER_B, WATER_A)
         scene:ObjSetBounds(ch.objWater, loX, 0, loZ, hiX, WY, hiZ)
+        ch.objGlass = scene:NewObject()   -- transparent textured pass (glass panes)
+        scene:ObjSetPass(ch.objGlass, 1, 0, 0, 0, GLASS_A)
+        scene:ObjSetBounds(ch.objGlass, loX, 0, loZ, hiX, WY, hiZ)
     end
-    local objWater = ch.objWater
+    local objWater, objGlass = ch.objWater, ch.objGlass
     scene:ObjBegin(objWater)
+    scene:ObjBegin(objGlass)
     local mask = _mask
     local lo = { loX, 0, loZ }
     local hi = { hiX, WY, hiZ }
@@ -512,13 +705,16 @@ local function meshChunk(cx, cz)
                 local b0 = (p - pLo) * qSpan - qLo
                 for q = qLo, qHi - 1 do
                     local b = voxAt(da, dd, pa, p, qa, q)
-                    -- mask value: 0 none, -1 water, else texId*32 + light (so greedy only
-                    -- merges faces that share BOTH texture and light level). Torches are not
-                    -- meshed here — they're drawn separately as a slim post.
+                    -- mask value: 0 none, -1 water, -100-light glass, else texId*32 + light
+                    -- (so greedy only merges faces sharing texture+light; glass/water never
+                    -- merge with opaque). Torches aren't meshed here (drawn as slim posts).
                     local val = 0
                     if b ~= AIR and b ~= TORCH then
                         local nb = voxAt(da, dd + sign, pa, p, qa, q)
-                        if isTransparent(nb) then
+                        -- glass shows a face against anything but glass; other blocks only
+                        -- where the neighbour is see-through.
+                        local show = (b == GLASS) and (nb ~= GLASS) or (b ~= GLASS and isTransparent(nb))
+                        if show then
                             if b == WATER then
                                 if di == 3 and nb == AIR then val = -1 end
                             else
@@ -526,7 +722,9 @@ local function meshChunk(cx, cz)
                                 if da == 1 then nb1 = dd + sign elseif da == 2 then nb2 = dd + sign else nb3 = dd + sign end
                                 if pa == 1 then nb1 = p elseif pa == 2 then nb2 = p else nb3 = p end
                                 if qa == 1 then nb1 = q elseif qa == 2 then nb2 = q else nb3 = q end
-                                val = texIdFor(b, di) * 32 + lightAt(nb1, nb2, nb3)
+                                local lite = lightAt(nb1, nb2, nb3)
+                                if b == GLASS then val = -100 - lite
+                                else val = texIdFor(b, di) * 32 + lite end
                             end
                         end
                     end
@@ -558,8 +756,12 @@ local function meshChunk(cx, cz)
                         local x1, y1, z1 = cw(da, planePos, pa, p + pw, qa, q)
                         local x2, y2, z2 = cw(da, planePos, pa, p + pw, qa, q + qh)
                         local x3, y3, z3 = cw(da, planePos, pa, p, qa, q + qh)
-                        if val < 0 then
+                        if val == -1 then
                             scene:ObjAddQuadFlat(objWater, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3)
+                        elseif val <= -100 then
+                            local lite = -val - 100
+                            scene:ObjAddQuadTex(objGlass, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
+                                TX.glass, pw, qh, shade * liteMul(lite))
                         else
                             local texId = val // 32
                             local lite = val - texId * 32
@@ -609,10 +811,10 @@ local torchCount = 0   -- when 0 we skip all torch-light work (the common, fast 
 local function setBlock(x, y, z, newType)
     local old = getVox(x, y, z)
     if old == newType then return end
-    local wasSolid = isSolid(old)
+    local wasSolid = blocksLight(old)   -- for light bookkeeping (glass doesn't block light)
     setVox(x, y, z, newType)
     recomputeSkyColumn(x, z)
-    local nowSolid = isSolid(newType)
+    local nowSolid = blocksLight(newType)
     local tIdx = (y * WZ + z) * WX + x + 1
     if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil; torchesDirty = true end
     if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z }; torchesDirty = true end
@@ -773,11 +975,11 @@ local function rebuildTorches()
         local x0, x1 = cxp - TORCH_HW, cxp + TORCH_HW
         local z0, z1 = czp - TORCH_HW, czp + TORCH_HW
         local y0, y1 = y, y + TORCH_H
-        scene:ObjAddQuadTex(torchObj, x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0, T_TORCH, 1, 1, 1.0) -- -Z
-        scene:ObjAddQuadTex(torchObj, x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1, T_TORCH, 1, 1, 1.0) -- +Z
-        scene:ObjAddQuadTex(torchObj, x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, T_TORCH, 1, 1, 1.0) -- -X
-        scene:ObjAddQuadTex(torchObj, x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, T_TORCH, 1, 1, 1.0) -- +X
-        scene:ObjAddQuadTex(torchObj, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, T_TORCH, 1, 1, 1.0) -- top
+        scene:ObjAddQuadTex(torchObj, x0,y0,z0, x1,y0,z0, x1,y1,z0, x0,y1,z0, TX.torch, 1, 1, 1.0) -- -Z
+        scene:ObjAddQuadTex(torchObj, x1,y0,z1, x0,y0,z1, x0,y1,z1, x1,y1,z1, TX.torch, 1, 1, 1.0) -- +Z
+        scene:ObjAddQuadTex(torchObj, x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, TX.torch, 1, 1, 1.0) -- -X
+        scene:ObjAddQuadTex(torchObj, x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, TX.torch, 1, 1, 1.0) -- +X
+        scene:ObjAddQuadTex(torchObj, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, TX.torch, 1, 1, 1.0) -- top
     end
 end
 
@@ -809,6 +1011,7 @@ function onStart()
     scene:SetCameraNear(NEAR)
     scene:SetRenderDistance(RENDER_DIST)
     scene:SetFog(true, SKY_HOR_R, SKY_HOR_G, SKY_HOR_B, FOG_START, FOG_END)
+    scene:SetThreads(THREADS)
     registerTextures()
     buildHotbarIcons()
     torchObj = scene:NewObject()                      -- one retained object for all torches
@@ -1031,8 +1234,14 @@ local function txt(font, str, r, g, b)
         COLOR:CreateColorFromRGBA(0, 0, 0, 255))
 end
 
-local BLOCK_NAMES = { [GRASS] = "Grass", [DIRT] = "Dirt", [STONE] = "Stone",
-                      [SAND] = "Sand", [WOOD] = "Wood", [LEAVES] = "Leaves", [TORCH] = "Torch" }
+local BLOCK_NAMES = { [AIR] = "Air", [GRASS] = "Grass", [DIRT] = "Dirt", [STONE] = "Stone",
+                      [SAND] = "Sand", [WATER] = "Water", [WOOD] = "Wood", [LEAVES] = "Leaves",
+                      [TORCH] = "Torch", [BEDROCK] = "Bedrock", [SNOW] = "Snow", [GLASS] = "Glass" }
+for _, m in ipairs(ORE_DEFS) do
+    BLOCK_NAMES[m.id] = m.gem and m.name or (m.name .. " Ore")   -- "Gold Ore"; gems keep their name
+    BLOCK_NAMES[m.bid] = "Block of " .. m.name                   -- "Block of Iron"
+end
+BLOCK_NAMES[COPPER_DIRT] = "Copper Ore"
 
 -- Held-block widget in the bottom-left: ‹ icon ›, with the block name under it.
 local function drawHotbar()
@@ -1055,9 +1264,10 @@ local function drawHotbar()
     -- left / right arrows (mouse wheel cycles the selection)
     txt(fontBig, "<", 235, 235, 240):DrawAtAnchor(x - pad - 26, y + sz / 2, "center")
     txt(fontBig, ">", 235, 235, 240):DrawAtAnchor(x + sz + pad + 26, y + sz / 2, "center")
-    -- block name
-    txt(fontSmall, BLOCK_NAMES[hotbar[heldIdx]] or "?", 230, 230, 235)
-        :DrawAtAnchor(x + sz / 2, y + sz + pad + 8, "top")
+    -- block id over the block name
+    local bid = hotbar[heldIdx]
+    txt(fontSmall, "ID " .. bid, 190, 205, 235):DrawAtAnchor(x + sz / 2, y + sz + pad + 6, "top")
+    txt(fontSmall, BLOCK_NAMES[bid] or "?", 235, 235, 240):DrawAtAnchor(x + sz / 2, y + sz + pad + 30, "top")
 end
 
 function draw()
@@ -1079,7 +1289,18 @@ function draw()
             235, 235, 235):Draw(24, 52)
     end
 
-    if not paused then drawHotbar() end
+    if not paused then
+        drawHotbar()
+        -- hovered block: name in a textbox centred at the bottom
+        if hasSel then
+            local nm = BLOCK_NAMES[getVox(selX, selY, selZ)] or "?"
+            local bw, bh = 360, 56
+            local bx, by = (SCREEN_W - bw) / 2, SCREEN_H - bh - 40
+            dim:SetColor(0.07, 0.07, 0.09); dim:SetOpacity(0.55)
+            dim:SetScale(bw / 2, bh / 2); dim:Draw(bx, by)
+            txt(fontMid, nm, 245, 245, 250):DrawAtAnchor(SCREEN_W / 2, by + bh / 2, "center")
+        end
+    end
 
     if paused then
         dim:SetColor(0, 0, 0)

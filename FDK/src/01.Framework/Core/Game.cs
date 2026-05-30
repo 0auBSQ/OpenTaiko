@@ -462,7 +462,15 @@ public abstract class Game : IDisposable {
 	}
 
 	protected virtual void Events() {
-		Window_.DoEvents();
+		// Silk's GLFW event pump can intermittently throw (seen as "Nullable object must have a
+		// value") under very rapid input, especially with the cursor locked. It's a transient in
+		// the windowing backend, not our state — swallow it and re-pump next frame instead of
+		// letting it crash the whole game.
+		try {
+			Window_.DoEvents();
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Window event pump threw (ignored): {e}");
+		}
 	}
 
 	protected virtual void Update() {

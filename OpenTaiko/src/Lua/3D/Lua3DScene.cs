@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FDK;
 using NLua;
 
@@ -32,6 +33,8 @@ namespace OpenTaiko {
 		private double _near = 0.06;
 		private double _scale = 1.0;
 		private double _renderDist = 0.0;   // 0 = unlimited; else objects past this are culled
+		private int _threads = 1;   // rasterizer threads (screen split into this many row bands)
+		private ParallelOptions _po = new ParallelOptions { MaxDegreeOfParallelism = 1 };
 
 		// Distance fog: pixels fade toward (_fogR,_fogG,_fogB) from _fogStart to _fogEnd
 		// (camera-space depth). _fogInv = 1/(end-start). Off by default.
@@ -97,6 +100,13 @@ namespace OpenTaiko {
 			_fog = on;
 			_fogR = r; _fogG = g; _fogB = b; _fogStart = start;
 			_fogInv = end > start ? 1.0 / (end - start) : 0.0;
+		}
+
+		/// <summary>Number of CPU threads the rasterizer uses (screen split into this many
+		/// horizontal row bands). 1 = single-threaded.</summary>
+		public void SetThreads(int n) {
+			_threads = n < 1 ? 1 : n;
+			_po = new ParallelOptions { MaxDegreeOfParallelism = _threads };
 		}
 
 		public double GetCameraFov() => _fov;
@@ -181,8 +191,6 @@ namespace OpenTaiko {
 		private readonly double[] _vx = new double[8], _vy = new double[8], _vz = new double[8], _vu = new double[8], _vv = new double[8];
 		private readonly double[] _ox = new double[8], _oy = new double[8], _oz = new double[8], _ou = new double[8], _ov = new double[8];
 		private readonly double[] _sx = new double[8], _sy = new double[8], _sw = new double[8], _su = new double[8], _sv = new double[8];
-		private int _mdx0, _mdy0, _mdx1, _mdy1;
-		private bool _mddirty;
 
 		private int ClipNear(int n) {
 			int m = 0; double near = _near;
@@ -219,22 +227,57 @@ namespace OpenTaiko {
 			return m;
 		}
 
-		// Flat triangle, incremental edges, unsafe.
-		private unsafe void RasterTriFlat(int i0, int i1, int i2, byte r, byte g, byte b, int alpha) {
-			double x0 = _sx[i0], y0 = _sy[i0], w0 = _sw[i0];
-			double x1 = _sx[i1], y1 = _sy[i1], w1 = _sw[i1];
-			double x2 = _sx[i2], y2 = _sy[i2], w2 = _sw[i2];
+		// ── Render-triangle list: built single-threaded by BuildObject, then rasterized either
+		// on one thread or split across _threads horizontal row bands (disjoint rows => no races).
+		private struct RTri {
+			public double X0, Y0, W0, X1, Y1, W1, X2, Y2, W2;
+			public double U0, V0, U1, V1, U2, V2;
+			public int[] Tex; public int Tw, Th;
+			public double Shade; public int Alpha;
+			public byte R, G, B; public bool IsTex;
+		}
+		private RTri[] _tris = new RTri[2048];
+		private int _triN;
+
+		private void AddTexTri(int i0, int i1, int i2, int[] tex, int tw, int th, double shade, int alpha) {
+			if (_triN == _tris.Length) Array.Resize(ref _tris, _tris.Length * 2);
+			ref RTri t = ref _tris[_triN++];
+			t.IsTex = true; t.Tex = tex; t.Tw = tw; t.Th = th; t.Shade = shade; t.Alpha = alpha;
+			t.X0 = _sx[i0]; t.Y0 = _sy[i0]; t.W0 = _sw[i0]; t.U0 = _su[i0]; t.V0 = _sv[i0];
+			t.X1 = _sx[i1]; t.Y1 = _sy[i1]; t.W1 = _sw[i1]; t.U1 = _su[i1]; t.V1 = _sv[i1];
+			t.X2 = _sx[i2]; t.Y2 = _sy[i2]; t.W2 = _sw[i2]; t.U2 = _su[i2]; t.V2 = _sv[i2];
+		}
+		private void AddFlatTri(int i0, int i1, int i2, byte r, byte g, byte b, int alpha) {
+			if (_triN == _tris.Length) Array.Resize(ref _tris, _tris.Length * 2);
+			ref RTri t = ref _tris[_triN++];
+			t.IsTex = false; t.R = r; t.G = g; t.B = b; t.Alpha = alpha;
+			t.X0 = _sx[i0]; t.Y0 = _sy[i0]; t.W0 = _sw[i0];
+			t.X1 = _sx[i1]; t.Y1 = _sy[i1]; t.W1 = _sw[i1];
+			t.X2 = _sx[i2]; t.Y2 = _sy[i2]; t.W2 = _sw[i2];
+		}
+
+		private void RasterizeBand(int by0, int by1) {
+			for (int i = 0; i < _triN; i++) {
+				if (_tris[i].IsTex) RasterTexBand(ref _tris[i], by0, by1);
+				else RasterFlatBand(ref _tris[i], by0, by1);
+			}
+		}
+
+		private unsafe void RasterFlatBand(ref RTri t, int by0, int by1) {
+			double x0 = t.X0, y0 = t.Y0, w0 = t.W0;
+			double x1 = t.X1, y1 = t.Y1, w1 = t.W1;
+			double x2 = t.X2, y2 = t.Y2, w2 = t.W2;
 			double area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
 			if (area > -1e-9 && area < 1e-9) return;
-			if (area < 0) { double t; t = x1; x1 = x2; x2 = t; t = y1; y1 = y2; y2 = t; t = w1; w1 = w2; w2 = t; area = -area; }
+			if (area < 0) { double tt; tt=x1;x1=x2;x2=tt; tt=y1;y1=y2;y2=tt; tt=w1;w1=w2;w2=tt; area=-area; }
 			int minX = (int)Math.Floor(Math.Min(x0, Math.Min(x1, x2))); if (minX < 0) minX = 0;
 			int maxX = (int)Math.Ceiling(Math.Max(x0, Math.Max(x1, x2))); if (maxX > _w - 1) maxX = _w - 1;
-			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < 0) minY = 0;
-			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > _h - 1) maxY = _h - 1;
+			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < by0) minY = by0;
+			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > by1 - 1) maxY = by1 - 1;
 			if (minX > maxX || minY > maxY) return;
-
+			byte r = t.R, g = t.G, b = t.B; int alpha = t.Alpha;
 			double invA = 1.0 / area;
-			double d0x = y1 - y2, d0y = x2 - x1;   // d(e0)/dx, /dy
+			double d0x = y1 - y2, d0y = x2 - x1;
 			double d1x = y2 - y0, d1y = x0 - x2;
 			double d2x = y0 - y1, d2y = x1 - x0;
 			double cx = minX + 0.5, cy = minY + 0.5;
@@ -245,7 +288,6 @@ namespace OpenTaiko {
 			double idDx = invA * (d0x * w0 + d1x * w1 + d2x * w2);
 			double idDy = invA * (d0y * w0 + d1y * w1 + d2y * w2);
 			bool opaque = alpha >= 255; double a = alpha / 255.0, ia = 1.0 - a;
-
 			fixed (byte* B = _canvas._buf) fixed (float* D = _depth) {
 				for (int py = minY; py <= maxY; py++) {
 					double E0 = e0r, E1 = e1r, E2 = e2r, ID = idr;
@@ -257,19 +299,15 @@ namespace OpenTaiko {
 							if (fid > D[idx]) {
 								int o = idx * 4;
 								if (_fog) {
-									double f = (1.0 / ID - _fogStart) * _fogInv;   // 1/ID == camera depth z
+									double f = (1.0 / ID - _fogStart) * _fogInv;
 									double cr = r, cg = g, cb = b;
 									if (f > 0) { if (f > 1) f = 1; cr += (_fogR - cr) * f; cg += (_fogG - cg) * f; cb += (_fogB - cb) * f; }
 									if (opaque) { D[idx] = fid; B[o] = (byte)cr; B[o + 1] = (byte)cg; B[o + 2] = (byte)cb; B[o + 3] = 255; }
-									else {
-										B[o] = (byte)(cr * a + B[o] * ia); B[o + 1] = (byte)(cg * a + B[o + 1] * ia);
-										B[o + 2] = (byte)(cb * a + B[o + 2] * ia); B[o + 3] = 255;
-									}
+									else { B[o] = (byte)(cr * a + B[o] * ia); B[o + 1] = (byte)(cg * a + B[o + 1] * ia); B[o + 2] = (byte)(cb * a + B[o + 2] * ia); B[o + 3] = 255; }
 								} else if (opaque) {
 									D[idx] = fid; B[o] = r; B[o + 1] = g; B[o + 2] = b; B[o + 3] = 255;
 								} else {
-									B[o] = (byte)(r * a + B[o] * ia); B[o + 1] = (byte)(g * a + B[o + 1] * ia);
-									B[o + 2] = (byte)(b * a + B[o + 2] * ia); B[o + 3] = 255;
+									B[o] = (byte)(r * a + B[o] * ia); B[o + 1] = (byte)(g * a + B[o + 1] * ia); B[o + 2] = (byte)(b * a + B[o + 2] * ia); B[o + 3] = 255;
 								}
 							}
 						}
@@ -278,26 +316,21 @@ namespace OpenTaiko {
 					e0r += d0y; e1r += d1y; e2r += d2y; idr += idDy;
 				}
 			}
-			Bump(minX, minY, maxX, maxY);
 		}
 
-		// Textured, perspective-correct, incremental edges + attribute planes, unsafe.
-		private unsafe void RasterTriTex(int i0, int i1, int i2, int[] tex, int tw, int th, double shade, int alpha) {
-			double x0 = _sx[i0], y0 = _sy[i0], w0 = _sw[i0], uz0 = _su[i0], vz0 = _sv[i0];
-			double x1 = _sx[i1], y1 = _sy[i1], w1 = _sw[i1], uz1 = _su[i1], vz1 = _sv[i1];
-			double x2 = _sx[i2], y2 = _sy[i2], w2 = _sw[i2], uz2 = _su[i2], vz2 = _sv[i2];
+		private unsafe void RasterTexBand(ref RTri t, int by0, int by1) {
+			double x0 = t.X0, y0 = t.Y0, w0 = t.W0, uz0 = t.U0, vz0 = t.V0;
+			double x1 = t.X1, y1 = t.Y1, w1 = t.W1, uz1 = t.U1, vz1 = t.V1;
+			double x2 = t.X2, y2 = t.Y2, w2 = t.W2, uz2 = t.U2, vz2 = t.V2;
 			double area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
 			if (area > -1e-9 && area < 1e-9) return;
-			if (area < 0) {
-				double t; t = x1; x1 = x2; x2 = t; t = y1; y1 = y2; y2 = t; t = w1; w1 = w2; w2 = t;
-				t = uz1; uz1 = uz2; uz2 = t; t = vz1; vz1 = vz2; vz2 = t; area = -area;
-			}
+			if (area < 0) { double tt; tt=x1;x1=x2;x2=tt; tt=y1;y1=y2;y2=tt; tt=w1;w1=w2;w2=tt; tt=uz1;uz1=uz2;uz2=tt; tt=vz1;vz1=vz2;vz2=tt; area=-area; }
 			int minX = (int)Math.Floor(Math.Min(x0, Math.Min(x1, x2))); if (minX < 0) minX = 0;
 			int maxX = (int)Math.Ceiling(Math.Max(x0, Math.Max(x1, x2))); if (maxX > _w - 1) maxX = _w - 1;
-			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < 0) minY = 0;
-			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > _h - 1) maxY = _h - 1;
+			int minY = (int)Math.Floor(Math.Min(y0, Math.Min(y1, y2))); if (minY < by0) minY = by0;
+			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > by1 - 1) maxY = by1 - 1;
 			if (minX > maxX || minY > maxY) return;
-
+			int[] tex = t.Tex; int tw = t.Tw, th = t.Th; double shade = t.Shade; int alpha = t.Alpha;
 			double invA = 1.0 / area;
 			double d0x = y1 - y2, d0y = x2 - x1;
 			double d1x = y2 - y0, d1y = x0 - x2;
@@ -306,12 +339,10 @@ namespace OpenTaiko {
 			double e0r = (x2 - x1) * (cy - y1) - (y2 - y1) * (cx - x1);
 			double e1r = (x0 - x2) * (cy - y2) - (y0 - y2) * (cx - x2);
 			double e2r = (x1 - x0) * (cy - y0) - (y1 - y0) * (cx - x0);
-			// attribute planes (interpolated linearly in screen space): W=1/z, UZ=u/z, VZ=v/z
 			double wR = invA * (e0r * w0 + e1r * w1 + e2r * w2), wDx = invA * (d0x * w0 + d1x * w1 + d2x * w2), wDy = invA * (d0y * w0 + d1y * w1 + d2y * w2);
 			double uR = invA * (e0r * uz0 + e1r * uz1 + e2r * uz2), uDx = invA * (d0x * uz0 + d1x * uz1 + d2x * uz2), uDy = invA * (d0y * uz0 + d1y * uz1 + d2y * uz2);
 			double vR = invA * (e0r * vz0 + e1r * vz1 + e2r * vz2), vDx = invA * (d0x * vz0 + d1x * vz1 + d2x * vz2), vDy = invA * (d0y * vz0 + d1y * vz1 + d2y * vz2);
 			bool opaque = alpha >= 255; double a = alpha / 255.0, ia = 1.0 - a;
-
 			fixed (byte* B = _canvas._buf) fixed (float* D = _depth) fixed (int* T = tex) {
 				for (int py = minY; py <= maxY; py++) {
 					double E0 = e0r, E1 = e1r, E2 = e2r, W = wR, UZ = uR, VZ = vR;
@@ -329,7 +360,7 @@ namespace OpenTaiko {
 								double tr = ((packed >> 16) & 0xFF) * shade;
 								double tg = ((packed >> 8) & 0xFF) * shade;
 								double tb = (packed & 0xFF) * shade;
-								if (_fog) {                       // iw == camera-space depth z
+								if (_fog) {
 									double f = (iw - _fogStart) * _fogInv;
 									if (f > 0) { if (f > 1) f = 1; tr += (_fogR - tr) * f; tg += (_fogG - tg) * f; tb += (_fogB - tb) * f; }
 								}
@@ -337,8 +368,7 @@ namespace OpenTaiko {
 								if (opaque) {
 									D[idx] = fw; B[o] = CB(tr); B[o + 1] = CB(tg); B[o + 2] = CB(tb); B[o + 3] = 255;
 								} else {
-									B[o] = (byte)(tr * a + B[o] * ia); B[o + 1] = (byte)(tg * a + B[o + 1] * ia);
-									B[o + 2] = (byte)(tb * a + B[o + 2] * ia); B[o + 3] = 255;
+									B[o] = (byte)(tr * a + B[o] * ia); B[o + 1] = (byte)(tg * a + B[o + 1] * ia); B[o + 2] = (byte)(tb * a + B[o + 2] * ia); B[o + 3] = 255;
 								}
 							}
 						}
@@ -347,16 +377,7 @@ namespace OpenTaiko {
 					e0r += d0y; e1r += d1y; e2r += d2y; wR += wDy; uR += uDy; vR += vDy;
 				}
 			}
-			Bump(minX, minY, maxX, maxY);
 		}
-
-		private void Bump(int minX, int minY, int maxX, int maxY) {
-			if (minX < _mdx0) _mdx0 = minX; if (minY < _mdy0) _mdy0 = minY;
-			if (maxX > _mdx1) _mdx1 = maxX; if (maxY > _mdy1) _mdy1 = maxY;
-			_mddirty = true;
-		}
-		private void BeginPoly() { _mddirty = false; _mdx0 = _w; _mdy0 = _h; _mdx1 = -1; _mdy1 = -1; }
-		private void EndPoly() { if (_mddirty) _canvas.MarkDirty(_mdx0, _mdy0, _mdx1, _mdy1); }
 		#endregion
 
 		#region Scene objects (retained mode)
@@ -505,7 +526,7 @@ namespace OpenTaiko {
 			return vx*vx + vy*vy + vz*vz;
 		}
 
-		private void DrawObject(SceneObject o) {
+		private void BuildObject(SceneObject o) {
 			var d = o.D; var t = o.Transform;
 			if (o.Kind == 0) {                                           // textured quads
 				for (int i = 0; i < o.N; i++) {
@@ -519,7 +540,7 @@ namespace OpenTaiko {
 					Xform(t, d[k+9], d[k+10],d[k+11], out wx, out wy, out wz); ToCam(wx,wy,wz, out _vx[3], out _vy[3], out _vz[3]); _vu[3]=0;    _vv[3]=0;
 					int m = ClipNear(4); if (m < 3) continue;
 					Project(m);
-					for (int tri = 1; tri < m - 1; tri++) RasterTriTex(0, tri, tri+1, tex, tw, th, shade, 255);
+					for (int tri = 1; tri < m - 1; tri++) AddTexTri(0, tri, tri+1, tex, tw, th, shade, o.A);
 				}
 			} else if (o.Kind == 1) {                                    // flat quads
 				byte br = CB(o.R), bg = CB(o.G), bb = CB(o.B);
@@ -531,7 +552,7 @@ namespace OpenTaiko {
 					Xform(t, d[k+9], d[k+10],d[k+11], out wx, out wy, out wz); ToCam(wx,wy,wz, out _vx[3], out _vy[3], out _vz[3]);
 					int m = ClipNear(4); if (m < 3) continue;
 					Project(m);
-					for (int tri = 1; tri < m - 1; tri++) RasterTriFlat(0, tri, tri+1, br, bg, bb, o.A);
+					for (int tri = 1; tri < m - 1; tri++) AddFlatTri(0, tri, tri+1, br, bg, bb, o.A);
 				}
 			} else if (o.Kind == 2) {                                    // textured triangles (models)
 				for (int i = 0; i < o.N; i++) {
@@ -543,7 +564,7 @@ namespace OpenTaiko {
 					Xform(t, d[k+10], d[k+11], d[k+12], out wx, out wy, out wz); ToCam(wx,wy,wz, out _vx[2], out _vy[2], out _vz[2]); _vu[2]=d[k+13]; _vv[2]=d[k+14];
 					int m = ClipNear(3); if (m < 3) continue;
 					Project(m);
-					for (int tri = 1; tri < m - 1; tri++) RasterTriTex(0, tri, tri+1, tex, tw, th, shade, 255);
+					for (int tri = 1; tri < m - 1; tri++) AddTexTri(0, tri, tri+1, tex, tw, th, shade, o.A);
 				}
 			}
 		}
@@ -556,24 +577,25 @@ namespace OpenTaiko {
 		/// background (draw your sky/clear first) and does not Upload (call Upload after).</summary>
 		public void Render() {
 			Array.Clear(_depth, 0, _depth.Length);
-			BeginPoly();
-			// opaque pass (front → back)
+			_triN = 0;
 			_drawList.Clear();
 			foreach (var o in _objects.Values) {
 				if (!o.Visible || o.N == 0 || o.Pass != 0 || Culled(o)) continue;
 				o.Dist = DistSq(o); _drawList.Add(o);
 			}
 			_drawList.Sort(_nearFirst);
-			for (int i = 0; i < _drawList.Count; i++) DrawObject(_drawList[i]);
-			// transparent pass (back → front)
+			for (int i = 0; i < _drawList.Count; i++) BuildObject(_drawList[i]);
 			_drawList.Clear();
 			foreach (var o in _objects.Values) {
 				if (!o.Visible || o.N == 0 || o.Pass == 0 || Culled(o)) continue;
 				o.Dist = DistSq(o); _drawList.Add(o);
 			}
 			_drawList.Sort(_farFirst);
-			for (int i = 0; i < _drawList.Count; i++) DrawObject(_drawList[i]);
-			EndPoly();
+			for (int i = 0; i < _drawList.Count; i++) BuildObject(_drawList[i]);
+			int n = _threads;
+			if (n <= 1 || _triN == 0) RasterizeBand(0, _h);
+			else Parallel.For(0, n, _po, bi => RasterizeBand(bi * _h / n, (bi + 1) * _h / n));
+			_canvas.MarkDirty(0, 0, _w - 1, _h - 1);
 		}
 		#endregion
 
