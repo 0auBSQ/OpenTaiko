@@ -407,6 +407,50 @@ public class CTexture : IDisposable {
 		this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
 	}
 
+	private int _pixBufW = 0;
+	private int _pixBufH = 0;
+
+	/// <summary>
+	/// Creates or updates this texture from a raw RGBA pixel buffer
+	/// (length = width * height * 4, top-left origin).
+	/// Uses glTexSubImage2D when the size is unchanged (cheap per-frame upload),
+	/// otherwise (re)allocates the GL texture. Safe to call off the render thread
+	/// (the upload is then deferred to the main thread with a copy of the data).
+	/// </summary>
+	public void UpdatePixelBuffer(byte[] data, int width, int height) {
+		if (data == null || width <= 0 || height <= 0)
+			return;
+
+		void DoUpload(byte[] buf) {
+			unsafe {
+				fixed (byte* p = buf) {
+					if (Pointer == 0 || width != _pixBufW || height != _pixBufH) {
+						if (Pointer != 0)
+							Game.Gl.DeleteTexture(Pointer);
+						Pointer = GenTexture(p, (uint)width, (uint)height, PixelFormat.Rgba);
+						_pixBufW = width;
+						_pixBufH = height;
+						this.sz画像サイズ = new Size(width, height);
+						this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+						this.rc全画像 = new Rectangle(0, 0, width, height);
+					} else {
+						Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+						Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0,
+							(uint)width, (uint)height, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+						Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+					}
+				}
+			}
+		}
+
+		if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+			DoUpload(data);
+		} else {
+			var copy = (byte[])data.Clone();
+			Game.AsyncActions.Enqueue(() => DoUpload(copy));
+		}
+	}
+
 	/// <summary>
 	/// <para>指定されたビットマップオブジェクトから Managed テクスチャを作成する。</para>
 	/// <para>テクスチャのサイズは、BITMAP画像のサイズ以上、かつ、D3D9デバイスで生成可能な最小のサイズに自動的に調節される。

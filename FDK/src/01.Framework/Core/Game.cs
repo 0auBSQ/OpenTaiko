@@ -188,8 +188,11 @@ public abstract class Game : IDisposable {
 
 	public static int MainThreadID { get; private set; }
 
-	private Vector2D<int> ViewPortSize = new Vector2D<int>();
-	private Vector2D<int> ViewPortOffset = new Vector2D<int>();
+	// Public so input mapping can convert window-pixel mouse coords into game-surface
+	// coords (the rendered surface is aspect-fit inside the window, leaving letterbox
+	// borders described by these two values).
+	public static Vector2D<int> ViewPortSize = new Vector2D<int>();
+	public static Vector2D<int> ViewPortOffset = new Vector2D<int>();
 
 	public unsafe SKBitmap GetScreenShot() {
 		int ViewportWidth = ViewPortSize.X;

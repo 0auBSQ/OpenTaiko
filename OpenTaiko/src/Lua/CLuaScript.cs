@@ -21,6 +21,7 @@ class CLuaScript : IDisposable {
 	#region [For the new Lua module methods]
 
 	public HashSet<LuaTexture> TextureList = [];
+	public HashSet<LuaCanvas> CanvasList = [];
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];
 	public HashSet<LuaText> TextList = [];
@@ -243,6 +244,7 @@ class CLuaScript : IDisposable {
 			var lsf = new LuaSoundFunc(SoundList, dir);
 
 			LuaScript["TEXTURE"] = ltf;
+			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
 			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
@@ -320,6 +322,7 @@ class CLuaScript : IDisposable {
 		}
 		freeDisposableList(this.listDisposables);
 		freeDisposableList(this.TextureList);
+		freeDisposableList(this.CanvasList);
 		freeDisposableList(this.SoundList);
 		freeDisposableList(this.VideoList);
 		freeDisposableList(this.TextList);

@@ -1,4 +1,5 @@
-﻿using NLua;
+﻿using FDK;
+using NLua;
 
 namespace OpenTaiko {
 	public class LuaInputFunc {
@@ -114,13 +115,65 @@ namespace OpenTaiko {
 		}
 
 		// Mouse inputs
+		//
+		// The rendered surface is aspect-fit inside the window (letterbox borders when
+		// the window and game resolutions differ). These helpers convert the raw window
+		// mouse position into game-surface coordinates (the same space scripts draw in,
+		// i.e. 0..GameWindowSize), so they are correct at any window size/resolution.
 
-		// Due to the way the surface scales in non-native resolutions,
-		// the position of the mouse will only match the window, and not the surface.
-		// For now, we'll not be doing any mouse-specific methods.
+		private CInputMouse? MouseDevice => OpenTaiko.InputManager?.Mouse as CInputMouse;
 
-		//public (int x, int y) GetMousePos() {
-		//	return ((CInputMouse)OpenTaiko.InputManager.Mouse).Position;
-		//}
+		private (double x, double y) MouseSurfacePosition() {
+			var m = MouseDevice;
+			if (m == null) return (-1, -1);
+			int vw = Game.ViewPortSize.X, vh = Game.ViewPortSize.Y;
+			if (vw <= 0 || vh <= 0) return (-1, -1);
+			double sx = (m.Position.x - Game.ViewPortOffset.X) / (double)vw * GameWindowSize.Width;
+			double sy = (m.Position.y - Game.ViewPortOffset.Y) / (double)vh * GameWindowSize.Height;
+			return (sx, sy);
+		}
+
+		/// <summary>Mouse X in game-surface coordinates (0..surface width). -1 if no mouse.</summary>
+		public double GetMouseX() => MouseSurfacePosition().x;
+		/// <summary>Mouse Y in game-surface coordinates (0..surface height). -1 if no mouse.</summary>
+		public double GetMouseY() => MouseSurfacePosition().y;
+
+		/// <summary>True when the mouse is within the rendered surface (not on a letterbox border).</summary>
+		public bool IsMouseInside() {
+			var (x, y) = MouseSurfacePosition();
+			return x >= 0 && y >= 0 && x < GameWindowSize.Width && y < GameWindowSize.Height;
+		}
+
+		/// <summary>Size of the game surface (the coordinate space scripts draw in).</summary>
+		public int GetSurfaceWidth() => GameWindowSize.Width;
+		public int GetSurfaceHeight() => GameWindowSize.Height;
+
+		// Button names: "left", "right", "middle", "button4", "button5", or a numeric index.
+		private static int MouseButtonIndex(string button) {
+			switch ((button ?? "").ToLower()) {
+				case "left": return 0;
+				case "right": return 1;
+				case "middle": return 2;
+				case "button4": return 3;
+				case "button5": return 4;
+				default: return int.TryParse(button, out var i) ? i : -1;
+			}
+		}
+
+		public bool MousePressing(string button) {
+			var m = MouseDevice; if (m == null) return false;
+			int idx = MouseButtonIndex(button);
+			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyPressing(idx);
+		}
+		public bool MousePressed(string button) {
+			var m = MouseDevice; if (m == null) return false;
+			int idx = MouseButtonIndex(button);
+			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyPressed(idx);
+		}
+		public bool MouseReleased(string button) {
+			var m = MouseDevice; if (m == null) return false;
+			int idx = MouseButtonIndex(button);
+			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyReleased(idx);
+		}
 	}
 }
