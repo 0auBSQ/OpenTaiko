@@ -451,6 +451,60 @@ public class CTexture : IDisposable {
 		}
 	}
 
+	private byte[] _regionBuf = null;
+
+	/// <summary>
+	/// Updates only a sub-rectangle of the texture from the full RGBA buffer
+	/// <paramref name="data"/> (size <paramref name="fullW"/>×<paramref name="fullH"/>).
+	/// Far cheaper than re-uploading the whole texture when only a small area changed
+	/// (e.g. a brush stroke). Falls back to a full (re)create when needed.
+	/// </summary>
+	public void UpdatePixelBufferRegion(byte[] data, int fullW, int fullH,
+		int rx, int ry, int rw, int rh) {
+		if (data == null || fullW <= 0 || fullH <= 0) return;
+		// First upload or a resize → must allocate the whole texture.
+		if (Pointer == 0 || fullW != _pixBufW || fullH != _pixBufH) {
+			UpdatePixelBuffer(data, fullW, fullH);
+			return;
+		}
+		// clamp the region to the texture
+		if (rx < 0) { rw += rx; rx = 0; }
+		if (ry < 0) { rh += ry; ry = 0; }
+		if (rx + rw > fullW) rw = fullW - rx;
+		if (ry + rh > fullH) rh = fullH - ry;
+		if (rw <= 0 || rh <= 0) return;
+		// whole-texture update → upload directly without the row-copy
+		if (rx == 0 && ry == 0 && rw == fullW && rh == fullH) {
+			UpdatePixelBuffer(data, fullW, fullH);
+			return;
+		}
+
+		void DoUpload(byte[] buf) {
+			int rowBytes = rw * 4;
+			int need = rowBytes * rh;
+			if (_regionBuf == null || _regionBuf.Length < need)
+				_regionBuf = new byte[need];
+			// pack the (possibly non-contiguous) sub-rect rows into a tight buffer
+			for (int row = 0; row < rh; row++)
+				System.Buffer.BlockCopy(buf, ((ry + row) * fullW + rx) * 4, _regionBuf, row * rowBytes, rowBytes);
+			unsafe {
+				fixed (byte* p = _regionBuf) {
+					Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+					Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, rx, ry,
+						(uint)rw, (uint)rh, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+					Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+				}
+			}
+		}
+
+		if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
+			DoUpload(data);
+		} else {
+			var copy = (byte[])data.Clone();
+			Game.AsyncActions.Enqueue(() => DoUpload(copy));
+		}
+	}
+
 	/// <summary>
 	/// <para>指定されたビットマップオブジェクトから Managed テクスチャを作成する。</para>
 	/// <para>テクスチャのサイズは、BITMAP画像のサイズ以上、かつ、D3D9デバイスで生成可能な最小のサイズに自動的に調節される。

@@ -1,4 +1,5 @@
 using FDK;
+using NLua;
 
 namespace OpenTaiko {
 	/// <summary>
@@ -18,6 +19,8 @@ namespace OpenTaiko {
 		private readonly int _w;
 		private readonly int _h;
 		private bool _dirty;
+		// dirty rectangle (inclusive) so Upload only sends the changed region
+		private int _dx0, _dy0, _dx1, _dy1;
 
 		public uint Pointer => _texture != null ? _texture.Pointer : 0;
 		public int Width => _w;
@@ -30,8 +33,19 @@ namespace OpenTaiko {
 			_texture = new CTexture(_w, _h);
 			_texture.tUpdateColor4(new(1f, 1f, 1f, 1f));  // no tint
 			_texture.tUpdateOpacity(255);
-			_dirty = true;
+			MarkDirty(0, 0, _w - 1, _h - 1);
 			Upload();                              // allocate the GL texture up front
+		}
+
+		private void MarkDirty(int x0, int y0, int x1, int y1) {
+			if (!_dirty) {
+				_dx0 = x0; _dy0 = y0; _dx1 = x1; _dy1 = y1; _dirty = true;
+			} else {
+				if (x0 < _dx0) _dx0 = x0;
+				if (y0 < _dy0) _dy0 = y0;
+				if (x1 > _dx1) _dx1 = x1;
+				if (y1 > _dy1) _dy1 = y1;
+			}
 		}
 
 		#region Pixel editing
@@ -40,7 +54,7 @@ namespace OpenTaiko {
 			if ((uint)x >= (uint)_w || (uint)y >= (uint)_h) return;
 			int o = (y * _w + x) * 4;
 			_buf[o] = (byte)r; _buf[o + 1] = (byte)g; _buf[o + 2] = (byte)b; _buf[o + 3] = (byte)a;
-			_dirty = true;
+			MarkDirty(x, y, x, y);
 		}
 
 		/// <summary>Fill an axis-aligned rectangle (clipped to the canvas). r,g,b,a are 0-255.</summary>
@@ -57,7 +71,48 @@ namespace OpenTaiko {
 					o += 4;
 				}
 			}
-			_dirty = true;
+			MarkDirty(x0, y0, x1 - 1, y1 - 1);
+		}
+
+		/// <summary>Fill a filled disc (radius in pixels). r,g,b,a are 0-255.</summary>
+		public void FillCircle(int cx, int cy, int radius, int r, int g, int b, int a) {
+			if (radius < 0) return;
+			byte br = (byte)r, bg = (byte)g, bb = (byte)b, ba = (byte)a;
+			int r2 = radius * radius;
+			int y0 = Math.Max(0, cy - radius), y1 = Math.Min(_h - 1, cy + radius);
+			int minx = _w, miny = _h, maxx = -1, maxy = -1;
+			for (int yy = y0; yy <= y1; yy++) {
+				int dy = yy - cy;
+				int span = r2 - dy * dy;
+				if (span < 0) continue;
+				int hw = (int)Math.Sqrt(span);
+				int x0 = Math.Max(0, cx - hw), x1 = Math.Min(_w - 1, cx + hw);
+				if (x1 < x0) continue;
+				int o = (yy * _w + x0) * 4;
+				for (int xx = x0; xx <= x1; xx++) {
+					_buf[o] = br; _buf[o + 1] = bg; _buf[o + 2] = bb; _buf[o + 3] = ba;
+					o += 4;
+				}
+				if (x0 < minx) minx = x0;
+				if (x1 > maxx) maxx = x1;
+				if (yy < miny) miny = yy;
+				if (yy > maxy) maxy = yy;
+			}
+			if (maxx >= 0) MarkDirty(minx, miny, maxx, maxy);
+		}
+
+		/// <summary>
+		/// Stamp a thick line (a brush stroke) as overlapping discs of the given radius,
+		/// entirely in C#. One Lua call paints a whole stroke instead of hundreds.
+		/// </summary>
+		public void StrokeLine(int x0, int y0, int x1, int y1, int radius, int r, int g, int b, int a) {
+			int dx = x1 - x0, dy = y1 - y0;
+			double dist = Math.Sqrt(dx * dx + dy * dy);
+			int n = Math.Max(1, (int)(dist / Math.Max(1, radius * 0.5)));
+			for (int i = 0; i <= n; i++) {
+				double t = (double)i / n;
+				FillCircle((int)Math.Round(x0 + dx * t), (int)Math.Round(y0 + dy * t), radius, r, g, b, a);
+			}
 		}
 
 		/// <summary>Fill the whole canvas with a colour (r,g,b,a 0-255).</summary>
@@ -66,15 +121,43 @@ namespace OpenTaiko {
 		/// <summary>Reset the whole canvas to transparent.</summary>
 		public void ClearTransparent() {
 			Array.Clear(_buf, 0, _buf.Length);
-			_dirty = true;
+			MarkDirty(0, 0, _w - 1, _h - 1);
 		}
 
-		/// <summary>Push pending pixel edits to the GPU. No-op if nothing changed.</summary>
+		/// <summary>Push pending pixel edits to the GPU (only the changed region). No-op if clean.</summary>
 		public void Upload() {
 			if (_dirty && _texture != null) {
-				_texture.UpdatePixelBuffer(_buf, _w, _h);
+				_texture.UpdatePixelBufferRegion(_buf, _w, _h,
+					_dx0, _dy0, _dx1 - _dx0 + 1, _dy1 - _dy0 + 1);
 				_dirty = false;
 			}
+		}
+
+		/// <summary>
+		/// Fast full-surface blit from a Lua array of packed 0xRRGGBB integers
+		/// (1-indexed, length = count, row-major; pixels are made fully opaque), then
+		/// uploads in one call. This avoids per-pixel Lua↔C# calls, making it practical
+		/// to repaint an entire software-rendered frame every frame.
+		/// </summary>
+		public void BlitPacked(LuaTable data, int count) {
+			if (data == null) return;
+			int n = Math.Min(count, _w * _h);
+			for (int i = 0; i < n; i++) {
+				object o = data[i + 1];
+				long p = o switch {
+					long l   => l,
+					double d => (long)d,
+					int ii   => ii,
+					_        => 0L,
+				};
+				int b4 = i * 4;
+				_buf[b4]     = (byte)((p >> 16) & 0xFF);
+				_buf[b4 + 1] = (byte)((p >> 8) & 0xFF);
+				_buf[b4 + 2] = (byte)(p & 0xFF);
+				_buf[b4 + 3] = 255;
+			}
+			MarkDirty(0, 0, _w - 1, _h - 1);
+			Upload();
 		}
 		#endregion
 

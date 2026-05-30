@@ -253,6 +253,13 @@ class CLuaScript : IDisposable {
 			LuaScript["INPUT"] = new LuaInputFunc();
 			LuaScript["SIZE"] = new LuaSizeFunc();
 			LuaScript["VECTOR2"] = new LuaVector2Func();
+			LuaScript["VECTOR3"] = new LuaVector3Func();
+			LuaScript["VECTOR4"] = new LuaVector4Func();
+			LuaScript["VECTOR"] = new LuaVectorFunc();
+			LuaScript["MATRIX2"] = new LuaMatrix2Func();
+			LuaScript["MATRIX3"] = new LuaMatrix3Func();
+			LuaScript["MATRIX4"] = new LuaMatrix4Func();
+			LuaScript["MATRIX"] = new LuaMatrixFunc();
 			LuaScript["COLOR"] = new LuaColorFunc();
 			LuaScript["COUNTER"] = new LuaCounterFunc();
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
