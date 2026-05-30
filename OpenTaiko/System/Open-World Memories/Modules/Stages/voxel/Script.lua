@@ -1001,6 +1001,7 @@ end
 
 function onStart()
     scene = SCENE3D:CreateScene(RW, RH)
+    scene:SetMode("raster")                            -- voxel uses the rasterizer (the default)
     dim   = CANVAS:CreateCanvas(2, 2)
     dim:Clear(255, 255, 255, 255); dim:Upload()   -- white so SetColor can tint it any colour
     fontBig   = TEXT:Create(40)
