@@ -131,6 +131,7 @@ local function buildMenus()
     m[#m + 1] = dbgEntry("Canvas Test (Debug)",        "A tiny paint program: draw on a white sheet with the mouse, demonstrating the LuaCanvas + mouse input.", "canvas_test")
     m[#m + 1] = dbgEntry("Voxel Engine (Debug)",       "A voxel world rendered via a Lua3DScene window.", "voxel")
     m[#m + 1] = dbgEntry("Raytracer Demo (Debug)",     "The Lua3DScene path-traced raytracer mode.", "rt_demo")
+    m[#m + 1] = dbgEntry("Particle Showcase (Debug)",  "A stress test of the Lua3DScene particle engine.", "particles")
 
     return m
 end

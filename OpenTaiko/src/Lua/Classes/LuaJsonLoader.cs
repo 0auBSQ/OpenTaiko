@@ -69,6 +69,22 @@ namespace OpenTaiko {
 			return ConvertToken(token);
 		}
 
+		/// <summary>Write text to a file under the stage directory (creating subdirectories as needed).
+		/// Used by tools such as the map editor to save JSON. Rejects absolute paths and ".." traversal
+		/// so a stage can only write inside its own folder. Returns true on success.</summary>
+		public bool WriteText(string name, string contents) {
+			if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name)) return false;
+			string fullPath = Path.GetFullPath(Path.Combine(DirPath, name));
+			string root = Path.GetFullPath(DirPath);
+			if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase)) return false;
+			try {
+				string dir = Path.GetDirectoryName(fullPath);
+				if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+				File.WriteAllText(fullPath, contents);
+				return true;
+			} catch { return false; }
+		}
+
 		public Dictionary<string, object> JsonParseString(string json) {
 			if (string.IsNullOrWhiteSpace(json))
 				return new Dictionary<string, object>();

@@ -22,8 +22,8 @@ namespace OpenTaiko {
 		internal LuaCanvas _canvas;
 		internal HashSet<Lua3DScene>? _disposeList = null;
 
-		internal readonly int _w;
-		internal readonly int _h;
+		internal int _w;   // mutable: RenderView temporarily shrinks the viewport for reduced-res reflections
+		internal int _h;
 		internal float[] _depth;
 
 		// Camera, owned by the scene: position + orientation (yaw/pitch → basis) +
@@ -105,6 +105,69 @@ namespace OpenTaiko {
 		/// <summary>Near clip plane (camera-space z, > 0).</summary>
 		public void SetCameraNear(double near) { _near = near < 1e-4 ? 1e-4 : near; Revision++; }
 
+		/// <summary>Project a world point to scene-buffer pixel coords. Returns (x, y, depth); depth is
+		/// camera-space z — &lt;= 0 means behind the camera / off-screen (ignore x,y then). Lets Lua place
+		/// 2D overlays (HP bars, markers, a sun sprite) over the 3D view.</summary>
+		public (double, double, double) WorldToScreen(double wx, double wy, double wz) {
+			double rx = wx - _camX, ry = wy - _camY, rz = wz - _camZ;
+			double cx = rx * _Rx + ry * _Ry + rz * _Rz;
+			double cy = rx * _Ux + ry * _Uy + rz * _Uz;
+			double cz = rx * _Fx + ry * _Fy + rz * _Fz;
+			if (cz <= _near) return (0, 0, -1);
+			double iz = 1.0 / cz;
+			return (_w * 0.5 + cx * iz * _scale, _h * 0.5 - cy * iz * _scale, cz);
+		}
+
+		// ── Render-to-texture cameras ───────────────────────────────────────────────────
+		// Render the scene from an arbitrary camera into texture `texId` (same resolution as the
+		// scene), so a quad can display that view (mirrors, portals, security monitors, …). Mirror
+		// and overlay objects are skipped inside the render so reflections don't recurse on themselves.
+		internal bool _rttPass;
+		private LuaCanvas? _rttCanvas; private float[]? _rttDepth;
+		private readonly Dictionary<int, int[]> _rttBufs = new();
+		// Reflection/portal views (RenderView) are re-renders of the whole scene; they only show on a
+		// small surface, so rendering them at a fraction of the main resolution is a big win for little
+		// visual loss. _rttShift = 0 full, 1 half (¼ the pixels), 2 quarter (1/16). Screen-tex sampling
+		// maps the main pixel (px,py) → reduced texel (px>>shift, py>>shift).
+		internal int _rttShift = 1;
+		/// <summary>Resolution of reflection/portal re-renders relative to the main view: 0=full,
+		/// 1=half (default, ¼ the work), 2=quarter (1/16). Higher = faster, blockier reflections.</summary>
+		public void SetReflectionScale(int shift) { _rttShift = shift < 0 ? 0 : (shift > 3 ? 3 : shift); }
+
+		// Optional post-process antialiasing (FXAA-lite). Off by default; smooths a low-res render.
+		internal bool _aa;
+		/// <summary>Enable/disable post-process edge smoothing on the final colour buffer.</summary>
+		public void SetAntialias(bool on) { _aa = on; }
+
+		public void RenderView(int texId, double cx, double cy, double cz, double yawDeg, double pitchDeg,
+			double fovDeg, int clr, int clg, int clb, int flipX) {
+			int rw = _w >> _rttShift, rh = _h >> _rttShift;   // reduced render size
+			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
+			if (_rttCanvas == null || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+				_rttCanvas = new LuaCanvas(rw, rh); _rttDepth = new float[rw * rh];
+			}
+			var sc = _canvas; var sd = _depth; int ow = _w, oh = _h;
+			double ox = _camX, oy = _camY, oz = _camZ, oyaw = _yaw, opit = _pitch, ofov = _fov;
+
+			_canvas = _rttCanvas; _depth = _rttDepth; _w = rw; _h = rh;   // render the reflection small
+			_rttCanvas.Clear(clr, clg, clb, 255);
+            _rttPass = true;
+			SetCameraPosition(cx, cy, cz); SetCameraFov(fovDeg); SetCameraAngles(yawDeg, pitchDeg);
+			// a planar mirror is a reflected (left-handed) camera: flip the right axis so the image is
+			// mirrored. Without this the reflection pans the wrong way as the player turns.
+			if (flipX != 0) { _Rx = -_Rx; _Ry = -_Ry; _Rz = -_Rz; }
+			_renderer.Render(this);
+			_rttPass = false;
+
+			if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
+			var buf = _rttCanvas._buf;
+			for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+			RegisterTexturePixels(texId, px, rw, rh);
+
+			_canvas = sc; _depth = sd; _w = ow; _h = oh;
+			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
+		}
+
 		/// <summary>Cull objects whose bounds lie entirely beyond this distance from the camera
 		/// (0 = unlimited). Lowers the drawn geometry for big worlds.</summary>
 		public void SetRenderDistance(double d) { _renderDist = d < 0 ? 0 : d; Revision++; }
@@ -185,6 +248,13 @@ namespace OpenTaiko {
 			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
 		}
 
+		/// <summary>Register a texture from a raw packed-RGB int[] (length w*h). For engine-internal
+		/// use (e.g. the glTF model loader registering solid material-colour textures).</summary>
+		internal void RegisterTexturePixels(int id, int[] px, int w, int h) {
+			if (px == null || w <= 0 || h <= 0 || px.Length < w * h) return;
+			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
+		}
+
 		/// <summary>2D line in the colour buffer (screen pixels), drawn on top (no depth).</summary>
 		public void DrawLine(int x0, int y0, int x1, int y1, int r, int g, int b) {
 			byte br = RenderUtil.CB(r), bg = RenderUtil.CB(g), bb = RenderUtil.CB(b);
@@ -233,9 +303,22 @@ namespace OpenTaiko {
 		public int NewObject() { int id = _nextObjId++; _objects[id] = new SceneObject(); Revision++; return id; }
 		/// <summary>Remove an object and its geometry.</summary>
 		public void DeleteObject(int id) { _objects.Remove(id); Revision++; }
+		/// <summary>Remove every object and particle system (e.g. when restarting a level). Textures,
+		/// lights and camera are kept. Object ids restart from 1.</summary>
+		public void ClearObjects() { _objects.Clear(); _nextObjId = 1; _particleSystems.Clear(); Revision++; }
 		/// <summary>Clear an object's primitives so it can be refilled (kind resets).</summary>
 		public void ObjBegin(int id) { var o = Obj(id); if (o != null) { o.N = 0; o.Kind = -1; Revision++; } }
 		public void ObjSetVisible(int id, bool v) { var o = Obj(id); if (o != null) { o.Visible = v; Revision++; } }
+		/// <summary>Per-channel colour multiply for an object's textured surfaces (1,1,1 = none).
+		/// Cheap way to flash/tint a model (e.g. a hurt enemy red). Applies in the unlit path.</summary>
+		public void ObjSetTint(int id, double r, double g, double b) { var o = Obj(id); if (o != null) { o.TintR = r; o.TintG = g; o.TintB = b; } }
+		/// <summary>Mark an object as an overlay: drawn last, over a freshly-cleared depth buffer, so it
+		/// always renders on top of the world (first-person weapon viewmodels).</summary>
+		public void ObjSetOverlay(int id, bool on) { var o = Obj(id); if (o != null) { o.Overlay = on; Revision++; } }
+		/// <summary>Sample this object's texture by screen pixel instead of UV. With a texture produced
+		/// by <see cref="RenderView"/> (same resolution as the scene), this makes a flat quad show that
+		/// rendered view aligned to the screen — used for planar mirrors and portal surfaces.</summary>
+		public void ObjSetScreenTex(int id, bool on) { var o = Obj(id); if (o != null) { o.ScreenTex = on; Revision++; } }
 		/// <summary>Axis-aligned bounds used for frustum (behind-camera) culling.</summary>
 		public void ObjSetBounds(int id, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 			var o = Obj(id); if (o == null) return;
@@ -270,6 +353,20 @@ namespace OpenTaiko {
 			o.Transform = t; Revision++;
 		}
 		public void ObjClearTransform(int id) { var o = Obj(id); if (o != null) { o.Transform = null; Revision++; } }
+
+		/// <summary>Fast per-frame transform setter: 16 row-major doubles, no Lua-table marshaling and
+		/// no per-call allocation (reuses the object's matrix array). Use this on the hot path instead
+		/// of <see cref="ObjSetTransform"/>, which boxes a LuaTable and allocates every call.</summary>
+		public void ObjSetTransform16(int id,
+			double m0, double m1, double m2, double m3, double m4, double m5, double m6, double m7,
+			double m8, double m9, double m10, double m11, double m12, double m13, double m14, double m15) {
+			var o = Obj(id); if (o == null) return;
+			var t = o.Transform; if (t == null || t.Length != 16) { t = new double[16]; o.Transform = t; }
+			t[0] = m0; t[1] = m1; t[2] = m2; t[3] = m3; t[4] = m4; t[5] = m5; t[6] = m6; t[7] = m7;
+			t[8] = m8; t[9] = m9; t[10] = m10; t[11] = m11; t[12] = m12; t[13] = m13; t[14] = m14; t[15] = m15;
+			Revision++;
+		}
+
 
 		public void ObjAddQuadTex(int id,
 			double x0, double y0, double z0, double x1, double y1, double z1,
@@ -306,6 +403,22 @@ namespace OpenTaiko {
 			d[k+10]=x2; d[k+11]=y2; d[k+12]=z2; d[k+13]=u2; d[k+14]=v2;
 			d[k+15]=texId; d[k+16]=shade;
 			o.N++;
+		}
+
+		/// <summary>Add a billboarded 2D sprite (HD2D 2D-in-3D) to an object: an alpha-textured quad of
+		/// world size <paramref name="w"/>×<paramref name="h"/> standing with its foot at (cx,cy,cz),
+		/// drawn from the sprite registered as <paramref name="spriteId"/> (RGBA — e.g. via
+		/// RegisterSpriteFromTexture or MakeSoftCircle). <paramref name="billboard"/>: 0 = fixed (XY
+		/// plane), 1 = Y-axis (faces the camera but stays upright — the usual HD2D character/tree),
+		/// 2 = full (always faces the camera). <paramref name="cutout"/>!=0 = alpha-test + depth write
+		/// (crisp edges that occlude, put the object in the opaque pass); 0 = alpha blend (transparent
+		/// pass). The object's tint (ObjSetTint) multiplies the sprite; its alpha (ObjSetPass a) fades it.</summary>
+		public void ObjAddSprite(int id, double cx, double cy, double cz, double w, double h, int spriteId, int billboard, int cutout) {
+			var o = Obj(id); if (o == null) return;
+			o.Kind = 3; EnsureCap(o, 8);
+			int k = o.N * 8; var d = o.D;
+			d[k]=cx; d[k+1]=cy; d[k+2]=cz; d[k+3]=w; d[k+4]=h; d[k+5]=spriteId; d[k+6]=billboard; d[k+7]=cutout;
+			o.N++; Revision++;
 		}
 
 		/// <summary>Clear depth (raster) / reset accumulation (raytrace) as needed, then render
@@ -382,6 +495,141 @@ namespace OpenTaiko {
 		}
 		public void ClearLights() { _lights.Clear(); Revision++; }
 
+		// ── Particle systems ──────────────────────────────────────────────────────────────
+		// A reusable billboard particle pool. Lua creates a system, emits bursts, and calls
+		// PsUpdate(dt) each frame; live particles render automatically in the transparent pass.
+		internal readonly List<ParticleSystem> _particleSystems = new();
+		private readonly Random _prng = new();
+
+		/// <summary>Create a particle system and return its handle (index).</summary>
+		public int NewParticleSystem() { _particleSystems.Add(new ParticleSystem()); return _particleSystems.Count - 1; }
+		/// <summary>Remove all live particles from a system.</summary>
+		public void PsClear(int id) { if (id >= 0 && id < _particleSystems.Count) _particleSystems[id].Clear(); }
+		/// <summary>Advance a system's simulation by dt seconds (gravity, drag, motion, ageing).</summary>
+		public void PsUpdate(int id, double dt) { if (id >= 0 && id < _particleSystems.Count) _particleSystems[id].Update(dt); }
+		/// <summary>Live particle count (e.g. to know when an effect has finished).</summary>
+		public int PsCount(int id) => (id >= 0 && id < _particleSystems.Count) ? _particleSystems[id].Count : 0;
+		/// <summary>Max live particles a system will hold (default 4000). Raise it for heavy showcases;
+		/// extra emits beyond the cap are dropped.</summary>
+		public void PsSetCap(int id, int cap) { if (id >= 0 && id < _particleSystems.Count) _particleSystems[id].Cap = cap < 0 ? 0 : cap; }
+
+		/// <summary>Emit one particle. Colour r,g,b are 0-255; a0 is start opacity 0-1; size0→size1
+		/// is the billboard size (world units) over its life; additive!=0 glows (else alpha-blends).</summary>
+		public void PsEmit(int id, double x, double y, double z, double vx, double vy, double vz,
+			double r, double g, double b, double a0, double size0, double size1, double life,
+			double gravity, double drag, int additive) {
+			if (id < 0 || id >= _particleSystems.Count) return;
+			var psy = _particleSystems[id];
+			psy.Add(new Particle {
+				X = x, Y = y, Z = z, VX = vx, VY = vy, VZ = vz,
+				R = r, G = g, B = b, A0 = a0, Size0 = size0, Size1 = size1,
+				Life = life, MaxLife = life, Gravity = gravity, Drag = drag, Additive = additive != 0,
+				Sprite = psy.CurSprite,
+			});
+		}
+
+		/// <summary>Emit <paramref name="count"/> particles from (x,y,z) in random directions (biased
+		/// toward dir if its length &gt; 0) at up to <paramref name="speed"/>, with colour jitter and
+		/// per-particle life variation. A one-call helper for impacts / puffs / muzzle flashes.</summary>
+		public void PsBurst(int id, double x, double y, double z, int count,
+			double dirX, double dirY, double dirZ, double spread, double speed,
+			double r, double g, double b, double colorJitter, double a0, double size0, double size1,
+			double life, double lifeVar, double gravity, double drag, int additive) {
+			if (id < 0 || id >= _particleSystems.Count) return;
+			var ps = _particleSystems[id];
+			double dl = Math.Sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+			bool hasDir = dl > 1e-6;
+			if (hasDir) { dirX /= dl; dirY /= dl; dirZ /= dl; }
+			for (int i = 0; i < count; i++) {
+				// random unit direction, then blend toward dir by (1-spread)
+				double ux, uy, uz;
+				do { ux = _prng.NextDouble() * 2 - 1; uy = _prng.NextDouble() * 2 - 1; uz = _prng.NextDouble() * 2 - 1; }
+				while (ux * ux + uy * uy + uz * uz > 1.0 || ux * ux + uy * uy + uz * uz < 1e-6);
+				double ul = Math.Sqrt(ux * ux + uy * uy + uz * uz); ux /= ul; uy /= ul; uz /= ul;
+				if (hasDir) {
+					ux = dirX + (ux - dirX) * spread; uy = dirY + (uy - dirY) * spread; uz = dirZ + (uz - dirZ) * spread;
+					double bl = Math.Sqrt(ux * ux + uy * uy + uz * uz); if (bl > 1e-6) { ux /= bl; uy /= bl; uz /= bl; }
+				}
+				double sp = speed * (0.4 + 0.6 * _prng.NextDouble());
+				double jit = (_prng.NextDouble() * 2 - 1) * colorJitter;
+				double lifeF = life * (1.0 - lifeVar + 2 * lifeVar * _prng.NextDouble());
+				ps.Add(new Particle {
+					X = x, Y = y, Z = z, VX = ux * sp, VY = uy * sp, VZ = uz * sp,
+					R = r + jit, G = g + jit, B = b + jit, A0 = a0,
+					Size0 = size0, Size1 = size1, Life = lifeF, MaxLife = lifeF,
+					Gravity = gravity, Drag = drag, Additive = additive != 0,
+					Sprite = ps.CurSprite,
+				});
+			}
+			Revision++;
+		}
+
+		// ── particle sprites (alpha-textured billboards) ─────────────────────────────────
+		// A sprite is an ARGB image (a<<24 | r<<16 | g<<8 | b). Particles whose Sprite>=0 billboard the
+		// sprite — its alpha (× the particle's opacity) shapes a soft circle / crystal / glow / any
+		// Lua-supplied image, instead of a flat square. The particle's colour tints the sprite.
+		internal readonly Dictionary<int, int[]> _spritePix = new();
+		internal readonly Dictionary<int, int> _spriteW = new();
+		internal readonly Dictionary<int, int> _spriteH = new();
+
+		/// <summary>Stamp this sprite onto particles emitted next into the system (-1 = flat square).</summary>
+		public void PsSetSprite(int id, int spriteId) { if (id >= 0 && id < _particleSystems.Count) _particleSystems[id].CurSprite = spriteId; }
+
+		/// <summary>Register a particle sprite from a flat ARGB array (length w*h, top-left origin).</summary>
+		public void RegisterSprite(int spriteId, int[] argb, int w, int h) {
+			if (argb == null || w <= 0 || h <= 0) return;
+			_spritePix[spriteId] = argb; _spriteW[spriteId] = w; _spriteH[spriteId] = h; Revision++;
+		}
+
+		/// <summary>Register a particle sprite from a Lua array of ARGB ints (1-based, length w*h).</summary>
+		public void SetSpriteRGBA(int spriteId, LuaTable px, int w, int h) {
+			if (px == null || w <= 0 || h <= 0) return;
+			var a = new int[w * h];
+			for (int i = 0; i < a.Length; i++) { object v = px[i + 1]; a[i] = v is long l ? (int)l : (v is double d ? (int)d : 0); }
+			RegisterSprite(spriteId, a, w, h);
+		}
+
+		/// <summary>Capture a LuaTexture's pixels as a particle sprite, so any drawn/loaded image can be
+		/// used as a particle (main-thread; one-off at load).</summary>
+		public void RegisterSpriteFromTexture(int spriteId, LuaTexture tex) {
+			if (tex == null) return;
+			var rgba = tex.GetCachedPixels(out int w, out int h);
+			if (rgba == null || w <= 0 || h <= 0) return;
+			var a = new int[w * h];
+			for (int i = 0; i < a.Length; i++) { int o = i * 4; a[i] = (rgba[o + 3] << 24) | (rgba[o] << 16) | (rgba[o + 1] << 8) | rgba[o + 2]; }
+			RegisterSprite(spriteId, a, w, h);
+		}
+
+		/// <summary>Generate a soft round particle: white, opaque at the centre fading to 0 at the edge.
+		/// <paramref name="edge"/> shapes the falloff (1≈linear, 2-3 = soft glow). res ~32-64 is plenty.</summary>
+		public void MakeSoftCircle(int spriteId, int res, double edge) {
+			if (res < 2) res = 2; if (edge <= 0) edge = 1;
+			var a = new int[res * res]; double c = (res - 1) * 0.5;
+			for (int y = 0; y < res; y++) for (int x = 0; x < res; x++) {
+				double dx = (x - c) / c, dy = (y - c) / c; double d = Math.Sqrt(dx * dx + dy * dy);
+				double f = d >= 1 ? 0 : Math.Pow(1 - d, edge);
+				int al = (int)(f * 255 + 0.5); if (al < 0) al = 0; else if (al > 255) al = 255;
+				a[y * res + x] = (al << 24) | 0xFFFFFF;
+			}
+			RegisterSprite(spriteId, a, res, res);
+		}
+
+		/// <summary>Generate a six-armed ice-crystal/snowflake sprite (white-blue) for snow/frost.</summary>
+		public void MakeCrystal(int spriteId, int res) {
+			if (res < 4) res = 4;
+			var a = new int[res * res]; double c = (res - 1) * 0.5;
+			for (int y = 0; y < res; y++) for (int x = 0; x < res; x++) {
+				double dx = (x - c) / c, dy = (y - c) / c; double r = Math.Sqrt(dx * dx + dy * dy);
+				double ang = Math.Atan2(dy, dx);
+				double arm = Math.Pow(Math.Abs(Math.Cos(3 * ang)), 8);   // 6 sharp arms
+				double core = Math.Exp(-(r * r) / 0.02);                 // small bright centre
+				double val = Math.Max(core, arm * (r < 1 ? 1 - r : 0));
+				int al = (int)(val * 255 + 0.5); if (al < 0) al = 0; else if (al > 255) al = 255;
+				a[y * res + x] = (al << 24) | 0x00E6F0FF;                // tint white-blue (230,240,255)
+			}
+			RegisterSprite(spriteId, a, res, res);
+		}
+
 		// ── Rasterizer forward lighting ───────────────────────────────────────────────────
 		internal bool _useLights;     // master switch for the rasterizer's forward lighting
 		// Directional sun + global ambient (cheap, per-face): lit pixel = texel * (ambient +
@@ -457,7 +705,7 @@ namespace OpenTaiko {
 				_disposeList?.Remove(this);
 				_depth = Array.Empty<float>();
 				_texPix.Clear(); _texW.Clear(); _texH.Clear();
-				_objects.Clear();
+				_objects.Clear(); _particleSystems.Clear();
 				_disposedValue = true;
 			}
 		}

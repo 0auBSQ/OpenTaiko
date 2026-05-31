@@ -19,6 +19,9 @@ namespace OpenTaiko {
 		public double[] Transform;    // null = identity (row-major 4x4 for models)
 		public int Material = -1;     // raytracer material id (-1 = use a default); rasterizer ignores
 		public bool Lit = true;       // rasterizer forward lighting applies (false = render at shade only)
+		public double TintR = 1, TintG = 1, TintB = 1;   // per-channel colour multiply (unlit textured)
+		public bool Overlay;          // drawn last over a cleared depth buffer (e.g. first-person viewmodel)
+		public bool ScreenTex;        // sample the texture by screen pixel, not UV (mirrors / portals)
 		public double Dist;           // scratch: squared distance to camera (set each Render)
 	}
 
