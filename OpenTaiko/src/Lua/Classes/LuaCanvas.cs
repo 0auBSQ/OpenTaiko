@@ -231,6 +231,7 @@ namespace OpenTaiko {
 					_        => 0L,
 				};
 				int b4 = i * 4;
+				if (p < 0) { _buf[b4] = 0; _buf[b4 + 1] = 0; _buf[b4 + 2] = 0; _buf[b4 + 3] = 0; continue; }  // cutout texel
 				_buf[b4]     = (byte)((p >> 16) & 0xFF);
 				_buf[b4 + 1] = (byte)((p >> 8) & 0xFF);
 				_buf[b4 + 2] = (byte)(p & 0xFF);

@@ -27,7 +27,7 @@ local ARROW_TURN = 90.0          -- deg/sec for arrow-key look
 local RENDER_DIST = 60.0
 local FOG_START   = 38.0
 local FOG_END     = 60.0
-local THREADS     = 4            -- rasterizer threads (screen split into this many row bands)
+local THREADS     = 8            -- rasterizer threads (screen split into this many row bands)
 
 -- physics
 local GRAV       = 28.0
@@ -44,7 +44,7 @@ local SWIM_UP    = 4.2
 local WATER_MOVE = 0.6
 local WATER_DRAG = 0.86
 
-local WX, WY, WZ = 256, 128, 256
+local WX, WY, WZ = 128, 128, 128
 local SEA_LEVEL  = 64
 local SEED       = 1337
 
@@ -82,11 +82,15 @@ local ORE_DEFS = {
 local oreTexOf = {}   -- [blockId] = textureId (ore blocks AND refined "Block of X"), for texIdFor
 for _, m in ipairs(ORE_DEFS) do oreTexOf[m.id] = m.tex; oreTexOf[m.bid] = m.btex end
 
--- lighting
+-- lighting: faces bake a sky-exposure value (0..1); the engine sun is gated by it and a global
+-- ambient fills the rest. Torch point lights add on top.
 local LIGHT_MAX   = 15       -- full skylight
-local TORCH_MAX   = 13       -- torch emission level
-local LIGHT_AMB   = 0.34     -- minimum brightness multiplier in full darkness
 local SKY_FALLOFF = 3        -- skylight lost per block of vertical cover (0 = hard shadow)
+-- Faces with baked light <= LIT_MERGE_LITE (caves/shade) cap their greedy-merge size at
+-- LIT_MERGE_CAP blocks so torch point lights get enough vertices to look right. Bright faces
+-- merge freely. Lower the cap for nicer torch light, raise it (or the threshold) for more speed.
+local LIT_MERGE_LITE = 8
+local LIT_MERGE_CAP  = 4
 
 local SKY_TOP_R, SKY_TOP_G, SKY_TOP_B = 70, 130, 225
 local SKY_HOR_R, SKY_HOR_G, SKY_HOR_B = 200, 225, 255
@@ -199,19 +203,20 @@ local function isSolid(b) return b ~= AIR and b ~= WATER and b ~= TORCH end
 -- Blocks skylight / torch light. Same as solid but glass lets light through.
 local function blocksLight(b) return b ~= AIR and b ~= WATER and b ~= TORCH and b ~= GLASS end
 -- A face is drawn when the neighbour is see-through (air, water, torch or glass).
-local function isTransparent(b) return b == AIR or b == WATER or b == TORCH or b == GLASS end
+-- See-through for face culling: a neighbour that doesn't fully hide the face behind it. Leaves
+-- count (they're cutout), so blocks next to leaves still draw their face (no see-through holes
+-- into solid blocks) and leaves draw faces against each other (holes reveal the leaves behind).
+local function isTransparent(b) return b == AIR or b == WATER or b == TORCH or b == GLASS or b == LEAVES end
 -- Targetable by the crosshair (so torches/glass can be broken, water/air cannot).
 local function isSelectable(b) return b ~= AIR and b ~= WATER end
 
--- Lighting = max(vertical skylight, torch block-light). Skylight is a cheap per-column
--- value (a cell is lit by sky only if nothing solid is above it in its column), so
--- tunnels and overhangs go dark. Torch light is a proper flood fill with occlusion,
--- updated incrementally so placing/removing a torch is cheap.
+-- Skylight is a cheap per-column value (a cell is lit by sky only if nothing solid is above it
+-- in its column), so tunnels/overhangs go dark — it's baked into each face's shade. Torch light
+-- is now produced by the engine's forward point lights (each with a small per-torch occupancy
+-- grid so it casts real shadows), so there is no torch flood-fill here any more.
 local skyTop = {}     -- [x*WZ+z+1] = lowest y that still sees the sky (everything >= it is lit)
-local torchLight = {} -- [(y*WZ+z)*WX+x+1] = 0..TORCH_MAX
-local torches = {}    -- [packed idx] = {x,y,z} of each torch, for the slim-post render pass
-local torchesDirty = false   -- set when a torch is added/removed → rebuild the torch object
-local _lq, _lqv = {}, {}   -- reused BFS queues (packed index / value)
+local torches = {}    -- [packed idx] = {x,y,z} of each torch (for the posts + the point lights)
+local torchesDirty = false   -- set when a torch is added/removed → rebuild the torch object + lights
 
 local function recomputeSkyColumn(x, z)
     local top = 0
@@ -229,91 +234,9 @@ local function skyAt(x, y, z)
     local v = LIGHT_MAX - (top - y) * SKY_FALLOFF
     return v > 0 and v or 0
 end
-local function torchAt(x, y, z)
-    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return 0 end
-    return torchLight[(y * WZ + z) * WX + x + 1] or 0
-end
--- Combined 0..LIGHT_MAX light reaching a (transparent) cell.
-local function lightAt(x, y, z)
-    local s = skyAt(x, y, z)
-    local t = torchAt(x, y, z)
-    return s >= t and s or t
-end
-
--- Flood the torch light outward from every seed already written into _lq[1..qn].
-local function propagateTorch(qn)
-    local head = 1
-    while head <= qn do
-        local i = _lq[head]; head = head + 1
-        local cl = torchLight[i] or 0
-        if cl > 1 then
-            local t = i - 1
-            local x = t % WX; t = (t - x) // WX
-            local z = t % WZ; local y = (t - z) // WZ
-            local nl = cl - 1
-            local function spread(nx, ny, nz)
-                if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
-                if blocksLight(getVox(nx, ny, nz)) then return end
-                local ni = (ny * WZ + nz) * WX + nx + 1
-                if (torchLight[ni] or 0) < nl then torchLight[ni] = nl; qn = qn + 1; _lq[qn] = ni end
-            end
-            spread(x - 1, y, z); spread(x + 1, y, z)
-            spread(x, y - 1, z); spread(x, y + 1, z)
-            spread(x, y, z - 1); spread(x, y, z + 1)
-        end
-    end
-end
-
-local function addTorchLight(x, y, z, level)
-    local i0 = (y * WZ + z) * WX + x + 1
-    if (torchLight[i0] or 0) >= level then return end
-    torchLight[i0] = level
-    _lq[1] = i0
-    propagateTorch(1)
-end
-
-local function removeTorchLight(x, y, z)
-    local i0 = (y * WZ + z) * WX + x + 1
-    local startVal = torchLight[i0] or 0
-    if startVal == 0 then return end
-    torchLight[i0] = 0
-    local qn = 1; _lq[1] = i0; _lqv[1] = startVal
-    local relight, rn = {}, 0
-    local head = 1
-    while head <= qn do
-        local i = _lq[head]; local val = _lqv[head]; head = head + 1
-        local t = i - 1
-        local x2 = t % WX; t = (t - x2) // WX
-        local z2 = t % WZ; local y2 = (t - z2) // WZ
-        local function visit(nx, ny, nz)
-            if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
-            if blocksLight(getVox(nx, ny, nz)) then return end
-            local ni = (ny * WZ + nz) * WX + nx + 1
-            local nv = torchLight[ni] or 0
-            if nv ~= 0 and nv < val then
-                torchLight[ni] = 0; qn = qn + 1; _lq[qn] = ni; _lqv[qn] = nv
-            elseif nv >= val then
-                rn = rn + 1; relight[rn] = ni   -- still lit by another source → re-seed
-            end
-        end
-        visit(x2 - 1, y2, z2); visit(x2 + 1, y2, z2)
-        visit(x2, y2 - 1, z2); visit(x2, y2 + 1, z2)
-        visit(x2, y2, z2 - 1); visit(x2, y2, z2 + 1)
-    end
-    -- re-propagate from the surviving sources
-    if rn > 0 then
-        for k = 1, rn do _lq[k] = relight[k] end
-        propagateTorch(rn)
-    end
-end
-
 local function initLight()
     skyTop = {}
     for x = 0, WX - 1 do for z = 0, WZ - 1 do recomputeSkyColumn(x, z) end end
-    torchLight = {}
-    for y = 0, WY - 1 do for z = 0, WZ - 1 do for x = 0, WX - 1 do
-        if getVox(x, y, z) == TORCH then addTorchLight(x, y, z, TORCH_MAX) end
-    end end end
 end
 
 -- Plant a tree on the grass block at (x, groundY): trunk sits directly on the grass,
@@ -332,6 +255,41 @@ local function plantTree(x, z, groundY)
         end end
     end
     setVox(x, topY + 2, z, LEAVES)               -- crown tip
+end
+
+-- 3D value noise for caves (trilinear-interpolated integer hash — no sin, fast enough to run
+-- over every underground cell at gen time).
+local function hash3(x, y, z)
+    local n = (x * 374761393 + y * 668265263 + z * 1274126177 + SEED * 9176)
+    n = (n ~ (n >> 13)) * 1274126177
+    n = n ~ (n >> 16)
+    return (n & 0xFFFFFF) / 16777216.0
+end
+local function vnoise3(x, y, z)
+    local x0, y0, z0 = floor(x), floor(y), floor(z)
+    local fx, fy, fz = x - x0, y - y0, z - z0
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz)
+    local c000, c100 = hash3(x0, y0, z0),     hash3(x0 + 1, y0, z0)
+    local c010, c110 = hash3(x0, y0 + 1, z0), hash3(x0 + 1, y0 + 1, z0)
+    local c001, c101 = hash3(x0, y0, z0 + 1), hash3(x0 + 1, y0, z0 + 1)
+    local c011, c111 = hash3(x0, y0 + 1, z0 + 1), hash3(x0 + 1, y0 + 1, z0 + 1)
+    local a = c000 + (c100 - c000) * fx
+    local b = c010 + (c110 - c010) * fx
+    local cc = c001 + (c101 - c001) * fx
+    local dd = c011 + (c111 - c011) * fx
+    local e = a + (b - a) * fy
+    local f = cc + (dd - cc) * fy
+    return e + (f - e) * fz
+end
+-- Winding "worm" tunnels: where two independent noise fields are both near their mid value,
+-- their zero-sets intersect in tube-like channels — a classic, cheap cave-carving trick.
+local CAVE_FREQ   = 0.05    -- bigger = tighter/twistier tunnels
+local CAVE_THRESH = 0.038   -- bigger = more/wider caves (kept lean: cave surface area is the main
+                            -- per-frame cost, since the engine rebuilds all visible faces each frame)
+local function caveAt(x, y, z)
+    local n1 = vnoise3(x * CAVE_FREQ,        y * CAVE_FREQ * 1.7,      z * CAVE_FREQ)
+    local n2 = vnoise3(x * CAVE_FREQ + 53.3, y * CAVE_FREQ * 1.7 + 18.7, z * CAVE_FREQ + 71.1)
+    return abs(n1 - 0.5) < CAVE_THRESH and abs(n2 - 0.5) < CAVE_THRESH
 end
 
 local function generateWorld()
@@ -362,6 +320,8 @@ local function generateWorld()
                         if math.random() < 0.02 then b = COPPER_DIRT end -- copper occasionally in the dirt layer
                     end
                 end
+                -- carve natural cave tunnels through the terrain (never the bedrock floor)
+                if y >= 1 and caveAt(x, y, z) then b = AIR end
                 setVox(x, y, z, b)
             end
             for y = h + 1, SEA_LEVEL do setVox(x, y, z, WATER) end
@@ -497,8 +457,15 @@ local function registerTextures()
     local leaves = {}
     for v = 0, 15 do for u = 0, 15 do
         local n = (hash2(u, v, 23) - 0.5) * 40
-        local dark = hash2(u, v, 41) < 0.18 and -26 or 0
-        leaves[v * 16 + u + 1] = packc(60 + n + dark, 118 + n + dark, 46 + n + dark)
+        -- scattered holes (cutout): a negative texel reads as transparent in the rasterizer, so
+        -- the leaf block shows gaps like Minecraft's. Keep the border mostly solid so the leaf
+        -- texture still tiles as a recognisable block.
+        if hash2(u, v, 63) < 0.16 then
+            leaves[v * 16 + u + 1] = -1
+        else
+            local dark = hash2(u, v, 41) < 0.18 and -26 or 0
+            leaves[v * 16 + u + 1] = packc(60 + n + dark, 118 + n + dark, 46 + n + dark)
+        end
     end end
     reg(TX.leaves, leaves)
     local gs = {}
@@ -651,9 +618,6 @@ end
 
 local _mask = {}   -- scratch face mask, reused across meshChunk calls
 
--- light → brightness multiplier (ambient floor so nothing is pure black)
-local function liteMul(l) return LIGHT_AMB + (1 - LIGHT_AMB) * (l / LIGHT_MAX) end
-
 -- Mesh one chunk column (X,Z in [c*CHUNK, ..), full Y) straight into the scene's geometry
 -- batches: one textured batch per face direction (id = ci*8 + di) plus one flat batch for
 -- water (id = ci). The geometry then lives in C# and is drawn per frame with one call per
@@ -693,7 +657,6 @@ local function meshChunk(cx, cz)
     for di = 1, 6 do
         local cfg = DIRS[di]
         local da, sign, pa, qa = cfg[1], cfg[2], cfg[3], cfg[4]
-        local shade = cfg[8]
         local ddLo, ddHi = lo[da], hi[da]
         local pLo, pHi = lo[pa], hi[pa]
         local qLo, qHi = lo[qa], hi[qa]
@@ -711,9 +674,15 @@ local function meshChunk(cx, cz)
                     local val = 0
                     if b ~= AIR and b ~= TORCH then
                         local nb = voxAt(da, dd + sign, pa, p, qa, q)
-                        -- glass shows a face against anything but glass; other blocks only
-                        -- where the neighbour is see-through.
-                        local show = (b == GLASS) and (nb ~= GLASS) or (b ~= GLASS and isTransparent(nb))
+                        -- glass shows a face against anything but glass. Everything else shows where
+                        -- the neighbour is see-through — including leaves (so a solid block next to
+                        -- leaves still draws its face). But leaf-vs-leaf is NOT drawn: that would
+                        -- turn every canopy into a fully-faceted solid (huge face count) for no
+                        -- visible gain, so leaves stay a cheap hollow shell.
+                        local show
+                        if b == GLASS then show = nb ~= GLASS
+                        elseif b == LEAVES then show = isTransparent(nb) and nb ~= LEAVES
+                        else show = isTransparent(nb) end
                         if show then
                             if b == WATER then
                                 if di == 3 and nb == AIR then val = -1 end
@@ -722,7 +691,9 @@ local function meshChunk(cx, cz)
                                 if da == 1 then nb1 = dd + sign elseif da == 2 then nb2 = dd + sign else nb3 = dd + sign end
                                 if pa == 1 then nb1 = p elseif pa == 2 then nb2 = p else nb3 = p end
                                 if qa == 1 then nb1 = q elseif qa == 2 then nb2 = q else nb3 = q end
-                                local lite = lightAt(nb1, nb2, nb3)
+                                -- bake skylight exposure only; the sun, ambient and torch point
+                                -- lights are applied per-frame by the engine (scene:SetLighting).
+                                local lite = skyAt(nb1, nb2, nb3)
                                 if b == GLASS then val = -100 - lite
                                 else val = texIdFor(b, di) * 32 + lite end
                             end
@@ -739,11 +710,16 @@ local function meshChunk(cx, cz)
                     local val = mask[b0 + q + 1]
                     if val == 0 then q = q + 1
                     else
-                        -- greedy rectangle merge: grow along q, then along p, over equal vals
+                        -- greedy rectangle merge: grow along q, then along p, over equal vals.
+                        -- In low-light areas (caves/shade, where torches are used) we cap the quad
+                        -- size so the per-vertex torch falloff has enough vertices to look right;
+                        -- bright outdoor faces merge with no cap (kept cheap).
+                        local litev = (val <= -100) and (-val - 100) or (val % 32)
+                        local cap = (litev <= LIT_MERGE_LITE) and LIT_MERGE_CAP or 4096
                         local qh = 1
-                        while q + qh < qHi and mask[b0 + q + qh + 1] == val do qh = qh + 1 end
+                        while q + qh < qHi and qh < cap and mask[b0 + q + qh + 1] == val do qh = qh + 1 end
                         local pw = 1; local grow = true
-                        while p + pw < pHi and grow do
+                        while p + pw < pHi and pw < cap and grow do
                             local b2 = (p + pw - pLo) * qSpan - qLo
                             for qq = q, q + qh - 1 do if mask[b2 + qq + 1] ~= val then grow = false; break end end
                             if grow then pw = pw + 1 end
@@ -760,13 +736,15 @@ local function meshChunk(cx, cz)
                             scene:ObjAddQuadFlat(objWater, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3)
                         elseif val <= -100 then
                             local lite = -val - 100
+                            -- pass the face's SKY EXPOSURE (0..1) as "shade"; the engine's sun is
+                            -- gated by it (so it doesn't leak into caves), and ambient fills the rest.
                             scene:ObjAddQuadTex(objGlass, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
-                                TX.glass, pw, qh, shade * liteMul(lite))
+                                TX.glass, pw, qh, lite / LIGHT_MAX)
                         else
                             local texId = val // 32
                             local lite = val - texId * 32
                             scene:ObjAddQuadTex(objT, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
-                                texId, pw, qh, shade * liteMul(lite))
+                                texId, pw, qh, lite / LIGHT_MAX)
                         end
                         q = q + qh
                     end
@@ -796,53 +774,21 @@ local function remeshAt(x, y, z)
     mark(x, z); mark(x - 1, z); mark(x + 1, z); mark(x, z - 1); mark(x, z + 1)
 end
 
--- Remesh every chunk overlapping a world X/Z box (used when torch light changes,
--- which can reach up to TORCH_MAX blocks away).
-local function remeshBox(x0, z0, x1, z1)
-    local cx0 = max(0, floor(x0 / CHUNK)); local cx1 = min(ncx - 1, floor(x1 / CHUNK))
-    local cz0 = max(0, floor(z0 / CHUNK)); local cz1 = min(ncz - 1, floor(z1 / CHUNK))
-    for cz = cz0, cz1 do for cx = cx0, cx1 do meshChunk(cx, cz) end end
-end
+local torchCount = 0   -- number of torches placed (kept for HUD/debug; lights come from `torches`)
 
-local torchCount = 0   -- when 0 we skip all torch-light work (the common, fast path)
-
--- The one entry point for editing a voxel: updates the block, the column's skylight and
--- the torch-light field, then remeshes only the chunks that can have changed.
+-- The one entry point for editing a voxel: updates the block + the column's skylight, tracks
+-- torches (they drive the engine point lights, rebuilt from `torches` on the next frame), then
+-- remeshes the affected chunks. Torch light no longer touches the baked mesh, so a plain local
+-- remesh is enough.
 local function setBlock(x, y, z, newType)
     local old = getVox(x, y, z)
     if old == newType then return end
-    local wasSolid = blocksLight(old)   -- for light bookkeeping (glass doesn't block light)
     setVox(x, y, z, newType)
     recomputeSkyColumn(x, z)
-    local nowSolid = blocksLight(newType)
     local tIdx = (y * WZ + z) * WX + x + 1
     if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil; torchesDirty = true end
     if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z }; torchesDirty = true end
-
-    local lightTouched = false
-    if torchCount > 0 or old == TORCH or newType == TORCH then
-        if old == TORCH then removeTorchLight(x, y, z); lightTouched = true end
-        if (not wasSolid) and nowSolid and torchAt(x, y, z) > 0 then
-            removeTorchLight(x, y, z); lightTouched = true              -- new block casts a shadow
-        elseif wasSolid and (not nowSolid) then
-            local qn = 0                                               -- opening lets light flow in
-            local function seed(nx, ny, nz)
-                if nx < 0 or nx >= WX or ny < 0 or ny >= WY or nz < 0 or nz >= WZ then return end
-                if isSolid(getVox(nx, ny, nz)) then return end
-                if torchAt(nx, ny, nz) > 0 then qn = qn + 1; _lq[qn] = (ny * WZ + nz) * WX + nx + 1 end
-            end
-            seed(x - 1, y, z); seed(x + 1, y, z); seed(x, y - 1, z)
-            seed(x, y + 1, z); seed(x, y, z - 1); seed(x, y, z + 1)
-            if qn > 0 then propagateTorch(qn); lightTouched = true end
-        end
-        if newType == TORCH then addTorchLight(x, y, z, TORCH_MAX); lightTouched = true end
-    end
-
-    if lightTouched then
-        remeshBox(x - TORCH_MAX, z - TORCH_MAX, x + TORCH_MAX, z + TORCH_MAX)
-    else
-        remeshAt(x, y, z)
-    end
+    remeshAt(x, y, z)
 end
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -915,15 +861,36 @@ end
 -- Render
 -- ════════════════════════════════════════════════════════════════════════════════
 
+-- ── Day/night sun ───────────────────────────────────────────────────────────────
+-- A single directional "sun" arcs around the world — cheap (one dot product per face in the
+-- engine) — plus a global ambient fill. Torches add local light on top. This is what lights the
+-- world generally, instead of relying on many point lights.
+local DAY_LEN = 360.0       -- seconds for a full day/night cycle
+local dayTime = 0.28       -- [0,1) phase; starts mid-morning
+local skyMul  = 1.0        -- sky/fog brightness for the current time of day
+
+local function updateSun(dt)
+    dayTime = (dayTime + dt / DAY_LEN) % 1.0
+    local theta = dayTime * 2 * math.pi
+    local dx, dy, dz = math.cos(theta), math.sin(theta), 0.35    -- arcs over the +X/-X sky
+    local day = dy > 0 and dy or 0                               -- elevation: 0 at night, 1 at noon
+    local warm = 1 - day                                        -- dimmer + redder near the horizon
+    scene:SetSun(dx, dy, dz, 1.35 * day, (1.18 - 0.18 * warm) * day, (1.02 - 0.50 * warm) * day)
+    scene:SetAmbient(0.07 + 0.26 * day, 0.08 + 0.28 * day, 0.13 + 0.30 * day)
+    skyMul = 0.16 + 0.84 * day                                  -- keep a dark-blue night sky
+    scene:SetFog(true, SKY_HOR_R * skyMul, SKY_HOR_G * skyMul, SKY_HOR_B * skyMul, FOG_START, FOG_END)
+end
+
 local function drawSky()
     local bands = 24
     local bh = RH / bands
+    local m = skyMul
     for i = 0, bands - 1 do
         local t = i / (bands - 1)
         scene:FillRect(0, floor(i * bh), RW, floor(bh) + 2,
-            floor(SKY_TOP_R + (SKY_HOR_R - SKY_TOP_R) * t),
-            floor(SKY_TOP_G + (SKY_HOR_G - SKY_TOP_G) * t),
-            floor(SKY_TOP_B + (SKY_HOR_B - SKY_TOP_B) * t), 255)
+            floor((SKY_TOP_R + (SKY_HOR_R - SKY_TOP_R) * t) * m),
+            floor((SKY_TOP_G + (SKY_HOR_G - SKY_TOP_G) * t) * m),
+            floor((SKY_TOP_B + (SKY_HOR_B - SKY_TOP_B) * t) * m), 255)
     end
 end
 
@@ -965,10 +932,15 @@ end
 -- when a torch is added/removed. Opaque pass, so the scene draws them before water.
 local TORCH_HW = 0.09   -- half-width of the post
 local TORCH_H  = 0.62   -- post height
+-- Torch light (engine forward lighting): warm orange, finite range so it glows locally.
+local TL_R, TL_G, TL_B = 1.0, 0.55, 0.22
+local TL_INTENSITY     = 2.3
+local TL_RANGE         = 9.5
 local torchObj = nil
 local function rebuildTorches()
     if torchObj == nil then return end
     scene:ObjBegin(torchObj)
+    scene:ClearLights()                      -- the torches ARE the scene's point lights
     for _, t in pairs(torches) do
         local x, y, z = t[1], t[2], t[3]
         local cxp, czp = x + 0.5, z + 0.5
@@ -980,6 +952,9 @@ local function rebuildTorches()
         scene:ObjAddQuadTex(torchObj, x0,y0,z1, x0,y0,z0, x0,y1,z0, x0,y1,z1, TX.torch, 1, 1, 1.0) -- -X
         scene:ObjAddQuadTex(torchObj, x1,y0,z0, x1,y0,z1, x1,y1,z1, x1,y1,z0, TX.torch, 1, 1, 1.0) -- +X
         scene:ObjAddQuadTex(torchObj, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, TX.torch, 1, 1, 1.0) -- top
+        -- a warm point light at the flame (top of the post); unshadowed (the engine no longer casts
+        -- shadow rays), so torches glow locally and add on top of the sun + ambient.
+        scene:AddLightRanged(cxp, y + TORCH_H * 0.85, czp, TL_R, TL_G, TL_B, TL_INTENSITY, TL_RANGE)
     end
 end
 
@@ -1002,6 +977,7 @@ end
 function onStart()
     scene = SCENE3D:CreateScene(RW, RH)
     scene:SetMode("raster")                            -- voxel uses the rasterizer (the default)
+    scene:SetLighting(true)                            -- forward lighting: rotating sun + ambient + torches
     dim   = CANVAS:CreateCanvas(2, 2)
     dim:Clear(255, 255, 255, 255); dim:Upload()   -- white so SetColor can tint it any colour
     fontBig   = TEXT:Create(40)
@@ -1017,9 +993,11 @@ function onStart()
     buildHotbarIcons()
     torchObj = scene:NewObject()                      -- one retained object for all torches
     scene:ObjSetPass(torchObj, 0, 0, 0, 0, 255)       -- opaque (drawn before water)
+    scene:ObjSetLit(torchObj, false)                  -- posts are the light source: render full-bright
     generateWorld()
     initLight()
     greedyMesh()
+    updateSun(0)                                      -- set the initial sun / ambient / sky
     local gh = terrainHeight(floor(feetX), floor(feetZ))
     feetY = max(gh + 1, SEA_LEVEL + 1)
     spawnX, spawnY, spawnZ = feetX, feetY, feetZ
@@ -1059,6 +1037,8 @@ local function kp(k) return INPUT:KeyboardPressed(k) end
 local MENU_RECTS = { { 960, 452, 380, 72 }, { 960, 540, 380, 72 }, { 960, 628, 380, 72 } }
 
 local function updateGame(dt)
+    updateSun(dt)                       -- advance the day/night sun + ambient
+
     -- look: mouse delta + arrow keys
     local dmx, dmy = INPUT:GetMouseDelta()
     yaw = yaw + dmx * MOUSE_SENS

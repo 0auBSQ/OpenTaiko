@@ -14,16 +14,20 @@ namespace OpenTaiko {
 		public double R, G, B; public int A = 255;       // flat-quad colour
 		public bool HasBounds;
 		public double MinX, MinY, MinZ, MaxX, MaxY, MaxZ;
+		public double CenX, CenY, CenZ, Radius;   // bounding sphere, precomputed by ObjSetBounds (cull hot path)
 		public bool HasNormal; public double Nx, Ny, Nz; // axis-aligned planar back-face cull
 		public double[] Transform;    // null = identity (row-major 4x4 for models)
 		public int Material = -1;     // raytracer material id (-1 = use a default); rasterizer ignores
+		public bool Lit = true;       // rasterizer forward lighting applies (false = render at shade only)
 		public double Dist;           // scratch: squared distance to camera (set each Render)
 	}
 
-	/// <summary>A point light (raytracer only).</summary>
+	/// <summary>A point light. Used by the raytracer (inverse-square) and the rasterizer's
+	/// optional forward lighting (smooth finite falloff when <see cref="Range"/> &gt; 0).</summary>
 	internal struct SceneLight {
 		public double X, Y, Z;
 		public double R, G, B;        // colour * intensity
+		public double Range;          // rasterizer: falloff radius (0 = inverse-square); raytracer ignores
 	}
 
 	/// <summary>Material for the raytracer (rasterizer ignores it).</summary>

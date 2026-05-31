@@ -240,6 +240,9 @@ namespace OpenTaiko {
 		public void ObjSetBounds(int id, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
 			var o = Obj(id); if (o == null) return;
 			o.MinX = minX; o.MinY = minY; o.MinZ = minZ; o.MaxX = maxX; o.MaxY = maxY; o.MaxZ = maxZ; o.HasBounds = true;
+			o.CenX = (minX + maxX) * 0.5; o.CenY = (minY + maxY) * 0.5; o.CenZ = (minZ + maxZ) * 0.5;
+			double rx = (maxX - minX) * 0.5, ry = (maxY - minY) * 0.5, rz = (maxZ - minZ) * 0.5;
+			o.Radius = Math.Sqrt(rx * rx + ry * ry + rz * rz);   // once here, not per-frame in cull
 		}
 		/// <summary>Mark this object as a planar group facing (nx,ny,nz); it's skipped when the
 		/// camera is on its back side (axis-aligned back-face culling). Pass 0,0,0 to disable.</summary>
@@ -366,11 +369,42 @@ namespace OpenTaiko {
 		public void MatSetNormalMapTexture(int id, int texId) { var m = Mat(id); if (m == null) return; m.NormalTex = texId; Revision++; }
 
 		// ── Lights ──────────────────────────────────────────────────────────────────────
-		/// <summary>Add a point light at (x,y,z), colour (r,g,b) linear 0-1 × intensity.</summary>
+		/// <summary>Add a point light at (x,y,z), colour (r,g,b) linear 0-1 × intensity. The
+		/// raytracer uses inverse-square falloff; the rasterizer (if lit) too.</summary>
 		public void AddLight(double x, double y, double z, double r, double g, double b, double intensity) {
 			_lights.Add(new SceneLight { X = x, Y = y, Z = z, R = r * intensity, G = g * intensity, B = b * intensity }); Revision++;
 		}
+		/// <summary>Like <see cref="AddLight"/> but with a finite falloff radius (light reaches zero
+		/// at <paramref name="range"/>) — used by the rasterizer's forward lighting (e.g. voxel
+		/// torches). The raytracer ignores the range and uses inverse-square.</summary>
+		public void AddLightRanged(double x, double y, double z, double r, double g, double b, double intensity, double range) {
+			_lights.Add(new SceneLight { X = x, Y = y, Z = z, R = r * intensity, G = g * intensity, B = b * intensity, Range = range }); Revision++;
+		}
 		public void ClearLights() { _lights.Clear(); Revision++; }
+
+		// ── Rasterizer forward lighting ───────────────────────────────────────────────────
+		internal bool _useLights;     // master switch for the rasterizer's forward lighting
+		// Directional sun + global ambient (cheap, per-face): lit pixel = texel * (ambient +
+		// shade * sunColour * max(0, N·sunDir) + Σ point lights). `shade` is the per-face sky
+		// exposure (gates the sun so it doesn't leak into caves); point lights add on top.
+		internal double _ambR, _ambG, _ambB;
+		internal double _sunX, _sunY = 1, _sunZ, _sunR, _sunG, _sunB;   // sunDir points TO the sun
+
+		/// <summary>Enable/disable the rasterizer's forward lighting (off by default; the raytracer
+		/// has its own lighting). When on, faces are lit by the ambient + sun + point lights.</summary>
+		public void SetLighting(bool on) { _useLights = on; }
+		/// <summary>Global ambient light (linear, added to every lit face so nothing is pure black).</summary>
+		public void SetAmbient(double r, double g, double b) { _ambR = r; _ambG = g; _ambB = b; }
+		/// <summary>Directional "sun": (dx,dy,dz) is the direction TO the sun (auto-normalised),
+		/// colour (r,g,b) × brightness. Cheap — one dot product per face, gated by each face's sky
+		/// exposure. Animate it for a day/night cycle. Set colour to 0 to disable.</summary>
+		public void SetSun(double dx, double dy, double dz, double r, double g, double b) {
+			double l = Math.Sqrt(dx * dx + dy * dy + dz * dz); if (l > 1e-9) { dx /= l; dy /= l; dz /= l; }
+			_sunX = dx; _sunY = dy; _sunZ = dz; _sunR = r; _sunG = g; _sunB = b;
+		}
+		/// <summary>Exempt an object from forward lighting (renders at its baked shade only) — e.g.
+		/// the voxel torch posts, which are the light sources themselves.</summary>
+		public void ObjSetLit(int id, bool lit) { var o = Obj(id); if (o != null) o.Lit = lit; }
 
 		// ── Primitives (analytic + SDF) ───────────────────────────────────────────────────
 		/// <summary>Sphere centred (cx,cy,cz) radius r with material <paramref name="mat"/>.</summary>
