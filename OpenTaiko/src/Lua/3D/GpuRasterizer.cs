@@ -21,7 +21,7 @@ namespace OpenTaiko {
 	/// max(0,N·sun)·sun) + Σ point-lights (range or inverse-square). Cutout transparency: a negative texel
 	/// (packed&lt;0) uploads as alpha 0 and is alpha-tested away. Output goes into the scene's canvas GL
 	/// texture via an FBO over the Lua-drawn background; projection matches the CPU (vertically flipped to
-	/// match the 2D draw). NOT yet ported: particles, screen-texture mirrors, FXAA, the overlay pass.
+	/// match the 2D draw).
 	/// </summary>
 	internal sealed class GpuRasterizer : IRenderer {
 		private GL Gl => Game.Gl;
