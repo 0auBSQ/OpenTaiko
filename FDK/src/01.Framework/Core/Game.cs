@@ -42,6 +42,10 @@ namespace FDK;
 public abstract class Game : IDisposable {
 	public static GL Gl { get; private set; }
 	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+
+	/// <summary>True when the GL context is GLES 3.1+, i.e. compute shaders (the GPU renderer path)
+	/// are usable. False on the GLES 2.0 fallback, where the CPU renderers are used instead.</summary>
+	public static bool ComputeShadersAvailable { get; private set; }
 	
 	private static string[] parameters;
 	private static string GetParameterValue(string parameter = "", string parameter_full = "") {
@@ -524,6 +528,21 @@ public abstract class Game : IDisposable {
 		}
 
 		Gl = GL.GetApi(Context);
+
+		// Detect compute-shader capability (GLES 3.1+) so renderers can pick the GPU or CPU path.
+		ComputeShadersAvailable = false;
+		try {
+			if (Context is AngleContext ac) {
+				ComputeShadersAvailable = ac.ContextMajor > 3 || (ac.ContextMajor == 3 && ac.ContextMinor >= 1);
+			} else {
+				int glMaj = Gl.GetInteger(GLEnum.MajorVersion);
+				int glMin = Gl.GetInteger(GLEnum.MinorVersion);
+				ComputeShadersAvailable = glMaj > 3 || (glMaj == 3 && glMin >= 1);
+			}
+			if (ComputeShadersAvailable && !Context.TryGetProcAddress("glDispatchCompute", out _))
+				ComputeShadersAvailable = false;
+		} catch { ComputeShadersAvailable = false; }
+		Trace.TraceInformation($"Compute shaders available: {ComputeShadersAvailable}");
 
 		Gl.Enable(GLEnum.Blend);
 		BlendHelper.SetBlend(BlendType.Normal);

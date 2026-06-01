@@ -46,13 +46,22 @@ namespace OpenTaiko {
 		internal readonly Dictionary<int, int[]> _texPix = new();
 		internal readonly Dictionary<int, int> _texW = new();
 		internal readonly Dictionary<int, int> _texH = new();
+		// bumped whenever a texture's pixels change (e.g. a per-frame mirror RTT); the GPU renderer compares
+		// it to know when to re-upload that texture's GL copy instead of using its cached (stale) upload.
+		internal readonly Dictionary<int, int> _texRev = new();
+		internal void BumpTexRev(int id) { _texRev[id] = _texRev.TryGetValue(id, out var v) ? v + 1 : 1; }
 
 		// ── Renderers ─────────────────────────────────────────────────────────────────
 		// The rasterizer is created up front (the common case); the raytracer is created lazily
 		// the first time raytrace mode is selected. _renderer points at the active one.
 		private readonly Rasterizer _rasterizer = new();
 		private Raytracer? _raytracer;
+		private GpuRaytracer? _gpuRaytracer;
+		private GpuRasterizer? _gpuRasterizer;
 		private IRenderer _renderer;
+		/// <summary>Set by the GPU rasterizer when it has rendered straight into the canvas texture, so
+		/// <see cref="Upload"/> skips re-pushing the (now stale) CPU buffer over the GPU result.</summary>
+		internal bool _gpuOwnsCanvas;
 		/// <summary>Bumped on every camera / geometry / light / material / primitive edit; the
 		/// raytracer compares it to know when to reset its progressive accumulation.</summary>
 		internal int Revision;
@@ -63,7 +72,9 @@ namespace OpenTaiko {
 			_h = _canvas._h;
 			_depth = new float[_w * _h];
 			_scale = (_h * 0.5) / Math.Tan(_fov * 0.5 * Math.PI / 180.0);
-			_renderer = _rasterizer;
+			// GPU hardware-pipeline rasterizer is the DEFAULT when GLES 3.1 is available; the CPU
+			// Rasterizer remains the automatic fallback (and for "raster_cpu" / raytrace).
+			_renderer = FDK.Game.ComputeShadersAvailable ? (_gpuRasterizer = new GpuRasterizer()) : _rasterizer;
 		}
 
 		public int Width => _w;
@@ -71,7 +82,10 @@ namespace OpenTaiko {
 
 		#region Frame setup / 2D / textures
 		public void Clear(int r, int g, int b, int a) => _canvas.Clear(r, g, b, a);
-		public void FillRect(int x, int y, int w, int h, int r, int g, int b, int a) => _canvas.FillRect(x, y, w, h, r, g, b, a);
+		public void FillRect(int x, int y, int w, int h, int r, int g, int b, int a) {
+			if (_gpuOwnsCanvas && _gpuRasterizer != null) _gpuRasterizer.Rect2D(this, x, y, w, h, r, g, b, a);   // after GPU 3D: composite onto the canvas texture
+			else _canvas.FillRect(x, y, w, h, r, g, b, a);
+		}
 		public void ClearDepth() => Array.Clear(_depth, 0, _depth.Length);
 
 		// ── Scene-owned camera ────────────────────────────────────────────────────────
@@ -156,13 +170,16 @@ namespace OpenTaiko {
 			// a planar mirror is a reflected (left-handed) camera: flip the right axis so the image is
 			// mirrored. Without this the reflection pans the wrong way as the player turns.
 			if (flipX != 0) { _Rx = -_Rx; _Ry = -_Ry; _Rz = -_Rz; }
-			_renderer.Render(this);
+			// Always render reflections with the CPU rasterizer (into _rttCanvas._buf), so the capture below
+			// works regardless of which renderer drives the MAIN view — this lets doom run its main view on
+			// the GPU while mirror/portal RTTs are still produced as CPU pixels we can read back.
+			_rasterizer.Render(this);
 			_rttPass = false;
 
 			if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
 			var buf = _rttCanvas._buf;
 			for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
-			RegisterTexturePixels(texId, px, rw, rh);
+			RegisterTexturePixels(texId, px, rw, rh);   // bumps _texRev[texId] → GPU re-uploads the live mirror texture
 
 			_canvas = sc; _depth = sd; _w = ow; _h = oh;
 			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
@@ -191,15 +208,25 @@ namespace OpenTaiko {
 		/// <summary>Choose the renderer: "raster" (default) or "raytrace"/"rt" (path tracer).
 		/// Switching drops any cached/accumulated state.</summary>
 		public void SetMode(string mode) {
-			IRenderer want = (mode == "raytrace" || mode == "rt") ? (_raytracer ??= new Raytracer()) : _rasterizer;
+			IRenderer want;
+			if (mode == "raytrace_cpu" || mode == "rt_cpu") want = (_raytracer ??= new Raytracer());   // force the CPU path tracer
+			else if (mode == "raytrace" || mode == "rt")                                                // GPU compute path tracer (CPU fallback)
+				want = FDK.Game.ComputeShadersAvailable ? (_gpuRaytracer ??= new GpuRaytracer()) : (IRenderer)(_raytracer ??= new Raytracer());
+			else if (mode == "raster_cpu") want = _rasterizer;     // force the CPU rasterizer (e.g. doom mirrors)
+			else if (FDK.Game.ComputeShadersAvailable) want = (_gpuRasterizer ??= new GpuRasterizer());   // "raster"/"raster_gpu"/"gpu" → GPU (the default)
+			else want = _rasterizer;                               // CPU fallback when GLES 3.1 is unavailable
 			if (want != _renderer) { _renderer = want; _renderer.Invalidate(); Revision++; }
 		}
-		/// <summary>"raster" or "raytrace".</summary>
-		public string GetMode() => _renderer == _rasterizer ? "raster" : "raytrace";
+		/// <summary>"raster" (GPU, the default), "raster_cpu" (CPU fallback) or "raytrace".</summary>
+		public string GetMode() => _renderer == (IRenderer?)_gpuRasterizer ? "raster" : (_renderer == _rasterizer ? "raster_cpu" : "raytrace");
 
 		/// <summary>Accumulated samples-per-pixel of the path tracer since its last reset (0 in
 		/// raster mode or right after a camera/scene change). Useful for a convergence readout.</summary>
-		public int GetSampleCount() => _raytracer?.SampleCount ?? 0;
+		public int GetSampleCount() => _renderer is GpuRaytracer g ? g.SampleCount : (_renderer is Raytracer r ? r.SampleCount : 0);
+
+		/// <summary>Backend readout for raytrace mode: e.g. "GPU compute: 0.8 ms/spp → 11 spp/fr", or
+		/// "CPU fallback: …" if the compute shader couldn't build, or "CPU path tracer" when forced.</summary>
+		public string GetRaytracerStatus() => _renderer is GpuRaytracer gr ? gr.Status : (_renderer is Raytracer ? "CPU path tracer" : "");
 
 		public double GetCameraFov() => _fov;
 		public double GetCameraNear() => _near;
@@ -228,7 +255,7 @@ namespace OpenTaiko {
 				object o = pixels[i + 1];
 				px[i] = o switch { long l => (int)l, double d => (int)d, int ii => ii, _ => 0 };
 			}
-			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
+			_texPix[id] = px; _texW[id] = w; _texH[id] = h; BumpTexRev(id);
 		}
 
 		/// <summary>
@@ -245,18 +272,19 @@ namespace OpenTaiko {
 				int o = i * 4;
 				px[i] = (rgba[o] << 16) | (rgba[o + 1] << 8) | rgba[o + 2];
 			}
-			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
+			_texPix[id] = px; _texW[id] = w; _texH[id] = h; BumpTexRev(id);
 		}
 
 		/// <summary>Register a texture from a raw packed-RGB int[] (length w*h). For engine-internal
 		/// use (e.g. the glTF model loader registering solid material-colour textures).</summary>
 		internal void RegisterTexturePixels(int id, int[] px, int w, int h) {
 			if (px == null || w <= 0 || h <= 0 || px.Length < w * h) return;
-			_texPix[id] = px; _texW[id] = w; _texH[id] = h;
+			_texPix[id] = px; _texW[id] = w; _texH[id] = h; BumpTexRev(id);
 		}
 
 		/// <summary>2D line in the colour buffer (screen pixels), drawn on top (no depth).</summary>
 		public void DrawLine(int x0, int y0, int x1, int y1, int r, int g, int b) {
+			if (_gpuOwnsCanvas && _gpuRasterizer != null) { _gpuRasterizer.Line2D(this, x0, y0, x1, y1, r, g, b); return; }   // after GPU 3D: composite onto the canvas texture
 			byte br = RenderUtil.CB(r), bg = RenderUtil.CB(g), bb = RenderUtil.CB(b);
 			int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 			int dy = -Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -292,6 +320,10 @@ namespace OpenTaiko {
 
 		internal readonly Dictionary<int, SceneObject> _objects = new();
 		private int _nextObjId = 1;
+		/// <summary>Bumped only when object GEOMETRY (verts / transforms / add / delete) changes — NOT on
+		/// camera/tint/visibility edits. The GPU rasterizer rebuilds its retained vertex buffer only when
+		/// this changes, so a static scene costs nothing to re-upload per frame.</summary>
+		internal int _geomRevision;
 
 		private SceneObject? Obj(int id) => _objects.TryGetValue(id, out var o) ? o : null;
 		private static void EnsureCap(SceneObject o, int stride) {
@@ -300,14 +332,14 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>Create an empty object; returns its id. Visible by default, opaque pass.</summary>
-		public int NewObject() { int id = _nextObjId++; _objects[id] = new SceneObject(); Revision++; return id; }
+		public int NewObject() { int id = _nextObjId++; _objects[id] = new SceneObject(); Revision++; _geomRevision++; return id; }
 		/// <summary>Remove an object and its geometry.</summary>
-		public void DeleteObject(int id) { _objects.Remove(id); Revision++; }
+		public void DeleteObject(int id) { _objects.Remove(id); Revision++; _geomRevision++; }
 		/// <summary>Remove every object and particle system (e.g. when restarting a level). Textures,
 		/// lights and camera are kept. Object ids restart from 1.</summary>
-		public void ClearObjects() { _objects.Clear(); _nextObjId = 1; _particleSystems.Clear(); Revision++; }
+		public void ClearObjects() { _objects.Clear(); _nextObjId = 1; _particleSystems.Clear(); Revision++; _geomRevision++; }
 		/// <summary>Clear an object's primitives so it can be refilled (kind resets).</summary>
-		public void ObjBegin(int id) { var o = Obj(id); if (o != null) { o.N = 0; o.Kind = -1; Revision++; } }
+		public void ObjBegin(int id) { var o = Obj(id); if (o != null) { o.N = 0; o.Kind = -1; o.GeomVersion++; Revision++; _geomRevision++; } }
 		public void ObjSetVisible(int id, bool v) { var o = Obj(id); if (o != null) { o.Visible = v; Revision++; } }
 		/// <summary>Per-channel colour multiply for an object's textured surfaces (1,1,1 = none).
 		/// Cheap way to flash/tint a model (e.g. a hurt enemy red). Applies in the unlit path.</summary>
@@ -424,7 +456,19 @@ namespace OpenTaiko {
 		/// <summary>Clear depth (raster) / reset accumulation (raytrace) as needed, then render
 		/// every visible object with the active renderer. Does not touch the colour buffer's
 		/// background (draw your sky/clear first) and does not Upload (call Upload after).</summary>
-		public void Render() => _renderer.Render(this);
+		public void Render() {
+			try {
+				_renderer.Render(this);
+			} catch (Exception e) {
+				// A GPU-renderer failure (e.g. a shader that won't compile on this driver) must not take the
+				// whole stage down: fall back to the CPU rasterizer for the rest of the session and carry on.
+				if (_renderer != _rasterizer) {
+					System.Diagnostics.Trace.TraceError("Lua3DScene: GPU renderer failed, falling back to the CPU rasterizer.\n" + e);
+					_renderer = _rasterizer;
+					try { _renderer.Render(this); } catch { }
+				}
+			}
+		}
 		#endregion
 
 		#region Raytracer scene model (materials / lights / primitives)
@@ -688,7 +732,7 @@ namespace OpenTaiko {
 		#endregion
 
 		#region Display
-		public void Upload() => _canvas.Upload();
+		public void Upload() { if (_gpuOwnsCanvas) { _gpuRasterizer?.End2D(); _gpuOwnsCanvas = false; return; } _canvas.Upload(); }
 		public void Draw(int x, int y) => _canvas.Draw(x, y);
 		public void DrawAtAnchor(int x, int y, string anchor) => _canvas.DrawAtAnchor(x, y, anchor);
 		public void SetScale(float sx, float sy) => _canvas.SetScale(sx, sy);
@@ -701,6 +745,8 @@ namespace OpenTaiko {
 		private bool _disposedValue;
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
+				_gpuRasterizer?.Dispose();   // free the GPU renderer's GL resources (FBO, VBOs, textures, programs)
+				_gpuRaytracer?.Dispose();    // free the GPU path tracer's GL resources (compute program, SSBOs, accum/atlas textures, FBO)
 				_canvas?.Dispose();
 				_disposeList?.Remove(this);
 				_depth = Array.Empty<float>();

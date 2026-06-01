@@ -11,6 +11,9 @@ namespace OpenTaiko {
 		/// <summary>Returns true when this entry has an explicit unlock condition. Items with no condition are available by default.</summary>
 		public bool HasCondition => _cUC != null;
 
+		/// <summary>The condition's type id (e.g. "ch","cs","gt","gc","ig",…) or "" if none.</summary>
+		public string GetConditionType() => _cUC?.Type ?? "";
+
 		/// <summary>Returns the coin price of this unlock condition (0 if no coin cost).</summary>
 		public int GetCoinPrice() => _cUC?.CoinStack ?? 0;
 

@@ -18,7 +18,7 @@
 -- ════════════════════════════════════════════════════════════════════════════════
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local RW, RH      = 480, 270        -- internal path-trace resolution (kept low; tracing is heavy)
+local RW, RH      = 1920, 1080        -- internal path-trace resolution (kept low; tracing is heavy)
 local FOV         = 65.0
 local NEAR        = 0.05
 local MOUSE_SENS  = 0.14            -- deg per mouse pixel
@@ -543,6 +543,8 @@ function draw()
 
     txt(fontMid, "Raytracer " .. sceneName, 255, 255, 255):Draw(24, 16)
     txt(fontSmall, "samples: " .. scene:GetSampleCount() .. "  (hold still to converge)", 220, 230, 245):Draw(24, 52)
+    -- backend readout: confirms GPU compute vs CPU fallback + the measured per-sample GPU cost
+    txt(fontSmall, scene:GetRaytracerStatus(), 180, 255, 200):Draw(24, 80)
     txt(fontSmall, "WASD move   Space/LCtrl up·down   Shift faster   hold L-click + drag to look   1-8 scenes   Esc quit",
         220, 220, 225):Draw(24, SCREEN_H - 40)
 end

@@ -15,7 +15,7 @@
 -- ════════════════════════════════════════════════════════════════════════════════
 
 local SCREEN_W, SCREEN_H = 1920, 1080
-local RW, RH    = 640, 360       -- internal resolution (raster fill is native; tune freely)
+local RW, RH    = 1920, 1080       -- internal resolution (raster fill is native; tune freely)
 
 local FOV       = 70.0
 local NEAR      = 0.06
@@ -904,21 +904,29 @@ local function faceCorners(x, y, z, nx, ny, nz)
     else return {x,y,z},{x+1,y,z},{x+1,y+1,z},{x,y+1,z} end
 end
 
--- Outline only the face the ray hit (the visible front face) instead of the whole
--- cube, so occluded back edges no longer poke through neighbouring blocks.
-local function drawSelection()
+local selObj = nil
+-- The selected face's outline as four thin YELLOW quads in 3D (unlit, opaque → depth-tested), so it
+-- sits in the world: nearer blocks occlude it and it stays visible in the dark. Built each frame BEFORE
+-- scene:Render() (geometry submitted before the render is what gets drawn).
+local function buildSelection()
+    if selObj == nil then return end
+    scene:ObjBegin(selObj)
     if not hasSel then return end
     local c = { faceCorners(selX, selY, selZ, selNx, selNy, selNz) }
-    local sxv, syv, okv = {}, {}, {}
+    local nx, ny, nz = selNx, selNy, selNz
+    local off, tw = 0.012, 0.045                       -- lift off the face (no z-fight) + outline width
+    for i = 1, 4 do c[i] = { c[i][1] + nx * off, c[i][2] + ny * off, c[i][3] + nz * off } end
+    local fcx = (c[1][1] + c[2][1] + c[3][1] + c[4][1]) * 0.25   -- face centre (to push the border inward)
+    local fcy = (c[1][2] + c[2][2] + c[3][2] + c[4][2]) * 0.25
+    local fcz = (c[1][3] + c[2][3] + c[3][3] + c[4][3]) * 0.25
     for i = 1, 4 do
-        local sx, sy, ok = project(c[i][1], c[i][2], c[i][3])
-        sxv[i] = sx; syv[i] = sy; okv[i] = ok
-    end
-    for i = 1, 4 do
-        local a, b = i, (i % 4) + 1
-        if okv[a] and okv[b] then
-            scene:DrawLine(floor(sxv[a]), floor(syv[a]), floor(sxv[b]), floor(syv[b]), 20, 20, 20)
-        end
+        local a, b = c[i], c[(i % 4) + 1]
+        local ex, ey, ez = b[1] - a[1], b[2] - a[2], b[3] - a[3]
+        local tx, ty, tz = ey * nz - ez * ny, ez * nx - ex * nz, ex * ny - ey * nx   -- edge × normal, in-plane
+        local tl = math.sqrt(tx * tx + ty * ty + tz * tz); if tl > 1e-6 then tx, ty, tz = tx / tl * tw, ty / tl * tw, tz / tl * tw end
+        local mx, my, mz = (a[1] + b[1]) * 0.5, (a[2] + b[2]) * 0.5, (a[3] + b[3]) * 0.5
+        if tx * (fcx - mx) + ty * (fcy - my) + tz * (fcz - mz) < 0 then tx, ty, tz = -tx, -ty, -tz end   -- inward
+        scene:ObjAddQuadFlat(selObj, a[1], a[2], a[3], b[1], b[2], b[3], b[1] + tx, b[2] + ty, b[3] + tz, a[1] + tx, a[2] + ty, a[3] + tz)
     end
 end
 
@@ -963,9 +971,9 @@ end
 local function renderFrame()
     if torchesDirty then rebuildTorches(); torchesDirty = false end
     drawSky()
+    buildSelection()                       -- 3D outline, submitted before Render so it's depth-tested
     scene:SetCameraPosition(camX, camY, camZ)
     scene:Render()
-    drawSelection()
     drawCrosshair()
     scene:Upload()
 end
@@ -976,7 +984,7 @@ end
 
 function onStart()
     scene = SCENE3D:CreateScene(RW, RH)
-    scene:SetMode("raster")                            -- voxel uses the rasterizer (the default)
+    scene:SetMode("raster")                            -- GPU hardware-pipeline rasterizer (now the engine default; CPU fallback if GLES 3.1 unavailable)
     scene:SetLighting(true)                            -- forward lighting: rotating sun + ambient + torches
     dim   = CANVAS:CreateCanvas(2, 2)
     dim:Clear(255, 255, 255, 255); dim:Upload()   -- white so SetColor can tint it any colour
@@ -994,6 +1002,9 @@ function onStart()
     torchObj = scene:NewObject()                      -- one retained object for all torches
     scene:ObjSetPass(torchObj, 0, 0, 0, 0, 255)       -- opaque (drawn before water)
     scene:ObjSetLit(torchObj, false)                  -- posts are the light source: render full-bright
+    selObj = scene:NewObject()                        -- block-selection outline (3D, depth-tested)
+    scene:ObjSetPass(selObj, 0, 255, 255, 0, 255)     -- opaque, yellow (shows even in the dark)
+    scene:ObjSetLit(selObj, false)                    -- full-bright yellow regardless of lighting
     generateWorld()
     initLight()
     greedyMesh()

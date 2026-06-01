@@ -247,6 +247,7 @@ class CLuaScript : IDisposable {
 			LuaScript["TEXTURE"] = ltf;
 			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
 			LuaScript["SCENE3D"] = new Lua3DSceneFunc(Scene3DList);
+			LuaScript["GLOBALCAMERA"] = new LuaGlobalCamera();
 			LuaScript["MODEL"] = new LuaModelFunc(dir);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);

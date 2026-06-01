@@ -23,6 +23,7 @@ namespace OpenTaiko {
 		public bool Overlay;          // drawn last over a cleared depth buffer (e.g. first-person viewmodel)
 		public bool ScreenTex;        // sample the texture by screen pixel, not UV (mirrors / portals)
 		public double Dist;           // scratch: squared distance to camera (set each Render)
+		public int GeomVersion;       // bumped on ObjBegin; GPU rasterizer re-uploads this object's VBO only when it changes
 	}
 
 	/// <summary>A point light. Used by the raytracer (inverse-square) and the rasterizer's

@@ -90,14 +90,34 @@ public class AngleContext : IGLContext {
 			Egl.ChooseConfig(Display, configAttributes, configs, configs.Length, out int num_config);
 		}
 
-		int[] contextAttributes = new int[]
-		{
-            //Egl.CONTEXT_CLIENT_VERSION, 2,
-            Egl.CONTEXT_MAJOR_VERSION, 2,
-			Egl.CONTEXT_MINOR_VERSION, 0,
-			Egl.NONE
-		};
-		Context = Egl.CreateContext(Display, configs[0], 0, contextAttributes);
+		// Try to create a GLES 3.1 context (required for compute shaders — the GPU renderer path); fall
+		// back to GLES 2.0 if the driver/ANGLE backend can't provide one, so startup is never broken.
+		// Set OPENTAIKO_FORCE_GLES2=1 to force the legacy 2.0 path.
+		const int OPENGL_ES3_BIT_KHR = 0x00000040;
+		bool preferES31 = Environment.GetEnvironmentVariable("OPENTAIKO_FORCE_GLES2") != "1";
+		Context = 0;
+		if (preferES31) {
+			IntPtr[] configs3 = new IntPtr[1];
+			int num3 = 0;
+			int[] configAttributes3 = new int[]
+			{
+				Egl.RENDERABLE_TYPE, OPENGL_ES3_BIT_KHR,
+				Egl.BUFFER_SIZE, 0,
+				Egl.NONE
+			};
+			unsafe { Egl.ChooseConfig(Display, configAttributes3, configs3, configs3.Length, out num3); }
+			if (num3 > 0 && configs3[0] != 0) {
+				int[] ctx31 = { Egl.CONTEXT_MAJOR_VERSION, 3, Egl.CONTEXT_MINOR_VERSION, 1, Egl.NONE };
+				Context = Egl.CreateContext(Display, configs3[0], 0, ctx31);
+				if (Context != 0) { configs[0] = configs3[0]; ContextMajor = 3; ContextMinor = 1; }
+			}
+		}
+		if (Context == 0) {
+			int[] contextAttributes = { Egl.CONTEXT_MAJOR_VERSION, 2, Egl.CONTEXT_MINOR_VERSION, 0, Egl.NONE };
+			Context = Egl.CreateContext(Display, configs[0], 0, contextAttributes);
+			ContextMajor = 2; ContextMinor = 0;
+		}
+		Console.WriteLine($"GLES context created: {ContextMajor}.{ContextMinor}" + (ContextMajor >= 3 && ContextMinor >= 1 ? " (compute shaders available)" : " (no compute shaders)"));
 
 		int[] surfaceAttributes = new int[]
 		{
@@ -120,6 +140,10 @@ public class AngleContext : IGLContext {
 	}
 
 	public nint Handle { get; set; }
+
+	/// <summary>The GLES version actually granted (3.1 enables compute shaders; otherwise 2.0).</summary>
+	public int ContextMajor { get; private set; }
+	public int ContextMinor { get; private set; }
 
 	public IGLContextSource? Source { get; set; }
 
