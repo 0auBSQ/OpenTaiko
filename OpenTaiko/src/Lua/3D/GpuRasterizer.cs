@@ -26,7 +26,11 @@ namespace OpenTaiko {
 	internal sealed class GpuRasterizer : IRenderer {
 		private GL Gl => Game.Gl;
 		private const int STRIDE = 9;        // pos(3) uv(2) shade(1) normal(3)
-		private const double FAR = 10000.0;
+		// Projection far plane. Kept as tight as every stage allows (the iso faked-ortho camera sits ~46 back of a
+		// ~400-wide world → ~600 max; doom/kart are smaller) because a huge FAR with a tiny near wastes almost all
+		// the 24-bit depth range up close — that hyperbolic crush is the #1 cause of z-fighting on near-coplanar
+		// surfaces. 3000 keeps generous headroom while giving ~3x the depth resolution the old 10000 did.
+		private const double FAR = 3000.0;
 		private const int MAXL = 64;         // max point lights sent to the shader
 
 		private bool _init;
@@ -49,9 +53,40 @@ namespace OpenTaiko {
 
 		// FXAA-lite post pass (optional, SetAntialias): copy scene→temp, then edge-aware blend temp→canvas
 		private uint _progPost, _vaoPost, _fxaaTex, _fxaaFbo; private int _postTex, _postMode, _postRes; private int _fxaaW, _fxaaH;
+		// HD2D post pass (SetHD2D, "diorama"): a cheap SCREEN-SPACE tilt-shift (blur grows toward
+		// the top/bottom, a sharp middle band) + saturation/contrast/vignette grade. No depth sample (the old
+		// depth blur was too costly + the depth-texture FBO slowed the main pass), so the main FBO is back to a
+		// plain depth renderbuffer.
+		private uint _progHD2D; private int _hTex, _hRes, _hTilt, _hSat, _hVig;
 
 		private uint _fbo, _depthRb;
 		private int _fboW, _fboH; private uint _fboColorTex;
+
+		// ── sun SHADOW MAP. The lit fragment shader is compiled in TWO variants: the DEFAULT _prog has NO shadow
+		// code at all (so stages that don't use shadows are byte-identical to before — no predicated texture
+		// taps), and _progShadow adds the depth-map sampling. We SWITCH PROGRAMS per frame (BindWorldProgram)
+		// rather than branch on a uniform inside one shared shader: a uniform branch is PREDICATED on GLES/ANGLE,
+		// so the 4 shadow taps + the light-space transform would run for EVERY fragment of EVERY stage — that was
+		// the 10× regression. Variants confine the cost to scenes that actually want shadows.
+		private uint _progDepth, _progDepthSpr, _progShadow, _shadowFbo, _shadowTex;
+		private int _uDLightVP, _uDModel, _uDSLightVP, _uDSTex;
+		private int _uLightVP, _uShadow, _uShadowTexel;
+		private bool _shadowOk = true;
+		private bool _worldShadow;       // which world variant is currently bound (so a mid-pass rebind matches)
+		private const int SHADOW_SIZE = 1920;   // full-HD shadow map over a tight player-centred box (HALF 60) = ~16 texels/unit
+		private const double SHADOW_HALF = 60.0; // ortho half-extent (world units) around the focus
+		private readonly float[] _lightVP = new float[16];
+		private double _lightFx, _lightFz;       // shadow-map focus XZ (for culling far merge buckets out of the depth pass)
+		// sun-facing silhouette casters for billboard characters, rebuilt per shadow frame: a camera-facing quad
+		// presents the wrong outline to the sun (and thins/warps as you orbit), so the depth pass instead draws a
+		// quad turned to face the sun's azimuth → a stable, correctly-shaped cast shadow on the ground.
+		private uint _casterVbo;
+		private struct CBatch { public uint Tex; public int Start, Count; }
+		private readonly List<float> _casterVerts = new(512);
+		private readonly List<CBatch> _casterBatches = new(16);
+		// cached world-program uniform locations per variant; BindWorldProgram copies the active set into _u*
+		private struct WLoc { public int Cam, R, U, F, Sx, Sy, A, B, Model, Mode, Tex, Cutout, Tint, Alpha, Flat, Fog, FogCol, FogStart, FogInv, Rsh, Lit, SunDir, SunCol, Amb, NumLights, LightPosR, LightCol, LightVP, Shadow, ShadowTexel; }
+		private WLoc _locDef, _locSh;
 
 		private readonly Dictionary<int, uint> _glTex = new();
 		private readonly Dictionary<int, uint> _glSprite = new();
@@ -102,7 +137,11 @@ void main(){
     vCamZ = cz;
     gl_Position = vec4(cx * uSx, cy * uSy, uA * cz + uB, cz);
 }";
-		private const string FS = @"#version 300 es
+		// Lit/textured world FS. Compiled TWICE: as-is (default — no shadow code) and with `#define SHADOWS`
+		// prepended (adds the sun depth-map sampling). The `#version` is prepended at compile time so the define
+		// can sit right after it. A separate VARIANT — not a `uShadowOn` uniform branch — is what keeps the shadow
+		// taps from running (predicated) on every stage's fragments. In the default variant shf folds to 1.0.
+		private const string FS = @"
 precision highp float;
 in vec2 vUV; in float vShade; in float vCamZ; in vec3 vWorld; in vec3 vNormal;
 uniform int uMode;            // 0 flat, 1 textured, 2 sprite, 3 screen-tex mirror
@@ -113,9 +152,31 @@ uniform int uFog; uniform vec3 uFogCol; uniform float uFogStart; uniform float u
 uniform int uLit; uniform vec3 uSunDir, uSunCol, uAmb;
 uniform int uNumLights; uniform vec4 uLightPosR[64]; uniform vec3 uLightCol[64];
 out vec4 frag;
+#ifdef SHADOWS
+uniform mat4 uLightVP; uniform sampler2D uShadow; uniform float uShadowTexel;
+float sunShadow(vec3 wp, vec3 N){
+    vec4 lp = uLightVP * vec4(wp, 1.0);
+    vec3 p = lp.xyz / lp.w * 0.5 + 0.5;
+    if (p.z > 1.0 || p.x < 0.0 || p.x > 1.0 || p.y < 0.0 || p.y > 1.0) return 1.0;   // outside the map -> lit (ASCII only! ANGLE rejects bytes>127 even in comments)
+    // slope-scaled bias: tiny on surfaces facing the sun (shadow hugs the feet, no peter-panning), larger on
+    // grazing slopes (no acne). The old flat 0.0024 floated the shadow off the character's feet.
+    float ndl = max(dot(N, uSunDir), 0.0);
+    float bias = max(0.0008, 0.0026 * (1.0 - ndl)); float t = p.z - bias; float ts = uShadowTexel; float sh = 0.0;
+    sh += step(t, texture(uShadow, p.xy + vec2(-0.5, -0.5) * ts).r);
+    sh += step(t, texture(uShadow, p.xy + vec2( 0.5, -0.5) * ts).r);
+    sh += step(t, texture(uShadow, p.xy + vec2(-0.5,  0.5) * ts).r);
+    sh += step(t, texture(uShadow, p.xy + vec2( 0.5,  0.5) * ts).r);
+    return sh * 0.25;
+}
+#endif
 vec3 lightAt(vec3 N, vec3 wp){
     float e = sqrt(max(vShade, 0.0));
-    vec3 l = e * (uAmb + max(dot(N, uSunDir), 0.0) * uSunCol);
+#ifdef SHADOWS
+    float shf = sunShadow(wp, N);
+#else
+    float shf = 1.0;
+#endif
+    vec3 l = e * (uAmb + max(dot(N, uSunDir), 0.0) * uSunCol * shf);
     for (int i = 0; i < uNumLights; i++){
         vec3 dp = uLightPosR[i].xyz - wp; float range = uLightPosR[i].w;
         float d2 = dot(dp, dp);
@@ -135,11 +196,18 @@ void main(){
         ivec2 ts = textureSize(uTex, 0);
         ivec2 mp = clamp(ivec2(int(gl_FragCoord.x) >> uRsh, int(gl_FragCoord.y) >> uRsh), ivec2(0), ts - 1);
         vec3 m = texelFetch(uTex, mp, 0).rgb;
-        vec3 col = m * uTint + uFlat * (1.0 - uTint);
+        // reflection amount = tint * surface shade (matches the CPU's fmR = shade*tint). The mirror leaves
+        // its tint at 1 and carries the reflectivity (e.g. 0.85) in the per-vertex shade, so it stays
+        // semi-opaque (reflection blended over the base colour) rather than a full mirror.
+        vec3 fm = uTint * vShade;
+        vec3 col = m * fm + uFlat * (1.0 - fm);
         if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); col = mix(col, uFogCol, f); }
         frag = vec4(col, uAlpha); return;
     }
     if (uMode == 2){ vec4 t = texture(uTex, vUV); vec4 c = vec4(t.rgb * uTint, t.a * uAlpha); if (uCutout == 1 && c.a < 0.5) discard;
+#ifdef SHADOWS
+        c.rgb *= (0.55 + 0.45 * sunShadow(vWorld, vNormal));   // characters RECEIVE the sun shadow (a wall's shade dims them)
+#endif
         if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); c.rgb = mix(c.rgb, uFogCol, f); } frag = c; return; }
     vec3 base;
     if (uMode == 0){ base = uFlat; }
@@ -148,6 +216,26 @@ void main(){
     if (uFog == 1){ float f = clamp((vCamZ - uFogStart) * uFogInv, 0.0, 1.0); col = mix(col, uFogCol, f); }
     frag = vec4(col, uAlpha);
 }";
+
+		// shadow depth pass — opaque casters (terrain/objects): write depth from the light's POV
+		private const string VSD = @"#version 300 es
+layout(location=0) in vec3 aPos;
+uniform mat4 uLightVP, uModel;
+void main(){ gl_Position = uLightVP * uModel * vec4(aPos, 1.0); }";
+		private const string FSD = @"#version 300 es
+precision highp float;
+void main(){}";
+		// shadow depth pass — SPRITE casters (the character): alpha-test so the SILHOUETTE is what casts
+		private const string VSDS = @"#version 300 es
+layout(location=0) in vec3 aPos;
+layout(location=1) in vec2 aUV;
+uniform mat4 uLightVP;
+out vec2 vUV;
+void main(){ vUV = aUV; gl_Position = uLightVP * vec4(aPos, 1.0); }";
+		private const string FSDS = @"#version 300 es
+precision highp float;
+in vec2 vUV; uniform sampler2D uTex;
+void main(){ if (texture(uTex, vUV).a < 0.5) discard; }";
 
 		private const string VSP = @"#version 300 es
 layout(location=0) in vec3 aPos;
@@ -195,6 +283,31 @@ void main(){
     if (abs(lN+lS-2.0*lC) >= abs(lE+lW-2.0*lC)){ a=cn; b=cs; } else { a=ce; b=cw; }
     frag = vec4((c*2.0 + a + b) * 0.25, 1.0);
 }";
+		// HD2D 'diorama' grade: SCREEN-SPACE tilt-shift (sharp middle band, blur ramping to the
+		// top/bottom — only the edge bands pay the 4 taps, the centre is 1 tap) + saturation/contrast/vignette.
+		// No depth sample, so it's cheap and needs no special FBO.
+		private const string FSHD2D = @"#version 300 es
+precision highp float;
+uniform sampler2D uTex; uniform vec2 uRes; uniform float uTilt, uSat, uVig;
+out vec4 frag;
+void main(){
+    vec2 uv = (gl_FragCoord.xy) / uRes;
+    float dy = abs(uv.y - 0.5) * 2.0;                 // 0 centre .. 1 top/bottom
+    float band = smoothstep(0.34, 1.0, dy);           // middle ~34% stays sharp, ramps out
+    float rad = band * uTilt;
+    vec3 c = texture(uTex, uv).rgb;
+    if (rad > 0.5){
+        vec2 inv = 1.0 / uRes;
+        c = (c + texture(uTex, uv + vec2(0.0, rad) * inv).rgb + texture(uTex, uv + vec2(0.0, -rad) * inv).rgb
+               + texture(uTex, uv + vec2(rad, 0.0) * inv).rgb + texture(uTex, uv + vec2(-rad, 0.0) * inv).rgb) * 0.2;
+    }
+    float l = dot(c, vec3(0.299, 0.587, 0.114));
+    c = mix(vec3(l), c, uSat);                         // saturation
+    c = (c - 0.5) * 1.08 + 0.5;                        // gentle contrast
+    vec2 d = uv - 0.5;
+    c *= 1.0 - uVig * dot(d, d) * 2.2;                 // vignette
+    frag = vec4(clamp(c, 0.0, 1.0), 1.0);
+}";
 		private const string VS2D = @"#version 300 es
 layout(location=0) in vec2 aPx;
 uniform vec2 uRes;
@@ -205,20 +318,60 @@ uniform vec4 uColor;
 out vec4 frag;
 void main(){ frag = uColor; }";
 
+		// ANGLE's GLSL ES translator rejects ANY byte >127 (even inside // comments) -> the shader fails to
+		// compile -> EnsureGL throws -> the WHOLE GPU rasterizer silently falls back to the CPU one (no shadows,
+		// CPU-speed lag). That bug has bitten twice (a stray arrow/em-dash in a comment), so strip non-ASCII
+		// defensively here — harmless in comments, and code shouldn't contain any.
+		private static string Ascii(string s) {
+			bool clean = true; foreach (char c in s) if (c > 127) { clean = false; break; }
+			if (clean) return s;
+			var sb = new System.Text.StringBuilder(s.Length);
+			foreach (char c in s) if (c <= 127) sb.Append(c);
+			return sb.ToString();
+		}
+
+		// look up every world-program uniform for one variant (locations differ between the two compiled programs)
+		private WLoc QueryWLoc(uint p) {
+			int g(string n) => Gl.GetUniformLocation(p, n);
+			return new WLoc {
+				Cam = g("uCam"), R = g("uR"), U = g("uU"), F = g("uF"), Sx = g("uSx"), Sy = g("uSy"), A = g("uA"), B = g("uB"), Model = g("uModel"),
+				Mode = g("uMode"), Tex = g("uTex"), Cutout = g("uCutout"), Tint = g("uTint"), Alpha = g("uAlpha"), Flat = g("uFlat"),
+				Fog = g("uFog"), FogCol = g("uFogCol"), FogStart = g("uFogStart"), FogInv = g("uFogInv"), Rsh = g("uRsh"),
+				Lit = g("uLit"), SunDir = g("uSunDir"), SunCol = g("uSunCol"), Amb = g("uAmb"),
+				NumLights = g("uNumLights"), LightPosR = g("uLightPosR[0]"), LightCol = g("uLightCol[0]"),
+				LightVP = g("uLightVP"), Shadow = g("uShadow"), ShadowTexel = g("uShadowTexel"),
+			};
+		}
+		// bind the chosen world variant AND point the active _u* fields at that program's locations, so every
+		// Gl.Uniform* in the draw code targets the bound program (locations are NOT guaranteed equal across variants)
+		private void BindWorldProgram(bool shadow) {
+			_worldShadow = shadow && _shadowOk;
+			Gl.UseProgram(_worldShadow ? _progShadow : _prog);
+			var L = _worldShadow ? _locSh : _locDef;
+			_uCam = L.Cam; _uR = L.R; _uU = L.U; _uF = L.F; _uSx = L.Sx; _uSy = L.Sy; _uA = L.A; _uB = L.B; _uModel = L.Model;
+			_uMode = L.Mode; _uTex = L.Tex; _uCutout = L.Cutout; _uTint = L.Tint; _uAlpha = L.Alpha; _uFlat = L.Flat;
+			_uFog = L.Fog; _uFogCol = L.FogCol; _uFogStart = L.FogStart; _uFogInv = L.FogInv; _uRsh = L.Rsh;
+			_uLit = L.Lit; _uSunDir = L.SunDir; _uSunCol = L.SunCol; _uAmb = L.Amb;
+			_uNumLights = L.NumLights; _uLightPosR = L.LightPosR; _uLightCol = L.LightCol;
+			_uLightVP = L.LightVP; _uShadow = L.Shadow; _uShadowTexel = L.ShadowTexel;
+		}
+
 		private void EnsureGL() {
 			if (_init) return;
-			_prog = ShaderHelper.CreateShaderProgramFromSource(VS, FS);
+			_prog = ShaderHelper.CreateShaderProgramFromSource(Ascii(VS), Ascii("#version 300 es\n" + FS));
 			_prog2d = ShaderHelper.CreateShaderProgramFromSource(VS2D, FS2D);
 			_uRes2d = Gl.GetUniformLocation(_prog2d, "uRes"); _uColor2d = Gl.GetUniformLocation(_prog2d, "uColor");
 			_vbo2d = Gl.GenBuffer();
-			int U(string n) => Gl.GetUniformLocation(_prog, n);
-			_uCam = U("uCam"); _uR = U("uR"); _uU = U("uU"); _uF = U("uF");
-			_uSx = U("uSx"); _uSy = U("uSy"); _uA = U("uA"); _uB = U("uB"); _uModel = U("uModel");
-			_uMode = U("uMode"); _uTex = U("uTex"); _uCutout = U("uCutout"); _uTint = U("uTint");
-			_uAlpha = U("uAlpha"); _uFlat = U("uFlat"); _uRsh = U("uRsh");
-			_uFog = U("uFog"); _uFogCol = U("uFogCol"); _uFogStart = U("uFogStart"); _uFogInv = U("uFogInv");
-			_uLit = U("uLit"); _uSunDir = U("uSunDir"); _uSunCol = U("uSunCol"); _uAmb = U("uAmb");
-			_uNumLights = U("uNumLights"); _uLightPosR = U("uLightPosR[0]"); _uLightCol = U("uLightCol[0]");
+			_locDef = QueryWLoc(_prog);
+			try {   // the lit shader's SHADOWS variant + the two depth-pass programs (degrade to no-shadows on failure)
+				_progShadow = ShaderHelper.CreateShaderProgramFromSource(Ascii(VS), Ascii("#version 300 es\n#define SHADOWS\n" + FS));
+				_locSh = QueryWLoc(_progShadow);
+				_progDepth = ShaderHelper.CreateShaderProgramFromSource(VSD, FSD);
+				_uDLightVP = Gl.GetUniformLocation(_progDepth, "uLightVP"); _uDModel = Gl.GetUniformLocation(_progDepth, "uModel");
+				_progDepthSpr = ShaderHelper.CreateShaderProgramFromSource(VSDS, FSDS);
+				_uDSLightVP = Gl.GetUniformLocation(_progDepthSpr, "uLightVP"); _uDSTex = Gl.GetUniformLocation(_progDepthSpr, "uTex");
+			} catch (Exception e) { Trace.TraceError("Shadow programs failed: " + e); _shadowOk = false; }
+			BindWorldProgram(false);   // populate the active _u* set from the default variant
 			// 3D VAO uses separate attribute format (GLES 3.1): the vertex layout is fixed once here, so
 			// switching geometry buffers per draw is a single cheap glBindVertexBuffer (binding index 0).
 			_vao = Gl.GenVertexArray();
@@ -243,8 +396,11 @@ void main(){ frag = uColor; }";
 			}
 			Gl.BindVertexArray(0);
 			// FXAA post program + an empty VAO (fullscreen triangle is generated from gl_VertexID)
-			_progPost = ShaderHelper.CreateShaderProgramFromSource(VSPOST, FSPOST);
+			_progPost = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSPOST));
 			_postTex = Gl.GetUniformLocation(_progPost, "uTex"); _postMode = Gl.GetUniformLocation(_progPost, "uMode"); _postRes = Gl.GetUniformLocation(_progPost, "uRes");
+			_progHD2D = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSHD2D));
+			_hTex = Gl.GetUniformLocation(_progHD2D, "uTex"); _hRes = Gl.GetUniformLocation(_progHD2D, "uRes");
+			_hTilt = Gl.GetUniformLocation(_progHD2D, "uTilt"); _hSat = Gl.GetUniformLocation(_progHD2D, "uSat"); _hVig = Gl.GetUniformLocation(_progHD2D, "uVig");
 			_vaoPost = Gl.GenVertexArray();
 			_init = true;
 		}
@@ -271,11 +427,61 @@ void main(){ frag = uColor; }";
 			if (_fbo == 0) _fbo = Gl.GenFramebuffer();
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
 			Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, colorTex, 0);
+			// depth RENDERBUFFER (24-bit; avoids the edge z-fighting the old 16-bit buffer had). Plain renderbuffer
+			// keeps the main pass fast (a sampleable depth texture lost a driver fast path → the volcano slowdown).
 			if (_depthRb == 0) _depthRb = Gl.GenRenderbuffer();
 			Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _depthRb);
-			Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)s._w, (uint)s._h);   // 24-bit: avoids edge z-fighting the 16-bit buffer caused
+			Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)s._w, (uint)s._h);
 			Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _depthRb);
 			_fboW = s._w; _fboH = s._h; _fboColorTex = colorTex;
+		}
+
+		private unsafe bool EnsureShadowFbo() {
+			if (!_shadowOk) return false;
+			if (_shadowFbo != 0) return true;
+			try {
+				_shadowTex = Gl.GenTexture();
+				Gl.BindTexture(TextureTarget.Texture2D, _shadowTex);
+				Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.DepthComponent24, SHADOW_SIZE, SHADOW_SIZE, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, (void*)0);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+				_shadowFbo = Gl.GenFramebuffer();
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _shadowFbo);
+				Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, _shadowTex, 0);
+				var st = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+				if (st != GLEnum.FramebufferComplete) { Trace.TraceError("Shadow FBO incomplete: " + st); _shadowOk = false; return false; }
+				return true;
+			} catch (Exception e) { Trace.TraceError("Shadow FBO failed: " + e); _shadowOk = false; return false; }
+		}
+
+		// orthographic light view-projection (column-major), looking along the sun, covering an area in front of
+		// the camera. Maps a world point so clip.xy∈[-1,1] over ±HALF and clip.z (=p.z after *0.5+0.5) over [0,1].
+		private void BuildLightVP(Lua3DScene s) {
+			const double DEPTH = 260.0; double HALF = SHADOW_HALF;
+			// centre on the player (SetShadowFocus) when given — the faked-ortho iso camera sits far back, so
+			// camera+forward*38 lands behind the action and the map would miss the player entirely.
+			double fxC, fyC, fzC;
+			if (s._shadowFocusSet) { fxC = s._sfx; fyC = s._sfy; fzC = s._sfz; }
+			else { fxC = s._camX + s._Fx * 38; fyC = s._camY + s._Fy * 38; fzC = s._camZ + s._Fz * 38; }
+			_lightFx = fxC; _lightFz = fzC;   // remember the focus so the depth pass can skip far-away merge buckets
+			double lx = s._sunX, ly = s._sunY, lz = s._sunZ;
+			double ll = Math.Sqrt(lx * lx + ly * ly + lz * lz); if (ll < 1e-6) { lx = 0; ly = 1; lz = 0; } else { lx /= ll; ly /= ll; lz /= ll; }
+			double fX = -lx, fY = -ly, fZ = -lz;
+			double ex = fxC + lx * DEPTH * 0.5, ey = fyC + ly * DEPTH * 0.5, ez = fzC + lz * DEPTH * 0.5;
+			double upx = 0, upy = 1, upz = 0; if (Math.Abs(fY) > 0.95) { upx = 0; upy = 0; upz = 1; }
+			double rX = fY * upz - fZ * upy, rY = fZ * upx - fX * upz, rZ = fX * upy - fY * upx;
+			double rl = Math.Sqrt(rX * rX + rY * rY + rZ * rZ); rX /= rl; rY /= rl; rZ /= rl;
+			double uX = rY * fZ - rZ * fY, uY = rZ * fX - rX * fZ, uZ = rX * fY - rY * fX;
+			double sH = 1.0 / HALF, sD = 2.0 / DEPTH;
+			double er = ex * rX + ey * rY + ez * rZ, eu = ex * uX + ey * uY + ez * uZ, ef = ex * fX + ey * fY + ez * fZ;
+			var m = _lightVP;   // column-major (m[col*4+row])
+			m[0] = (float)(rX * sH); m[1] = (float)(uX * sH); m[2] = (float)(fX * sD); m[3] = 0;
+			m[4] = (float)(rY * sH); m[5] = (float)(uY * sH); m[6] = (float)(fY * sD); m[7] = 0;
+			m[8] = (float)(rZ * sH); m[9] = (float)(uZ * sH); m[10] = (float)(fZ * sD); m[11] = 0;
+			m[12] = (float)(-er * sH); m[13] = (float)(-eu * sH); m[14] = (float)(-ef * sD - 1.0); m[15] = 1;
 		}
 
 		private unsafe uint UploadTexture(int[] px, int w, int h, bool sprite) {
@@ -296,6 +502,7 @@ void main(){ frag = uColor; }";
 			return tex;
 		}
 		private uint TexFor(Lua3DScene s, int id) {
+			if (_rttColor.TryGetValue(id, out var rttTex)) return rttTex;   // live GPU reflection/portal target (RenderToTexture)
 			s._texRev.TryGetValue(id, out int rev);
 			if (_glTex.TryGetValue(id, out var t)) {
 				if (!_glTexRev.TryGetValue(id, out int got) || got == rev) return t;   // current (or untracked) → reuse
@@ -378,7 +585,7 @@ void main(){ frag = uColor; }";
 
 		// ── merged static opaque geometry ────────────────────────────────────────────────────────
 		private static bool StaticMerged(SceneObject o) {
-			return (o.Kind == 0 || o.Kind == 2) && o.N > 0 && o.Pass == 0 && o.Transform == null && o.Lit
+			return (o.Kind == 0 || o.Kind == 2) && o.N > 0 && o.Visible && o.Pass == 0 && o.Transform == null && o.Lit
 				&& !o.Overlay && !o.ScreenTex && o.A == 255 && o.TintR == 1.0 && o.TintG == 1.0 && o.TintB == 1.0;
 		}
 		private long ComputeStaticSig(Lua3DScene s) {
@@ -441,14 +648,34 @@ void main(){ frag = uColor; }";
 			}
 		}
 
+		private static void XfPt(double[] t, double px, double py, double pz, out double x, out double y, out double z) {
+			if (t == null) { x = px; y = py; z = pz; return; }
+			x = t[0] * px + t[1] * py + t[2] * pz + t[3];
+			y = t[4] * px + t[5] * py + t[6] * pz + t[7];
+			z = t[8] * px + t[9] * py + t[10] * pz + t[11];
+		}
 		private void BuildSprites(Lua3DScene s) {
 			_sprVerts.Clear(); _sprBatches.Clear();
 			foreach (var o in s._objects.Values) {
-				if (o.Kind != 3 || o.N <= 0 || !o.Visible) continue;
+				if ((o.Kind != 3 && o.Kind != 4) || o.N <= 0 || !o.Visible) continue;
 				var d = o.D; var t = o.Transform;
 				int curCut = -1; uint curTex = uint.MaxValue; int start = _sprVerts.Count / STRIDE;
 				void Flush() { int cnt = _sprVerts.Count / STRIDE - start; if (cnt > 0) _sprBatches.Add(new SprBatch { Obj = o, Cutout = curCut, Tex = curTex, Start = start, Count = cnt, Pass = o.Pass }); start = _sprVerts.Count / STRIDE; }
 				void Use(uint tex, int cut) { if (tex != curTex || cut != curCut) { Flush(); curTex = tex; curCut = cut; } }
+				if (o.Kind == 4) {
+					// sprite drawn on an EXPLICIT world quad (4 corners) — e.g. a shadow draped over the terrain
+					for (int i = 0; i < o.N; i++) {
+						int k = i * 14; uint gt = SpriteFor(s, (int)d[k + 12]); if (gt == 0) continue;
+						int cut = d[k + 13] != 0 ? 1 : 0; Use(gt, cut);
+						XfPt(t, d[k], d[k + 1], d[k + 2], out double q0x, out double q0y, out double q0z);
+						XfPt(t, d[k + 3], d[k + 4], d[k + 5], out double q1x, out double q1y, out double q1z);
+						XfPt(t, d[k + 6], d[k + 7], d[k + 8], out double q2x, out double q2y, out double q2z);
+						XfPt(t, d[k + 9], d[k + 10], d[k + 11], out double q3x, out double q3y, out double q3z);
+						Vtx(_sprVerts, q0x, q0y, q0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, q1x, q1y, q1z, 1, 1, 1, 0, 0, 0); Vtx(_sprVerts, q2x, q2y, q2z, 1, 0, 1, 0, 0, 0);
+						Vtx(_sprVerts, q0x, q0y, q0z, 0, 1, 1, 0, 0, 0); Vtx(_sprVerts, q2x, q2y, q2z, 1, 0, 1, 0, 0, 0); Vtx(_sprVerts, q3x, q3y, q3z, 0, 0, 1, 0, 0, 0);
+					}
+					Flush(); continue;
+				}
 				for (int i = 0; i < o.N; i++) {
 					int k = i * 8; uint gt = SpriteFor(s, (int)d[k + 5]); if (gt == 0) continue;
 					double w = d[k + 3], hgt = d[k + 4]; int bb = (int)d[k + 6]; int cut = d[k + 7] != 0 ? 1 : 0;
@@ -458,6 +685,7 @@ void main(){ frag = uColor; }";
 					double rx, ry, rz, ux, uy, uz;
 					if (bb == 2) { rx = s._Rx; ry = s._Ry; rz = s._Rz; ux = s._Ux; uy = s._Uy; uz = s._Uz; }
 					else if (bb == 1) { rx = s._Rx; ry = 0; rz = s._Rz; double rl = Math.Sqrt(rx * rx + rz * rz); if (rl > 1e-6) { rx /= rl; rz /= rl; } ux = 0; uy = 1; uz = 0; }
+					else if (bb == 3) { rx = s._GsLz; ry = 0; rz = -s._GsLx; ux = s._GsLx * s._GsLen; uy = 0; uz = s._GsLz * s._GsLen; }   // ground-flat cast shadow: lies on XZ, stretched along the light
 					else { rx = 1; ry = 0; rz = 0; ux = 0; uy = 1; uz = 0; }
 					double hw = w * 0.5;
 					double b0x = cx - rx * hw, b0y = cy - ry * hw, b0z = cz - rz * hw;
@@ -470,6 +698,44 @@ void main(){ frag = uColor; }";
 				Flush();
 			}
 			if (_sprVerts.Count > 0) { Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _spriteVbo); Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_sprVerts), BufferUsageARB.StreamDraw); }
+		}
+
+		// Build SUN-FACING silhouette quads for the upright billboard sprites (characters/NPCs/props), used only
+		// as shadow-map casters. A standing billboard is camera-facing in the main pass, which would present an
+		// edge-on or skewed outline to the sun (a thin/warped, orbit-dependent shadow). Here each sprite becomes a
+		// vertical quad whose width axis is perpendicular to the sun's azimuth, so the sun sees its full outline
+		// and the cast shadow keeps the character's shape and stretches away from the light. Grouped by texture
+		// for the alpha-test discard in the depth-sprite program.
+		private void BuildCasters(Lua3DScene s) {
+			_casterVerts.Clear(); _casterBatches.Clear();
+			double sdx = s._sunX, sdz = s._sunZ;
+			double shl = Math.Sqrt(sdx * sdx + sdz * sdz);
+			double rx, rz; if (shl > 1e-6) { rx = sdz / shl; rz = -sdx / shl; } else { rx = 1; rz = 0; }   // horizontal ⟂ to sun
+			foreach (var o in s._objects.Values) {
+				if (o.Kind != 3 || o.N <= 0 || !o.Visible || !o.CastShadow) continue;   // only billboard sprites (Kind 3); Kind 4 = flat decals; CastShadow=false skips UI markers/bubbles
+				var d = o.D; var t = o.Transform;
+				uint curTex = uint.MaxValue; int start = _casterVerts.Count / STRIDE;
+				void Flush() { int cnt = _casterVerts.Count / STRIDE - start; if (cnt > 0) _casterBatches.Add(new CBatch { Tex = curTex, Start = start, Count = cnt }); start = _casterVerts.Count / STRIDE; }
+				for (int i = 0; i < o.N; i++) {
+					int k = i * 8; uint gt = SpriteFor(s, (int)d[k + 5]); if (gt == 0) continue;
+					int bb = (int)d[k + 6]; if (bb != 1 && bb != 2) continue;   // only UPRIGHT billboards cast (skip ground-flat bb=3)
+					double w = d[k + 3], hgt = d[k + 4];
+					double cx, cy, cz;
+					if (t == null) { cx = d[k]; cy = d[k + 1]; cz = d[k + 2]; }
+					else { cx = t[0] * d[k] + t[1] * d[k + 1] + t[2] * d[k + 2] + t[3]; cy = t[4] * d[k] + t[5] * d[k + 1] + t[6] * d[k + 2] + t[7]; cz = t[8] * d[k] + t[9] * d[k + 1] + t[10] * d[k + 2] + t[11]; }
+					if (gt != curTex) { Flush(); curTex = gt; }
+					double hw = w * 0.5;
+					double b0x = cx - rx * hw, b0z = cz - rz * hw, b1x = cx + rx * hw, b1z = cz + rz * hw;
+					Vtx(_casterVerts, b0x, cy, b0z, 0, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy, b1z, 1, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy + hgt, b1z, 1, 0, 1, 0, 0, 0);
+					Vtx(_casterVerts, b0x, cy, b0z, 0, 1, 1, 0, 0, 0); Vtx(_casterVerts, b1x, cy + hgt, b1z, 1, 0, 1, 0, 0, 0); Vtx(_casterVerts, b0x, cy + hgt, b0z, 0, 0, 1, 0, 0, 0);
+				}
+				Flush();
+			}
+			if (_casterVerts.Count > 0) {
+				if (_casterVbo == 0) _casterVbo = Gl.GenBuffer();
+				Gl.BindBuffer(BufferTargetARB.ArrayBuffer, _casterVbo);
+				Gl.BufferData<float>(BufferTargetARB.ArrayBuffer, (ReadOnlySpan<float>)CollectionsMarshal.AsSpan(_casterVerts), BufferUsageARB.StreamDraw);
+			}
 		}
 
 		// ── particles (camera-facing billboards; built per frame, drawn last in the transparent pass) ──
@@ -543,53 +809,81 @@ void main(){ frag = uColor; }";
 			long sig = ComputeStaticSig(s);
 			if (sig != _staticSig) { RebuildMerged(s); _staticSig = sig; }   // synchronous, per-bucket → no spike
 
-			_opaque.Clear(); _trans.Clear(); _overlay.Clear(); _screenTex.Clear();
-			foreach (var o in s._objects.Values) {
-				if (o.Kind < 0 || o.Kind == 3 || o.N <= 0) continue;
-				if (o.ScreenTex) { if (o.Visible && !s._rttPass) _screenTex.Add(o); continue; }   // mirror/portal surfaces: own draw
-				if (StaticMerged(o)) continue;
-				if (o.Overlay) { if (o.Visible) _overlay.Add(o); continue; }   // viewmodels: own pass
-				if (!Drawable(s, o)) continue;
-				if (o.Pass == 0) _opaque.Add(o); else _trans.Add(o);
+			GatherObjects(s);
+
+			// ── SUN SHADOW MAP: depth from the light's POV. Casters = merged terrain (opaque) + the character
+			// sprites (alpha-tested silhouette). Skipped unless the scene opted in + is lit + has a sun.
+			bool shadows = s._shadows && s._useLights && (s._sunR + s._sunG + s._sunB) > 0.0 && !s._rttPass && EnsureShadowFbo();
+			if (shadows) {
+				BuildLightVP(s);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _shadowFbo);
+				Gl.Viewport(0, 0, SHADOW_SIZE, SHADOW_SIZE);
+				Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
+				Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.DepthMask(true);
+				Gl.Disable(EnableCap.CullFace); Gl.Disable(EnableCap.Blend);
+				Gl.UseProgram(_progDepth); Gl.BindVertexArray(_vao);
+				Gl.UniformMatrix4(_uDLightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
+				Gl.UniformMatrix4(_uDModel, 1, false, (ReadOnlySpan<float>)_ident);
+				// only the geometry NEAR the player matters for the shadow box → skip merge buckets outside it.
+				// This is the key perf fix for big worlds (the 400x400 volcano was drawn whole into the map each
+				// frame). Buckets are 32u; keep any within HALF + a bucket of the focus (a point beyond samples
+				// "outside the map" and reads as lit anyway, so culling is visually consistent).
+				double cullR = SHADOW_HALF + BS, cullR2 = cullR * cullR;
+				foreach (var kv in _merge) {
+					if (kv.Value.Count == 0) continue;
+					double bcx = (kv.Key.bx + 0.5) * BS - _lightFx, bcz = (kv.Key.bz + 0.5) * BS - _lightFz;
+					if (bcx * bcx + bcz * bcz > cullR2) continue;
+					Bind3D(kv.Value.Vbo); Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
+				}
+				BuildCasters(s);   // sun-facing silhouette quads for the characters (camera-facing sprites cast wrong)
+				if (_casterVerts.Count > 0) {
+					Gl.UseProgram(_progDepthSpr); Gl.BindVertexArray(_vao); Bind3D(_casterVbo);
+					Gl.UniformMatrix4(_uDSLightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
+					Gl.Uniform1(_uDSTex, 0); Gl.ActiveTexture(TextureUnit.Texture0);
+					foreach (var bt in _casterBatches) { Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count); }
+				}
 			}
-			_trans.Sort((a, b) => Dist(s, b).CompareTo(Dist(s, a)));
 
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
 			Gl.Viewport(0, 0, (uint)s._w, (uint)s._h);
 			Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
 			Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.Disable(EnableCap.CullFace);
-			Gl.UseProgram(_prog); Gl.BindVertexArray(_vao);
+			BindWorldProgram(shadows); Gl.BindVertexArray(_vao);
 			SetFrameUniforms(s);
+			if (_worldShadow) {   // only the shadow variant reads these: the light matrix + the depth map on unit 1
+				Gl.UniformMatrix4(_uLightVP, 1, false, (ReadOnlySpan<float>)_lightVP);
+				Gl.Uniform1(_uShadowTexel, 1.0f / SHADOW_SIZE);
+				Gl.ActiveTexture(TextureUnit.Texture1); Gl.BindTexture(TextureTarget.Texture2D, _shadowTex); Gl.Uniform1(_uShadow, 1);
+				Gl.ActiveTexture(TextureUnit.Texture0);
+			}
 
 			int litScene = s._useLights ? 1 : 0;
-
-			Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);
-			// merged static opaque (one draw per texture)
-			Gl.Uniform1(_uMode, 1); Gl.Uniform1(_uCutout, 0); Gl.Uniform3(_uTint, 1f, 1f, 1f); Gl.Uniform1(_uAlpha, 1f);
-			Gl.Uniform1(_uLit, litScene); Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)_ident);
-			foreach (var kv in _merge) {
-				if (kv.Value.Count == 0) continue;
-				Bind3D(kv.Value.Vbo);
-				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, kv.Key.gt);
-				Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
-			}
-			foreach (var o in _opaque) DrawObj(s, o, litScene);
-			foreach (var o in _screenTex) DrawScreenTex(s, o);   // mirrors/portals (opaque, depth-written, screen-space sample)
-			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 0) DrawSprite(bt);
-
-			Gl.DepthMask(false); Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			foreach (var o in _trans) DrawObj(s, o, litScene);
-			Bind3D(_spriteVbo);
-			foreach (var bt in _sprBatches) if (bt.Pass == 1) DrawSprite(bt);
-			DrawParticles(s);   // additive/alpha billboards, depth-tested against the scene, no depth write
+			DrawWorld(s, litScene);
 
 			// overlay pass: viewmodels over a freshly-cleared depth buffer → always on top of the world
 			if (_overlay.Count > 0) {
-				Gl.UseProgram(_prog); Gl.BindVertexArray(_vao);
+				BindWorldProgram(false); Gl.BindVertexArray(_vao);   // viewmodels: no world shadows
 				Gl.Clear((uint)ClearBufferMask.DepthBufferBit);
 				Gl.Enable(EnableCap.DepthTest); Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);
 				foreach (var o in _overlay) DrawObj(s, o, litScene);
+			}
+
+			// HD2D post pass ('diorama' grade): tilt-shift + colour grade. Copy canvas->temp, then
+			// grade temp->canvas. No depth, cheap. Only HD2D scenes opt in, so others pay nothing.
+			if (s._hd2d && !s._rttPass) {
+				EnsureFxaaTarget(s);
+				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
+				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);     // copy canvas -> temp
+				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 0);
+				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
+				Gl.UseProgram(_progHD2D);                                    // grade temp -> canvas
+				Gl.Uniform1(_hTex, 0); Gl.Uniform2(_hRes, (float)s._w, (float)s._h);
+				Gl.Uniform1(_hTilt, (float)s._hdTilt); Gl.Uniform1(_hSat, (float)s._hdSat); Gl.Uniform1(_hVig, (float)s._hdVig);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
+				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
 			}
 
 			// FXAA-lite post pass (before the stage's 2D overlay so the crosshair stays sharp):
@@ -619,6 +913,124 @@ void main(){ frag = uColor; }";
 			if (_frame >= _pruneAt) { _pruneAt = _frame + 120; Prune(s); }
 		}
 
+		// Split the per-frame object scan + the world draw out of Render so the off-screen reflection
+		// pass (RenderToTexture) can reuse them with a different camera/target.
+		private void GatherObjects(Lua3DScene s) {
+			_opaque.Clear(); _trans.Clear(); _overlay.Clear(); _screenTex.Clear();
+			foreach (var o in s._objects.Values) {
+				if (o.Kind < 0 || o.Kind == 3 || o.Kind == 4 || o.N <= 0) continue;   // 3/4 = sprites, drawn in the sprite pass
+				if (o.ScreenTex) { if (o.Visible && !s._rttPass) _screenTex.Add(o); continue; }   // mirror/portal surfaces: own draw (never inside an RTT)
+				if (StaticMerged(o)) continue;
+				if (o.Overlay) { if (o.Visible) _overlay.Add(o); continue; }   // viewmodels: own pass
+				if (!Drawable(s, o)) continue;
+				if (o.Pass == 0) _opaque.Add(o); else _trans.Add(o);
+			}
+			_trans.Sort((a, b) => Dist(s, b).CompareTo(Dist(s, a)));
+		}
+
+		// Opaque (merged + per-object + screen-tex + sprites) then transparent (glass writes depth, then
+		// sprites/particles). Assumes the program/VAO are bound and SetFrameUniforms already ran.
+		private void DrawWorld(Lua3DScene s, int litScene) {
+			Gl.DepthMask(true); Gl.Disable(EnableCap.Blend);
+			// merged static opaque (one draw per texture)
+			Gl.Uniform1(_uMode, 1); Gl.Uniform1(_uCutout, 0); Gl.Uniform3(_uTint, 1f, 1f, 1f); Gl.Uniform1(_uAlpha, 1f);
+			Gl.Uniform1(_uLit, litScene); Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)_ident);
+			foreach (var kv in _merge) {
+				if (kv.Value.Count == 0) continue;
+				Bind3D(kv.Value.Vbo);
+				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, kv.Key.gt);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, (uint)kv.Value.Count);
+			}
+			foreach (var o in _opaque) DrawObj(s, o, litScene);
+			foreach (var o in _screenTex) DrawScreenTex(s, o);   // mirrors/portals (opaque, depth-written, screen-space sample)
+			Bind3D(_spriteVbo);
+			foreach (var bt in _sprBatches) if (bt.Pass == 0) DrawSprite(bt);
+
+			// Transparent pass, back-to-front, no depth write. ORDER matters: soft sprites + particles are
+			// drawn BEFORE the alpha-blended glass objects, so a glass pane drawn afterward blends OVER the
+			// stuff behind it (death fog, bolts) — they read as dimmed THROUGH the glass instead of either
+			// popping in front of it (no ordering) or vanishing (if glass wrote depth). Glass panes are
+			// back-to-front sorted among themselves so a nearer pane layers over a farther one.
+			Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+			Gl.DepthMask(false);
+			Bind3D(_spriteVbo);
+			foreach (var bt in _sprBatches) if (bt.Pass == 1) DrawSprite(bt);
+			DrawParticles(s);   // additive/alpha billboards, depth-tested against opaque (switches to the particle program)
+			// glass last, over the particles/sprites behind it — rebind the active world program/VAO + blend
+			// state that DrawParticles left on the particle program (_u* are still this frame's variant).
+			Gl.UseProgram(_worldShadow ? _progShadow : _prog); Gl.BindVertexArray(_vao);
+			Gl.Enable(EnableCap.Blend); Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha); Gl.DepthMask(false);
+			foreach (var o in _trans) DrawObj(s, o, litScene);
+		}
+
+		// ── GPU off-screen reflection/portal render — replaces the CPU RenderView for mirrors/portals ──
+		// Renders the scene from the camera CURRENTLY set on `s` (Lua3DScene.RenderView positions it) into a
+		// dedicated rgba8 colour texture sized rw×rh, then registers that texture as texId's GL texture so the
+		// mirror/portal surface (uMode 3) samples it directly — no CPU rasterise, no pixel readback. ScreenTex
+		// objects are skipped (no mirrors-in-mirrors) because s._rttPass is true while this runs. This is the
+		// fix for the manor's 25fps: a 233-sector reflection re-render is now a GPU pass, not a CPU one.
+		private int _rttW, _rttH;
+		private readonly Dictionary<int, uint> _rttColor = new();   // texId → colour texture
+		private readonly Dictionary<int, uint> _rttFbos = new();    // texId → its OWN FBO (no attachment swapping)
+		private readonly Dictionary<int, uint> _rttDepth = new();   // texId → its OWN depth RB (no shared GL state across FBOs)
+		public unsafe void RenderToTexture(Lua3DScene s, int texId, int rw, int rh, int clr, int clg, int clb) {
+			EnsureGL();
+			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
+			Span<int> vp = stackalloc int[4]; Gl.GetInteger(GLEnum.Viewport, vp);
+			uint prevFbo = (uint)Gl.GetInteger(GLEnum.FramebufferBinding);
+
+			if (_rttW != rw || _rttH != rh) {                       // size changed → drop all targets
+				foreach (var t in _rttColor.Values) Gl.DeleteTexture(t); _rttColor.Clear();
+				foreach (var f in _rttFbos.Values) Gl.DeleteFramebuffer(f); _rttFbos.Clear();
+				foreach (var d in _rttDepth.Values) Gl.DeleteRenderbuffer(d); _rttDepth.Clear();
+				_rttW = rw; _rttH = rh;
+			}
+			// Each mirror/portal texId owns its OWN FBO + colour texture + DEPTH renderbuffer, built once.
+			// Sharing a single FBO (attachment swapping) OR a single depth RB across FBOs corrupted the frame
+			// once 2+ reflections were live (ANGLE/D3D11 mis-validates shared targets rendered in sequence).
+			// Fully independent targets fix the multi-mirror/portal break.
+			if (!_rttFbos.TryGetValue(texId, out uint fbo)) {
+				uint color = Gl.GenTexture();
+				Gl.BindTexture(TextureTarget.Texture2D, color);
+				Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)rw, (uint)rh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, null);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Nearest);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Nearest);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+				Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+				uint depth = Gl.GenRenderbuffer();
+				Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depth);
+				Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)rw, (uint)rh);
+				fbo = Gl.GenFramebuffer();
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+				Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, color, 0);
+				Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, depth);
+				if (Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != GLEnum.FramebufferComplete)
+					Trace.TraceError($"GpuRasterizer RTT FBO incomplete for texId {texId}");
+				_rttColor[texId] = color; _rttFbos[texId] = fbo; _rttDepth[texId] = depth;
+			}
+
+			BuildSprites(s); BuildParticles(s);
+			long sig = ComputeStaticSig(s);
+			if (sig != _staticSig) { RebuildMerged(s); _staticSig = sig; }
+			GatherObjects(s);
+
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
+			Gl.Viewport(0, 0, (uint)rw, (uint)rh);
+			Gl.ClearColor(clr / 255f, clg / 255f, clb / 255f, 1f);
+			Gl.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit));
+			Gl.Enable(EnableCap.DepthTest); Gl.DepthFunc(DepthFunction.Lequal); Gl.Disable(EnableCap.CullFace);
+			BindWorldProgram(false); Gl.BindVertexArray(_vao);   // mirror/portal RTT never casts/receives shadows
+			SetFrameUniforms(s);
+			DrawWorld(s, s._useLights ? 1 : 0);
+			// the colour texture lives in _rttColor; DrawScreenTex's TexFor returns it directly for texId,
+			// so the mirror/portal surface samples this live GPU target with no CPU pixel-upload path.
+
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, prevFbo);
+			Gl.Viewport(vp[0], vp[1], (uint)vp[2], (uint)vp[3]);
+			Gl.UseProgram(0); Gl.BindVertexArray(0);
+			Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, 0);
+		}
+
 		private void SetFrameUniforms(Lua3DScene s) {
 			Gl.Uniform3(_uCam, (float)s._camX, (float)s._camY, (float)s._camZ);
 			Gl.Uniform3(_uR, (float)s._Rx, (float)s._Ry, (float)s._Rz);
@@ -644,6 +1056,8 @@ void main(){ frag = uColor; }";
 			}
 			Gl.Uniform1(_uNumLights, nl);
 			if (nl > 0) { Gl.Uniform4(_uLightPosR, (uint)nl, new ReadOnlySpan<float>(_lpos, 0, nl * 4)); Gl.Uniform3(_uLightCol, (uint)nl, new ReadOnlySpan<float>(_lcol, 0, nl * 3)); }
+			// (the shadow map + light matrix are bound by the main pass only when the shadow variant is active;
+			// the default variant has no shadow uniforms at all, so there's nothing to reset here.)
 		}
 
 		private bool Drawable(Lua3DScene s, SceneObject o) {
@@ -661,6 +1075,9 @@ void main(){ frag = uColor; }";
 			Gl.Uniform3(_uTint, (float)o.TintR, (float)o.TintG, (float)o.TintB);
 			Gl.Uniform1(_uAlpha, o.A / 255.0f); Gl.Uniform1(_uCutout, 0);
 			Gl.Uniform1(_uLit, (litScene == 1 && o.Lit) ? 1 : 0);
+			// per-object depth bias (polygon offset): lets a coplanar decal/marking sit cleanly on its surface
+			// instead of z-fighting it (road stripes on the road, ground shadows, etc.).
+			if (o.DepthBias != 0f) { Gl.Enable(EnableCap.PolygonOffsetFill); Gl.PolygonOffset(o.DepthBias, o.DepthBias); }
 			float fr = (float)(o.R / 255.0), fg = (float)(o.G / 255.0), fb = (float)(o.B / 255.0);
 			foreach (var bt in c.Batches) {
 				Gl.Uniform1(_uMode, bt.Mode);
@@ -668,6 +1085,7 @@ void main(){ frag = uColor; }";
 				else { Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, bt.Tex); }
 				Gl.DrawArrays(PrimitiveType.Triangles, bt.Start, (uint)bt.Count);
 			}
+			if (o.DepthBias != 0f) Gl.Disable(EnableCap.PolygonOffsetFill);
 		}
 		private void DrawSprite(SprBatch bt) {
 			var o = bt.Obj;
@@ -748,8 +1166,14 @@ void main(){ frag = uColor; }";
 		public void Invalidate() {
 			if (_fbo != 0) { Gl.DeleteFramebuffer(_fbo); _fbo = 0; }
 			if (_depthRb != 0) { Gl.DeleteRenderbuffer(_depthRb); _depthRb = 0; }
+			if (_shadowFbo != 0) { Gl.DeleteFramebuffer(_shadowFbo); _shadowFbo = 0; }
+			if (_shadowTex != 0) { Gl.DeleteTexture(_shadowTex); _shadowTex = 0; }
 			if (_fxaaFbo != 0) { Gl.DeleteFramebuffer(_fxaaFbo); _fxaaFbo = 0; }
 			if (_fxaaTex != 0) { Gl.DeleteTexture(_fxaaTex); _fxaaTex = 0; }
+			foreach (var f in _rttFbos.Values) Gl.DeleteFramebuffer(f); _rttFbos.Clear();
+			foreach (var d in _rttDepth.Values) Gl.DeleteRenderbuffer(d); _rttDepth.Clear();
+			foreach (var t in _rttColor.Values) Gl.DeleteTexture(t);
+			_rttColor.Clear(); _rttW = _rttH = 0;
 			_fboW = _fboH = 0; _fboColorTex = 0; _fxaaW = _fxaaH = 0;
 			foreach (var c in _cache.Values) Gl.DeleteBuffer(c.Vbo);
 			_cache.Clear();
@@ -770,13 +1194,19 @@ void main(){ frag = uColor; }";
 			if (_vaoP != 0) Gl.DeleteVertexArray(_vaoP);
 			if (_vaoPost != 0) Gl.DeleteVertexArray(_vaoPost);
 			if (_spriteVbo != 0) Gl.DeleteBuffer(_spriteVbo);
+			if (_casterVbo != 0) Gl.DeleteBuffer(_casterVbo);
 			if (_vbo2d != 0) Gl.DeleteBuffer(_vbo2d);
 			if (_partVbo != 0) Gl.DeleteBuffer(_partVbo);
 			if (_prog != 0) Gl.DeleteProgram(_prog);
+			if (_progShadow != 0) Gl.DeleteProgram(_progShadow);
+			if (_progDepth != 0) Gl.DeleteProgram(_progDepth);
+			if (_progDepthSpr != 0) Gl.DeleteProgram(_progDepthSpr);
 			if (_prog2d != 0) Gl.DeleteProgram(_prog2d);
 			if (_progP != 0) Gl.DeleteProgram(_progP);
 			if (_progPost != 0) Gl.DeleteProgram(_progPost);
-			_vao = _vao2d = _vaoP = _vaoPost = _spriteVbo = _vbo2d = _partVbo = _prog = _prog2d = _progP = _progPost = 0;
+			if (_progHD2D != 0) Gl.DeleteProgram(_progHD2D);
+			_vao = _vao2d = _vaoP = _vaoPost = _spriteVbo = _casterVbo = _vbo2d = _partVbo = 0;
+			_prog = _progShadow = _progDepth = _progDepthSpr = _prog2d = _progP = _progPost = _progHD2D = 0;
 			_init = false;
 		}
 	}

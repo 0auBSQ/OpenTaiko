@@ -30,6 +30,9 @@ namespace OpenTaiko {
 		// lens (fov → scale, near plane). Lua feeds these and reads the basis / Project back.
 		internal double _camX, _camY, _camZ;
 		internal double _Rx = 1, _Ry, _Rz, _Ux, _Uy = 1, _Uz, _Fx, _Fy, _Fz = 1;
+		// ground-sprite (billboard mode 3) cast-shadow light: the horizontal direction shadows stretch in,
+		// and a length scale. Set from Lua (SetGroundSpriteLight) to match the stage's shadow light.
+		internal double _GsLx = 0, _GsLz = 1, _GsLen = 1.4;
 		internal double _yaw, _pitch;
 		internal double _fov = 70.0;
 		internal double _near = 0.06;
@@ -42,6 +45,14 @@ namespace OpenTaiko {
 		// (camera-space depth). _fogInv = 1/(end-start). Off by default.
 		internal bool _fog;
 		internal double _fogR, _fogG, _fogB, _fogStart, _fogInv;
+		// Distance BLUR (deprecated — too costly + the depth-texture FBO slowed the main pass). Kept as a no-op
+		// stub so older stage scripts don't error; the HD2D pass below replaces it.
+		internal bool _distBlur;
+		internal double _blurNear = 60, _blurFar = 200;
+		// HD2D 'diorama' grade (GPU rasterizer): a cheap screen-space tilt-shift + saturation/contrast/vignette
+		// (Octopath-style). No depth sample. Off by default.
+		internal bool _hd2d;
+		internal double _hdTilt = 3.0, _hdSat = 1.25, _hdVig = 0.35;
 
 		internal readonly Dictionary<int, int[]> _texPix = new();
 		internal readonly Dictionary<int, int> _texW = new();
@@ -157,31 +168,39 @@ namespace OpenTaiko {
 			double fovDeg, int clr, int clg, int clb, int flipX) {
 			int rw = _w >> _rttShift, rh = _h >> _rttShift;   // reduced render size
 			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
-			if (_rttCanvas == null || _rttCanvas._w != rw || _rttCanvas._h != rh) {
-				_rttCanvas = new LuaCanvas(rw, rh); _rttDepth = new float[rw * rh];
-			}
-			var sc = _canvas; var sd = _depth; int ow = _w, oh = _h;
+			int ow = _w, oh = _h;
 			double ox = _camX, oy = _camY, oz = _camZ, oyaw = _yaw, opit = _pitch, ofov = _fov;
 
-			_canvas = _rttCanvas; _depth = _rttDepth; _w = rw; _h = rh;   // render the reflection small
-			_rttCanvas.Clear(clr, clg, clb, 255);
-            _rttPass = true;
+			_w = rw; _h = rh;                                 // projection aspect/scale matches the RTT viewport
+			_rttPass = true;
 			SetCameraPosition(cx, cy, cz); SetCameraFov(fovDeg); SetCameraAngles(yawDeg, pitchDeg);
 			// a planar mirror is a reflected (left-handed) camera: flip the right axis so the image is
 			// mirrored. Without this the reflection pans the wrong way as the player turns.
 			if (flipX != 0) { _Rx = -_Rx; _Ry = -_Ry; _Rz = -_Rz; }
-			// Always render reflections with the CPU rasterizer (into _rttCanvas._buf), so the capture below
-			// works regardless of which renderer drives the MAIN view — this lets doom run its main view on
-			// the GPU while mirror/portal RTTs are still produced as CPU pixels we can read back.
-			_rasterizer.Render(this);
+
+			// Reflections/portals always render with the CPU rasterizer into a small canvas, then upload as
+			// texId. The GPU off-screen path (GpuRasterizer.RenderToTexture) had persistent driver issues with
+			// >1 live reflection on this hardware (the main view lost geometry + portals failed to capture), so
+			// the reliable CPU capture is used regardless of the main renderer — the main view still runs on
+			// the GPU; only these small reduced-res reflection re-renders are CPU. Keep them cheap via
+			// SetReflectionScale (doom uses 1/4-res reflections).
+			{
+				var sc = _canvas; var sd = _depth;
+				if (_rttCanvas == null || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+					_rttCanvas = new LuaCanvas(rw, rh); _rttDepth = new float[rw * rh];
+				}
+				_canvas = _rttCanvas; _depth = _rttDepth;
+				_rttCanvas.Clear(clr, clg, clb, 255);
+				_rasterizer.Render(this);
+				if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
+				var buf = _rttCanvas._buf;
+				for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+				RegisterTexturePixels(texId, px, rw, rh);
+				_canvas = sc; _depth = sd;
+			}
 			_rttPass = false;
 
-			if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
-			var buf = _rttCanvas._buf;
-			for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
-			RegisterTexturePixels(texId, px, rw, rh);   // bumps _texRev[texId] → GPU re-uploads the live mirror texture
-
-			_canvas = sc; _depth = sd; _w = ow; _h = oh;
+			_w = ow; _h = oh;
 			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
 		}
 
@@ -196,6 +215,14 @@ namespace OpenTaiko {
 			_fogR = r; _fogG = g; _fogB = b; _fogStart = start;
 			_fogInv = end > start ? 1.0 / (end - start) : 0.0;
 			Revision++;
+		}
+		/// <summary>Deprecated no-op (the old distance blur). Kept so older scripts don't break — use SetHD2D.</summary>
+		public void SetDistanceBlur(bool on, double near, double far) { _distBlur = false; }
+		/// <summary>HD2D 'diorama' post grade (GPU rasterizer): a cheap screen-space tilt-shift (sharp middle band,
+		/// blur to the top/bottom) + saturation/contrast/vignette. <paramref name="tilt"/> = max blur px (0 = none),
+		/// <paramref name="sat"/> = saturation (1 = none), <paramref name="vig"/> = vignette strength.</summary>
+		public void SetHD2D(bool on, double tilt, double sat, double vig) {
+			_hd2d = on; _hdTilt = tilt; _hdSat = sat; _hdVig = vig; Revision++;
 		}
 
 		/// <summary>Number of CPU threads the rasterizer uses (screen split into this many
@@ -236,6 +263,16 @@ namespace OpenTaiko {
 		public (double, double, double) GetCameraForward() => (_Fx, _Fy, _Fz);
 		public (double, double, double) GetCameraRight() => (_Rx, _Ry, _Rz);
 		public (double, double, double) GetCameraUp() => (_Ux, _Uy, _Uz);
+
+		/// <summary>Set the cast-shadow light for ground-flat sprites (billboard mode 3): the horizontal
+		/// direction the silhouette stretches in (dx,dz) and a length scale (≈ 1/tan(sun elevation)). A
+		/// transparency-aware shadow is drawn by adding the actor's own sprite to a black-tinted object in
+		/// this mode — it lies on the floor with the sprite's cutout alpha as the shape.</summary>
+		public void SetGroundSpriteLight(double dx, double dz, double lenScale) {
+			double l = Math.Sqrt(dx * dx + dz * dz);
+			if (l > 1e-6) { _GsLx = dx / l; _GsLz = dz / l; }
+			_GsLen = lenScale > 0.05 ? lenScale : 0.05;
+		}
 
 		/// <summary>Project a world point to screen pixels using the scene camera:
 		/// returns (sx, sy, inFront). inFront is false when the point is behind the near plane.</summary>
@@ -450,6 +487,22 @@ namespace OpenTaiko {
 			o.Kind = 3; EnsureCap(o, 8);
 			int k = o.N * 8; var d = o.D;
 			d[k]=cx; d[k+1]=cy; d[k+2]=cz; d[k+3]=w; d[k+4]=h; d[k+5]=spriteId; d[k+6]=billboard; d[k+7]=cutout;
+			o.N++; Revision++;
+		}
+
+		/// <summary>Add a sprite drawn on an EXPLICIT world quad given by its four corners (winding
+		/// 0→1→2→3, UVs (0,1)(1,1)(1,0)(0,0)). Unlike ObjAddSprite this does NOT billboard — you place the
+		/// corners yourself, e.g. dropped onto the terrain so a character's silhouette shadow DRAPES over
+		/// slopes/stairs. Sampled + tinted exactly like a sprite (object tint multiplies; alpha fades; cutout
+		/// alpha-tests). An object holding these must hold ONLY sprite-quads (its own kind).</summary>
+		public void ObjAddSpriteQuad(int id, double x0, double y0, double z0, double x1, double y1, double z1,
+			double x2, double y2, double z2, double x3, double y3, double z3, int spriteId, int cutout) {
+			var o = Obj(id); if (o == null) return;
+			o.Kind = 4; EnsureCap(o, 14);
+			int k = o.N * 14; var d = o.D;
+			d[k]=x0; d[k+1]=y0; d[k+2]=z0; d[k+3]=x1; d[k+4]=y1; d[k+5]=z1;
+			d[k+6]=x2; d[k+7]=y2; d[k+8]=z2; d[k+9]=x3; d[k+10]=y3; d[k+11]=z3;
+			d[k+12]=spriteId; d[k+13]=cutout;
 			o.N++; Revision++;
 		}
 
@@ -685,6 +738,17 @@ namespace OpenTaiko {
 		/// <summary>Enable/disable the rasterizer's forward lighting (off by default; the raytracer
 		/// has its own lighting). When on, faces are lit by the ambient + sun + point lights.</summary>
 		public void SetLighting(bool on) { _useLights = on; }
+		internal bool _shadows;
+		internal bool _shadowFocusSet; internal double _sfx, _sfy, _sfz;   // where to centre the shadow map (the player)
+		/// <summary>Enable sun shadow MAPPING on the GPU rasterizer: a depth pass from the sun (terrain +
+		/// objects + the sun-facing character silhouettes) sampled in a SEPARATE lit-shader VARIANT. Needs
+		/// SetLighting(true) + a non-zero SetSun. Perf-safe — only shadow-enabled scenes compile/run the shadow
+		/// path, so other stages are byte-identical to no-shadows. Degrades to no-shadows if unsupported.</summary>
+		public void SetShadows(bool on) { _shadows = on; }
+		/// <summary>Centre the sun shadow map on this world point (normally the player) each frame, so the
+		/// limited-coverage depth map always covers the action. Without it the map is centred in front of the
+		/// camera, which misses the play area when the camera is pulled far back (the faked-ortho iso rig).</summary>
+		public void SetShadowFocus(double x, double y, double z) { _shadowFocusSet = true; _sfx = x; _sfy = y; _sfz = z; }
 		/// <summary>Global ambient light (linear, added to every lit face so nothing is pure black).</summary>
 		public void SetAmbient(double r, double g, double b) { _ambR = r; _ambG = g; _ambB = b; }
 		/// <summary>Directional "sun": (dx,dy,dz) is the direction TO the sun (auto-normalised),
@@ -697,6 +761,13 @@ namespace OpenTaiko {
 		/// <summary>Exempt an object from forward lighting (renders at its baked shade only) — e.g.
 		/// the voxel torch posts, which are the light sources themselves.</summary>
 		public void ObjSetLit(int id, bool lit) { var o = Obj(id); if (o != null) o.Lit = lit; }
+		/// <summary>Whether this object's billboard sprites cast into the sun shadow map (default true). Set false
+		/// for UI markers / talk bubbles / floating arrows that shouldn't drop a shadow. (GPU rasterizer only.)</summary>
+		public void ObjSetCastShadow(int id, bool on) { var o = Obj(id); if (o != null) o.CastShadow = on; }
+		/// <summary>Per-object GPU depth bias (polygon offset). Negative pulls toward the camera (a decal/marking
+		/// drawn cleanly ON TOP of a coplanar surface), positive pushes away. 0 = off. Fixes z-fighting between
+		/// intentionally-coplanar layers (road stripes on the road, ground shadows, etc.). (GPU rasterizer only.)</summary>
+		public void ObjSetDepthBias(int id, double bias) { var o = Obj(id); if (o != null) o.DepthBias = (float)bias; }
 
 		// ── Primitives (analytic + SDF) ───────────────────────────────────────────────────
 		/// <summary>Sphere centred (cx,cy,cz) radius r with material <paramref name="mat"/>.</summary>

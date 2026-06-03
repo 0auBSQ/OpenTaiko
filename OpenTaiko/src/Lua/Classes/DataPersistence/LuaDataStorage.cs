@@ -2,71 +2,58 @@
 using LightningDB;
 
 namespace OpenTaiko {
+	/// <summary>
+	/// Lua-facing key/value store backed by LMDB. Each operation opens its OWN short-lived
+	/// <see cref="LightningEnvironment"/> and disposes it immediately (via <c>using</c>). This is
+	/// deliberate: LightningDB's <c>LightningEnvironment</c> finalizer THROWS
+	/// ("The LightningEnvironment was not disposed and cannot be reliably dealt with from the finalizer")
+	/// when an environment is garbage-collected without being disposed, which crashes the whole process.
+	/// Lua scripts obtain these handles via <c>DATABASE:OpenLocalDatabase(...)</c> and have no reliable
+	/// way to dispose them (NLua just drops the reference, and the GC then finalizes the env), so keeping
+	/// a long-lived environment was a latent process-killer. Opening per operation keeps every environment
+	/// deterministically disposed and also avoids LMDB's "same env opened twice in one process" hazard.
+	/// These stores see only occasional reads/writes (save-on-change, mission/track load), so the
+	/// per-operation open cost is negligible.
+	/// </summary>
 	public class LuaDataStorage : IDisposable {
-		private string Path;
-		private LightningEnvironment? LEnv;
-
-		private LightningEnvironment? InitEnvironment(string path) {
-			LightningEnvironment? env = null;
-
-			try {
-				env = new LightningEnvironment(path);
-				env.Open();
-
-				using (var tx = env.BeginTransaction())
-				using (tx.OpenDatabase(configuration: new DatabaseConfiguration {
-					Flags = DatabaseOpenFlags.Create
-				})) {
-					tx.Commit();
-				}
-			} catch (Exception ex) {
-				LogNotification.PopError($"Failed to init the database: {ex.Message}");
-				env?.Dispose();
-				env = null;
-			}
-
-			return env;
-		}
+		private readonly string Path;
 
 		public LuaDataStorage(string path) {
 			Path = path;
-			LEnv = InitEnvironment(path);
+			// LMDB needs the environment directory to exist before Open(); create it once up front so the
+			// first read of a brand-new store doesn't error.
+			try { System.IO.Directory.CreateDirectory(path); }
+			catch (Exception ex) { LogNotification.PopError($"Failed to init the database: {ex.Message}"); }
 		}
 
 		public void Write(string key, string value) {
-			if (LEnv == null) {
-				LogNotification.PopError($"Failed to write the value '{value}' to the entry '{key}': The LightningEnvironment failed to setup");
-				return;
-			}
-			using (var tx = LEnv.BeginTransaction())
-			using (var db = tx.OpenDatabase(configuration: new DatabaseConfiguration { Flags = DatabaseOpenFlags.Create })) {
-				// Put a key-value pair into the database
+			try {
+				using var env = new LightningEnvironment(Path);
+				env.Open();
+				using var tx = env.BeginTransaction();
+				using var db = tx.OpenDatabase(configuration: new DatabaseConfiguration { Flags = DatabaseOpenFlags.Create });
 				tx.Put(db, Encoding.UTF8.GetBytes(key), Encoding.UTF8.GetBytes(value));
 				tx.Commit();
+			} catch (Exception ex) {
+				LogNotification.PopError($"Failed to write the value '{value}' to the entry '{key}': {ex.Message}");
 			}
 		}
 
 		public string? Read(string key) {
-			if (LEnv == null) {
-				LogNotification.PopError($"Failed to read the entry '{key}': The LightningEnvironment failed to setup");
+			try {
+				using var env = new LightningEnvironment(Path);
+				env.Open();
+				using var tx = env.BeginTransaction(TransactionBeginFlags.ReadOnly);
+				using var db = tx.OpenDatabase();
+				var (resultCode, _key, value) = tx.Get(db, Encoding.UTF8.GetBytes(key));
+				return resultCode == MDBResultCode.Success ? Encoding.UTF8.GetString(value.AsSpan()) : null;
+			} catch (Exception ex) {
+				LogNotification.PopError($"Failed to read the entry '{key}': {ex.Message}");
 				return null;
 			}
-
-			// Begin a read-only transaction to retrieve the value
-			using (var tx = LEnv.BeginTransaction(TransactionBeginFlags.ReadOnly))
-			using (var db = tx.OpenDatabase()) {
-				var (resultCode, _key, value) = tx.Get(db, Encoding.UTF8.GetBytes(key));
-				if (resultCode == MDBResultCode.Success) {
-					return Encoding.UTF8.GetString(value.AsSpan());
-				} else {
-					return null;
-				}
-			}
 		}
 
-		public void Dispose() {
-			LEnv?.Dispose();
-		}
+		public void Dispose() { }   // nothing persistent is held; each operation disposes its own environment
 	}
 
 	public class LuaDataStorageFunc {

@@ -319,6 +319,7 @@ namespace OpenTaiko {
 					double rx, ry, rz, ux, uy, uz;
 					if (bb == 2) { rx = s._Rx; ry = s._Ry; rz = s._Rz; ux = s._Ux; uy = s._Uy; uz = s._Uz; }
 					else if (bb == 1) { rx = s._Rx; ry = 0; rz = s._Rz; double rl = Math.Sqrt(rx * rx + rz * rz); if (rl > 1e-6) { rx /= rl; rz /= rl; } ux = 0; uy = 1; uz = 0; }
+					else if (bb == 3) { rx = s._GsLz; ry = 0; rz = -s._GsLx; ux = s._GsLx * s._GsLen; uy = 0; uz = s._GsLz * s._GsLen; }   // ground-flat cast shadow: lies on XZ, stretched along the light
 					else { rx = 1; ry = 0; rz = 0; ux = 0; uy = 1; uz = 0; }
 					double hw2 = w * 0.5;                                  // bottom-anchored: (cx,cy,cz) is the foot
 					double b0x = wcx - rx * hw2, b0y = wcy - ry * hw2, b0z = wcz - rz * hw2;

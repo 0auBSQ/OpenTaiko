@@ -247,7 +247,10 @@ class CLuaScript : IDisposable {
 			LuaScript["TEXTURE"] = ltf;
 			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
 			LuaScript["SCENE3D"] = new Lua3DSceneFunc(Scene3DList);
+			LuaScript["PHYSICS"] = new LuaPhysicsFunc();
 			LuaScript["GLOBALCAMERA"] = new LuaGlobalCamera();
+			LuaScript["COLLIDERS"] = new LuaCollidersFunc();   // general collider shapes (raycast / overlap)
+			LuaScript["PATHFIND"] = new LuaPathfindFunc();     // weighted nav graph + A*
 			LuaScript["MODEL"] = new LuaModelFunc(dir);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
