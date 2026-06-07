@@ -69,6 +69,53 @@ public class LuaVirtualSlotManager {
 		if (v != null) v.NameplateDan = dan ?? "";
 	}
 
+	// ── Nameplate styling (type / rarity / dan plate) ───────────────────────────
+
+	/// <summary>
+	/// Applies a catalogue nameplate (by global nameplate id) to slot V<paramref name="slot"/> (1-5):
+	/// sets the title text, type and rarity from the nameplate database. Used to mirror a remote
+	/// player's nameplate styling in online play — only the id needs to cross the wire, since the
+	/// catalogue is identical on every install. Falls back to the bare id if it is unknown locally.
+	/// </summary>
+	public void SetNameplateById(int slot, int nameplateId) {
+		var v = GetV(slot);
+		if (v == null) return;
+		var npDb = OpenTaiko.Databases?.DBNameplateUnlockables?.data;
+		if (npDb != null && npDb.TryGetValue(nameplateId, out var np)) {
+			v.NameplateTitle             = np.nameplateInfo.cld.GetString("");
+			v.VirtualData.Title          = v.NameplateTitle;
+			v.VirtualData.TitleId        = nameplateId;
+			v.VirtualData.TitleType      = np.nameplateInfo.iType;
+			v.VirtualData.TitleRarityInt = HRarity.tRarityToLangInt(np.rarity);
+		} else {
+			v.VirtualData.TitleId = nameplateId;
+		}
+	}
+
+	/// <summary>Sets the nameplate title TYPE (style index) for slot V<paramref name="slot"/> (1-5) directly.</summary>
+	public void SetNameplateType(int slot, int type) {
+		var v = GetV(slot);
+		if (v != null) v.VirtualData.TitleType = type;
+	}
+
+	/// <summary>Sets the nameplate title RARITY (lang int) for slot V<paramref name="slot"/> (1-5) directly.</summary>
+	public void SetNameplateRarity(int slot, int rarity) {
+		var v = GetV(slot);
+		if (v != null) v.VirtualData.TitleRarityInt = rarity;
+	}
+
+	/// <summary>Sets the dan-plate TYPE for slot V<paramref name="slot"/> (1-5).</summary>
+	public void SetNameplateDanType(int slot, int danType) {
+		var v = GetV(slot);
+		if (v != null) v.VirtualData.DanType = danType;
+	}
+
+	/// <summary>Sets whether the dan plate is rendered gold for slot V<paramref name="slot"/> (1-5).</summary>
+	public void SetNameplateDanGold(int slot, bool gold) {
+		var v = GetV(slot);
+		if (v != null) v.VirtualData.DanGold = gold;
+	}
+
 	// ── Mount / unmount ───────────────────────────────────────────────────────
 
 	/// <summary>

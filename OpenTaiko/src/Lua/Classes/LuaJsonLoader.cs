@@ -69,28 +69,27 @@ namespace OpenTaiko {
 			return ConvertToken(token);
 		}
 
-		/// <summary>Write text to a file under the stage directory (creating subdirectories as needed).
-		/// Used by tools such as the map editor to save JSON. Rejects absolute paths and ".." traversal
-		/// so a stage can only write inside its own folder. Returns true on success.</summary>
-		public bool WriteText(string name, string contents) {
-			if (string.IsNullOrEmpty(name) || Path.IsPathRooted(name)) return false;
-			string fullPath = Path.GetFullPath(Path.Combine(DirPath, name));
-			string root = Path.GetFullPath(DirPath);
-			if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase)) return false;
-			try {
-				string dir = Path.GetDirectoryName(fullPath);
-				if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-				File.WriteAllText(fullPath, contents);
-				return true;
-			} catch { return false; }
-		}
-
 		public Dictionary<string, object> JsonParseString(string json) {
 			if (string.IsNullOrWhiteSpace(json))
 				return new Dictionary<string, object>();
 
 			var token = JToken.Parse(json);
 			return ToDictionary(token);
+		}
+
+		/// <summary>Parse a JSON string whose root may be an OBJECT or an ARRAY (arrays become a 1-indexed
+		/// Dictionary&lt;int,object&gt;). Returns null on empty/invalid input. Use with <see cref="JsonGet"/>.
+		/// Handy for network payloads like a peer roster array.</summary>
+		public object? JsonParseStringAny(string json) {
+			if (string.IsNullOrWhiteSpace(json)) return null;
+			try { return ConvertToken(JToken.Parse(json)); } catch { return null; }
+		}
+
+		/// <summary>Number of entries in a parsed JSON array/object dictionary (0 if not a dictionary).</summary>
+		public int JsonCount(object? dict) {
+			if (dict is Dictionary<int, object> id) return id.Count;
+			if (dict is Dictionary<string, object> sd) return sd.Count;
+			return 0;
 		}
 
 		private Dictionary<string, object> ToDictionary(JToken token) {

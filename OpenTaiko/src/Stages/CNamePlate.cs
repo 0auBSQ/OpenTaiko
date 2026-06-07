@@ -67,7 +67,11 @@ class CNamePlate {
 				vslot.VirtualData.Dan  = dan;
 
 				bIsPrevAI[player] = isAI;
-				Script?.Activate(player, name, title, dan, vslot.VirtualData);
+				// Honor a shared gold dan plate (mirrors the real-save-file branch below).
+				if (vslot.VirtualData.DanGold)
+					Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", vslot.VirtualData);
+				else
+					Script?.Activate(player, name, title, dan, vslot.VirtualData);
 				return;
 			} else {
 				// Use the player's real save file (possibly redirected to another slot).

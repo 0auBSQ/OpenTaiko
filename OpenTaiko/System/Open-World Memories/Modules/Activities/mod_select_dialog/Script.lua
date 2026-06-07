@@ -2,6 +2,7 @@
 local reactive = false
 local player = 0
 local save = nil
+local restrictMods = false   -- online lobby: when true, the Auto + Fun-Mod (dynamic beat) options are hidden
 
 -- Mod options
 local options = {}
@@ -275,6 +276,7 @@ end
 local function loadOptions()
     options = {}
     for _, def in ipairs(OPTION_DEFS) do
+      if not (restrictMods and (def.meta == "auto" or def.meta == "fun-mod")) then   -- online: no Auto / Dynamic Beat
         local val
         if     def.meta == "auto"         then val = CONFIG:GetAutoStatus(player) and 1 or 0
         elseif def.meta == "scroll-speed" then val = CONFIG:GetScrollSpeed(player)
@@ -295,7 +297,14 @@ local function loadOptions()
             min     = def.min,      -- scroll only
             max     = def.max,      -- scroll only
         })
+      end
     end
+    -- recompute the navigation counts from the (possibly filtered) option list, else OK/Cancel indices and
+    -- options[selectedIndex+1] desync when restrictMods drops Auto + Fun-Mod → nil access / lua error
+    OPTION_COUNT = #options
+    OK_INDEX     = OPTION_COUNT
+    CANCEL_INDEX = OPTION_COUNT + 1
+    TOTAL_ITEMS  = OPTION_COUNT + 2
 end
 
 -- ============================================================
@@ -518,8 +527,8 @@ end
 -- ============================================================
 -- Lifecycle
 -- ============================================================
-function activate(pl)
-    debugLog(tostring(pl))
+function activate(pl, restrict)
+    restrictMods = restrict == true
     save   = GetSaveFile(pl)
     player = pl
     loadOptions()

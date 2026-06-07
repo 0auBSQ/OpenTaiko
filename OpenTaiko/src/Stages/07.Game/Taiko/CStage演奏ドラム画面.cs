@@ -344,6 +344,17 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	public override int Draw() {
 		base.sw.Start();
 		if (!base.IsDeActivated) {
+			// Online VS: hold at the very START of the gameplay screen until EVERY player has reached it too (the
+			// real sync point). Report once, then wait for all peers or a 30s timeout (host then drops laggards so
+			// they vanish). The song clock hasn't started yet (IsFirstDraw still pending). No-op when offline.
+			if (base.IsFirstDraw && LuaNetworking.Active?.PlaySyncActive == true) {
+				LuaNetworking.Active.ReportLoaded();
+				if (!LuaNetworking.Active.LoadBarrierReady(30000)) {
+					OnlinePlaySync.DrawWaiting("Waiting for all players...");
+					base.sw.Stop();
+					return 0;
+				}
+			}
 			#region [ 初めての進行描画 ]
 			if (base.IsFirstDraw) {
 				SoundManager.PlayTimer.Reset();
@@ -363,6 +374,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				}
 
 				// TJAPlayer3.Sound管理.tDisableUpdateBufferAutomatically();
+				this._onlEndAnimsDone = false;   // online VS: reset the deferred-clear-anim guard each play
 				base.IsFirstDraw = false;
 			}
 			#endregion
@@ -541,6 +553,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			this.actPanel.t歌詞テクスチャを描画する();
 
+			// Online VS: drive remote player spots — broadcast my score + feed peers' score/gauge (no-op offline)
+			OnlinePlaySync.Tick(this);
+
 			// handle retry states here
 			this.actPauseMenu.Update();
 
@@ -602,21 +617,28 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						actTokkun.tPausePlay();
 
 						actTokkun.tMatchWithTheChartDisplayPosition(true);
+					} else if (LuaNetworking.Active?.PlaySyncActive == true) {
+						// Online VS: wait for every still-active player to finish, THEN play all clear anims with the
+						// gathered results (correct clear/fail/full-combo), before moving to the result screen.
+						if (LuaNetworking.Active.FinishBarrierReady(20000)) {
+							if (!this._onlEndAnimsDone) {
+								for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) this.tEndClearAnim(i, isTower);
+								this._onlEndAnimsDone = true;
+							}
+							base.ePhaseID = CStage.EPhase.Game_EndStage;
+						}
 					} else {
 						base.ePhaseID = CStage.EPhase.Game_EndStage;
 					}
 				}
 			} else if (this.IsEndOfPlay(bIsChartEnded, bIsFinishedPlaying)) {
 				if (!OpenTaiko.ConfigIni.bTokkunMode) {
-					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-						if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives >= OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i)) {
-							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_10COMBO_MAX);
-						} else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
-							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_CLEARED);
-						} else {
-							this.actChara.CharacterControllers[i].PlayAction(i, CCharacter.ANIM_GAME_FAILED);
-						}
-						this.actEnd.Start(i, endOfPlay: true);
+					if (LuaNetworking.Active?.PlaySyncActive == true) {
+						// Online VS: gather my final result now; DEFER all clear anims until everyone finishes (played
+						// in the Game_EndChart finish barrier above, so they reflect the gathered results).
+						LuaNetworking.Active.ReportFinished(this.BuildOnlineFinishJson());
+					} else {
+						for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) this.tEndClearAnim(i, isTower);
 					}
 				}
 				base.ePhaseID = CStage.EPhase.Game_EndChart;
@@ -642,6 +664,36 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		}
 		base.sw.Stop();
 		return 0;
+	}
+
+	// ── Online VS end-of-play helpers ──────────────────────────────────────────────────────────────────
+	private bool _onlEndAnimsDone = false;
+	// This client's final result (for the finish broadcast + remote clear anims).
+	private string BuildOnlineFinishJson() {
+		var cs = this.CChartScore[0];
+		bool clear = !this.IsStageFailed(0) && HGaugeMethods.UNSAFE_FastNormaCheck(0);
+		bool rainbow = HGaugeMethods.UNSAFE_IsRainbow(0);
+		bool fc = clear && cs != null && cs.nMiss == 0;
+		bool pf = fc && cs.nGood == 0;
+		int gr = cs?.nGreat ?? 0, gd = cs?.nGood ?? 0, ms = cs?.nMiss ?? 0;
+		return string.Format("{{\"cl\":{0},\"fc\":{1},\"pf\":{2},\"mx\":{3},\"gr\":{4},\"gd\":{5},\"ms\":{6}}}",
+			clear ? "true" : "false", fc ? "true" : "false", pf ? "true" : "false", rainbow ? "true" : "false", gr, gd, ms);
+	}
+	// Play spot i's end clear animation. Online-aware: a REMOTE spot uses the gathered broadcast result (so the
+	// clear/fail/full-combo shown is correct); local/normal spots use the live gauge as before.
+	private void tEndClearAnim(int i, bool isTower) {
+		int onl = (LuaNetworking.Active?.IsRemoteSpot(i) == true) ? LuaNetworking.Active.GetSpotClearLevel(i) : -2;
+		string anim;
+		if (onl >= 0)
+			anim = onl == 2 ? CCharacter.ANIM_GAME_10COMBO_MAX : onl == 1 ? CCharacter.ANIM_GAME_CLEARED : CCharacter.ANIM_GAME_FAILED;
+		else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives >= OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives) : HGaugeMethods.UNSAFE_IsRainbow(i))
+			anim = CCharacter.ANIM_GAME_10COMBO_MAX;
+		else if (isTower ? (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) : HGaugeMethods.UNSAFE_FastNormaCheck(i))
+			anim = CCharacter.ANIM_GAME_CLEARED;
+		else
+			anim = CCharacter.ANIM_GAME_FAILED;
+		this.actChara.CharacterControllers[i].PlayAction(i, anim);
+		this.actEnd.Start(i, endOfPlay: true);
 	}
 
 	protected override void UpdateClearAnimation(int iPlayer) {
@@ -755,6 +807,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
 				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
 				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
+				|| (LuaNetworking.Active != null && LuaNetworking.Active.IsRemoteSpot(nUsePlayer))   // online VS: spots 2-5 are remote players — ignore any local input mapped to them
 				) {
 				continue; // skip input
 			}

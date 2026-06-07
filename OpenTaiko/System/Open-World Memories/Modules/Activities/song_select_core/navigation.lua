@@ -200,11 +200,13 @@ function M.handleSongSelectInput(Sort, Diff)
         G.highlightedPlayer = (G.highlightedPlayer + 1) % CONFIG.PlayerCount
         if G.highlightedPlayer ~= prev then Sort.applySort(); M.refreshPage(true) end
     end
-    if INPUT:KeyboardPressed("F3") then
-        G.sounds.Decide:Play(); CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
-    end
-    if INPUT:KeyboardPressed("F4") and CONFIG.PlayerCount >= 2 then
-        G.sounds.Decide:Play(); CONFIG:SetAutoStatus(1, not CONFIG:GetAutoStatus(1))
+    if not G.activeConfig.songOnly then   -- online lobby (songOnly): Auto cannot be toggled in song select
+        if INPUT:KeyboardPressed("F3") then
+            G.sounds.Decide:Play(); CONFIG:SetAutoStatus(0, not CONFIG:GetAutoStatus(0))
+        end
+        if INPUT:KeyboardPressed("F4") and CONFIG.PlayerCount >= 2 then
+            G.sounds.Decide:Play(); CONFIG:SetAutoStatus(1, not CONFIG:GetAutoStatus(1))
+        end
     end
 
     local inpset = G.inputSets[G.highlightedPlayer + 1]
@@ -292,6 +294,14 @@ function M.handleSongSelectInput(Sort, Diff)
 
     -- Song chosen → start transition to difficulty select
     if G.selectedSongNode ~= nil then
+        if G.activeConfig.songOnly then
+            -- Online lobby: pick the SONG only — NO difficulty prompt. Set it as the chosen song globally
+            -- (difficulty is chosen per-player back in the lobby) and signal the parent to return.
+            stopHold()
+            pcall(function() G.selectedSongNode:Mount(0, 0, 0, 0, 0) end)
+            G.lastSignal = "play"
+            return "play"
+        end
         Diff.loadDiffBars(G.selectedSongNode)
         stopHold()
         G.activeScreen   = "transition"

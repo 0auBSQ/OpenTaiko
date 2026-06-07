@@ -15,6 +15,11 @@ local M = {}
 local G
 
 local favDB = nil
+-- In-memory mirror (saveId -> set). isFavorite() is called for every song bar every frame; LuaDataStorage:Read
+-- opens+closes the whole LightningDB environment per call, so reading the DB per draw tanks the song select to
+-- single-digit FPS inside folders. We read each save's set ONCE and keep it in sync on writes (favorites only
+-- change in-process via toggleFavorite).
+local favCache = {}
 
 function M.init(g)
     G = g
@@ -26,20 +31,25 @@ end
 
 -- ── Internal helpers ──────────────────────────────────────────────────────────
 
--- Returns a set (uid → true) for the given saveId.
+-- Returns a set (uid → true) for the given saveId. Cached in memory after the first DB read so the per-frame
+-- isFavorite() calls never touch the (expensive, open-per-op) LightningDB again.
 local function readFavSet(saveId)
     if favDB == nil then return {} end
+    local cached = favCache[saveId]
+    if cached ~= nil then return cached end
     local raw = favDB:Read("fav_" .. tostring(saveId)) or ""
     local set = {}
     for uid in raw:gmatch("[^|]+") do
         set[uid] = true
     end
+    favCache[saveId] = set
     return set
 end
 
--- Writes a set back to the DB.
+-- Writes a set back to the DB and refreshes the in-memory mirror.
 local function writeFavSet(saveId, set)
     if favDB == nil then return end
+    favCache[saveId] = set
     local parts = {}
     for uid in pairs(set) do
         parts[#parts + 1] = uid

@@ -2182,7 +2182,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			*/
 			else if (keyboard.KeyPressed([(int)SlimDXKeys.Key.Escape, (int)SlimDXKeys.Key.F1]) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
-				if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
+				if (LuaNetworking.Active?.PlaySyncActive == true) {
+					// online play: pause (and the restart that lives in the pause menu) is disabled for fairness
+					LogNotification.PopInfo("Pause is disabled during online play.");
+				} else if (!this.actPauseMenu.bIsActivePopupMenu && this.bPAUSE == false) {
 					long cooldownRemaining = 1000 - _pauseCooldown.ElapsedMilliseconds;
 					if (cooldownRemaining > 0) {
 						LogNotification.PopInfo($"Pause on cooldown. Please wait {cooldownRemaining / 1000.0:F1}s.");
@@ -4295,8 +4298,22 @@ internal abstract class CStage演奏画面共通 : CStage {
 					 < OpenTaiko.ConfigIni.apAIPerformances[AILevel - 1].nGoodOdds)
 				return ENoteJudge.Good;
 		}
+		// Online VS: a REMOTE player's auto-hit judge is sampled to match THEIR broadcast good/ok/bad rates (per
+		// mille), so their lane shows the chart being hit with a realistic judge mix — AI-battle-style, driven by
+		// the wire instead of an AI level. Only applies during an online play round (IsRemoteSpot is else false).
+		var _onl = LuaNetworking.Active;
+		if (_onl != null && _onl.IsRemoteSpot(player)) {
+			if (reroll) nDice = OpenTaiko.Random.Next(1000);
+			int _bad = _onl.GetSpotBadOdds(player), _good = _onl.GetSpotGoodOdds(player);
+			if (nDice < _bad) return ENoteJudge.Poor;
+			else if (nDice - _bad < _good) return ENoteJudge.Good;
+		}
 		return judgement;
 	}
+
+	// Online VS: freeze a player spot whose remote player disconnected mid-play — stops its auto-hits so it stops
+	// updating, while staying flagged auto (still excluded from saving). Called each frame by OnlinePlaySync.
+	public void OnlineFreezeSpot(int spot) { if (spot >= 0 && spot < this.isDeniedPlaying.Length) this.isDeniedPlaying[spot] = true; }
 
 	public bool CanAutoplayHitMine(int player, bool reroll) {
 		if (this.isDeniedPlaying[player] || this.IsStageFailed_Fast())

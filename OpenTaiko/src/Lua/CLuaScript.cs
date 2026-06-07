@@ -249,6 +249,7 @@ class CLuaScript : IDisposable {
 			LuaScript["SCENE3D"] = new Lua3DSceneFunc(Scene3DList);
 			LuaScript["PHYSICS"] = new LuaPhysicsFunc();
 			LuaScript["GLOBALCAMERA"] = new LuaGlobalCamera();
+			LuaScript["NET"] = new LuaNetworking();   // P2P online core (OpenTaiko Online protocol)
 			LuaScript["COLLIDERS"] = new LuaCollidersFunc();   // general collider shapes (raycast / overlap)
 			LuaScript["PATHFIND"] = new LuaPathfindFunc();     // weighted nav graph + A*
 			LuaScript["MODEL"] = new LuaModelFunc(dir);
@@ -273,6 +274,7 @@ class CLuaScript : IDisposable {
 			LuaScript["NAMEPLATE"] = new LuaNameplateFunc();
 			LuaScript["NAMEPLATESLIST"] = new LuaNameplatesDatabase();
 			LuaScript["CONFIG"] = new LuaConfigIniFunc();
+			LuaScript["SONGMOUNT"] = new LuaSongMountFunc();   // read the song the host just confirmed (for online sync)
 			LuaScript["THEME"] = new LuaThemeFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, OpenTaiko.GlobalStores.SharedStrings, ltf, lsf, dir);
 			LuaScript["DATABASE"] = new LuaDataStorageFunc(dir);

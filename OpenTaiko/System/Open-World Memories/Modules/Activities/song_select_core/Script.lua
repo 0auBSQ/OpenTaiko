@@ -291,11 +291,12 @@ function onStart()
     G.favs = Favs
 end
 
-function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2)
+function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly)
     G.activeConfig = {
         allowPlayerCount  = allowPlayerCount,
         lockedPlayerCount = lockedPlayerCount,
         mountAISlotToP2   = mountAISlotToP2 == true,
+        songOnly          = songOnly == true,   -- online lobby: pick song only (no diff prompt), Auto disabled
     }
 
     if G.activeConfig.lockedPlayerCount ~= nil then
