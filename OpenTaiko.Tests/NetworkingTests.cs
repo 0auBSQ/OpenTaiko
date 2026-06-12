@@ -198,6 +198,58 @@ namespace OpenTaikoTests {
 			} finally { b.Leave(); a.Leave(); host.Leave(); }
 		}
 
+		// ── in-process rendezvous bus (stands in for the public MQTT broker) ──────────────────────
+		private sealed class MemorySignal : OpenTaiko.LuaNetworking.IOtonSignal {
+			private static readonly Dictionary<string, List<Action<byte[]>>> _bus = new();
+			private readonly List<(string, Action<byte[]>)> _mine = new();
+			public bool Open() => true;
+			public bool Alive => true;
+			public void Listen(string channel, Action<byte[]> onMessage) {
+				lock (_bus) {
+					if (!_bus.TryGetValue(channel, out var l)) _bus[channel] = l = new List<Action<byte[]>>();
+					l.Add(onMessage); _mine.Add((channel, onMessage));
+				}
+			}
+			public void Send(string channel, byte[] payload) {
+				Action<byte[]>[] subs;
+				lock (_bus) subs = _bus.TryGetValue(channel, out var l) ? l.ToArray() : Array.Empty<Action<byte[]>>();
+				foreach (var s in subs) System.Threading.Tasks.Task.Run(() => s(payload));
+			}
+			public void Dispose() {
+				lock (_bus) foreach (var (c, a) in _mine) if (_bus.TryGetValue(c, out var l)) l.Remove(a);
+			}
+		}
+
+		[Fact]
+		public void P2PJoin_HostConnectsBackThroughRendezvous() {
+			// the pure-P2P internet path: the joiner has NO direct route (forced), publishes its
+			// candidates on the rendezvous channel, and the HOST dials back; handshake + traffic
+			// then flow over that reverse-established direct socket.
+			var oldFactory = OpenTaiko.LuaNetworking.SignalFactory;
+			OpenTaiko.LuaNetworking.SignalFactory = () => new MemorySignal();
+			int port = NextPort();
+			var host = NewNet(port, "{\"name\":\"H\"}");
+			var cli = NewNet(port, "{\"name\":\"C\"}");
+			try {
+				string code = host.CreateRoom("p2pstage", "pay", 8);
+				Assert.False(string.IsNullOrEmpty(code));
+				cli.ForceP2POnly = true;                       // no direct candidates, no relay
+				Assert.True(cli.JoinRoom(code));
+				Assert.NotNull(WaitEvent(cli, "connected", 15000));
+				Assert.NotNull(WaitEvent(host, "joined", 15000));
+				Assert.True(WaitUntil(() => host.PeerCount() == 2 && cli.PeerCount() == 2));
+				cli.Broadcast("chat", "reverse-p2p");
+				var e = WaitEvent(host, "message");
+				Assert.NotNull(e); Assert.Equal("reverse-p2p", e.Data); Assert.Equal(2, e.Peer);
+				host.SendTo(2, "dm", "direct-back");
+				var e2 = WaitEvent(cli, "message");
+				Assert.NotNull(e2); Assert.Equal("direct-back", e2.Data);
+			} finally {
+				cli.Leave(); host.Leave();
+				OpenTaiko.LuaNetworking.SignalFactory = oldFactory;
+			}
+		}
+
 		[Fact]
 		public void RoomCode_TamperAndGarbage_AreRejected() {
 			int port = NextPort();

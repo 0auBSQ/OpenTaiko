@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -11,22 +12,32 @@ using Newtonsoft.Json.Linq;
 
 namespace OpenTaiko {
 	// ── LuaNetworking - OpenTaiko's P2P online core (src/Lua/Networking) ───────────────────────────────────
-	// The room CREATOR is the server/relay (a TCP listener);
-	// joiners connect to it (a star topology). On top of that sits a rotating "HOST ROLE" - the lobby authority
+	// The room CREATOR is the server (a TCP listener); joiners connect to it and it routes all room
+	// traffic (a star topology). On top of that sits a rotating "HOST ROLE" - the lobby authority
 	// that picks the track/map/song and starts the play - which hands off after each play independently of who
-	// owns the socket. If the server itself leaves, the room closes for everyone (a "roomclosed" event); that's
-	// the accepted fallback (true socket migration is a future step).
+	// owns the socket. SOCKET MIGRATION: if the server leaves (gracefully or by crash), the survivors agree on
+	// a successor (lowest surviving roster id), it re-binds and re-registers the rendezvous topic, and everyone
+	// rejoins with their old identity; the room only closes when nobody is left to take over.
+	//
+	// How a joiner reaches the server (all automatic, in order):
+	//   1. DIRECT to the addresses in the room code ("ips": LAN/VPN/IPv6 + "pub": public IP) - instant on the
+	//      same network; UPnP port-forwarding is requested silently so this often works over the internet too.
+	//   2. PURE-P2P RENDEZVOUS: both sides meet on a public MQTT broker topic ("tok"), the joiner publishes its
+	//      own candidates (sealed with the room-code secret), and the SERVER dials the JOINER back - so a join
+	//      succeeds if EITHER side is reachable. Game traffic always flows directly between players.
 	//
 	// Protocol = "OpenTaiko Online" (OTON):
 	//   • A connecting client must lead with the magic "OTON" + protocol version, or it's rejected outright -
 	//     so a non-OpenTaiko client (random port-scanner, wrong game) can never join.
 	//   • Right after, both sides do an ephemeral ECDH (P-256) key exchange and derive a per-SESSION AES-256-GCM
-	//     key. EVERY message after the handshake is an AES-GCM frame (encrypted + authenticated), so a passive
-	//     eavesdropper can't read traffic and a tamperer/MITM can't forge frames (the GCM tag fails). NOTE: the
-	//     game is open source, so the *room-code* obfuscation key is discoverable - the room code resists casual
-	//     hand-decoding, not a determined reader; the live SESSION is what's genuinely protected by the ECDH.
-	//   • The connection string (room code) is the object {ip, stageid, payload} AES-GCM-encrypted under a fixed
-	//     app key and Base64'd - copy/paste-able, and tamper-evident (a bad code just fails to decode).
+	//     key, additionally bound to the room-code secret ("k") - so a passive eavesdropper can't read traffic,
+	//     a tamperer can't forge frames (the GCM tag fails), and nothing in the middle (broker, proxy) can MITM
+	//     the handshake without the room code. NOTE: the game is open source, so the *room-code* obfuscation key
+	//     is discoverable - the room code resists casual hand-decoding, not a determined reader; the live
+	//     SESSION is what's genuinely protected.
+	//   • The connection string (room code) is the object {ip/ips/pub, stageid, payload, k, tok} AES-GCM-
+	//     encrypted under a fixed app key and Base64'd - copy/paste-able, and tamper-evident (a bad code just
+	//     fails to decode).
 	//
 	// Lua API (global NET): all data crosses the boundary as STRINGS (stages use JSON), so there's no LuaTable
 	// marshalling. The network runs on background threads and pushes events into a queue the stage drains each
@@ -53,7 +64,12 @@ namespace OpenTaiko {
 	public sealed class LuaNetworking {
 		// ── protocol constants ──────────────────────────────────────────────────────────────────────────
 		private static readonly byte[] MAGIC = Encoding.ASCII.GetBytes("OTON");
-		private const ushort PROTO_VER = 1;
+		private const ushort PROTO_VER = 2;   // v2: session keys are bound to the room-code secret (no middlebox can MITM)
+
+		// room token: names the pure-P2P rendezvous topic; the secret below seals the signaling and
+		// binds every session key to the room code (nothing in the middle can read or impersonate).
+		private string _roomToken = "";                         // rendezvous topic id (survives host migration)
+		private byte[] _psk = Array.Empty<byte>();              // room-code secret mixed into every session key
 		private const int DEFAULT_PORT = 41234;
 		/// <summary>Test/advanced hook: when > 0, this room uses this port instead of the default.</summary>
 		public int PortOverride = 0;
@@ -136,8 +152,9 @@ namespace OpenTaiko {
 		// ── Lua: identity / lifecycle ────────────────────────────────────────────────────────────────────
 		public void SetLocalPlayer(string infoJson) { _localInfo = string.IsNullOrEmpty(infoJson) ? "{}" : infoJson; }
 
-		/// <summary>Host a room: start the TCP server, become host (id 1) + initial host-role holder, and return
-		/// the encrypted room code carrying {ip, stageid, payload}. maxPlayers caps joiners (default 8).</summary>
+		/// <summary>Host a room: start the (dual-stack) TCP server, register the P2P rendezvous topic, become
+		/// host (id 1) + initial host-role holder, and return the encrypted room code carrying the connection
+		/// candidates + secrets {ip/ips/pub, stageid, payload, k, tok}. maxPlayers caps joiners (default 8).</summary>
 		public string CreateRoom(string stageId, string payload, int maxPlayers) {
 			Leave();
 			lock (_lock) {
@@ -147,9 +164,13 @@ namespace OpenTaiko {
 				_roster[1] = _localInfo; _order.Clear(); _order.Add(1);
 				_roomSecret = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
 				_peerAddr.Clear(); _peerAddr[1] = LocalIPv4(); _serverPeerId = 1;
+				_psk = RandomNumberGenerator.GetBytes(16);
+				_roomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(6));   // rendezvous topic id
+				lock (_seenOffers) _seenOffers.Clear();
 			}
 			try {
-				_listener = new TcpListener(IPAddress.Any, Port);
+				_listener = new TcpListener(IPAddress.IPv6Any, Port);
+				_listener.Server.DualMode = true;            // accept IPv4 and IPv6 joiners alike
 				_listener.Start();
 			} catch (Exception e) { Enqueue("error", 0, "", "Could not host: " + e.Message); _isHost = false; return null; }
 			_running = true;
@@ -157,8 +178,13 @@ namespace OpenTaiko {
 			_acceptThread.Start();
 			Active = this;
 			if (PortOverride == 0) { UpnpMapPort(Port); _upnpMapped = true; }   // ask the router to forward us (real game only)
+			StartSignalHostLoop();                                               // pure-P2P internet path (zero config)
 			var hostIps = LocalIPv4s();
-			var obj = new JObject { ["ip"] = hostIps[0], ["ips"] = new JArray(hostIps), ["stageid"] = _stageId, ["payload"] = _payload };
+			var obj = new JObject {
+				["ip"] = hostIps[0], ["ips"] = new JArray(hostIps), ["stageid"] = _stageId, ["payload"] = _payload,
+				["k"] = Convert.ToBase64String(_psk), ["tok"] = _roomToken,
+			};
+			foreach (string ip6 in LocalIPv6s()) ((JArray)obj["ips"]).Add(ip6);  // IPv6 = direct internet, no NAT at all
 			string pub = _publicIp;
 			if (!string.IsNullOrEmpty(pub) && !hostIps.Contains(pub)) obj["pub"] = pub;   // direct internet candidate
 			return EncodeRoom(obj.ToString(Newtonsoft.Json.Formatting.None));
@@ -172,6 +198,7 @@ namespace OpenTaiko {
 		}
 
 		/// <summary>Join a room from its code (async - success/failure arrives as a "connected"/"error" event).
+		/// Tries the code's direct addresses first, then the P2P rendezvous (the host dials us back).
 		/// Returns false immediately only if the code itself is malformed.</summary>
 		public bool JoinRoom(string roomCode) {
 			var o = DecodeRoom(roomCode);
@@ -184,32 +211,48 @@ namespace OpenTaiko {
 			if (!string.IsNullOrEmpty(one) && !ips.Contains(one)) ips.Insert(0, one);
 			string pub = o["pub"]?.ToString();
 			if (!string.IsNullOrEmpty(pub) && !ips.Contains(pub)) ips.Add(pub);   // internet candidate last: LAN/VPN joins stay instant
-			if (ips.Count == 0) return false;
+			string roomTok = o["tok"]?.ToString() ?? "";
+			if (ips.Count == 0 && roomTok.Length == 0) return false;
 			Leave();
 			_stageId = stage; _payload = pay;   // keep the room metadata: a migration SUCCESSOR re-hosts with it
+			try { _psk = Convert.FromBase64String(o["k"]?.ToString() ?? ""); } catch { _psk = Array.Empty<byte>(); }
+			_roomToken = roomTok;
 			_isHost = false; _running = true;
 			Active = this;
+			bool hasP2P = roomTok.Length > 0 && _psk.Length > 0;
 			var t = new Thread(() => {
 				string lastErr = null;
-				foreach (string ip in ips) {
-					if (!_running) return;
-					lastErr = ClientConnect(ip, Port, stage, pay, 0, ips.Count > 1 ? 3000 : 6000);
-					if (lastErr == null) return;   // connected
+				if (!ForceP2POnly) {
+					// direct candidates first: instant on LAN/VPN/IPv6, fails fast when the host is
+					// genuinely unreachable — then the P2P rendezvous takes over invisibly
+					foreach (string ip in ips) {
+						if (!_running) return;
+						lastErr = ClientConnect(ip, Port, stage, pay, 0, (ips.Count > 1 || hasP2P) ? 2500 : 6000);
+						if (lastErr == null) return;   // connected
+						if (lastErr.StartsWith("REJECTED:")) { Enqueue("error", 0, "", lastErr.Substring(9)); return; }
+					}
 				}
-				bool unreachable = lastErr != null && lastErr.Contains("did not respond");
-				string hint = unreachable
-					? $" — same network/VPN: check the host's firewall allows OpenTaiko (inbound TCP {Port}); over the internet: the host needs UPnP or port forwarding (TCP {Port}), or use a VPN like Tailscale/Radmin"
-					: "";
-				Enqueue("error", 0, "", $"{lastErr} (tried {string.Join(", ", ips)}){hint}");
+				if (hasP2P && _running) {
+					string p2pErr = P2PJoin(stage, pay, 0);
+					if (p2pErr == null) return;        // host connected back to us — pure P2P
+					if (p2pErr.StartsWith("REJECTED:")) { Enqueue("error", 0, "", p2pErr.Substring(9)); return; }
+					lastErr = p2pErr;
+				}
+				// plain words for players; the addresses tried go to the log for debugging
+				Trace.TraceWarning($"[OTON] join failed (tried {string.Join(", ", ips)}{(hasP2P ? " + p2p" : "")}): {lastErr}");
+				Enqueue("error", 0, "", $"Could not join: {lastErr ?? "no route to the host"}. " +
+					"Make sure the room is still open and both players use the same game version.");
 			}) { IsBackground = true, Name = "OTON-connect" };
 			t.Start();
 			return true;
 		}
 
-		/// <summary>Disconnect / close the room. (Server leaving closes it for everyone.)</summary>
+		/// <summary>Disconnect. A leaving SERVER hands the room to a successor when other players remain
+		/// (socket migration); the room only closes for everyone when no successor exists.</summary>
 		public void Leave() {
 			_running = false;
 			if (_upnpMapped) { _upnpMapped = false; UpnpUnmapPort(Port); }
+			_roomToken = "";   // stops the rendezvous loop; the next room registers fresh
 			try { _listener?.Stop(); } catch { } _listener = null;
 			List<PeerConn> conns; int successor = -1;
 			lock (_lock) {
@@ -465,9 +508,170 @@ namespace OpenTaiko {
 			if (toHost) DeliverMessage(from, body["c"]?.ToString() ?? "", body["d"]?.ToString() ?? "");
 		}
 
+		// ── pure-P2P rendezvous (zero infrastructure) ────────────────────────────────────────────────────
+		// When the joiner cannot reach the host directly, the two machines meet on a public MQTT broker
+		// topic derived from the room token and exchange CONNECTION CANDIDATES (AES-GCM sealed with the
+		// room-code secret — the broker sees ~1 KB of opaque bytes, and cannot forge offers). Then the
+		// HOST dials the JOINER ("reverse connection"): a join now succeeds if EITHER side is reachable
+		// (either router doing UPnP, either side with a public or IPv6 address), instead of requiring
+		// the host specifically to be. Game traffic itself always flows directly between the players.
+
+		internal interface IOtonSignal : IDisposable {
+			bool Open();
+			bool Alive { get; }
+			void Listen(string channel, Action<byte[]> onMessage);
+			void Send(string channel, byte[] payload);
+		}
+
+		private sealed class MqttSignal : IOtonSignal {
+			private readonly MiniMqtt _m = new();
+			private bool _open;
+			public bool Open() => _open = _m.Connect(MiniMqtt.PublicBrokers);
+			public bool Alive => _open;
+			public void Listen(string channel, Action<byte[]> onMessage) => _m.Subscribe(channel, onMessage);
+			public void Send(string channel, byte[] payload) => _m.Publish(channel, payload);
+			public void Dispose() => _m.Dispose();
+		}
+
+		/// <summary>Test hook: replaces the public-broker signal with an in-process bus.</summary>
+		internal static Func<IOtonSignal> SignalFactory = () => new MqttSignal();
+		internal bool ForceP2POnly = false;          // test hook: joiner skips the direct candidates
+
+		private string SignalTopic => "oton/v1/" + _roomToken;
+		private readonly HashSet<string> _seenOffers = new();
+
+		private byte[] SealPsk(JObject o) {
+			byte[] pt = Encoding.UTF8.GetBytes(o.ToString(Newtonsoft.Json.Formatting.None));
+			byte[] nonce = RandomNumberGenerator.GetBytes(12);
+			byte[] ct = new byte[pt.Length]; byte[] tag = new byte[16];
+			using (var gcm = new AesGcm(SHA256.HashData(_psk), 16)) gcm.Encrypt(nonce, pt, ct, tag);
+			byte[] outb = new byte[12 + ct.Length + 16];
+			Buffer.BlockCopy(nonce, 0, outb, 0, 12); Buffer.BlockCopy(ct, 0, outb, 12, ct.Length); Buffer.BlockCopy(tag, 0, outb, 12 + ct.Length, 16);
+			return outb;
+		}
+		private JObject OpenPsk(byte[] inb) {
+			if (inb == null || inb.Length < 12 + 16 || _psk.Length == 0) return null;
+			byte[] nonce = new byte[12]; Buffer.BlockCopy(inb, 0, nonce, 0, 12);
+			int ctLen = inb.Length - 12 - 16;
+			byte[] ct = new byte[ctLen]; Buffer.BlockCopy(inb, 12, ct, 0, ctLen);
+			byte[] tag = new byte[16]; Buffer.BlockCopy(inb, 12 + ctLen, tag, 0, 16);
+			byte[] pt = new byte[ctLen];
+			try { using var gcm = new AesGcm(SHA256.HashData(_psk), 16); gcm.Decrypt(nonce, ct, tag, pt); } catch { return null; }
+			try { return JObject.Parse(Encoding.UTF8.GetString(pt)); } catch { return null; }
+		}
+
+		/// <summary>Host: listen on the rendezvous channel; for every (authentic) joiner offer, dial the
+		/// joiner's candidates and run the normal host handshake on whichever connects first.</summary>
+		private void StartSignalHostLoop() {
+			string tok = _roomToken;
+			var t = new Thread(() => {
+				IOtonSignal sig = null;
+				while (_running && _isHost && _roomToken == tok) {
+					try {
+						if (sig == null || !sig.Alive) {
+							sig?.Dispose();
+							sig = SignalFactory();
+							if (!sig.Open()) { sig.Dispose(); sig = null; Thread.Sleep(15000); continue; }
+							sig.Listen(SignalTopic, OnJoinerOffer);
+						}
+					} catch { try { sig?.Dispose(); } catch { } sig = null; }
+					Thread.Sleep(5000);
+				}
+				try { sig?.Dispose(); } catch { }
+			}) { IsBackground = true, Name = "OTON-signal-host" };
+			t.Start();
+		}
+
+		private void OnJoinerOffer(byte[] sealedOffer) {
+			var o = OpenPsk(sealedOffer);
+			if (o == null) return;                            // not sealed with our room-CODE secret → ignore
+			string nonce = o["n"]?.ToString() ?? "";
+			lock (_seenOffers) { if (nonce.Length == 0 || !_seenOffers.Add(nonce)) return; }
+			var cands = new List<string>();
+			if (o["c"] is JArray ca) foreach (var v in ca) { string s = v?.ToString(); if (!string.IsNullOrEmpty(s)) cands.Add(s); }
+			if (cands.Count == 0 || cands.Count > 12) return;
+			int won = 0;
+			foreach (string cand in cands) {
+				string c = cand;
+				new Thread(() => {
+					int i = c.LastIndexOf(':');
+					if (i <= 0 || !int.TryParse(c.Substring(i + 1), out int cport)) return;
+					string chost = c.Substring(0, i).Trim('[', ']');
+					TcpClient cli = null;
+					try {
+						cli = new TcpClient();
+						var ar = cli.BeginConnect(chost, cport, null, null);
+						if (!ar.AsyncWaitHandle.WaitOne(5000)) throw new Exception();
+						cli.EndConnect(ar); cli.NoDelay = true;
+						if (Interlocked.CompareExchange(ref won, 1, 0) != 0) { cli.Close(); return; }
+						HostHandshake(cli);                   // reverse-established, but protocol-wise just a joiner
+					} catch { try { cli?.Close(); } catch { } }
+				}) { IsBackground = true, Name = "OTON-reverse-dial" }.Start();
+			}
+		}
+
+		/// <summary>Joiner: open a temporary listener, publish our candidates on the rendezvous channel,
+		/// and run the client handshake on whatever the host connects back with. Null on success.</summary>
+		private string P2PJoin(string stage, string payload, int rejoinId) {
+			IOtonSignal sig = null;
+			TcpListener lst = null;
+			try {
+				lst = new TcpListener(IPAddress.IPv6Any, 0);
+				lst.Server.DualMode = true;
+				lst.Start();
+				int lport = ((IPEndPoint)lst.LocalEndpoint).Port;
+				if (PortOverride == 0) UpnpMapPort(lport);     // best effort; lease expires on its own
+
+				var cands = new List<string>();
+				foreach (string ip in LocalIPv4s()) cands.Add($"{ip}:{lport}");
+				string pub = _publicIp;
+				if (!string.IsNullOrEmpty(pub) && !cands.Contains($"{pub}:{lport}")) cands.Add($"{pub}:{lport}");
+				foreach (string ip6 in LocalIPv6s()) cands.Add($"[{ip6}]:{lport}");
+				cands.Add($"127.0.0.1:{lport}");               // same-machine sessions; strangers die on the magic check
+
+				sig = SignalFactory();
+				if (!sig.Open()) return "The matchmaking service is unreachable";
+				var offer = new JObject {
+					["n"] = Convert.ToHexString(RandomNumberGenerator.GetBytes(8)),
+					["c"] = new JArray(cands),
+				};
+				sig.Send(SignalTopic, SealPsk(offer));
+
+				long deadline = Environment.TickCount64 + 12000;
+				while (_running && Environment.TickCount64 < deadline) {
+					if (!lst.Pending()) { Thread.Sleep(50); continue; }
+					TcpClient cli = lst.AcceptTcpClient();
+					cli.NoDelay = true;
+					// the host may reach us over several candidates; first complete handshake wins
+					if (ClientHandshake(cli, "p2p", stage, payload, rejoinId) == null) return null;
+				}
+				return "The host could not connect back";
+			} catch (Exception e) { return e.Message; }
+			finally { try { lst?.Stop(); } catch { } try { sig?.Dispose(); } catch { } }
+		}
+
+		private static List<string> LocalIPv6s() {
+			var ips = new List<string>();
+			try {
+				foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()) {
+					if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
+					if (ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
+					foreach (var ua in ni.GetIPProperties().UnicastAddresses) {
+						var a = ua.Address;
+						if (a.AddressFamily != AddressFamily.InterNetworkV6) continue;
+						if (a.IsIPv6LinkLocal || a.IsIPv6SiteLocal || IPAddress.IsLoopback(a)) continue;
+						string s = a.ToString();
+						if (!ips.Contains(s)) ips.Add(s);
+					}
+				}
+			} catch { }
+			if (ips.Count > 3) ips.RemoveRange(3, ips.Count - 3);
+			return ips;
+		}
+
 		// ── client: connect + handshake ──────────────────────────────────────────────────────────────────
-		/// <summary>One connection attempt; returns null on success or the error text (callers decide
-		/// whether/how to surface it — the joiner aggregates over several candidate addresses).</summary>
+		/// <summary>One direct connection attempt; returns null on success or the error text (callers
+		/// decide whether/how to surface it — the joiner aggregates over several candidate addresses).</summary>
 		private string ClientConnect(string ip, int port, string stage, string payload, int rejoinId, int connectTimeoutMs = 6000) {
 			TcpClient cli = null;
 			try {
@@ -481,6 +685,17 @@ namespace OpenTaiko {
 				}
 				if (!cli.Connected) throw new Exception($"Host did not respond at {ip}");
 				cli.NoDelay = true;
+			} catch (Exception e) {
+				try { cli?.Close(); } catch { }
+				return e.Message;
+			}
+			return ClientHandshake(cli, ip, stage, payload, rejoinId);
+		}
+
+		/// <summary>The protocol handshake over an established pipe (a socket we dialed, or one the host
+		/// reverse-dialed to us via the P2P rendezvous). Returns null on success or the error text.</summary>
+		private string ClientHandshake(TcpClient cli, string ip, string stage, string payload, int rejoinId) {
+			try {
 				var ns = cli.GetStream(); ns.ReadTimeout = 8000;
 				WriteHeader(ns);
 				using var dh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
@@ -496,7 +711,8 @@ namespace OpenTaiko {
 				SendFrame(conn, OP_HELLO, helloMsg);
 				ns.ReadTimeout = 12000;
 				if (!ReadFrame(conn, out byte op, out JObject msg)) throw new Exception("No reply from host");
-				if (op == OP_REJECT) throw new Exception(msg["why"]?.ToString() ?? "Rejected");
+				// a REJECT is a definitive answer from a host we DID reach — no point trying other routes
+				if (op == OP_REJECT) throw new Exception("REJECTED:" + (msg["why"]?.ToString() ?? "Rejected"));
 				if (op != OP_WELCOME) throw new Exception("Unexpected handshake reply");
 				ns.ReadTimeout = Timeout.Infinite;
 				lock (_lock) {
@@ -588,8 +804,9 @@ namespace OpenTaiko {
 		// ── reconnect + socket migration ─────────────────────────────────────────────────────────────────
 		// Runs when a CLIENT loses the server. Phase 1 (skipped on a graceful OP_MIGRATE handover):
 		// retry the same server — covers a network blip on OUR side. Phase 2: everyone deterministically
-		// agrees the successor = the LOWEST surviving roster id; the successor re-binds the port and the
-		// rest reconnect to its known address with their old id + the room secret, so identities survive.
+		// agrees the successor = the LOWEST surviving roster id; the successor re-binds the port and
+		// re-registers the room's rendezvous topic, and the rest reconnect — direct to its known address,
+		// or through the P2P rendezvous — with their old id + the room secret, so identities survive.
 		private void Recover(PeerConn deadConn) {
 			if (_recovering || !_running) return;
 			_recovering = true;
@@ -627,7 +844,11 @@ namespace OpenTaiko {
 		private bool TryRejoin(string ip, int myId) {
 			try {
 				// synchronous; per-attempt errors stay silent (RecoverLoop already told the user once)
-				return ClientConnect(ip, Port, _stageId, _payload, myId) == null && Connected();
+				if (ip != "p2p" && !string.IsNullOrEmpty(ip)
+					&& ClientConnect(ip, Port, _stageId, _payload, myId, 4000) == null && Connected()) return true;
+				// the (new) host re-registers the same rendezvous topic, so the P2P path still works
+				return _roomToken.Length > 0 && _psk.Length > 0
+					&& P2PJoin(_stageId, _payload, myId) == null && Connected();
 			} catch { return false; }
 		}
 		private void GiveUp() { _recovering = false; if (_running) Enqueue("roomclosed", 0, "", ""); }
@@ -643,11 +864,13 @@ namespace OpenTaiko {
 				if (!_roster.ContainsKey(_hostRoleId)) _hostRoleId = _selfId;
 			}
 			try {
-				_listener = new TcpListener(IPAddress.Any, Port);
+				_listener = new TcpListener(IPAddress.IPv6Any, Port);
+				_listener.Server.DualMode = true;
 				_listener.Start();
 			} catch { GiveUp(); return; }
 			_acceptThread = new Thread(AcceptLoop) { IsBackground = true, Name = "OTON-accept" };
 			_acceptThread.Start();
+			if (_roomToken.Length > 0) StartSignalHostLoop();   // take over the room's rendezvous topic
 			Enqueue("left", deadServer, "", "");
 			Enqueue("hostrole", _hostRoleId, "", "");
 			Enqueue("error", 0, "", "You now host the room.");
@@ -774,10 +997,16 @@ namespace OpenTaiko {
 			return b;
 		}
 
-		private static byte[] DeriveSession(ECDiffieHellman mine, byte[] otherPubDer) {
+		private byte[] DeriveSession(ECDiffieHellman mine, byte[] otherPubDer) {
 			using var other = ECDiffieHellman.Create();
 			other.ImportSubjectPublicKeyInfo(otherPubDer, out _);
-			return mine.DeriveKeyFromHash(other.PublicKey, HashAlgorithmName.SHA256);   // 32 bytes
+			byte[] ecdh = mine.DeriveKeyFromHash(other.PublicKey, HashAlgorithmName.SHA256);   // 32 bytes
+			// bind the session to the room-code secret: anything in the middle (broker, proxy) that runs
+			// its own ECDH on both legs still cannot produce matching keys without the code
+			byte[] mix = new byte[ecdh.Length + _psk.Length];
+			Buffer.BlockCopy(ecdh, 0, mix, 0, ecdh.Length);
+			if (_psk.Length > 0) Buffer.BlockCopy(_psk, 0, mix, ecdh.Length, _psk.Length);
+			return SHA256.HashData(mix);
 		}
 
 		private static string EncodeRoom(string json) {
@@ -816,8 +1045,9 @@ namespace OpenTaiko {
 		// ── internet play: public IP + UPnP (best effort) ───────────────────────────────────────────────
 		// Discovered ONCE per process on a background thread (kicked at first LuaNetworking construction so
 		// it is long done by the time a human hosts a room). The public IP goes into the room code ("pub")
-		// and UPnP asks the router to forward the port — together they make direct internet hosting work on
-		// cooperative routers. Hosts behind CGNAT still need a VPN; the join error says so.
+		// and UPnP asks the router to forward the port — together they make DIRECT internet connections work
+		// on cooperative routers (and feed both sides' candidates for the P2P rendezvous path). When neither
+		// side is reachable at all (e.g. strict CGNAT on both ends), the join fails with a plain-language error.
 		private static volatile string _publicIp;             // null until discovered (or undiscoverable)
 		private static string _upnpControlUrl, _upnpServiceType;
 		private static int _discoveryKicked;
