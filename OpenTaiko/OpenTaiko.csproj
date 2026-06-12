@@ -44,4 +44,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenTaiko.Tests" />
+  </ItemGroup>
 </Project>
