@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -56,6 +57,10 @@ namespace OpenTaiko {
 		private const int DEFAULT_PORT = 41234;
 		/// <summary>Test/advanced hook: when > 0, this room uses this port instead of the default.</summary>
 		public int PortOverride = 0;
+
+		public LuaNetworking() { KickDiscovery(); }   // public IP + UPnP lookup, once per process
+
+		private bool _upnpMapped;                      // we asked the router for a forward → undo on Leave
 		private int Port => PortOverride > 0 ? PortOverride : DEFAULT_PORT;
 		// fixed key for the ROOM CODE only (OpenTaiko being open-source, simple obfuscation + integrity not secrecy)
 		private static readonly byte[] APP_KEY = SHA256.HashData(Encoding.UTF8.GetBytes("OpenTaiko Online :: room code :: v1"));
@@ -151,7 +156,11 @@ namespace OpenTaiko {
 			_acceptThread = new Thread(AcceptLoop) { IsBackground = true, Name = "OTON-accept" };
 			_acceptThread.Start();
 			Active = this;
-			var obj = new JObject { ["ip"] = LocalIPv4(), ["stageid"] = _stageId, ["payload"] = _payload };
+			if (PortOverride == 0) { UpnpMapPort(Port); _upnpMapped = true; }   // ask the router to forward us (real game only)
+			var hostIps = LocalIPv4s();
+			var obj = new JObject { ["ip"] = hostIps[0], ["ips"] = new JArray(hostIps), ["stageid"] = _stageId, ["payload"] = _payload };
+			string pub = _publicIp;
+			if (!string.IsNullOrEmpty(pub) && !hostIps.Contains(pub)) obj["pub"] = pub;   // direct internet candidate
 			return EncodeRoom(obj.ToString(Newtonsoft.Json.Formatting.None));
 		}
 		public string CreateRoom(string stageId, string payload) => CreateRoom(stageId, payload, 8);
@@ -167,13 +176,32 @@ namespace OpenTaiko {
 		public bool JoinRoom(string roomCode) {
 			var o = DecodeRoom(roomCode);
 			if (o == null) return false;
-			string ip = o["ip"]?.ToString(); string stage = o["stageid"]?.ToString() ?? ""; string pay = o["payload"]?.ToString() ?? "";
-			if (string.IsNullOrEmpty(ip)) return false;
+			string stage = o["stageid"]?.ToString() ?? ""; string pay = o["payload"]?.ToString() ?? "";
+			// newer codes carry every host address ("ips" + public "pub"); older ones just the primary ("ip")
+			var ips = new List<string>();
+			if (o["ips"] is JArray arr) foreach (var v in arr) { string s = v?.ToString(); if (!string.IsNullOrEmpty(s) && !ips.Contains(s)) ips.Add(s); }
+			string one = o["ip"]?.ToString();
+			if (!string.IsNullOrEmpty(one) && !ips.Contains(one)) ips.Insert(0, one);
+			string pub = o["pub"]?.ToString();
+			if (!string.IsNullOrEmpty(pub) && !ips.Contains(pub)) ips.Add(pub);   // internet candidate last: LAN/VPN joins stay instant
+			if (ips.Count == 0) return false;
 			Leave();
 			_stageId = stage; _payload = pay;   // keep the room metadata: a migration SUCCESSOR re-hosts with it
 			_isHost = false; _running = true;
 			Active = this;
-			var t = new Thread(() => ClientConnect(ip, Port, stage, pay)) { IsBackground = true, Name = "OTON-connect" };
+			var t = new Thread(() => {
+				string lastErr = null;
+				foreach (string ip in ips) {
+					if (!_running) return;
+					lastErr = ClientConnect(ip, Port, stage, pay, 0, ips.Count > 1 ? 3000 : 6000);
+					if (lastErr == null) return;   // connected
+				}
+				bool unreachable = lastErr != null && lastErr.Contains("did not respond");
+				string hint = unreachable
+					? $" — same network/VPN: check the host's firewall allows OpenTaiko (inbound TCP {Port}); over the internet: the host needs UPnP or port forwarding (TCP {Port}), or use a VPN like Tailscale/Radmin"
+					: "";
+				Enqueue("error", 0, "", $"{lastErr} (tried {string.Join(", ", ips)}){hint}");
+			}) { IsBackground = true, Name = "OTON-connect" };
 			t.Start();
 			return true;
 		}
@@ -181,6 +209,7 @@ namespace OpenTaiko {
 		/// <summary>Disconnect / close the room. (Server leaving closes it for everyone.)</summary>
 		public void Leave() {
 			_running = false;
+			if (_upnpMapped) { _upnpMapped = false; UpnpUnmapPort(Port); }
 			try { _listener?.Stop(); } catch { } _listener = null;
 			List<PeerConn> conns; int successor = -1;
 			lock (_lock) {
@@ -437,14 +466,21 @@ namespace OpenTaiko {
 		}
 
 		// ── client: connect + handshake ──────────────────────────────────────────────────────────────────
-		private void ClientConnect(string ip, int port, string stage, string payload) { ClientConnect(ip, port, stage, payload, 0); }
-		private void ClientConnect(string ip, int port, string stage, string payload, int rejoinId) {
+		/// <summary>One connection attempt; returns null on success or the error text (callers decide
+		/// whether/how to surface it — the joiner aggregates over several candidate addresses).</summary>
+		private string ClientConnect(string ip, int port, string stage, string payload, int rejoinId, int connectTimeoutMs = 6000) {
 			TcpClient cli = null;
 			try {
 				cli = new TcpClient();
 				var ar = cli.BeginConnect(ip, port, null, null);
-				if (!ar.AsyncWaitHandle.WaitOne(6000) || !cli.Connected) { throw new Exception("Host did not respond"); }
-				cli.EndConnect(ar); cli.NoDelay = true;
+				if (!ar.AsyncWaitHandle.WaitOne(connectTimeoutMs)) { throw new Exception($"Host did not respond at {ip}"); }
+				try { cli.EndConnect(ar); } catch (SocketException se) {
+					throw new Exception(se.SocketErrorCode == SocketError.ConnectionRefused
+						? $"Connection refused at {ip} (the room is closed, or another program owns the port)"
+						: $"Could not connect to {ip}: {se.SocketErrorCode}");
+				}
+				if (!cli.Connected) throw new Exception($"Host did not respond at {ip}");
+				cli.NoDelay = true;
 				var ns = cli.GetStream(); ns.ReadTimeout = 8000;
 				WriteHeader(ns);
 				using var dh = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
@@ -479,9 +515,10 @@ namespace OpenTaiko {
 				Enqueue("connected", _selfId, "", info.ToString(Newtonsoft.Json.Formatting.None));
 				conn.Reader = new Thread(() => ReaderLoop(conn)) { IsBackground = true, Name = "OTON-rx" };
 				conn.Reader.Start();
+				return null;
 			} catch (Exception e) {
 				try { cli?.Close(); } catch { }
-				Enqueue("error", 0, "", e.Message);
+				return e.Message;
 			}
 		}
 
@@ -589,9 +626,8 @@ namespace OpenTaiko {
 		}
 		private bool TryRejoin(string ip, int myId) {
 			try {
-				var before = _selfId;
-				ClientConnect(ip, Port, _stageId, _payload, myId);   // synchronous: enqueues connected/error
-				return Connected();
+				// synchronous; per-attempt errors stay silent (RecoverLoop already told the user once)
+				return ClientConnect(ip, Port, _stageId, _payload, myId) == null && Connected();
 			} catch { return false; }
 		}
 		private void GiveUp() { _recovering = false; if (_running) Enqueue("roomclosed", 0, "", ""); }
@@ -775,6 +811,121 @@ namespace OpenTaiko {
 				s.Connect("8.8.8.8", 65530);   // no packet is sent; this just selects the primary outbound interface
 				return ((IPEndPoint)s.LocalEndPoint).Address.ToString();
 			} catch { return "127.0.0.1"; }
+		}
+
+		// ── internet play: public IP + UPnP (best effort) ───────────────────────────────────────────────
+		// Discovered ONCE per process on a background thread (kicked at first LuaNetworking construction so
+		// it is long done by the time a human hosts a room). The public IP goes into the room code ("pub")
+		// and UPnP asks the router to forward the port — together they make direct internet hosting work on
+		// cooperative routers. Hosts behind CGNAT still need a VPN; the join error says so.
+		private static volatile string _publicIp;             // null until discovered (or undiscoverable)
+		private static string _upnpControlUrl, _upnpServiceType;
+		private static int _discoveryKicked;
+
+		internal static void KickDiscovery() {
+			if (Interlocked.Exchange(ref _discoveryKicked, 1) != 0) return;
+			new Thread(() => {
+				try {
+					using var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(4) };
+					foreach (var url in new[] { "https://api.ipify.org", "https://checkip.amazonaws.com" }) {
+						try {
+							string s = http.GetStringAsync(url).GetAwaiter().GetResult().Trim();
+							if (IPAddress.TryParse(s, out var a) && a.AddressFamily == AddressFamily.InterNetwork) { _publicIp = s; break; }
+						} catch { }
+					}
+				} catch { }
+				try { UpnpDiscover(); } catch { }
+			}) { IsBackground = true, Name = "OTON-discover" }.Start();
+		}
+
+		private static void UpnpDiscover() {
+			// SSDP M-SEARCH for an Internet Gateway Device, then fetch its control URL
+			using var udp = new UdpClient();
+			udp.Client.ReceiveTimeout = 2500;
+			byte[] req = Encoding.ASCII.GetBytes(
+				"M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 2\r\n" +
+				"ST: urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\n\r\n");
+			udp.Send(req, req.Length, new IPEndPoint(IPAddress.Parse("239.255.255.250"), 1900));
+			var from = new IPEndPoint(IPAddress.Any, 0);
+			string location = null;
+			long until = Environment.TickCount64 + 2500;
+			while (Environment.TickCount64 < until && location == null) {
+				try {
+					string resp = Encoding.ASCII.GetString(udp.Receive(ref from));
+					foreach (var line in resp.Split('\n'))
+						if (line.StartsWith("LOCATION:", StringComparison.OrdinalIgnoreCase)) { location = line.Substring(9).Trim(); break; }
+				} catch { break; }
+			}
+			if (location == null) return;
+			using var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(4) };
+			string xml = http.GetStringAsync(location).GetAwaiter().GetResult();
+			var doc = System.Xml.Linq.XDocument.Parse(xml);
+			foreach (var svc in doc.Descendants()) {
+				if (!svc.Name.LocalName.Equals("service")) continue;
+				string st = svc.Elements().FirstOrDefault(e => e.Name.LocalName == "serviceType")?.Value ?? "";
+				if (!st.Contains("WANIPConnection") && !st.Contains("WANPPPConnection")) continue;
+				string ctl = svc.Elements().FirstOrDefault(e => e.Name.LocalName == "controlURL")?.Value;
+				if (string.IsNullOrEmpty(ctl)) continue;
+				var baseUri = new Uri(location);
+				_upnpControlUrl = new Uri(baseUri, ctl).ToString();
+				_upnpServiceType = st;
+				return;
+			}
+		}
+
+		private static void UpnpSoap(string action, string args) {
+			if (_upnpControlUrl == null) return;
+			string body =
+				"<?xml version=\"1.0\"?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+				"s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>" +
+				$"<u:{action} xmlns:u=\"{_upnpServiceType}\">{args}</u:{action}></s:Body></s:Envelope>";
+			using var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(4) };
+			var content = new System.Net.Http.StringContent(body, Encoding.UTF8, "text/xml");
+			content.Headers.Add("SOAPACTION", $"\"{_upnpServiceType}#{action}\"");
+			http.PostAsync(_upnpControlUrl, content).GetAwaiter().GetResult();
+		}
+
+		/// <summary>Asks the router to forward our port to this machine (fire-and-forget).</summary>
+		private static void UpnpMapPort(int port) {
+			new Thread(() => {
+				try {
+					UpnpSoap("AddPortMapping",
+						$"<NewRemoteHost></NewRemoteHost><NewExternalPort>{port}</NewExternalPort><NewProtocol>TCP</NewProtocol>" +
+						$"<NewInternalPort>{port}</NewInternalPort><NewInternalClient>{LocalIPv4()}</NewInternalClient>" +
+						"<NewEnabled>1</NewEnabled><NewPortMappingDescription>OpenTaiko Online</NewPortMappingDescription><NewLeaseDuration>86400</NewLeaseDuration>");
+				} catch { }
+			}) { IsBackground = true, Name = "OTON-upnp" }.Start();
+		}
+
+		private static void UpnpUnmapPort(int port) {
+			new Thread(() => {
+				try {
+					UpnpSoap("DeletePortMapping",
+						$"<NewRemoteHost></NewRemoteHost><NewExternalPort>{port}</NewExternalPort><NewProtocol>TCP</NewProtocol>");
+				} catch { }
+			}) { IsBackground = true, Name = "OTON-upnp" }.Start();
+		}
+
+		/// <summary>All plausible host addresses, primary-outbound first. The room code carries every one
+		/// of them because the right one depends on how the JOINER reaches us: over a VPN (Radmin, Tailscale,
+		/// Hamachi…) the VPN adapter's IP is the reachable one, NOT the internet-facing adapter that the
+		/// 8.8.8.8 trick selects — that mismatch used to make every VPN join die with "Host did not respond".</summary>
+		private static List<string> LocalIPv4s() {
+			var ips = new List<string> { LocalIPv4() };
+			try {
+				foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()) {
+					if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
+					if (ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
+					foreach (var ua in ni.GetIPProperties().UnicastAddresses) {
+						if (ua.Address.AddressFamily != AddressFamily.InterNetwork) continue;
+						string a = ua.Address.ToString();
+						if (a.StartsWith("169.254.") || a == "127.0.0.1") continue;   // link-local / loopback
+						if (!ips.Contains(a)) ips.Add(a);
+					}
+				}
+			} catch { /* the primary alone still works */ }
+			if (ips.Count > 5) ips.RemoveRange(5, ips.Count - 5);   // keep the room code short
+			return ips;
 		}
 	}
 }
