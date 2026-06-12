@@ -199,11 +199,18 @@ namespace OpenTaikoTests {
 		}
 
 		// ── in-process rendezvous bus (stands in for the public MQTT broker) ──────────────────────
+		// pinned for the whole class: keeps every test hermetic (no real broker connections) and makes
+		// CreateRoom's broker-pin wait instant
+		static NetworkingTests() {
+			OpenTaiko.LuaNetworking.SignalFactory = _ => new MemorySignal();
+		}
+
 		private sealed class MemorySignal : OpenTaiko.LuaNetworking.IOtonSignal {
 			private static readonly Dictionary<string, List<Action<byte[]>>> _bus = new();
 			private readonly List<(string, Action<byte[]>)> _mine = new();
 			public bool Open() => true;
 			public bool Alive => true;
+			public string Broker => "memory";
 			public void Listen(string channel, Action<byte[]> onMessage) {
 				lock (_bus) {
 					if (!_bus.TryGetValue(channel, out var l)) _bus[channel] = l = new List<Action<byte[]>>();
@@ -225,8 +232,6 @@ namespace OpenTaikoTests {
 			// the pure-P2P internet path: the joiner has NO direct route (forced), publishes its
 			// candidates on the rendezvous channel, and the HOST dials back; handshake + traffic
 			// then flow over that reverse-established direct socket.
-			var oldFactory = OpenTaiko.LuaNetworking.SignalFactory;
-			OpenTaiko.LuaNetworking.SignalFactory = () => new MemorySignal();
 			int port = NextPort();
 			var host = NewNet(port, "{\"name\":\"H\"}");
 			var cli = NewNet(port, "{\"name\":\"C\"}");
@@ -244,10 +249,7 @@ namespace OpenTaikoTests {
 				host.SendTo(2, "dm", "direct-back");
 				var e2 = WaitEvent(cli, "message");
 				Assert.NotNull(e2); Assert.Equal("direct-back", e2.Data);
-			} finally {
-				cli.Leave(); host.Leave();
-				OpenTaiko.LuaNetworking.SignalFactory = oldFactory;
-			}
+			} finally { cli.Leave(); host.Leave(); }
 		}
 
 		[Fact]

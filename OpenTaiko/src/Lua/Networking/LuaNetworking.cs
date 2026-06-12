@@ -178,12 +178,17 @@ namespace OpenTaiko {
 			_acceptThread.Start();
 			Active = this;
 			if (PortOverride == 0) { UpnpMapPort(Port); _upnpMapped = true; }   // ask the router to forward us (real game only)
+			_signalBroker = "";
 			StartSignalHostLoop();                                               // pure-P2P internet path (zero config)
+			// the room code must name the broker we actually registered on (host and joiner have to meet
+			// on the SAME one) — give the loop a moment to connect; an empty "sb" still works as before
+			for (int i = 0; i < 40 && _hostSignal == null; i++) Thread.Sleep(100);
 			var hostIps = LocalIPv4s();
 			var obj = new JObject {
 				["ip"] = hostIps[0], ["ips"] = new JArray(hostIps), ["stageid"] = _stageId, ["payload"] = _payload,
 				["k"] = Convert.ToBase64String(_psk), ["tok"] = _roomToken,
 			};
+			if (_signalBroker.Length > 0) obj["sb"] = _signalBroker;             // rendezvous broker pin
 			foreach (string ip6 in LocalIPv6s()) ((JArray)obj["ips"]).Add(ip6);  // IPv6 = direct internet, no NAT at all
 			string pub = _publicIp;
 			if (!string.IsNullOrEmpty(pub) && !hostIps.Contains(pub)) obj["pub"] = pub;   // direct internet candidate
@@ -217,6 +222,7 @@ namespace OpenTaiko {
 			_stageId = stage; _payload = pay;   // keep the room metadata: a migration SUCCESSOR re-hosts with it
 			try { _psk = Convert.FromBase64String(o["k"]?.ToString() ?? ""); } catch { _psk = Array.Empty<byte>(); }
 			_roomToken = roomTok;
+			_signalBroker = o["sb"]?.ToString() ?? "";   // meet the host on the broker it registered on
 			_isHost = false; _running = true;
 			Active = this;
 			bool hasP2P = roomTok.Length > 0 && _psk.Length > 0;
@@ -238,8 +244,8 @@ namespace OpenTaiko {
 					if (p2pErr.StartsWith("REJECTED:")) { Enqueue("error", 0, "", p2pErr.Substring(9)); return; }
 					lastErr = p2pErr;
 				}
-				// plain words for players; the addresses tried go to the log for debugging
-				Trace.TraceWarning($"[OTON] join failed (tried {string.Join(", ", ips)}{(hasP2P ? " + p2p" : "")}): {lastErr}");
+				// plain words for players; the (masked) addresses tried go to the log for debugging
+				Trace.TraceWarning($"[OTON] join failed (tried {string.Join(", ", ips.Select(MaskIp))}{(hasP2P ? " + p2p" : "")}): {lastErr}");
 				Enqueue("error", 0, "", $"Could not join: {lastErr ?? "no route to the host"}. " +
 					"Make sure the room is still open and both players use the same game version.");
 			}) { IsBackground = true, Name = "OTON-connect" };
@@ -519,26 +525,51 @@ namespace OpenTaiko {
 		internal interface IOtonSignal : IDisposable {
 			bool Open();
 			bool Alive { get; }
+			string Broker { get; }
 			void Listen(string channel, Action<byte[]> onMessage);
 			void Send(string channel, byte[] payload);
 		}
 
 		private sealed class MqttSignal : IOtonSignal {
 			private readonly MiniMqtt _m = new();
+			private readonly string[] _brokers;
 			private bool _open;
-			public bool Open() => _open = _m.Connect(MiniMqtt.PublicBrokers);
+			/// <param name="pinned">when set, ONLY this broker is used — host and joiner must meet on the
+			/// SAME broker, so the host pins the one it registered on into the room code.</param>
+			public MqttSignal(string pinned = null) { _brokers = string.IsNullOrEmpty(pinned) ? MiniMqtt.PublicBrokers : new[] { pinned }; }
+			public string Broker => _m.ConnectedBroker;
+			public bool Open() => _open = _m.Connect(_brokers);
 			public bool Alive => _open;
 			public void Listen(string channel, Action<byte[]> onMessage) => _m.Subscribe(channel, onMessage);
 			public void Send(string channel, byte[] payload) => _m.Publish(channel, payload);
 			public void Dispose() => _m.Dispose();
 		}
 
-		/// <summary>Test hook: replaces the public-broker signal with an in-process bus.</summary>
-		internal static Func<IOtonSignal> SignalFactory = () => new MqttSignal();
+		/// <summary>Test hook: replaces the public-broker signal with an in-process bus. The string is the
+		/// pinned broker ("" = any) — host and joiner must rendezvous on the same one.</summary>
+		internal static Func<string, IOtonSignal> SignalFactory = pinned => new MqttSignal(pinned);
 		internal bool ForceP2POnly = false;          // test hook: joiner skips the direct candidates
+
+		/// <summary>Privacy mask for anything logged or shown to players: keeps only the first two groups
+		/// of an address (IPv4 a.b.x.x, IPv6 a:b:...) — enough to tell paths apart without exposing the
+		/// full address in logs of an open-source game.</summary>
+		private static string MaskIp(string ip) {
+			if (string.IsNullOrEmpty(ip)) return ip;
+			string s = ip.Trim('[', ']');
+			int colons = 0; foreach (char ch in s) if (ch == ':') colons++;
+			if (colons == 1 && s.Contains('.')) s = s.Substring(0, s.LastIndexOf(':'));   // strip "v4:port"
+			if (!s.Contains(':')) {
+				var p = s.Split('.');
+				return p.Length == 4 ? p[0] + "." + p[1] + ".x.x" : s;
+			}
+			var g = s.Split(':');
+			return g.Length > 2 ? g[0] + ":" + g[1] + ":..." : s;
+		}
 
 		private string SignalTopic => "oton/v1/" + _roomToken;
 		private readonly HashSet<string> _seenOffers = new();
+		private volatile IOtonSignal _hostSignal;    // the host's live rendezvous connection (for offer ACKs)
+		private string _signalBroker = "";           // joiner: the broker pinned in the room code ("sb")
 
 		private byte[] SealPsk(JObject o) {
 			byte[] pt = Encoding.UTF8.GetBytes(o.ToString(Newtonsoft.Json.Formatting.None));
@@ -560,8 +591,9 @@ namespace OpenTaiko {
 			try { return JObject.Parse(Encoding.UTF8.GetString(pt)); } catch { return null; }
 		}
 
-		/// <summary>Host: listen on the rendezvous channel; for every (authentic) joiner offer, dial the
-		/// joiner's candidates and run the normal host handshake on whichever connects first.</summary>
+		/// <summary>Host: listen on the rendezvous channel; for every (authentic) joiner offer, ACK it
+		/// (so the joiner knows we heard), dial the joiner's candidates, and hole-punch toward its public
+		/// endpoint — the normal host handshake runs on whichever path connects first.</summary>
 		private void StartSignalHostLoop() {
 			string tok = _roomToken;
 			var t = new Thread(() => {
@@ -569,14 +601,18 @@ namespace OpenTaiko {
 				while (_running && _isHost && _roomToken == tok) {
 					try {
 						if (sig == null || !sig.Alive) {
+							_hostSignal = null;
 							sig?.Dispose();
-							sig = SignalFactory();
+							sig = SignalFactory(_signalBroker);   // re-meets on the SAME broker the code advertises
 							if (!sig.Open()) { sig.Dispose(); sig = null; Thread.Sleep(15000); continue; }
+							if (_signalBroker.Length == 0) _signalBroker = sig.Broker;   // pin on first connect
 							sig.Listen(SignalTopic, OnJoinerOffer);
+							_hostSignal = sig;
 						}
-					} catch { try { sig?.Dispose(); } catch { } sig = null; }
+					} catch { try { sig?.Dispose(); } catch { } sig = null; _hostSignal = null; }
 					Thread.Sleep(5000);
 				}
+				_hostSignal = null;
 				try { sig?.Dispose(); } catch { }
 			}) { IsBackground = true, Name = "OTON-signal-host" };
 			t.Start();
@@ -590,6 +626,22 @@ namespace OpenTaiko {
 			var cands = new List<string>();
 			if (o["c"] is JArray ca) foreach (var v in ca) { string s = v?.ToString(); if (!string.IsNullOrEmpty(s)) cands.Add(s); }
 			if (cands.Count == 0 || cands.Count > 12) return;
+			string joinerPunch = o["pp"]?.ToString() ?? "";   // joiner's public endpoint for hole punching
+
+			// reserve a source port for our punch socket and ACK the offer with our public endpoint —
+			// the ACK doubles as "the host heard you", which the joiner uses for honest error messages
+			int punchPort = 0;
+			string hp = "";
+			if (joinerPunch.Length > 0 && !string.IsNullOrEmpty(_publicIp)) {
+				try {
+					using var tmp = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+					tmp.Bind(new IPEndPoint(IPAddress.Any, 0));
+					punchPort = ((IPEndPoint)tmp.LocalEndPoint).Port;
+					hp = _publicIp + ":" + punchPort;
+				} catch { punchPort = 0; hp = ""; }
+			}
+			try { _hostSignal?.Send(SignalTopic + "/" + nonce, SealPsk(new JObject { ["hp"] = hp })); } catch { }
+
 			int won = 0;
 			foreach (string cand in cands) {
 				string c = cand;
@@ -608,10 +660,43 @@ namespace OpenTaiko {
 					} catch { try { cli?.Close(); } catch { } }
 				}) { IsBackground = true, Name = "OTON-reverse-dial" }.Start();
 			}
+			if (punchPort > 0)
+				new Thread(() => {
+					var cli = PunchLoop(joinerPunch, punchPort, () => won == 0 && _running);
+					if (cli == null) return;
+					if (Interlocked.CompareExchange(ref won, 1, 0) != 0) { try { cli.Close(); } catch { } return; }
+					HostHandshake(cli);
+				}) { IsBackground = true, Name = "OTON-punch-host" }.Start();
+		}
+
+		/// <summary>TCP hole punch: repeatedly dial the peer's public endpoint from a FIXED source port.
+		/// Our outbound SYNs open our NAT mapping while the peer does the same toward us — when the SYNs
+		/// cross, the connection establishes (works on the common port-preserving home NATs).</summary>
+		private static TcpClient PunchLoop(string target, int srcPort, Func<bool> keepGoing) {
+			int i = target.LastIndexOf(':');
+			if (i <= 0 || !int.TryParse(target.Substring(i + 1), out int tport)) return null;
+			string thost = target.Substring(0, i).Trim('[', ']');
+			for (int a = 0; a < 12 && keepGoing(); a++) {
+				Socket s = null;
+				try {
+					s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+					s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+					s.Bind(new IPEndPoint(IPAddress.Any, srcPort));
+					var ar = s.BeginConnect(thost, tport, null, null);
+					if (ar.AsyncWaitHandle.WaitOne(1200) && s.Connected) {
+						s.EndConnect(ar);
+						return new TcpClient { Client = s };
+					}
+					try { s.Close(); } catch { }
+				} catch { try { s?.Close(); } catch { } }
+				Thread.Sleep(200);
+			}
+			return null;
 		}
 
 		/// <summary>Joiner: open a temporary listener, publish our candidates on the rendezvous channel,
-		/// and run the client handshake on whatever the host connects back with. Null on success.</summary>
+		/// and complete the client handshake on whichever path lands first — the host connecting back
+		/// directly, or the crossing hole-punch dials meeting in the middle. Null on success.</summary>
 		private string P2PJoin(string stage, string payload, int rejoinId) {
 			IOtonSignal sig = null;
 			TcpListener lst = null;
@@ -629,23 +714,58 @@ namespace OpenTaiko {
 				foreach (string ip6 in LocalIPv6s()) cands.Add($"[{ip6}]:{lport}");
 				cands.Add($"127.0.0.1:{lport}");               // same-machine sessions; strangers die on the magic check
 
-				sig = SignalFactory();
+				// reserve a fixed source port for hole punching and advertise its public endpoint
+				int punchPort = 0;
+				try {
+					using var tmp = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+					tmp.Bind(new IPEndPoint(IPAddress.Any, 0));
+					punchPort = ((IPEndPoint)tmp.LocalEndPoint).Port;
+				} catch { }
+				string myPunch = (punchPort > 0 && !string.IsNullOrEmpty(pub)) ? $"{pub}:{punchPort}" : "";
+
+				sig = SignalFactory(_signalBroker);            // the SAME broker the host pinned in the code
 				if (!sig.Open()) return "The matchmaking service is unreachable";
-				var offer = new JObject {
-					["n"] = Convert.ToHexString(RandomNumberGenerator.GetBytes(8)),
-					["c"] = new JArray(cands),
-				};
+				string nonce = Convert.ToHexString(RandomNumberGenerator.GetBytes(8));
+
+				// first complete handshake wins, whatever path delivered the socket
+				string result = "pending";
+				var done = new ManualResetEventSlim(false);
+				object hsLock = new();
+				void TryFinish(TcpClient c) {
+					lock (hsLock) {
+						if (done.IsSet) { try { c.Close(); } catch { } return; }
+						if (ClientHandshake(c, "p2p", stage, payload, rejoinId) == null) { result = null; done.Set(); }
+					}
+				}
+
+				bool ackSeen = false;
+				int punching = 0;
+				sig.Listen(SignalTopic + "/" + nonce, b => {
+					var a = OpenPsk(b);
+					if (a == null) return;
+					ackSeen = true;
+					string hp = a["hp"]?.ToString() ?? "";
+					if (hp.Length > 0 && punchPort > 0 && Interlocked.Exchange(ref punching, 1) == 0)
+						new Thread(() => {
+							var c = PunchLoop(hp, punchPort, () => !done.IsSet && _running);
+							if (c != null) TryFinish(c);
+						}) { IsBackground = true, Name = "OTON-punch-join" }.Start();
+				});
+				var offer = new JObject { ["n"] = nonce, ["c"] = new JArray(cands) };
+				if (myPunch.Length > 0) offer["pp"] = myPunch;
 				sig.Send(SignalTopic, SealPsk(offer));
 
-				long deadline = Environment.TickCount64 + 12000;
-				while (_running && Environment.TickCount64 < deadline) {
+				long deadline = Environment.TickCount64 + 15000;
+				while (_running && !done.IsSet && Environment.TickCount64 < deadline) {
 					if (!lst.Pending()) { Thread.Sleep(50); continue; }
 					TcpClient cli = lst.AcceptTcpClient();
 					cli.NoDelay = true;
-					// the host may reach us over several candidates; first complete handshake wins
-					if (ClientHandshake(cli, "p2p", stage, payload, rejoinId) == null) return null;
+					new Thread(() => TryFinish(cli)) { IsBackground = true, Name = "OTON-p2p-accept" }.Start();
 				}
-				return "The host could not connect back";
+				if (done.IsSet) return result;
+				return ackSeen
+					? "We found the host, but no direct connection could be opened (both networks block incoming traffic)"
+					: "The host did not answer the join request — the room may be closed";
 			} catch (Exception e) { return e.Message; }
 			finally { try { lst?.Stop(); } catch { } try { sig?.Dispose(); } catch { } }
 		}
@@ -677,13 +797,13 @@ namespace OpenTaiko {
 			try {
 				cli = new TcpClient();
 				var ar = cli.BeginConnect(ip, port, null, null);
-				if (!ar.AsyncWaitHandle.WaitOne(connectTimeoutMs)) { throw new Exception($"Host did not respond at {ip}"); }
+				if (!ar.AsyncWaitHandle.WaitOne(connectTimeoutMs)) { throw new Exception($"Host did not respond at {MaskIp(ip)}"); }
 				try { cli.EndConnect(ar); } catch (SocketException se) {
 					throw new Exception(se.SocketErrorCode == SocketError.ConnectionRefused
-						? $"Connection refused at {ip} (the room is closed, or another program owns the port)"
-						: $"Could not connect to {ip}: {se.SocketErrorCode}");
+						? $"Connection refused at {MaskIp(ip)} (the room is closed, or another program owns the port)"
+						: $"Could not connect to {MaskIp(ip)}: {se.SocketErrorCode}");
 				}
-				if (!cli.Connected) throw new Exception($"Host did not respond at {ip}");
+				if (!cli.Connected) throw new Exception($"Host did not respond at {MaskIp(ip)}");
 				cli.NoDelay = true;
 			} catch (Exception e) {
 				try { cli?.Close(); } catch { }
