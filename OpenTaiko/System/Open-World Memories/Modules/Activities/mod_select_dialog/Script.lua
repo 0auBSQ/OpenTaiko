@@ -2,7 +2,7 @@
 local reactive = false
 local player = 0
 local save = nil
-local restrictMods = false   -- online lobby: when true, the Auto + Fun-Mod (dynamic beat) options are hidden
+local restrictMods = false   -- online lobby: when true, only the Auto option is hidden (Fun Mod incl. Dynamic Beat stays, per-player)
 
 -- Mod options
 local options = {}
@@ -195,7 +195,7 @@ local OPTION_DEFS = {
             { label = "None",         color = COL_WHITE, desc = "No fun mod active." },
             { label = "Avalanche",    color = COL_WHITE, desc = "Very chaotic scroll speeds!" },
             { label = "Minesweeper",  color = COL_WHITE, desc = "Watch out for notes swapped to bombs!" },
-            { label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players." },
+            { label = "Dynamic Beat", color = COL_WHITE, desc = "The song speeds up as you play well, and slows down on mistakes. Shared among all players in local play; per-player online." },
         }
     },
 }
@@ -276,7 +276,7 @@ end
 local function loadOptions()
     options = {}
     for _, def in ipairs(OPTION_DEFS) do
-      if not (restrictMods and (def.meta == "auto" or def.meta == "fun-mod")) then   -- online: no Auto / Dynamic Beat
+      if not (restrictMods and def.meta == "auto") then   -- online: hide Auto only; Fun Mod (incl. Dynamic Beat) is a per-player choice
         local val
         if     def.meta == "auto"         then val = CONFIG:GetAutoStatus(player) and 1 or 0
         elseif def.meta == "scroll-speed" then val = CONFIG:GetScrollSpeed(player)

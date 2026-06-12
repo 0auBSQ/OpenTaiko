@@ -28,7 +28,7 @@ for k, _ in pairs(debug) do
 end
 debug = nil
 
-package.path = ""{normalizedDirectory}/?.lua;""
+package.path = ""{normalizedDirectory}/?.lua;{normalizedDirectory}/../../Lib/?.lua;""
 
 do
 	local _readFile = _csReadFile

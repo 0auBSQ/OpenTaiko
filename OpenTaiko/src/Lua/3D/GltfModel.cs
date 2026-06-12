@@ -42,11 +42,18 @@ namespace OpenTaiko {
 
 		// each loaded model claims its own texture-id range so several models can coexist in a scene
 		private static int _nextBase = 4000;
+		// per-material decoded base-colour TEXTURE (null = flat colour). Transparent texels are encoded
+		// as NEGATIVE ints — the engine's cutout convention across both renderers.
+		private int[][] _matPix; private int[] _matTexW, _matTexH;
 
 		// register a 2×2 solid texture per material into the scene (call once per scene)
 		public void Register(Lua3DScene scene) {
 			if (_texBase < 0) { _texBase = _nextBase; _nextBase += 256; }
 			for (int m = 0; m < _matRgb.Length; m++) {
+				if (_matPix != null && _matPix[m] != null) {     // real base-colour texture (VRM etc.)
+					scene.RegisterTexturePixels(_texBase + m, _matPix[m], _matTexW[m], _matTexH[m]);
+					continue;
+				}
 				int rgb = _matRgb[m];
 				var px = new int[4] { rgb, rgb, rgb, rgb };
 				scene.RegisterTexturePixels(_texBase + m, px, 2, 2);
@@ -220,16 +227,58 @@ namespace OpenTaiko {
 				return r;
 			}
 
-			// materials → packed base colour
+			// materials → packed base colour, plus the base-colour TEXTURE when present (decoded once;
+			// transparent texels become negative ints = the engine's cutout convention)
 			if (root.TryGetProperty("materials", out var mats)) {
-				g._matRgb = new int[mats.GetArrayLength()];
-				for (int m = 0; m < g._matRgb.Length; m++) {
-					int rgb = 0xC0C0C0;
-					if (mats[m].TryGetProperty("pbrMetallicRoughness", out var pbr) && pbr.TryGetProperty("baseColorFactor", out var bc)) {
-						int r = (int)(bc[0].GetDouble() * 255), gg = (int)(bc[1].GetDouble() * 255), b = (int)(bc[2].GetDouble() * 255);
-						rgb = (Math.Clamp(r,0,255) << 16) | (Math.Clamp(gg,0,255) << 8) | Math.Clamp(b,0,255);
+				int nm = mats.GetArrayLength();
+				g._matRgb = new int[nm];
+				g._matPix = new int[nm][]; g._matTexW = new int[nm]; g._matTexH = new int[nm];
+				for (int m = 0; m < nm; m++) {
+					int rgb = 0xC0C0C0; int texIdx = -1;
+					if (mats[m].TryGetProperty("pbrMetallicRoughness", out var pbr)) {
+						if (pbr.TryGetProperty("baseColorFactor", out var bc)) {
+							int r = (int)(bc[0].GetDouble() * 255), gg = (int)(bc[1].GetDouble() * 255), b = (int)(bc[2].GetDouble() * 255);
+							rgb = (Math.Clamp(r,0,255) << 16) | (Math.Clamp(gg,0,255) << 8) | Math.Clamp(b,0,255);
+						}
+						if (pbr.TryGetProperty("baseColorTexture", out var bct) && bct.TryGetProperty("index", out var bti))
+							texIdx = bti.GetInt32();
 					}
 					g._matRgb[m] = rgb;
+					if (texIdx >= 0 && root.TryGetProperty("textures", out var texsEl) && texIdx < texsEl.GetArrayLength()
+						&& texsEl[texIdx].TryGetProperty("source", out var srcEl)
+						&& root.TryGetProperty("images", out var imgsEl)) {
+						int imgIdx = srcEl.GetInt32();
+						if (imgIdx < imgsEl.GetArrayLength() && imgsEl[imgIdx].TryGetProperty("bufferView", out var ibv)) {
+							var view = views[ibv.GetInt32()];
+							int vOff = view.TryGetProperty("byteOffset", out var vo2) ? vo2.GetInt32() : 0;
+							int vLen = view.GetProperty("byteLength").GetInt32();
+							try {
+								var imgBytes = new byte[vLen];
+								Array.Copy(bin, vOff, imgBytes, 0, vLen);
+								using var bmp = SkiaSharp.SKBitmap.Decode(imgBytes);
+								if (bmp != null) {
+									int tw = bmp.Width, th = bmp.Height;
+									// cap huge textures (VRoid ships 2048²); 512² is plenty at chara scale
+									int max = 512;
+									SkiaSharp.SKBitmap use = bmp;
+									if (tw > max || th > max) {
+										int nw = Math.Max(1, tw * max / Math.Max(tw, th)), nh = Math.Max(1, th * max / Math.Max(tw, th));
+										use = bmp.Resize(new SkiaSharp.SKImageInfo(nw, nh), SkiaSharp.SKFilterQuality.Medium) ?? bmp;
+										tw = use.Width; th = use.Height;
+									}
+									var px2 = new int[tw * th];
+									var cols = use.Pixels;
+									for (int i = 0; i < px2.Length; i++) {
+										var c2 = cols[i];
+										int packed = (c2.Red << 16) | (c2.Green << 8) | c2.Blue;
+										px2[i] = c2.Alpha < 128 ? (packed | unchecked((int)0x80000000)) : packed;
+									}
+									g._matPix[m] = px2; g._matTexW[m] = tw; g._matTexH[m] = th;
+									if (!ReferenceEquals(use, bmp)) use.Dispose();
+								}
+							} catch (Exception e) { System.Diagnostics.Trace.TraceWarning("GltfModel texture decode failed: " + e.Message); }
+						}
+					}
 				}
 			}
 

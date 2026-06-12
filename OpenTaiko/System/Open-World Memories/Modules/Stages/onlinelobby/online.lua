@@ -43,8 +43,34 @@ function LO.selfInfo()
     pcall(function() dan = sf.SelectedDan or "" end)
     pcall(function() local dp = sf.DanplateInfo; if dp then dgold = dp.Gold and true or false; dtype = dp.ClearStatus or 0 end end)
     -- npid lets the receiver resolve nameplate type+rarity+text from its (identical) catalogue; dgold/dtype style the dan plate
-    return string.format('{"name":%s,"char":%s,"puchi":%s,"title":%s,"dan":%s,"npid":%d,"dgold":%s,"dtype":%d}',
-        jstr(LO.myName()), jstr(char), jstr(puchi), jstr(title), jstr(dan), npid, tostring(dgold), dtype)
+    -- pal carries the character palette gradient (stops+blend) so remote V-slots render in the right colours.
+    return string.format('{"name":%s,"char":%s,"puchi":%s,"title":%s,"dan":%s,"npid":%d,"dgold":%s,"dtype":%d,"pal":%s}',
+        jstr(LO.myName()), jstr(char), jstr(puchi), jstr(title), jstr(dan), npid, tostring(dgold), dtype, LO.selfPaletteJson())
+end
+-- the local player's selected character palette, as a self-contained JSON object {"b":blend,"s":[[pos,r,g,b(,a)],...]}
+-- (or "null"). Read from the char's own Palettes.json by the persisted selection index, so the receiver can apply
+-- it to the matching V-slot without depending on its own copy of that character's palette file.
+function LO.selfPaletteJson()
+    local out = "null"
+    pcall(function()
+        local sf = GetSaveFile(0); local cha = sf:GetCharacter()
+        if not (cha and cha.IsValid) then return end
+        local idx = floor(sf:GetGlobalCounter(".character_palette_" .. (sf.CharacterName or "")) or 0)
+        local raw = JSONLOADER:JsonParseFileAny(cha.FullPath .. "/Palettes.json")
+        if not (raw and raw.Count and idx >= 0 and idx < raw.Count) then return end
+        local e = raw[idx + 1]; if not e then return end
+        local rawStops = JSONLOADER:JsonGet(e, "stops")
+        if not (rawStops and rawStops.Count and rawStops.Count >= 2) then return end   -- no stops = Default (no gradient)
+        local blend = tonumber(tostring(JSONLOADER:JsonGet(e, "blend") or 0)) or 0
+        local parts = {}
+        for j = 1, rawStops.Count do
+            local s = rawStops[j]; local a = JSONLOADER:JsonGet(s, 5)
+            parts[j] = a ~= nil and string.format("[%s,%s,%s,%s,%s]", s[1], s[2], s[3], s[4], a)
+                or string.format("[%s,%s,%s,%s]", s[1], s[2], s[3], s[4])
+        end
+        out = string.format('{"b":%s,"s":[%s]}', blend, table.concat(parts, ","))
+    end)
+    return out
 end
 function LO.amController() return net.online and NET:HasHostRole() end
 function LO.count() local c = 0; for _ in pairs(net.nameByPeer) do c = c + 1 end return c end
@@ -73,28 +99,65 @@ function LO.stopPreview() pcall(function() SHARED:SetSharedPreview("presound", "
 
 -- load the chosen song's jacket (SHARED "preimage"), start its preview, and read its difficulty levels.
 -- Sets net.iLackSong when this client doesn't have the song. Safe to call on host + guests.
+local function setBorder(t) pcall(function() t:SetWrapMode("Border") end) end
+local function placeholderPreimage() pcall(function() SHARED:SetSharedTexture("preimage", "Textures/preimage.png", setBorder) end) end
 local function loadSongMedia()
     net.songLevels = {}; net.iLackSong = true; net.songSubtitle = nil
-    pcall(function() SHARED:ClearSharedTexture("preimage") end)
+    net.previewLoaded = false; net.previewDemoStart = 0; net.previewSpeed = 1.0; net.previewCool = 0
     LO.stopPreview()
-    if not net.song then return end
+    if not net.song then placeholderPreimage(); return end
     local node = findSong(net.song.uid)
-    if not node then net.iLackSong = true; return end
+    if not node then net.iLackSong = true; placeholderPreimage(); return end
     net.iLackSong = false
     pcall(function() net.songSubtitle = node.Subtitle end)
-    pcall(function()                                   -- jacket: exactly like regular song select (shared "preimage")
-        if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath) end
-        local t = SHARED:GetSharedTexture("preimage"); if t then t:SetWrapMode("Border") end
+    -- jacket via the shared "preimage" texture. We do NOT ClearSharedTexture first: Clear bumps the resource's
+    -- async version AFTER SetShared... captured it, so the loaded jacket was discarded as stale (showed once,
+    -- never updated). SetShared... already swaps atomically; set the border wrap on the actual loaded texture.
+    pcall(function()
+        if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)
+        else placeholderPreimage() end
     end)
     for d = 0, 4 do pcall(function() if node.score[d] ~= nil then net.songLevels[d] = node.nLevel[d] end end) end
     pcall(function()
         local spd = (net.song.speed or 20) / 20
+        net.previewSpeed = spd
+        net.previewDemoStart = floor((node.DemoStart or 0) / spd)
         SHARED:SetSharedPreviewUsingAbsolutePath("presound", node.AudioPath, function(snd)
-            snd:SetSpeed(spd); snd:Play(); snd:SetTimestamp(floor((node.DemoStart or 0) / spd))
+            snd:SetSpeed(spd); snd:Play(); snd:SetTimestamp(net.previewDemoStart)
+            net.previewLoaded = true
         end)
     end)
 end
+-- loop the lobby preview (call each frame in lobby/results; song select owns its own preview). Replays from the
+-- demo start when the preview finishes, with a short cooldown to avoid double-seeking the same restart.
+function LO.tickPreview(dt)
+    if net.iLackSong or not net.song or not net.previewLoaded then return end
+    if (net.previewCool or 0) > 0 then net.previewCool = net.previewCool - dt; return end
+    pcall(function()
+        local snd = SHARED:GetSharedSound("presound")
+        if snd and snd.Loaded and not snd.IsPlaying then
+            snd:SetSpeed(net.previewSpeed or 1.0); snd:Play(); snd:SetTimestamp(net.previewDemoStart or 0)
+            net.previewCool = 0.5
+        end
+    end)
+end
 LO.loadSongMedia = loadSongMedia
+
+-- parse a received "pal" object {b, s:[[pos,r,g,b(,a)],...]} back into (luaStops, blend) for SetPaletteGradient.
+local function parsePalette(io)
+    if not io then return nil, 0 end
+    local pal = JSONLOADER:JsonGet(io, "pal"); if not pal then return nil, 0 end
+    local sArr = JSONLOADER:JsonGet(pal, "s")
+    if not (sArr and sArr.Count and sArr.Count >= 2) then return nil, 0 end
+    local blend = tonumber(tostring(JSONLOADER:JsonGet(pal, "b") or 0)) or 0
+    local stops = {}
+    for j = 1, sArr.Count do
+        local s = sArr[j]; local a = JSONLOADER:JsonGet(s, 5)
+        stops[j] = { s[1], s[2], s[3], s[4] }
+        if a ~= nil then stops[j][5] = a end
+    end
+    return stops, blend
+end
 
 -- ── roster ──────────────────────────────────────────────────────────────────────────────────────
 function LO.refreshRoster()
@@ -106,6 +169,7 @@ function LO.refreshRoster()
             id = floor(id)
             local io = e and JSONLOADER:JsonGet(e, "info"); io = io and JSONLOADER:JsonParseStringAny(io) or nil
             names[id] = (io and JSONLOADER:JsonGet(io, "name")) or ("Player " .. id)
+            local palStops, palBlend = parsePalette(io)
             net.infoByPeer[id] = { name = names[id],
                 char  = (io and JSONLOADER:JsonGet(io, "char"))  or "None",
                 puchi = (io and JSONLOADER:JsonGet(io, "puchi")) or "None",
@@ -113,7 +177,8 @@ function LO.refreshRoster()
                 dan   = (io and JSONLOADER:JsonGet(io, "dan"))   or "",
                 npid  = floor((io and JSONLOADER:JsonGet(io, "npid")) or -1),
                 dgold = (io and JSONLOADER:JsonGet(io, "dgold")) and true or false,
-                dtype = floor((io and JSONLOADER:JsonGet(io, "dtype")) or 0) }
+                dtype = floor((io and JSONLOADER:JsonGet(io, "dtype")) or 0),
+                palStops = palStops, palBlend = palBlend }
             if net.diffByPeer[id] == nil then net.diffByPeer[id] = 1 end
             if net.modByPeer[id] == nil then net.modByPeer[id] = defMods() end
             if net.readyByPeer[id] == nil then net.readyByPeer[id] = false end
@@ -204,11 +269,11 @@ end
 function LO.adjustSpeed(delta)
     if not net.song then return end
     local sp = (net.song.speed or 20) + delta; if sp < 2 then sp = 2 elseif sp > 200 then sp = 200 end
-    net.song.speed = sp; if LO.amController() then LO.rebroadcastSong() end
-end
-function LO.toggleDyn()
-    if not net.song then return end
-    net.song.dyn = (net.song.dyn == 1) and 0 or 1; if LO.amController() then LO.rebroadcastSong() end
+    net.song.speed = sp
+    -- apply to the live host preview immediately (guests pick it up via the song rebroadcast → applySong reload)
+    net.previewSpeed = sp / 20
+    pcall(function() local snd = SHARED:GetSharedSound("presound"); if snd then snd:SetSpeed(sp / 20) end end)
+    if LO.amController() then LO.rebroadcastSong() end
 end
 function LO.setDiff(d) net.diffByPeer[NET:SelfId()] = d; NET:Broadcast("diff", string.format('{"d":%d}', d)) end
 function LO.setReady(r) net.readyByPeer[NET:SelfId()] = r; NET:Broadcast("ready", string.format('{"r":%s}', r and "true" or "false")) end
@@ -258,7 +323,8 @@ function LO.launchPlay()
         CONFIG.SongSpeed = s.speed or 20                 -- song PLAYBACK rate (host-set, shared)
         CONFIG:SetAutoStatus(0, false)                   -- YOU (spot 0) play for real (overrides the dialog's Auto)
         for sp = 1, N - 1 do CONFIG:SetAutoStatus(sp, true) end   -- remote spots AUTO-PLAY (judge sampled from the wire) + excluded from saving
-        if s.dyn == 1 then CONFIG:SetFunMod(0, 3) else CONFIG:SetFunMod(0, 0) end   -- host dynamic beat is shared; never a per-player fun mod online
+        -- Dynamic beat is now a PER-PLAYER mod (chosen in mod select). Spot 0 keeps whatever fun mod the local
+        -- player set; remote spots are auto-judged so theirs doesn't matter locally. Don't override fun mod here.
     end)
     local mounted = false
     pcall(function() mounted = node:Mount(diffOf(1), diffOf(2), diffOf(3), diffOf(4), diffOf(5)) end)
@@ -277,6 +343,14 @@ function LO.launchPlay()
             VIRTUALSLOTS:SetNameplateDanType(slot, inf.dtype or 0)
             VIRTUALSLOTS:SetNameplateDanGold(slot, inf.dgold and true or false)
             VIRTUALSLOTS:MountSlot(i, "V" .. slot)
+            -- apply the remote player's character palette to this spot (player index i-1); clear if they have none
+            pcall(function()
+                local cha = GetSaveFile(i - 1):GetCharacter()
+                if cha then
+                    if inf.palStops then cha:SetPaletteGradient(inf.palStops, inf.palBlend or 0)
+                    else cha:ClearPaletteGradient() end
+                end
+            end)
         end
     end)
     LO.stopPreview()

@@ -46,13 +46,13 @@ namespace OpenTaiko {
 		internal bool _fog;
 		internal double _fogR, _fogG, _fogB, _fogStart, _fogInv;
 		// Distance BLUR (deprecated — too costly + the depth-texture FBO slowed the main pass). Kept as a no-op
-		// stub so older stage scripts don't error; the HD2D pass below replaces it.
+		// stub so older stage scripts don't error; the diorama pass below replaces it.
 		internal bool _distBlur;
 		internal double _blurNear = 60, _blurFar = 200;
-		// HD2D 'diorama' grade (GPU rasterizer): a cheap screen-space tilt-shift + saturation/contrast/vignette
-		// (Octopath-style). No depth sample. Off by default.
-		internal bool _hd2d;
-		internal double _hdTilt = 3.0, _hdSat = 1.25, _hdVig = 0.35;
+		// 'Diorama' grade (GPU rasterizer): a cheap screen-space tilt-shift + saturation/contrast/vignette
+		// (diorama-style). No depth sample. Off by default.
+		internal bool _diorama;
+		internal double _hdTilt = 3.0, _hdSat = 1.25, _hdVig = 0.35, _hdBloom = 0.0;
 
 		internal readonly Dictionary<int, int[]> _texPix = new();
 		internal readonly Dictionary<int, int> _texW = new();
@@ -148,6 +148,8 @@ namespace OpenTaiko {
 		// scene), so a quad can display that view (mirrors, portals, security monitors, …). Mirror
 		// and overlay objects are skipped inside the render so reflections don't recurse on themselves.
 		internal bool _rttPass;
+		private readonly Dictionary<int, LuaCanvas> _rttCanvases = new();   // per-texId (two live portals share nothing)
+		private readonly Dictionary<int, float[]> _rttDepths = new();
 		private LuaCanvas? _rttCanvas; private float[]? _rttDepth;
 		private readonly Dictionary<int, int[]> _rttBufs = new();
 		// Reflection/portal views (RenderView) are re-renders of the whole scene; they only show on a
@@ -163,6 +165,19 @@ namespace OpenTaiko {
 		internal bool _aa;
 		/// <summary>Enable/disable post-process edge smoothing on the final colour buffer.</summary>
 		public void SetAntialias(bool on) { _aa = on; }
+
+		internal double _shadowHalf = 60.0;
+		internal int _outlineR, _outlineG, _outlineB; internal double _outlineTh = 0;
+		/// <summary>Half-extent (world units) of the sun shadow map's box around the focus. Smaller = sharper
+		/// shadows over a tighter area (e.g. small iso maps want ~18); default 60.</summary>
+		public void SetShadowArea(double half) { _shadowHalf = half < 4 ? 4 : half; }
+
+		/// <summary>Toon OUTLINE for the rendered scene: silhouette ink of the given colour and pixel
+		/// thickness with an anti-aliased rim. GPU scenes run it as a post shader; CPU scenes fall back
+		/// to ApplyOutline after the raster. 0 thickness = off.</summary>
+		public void SetOutline(int r, int g, int b, double thicknessPx) {
+			_outlineR = r; _outlineG = g; _outlineB = b; _outlineTh = thicknessPx < 0 ? 0 : thicknessPx;
+		}
 
 		public void RenderView(int texId, double cx, double cy, double cz, double yawDeg, double pitchDeg,
 			double fovDeg, int clr, int clg, int clb, int flipX) {
@@ -183,11 +198,14 @@ namespace OpenTaiko {
 			// >1 live reflection on this hardware (the main view lost geometry + portals failed to capture), so
 			// the reliable CPU capture is used regardless of the main renderer — the main view still runs on
 			// the GPU; only these small reduced-res reflection re-renders are CPU. Keep them cheap via
-			// SetReflectionScale (doom uses 1/4-res reflections).
+			// SetReflectionScale (the FPS stage uses 1/4-res reflections).
 			{
 				var sc = _canvas; var sd = _depth;
-				if (_rttCanvas == null || _rttCanvas._w != rw || _rttCanvas._h != rh) {
-					_rttCanvas = new LuaCanvas(rw, rh); _rttDepth = new float[rw * rh];
+				if (!_rttCanvases.TryGetValue(texId, out _rttCanvas) || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+					_rttCanvas = new LuaCanvas(rw, rh); _rttCanvases[texId] = _rttCanvas;
+					_rttDepth = new float[rw * rh]; _rttDepths[texId] = _rttDepth;
+				} else {
+					_rttDepth = _rttDepths[texId];
 				}
 				_canvas = _rttCanvas; _depth = _rttDepth;
 				_rttCanvas.Clear(clr, clg, clb, 255);
@@ -204,6 +222,46 @@ namespace OpenTaiko {
 			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
 		}
 
+		/// <summary>HYBRID rendering: like <see cref="RenderView"/>, but the inset view is rendered by the
+		/// CPU PATH TRACER instead of the rasterizer — true raytraced output (soft shadows, GI-ish bounce)
+		/// composited into the rasterized main scene via a screen-sampled quad (mirrors, monitors, …).
+		/// Renders at a quarter of the reflection resolution (path tracing is per-pixel expensive).</summary>
+		public void RenderViewRT(int texId, double cx, double cy, double cz, double yawDeg, double pitchDeg,
+			double fovDeg, int clr, int clg, int clb, int flipX) {
+			int shift = _rttShift + 2;                         // RT insets render at 1/8: path tracing is per-pixel expensive
+			int rw = _w >> shift, rh = _h >> shift;
+			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
+			int ow = _w, oh = _h;
+			double ox = _camX, oy = _camY, oz = _camZ, oyaw = _yaw, opit = _pitch, ofov = _fov;
+			_w = rw; _h = rh;
+			_rttPass = true;
+			SetCameraPosition(cx, cy, cz); SetCameraFov(fovDeg); SetCameraAngles(yawDeg, pitchDeg);
+			if (flipX != 0) { _Rx = -_Rx; _Ry = -_Ry; _Rz = -_Rz; }
+			{
+				var sc = _canvas; var sd = _depth;
+				if (_rttCanvas == null || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+					_rttCanvas = new LuaCanvas(rw, rh); _rttDepth = new float[rw * rh];
+				}
+				_canvas = _rttCanvas; _depth = _rttDepth;
+				_rttCanvas.Clear(clr, clg, clb, 255);
+				try {
+					var rt = _raytracer ??= new Raytracer();
+					rt.MaxDepthOverride = 3;                   // 3 bounces is plenty for a mirror inset
+					rt.Render(this);
+					rt.MaxDepthOverride = 0;
+				}
+				catch { _rasterizer.Render(this); }            // RT path unavailable → raster fallback
+				if (!_rttBufs.TryGetValue(texId, out var px) || px.Length != rw * rh) { px = new int[rw * rh]; _rttBufs[texId] = px; }
+				var buf = _rttCanvas._buf;
+				for (int i = 0; i < px.Length; i++) { int o = i * 4; px[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+				RegisterTexturePixels(texId, px, rw, rh);
+				_canvas = sc; _depth = sd;
+			}
+			_rttPass = false;
+			_w = ow; _h = oh;
+			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
+		}
+
 		/// <summary>Cull objects whose bounds lie entirely beyond this distance from the camera
 		/// (0 = unlimited). Lowers the drawn geometry for big worlds.</summary>
 		public void SetRenderDistance(double d) { _renderDist = d < 0 ? 0 : d; Revision++; }
@@ -216,13 +274,14 @@ namespace OpenTaiko {
 			_fogInv = end > start ? 1.0 / (end - start) : 0.0;
 			Revision++;
 		}
-		/// <summary>Deprecated no-op (the old distance blur). Kept so older scripts don't break — use SetHD2D.</summary>
+		/// <summary>Deprecated no-op (the old distance blur). Kept so older scripts don't break — use SetDiorama.</summary>
 		public void SetDistanceBlur(bool on, double near, double far) { _distBlur = false; }
-		/// <summary>HD2D 'diorama' post grade (GPU rasterizer): a cheap screen-space tilt-shift (sharp middle band,
-		/// blur to the top/bottom) + saturation/contrast/vignette. <paramref name="tilt"/> = max blur px (0 = none),
-		/// <paramref name="sat"/> = saturation (1 = none), <paramref name="vig"/> = vignette strength.</summary>
-		public void SetHD2D(bool on, double tilt, double sat, double vig) {
-			_hd2d = on; _hdTilt = tilt; _hdSat = sat; _hdVig = vig; Revision++;
+		/// <summary>diorama 'diorama' post grade (GPU rasterizer): a cheap screen-space tilt-shift (sharp middle band,
+		/// blur to the top/bottom) + saturation/contrast/vignette + bloom. <paramref name="tilt"/> = max blur px
+		/// (0 = none), <paramref name="sat"/> = saturation (1 = none), <paramref name="vig"/> = vignette strength,
+		/// <paramref name="bloom"/> = glow strength (0 = off; the diorama-style highlight halo).</summary>
+		public void SetDiorama(bool on, double tilt, double sat, double vig, double bloom = 0.0) {
+			_diorama = on; _hdTilt = tilt; _hdSat = sat; _hdVig = vig; _hdBloom = bloom; Revision++;
 		}
 
 		/// <summary>Number of CPU threads the rasterizer uses (screen split into this many
@@ -239,7 +298,7 @@ namespace OpenTaiko {
 			if (mode == "raytrace_cpu" || mode == "rt_cpu") want = (_raytracer ??= new Raytracer());   // force the CPU path tracer
 			else if (mode == "raytrace" || mode == "rt")                                                // GPU compute path tracer (CPU fallback)
 				want = FDK.Game.ComputeShadersAvailable ? (_gpuRaytracer ??= new GpuRaytracer()) : (IRenderer)(_raytracer ??= new Raytracer());
-			else if (mode == "raster_cpu") want = _rasterizer;     // force the CPU rasterizer (e.g. doom mirrors)
+			else if (mode == "raster_cpu") want = _rasterizer;     // force the CPU rasterizer (e.g. mirror surfaces)
 			else if (FDK.Game.ComputeShadersAvailable) want = (_gpuRasterizer ??= new GpuRasterizer());   // "raster"/"raster_gpu"/"gpu" → GPU (the default)
 			else want = _rasterizer;                               // CPU fallback when GLES 3.1 is unavailable
 			if (want != _renderer) { _renderer = want; _renderer.Invalidate(); Revision++; }
@@ -474,11 +533,11 @@ namespace OpenTaiko {
 			o.N++;
 		}
 
-		/// <summary>Add a billboarded 2D sprite (HD2D 2D-in-3D) to an object: an alpha-textured quad of
+		/// <summary>Add a billboarded 2D sprite (2D-in-3D) to an object: an alpha-textured quad of
 		/// world size <paramref name="w"/>×<paramref name="h"/> standing with its foot at (cx,cy,cz),
 		/// drawn from the sprite registered as <paramref name="spriteId"/> (RGBA — e.g. via
 		/// RegisterSpriteFromTexture or MakeSoftCircle). <paramref name="billboard"/>: 0 = fixed (XY
-		/// plane), 1 = Y-axis (faces the camera but stays upright — the usual HD2D character/tree),
+		/// plane), 1 = Y-axis (faces the camera but stays upright — the usual 2D-in-3D character/tree),
 		/// 2 = full (always faces the camera). <paramref name="cutout"/>!=0 = alpha-test + depth write
 		/// (crisp edges that occlude, put the object in the opaque pass); 0 = alpha blend (transparent
 		/// pass). The object's tint (ObjSetTint) multiplies the sprite; its alpha (ObjSetPass a) fades it.</summary>
@@ -512,6 +571,8 @@ namespace OpenTaiko {
 		public void Render() {
 			try {
 				_renderer.Render(this);
+				// CPU path: the toon outline runs as a canvas post-op (GPU scenes ink it in-shader)
+				if (_outlineTh > 0 && !_gpuOwnsCanvas) ApplyOutline(_outlineR, _outlineG, _outlineB, (int)Math.Round(_outlineTh));
 			} catch (Exception e) {
 				// A GPU-renderer failure (e.g. a shader that won't compile on this driver) must not take the
 				// whole stage down: fall back to the CPU rasterizer for the rest of the session and carry on.
@@ -804,8 +865,70 @@ namespace OpenTaiko {
 
 		#region Display
 		public void Upload() { if (_gpuOwnsCanvas) { _gpuRasterizer?.End2D(); _gpuOwnsCanvas = false; return; } _canvas.Upload(); }
+		/// <summary>Silhouette OUTLINE post-pass on the CPU canvas: inks every transparent pixel within
+		/// <paramref name="thickness"/> px of the rendered shape, with a ~1px ANTI-ALIASED falloff at the
+		/// rim. Implemented as a 3-4 chamfer distance transform (two scans, cost independent of the
+		/// thickness — the naive per-ring dilation was a frame-rate killer).</summary>
+		public void ApplyOutline(int r, int g, int b, int thickness) {
+			byte[] buf = _canvas._buf;
+			int w = _w, h = _h, n = w * h;
+			if (_outlineDist == null || _outlineDist.Length < n) _outlineDist = new int[n];
+			var dist = _outlineDist;
+			const int INF = 1 << 28;
+			for (int i = 0; i < n; i++) dist[i] = buf[i * 4 + 3] == 255 ? 0 : INF;
+			// forward chamfer pass (3 orthogonal / 4 diagonal)
+			for (int y = 0; y < h; y++) {
+				int row = y * w;
+				for (int x = 0; x < w; x++) {
+					int i = row + x; int d = dist[i]; if (d == 0) continue;
+					if (x > 0 && dist[i - 1] + 3 < d) d = dist[i - 1] + 3;
+					if (y > 0) {
+						if (dist[i - w] + 3 < d) d = dist[i - w] + 3;
+						if (x > 0 && dist[i - w - 1] + 4 < d) d = dist[i - w - 1] + 4;
+						if (x < w - 1 && dist[i - w + 1] + 4 < d) d = dist[i - w + 1] + 4;
+					}
+					dist[i] = d;
+				}
+			}
+			// backward pass
+			for (int y = h - 1; y >= 0; y--) {
+				int row = y * w;
+				for (int x = w - 1; x >= 0; x--) {
+					int i = row + x; int d = dist[i]; if (d == 0) continue;
+					if (x < w - 1 && dist[i + 1] + 3 < d) d = dist[i + 1] + 3;
+					if (y < h - 1) {
+						if (dist[i + w] + 3 < d) d = dist[i + w] + 3;
+						if (x < w - 1 && dist[i + w + 1] + 4 < d) d = dist[i + w + 1] + 4;
+						if (x > 0 && dist[i + w - 1] + 4 < d) d = dist[i + w - 1] + 4;
+					}
+					dist[i] = d;
+				}
+			}
+			byte br = RenderUtil.CB(r), bg = RenderUtil.CB(g), bb = RenderUtil.CB(b);
+			double th3 = thickness * 3.0;                       // chamfer units (3 per pixel)
+			for (int i = 0; i < n; i++) {
+				int o = i * 4;
+				if (buf[o + 3] != 0) continue;
+				double d = dist[i];
+				if (d > th3 + 3.0) continue;
+				double a2 = d <= th3 ? 1.0 : 1.0 - (d - th3) / 3.0;   // soft 1px rim = anti-aliased edge
+				if (a2 <= 0) continue;
+				buf[o] = br; buf[o + 1] = bg; buf[o + 2] = bb; buf[o + 3] = (byte)(a2 * 255.0);
+			}
+		}
+		private int[] _outlineDist;
+
 		public void Draw(int x, int y) => _canvas.Draw(x, y);
 		public void DrawAtAnchor(int x, int y, string anchor) => _canvas.DrawAtAnchor(x, y, anchor);
+		/// <summary>Blit the rendered scene scaled/tinted/faded at an anchor — used by 3D CHARACTERS,
+		/// whose draw contract (scale/opacity/colour) comes from the 2D chara pipeline.</summary>
+		public void DrawScaled(int x, int y, double scaleX, double scaleY, double opacity, double r, double g, double b, string anchor) {
+			_canvas.SetScale((float)scaleX, (float)scaleY);
+			_canvas.SetOpacity((float)opacity);
+			_canvas.SetColor((float)r, (float)g, (float)b);
+			_canvas.DrawAtAnchor(x, y, anchor ?? "bottom");
+			_canvas.SetScale(1f, 1f); _canvas.SetOpacity(1f); _canvas.SetColor(1f, 1f, 1f);
+		}
 		public void SetScale(float sx, float sy) => _canvas.SetScale(sx, sy);
 		public void SetOpacity(float o) => _canvas.SetOpacity(o);
 		public void SetColor(float r, float g, float b) => _canvas.SetColor(r, g, b);

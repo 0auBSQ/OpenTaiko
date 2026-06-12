@@ -27,7 +27,7 @@ namespace OpenTaiko {
 		private GL Gl => Game.Gl;
 		private const int STRIDE = 9;        // pos(3) uv(2) shade(1) normal(3)
 		// Projection far plane. Kept as tight as every stage allows (the iso faked-ortho camera sits ~46 back of a
-		// ~400-wide world → ~600 max; doom/kart are smaller) because a huge FAR with a tiny near wastes almost all
+		// ~400-wide world → ~600 max; the FPS/kart stages are smaller) because a huge FAR with a tiny near wastes almost all
 		// the 24-bit depth range up close — that hyperbolic crush is the #1 cause of z-fighting on near-coplanar
 		// surfaces. 3000 keeps generous headroom while giving ~3x the depth resolution the old 10000 did.
 		private const double FAR = 3000.0;
@@ -53,11 +53,13 @@ namespace OpenTaiko {
 
 		// FXAA-lite post pass (optional, SetAntialias): copy scene→temp, then edge-aware blend temp→canvas
 		private uint _progPost, _vaoPost, _fxaaTex, _fxaaFbo; private int _postTex, _postMode, _postRes; private int _fxaaW, _fxaaH;
-		// HD2D post pass (SetHD2D, "diorama"): a cheap SCREEN-SPACE tilt-shift (blur grows toward
+		// diorama post pass (SetDiorama, "diorama"): a cheap SCREEN-SPACE tilt-shift (blur grows toward
 		// the top/bottom, a sharp middle band) + saturation/contrast/vignette grade. No depth sample (the old
 		// depth blur was too costly + the depth-texture FBO slowed the main pass), so the main FBO is back to a
 		// plain depth renderbuffer.
-		private uint _progHD2D; private int _hTex, _hRes, _hTilt, _hSat, _hVig;
+		private uint _progDiorama; private int _hTex, _hRes, _hTilt, _hSat, _hVig, _hBloom;
+		// toon OUTLINE post pass (3D characters): true-distance silhouette ink with an AA rim
+		private uint _progOutline; private int _oTex, _oRes, _oColor, _oThick;
 
 		private uint _fbo, _depthRb;
 		private int _fboW, _fboH; private uint _fboColorTex;
@@ -74,7 +76,7 @@ namespace OpenTaiko {
 		private bool _shadowOk = true;
 		private bool _worldShadow;       // which world variant is currently bound (so a mid-pass rebind matches)
 		private const int SHADOW_SIZE = 1920;   // full-HD shadow map over a tight player-centred box (HALF 60) = ~16 texels/unit
-		private const double SHADOW_HALF = 60.0; // ortho half-extent (world units) around the focus
+		// shadow half-extent now lives on the scene (Lua3DScene._shadowHalf, SetShadowArea)
 		private readonly float[] _lightVP = new float[16];
 		private double _lightFx, _lightFz;       // shadow-map focus XZ (for culling far merge buckets out of the depth pass)
 		// sun-facing silhouette casters for billboard characters, rebuilt per shadow frame: a camera-facing quad
@@ -271,6 +273,7 @@ float luma(vec3 c){ return (c.r + 2.0*c.g + c.b) * 255.0; }   // 0..1020, matche
 void main(){
     ivec2 p = ivec2(gl_FragCoord.xy);
     vec3 c = texelFetch(uTex, p, 0).rgb;
+    if (uMode == 2){ frag = texelFetch(uTex, p, 0); return; } // RGBA copy (alpha preserved: outline pass)
     if (uMode == 0){ frag = vec4(c, 1.0); return; }            // plain copy
     if (p.x < 1 || p.y < 1 || p.x >= int(uRes.x)-1 || p.y >= int(uRes.y)-1){ frag = vec4(c,1.0); return; }
     vec3 cn = texelFetch(uTex, p+ivec2(0,-1),0).rgb, cs = texelFetch(uTex, p+ivec2(0,1),0).rgb;
@@ -283,12 +286,38 @@ void main(){
     if (abs(lN+lS-2.0*lC) >= abs(lE+lW-2.0*lC)){ a=cn; b=cs; } else { a=ce; b=cw; }
     frag = vec4((c*2.0 + a + b) * 0.25, 1.0);
 }";
-		// HD2D 'diorama' grade: SCREEN-SPACE tilt-shift (sharp middle band, blur ramping to the
+		// 'Diorama' grade: SCREEN-SPACE tilt-shift (sharp middle band, blur ramping to the
 		// top/bottom — only the edge bands pay the 4 taps, the centre is 1 tap) + saturation/contrast/vignette.
 		// No depth sample, so it's cheap and needs no special FBO.
-		private const string FSHD2D = @"#version 300 es
+		private const string FSOUTLINE = @"#version 300 es
 precision highp float;
-uniform sampler2D uTex; uniform vec2 uRes; uniform float uTilt, uSat, uVig;
+uniform sampler2D uTex; uniform vec2 uRes; uniform vec3 uColor; uniform float uThick;
+out vec4 frag;
+void main(){
+    ivec2 p = ivec2(gl_FragCoord.xy);
+    vec4 c = texelFetch(uTex, p, 0);
+    if (c.a > 0.001) { frag = c; return; }
+    int T = int(ceil(uThick)) + 1;
+    if (T > 12) T = 12;
+    float best = 1e9;
+    for (int dy = -12; dy <= 12; dy++) {
+        if (dy < -T || dy > T) continue;
+        for (int dx = -12; dx <= 12; dx++) {
+            if (dx < -T || dx > T) continue;
+            ivec2 q = p + ivec2(dx, dy);
+            if (q.x < 0 || q.y < 0 || q.x >= int(uRes.x) || q.y >= int(uRes.y)) continue;
+            if (texelFetch(uTex, q, 0).a > 0.5) {
+                float d = length(vec2(float(dx), float(dy)));
+                if (d < best) best = d;
+            }
+        }
+    }
+    float a = clamp(uThick + 0.5 - best, 0.0, 1.0);
+    frag = vec4(uColor, a);
+}";
+		private const string FSDIORAMA = @"#version 300 es
+precision highp float;
+uniform sampler2D uTex; uniform vec2 uRes; uniform float uTilt, uSat, uVig, uBloom;
 out vec4 frag;
 void main(){
     vec2 uv = (gl_FragCoord.xy) / uRes;
@@ -300,6 +329,20 @@ void main(){
         vec2 inv = 1.0 / uRes;
         c = (c + texture(uTex, uv + vec2(0.0, rad) * inv).rgb + texture(uTex, uv + vec2(0.0, -rad) * inv).rgb
                + texture(uTex, uv + vec2(rad, 0.0) * inv).rgb + texture(uTex, uv + vec2(-rad, 0.0) * inv).rgb) * 0.2;
+    }
+    // BLOOM (the diorama glow): a sparse 12-tap ring gathers thresholded brightness around the pixel and
+    // adds it back as a soft halo. One pass, no extra FBO; only diorama scenes pay for it (and only if uBloom>0).
+    if (uBloom > 0.001){
+        vec2 inv = 1.0 / uRes;
+        vec3 acc = vec3(0.0);
+        const float R1 = 7.0; const float R2 = 15.0;
+        for (int i = 0; i < 6; i++){
+            float a = float(i) * 1.0471975;            // 6 taps on the inner ring (60 deg apart)
+            vec2 o = vec2(cos(a), sin(a));
+            acc += max(texture(uTex, uv + o * R1 * inv).rgb - 0.62, 0.0);
+            acc += max(texture(uTex, uv + o * R2 * inv).rgb - 0.62, 0.0) * 0.6;
+        }
+        c += acc * (uBloom * 0.22);
     }
     float l = dot(c, vec3(0.299, 0.587, 0.114));
     c = mix(vec3(l), c, uSat);                         // saturation
@@ -398,9 +441,13 @@ void main(){ frag = uColor; }";
 			// FXAA post program + an empty VAO (fullscreen triangle is generated from gl_VertexID)
 			_progPost = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSPOST));
 			_postTex = Gl.GetUniformLocation(_progPost, "uTex"); _postMode = Gl.GetUniformLocation(_progPost, "uMode"); _postRes = Gl.GetUniformLocation(_progPost, "uRes");
-			_progHD2D = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSHD2D));
-			_hTex = Gl.GetUniformLocation(_progHD2D, "uTex"); _hRes = Gl.GetUniformLocation(_progHD2D, "uRes");
-			_hTilt = Gl.GetUniformLocation(_progHD2D, "uTilt"); _hSat = Gl.GetUniformLocation(_progHD2D, "uSat"); _hVig = Gl.GetUniformLocation(_progHD2D, "uVig");
+			_progDiorama = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSDIORAMA));
+			_progOutline = ShaderHelper.CreateShaderProgramFromSource(Ascii(VSPOST), Ascii(FSOUTLINE));
+			_oTex = Gl.GetUniformLocation(_progOutline, "uTex"); _oRes = Gl.GetUniformLocation(_progOutline, "uRes");
+			_oColor = Gl.GetUniformLocation(_progOutline, "uColor"); _oThick = Gl.GetUniformLocation(_progOutline, "uThick");
+			_hTex = Gl.GetUniformLocation(_progDiorama, "uTex"); _hRes = Gl.GetUniformLocation(_progDiorama, "uRes");
+			_hTilt = Gl.GetUniformLocation(_progDiorama, "uTilt"); _hSat = Gl.GetUniformLocation(_progDiorama, "uSat"); _hVig = Gl.GetUniformLocation(_progDiorama, "uVig");
+			_hBloom = Gl.GetUniformLocation(_progDiorama, "uBloom");
 			_vaoPost = Gl.GenVertexArray();
 			_init = true;
 		}
@@ -460,7 +507,7 @@ void main(){ frag = uColor; }";
 		// orthographic light view-projection (column-major), looking along the sun, covering an area in front of
 		// the camera. Maps a world point so clip.xy∈[-1,1] over ±HALF and clip.z (=p.z after *0.5+0.5) over [0,1].
 		private void BuildLightVP(Lua3DScene s) {
-			const double DEPTH = 260.0; double HALF = SHADOW_HALF;
+			const double DEPTH = 260.0; double HALF = s._shadowHalf;
 			// centre on the player (SetShadowFocus) when given — the faked-ortho iso camera sits far back, so
 			// camera+forward*38 lands behind the action and the map would miss the player entirely.
 			double fxC, fyC, fzC;
@@ -828,7 +875,7 @@ void main(){ frag = uColor; }";
 				// This is the key perf fix for big worlds (the 400x400 volcano was drawn whole into the map each
 				// frame). Buckets are 32u; keep any within HALF + a bucket of the focus (a point beyond samples
 				// "outside the map" and reads as lit anyway, so culling is visually consistent).
-				double cullR = SHADOW_HALF + BS, cullR2 = cullR * cullR;
+				double cullR = s._shadowHalf + BS, cullR2 = cullR * cullR;
 				foreach (var kv in _merge) {
 					if (kv.Value.Count == 0) continue;
 					double bcx = (kv.Key.bx + 0.5) * BS - _lightFx, bcz = (kv.Key.bz + 0.5) * BS - _lightFz;
@@ -868,9 +915,9 @@ void main(){ frag = uColor; }";
 				foreach (var o in _overlay) DrawObj(s, o, litScene);
 			}
 
-			// HD2D post pass ('diorama' grade): tilt-shift + colour grade. Copy canvas->temp, then
-			// grade temp->canvas. No depth, cheap. Only HD2D scenes opt in, so others pay nothing.
-			if (s._hd2d && !s._rttPass) {
+			// diorama post pass ('diorama' grade): tilt-shift + colour grade. Copy canvas->temp, then
+			// grade temp->canvas. No depth, cheap. Only diorama scenes opt in, so others pay nothing.
+			if (s._diorama && !s._rttPass) {
 				EnsureFxaaTarget(s);
 				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
 				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);     // copy canvas -> temp
@@ -878,9 +925,10 @@ void main(){ frag = uColor; }";
 				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
 				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
 				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-				Gl.UseProgram(_progHD2D);                                    // grade temp -> canvas
+				Gl.UseProgram(_progDiorama);                                    // grade temp -> canvas
 				Gl.Uniform1(_hTex, 0); Gl.Uniform2(_hRes, (float)s._w, (float)s._h);
 				Gl.Uniform1(_hTilt, (float)s._hdTilt); Gl.Uniform1(_hSat, (float)s._hdSat); Gl.Uniform1(_hVig, (float)s._hdVig);
+				Gl.Uniform1(_hBloom, (float)s._hdBloom);
 				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
 				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
 				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
@@ -899,6 +947,24 @@ void main(){ frag = uColor; }";
 				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
 				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);          // fxaa: temp → canvas
 				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex); Gl.Uniform1(_postMode, 1);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
+			}
+
+			// toon OUTLINE post pass (3D characters): copy canvas→temp with alpha, ink temp→canvas
+			if (s._outlineTh > 0 && !s._rttPass) {
+				EnsureFxaaTarget(s);
+				Gl.Disable(EnableCap.DepthTest); Gl.DepthMask(false); Gl.Disable(EnableCap.Blend);
+				Gl.UseProgram(_progPost); Gl.BindVertexArray(_vaoPost);
+				Gl.Uniform1(_postTex, 0); Gl.Uniform2(_postRes, (float)s._w, (float)s._h); Gl.Uniform1(_postMode, 2);
+				Gl.ActiveTexture(TextureUnit.Texture0); Gl.BindTexture(TextureTarget.Texture2D, s._canvas.Pointer);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fxaaFbo);
+				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
+				Gl.UseProgram(_progOutline);
+				Gl.Uniform1(_oTex, 0); Gl.Uniform2(_oRes, (float)s._w, (float)s._h);
+				Gl.Uniform3(_oColor, (float)(s._outlineR / 255.0), (float)(s._outlineG / 255.0), (float)(s._outlineB / 255.0));
+				Gl.Uniform1(_oThick, (float)s._outlineTh);
+				Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _fbo);
+				Gl.BindTexture(TextureTarget.Texture2D, _fxaaTex);
 				Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
 			}
 
@@ -1073,7 +1139,7 @@ void main(){ frag = uColor; }";
 			Bind3D(c.Vbo);
 			Gl.UniformMatrix4(_uModel, 1, false, (ReadOnlySpan<float>)ModelMatrix(o.Transform));
 			Gl.Uniform3(_uTint, (float)o.TintR, (float)o.TintG, (float)o.TintB);
-			Gl.Uniform1(_uAlpha, o.A / 255.0f); Gl.Uniform1(_uCutout, 0);
+			Gl.Uniform1(_uAlpha, o.A / 255.0f); Gl.Uniform1(_uCutout, 1);   // alpha-test: free for opaque texels, makes VRM hair/lashes cut out
 			Gl.Uniform1(_uLit, (litScene == 1 && o.Lit) ? 1 : 0);
 			// per-object depth bias (polygon offset): lets a coplanar decal/marking sit cleanly on its surface
 			// instead of z-fighting it (road stripes on the road, ground shadows, etc.).
@@ -1204,9 +1270,9 @@ void main(){ frag = uColor; }";
 			if (_prog2d != 0) Gl.DeleteProgram(_prog2d);
 			if (_progP != 0) Gl.DeleteProgram(_progP);
 			if (_progPost != 0) Gl.DeleteProgram(_progPost);
-			if (_progHD2D != 0) Gl.DeleteProgram(_progHD2D);
+			if (_progDiorama != 0) Gl.DeleteProgram(_progDiorama);
 			_vao = _vao2d = _vaoP = _vaoPost = _spriteVbo = _casterVbo = _vbo2d = _partVbo = 0;
-			_prog = _progShadow = _progDepth = _progDepthSpr = _prog2d = _progP = _progPost = _progHD2D = 0;
+			_prog = _progShadow = _progDepth = _progDepthSpr = _prog2d = _progP = _progPost = _progDiorama = 0;
 			_init = false;
 		}
 	}

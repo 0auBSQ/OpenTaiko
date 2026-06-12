@@ -54,10 +54,13 @@ namespace OpenTaiko {
 		private static readonly byte[] MAGIC = Encoding.ASCII.GetBytes("OTON");
 		private const ushort PROTO_VER = 1;
 		private const int DEFAULT_PORT = 41234;
+		/// <summary>Test/advanced hook: when > 0, this room uses this port instead of the default.</summary>
+		public int PortOverride = 0;
+		private int Port => PortOverride > 0 ? PortOverride : DEFAULT_PORT;
 		// fixed key for the ROOM CODE only (OpenTaiko being open-source, simple obfuscation + integrity not secrecy)
 		private static readonly byte[] APP_KEY = SHA256.HashData(Encoding.UTF8.GetBytes("OpenTaiko Online :: room code :: v1"));
 		// wire opcodes (1 byte before the JSON body, inside each encrypted frame)
-		private const byte OP_HELLO = 1, OP_WELCOME = 2, OP_PEERJOIN = 3, OP_PEERLEFT = 4, OP_HOSTROLE = 5, OP_DATA = 6, OP_REJECT = 7, OP_CLOSED = 8;
+		private const byte OP_HELLO = 1, OP_WELCOME = 2, OP_PEERJOIN = 3, OP_PEERLEFT = 4, OP_HOSTROLE = 5, OP_DATA = 6, OP_REJECT = 7, OP_CLOSED = 8, OP_MIGRATE = 9;
 
 		// ── state (guarded by _lock for the roster/peers; events via a concurrent queue) ─────────────────
 		private readonly object _lock = new();
@@ -75,6 +78,15 @@ namespace OpenTaiko {
 		private int _nextId = 2;            // host assigns ids; host itself is 1
 		private string _localInfo = "{}";
 		private string _stageId = "", _payload = "";
+		// ── migration + reconnect state ──────────────────────────────────────────────────────────────
+		// the room SECRET authenticates rejoins (id reuse) and is shared over the encrypted channel;
+		// the address book (id → ip as observed by the server) lets survivors find the successor.
+		private string _roomSecret = "";
+		private readonly Dictionary<int, string> _peerAddr = new();
+		private int _serverPeerId = 1;            // the roster id of the current socket owner
+		private string _serverIp = "";
+		private volatile int _migrateTo = -1;     // successor announced by a gracefully-leaving server
+		private volatile bool _recovering;
 
 		// ── live in-game score sync ──────────────────────────────────────────────────────────────────────
 		// During an online song the Lua lobby is suspended, so the C# gameplay screen streams the local
@@ -128,9 +140,11 @@ namespace OpenTaiko {
 				_maxPlayers = maxPlayers > 0 ? maxPlayers : 8;
 				_stageId = stageId ?? ""; _payload = payload ?? "";
 				_roster[1] = _localInfo; _order.Clear(); _order.Add(1);
+				_roomSecret = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
+				_peerAddr.Clear(); _peerAddr[1] = LocalIPv4(); _serverPeerId = 1;
 			}
 			try {
-				_listener = new TcpListener(IPAddress.Any, DEFAULT_PORT);
+				_listener = new TcpListener(IPAddress.Any, Port);
 				_listener.Start();
 			} catch (Exception e) { Enqueue("error", 0, "", "Could not host: " + e.Message); _isHost = false; return null; }
 			_running = true;
@@ -156,9 +170,10 @@ namespace OpenTaiko {
 			string ip = o["ip"]?.ToString(); string stage = o["stageid"]?.ToString() ?? ""; string pay = o["payload"]?.ToString() ?? "";
 			if (string.IsNullOrEmpty(ip)) return false;
 			Leave();
+			_stageId = stage; _payload = pay;   // keep the room metadata: a migration SUCCESSOR re-hosts with it
 			_isHost = false; _running = true;
 			Active = this;
-			var t = new Thread(() => ClientConnect(ip, DEFAULT_PORT, stage, pay)) { IsBackground = true, Name = "OTON-connect" };
+			var t = new Thread(() => ClientConnect(ip, Port, stage, pay)) { IsBackground = true, Name = "OTON-connect" };
 			t.Start();
 			return true;
 		}
@@ -167,9 +182,19 @@ namespace OpenTaiko {
 		public void Leave() {
 			_running = false;
 			try { _listener?.Stop(); } catch { } _listener = null;
-			List<PeerConn> conns;
-			lock (_lock) { conns = new List<PeerConn>(_peers.Values); _peers.Clear(); _roster.Clear(); _order.Clear(); }
-			foreach (var c in conns) CloseConn(c, _isHost ? OP_CLOSED : (byte)0);
+			List<PeerConn> conns; int successor = -1;
+			lock (_lock) {
+				conns = new List<PeerConn>(_peers.Values);
+				if (_isHost) foreach (var id in _order) if (id != _selfId && _roster.ContainsKey(id) && (successor < 0 || id < successor)) successor = id;
+				_peers.Clear(); _roster.Clear(); _order.Clear(); _peerAddr.Clear();
+			}
+			// a deliberately-leaving server HANDS THE ROOM OVER instead of closing it: announce the
+			// successor (lowest surviving id); the clients migrate to it (socket migration).
+			if (_isHost && successor > 0) {
+				var mig = new JObject { ["id"] = successor };
+				foreach (var c in conns) { try { SendFrame(c, OP_MIGRATE, mig); } catch { } }
+			}
+			foreach (var c in conns) CloseConn(c, (_isHost && successor <= 0) ? OP_CLOSED : (byte)0);
 			_isHost = false; _selfId = 0; _hostRoleId = 0;
 			_playSync = false; _liveScores.Clear(); _spotLive.Clear(); _spotPeers = null;
 			Array.Clear(_spotBadOdds, 0, _spotBadOdds.Length); Array.Clear(_spotGoodOdds, 0, _spotGoodOdds.Length);
@@ -191,7 +216,10 @@ namespace OpenTaiko {
 
 		// ── Lua/C#: live in-game score side-channel (safe no-ops outside a play round) ──────────────────────
 		/// <summary>Open the live-score round (clears prior scores). Call right before Exit("play").</summary>
-		public void BeginPlaySync(string selfName) { _selfPlayName = selfName ?? ""; _selfPlayScore = ""; _liveScores.Clear(); _spotLive.Clear(); Array.Clear(_spotBadOdds, 0, _spotBadOdds.Length); Array.Clear(_spotGoodOdds, 0, _spotGoodOdds.Length); BarrierReset(); _playEpoch++; _playSync = true; }
+		public void BeginPlaySync(string selfName) { _selfPlayName = selfName ?? ""; _selfPlayScore = ""; _liveScores.Clear(); _spotLive.Clear(); Array.Clear(_spotBadOdds, 0, _spotBadOdds.Length); Array.Clear(_spotGoodOdds, 0, _spotGoodOdds.Length); _ldSent = false; _fnSent = false; _barrierStart = 0; _playEpoch++; _playSync = true; }
+	// NOTE: the loaded/finished sets are NOT cleared here — a fast peer's "ld" may arrive before our
+	// own BeginPlaySync (stage-transition lag), and wiping it would stall the load barrier to timeout.
+	// They are cleared when the previous round ENDS (EndPlaySync) and on Leave().
 		/// <summary>Set the spot→peer mapping for the upcoming play (JSON int array; index 0 = self). The gameplay
 		/// screen renders spots 1.. as remote players. Call alongside BeginPlaySync.</summary>
 		public void SetPlaySpots(string json) {
@@ -242,6 +270,14 @@ namespace OpenTaiko {
 			if (string.IsNullOrEmpty(j)) return -1;
 			try { var o = JObject.Parse(j); if ((bool?)o["mx"] == true) return 2; if ((bool?)o["cl"] == true) return 1; return 0; } catch { return -1; }
 		}
+		/// <summary>A remote spot's final judge count from its broadcast finish result ("gr"=great, "gd"=good,
+		/// "ms"=bad), or -1 if there's no result yet. Lets the results screen show the real player's judges
+		/// instead of the local auto-play's.</summary>
+		public int GetSpotJudge(int spot, string key) {
+			var j = GetSpotResultJson(spot);
+			if (string.IsNullOrEmpty(j)) return -1;
+			try { var o = JObject.Parse(j); return (int?)o[key] ?? -1; } catch { return -1; }
+		}
 		/// <summary>Is the peer rendered in this spot still connected? (false = dropped mid-play → hide that spot.)</summary>
 		public bool IsSpotActive(int spot) {
 			if (_spotPeers == null || spot < 0 || spot >= _spotPeers.Length) return false;
@@ -260,7 +296,7 @@ namespace OpenTaiko {
 			foreach (var c in drop) OnConnDropped(c);   // removes from roster + tells everyone (they see "left")
 		}
 		/// <summary>Close the live-score round. Call when the lobby regains control after the song.</summary>
-		public void EndPlaySync() { _playSync = false; }
+		public void EndPlaySync() { _playSync = false; BarrierReset(); }
 		/// <summary>Broadcast the local player's running score (called by the C# gameplay screen ~6-7x/sec).</summary>
 		public void PushPlayScore(string json) { _selfPlayScore = json ?? ""; Broadcast("ps", json ?? ""); }
 		public string GetSelfPlayScore() => _selfPlayScore;
@@ -344,22 +380,43 @@ namespace OpenTaiko {
 				int id; bool full;
 				lock (_lock) {
 					full = _roster.Count >= _maxPlayers;
-					id = _nextId++;
+					id = full ? 0 : _nextId++;
 				}
 				if (full) { SendFrame(conn, OP_REJECT, new JObject { ["why"] = "Room is full" }); CloseConn(conn, 0); return; }
+				// REJOIN: a dropped peer (or a migration survivor) presents its old id + the room secret
+				int rid = hello["rid"] != null ? (int)hello["rid"] : 0;
+				string sec = hello["sec"]?.ToString() ?? "";
+				bool isRejoin = rid > 0 && sec == _roomSecret && _roomSecret.Length > 0;
+				bool wasKnown = false;
+				if (isRejoin) {
+					PeerConn zombie = null;
+					lock (_lock) {
+						if (_peers.TryGetValue(rid, out zombie)) _peers.Remove(rid);   // replace a half-dead conn
+						wasKnown = _roster.ContainsKey(rid);
+						id = rid; if (rid >= _nextId) _nextId = rid + 1;
+					}
+					if (zombie != null) CloseConn(zombie, 0);
+				}
 				conn.Id = id;
 				string info = hello["i"]?.ToString() ?? "{}";
+				if (info.Length > 16384) info = "{}";   // relayed to the whole room: cap the amplification
+				string addr = "";
+				try { addr = ((IPEndPoint)cli.Client.RemoteEndPoint).Address.ToString(); } catch { }
 				JArray roster = new JArray();
 				lock (_lock) {
-					_peers[id] = conn; _roster[id] = info; _order.Add(id);
-					foreach (var kv in _roster) roster.Add(new JObject { ["id"] = kv.Key, ["i"] = kv.Value });
+					_peers[id] = conn; _roster[id] = info;
+					if (!_order.Contains(id)) _order.Add(id);
+					_peerAddr[id] = addr;
+					foreach (var oid in _order) if (_roster.TryGetValue(oid, out var oinfo))
+						roster.Add(new JObject { ["id"] = oid, ["i"] = oinfo, ["a"] = _peerAddr.TryGetValue(oid, out var oa) ? oa : "" });
 				}
-				// welcome the joiner (their id, the host-role, the stage/payload, the full roster)
-				SendFrame(conn, OP_WELCOME, new JObject { ["id"] = id, ["h"] = _hostRoleId, ["s"] = _stageId, ["p"] = _payload, ["r"] = roster });
+				// welcome the joiner (their id, the host-role, the stage/payload, the roster, the room
+				// secret + the server's own roster id — everything a survivor needs to migrate later)
+				SendFrame(conn, OP_WELCOME, new JObject { ["id"] = id, ["h"] = _hostRoleId, ["s"] = _stageId, ["p"] = _payload, ["r"] = roster, ["sec"] = _roomSecret, ["sid"] = _selfId });
 				// tell everyone else a peer joined; tell ourselves (host) via the event queue
-				var pj = new JObject { ["id"] = id, ["i"] = info };
+				var pj = new JObject { ["id"] = id, ["i"] = info, ["a"] = addr };
 				lock (_lock) foreach (var c in _peers.Values) if (c.Id != id) SendFrame(c, OP_PEERJOIN, pj);
-				Enqueue("joined", id, "", info);
+				if (!wasKnown) Enqueue("joined", id, "", info);
 				conn.Reader = new Thread(() => ReaderLoop(conn)) { IsBackground = true, Name = "OTON-rx" + id };
 				conn.Reader.Start();
 			} catch { try { cli.Close(); } catch { } }
@@ -380,7 +437,8 @@ namespace OpenTaiko {
 		}
 
 		// ── client: connect + handshake ──────────────────────────────────────────────────────────────────
-		private void ClientConnect(string ip, int port, string stage, string payload) {
+		private void ClientConnect(string ip, int port, string stage, string payload) { ClientConnect(ip, port, stage, payload, 0); }
+		private void ClientConnect(string ip, int port, string stage, string payload, int rejoinId) {
 			TcpClient cli = null;
 			try {
 				cli = new TcpClient();
@@ -397,7 +455,9 @@ namespace OpenTaiko {
 				byte[] hostPub = ReadBlock(ns); if (hostPub == null) throw new Exception("Bad handshake");
 				byte[] key = DeriveSession(dh, hostPub);
 				var conn = new PeerConn { Id = 1, Tcp = cli, Stream = ns, Rx = new AesGcm(key, 16), Tx = new AesGcm(key, 16) };
-				SendFrame(conn, OP_HELLO, new JObject { ["i"] = _localInfo });
+				var helloMsg = new JObject { ["i"] = _localInfo };
+				if (rejoinId > 0 && _roomSecret.Length > 0) { helloMsg["rid"] = rejoinId; helloMsg["sec"] = _roomSecret; }
+				SendFrame(conn, OP_HELLO, helloMsg);
 				ns.ReadTimeout = 12000;
 				if (!ReadFrame(conn, out byte op, out JObject msg)) throw new Exception("No reply from host");
 				if (op == OP_REJECT) throw new Exception(msg["why"]?.ToString() ?? "Rejected");
@@ -405,8 +465,14 @@ namespace OpenTaiko {
 				ns.ReadTimeout = Timeout.Infinite;
 				lock (_lock) {
 					_selfId = (int)msg["id"]; _hostRoleId = (int)msg["h"];
-					_peers[1] = conn; _roster.Clear(); _order.Clear();
-					foreach (var r in (JArray)msg["r"]) { int rid = (int)r["id"]; _roster[rid] = r["i"]?.ToString() ?? "{}"; _order.Add(rid); }
+					_roomSecret = msg["sec"]?.ToString() ?? "";
+					_serverPeerId = msg["sid"] != null ? (int)msg["sid"] : 1;
+					_serverIp = ip; _migrateTo = -1;
+					_peers[1] = conn; _roster.Clear(); _order.Clear(); _peerAddr.Clear();
+					foreach (var r in (JArray)msg["r"]) {
+						int rid2 = (int)r["id"]; _roster[rid2] = r["i"]?.ToString() ?? "{}"; _order.Add(rid2);
+						_peerAddr[rid2] = r["a"]?.ToString() ?? "";
+					}
 					if (!_order.Contains(_selfId)) { _order.Add(_selfId); _roster[_selfId] = _localInfo; }
 				}
 				var info = new JObject { ["selfId"] = _selfId, ["stageId"] = msg["s"]?.ToString() ?? stage, ["payload"] = msg["p"]?.ToString() ?? payload, ["hostRoleId"] = _hostRoleId };
@@ -436,8 +502,12 @@ namespace OpenTaiko {
 					break;
 				case OP_PEERJOIN: {   // client side
 					int id = (int)body["id"]; string info = body["i"]?.ToString() ?? "{}";
-					lock (_lock) { if (!_roster.ContainsKey(id)) _order.Add(id); _roster[id] = info; }
-					Enqueue("joined", id, "", info);
+					bool isNew;
+					lock (_lock) {
+						isNew = !_roster.ContainsKey(id); if (isNew) _order.Add(id); _roster[id] = info;
+						_peerAddr[id] = body["a"]?.ToString() ?? "";
+					}
+					if (isNew) Enqueue("joined", id, "", info);   // join-race duplicates carry no news
 					break;
 				}
 				case OP_PEERLEFT: {   // client side
@@ -448,6 +518,11 @@ namespace OpenTaiko {
 				}
 				case OP_HOSTROLE:
 					_hostRoleId = (int)body["id"]; Enqueue("hostrole", _hostRoleId, "", "");
+					break;
+				case OP_MIGRATE:
+					_migrateTo = body["id"] != null ? (int)body["id"] : -1;   // graceful handover: skip the
+					conn.Alive = false;                                       // retry phase, go straight to it
+					Recover(conn);
 					break;
 				case OP_CLOSED:
 					conn.Alive = false; Enqueue("roomclosed", 0, "", "");
@@ -469,8 +544,91 @@ namespace OpenTaiko {
 				if (wasHostRole) RotateHost();
 			} else {
 				CloseConn(conn, 0);
-				if (_running) Enqueue("roomclosed", 0, "", "");   // lost the host -> room is gone
+				if (_running) Recover(conn);   // lost the server unexpectedly → reconnect / migrate
 			}
+		}
+
+		// ── reconnect + socket migration ─────────────────────────────────────────────────────────────────
+		// Runs when a CLIENT loses the server. Phase 1 (skipped on a graceful OP_MIGRATE handover):
+		// retry the same server — covers a network blip on OUR side. Phase 2: everyone deterministically
+		// agrees the successor = the LOWEST surviving roster id; the successor re-binds the port and the
+		// rest reconnect to its known address with their old id + the room secret, so identities survive.
+		private void Recover(PeerConn deadConn) {
+			if (_recovering || !_running) return;
+			_recovering = true;
+			var t = new Thread(() => RecoverLoop()) { IsBackground = true, Name = "OTON-recover" };
+			t.Start();
+		}
+		private void RecoverLoop() {
+			try {
+				int deadServer; string serverIp; int migrateTo = _migrateTo; int myId = _selfId;
+				lock (_lock) { deadServer = _serverPeerId; serverIp = _serverIp; _peers.Clear(); }
+				Enqueue("error", 0, "", migrateTo > 0 ? "Host left — migrating the room..." : "Connection lost — reconnecting...");
+				// phase 1: the server may still be there (our blip) — unless it told us it left
+				if (migrateTo < 0) {
+					for (int a = 0; a < 3 && _running; a++) {
+						if (TryRejoin(serverIp, myId)) { _recovering = false; return; }
+						Thread.Sleep(2500);
+					}
+				}
+				// phase 2: deterministic successor among survivors
+				int succ = migrateTo;
+				if (succ <= 0) {
+					lock (_lock) foreach (var id in _roster.Keys) if (id != deadServer && (succ <= 0 || id < succ)) succ = id;
+				}
+				if (succ <= 0) { GiveUp(); return; }
+				if (succ == myId) { BecomeServer(deadServer); _recovering = false; return; }
+				string succIp; lock (_lock) _peerAddr.TryGetValue(succ, out succIp);
+				if (string.IsNullOrEmpty(succIp)) { GiveUp(); return; }
+				for (int a = 0; a < 8 && _running; a++) {        // the successor needs a moment to re-bind
+					Thread.Sleep(2500);
+					if (TryRejoin(succIp, myId)) { _recovering = false; return; }
+				}
+				GiveUp();
+			} catch { GiveUp(); }
+		}
+		private bool TryRejoin(string ip, int myId) {
+			try {
+				var before = _selfId;
+				ClientConnect(ip, Port, _stageId, _payload, myId);   // synchronous: enqueues connected/error
+				return Connected();
+			} catch { return false; }
+		}
+		private void GiveUp() { _recovering = false; if (_running) Enqueue("roomclosed", 0, "", ""); }
+		// the successor: become the room's socket owner, keep every surviving identity, and give the
+		// stragglers a grace window to rejoin before declaring them gone.
+		private void BecomeServer(int deadServer) {
+			List<int> expected = new();
+			lock (_lock) {
+				_isHost = true; _serverPeerId = _selfId; _serverIp = LocalIPv4(); _peerAddr[_selfId] = _serverIp;
+				_roster.Remove(deadServer); _order.Remove(deadServer); _peerAddr.Remove(deadServer);
+				int mx = 1; foreach (var id in _roster.Keys) { if (id > mx) mx = id; if (id != _selfId) expected.Add(id); }
+				_nextId = mx + 1;
+				if (!_roster.ContainsKey(_hostRoleId)) _hostRoleId = _selfId;
+			}
+			try {
+				_listener = new TcpListener(IPAddress.Any, Port);
+				_listener.Start();
+			} catch { GiveUp(); return; }
+			_acceptThread = new Thread(AcceptLoop) { IsBackground = true, Name = "OTON-accept" };
+			_acceptThread.Start();
+			Enqueue("left", deadServer, "", "");
+			Enqueue("hostrole", _hostRoleId, "", "");
+			Enqueue("error", 0, "", "You now host the room.");
+			// grace watchdog: drop survivors that never made it over
+			var wd = new Thread(() => {
+				Thread.Sleep(25000);
+				if (!_running || !_isHost) return;
+				List<int> gone = new();
+				lock (_lock) { foreach (var id in expected) if (_roster.ContainsKey(id) && !_peers.ContainsKey(id)) gone.Add(id); }
+				foreach (var id in gone) {
+					lock (_lock) { _roster.Remove(id); _order.Remove(id); _peerAddr.Remove(id); }
+					var pl = new JObject { ["id"] = id };
+					lock (_lock) foreach (var c in _peers.Values) SendFrame(c, OP_PEERLEFT, pl);
+					Enqueue("left", id, "", "");
+				}
+			}) { IsBackground = true, Name = "OTON-grace" };
+			wd.Start();
 		}
 
 		// ── framing + crypto ─────────────────────────────────────────────────────────────────────────────
@@ -548,8 +706,10 @@ namespace OpenTaiko {
 				}
 				return;
 			}
-			if (_playSync && channel == "ld") { lock (_loadedPeers) _loadedPeers.Add(from); return; }
-			if (_playSync && channel == "fn") {
+			// barrier reports register regardless of _playSync: they can legitimately arrive BEFORE this
+			// client's own BeginPlaySync (see the note there) and must not stall the round
+			if (channel == "ld") { lock (_loadedPeers) _loadedPeers.Add(from); return; }
+			if (channel == "fn") {
 				lock (_finishedPeers) _finishedPeers.Add(from);
 				if (_spotPeers != null) { int sp = Array.IndexOf(_spotPeers, from); if (sp >= 1) _spotResult[sp] = data ?? ""; }
 				return;

@@ -622,6 +622,7 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 						// gathered results (correct clear/fail/full-combo), before moving to the result screen.
 						if (LuaNetworking.Active.FinishBarrierReady(20000)) {
 							if (!this._onlEndAnimsDone) {
+								this.ApplyOnlineRemoteResults();   // sync remote spots' judges to the result screen
 								for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) this.tEndClearAnim(i, isTower);
 								this._onlEndAnimsDone = true;
 							}
@@ -681,6 +682,21 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	}
 	// Play spot i's end clear animation. Online-aware: a REMOTE spot uses the gathered broadcast result (so the
 	// clear/fail/full-combo shown is correct); local/normal spots use the live gauge as before.
+	// Online VS: overwrite each REMOTE spot's judge counts with the values broadcast at finish, so the
+	// result screen shows the real remote player's great/good/bad, not this client's local auto-play.
+	private void ApplyOnlineRemoteResults() {
+		var net = LuaNetworking.Active;
+		if (net == null) return;
+		for (int i = 1; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (!net.IsRemoteSpot(i)) continue;
+			var cs = this.CChartScore[i];
+			if (cs == null) continue;
+			int gr = net.GetSpotJudge(i, "gr"), gd = net.GetSpotJudge(i, "gd"), ms = net.GetSpotJudge(i, "ms");
+			if (gr >= 0) cs.nGreat = gr;
+			if (gd >= 0) cs.nGood = gd;
+			if (ms >= 0) cs.nMiss = ms;
+		}
+	}
 	private void tEndClearAnim(int i, bool isTower) {
 		int onl = (LuaNetworking.Active?.IsRemoteSpot(i) == true) ? LuaNetworking.Active.GetSpotClearLevel(i) : -2;
 		string anim;

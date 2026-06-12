@@ -48,6 +48,41 @@ namespace OpenTaiko {
 			_fontRenderer = HPrivateFastFont.tInstantiateFont(name, size, fontstyle);
 		}
 
+		// ── DIRECT text drawing (the real fix for per-frame-changing strings) ────────────────────────
+		// DrawDirect renders strings from a PER-CHARACTER glyph cache: each distinct character is
+		// rasterized once (white on a black edge) and then drawn as a tinted quad per use. A chronometer
+		// that changes every frame costs ~12 cached glyphs TOTAL instead of one new texture per frame —
+		// bounded memory, no re-rasterization, no upload churn.
+		private readonly Dictionary<char, LuaTexture> _glyphs = [];
+
+		private LuaTexture? Glyph(char ch) {
+			if (_fontRenderer == null) return null;
+			if (_glyphs.TryGetValue(ch, out var g)) return g;
+			TitleTextureKey key = new(ch.ToString(), _fontRenderer, Color.White, Color.Black, 9999);
+			g = new(TitleTextureKey.ResolveTitleTexture(key, false, false));
+			_glyphs[ch] = g;
+			return g;
+		}
+
+		/// <summary>Draws <paramref name="text"/> at (x, y) tinted (r,g,b 0-255), glyph by glyph from a
+		/// bounded per-character cache. Use this for text that CHANGES every frame (timers, counters,
+		/// scores) — unlike GetText it never caches whole strings. <paramref name="spacing"/> tightens or
+		/// widens tracking (px, default -6 ≈ compensates the glyph edge padding). Returns the end x.</summary>
+		public double DrawDirect(string text, double x, double y, int r = 255, int g = 255, int b = 255, double opacity = 1.0, double spacing = -6) {
+			if (string.IsNullOrEmpty(text) || _fontRenderer == null) return x;
+			foreach (char ch in text) {
+				if (ch == ' ') { var zero = Glyph('0'); x += (zero != null ? zero.Width * 0.55 : 12); continue; }
+				var gl = Glyph(ch);
+				if (gl == null) continue;
+				gl.SetColor(r / 255f, g / 255f, b / 255f);
+				gl.SetOpacity((float)opacity);
+				gl.Draw((int)x, (int)y);
+				gl.SetColor(1f, 1f, 1f); gl.SetOpacity(1f);
+				x += gl.Width + spacing;
+			}
+			return x;
+		}
+
 		public LuaTexture GetText(string text, bool centered = false, int max_width = 99999, LuaColor? forecolor = null, LuaColor? backcolor = null) {
 			if (_fontRenderer == null) return new();
 			TitleTextureKey key = new(text, _fontRenderer,
@@ -82,6 +117,8 @@ namespace OpenTaiko {
 				foreach (var tex in _titles.Values) {
 					tex.Dispose();
 				}
+				foreach (var gl in _glyphs.Values) gl.Dispose();
+				_glyphs.Clear();
 
 				_titles.Clear();
 				_fontRenderer?.Dispose();

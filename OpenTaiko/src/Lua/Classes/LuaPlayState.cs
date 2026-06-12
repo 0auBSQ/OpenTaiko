@@ -58,6 +58,13 @@
 		}
 
 		public int GetHighestCombo(int player) {
+			// CChartScore.nHighestCombo is only populated in Dan mode. For normal play the live per-player max
+			// combo is tracked by the combo actor (same source the results screen reads), so use that.
+			var ac = OpenTaiko.stageGameScreen?.actCombo;
+			if (ac != null) {
+				var max = ac.nCurrentCombo.最高値;
+				if (max != null && player >= 0 && player < max.Length) return max[player];
+			}
 			return OpenTaiko.stageGameScreen.CChartScore[player].nHighestCombo;
 		}
 

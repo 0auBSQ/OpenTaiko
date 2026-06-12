@@ -13,7 +13,7 @@ namespace OpenTaiko {
 		public double Shade; public int Alpha;
 		public byte R, G, B; public bool IsTex; public bool Additive; public bool ScreenTex;
 		public byte BaseR, BaseG, BaseB;   // base colour blended under a ScreenTex (mirror) sample
-		public bool Sprite, Cutout;        // Sprite: Tex is ARGB (per-texel alpha). Cutout: alpha-test + depth write (HD2D); else blend
+		public bool Sprite, Cutout;        // Sprite: Tex is ARGB (per-texel alpha). Cutout: alpha-test + depth write (2D-in-3D); else blend
 	}
 
 	/// <summary>
@@ -131,7 +131,7 @@ namespace OpenTaiko {
 			}
 		}
 
-		// alpha-textured sprite tri (for billboarded HD2D sprite objects). Tex is ARGB; tinted by
+		// alpha-textured sprite tri (for billboarded 2D-in-3D sprite objects). Tex is ARGB; tinted by
 		// (tr,tg,tb); cutout = alpha-test + depth write (crisp, occludes), else alpha blend (no write).
 		private void AddSpriteTri(int i0, int i1, int i2, int[] tex, int tw, int th,
 			double tr, double tg, double tb, int alpha, bool additive, bool cutout) {
@@ -308,14 +308,14 @@ namespace OpenTaiko {
 					Project(m);
 					for (int tri = 1; tri < m - 1; tri++) AddTexTri(0, tri, tri+1, tex, tw, th, shade, o.A, fg, flR, flG, flB);
 				}
-			} else if (o.Kind == 3) {                           // billboarded alpha sprites (HD2D 2D-in-3D)
+			} else if (o.Kind == 3) {                           // billboarded alpha sprites (2D-in-3D)
 				for (int i = 0; i < o.N; i++) {
 					int k = i * 8; int spriteId = (int)d[k + 5];
 					if (!s._spritePix.TryGetValue(spriteId, out var tex)) continue;
 					int tw = s._spriteW[spriteId], th = s._spriteH[spriteId];
 					double w = d[k + 3], hgt = d[k + 4]; int bb = (int)d[k + 6]; bool cut = d[k + 7] != 0;
 					Xform(t, d[k], d[k + 1], d[k + 2], out double wcx, out double wcy, out double wcz);
-					// billboard basis: 2 = full (camera right/up), 1 = Y-axis (face camera, upright; HD2D), else fixed XY
+					// billboard basis: 2 = full (camera right/up), 1 = Y-axis (face camera, upright; 2D-in-3D), else fixed XY
 					double rx, ry, rz, ux, uy, uz;
 					if (bb == 2) { rx = s._Rx; ry = s._Ry; rz = s._Rz; ux = s._Ux; uy = s._Uy; uz = s._Uz; }
 					else if (bb == 1) { rx = s._Rx; ry = 0; rz = s._Rz; double rl = Math.Sqrt(rx * rx + rz * rz); if (rl > 1e-6) { rx /= rl; rz /= rl; } ux = 0; uy = 1; uz = 0; }
@@ -735,7 +735,7 @@ namespace OpenTaiko {
 			int maxY = (int)Math.Ceiling(Math.Max(y0, Math.Max(y1, y2))); if (maxY > by1 - 1) maxY = by1 - 1;
 			if (minX > maxX || minY > maxY) return;
 			int[] tex = t.Tex; int tw = t.Tw, th = t.Th; int alpha = t.Alpha; bool screenT = t.ScreenTex;
-			bool sprite = t.Sprite, cutout = t.Cutout, add = t.Additive;   // alpha-textured HD2D sprite quad
+			bool sprite = t.Sprite, cutout = t.Cutout, add = t.Additive;   // alpha-textured 2D-in-3D sprite quad
 			int rsh = s._rttShift;   // mirror/portal screen-tex is rendered at 1/2^rsh res -> sample px>>rsh
 			double bR = t.BaseR, bG = t.BaseG, bB = t.BaseB;
 			double invA = 1.0 / area;
@@ -774,7 +774,7 @@ namespace OpenTaiko {
 									int sxi = (int)(su * tw); if (sxi < 0) sxi = 0; else if (sxi >= tw) sxi = tw - 1;
 									int syi = (int)(sv * th); if (syi < 0) syi = 0; else if (syi >= th) syi = th - 1;
 									int pk = T[syi * tw + sxi]; int ta = (pk >> 24) & 0xFF;
-									if (cutout) {                       // HD2D: alpha-test crisp edges, write depth (occludes)
+									if (cutout) {                       // cutout: alpha-test crisp edges, write depth (occludes)
 										if (ta >= 128) {
 											double sr = ((pk >> 16) & 0xFF) * fmR, sg = ((pk >> 8) & 0xFF) * fmG, sb = (pk & 0xFF) * fmB;
 											if (fog) { double f = (iw - fstart) * finv; if (f > 0) { if (f > 1) f = 1; sr += (fr - sr) * f; sg += (fg - sg) * f; sb += (fb - sb) * f; } }

@@ -33,13 +33,15 @@ function onStart()
     fontMid   = TEXT:Create(28)
     fontSmall = TEXT:Create(20)
     dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload()
-    modDlg = ACTIVITY:GetActivity("mod_select_dialog")
-    modicons = ROACTIVITY:GetROActivity("modicons")
-    if modicons then pcall(function() modicons:Activate() end) end
+    -- NOTE: do NOT fetch activities here. At skin load, stages' PropagateOnStart runs BEFORE Activities and
+    -- ROActivities are registered (see CSkin.FetchMenusAndModules), so GetActivity/GetROActivity return nil in
+    -- onStart. We fetch them in activate() (runs on entry, after everything is loaded) — same as song_select_core.
 end
 
 function activate()
     lastTs = 0; INPUT:SetMouseLocked(false)
+    if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end
+    if not modicons then modicons = ROACTIVITY:GetROActivity("modicons"); if modicons then pcall(function() modicons:Activate() end) end end
     if pendingReturn then                    -- returned from a song
         pendingReturn = false
         if net.online then LO.broadcastResult(); LO.setWatching(true) end
@@ -99,6 +101,7 @@ function update(ts)
         LO.drain()
         if net.roomGone then backToMenu("The room was closed."); return nil end
     end
+    if mode == "lobby" or mode == "results" then LO.tickPreview(dt) end   -- loop the jacket preview (song select owns its own)
 
     if mode == "menu" then
         if kp("UpArrow") or kp("DownArrow") then menuSel = (menuSel == 1) and 2 or 1 end
@@ -148,7 +151,10 @@ function update(ts)
             if kp("LeftArrow") then LO.cycleDiff(-1) end    -- only difficulties the song actually has
             if kp("RightArrow") then LO.cycleDiff(1) end
         elseif tab == 3 then
-            if kp("Space") or kp("Return") then modDlg:Activate(0, true) end   -- restrict: no Auto / Dynamic Beat online
+            if kp("Space") or kp("Return") then
+                if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end   -- lazily (re)fetch if onStart missed it
+                if modDlg then modDlg:Activate(0, true) else setMsg("Mod select unavailable.", 3) end   -- restrict: no Auto (Dynamic Beat IS allowed, per-player)
+            end
         end
         -- controller-only song controls
         if LO.amController() then
@@ -156,7 +162,6 @@ function update(ts)
             if net.song then
                 if kp("Q") then LO.adjustSpeed(-1) end
                 if kp("E") then LO.adjustSpeed(1) end
-                if kp("B") then LO.toggleDyn() end
             end
         end
         -- Escape: un-ready if readied (Ready is reversible), otherwise leave the room
@@ -232,8 +237,7 @@ local function drawLobby()
     if net.song then
         txt(fontMid, net.song.title or "?", 255, 255, 255, sx, JK_Y + 6)
         if net.songSubtitle and net.songSubtitle ~= "" then txt(fontSmall, net.songSubtitle, 205, 205, 220, sx, JK_Y + 46) end
-        txt(fontSmall, string.format("Speed x%.2f      Dynamic Beat: %s", (net.song.speed or 20) / 20, (net.song.dyn == 1) and "ON" or "off"),
-            190, 220, 255, sx, JK_Y + 76)
+        txt(fontSmall, string.format("Speed x%.2f", (net.song.speed or 20) / 20), 190, 220, 255, sx, JK_Y + 76)
         -- available difficulties + their level numbers
         local lx = sx
         for d = 0, 4 do
@@ -294,7 +298,7 @@ local function drawLobby()
     end
 
     local hint = LO.amController()
-        and "[Up/Down] menu   [S] song   [Q]/[E] speed   [B] dynamic beat   [Esc] leave"
+        and "[Up/Down] menu   [S] song   [Q]/[E] speed   [Esc] leave   (Dynamic Beat = your Mods)"
         or  "[Up/Down] menu   pick difficulty/mods, then Ready   [Esc] un-ready / leave"
     txt(fontSmall, hint, 255, 235, 150, SCREEN_W / 2, SCREEN_H - 60, "center")
     if net.connecting then

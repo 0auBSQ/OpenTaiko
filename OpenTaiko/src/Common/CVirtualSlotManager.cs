@@ -48,6 +48,13 @@ public static class CVirtualSlotManager {
 	// "V1"-"V5" = use virtual slot V[0..4].
 	private static readonly string?[] _mounts = new string?[5];
 
+	// The character index actually LOADED for each player spot via MountSlot (-1 = none loaded by us yet → the
+	// spot still shows whatever the engine loaded, i.e. the player's own character). We can't recompute the
+	// "old" index from the slot data inside MountSlot, because callers change the slot's CharacterFolderName
+	// (SetCharacter) BEFORE re-mounting — so we'd read the NEW character as the old one, skip the swap, and leak
+	// the previously-loaded character. Tracking what we loaded lets us always unload it before loading the next.
+	private static readonly int[] _mountedCharIdx = { -1, -1, -1, -1, -1 };
+
 	// ── Initialisation ────────────────────────────────────────────────────────
 
 	public static void Initialize() {
@@ -59,8 +66,10 @@ public static class CVirtualSlotManager {
 		RefreshAINameplate();
 
 		// Clear all mounts
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; i++) {
 			_mounts[i] = null;
+			_mountedCharIdx[i] = -1;
+		}
 	}
 
 	/// <summary>
@@ -103,18 +112,19 @@ public static class CVirtualSlotManager {
 		if (playerSpot < 1 || playerSpot > 5) return;
 		int player = playerSpot - 1;
 
-		// Record old character index before applying the new mount.
-		int oldCharIdx = GetCharacterIndex(player);
-
 		_mounts[player] = slotInfo;
 
-		// If the effective character changed, swap the loaded animations for this player
-		// slot so the new character is actually rendered.  We do NOT touch any save-file
-		// data (mountedCharacter, data.Character, etc.) — virtual slots are self-contained.
+		// Swap the loaded animations for this player slot so the new character is actually rendered. We use the
+		// index WE last loaded (_mountedCharIdx) as the "old" — NOT a recompute from slot data, which the caller
+		// may already have changed (→ would skip the swap and leak the previously-loaded character). Baseline when
+		// we've never loaded for this slot: the player's own character (what the engine loaded). No save-file data
+		// is touched — virtual slots are self-contained.
 		int newCharIdx = GetCharacterIndex(player);
+		int oldCharIdx = _mountedCharIdx[player] >= 0 ? _mountedCharIdx[player] : OpenTaiko.SaveFileInstances[player].data.Character;
 		if (oldCharIdx != newCharIdx) {
 			OpenTaiko.Tx?.SwapCharacterAnimations(oldCharIdx, newCharIdx, player);
 		}
+		_mountedCharIdx[player] = newCharIdx;
 
 		// Refresh the nameplate for this spot so it picks up the new data.
 		OpenTaiko.NamePlate?.tNamePlateRefreshTitles(player);

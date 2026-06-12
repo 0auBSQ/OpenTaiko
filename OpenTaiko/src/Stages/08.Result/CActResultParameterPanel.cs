@@ -195,11 +195,15 @@ internal class CActResultParameterPanel : CActivity {
 
 			int _charaId = OpenTaiko.SaveFileInstances[i].data.Character;
 
+			var speech = OpenTaiko.Tx.Characters[_charaId].metadata.SpeechText;
 			for (int j = 0; j < 6; j++) {
 				// { "simplestyleSweat", "...", "○", "◎", "★", "!!!!" }
+				// guard: characters may ship fewer than 6 speech lines (repeat the last / fall back to "")
+				string line = (speech != null && speech.Length > 0)
+					? speech[Math.Min(j, speech.Length - 1)].GetString("")
+					: "";
 				ttkSpeechText[i][j] = new TitleTextureKey(
-					OpenTaiko.Tx.Characters[_charaId].metadata.SpeechText[j].GetString(""),
-					pfSpeechText, Color.White, Color.Black, OpenTaiko.Skin.Result_Speech_Text_MaxWidth);
+					line, pfSpeechText, Color.White, Color.Black, OpenTaiko.Skin.Result_Speech_Text_MaxWidth);
 			}
 
 			CCharacter.AddEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARSUCCESS);

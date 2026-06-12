@@ -61,6 +61,9 @@ namespace OpenTaiko {
 		private SceneLight[] _lights = Array.Empty<SceneLight>();
 
 		private const int MaxDepth = 8;
+		/// <summary>When > 0, caps the per-ray bounce depth (used by the hybrid RTT insets to trade
+		/// fidelity for speed; 0 = full depth).</summary>
+		public int MaxDepthOverride = 0;
 
 		/// <summary>How many samples per pixel have accumulated since the last reset (0 just after
 		/// a camera/scene change). Lets the demo show convergence progress.</summary>
@@ -184,7 +187,8 @@ namespace OpenTaiko {
 		// ── path integrator ─────────────────────────────────────────────────────────────
 		private V3 Trace(V3 o, V3 d, ref uint seed) {
 			V3 L = new(0, 0, 0), thr = new(1, 1, 1);
-			for (int bounce = 0; bounce < MaxDepth; bounce++) {
+			int maxDepth = MaxDepthOverride > 0 ? MaxDepthOverride : MaxDepth;
+			for (int bounce = 0; bounce < maxDepth; bounce++) {
 				if (!Closest(o, d, 1e-4, double.MaxValue, out Hit h)) {
 					L = L + thr * Sky(d); break;
 				}
