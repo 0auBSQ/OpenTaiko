@@ -464,6 +464,8 @@ internal class OpenTaiko : Game {
 		}
 
 
+		if (VideoExporter.Active) VideoExporter.ApplyBootOverrides(this);
+
 		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
 		FullScreen = ConfigIni.bFullScreen;
@@ -552,6 +554,9 @@ internal class OpenTaiko : Game {
 
 				OpenTaiko.NamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
+
+				if (VideoExporter.Active)
+					this.nDrawLoopReturnValue = VideoExporter.Tick(this, this.nDrawLoopReturnValue);
 
 				if (OpenTaiko.TJA != null) {
 					//object rendering
@@ -1814,7 +1819,8 @@ internal class OpenTaiko : Game {
 			string str = strEXEのあるフォルダ + "Config.ini";
 			Trace.Indent();
 			try {
-				ConfigIni.t書き出し(str);
+				// the exporter mutates the config (hidden window, auto, player count) — never persist that
+				if (!VideoExporter.Active) ConfigIni.t書き出し(str);
 				Trace.TraceInformation("Saved succesfully. ({0})", str);
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());

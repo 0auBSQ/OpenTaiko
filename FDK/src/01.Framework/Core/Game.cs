@@ -192,6 +192,16 @@ public abstract class Game : IDisposable {
 
 	public static int MainThreadID { get; private set; }
 
+	// ── virtual clock (offline video export) ────────────────────────────────────────────────────
+	// When enabled, TimeMs/dbTimeMs come from VirtualClockMs instead of the window's wall clock.
+	// Everything timed off Game.TimeMs (CTimer.MultiMedia, CSoundTimer in OS-timer mode, video
+	// decoders) then advances exactly as fast as the exporter steps this value — one fixed step
+	// per rendered frame — so render duration no longer affects game time at all.
+	public static bool VirtualClockEnabled = false;
+	public static double VirtualClockMs = 0;
+	/// <summary>Create the window invisible (offline export); set before Run().</summary>
+	public bool StartHidden = false;
+
 	// Public so input mapping can convert window-pixel mouse coords into game-surface
 	// coords (the rendered surface is aspect-fit inside the window, leaving letterbox
 	// borders described by these two values).
@@ -345,6 +355,7 @@ public abstract class Game : IDisposable {
 
 		options.WindowBorder = WindowBorder.Resizable;
 		options.Title = Text;
+		options.IsVisible = !StartHidden;
 
 		#region Override Windowing
 		string windowing_override = GetParameterValue("-w", "--windowing");
@@ -599,8 +610,13 @@ public abstract class Game : IDisposable {
 
 	public void Window_Update(double deltaTime) {
 		double fps = 1.0f / deltaTime;
-		dbTimeMs = Window_.Time * 1000;
-		TimeMs = (long)(Window_.Time * 1000);
+		if (VirtualClockEnabled) {
+			dbTimeMs = VirtualClockMs;
+			TimeMs = (long)VirtualClockMs;
+		} else {
+			dbTimeMs = Window_.Time * 1000;
+			TimeMs = (long)(Window_.Time * 1000);
+		}
 		unsafe {
 			if (SdlWindowing.IsViewSdl(Window_)) {
 				Silk.NET.SDL.Event sdlEvent;

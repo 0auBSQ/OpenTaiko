@@ -46,7 +46,11 @@ internal class Program {
 		Console.WriteLine("Args: " + (args.Length > 0 ? string.Join(" ", args) : "(None)"));
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-		mutex二重起動防止用 = new Mutex(false, "DTXManiaMutex");
+		// offline video export (--uid/--difficulties): runs as its own process even if the game is
+		// already open, so it must not share the single-instance mutex
+		bool bVideoExport = VideoExporter.TryInit(args);
+
+		mutex二重起動防止用 = new Mutex(false, bVideoExport ? "OpenTaikoExport-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
 
 		if (mutex二重起動防止用.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;

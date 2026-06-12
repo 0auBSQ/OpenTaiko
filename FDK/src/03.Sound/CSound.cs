@@ -408,7 +408,24 @@ public class CSound : IDisposable {
 	public void tPlaySound() {
 		tPlaySound(false);
 	}
+
+	// ── offline-export capture ──────────────────────────────────────────────────────────────────
+	// Every actual playback start funnels through tPlaySound(); the video exporter subscribes here
+	// to log (file, virtual time, volume, pan) and later reproduce the session's audio offline.
+	public static Action<CSound>? SoundPlayCapture = null;
+
+	/// <summary>Current effective BASS channel volume/pan of this sound (1.0/0.0 when unavailable).</summary>
+	public (float volume, float pan) tGetChannelLevels() {
+		float vol = 1f, pan = 0f;
+		if (this.IsBassSound && this.hBassStream != 0) {
+			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Volume, out vol)) vol = 1f;
+			if (!Bass.ChannelGetAttribute(this.hBassStream, ChannelAttribute.Pan, out pan)) pan = 0f;
+		}
+		return (vol, pan);
+	}
+
 	private void tPlaySound(bool bループする) {
+		SoundPlayCapture?.Invoke(this);
 		if (this.IsBassSound)           // BASSサウンド時のループ処理は、t再生を開始する()側に実装。ここでは「bループする」は未使用。
 		{
 			//Debug.WriteLine( "再生中?: " +  System.IO.Path.GetFileName(this.strファイル名) + " status=" + BassMix.BASS_Mixer_ChannelIsActive( this.hBassStream ) + " current=" + BassMix.BASS_Mixer_ChannelGetPosition( this.hBassStream ) + " nBytes=" + nBytes );

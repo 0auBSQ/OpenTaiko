@@ -23,6 +23,12 @@ public class SoundManager   // : CSound
 
 	public static bool bIsTimeStretch = false;
 
+	/// <summary>Silences the output device's master mixer (offline video export). Per-channel volume
+	/// attributes are untouched, so the exporter's sound-event capture still reads true levels.</summary>
+	public static void MuteMasterOutput() {
+		try { if (SoundDevice != null) SoundDevice.nMasterVolume = 0; } catch { /* best effort */ }
+	}
+
 	private static IWindow Window_;
 
 	private static int _nMasterVolume;
