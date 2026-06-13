@@ -136,9 +136,7 @@ class TextureLoader {
 		Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
 		Overlay = TxC(@$"Overlay.png");
 		Network_Connection = TxC(@$"Network_Connection.png");
-		// Readme = TxC(@$"Readme.png");
 		NamePlateBase = TxC(@$"NamePlate.png");
-		NamePlate_Extension = TxC(@$"NamePlate_Extension.png");
 
 		#endregion
 
@@ -170,7 +168,6 @@ class TextureLoader {
 		SongLoading_BgWait = TxC(SONGLOADING + @$"Bg_Wait.png");
 		SongLoading_Chara = TxC(SONGLOADING + @$"Chara.png");
 		SongLoading_Fade = TxC(SONGLOADING + @$"Fade.png");
-		SongLoading_Bg_Dan = TxC(SONGLOADING + @$"Bg_Dan.png");
 
 		SongLoading_Plate_AI = TxC(SONGLOADING + @$"Plate_AI.png");
 		SongLoading_Bg_AI = TxC(SONGLOADING + @$"Bg_AI.png");
@@ -514,7 +511,6 @@ class TextureLoader {
 		DanC_Small_Number = TxC(GAME + DANC + @$"Small_Number.png");
 		DanC_ExamType = TxC(GAME + DANC + @$"ExamType.png");
 		DanC_ExamRange = TxC(GAME + DANC + @$"ExamRange.png");
-		DanC_ExamUnit = TxC(GAME + DANC + @$"ExamUnit.png");
 		DanC_Screen = TxC(GAME + DANC + @$"Screen.png");
 		DanC_SmallBase = TxC(GAME + DANC + @$"SmallBase.png");
 		DanC_Small_ExamCymbol = TxC(GAME + DANC + @$"Small_ExamCymbol.png");
@@ -599,41 +595,6 @@ class TextureLoader {
 
 		#endregion
 
-		#region [21_ModIcons]
-
-		HiSp = new CTexture[14];
-		for (int i = 0; i < HiSp.Length; i++) {
-			HiSp[i] = TxC(GAME + MODICONS + @$"HS{Path.DirectorySeparatorChar}" + i.ToString() + @$".png");
-		}
-
-		Mod_Timing = new CTexture[5];
-		for (int i = 0; i < Mod_Timing.Length; i++) {
-			Mod_Timing[i] = TxC(GAME + MODICONS + @$"Timing{Path.DirectorySeparatorChar}" + i.ToString() + @$".png");
-		}
-
-		Mod_SongSpeed = new CTexture[2];
-		for (int i = 0; i < Mod_SongSpeed.Length; i++) {
-			Mod_SongSpeed[i] = TxC(GAME + MODICONS + @$"SongSpeed{Path.DirectorySeparatorChar}" + i.ToString() + @$".png");
-		}
-
-		Mod_Fun = new CTexture[3];
-		for (int i = 0; i < Mod_Fun.Length; i++) {
-			Mod_Fun[i] = TxC(GAME + MODICONS + @$"Fun{Path.DirectorySeparatorChar}" + i.ToString() + @$".png");
-		}
-
-		Mod_Doron = TxC(GAME + MODICONS + @$"Doron.png");
-		Mod_Stealth = TxC(GAME + MODICONS + @$"Stealth.png");
-		Mod_Mirror = TxC(GAME + MODICONS + @$"Mirror.png");
-		Mod_Super = TxC(GAME + MODICONS + @$"Super.png");
-		Mod_Hyper = TxC(GAME + MODICONS + @$"Hyper.png");
-		Mod_Random = TxC(GAME + MODICONS + @$"Random.png");
-		Mod_Auto = TxC(GAME + MODICONS + @$"Auto.png");
-		Mod_Just = TxC(GAME + MODICONS + @$"Just.png");
-		Mod_Safe = TxC(GAME + MODICONS + @$"Safe.png");
-		Mod_None = TxC(GAME + MODICONS + @$"None.png");
-
-		#endregion
-
 		#region [22_AIBattle]
 
 		AIBattle_SectionTime_Panel = TxC(GAME + AIBATTLE + @$"SectionTime_Panel.png");
@@ -680,7 +641,6 @@ class TextureLoader {
 		Result_Soul_Fire = TxC(RESULT + @$"Result_Soul_Fire.png");
 		Result_Diff_Bar = TxC(RESULT + @$"DifficultyBar.png");
 		Result_Score_Number = TxC(RESULT + @$"Score_Number.png");
-		Result_Dan = TxC(RESULT + @$"Dan.png");
 
 		Result_CrownEffect = TxC(RESULT + @$"CrownEffect.png");
 		Result_ScoreRankEffect = TxC(RESULT + @$"ScoreRankEffect.png");
@@ -721,9 +681,6 @@ class TextureLoader {
 
 		//for (int i = 0; i < 4; i++)
 		//Result_Mountain[i] = TxC(RESULT + @$"Background_Mountain_" + i.ToString() + ".png");
-
-		for (int i = 0; i < 3; i++)
-			Result_Crown[i] = TxC(RESULT + @$"Crown{Path.DirectorySeparatorChar}Crown_" + i.ToString() + ".png");
 
 		#endregion
 
@@ -767,8 +724,6 @@ class TextureLoader {
 		#region [10_Heya]
 
 		//Heya_Background = TxC(HEYA + @$"Background.png");
-		Heya_Center_Menu_Bar = TxC(HEYA + @$"Center_Menu_Bar.png");
-		Heya_Center_Menu_Box = TxC(HEYA + @$"Center_Menu_Box.png");
 		Heya_Center_Menu_Box_Slot = TxC(HEYA + @$"Center_Menu_Box_Slot.png");
 		Heya_Side_Menu = TxC(HEYA + @$"Side_Menu.png");
 		Heya_Render_Field = TxC(HEYA + @$"Render_Field.png");
@@ -816,18 +771,10 @@ class TextureLoader {
 
 		//OnlineLounge_Background = TxC(ONLINELOUNGE + @"Background.png");
 		OnlineLounge_Box = TxC(ONLINELOUNGE + @"Box.png");
-		OnlineLounge_Center_Menu_Bar = TxC(ONLINELOUNGE + @"Center_Menu_Bar.png");
-		OnlineLounge_Center_Menu_Box_Slot = TxC(ONLINELOUNGE + @"Center_Menu_Box_Slot.png");
 		OnlineLounge_Side_Menu = TxC(ONLINELOUNGE + @"Side_Menu.png");
 		OnlineLounge_Context = TxC(ONLINELOUNGE + @"Context.png");
 		OnlineLounge_Song_Box = TxC(ONLINELOUNGE + @"Song_Box.png");
 		OnlineLounge_Return_Box = TxC(ONLINELOUNGE + @"Return_Box.png");
-
-		#endregion
-
-		#region [13_TowerSelect]
-
-		TowerSelect_Tower = TxC(TOWERSELECT + @"Tower.png");
 
 		#endregion
 
@@ -929,9 +876,7 @@ class TextureLoader {
 		Loading,
 		Scanning_Loudness,
 		NamePlateBase,
-		NamePlate_Extension,
 		Overlay,
-		Readme,
 		Network_Connection;
 
 	#endregion
@@ -963,7 +908,6 @@ class TextureLoader {
 		SongLoading_Bg,
 		SongLoading_BgWait,
 		SongLoading_Chara,
-		SongLoading_Bg_Dan,
 		SongLoading_Fade,
 
 		SongLoading_Plate_AI,
@@ -1019,8 +963,7 @@ class TextureLoader {
 	public CTexture[] Couse_Symbol, // コースシンボル
 		Couse_Symbol_Back,
 		Couse_Symbol_Back_Flash,
-		Taiko_PlayerNumber,
-		Taiko_NamePlate; // ネームプレート
+		Taiko_PlayerNumber;
 	public CTexture[] Taiko_Score,
 		Taiko_Combo,
 		Taiko_Combo_Guide;
@@ -1085,10 +1028,6 @@ class TextureLoader {
 	public CTexture GameMode_Timer_Frame,
 		GameMode_Timer_Tick;
 	#endregion
-	#region ステージ失敗
-	public CTexture Failed_Game,
-		Failed_Stage;
-	#endregion
 	#region ランナー
 	//public CTexture Runner;
 	#endregion
@@ -1108,8 +1047,7 @@ class TextureLoader {
 		DanC_ExamRange,
 		DanC_Small_ExamCymbol,
 		DanC_ExamCymbol,
-		DanC_MiniNumber,
-		DanC_ExamUnit;
+		DanC_MiniNumber;
 	public CTexture DanC_Screen;
 	#endregion
 	#region PuchiChara
@@ -1140,25 +1078,6 @@ class TextureLoader {
 	public CTexture[][] Tower_Base,
 		Tower_Deco;
 
-
-	#endregion
-
-	#region [21_ModIcons]
-
-	public CTexture[] Mod_Timing,
-		Mod_SongSpeed,
-		Mod_Fun,
-		HiSp;
-	public CTexture Mod_None,
-		Mod_Doron,
-		Mod_Stealth,
-		Mod_Mirror,
-		Mod_Random,
-		Mod_Super,
-		Mod_Hyper,
-		Mod_Just,
-		Mod_Safe,
-		Mod_Auto;
 
 	#endregion
 
@@ -1198,17 +1117,13 @@ class TextureLoader {
 		Result_Gauge_Frame,
 		Result_Gauge_Clear,
 		Result_Gauge_Clear_Base,
-		Result_Gauge_Killzone,
-
-		Result_Dan;
+		Result_Gauge_Killzone;
 
 	public CTexture[]
 		Result_Panel_5P = new CTexture[5],
 		Result_Panel_4P = new CTexture[4],
 		Result_Rainbow = new CTexture[41],
 		//Result_Background = new CTexture[6],
-		Result_Crown = new CTexture[3],
-
 		Result_Flower_Rotate = new CTexture[5],
 		//Result_Work = new CTexture[3],
 
@@ -1259,8 +1174,6 @@ Result_Mountain = new CTexture[4]*/;
 
 	public CTexture
 		//Heya_Background,
-		Heya_Center_Menu_Bar,
-		Heya_Center_Menu_Box,
 		Heya_Center_Menu_Box_Slot,
 		Heya_Side_Menu,
 		Heya_Box,
@@ -1338,22 +1251,12 @@ Result_Mountain = new CTexture[4]*/;
 	public CTexture
 		//OnlineLounge_Background,
 		OnlineLounge_Box,
-		OnlineLounge_Center_Menu_Bar,
-		OnlineLounge_Center_Menu_Box_Slot,
 		OnlineLounge_Side_Menu,
 		OnlineLounge_Context,
 		OnlineLounge_Return_Box,
 		OnlineLounge_Song_Box;
 
 	#endregion
-
-	#region [13_TowerSelect]
-
-	public CTexture
-		TowerSelect_Tower;
-
-	#endregion
-
 
 	#region [ 解放用 ]
 	public List<CTexture> listTexture = new List<CTexture>();
