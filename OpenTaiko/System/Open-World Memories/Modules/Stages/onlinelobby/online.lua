@@ -278,6 +278,24 @@ end
 function LO.setDiff(d) net.diffByPeer[NET:SelfId()] = d; NET:Broadcast("diff", string.format('{"d":%d}', d)) end
 function LO.setReady(r) net.readyByPeer[NET:SelfId()] = r; NET:Broadcast("ready", string.format('{"r":%s}', r and "true" or "false")) end
 function LO.setWatching(w) net.watchByPeer[NET:SelfId()] = w and true or nil; NET:Broadcast("watch", string.format('{"w":%s}', w and "true" or "false")) end
+-- send all of MY current selections to one peer (a late joiner) so they see real values, not the
+-- diff=Normal / no-mods defaults refreshRoster seeds. Mirrors what a fresh change would broadcast.
+function LO.sendMyStateTo(peer)
+    local me = NET:SelfId()
+    NET:SendTo(peer, "diff", string.format('{"d":%d}', net.diffByPeer[me] or 1))
+    local m = net.modByPeer[me] or defMods()
+    NET:SendTo(peer, "mod", string.format('{"r":%d,"st":%d,"ju":%d,"tz":%d,"ss":%d}', m.r or 0, m.st or 0, m.ju or 0, m.tz or 2, m.ss or 9))
+    NET:SendTo(peer, "ready", string.format('{"r":%s}', net.readyByPeer[me] and "true" or "false"))
+    NET:SendTo(peer, "have", string.format('{"h":%s}', net.iLackSong and "false" or "true"))
+    if net.watchByPeer[me] then NET:SendTo(peer, "watch", '{"w":true}') end
+end
+-- broadcast all of MY current selections (after I just joined a room, so everyone already there sees me)
+function LO.broadcastMyState()
+    local me = NET:SelfId()
+    NET:Broadcast("diff", string.format('{"d":%d}', net.diffByPeer[me] or 1))
+    LO.broadcastMods()
+    NET:Broadcast("ready", string.format('{"r":%s}', net.readyByPeer[me] and "true" or "false"))
+end
 -- read the player's mod_select_dialog choices (CONFIG, player 0; excludes auto + fun-mod, which are disabled
 -- online), store + broadcast them so everyone can render the player's mod ICONS.
 function LO.broadcastMods()
@@ -409,9 +427,13 @@ function LO.drain()
         local ty = e.Type
         if ty == "connected" then
             net.online, net.connecting = true, false; LO.refreshRoster()
+            -- announce my own current selections so players already in the room see real values
+            LO.broadcastMyState()
         elseif ty == "joined" then
             LO.refreshRoster()
             if net.song and LO.amController() then NET:SendTo(e.Peer, "song", songJson(net.song)) end
+            -- a newcomer seeds everyone at diff=Normal/no-mods; push MY real state straight to them
+            LO.sendMyStateTo(e.Peer)
         elseif ty == "left" then
             net.diffByPeer[e.Peer] = nil; net.modByPeer[e.Peer] = nil; net.readyByPeer[e.Peer] = nil
             net.resultByPeer[e.Peer] = nil; net.lackByPeer[e.Peer] = nil; net.watchByPeer[e.Peer] = nil

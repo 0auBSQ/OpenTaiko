@@ -186,14 +186,24 @@ internal abstract class CStage演奏画面共通 : CStage {
 			nDynBeatSectionBads[i]     = 0;
 			nDynBeatSectionNotes[i]    = 0;
 		}
-		// If any player has DynamicBeat, force it for all players
-		bool anyDynBeat = false;
-		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat) { anyDynBeat = true; break; }
-		}
-		if (anyDynBeat) {
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
-				OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.DynamicBeat;
+		// Dynamic Beat warps the shared scroll clock, so in LOCAL co-op one player's pick is forced on
+		// all (they share one screen/clock). ONLINE it is per-player: every spot but you is an auto-played
+		// remote whose scroll is cosmetic, and forcing it would change YOUR scroll for a choice you never
+		// made — so don't share it, and clear it off the remote spots so only spot 0 (you) can drive it.
+		bool _onlineDynBeat = LuaNetworking.Active?.PlaySyncActive == true;
+		if (_onlineDynBeat) {
+			for (int i = 1; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
+				if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat)
+					OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.None;
+		} else {
+			bool anyDynBeat = false;
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat) { anyDynBeat = true; break; }
+			}
+			if (anyDynBeat) {
+				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++)
+					OpenTaiko.ConfigIni.nFunMods[i] = EFunMods.DynamicBeat;
+			}
 		}
 		this.bLEVELHOLD = new bool[] { false, false, false, false, false };
 		this.JPOSCROLLX = new double[5];

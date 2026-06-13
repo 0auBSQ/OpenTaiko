@@ -26,6 +26,7 @@ local slot_w       = res_w
 -- Per-player state (1-indexed), used in normal mode only
 local characters   = {}
 local slide_infos  = {}   -- { counter, delay, elapsed, started }
+local setup_characters    -- forward declaration (defined after activate, called from activate + update)
 
 -- Dan background vertical scroll (pixels, positive = scrolled up)
 local dan_scroll_y = 0
@@ -109,42 +110,54 @@ function activate(node, chosen_diff, tick, r, g, b, title, plate_x, plate_y)
 	dan_plate_x = plate_x or 0
 	dan_plate_y = plate_y or 0
 
-	-- Set up character slide-in (normal mode only)
+	-- Set up the per-player character slide-in (normal mode only)
+	setup_characters()
+end
+
+-- (Re)build the character renders + slide animations for the CURRENT player count, splitting the
+-- screen into player_count equal slots. Extracted from activate so update() can re-run it if the
+-- count changes after activation — online play sets the real N late (the lobby mounts virtual slots
+-- right before launch), and if we sized for the stale count the renders would overlap.
+setup_characters = function()
+	-- dispose any previously-loaded renders first
+	for i = 1, #characters do
+		if characters[i] ~= nil then characters[i]:DisposeAnimation(CHARACTER.ANIM_RENDER) end
+	end
 	characters  = {}
 	slide_infos = {}
+	slot_w      = res_w / math.max(1, player_count)
 
-	if mode == "normal" then
-		-- Cap total stagger so the last player always starts within 0.7 s,
-		-- regardless of how many players there are.
-		local stagger = (player_count > 1)
-			and math.min(SLIDE_STAGGER, 0.7 / (player_count - 1))
-			or  0.0
+	if mode ~= "normal" then return end
 
-		for i = 1, player_count do
-			local chara = CHARACTER:GetPlayerCharacter(i - 1)
-			chara:LoadAnimation(CHARACTER.ANIM_RENDER)
-			chara:SetOpacity(0.3)
-			characters[i] = chara
+	-- Cap total stagger so the last player always starts within 0.7 s, regardless of player count.
+	local stagger = (player_count > 1)
+		and math.min(SLIDE_STAGGER, 0.7 / (player_count - 1))
+		or  0.0
 
-			-- P1 enters first, then P2, P3, … in order
-			local delay = (i - 1) * stagger
+	for i = 1, player_count do
+		local chara = CHARACTER:GetPlayerCharacter(i - 1)
+		chara:LoadAnimation(CHARACTER.ANIM_RENDER)
+		chara:SetOpacity(0.3)
+		characters[i] = chara
 
-			-- Counter goes 0 → 1 over SLIDE_DURATION seconds.
-			-- slot_x = startpos - counter * res_w
-			--   at 0: fully off-screen right  (startpos = res_w + (i-1)*slot_w)
-			--   at 1: resting position         (endpos   = (i-1)*slot_w)
-			local cnt = COUNTER:CreateCounterDuration(0.0, 1.0, SLIDE_DURATION)
-			cnt:SetEasing("OUT", "QUAD")
+		-- P1 enters first, then P2, P3, … in order
+		local delay = (i - 1) * stagger
 
-			slide_infos[i] = {
-				counter  = cnt,
-				delay    = delay,
-				elapsed  = 0.0,
-				started  = false,
-				startpos = res_w + (i - 1) * slot_w,
-				endpos   = (i - 1) * slot_w,
-			}
-		end
+		-- Counter goes 0 → 1 over SLIDE_DURATION seconds.
+		-- slot_x = startpos - counter * res_w
+		--   at 0: fully off-screen right  (startpos = res_w + (i-1)*slot_w)
+		--   at 1: resting position         (endpos   = (i-1)*slot_w)
+		local cnt = COUNTER:CreateCounterDuration(0.0, 1.0, SLIDE_DURATION)
+		cnt:SetEasing("OUT", "QUAD")
+
+		slide_infos[i] = {
+			counter  = cnt,
+			delay    = delay,
+			elapsed  = 0.0,
+			started  = false,
+			startpos = res_w + (i - 1) * slot_w,
+			endpos   = (i - 1) * slot_w,
+		}
 	end
 end
 
@@ -161,6 +174,14 @@ end
 
 function update()
 	local dt = fps.deltaTime
+
+	-- self-heal if the player count changed since activate (online sets the real N late) so the
+	-- screen always splits into the right number of slots instead of overlapping renders
+	local live = CONFIG.PlayerCount or player_count
+	if live ~= player_count and live >= 1 then
+		player_count = live
+		setup_characters()
+	end
 
 	-- Dan background scroll
 	if mode == "dan" then

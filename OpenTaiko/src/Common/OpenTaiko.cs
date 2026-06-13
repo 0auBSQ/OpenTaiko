@@ -835,7 +835,9 @@ internal class OpenTaiko : Game {
 							UnmountActivity(rCurrentStage);
 							this.tExecuteGarbageCollection();
 
-							if (stageCutScene.LoadCutScenes(rCurrentStage)) {
+							// Online VS: no outro cutscene — every player would otherwise sit through it out of sync.
+							bool _onlineNoCut = LuaNetworking.Active?.PlaySyncActive == true;
+							if (!_onlineNoCut && stageCutScene.LoadCutScenes(rCurrentStage)) {
 								//-----------------------------
 								this.ChangeStage(stageCutScene, "Cut Scene");
 							} else {
@@ -890,7 +892,10 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.SongSelected:
 								#region [ Song selected ]
 								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage, true);
+								// Online VS: skip intro cutscenes — the lobby already bracketed the play round
+								// (PlaySyncActive), and a cutscene would desync every player's start.
+								bool playCutScenes = LuaNetworking.Active?.PlaySyncActive != true
+									&& stageCutScene.LoadCutScenes(rCurrentStage, true);
 								latestSongSelect = rCurrentStage;
 								UnmountAndChangeStage(playCutScenes ? stageCutScene : stageSongLoading, playCutScenes ? "Cut Scene" : "Song Loading");
 								this.tExecuteGarbageCollection();

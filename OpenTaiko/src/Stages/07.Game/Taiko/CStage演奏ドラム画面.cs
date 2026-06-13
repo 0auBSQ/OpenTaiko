@@ -9,7 +9,7 @@ using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 namespace OpenTaiko;
 
-internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
+internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 	// コンストラクタ
 
 	public CStage演奏ドラム画面() {
@@ -667,36 +667,12 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		return 0;
 	}
 
-	// ── Online VS end-of-play helpers ──────────────────────────────────────────────────────────────────
-	private bool _onlEndAnimsDone = false;
-	// This client's final result (for the finish broadcast + remote clear anims).
-	private string BuildOnlineFinishJson() {
-		var cs = this.CChartScore[0];
-		bool clear = !this.IsStageFailed(0) && HGaugeMethods.UNSAFE_FastNormaCheck(0);
-		bool rainbow = HGaugeMethods.UNSAFE_IsRainbow(0);
-		bool fc = clear && cs != null && cs.nMiss == 0;
-		bool pf = fc && cs.nGood == 0;
-		int gr = cs?.nGreat ?? 0, gd = cs?.nGood ?? 0, ms = cs?.nMiss ?? 0;
-		return string.Format("{{\"cl\":{0},\"fc\":{1},\"pf\":{2},\"mx\":{3},\"gr\":{4},\"gd\":{5},\"ms\":{6}}}",
-			clear ? "true" : "false", fc ? "true" : "false", pf ? "true" : "false", rainbow ? "true" : "false", gr, gd, ms);
-	}
+	// ── Online VS end-of-play ────────────────────────────────────────────────────────────────────────
+	// The online result/finish plumbing (BuildOnlineFinishJson, ApplyOnlineRemoteResults, _onlEndAnimsDone)
+	// lives in the partial file CStage演奏ドラム画面.Online.cs to keep the online concern out of this file.
+
 	// Play spot i's end clear animation. Online-aware: a REMOTE spot uses the gathered broadcast result (so the
 	// clear/fail/full-combo shown is correct); local/normal spots use the live gauge as before.
-	// Online VS: overwrite each REMOTE spot's judge counts with the values broadcast at finish, so the
-	// result screen shows the real remote player's great/good/bad, not this client's local auto-play.
-	private void ApplyOnlineRemoteResults() {
-		var net = LuaNetworking.Active;
-		if (net == null) return;
-		for (int i = 1; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!net.IsRemoteSpot(i)) continue;
-			var cs = this.CChartScore[i];
-			if (cs == null) continue;
-			int gr = net.GetSpotJudge(i, "gr"), gd = net.GetSpotJudge(i, "gd"), ms = net.GetSpotJudge(i, "ms");
-			if (gr >= 0) cs.nGreat = gr;
-			if (gd >= 0) cs.nGood = gd;
-			if (ms >= 0) cs.nMiss = ms;
-		}
-	}
 	private void tEndClearAnim(int i, bool isTower) {
 		int onl = (LuaNetworking.Active?.IsRemoteSpot(i) == true) ? LuaNetworking.Active.GetSpotClearLevel(i) : -2;
 		string anim;

@@ -52,6 +52,9 @@ namespace OpenTaiko {
 						if (o["s"] != null) screen.actScore.Set((double)o["s"], spot);
 						if (o["g"] != null && screen.actGauge?.db現在のゲージ値 != null && spot < screen.actGauge.db現在のゲージ値.Length)
 							screen.actGauge.db現在のゲージ値[spot] = (double)o["g"];
+						// snap the combo counter too, so a remote spot's combo tracks the wire like its score
+						if (o["co"] != null && screen.actCombo != null)
+							screen.actCombo.nCurrentCombo[spot] = (int)o["co"];
 					} catch { }
 				}
 

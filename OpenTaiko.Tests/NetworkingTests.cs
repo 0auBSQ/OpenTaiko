@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 using OpenTaiko;
 using Xunit;
 
@@ -265,6 +266,78 @@ namespace OpenTaikoTests {
 				Assert.Null(host.PeekStageId("not a code at all"));
 				Assert.False(host.JoinRoom("OTON1.garbage!!"));
 			} finally { host.Leave(); }
+		}
+
+		// ── online play-sync transport (guards the in-game/results sync the lobby relies on) ──────────
+		[Fact]
+		public void PlaySync_RemoteSpot_LiveScoreComboAndFinishCounts_RoundTrip() {
+			// Reproduces the play round end to end at the wire level: the host renders a remote player on a
+			// virtual spot, that player streams its live score/combo + judge mix, then reports its final
+			// authoritative tally. This is the exact path the results screen reads (great/good/bad, rolls,
+			// balloons, adlibs, combo, score) — so it regression-guards the "judges/rolls/combo not synced"
+			// fixes without needing the gameplay screen.
+			int port = NextPort();
+			var host = NewNet(port, "{\"name\":\"H\"}");
+			var cli = NewNet(port, "{\"name\":\"C\"}");
+			try {
+				string code = host.CreateRoom("onlinelobby", "", 8);
+				Assert.True(cli.JoinRoom(code));
+				Assert.NotNull(WaitEvent(cli, "connected"));
+				Assert.NotNull(WaitEvent(host, "joined"));
+				Assert.True(WaitUntil(() => host.PeerCount() == 2 && cli.PeerCount() == 2));
+
+				// host: spot 0 = itself (id 1), spot 1 = the remote client (id 2) — mirrors LO.launchPlay order
+				host.SetPlaySpots("[1,2]");
+				host.BeginPlaySync("H");
+				cli.SetPlaySpots("[2,1]");
+				cli.BeginPlaySync("C");
+				Assert.True(host.IsRemoteSpot(1));
+				Assert.False(host.IsRemoteSpot(0));
+
+				// LIVE: client streams running score + combo + good/ok/bad → host snaps them onto spot 1
+				cli.PushPlayScore("{\"n\":\"C\",\"s\":123456,\"g\":50.0,\"a\":97.5,\"gr\":80,\"gd\":15,\"ms\":5,\"co\":42}");
+				Assert.True(WaitUntil(() => host.GetSpotPlayJson(1) != ""));
+				var live = JObject.Parse(host.GetSpotPlayJson(1));
+				Assert.Equal(123456, (long)live["s"]);
+				Assert.Equal(42, (int)live["co"]);          // combo crosses the wire (was dropped before)
+				Assert.Equal(50, host.GetSpotBadOdds(1));    // 5 / 100 → 50 per mille
+				Assert.Equal(150, host.GetSpotGoodOdds(1));  // 15 / 100 → 150 per mille
+
+				// FINISH: client reports its real final tally → host can read every result field for that spot
+				cli.ReportFinished("{\"cl\":true,\"fc\":false,\"pf\":false,\"mx\":false,\"gr\":820,\"gd\":30,\"ms\":4,\"rl\":12,\"bl\":3,\"ad\":2,\"hc\":777,\"sc\":998877}");
+				Assert.True(WaitUntil(() => host.GetSpotJudge(1, "gr") >= 0));
+				Assert.Equal(820, host.GetSpotJudge(1, "gr"));
+				Assert.Equal(30, host.GetSpotJudge(1, "gd"));
+				Assert.Equal(4, host.GetSpotJudge(1, "ms"));
+				Assert.Equal(12, host.GetSpotJudge(1, "rl"));    // rolls
+				Assert.Equal(3, host.GetSpotJudge(1, "bl"));     // balloon hits
+				Assert.Equal(2, host.GetSpotJudge(1, "ad"));     // adlibs
+				Assert.Equal(777, host.GetSpotJudge(1, "hc"));   // highest combo
+				Assert.Equal(998877, host.GetSpotJudge(1, "sc")); // final score
+				Assert.Equal(1, host.GetSpotClearLevel(1));      // cl=true, mx=false → cleared (not rainbow)
+			} finally { cli.Leave(); host.Leave(); }
+		}
+
+		// ── pure helpers (privacy + zero-config rendezvous agreement) ─────────────────────────────────
+		[Theory]
+		[InlineData("198.51.100.23", "1x.x.x.x")]
+		[InlineData("203.0.113.7:41234", "2x.x.x.x")]      // port stripped, then masked
+		[InlineData("2001:db8:abcd:12::1", "2x:x")]
+		[InlineData("[2001:db8::5]:41234", "2x:x")]        // bracketed v6 with port
+		public void MaskIp_KeepsOnlyTheFirstDigit(string input, string expected) {
+			Assert.Equal(expected, LuaNetworking.MaskIp(input));
+		}
+
+		[Fact]
+		public void DerivedSignalBroker_IsDeterministicPerToken() {
+			// host and joiner derive the rendezvous broker from the room token alone (no coordination),
+			// so the same token MUST always map to the same broker, and always to a real configured one.
+			string a = LuaNetworking.DerivedSignalBroker("abc123");
+			Assert.Equal(a, LuaNetworking.DerivedSignalBroker("abc123"));   // stable
+			Assert.Contains(a, MiniMqtt.PublicBrokers);                     // a real broker
+			// different tokens generally land on (any of) the configured brokers — never crash / empty
+			foreach (var tok in new[] { "", "0", "ffffff", "deadbeef", "OTON" })
+				Assert.Contains(LuaNetworking.DerivedSignalBroker(tok), MiniMqtt.PublicBrokers);
 		}
 	}
 

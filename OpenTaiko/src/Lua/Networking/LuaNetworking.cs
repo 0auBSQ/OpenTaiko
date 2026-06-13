@@ -178,11 +178,11 @@ namespace OpenTaiko {
 			_acceptThread.Start();
 			Active = this;
 			if (PortOverride == 0) { UpnpMapPort(Port); _upnpMapped = true; }   // ask the router to forward us (real game only)
-			_signalBroker = "";
+			// pick the rendezvous broker DETERMINISTICALLY from the room token: host and joiner both derive
+			// the same one with zero coordination, so room creation never blocks waiting for a broker (it used
+			// to stall up to 4s) and there is no host/joiner broker-mismatch.
+			_signalBroker = DerivedSignalBroker(_roomToken);
 			StartSignalHostLoop();                                               // pure-P2P internet path (zero config)
-			// the room code must name the broker we actually registered on (host and joiner have to meet
-			// on the SAME one) — give the loop a moment to connect; an empty "sb" still works as before
-			for (int i = 0; i < 40 && _hostSignal == null; i++) Thread.Sleep(100);
 			var hostIps = LocalIPv4s();
 			var obj = new JObject {
 				["ip"] = hostIps[0], ["ips"] = new JArray(hostIps), ["stageid"] = _stageId, ["payload"] = _payload,
@@ -222,34 +222,60 @@ namespace OpenTaiko {
 			_stageId = stage; _payload = pay;   // keep the room metadata: a migration SUCCESSOR re-hosts with it
 			try { _psk = Convert.FromBase64String(o["k"]?.ToString() ?? ""); } catch { _psk = Array.Empty<byte>(); }
 			_roomToken = roomTok;
-			_signalBroker = o["sb"]?.ToString() ?? "";   // meet the host on the broker it registered on
+			// meet the host on its broker: prefer the one named in the code ("sb"), else derive the same
+			// one it would have from the shared token (covers older codes that omit "sb")
+			_signalBroker = o["sb"]?.ToString() ?? "";
+			if (_signalBroker.Length == 0) _signalBroker = DerivedSignalBroker(_roomToken);
 			_isHost = false; _running = true;
 			Active = this;
 			bool hasP2P = roomTok.Length > 0 && _psk.Length > 0;
-			var t = new Thread(() => {
-				string lastErr = null;
-				if (!ForceP2POnly) {
-					// direct candidates first: instant on LAN/VPN/IPv6, fails fast when the host is
-					// genuinely unreachable — then the P2P rendezvous takes over invisibly
-					foreach (string ip in ips) {
-						if (!_running) return;
-						lastErr = ClientConnect(ip, Port, stage, pay, 0, (ips.Count > 1 || hasP2P) ? 2500 : 6000);
-						if (lastErr == null) return;   // connected
-						if (lastErr.StartsWith("REJECTED:")) { Enqueue("error", 0, "", lastErr.Substring(9)); return; }
-					}
+
+			// Race EVERY path at once instead of trying them one-by-one. Old behaviour walked the
+			// candidate list with a 2.5s timeout each and only fell back to the P2P rendezvous after they
+			// all failed — so a player on a different network sat through ~15s of dead LAN/IPv6 timeouts
+			// before the path that actually works was even attempted (the "unstable / depends on who is
+			// hosting" feeling). Now: all direct candidates + the rendezvous run concurrently and the FIRST
+			// to reach the host wins (the claim latch lets exactly one send HELLO, so no phantom joins).
+			int phase = 0;   // 0 = open, 1 = a path is mid-handshake, 2 = connected, 3 = rejected
+			Func<bool> claim = () => Interlocked.CompareExchange(ref phase, 1, 0) == 0;
+			string rejectMsg = null, lastErr = null;
+			var errLock = new object();
+			var workers = new List<Thread>();
+			void Finish(string err) {
+				if (err == null) { Volatile.Write(ref phase, 2); return; }              // connected
+				if (err.StartsWith("REJECTED:")) { rejectMsg = err.Substring(9); Volatile.Write(ref phase, 3); return; }
+				if (err == "superseded") return;                                        // lost the race; stay silent
+				lock (errLock) lastErr = err;                                            // a path failed; others may still win
+				Interlocked.CompareExchange(ref phase, 0, 1);                            // claimed-then-failed: reopen for others
+			}
+			void StartWorker(string name, Func<string> run) {
+				var w = new Thread(() => { try { Finish(run()); } catch (Exception e) { Finish(e.Message); } }) { IsBackground = true, Name = name };
+				workers.Add(w); w.Start();
+			}
+
+			if (!ForceP2POnly)
+				foreach (string ip in ips) { string ipc = ip; StartWorker("OTON-dial", () => ClientConnect(ipc, Port, stage, pay, 0, 6000, claim)); }
+			if (hasP2P)
+				StartWorker("OTON-p2p", () => P2PJoin(stage, pay, 0, claim));
+
+			// coordinator: surface the outcome once (success is enqueued by the winning handshake itself)
+			var coord = new Thread(() => {
+				long deadline = Environment.TickCount64 + 25000;
+				while (_running && Volatile.Read(ref phase) < 2 && Environment.TickCount64 < deadline) {
+					if (Volatile.Read(ref phase) == 3) break;
+					bool anyAlive = false; foreach (var w in workers) if (w.IsAlive) { anyAlive = true; break; }
+					if (!anyAlive) break;
+					Thread.Sleep(50);
 				}
-				if (hasP2P && _running) {
-					string p2pErr = P2PJoin(stage, pay, 0);
-					if (p2pErr == null) return;        // host connected back to us — pure P2P
-					if (p2pErr.StartsWith("REJECTED:")) { Enqueue("error", 0, "", p2pErr.Substring(9)); return; }
-					lastErr = p2pErr;
-				}
-				// plain words for players; the (masked) addresses tried go to the log for debugging
-				Trace.TraceWarning($"[OTON] join failed (tried {string.Join(", ", ips.Select(MaskIp))}{(hasP2P ? " + p2p" : "")}): {lastErr}");
+				if (!_running) return;
+				int ph = Volatile.Read(ref phase);
+				if (ph == 2) return;                                  // connected — handshake already enqueued it
+				if (ph == 3 && rejectMsg != null) { Enqueue("error", 0, "", rejectMsg); return; }
+				Trace.TraceWarning($"[OTON] join failed (raced {string.Join(", ", ips.Select(MaskIp))}{(hasP2P ? " + p2p" : "")}): {lastErr}");
 				Enqueue("error", 0, "", $"Could not join: {lastErr ?? "no route to the host"}. " +
 					"Make sure the room is still open and both players use the same game version.");
 			}) { IsBackground = true, Name = "OTON-connect" };
-			t.Start();
+			coord.Start();
 			return true;
 		}
 
@@ -550,24 +576,29 @@ namespace OpenTaiko {
 		internal static Func<string, IOtonSignal> SignalFactory = pinned => new MqttSignal(pinned);
 		internal bool ForceP2POnly = false;          // test hook: joiner skips the direct candidates
 
-		/// <summary>Privacy mask for anything logged or shown to players: keeps only the first two groups
-		/// of an address (IPv4 a.b.x.x, IPv6 a:b:...) — enough to tell paths apart without exposing the
-		/// full address in logs of an open-source game.</summary>
-		private static string MaskIp(string ip) {
+		internal static string MaskIp(string ip) {
 			if (string.IsNullOrEmpty(ip)) return ip;
 			string s = ip.Trim('[', ']');
 			int colons = 0; foreach (char ch in s) if (ch == ':') colons++;
 			if (colons == 1 && s.Contains('.')) s = s.Substring(0, s.LastIndexOf(':'));   // strip "v4:port"
-			if (!s.Contains(':')) {
-				var p = s.Split('.');
-				return p.Length == 4 ? p[0] + "." + p[1] + ".x.x" : s;
-			}
-			var g = s.Split(':');
-			return g.Length > 2 ? g[0] + ":" + g[1] + ":..." : s;
+			bool v6 = s.Contains(':');
+			char sep = v6 ? ':' : '.';
+			string first = s.Split(sep)[0];
+			string head = first.Length > 0 ? first.Substring(0, 1) : "x";
+			return v6 ? head + "x:x" : head + "x.x.x.x";
 		}
 
 		private string SignalTopic => "oton/v1/" + _roomToken;
 		private readonly HashSet<string> _seenOffers = new();
+
+		/// <summary>The rendezvous broker for a room, derived from its token so both sides agree without
+		/// any handshake. Empty when no brokers are configured. Pure function (testable).</summary>
+		internal static string DerivedSignalBroker(string token) {
+			var b = MiniMqtt.PublicBrokers;
+			if (b == null || b.Length == 0) return "";
+			int h = 17; foreach (char c in token ?? "") h = unchecked(h * 31 + c);
+			return b[((h % b.Length) + b.Length) % b.Length];
+		}
 		private volatile IOtonSignal _hostSignal;    // the host's live rendezvous connection (for offer ACKs)
 		private string _signalBroker = "";           // joiner: the broker pinned in the room code ("sb")
 
@@ -603,9 +634,8 @@ namespace OpenTaiko {
 						if (sig == null || !sig.Alive) {
 							_hostSignal = null;
 							sig?.Dispose();
-							sig = SignalFactory(_signalBroker);   // re-meets on the SAME broker the code advertises
+							sig = SignalFactory(_signalBroker);   // the token-derived broker (joiner derives the same)
 							if (!sig.Open()) { sig.Dispose(); sig = null; Thread.Sleep(15000); continue; }
-							if (_signalBroker.Length == 0) _signalBroker = sig.Broker;   // pin on first connect
 							sig.Listen(SignalTopic, OnJoinerOffer);
 							_hostSignal = sig;
 						}
@@ -696,8 +726,9 @@ namespace OpenTaiko {
 
 		/// <summary>Joiner: open a temporary listener, publish our candidates on the rendezvous channel,
 		/// and complete the client handshake on whichever path lands first — the host connecting back
-		/// directly, or the crossing hole-punch dials meeting in the middle. Null on success.</summary>
-		private string P2PJoin(string stage, string payload, int rejoinId) {
+		/// directly, or the crossing hole-punch dials meeting in the middle. Null on success.
+		/// <paramref name="claim"/> is the shared race latch (see ClientHandshake).</summary>
+		private string P2PJoin(string stage, string payload, int rejoinId, Func<bool> claim = null) {
 			IOtonSignal sig = null;
 			TcpListener lst = null;
 			try {
@@ -727,15 +758,14 @@ namespace OpenTaiko {
 				if (!sig.Open()) return "The matchmaking service is unreachable";
 				string nonce = Convert.ToHexString(RandomNumberGenerator.GetBytes(8));
 
-				// first complete handshake wins, whatever path delivered the socket
+				// first complete handshake wins, whatever path delivered the socket (the shared claim
+				// serializes the actual HELLO across this and the direct attempts)
 				string result = "pending";
 				var done = new ManualResetEventSlim(false);
-				object hsLock = new();
 				void TryFinish(TcpClient c) {
-					lock (hsLock) {
-						if (done.IsSet) { try { c.Close(); } catch { } return; }
-						if (ClientHandshake(c, "p2p", stage, payload, rejoinId) == null) { result = null; done.Set(); }
-					}
+					if (done.IsSet) { try { c.Close(); } catch { } return; }
+					if (ClientHandshake(c, "p2p", stage, payload, rejoinId, claim) == null) { result = null; done.Set(); }
+					else { try { c.Close(); } catch { } }
 				}
 
 				bool ackSeen = false;
@@ -792,7 +822,7 @@ namespace OpenTaiko {
 		// ── client: connect + handshake ──────────────────────────────────────────────────────────────────
 		/// <summary>One direct connection attempt; returns null on success or the error text (callers
 		/// decide whether/how to surface it — the joiner aggregates over several candidate addresses).</summary>
-		private string ClientConnect(string ip, int port, string stage, string payload, int rejoinId, int connectTimeoutMs = 6000) {
+		private string ClientConnect(string ip, int port, string stage, string payload, int rejoinId, int connectTimeoutMs = 6000, Func<bool> claim = null) {
 			TcpClient cli = null;
 			try {
 				cli = new TcpClient();
@@ -809,12 +839,15 @@ namespace OpenTaiko {
 				try { cli?.Close(); } catch { }
 				return e.Message;
 			}
-			return ClientHandshake(cli, ip, stage, payload, rejoinId);
+			return ClientHandshake(cli, ip, stage, payload, rejoinId, claim);
 		}
 
 		/// <summary>The protocol handshake over an established pipe (a socket we dialed, or one the host
-		/// reverse-dialed to us via the P2P rendezvous). Returns null on success or the error text.</summary>
-		private string ClientHandshake(TcpClient cli, string ip, string stage, string payload, int rejoinId) {
+		/// reverse-dialed to us via the P2P rendezvous). Returns null on success or the error text.
+		/// <paramref name="claim"/> (when several join paths race) is checked once, RIGHT BEFORE we send
+		/// HELLO: only the first caller to claim sends it, so the host never allocates a second roster id
+		/// for a path that loses the race — the losers close their socket before the host ever sees them.</summary>
+		private string ClientHandshake(TcpClient cli, string ip, string stage, string payload, int rejoinId, Func<bool> claim = null) {
 			try {
 				var ns = cli.GetStream(); ns.ReadTimeout = 8000;
 				WriteHeader(ns);
@@ -828,6 +861,7 @@ namespace OpenTaiko {
 				var conn = new PeerConn { Id = 1, Tcp = cli, Stream = ns, Rx = new AesGcm(key, 16), Tx = new AesGcm(key, 16) };
 				var helloMsg = new JObject { ["i"] = _localInfo };
 				if (rejoinId > 0 && _roomSecret.Length > 0) { helloMsg["rid"] = rejoinId; helloMsg["sec"] = _roomSecret; }
+				if (claim != null && !claim()) throw new Exception("superseded");   // another path won the race
 				SendFrame(conn, OP_HELLO, helloMsg);
 				ns.ReadTimeout = 12000;
 				if (!ReadFrame(conn, out byte op, out JObject msg)) throw new Exception("No reply from host");
