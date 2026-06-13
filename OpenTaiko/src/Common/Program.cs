@@ -46,11 +46,14 @@ internal class Program {
 		Console.WriteLine("Args: " + (args.Length > 0 ? string.Join(" ", args) : "(None)"));
 		Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-		// offline video export (--uid/--difficulties): runs as its own process even if the game is
-		// already open, so it must not share the single-instance mutex
-		bool bVideoExport = VideoExporter.TryInit(args);
+		// app-level CLI: --mode=record (offline video export) / --mode=checkgl (graphics self-test).
+		// Both run as their own process even while the game is open, so they bypass the single-instance lock.
+		CommandLineArgs cli = CommandLineArgs.Parse(args);
+		bool bVideoExport = cli.Mode == AppMode.Record && VideoExporter.Begin(cli);
+		if (cli.Mode == AppMode.CheckGl) { FDK.Game.GraphicsSelfTest = true; Environment.ExitCode = 70; }
+		bool bSpecialMode = cli.Mode != AppMode.Normal;
 
-		mutex二重起動防止用 = new Mutex(false, bVideoExport ? "OpenTaikoExport-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
+		mutex二重起動防止用 = new Mutex(false, bSpecialMode ? "OpenTaiko-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
 
 		if (mutex二重起動防止用.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;

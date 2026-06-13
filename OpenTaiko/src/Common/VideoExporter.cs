@@ -9,7 +9,7 @@ using Silk.NET.OpenGLES;
 namespace OpenTaiko;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════════
-// Offline gameplay video exporter ("--uid <chartUniqueId> --difficulties 3,4" on the command line).
+// Offline gameplay video exporter ("--mode=record --uid <chartUniqueId> --difficulties 3,4").
 //
 // Boots the game with a hidden window, waits for the song list, jumps straight into an auto-play
 // of the requested chart (one player per difficulty, up to 5), and renders the whole play on a
@@ -90,43 +90,29 @@ internal static class VideoExporter {
 
 	private static string Fmt(double sec) => $"{(int)sec / 60}:{(int)sec % 60:00}";
 
-	// ── command line ─────────────────────────────────────────────────────────────────────────────
+	// ── activation (from --mode=record; args already parsed by CommandLineArgs) ────────────────────
 
-	/// <summary>Parses export args. Returns true (and arms the exporter) when --uid is present.</summary>
-	public static bool TryInit(string[] args) {
-		string? Get(string name) {
-			for (int i = 0; i < args.Length - 1; i++)
-				if (string.Equals(args[i], name, StringComparison.OrdinalIgnoreCase)) return args[i + 1];
-			return null;
-		}
-
-		string? uid = Get("--uid");
-		if (string.IsNullOrWhiteSpace(uid)) return false;
-		_uid = uid.Trim();
-
-		string diffs = Get("--difficulties") ?? Get("--diff") ?? "3";
-		try {
-			_diffs = diffs.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-				.Select(int.Parse).ToArray();
-		} catch { _diffs = Array.Empty<int>(); }
-		if (_diffs.Length < 1 || _diffs.Length > 5 || _diffs.Any(d => d < 0 || d > 4)) {
-			Console.Error.WriteLine("--difficulties must be 1 to 5 comma-separated values between 0 and 4.");
+	/// <summary>Arm the exporter from the parsed CLI. Exits the process with code 2 on a usage error
+	/// (missing/invalid options). Returns true once armed.</summary>
+	public static bool Begin(CommandLineArgs cli) {
+		if (string.IsNullOrWhiteSpace(cli.Uid)) {
+			Console.Error.WriteLine("--mode=record requires --uid <chartUniqueId>.");
 			Environment.Exit(2);
 		}
-
-		if (int.TryParse(Get("--fps"), out int fps) && fps >= 10 && fps <= 240) _fps = fps;
-
-		string? size = Get("--size");
-		if (size != null) {
-			var parts = size.ToLowerInvariant().Split('x');
-			if (parts.Length == 2 && int.TryParse(parts[0], out _reqW) && int.TryParse(parts[1], out _reqH)) { } else { _reqW = _reqH = 0; }
+		if (cli.DifficultiesError != null) {
+			Console.Error.WriteLine(cli.DifficultiesError);
+			Environment.Exit(2);
 		}
-		if (_reqW <= 0 || _reqH <= 0) { _reqW = 1920; _reqH = 1080; }   // full res by default
-
-		_outPath = Get("--out") ?? $"export_{_uid}_{string.Join("-", _diffs)}.mp4";
+		_uid = cli.Uid;
+		_diffs = cli.Difficulties;
+		_fps = cli.Fps;
+		_reqW = cli.Width; _reqH = cli.Height;
+		_outPath = cli.OutPath;
 		Active = true;
 
-		AttachConsole(ATTACH_PARENT_PROCESS);   // WinExe → reattach stdout to the calling terminal
+		// WinExe → reattach stdout to the calling terminal (Windows only; on Linux/macOS the process
+		// already inherits the terminal's stdout, and kernel32 doesn't exist there).
+		if (OperatingSystem.IsWindows()) { try { AttachConsole(ATTACH_PARENT_PROCESS); } catch { } }
 		try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { /* legacy console */ }
 		_lineMode = Console.IsOutputRedirected;
 		Console.WriteLine();
