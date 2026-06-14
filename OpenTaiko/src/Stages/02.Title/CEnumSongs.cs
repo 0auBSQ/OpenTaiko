@@ -260,6 +260,9 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		// 構築が完了したら、DTXEnumerateState state を DTXEnumerateState.Done にすること。(2012.2.9)
 
 		DateTime now = DateTime.Now;
+#if DEBUG
+		tTraceSongEnumMemory("before enum");
+#endif
 
 		try {
 			if (hard_reload) {
@@ -377,11 +380,25 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			TimeSpan span = (TimeSpan)(DateTime.Now - now);
 			Trace.TraceInformation("曲探索所要時間: {0}", span.ToString());
 		}
+#if DEBUG
+		tTraceSongEnumMemory("after enum+serialize");
+#endif
+
 		lock (this) {
 			// state = DTXEnumState.Done;		// DoneにするのはCDTXMania.cs側にて。
 			state = DTXEnumState.Enumeratad;
 		}
 	}
+
+#if DEBUG
+	private static void tTraceSongEnumMemory(string tag) {
+		long managedMB = GC.GetTotalMemory(forceFullCollection: true) / (1024 * 1024);
+		using var proc = System.Diagnostics.Process.GetCurrentProcess();
+		Trace.TraceInformation(
+			"[ENUM_MEM] {0}: managed(after full GC)={1:N0}MB, workingSet={2:N0}MB, paged={3:N0}MB",
+			tag, managedMB, proc.WorkingSet64 / (1024 * 1024), proc.PagedMemorySize64 / (1024 * 1024));
+	}
+#endif
 
 
 #pragma warning disable SYSLIB0011

@@ -3626,12 +3626,18 @@ internal class CTja : CActivity {
 				strVideoFilename = this.strFolderPath + this.strBGVIDEO_PATH;
 
 			try {
-				CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
+				// Only open the native (FFmpeg) video decoder when the chart is actually being loaded
+				// for play. During metadata enumeration (bLoadChart == false) the decoder is never used
+				// (tAVILoad is itself gated on bLoadChart) and would leak native memory, since the parsed
+				// CTja is discarded without Dispose. Enumeration still records strBGVIDEO_PATH above.
+				if (this.bLoadChart) {
+					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
 
-				if (this.listVD.ContainsKey(1))
-					this.listVD.Remove(1);
+					if (this.listVD.ContainsKey(1))
+						this.listVD.Remove(1);
 
-				this.listVD.Add(1, vd);
+					this.listVD.Add(1, vd);
+				}
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued", e);
 				if (this.listVD.ContainsKey(1))
@@ -3654,11 +3660,14 @@ internal class CTja : CActivity {
 				strVideoFilename = this.strFolderPath + videoPath;
 
 			try {
-				CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
+				// As with BGMOVIE: only open the native decoder for actual play, not metadata enumeration.
+				if (this.bLoadChart) {
+					CVideoDecoder vd = new CVideoDecoder(strVideoFilename);
 
-				var indexText = strCommandName.Remove(0, 3);
+					var indexText = strCommandName.Remove(0, 3);
 
-				this.listVD.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
+					this.listVD.Add((10 * int.Parse(indexText[0].ToString())) + int.Parse(indexText[1].ToString()) + 2, vd);
+				}
 			} catch (Exception e) {
 				this.AddWarn($"{strCommandName}: Exception when generating decoder for video {strVideoFilename}: {e.Message}; continued.", e);
 				if (this.listVD.ContainsKey(1))
