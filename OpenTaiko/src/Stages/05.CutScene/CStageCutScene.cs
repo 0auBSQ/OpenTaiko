@@ -251,7 +251,7 @@ class CStageCutScene : CStage {
 	private void KeyInput() {
 		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
 		if ((base.ePhaseID == CStage.EPhase.Common_NORMAL) && (
-			keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || keyboard.KeyPressed((int)SlimDXKeys.Key.F1) || OpenTaiko.Pad.bPressedGB(EPad.FT)
+			keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || keyboard.KeyPressed((int)SlimDXKeys.Key.F1)
 			)) {
 			if (!this.actPauseMenu.bIsActivePopupMenu && !this.isPause) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();

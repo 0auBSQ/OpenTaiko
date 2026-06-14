@@ -799,7 +799,7 @@ internal class OpenTaiko : Game {
 								stageGameScreen.bPreviousPlayWasEndedNormally = true;
 								CScoreIni.C演奏記録 c演奏記録_Drums;
 								stageGameScreen.t演奏結果を格納する(out c演奏記録_Drums);
-								stageResults.st演奏記録.Drums = c演奏記録_Drums;
+								stageResults.st演奏記録 = c演奏記録_Drums;
 								UnmountAndChangeStage(stageResults, "Results");
 								break;
 								//-----------------------------

@@ -335,7 +335,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (becomeStageFailed) {
 			this.actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 			this.actGauge.db現在のゲージ値[iPlayer] = 0; // for indicate life failure in AI mode
-			this.UpdateGauge(null, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
+			this.UpdateGauge(null, EKeyConfigPart.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
 			OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives = 0; // prevent clear
 			if (!OpenTaiko.ConfigIni.bAIBattleMode)
 				this.actEnd.Start(iPlayer);
@@ -359,7 +359,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (base.IsFirstDraw) {
 				SoundManager.PlayTimer.Reset();
 				OpenTaiko.Timer.Reset();
-				this.ctチップ模様アニメ.Drums = new CCounter(0, 1, 500, OpenTaiko.Timer);
+				this.ctチップ模様アニメ = new CCounter(0, 1, 500, OpenTaiko.Timer);
 
 				// this.actChipFireD.Start( Eレーン.HH );	// #31554 2013.6.12 yyagi
 				// 初チップヒット時のもたつき回避。最初にactChipFireD.Start()するときにJITが掛かって？
@@ -470,7 +470,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
-				bool btmp = this.t進行描画_チップ(EInstrumentPad.Drums, i);
+				bool btmp = this.t進行描画_チップ(EKeyConfigPart.Taiko, i);
 				if (btmp == true)
 					isFinishedPlaying[i] = true;
 
@@ -760,7 +760,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		if (!(pChip != null && NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip)))
 			return ENoteJudge.Miss;
 
-		var e判定 = this.tチップのヒット処理(nHitTime, pChip, EInstrumentPad.Taiko, true, nInput, nPlayer);
+		var e判定 = this.tチップのヒット処理(nHitTime, pChip, EKeyConfigPart.Taiko, true, nInput, nPlayer);
 		if (NotesManager.IsGenericRoll(pChip))
 			return e判定;
 		if (e判定 == ENoteJudge.Miss)
@@ -792,7 +792,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
 
-		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EInstrumentPad.Drums)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
+		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EKeyConfigPart.Taiko)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
 			int nUsePlayer = NotesManager.GetPadPlayer(nPad);
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
@@ -804,7 +804,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 				continue; // skip input
 			}
 
-			this.t入力メソッド記憶(EInstrumentPad.Drums);
+			this.t入力メソッド記憶(EKeyConfigPart.Taiko);
 
 			if (!inputEvent.Pressed)
 				continue;
@@ -846,7 +846,7 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 			// BAD or TIGHT 時の処理。
 			if (e判定 is ENoteJudge.Miss && OpenTaiko.ConfigIni.bTight)
-				this.tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad.Drums, e判定, nUsePlayer, null);
+				this.tチップのヒット処理_BadならびにTight時のMiss(EKeyConfigPart.Taiko, e判定, nUsePlayer, null);
 		}
 		#endregion
 	}
@@ -1361,16 +1361,16 @@ internal partial class CStage演奏ドラム画面 : CStage演奏画面共通 {
 			if (OpenTaiko.Tx.Judge_Meter != null)
 				OpenTaiko.Tx.Judge_Meter.t2D描画(OpenTaiko.Skin.Game_Judge_Meter[0], OpenTaiko.Skin.Game_Judge_Meter[1]);
 
-			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Perfect[0], OpenTaiko.Skin.Game_Judge_Meter_Perfect[1], this.nHitCount_ExclAuto.Drums.Perfect, false, false);
-			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Good[0], OpenTaiko.Skin.Game_Judge_Meter_Good[1], this.nHitCount_ExclAuto.Drums.Great, false, false);
-			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Miss[0], OpenTaiko.Skin.Game_Judge_Meter_Miss[1], this.nHitCount_ExclAuto.Drums.Miss, false, false);
+			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Perfect[0], OpenTaiko.Skin.Game_Judge_Meter_Perfect[1], this.nHitCount_ExclAuto.Perfect, false, false);
+			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Good[0], OpenTaiko.Skin.Game_Judge_Meter_Good[1], this.nHitCount_ExclAuto.Great, false, false);
+			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Miss[0], OpenTaiko.Skin.Game_Judge_Meter_Miss[1], this.nHitCount_ExclAuto.Miss, false, false);
 			this.t小文字表示(OpenTaiko.Skin.Game_Judge_Meter_Roll[0], OpenTaiko.Skin.Game_Judge_Meter_Roll[1], GetRoll(0), false, false);
 
-			int nNowTotal = this.nHitCount_ExclAuto.Drums.Perfect + this.nHitCount_ExclAuto.Drums.Great + this.nHitCount_ExclAuto.Drums.Miss;
-			double dbたたけた率 = Math.Round((100.0 * (OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great)) / (double)nNowTotal);
-			double dbPERFECT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect) / (double)nNowTotal);
-			double dbGREAT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great / (double)nNowTotal));
-			double dbMISS率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Miss / (double)nNowTotal));
+			int nNowTotal = this.nHitCount_ExclAuto.Perfect + this.nHitCount_ExclAuto.Great + this.nHitCount_ExclAuto.Miss;
+			double dbたたけた率 = Math.Round((100.0 * (OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Great)) / (double)nNowTotal);
+			double dbPERFECT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Perfect) / (double)nNowTotal);
+			double dbGREAT率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Great / (double)nNowTotal));
+			double dbMISS率 = Math.Round((100.0 * OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Miss / (double)nNowTotal));
 
 			if (double.IsNaN(dbたたけた率))
 				dbたたけた率 = 0;

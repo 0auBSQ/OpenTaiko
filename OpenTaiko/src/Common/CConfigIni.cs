@@ -160,9 +160,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		private readonly CKeyAssignPad[] padSets = Enumerable.Range(0, (int)EKeyConfigPart.Total).Select(i => new CKeyAssignPad()).ToArray();
 		public CKeyAssignPad this[int index] { get => padSets[index]; internal set => padSets[index] = value; }
-		public CKeyAssignPad Bass => padSets[(int)EKeyConfigPart.Bass];
-		public CKeyAssignPad Drums => padSets[(int)EKeyConfigPart.Drums];
-		public CKeyAssignPad Guitar => padSets[(int)EKeyConfigPart.Guitar];
 		public CKeyAssignPad Taiko => padSets[(int)EKeyConfigPart.Taiko];
 		public CKeyAssignPad System => padSets[(int)EKeyConfigPart.System];
 	}
@@ -214,7 +211,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bOutputDetailedDTXLog;
 	public bool bOutputSongSearchLog;
 	public bool bOutputCreationReleaseLog;
-	public STDGBVALUE<bool> bReverse;
+	public bool bReverse;
 
 	public bool bDanTowerHide;
 
@@ -317,7 +314,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			nameof(KeyboardSoundLevelIncrement));
 	}
 
-	public STDGBVALUE<int> nMinDisplayedCombo;
+	public int nMinDisplayedCombo;
 	public int[] nScrollSpeed;
 	public int[] nTimingZones;
 	public EGameType[] nGameType;
@@ -427,7 +424,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool bEndingAnime = false; // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
-	public STDGBVALUE<EJudgeTextDisplayPosition> JudgeTextDisplayPosition;
+	public EJudgeTextDisplayPosition JudgeTextDisplayPosition;
 	public int nInputAdjustTimeMs;
 	public int nGlobalOffsetMs;
 	public bool bIsAutoResultCapture; // #25399 2011.6.9 yyagi リザルト画像自動保存機能のON/OFF制御
@@ -497,10 +494,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bUseOSTimer; // #33689 2014.6.6 yyagi 演奏タイマーの種類
 	public bool bDynamicBassMixerManagement; // #24820
 	public bool bTimeStretch; // #23664 2013.2.24 yyagi ピッチ変更無しで再生速度を変更するかどうか
-	public STDGBVALUE<EInvisible> eInvisible; // #32072 2013.9.20 yyagi チップを非表示にする
+	public EInvisible eInvisible; // #32072 2013.9.20 yyagi チップを非表示にする
 	public int nDisplayTimesMs, nFadeoutTimeMs;
 
-	public STDGBVALUE<int> nViewerScrollSpeed;
+	public int nViewerScrollSpeed;
 	public bool bViewerVSyncWait;
 	public bool bViewerShowDebugStatus;
 	public bool bViewerTimeStretch;
@@ -778,8 +775,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.bDanTowerHide = false;
 
 		this.bIncludeSubfoldersOnRandomSelect = true;
-		this.nMinDisplayedCombo = new STDGBVALUE<int>();
-		this.nMinDisplayedCombo.Drums = 10;
+		this.nMinDisplayedCombo = 10;
 		this.nRollsPerSec = 15;
 		this.nAILevel = 1;
 		this.bAIBattleMode = false;
@@ -816,9 +812,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.SongPlaybackLevel = CSound.DefaultSongPlaybackLevel;
 		this.KeyboardSoundLevelIncrement = DefaultKeyboardSoundLevelIncrement;
 		this.bOutputLogs = true;
-		this.bReverse = new STDGBVALUE<bool>();
 		this.eRandom = new ERandomMode[5];
-		this.JudgeTextDisplayPosition = new STDGBVALUE<EJudgeTextDisplayPosition>();
 		this.nScrollSpeed = new int[5] { 9, 9, 9, 9, 9 };
 		this.nTimingZones = new int[5] { 2, 2, 2, 2, 2 };
 		this.nGameType = new EGameType[5] {
@@ -828,10 +822,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 			new EFunMods[5] { EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None };
 		this.nInputAdjustTimeMs = 0;
 		this.nGlobalOffsetMs = 0;
-		for (int i = 0; i < 3; i++) {
-			this.bReverse[i] = false;
-			this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.AboveLane;
-		}
+		this.bReverse = false;
+		this.JudgeTextDisplayPosition = EJudgeTextDisplayPosition.AboveLane;
 
 
 		for (int i = 0; i < 5; i++) {
@@ -1315,7 +1307,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("DanTowerHide={0}", this.bDanTowerHide ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; 最小表示コンボ数");
-		sw.WriteLine("MinComboDrums={0}", this.nMinDisplayedCombo.Drums);
+		sw.WriteLine("MinComboDrums={0}", this.nMinDisplayedCombo);
 		sw.WriteLine();
 		sw.WriteLine("; RANDOM SELECT で子BOXを検索対象に含める (0:OFF, 1:ON)");
 		sw.WriteLine("RandomFromSubBox={0}", this.bIncludeSubfoldersOnRandomSelect ? 1 : 0);
@@ -1489,7 +1481,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("EnableCountDownTimer={0}", this.bEnableCountdownTimer ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; ドラムREVERSEモード(0:OFF, 1:ON)");
-		sw.WriteLine("DrumsReverse={0}", this.bReverse.Drums ? 1 : 0);
+		sw.WriteLine("DrumsReverse={0}", this.bReverse ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; RISKYモード(0:OFF, 1-10)"); // #23559 2011.6.23 yyagi
 		sw.WriteLine("; RISKY mode. 0=OFF, 1-10 is the times of misses to be Failed."); //
@@ -1669,97 +1661,97 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine();
 
 		sw.Write("LeftRed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed);
 		sw.WriteLine();
 		sw.Write("RightRed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed);
 		sw.WriteLine();
 		sw.Write("LeftBlue="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed2P);
 		sw.WriteLine();
 		sw.Write("RightRed2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed2P);
 		sw.WriteLine();
 		sw.Write("LeftBlue2P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue2P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue2P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue2P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue2P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue2P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed3P);
 		sw.WriteLine();
 		sw.Write("RightRed3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed3P);
 		sw.WriteLine();
 		sw.Write("LeftBlue3P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue3P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue3P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue3P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue3P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue3P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed4P);
 		sw.WriteLine();
 		sw.Write("RightRed4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed4P);
 		sw.WriteLine();
 		sw.Write("LeftBlue4P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue4P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue4P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue4P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue4P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue4P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed5P);
 		sw.WriteLine();
 		sw.Write("RightRed5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed5P);
 		sw.WriteLine();
 		sw.Write("LeftBlue5P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue5P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue5P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue5P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue5P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue5P); //
 		sw.WriteLine();
 
 		sw.Write("Clap=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap);
 		sw.WriteLine();
 		sw.Write("Clap2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap2P);
 		sw.WriteLine();
 		sw.Write("Clap3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap3P);
 		sw.WriteLine();
 		sw.Write("Clap4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap4P);
 		sw.WriteLine();
 		sw.Write("Clap5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap5P);
 		sw.WriteLine();
 
 		sw.Write("Decide=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Decide);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Decide);
 		sw.WriteLine();
 		sw.Write("Cancel=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Cancel);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Cancel);
 		sw.WriteLine();
 		sw.Write("LeftChange=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftChange);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftChange);
 		sw.WriteLine();
 		sw.Write("RightChange=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightChange);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightChange);
 		sw.WriteLine();
 
 		sw.WriteLine();
@@ -1813,52 +1805,52 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("[TrainingKeyAssign]");
 		sw.WriteLine();
 		sw.Write("TrainingIncreaseScrollSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingIncreaseScrollSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingDecreaseScrollSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingDecreaseScrollSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingIncreaseSongSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingIncreaseSongSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingDecreaseSongSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingDecreaseSongSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingToggleAuto=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingToggleAuto);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingToggleAuto);
 		sw.WriteLine();
 		sw.Write("TrainingBranchNormal=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchNormal);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchNormal);
 		sw.WriteLine();
 		sw.Write("TrainingBranchExpert=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchExpert);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchExpert);
 		sw.WriteLine();
 		sw.Write("TrainingBranchMaster=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchMaster);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchMaster);
 		sw.WriteLine();
 		sw.Write("TrainingPause=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingPause);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingPause);
 		sw.WriteLine();
 		sw.Write("TrainingBookmark=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBookmark);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBookmark);
 		sw.WriteLine();
 		sw.Write("TrainingMoveForwardMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingMoveForwardMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingMoveBackMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingMoveBackMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingSkipForwardMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingSkipForwardMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingSkipBackMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingSkipBackMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingJumpToFirstMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingJumpToFirstMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingJumpToLastMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingJumpToLastMeasure);
 		sw.WriteLine();
 		sw.WriteLine();
 
@@ -2111,8 +2103,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bIncludeSubfoldersOnRandomSelect = CConversion.bONorOFF(value[0]);
 				break;
 			case "MinComboDrums":
-				this.nMinDisplayedCombo.Drums =
-					CConversion.ParseIntInRange(value, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
+				this.nMinDisplayedCombo =
+					CConversion.ParseIntInRange(value, 1, 0x1869f, this.nMinDisplayedCombo);
 				break;
 			case "ShowDebugStatus":
 				this.bDisplayDebugInfo = CConversion.bONorOFF(value[0]);
@@ -2314,12 +2306,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bEnableCountdownTimer = CConversion.bONorOFF(value[0]);
 				break;
 			case "DrumsReverse":
-				this.bReverse.Drums = CConversion.bONorOFF(value[0]);
+				this.bReverse = CConversion.bONorOFF(value[0]);
 				break;
 			case "DrumsPosition":
-				this.JudgeTextDisplayPosition.Drums =
+				this.JudgeTextDisplayPosition =
 					(EJudgeTextDisplayPosition)CConversion.ParseIntInRange(value, 0, 2,
-						(int)this.JudgeTextDisplayPosition.Drums);
+						(int)this.JudgeTextDisplayPosition);
 				break;
 			case "DrumsScrollSpeed":
 			case "DrumsScrollSpeed1P":
@@ -2595,91 +2587,91 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void ProcessDrumKeyAssignmentSection(string key, string value) {
 		switch (key) {
 			case "LeftRed":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed);
 				break;
 			case "RightRed":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed);
 				break;
 			case "LeftBlue":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue);
 				break;
 			case "RightBlue":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue);
 				break;
 			case "LeftRed2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed2P);
 				break;
 			case "RightRed2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed2P);
 				break;
 			case "LeftBlue2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue2P);
 				break;
 			case "RightBlue2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue2P);
 				break;
 			case "LeftRed3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed3P);
 				break;
 			case "RightRed3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed3P);
 				break;
 			case "LeftBlue3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue3P);
 				break;
 			case "RightBlue3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue3P);
 				break;
 			case "LeftRed4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed4P);
 				break;
 			case "RightRed4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed4P);
 				break;
 			case "LeftBlue4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue4P);
 				break;
 			case "RightBlue4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue4P);
 				break;
 			case "LeftRed5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed5P);
 				break;
 			case "RightRed5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed5P);
 				break;
 			case "LeftBlue5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue5P);
 				break;
 			case "RightBlue5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue5P);
 				break;
 			case "Clap":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap);
 				break;
 			case "Clap2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap2P);
 				break;
 			case "Clap3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap3P);
 				break;
 			case "Clap4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap4P);
 				break;
 			case "Clap5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap5P);
 				break;
 			case "Decide":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Decide);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Decide);
 				break;
 			case "Cancel":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Cancel);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Cancel);
 				break;
 			case "LeftChange":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftChange);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftChange);
 				break;
 			case "RightChange":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightChange);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightChange);
 				break;
 		}
 	}
@@ -2736,67 +2728,67 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void ProcessTrainingKeyAssignmentSection(string key, string value) {
 		switch (key) {
 			case "TrainingIncreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingIncreaseScrollSpeed);
 					break;
 				}
 			case "TrainingDecreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingDecreaseScrollSpeed);
 					break;
 				}
 			case "TrainingIncreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingIncreaseSongSpeed);
 					break;
 				}
 			case "TrainingDecreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingDecreaseSongSpeed);
 					break;
 				}
 			case "TrainingToggleAuto": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingToggleAuto);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingToggleAuto);
 					break;
 				}
 			case "TrainingBranchNormal": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchNormal);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchNormal);
 					break;
 				}
 			case "TrainingBranchExpert": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchExpert);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchExpert);
 					break;
 				}
 			case "TrainingBranchMaster": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchMaster);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchMaster);
 					break;
 				}
 			case "TrainingPause": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingPause);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingPause);
 					break;
 				}
 			case "TrainingBookmark": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBookmark);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBookmark);
 					break;
 				}
 			case "TrainingMoveForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingMoveForwardMeasure);
 					break;
 				}
 			case "TrainingMoveBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingMoveBackMeasure);
 					break;
 				}
 			case "TrainingSkipForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingSkipForwardMeasure);
 					break;
 				}
 			case "TrainingSkipBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingSkipBackMeasure);
 					break;
 				}
 			case "TrainingJumpToFirstMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingJumpToFirstMeasure);
 					break;
 				}
 			case "TrainingJumpToLastMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingJumpToLastMeasure);
 					break;
 				}
 		}

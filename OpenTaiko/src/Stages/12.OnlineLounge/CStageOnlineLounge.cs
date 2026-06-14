@@ -322,17 +322,17 @@ class CStageOnlineLounge : CStage {
 		//if (!IsDownloading)
 		{
 			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
-				OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+				OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RightChange)) {
 				if (this.tMove(1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
-					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
+					   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LeftChange)) {
 				if (this.tMove(-1)) {
 					OpenTaiko.Skin.soundChangeSFX.tPlay();
 				}
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel)) {
+					   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Cancel)) {
 
 				#region [Fast return (Escape)]
 
@@ -363,7 +363,7 @@ class CStageOnlineLounge : CStage {
 
 				#endregion
 			} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
+					   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide)) {
 
 				#region [Decide]
 

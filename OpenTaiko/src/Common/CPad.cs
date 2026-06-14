@@ -51,7 +51,7 @@ public class CPad {
 	}
 
 	// Methods
-	public List<(EPad pad, STInputEvent inputEvent, int order)> GetEvents(EInstrumentPad part) {
+	public List<(EPad pad, STInputEvent inputEvent, int order)> GetEvents(EKeyConfigPart part) {
 		var stkeyassignArray = this.rConfigIni.KeyAssign[(int)part];
 		List<(EPad pad, STInputEvent inputEvent, int order)> list = new();
 		// すべての入力デバイスについて…
@@ -73,8 +73,8 @@ public class CPad {
 		return list;
 	}
 
-	public bool HasInput(EInstrumentPad part, EPad pad, Func<IInputDevice?, int, bool> predicate) {
-		if (part == EInstrumentPad.Unknown) {
+	public bool HasInput(EKeyConfigPart part, EPad pad, Func<IInputDevice?, int, bool> predicate) {
+		if (part == EKeyConfigPart.Unknown) {
 			return false;
 		}
 
@@ -86,30 +86,16 @@ public class CPad {
 		return false;
 	}
 
-	public bool bPressed(EInstrumentPad part, EPad pad)
+	public bool bPressed(EKeyConfigPart part, EPad pad)
 		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressed(keyCode) ?? false);
 
-	public bool bPressed(EInstrumentPad part, EKeyConfigPad pad) => bPressed(part, (EPad)pad);
+	public bool bPressed(EKeyConfigPart part, EKeyConfigPad pad) => bPressed(part, (EPad)pad);
 
-	public bool bPressedDGB(EPad pad) {
-		if (!this.bPressed(EInstrumentPad.Drums, pad) && !this.bPressed(EInstrumentPad.Guitar, pad)) {
-			return this.bPressed(EInstrumentPad.Bass, pad);
-		}
-		return true;
-	}
-
-	public bool bPressedGB(EPad pad) {
-		return this.bPressed(EInstrumentPad.Guitar, pad) || this.bPressed(EInstrumentPad.Bass, pad);
-	}
-
-	public bool IsPressing(EInstrumentPad part, EPad pad)
+	public bool IsPressing(EKeyConfigPart part, EPad pad)
 		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressing(keyCode) ?? false);
 
-	public bool IsPressing(EInstrumentPad part, EKeyConfigPad pad) => IsPressing(part, (EPad)pad);
+	public bool IsPressing(EKeyConfigPart part, EKeyConfigPad pad) => IsPressing(part, (EPad)pad);
 
-	public bool IsPressingGB(EPad pad) {
-		return this.IsPressing(EInstrumentPad.Guitar, pad) || this.IsPressing(EInstrumentPad.Bass, pad);
-	}
 	public void InvalidateInputToPadCache() => inputToPadCacheValid = false;
 
 	public bool IsUsedByPlayer(InputDeviceType device, int id, int key, int iPlayer) {
@@ -120,9 +106,9 @@ public class CPad {
 	internal bool IsUsedByPlayer(ref CConfigIni.CKeyAssign.STKEYASSIGN keyAssign, int iPlayer)
 		=> IsUsedByPlayer(keyAssign.InputDevice, keyAssign.ID, keyAssign.Code, iPlayer);
 
-	public bool IsReleasing(EInstrumentPad part, EPad pad) { return IsReleasing(part, (EKeyConfigPad)pad); }
-	public bool IsReleasing(EInstrumentPad part, EKeyConfigPad pad) {
-		if (part == EInstrumentPad.Unknown) {
+	public bool IsReleasing(EKeyConfigPart part, EPad pad) { return IsReleasing(part, (EKeyConfigPad)pad); }
+	public bool IsReleasing(EKeyConfigPart part, EKeyConfigPad pad) {
+		if (part == EKeyConfigPart.Unknown) {
 			return false;
 		}
 
@@ -166,9 +152,9 @@ public class CPad {
 		return true;
 	}
 
-	public bool IsReleased(EInstrumentPad part, EPad pad) { return IsReleased(part, (EKeyConfigPad)pad); }
-	public bool IsReleased(EInstrumentPad part, EKeyConfigPad pad) {
-		if (part == EInstrumentPad.Unknown) {
+	public bool IsReleased(EKeyConfigPart part, EPad pad) { return IsReleased(part, (EKeyConfigPad)pad); }
+	public bool IsReleased(EKeyConfigPart part, EKeyConfigPad pad) {
+		if (part == EKeyConfigPart.Unknown) {
 			return false;
 		}
 
@@ -235,7 +221,9 @@ public class CPad {
 
 	private void RebuildInputToPadCache() {
 		this.inputToPadCache.Clear();
-		for (EInstrumentPad part = 0; part < EInstrumentPad.Total; ++part) {
+		// Only the gameplay parts feed this cache — System keys (Capture, volume, …) must never map to
+		// a gameplay pad. EKeyConfigPart.System is the first non-gameplay part, so it is the exclusive bound.
+		for (EKeyConfigPart part = 0; part < EKeyConfigPart.System; ++part) {
 			for (EPad pad = 0; pad < EPad.Max; ++pad) {
 				var keyAssigns = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 				for (int i = 0; i < keyAssigns.Length; ++i) {

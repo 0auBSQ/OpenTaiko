@@ -18,9 +18,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 		Drums = new CScoreIni.C演奏記録();
 
 		{
-			Drums.nGoodCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Perfect : this.nHitCount_ExclAuto.Drums.Perfect;
-			Drums.nOkCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Great : this.nHitCount_ExclAuto.Drums.Great;
-			Drums.nBadCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Drums.Miss : this.nHitCount_ExclAuto.Drums.Miss;
+			Drums.nGoodCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Perfect : this.nHitCount_ExclAuto.Perfect;
+			Drums.nOkCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Great : this.nHitCount_ExclAuto.Great;
+			Drums.nBadCount = OpenTaiko.ConfigIni.bAutoPlay[0] ? this.nHitCount_InclAuto.Miss : this.nHitCount_ExclAuto.Miss;
 
 			// save result, as the original will be cleaned
 			// individual exams are saved to stageGameSelection
@@ -144,16 +144,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 		listWAV = OpenTaiko.TJA.listWAV;
 
 
-		for (int k = 0; k < 4; k++) {
-			//for ( int n = 0; n < 5; n++ )
-			//{
-			this.nHitCount_ExclAuto[k] = new CHITCOUNTOFRANK();
-			this.nHitCount_InclAuto[k] = new CHITCOUNTOFRANK();
-			//}
-			this.r現在の歓声Chip[k] = null;
-			this.bReverse[k] = OpenTaiko.ConfigIni.bReverse[k];
-
-		}
+		this.nHitCount_ExclAuto = new CHITCOUNTOFRANK();
+		this.nHitCount_InclAuto = new CHITCOUNTOFRANK();
+		this.r現在の歓声Chip = null;
+		this.bReverse = OpenTaiko.ConfigIni.bReverse;
 
 		base.Activate();
 		this.tパネル文字列の設定();
@@ -452,7 +446,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 
 	public override void DeActivate() {
 		this.bgmlength = 1;
-		this.ctチップ模様アニメ.Drums = null;
+		this.ctチップ模様アニメ = null;
 
 		OpenTaiko.ResetCameraStates();
 
@@ -710,7 +704,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool b演奏にキーボードを使った;
 	protected bool b演奏にジョイパッドを使った;
 	protected bool b演奏にマウスを使った;
-	protected STDGBVALUE<CCounter> ctチップ模様アニメ;
+	protected CCounter ctチップ模様アニメ;
 	public CCounter[] ctChipAnime;
 	public CCounter[] ctChipAnimeLag;
 	private int bgmlength = 1;
@@ -723,8 +717,8 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected readonly int[] nパッド0Atoパッド08 = new int[] { 1, 2, 3, 4, 5, 6, 7, 1, 8, 0, 9, 9 };// パッド画像のヒット処理用
 																							  //   HH SD BD HT LT FT CY HHO RD LC LP LBD
 	protected readonly int[] nパッド0Atoレーン07 = new int[] { 1, 2, 3, 4, 5, 6, 7, 1, 9, 0, 8, 8 };
-	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_ExclAuto;
-	public STDGBVALUE<CHITCOUNTOFRANK> nHitCount_InclAuto;
+	public CHITCOUNTOFRANK nHitCount_ExclAuto;
+	public CHITCOUNTOFRANK nHitCount_InclAuto;
 	public bool ShowVideo;
 	public CBRANCHSCORE[] DanSongScore = [];
 
@@ -743,9 +737,9 @@ internal abstract class CStage演奏画面共通 : CStage {
 	protected bool bIsDirectSound;                          //
 	protected bool bValidScore;
 	//		protected bool bDTXVmode;
-	protected STDGBVALUE<bool> bReverse;
+	protected bool bReverse;
 
-	protected STDGBVALUE<CChip> r現在の歓声Chip;
+	protected CChip r現在の歓声Chip;
 
 	protected CTexture txBgImage;
 
@@ -1405,7 +1399,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		return ENoteJudge.Perfect;
 	}
 
-	protected unsafe ENoteJudge tチップのヒット処理(long msHitTjaTime, CChip pChip, EInstrumentPad screenmode, bool bCorrectLane, NotesManager.EInputType nNowInput, int nPlayer) {
+	protected unsafe ENoteJudge tチップのヒット処理(long msHitTjaTime, CChip pChip, EKeyConfigPart screenmode, bool bCorrectLane, NotesManager.EInputType nNowInput, int nPlayer) {
 		//unsafeコードにつき、デバッグ中の変更厳禁!
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
@@ -1555,7 +1549,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	// Note: use ENoteJudge.Auto to simply update gauge status
-	protected void UpdateGauge(CChip? pChip, EInstrumentPad screenmode, int nPlayer, ENoteJudge eJudgeResult) {
+	protected void UpdateGauge(CChip? pChip, EKeyConfigPart screenmode, int nPlayer, ENoteJudge eJudgeResult) {
 		bool hasFailed = this.IsStageFailed(nPlayer);
 		if (!hasFailed) { // prevent gauge change if song aborted
 			if (eJudgeResult is ENoteJudge.Bad && (NotesManager.IsMine(pChip) || NotesManager.IsFuzeRoll(pChip))) {
@@ -1670,7 +1664,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						});
 
 						if (nPlayer == 0)
-							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Perfect++;
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Perfect++;
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
@@ -1721,7 +1715,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						});
 
 						if (nPlayer == 0)
-							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Great++;
+							(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Great++;
 						this.actCombo.nCurrentCombo[nPlayer]++;
 
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
@@ -1775,7 +1769,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 							});
 
 							if (nPlayer == 0)
-								(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Drums.Miss++;
+								(!bAutoPlay ? this.nHitCount_ExclAuto : this.nHitCount_InclAuto).Miss++;
 						}
 						AIRegisterInput(nPlayer, 0f);
 					}
@@ -1807,7 +1801,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				break;
 			default:
 				if (pChip != null)
-					this.nHitCount_InclAuto.Drums[(int)eJudgeResult]++;
+					this.nHitCount_InclAuto[(int)eJudgeResult]++;
 				break;
 		}
 		actDan.Update();
@@ -1993,7 +1987,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 	}
 
-	protected void tチップのヒット処理_BadならびにTight時のMiss(EInstrumentPad screenmode, ENoteJudge eJudgeResult, int nPlayer, CTja.ECourse? eCourse) {
+	protected void tチップのヒット処理_BadならびにTight時のMiss(EKeyConfigPart screenmode, ENoteJudge eJudgeResult, int nPlayer, CTja.ECourse? eCourse) {
 		this.actJudgeString.Start(nPlayer, eJudgeResult);
 		this.UpdateGauge(null, screenmode, nPlayer, eJudgeResult);
 		this.UpdateJudgeCount(null, nPlayer, false, false, eJudgeResult);
@@ -2169,10 +2163,10 @@ internal abstract class CStage演奏画面共通 : CStage {
 			}
 			// Tokkun only
 			else if (OpenTaiko.ConfigIni.bTokkunMode &&
-					 OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseScrollSpeed.IsPressed()) {  // UpArrow(scrollspeed up)
+					 OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingIncreaseScrollSpeed.IsPressed()) {  // UpArrow(scrollspeed up)
 				ドラムスクロール速度アップ();
 			} else if (OpenTaiko.ConfigIni.bTokkunMode &&
-					   OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseScrollSpeed.IsPressed()) {  // DownArrow (scrollspeed down)
+					   OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingDecreaseScrollSpeed.IsPressed()) {  // DownArrow (scrollspeed down)
 				ドラムスクロール速度ダウン();
 			}
 			// Debug mode
@@ -2191,7 +2185,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				ChangeInputAdjustTimeInPlaying( keyboard, +1 );
 			}
 			*/
-			else if (keyboard.KeyPressed([(int)SlimDXKeys.Key.Escape, (int)SlimDXKeys.Key.F1]) || OpenTaiko.Pad.bPressedGB(EPad.FT)) {    // escape (exit)
+			else if (keyboard.KeyPressed([(int)SlimDXKeys.Key.Escape, (int)SlimDXKeys.Key.F1])) {    // escape (exit)
 				if (LuaNetworking.Active?.PlaySyncActive == true) {
 					// online play: pause (and the restart that lives in the pause menu) is disabled for fairness
 					LogNotification.PopInfo("Pause is disabled during online play.");
@@ -2206,11 +2200,11 @@ internal abstract class CStage演奏画面共通 : CStage {
 					}
 				}
 				// this.t演奏中止();
-			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchNormal.IsPressed()) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingBranchNormal.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eNormal);
-			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchExpert.IsPressed()) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingBranchExpert.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eExpert);
-			} else if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBranchMaster.IsPressed()) {
+			} else if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingBranchMaster.IsPressed()) {
 				this.TrainingSwitchBranch(CTja.ECourse.eMaster);
 			}
 
@@ -2238,7 +2232,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 				}
 			}
 
-			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingToggleAuto.IsPressed()) {
+			if (OpenTaiko.ConfigIni.bTokkunMode && OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingToggleAuto.IsPressed()) {
 				OpenTaiko.ConfigIni.bAutoPlay[0] = !OpenTaiko.ConfigIni.bAutoPlay[0];
 			}
 		}
@@ -2314,7 +2308,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.b強制的に分岐させた[0] = true;
 	}
 
-	protected void t入力メソッド記憶(EInstrumentPad part) {
+	protected void t入力メソッド記憶(EKeyConfigPart part) {
 		if (OpenTaiko.Pad.detectedDevice.Keyboard) {
 			this.b演奏にキーボードを使った = true;
 		}
@@ -2392,7 +2386,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		this.actScore.Draw();
 	}
 
-	protected bool t進行描画_チップ(EInstrumentPad ePlayMode, int nPlayer) {
+	protected bool t進行描画_チップ(EKeyConfigPart ePlayMode, int nPlayer) {
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
 		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
@@ -3265,7 +3259,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 								pChip.bHit = true; // skip silently — trigger condition not met
 							} else if (this.e指定時刻からChipのJUDGEを返す(n現在時刻ms, pChip, nPlayer) == ENoteJudge.Miss) {
 								pChip.IsMissed = true;
-								this.tチップのヒット処理(n現在時刻ms, pChip, EInstrumentPad.Taiko, false, 0, nPlayer);
+								this.tチップのヒット処理(n現在時刻ms, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
 								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
 							}
 						}
@@ -3549,7 +3543,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 						this.actComboVoice.tReset(iPlayer);
 						this.bIsMiss[iPlayer] = true;
 
-						UpdateGauge(chip, EInstrumentPad.Taiko, iPlayer, ENoteJudge.Bad);
+						UpdateGauge(chip, EKeyConfigPart.Taiko, iPlayer, ENoteJudge.Bad);
 						if (OpenTaiko.ConfigIni.nFunMods[iPlayer] == EFunMods.DynamicBeat)
 							ApplyDynamicBeatFactor(-0.05);
 					}
@@ -3909,17 +3903,17 @@ internal abstract class CStage演奏画面共通 : CStage {
 			this.b演奏にMIDI入力を使った = false;
 			this.b演奏にマウスを使った = false;
 
-			this.nHitCount_InclAuto.Taiko.Perfect = 0;
-			this.nHitCount_InclAuto.Taiko.Great = 0;
-			this.nHitCount_InclAuto.Taiko.Good = 0;
-			this.nHitCount_InclAuto.Taiko.Poor = 0;
-			this.nHitCount_InclAuto.Taiko.Miss = 0;
+			this.nHitCount_InclAuto.Perfect = 0;
+			this.nHitCount_InclAuto.Great = 0;
+			this.nHitCount_InclAuto.Good = 0;
+			this.nHitCount_InclAuto.Poor = 0;
+			this.nHitCount_InclAuto.Miss = 0;
 
-			this.nHitCount_ExclAuto.Taiko.Perfect = 0;
-			this.nHitCount_ExclAuto.Taiko.Great = 0;
-			this.nHitCount_ExclAuto.Taiko.Good = 0;
-			this.nHitCount_ExclAuto.Taiko.Poor = 0;
-			this.nHitCount_ExclAuto.Taiko.Miss = 0;
+			this.nHitCount_ExclAuto.Perfect = 0;
+			this.nHitCount_ExclAuto.Great = 0;
+			this.nHitCount_ExclAuto.Good = 0;
+			this.nHitCount_ExclAuto.Poor = 0;
+			this.nHitCount_ExclAuto.Miss = 0;
 
 			this.actCombo.Activate();
 			this.actScore.Activate();
@@ -4270,7 +4264,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 	}
 
 	protected void t進行描画_判定文字列1_通常位置指定の場合() {
-		if (((EJudgeTextDisplayPosition)OpenTaiko.ConfigIni.JudgeTextDisplayPosition.Drums) != EJudgeTextDisplayPosition.BelowCombo)    // 判定ライン上または横
+		if (((EJudgeTextDisplayPosition)OpenTaiko.ConfigIni.JudgeTextDisplayPosition) != EJudgeTextDisplayPosition.BelowCombo)    // 判定ライン上または横
 		{
 			this.actJudgeString.Draw();
 		}

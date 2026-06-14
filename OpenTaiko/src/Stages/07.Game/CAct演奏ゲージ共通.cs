@@ -276,7 +276,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		this.Damage(nPlayer, fDamage);
 	}
 
-	public void Damage(EInstrumentPad screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
+	public void Damage(EKeyConfigPart screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
 		float fDamage;
 		int nコース = (int)(chipBranch ?? OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer]);
 

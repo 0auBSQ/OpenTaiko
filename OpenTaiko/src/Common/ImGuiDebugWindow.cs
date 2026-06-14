@@ -206,7 +206,7 @@ public static class ImGuiDebugWindow {
 			if (ImGui.TreeNodeEx("Current Keybinds (via. EKeyConfigPart)")) {
 
 				foreach (var instrument in Enum.GetValues<EKeyConfigPart>()) {
-					if (instrument == EKeyConfigPart.Unknown) continue;
+					if (instrument == EKeyConfigPart.Unknown || instrument == EKeyConfigPart.Total) continue;
 
 					if (ImGui.TreeNodeEx(instrument.ToString())) {
 						foreach (var pad in Enum.GetValues<EPad>()) {

@@ -109,8 +109,6 @@ internal class CTja : CActivity {
 				this.bBGMとして使う = !value;
 			}
 		}
-		public bool bIsBassSound = false;
-		public bool bIsGuitarSound = false;
 		public bool bIsDrumsSound = false;
 		public bool bIsSESound = false;
 		public bool bIsBGMSound = false;
@@ -284,7 +282,7 @@ internal class CTja : CActivity {
 	public bool EXPLICIT;
 	public string SELECTBG;
 	public bool HIDDENLEVEL;
-	public STDGBVALUE<int> LEVEL;
+	public int LEVEL;
 	public bool bLyrics;
 	public ESide SIDE = ESide.eBoth;
 	public CSongUniqueID uniqueID;
@@ -544,12 +542,6 @@ internal class CTja : CActivity {
 
 
 
-#if TEST_NOTEOFFMODE
-		public STLANEVALUE<bool> b演奏で直前の音を消音する;
-//		public bool bHH演奏で直前のHHを消音する;
-//		public bool bGUITAR演奏で直前のGUITARを消音する;
-//		public bool bBASS演奏で直前のBASSを消音する;
-#endif
 	// Constructor
 
 	public CTja() {
@@ -572,9 +564,7 @@ internal class CTja : CActivity {
 		this.BPM = 120.0;
 		this.msOFFSET_Abs = 0;
 		this.isOFFSET_Negative = false;
-		STDGBVALUE<int> stdgbvalue = new STDGBVALUE<int>();
-		stdgbvalue.Drums = 0;
-		this.LEVEL = stdgbvalue;
+		this.LEVEL = 0;
 		this.strFileName = "";
 		this.strFolderPath = "";
 		this.strFullPath = "";
@@ -595,12 +585,6 @@ internal class CTja : CActivity {
 		this.SongLoudnessMetadata = null;
 
 		GaugeIncreaseMode = GaugeIncreaseMode.Normal;
-
-#if TEST_NOTEOFFMODE
-			this.bHH演奏で直前のHHを消音する = true;
-			this.bGUITAR演奏で直前のGUITARを消音する = true;
-			this.bBASS演奏で直前のBASSを消音する = true;
-#endif
 
 		Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Change default culture to invariant, fixes (Purota)
 		Dan_C = new Dan_C[CExamInfo.cMaxExam];
@@ -687,9 +671,7 @@ internal class CTja : CActivity {
 			if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") // DShowでの再生の場合はミキシング負荷が高くないため、
 			{
 				// チップのライフタイム管理を行わない
-				if (cwav.bIsBassSound) nPoly = (nPolyphonicSounds >= 2) ? 2 : 1;
-				else if (cwav.bIsGuitarSound) nPoly = (nPolyphonicSounds >= 2) ? 2 : 1;
-				else if (cwav.bIsSESound) nPoly = 1;
+				if (cwav.bIsSESound) nPoly = 1;
 				else if (cwav.bIsBGMSound) nPoly = 1;
 			}
 
@@ -1329,10 +1311,6 @@ internal class CTja : CActivity {
 						switch (c) {
 							case 0x01:
 								cwav.bIsDrumsSound = true; break;
-							case 0x02:
-								cwav.bIsGuitarSound = true; break;
-							case 0x0A:
-								cwav.bIsBassSound = true; break;
 							case 0x06:
 							case 0x07:
 							case 0x08:
@@ -3303,8 +3281,7 @@ internal class CTja : CActivity {
 						metadata.LEVELtaikoIcon = icon;
 				}
 			}
-			this.LEVEL.Drums = (int)level;
-			this.LEVEL.Taiko = (int)level;
+			this.LEVEL = (int)level;
 			foreach (var metadata in metadatas)
 				metadata.LEVELtaiko = (int)level;
 		} else if (strCommandName.Equals("SCOREMODE")) {
@@ -4265,8 +4242,6 @@ internal class CTja : CActivity {
 		n新発声位置 = (listChip[index_max].n発声位置 + listChip[index_min].n発声位置) / 2;
 		return !isOutOfBound;
 	}
-
-	// SwapGuitarBassInfos_AutoFlags()は、CDTXからCConfigIniに移動。
 
 	// CActivity 実装
 	private CCachedFontRenderer pf歌詞フォント;

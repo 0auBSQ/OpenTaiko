@@ -384,7 +384,7 @@ internal class CAct演奏Combo共通 : CActivity {
 			combo_ex4_y = OpenTaiko.Skin.Game_Taiko_Combo_Ex4_Y[nPlayer];
 		}
 
-		int nY上辺位置px = OpenTaiko.ConfigIni.bReverse.Drums ? 350 : 10;
+		int nY上辺位置px = OpenTaiko.ConfigIni.bReverse ? 350 : 10;
 		int n数字とCOMBOを合わせた画像の全長px = ((44) * n桁数);
 		int x = 245 + (n数字とCOMBOを合わせた画像の全長px / 2);
 		//int y = 212;
@@ -564,7 +564,7 @@ internal class CAct演奏Combo共通 : CActivity {
 				e今回の状態遷移イベント = EEvent.同一数値;
 			} else if (this.status[i].n現在表示中のCOMBO値 > this.status[i].nCOMBO値) {
 				e今回の状態遷移イベント = EEvent.ミス通知;
-			} else if ((this.status[i].n現在表示中のCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums) && (this.status[i].nCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums)) {
+			} else if ((this.status[i].n現在表示中のCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo) && (this.status[i].nCOMBO値 < OpenTaiko.ConfigIni.nMinDisplayedCombo)) {
 				e今回の状態遷移イベント = EEvent.非表示;
 			} else {
 				e今回の状態遷移イベント = EEvent.数値更新;

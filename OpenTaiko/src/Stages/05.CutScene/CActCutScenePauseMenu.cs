@@ -35,7 +35,7 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 	}
 
 	// メソッド
-	public override void tActivatePopupMenu(EInstrumentPad einst) {
+	public override void tActivatePopupMenu(EKeyConfigPart einst) {
 		this.CActCutScenePauseMenuMain();
 		CActSelectPopupMenu.b選択した = false;
 		base.tActivatePopupMenu(einst);

@@ -33,7 +33,7 @@ internal class CActSelectPopupMenu : CActivity {
 		get;
 		private set;
 	}
-	public virtual void tActivatePopupMenu(EInstrumentPad einst) {
+	public virtual void tActivatePopupMenu(EKeyConfigPart einst) {
 		nItemSelecting = -1;        // #24757 2011.4.1 yyagi: Clear sorting status in each stating menu.
 		this.bIsActivePopupMenu = true;
 		this.bIsSelectingIntItem = false;
@@ -227,8 +227,7 @@ internal class CActSelectPopupMenu : CActivity {
 				#endregion
 				#region [ キー入力: キャンセル ]
 				else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
-						  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)
-						  || OpenTaiko.Pad.bPressedGB(EPad.Cancel))
+						  || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.FT))
 						 && this.bEsc有効) {   // キャンセル
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					tCancel();
@@ -241,11 +240,11 @@ internal class CActSelectPopupMenu : CActivity {
 					// E楽器パート eInst = E楽器パート.UNKNOWN;
 					ESortAction eAction = ESortAction.END;
 					if (
-						OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
-						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD)
-						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
-						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
-						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+						OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide)
+						|| OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RD)
+						|| OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LC)
+						|| OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LRed)
+						|| OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RRed)
 						|| (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))) {
 						eAction = ESortAction.Decide;
 					}
@@ -256,15 +255,13 @@ internal class CActSelectPopupMenu : CActivity {
 					#endregion
 					#region [ キー入力: 前に移動 ]
 					this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
-					this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
+					if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.SD) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LBlue)) {
 						this.t前に移動();
 					}
 					#endregion
 					#region [ キー入力: 次に移動 ]
 					this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
-					this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
-					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
+					if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LT) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RBlue)) {
 						this.t次に移動();
 					}
 					#endregion

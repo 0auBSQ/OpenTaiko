@@ -42,7 +42,7 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	}
 
 	// メソッド
-	public override void tActivatePopupMenu(EInstrumentPad einst) {
+	public override void tActivatePopupMenu(EKeyConfigPart einst) {
 		this.CAct演奏PauseMenuMain();
 		CActSelectPopupMenu.b選択した = false;
 		this.bやり直しを選択した = false;

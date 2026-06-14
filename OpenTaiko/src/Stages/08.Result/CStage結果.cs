@@ -10,17 +10,6 @@ internal class CStage結果 : CStage {
 
 	// Properties
 
-	public STDGBVALUE<float> fPerfect率;
-	public STDGBVALUE<float> fGreat率;
-	public STDGBVALUE<float> fGood率;
-	public STDGBVALUE<float> fPoor率;
-	public STDGBVALUE<float> fMiss率;
-	public STDGBVALUE<bool> bオート;        // #23596 10.11.16 add ikanick
-										 //        10.11.17 change (int to bool) ikanick
-
-	public STDGBVALUE<int> nランク値;
-	public STDGBVALUE<int> n演奏回数;
-	public STDGBVALUE<int> nScoreRank;
 	public int n総合ランク値;
 
 	public int[] nクリア = { 0, 0, 0, 0, 0 };        //0:Not-cleared 1:Assisted-cleared 2:Cleared 3:Full-combo 4:Perfect
@@ -31,13 +20,13 @@ internal class CStage結果 : CStage {
 	public int[] ScoreRanksSaved = [0, 0, 0, 0, 0];
 
 	public CChip[] r空うちドラムチップ;
-	public STDGBVALUE<CScoreIni.C演奏記録> st演奏記録;
+	public CScoreIni.C演奏記録 st演奏記録;
 
 
 	// Constructor
 
 	public CStage結果() {
-		this.st演奏記録.Drums = new CScoreIni.C演奏記録();
+		this.st演奏記録 = new CScoreIni.C演奏記録();
 		this.r空うちドラムチップ = new CChip[10];
 		this.n総合ランク値 = -1;
 		base.eStageID = CStage.EStage.Results;
@@ -232,11 +221,11 @@ internal class CStage結果 : CStage {
 							clearValue += 1;
 
 						// Gold Iki
-						if (this.st演奏記録.Drums.nBadCount == 0) {
+						if (this.st演奏記録.nBadCount == 0) {
 							clearValue += 2;
 
 							// Rainbow Iki
-							if (this.st演奏記録.Drums.nOkCount == 0)
+							if (this.st演奏記録.nOkCount == 0)
 								clearValue += 2;
 						}
 
@@ -343,9 +332,9 @@ internal class CStage結果 : CStage {
 
 			// Medals
 
-			int nTotalHits = this.st演奏記録.Drums.nOkCount + this.st演奏記録.Drums.nBadCount + this.st演奏記録.Drums.nGoodCount;
+			int nTotalHits = this.st演奏記録.nOkCount + this.st演奏記録.nBadCount + this.st演奏記録.nGoodCount;
 
-			double dAccuracyRate = Math.Pow((50 * this.st演奏記録.Drums.nOkCount + 100 * this.st演奏記録.Drums.nGoodCount) / (double)(100 * nTotalHits), 3);
+			double dAccuracyRate = Math.Pow((50 * this.st演奏記録.nOkCount + 100 * this.st演奏記録.nGoodCount) / (double)(100 * nTotalHits), 3);
 
 			double diffModifier;
 			float starRate;
@@ -387,9 +376,9 @@ internal class CStage結果 : CStage {
 
 				int clearModifier = 0;
 
-				if (this.st演奏記録.Drums.nBadCount == 0) {
+				if (this.st演奏記録.nBadCount == 0) {
 					clearModifier = (int)(5 * lengthBonus);
-					if (this.st演奏記録.Drums.nOkCount == 0) {
+					if (this.st演奏記録.nOkCount == 0) {
 						clearModifier = (int)(12 * lengthBonus);
 					}
 				}
@@ -411,9 +400,9 @@ internal class CStage結果 : CStage {
 
 				if (examStatus != Exam.Status.Failure) {
 					clearModifier = 0;
-					if (this.st演奏記録.Drums.nBadCount == 0) {
+					if (this.st演奏記録.nBadCount == 0) {
 						clearModifier = 4;
-						if (this.st演奏記録.Drums.nOkCount == 0)
+						if (this.st演奏記録.nOkCount == 0)
 							clearModifier = 6;
 					}
 
@@ -1149,10 +1138,10 @@ internal class CStage結果 : CStage {
 								successType += 1;
 
 							int comboType = 0;
-							if (this.st演奏記録.Drums.nBadCount == 0) {
+							if (this.st演奏記録.nBadCount == 0) {
 								comboType += 1;
 
-								if (this.st演奏記録.Drums.nOkCount == 0)
+								if (this.st演奏記録.nOkCount == 0)
 									comboType += 1;
 							}
 
@@ -1405,10 +1394,10 @@ internal class CStage結果 : CStage {
 					this.eフェードアウト完了時の戻り値 = E戻り値.完了;
 				}
 
-				if (((OpenTaiko.Pad.bPressedDGB(EPad.CY)
-					  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RD))
-					 || (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LC)
-						 || (OpenTaiko.Pad.bPressedDGB(EPad.Decide)
+				if (((OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.CY)
+					  || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RD))
+					 || (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LC)
+						 || (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide)
 							 || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return))))) {
 
 					#region [ Skip animations ]
@@ -1442,9 +1431,9 @@ internal class CStage結果 : CStage {
 
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
+					OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LeftChange) ||
 					OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+					OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RightChange)) {
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 						#region [ Phase 2 (Swap freely between Exams and Songs) ]
 
@@ -1509,7 +1498,7 @@ internal class CStage結果 : CStage {
 
 		#region [ Display exams ]
 
-		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, true, offset);
+		OpenTaiko.stageGameScreen.actDan.DrawExam(this.st演奏記録.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, true, offset);
 
 		#endregion
 	}
@@ -1667,7 +1656,7 @@ internal class CStage結果 : CStage {
 	}
 
 	public Exam.Status GetResultExamStatus() {
-		Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Drums.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
+		Exam.Status examStatus = OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(this.st演奏記録.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs, forceFinalJudge: true);
 		if (OpenTaiko.stageGameScreen.IsStageFailed(0))
 			examStatus = Exam.Status.Failure;
 		return examStatus;

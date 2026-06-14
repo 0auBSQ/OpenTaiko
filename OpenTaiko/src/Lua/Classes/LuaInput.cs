@@ -10,14 +10,14 @@ namespace OpenTaiko {
 		public bool Pressed(string input) {
 			if (Enum.TryParse(typeof(EKeyConfigPad), input, true, out var pad)) {
 				if ((EKeyConfigPad)pad >= EKeyConfigPad.Max) return false;
-				return OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, (EKeyConfigPad)pad);
+				return OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, (EKeyConfigPad)pad);
 			}
 			return false;
 		}
 		public bool Pressing(string input) {
 			if (Enum.TryParse(typeof(EKeyConfigPad), input, true, out var pad)) {
 				if ((EKeyConfigPad)pad >= EKeyConfigPad.Max) return false;
-				return OpenTaiko.Pad.IsPressing(EInstrumentPad.Drums, (EKeyConfigPad)pad);
+				return OpenTaiko.Pad.IsPressing(EKeyConfigPart.Taiko, (EKeyConfigPad)pad);
 			}
 			return false;
 		}
@@ -45,14 +45,14 @@ namespace OpenTaiko {
 		public bool Released(string input) {
 			if (Enum.TryParse(typeof(EKeyConfigPad), input, true, out var pad)) {
 				if ((EKeyConfigPad)pad >= EKeyConfigPad.Max) return false;
-				return OpenTaiko.Pad.IsReleased(EInstrumentPad.Drums, (EKeyConfigPad)pad);
+				return OpenTaiko.Pad.IsReleased(EKeyConfigPart.Taiko, (EKeyConfigPad)pad);
 			}
 			return false;
 		}
 		public bool Releasing(string input) {
 			if (Enum.TryParse(typeof(EKeyConfigPad), input, true, out var pad)) {
 				if ((EKeyConfigPad)pad >= EKeyConfigPad.Max) return false;
-				return OpenTaiko.Pad.IsReleasing(EInstrumentPad.Drums, (EKeyConfigPad)pad);
+				return OpenTaiko.Pad.IsReleasing(EKeyConfigPart.Taiko, (EKeyConfigPad)pad);
 			}
 			return false;
 		}

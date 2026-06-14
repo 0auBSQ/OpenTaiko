@@ -524,17 +524,17 @@ class CStageHeya : CStage {
 		#region [ Inputs ]
 
 		if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightArrow) ||
-			OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
+			OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RightChange)) {
 			if (this.tMove(1)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			}
 		} else if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftArrow) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
+				   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LeftChange)) {
 			if (this.tMove(-1)) {
 				OpenTaiko.Skin.soundChangeSFX.tPlay();
 			}
 		} else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
-					 OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide))) {
+					 OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide))) {
 
 			#region [Decide]
 
@@ -670,7 +670,7 @@ class CStageHeya : CStage {
 
 			#endregion
 		} else if (iCurrentMenu != CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) ||
-					 OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Cancel))) {
+					 OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Cancel))) {
 
 			if (iCurrentMenu == CurrentMenu.ReturnToMenu) {
 				if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {

@@ -358,7 +358,7 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_NOTELOCK_DESC"));
 		this.list項目リスト.Add(this.iDrumsTight);
 
-		this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums,
+		this.iSystemMinComboDrums = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY"), 1, 0x1869f, OpenTaiko.ConfigIni.nMinDisplayedCombo,
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_COMBODISPLAY_DESC"));
 		this.list項目リスト.Add(this.iSystemMinComboDrums);
 
@@ -579,81 +579,81 @@ internal class CActConfigList : CActivity {
 		#region [ 個々のキーアサイン ]
 		//太鼓のキー設定。
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LRed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LRed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RRed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RRed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LBlue);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LBlue);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RBlue);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RBlue);
 		}
 
 		//太鼓のキー設定。2P
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed2P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LRed2P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LRed2P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed2P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RRed2P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RRed2P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue2P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LBlue2P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LBlue2P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue2P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RBlue2P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RBlue2P);
 		}
 
 		//太鼓のキー設定。3P
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed3P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LRed3P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LRed3P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed3P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RRed3P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RRed3P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue3P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LBlue3P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LBlue3P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue3P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RBlue3P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RBlue3P);
 		}
 
 		//太鼓のキー設定。4P
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed4P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LRed4P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LRed4P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed4P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RRed4P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RRed4P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue4P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LBlue4P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LBlue4P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue4P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RBlue4P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RBlue4P);
 		}
 
 		//太鼓のキー設定。5P
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLRed5P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LRed5P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LRed5P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRRed5P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RRed5P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RRed5P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoLBlue5P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LBlue5P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LBlue5P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTaikoRBlue5P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RBlue5P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RBlue5P);
 		}
 
 		// Konga claps
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Clap);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Clap);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap2P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Clap2P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Clap2P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap3P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Clap3P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Clap3P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap4P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Clap4P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Clap4P);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignKongaClap5P) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Clap5P);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Clap5P);
 		}
 
 		// Menu controls
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignDecide) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Decide);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Decide);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignCancel) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.Cancel);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.Cancel);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignLeftChange) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.LeftChange);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.LeftChange);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignRightChange) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.RightChange);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.RightChange);
 		}
 
 		// System controls
@@ -683,37 +683,37 @@ internal class CActConfigList : CActivity {
 
 		// Training controls
 		else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingPause) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingPause);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingPause);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingToggleAuto) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingToggleAuto);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingToggleAuto);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBookmark) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingBookmark);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingBookmark);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseScrollSpeed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingIncreaseScrollSpeed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingIncreaseScrollSpeed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseScrollSpeed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingDecreaseScrollSpeed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingDecreaseScrollSpeed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingIncreaseSongSpeed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingIncreaseSongSpeed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingIncreaseSongSpeed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingDecreaseSongSpeed) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingDecreaseSongSpeed);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingDecreaseSongSpeed);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchNormal) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingBranchNormal);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingBranchNormal);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchExpert) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingBranchExpert);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingBranchExpert);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingBranchMaster) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingBranchMaster);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingBranchMaster);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveForwardMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingMoveForwardMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingMoveForwardMeasure);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingMoveBackMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingMoveBackMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingMoveBackMeasure);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipForwardMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingSkipForwardMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingSkipForwardMeasure);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingSkipBackMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingSkipBackMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingSkipBackMeasure);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToFirstMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingJumpToFirstMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingJumpToFirstMeasure);
 		} else if (this.list項目リスト[this.n現在の選択項目] == this.iKeyAssignTrainingJumpToLastMeasure) {
-			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Drums, EKeyConfigPad.TrainingJumpToLastMeasure);
+			OpenTaiko.stageConfig.tパッド選択通知(EKeyConfigPart.Taiko, EKeyConfigPad.TrainingJumpToLastMeasure);
 		}
 		#endregion
 		else {
@@ -1903,7 +1903,7 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.InputManager.Deadzone = OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f;
 		OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
-		OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;
+		OpenTaiko.ConfigIni.nMinDisplayedCombo = this.iSystemMinComboDrums.n現在の値;
 		OpenTaiko.ConfigIni.nRisky = this.iSystemRisky.n現在の値;                      // #23559 2911.7.27 yyagi
 		OpenTaiko.ConfigIni.bBranchGuide = this.iTaikoBranchGuide.bON;
 		OpenTaiko.ConfigIni.nDefaultCourse = this.iTaikoDefaultCourse.n現在選択されている項目番号;

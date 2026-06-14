@@ -551,7 +551,7 @@ internal class CSongs管理 {
 						c曲リストノード.score[i].譜面情報.Preimage = cdtx.PREIMAGE;
 					c曲リストノード.score[i].譜面情報.Presound = cdtx.PREVIEW;
 					c曲リストノード.score[i].譜面情報.Backgound = cdtx.BACKGROUND;
-					c曲リストノード.score[i].譜面情報.レベル.Drums = cdtx.LEVEL.Drums;
+					c曲リストノード.score[i].譜面情報.レベル = cdtx.LEVEL;
 					c曲リストノード.score[i].譜面情報.レベルを非表示にする = cdtx.HIDDENLEVEL;
 					c曲リストノード.score[i].譜面情報.Bpm = cdtx.BPM;
 					c曲リストノード.score[i].譜面情報.BaseBpm = cdtx.BASEBPM;
@@ -605,7 +605,7 @@ internal class CSongs管理 {
 						sb.Append(", premovie=" + c曲リストノード.score[i].譜面情報.Premovie);
 						sb.Append(", presound=" + c曲リストノード.score[i].譜面情報.Presound);
 						sb.Append(", background=" + c曲リストノード.score[i].譜面情報.Backgound);
-						sb.Append(", lvDr=" + c曲リストノード.score[i].譜面情報.レベル.Drums);
+						sb.Append(", lvDr=" + c曲リストノード.score[i].譜面情報.レベル);
 						sb.Append(", lvHide=" + c曲リストノード.score[i].譜面情報.レベルを非表示にする);
 						sb.Append(", bpm=" + c曲リストノード.score[i].譜面情報.Bpm);
 						sb.Append(", basebpm=" + c曲リストノード.score[i].譜面情報.BaseBpm);

@@ -236,24 +236,13 @@ public enum EGameType {
 	Konga = 1,
 }
 
-public enum EInstrumentPad      // ここを修正するときは、セットで次の EKeyConfigPart も修正すること。
-{
-	Drums = 0,
-	Guitar = 1,
-	Bass = 2,
-	Taiko = 3,
-	Total,
-	Unknown = 99
-}
-public enum EKeyConfigPart  // : E楽器パート
-{
-	Drums = EInstrumentPad.Drums,
-	Guitar = EInstrumentPad.Guitar,
-	Bass = EInstrumentPad.Bass,
-	Taiko = EInstrumentPad.Taiko,
+// OpenTaiko is Taiko-only. DTXMania's Drums/Guitar/Bass instrument parts are gone and the former
+// Drums/Taiko split is merged into a single Taiko gameplay part. System is the non-gameplay key group.
+public enum EKeyConfigPart {
+	Taiko = 0,
 	System,
 	Total,
-	Unknown = EInstrumentPad.Unknown
+	Unknown = 99
 }
 
 public enum ENoteJudge {
@@ -315,38 +304,6 @@ public enum EInvisible {
 	Off,        // チップを透明化しない
 	Semi,       // Poor/Miss時だけ、一時的に透明解除する
 	Full        // チップを常に透明化する
-}
-
-/// <summary>
-/// Drum/Guitar/Bass の値を扱う汎用の構造体。
-/// </summary>
-/// <typeparam name="T">値の型。</typeparam>
-[Serializable]
-[StructLayout(LayoutKind.Sequential)]
-public struct STDGBVALUE<T>         // indexはE楽器パートと一致させること
-{
-	public T Drums { get => Taiko; set => Taiko = value; }
-	public T Taiko;
-	public T this[int index] {
-		get {
-			return index switch {
-				(int)EInstrumentPad.Drums or (int)EInstrumentPad.Taiko => this.Taiko,
-				(int)EInstrumentPad.Guitar or (int)EInstrumentPad.Bass or (int)EInstrumentPad.Unknown => default,
-				_ => throw new IndexOutOfRangeException()
-			};
-		}
-		set {
-			switch (index) {
-				case (int)EInstrumentPad.Drums or (int)EInstrumentPad.Taiko:
-					this.Taiko = value;
-					return;
-
-				case (int)EInstrumentPad.Guitar or (int)EInstrumentPad.Bass or (int)EInstrumentPad.Unknown:
-					return;
-			}
-			throw new IndexOutOfRangeException();
-		}
-	}
 }
 
 public enum EReturnValue : int {

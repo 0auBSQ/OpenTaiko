@@ -552,8 +552,8 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 				}
 			}
 			#region[ 全体 ]
-			if (OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect != 0 || OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great != 0) {
-				double db全体精度 = ((double)(OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Great) / this.st叩ききりまショー.n区間ノート数) * 100.0;
+			if (OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Perfect != 0 || OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Great != 0) {
+				double db全体精度 = ((double)(OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Perfect + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Great) / this.st叩ききりまショー.n区間ノート数) * 100.0;
 				for (int i = 0; i < this.n全体精度ボーナス.Length; i++) {
 					if (db全体精度 >= this.n全体精度ボーナス[i].ret) {
 						n延長する時間 += this.n全体精度ボーナス[i].point;
@@ -583,7 +583,7 @@ internal class CAct演奏Drumsゲームモード : CActivity {
 				}
 			}
 
-			double db全体ミス率 = (((double)OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Poor + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Drums.Miss) / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
+			double db全体ミス率 = (((double)OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Poor + OpenTaiko.stageGameScreen.nHitCount_ExclAuto.Miss) / this.st叩ききりまショー.n現在通過したノート数) * 100.0;
 			for (int i = 0; i < this.n全体ミス率ボーナス.Length; i++) {
 				if (db全体ミス率 >= this.n全体ミス率ボーナス[i].ret) {
 					n延長する時間 += this.n全体ミス率ボーナス[i].point;

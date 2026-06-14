@@ -40,9 +40,9 @@ internal class CActCalibrationMode : CActivity {
 
 		CalibrateTick.Tick();
 
-		bool decide = OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
+		bool decide = OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide) ||
+					  OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RRed) ||
+					  OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LRed) ||
 					  OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return);
 
 		if (CalibrateTick.IsEnded) {
@@ -50,13 +50,13 @@ internal class CActCalibrationMode : CActivity {
 			CalibrateTick.Start(0, 500, 1, OpenTaiko.Timer);
 		}
 
-		if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
-			OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue) ||
+		if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LeftChange) ||
+			OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LBlue) ||
 			OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 			buttonIndex = Math.Max(buttonIndex - 1, 0);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
-		} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue) ||
+		} else if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RightChange) ||
+				   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RBlue) ||
 				   OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 			buttonIndex = Math.Min(buttonIndex + 1, 2);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();

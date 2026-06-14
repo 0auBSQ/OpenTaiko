@@ -54,10 +54,10 @@ internal class CScore {
 		public string Premovie;
 		public string Presound;
 		public string Backgound;
-		public STDGBVALUE<int> レベル;
+		public int レベル;
 		public STSKILL 最大スキル;
-		public STDGBVALUE<bool> フルコンボ;
-		public STDGBVALUE<int> 演奏回数;
+		public bool フルコンボ;
+		public int 演奏回数;
 		public STHISTORY 演奏履歴;
 		public bool レベルを非表示にする;
 		public double Bpm;
@@ -157,29 +157,12 @@ internal class CScore {
 
 		[Serializable]
 		[StructLayout(LayoutKind.Sequential)]
-		public struct STRANK {
-			public int Drums;
-			public int Guitar;
-			public int Bass;
-		}
-
-		[Serializable]
-		[StructLayout(LayoutKind.Sequential)]
 		public struct STSKILL {
 			public double Drums;
-			public double Guitar;
-			public double Bass;
 			public double this[int index] {
 				get {
-					switch (index) {
-						case 0:
-							return this.Drums;
-
-						case 1:
-							return this.Guitar;
-
-						case 2:
-							return this.Bass;
+					if (index == 0) {
+						return this.Drums;
 					}
 					throw new IndexOutOfRangeException();
 				}
@@ -187,18 +170,9 @@ internal class CScore {
 					if ((value < 0.0) || (value > 100.0)) {
 						throw new ArgumentOutOfRangeException();
 					}
-					switch (index) {
-						case 0:
-							this.Drums = value;
-							return;
-
-						case 1:
-							this.Guitar = value;
-							return;
-
-						case 2:
-							this.Bass = value;
-							return;
+					if (index == 0) {
+						this.Drums = value;
+						return;
 					}
 					throw new IndexOutOfRangeException();
 				}
@@ -209,7 +183,7 @@ internal class CScore {
 	public bool bSongDBにキャッシュがあった;
 	public bool bスコアが有効である {
 		get {
-			return (((this.譜面情報.レベル[0] + this.譜面情報.レベル[1]) + this.譜面情報.レベル[2]) != 0);
+			return (this.譜面情報.レベル != 0);
 		}
 	}
 
@@ -229,9 +203,9 @@ internal class CScore {
 		this.譜面情報.Premovie = "";
 		this.譜面情報.Presound = "";
 		this.譜面情報.Backgound = "";
-		this.譜面情報.レベル = new STDGBVALUE<int>();
-		this.譜面情報.フルコンボ = new STDGBVALUE<bool>();
-		this.譜面情報.演奏回数 = new STDGBVALUE<int>();
+		this.譜面情報.レベル = 0;
+		this.譜面情報.フルコンボ = false;
+		this.譜面情報.演奏回数 = 0;
 		this.譜面情報.演奏履歴 = new ST譜面情報.STHISTORY();
 		this.譜面情報.演奏履歴.行1 = "";
 		this.譜面情報.演奏履歴.行2 = "";
