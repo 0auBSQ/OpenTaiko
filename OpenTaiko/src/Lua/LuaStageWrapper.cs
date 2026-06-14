@@ -52,9 +52,10 @@
 			}
 		}
 
-		public static void PropagateOnStart() {
+		public static void PropagateOnStart(Action? onEach = null) {
 			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
 				_stage.Value.OnStart();
+				onEach?.Invoke();
 			}
 		}
 
@@ -163,7 +164,7 @@
 		#region [Events not present on CStage/CActivity]
 
 		// Executes **Just after** loading the skin, once the readme notice appears, also executes everytime the skin is reloaded
-		private void OnStart() {
+		internal void OnStart() {
 			lcStageScript?.OnStart();
 		}
 

@@ -23,6 +23,8 @@ internal class CStageSongLoading : CStage {
 		Trace.TraceInformation("曲読み込みステージを活性化します。");
 		Trace.Indent();
 		try {
+			CLoadingProgress.Begin();   // bar tracks the streamed game-screen texture upload % (driven in Draw)
+
 			this.strSongTitle = "";
 			this.strSTAGEFILE = "";
 			this.nBGMPlaybackStartTime = -1;
@@ -119,6 +121,17 @@ internal class CStageSongLoading : CStage {
 			_dtxLoadTask = null;
 			_wavLoadTask = null;
 			_loadedTjas  = null;
+
+			// On ESC mid-stream the game screen WAS activated (its textures are streaming in), so it must be
+			// torn down — OpenTaiko's LoadCanceled handler doesn't do it. Cancel/clear the stream queues FIRST
+			// (drops the stub references + disposes pending bitmaps), THEN DeActivate disposes the stub textures.
+			if (_streamingActive) {
+				CTexture.CancelStreaming();
+				OpenTaiko.stageGameScreen.DeActivate();
+				_streamingActive = false;
+			}
+
+			CLoadingProgress.End();   // clear the loading bar (covers normal completion + ESC cancel)
 
 			Script?.Deactivate();
 			OpenTaiko.tTextureRelease(ref this.txTitle);
@@ -283,6 +296,11 @@ internal class CStageSongLoading : CStage {
 		} else {
 			drawPlate();
 		}
+
+		// Real-time bar: a small crawl during chart/WAV load, then the streamed game-screen texture upload %
+		// (the per-song bulk). The render loop is free throughout, so it stays smooth + ESC-responsive.
+		CLoadingProgress.Report(_streamingActive ? 0.15f + 0.80f * CTexture.StreamFraction : 0.12f);
+		CLoadingScreen.Draw();   // engine loading bar overlay (on top of the song-loading screen)
 
 		switch (base.ePhaseID) {
 			case CStage.EPhase.Common_FADEIN:
@@ -452,23 +470,43 @@ internal class CStageSongLoading : CStage {
 						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
 					}
 
-					// Game screen activation (loads background scripts, character anims, etc.)
-					// This still runs on the main thread as it involves GPU texture uploads.
-					OpenTaiko.stageGameScreen.Activate();
-
+					// Chart + WAV are loaded; the game-screen activation (streamed) runs in the next phase.
 					base.ePhaseID = CStage.EPhase.SongLoading_LoadBMPFile;
 					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
 
 			case CStage.EPhase.SongLoading_LoadBMPFile: {
-					TimeSpan span;
-					DateTime timeBeginLoadBMPAVI = DateTime.Now;
+					// Activate the game screen in STREAMING mode: it runs synchronously on the render thread (Lua
+					// VMs are thread-affine — running them off-thread corrupts the interpreter and AccessViolation
+					// crashes), but each MakeTexture(path) only reads the image header (size) and QUEUES the pixel
+					// work instead of decoding inline. So Activate returns in a few ms rather than freezing for
+					// seconds; the decode + GL upload then stream in over the next frames (StreamTextures below)
+					// with the render loop free → smooth bar + live ESC.
+					CTexture.BeginStreaming();
+					OpenTaiko.stageGameScreen.Activate();
+					CTexture.StreamingLoad = false;     // activation done queueing; later loads go synchronous
+					CTexture.StartStreamDecode();       // decode everything queued, off-thread
+					_streamingActive = true;
+					base.ePhaseID = CStage.EPhase.SongLoading_StreamTextures;
+					return (int)ESongLoadingScreenReturnValue.Continue;
+				}
+
+			case CStage.EPhase.SongLoading_StreamTextures: {
+					// Drain decoded bitmaps to the GPU within a per-frame time budget; keep rendering (smooth bar
+					// + responsive ESC) until every queued texture is uploaded. AVI + FastRender below both touch
+					// the freshly-loaded textures, so they MUST run only after the stream completes.
+					CTexture.PumpUploads(8.0);
+					if (!CTexture.StreamComplete)
+						return (int)ESongLoadingScreenReturnValue.Continue;
+
+					CTexture.EndStreaming();
+					_streamingActive = false;
+					CLoadingProgress.Report(0.96f);
 
 					if (OpenTaiko.ConfigIni.bEnableAVI)
 						OpenTaiko.TJA.tAVILoad();
-					span = (TimeSpan)(DateTime.Now - timeBeginLoadBMPAVI);
 
-					span = (TimeSpan)(DateTime.Now - timeBeginLoad);
+					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoad);
 					Trace.TraceInformation("総読込時間:                {0}", span.ToString());
 
 					if (OpenTaiko.ConfigIni.FastRender) {
@@ -477,6 +515,7 @@ internal class CStageSongLoading : CStage {
 						fastRender = null;
 					}
 
+					CLoadingProgress.End();   // everything loaded → 100%
 
 					// Loading is complete — release the cancellation token source.
 					_loadCts?.Dispose();
@@ -549,6 +588,7 @@ internal class CStageSongLoading : CStage {
 	private Task? _dtxLoadTask;
 	private CTja[]? _loadedTjas;
 	private Task? _wavLoadTask;
+	private bool _streamingActive;             // game screen activated + textures streaming in (see LoadBMPFile)
 	private CCounter ctWait;
 	private CCounter ctSongNameDisplay;
 

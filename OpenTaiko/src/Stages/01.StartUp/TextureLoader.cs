@@ -73,6 +73,7 @@ class TextureLoader {
 	}
 
 	internal CTexture TxC(string FileName, bool localize = true) {
+		tTickTextureProgress();
 		var texpath = (localize) ? HLocalizedPath.GetAvailableLocalizedPath(CSkin.Path(BASE + FileName)) : CSkin.Path(BASE + FileName);
 		var tex = OpenTaiko.tTextureCreate(texpath, false);
 
@@ -81,23 +82,27 @@ class TextureLoader {
 	}
 
 	internal CTexture TxCGlobal(string FileName) {
+		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreate(OpenTaiko.strEXEFolder + GLOBAL + FileName, false);
 		listTexture.Add(tex);
 		return tex;
 	}
 
 	internal CTexture TxCAbsolute(string FileName) {
+		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreate(FileName, false);
 		listTexture.Add(tex);
 		return tex;
 	}
 
 	internal CTextureAf TxCAf(string FileName) {
+		tTickTextureProgress();
 		var tex = OpenTaiko.tTextureCreateAf(CSkin.Path(BASE + FileName));
 		listTexture.Add(tex);
 		return tex;
 	}
 	internal CTexture TxCGen(string FileName) {
+		tTickTextureProgress();
 		return OpenTaiko.tTextureCreate(CSkin.Path(BASE + GAME + GENRE + FileName + ".png"), false);
 	}
 
@@ -120,10 +125,38 @@ class TextureLoader {
 	}
 
 	internal CTexture TxCUntrackedSong(string path) {
+		tTickTextureProgress();
 		return OpenTaiko.tTextureCreate(path, false);
 	}
 
+	// ── Boot loading-bar progress ──────────────────────────────────────────────────────────────────
+	// LoadTexture() loads hundreds of textures as a flat sequence (no loop to count), so we count calls
+	// through the TxC* family while it runs and map them onto the 20%..100% range of the boot bar (the
+	// first 20% is the system-sound preload). The total isn't known statically, so we use an estimate
+	// that is persisted after each run (exact from the second boot onward) and let the startup stage snap
+	// the bar to 100% when LoadTexture returns.
+	private static readonly string strTextureCountCache = OpenTaiko.strEXEFolder + "startup_textures.count";
+	private bool bReportTextureProgress = false;
+	private int nTexturesLoaded = 0;
+	private int nTextureEstimate = 320;   // first-run fallback; refined from strTextureCountCache afterwards
+	private void tTickTextureProgress() {
+		if (!bReportTextureProgress) return;
+		nTexturesLoaded++;
+		// Boot loading bar: textures are the final 66-100% (modules 0-60%, system sounds 60-66%).
+		CLoadingProgress.ReportSegment(0.66f, 1.0f, nTexturesLoaded, nTextureEstimate);
+	}
+
 	public void LoadTexture() {
+		#region [ Boot loading-bar bracket: start ]
+		nTexturesLoaded = 0;
+		try {
+			if (File.Exists(strTextureCountCache)
+				&& int.TryParse(File.ReadAllText(strTextureCountCache).Trim(), out int est) && est > 0)
+				nTextureEstimate = est;
+		} catch { /* estimate stays at the fallback */ }
+		bReportTextureProgress = true;
+		#endregion
+
 		CalibrateFG = TxC(CONFIG + $@"Calibration{Path.DirectorySeparatorChar}FG.png");
 		CalibrateBG = TxC(CONFIG + $@"Calibration{Path.DirectorySeparatorChar}BG.png");
 
@@ -783,6 +816,13 @@ class TextureLoader {
 				act.CreateUnmanagedResource();
 			}
 		}
+
+		#region [ Boot loading-bar bracket: end ]
+		bReportTextureProgress = false;
+		try {
+			File.WriteAllText(strTextureCountCache, nTexturesLoaded.ToString());
+		} catch { /* non-fatal: just means next boot reuses the previous estimate */ }
+		#endregion
 	}
 
 	public int[] CreateNumberedArrayFromInt(int total) {

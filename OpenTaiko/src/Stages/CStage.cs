@@ -61,6 +61,7 @@ public class CStage : CActivity {
 		SongLoading_LoadWAVFile,
 		SongLoading_WaitWAVLoaded,
 		SongLoading_LoadBMPFile,
+		SongLoading_StreamTextures,
 		SongLoading_WaitForSoundSystemBGM,
 		Game_STAGE_FAILED,
 		Game_EndChart,

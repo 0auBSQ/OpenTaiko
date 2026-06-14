@@ -1045,6 +1045,13 @@ internal class OpenTaiko : Game {
 #if DEBUG
 		Trace.TraceInformation($"[ALLOC_TEX] {fileName}");
 #endif
+		// Fast-skip missing files: returning null avoids a FileNotFoundException per missing texture, which is
+		// very slow under a debugger (first-chance handling) — a malformed asset (e.g. a dancer whose
+		// DancerConfig count exceeds its frame folders) otherwise throws dozens of them and freezes the load.
+		if (!File.Exists(fileName)) {
+			Trace.TraceWarning("Could not find specified texture file. ({0})", fileName);
+			return null;
+		}
 		try {
 			return new CTexture(fileName, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
@@ -1575,20 +1582,16 @@ internal class OpenTaiko : Game {
 
 		#region [ Move to Startup Stage ]
 		//---------------------
-		ChangeStage(stageStartup);
+		// The skin's Lua modules are NOT loaded here anymore. The boot stage loads them incrementally in its
+		// own Draw loop (so the loading bar animates via the normal render loop, no manual presenting), and
+		// once done it runs NamePlate/Modal RefleshSkin + starts the song-list enum. This keeps OnLoad fast
+		// so the render loop (and the loading screen) starts immediately.
+		CLoadingProgress.Begin();
+		ChangeStage(stageStartup, "Startup");
 		Trace.TraceInformation("----------------------");
 		Trace.TraceInformation("■ Startup");
 		//---------------------
 		#endregion
-
-		// Fetch the skin modules first once the base is fully loaded
-		Skin.FetchMenusAndModules();
-		OpenTaiko.NamePlate.RefleshSkin();
-		OpenTaiko.ModalManager.RefleshSkin();
-
-		Trace.TraceInformation("Application successfully started.");
-
-		ChangeStage(stageStartup, "Startup");
 	}
 
 	public void ShowWindowTitle() {

@@ -473,48 +473,56 @@ internal class CSkin : IDisposable {
 		LuaROActivityWrapper.ResetROActivityDictionary();
 	}
 
-	public void FetchMenusAndModules() {
+	/// <summary>
+	/// Loads the skin's Lua modules (Stages / Activities / ROActivities) INCREMENTALLY: instantiate each,
+	/// then onStart()/loadAssets each, yielding a 0..1 progress fraction after every unit. The boot stage
+	/// drives this from its Draw loop (a time-budgeted batch per frame), so the loading screen renders +
+	/// the bar advances normally instead of blocking. Per-unit granularity keeps any single step short.
+	/// Instantiate-all-then-onStart-all per category preserves the original ordering (a module's onStart may
+	/// reference another already-instantiated module).
+	/// </summary>
+	internal IEnumerator<float> LoadModulesIncrementally() {
 		// Main Menu Settings
 		MainMenuSettings = new CMainMenuSettings();
 		MainMenuSettings.tReloadMenus();
 
-		// Lua Stages
 		string[] _modulesList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Stages")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 		string[] _globalModulesList = DirectoryUtils.SafeGetDirectories($"Global/Stages").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
-
-		foreach (string _module in _modulesList) {
-			LuaStageWrapper _lsw = new LuaStageWrapper(_module, false);
-		}
-
-		foreach (string _module in _globalModulesList) {
-			LuaStageWrapper _lsw = new LuaStageWrapper(_module, true);
-		}
-
-		LuaStageWrapper.PropagateOnStart();
-
-		// Lua Activities
 		string[] _actList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Activities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 		string[] _globalActList = DirectoryUtils.SafeGetDirectories($"Global/Activities").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		string[] _roActList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/ROActivities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 
-		foreach (string _act in _actList) {
-			LuaActivityWrapper _law = new LuaActivityWrapper(_act, false);
-		}
+		// Each item is processed twice (instantiate, then onStart).
+		int total = (_modulesList.Length + _globalModulesList.Length + _actList.Length + _globalActList.Length + _roActList.Length) * 2;
+		if (total <= 0) yield break;
+		int done = 0;
 
-		foreach (string _act in _globalActList) {
-			LuaActivityWrapper _law = new LuaActivityWrapper(_act, true);
-		}
+		// Lua Stages
+		var stages = new List<LuaStageWrapper>();
+		foreach (string _module in _modulesList) { stages.Add(new LuaStageWrapper(_module, false)); yield return ++done / (float)total; }
+		foreach (string _module in _globalModulesList) { stages.Add(new LuaStageWrapper(_module, true)); yield return ++done / (float)total; }
+		foreach (var _s in stages) { _s.OnStart(); yield return ++done / (float)total; }
 
-		LuaActivityWrapper.PropagateOnStart();
+		// Lua Activities
+		var acts = new List<LuaActivityWrapper>();
+		foreach (string _act in _actList) { acts.Add(new LuaActivityWrapper(_act, false)); yield return ++done / (float)total; }
+		foreach (string _act in _globalActList) { acts.Add(new LuaActivityWrapper(_act, true)); yield return ++done / (float)total; }
+		foreach (var _a in acts) { _a.OnStart(); yield return ++done / (float)total; }
 
 		// Lua RO Activities
-		string[] _roActList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/ROActivities"))
-			.Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
+		var roActs = new List<LuaROActivityWrapper>();
+		foreach (string _act in _roActList) { roActs.Add(new LuaROActivityWrapper(_act)); yield return ++done / (float)total; }
+		foreach (var _a in roActs) { _a.OnStart(); yield return ++done / (float)total; }
+	}
 
-		foreach (string _act in _roActList) {
-			LuaROActivityWrapper _law = new LuaROActivityWrapper(_act);
-		}
-
-		LuaROActivityWrapper.PropagateOnStart();
+	/// <summary>
+	/// Synchronous full load of all skin modules — used by the skin reload/change path (<c>LoadSkin</c>),
+	/// where blocking is acceptable. The boot uses the incremental <see cref="LoadModulesIncrementally"/>
+	/// (driven by the boot stage's render loop) so its loading bar animates.
+	/// </summary>
+	public void FetchMenusAndModules() {
+		var steps = LoadModulesIncrementally();
+		while (steps.MoveNext()) { }
 	}
 
 	#endregion
@@ -662,7 +670,8 @@ internal class CSkin : IDisposable {
 	}
 
 	public void PreloadSystemSounds() {
-		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
+		int count = this.listSystemSound.Count;
+		for (int i = 0; i < count; ++i) { // concurrent
 			var snd = this.listSystemSound.ElementAtOrDefault(i);
 			if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 			{
@@ -680,6 +689,8 @@ internal class CSkin : IDisposable {
 					}
 				}
 			}
+			// Boot loading bar: modules 0-60%, then system sounds 60-66%, then textures 66-100%.
+			CLoadingProgress.ReportSegment(0.60f, 0.66f, i + 1, count);
 		}
 	}
 

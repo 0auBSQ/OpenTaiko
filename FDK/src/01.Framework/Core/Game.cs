@@ -642,11 +642,21 @@ public abstract partial class Game : IDisposable {
 		}
 		*/
 
-		if (AsyncActions.TryDequeue(out var action)) {
-			try {
-				action();
-			} catch (Exception ex) {
-				Console.Error.WriteLine($"Error in async action: {ex}");
+		// Drain queued main-thread actions (mostly deferred GL texture uploads from background loaders —
+		// boot atlas, song-load game-screen activation). Process a batch within a small time budget so a
+		// large burst uploads quickly instead of trickling out one-per-frame, while still capping the time
+		// spent so the frame rate stays smooth. When the queue is empty (the normal in-game case) the very
+		// first TryDequeue fails and the loop exits immediately — no per-frame cost.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= 6.0)
+					break;
 			}
 		}
 

@@ -8,7 +8,7 @@ using RectangleF = System.Drawing.RectangleF;
 
 namespace FDK;
 
-public class CTexture : IDisposable {
+public partial class CTexture : IDisposable {   // streaming subsystem is in CTexture.Streaming.cs
 	/// <summary>
 	/// バッファの集まり
 	/// </summary>
@@ -587,6 +587,15 @@ public class CTexture : IDisposable {
 		MakeTexture(strFileName, bBlackTransparent);
 	}
 	public void MakeTexture(string strFileName, bool bBlackTransparent) {
+		// Streamed-load fast path: while the song-loading screen is streaming (StreamingLoad), the game-screen
+		// activation must NOT block the render thread decoding ~150 PNGs. Read only the image header (dimensions
+		// — microseconds, no pixel decode) so size-dependent layout at Activate stays correct, then queue the
+		// heavy pixel work for the background decode + budgeted GL upload (StartStreamDecode / PumpUploads).
+		// Only on the render thread (Lua/activation thread); background workers never take this branch.
+		if (StreamingLoad && Thread.CurrentThread.ManagedThreadId == _streamThreadId
+			&& tQueueStreamedTexture(strFileName, bBlackTransparent))
+			return;
+
 		if (!File.Exists(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
 			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
 
@@ -594,6 +603,11 @@ public class CTexture : IDisposable {
 		MakeTexture(bitmap, bBlackTransparent);
 		bitmap.Dispose();
 	}
+
+	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────
+	// Implemented in CTexture.Streaming.cs (StreamingLoad / BeginStreaming / StartStreamDecode / PumpUploads
+	// / EndStreaming / CancelStreaming / StreamFraction / StreamComplete + tQueueStreamedTexture). The
+	// streaming branch at the top of MakeTexture(string) above calls tQueueStreamedTexture.
 
 	public CTexture(SKBitmap bitmap, bool bBlackTransparent)
 		: this() {
@@ -881,6 +895,7 @@ public class CTexture : IDisposable {
 		this.t2DDraw((int)x, (int)y, 1f, rcImageInDrawRegion);
 	}
 	public void t2DDraw(float x, float y, float depth, RectangleF rcImageInDrawRegion, bool flipX = false, bool flipY = false, bool rollMode = false) {
+		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
 		BlendType blend_type = blendType;
@@ -974,6 +989,39 @@ public class CTexture : IDisposable {
 	public void t2DDraw(int x, int y, float depth, Rectangle rcImageInDrawRegion) {
 		t2DDraw((float)x, (float)y, depth, rcImageInDrawRegion);
 	}
+
+	// ── Solid-rectangle primitive ────────────────────────────────────────────────────────────────────
+	// A shared 1×1 white texture, tinted + scaled to draw an arbitrary filled rectangle without needing
+	// any asset file. Used for the programmatic loading bars (see CLoadingProgress / the Lua loading
+	// screens). Only ever called from the render thread during draw, so lazy GL creation is safe; the
+	// single instance lives for the app lifetime (1 texel — negligible) and is never disposed.
+	private static CTexture _solidWhite;
+	public static void FillBox(int x, int y, int w, int h, int r, int g, int b, int a) {
+		if (w <= 0 || h <= 0 || a <= 0)
+			return;
+
+		if (_solidWhite == null) {
+			using var bmp = new SKBitmap(1, 1);
+			bmp.SetPixel(0, 0, new SKColor(0xFF, 0xFF, 0xFF, 0xFF));
+			_solidWhite = new CTexture(bmp);
+		}
+
+		var tex = _solidWhite;
+		// Save/restore: it is a shared instance and other FillBox calls (or a future reuse) must not
+		// inherit this call's tint/scale.
+		var savedScale = tex.vcScaleRatio;
+		var savedColor = tex.color4;
+		var savedOpacity = tex.Opacity;
+
+		tex.vcScaleRatio = new Vector3D<float>(w, h, 1f);   // 1px image × (w,h) ⇒ a w×h rectangle
+		tex.color4 = new Color4(r / 255f, g / 255f, b / 255f, 1f);
+		tex.Opacity = a;
+		tex.t2DDraw(x, y);
+
+		tex.vcScaleRatio = savedScale;
+		tex.color4 = savedColor;
+		tex.Opacity = savedOpacity;
+	}
 	public void t2DFlipVDraw(int x, int y) {
 		this.t2DFlipVDraw(x, y, 1f, this.rcFullImage);
 	}
@@ -1028,6 +1076,7 @@ public class CTexture : IDisposable {
 
 
 	public void t2DDrawSongObj(float x, float y, float xScale, float yScale) {
+		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
 		var rcImageInDrawRegion = rcFullImage;

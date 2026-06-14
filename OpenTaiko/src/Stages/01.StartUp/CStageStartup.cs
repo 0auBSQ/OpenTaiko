@@ -22,6 +22,10 @@ internal class CStageStartup : CStage {
 			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
 			Background.Init();
 
+			// Note: CLoadingProgress.Begin() is NOT called here — the boot stage is activated twice during
+			// startup, which would reset the bar mid-preload. Begin() is called once in tStartupProcess,
+			// before the module preload (the first thing the boot bar tracks).
+
 			this.listProgressString = new List<string>();
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.Activate();
@@ -56,6 +60,7 @@ internal class CStageStartup : CStage {
 	public override void ReleaseManagedResource() {
 		base.ReleaseManagedResource();
 	}
+
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
@@ -69,8 +74,11 @@ internal class CStageStartup : CStage {
 				this.listProgressString.Add("OpenTaiko edited by 0AuBSQ");
 				this.listProgressString.Add("");
 
-				es = new CEnumSongs();
-				es.StartEnumFromCache();                                        // 曲リスト取得(別スレッドで実行される)
+				// Load the skin's Lua modules incrementally over the next frames, driven by this render loop
+				// (so the loading bar animates normally — no manual presenting). The song-list enum is
+				// started once module loading finishes (see below).
+				_moduleLoad = OpenTaiko.Skin.LoadModulesIncrementally();
+				_modulesLoading = true;
 				base.IsFirstDraw = false;
 				return 0;
 			}
@@ -79,6 +87,25 @@ internal class CStageStartup : CStage {
 
 			Background.Update();
 			Background.Draw();
+			CLoadingScreen.Draw();   // engine loading bar overlay
+
+			#region [ Incremental Lua module loading (0-60% of the bar, before the song enum) ]
+			if (_modulesLoading) {
+				// Process a time-budgeted batch per frame so the screen keeps rendering + the bar advances.
+				long _t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+				while (System.Diagnostics.Stopwatch.GetElapsedTime(_t0).TotalMilliseconds < 10.0) {
+					if (!_moduleLoad.MoveNext()) {
+						_modulesLoading = false;
+						OpenTaiko.NamePlate.RefleshSkin();
+						OpenTaiko.ModalManager.RefleshSkin();
+						es = new CEnumSongs();
+						es.StartEnumFromCache();   // 曲リスト取得(別スレッドで実行される)
+						break;
+					}
+					CLoadingProgress.Report(0.60f * _moduleLoad.Current);
+				}
+			}
+			#endregion
 
 			#region [ this.str現在進行中 の決定 ]
 			//-----------------
@@ -114,6 +141,7 @@ internal class CStageStartup : CStage {
 
 							try {
 								OpenTaiko.Tx.LoadTexture();
+								CLoadingProgress.End();   // textures done → snap the boot bar to 100%
 
 								this.listProgressString.Add("LOADING TEXTURES...OK");
 								this.strCurrentProgress = "Setup done.";
@@ -180,6 +208,8 @@ internal class CStageStartup : CStage {
 	private ScriptBG Background;
 	private CEnumSongs es;
 	private bool bIsLoadingTextures;
+	private System.Collections.Generic.IEnumerator<float> _moduleLoad;   // incremental skin-module loader
+	private bool _modulesLoading;
 
 #if false
 		private void t曲リストの構築()
