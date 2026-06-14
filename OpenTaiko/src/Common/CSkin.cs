@@ -1532,10 +1532,6 @@ internal class CSkin : IDisposable {
 									SongSelect_BoxExplanation_Interval = int.Parse(strParam);
 									break;
 								}
-							case "SongSelect_GenreName": {
-									SongSelect_GenreName = this.strStringArrayConvert(strParam);
-									break;
-								}
 							case "SongSelect_Bar_Count": {
 									SongSelect_Bar_Count = int.Parse(strParam);
 									break;
@@ -2649,62 +2645,6 @@ internal class CSkin : IDisposable {
 									for (int i = 0; i < 2; i++) {
 										SongSelect_Option_ModMults2_Y[i] = int.Parse(strSplit[i]);
 									}
-									break;
-								}
-							case "SongSelect_ForeColor_JPOP": {
-									SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Anime": {
-									SongSelect_ForeColor_Anime = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_VOCALOID": {
-									SongSelect_ForeColor_VOCALOID = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Children": {
-									SongSelect_ForeColor_Children = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Variety": {
-									SongSelect_ForeColor_Variety = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_Classic": {
-									SongSelect_ForeColor_Classic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_ForeColor_GameMusic": {
-									SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_JPOP": {
-									SongSelect_BackColor_JPOP = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Anime": {
-									SongSelect_BackColor_Anime = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_VOCALOID": {
-									SongSelect_BackColor_VOCALOID = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Children": {
-									SongSelect_BackColor_Children = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Variety": {
-									SongSelect_BackColor_Variety = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_Classic": {
-									SongSelect_BackColor_Classic = ColorTranslator.FromHtml(strParam);
-									break;
-								}
-							case "SongSelect_BackColor_GameMusic": {
-									SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml(strParam);
 									break;
 								}
 							case nameof(SongSelect_CorrectionX_Chara): {
@@ -7809,8 +7749,6 @@ internal class CSkin : IDisposable {
 	#endregion
 
 	#region SongSelect
-	public string[] SongSelect_GenreName = { "ポップス", "アニメ", "ゲームバラエティ", "ナムコオリジナル", "クラシック", "バラエティ", "キッズ", "ボーカロイド", "最近遊んだ曲" };
-
 	public int SongSelect_Bar_Count = 9;
 
 	public int[] SongSelect_Bar_X = new int[] { 214, 239, 263, 291, 324, 358, 386, 411, 436 };
@@ -8066,21 +8004,6 @@ internal class CSkin : IDisposable {
 	public int[] SongSelect_Option_ModMults2_X = new int[] { 108, 1096 };
 	public int[] SongSelect_Option_ModMults2_Y = new int[] { 52, 52 };
 
-
-	public Color SongSelect_ForeColor_JPOP = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Anime = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_VOCALOID = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Children = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Variety = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_Classic = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_ForeColor_GameMusic = ColorTranslator.FromHtml("#FFFFFF");
-	public Color SongSelect_BackColor_JPOP = ColorTranslator.FromHtml("#01455B");
-	public Color SongSelect_BackColor_Anime = ColorTranslator.FromHtml("#99001F");
-	public Color SongSelect_BackColor_VOCALOID = ColorTranslator.FromHtml("#5B6278");
-	public Color SongSelect_BackColor_Children = ColorTranslator.FromHtml("#9D3800");
-	public Color SongSelect_BackColor_Variety = ColorTranslator.FromHtml("#366600");
-	public Color SongSelect_BackColor_Classic = ColorTranslator.FromHtml("#875600");
-	public Color SongSelect_BackColor_GameMusic = ColorTranslator.FromHtml("#412080");
 
 	public string[] SongSelect_CorrectionX_Chara = { "ここにX座標を補正したい文字をカンマで区切って記入" };
 	public string[] SongSelect_CorrectionY_Chara = { "ここにY座標を補正したい文字をカンマで区切って記入" };

@@ -16,33 +16,6 @@ internal class CActPlayPanelString : CActivity {
 		this.Start();
 	}
 
-	private readonly Dictionary<string, Color4> tTagDict = new Dictionary<string, Color4> {
-		["アニメ"] = new Color4(tToArgb(253, 145, 208)),
-		["Anime"] = new Color4(tToArgb(253, 145, 208)),
-		["クラシック"] = new Color4(tToArgb(221, 172, 4)),
-		["Classical"] = new Color4(tToArgb(221, 172, 4)),
-		["バラエティ"] = new Color4(tToArgb(32, 218, 56)),
-		["Variety"] = new Color4(tToArgb(32, 218, 56)),
-		["どうよう"] = new Color4(tToArgb(254, 191, 3)),
-		["キッズ"] = new Color4(tToArgb(254, 191, 3)),
-		["Children & Folk"] = new Color4(tToArgb(254, 191, 3)),
-		["ボーカロイド"] = new Color4(tToArgb(204, 207, 222)),
-		["VOCALOID"] = new Color4(tToArgb(204, 207, 222)),
-		["Vocaloid"] = new Color4(tToArgb(204, 207, 222)),
-		["ゲームミュージック"] = new Color4(tToArgb(205, 138, 237)),
-		["ゲームバラエティ"] = new Color4(tToArgb(205, 138, 237)),
-		["Game Music"] = new Color4(tToArgb(205, 138, 237)),
-		["J-POP"] = new Color4(tToArgb(68, 192, 209)),
-		["POP"] = new Color4(tToArgb(68, 192, 209)),
-		["ナムコオリジナル"] = new Color4(tToArgb(255, 70, 28)),
-		["OpenTaikoオリジナル"] = new Color4(tToArgb(249, 255, 40)),
-		["OpenTaiko Original"] = new Color4(tToArgb(249, 255, 40)),
-		["ポップス"] = new Color4(tToArgb(68, 192, 209)),
-		["太鼓タワー"] = new Color4(tToArgb(254, 191, 3)),
-		["Taiko Towers"] = new Color4(tToArgb(254, 191, 3)), // Temporary, will use CLang
-		["段位道場"] = new Color4(tToArgb(42, 122, 169)),
-	};
-
 
 	// メソッド
 
@@ -104,19 +77,12 @@ internal class CActPlayPanelString : CActivity {
 
 			this.txGENRE = OpenTaiko.Tx.TxCGen("Template");
 
+			// Genre text color comes from the box's color (boxdef); default to white otherwise.
 			Color stageColor = Color.White;
 			if (songNode != null && songNode.isChangedBoxColor)
 				stageColor = songNode.BoxColor;
 
-			if (!(songNode != null && songNode.isChangedBoxColor)
-				&& tTagDict != null
-				&& tTagDict.ContainsKey(genreName)) {
-				this.txGENRE.color4 = tTagDict[genreName];
-			} else if (genreName == CLangManager.LangInstance.GetString("TITLE_MODE_DAN")) {
-				this.txGENRE.color4 = tTagDict["段位道場"];
-			} else {
-				this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
-			}
+			this.txGENRE.color4 = CConversion.ColorToColor4(stageColor);
 
 			pfGENRE = HPrivateFastFont.tInstantiateBoxFont(OpenTaiko.Skin.Game_GenreText_FontSize);
 

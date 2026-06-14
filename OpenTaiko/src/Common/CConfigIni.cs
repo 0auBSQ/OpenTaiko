@@ -401,7 +401,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public EStealthMode[] eSTEALTH;
 	public bool bNoInfo;
 
-	public int nDefaultSongSort;
 	public int nRecentlyPlayedMax;
 	public EGame eGameMode;
 	public int TokkunSkipMeasures;
@@ -957,7 +956,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		//this.bNoMP3Streaming = false;
 		this.nMasterVolume = 100; // #33700 2014.4.26 yyagi マスターボリュームの設定(WASAPI/ASIO用)
 		this.bHispeedRandom = false;
-		this.nDefaultSongSort = 2;
 		this.nRecentlyPlayedMax = 5;
 		this.eGameMode = EGame.Off;
 		this.TokkunMashInterval = 750;
@@ -1555,9 +1553,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; 譜面分岐のアニメーション(0:7～14, 1:15)");
 		sw.WriteLine("BranchAnime={0}", this.nBranchAnime);
 		sw.WriteLine();
-		sw.WriteLine("; デフォルトの曲ソート(0:絶対パス順, 1:ジャンル名ソートOLD, 2:ジャンル名ソートNEW )");
-		sw.WriteLine("0:Path, 1:GenreName(AC8～AC14), 2GenreName(AC15～)");
-		sw.WriteLine("DefaultSongSort={0}", this.nDefaultSongSort);
 		sw.WriteLine("RecentlyPlayedMax={0}", this.nRecentlyPlayedMax);
 		sw.WriteLine();
 		sw.WriteLine(
@@ -2514,10 +2509,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "NoInfo":
 				this.bNoInfo = CConversion.bONorOFF(value[0]);
-				break;
-			case "DefaultSongSort":
-				this.nDefaultSongSort =
-					CConversion.ParseIntInRange(value, 0, 2, this.nDefaultSongSort);
 				break;
 			case "RecentlyPlayedMax":
 				this.nRecentlyPlayedMax =

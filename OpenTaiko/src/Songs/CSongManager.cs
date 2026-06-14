@@ -258,38 +258,6 @@ internal class CSongManager {
 								}
 
 
-								switch (CStrGenreToNum.ForAC15(cSongListNode.songGenre)) {
-									case 0:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_JPOP;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_JPOP;
-										break;
-									case 1:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Anime;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Anime;
-										break;
-									case 2:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_VOCALOID;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_VOCALOID;
-										break;
-									case 3:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Children;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Children;
-										break;
-									case 4:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Variety;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Variety;
-										break;
-									case 5:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Classic;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Classic;
-										break;
-									case 6:
-										cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic;
-										cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic;
-										break;
-								default:
-										break;
-								}
 
 
 								cSongListNode.nLevel = dtx.SongListCourseMetadata.Select(m => m.LEVELtaiko).ToArray();
@@ -346,7 +314,6 @@ internal class CSongManager {
 							tciNode.strBreadcrumbs = (tciNode.rParentNode == null)
 								? filePath : tciNode.rParentNode.strBreadcrumbs + " > " + filePath;
 							ApplyParentSettings(tciNode, nodeParent);
-							ApplyGenreColors(tciNode);
 							CSongDict.tAddSongNode(tciNode.uniqueId, tciNode);
 							if (!listSongsDB.ContainsKey(filePath + tciHashStr))
 								listSongsDB.Add(filePath + tciHashStr, tciNode);
@@ -417,38 +384,6 @@ internal class CSongManager {
 					if ((boxdef.strBoxText[i] != null)) {
 						cSongListNode.strBoxText[i] = boxdef.strBoxText[i];
 					}
-				}
-				switch (CStrGenreToNum.ForAC15(cSongListNode.songGenre)) {
-					case 0:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_JPOP;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_JPOP;
-						break;
-					case 1:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Anime;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Anime;
-						break;
-					case 2:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_VOCALOID;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_VOCALOID;
-						break;
-					case 3:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Children;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Children;
-						break;
-					case 4:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Variety;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Variety;
-						break;
-					case 5:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Classic;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Classic;
-						break;
-					case 6:
-						cSongListNode.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic;
-						cSongListNode.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic;
-						break;
-				default:
-						break;
 				}
 
 
@@ -959,7 +894,6 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 						tcmNode.strBreadcrumbs = (tcmNode.rParentNode == null)
 							? filePath : tcmNode.rParentNode.strBreadcrumbs + " > " + filePath;
 						ApplyParentSettings(tcmNode, parent);
-						ApplyGenreColors(tcmNode);
 						CSongDict.tAddSongNode(tcmNode.uniqueId, tcmNode);
 						if (!listSongsDB.ContainsKey(filePath + tcmHashStr))
 							listSongsDB.Add(filePath + tcmHashStr, tcmNode);
@@ -988,15 +922,4 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 			node.score[0].ChartInfo.Preimage = parent.score[0].ChartInfo.Preimage;
 	}
 
-	private static void ApplyGenreColors(CSongListNode node) {
-		switch (CStrGenreToNum.ForAC15(node.songGenre)) {
-			case 0: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_JPOP; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_JPOP; break;
-			case 1: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Anime; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Anime; break;
-			case 2: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_VOCALOID; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_VOCALOID; break;
-			case 3: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Children; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Children; break;
-			case 4: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Variety; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Variety; break;
-			case 5: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_Classic; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_Classic; break;
-			case 6: node.ForeColor = OpenTaiko.Skin.SongSelect_ForeColor_GameMusic; node.BackColor = OpenTaiko.Skin.SongSelect_BackColor_GameMusic; break;
-			}
-	}
 }
