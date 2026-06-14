@@ -135,7 +135,6 @@ class TextureLoader {
 		Loading = TxC(@$"Loading.png");
 		Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
 		Overlay = TxC(@$"Overlay.png");
-		Network_Connection = TxC(@$"Network_Connection.png");
 		NamePlateBase = TxC(@$"NamePlate.png");
 
 		#endregion
@@ -876,8 +875,7 @@ class TextureLoader {
 		Loading,
 		Scanning_Loudness,
 		NamePlateBase,
-		Overlay,
-		Network_Connection;
+		Overlay;
 
 	#endregion
 

@@ -205,7 +205,11 @@ public unsafe class CVideoDecoder : IDisposable {
 	private void EnqueueFrames() {
 		if (DS != DecodingState.Running && !close) {
 			cts = new CancellationTokenSource();
-			Task.Factory.StartNew(() => EnqueueOneFrame());
+			// LongRunning → dedicated thread, not a thread-pool worker. EnqueueOneFrame is a loop that lives
+			// for the whole video (it Thread.Sleep(1)s while the frame queue is full); on the pool it would
+			// occupy a worker for minutes and make the pool inject/retire extra threads (the "[thread]
+			// exited with code 0" churn seen in-game) and risk starving other pooled work.
+			Task.Factory.StartNew(() => EnqueueOneFrame(), TaskCreationOptions.LongRunning);
 		}
 	}
 

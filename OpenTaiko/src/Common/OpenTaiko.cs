@@ -957,20 +957,6 @@ internal class OpenTaiko : Game {
 
 				actScanningLoudness?.Draw();
 
-				if (rCurrentStage != null
-					&& rCurrentStage.eStageID != CStage.EStage.StartUp
-					&& rCurrentStage.eStageID != CStage.EStage.CRASH
-					&& OpenTaiko.Tx.Network_Connection != null) {
-					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
-						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
-						Task.Factory.StartNew(() => {
-							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
-							PingReply reply = new Ping().Send("8.8.8.8", 5000);
-							this.bInternetConnectionSuccess = reply.Status == IPStatus.Success;
-						});
-					}
-					OpenTaiko.Tx.Network_Connection.t2DDraw(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bInternetConnectionSuccess ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
-				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
 				// Display log cards
@@ -1196,8 +1182,6 @@ internal class OpenTaiko : Game {
 	//-----------------
 	private bool bMouseCursorDisplaying = true;
 	private bool bEndProcessCompleteDone;
-	public bool bInternetConnectionSuccess { get; private set; } = false;
-	private long PreviousSystemTimeMs = long.MinValue;
 	private static CTja[] tja = new CTja[MAX_PLAYERS];
 
 	public static TextureLoader Tx = new TextureLoader();
