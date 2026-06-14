@@ -54,10 +54,6 @@ internal class CActImplRoll : CActivity {
 		this.ctRollFrameCounter[player].Tick();
 		this.ctRollAnime[player].Tick();
 		FadeOut[player].Tick();
-		//1PY:-3 2PY:514
-		//仮置き
-		int[] nRollBalloon = new int[] { -3, 514, 0, 0 };
-		int[] nRollNumber = new int[] { 48, 559, 0, 0 };
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			//CDTXMania.act文字コンソール.tPrint(0, 0, C文字コンソール.Eフォント種別.白, this.ct連打枠カウンター[player].n現在の値.ToString());
 			if (this.ctRollFrameCounter[player].IsUnEnded) {

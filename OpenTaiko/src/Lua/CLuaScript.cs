@@ -118,7 +118,13 @@ class CLuaScript : IDisposable {
 				return null;
 			}
 			var ret = luaFunction.Func.Call(args);
-			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Collect, 0);
+			// Run ONE incremental GC step per call instead of a full collection. This was previously
+			// LuaGC.Collect — a FULL Lua-heap collection on every single Lua call. Per-frame callbacks
+			// (stage + background Draw/Update, every character's Update/Draw, nameplates, modals) all go
+			// through here, so it meant dozens of full collections per frame, with cost scaling to the
+			// Lua heap — a direct cause of irregular gameplay hitches (and audio/visual desync). An
+			// incremental step spreads collection cheaply while still keeping the Lua heap bounded.
+			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
 			return ret;
 		} catch (Exception exception) {
 			Crash(exception);

@@ -5,6 +5,14 @@ namespace OpenTaiko;
 internal class CActImplScore : CActPlayScoreCommon {
 	// CActivity 実装（共通クラスからの差分のみ）
 
+	// Reused per-frame scratch buffers for player draw positions, filled fresh every Draw (no per-frame alloc).
+	private readonly int[] x = new int[5];
+	private readonly int[] y = new int[5];
+	private readonly int[] add_x = new int[5];
+	private readonly int[] add_y = new int[5];
+	private readonly int[] addBonus_x = new int[5];
+	private readonly int[] addBonus_y = new int[5];
+
 	public unsafe override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
@@ -40,13 +48,6 @@ internal class CActImplScore : CActPlayScoreCommon {
 					}
 				}
 			}
-
-			int[] x = new int[5];
-			int[] y = new int[5];
-			int[] add_x = new int[5];
-			int[] add_y = new int[5];
-			int[] addBonus_x = new int[5];
-			int[] addBonus_y = new int[5];
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {

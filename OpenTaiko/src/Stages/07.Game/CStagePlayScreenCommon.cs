@@ -256,8 +256,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		this.sw = new Stopwatch();
 		//          this.sw2 = new Stopwatch();
-		//			this.gclatencymode = GCSettings.LatencyMode;
-		//			GCSettings.LatencyMode = GCLatencyMode.Batch;	// 演奏画面中はGCを抑止する
+		// Reduce .NET GC hitches during the song: ask the GC to avoid blocking gen-2 collections while
+		// playing. Restored to the previous mode in DeActivate. (SustainedLowLatency, not Batch — Batch
+		// favors throughput and still permits the blocking gen-2 collections we're trying to avoid.)
+		this.gclatencymode = System.Runtime.GCSettings.LatencyMode;
+		System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
 		this.bIsAlreadyCleared = new bool[5];
 		this.bIsAlreadyMaxed = new bool[5];
 
@@ -470,7 +473,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		listChip = null;
 		queueMixerSound.Clear();
 		queueMixerSound = null;
-		//			GCSettings.LatencyMode = this.gclatencymode;
+		System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode
 
 		this.actAVI.rVD = null; // Will be disposed by TJA.DeActivate() later
 
@@ -818,6 +821,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	protected CSound[] soundClap = new CSound[5];
 	public bool isMultiPlay; // 2016.08.21 kairera0467 表示だけ。
 	protected Stopwatch sw;     // 2011.6.13 最適化検討用のストップウォッチ
+	protected System.Runtime.GCLatencyMode gclatencymode;   // saved GC latency mode, restored on DeActivate
 	public int ListDan_Number;
 	private bool IsDanFailed;
 

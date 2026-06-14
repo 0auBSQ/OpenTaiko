@@ -24,6 +24,8 @@ public static class ImGuiDebugWindow {
 	private static long pagedmemory = 0;
 	private static long textureMemoryUsage = 0;
 	private static long currentStageMemoryUsage = 0;
+	private static long lastAllocatedBytes = 0;
+	private static long allocRateBytesPerSec = 0;
 
 	private static int sortType = -1;
 	private static readonly string[] sortNames = ["Memory Usage (Highest -> Lowest)", "Memory Usage (Lowest -> Highest)", "Pointer ID"];
@@ -76,6 +78,10 @@ public static class ImGuiDebugWindow {
 		#region Fetch allocated memory
 		if (SoundManager.PlayTimer.SystemTimeMs - memoryReadTimer > 5000) {
 			memoryReadTimer = SoundManager.PlayTimer.SystemTimeMs;
+				long nowAllocated = GC.GetTotalAllocatedBytes();
+				if (lastAllocatedBytes > 0)
+					allocRateBytesPerSec = (nowAllocated - lastAllocatedBytes) / 5;   // ~5s sample window
+				lastAllocatedBytes = nowAllocated;
 			Task.Factory.StartNew(() => {
 				using (Process process = Process.GetCurrentProcess()) {
 					if (OperatingSystem.IsWindows())
@@ -99,6 +105,8 @@ public static class ImGuiDebugWindow {
 
 			ImGui.Separator();
 			ImGui.Text($"Game Version: {OpenTaiko.VERSION}");
+			ImGui.Text($"Managed heap: {GC.GetTotalMemory(false) / (1024 * 1024)} MB | Alloc rate: {allocRateBytesPerSec / (1024 * 1024)} MB/s (5s avg)");
+			ImGui.Text($"GC collections — Gen0: {GC.CollectionCount(0)}  Gen1: {GC.CollectionCount(1)}  Gen2: {GC.CollectionCount(2)}");
 			ImGui.Text($"Allocated Memory: {pagedmemory} bytes ({String.Format("{0:0.###}", (float)pagedmemory / (1024 * 1024 * 1024))}GB)");
 			ImGui.Text($"Draw FPS: {(OpenTaiko.FPS != null ? OpenTaiko.FPS?.NowFPS : "???")}, Input FPS: {(OpenTaiko.FPSInput != null ? OpenTaiko.FPSInput?.NowFPS : "???")}");
 			ImGui.Text("Current Stage: " + OpenTaiko.rCurrentStage.eStageID.ToString() + " (StageID " + ((int)OpenTaiko.rCurrentStage.eStageID).ToString() + ")");

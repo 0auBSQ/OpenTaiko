@@ -84,13 +84,8 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 			this.ctGaugeFlash.TickLoop();
 
 			int nWidth = (OpenTaiko.Skin.Game_Gauge_Rect[2] / 50);
-			int[] nRectX = new int[] {
-				(int)( this.dbCurrentGaugeValue[ 0 ] / 2 ) * nWidth,
-				(int)( this.dbCurrentGaugeValue[ 1 ] / 2 ) * nWidth,
-				(int)( this.dbCurrentGaugeValue[ 2 ] / 2 ) * nWidth,
-				(int)( this.dbCurrentGaugeValue[ 3 ] / 2 ) * nWidth,
-				(int)( this.dbCurrentGaugeValue[ 4 ] / 2 ) * nWidth
-			};
+			for (int g = 0; g < 5; g++)
+				nRectX[g] = (int)(this.dbCurrentGaugeValue[g] / 2) * nWidth;
 			int RainbowBase = ctRainbowAnime.CurrentValue + 1;
 			if (RainbowBase == ctRainbowAnime.EndValue + 1) RainbowBase = 0;
 			/*
@@ -140,9 +135,6 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 				if (OpenTaiko.ConfigIni.bAIBattleMode) {
 					scale = 0.8f;
 				}
-
-				int[] gauge_x = new int[5];
-				int[] gauge_y = new int[5];
 
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
@@ -351,8 +343,6 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 
 
 
-			//仮置き
-			int[] nSoulExplosion = new int[] { 73, 468, 0, 0 };
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				for (int d = 0; d < 32; d++) {
 					if (this.stFireworkState[i][d].bUse) {
@@ -377,6 +367,11 @@ internal class CActImplGauge : CActPlayGaugeCommon {
 	#region [ private ]
 	//-----------------
 	private CCounter ctGaugeFlash;
+
+	// Reused per-frame scratch buffers (filled fresh every Draw) so the draw loop allocates no arrays.
+	private readonly int[] nRectX = new int[5];
+	private readonly int[] gauge_x = new int[5];
+	private readonly int[] gauge_y = new int[5];
 
 	protected STSTATUS[][] stFireworkState = new STSTATUS[5][] {
 		new STSTATUS[ 32 ],
