@@ -3,7 +3,7 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CActオプションパネル : CActivity {
+internal class CActOptionPanel : CActivity {
 	// CActivity 実装
 
 	public override void DeActivate() {
@@ -12,11 +12,11 @@ internal class CActオプションパネル : CActivity {
 		}
 	}
 	public override void CreateManagedResource() {
-		this.txオプションパネル = OpenTaiko.tテクスチャの生成(CSkin.Path($@"Graphics{Path.DirectorySeparatorChar}Screen option panels.png"), false);
+		this.txOptionPanel = OpenTaiko.tTextureCreate(CSkin.Path($@"Graphics{Path.DirectorySeparatorChar}Screen option panels.png"), false);
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
-		OpenTaiko.tテクスチャの解放(ref this.txオプションパネル);
+		OpenTaiko.tTextureRelease(ref this.txOptionPanel);
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {
@@ -103,8 +103,8 @@ internal class CActオプションパネル : CActivity {
 	private readonly Rectangle[] rcRandom = new Rectangle[] { new Rectangle(0x48, 0x30, 0x18, 12), new Rectangle(0x48, 60, 0x18, 12), new Rectangle(0x48, 0x48, 0x18, 12), new Rectangle(0x48, 0x54, 0x18, 12) };
 	private readonly Rectangle[] rcReverse = new Rectangle[] { new Rectangle(0x18, 0x18, 0x18, 12), new Rectangle(0x18, 0x24, 0x18, 12) };
 	private readonly Rectangle[] rcTight = new Rectangle[] { new Rectangle(0x60, 0x30, 0x18, 12), new Rectangle(0x60, 60, 0x18, 12) };
-	private readonly Rectangle[] rc譜面スピード = new Rectangle[] { new Rectangle(0x30, 0, 0x18, 12), new Rectangle(0x30, 12, 0x18, 12), new Rectangle(0x30, 0x18, 0x18, 12), new Rectangle(0x30, 0x24, 0x18, 12), new Rectangle(0x48, 0, 0x18, 12), new Rectangle(0x48, 12, 0x18, 12), new Rectangle(0x48, 0x18, 0x18, 12), new Rectangle(0x48, 0x24, 0x18, 12), new Rectangle(0x60, 0, 0x18, 12), new Rectangle(0x60, 12, 0x18, 12), new Rectangle(0x60, 0x18, 0x18, 12), new Rectangle(0x60, 0x24, 0x18, 12), new Rectangle(120, 0, 0x18, 12), new Rectangle(120, 12, 0x18, 12), new Rectangle(120, 0x18, 0x18, 12), new Rectangle(120, 0x24, 0x18, 12) };
-	private CTexture txオプションパネル;
+	private readonly Rectangle[] rcChartSpeed = new Rectangle[] { new Rectangle(0x30, 0, 0x18, 12), new Rectangle(0x30, 12, 0x18, 12), new Rectangle(0x30, 0x18, 0x18, 12), new Rectangle(0x30, 0x24, 0x18, 12), new Rectangle(0x48, 0, 0x18, 12), new Rectangle(0x48, 12, 0x18, 12), new Rectangle(0x48, 0x18, 0x18, 12), new Rectangle(0x48, 0x24, 0x18, 12), new Rectangle(0x60, 0, 0x18, 12), new Rectangle(0x60, 12, 0x18, 12), new Rectangle(0x60, 0x18, 0x18, 12), new Rectangle(0x60, 0x24, 0x18, 12), new Rectangle(120, 0, 0x18, 12), new Rectangle(120, 12, 0x18, 12), new Rectangle(120, 0x18, 0x18, 12), new Rectangle(120, 0x24, 0x18, 12) };
+	private CTexture txOptionPanel;
 	//-----------------
 	#endregion
 }

@@ -4,7 +4,7 @@ namespace OpenTaiko;
 
 class DBEncyclopediaMenus : CSavableT<DBEncyclopediaMenus.EncyclopediaMenu> {
 	public DBEncyclopediaMenus() {
-		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Encyclopedia{Path.DirectorySeparatorChar}Menus.json";
+		_fn = @$"{OpenTaiko.strEXEFolder}Encyclopedia{Path.DirectorySeparatorChar}Menus.json";
 		base.tDBInitSavable();
 	}
 

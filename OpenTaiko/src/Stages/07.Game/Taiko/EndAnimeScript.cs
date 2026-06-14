@@ -29,7 +29,7 @@ class EndAnimeScript : ScriptBG {
 			float currentFloorPositionMax140 = 0;
 
 			if (OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);

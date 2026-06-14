@@ -110,7 +110,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		this.ElapsedTimeMs = 0;
 		this.UpdateSystemTimeMs = CTimer.UnusedNum;
 		this.SystemTimer = new CTimer(CTimer.TimerType.MultiMedia);
-		this.b最初の実出力遅延算出 = true;
+		this.bFirstActualOutputDelayCalc = true;
 
 		// BASS の設定。
 
@@ -127,8 +127,8 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 		// BASS の初期化。
 
-		int nデバイス = 0;      // 0:"no device" … BASS からはデバイスへアクセスさせない。アクセスは BASSWASAPI アドオンから行う。
-		int n周波数 = 44100;   // 仮決め。lデバイス（≠ドライバ）がネイティブに対応している周波数であれば何でもいい？ようだ。BASSWASAPIでデバイスの周波数は変えられる。いずれにしろBASSMXで自動的にリサンプリングされる。
+		int nDevice = 0;      // 0:"no device" … BASS からはデバイスへアクセスさせない。アクセスは BASSWASAPI アドオンから行う。
+		int nFrequency = 44100;   // 仮決め。lデバイス（≠ドライバ）がネイティブに対応している周波数であれば何でもいい？ようだ。BASSWASAPIでデバイスの周波数は変えられる。いずれにしろBASSMXで自動的にリサンプリングされる。
 							//if( !Bass.Init( nデバイス, n周波数, DeviceInitFlags.Default, IntPtr.Zero ) )
 							//	throw new Exception( string.Format( "BASS (WASAPI) の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString() ) );
 
@@ -161,10 +161,10 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 		// BASS WASAPI の初期化。
 
-		nデバイス = -1;
-		n周波数 = 0;           // デフォルトデバイスの周波数 (0="mix format" sample rate)
-		int nチャンネル数 = 0;    // デフォルトデバイスのチャンネル数 (0="mix format" channels)
-		this.tWasapiProc = new WasapiProcedure(this.tWASAPI処理);     // アンマネージに渡す delegate は、フィールドとして保持しておかないとGCでアドレスが変わってしまう。
+		nDevice = -1;
+		nFrequency = 0;           // デフォルトデバイスの周波数 (0="mix format" sample rate)
+		int nChannelCount = 0;    // デフォルトデバイスのチャンネル数 (0="mix format" channels)
+		this.tWasapiProc = new WasapiProcedure(this.tWASAPIProcess);     // アンマネージに渡す delegate は、フィールドとして保持しておかないとGCでアドレスが変わってしまう。
 
 		// WASAPIの更新間隔(period)は、バッファサイズにも影響を与える。
 		// 更新間隔を最小にするには、BassWasapi.BASS_WASAPI_GetDeviceInfo( ndevNo ).minperiod の値を使えばよい。
@@ -217,7 +217,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		var flags = (mode == EWASAPIMode.Exclusion) ? WasapiInitFlags.AutoFormat | WasapiInitFlags.Exclusive : WasapiInitFlags.Shared | WasapiInitFlags.AutoFormat;
 		//var flags = ( mode == Eデバイスモード.排他 ) ? BASSWASAPIInit.BASS_WASAPI_AUTOFORMAT | BASSWASAPIInit.BASS_WASAPI_EVENT | BASSWASAPIInit.BASS_WASAPI_EXCLUSIVE : BASSWASAPIInit.BASS_WASAPI_AUTOFORMAT | BASSWASAPIInit.BASS_WASAPI_EVENT;
 
-		if (BassWasapi.Init(nデバイス, n周波数, nチャンネル数, flags, (bufferSize / 1000.0f), (interval / 1000.0f), this.tWasapiProc, IntPtr.Zero)) {
+		if (BassWasapi.Init(nDevice, nFrequency, nChannelCount, flags, (bufferSize / 1000.0f), (interval / 1000.0f), this.tWasapiProc, IntPtr.Zero)) {
 			if (mode == EWASAPIMode.Exclusion) {
 				#region [ 排他モードで作成成功。]
 				//-----------------
@@ -226,18 +226,18 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 				nDevNo = BassWasapi.CurrentDevice;
 				deviceInfo = BassWasapi.GetDeviceInfo(nDevNo);
 				BassWasapi.GetInfo(out var wasapiInfo);
-				int n1サンプルのバイト数 = 2 * wasapiInfo.Channels;  // default;
+				int n1SampleByteCount = 2 * wasapiInfo.Channels;  // default;
 				switch (wasapiInfo.Format)      // BASS WASAPI で扱うサンプルはすべて 32bit float で固定されているが、デバイスはそうとは限らない。
 				{
-					case WasapiFormat.Bit8: n1サンプルのバイト数 = 1 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit16: n1サンプルのバイト数 = 2 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit24: n1サンプルのバイト数 = 3 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit32: n1サンプルのバイト数 = 4 * wasapiInfo.Channels; break;
-					case WasapiFormat.Float: n1サンプルのバイト数 = 4 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit8: n1SampleByteCount = 1 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit16: n1SampleByteCount = 2 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit24: n1SampleByteCount = 3 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit32: n1SampleByteCount = 4 * wasapiInfo.Channels; break;
+					case WasapiFormat.Float: n1SampleByteCount = 4 * wasapiInfo.Channels; break;
 					case WasapiFormat.Unknown: throw new ArgumentOutOfRangeException($"WASAPI format error ({wasapiInfo.ToString()})");
 				}
-				int n1秒のバイト数 = n1サンプルのバイト数 * wasapiInfo.Frequency;
-				this.BufferSize = (long)(wasapiInfo.BufferLength * 1000.0f / n1秒のバイト数);
+				int n1SecondByteCount = n1SampleByteCount * wasapiInfo.Frequency;
+				this.BufferSize = (long)(wasapiInfo.BufferLength * 1000.0f / n1SecondByteCount);
 				this.OutputDelay = 0;   // 初期値はゼロ
 				Trace.TraceInformation("使用デバイス: #" + nDevNo + " : " + deviceInfo.Name);
 				Trace.TraceInformation("BASS を初期化しました。(WASAPI排他モード, {0}Hz, {1}ch, フォーマット:{2}, バッファ{3}bytes [{4}ms(希望{5}ms)], 更新間隔{6}ms)",
@@ -259,18 +259,18 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 
 				var devInfo = BassWasapi.GetDeviceInfo(BassWasapi.CurrentDevice);
 				BassWasapi.GetInfo(out var wasapiInfo);
-				int n1サンプルのバイト数 = 2 * wasapiInfo.Channels; // default;
+				int n1SampleByteCount = 2 * wasapiInfo.Channels; // default;
 				switch (wasapiInfo.Format)      // BASS WASAPI で扱うサンプルはすべて 32bit float で固定されているが、デバイスはそうとは限らない。
 				{
-					case WasapiFormat.Bit8: n1サンプルのバイト数 = 1 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit16: n1サンプルのバイト数 = 2 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit24: n1サンプルのバイト数 = 3 * wasapiInfo.Channels; break;
-					case WasapiFormat.Bit32: n1サンプルのバイト数 = 4 * wasapiInfo.Channels; break;
-					case WasapiFormat.Float: n1サンプルのバイト数 = 4 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit8: n1SampleByteCount = 1 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit16: n1SampleByteCount = 2 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit24: n1SampleByteCount = 3 * wasapiInfo.Channels; break;
+					case WasapiFormat.Bit32: n1SampleByteCount = 4 * wasapiInfo.Channels; break;
+					case WasapiFormat.Float: n1SampleByteCount = 4 * wasapiInfo.Channels; break;
 					case WasapiFormat.Unknown: throw new ArgumentOutOfRangeException($"WASAPI format error ({wasapiInfo.ToString()})");
 				}
-				int n1秒のバイト数 = n1サンプルのバイト数 * wasapiInfo.Frequency;
-				this.BufferSize = (long)(wasapiInfo.BufferLength * 1000.0f / n1秒のバイト数);
+				int n1SecondByteCount = n1SampleByteCount * wasapiInfo.Frequency;
+				this.BufferSize = (long)(wasapiInfo.BufferLength * 1000.0f / n1SecondByteCount);
 
 				this.OutputDelay = 0;   // 初期値はゼロ
 
@@ -324,8 +324,8 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		// BASS ミキサーの1秒あたりのバイト数を算出。
 
 		var mixerInfo = Bass.ChannelGetInfo(this.hMixer);
-		long nミキサーの1サンプルあたりのバイト数 = mixerInfo.Channels * 4;  // 4 = sizeof(FLOAT)
-		this.nBytesPerSec = nミキサーの1サンプルあたりのバイト数 * mixerInfo.Frequency;
+		long nMixer1SamplePerByteCount = mixerInfo.Channels * 4;  // 4 = sizeof(FLOAT)
+		this.nBytesPerSec = nMixer1SamplePerByteCount * mixerInfo.Frequency;
 
 
 
@@ -362,14 +362,14 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		BassWasapi.Start();
 	}
 	#region [ tサウンドを作成する() ]
-	public CSound tCreateSound(string strファイル名, ESoundGroup soundGroup) {
+	public CSound tCreateSound(string strFileName, ESoundGroup soundGroup) {
 		var sound = new CSound(soundGroup);
-		sound.CreateWASAPISound(strファイル名, this.hMixer, this.SoundDeviceType);
+		sound.CreateWASAPISound(strFileName, this.hMixer, this.SoundDeviceType);
 		return sound;
 	}
 
-	public void tCreateSound(string strファイル名, CSound sound) {
-		sound.CreateWASAPISound(strファイル名, this.hMixer, this.SoundDeviceType);
+	public void tCreateSound(string strFileName, CSound sound) {
+		sound.CreateWASAPISound(strFileName, this.hMixer, this.SoundDeviceType);
 	}
 	#endregion
 
@@ -403,7 +403,7 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 	protected int hMixer_DeviceOut = -1;
 	protected WasapiProcedure tWasapiProc = null;
 
-	protected int tWASAPI処理(IntPtr buffer, int length, IntPtr user) {
+	protected int tWASAPIProcess(IntPtr buffer, int length, IntPtr user) {
 		// BASSミキサからの出力データをそのまま WASAPI buffer へ丸投げ。
 
 		int num = Bass.ChannelGetData(this.hMixer_DeviceOut, buffer, length);       // num = 実際に転送した長さ
@@ -413,8 +413,8 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		// 経過時間を更新。
 		// データの転送差分ではなく累積転送バイト数から算出する。
 
-		int n未再生バイト数 = BassWasapi.GetData(null, (int)DataFlags.Available);  // 誤差削減のため、必要となるギリギリ直前に取得する。
-		this.dbElapsedTimeMs = (this.n累積転送バイト数 - n未再生バイト数) * 1000.0 / this.nBytesPerSec;
+		int nUnplayedByteCount = BassWasapi.GetData(null, (int)DataFlags.Available);  // 誤差削減のため、必要となるギリギリ直前に取得する。
+		this.dbElapsedTimeMs = (this.nCumulativeTransferByteCount - nUnplayedByteCount) * 1000.0 / this.nBytesPerSec;
 		this.ElapsedTimeMs = (long)this.dbElapsedTimeMs;
 		this.UpdateSystemTimeMs = this.SystemTimer.SystemTimeMs;
 		this.dbUpdateSystemTimeMs = this.SystemTimer.SystemTimeMs_Double;
@@ -422,18 +422,18 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 		// 実出力遅延を更新。
 		// 未再生バイト数の平均値。
 
-		long n今回の遅延ms = n未再生バイト数 * 1000 / this.nBytesPerSec;
-		this.OutputDelay = (this.b最初の実出力遅延算出) ? n今回の遅延ms : (this.OutputDelay + n今回の遅延ms) / 2;
-		this.b最初の実出力遅延算出 = false;
+		long nThisTimeDelayms = nUnplayedByteCount * 1000 / this.nBytesPerSec;
+		this.OutputDelay = (this.bFirstActualOutputDelayCalc) ? nThisTimeDelayms : (this.OutputDelay + nThisTimeDelayms) / 2;
+		this.bFirstActualOutputDelayCalc = false;
 
 
 		// 経過時間を更新後に、今回分の累積転送バイト数を反映。
 
-		this.n累積転送バイト数 += num;
+		this.nCumulativeTransferByteCount += num;
 		return num;
 	}
 
-	private long n累積転送バイト数 = 0;
-	private bool b最初の実出力遅延算出 = true;
+	private long nCumulativeTransferByteCount = 0;
+	private bool bFirstActualOutputDelayCalc = true;
 	private bool bIsBASSFree = true;
 }

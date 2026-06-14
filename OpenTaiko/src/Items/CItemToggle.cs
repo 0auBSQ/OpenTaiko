@@ -11,67 +11,67 @@ internal class CItemToggle : CItemBase {
 	// Constructor
 
 	public CItemToggle() {
-		base.e種別 = CItemBase.E種別.ONorOFFトグル;
+		base.eType = CItemBase.EType.ONorOFFToggle;
 		this.bON = false;
 	}
-	public CItemToggle(string str項目名, bool b初期状態)
+	public CItemToggle(string strItemName, bool bInitialState)
 		: this() {
-		this.t初期化(str項目名, b初期状態);
+		this.tInitialize(strItemName, bInitialState);
 	}
-	public CItemToggle(string str項目名, bool b初期状態, string str説明文jp)
+	public CItemToggle(string strItemName, bool bInitialState, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, b初期状態, str説明文jp);
+		this.tInitialize(strItemName, bInitialState, strDescriptionjp);
 	}
-	public CItemToggle(string str項目名, bool b初期状態, string str説明文jp, string str説明文en)
+	public CItemToggle(string strItemName, bool bInitialState, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, b初期状態, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, bInitialState, strDescriptionjp, strDescriptionen);
 	}
-	public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別)
+	public CItemToggle(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, b初期状態, eパネル種別);
+		this.tInitialize(strItemName, bInitialState, ePanelType);
 	}
-	public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp)
+	public CItemToggle(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp);
+		this.tInitialize(strItemName, bInitialState, ePanelType, strDescriptionjp);
 	}
-	public CItemToggle(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en)
+	public CItemToggle(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, bInitialState, ePanelType, strDescriptionjp, strDescriptionen);
 	}
 
 
 	// CItemBase 実装
 
-	public override void tEnter押下() {
-		this.t項目値を次へ移動();
+	public override void tEnterPressed() {
+		this.tItemValueNextMove();
 	}
-	public override void t項目値を次へ移動() {
+	public override void tItemValueNextMove() {
 		this.bON = !this.bON;
 	}
-	public override void t項目値を前へ移動() {
-		this.t項目値を次へ移動();
+	public override void tItemValuePrevMove() {
+		this.tItemValueNextMove();
 	}
-	public void t初期化(string str項目名, bool b初期状態) {
-		this.t初期化(str項目名, b初期状態, CItemBase.EPanelType.Normal);
+	public void tInitialize(string strItemName, bool bInitialState) {
+		this.tInitialize(strItemName, bInitialState, CItemBase.EPanelType.Normal);
 	}
-	public void t初期化(string str項目名, bool b初期状態, string str説明文jp) {
-		this.t初期化(str項目名, b初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, bool bInitialState, string strDescriptionjp) {
+		this.tInitialize(strItemName, bInitialState, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, bool b初期状態, string str説明文jp, string str説明文en) {
-		this.t初期化(str項目名, b初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文en);
+	public void tInitialize(string strItemName, bool bInitialState, string strDescriptionjp, string strDescriptionen) {
+		this.tInitialize(strItemName, bInitialState, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionen);
 	}
 
-	public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別) {
-		this.t初期化(str項目名, b初期状態, eパネル種別, "", "");
+	public void tInitialize(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType) {
+		this.tInitialize(strItemName, bInitialState, ePanelType, "", "");
 	}
-	public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp) {
-		this.t初期化(str項目名, b初期状態, eパネル種別, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp) {
+		this.tInitialize(strItemName, bInitialState, ePanelType, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, bool b初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en) {
-		base.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
-		this.bON = b初期状態;
+	public void tInitialize(string strItemName, bool bInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen) {
+		base.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionen);
+		this.bON = bInitialState;
 	}
-	public override object obj現在値() {
+	public override object objCurrentValue() {
 		return (this.bON) ? "ON" : "OFF";
 	}
 	public override int GetIndex() {

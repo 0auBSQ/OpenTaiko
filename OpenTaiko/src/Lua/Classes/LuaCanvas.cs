@@ -244,7 +244,7 @@ namespace OpenTaiko {
 
 		#region Drawing (mirrors LuaTexture)
 		public void Draw(int x, int y) {
-			_texture?.t2D描画(x, y);
+			_texture?.t2DDraw(x, y);
 		}
 		public void DrawAtAnchor(int x, int y, string anchor) {
 			CTexture.RefPnt ref_anchor = anchor.ToLower() switch {
@@ -259,7 +259,7 @@ namespace OpenTaiko {
 				"bottomright" => CTexture.RefPnt.DownRight,
 				_ => CTexture.RefPnt.UpLeft
 			};
-			_texture?.t2D拡大率考慮描画(ref_anchor, x, y, new(0, 0, _w, _h));
+			_texture?.t2DScaledDraw(ref_anchor, x, y, new(0, 0, _w, _h));
 		}
 		public void SetScale(float scale_x, float scale_y) {
 			_texture?.tSetScale(scale_x, scale_y);

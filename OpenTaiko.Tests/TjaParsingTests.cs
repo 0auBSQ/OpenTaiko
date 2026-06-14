@@ -105,7 +105,7 @@ namespace OpenTaikoTests {
 				File.Copy(tjaPath, p);
 				var tja = new CTja();
 				tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
-				tja.t入力(p, difficulty, 0, loadChart, 0);
+				tja.tInput(p, difficulty, 0, loadChart, 0);
 				return tja;
 			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}
@@ -113,7 +113,7 @@ namespace OpenTaikoTests {
 		// listChip order (the engine's play order) — monotonicity is checked against it, not re-sorted
 		private static List<int> NoteTimes(CTja tja)
 			=> tja.listChip.Where(c => c.nChannelNo >= 0x11 && c.nChannelNo <= 0x14)
-				.Select(c => c.n発声時刻ms).ToList();
+				.Select(c => c.nSoundTimems).ToList();
 	}
 
 	[CollectionDefinition("tja", DisableParallelization = true)]

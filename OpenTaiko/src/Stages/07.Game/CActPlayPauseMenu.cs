@@ -3,15 +3,15 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CAct演奏PauseMenu : CActSelectPopupMenu {
+internal class CActPlayPauseMenu : CActSelectPopupMenu {
 	// コンストラクタ
 
-	public CAct演奏PauseMenu() {
-		CAct演奏PauseMenuMain();
+	public CActPlayPauseMenu() {
+		CActPlayPauseMenuMain();
 	}
 
-	private void CAct演奏PauseMenuMain() {
-		this.bEsc有効 = false;
+	private void CActPlayPauseMenuMain() {
+		this.bEscEnabled = false;
 		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
 		for (int nConfSet = 0; nConfSet < (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++) {
 			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
@@ -43,9 +43,9 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 
 	// メソッド
 	public override void tActivatePopupMenu(EKeyConfigPart einst) {
-		this.CAct演奏PauseMenuMain();
-		CActSelectPopupMenu.b選択した = false;
-		this.bやり直しを選択した = false;
+		this.CActPlayPauseMenuMain();
+		CActSelectPopupMenu.bSelected = false;
+		this.bRetrySelected = false;
 		base.tActivatePopupMenu(einst);
 	}
 	//public void tDeativatePopupMenu()
@@ -54,11 +54,11 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 	//}
 
 	public override void UpdateSub() {
-		if (this.bやり直しを選択した) {
+		if (this.bRetrySelected) {
 			if (!sw.IsRunning)
 				this.sw = Stopwatch.StartNew();
 			if (sw.ElapsedMilliseconds > 1500) {
-				OpenTaiko.stageGameScreen.t演奏やりなおし();
+				OpenTaiko.stageGameScreen.tPlayRetry();
 
 				this.tDeativatePopupMenu();
 				this.sw.Reset();
@@ -66,22 +66,22 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 		}
 	}
 
-	public override void tEnter押下Main(int nSortOrder) {
-		if (n現在の選択行 < 0 || n現在の選択行 >= menuActions.Count)
+	public override void tEnterPressedMain(int nSortOrder) {
+		if (nCurrentSelectedLine < 0 || nCurrentSelectedLine >= menuActions.Count)
 			return;
-		switch (menuActions[n現在の選択行]) {
+		switch (menuActions[nCurrentSelectedLine]) {
 			case EOrder.Continue:
 				OpenTaiko.stageGameScreen.Resume();
-				CActSelectPopupMenu.b選択した = true;
+				CActSelectPopupMenu.bSelected = true;
 				this.tDeativatePopupMenu();
 				break;
 			case EOrder.Redoing:
-				this.bやり直しを選択した = true;
-				CActSelectPopupMenu.b選択した = true;
+				this.bRetrySelected = true;
+				CActSelectPopupMenu.bSelected = true;
 				break;
 			case EOrder.Return:
-				OpenTaiko.stageGameScreen.t演奏中止();
-				CActSelectPopupMenu.b選択した = true;
+				OpenTaiko.stageGameScreen.tPlayAbort();
+				CActSelectPopupMenu.bSelected = true;
 				this.tDeativatePopupMenu();
 				break;
 		}
@@ -101,16 +101,16 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
-		string pathパネル本体 = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
-		if (File.Exists(pathパネル本体)) {
-			this.txパネル本体 = OpenTaiko.tテクスチャの生成(pathパネル本体, true);
+		string pathPanelBody = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
+		if (File.Exists(pathPanelBody)) {
+			this.txPanelBody = OpenTaiko.tTextureCreate(pathPanelBody, true);
 		}
 
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
-		OpenTaiko.tテクスチャの解放(ref this.txパネル本体);
-		OpenTaiko.tテクスチャの解放(ref this.tx文字列パネル);
+		OpenTaiko.tTextureRelease(ref this.txPanelBody);
+		OpenTaiko.tTextureRelease(ref this.txStringPanel);
 		base.ReleaseManagedResource();
 	}
 
@@ -127,11 +127,11 @@ internal class CAct演奏PauseMenu : CActSelectPopupMenu {
 		Default = 99
 	};
 
-	private bool b選択した;
-	private CTexture txパネル本体;
-	private CTexture tx文字列パネル;
+	private bool bSelected;
+	private CTexture txPanelBody;
+	private CTexture txStringPanel;
 	private Stopwatch sw;
-	private bool bやり直しを選択した;
+	private bool bRetrySelected;
 	//-----------------
 	#endregion
 }

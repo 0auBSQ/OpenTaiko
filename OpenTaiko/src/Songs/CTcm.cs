@@ -97,7 +97,7 @@ internal class CTcm {
 				Title    = refNode.ldTitle.GetString(""),
 				SubTitle = refNode.ldSubtitle.GetString(""),
 				Genre    = refNode.songGenre,
-				FileName = refNode.score[diff].ファイル情報.ファイルの絶対パス ?? "",
+				FileName = refNode.score[diff].FileInfo.FileAbsolutePath ?? "",
 				Level      = refNode.nLevel[diff],
 				Difficulty = diff,
 				ScoreInit  = 300,
@@ -139,18 +139,18 @@ internal class CTcm {
 		node.Dan_C = danC;
 
 		var score = new CScore();
-		score.ファイル情報.ファイルの絶対パス  = FilePath;
-		score.ファイル情報.フォルダの絶対パス  = FolderPath;
-		score.ファイル情報.ファイルサイズ      = FileInfo.Length;
-		score.ファイル情報.最終更新日時        = FileInfo.LastWriteTime;
-		score.譜面情報.タイトル       = TITLE.GetString("");
-		score.譜面情報.strサブタイトル = SUBTITLE.GetString("");
-		score.譜面情報.nレベル        = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
-		score.譜面情報.nレベル[(int)Difficulty.Dan] = 10;
-		score.譜面情報.nLevelIcon  = new CTja.ELevelIcon[(int)Difficulty.Total];
-		score.譜面情報.b譜面分岐    = new bool[(int)Difficulty.Total];
-		score.譜面情報.nDanTick    = DAN_TICK;
-		score.譜面情報.cDanTickColor = DAN_TICK_COLOR;
+		score.FileInfo.FileAbsolutePath  = FilePath;
+		score.FileInfo.FolderAbsolutePath  = FolderPath;
+		score.FileInfo.FileSize      = FileInfo.Length;
+		score.FileInfo.LastUpdateDateTime        = FileInfo.LastWriteTime;
+		score.ChartInfo.Title       = TITLE.GetString("");
+		score.ChartInfo.strSubtitle = SUBTITLE.GetString("");
+		score.ChartInfo.nLevel        = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
+		score.ChartInfo.nLevel[(int)Difficulty.Dan] = 10;
+		score.ChartInfo.nLevelIcon  = new CTja.ELevelIcon[(int)Difficulty.Total];
+		score.ChartInfo.bChartBranch    = new bool[(int)Difficulty.Total];
+		score.ChartInfo.nDanTick    = DAN_TICK;
+		score.ChartInfo.cDanTickColor = DAN_TICK_COLOR;
 		node.score[(int)Difficulty.Dan] = score;
 		node.nLevel[(int)Difficulty.Dan] = 10;
 

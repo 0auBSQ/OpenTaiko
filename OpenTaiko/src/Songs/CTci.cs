@@ -108,30 +108,30 @@ internal class CTci {
 			node.difficultiesCount++;
 
 			var score = new CScore();
-			score.ファイル情報.ファイルの絶対パス  = FilePath;
-			score.ファイル情報.フォルダの絶対パス  = FolderPath;
-			score.ファイル情報.ファイルサイズ      = FileInfo.Length;
-			score.ファイル情報.最終更新日時        = FileInfo.LastWriteTime;
-			score.譜面情報.タイトル       = TITLE.GetString("");
-			score.譜面情報.strサブタイトル = SUBTITLE.GetString("");
-			score.譜面情報.アーティスト名  = ARTIST;
-			score.譜面情報.ジャンル       = GENRE;
-			score.譜面情報.strBGMファイル名  = AUDIO ?? "";
-			score.譜面情報.Presound        = AUDIO ?? "";
-			score.譜面情報.nデモBGMオフセット = (int)(SONGPREVIEW * 1000.0);
-			score.譜面情報.Bpm     = FIRST_BPM;
-			score.譜面情報.BaseBpm = FIRST_BPM;
-			score.譜面情報.MinBpm  = MIN_BPM;
-			score.譜面情報.MaxBpm  = MAX_BPM;
+			score.FileInfo.FileAbsolutePath  = FilePath;
+			score.FileInfo.FolderAbsolutePath  = FolderPath;
+			score.FileInfo.FileSize      = FileInfo.Length;
+			score.FileInfo.LastUpdateDateTime        = FileInfo.LastWriteTime;
+			score.ChartInfo.Title       = TITLE.GetString("");
+			score.ChartInfo.strSubtitle = SUBTITLE.GetString("");
+			score.ChartInfo.ArtistName  = ARTIST;
+			score.ChartInfo.Genre       = GENRE;
+			score.ChartInfo.strBGMFileName  = AUDIO ?? "";
+			score.ChartInfo.Presound        = AUDIO ?? "";
+			score.ChartInfo.nDemoBGMOffset = (int)(SONGPREVIEW * 1000.0);
+			score.ChartInfo.Bpm     = FIRST_BPM;
+			score.ChartInfo.BaseBpm = FIRST_BPM;
+			score.ChartInfo.MinBpm  = MIN_BPM;
+			score.ChartInfo.MaxBpm  = MAX_BPM;
 			if (!string.IsNullOrEmpty(ALBUMART))
-				score.譜面情報.Preimage = ALBUMART;
-			score.譜面情報.nレベル     = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
-			score.譜面情報.nLevelIcon  = new CTja.ELevelIcon[(int)Difficulty.Total];
-			score.譜面情報.b譜面分岐   = new bool[(int)Difficulty.Total];
-			score.譜面情報.nレベル[i]    = course.Level;
-			score.譜面情報.nLevelIcon[i] = course.LevelIcon;
+				score.ChartInfo.Preimage = ALBUMART;
+			score.ChartInfo.nLevel     = Enumerable.Repeat(-1, (int)Difficulty.Total).ToArray();
+			score.ChartInfo.nLevelIcon  = new CTja.ELevelIcon[(int)Difficulty.Total];
+			score.ChartInfo.bChartBranch   = new bool[(int)Difficulty.Total];
+			score.ChartInfo.nLevel[i]    = course.Level;
+			score.ChartInfo.nLevelIcon[i] = course.LevelIcon;
 			if ((Difficulty)i == Difficulty.Tower)
-				score.譜面情報.nLife = course.Life;
+				score.ChartInfo.nLife = course.Life;
 			node.score[i] = score;
 		}
 
@@ -139,8 +139,8 @@ internal class CTci {
 		foreach (var course in Courses) {
 			int i = course.DifficultyIndex;
 			for (int k = 0; k < (int)Difficulty.Total; k++) {
-				node.score[i].譜面情報.nレベル[k]    = levels[k];
-				node.score[i].譜面情報.nLevelIcon[k] = levelIcons[k];
+				node.score[i].ChartInfo.nLevel[k]    = levels[k];
+				node.score[i].ChartInfo.nLevelIcon[k] = levelIcons[k];
 			}
 		}
 
@@ -175,14 +175,14 @@ internal class CTci {
 		tja.strFolderPath = FolderPath;
 		tja.uniqueID      = UniqueID;
 		tja.bLoadChart    = true;
-		tja.n参照中の難易度              = difficulty;
-		tja.b譜面が存在する[difficulty]   = true;
+		tja.nReferenceDifficulty              = difficulty;
+		tja.bChartExists[difficulty]   = true;
 		tja.TITLE    = TITLE;
 		tja.SUBTITLE = SUBTITLE;
 		tja.MAKER    = MAKER;
 		tja.GENRE    = GENRE;
 		tja.SIDE     = SIDE;
-		tja.nデモBGMオフセット = (int)(SONGPREVIEW * 1000.0);
+		tja.nDemoBGMOffset = (int)(SONGPREVIEW * 1000.0);
 		tja.strBGM_PATH = bgmRelative;
 		if ((Difficulty)difficulty == Difficulty.Tower)
 			tja.LIFE = course.Life;
@@ -266,8 +266,8 @@ internal class CTci {
 
 		for (int ib = 0; ib < 3; ib++) {
 			tja.listBPM.Add(new CTja.CBPM {
-				n内部番号 = ib, n表記上の番号 = ib,
-				dbBPM値 = firstBpm,
+				nInternalNumber = ib, nNotationTopNumber = ib,
+				dbBPMValue = firstBpm,
 				bpm_change_time = 0.0, bpm_change_bmscroll_time = 0.0,
 				bpm_change_course = (CTja.ECourse)ib,
 			});
@@ -283,8 +283,8 @@ internal class CTci {
 			bmscroll += (tp.OffsetMs - prevTime) * prevBpm / 15000.0;
 			int idx = tja.listBPM.Count;
 			tja.listBPM.Add(new CTja.CBPM {
-				n内部番号 = idx, n表記上の番号 = idx,
-				dbBPM値 = bpm,
+				nInternalNumber = idx, nNotationTopNumber = idx,
+				dbBPMValue = bpm,
 				bpm_change_time = tp.OffsetMs,
 				bpm_change_bmscroll_time = bmscroll,
 				bpm_change_course = CTja.ECourse.eNormal,
@@ -300,14 +300,14 @@ internal class CTci {
 		var bgmChip = MakeChip(0x01, 0, bgmWavId);
 		ApplyChipState(bgmChip, osu, 0);
 		var cwav = new CTja.CWAV {
-			n内部番号 = bgmWavId, n表記上の番号 = bgmWavId,
+			nInternalNumber = bgmWavId, nNotationTopNumber = bgmWavId,
 			bIsBGMSound = true,
-			strファイル名 = bgmRelative, // relative — CTja prepends strFolderPath on load
-			strコメント文 = "BGM",
+			strFileName = bgmRelative, // relative — CTja prepends strFolderPath on load
+			strCommentText = "BGM",
 			PlayChip = bgmChip,
 			SongVol = CSound.DefaultSongVol,
 		};
-		cwav.listこのWAVを使用するチャンネル番号の集合.Add(0x01);
+		cwav.listThisWAVUseChannelNumberSet.Add(0x01);
 		if (!string.IsNullOrEmpty(bgmAbsolute))
 			cwav.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(bgmAbsolute);
 		tja.listWAV.Add(bgmWavId, cwav);
@@ -338,14 +338,14 @@ internal class CTci {
 			// Critically this includes 0x18 (EndRoll) — without it the engine never fires
 			// the roll-end chip and rolls run indefinitely on screen.
 			if (note.ChannelNo is >= 0x11 and <= 0x1F) {
-				chip.n整数値_内部番号 = tja.listNoteChip.Count;
+				chip.nIntValue_InternalNumber = tja.listNoteChip.Count;
 				tja.listNoteChip.Add(chip);
 			}
 			if (NotesManager.IsMissableNote((NotesManager.ENoteType)note.ChannelNo)) noteIdx++;
 		}
 
-		tja.nノーツ数_Common = noteIdx;
-		for (int ib = 0; ib < 3; ib++) tja.nノーツ数_Branch[ib] = noteIdx;
+		tja.nNotesCount_Common = noteIdx;
+		for (int ib = 0; ib < 3; ib++) tja.nNotesCount_Branch[ib] = noteIdx;
 
 		int lastMs = osu.Notes.Count > 0 ? osu.Notes.Max(n => n.TimeMs) : 0;
 		AddToAllBranches(tja, MakeChip(0xFF, lastMs + 2000, 0));
@@ -367,7 +367,7 @@ internal class CTci {
 			while (t < nextOffset && t <= maxTime) {
 				int timeMs = (int)Math.Round(t);
 				var bl = MakeChip(0x50, timeMs, 0);
-				bl.n整数値_内部番号 = measure++;
+				bl.nIntValue_InternalNumber = measure++;
 				ApplyChipState(bl, osu, timeMs);
 				tja.listChip.Add(bl);
 				tja.listBarLineChip.Add(bl);
@@ -384,9 +384,9 @@ internal class CTci {
 	}
 
 	private static CChip MakeChip(int channel, int timeMs, int intVal) {
-		var c = new CChip(); c.t初期化();
-		c.nChannelNo = channel; c.n発声時刻ms = timeMs; c.db発声時刻ms = timeMs;
-		c.n整数値 = intVal; c.n整数値_内部番号 = intVal; c.start = c; c.end = c;
+		var c = new CChip(); c.tInitialize();
+		c.nChannelNo = channel; c.nSoundTimems = timeMs; c.dbSoundTimems = timeMs;
+		c.nIntValue = intVal; c.nIntValue_InternalNumber = intVal; c.start = c; c.end = c;
 		c.bHideBarLine = false; // default is true; must be false or bar lines are never drawn
 		return c;
 	}

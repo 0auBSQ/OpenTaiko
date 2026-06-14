@@ -206,7 +206,7 @@ namespace OpenTaiko {
 			_player = -1;
 			_ownsCharacter = true;
 			string path = Path.Combine(
-				OpenTaiko.strEXEのあるフォルダ,
+				OpenTaiko.strEXEFolder,
 				TextureLoader.GLOBAL,
 				TextureLoader.CHARACTERS,
 				characterName);

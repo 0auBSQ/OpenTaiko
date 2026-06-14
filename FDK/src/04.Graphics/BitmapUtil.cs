@@ -24,17 +24,17 @@ public static class BitmapUtil {
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct BITMAPINFOHEADER {
 		public const int BI_RGB = 0;
-		public uint biSize構造体のサイズ;
-		public int biWidthビットマップの幅dot;
-		public int biHeightビットマップの高さdot;
-		public ushort biPlanes面の数;
+		public uint biSizeStructSize;
+		public int biWidthBitmapWidthdot;
+		public int biHeightBitmapHeightdot;
+		public ushort biPlanesPlaneCount;
 		public ushort biBitCount;
-		public uint biCompression圧縮形式;
-		public uint biSizeImage画像イメージのサイズ;
-		public int biXPelsPerMete水平方向の解像度;
-		public int biYPelsPerMeter垂直方向の解像度;
-		public uint biClrUsed色テーブルのインデックス数;
-		public uint biClrImportant表示に必要な色インデックスの数;
+		public uint biCompressionCompressFormat;
+		public uint biSizeImage;
+		public int biXPelsPerMeteHorizontalDirectionResolution;
+		public int biYPelsPerMeterVerticalDirectionResolution;
+		public uint biClrUsedColorTableIndexCount;
+		public uint biClrImportant;
 	}
 
 
@@ -45,7 +45,7 @@ public static class BitmapUtil {
 		BITMAPINFOHEADER* bitmapinfoheaderPtr = (BITMAPINFOHEADER*)pBITMAPINFOHEADER;
 		bitmapfileheader.bfType = 0x4d42;
 		bitmapfileheader.bfOffBits = (uint)(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
-		bitmapfileheader.bfSize = bitmapfileheader.bfOffBits + bitmapinfoheaderPtr->biSizeImage画像イメージのサイズ;
+		bitmapfileheader.bfSize = bitmapfileheader.bfOffBits + bitmapinfoheaderPtr->biSizeImage;
 		MemoryStream output = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(output);
 		byte[] destination = new byte[sizeof(BITMAPFILEHEADER)];
@@ -54,7 +54,7 @@ public static class BitmapUtil {
 		destination = new byte[sizeof(BITMAPINFOHEADER)];
 		Marshal.Copy(pBITMAPINFOHEADER, destination, 0, destination.Length);
 		writer.Write(destination);
-		destination = new byte[bitmapinfoheaderPtr->biSizeImage画像イメージのサイズ];
+		destination = new byte[bitmapinfoheaderPtr->biSizeImage];
 		bitmapinfoheaderPtr++;
 		Marshal.Copy((IntPtr)bitmapinfoheaderPtr, destination, 0, destination.Length);
 		writer.Write(destination);

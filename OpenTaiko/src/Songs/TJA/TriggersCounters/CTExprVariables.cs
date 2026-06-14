@@ -64,7 +64,7 @@
 				case "g":
 				case "gauge": {
 						var gs = OpenTaiko.stageGameScreen;
-						if (gs != null && expr._player >= 0) return gs.actGauge.db現在のゲージ値[expr._player];
+						if (gs != null && expr._player >= 0) return gs.actGauge.dbCurrentGaugeValue[expr._player];
 						break;
 					}
 				case "cc":
@@ -76,7 +76,7 @@
 				case "c":
 				case "mc": {
 						var gs = OpenTaiko.stageGameScreen;
-						if (gs != null && expr._player >= 0) return gs.actCombo.nCurrentCombo.最高値[expr._player];
+						if (gs != null && expr._player >= 0) return gs.actCombo.nCurrentCombo.MaxValue[expr._player];
 						break;
 					}
 
@@ -85,7 +85,7 @@
 						var gs = OpenTaiko.stageGameScreen;
 						if (gs != null && expr._player >= 0) {
 							int branch = (int)gs.nCurrentBranch[expr._player];
-							if (branch < _chart.nノーツ数_Branch.Length) return _chart.nノーツ数_Branch[branch];
+							if (branch < _chart.nNotesCount_Branch.Length) return _chart.nNotesCount_Branch[branch];
 						}
 						break;
 					}

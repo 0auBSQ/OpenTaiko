@@ -45,7 +45,7 @@ namespace OpenTaiko {
 		private static LuaTexture LoadTexture(string path) {
 			if (!File.Exists(path)) return new LuaTexture();
 			try {
-				return new LuaTexture(OpenTaiko.tテクスチャの生成(path));
+				return new LuaTexture(OpenTaiko.tTextureCreate(path));
 			} catch {
 				return new LuaTexture();
 			}

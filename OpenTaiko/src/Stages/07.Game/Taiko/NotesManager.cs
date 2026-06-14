@@ -305,10 +305,10 @@ class NotesManager {
 			case ENoteType.Ka:
 			case ENoteType.DonBig:
 			case ENoteType.KaBig:
-				OpenTaiko.Tx.Notes[(int)gt]?.t2D中心基準描画(x, y, new Rectangle(NoteTextureColumnFast(Lane) * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Notes[(int)gt]?.t2DCenterBasedDraw(x, y, new Rectangle(NoteTextureColumnFast(Lane) * OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
 			case ENoteType.Kadon:
-				OpenTaiko.Tx.Note_Swap?.t2D中心基準描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Note_Swap?.t2DCenterBasedDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_Notes_Size[1] * 3, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 				break;
 		}
 	}
@@ -326,30 +326,30 @@ class NotesManager {
 		EGameType _gt = GetChipGameType(chip, player);
 
 		if (IsMine(nt)) {
-			OpenTaiko.Tx.Note_Mine?.t2D描画(x, y);
+			OpenTaiko.Tx.Note_Mine?.t2DDraw(x, y);
 			return;
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			OpenTaiko.Tx.Note_Swap?.t2D描画(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			OpenTaiko.Tx.Note_Swap?.t2DDraw(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
 		} else if (IsKusudama(nt)) {
-			OpenTaiko.Tx.Note_Kusu?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+			OpenTaiko.Tx.Note_Kusu?.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 			return;
 		} else if (IsADLIB(nt)) {
 			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
 			if (puchichara.effect.ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
-				OpenTaiko.Tx.Note_Adlib?.t2D描画(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+				OpenTaiko.Tx.Note_Adlib?.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
 			return;
 		}
 
 		int noteType = NoteTextureColumn(chip, _gt);
-		OpenTaiko.Tx.Notes[(int)_gt]?.t2D描画(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+		OpenTaiko.Tx.Notes[(int)_gt]?.t2DDraw(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
 	}
 
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
-		Color4 normalColor, Color4 effectedColor, int x末端, int y末端, EStealthMode hiddenMode = EStealthMode.Off
+		Color4 normalColor, Color4 effectedColor, int xEnd, int yEnd, EStealthMode hiddenMode = EStealthMode.Off
 		) {
 		if (hiddenMode >= EStealthMode.Doron)
 			return;
@@ -383,9 +383,9 @@ class NotesManager {
 		if (_texarr == null) return;
 
 		if (chip.bShowRoll) {
-			var theta = -Math.Atan2(y末端 - y, x末端 - x);
+			var theta = -Math.Atan2(yEnd - y, xEnd - x);
 
-			var dist = Math.Sqrt(Math.Pow(x末端 - x, 2) + Math.Pow(y末端 - y, 2));
+			var dist = Math.Sqrt(Math.Pow(xEnd - x, 2) + Math.Pow(yEnd - y, 2));
 			var div = (dist + 2) / wImage; // + 2 (1 for head, 1 for back) to avoid the gap before tail
 
 			if (OpenTaiko.Skin.Game_RollColorMode != CSkin.RollColorMode.None)
@@ -395,10 +395,10 @@ class NotesManager {
 
 			// Body
 			_texarr.vcScaleRatio.X = (float)div;
-			_texarr.fZ軸中心回転 = (float)theta;
+			_texarr.fZAxisCenterRotate = (float)theta;
 
-			var _center_x = (x + x末端) / 2 + xHitNoteOffset;
-			var _center_y = (y + y末端) / 2 + yHitNoteOffset;
+			var _center_x = (x + xEnd) / 2 + xHitNoteOffset;
+			var _center_y = (y + yEnd) / 2 + yHitNoteOffset;
 			_texarr.t2D_DisplayImage_RollNote((int)_center_x, (int)_center_y, new Rectangle(
 				rollOrigin + OpenTaiko.Skin.Game_Notes_Size[0] + _offset,
 				0,
@@ -407,19 +407,19 @@ class NotesManager {
 
 			// Tail
 			_texarr.vcScaleRatio.X = 1.0f;
-			var _xc = x末端 + xHitNoteOffset;
-			var _yc = y末端 + yHitNoteOffset;
+			var _xc = xEnd + xHitNoteOffset;
+			var _yc = yEnd + yHitNoteOffset;
 			// notice that the texture for bar tail is centered at the mid-left of the image rect
 			// rotate around image rect center, find bar tail center relative to top-left of image rect
 			var xTailOrig = (Math.Cos(theta) * -wImage / 2) + wImage / 2;
 			var yTailOrig = (-Math.Sin(theta) * -wImage / 2) + hImage / 2;
-			_texarr.t2D描画((int)(_xc - xTailOrig), (int)(_yc - yTailOrig), 0, new Rectangle(
+			_texarr.t2DDraw((int)(_xc - xTailOrig), (int)(_yc - yTailOrig), 0, new Rectangle(
 				rollOrigin + (OpenTaiko.Skin.Game_Notes_Size[0] * 2) + _offset,
 				frame,
 				OpenTaiko.Skin.Game_Notes_Size[0],
 				OpenTaiko.Skin.Game_Notes_Size[1]));
 
-			_texarr.fZ軸中心回転 = 0;
+			_texarr.fZAxisCenterRotate = 0;
 		}
 
 		if (OpenTaiko.Skin.Game_RollColorMode == CSkin.RollColorMode.All)
@@ -428,7 +428,7 @@ class NotesManager {
 			_texarr.color4 = normalColor;
 
 		// Head
-		_texarr.t2D描画(x, y, 0, new Rectangle(rollOrigin + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+		_texarr.t2DDraw(x, y, 0, new Rectangle(rollOrigin + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 		_texarr.color4 = normalColor;
 	}
 
@@ -448,15 +448,15 @@ class NotesManager {
 		EGameType _gt = GetChipGameType(chip, player);
 
 		if (IsMine(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else if (IsFuzeRoll(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else if (IsKusudama(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 3, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 3, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		} else {
-			OpenTaiko.Tx.SENotes[(int)_gt]?.t2D描画(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * chip.nSenote, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			OpenTaiko.Tx.SENotes[(int)_gt]?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * chip.nSenote, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
 		}
 	}
 
@@ -477,19 +477,19 @@ class NotesManager {
 
 		if (player != OpenTaiko.ConfigIni.nPlayerCount - 1 && chip.multiLink?[player + 1, 0] != null) {
 			//downward link
-			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+			OpenTaiko.Tx.Notes_Arm?.t2DFlipVDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[0] + moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[0] + moveY);
-			OpenTaiko.Tx.Notes_Arm?.t2D上下反転描画(
+			OpenTaiko.Tx.Notes_Arm?.t2DFlipVDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[0] - moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[0] - moveY);
 		}
 		if (player != 0 && chip.multiLink?[player - 1, 0] != null) {
 			//upward link
-			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+			OpenTaiko.Tx.Notes_Arm?.t2DDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_X[1] + moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Left_Y[1] + moveY);
-			OpenTaiko.Tx.Notes_Arm?.t2D描画(
+			OpenTaiko.Tx.Notes_Arm?.t2DDraw(
 				x + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_X[1] - moveX,
 				y + OpenTaiko.Skin.Game_Notes_Arm_Offset_Right_Y[1] - moveY);
 		}

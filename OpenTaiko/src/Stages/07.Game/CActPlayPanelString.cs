@@ -5,13 +5,13 @@ using Color = System.Drawing.Color;
 
 namespace OpenTaiko;
 
-internal class CAct演奏パネル文字列 : CActivity {
+internal class CActPlayPanelString : CActivity {
 	public static int tToArgb(int r, int g, int b) {
 		return (b * 65536 + g * 256 + r);
 	}
 
 	// コンストラクタ
-	public CAct演奏パネル文字列() {
+	public CActPlayPanelString() {
 		base.IsDeActivated = true;
 		this.Start();
 	}
@@ -54,11 +54,11 @@ internal class CAct演奏パネル文字列 : CActivity {
 	/// <param name="stageText">曲数</param>
 	public void SetPanelString(string songName, string genreName, string stageText = null, CSongListNode songNode = null) {
 		if (base.IsActivated) {
-			OpenTaiko.tテクスチャの解放(ref this.txPanel);
+			OpenTaiko.tTextureRelease(ref this.txPanel);
 			if ((songName != null) && (songName.Length > 0)) {
 				try {
 					using (var bmpSongTitle = pfMusicName.DrawText(songName, OpenTaiko.Skin.Game_MusicName_ForeColor, OpenTaiko.Skin.Game_MusicName_BackColor, null, 30)) {
-						this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
+						this.txMusicName = OpenTaiko.tTextureCreate(bmpSongTitle, false);
 					}
 					if (txMusicName != null) {
 						this.txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName);
@@ -122,7 +122,7 @@ internal class CAct演奏パネル文字列 : CActivity {
 
 			this.ttkGENRE = new TitleTextureKey(genreName, this.pfGENRE, Color.White, Color.Black, 1000);
 
-			this.ct進行用 = new CCounter(0, 2000, 2, OpenTaiko.Timer);
+			this.ctForProgress = new CCounter(0, 2000, 2, OpenTaiko.Timer);
 			this.Start();
 
 
@@ -130,24 +130,24 @@ internal class CAct演奏パネル文字列 : CActivity {
 		}
 	}
 
-	public void t歌詞テクスチャを生成する(SKBitmap bmplyric) {
-		OpenTaiko.tDisposeSafely(ref this.tx歌詞テクスチャ);
-		this.tx歌詞テクスチャ = OpenTaiko.tテクスチャの生成(bmplyric);
+	public void tLyricsTextureCreate(SKBitmap bmplyric) {
+		OpenTaiko.tDisposeSafely(ref this.txLyricsTexture);
+		this.txLyricsTexture = OpenTaiko.tTextureCreate(bmplyric);
 	}
-	public void t歌詞テクスチャを削除する() {
-		OpenTaiko.tテクスチャの解放(ref this.tx歌詞テクスチャ);
+	public void tLyricsTextureRemove() {
+		OpenTaiko.tTextureRelease(ref this.txLyricsTexture);
 	}
 	/// <summary>
 	/// レイヤー管理のため、On進行描画から分離。
 	/// </summary>
-	public void t歌詞テクスチャを描画する() {
-		if (this.tx歌詞テクスチャ != null) {
+	public void tLyricsTextureDraw() {
+		if (this.txLyricsTexture != null) {
 			if (OpenTaiko.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Left) {
-				this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X, OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+				this.txLyricsTexture.t2DDraw(OpenTaiko.Skin.Game_Lyric_X, OpenTaiko.Skin.Game_Lyric_Y - (this.txLyricsTexture.szTextureSize.Height));
 			} else if (OpenTaiko.Skin.Game_Lyric_ReferencePoint == CSkin.ReferencePoint.Right) {
-				this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X - this.tx歌詞テクスチャ.szTextureSize.Width, OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+				this.txLyricsTexture.t2DDraw(OpenTaiko.Skin.Game_Lyric_X - this.txLyricsTexture.szTextureSize.Width, OpenTaiko.Skin.Game_Lyric_Y - (this.txLyricsTexture.szTextureSize.Height));
 			} else {
-				this.tx歌詞テクスチャ.t2D描画(OpenTaiko.Skin.Game_Lyric_X - (this.tx歌詞テクスチャ.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Lyric_Y - (this.tx歌詞テクスチャ.szTextureSize.Height));
+				this.txLyricsTexture.t2DDraw(OpenTaiko.Skin.Game_Lyric_X - (this.txLyricsTexture.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Lyric_Y - (this.txLyricsTexture.szTextureSize.Height));
 			}
 		}
 	}
@@ -165,21 +165,21 @@ internal class CAct演奏パネル文字列 : CActivity {
 	public override void Activate() {
 		this.pfMusicName = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_MusicName_FontSize);
 		this.txPanel = null;
-		this.ct進行用 = new CCounter();
+		this.ctForProgress = new CCounter();
 		this.Start();
 		this.bFirst = true;
 		base.Activate();
 	}
 	public override void DeActivate() {
-		this.ct進行用 = null;
+		this.ctForProgress = null;
 		OpenTaiko.tDisposeSafely(ref this.txPanel);
 		OpenTaiko.tDisposeSafely(ref this.txMusicName);
 		OpenTaiko.tDisposeSafely(ref this.txGENRE);
 		OpenTaiko.tDisposeSafely(ref this.pfGENRE);
 		OpenTaiko.tDisposeSafely(ref this.txPanel);
 		OpenTaiko.tDisposeSafely(ref this.pfMusicName);
-		OpenTaiko.tDisposeSafely(ref this.pf歌詞フォント);
-		OpenTaiko.tDisposeSafely(ref this.tx歌詞テクスチャ);
+		OpenTaiko.tDisposeSafely(ref this.pfLyricsFont);
+		OpenTaiko.tDisposeSafely(ref this.txLyricsTexture);
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
@@ -191,16 +191,16 @@ internal class CAct演奏パネル文字列 : CActivity {
 	public override int Draw() {
 		if (OpenTaiko.stageGameScreen.actDan.IsAnimating || OpenTaiko.ConfigIni.nPlayerCount > 2) return 0;
 		if (!base.IsDeActivated && !this.bMute) {
-			this.ct進行用.TickLoop();
+			this.ctForProgress.TickLoop();
 
 			if (this.txGENRE != null) {
-				this.txGENRE.t2D描画(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
-				TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Game_Genre_X + OpenTaiko.Skin.Game_GenreText_Offset[0], OpenTaiko.Skin.Game_Genre_Y + OpenTaiko.Skin.Game_GenreText_Offset[1]);
+				this.txGENRE.t2DDraw(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
+				TitleTextureKey.ResolveTitleTexture(this.ttkGENRE).t2DScaledCenterBasedDraw(OpenTaiko.Skin.Game_Genre_X + OpenTaiko.Skin.Game_GenreText_Offset[0], OpenTaiko.Skin.Game_Genre_Y + OpenTaiko.Skin.Game_GenreText_Offset[1]);
 			}
 			if (this.txStage != null)
-				this.txStage.t2D描画(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
+				this.txStage.t2DDraw(OpenTaiko.Skin.Game_Genre_X, OpenTaiko.Skin.Game_Genre_Y);
 
-			if (OpenTaiko.Skin.b現在のステージ数を表示しない) {
+			if (OpenTaiko.Skin.bCurrentStageCountDisplay) {
 				if (this.txMusicName != null) {
 					float fRate = (float)OpenTaiko.Skin.Game_MusicName_MaxWidth / this.txMusicName.szTextureSize.Width;
 					if (this.txMusicName.szTextureSize.Width <= OpenTaiko.Skin.Game_MusicName_MaxWidth)
@@ -208,23 +208,23 @@ internal class CAct演奏パネル文字列 : CActivity {
 
 					this.txMusicName.vcScaleRatio.X = fRate;
 
-					this.txMusicName.t2D描画(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
+					this.txMusicName.t2DDraw(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
 				}
 			} else {
 				#region[ 透明度制御 ]
 
-				if (this.ct進行用.CurrentValue < 745) {
+				if (this.ctForProgress.CurrentValue < 745) {
 					if (this.txStage != null)
 						this.txStage.Opacity = 0;
-				} else if (this.ct進行用.CurrentValue >= 745 && this.ct進行用.CurrentValue < 1000) {
+				} else if (this.ctForProgress.CurrentValue >= 745 && this.ctForProgress.CurrentValue < 1000) {
 					if (this.txStage != null)
-						this.txStage.Opacity = (this.ct進行用.CurrentValue - 745);
-				} else if (this.ct進行用.CurrentValue >= 1000 && this.ct進行用.CurrentValue <= 1745) {
+						this.txStage.Opacity = (this.ctForProgress.CurrentValue - 745);
+				} else if (this.ctForProgress.CurrentValue >= 1000 && this.ctForProgress.CurrentValue <= 1745) {
 					if (this.txStage != null)
 						this.txStage.Opacity = 255;
-				} else if (this.ct進行用.CurrentValue >= 1745) {
+				} else if (this.ctForProgress.CurrentValue >= 1745) {
 					if (this.txStage != null)
-						this.txStage.Opacity = 255 - (this.ct進行用.CurrentValue - 1745);
+						this.txStage.Opacity = 255 - (this.ctForProgress.CurrentValue - 1745);
 				}
 				#endregion
 
@@ -239,7 +239,7 @@ internal class CAct演奏パネル文字列 : CActivity {
 
 						this.txMusicName.vcScaleRatio.X = fRate;
 
-						this.txMusicName.t2D描画(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
+						this.txMusicName.t2DDraw(OpenTaiko.Skin.Game_MusicName_X - (this.txMusicName.szTextureSize.Width * fRate), OpenTaiko.Skin.Game_MusicName_Y);
 					}
 				}
 			}
@@ -264,7 +264,7 @@ internal class CAct演奏パネル文字列 : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private CCounter ct進行用;
+	private CCounter ctForProgress;
 
 	private CTexture txPanel;
 	private bool bMute;
@@ -275,9 +275,9 @@ internal class CAct演奏パネル文字列 : CActivity {
 	private CTexture txGENRE;
 	private CCachedFontRenderer pfGENRE;
 	private TitleTextureKey ttkGENRE;
-	private CTexture tx歌詞テクスチャ;
+	private CTexture txLyricsTexture;
 	private CCachedFontRenderer pfMusicName;
-	private CCachedFontRenderer pf歌詞フォント;
+	private CCachedFontRenderer pfLyricsFont;
 	//-----------------
 	#endregion
 }

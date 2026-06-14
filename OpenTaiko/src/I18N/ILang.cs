@@ -8,8 +8,8 @@ static internal class CLangManager {
 	// Cheap factory-like design pattern
 
 	private static void InitializeLangs() {
-		foreach (string path in Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)) {
-			string id = Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), path);
+		foreach (string path in Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEFolder, "Lang"), "*", SearchOption.TopDirectoryOnly)) {
+			string id = Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEFolder, "Lang"), path);
 			_langs.Add(id, CLang.GetCLang(id));
 		}
 	}

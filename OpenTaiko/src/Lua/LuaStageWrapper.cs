@@ -117,7 +117,7 @@
 
 		private int RequestExitStage(string transition, string? moduleName) {
 			this.eFadeOutReturnValue = _StringToReturnValue(transition, moduleName);
-			this.actFOtoTitle.tフェードアウト開始();
+			this.actFOtoTitle.tFadeOutStart();
 			base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 			return 0;
 		}

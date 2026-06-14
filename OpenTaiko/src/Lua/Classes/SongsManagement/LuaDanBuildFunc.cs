@@ -138,8 +138,8 @@ namespace OpenTaiko {
 			output.strFullPath = CTja.DanBuilderSentinelPath;
 			output.strFolderPath = "";           // all WAV strファイル名 will be absolute
 			output.bLoadChart = true;
-			output.n参照中の難易度 = (int)Difficulty.Dan;
-			output.b譜面が存在する[(int)Difficulty.Dan] = true;
+			output.nReferenceDifficulty = (int)Difficulty.Dan;
+			output.bChartExists[(int)Difficulty.Dan] = true;
 
 			// Global exams
 			for (int i = 0; i < CExamInfo.cMaxExam; i++) {
@@ -185,7 +185,7 @@ namespace OpenTaiko {
 				CScore? score = internalNode.score[diff];
 				if (score == null) continue;
 
-				string tjaPath = score.ファイル情報.ファイルの絶対パス ?? "";
+				string tjaPath = score.FileInfo.FileAbsolutePath ?? "";
 				if (!File.Exists(tjaPath)) continue;
 
 				// ── Parse source song ──────────────────────────────────────────
@@ -196,10 +196,10 @@ namespace OpenTaiko {
 
 				// BGM chip in source is the channel-0x01 chip that plays the audio.
 				CChip? srcBgmChip = src.listChip.FirstOrDefault(c => c.nChannelNo == 0x01);
-				double srcBgmTimeDb = srcBgmChip?.db発声時刻ms ?? 0.0;
+				double srcBgmTimeDb = srcBgmChip?.dbSoundTimems ?? 0.0;
 				// Initial BPM of this source chart — used for the animation-BPM chip emitted
 				// at the song boundary so character/puchichara animations run at the right speed.
-				double srcInitialBpm = src.listBPM.Count > 0 ? src.listBPM[0].dbBPM値 : 120.0;
+				double srcInitialBpm = src.listBPM.Count > 0 ? src.listBPM[0].dbBPMValue : 120.0;
 
 				// Anchor the shift on time 0 in the source — where #START would be.
 				// This means:
@@ -261,9 +261,9 @@ namespace OpenTaiko {
 					animBpmListIdx = output.listBPM.Count;
 					double th16AtAnimBpm = bmscrollAccum;   // th16 at nextsongTime+1.0
 					output.listBPM.Add(new CTja.CBPM {
-						n内部番号 = animBpmListIdx,
-						n表記上の番号 = animBpmListIdx,
-						dbBPM値 = srcInitialBpm,
+						nInternalNumber = animBpmListIdx,
+						nNotationTopNumber = animBpmListIdx,
+						dbBPMValue = srcInitialBpm,
 						bpm_change_time = songBoundaryTime + 1.0,
 						bpm_change_bmscroll_time = th16AtAnimBpm,
 						bpm_change_course = CTja.ECourse.eNormal,
@@ -281,11 +281,11 @@ namespace OpenTaiko {
 				if (!bpmSeeded) {
 					// Seed output.listBPM[0..2]: one sentinel per branch with this song's initial BPM.
 					for (int ib = 0; ib < 3; ib++) {
-						double branchBpm = (ib < src.listBPM.Count) ? src.listBPM[ib].dbBPM値 : 120.0;
+						double branchBpm = (ib < src.listBPM.Count) ? src.listBPM[ib].dbBPMValue : 120.0;
 						output.listBPM.Add(new CTja.CBPM {
-							n内部番号 = ib,
-							n表記上の番号 = ib,
-							dbBPM値 = branchBpm,
+							nInternalNumber = ib,
+							nNotationTopNumber = ib,
+							dbBPMValue = branchBpm,
 							bpm_change_time = 0.0,
 							bpm_change_bmscroll_time = 0.0,
 							bpm_change_course = (CTja.ECourse)ib,
@@ -310,9 +310,9 @@ namespace OpenTaiko {
 					var srcBpm = src.listBPM[bi];
 					int newIdx = output.listBPM.Count;
 					output.listBPM.Add(new CTja.CBPM {
-						n内部番号 = newIdx,
-						n表記上の番号 = srcBpm.n表記上の番号,
-						dbBPM値 = srcBpm.dbBPM値,
+						nInternalNumber = newIdx,
+						nNotationTopNumber = srcBpm.nNotationTopNumber,
+						dbBPMValue = srcBpm.dbBPMValue,
 						bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset,
 						bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum,
 						bpm_change_course = srcBpm.bpm_change_course,
@@ -328,8 +328,8 @@ namespace OpenTaiko {
 					var srcJpos = src.listJPOSSCROLL[ji];
 					int newIdx = output.listJPOSSCROLL.Count;
 					output.listJPOSSCROLL.Add(new CTja.CJPOSSCROLL {
-						n内部番号 = newIdx,
-						n表記上の番号 = srcJpos.n表記上の番号,
+						nInternalNumber = newIdx,
+						nNotationTopNumber = srcJpos.nNotationTopNumber,
 						msMoveDt = srcJpos.msMoveDt,
 						pxOrigX = srcJpos.pxOrigX,
 						pxOrigY = srcJpos.pxOrigY,
@@ -342,7 +342,7 @@ namespace OpenTaiko {
 
 				// ── BASEBPM: grab from the first song so character animations start correctly ──
 				if (!baseBpmSet) {
-					output.BASEBPM = src.BASEBPM > 0 ? src.BASEBPM : (src.listBPM.Count > 0 ? src.listBPM[0].dbBPM値 : 120.0);
+					output.BASEBPM = src.BASEBPM > 0 ? src.BASEBPM : (src.listBPM.Count > 0 ? src.listBPM[0].dbBPMValue : 120.0);
 					baseBpmSet = true;
 				}
 
@@ -352,11 +352,11 @@ namespace OpenTaiko {
 				// exactly mirroring how the real TJA parser emits it at the current
 				// cursor time before advancing by msDanNextSongDelay + MusicPreTimeMs.
 				var nextsongChip = new CChip();
-				nextsongChip.t初期化();
+				nextsongChip.tInitialize();
 				nextsongChip.nChannelNo = 0x9B;
-				nextsongChip.n整数値_内部番号 = si;
-				nextsongChip.n発声時刻ms = (int)Math.Round(nextsongTime);
-				nextsongChip.db発声時刻ms = nextsongTime;
+				nextsongChip.nIntValue_InternalNumber = si;
+				nextsongChip.nSoundTimems = (int)Math.Round(nextsongTime);
+				nextsongChip.dbSoundTimems = nextsongTime;
 				nextsongChip.nBranch = CTja.ECourse.eNormal;
 				nextsongChip.start = nextsongChip;
 				nextsongChip.end = nextsongChip;
@@ -370,11 +370,11 @@ namespace OpenTaiko {
 				// Here we only emit the chip that references it.
 				if (animBpmListIdx >= 0) {
 					var animBpmChip = new CChip();
-					animBpmChip.t初期化();
+					animBpmChip.tInitialize();
 					animBpmChip.nChannelNo = 0x9C;
-					animBpmChip.n整数値_内部番号 = animBpmListIdx;
-					animBpmChip.n発声時刻ms = (int)Math.Round(songBoundaryTime + 1.0);
-					animBpmChip.db発声時刻ms = songBoundaryTime + 1.0;
+					animBpmChip.nIntValue_InternalNumber = animBpmListIdx;
+					animBpmChip.nSoundTimems = (int)Math.Round(songBoundaryTime + 1.0);
+					animBpmChip.dbSoundTimems = songBoundaryTime + 1.0;
 					animBpmChip.start = animBpmChip;
 					animBpmChip.end = animBpmChip;
 					output.listChip.Add(animBpmChip);
@@ -383,18 +383,18 @@ namespace OpenTaiko {
 				// Absolute path of the source audio file.
 				string absoluteBgmPath = "";
 				if (srcBgmChip != null &&
-					src.listWAV.TryGetValue(srcBgmChip.n整数値_内部番号, out var srcBgmWav) &&
-					!string.IsNullOrEmpty(srcBgmWav.strファイル名)) {
-					absoluteBgmPath = Path.Combine(src.strFolderPath, srcBgmWav.strファイル名);
+					src.listWAV.TryGetValue(srcBgmChip.nIntValue_InternalNumber, out var srcBgmWav) &&
+					!string.IsNullOrEmpty(srcBgmWav.strFileName)) {
+					absoluteBgmPath = Path.Combine(src.strFolderPath, srcBgmWav.strFileName);
 				}
 
 				// ── Create output BGM chip ─────────────────────────────────────
 				int wavId = si + 1;
 				var bgmChip = new CChip();
-				bgmChip.t初期化();
+				bgmChip.tInitialize();
 				bgmChip.nChannelNo = 0x01;
-				bgmChip.n整数値 = wavId;
-				bgmChip.n整数値_内部番号 = wavId;
+				bgmChip.nIntValue = wavId;
+				bgmChip.nIntValue_InternalNumber = wavId;
 				// BGM chip fires at srcBgmTimeDb + accum.
 				// Since srcBgmTimeDb ≥ 0 and accum > nextsongTime, the BGM always fires
 				// after the song-boundary gate — it can never bleed into the previous song.
@@ -402,22 +402,22 @@ namespace OpenTaiko {
 				// Zero OFFSET:             srcBgmTimeDb = 0, BGM fires exactly at accum.
 				// Positive OFFSET:         srcBgmTimeDb = 0, first note after BGM start.
 				double bgmChipTimeDb = srcBgmTimeDb + offsetDb;
-				bgmChip.n発声時刻ms = (int)Math.Round(bgmChipTimeDb);
-				bgmChip.db発声時刻ms = bgmChipTimeDb;
+				bgmChip.nSoundTimems = (int)Math.Round(bgmChipTimeDb);
+				bgmChip.dbSoundTimems = bgmChipTimeDb;
 				bgmChip.start = bgmChip;
 				bgmChip.end = bgmChip;
 
 				// ── Create CWAV for this song's BGM ───────────────────────────
 				var cwav = new CTja.CWAV {
-					n内部番号 = wavId,
-					n表記上の番号 = wavId,
+					nInternalNumber = wavId,
+					nNotationTopNumber = wavId,
 					bIsBGMSound = true,
-					strファイル名 = absoluteBgmPath,
-					strコメント文 = $"DanBuilder BGM [{si + 1}]",
+					strFileName = absoluteBgmPath,
+					strCommentText = $"DanBuilder BGM [{si + 1}]",
 					PlayChip = bgmChip,
 					SongVol = CSound.DefaultSongVol,
 				};
-				cwav.listこのWAVを使用するチャンネル番号の集合.Add(0x01);
+				cwav.listThisWAVUseChannelNumberSet.Add(0x01);
 				if (!string.IsNullOrEmpty(absoluteBgmPath))
 					cwav.SongLoudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(absoluteBgmPath);
 
@@ -436,8 +436,8 @@ namespace OpenTaiko {
 					if (srcChip.nChannelNo == 0xFF) continue; // end-of-chart sentinel — one is appended after the last song
 
 					var newChip = (CChip)srcChip.Clone();
-					newChip.n発声時刻ms = srcChip.n発声時刻ms + offsetMs; // setter updates db too
-					newChip.db発声時刻ms = srcChip.db発声時刻ms + offsetDb;  // restore double precision
+					newChip.nSoundTimems = srcChip.nSoundTimems + offsetMs; // setter updates db too
+					newChip.dbSoundTimems = srcChip.dbSoundTimems + offsetDb;  // restore double precision
 					// Shift HBSCROLL/BMSCROLL position: fBMSCROLLTime is in the same 16th-beat
 					// units as bpm_change_bmscroll_time, so add bmscrollAccum (not offsetDb).
 					newChip.fBMSCROLLTime = srcChip.fBMSCROLLTime + bmscrollAccum;
@@ -445,15 +445,15 @@ namespace OpenTaiko {
 					// Remap BPM-referencing chips (0x08 = extended BPM, 0x9C = animation BPM)
 					// so they point to the correct entries in the output listBPM table.
 					if ((newChip.nChannelNo == 0x08 || newChip.nChannelNo == 0x9C) &&
-						bpmIdxMap.TryGetValue(newChip.n整数値_内部番号, out int remappedBpmIdx))
-						newChip.n整数値_内部番号 = remappedBpmIdx;
+						bpmIdxMap.TryGetValue(newChip.nIntValue_InternalNumber, out int remappedBpmIdx))
+						newChip.nIntValue_InternalNumber = remappedBpmIdx;
 
 					// Remap JPOSSCROLL chips (0xE2) so they point to the correct entry in
 					// output.listJPOSSCROLL. Without this the engine crashes with an out-of-range
 					// exception when the chip fires.
 					if (newChip.nChannelNo == 0xE2 &&
-						jposIdxMap.TryGetValue(newChip.n整数値_内部番号, out int remappedJposIdx))
-						newChip.n整数値_内部番号 = remappedJposIdx;
+						jposIdxMap.TryGetValue(newChip.nIntValue_InternalNumber, out int remappedJposIdx))
+						newChip.nIntValue_InternalNumber = remappedJposIdx;
 
 					chipMap[srcChip] = newChip;
 					clonedInOrder.Add(newChip);
@@ -510,8 +510,8 @@ namespace OpenTaiko {
 				// setting it on the head chip is sufficient to gate the whole roll.
 				foreach (var srcNoteChip in src.listNoteChip) {
 					if (chipMap.TryGetValue(srcNoteChip, out var clonedNoteChip)) {
-						clonedNoteChip.n整数値_内部番号 = output.listNoteChip.Count;
-						clonedNoteChip.msShowOffset = clonedNoteChip.n発声時刻ms - nextsongTime;
+						clonedNoteChip.nIntValue_InternalNumber = output.listNoteChip.Count;
+						clonedNoteChip.msShowOffset = clonedNoteChip.nSoundTimems - nextsongTime;
 						clonedNoteChip.msMoveOffset = double.PositiveInfinity; // always move at natural speed
 						clonedNoteChip.IsSuddenHideRoll = false;                  // don't hide roll bodies
 						output.listNoteChip.Add(clonedNoteChip);
@@ -578,7 +578,7 @@ namespace OpenTaiko {
 				// Anchoring on time 0, the last chip of song N in the Dan is at
 				// srcLastTimeDb + accum, so the next boundary is accum + srcLastTimeDb.
 				double srcLastTimeDb = src.listChip.Count > 0
-					? src.listChip.Max(c => c.db発声時刻ms)
+					? src.listChip.Max(c => c.dbSoundTimems)
 					: srcBgmTimeDb;
 				double srcDuration = srcLastTimeDb;   // anchor = time 0
 				nextsongTime = accum + srcDuration;
@@ -604,8 +604,8 @@ namespace OpenTaiko {
 						: src.listBPM[0];
 					double srcLastRawTimeDb = srcLastTimeDb - srcBpmOffset;   // strip OFFSET → raw chart time
 					double srcEndBmscroll = lastSrcBpm.bpm_change_bmscroll_time
-						+ (srcLastRawTimeDb - lastSrcBpm.bpm_change_time) * lastSrcBpm.dbBPM値 / 15000.0;
-					bmscrollAccum = bmscrollAccum + srcEndBmscroll + 1.0 * lastSrcBpm.dbBPM値 / 15000.0;
+						+ (srcLastRawTimeDb - lastSrcBpm.bpm_change_time) * lastSrcBpm.dbBPMValue / 15000.0;
+					bmscrollAccum = bmscrollAccum + srcEndBmscroll + 1.0 * lastSrcBpm.dbBPMValue / 15000.0;
 				}
 
 				// ── Inter-song gimmick resets ─────────────────────────────────────
@@ -619,22 +619,22 @@ namespace OpenTaiko {
 
 					CChip MakeReset(int channel) {
 						var c = new CChip();
-						c.t初期化();
+						c.tInitialize();
 						c.nChannelNo = channel;
-						c.n発声時刻ms = resetTimeMs;
-						c.db発声時刻ms = resetTime;
+						c.nSoundTimems = resetTimeMs;
+						c.dbSoundTimems = resetTime;
 						c.start = c; c.end = c;
 						return c;
 					}
 
 					// 0x9F  GOGOEND — ensure Gogo Time is off for the next song
 					var gogoEnd = MakeReset(0x9F);
-					gogoEnd.n整数値 = 1;
+					gogoEnd.nIntValue = 1;
 					output.listChip.Add(gogoEnd);
 
 					// 0xE0  BARLINEON (n整数値 = 2) — restore bar lines if a song hid them
 					var barlineOn = MakeReset(0xE0);
-					barlineOn.n整数値 = 2;
+					barlineOn.nIntValue = 2;
 					output.listChip.Add(barlineOn);
 
 					// 0x09  NMSCROLL — reset scroll mode to Normal.
@@ -658,15 +658,15 @@ namespace OpenTaiko {
 					// 0xE2  JPOSSCROLL — snap judgment frame back to default centre position
 					int jposResetIdx = output.listJPOSSCROLL.Count;
 					output.listJPOSSCROLL.Add(new CTja.CJPOSSCROLL {
-						n内部番号 = jposResetIdx,
-						n表記上の番号 = jposResetIdx,
+						nInternalNumber = jposResetIdx,
+						nNotationTopNumber = jposResetIdx,
 						pxOrigX = 0, pxOrigY = 0,
 						pxMoveDx = 0, pxMoveDy = 0,
 						msMoveDt = 0,
 					});
 					var jposReset = MakeReset(0xE2);
-					jposReset.n整数値 = jposResetIdx;
-					jposReset.n整数値_内部番号 = jposResetIdx;
+					jposReset.nIntValue = jposResetIdx;
+					jposReset.nIntValue_InternalNumber = jposResetIdx;
 					output.listJPOSSCROLL[jposResetIdx].chip = jposReset;
 					output.listChip.Add(jposReset);
 				}
@@ -680,15 +680,15 @@ namespace OpenTaiko {
 			// branch slots to the total note count across all Dan songs so the gauge
 			// initialises correctly instead of falling back to +1.2%/hit, -2.4%/miss.
 			int totalDanNotes = output.nDan_NotesCount.Sum();
-			output.nノーツ数_Branch[0] = totalDanNotes;
-			output.nノーツ数_Branch[1] = totalDanNotes;
-			output.nノーツ数_Branch[2] = totalDanNotes;
+			output.nNotesCount_Branch[0] = totalDanNotes;
+			output.nNotesCount_Branch[1] = totalDanNotes;
+			output.nNotesCount_Branch[2] = totalDanNotes;
 			// nノーツ数_Common is the total missable-note count for the whole Dan chart.
 			// GetTotalExamScore() reads this as nNotesMax for global exams; if it stays 0,
 			// amountRemainMax == 0 at game start → doFinalJudge fires immediately with
 			// gauge=0% → Failure before the player hits a single note.
 			// NOTE: is the lower bound of total missable-note count for branched Dan
-			output.nノーツ数_Common = totalDanNotes;
+			output.nNotesCount_Common = totalDanNotes;
 
 			// Add the two end-of-chart sentinel chips that the engine uses to know the Dan is done.
 			//   0xFF with n整数値=0    → sets isChartEnded[player] = true, continues chip loop
@@ -696,25 +696,25 @@ namespace OpenTaiko {
 			// Each source TJA normally has its own pair; we stripped those (they would fire after song 0
 			// and prematurely end the entire Dan). Now we add a single pair after the last song.
 			int lastDanChipMs = (output.pDan_LastChip.Length > 0 && output.pDan_LastChip[^1] != null)
-				? output.pDan_LastChip[^1]!.n発声時刻ms
+				? output.pDan_LastChip[^1]!.nSoundTimems
 				: (int)Math.Round(nextsongTime);
 
 			var chartEndChip = new CChip();
-			chartEndChip.t初期化();
+			chartEndChip.tInitialize();
 			chartEndChip.nChannelNo = 0xFF;
-			chartEndChip.n整数値 = 0;
-			chartEndChip.n発声時刻ms = lastDanChipMs + 2000;
-			chartEndChip.db発声時刻ms = lastDanChipMs + 2000.0;
+			chartEndChip.nIntValue = 0;
+			chartEndChip.nSoundTimems = lastDanChipMs + 2000;
+			chartEndChip.dbSoundTimems = lastDanChipMs + 2000.0;
 			chartEndChip.start = chartEndChip;
 			chartEndChip.end = chartEndChip;
 			output.listChip.Add(chartEndChip);
 
 			var gameFadeOutChip = new CChip();
-			gameFadeOutChip.t初期化();
+			gameFadeOutChip.tInitialize();
 			gameFadeOutChip.nChannelNo = 0xFF;
-			gameFadeOutChip.n整数値 = 0xFF;
-			gameFadeOutChip.n発声時刻ms = lastDanChipMs + 3000;
-			gameFadeOutChip.db発声時刻ms = lastDanChipMs + 3000.0;
+			gameFadeOutChip.nIntValue = 0xFF;
+			gameFadeOutChip.nSoundTimems = lastDanChipMs + 3000;
+			gameFadeOutChip.dbSoundTimems = lastDanChipMs + 3000.0;
 			gameFadeOutChip.start = gameFadeOutChip;
 			gameFadeOutChip.end = gameFadeOutChip;
 			output.listChip.Add(gameFadeOutChip);
@@ -745,16 +745,16 @@ namespace OpenTaiko {
 			// Fake CScore — the sentinel path tells the loading stage to use the
 			// pre-built CTja stored in OpenTaiko.DanBuilderPrebuiltTja.
 			var fakeScore = new CScore();
-			fakeScore.ファイル情報 = new CScore.STファイル情報(
+			fakeScore.FileInfo = new CScore.STFileInfo(
 				CTja.DanBuilderSentinelPath,
 				"",
 				DateTime.Now,
 				0L
 			);
-			fakeScore.譜面情報.タイトル = _title;
-			fakeScore.譜面情報.strサブタイトル = _subtitle;
-			fakeScore.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, 10 };
-			fakeScore.譜面情報.cDanTickColor = _danTickColor;
+			fakeScore.ChartInfo.Title = _title;
+			fakeScore.ChartInfo.strSubtitle = _subtitle;
+			fakeScore.ChartInfo.nLevel = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, 10 };
+			fakeScore.ChartInfo.cDanTickColor = _danTickColor;
 
 			node.score[(int)Difficulty.Dan] = fakeScore;
 			node.nLevel[(int)Difficulty.Dan] = 10;

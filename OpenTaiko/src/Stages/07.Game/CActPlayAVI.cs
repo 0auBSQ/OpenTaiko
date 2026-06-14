@@ -2,10 +2,10 @@
 
 namespace OpenTaiko;
 
-internal class CAct演奏AVI : CActivity {
+internal class CActPlayAVI : CActivity {
 	// コンストラクタ
 
-	public CAct演奏AVI() {
+	public CActPlayAVI() {
 		base.IsDeActivated = true;
 		this.isCutScene = false;
 	}
@@ -40,29 +40,29 @@ internal class CAct演奏AVI : CActivity {
 			if (this.rVD == null || !(this.isCutScene || this.rVD.bDrawing))
 				return 0;
 
-			this.rVD.GetNowFrame(ref this.tx描画用);
+			this.rVD.GetNowFrame(ref this.txDraw);
 
-			this.tx描画用.vcScaleRatio.X = this.ratio1;
-			this.tx描画用.vcScaleRatio.Y = this.ratio1;
+			this.txDraw.vcScaleRatio.X = this.ratio1;
+			this.txDraw.vcScaleRatio.Y = this.ratio1;
 
 			if (this.isCutScene || OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.BackgroundOnly)) {
-				this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Center, GameWindowSize.Width / 2, GameWindowSize.Height / 2);
+				this.txDraw.t2DScaledDraw(CTexture.RefPnt.Center, GameWindowSize.Width / 2, GameWindowSize.Height / 2);
 			}
 		}
 		return 0;
 	}
 
-	public void t窓表示() {
-		if (this.rVD == null || this.tx描画用 == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.WindowOnly))
+	public void tWindowDisplay() {
+		if (this.rVD == null || this.txDraw == null || !OpenTaiko.ConfigIni.eClipDispType.HasFlag(EClipDispType.WindowOnly))
 			return;
 
 		float[] fRatio = new float[] { (GameWindowSize.Width / 2) - 4.0f, (GameWindowSize.Height / 2) - 4.0f }; //中央下表示
 
 		float ratio = Math.Min((float)(fRatio[0] / this.rVD.FrameSize.Width), (float)(fRatio[1] / this.rVD.FrameSize.Height));
-		this.tx描画用.vcScaleRatio.X = ratio;
-		this.tx描画用.vcScaleRatio.Y = ratio;
+		this.txDraw.vcScaleRatio.X = ratio;
+		this.txDraw.vcScaleRatio.Y = ratio;
 
-		this.tx描画用.t2D拡大率考慮描画(CTexture.RefPnt.Down, GameWindowSize.Width / 2, GameWindowSize.Height);
+		this.txDraw.t2DScaledDraw(CTexture.RefPnt.Down, GameWindowSize.Width / 2, GameWindowSize.Height);
 	}
 
 	// CActivity 実装
@@ -71,9 +71,9 @@ internal class CAct演奏AVI : CActivity {
 		base.Activate();
 	}
 	public override void DeActivate() {
-		if (this.tx描画用 != null) {
-			this.tx描画用.Dispose();
-			this.tx描画用 = null;
+		if (this.txDraw != null) {
+			this.txDraw.Dispose();
+			this.txDraw = null;
 		}
 		base.DeActivate();
 	}
@@ -93,7 +93,7 @@ internal class CAct演奏AVI : CActivity {
 
 	private float ratio1;
 
-	private CTexture tx描画用;
+	private CTexture txDraw;
 
 	public CVideoDecoder? rVD;
 

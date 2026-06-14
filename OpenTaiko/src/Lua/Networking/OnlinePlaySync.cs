@@ -26,16 +26,16 @@ namespace OpenTaiko {
 			try {
 				if (_waitFont == null) _waitFont = HPrivateFastFont.tInstantiateMainFont(40);
 				if (_waitTex == null || _waitText != text) {
-					if (_waitTex != null) { var t = _waitTex; OpenTaiko.tテクスチャの解放(ref t); _waitTex = null; }
+					if (_waitTex != null) { var t = _waitTex; OpenTaiko.tTextureRelease(ref t); _waitTex = null; }
 					using var bmp = _waitFont.DrawText(text, Color.White, Color.Black, null, 30);
-					_waitTex = OpenTaiko.tテクスチャの生成(bmp, false); _waitText = text;
+					_waitTex = OpenTaiko.tTextureCreate(bmp, false); _waitText = text;
 				}
 				if (_waitTex != null)
-					_waitTex.t2D描画(OpenTaiko.Skin.Resolution[0] / 2 - (int)(_waitTex.szTextureSize.Width / 2), OpenTaiko.Skin.Resolution[1] / 2 - 30);
+					_waitTex.t2DDraw(OpenTaiko.Skin.Resolution[0] / 2 - (int)(_waitTex.szTextureSize.Width / 2), OpenTaiko.Skin.Resolution[1] / 2 - 30);
 			} catch { }
 		}
 
-		public static void Tick(CStage演奏画面共通 screen) {
+		public static void Tick(CStagePlayScreenCommon screen) {
 			var net = LuaNetworking.Active;
 			if (net == null || !net.PlaySyncActive) return;
 			try {
@@ -50,8 +50,8 @@ namespace OpenTaiko {
 					JObject o; try { o = JObject.Parse(json); } catch { continue; }
 					try {
 						if (o["s"] != null) screen.actScore.Set((double)o["s"], spot);
-						if (o["g"] != null && screen.actGauge?.db現在のゲージ値 != null && spot < screen.actGauge.db現在のゲージ値.Length)
-							screen.actGauge.db現在のゲージ値[spot] = (double)o["g"];
+						if (o["g"] != null && screen.actGauge?.dbCurrentGaugeValue != null && spot < screen.actGauge.dbCurrentGaugeValue.Length)
+							screen.actGauge.dbCurrentGaugeValue[spot] = (double)o["g"];
 						// snap the combo counter too, so a remote spot's combo tracks the wire like its score
 						if (o["co"] != null && screen.actCombo != null)
 							screen.actCombo.nCurrentCombo[spot] = (int)o["co"];
@@ -67,7 +67,7 @@ namespace OpenTaiko {
 					score = screen.actScore.GetDisplayedScore(0);
 					var cs = screen.CChartScore[0];
 					if (cs != null) { gr = cs.nGreat; gd = cs.nGood; ms = cs.nMiss; combo = cs.nCombo; acc = cs.GetScore(Exam.Type.Accuracy); }
-					gauge = screen.actGauge.db現在のゲージ値[0];
+					gauge = screen.actGauge.dbCurrentGaugeValue[0];
 				} catch { }
 				var p = new JObject { ["n"] = net.SelfPlayName, ["s"] = score, ["g"] = gauge, ["a"] = Math.Round(acc, 2), ["gr"] = gr, ["gd"] = gd, ["ms"] = ms, ["co"] = combo };
 				net.PushPlayScore(p.ToString(Newtonsoft.Json.Formatting.None));

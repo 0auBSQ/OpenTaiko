@@ -20,12 +20,12 @@ internal class CItemString : CItemBase {
 
 	public CItemString(string label, string currentValue, string description)
 		: base() {
-		t初期化(label, EPanelType.Normal, description);
-		e種別 = E種別.基本形;
+		tInitialize(label, EPanelType.Normal, description);
+		eType = EType.BasicForm;
 		_value = currentValue;
 		_epoch = 0;
 	}
 
-	public override object obj現在値() => _value ?? "";
+	public override object objCurrentValue() => _value ?? "";
 	public override int GetIndex() => _epoch;
 }

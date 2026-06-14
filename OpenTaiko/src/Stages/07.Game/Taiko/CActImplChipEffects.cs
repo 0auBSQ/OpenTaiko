@@ -16,11 +16,11 @@ internal class CActImplChipEffects : CActivity {
 	public virtual void Start(int nPlayer, NotesManager.ENoteType Lane, EGameType gameType) {
 		if (OpenTaiko.Tx.Gauge_Soul_Explosion != null && OpenTaiko.ConfigIni.nPlayerCount <= 2 && !OpenTaiko.ConfigIni.bAIBattleMode) {
 			for (int i = 0; i < 128; i++) {
-				if (!st[i].b使用中) {
-					st[i].b使用中 = true;
-					st[i].ct進行 = new CCounter(0, OpenTaiko.Skin.Game_Effect_NotesFlash[2], OpenTaiko.Skin.Game_Effect_NotesFlash_Timer, OpenTaiko.Timer);
+				if (!st[i].bUse) {
+					st[i].bUse = true;
+					st[i].ctProgress = new CCounter(0, OpenTaiko.Skin.Game_Effect_NotesFlash[2], OpenTaiko.Skin.Game_Effect_NotesFlash_Timer, OpenTaiko.Timer);
 					st[i].ctChipEffect = new CCounter(0, 24, 17, OpenTaiko.Timer);
-					st[i].nプレイヤー = nPlayer;
+					st[i].nPlayer = nPlayer;
 					st[i].Lane = Lane;
 					st[i].GameType = gameType;
 					break;
@@ -33,9 +33,9 @@ internal class CActImplChipEffects : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < 128; i++) {
-			st[i] = new STチップエフェクト {
-				b使用中 = false,
-				ct進行 = new CCounter(),
+			st[i] = new STChipEffect {
+				bUse = false,
+				ctProgress = new CCounter(),
 				ctChipEffect = new CCounter()
 			};
 		}
@@ -43,29 +43,29 @@ internal class CActImplChipEffects : CActivity {
 	}
 	public override void DeActivate() {
 		for (int i = 0; i < 128; i++) {
-			st[i].ct進行 = null;
+			st[i].ctProgress = null;
 			st[i].ctChipEffect = null;
-			st[i].b使用中 = false;
+			st[i].bUse = false;
 		}
 		base.DeActivate();
 	}
 	public override int Draw() {
 		for (int i = 0; i < 128; i++) {
-			if (st[i].b使用中) {
-				st[i].ct進行.Tick();
+			if (st[i].bUse) {
+				st[i].ctProgress.Tick();
 				st[i].ctChipEffect.Tick();
-				if (st[i].ct進行.IsEnded) {
-					st[i].ct進行.Stop();
-					st[i].b使用中 = false;
+				if (st[i].ctProgress.IsEnded) {
+					st[i].ctProgress.Stop();
+					st[i].bUse = false;
 				}
 
-				switch (st[i].nプレイヤー) {
+				switch (st[i].nPlayer) {
 					case 0:
-						OpenTaiko.Tx.Gauge_Soul_Explosion[OpenTaiko.P1IsBlue() ? 1 : 0]?.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[0], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0], new Rectangle(st[i].ct進行.CurrentValue * OpenTaiko.Skin.Game_Effect_NotesFlash[0], 0, OpenTaiko.Skin.Game_Effect_NotesFlash[0], OpenTaiko.Skin.Game_Effect_NotesFlash[1]));
+						OpenTaiko.Tx.Gauge_Soul_Explosion[OpenTaiko.P1IsBlue() ? 1 : 0]?.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[0], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0], new Rectangle(st[i].ctProgress.CurrentValue * OpenTaiko.Skin.Game_Effect_NotesFlash[0], 0, OpenTaiko.Skin.Game_Effect_NotesFlash[0], OpenTaiko.Skin.Game_Effect_NotesFlash[1]));
 
 						if (this.st[i].ctChipEffect.CurrentValue < 13)
 							NotesManager.DisplayNote(
-								st[i].nプレイヤー,
+								st[i].nPlayer,
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[0],
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[0],
 								st[i].Lane,
@@ -73,10 +73,10 @@ internal class CActImplChipEffects : CActivity {
 						break;
 
 					case 1:
-						OpenTaiko.Tx.Gauge_Soul_Explosion[1]?.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[1], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1], new Rectangle(st[i].ct進行.CurrentValue * OpenTaiko.Skin.Game_Effect_NotesFlash[0], 0, OpenTaiko.Skin.Game_Effect_NotesFlash[0], OpenTaiko.Skin.Game_Effect_NotesFlash[1]));
+						OpenTaiko.Tx.Gauge_Soul_Explosion[1]?.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[1], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1], new Rectangle(st[i].ctProgress.CurrentValue * OpenTaiko.Skin.Game_Effect_NotesFlash[0], 0, OpenTaiko.Skin.Game_Effect_NotesFlash[0], OpenTaiko.Skin.Game_Effect_NotesFlash[1]));
 						if (this.st[i].ctChipEffect.CurrentValue < 13)
 							NotesManager.DisplayNote(
-								st[i].nプレイヤー,
+								st[i].nPlayer,
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[1],
 								OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[1],
 								st[i].Lane,
@@ -93,12 +93,12 @@ internal class CActImplChipEffects : CActivity {
 					if (this.st[i].ctChipEffect.CurrentValue < 12) {
 						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
 						OpenTaiko.Tx.ChipEffect.Opacity = (int)(this.st[i].ctChipEffect.CurrentValue * (float)(225 / 11));
-						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+						OpenTaiko.Tx.ChipEffect.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nPlayer], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nPlayer], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					}
 					if (this.st[i].ctChipEffect.CurrentValue > 12 && this.st[i].ctChipEffect.CurrentValue < 24) {
 						OpenTaiko.Tx.ChipEffect.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 						OpenTaiko.Tx.ChipEffect.Opacity = 255 - (int)((this.st[i].ctChipEffect.CurrentValue - 10) * (float)(255 / 14));
-						OpenTaiko.Tx.ChipEffect.t2D中心基準描画(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nプレイヤー], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nプレイヤー], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+						OpenTaiko.Tx.ChipEffect.t2DCenterBasedDraw(OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_X[st[i].nPlayer], OpenTaiko.Skin.Game_Effect_FlyingNotes_EndPoint_Y[st[i].nPlayer], new Rectangle(laneXOffset * OpenTaiko.Skin.Game_Notes_Size[0], 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 					}
 				}
 
@@ -115,15 +115,15 @@ internal class CActImplChipEffects : CActivity {
 	//private CTexture[] txChara;
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct STチップエフェクト {
-		public bool b使用中;
-		public CCounter ct進行;
+	private struct STChipEffect {
+		public bool bUse;
+		public CCounter ctProgress;
 		public CCounter ctChipEffect;
-		public int nプレイヤー;
+		public int nPlayer;
 		public NotesManager.ENoteType Lane;
 		public EGameType GameType;
 	}
-	private STチップエフェクト[] st = new STチップエフェクト[128];
+	private STChipEffect[] st = new STChipEffect[128];
 
 	//-----------------
 	#endregion

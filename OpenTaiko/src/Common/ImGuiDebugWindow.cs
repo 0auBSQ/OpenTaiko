@@ -508,8 +508,8 @@ public static class ImGuiDebugWindow {
 									}
 									if (song.nLevel[(int)Difficulty.Tower] != -1) {
 										ImGui.Text($"Side: {song.nSide}");
-										ImGui.Text($"Floor Count: {song.score[5]?.譜面情報.nTotalFloor.ToString() ?? "???"}");
-										ImGui.Text($"Life: {song.score[5]?.譜面情報.nLife.ToString() ?? "?"}");
+										ImGui.Text($"Floor Count: {song.score[5]?.ChartInfo.nTotalFloor.ToString() ?? "???"}");
+										ImGui.Text($"Life: {song.score[5]?.ChartInfo.nLife.ToString() ?? "?"}");
 									}
 									ImGui.TreePop();
 								}
@@ -608,7 +608,7 @@ public static class ImGuiDebugWindow {
 									ImGui.SeparatorText("Tower Mode");
 									ImGui.Text("Side: " + dtx.SIDE);
 									ImGui.Text("Life: " + dtx.LIFE);
-									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].譜面情報.nTotalFloor);
+									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].ChartInfo.nTotalFloor);
 									break;
 								default:
 									ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
@@ -625,14 +625,14 @@ public static class ImGuiDebugWindow {
 								$"Difficulty: {game_difficulty} {dtx.PlayerSideMetadata.LEVELtaiko}{levelIcon}");
 							ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
-							var db現在時刻ms = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-							double play_time = dtx.TjaTimeToRawTjaTimeNote(db現在時刻ms);
+							var dbCurrentTimems = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+							double play_time = dtx.TjaTimeToRawTjaTimeNote(dbCurrentTimems);
 							var play_bpm_points = new[] {
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eNormal),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eNormal),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
 							};
-							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStage演奏画面共通.GetNowPBMTime(bp, play_time)).ToArray();
+							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStagePlayScreenCommon.GetNowPBMTime(bp, play_time)).ToArray();
 							for (int ib = 0; ib < 3; ++ib) {
 								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib] / 4:0.00} 16ths\n"
 									+ $" {play_bpm_points[ib]}\n");
@@ -649,7 +649,7 @@ public static class ImGuiDebugWindow {
 							if (dtx.listBPM.Count > 1) {
 								if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
 									foreach (CTja.CBPM bpm in dtx.listBPM) {
-										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPM値}");
+										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPMValue}");
 									}
 									ImGui.TreePop();
 								}
@@ -661,9 +661,9 @@ public static class ImGuiDebugWindow {
 
 							ImGui.Text("Note Count: ");
 							ImGui.Indent();
-							ImGui.Text("Normal: " + dtx.nノーツ数_Branch[0] +
-									   " / Expert: " + dtx.nノーツ数_Branch[1] +
-									   " / Master: " + dtx.nノーツ数_Branch[2]);
+							ImGui.Text("Normal: " + dtx.nNotesCount_Branch[0] +
+									   " / Expert: " + dtx.nNotesCount_Branch[1] +
+									   " / Master: " + dtx.nNotesCount_Branch[2]);
 							ImGui.Unindent();
 
 
@@ -808,7 +808,7 @@ public static class ImGuiDebugWindow {
 			ImGui.InputText("Path", ref reloadResourcePath, 2048);
 			if (ImGui.Button($"Update via. Path###TEXTURE_UPDATE_{label}") && texture != null) {
 				CTexture new_tex = new CTexture(reloadResourcePath, false);
-				texture.UpdateTexture(new_tex, new_tex.sz画像サイズ.Width, new_tex.sz画像サイズ.Height);
+				texture.UpdateTexture(new_tex, new_tex.szImageSize.Width, new_tex.szImageSize.Height);
 			}
 			if (texture != null && texture.Pointer != 0) {
 				if (ImGui.BeginCombo($"Texture Wrap Mode", texture.WrapMode.ToString())) {
@@ -845,7 +845,7 @@ public static class ImGuiDebugWindow {
 			ImGui.BeginDisabled(sound == null);
 			ImGui.InputText("Path", ref reloadResourcePath, 2048);
 			if (ImGui.Button($"Update via. Path###SOUND_UPDATE_{label}")) {
-				CSkin.CSystemSound new_snd = new(reloadResourcePath, sound.bLoop, sound.bExclusive, sound.bCompact対象, sound.SoundGroup);
+				CSkin.CSystemSound new_snd = new(reloadResourcePath, sound.bLoop, sound.bExclusive, sound.bCompactTarget, sound.SoundGroup);
 				sound.UpdateSound(new_snd);
 			}
 			ImGui.EndDisabled();
@@ -857,7 +857,7 @@ public static class ImGuiDebugWindow {
 			if (ImGui.BeginItemTooltip()) {
 				if (sound?.bLoadedSuccessfuly ?? false) {
 					DrawForImGui(sound, shouldPlay);
-					ImGui.Text($"Length: {sound.n長さ_現在のサウンド:0.###},{sound.n長さ_次に鳴るサウンド:0.###}");
+					ImGui.Text($"Length: {sound.nLength_CurrentSound:0.###},{sound.nLength_NextPlaySound:0.###}");
 					ImGui.Text("Memory allocated: " + String.Format("{0:0.###}", GetMemAllocationInMegabytes(GetResourceMemAllocation(sound))) + "MB");
 				} else {
 					ImGui.TextDisabled("Sound is not loaded.");
@@ -965,7 +965,7 @@ public static class ImGuiDebugWindow {
 	private static long GetResourceMemAllocation(CSkin.CSystemSound? sound, long orDefault = 0) {
 		if (sound == null || !sound.bLoadedSuccessfuly)
 			return orDefault;
-		return (long)Math.Ceiling((sound.n長さ_現在のサウンド + sound.n長さ_現在のサウンド) * SoundManager.nBytesPerSec / 1000);
+		return (long)Math.Ceiling((sound.nLength_CurrentSound + sound.nLength_CurrentSound) * SoundManager.nBytesPerSec / 1000);
 	}
 	private static long GetResourceMemAllocation<T>(T? resource, long orDefault = 0) {
 		return resource switch {

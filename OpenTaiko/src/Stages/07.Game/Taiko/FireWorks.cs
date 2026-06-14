@@ -62,7 +62,7 @@ internal class FireWorks : CActivity {
 			for (int i = 0; i < 32; i++) {
 				if (FireWork[i].IsUsing) {
 					FireWork[i].Counter.Tick();
-					OpenTaiko.Tx.Effects_Hit_FireWorks?.t2D中心基準描画((float)FireWork[i].X, (float)FireWork[i].Y, 1, new Rectangle(FireWork[i].Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
+					OpenTaiko.Tx.Effects_Hit_FireWorks?.t2DCenterBasedDraw((float)FireWork[i].X, (float)FireWork[i].Y, 1, new Rectangle(FireWork[i].Counter.CurrentValue * OpenTaiko.Skin.Game_Effect_FireWorks[0], 0, OpenTaiko.Skin.Game_Effect_FireWorks[0], OpenTaiko.Skin.Game_Effect_FireWorks[1]));
 					if (FireWork[i].Counter.IsEnded) {
 						FireWork[i].Counter.Stop();
 						FireWork[i].IsUsing = false;

@@ -2,10 +2,10 @@
 
 namespace OpenTaiko;
 
-internal class CAct演奏Combo音声 : CActivity {
+internal class CActPlayComboSound : CActivity {
 	// コンストラクタ
 
-	public CAct演奏Combo音声() {
+	public CActPlayComboSound() {
 		base.IsDeActivated = true;
 	}
 

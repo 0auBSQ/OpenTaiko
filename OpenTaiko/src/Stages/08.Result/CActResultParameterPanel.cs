@@ -8,154 +8,154 @@ internal class CActResultParameterPanel : CActivity {
 	// Constructor
 
 	public CActResultParameterPanel() {
-		ST文字位置[] st文字位置Array = new ST文字位置[11];
-		ST文字位置 st文字位置 = new ST文字位置();
-		st文字位置.ch = '0';
-		st文字位置.pt = new Point(0, 0);
-		st文字位置Array[0] = st文字位置;
-		ST文字位置 st文字位置2 = new ST文字位置();
-		st文字位置2.ch = '1';
-		st文字位置2.pt = new Point(32, 0);
-		st文字位置Array[1] = st文字位置2;
-		ST文字位置 st文字位置3 = new ST文字位置();
-		st文字位置3.ch = '2';
-		st文字位置3.pt = new Point(64, 0);
-		st文字位置Array[2] = st文字位置3;
-		ST文字位置 st文字位置4 = new ST文字位置();
-		st文字位置4.ch = '3';
-		st文字位置4.pt = new Point(96, 0);
-		st文字位置Array[3] = st文字位置4;
-		ST文字位置 st文字位置5 = new ST文字位置();
-		st文字位置5.ch = '4';
-		st文字位置5.pt = new Point(128, 0);
-		st文字位置Array[4] = st文字位置5;
-		ST文字位置 st文字位置6 = new ST文字位置();
-		st文字位置6.ch = '5';
-		st文字位置6.pt = new Point(160, 0);
-		st文字位置Array[5] = st文字位置6;
-		ST文字位置 st文字位置7 = new ST文字位置();
-		st文字位置7.ch = '6';
-		st文字位置7.pt = new Point(192, 0);
-		st文字位置Array[6] = st文字位置7;
-		ST文字位置 st文字位置8 = new ST文字位置();
-		st文字位置8.ch = '7';
-		st文字位置8.pt = new Point(224, 0);
-		st文字位置Array[7] = st文字位置8;
-		ST文字位置 st文字位置9 = new ST文字位置();
-		st文字位置9.ch = '8';
-		st文字位置9.pt = new Point(256, 0);
-		st文字位置Array[8] = st文字位置9;
-		ST文字位置 st文字位置10 = new ST文字位置();
-		st文字位置10.ch = '9';
-		st文字位置10.pt = new Point(288, 0);
-		st文字位置Array[9] = st文字位置10;
-		ST文字位置 st文字位置11 = new ST文字位置();
-		st文字位置11.ch = ' ';
-		st文字位置11.pt = new Point(0, 0);
-		st文字位置Array[10] = st文字位置11;
-		this.st小文字位置 = st文字位置Array;
+		STTextPosition[] stTextPositionArray = new STTextPosition[11];
+		STTextPosition stTextPosition = new STTextPosition();
+		stTextPosition.ch = '0';
+		stTextPosition.pt = new Point(0, 0);
+		stTextPositionArray[0] = stTextPosition;
+		STTextPosition stTextPosition2 = new STTextPosition();
+		stTextPosition2.ch = '1';
+		stTextPosition2.pt = new Point(32, 0);
+		stTextPositionArray[1] = stTextPosition2;
+		STTextPosition stTextPosition3 = new STTextPosition();
+		stTextPosition3.ch = '2';
+		stTextPosition3.pt = new Point(64, 0);
+		stTextPositionArray[2] = stTextPosition3;
+		STTextPosition stTextPosition4 = new STTextPosition();
+		stTextPosition4.ch = '3';
+		stTextPosition4.pt = new Point(96, 0);
+		stTextPositionArray[3] = stTextPosition4;
+		STTextPosition stTextPosition5 = new STTextPosition();
+		stTextPosition5.ch = '4';
+		stTextPosition5.pt = new Point(128, 0);
+		stTextPositionArray[4] = stTextPosition5;
+		STTextPosition stTextPosition6 = new STTextPosition();
+		stTextPosition6.ch = '5';
+		stTextPosition6.pt = new Point(160, 0);
+		stTextPositionArray[5] = stTextPosition6;
+		STTextPosition stTextPosition7 = new STTextPosition();
+		stTextPosition7.ch = '6';
+		stTextPosition7.pt = new Point(192, 0);
+		stTextPositionArray[6] = stTextPosition7;
+		STTextPosition stTextPosition8 = new STTextPosition();
+		stTextPosition8.ch = '7';
+		stTextPosition8.pt = new Point(224, 0);
+		stTextPositionArray[7] = stTextPosition8;
+		STTextPosition stTextPosition9 = new STTextPosition();
+		stTextPosition9.ch = '8';
+		stTextPosition9.pt = new Point(256, 0);
+		stTextPositionArray[8] = stTextPosition9;
+		STTextPosition stTextPosition10 = new STTextPosition();
+		stTextPosition10.ch = '9';
+		stTextPosition10.pt = new Point(288, 0);
+		stTextPositionArray[9] = stTextPosition10;
+		STTextPosition stTextPosition11 = new STTextPosition();
+		stTextPosition11.ch = ' ';
+		stTextPosition11.pt = new Point(0, 0);
+		stTextPositionArray[10] = stTextPosition11;
+		this.stSmallPosition = stTextPositionArray;
 
-		ST文字位置[] st文字位置Array2 = new ST文字位置[11];
-		ST文字位置 st文字位置12 = new ST文字位置();
-		st文字位置12.ch = '0';
-		st文字位置12.pt = new Point(0, 0);
-		st文字位置Array2[0] = st文字位置12;
-		ST文字位置 st文字位置13 = new ST文字位置();
-		st文字位置13.ch = '1';
-		st文字位置13.pt = new Point(32, 0);
-		st文字位置Array2[1] = st文字位置13;
-		ST文字位置 st文字位置14 = new ST文字位置();
-		st文字位置14.ch = '2';
-		st文字位置14.pt = new Point(64, 0);
-		st文字位置Array2[2] = st文字位置14;
-		ST文字位置 st文字位置15 = new ST文字位置();
-		st文字位置15.ch = '3';
-		st文字位置15.pt = new Point(96, 0);
-		st文字位置Array2[3] = st文字位置15;
-		ST文字位置 st文字位置16 = new ST文字位置();
-		st文字位置16.ch = '4';
-		st文字位置16.pt = new Point(128, 0);
-		st文字位置Array2[4] = st文字位置16;
-		ST文字位置 st文字位置17 = new ST文字位置();
-		st文字位置17.ch = '5';
-		st文字位置17.pt = new Point(160, 0);
-		st文字位置Array2[5] = st文字位置17;
-		ST文字位置 st文字位置18 = new ST文字位置();
-		st文字位置18.ch = '6';
-		st文字位置18.pt = new Point(192, 0);
-		st文字位置Array2[6] = st文字位置18;
-		ST文字位置 st文字位置19 = new ST文字位置();
-		st文字位置19.ch = '7';
-		st文字位置19.pt = new Point(224, 0);
-		st文字位置Array2[7] = st文字位置19;
-		ST文字位置 st文字位置20 = new ST文字位置();
-		st文字位置20.ch = '8';
-		st文字位置20.pt = new Point(256, 0);
-		st文字位置Array2[8] = st文字位置20;
-		ST文字位置 st文字位置21 = new ST文字位置();
-		st文字位置21.ch = '9';
-		st文字位置21.pt = new Point(288, 0);
-		st文字位置Array2[9] = st文字位置21;
-		ST文字位置 st文字位置22 = new ST文字位置();
-		st文字位置22.ch = '%';
-		st文字位置22.pt = new Point(0x37, 0);
-		st文字位置Array2[10] = st文字位置22;
-		this.st大文字位置 = st文字位置Array2;
+		STTextPosition[] stTextPositionArray2 = new STTextPosition[11];
+		STTextPosition stTextPosition12 = new STTextPosition();
+		stTextPosition12.ch = '0';
+		stTextPosition12.pt = new Point(0, 0);
+		stTextPositionArray2[0] = stTextPosition12;
+		STTextPosition stTextPosition13 = new STTextPosition();
+		stTextPosition13.ch = '1';
+		stTextPosition13.pt = new Point(32, 0);
+		stTextPositionArray2[1] = stTextPosition13;
+		STTextPosition stTextPosition14 = new STTextPosition();
+		stTextPosition14.ch = '2';
+		stTextPosition14.pt = new Point(64, 0);
+		stTextPositionArray2[2] = stTextPosition14;
+		STTextPosition stTextPosition15 = new STTextPosition();
+		stTextPosition15.ch = '3';
+		stTextPosition15.pt = new Point(96, 0);
+		stTextPositionArray2[3] = stTextPosition15;
+		STTextPosition stTextPosition16 = new STTextPosition();
+		stTextPosition16.ch = '4';
+		stTextPosition16.pt = new Point(128, 0);
+		stTextPositionArray2[4] = stTextPosition16;
+		STTextPosition stTextPosition17 = new STTextPosition();
+		stTextPosition17.ch = '5';
+		stTextPosition17.pt = new Point(160, 0);
+		stTextPositionArray2[5] = stTextPosition17;
+		STTextPosition stTextPosition18 = new STTextPosition();
+		stTextPosition18.ch = '6';
+		stTextPosition18.pt = new Point(192, 0);
+		stTextPositionArray2[6] = stTextPosition18;
+		STTextPosition stTextPosition19 = new STTextPosition();
+		stTextPosition19.ch = '7';
+		stTextPosition19.pt = new Point(224, 0);
+		stTextPositionArray2[7] = stTextPosition19;
+		STTextPosition stTextPosition20 = new STTextPosition();
+		stTextPosition20.ch = '8';
+		stTextPosition20.pt = new Point(256, 0);
+		stTextPositionArray2[8] = stTextPosition20;
+		STTextPosition stTextPosition21 = new STTextPosition();
+		stTextPosition21.ch = '9';
+		stTextPosition21.pt = new Point(288, 0);
+		stTextPositionArray2[9] = stTextPosition21;
+		STTextPosition stTextPosition22 = new STTextPosition();
+		stTextPosition22.ch = '%';
+		stTextPosition22.pt = new Point(0x37, 0);
+		stTextPositionArray2[10] = stTextPosition22;
+		this.stLargePosition = stTextPositionArray2;
 
-		ST文字位置[] stScore文字位置Array = new ST文字位置[10];
-		ST文字位置 stScore文字位置 = new ST文字位置();
-		stScore文字位置.ch = '0';
-		stScore文字位置.pt = new Point(0, 0);
-		stScore文字位置Array[0] = stScore文字位置;
-		ST文字位置 stScore文字位置2 = new ST文字位置();
-		stScore文字位置2.ch = '1';
-		stScore文字位置2.pt = new Point(51, 0);
-		stScore文字位置Array[1] = stScore文字位置2;
-		ST文字位置 stScore文字位置3 = new ST文字位置();
-		stScore文字位置3.ch = '2';
-		stScore文字位置3.pt = new Point(102, 0);
-		stScore文字位置Array[2] = stScore文字位置3;
-		ST文字位置 stScore文字位置4 = new ST文字位置();
-		stScore文字位置4.ch = '3';
-		stScore文字位置4.pt = new Point(153, 0);
-		stScore文字位置Array[3] = stScore文字位置4;
-		ST文字位置 stScore文字位置5 = new ST文字位置();
-		stScore文字位置5.ch = '4';
-		stScore文字位置5.pt = new Point(204, 0);
-		stScore文字位置Array[4] = stScore文字位置5;
-		ST文字位置 stScore文字位置6 = new ST文字位置();
-		stScore文字位置6.ch = '5';
-		stScore文字位置6.pt = new Point(255, 0);
-		stScore文字位置Array[5] = stScore文字位置6;
-		ST文字位置 stScore文字位置7 = new ST文字位置();
-		stScore文字位置7.ch = '6';
-		stScore文字位置7.pt = new Point(306, 0);
-		stScore文字位置Array[6] = stScore文字位置7;
-		ST文字位置 stScore文字位置8 = new ST文字位置();
-		stScore文字位置8.ch = '7';
-		stScore文字位置8.pt = new Point(357, 0);
-		stScore文字位置Array[7] = stScore文字位置8;
-		ST文字位置 stScore文字位置9 = new ST文字位置();
-		stScore文字位置9.ch = '8';
-		stScore文字位置9.pt = new Point(408, 0);
-		stScore文字位置Array[8] = stScore文字位置9;
-		ST文字位置 stScore文字位置10 = new ST文字位置();
-		stScore文字位置10.ch = '9';
-		stScore文字位置10.pt = new Point(459, 0);
-		stScore文字位置Array[9] = stScore文字位置10;
-		this.stScoreFont = stScore文字位置Array;
+		STTextPosition[] stScoreTextPositionArray = new STTextPosition[10];
+		STTextPosition stScoreTextPosition = new STTextPosition();
+		stScoreTextPosition.ch = '0';
+		stScoreTextPosition.pt = new Point(0, 0);
+		stScoreTextPositionArray[0] = stScoreTextPosition;
+		STTextPosition stScoreTextPosition2 = new STTextPosition();
+		stScoreTextPosition2.ch = '1';
+		stScoreTextPosition2.pt = new Point(51, 0);
+		stScoreTextPositionArray[1] = stScoreTextPosition2;
+		STTextPosition stScoreTextPosition3 = new STTextPosition();
+		stScoreTextPosition3.ch = '2';
+		stScoreTextPosition3.pt = new Point(102, 0);
+		stScoreTextPositionArray[2] = stScoreTextPosition3;
+		STTextPosition stScoreTextPosition4 = new STTextPosition();
+		stScoreTextPosition4.ch = '3';
+		stScoreTextPosition4.pt = new Point(153, 0);
+		stScoreTextPositionArray[3] = stScoreTextPosition4;
+		STTextPosition stScoreTextPosition5 = new STTextPosition();
+		stScoreTextPosition5.ch = '4';
+		stScoreTextPosition5.pt = new Point(204, 0);
+		stScoreTextPositionArray[4] = stScoreTextPosition5;
+		STTextPosition stScoreTextPosition6 = new STTextPosition();
+		stScoreTextPosition6.ch = '5';
+		stScoreTextPosition6.pt = new Point(255, 0);
+		stScoreTextPositionArray[5] = stScoreTextPosition6;
+		STTextPosition stScoreTextPosition7 = new STTextPosition();
+		stScoreTextPosition7.ch = '6';
+		stScoreTextPosition7.pt = new Point(306, 0);
+		stScoreTextPositionArray[6] = stScoreTextPosition7;
+		STTextPosition stScoreTextPosition8 = new STTextPosition();
+		stScoreTextPosition8.ch = '7';
+		stScoreTextPosition8.pt = new Point(357, 0);
+		stScoreTextPositionArray[7] = stScoreTextPosition8;
+		STTextPosition stScoreTextPosition9 = new STTextPosition();
+		stScoreTextPosition9.ch = '8';
+		stScoreTextPosition9.pt = new Point(408, 0);
+		stScoreTextPositionArray[8] = stScoreTextPosition9;
+		STTextPosition stScoreTextPosition10 = new STTextPosition();
+		stScoreTextPosition10.ch = '9';
+		stScoreTextPosition10.pt = new Point(459, 0);
+		stScoreTextPositionArray[9] = stScoreTextPosition10;
+		this.stScoreFont = stScoreTextPositionArray;
 
 		base.ChildActivities.Add(this.PuchiChara = new PuchiChara());
 
-		this.ptFullCombo位置 = new Point[] { new Point(0x80, 0xed), new Point(0xdf, 0xed), new Point(0x141, 0xed) };
+		this.ptFullComboPosition = new Point[] { new Point(0x80, 0xed), new Point(0xdf, 0xed), new Point(0x141, 0xed) };
 		base.IsDeActivated = true;
 	}
 
 
 	// メソッド
 
-	public void tアニメを完了させる() {
-		this.ct表示用.CurrentValue = (int)this.ct表示用.EndValue;
+	public void tAnimeComplete() {
+		this.ctDisplay.CurrentValue = (int)this.ctDisplay.EndValue;
 	}
 
 
@@ -163,14 +163,14 @@ internal class CActResultParameterPanel : CActivity {
 		OpenTaiko.stageResults.Background.SkipAnimation();
 		ctMainCounter.CurrentValue = (int)MountainAppearValue;
 
-		for (int i = 0; i < b音声再生.Length; i++) {
-			b音声再生[i] = true;
+		for (int i = 0; i < bAudioPlayback.Length; i++) {
+			bAudioPlayback[i] = true;
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!ctゲージアニメ[i].IsTicked)
-				ctゲージアニメ[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
-			ctゲージアニメ[i].CurrentValue = (int)ctゲージアニメ[i].EndValue;
+			if (!ctGaugeAnime[i].IsTicked)
+				ctGaugeAnime[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
+			ctGaugeAnime[i].CurrentValue = (int)ctGaugeAnime[i].EndValue;
 
 			CheckClear(i);
 		}
@@ -182,7 +182,7 @@ internal class CActResultParameterPanel : CActivity {
 	// CActivity 実装
 
 	public override void Activate() {
-		this.sdDTXで指定されたフルコンボ音 = null;
+		this.sdDTXSpecifiedFullComboSound = null;
 
 		ttkAISection = new TitleTextureKey[OpenTaiko.stageGameScreen.AIBattleSections.Count];
 		for (int i = 0; i < ttkAISection.Length; i++) {
@@ -213,11 +213,11 @@ internal class CActResultParameterPanel : CActivity {
 
 		ctMainCounter = new CCounter(0, 50000, 1, OpenTaiko.Timer);
 
-		ctゲージアニメ = new CCounter[5];
+		ctGaugeAnime = new CCounter[5];
 		for (int i = 0; i < 5; i++)
-			ctゲージアニメ[i] = new CCounter();
+			ctGaugeAnime[i] = new CCounter();
 
-		ct虹ゲージアニメ = new CCounter();
+		ctRainbowGaugeAnime = new CCounter();
 
 		ctSoul = new CCounter();
 
@@ -253,7 +253,7 @@ internal class CActResultParameterPanel : CActivity {
 
 		gaugeValues = new int[5];
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			gaugeValues[i] = (int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[i];
+			gaugeValues[i] = (int)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[i];
 		}
 
 		// Replace by max between 2 gauges if 2p
@@ -266,8 +266,8 @@ internal class CActResultParameterPanel : CActivity {
 		base.Activate();
 	}
 	public override void DeActivate() {
-		if (this.ct表示用 != null) {
-			this.ct表示用 = null;
+		if (this.ctDisplay != null) {
+			this.ctDisplay = null;
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -280,13 +280,13 @@ internal class CActResultParameterPanel : CActivity {
 			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_RESULT_CLEARFAILED);
 		}
 
-		for (int i = 0; i < this.b音声再生.Length; i++) {
-			b音声再生[i] = false;
+		for (int i = 0; i < this.bAudioPlayback.Length; i++) {
+			bAudioPlayback[i] = false;
 		}
 
-		if (this.sdDTXで指定されたフルコンボ音 != null) {
-			OpenTaiko.SoundManager.tDisposeSound(this.sdDTXで指定されたフルコンボ音);
-			this.sdDTXで指定されたフルコンボ音 = null;
+		if (this.sdDTXSpecifiedFullComboSound != null) {
+			OpenTaiko.SoundManager.tDisposeSound(this.sdDTXSpecifiedFullComboSound);
+			this.sdDTXSpecifiedFullComboSound = null;
 		}
 		base.DeActivate();
 	}
@@ -307,15 +307,15 @@ internal class CActResultParameterPanel : CActivity {
 			return 0;
 		}
 		if (base.IsFirstDraw) {
-			this.ct表示用 = new CCounter(0, 0x3e7, 2, OpenTaiko.Timer);
+			this.ctDisplay = new CCounter(0, 0x3e7, 2, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}
-		this.ct表示用.Tick();
+		this.ctDisplay.Tick();
 
 		ctMainCounter.Tick();
 
 		for (int i = 0; i < 5; i++)
-			ctゲージアニメ[i].Tick();
+			ctGaugeAnime[i].Tick();
 
 		ctEndAnime.Tick();
 		ctBackgroundAnime.TickLoop();
@@ -382,14 +382,14 @@ internal class CActResultParameterPanel : CActivity {
 
 				if (nLayoutPlayers <= 2) {
 					if (shiftPos == 0)
-						OpenTaiko.Tx.Result_Panel.t2D描画(0 + uioffset_x, 0);
+						OpenTaiko.Tx.Result_Panel.t2DDraw(0 + uioffset_x, 0);
 					else
-						OpenTaiko.Tx.Result_Panel_2P.t2D描画(0 + uioffset_x, 0);
+						OpenTaiko.Tx.Result_Panel_2P.t2DDraw(0 + uioffset_x, 0);
 				} else {
 					if (nLayoutPlayers == 5) {
-						OpenTaiko.Tx.Result_Panel_5P[i].t2D描画(OpenTaiko.Skin.Result_UIMove_5P_X[i], OpenTaiko.Skin.Result_UIMove_5P_Y[i]);
+						OpenTaiko.Tx.Result_Panel_5P[i].t2DDraw(OpenTaiko.Skin.Result_UIMove_5P_X[i], OpenTaiko.Skin.Result_UIMove_5P_Y[i]);
 					} else {
-						OpenTaiko.Tx.Result_Panel_4P[i].t2D描画(OpenTaiko.Skin.Result_UIMove_4P_X[i], OpenTaiko.Skin.Result_UIMove_4P_Y[i]);
+						OpenTaiko.Tx.Result_Panel_4P[i].t2DDraw(OpenTaiko.Skin.Result_UIMove_4P_X[i], OpenTaiko.Skin.Result_UIMove_4P_Y[i]);
 					}
 				}
 
@@ -422,34 +422,34 @@ internal class CActResultParameterPanel : CActivity {
 						gauge_base_y = OpenTaiko.Skin.Result_Gauge_Base_Y[pos];
 					}
 
-					OpenTaiko.Tx.Result_Diff_Bar.t2D描画(bar_x, bar_y,
+					OpenTaiko.Tx.Result_Diff_Bar.t2DDraw(bar_x, bar_y,
 						new RectangleF(0, OpenTaiko.SongMount.nChoosenSongDifficulty[i] * OpenTaiko.Skin.Result_DifficultyBar_Size[1], OpenTaiko.Skin.Result_DifficultyBar_Size[0], OpenTaiko.Skin.Result_DifficultyBar_Size[1]));
 
-					_frame.t2D描画(gauge_base_x, gauge_base_y);
+					_frame.t2DDraw(gauge_base_x, gauge_base_y);
 					_frame.vcScaleRatio.X = 1.0f;
 				}
 
 				if (ctMainCounter.CurrentValue >= 2000) {
 					#region [ Gauge updates ]
 
-					if (!b音声再生[0]) {
+					if (!bAudioPlayback[0]) {
 						OpenTaiko.Skin.soundGauge.tPlay();
-						b音声再生[0] = true;
+						bAudioPlayback[0] = true;
 					}
 
 					// Split gauge counter, one for each player in two
-					if (!ctゲージアニメ[i].IsTicked) {
-						ctゲージアニメ[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
+					if (!ctGaugeAnime[i].IsTicked) {
+						ctGaugeAnime[i].Start(0, gaugeValues[i] / 2, 59, OpenTaiko.Timer);
 						if (ctMainCounter.CurrentValue >= MountainAppearValue)
-							ctゲージアニメ[i].CurrentValue = (int)ctゲージアニメ[i].EndValue;
+							ctGaugeAnime[i].CurrentValue = (int)ctGaugeAnime[i].EndValue;
 					}
 
 
-					if (ctゲージアニメ[i].IsEnded) {
-						if (ctゲージアニメ[i].CurrentValue != 50) {
+					if (ctGaugeAnime[i].IsEnded) {
+						if (ctGaugeAnime[i].CurrentValue != 50) {
 							// Gauge didn't reach rainbow
 							if (nDrawnPlayers < 2
-								|| ctゲージアニメ[(i == 0) ? 1 : 0].IsEnded)
+								|| ctGaugeAnime[(i == 0) ? 1 : 0].IsEnded)
 								OpenTaiko.Skin.soundGauge.tStop();
 						} else {
 							// Gauge reached rainbow
@@ -457,18 +457,18 @@ internal class CActResultParameterPanel : CActivity {
 								OpenTaiko.Skin.soundGauge.tStop();
 							}
 
-							if (!ct虹ゲージアニメ.IsTicked)
-								ct虹ゲージアニメ.Start(0, OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn - 1, OpenTaiko.Skin.Result_Gauge_Rainbow_Interval, OpenTaiko.Timer);
+							if (!ctRainbowGaugeAnime.IsTicked)
+								ctRainbowGaugeAnime.Start(0, OpenTaiko.Skin.Result_Gauge_Rainbow_Ptn - 1, OpenTaiko.Skin.Result_Gauge_Rainbow_Interval, OpenTaiko.Timer);
 
 							if (!ctSoul.IsTicked)
 								ctSoul.Start(0, 8, 33, OpenTaiko.Timer);
 
-							ct虹ゲージアニメ.TickLoop();
+							ctRainbowGaugeAnime.TickLoop();
 							ctSoul.TickLoop();
 						}
 					}
 
-					HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctゲージアニメ[i].CurrentValue, ct虹ゲージアニメ.CurrentValue, ctSoul.CurrentValue, uioffset_x);
+					HGaugeMethods.UNSAFE_DrawResultGaugeFast(i, shiftPos, pos, ctGaugeAnime[i].CurrentValue, ctRainbowGaugeAnime.CurrentValue, ctSoul.CurrentValue, uioffset_x);
 
 					#endregion
 				}
@@ -488,7 +488,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.stageGameScreen.CChartScore[i].nGood,
 							OpenTaiko.stageGameScreen.CChartScore[i].nMiss,
 							OpenTaiko.stageGameScreen.CChartScore[i].nRoll,
-							OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[i],
+							OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[i],
 							OpenTaiko.stageGameScreen.CChartScore[i].nADLIB,
 							OpenTaiko.stageGameScreen.CChartScore[i].nMine,
 						};
@@ -579,17 +579,17 @@ internal class CActResultParameterPanel : CActivity {
 								OpenTaiko.Tx.Result_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount + (Interval * k) + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - (AnimeCount + (Interval * k))) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f;
 
 								if ((k != 5 || OpenTaiko.Skin.Result_ADLib_Show) && (k != 6 || OpenTaiko.Skin.Result_Bomb_Show)) {
-									this.t小文字表示(num_x[k][pos] + uioffset_x, num_y[k][pos], scoresArr[k], numScale);
+									this.tSmallDisplay(num_x[k][pos] + uioffset_x, num_y[k][pos], scoresArr[k], numScale);
 								}
 
 								OpenTaiko.Tx.Result_Number.vcScaleRatio.X = 1f;
 								OpenTaiko.Tx.Result_Number.vcScaleRatio.Y = 1f;
 
-								if (!this.b音声再生[1 + k]) {
+								if (!this.bAudioPlayback[1 + k]) {
 									if ((k != 5 || OpenTaiko.Skin.Result_ADLib_Show) && (k != 6 || OpenTaiko.Skin.Result_Bomb_Show)) {
 										OpenTaiko.Skin.soundPon.tPlay();
 									}
-									this.b音声再生[1 + k] = true;
+									this.bAudioPlayback[1 + k] = true;
 								}
 							} else
 								break;
@@ -623,11 +623,11 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.Y = ctMainCounter.CurrentValue <= AnimeCount1 + 270 ? 1.0f + (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1) / 1.5f * (Math.PI / 180)) * 0.65f :
 								ctMainCounter.CurrentValue <= AnimeCount1 + 360 ? 1.0f - (float)Math.Sin((ctMainCounter.CurrentValue - AnimeCount1 - 270) * (Math.PI / 180)) * 0.1f : 1.0f;
 
-							this.tスコア文字表示(score_x, score_y, (int)OpenTaiko.stageGameScreen.actScore.Get(i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
+							this.tScoreTextDisplay(score_x, score_y, (int)OpenTaiko.stageGameScreen.actScore.Get(i), numScale);// TJAPlayer3.stage演奏ドラム画面.CChartScore[i].nScore.ToString()));
 
-							if (!b音声再生[8]) {
+							if (!bAudioPlayback[8]) {
 								OpenTaiko.Skin.soundScoreDon.tPlay();
-								b音声再生[8] = true;
+								bAudioPlayback[8] = true;
 							}
 						}
 
@@ -647,7 +647,7 @@ internal class CActResultParameterPanel : CActivity {
 			}
 
 			if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				OpenTaiko.Tx.Result_AIBattle_Panel_AI.t2D描画(0, 0);
+				OpenTaiko.Tx.Result_AIBattle_Panel_AI.t2DDraw(0, 0);
 
 				int batch_width = OpenTaiko.Tx.Result_AIBattle_Batch.szTextureSize.Width / 3;
 				int batch_height = OpenTaiko.Tx.Result_AIBattle_Batch.szTextureSize.Height;
@@ -680,22 +680,22 @@ internal class CActResultParameterPanel : CActivity {
 							TitleTextureKey.ResolveTitleTexture(ttkAISection[i]).Opacity = 255 - opacityCounter;
 					}
 
-					OpenTaiko.Tx.Result_AIBattle_Batch.t2D描画(x, y, new RectangleF(batch_width * 0, 0, batch_width, batch_height));
+					OpenTaiko.Tx.Result_AIBattle_Batch.t2DDraw(x, y, new RectangleF(batch_width * 0, 0, batch_width, batch_height));
 
 					switch (section.End) {
-						case CStage演奏画面共通.AIBattleSection.EndType.Clear:
-							OpenTaiko.Tx.Result_AIBattle_Batch.t2D描画(x, y, new Rectangle(batch_width * 1, 0, batch_width, batch_height));
+						case CStagePlayScreenCommon.AIBattleSection.EndType.Clear:
+							OpenTaiko.Tx.Result_AIBattle_Batch.t2DDraw(x, y, new Rectangle(batch_width * 1, 0, batch_width, batch_height));
 							break;
-						case CStage演奏画面共通.AIBattleSection.EndType.Lose:
-							OpenTaiko.Tx.Result_AIBattle_Batch.t2D描画(x, y, new Rectangle(batch_width * 2, 0, batch_width, batch_height));
+						case CStagePlayScreenCommon.AIBattleSection.EndType.Lose:
+							OpenTaiko.Tx.Result_AIBattle_Batch.t2DDraw(x, y, new Rectangle(batch_width * 2, 0, batch_width, batch_height));
 							break;
 					}
 
 					OpenTaiko.Tx.Result_AIBattle_Batch.Opacity = 255;
 
-					OpenTaiko.Tx.Result_AIBattle_SectionPlate.t2D描画(x + OpenTaiko.Skin.Result_AIBattle_SectionPlate_Offset[0], y + OpenTaiko.Skin.Result_AIBattle_SectionPlate_Offset[1]);
+					OpenTaiko.Tx.Result_AIBattle_SectionPlate.t2DDraw(x + OpenTaiko.Skin.Result_AIBattle_SectionPlate_Offset[0], y + OpenTaiko.Skin.Result_AIBattle_SectionPlate_Offset[1]);
 
-					TitleTextureKey.ResolveTitleTexture(ttkAISection[i])?.t2D中心基準描画(x + OpenTaiko.Skin.Result_AIBattle_SectionText_Offset[0], y + OpenTaiko.Skin.Result_AIBattle_SectionText_Offset[1]);
+					TitleTextureKey.ResolveTitleTexture(ttkAISection[i])?.t2DCenterBasedDraw(x + OpenTaiko.Skin.Result_AIBattle_SectionText_Offset[0], y + OpenTaiko.Skin.Result_AIBattle_SectionText_Offset[1]);
 				}
 
 				if (ctMainCounter.CurrentValue >= MountainAppearValue) {
@@ -706,7 +706,7 @@ internal class CActResultParameterPanel : CActivity {
 					tex.vcScaleRatio.X = flagScale;
 					tex.vcScaleRatio.Y = flagScale;
 
-					tex.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Result_AIBattle_WinFlag[0], OpenTaiko.Skin.Result_AIBattle_WinFlag[1]);
+					tex.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_AIBattle_WinFlag[0], OpenTaiko.Skin.Result_AIBattle_WinFlag[1]);
 				}
 			}
 
@@ -826,7 +826,7 @@ internal class CActResultParameterPanel : CActivity {
 
 				//this.PuchiChara.On進行描画(ttps, 562, false, 255, false, p);
 
-				this.PuchiChara.On進行描画(puchi_x, puchi_y, false, 255, false, p);
+				this.PuchiChara.OnProgressDraw(puchi_x, puchi_y, false, 255, false, p);
 
 				#endregion
 
@@ -838,14 +838,14 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Cherry blossom animation]
 
-					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nLayoutPlayers <= 2) {
+					if (OpenTaiko.stageResults.nClear[p] >= 1 && nLayoutPlayers <= 2) {
 						OpenTaiko.Tx.Result_Flower.vcScaleRatio.X = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 						OpenTaiko.Tx.Result_Flower.vcScaleRatio.Y = 0.6f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 
 						int flower_width = OpenTaiko.Tx.Result_Flower.szTextureSize.Width;
 						int flower_height = OpenTaiko.Tx.Result_Flower.szTextureSize.Height / 2;
 
-						OpenTaiko.Tx.Result_Flower.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Result_Flower_X[pos], OpenTaiko.Skin.Result_Flower_Y[pos],
+						OpenTaiko.Tx.Result_Flower.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_Flower_X[pos], OpenTaiko.Skin.Result_Flower_Y[pos],
 							new Rectangle(0, 0, flower_width, flower_height));
 					}
 
@@ -853,7 +853,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Cherry blossom Rotating flowers]
 
-					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nLayoutPlayers <= 2) {
+					if (OpenTaiko.stageResults.nClear[p] >= 1 && nLayoutPlayers <= 2) {
 						float FlowerTime = ctRotate_Flowers.CurrentValue;
 
 						for (int i = 0; i < 5; i++) {
@@ -875,9 +875,9 @@ internal class CActResultParameterPanel : CActivity {
 
 							OpenTaiko.Tx.Result_Flower_Rotate[i].vcScaleRatio.X = 0.6f;
 							OpenTaiko.Tx.Result_Flower_Rotate[i].vcScaleRatio.Y = 0.6f;
-							OpenTaiko.Tx.Result_Flower_Rotate[i].fZ軸中心回転 = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
+							OpenTaiko.Tx.Result_Flower_Rotate[i].fZAxisCenterRotate = (float)(FlowerTime - ApparitionTimeStamps[i]) / (FlowerRotationSpeeds[i] * 360f);
 
-							OpenTaiko.Tx.Result_Flower_Rotate[i].t2D中心基準描画(OpenTaiko.Skin.Result_Flower_Rotate_X[pos][i], OpenTaiko.Skin.Result_Flower_Rotate_Y[pos][i]);
+							OpenTaiko.Tx.Result_Flower_Rotate[i].t2DCenterBasedDraw(OpenTaiko.Skin.Result_Flower_Rotate_X[pos][i], OpenTaiko.Skin.Result_Flower_Rotate_Y[pos][i]);
 						}
 
 					}
@@ -886,7 +886,7 @@ internal class CActResultParameterPanel : CActivity {
 
 					#region [Panel shines]
 
-					if (OpenTaiko.stageResults.nクリア[p] >= 1 && nLayoutPlayers <= 2) {
+					if (OpenTaiko.stageResults.nClear[p] >= 1 && nLayoutPlayers <= 2) {
 						int ShineTime = (int)ctShine_Plate.CurrentValue;
 						int Quadrant500 = ShineTime % 500;
 
@@ -901,7 +901,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_Shine.vcScaleRatio.X = 0.15f;
 							OpenTaiko.Tx.Result_Shine.vcScaleRatio.Y = 0.15f;
 
-							OpenTaiko.Tx.Result_Shine.t2D中心基準描画(OpenTaiko.Skin.Result_PlateShine_X[pos][i], OpenTaiko.Skin.Result_PlateShine_Y[pos][i]);
+							OpenTaiko.Tx.Result_Shine.t2DCenterBasedDraw(OpenTaiko.Skin.Result_PlateShine_X[pos][i], OpenTaiko.Skin.Result_PlateShine_Y[pos][i]);
 						}
 
 					}
@@ -915,19 +915,19 @@ internal class CActResultParameterPanel : CActivity {
 					int Mood = 0;
 					int MoodV2 = 0;
 
-					if (OpenTaiko.stageResults.nクリア[p] == 4) {
+					if (OpenTaiko.stageResults.nClear[p] == 4) {
 						Mood = 3;
 						MoodV2 = 5;
-					} else if (OpenTaiko.stageResults.nクリア[p] == 3) {
+					} else if (OpenTaiko.stageResults.nClear[p] == 3) {
 						Mood = 3;
 						MoodV2 = 4;
-					} else if (OpenTaiko.stageResults.nクリア[p] >= 1) {
+					} else if (OpenTaiko.stageResults.nClear[p] >= 1) {
 						if (gaugeValues[p] >= 100.0f) {
 							Mood = MoodV2 = 3;
 						} else {
 							Mood = MoodV2 = 2;
 						}
-					} else if (OpenTaiko.stageResults.nクリア[p] == 0) {
+					} else if (OpenTaiko.stageResults.nClear[p] == 0) {
 						if (gaugeValues[p] >= 40.0f) {
 							Mood = MoodV2 = 1;
 						} else {
@@ -941,7 +941,7 @@ internal class CActResultParameterPanel : CActivity {
 
 						OpenTaiko.Tx.Result_Speech_Bubble[pos].vcScaleRatio.X = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 						OpenTaiko.Tx.Result_Speech_Bubble[pos].vcScaleRatio.Y = 0.9f * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble[pos].t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Result_Speech_Bubble_X[pos], OpenTaiko.Skin.Result_Speech_Bubble_Y[pos],
+						OpenTaiko.Tx.Result_Speech_Bubble[pos].t2DScaledCenterBasedDraw(OpenTaiko.Skin.Result_Speech_Bubble_X[pos], OpenTaiko.Skin.Result_Speech_Bubble_Y[pos],
 							new Rectangle(Mood * speechBuddle_width, RandomText * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 					}
 					int speech_vubble_index = nLayoutPlayers <= 2 ? pos : 2;
@@ -972,20 +972,20 @@ internal class CActResultParameterPanel : CActivity {
 
 						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vcScaleRatio.X = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
 						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].vcScaleRatio.Y = 0.9f * scale * (ctMainCounter.CurrentValue <= MountainAppearValue + AddCount ? 1.3f - (float)Math.Sin((ctMainCounter.CurrentValue - MountainAppearValue) / (AddCount / 90) * (Math.PI / 180)) * 0.3f : 1.0f);
-						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2D拡大率考慮中央基準描画(speech_bubble_x, speech_bubble_y,
+						OpenTaiko.Tx.Result_Speech_Bubble_V2[speech_vubble_index].t2DScaledCenterBasedDraw(speech_bubble_x, speech_bubble_y,
 							new Rectangle(0, MoodV2 * speechBuddle_height, speechBuddle_width, speechBuddle_height));
 
 						TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.X = scale;
 						TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).vcScaleRatio.Y = scale;
-						TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2D拡大率考慮中央基準描画(
+						TitleTextureKey.ResolveTitleTexture(ttkSpeechText[p][MoodV2]).t2DScaledCenterBasedDraw(
 							speech_bubble_x + (int)(OpenTaiko.Skin.Result_Speech_Text_Offset[0] * scale),
 							speech_bubble_y + (int)(OpenTaiko.Skin.Result_Speech_Text_Offset[1] * scale));
 					}
-					if (!b音声再生[11]) {
+					if (!bAudioPlayback[11]) {
 						CheckClear(p);
 
 						if (p == nDrawnPlayers - 1)
-							b音声再生[11] = true;
+							bAudioPlayback[11] = true;
 					}
 
 					#endregion
@@ -1017,7 +1017,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_ScoreRankEffect.vcScaleRatio.Y = 1f;
 						}
 
-						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageResults.nスコアランク[p] > 0) {
+						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.stageResults.nScoreRank[p] > 0) {
 							int CurrentFlash = 0;
 							int[] FlashTimes = { 1500, 1540, 1580, 1620, 1660, 1700, 1740, 1780 };
 
@@ -1042,12 +1042,12 @@ internal class CActResultParameterPanel : CActivity {
 								scoreRankEffect_y = OpenTaiko.Skin.Result_ScoreRankEffect_Y[pos];
 							}
 
-							OpenTaiko.Tx.Result_ScoreRankEffect.t2D拡大率考慮中央基準描画(scoreRankEffect_x, scoreRankEffect_y,
-								new Rectangle((OpenTaiko.stageResults.nスコアランク[p] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
+							OpenTaiko.Tx.Result_ScoreRankEffect.t2DScaledCenterBasedDraw(scoreRankEffect_x, scoreRankEffect_y,
+								new Rectangle((OpenTaiko.stageResults.nScoreRank[p] - 1) * scoreRank_width, CurrentFlash * scoreRank_height, scoreRank_width, scoreRank_height));
 
-							if (!b音声再生[9] && ctMainCounter.CurrentValue >= ScoreApparitionTimeStamp + 1180) {
+							if (!bAudioPlayback[9] && ctMainCounter.CurrentValue >= ScoreApparitionTimeStamp + 1180) {
 								OpenTaiko.Skin.soundRankIn.tPlay();
-								b音声再生[9] = true;
+								bAudioPlayback[9] = true;
 							}
 						}
 
@@ -1077,7 +1077,7 @@ internal class CActResultParameterPanel : CActivity {
 							OpenTaiko.Tx.Result_CrownEffect.vcScaleRatio.Y = 1f;
 						}
 
-						int ClearType = OpenTaiko.stageResults.nクリア[p] - 1;
+						int ClearType = OpenTaiko.stageResults.nClear[p] - 1;
 
 						if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)(Difficulty.Dan) && ClearType >= 0) {
 							int CurrentFlash = 0;
@@ -1104,12 +1104,12 @@ internal class CActResultParameterPanel : CActivity {
 								crownEffect_y = OpenTaiko.Skin.Result_CrownEffect_Y[pos];
 							}
 
-							OpenTaiko.Tx.Result_CrownEffect.t2D拡大率考慮中央基準描画(crownEffect_x, crownEffect_y,
+							OpenTaiko.Tx.Result_CrownEffect.t2DScaledCenterBasedDraw(crownEffect_x, crownEffect_y,
 								new Rectangle(ClearType * crownEffect_width, CurrentFlash * crownEffect_height, crownEffect_width, crownEffect_height));
 
-							if (!b音声再生[10] && ctMainCounter.CurrentValue >= ScoreApparitionTimeStamp + 2680) {
+							if (!bAudioPlayback[10] && ctMainCounter.CurrentValue >= ScoreApparitionTimeStamp + 2680) {
 								OpenTaiko.Skin.soundCrownIn.tPlay();
-								b音声再生[10] = true;
+								bAudioPlayback[10] = true;
 							}
 						}
 
@@ -1125,7 +1125,7 @@ internal class CActResultParameterPanel : CActivity {
 			#endregion
 		}
 
-		if (!this.ct表示用.IsEnded) {
+		if (!this.ctDisplay.IsEnded) {
 			return 0;
 		}
 		return 1;
@@ -1138,14 +1138,14 @@ internal class CActResultParameterPanel : CActivity {
 	#region [ private ]
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST文字位置 {
+	private struct STTextPosition {
 		public char ch;
 		public Point pt;
 	}
 
 	public CCounter ctMainCounter;
-	public CCounter[] ctゲージアニメ;
-	private CCounter ct虹ゲージアニメ;
+	public CCounter[] ctGaugeAnime;
+	private CCounter ctRainbowGaugeAnime;
 	private CCounter ctSoul;
 
 	public CCounter ctEndAnime;
@@ -1169,7 +1169,7 @@ internal class CActResultParameterPanel : CActivity {
 	/// 0: soundGauge, 1~7: soundPon (Perfect_X, Good_X, Miss_X, Roll_X, MaxCombo_X, ADLib_X, Bomb),
 	/// 8: soundScoreDon, 9: soundRankIn, 10: soundCrownIn, 11: voiceResultClearSuccess / voiceResultClearFailed
 	/// </summary>
-	public bool[] b音声再生 = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+	public bool[] bAudioPlayback = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
 	// Cherry blossom flowers variables
 	/*
@@ -1188,12 +1188,12 @@ internal class CActResultParameterPanel : CActivity {
 
 	public int[] gaugeValues;
 
-	private CCounter ct表示用;
-	private readonly Point[] ptFullCombo位置;
-	private CSound sdDTXで指定されたフルコンボ音;
-	private readonly ST文字位置[] st小文字位置;
-	private readonly ST文字位置[] st大文字位置;
-	private ST文字位置[] stScoreFont;
+	private CCounter ctDisplay;
+	private readonly Point[] ptFullComboPosition;
+	private CSound sdDTXSpecifiedFullComboSound;
+	private readonly STTextPosition[] stSmallPosition;
+	private readonly STTextPosition[] stLargePosition;
+	private STTextPosition[] stScoreFont;
 	private CCharacterController[] characterController = new CCharacterController[5];
 
 	private TitleTextureKey[] ttkAISection;
@@ -1210,7 +1210,7 @@ internal class CActResultParameterPanel : CActivity {
 	private int nNowAISection;
 
 	private void CheckClear(int player) {
-		if (OpenTaiko.stageResults.nクリア[player] >= 1) {
+		if (OpenTaiko.stageResults.nClear[player] >= 1) {
 			CCharacter character = CCharacter.GetCharacter(player);
 			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARSUCCESS);
 
@@ -1237,37 +1237,37 @@ internal class CActResultParameterPanel : CActivity {
 		}
 	}
 
-	public void t小文字表示(int x, int y, int num, float scale) {
+	public void tSmallDisplay(int x, int y, int num, float scale) {
 		OpenTaiko.Tx.Result_Number.vcScaleRatio.X *= scale;
 		OpenTaiko.Tx.Result_Number.vcScaleRatio.Y *= scale;
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
 			float offset = j;
 
-			float width = (OpenTaiko.Tx.Result_Number.sz画像サイズ.Width / 11.0f);
-			float height = (OpenTaiko.Tx.Result_Number.sz画像サイズ.Height / 2.0f);
+			float width = (OpenTaiko.Tx.Result_Number.szImageSize.Width / 11.0f);
+			float height = (OpenTaiko.Tx.Result_Number.szImageSize.Height / 2.0f);
 
 			float _x = x - ((OpenTaiko.Skin.Result_Number_Interval[0] * scale) * offset) + (width * 2);
 			float _y = y - ((OpenTaiko.Skin.Result_Number_Interval[1] * scale) * offset);
 
-			OpenTaiko.Tx.Result_Number.t2D拡大率考慮中央基準描画(_x + (width * scale / 2), _y + (height * scale / 2),
+			OpenTaiko.Tx.Result_Number.t2DScaledCenterBasedDraw(_x + (width * scale / 2), _y + (height * scale / 2),
 				new RectangleF(width * nums[j], 0, width, height));
 		}
 	}
-	private void t大文字表示(int x, int y, string str) {
-		this.t大文字表示(x, y, str, false);
+	private void tLargeDisplay(int x, int y, string str) {
+		this.tLargeDisplay(x, y, str, false);
 	}
-	private void t大文字表示(int x, int y, string str, bool b強調) {
+	private void tLargeDisplay(int x, int y, string str, bool bEmphasis) {
 		foreach (char ch in str) {
-			for (int i = 0; i < this.st大文字位置.Length; i++) {
-				if (this.st大文字位置[i].ch == ch) {
-					Rectangle rectangle = new Rectangle(this.st大文字位置[i].pt.X, this.st大文字位置[i].pt.Y, 11, 0x10);
+			for (int i = 0; i < this.stLargePosition.Length; i++) {
+				if (this.stLargePosition[i].ch == ch) {
+					Rectangle rectangle = new Rectangle(this.stLargePosition[i].pt.X, this.stLargePosition[i].pt.Y, 11, 0x10);
 					if (ch == '.') {
 						rectangle.Width -= 2;
 						rectangle.Height -= 2;
 					}
 					if (OpenTaiko.Tx.Result_Number != null) {
-						OpenTaiko.Tx.Result_Number.t2D描画(x, y, rectangle);
+						OpenTaiko.Tx.Result_Number.t2DDraw(x, y, rectangle);
 					}
 					break;
 				}
@@ -1276,7 +1276,7 @@ internal class CActResultParameterPanel : CActivity {
 		}
 	}
 
-	public void tスコア文字表示(int x, int y, int num, float scale) {
+	public void tScoreTextDisplay(int x, int y, int num, float scale) {
 		OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.X *= scale;
 		OpenTaiko.Tx.Result_Score_Number.vcScaleRatio.Y *= scale;
 		int[] nums = CConversion.SeparateDigits(num);
@@ -1285,10 +1285,10 @@ internal class CActResultParameterPanel : CActivity {
 			float _x = x - (OpenTaiko.Skin.Result_Score_Number_Interval[0] * scale * offset);
 			float _y = y - (OpenTaiko.Skin.Result_Score_Number_Interval[1] * scale * offset);
 
-			float width = (OpenTaiko.Tx.Result_Score_Number.sz画像サイズ.Width / 10.0f);
-			float height = (OpenTaiko.Tx.Result_Score_Number.sz画像サイズ.Height);
+			float width = (OpenTaiko.Tx.Result_Score_Number.szImageSize.Width / 10.0f);
+			float height = (OpenTaiko.Tx.Result_Score_Number.szImageSize.Height);
 
-			OpenTaiko.Tx.Result_Score_Number.t2D拡大率考慮中央基準描画(_x, _y + (height * scale / 2), new RectangleF(width * nums[j], 0, width, height));
+			OpenTaiko.Tx.Result_Score_Number.t2DScaledCenterBasedDraw(_x, _y + (height * scale / 2), new RectangleF(width * nums[j], 0, width, height));
 		}
 	}
 	//-----------------

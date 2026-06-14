@@ -8,26 +8,26 @@ namespace OpenTaiko;
 internal class Program {
 	#region [ 二重起動チェック、DLL存在チェック ]
 	//-----------------------------
-	private static Mutex mutex二重起動防止用;
+	private static Mutex mutexDoubleStartupPrevent;
 
-	private static bool tDLLの存在チェック(string strDll名, string str存在しないときに表示するエラー文字列jp, string str存在しないときに表示するエラー文字列en, bool bLoadDllCheck) {
-		string str存在しないときに表示するエラー文字列 = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ?
-			str存在しないときに表示するエラー文字列jp : str存在しないときに表示するエラー文字列en;
+	private static bool tDLLExistsCheck(string strDllName, string strNotFoundErrorTextJp, string strNotFoundErrorTextEn, bool bLoadDllCheck) {
+		string strNotFoundErrorText = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ?
+			strNotFoundErrorTextJp : strNotFoundErrorTextEn;
 		if (bLoadDllCheck) {
-			IntPtr hModule = LoadLibrary(strDll名);      // 実際にLoadDll()してチェックする
+			IntPtr hModule = LoadLibrary(strDllName);      // 実際にLoadDll()してチェックする
 			if (hModule == IntPtr.Zero) {
 				return false;
 			}
 			FreeLibrary(hModule);
 		} else {                                                    // 単純にファイルの存在有無をチェックするだけ (プロジェクトで「参照」していたり、アンマネージドなDLLが暗黙リンクされるものはこちら)
-			string path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), strDll名);
+			string path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), strDllName);
 			if (!File.Exists(path)) {
 				return false;
 			}
 		}
 		return true;
 	}
-	private static bool tDLLの存在チェック(string strDll名, string str存在しないときに表示するエラー文字列jp, string str存在しないときに表示するエラー文字列en) {
+	private static bool tDLLExistsCheck(string strDllName, string strNotFoundErrorTextJp, string strNotFoundErrorTextEn) {
 		return true;
 	}
 
@@ -53,9 +53,9 @@ internal class Program {
 		if (cli.Mode == AppMode.CheckGl) { FDK.Game.GraphicsSelfTest = true; Environment.ExitCode = 70; }
 		bool bSpecialMode = cli.Mode != AppMode.Normal;
 
-		mutex二重起動防止用 = new Mutex(false, bSpecialMode ? "OpenTaiko-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
+		mutexDoubleStartupPrevent = new Mutex(false, bSpecialMode ? "OpenTaiko-" + Guid.NewGuid().ToString("N") : "DTXManiaMutex");
 
-		if (mutex二重起動防止用.WaitOne(0, false)) {
+		if (mutexDoubleStartupPrevent.WaitOne(0, false)) {
 			string newLine = Environment.NewLine;
 			bool bDLLnotfound = false;
 
@@ -131,8 +131,8 @@ internal class Program {
 
 			// BEGIN #24615 2011.03.09 from: Mutex.WaitOne() が true を返した場合は、Mutex のリリースが必要である。
 
-			mutex二重起動防止用.ReleaseMutex();
-			mutex二重起動防止用 = null;
+			mutexDoubleStartupPrevent.ReleaseMutex();
+			mutexDoubleStartupPrevent = null;
 
 			// END #24615 2011.03.09 from
 		} else      // DTXManiaが既に起動中

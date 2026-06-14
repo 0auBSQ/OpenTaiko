@@ -59,13 +59,13 @@ class CSongObject {
 		if (frame + 1 > textures.Length) return;
 		if (tx == null) return;
 
-		tx.fZ軸中心回転 = CConversion.DegreeToRadian(this.rotation);
+		tx.fZAxisCenterRotate = CConversion.DegreeToRadian(this.rotation);
 		tx.color4 = this.color;
 		tx.Opacity = this.opacity;
 
 		float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
 		float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
-		if (isVisible) tx.t2D描画SongObj((int)(this.x * screen_ratiox), (int)(this.y * screen_ratioy), this.xScale * screen_ratiox, this.yScale * screen_ratioy);
+		if (isVisible) tx.t2DDrawSongObj((int)(this.x * screen_ratiox), (int)(this.y * screen_ratioy), this.xScale * screen_ratiox, this.yScale * screen_ratioy);
 	}
 
 	public void tDispose() {

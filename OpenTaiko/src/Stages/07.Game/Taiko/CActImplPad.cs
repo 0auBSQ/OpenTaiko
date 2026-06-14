@@ -14,23 +14,23 @@ internal class CActImplPad : CActivity {
 	// メソッド
 
 	public void Hit(int nLane) {
-		this.stパッド状態[nLane].n明るさ = 6;
-		this.stパッド状態[nLane].nY座標加速度dot = 2;
+		this.stPadState[nLane].nBrightness = 6;
+		this.stPadState[nLane].nYCoordAccelerationdot = 2;
 	}
 
 
 	// CActivity 実装
 
 	public override void Activate() {
-		this.nフラッシュ制御タイマ = -1;
-		this.nY座標制御タイマ = -1;
+		this.nFlashControlTimer = -1;
+		this.nYCoordControlTimer = -1;
 		for (int i = 0; i < 9; i++) {
-			STパッド状態 stパッド状態2 = new STパッド状態();
-			STパッド状態 stパッド状態 = stパッド状態2;
-			stパッド状態.nY座標オフセットdot = 0;
-			stパッド状態.nY座標加速度dot = 0;
-			stパッド状態.n明るさ = 0;
-			this.stパッド状態[i] = stパッド状態;
+			STPadState stPadState2 = new STPadState();
+			STPadState stPadState = stPadState2;
+			stPadState.nYCoordOffsetdot = 0;
+			stPadState.nYCoordAccelerationdot = 0;
+			stPadState.nBrightness = 0;
+			this.stPadState[i] = stPadState;
 		}
 		base.Activate();
 	}
@@ -43,38 +43,38 @@ internal class CActImplPad : CActivity {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.nフラッシュ制御タイマ = SoundManager.PlayTimer.NowTimeMs;
-				this.nY座標制御タイマ = SoundManager.PlayTimer.NowTimeMs;
+				this.nFlashControlTimer = SoundManager.PlayTimer.NowTimeMs;
+				this.nYCoordControlTimer = SoundManager.PlayTimer.NowTimeMs;
 				base.IsFirstDraw = false;
 			}
 			long num = SoundManager.PlayTimer.NowTimeMs;
-			if (num < this.nフラッシュ制御タイマ) {
-				this.nフラッシュ制御タイマ = num;
+			if (num < this.nFlashControlTimer) {
+				this.nFlashControlTimer = num;
 			}
-			while ((num - this.nフラッシュ制御タイマ) >= 15) {
+			while ((num - this.nFlashControlTimer) >= 15) {
 				for (int j = 0; j < 10; j++) {
-					if (this.stパッド状態[j].n明るさ > 0) {
-						this.stパッド状態[j].n明るさ--;
+					if (this.stPadState[j].nBrightness > 0) {
+						this.stPadState[j].nBrightness--;
 					}
 				}
-				this.nフラッシュ制御タイマ += 15;
+				this.nFlashControlTimer += 15;
 			}
 			long num3 = SoundManager.PlayTimer.NowTimeMs;
-			if (num3 < this.nY座標制御タイマ) {
-				this.nY座標制御タイマ = num3;
+			if (num3 < this.nYCoordControlTimer) {
+				this.nYCoordControlTimer = num3;
 			}
-			while ((num3 - this.nY座標制御タイマ) >= 5) {
+			while ((num3 - this.nYCoordControlTimer) >= 5) {
 				for (int k = 0; k < 10; k++) {
-					this.stパッド状態[k].nY座標オフセットdot += this.stパッド状態[k].nY座標加速度dot;
-					if (this.stパッド状態[k].nY座標オフセットdot > 15) {
-						this.stパッド状態[k].nY座標オフセットdot = 15;
-						this.stパッド状態[k].nY座標加速度dot = -1;
-					} else if (this.stパッド状態[k].nY座標オフセットdot < 0) {
-						this.stパッド状態[k].nY座標オフセットdot = 0;
-						this.stパッド状態[k].nY座標加速度dot = 0;
+					this.stPadState[k].nYCoordOffsetdot += this.stPadState[k].nYCoordAccelerationdot;
+					if (this.stPadState[k].nYCoordOffsetdot > 15) {
+						this.stPadState[k].nYCoordOffsetdot = 15;
+						this.stPadState[k].nYCoordAccelerationdot = -1;
+					} else if (this.stPadState[k].nYCoordOffsetdot < 0) {
+						this.stPadState[k].nYCoordOffsetdot = 0;
+						this.stPadState[k].nYCoordAccelerationdot = 0;
 					}
 				}
-				this.nY座標制御タイマ += 5;
+				this.nYCoordControlTimer += 5;
 			}
 
 
@@ -88,15 +88,15 @@ internal class CActImplPad : CActivity {
 	#region [ private ]
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]
-	private struct STパッド状態 {
-		public int n明るさ;
-		public int nY座標オフセットdot;
-		public int nY座標加速度dot;
+	private struct STPadState {
+		public int nBrightness;
+		public int nYCoordOffsetdot;
+		public int nYCoordAccelerationdot;
 	}
 
-	private long nY座標制御タイマ;
-	private long nフラッシュ制御タイマ;
-	private STパッド状態[] stパッド状態 = new STパッド状態[10];
+	private long nYCoordControlTimer;
+	private long nFlashControlTimer;
+	private STPadState[] stPadState = new STPadState[10];
 	//-----------------
 	#endregion
 }

@@ -59,7 +59,7 @@ internal class CActImplCharacter : CActivity {
 			CharacterControllers[i].bLooping = true;
 
 			this.IsInKusudama = false;
-			this.b風船連打中[i] = false;
+			this.bBalloonRoll[i] = false;
 
 			//CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]]);
 			CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(100);
@@ -422,7 +422,7 @@ internal class CActImplCharacter : CActivity {
 
 			float charaScale = 1.0f;
 
-			if (!b風船連打中[i] && !visibleKusuChara && !IsPlayingBalloonAction(i)) {
+			if (!bBalloonRoll[i] && !visibleKusuChara && !IsPlayingBalloonAction(i)) {
 				// P2 in AI battle mode is mirrored — encode as negative scaleX instead of a flipX flag.
 				bool _mirrorP2 = OpenTaiko.ConfigIni.bAIBattleMode && (i == 1);
 
@@ -461,13 +461,13 @@ internal class CActImplCharacter : CActivity {
 			}
 
 
-			if ((!b風船連打中[i] && !IsPlayingBalloonAction(i)) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			if ((!bBalloonRoll[i] && !IsPlayingBalloonAction(i)) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
 				if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i), OpenTaiko.Skin.Game_PuchiChara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i), OpenTaiko.Skin.Game_PuchiChara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
 				} else {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i), OpenTaiko.Skin.Game_PuchiChara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i), OpenTaiko.Skin.Game_PuchiChara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
 				}
 			}
 		}
@@ -481,7 +481,7 @@ internal class CActImplCharacter : CActivity {
 
 	public void OnDraw_Balloon() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!b風船連打中[i] && !IsPlayingBalloonAction(i)) continue;
+			if (!bBalloonRoll[i] && !IsPlayingBalloonAction(i)) continue;
 
 			float chara_x;
 			float chara_y;
@@ -501,7 +501,7 @@ internal class CActImplCharacter : CActivity {
 			//CCharacter.GetCharacter(i).Draw(i, CCharacter.ANIM_GAME_BALLOON_BREAKING, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
 			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2 && !IsInKusudama)
-				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+				OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 					OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player: i);
 		}
@@ -530,7 +530,7 @@ internal class CActImplCharacter : CActivity {
 
 				CharacterControllers[i].Draw(i, chara_x + kusuX, chara_y + kusuY,
 				(i % 2 == 1) ? -charaScale : charaScale, charaScale, 255, Color4.White);
-				OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+				OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuX,
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuY, false, 255, true, player: i);
 			}
@@ -745,7 +745,7 @@ internal class CActImplCharacter : CActivity {
 			CharacterControllers[player].bLooping = true;
 			return;
 		}
-		if (this.b風船連打中[player]) {
+		if (this.bBalloonRoll[player]) {
 			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_BALLOON_BREAKING;
 			CharacterControllers[player].bLooping = false;
 			return;
@@ -933,7 +933,7 @@ internal class CActImplCharacter : CActivity {
 	//public bool[] bキャラクターアクション中 = new bool[5];
 
 	public bool IsInKusudama = false;
-	public bool[] b風船連打中 = new bool[5];
+	public bool[] bBalloonRoll = new bool[5];
 
 	public int[] iCurrentCharacter = new int[5] { 0, 0, 0, 0, 0 };
 }

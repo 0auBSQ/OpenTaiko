@@ -48,7 +48,7 @@ public class LaneFlash : CActivity {
 			if (Counter.IsEnded) Counter.Stop();
 			int opacity = (((150 - Counter.CurrentValue) * 255) / 100);
 			Texture.Opacity = opacity;
-			Texture.t2D描画(x, y);
+			Texture.t2DDraw(x, y);
 		}
 		return base.Draw();
 	}

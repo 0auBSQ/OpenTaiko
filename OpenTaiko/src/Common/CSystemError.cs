@@ -134,7 +134,7 @@ internal class CSystemError : CStage {
 			if (this._pfText != null) {
 				this._ttkText = new TitleTextureKey(ErrorMessage, this._pfText, Color.White, Color.Black, 1920);
 				CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(this._ttkText);
-				tmpTex.t2D描画(0, 0);
+				tmpTex.t2DDraw(0, 0);
 			}
 		}
 		return 0;

@@ -58,7 +58,7 @@ namespace OpenTaiko {
 		}
 
 		// ── online lobby codes: written to the shared <exe>/Global/Lobbycodes/ folder (NOT a stage dir) ────────
-		private static string LobbyCodesDir() => Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Global", "Lobbycodes");
+		private static string LobbyCodesDir() => Path.Combine(OpenTaiko.strEXEFolder, "Global", "Lobbycodes");
 		/// <summary>Write a lobby code to <exe>/Global/Lobbycodes/&lt;name&gt;. Access is limited to that subfolder
 		/// (rooted paths / ".." rejected). Returns true on success.</summary>
 		public bool WriteLobbyCode(string name, string contents) {

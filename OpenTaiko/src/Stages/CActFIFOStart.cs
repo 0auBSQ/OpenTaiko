@@ -6,9 +6,9 @@ namespace OpenTaiko;
 internal class CActFIFOStart : CActFIFOBase {
 	// メソッド
 
-	public override void tフェードアウト開始(int? start = null, int? end = null, int? interval = null)
-		=> tフェードアウト開始(false, start, end, interval);
-	public void tフェードアウト開始(bool skipDelay, int? start = null, int? end = null, int? interval = null) {
+	public override void tFadeOutStart(int? start = null, int? end = null, int? interval = null)
+		=> tFadeOutStart(false, start, end, interval);
+	public void tFadeOutStart(bool skipDelay, int? start = null, int? end = null, int? interval = null) {
 		OpenTaiko.Skin.soundDanSelectBGM.tStop();
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
@@ -22,7 +22,7 @@ internal class CActFIFOStart : CActFIFOBase {
 		}
 	}
 
-	public override void tフェードイン開始(int? start = null, int? end = null, int? interval = null) {
+	public override void tFadeInStart(int? start = null, int? end = null, int? interval = null) {
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 			base.StartFadeInCounter(start ?? 0, end ?? 255, interval ?? 1);
 
@@ -48,7 +48,7 @@ internal class CActFIFOStart : CActFIFOBase {
 				{
 					for (int j = 0; j <= (GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++) // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 					{
-						OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+						OpenTaiko.Tx.Tile_Black.t2DDraw(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 					}
 				}
 			}
@@ -57,55 +57,55 @@ internal class CActFIFOStart : CActFIFOBase {
 				var preTime = (this.counter.CurrentValue >= 2000 ? this.counter.CurrentValue - 2000 : 0) * 2;
 
 				OpenTaiko.Tx.SongLoading_Fade_AI.Opacity = preTime;
-				OpenTaiko.Tx.SongLoading_Fade_AI.t2D描画(0, 0);
+				OpenTaiko.Tx.SongLoading_Fade_AI.t2DDraw(0, 0);
 
 				if (preTime > 500) {
 					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Base.vcScaleRatio.X = Math.Min(((preTime - 500) / 255.0f), 1.0f);
-					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Base.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Resolution[0] / 2, OpenTaiko.Skin.Resolution[1] / 2);
+					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Base.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Resolution[0] / 2, OpenTaiko.Skin.Resolution[1] / 2);
 				}
 
 				if (preTime > 1000) {
 					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.Opacity = preTime - 1000;
-					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.fZ軸中心回転 = preTime / 6000.0f;
-					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[1]);
+					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.fZAxisCenterRotate = preTime / 6000.0f;
+					OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Ring.t2DDraw(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_Ring[1]);
 					if (preTime - 1000 < 1500) {
 						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_NowLoading.Opacity = preTime - 1000;
-						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_NowLoading.t2D描画(0, 0);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_NowLoading.t2DDraw(0, 0);
 
-						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar_Base.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1]);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar_Base.t2DDraw(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1]);
 
 						float value = (preTime - 1000) / 1500.0f;
 						value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 						value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 						value = 1.0f - (float)Math.Cos(value * Math.PI / 2.0);
 
-						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.t2D描画(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1],
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.t2DDraw(OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[0], OpenTaiko.Skin.SongLoading_Fade_AI_Anime_LoadBar[1],
 							new RectangleF(0, 0, OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Width * value,
 								OpenTaiko.Tx.SongLoading_Fade_AI_Anime_LoadBar.szTextureSize.Height));
 					} else {
-						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Start.t2D描画(0, 0);
+						OpenTaiko.Tx.SongLoading_Fade_AI_Anime_Start.t2DDraw(0, 0);
 					}
 				}
 
 				var time = this.counter.CurrentValue >= 5000 ? this.counter.CurrentValue - 5000 : 0;
 
 				OpenTaiko.Tx.SongLoading_Bg_AI.Opacity = time;
-				OpenTaiko.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
+				OpenTaiko.Tx.SongLoading_Bg_AI.t2DDraw(0, 0);
 
 				OpenTaiko.Tx.SongLoading_Bg_AI_Wait.Opacity = time - 255;
-				OpenTaiko.Tx.SongLoading_Bg_AI_Wait.t2D描画(0, 0);
+				OpenTaiko.Tx.SongLoading_Bg_AI_Wait.t2DDraw(0, 0);
 
 				OpenTaiko.Tx.SongLoading_Plate_AI.Opacity = time - 255;
 				if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Left) {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
 				} else if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Right) {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI - OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Width, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI - OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Width, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
 				} else {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Width / 2), OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.sz画像サイズ.Height / 2));
+					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Width / 2), OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
 				}
 			} else {
 				OpenTaiko.Tx.SongLoading_Bg_AI.Opacity = 255 - counter.CurrentValue;
-				OpenTaiko.Tx.SongLoading_Bg_AI.t2D描画(0, 0);
+				OpenTaiko.Tx.SongLoading_Bg_AI.t2DDraw(0, 0);
 			}
 		} else {
 			if (this.mode == EFIFOMode.FadeOut) {
@@ -151,8 +151,8 @@ internal class CActFIFOStart : CActFIFOBase {
 		var Value = (float)((IsExit ? 1f : 0f) - ((time >= max ? (time - max) : 0) * (1f / end))) * (IsExit ? 1f : -1f);
 
 		ShowTex.vcScaleRatio.X = StartScaleX + ScaleX;
-		ShowTex.t2D描画(-(SizeXHarf * StartScaleX) + (Value * (SizeXHarf * StartScaleX)), 0, new RectangleF(0, 0, SizeXHarf, SizeY));
-		ShowTex.t2D描画((SizeXHarf + (SizeXHarf * StartScaleX)) - (Value * (SizeXHarf * StartScaleX)) + ((1f - ShowTex.vcScaleRatio.X) * SizeXHarf), 0, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
+		ShowTex.t2DDraw(-(SizeXHarf * StartScaleX) + (Value * (SizeXHarf * StartScaleX)), 0, new RectangleF(0, 0, SizeXHarf, SizeY));
+		ShowTex.t2DDraw((SizeXHarf + (SizeXHarf * StartScaleX)) - (Value * (SizeXHarf * StartScaleX)) + ((1f - ShowTex.vcScaleRatio.X) * SizeXHarf), 0, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 
 	}
 	/// <summary>
@@ -163,7 +163,7 @@ internal class CActFIFOStart : CActFIFOBase {
 		if (OpenTaiko.Tx.SongLoading_BgWait is null) return;
 
 		OpenTaiko.Tx.SongLoading_BgWait.Opacity = (int)opacity;
-		OpenTaiko.Tx.SongLoading_BgWait.t2D描画(0, 0);
+		OpenTaiko.Tx.SongLoading_BgWait.t2DDraw(0, 0);
 	}
 
 	/// <summary>
@@ -179,7 +179,7 @@ internal class CActFIFOStart : CActFIFOBase {
 		OpenTaiko.Tx.SongLoading_Plate.Opacity = (int)opacity;
 		OpenTaiko.Tx.SongLoading_Plate.vcScaleRatio.X = scaleX;
 		OpenTaiko.Tx.SongLoading_Plate.vcScaleRatio.Y = scaleY;
-		OpenTaiko.Tx.SongLoading_Plate.t2D描画(OpenTaiko.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, OpenTaiko.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
+		OpenTaiko.Tx.SongLoading_Plate.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X + SizeX_Harf - (SizeX_Harf * scaleX) - SizeX_Harf, OpenTaiko.Skin.SongLoading_Plate_Y - SizeY_Harf + ((1f - scaleY) * SizeY_Harf));
 	}
 
 	private void DrawChara(double time, float opacity, float X = -1, float Y = -1) {
@@ -194,8 +194,8 @@ internal class CActFIFOStart : CActFIFOBase {
 
 		OpenTaiko.Tx.SongLoading_Chara.Opacity = (int)opacity;
 		//左キャラ
-		OpenTaiko.Tx.SongLoading_Chara.t2D描画(-OpenTaiko.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
+		OpenTaiko.Tx.SongLoading_Chara.t2DDraw(-OpenTaiko.Skin.SongLoading_Chara_Move[0] + X, Y, new RectangleF(0, 0, SizeXHarf, SizeY));
 		//左キャラ
-		OpenTaiko.Tx.SongLoading_Chara.t2D描画(SizeXHarf + OpenTaiko.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
+		OpenTaiko.Tx.SongLoading_Chara.t2DDraw(SizeXHarf + OpenTaiko.Skin.SongLoading_Chara_Move[0] - X, Y, new RectangleF(SizeXHarf, 0, SizeXHarf, SizeY));
 	}
 }

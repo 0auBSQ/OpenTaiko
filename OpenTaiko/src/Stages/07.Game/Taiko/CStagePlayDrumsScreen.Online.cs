@@ -12,7 +12,7 @@ namespace OpenTaiko;
 //                                                 shows their actual great/good/bad, rolls, balloons, adlibs,
 //                                                 combo and score — not this machine's simulation of them.
 // Nothing here runs offline (every entry guards on the spot being a live remote player).
-internal partial class CStage演奏ドラム画面 {
+internal partial class CStagePlayDrumsScreen {
 	// guards the one-shot end-anim pass in the finish barrier (see Draw())
 	private bool _onlEndAnimsDone = false;
 

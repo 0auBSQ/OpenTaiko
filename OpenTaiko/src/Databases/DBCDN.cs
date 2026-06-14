@@ -4,7 +4,7 @@ namespace OpenTaiko;
 
 class DBCDN : CSavableT<Dictionary<string, DBCDN.CDNData>> {
 	public DBCDN() {
-		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}CDN.json";
+		_fn = @$"{OpenTaiko.strEXEFolder}Databases{Path.DirectorySeparatorChar}CDN.json";
 		base.tDBInitSavable();
 	}
 

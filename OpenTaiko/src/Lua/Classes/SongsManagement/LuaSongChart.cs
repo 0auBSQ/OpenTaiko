@@ -5,7 +5,7 @@
 		private CTja.ELevelIcon _levelIcon;
 		private string _notesDesigner = "";
 		private CScore _score;
-		private CScore.ST譜面情報? _chartInfo;
+		private CScore.STChartInfo? _chartInfo;
 		private LuaSongNode? _parent;
 		private CSongListNode? _parentListNode;
 		private Dictionary<string, string> _customCommands = new();
@@ -134,7 +134,7 @@
 			get {
 				LuaColorFunc lfc = new LuaColorFunc();
 				if (_chartInfo != null) {
-					CScore.ST譜面情報 _cinfo = (CScore.ST譜面情報)_chartInfo;
+					CScore.STChartInfo _cinfo = (CScore.STChartInfo)_chartInfo;
 					return lfc.CreateColorFromRGBA(_cinfo.cDanTickColor.R, _cinfo.cDanTickColor.G, _cinfo.cDanTickColor.B, _cinfo.cDanTickColor.A);
 				}
 				return lfc.CreateColorFromHex("#ffffff");
@@ -213,7 +213,7 @@
 				_level = _from.nLevel[_chart];
 				_levelIcon = _from.nLevelIcon[_chart];
 				_notesDesigner = _from.strNotesDesigner[_chart];
-				_chartInfo = _from.score[_chart]?.譜面情報 ?? null;
+				_chartInfo = _from.score[_chart]?.ChartInfo ?? null;
 				_score = _from.score[_chart];
 				_parent = parent;
 				_parentListNode = _from;

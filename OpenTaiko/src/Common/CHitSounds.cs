@@ -34,14 +34,14 @@ class CHitSounds {
 	/// <summary>Returns the absolute path of the Don ("dong") sound for the hitsound set at the given index.</summary>
 	public string GetDonPath(int index) {
 		if (data == null || index < 0 || index >= data.Length) return string.Empty;
-		string p = Path.GetFullPath(Path.Combine(data[index].path, "dong"), OpenTaiko.strEXEのあるフォルダ);
+		string p = Path.GetFullPath(Path.Combine(data[index].path, "dong"), OpenTaiko.strEXEFolder);
 		return File.Exists(p + ".ogg") ? p + ".ogg" : p + ".wav";
 	}
 
 	/// <summary>Returns the absolute path of the Ka sound for the hitsound set at the given index.</summary>
 	public string GetKaPath(int index) {
 		if (data == null || index < 0 || index >= data.Length) return string.Empty;
-		string p = Path.GetFullPath(Path.Combine(data[index].path, "ka"), OpenTaiko.strEXEのあるフォルダ);
+		string p = Path.GetFullPath(Path.Combine(data[index].path, "ka"), OpenTaiko.strEXEFolder);
 		return File.Exists(p + ".ogg") ? p + ".ogg" : p + ".wav";
 	}
 

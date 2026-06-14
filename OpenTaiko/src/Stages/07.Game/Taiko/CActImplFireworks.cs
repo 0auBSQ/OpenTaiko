@@ -19,52 +19,52 @@ internal class CActImplFireworks : CActivity {
 	/// </summary>
 	/// <param name="nLane"></param>
 	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, int nPlayer) {
-		nY座標P2 = new int[] { 548, 612, 670, 712, 730, 780, 725, 690, 640 };
+		nYCoordP2 = new int[] { 548, 612, 670, 712, 730, 780, 725, 690, 640 };
 		if (OpenTaiko.Tx.Effects_Hit_FireWorks != null && OpenTaiko.Tx.Effects_Hit_FireWorks != null) {
 			for (int i = 0; i < 9; i++) {
 				for (int j = 0; j < 45; j++) {
-					if (!this.st大音符花火[j].b使用中) {
-						this.st大音符花火[j].b使用中 = true;
-						this.st大音符花火[j].ct進行 = new CCounter(0, 40, 18, OpenTaiko.Timer); // カウンタ
-						this.st大音符花火[j].fX = this.nX座標[i]; //X座標
-						this.st大音符花火[j].fY = nPlayer == 0 ? this.nY座標[i] : this.nY座標P2[i];
+					if (!this.stBigNoteFirework[j].bUse) {
+						this.stBigNoteFirework[j].bUse = true;
+						this.stBigNoteFirework[j].ctProgress = new CCounter(0, 40, 18, OpenTaiko.Timer); // カウンタ
+						this.stBigNoteFirework[j].fX = this.nXCoord[i]; //X座標
+						this.stBigNoteFirework[j].fY = nPlayer == 0 ? this.nYCoord[i] : this.nYCoordP2[i];
 
 						switch (i) {
 							case 0:
-								this.st大音符花火[j].n開始フレーム = 0;
-								this.st大音符花火[j].n終了フレーム = 16;
+								this.stBigNoteFirework[j].nStartFrame = 0;
+								this.stBigNoteFirework[j].nEndFrame = 16;
 								break;
 							case 1:
-								this.st大音符花火[j].n開始フレーム = 3;
-								this.st大音符花火[j].n終了フレーム = 19;
+								this.stBigNoteFirework[j].nStartFrame = 3;
+								this.stBigNoteFirework[j].nEndFrame = 19;
 								break;
 							case 2:
-								this.st大音符花火[j].n開始フレーム = 6;
-								this.st大音符花火[j].n終了フレーム = 22;
+								this.stBigNoteFirework[j].nStartFrame = 6;
+								this.stBigNoteFirework[j].nEndFrame = 22;
 								break;
 							case 3:
-								this.st大音符花火[j].n開始フレーム = 9;
-								this.st大音符花火[j].n終了フレーム = 25;
+								this.stBigNoteFirework[j].nStartFrame = 9;
+								this.stBigNoteFirework[j].nEndFrame = 25;
 								break;
 							case 4:
-								this.st大音符花火[j].n開始フレーム = 12;
-								this.st大音符花火[j].n終了フレーム = 28;
+								this.stBigNoteFirework[j].nStartFrame = 12;
+								this.stBigNoteFirework[j].nEndFrame = 28;
 								break;
 							case 5:
-								this.st大音符花火[j].n開始フレーム = 15;
-								this.st大音符花火[j].n終了フレーム = 31;
+								this.stBigNoteFirework[j].nStartFrame = 15;
+								this.stBigNoteFirework[j].nEndFrame = 31;
 								break;
 							case 6:
-								this.st大音符花火[j].n開始フレーム = 18;
-								this.st大音符花火[j].n終了フレーム = 34;
+								this.stBigNoteFirework[j].nStartFrame = 18;
+								this.stBigNoteFirework[j].nEndFrame = 34;
 								break;
 							case 7:
-								this.st大音符花火[j].n開始フレーム = 21;
-								this.st大音符花火[j].n終了フレーム = 37;
+								this.stBigNoteFirework[j].nStartFrame = 21;
+								this.stBigNoteFirework[j].nEndFrame = 37;
 								break;
 							case 8:
-								this.st大音符花火[j].n開始フレーム = 24;
-								this.st大音符花火[j].n終了フレーム = 40;
+								this.stBigNoteFirework[j].nStartFrame = 24;
+								this.stBigNoteFirework[j].nEndFrame = 40;
 								break;
 						}
 
@@ -79,21 +79,21 @@ internal class CActImplFireworks : CActivity {
 
 	public virtual void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, bool isBigInput, int player) {
 		for (int j = 0; j < 3 * 4; j++) {
-			if (!this.st状態[j].b使用中)
+			if (!this.stState[j].bUse)
 			//for( int n = 0; n < 1; n++ )
 			{
-				this.st状態[j].b使用中 = true;
+				this.stState[j].bUse = true;
 				//this.st状態[ n ].ct進行 = new CCounter( 0, 9, 20, CDTXMania.Timer );
-				this.st状態[j].ct進行 = new CCounter(0, 6, 25, OpenTaiko.Timer);
-				this.st状態[j].judge = judge;
-				this.st状態[j].nPlayer = player;
+				this.stState[j].ctProgress = new CCounter(0, 6, 25, OpenTaiko.Timer);
+				this.stState[j].judge = judge;
+				this.stState[j].nPlayer = player;
 				if (NotesManager.IsBigNoteTaiko(nLane, gameType) && isBigInput) {
-					this.st状態_大[j].ct進行 = new CCounter(0, 9, 20, OpenTaiko.Timer);
-					this.st状態_大[j].judge = judge;
-					this.st状態_大[j].nPlayer = player;
-					this.st状態[j].IsBig = this.st状態_大[j].IsBig = true;
+					this.stState_Big[j].ctProgress = new CCounter(0, 9, 20, OpenTaiko.Timer);
+					this.stState_Big[j].judge = judge;
+					this.stState_Big[j].nPlayer = player;
+					this.stState[j].IsBig = this.stState_Big[j].IsBig = true;
 				} else {
-					this.st状態[j].IsBig = false;
+					this.stState[j].IsBig = false;
 				}
 				break;
 			}
@@ -104,24 +104,24 @@ internal class CActImplFireworks : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < 3 * 4; i++) {
-			this.st状態[i].ct進行 = new CCounter();
-			this.st状態[i].b使用中 = false;
-			this.st状態_大[i].ct進行 = new CCounter();
+			this.stState[i].ctProgress = new CCounter();
+			this.stState[i].bUse = false;
+			this.stState_Big[i].ctProgress = new CCounter();
 		}
 		for (int i = 0; i < 256; i++) {
-			this.st紙吹雪[i] = new ST紙吹雪();
-			this.st紙吹雪[i].b使用中 = false;
-			this.st紙吹雪[i].ct進行 = new CCounter();
+			this.stConfetti[i] = new STConfetti();
+			this.stConfetti[i].bUse = false;
+			this.stConfetti[i].ctProgress = new CCounter();
 		}
 		base.Activate();
 	}
 	public override void DeActivate() {
 		for (int i = 0; i < 3 * 4; i++) {
-			this.st状態[i].ct進行 = null;
-			this.st状態_大[i].ct進行 = null;
+			this.stState[i].ctProgress = null;
+			this.stState_Big[i].ctProgress = null;
 		}
 		for (int i = 0; i < 256; i++) {
-			this.st紙吹雪[i].ct進行 = null;
+			this.stConfetti[i].ctProgress = null;
 		}
 		base.DeActivate();
 	}
@@ -138,13 +138,13 @@ internal class CActImplFireworks : CActivity {
 			int nBombWidth = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Width / 7);
 			int nBombHeight = (OpenTaiko.Tx.Effects_Hit_Bomb.szTextureSize.Height / 4);
 			for (int i = 0; i < 3 * 4; i++) {
-				ref STSTATUS state = ref this.st状態[i];
-				if (state.b使用中) {
-					if (!state.ct進行.IsStoped) {
-						state.ct進行.Tick();
-						if (state.ct進行.IsEnded) {
-							state.ct進行.Stop();
-							state.b使用中 = false;
+				ref STSTATUS state = ref this.stState[i];
+				if (state.bUse) {
+					if (!state.ctProgress.IsStoped) {
+						state.ctProgress.Tick();
+						if (state.ctProgress.IsEnded) {
+							state.ctProgress.Stop();
+							state.bUse = false;
 						}
 
 						// (When performing calibration, reduce visual distraction
@@ -168,17 +168,17 @@ internal class CActImplFireworks : CActivity {
 							nX += OpenTaiko.stageGameScreen.GetJPOSCROLLX(state.nPlayer);
 							nY += OpenTaiko.stageGameScreen.GetJPOSCROLLY(state.nPlayer);
 
-							switch (st状態[i].judge) {
+							switch (stState[i].judge) {
 								case ENoteJudge.Perfect:
 								case ENoteJudge.Great:
 								case ENoteJudge.Auto:
-									if (!OpenTaiko.ConfigIni.SimpleMode) OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nWidth, n, nWidth, nHeight));
+									if (!OpenTaiko.ConfigIni.SimpleMode) OpenTaiko.Tx.Effects_Hit_Explosion.t2DDraw(nX, nY, new Rectangle(state.ctProgress.CurrentValue * nWidth, n, nWidth, nHeight));
 									break;
 								case ENoteJudge.Good:
-									OpenTaiko.Tx.Effects_Hit_Explosion.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
+									OpenTaiko.Tx.Effects_Hit_Explosion.t2DDraw(nX, nY, new Rectangle(state.ctProgress.CurrentValue * nWidth, n + nHeight, nWidth, nHeight));
 									break;
 								case ENoteJudge.Mine:
-									OpenTaiko.Tx.Effects_Hit_Bomb?.t2D描画(nX, nY, new Rectangle(state.ct進行.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
+									OpenTaiko.Tx.Effects_Hit_Bomb?.t2DDraw(nX, nY, new Rectangle(state.ctProgress.CurrentValue * nBombWidth, 0, nBombWidth, nBombHeight));
 									break;
 								case ENoteJudge.Miss:
 								case ENoteJudge.Bad:
@@ -190,11 +190,11 @@ internal class CActImplFireworks : CActivity {
 			}
 
 			for (int i = 0; i < 3 * 4; i++) {
-				ref STSTATUS_B state = ref this.st状態_大[i];
-				if (!state.ct進行.IsStoped) {
-					state.ct進行.Tick();
-					if (state.ct進行.IsEnded) {
-						state.ct進行.Stop();
+				ref STSTATUS_B state = ref this.stState_Big[i];
+				if (!state.ctProgress.IsStoped) {
+					state.ctProgress.Tick();
+					if (state.ctProgress.IsEnded) {
+						state.ctProgress.Stop();
 					}
 					if (OpenTaiko.Tx.Effects_Hit_Explosion_Big != null && state.IsBig) {
 
@@ -209,7 +209,7 @@ internal class CActImplFireworks : CActivity {
 									//float fY = 257 - ((this.txアタックエフェクトUpper_big.sz画像サイズ.Height * this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y ) / 2.0f);
 
 									////7
-									float f倍率 = 0.5f + (state.ct進行.CurrentValue * 0.5f / 10.0f);
+									float fScale = 0.5f + (state.ctProgress.CurrentValue * 0.5f / 10.0f);
 									//this.txアタックエフェクトUpper_big.vc拡大縮小倍率.X = f倍率;
 									//this.txアタックエフェクトUpper_big.vc拡大縮小倍率.Y = f倍率;
 									//this.txアタックエフェクトUpper_big.n透明度 = (int)(255 * f倍率);
@@ -231,17 +231,17 @@ internal class CActImplFireworks : CActivity {
 									x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(state.nPlayer);
 									y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(state.nPlayer);
 
-									x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (f倍率 - 1.0f) / 2.0f);
-									y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (f倍率 - 1.0f) / 2.0f);
+									x -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Width * (fScale - 1.0f) / 2.0f);
+									y -= (OpenTaiko.Tx.Effects_Hit_Explosion_Big.szTextureSize.Height * (fScale - 1.0f) / 2.0f);
 
 									if (state.judge is ENoteJudge.Good) // TODO: add Explosion_Big for 可/OK
 										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(4.0f, 4.0f, 4.0f, 1.0f); // HACK: made whiter
 									else
 										OpenTaiko.Tx.Effects_Hit_Explosion_Big.color4 = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 
-									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = f倍率;
-									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = f倍率;
-									OpenTaiko.Tx.Effects_Hit_Explosion_Big.t2D描画(x, y);
+									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.X = fScale;
+									OpenTaiko.Tx.Effects_Hit_Explosion_Big.vcScaleRatio.Y = fScale;
+									OpenTaiko.Tx.Effects_Hit_Explosion_Big.t2DDraw(x, y);
 								}
 								break;
 
@@ -257,20 +257,20 @@ internal class CActImplFireworks : CActivity {
 				if (OpenTaiko.Skin.nScrollFieldX[0] != 414)
 					break;
 
-				if (this.st大音符花火[i].b使用中) {
-					this.st大音符花火[i].n前回のValue = this.st大音符花火[i].ct進行.CurrentValue;
-					this.st大音符花火[i].ct進行.Tick();
-					if (this.st大音符花火[i].ct進行.IsEnded) {
-						this.st大音符花火[i].ct進行.Stop();
-						this.st大音符花火[i].b使用中 = false;
+				if (this.stBigNoteFirework[i].bUse) {
+					this.stBigNoteFirework[i].nPreviousValue = this.stBigNoteFirework[i].ctProgress.CurrentValue;
+					this.stBigNoteFirework[i].ctProgress.Tick();
+					if (this.stBigNoteFirework[i].ctProgress.IsEnded) {
+						this.stBigNoteFirework[i].ctProgress.Stop();
+						this.stBigNoteFirework[i].bUse = false;
 					}
 					/*
                     Matrix mat = Matrix.Identity;
 
                     mat *= Matrix.Translation(this.st大音符花火[i].fX - SampleFramework.GameWindowSize.Width / 2, -(this.st大音符花火[i].fY - SampleFramework.GameWindowSize.Height / 2), 0f);
                     */
-					float fX = this.st大音符花火[i].fX - (192 / 2);
-					float fY = this.st大音符花火[i].fY - (192 / 2);
+					float fX = this.stBigNoteFirework[i].fX - (192 / 2);
+					float fY = this.stBigNoteFirework[i].fY - (192 / 2);
 
 					//if(CDTXMania.Tx.Effects_Hit_FireWorks[ 0 ] != null && this.st大音符花火[ i ].nColor == 0 )
 					//{
@@ -294,22 +294,22 @@ internal class CActImplFireworks : CActivity {
 			}
 
 			for (int i = 0; i < 256; i++) {
-				if (this.st紙吹雪[i].b使用中) {
-					this.st紙吹雪[i].n前回のValue = this.st紙吹雪[i].ct進行.CurrentValue;
-					this.st紙吹雪[i].ct進行.Tick();
-					if (this.st紙吹雪[i].ct進行.IsEnded) {
-						this.st紙吹雪[i].ct進行.Stop();
-						this.st紙吹雪[i].b使用中 = false;
-					} else if (this.st紙吹雪[i].fX > 1300 || this.st紙吹雪[i].fX < -20) {
-						this.st紙吹雪[i].ct進行.Stop();
-						this.st紙吹雪[i].b使用中 = false;
+				if (this.stConfetti[i].bUse) {
+					this.stConfetti[i].nPreviousValue = this.stConfetti[i].ctProgress.CurrentValue;
+					this.stConfetti[i].ctProgress.Tick();
+					if (this.stConfetti[i].ctProgress.IsEnded) {
+						this.stConfetti[i].ctProgress.Stop();
+						this.stConfetti[i].bUse = false;
+					} else if (this.stConfetti[i].fX > 1300 || this.stConfetti[i].fX < -20) {
+						this.stConfetti[i].ctProgress.Stop();
+						this.stConfetti[i].bUse = false;
 					}
-					for (int n = this.st紙吹雪[i].n前回のValue; n < this.st紙吹雪[i].ct進行.CurrentValue; n++) {
-						this.st紙吹雪[i].fX -= this.st紙吹雪[i].f加速度X;
-						this.st紙吹雪[i].fY -= this.st紙吹雪[i].f加速度Y;
-						this.st紙吹雪[i].f加速度X *= this.st紙吹雪[i].f加速度の加速度X;
-						this.st紙吹雪[i].f加速度Y *= this.st紙吹雪[i].f加速度の加速度Y;
-						this.st紙吹雪[i].f加速度Y -= this.st紙吹雪[i].f重力加速度;
+					for (int n = this.stConfetti[i].nPreviousValue; n < this.stConfetti[i].ctProgress.CurrentValue; n++) {
+						this.stConfetti[i].fX -= this.stConfetti[i].fAccelerationX;
+						this.stConfetti[i].fY -= this.stConfetti[i].fAccelerationY;
+						this.stConfetti[i].fAccelerationX *= this.stConfetti[i].fAccelerationAccelerationX;
+						this.stConfetti[i].fAccelerationY *= this.stConfetti[i].fAccelerationAccelerationY;
+						this.stConfetti[i].fAccelerationY -= this.stConfetti[i].fGravityAcceleration;
 					}
 					/*
                     Matrix mat = Matrix.Identity;
@@ -341,60 +341,60 @@ internal class CActImplFireworks : CActivity {
 	//private CTextureAf[] tx大音符花火 = new CTextureAf[2];
 	//private CTexture tx紙吹雪;
 
-	protected STSTATUS[] st状態 = new STSTATUS[3 * 4];
-	protected STSTATUS_B[] st状態_大 = new STSTATUS_B[3 * 4];
-	private ST大音符花火[] st大音符花火 = new ST大音符花火[45];
+	protected STSTATUS[] stState = new STSTATUS[3 * 4];
+	protected STSTATUS_B[] stState_Big = new STSTATUS_B[3 * 4];
+	private STBigNoteFirework[] stBigNoteFirework = new STBigNoteFirework[45];
 
-	protected int[] nX座標 = new int[] { 450, 521, 596, 686, 778, 863, 970, 1070, 1150 };
-	protected int[] nY座標 = new int[] { 172, 108, 50, 8, -10, -60, -5, 30, 90 };
-	protected int[] nY座標P2 = new int[] { 172, 108, 50, 8, -10, -60, -5, 30, 90 };
+	protected int[] nXCoord = new int[] { 450, 521, 596, 686, 778, 863, 970, 1070, 1150 };
+	protected int[] nYCoord = new int[] { 172, 108, 50, 8, -10, -60, -5, 30, 90 };
+	protected int[] nYCoordP2 = new int[] { 172, 108, 50, 8, -10, -60, -5, 30, 90 };
 
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
-		public bool b使用中;
-		public CCounter ct進行;
+		public bool bUse;
+		public CCounter ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
-		public int n透明度;
+		public int nOpacity;
 		public int nPlayer;
 	}
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS_B {
-		public CCounter ct進行;
+		public CCounter ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
-		public int n透明度;
+		public int nOpacity;
 		public int nPlayer;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST大音符花火 {
-		public bool b使用中;
-		public CCounter ct進行;
-		public int n前回のValue;
+	private struct STBigNoteFirework {
+		public bool bUse;
+		public CCounter ctProgress;
+		public int nPreviousValue;
 		public float fX;
 		public float fY;
-		public int n開始フレーム;
-		public int n終了フレーム;
+		public int nStartFrame;
+		public int nEndFrame;
 	}
 
-	private ST紙吹雪[] st紙吹雪 = new ST紙吹雪[256];
+	private STConfetti[] stConfetti = new STConfetti[256];
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST紙吹雪 {
+	private struct STConfetti {
 		public int nGraphic;
 		public int nColor;
-		public bool b使用中;
-		public CCounter ct進行;
-		public int n前回のValue;
+		public bool bUse;
+		public CCounter ctProgress;
+		public int nPreviousValue;
 		public float fX;
 		public float fY;
-		public float f加速度X;
-		public float f加速度Y;
-		public float f加速度の加速度X;
-		public float f加速度の加速度Y;
-		public float f重力加速度;
-		public float f半径;
-		public float f角度;
+		public float fAccelerationX;
+		public float fAccelerationY;
+		public float fAccelerationAccelerationX;
+		public float fAccelerationAccelerationY;
+		public float fGravityAcceleration;
+		public float fRadius;
+		public float fAngle;
 	}
 	//-----------------
 	#endregion

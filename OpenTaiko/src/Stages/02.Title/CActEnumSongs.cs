@@ -8,7 +8,7 @@ using SkiaSharp;
 namespace OpenTaiko;
 
 internal class CActEnumSongs : CActivity {
-	public bool bコマンドでの曲データ取得;
+	public bool bCommandSongDataGet;
 
 
 	/// <summary>
@@ -18,12 +18,12 @@ internal class CActEnumSongs : CActivity {
 		Init(false);
 	}
 
-	public CActEnumSongs(bool _bコマンドでの曲データ取得) {
-		Init(_bコマンドでの曲データ取得);
+	public CActEnumSongs(bool _bCommandSongDataGet) {
+		Init(_bCommandSongDataGet);
 	}
-	private void Init(bool _bコマンドでの曲データ取得) {
+	private void Init(bool _bCommandSongDataGet) {
 		base.IsDeActivated = true;
-		bコマンドでの曲データ取得 = _bコマンドでの曲データ取得;
+		bCommandSongDataGet = _bCommandSongDataGet;
 	}
 
 	// CActivity 実装
@@ -96,11 +96,11 @@ internal class CActEnumSongs : CActivity {
 		this.ctNowEnumeratingSongs.TickLoop();
 		if (OpenTaiko.Tx.Enum_Song != null) {
 			OpenTaiko.Tx.Enum_Song.Opacity = (int)(176.0 + 80.0 * Math.Sin((double)(2 * Math.PI * this.ctNowEnumeratingSongs.CurrentValue * 2 / 100.0)));
-			OpenTaiko.Tx.Enum_Song.t2D描画(18, 7);
+			OpenTaiko.Tx.Enum_Song.t2DDraw(18, 7);
 		}
-		if (bコマンドでの曲データ取得 && OpenTaiko.Tx.Config_Enum_Song != null) {
-			OpenTaiko.Tx.Config_Enum_Song.t2D描画(180, 177);
-			this.txMessage.t2D描画(190, 197);
+		if (bCommandSongDataGet && OpenTaiko.Tx.Config_Enum_Song != null) {
+			OpenTaiko.Tx.Config_Enum_Song.t2DDraw(180, 177);
+			this.txMessage.t2DDraw(190, 197);
 		}
 
 		return 0;

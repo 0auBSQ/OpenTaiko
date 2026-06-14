@@ -30,10 +30,10 @@ namespace OpenTaiko {
 
 		#region Drawing
 		public void Draw(int x, int y) {
-			_texture?.t2D描画(x, y);
+			_texture?.t2DDraw(x, y);
 		}
 		public void DrawRect(int x, int y, int rect_x, int rect_y, int rect_width, int rect_height) {
-			_texture?.t2D描画(x, y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+			_texture?.t2DDraw(x, y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 		}
 		public void DrawAtAnchor(int x, int y, string anchor) {
 			DrawRectAtAnchor(x, y, 0, 0, Width, Height, anchor);
@@ -52,7 +52,7 @@ namespace OpenTaiko {
 				_ => CTexture.RefPnt.UpLeft
 			};
 
-			_texture?.t2D拡大率考慮描画(ref_anchor, x, y, new(rect_x, rect_y, rect_width, rect_height));
+			_texture?.t2DScaledDraw(ref_anchor, x, y, new(rect_x, rect_y, rect_width, rect_height));
 		}
 		#endregion
 		#region Gets
@@ -107,7 +107,7 @@ namespace OpenTaiko {
 			_texture?.tUpdateColor4(new(red, green, blue, 1f));
 		}
 		public void SetRotation(float angle) {
-			if (_texture != null) _texture.fZ軸中心回転 = (float)(angle * Math.PI / 180);
+			if (_texture != null) _texture.fZAxisCenterRotate = (float)(angle * Math.PI / 180);
 		}
 		public void SetBlendMode(string mode) {
 			if (_texture != null) {
@@ -176,7 +176,7 @@ namespace OpenTaiko {
 			LuaTexture luatex = new();
 			if (File.Exists(full_path)) {
 				try {
-					var tex = OpenTaiko.tテクスチャの生成(full_path);
+					var tex = OpenTaiko.tTextureCreate(full_path);
 					luatex = new LuaTexture(tex);
 					Textures.Add(luatex);
 					if (autoDispose)

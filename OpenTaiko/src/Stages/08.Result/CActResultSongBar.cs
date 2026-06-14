@@ -12,8 +12,8 @@ internal class CActResultSongBar : CActivity {
 
 	// メソッド
 
-	public void tアニメを完了させる() {
-		this.ct登場用.CurrentValue = (int)this.ct登場用.EndValue;
+	public void tAnimeComplete() {
+		this.ctAppear.CurrentValue = (int)this.ctAppear.EndValue;
 	}
 
 
@@ -24,18 +24,18 @@ internal class CActResultSongBar : CActivity {
 		var title = OpenTaiko.TJA.TITLE.GetString("");
 
 		using (var bmpSongTitle = pfMusicName.DrawText(title, OpenTaiko.Skin.Result_MusicName_ForeColor, OpenTaiko.Skin.Result_MusicName_BackColor, null, 30)) {
-			this.txMusicName = OpenTaiko.tテクスチャの生成(bmpSongTitle, false);
+			this.txMusicName = OpenTaiko.tTextureCreate(bmpSongTitle, false);
 			txMusicName.vcScaleRatio.X = OpenTaiko.GetSongNameXScaling(ref txMusicName, OpenTaiko.Skin.Result_MusicName_MaxSize);
 		}
 
 		base.Activate();
 	}
 	public override void DeActivate() {
-		if (this.ct登場用 != null) {
-			this.ct登場用 = null;
+		if (this.ctAppear != null) {
+			this.ctAppear = null;
 		}
 
-		OpenTaiko.tテクスチャの解放(ref this.txMusicName);
+		OpenTaiko.tTextureRelease(ref this.txMusicName);
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
@@ -51,20 +51,20 @@ internal class CActResultSongBar : CActivity {
 			return 0;
 		}
 		if (base.IsFirstDraw) {
-			this.ct登場用 = new CCounter(0, 270, 4, OpenTaiko.Timer);
+			this.ctAppear = new CCounter(0, 270, 4, OpenTaiko.Timer);
 			base.IsFirstDraw = false;
 		}
-		this.ct登場用.Tick();
+		this.ctAppear.Tick();
 
 		if (OpenTaiko.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Center) {
-			this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X - ((this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X) / 2), OpenTaiko.Skin.Result_MusicName_Y);
+			this.txMusicName.t2DDraw(OpenTaiko.Skin.Result_MusicName_X - ((this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X) / 2), OpenTaiko.Skin.Result_MusicName_Y);
 		} else if (OpenTaiko.Skin.Result_MusicName_ReferencePoint == CSkin.ReferencePoint.Left) {
-			this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X, OpenTaiko.Skin.Result_MusicName_Y);
+			this.txMusicName.t2DDraw(OpenTaiko.Skin.Result_MusicName_X, OpenTaiko.Skin.Result_MusicName_Y);
 		} else {
-			this.txMusicName.t2D描画(OpenTaiko.Skin.Result_MusicName_X - this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X, OpenTaiko.Skin.Result_MusicName_Y);
+			this.txMusicName.t2DDraw(OpenTaiko.Skin.Result_MusicName_X - this.txMusicName.szTextureSize.Width * txMusicName.vcScaleRatio.X, OpenTaiko.Skin.Result_MusicName_Y);
 		}
 
-		if (!this.ct登場用.IsEnded) {
+		if (!this.ctAppear.IsEnded) {
 			return 0;
 		}
 		return 1;
@@ -75,7 +75,7 @@ internal class CActResultSongBar : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private CCounter ct登場用;
+	private CCounter ctAppear;
 
 	private CTexture txMusicName;
 	private CCachedFontRenderer pfMusicName;

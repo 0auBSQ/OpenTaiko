@@ -37,8 +37,8 @@ public class CUtility {
 
 	// IO
 
-	public static string t指定した拡張子を持つファイルを検索し最初に見つけたファイルの絶対パスを返す(string strフォルダパス, List<string> extensions) {
-		string[] files = Directory.GetFiles(strフォルダパス);     // GetFiles() は完全パスを返す。
+	public static string tFindFirstFileWithExtension(string strFolderPath, List<string> extensions) {
+		string[] files = Directory.GetFiles(strFolderPath);     // GetFiles() は完全パスを返す。
 
 
 		// ファイル順より拡張子順を優先して検索する。→ 拡張子リストの前方の拡張子ほど先に発見されるようにするため。

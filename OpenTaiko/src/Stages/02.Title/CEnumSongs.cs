@@ -1,12 +1,15 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace OpenTaiko;
 
 internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲リストを取得するクラス
 {                                                   // ファイルキャッシュ(songslist.db)からの取得と、ディスクからの取得を、この一つのクラスに集約。
 
-	public CSongs管理 Songs管理                     // 曲の探索結果はこのSongs管理に読み込まれる
+	public CSongManager SongManager                     // 曲の探索結果はこのSongs管理に読み込まれる
 	{
 		get;
 		private set;
@@ -40,15 +43,15 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	}
 	public void SongListEnumCompletelyDone() {
 		this.state = DTXEnumState.CompletelyDone;
-		this.Songs管理 = null;                        // GCはOSに任せる
+		this.SongManager = null;                        // GCはOSに任せる
 	}
 	public bool IsSlowdown                          // #PREMOVIE再生中は検索負荷を落とす
 	{
 		get {
-			return this.Songs管理.bIsSlowdown;
+			return this.SongManager.bIsSlowdown;
 		}
 		set {
-			this.Songs管理.bIsSlowdown = value;
+			this.SongManager.bIsSlowdown = value;
 		}
 	}
 
@@ -57,8 +60,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			this.thDTXFileEnumerate.Priority = tp;
 		}
 	}
-	private readonly string strPathSongsDB = OpenTaiko.strEXEのあるフォルダ + "songs.db";
-	private readonly string strPathSongList = OpenTaiko.strEXEのあるフォルダ + "songlist.db";
+	private readonly string strPathSongsDB = OpenTaiko.strEXEFolder + "songs.db";
+	private readonly string strPathSongList = OpenTaiko.strEXEFolder + "songlist.db";
 
 	public Thread thDTXFileEnumerate {
 		get;
@@ -79,7 +82,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// Constractor
 	/// </summary>
 	public CEnumSongs() {
-		this.Songs管理 = new CSongs管理();
+		this.SongManager = new CSongManager();
 	}
 
 	public void Init() {
@@ -112,9 +115,9 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			}
 			// this.autoReset = new AutoResetEvent( true );
 
-			if (this.Songs管理 == null)       // Enumerating Songs完了後、CONFIG画面から再スキャンしたときにこうなる
+			if (this.SongManager == null)       // Enumerating Songs完了後、CONFIG画面から再スキャンしたときにこうなる
 			{
-				this.Songs管理 = new CSongs管理();
+				this.SongManager = new CSongManager();
 			}
 			if (hard_reload)
 				this.thDTXFileEnumerate = new Thread(new ThreadStart(this.HardReloadSongList));
@@ -141,7 +144,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		if (this.state != DTXEnumState.CompletelyDone &&
 			((thDTXFileEnumerate?.ThreadState & (System.Threading.ThreadState.Background)) != 0)) {
 			// this.thDTXFileEnumerate.Suspend();		// obsoleteにつき使用中止
-			this.Songs管理.bIsSuspending = true;
+			this.SongManager.bIsSuspending = true;
 			this.state = DTXEnumState.Suspended;
 			Trace.TraceInformation("★曲データ検索スレッドを中断しました。");
 		}
@@ -155,8 +158,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			if ((this.thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.StopRequested)) != 0) //
 			{
 				// this.thDTXFileEnumerate.Resume();	// obsoleteにつき使用中止
-				this.Songs管理.bIsSuspending = false;
-				this.Songs管理.AutoReset.Set();
+				this.SongManager.bIsSuspending = false;
+				this.SongManager.AutoReset.Set();
 				this.state = DTXEnumState.Ongoing;
 				Trace.TraceInformation("★曲データ検索スレッドを再開しました。");
 			}
@@ -185,7 +188,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Abort() {
 		if (thDTXFileEnumerate != null) {
-			this.Songs管理.bIsCanceled = true;
+			this.SongManager.bIsCanceled = true;
 			this.state = DTXEnumState.Canceled;
 			try {
 				thDTXFileEnumerate.Join();
@@ -197,7 +200,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			// Songs管理を再初期化する (途中まで作った曲リストの最後に、一から重複して追記することにならないようにする。)
 			thDTXFileEnumerate = null;
-			this.Songs管理 = new CSongs管理();
+			this.SongManager = new CSongManager();
 			this.state = DTXEnumState.None;
 		}
 	}
@@ -223,10 +226,10 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			Trace.Indent();
 
 			try {
-				OpenTaiko.Skin.bgm起動画面.tPlay();
+				OpenTaiko.Skin.bgmStartupScreen.tPlay();
 				OpenTaiko.Skin.PreloadSystemSounds();
-				lock (OpenTaiko.stageStartup.list進行文字列) {
-					OpenTaiko.stageStartup.list進行文字列.Add("SYSTEM SOUND...OK");
+				lock (OpenTaiko.stageStartup.listProgressString) {
+					OpenTaiko.stageStartup.listProgressString.Add("SYSTEM SOUND...OK");
 				}
 			} finally {
 				Trace.Unindent();
@@ -260,8 +263,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 		try {
 			if (hard_reload) {
-				if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db"))
-					File.Delete($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
+				if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db"))
+					File.Delete($"{OpenTaiko.strEXEFolder}songlist.db");
 			}
 			Deserialize();
 
@@ -281,7 +284,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 						foreach (string str in strArray) {
 							string path = str;
 							if (!Path.IsPathRooted(path)) {
-								path = OpenTaiko.strEXEのあるフォルダ + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
+								path = OpenTaiko.strEXEFolder + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
 							}
 
 							if (!string.IsNullOrEmpty(path)) {
@@ -289,7 +292,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 								Trace.Indent();
 
 								try {
-									this.Songs管理.t曲を検索してリストを作成する(path, true);
+									this.SongManager.tSongSearchListCreate(path, true);
 								} catch (OperationCanceledException) {
 									throw; // forward cancellation
 								} catch (Exception e) {
@@ -305,7 +308,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 					Trace.TraceWarning("曲データの検索パス(TJAPath)の指定がありません。");
 				}
 			} finally {
-				Trace.TraceInformation("曲データの検索を完了しました。[{0}曲{1}スコア]", this.Songs管理.n検索された曲ノード数, this.Songs管理.n検索されたスコア数);
+				Trace.TraceInformation("曲データの検索を完了しました。[{0}曲{1}スコア]", this.SongManager.nSearchSongNodeCount, this.SongManager.nSearchScoreCount);
 				Trace.Unindent();
 			}
 			//	lock ( this.list進行文字列 )
@@ -323,7 +326,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			Trace.Indent();
 
 			try {
-				this.Songs管理.tSongListPostprocessing();
+				this.SongManager.tSongListPostprocessing();
 			} catch (OperationCanceledException) {
 				throw; // forward cancellation
 			} catch (Exception e) {
@@ -386,27 +389,73 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 曲リストのserialize
 	/// </summary>
 	private void SerializeSongList() {
-		BinaryFormatter songlistdb_ = new BinaryFormatter();
-		using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-		songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
+		using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
+		WriteSongListCache(songlistdb, SongManager.listSongsDB);
 	}
 
 	/// <summary>
-	/// 曲リストのdeserialize
+	/// Deserialize the song-list cache. If the cache predates or no longer matches the current
+	/// serialized schema (e.g. a serialized field was renamed/added/removed), it is silently discarded
+	/// so the caller rebuilds the list from disk. Users never have to delete songlist.db by hand.
 	/// </summary>
-	/// <param name="songs管理"></param>
-	/// <param name="strPathSongList"></param>
 	public void Deserialize() {
 		try {
-			if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db")) {
-				BinaryFormatter songlistdb_ = new BinaryFormatter();
-				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-				this.Songs管理.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
+			if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db")) {
+				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEFolder}songlist.db");
+				this.SongManager.listSongsDB = ReadSongListCache(songlistdb) ?? new();
 			}
 		} catch (Exception exception) {
-			this.Songs管理.listSongsDB = new();
-		} finally {
+			this.SongManager.listSongsDB = new();
 		}
+	}
+
+	// ── songlist.db format: a schema signature, then the song dictionary ───────────────────────────────
+	// The signature is a fingerprint of the serialized type graph (every serialized field's name + type),
+	// so ANY change to the CSongListNode/CScore/… layout — including a rename — changes it and makes old
+	// caches load as empty and rebuild automatically. This prevents BinaryFormatter from silently loading
+	// a stale cache with mismatched field names (which leaves the renamed fields null).
+	private static string _cacheSchemaSignature;
+	internal static string SongListCacheSchemaSignature
+		=> _cacheSchemaSignature ??= ComputeSchemaSignature(typeof(Dictionary<string, CSongListNode>));
+
+	internal static void WriteSongListCache(Stream stream, Dictionary<string, CSongListNode> listSongsDB) {
+		BinaryFormatter songlistdb_ = new BinaryFormatter();
+		songlistdb_.Serialize(stream, SongListCacheSchemaSignature);
+		songlistdb_.Serialize(stream, listSongsDB);
+	}
+
+	internal static Dictionary<string, CSongListNode> ReadSongListCache(Stream stream) {
+		BinaryFormatter songlistdb_ = new BinaryFormatter();
+		// A cache written before this header (or with a different schema) fails this check → rebuild.
+		if (songlistdb_.Deserialize(stream) is not string signature || signature != SongListCacheSchemaSignature)
+			return null;
+		return (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(stream);
+	}
+
+	/// <summary>Fingerprint of the serialized object graph reachable from <paramref name="root"/>
+	/// (field names + field types, recursively through OpenTaiko types), stable across runs.</summary>
+	private static string ComputeSchemaSignature(Type root) {
+		var sb = new StringBuilder();
+		var seen = new HashSet<Type>();
+		void Consider(Type t) {
+			if (t == null) return;
+			if (t.IsArray) { Consider(t.GetElementType()); return; }
+			if (t.IsGenericType) { foreach (var a in t.GetGenericArguments()) Consider(a); return; }
+			if (t.Namespace != null && t.Namespace.StartsWith("OpenTaiko")) Walk(t);
+		}
+		void Walk(Type t) {
+			if (!seen.Add(t)) return;
+			sb.Append(t.FullName).Append('{');
+			foreach (var f in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+								.Where(f => !f.IsNotSerialized)
+								.OrderBy(f => f.Name, StringComparer.Ordinal)) {
+				sb.Append(f.Name).Append(':').Append(f.FieldType.FullName).Append(';');
+				Consider(f.FieldType);
+			}
+			sb.Append('}');
+		}
+		Consider(root);
+		return Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(sb.ToString())));
 	}
 #pragma warning restore SYSLIB0011
 }

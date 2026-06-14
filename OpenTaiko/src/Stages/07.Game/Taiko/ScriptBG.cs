@@ -25,20 +25,20 @@ class ScriptBGFunc {
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
 		if (this.Textures.ContainsKey(fileName)) // already loaded
 			return;
-		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+		Textures.Add(fileName, OpenTaiko.tTextureCreate($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
 		Textures[fileName]?.SetTextureWrapMode(Silk.NET.OpenGLES.TextureWrapMode.Repeat);
 	}
 	public void DrawGraph(double x, double y, string fileName) {
-		Textures[fileName]?.t2D描画((int)x, (int)y);
+		Textures[fileName]?.t2DDraw((int)x, (int)y);
 	}
 	public void DrawRectGraph(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName) {
-		Textures[fileName]?.t2D描画((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		Textures[fileName]?.t2DDraw((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 	}
 	public void DrawGraphCenter(double x, double y, string fileName) {
-		Textures[fileName]?.t2D拡大率考慮中央基準描画((int)x, (int)y);
+		Textures[fileName]?.t2DScaledCenterBasedDraw((int)x, (int)y);
 	}
 	public void DrawGraphRectCenter(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName) {
-		Textures[fileName]?.t2D拡大率考慮中央基準描画((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		Textures[fileName]?.t2DScaledCenterBasedDraw((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 	}
 	public void SetOpacity(double opacity, string fileName) {
 		if (Textures[fileName] != null)
@@ -52,7 +52,7 @@ class ScriptBGFunc {
 	}
 	public void SetRotation(double angle, string fileName) {
 		if (Textures[fileName] != null) {
-			Textures[fileName].fZ軸中心回転 = (float)(angle * Math.PI / 180);
+			Textures[fileName].fZAxisCenterRotate = (float)(angle * Math.PI / 180);
 		}
 	}
 	public void SetColor(double r, double g, double b, string fileName) {
@@ -65,34 +65,34 @@ class ScriptBGFunc {
 			switch (type) {
 				case "Normal":
 				default:
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Add":
-					Textures[fileName].b加算合成 = true;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = true;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Multi":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = true;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = true;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Sub":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = true;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = true;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Screen":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = true;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = true;
 					break;
 			}
 		}
@@ -271,7 +271,7 @@ class ScriptBG : IDisposable {
 				0,
 				OpenTaiko.stageGameScreen.AIBattleState,
 				OpenTaiko.stageGameScreen.bIsAIBattleWin,
-				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue,
 				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
 				new bool[] { false, false, false, false, false },
 				-1
@@ -289,7 +289,7 @@ class ScriptBG : IDisposable {
 			float currentFloorPositionMax140 = 0;
 
 			if (OpenTaiko.SongMount.rChoosenSong != null && OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -312,7 +312,7 @@ class ScriptBG : IDisposable {
 				(double)currentFloorPositionMax140,
 				OpenTaiko.stageGameScreen.AIBattleState,
 				OpenTaiko.stageGameScreen.bIsAIBattleWin,
-				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue,
 				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
 				OpenTaiko.stageGameScreen.bIsGOGOTIME,
 				timestamp);

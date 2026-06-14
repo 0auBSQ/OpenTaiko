@@ -9,12 +9,12 @@ namespace OpenTaiko;
 /// _STAGE FAILED OFF時にゲージ回復を止める
 /// _黒→閉店までの差を大きくする。
 /// </summary>
-internal class CAct演奏ゲージ共通 : CActivity {
+internal class CActPlayGaugeCommon : CActivity {
 	// Properties
 	public CActLVLNFont actLVLNFont { get; protected set; }
 
 	// コンストラクタ
-	public CAct演奏ゲージ共通() {
+	public CActPlayGaugeCommon() {
 		//actLVLNFont = new CActLVLNFont();		// On活性化()に移動
 		//actLVLNFont.On活性化();
 	}
@@ -24,7 +24,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	public override void Activate() {
 		for (int i = 0; i < 3; i++) {
 			for (int n = 0; n < 3; n++) {
-				dbゲージ増加量_Branch[i, n] = new float[5];
+				dbGaugeIncreaseAmount_Branch[i, n] = new float[5];
 			}
 		}
 		for (int i = 0; i < this.DTX.Length; ++i)
@@ -93,11 +93,11 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		switch (HGaugeMethods.tGetGaugeTypeEnum(nPlayer)) {
 			default:
 			case HGaugeMethods.EGaugeType.NORMAL:
-				this.db現在のゲージ値[nPlayer] = 0;
+				this.dbCurrentGaugeValue[nPlayer] = 0;
 				break;
 			case HGaugeMethods.EGaugeType.HARD:
 			case HGaugeMethods.EGaugeType.EXTREME:
-				this.db現在のゲージ値[nPlayer] = 100;
+				this.dbCurrentGaugeValue[nPlayer] = 100;
 				break;
 		}
 
@@ -149,7 +149,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		#region [(Unbloated) Gauge max combo values]
 
 		for (int i = 0; i < 3; i++) {
-			dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nノーツ数_Branch[i] * (gaugeRate / 100.0f);
+			dbGaugeMaxComboValue_branch[i] = this.DTX[nPlayer].nNotesCount_Branch[i] * (gaugeRate / 100.0f);
 		}
 
 		#endregion
@@ -177,13 +177,13 @@ internal class CAct演奏ゲージ共通 : CActivity {
 			if (!double.IsInfinity(nGaugeRankValue_branch[ib] / 100.0f)) { //値がInfintyかチェック
 				fIsDontInfinty = (float)(nGaugeRankValue_branch[ib] / 100.0f);
 				for (int ij = 0; ij < 3; ++ij) {
-					this.dbゲージ増加量_Branch[ib, ij][nPlayer] = fIsDontInfinty * fAddVolume[ij];
+					this.dbGaugeIncreaseAmount_Branch[ib, ij][nPlayer] = fIsDontInfinty * fAddVolume[ij];
 				}
 			} else {
 				for (int ij = 0; ij < 3; ++ij) {
 					// Handling infinity cases
 					//Infintyだった場合はInfintyではない値 * 3.0をしてその値を利用する。
-					this.dbゲージ増加量_Branch[ib, ij][nPlayer] = (fIsDontInfinty * fAddVolume[ij]) * 3f;
+					this.dbGaugeIncreaseAmount_Branch[ib, ij][nPlayer] = (fIsDontInfinty * fAddVolume[ij]) * 3f;
 				}
 			}
 		}
@@ -199,7 +199,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		if (gaugeRoundFunc != null) {
 			for (int ib = 0; ib < 3; ++ib) {
 				for (int ij = 0; ij < 3; ++ij)
-					dbゲージ増加量_Branch[ib, ij][nPlayer] = gaugeRoundFunc(dbゲージ増加量_Branch[ib, ij][nPlayer] * 10000.0f) / 10000.0f;
+					dbGaugeIncreaseAmount_Branch[ib, ij][nPlayer] = gaugeRoundFunc(dbGaugeIncreaseAmount_Branch[ib, ij][nPlayer] * 10000.0f) / 10000.0f;
 			}
 		}
 
@@ -211,7 +211,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		if (gaugeFillRatio != 1) {
 			for (int ib = 0; ib < 3; ++ib) {
 				for (int ij = 0; ij < 3; ++ij)
-					dbゲージ増加量_Branch[ib, ij][nPlayer] *= gaugeFillRatio;
+					dbGaugeIncreaseAmount_Branch[ib, ij][nPlayer] *= gaugeFillRatio;
 			}
 		}
 		#endregion
@@ -234,7 +234,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	};
 
 	//譜面レベル, 判定
-	public float[,][] dbゲージ増加量_Branch = new float[3, 3][];
+	public float[,][] dbGaugeIncreaseAmount_Branch = new float[3, 3][];
 
 
 	public float[] fGaugeMaxRate =
@@ -262,7 +262,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 				fDamage = -Math.Abs(tja.boomRuleValue);
 				break;
 			case CTja.EBoomRule.Ratio:
-				fDamage = -Math.Abs(tja.boomRuleValue * this.dbゲージ増加量_Branch[iBranch, 0][nPlayer]);
+				fDamage = -Math.Abs(tja.boomRuleValue * this.dbGaugeIncreaseAmount_Branch[iBranch, 0][nPlayer]);
 				break;
 			case CTja.EBoomRule.Fatal:
 				fDamage = 0; // or use another default value?
@@ -276,21 +276,21 @@ internal class CAct演奏ゲージ共通 : CActivity {
 		this.Damage(nPlayer, fDamage);
 	}
 
-	public void Damage(EKeyConfigPart screenmode, ENoteJudge e今回の判定, int nPlayer, CTja.ECourse? chipBranch = null) {
+	public void Damage(EKeyConfigPart screenmode, ENoteJudge eThisTimeJudge, int nPlayer, CTja.ECourse? chipBranch = null) {
 		float fDamage;
-		int nコース = (int)(chipBranch ?? OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer]);
+		int nCourse = (int)(chipBranch ?? OpenTaiko.stageGameScreen.nCurrentBranch[nPlayer]);
 
-		switch (e今回の判定) {
+		switch (eThisTimeJudge) {
 			case ENoteJudge.Perfect:
 			case ENoteJudge.Great:
-				fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
+				fDamage = this.dbGaugeIncreaseAmount_Branch[nCourse, 0][nPlayer];
 				break;
 			case ENoteJudge.Good:
-				fDamage = this.dbゲージ増加量_Branch[nコース, 1][nPlayer];
+				fDamage = this.dbGaugeIncreaseAmount_Branch[nCourse, 1][nPlayer];
 				break;
 			case ENoteJudge.Poor:
 			case ENoteJudge.Miss: {
-					fDamage = this.dbゲージ増加量_Branch[nコース, 2][nPlayer];
+					fDamage = this.dbGaugeIncreaseAmount_Branch[nCourse, 2][nPlayer];
 
 					int level = this.DTX[nPlayer].PlayerSideMetadata.LEVELtaiko;
 					int nanidou = this.DTX[nPlayer].nInstanceDifficulty;
@@ -314,7 +314,7 @@ internal class CAct演奏ゲージ共通 : CActivity {
 
 
 			default:
-				fDamage = this.dbゲージ増加量_Branch[nコース, 0][nPlayer];
+				fDamage = this.dbGaugeIncreaseAmount_Branch[nCourse, 0][nPlayer];
 				break;
 		}
 
@@ -322,12 +322,12 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	}
 
 	public void Damage(int nPlayer, float fDamage) {
-		this.db現在のゲージ値[nPlayer] = Math.Round(this.db現在のゲージ値[nPlayer] + fDamage, 5, MidpointRounding.ToEven);
+		this.dbCurrentGaugeValue[nPlayer] = Math.Round(this.dbCurrentGaugeValue[nPlayer] + fDamage, 5, MidpointRounding.ToEven);
 
-		if (this.db現在のゲージ値[nPlayer] >= 100.0)
-			this.db現在のゲージ値[nPlayer] = 100.0;
-		else if (this.db現在のゲージ値[nPlayer] <= 0.0)
-			this.db現在のゲージ値[nPlayer] = 0.0;
+		if (this.dbCurrentGaugeValue[nPlayer] >= 100.0)
+			this.dbCurrentGaugeValue[nPlayer] = 100.0;
+		else if (this.dbCurrentGaugeValue[nPlayer] <= 0.0)
+			this.dbCurrentGaugeValue[nPlayer] = 0.0;
 
 
 		//CDTXMania.stage演奏ドラム画面.nGauge = fDamage;
@@ -341,10 +341,10 @@ internal class CAct演奏ゲージ共通 : CActivity {
 	#endregion
 
 	private CTja[] DTX = new CTja[OpenTaiko.MAX_PLAYERS];
-	public double[] db現在のゲージ値 = new double[5];
-	protected CCounter ct炎;
-	protected CCounter ct虹アニメ;
-	protected CCounter ct虹透明度;
-	protected CTexture[] txゲージ虹 = new CTexture[12];
-	protected CTexture[] txゲージ虹2P = new CTexture[12];
+	public double[] dbCurrentGaugeValue = new double[5];
+	protected CCounter ctFlame;
+	protected CCounter ctRainbowAnime;
+	protected CCounter ctRainbowOpacity;
+	protected CTexture[] txGaugeRainbow = new CTexture[12];
+	protected CTexture[] txGaugeRainbow2P = new CTexture[12];
 }

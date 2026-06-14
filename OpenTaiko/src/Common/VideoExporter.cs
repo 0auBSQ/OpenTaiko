@@ -160,8 +160,8 @@ internal static class VideoExporter {
 					// the song list enumerates in the background during the title stage; once it is
 					// reflected, resolve the uid and jump straight into song loading.
 					if (OpenTaiko.EnumSongs != null && OpenTaiko.EnumSongs.IsSongListEnumCompletelyDone
-						&& OpenTaiko.Songs管理 != null && OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.CUSTOM) {
-						CSongListNode? node = FindByUid(OpenTaiko.Songs管理.list曲ルート, _uid);
+						&& OpenTaiko.SongManager != null && OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.CUSTOM) {
+						CSongListNode? node = FindByUid(OpenTaiko.SongManager.listSongRoot, _uid);
 						if (node == null) { Fail(game, $"No chart with unique id '{_uid}' was found in the song list."); break; }
 
 						var missing = _diffs.Where(d => node.score[d] == null).ToArray();
@@ -259,7 +259,7 @@ internal static class VideoExporter {
 		// the last chip in the (time-sorted) chart marks the play's end → a real percentage is possible
 		try {
 			var chips = OpenTaiko.TJA?.listChip;
-			_chartEndMs = (chips != null && chips.Count > 0 ? chips[chips.Count - 1].n発声時刻ms : 120000) + 4000;   // + outro fade pad
+			_chartEndMs = (chips != null && chips.Count > 0 ? chips[chips.Count - 1].nSoundTimems : 120000) + 4000;   // + outro fade pad
 		} catch { _chartEndMs = 120000; }
 		_wallStartTicks = Environment.TickCount64;
 

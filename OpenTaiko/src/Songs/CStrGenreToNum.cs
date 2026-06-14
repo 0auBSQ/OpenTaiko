@@ -1,8 +1,8 @@
 ﻿namespace OpenTaiko;
 
-internal static class CStrジャンルtoNum {
-	internal static int ForAC8_14(string strジャンル) {
-		switch (strジャンル) {
+internal static class CStrGenreToNum {
+	internal static int ForAC8_14(string strGenre) {
+		switch (strGenre) {
 			case "アニメ":
 				return 0;
 			case "ポップス":
@@ -25,8 +25,8 @@ internal static class CStrジャンルtoNum {
 		}
 	}
 
-	internal static int ForAC15(string strジャンル) {
-		switch (strジャンル) {
+	internal static int ForAC15(string strGenre) {
+		switch (strGenre) {
 			case "ポップス":
 			case "J-POP":
 			case "POPS":

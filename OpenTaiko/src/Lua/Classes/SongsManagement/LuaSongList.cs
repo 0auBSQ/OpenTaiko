@@ -13,7 +13,7 @@ namespace OpenTaiko {
 		public void ReloadSongList() {
 			_root = new LuaSongNodeRoot();
 
-			var _scanningList = OpenTaiko.Songs管理.list曲ルート;
+			var _scanningList = OpenTaiko.SongManager.listSongRoot;
 
 			if (_settings.RootGenreFolderNode != null) {
 				var _col = _settings.RootGenreFolderNode.INTERNAL_GetChildrenList(new CBlankClass());

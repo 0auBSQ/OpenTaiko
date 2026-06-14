@@ -73,7 +73,7 @@ namespace OpenTaikoTests {
 
 			string path = TempPath();
 			try {
-				cfg.t書き出し(path);
+				cfg.tExport(path);
 				string text = File.ReadAllText(path);
 				Assert.Contains("[DrumsKeyAssign]", text);
 				Assert.Contains("[SystemKeyAssign]", text);
@@ -115,7 +115,7 @@ namespace OpenTaikoTests {
 		// check on the setter must remain, and any other index must be rejected.
 		[Fact]
 		public void STSKILL_Indexer_Index0Only_WithRangeCheck() {
-			var s = new CScore.ST譜面情報.STSKILL();
+			var s = new CScore.STChartInfo.STSKILL();
 			s[0] = 87.5;
 			Assert.Equal(87.5, s[0]);
 			Assert.Equal(87.5, s.Drums);
@@ -129,11 +129,11 @@ namespace OpenTaikoTests {
 		[Fact]
 		public void CScore_ScoreValidity_GatedByTaikoLevel() {
 			var sc = new CScore();
-			Assert.False(sc.bスコアが有効である);   // freshly constructed → level 0 → invalid
-			sc.譜面情報.レベル = 8;
-			Assert.True(sc.bスコアが有効である);
-			sc.譜面情報.レベル = 0;
-			Assert.False(sc.bスコアが有効である);
+			Assert.False(sc.bScoreEnabled);   // freshly constructed → level 0 → invalid
+			sc.ChartInfo.Level = 8;
+			Assert.True(sc.bScoreEnabled);
+			sc.ChartInfo.Level = 0;
+			Assert.False(sc.bScoreEnabled);
 		}
 
 		// CTja.LEVEL went from STDGBVALUE<int> to a plain int; the LEVEL command parse must still land
@@ -148,7 +148,7 @@ namespace OpenTaikoTests {
 					"TITLE:LevelParseTest\nBPM:120\nWAVE:none.ogg\nCOURSE:Oni\nLEVEL:7\n#START\n1010,\n#END\n");
 				var tja = new CTja();
 				tja.Activate();
-				tja.t入力(p, 3 /* Oni */, 0, false, 0);
+				tja.tInput(p, 3 /* Oni */, 0, false, 0);
 				Assert.Equal(7, tja.LEVEL);
 			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}

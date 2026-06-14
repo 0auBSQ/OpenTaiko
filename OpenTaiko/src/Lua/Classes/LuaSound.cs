@@ -26,7 +26,7 @@ namespace OpenTaiko {
 		public bool GetLoop() => _sound?.bLoop ?? false;
 		public int GetPan() => _sound?.nPosition_CurrentlyPlayingSound ?? 0;
 		/// <summary>Returns the total duration of the sound in milliseconds, or 0 if not loaded.</summary>
-		public int GetDurationMs() => (int)(_sound?.n長さ_現在のサウンド ?? 0);
+		public int GetDurationMs() => (int)(_sound?.nLength_CurrentSound ?? 0);
 		/// <summary>Returns the current playback position in milliseconds.</summary>
 		public int GetTimestampMs() => (int)(_sound?.msTimeStamp_nowSound ?? 0);
 		#endregion

@@ -7,33 +7,33 @@ using FDK;
 namespace OpenTaiko;
 // グローバル定数
 
-public enum Eシステムサウンド {
-	BGMオプション画面 = 0,
-	BGMコンフィグ画面,
-	BGM起動画面,
-	BGM選曲画面,
-	SOUNDステージ失敗音,
-	SOUNDカーソル移動音,
-	SOUNDゲーム開始音,
-	SOUNDゲーム終了音,
-	SOUNDステージクリア音,
-	SOUNDタイトル音,
-	SOUNDフルコンボ音,
-	SOUND歓声音,
-	SOUND曲読込開始音,
-	SOUND決定音,
-	SOUND取消音,
-	SOUND変更音,
+public enum ESystemSound {
+	BGMOptionScreen = 0,
+	BGMConfigScreen,
+	BGMStartupScreen,
+	BGMSelSongScreen,
+	SOUNDStageFailureSound,
+	SOUNDCursorMoveSound,
+	SOUNDGameStartSound,
+	SOUNDGameEndSound,
+	SOUNDStageClearSound,
+	SOUNDTitleSound,
+	SOUNDFullComboSound,
+	SOUNDCheerSound,
+	SOUNDSongLoadStartSound,
+	SOUNDDecideSound,
+	SOUNDCancelSound,
+	SOUNDChangeSound,
 	//SOUND赤,
 	//SOUND青,
-	SOUND風船,
-	SOUND曲決定音,
-	SOUND成績発表,
-	SOUND特訓再生,
-	SOUND特訓停止,
-	sound特訓ジャンプポイント,
-	sound特訓スキップ音,
-	SOUND特訓スクロール,
+	SOUNDBalloon,
+	SOUNDSongDecideSound,
+	SOUNDGradeAnnounce,
+	SOUNDTrainingPlayback,
+	SOUNDTrainingStop,
+	soundTrainingJumpPoint,
+	soundTrainingSkipSound,
+	SOUNDTrainingScroll,
 	Count               // システムサウンド総数の計算用
 }
 
@@ -43,14 +43,14 @@ internal class CSkin : IDisposable {
 	public class CSystemSound : IDisposable {
 		// static フィールド
 
-		public static CSkin.CSystemSound r最後に再生した排他システムサウンド;
+		public static CSkin.CSystemSound rLastPlaybackExclusiveSystemSound;
 
 		public ESoundGroup SoundGroup { get; private init; }
 
 		// フィールド、プロパティ
 
 		public bool bPlayed;
-		public bool bCompact対象;
+		public bool bCompactTarget;
 		public bool bLoop;
 		public bool bNotLoadedYet;
 		public bool bLoadedSuccessfuly;
@@ -69,7 +69,7 @@ internal class CSkin : IDisposable {
 			get => nextSound?.SoundPosition ?? 0;
 			set => nextSound?.SetPanning(value);
 		}
-		public int nAutomationLevel_現在のサウンド {
+		public int nAutomationLevel_CurrentSound {
 			get => this.nowSound?.AutomationLevel ?? 0;
 			set {
 				CSound sound = this.nowSound;
@@ -92,10 +92,10 @@ internal class CSkin : IDisposable {
 				return msTimeStamp;
 			}
 		}
-		public double n長さ_現在のサウンド {
+		public double nLength_CurrentSound {
 			get => this.nowSound?.dbTotalPlayTime ?? 0;
 		}
-		public double n長さ_次に鳴るサウンド {
+		public double nLength_NextPlaySound {
 			get => nextSound?.dbTotalPlayTime ?? 0;
 		}
 
@@ -109,11 +109,11 @@ internal class CSkin : IDisposable {
 		/// <param name="bLoop"></param>
 		/// <param name="bExclusive"></param>
 		/// <param name="bCompact対象"></param>
-		public CSystemSound(string strFileName, bool bLoop, bool bExclusive, bool bCompact対象, ESoundGroup soundGroup) {
+		public CSystemSound(string strFileName, bool bLoop, bool bExclusive, bool bCompactTarget, ESoundGroup soundGroup) {
 			this.strFileName = strFileName;
 			this.bLoop = bLoop;
 			this.bExclusive = bExclusive;
-			this.bCompact対象 = bCompact対象;
+			this.bCompactTarget = bCompactTarget;
 			SoundGroup = soundGroup;
 			this.bNotLoadedYet = true;
 			this.bPlayed = false;
@@ -167,10 +167,10 @@ internal class CSkin : IDisposable {
 				}
 			}
 			if (this.bExclusive) {
-				if (r最後に再生した排他システムサウンド != null)
-					r最後に再生した排他システムサウンド.tStop();
+				if (rLastPlaybackExclusiveSystemSound != null)
+					rLastPlaybackExclusiveSystemSound.tStop();
 
-				r最後に再生した排他システムサウンド = this;
+				rLastPlaybackExclusiveSystemSound = this;
 			}
 			this.nextSound?.PlayStart(this.bLoop);
 
@@ -183,8 +183,8 @@ internal class CSkin : IDisposable {
 			this.rSound[0]?.Stop();
 			this.rSound[1]?.Stop();
 
-			if (r最後に再生した排他システムサウンド == this)
-				r最後に再生した排他システムサウンド = null;
+			if (rLastPlaybackExclusiveSystemSound == this)
+				rLastPlaybackExclusiveSystemSound = null;
 		}
 
 		public void SetPanning(int pan) {
@@ -299,17 +299,17 @@ internal class CSkin : IDisposable {
 
 	// General sound effects (Skin specific)
 
-	public CSystemSound bgmオプション画面 = null;
-	public CSystemSound bgmコンフィグ画面 = null;
-	public CSystemSound bgm起動画面 = null;
-	public CSystemSound soundSTAGEFAILED音 = null;
-	public CSystemSound soundカーソル移動音 = null;
-	public CSystemSound soundゲーム開始音 = null;
-	public CSystemSound soundゲーム終了音 = null;
-	public CSystemSound soundステージクリア音 = null;
-	public CSystemSound soundフルコンボ音 = null;
-	public CSystemSound sound歓声音 = null;
-	public CSystemSound sound曲読込開始音 = null;
+	public CSystemSound bgmOptionScreen = null;
+	public CSystemSound bgmConfigScreen = null;
+	public CSystemSound bgmStartupScreen = null;
+	public CSystemSound soundSTAGEFAILEDSound = null;
+	public CSystemSound soundCursorMoveSound = null;
+	public CSystemSound soundGameStartSound = null;
+	public CSystemSound soundGameEndSound = null;
+	public CSystemSound soundStageClearSound = null;
+	public CSystemSound soundFullComboSound = null;
+	public CSystemSound soundCheerSound = null;
+	public CSystemSound soundSongLoadStartSound = null;
 	public CSystemSound soundDecideSFX = null;
 	public CSystemSound soundCancelSFX = null;
 	public CSystemSound soundChangeSFX = null;
@@ -320,30 +320,30 @@ internal class CSkin : IDisposable {
 	public CSystemSound soundsanka = null;
 	public CSystemSound soundBomb = null;
 	//add
-	public CSystemSound sound曲決定音 = null;
+	public CSystemSound soundSongDecideSound = null;
 	public CSystemSound soundSongDecide_AI = null;
-	public CSystemSound bgmリザルトイン音 = null;
-	public CSystemSound bgmリザルト音 = null;
+	public CSystemSound bgmResultInSound = null;
+	public CSystemSound bgmResultSound = null;
 	public CSystemSound bgmResultIn_AI = null;
 	public CSystemSound bgmResult_AI = null;
 
 	public CSystemSound bgmDanResult = null;
 
-	public CSystemSound bgmタイトル = null;
-	public CSystemSound bgmタイトルイン = null;
-	public CSystemSound bgm選曲画面 = null;
-	public CSystemSound bgm選曲画面イン = null;
+	public CSystemSound bgmTitle = null;
+	public CSystemSound bgmTitleIn = null;
+	public CSystemSound bgmSelSongScreen = null;
+	public CSystemSound bgmSelSongScreenIn = null;
 	public CSystemSound bgmSongSelect_AI = null;
 	public CSystemSound bgmSongSelect_AI_In = null;
-	public CSystemSound bgmリザルト = null;
-	public CSystemSound bgmリザルトイン = null;
+	public CSystemSound bgmResult = null;
+	public CSystemSound bgmResultIn = null;
 
 	public CSystemSound SoundBanapas = null;
 
-	public CSystemSound sound特訓再生音 = null;
-	public CSystemSound sound特訓停止音 = null;
+	public CSystemSound soundTrainingPlaybackSound = null;
+	public CSystemSound soundTrainingStopSound = null;
 	public CSystemSound soundTrainingToggleBookmarkSFX = null;
-	public CSystemSound sound特訓スキップ音 = null;
+	public CSystemSound soundTrainingSkipSound = null;
 	public CSystemSound soundTrainingModeScrollSFX = null;
 	public CSystemSound soundPon = null;
 	public CSystemSound soundGauge = null;
@@ -388,8 +388,8 @@ internal class CSkin : IDisposable {
 	public List<CSystemSound> listSystemSound = new();
 	#endregion
 
-	internal CSystemSound SndCAbsolute(string FileName, bool bLoop, bool bExclusive, bool bCompact対象, ESoundGroup soundGroup) {
-		CSystemSound snd = new(FileName, bLoop, bExclusive, bCompact対象, soundGroup);
+	internal CSystemSound SndCAbsolute(string FileName, bool bLoop, bool bExclusive, bool bCompactTarget, ESoundGroup soundGroup) {
+		CSystemSound snd = new(FileName, bLoop, bExclusive, bCompactTarget, soundGroup);
 		listSystemSound.Add(snd);
 		return snd;
 	}
@@ -540,7 +540,7 @@ internal class CSkin : IDisposable {
 		PrepareReloadSkin();
 	}
 	private string InitializeSkinPathRoot() {
-		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System" + System.IO.Path.DirectorySeparatorChar);
+		strSystemSkinRoot = System.IO.Path.Combine(OpenTaiko.strEXEFolder, "System" + System.IO.Path.DirectorySeparatorChar);
 		return strSystemSkinRoot;
 	}
 
@@ -568,17 +568,17 @@ internal class CSkin : IDisposable {
 	public void ReloadSystemSounds() {
 		UnloadSystemSounds();
 
-		this.soundカーソル移動音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundCursorMoveSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Move.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundDecideSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Decide.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundChangeSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Change.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundCancelSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Cancel.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound歓声音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.soundSTAGEFAILED音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundゲーム開始音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
-		this.soundゲーム終了音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
-		this.soundステージクリア音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
-		this.soundフルコンボ音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
-		this.sound曲読込開始音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
+		this.soundCheerSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Audience.ogg", false, false, true, ESoundGroup.SoundEffect);
+		this.soundSTAGEFAILEDSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage failed.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundGameStartSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game start.ogg", false, false, false, ESoundGroup.Voice);
+		this.soundGameEndSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Game end.ogg", false, true, false, ESoundGroup.Voice);
+		this.soundStageClearSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Stage clear.ogg", false, true, true, ESoundGroup.Voice);
+		this.soundFullComboSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Full combo.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundSongLoadStartSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Now loading.ogg", false, true, true, ESoundGroup.Unknown);
 		//this.bgm選曲画面 = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Select BGM.ogg", true, true, false, ESoundGroup.SongPlayback);
 		//this.soundSongSelectChara = new Cシステムサウンド(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect Chara.ogg", false, false, false, ESoundGroup.SongPlayback);
 		this.soundSkip = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -593,20 +593,20 @@ internal class CSkin : IDisposable {
 		this.soundBalloon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}balloon.ogg", false, false, true, ESoundGroup.SoundEffect);
 		this.soundKusudama = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Kusudama.ogg", false, false, true, ESoundGroup.SoundEffect);
 		this.soundKusudamaMiss = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}KusudamaMiss.ogg", false, false, true, ESoundGroup.SoundEffect);
-		this.sound曲決定音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
+		this.soundSongDecideSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide.ogg", false, false, true, ESoundGroup.Voice);
 		this.soundSongDecide_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongDecide_AI.ogg", false, false, true, ESoundGroup.Voice);
 
-		this.bgm起動画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmタイトルイン = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmタイトル = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmオプション画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgmコンフィグ画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
-		this.bgm選曲画面イン = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgm選曲画面 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmStartupScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Setup.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmTitleIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmTitle = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Title.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmOptionScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Option.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmConfigScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Config.ogg", true, true, false, ESoundGroup.SongPlayback);
+		this.bgmSelSongScreenIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmSelSongScreen = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect.ogg", true, false, true, ESoundGroup.SongPlayback);
 		this.bgmSongSelect_AI_In = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI_Start.ogg", false, false, true, ESoundGroup.SongPlayback);
 		this.bgmSongSelect_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}SongSelect_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルトイン音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
-		this.bgmリザルト音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
+		this.bgmResultInSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In.ogg", false, false, true, ESoundGroup.SongPlayback);
+		this.bgmResultSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result.ogg", true, false, true, ESoundGroup.SongPlayback);
 		this.bgmResultIn_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_In_AI.ogg", false, false, true, ESoundGroup.SongPlayback);
 		this.bgmResult_AI = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}BGM{System.IO.Path.DirectorySeparatorChar}Result_AI.ogg", true, false, true, ESoundGroup.SongPlayback);
 
@@ -617,11 +617,11 @@ internal class CSkin : IDisposable {
 		this.soundCrownIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}CrownIn.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundRankIn = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ResultScreen{System.IO.Path.DirectorySeparatorChar}RankIn.ogg", false, false, false, ESoundGroup.SoundEffect);
 
-		this.sound特訓再生音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓停止音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingPlaybackSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Resume.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingStopSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pause.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundTrainingModeScrollSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Scroll.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundTrainingToggleBookmarkSFX = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Jump Point.ogg", false, false, false, ESoundGroup.SoundEffect);
-		this.sound特訓スキップ音 = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
+		this.soundTrainingSkipSound = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Traning Skip.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundPon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Pon.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundGauge = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Gauge.ogg", false, false, false, ESoundGroup.SoundEffect);
 		this.soundScoreDon = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}ScoreDon.ogg", false, false, false, ESoundGroup.SoundEffect);
@@ -666,17 +666,17 @@ internal class CSkin : IDisposable {
 			var snd = this.listSystemSound.ElementAtOrDefault(i);
 			if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 			{
-				CSystemSound cシステムサウンド = snd;
-				if (cシステムサウンド.bCompact対象) {
+				CSystemSound cSystemSound = snd;
+				if (cSystemSound.bCompactTarget) {
 					try {
-						cシステムサウンド.tLoading();
-						Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
+						cSystemSound.tLoading();
+						Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
 					} catch (FileNotFoundException e) {
 						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドが存在しません。({0})", cシステムサウンド.strFileName);
+						Trace.TraceWarning("システムサウンドが存在しません。({0})", cSystemSound.strFileName);
 					} catch (Exception e) {
 						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strFileName);
+						Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cSystemSound.strFileName);
 					}
 				}
 			}
@@ -767,11 +767,11 @@ internal class CSkin : IDisposable {
 
 	// メソッド
 
-	public static string Path(string strファイルの相対パス) {
+	public static string Path(string strFileRelativePath) {
 		if (strBoxDefSkinSubfolderFullName == "" || !bUseBoxDefSkin) {
-			return System.IO.Path.Combine(strSystemSkinSubfolderFullName, strファイルの相対パス);
+			return System.IO.Path.Combine(strSystemSkinSubfolderFullName, strFileRelativePath);
 		} else {
-			return System.IO.Path.Combine(strBoxDefSkinSubfolderFullName, strファイルの相対パス);
+			return System.IO.Path.Combine(strBoxDefSkinSubfolderFullName, strFileRelativePath);
 		}
 	}
 
@@ -840,7 +840,7 @@ internal class CSkin : IDisposable {
 	/// </summary>
 	public void tSkinConfigInit() {
 		this.eDiffDispMode = EDifficultyDisplayType.ImageOnMTaiko;
-		this.b現在のステージ数を表示しない = false;
+		this.bCurrentStageCountDisplay = false;
 	}
 
 	public void LoadSkinConfigFromFile(string path, ref string work) {
@@ -863,11 +863,11 @@ internal class CSkin : IDisposable {
 	public void tReadSkinConfig() {
 		var str = "";
 		LoadSkinConfigFromFile(Path(@$"SkinConfig.ini"), ref str);
-		this.t文字列から読み込み(str);
+		this.tLoadFromString(str);
 
 	}
 
-	private void t文字列から読み込み(string strAllSettings)  // 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
+	private void tLoadFromString(string strAllSettings)  // 2011.4.13 yyagi; refactored to make initial KeyConfig easier.
 	{
 		string[] delimiter = { "\n" };
 		string[] strSingleLine = strAllSettings.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
@@ -961,7 +961,7 @@ internal class CSkin : IDisposable {
 									break;
 								}
 							case "NowStageDisp": {
-									this.b現在のステージ数を表示しない = CConversion.bONorOFF(strParam[0]);
+									this.bCurrentStageCountDisplay = CConversion.bONorOFF(strParam[0]);
 									break;
 								}
 
@@ -1533,7 +1533,7 @@ internal class CSkin : IDisposable {
 									break;
 								}
 							case "SongSelect_GenreName": {
-									SongSelect_GenreName = this.strStringを配列に直す(strParam);
+									SongSelect_GenreName = this.strStringArrayConvert(strParam);
 									break;
 								}
 							case "SongSelect_Bar_Count": {
@@ -7394,7 +7394,7 @@ internal class CSkin : IDisposable {
 		}
 	}
 
-	private void t座標の追従設定() {
+	private void tCoordAddFollowSettings() {
 		//
 		if (bFieldBgPointOverride == true) {
 
@@ -7404,14 +7404,14 @@ internal class CSkin : IDisposable {
 	#region [ IDisposable 実装 ]
 	//-----------------
 	public void Dispose() {
-		if (!this.bDisposed済み) {
+		if (!this.bDisposedDone) {
 			// concurrent
 			var list = Interlocked.Exchange(ref this.listSystemSound, []);
 			for (int i = 0; i < list.Count; ++i)
 				list.ElementAtOrDefault(i)?.Dispose();
 			list.Clear();
 
-			this.bDisposed済み = true;
+			this.bDisposedDone = true;
 		}
 	}
 	//-----------------
@@ -7422,7 +7422,7 @@ internal class CSkin : IDisposable {
 
 	#region [ private ]
 	//-----------------
-	private bool bDisposed済み;
+	private bool bDisposedDone;
 	//-----------------
 	#endregion
 
@@ -7477,7 +7477,7 @@ internal class CSkin : IDisposable {
 	public float fComboNumberSpacing_l = 0;
 
 	public EDifficultyDisplayType eDiffDispMode;
-	public bool b現在のステージ数を表示しない;
+	public bool bCurrentStageCountDisplay;
 
 	//リザルト画面
 	//現在のデフォルト値はダミーです。
@@ -7506,7 +7506,7 @@ internal class CSkin : IDisposable {
 	public int nResultGaugeBodyP1Y = 125;
 	#endregion
 
-	public string[] strStringを配列に直す(string str) {
+	public string[] strStringArrayConvert(string str) {
 		string[] strArray = str.Split(',');
 		return strArray;
 	}

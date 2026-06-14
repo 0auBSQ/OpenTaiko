@@ -120,7 +120,7 @@ internal class CActImplBackground : CActivity {
 		this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText, Color.White, Color.Black, 700);
 		this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText, Color.White, Color.Black, 700);
 
-		this.ct炎 = new CCounter(0, 6, 50, OpenTaiko.Timer);
+		this.ctFlame = new CCounter(0, 6, 50, OpenTaiko.Timer);
 
 		this.currentCharacter = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[0].data.Character, OpenTaiko.Tx.Characters.Length - 1));
 
@@ -245,7 +245,7 @@ internal class CActImplBackground : CActivity {
 
 				this.bFloorChanged = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor > 0 && (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
 
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -255,10 +255,10 @@ internal class CActImplBackground : CActivity {
 				#region [Tower background informations]
 
 				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2D描画(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-					TitleTextureKey.ResolveTitleTexture(ttkKai).t2D描画(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
+					TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2DDraw(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
+					TitleTextureKey.ResolveTitleTexture(ttkKai).t2DDraw(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
 
-					this.ct炎.TickLoop();
+					this.ctFlame.TickLoop();
 					OpenTaiko.stageGameScreen.FloorManagement.loopFrames();
 
 					#region [Floor number]
@@ -284,7 +284,7 @@ internal class CActImplBackground : CActivity {
 					for (int idx = len - 1; idx >= 0; idx--) {
 						int currentNum = int.Parse(floorStr[idx].ToString());
 
-						OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
+						OpenTaiko.Tx.Taiko_Combo[0].t2DDraw(OpenTaiko.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
 							OpenTaiko.Skin.Game_Tower_Floor_Number[1],
 							new Rectangle(digitLength * currentNum, 0,
 								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
@@ -299,8 +299,8 @@ internal class CActImplBackground : CActivity {
 
 					int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
 
-					OpenTaiko.Tx.Gauge_Soul_Fire?.t2D描画(OpenTaiko.Skin.Gauge_Soul_Fire_X_Tower, OpenTaiko.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
-					OpenTaiko.Tx.Gauge_Soul?.t2D描画(OpenTaiko.Skin.Gauge_Soul_X_Tower, OpenTaiko.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
+					OpenTaiko.Tx.Gauge_Soul_Fire?.t2DDraw(OpenTaiko.Skin.Gauge_Soul_Fire_X_Tower, OpenTaiko.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ctFlame.CurrentValue), 0, soulfire_width, soulfire_height));
+					OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.Gauge_Soul_X_Tower, OpenTaiko.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
 
 					#endregion
 
@@ -323,7 +323,7 @@ internal class CActImplBackground : CActivity {
 					for (int idx = 0; idx < len; idx++) {
 						int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
 
-						OpenTaiko.Tx.Taiko_Combo[0].t2D描画(OpenTaiko.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
+						OpenTaiko.Tx.Taiko_Combo[0].t2DDraw(OpenTaiko.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
 							OpenTaiko.Skin.Game_Tower_Life_Number[1],
 							new Rectangle(digitLength * currentNum, 0,
 								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
@@ -345,13 +345,13 @@ internal class CActImplBackground : CActivity {
 
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
+			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
 			int nightTime = Math.Max(140, maxFloor / 2);
 
-			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTowerType);
+			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTowerType);
 
 			if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
 				currentTowerType = 0;
@@ -404,16 +404,16 @@ internal class CActImplBackground : CActivity {
 
 			// Current trunk
 			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2D下中央基準描画(
+				OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2DBottomCenterBasedDraw(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
 			else
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
+				OpenTaiko.Tx.Tower_Top[currentTower]?.t2DBottomCenterBasedDraw(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange);
 
 			// Current deco
-			OpenTaiko.Tx.Tower_Deco[currentTower][currentDeco]?.t2D下中央基準描画(
+			OpenTaiko.Tx.Tower_Deco[currentTower][currentDeco]?.t2DBottomCenterBasedDraw(
 				OpenTaiko.Skin.Game_Tower_Floors_Deco[0] + widthChange,
 				OpenTaiko.Skin.Game_Tower_Floors_Deco[1] + heightChange);
 
@@ -421,12 +421,12 @@ internal class CActImplBackground : CActivity {
 
 			// Next trunk
 			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2D下中央基準描画(
+				OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2DBottomCenterBasedDraw(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
 					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
 			else if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2D下中央基準描画(
+				OpenTaiko.Tx.Tower_Top[currentTower]?.t2DBottomCenterBasedDraw(
 					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
 					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Width, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
@@ -434,7 +434,7 @@ internal class CActImplBackground : CActivity {
 
 			// Next deco
 			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
-				OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2D下中央基準描画(
+				OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2DBottomCenterBasedDraw(
 					OpenTaiko.Skin.Game_Tower_Floors_Deco[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
 					OpenTaiko.Skin.Game_Tower_Floors_Deco[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange);
 
@@ -585,7 +585,7 @@ internal class CActImplBackground : CActivity {
 			if (OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames != null && OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue < OpenTaiko.stageGameScreen.FloorManagement.InvincibilityDurationSpeedDependent) {
 				if (OpenTaiko.Tx.Tower_Miss != null)
 					OpenTaiko.Tx.Tower_Miss.Opacity = Math.Min(255, 1000 - OpenTaiko.stageGameScreen.FloorManagement.InvincibilityFrames.CurrentValue);
-				OpenTaiko.Tx.Tower_Miss?.t2D下中央基準描画(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
+				OpenTaiko.Tx.Tower_Miss?.t2DBottomCenterBasedDraw(OpenTaiko.Skin.Game_Tower_Miss[0], OpenTaiko.Skin.Game_Tower_Miss[1]);
 			}
 
 			#endregion
@@ -673,7 +673,7 @@ internal class CActImplBackground : CActivity {
 	private CCounter ctClimbDuration;
 	private bool TowerFinished;
 
-	private CCounter ct炎;
+	private CCounter ctFlame;
 
 	private bool IsUpNotFound;
 	private bool IsDownNotFound;

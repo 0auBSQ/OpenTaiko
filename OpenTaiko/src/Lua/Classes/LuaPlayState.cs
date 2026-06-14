@@ -62,7 +62,7 @@
 			// combo is tracked by the combo actor (same source the results screen reads), so use that.
 			var ac = OpenTaiko.stageGameScreen?.actCombo;
 			if (ac != null) {
-				var max = ac.nCurrentCombo.最高値;
+				var max = ac.nCurrentCombo.MaxValue;
 				if (max != null && player >= 0 && player < max.Length) return max[player];
 			}
 			return OpenTaiko.stageGameScreen.CChartScore[player].nHighestCombo;
@@ -95,7 +95,7 @@
 
 		// Dan
 		private Exam.Status ExamStatus() {
-			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.st演奏記録.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
+			return OpenTaiko.stageGameScreen.actDan.GetResultExamStatus(OpenTaiko.stageResults.stPlayRecord.Dan_C, OpenTaiko.SongMount.rChoosenSong.DanSongs);
 		}
 
 		public bool IsPass() {

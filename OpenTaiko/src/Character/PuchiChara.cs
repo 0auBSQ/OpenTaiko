@@ -46,7 +46,7 @@ class PuchiChara : CActivity {
 	/// <param name="y">Y coordinate (center)</param>
 	/// <param name="alpha">Opacity (0-255)</param>
 	/// <returns></returns>
-	public int On進行描画(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
+	public int OnProgressDraw(int x, int y, bool isGrowing, int alpha = 255, bool isBalloon = false, int player = 0, float scale = 1.0f) {
 		if (!OpenTaiko.ConfigIni.ShowPuchiChara) return base.Draw();
 		if (Counter == null || SineCounter == null || OpenTaiko.Tx.Puchichara == null) return base.Draw();
 		Counter.TickLoop();
@@ -81,7 +81,7 @@ class PuchiChara : CActivity {
 			int adjustedX = x - 32;
 			int adjustedY = y - 32;
 
-			chara.t2D拡大率考慮中央基準描画(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2]) * OpenTaiko.Skin.Game_PuchiChara[0], 0, OpenTaiko.Skin.Game_PuchiChara[0], OpenTaiko.Skin.Game_PuchiChara[1]));
+			chara.t2DScaledCenterBasedDraw(adjustedX, adjustedY + (int)sineY, new Rectangle((Counter.CurrentValue % OpenTaiko.Skin.Game_PuchiChara[2]) * OpenTaiko.Skin.Game_PuchiChara[0], 0, OpenTaiko.Skin.Game_PuchiChara[0], OpenTaiko.Skin.Game_PuchiChara[1]));
 		}
 
 		return base.Draw();
@@ -104,7 +104,7 @@ class PuchiChara : CActivity {
 		sineY = (double)SineCounterIdle.CurrentValue;
 		sineY = (Math.Sin(sineY * (Math.PI / 180)) * (OpenTaiko.Skin.Game_PuchiChara_Sine * OpenTaiko.Skin.Game_PuchiChara_Scale[0]));
 
-		puchi.t2D拡大率考慮中央基準描画(x, y + (useSine ? (int)sineY : 0),
+		puchi.t2DScaledCenterBasedDraw(x, y + (useSine ? (int)sineY : 0),
 			new((puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2]) * sprite, 0,
 			puchi.szTextureSize.Width / OpenTaiko.Skin.Game_PuchiChara[2], puchi.szTextureSize.Height));
 

@@ -4,7 +4,7 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CAct演奏スコア共通 : CActivity {
+internal class CActPlayScoreCommon : CActivity {
 	// Properties
 
 	protected double[] nCurrentRealScore;
@@ -13,18 +13,18 @@ internal class CAct演奏スコア共通 : CActivity {
 
 	//      protected CTexture txScore_1P;
 	protected CCounter ctTimer;
-	public CCounter[] ct点数アニメタイマ;
+	public CCounter[] ctPointsAnimeTimer;
 
 	public CCounter[] ctBonusAddTimer;
 
-	protected STスコア[] stScore;
+	protected STScore[] stScore;
 	protected int nNowDisplayedAddScore;
 
 	[StructLayout(LayoutKind.Sequential)]
-	protected struct STスコア {
+	protected struct STScore {
 		public bool bAddEnd;
-		public bool b使用中;
-		public bool b表示中;
+		public bool bUse;
+		public bool bDisplaying;
 		public bool bBonusScore;
 		public CCounter ctTimer;
 		public int nAddScore;
@@ -32,11 +32,11 @@ internal class CAct演奏スコア共通 : CActivity {
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST文字位置 {
+	private struct STTextPosition {
 		public char ch;
 		public Point pt;
 	}
-	private ST文字位置[] stFont;
+	private STTextPosition[] stFont;
 
 
 	public long GetDisplayedScore(int player) {
@@ -45,58 +45,58 @@ internal class CAct演奏スコア共通 : CActivity {
 
 	// コンストラクタ
 
-	public CAct演奏スコア共通() {
-		ST文字位置[] st文字位置Array = new ST文字位置[11];
-		ST文字位置 st文字位置 = new ST文字位置();
-		st文字位置.ch = '0';
-		st文字位置.pt = new Point(0, 0);
-		st文字位置Array[0] = st文字位置;
-		ST文字位置 st文字位置2 = new ST文字位置();
-		st文字位置2.ch = '1';
-		st文字位置2.pt = new Point(24, 0);
-		st文字位置Array[1] = st文字位置2;
-		ST文字位置 st文字位置3 = new ST文字位置();
-		st文字位置3.ch = '2';
-		st文字位置3.pt = new Point(48, 0);
-		st文字位置Array[2] = st文字位置3;
-		ST文字位置 st文字位置4 = new ST文字位置();
-		st文字位置4.ch = '3';
-		st文字位置4.pt = new Point(72, 0);
-		st文字位置Array[3] = st文字位置4;
-		ST文字位置 st文字位置5 = new ST文字位置();
-		st文字位置5.ch = '4';
-		st文字位置5.pt = new Point(96, 0);
-		st文字位置Array[4] = st文字位置5;
-		ST文字位置 st文字位置6 = new ST文字位置();
-		st文字位置6.ch = '5';
-		st文字位置6.pt = new Point(120, 0);
-		st文字位置Array[5] = st文字位置6;
-		ST文字位置 st文字位置7 = new ST文字位置();
-		st文字位置7.ch = '6';
-		st文字位置7.pt = new Point(144, 0);
-		st文字位置Array[6] = st文字位置7;
-		ST文字位置 st文字位置8 = new ST文字位置();
-		st文字位置8.ch = '7';
-		st文字位置8.pt = new Point(168, 0);
-		st文字位置Array[7] = st文字位置8;
-		ST文字位置 st文字位置9 = new ST文字位置();
-		st文字位置9.ch = '8';
-		st文字位置9.pt = new Point(192, 0);
-		st文字位置Array[8] = st文字位置9;
-		ST文字位置 st文字位置10 = new ST文字位置();
-		st文字位置10.ch = '9';
-		st文字位置10.pt = new Point(216, 0);
-		st文字位置Array[9] = st文字位置10;
-		this.stFont = st文字位置Array;
+	public CActPlayScoreCommon() {
+		STTextPosition[] stTextPositionArray = new STTextPosition[11];
+		STTextPosition stTextPosition = new STTextPosition();
+		stTextPosition.ch = '0';
+		stTextPosition.pt = new Point(0, 0);
+		stTextPositionArray[0] = stTextPosition;
+		STTextPosition stTextPosition2 = new STTextPosition();
+		stTextPosition2.ch = '1';
+		stTextPosition2.pt = new Point(24, 0);
+		stTextPositionArray[1] = stTextPosition2;
+		STTextPosition stTextPosition3 = new STTextPosition();
+		stTextPosition3.ch = '2';
+		stTextPosition3.pt = new Point(48, 0);
+		stTextPositionArray[2] = stTextPosition3;
+		STTextPosition stTextPosition4 = new STTextPosition();
+		stTextPosition4.ch = '3';
+		stTextPosition4.pt = new Point(72, 0);
+		stTextPositionArray[3] = stTextPosition4;
+		STTextPosition stTextPosition5 = new STTextPosition();
+		stTextPosition5.ch = '4';
+		stTextPosition5.pt = new Point(96, 0);
+		stTextPositionArray[4] = stTextPosition5;
+		STTextPosition stTextPosition6 = new STTextPosition();
+		stTextPosition6.ch = '5';
+		stTextPosition6.pt = new Point(120, 0);
+		stTextPositionArray[5] = stTextPosition6;
+		STTextPosition stTextPosition7 = new STTextPosition();
+		stTextPosition7.ch = '6';
+		stTextPosition7.pt = new Point(144, 0);
+		stTextPositionArray[6] = stTextPosition7;
+		STTextPosition stTextPosition8 = new STTextPosition();
+		stTextPosition8.ch = '7';
+		stTextPosition8.pt = new Point(168, 0);
+		stTextPositionArray[7] = stTextPosition8;
+		STTextPosition stTextPosition9 = new STTextPosition();
+		stTextPosition9.ch = '8';
+		stTextPosition9.pt = new Point(192, 0);
+		stTextPositionArray[8] = stTextPosition9;
+		STTextPosition stTextPosition10 = new STTextPosition();
+		stTextPosition10.ch = '9';
+		stTextPosition10.pt = new Point(216, 0);
+		stTextPositionArray[9] = stTextPosition10;
+		this.stFont = stTextPositionArray;
 
-		this.stScore = new STスコア[256];
+		this.stScore = new STScore[256];
 		base.IsDeActivated = true;
 	}
 
 
 	// メソッド
 
-	private float[,] n点数アニメ拡大率_座標 = new float[,]
+	private float[,] nPointsAnimeScale_Coord = new float[,]
 	{
 		{
 			1.14f,
@@ -191,9 +191,9 @@ internal class CAct演奏スコア共通 : CActivity {
 
 		for (int sc = 0; sc < 1; sc++) {
 			for (int i = 0; i < 256; i++) {
-				if (this.stScore[i].b使用中 == false) {
-					this.stScore[i].b使用中 = true;
-					this.stScore[i].b表示中 = true;
+				if (this.stScore[i].bUse == false) {
+					this.stScore[i].bUse = true;
+					this.stScore[i].bDisplaying = true;
 					this.stScore[i].nAddScore = (int)delta;
 					this.stScore[i].ctTimer = new CCounter(0, 465, 2, OpenTaiko.Timer);
 					this.stScore[i].bBonusScore = false;
@@ -213,9 +213,9 @@ internal class CAct演奏スコア共通 : CActivity {
 
 		for (int sc = 0; sc < 1; sc++) {
 			for (int i = 0; i < 256; i++) {
-				if (this.stScore[i].b使用中 == false) {
-					this.stScore[i].b使用中 = true;
-					this.stScore[i].b表示中 = true;
+				if (this.stScore[i].bUse == false) {
+					this.stScore[i].bUse = true;
+					this.stScore[i].bDisplaying = true;
 					this.stScore[i].nAddScore = 10000;
 					this.stScore[i].ctTimer = new CCounter(0, 100, 4, OpenTaiko.Timer);
 					this.stScore[i].bBonusScore = true;
@@ -237,7 +237,7 @@ internal class CAct演奏スコア共通 : CActivity {
 		this.nCurrentRealScore = new double[5] { 0L, 0L, 0L, 0L, 0L };
 
 		for (int sc = 0; sc < 256; sc++) {
-			this.stScore[sc].b使用中 = false;
+			this.stScore[sc].bUse = false;
 			this.stScore[sc].ctTimer = new CCounter();
 			this.stScore[sc].nAddScore = 0;
 			this.stScore[sc].bBonusScore = false;
@@ -248,9 +248,9 @@ internal class CAct演奏スコア共通 : CActivity {
 
 		this.ctTimer = new CCounter();
 
-		this.ct点数アニメタイマ = new CCounter[5];
+		this.ctPointsAnimeTimer = new CCounter[5];
 		for (int i = 0; i < 5; i++) {
-			this.ct点数アニメタイマ[i] = new CCounter();
+			this.ctPointsAnimeTimer[i] = new CCounter();
 		}
 		this.ctBonusAddTimer = new CCounter[5];
 		for (int i = 0; i < 5; i++) {
@@ -269,7 +269,7 @@ internal class CAct演奏スコア共通 : CActivity {
 		base.ReleaseManagedResource();
 	}
 
-	protected void t小文字表示(int x, int y, string str, int mode, int alpha, int player) {
+	protected void tSmallDisplay(int x, int y, string str, int mode, int alpha, int player) {
 		foreach (char ch in str) {
 			for (int i = 0; i < this.stFont.Length; i++) {
 				if (this.stFont[i].ch == ch) {
@@ -282,9 +282,9 @@ internal class CAct演奏スコア共通 : CActivity {
 								if (OpenTaiko.ConfigIni.SimpleMode) {
 									OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = 1;
 								} else {
-									OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ct点数アニメタイマ[player].CurrentValue];
+									OpenTaiko.Tx.Taiko_Score[0].vcScaleRatio.Y = ScoreScale[this.ctPointsAnimeTimer[player].CurrentValue];
 								}
-								OpenTaiko.Tx.Taiko_Score[0].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[0].t2DScaledBottomBasedDraw(x, y, rectangle);
 
 							}
 							break;
@@ -294,7 +294,7 @@ internal class CAct演奏スコア共通 : CActivity {
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor1P;
 								OpenTaiko.Tx.Taiko_Score[1].Opacity = alpha;
 								OpenTaiko.Tx.Taiko_Score[1].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[1].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[1].t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 2:
@@ -303,7 +303,7 @@ internal class CAct演奏スコア共通 : CActivity {
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
 								OpenTaiko.Tx.Taiko_Score[2].Opacity = alpha;
 								OpenTaiko.Tx.Taiko_Score[2].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[2].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[2].t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 3:
@@ -312,7 +312,7 @@ internal class CAct演奏スコア共通 : CActivity {
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
 								OpenTaiko.Tx.Taiko_Score[3].Opacity = alpha;
 								OpenTaiko.Tx.Taiko_Score[3].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[3].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[3].t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 4:
@@ -321,7 +321,7 @@ internal class CAct演奏スコア共通 : CActivity {
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
 								OpenTaiko.Tx.Taiko_Score[4].Opacity = alpha;
 								OpenTaiko.Tx.Taiko_Score[4].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[4].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[4].t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 						case 5:
@@ -330,7 +330,7 @@ internal class CAct演奏スコア共通 : CActivity {
 								//this.txScore.color4 = CDTXMania.Skin.cScoreColor2P;
 								OpenTaiko.Tx.Taiko_Score[5].Opacity = alpha;
 								OpenTaiko.Tx.Taiko_Score[5].vcScaleRatio.Y = 1;
-								OpenTaiko.Tx.Taiko_Score[5].t2D拡大率考慮下基準描画(x, y, rectangle);
+								OpenTaiko.Tx.Taiko_Score[5].t2DScaledBottomBasedDraw(x, y, rectangle);
 							}
 							break;
 					}

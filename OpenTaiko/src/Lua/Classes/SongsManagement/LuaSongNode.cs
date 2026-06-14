@@ -264,22 +264,22 @@
 		public int DemoStart {
 			get {
 
-				return _GetFirstAvailableScore()?.譜面情報.nデモBGMオフセット ?? 0;
+				return _GetFirstAvailableScore()?.ChartInfo.nDemoBGMOffset ?? 0;
 			}
 		}
 
 		public string PreimagePath {
 			get {
 				var score = _GetFirstAvailableScore();
-				var fPath = score?.ファイル情報.フォルダの絶対パス ?? "";
-				var pPath = score?.譜面情報.Preimage ?? "";
+				var fPath = score?.FileInfo.FolderAbsolutePath ?? "";
+				var pPath = score?.ChartInfo.Preimage ?? "";
 				return ((!Path.IsPathRooted(pPath)) ? fPath : "") + pPath;
 			}
 		}
 
 		public bool HasPreimage {
 			get {
-				return !string.IsNullOrEmpty(_GetFirstAvailableScore()?.譜面情報.Preimage ?? "");
+				return !string.IsNullOrEmpty(_GetFirstAvailableScore()?.ChartInfo.Preimage ?? "");
 			}
 		}
 
@@ -287,7 +287,7 @@
 			get {
 				var score = _GetFirstAvailableScore() ?? null;
 				if (score == null) return "";
-				return score.ファイル情報.フォルダの絶対パス + score.譜面情報.strBGMファイル名;
+				return score.FileInfo.FolderAbsolutePath + score.ChartInfo.strBGMFileName;
 			}
 		}
 
@@ -391,7 +391,7 @@
 				// so that the per-song file integrates transparently with the unlock system.
 				string? folderPath = null;
 				for (int i = 0; i < node.score.Length; i++) {
-					if (node.score[i] != null) { folderPath = node.score[i].ファイル情報.フォルダの絶対パス; break; }
+					if (node.score[i] != null) { folderPath = node.score[i].FileInfo.FolderAbsolutePath; break; }
 				}
 				if (folderPath != null)
 					OpenTaiko.Databases.DBSongUnlockables.tTryRegisterLocalUnlock(node.tGetUniqueId(), folderPath);

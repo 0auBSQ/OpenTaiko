@@ -3,10 +3,10 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CStage終了 : CStage {
+internal class CStageShutdown : CStage {
 	// Constructor
 
-	public CStage終了() {
+	public CStageShutdown() {
 		base.eStageID = CStage.EStage.End;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		base.IsDeActivated = true;
@@ -19,7 +19,7 @@ internal class CStage終了 : CStage {
 		Trace.TraceInformation("終了ステージを活性化します。");
 		Trace.Indent();
 		try {
-			this.ct時間稼ぎ = new CCounter();
+			this.ctTimeStall = new CCounter();
 
 			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}Script.lua"));
 			Background.Init();
@@ -71,20 +71,20 @@ internal class CStage終了 : CStage {
 
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				OpenTaiko.Skin.soundゲーム終了音.tPlay();
-				this.ct時間稼ぎ.Start(0, OpenTaiko.Skin.Exit_Duration, 1, OpenTaiko.Timer);
+				OpenTaiko.Skin.soundGameEndSound.tPlay();
+				this.ctTimeStall.Start(0, OpenTaiko.Skin.Exit_Duration, 1, OpenTaiko.Timer);
 				base.IsFirstDraw = false;
 			}
 
 
-			this.ct時間稼ぎ.Tick();
+			this.ctTimeStall.Tick();
 
 			Background.Update();
 			Background.Draw();
 
 			//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
-			if (this.ct時間稼ぎ.IsEnded && !OpenTaiko.Skin.soundゲーム終了音.bIsPlaying) {
+			if (this.ctTimeStall.IsEnded && !OpenTaiko.Skin.soundGameEndSound.bIsPlaying) {
 				return 1;
 			}
 		}
@@ -97,7 +97,7 @@ internal class CStage終了 : CStage {
 	#region [ private ]
 	//-----------------
 	private ScriptBG Background;
-	private CCounter ct時間稼ぎ;
+	private CCounter ctTimeStall;
 	//private CTexture tx背景;
 	//      private CTexture tx文字;
 	//      private CTexture tx文字2;

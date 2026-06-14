@@ -6,7 +6,7 @@ using SkiaSharp;
 
 namespace OpenTaiko;
 
-internal class CStageコンフィグ : CStage {
+internal class CStageConfig : CStage {
 	// Properties
 
 	public CActDFPFont actFont { get; private set; }
@@ -15,7 +15,7 @@ internal class CStageコンフィグ : CStage {
 
 	// Constructor
 
-	public CStageコンフィグ() {
+	public CStageConfig() {
 		CActDFPFont font;
 		base.eStageID = CStage.EStage.Config;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
@@ -24,7 +24,7 @@ internal class CStageコンフィグ : CStage {
 		base.ChildActivities.Add(this.actFIFO = new CActFIFOWhite());
 		base.ChildActivities.Add(this.actList = new CActConfigList());
 		base.ChildActivities.Add(this.actKeyAssign = new CActConfigKeyAssign());
-		base.ChildActivities.Add(this.actオプションパネル = new CActオプションパネル());
+		base.ChildActivities.Add(this.actOptionPanel = new CActOptionPanel());
 		base.ChildActivities.Add(this.actCalibrationMode = new CActCalibrationMode());
 		base.IsDeActivated = true;
 	}
@@ -32,18 +32,18 @@ internal class CStageコンフィグ : CStage {
 
 	// メソッド
 
-	public void tアサイン完了通知()                                                         // CONFIGにのみ存在
+	public void tAssignCompleteNotify()                                                         // CONFIGにのみ存在
 	{                                                                                       //
-		this.eItemPanelモード = EItemPanelモード.パッド一覧;                               //
+		this.eItemPanelMode = EItemPanelMode.PadList;                               //
 	}                                                                                       //
-	public void tパッド選択通知(EKeyConfigPart part, EKeyConfigPad pad)                            //
+	public void tPadSelectedNotify(EKeyConfigPart part, EKeyConfigPad pad)                            //
 	{                                                                                       //
-		this.actKeyAssign.t開始(part, pad, this.actList.ib現在の選択項目.str項目名);        //
-		this.eItemPanelモード = EItemPanelモード.キーコード一覧;                         //
+		this.actKeyAssign.tStart(part, pad, this.actList.ibCurrentSelectedItem.strItemName);        //
+		this.eItemPanelMode = EItemPanelMode.KeyCodeList;                         //
 	}                                                                                       //
-	public void t項目変更通知()                                                               // OPTIONと共通
+	public void tItemChangeNotify()                                                               // OPTIONと共通
 	{                                                                                       //
-		this.t説明文パネルに現在選択されている項目の説明を描画する();                     //
+		this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();                     //
 	}                                                                                       //
 
 
@@ -53,15 +53,15 @@ internal class CStageコンフィグ : CStage {
 		Trace.TraceInformation("コンフィグステージを活性化します。");
 		Trace.Indent();
 		try {
-			OpenTaiko.Skin.bgmコンフィグ画面.tPlay();
+			OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
-			this.n現在のメニュー番号 = 0;                                                    //
+			this.nCurrentMenuNumber = 0;                                                    //
 			for (int i = 0; i < 4; i++)                                                 //
 			{                                                                               //
-				this.ctキー反復用[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);          //
+				this.ctKeyRepeat[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);          //
 			}                                                                               //
-			this.bメニューにフォーカス中 = true;                                           // ここまでOPTIONと共通
-			this.eItemPanelモード = EItemPanelモード.パッド一覧;
+			this.bMenuFocus = true;                                           // ここまでOPTIONと共通
+			this.eItemPanelMode = EItemPanelMode.PadList;
 
 			ReloadMenus();
 
@@ -69,10 +69,10 @@ internal class CStageコンフィグ : CStage {
 			Background.Init();
 
 
-			if (this.bメニューにフォーカス中) {
-				this.t説明文パネルに現在選択されているメニューの説明を描画する();
+			if (this.bMenuFocus) {
+				this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
 			} else {
-				this.t説明文パネルに現在選択されている項目の説明を描画する();
+				this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
 			}
 		} finally {
 			Trace.TraceInformation("コンフィグステージの活性化を完了しました。");
@@ -84,11 +84,11 @@ internal class CStageコンフィグ : CStage {
 		Trace.TraceInformation("コンフィグステージを非活性化します。");
 		Trace.Indent();
 		try {
-			OpenTaiko.Skin.bgmコンフィグ画面.tStop();
+			OpenTaiko.Skin.bgmConfigScreen.tStop();
 
-			OpenTaiko.ConfigIni.t書き出し(OpenTaiko.strEXEのあるフォルダ + "Config.ini");    // CONFIGだけ
+			OpenTaiko.ConfigIni.tExport(OpenTaiko.strEXEFolder + "Config.ini");    // CONFIGだけ
 			for (int i = 0; i < 4; i++) {
-				this.ctキー反復用[i] = null;
+				this.ctKeyRepeat[i] = null;
 			}
 
 			for (int i = 0; i < txMenuItemLeft.GetLength(0); i++) {
@@ -129,7 +129,7 @@ internal class CStageコンフィグ : CStage {
 			for (int i = 0; i < strMenuItem.Length; i++) {
 				using (var bmpStr = prvFont.DrawText(strMenuItem[i], Color.White, Color.Black, null, 30)) {
 					txMenuItemLeft[i, 0]?.Dispose();
-					txMenuItemLeft[i, 0] = OpenTaiko.tテクスチャの生成(bmpStr, false);
+					txMenuItemLeft[i, 0] = OpenTaiko.tTextureCreate(bmpStr, false);
 				}
 				using (var bmpStr = prvFont.DrawText(strMenuItem[i],
 						   Color.White,
@@ -139,7 +139,7 @@ internal class CStageコンフィグ : CStage {
 						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
 						   30)) {
 					txMenuItemLeft[i, 1]?.Dispose();
-					txMenuItemLeft[i, 1] = OpenTaiko.tテクスチャの生成(bmpStr, false);
+					txMenuItemLeft[i, 1] = OpenTaiko.tTextureCreate(bmpStr, false);
 				}
 			}
 		}
@@ -155,10 +155,10 @@ internal class CStageコンフィグ : CStage {
 		//{
 		//    this.ftフォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 		//}
-		this.ftフォント = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
+		this.ftFont = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
 
 
-		OpenTaiko.Tx.Config_Cursor = OpenTaiko.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
+		OpenTaiko.Tx.Config_Cursor = OpenTaiko.tTextureCreate(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
 
 		//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
 
@@ -190,16 +190,16 @@ internal class CStageコンフィグ : CStage {
 	}
 	public override void ReleaseManagedResource()                                           // OPTIONと同じ(COnfig.iniの書き出しタイミングのみ異なるが、無視して良い)
 	{
-		if (this.ftフォント != null) {
-			this.ftフォント.Dispose();
-			this.ftフォント = null;
+		if (this.ftFont != null) {
+			this.ftFont.Dispose();
+			this.ftFont = null;
 		}
 		//CDTXMania.tテクスチャの解放( ref this.tx背景 );
 		//CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
 		//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
 		//CDTXMania.tテクスチャの解放( ref this.txMenuカーソル );
 
-		OpenTaiko.tテクスチャの解放(ref this.tx説明文パネル);
+		OpenTaiko.tTextureRelease(ref this.txDescriptionPanel);
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {
@@ -208,7 +208,7 @@ internal class CStageコンフィグ : CStage {
 
 		if (base.IsFirstDraw) {
 			base.ePhaseID = CStage.EPhase.Common_FADEIN;
-			this.actFIFO.tフェードイン開始();
+			this.actFIFO.tFadeInStart();
 			base.IsFirstDraw = false;
 		}
 
@@ -259,25 +259,25 @@ internal class CStageコンフィグ : CStage {
 			#endregion
 
 
-			int x = OpenTaiko.Skin.Config_Item_X[this.n現在のメニュー番号];
-			int y = OpenTaiko.Skin.Config_Item_Y[this.n現在のメニュー番号];
+			int x = OpenTaiko.Skin.Config_Item_X[this.nCurrentMenuNumber];
+			int y = OpenTaiko.Skin.Config_Item_Y[this.nCurrentMenuNumber];
 
-			int width = OpenTaiko.Tx.Config_Cursor.sz画像サイズ.Width / 3;
-			int height = OpenTaiko.Tx.Config_Cursor.sz画像サイズ.Height;
+			int width = OpenTaiko.Tx.Config_Cursor.szImageSize.Width / 3;
+			int height = OpenTaiko.Tx.Config_Cursor.szImageSize.Height;
 
 			int move = OpenTaiko.Skin.Config_Item_Width;
 
 			//Left
-			OpenTaiko.Tx.Config_Cursor.t2D中心基準描画(x - (width / 2) - move, y,
+			OpenTaiko.Tx.Config_Cursor.t2DCenterBasedDraw(x - (width / 2) - move, y,
 				new Rectangle(0, 0, width, height));
 
 			//Right
-			OpenTaiko.Tx.Config_Cursor.t2D中心基準描画(x + (width / 2) + move, y,
+			OpenTaiko.Tx.Config_Cursor.t2DCenterBasedDraw(x + (width / 2) + move, y,
 				new Rectangle(width * 2, 0, width, height));
 
 			//Center
 			OpenTaiko.Tx.Config_Cursor.vcScaleRatio.X = (move / (float)width) * 2.0f;
-			OpenTaiko.Tx.Config_Cursor.t2D拡大率考慮中央基準描画(x, y,
+			OpenTaiko.Tx.Config_Cursor.t2DScaledCenterBasedDraw(x, y,
 				new Rectangle(width, 0, width, height));
 
 			OpenTaiko.Tx.Config_Cursor.vcScaleRatio.X = 1.0f;
@@ -295,8 +295,8 @@ internal class CStageコンフィグ : CStage {
 			//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black );
 			//txMenuItemLeft = CDTXMania.tテクスチャの生成( bmpStr, false );
 
-			int flag = (this.n現在のメニュー番号 == i) ? 1 : 0;
-			txMenuItemLeft[i, flag].t2D中心基準描画(OpenTaiko.Skin.Config_Item_X[i] + OpenTaiko.Skin.Config_Item_Font_Offset[0], OpenTaiko.Skin.Config_Item_Y[i] + OpenTaiko.Skin.Config_Item_Font_Offset[1]); //55
+			int flag = (this.nCurrentMenuNumber == i) ? 1 : 0;
+			txMenuItemLeft[i, flag].t2DCenterBasedDraw(OpenTaiko.Skin.Config_Item_X[i] + OpenTaiko.Skin.Config_Item_Font_Offset[0], OpenTaiko.Skin.Config_Item_Y[i] + OpenTaiko.Skin.Config_Item_Font_Offset[1]); //55
 																																																		 //txMenuItem.Dispose();
 																																																		 //menuY += stepY;
 		}
@@ -305,19 +305,19 @@ internal class CStageコンフィグ : CStage {
 
 		#region [ Explanation Panel ]
 		//---------------------
-		if (this.tx説明文パネル != null)
-			this.tx説明文パネル.t2D描画(OpenTaiko.Skin.Config_ExplanationPanel[0], OpenTaiko.Skin.Config_ExplanationPanel[1]);
+		if (this.txDescriptionPanel != null)
+			this.txDescriptionPanel.t2DDraw(OpenTaiko.Skin.Config_ExplanationPanel[0], OpenTaiko.Skin.Config_ExplanationPanel[1]);
 		//---------------------
 		#endregion
 
 		#region [ Item ]
 		//---------------------
-		switch (this.eItemPanelモード) {
-			case EItemPanelモード.パッド一覧:
-				this.actList.Draw(!this.bメニューにフォーカス中);
+		switch (this.eItemPanelMode) {
+			case EItemPanelMode.PadList:
+				this.actList.Draw(!this.bMenuFocus);
 				break;
 
-			case EItemPanelモード.キーコード一覧:
+			case EItemPanelMode.KeyCodeList:
 				this.actKeyAssign.Draw();
 				break;
 		}
@@ -368,12 +368,12 @@ internal class CStageコンフィグ : CStage {
 		// キー入力
 
 		if ((base.ePhaseID != CStage.EPhase.Common_NORMAL)
-			|| this.actKeyAssign.bキー入力待ちの最中である)
+			|| this.actKeyAssign.bKeyInputWaitMiddle)
 			return 0;
 
 		if (actCalibrationMode.IsStarted) {
-			if (OpenTaiko.Skin.bgmコンフィグ画面.bIsPlaying)
-				OpenTaiko.Skin.bgmコンフィグ画面.tStop();
+			if (OpenTaiko.Skin.bgmConfigScreen.bIsPlaying)
+				OpenTaiko.Skin.bgmConfigScreen.tStop();
 
 			actCalibrationMode.Update();
 			actCalibrationMode.Draw();
@@ -393,70 +393,70 @@ internal class CStageコンフィグ : CStage {
 			}
 		}
 		// 曲データの一覧取得中は、キー入力を無効化する
-		else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bコマンドでの曲データ取得 != true) {
-			if (!OpenTaiko.Skin.bgmコンフィグ画面.bIsPlaying)
-				OpenTaiko.Skin.bgmコンフィグ画面.tPlay();
+		else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bCommandSongDataGet != true) {
+			if (!OpenTaiko.Skin.bgmConfigScreen.bIsPlaying)
+				OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
 			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.FT)) {
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
-				if (!this.bメニューにフォーカス中) {
-					if (this.eItemPanelモード == EItemPanelモード.キーコード一覧) {
-						OpenTaiko.stageConfig.tアサイン完了通知();
+				if (!this.bMenuFocus) {
+					if (this.eItemPanelMode == EItemPanelMode.KeyCodeList) {
+						OpenTaiko.stageConfig.tAssignCompleteNotify();
 						return 0;
 					}
 					bool wasEditingStringInput = this.actList.bIsFocusingParameter;
 					if (!this.actList.bIsKeyAssignSelected && !wasEditingStringInput)   // #24525 2011.3.15 yyagi, #32059 2013.9.17 yyagi
 					{
-						this.bメニューにフォーカス中 = true;
+						this.bMenuFocus = true;
 					}
 					// Only reset the description panel when not simply cancelling a string text input.
 					if (!wasEditingStringInput)
-						this.t説明文パネルに現在選択されているメニューの説明を描画する();
-					this.actList.tEsc押下();                              // #24525 2011.3.15 yyagi ESC押下時の右メニュー描画用
+						this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
+					this.actList.tEscPressed();                              // #24525 2011.3.15 yyagi ESC押下時の右メニュー描画用
 				} else {
-					this.actFIFO.tフェードアウト開始();
+					this.actFIFO.tFadeOutStart();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				}
 			} else if ((OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.CY) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RD)) || (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LC) || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
-				if (this.n現在のメニュー番号 == 3) {
+				if (this.nCurrentMenuNumber == 3) {
 					// Exit
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					this.actFIFO.tフェードアウト開始();
+					this.actFIFO.tFadeOutStart();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-				} else if (this.bメニューにフォーカス中) {
+				} else if (this.bMenuFocus) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					this.bメニューにフォーカス中 = false;
-					this.t説明文パネルに現在選択されている項目の説明を描画する();
+					this.bMenuFocus = false;
+					this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
 				} else {
-					switch (this.eItemPanelモード) {
-						case EItemPanelモード.パッド一覧:
+					switch (this.eItemPanelMode) {
+						case EItemPanelMode.PadList:
 							bool bIsKeyAssignSelectedBeforeHitEnter = this.actList.bIsKeyAssignSelected;    // #24525 2011.3.15 yyagi
-							this.actList.tEnter押下();
+							this.actList.tEnterPressed();
 
-							this.t説明文パネルに現在選択されている項目の説明を描画する();
+							this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
 
-							if (this.actList.b現在選択されている項目はReturnToMenuである) {
-								this.t説明文パネルに現在選択されているメニューの説明を描画する();
+							if (this.actList.bCurrentSelectedItemReturnToMenu) {
+								this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
 								if (bIsKeyAssignSelectedBeforeHitEnter == false)                            // #24525 2011.3.15 yyagi
 								{
-									this.bメニューにフォーカス中 = true;
+									this.bMenuFocus = true;
 								}
 							}
 							break;
 
-						case EItemPanelモード.キーコード一覧:
-							this.actKeyAssign.tEnter押下();
+						case EItemPanelMode.KeyCodeList:
+							this.actKeyAssign.tEnterPressed();
 							break;
 					}
 				}
 			}
-			this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
+			this.ctKeyRepeat.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tCursorTopMove));
 			if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.SD)) {
-				this.tカーソルを上へ移動する();
+				this.tCursorTopMove();
 			}
-			this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
+			this.ctKeyRepeat.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tCursorBottomMove));
 			if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LT)) {
-				this.tカーソルを下へ移動する();
+				this.tCursorBottomMove();
 			}
 		}
 		return 0;
@@ -467,13 +467,13 @@ internal class CStageコンフィグ : CStage {
 
 	#region [ private ]
 	//-----------------
-	private enum EItemPanelモード {
-		パッド一覧,
-		キーコード一覧
+	private enum EItemPanelMode {
+		PadList,
+		KeyCodeList
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct STキー反復用カウンタ {
+	private struct STKeyRepeatCounter {
 		public CCounter Up;
 		public CCounter Down;
 		public CCounter R;
@@ -522,95 +522,95 @@ internal class CStageコンフィグ : CStage {
 	private CActFIFOWhite actFIFO;
 	private CActConfigKeyAssign actKeyAssign;
 	public CActConfigList actList;
-	private CActオプションパネル actオプションパネル;
-	private bool bメニューにフォーカス中;
-	private STキー反復用カウンタ ctキー反復用;
+	private CActOptionPanel actOptionPanel;
+	private bool bMenuFocus;
+	private STKeyRepeatCounter ctKeyRepeat;
 	private const int DESC_H = 0x80;
 	private const int DESC_W = 220;
-	private EItemPanelモード eItemPanelモード;
-	internal CCachedFontRenderer ftフォント;
-	private int n現在のメニュー番号;
+	private EItemPanelMode eItemPanelMode;
+	internal CCachedFontRenderer ftFont;
+	private int nCurrentMenuNumber;
 	//private CTexture txMenuカーソル;
 	//private CTexture tx下部パネル;
 	//private CTexture tx上部パネル;
-	private CTexture tx説明文パネル;
+	private CTexture txDescriptionPanel;
 	//private CTexture tx背景;
 	private CTexture[,] txMenuItemLeft;
 
 	private ScriptBG Background;
 
-	private void tカーソルを下へ移動する() {
-		if (!this.bメニューにフォーカス中) {
-			switch (this.eItemPanelモード) {
-				case EItemPanelモード.パッド一覧:
-					this.actList.t次に移動();
+	private void tCursorBottomMove() {
+		if (!this.bMenuFocus) {
+			switch (this.eItemPanelMode) {
+				case EItemPanelMode.PadList:
+					this.actList.tNextMove();
 					return;
 
-				case EItemPanelモード.キーコード一覧:
-					this.actKeyAssign.t次に移動();
-					return;
-			}
-		} else {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在のメニュー番号 = (this.n現在のメニュー番号 + 1) % 4;
-			switch (this.n現在のメニュー番号) {
-				case 0:
-					this.actList.t項目リストの設定_System();
-					break;
-
-				case 1:
-					this.actList.t項目リストの設定_Drums();
-					break;
-
-				case 2:
-					this.actList.t項目リストの設定_Theme();
-					break;
-
-				case 3:
-					this.actList.t項目リストの設定_Exit();
-					break;
-			}
-			this.t説明文パネルに現在選択されているメニューの説明を描画する();
-		}
-	}
-	private void tカーソルを上へ移動する() {
-		if (!this.bメニューにフォーカス中) {
-			switch (this.eItemPanelモード) {
-				case EItemPanelモード.パッド一覧:
-					this.actList.t前に移動();
-					return;
-
-				case EItemPanelモード.キーコード一覧:
-					this.actKeyAssign.t前に移動();
+				case EItemPanelMode.KeyCodeList:
+					this.actKeyAssign.tNextMove();
 					return;
 			}
 		} else {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在のメニュー番号 = ((this.n現在のメニュー番号 - 1) + 4) % 4;
-			switch (this.n現在のメニュー番号) {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
+			this.nCurrentMenuNumber = (this.nCurrentMenuNumber + 1) % 4;
+			switch (this.nCurrentMenuNumber) {
 				case 0:
-					this.actList.t項目リストの設定_System();
+					this.actList.tItemListSettings_System();
 					break;
 
 				case 1:
-					this.actList.t項目リストの設定_Drums();
+					this.actList.tItemListSettings_Drums();
 					break;
 
 				case 2:
-					this.actList.t項目リストの設定_Theme();
+					this.actList.tItemListSettings_Theme();
 					break;
 
 				case 3:
-					this.actList.t項目リストの設定_Exit();
+					this.actList.tItemListSettings_Exit();
 					break;
 			}
-			this.t説明文パネルに現在選択されているメニューの説明を描画する();
+			this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
 		}
 	}
-	private void t説明文パネルに現在選択されているメニューの説明を描画する() {
+	private void tCursorTopMove() {
+		if (!this.bMenuFocus) {
+			switch (this.eItemPanelMode) {
+				case EItemPanelMode.PadList:
+					this.actList.tPrevMove();
+					return;
+
+				case EItemPanelMode.KeyCodeList:
+					this.actKeyAssign.tPrevMove();
+					return;
+			}
+		} else {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
+			this.nCurrentMenuNumber = ((this.nCurrentMenuNumber - 1) + 4) % 4;
+			switch (this.nCurrentMenuNumber) {
+				case 0:
+					this.actList.tItemListSettings_System();
+					break;
+
+				case 1:
+					this.actList.tItemListSettings_Drums();
+					break;
+
+				case 2:
+					this.actList.tItemListSettings_Theme();
+					break;
+
+				case 3:
+					this.actList.tItemListSettings_Exit();
+					break;
+			}
+			this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
+		}
+	}
+	private void tDescriptionPanelCurrentSelectedMenuDescriptionDraw() {
 		try {
 			string text = "";
-			switch (this.n現在のメニュー番号) {
+			switch (this.nCurrentMenuNumber) {
 				case 0:
 					text = CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DESC");
 					break;
@@ -624,36 +624,36 @@ internal class CStageコンフィグ : CStage {
 					text = CLangManager.LangInstance.GetString("SETTINGS_EXIT_DESC");
 					break;
 			}
-			SKBitmap image = ftフォント.DrawText(text, Color.White, Color.Black, null, 30);
-			if (this.tx説明文パネル != null) {
-				this.tx説明文パネル.Dispose();
+			SKBitmap image = ftFont.DrawText(text, Color.White, Color.Black, null, 30);
+			if (this.txDescriptionPanel != null) {
+				this.txDescriptionPanel.Dispose();
 			}
-			this.tx説明文パネル = new CTexture(image);
+			this.txDescriptionPanel = new CTexture(image);
 			image.Dispose();
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("説明文テクスチャの作成に失敗しました。");
-			this.tx説明文パネル = null;
+			this.txDescriptionPanel = null;
 		}
 	}
-	private void t説明文パネルに現在選択されている項目の説明を描画する() {
+	private void tDescriptionPanelCurrentSelectedItemDescriptionDraw() {
 		try {
 			var image = new SKBitmap(440, 288);     // 説明文領域サイズの縦横 2 倍。（描画時に 0.5 倍で表示する___のは中止。処理速度向上のため。）
 
-			CItemBase item = this.actList.ib現在の選択項目;
-			if ((item.str説明文 != null) && (item.str説明文.Length > 0)) {
+			CItemBase item = this.actList.ibCurrentSelectedItem;
+			if ((item.strDescription != null) && (item.strDescription.Length > 0)) {
 				image.Dispose();
-				image = ftフォント.DrawText(item.str説明文, Color.White, Color.Black, null, 30);
+				image = ftFont.DrawText(item.strDescription, Color.White, Color.Black, null, 30);
 			}
-			if (this.tx説明文パネル != null) {
-				this.tx説明文パネル.Dispose();
+			if (this.txDescriptionPanel != null) {
+				this.txDescriptionPanel.Dispose();
 			}
-			this.tx説明文パネル = new CTexture(image);
+			this.txDescriptionPanel = new CTexture(image);
 			image.Dispose();
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("説明文パネルテクスチャの作成に失敗しました。");
-			this.tx説明文パネル = null;
+			this.txDescriptionPanel = null;
 		}
 	}
 	//-----------------

@@ -59,33 +59,33 @@ internal class CSongMount {
 
 		// 現在のアンカレベルから、難易度上向きに検索開始。
 
-		int n最も近いレベル = difficulty;
+		int nNearestLevel = difficulty;
 
 		for (int i = 0; i < (int)Difficulty.Total; i++) {
-			if (song.score[n最も近いレベル] != null)
+			if (song.score[nNearestLevel] != null)
 				break;  // 曲があった。
 
-			n最も近いレベル = (n最も近いレベル + 1) % (int)Difficulty.Total;  // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
+			nNearestLevel = (nNearestLevel + 1) % (int)Difficulty.Total;  // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
 		}
 
 
 		// 見つかった曲がアンカより下のレベルだった場合……
 		// アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
 
-		if (n最も近いレベル < difficulty) {
+		if (nNearestLevel < difficulty) {
 			// 現在のアンカレベルから、難易度下向きに検索開始。
 
-			n最も近いレベル = difficulty;
+			nNearestLevel = difficulty;
 
 			for (int i = 0; i < (int)Difficulty.Total; i++) {
-				if (song.score[n最も近いレベル] != null)
+				if (song.score[nNearestLevel] != null)
 					break;  // 曲があった。
 
-				n最も近いレベル = ((n最も近いレベル - 1) + (int)Difficulty.Total) % (int)Difficulty.Total;    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
+				nNearestLevel = ((nNearestLevel - 1) + (int)Difficulty.Total) % (int)Difficulty.Total;    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
 			}
 		}
 
-		return n最も近いレベル;
+		return nNearestLevel;
 	}
 
 	public int FindClosestDifficultyToAnchor(CSongListNode? song)
