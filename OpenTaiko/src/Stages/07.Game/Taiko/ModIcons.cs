@@ -51,9 +51,9 @@ class ModIcons {
 		}
 
 		if (_i >= 0)
-			OpenTaiko.Tx.HiSp[_i]?.t2D描画(x, y);
+			OpenTaiko.Tx.HiSp[_i]?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayAutoIcon(int x, int y, int player) {
@@ -63,77 +63,77 @@ class ModIcons {
 			_displayed = true;
 
 		if (_displayed == true)
-			OpenTaiko.Tx.Mod_Auto?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Auto?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayDoronIcon(int x, int y, int player) {
 		var conf_ = OpenTaiko.ConfigIni.eSTEALTH[player];
 
 		if (conf_ == EStealthMode.Doron)
-			OpenTaiko.Tx.Mod_Doron?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Doron?.t2DDraw(x, y);
 		else if (conf_ == EStealthMode.Stealth)
-			OpenTaiko.Tx.Mod_Stealth?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Stealth?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayJustIcon(int x, int y, int player) {
 		var conf_ = OpenTaiko.ConfigIni.bJust[player];
 
 		if (conf_ == 1)
-			OpenTaiko.Tx.Mod_Just?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Just?.t2DDraw(x, y);
 		else if (conf_ == 2)
-			OpenTaiko.Tx.Mod_Safe?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Safe?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayRandomIcon(int x, int y, int player) {
 		var rand_ = OpenTaiko.ConfigIni.eRandom[player];
 
 		if (rand_ == ERandomMode.Mirror)
-			OpenTaiko.Tx.Mod_Mirror?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Mirror?.t2DDraw(x, y);
 		else if (rand_ == ERandomMode.Random)
-			OpenTaiko.Tx.Mod_Random?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Random?.t2DDraw(x, y);
 		else if (rand_ == ERandomMode.SuperRandom)
-			OpenTaiko.Tx.Mod_Super?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Super?.t2DDraw(x, y);
 		else if (rand_ == ERandomMode.MirrorRandom)
-			OpenTaiko.Tx.Mod_Hyper?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Hyper?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplaySongSpeedIcon(int x, int y, int player) {
 		if (OpenTaiko.ConfigIni.nSongSpeed > 20)
-			OpenTaiko.Tx.Mod_SongSpeed[1]?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_SongSpeed[1]?.t2DDraw(x, y);
 		else if (OpenTaiko.ConfigIni.nSongSpeed < 20)
-			OpenTaiko.Tx.Mod_SongSpeed[0]?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_SongSpeed[0]?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayFunModIcon(int x, int y, int player) {
 		int nFun = (int)OpenTaiko.ConfigIni.nFunMods[player];
 
 		if (nFun > 0)
-			OpenTaiko.Tx.Mod_Fun[nFun]?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Fun[nFun]?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void tDisplayTimingIcon(int x, int y, int player) {
 		int zones = OpenTaiko.ConfigIni.nTimingZones[player];
 
 		if (zones != 2)
-			OpenTaiko.Tx.Mod_Timing[zones]?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_Timing[zones]?.t2DDraw(x, y);
 		else
-			OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+			OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	static private void PLACEHOLDER_tDisplayNoneIcon(int x, int y, int player) {
-		OpenTaiko.Tx.Mod_None?.t2D描画(x, y);
+		OpenTaiko.Tx.Mod_None?.t2DDraw(x, y);
 	}
 
 	#endregion

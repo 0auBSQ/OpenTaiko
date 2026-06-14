@@ -210,7 +210,7 @@ class CLuaScript : IDisposable {
 			LuaScript["getNumArray"] = getNumArray;
 			LuaScript["getTextArray"] = getTextArray;
 			LuaScript["getLocalizedString"] = GetLocalizedString;
-			LuaScript["displayDanPlate"] = CActSelect段位リスト.tDisplayDanPlate;
+			LuaScript["displayDanPlate"] = CActSelectDanList.tDisplayDanPlate;
 			LuaScript["debugLog"] = DebugLog;
 
 

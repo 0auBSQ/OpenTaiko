@@ -35,53 +35,53 @@ class CActSelect段位挑戦選択画面 : CActivity {
 			OpenTaiko.Tx.Challenge_Select[1].Opacity = OpenTaiko.stageDanSongSelect.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
 			OpenTaiko.Tx.Challenge_Select[2].Opacity = OpenTaiko.stageDanSongSelect.bDifficultyIn ? ctBarIn.CurrentValue : 255 - ctBarOut.CurrentValue;
 
-			OpenTaiko.Tx.Challenge_Select[0].t2D描画(0, 0);
+			OpenTaiko.Tx.Challenge_Select[0].t2DDraw(0, 0);
 
-			int selectIndex = (2 - n現在の選択行);
+			int selectIndex = (2 - nCurrentSelectedLine);
 			int[] challenge_select_rect = OpenTaiko.Skin.DaniSelect_Challenge_Select_Rect[selectIndex];
 
-			OpenTaiko.Tx.Challenge_Select[2].t2D描画(OpenTaiko.Skin.DaniSelect_Challenge_Select_X[selectIndex], OpenTaiko.Skin.DaniSelect_Challenge_Select_Y[selectIndex],
+			OpenTaiko.Tx.Challenge_Select[2].t2DDraw(OpenTaiko.Skin.DaniSelect_Challenge_Select_X[selectIndex], OpenTaiko.Skin.DaniSelect_Challenge_Select_Y[selectIndex],
 				new Rectangle(challenge_select_rect[0], challenge_select_rect[1], challenge_select_rect[2], challenge_select_rect[3]));
 
-			OpenTaiko.Tx.Challenge_Select[1].t2D描画(0, 0);
+			OpenTaiko.Tx.Challenge_Select[1].t2DDraw(0, 0);
 
 
-			if (OpenTaiko.stageDanSongSelect.ct待機.IsStarted)
+			if (OpenTaiko.stageDanSongSelect.ctWait.IsStarted)
 				return base.Draw();
 
 			#region [Key bindings]
 
-			if (ctBarIn.IsEnded && !OpenTaiko.stageDanSongSelect.b選択した && bOption == false) {
+			if (ctBarIn.IsEnded && !OpenTaiko.stageDanSongSelect.bSelected && bOption == false) {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
-					if (n現在の選択行 - 1 >= 0) {
+					if (nCurrentSelectedLine - 1 >= 0) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
-						n現在の選択行--;
+						nCurrentSelectedLine--;
 					}
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
-					if (n現在の選択行 + 1 <= 2) {
+					if (nCurrentSelectedLine + 1 <= 2) {
 						OpenTaiko.Skin.soundChangeSFX.tPlay();
-						n現在の選択行++;
+						nCurrentSelectedLine++;
 					}
 				}
 
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
 					OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)) {
-					if (n現在の選択行 == 0) {
+					if (nCurrentSelectedLine == 0) {
 						this.ctBarOut.Start(0, 255, 0.5f, OpenTaiko.Timer);
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
 						OpenTaiko.stageDanSongSelect.bDifficultyIn = false;
-					} else if (n現在の選択行 == 1) {
+					} else if (nCurrentSelectedLine == 1) {
 						//TJAPlayer3.Skin.soundDanSongSelect.t再生する();
 						OpenTaiko.ConfigIni.bTokkunMode = false;
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.Skin.voiceMenuDanSelectConfirm[OpenTaiko.SaveFile]?.tPlay();
-						OpenTaiko.stageDanSongSelect.ct待機.Start(0, 3000, 1, OpenTaiko.Timer);
-					} else if (n現在の選択行 == 2) {
+						OpenTaiko.stageDanSongSelect.ctWait.Start(0, 3000, 1, OpenTaiko.Timer);
+					} else if (nCurrentSelectedLine == 2) {
 						bOption = true;
 					}
 				}
@@ -98,5 +98,5 @@ class CActSelect段位挑戦選択画面 : CActivity {
 
 	public bool bOption;
 
-	private int n現在の選択行;
+	private int nCurrentSelectedLine;
 }

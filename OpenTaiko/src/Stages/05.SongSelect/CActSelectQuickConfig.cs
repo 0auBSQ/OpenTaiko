@@ -79,14 +79,14 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 	//	base.tDeativatePopupMenu();
 	//}
 
-	public override void tEnter押下Main(int nSortOrder) {
-		switch (n現在の選択行) {
+	public override void tEnterPressedMain(int nSortOrder) {
+		switch (nCurrentSelectedLine) {
 			case (int)EOrder.ScrollSpeed:
-				OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = (int)GetObj現在値((int)EOrder.ScrollSpeed);
+				OpenTaiko.ConfigIni.nScrollSpeed[OpenTaiko.SaveFile] = (int)GetObjCurrentValue((int)EOrder.ScrollSpeed);
 				break;
 
 			case (int)EOrder.PlaySpeed:
-				OpenTaiko.ConfigIni.nSongSpeed = (int)GetObj現在値((int)EOrder.PlaySpeed);
+				OpenTaiko.ConfigIni.nSongSpeed = (int)GetObjCurrentValue((int)EOrder.PlaySpeed);
 				break;
 			case (int)EOrder.Random:
 				OpenTaiko.ConfigIni.eRandom[OpenTaiko.SaveFile] = (ERandomMode)GetIndex((int)EOrder.Random);
@@ -107,7 +107,7 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 				OpenTaiko.ConfigIni.ShinuchiMode = !OpenTaiko.ConfigIni.ShinuchiMode;
 				break;
 			case (int)EOrder.PlayerCount:
-				OpenTaiko.ConfigIni.nPlayerCount = (int)GetObj現在値((int)EOrder.PlayerCount);
+				OpenTaiko.ConfigIni.nPlayerCount = (int)GetObjCurrentValue((int)EOrder.PlayerCount);
 				break;
 			case (int)EOrder.More:
 				SetAutoParameters();            // 簡易CONFIGメニュー脱出に伴い、簡易CONFIG内のAUTOの設定をConfigIniクラスに反映する
@@ -163,7 +163,7 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 			this.ft表示用フォント = null;
 		}
 		//CDTXMania.tテクスチャの解放( ref this.txパネル本体 );
-		OpenTaiko.tテクスチャの解放(ref this.tx文字列パネル);
+		OpenTaiko.tTextureRelease(ref this.txStringPanel);
 		base.ReleaseManagedResource();
 	}
 
@@ -188,7 +188,7 @@ internal class CActSelectQuickConfig : CActSelectPopupMenu {
 
 	private CCachedFontRenderer ft表示用フォント;
 	//private CTexture txパネル本体;
-	private CTexture tx文字列パネル;
+	private CTexture txStringPanel;
 	private CTexture tx説明文1;
 	//-----------------
 	#endregion

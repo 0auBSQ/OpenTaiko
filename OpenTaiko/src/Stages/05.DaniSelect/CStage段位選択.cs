@@ -9,7 +9,7 @@ class CStage段位選択 : CStage {
 		base.eStageID = EStage.DanDojoSelect;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
-		base.ChildActivities.Add(this.段位リスト = new CActSelect段位リスト());
+		base.ChildActivities.Add(this.段位リスト = new CActSelectDanList());
 
 		base.ChildActivities.Add(this.actFOtoNowLoading = new CActFIFOStart());
 		base.ChildActivities.Add(this.段位挑戦選択画面 = new CActSelect段位挑戦選択画面());
@@ -22,12 +22,12 @@ class CStage段位選択 : CStage {
 		if (base.IsActivated)
 			return;
 
-		this.b選択した = false;
+		this.bSelected = false;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.Continuation;
 
-		ct待機 = new CCounter();
+		ctWait = new CCounter();
 		ctChara_In = new CCounter();
 
 		// ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
@@ -63,7 +63,7 @@ class CStage段位選択 : CStage {
 	public override int Draw() {
 		// ctChara_Normal.t進行Loop();
 		ctChara_In.Tick();
-		ct待機.Tick();
+		ctWait.Tick();
 
 		int stamp = this.段位リスト.ctDaniIn.CurrentValue;
 
@@ -154,13 +154,13 @@ class CStage段位選択 : CStage {
 
 			#region [ キー関連 ]
 
-			if (!this.段位リスト.bスクロール中 && !b選択した && !bDifficultyIn) {
+			if (!this.段位リスト.bスクロール中 && !bSelected && !bDifficultyIn) {
 				int returnTitle() {
 					if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 						OpenTaiko.Skin.soundDanSelectBGM.tStop();
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
-						this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
-						this.actFOtoTitle.tフェードアウト開始();
+						this.eFadeOutCompleteWhenReturnValue = EReturnValue.BackToTitle;
+						this.actFOtoTitle.tFadeOutStart();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 					return 0;
@@ -242,7 +242,7 @@ class CStage段位選択 : CStage {
 				int puchi_y = chara_y + OpenTaiko.Skin.Adjustments_MenuPuchichara_Y[0];
 
 				//this.PuchiChara.On進行描画(0 + 100, 336 + 230, false);
-				this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
+				this.PuchiChara.OnProgressDraw(puchi_x, puchi_y, false);
 
 				#endregion
 			}
@@ -252,20 +252,20 @@ class CStage段位選択 : CStage {
 			this.段位挑戦選択画面.Draw();
 		}
 
-		this.actPlayOption.On進行描画(1, [this.段位挑戦選択画面.bOption]);
+		this.actPlayOption.OnProgressDraw(1, [this.段位挑戦選択画面.bOption]);
 
-		if (ct待機.CurrentValue >= 3000) {
+		if (ctWait.CurrentValue >= 3000) {
 			if (段位リスト.Cursor.Item == null || 段位リスト.Cursor.Item.nodeType == CSongListNode.ENodeType.RANDOM) {
 				if (段位リスト.Cursor.Item == null || !tSelectSongRandomly()) {
 					bDifficultyIn = false;
-					b選択した = false;
+					bSelected = false;
 					OpenTaiko.Skin.soundError.tPlay();
 				}
 			} else {
 				OpenTaiko.stageDanSongSelect.t段位を選択する();
 			}
-			ct待機.CurrentValue = 0;
-			ct待機.Stop();
+			ctWait.CurrentValue = 0;
+			ctWait.Stop();
 		}
 
 		switch (base.ePhaseID) {
@@ -273,13 +273,13 @@ class CStage段位選択 : CStage {
 				if (this.actFOtoNowLoading.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 			case CStage.EPhase.Common_FADEOUT:
 				if (this.actFOtoTitle.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 		}
 
@@ -287,14 +287,14 @@ class CStage段位選択 : CStage {
 	}
 
 	public void t段位を選択する() {
-		this.b選択した = true;
+		this.bSelected = true;
 		OpenTaiko.SongMount.rChoosenSong = 段位リスト.Cursor.Item!;
 		OpenTaiko.SongMount.rChosenScore = 段位リスト.Cursor.Item.score[(int)Difficulty.Dan];
 		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Dan;
 		OpenTaiko.SongMount.strChosenSongGenre = 段位リスト.Cursor.Item.songGenre;
 		if ((OpenTaiko.SongMount.rChoosenSong != null) && (OpenTaiko.SongMount.rChosenScore != null)) {
-			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+			this.eFadeOutCompleteWhenReturnValue = EReturnValue.SongSelected;
+			this.actFOtoNowLoading.tFadeOutStart();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}
 		// TJAPlayer3.Skin.bgm選曲画面.t停止する();
@@ -302,7 +302,7 @@ class CStage段位選択 : CStage {
 	}
 
 	private bool tSelectSongRandomly() {
-		this.b選択した = true;
+		this.bSelected = true;
 		var mandatoryDiffs = new List<int>();
 		CSongListNode song = 段位リスト.Cursor.Item!;
 
@@ -333,8 +333,8 @@ class CStage段位選択 : CStage {
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
-		this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-		this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.SongSelected;
+		this.actFOtoNowLoading.tFadeOutStart();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 		base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 
 		CSongSelectSongManager.stopSong();
@@ -344,9 +344,9 @@ class CStage段位選択 : CStage {
 
 	private ScriptBG Background;
 
-	public CCounter ct待機;
+	public CCounter ctWait;
 
-	public bool b選択した;
+	public bool bSelected;
 	public bool bDifficultyIn;
 
 	public bool bInSongPlayed;
@@ -356,11 +356,11 @@ class CStage段位選択 : CStage {
 
 	private PuchiChara PuchiChara;
 
-	public EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eFadeOutCompleteWhenReturnValue;
 
 	public CActFIFOStart actFOtoNowLoading;
 	public CActFIFOBlack actFOtoTitle;
-	public CActSelect段位リスト 段位リスト;
+	public CActSelectDanList 段位リスト;
 	public CActSelect段位挑戦選択画面 段位挑戦選択画面;
 	public CActPlayOption actPlayOption;
 }

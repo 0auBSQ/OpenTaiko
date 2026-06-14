@@ -42,7 +42,7 @@ class CActSelectTowerInfo : CStage {
 
 	public override int Draw() {
 		if (OpenTaiko.SongMount.rCurrentlySelectedSong.score[5] != null)
-			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].譜面情報.nTotalFloor);
+			tFloorNumberDraw(OpenTaiko.Skin.SongSelect_FloorNum_X, OpenTaiko.Skin.SongSelect_FloorNum_Y, OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].ChartInfo.nTotalFloor);
 
 		return 0;
 	}
@@ -58,10 +58,10 @@ class CActSelectTowerInfo : CStage {
 				float x = originx - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[0] * offset);
 				float y = originy - (OpenTaiko.Skin.SongSelect_FloorNum_Interval[1] * offset);
 
-				float width = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Width / 10.0f;
-				float height = OpenTaiko.Tx.SongSelect_Floor_Number.sz画像サイズ.Height;
+				float width = OpenTaiko.Tx.SongSelect_Floor_Number.szImageSize.Width / 10.0f;
+				float height = OpenTaiko.Tx.SongSelect_Floor_Number.szImageSize.Height;
 
-				OpenTaiko.Tx.SongSelect_Floor_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
+				OpenTaiko.Tx.SongSelect_Floor_Number.t2DDraw(x, y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
 	}

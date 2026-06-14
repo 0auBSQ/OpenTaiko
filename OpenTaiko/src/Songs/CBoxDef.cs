@@ -44,17 +44,17 @@ internal class CBoxDef {
 		DefaultPreimage = null;
 		ScenePreset = null;
 	}
-	public CBoxDef(string boxdefファイル名)
+	public CBoxDef(string boxdefFileName)
 		: this() {
-		this.t読み込み(boxdefファイル名);
+		this.tLoad(boxdefFileName);
 	}
 
 	// メソッド
 	private static readonly Regex KeyAndValueRegex =
 		new Regex(@"^[ \t]*(#[A-Z0-9]+)(?::\s?|\s)(.+?)?$", RegexOptions.Compiled);
 
-	public void t読み込み(string boxdefファイル名) {
-		StreamReader reader = new StreamReader(boxdefファイル名, Encoding.GetEncoding(OpenTaiko.sEncType));
+	public void tLoad(string boxdefFileName) {
+		StreamReader reader = new StreamReader(boxdefFileName, Encoding.GetEncoding(OpenTaiko.sEncType));
 		string str = null;
 		while ((str = reader.ReadLine()) != null) {
 			if (str.Length != 0) {
@@ -112,7 +112,7 @@ internal class CBoxDef {
 							} else if (key == "#SCENEPRESET") {
 								this.ScenePreset = value;
 							} else if (key == "#DEFAULTPREIMAGE") {
-								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefファイル名).FullName, value);
+								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefFileName).FullName, value);
 							} else {
 								for (int i = 0; i < 3; i++) {
 									if (key == "#BOXEXPLANATION" + (i + 1).ToString()) {

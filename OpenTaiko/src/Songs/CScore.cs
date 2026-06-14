@@ -11,71 +11,71 @@ internal class CScore {
 
 	// Properties
 
-	public STScoreIni情報 ScoreIni情報;
+	public STScoreIniInfo ScoreIniInfo;
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
-	public struct STScoreIni情報 {
-		public DateTime 最終更新日時;
-		public long ファイルサイズ;
+	public struct STScoreIniInfo {
+		public DateTime LastUpdateDateTime;
+		public long FileSize;
 
-		public STScoreIni情報(DateTime 最終更新日時, long ファイルサイズ) {
-			this.最終更新日時 = 最終更新日時;
-			this.ファイルサイズ = ファイルサイズ;
+		public STScoreIniInfo(DateTime LastUpdateDateTime, long FileSize) {
+			this.LastUpdateDateTime = LastUpdateDateTime;
+			this.FileSize = FileSize;
 		}
 	}
 
-	public STファイル情報 ファイル情報;
+	public STFileInfo FileInfo;
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
-	public struct STファイル情報 {
-		public string ファイルの絶対パス;
-		public string フォルダの絶対パス;
-		public DateTime 最終更新日時;
-		public long ファイルサイズ;
+	public struct STFileInfo {
+		public string FileAbsolutePath;
+		public string FolderAbsolutePath;
+		public DateTime LastUpdateDateTime;
+		public long FileSize;
 
-		public STファイル情報(string ファイルの絶対パス, string フォルダの絶対パス, DateTime 最終更新日時, long ファイルサイズ) {
-			this.ファイルの絶対パス = ファイルの絶対パス;
-			this.フォルダの絶対パス = フォルダの絶対パス;
-			this.最終更新日時 = 最終更新日時;
-			this.ファイルサイズ = ファイルサイズ;
+		public STFileInfo(string FileAbsolutePath, string FolderAbsolutePath, DateTime LastUpdateDateTime, long FileSize) {
+			this.FileAbsolutePath = FileAbsolutePath;
+			this.FolderAbsolutePath = FolderAbsolutePath;
+			this.LastUpdateDateTime = LastUpdateDateTime;
+			this.FileSize = FileSize;
 		}
 	}
 
-	public ST譜面情報 譜面情報;
+	public STChartInfo ChartInfo;
 
 	[Serializable]
 	[StructLayout(LayoutKind.Sequential)]
-	public struct ST譜面情報 {
-		public string タイトル;
-		public string アーティスト名;
-		public string コメント;
-		public string ジャンル;
+	public struct STChartInfo {
+		public string Title;
+		public string ArtistName;
+		public string Comment;
+		public string Genre;
 		public string Preimage;
 		public string Premovie;
 		public string Presound;
 		public string Backgound;
-		public STDGBVALUE<int> レベル;
-		public STSKILL 最大スキル;
-		public STDGBVALUE<bool> フルコンボ;
-		public STDGBVALUE<int> 演奏回数;
-		public STHISTORY 演奏履歴;
-		public bool レベルを非表示にする;
+		public STDGBVALUE<int> Level;
+		public STSKILL MaxSkill;
+		public STDGBVALUE<bool> FullCombo;
+		public STDGBVALUE<int> PlayCount;
+		public STHISTORY PlayHistory;
+		public bool LevelHide;
 		public double Bpm;
 		public double BaseBpm;
 		public double MinBpm;
 		public double MaxBpm;
 		public int Duration;
-		public string strBGMファイル名;
+		public string strBGMFileName;
 		public int SongVol;
 		public LoudnessMetadata? SongLoudnessMetadata;
-		public int nデモBGMオフセット;
-		public bool[] b譜面分岐;
-		public int ハイスコア;
-		public int[] nハイスコア;
-		public string strサブタイトル;
-		public int[] nレベル;
-		public int[] nクリア;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
-		public int[] nスコアランク;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
+		public int nDemoBGMOffset;
+		public bool[] bChartBranch;
+		public int HighScore;
+		public int[] nHighScore;
+		public string strSubtitle;
+		public int[] nLevel;
+		public int[] nClear;      //0:未クリア 1:クリア 2:フルコンボ 3:ドンダフルコンボ
+		public int[] nScoreRank;  //0:未取得 1:白粋 2:銅粋 3:銀粋 4:金雅 5:桃雅 6:紫雅 7:虹極
 		public CTja.ELevelIcon[] nLevelIcon;
 
 		// Tower lifes
@@ -91,63 +91,63 @@ internal class CScore {
 		[Serializable]
 		[StructLayout(LayoutKind.Sequential)]
 		public struct STHISTORY {
-			public string 行1;
-			public string 行2;
-			public string 行3;
-			public string 行4;
-			public string 行5;
-			public string 行6;
-			public string 行7;
+			public string Line1;
+			public string Line2;
+			public string Line3;
+			public string Line4;
+			public string Line5;
+			public string Line6;
+			public string Line7;
 			public string this[int index] {
 				get {
 					switch (index) {
 						case 0:
-							return this.行1;
+							return this.Line1;
 
 						case 1:
-							return this.行2;
+							return this.Line2;
 
 						case 2:
-							return this.行3;
+							return this.Line3;
 
 						case 3:
-							return this.行4;
+							return this.Line4;
 
 						case 4:
-							return this.行5;
+							return this.Line5;
 						case 5:
-							return this.行6;
+							return this.Line6;
 						case 6:
-							return this.行7;
+							return this.Line7;
 					}
 					throw new IndexOutOfRangeException();
 				}
 				set {
 					switch (index) {
 						case 0:
-							this.行1 = value;
+							this.Line1 = value;
 							return;
 
 						case 1:
-							this.行2 = value;
+							this.Line2 = value;
 							return;
 
 						case 2:
-							this.行3 = value;
+							this.Line3 = value;
 							return;
 
 						case 3:
-							this.行4 = value;
+							this.Line4 = value;
 							return;
 
 						case 4:
-							this.行5 = value;
+							this.Line5 = value;
 							return;
 						case 5:
-							this.行6 = value;
+							this.Line6 = value;
 							return;
 						case 6:
-							this.行7 = value;
+							this.Line7 = value;
 							return;
 					}
 					throw new IndexOutOfRangeException();
@@ -206,10 +206,10 @@ internal class CScore {
 		}
 	}
 
-	public bool bSongDBにキャッシュがあった;
-	public bool bスコアが有効である {
+	public bool bHadCacheInSongDB;
+	public bool bScoreEnabled {
 		get {
-			return (((this.譜面情報.レベル[0] + this.譜面情報.レベル[1]) + this.譜面情報.レベル[2]) != 0);
+			return (((this.ChartInfo.Level[0] + this.ChartInfo.Level[1]) + this.ChartInfo.Level[2]) != 0);
 		}
 	}
 
@@ -217,49 +217,49 @@ internal class CScore {
 	// Constructor
 
 	public CScore() {
-		this.ScoreIni情報 = new STScoreIni情報(DateTime.MinValue, 0L);
-		this.bSongDBにキャッシュがあった = false;
-		this.ファイル情報 = new STファイル情報("", "", DateTime.MinValue, 0L);
-		this.譜面情報 = new ST譜面情報();
-		this.譜面情報.タイトル = "";
-		this.譜面情報.アーティスト名 = "";
-		this.譜面情報.コメント = "";
-		this.譜面情報.ジャンル = "";
-		this.譜面情報.Preimage = "";
-		this.譜面情報.Premovie = "";
-		this.譜面情報.Presound = "";
-		this.譜面情報.Backgound = "";
-		this.譜面情報.レベル = new STDGBVALUE<int>();
-		this.譜面情報.フルコンボ = new STDGBVALUE<bool>();
-		this.譜面情報.演奏回数 = new STDGBVALUE<int>();
-		this.譜面情報.演奏履歴 = new ST譜面情報.STHISTORY();
-		this.譜面情報.演奏履歴.行1 = "";
-		this.譜面情報.演奏履歴.行2 = "";
-		this.譜面情報.演奏履歴.行3 = "";
-		this.譜面情報.演奏履歴.行4 = "";
-		this.譜面情報.演奏履歴.行5 = "";
-		this.譜面情報.演奏履歴.行6 = "";
-		this.譜面情報.演奏履歴.行7 = "";
-		this.譜面情報.レベルを非表示にする = false;
-		this.譜面情報.最大スキル = new ST譜面情報.STSKILL();
-		this.譜面情報.Bpm = 120.0;
-		this.譜面情報.MinBpm = 120.0;
-		this.譜面情報.MaxBpm = 120.0;
-		this.譜面情報.Duration = 0;
-		this.譜面情報.strBGMファイル名 = "";
-		this.譜面情報.SongVol = CSound.DefaultSongVol;
-		this.譜面情報.SongLoudnessMetadata = null;
-		this.譜面情報.nデモBGMオフセット = 0;
-		this.譜面情報.b譜面分岐 = new bool[(int)Difficulty.Total];
-		this.譜面情報.ハイスコア = 0;
-		this.譜面情報.nハイスコア = new int[(int)Difficulty.Total];
-		this.譜面情報.strサブタイトル = "";
-		this.譜面情報.nレベル = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
-		this.譜面情報.nLevelIcon = new CTja.ELevelIcon[(int)Difficulty.Total] { CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone };
-		this.譜面情報.nクリア = new int[5];
-		this.譜面情報.nスコアランク = new int[5];
-		this.譜面情報.nExamResult = new List<int[]> { };
-		this.譜面情報.nLife = 5;
-		this.譜面情報.nTotalFloor = 140;
+		this.ScoreIniInfo = new STScoreIniInfo(DateTime.MinValue, 0L);
+		this.bHadCacheInSongDB = false;
+		this.FileInfo = new STFileInfo("", "", DateTime.MinValue, 0L);
+		this.ChartInfo = new STChartInfo();
+		this.ChartInfo.Title = "";
+		this.ChartInfo.ArtistName = "";
+		this.ChartInfo.Comment = "";
+		this.ChartInfo.Genre = "";
+		this.ChartInfo.Preimage = "";
+		this.ChartInfo.Premovie = "";
+		this.ChartInfo.Presound = "";
+		this.ChartInfo.Backgound = "";
+		this.ChartInfo.Level = new STDGBVALUE<int>();
+		this.ChartInfo.FullCombo = new STDGBVALUE<bool>();
+		this.ChartInfo.PlayCount = new STDGBVALUE<int>();
+		this.ChartInfo.PlayHistory = new STChartInfo.STHISTORY();
+		this.ChartInfo.PlayHistory.Line1 = "";
+		this.ChartInfo.PlayHistory.Line2 = "";
+		this.ChartInfo.PlayHistory.Line3 = "";
+		this.ChartInfo.PlayHistory.Line4 = "";
+		this.ChartInfo.PlayHistory.Line5 = "";
+		this.ChartInfo.PlayHistory.Line6 = "";
+		this.ChartInfo.PlayHistory.Line7 = "";
+		this.ChartInfo.LevelHide = false;
+		this.ChartInfo.MaxSkill = new STChartInfo.STSKILL();
+		this.ChartInfo.Bpm = 120.0;
+		this.ChartInfo.MinBpm = 120.0;
+		this.ChartInfo.MaxBpm = 120.0;
+		this.ChartInfo.Duration = 0;
+		this.ChartInfo.strBGMFileName = "";
+		this.ChartInfo.SongVol = CSound.DefaultSongVol;
+		this.ChartInfo.SongLoudnessMetadata = null;
+		this.ChartInfo.nDemoBGMOffset = 0;
+		this.ChartInfo.bChartBranch = new bool[(int)Difficulty.Total];
+		this.ChartInfo.HighScore = 0;
+		this.ChartInfo.nHighScore = new int[(int)Difficulty.Total];
+		this.ChartInfo.strSubtitle = "";
+		this.ChartInfo.nLevel = new int[(int)Difficulty.Total] { -1, -1, -1, -1, -1, -1, -1 };
+		this.ChartInfo.nLevelIcon = new CTja.ELevelIcon[(int)Difficulty.Total] { CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone, CTja.ELevelIcon.eNone };
+		this.ChartInfo.nClear = new int[5];
+		this.ChartInfo.nScoreRank = new int[5];
+		this.ChartInfo.nExamResult = new List<int[]> { };
+		this.ChartInfo.nLife = 5;
+		this.ChartInfo.nTotalFloor = 140;
 	}
 }

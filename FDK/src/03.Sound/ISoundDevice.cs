@@ -11,6 +11,6 @@ internal interface ISoundDevice : IDisposable {
 	double dbUpdateSystemTimeMs { get; }
 	CTimer SystemTimer { get; }
 
-	CSound tCreateSound(string strファイル名, ESoundGroup soundGroup);
-	void tCreateSound(string strファイル名, CSound sound);
+	CSound tCreateSound(string strFileName, ESoundGroup soundGroup);
+	void tCreateSound(string strFileName, CSound sound);
 }

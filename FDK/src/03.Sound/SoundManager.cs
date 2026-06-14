@@ -182,7 +182,7 @@ public class SoundManager   // : CSound
 		tInitialize(soundDeviceType, nSoundDelayBASS, nSoundDelayExclusiveWASAPI, nSoundDelayASIO, nASIODevice, _bUseOSTimer);
 	}
 	public void Dispose() {
-		t終了();
+		tEnd();
 	}
 
 	//public static void t初期化()
@@ -274,7 +274,7 @@ public class SoundManager   // : CSound
 	}
 
 
-	public static void t終了() {
+	public static void tEnd() {
 		SoundDevice.Dispose();
 		PlayTimer.Dispose();    // Global.Bass を解放した後に解放すること。（Global.Bass で参照されているため）
 	}
@@ -364,13 +364,13 @@ public class SoundManager   // : CSound
 		}
 	}
 
-	public void AddMixer(CSound cs, double db再生速度, bool _b演奏終了後も再生が続くチップである) {
-		cs.b演奏終了後も再生が続くチップである = _b演奏終了後も再生が続くチップである;
-		cs.PlaySpeed = db再生速度;
+	public void AddMixer(CSound cs, double dbPlaybackSpeed, bool _bPlayEndAfterPlaybackContinuesChip) {
+		cs.bPlayEndAfterPlaybackContinuesChip = _bPlayEndAfterPlaybackContinuesChip;
+		cs.PlaySpeed = dbPlaybackSpeed;
 		cs.AddBassSoundFromMixer();
 	}
-	public void AddMixer(CSound cs, double db再生速度) {
-		cs.PlaySpeed = db再生速度;
+	public void AddMixer(CSound cs, double dbPlaybackSpeed) {
+		cs.PlaySpeed = dbPlaybackSpeed;
 		cs.AddBassSoundFromMixer();
 	}
 	public void AddMixer(CSound cs) {

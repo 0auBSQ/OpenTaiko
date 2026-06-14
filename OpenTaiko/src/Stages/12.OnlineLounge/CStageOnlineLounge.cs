@@ -47,7 +47,7 @@ class CStageOnlineLounge : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.Continuation;
 
 		OpenTaiko.Skin.soundOnlineLoungeBGM?.tPlay();
 
@@ -121,7 +121,7 @@ class CStageOnlineLounge : CStage {
 
 		OpenTaiko.tDisposeSafely(ref Background);
 
-		OpenTaiko.Songs管理.UpdateDownloadBox();
+		OpenTaiko.SongManager.UpdateDownloadBox();
 
 		base.DeActivate();
 	}
@@ -183,9 +183,9 @@ class CStageOnlineLounge : CStage {
 					OpenTaiko.Tx.OnlineLounge_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 				}
 
-				OpenTaiko.Tx.OnlineLounge_Side_Menu?.t2D拡大率考慮上中央基準描画(baseX + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] * i,
+				OpenTaiko.Tx.OnlineLounge_Side_Menu?.t2DScaledTopCenterBasedDraw(baseX + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] * i,
 					baseY + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] * i);
-				tmpTex.t2D拡大率考慮上中央基準描画(
+				tmpTex.t2DScaledTopCenterBasedDraw(
 					baseX + OpenTaiko.Skin.OnlineLounge_Side_Menu_Text_Offset[0] + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[0] * i,
 					baseY + OpenTaiko.Skin.OnlineLounge_Side_Menu_Text_Offset[1] + OpenTaiko.Skin.OnlineLounge_Side_Menu_Move[1] * i);
 			}
@@ -229,18 +229,18 @@ class CStageOnlineLounge : CStage {
 
 				if (pos == 0) {
 					OpenTaiko.Tx.OnlineLounge_Return_Box?.tUpdateColor4(_color);
-					OpenTaiko.Tx.OnlineLounge_Return_Box?.t2D拡大率考慮上中央基準描画(x, y);
+					OpenTaiko.Tx.OnlineLounge_Return_Box?.t2DScaledTopCenterBasedDraw(x, y);
 				} else {
 					OpenTaiko.Tx.OnlineLounge_Song_Box?.tUpdateColor4(_color);
-					OpenTaiko.Tx.OnlineLounge_Song_Box?.t2D拡大率考慮上中央基準描画(x, y);
+					OpenTaiko.Tx.OnlineLounge_Song_Box?.t2DScaledTopCenterBasedDraw(x, y);
 				}
 
 
-				tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[1]);
-				tmpSubtitle.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
+				tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_Title_Offset[1]);
+				tmpSubtitle.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[0], y + OpenTaiko.Skin.OnlineLounge_Song_SubTitle_Offset[1]);
 
 				if (pos != 0 && i == 0) {
-					OpenTaiko.Tx.OnlineLounge_Context.t2D描画(0, 0);
+					OpenTaiko.Tx.OnlineLounge_Context.t2DDraw(0, 0);
 
 					var song_ = apiMethods.FetchedSongsList[pos - 1];
 
@@ -260,7 +260,7 @@ class CStageOnlineLounge : CStage {
 					if (song_.charter != null && song_.charter.charter_name != null && song_.charter.charter_name != "") {
 						var charter_ = TitleTextureKey.ResolveTitleTexture(
 							new TitleTextureKey("Charter : " + song_.charter.charter_name, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-						charter_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Charter[0], OpenTaiko.Skin.OnlineLounge_Context_Charter[1]);
+						charter_?.t2DCenterBasedDraw(OpenTaiko.Skin.OnlineLounge_Context_Charter[0], OpenTaiko.Skin.OnlineLounge_Context_Charter[1]);
 					}
 
 					#endregion
@@ -270,7 +270,7 @@ class CStageOnlineLounge : CStage {
 					if (song_.Genre != null && song_.Genre.genre != null && song_.Genre.genre != "") {
 						var genre_ = TitleTextureKey.ResolveTitleTexture(
 							new TitleTextureKey(song_.Genre.genre, this.pfOLFontLarge, Color.White, Color.Black, 1000));
-						genre_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Genre[0], OpenTaiko.Skin.OnlineLounge_Context_Genre[1]);
+						genre_?.t2DCenterBasedDraw(OpenTaiko.Skin.OnlineLounge_Context_Genre[0], OpenTaiko.Skin.OnlineLounge_Context_Genre[1]);
 					}
 
 					#endregion
@@ -284,13 +284,13 @@ class CStageOnlineLounge : CStage {
 						int row = OpenTaiko.Skin.OnlineLounge_Context_Couse_Move[1] * (k % 3);
 
 						if (diff > 0) {
-							OpenTaiko.Tx.Couse_Symbol[k]?.t2D中心基準描画(
+							OpenTaiko.Tx.Couse_Symbol[k]?.t2DCenterBasedDraw(
 								OpenTaiko.Skin.OnlineLounge_Context_Couse_Symbol[0] + column,
 								OpenTaiko.Skin.OnlineLounge_Context_Couse_Symbol[1] + row);
 
 							var difnb_ = TitleTextureKey.ResolveTitleTexture(
 								new TitleTextureKey(diff.ToString(), this.pfOLFontLarge, (diff > 10) ? Color.Red : Color.White, Color.Black, 1000));
-							difnb_?.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Context_Level[0] + column, OpenTaiko.Skin.OnlineLounge_Context_Level[1] + row);
+							difnb_?.t2DCenterBasedDraw(OpenTaiko.Skin.OnlineLounge_Context_Level[0] + column, OpenTaiko.Skin.OnlineLounge_Context_Level[1] + row);
 						}
 
 					}
@@ -306,11 +306,11 @@ class CStageOnlineLounge : CStage {
 		#endregion
 
 		if (IsDownloading) {
-			OpenTaiko.Tx.OnlineLounge_Box.t2D描画(0, 0);
+			OpenTaiko.Tx.OnlineLounge_Box.t2DDraw(0, 0);
 
 			var text = TitleTextureKey.ResolveTitleTexture(
 				new TitleTextureKey("Downloading...", this.pfOLFontLarge, Color.White, Color.Black, 1000));
-			text.t2D中心基準描画(OpenTaiko.Skin.OnlineLounge_Downloading[0], OpenTaiko.Skin.OnlineLounge_Downloading[1]);
+			text.t2DCenterBasedDraw(OpenTaiko.Skin.OnlineLounge_Downloading[0], OpenTaiko.Skin.OnlineLounge_Downloading[1]);
 		}
 
 		#endregion
@@ -341,8 +341,8 @@ class CStageOnlineLounge : CStage {
 						// Return to title screen
 						OpenTaiko.Skin.soundCancelSFX.tPlay();
 						OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-						this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
-						this.actFOtoTitle.tフェードアウト開始();
+						this.eFadeOutCompleteWhenReturnValue = EReturnValue.BackToTitle;
+						this.actFOtoTitle.tFadeOutStart();
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 				} else {
@@ -375,8 +375,8 @@ class CStageOnlineLounge : CStage {
 							if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 								OpenTaiko.Skin.soundCancelSFX.tPlay();
 								OpenTaiko.Skin.soundOnlineLoungeBGM?.tStop();
-								this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
-								this.actFOtoTitle.tフェードアウト開始();
+								this.eFadeOutCompleteWhenReturnValue = EReturnValue.BackToTitle;
+								this.actFOtoTitle.tFadeOutStart();
 								base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 							}
 						} else {
@@ -468,7 +468,7 @@ class CStageOnlineLounge : CStage {
 				if (this.actFOtoTitle.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 		}
 
@@ -544,11 +544,11 @@ class CStageOnlineLounge : CStage {
 			}
 
 			// Get the download folder root
-			CSongListNode? downloadBox = OpenTaiko.Songs管理.SongRootDownload;
+			CSongListNode? downloadBox = OpenTaiko.SongManager.SongRootDownload;
 
 			// If the download folder exists, transfer the zip contents in it
 			if (downloadBox != null) {
-				var path = downloadBox.score[0].ファイル情報.フォルダの絶対パス;
+				var path = downloadBox.score[0].FileInfo.FolderAbsolutePath;
 				var genredPath = $@"{path}{Path.DirectorySeparatorChar}{song.Genre.genre}{Path.DirectorySeparatorChar}";
 
 				if (!Directory.Exists(genredPath)) {
@@ -557,10 +557,10 @@ class CStageOnlineLounge : CStage {
 
 					// Search a corresponding box-def if exists
 					CSongListNode correspondingBox = null;
-					for (int i = 0; i < OpenTaiko.Songs管理.list曲ルート.Count; i++) {
-						if (OpenTaiko.Songs管理.list曲ルート[i].songGenre == song.Genre.genre
-							&& OpenTaiko.Songs管理.list曲ルート[i].nodeType == CSongListNode.ENodeType.BOX)
-							correspondingBox = OpenTaiko.Songs管理.list曲ルート[i];
+					for (int i = 0; i < OpenTaiko.SongManager.listSongRoot.Count; i++) {
+						if (OpenTaiko.SongManager.listSongRoot[i].songGenre == song.Genre.genre
+							&& OpenTaiko.SongManager.listSongRoot[i].nodeType == CSongListNode.ENodeType.BOX)
+							correspondingBox = OpenTaiko.SongManager.listSongRoot[i];
 					}
 
 					var newBoxDef = $@"{genredPath}{Path.DirectorySeparatorChar}box.def";
@@ -585,7 +585,7 @@ class CStageOnlineLounge : CStage {
 						sw.Close();
 					} else {
 						// Copy the existing box.def if available
-						var corPath = correspondingBox.score[0].ファイル情報.フォルダの絶対パス;
+						var corPath = correspondingBox.score[0].FileInfo.FolderAbsolutePath;
 
 						File.Copy($@"{corPath}{Path.DirectorySeparatorChar}box.def", newBoxDef);
 					}
@@ -650,7 +650,7 @@ class CStageOnlineLounge : CStage {
 	private ECurrentMenu currentMenu;
 	private ECurrentMenu menuPointer;
 	private CMenuInfo[] menus;
-	public EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eFadeOutCompleteWhenReturnValue;
 	public CActFIFOBlack actFOtoTitle;
 
 

@@ -70,11 +70,11 @@ internal class Rainbow : CActivity {
 
 						if (this.Rainbow1P[f].Counter.CurrentValue < 82) {
 							int nRectX = ((this.Rainbow1P[f].Counter.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
-							OpenTaiko.Tx.Effects_Rainbow.t2D描画(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
+							OpenTaiko.Tx.Effects_Rainbow.t2DDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
 								new Rectangle(0, 0, nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						} else if (this.Rainbow1P[f].Counter.CurrentValue >= 82) {
 							int nRectX = (((this.Rainbow1P[f].Counter.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
-							OpenTaiko.Tx.Effects_Rainbow.t2D描画(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
+							OpenTaiko.Tx.Effects_Rainbow.t2DDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[0],
 								new Rectangle(nRectX, 0, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width - nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						}
 
@@ -96,11 +96,11 @@ internal class Rainbow : CActivity {
 
 						if (this.Rainbow2P[f].Counter.CurrentValue < 82) {
 							int nRectX = ((this.Rainbow2P[f].Counter.CurrentValue * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
-							OpenTaiko.Tx.Effects_Rainbow.t2D上下反転描画(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
+							OpenTaiko.Tx.Effects_Rainbow.t2DFlipVDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0], OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
 								new Rectangle(0, 0, nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						} else if (this.Rainbow2P[f].Counter.CurrentValue >= 82) {
 							int nRectX = (((this.Rainbow2P[f].Counter.CurrentValue - 82) * OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width) / 85);
-							OpenTaiko.Tx.Effects_Rainbow.t2D上下反転描画(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
+							OpenTaiko.Tx.Effects_Rainbow.t2DFlipVDraw(OpenTaiko.Skin.Game_Effect_Rainbow_X[0] + nRectX, OpenTaiko.Skin.Game_Effect_Rainbow_Y[1],
 								new Rectangle(nRectX, 0, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Width - nRectX, OpenTaiko.Tx.Effects_Rainbow.szTextureSize.Height));
 						}
 

@@ -375,7 +375,7 @@ class CActNewHeya : CActivity {
 			{
 				for (int j = 0; j <= (GameWindowSize.Height / OpenTaiko.Tx.Tile_Black.szTextureSize.Height); j++)  // #23510 2010.10.31 yyagi: change "clientSize.Height" to "480" to fix FIFO drawing size
 				{
-					OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+					OpenTaiko.Tx.Tile_Black.t2DDraw(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 				}
 			}
 		}
@@ -384,13 +384,13 @@ class CActNewHeya : CActivity {
 		switch (CurrentState) {
 			case SelectableInfo.PlayerSelect:
 				if (CurrentIndex == 0) {
-					OpenTaiko.Tx.NewHeya_Close_Select.t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_Close_Select[0], OpenTaiko.Skin.SongSelect_NewHeya_Close_Select[1]);
+					OpenTaiko.Tx.NewHeya_Close_Select.t2DDraw(OpenTaiko.Skin.SongSelect_NewHeya_Close_Select[0], OpenTaiko.Skin.SongSelect_NewHeya_Close_Select[1]);
 				} else {
-					OpenTaiko.Tx.NewHeya_PlayerPlate_Select.t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[CurrentIndex - 1], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[CurrentIndex - 1]);
+					OpenTaiko.Tx.NewHeya_PlayerPlate_Select.t2DDraw(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[CurrentIndex - 1], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[CurrentIndex - 1]);
 				}
 				break;
 			case SelectableInfo.ModeSelect: {
-					OpenTaiko.Tx.NewHeya_ModeBar_Select.t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_X[CurrentIndex], OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Y[CurrentIndex]);
+					OpenTaiko.Tx.NewHeya_ModeBar_Select.t2DDraw(OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_X[CurrentIndex], OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Y[CurrentIndex]);
 				}
 				break;
 			case SelectableInfo.Select: {
@@ -406,7 +406,7 @@ class CActNewHeya : CActivity {
 								while (index >= CurrentMaxIndex) {
 									index -= CurrentMaxIndex;
 								}
-								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);
+								OpenTaiko.Tx.NewHeya_Box.t2DDraw(x, y);
 
 
 								float charaRatioX = 1.0f;
@@ -421,28 +421,28 @@ class CActNewHeya : CActivity {
 									OpenTaiko.Tx.Characters_Heya_Preview[index].vcScaleRatio.Y = charaRatioY;
 								}
 
-								OpenTaiko.Tx.Characters_Heya_Preview[index]?.t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1]);
+								OpenTaiko.Tx.Characters_Heya_Preview[index]?.t2DScaledCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1]);
 								OpenTaiko.Tx.Characters_Heya_Preview[index]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 
 								if (ttkCharacterNames[index] != null) {
 									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterNames[index]);
 
-									tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
+									tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
 								}
 
 								if (ttkCharacterAuthors[index] != null) {
 									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterAuthors[index]);
 
-									tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
+									tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
 								}
 
 								if (OpenTaiko.Tx.Characters[index].unlock != null
 									&& !OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[index])) {
-									OpenTaiko.Tx.NewHeya_Lock?.t2D描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[1]);
+									OpenTaiko.Tx.NewHeya_Lock?.t2DDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[1]);
 
 									if (this.ttkInfoSection != null)
 										TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
-											.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
+											.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
 								}
 							}
 							break;
@@ -457,7 +457,7 @@ class CActNewHeya : CActivity {
 								while (index >= CurrentMaxIndex) {
 									index -= CurrentMaxIndex;
 								}
-								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);
+								OpenTaiko.Tx.NewHeya_Box.t2DDraw(x, y);
 
 								OpenTaiko.stageSongSelect.PuchiChara.DrawPuchichara(index,
 									x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1],
@@ -469,22 +469,22 @@ class CActNewHeya : CActivity {
 								if (ttkPuchiCharaNames[index] != null) {
 									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaNames[index]);
 
-									tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
+									tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Name_Offset[1]);
 								}
 
 								if (ttkPuchiCharaAuthors[index] != null) {
 									CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaAuthors[index]);
 
-									tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
+									tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Box_Author_Offset[1]);
 								}
 
 								if (OpenTaiko.Tx.Puchichara[index].unlock != null
 									&& !OpenTaiko.SaveFileInstances[CurrentPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[index])) {
-									OpenTaiko.Tx.NewHeya_Lock?.t2D描画(x + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[1]);
+									OpenTaiko.Tx.NewHeya_Lock?.t2DDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_Lock_Offset[1]);
 
 									if (this.ttkInfoSection != null)
 										TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
-											.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
+											.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[0], y + OpenTaiko.Skin.SongSelect_NewHeya_InfoSection_Offset[1]);
 								}
 							}
 							break;
@@ -507,7 +507,7 @@ class CActNewHeya : CActivity {
 									tmpTex.color4 = CConversion.ColorToColor4(Color.White);
 								}
 
-								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);
+								OpenTaiko.Tx.NewHeya_Box.t2DDraw(x, y);
 
 								x += OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0];
 								y += OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1];
@@ -528,7 +528,7 @@ class CActNewHeya : CActivity {
 
 
 
-								tmpTex.t2D拡大率考慮上中央基準描画(x + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[0], y + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[1]);
+								tmpTex.t2DScaledTopCenterBasedDraw(x + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[0], y + OpenTaiko.Skin.Heya_Side_Menu_Font_Offset[1]);
 
 								OpenTaiko.NamePlate.lcNamePlate.DrawTitlePlate(x, y, 255, iType, tmpTex, rarity, id);
 
@@ -553,7 +553,7 @@ class CActNewHeya : CActivity {
 									tmpTex.color4 = CConversion.ColorToColor4(Color.White);
 								}
 
-								OpenTaiko.Tx.NewHeya_Box.t2D描画(x, y);
+								OpenTaiko.Tx.NewHeya_Box.t2DDraw(x, y);
 
 								x += OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[0];
 								y += OpenTaiko.Skin.SongSelect_NewHeya_Box_Chara_Offset[1];
@@ -581,17 +581,17 @@ class CActNewHeya : CActivity {
 				break;
 		}
 
-		OpenTaiko.Tx.NewHeya_Close.t2D描画(0, 0);
+		OpenTaiko.Tx.NewHeya_Close.t2DDraw(0, 0);
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			OpenTaiko.Tx.NewHeya_PlayerPlate[OpenTaiko.GetActualPlayer(i)].t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[i], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[i]);
+			OpenTaiko.Tx.NewHeya_PlayerPlate[OpenTaiko.GetActualPlayer(i)].t2DDraw(OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_X[i], OpenTaiko.Skin.SongSelect_NewHeya_PlayerPlate_Y[i]);
 		}
 
 		for (int i = 0; i < 5; i++) {
-			OpenTaiko.Tx.NewHeya_ModeBar.t2D描画(OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_X[i], OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Y[i]);
+			OpenTaiko.Tx.NewHeya_ModeBar.t2DDraw(OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_X[i], OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Y[i]);
 			int title_x = OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_X[i] + OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[0];
 			int title_y = OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Y[i] + OpenTaiko.Skin.SongSelect_NewHeya_ModeBar_Font_Offset[1];
-			TitleTextureKey.ResolveTitleTexture(MenuTitleKeys[i], false).t2D拡大率考慮中央基準描画(title_x, title_y);
+			TitleTextureKey.ResolveTitleTexture(MenuTitleKeys[i], false).t2DScaledCenterBasedDraw(title_x, title_y);
 		}
 
 		return base.Draw();

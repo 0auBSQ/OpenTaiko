@@ -27,7 +27,7 @@ class CStageHeya : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = E戻り値.継続;
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.Continue;
 
 		ctChara_In = new CCounter();
 		//ctChara_Normal = new CCounter(0, TJAPlayer3.Tx.SongSelect_Chara_Normal.Length - 1, 1000 / 45, TJAPlayer3.Timer);
@@ -203,8 +203,8 @@ class CStageHeya : CStage {
 				OpenTaiko.Tx.Heya_Side_Menu?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
 			}
 
-			OpenTaiko.Tx.Heya_Side_Menu?.t2D拡大率考慮上中央基準描画(OpenTaiko.Skin.Heya_Main_Menu_X[i], OpenTaiko.Skin.Heya_Main_Menu_Y[i]);
-			tmpTex.t2D拡大率考慮上中央基準描画(OpenTaiko.Skin.Heya_Main_Menu_X[i] + OpenTaiko.Skin.Heya_Main_Menu_Font_Offset[0], OpenTaiko.Skin.Heya_Main_Menu_Y[i] + OpenTaiko.Skin.Heya_Main_Menu_Font_Offset[1]);
+			OpenTaiko.Tx.Heya_Side_Menu?.t2DScaledTopCenterBasedDraw(OpenTaiko.Skin.Heya_Main_Menu_X[i], OpenTaiko.Skin.Heya_Main_Menu_Y[i]);
+			tmpTex.t2DScaledTopCenterBasedDraw(OpenTaiko.Skin.Heya_Main_Menu_X[i] + OpenTaiko.Skin.Heya_Main_Menu_Font_Offset[0], OpenTaiko.Skin.Heya_Main_Menu_Y[i] + OpenTaiko.Skin.Heya_Main_Menu_Font_Offset[1]);
 		}
 
 		#endregion
@@ -212,7 +212,7 @@ class CStageHeya : CStage {
 		#region [Background center]
 
 		if (iCurrentMenu >= 0) {
-			OpenTaiko.Tx.Heya_Center_Menu_Background?.t2D描画(0, 0);
+			OpenTaiko.Tx.Heya_Center_Menu_Background?.t2DDraw(0, 0);
 		}
 
 		#endregion
@@ -231,9 +231,9 @@ class CStageHeya : CStage {
 			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.X = renderRatioX;
 			OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent].vcScaleRatio.Y = renderRatioY;
 		}
-		if (iCurrentMenu == CurrentMenu.Puchi || iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Heya_Render_Field?.t2D描画(0, 0);
-		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2D描画(0, 0);
-		if (iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2D描画(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
+		if (iCurrentMenu == CurrentMenu.Puchi || iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Heya_Render_Field?.t2DDraw(0, 0);
+		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2DDraw(0, 0);
+		if (iCurrentMenu == CurrentMenu.Chara) OpenTaiko.Tx.Characters_Heya_Render[iCharacterCurrent]?.t2DDraw(OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][0] * renderRatioX, OpenTaiko.Skin.Characters_Heya_Render_Offset[iCharacterCurrent][1] * renderRatioY);
 
 		#endregion
 
@@ -268,20 +268,20 @@ class CStageHeya : CStage {
 				if (ttkPuchiCharaNames[pos] != null) {
 					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaNames[pos]);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[0],
+					tmpTex.t2DScaledTopCenterBasedDraw(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[0],
 						scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
 				}
 
 				if (ttkPuchiCharaAuthors[pos] != null) {
 					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkPuchiCharaAuthors[pos]);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
+					tmpTex.t2DScaledTopCenterBasedDraw(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
 						scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
 				}
 
 				if (OpenTaiko.Tx.Puchichara[pos].unlock != null
 					&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedPuchicharas.Contains(OpenTaiko.Skin.Puchicharas_Name[pos]))
-					OpenTaiko.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(scroll.Item1, scroll.Item2);
+					OpenTaiko.Tx.Heya_Lock?.t2DScaledTopCenterBasedDraw(scroll.Item1, scroll.Item2);
 
 				#endregion
 
@@ -322,7 +322,7 @@ class CStageHeya : CStage {
 					OpenTaiko.Tx.Characters_Heya_Preview[pos].vcScaleRatio.Y = charaRatioY;
 				}
 
-				OpenTaiko.Tx.Characters_Heya_Preview[pos]?.t2D拡大率考慮中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
+				OpenTaiko.Tx.Characters_Heya_Preview[pos]?.t2DScaledCenterBasedDraw(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
 					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1]);
 
 				OpenTaiko.Tx.Characters_Heya_Preview[pos]?.tUpdateColor4(CConversion.ColorToColor4(Color.White));
@@ -332,20 +332,20 @@ class CStageHeya : CStage {
 				if (ttkCharacterNames[pos] != null) {
 					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterNames[pos]);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[0],
+					tmpTex.t2DScaledTopCenterBasedDraw(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[0],
 						scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Name_Offset[1]);
 				}
 
 				if (ttkCharacterAuthors[pos] != null) {
 					CTexture tmpTex = TitleTextureKey.ResolveTitleTexture(ttkCharacterAuthors[pos]);
 
-					tmpTex.t2D拡大率考慮上中央基準描画(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
+					tmpTex.t2DScaledTopCenterBasedDraw(scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[0],
 						scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Authors_Offset[1]);
 				}
 
 				if (OpenTaiko.Tx.Characters[pos].unlock != null
 					&& !OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedCharacters.Contains(OpenTaiko.Skin.Characters_DirName[pos]))
-					OpenTaiko.Tx.Heya_Lock?.t2D拡大率考慮上中央基準描画(scroll.Item1, scroll.Item2);
+					OpenTaiko.Tx.Heya_Lock?.t2DScaledTopCenterBasedDraw(scroll.Item1, scroll.Item2);
 
 				#endregion
 			}
@@ -465,11 +465,11 @@ class CStageHeya : CStage {
 			#region [Unlockable information zone]
 
 			if (this.ttkInfoSection != null && this.ttkInfoSection.str != "")
-				OpenTaiko.Tx.Heya_Box?.t2D描画(0, 0);
+				OpenTaiko.Tx.Heya_Box?.t2DDraw(0, 0);
 
 			if (this.ttkInfoSection != null)
 				TitleTextureKey.ResolveTitleTexture(this.ttkInfoSection)
-					.t2D拡大率考慮上中央基準描画(OpenTaiko.Skin.Heya_InfoSection[0], OpenTaiko.Skin.Heya_InfoSection[1]);
+					.t2DScaledTopCenterBasedDraw(OpenTaiko.Skin.Heya_InfoSection[0], OpenTaiko.Skin.Heya_InfoSection[1]);
 
 			#endregion
 
@@ -518,7 +518,7 @@ class CStageHeya : CStage {
 
 			#region [PuchiChara]
 
-			this.PuchiChara.On進行描画(puchi_x, puchi_y, false);
+			this.PuchiChara.OnProgressDraw(puchi_x, puchi_y, false);
 
 			#endregion
 		}
@@ -554,8 +554,8 @@ class CStageHeya : CStage {
 			if (iCurrentMenu == CurrentMenu.ReturnToMenu && iMainMenuCurrent == 0) {
 				if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 					OpenTaiko.Skin.soundHeyaBGM.tStop();
-					this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
-					this.actFOtoTitle.tフェードアウト開始();
+					this.eFadeOutCompleteWhenReturnValue = EReturnValue.TitleReturn;
+					this.actFOtoTitle.tFadeOutStart();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				} else {
 					ess = ESelectStatus.NONE;
@@ -686,8 +686,8 @@ class CStageHeya : CStage {
 				if (base.ePhaseID != CStage.EPhase.Common_FADEOUT) {
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					OpenTaiko.Skin.soundHeyaBGM.tStop();
-					this.eフェードアウト完了時の戻り値 = E戻り値.タイトルに戻る;
-					this.actFOtoTitle.tフェードアウト開始();
+					this.eFadeOutCompleteWhenReturnValue = EReturnValue.TitleReturn;
+					this.actFOtoTitle.tFadeOutStart();
 					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				}
 			} else {
@@ -721,17 +721,17 @@ class CStageHeya : CStage {
 				if (this.actFOtoTitle.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 		}
 
 		return 0;
 	}
 
-	public enum E戻り値 : int {
-		継続,
-		タイトルに戻る,
-		選曲した
+	public enum EReturnValue : int {
+		Continue,
+		TitleReturn,
+		SelSong
 	}
 
 	public bool bInSongPlayed;
@@ -836,7 +836,7 @@ class CStageHeya : CStage {
 		int x = OpenTaiko.Skin.Heya_Center_Menu_Box_X[i] + (int)((OpenTaiko.Skin.Heya_Center_Menu_Box_X[nextIndex] - OpenTaiko.Skin.Heya_Center_Menu_Box_X[i]) * value);
 		int y = OpenTaiko.Skin.Heya_Center_Menu_Box_Y[i] + (int)((OpenTaiko.Skin.Heya_Center_Menu_Box_Y[nextIndex] - OpenTaiko.Skin.Heya_Center_Menu_Box_Y[i]) * value);
 
-		OpenTaiko.Tx.Heya_Center_Menu_Box_Slot?.t2D拡大率考慮上中央基準描画(x, y);
+		OpenTaiko.Tx.Heya_Center_Menu_Box_Slot?.t2DScaledTopCenterBasedDraw(x, y);
 		return (x, y);
 	}
 
@@ -850,7 +850,7 @@ class CStageHeya : CStage {
 		int x = OpenTaiko.Skin.Heya_Side_Menu_X[i] + (int)((OpenTaiko.Skin.Heya_Side_Menu_X[nextIndex] - OpenTaiko.Skin.Heya_Side_Menu_X[i]) * value);
 		int y = OpenTaiko.Skin.Heya_Side_Menu_Y[i] + (int)((OpenTaiko.Skin.Heya_Side_Menu_Y[nextIndex] - OpenTaiko.Skin.Heya_Side_Menu_Y[i]) * value);
 
-		OpenTaiko.Tx.Heya_Side_Menu.t2D拡大率考慮上中央基準描画(x, y);
+		OpenTaiko.Tx.Heya_Side_Menu.t2DScaledTopCenterBasedDraw(x, y);
 		return (x, y);
 	}
 
@@ -971,7 +971,7 @@ class CStageHeya : CStage {
 	private const int SideInterval_Y = 70;
 	private int ScrollMode;
 
-	public E戻り値 eフェードアウト完了時の戻り値;
+	public EReturnValue eFadeOutCompleteWhenReturnValue;
 
 	public CActFIFOBlack actFOtoTitle;
 }

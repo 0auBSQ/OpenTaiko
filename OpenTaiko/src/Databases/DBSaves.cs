@@ -7,7 +7,7 @@ namespace OpenTaiko;
 
 internal class DBSaves {
 	private static string _savesDBFilename = $@"Saves.db3";
-	private static string _savesDBPath = @$"{OpenTaiko.strEXEのあるフォルダ}{_savesDBFilename}";
+	private static string _savesDBPath = @$"{OpenTaiko.strEXEFolder}{_savesDBFilename}";
 	private static SqliteConnection SavesDBConnection = new SqliteConnection(@$"Data Source={_savesDBPath}");
 
 	private static string _DBNotFoundError = @$"The database {_savesDBFilename} was not found or the connection failed";
@@ -405,7 +405,7 @@ internal class DBSaves {
 			currentPlay.Artist = choosenSong.ldSubtitle.GetString(""); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
 			currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
 			currentPlay.ChartDifficulty = choosenDifficulty;
-			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
+			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].ChartInfo.nLevel[choosenDifficulty];
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
@@ -424,7 +424,7 @@ internal class DBSaves {
 			currentPlay.HighScoreGoodCount = chartScore.nGreat;
 			currentPlay.HighScoreOkCount = chartScore.nGood;
 			currentPlay.HighScoreBadCount = chartScore.nMiss;
-			currentPlay.HighScoreMaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[player];
+			currentPlay.HighScoreMaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[player];
 			currentPlay.HighScoreRollCount = chartScore.nRoll;
 			currentPlay.HighScoreADLibCount = chartScore.nADLIB;
 			currentPlay.HighScoreBoomCount = chartScore.nMine;

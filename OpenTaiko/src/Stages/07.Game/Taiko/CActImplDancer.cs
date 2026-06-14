@@ -50,32 +50,32 @@ internal class CActImplDancer : CActivity {
 				nNowDancerInCounter = new float[nDancerCount];
 				nNowDancerOutCounter = new float[nDancerCount];
 
-				nDancerInPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_In{Path.DirectorySeparatorChar}");
+				nDancerInPtn = OpenTaiko.tSequenceImageSheetCountCount($@"{path}{Path.DirectorySeparatorChar}1_In{Path.DirectorySeparatorChar}");
 				if (nDancerInPtn != 0) {
 					for (int i = 0; i < nDancerCount; i++) {
 						Dancer_In[i] = new CTexture[nDancerInPtn];
 						for (int p = 0; p < nDancerInPtn; p++) {
-							Dancer_In[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_In{Path.DirectorySeparatorChar}{p}.png");
+							Dancer_In[i][p] = OpenTaiko.tTextureCreate($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_In{Path.DirectorySeparatorChar}{p}.png");
 						}
 					}
 				}
 
-				nDancerOutPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1_Out{Path.DirectorySeparatorChar}");
+				nDancerOutPtn = OpenTaiko.tSequenceImageSheetCountCount($@"{path}{Path.DirectorySeparatorChar}1_Out{Path.DirectorySeparatorChar}");
 				if (nDancerOutPtn != 0) {
 					for (int i = 0; i < nDancerCount; i++) {
 						Dancer_Out[i] = new CTexture[nDancerOutPtn];
 						for (int p = 0; p < nDancerOutPtn; p++) {
-							Dancer_Out[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_Out{Path.DirectorySeparatorChar}{p}.png");
+							Dancer_Out[i][p] = OpenTaiko.tTextureCreate($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}_Out{Path.DirectorySeparatorChar}{p}.png");
 						}
 					}
 				}
 
-				nDancerPtn = OpenTaiko.t連番画像の枚数を数える($@"{path}{Path.DirectorySeparatorChar}1{Path.DirectorySeparatorChar}");
+				nDancerPtn = OpenTaiko.tSequenceImageSheetCountCount($@"{path}{Path.DirectorySeparatorChar}1{Path.DirectorySeparatorChar}");
 				if (nDancerPtn != 0) {
 					for (int i = 0; i < nDancerCount; i++) {
 						Dancer[i] = new CTexture[nDancerPtn];
 						for (int p = 0; p < nDancerPtn; p++) {
-							Dancer[i][p] = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}{Path.DirectorySeparatorChar}{p}.png");
+							Dancer[i][p] = OpenTaiko.tTextureCreate($@"{path}{Path.DirectorySeparatorChar}{(i + 1)}{Path.DirectorySeparatorChar}{p}.png");
 						}
 					}
 				}
@@ -88,8 +88,8 @@ internal class CActImplDancer : CActivity {
 		arMotionArray_Out = CConversion.StringToIntArray(Game_Dancer_Out_Motion);
 		if (this.arMotionArray_Out == null) arMotionArray_Out = CConversion.StringToIntArray("0,0");
 
-		this.ar踊り子モーション番号 = CConversion.StringToIntArray(OpenTaiko.Skin.Game_Dancer_Motion);
-		if (this.ar踊り子モーション番号 == null) ar踊り子モーション番号 = CConversion.StringToIntArray("0,0");
+		this.arDancerMotionNumber = CConversion.StringToIntArray(OpenTaiko.Skin.Game_Dancer_Motion);
+		if (this.arDancerMotionNumber == null) arDancerMotionNumber = CConversion.StringToIntArray("0,0");
 
 		nNowDancerCounter = 0;
 		nNowDancerFrame = 0;
@@ -126,16 +126,16 @@ internal class CActImplDancer : CActivity {
 		}
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-			if (OpenTaiko.ConfigIni.ShowDancer && (this.ar踊り子モーション番号.Length - 1) != 0) {
+			if (OpenTaiko.ConfigIni.ShowDancer && (this.arDancerMotionNumber.Length - 1) != 0) {
 				if (!OpenTaiko.stageGameScreen.bPAUSE)
 					nNowDancerCounter += Math.Abs((float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;
 				if (nNowDancerCounter >= 1) {
 					nNowDancerCounter = 0;
 				}
-				nNowDancerFrame = (int)(nNowDancerCounter * (this.ar踊り子モーション番号.Length - 1));
+				nNowDancerFrame = (int)(nNowDancerCounter * (this.arDancerMotionNumber.Length - 1));
 
 				for (int i = 0; i < nDancerCount; i++) {
-					if ((int)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[0] >= OpenTaiko.Skin.Game_Dancer_Gauge[i]) {
+					if ((int)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[0] >= OpenTaiko.Skin.Game_Dancer_Gauge[i]) {
 						if (DancerStates[i] == 0) {
 							DancerStates[i] = 1;
 							nNowDancerInCounter[i] = 0;
@@ -164,7 +164,7 @@ internal class CActImplDancer : CActivity {
 
 									int frame = (int)(nNowDancerInCounter[i] * (this.arMotionArray_In.Length - 1));
 									if (this.Dancer_In[i] != null && this.Dancer_In[i].Length > 0 && this.Dancer_In[i][this.arMotionArray_In[frame]] != null) {
-										this.Dancer_In[i][this.arMotionArray_In[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+										this.Dancer_In[i][this.arMotionArray_In[frame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 									}
 								}
 
@@ -184,14 +184,14 @@ internal class CActImplDancer : CActivity {
 
 									int frame = (int)(nNowDancerOutCounter[i] * (this.arMotionArray_Out.Length - 1));
 									if (this.Dancer_Out[i] != null && this.Dancer_Out[i].Length > 0 && this.Dancer_Out[i][this.arMotionArray_Out[frame]] != null) {
-										this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+										this.Dancer_Out[i][this.arMotionArray_Out[frame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 									}
 								}
 							}
 							break;
 						case 3:
-							if (this.Dancer[i] != null && this.Dancer[i].Length > 0 && this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]] != null) {
-								this.Dancer[i][this.ar踊り子モーション番号[nNowDancerFrame]].t2D中心基準描画(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
+							if (this.Dancer[i] != null && this.Dancer[i].Length > 0 && this.Dancer[i][this.arDancerMotionNumber[nNowDancerFrame]] != null) {
+								this.Dancer[i][this.arDancerMotionNumber[nNowDancerFrame]].t2DCenterBasedDraw(OpenTaiko.Skin.Game_Dancer_X[i], OpenTaiko.Skin.Game_Dancer_Y[i]);
 							}
 							break;
 					}
@@ -217,7 +217,7 @@ internal class CActImplDancer : CActivity {
 	private float nDancerOutInterval;
 	private int[] arMotionArray_In;
 	private int[] arMotionArray_Out;
-	private int[] ar踊り子モーション番号;
+	private int[] arDancerMotionNumber;
 	//public CCounter ct踊り子モーション;
 	private CTexture[][] Dancer_In;
 	private CTexture[][] Dancer_Out;

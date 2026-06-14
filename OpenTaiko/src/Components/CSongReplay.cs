@@ -259,7 +259,7 @@ class CSongReplay {
 		OkCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGood;
 		BadCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMiss;
 		RollCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nRoll;
-		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[storedPlayer];
+		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[storedPlayer];
 		BoomCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMine;
 		ADLibCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nADLIB;
 		Score = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nScore;
@@ -310,7 +310,7 @@ class CSongReplay {
 		 */
 		GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(storedPlayer);
 		// Gauge fill value
-		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[storedPlayer];
+		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[storedPlayer];
 		// Generation timestamp (in ticks)
 		Timestamp = DateTime.Now.Ticks;
 		// Compressed inputs and size
@@ -320,7 +320,7 @@ class CSongReplay {
 		// Chart metadata
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
-		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
+		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].ChartInfo.nLevel[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
 		// Replay Checksum (Calculate at the end)

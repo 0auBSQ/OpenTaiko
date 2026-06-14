@@ -24,18 +24,18 @@ internal class CActSelectPreimageパネル : CActivity {
 		base.Activate();
 	}
 	public override void DeActivate() {
-		OpenTaiko.tテクスチャの解放(ref this.txPreimage);
+		OpenTaiko.tTextureRelease(ref this.txPreimage);
 		this.ctApparitionAnimation = null;
 		this.ctDelayedDisplay = null;
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
-		this.txDefaultPreimage = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}3_SongSelect{Path.DirectorySeparatorChar}PreImageDefault.png"), false);
+		this.txDefaultPreimage = OpenTaiko.tTextureCreate(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}3_SongSelect{Path.DirectorySeparatorChar}PreImageDefault.png"), false);
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
 
-		OpenTaiko.tテクスチャの解放(ref this.txDefaultPreimage);
+		OpenTaiko.tTextureRelease(ref this.txDefaultPreimage);
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {
@@ -74,8 +74,8 @@ internal class CActSelectPreimageパネル : CActivity {
 			int width = OpenTaiko.Skin.SongSelect_Preimage_Size[0];
 			int height = OpenTaiko.Skin.SongSelect_Preimage_Size[1];
 
-			float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Width;
-			float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Height;
+			float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.szImageSize.Width;
+			float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.szImageSize.Height;
 			float bestRatio = Math.Min(xRatio, yRatio);
 
 			this.rCurrentlyDisplayedPreimage.Opacity = 255;
@@ -116,17 +116,17 @@ internal class CActSelectPreimageパネル : CActivity {
 		this.strCurrentFilename = "";
 	}
 	private bool tBuildPreimageAssets(CScore cScoreInst) {
-		if ((cScoreInst == null) || string.IsNullOrEmpty(cScoreInst.譜面情報.Preimage)) return false;
+		if ((cScoreInst == null) || string.IsNullOrEmpty(cScoreInst.ChartInfo.Preimage)) return false;
 
-		string str = ((!Path.IsPathRooted(cScoreInst.譜面情報.Preimage)) ? cScoreInst.ファイル情報.フォルダの絶対パス : "") + cScoreInst.譜面情報.Preimage;
+		string str = ((!Path.IsPathRooted(cScoreInst.ChartInfo.Preimage)) ? cScoreInst.FileInfo.FolderAbsolutePath : "") + cScoreInst.ChartInfo.Preimage;
 		if (!str.Equals(this.strCurrentFilename)) {
-			OpenTaiko.tテクスチャの解放(ref this.txPreimage);
+			OpenTaiko.tTextureRelease(ref this.txPreimage);
 			this.strCurrentFilename = str;
 			if (!File.Exists(this.strCurrentFilename)) {
 				LogNotification.PopWarning("Preimage not found ({0})".SafeFormat(this.strCurrentFilename));
 				return false;
 			}
-			this.txPreimage = OpenTaiko.tテクスチャの生成(this.strCurrentFilename, false);
+			this.txPreimage = OpenTaiko.tTextureCreate(this.strCurrentFilename, false);
 			if (this.txPreimage != null) {
 				this.rCurrentlyDisplayedPreimage = this.txPreimage;
 			} else {
@@ -147,8 +147,8 @@ internal class CActSelectPreimageパネル : CActivity {
 				int width = OpenTaiko.Skin.SongSelect_Preimage_Size[0];
 				int height = OpenTaiko.Skin.SongSelect_Preimage_Size[1];
 
-				float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Width;
-				float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.sz画像サイズ.Height;
+				float xRatio = width / (float)this.rCurrentlyDisplayedPreimage.szImageSize.Width;
+				float yRatio = height / (float)this.rCurrentlyDisplayedPreimage.szImageSize.Height;
 				float bestRatio = Math.Min(xRatio, yRatio);
 
 				this.rCurrentlyDisplayedPreimage.Opacity = (int)(255f * num3);
@@ -159,10 +159,10 @@ internal class CActSelectPreimageパネル : CActivity {
 
 				if (HiddenIndex >= DBSongUnlockables.EHiddenIndex.BLURED) {
 					this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = true;
-					this.rCurrentlyDisplayedPreimage.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
+					this.rCurrentlyDisplayedPreimage.t2DScaledCenterBasedDraw(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
 					this.rCurrentlyDisplayedPreimage.bUseNoiseEffect = false;
 				} else
-					this.rCurrentlyDisplayedPreimage.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
+					this.rCurrentlyDisplayedPreimage.t2DScaledCenterBasedDraw(OpenTaiko.Skin.SongSelect_Preimage[0], OpenTaiko.Skin.SongSelect_Preimage[1]);
 			}
 		}
 	}

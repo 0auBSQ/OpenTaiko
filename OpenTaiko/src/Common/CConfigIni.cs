@@ -335,7 +335,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool[] bAutoPlay = new bool[5];
 
-	public bool bAuto先生の連打;
+	public bool bAutoSenseiRoll;
 	public int nRollsPerSec;
 	public int nDefaultAILevel = 4;
 	public int nAILevel = 4;
@@ -494,7 +494,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bViewerVSyncWait;
 	public bool bViewerShowDebugStatus;
 	public bool bViewerTimeStretch;
-	public bool bViewerDrums有効, bViewerGuitar有効;
+	public bool bViewerDrumsEnabled, bViewerGuitarEnabled;
 	public int nMasterVolume;
 	public bool ShinuchiMode; // 真打モード
 	public bool FastRender; // 事前画像描画モード
@@ -838,7 +838,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			this.bAutoPlay[i] = false;
 		}
 
-		this.bAuto先生の連打 = true;
+		this.bAutoSenseiRoll = true;
 
 		#endregion
 
@@ -920,8 +920,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		bViewerVSyncWait = true;
 		bViewerShowDebugStatus = true;
 		bViewerTimeStretch = false;
-		bViewerDrums有効 = true;
-		bViewerGuitar有効 = true;
+		bViewerDrumsEnabled = true;
+		bViewerGuitarEnabled = true;
 
 
 		this.bBranchGuide = false;
@@ -985,9 +985,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		#endregion
 	}
 
-	public CConfigIni(string iniファイル名)
+	public CConfigIni(string iniFileName)
 		: this() {
-		this.LoadFromFile(iniファイル名);
+		this.LoadFromFile(iniFileName);
 	}
 
 
@@ -1018,8 +1018,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		}
 	}
 
-	public void t書き出し(string iniファイル名) {
-		StreamWriter sw = new StreamWriter(iniファイル名, false, Encoding.GetEncoding(OpenTaiko.sEncType));
+	public void tExport(string iniFileName) {
+		StreamWriter sw = new StreamWriter(iniFileName, false, Encoding.GetEncoding(OpenTaiko.sEncType));
 		sw.WriteLine(";-------------------");
 
 		#region [ System ]
@@ -1051,12 +1051,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		#region [ Skinパスの絶対パス→相対パス変換 ]
 
-		Uri uriRoot = new Uri(System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
+		Uri uriRoot = new Uri(System.IO.Path.Combine(OpenTaiko.strEXEFolder,
 			"System" + System.IO.Path.DirectorySeparatorChar));
 		if (strSystemSkinSubfolderFullName != null && strSystemSkinSubfolderFullName.Length == 0) {
 			// Config.iniが空の状態でDTXManiaをViewerとして起動_終了すると、strSystemSkinSubfolderFullName が空の状態でここに来る。
 			// → 初期値として Default/ を設定する。
-			strSystemSkinSubfolderFullName = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
+			strSystemSkinSubfolderFullName = System.IO.Path.Combine(OpenTaiko.strEXEFolder,
 				"System" + System.IO.Path.DirectorySeparatorChar + "Default" +
 				System.IO.Path.DirectorySeparatorChar);
 		}
@@ -1424,7 +1424,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("Taiko3P={0}", this.bAutoPlay[2] ? 1 : 0);
 		sw.WriteLine("Taiko4P={0}", this.bAutoPlay[3] ? 1 : 0);
 		sw.WriteLine("Taiko5P={0}", this.bAutoPlay[4] ? 1 : 0);
-		sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
+		sw.WriteLine("TaikoAutoRoll={0}", this.bAutoSenseiRoll ? 1 : 0);
 		sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 		sw.WriteLine("DefaultAILevel={0}", this.nDefaultAILevel);
 		sw.WriteLine();
@@ -1964,7 +1964,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "SkinPath": {
 					string absSkinPath = value;
 					if (!System.IO.Path.IsPathRooted(value)) {
-						absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
+						absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEFolder, "System");
 						absSkinPath = System.IO.Path.Combine(absSkinPath, value);
 						Uri u = new Uri(absSkinPath);
 						absSkinPath = u.AbsolutePath.ToString(); // str4内に相対パスがある場合に備える
@@ -2224,7 +2224,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bAutoPlay[4] = CConversion.bONorOFF(value[0]);
 				break;
 			case "TaikoAutoRoll":
-				this.bAuto先生の連打 = CConversion.bONorOFF(value[0]);
+				this.bAutoSenseiRoll = CConversion.bONorOFF(value[0]);
 				break;
 			case "RollsPerSec":
 				this.nRollsPerSec = int.Parse(value);
@@ -2555,10 +2555,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bViewerTimeStretch = CConversion.bONorOFF(value[0]);
 				break;
 			case "ViewerGuitar":
-				this.bViewerGuitar有効 = CConversion.bONorOFF(value[0]);
+				this.bViewerGuitarEnabled = CConversion.bONorOFF(value[0]);
 				break;
 			case "ViewerDrums":
-				this.bViewerDrums有効 = CConversion.bONorOFF(value[0]);
+				this.bViewerDrumsEnabled = CConversion.bONorOFF(value[0]);
 				break;
 		}
 	}

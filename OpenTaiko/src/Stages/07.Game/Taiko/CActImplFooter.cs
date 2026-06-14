@@ -26,7 +26,7 @@ internal class CActImplFooter : CActivity {
 					? _presetPath
 					: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : "");
 
-				Mob_Footer = OpenTaiko.tテクスチャの生成(path);
+				Mob_Footer = OpenTaiko.tTextureCreate(path);
 			}
 		}
 
@@ -48,7 +48,7 @@ internal class CActImplFooter : CActivity {
 	}
 
 	public override int Draw() {
-		this.Mob_Footer?.t2D描画(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
+		this.Mob_Footer?.t2DDraw(0, OpenTaiko.Skin.Resolution[1] - this.Mob_Footer.szTextureSize.Height);
 		return base.Draw();
 	}
 

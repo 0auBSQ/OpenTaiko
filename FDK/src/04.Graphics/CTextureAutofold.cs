@@ -24,18 +24,18 @@ public class CTextureAf : CTexture, IDisposable {
 	/// <param name="b黒を透過する">画像の黒（0xFFFFFFFF）を透過させるなら true。</param>
 	/// <param name="pool">テクスチャの管理方法。</param>
 	/// <exception cref="CTextureCreateFailedException">テクスチャの作成に失敗しました。</exception>
-	public CTextureAf(string strファイル名, bool b黒を透過する) {
-		MakeTexture(strファイル名, b黒を透過する);
+	public CTextureAf(string strFileName, bool bBlackTransparent) {
+		MakeTexture(strFileName, bBlackTransparent);
 	}
 
 
 
 
-	public new void MakeTexture(string strファイル名, bool b黒を透過する) {
-		if (!File.Exists(strファイル名))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
-			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strファイル名));
+	public new void MakeTexture(string strFileName, bool bBlackTransparent) {
+		if (!File.Exists(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
+			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
 
-		base.MakeTexture(strファイル名, b黒を透過する);
+		base.MakeTexture(strFileName, bBlackTransparent);
 	}
 
 	/// <summary>
@@ -92,58 +92,58 @@ public class CTextureAf : CTexture, IDisposable {
 	/// <param name="device">Direct3D9 デバイス。</param>
 	/// <param name="x">描画位置（テクスチャの左上位置の X 座標[dot]）。</param>
 	/// <param name="y">描画位置（テクスチャの左上位置の Y 座標[dot]）。</param>
-	public new void t2D描画(int x, int y) {
+	public new void t2DDraw(int x, int y) {
 #if TEST_FOLDTEXTURE
-			base.t2D描画( x, y, 1f, rc全画像 );
+			base.t2DDraw( x, y, 1f, rcFullImage );
 #else
 		for (int n = 0; n <= _foldtimes; n++) {
 			Rectangle r;
-			if (b横長のテクスチャである) {
+			if (bWideLengthTexture) {
 				int currentHeight = n * _orgHeight;
-				r = new Rectangle(0, currentHeight, this.rc全画像.Width, _orgHeight);
-				base.t2D描画(x + n * this.rc全画像.Width, y, 1f, r);
+				r = new Rectangle(0, currentHeight, this.rcFullImage.Width, _orgHeight);
+				base.t2DDraw(x + n * this.rcFullImage.Width, y, 1f, r);
 			} else {
 				int currentWidth = n * _orgWidth;
-				r = new Rectangle(currentWidth, 0, _orgWidth, this.rc全画像.Height);
-				base.t2D描画(x, y + n * this.rc全画像.Height, 1f, r);
+				r = new Rectangle(currentWidth, 0, _orgWidth, this.rcFullImage.Height);
+				base.t2DDraw(x, y + n * this.rcFullImage.Height, 1f, r);
 			}
 		}
 #endif
 	}
-	public new void t2D描画(int x, int y, Rectangle rc) {
+	public new void t2DDraw(int x, int y, Rectangle rc) {
 		Rectangle r;
-		if (b横長のテクスチャである) {
-			int beginFold = rc.X / this.rc全画像.Width;
-			int endFold = (rc.X + rc.Width) / rc全画像.Width;
+		if (bWideLengthTexture) {
+			int beginFold = rc.X / this.rcFullImage.Width;
+			int endFold = (rc.X + rc.Width) / rcFullImage.Width;
 			for (int i = beginFold; i <= endFold; i++) {
 				if (i > _foldtimes) break;
 
 				int newRcY = i * _orgHeight + rc.Y;
-				int newRcX = (i == beginFold) ? (rc.X % this.rc全画像.Width) : 0;
-				int newRcWidth = (newRcX + rc.Width > rc全画像.Width) ? rc全画像.Width - newRcX : rc.Width;
+				int newRcX = (i == beginFold) ? (rc.X % this.rcFullImage.Width) : 0;
+				int newRcWidth = (newRcX + rc.Width > rcFullImage.Width) ? rcFullImage.Width - newRcX : rc.Width;
 
 				r = new Rectangle(newRcX, newRcY, newRcWidth, rc.Height);
-				base.t2D描画(x, y, 1f, r);
+				base.t2DDraw(x, y, 1f, r);
 
-				int deltaX = (i == beginFold) ? (i + 1) * rc全画像.Width - rc.X : rc全画像.Width;
+				int deltaX = (i == beginFold) ? (i + 1) * rcFullImage.Width - rc.X : rcFullImage.Width;
 				int newWidth = rc.Width - deltaX;
 				x += deltaX;
 				rc.Width = newWidth;
 			}
 		} else {
-			int beginFold = rc.Y / this.rc全画像.Height;
-			int endFold = (rc.Y + rc.Height) / rc全画像.Height;
+			int beginFold = rc.Y / this.rcFullImage.Height;
+			int endFold = (rc.Y + rc.Height) / rcFullImage.Height;
 			for (int i = beginFold; i <= endFold; i++) {
 				if (i > _foldtimes) break;
 
 				int newRcX = i * _orgWidth + rc.X;
-				int newRcY = (i == beginFold) ? (rc.Y % this.rc全画像.Height) : 0;
-				int newRcHeight = (newRcY + rc.Height > rc全画像.Height) ? rc全画像.Height - newRcY : rc.Height;
+				int newRcY = (i == beginFold) ? (rc.Y % this.rcFullImage.Height) : 0;
+				int newRcHeight = (newRcY + rc.Height > rcFullImage.Height) ? rcFullImage.Height - newRcY : rc.Height;
 
 				r = new Rectangle(newRcX, newRcY, rc.Width, newRcHeight);
-				base.t2D描画(x, y, 1f, r);
+				base.t2DDraw(x, y, 1f, r);
 
-				int deltaY = (i == beginFold) ? (i + 1) * rc全画像.Height - rc.Y : rc全画像.Height;
+				int deltaY = (i == beginFold) ? (i + 1) * rcFullImage.Height - rc.Y : rcFullImage.Height;
 				int newHeight = rc.Height - deltaY;
 				y += deltaY;
 				rc.Height = newHeight;
@@ -151,16 +151,16 @@ public class CTextureAf : CTexture, IDisposable {
 		}
 
 	}
-	public new void t2D描画(float x, float y) {
-		t2D描画((int)x, (int)y);
+	public new void t2DDraw(float x, float y) {
+		t2DDraw((int)x, (int)y);
 	}
-	public void t2D描画(float x, float y, Rectangle rc) {
-		t2D描画((int)x, (int)y, rc);
+	public void t2DDraw(float x, float y, Rectangle rc) {
+		t2DDraw((int)x, (int)y, rc);
 	}
 
 	#region [ private ]
 	//-----------------
-	private bool b横長のテクスチャである;
+	private bool bWideLengthTexture;
 
 	/// <summary>
 	/// 元画像のWidth

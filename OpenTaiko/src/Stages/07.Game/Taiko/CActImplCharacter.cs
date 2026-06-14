@@ -49,7 +49,7 @@ internal class CActImplCharacter : CActivity {
 			else ChangeAnime(i, Anime.None, true);
 
 			this.IsInKusudama = false;
-			this.b風船連打中[i] = false;
+			this.bBalloonRoll[i] = false;
 
 			CharaAction_Balloon_FadeOut[i] = new Animations.FadeOut(OpenTaiko.Skin.Characters_Balloon_FadeOut[this.iCurrentCharacter[i]]);
 			if (CharaAction_Balloon_Delay[i] != null) CharaAction_Balloon_Delay[i].CurrentValue = (int)CharaAction_Balloon_Delay[i].EndValue;
@@ -425,22 +425,22 @@ internal class CActImplCharacter : CActivity {
 				nowChara.vcScaleRatio.Y = charaScale;
 
 				if (flipX) {
-					nowChara.t2D左右反転描画(chara_x, chara_y);
+					nowChara.t2DFlipHDraw(chara_x, chara_y);
 				} else {
-					nowChara.t2D描画(chara_x, chara_y);
+					nowChara.t2DDraw(chara_x, chara_y);
 				}
 
 				nowChara.vcScaleRatio.X = 1.0f;
 				nowChara.vcScaleRatio.Y = 1.0f;
 			}
 
-			if ((this.b風船連打中[i] != true && CharaAction_Balloon_Delay[i].IsEnded) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			if ((this.bBalloonRoll[i] != true && CharaAction_Balloon_Delay[i].IsEnded) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
 				if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i), OpenTaiko.Skin.Game_PuchiChara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i), OpenTaiko.Skin.Game_PuchiChara_5P[1] + (OpenTaiko.Skin.Game_UIMove_5P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
 				} else {
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(OpenTaiko.Skin.Game_PuchiChara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i), OpenTaiko.Skin.Game_PuchiChara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_4P[0] + (OpenTaiko.Skin.Game_UIMove_4P[0] * i), OpenTaiko.Skin.Game_PuchiChara_4P[1] + (OpenTaiko.Skin.Game_UIMove_4P[1] * i), OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i, scale: 0.5f);
 				}
 			}
 		}
@@ -491,13 +491,13 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
 						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
-						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(
+						OpenTaiko.Tx.Characters_Balloon_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + chara_x,
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + chara_y);
 					}
 
 					if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
@@ -509,13 +509,13 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].Opacity = nowOpacity;
 						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
-						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(
+						OpenTaiko.Tx.Characters_Balloon_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + chara_x,
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + chara_y);
 					}
 
 					if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, nowOpacity, true, player: i);
 
@@ -526,13 +526,13 @@ internal class CActImplCharacter : CActivity {
 					if (OpenTaiko.Skin.Characters_Balloon_Breaking_Ptn[this.iCurrentCharacter[i]] != 0 && OpenTaiko.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]] != null) {
 						OpenTaiko.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
-						OpenTaiko.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(
+						OpenTaiko.Tx.Characters_Balloon_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + chara_x,
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + chara_y);
 					}
 
 					if (OpenTaiko.ConfigIni.nPlayerCount <= 2)
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 							OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player: i);
 				} else if (eNowAnime[i] == Anime.Kusudama_Broke) {
@@ -544,17 +544,17 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
 						if (i % 2 == 0) {
-							OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuOutX, kusu_chara_y - kusuOutY);
+							OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(kusu_chara_x - kusuOutX, kusu_chara_y - kusuOutY);
 						} else {
-							OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuOutX, kusu_chara_y - kusuOutY);
+							OpenTaiko.Tx.Characters_Kusudama_Broke[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DFlipHDraw(kusu_chara_x + kusuOutX, kusu_chara_y - kusuOutY);
 						}
 					}
 					if (i % 2 == 0) {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuOutX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] - (int)kusuOutY, false, nowOpacity, true, player: i);
 					} else {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuOutX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] - (int)kusuOutY, false, nowOpacity, true, player: i);
 					}
@@ -572,13 +572,13 @@ internal class CActImplCharacter : CActivity {
 
 
 						if (i % 2 == 0) {
-							OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x, kusu_chara_y + kusuOutY);
+							OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(kusu_chara_x, kusu_chara_y + kusuOutY);
 						} else {
-							OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x, kusu_chara_y + kusuOutY);
+							OpenTaiko.Tx.Characters_Kusudama_Miss[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DFlipHDraw(kusu_chara_x, kusu_chara_y + kusuOutY);
 						}
 					}
 
-					OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 						OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i],
 						OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuOutY, false, nowOpacity, true, player: i);
 
@@ -594,18 +594,18 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
 						if (i % 2 == 0) {
-							OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
+							OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
 						} else {
-							OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
+							OpenTaiko.Tx.Characters_Kusudama_Breaking[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DFlipHDraw(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
 						}
 					}
 
 					if (i % 2 == 0) {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuInX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player: i);
 					} else {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuInX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player: i);
 					}
@@ -621,18 +621,18 @@ internal class CActImplCharacter : CActivity {
 						OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.X = charaScale;
 						OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].vcScaleRatio.Y = charaScale;
 						if (i % 2 == 0) {
-							OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D描画(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
+							OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DDraw(kusu_chara_x - kusuInX, kusu_chara_y + kusuInY);
 						} else {
-							OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2D左右反転描画(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
+							OpenTaiko.Tx.Characters_Kusudama_Idle[this.iCurrentCharacter[i]][nNowCharaFrame[i]].t2DFlipHDraw(kusu_chara_x + kusuInX, kusu_chara_y + kusuInY);
 						}
 					}
 
 					if (i % 2 == 0) {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] - (int)kusuInX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player: i);
 					} else {
-						OpenTaiko.stageGameScreen.PuchiChara.On進行描画(
+						OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuInX,
 							OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuInY, false, 255, true, player: i);
 					}
@@ -651,7 +651,7 @@ internal class CActImplCharacter : CActivity {
 			ChangeAnime(player, Anime.Kusudama_Idle, resetCounter);
 			return;
 		}
-		if (this.b風船連打中[player]) {
+		if (this.bBalloonRoll[player]) {
 			ChangeAnime(player, Anime.Balloon_Breaking, resetCounter);
 			return;
 		}
@@ -877,7 +877,7 @@ internal class CActImplCharacter : CActivity {
 	//public bool[] bキャラクターアクション中 = new bool[5];
 
 	public bool IsInKusudama = false;
-	public bool[] b風船連打中 = new bool[5];
+	public bool[] bBalloonRoll = new bool[5];
 
 	public int[] iCurrentCharacter = new int[5] { 0, 0, 0, 0, 0 };
 }

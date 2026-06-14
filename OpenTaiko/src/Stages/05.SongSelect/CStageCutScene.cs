@@ -201,12 +201,12 @@ class CStageCutScene : CStage {
 			base.ePhaseID = EPhase.Common_FADEOUT;
 			switch (this.mode) {
 				case ECutSceneMode.Intro:
-					this.actFOIntro.tフェードアウト開始(true);
+					this.actFOIntro.tFadeOutStart(true);
 					this.ReturnValueAfterFadingOut = EReturnValue.IntroFinished;
 					break;
 
 				case ECutSceneMode.Outro:
-					this.actFOOutro.tフェードアウト開始();
+					this.actFOOutro.tFadeOutStart();
 					this.ReturnValueAfterFadingOut = EReturnValue.OutroFinished;
 					break;
 			}
@@ -318,7 +318,7 @@ class CStageCutScene : CStage {
 	private ECutSceneMode mode;
 	private EReturnValue ReturnValueAfterFadingOut;
 
-	private CAct演奏AVI actAVI;
+	private CActPlayAVI actAVI;
 	private CActFIFOStart actFOIntro;
 	private CActFIFOBlack actFOOutro;
 

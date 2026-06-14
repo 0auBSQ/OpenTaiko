@@ -5,19 +5,19 @@ namespace OpenTaiko;
 internal abstract class CActFIFOBase : CActivity {
 	// メソッド
 
-	public abstract void tフェードアウト開始(int? start = null, int? end = null, int? interval = null);
+	public abstract void tFadeOutStart(int? start = null, int? end = null, int? interval = null);
 	protected void StartFadeOutCounter(int start, int end, int interval) {
 		this.mode = EFIFOMode.FadeOut;
 		this.counter = new CCounter(start, end, interval, OpenTaiko.Timer);
 	}
 
-	public abstract void tフェードイン開始(int? start = null, int? end = null, int? interval = null);
+	public abstract void tFadeInStart(int? start = null, int? end = null, int? interval = null);
 	protected void StartFadeInCounter(int start, int end, int interval) {
 		this.mode = EFIFOMode.FadeIn;
 		this.counter = new CCounter(start, end, interval, OpenTaiko.Timer);
 	}
 
-	public virtual void tフェードイン完了() => EndFadeCounter();
+	public virtual void tFadeInComplete() => EndFadeCounter();
 	protected void EndFadeCounter() {
 		this.counter.CurrentValue = (int)this.counter.EndValue;
 	}
@@ -33,7 +33,7 @@ internal abstract class CActFIFOBase : CActivity {
 
 		var subRes = this.DrawSub();
 		if (subRes != 0) {
-			this.tフェードイン完了();
+			this.tFadeInComplete();
 			return subRes;
 		}
 

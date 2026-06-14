@@ -18,8 +18,8 @@ internal class CActSelectPopupMenu : CActivity {
 	public int GetIndex(int pos) {
 		return lciMenuItems[pos].cItem.GetIndex();
 	}
-	public object GetObj現在値(int pos) {
-		return lciMenuItems[pos].cItem.obj現在値();
+	public object GetObjCurrentValue(int pos) {
+		return lciMenuItems[pos].cItem.objCurrentValue();
 	}
 	public bool bGotoDetailConfig {
 		get;
@@ -51,25 +51,25 @@ internal class CActSelectPopupMenu : CActivity {
 	protected void Initialize(List<CItemBase> menulist, bool showAllItems, string title, int defaultPos) {
 		InitializePrvFont();
 
-		b選択した = false;
+		bSelected = false;
 		stqMenuTitle = new stQuickMenuItem();
 		stqMenuTitle.cItem = new CItemBase();
-		stqMenuTitle.cItem.str項目名 = title;
+		stqMenuTitle.cItem.strItemName = title;
 		using (var bitmap = prvFont.DrawText(title, Color.White, Color.Black, null, 30)) {
-			stqMenuTitle.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+			stqMenuTitle.txName = OpenTaiko.tTextureCreate(bitmap, false);
 		}
 		lciMenuItems = new stQuickMenuItem[menulist.Count];
 		for (int i = 0; i < menulist.Count; i++) {
 			stQuickMenuItem stqm = new stQuickMenuItem();
 			stqm.cItem = menulist[i];
-			using (var bitmap = prvFont.DrawText(menulist[i].str項目名, Color.White, Color.Black, null, 30)) {
-				stqm.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+			using (var bitmap = prvFont.DrawText(menulist[i].strItemName, Color.White, Color.Black, null, 30)) {
+				stqm.txName = OpenTaiko.tTextureCreate(bitmap, false);
 			}
 			lciMenuItems[i] = stqm;
 		}
 
 		bShowAllItems = showAllItems;
-		n現在の選択行 = defaultPos;
+		nCurrentSelectedLine = defaultPos;
 	}
 
 	private void InitializePrvFont() {
@@ -87,41 +87,41 @@ internal class CActSelectPopupMenu : CActivity {
 		OpenTaiko.tDisposeSafely(ref prvFont);
 		InitializePrvFont();
 
-		using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem?.str項目名 ?? "", Color.White, Color.Black, null, 30)) {
+		using (var bitmap = prvFont.DrawText(stqMenuTitle.cItem?.strItemName ?? "", Color.White, Color.Black, null, 30)) {
 			OpenTaiko.tDisposeSafely(ref stqMenuTitle.txName);
-			stqMenuTitle.txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+			stqMenuTitle.txName = OpenTaiko.tTextureCreate(bitmap, false);
 		}
 		if (lciMenuItems != null) {
 			for (int i = 0; i < lciMenuItems.Length; i++) {
-				using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem?.str項目名 ?? "", Color.White, Color.Black, null, 30)) {
+				using (var bitmap = prvFont.DrawText(lciMenuItems[i].cItem?.strItemName ?? "", Color.White, Color.Black, null, 30)) {
 					OpenTaiko.tDisposeSafely(ref lciMenuItems[i].txName);
-					lciMenuItems[i].txName = OpenTaiko.tテクスチャの生成(bitmap, false);
+					lciMenuItems[i].txName = OpenTaiko.tTextureCreate(bitmap, false);
 				}
 			}
 		}
 	}
 
-	public void tEnter押下() {
-		if (this.bキー入力待ち) {
+	public void tEnterPressed() {
+		if (this.bKeyInputWait) {
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 
-			if (this.n現在の選択行 != lciMenuItems.Length - 1) {
-				if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.リスト ||
-					lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFトグル ||
-					lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.ONorOFFor不定スリーステート) {
-					lciMenuItems[n現在の選択行].cItem.t項目値を次へ移動();
-				} else if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.整数) {
+			if (this.nCurrentSelectedLine != lciMenuItems.Length - 1) {
+				if (lciMenuItems[nCurrentSelectedLine].cItem.eType == CItemBase.EType.List ||
+					lciMenuItems[nCurrentSelectedLine].cItem.eType == CItemBase.EType.ONorOFFToggle ||
+					lciMenuItems[nCurrentSelectedLine].cItem.eType == CItemBase.EType.ONorOFForIndeterminateThreeState) {
+					lciMenuItems[nCurrentSelectedLine].cItem.tItemValueNextMove();
+				} else if (lciMenuItems[nCurrentSelectedLine].cItem.eType == CItemBase.EType.Int) {
 					bIsSelectingIntItem = !bIsSelectingIntItem;     // 選択状態/選択解除状態を反転する
-				} else if (lciMenuItems[n現在の選択行].cItem.e種別 == CItemBase.E種別.切替リスト) {
+				} else if (lciMenuItems[nCurrentSelectedLine].cItem.eType == CItemBase.EType.SwitchList) {
 					// 特に何もしない
 				} else {
 					throw new ArgumentException();
 				}
-				nItemSelecting = n現在の選択行;
+				nItemSelecting = nCurrentSelectedLine;
 			}
-			tEnter押下Main((int)lciMenuItems[n現在の選択行].cItem.GetIndex());
+			tEnterPressedMain((int)lciMenuItems[nCurrentSelectedLine].cItem.GetIndex());
 
-			this.bキー入力待ち = true;
+			this.bKeyInputWait = true;
 		}
 	}
 
@@ -129,7 +129,7 @@ internal class CActSelectPopupMenu : CActivity {
 	/// Decide押下時の処理を、継承先で記述する。
 	/// </summary>
 	/// <param name="val">CItemBaseの現在の設定値のindex</param>
-	public virtual void tEnter押下Main(int val) {
+	public virtual void tEnterPressedMain(int val) {
 	}
 	/// <summary>
 	/// Cancel押下時の追加処理があれば、継承先で記述する。
@@ -141,29 +141,29 @@ internal class CActSelectPopupMenu : CActivity {
 	/// <summary>
 	/// 追加の描画処理。必要に応じて、継承先で記述する。
 	/// </summary>
-	public virtual void t進行描画sub() {
+	public virtual void tProgressDrawsub() {
 	}
 
-	public void t次に移動() {
-		if (this.bキー入力待ち) {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
+	public void tNextMove() {
+		if (this.bKeyInputWait) {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
 			if (bIsSelectingIntItem) {
-				lciMenuItems[n現在の選択行].cItem.t項目値を前へ移動();        // 項目移動と数値上下は方向が逆になるので注意
+				lciMenuItems[nCurrentSelectedLine].cItem.tItemValuePrevMove();        // 項目移動と数値上下は方向が逆になるので注意
 			} else {
-				if (++this.n現在の選択行 >= this.lciMenuItems.Length) {
-					this.n現在の選択行 = 0;
+				if (++this.nCurrentSelectedLine >= this.lciMenuItems.Length) {
+					this.nCurrentSelectedLine = 0;
 				}
 			}
 		}
 	}
-	public void t前に移動() {
-		if (this.bキー入力待ち) {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
+	public void tPrevMove() {
+		if (this.bKeyInputWait) {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
 			if (bIsSelectingIntItem) {
-				lciMenuItems[n現在の選択行].cItem.t項目値を次へ移動();        // 項目移動と数値上下は方向が逆になるので注意
+				lciMenuItems[nCurrentSelectedLine].cItem.tItemValueNextMove();        // 項目移動と数値上下は方向が逆になるので注意
 			} else {
-				if (--this.n現在の選択行 < 0) {
-					this.n現在の選択行 = this.lciMenuItems.Length - 1;
+				if (--this.nCurrentSelectedLine < 0) {
+					this.nCurrentSelectedLine = this.lciMenuItems.Length - 1;
 				}
 			}
 		}
@@ -173,12 +173,12 @@ internal class CActSelectPopupMenu : CActivity {
 
 	public override void Activate() {
 		//		this.n現在の選択行 = 0;
-		this.bキー入力待ち = true;
+		this.bKeyInputWait = true;
 		for (int i = 0; i < 4; i++) {
-			this.ctキー反復用[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);
+			this.ctKeyRepeat[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);
 		}
 		base.IsDeActivated = true;
-		b選択した = false;
+		bSelected = false;
 		this.bIsActivePopupMenu = false;
 		this.font = new CActDFPFont();
 		base.ChildActivities.Add(this.font);
@@ -195,7 +195,7 @@ internal class CActSelectPopupMenu : CActivity {
 			//CDTXMania.tテクスチャの解放( ref this.txCursor );
 			//CDTXMania.tテクスチャの解放( ref this.txPopupMenuBackground );
 			for (int i = 0; i < 4; i++) {
-				this.ctキー反復用[i] = null;
+				this.ctKeyRepeat[i] = null;
 			}
 			base.DeActivate();
 		}
@@ -216,7 +216,7 @@ internal class CActSelectPopupMenu : CActivity {
 
 	public int Update() {
 		if (!base.IsDeActivated && this.bIsActivePopupMenu) {
-			if (this.bキー入力待ち) {
+			if (this.bKeyInputWait) {
 				#region [ Shift-F1: CONFIG画面 ]
 				if ((OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift) || OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift)) &&
 					OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.F1)) {  // [SHIFT] + [F1] CONFIG
@@ -229,14 +229,14 @@ internal class CActSelectPopupMenu : CActivity {
 				else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)
 						  || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.FT)
 						  || OpenTaiko.Pad.bPressedGB(EPad.Cancel))
-						 && this.bEsc有効) {   // キャンセル
+						 && this.bEscEnabled) {   // キャンセル
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
 					tCancel();
 					this.bIsActivePopupMenu = false;
 				}
 				#endregion
 
-				if (!b選択した) {
+				if (!bSelected) {
 					#region [ キー入力: 決定 ]
 					// E楽器パート eInst = E楽器パート.UNKNOWN;
 					ESortAction eAction = ESortAction.END;
@@ -251,21 +251,21 @@ internal class CActSelectPopupMenu : CActivity {
 					}
 					if (eAction == ESortAction.Decide)  // 決定
 					{
-						this.tEnter押下();
+						this.tEnterPressed();
 					}
 					#endregion
 					#region [ キー入力: 前に移動 ]
-					this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.t前に移動));
-					this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.R), new CCounter.KeyProcess(this.t前に移動));
+					this.ctKeyRepeat.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tPrevMove));
+					this.ctKeyRepeat.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.R), new CCounter.KeyProcess(this.tPrevMove));
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
-						this.t前に移動();
+						this.tPrevMove();
 					}
 					#endregion
 					#region [ キー入力: 次に移動 ]
-					this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.t次に移動));
-					this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.B), new CCounter.KeyProcess(this.t次に移動));
+					this.ctKeyRepeat.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tNextMove));
+					this.ctKeyRepeat.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.B), new CCounter.KeyProcess(this.tNextMove));
 					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
-						this.t次に移動();
+						this.tNextMove();
 					}
 					#endregion
 				}
@@ -279,28 +279,28 @@ internal class CActSelectPopupMenu : CActivity {
 		if (!base.IsDeActivated && this.bIsActivePopupMenu) {
 			#region [ ポップアップメニュー 背景描画 ]
 			if (OpenTaiko.Tx.Menu_Title != null) {
-				OpenTaiko.Tx.Menu_Title.t2D描画(OpenTaiko.Skin.PopupMenu_Menu_Title[0], OpenTaiko.Skin.PopupMenu_Menu_Title[1]);
+				OpenTaiko.Tx.Menu_Title.t2DDraw(OpenTaiko.Skin.PopupMenu_Menu_Title[0], OpenTaiko.Skin.PopupMenu_Menu_Title[1]);
 			}
 			#endregion
 			#region [ ソートメニュータイトル描画 ]
-			stqMenuTitle.txName.t2D描画(OpenTaiko.Skin.PopupMenu_Title[0], OpenTaiko.Skin.PopupMenu_Title[1]);
+			stqMenuTitle.txName.t2DDraw(OpenTaiko.Skin.PopupMenu_Title[0], OpenTaiko.Skin.PopupMenu_Title[1]);
 			#endregion
 			#region [ カーソル描画 ]
 			if (OpenTaiko.Tx.Menu_Highlight != null) {
-				int curX = OpenTaiko.Skin.PopupMenu_Menu_Highlight[0] + (OpenTaiko.Skin.PopupMenu_Move[0] * (this.n現在の選択行 + 1));
-				int curY = OpenTaiko.Skin.PopupMenu_Menu_Highlight[1] + (OpenTaiko.Skin.PopupMenu_Move[1] * (this.n現在の選択行 + 1));
+				int curX = OpenTaiko.Skin.PopupMenu_Menu_Highlight[0] + (OpenTaiko.Skin.PopupMenu_Move[0] * (this.nCurrentSelectedLine + 1));
+				int curY = OpenTaiko.Skin.PopupMenu_Menu_Highlight[1] + (OpenTaiko.Skin.PopupMenu_Move[1] * (this.nCurrentSelectedLine + 1));
 
 				int width = OpenTaiko.Tx.Menu_Highlight.szTextureSize.Width / 2;
 				int height = OpenTaiko.Tx.Menu_Highlight.szTextureSize.Height;
 
-				OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(0, 0, width, height));
+				OpenTaiko.Tx.Menu_Highlight.t2DDraw(curX, curY, new Rectangle(0, 0, width, height));
 				curX += width;
 				Rectangle rectangle = new Rectangle(width / 2, 0, width, height);
 				for (int j = 0; j < 16; j++) {
-					OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, rectangle);
+					OpenTaiko.Tx.Menu_Highlight.t2DDraw(curX, curY, rectangle);
 					curX += width;
 				}
-				OpenTaiko.Tx.Menu_Highlight.t2D描画(curX, curY, new Rectangle(width, 0, width, height));
+				OpenTaiko.Tx.Menu_Highlight.t2DDraw(curX, curY, new Rectangle(width, 0, width, height));
 			}
 			#endregion
 			#region [ ソート候補文字列描画 ]
@@ -308,21 +308,21 @@ internal class CActSelectPopupMenu : CActivity {
 				bool bItemBold = (i == nItemSelecting && !bShowAllItems) ? true : false;
 				//font.t文字列描画( 190, 80 + i * 32, lciMenuItems[ i ].cItem.str項目名, bItemBold, 1.0f );
 				if (lciMenuItems[i].txName != null) {
-					lciMenuItems[i].txName.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Name[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
+					lciMenuItems[i].txName.t2DDraw(OpenTaiko.Skin.PopupMenu_MenuItem_Name[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
 						OpenTaiko.Skin.PopupMenu_MenuItem_Name[1] + i * OpenTaiko.Skin.PopupMenu_Move[1]);
 				}
 
 				bool bValueBold = (bItemBold || (i == nItemSelecting && bIsSelectingIntItem)) ? true : false;
 				if (bItemBold || bShowAllItems) {
 					string s;
-					if (lciMenuItems[i].cItem.str項目名 == CLangManager.LangInstance.GetString("MOD_SONGSPEED")) {
-						double d = (double)((int)lciMenuItems[i].cItem.obj現在値() / 20.0);
+					if (lciMenuItems[i].cItem.strItemName == CLangManager.LangInstance.GetString("MOD_SONGSPEED")) {
+						double d = (double)((int)lciMenuItems[i].cItem.objCurrentValue() / 20.0);
 						s = "x" + d.ToString("0.00");
-					} else if (lciMenuItems[i].cItem.str項目名 == CLangManager.LangInstance.GetString("MOD_SPEED")) {
-						double d = (double)((((int)lciMenuItems[i].cItem.obj現在値()) + 1) / 10.0);
+					} else if (lciMenuItems[i].cItem.strItemName == CLangManager.LangInstance.GetString("MOD_SPEED")) {
+						double d = (double)((((int)lciMenuItems[i].cItem.objCurrentValue()) + 1) / 10.0);
 						s = "x" + d.ToString("0.0");
 					} else {
-						s = lciMenuItems[i].cItem.obj現在値().ToString();
+						s = lciMenuItems[i].cItem.objCurrentValue().ToString();
 					}
 					//               switch (lciMenuItems[i].cItem.str項目名)
 					//               {
@@ -347,15 +347,15 @@ internal class CActSelectPopupMenu : CActivity {
 					using (var bmpStr = bValueBold ?
 							   prvFont.DrawText(s, Color.White, Color.OrangeRed, null, Color.Yellow, Color.OrangeRed, 30) :
 							   prvFont.DrawText(s, Color.White, Color.Black, null, 30)) {
-						using (var ctStr = OpenTaiko.tテクスチャの生成(bmpStr, false)) {
-							ctStr.t2D描画(OpenTaiko.Skin.PopupMenu_MenuItem_Value[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
+						using (var ctStr = OpenTaiko.tTextureCreate(bmpStr, false)) {
+							ctStr.t2DDraw(OpenTaiko.Skin.PopupMenu_MenuItem_Value[0] + i * OpenTaiko.Skin.PopupMenu_Move[0],
 								OpenTaiko.Skin.PopupMenu_MenuItem_Value[1] + i * OpenTaiko.Skin.PopupMenu_Move[1]);
 						}
 					}
 				}
 			}
 			#endregion
-			t進行描画sub();
+			tProgressDrawsub();
 		}
 		return 0;
 	}
@@ -365,10 +365,10 @@ internal class CActSelectPopupMenu : CActivity {
 
 	#region [ private ]
 	//-----------------
-	private bool bキー入力待ち;
-	protected bool bEsc有効;
+	private bool bKeyInputWait;
+	protected bool bEscEnabled;
 
-	internal int n現在の選択行;
+	internal int nCurrentSelectedLine;
 
 	//private CTexture txPopupMenuBackground;
 	//private CTexture txCursor;
@@ -384,9 +384,9 @@ internal class CActSelectPopupMenu : CActivity {
 	private string strMenuTitle;
 	private bool bShowAllItems;
 	private bool bIsSelectingIntItem;
-	public static bool b選択した;
+	public static bool bSelected;
 	[StructLayout(LayoutKind.Sequential)]
-	private struct STキー反復用カウンタ {
+	private struct STKeyRepeatCounter {
 		public CCounter Up;
 		public CCounter Down;
 		public CCounter R;
@@ -430,7 +430,7 @@ internal class CActSelectPopupMenu : CActivity {
 			}
 		}
 	}
-	private STキー反復用カウンタ ctキー反復用;
+	private STKeyRepeatCounter ctKeyRepeat;
 
 	private enum ESortAction : int {
 		Cancel, Decide, Previous, Next, END

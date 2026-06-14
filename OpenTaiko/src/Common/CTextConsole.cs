@@ -31,7 +31,7 @@ internal class CTextConsole : CActivity {
 				int index = printableCharacters.IndexOf(ch);
 				if (index >= 0) {
 					if (this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)] != null) {
-						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2D描画(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
+						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2DDraw(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
 					}
 				}
 

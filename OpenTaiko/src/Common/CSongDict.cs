@@ -6,13 +6,13 @@ internal class CSongDict {
 	private static Dictionary<string, CSongListNode> nodes = new Dictionary<string, CSongListNode>();
 	private static HashSet<string> urls = new HashSet<string>();
 
-	public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[5][]
+	public static CActSelectSongList.CScorePad[][] ScorePads = new CActSelectSongList.CScorePad[5][]
 	{
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() }
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() }
 	};
 
 	public static int tGetNodesCount() {
@@ -104,9 +104,9 @@ internal class CSongDict {
 			itemBack.ldTitle.GetString("") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("");
 
 		itemBack.score[0] = new CScore();
-		itemBack.score[0].ファイル情報.フォルダの絶対パス = "";
-		itemBack.score[0].譜面情報.タイトル = itemBack.ldTitle.GetString("");
-		itemBack.score[0].譜面情報.コメント = "";
+		itemBack.score[0].FileInfo.FolderAbsolutePath = "";
+		itemBack.score[0].ChartInfo.Title = itemBack.ldTitle.GetString("");
+		itemBack.score[0].ChartInfo.Comment = "";
 
 		return (itemBack);
 	}
@@ -301,11 +301,11 @@ internal class CSongDict {
 
 	public static void tRefreshScoreTables() {
 		for (int pl = 0; pl < 5; pl++) {
-			CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
+			CActSelectSongList.CScorePad[] SPArrRef = ScorePads[pl];
 			var BestPlayStats = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(pl)].data.bestPlaysStats;
 
 			for (int s = 0; s <= (int)Difficulty.Edit + 1; s++) {
-				CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
+				CActSelectSongList.CScorePad SPRef = SPArrRef[s];
 
 				if (s <= (int)Difficulty.Edit) {
 					SPRef.ScoreRankCount = BestPlayStats.ScoreRanks[s].Skip(1).ToArray(); ;

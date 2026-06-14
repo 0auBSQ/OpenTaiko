@@ -129,8 +129,8 @@ internal class CActSelectArtistComment : CActivity {
 		base.Activate();
 	}
 	public override void DeActivate() {
-		OpenTaiko.tテクスチャの解放(ref this.txArtist);
-		OpenTaiko.tテクスチャの解放(ref this.txComment);
+		OpenTaiko.tTextureRelease(ref this.txArtist);
+		OpenTaiko.tTextureRelease(ref this.txComment);
 		this.ctComment = null;
 		base.DeActivate();
 	}
@@ -144,8 +144,8 @@ internal class CActSelectArtistComment : CActivity {
 			this.ft描画用フォント = null;
 		}
 
-		OpenTaiko.tテクスチャの解放(ref this.txArtist);
-		OpenTaiko.tテクスチャの解放(ref this.txComment);
+		OpenTaiko.tTextureRelease(ref this.txArtist);
+		OpenTaiko.tTextureRelease(ref this.txComment);
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {

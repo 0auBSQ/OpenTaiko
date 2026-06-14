@@ -215,12 +215,12 @@ class CResultCharacter {
 			_tex.vcScaleRatio.Y *= resolutionRatioY;
 
 			if (pos % 2 == 0 || OpenTaiko.ConfigIni.nPlayerCount > 2) {
-				_tex.t2D拡大率考慮下中心基準描画(
+				_tex.t2DScaledBottomCenterBasedDraw(
 					_x,
 					_y
 				);
 			} else {
-				_tex.t2D拡大率考慮下中心基準描画Mirrored(
+				_tex.t2DScaledBottomCenterBasedDrawMirrored(
 					_x,
 					_y
 				);

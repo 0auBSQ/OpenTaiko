@@ -119,7 +119,7 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CSongs管理 Songs管理 {
+	public static CSongManager SongManager {
 		get;
 		set;    // 2012.1.26 yyagi private解除 CStage起動でのdesirialize読み込みのため
 	}
@@ -180,7 +180,7 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStage起動 stageStartup {
+	public static CStageStartup stageStartup {
 		get;
 		private set;
 	}
@@ -188,7 +188,7 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStageコンフィグ stageConfig {
+	public static CStageConfig stageConfig {
 		get;
 		private set;
 	}
@@ -225,15 +225,15 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStage曲読み込み stageSongLoading {
+	public static CStageSongLoading stageSongLoading {
 		get;
 		private set;
 	}
-	public static CStage演奏ドラム画面 stageGameScreen {
+	public static CStagePlayDrumsScreen stageGameScreen {
 		get;
 		private set;
 	}
-	public static CStage結果 stageResults {
+	public static CStageResult stageResults {
 		get;
 		private set;
 	}
@@ -241,13 +241,13 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStage終了 stageExit {
+	public static CStageShutdown stageExit {
 		get;
 		private set;
 	}
 	public static CStage rCurrentStage = null;
 	public static CStage rPreviousStage = null;
-	public static string strEXEのあるフォルダ {
+	public static string strEXEFolder {
 		get;
 		private set;
 	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
@@ -417,7 +417,7 @@ internal class OpenTaiko : Game {
 	protected override void Configuration() {
 		ConfigIni = new CConfigIni();
 
-		string path = strEXEのあるフォルダ + "Config.ini";
+		string path = strEXEFolder + "Config.ini";
 		if (File.Exists(path)) {
 			try {
 				// Load config info
@@ -483,11 +483,11 @@ internal class OpenTaiko : Game {
 
 	protected override void LoadContent() {
 		if (ConfigIni.bWindowMode) {
-			if (!this.bマウスカーソル表示中) {
-				this.bマウスカーソル表示中 = true;
+			if (!this.bMouseCursorDisplaying) {
+				this.bMouseCursorDisplaying = true;
 			}
-		} else if (this.bマウスカーソル表示中) {
-			this.bマウスカーソル表示中 = false;
+		} else if (this.bMouseCursorDisplaying) {
+			this.bMouseCursorDisplaying = false;
 		}
 
 		if (this.listTopLevelActivities != null) {
@@ -628,7 +628,7 @@ internal class OpenTaiko : Game {
 
 								if (EnumSongs.IsSongListEnumerated) {
 									bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
-									OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
+									OpenTaiko.stageSongSelect.Refresh(EnumSongs.SongManager, bRemakeSongTitleBar);
 									EnumSongs.SongListEnumCompletelyDone();
 								}
 							}
@@ -1096,8 +1096,8 @@ internal class OpenTaiko : Game {
 								//-----------------------------
 
 								// Fetch the results of the finished play
-								CScoreIni.C演奏記録 c演奏記録_Drums;
-								stageGameScreen.t演奏結果を格納する(out c演奏記録_Drums);
+								CScoreIni.CPlayRecord cPlayRecord_Drums;
+								stageGameScreen.tPlayResultStore(out cPlayRecord_Drums);
 
 								rCurrentStage.DeActivate();
 								if (!ConfigIni.PreAssetsLoading) {
@@ -1106,7 +1106,7 @@ internal class OpenTaiko : Game {
 								}
 								Trace.TraceInformation("----------------------");
 								Trace.TraceInformation("■ Results");
-								stageResults.st演奏記録.Drums = c演奏記録_Drums;
+								stageResults.stPlayRecord.Drums = cPlayRecord_Drums;
 								stageResults.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
 									stageResults.CreateManagedResource();
@@ -1128,7 +1128,7 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							//DTX.t全チップの再生一時停止();
-							TJA.t全チップの再生停止とミキサーからの削除();
+							TJA.tStopAllChipsAndRemoveFromMixer();
 							TJA.DeActivate();
 							TJA.ReleaseManagedResource();
 							TJA.ReleaseUnmanagedResource();
@@ -1252,7 +1252,7 @@ internal class OpenTaiko : Game {
 							this.bInternetConnectionSuccess = reply.Status == IPStatus.Success;
 						});
 					}
-					OpenTaiko.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bInternetConnectionSuccess ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
+					OpenTaiko.Tx.Network_Connection.t2DDraw(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bInternetConnectionSuccess ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
 				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
@@ -1263,7 +1263,7 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Overlay != null) {
-					OpenTaiko.Tx.Overlay.t2D描画(0, 0);
+					OpenTaiko.Tx.Overlay.t2DDraw(0, 0);
 				}
 			}
 
@@ -1286,13 +1286,13 @@ internal class OpenTaiko : Game {
 				} else {
 					// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
 					string strFullPath =
-						Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
+						Path.Combine(OpenTaiko.strEXEFolder, "Capture_img");
 					strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
 					SaveResultScreen(strFullPath);
 				}
 #else
 				string strFullPath =
-					Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
+					Path.Combine(OpenTaiko.strEXEFolder, "Capture_img");
 				strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
 				SaveResultScreen(strFullPath);
 #endif
@@ -1349,15 +1349,15 @@ internal class OpenTaiko : Game {
 
 	#region [ 汎用ヘルパー ]
 	//-----------------
-	public static CTexture tテクスチャの生成(string fileName) {
-		return tテクスチャの生成(fileName, false);
+	public static CTexture tTextureCreate(string fileName) {
+		return tTextureCreate(fileName, false);
 	}
-	public static CTexture tテクスチャの生成(string fileName, bool b黒を透過する) {
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
 		try {
-			return new CTexture(fileName, b黒を透過する);
+			return new CTexture(fileName, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);
@@ -1367,16 +1367,16 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 	}
-	public static void tテクスチャの解放(ref CTexture tx) {
+	public static void tTextureRelease(ref CTexture tx) {
 		OpenTaiko.tDisposeSafely(ref tx);
 	}
-	public static void tテクスチャの解放(ref CTextureAf tx) {
+	public static void tTextureRelease(ref CTextureAf tx) {
 		OpenTaiko.tDisposeSafely(ref tx);
 	}
-	public static CTexture tテクスチャの生成(SKBitmap bitmap) {
-		return tテクスチャの生成(bitmap, false);
+	public static CTexture tTextureCreate(SKBitmap bitmap) {
+		return tTextureCreate(bitmap, false);
 	}
-	public static CTexture tテクスチャの生成(SKBitmap bitmap, bool b黒を透過する) {
+	public static CTexture tTextureCreate(SKBitmap bitmap, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
@@ -1385,7 +1385,7 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 		try {
-			return new CTexture(bitmap, b黒を透過する);
+			return new CTexture(bitmap, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. (txData)");
@@ -1393,15 +1393,15 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public static CTextureAf tテクスチャの生成Af(string fileName) {
-		return tテクスチャの生成Af(fileName, false);
+	public static CTextureAf tTextureCreateAf(string fileName) {
+		return tTextureCreateAf(fileName, false);
 	}
-	public static CTextureAf tテクスチャの生成Af(string fileName, bool b黒を透過する) {
+	public static CTextureAf tTextureCreateAf(string fileName, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
 		try {
-			return new CTextureAf(fileName, b黒を透過する);
+			return new CTextureAf(fileName, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);
@@ -1438,9 +1438,9 @@ internal class OpenTaiko : Game {
 	/// <summary>
 	/// そのフォルダの連番画像の最大値を返す。
 	/// </summary>
-	public static int t連番画像の枚数を数える(string ディレクトリ名, string プレフィックス = "", string 拡張子 = ".png") {
+	public static int tSequenceImageSheetCountCount(string DirectoryName, string Prefix = "", string Extension = ".png") {
 		int num = 0;
-		while (File.Exists(ディレクトリ名 + プレフィックス + num + 拡張子)) {
+		while (File.Exists(DirectoryName + Prefix + num + Extension)) {
 			num++;
 		}
 		return num;
@@ -1491,8 +1491,8 @@ internal class OpenTaiko : Game {
 
 	#region [ private ]
 	//-----------------
-	private bool bマウスカーソル表示中 = true;
-	private bool b終了処理完了済み;
+	private bool bMouseCursorDisplaying = true;
+	private bool bEndProcessCompleteDone;
 	public bool bInternetConnectionSuccess { get; private set; } = false;
 	private long PreviousSystemTimeMs = long.MinValue;
 	private static CTja[] tja = new CTja[MAX_PLAYERS];
@@ -1519,7 +1519,7 @@ internal class OpenTaiko : Game {
 	private static void tStartupLog() {
 		Trace.AutoFlush = true;
 		try {
-			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
+			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEFolder, "OpenTaiko.log"), false, Encoding.UTF8)));
 		} catch (System.UnauthorizedAccessException e)            // #24481 2011.2.20 yyagi
 		{
 			// still has console logging
@@ -1802,7 +1802,7 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing song list...");
 		Trace.Indent();
 		try {
-			Songs管理 = new CSongs管理();
+			SongManager = new CSongManager();
 			//				Songs管理_裏読 = new CSongs管理();
 			EnumSongs = new CEnumSongs();
 			actEnumSongs = new CActEnumSongs();
@@ -1835,9 +1835,9 @@ internal class OpenTaiko : Game {
 		//---------------------
 		rCurrentStage = null;
 		rPreviousStage = null;
-		stageStartup = new CStage起動();
+		stageStartup = new CStageStartup();
 		stageTitle = new CStageTitle();
-		stageConfig = new CStageコンフィグ();
+		stageConfig = new CStageConfig();
 		SongMount = new CSongMount();
 		stageSongSelect = new CStageSongSelect();
 		stageDanSongSelect = new CStage段位選択();
@@ -1845,11 +1845,11 @@ internal class OpenTaiko : Game {
 		stageOnlineLounge = new CStageOnlineLounge();
 		stageTowerSelect = new CStageTowerSelect();
 		stageCutScene = new CStageCutScene();
-		stageSongLoading = new CStage曲読み込み();
-		stageGameScreen = new CStage演奏ドラム画面();
-		stageResults = new CStage結果();
+		stageSongLoading = new CStageSongLoading();
+		stageGameScreen = new CStagePlayDrumsScreen();
+		stageResults = new CStageResult();
 		stageChangeSkin = new CStageChangeSkin();
-		stageExit = new CStage終了();
+		stageExit = new CStageShutdown();
 		NamePlate = new CNamePlate();
 		SaveFile = 0;
 
@@ -1912,7 +1912,7 @@ internal class OpenTaiko : Game {
 	}
 
 	private void tExitProcess() {
-		if (!this.b終了処理完了済み) {
+		if (!this.bEndProcessCompleteDone) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
 
@@ -1968,19 +1968,19 @@ internal class OpenTaiko : Game {
 			#endregion
 			#region [ 曲リストの終了処理 ]
 			//---------------------
-			if (Songs管理 != null) {
+			if (SongManager != null) {
 				Trace.TraceInformation("Ending song list...");
 				Trace.Indent();
 				try {
 #pragma warning disable SYSLIB0011
 					if (EnumSongs.IsSongListEnumCompletelyDone) {
 						BinaryFormatter songlistdb_ = new BinaryFormatter();
-						using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-						songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
+						using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEFolder}songlist.db");
+						songlistdb_.Serialize(songlistdb, SongManager.listSongsDB);
 					}
 #pragma warning restore SYSLIB0011
 
-					Songs管理 = null;
+					SongManager = null;
 					Trace.TraceInformation("Song list terminated.");
 				} catch (Exception exception) {
 					Trace.TraceError(exception.ToString());
@@ -2118,10 +2118,10 @@ internal class OpenTaiko : Game {
 			//---------------------
 			Trace.TraceInformation("Outputting Config.ini...");
 			Trace.TraceInformation("This only needs to be done once, unless you have deleted the file!");
-			string str = strEXEのあるフォルダ + "Config.ini";
+			string str = strEXEFolder + "Config.ini";
 			Trace.Indent();
 			try {
-				ConfigIni.t書き出し(str);
+				ConfigIni.tExport(str);
 				Trace.TraceInformation("Saved succesfully. ({0})", str);
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
@@ -2152,7 +2152,7 @@ internal class OpenTaiko : Game {
 			//---------------------
 			#endregion
 			Trace.TraceInformation("OpenTaiko has closed down successfully.");
-			this.b終了処理完了済み = true;
+			this.bEndProcessCompleteDone = true;
 		}
 	}
 
@@ -2196,7 +2196,7 @@ internal class OpenTaiko : Game {
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();
-		CActSelect段位リスト.RefleshSkin();
+		CActSelectDanList.RefleshSkin();
 	}
 	#endregion
 

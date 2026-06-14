@@ -481,8 +481,8 @@ public static class ImGuiDebugWindow {
 									}
 									if (song.nLevel[(int)Difficulty.Tower] != -1) {
 										ImGui.Text($"Side: {song.nSide}");
-										ImGui.Text($"Floor Count: {song.score[5]?.譜面情報.nTotalFloor.ToString() ?? "???"}");
-										ImGui.Text($"Life: {song.score[5]?.譜面情報.nLife.ToString() ?? "?"}");
+										ImGui.Text($"Floor Count: {song.score[5]?.ChartInfo.nTotalFloor.ToString() ?? "???"}");
+										ImGui.Text($"Life: {song.score[5]?.ChartInfo.nLife.ToString() ?? "?"}");
 									}
 									ImGui.TreePop();
 								}
@@ -582,7 +582,7 @@ public static class ImGuiDebugWindow {
 									ImGui.SeparatorText("Tower Mode");
 									ImGui.Text("Side: " + dtx.SIDE);
 									ImGui.Text("Life: " + dtx.LIFE);
-									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].譜面情報.nTotalFloor);
+									ImGui.Text("Floor Count: " + OpenTaiko.SongMount.rCurrentlySelectedSong.score[5].ChartInfo.nTotalFloor);
 									break;
 								default:
 									ImGui.SeparatorText(OpenTaiko.ConfigIni.nGameType[i] == EGameType.Konga ? "Konga Mode" : "Taiko Mode");
@@ -599,14 +599,14 @@ public static class ImGuiDebugWindow {
 								$"Difficulty: {game_difficulty} {dtx.PlayerSideMetadata.LEVELtaiko}{levelIcon}");
 							ImGui.Text($"Auto Play: " + OpenTaiko.ConfigIni.bAutoPlay[i]);
 
-							var db現在時刻ms = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-							double play_time = dtx.TjaTimeToRawTjaTimeNote(db現在時刻ms);
+							var dbCurrentTimems = dtx.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+							double play_time = dtx.TjaTimeToRawTjaTimeNote(dbCurrentTimems);
 							var play_bpm_points = new[] {
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eNormal),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
-								CStage演奏画面共通.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eNormal),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
+								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
 							};
-							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStage演奏画面共通.GetNowPBMTime(bp, play_time)).ToArray();
+							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStagePlayScreenCommon.GetNowPBMTime(bp, play_time)).ToArray();
 							for (int ib = 0; ib < 3; ++ib) {
 								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib] / 4:0.00} 16ths\n"
 									+ $" {play_bpm_points[ib]}\n");
@@ -623,7 +623,7 @@ public static class ImGuiDebugWindow {
 							if (dtx.listBPM.Count > 1) {
 								if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
 									foreach (CTja.CBPM bpm in dtx.listBPM) {
-										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPM値}");
+										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPMValue}");
 									}
 									ImGui.TreePop();
 								}
@@ -635,9 +635,9 @@ public static class ImGuiDebugWindow {
 
 							ImGui.Text("Note Count: ");
 							ImGui.Indent();
-							ImGui.Text("Normal: " + dtx.nノーツ数_Branch[0] +
-									   " / Expert: " + dtx.nノーツ数_Branch[1] +
-									   " / Master: " + dtx.nノーツ数_Branch[2]);
+							ImGui.Text("Normal: " + dtx.nNotesCount_Branch[0] +
+									   " / Expert: " + dtx.nNotesCount_Branch[1] +
+									   " / Master: " + dtx.nNotesCount_Branch[2]);
 							ImGui.Unindent();
 
 

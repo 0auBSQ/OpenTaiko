@@ -24,10 +24,10 @@ internal class CActSelectShowCurrentPosition : CActivity {
 		string pathScrollBar = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_scrollbar.png");
 		string pathScrollPosition = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_scrollbar.png");
 		if (File.Exists(pathScrollBar)) {
-			this.txScrollBar = OpenTaiko.tテクスチャの生成(pathScrollBar, false);
+			this.txScrollBar = OpenTaiko.tTextureCreate(pathScrollBar, false);
 		}
 		if (File.Exists(pathScrollPosition)) {
-			this.txScrollPosition = OpenTaiko.tテクスチャの生成(pathScrollPosition, false);
+			this.txScrollPosition = OpenTaiko.tTextureCreate(pathScrollPosition, false);
 		}
 		base.CreateManagedResource();
 	}

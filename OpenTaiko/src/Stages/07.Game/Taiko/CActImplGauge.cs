@@ -4,7 +4,7 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CActImplGauge : CAct演奏ゲージ共通 {
+internal class CActImplGauge : CActPlayGaugeCommon {
 	// コンストラクタ
 	/// <summary>
 	/// ゲージの描画クラス。ドラム側。
@@ -21,13 +21,13 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 	public override void Start(NotesManager.ENoteType nLane, EGameType gameType, ENoteJudge judge, int player) {
 		for (int j = 0; j < 32; j++) {
 			if (player == 0) {
-				if (!this.st花火状態[player][j].b使用中) {
-					this.st花火状態[player][j].ct進行 = new CCounter(0, 10, 20, OpenTaiko.Timer);
-					this.st花火状態[player][j].nPlayer = player;
-					this.st花火状態[player][j].nLane = nLane;
-					this.st花火状態[player][j].gameType = gameType;
-					this.st花火状態[player][j].isBig = NotesManager.IsBigNoteTaiko(nLane, gameType) || NotesManager.IsBigRollTaiko(nLane, gameType) || NotesManager.IsBalloon(nLane);
-					this.st花火状態[player][j].b使用中 = true;
+				if (!this.stFireworkState[player][j].bUse) {
+					this.stFireworkState[player][j].ctProgress = new CCounter(0, 10, 20, OpenTaiko.Timer);
+					this.stFireworkState[player][j].nPlayer = player;
+					this.stFireworkState[player][j].nLane = nLane;
+					this.stFireworkState[player][j].gameType = gameType;
+					this.stFireworkState[player][j].isBig = NotesManager.IsBigNoteTaiko(nLane, gameType) || NotesManager.IsBigRollTaiko(nLane, gameType) || NotesManager.IsBalloon(nLane);
+					this.stFireworkState[player][j].bUse = true;
 					break;
 				}
 			}
@@ -37,19 +37,19 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 	// CActivity 実装
 
 	public override void Activate() {
-		this.ct炎 = new CCounter(0, 6, 50, OpenTaiko.Timer);
+		this.ctFlame = new CCounter(0, 6, 50, OpenTaiko.Timer);
 
 		for (int player = 0; player < 5; player++) {
 			for (int i = 0; i < 32; i++) {
-				this.st花火状態[player][i].ct進行 = new CCounter();
+				this.stFireworkState[player][i].ctProgress = new CCounter();
 			}
 		}
 
 		if (OpenTaiko.Skin.Game_Gauge_Rainbow_Timer <= 1) {
 			throw new DivideByZeroException("SkinConfigの設定\"Game_Gauge_Rainbow_Timer\"を1以下にすることは出来ません。");
 		}
-		this.ct虹アニメ = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn - 1, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer, OpenTaiko.Timer);
-		this.ct虹透明度 = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
+		this.ctRainbowAnime = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn - 1, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer, OpenTaiko.Timer);
+		this.ctRainbowOpacity = new CCounter(0, OpenTaiko.Skin.Game_Gauge_Rainbow_Timer - 1, 1, OpenTaiko.Timer);
 		this.ctGaugeFlash = new CCounter(0, 532, 1, OpenTaiko.Timer);
 
 		base.Activate();
@@ -57,12 +57,12 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 	public override void DeActivate() {
 		for (int player = 0; player < 5; player++) {
 			for (int i = 0; i < 32; i++) {
-				this.st花火状態[player][i].ct進行 = null;
+				this.stFireworkState[player][i].ctProgress = null;
 			}
 		}
-		this.ct炎 = null;
+		this.ctFlame = null;
 
-		this.ct虹アニメ = null;
+		this.ctRainbowAnime = null;
 	}
 	public override void CreateManagedResource() {
 		//this.tx音符 = CDTXMania.tテクスチャの生成(CSkin.Path(@"Graphics\7_taiko_notes.png"));
@@ -85,14 +85,14 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 			int nWidth = (OpenTaiko.Skin.Game_Gauge_Rect[2] / 50);
 			int[] nRectX = new int[] {
-				(int)( this.db現在のゲージ値[ 0 ] / 2 ) * nWidth,
-				(int)( this.db現在のゲージ値[ 1 ] / 2 ) * nWidth,
-				(int)( this.db現在のゲージ値[ 2 ] / 2 ) * nWidth,
-				(int)( this.db現在のゲージ値[ 3 ] / 2 ) * nWidth,
-				(int)( this.db現在のゲージ値[ 4 ] / 2 ) * nWidth
+				(int)( this.dbCurrentGaugeValue[ 0 ] / 2 ) * nWidth,
+				(int)( this.dbCurrentGaugeValue[ 1 ] / 2 ) * nWidth,
+				(int)( this.dbCurrentGaugeValue[ 2 ] / 2 ) * nWidth,
+				(int)( this.dbCurrentGaugeValue[ 3 ] / 2 ) * nWidth,
+				(int)( this.dbCurrentGaugeValue[ 4 ] / 2 ) * nWidth
 			};
-			int 虹ベース = ct虹アニメ.CurrentValue + 1;
-			if (虹ベース == ct虹アニメ.EndValue + 1) 虹ベース = 0;
+			int RainbowBase = ctRainbowAnime.CurrentValue + 1;
+			if (RainbowBase == ctRainbowAnime.EndValue + 1) RainbowBase = 0;
 			/*
 
             新虹ゲージの仕様  2018/08/10 ろみゅ～？
@@ -121,13 +121,13 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 				else if (this.ctGaugeFlash.CurrentValue <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.CurrentValue - 448) / 83f * 255f);
 
 				// Rainbow gauge
-				this.ct虹アニメ.TickLoop();
-				this.ct虹透明度.TickLoop();
-				int rainbowFrame = this.ct虹アニメ.CurrentValue;
+				this.ctRainbowAnime.TickLoop();
+				this.ctRainbowOpacity.TickLoop();
+				int rainbowFrame = this.ctRainbowAnime.CurrentValue;
 
 				// Soul fire frame
-				this.ct炎.TickLoop();
-				int soulFireFrame = this.ct炎.CurrentValue;
+				this.ctFlame.TickLoop();
+				int soulFireFrame = this.ctFlame.CurrentValue;
 
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) continue;
@@ -161,10 +161,10 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 					if (OpenTaiko.P1IsBlue()) {
-						OpenTaiko.Tx.Gauge_Dan[4]?.t2D描画(gauge_x[0], gauge_y[0],
+						OpenTaiko.Tx.Gauge_Dan[4]?.t2DDraw(gauge_x[0], gauge_y[0],
 							new Rectangle(OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 					} else {
-						OpenTaiko.Tx.Gauge_Dan[0]?.t2D描画(gauge_x[0], gauge_y[0],
+						OpenTaiko.Tx.Gauge_Dan[0]?.t2DDraw(gauge_x[0], gauge_y[0],
 							new Rectangle(OpenTaiko.Skin.Game_Gauge_Rect[0], OpenTaiko.Skin.Game_Gauge_Rect[1], OpenTaiko.Skin.Game_Gauge_Rect[2], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 					}
 
@@ -177,7 +177,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 									OpenTaiko.TJA.Dan_C[i];
 
 								if (dan_c.ExamType == Exam.Type.Gauge) {
-									OpenTaiko.Tx.Gauge_Dan[2].t2D描画(gauge_x[0] + (dan_c.GetValue()[0] / 2 * nWidth), gauge_y[0],
+									OpenTaiko.Tx.Gauge_Dan[2].t2DDraw(gauge_x[0] + (dan_c.GetValue()[0] / 2 * nWidth), gauge_y[0],
 										new Rectangle((dan_c.GetValue()[0] / 2 * nWidth), 0, OpenTaiko.Skin.Game_Gauge_Rect[2] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 								}
 							}
@@ -202,25 +202,25 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 					if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
 						if (OpenTaiko.P1IsBlue())
-							OpenTaiko.Tx.Gauge_Dan[5]?.t2D描画(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
+							OpenTaiko.Tx.Gauge_Dan[5]?.t2DDraw(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 						else
-							OpenTaiko.Tx.Gauge_Dan[1]?.t2D描画(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
+							OpenTaiko.Tx.Gauge_Dan[1]?.t2DDraw(x, y, new Rectangle(0, 0, nRectX[0], OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 						for (int i = 0; i < OpenTaiko.TJA.Dan_C.Length; i++) {
 							Dan_C dan_c = OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] != null ?
 								OpenTaiko.TJA.List_DanSongs[OpenTaiko.stageGameScreen.actDan.NowCymbolShowingNumber].Dan_C[i] :
 								OpenTaiko.TJA.Dan_C[i];
 
-							if (dan_c != null && dan_c.ExamType == Exam.Type.Gauge && db現在のゲージ値[0] >= dan_c.GetValue()[0]) {
+							if (dan_c != null && dan_c.ExamType == Exam.Type.Gauge && dbCurrentGaugeValue[0] >= dan_c.GetValue()[0]) {
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = 255;
-								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x + (dan_c.GetValue()[0] / 2 * nWidth), y, new Rectangle(dan_c.GetValue()[0] / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
+								OpenTaiko.Tx.Gauge_Dan[3]?.t2DDraw(x + (dan_c.GetValue()[0] / 2 * nWidth), y, new Rectangle(dan_c.GetValue()[0] / 2 * nWidth, 0, nRectX[0] - (dan_c.GetValue()[0] / 2 * nWidth), OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								int Opacity = 0;
 								if (this.ctGaugeFlash.CurrentValue <= 365) Opacity = 0;
 								else if (this.ctGaugeFlash.CurrentValue <= 448) Opacity = (int)((this.ctGaugeFlash.CurrentValue - 365) / 83f * 255f);
 								else if (this.ctGaugeFlash.CurrentValue <= 531) Opacity = 255 - (int)((this.ctGaugeFlash.CurrentValue - 448) / 83f * 255f);
 								OpenTaiko.Tx.Gauge_Dan[3].Opacity = Opacity;
-								OpenTaiko.Tx.Gauge_Dan[3]?.t2D描画(x, y, new Rectangle(0, 0, dan_c.GetValue()[0] / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
+								OpenTaiko.Tx.Gauge_Dan[3]?.t2DDraw(x, y, new Rectangle(0, 0, dan_c.GetValue()[0] / 2 * nWidth, OpenTaiko.Skin.Game_Gauge_Rect[3]));
 
 								break;
 							}
@@ -230,33 +230,33 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 
 					#region [Rainbow]
 
-					if (this.db現在のゲージ値[0] >= 100.0) {
-						this.ct虹アニメ.TickLoop();
-						this.ct虹透明度.TickLoop();
-						if (OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue] != null) {
-							OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.X = scale;
-							OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].vcScaleRatio.Y = scale;
+					if (this.dbCurrentGaugeValue[0] >= 100.0) {
+						this.ctRainbowAnime.TickLoop();
+						this.ctRainbowOpacity.TickLoop();
+						if (OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue] != null) {
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.X = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].vcScaleRatio.Y = scale;
 
-							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.X = scale;
-							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].vcScaleRatio.Y = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].vcScaleRatio.X = scale;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].vcScaleRatio.Y = scale;
 
 							bool smart = OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan;
 
 
-							OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].Opacity = 255;
-							OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].Opacity = 255;
+							OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
 								new RectangleF(0,
 									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-									OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Width,
-									smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ct虹アニメ.CurrentValue].szTextureSize.Height));
+									OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[this.ctRainbowAnime.CurrentValue].szTextureSize.Height));
 
 
-							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].Opacity = (ct虹透明度.CurrentValue * 255 / (int)ct虹透明度.EndValue) / 1;
-							OpenTaiko.Tx.Gauge_Rainbow[虹ベース].t2D描画(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].Opacity = (ctRainbowOpacity.CurrentValue * 255 / (int)ctRainbowOpacity.EndValue) / 1;
+							OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].t2DDraw(x, y + (smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0),
 								new RectangleF(0,
 									smart ? (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : 0,
-									OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Width,
-									smart ? OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[虹ベース].szTextureSize.Height));
+									OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Width,
+									smart ? OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Height - (OpenTaiko.Skin.Game_Gauge_Rect[3] / 2) : OpenTaiko.Tx.Gauge_Rainbow[RainbowBase].szTextureSize.Height));
 						}
 					}
 
@@ -267,7 +267,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 						OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.X = scale;
 						OpenTaiko.Tx.Gauge_Line[0].vcScaleRatio.Y = scale;
 
-						OpenTaiko.Tx.Gauge_Line[0].t2D描画(x, y);
+						OpenTaiko.Tx.Gauge_Line[0].t2DDraw(x, y);
 					}
 
 				}
@@ -300,13 +300,13 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 							}
 						}
 
-						if (this.db現在のゲージ値[i] >= 100.0) {
-							this.ct炎.TickLoop();
+						if (this.dbCurrentGaugeValue[i] >= 100.0) {
+							this.ctFlame.TickLoop();
 
 							OpenTaiko.Tx.Gauge_Soul_Fire.vcScaleRatio.X = scale;
 							OpenTaiko.Tx.Gauge_Soul_Fire.vcScaleRatio.Y = scale;
 
-							OpenTaiko.Tx.Gauge_Soul_Fire.t2D描画(x, y, new Rectangle(soulfire_width * (this.ct炎.CurrentValue), 0, soulfire_width, soulfire_height));
+							OpenTaiko.Tx.Gauge_Soul_Fire.t2DDraw(x, y, new Rectangle(soulfire_width * (this.ctFlame.CurrentValue), 0, soulfire_width, soulfire_height));
 						}
 					}
 				}
@@ -337,10 +337,10 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 						OpenTaiko.Tx.Gauge_Soul.vcScaleRatio.X = scale;
 						OpenTaiko.Tx.Gauge_Soul.vcScaleRatio.Y = scale;
 
-						if (this.db現在のゲージ値[i] >= 80.0) {
-							OpenTaiko.Tx.Gauge_Soul.t2D描画(x, y, new Rectangle(0, 0, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
+						if (this.dbCurrentGaugeValue[i] >= 80.0) {
+							OpenTaiko.Tx.Gauge_Soul.t2DDraw(x, y, new Rectangle(0, 0, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
 						} else {
-							OpenTaiko.Tx.Gauge_Soul.t2D描画(x, y, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
+							OpenTaiko.Tx.Gauge_Soul.t2DDraw(x, y, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
 						}
 					}
 				}
@@ -355,11 +355,11 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 			int[] nSoulExplosion = new int[] { 73, 468, 0, 0 };
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				for (int d = 0; d < 32; d++) {
-					if (this.st花火状態[i][d].b使用中) {
-						this.st花火状態[i][d].ct進行.Tick();
-						if (this.st花火状態[i][d].ct進行.IsEnded) {
-							this.st花火状態[i][d].ct進行.Stop();
-							this.st花火状態[i][d].b使用中 = false;
+					if (this.stFireworkState[i][d].bUse) {
+						this.stFireworkState[i][d].ctProgress.Tick();
+						if (this.stFireworkState[i][d].ctProgress.IsEnded) {
+							this.stFireworkState[i][d].ctProgress.Stop();
+							this.stFireworkState[i][d].bUse = false;
 						}
 
 
@@ -378,7 +378,7 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 	//-----------------
 	private CCounter ctGaugeFlash;
 
-	protected STSTATUS[][] st花火状態 = new STSTATUS[5][] {
+	protected STSTATUS[][] stFireworkState = new STSTATUS[5][] {
 		new STSTATUS[ 32 ],
 		new STSTATUS[ 32 ],
 		new STSTATUS[ 32 ],
@@ -387,9 +387,9 @@ internal class CActImplGauge : CAct演奏ゲージ共通 {
 	};
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
-		public CCounter ct進行;
+		public CCounter ctProgress;
 		public bool isBig;
-		public bool b使用中;
+		public bool bUse;
 		public int nPlayer;
 		public NotesManager.ENoteType nLane;
 		public EGameType gameType;

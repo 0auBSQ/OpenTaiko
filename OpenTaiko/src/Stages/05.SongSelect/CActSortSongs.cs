@@ -22,43 +22,43 @@ internal class CActSortSongs : CActSelectPopupMenu {
 	}
 
 	// メソッド
-	public void tActivatePopupMenu(EInstrumentPad einst, ref CActSelect曲リスト ca) {
+	public void tActivatePopupMenu(EInstrumentPad einst, ref CActSelectSongList ca) {
 		this.act曲リスト = ca;
 		base.tActivatePopupMenu(einst);
 	}
 
-	public override void tEnter押下Main(int nSortOrder) {
+	public override void tEnterPressedMain(int nSortOrder) {
 		nSortOrder *= 2;    // 0,1  => -1, 1
 		nSortOrder -= 1;
-		switch ((EOrder)n現在の選択行) {
+		switch ((EOrder)nCurrentSelectedLine) {
 			case EOrder.Path:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortByPath, nSortOrder
+					CSongManager.tSongListSortByPath, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Title:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortByTitle, nSortOrder
+					CSongManager.tSongListSortByTitle, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Subtitle:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortBySubtitle, nSortOrder
+					CSongManager.tSongListSortBySubtitle, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 			case EOrder.Level:
 				this.act曲リスト.t曲リストのソート(
-					CSongs管理.tSongListSortByLevel, nSortOrder
+					CSongManager.tSongListSortByLevel, nSortOrder
 				);
 				this.act曲リスト.t選択曲が変更された(true);
 				break;
 #if TEST_SORTBGM
 						case (int) ESortItem.BPM:
 						this.act曲リスト.t曲リストのソート(
-							CSongs管理.t曲リストのソート9_BPM順, eInst, nSortOrder,
+							CSongManager.t曲リストのソート9_BPM順, eInst, nSortOrder,
 							this.act曲リスト.n現在のアンカ難易度レベル
 						);
 					this.act曲リスト.t選択曲が変更された(true);
@@ -83,7 +83,7 @@ internal class CActSortSongs : CActSelectPopupMenu {
 	#region [ private ]
 	//-----------------
 
-	private CActSelect曲リスト act曲リスト;
+	private CActSelectSongList act曲リスト;
 
 	private enum EOrder : int {
 		Path = 0,

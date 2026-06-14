@@ -8,34 +8,34 @@ namespace OpenTaiko;
 internal class CItemBase {
 	// Properties
 
-	public EPanelType eパネル種別;
+	public EPanelType ePanelType;
 	public enum EPanelType {
 		Normal,
 		Other
 	}
 
-	public E種別 e種別;
-	public enum E種別 {
-		基本形,
-		ONorOFFトグル,
-		ONorOFFor不定スリーステート,
-		整数,
-		リスト,
-		切替リスト
+	public EType eType;
+	public enum EType {
+		BasicForm,
+		ONorOFFToggle,
+		ONorOFForIndeterminateThreeState,
+		Int,
+		List,
+		SwitchList
 	}
 
-	public string str項目名;
+	public string strItemName;
 	public string strName {
 		get {
-			return str項目名;
+			return strItemName;
 
 		}
 	}
 
-	public string str説明文;
+	public string strDescriptionText;
 	public string strDescription {
 		get {
-			return str説明文;
+			return strDescriptionText;
 
 		}
 	}
@@ -44,71 +44,71 @@ internal class CItemBase {
 	// Constructor
 
 	public CItemBase() {
-		this.str項目名 = "";
-		this.str説明文 = "";
+		this.strItemName = "";
+		this.strDescriptionText = "";
 	}
-	public CItemBase(string str項目名)
+	public CItemBase(string strItemName)
 		: this() {
-		this.t初期化(str項目名);
+		this.tInitialize(strItemName);
 	}
-	public CItemBase(string str項目名, string str説明文jp)
+	public CItemBase(string strItemName, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, str説明文jp);
+		this.tInitialize(strItemName, strDescriptionjp);
 	}
-	public CItemBase(string str項目名, string str説明文jp, string str説明文en)
+	public CItemBase(string strItemName, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, strDescriptionjp, strDescriptionen);
 	}
 
-	public CItemBase(string str項目名, EPanelType eパネル種別)
+	public CItemBase(string strItemName, EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, eパネル種別);
+		this.tInitialize(strItemName, ePanelType);
 	}
-	public CItemBase(string str項目名, EPanelType eパネル種別, string str説明文jp)
+	public CItemBase(string strItemName, EPanelType ePanelType, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, str説明文jp);
+		this.tInitialize(strItemName, ePanelType, strDescriptionjp);
 	}
-	public CItemBase(string str項目名, EPanelType eパネル種別, string str説明文jp, string str説明文en)
+	public CItemBase(string strItemName, EPanelType ePanelType, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionen);
 	}
 
 
 	// メソッド；子クラスで実装する
 
-	public virtual void tEnter押下() {
+	public virtual void tEnterPressed() {
 	}
-	public virtual void t項目値を次へ移動() {
+	public virtual void tItemValueNextMove() {
 	}
-	public virtual void t項目値を前へ移動() {
+	public virtual void tItemValuePrevMove() {
 	}
-	public virtual void t初期化(string str項目名) {
-		this.t初期化(str項目名, EPanelType.Normal);
+	public virtual void tInitialize(string strItemName) {
+		this.tInitialize(strItemName, EPanelType.Normal);
 	}
-	public virtual void t初期化(string str項目名, string str説明文jp) {
-		this.t初期化(str項目名, EPanelType.Normal, str説明文jp, str説明文jp);
+	public virtual void tInitialize(string strItemName, string strDescriptionjp) {
+		this.tInitialize(strItemName, EPanelType.Normal, strDescriptionjp, strDescriptionjp);
 	}
-	public virtual void t初期化(string str項目名, string str説明文jp, string str説明文en) {
-		this.t初期化(str項目名, EPanelType.Normal, str説明文jp, str説明文en);
+	public virtual void tInitialize(string strItemName, string strDescriptionjp, string strDescriptionen) {
+		this.tInitialize(strItemName, EPanelType.Normal, strDescriptionjp, strDescriptionen);
 	}
 
-	public virtual void t初期化(string str項目名, EPanelType eパネル種別) {
-		this.t初期化(str項目名, eパネル種別, "", "");
+	public virtual void tInitialize(string strItemName, EPanelType ePanelType) {
+		this.tInitialize(strItemName, ePanelType, "", "");
 	}
-	public virtual void t初期化(string str項目名, EPanelType eパネル種別, string str説明文jp) {
-		this.t初期化(str項目名, eパネル種別, str説明文jp, str説明文jp);
+	public virtual void tInitialize(string strItemName, EPanelType ePanelType, string strDescriptionjp) {
+		this.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionjp);
 	}
-	public virtual void t初期化(string str項目名, EPanelType eパネル種別, string str説明文jp, string str説明文en) {
-		this.str項目名 = str項目名;
-		this.eパネル種別 = eパネル種別;
-		this.str説明文 = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? str説明文jp : str説明文en;
+	public virtual void tInitialize(string strItemName, EPanelType ePanelType, string strDescriptionjp, string strDescriptionen) {
+		this.strItemName = strItemName;
+		this.ePanelType = ePanelType;
+		this.strDescriptionText = (CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ja") ? strDescriptionjp : strDescriptionen;
 	}
-	public virtual object obj現在値() {
+	public virtual object objCurrentValue() {
 		return null;
 	}
 
 	public string tGetValueText() {
-		object value = obj現在値();
+		object value = objCurrentValue();
 		return value == null ? "" : value.ToString();
 	}
 	public virtual int GetIndex() {

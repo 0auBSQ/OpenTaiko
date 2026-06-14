@@ -19,7 +19,7 @@ internal class CActSelectInformation : CActivity {
 		this.n画像Index下 = 0;
 
 		this.bFirst = true;
-		this.ct進行用 = new CCounter(0, 3000, 3, OpenTaiko.Timer);
+		this.ctForProgress = new CCounter(0, 3000, 3, OpenTaiko.Timer);
 		base.Activate();
 	}
 	public override void DeActivate() {
@@ -27,15 +27,15 @@ internal class CActSelectInformation : CActivity {
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
-		this.txInfo_Back = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information_BG.png"));
-		this.txInfo[0] = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information.png"));
-		this.txInfo[1] = OpenTaiko.tテクスチャの生成(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information2.png"));
+		this.txInfo_Back = OpenTaiko.tTextureCreate(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information_BG.png"));
+		this.txInfo[0] = OpenTaiko.tTextureCreate(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information.png"));
+		this.txInfo[1] = OpenTaiko.tTextureCreate(CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}5_information2.png"));
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
-		OpenTaiko.tテクスチャの解放(ref this.txInfo_Back);
-		OpenTaiko.tテクスチャの解放(ref this.txInfo[0]);
-		OpenTaiko.tテクスチャの解放(ref this.txInfo[1]);
+		OpenTaiko.tTextureRelease(ref this.txInfo_Back);
+		OpenTaiko.tTextureRelease(ref this.txInfo[0]);
+		OpenTaiko.tTextureRelease(ref this.txInfo[1]);
 		base.ReleaseManagedResource();
 	}
 	public override int Draw() {
@@ -45,33 +45,33 @@ internal class CActSelectInformation : CActivity {
 			}
 
 			if (this.txInfo_Back != null)
-				this.txInfo_Back.t2D描画(340, 600);
+				this.txInfo_Back.t2DDraw(340, 600);
 
 
-			this.ct進行用.TickLoop();
+			this.ctForProgress.TickLoop();
 			if (this.bFirst) {
-				this.ct進行用.CurrentValue = 300;
+				this.ctForProgress.CurrentValue = 300;
 			}
 
 			#region[ 透明度制御 ]
 			if (this.txInfo[0] != null && this.txInfo[1] != null) {
-				if (this.ct進行用.CurrentValue < 255) {
-					this.txInfo[0].Opacity = this.ct進行用.CurrentValue;
-					this.txInfo[1].Opacity = 255 - this.ct進行用.CurrentValue;
-				} else if (this.ct進行用.CurrentValue >= 255 && this.ct進行用.CurrentValue < 1245) {
+				if (this.ctForProgress.CurrentValue < 255) {
+					this.txInfo[0].Opacity = this.ctForProgress.CurrentValue;
+					this.txInfo[1].Opacity = 255 - this.ctForProgress.CurrentValue;
+				} else if (this.ctForProgress.CurrentValue >= 255 && this.ctForProgress.CurrentValue < 1245) {
 					this.bFirst = false;
 					this.txInfo[0].Opacity = 255;
 					this.txInfo[1].Opacity = 0;
-				} else if (this.ct進行用.CurrentValue >= 1245 && this.ct進行用.CurrentValue < 1500) {
-					this.txInfo[0].Opacity = 255 - (this.ct進行用.CurrentValue - 1245);
-					this.txInfo[1].Opacity = this.ct進行用.CurrentValue - 1245;
-				} else if (this.ct進行用.CurrentValue >= 1500 && this.ct進行用.CurrentValue <= 3000) {
+				} else if (this.ctForProgress.CurrentValue >= 1245 && this.ctForProgress.CurrentValue < 1500) {
+					this.txInfo[0].Opacity = 255 - (this.ctForProgress.CurrentValue - 1245);
+					this.txInfo[1].Opacity = this.ctForProgress.CurrentValue - 1245;
+				} else if (this.ctForProgress.CurrentValue >= 1500 && this.ctForProgress.CurrentValue <= 3000) {
 					this.txInfo[0].Opacity = 0;
 					this.txInfo[1].Opacity = 255;
 				}
 
-				this.txInfo[0].t2D描画(340, 600);
-				this.txInfo[1].t2D描画(340, 600);
+				this.txInfo[0].t2DDraw(340, 600);
+				this.txInfo[1].t2DDraw(340, 600);
 			}
 
 			#endregion
@@ -113,7 +113,7 @@ internal class CActSelectInformation : CActivity {
 	private CTexture txInfo_Back;
 	private CTexture[] txInfo = new CTexture[2];
 	private bool bFirst;
-	private CCounter ct進行用;
+	private CCounter ctForProgress;
 	//-----------------
 	#endregion
 }

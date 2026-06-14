@@ -18,7 +18,7 @@ internal class DBSongUnlockables : CSavableT<Dictionary<string, SongUnlockable>>
 	}
 
 	public DBSongUnlockables() {
-		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}SongUnlockables.db3";
+		_fn = @$"{OpenTaiko.strEXEFolder}Databases{Path.DirectorySeparatorChar}SongUnlockables.db3";
 		using (var connection = new SqliteConnection(@$"Data Source={_fn}")) {
 			connection.Open();
 

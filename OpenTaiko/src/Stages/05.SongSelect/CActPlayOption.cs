@@ -138,7 +138,7 @@ internal class CActPlayOption : CActivity {
 
 
 
-	public int On進行描画(int nPlayers, ReadOnlySpan<bool> bOptions) {
+	public int OnProgressDraw(int nPlayers, ReadOnlySpan<bool> bOptions) {
 		if (this.IsDeActivated)
 			return 0;
 
@@ -202,20 +202,20 @@ internal class CActPlayOption : CActivity {
 			var _shift = pos == 1 ? (OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2) : 0;
 			var _rect = new Rectangle(_shift, 0, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Width / 2, OpenTaiko.Tx.Difficulty_Option.szTextureSize.Height);
 
-			OpenTaiko.Tx.Difficulty_Option.t2D描画(_shift, y, _rect);
-			OpenTaiko.Tx.Difficulty_Option_Select.t2D描画(_shift + OpenTaiko.Skin.SongSelect_Option_Select_Offset[0] + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+			OpenTaiko.Tx.Difficulty_Option.t2DDraw(_shift, y, _rect);
+			OpenTaiko.Tx.Difficulty_Option_Select.t2DDraw(_shift + OpenTaiko.Skin.SongSelect_Option_Select_Offset[0] + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[0],
 				OpenTaiko.Skin.SongSelect_Option_Select_Offset[1] + y + NowCount * OpenTaiko.Skin.SongSelect_Option_Interval[1], _rect);
 
 			for (int i = 0; i < OptionType.Length; i++) {
-				OptionType[i].t2D描画(OpenTaiko.Skin.SongSelect_Option_OptionType_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+				OptionType[i].t2DDraw(OpenTaiko.Skin.SongSelect_Option_OptionType_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
 					OpenTaiko.Skin.SongSelect_Option_OptionType_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
-			txModMults[0]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults1_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
-			txModMults[1]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults2_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
+			txModMults[0]?.t2DScaledDraw(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults1_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults1_Y[pos] + y);
+			txModMults[1]?.t2DScaledDraw(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_ModMults2_X[pos], OpenTaiko.Skin.SongSelect_Option_ModMults2_Y[pos] + y);
 
 			for (int i = 0; i < _textures.Length; i++) {
-				_textures[i]?.t2D拡大率考慮描画(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_Value_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
+				_textures[i]?.t2DScaledDraw(CTexture.RefPnt.Up, OpenTaiko.Skin.SongSelect_Option_Value_X[pos] + i * OpenTaiko.Skin.SongSelect_Option_Interval[0],
 					OpenTaiko.Skin.SongSelect_Option_Value_Y[pos] + y + i * OpenTaiko.Skin.SongSelect_Option_Interval[1]);
 			}
 
@@ -378,9 +378,9 @@ internal class CActPlayOption : CActivity {
 
 	public CTexture[] txModMults = new CTexture[2];
 
-	public CTexture OptionTypeTx(string str文字, Color forecolor, Color backcolor) {
-		using (var bmp = OptionFont.DrawText(str文字, forecolor, backcolor, null, 30)) {
-			return OpenTaiko.tテクスチャの生成(bmp);
+	public CTexture OptionTypeTx(string strText, Color forecolor, Color backcolor) {
+		using (var bmp = OptionFont.DrawText(strText, forecolor, backcolor, null, 30)) {
+			return OpenTaiko.tTextureCreate(bmp);
 		}
 	}
 

@@ -13,7 +13,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool bShowRoll;
 	public bool bBranch = false;
 	public double dbChipSizeRatio = 1.0;
-	public double db実数値;
+	public double dbDoubleValue;
 	public double dbBPM;
 	public float fNow_Measure_s = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public float fNow_Measure_m = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
@@ -57,28 +57,28 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int VideoStartTimeMs;
 	public int nHorizontalChipDistance;
 	public int nVerticalChipDistance;
-	public int n整数値;
-	public int n文字数 = 16;
+	public int nIntValue;
+	public int nTextCount = 16;
 
-	public int n整数値_内部番号;
+	public int nIntValue_InternalNumber;
 	public int nOpacity = 255;
-	public int n発声位置;
+	public int nSoundPos;
 	public double nBranchCondition1_Professional;
 	public double nBranchCondition2_Master;
 	public (Exam.Type type, EBranchCondBig big) eBranchCondition;
 	public Exam.Range eBranchConditionRange;
 	public bool[] hasLevelHold = []; // [iBranch]
 
-	public double db発声位置;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
+	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
-	private int _n発声時刻ms;
-	public int n発声時刻ms { get => _n発声時刻ms; set => db発声時刻ms = _n発声時刻ms = value; }
+	private int _nSoundTimems;
+	public int nSoundTimems { get => _nSoundTimems; set => dbSoundTimems = _nSoundTimems = value; }
 
 	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
-	public double n分岐時刻ms { get => _msBorder; set => _msBorder = value; } // Branch judge chip
+	public double nBranchTimems { get => _msBorder; set => _msBorder = value; } // Branch judge chip
 	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
-	public double db発声時刻ms;
+	public double dbSoundTimems;
 
 	// for #SUDDEN
 	public bool bShowSudden;
@@ -129,7 +129,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	//
 
 
-	public bool b自動再生音チャンネルである {
+	public bool bAutoPlaySoundChannel {
 		get {
 			int num = this.nChannelNo;
 			if ((((num != 1) && ((0x61 > num) || (num > 0x69))) && ((0x70 > num) || (num > 0x79))) && ((0x80 > num) || (num > 0x89))) {
@@ -141,7 +141,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 
 
-	public bool b演奏終了後も再生が続くチップである; // #32248 2013.10.14 yyagi
+	public bool bPlayEndAfterPlaybackContinuesChip; // #32248 2013.10.14 yyagi
 	public CCounter? RollDelay; // 18.9.22 AioiLight Add 連打時に赤くなるやつのタイマー
 	public CCounter? RollInputTime; // 18.9.22 AioiLight Add  連打入力後、RollDelayが作動するまでのタイマー
 	public int RollEffectLevel; // 18.9.22 AioiLight Add 連打時に赤くなるやつの度合い
@@ -178,19 +178,19 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.start = this;
 		this.end = this;
 	}
-	public void t初期化() {
+	public void tInitialize() {
 		this.bBranch = false;
 		this.nChannelNo = 0;
-		this.n整数値 = 0; //整数値をList上の番号として用いる。
-		this.n整数値_内部番号 = 0;
-		this.db実数値 = 0.0;
-		this.n発声位置 = 0;
-		this.db発声位置 = 0.0D;
-		this.n発声時刻ms = 0;
-		this.db発声時刻ms = 0.0D;
+		this.nIntValue = 0; //整数値をList上の番号として用いる。
+		this.nIntValue_InternalNumber = 0;
+		this.dbDoubleValue = 0.0;
+		this.nSoundPos = 0;
+		this.dbSoundPos = 0.0D;
+		this.nSoundTimems = 0;
+		this.dbSoundTimems = 0.0D;
 		this.fBMSCROLLTime = 0;
 		this.nLag = int.MinValue;
-		this.b演奏終了後も再生が続くチップである = false;
+		this.bPlayEndAfterPlaybackContinuesChip = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
 		this.bHit = false;
 		this.IsMissed = false;
@@ -277,16 +277,16 @@ internal class CChip : IComparable<CChip>, ICloneable {
 				"??", "??", "??", "??", "??", "??", "??", "??",
 			};
 		return string.Format("CChip: 位置:{0:D4}.{1:D3}, 時刻{2:D6}, Ch:{3:X2}({4}), Pn:{5}({11})(内部{6}), Pd:{7}, Sz:{8}, BMScroll:{9}, Auto:{10}, コース:{11}",
-			this.n発声位置 / 384, this.n発声位置 % 384,
-			this.n発声時刻ms,
+			this.nSoundPos / 384, this.nSoundPos % 384,
+			this.nSoundTimems,
 			this.nChannelNo, chToStr[this.nChannelNo],
-			this.n整数値, this.n整数値_内部番号,
-			this.db実数値,
+			this.nIntValue, this.nIntValue_InternalNumber,
+			this.dbDoubleValue,
 			this.dbChipSizeRatio,
 			this.fBMSCROLLTime,
-			this.b自動再生音チャンネルである,
+			this.bAutoPlaySoundChannel,
 			this.nBranch,
-			CTja.tZZ(this.n整数値));
+			CTja.tZZ(this.nIntValue));
 	}
 	/// <summary>
 	/// チップの再生長を取得する。現状、WAVチップとBGAチップでのみ使用可能。
@@ -298,7 +298,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		if (this.nChannelNo == 0x01)       // WAV
 		{
 			CTja.CWAV wc;
-			OpenTaiko.TJA.listWAV.TryGetValue(this.n整数値_内部番号, out wc);
+			OpenTaiko.TJA.listWAV.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
@@ -307,7 +307,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		} else if (this.nChannelNo == 0x54) // AVI
 		{
 			CVideoDecoder wc;
-			OpenTaiko.TJA.listVD.TryGetValue(this.n整数値_内部番号, out wc);
+			OpenTaiko.TJA.listVD.TryGetValue(this.nIntValue_InternalNumber, out wc);
 			if (wc == null) {
 				nDuration = 0;
 			} else {
@@ -321,7 +321,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	#region [ IComparable 実装 ]
 	//-----------------
 
-	private static readonly byte[] n優先度 = new byte[] {
+	private static readonly byte[] nPriority = new byte[] {
 			5, 5, 3, 7, 5, 5, 5, 5, 3, 5, 5, 5, 5, 5, 5, 5, //0x00
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x10
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x20
@@ -341,14 +341,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, //0x100
 		};
 
-	public static readonly int nChannelNoMostPrior = Array.IndexOf(n優先度, n優先度.Min());
-	public static readonly int nChannelNoLeastPrior = Array.IndexOf(n優先度, n優先度.Max());
+	public static readonly int nChannelNoMostPrior = Array.IndexOf(nPriority, nPriority.Min());
+	public static readonly int nChannelNoLeastPrior = Array.IndexOf(nPriority, nPriority.Max());
 
 	public int CompareTo(CChip other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
 		// 位置が同じなら優先度で比較。
-		return (this.n発声時刻ms, this.db発声時刻ms, n優先度[this.nChannelNo], this.idxDefine)
-			.CompareTo((other.n発声時刻ms, other.db発声時刻ms, n優先度[other.nChannelNo], other.idxDefine));
+		return (this.nSoundTimems, this.dbSoundTimems, nPriority[this.nChannelNo], this.idxDefine)
+			.CompareTo((other.nSoundTimems, other.dbSoundTimems, nPriority[other.nChannelNo], other.idxDefine));
 	}
 	//-----------------
 	#endregion

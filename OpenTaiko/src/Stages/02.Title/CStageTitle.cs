@@ -68,11 +68,11 @@ internal class CStageTitle : CStage {
 			Background.Init();
 
 
-			b音声再生 = false;
+			bAudioPlayback = false;
 			if (bSaveFileLoaded == false)
 				OpenTaiko.Skin.soundEntry.tPlay();
 			if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound)
-				OpenTaiko.Skin.bgmタイトルイン.tPlay();
+				OpenTaiko.Skin.bgmTitleIn.tPlay();
 			base.Activate();
 		} finally {
 			Trace.TraceInformation("タイトルステージの活性化を完了しました。");
@@ -115,10 +115,10 @@ internal class CStageTitle : CStage {
 			//---------------------
 			if (base.IsFirstDraw) {
 				if (OpenTaiko.rPreviousStage == OpenTaiko.stageStartup) {
-					this.actFIfromSetup.tフェードイン開始();
+					this.actFIfromSetup.tFadeInStart();
 					base.ePhaseID = CStage.EPhase.Title_FadeIn;
 				} else {
-					this.actFI.tフェードイン開始();
+					this.actFI.tFadeInStart();
 					base.ePhaseID = CStage.EPhase.Common_FADEIN;
 				}
 				base.IsFirstDraw = false;
@@ -134,10 +134,10 @@ internal class CStageTitle : CStage {
 			this.ctキャライン.Tick();
 			this.ctBarMove.Tick();
 
-			if (!OpenTaiko.Skin.bgmタイトルイン.bIsPlaying) {
-				if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound && !b音声再生) {
-					OpenTaiko.Skin.bgmタイトル.tPlay();
-					b音声再生 = true;
+			if (!OpenTaiko.Skin.bgmTitleIn.bIsPlaying) {
+				if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound && !bAudioPlayback) {
+					OpenTaiko.Skin.bgmTitle.tPlay();
+					bAudioPlayback = true;
 				}
 			}
 
@@ -157,7 +157,7 @@ internal class CStageTitle : CStage {
 					} else {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						this._idNextStageForced = EReturnValue.EXIT;
-						this.actFO.tフェードアウト開始(0, 500);
+						this.actFO.tFadeOutStart(0, 500);
 						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 				}
@@ -286,7 +286,7 @@ internal class CStageTitle : CStage {
 						bool operationSucceded = false;
 
 						if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.DANGAMESTART || CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].rp == EReturnValue.TAIKOTOWERSSTART) {
-							if (OpenTaiko.Songs管理.list曲ルート_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
+							if (OpenTaiko.SongManager.listSongRoot_Dan.Count > 0 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 								operationSucceded = true;
 						} else if (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]].implemented == true
 								   && (CMainMenuTab.__Menus[usedMenus[this.n現在の選択行モード選択]]._1pRestricted == false
@@ -295,7 +295,7 @@ internal class CStageTitle : CStage {
 
 						if (operationSucceded == true) {
 							OpenTaiko.Skin.soundDecideSFX.tPlay();
-							this.actFO.tフェードアウト開始(0, 500);
+							this.actFO.tFadeOutStart(0, 500);
 							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 						} else
 							OpenTaiko.Skin.soundError.tPlay();
@@ -344,7 +344,7 @@ internal class CStageTitle : CStage {
 				#region [ Save Loading ]
 
 				if (!bSaveIsLoading) {
-					OpenTaiko.Tx.Entry_Bar.t2D描画(0, 0);
+					OpenTaiko.Tx.Entry_Bar.t2DDraw(0, 0);
 
 					if (this.ctコインイン待機.CurrentValue <= 255)
 						OpenTaiko.Tx.Entry_Bar_Text.Opacity = this.ctコインイン待機.CurrentValue;
@@ -353,8 +353,8 @@ internal class CStageTitle : CStage {
 					else
 						OpenTaiko.Tx.Entry_Bar_Text.Opacity = 255 - (this.ctコインイン待機.CurrentValue - (2000 - 355));
 
-					OpenTaiko.Tx.Entry_Bar_Text.t2D描画(OpenTaiko.Skin.Title_Entry_Bar_Text_X[0], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[0], new RectangleF(0, 0, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Width, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
-					OpenTaiko.Tx.Entry_Bar_Text.t2D描画(OpenTaiko.Skin.Title_Entry_Bar_Text_X[1], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[1], new RectangleF(0, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Width, OpenTaiko.Tx.Entry_Bar_Text.sz画像サイズ.Height / 2));
+					OpenTaiko.Tx.Entry_Bar_Text.t2DDraw(OpenTaiko.Skin.Title_Entry_Bar_Text_X[0], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[0], new RectangleF(0, 0, OpenTaiko.Tx.Entry_Bar_Text.szImageSize.Width, OpenTaiko.Tx.Entry_Bar_Text.szImageSize.Height / 2));
+					OpenTaiko.Tx.Entry_Bar_Text.t2DDraw(OpenTaiko.Skin.Title_Entry_Bar_Text_X[1], OpenTaiko.Skin.Title_Entry_Bar_Text_Y[1], new RectangleF(0, OpenTaiko.Tx.Entry_Bar_Text.szImageSize.Height / 2, OpenTaiko.Tx.Entry_Bar_Text.szImageSize.Width, OpenTaiko.Tx.Entry_Bar_Text.szImageSize.Height / 2));
 				} else {
 					if (this.ctSaveLoaded.CurrentValue <= 1000 && this.ctSaveLoadingFailed.CurrentValue <= 1128) {
 						if (bSaveIsLoading) {
@@ -362,14 +362,14 @@ internal class CStageTitle : CStage {
 
 							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
 								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+									OpenTaiko.Tx.Tile_Black.t2DDraw(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 
 							OpenTaiko.Tx.Banapas_Load[0].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue * 2;
 							OpenTaiko.Tx.Banapas_Load[0].vcScaleRatio.Y = ctSaveLoaded.CurrentValue <= 100 ? ctSaveLoaded.CurrentValue * 0.01f : 1.0f;
-							OpenTaiko.Tx.Banapas_Load[0].t2D描画(0, 0);
+							OpenTaiko.Tx.Banapas_Load[0].t2DDraw(0, 0);
 
 							OpenTaiko.Tx.Banapas_Load[1].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue <= 96 ? (int)((ctSaveLoaded.CurrentValue - 96) * 7.96875f) : 255;
-							OpenTaiko.Tx.Banapas_Load[1].t2D描画(0, 0);
+							OpenTaiko.Tx.Banapas_Load[1].t2DDraw(0, 0);
 
 							if (OpenTaiko.Tx.Banapas_Load[2] != null) {
 								int step = OpenTaiko.Tx.Banapas_Load[2].szTextureSize.Width / OpenTaiko.Skin.Title_LoadingPinFrameCount;
@@ -380,7 +380,7 @@ internal class CStageTitle : CStage {
 									OpenTaiko.Tx.Banapas_Load[2].Opacity = ctSaveLoaded.CurrentValue >= 872 ? 255 - (ctSaveLoaded.CurrentValue - 872) * 2 : ctSaveLoaded.CurrentValue <= 96 ? (int)((ctSaveLoaded.CurrentValue - 96) * 7.96875f) : 255;
 
 
-									OpenTaiko.Tx.Banapas_Load[2].t2D拡大率考慮中央基準描画(
+									OpenTaiko.Tx.Banapas_Load[2].t2DScaledCenterBasedDraw(
 										OpenTaiko.Skin.Title_LoadingPinBase[0] + OpenTaiko.Skin.Title_LoadingPinDiff[0] * i,
 										OpenTaiko.Skin.Title_LoadingPinBase[1] + OpenTaiko.Skin.Title_LoadingPinDiff[1] * i,
 										new Rectangle(step
@@ -402,7 +402,7 @@ internal class CStageTitle : CStage {
 
 							for (int i = 0; i < OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tile_Black.szTextureSize.Width + 1; i++)
 								for (int j = 0; j < OpenTaiko.Skin.Resolution[1] / OpenTaiko.Tx.Tile_Black.szTextureSize.Height + 1; j++)
-									OpenTaiko.Tx.Tile_Black.t2D描画(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
+									OpenTaiko.Tx.Tile_Black.t2DDraw(i * OpenTaiko.Tx.Tile_Black.szTextureSize.Width, j * OpenTaiko.Tx.Tile_Black.szTextureSize.Height);
 
 							if (!OpenTaiko.Skin.SoundBanapas.bPlayed)
 								OpenTaiko.Skin.SoundBanapas.tPlay();
@@ -410,7 +410,7 @@ internal class CStageTitle : CStage {
 							int count = this.ctSaveLoaded.CurrentValue - 1000;
 							OpenTaiko.Tx.Banapas_Load_Clear[0].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
 							OpenTaiko.Tx.Banapas_Load_Clear[0].vcScaleRatio.Y = count <= 100 ? count * 0.01f : 1.0f;
-							OpenTaiko.Tx.Banapas_Load_Clear[0].t2D描画(0, 0);
+							OpenTaiko.Tx.Banapas_Load_Clear[0].t2DDraw(0, 0);
 
 							float anime = 0f;
 							float scalex = 0f;
@@ -438,7 +438,7 @@ internal class CStageTitle : CStage {
 							OpenTaiko.Tx.Banapas_Load_Clear[1].vcScaleRatio.X = 1.0f + scalex;
 							OpenTaiko.Tx.Banapas_Load_Clear[1].vcScaleRatio.Y = 1.0f + scaley;
 							OpenTaiko.Tx.Banapas_Load_Clear[1].Opacity = count >= 1872 ? 255 - (count - 1872) * 2 : count * 2;
-							OpenTaiko.Tx.Banapas_Load_Clear[1].t2D拡大率考慮下中心基準描画(OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[0], OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[1] - anime);
+							OpenTaiko.Tx.Banapas_Load_Clear[1].t2DScaledBottomCenterBasedDraw(OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[0], OpenTaiko.Skin.Title_Banapas_Load_Clear_Anime[1] - anime);
 
 							if (ctSaveLoaded.CurrentValue >= 2000) {
 								bプレイヤーエントリー = true;
@@ -473,7 +473,7 @@ internal class CStageTitle : CStage {
 
 				//Chara_Entry[this.ctキャラエントリーループ.n現在の値].Opacity = alpha;
 
-				OpenTaiko.Tx.Entry_Player[0].t2D描画(0, 0);
+				OpenTaiko.Tx.Entry_Player[0].t2DDraw(0, 0);
 
 				//Chara_Entry[this.ctキャラエントリーループ.n現在の値].t2D描画(485, 140);
 
@@ -507,10 +507,10 @@ internal class CStageTitle : CStage {
 
 
 				//this.PuchiChara.On進行描画(485 + 100, 140 + 190, false, alpha);
-				this.PuchiChara.On進行描画(puchi_x, puchi_y, false, alpha);
+				this.PuchiChara.OnProgressDraw(puchi_x, puchi_y, false, alpha);
 
 				OpenTaiko.Tx.Entry_Player[2].Opacity = ctエントリーバー決定点滅.CurrentValue >= 800 ? 255 - (ctエントリーバー決定点滅.CurrentValue - 800) : (this.ctSaveLoaded.CurrentValue - 3400) - (this.ctエントリーバー点滅.CurrentValue <= 255 ? this.ctエントリーバー点滅.CurrentValue : 255 - (this.ctエントリーバー点滅.CurrentValue - 255));
-				OpenTaiko.Tx.Entry_Player[2].t2D描画(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+				OpenTaiko.Tx.Entry_Player[2].t2DDraw(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
 					new RectangleF(OpenTaiko.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[0][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
@@ -518,14 +518,14 @@ internal class CStageTitle : CStage {
 					));
 
 				OpenTaiko.Tx.Entry_Player[2].Opacity = alpha;
-				OpenTaiko.Tx.Entry_Player[2].t2D描画(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+				OpenTaiko.Tx.Entry_Player[2].t2DDraw(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
 					new RectangleF(OpenTaiko.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[1][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][3]
 					));
 
-				OpenTaiko.Tx.Entry_Player[1].t2D描画(0, 0);
+				OpenTaiko.Tx.Entry_Player[1].t2DDraw(0, 0);
 
 				#region [ 透明度 ]
 
@@ -547,7 +547,7 @@ internal class CStageTitle : CStage {
 				#endregion
 
 				OpenTaiko.Tx.Entry_Player[2].Opacity = Opacity;
-				OpenTaiko.Tx.Entry_Player[2].t2D描画(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
+				OpenTaiko.Tx.Entry_Player[2].t2DDraw(OpenTaiko.Skin.Title_Entry_Player_Select_X[n現在の選択行プレイヤーエントリー], OpenTaiko.Skin.Title_Entry_Player_Select_Y[n現在の選択行プレイヤーエントリー],
 					new RectangleF(OpenTaiko.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][0],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][1],
 						OpenTaiko.Skin.Title_Entry_Player_Select_Rect[2][n現在の選択行プレイヤーエントリー == 1 ? 1 : 0][2],
@@ -595,7 +595,7 @@ internal class CStageTitle : CStage {
 					//int puchi_x = TJAPlayer3.Skin.Characters_Menu_X[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_X[player];
 					//int puchi_y = TJAPlayer3.Skin.Characters_Menu_Y[_charaId][player] + TJAPlayer3.Skin.Adjustments_MenuPuchichara_Y[player];
 
-					this.PuchiChara.On進行描画(puchi_x, puchi_y, false, player: player);
+					this.PuchiChara.OnProgressDraw(puchi_x, puchi_y, false, player: player);
 				}
 
 				#endregion
@@ -656,13 +656,13 @@ internal class CStageTitle : CStage {
 								_bar.Opacity = 255;
 								_bar.vcScaleRatio.X = 1.0f;
 								_bar.vcScaleRatio.Y = 1.0f;
-								_bar.t2D描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[0] - (OpenTaiko.Skin.Title_VerticalBar ? barAnimeX : 0),
+								_bar.t2DDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[0] - (OpenTaiko.Skin.Title_VerticalBar ? barAnimeX : 0),
 									OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Y[0] - (OpenTaiko.Skin.Title_VerticalBar ? 0 : barAnime),
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[0][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[0][1],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[0][2],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[0][3]));
-								_bar.t2D描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[1] + (OpenTaiko.Skin.Title_VerticalBar ? barAnimeX : 0),
+								_bar.t2DDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[1] + (OpenTaiko.Skin.Title_VerticalBar ? barAnimeX : 0),
 									OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Y[1] + (OpenTaiko.Skin.Title_VerticalBar ? 0 : barAnime),
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[1][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[1][1],
@@ -675,7 +675,7 @@ internal class CStageTitle : CStage {
 									_bar.vcScaleRatio.Y = (barAnime / OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][3]) * 2.0f;
 								}
 
-								_bar.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[2], OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Y[2],
+								_bar.t2DScaledCenterBasedDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_X[2], OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Y[2],
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][1],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Rect[2][2],
@@ -688,12 +688,12 @@ internal class CStageTitle : CStage {
 
 								_overlap.vcScaleRatio.X = 1.0f;
 								_overlap.vcScaleRatio.Y = 1.0f;
-								_overlap.t2D描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[0], OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Y[0],
+								_overlap.t2DDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[0], OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Y[0],
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][1],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][2],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[0][3]));
-								_overlap.t2D描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[1] + (OpenTaiko.Skin.Title_VerticalBar ? overlayAnimeX : 0),
+								_overlap.t2DDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[1] + (OpenTaiko.Skin.Title_VerticalBar ? overlayAnimeX : 0),
 									OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Y[1] + (OpenTaiko.Skin.Title_VerticalBar ? 0 : overlayAnime),
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[1][1],
@@ -706,7 +706,7 @@ internal class CStageTitle : CStage {
 									_overlap.vcScaleRatio.Y = (overlayAnime / OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][3]);
 								}
 
-								_overlap.t2D拡大率考慮上中央基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[2], OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Y[2],
+								_overlap.t2DScaledTopCenterBasedDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_X[2], OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Y[2],
 									new Rectangle(OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][0],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][1],
 										OpenTaiko.Skin.Title_ModeSelect_Bar_Overlay_Rect[2][2],
@@ -726,20 +726,20 @@ internal class CStageTitle : CStage {
 
 							if (_chara != null) {
 								_chara.Opacity = (int)(BarAnimeCount * 255f) + (int)(barAnimef * 2.5f);
-								_chara.t2D中心基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_X[0] - anime, OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Y[0],
+								_chara.t2DCenterBasedDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_X[0] - anime, OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Y[0],
 									new Rectangle(0, 0, _chara.szTextureSize.Width / 2, _chara.szTextureSize.Height));
-								_chara.t2D中心基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_X[1] + anime, OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Y[1],
+								_chara.t2DCenterBasedDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_X[1] + anime, OpenTaiko.Skin.Title_ModeSelect_Bar_Chara_Y[1],
 									new Rectangle(_chara.szTextureSize.Width / 2, 0, _chara.szTextureSize.Width / 2, _chara.szTextureSize.Height));
 							}
 
-							TitleTextureKey.ResolveTitleTexture(_menu.ttkTitle, OpenTaiko.Skin.Title_VerticalText)?.t2D中心基準描画(
+							TitleTextureKey.ResolveTitleTexture(_menu.ttkTitle, OpenTaiko.Skin.Title_VerticalText)?.t2DCenterBasedDraw(
 								OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title[0] + (OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title_Move_X * BarAnimeCount),
 								OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title[1] - (OpenTaiko.Skin.Title_ModeSelect_Bar_Center_Title_Move * BarAnimeCount));
 
 							CTexture currentText = TitleTextureKey.ResolveTitleTexture(_menu.ttkBoxText, OpenTaiko.Skin.Title_VerticalText, true);
 							if (currentText != null) {
 								currentText.Opacity = (int)(BarAnimeCount * 255f);
-								currentText?.t2D中心基準描画(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[0], OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[1]);
+								currentText?.t2DCenterBasedDraw(OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[0], OpenTaiko.Skin.Title_ModeSelect_Bar_Center_BoxText[1]);
 							}
 
 						} else {
@@ -772,7 +772,7 @@ internal class CStageTitle : CStage {
 							if (_bar != null) {
 								_bar.vcScaleRatio.X = 1.0f;
 								_bar.vcScaleRatio.Y = 1.0f;
-								_bar.t2D描画(pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
+								_bar.t2DDraw(pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 							}
 
 							if (OpenTaiko.Tx.ModeSelect_Bar[CMainMenuTab.__MenuCount] != null) {
@@ -780,12 +780,12 @@ internal class CStageTitle : CStage {
 
 								_overlap.vcScaleRatio.X = 1.0f;
 								_overlap.vcScaleRatio.Y = 1.0f;
-								_overlap.t2D描画(pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
+								_overlap.t2DDraw(pos.X + BarAnimeX - BarMoveX, pos.Y + BarAnimeY - BarMoveY);
 							}
 
 
 
-							TitleTextureKey.ResolveTitleTexture(_menu.ttkTitle, OpenTaiko.Skin.Title_VerticalText)?.t2D中心基準描画(pos.X + BarAnimeX - BarMoveX + OpenTaiko.Skin.Title_ModeSelect_Title_Offset[0], pos.Y + BarAnimeY - BarMoveY + OpenTaiko.Skin.Title_ModeSelect_Title_Offset[1]);
+							TitleTextureKey.ResolveTitleTexture(_menu.ttkTitle, OpenTaiko.Skin.Title_VerticalText)?.t2DCenterBasedDraw(pos.X + BarAnimeX - BarMoveX + OpenTaiko.Skin.Title_ModeSelect_Title_Offset[0], pos.Y + BarAnimeY - BarMoveY + OpenTaiko.Skin.Title_ModeSelect_Title_Offset[1]);
 						}
 					}
 				}
@@ -831,8 +831,8 @@ internal class CStageTitle : CStage {
 
 				case CStage.EPhase.Common_FADEOUT:
 					if (this.actFO.Draw() == 0) {
-						OpenTaiko.Skin.bgmタイトル.tStop();
-						OpenTaiko.Skin.bgmタイトルイン.tStop();
+						OpenTaiko.Skin.bgmTitle.tStop();
+						OpenTaiko.Skin.bgmTitleIn.tStop();
 						break;
 					}
 					base.ePhaseID = CStage.EPhase.Common_EXIT;
@@ -984,7 +984,7 @@ internal class CStageTitle : CStage {
 		return new Point(posX, posY);
 	}
 
-	private bool b音声再生;
+	private bool bAudioPlayback;
 	private CActFIFOBlack actFI;
 	private CActFIFOBlack actFIfromSetup;
 	private CActFIFOBlack actFO;

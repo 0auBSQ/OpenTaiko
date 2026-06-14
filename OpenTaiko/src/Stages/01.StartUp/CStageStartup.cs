@@ -3,15 +3,15 @@ using FDK;
 
 namespace OpenTaiko;
 
-internal class CStage起動 : CStage {
+internal class CStageStartup : CStage {
 	// Constructor
 
-	public CStage起動() {
+	public CStageStartup() {
 		base.eStageID = CStage.EStage.StartUp;
 		base.IsDeActivated = true;
 	}
 
-	public List<string> list進行文字列;
+	public List<string> listProgressString;
 
 	// CStage 実装
 
@@ -24,18 +24,18 @@ internal class CStage起動 : CStage {
 
 			if (OpenTaiko.ConfigIsNew) {
 				langSelectFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.StartUp_LangSelect_FontSize);
-				langSelectTitle = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
+				langSelectTitle = OpenTaiko.tTextureCreate(langSelectFont.DrawText("Select Language:", System.Drawing.Color.White));
 				langList = new CTexture[CLangManager.Languages.Length];
 				langListHighlighted = new CTexture[CLangManager.Languages.Length];
 
 				for (int i = 0; i < langList.Length; i++) {
-					langList[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
-					langListHighlighted[i] = OpenTaiko.tテクスチャの生成(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
+					langList[i] = OpenTaiko.tTextureCreate(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.White));
+					langListHighlighted[i] = OpenTaiko.tTextureCreate(langSelectFont.DrawText(CLangManager.Languages[i], System.Drawing.Color.Red));
 				}
 				langSelectOffset = new int[2] { GameWindowSize.Width / 2, (GameWindowSize.Height - langList.Select(tex => tex.szTextureSize.Height).Sum() - langSelectTitle.szTextureSize.Height) / 2 };
 			}
 
-			this.list進行文字列 = new List<string>();
+			this.listProgressString = new List<string>();
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			base.Activate();
 			Trace.TraceInformation("起動ステージの活性化を完了しました。");
@@ -58,7 +58,7 @@ internal class CStage起動 : CStage {
 				}
 			}
 
-			this.list進行文字列 = null;
+			this.listProgressString = null;
 			if (es != null) {
 				if ((es.thDTXFileEnumerate != null) && es.thDTXFileEnumerate.IsAlive) {
 					Trace.TraceWarning("リスト構築スレッドを強制停止します。");
@@ -81,15 +81,15 @@ internal class CStage起動 : CStage {
 	public override int Draw() {
 		if (!base.IsDeActivated) {
 			if (base.IsFirstDraw) {
-				this.list進行文字列.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums");
-				this.list進行文字列.Add("Product by.kairera0467");
-				this.list進行文字列.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
+				this.listProgressString.Add("DTXManiaXG Ver.K powered by YAMAHA Silent Session Drums");
+				this.listProgressString.Add("Product by.kairera0467");
+				this.listProgressString.Add("Release: " + OpenTaiko.VERSION + " [" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "]");
 
-				this.list進行文字列.Add("");
-				this.list進行文字列.Add("TJAPlayer3-Develop-ReWrite forked TJAPlayer3(@aioilight)");
-				this.list進行文字列.Add("OpenTaiko forked TJAPlayer3-Develop-ReWrite(@TouhouRenren)");
-				this.list進行文字列.Add("OpenTaiko edited by 0AuBSQ");
-				this.list進行文字列.Add("");
+				this.listProgressString.Add("");
+				this.listProgressString.Add("TJAPlayer3-Develop-ReWrite forked TJAPlayer3(@aioilight)");
+				this.listProgressString.Add("OpenTaiko forked TJAPlayer3-Develop-ReWrite(@TouhouRenren)");
+				this.listProgressString.Add("OpenTaiko edited by 0AuBSQ");
+				this.listProgressString.Add("");
 
 				es = new CEnumSongs();
 				es.StartEnumFromCache();                                        // 曲リスト取得(別スレッドで実行される)
@@ -102,59 +102,59 @@ internal class CStage起動 : CStage {
 			Background.Update();
 			Background.Draw();
 
-			#region [ this.str現在進行中 の決定 ]
+			#region [ this.strCurrentProgress の決定 ]
 			//-----------------
 			switch (base.ePhaseID) {
 				case CStage.EPhase.Startup_0_CreateSystemSound:
-					this.str現在進行中 = "SYSTEM SOUND...";
+					this.strCurrentProgress = "SYSTEM SOUND...";
 					break;
 
 				case CStage.EPhase.Startup_1_InitializeSonglist:
-					this.str現在進行中 = "SONG LIST...";
+					this.strCurrentProgress = "SONG LIST...";
 					break;
 
 				case CStage.EPhase.Startup_2_EnumerateSongs:
-					this.str現在進行中 = string.Format("{0} ... {1}", "Enumerating songs", es.Songs管理.n検索されたスコア数);
+					this.strCurrentProgress = string.Format("{0} ... {1}", "Enumerating songs", es.SongManager.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_3_ApplyScoreCache:
-					this.str現在進行中 = string.Format("{0} ... {1}/{2}", "Loading score properties from songs.db", es.Songs管理.nスコアキャッシュから反映できたスコア数, es.Songs管理.n検索されたスコア数);
+					this.strCurrentProgress = string.Format("{0} ... {1}/{2}", "Loading score properties from songs.db", es.SongManager.nScoresAppliedFromScoreCache, es.SongManager.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem:
-					this.str現在進行中 = string.Format("{0} ... {1}/{2}", "Loading score properties from files", es.Songs管理.nファイルから反映できたスコア数, es.Songs管理.n検索されたスコア数 - es.Songs管理.nスコアキャッシュから反映できたスコア数);
+					this.strCurrentProgress = string.Format("{0} ... {1}/{2}", "Loading score properties from files", es.SongManager.nScoresAppliedFromFile, es.SongManager.nSearchScoreCount - es.SongManager.nScoresAppliedFromScoreCache);
 					break;
 
 				case CStage.EPhase.Startup_5_PostProcessSonglist:
-					this.str現在進行中 = string.Format("{0} ... ", "Building songlists");
+					this.strCurrentProgress = string.Format("{0} ... ", "Building songlists");
 					break;
 
 				case CStage.EPhase.Startup_6_LoadTextures:
 					if (!bIsLoadingTextures) {
 						void loadTexture() {
-							this.list進行文字列.Add("LOADING TEXTURES...");
+							this.listProgressString.Add("LOADING TEXTURES...");
 
 							try {
 								OpenTaiko.Tx.LoadTexture();
 
-								this.list進行文字列.Add("LOADING TEXTURES...OK");
-								this.str現在進行中 = "Setup done.";
+								this.listProgressString.Add("LOADING TEXTURES...OK");
+								this.strCurrentProgress = "Setup done.";
 								this.ePhaseID = EPhase.Startup_Complete;
-								OpenTaiko.Skin.bgm起動画面.tStop();
+								OpenTaiko.Skin.bgmStartupScreen.tStop();
 							} catch (Exception exception) {
-								OpenTaiko.Skin.bgm起動画面.tStop();
+								OpenTaiko.Skin.bgmStartupScreen.tStop();
 
 								Trace.TraceError(exception.ToString());
-								this.list進行文字列.Add("LOADING TEXTURES...NG");
+								this.listProgressString.Add("LOADING TEXTURES...NG");
 								foreach (var text in exception.ToString().Split('\n')) {
-									this.list進行文字列.Add(text);
+									this.listProgressString.Add(text);
 								}
 							}
 
-							this.list進行文字列.Add("LOADING TEXTURES...OK");
-							this.str現在進行中 = "Setup done.";
+							this.listProgressString.Add("LOADING TEXTURES...OK");
+							this.strCurrentProgress = "Setup done.";
 							this.ePhaseID = EPhase.Startup_Complete;
-							OpenTaiko.Skin.bgm起動画面.tStop();
+							OpenTaiko.Skin.bgmStartupScreen.tStop();
 						}
 						if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
 							Task.Run(loadTexture);
@@ -169,13 +169,13 @@ internal class CStage起動 : CStage {
 			#endregion
 
 			if (ePhaseID != EPhase.Startup_Complete) {
-				#region [ this.list進行文字列＋this.現在進行中 の表示 ]
+				#region [ this.listProgressString＋this.現在進行中 の表示 ]
 				//-----------------
 				int x = (int)(320 * OpenTaiko.Skin.Resolution[0] / 1280.0);
 				int y = (int)(20 * OpenTaiko.Skin.Resolution[1] / 720.0);
 				int dy = (int)((OpenTaiko.actTextConsole.fontHeight + 8) * OpenTaiko.Skin.Resolution[1] / 720.0);
-				for (int i = 0; i < this.list進行文字列.Count; i++) {
-					y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.list進行文字列[i]).y;
+				for (int i = 0; i < this.listProgressString.Count; i++) {
+					y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.listProgressString[i]).y;
 					y += dy;
 				}
 				//-----------------
@@ -187,14 +187,14 @@ internal class CStage起動 : CStage {
 				int x = langSelectOffset[0];
 				int y = langSelectOffset[1];
 
-				langSelectTitle.t2D中心基準描画(x, y);
+				langSelectTitle.t2DCenterBasedDraw(x, y);
 				y += langSelectTitle.szTextureSize.Height;
 
 				for (int i = 0; i < langList.Length; i++) {
 					if (i == langSelectIndex)
-						langListHighlighted[i].t2D中心基準描画(x, y);
+						langListHighlighted[i].t2DCenterBasedDraw(x, y);
 					else
-						langList[i].t2D中心基準描画(x, y);
+						langList[i].t2DCenterBasedDraw(x, y);
 
 					y += langList[i].szTextureSize.Height;
 				}
@@ -212,7 +212,7 @@ internal class CStage起動 : CStage {
 			} else {
 				if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
 				{
-					OpenTaiko.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
+					OpenTaiko.SongManager = (es != null) ? es.SongManager : null;      // 最後に、曲リストを拾い上げる
 
 					return 1;
 				}
@@ -227,7 +227,7 @@ internal class CStage起動 : CStage {
 
 	#region [ private ]
 	//-----------------
-	private string str現在進行中 = "";
+	private string strCurrentProgress = "";
 	private ScriptBG Background;
 	private CEnumSongs es;
 	private bool bIsLoadingTextures;
@@ -249,8 +249,8 @@ internal class CStage起動 : CStage {
 			// すべてのファイルアクセスは「絶対パス」で行うこと。(2010.9.16)
 
 			DateTime now = DateTime.Now;
-			string strPathSongsDB = CDTXMania.strEXEのあるフォルダ + "songs.db";
-			string strPathSongList = CDTXMania.strEXEのあるフォルダ + "songlist.db";
+			string strPathSongsDB = CDTXMania.strEXEFolder + "songs.db";
+			string strPathSongList = CDTXMania.strEXEFolder + "songlist.db";
 
 			try
 			{
@@ -265,32 +265,32 @@ internal class CStage起動 : CStage {
 				{
 					for( int i = 0; i < CDTXMania.Skin.nシステムサウンド数; i++ )
 					{
-						CSkin.Cシステムサウンド cシステムサウンド = CDTXMania.Skin[ i ];
-						if( !CDTXMania.bコンパクトモード || cシステムサウンド.bCompact対象 )
+						CSkin.Cシステムサウンド cSystemSound = CDTXMania.Skin[ i ];
+						if( !CDTXMania.bコンパクトモード || cSystemSound.bCompactTarget )
 						{
 							try
 							{
-								cシステムサウンド.t読み込み();
-								Trace.TraceInformation( "システムサウンドを読み込みました。({0})", new object[] { cシステムサウンド.strファイル名 } );
-								if( ( cシステムサウンド == CDTXMania.Skin.bgm起動画面 ) && cシステムサウンド.b読み込み成功 )
+								cSystemSound.tLoad();
+								Trace.TraceInformation( "システムサウンドを読み込みました。({0})", new object[] { cSystemSound.strFileName } );
+								if( ( cSystemSound == CDTXMania.Skin.bgmStartupScreen ) && cSystemSound.b読み込み成功 )
 								{
-									cシステムサウンド.t再生する();
+									cSystemSound.t再生する();
 								}
 							}
 							catch( FileNotFoundException )
 							{
-								Trace.TraceWarning( "システムサウンドが存在しません。({0})", new object[] { cシステムサウンド.strファイル名 } );
+								Trace.TraceWarning( "システムサウンドが存在しません。({0})", new object[] { cSystemSound.strFileName } );
 							}
 							catch( Exception exception )
 							{
 								Trace.TraceError( exception.Message );
-								Trace.TraceWarning( "システムサウンドの読み込みに失敗しました。({0})", new object[] { cシステムサウンド.strファイル名 } );
+								Trace.TraceWarning( "システムサウンドの読み込みに失敗しました。({0})", new object[] { cSystemSound.strFileName } );
 							}
 						}
 					}
-					lock( this.list進行文字列 )
+					lock( this.listProgressString )
 					{
-						this.list進行文字列.Add( "Loading system sounds ... OK " );
+						this.listProgressString.Add( "Loading system sounds ... OK " );
 					}
 				}
 				finally
@@ -319,26 +319,26 @@ internal class CStage起動 : CStage {
 					{
 						try
 						{
-							CDTXMania.Songs管理.tSongListDBを読み込む( strPathSongList );
+							CDTXMania.SongManager.tSongListDBを読み込む( strPathSongList );
 						}
 						catch
 						{
 							Trace.TraceError( "songlist.db の読み込みに失敗しました。" );
 						}
 
-						int scores = ( CDTXMania.Songs管理 == null ) ? 0 : CDTXMania.Songs管理.n検索されたスコア数;		// 読み込み途中でアプリ終了した場合など、CDTXMania.Songs管理 がnullの場合があるので注意
+						int scores = ( CDTXMania.SongManager == null ) ? 0 : CDTXMania.SongManager.nSearchScoreCount;		// 読み込み途中でアプリ終了した場合など、CDTXMania.Songs管理 がnullの場合があるので注意
 						Trace.TraceInformation( "songlist.db の読み込みを完了しました。[{0}スコア]", scores );
-						lock ( this.list進行文字列 )
+						lock ( this.listProgressString )
 						{
-							this.list進行文字列.Add( "Loading songlist.db ... OK" );
+							this.listProgressString.Add( "Loading songlist.db ... OK" );
 						}
 					}
 					else
 					{
 						Trace.TraceInformation( "初回の起動であるかまたはDTXManiaのバージョンが上がったため、songlist.db の読み込みをスキップします。" );
-						lock ( this.list進行文字列 )
+						lock ( this.listProgressString )
 						{
-							this.list進行文字列.Add( "Loading songlist.db ... Skip" );
+							this.listProgressString.Add( "Loading songlist.db ... Skip" );
 						}
 					}
 				}
@@ -362,26 +362,26 @@ internal class CStage起動 : CStage {
 					{
 						try
 						{
-							CDTXMania.Songs管理.tSongsDBを読み込む( strPathSongsDB );
+							CDTXMania.SongManager.tSongsDBを読み込む( strPathSongsDB );
 						}
 						catch
 						{
 							Trace.TraceError( "songs.db の読み込みに失敗しました。" );
 						}
 
-						int scores = ( CDTXMania.Songs管理 == null ) ? 0 : CDTXMania.Songs管理.nSongsDBから取得できたスコア数;	// 読み込み途中でアプリ終了した場合など、CDTXMania.Songs管理 がnullの場合があるので注意
+						int scores = ( CDTXMania.SongManager == null ) ? 0 : CDTXMania.SongManager.nSongsDBから取得できたスコア数;	// 読み込み途中でアプリ終了した場合など、CDTXMania.Songs管理 がnullの場合があるので注意
 						Trace.TraceInformation( "songs.db の読み込みを完了しました。[{0}スコア]", scores );
-						lock ( this.list進行文字列 )
+						lock ( this.listProgressString )
 						{
-							this.list進行文字列.Add( "Loading songs.db ... OK" );
+							this.listProgressString.Add( "Loading songs.db ... OK" );
 						}
 					}
 					else
 					{
 						Trace.TraceInformation( "初回の起動であるかまたはDTXManiaのバージョンが上がったため、songs.db の読み込みをスキップします。" );
-						lock ( this.list進行文字列 )
+						lock ( this.listProgressString )
 						{
-							this.list進行文字列.Add( "Loading songs.db ... Skip" );
+							this.listProgressString.Add( "Loading songs.db ... Skip" );
 						}
 					}
 				}

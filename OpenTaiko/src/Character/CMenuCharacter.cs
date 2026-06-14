@@ -254,12 +254,12 @@ class CMenuCharacter {
 			float _y = y + (OpenTaiko.Skin.Characters_Menu_Offset[_charaId][1] * _tex.vcScaleRatio.Y);
 
 			if (player % 2 == 0) {
-				_tex.t2D拡大率考慮下中心基準描画(
+				_tex.t2DScaledBottomCenterBasedDraw(
 					_x,
 					_y // 312
 				);
 			} else {
-				_tex.t2D拡大率考慮下中心基準描画Mirrored(
+				_tex.t2DScaledBottomCenterBasedDrawMirrored(
 					_x,
 					_y // 312
 				);

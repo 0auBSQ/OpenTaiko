@@ -6,7 +6,7 @@ namespace OpenTaiko;
 internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲リストを取得するクラス
 {                                                   // ファイルキャッシュ(songslist.db)からの取得と、ディスクからの取得を、この一つのクラスに集約。
 
-	public CSongs管理 Songs管理                     // 曲の探索結果はこのSongs管理に読み込まれる
+	public CSongManager SongManager                     // 曲の探索結果はこのSongs管理に読み込まれる
 	{
 		get;
 		private set;
@@ -40,15 +40,15 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	}
 	public void SongListEnumCompletelyDone() {
 		this.state = DTXEnumState.CompletelyDone;
-		this.Songs管理 = null;                        // GCはOSに任せる
+		this.SongManager = null;                        // GCはOSに任せる
 	}
 	public bool IsSlowdown                          // #PREMOVIE再生中は検索負荷を落とす
 	{
 		get {
-			return this.Songs管理.bIsSlowdown;
+			return this.SongManager.bIsSlowdown;
 		}
 		set {
-			this.Songs管理.bIsSlowdown = value;
+			this.SongManager.bIsSlowdown = value;
 		}
 	}
 
@@ -57,8 +57,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			this.thDTXFileEnumerate.Priority = tp;
 		}
 	}
-	private readonly string strPathSongsDB = OpenTaiko.strEXEのあるフォルダ + "songs.db";
-	private readonly string strPathSongList = OpenTaiko.strEXEのあるフォルダ + "songlist.db";
+	private readonly string strPathSongsDB = OpenTaiko.strEXEFolder + "songs.db";
+	private readonly string strPathSongList = OpenTaiko.strEXEFolder + "songlist.db";
 
 	public Thread thDTXFileEnumerate {
 		get;
@@ -79,7 +79,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// Constractor
 	/// </summary>
 	public CEnumSongs() {
-		this.Songs管理 = new CSongs管理();
+		this.SongManager = new CSongManager();
 	}
 
 	public void Init() {
@@ -112,9 +112,9 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			}
 			// this.autoReset = new AutoResetEvent( true );
 
-			if (this.Songs管理 == null)       // Enumerating Songs完了後、CONFIG画面から再スキャンしたときにこうなる
+			if (this.SongManager == null)       // Enumerating Songs完了後、CONFIG画面から再スキャンしたときにこうなる
 			{
-				this.Songs管理 = new CSongs管理();
+				this.SongManager = new CSongManager();
 			}
 			if (hard_reload)
 				this.thDTXFileEnumerate = new Thread(new ThreadStart(this.HardReloadSongList));
@@ -141,7 +141,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		if (this.state != DTXEnumState.CompletelyDone &&
 			((thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.Background)) != 0)) {
 			// this.thDTXFileEnumerate.Suspend();		// obsoleteにつき使用中止
-			this.Songs管理.bIsSuspending = true;
+			this.SongManager.bIsSuspending = true;
 			this.state = DTXEnumState.Suspended;
 			Trace.TraceInformation("★曲データ検索スレッドを中断しました。");
 		}
@@ -155,8 +155,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			if ((this.thDTXFileEnumerate.ThreadState & (System.Threading.ThreadState.WaitSleepJoin | System.Threading.ThreadState.StopRequested)) != 0) //
 			{
 				// this.thDTXFileEnumerate.Resume();	// obsoleteにつき使用中止
-				this.Songs管理.bIsSuspending = false;
-				this.Songs管理.AutoReset.Set();
+				this.SongManager.bIsSuspending = false;
+				this.SongManager.AutoReset.Set();
 				this.state = DTXEnumState.Ongoing;
 				Trace.TraceInformation("★曲データ検索スレッドを再開しました。");
 			}
@@ -185,7 +185,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	public void Abort() {
 		if (thDTXFileEnumerate != null) {
-			this.Songs管理.bIsCanceled = true;
+			this.SongManager.bIsCanceled = true;
 			this.state = DTXEnumState.Canceled;
 			try {
 				thDTXFileEnumerate.Join();
@@ -197,7 +197,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 			// Songs管理を再初期化する (途中まで作った曲リストの最後に、一から重複して追記することにならないようにする。)
 			thDTXFileEnumerate = null;
-			this.Songs管理 = new CSongs管理();
+			this.SongManager = new CSongManager();
 			this.state = DTXEnumState.None;
 		}
 	}
@@ -223,30 +223,30 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			Trace.Indent();
 
 			try {
-				OpenTaiko.Skin.bgm起動画面.tPlay();
+				OpenTaiko.Skin.bgmStartupScreen.tPlay();
 				for (int i = 0; i < OpenTaiko.Skin.nシステムサウンド数; i++) {
 					if (!OpenTaiko.Skin[i].bExclusive) // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
 					{
-						CSkin.CSystemSound cシステムサウンド = OpenTaiko.Skin[i];
-						if (cシステムサウンド.bCompact対象) {
+						CSkin.CSystemSound cSystemSound = OpenTaiko.Skin[i];
+						if (cSystemSound.bCompactTarget) {
 							try {
-								cシステムサウンド.tLoading();
-								Trace.TraceInformation("システムサウンドを読み込みました。({0})", cシステムサウンド.strFileName);
-								//if ( ( cシステムサウンド == CDTXMania.Skin.bgm起動画面 ) && cシステムサウンド.b読み込み成功 )
+								cSystemSound.tLoading();
+								Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
+								//if ( ( cSystemSound == CDTXMania.Skin.bgmStartupScreen ) && cSystemSound.b読み込み成功 )
 								//{
-								//	cシステムサウンド.t再生する();
+								//	cSystemSound.t再生する();
 								//}
 							} catch (FileNotFoundException) {
-								Trace.TraceWarning("システムサウンドが存在しません。({0})", cシステムサウンド.strFileName);
+								Trace.TraceWarning("システムサウンドが存在しません。({0})", cSystemSound.strFileName);
 							} catch (Exception e) {
 								Trace.TraceWarning(e.ToString());
-								Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cシステムサウンド.strFileName);
+								Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cSystemSound.strFileName);
 							}
 						}
 					}
 				}
-				lock (OpenTaiko.stageStartup.list進行文字列) {
-					OpenTaiko.stageStartup.list進行文字列.Add("SYSTEM SOUND...OK");
+				lock (OpenTaiko.stageStartup.listProgressString) {
+					OpenTaiko.stageStartup.listProgressString.Add("SYSTEM SOUND...OK");
 				}
 			} finally {
 				Trace.Unindent();
@@ -280,8 +280,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 		try {
 			if (hard_reload) {
-				if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db"))
-					File.Delete($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
+				if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db"))
+					File.Delete($"{OpenTaiko.strEXEFolder}songlist.db");
 			}
 			Deserialize();
 
@@ -301,7 +301,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 						foreach (string str in strArray) {
 							string path = str;
 							if (!Path.IsPathRooted(path)) {
-								path = OpenTaiko.strEXEのあるフォルダ + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
+								path = OpenTaiko.strEXEFolder + str;  // 相対パスの場合、絶対パスに直す(2010.9.16)
 							}
 
 							if (!string.IsNullOrEmpty(path)) {
@@ -309,7 +309,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 								Trace.Indent();
 
 								try {
-									this.Songs管理.t曲を検索してリストを作成する(path, true);
+									this.SongManager.tSongSearchListCreate(path, true);
 								} catch (OperationCanceledException) {
 									throw; // forward cancellation
 								} catch (Exception e) {
@@ -325,7 +325,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 					Trace.TraceWarning("曲データの検索パス(TJAPath)の指定がありません。");
 				}
 			} finally {
-				Trace.TraceInformation("曲データの検索を完了しました。[{0}曲{1}スコア]", this.Songs管理.n検索された曲ノード数, this.Songs管理.n検索されたスコア数);
+				Trace.TraceInformation("曲データの検索を完了しました。[{0}曲{1}スコア]", this.SongManager.nSearchSongNodeCount, this.SongManager.nSearchScoreCount);
 				Trace.Unindent();
 			}
 			//	lock ( this.list進行文字列 )
@@ -374,7 +374,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			Trace.Indent();
 
 			try {
-				this.Songs管理.tSongListPostprocessing();
+				this.SongManager.tSongListPostprocessing();
 			} catch (OperationCanceledException) {
 				throw; // forward cancellation
 			} catch (Exception e) {
@@ -426,8 +426,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// </summary>
 	private void SerializeSongList() {
 		BinaryFormatter songlistdb_ = new BinaryFormatter();
-		using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-		songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
+		using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEFolder}songlist.db");
+		songlistdb_.Serialize(songlistdb, SongManager.listSongsDB);
 	}
 
 	/// <summary>
@@ -437,13 +437,13 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// <param name="strPathSongList"></param>
 	public void Deserialize() {
 		try {
-			if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db")) {
+			if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db")) {
 				BinaryFormatter songlistdb_ = new BinaryFormatter();
-				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-				this.Songs管理.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
+				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEFolder}songlist.db");
+				this.SongManager.listSongsDB = (Dictionary<string, CSongListNode>)songlistdb_.Deserialize(songlistdb);
 			}
 		} catch (Exception exception) {
-			this.Songs管理.listSongsDB = new();
+			this.SongManager.listSongsDB = new();
 		} finally {
 		}
 	}

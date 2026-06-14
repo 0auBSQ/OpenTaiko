@@ -72,7 +72,7 @@ class CActSelectDanInfo : CStage {
 				}
 
 				int pos = i % 3;
-				CActSelect段位リスト.tDisplayDanIcon(i + 1, OpenTaiko.Skin.SongSelect_DanInfo_Icon_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Icon_Y[pos], opacity, OpenTaiko.Skin.SongSelect_DanInfo_Icon_Scale, false);
+				CActSelectDanList.tDisplayDanIcon(i + 1, OpenTaiko.Skin.SongSelect_DanInfo_Icon_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Icon_Y[pos], opacity, OpenTaiko.Skin.SongSelect_DanInfo_Icon_Scale, false);
 
 				int difficulty_cymbol_width = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Width / 5;
 				int difficulty_cymbol_height = OpenTaiko.Tx.Dani_Difficulty_Cymbol.szTextureSize.Height;
@@ -80,7 +80,7 @@ class CActSelectDanInfo : CStage {
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = opacity;
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Scale;
-				OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2D拡大率考慮中央基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Y[pos], new Rectangle(dan.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+				OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2DScaledCenterBasedDraw(OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Difficulty_Cymbol_Y[pos], new Rectangle(dan.Difficulty * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.X = 1;
 				OpenTaiko.Tx.Dani_Difficulty_Cymbol.vcScaleRatio.Y = 1;
@@ -90,7 +90,7 @@ class CActSelectDanInfo : CStage {
 				OpenTaiko.Tx.Dani_Level_Number.Opacity = 255;
 
 				TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).Opacity = opacity;
-				TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).t2D描画(OpenTaiko.Skin.SongSelect_DanInfo_Title_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Title_Y[pos]);
+				TitleTextureKey.ResolveTitleTexture(ttkTitles[i]).t2DDraw(OpenTaiko.Skin.SongSelect_DanInfo_Title_X[pos], OpenTaiko.Skin.SongSelect_DanInfo_Title_Y[pos]);
 
 
 			}
@@ -100,7 +100,7 @@ class CActSelectDanInfo : CStage {
 				Dan_C danc0 = OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[0].Dan_C[j];
 
 				if (danc0 != null) {
-					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.ExamType]).t2D中心基準描画(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
+					TitleTextureKey.ResolveTitleTexture(this.ttkExams[(int)danc0.ExamType]).t2DCenterBasedDraw(OpenTaiko.Skin.SongSelect_DanInfo_Exam_X[index], OpenTaiko.Skin.SongSelect_DanInfo_Exam_Y[index]);
 				}
 
 				if (OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs[OpenTaiko.SongMount.rCurrentlySelectedSong.DanSongs.Count - 1].Dan_C[j] == null) {

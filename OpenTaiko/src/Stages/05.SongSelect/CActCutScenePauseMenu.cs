@@ -11,7 +11,7 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 	}
 
 	private void CActCutScenePauseMenuMain() {
-		this.bEsc有効 = false;
+		this.bEscEnabled = false;
 		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
 		for (int nConfSet = 0; nConfSet < 2; nConfSet++) {
 			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
@@ -37,7 +37,7 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 	// メソッド
 	public override void tActivatePopupMenu(EInstrumentPad einst) {
 		this.CActCutScenePauseMenuMain();
-		CActSelectPopupMenu.b選択した = false;
+		CActSelectPopupMenu.bSelected = false;
 		base.tActivatePopupMenu(einst);
 	}
 	//public void tDeativatePopupMenu()
@@ -45,17 +45,17 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 	//	base.tDeativatePopupMenu();
 	//}
 
-	public override void tEnter押下Main(int nSortOrder) {
-		switch (n現在の選択行) {
+	public override void tEnterPressedMain(int nSortOrder) {
+		switch (nCurrentSelectedLine) {
 			case (int)EOrder.Continue:
 				OpenTaiko.stageCutScene.Resume();
-				CActSelectPopupMenu.b選択した = true;
+				CActSelectPopupMenu.bSelected = true;
 				this.tDeativatePopupMenu();
 				break;
 
 			case (int)EOrder.Skip:
 				OpenTaiko.stageCutScene.Skip();
-				CActSelectPopupMenu.b選択した = true;
+				CActSelectPopupMenu.bSelected = true;
 				this.tDeativatePopupMenu();
 				break;
 			default:
@@ -76,16 +76,16 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 		base.DeActivate();
 	}
 	public override void CreateManagedResource() {
-		string pathパネル本体 = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
-		if (File.Exists(pathパネル本体)) {
-			this.txパネル本体 = OpenTaiko.tテクスチャの生成(pathパネル本体, true);
+		string pathPanelBody = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
+		if (File.Exists(pathPanelBody)) {
+			this.txPanelBody = OpenTaiko.tTextureCreate(pathPanelBody, true);
 		}
 
 		base.CreateManagedResource();
 	}
 	public override void ReleaseManagedResource() {
-		OpenTaiko.tテクスチャの解放(ref this.txパネル本体);
-		OpenTaiko.tテクスチャの解放(ref this.tx文字列パネル);
+		OpenTaiko.tTextureRelease(ref this.txPanelBody);
+		OpenTaiko.tTextureRelease(ref this.txStringPanel);
 		base.ReleaseManagedResource();
 	}
 
@@ -101,9 +101,9 @@ internal class CActCutScenePauseMenu : CActSelectPopupMenu {
 		Default = 99,
 	};
 
-	private bool b選択した;
-	private CTexture txパネル本体;
-	private CTexture tx文字列パネル;
+	private bool bSelected;
+	private CTexture txPanelBody;
+	private CTexture txStringPanel;
 	//-----------------
 	#endregion
 }

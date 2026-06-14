@@ -97,7 +97,7 @@ internal class CActImplRollEffect : CActivity {
 					}
 
 					if (OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type] != null) {
-						OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type]?.t2D描画(RollCharas[i].X, RollCharas[i].Y);
+						OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type]?.t2DDraw(RollCharas[i].X, RollCharas[i].Y);
 
 						// 画面外にいたら描画をやめさせる
 						if (RollCharas[i].X < 0 - OpenTaiko.Tx.Effects_Roll[RollCharas[i].Type].szTextureSize.Width || RollCharas[i].X > OpenTaiko.Skin.Resolution[0]) {
@@ -124,23 +124,23 @@ internal class CActImplRollEffect : CActivity {
 	#region [ private ]
 	//-----------------
 	//private CTexture[] txChara;
-	private int nTex枚数;
+	private int nTexSheetCount;
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST連打キャラ {
+	private struct STRollChar {
 		public int nColor;
-		public bool b使用中;
-		public CCounter ct進行;
-		public int n前回のValue;
+		public bool bUse;
+		public CCounter ctProgress;
+		public int nPreviousValue;
 		public float fX;
 		public float fY;
-		public float fX開始点;
-		public float fY開始点;
-		public float f進行方向; //進行方向 0:左→右 1:左下→右上 2:右→左
-		public float fX加速度;
-		public float fY加速度;
+		public float fXStartPoint;
+		public float fYStartPoint;
+		public float fProgressDirection; //進行方向 0:左→右 1:左下→右上 2:右→左
+		public float fXAcceleration;
+		public float fYAcceleration;
 	}
-	private ST連打キャラ[] st連打キャラ = new ST連打キャラ[64];
+	private STRollChar[] stRollChar = new STRollChar[64];
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct RollChara {

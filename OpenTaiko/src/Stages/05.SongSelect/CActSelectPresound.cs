@@ -19,11 +19,11 @@ internal class CActSelectPresound : CActivity {
 	public void t選択曲が変更された() {
 		CScore cスコア = OpenTaiko.SongMount.rCurrentScore;
 
-		if ((cスコア != null) && ((!(cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名).Equals(this.str現在のファイル名) || (this.sound == null)) || !this.sound.IsPlaying)) {
+		if ((cスコア != null) && ((!(cスコア.FileInfo.FolderAbsolutePath + cスコア.ChartInfo.strBGMFileName).Equals(this.str現在のファイル名) || (this.sound == null)) || !this.sound.IsPlaying)) {
 			this.tStopSound();
 			this.tBGMフェードイン開始();
 			this.long再生位置 = -1;
-			if ((cスコア.譜面情報.strBGMファイル名 != null) && (cスコア.譜面情報.strBGMファイル名.Length > 0)) {
+			if ((cスコア.ChartInfo.strBGMFileName != null) && (cスコア.ChartInfo.strBGMFileName.Length > 0)) {
 				//this.ct再生待ちウェイト = new CCounter( 0, CDTXMania.ConfigIni.n曲が選択されてからプレビュー音が鳴るまでのウェイトms, 1, CDTXMania.Timer );
 				if (OpenTaiko.SoundManager.GetCurrentSoundDeviceType() != "DirectSound") {
 					this.ct再生待ちウェイト = new CCounter(0, 1, 270, OpenTaiko.Timer);
@@ -68,14 +68,14 @@ internal class CActSelectPresound : CActivity {
 		if (!base.IsDeActivated) {
 			if ((this.ctBGMフェードイン用 != null) && this.ctBGMフェードイン用.IsTicked) {
 				this.ctBGMフェードイン用.Tick();
-				OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = this.ctBGMフェードイン用.CurrentValue;
+				OpenTaiko.Skin.bgmSelSongScreen.nAutomationLevel_CurrentSound = this.ctBGMフェードイン用.CurrentValue;
 				if (this.ctBGMフェードイン用.IsEnded) {
 					this.ctBGMフェードイン用.Stop();
 				}
 			}
 			if ((this.ctBGMフェードアウト用 != null) && this.ctBGMフェードアウト用.IsTicked) {
 				this.ctBGMフェードアウト用.Tick();
-				OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド = CSound.MaximumAutomationLevel - this.ctBGMフェードアウト用.CurrentValue;
+				OpenTaiko.Skin.bgmSelSongScreen.nAutomationLevel_CurrentSound = CSound.MaximumAutomationLevel - this.ctBGMフェードアウト用.CurrentValue;
 				if (this.ctBGMフェードアウト用.IsEnded) {
 					this.ctBGMフェードアウト用.Stop();
 				}
@@ -86,13 +86,13 @@ internal class CActSelectPresound : CActivity {
 				CScore cスコア = OpenTaiko.SongMount.rCurrentScore;
 				if (long再生位置 == -1) {
 					this.long再生開始時のシステム時刻 = SoundManager.PlayTimer.SystemTimeMs;
-					this.long再生位置 = cスコア.譜面情報.nデモBGMオフセット;
+					this.long再生位置 = cスコア.ChartInfo.nDemoBGMOffset;
 
-					this.sound.tSetPositonToBegin(cスコア.譜面情報.nデモBGMオフセット);
+					this.sound.tSetPositonToBegin(cスコア.ChartInfo.nDemoBGMOffset);
 
 				} else {
 					this.long再生位置 = SoundManager.PlayTimer.SystemTimeMs - this.long再生開始時のシステム時刻;
-					if (this.long再生位置 >= this.sound.TotalPlayTime - cスコア.譜面情報.nデモBGMオフセット) //2020.04.18 Mr-Ojii #DEMOSTARTから何度も再生するために追加
+					if (this.long再生位置 >= this.sound.TotalPlayTime - cスコア.ChartInfo.nDemoBGMOffset) //2020.04.18 Mr-Ojii #DEMOSTARTから何度も再生するために追加
 						this.long再生位置 = -1;
 				}
 				//if (this.long再生位置 >= (this.sound.n総演奏時間ms - cスコア.譜面情報.nデモBGMオフセット) - 1 && this.long再生位置 <= (this.sound.n総演奏時間ms - cスコア.譜面情報.nデモBGMオフセット) + 0)
@@ -123,26 +123,26 @@ internal class CActSelectPresound : CActivity {
 			this.ctBGMフェードイン用.Stop();
 		}
 		this.ctBGMフェードアウト用 = new CCounter(0, 100, 10, OpenTaiko.Timer);
-		this.ctBGMフェードアウト用.CurrentValue = 100 - OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
+		this.ctBGMフェードアウト用.CurrentValue = 100 - OpenTaiko.Skin.bgmSelSongScreen.nAutomationLevel_CurrentSound;
 	}
 	private void tBGMフェードイン開始() {
 		if (this.ctBGMフェードアウト用 != null) {
 			this.ctBGMフェードアウト用.Stop();
 		}
 		this.ctBGMフェードイン用 = new CCounter(0, 100, 20, OpenTaiko.Timer);
-		this.ctBGMフェードイン用.CurrentValue = OpenTaiko.Skin.bgm選曲画面.nAutomationLevel_現在のサウンド;
+		this.ctBGMフェードイン用.CurrentValue = OpenTaiko.Skin.bgmSelSongScreen.nAutomationLevel_CurrentSound;
 	}
 	private void tプレビューサウンドの作成() {
 		CScore cスコア = OpenTaiko.SongMount.rCurrentScore;
 		var HiddenIndex = OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(OpenTaiko.SongMount.rCurrentlySelectedSong);
 		if ((cスコア != null)
-			&& !string.IsNullOrEmpty(cスコア.譜面情報.strBGMファイル名)
+			&& !string.IsNullOrEmpty(cスコア.ChartInfo.strBGMFileName)
 			&& OpenTaiko.stageSongSelect.ePhaseID != CStage.EPhase.SongSelect_FadeOutToNowLoading
 			&& HiddenIndex < DBSongUnlockables.EHiddenIndex.GRAYED
 		   ) {
-			string strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.Presound;
+			string strPreviewFilename = cスコア.FileInfo.FolderAbsolutePath + cスコア.ChartInfo.Presound;
 			try {
-				strPreviewFilename = cスコア.ファイル情報.フォルダの絶対パス + cスコア.譜面情報.strBGMファイル名;
+				strPreviewFilename = cスコア.FileInfo.FolderAbsolutePath + cスコア.ChartInfo.strBGMFileName;
 				if (OpenTaiko.ConfigIni.bBGMPlayVoiceSound)
 					this.sound = OpenTaiko.SoundManager.tCreateSound(strPreviewFilename, ESoundGroup.SongPreview);
 				if (this.sound == null) return;
@@ -152,9 +152,9 @@ internal class CActSelectPresound : CActivity {
 				//                           Initialization, song enumeration, and/or interactions may have
 				//                           caused background scanning and the metadata may now be available.
 				//                           If is not yet available then we wish to queue scanning.
-				var loudnessMetadata = cスコア.譜面情報.SongLoudnessMetadata
+				var loudnessMetadata = cスコア.ChartInfo.SongLoudnessMetadata
 									   ?? LoudnessMetadataScanner.LoadForAudioPath(strPreviewFilename);
-				OpenTaiko.SongGainController.Set(cスコア.譜面情報.SongVol, loudnessMetadata, this.sound);
+				OpenTaiko.SongGainController.Set(cスコア.ChartInfo.SongVol, loudnessMetadata, this.sound);
 
 				// Disable song if playing while playing the preview song
 				CSongSelectSongManager.disable();
@@ -163,8 +163,8 @@ internal class CActSelectPresound : CActivity {
 
 				if (long再生位置 == -1) {
 					this.long再生開始時のシステム時刻 = SoundManager.PlayTimer.SystemTimeMs;
-					this.long再生位置 = cスコア.譜面情報.nデモBGMオフセット;
-					this.sound.tSetPositonToBegin(cスコア.譜面情報.nデモBGMオフセット);
+					this.long再生位置 = cスコア.ChartInfo.nDemoBGMOffset;
+					this.sound.tSetPositonToBegin(cスコア.ChartInfo.nDemoBGMOffset);
 					this.long再生位置 = SoundManager.PlayTimer.SystemTimeMs - this.long再生開始時のシステム時刻;
 				}
 				//if( long再生位置 == this.sound.n総演奏時間ms - 10 )

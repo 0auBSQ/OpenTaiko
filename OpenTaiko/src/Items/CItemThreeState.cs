@@ -6,122 +6,122 @@
 internal class CItemThreeState : CItemBase {
 	// Properties
 
-	public E状態 e現在の状態;
-	public enum E状態 {
+	public EState eCurrentState;
+	public enum EState {
 		ON,
 		OFF,
-		不定
+		Indeterminate
 	}
 
 
 	// Constructor
 
 	public CItemThreeState() {
-		base.e種別 = CItemBase.E種別.ONorOFFor不定スリーステート;
-		this.e現在の状態 = E状態.不定;
+		base.eType = CItemBase.EType.ONorOFForIndeterminateThreeState;
+		this.eCurrentState = EState.Indeterminate;
 	}
-	public CItemThreeState(string str項目名, E状態 e初期状態)
+	public CItemThreeState(string strItemName, EState eInitialState)
 		: this() {
-		this.t初期化(str項目名, e初期状態);
+		this.tInitialize(strItemName, eInitialState);
 	}
-	public CItemThreeState(string str項目名, E状態 e初期状態, string str説明文jp)
+	public CItemThreeState(string strItemName, EState eInitialState, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, e初期状態, str説明文jp, str説明文jp);
+		this.tInitialize(strItemName, eInitialState, strDescriptionjp, strDescriptionjp);
 	}
-	public CItemThreeState(string str項目名, E状態 e初期状態, string str説明文jp, string str説明文en)
+	public CItemThreeState(string strItemName, EState eInitialState, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, e初期状態, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, eInitialState, strDescriptionjp, strDescriptionen);
 	}
 
-	public CItemThreeState(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別)
+	public CItemThreeState(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType)
 		: this() {
-		this.t初期化(str項目名, e初期状態, eパネル種別);
+		this.tInitialize(strItemName, eInitialState, ePanelType);
 	}
-	public CItemThreeState(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp)
+	public CItemThreeState(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp)
 		: this() {
-		this.t初期化(str項目名, e初期状態, eパネル種別, str説明文jp, str説明文jp);
+		this.tInitialize(strItemName, eInitialState, ePanelType, strDescriptionjp, strDescriptionjp);
 	}
-	public CItemThreeState(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en)
+	public CItemThreeState(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen)
 		: this() {
-		this.t初期化(str項目名, e初期状態, eパネル種別, str説明文jp, str説明文en);
+		this.tInitialize(strItemName, eInitialState, ePanelType, strDescriptionjp, strDescriptionen);
 	}
 
 
 	// CItemBase 実装
 
-	public override void tEnter押下() {
-		this.t項目値を次へ移動();
+	public override void tEnterPressed() {
+		this.tItemValueNextMove();
 	}
-	public override void t項目値を次へ移動() {
-		switch (this.e現在の状態) {
-			case E状態.ON:
-				this.e現在の状態 = E状態.OFF;
+	public override void tItemValueNextMove() {
+		switch (this.eCurrentState) {
+			case EState.ON:
+				this.eCurrentState = EState.OFF;
 				return;
 
-			case E状態.OFF:
-				this.e現在の状態 = E状態.ON;
+			case EState.OFF:
+				this.eCurrentState = EState.ON;
 				return;
 
-			case E状態.不定:
-				this.e現在の状態 = E状態.ON;
+			case EState.Indeterminate:
+				this.eCurrentState = EState.ON;
 				return;
 		}
 	}
-	public override void t項目値を前へ移動() {
-		switch (this.e現在の状態) {
-			case E状態.ON:
-				this.e現在の状態 = E状態.OFF;
+	public override void tItemValuePrevMove() {
+		switch (this.eCurrentState) {
+			case EState.ON:
+				this.eCurrentState = EState.OFF;
 				return;
 
-			case E状態.OFF:
-				this.e現在の状態 = E状態.ON;
+			case EState.OFF:
+				this.eCurrentState = EState.ON;
 				return;
 
-			case E状態.不定:
-				this.e現在の状態 = E状態.OFF;
+			case EState.Indeterminate:
+				this.eCurrentState = EState.OFF;
 				return;
 		}
 	}
-	public void t初期化(string str項目名, E状態 e初期状態) {
-		this.t初期化(str項目名, e初期状態, CItemBase.EPanelType.Normal);
+	public void tInitialize(string strItemName, EState eInitialState) {
+		this.tInitialize(strItemName, eInitialState, CItemBase.EPanelType.Normal);
 	}
-	public void t初期化(string str項目名, E状態 e初期状態, string str説明文jp) {
-		this.t初期化(str項目名, e初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, EState eInitialState, string strDescriptionjp) {
+		this.tInitialize(strItemName, eInitialState, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, E状態 e初期状態, string str説明文jp, string str説明文en) {
-		this.t初期化(str項目名, e初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文en);
+	public void tInitialize(string strItemName, EState eInitialState, string strDescriptionjp, string strDescriptionen) {
+		this.tInitialize(strItemName, eInitialState, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionen);
 	}
 
-	public void t初期化(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別) {
-		this.t初期化(str項目名, e初期状態, CItemBase.EPanelType.Normal, "", "");
+	public void tInitialize(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType) {
+		this.tInitialize(strItemName, eInitialState, CItemBase.EPanelType.Normal, "", "");
 	}
-	public void t初期化(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp) {
-		this.t初期化(str項目名, e初期状態, CItemBase.EPanelType.Normal, str説明文jp, str説明文jp);
+	public void tInitialize(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp) {
+		this.tInitialize(strItemName, eInitialState, CItemBase.EPanelType.Normal, strDescriptionjp, strDescriptionjp);
 	}
-	public void t初期化(string str項目名, E状態 e初期状態, CItemBase.EPanelType eパネル種別, string str説明文jp, string str説明文en) {
-		base.t初期化(str項目名, eパネル種別, str説明文jp, str説明文en);
-		this.e現在の状態 = e初期状態;
+	public void tInitialize(string strItemName, EState eInitialState, CItemBase.EPanelType ePanelType, string strDescriptionjp, string strDescriptionen) {
+		base.tInitialize(strItemName, ePanelType, strDescriptionjp, strDescriptionen);
+		this.eCurrentState = eInitialState;
 	}
-	public override object obj現在値() {
-		if (this.e現在の状態 == E状態.不定) {
+	public override object objCurrentValue() {
+		if (this.eCurrentState == EState.Indeterminate) {
 			return "- -";
 		} else {
-			return this.e現在の状態.ToString();
+			return this.eCurrentState.ToString();
 		}
 	}
 	public override int GetIndex() {
-		return (int)this.e現在の状態;
+		return (int)this.eCurrentState;
 	}
 	public override void SetIndex(int index) {
 		switch (index) {
 			case 0:
-				this.e現在の状態 = E状態.ON;
+				this.eCurrentState = EState.ON;
 				break;
 			case 1:
-				this.e現在の状態 = E状態.OFF;
+				this.eCurrentState = EState.OFF;
 				break;
 			case 2:
-				this.e現在の状態 = E状態.不定;
+				this.eCurrentState = EState.Indeterminate;
 				break;
 			default:
 				throw new ArgumentOutOfRangeException();

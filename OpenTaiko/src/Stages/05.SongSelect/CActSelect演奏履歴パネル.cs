@@ -13,49 +13,49 @@ internal class CActSelect演奏履歴パネル : CActivity {
 	// メソッド
 
 	public CActSelect演奏履歴パネル() {
-		ST文字位置[] st文字位置Array = new ST文字位置[10];
+		STTextPosition[] stTextPositionArray = new STTextPosition[10];
 
-		ST文字位置 st文字位置 = new ST文字位置();
-		st文字位置.ch = '0';
-		st文字位置.pt = new Point(0, 0);
-		st文字位置Array[0] = st文字位置;
-		ST文字位置 st文字位置2 = new ST文字位置();
-		st文字位置2.ch = '1';
-		st文字位置2.pt = new Point(26, 0);
-		st文字位置Array[1] = st文字位置2;
-		ST文字位置 st文字位置3 = new ST文字位置();
-		st文字位置3.ch = '2';
-		st文字位置3.pt = new Point(52, 0);
-		st文字位置Array[2] = st文字位置3;
-		ST文字位置 st文字位置4 = new ST文字位置();
-		st文字位置4.ch = '3';
-		st文字位置4.pt = new Point(78, 0);
-		st文字位置Array[3] = st文字位置4;
-		ST文字位置 st文字位置5 = new ST文字位置();
-		st文字位置5.ch = '4';
-		st文字位置5.pt = new Point(104, 0);
-		st文字位置Array[4] = st文字位置5;
-		ST文字位置 st文字位置6 = new ST文字位置();
-		st文字位置6.ch = '5';
-		st文字位置6.pt = new Point(130, 0);
-		st文字位置Array[5] = st文字位置6;
-		ST文字位置 st文字位置7 = new ST文字位置();
-		st文字位置7.ch = '6';
-		st文字位置7.pt = new Point(156, 0);
-		st文字位置Array[6] = st文字位置7;
-		ST文字位置 st文字位置8 = new ST文字位置();
-		st文字位置8.ch = '7';
-		st文字位置8.pt = new Point(182, 0);
-		st文字位置Array[7] = st文字位置8;
-		ST文字位置 st文字位置9 = new ST文字位置();
-		st文字位置9.ch = '8';
-		st文字位置9.pt = new Point(208, 0);
-		st文字位置Array[8] = st文字位置9;
-		ST文字位置 st文字位置10 = new ST文字位置();
-		st文字位置10.ch = '9';
-		st文字位置10.pt = new Point(234, 0);
-		st文字位置Array[9] = st文字位置10;
-		this.st小文字位置 = st文字位置Array;
+		STTextPosition stTextPosition = new STTextPosition();
+		stTextPosition.ch = '0';
+		stTextPosition.pt = new Point(0, 0);
+		stTextPositionArray[0] = stTextPosition;
+		STTextPosition stTextPosition2 = new STTextPosition();
+		stTextPosition2.ch = '1';
+		stTextPosition2.pt = new Point(26, 0);
+		stTextPositionArray[1] = stTextPosition2;
+		STTextPosition stTextPosition3 = new STTextPosition();
+		stTextPosition3.ch = '2';
+		stTextPosition3.pt = new Point(52, 0);
+		stTextPositionArray[2] = stTextPosition3;
+		STTextPosition stTextPosition4 = new STTextPosition();
+		stTextPosition4.ch = '3';
+		stTextPosition4.pt = new Point(78, 0);
+		stTextPositionArray[3] = stTextPosition4;
+		STTextPosition stTextPosition5 = new STTextPosition();
+		stTextPosition5.ch = '4';
+		stTextPosition5.pt = new Point(104, 0);
+		stTextPositionArray[4] = stTextPosition5;
+		STTextPosition stTextPosition6 = new STTextPosition();
+		stTextPosition6.ch = '5';
+		stTextPosition6.pt = new Point(130, 0);
+		stTextPositionArray[5] = stTextPosition6;
+		STTextPosition stTextPosition7 = new STTextPosition();
+		stTextPosition7.ch = '6';
+		stTextPosition7.pt = new Point(156, 0);
+		stTextPositionArray[6] = stTextPosition7;
+		STTextPosition stTextPosition8 = new STTextPosition();
+		stTextPosition8.ch = '7';
+		stTextPosition8.pt = new Point(182, 0);
+		stTextPositionArray[7] = stTextPosition8;
+		STTextPosition stTextPosition9 = new STTextPosition();
+		stTextPosition9.ch = '8';
+		stTextPosition9.pt = new Point(208, 0);
+		stTextPositionArray[8] = stTextPosition9;
+		STTextPosition stTextPosition10 = new STTextPosition();
+		stTextPosition10.ch = '9';
+		stTextPosition10.pt = new Point(234, 0);
+		stTextPositionArray[9] = stTextPosition10;
+		this.stSmallPosition = stTextPositionArray;
 
 		base.IsDeActivated = true;
 	}
@@ -63,21 +63,21 @@ internal class CActSelect演奏履歴パネル : CActivity {
 		CScore cスコア = OpenTaiko.SongMount.rCurrentScore;
 		if ((cスコア != null) && !OpenTaiko.stageSongSelect.bCurrentlyScrolling) {
 			try {
-				foreach (var item in tx文字列パネル) {
+				foreach (var item in txStringPanel) {
 					item.Dispose();
 				}
-				tx文字列パネル.Clear();
+				txStringPanel.Clear();
 				for (int i = 0; i < (int)Difficulty.Total; i++) {
-					SKBitmap image = ft表示用フォント.DrawText(cスコア.譜面情報.演奏履歴[i], Color.Yellow);
+					SKBitmap image = ft表示用フォント.DrawText(cスコア.ChartInfo.PlayHistory[i], Color.Yellow);
 					var tex = new CTexture(image);
 					tex.vcScaleRatio = new Vector3D<float>(0.5f, 0.5f, 1f);
-					this.tx文字列パネル.Add(tex);
+					this.txStringPanel.Add(tex);
 					image.Dispose();
 				}
 			} catch (CTextureCreateFailedException e) {
 				Trace.TraceError(e.ToString());
 				Trace.TraceError("演奏履歴文字列テクスチャの作成に失敗しました。");
-				this.tx文字列パネル = null;
+				this.txStringPanel = null;
 			}
 		}
 	}
@@ -134,9 +134,9 @@ internal class CActSelect演奏履歴パネル : CActivity {
 				//CDTXMania.Tx.SongSelect_ScoreWindow_Text.n透明度 = ct登場アニメ用.n現在の値 - 1745;
 				if (OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.SongMount.nCurrentSongDifficulty] != null) {
 					//CDTXMania.Tx.SongSelect_ScoreWindow[CDTXMania.stage選曲.n現在選択中の曲の難易度].n透明度 = ct登場アニメ用.n現在の値 - 1745;
-					OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.SongMount.nCurrentSongDifficulty].t2D描画(x, y);
-					this.t小文字表示(x + 56, y + 160, string.Format("{0,7:######0}", OpenTaiko.SongMount.rCurrentScore.譜面情報.nハイスコア[OpenTaiko.SongMount.nCurrentSongDifficulty].ToString()));
-					OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2D描画(x + 236, y + 166, new Rectangle(0, 36, 32, 30));
+					OpenTaiko.Tx.SongSelect_ScoreWindow[OpenTaiko.SongMount.nCurrentSongDifficulty].t2DDraw(x, y);
+					this.tSmallDisplay(x + 56, y + 160, string.Format("{0,7:######0}", OpenTaiko.SongMount.rCurrentScore.ChartInfo.nHighScore[OpenTaiko.SongMount.nCurrentSongDifficulty].ToString()));
+					OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2DDraw(x + 236, y + 166, new Rectangle(0, 36, 32, 30));
 				}
 			}
 		}
@@ -154,24 +154,24 @@ internal class CActSelect演奏履歴パネル : CActivity {
 	private int n本体X;
 	private int n本体Y;
 	//private CTexture txパネル本体;
-	private List<CTexture> tx文字列パネル = new();
+	private List<CTexture> txStringPanel = new();
 	//      private CTexture[] txスコアボード = new CTexture[4];
 	//      private CTexture tx文字;
 	//-----------------
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct ST文字位置 {
+	private struct STTextPosition {
 		public char ch;
 		public Point pt;
 	}
-	private readonly ST文字位置[] st小文字位置;
-	private void t小文字表示(int x, int y, string str) {
+	private readonly STTextPosition[] stSmallPosition;
+	private void tSmallDisplay(int x, int y, string str) {
 		foreach (char ch in str) {
-			for (int i = 0; i < this.st小文字位置.Length; i++) {
-				if (this.st小文字位置[i].ch == ch) {
-					Rectangle rectangle = new Rectangle(this.st小文字位置[i].pt.X, this.st小文字位置[i].pt.Y, 26, 36);
+			for (int i = 0; i < this.stSmallPosition.Length; i++) {
+				if (this.stSmallPosition[i].ch == ch) {
+					Rectangle rectangle = new Rectangle(this.stSmallPosition[i].pt.X, this.stSmallPosition[i].pt.Y, 26, 36);
 					if (OpenTaiko.Tx.SongSelect_ScoreWindow_Text != null) {
-						OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2D描画(x, y, rectangle);
+						OpenTaiko.Tx.SongSelect_ScoreWindow_Text.t2DDraw(x, y, rectangle);
 					}
 					break;
 				}

@@ -27,9 +27,9 @@ class CStageTowerSelect : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.Continuation;
 
-		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Tower);
+		this.Cursor.Activate(OpenTaiko.SongManager.listSongRoot_Tower);
 		tUpdateBarInfos();
 
 		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERSELECT}Script.lua"));
@@ -80,12 +80,12 @@ class CStageTowerSelect : CStage {
 
 		#region [Input]
 
-		if (this.eフェードアウト完了時の戻り値 == EReturnValue.Continuation) {
+		if (this.eFadeOutCompleteWhenReturnValue == EReturnValue.Continuation) {
 			int returnTitle() {
 				OpenTaiko.Skin.soundDecideSFX.tStop(); // cancel if played
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
-				this.eフェードアウト完了時の戻り値 = EReturnValue.BackToTitle;
-				this.actFOtoTitle.tフェードアウト開始();
+				this.eFadeOutCompleteWhenReturnValue = EReturnValue.BackToTitle;
+				this.actFOtoTitle.tFadeOutStart();
 				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 				return 0;
 			}
@@ -151,12 +151,12 @@ class CStageTowerSelect : CStage {
 				if (this.actFOtoNowLoading.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 			case CStage.EPhase.Common_FADEOUT:
 				if (this.actFOtoTitle.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 		}
 
@@ -180,8 +180,8 @@ class CStageTowerSelect : CStage {
 		OpenTaiko.SongMount.nChoosenSongDifficulty[0] = (int)Difficulty.Tower;
 		OpenTaiko.SongMount.strChosenSongGenre = Cursor.Item!.songGenre;
 		if ((OpenTaiko.SongMount.rChoosenSong != null) && (OpenTaiko.SongMount.rChosenScore != null)) {
-			this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-			this.actFOtoNowLoading.tフェードアウト開始();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+			this.eFadeOutCompleteWhenReturnValue = EReturnValue.SongSelected;
+			this.actFOtoNowLoading.tFadeOutStart();                // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 			base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 		}
 		// TJAPlayer3.Skin.bgm選曲画面.t停止する();
@@ -219,8 +219,8 @@ class CStageTowerSelect : CStage {
 
 		//TJAPlayer3.Skin.sound曲決定音.t再生する();
 
-		this.eフェードアウト完了時の戻り値 = EReturnValue.SongSelected;
-		this.actFOtoNowLoading.tフェードアウト開始();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.SongSelected;
+		this.actFOtoNowLoading.tFadeOutStart();                    // #27787 2012.3.10 yyagi 曲決定時の画面フェードアウトの省略
 		base.ePhaseID = CStage.EPhase.SongSelect_FadeOutToNowLoading;
 
 		CSongSelectSongManager.stopSong();
@@ -231,21 +231,21 @@ class CStageTowerSelect : CStage {
 	private void tDrawTower(int x, int y, BarInfo barInfo) {
 		switch (barInfo.eノード種別) {
 			case CSongListNode.ENodeType.SCORE:
-				OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+				OpenTaiko.Tx.TowerSelect_Tower.t2DCenterBasedDraw(x, y);
 				break;
 			case CSongListNode.ENodeType.RANDOM:
-				OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+				OpenTaiko.Tx.TowerSelect_Tower.t2DCenterBasedDraw(x, y);
 				break;
 			case CSongListNode.ENodeType.BOX:
-				OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+				OpenTaiko.Tx.TowerSelect_Tower.t2DCenterBasedDraw(x, y);
 				break;
 			case CSongListNode.ENodeType.BACKBOX:
-				OpenTaiko.Tx.TowerSelect_Tower.t2D中心基準描画(x, y);
+				OpenTaiko.Tx.TowerSelect_Tower.t2DCenterBasedDraw(x, y);
 				break;
 		}
 
-		TitleTextureKey.ResolveTitleTexture(barInfo.ttkTitle).t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.TowerSelect_Title_Offset[0], y + OpenTaiko.Skin.TowerSelect_Title_Offset[1]);
-		TitleTextureKey.ResolveTitleTexture(barInfo.ttkSubTitle).t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[0], y + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[1]);
+		TitleTextureKey.ResolveTitleTexture(barInfo.ttkTitle).t2DScaledCenterBasedDraw(x + OpenTaiko.Skin.TowerSelect_Title_Offset[0], y + OpenTaiko.Skin.TowerSelect_Title_Offset[1]);
+		TitleTextureKey.ResolveTitleTexture(barInfo.ttkSubTitle).t2DScaledCenterBasedDraw(x + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[0], y + OpenTaiko.Skin.TowerSelect_SubTitle_Offset[1]);
 	}
 
 	private void tUpdateBarInfos() {
@@ -276,7 +276,7 @@ class CStageTowerSelect : CStage {
 	private CCachedFontRenderer pfTitleFont;
 	private CCachedFontRenderer pfSubTitleFont;
 
-	public EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eFadeOutCompleteWhenReturnValue;
 	public CActFIFOStart actFOtoNowLoading;
 	public CActFIFOBlack actFOtoTitle;
 	#endregion

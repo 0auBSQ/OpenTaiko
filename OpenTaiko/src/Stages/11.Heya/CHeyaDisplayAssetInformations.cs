@@ -1,5 +1,5 @@
 ﻿using FDK;
-using static OpenTaiko.CActSelect曲リスト;
+using static OpenTaiko.CActSelectSongList;
 using Color = System.Drawing.Color;
 
 namespace OpenTaiko;
@@ -62,8 +62,8 @@ class CHeyaDisplayAssetInformations {
 			ttkDescription = new TitleTextureKey(description, pf, Color.White, Color.Black, 1000);
 		}
 
-		OpenTaiko.Tx.Heya_Description_Panel?.t2D描画(0, 0);
-		TitleTextureKey.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
+		OpenTaiko.Tx.Heya_Description_Panel?.t2DDraw(0, 0);
+		TitleTextureKey.ResolveTitleTexture(ttkDescription).t2DDraw(XOrigin, YOrigin);
 	}
 
 	public static void DisplayPuchicharaInfo(CCachedFontRenderer pf, CPuchichara puchi) {
@@ -87,8 +87,8 @@ class CHeyaDisplayAssetInformations {
 			ttkDescription = new TitleTextureKey(description, pf, Color.White, Color.Black, 1000);
 		}
 
-		OpenTaiko.Tx.Heya_Description_Panel?.t2D描画(0, 0);
-		TitleTextureKey.ResolveTitleTexture(ttkDescription).t2D描画(XOrigin, YOrigin);
+		OpenTaiko.Tx.Heya_Description_Panel?.t2DDraw(0, 0);
+		TitleTextureKey.ResolveTitleTexture(ttkDescription).t2DDraw(XOrigin, YOrigin);
 	}
 
 	public static void DisplayNameplateTitleInfo(CCachedFontRenderer pf) {

@@ -5,8 +5,8 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace OpenTaiko;
 
-class CActSelect段位リスト : CStage {
-	public CActSelect段位リスト() {
+class CActSelectDanList : CStage {
+	public CActSelectDanList() {
 		this.Cursor = new() { UpdateInfo = () => this.tUpdateSongs() };
 
 		for (int i = 0; i < 10; i++) {
@@ -46,7 +46,7 @@ class CActSelect段位リスト : CStage {
 			this.ttkExams[i] = new TitleTextureKey(CLangManager.LangInstance.GetExamName(i), this.pfExamFont, Color.White, Color.SaddleBrown, 1000);
 		}
 
-		this.Cursor.Activate(OpenTaiko.Songs管理.list曲ルート_Dan);
+		this.Cursor.Activate(OpenTaiko.SongManager.listSongRoot_Dan);
 		tUpdateSongs();
 
 		base.Activate();
@@ -161,25 +161,25 @@ class CActSelect段位リスト : CStage {
 				case CSongListNode.ENodeType.BACKBOX: {
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
-						OpenTaiko.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(0, 0, tickExtraWidth, tickExtraHeight));
+						OpenTaiko.Tx.Dani_Plate_Extra?.t2DScaledTopCenterBasedDraw(xPos, yPos, new Rectangle(0, 0, tickExtraWidth, tickExtraHeight));
 						break;
 					}
 				case CSongListNode.ENodeType.BOX: {
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
-						OpenTaiko.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickExtraWidth, 0, tickExtraWidth, tickExtraHeight));
+						OpenTaiko.Tx.Dani_Plate_Extra?.t2DScaledTopCenterBasedDraw(xPos, yPos, new Rectangle(tickExtraWidth, 0, tickExtraWidth, tickExtraHeight));
 						break;
 					}
 				case CSongListNode.ENodeType.RANDOM: {
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateOpacity(255);
 						OpenTaiko.Tx.Dani_Plate_Extra?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
-						OpenTaiko.Tx.Dani_Plate_Extra?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickExtraWidth * 2, 0, tickExtraWidth, tickExtraHeight));
+						OpenTaiko.Tx.Dani_Plate_Extra?.t2DScaledTopCenterBasedDraw(xPos, yPos, new Rectangle(tickExtraWidth * 2, 0, tickExtraWidth, tickExtraHeight));
 						break;
 					}
 				default: {
 						OpenTaiko.Tx.Dani_Plate?.tUpdateOpacity(255);
 						OpenTaiko.Tx.Dani_Plate?.tUpdateColor4(CConversion.ColorToColor4(tickColor));
-						OpenTaiko.Tx.Dani_Plate?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
+						OpenTaiko.Tx.Dani_Plate?.t2DScaledTopCenterBasedDraw(xPos, yPos, new Rectangle(tickWidth * tick, 0, tickWidth, tickHeight));
 						break;
 					}
 			}
@@ -192,7 +192,7 @@ class CActSelect段位リスト : CStage {
 			#region [Dan grade title]
 			if (stバー情報[currentSong].eノード種別 == CSongListNode.ENodeType.SCORE)
 				TitleTextureKey.ResolveTitleTextureTate(stバー情報[currentSong].ttkタイトル[stバー情報[currentSong].ttkタイトル.Length - 1])
-					.t2D拡大率考慮上中央基準描画(xPos + OpenTaiko.Skin.DaniSelect_Plate_Title_Offset[0], yPos + OpenTaiko.Skin.DaniSelect_Plate_Title_Offset[1]);
+					.t2DScaledTopCenterBasedDraw(xPos + OpenTaiko.Skin.DaniSelect_Plate_Title_Offset[0], yPos + OpenTaiko.Skin.DaniSelect_Plate_Title_Offset[1]);
 
 			#endregion
 
@@ -201,7 +201,7 @@ class CActSelect段位リスト : CStage {
 
 			if (idx == 0) {
 				OpenTaiko.Tx.Dani_Plate?.tUpdateOpacity(Math.Abs(255 - ctDanTick.CurrentValue));
-				OpenTaiko.Tx.Dani_Plate?.t2D拡大率考慮上中央基準描画(xPos, yPos, new Rectangle(tickWidth * 6, 0, tickWidth, tickHeight));
+				OpenTaiko.Tx.Dani_Plate?.t2DScaledTopCenterBasedDraw(xPos, yPos, new Rectangle(tickWidth * 6, 0, tickWidth, tickHeight));
 			}
 
 			#endregion
@@ -215,7 +215,7 @@ class CActSelect段位リスト : CStage {
 				OpenTaiko.Tx.DanResult_Rank.vcScaleRatio.Y = 0.20f;
 				int rank_width = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Width / 7;
 				int rank_height = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Height;
-				OpenTaiko.Tx.DanResult_Rank.t2D拡大率考慮上中央基準描画(xPos - 2, yPos - 14, new Rectangle(rank_width * (currentRank + 1), 0, rank_width, rank_height));
+				OpenTaiko.Tx.DanResult_Rank.t2DScaledTopCenterBasedDraw(xPos - 2, yPos - 14, new Rectangle(rank_width * (currentRank + 1), 0, rank_width, rank_height));
 			}
 
 			#endregion
@@ -279,7 +279,7 @@ class CActSelect段位リスト : CStage {
 	public static void tDisplayDanPlate(CTexture givenPlate, STバー情報? songNode, int x, int y) {
 		if (givenPlate != null) {
 			givenPlate.Opacity = 255;
-			givenPlate.t2D中心基準描画(x, y);
+			givenPlate.t2DCenterBasedDraw(x, y);
 		} else {
 			// Default Dan Plate
 
@@ -287,8 +287,8 @@ class CActSelect段位リスト : CStage {
 			Color danTickColor = Color.White;
 
 			if (OpenTaiko.SongMount.rChosenScore != null) {
-				danTick = OpenTaiko.SongMount.rChosenScore.譜面情報.nDanTick;
-				danTickColor = OpenTaiko.SongMount.rChosenScore.譜面情報.cDanTickColor;
+				danTick = OpenTaiko.SongMount.rChosenScore.ChartInfo.nDanTick;
+				danTickColor = OpenTaiko.SongMount.rChosenScore.ChartInfo.cDanTickColor;
 			}
 			if (songNode != null) {
 				STバー情報 stNode = (STバー情報)songNode;
@@ -304,13 +304,13 @@ class CActSelect段位リスト : CStage {
 				OpenTaiko.Tx.Dani_DanPlates.Opacity = 255;
 				OpenTaiko.Tx.Dani_DanPlates.color4 = CConversion.ColorToColor4(danTickColor);
 			}
-			OpenTaiko.Tx.Dani_DanPlates_Back?.t2D中心基準描画(x, y, new Rectangle(
+			OpenTaiko.Tx.Dani_DanPlates_Back?.t2DCenterBasedDraw(x, y, new Rectangle(
 				unit * danTick,
 				0,
 				unit,
 				OpenTaiko.Tx.Dani_DanPlates_Back.szTextureSize.Height
 			));
-			OpenTaiko.Tx.Dani_DanPlates?.t2D中心基準描画(x, y, new Rectangle(
+			OpenTaiko.Tx.Dani_DanPlates?.t2DCenterBasedDraw(x, y, new Rectangle(
 				unit * danTick,
 				0,
 				unit,
@@ -331,7 +331,7 @@ class CActSelect段位リスト : CStage {
 			}
 
 			TitleTextureKey ttkTmp = new TitleTextureKey(titleTmp.TrimStringWithTags(2), pfDanPlateTitle, Color.White, Color.Black, 1000);
-			TitleTextureKey.ResolveTitleTextureTate(ttkTmp).t2D中心基準描画(x + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[1]);
+			TitleTextureKey.ResolveTitleTextureTate(ttkTmp).t2DCenterBasedDraw(x + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanPlateTitle_Offset[1]);
 		}
 	}
 
@@ -358,19 +358,19 @@ class CActSelect段位リスト : CStage {
 			OpenTaiko.Tx.Dani_DanIcon_Fade.vcScaleRatio = new Vector3D<float>(scale, scale, 1.0f);
 			OpenTaiko.Tx.Dani_DanIcon_Fade.Opacity = opacity;
 			OpenTaiko.Tx.Dani_DanIcon_Fade.color4 = CConversion.ColorToColor4(OpenTaiko.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, OpenTaiko.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
-			OpenTaiko.Tx.Dani_DanIcon_Fade.t2D拡大率考慮描画(CTexture.RefPnt.Left, x - ((OpenTaiko.Tx.Dani_DanIcon.szTextureSize.Width / 2) * scale), y);
+			OpenTaiko.Tx.Dani_DanIcon_Fade.t2DScaledDraw(CTexture.RefPnt.Left, x - ((OpenTaiko.Tx.Dani_DanIcon.szTextureSize.Width / 2) * scale), y);
 			OpenTaiko.Tx.Dani_DanIcon_Fade.Opacity = 255;
 		}
 
 		OpenTaiko.Tx.Dani_DanIcon.vcScaleRatio = new Vector3D<float>(scale, scale, 1.0f);
 		OpenTaiko.Tx.Dani_DanIcon.Opacity = opacity;
 		OpenTaiko.Tx.Dani_DanIcon.color4 = CConversion.ColorToColor4(OpenTaiko.Skin.DaniSelect_DanIcon_Color[Math.Min(count - 1, OpenTaiko.Skin.DaniSelect_DanIcon_Color.Length - 1)]);
-		OpenTaiko.Tx.Dani_DanIcon.t2D拡大率考慮中央基準描画(x, y);
+		OpenTaiko.Tx.Dani_DanIcon.t2DScaledCenterBasedDraw(x, y);
 		OpenTaiko.Tx.Dani_DanIcon.Opacity = 255;
 
 		TitleTextureKey.ResolveTitleTexture(ttkTmp).vcScaleRatio = new Vector3D<float>(scale, scale, 1.0f);
 		TitleTextureKey.ResolveTitleTexture(ttkTmp).Opacity = opacity;
-		TitleTextureKey.ResolveTitleTexture(ttkTmp).t2D拡大率考慮中央基準描画(x + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[1]);
+		TitleTextureKey.ResolveTitleTexture(ttkTmp).t2DScaledCenterBasedDraw(x + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[0], y + OpenTaiko.Skin.DaniSelect_DanIconTitle_Offset[1]);
 		TitleTextureKey.ResolveTitleTexture(ttkTmp).Opacity = 255;
 	}
 
@@ -388,22 +388,22 @@ class CActSelect段位リスト : CStage {
 
 					// Use the given bar center if provided, else use a default one
 					if (stバー情報[currentSong].txBarCenter != null) {
-						stバー情報[currentSong].txBarCenter.t2D描画(scroll + Anime, 0);
+						stバー情報[currentSong].txBarCenter.t2DDraw(scroll + Anime, 0);
 					} else {
 						int unit = OpenTaiko.Tx.Dani_DanSides.szTextureSize.Width / 6;
 						OpenTaiko.Tx.Dani_DanSides.color4 = CConversion.ColorToColor4(danTickColor);
 
-						OpenTaiko.Tx.Dani_Bar_Center.t2D描画(scroll + Anime, 0);
+						OpenTaiko.Tx.Dani_Bar_Center.t2DDraw(scroll + Anime, 0);
 
 						// Bar sides
-						OpenTaiko.Tx.Dani_DanSides.t2D描画((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanSides_X[0], OpenTaiko.Skin.DaniSelect_DanSides_Y[0], new Rectangle(
+						OpenTaiko.Tx.Dani_DanSides.t2DDraw((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanSides_X[0], OpenTaiko.Skin.DaniSelect_DanSides_Y[0], new Rectangle(
 							unit * danTick,
 							0,
 							unit,
 							OpenTaiko.Tx.Dani_DanSides.szTextureSize.Height
 						));
 
-						OpenTaiko.Tx.Dani_DanSides.t2D左右反転描画((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanSides_X[1], OpenTaiko.Skin.DaniSelect_DanSides_Y[1], new Rectangle(
+						OpenTaiko.Tx.Dani_DanSides.t2DFlipHDraw((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanSides_X[1], OpenTaiko.Skin.DaniSelect_DanSides_Y[1], new Rectangle(
 							unit * danTick,
 							0,
 							unit,
@@ -411,7 +411,7 @@ class CActSelect段位リスト : CStage {
 						));
 					}
 
-					CActSelect段位リスト.tDisplayDanPlate(stバー情報[currentSong].txDanPlate, stバー情報[currentSong], (int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanPlate[0], OpenTaiko.Skin.DaniSelect_DanPlate[1]);
+					CActSelectDanList.tDisplayDanPlate(stバー情報[currentSong].txDanPlate, stバー情報[currentSong], (int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_DanPlate[0], OpenTaiko.Skin.DaniSelect_DanPlate[1]);
 
 					#endregion
 
@@ -426,20 +426,20 @@ class CActSelect段位リスト : CStage {
 						int rank_width = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Width / 7;
 						int rank_height = OpenTaiko.Tx.DanResult_Rank.szTextureSize.Height;
 
-						OpenTaiko.Tx.DanResult_Rank.t2D拡大率考慮中央基準描画(scroll + Anime + OpenTaiko.Skin.DaniSelect_Rank[0], OpenTaiko.Skin.DaniSelect_Rank[1], new Rectangle(rank_width * (currentRank + 1), 0, rank_width, rank_height));
+						OpenTaiko.Tx.DanResult_Rank.t2DScaledCenterBasedDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Rank[0], OpenTaiko.Skin.DaniSelect_Rank[1], new Rectangle(rank_width * (currentRank + 1), 0, rank_width, rank_height));
 					}
 
 					#endregion
 
 					#region [Soul gauge condition]
 
-					OpenTaiko.Tx.Dani_Bloc[2]?.t2D描画(scroll + Anime + OpenTaiko.Skin.DaniSelect_Bloc2[0], OpenTaiko.Skin.DaniSelect_Bloc2[1]);
+					OpenTaiko.Tx.Dani_Bloc[2]?.t2DDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Bloc2[0], OpenTaiko.Skin.DaniSelect_Bloc2[1]);
 
 					if (stバー情報[currentSong].List_DanSongs[0].Dan_C[0] != null)
 						tSoulDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Value_Gauge[0], OpenTaiko.Skin.DaniSelect_Value_Gauge[1], stバー情報[currentSong].List_DanSongs[0].Dan_C[0].GetValue()[0]);
 
 					//TJAPlayer3.stage選曲.act曲リスト.ResolveTitleTexture(this.ttkExams[0]).t2D下中央基準描画((int)(scroll + 396 + Anime), 452);
-					TitleTextureKey.ResolveTitleTexture(this.ttkExams[0]).t2D拡大率考慮中央基準描画((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_Text_Gauge[0], OpenTaiko.Skin.DaniSelect_Text_Gauge[1]);
+					TitleTextureKey.ResolveTitleTexture(this.ttkExams[0]).t2DScaledCenterBasedDraw((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_Text_Gauge[0], OpenTaiko.Skin.DaniSelect_Text_Gauge[1]);
 
 					#endregion
 
@@ -496,7 +496,7 @@ class CActSelect段位リスト : CStage {
 							opacity = getOpacity(i, sections_count);
 						}
 						TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = opacity;
-						TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2D描画(scroll + Anime + OpenTaiko.Skin.DaniSelect_Title_X[pos], OpenTaiko.Skin.DaniSelect_Title_Y[pos]);
+						TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).t2DDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Title_X[pos], OpenTaiko.Skin.DaniSelect_Title_Y[pos]);
 						TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[i]).Opacity = 255;
 
 						tDisplayDanIcon(i + 1, scroll + Anime + OpenTaiko.Skin.DaniSelect_DanIcon_X[pos], OpenTaiko.Skin.DaniSelect_DanIcon_Y[pos], opacity, 1.0f);
@@ -507,7 +507,7 @@ class CActSelect段位リスト : CStage {
 						if (stバー情報[currentSong].n曲難易度.Length > 3) {
 							OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = getOpacity(i, sections_count);
 						}
-						OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2D中心基準描画(scroll + Anime + OpenTaiko.Skin.DaniSelect_Difficulty_Cymbol_X[pos], OpenTaiko.Skin.DaniSelect_Difficulty_Cymbol_Y[pos], new Rectangle(stバー情報[currentSong].n曲難易度[i] * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
+						OpenTaiko.Tx.Dani_Difficulty_Cymbol.t2DCenterBasedDraw(scroll + Anime + OpenTaiko.Skin.DaniSelect_Difficulty_Cymbol_X[pos], OpenTaiko.Skin.DaniSelect_Difficulty_Cymbol_Y[pos], new Rectangle(stバー情報[currentSong].n曲難易度[i] * difficulty_cymbol_width, 0, difficulty_cymbol_width, difficulty_cymbol_height));
 						OpenTaiko.Tx.Dani_Difficulty_Cymbol.Opacity = 255;
 					}
 
@@ -609,7 +609,7 @@ class CActSelect段位リスト : CStage {
 									if (i == 0) {
 										if (tex != null)
 											tex.Opacity = opacity;
-										tex?.t2D描画(
+										tex?.t2DDraw(
 											scroll + Anime + x,
 											y);
 									}
@@ -624,7 +624,7 @@ class CActSelect段位リスト : CStage {
 									if (i == 0) {
 										if (OpenTaiko.Tx.Dani_Bloc[0] != null)
 											OpenTaiko.Tx.Dani_Bloc[0].Opacity = opacity;
-										OpenTaiko.Tx.Dani_Bloc[0]?.t2D描画(
+										OpenTaiko.Tx.Dani_Bloc[0]?.t2DDraw(
 											scroll + Anime + OpenTaiko.Skin.DaniSelect_Exam_Bloc_X[index],
 											OpenTaiko.Skin.DaniSelect_Exam_Bloc_Y[index]);
 									}
@@ -647,7 +647,7 @@ class CActSelect段位リスト : CStage {
 							tmpTex.Opacity = opacity;
 							//tmpTex.t2D下中央基準描画((int)(scroll + 614 + Anime), 452 + index * 88);
 
-							tmpTex.t2D拡大率考慮中央基準描画((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_Exam_Title_X[index], OpenTaiko.Skin.DaniSelect_Exam_Title_Y[index]);
+							tmpTex.t2DScaledCenterBasedDraw((int)(scroll + Anime) + OpenTaiko.Skin.DaniSelect_Exam_Title_X[index], OpenTaiko.Skin.DaniSelect_Exam_Title_Y[index]);
 						}
 
 						#endregion
@@ -657,21 +657,21 @@ class CActSelect段位リスト : CStage {
 				}
 				break;
 			case CSongListNode.ENodeType.BACKBOX: {
-					OpenTaiko.Tx.Dani_Bar_Back?.t2D描画(scroll + Anime, 0);
+					OpenTaiko.Tx.Dani_Bar_Back?.t2DDraw(scroll + Anime, 0);
 					break;
 				}
 			case CSongListNode.ENodeType.BOX: {
-					OpenTaiko.Tx.Dani_Bar_Folder_Back?.t2D描画(scroll + Anime, 0);
-					OpenTaiko.Tx.Dani_Bar_Folder?.t2D描画(scroll + Anime, 0);
+					OpenTaiko.Tx.Dani_Bar_Folder_Back?.t2DDraw(scroll + Anime, 0);
+					OpenTaiko.Tx.Dani_Bar_Folder?.t2DDraw(scroll + Anime, 0);
 					TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[0])
-						.t2D拡大率考慮上中央基準描画((int)(scroll + Anime + OpenTaiko.Skin.DaniSelect_FolderText_X[0]), OpenTaiko.Skin.DaniSelect_FolderText_Y[0]);
+						.t2DScaledTopCenterBasedDraw((int)(scroll + Anime + OpenTaiko.Skin.DaniSelect_FolderText_X[0]), OpenTaiko.Skin.DaniSelect_FolderText_Y[0]);
 					for (int desc = 1; desc < 4; desc++)
 						TitleTextureKey.ResolveTitleTexture(stバー情報[currentSong].ttkタイトル[desc])
-							.t2D拡大率考慮上中央基準描画((int)(scroll + Anime + OpenTaiko.Skin.DaniSelect_FolderText_X[desc]), OpenTaiko.Skin.DaniSelect_FolderText_Y[desc]);
+							.t2DScaledTopCenterBasedDraw((int)(scroll + Anime + OpenTaiko.Skin.DaniSelect_FolderText_X[desc]), OpenTaiko.Skin.DaniSelect_FolderText_Y[desc]);
 					break;
 				}
 			case CSongListNode.ENodeType.RANDOM: {
-					OpenTaiko.Tx.Dani_Bar_Random?.t2D描画(scroll + Anime, 0);
+					OpenTaiko.Tx.Dani_Bar_Random?.t2DDraw(scroll + Anime, 0);
 					break;
 				}
 		}
@@ -704,26 +704,26 @@ class CActSelect段位リスト : CStage {
 
 						stバー情報[i].ttkタイトル[Cursor.Items[i].DanSongs.Count] = new TitleTextureKey(tmp, pfDanSong, Color.Black, Color.Transparent, 700);
 
-						stバー情報[i].nDanTick = song.score[6].譜面情報.nDanTick;
-						stバー情報[i].cDanTickColor = song.score[6].譜面情報.cDanTickColor;
+						stバー情報[i].nDanTick = song.score[6].ChartInfo.nDanTick;
+						stバー情報[i].cDanTickColor = song.score[6].ChartInfo.cDanTickColor;
 
 						//stバー情報[i].clearGrade = song.arスコア[6].譜面情報.nクリア[0];
 						var TableEntry = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data.tGetSongSelectTableEntry(song.tGetUniqueId());
 						stバー情報[i].clearGrade = TableEntry.ClearStatuses[(int)Difficulty.Dan];
 
-						string barCenter = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";
+						string barCenter = Path.GetDirectoryName(song.score[6].FileInfo.FileAbsolutePath) + @$"${Path.DirectorySeparatorChar}Bar_Center.png";
 						if (BarTexCache.TryGetValue(barCenter, out CTexture texture1)) {
 							stバー情報[i].txBarCenter = texture1;
 						} else {
-							stバー情報[i].txBarCenter = OpenTaiko.tテクスチャの生成(barCenter);
+							stバー情報[i].txBarCenter = OpenTaiko.tTextureCreate(barCenter);
 							BarTexCache.Add(barCenter, stバー情報[i].txBarCenter);
 						}
 
-						string danPlate = Path.GetDirectoryName(song.score[6].ファイル情報.ファイルの絶対パス) + @$"${Path.DirectorySeparatorChar}Dan_Plate.png";
+						string danPlate = Path.GetDirectoryName(song.score[6].FileInfo.FileAbsolutePath) + @$"${Path.DirectorySeparatorChar}Dan_Plate.png";
 						if (BarTexCache.TryGetValue(danPlate, out CTexture texture2)) {
 							stバー情報[i].txDanPlate = texture2;
 						} else {
-							stバー情報[i].txDanPlate = OpenTaiko.tテクスチャの生成(danPlate);
+							stバー情報[i].txDanPlate = OpenTaiko.tTextureCreate(danPlate);
 							BarTexCache.Add(danPlate, stバー情報[i].txDanPlate);
 						}
 					}
@@ -788,8 +788,8 @@ class CActSelect段位リスト : CStage {
             }
         }*/
 
-		float width = OpenTaiko.Tx.Dani_Level_Number.sz画像サイズ.Width / 10.0f;
-		float height = OpenTaiko.Tx.Dani_Level_Number.sz画像サイズ.Height;
+		float width = OpenTaiko.Tx.Dani_Level_Number.szImageSize.Width / 10.0f;
+		float height = OpenTaiko.Tx.Dani_Level_Number.szImageSize.Height;
 
 		int[] nums = CConversion.SeparateDigits(num);
 		for (int j = 0; j < nums.Length; j++) {
@@ -800,7 +800,7 @@ class CActSelect段位リスト : CStage {
 
 			OpenTaiko.Tx.Dani_Level_Number.vcScaleRatio.X = scale;
 			OpenTaiko.Tx.Dani_Level_Number.vcScaleRatio.Y = scale;
-			OpenTaiko.Tx.Dani_Level_Number.t2D描画(_x, _y,
+			OpenTaiko.Tx.Dani_Level_Number.t2DDraw(_x, _y,
 				new RectangleF(width * nums[j], 0, width, height));
 			OpenTaiko.Tx.Dani_Level_Number.vcScaleRatio.X = 1;
 			OpenTaiko.Tx.Dani_Level_Number.vcScaleRatio.Y = 1;
@@ -825,12 +825,12 @@ class CActSelect段位リスト : CStage {
 
 		int[] nums = CConversion.SeparateDigits(num);
 
-		float width = OpenTaiko.Tx.Dani_Soul_Number.sz画像サイズ.Width / 10.0f;
-		float height = OpenTaiko.Tx.Dani_Soul_Number.sz画像サイズ.Height / 2.0f;
+		float width = OpenTaiko.Tx.Dani_Soul_Number.szImageSize.Width / 10.0f;
+		float height = OpenTaiko.Tx.Dani_Soul_Number.szImageSize.Height / 2.0f;
 
 		float text_width = OpenTaiko.Skin.DaniSelect_Soul_Number_Text_Width;
 
-		OpenTaiko.Tx.Dani_Soul_Number.t2D描画(x + OpenTaiko.Skin.DaniSelect_Soul_Number_Interval[0] + (width / 2),
+		OpenTaiko.Tx.Dani_Soul_Number.t2DDraw(x + OpenTaiko.Skin.DaniSelect_Soul_Number_Interval[0] + (width / 2),
 			y + OpenTaiko.Skin.DaniSelect_Soul_Number_Interval[1] - (height / 2),
 			new RectangleF(0, height, text_width, height));
 
@@ -840,7 +840,7 @@ class CActSelect段位リスト : CStage {
 			float _x = x - (OpenTaiko.Skin.DaniSelect_Soul_Number_Interval[0] * offset) + (width / 2);
 			float _y = y - (OpenTaiko.Skin.DaniSelect_Soul_Number_Interval[1] * offset) - (height / 2);
 
-			OpenTaiko.Tx.Dani_Soul_Number.t2D描画(_x, _y,
+			OpenTaiko.Tx.Dani_Soul_Number.t2DDraw(_x, _y,
 				new RectangleF(width * nums[j], 0, width, height));
 		}
 	}
@@ -865,15 +865,15 @@ class CActSelect段位リスト : CStage {
 
 		int[] nums = CConversion.SeparateDigits(num);
 
-		float width = OpenTaiko.Tx.Dani_Exam_Number.sz画像サイズ.Width / 10.0f;
-		float height = OpenTaiko.Tx.Dani_Exam_Number.sz画像サイズ.Height / 2.0f;
+		float width = OpenTaiko.Tx.Dani_Exam_Number.szImageSize.Width / 10.0f;
+		float height = OpenTaiko.Tx.Dani_Exam_Number.szImageSize.Height / 2.0f;
 
 		float text_width = OpenTaiko.Skin.DaniSelect_Exam_Number_Text_Width;
 
 		OpenTaiko.Tx.Dani_Exam_Number.vcScaleRatio.X = scale;
 		OpenTaiko.Tx.Dani_Exam_Number.vcScaleRatio.Y = scale;
 
-		OpenTaiko.Tx.Dani_Exam_Number.t2D描画(
+		OpenTaiko.Tx.Dani_Exam_Number.t2DDraw(
 			x + ((OpenTaiko.Skin.DaniSelect_Exam_Number_Interval[0] + (width / 2)) * scale),
 			y + ((OpenTaiko.Skin.DaniSelect_Exam_Number_Interval[1] + (height / 2)) * scale),
 			new RectangleF(text_width * (int)Range, height, text_width, height));
@@ -884,7 +884,7 @@ class CActSelect段位リスト : CStage {
 			float _x = x - (((OpenTaiko.Skin.DaniSelect_Exam_Number_Interval[0] * offset) + (width / 2)) * scale);
 			float _y = y - (((OpenTaiko.Skin.DaniSelect_Exam_Number_Interval[1] * offset) - (height / 2)) * scale);
 
-			OpenTaiko.Tx.Dani_Exam_Number.t2D描画(_x, _y,
+			OpenTaiko.Tx.Dani_Exam_Number.t2DDraw(_x, _y,
 				new RectangleF(width * nums[j], 0, width, height));
 		}
 	}

@@ -41,24 +41,24 @@ class CActSelectSongInfo : CStage {
 	public override int Draw() {
 		if (OpenTaiko.SongMount.rCurrentlySelectedSong != null && OpenTaiko.SongMount.rCurrentlySelectedSong.nodeType == CSongListNode.ENodeType.SCORE) {
 			int[] bpms = new int[3] {
-				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.BaseBpm,
-				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.MinBpm,
-				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].譜面情報.MaxBpm
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].ChartInfo.BaseBpm,
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].ChartInfo.MinBpm,
+				(int)OpenTaiko.SongMount.rCurrentlySelectedSong.score[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(OpenTaiko.SongMount.rCurrentlySelectedSong)].ChartInfo.MaxBpm
 			};
 			for (int i = 0; i < 3; i++) {
 				tBPMNumberDraw(OpenTaiko.Skin.SongSelect_Bpm_X[i], OpenTaiko.Skin.SongSelect_Bpm_Y[i], bpms[i]);
 			}
 
 			if (OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongMaker != null && OpenTaiko.Skin.SongSelect_Maker_Show) {
-				TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongMaker).t2D拡大率考慮描画(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_Maker[0], OpenTaiko.Skin.SongSelect_Maker[1]);
+				TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongMaker).t2DScaledDraw(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_Maker[0], OpenTaiko.Skin.SongSelect_Maker[1]);
 			}
 			if (OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM != null && OpenTaiko.Skin.SongSelect_BPM_Text_Show) {
-				TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM).t2D拡大率考慮描画(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_BPM_Text[0], OpenTaiko.Skin.SongSelect_BPM_Text[1]);
+				TitleTextureKey.ResolveTitleTexture(OpenTaiko.stageSongSelect.actSongList.ttkSelectedSongBPM).t2DScaledDraw(CTexture.RefPnt.Left, OpenTaiko.Skin.SongSelect_BPM_Text[0], OpenTaiko.Skin.SongSelect_BPM_Text[1]);
 			}
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong.bExplicit)
-				OpenTaiko.Tx.SongSelect_Explicit?.t2D描画(OpenTaiko.Skin.SongSelect_Explicit[0], OpenTaiko.Skin.SongSelect_Explicit[1]);
+				OpenTaiko.Tx.SongSelect_Explicit?.t2DDraw(OpenTaiko.Skin.SongSelect_Explicit[0], OpenTaiko.Skin.SongSelect_Explicit[1]);
 			if (OpenTaiko.SongMount.rCurrentlySelectedSong.bMovie)
-				OpenTaiko.Tx.SongSelect_Movie?.t2D描画(OpenTaiko.Skin.SongSelect_Movie[0], OpenTaiko.Skin.SongSelect_Movie[1]);
+				OpenTaiko.Tx.SongSelect_Movie?.t2DDraw(OpenTaiko.Skin.SongSelect_Movie[0], OpenTaiko.Skin.SongSelect_Movie[1]);
 		}
 
 
@@ -76,10 +76,10 @@ class CActSelectSongInfo : CStage {
 				float x = originx - (OpenTaiko.Skin.SongSelect_Bpm_Interval[0] * offset);
 				float y = originy - (OpenTaiko.Skin.SongSelect_Bpm_Interval[1] * offset);
 
-				float width = OpenTaiko.Tx.SongSelect_Bpm_Number.sz画像サイズ.Width / 10.0f;
-				float height = OpenTaiko.Tx.SongSelect_Bpm_Number.sz画像サイズ.Height;
+				float width = OpenTaiko.Tx.SongSelect_Bpm_Number.szImageSize.Width / 10.0f;
+				float height = OpenTaiko.Tx.SongSelect_Bpm_Number.szImageSize.Height;
 
-				OpenTaiko.Tx.SongSelect_Bpm_Number.t2D描画(x, y, new RectangleF(width * nums[j], 0, width, height));
+				OpenTaiko.Tx.SongSelect_Bpm_Number.t2DDraw(x, y, new RectangleF(width * nums[j], 0, width, height));
 			}
 		}
 	}
