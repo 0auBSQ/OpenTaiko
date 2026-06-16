@@ -33,13 +33,6 @@
 			}
 		}
 
-		public static void PropagateOnStart(Action? onEach = null) {
-			foreach (KeyValuePair<string, LuaActivityWrapper> _act in _allLuaActivities) {
-				_act.Value.OnStart();
-				onEach?.Invoke();
-			}
-		}
-
 		public static void PropagateOnDestroy() {
 			foreach (KeyValuePair<string, LuaActivityWrapper> _act in _allLuaActivities) {
 				_act.Value.OnDestroy();
@@ -88,9 +81,14 @@
 
 		#region [Events not present on CStage/CActivity]
 
-		// Executes **Just after** loading the skin, once the readme notice appears, also executes everytime the skin is reloaded
-		internal void OnStart() {
-			lcActScript?.OnStart();
+		// Incremental onStart (see LuaStageWrapper) — drives a yielding onStart across frames with the bar.
+		internal void BeginOnStart() {
+			lcActScript?.BeginOnStart();
+		}
+
+		internal bool StepOnStart(out float progress) {
+			if (lcActScript == null) { progress = 0f; return false; }
+			return lcActScript.StepOnStart(out progress);
 		}
 
 

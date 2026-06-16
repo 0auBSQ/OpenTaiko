@@ -79,6 +79,12 @@ internal class CStageStartup : CStage {
 				// started once module loading finishes (see below).
 				_moduleLoad = OpenTaiko.Skin.LoadModulesIncrementally();
 				_modulesLoading = true;
+				// Open an async-load phase so the modules' onStart textures stream in + their SOUND/Shared loads
+				// defer (CAsyncLoad), and batch the per-texture trace flush, so a heavy onStart doesn't freeze the
+				// boot. Drained before the song enum (see below); EndPhase + AutoFlush restore there.
+				CAsyncLoad.BeginPhase();
+				_savedAutoFlush = System.Diagnostics.Trace.AutoFlush;
+				System.Diagnostics.Trace.AutoFlush = false;
 				base.IsFirstDraw = false;
 				return 0;
 			}
@@ -89,20 +95,32 @@ internal class CStageStartup : CStage {
 			Background.Draw();
 			CLoadingScreen.Draw();   // engine loading bar overlay
 
-			#region [ Incremental Lua module loading (0-60% of the bar, before the song enum) ]
+			#region [ Incremental Lua module loading (0-55% bar) + texture stream drain (55-60%), before the song enum ]
 			if (_modulesLoading) {
 				// Process a time-budgeted batch per frame so the screen keeps rendering + the bar advances.
 				long _t0 = System.Diagnostics.Stopwatch.GetTimestamp();
 				while (System.Diagnostics.Stopwatch.GetElapsedTime(_t0).TotalMilliseconds < 10.0) {
 					if (!_moduleLoad.MoveNext()) {
 						_modulesLoading = false;
-						OpenTaiko.NamePlate.RefleshSkin();
-						OpenTaiko.ModalManager.RefleshSkin();
-						es = new CEnumSongs();
-						es.StartEnumFromCache();   // 曲リスト取得(別スレッドで実行される)
+						CAsyncLoad.StartDecode();   // begin decoding the queued onStart textures (off-thread)
+						_modulesDraining = true;        // then finish uploading them before the song enum
 						break;
 					}
-					CLoadingProgress.Report(0.60f * _moduleLoad.Current);
+					CLoadingProgress.Report(0.55f * _moduleLoad.Current);
+				}
+				CAsyncLoad.Pump(8.0);   // upload the onStart textures decoded off-thread (a budget per frame)
+			} else if (_modulesDraining) {
+				CAsyncLoad.Pump(8.0);
+				CLoadingProgress.Report(0.55f + 0.05f * CAsyncLoad.Fraction);
+				if (CAsyncLoad.Complete) {
+					_modulesDraining = false;
+					CAsyncLoad.EndPhase();
+					System.Diagnostics.Trace.AutoFlush = _savedAutoFlush;
+					System.Diagnostics.Trace.Flush();
+					OpenTaiko.NamePlate.RefleshSkin();
+					OpenTaiko.ModalManager.RefleshSkin();
+					es = new CEnumSongs();
+					es.StartEnumFromCache();   // 曲リスト取得(別スレッドで実行される)
 				}
 			}
 			#endregion
@@ -210,6 +228,8 @@ internal class CStageStartup : CStage {
 	private bool bIsLoadingTextures;
 	private System.Collections.Generic.IEnumerator<float> _moduleLoad;   // incremental skin-module loader
 	private bool _modulesLoading;
+	private bool _modulesDraining;       // finishing the streamed onStart-texture uploads before the song enum
+	private bool _savedAutoFlush;        // Trace.AutoFlush state to restore after the batched module-load phase
 
 #if false
 		private void t曲リストの構築()

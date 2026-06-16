@@ -482,11 +482,21 @@ internal class CStageSongLoading : CStage {
 					// work instead of decoding inline. So Activate returns in a few ms rather than freezing for
 					// seconds; the decode + GL upload then stream in over the next frames (StreamTextures below)
 					// with the render loop free → smooth bar + live ESC.
-					CTexture.BeginStreaming();
-					OpenTaiko.stageGameScreen.Activate();
-					CTexture.StreamingLoad = false;     // activation done queueing; later loads go synchronous
-					CTexture.StartStreamDecode();       // decode everything queued, off-thread
-					_streamingActive = true;
+					// Batch trace writes during activation: Trace.AutoFlush is on (OpenTaiko.cs), so the per-texture
+					// [ALLOC_TEX] debug log otherwise flushes to disk every call — slow on an AV-scanned folder and
+					// a big part of the activation cost. Buffer it, then flush once.
+					bool prevAutoFlush = System.Diagnostics.Trace.AutoFlush;
+					System.Diagnostics.Trace.AutoFlush = false;
+					try {
+						CTexture.BeginStreaming();
+						OpenTaiko.stageGameScreen.Activate();
+						CTexture.StreamingLoad = false;     // activation done queueing; later loads go synchronous
+						CTexture.StartStreamDecode();       // decode everything queued, off-thread
+						_streamingActive = true;
+					} finally {
+						System.Diagnostics.Trace.AutoFlush = prevAutoFlush;
+						System.Diagnostics.Trace.Flush();
+					}
 					base.ePhaseID = CStage.EPhase.SongLoading_StreamTextures;
 					return (int)ESongLoadingScreenReturnValue.Continue;
 				}

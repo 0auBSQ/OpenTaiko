@@ -16,6 +16,15 @@ namespace OpenTaiko {
 			_sound.tLoading();
 		}
 
+		// Build the underlying sound in-place (async-load path: created empty, filled on the render thread).
+		// Until this runs, every method is a harmless no-op.
+		internal void LoadDeferred(string path, ESoundGroup group) {
+			Path = path;
+			var s = new CSkin.CSystemSound(path, false, false, false, group);
+			s.tLoading();
+			_sound = s;
+		}
+
 		#region Sound
 		public void Play() => _sound?.tPlay();
 		public void Stop() => _sound?.tStop();
@@ -92,6 +101,22 @@ namespace OpenTaiko {
 #endif
 
 			LuaSound sound = new();
+
+			// In a load phase: return an empty stub + defer the BASS stream creation, spread across frames by
+			// CAsyncLoad (stays render-thread-only), so many sounds in one onStart don't freeze the frame.
+			if (CAsyncLoad.ShouldDefer) {
+				Sounds.Add(sound);
+				if (autoDispose)
+					sound._disposeList = this.Sounds;
+				CAsyncLoad.TrackRenderThread(() => {
+					try {
+						sound.LoadDeferred(full_path, group);
+					} catch (Exception e) {
+						LogNotification.PopError($"Lua Sound failed to load: {e}");
+					}
+				});
+				return sound;
+			}
 
 			try {
 				sound = new(full_path, group);

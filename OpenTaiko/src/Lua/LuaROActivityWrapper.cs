@@ -34,12 +34,6 @@ namespace OpenTaiko {
 				pair.Value.AfterSongsEnum();
 		}
 
-		public static void PropagateOnStart(Action? onEach = null) {
-			foreach (var pair in _allROActivities) {
-				pair.Value.OnStart();
-				onEach?.Invoke();
-			}
-		}
 
 		public static void PropagateOnDestroy() {
 			foreach (var pair in _allROActivities)
@@ -81,7 +75,11 @@ namespace OpenTaiko {
 
 		#region [Extra skin events]
 
-		internal void OnStart() => lcActScript?.OnStart();
+		internal void BeginOnStart() => lcActScript?.BeginOnStart();
+		internal bool StepOnStart(out float progress) {
+			if (lcActScript == null) { progress = 0f; return false; }
+			return lcActScript.StepOnStart(out progress);
+		}
 		private void AfterSongsEnum() => lcActScript?.AfterSongsEnum();
 		private void OnDestroy() => lcActScript?.OnDestroy();
 

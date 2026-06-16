@@ -231,6 +231,10 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	public static CStageTransition stageTransition {
+		get;
+		private set;
+	}
 	public static CStageShutdown stageExit {
 		get;
 		private set;
@@ -352,6 +356,16 @@ internal class OpenTaiko : Game {
 	}
 
 	public void UnmountAndChangeStage(CStage Stage, string? traceMessage = null) {
+		// A Lua Exit(...) requested a transition: hand the switch to CStageTransition (it renders the still-
+		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
+		var pendingTransition = CStageTransition.ConsumePendingScript();
+		if (pendingTransition != null && Stage != null) {
+			stageTransition.Begin(rCurrentStage, Stage, pendingTransition, traceMessage);
+			rPreviousStage = rCurrentStage;
+			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
+			return;
+		}
+
 		UnmountActivity(rCurrentStage);
 		this.ChangeStage(Stage, traceMessage);
 	}
@@ -367,6 +381,7 @@ internal class OpenTaiko : Game {
 	}
 
 	public void TriggerSystemError(CSystemError.Errno errno, Exception? exception = null, string? message = null) {
+		CStageTransition.ClearPendingScript();   // don't carry a pending transition into the error stage
 		if (exception != null)
 			Trace.TraceError(exception.ToString());
 		if (message != null)
@@ -652,6 +667,16 @@ internal class OpenTaiko : Game {
 						}
 						break;
 
+					case CStage.EStage.Transition:
+						// Transition finished: take over the target it already mounted (rPreviousStage stays the
+						// stage we came from, set when the transition began).
+						if (this.nDrawLoopReturnValue != 0) {
+							CStage? _target = stageTransition.Target;
+							stageTransition.Finish();
+							rCurrentStage = _target ?? rCurrentStage;
+						}
+						break;
+
 					case CStage.EStage.Config:
 						#region [ *** ]
 						//-----------------------------
@@ -854,23 +879,10 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							if (stageChangeSkin.IsPreviousStageSaved) { // revert screen history
-								var prevStage = stageChangeSkin.SavedPreviousStage;
-								var backStage = rPreviousStage;
-								if (backStage.eStageID == CStage.EStage.CUSTOM) {
-									UnmountAndChangeLuaStageOrError(backStage.customStageName);
-								} else {
-									UnmountAndChangeStage(backStage);
-								}
-								if (prevStage?.eStageID == CStage.EStage.CUSTOM) { // prevent invalid reference
-									rPreviousStage = LuaStageWrapper.GetLuaStage(prevStage.customStageName);
-								} else {
-									rPreviousStage = prevStage;
-								}
-							} else { // old behavior: return to title
-								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
-								this.tExecuteGarbageCollection();
-							}
+							// After a skin (re)load, enter the new skin's _boot stage (same entry point as the
+							// initial startup) instead of silently reverting to the previous screen.
+							UnmountAndChangeLuaStageOrError("_boot", "Boot", CSystemError.Errno.ENO_BOOTNOTFOUND);
+							this.tExecuteGarbageCollection();
 						}
 						//-----------------------------
 						#endregion
@@ -1048,7 +1060,8 @@ internal class OpenTaiko : Game {
 		// Fast-skip missing files: returning null avoids a FileNotFoundException per missing texture, which is
 		// very slow under a debugger (first-chance handling) — a malformed asset (e.g. a dancer whose
 		// DancerConfig count exceeds its frame folders) otherwise throws dozens of them and freezes the load.
-		if (!File.Exists(fileName)) {
+		// FileExistsCached uses a per-directory listing (no slow per-file metadata hit on AV-scanned folders).
+		if (!CTexture.FileExistsCached(fileName)) {
 			Trace.TraceWarning("Could not find specified texture file. ({0})", fileName);
 			return null;
 		}
@@ -1541,6 +1554,7 @@ internal class OpenTaiko : Game {
 		stageGameScreen = new CStagePlayDrumsScreen();
 		stageResults = new CStageResult();
 		stageChangeSkin = new CStageChangeSkin();
+		stageTransition = new CStageTransition();
 		stageExit = new CStageShutdown();
 		NamePlate = new CNamePlate();
 
@@ -1554,6 +1568,7 @@ internal class OpenTaiko : Game {
 		this.listTopLevelActivities.Add(stageGameScreen);
 		this.listTopLevelActivities.Add(stageResults);
 		this.listTopLevelActivities.Add(stageChangeSkin);
+		this.listTopLevelActivities.Add(stageTransition);
 		this.listTopLevelActivities.Add(stageExit);
 		//---------------------
 		#endregion
@@ -1883,11 +1898,22 @@ internal class OpenTaiko : Game {
 	}
 
 	public void LoadSkin() {
+		// Synchronous full (re)load — kept for any caller that doesn't drive the incremental path.
+		var loader = LoadSkinBegin();
+		while (loader.MoveNext()) { }
+		LoadSkinFinish();
+	}
+
+	// Incremental skin (re)load, so CStageChangeSkin can drive it across frames with a loading bar (the same
+	// pattern boot uses). LoadSkinBegin returns the module loader to MoveNext each frame; LoadSkinFinish runs
+	// once it (and the streamed onStart textures) are done.
+	public System.Collections.Generic.IEnumerator<float> LoadSkinBegin() {
 		OpenTaiko.Skin.PreloadSystemSounds();
-		OpenTaiko.Skin.FetchMenusAndModules();
+		return OpenTaiko.Skin.LoadModulesIncrementally();
+	}
 
+	public void LoadSkinFinish() {
 		OpenTaiko.Tx.DisposeTexture();
-
 		OpenTaiko.Tx.LoadTexture();
 
 		// Re-propagate AfterSongEnum events to all lua stages

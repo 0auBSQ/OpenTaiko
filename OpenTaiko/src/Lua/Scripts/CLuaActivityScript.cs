@@ -51,9 +51,10 @@ namespace OpenTaiko {
 
 		#region [Extra events]
 
-		public void OnStart() {
-			RunLuaCode(lfOnStart);
-		}
+		// onStart runs as a coroutine (BeginOnStart + StepOnStart per frame) so heavy loading spreads across
+		// frames instead of freezing the render thread.
+		public void BeginOnStart() => tBeginYieldable(lfOnStart);
+		public bool StepOnStart(out float progress) => tStepYieldable(out progress);
 
 		public void AfterSongsEnum() {
 			RunLuaCode(lfAfterSongEnum);

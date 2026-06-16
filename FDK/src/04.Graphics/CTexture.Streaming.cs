@@ -25,6 +25,40 @@ public partial class CTexture {
 	private static System.Threading.Tasks.Task? _streamDecodeTask;
 	private static System.Threading.CancellationTokenSource? _streamCts;
 
+	// ── Cached file existence ─────────────────────────────────────────────────────────────────────
+	// A stage activation checks existence for hundreds of texture paths. On systems where the game folder is
+	// scanned by antivirus, each per-file metadata hit is slow; enumerating a directory ONCE (metadata only,
+	// not file contents → not AV-scanned) and caching the name set turns N per-file checks into ~1 per dir.
+	// Works for everyone with no setup. Session-long (game assets are static at runtime); call
+	// ClearFileListCache() after a skin reload if assets change on disk.
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Generic.HashSet<string>> _dirListCache
+		= new(StringComparer.OrdinalIgnoreCase);
+
+	/// <summary>File.Exists via a cached per-directory listing (see note above). Falls back to File.Exists on
+	/// any error.</summary>
+	public static bool FileExistsCached(string path) {
+		if (string.IsNullOrEmpty(path)) return false;
+		try {
+			string dir = Path.GetDirectoryName(path);
+			if (string.IsNullOrEmpty(dir)) return File.Exists(path);
+			var names = _dirListCache.GetOrAdd(dir, d => {
+				var set = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				try {
+					if (Directory.Exists(d))
+						foreach (var f in Directory.EnumerateFiles(d))
+							set.Add(Path.GetFileName(f));
+				} catch { /* leave empty → treated as missing */ }
+				return set;
+			});
+			return names.Contains(Path.GetFileName(path));
+		} catch {
+			return File.Exists(path);
+		}
+	}
+
+	/// <summary>Drop the cached directory listings (call after a skin reload / when on-disk assets change).</summary>
+	public static void ClearFileListCache() => _dirListCache.Clear();
+
 	/// <summary>Real-time stream progress 0..1 (1 when nothing queued). Read each frame for the bar.</summary>
 	public static float StreamFraction => _streamTotal <= 0 ? 1f : Math.Min(1f, _streamUploaded / (float)_streamTotal);
 	/// <summary>True once every queued texture has been uploaded (or skipped on decode failure).</summary>
@@ -38,7 +72,7 @@ public partial class CTexture {
 	/// so a transient zero size is invisible. (File.Exists is metadata-only ⇒ no AV scan ⇒ cheap.) Render
 	/// thread only.</summary>
 	private bool tQueueStreamedTexture(string strFileName, bool bBlackTransparent) {
-		if (!File.Exists(strFileName))
+		if (!FileExistsCached(strFileName))
 			return false;
 		// Pointer + size stay 0 until PumpUploads fills them; t2DDraw no-ops while Pointer == 0.
 		_streamPending.Enqueue((this, strFileName, bBlackTransparent));
@@ -84,17 +118,32 @@ public partial class CTexture {
 						System.Threading.Thread.Sleep(1);
 					if (ct.IsCancellationRequested) return;
 
-					SKBitmap? bmp = null;
-					try {
-						if (File.Exists(item.path))
-							bmp = SKBitmap.Decode(item.path);
-					} catch { bmp = null; }
+					SKBitmap? bmp = tDecodeForUpload(item.path);
 					if (bmp != null)
 						System.Threading.Interlocked.Add(ref _streamReadyBytes, bmp.ByteCount);
 					_streamReady.Enqueue((item.tex, bmp, item.black));
 				});
 			} catch (OperationCanceledException) { /* cancelled */ }
 		}, ct);
+	}
+
+	/// <summary>Decode an image to BGRA8888 UNPREMUL so the GL upload can be zero-copy (GetPixels) and matches
+	/// the engine's straight-alpha blending. Falls back to a plain decode (premul) — the upload then uses the
+	/// .Pixels conversion path, which is correct but copies. Off-thread (decode worker).</summary>
+	private static SKBitmap? tDecodeForUpload(string path) {
+		try {
+			using var fs = File.OpenRead(path);
+			using var codec = SKCodec.Create(fs);
+			if (codec != null) {
+				var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+				var bmp = new SKBitmap(info);
+				var res = codec.GetPixels(info, bmp.GetPixels());
+				if (res == SKCodecResult.Success || res == SKCodecResult.IncompleteInput)
+					return bmp;
+				bmp.Dispose();
+			}
+		} catch { /* fall through to the plain decode */ }
+		try { return SKBitmap.Decode(path); } catch { return null; }
 	}
 
 	/// <summary>Drain decoded bitmaps to the GPU within a per-frame time budget (render thread). Call each

@@ -20,6 +20,7 @@ public class CStage : CActivity {
 		Game,
 		Results,
 		ChangeSkin,                     // #28195 2011.5.4 yyagi
+		Transition,                     // smooth stage→stage fade + loading screen (CStageTransition)
 		Heya,
 		TaikoTowers,
 		BoukenTitle,

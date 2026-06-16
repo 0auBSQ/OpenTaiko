@@ -52,13 +52,6 @@
 			}
 		}
 
-		public static void PropagateOnStart(Action? onEach = null) {
-			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
-				_stage.Value.OnStart();
-				onEach?.Invoke();
-			}
-		}
-
 		public static void PropagateOnDestroy() {
 			foreach (KeyValuePair<string, LuaStageWrapper> _stage in _allLuaStages) {
 				_stage.Value.OnDestroy();
@@ -116,10 +109,21 @@
 			return _rv;
 		}
 
-		private int RequestExitStage(string transition, string? moduleName) {
-			this.eFadeOutReturnValue = _StringToReturnValue(transition, moduleName);
-			this.actFOtoTitle.tFadeOutStart();
-			base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+		private bool _exitImmediate = false;
+
+		private int RequestExitStage(string target, string? moduleName, string? transitionName) {
+			this.eFadeOutReturnValue = _StringToReturnValue(target, moduleName);
+
+			var tr = LuaTransitionWrapper.Get(transitionName);
+			if (tr != null) {
+				// Hand off this frame so CStageTransition plays the fade-out/loading/fade-in (skip the legacy fade).
+				CStageTransition.SetPendingScript(tr);
+				_exitImmediate = true;
+			} else {
+				// No transition modules in this skin — fall back to the legacy black fade-out.
+				this.actFOtoTitle.tFadeOutStart();
+				base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+			}
 			return 0;
 		}
 
@@ -131,6 +135,7 @@
 
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.eFadeOutReturnValue = EReturnValue.Continuation;
+			_exitImmediate = false;
 
 			lcStageScript?.Activate();
 
@@ -147,7 +152,13 @@
 			if (this.eFadeOutReturnValue == EReturnValue.Continuation) lcStageScript?.Update(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
 			lcStageScript?.Draw();
 
-			// Menu exit fade out transition
+			// A transition was requested: hand off this frame (CStageTransition then drives the fade/loading).
+			if (_exitImmediate) {
+				_exitImmediate = false;
+				return (int)this.eFadeOutReturnValue;
+			}
+
+			// Legacy exit fade out (no transition module in this skin)
 			switch (base.ePhaseID) {
 				case CStage.EPhase.Common_FADEOUT:
 					if (this.actFOtoTitle.Draw() == 0) {
@@ -163,9 +174,15 @@
 
 		#region [Events not present on CStage/CActivity]
 
-		// Executes **Just after** loading the skin, once the readme notice appears, also executes everytime the skin is reloaded
-		internal void OnStart() {
-			lcStageScript?.OnStart();
+		// Incremental onStart (run just after the skin loads + on every reload): the engine calls BeginOnStart()
+		// then StepOnStart() each frame until it returns false, so a heavy onStart spreads across frames.
+		internal void BeginOnStart() {
+			lcStageScript?.BeginOnStart();
+		}
+
+		internal bool StepOnStart(out float progress) {
+			if (lcStageScript == null) { progress = 0f; return false; }
+			return lcStageScript.StepOnStart(out progress);
 		}
 
 

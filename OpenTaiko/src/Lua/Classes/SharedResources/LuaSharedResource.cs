@@ -20,19 +20,34 @@ namespace OpenTaiko {
 				capturedVersion = ++_version;
 			}
 
+			// Already async (factory off-thread → version-deduped swap). During a load phase, count it so the bar
+			// waits for it; the version counter still discards stale loads, so no leak.
+			bool track = CAsyncLoad.ShouldDefer;
+			if (track) CAsyncLoad.NotePending();
+
 			Task.Run(() => {
-				var newResource = factory(path);
+				T? newResource = null;
+				try {
+					newResource = factory(path);
+				} catch (Exception e) {
+					System.Diagnostics.Trace.TraceWarning("[SharedResource] factory failed: " + e.Message);
+				}
 
 				Game.AsyncActions.Enqueue(() => {
-					if (_version != capturedVersion) {
-						try { newResource.Dispose(); } catch { }
-						return;
-					}
+					try {
+						if (newResource == null) return;
+						if (_version != capturedVersion) {
+							try { newResource.Dispose(); } catch { }
+							return;
+						}
 
-					_resource.Dispose();
-					_resource = newResource;
-					_version++;
-					onCreate?.Invoke(newResource);
+						_resource.Dispose();
+						_resource = newResource;
+						_version++;
+						onCreate?.Invoke(newResource);
+					} finally {
+						if (track) CAsyncLoad.NoteDone();
+					}
 				});
 			});
 		}

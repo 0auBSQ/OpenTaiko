@@ -596,7 +596,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			&& tQueueStreamedTexture(strFileName, bBlackTransparent))
 			return;
 
-		if (!File.Exists(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
+		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
 			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
 
 		SKBitmap bitmap = SKBitmap.Decode(strFileName);
@@ -649,26 +649,38 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		return handle;
 	}
 
+	/// <summary>Create a GL texture from a bitmap, ZERO-COPY when possible. The engine blends with straight
+	/// (unpremultiplied) alpha, so: if the bitmap is already Unpremul Bgra/Rgba, hand GL its native buffer via
+	/// GetPixels() (no managed copy); otherwise read .Pixels, which converts to unpremultiplied BGRA (correct,
+	/// but copies the whole image — the old behavior, kept as a safe fallback). Render thread only (calls GL).</summary>
+	private uint tGenFromBitmap(SKBitmap b) {
+		if (b.AlphaType == SKAlphaType.Unpremul && (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
+			var fmt = b.ColorType == SKColorType.Rgba8888 ? PixelFormat.Rgba : PixelFormat.Bgra;
+			unsafe {
+				void* p = (void*)b.GetPixels();
+				if (p != null)
+					return GenTexture(p, (uint)b.Width, (uint)b.Height, fmt);
+			}
+		}
+		unsafe {
+			fixed (void* data = b.Pixels) {
+				return GenTexture(data, (uint)b.Width, (uint)b.Height, PixelFormat.Bgra);
+			}
+		}
+	}
+
 	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) {
 		try {
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
 
 			if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
-				unsafe {
-					fixed (void* data = bitmap.Pixels) {
-						Pointer = GenTexture(data, (uint)bitmap.Width, (uint)bitmap.Height, PixelFormat.Bgra);
-					}
-				}
+				Pointer = tGenFromBitmap(bitmap);
 			} else {
 				var asyncCopy = bitmap.Copy();
 				Action createInstance = () => {
 					try {
-						unsafe {
-							fixed (void* data2 = asyncCopy.Pixels) {
-								Pointer = GenTexture(data2, (uint)asyncCopy.Width, (uint)asyncCopy.Height, PixelFormat.Bgra);
-							}
-						}
+						Pointer = tGenFromBitmap(asyncCopy);
 					} finally {
 						asyncCopy.Dispose();
 					}

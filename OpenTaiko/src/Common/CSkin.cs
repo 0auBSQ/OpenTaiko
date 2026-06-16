@@ -471,6 +471,9 @@ internal class CSkin : IDisposable {
 		LuaActivityWrapper.ResetLuaActivityDictionary();
 		LuaROActivityWrapper.PropagateOnDestroy();
 		LuaROActivityWrapper.ResetROActivityDictionary();
+		// Transitions LAST — onDestroy runs after Stages/Activities (mirror of the load order).
+		LuaTransitionWrapper.PropagateOnDestroy();
+		LuaTransitionWrapper.ResetTransitionsDictionary();
 	}
 
 	/// <summary>
@@ -486,6 +489,7 @@ internal class CSkin : IDisposable {
 		MainMenuSettings = new CMainMenuSettings();
 		MainMenuSettings.tReloadMenus();
 
+		string[] _transitionsList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Transitions")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 		string[] _modulesList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Stages")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 		string[] _globalModulesList = DirectoryUtils.SafeGetDirectories($"Global/Stages").Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 		string[] _actList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/Activities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
@@ -493,26 +497,52 @@ internal class CSkin : IDisposable {
 		string[] _roActList = DirectoryUtils.SafeGetDirectories(CSkin.Path($"Modules/ROActivities")).Select(_path => System.IO.Path.GetFileName(_path)).ToArray();
 
 		// Each item is processed twice (instantiate, then onStart).
-		int total = (_modulesList.Length + _globalModulesList.Length + _actList.Length + _globalActList.Length + _roActList.Length) * 2;
+		int total = (_transitionsList.Length + _modulesList.Length + _globalModulesList.Length + _actList.Length + _globalActList.Length + _roActList.Length) * 2;
 		if (total <= 0) yield break;
 		int done = 0;
+
+		// onStart is driven as a coroutine (BeginOnStart + StepOnStart): a stage that calls coroutine.yield(p)
+		// in its onStart spreads its load across many MoveNext()s with live sub-progress, so a heavy onStart
+		// no longer blocks one whole step (the boot/skin-reload freeze). A non-yielding onStart finishes on
+		// the first step ⇒ same as before.
+
+		// Transitions FIRST — onStart runs before Stages/Activities so they're ready for the first stage switch.
+		var transitions = new List<LuaTransitionWrapper>();
+		foreach (string _t in _transitionsList) { transitions.Add(new LuaTransitionWrapper(_t)); yield return ++done / (float)total; }
+		foreach (var _t in transitions) {
+			_t.BeginOnStart();
+			while (_t.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			yield return ++done / (float)total;
+		}
 
 		// Lua Stages
 		var stages = new List<LuaStageWrapper>();
 		foreach (string _module in _modulesList) { stages.Add(new LuaStageWrapper(_module, false)); yield return ++done / (float)total; }
 		foreach (string _module in _globalModulesList) { stages.Add(new LuaStageWrapper(_module, true)); yield return ++done / (float)total; }
-		foreach (var _s in stages) { _s.OnStart(); yield return ++done / (float)total; }
+		foreach (var _s in stages) {
+			_s.BeginOnStart();
+			while (_s.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			yield return ++done / (float)total;
+		}
 
 		// Lua Activities
 		var acts = new List<LuaActivityWrapper>();
 		foreach (string _act in _actList) { acts.Add(new LuaActivityWrapper(_act, false)); yield return ++done / (float)total; }
 		foreach (string _act in _globalActList) { acts.Add(new LuaActivityWrapper(_act, true)); yield return ++done / (float)total; }
-		foreach (var _a in acts) { _a.OnStart(); yield return ++done / (float)total; }
+		foreach (var _a in acts) {
+			_a.BeginOnStart();
+			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			yield return ++done / (float)total;
+		}
 
 		// Lua RO Activities
 		var roActs = new List<LuaROActivityWrapper>();
 		foreach (string _act in _roActList) { roActs.Add(new LuaROActivityWrapper(_act)); yield return ++done / (float)total; }
-		foreach (var _a in roActs) { _a.OnStart(); yield return ++done / (float)total; }
+		foreach (var _a in roActs) {
+			_a.BeginOnStart();
+			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			yield return ++done / (float)total;
+		}
 	}
 
 	/// <summary>

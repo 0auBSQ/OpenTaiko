@@ -132,6 +132,89 @@ class CLuaScript : IDisposable {
 		return null;
 	}
 
+	// Run a hook (onStart) as an engine-owned Lua coroutine: a count hook on the thread auto-yields every N VM
+	// instructions, so a long load spreads across frames instead of freezing the render loop. (Lua is
+	// render-thread-only, so it can't move off-thread — but it can yield.) Resuming the thread directly, not via
+	// NLua's coroutine.resume under a lua_pcall, is what lets the hook's yield propagate back to us.
+	public static int LoadYieldInstructions = 100_000;   // VM instructions between auto-yields
+
+	// Static so the native callback isn't GC-collected. The count-event yield defers to hook-return (no longjmp
+	// through this managed frame); the IsYieldable guard avoids "yield across a C-call boundary"; exceptions are
+	// swallowed so none crosses back into native Lua.
+	private static readonly KeraLua.LuaHookFunction _yieldHook = YieldHook;
+
+	private static void YieldHook(IntPtr L, IntPtr ar) {
+		try {
+			var st = KeraLua.Lua.FromIntPtr(L);
+			if (st != null && st.IsYieldable) st.Yield(0);
+		} catch { /* never let a managed exception cross back into native Lua */ }
+	}
+
+	// The coroutine thread we own + drive for the current hook (onStart). One at a time per script instance.
+	private KeraLua.Lua? _hookCo;
+	private int _hookThreadRef = -1;
+
+	/// <summary>Begin running a hook function (e.g. onStart) as a coroutine on a dedicated, engine-owned Lua
+	/// thread. Call tStepYieldable() repeatedly until it returns false.</summary>
+	protected void tBeginYieldable(NamedLuaFunction luaFunction) {
+		tEndYieldable();
+		var L = LuaScript?.State;
+		if (L == null || luaFunction.Func == null) return;   // undefined hook ⇒ no-op (treated as done)
+		try {
+			var co = L.NewThread();                              // new thread pushed on L's stack + wrapper
+			_hookThreadRef = L.Ref(KeraLua.LuaRegistry.Index);   // anchor it (pops it off L) so Lua won't GC it
+			if (L.GetGlobal(luaFunction.Name) != KeraLua.LuaType.Function) {
+				L.Pop(1);
+				tEndYieldable();
+				return;
+			}
+			L.XMove(co, 1);                                      // move the hook function onto co's stack
+			co.SetHook(_yieldHook, KeraLua.LuaHookMask.Count, Math.Max(1, LoadYieldInstructions));
+			_hookCo = co;
+		} catch (Exception exception) {
+			Crash(exception);
+			tEndYieldable();
+		}
+	}
+
+	/// <summary>Resume the hook coroutine one chunk (to the next auto-yield / explicit coroutine.yield, or
+	/// completion). Returns true while still running; sets <paramref name="progress"/> (0..1) to the last value
+	/// passed to coroutine.yield (0 for an auto-yield).</summary>
+	protected bool tStepYieldable(out float progress) {
+		progress = 0f;
+		var co = _hookCo;
+		if (co == null) return false;
+		try {
+			var status = co.Resume(LuaScript.State, 0, out int nresults);
+			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
+			if (status == KeraLua.LuaStatus.Yield) {
+				if (nresults > 0) {
+					try { progress = (float)co.ToNumber(-nresults); } catch { /* keep 0 */ }
+					co.Pop(nresults);   // drop the yielded values so the next Resume passes nothing back
+				}
+				return true;
+			}
+			if (status != KeraLua.LuaStatus.OK) {   // runtime/other error in the hook
+				bCrashed = true;
+				Trace.TraceError($"{this.strScriptShort} hook error: {co.ToString(-1)}");
+			}
+			tEndYieldable();
+			return false;
+		} catch (Exception exception) {
+			Crash(exception);
+			tEndYieldable();
+			return false;
+		}
+	}
+
+	private void tEndYieldable() {
+		if (_hookThreadRef != -1) {
+			try { LuaScript?.State?.Unref(KeraLua.LuaRegistry.Index, _hookThreadRef); } catch { /* ignore */ }
+			_hookThreadRef = -1;
+		}
+		_hookCo = null;
+	}
+
 	private JsonNode LoadConfig(string name) {
 		using Stream stream = File.OpenRead($"{strDir}/{name}");
 		JsonNode jsonNode = JsonNode.Parse(stream);
