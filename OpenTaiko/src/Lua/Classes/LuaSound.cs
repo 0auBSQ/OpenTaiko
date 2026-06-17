@@ -6,6 +6,15 @@ namespace OpenTaiko {
 		internal CSkin.CSystemSound? _sound;
 		internal HashSet<LuaSound>? _disposeList = null;
 
+		// State set on the stub before the deferred sound is built (async-load path) — applied on LoadDeferred,
+		// so e.g. SetLoop(true)/Play() called in onStart aren't lost while the BASS stream is still being created.
+		private bool? _pendingLoop;
+		private int? _pendingVolume;
+		private int? _pendingPan;
+		private int? _pendingTimestamp;
+		private double? _pendingSpeed;
+		private bool _pendingPlay;
+
 		public string Path { get; private set; } = "";
 		public LuaSound() {
 			_sound = null;
@@ -23,11 +32,19 @@ namespace OpenTaiko {
 			var s = new CSkin.CSystemSound(path, false, false, false, group);
 			s.tLoading();
 			_sound = s;
+			// Apply anything set on the stub while it was still loading.
+			if (_pendingLoop.HasValue) s.bLoop = _pendingLoop.Value;
+			if (_pendingVolume.HasValue) s.SetVolume(_pendingVolume.Value);
+			if (_pendingPan.HasValue) s.SetPanning(_pendingPan.Value);
+			if (_pendingTimestamp.HasValue) s.SetTimestamp(_pendingTimestamp.Value);
+			if (_pendingSpeed.HasValue) s.SetSpeed(_pendingSpeed.Value);
+			if (_pendingPlay) s.tPlay();
+			_pendingLoop = null; _pendingVolume = null; _pendingPan = null; _pendingTimestamp = null; _pendingSpeed = null; _pendingPlay = false;
 		}
 
 		#region Sound
-		public void Play() => _sound?.tPlay();
-		public void Stop() => _sound?.tStop();
+		public void Play() { if (_sound != null) _sound.tPlay(); else _pendingPlay = true; }
+		public void Stop() { if (_sound != null) _sound.tStop(); else _pendingPlay = false; }
 		#endregion
 		#region Gets
 		public bool Loaded => _sound != null;
@@ -41,16 +58,24 @@ namespace OpenTaiko {
 		#endregion
 		#region Sets
 		public void SetLoop(bool loop) {
-			if (_sound != null) _sound.bLoop = loop;
+			if (_sound != null) _sound.bLoop = loop; else _pendingLoop = loop;
 		}
-		public void SetPan(int panning) => _sound?.SetPanning(panning);
+		public void SetPan(int panning) {
+			if (_sound != null) _sound.SetPanning(panning); else _pendingPan = panning;
+		}
 
-		public void SetTimestamp(int ms) => _sound?.SetTimestamp(ms);
+		public void SetTimestamp(int ms) {
+			if (_sound != null) _sound.SetTimestamp(ms); else _pendingTimestamp = ms;
+		}
 
-		public void SetVolume(int vol) => _sound?.SetVolume(vol);
+		public void SetVolume(int vol) {
+			if (_sound != null) _sound.SetVolume(vol); else _pendingVolume = vol;
+		}
 
 		/// <summary>Sets the playback speed multiplier (1.0 = normal).</summary>
-		public void SetSpeed(double speed) => _sound?.SetSpeed(speed);
+		public void SetSpeed(double speed) {
+			if (_sound != null) _sound.SetSpeed(speed); else _pendingSpeed = speed;
+		}
 
 		#endregion
 		#region Dispose

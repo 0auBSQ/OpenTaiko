@@ -370,6 +370,22 @@ internal class OpenTaiko : Game {
 		this.ChangeStage(Stage, traceMessage);
 	}
 
+	// Enter the song load. With a transition module available, run it as ONE transition (fade the outgoing
+	// stage out → drive CStageSongLoading [its screen + bar] → fade the loaded game screen in), so there's no
+	// abrupt cut. Otherwise fall back to the legacy song-loading stage. `outgoing` is the still-mounted stage
+	// being left (song select, or the cutscene). ESC during the load returns to the last song select.
+	public void EnterSongLoad(CStage outgoing) {
+		var slScript = LuaTransitionWrapper.Get("song_loading");
+		if (slScript != null) {
+			CStageTransition.ClearPendingScript();   // play path always uses the song_loading transition
+			stageTransition.BeginSongLoad(outgoing, stageGameScreen, latestSongSelect ?? outgoing, slScript, "Song Loading");
+			rPreviousStage = rCurrentStage;
+			rCurrentStage = stageTransition;
+		} else {
+			UnmountAndChangeStage(stageSongLoading, "Song Loading");
+		}
+	}
+
 	public void UnmountAndChangeLuaStageOrError(string name, string? traceMessage = null, CSystemError.Errno errno = CSystemError.Errno.ENO_INVALIDSTAGENAME) {
 		LuaStageWrapper.ForceSetNextRequestedStage(name);
 		LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
@@ -573,7 +589,10 @@ internal class OpenTaiko : Game {
 				if (VideoExporter.Active)
 					this.nDrawLoopReturnValue = VideoExporter.Tick(this, this.nDrawLoopReturnValue);
 
-				if (OpenTaiko.TJA != null) {
+				// Skip the chart object overlay while a transition COVERS the screen, so chips don't punch through
+				// a black/cover fade. Exception: during the song-loading → gameplay reveal the loading screen
+				// fades out OVER the chips, so we DO draw them (they stay visible as the screen clears).
+				if (OpenTaiko.TJA != null && (rCurrentStage?.eStageID != CStage.EStage.Transition || stageTransition.RevealingGameplay)) {
 					//object rendering
 					foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
 						pair.Value.tDraw();
@@ -668,12 +687,27 @@ internal class OpenTaiko : Game {
 						break;
 
 					case CStage.EStage.Transition:
-						// Transition finished: take over the target it already mounted (rPreviousStage stays the
-						// stage we came from, set when the transition began).
+						// Transition finished. Normal: take over the target it already mounted (rPreviousStage
+						// stays the stage we came from). Cancelled song load (ESC): tear down the chart + go back
+						// to song select.
 						if (this.nDrawLoopReturnValue != 0) {
-							CStage? _target = stageTransition.Target;
-							stageTransition.Finish();
-							rCurrentStage = _target ?? rCurrentStage;
+							if (stageTransition.Canceled) {
+								CStage? cancelTo = stageTransition.CancelTarget;
+								stageTransition.Finish();
+								OpenTaiko.Pad.detectedDevice.Clear();
+								if (TJA != null) {
+									TJA.DeActivate();
+									TJA.ReleaseManagedResource();
+									TJA.ReleaseUnmanagedResource();
+								}
+								SongMount.bIsAfterSongJump = false;
+								UnmountAndChangeStage(cancelTo ?? latestSongSelect, "Return to song select menu");
+								this.tExecuteGarbageCollection();
+							} else {
+								CStage? _target = stageTransition.Target;
+								stageTransition.Finish();
+								rCurrentStage = _target ?? rCurrentStage;
+							}
 						}
 						break;
 
@@ -719,7 +753,7 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
 							case (int)CStageCutScene.EReturnValue.IntroFinished:
-								UnmountAndChangeStage(stageSongLoading, "Song Loading");
+								EnterSongLoad(rCurrentStage);   // song_loading transition, or legacy stage fallback
 								this.tExecuteGarbageCollection();
 								break;
 
@@ -738,9 +772,9 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							OpenTaiko.Pad.detectedDevice.Clear();
-							UnmountActivity(rCurrentStage);
 							#region [ If ESC is pressed, cancel the loading and go back to song select ]
 							if (this.nDrawLoopReturnValue == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
+								UnmountActivity(rCurrentStage);
 
 								if (TJA != null) {
 									TJA.DeActivate();
@@ -756,11 +790,22 @@ internal class OpenTaiko : Game {
 
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Gameplay (Drum Screen)");
-
-							rPreviousStage = rCurrentStage;
-							rCurrentStage = stageGameScreen;
-
 							this.tExecuteGarbageCollection();
+
+							// Gameplay was already activated during the song load. Hand off via a reveal transition
+							// (fade the loading screen out + the game screen in, both clock-driven so audio/notes stay
+							// in sync) instead of the abrupt cut. The chart-object overlay is held during the fade
+							// (see the EStage.Transition guard above). No transition module ⇒ legacy direct swap.
+							var revealScript = LuaTransitionWrapper.Get(null);
+							if (revealScript != null) {
+								stageTransition.BeginReveal(rCurrentStage, stageGameScreen, revealScript, "Gameplay (Drum Screen)");
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageTransition;
+							} else {
+								UnmountActivity(rCurrentStage);
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageGameScreen;
+							}
 						}
 						//-----------------------------
 						#endregion
@@ -909,7 +954,11 @@ internal class OpenTaiko : Game {
 								bool playCutScenes = LuaNetworking.Active?.PlaySyncActive != true
 									&& stageCutScene.LoadCutScenes(rCurrentStage, true);
 								latestSongSelect = rCurrentStage;
-								UnmountAndChangeStage(playCutScenes ? stageCutScene : stageSongLoading, playCutScenes ? "Cut Scene" : "Song Loading");
+								if (playCutScenes) {
+									UnmountAndChangeStage(stageCutScene, "Cut Scene");
+								} else {
+									EnterSongLoad(rCurrentStage);   // song_loading transition, or legacy stage fallback
+								}
 								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------

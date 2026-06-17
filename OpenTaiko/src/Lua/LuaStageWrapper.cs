@@ -129,18 +129,36 @@
 
 		#region [Override events]
 
+		// Synchronous activate (non-transition mounts): begin + drain + finish in one call.
 		public override void Activate() {
 			if (base.IsActivated)
 				return;
+			BeginActivate();
+			while (StepActivate(out _)) { }
+			FinishActivate();
+		}
 
+		// Incremental activate, driven by CStageTransition so a heavy activate spreads across frames behind the
+		// loading bar. BeginActivate → StepActivate each frame until false → FinishActivate (framework activate).
+		internal void BeginActivate() {
+			if (base.IsActivated) { _activating = false; return; }
 			base.ePhaseID = CStage.EPhase.Common_NORMAL;
 			this.eFadeOutReturnValue = EReturnValue.Continuation;
 			_exitImmediate = false;
-
-			lcStageScript?.Activate();
-
-			base.Activate();
+			lcStageScript?.BeginActivate();
+			_activating = true;
 		}
+		internal bool StepActivate(out float progress) {
+			progress = 1f;
+			if (!_activating || lcStageScript == null) { _activating = false; return false; }
+			bool more = lcStageScript.StepActivate(out progress);
+			if (!more) _activating = false;
+			return more;
+		}
+		internal void FinishActivate() {
+			if (!base.IsActivated) base.Activate();
+		}
+		private bool _activating = false;
 
 		public override void DeActivate() {
 			lcStageScript?.Deactivate();

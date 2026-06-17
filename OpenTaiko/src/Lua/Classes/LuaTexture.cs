@@ -170,6 +170,16 @@ namespace OpenTaiko {
 			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose);
 		public LuaTexture CreateTexture(string path) => CreateTexture(path, autoDispose: true);
 
+		// Load synchronously (decode + GL upload inline) even inside a load phase. Use when the texture's pixels
+		// are read back immediately — e.g. SCENE3D:RegisterSpriteFromTexture — since a deferred/streamed texture
+		// has no pixels yet (and would register an empty sprite).
+		public LuaTexture CreateTextureSync(string path) {
+			bool prev = CTexture.StreamingLoad;
+			CTexture.StreamingLoad = false;
+			try { return CreateTexture(path, autoDispose: true); }
+			finally { CTexture.StreamingLoad = prev; }
+		}
+
 		internal LuaTexture CreateTextureFromAbsolutePath(string path, bool autoDispose) {
 			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 

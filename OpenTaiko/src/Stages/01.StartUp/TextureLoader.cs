@@ -18,7 +18,6 @@ class TextureLoader {
 	public static string CONFIG = @$"2_Config{Path.DirectorySeparatorChar}";
 	public static string SONGSELECT = @$"3_SongSelect{Path.DirectorySeparatorChar}";
 	public static string DANISELECT = @$"3_DaniSelect{Path.DirectorySeparatorChar}";
-	public static string SONGLOADING = @$"4_SongLoading{Path.DirectorySeparatorChar}";
 	public static string GAME = @$"5_Game{Path.DirectorySeparatorChar}";
 	public static string RESULT = @$"6_Result{Path.DirectorySeparatorChar}";
 	public static string EXIT = @$"7_Exit{Path.DirectorySeparatorChar}";
@@ -190,27 +189,6 @@ class TextureLoader {
 		Dani_Level_Number = TxC(DANISELECT + "Level_Number.png");
 		Dani_DanIcon = TxC(DANISELECT + "DanIcon.png");
 		Dani_DanIcon_Fade = TxC(DANISELECT + "DanIcon_Fade.png");
-
-		#endregion
-
-		#region 4_読み込み画面
-
-		SongLoading_Plate = TxC(SONGLOADING + @$"Plate.png");
-		SongLoading_Bg = TxC(SONGLOADING + @$"Bg.png");
-		SongLoading_BgWait = TxC(SONGLOADING + @$"Bg_Wait.png");
-		SongLoading_Chara = TxC(SONGLOADING + @$"Chara.png");
-		SongLoading_Fade = TxC(SONGLOADING + @$"Fade.png");
-
-		SongLoading_Plate_AI = TxC(SONGLOADING + @$"Plate_AI.png");
-		SongLoading_Bg_AI = TxC(SONGLOADING + @$"Bg_AI.png");
-		SongLoading_Bg_AI_Wait = TxC(SONGLOADING + @$"Bg_AI_Wait.png");
-		SongLoading_Fade_AI = TxC(SONGLOADING + @$"Fade_AI.png");
-		SongLoading_Fade_AI_Anime_Base = TxC(SONGLOADING + @$"Fade_AI_Anime_Base.png");
-		SongLoading_Fade_AI_Anime_Ring = TxC(SONGLOADING + @$"Fade_AI_Anime_Ring.png");
-		SongLoading_Fade_AI_Anime_NowLoading = TxC(SONGLOADING + @$"Fade_AI_Anime_NowLoading.png");
-		SongLoading_Fade_AI_Anime_Start = TxC(SONGLOADING + @$"Fade_AI_Anime_Start.png");
-		SongLoading_Fade_AI_Anime_LoadBar_Base = TxC(SONGLOADING + @$"Fade_AI_Anime_LoadBar_Base.png");
-		SongLoading_Fade_AI_Anime_LoadBar = TxC(SONGLOADING + @$"Fade_AI_Anime_LoadBar.png");
 
 		#endregion
 
@@ -939,25 +917,6 @@ class TextureLoader {
 	public CTexture Dani_DanIcon;
 	public CTexture Dani_DanIcon_Fade;
 
-	#endregion
-
-	#region 4_読み込み画面
-	public CTexture SongLoading_Plate,
-		SongLoading_Bg,
-		SongLoading_BgWait,
-		SongLoading_Chara,
-		SongLoading_Fade,
-
-		SongLoading_Plate_AI,
-		SongLoading_Bg_AI,
-		SongLoading_Bg_AI_Wait,
-		SongLoading_Fade_AI,
-		SongLoading_Fade_AI_Anime_Base,
-		SongLoading_Fade_AI_Anime_Ring,
-		SongLoading_Fade_AI_Anime_NowLoading,
-		SongLoading_Fade_AI_Anime_Start,
-		SongLoading_Fade_AI_Anime_LoadBar_Base,
-		SongLoading_Fade_AI_Anime_LoadBar;
 	#endregion
 
 	#region 5_演奏画面

@@ -4,7 +4,9 @@ using FDK;
 namespace OpenTaiko;
 
 internal class CStageSongLoading : CStage {
-	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("song_loading");
+	// When driven by the song_loading transition, the transition draws the whole loading screen (bg, characters,
+	// title/plate, bar) — so this stage runs the load only and skips its own visual. Set before Activate().
+	internal bool TransitionDriven = false;
 
 	// コンストラクタ
 
@@ -46,9 +48,6 @@ internal class CStageSongLoading : CStage {
 			this.strSongTitle = ChartInfo.Title;
 			this.strSubtitle = ChartInfo.strSubtitle;
 
-			this.strSTAGEFILE = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}4_SongLoading{Path.DirectorySeparatorChar}Background.png");
-
-
 			float wait = 600f;
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)
 				wait = 1000f;
@@ -66,7 +65,10 @@ internal class CStageSongLoading : CStage {
 
 				var Subtitle = this.strSubtitle;
 
-				if (!string.IsNullOrEmpty(Title)) {
+				if (TransitionDriven) {
+					this.txTitle = null;
+					this.txSubtitle = null;
+				} else if (!string.IsNullOrEmpty(Title)) {
 					//this.txタイトル = new CTexture( CDTXMania.app.Device, image, CDTXMania.TextureFormat );
 					//this.txタイトル.vc拡大縮小倍率 = new Vector3( 0.5f, 0.5f, 1f );
 
@@ -92,15 +94,6 @@ internal class CStageSongLoading : CStage {
 				this.txTitle = null;
 				this.txSubtitle = null;
 			}
-
-			int _danTick = 0, _danR = 255, _danG = 255, _danB = 255;
-			string _danTitle = "";
-			Script?.Activate(
-				new LuaSongNode(OpenTaiko.SongMount.rChoosenSong, null, false),
-				OpenTaiko.SongMount.nChoosenSongDifficulty[0],
-				_danTick, _danR, _danG, _danB, _danTitle,
-				OpenTaiko.Skin.SongLoading_DanPlate[0],
-				OpenTaiko.Skin.SongLoading_DanPlate[1]);
 
 			_activateTime = DateTime.Now;
 			base.Activate();
@@ -133,7 +126,6 @@ internal class CStageSongLoading : CStage {
 
 			CLoadingProgress.End();   // clear the loading bar (covers normal completion + ESC cancel)
 
-			Script?.Deactivate();
 			OpenTaiko.tTextureRelease(ref this.txTitle);
 			//CDTXMania.tテクスチャの解放( ref this.txSongnamePlate );
 			OpenTaiko.tTextureRelease(ref this.txSubtitle);
@@ -206,18 +198,6 @@ internal class CStageSongLoading : CStage {
 		bool isAI    = OpenTaiko.ConfigIni.bAIBattleMode;
 
 		void drawPlate() {
-			if (OpenTaiko.Tx.SongLoading_Plate != null) {
-				OpenTaiko.Tx.SongLoading_Plate.bScreenBlend = OpenTaiko.Skin.SongLoading_Plate_ScreenBlend;
-				OpenTaiko.Tx.SongLoading_Plate.Opacity = 255;
-				if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Left) {
-					OpenTaiko.Tx.SongLoading_Plate.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X, OpenTaiko.Skin.SongLoading_Plate_Y - (OpenTaiko.Tx.SongLoading_Plate.szImageSize.Height / 2));
-				} else if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Right) {
-					OpenTaiko.Tx.SongLoading_Plate.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X - OpenTaiko.Tx.SongLoading_Plate.szImageSize.Width, OpenTaiko.Skin.SongLoading_Plate_Y - (OpenTaiko.Tx.SongLoading_Plate.szImageSize.Height / 2));
-				} else {
-					OpenTaiko.Tx.SongLoading_Plate.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X - (OpenTaiko.Tx.SongLoading_Plate.szImageSize.Width / 2), OpenTaiko.Skin.SongLoading_Plate_Y - (OpenTaiko.Tx.SongLoading_Plate.szImageSize.Height / 2));
-				}
-			}
-
 			if (this.txTitle != null) {
 				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.ChartInfo.strSubtitle) ? 15 : 0;
 				this.txTitle.Opacity = 255;
@@ -242,18 +222,6 @@ internal class CStageSongLoading : CStage {
 		}
 
 		void drawPlate_AI() {
-			if (OpenTaiko.Tx.SongLoading_Plate_AI != null) {
-				OpenTaiko.Tx.SongLoading_Plate_AI.bScreenBlend = OpenTaiko.Skin.SongLoading_Plate_ScreenBlend;
-				OpenTaiko.Tx.SongLoading_Plate_AI.Opacity = 255;
-				if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Left) {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
-				} else if (OpenTaiko.Skin.SongLoading_Plate_ReferencePoint == CSkin.ReferencePoint.Right) {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI - OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Width, OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
-				} else {
-					OpenTaiko.Tx.SongLoading_Plate_AI.t2DDraw(OpenTaiko.Skin.SongLoading_Plate_X_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Width / 2), OpenTaiko.Skin.SongLoading_Plate_Y_AI - (OpenTaiko.Tx.SongLoading_Plate_AI.szImageSize.Height / 2));
-				}
-			}
-
 			if (this.txTitle != null) {
 				int nSubtitleCorrection = string.IsNullOrEmpty(OpenTaiko.SongMount.rChosenScore.ChartInfo.strSubtitle) ? 15 : 0;
 				this.txTitle.Opacity = 255;
@@ -279,10 +247,9 @@ internal class CStageSongLoading : CStage {
 
 		this.ctSongNameDisplay.Tick();
 
-		Script?.Update();
-		Script?.Draw();
-
-		if (isDan) {
+		if (TransitionDriven) {
+				// The song_loading transition draws the whole loading screen — skip our own plate/title/tiles.
+			} else if (isDan) {
 			if (OpenTaiko.Tx.Tile_Black != null) {
 				OpenTaiko.Tx.Tile_Black.Opacity = (int)(ctWait.CurrentValue <= 51 ? (255 - ctWait.CurrentValue / 0.2f) : (this.ctWait.CurrentValue - 949) / 0.2);
 				for (int i = 0; i <= (GameWindowSize.Width / OpenTaiko.Tx.Tile_Black.szTextureSize.Width); i++) {
@@ -300,7 +267,7 @@ internal class CStageSongLoading : CStage {
 		// Real-time bar: a small crawl during chart/WAV load, then the streamed game-screen texture upload %
 		// (the per-song bulk). The render loop is free throughout, so it stays smooth + ESC-responsive.
 		CLoadingProgress.Report(_streamingActive ? 0.15f + 0.80f * CTexture.StreamFraction : 0.12f);
-		CLoadingScreen.Draw();   // engine loading bar overlay (on top of the song-loading screen)
+		if (!TransitionDriven) CLoadingScreen.Draw();   // the song_loading transition draws the bar itself when driving
 
 		switch (base.ePhaseID) {
 			case CStage.EPhase.Common_FADEIN:

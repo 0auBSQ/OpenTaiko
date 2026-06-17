@@ -132,11 +132,57 @@ class CLuaScript : IDisposable {
 		return null;
 	}
 
-	// Run a hook (onStart) as an engine-owned Lua coroutine: a count hook on the thread auto-yields every N VM
-	// instructions, so a long load spreads across frames instead of freezing the render loop. (Lua is
+	// Run a hook (onStart / activate) as an engine-owned Lua coroutine: a count hook on the thread auto-yields
+	// every N VM instructions, so a long load spreads across frames instead of freezing the render loop. (Lua is
 	// render-thread-only, so it can't move off-thread — but it can yield.) Resuming the thread directly, not via
 	// NLua's coroutine.resume under a lua_pcall, is what lets the hook's yield propagate back to us.
 	public static int LoadYieldInstructions = 100_000;   // VM instructions between auto-yields
+
+	// The skinner LOADING API + the wrapper that runs onStart/activate so queued blocks load + yield around it.
+	// LOADING:Add(label?, weight?, fn) records a block; LOADING:Tick(sub) yields a frame inside a heavy loop.
+	// All yielding is Lua-side (coroutine.yield) — never from a C# frame (that would cross a C-call boundary).
+	private const string LoadingApiLua = @"
+LOADING = { _queue = {}, _base = 0, _w = 0, _total = 1 }
+function LOADING:Add(a, b, c)
+  local label, weight, fn
+  if type(a) == 'function' then fn = a
+  elseif type(b) == 'function' then label = a; fn = b
+  else label = a; weight = b; fn = c end
+  self._queue[#self._queue + 1] = { label = label, weight = weight or 1, fn = fn }
+end
+function LOADING:Tick(sub)
+  sub = tonumber(sub) or 0
+  if sub < 0 then sub = 0 elseif sub > 1 then sub = 1 end
+  coroutine.yield((self._base + sub * self._w) / self._total)
+end
+function LOADING.__begin()
+  LOADING._queue = {}; LOADING._base = 0; LOADING._w = 0; LOADING._total = 1
+end
+function LOADING.__run()
+  local q = LOADING._queue
+  local total = 0
+  for i = 1, #q do total = total + (q[i].weight or 1) end
+  if total <= 0 then total = 1 end
+  LOADING._total = total
+  local done = 0
+  for i = 1, #q do
+    local item = q[i]
+    LOADING._base = done; LOADING._w = item.weight or 1
+    if type(item.fn) == 'function' then item.fn() end
+    done = done + (item.weight or 1)
+    coroutine.yield(done / total)
+  end
+  LOADING._queue = {}
+end
+function __otk_bindload(name)
+  return function()
+    LOADING.__begin()
+    local f = _G[name]
+    if type(f) == 'function' then f() end
+    LOADING.__run()
+  end
+end
+";
 
 	// Static so the native callback isn't GC-collected. The count-event yield defers to hook-return (no longjmp
 	// through this managed frame); the IsYieldable guard avoids "yield across a C-call boundary"; exceptions are
@@ -163,12 +209,26 @@ class CLuaScript : IDisposable {
 		try {
 			var co = L.NewThread();                              // new thread pushed on L's stack + wrapper
 			_hookThreadRef = L.Ref(KeraLua.LuaRegistry.Index);   // anchor it (pops it off L) so Lua won't GC it
-			if (L.GetGlobal(luaFunction.Name) != KeraLua.LuaType.Function) {
-				L.Pop(1);
-				tEndYieldable();
-				return;
+			// Wrap the target in the LOADING runner: __otk_bindload(name) → fn that runs LOADING.__begin();
+			// _G[name](); LOADING.__run(), so any LOADING:Add blocks load + yield around it.
+			if (L.GetGlobal("__otk_bindload") == KeraLua.LuaType.Function) {
+				L.PushString(luaFunction.Name);
+				if (L.PCall(1, 1, 0) != KeraLua.LuaStatus.OK) {
+					Trace.TraceError($"{strScriptShort} loader wrap failed: {L.ToString(-1)}");
+					L.Pop(1);
+					tEndYieldable();
+					return;
+				}
+				L.XMove(co, 1);                                  // wrapped closure onto co's stack
+			} else {
+				L.Pop(1);                                        // helper missing — run the function directly
+				if (L.GetGlobal(luaFunction.Name) != KeraLua.LuaType.Function) {
+					L.Pop(1);
+					tEndYieldable();
+					return;
+				}
+				L.XMove(co, 1);
 			}
-			L.XMove(co, 1);                                      // move the hook function onto co's stack
 			co.SetHook(_yieldHook, KeraLua.LuaHookMask.Count, Math.Max(1, LoadYieldInstructions));
 			_hookCo = co;
 		} catch (Exception exception) {
@@ -386,6 +446,8 @@ class CLuaScript : IDisposable {
 			LuaScript["RequestSongList"] = RequestSongList;
 			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
 			LuaScript["IsSongsEnumerating"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsEnumerating ?? false);
+
+			LuaScript.DoString(LoadingApiLua, "LOADING");   // skinner loading-bar API (LOADING:Add/Tick), see tBeginYieldable
 
 			if (File.Exists(this.strScriptPath)) {
 				LuaScript.DoString(File.ReadAllText(this.strScriptPath), this.strScriptShort);

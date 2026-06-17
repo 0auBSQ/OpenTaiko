@@ -29,12 +29,21 @@ namespace OpenTaiko {
 			RunLuaCode(lfDraw);
 		}
 
+		// Synchronous activate (non-transition mounts): drain the coroutine to completion.
 		public void Activate() {
+			BeginActivate();
+			while (StepActivate(out _)) { }
+		}
+
+		// Incremental activate (transition-driven): runs `activate` as a coroutine so a heavy activate + its
+		// LOADING:Add/Tick blocks spread across frames behind the loading bar instead of freezing.
+		public void BeginActivate() {
 			// Refresh globals that are populated by TextureLoader after script construction.
 			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;
 			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
-			RunLuaCode(lfActivate);
+			tBeginYieldable(lfActivate);
 		}
+		public bool StepActivate(out float progress) => tStepYieldable(out progress);
 
 		public void Deactivate() {
 			RunLuaCode(lfDeactivate);
