@@ -107,6 +107,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	/// <summary>
+	/// iOS: set external input devices (e.g. the iOS keyboard) before calling InitWithExternalContext().
+	/// </summary>
+	internal static List<IInputDevice> ExternalInputDevices { get; set; }
+
 	public static CPad Pad {
 		get;
 		private set;
@@ -1690,7 +1695,12 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 		Trace.Indent();
 		try {
-			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+			if (OperatingSystem.IsIOS() && ExternalInputDevices != null) {
+				// iOS: use externally-provided input devices (touch) instead of Silk.NET
+				InputManager = new CInputManager(ExternalInputDevices);
+			} else {
+				InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+			}
 			InputManager.SetID(ConfigIni.StableIdToGuid);
 			Trace.TraceInformation("DirectInput has been initialized.");
 		} catch (Exception ex) {
