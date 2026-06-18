@@ -181,6 +181,7 @@ public class SoundManager   // : CSound
 		//bUseOSTimer = false;
 		tInitialize(soundDeviceType, nSoundDelayBASS, nSoundDelayExclusiveWASAPI, nSoundDelayASIO, nASIODevice, _bUseOSTimer);
 	}
+
 	public void Dispose() {
 		t終了();
 	}
@@ -340,7 +341,12 @@ public class SoundManager   // : CSound
 		if (SoundDeviceType == ESoundDeviceType.Unknown) {
 			throw new Exception(string.Format("未対応の SoundDeviceType です。[{0}]", SoundDeviceType.ToString()));
 		}
-		return SoundDevice.tCreateSound(filename, soundGroup);
+		try {
+			return SoundDevice.tCreateSound(filename, soundGroup);
+		} catch (Exception ex) {
+			Trace.TraceWarning($"Failed to create sound: {System.IO.Path.GetFileName(filename)}: {ex.Message}");
+			return null;
+		}
 	}
 
 	private static DateTime lastUpdateTime = DateTime.MinValue;

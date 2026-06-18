@@ -1735,74 +1735,90 @@ internal class OpenTaiko : Game {
 
 		#region [ Sound Device initialization ]
 		//---------------------
-		Trace.TraceInformation("Initializing sound device...");
-		Trace.Indent();
-		try {
-			ESoundDeviceType soundDeviceType;
-			switch (OpenTaiko.ConfigIni.nSoundDeviceType) {
-				case 0:
-					soundDeviceType = ESoundDeviceType.Bass;
-					break;
-				case 1:
-					soundDeviceType = ESoundDeviceType.ASIO;
-					break;
-				case 2:
-					soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
-					break;
-				case 3:
-					soundDeviceType = ESoundDeviceType.SharedWASAPI;
-					break;
-				default:
-					soundDeviceType = ESoundDeviceType.Unknown;
-					break;
-			}
+		if (OperatingSystem.IsIOS()) {
+			Trace.TraceInformation("iOS: initializing BASS sound device (direct playback).");
 			SoundManager = new SoundManager(Window_,
-				soundDeviceType,
+				ESoundDeviceType.Bass,
 				OpenTaiko.ConfigIni.nBassBufferSizeMs,
 				OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
-				// CDTXMania.ConfigIni.nASIOBufferSizeMs,
 				0,
 				OpenTaiko.ConfigIni.nASIODevice,
-				OpenTaiko.ConfigIni.bUseOSTimer
-			);
-			//Sound管理 = FDK.CSound管理.Instance;
-			//Sound管理.t初期化( soundDeviceType, 0, 0, CDTXMania.ConfigIni.nASIODevice, base.Window.Handle );
-
-
-			Trace.TraceInformation("Initializing loudness scanning, song gain control, and sound group level control...");
+				OpenTaiko.ConfigIni.bUseOSTimer);
+			// iOS: the desktop branch below also creates these; without SongGainController the first note NREs (CTja.tチップの再生).
+			SongGainController = new SongGainController();
+			ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
+			SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+			ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+		} else {
+			Trace.TraceInformation("Initializing sound device...");
 			Trace.Indent();
 			try {
-				actScanningLoudness = new CActScanningLoudness();
-				actScanningLoudness.Activate();
-				if (!ConfigIni.PreAssetsLoading) {
-					actScanningLoudness.CreateManagedResource();
-					actScanningLoudness.CreateUnmanagedResource();
+				ESoundDeviceType soundDeviceType;
+				switch (OpenTaiko.ConfigIni.nSoundDeviceType) {
+					case 0:
+						soundDeviceType = ESoundDeviceType.Bass;
+						break;
+					case 1:
+						soundDeviceType = ESoundDeviceType.ASIO;
+						break;
+					case 2:
+						soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
+						break;
+					case 3:
+						soundDeviceType = ESoundDeviceType.SharedWASAPI;
+						break;
+					default:
+						soundDeviceType = ESoundDeviceType.Unknown;
+						break;
 				}
-				LoudnessMetadataScanner.ScanningStateChanged +=
-					(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
-				LoudnessMetadataScanner.StartBackgroundScanning();
+				SoundManager = new SoundManager(Window_,
+					soundDeviceType,
+					OpenTaiko.ConfigIni.nBassBufferSizeMs,
+					OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
+					// CDTXMania.ConfigIni.nASIOBufferSizeMs,
+					0,
+					OpenTaiko.ConfigIni.nASIODevice,
+					OpenTaiko.ConfigIni.bUseOSTimer
+				);
+				//Sound管理 = FDK.CSound管理.Instance;
+				//Sound管理.t初期化( soundDeviceType, 0, 0, CDTXMania.ConfigIni.nASIODevice, base.Window.Handle );
 
-				SongGainController = new SongGainController();
-				ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
 
-				SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
-				ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+				Trace.TraceInformation("Initializing loudness scanning, song gain control, and sound group level control...");
+				Trace.Indent();
+				try {
+					actScanningLoudness = new CActScanningLoudness();
+					actScanningLoudness.Activate();
+					if (!ConfigIni.PreAssetsLoading) {
+						actScanningLoudness.CreateManagedResource();
+						actScanningLoudness.CreateUnmanagedResource();
+					}
+					LoudnessMetadataScanner.ScanningStateChanged +=
+						(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
+					LoudnessMetadataScanner.StartBackgroundScanning();
+
+					SongGainController = new SongGainController();
+					ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
+
+					SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+					ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+				} finally {
+					Trace.Unindent();
+					Trace.TraceInformation("Initialized loudness scanning, song gain control, and sound group level control.");
+				}
+
+				ShowWindowTitle();
+				FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
+				SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
+				Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
+			} catch (Exception e) {
+				Trace.TraceError(e.ToString());
+				TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
+				return;
+				// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 			} finally {
 				Trace.Unindent();
-				Trace.TraceInformation("Initialized loudness scanning, song gain control, and sound group level control.");
 			}
-
-			ShowWindowTitle();
-			FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
-			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
-			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
-		} catch (Exception e) {
-			Trace.TraceError(e.ToString());
-			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
-			return;
-			// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
-		} finally {
-			Trace.Unindent();
 		}
 		//---------------------
 		#endregion
