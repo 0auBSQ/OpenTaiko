@@ -119,10 +119,19 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH_DESC"));
 		this.list項目リスト.Add(this.iSystemTimeStretch);
 
-		this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
-			AvailableGraphicsDevices);
-		this.list項目リスト.Add(this.iSystemGraphicsType);
+		// The graphics-API (ANGLE backend) selector is desktop-only; it is inert on iOS, where the
+		// GLES context is provided natively by the host. iOS instead gets its own renderer/FPS items.
+		if (OperatingSystem.IsIOS()) {
+			this.iSystemIOSFrameRate = new CItemList("Frame Rate", CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.biOSUnlimitedFrameRate ? 1 : 0,
+				"Maximum frame rate. Unlimited uses the display's refresh rate (e.g. 120Hz on ProMotion). Applies after restart.",
+				new string[] { "60 FPS", "Unlimited" });
+			this.list項目リスト.Add(this.iSystemIOSFrameRate);
+		} else {
+			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
+				AvailableGraphicsDevices);
+			this.list項目リスト.Add(this.iSystemGraphicsType);
+		}
 
 		this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), OpenTaiko.ConfigIni.bFullScreen,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN_DESC"));
@@ -426,6 +435,16 @@ internal class CActConfigList : CActivity {
 		this.iControllerDeadzone = new CItemInteger(CLangManager.LangInstance.GetString("SETTINGS_GAME_CONTROLLERDEADZONE"), 10, 90, OpenTaiko.ConfigIni.nControllerDeadzone,
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_CONTROLLERDEADZONE_DESC"));
 		this.list項目リスト.Add(this.iControllerDeadzone);
+
+		if (OperatingSystem.IsIOS()) {
+			this.iTouchDrumVisual = new CItemInteger("Touch Drum Size", 10, 50, OpenTaiko.ConfigIni.nTouchDrumVisual,
+				"Radius of the Don drum circle as % of screen width.");
+			this.list項目リスト.Add(this.iTouchDrumVisual);
+
+			this.iEnableLua = new CItemToggle("Enable Lua Scripting", OpenTaiko.ConfigIni.bEnableLua,
+				"Enable Lua scripts for skin backgrounds and modules. Disable to improve performance. Requires restart.");
+			this.list項目リスト.Add(this.iEnableLua);
+		}
 
 		this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DESC"));
@@ -1529,6 +1548,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iSystemBGMSound;
 	private CItemToggle iSystemDebugInfo;
 	private CItemList iSystemGraphicsType;                 // #24820 2013.1.3 yyagi
+	private CItemList iSystemIOSFrameRate;
 	private CItemToggle iSystemFullscreen;
 	private CItemInteger iSystemMinComboDrums;
 	private CItemInteger iSystemPreviewImageWait;
@@ -1594,6 +1614,8 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iTaikoAutoRoll;
 	private CItemToggle iTaikoIgnoreSongUnlockables;
 	private CItemInteger iControllerDeadzone;
+	private CItemInteger iTouchDrumVisual;
+	private CItemToggle iEnableLua;
 
 	private CItemInteger iRollsPerSec;
 	private CItemInteger iAILevel;
@@ -1674,7 +1696,11 @@ internal class CActConfigList : CActivity {
 	private void tConfigIniへ記録する_System() {
 		OpenTaiko.ConfigIni.nSongSpeed = this.iCommonPlaySpeed.n現在の値;
 
-		OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
+		if (OperatingSystem.IsIOS()) {
+			OpenTaiko.ConfigIni.biOSUnlimitedFrameRate = this.iSystemIOSFrameRate.n現在選択されている項目番号 == 1;
+		} else {
+			OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
+		}
 		OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
@@ -1763,6 +1789,10 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 		OpenTaiko.ConfigIni.nControllerDeadzone = this.iControllerDeadzone.n現在の値;
 		OpenTaiko.InputManager.Deadzone = OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f;
+		if (OperatingSystem.IsIOS()) {
+			OpenTaiko.ConfigIni.nTouchDrumVisual = this.iTouchDrumVisual.n現在の値;
+			OpenTaiko.ConfigIni.bEnableLua = this.iEnableLua.bON;
+		}
 		OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
 		OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;

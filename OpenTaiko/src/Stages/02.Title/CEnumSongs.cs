@@ -425,6 +425,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 曲リストのserialize
 	/// </summary>
 	private void SerializeSongList() {
+		if (OperatingSystem.IsIOS()) return; // BinaryFormatter not supported on iOS
 		BinaryFormatter songlistdb_ = new BinaryFormatter();
 		using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
 		songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
@@ -436,6 +437,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// <param name="songs管理"></param>
 	/// <param name="strPathSongList"></param>
 	public void Deserialize() {
+		if (OperatingSystem.IsIOS()) return; // BinaryFormatter not supported on iOS
 		try {
 			if (File.Exists($"{OpenTaiko.strEXEのあるフォルダ}songlist.db")) {
 				BinaryFormatter songlistdb_ = new BinaryFormatter();

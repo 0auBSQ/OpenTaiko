@@ -8,6 +8,12 @@ using ImGuiNET;
 
 namespace OpenTaiko {
 	public class CTextInput {
+		/// <summary>
+		/// Set by the iOS project to provide native text input via UIAlertController.
+		/// Parameters: (currentText, maxLength, callback with result string or null if cancelled).
+		/// </summary>
+		public static Action<string, uint, Action<string?>>? iOSTextInputHandler;
+
 		public CTextInput() { }
 		/// <summary>
 		/// 
@@ -23,6 +29,10 @@ namespace OpenTaiko {
 		/// Returns <c>true</c> if the user presses Enter to confirm their text.
 		/// </summary>
 		public bool Update() {
+			if (OperatingSystem.IsIOS()) {
+				return UpdateiOS();
+			}
+
 			ImGui.SetNextWindowSize(new(300,150));
 
 			ImGui.Begin("Text Input", ImGuiWindowFlags.NoResize);
@@ -35,6 +45,45 @@ namespace OpenTaiko {
 			return false;
 		}
 
+		private bool _iOSAlertShown;
+		private bool _iOSCompleted;
+		private string? _iOSResult;
+
+		/// <summary>
+		/// True when the iOS alert was dismissed via Cancel.
+		/// Checked by callers to back out of text input state.
+		/// Resets on next Update() call.
+		/// </summary>
+		public bool iOSCancelled { get; private set; }
+
+		private bool UpdateiOS() {
+			iOSCancelled = false;
+
+			if (_iOSCompleted) {
+				bool confirmed = _iOSResult != null;
+				if (confirmed) {
+					Text = _iOSResult!;
+				} else {
+					iOSCancelled = true;
+				}
+				// Reset for potential reuse
+				_iOSAlertShown = false;
+				_iOSCompleted = false;
+				_iOSResult = null;
+				return confirmed;
+			}
+
+			if (!_iOSAlertShown && iOSTextInputHandler != null) {
+				_iOSAlertShown = true;
+				iOSTextInputHandler(Text, MaxLength, result => {
+					_iOSResult = result;
+					_iOSCompleted = true;
+				});
+			}
+
+			return false;
+		}
+
 		public string Text = "";
 		/// <summary>
 		/// Used to display the current text with a blinking cursor, to imitate an input text box. For actual text, use <seealso cref="Text"/>.
@@ -42,6 +91,8 @@ namespace OpenTaiko {
 		public string DisplayText {
 			get
 			{
+				if (OperatingSystem.IsIOS() && _iOSAlertShown && !_iOSCompleted)
+					return Text; // No blinking cursor while alert is shown
 				return Text + (OpenTaiko.Timer.SystemTimeMs % 1000 >= 300 ? "|" : "");
 			}
 		}

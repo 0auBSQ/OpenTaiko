@@ -144,16 +144,15 @@ class ScriptBG : IDisposable {
 		Textures = new Dictionary<string, CTexture>();
 
 		if (!File.Exists(filePath)) return;
-
-		LuaScript = new Lua();
-		LuaScript.State.Encoding = Encoding.UTF8;
-		LuaSecurity.Secure(LuaScript);
-
-		LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
-
+		if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bEnableLua) return;
 
 		try {
-			using (var streamAPI = new StreamReader("BGScriptAPI.lua", Encoding.UTF8)) {
+			LuaScript = new Lua();
+			LuaScript.State.Encoding = Encoding.UTF8;
+			LuaSecurity.Secure(LuaScript);
+
+			LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
+			using (var streamAPI = new StreamReader(OpenTaiko.ResolveAssetPath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "BGScriptAPI.lua")), Encoding.UTF8)) {
 				using (var stream = new StreamReader(filePath, Encoding.UTF8)) {
 					var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
 					LuaScript.DoString(text, this.FilePathShort);
