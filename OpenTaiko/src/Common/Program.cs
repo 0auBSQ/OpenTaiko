@@ -70,6 +70,8 @@ internal class Program {
 						osplatform = "osx";
 					else if (OperatingSystem.IsLinux())
 						osplatform = "linux";
+					else if (OperatingSystem.IsIOS())
+						osplatform = "ios";
 					else
 						throw new PlatformNotSupportedException("OpenTaiko does not support this OS.");
 
@@ -92,12 +94,15 @@ internal class Program {
 							throw new PlatformNotSupportedException($"OpenTaiko does not support this architecture. ({RuntimeInformation.ProcessArchitecture})");
 					}
 
-					FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
-					DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
+					if (!OperatingSystem.IsIOS()) {
+						// iOS bundles native libraries in the app framework; no runtime copy needed.
+						FFmpeg.AutoGen.ffmpeg.RootPath = AppContext.BaseDirectory + @"FFmpeg/" + osplatform + "-" + platform + "/";
+						DirectoryInfo info = new DirectoryInfo(AppContext.BaseDirectory + @"Libs/" + osplatform + "-" + platform + "/");
 
-					//実行ファイルの階層にライブラリをコピー
-					foreach (FileInfo fileinfo in info.GetFiles()) {
-						fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						//実行ファイルの階層にライブラリをコピー
+						foreach (FileInfo fileinfo in info.GetFiles()) {
+							fileinfo.CopyTo(AppContext.BaseDirectory + fileinfo.Name, true);
+						}
 					}
 
 					using (var mania = new OpenTaiko(args))

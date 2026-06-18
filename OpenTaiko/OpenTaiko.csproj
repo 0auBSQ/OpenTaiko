@@ -15,10 +15,10 @@
     <Content Include="Databases/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Documentation/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Encyclopedia/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="FFmpeg/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Lang/**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Libs/**" CopyToOutputDirectory="PreserveNewest" Condition="'$(BuildingAsLibrary)' != 'true'" />
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="System/**" CopyToOutputDirectory="PreserveNewest" />
@@ -34,7 +34,8 @@
   </ItemGroup>
   <PropertyGroup>
     <Version>0.6.0.107</Version>
-    <OutputType>WinExe</OutputType>
+    <OutputType Condition="'$(BuildingAsLibrary)' != 'true'">WinExe</OutputType>
+    <OutputType Condition="'$(BuildingAsLibrary)' == 'true'">Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
         <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -42,4 +43,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>OpenTaiko.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenTaiko.iOS" />
+  </ItemGroup>
 </Project>

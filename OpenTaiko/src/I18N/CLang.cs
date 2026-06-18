@@ -19,7 +19,7 @@ internal class CLang {
 		get { return File.Exists(Path.Combine(Folder, _boxFontName)) ? Path.Combine(Folder, _boxFontName) : _boxFontName; }
 		private set { _boxFontName = value; }
 	}
-	public string Folder { get { return @$"{OpenTaiko.strEXEのあるフォルダ}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"; } }
+	public string Folder { get { return OpenTaiko.ResolveAssetPath(@$"{OpenTaiko.strEXEのあるフォルダ}Lang{Path.DirectorySeparatorChar}{Id}{Path.DirectorySeparatorChar}"); } }
 
 	private string _fontName = CFontRenderer.DefaultFontName;
 	private string _boxFontName = CFontRenderer.DefaultFontName;
