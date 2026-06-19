@@ -89,7 +89,7 @@ public class CFontRenderer : IDisposable {
 				this.textRenderer = new CSkiaSharpTextRenderer(fontpath, pt, style);
 			}
 			else {
-				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), pt, style);
+				this.textRenderer = new CSkiaSharpTextRenderer(Assembly.GetExecutingAssembly().GetManifestResourceStream(@"FDK.mplus-1p-medium.ttf"), "FDK.mplus-1p-medium.ttf", pt, style);
 			}
 			return;
 		} catch (Exception e) {
@@ -247,7 +247,8 @@ public class CFontRenderer : IDisposable {
 		}
 
 
-		SKImage image = skSurface.Snapshot();
+		// Snapshot the surface, then copy into the returned bitmap; the SKImage is native, so dispose it via using.
+		using SKImage image = skSurface.Snapshot();
 		//返します
 		return SKBitmap.FromImage(image);
 	}
