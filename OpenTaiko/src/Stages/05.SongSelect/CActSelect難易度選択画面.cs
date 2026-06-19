@@ -289,8 +289,9 @@ internal class CActSelect難易度選択画面 : CActivity {
 		var difficulty_back = HGenreBar.tGetGenreBar(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxType, OpenTaiko.Tx.Difficulty_Back);
 
 
-		difficulty_back.Opacity =
-			(OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
+		if (difficulty_back != null)
+			difficulty_back.Opacity =
+				(OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Bar.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Number.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Crown.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
@@ -299,9 +300,11 @@ internal class CActSelect難易度選択画面 : CActivity {
 		OpenTaiko.Tx.SongSelect_ScoreRank.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 		OpenTaiko.Tx.Difficulty_Star.Opacity = (OpenTaiko.stageSongSelect.actSongList.ctDifficultyIn.CurrentValue - 1255);
 
-		difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxColor);
+		if (difficulty_back != null) {
+			difficulty_back.color4 = CConversion.ColorToColor4(OpenTaiko.SongMount.rCurrentlySelectedSong.BoxColor);
 
-		difficulty_back.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Difficulty_Back[0], OpenTaiko.Skin.SongSelect_Difficulty_Back[1]);
+			difficulty_back.t2D中心基準描画(OpenTaiko.Skin.SongSelect_Difficulty_Back[0], OpenTaiko.Skin.SongSelect_Difficulty_Back[1]);
+		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1) break;

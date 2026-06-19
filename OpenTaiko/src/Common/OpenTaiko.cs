@@ -549,7 +549,7 @@ internal class OpenTaiko : Game {
 					}
 				}
 
-				OpenTaiko.NamePlate?.lcNamePlate.Update();
+				OpenTaiko.NamePlate?.lcNamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
 				// draw the remaining elements normally
@@ -1244,7 +1244,7 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Network_Connection != null) {
-					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
+					if (FDK.SoundManager.PlayTimer != null && this.PreviousSystemTimeMs != long.MinValue && Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
 						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
 						Task.Factory.StartNew(() => {
 							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
@@ -1326,7 +1326,7 @@ internal class OpenTaiko : Game {
 			Trace.WriteLine("");
 			Trace.WriteLine("An error has occured.");
 			AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-			throw e;
+			throw;
 		}
 #endif
 	}

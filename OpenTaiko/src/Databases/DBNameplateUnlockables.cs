@@ -17,11 +17,18 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 
 			// Get nameplates
 			var command = connection.CreateCommand();
+
+			string selectCols = _translations.Count > 0
+				? ", " + String.Join(", ", _translations.Select((code, _) => $@"{code}.String AS {code}_String"))
+				: "";
+			string joins = String.Join(Environment.NewLine,
+				_translations.Select((code, _) => $@"LEFT JOIN translation_{code} {code} ON np.NameplateId = {code}.NameplateId"));
+
 			command.CommandText =
 				@$"
-                    SELECT np.*, {String.Join(", ", _translations.Select((code, _) => $@"{code}.String AS {code}_String"))}
+                    SELECT np.*{selectCols}
                     FROM nameplates np
-                    {String.Join(Environment.NewLine, _translations.Select((code, _) => $@"LEFT JOIN translation_{code} {code} ON np.NameplateId = {code}.NameplateId"))}
+                    {joins}
                 ";
 
 			var reader = command.ExecuteReader();
