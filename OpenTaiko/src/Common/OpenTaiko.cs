@@ -633,6 +633,15 @@ internal class OpenTaiko : Game {
 					}
 				}
 
+				if (OperatingSystem.IsIOS() && _iosStageDebugCounter++ % 300 == 0) {
+					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage.eStageID}, Phase: {rCurrentStage.ePhaseID}");
+				}
+				// Mark a new scene on stage change so memory-pressure eviction protects the new
+				// stage's textures and only releases ones left over from the previous stage.
+				if (rCurrentStage.eStageID != _lastSceneStageId) {
+					_lastSceneStageId = rCurrentStage.eStageID;
+					CTexture.BeginNewScene();
+				}
 				OpenTaiko.NamePlate?.lcNamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
@@ -1586,6 +1595,8 @@ internal class OpenTaiko : Game {
 
 	public List<CActivity> listTopLevelActivities;
 	private int nDrawLoopReturnValue;
+	private int _iosStageDebugCounter;
+	private CStage.EStage _lastSceneStageId = CStage.EStage.None; // tracks stage changes for CTexture.BeginNewScene()
 	private string strWindowTitle
 	// ayo komi isn't this useless code? - tfd500
 	{
