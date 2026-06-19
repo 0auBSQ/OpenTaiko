@@ -525,7 +525,17 @@ public class CTexture : IDisposable {
 		//-----
 
 		//テクスチャのデータをVramに送る
-		if (OperatingSystem.IsMacOS()) {
+		if (OperatingSystem.IsIOS()) {
+			// iOS ES 2.0 requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
+			int internalFormat = pixelFormat switch {
+				PixelFormat.Bgra => (int)InternalFormat.Rgba,
+				PixelFormat.Rgba => (int)InternalFormat.Rgba,
+				PixelFormat.Rgb => (int)InternalFormat.Rgb,
+				_ => (int)InternalFormat.Rgba
+			};
+
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		} else if (OperatingSystem.IsMacOS()) {
 			// Desktop OpenGL requires sized internal formats
 			int internalFormat = pixelFormat switch {
 				PixelFormat.Bgra => (int)InternalFormat.Rgba8,
@@ -533,7 +543,7 @@ public class CTexture : IDisposable {
 				PixelFormat.Rgb => (int)InternalFormat.Rgb8,
 				_ => (int)InternalFormat.Rgba8
 			};
-			
+
 			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
 		} else {
 			// OpenGL ES allows unsized internal formats
@@ -542,8 +552,13 @@ public class CTexture : IDisposable {
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		if (OperatingSystem.IsIOS()) {
+			// iOS/GLES 2.0: NPOT textures require CLAMP_TO_EDGE, otherwise they are incomplete
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.ClampToEdge);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.ClampToEdge);
+		}
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
@@ -891,6 +906,7 @@ public class CTexture : IDisposable {
 
 		BlendHelper.SetBlend(BlendType.Normal);
 	}
+
 	public void t2D描画(int x, int y, float depth, Rectangle rc画像内の描画領域) {
 		t2D描画((float)x, (float)y, depth, rc画像内の描画領域);
 	}
