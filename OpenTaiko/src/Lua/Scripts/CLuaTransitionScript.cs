@@ -5,6 +5,11 @@ namespace OpenTaiko {
 	internal class CLuaTransitionScript : CLuaScript {
 		internal string _transitionName;
 
+		// Optional per-transition fade durations: a transition's Script.lua may set the top-level globals
+		// FADE_OUT_SECONDS / FADE_IN_SECONDS to override CStageTransition's default. null ⇒ use the default.
+		internal double? FadeOutSeconds;
+		internal double? FadeInSeconds;
+
 		private NamedLuaFunction lfFadeOut = new("fadeOut");
 		private NamedLuaFunction lfLoading = new("loading");
 		private NamedLuaFunction lfFadeIn = new("fadeIn");
@@ -30,9 +35,21 @@ namespace OpenTaiko {
 				lfFadeIn.Load(LuaScript);
 				lfOnStart.Load(LuaScript);
 				lfOnDestroy.Load(LuaScript);
+				FadeOutSeconds = ReadSeconds("FADE_OUT_SECONDS");
+				FadeInSeconds = ReadSeconds("FADE_IN_SECONDS");
 			} catch (Exception e) {
 				Crash(e);
 			}
+		}
+
+		// Read a top-level numeric global (the transition's fade duration override), or null if unset/invalid.
+		private double? ReadSeconds(string name) {
+			try {
+				var v = LuaScript?[name];
+				if (v == null) return null;
+				double s = Convert.ToDouble(v);
+				return s > 0 ? s : null;
+			} catch { return null; }
 		}
 	}
 }

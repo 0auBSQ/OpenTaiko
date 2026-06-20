@@ -1,41 +1,45 @@
 using SkiaSharp;
+using System.Collections.Concurrent;
 
 namespace FDK;
 
-// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────────────
-// Loading a texture = PNG decode (slow, CPU) + GL upload (cheap, render-thread-only). A synchronous
-// game-screen activation decodes ~150 PNGs in one blast → a multi-second freeze. Instead, while
-// StreamingLoad is on, MakeTexture(path) on the render thread (see CTexture.cs) only QUEUES the pixel work;
-// a background task decodes (SKBitmap.Decode — thread-safe) into _streamReady and the loading screen calls
-// PumpUploads each frame to do the GL uploads within a time budget. The render loop keeps running → smooth
-// real-time bar + responsive ESC + no freeze. Decode off-thread; GL upload on the render thread. Hooking
-// MakeTexture itself means we capture EXACTLY what the activation loads (random picks + Lua-driven loads
-// included) with zero path-matching.
+// ── Asynchronous texture loading ──────────────────────────────────────────────────────────────────────
+// Loading a texture = PNG decode (slow, CPU) + GL upload (cheap, render-thread-only). To never block the render
+// thread, MakeTexture(path) on the render thread QUEUES the work instead of doing it inline: a small background
+// pool decodes (SKBitmap.Decode, thread-safe) and enqueues the GL upload onto Game.AsyncActions — the ONE
+// render-thread "finalize" queue, drained each frame within a time budget (Game.AsyncBudgetMs; raised behind a
+// loading screen). The texture stays blank (Pointer==0 ⇒ t2DDraw no-ops) until uploaded, so consumers naturally
+// "show nothing until it's ready". Decode off-thread; GL upload on the render thread. Hooking MakeTexture itself
+// captures EXACTLY what is loaded (random picks + Lua-driven loads) with zero path-matching.
 //
-// Wiring: CStageSongLoading (BeginStreaming → game-screen Activate → StartStreamDecode → PumpUploads per
-// frame → EndStreaming/CancelStreaming) + the streaming branch at the top of MakeTexture(string).
+// Three flags decide whether a MakeTexture(path) on the render thread queues (vs loads inline):
+//   • AsyncLoad     — a runtime async load (Lua TEXTURE:CreateTexture): queue, non-blocking, not counted.
+//   • StreamingLoad — a load PHASE (boot / song-load game screen): queue AND count the item for the loading bar.
+//   • SyncForce     — overrides both: load inline now (CreateTextureSync — pixels needed immediately, e.g. a
+//                     sprite registered from the texture via GPU readback).
 public partial class CTexture {
-	public static volatile bool StreamingLoad;
-	private static readonly System.Collections.Concurrent.ConcurrentQueue<(CTexture tex, string path, bool black)> _streamPending = new();
-	private static readonly System.Collections.Concurrent.ConcurrentQueue<(CTexture tex, SKBitmap? bmp, bool black)> _streamReady = new();
-	private static int _streamTotal;
-	private static int _streamUploaded;
-	private static long _streamReadyBytes;
-	private static int _streamThreadId;   // the activation/render thread that began streaming (Game.MainThreadID can differ from it)
-	private static System.Threading.Tasks.Task? _streamDecodeTask;
-	private static System.Threading.CancellationTokenSource? _streamCts;
+	public static volatile bool StreamingLoad;   // a load phase is active → queued items count toward the bar
+	// Per-thread: set around a load that should QUEUE (Lua TEXTURE:CreateTexture on the render thread, or the
+	// off-thread chart parse's chart-object textures). ThreadStatic so the off-thread set is isolated from the
+	// render thread (and vice-versa) — each thread sets+reads its own copy in MakeTexture(path).
+	[ThreadStatic] public static bool AsyncLoad;
+	public static volatile bool SyncForce;       // force inline decode + upload (CreateTextureSync)
+
+	private struct StreamItem { public CTexture tex; public string path; public bool black; public bool inPhase; public int gen; }
+	private static readonly ConcurrentQueue<StreamItem> _pending = new();
+	private static int _phaseTotal, _phaseDone, _phaseGen;
+	private static int _decodeWorkers;
+	private static long _readyBytes;                                       // decoded-but-not-uploaded bytes (backpressure)
+	private static readonly int _maxWorkers = Math.Max(2, Environment.ProcessorCount / 2);
 
 	// ── Cached file existence ─────────────────────────────────────────────────────────────────────
 	// A stage activation checks existence for hundreds of texture paths. On systems where the game folder is
 	// scanned by antivirus, each per-file metadata hit is slow; enumerating a directory ONCE (metadata only,
 	// not file contents → not AV-scanned) and caching the name set turns N per-file checks into ~1 per dir.
-	// Works for everyone with no setup. Session-long (game assets are static at runtime); call
-	// ClearFileListCache() after a skin reload if assets change on disk.
-	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Collections.Generic.HashSet<string>> _dirListCache
+	private static readonly ConcurrentDictionary<string, System.Collections.Generic.HashSet<string>> _dirListCache
 		= new(StringComparer.OrdinalIgnoreCase);
 
-	/// <summary>File.Exists via a cached per-directory listing (see note above). Falls back to File.Exists on
-	/// any error.</summary>
+	/// <summary>File.Exists via a cached per-directory listing. Falls back to File.Exists on any error.</summary>
 	public static bool FileExistsCached(string path) {
 		if (string.IsNullOrEmpty(path)) return false;
 		try {
@@ -59,77 +63,78 @@ public partial class CTexture {
 	/// <summary>Drop the cached directory listings (call after a skin reload / when on-disk assets change).</summary>
 	public static void ClearFileListCache() => _dirListCache.Clear();
 
-	/// <summary>Real-time stream progress 0..1 (1 when nothing queued). Read each frame for the bar.</summary>
-	public static float StreamFraction => _streamTotal <= 0 ? 1f : Math.Min(1f, _streamUploaded / (float)_streamTotal);
-	/// <summary>True once every queued texture has been uploaded (or skipped on decode failure).</summary>
-	public static bool StreamComplete => _streamUploaded >= _streamTotal;
+	/// <summary>Loading-bar progress 0..1 for the current load phase (1 when nothing is queued).</summary>
+	public static float StreamFraction => Volatile.Read(ref _phaseTotal) <= 0 ? 1f
+		: Math.Min(1f, Volatile.Read(ref _phaseDone) / (float)Volatile.Read(ref _phaseTotal));
+	/// <summary>True once every texture queued during the current phase has been uploaded (or skipped).</summary>
+	public static bool StreamComplete => Volatile.Read(ref _phaseDone) >= Volatile.Read(ref _phaseTotal);
 
-	/// <summary>Queue a texture for streamed loading. Returns false only if the file is missing (→ the caller's
-	/// synchronous path handles it). DELIBERATELY does NOT open/read the file to get dimensions: opening a file
-	/// triggers per-file AV (Defender) scanning (~15-20ms each), so reading ~300 headers on the render thread
-	/// during Activate is itself a multi-second freeze. The size is filled in when the decode result is
-	/// uploaded (PumpUploads → MakeTexture(SKBitmap)); the game screen isn't drawn until streaming completes,
-	/// so a transient zero size is invisible. (File.Exists is metadata-only ⇒ no AV scan ⇒ cheap.) Render
-	/// thread only.</summary>
-	private bool tQueueStreamedTexture(string strFileName, bool bBlackTransparent) {
+	/// <summary>Queue a path-load for background decode + render-thread upload. Returns false only if the file is
+	/// missing (→ the caller's inline path handles it / throws). DELIBERATELY does NOT open the file to read the
+	/// size: opening triggers per-file AV scanning (~15-20ms), so reading hundreds of headers during an Activate
+	/// is itself a multi-second freeze. Pointer + size stay 0 until the upload fills them; t2DDraw no-ops
+	/// meanwhile, and a load phase isn't considered done (StreamComplete) until every item uploads. Render thread.</summary>
+	private bool tQueueAsyncTexture(string strFileName, bool bBlackTransparent) {
 		if (!FileExistsCached(strFileName))
 			return false;
-		// Pointer + size stay 0 until PumpUploads fills them; t2DDraw no-ops while Pointer == 0.
-		_streamPending.Enqueue((this, strFileName, bBlackTransparent));
-		System.Threading.Interlocked.Increment(ref _streamTotal);
+		bool inPhase = StreamingLoad;
+		if (inPhase) Interlocked.Increment(ref _phaseTotal);
+		_pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, inPhase = inPhase, gen = Volatile.Read(ref _phaseGen) });
+		EnsureDecodeWorkers();
 		return true;
 	}
 
-	/// <summary>Enable streamed loading + reset counters. Call on the MAIN thread BEFORE the activation that
-	/// should be streamed (e.g. the game-screen activation).</summary>
-	public static void BeginStreaming() {
-		tClearStreamQueues();
-		_streamTotal = 0;
-		_streamUploaded = 0;
-		_streamThreadId = Thread.CurrentThread.ManagedThreadId;   // stream only on THIS thread (the activation thread)
-		StreamingLoad = true;
-		System.Diagnostics.Trace.TraceInformation($"[STREAM] begin  main={Game.MainThreadID} cur={_streamThreadId}");
+	// Ensure up to _maxWorkers decode tasks are draining _pending. Decode-only on a capped pool → leaves cores
+	// for the render thread; tasks exit when the queue empties and restart on new work.
+	private static void EnsureDecodeWorkers() {
+		while (true) {
+			int cur = Volatile.Read(ref _decodeWorkers);
+			if (cur >= _maxWorkers) return;
+			if (Interlocked.CompareExchange(ref _decodeWorkers, cur + 1, cur) == cur) break;
+		}
+		System.Threading.Tasks.Task.Run(DecodeLoop);
 	}
 
-	/// <summary>After the streamed activation has finished queueing (StreamingLoad turned back off), kick off
-	/// the background decode of everything queued. Decode-only on CAPPED threads → safe + leaves cores for the
-	/// render thread. Backpressure keeps the decoded-but-not-yet-uploaded set bounded; a decode failure still
-	/// enqueues a (tex, null) so the count completes (no hang).</summary>
-	public static void StartStreamDecode() {
-		var items = _streamPending.ToArray();
-		while (_streamPending.TryDequeue(out _)) { }   // drain (snapshot taken above)
-		System.Diagnostics.Trace.TraceInformation($"[STREAM] decode start queued={items.Length} (streamTotal={_streamTotal})");
-		if (items.Length == 0)
-			return;
-		_streamCts = new System.Threading.CancellationTokenSource();
-		var ct = _streamCts.Token;
-		_streamDecodeTask = System.Threading.Tasks.Task.Run(() => {
-			const long readyByteCap = 96L * 1024 * 1024;
-			const int readyCountCap = 48;
-			var opts = new System.Threading.Tasks.ParallelOptions {
-				MaxDegreeOfParallelism = Math.Max(2, Environment.ProcessorCount / 2),
-				CancellationToken = ct,
-			};
-			try {
-				System.Threading.Tasks.Parallel.ForEach(items, opts, item => {
-					// Backpressure: don't decode faster than the render thread uploads (bounded memory).
-					while (!ct.IsCancellationRequested
-						&& (_streamReady.Count >= readyCountCap || System.Threading.Interlocked.Read(ref _streamReadyBytes) >= readyByteCap))
-						System.Threading.Thread.Sleep(1);
-					if (ct.IsCancellationRequested) return;
-
-					SKBitmap? bmp = tDecodeForUpload(item.path);
-					if (bmp != null)
-						System.Threading.Interlocked.Add(ref _streamReadyBytes, bmp.ByteCount);
-					_streamReady.Enqueue((item.tex, bmp, item.black));
-				});
-			} catch (OperationCanceledException) { /* cancelled */ }
-		}, ct);
+	private static void DecodeLoop() {
+		const long readyByteCap = 96L * 1024 * 1024;
+		try {
+			while (_pending.TryDequeue(out var item)) {
+				// Backpressure: don't decode faster than the render thread uploads (bounded memory).
+				while (Volatile.Read(ref _readyBytes) >= readyByteCap) System.Threading.Thread.Sleep(1);
+				if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
+				SKBitmap? bmp = tDecodeForUpload(item.path);
+				if (bmp != null) Interlocked.Add(ref _readyBytes, bmp.ByteCount);
+				var captured = item;
+				Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp));
+			}
+		} finally {
+			Interlocked.Decrement(ref _decodeWorkers);
+			if (!_pending.IsEmpty) EnsureDecodeWorkers();   // an item raced in just as this worker exited
+		}
 	}
 
-	/// <summary>Decode an image to BGRA8888 UNPREMUL so the GL upload can be zero-copy (GetPixels) and matches
-	/// the engine's straight-alpha blending. Falls back to a plain decode (premul) — the upload then uses the
-	/// .Pixels conversion path, which is correct but copies. Off-thread (decode worker).</summary>
+	// Render-thread GL upload (drained from Game.AsyncActions). Skips textures disposed since queueing (e.g. an
+	// ESC-cancelled song load tore down the half-loaded game screen).
+	private static void UploadOne(StreamItem item, SKBitmap? bmp) {
+		try {
+			if (bmp != null && !item.tex.bDisposeCompleteDone)
+				item.tex.MakeTexture(bmp, item.black);
+		} catch { /* leave the stub blank on upload failure */ }
+		finally {
+			if (bmp != null) { Interlocked.Add(ref _readyBytes, -bmp.ByteCount); bmp.Dispose(); }
+			CompleteItem(item);
+		}
+	}
+
+	// Count a phase item toward the bar — but only for the CURRENT generation, so stale items from an ended or
+	// cancelled phase can't corrupt a new phase's progress.
+	private static void CompleteItem(StreamItem item) {
+		if (item.inPhase && item.gen == Volatile.Read(ref _phaseGen))
+			Interlocked.Increment(ref _phaseDone);
+	}
+
+	/// <summary>Decode an image to BGRA8888 UNPREMUL so the GL upload is zero-copy (GetPixels) and matches the
+	/// engine's straight-alpha blending. Falls back to a plain decode. Off-thread (decode worker).</summary>
 	private static SKBitmap? tDecodeForUpload(string path) {
 		try {
 			using var fs = File.OpenRead(path);
@@ -146,54 +151,31 @@ public partial class CTexture {
 		try { return SKBitmap.Decode(path); } catch { return null; }
 	}
 
-	/// <summary>Drain decoded bitmaps to the GPU within a per-frame time budget (render thread). Call each
-	/// frame from the loading screen until StreamComplete.</summary>
-	public static void PumpUploads(double budgetMs) {
-		var sw = System.Diagnostics.Stopwatch.StartNew();
-		do {
-			if (!_streamReady.TryDequeue(out var item))
-				break;
-			long bytes = 0;
-			try {
-				if (item.bmp != null) {
-					bytes = item.bmp.ByteCount;
-					item.tex.MakeTexture(item.bmp, item.black);   // render thread ⇒ synchronous GL upload
-				}
-			} catch { /* leave the stub blank on upload failure */ }
-			finally {
-				item.bmp?.Dispose();
-				if (bytes != 0)
-					System.Threading.Interlocked.Add(ref _streamReadyBytes, -bytes);
-				System.Threading.Interlocked.Increment(ref _streamUploaded);
-			}
-		} while (sw.Elapsed.TotalMilliseconds < budgetMs);
+	// ── Load-phase API (CAsyncLoad / CStageSongLoading) ─────────────────────────────────────────────
+	/// <summary>Begin a load phase: queued textures count toward the bar. A new generation detaches any still
+	/// in-flight items from a previous phase. Render thread, before the streamed activation.</summary>
+	public static void BeginStreaming() {
+		Interlocked.Increment(ref _phaseGen);
+		Interlocked.Exchange(ref _phaseTotal, 0);
+		Interlocked.Exchange(ref _phaseDone, 0);
+		StreamingLoad = true;
 	}
 
-	/// <summary>Normal completion: stop the (finished) decode task and clear residue.</summary>
-	public static void EndStreaming() => tStopStreaming(resetCounters: false);
+	/// <summary>No-op: decode now starts per item as it is queued (kept for call-site compatibility).</summary>
+	public static void StartStreamDecode() { }
+	/// <summary>No-op: uploads finalize via Game.AsyncActions now (kept for call-site compatibility).</summary>
+	public static void PumpUploads(double budgetMs) { }
 
-	/// <summary>Cancellation (ESC mid-stream): stop the decode task, drop all pending/ready work, reset.
-	/// Call BEFORE the game screen's DeActivate disposes the stub textures.</summary>
-	public static void CancelStreaming() => tStopStreaming(resetCounters: true);
+	/// <summary>End a load phase normally (all items uploaded).</summary>
+	public static void EndStreaming() { StreamingLoad = false; }
 
-	private static void tStopStreaming(bool resetCounters) {
+	/// <summary>Cancel a load phase (ESC mid-load): stop counting + reset the bar. In-flight uploads to the
+	/// torn-down textures skip via the disposed check; the new generation detaches their counting. Call BEFORE
+	/// the screen's DeActivate disposes the stub textures.</summary>
+	public static void CancelStreaming() {
 		StreamingLoad = false;
-		_streamCts?.Cancel();
-		try { _streamDecodeTask?.Wait(500); } catch { /* ignore cancellation/decode errors */ }
-		_streamCts?.Dispose();
-		_streamCts = null;
-		_streamDecodeTask = null;
-		tClearStreamQueues();
-		if (resetCounters) {
-			_streamTotal = 0;
-			_streamUploaded = 0;
-		}
-	}
-
-	private static void tClearStreamQueues() {
-		while (_streamPending.TryDequeue(out _)) { }
-		while (_streamReady.TryDequeue(out var item))
-			item.bmp?.Dispose();
-		System.Threading.Interlocked.Exchange(ref _streamReadyBytes, 0);
+		Interlocked.Increment(ref _phaseGen);
+		Interlocked.Exchange(ref _phaseTotal, 0);
+		Interlocked.Exchange(ref _phaseDone, 0);
 	}
 }

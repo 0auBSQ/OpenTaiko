@@ -48,7 +48,18 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	/// <summary>Per-session Tower mode state. Always non-null during gameplay.</summary>
 	public CFloorManagement FloorManagement { get; private set; } = new CFloorManagement(5);
 
+	// Synchronous activate — the default for every caller. Drains the stepped build to completion, so behaviour is
+	// identical to the old monolithic Activate; the iterator just adds pause points so the song-loading screen can
+	// spread the build across frames (see ActivateSteps + CStageSongLoading's stepped phase).
 	public override void Activate() {
+		var it = ActivateSteps();
+		while (it.MoveNext()) { }
+	}
+
+	// The game-screen build as a stepped iterator: identical sequential logic to the old Activate, with
+	// `yield return progress` between the pre-setup, batches of child actors, and the note-state build, so the
+	// song load can advance it a slice per frame (smooth bar, no freeze) instead of one blocking call.
+	public virtual System.Collections.Generic.IEnumerator<float> ActivateSteps() {
 		OpenTaiko.HttpEventReporter.ReportGameplayStart();
 
 		// Initialize tower-mode life from the song node so the correct value is
@@ -149,7 +160,20 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.rCurrentCheerChip = null;
 		this.bReverse = OpenTaiko.ConfigIni.bReverse;
 
-		base.Activate();
+		yield return 0.1f;   // pre-setup done; now bring the child actors up a few per frame
+
+		// Inline CActivity.Activate's child loop so it can yield between batches (the old base.Activate() activated
+		// all ~25 actors in one synchronous call → a freeze). Pre/post setup is otherwise unchanged.
+		if (!this.IsActivated) {
+			this.IsDeActivated = false;   // == IsActivated = true
+			int __done = 0, __total = this.ChildActivities.Count;
+			foreach (var __child in this.ChildActivities) {
+				__child.Activate();
+				if ((++__done & 3) == 0) yield return 0.1f + 0.7f * __done / System.Math.Max(1, __total);
+			}
+			this.IsFirstDraw = true;
+		}
+
 		this.tPanelStringSettings();
 		//this.演奏判定ライン座標();
 		this.bIsGOGOTIME_Branch = new bool[5, 3];
@@ -273,6 +297,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.tBackgroundTextureCreate();
 
 		this.nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // reset for new chart
+		yield return 0.9f;   // children up; build the note state
 		this.tValueInitialize(true, true);
 
 		this.bPAUSE = false;

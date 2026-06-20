@@ -119,8 +119,12 @@ internal class CStageSongLoading : CStage {
 			// torn down — OpenTaiko's LoadCanceled handler doesn't do it. Cancel/clear the stream queues FIRST
 			// (drops the stub references + disposes pending bitmaps), THEN DeActivate disposes the stub textures.
 			if (_streamingActive) {
+				if (_gsActivate != null) {   // ESC mid-build: stop stepping + restore the batched-trace flag
+					_gsActivate = null;
+					System.Diagnostics.Trace.AutoFlush = _gsPrevAutoFlush;
+				}
 				CTexture.CancelStreaming();
-				OpenTaiko.stageGameScreen.DeActivate();
+				OpenTaiko.stageGameScreen.DeActivate();   // tears down whatever child actors were activated so far
 				_streamingActive = false;
 			}
 
@@ -264,9 +268,12 @@ internal class CStageSongLoading : CStage {
 			drawPlate();
 		}
 
-		// Real-time bar: a small crawl during chart/WAV load, then the streamed game-screen texture upload %
-		// (the per-song bulk). The render loop is free throughout, so it stays smooth + ESC-responsive.
-		CLoadingProgress.Report(_streamingActive ? 0.15f + 0.80f * CTexture.StreamFraction : 0.12f);
+		// Real-time bar (monotonic): chart/WAV ≈ 0.12; the stepped game-screen build reports its own 0.12..0.5
+		// (LoadBMPFile); the streamed texture upload fills 0.5..0.95. Render loop free throughout → smooth + ESC.
+		if (base.ePhaseID == CStage.EPhase.SongLoading_StreamTextures)
+			CLoadingProgress.Report(0.5f + 0.45f * CTexture.StreamFraction);
+		else if (base.ePhaseID != CStage.EPhase.SongLoading_LoadBMPFile)
+			CLoadingProgress.Report(0.12f);
 		if (!TransitionDriven) CLoadingScreen.Draw();   // the song_loading transition draws the bar itself when driving
 
 		switch (base.ePhaseID) {
@@ -443,27 +450,29 @@ internal class CStageSongLoading : CStage {
 				}
 
 			case CStage.EPhase.SongLoading_LoadBMPFile: {
-					// Activate the game screen in STREAMING mode: it runs synchronously on the render thread (Lua
-					// VMs are thread-affine — running them off-thread corrupts the interpreter and AccessViolation
-					// crashes), but each MakeTexture(path) only reads the image header (size) and QUEUES the pixel
-					// work instead of decoding inline. So Activate returns in a few ms rather than freezing for
-					// seconds; the decode + GL upload then stream in over the next frames (StreamTextures below)
-					// with the render loop free → smooth bar + live ESC.
-					// Batch trace writes during activation: Trace.AutoFlush is on (OpenTaiko.cs), so the per-texture
-					// [ALLOC_TEX] debug log otherwise flushes to disk every call — slow on an AV-scanned folder and
-					// a big part of the activation cost. Buffer it, then flush once.
-					bool prevAutoFlush = System.Diagnostics.Trace.AutoFlush;
-					System.Diagnostics.Trace.AutoFlush = false;
-					try {
+					// Activate the game screen in STREAMING + STEPPED mode. Lua VMs + GL are render-thread-only, so it
+					// stays here — but instead of one blocking Activate() (~20 hit-sound BASS creates + ~25 child
+					// actors + note-state build = a multi-second freeze), we drive ActivateSteps() one slice per call
+					// (CLoadSession batches calls to its per-frame budget) so the build spreads across frames with the
+					// bar advancing + ESC live. Each MakeTexture(path) only queues; the decode/upload stream in
+					// (StreamTextures below). Batch the per-texture [ALLOC_TEX] trace writes (AutoFlush off) across it.
+					if (_gsActivate == null) {
+						_gsPrevAutoFlush = System.Diagnostics.Trace.AutoFlush;
+						System.Diagnostics.Trace.AutoFlush = false;
 						CTexture.BeginStreaming();
-						OpenTaiko.stageGameScreen.Activate();
-						CTexture.StreamingLoad = false;     // activation done queueing; later loads go synchronous
-						CTexture.StartStreamDecode();       // decode everything queued, off-thread
-						_streamingActive = true;
-					} finally {
-						System.Diagnostics.Trace.AutoFlush = prevAutoFlush;
-						System.Diagnostics.Trace.Flush();
+						_gsActivate = OpenTaiko.stageGameScreen.ActivateSteps();
+						_streamingActive = true;   // set NOW so an ESC mid-build still tears the game screen down (DeActivate)
 					}
+					if (_gsActivate.MoveNext()) {
+						CLoadingProgress.Report(0.12f + 0.38f * Math.Clamp(_gsActivate.Current, 0f, 1f));   // build → 0.12..0.5 of the bar
+						return (int)ESongLoadingScreenReturnValue.Continue;
+					}
+					// Build complete.
+					_gsActivate = null;
+					CTexture.StreamingLoad = false;     // activation done queueing; later loads go synchronous
+					CTexture.StartStreamDecode();       // (no-op now — decode auto-starts per queued texture)
+					System.Diagnostics.Trace.AutoFlush = _gsPrevAutoFlush;
+					System.Diagnostics.Trace.Flush();
 					base.ePhaseID = CStage.EPhase.SongLoading_StreamTextures;
 					return (int)ESongLoadingScreenReturnValue.Continue;
 				}
@@ -480,17 +489,17 @@ internal class CStageSongLoading : CStage {
 					_streamingActive = false;
 					CLoadingProgress.Report(0.96f);
 
+					// BGA load + FastRender warm-up are synchronous + heavy; run them non-blocking on the budgeted
+					// finalize queue so they don't freeze the load frame. They complete during the BGM lead-in wait
+					// below, so they're ready by the time gameplay starts (the BGA/render just pops in when ready).
 					if (OpenTaiko.ConfigIni.bEnableAVI)
-						OpenTaiko.TJA.tAVILoad();
+						Game.AsyncActions.Enqueue(() => OpenTaiko.TJA.tAVILoad());
 
 					TimeSpan span = (TimeSpan)(DateTime.Now - timeBeginLoad);
 					Trace.TraceInformation("総読込時間:                {0}", span.ToString());
 
-					if (OpenTaiko.ConfigIni.FastRender) {
-						var fastRender = new FastRender();
-						fastRender.Render();
-						fastRender = null;
-					}
+					if (OpenTaiko.ConfigIni.FastRender)
+						Game.AsyncActions.Enqueue(() => { var fr = new FastRender(); fr.Render(); });
 
 					CLoadingProgress.End();   // everything loaded → 100%
 
@@ -566,6 +575,8 @@ internal class CStageSongLoading : CStage {
 	private CTja[]? _loadedTjas;
 	private Task? _wavLoadTask;
 	private bool _streamingActive;             // game screen activated + textures streaming in (see LoadBMPFile)
+	private System.Collections.Generic.IEnumerator<float>? _gsActivate;   // in-flight stepped game-screen build
+	private bool _gsPrevAutoFlush;             // Trace.AutoFlush to restore after the batched stepped build
 	private CCounter ctWait;
 	private CCounter ctSongNameDisplay;
 

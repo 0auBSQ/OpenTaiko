@@ -38,6 +38,11 @@ namespace OpenTaiko {
 			return lcTransitionScript.StepOnStart(out progress);
 		}
 
+		// Per-transition fade-duration overrides (null ⇒ CStageTransition's default), declared as FADE_OUT_SECONDS
+		// / FADE_IN_SECONDS globals in the transition's Script.lua.
+		public double? FadeOutSeconds => lcTransitionScript?.FadeOutSeconds;
+		public double? FadeInSeconds => lcTransitionScript?.FadeInSeconds;
+
 		public void FadeOut(double t) => lcTransitionScript?.FadeOut(t);
 		public void Loading(double progress, double elapsed) => lcTransitionScript?.Loading(progress, elapsed);
 		public void FadeIn(double t) => lcTransitionScript?.FadeIn(t);

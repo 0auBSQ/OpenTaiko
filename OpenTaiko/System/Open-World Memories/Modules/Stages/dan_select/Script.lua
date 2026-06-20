@@ -141,9 +141,8 @@ function activate()
 
     _load_menu_chara()
 
-    -- Load shared resources
+    -- Load shared resources (the door moved to the dan_doors transition)
     tx_bg   = TEXTURE:CreateTexture(TX .. "Background.png")
-    tx_door = TEXTURE:CreateTexture(TX .. "Door.png")
 
     snd_entry = SOUND:CreateSFX(SND .. "Entry.ogg")
     snd_bgm   = SOUND:CreateBGM(SND .. "BGM.ogg")
@@ -172,30 +171,15 @@ function activate()
         return
     end
 
-    -- ── Re-entering after cancel (door already shown) ─────────────────────────
-    if intro_shown then
-        door_done       = true
-        door_post_delay = DOOR_POST_DELAY_SEC
-        if song_enum_done then
-            state = "menu_3way"
-            startBGM()
-        else
-            state = "loading"
-        end
-        return
-    end
-
-    -- ── First time entry: door intro ──────────────────────────────────────────
-    door_timer      = 0.0
-    door_opening    = false
-    door_done       = false
-    door_open_t     = 0.0
-    door_post_delay = 0.0
-    bg_zoom         = BG_ZOOM_START
-
+    -- ── Enter the menu directly ───────────────────────────────────────────────
+    -- The dan doors are now the `dan_doors` transition (played by _title on entry), not an in-stage intro.
+    -- Start un-zoomed; play the entry sound once on the first visit (matching the old intro).
+    door_done = true
+    bg_zoom   = BG_ZOOM_END
     if song_enum_done then
-        state = "intro"
-        snd_entry:Play()
+        state = "menu_3way"
+        startBGM()
+        if not intro_shown then intro_shown = true; if snd_entry ~= nil then snd_entry:Play() end end
     else
         state = "loading"
     end
@@ -228,13 +212,9 @@ function afterSongEnum()
     pagoda.afterSongEnum()
 
     if state == "loading" then
-        if intro_shown then
-            state = "menu_3way"
-            startBGM()
-        else
-            state = "intro"
-            if snd_entry ~= nil then snd_entry:Play() end
-        end
+        state = "menu_3way"
+        startBGM()
+        if not intro_shown then intro_shown = true; if snd_entry ~= nil then snd_entry:Play() end end
     end
 end
 
@@ -286,7 +266,7 @@ function update()
     -- ── LOADING ───────────────────────────────────────────────────────────────
     if state == "loading" then
         if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-            return Exit("title", nil)
+            return Exit("title", nil, "dan_doors")   -- close the doors over dan_select, open onto the title
         end
         return
     end
@@ -322,7 +302,7 @@ function update()
         end
 
         if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-            return Exit("title", nil)
+            return Exit("title", nil, "dan_doors")   -- close the doors over dan_select, open onto the title
         end
         return
     end
@@ -332,7 +312,7 @@ function update()
         if bg_zoom_counter ~= nil then bg_zoom_counter:Tick() end
 
         if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-            return Exit("title", nil)
+            return Exit("title", nil, "dan_doors")   -- close the doors over dan_select, open onto the title
         end
 
         if INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("UpArrow") then

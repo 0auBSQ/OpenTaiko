@@ -3,42 +3,115 @@ using FDK;
 
 namespace OpenTaiko;
 
-// Orchestrates a stage→stage switch driven by a Lua transition component. Set as the current stage by
-// OpenTaiko.UnmountAndChangeStage when a Lua Exit(...) requested a transition, then runs in Draw():
-//   FadeOut    — render the outgoing stage under fadeOut(t)      (t 0→1)
-//   BeginLoad  — unmount outgoing, open the async-load phase, begin activating the target behind the cover
-//   Activating — (Lua targets) step `activate` as a coroutine each frame so a heavy activate doesn't freeze
-//   Draining   — pump the deferred asset loads; past ~0.5 s draw loading(progress, elapsed) (else hold cover)
-//   FadeIn     — render the loaded target under fadeIn(t)        (t 0→1)
-// On finish Draw() returns non-zero and the main loop swaps to the (already-mounted) Target.
-internal class CStageTransition : CStage {
-	private enum ETransitionPhase { Idle, FadeOut, BeginLoad, Activating, Draining, LoadingSong, FadeIn }
-	private ETransitionPhase _phase = ETransitionPhase.Idle;
+// Options that distinguish the few transition flavours (set by the caller; sensible defaults = a plain
+// stage-entry load). Everything else is uniform: FadeOut → Load → FadeIn driven by a single CLoadSession.
+internal struct TransitionOptions {
+	public bool NoAssetPhase;     // skip the CAsyncLoad asset phase (song load streams its own game-screen textures)
+	public bool LoaderDrivesBar;  // song load: the load source owns CLoadingProgress + the screen shows immediately;
+	                              //   otherwise the transition blends source/asset progress + anti-blink-holds the cover
+	public bool RevealsGameplay;  // draw the note chips through the load + fade-in (song load → gameplay)
+	public CStage? CancelTarget;  // ESC during the load → go here (song load → song select)
+}
 
-	private const double FadeOutSeconds = 0.25;
-	private const double FadeInSeconds = 0.25;
+// Activate a Lua stage incrementally as an IStepLoad: BeginActivate, then StepActivate each frame (self-limiting
+// via the time-based coroutine yield), then finish + create its managed/unmanaged resources.
+internal sealed class StageActivateStep : IStepLoad {
+	private readonly LuaStageWrapper _target;
+	private bool _begun;
+	public StageActivateStep(LuaStageWrapper target) { _target = target; }
+	public LoadStatus Step(out float progress) {
+		if (!_begun) { _target.BeginActivate(); _begun = true; }   // assets created while stepping defer to CAsyncLoad
+		if (_target.StepActivate(out progress)) return LoadStatus.More;
+		_target.FinishActivate();
+		if (!OpenTaiko.ConfigIni.PreAssetsLoading) {
+			_target.CreateManagedResource();
+			_target.CreateUnmanagedResource();
+		}
+		progress = 1f;
+		return LoadStatus.Done;
+	}
+}
+
+// Activate a non-Lua stage in one shot (synchronous behind the cover); its assets still defer to the phase.
+internal sealed class MountStep : IStepLoad {
+	private readonly CStage _target;
+	public MountStep(CStage target) { _target = target; }
+	public LoadStatus Step(out float progress) {
+		OpenTaiko.app.MountActivity(_target);
+		progress = 1f;
+		return LoadStatus.Done;
+	}
+}
+
+// Drive CStageSongLoading (chart / WAV / game-screen streaming — its own visual is gated off, it just loads +
+// reports CLoadingProgress) and map its return value. The game screen survives as the transition's Target.
+internal sealed class SongLoadStep : IStepLoad {
+	private readonly CStageSongLoading _loader;
+	private bool _mounted;
+	public SongLoadStep(CStageSongLoading loader) { _loader = loader; }
+	public LoadStatus Step(out float progress) {
+		if (!_mounted) {
+			_loader.TransitionDriven = true;
+			OpenTaiko.app.MountActivity(_loader);
+			_mounted = true;
+		}
+		int rv = _loader.Draw();   // steps the load; reports CLoadingProgress; draws nothing (TransitionDriven)
+		progress = CLoadingProgress.Progress;
+		if (rv == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
+			OpenTaiko.app.UnmountActivity(_loader);   // tears down the half-loaded game screen
+			_loader.TransitionDriven = false;
+			return LoadStatus.Canceled;
+		}
+		if (rv == (int)ESongLoadingScreenReturnValue.LoadComplete) {
+			OpenTaiko.app.UnmountActivity(_loader);   // game screen survives (streaming done)
+			_loader.TransitionDriven = false;
+			return LoadStatus.Done;
+		}
+		return LoadStatus.More;
+	}
+}
+
+// Orchestrates a stage→stage switch driven by a Lua transition component. Set as the current stage by
+// OpenTaiko.UnmountAndChangeStage / EnterSongLoad when a Lua Exit(...) (or the play path) requested a transition,
+// then runs in Draw() through three phases:
+//   FadeOut — render the outgoing stage under fadeOut(t)               (t 0→1)
+//   Load    — unmount the outgoing, drive the CLoadSession to completion behind loading(progress, elapsed)
+//             (skipped when there's nothing to load — revealing an already-mounted target)
+//   FadeIn  — render the loaded target under fadeIn(t)                 (t 0→1)
+// On finish Draw() returns non-zero and the main loop swaps to the (already-mounted) Target — or, if the load was
+// cancelled (ESC), to CancelTarget.
+internal class CStageTransition : CStage {
+	private enum Phase { Idle, FadeOut, Load, FadeIn }
+	private Phase _phase = Phase.Idle;
+
+	private const double DefaultFadeSeconds = 0.5;          // a transition may override via FADE_OUT/IN_SECONDS (Lua)
 	private const double LoadingScreenDelaySeconds = 0.5;   // shorter loads show no loading screen (anti-blink)
-	private const float ActivateBarSpan = 0.8f;             // activate coroutine fills 0..0.8, asset drain 0.8..1
+	private const float ActivateBarSpan = 0.8f;             // source fills 0..0.8 of the bar, asset drain 0.8..1
+
+	// Effective fade durations: the transition script's declared override, else the default.
+	private double FadeOutSeconds => _script?.FadeOutSeconds ?? DefaultFadeSeconds;
+	private double FadeInSeconds => _script?.FadeInSeconds ?? DefaultFadeSeconds;
 
 	private CStage? _outgoing;
 	private LuaTransitionWrapper? _script;
-	private LuaStageWrapper? _luaTarget;   // non-null when the target activates incrementally (a Lua stage)
-	private bool _revealOnly;              // target is already mounted (e.g. song-loading → gameplay): just fade
-	private bool _songLoad;                // drive CStageSongLoading (chart/WAV/game-screen) → fade into gameplay
-	private CStage? _cancelTarget;         // where to go if the song load is cancelled (ESC) — song select
+	private CLoadSession? _session;     // the unified load driver (null = reveal an already-mounted target)
+	private bool _loaderDrivesBar;      // song load: the loader owns CLoadingProgress + the screen shows at once
+	private bool _revealsGameplay;      // song load → gameplay: draw note chips through the load + fade-in
+	private CStage? _cancelTarget;      // ESC during the load → here
 	private long _phaseStart;
 	private long _loadStart;
+	private long _lastTickTs;           // for advancing the loading-bar easing each Load frame
 
-	// The stage being transitioned to (mounted by this transition; the main loop reads it once finished).
+	// The stage being transitioned to (mounted by this transition / the load; the main loop reads it once finished).
 	public CStage? Target { get; private set; }
 
-	// Set when a song load was cancelled (ESC): the main loop sends the player to CancelTarget instead of Target.
+	// Set when a load was cancelled (ESC): the main loop sends the player to CancelTarget instead of Target.
 	public bool Canceled { get; private set; }
 	public CStage? CancelTarget { get; private set; }
 
-	// True while fading the song-loading screen out to reveal gameplay: the main loop draws the note chips
-	// during this phase (the loading screen fades over them) so notes stay visible as the screen clears.
-	public bool RevealingGameplay => _songLoad && _phase == ETransitionPhase.FadeIn;
+	// True while fading the song-loading screen out to reveal gameplay: the main loop draws the note chips during
+	// this phase (the loading screen fades over them) so notes stay visible as the screen clears.
+	public bool RevealingGameplay => _revealsGameplay && _phase == Phase.FadeIn;
 
 	// Pending-script handoff: set by the requesting stage's Exit, consumed by UnmountAndChangeStage.
 	private static LuaTransitionWrapper? _pendingScript;
@@ -46,73 +119,43 @@ internal class CStageTransition : CStage {
 	public static LuaTransitionWrapper? ConsumePendingScript() { var s = _pendingScript; _pendingScript = null; return s; }
 	public static void ClearPendingScript() => _pendingScript = null;
 
+	// The right load step for a target stage: a Lua stage activates incrementally; anything else mounts in one shot.
+	public static IStepLoad ActivateStep(CStage target)
+		=> target is LuaStageWrapper lw ? new StageActivateStep(lw) : new MountStep(target);
+
 	public CStageTransition() {
 		base.eStageID = CStage.EStage.Transition;
 		base.IsDeActivated = true;
 	}
 
-	// outgoing is still mounted; target is NOT yet activated (this transition activates it behind the cover).
-	public void Begin(CStage? outgoing, CStage target, LuaTransitionWrapper script, string? traceMessage) {
+	// The single entry point. `load` == null reveals an already-mounted `target` (no load — e.g. the legacy
+	// song-loading → gameplay handoff). `outgoing` is still mounted (rendered during fade-out, then unmounted).
+	public void Begin(CStage? outgoing, CStage target, IStepLoad? load, in TransitionOptions opts,
+	                  LuaTransitionWrapper script, string? traceMessage) {
 		if (traceMessage != null) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation($"■ {traceMessage} (transition)");
 		}
 		_outgoing = outgoing;
 		Target = target;
-		_luaTarget = target as LuaStageWrapper;
-		_revealOnly = false;
-		_songLoad = false;
-		Canceled = false;
+		_session = load != null ? new CLoadSession(load, manageAssetPhase: !opts.NoAssetPhase) : null;
+		_loaderDrivesBar = opts.LoaderDrivesBar;
+		_revealsGameplay = opts.RevealsGameplay;
+		_cancelTarget = opts.CancelTarget;
 		_script = script;
-		_phase = ETransitionPhase.FadeOut;
-		_phaseStart = Stopwatch.GetTimestamp();
-		base.IsDeActivated = false;
-	}
-
-	// Song-select → gameplay as ONE transition: fade the outgoing (song select) out, drive CStageSongLoading
-	// (chart / WAV / game-screen streaming — its own visual + bar shown via loading()), then fade the loaded
-	// game screen in. ESC during the load → Canceled + CancelTarget (back to song select).
-	public void BeginSongLoad(CStage? outgoing, CStage gameplayTarget, CStage cancelTarget, LuaTransitionWrapper script, string? traceMessage) {
-		if (traceMessage != null) {
-			Trace.TraceInformation("----------------------");
-			Trace.TraceInformation($"■ {traceMessage} (song-load transition)");
-		}
-		_outgoing = outgoing;
-		Target = gameplayTarget;
-		_cancelTarget = cancelTarget;
-		_luaTarget = null;
-		_revealOnly = false;
-		_songLoad = true;
 		Canceled = false;
 		CancelTarget = null;
-		_script = script;
-		_phase = ETransitionPhase.FadeOut;
-		_phaseStart = Stopwatch.GetTimestamp();
-		base.IsDeActivated = false;
-	}
-
-	// Fade from an outgoing stage to an ALREADY-mounted target (no activate / load). Used as the legacy
-	// song-loading → gameplay handoff when no song_loading transition module exists.
-	public void BeginReveal(CStage? outgoing, CStage target, LuaTransitionWrapper script, string? traceMessage) {
-		if (traceMessage != null) {
-			Trace.TraceInformation("----------------------");
-			Trace.TraceInformation($"■ {traceMessage} (reveal)");
-		}
-		_outgoing = outgoing;
-		Target = target;
-		_luaTarget = null;
-		_revealOnly = true;
-		_songLoad = false;
-		Canceled = false;
-		_script = script;
-		_phase = ETransitionPhase.FadeOut;
+		// Diagnostic: confirms the resolved fade durations actually reach the running build (script override vs
+		// DefaultFadeSeconds). e.g. "fade out=0.5s in=0.5s" (default) / "1s" (song_loading) / "0.7s" (dan_doors).
+		Trace.TraceInformation($"[transition] {traceMessage ?? "(switch)"} — fade out={FadeOutSeconds:0.##}s in={FadeInSeconds:0.##}s");
+		_phase = Phase.FadeOut;
 		_phaseStart = Stopwatch.GetTimestamp();
 		base.IsDeActivated = false;
 	}
 
 	private static double Elapsed(long since) => Stopwatch.GetElapsedTime(since).TotalSeconds;
 
-	// Draw the loading visual, or hold the full cover during the <0.5 s anti-blink window.
+	// Draw the loading visual, or hold the full cover during the <0.5 s anti-blink window (stage entry only).
 	private void DrawLoading(float progress) {
 		double el = Elapsed(_loadStart);
 		if (el > LoadingScreenDelaySeconds) _script?.Loading(progress, el);
@@ -121,100 +164,67 @@ internal class CStageTransition : CStage {
 
 	public override int Draw() {
 		switch (_phase) {
-			case ETransitionPhase.FadeOut: {
+			case Phase.FadeOut: {
 				_outgoing?.Draw();
 				double t = Math.Clamp(Elapsed(_phaseStart) / FadeOutSeconds, 0.0, 1.0);
 				_script?.FadeOut(t);
 				if (t >= 1.0) {
 					OpenTaiko.app.UnmountActivity(_outgoing);
 					_outgoing = null;
-					if (_revealOnly) {                    // target already mounted → straight to fade-in
-						_phase = ETransitionPhase.FadeIn;
-						_phaseStart = Stopwatch.GetTimestamp();
-					} else if (_songLoad) {               // mount the song loader (load only — we draw the screen)
-						OpenTaiko.stageSongLoading.TransitionDriven = true;
-						OpenTaiko.app.MountActivity(OpenTaiko.stageSongLoading);
-						_loadStart = Stopwatch.GetTimestamp();
-						_phase = ETransitionPhase.LoadingSong;
+					_loadStart = Stopwatch.GetTimestamp();
+					if (_session == null) {                 // nothing to load → reveal the already-mounted target
+						_phase = Phase.FadeIn;
+						_phaseStart = _loadStart;
 					} else {
-						_phase = ETransitionPhase.BeginLoad;
+						CLoadingProgress.Begin();           // reset the bar (Report is monotonic) + start easing
+						_lastTickTs = 0;
+						_session.Begin();
+						_phase = Phase.Load;
 					}
 				}
 				return 0;
 			}
 
-			case ETransitionPhase.BeginLoad: {
-				_script?.FadeOut(1.0);   // keep covered this frame
-				_loadStart = Stopwatch.GetTimestamp();
-				CAsyncLoad.BeginPhase();
-				if (_luaTarget != null) {
-					_luaTarget.BeginActivate();   // assets created while stepping defer to CAsyncLoad
-					_phase = ETransitionPhase.Activating;
-				} else {
-					OpenTaiko.app.MountActivity(Target);   // non-Lua target: synchronous activate behind the cover
-					CAsyncLoad.StartDecode();
-					_phase = ETransitionPhase.Draining;
-				}
-				return 0;
-			}
+			case Phase.Load: {
+				// Advance the bar easing (the transition draws the bar via loading() — unlike CLoadingScreen.Draw
+				// it must tick the smoothing itself, so a coarse/0→100 source fills smoothly instead of snapping).
+				long now = Stopwatch.GetTimestamp();
+				if (_lastTickTs != 0) CLoadingProgress.Tick(Stopwatch.GetElapsedTime(_lastTickTs, now).TotalMilliseconds);
+				_lastTickTs = now;
 
-			case ETransitionPhase.Activating: {
-				bool more = _luaTarget!.StepActivate(out float p);   // sound/shared finalizers auto-drain via the render loop
-				DrawLoading(ActivateBarSpan * Math.Clamp(p, 0f, 1f));
-				if (!more) {
-					_luaTarget.FinishActivate();
-					if (!OpenTaiko.ConfigIni.PreAssetsLoading) {
-						_luaTarget.CreateManagedResource();
-						_luaTarget.CreateUnmanagedResource();
-					}
-					CAsyncLoad.StartDecode();   // decode the textures queued during activate
-					_phase = ETransitionPhase.Draining;
-				}
-				return 0;
-			}
-
-			case ETransitionPhase.Draining: {
-				CAsyncLoad.Pump(8.0);
-				float bar = _luaTarget != null ? ActivateBarSpan + (1f - ActivateBarSpan) * CAsyncLoad.Fraction
-				                                : CAsyncLoad.Fraction;
-				DrawLoading(bar);
-				if (CAsyncLoad.Complete) {
-					CAsyncLoad.EndPhase();
-					_phase = ETransitionPhase.FadeIn;
-					_phaseStart = Stopwatch.GetTimestamp();
-				}
-				return 0;
-			}
-
-			case ETransitionPhase.LoadingSong: {
-				// CStageSongLoading draws its own screen + bar and steps the chart/WAV/game-screen load; the
-				// transition's loading() overlays (e.g. fades the song-loading screen in over the cover).
-				int rv = OpenTaiko.stageSongLoading.Draw();
-				// Raw (not DisplayProgress): the smoothing Tick lives in CLoadingScreen.Draw, which we skip here.
-				_script?.Loading(CLoadingProgress.Progress, Elapsed(_loadStart));
-				if (rv == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
-					OpenTaiko.app.UnmountActivity(OpenTaiko.stageSongLoading);   // tears down the half-loaded game screen
-					OpenTaiko.stageSongLoading.TransitionDriven = false;
+				bool more = _session!.Step();
+				if (_session.Canceled) {
+					_session.Cancel();
 					Canceled = true;
 					CancelTarget = _cancelTarget;
-					_phase = ETransitionPhase.Idle;
-					return 1;   // main loop sends the player to CancelTarget (song select)
+					_phase = Phase.Idle;
+					CLoadingProgress.End();
+					return 1;   // main loop sends the player to CancelTarget
 				}
-				if (rv == (int)ESongLoadingScreenReturnValue.LoadComplete) {
-					OpenTaiko.app.UnmountActivity(OpenTaiko.stageSongLoading);   // game screen survives (streaming done)
-					OpenTaiko.stageSongLoading.TransitionDriven = false;
-					_phase = ETransitionPhase.FadeIn;
+				if (_loaderDrivesBar) {
+					// The loader (CStageSongLoading) Reports the raw target; draw the EASED value.
+					_script?.Loading(CLoadingProgress.DisplayProgress, Elapsed(_loadStart));
+				} else {
+					float bar = _session.SourceDone ? ActivateBarSpan + (1f - ActivateBarSpan) * _session.AssetFraction
+					                                : ActivateBarSpan * _session.SourceProgress;
+					CLoadingProgress.Report(bar);   // monotonic raw target → eased by Tick above
+					DrawLoading(CLoadingProgress.DisplayProgress);
+				}
+				if (!more) {
+					_session.End();
+					_phase = Phase.FadeIn;
 					_phaseStart = Stopwatch.GetTimestamp();
+					CLoadingProgress.End();
 				}
 				return 0;
 			}
 
-			case ETransitionPhase.FadeIn: {
+			case Phase.FadeIn: {
 				Target?.Draw();
 				double t = Math.Clamp(Elapsed(_phaseStart) / FadeInSeconds, 0.0, 1.0);
 				_script?.FadeIn(t);
 				if (t >= 1.0) {
-					_phase = ETransitionPhase.Idle;
+					_phase = Phase.Idle;
 					return 1;   // done — main loop swaps rCurrentStage to Target
 				}
 				return 0;
@@ -225,17 +235,17 @@ internal class CStageTransition : CStage {
 
 	// Release the hold once the main loop has taken over the (already-mounted) target; does NOT unmount it.
 	public void Finish() {
-		if (CAsyncLoad.Active) CAsyncLoad.CancelPhase();
+		_session?.Cancel();
 		_script = null;
 		_outgoing = null;
-		_luaTarget = null;
-		_revealOnly = false;
-		_songLoad = false;
+		_session = null;
+		_loaderDrivesBar = false;
+		_revealsGameplay = false;
 		Canceled = false;
 		Target = null;
 		_cancelTarget = null;
 		CancelTarget = null;
-		_phase = ETransitionPhase.Idle;
+		_phase = Phase.Idle;
 		base.IsDeActivated = true;
 	}
 }

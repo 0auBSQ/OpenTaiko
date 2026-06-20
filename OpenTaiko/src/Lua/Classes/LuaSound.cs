@@ -125,34 +125,21 @@ namespace OpenTaiko {
 			Trace.TraceInformation($"[ALLOC_SND] {full_path}");
 #endif
 
+			// Return an empty stub + create the BASS stream non-blocking on the render thread (BASS is sync-
+			// critical, so it is NOT moved off-thread — just spread across frames). Until it's built every method
+			// is a harmless no-op and Play/Set* are buffered, so the sound simply starts working when ready.
 			LuaSound sound = new();
-
-			// In a load phase: return an empty stub + defer the BASS stream creation, spread across frames by
-			// CAsyncLoad (stays render-thread-only), so many sounds in one onStart don't freeze the frame.
-			if (CAsyncLoad.ShouldDefer) {
-				Sounds.Add(sound);
-				if (autoDispose)
-					sound._disposeList = this.Sounds;
-				CAsyncLoad.TrackRenderThread(() => {
-					try {
-						sound.LoadDeferred(full_path, group);
-					} catch (Exception e) {
-						LogNotification.PopError($"Lua Sound failed to load: {e}");
-					}
-				});
-				return sound;
-			}
-
-			try {
-				sound = new(full_path, group);
-				Sounds.Add(sound);
-				if (autoDispose)
-					sound._disposeList = this.Sounds;
-			} catch (Exception e) {
-				LogNotification.PopError($"Lua Sound failed to load: {e}");
-				sound?.Dispose();
-				sound = new();
-			}
+			Sounds.Add(sound);
+			if (autoDispose)
+				sound._disposeList = this.Sounds;
+			Action build = () => {
+				try { sound.LoadDeferred(full_path, group); }
+				catch (Exception e) { LogNotification.PopError($"Lua Sound failed to load: {e}"); }
+			};
+			if (CAsyncLoad.ShouldDefer)
+				CAsyncLoad.TrackRenderThread(build);   // in a load phase → also counts toward the loading bar
+			else
+				Game.AsyncActions.Enqueue(build);      // runtime → just the per-frame finalize budget, non-blocking
 			return sound;
 		}
 	}

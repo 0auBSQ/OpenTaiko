@@ -132,11 +132,16 @@ class CLuaScript : IDisposable {
 		return null;
 	}
 
-	// Run a hook (onStart / activate) as an engine-owned Lua coroutine: a count hook on the thread auto-yields
-	// every N VM instructions, so a long load spreads across frames instead of freezing the render loop. (Lua is
-	// render-thread-only, so it can't move off-thread — but it can yield.) Resuming the thread directly, not via
-	// NLua's coroutine.resume under a lua_pcall, is what lets the hook's yield propagate back to us.
-	public static int LoadYieldInstructions = 100_000;   // VM instructions between auto-yields
+	// Run a hook (onStart / activate) as an engine-owned Lua coroutine: a count hook on the thread fires often +
+	// cheaply, but only YIELDS once the current resume has run past YieldBudgetMs of wall-clock. So a long load
+	// spreads across frames by TIME — not by VM-instruction count, which barely advances during C#-bound scene/
+	// texture building (each scene:Obj…/RegisterTexture is ~1 Lua instruction but expensive), the reason a build
+	// loop used to run start-to-finish in one resume and freeze the frame. Lua is render-thread-only so it can't
+	// move off-thread — but it can yield. Resuming the thread directly (not via NLua's coroutine.resume under a
+	// lua_pcall) is what lets the hook's yield propagate back to us.
+	public static int YieldCheckInstructions = 2000;    // VM instructions between wall-clock checks (fire often, cheap)
+	public static double YieldBudgetMs = 8.0;           // a resume keeps running until this much wall-time elapses
+	private static long _resumeStartTs;                 // Stopwatch ts when the current resume began (render-thread only)
 
 	// The skinner LOADING API + the wrapper that runs onStart/activate so queued blocks load + yield around it.
 	// LOADING:Add(label?, weight?, fn) records a block; LOADING:Tick(sub) yields a frame inside a heavy loop.
@@ -191,6 +196,7 @@ end
 
 	private static void YieldHook(IntPtr L, IntPtr ar) {
 		try {
+			if (Stopwatch.GetElapsedTime(_resumeStartTs).TotalMilliseconds < YieldBudgetMs) return;   // under budget — keep running
 			var st = KeraLua.Lua.FromIntPtr(L);
 			if (st != null && st.IsYieldable) st.Yield(0);
 		} catch { /* never let a managed exception cross back into native Lua */ }
@@ -229,7 +235,7 @@ end
 				}
 				L.XMove(co, 1);
 			}
-			co.SetHook(_yieldHook, KeraLua.LuaHookMask.Count, Math.Max(1, LoadYieldInstructions));
+			co.SetHook(_yieldHook, KeraLua.LuaHookMask.Count, Math.Max(1, YieldCheckInstructions));
 			_hookCo = co;
 		} catch (Exception exception) {
 			Crash(exception);
@@ -245,6 +251,7 @@ end
 		var co = _hookCo;
 		if (co == null) return false;
 		try {
+			_resumeStartTs = Stopwatch.GetTimestamp();   // YieldHook yields once this resume runs past YieldBudgetMs
 			var status = co.Resume(LuaScript.State, 0, out int nresults);
 			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
 			if (status == KeraLua.LuaStatus.Yield) {

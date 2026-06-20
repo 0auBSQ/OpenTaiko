@@ -38,13 +38,11 @@ internal class CStageChangeSkin : CStage {
 			OpenTaiko.tDisposeSafely(ref Background);
 
 			// Safety: if torn down mid-load, undo the batched-trace + async-load state so it can't leak.
-			if (_loading || _draining) {
+			if (_session != null) {
 				System.Diagnostics.Trace.AutoFlush = _savedAutoFlush;
-				CAsyncLoad.CancelPhase();
+				_session.Cancel();
+				_session = null;
 			}
-			_loading = false;
-			_draining = false;
-			_skinLoad = null;
 
 			base.DeActivate();
 			Trace.TraceInformation("スキン変更ステージの非活性化を完了しました。");
@@ -71,13 +69,13 @@ internal class CStageChangeSkin : CStage {
 				background.Init();
 				this.Background = background;
 
-				// Drive the module (re)load incrementally on the RENDER THREAD with the loading bar — never on
-				// a worker thread (Lua is thread-affine; the old Task.Run path could corrupt the VM). The
-				// modules' onStart textures stream in (async decode) + the per-texture trace flush is batched.
+				// Drive the module (re)load incrementally on the RENDER THREAD with the loading bar via the shared
+				// CLoadSession — never on a worker thread (Lua is thread-affine; the old Task.Run path could
+				// corrupt the VM). The session streams the modules' onStart textures (async decode); the
+				// per-texture trace flush is batched here.
 				CLoadingProgress.Begin();
-				_skinLoad = OpenTaiko.app.LoadSkinBegin();
-				_loading = true;
-				CAsyncLoad.BeginPhase();
+				_session = new CLoadSession(new EnumeratorStep(OpenTaiko.app.LoadSkinBegin()));
+				_session.Begin();
 				_savedAutoFlush = System.Diagnostics.Trace.AutoFlush;
 				System.Diagnostics.Trace.AutoFlush = false;
 
@@ -89,24 +87,14 @@ internal class CStageChangeSkin : CStage {
 			Background?.Draw();
 			CLoadingScreen.Draw();   // engine loading bar overlay
 
-			if (_loading) {
-				long _t0 = System.Diagnostics.Stopwatch.GetTimestamp();
-				while (System.Diagnostics.Stopwatch.GetElapsedTime(_t0).TotalMilliseconds < 10.0) {
-					if (!_skinLoad.MoveNext()) {
-						_loading = false;
-						CAsyncLoad.StartDecode();   // begin decoding the queued onStart textures (off-thread)
-						_draining = true;
-						break;
-					}
-					CLoadingProgress.Report(0.55f * _skinLoad.Current);
-				}
-				CAsyncLoad.Pump(8.0);
-			} else if (_draining) {
-				CAsyncLoad.Pump(8.0);
-				CLoadingProgress.Report(0.55f + 0.40f * CAsyncLoad.Fraction);
-				if (CAsyncLoad.Complete) {
-					_draining = false;
-					CAsyncLoad.EndPhase();
+			if (_session != null) {
+				bool more = _session.Step();
+				// 0-55%: module onStart;  55-95%: streamed onStart-texture upload drain.
+				CLoadingProgress.Report(_session.SourceDone ? 0.55f + 0.40f * _session.AssetFraction
+				                                            : 0.55f * _session.SourceProgress);
+				if (!more) {
+					_session.End();
+					_session = null;
 					System.Diagnostics.Trace.AutoFlush = _savedAutoFlush;
 					System.Diagnostics.Trace.Flush();
 					OpenTaiko.app.LoadSkinFinish();   // Tx textures + AfterSongEnum + Resume + RefleshSkin(s)
@@ -147,9 +135,7 @@ internal class CStageChangeSkin : CStage {
 
 	#region [ private ]
 	private ScriptBG? Background;
-	private System.Collections.Generic.IEnumerator<float>? _skinLoad;   // incremental module (re)loader
-	private bool _loading;
-	private bool _draining;            // finishing the streamed onStart-texture uploads
+	private CLoadSession? _session;    // drives the incremental module (re)load + onStart-texture stream
 	private bool _savedAutoFlush;      // Trace.AutoFlush state to restore after the batched reload
 	#endregion
 }

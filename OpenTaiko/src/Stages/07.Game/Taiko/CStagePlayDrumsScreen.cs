@@ -173,39 +173,37 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	// CStage 実装
 
-	public override void Activate() {
+	public override System.Collections.Generic.IEnumerator<float> ActivateSteps() {
 		LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: false);
 
 		this.ctHandHold = new CCounter(0, 60, 20, OpenTaiko.Timer);
 
-		// When performing calibration, reduce audio distraction from user input.
-		// For users who play primarily by listening to the music,
-		// you might think that we want them to hear drum sound effects during
-		// calibration, but we do not. Humans are remarkably good at adjusting
-		// the timing of their own physical movement, even without realizing it.
-		// We are calibrating their input timing for the purposes of judgment.
-		// We do not want them subconsciously playing early so as to line up
-		// their drum sound effects with the sounds of the input calibration file.
-		// Instead, we want them focused on the sounds of their keyboard, tatacon,
-		// other controller, etc. and the sounds of the input calibration audio file.
+		// Hit sounds: ~20 BASS streams across players. Create them NON-BLOCKING on the budgeted finalize queue
+		// (BASS stays render-thread, just spread across frames) so they don't freeze the load — they finalize
+		// during the song lead-in and the play path already null-checks them.
+		// (Calibration note: the drum hit sounds are intentionally NOT played during input calibration, so the
+		// player focuses on their controller + the calibration audio rather than lining up their own SFX.)
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			int actual = i;
-
 			var hs = OpenTaiko.Skin.hsHitSoundsInformations;
+			Game.AsyncActions.Enqueue(() => {
+				this.soundRed[actual] = OpenTaiko.SoundManager.tCreateSound(hs.don[actual], ESoundGroup.SoundEffect);
+				this.soundBlue[actual] = OpenTaiko.SoundManager.tCreateSound(hs.ka[actual], ESoundGroup.SoundEffect);
+				this.soundAdlib[actual] = OpenTaiko.SoundManager.tCreateSound(hs.adlib[actual], ESoundGroup.SoundEffect);
+				this.soundClap[actual] = OpenTaiko.SoundManager.tCreateSound(hs.clap[actual], ESoundGroup.SoundEffect);
 
-			this.soundRed[i] = OpenTaiko.SoundManager.tCreateSound(hs.don[actual], ESoundGroup.SoundEffect);
-			this.soundBlue[i] = OpenTaiko.SoundManager.tCreateSound(hs.ka[actual], ESoundGroup.SoundEffect);
-			this.soundAdlib[i] = OpenTaiko.SoundManager.tCreateSound(hs.adlib[actual], ESoundGroup.SoundEffect);
-			this.soundClap[i] = OpenTaiko.SoundManager.tCreateSound(hs.clap[actual], ESoundGroup.SoundEffect);
-
-			int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][i];
-			if (this.soundRed[i] != null) this.soundRed[i].SoundPosition = _panning;
-			if (this.soundBlue[i] != null) this.soundBlue[i].SoundPosition = _panning;
-			if (this.soundAdlib[i] != null) this.soundAdlib[i].SoundPosition = _panning;
-			if (this.soundClap[i] != null) this.soundClap[i].SoundPosition = _panning;
+				int _panning = OpenTaiko.ConfigIni.nPanning[OpenTaiko.ConfigIni.nPlayerCount - 1][actual];
+				if (this.soundRed[actual] != null) this.soundRed[actual].SoundPosition = _panning;
+				if (this.soundBlue[actual] != null) this.soundBlue[actual].SoundPosition = _panning;
+				if (this.soundAdlib[actual] != null) this.soundAdlib[actual].SoundPosition = _panning;
+				if (this.soundClap[actual] != null) this.soundClap[actual].SoundPosition = _panning;
+			});
 		}
 
-		base.Activate(); // to unpause at end
+		// Run the common build (children + note state), yielding through its steps. The base sets IsActivated /
+		// IsFirstDraw (the old "base.Activate() // to unpause at end").
+		var it = base.ActivateSteps();
+		while (it.MoveNext()) yield return it.Current;
 	}
 
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {

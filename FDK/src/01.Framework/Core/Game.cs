@@ -101,6 +101,12 @@ public abstract partial class Game : IDisposable {
 
 	public static ConcurrentQueue<Action> AsyncActions { get; private set; } = new ConcurrentQueue<Action>();
 
+	// Per-frame time budget for draining AsyncActions (the single render-thread "finalize" queue: deferred GL
+	// texture uploads + sound/shared creation). Small in normal gameplay so runtime async loads trickle in
+	// without hurting fps; CLoadSession raises it behind a loading screen, where nothing else needs the frame.
+	public const double DefaultAsyncBudgetMs = 3.0;
+	public static double AsyncBudgetMs = DefaultAsyncBudgetMs;
+
 	public Thread thInput { get; private set; }
 	private CancellationTokenSource thInputCancel;
 
@@ -655,7 +661,7 @@ public abstract partial class Game : IDisposable {
 				} catch (Exception ex) {
 					Console.Error.WriteLine($"Error in async action: {ex}");
 				}
-				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= 6.0)
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
 					break;
 			}
 		}

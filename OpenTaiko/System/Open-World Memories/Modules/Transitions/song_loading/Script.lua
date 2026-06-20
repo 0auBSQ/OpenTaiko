@@ -6,6 +6,11 @@
 --   fadeIn(t)             reveal the loaded game screen (t 0→1)
 -- The C# loader (CStageSongLoading) runs the actual load + reports `progress` (0..1); everything drawn here.
 
+-- Fade durations (seconds) for this transition; the engine reads these globals (default is 0.5s elsewhere).
+-- The song-select → gameplay flow reads better with a slightly slower 1s curtain in + reveal out.
+FADE_OUT_SECONDS = 1.0
+FADE_IN_SECONDS  = 1.0
+
 local TEXTURES_DIR = "Textures/"
 local DIFF_TOWER, DIFF_DAN = 5, 6
 

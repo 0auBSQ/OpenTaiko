@@ -168,16 +168,24 @@ namespace OpenTaiko {
 		public LuaTexture CreateTexture() => new();
 		internal LuaTexture CreateTexture(string path, bool autoDispose)
 			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose);
-		public LuaTexture CreateTexture(string path) => CreateTexture(path, autoDispose: true);
 
-		// Load synchronously (decode + GL upload inline) even inside a load phase. Use when the texture's pixels
-		// are read back immediately — e.g. SCENE3D:RegisterSpriteFromTexture — since a deferred/streamed texture
-		// has no pixels yet (and would register an empty sprite).
-		public LuaTexture CreateTextureSync(string path) {
-			bool prev = CTexture.StreamingLoad;
-			CTexture.StreamingLoad = false;
+		// Default: load ASYNCHRONOUSLY — the texture is blank (draws no-op) until the background decode + GL
+		// upload finish, so a runtime load never freezes the render thread (it pops in when ready).
+		public LuaTexture CreateTexture(string path) {
+			bool prev = CTexture.AsyncLoad;
+			CTexture.AsyncLoad = true;
 			try { return CreateTexture(path, autoDispose: true); }
-			finally { CTexture.StreamingLoad = prev; }
+			finally { CTexture.AsyncLoad = prev; }
+		}
+
+		// Load synchronously (decode + GL upload inline), even during a load phase. Use when the pixels/size are
+		// needed immediately — e.g. SCENE3D:RegisterSpriteFromTexture (GPU readback) — since an async texture has
+		// no pixels yet (and would register an empty sprite).
+		public LuaTexture CreateTextureSync(string path) {
+			bool prev = CTexture.SyncForce;
+			CTexture.SyncForce = true;
+			try { return CreateTexture(path, autoDispose: true); }
+			finally { CTexture.SyncForce = prev; }
 		}
 
 		internal LuaTexture CreateTextureFromAbsolutePath(string path, bool autoDispose) {

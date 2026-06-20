@@ -360,7 +360,7 @@ internal class OpenTaiko : Game {
 		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
 		var pendingTransition = CStageTransition.ConsumePendingScript();
 		if (pendingTransition != null && Stage != null) {
-			stageTransition.Begin(rCurrentStage, Stage, pendingTransition, traceMessage);
+			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pendingTransition, traceMessage);
 			rPreviousStage = rCurrentStage;
 			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
 			return;
@@ -378,7 +378,10 @@ internal class OpenTaiko : Game {
 		var slScript = LuaTransitionWrapper.Get("song_loading");
 		if (slScript != null) {
 			CStageTransition.ClearPendingScript();   // play path always uses the song_loading transition
-			stageTransition.BeginSongLoad(outgoing, stageGameScreen, latestSongSelect ?? outgoing, slScript, "Song Loading");
+			stageTransition.Begin(outgoing, stageGameScreen, new SongLoadStep(stageSongLoading),
+				new TransitionOptions { NoAssetPhase = true, LoaderDrivesBar = true, RevealsGameplay = true,
+				                        CancelTarget = latestSongSelect ?? outgoing },
+				slScript, "Song Loading");
 			rPreviousStage = rCurrentStage;
 			rCurrentStage = stageTransition;
 		} else {
@@ -798,7 +801,7 @@ internal class OpenTaiko : Game {
 							// (see the EStage.Transition guard above). No transition module ⇒ legacy direct swap.
 							var revealScript = LuaTransitionWrapper.Get(null);
 							if (revealScript != null) {
-								stageTransition.BeginReveal(rCurrentStage, stageGameScreen, revealScript, "Gameplay (Drum Screen)");
+								stageTransition.Begin(rCurrentStage, stageGameScreen, null, default, revealScript, "Gameplay (Drum Screen)");
 								rPreviousStage = rCurrentStage;
 								rCurrentStage = stageTransition;
 							} else {

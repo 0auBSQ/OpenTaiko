@@ -587,13 +587,14 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		MakeTexture(strFileName, bBlackTransparent);
 	}
 	public void MakeTexture(string strFileName, bool bBlackTransparent) {
-		// Streamed-load fast path: while the song-loading screen is streaming (StreamingLoad), the game-screen
-		// activation must NOT block the render thread decoding ~150 PNGs. Read only the image header (dimensions
-		// — microseconds, no pixel decode) so size-dependent layout at Activate stays correct, then queue the
-		// heavy pixel work for the background decode + budgeted GL upload (StartStreamDecode / PumpUploads).
-		// Only on the render thread (Lua/activation thread); background workers never take this branch.
-		if (StreamingLoad && Thread.CurrentThread.ManagedThreadId == _streamThreadId
-			&& tQueueStreamedTexture(strFileName, bBlackTransparent))
+		// Async fast path: queue the decode + GL upload instead of doing GL here (see CTexture.Streaming.cs).
+		// Triggered by a runtime async load (AsyncLoad) or a load phase (StreamingLoad); SyncForce overrides it
+		// (pixels needed now). The GL upload always lands on the render thread (Game.AsyncActions), so this is
+		// REQUIRED off the render thread (e.g. the off-thread chart parse's #ADDOBJECT textures) — doing GL there
+		// is unreliable. Background decode workers call the MakeTexture(SKBitmap) overload, never this. The texture
+		// stays blank (t2DDraw no-ops) until uploaded.
+		if (!SyncForce && (StreamingLoad || AsyncLoad)
+			&& tQueueAsyncTexture(strFileName, bBlackTransparent))
 			return;
 
 		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。

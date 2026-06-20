@@ -11,6 +11,12 @@ namespace OpenTaiko {
 		internal CTexture? _tmpTex = null;
 		internal HashSet<LuaVideo>? _disposeList = null;
 
+		// Play intent buffered while the decoder opens asynchronously (off-thread); applied in SetVideo so a
+		// Start()/seek/speed issued right after CreateVideo (before the decoder is ready) isn't lost.
+		private bool _pendingStart;
+		private double? _pendingSeek;
+		private double? _pendingSpeed;
+
 		public LuaVideo() {
 			_video = null;
 		}
@@ -19,12 +25,23 @@ namespace OpenTaiko {
 			_video = video;
 		}
 
+		// Attach the decoder once it's been opened off-thread (async-load path) + apply any buffered play state.
+		// Until then every method no-ops and Texture returns empty, so the video just starts when it's ready.
+		internal void SetVideo(CVideoDecoder video) {
+			if (_disposedValue) { video.Dispose(); return; }   // disposed before the open finished → don't leak
+			_video = video;
+			if (_pendingSeek.HasValue) video.Seek((long)(_pendingSeek.Value * 1000.0));
+			if (_pendingSpeed.HasValue) video.dbPlaySpeed = _pendingSpeed.Value;
+			if (_pendingStart) video.Start();
+			_pendingStart = false; _pendingSeek = null; _pendingSpeed = null;
+		}
+
 		public void Start() {
-			_video?.Start();
+			if (_video != null) _video.Start(); else _pendingStart = true;
 		}
 
 		public void Resume() {
-			_video?.Resume();
+			if (_video != null) _video.Resume(); else _pendingStart = true;
 		}
 
 		public void Pause() {
@@ -32,11 +49,11 @@ namespace OpenTaiko {
 		}
 
 		public void Stop() {
-			_video?.Stop();
+			if (_video != null) _video.Stop(); else _pendingStart = false;
 		}
 
 		public void Reset() {
-			_video?.Seek(0);
+			if (_video != null) _video.Seek(0); else _pendingSeek = 0;
 		}
 
 
@@ -68,13 +85,11 @@ namespace OpenTaiko {
 		#endregion
 		#region Sets
 		public void SetPlayPosition(double position) {
-			_video?.Seek((long)(position * 1000.0));
+			if (_video != null) _video.Seek((long)(position * 1000.0)); else _pendingSeek = position;
 		}
 
 		public void SetPlaySpeed(double playSpeed) {
-			if (_video == null) return;
-
-			_video.dbPlaySpeed = playSpeed;
+			if (_video != null) _video.dbPlaySpeed = playSpeed; else _pendingSpeed = playSpeed;
 		}
 
 		#endregion
@@ -109,18 +124,28 @@ namespace OpenTaiko {
 
 			LuaVideo luavid = new();
 			if (File.Exists(full_path)) {
-				try {
-					var vid = new CVideoDecoder(full_path);
-					vid.InitRead();
-					luavid = new LuaVideo(vid);
-					Videos.Add(luavid);
-					if (autoDispose)
-						luavid._disposeList = this.Videos;
-				} catch (Exception e) {
-					LogNotification.PopWarning($"Lua Video failed to load: {e}");
-					luavid?.Dispose();
-					luavid = new();
-				}
+				Videos.Add(luavid);
+				if (autoDispose)
+					luavid._disposeList = this.Videos;
+				// Open the decoder OFF the render thread (avformat + InitRead are GL-free — the GL upload happens
+				// later in GetNowFrame, which is render-thread-safe), then attach on the render thread when ready.
+				// Non-blocking: the video appears + plays once loaded (Start() is buffered until then). During a
+				// load phase the bar waits for it (NotePending/NoteDone). Works from onStart OR activate.
+				bool inPhase = CAsyncLoad.Active;
+				if (inPhase) CAsyncLoad.NotePending();
+				Task.Run(() => {
+					try {
+						var vid = new CVideoDecoder(full_path);
+						vid.InitRead();
+						Game.AsyncActions.Enqueue(() => {
+							try { luavid.SetVideo(vid); }
+							finally { if (inPhase) CAsyncLoad.NoteDone(); }
+						});
+					} catch (Exception e) {
+						LogNotification.PopWarning($"Lua Video failed to load: {e}");
+						if (inPhase) CAsyncLoad.NoteDone();
+					}
+				});
 			}
 			else if (Path.Exists(full_path)) {
 				LogNotification.PopWarning($"Lua Video failed to load because '{full_path}' is not a file.");

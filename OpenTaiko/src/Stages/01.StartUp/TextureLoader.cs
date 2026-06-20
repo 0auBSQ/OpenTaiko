@@ -125,7 +125,14 @@ class TextureLoader {
 
 	internal CTexture TxCUntrackedSong(string path) {
 		tTickTextureProgress();
-		return OpenTaiko.tTextureCreate(path, false);
+		// Chart-object textures (#ADDOBJECT / #CHANGETEXTURE) are created during the OFF-thread chart parse. Load
+		// them async so the GL upload lands on the render thread (Game.AsyncActions) — doing GL on the parse thread
+		// is unreliable (blank images). The CTexture is returned immediately (blank, correct count) + fills in
+		// before gameplay; t2DDraw no-ops until then.
+		bool prev = CTexture.AsyncLoad;
+		CTexture.AsyncLoad = true;
+		try { return OpenTaiko.tTextureCreate(path, false); }
+		finally { CTexture.AsyncLoad = prev; }
 	}
 
 	// ── Boot loading-bar progress ──────────────────────────────────────────────────────────────────
