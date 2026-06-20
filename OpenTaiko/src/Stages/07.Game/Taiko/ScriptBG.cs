@@ -25,7 +25,13 @@ class ScriptBGFunc {
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
 		if (this.Textures.ContainsKey(fileName)) // already loaded
 			return;
-		Textures.Add(fileName, OpenTaiko.tTextureCreate($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+		// Load SYNC: BG scripts read func:GetTextureWidth/Height right after AddGraph (in init) to size their
+		// scroll/tile loops — a streamed/async texture has size 0 until its upload finishes, which corrupts the
+		// layout (broken-looking background). The BG loads behind the loading bar, so an inline load here is fine.
+		bool prev = CTexture.SyncForce;
+		CTexture.SyncForce = true;
+		try { Textures.Add(fileName, OpenTaiko.tTextureCreate($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}")); }
+		finally { CTexture.SyncForce = prev; }
 		Textures[fileName]?.SetTextureWrapMode(Silk.NET.OpenGLES.TextureWrapMode.Repeat);
 	}
 	public void DrawGraph(double x, double y, string fileName) {

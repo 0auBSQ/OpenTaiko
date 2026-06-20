@@ -145,9 +145,6 @@ internal class CStageTransition : CStage {
 		_script = script;
 		Canceled = false;
 		CancelTarget = null;
-		// Diagnostic: confirms the resolved fade durations actually reach the running build (script override vs
-		// DefaultFadeSeconds). e.g. "fade out=0.5s in=0.5s" (default) / "1s" (song_loading) / "0.7s" (dan_doors).
-		Trace.TraceInformation($"[transition] {traceMessage ?? "(switch)"} — fade out={FadeOutSeconds:0.##}s in={FadeInSeconds:0.##}s");
 		_phase = Phase.FadeOut;
 		_phaseStart = Stopwatch.GetTimestamp();
 		base.IsDeActivated = false;
