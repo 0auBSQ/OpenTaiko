@@ -730,7 +730,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 	#region[System]
 
 	public bool bDirectShowMode;
-	public bool bEnableLua;
 
 	#endregion
 
@@ -979,7 +978,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		this.eLaneType = ELaneType.TypeA;
 		this.bDirectShowMode = false;
-		this.bEnableLua = true;
 
 		#endregion
 
@@ -1403,9 +1401,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; 動画再生にDirectShowを使うことによって、再生時の負担を軽減できます。");
 		sw.WriteLine("; ただし使用時にはセットアップが必要になるのでご注意ください。");
 		sw.WriteLine("DirectShowMode={0}", this.bDirectShowMode ? 1 : 0);
-		sw.WriteLine();
-		sw.WriteLine("; Enable Lua scripting for skin backgrounds and modules.");
-		sw.WriteLine("EnableLua={0}", this.bEnableLua ? 1 : 0);
 		sw.WriteLine();
 
 		#region [ Adjust ]
@@ -2216,9 +2211,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "DirectShowMode":
 				this.bDirectShowMode = CConversion.bONorOFF(value[0]);
 				;
-				break;
-			case "EnableLua":
-				this.bEnableLua = CConversion.bONorOFF(value[0]);
 				break;
 			case nameof(this.TJAP3FolderMode):
 				this.TJAP3FolderMode = CConversion.bONorOFF(value[0]);

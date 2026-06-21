@@ -144,7 +144,6 @@ class ScriptBG : IDisposable {
 		Textures = new Dictionary<string, CTexture>();
 
 		if (!File.Exists(filePath)) return;
-		if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bEnableLua) return;
 
 		try {
 			LuaScript = new Lua();

@@ -185,12 +185,6 @@ class CLuaScript : IDisposable {
 		strTexturesDir = texturesDir ?? $"{dir}/Textures";
 		strSounsdDir = soundsDir ?? $"{dir}/Sounds";
 
-		if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bEnableLua) {
-			IsAvailable = false;
-			bCrashed = true;
-			return;
-		}
-
 		IsAvailable = true;
 
 		try {

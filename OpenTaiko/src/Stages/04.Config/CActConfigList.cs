@@ -440,10 +440,6 @@ internal class CActConfigList : CActivity {
 			this.iTouchDrumVisual = new CItemInteger("Touch Drum Size", 10, 50, OpenTaiko.ConfigIni.nTouchDrumVisual,
 				"Radius of the Don drum circle as % of screen width.");
 			this.list項目リスト.Add(this.iTouchDrumVisual);
-
-			this.iEnableLua = new CItemToggle("Enable Lua Scripting", OpenTaiko.ConfigIni.bEnableLua,
-				"Enable Lua scripts for skin backgrounds and modules. Disable to improve performance. Requires restart.");
-			this.list項目リスト.Add(this.iEnableLua);
 		}
 
 		this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
@@ -1615,7 +1611,6 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iTaikoIgnoreSongUnlockables;
 	private CItemInteger iControllerDeadzone;
 	private CItemInteger iTouchDrumVisual;
-	private CItemToggle iEnableLua;
 
 	private CItemInteger iRollsPerSec;
 	private CItemInteger iAILevel;
@@ -1791,7 +1786,6 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.InputManager.Deadzone = OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f;
 		if (OperatingSystem.IsIOS()) {
 			OpenTaiko.ConfigIni.nTouchDrumVisual = this.iTouchDrumVisual.n現在の値;
-			OpenTaiko.ConfigIni.bEnableLua = this.iEnableLua.bON;
 		}
 		OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
