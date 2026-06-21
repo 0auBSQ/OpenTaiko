@@ -210,9 +210,7 @@ internal class CStage起動 : CStage {
 					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 					langSelectIndex = Math.Max(langSelectIndex - 1, 0);
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
-					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
-					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
-					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)) {
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);

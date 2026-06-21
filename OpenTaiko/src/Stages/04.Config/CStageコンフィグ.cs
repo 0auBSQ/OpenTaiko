@@ -452,12 +452,12 @@ internal class CStageコンフィグ : CStage {
 			}
 			this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 			this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.HH), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
-			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue)) {
+			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				this.tカーソルを上へ移動する();
 			}
 			this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 			this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.BD), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
-			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue)) {
+			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				this.tカーソルを下へ移動する();
 			}
 		}
