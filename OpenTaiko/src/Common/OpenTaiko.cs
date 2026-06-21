@@ -487,9 +487,10 @@ internal class OpenTaiko : Game {
 
 	protected override void Configuration() {
 		if (OperatingSystem.IsIOS()) {
-			// iOS: Documents is writable; bundle has all assets read-only.
+			// iOS: Documents is writable; the bundle ships read-only defaults.
 			// Writable files (Config.ini, databases, etc.) live in Documents.
-			// Read-only assets (Global/, Lang/, etc.) resolve to the bundle via ResolveAssetPath().
+			// Customizable trees (Global/, System/, Lang/) merge bundle defaults with Documents additions:
+			// listings via GetMergedDirectories(), single assets via ResolveAssetPath() (Documents override, bundle fallback).
 			strEXEのあるフォルダ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar;
 			// strBundleFolder is set by GameViewController before game launch
 			// Set CWD so relative paths (Favorite.json, etc.) resolve to writable Documents dir

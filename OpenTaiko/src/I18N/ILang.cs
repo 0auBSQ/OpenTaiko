@@ -29,9 +29,9 @@ static internal class CLangManager {
 	public static string[] Langcodes {
 		get {
 			if (_langCodes == null) {
-				var langDir = OpenTaiko.ResolveAssetPath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"));
-				_langCodes = Directory.GetDirectories(langDir, "*", SearchOption.TopDirectoryOnly)
-					.Select(result => Path.GetRelativePath(langDir, result))
+				var langDir = Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang");
+				_langCodes = OpenTaiko.GetMergedDirectories(langDir, "*")
+					.Select(result => Path.GetFileName(result))
 					.ToArray();
 			}
 
