@@ -47,10 +47,12 @@ internal class CActConfigList : CActivity {
 			case "DirectX11": return 1;
 			case "Vulkan": return 2;
 			case "Metal": return 3;
+			case "Metal (iOS)": return 3;
 			default: return 0;
 		}
 	}
 	private static string GraphicsDeviceFromInt(int device) {
+		if (OperatingSystem.IsIOS()) return "Metal (iOS)";
 		switch (device) {
 			case 0: return "OpenGL";
 			case 1: return "DirectX11";
@@ -61,6 +63,7 @@ internal class CActConfigList : CActivity {
 	}
 
 	private static string[] AvailableGraphicsDevices { get {
+			if (OperatingSystem.IsIOS()) return ["Metal (iOS)"];
 			if (OperatingSystem.IsWindows()) return ["OpenGL", "DirectX11", "Vulkan"];
 			if (OperatingSystem.IsMacOS()) return ["OpenGL", "Metal"];
 			if (OperatingSystem.IsLinux()) return ["OpenGL", "Vulkan"];
@@ -119,18 +122,19 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH_DESC"));
 		this.list項目リスト.Add(this.iSystemTimeStretch);
 
-		// The graphics-API (ANGLE backend) selector is desktop-only; it is inert on iOS, where the
-		// GLES context is provided natively by the host. iOS instead gets its own renderer/FPS items.
+		// The graphics-API selector's backends are limited per-platform by AvailableGraphicsDevices.
+		// On iOS the only backend is Metal (provided natively by the host) — a single "Metal (iOS)" entry.
+		this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
+			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
+			AvailableGraphicsDevices);
+		this.list項目リスト.Add(this.iSystemGraphicsType);
+
+		// iOS-only frame-rate cap (the desktop VSync item below does not drive the native iOS layer).
 		if (OperatingSystem.IsIOS()) {
 			this.iSystemIOSFrameRate = new CItemList("Frame Rate", CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.biOSUnlimitedFrameRate ? 1 : 0,
 				"Maximum frame rate. Unlimited uses the display's refresh rate (e.g. 120Hz on ProMotion). Applies after restart.",
 				new string[] { "60 FPS", "Unlimited" });
 			this.list項目リスト.Add(this.iSystemIOSFrameRate);
-		} else {
-			this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
-				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
-				AvailableGraphicsDevices);
-			this.list項目リスト.Add(this.iSystemGraphicsType);
 		}
 
 		this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), OpenTaiko.ConfigIni.bFullScreen,
@@ -1693,9 +1697,8 @@ internal class CActConfigList : CActivity {
 
 		if (OperatingSystem.IsIOS()) {
 			OpenTaiko.ConfigIni.biOSUnlimitedFrameRate = this.iSystemIOSFrameRate.n現在選択されている項目番号 == 1;
-		} else {
-			OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
 		}
+		OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
 		OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
