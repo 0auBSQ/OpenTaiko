@@ -129,14 +129,6 @@ internal class CActConfigList : CActivity {
 			AvailableGraphicsDevices);
 		this.list項目リスト.Add(this.iSystemGraphicsType);
 
-		// iOS-only frame-rate cap (the desktop VSync item below does not drive the native iOS layer).
-		if (OperatingSystem.IsIOS()) {
-			this.iSystemIOSFrameRate = new CItemList("Frame Rate", CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.biOSUnlimitedFrameRate ? 1 : 0,
-				"Maximum frame rate. Unlimited uses the display's refresh rate (e.g. 120Hz on ProMotion). Applies after restart.",
-				new string[] { "60 FPS", "Unlimited" });
-			this.list項目リスト.Add(this.iSystemIOSFrameRate);
-		}
-
 		this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), OpenTaiko.ConfigIni.bFullScreen,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN_DESC"));
 		this.list項目リスト.Add(this.iSystemFullscreen);
@@ -145,9 +137,17 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC"));
 		this.list項目リスト.Add(this.iSystemRandomFromSubBox);
 
-		this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC"), OpenTaiko.ConfigIni.bEnableVSync,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC_DESC"));
-		this.list項目リスト.Add(this.iSystemVSyncWait);
+		// One framerate control per platform: iOS caps FPS (thermal/CPU, not real VSync); desktop is VSync.
+		if (OperatingSystem.IsIOS()) {
+			this.iSystemIOSFrameRate = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FRAMERATE"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.biOSUnlimitedFrameRate ? 1 : 0,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FRAMERATE_DESC"),
+				new string[] { "60 FPS", "Unlimited" });
+			this.list項目リスト.Add(this.iSystemIOSFrameRate);
+		} else {
+			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC"), OpenTaiko.ConfigIni.bEnableVSync,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC_DESC"));
+			this.list項目リスト.Add(this.iSystemVSyncWait);
+		}
 
 		this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE"), OpenTaiko.ConfigIni.bEnableAVI,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE_DESC"));
@@ -659,7 +659,9 @@ internal class CActConfigList : CActivity {
 			if (this.list項目リスト[this.n現在の選択項目] == this.iSystemFullscreen) {
 				OpenTaiko.app.bSwitchFullScreenAtNextFrame = true;
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemVSyncWait) {
-				OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
+				if (!OperatingSystem.IsIOS()) {
+					OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
+				}
 				OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true;
 			}
 			#region [ キーアサインへの遷移と脱出 ]
