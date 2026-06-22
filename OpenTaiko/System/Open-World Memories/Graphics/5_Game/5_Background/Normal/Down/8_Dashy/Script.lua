@@ -1,7 +1,10 @@
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Down background 8 "Dashy": static BG with two counter-rotating gears in the bottom corners.
+-- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+
 local rotation = 0.0
 
--- local Background = TEXTURE:CreateTexture("BG.png")
--- local Gear = TEXTURE:CreateTexture("Gears.png")
+local tx = {}
 
 function clearIn(player)
 end
@@ -9,28 +12,27 @@ end
 function clearOut(player)
 end
 
-function init()
-    func:AddGraph("BG.png")
-    func:AddGraph("Gears.png")
+function onStart()
+    tx["BG.png"] = TEXTURE:CreateTextureSync("BG.png")
+    tx["Gears.png"] = TEXTURE:CreateTextureSync("Gears.png")
 end
 
-function update()
-    rotation = rotation + (deltaTime * 8)
+function update(timestamp, state)
+    rotation = rotation + (fps.deltaTime * 8)
 end
 
-function draw()
-    func:DrawGraph(0, 540, "BG.png")
+function draw(state)
+    tx["BG.png"]:Draw(0, 540)
 
+    tx["Gears.png"]:SetRotation(-rotation)
+    tx["Gears.png"]:DrawRectAtAnchor(40, 969, 0, 0, 333, 310, "center")
+    tx["Gears.png"]:SetRotation(rotation)
+    tx["Gears.png"]:DrawRectAtAnchor(1934, 556, 334, 0, 491, 457, "center")
+end
 
-    func:SetRotation(-rotation, "Gears.png")
-    func:DrawGraphRectCenter(40, 969, 0, 0, 333, 310, "Gears.png")
-    func:SetRotation(rotation, "Gears.png")
-    func:DrawGraphRectCenter(1934, 556, 334, 0, 491, 457, "Gears.png")
-
-    -- Background:Draw(0, 540)
-
-    -- Gear:SetRotation(-rotation)
-    -- Gear:DrawRectAtAnchor(40, 969, 0, 0, 333, 310, "center")
-    -- Gear:SetRotation(rotation)
-    -- Gear:DrawRectAtAnchor(1934, 556, 334, 0, 491, 457, "center")
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

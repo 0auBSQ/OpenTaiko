@@ -114,23 +114,23 @@ internal class CActImplClearAnimation : CActivity {
 
 		// lazy load
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			Tower_DropoutScript ??= new EndAnimeScript($@"{origindir}Tower_Dropout{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_PassScript ??= new EndAnimeScript($@"{origindir}Tower_TopReached_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_FullComboScript ??= new EndAnimeScript($@"{origindir}Tower_TopReached_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Tower_TopReached_PerfectScript ??= new EndAnimeScript($@"{origindir}Tower_TopReached_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
+			Tower_DropoutScript ??= new LuaBackgroundWrapper($@"{origindir}Tower_Dropout", $@"{origindir}ClearFailed");
+			Tower_TopReached_PassScript ??= new LuaBackgroundWrapper($@"{origindir}Tower_TopReached_Pass", $@"{origindir}Clear");
+			Tower_TopReached_FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}Tower_TopReached_FullCombo", $@"{origindir}FullCombo");
+			Tower_TopReached_PerfectScript ??= new LuaBackgroundWrapper($@"{origindir}Tower_TopReached_Perfect", $@"{origindir}AllPerfect");
 
 			this.soundTowerDropout ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_Dropout.ogg"), ESoundGroup.SoundEffect);
 			this.soundTowerTopPass ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Pass.ogg"), ESoundGroup.SoundEffect);
 			this.soundTowerTopFC ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_FullCombo.ogg"), ESoundGroup.SoundEffect);
 			this.soundTowerTopPerfect ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Tower{Path.DirectorySeparatorChar}Tower_TopReached_Perfect.ogg"), ESoundGroup.SoundEffect);
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			Dan_FailScript ??= new EndAnimeScript($@"{origindir}Dan_Fail{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_PassScript ??= new EndAnimeScript($@"{origindir}Dan_Red_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_FullComboScript ??= new EndAnimeScript($@"{origindir}Dan_Red_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Red_PerfectScript ??= new EndAnimeScript($@"{origindir}Dan_Red_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_PassScript ??= new EndAnimeScript($@"{origindir}Dan_Gold_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_Pass{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_FullComboScript ??= new EndAnimeScript($@"{origindir}Dan_Gold_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			Dan_Gold_PerfectScript ??= new EndAnimeScript($@"{origindir}Dan_Gold_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Dan_Red_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
+			Dan_FailScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Fail", $@"{origindir}ClearFailed");
+			Dan_Red_PassScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Red_Pass", $@"{origindir}Clear");
+			Dan_Red_FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Red_FullCombo", $@"{origindir}FullCombo");
+			Dan_Red_PerfectScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Red_Perfect", $@"{origindir}AllPerfect");
+			Dan_Gold_PassScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Gold_Pass", $@"{origindir}Dan_Red_Pass", $@"{origindir}Clear");
+			Dan_Gold_FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Gold_FullCombo", $@"{origindir}Dan_Red_FullCombo", $@"{origindir}FullCombo");
+			Dan_Gold_PerfectScript ??= new LuaBackgroundWrapper($@"{origindir}Dan_Gold_Perfect", $@"{origindir}Dan_Red_Perfect", $@"{origindir}AllPerfect");
 
 			this.soundDanFailed ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Fail.ogg"), ESoundGroup.SoundEffect);
 			this.soundDanRedClear ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Red_Pass.ogg"), ESoundGroup.SoundEffect);
@@ -141,20 +141,20 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundDanGoldPerfect ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}Dan{Path.DirectorySeparatorChar}Dan_Gold_Perfect.ogg"), ESoundGroup.SoundEffect);
 
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			AILoseScript ??= new EndAnimeScript($@"{origindir}AI_Lose{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");
-			AIWinScript ??= new EndAnimeScript($@"{origindir}AI_Win{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			AIWin_FullComboScript ??= new EndAnimeScript($@"{origindir}AI_Win_FullCombo{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			AIWin_PerfectScript ??= new EndAnimeScript($@"{origindir}AI_Win_Perfect{Path.DirectorySeparatorChar}Script.lua", $@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
+			AILoseScript ??= new LuaBackgroundWrapper($@"{origindir}AI_Lose", $@"{origindir}ClearFailed");
+			AIWinScript ??= new LuaBackgroundWrapper($@"{origindir}AI_Win", $@"{origindir}Clear");
+			AIWin_FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}AI_Win_FullCombo", $@"{origindir}FullCombo");
+			AIWin_PerfectScript ??= new LuaBackgroundWrapper($@"{origindir}AI_Win_Perfect", $@"{origindir}AllPerfect");
 
 			this.soundAILose ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Lose.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWin ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWinFullCombo ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWinPerfectCombo ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
 		} else {
-			FailedScript ??= new EndAnimeScript($@"{origindir}ClearFailed{Path.DirectorySeparatorChar}Script.lua");//ClearFailed
-			ClearScript ??= new EndAnimeScript($@"{origindir}Clear{Path.DirectorySeparatorChar}Script.lua");
-			FullComboScript ??= new EndAnimeScript($@"{origindir}FullCombo{Path.DirectorySeparatorChar}Script.lua");
-			PerfectComboScript ??= new EndAnimeScript($@"{origindir}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
+			FailedScript ??= new LuaBackgroundWrapper($@"{origindir}ClearFailed");//ClearFailed
+			ClearScript ??= new LuaBackgroundWrapper($@"{origindir}Clear");
+			FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}FullCombo");
+			PerfectComboScript ??= new LuaBackgroundWrapper($@"{origindir}AllPerfect");
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -170,6 +170,7 @@ internal class CActImplClearAnimation : CActivity {
 	}
 
 	public void InitScripts() {
+		_state.RefreshConst();
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i) {
 			this.Mode[i] = EndMode.Total;
 			this.bSoundPlayed[i] = false;
@@ -183,28 +184,28 @@ internal class CActImplClearAnimation : CActivity {
 		}
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-			Tower_DropoutScript?.Init();
-			Tower_TopReached_PassScript?.Init();
-			Tower_TopReached_FullComboScript?.Init();
-			Tower_TopReached_PerfectScript?.Init();
+			Tower_DropoutScript?.Activate(_state);
+			Tower_TopReached_PassScript?.Activate(_state);
+			Tower_TopReached_FullComboScript?.Activate(_state);
+			Tower_TopReached_PerfectScript?.Activate(_state);
 		} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-			Dan_FailScript?.Init();
-			Dan_Red_PassScript?.Init();
-			Dan_Red_FullComboScript?.Init();
-			Dan_Red_PerfectScript?.Init();
-			Dan_Gold_PassScript?.Init();
-			Dan_Gold_FullComboScript?.Init();
-			Dan_Gold_PerfectScript?.Init();
+			Dan_FailScript?.Activate(_state);
+			Dan_Red_PassScript?.Activate(_state);
+			Dan_Red_FullComboScript?.Activate(_state);
+			Dan_Red_PerfectScript?.Activate(_state);
+			Dan_Gold_PassScript?.Activate(_state);
+			Dan_Gold_FullComboScript?.Activate(_state);
+			Dan_Gold_PerfectScript?.Activate(_state);
 		} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-			AILoseScript?.Init();
-			AIWinScript?.Init();
-			AIWin_FullComboScript?.Init();
-			AIWin_PerfectScript?.Init();
+			AILoseScript?.Activate(_state);
+			AIWinScript?.Activate(_state);
+			AIWin_FullComboScript?.Activate(_state);
+			AIWin_PerfectScript?.Activate(_state);
 		} else {
-			FailedScript?.Init();
-			ClearScript?.Init();
-			FullComboScript?.Init();
-			PerfectComboScript?.Init();
+			FailedScript?.Activate(_state);
+			ClearScript?.Activate(_state);
+			FullComboScript?.Activate(_state);
+			PerfectComboScript?.Activate(_state);
 		}
 	}
 
@@ -334,7 +335,7 @@ internal class CActImplClearAnimation : CActivity {
 
 			if (!bSoundPlayed[iPlayer]) {
 				int pan = OpenTaiko.ConfigIni.nPanning[nDrawnPlayers - 1][iPlayer];
-				script?.PlayEndAnime(iPlayer);
+				script?.Call("playEndAnime", iPlayer);
 				sound?.SetPanning(pan);
 				sound?.PlayStart();
 				voices?[iPlayer]?.SetPanning(pan);
@@ -343,9 +344,11 @@ internal class CActImplClearAnimation : CActivity {
 				bSoundPlayed[iPlayer] = true;
 			}
 
+			_state.player = iPlayer;
+			_state.RefreshGameplay();
 			if (!OpenTaiko.stageGameScreen.bPAUSE)
-				script?.Update(iPlayer);
-			script?.Draw(iPlayer);
+				script?.Update(_state);
+			script?.Draw(_state);
 
 			if (this.ctProgressMain[iPlayer].IsEnded) {
 				return 1;
@@ -358,32 +361,33 @@ internal class CActImplClearAnimation : CActivity {
 	#region[ private ]
 	//-----------------
 
-	public EndAnimeScript FailedScript { get; private set; }
-	public EndAnimeScript ClearScript { get; private set; }
-	public EndAnimeScript FullComboScript { get; private set; }
-	public EndAnimeScript PerfectComboScript { get; private set; }
+	public LuaBackgroundWrapper FailedScript { get; private set; }
+	public LuaBackgroundWrapper ClearScript { get; private set; }
+	public LuaBackgroundWrapper FullComboScript { get; private set; }
+	public LuaBackgroundWrapper PerfectComboScript { get; private set; }
 
-	public EndAnimeScript AILoseScript { get; private set; }
-	public EndAnimeScript AIWinScript { get; private set; }
-	public EndAnimeScript AIWin_FullComboScript { get; private set; }
-	public EndAnimeScript AIWin_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper AILoseScript { get; private set; }
+	public LuaBackgroundWrapper AIWinScript { get; private set; }
+	public LuaBackgroundWrapper AIWin_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper AIWin_PerfectScript { get; private set; }
 
-	public EndAnimeScript Tower_DropoutScript { get; private set; }
-	public EndAnimeScript Tower_TopReached_PassScript { get; private set; }
-	public EndAnimeScript Tower_TopReached_FullComboScript { get; private set; }
-	public EndAnimeScript Tower_TopReached_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper Tower_DropoutScript { get; private set; }
+	public LuaBackgroundWrapper Tower_TopReached_PassScript { get; private set; }
+	public LuaBackgroundWrapper Tower_TopReached_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper Tower_TopReached_PerfectScript { get; private set; }
 
-	public EndAnimeScript Dan_FailScript { get; private set; }
-	public EndAnimeScript Dan_Red_PassScript { get; private set; }
-	public EndAnimeScript Dan_Red_FullComboScript { get; private set; }
-	public EndAnimeScript Dan_Red_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper Dan_FailScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Red_PassScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Red_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Red_PerfectScript { get; private set; }
 
-	public EndAnimeScript Dan_Gold_PassScript { get; private set; }
-	public EndAnimeScript Dan_Gold_FullComboScript { get; private set; }
-	public EndAnimeScript Dan_Gold_PerfectScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Gold_PassScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Gold_FullComboScript { get; private set; }
+	public LuaBackgroundWrapper Dan_Gold_PerfectScript { get; private set; }
 
 	bool[] bSoundPlayed = new bool[OpenTaiko.MAX_PLAYERS];
 	CCounter[] ctProgressMain = new CCounter[OpenTaiko.MAX_PLAYERS];
+	private readonly LuaBackgroundState _state = new();
 
 	/*
     CCounter ctEnd_ClearFailed;

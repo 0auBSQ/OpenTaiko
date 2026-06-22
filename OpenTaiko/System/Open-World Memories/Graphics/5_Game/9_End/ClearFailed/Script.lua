@@ -1,10 +1,7 @@
---func:DrawText(x, y, text);
---func:DrawNum(x, y, num);
---func:AddGraph("filename");
---func:DrawGraph(x, y, filename);
---func:SetOpacity(opacity, "filename");
---func:SetScale(xscale, yscale, "filename");
---func:SetColor(r, g, b, "filename");
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- End "ClearFailed" anime (Group C): per-player slide-in + fall sprite sequence (0..32.png), plus a
+-- TemplateMoyai drop when every player has failed. Ported from the old ScriptBG func: API to the
+-- ROActivity LuaTexture API. update/draw/playEndAnime take the player via the state table / index.
 
 local y = { 218, 482, 0, 0, 0 }
 
@@ -23,6 +20,8 @@ local failed = { false, false, false, false, false }
 
 local templateMoyai_y = -1080
 
+local tx = {}            -- name -> LuaTexture
+
 function playEndAnime(player)
     animeCounter[player + 1] = 0
     nowFrame[player + 1] = 0
@@ -39,29 +38,28 @@ function playEndAnime(player)
     end
 end
 
-function init()
-    -- reset for properly tracking all-failed status
-    allfailed = false
-    failed = { false, false, false, false, false }
+function onStart()
+    -- Load every frame sprite (0.png .. 32.png inclusive) + the all-failed Moyai up front.
+    for i = 0, textureCount do
+        tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
+    end
 
-    if playerCount <= 2 then
+    tx["TemplateMoyai.png"] = TEXTURE:CreateTextureSync("TemplateMoyai.png")
+end
+
+function update(timestamp, state)
+    local player = state.player
+
+    -- y layout depends on player count (was seeded in the old init()); state has it here.
+    if state.playerCount <= 2 then
         y = { 216, 480, 0, 0, 0 }
-    elseif playerCount == 5 then
+    elseif state.playerCount == 5 then
         y = { -5, 196, 412, 628, 844 }
     else
         y = { -24, 240, 504, 768, 0 }
     end
 
-    for i = 0 , textureCount do
-        func:AddGraph(tostring(i) .. ".png")
-    end
-
-    func:AddGraph("TemplateMoyai.png")
-end
-
-function update(player)
-
-    animeCounter[player + 1] = animeCounter[player + 1] + deltaTime
+    animeCounter[player + 1] = animeCounter[player + 1] + fps.deltaTime
     slideInFrame[player + 1] = math.min(math.floor(animeCounter[player + 1] * frameRate), 23)
     fallFrame[player + 1] = math.max(math.min(math.floor(((animeCounter[player + 1] - 1.133) * frameRate) + slideToFallFrameCount), 9), 0)
 
@@ -74,15 +72,23 @@ function update(player)
                 return
             end
         end
-        templateMoyai_y = math.min(templateMoyai_y + (deltaTime * 5120), 0)
+        templateMoyai_y = math.min(templateMoyai_y + (fps.deltaTime * 5120), 0)
     end
-
 end
 
-function draw(player)
-    func:DrawGraph(500, y[player + 1] - 10, tostring(nowFrame[player + 1]) .. ".png")
+function draw(state)
+    local player = state.player
 
-    if allfailed and playerCount > 2 then
-        func:DrawGraph(0, templateMoyai_y, "TemplateMoyai.png")
+    tx[tostring(nowFrame[player + 1]) .. ".png"]:Draw(500, y[player + 1] - 10)
+
+    if allfailed and state.playerCount > 2 then
+        tx["TemplateMoyai.png"]:Draw(0, templateMoyai_y)
     end
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

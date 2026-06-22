@@ -272,6 +272,12 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	// Pause-menu popup manager (drives the popup_menu ROActivity; replaces the old CActSelectPopupMenu rendering)
+	public static CPopupMenuManager PopupMenuManager {
+		get;
+		private set;
+	}
+
 	// Unlockables factory
 	public static CUnlockConditionFactory UnlockConditionFactory {
 		get;
@@ -1590,6 +1596,8 @@ internal class OpenTaiko : Game {
 		ModalManager = new CModalManager();
 		ModalManager.RefleshSkin();
 
+		PopupMenuManager = new CPopupMenuManager();
+
 		#endregion
 
 		#region [ Stages initialisation ]
@@ -1978,7 +1986,7 @@ internal class OpenTaiko : Game {
 		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
-		CActSelectPopupMenu.RefleshSkin();
+		OpenTaiko.PopupMenuManager.RefleshSkin();
 	}
 	#endregion
 

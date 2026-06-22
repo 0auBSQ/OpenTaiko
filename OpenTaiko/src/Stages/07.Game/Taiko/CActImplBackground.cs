@@ -29,13 +29,13 @@ internal class CActImplBackground : CActivity {
         this.ct上背景クリアインタイマー[player].n現在の値 = 0;
         this.ct上背景FIFOタイマー = new CCounter(0, 100, 2, TJAPlayer3.Timer);
         this.ct上背景FIFOタイマー.n現在の値 = 0;*/
-		UpScript?.ClearIn(player);
-		DownScript?.ClearIn(player);
+		UpScript?.Call("clearIn", player);
+		DownScript?.Call("clearIn", player);
 	}
 
 	public void ClearOut(int player) {
-		UpScript?.ClearOut(player);
-		DownScript?.ClearOut(player);
+		UpScript?.Call("clearOut", player);
+		DownScript?.Call("clearOut", player);
 	}
 
 	public override void Activate() {
@@ -55,6 +55,7 @@ internal class CActImplBackground : CActivity {
 		}
 
 		Random random = new Random();
+		_state.RefreshConst();
 
 		if (System.IO.Directory.Exists($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up")) {
 			var upDirs = System.IO.Directory.GetDirectories($@"{bgOrigindir}{Path.DirectorySeparatorChar}Up");
@@ -65,10 +66,10 @@ internal class CActImplBackground : CActivity {
 				? _presetPath
 				: upDirs[random.Next(0, upDirs.Length)];
 
-			UpScript = new ScriptBG($@"{upPath}{Path.DirectorySeparatorChar}Script.lua");
-			UpScript.Init();
+			UpScript = new LuaBackgroundWrapper(upPath);
+			UpScript.Activate(_state);
 
-			IsUpNotFound = false;
+			IsUpNotFound = !UpScript.Exists;
 		} else {
 			IsUpNotFound = true;
 		}
@@ -82,10 +83,10 @@ internal class CActImplBackground : CActivity {
 				? _presetPath
 				: downDirs[random.Next(0, downDirs.Length)];
 
-			DownScript = new ScriptBG($@"{downPath}{Path.DirectorySeparatorChar}Script.lua");
-			DownScript?.Init();
+			DownScript = new LuaBackgroundWrapper(downPath);
+			DownScript.Activate(_state);
 
-			if (DownScript.Exists()) IsDownNotFound = false;
+			if (DownScript.Exists) IsDownNotFound = false;
 		} else {
 			IsDownNotFound = true;
 		}
@@ -223,6 +224,8 @@ internal class CActImplBackground : CActivity {
 		if (base.IsDeActivated)
 			return 0;
 
+		// One per-frame state refresh, shared by both the Up (here) and Down (Tower / non-Tower below) draws.
+		_state.RefreshGameplay();
 
 		//this.ct上背景FIFOタイマー?.t進行();
 
@@ -238,8 +241,8 @@ internal class CActImplBackground : CActivity {
 		#region [Upper background]
 
 		if (!IsUpNotFound) {
-			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update();
-			UpScript?.Draw();
+			if (!OpenTaiko.stageGameScreen.bPAUSE) UpScript?.Update(_state);
+			UpScript?.Draw(_state);
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 				#region [Tower animations variables]
 
@@ -374,8 +377,8 @@ internal class CActImplBackground : CActivity {
 			//TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1],
 			//new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
 
-			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript.Update();
-			DownScript.Draw();
+			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript.Update(_state);
+			DownScript.Draw(_state);
 
 			#endregion
 
@@ -605,8 +608,8 @@ internal class CActImplBackground : CActivity {
 			#endregion
 		} else if (!OpenTaiko.stageGameScreen.isMultiPlay && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
 			if (!IsDownNotFound) {
-				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update();
-				DownScript?.Draw();
+				if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update(_state);
+				DownScript?.Draw(_state);
 			}
 		}
 
@@ -651,8 +654,9 @@ internal class CActImplBackground : CActivity {
 	//private CTexture tx下背景クリアメイン;
 	//private CTexture tx下背景クリアサブ1;
 
-	public ScriptBG UpScript;
-	public ScriptBG DownScript;
+	public LuaBackgroundWrapper UpScript;
+	public LuaBackgroundWrapper DownScript;
+	private readonly LuaBackgroundState _state = new();
 
 	private TitleTextureKey ttkTouTatsuKaiSuu;
 	private TitleTextureKey ttkKai;

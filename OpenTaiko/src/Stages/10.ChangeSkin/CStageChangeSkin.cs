@@ -65,8 +65,8 @@ internal class CStageChangeSkin : CStage {
 			if (base.IsFirstDraw) {
 				// Non-Lua skin swap (dispose old skin, new CSkin, resolution, console) + the _boot background.
 				OpenTaiko.app.ChangeSkin();
-				var background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
-				background.Init();
+				var background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}"));
+				background.Activate(_state.Refreshed());
 				this.Background = background;
 
 				// Drive the module (re)load incrementally on the RENDER THREAD with the loading bar via the shared
@@ -83,8 +83,8 @@ internal class CStageChangeSkin : CStage {
 				return 0;
 			}
 
-			Background?.Update();
-			Background?.Draw();
+			Background?.Update(_state);
+			Background?.Draw(_state);
 			CLoadingScreen.Draw();   // engine loading bar overlay
 
 			if (_session != null) {
@@ -134,7 +134,8 @@ internal class CStageChangeSkin : CStage {
 	public bool IsPreviousStageSaved { get; private set; }
 
 	#region [ private ]
-	private ScriptBG? Background;
+	private LuaBackgroundWrapper? Background;
+	private readonly LuaBackgroundState _state = new();
 	private CLoadSession? _session;    // drives the incremental module (re)load + onStart-texture stream
 	private bool _savedAutoFlush;      // Trace.AutoFlush state to restore after the batched reload
 	#endregion

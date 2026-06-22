@@ -21,8 +21,8 @@ internal class CStageShutdown : CStage {
 		try {
 			this.ctTimeStall = new CCounter();
 
-			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}Script.lua"));
-			Background.Init();
+			Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.EXIT}"));
+			Background.Activate(_state.Refreshed());
 
 			base.Activate();
 		} finally {
@@ -79,8 +79,8 @@ internal class CStageShutdown : CStage {
 
 			this.ctTimeStall.Tick();
 
-			Background.Update();
-			Background.Draw();
+			Background.Update(_state);
+			Background.Draw(_state);
 
 			//TJAPlayer3.Tx.Exit_Background?.t2D描画( 0, 0 );
 
@@ -96,7 +96,8 @@ internal class CStageShutdown : CStage {
 
 	#region [ private ]
 	//-----------------
-	private ScriptBG Background;
+	private LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 	private CCounter ctTimeStall;
 	//private CTexture tx背景;
 	//      private CTexture tx文字;

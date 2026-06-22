@@ -1,137 +1,92 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using FDK;
 
 namespace OpenTaiko;
 
-internal class CActPlayPauseMenu : CActSelectPopupMenu {
-	// コンストラクタ
+// Thin adapter: builds the in-game pause-menu model (Resume / Restart / Exit) + action dispatch, and drives the
+// shared CPopupMenuManager (which renders via the popup_menu ROActivity). Replaces the old CActSelectPopupMenu-based
+// implementation; the Pause/Resume/tPlayRetry/tPlayAbort state logic stays in CStagePlayScreenCommon.
+internal class CActPlayPauseMenu : CActivity {
+	private enum EOrder { Continue, Redoing, Return }
+	private List<EOrder> menuActions = new();
+
+	private bool bRetrySelected;
+	private Stopwatch sw = new();
 
 	public CActPlayPauseMenu() {
-		CActPlayPauseMenuMain();
+		base.IsDeActivated = true;
 	}
 
-	private void CActPlayPauseMenuMain() {
-		this.bEscEnabled = false;
-		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
-		for (int nConfSet = 0; nConfSet < (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan ? 3 : 2); nConfSet++) {
-			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
-			for (int nInst = 0; nInst < 3; nInst++) {
-				lci[nConfSet].Add(null);                                        // Drum/Guitar/Bassで3つ分、枠を作っておく
-				lci[nConfSet][nInst] = MakeListCItemBase(nConfSet, nInst);
-			}
-		}
-		base.Initialize(lci[nCurrentConfigSet][0], true, CLangManager.LangInstance.GetString("PAUSE_TITLE"), 0);    // ConfSet=0, nInst=Drums
-	}
+	public bool bIsActivePopupMenu => OpenTaiko.PopupMenuManager.IsActive;
 
-	private List<CItemBase> MakeListCItemBase(int nConfigSet, int nInst) {
-		List<CItemBase> l = new List<CItemBase>();
-		menuActions.Clear();
+	public void tActivatePopupMenu(EKeyConfigPart einst) {
+		this.bRetrySelected = false;
+		this.sw.Reset();
 
-		#region [ 共通 SET切り替え/More/Return ]
-		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+		var items = new List<string>();
+		menuActions = new List<EOrder>();
+
+		items.Add(CLangManager.LangInstance.GetString("PAUSE_RESUME"));
 		menuActions.Add(EOrder.Continue);
+		// Restart is unavailable in Dan mode and after a song-jump (matches the original).
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && !OpenTaiko.SongMount.bIsAfterSongJump) {
-			l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESTART"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
+			items.Add(CLangManager.LangInstance.GetString("PAUSE_RESTART"));
 			menuActions.Add(EOrder.Redoing);
 		}
-		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_EXIT"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
+		items.Add(CLangManager.LangInstance.GetString("PAUSE_EXIT"));
 		menuActions.Add(EOrder.Return);
-		#endregion
 
-		return l;
+		OpenTaiko.PopupMenuManager.Open(
+			CLangManager.LangInstance.GetString("PAUSE_TITLE"),
+			items.ToArray(), 0, OnDecide, null, escEnabled: false, onUpdateSub: OnUpdateSub);
 	}
 
-	// メソッド
-	public override void tActivatePopupMenu(EKeyConfigPart einst) {
-		this.CActPlayPauseMenuMain();
-		CActSelectPopupMenu.bSelected = false;
-		this.bRetrySelected = false;
-		base.tActivatePopupMenu(einst);
-	}
-	//public void tDeativatePopupMenu()
-	//{
-	//	base.tDeativatePopupMenu();
-	//}
+	public void tDeativatePopupMenu() => OpenTaiko.PopupMenuManager.Close();
 
-	public override void UpdateSub() {
+	private void OnDecide(int index) {
+		if (index < 0 || index >= menuActions.Count) return;
+		switch (menuActions[index]) {
+			case EOrder.Continue:
+				OpenTaiko.stageGameScreen.Resume();
+				OpenTaiko.PopupMenuManager.Close();
+				break;
+			case EOrder.Redoing:
+				// Defer the retry: lock input + run the 1.5 s delay in OnUpdateSub (matches the old UpdateSub).
+				this.bRetrySelected = true;
+				OpenTaiko.PopupMenuManager.LockSelection();
+				break;
+			case EOrder.Return:
+				OpenTaiko.stageGameScreen.tPlayAbort();
+				OpenTaiko.PopupMenuManager.Close();
+				break;
+		}
+	}
+
+	private void OnUpdateSub() {
 		if (this.bRetrySelected) {
 			if (!sw.IsRunning)
 				this.sw = Stopwatch.StartNew();
 			if (sw.ElapsedMilliseconds > 1500) {
 				OpenTaiko.stageGameScreen.tPlayRetry();
-
-				this.tDeativatePopupMenu();
+				OpenTaiko.PopupMenuManager.Close();
 				this.sw.Reset();
+				this.bRetrySelected = false;
 			}
 		}
 	}
 
-	public override void tEnterPressedMain(int nSortOrder) {
-		if (nCurrentSelectedLine < 0 || nCurrentSelectedLine >= menuActions.Count)
-			return;
-		switch (menuActions[nCurrentSelectedLine]) {
-			case EOrder.Continue:
-				OpenTaiko.stageGameScreen.Resume();
-				CActSelectPopupMenu.bSelected = true;
-				this.tDeativatePopupMenu();
-				break;
-			case EOrder.Redoing:
-				this.bRetrySelected = true;
-				CActSelectPopupMenu.bSelected = true;
-				break;
-			case EOrder.Return:
-				OpenTaiko.stageGameScreen.tPlayAbort();
-				CActSelectPopupMenu.bSelected = true;
-				this.tDeativatePopupMenu();
-				break;
-		}
+	public int Update() {
+		OpenTaiko.PopupMenuManager.Update();
+		return 0;
 	}
 
-	public override void tCancel() {
+	public override int Draw() {
+		OpenTaiko.PopupMenuManager.Draw();
+		return 0;
 	}
 
-	// CActivity 実装
-
-	public override void Activate() {
-		base.Activate();
-		this.bGotoDetailConfig = false;
-		this.sw = new Stopwatch();
-	}
 	public override void DeActivate() {
+		if (OpenTaiko.PopupMenuManager.IsActive) OpenTaiko.PopupMenuManager.Close();
 		base.DeActivate();
 	}
-	public override void CreateManagedResource() {
-		string pathPanelBody = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
-		if (File.Exists(pathPanelBody)) {
-			this.txPanelBody = OpenTaiko.tTextureCreate(pathPanelBody, true);
-		}
-
-		base.CreateManagedResource();
-	}
-	public override void ReleaseManagedResource() {
-		OpenTaiko.tTextureRelease(ref this.txPanelBody);
-		OpenTaiko.tTextureRelease(ref this.txStringPanel);
-		base.ReleaseManagedResource();
-	}
-
-	#region [ private ]
-	//-----------------
-	private int nCurrentTarget = 0;
-	private int nCurrentConfigSet = 0;
-	private List<List<List<CItemBase>>> lci;
-	private List<EOrder> menuActions = new();
-	private enum EOrder : int {
-		Continue,
-		Redoing,
-		Return, END,
-		Default = 99
-	};
-
-	private bool bSelected;
-	private CTexture txPanelBody;
-	private CTexture txStringPanel;
-	private Stopwatch sw;
-	private bool bRetrySelected;
-	//-----------------
-	#endregion
 }

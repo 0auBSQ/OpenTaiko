@@ -110,8 +110,8 @@ class CStageOnlineLounge : CStage {
 
 		#endregion
 
-		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.ONLINELOUNGE}Script.lua"));
-		Background.Init();
+		Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.ONLINELOUNGE}"));
+		Background.Activate(_state.Refreshed());
 
 		base.Activate();
 	}
@@ -144,8 +144,8 @@ class CStageOnlineLounge : CStage {
 	}
 
 	public override int Draw() {
-		Background.Update();
-		Background.Draw();
+		Background.Update(_state);
+		Background.Draw(_state);
 
 		//OnlineLounge_Background.t2D描画(0, 0);
 
@@ -645,7 +645,8 @@ class CStageOnlineLounge : CStage {
 
 	#region [Private]
 
-	private ScriptBG Background;
+	private LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 
 	private ECurrentMenu currentMenu;
 	private ECurrentMenu menuPointer;

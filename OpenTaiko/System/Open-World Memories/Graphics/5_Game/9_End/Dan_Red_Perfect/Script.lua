@@ -1,11 +1,10 @@
---func:DrawText(x, y, text);
---func:DrawNum(x, y, num);
---func:AddGraph("filename");
---func:DrawGraph(x, y, filename);
---func:DrawRectGraph(x, y, rect_x, rect_y, rect_width, rect_height, filename);
---func:SetOpacity(opacity, "filename");
---func:SetScale(xscale, yscale, "filename");
---func:SetColor(r, g, b, "filename");
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Dan Red Perfect end animation: a scroll rises then slides open to reveal its backing.
+-- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+--   func:AddGraph        -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
+--   func:DrawRectGraph   -> tx[name]:DrawRect / func:DrawGraph -> tx[name]:Draw
+--   deltaTime            -> fps.deltaTime ; the host passes the player index via state.player.
+-- Group C clear/end anime: playEndAnime(player) restarts the per-play counters.
 
 local width = 1920
 local height = 1080
@@ -31,6 +30,8 @@ local scrollSlideDuration = 0.2
 local easeA = 1.1
 local easeB = easeA + 1
 
+local tx = {}
+
 function clearIn(player)
 end
 
@@ -38,22 +39,24 @@ function clearOut(player)
 end
 
 function playEndAnime(player)
-    animeTimer = 0
-end
-
-function init()
+    -- per-play reset (old init() reset all of these; keep the full reset on each play)
     animeTimer = 0
     scrollRiseTransition = 0
     scrollSlideTransition = 0
     scrollRisePos = 0
     scrollSlidePos = 0
-    func:AddGraph("Scroll.png")
-    func:AddGraph("Scroll_Back.png")
-    func:AddGraph("Scroll_Back_Overlay.png")
 end
 
-function update(player)
-    animeTimer = animeTimer + deltaTime
+function onStart()
+    tx["Scroll.png"] = TEXTURE:CreateTextureSync("Scroll.png")
+    tx["Scroll_Back.png"] = TEXTURE:CreateTextureSync("Scroll_Back.png")
+    tx["Scroll_Back_Overlay.png"] = TEXTURE:CreateTextureSync("Scroll_Back_Overlay.png")
+end
+
+function update(timestamp, state)
+    local player = state.player
+
+    animeTimer = animeTimer + fps.deltaTime
     scrollRiseTransition = math.min(animeTimer, scrollRiseDuration) * (1 / scrollRiseDuration)
     scrollSlideTransition = math.min(math.max(animeTimer - scrollRiseDuration, 0), scrollSlideDuration) * (1 / scrollSlideDuration)
 
@@ -65,12 +68,21 @@ function update(player)
     end
 end
 
-function draw(player)
+function draw(state)
+    local player = state.player
+
     if scrollSlideTransition > 0 then
         -- Draw scroll background
-        func:DrawRectGraph(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight, "Scroll_Back.png")
-        func:DrawRectGraph(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight, "Scroll_Back_Overlay.png")
+        tx["Scroll_Back.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
+        tx["Scroll_Back_Overlay.png"]:DrawRect(scrollSlidePos, scrollRisePos, scrollSlidePos - scrollBackWidth - scrollBackXOffset, 0, scrollBackWidth - scrollSlidePos + scrollBackXOffset, scrollHeight)
     end
     -- Draw scroll
-    func:DrawGraph(scrollSlidePos, scrollRisePos, "Scroll.png")
+    tx["Scroll.png"]:Draw(scrollSlidePos, scrollRisePos)
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

@@ -65,8 +65,8 @@ internal class CStageConfig : CStage {
 
 			ReloadMenus();
 
-			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Script.lua"));
-			Background.Init();
+			Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}"));
+			Background.Activate(_state.Refreshed());
 
 
 			if (this.bMenuFocus) {
@@ -226,8 +226,8 @@ internal class CStageConfig : CStage {
 		if(TJAPlayer3.Tx.Config_Header != null )
             TJAPlayer3.Tx.Config_Header.t2D描画( 0, 0 );
 		*/
-		Background.Update();
-		Background.Draw();
+		Background.Update(_state);
+		Background.Draw(_state);
 		//---------------------
 
 		#endregion
@@ -537,7 +537,8 @@ internal class CStageConfig : CStage {
 	//private CTexture tx背景;
 	private CTexture[,] txMenuItemLeft;
 
-	private ScriptBG Background;
+	private LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 
 	private void tCursorBottomMove() {
 		if (!this.bMenuFocus) {

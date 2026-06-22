@@ -22,8 +22,9 @@ internal class CActImplBalloon : CActivity {
 
 		this.ctBalloonBubbleAnime = new CCounter(0, 1, 100, OpenTaiko.Timer);
 
-		KusudamaScript = new(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}Script.lua"));
-		KusudamaScript.Init();
+		_state.RefreshConst();
+		KusudamaScript = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}"));
+		KusudamaScript.Activate(_state);
 
 		base.Activate();
 	}
@@ -50,26 +51,27 @@ internal class CActImplBalloon : CActivity {
 	}
 
 	public void KusuIn() {
-		KusudamaScript.KusuIn();
+		KusudamaScript.Call("kusuIn");
 		KusudamaIsActive = true;
 	}
 	public void KusuBroke() {
-		KusudamaScript.KusuBroke();
+		KusudamaScript.Call("kusuBroke");
 		KusudamaIsActive = false;
 	}
 	public void KusuMiss() {
-		KusudamaScript.KusuMiss();
+		KusudamaScript.Call("kusuMiss");
 		KusudamaIsActive = false;
 	}
 
 	public bool KusudamaIsActive { get; private set; } = false;
 
 	public void tDrawKusudama(bool isTrainingPaused) {
+		_state.RefreshGameplay();
 		if (!OpenTaiko.stageGameScreen.bPAUSE) {
-			KusudamaScript.Update();
+			KusudamaScript.Update(_state);
 		}
 		if (!(OpenTaiko.ConfigIni.bTokkunMode && isTrainingPaused)) {
-			KusudamaScript.Draw();
+			KusudamaScript.Draw(_state);
 		}
 	}
 
@@ -164,7 +166,8 @@ internal class CActImplBalloon : CActivity {
 		return base.Draw();
 	}
 
-	public KusudamaScript KusudamaScript { get; private set; }
+	public LuaBackgroundWrapper KusudamaScript { get; private set; }
+	private readonly LuaBackgroundState _state = new();
 
 
 	private CCounter ctBalloonEnd;

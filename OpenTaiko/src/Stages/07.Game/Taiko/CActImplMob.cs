@@ -26,8 +26,9 @@ internal class CActImplMob : CActivity {
 					? _presetPath
 					: (upDirs.Length > 0 ? upDirs[random.Next(0, upDirs.Length)] : "");
 
-				MobScript = new ScriptBG($@"{path}{Path.DirectorySeparatorChar}Script.lua");
-				MobScript.Init();
+				_state.RefreshConst();
+				MobScript = new LuaBackgroundWrapper(path);
+				MobScript.Activate(_state);
 			}
 		}
 
@@ -51,8 +52,9 @@ internal class CActImplMob : CActivity {
 	public override int Draw() {
 		if (!OpenTaiko.stageGameScreen.isMultiPlay) {
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-				if (!OpenTaiko.stageGameScreen.bPAUSE) MobScript?.Update();
-				MobScript?.Draw();
+				_state.RefreshGameplay();
+				if (!OpenTaiko.stageGameScreen.bPAUSE) MobScript?.Update(_state);
+				MobScript?.Draw(_state);
 
 				/*
                 if (HGaugeMethods.UNSAFE_IsRainbow(0))
@@ -79,7 +81,8 @@ internal class CActImplMob : CActivity {
 	}
 	#region[ private ]
 	//-----------------
-	public ScriptBG MobScript { get; private set; }
+	public LuaBackgroundWrapper MobScript { get; private set; }
+	private readonly LuaBackgroundState _state = new();
 	//-----------------
 	#endregion
 }
