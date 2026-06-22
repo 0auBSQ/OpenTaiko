@@ -6,7 +6,7 @@ namespace OpenTaiko;
 public sealed class TitleTextureKey {
 
 	// Static
-	private static readonly Dictionary<TitleTextureKey, CTexture> _titledictionary
+	internal static readonly Dictionary<TitleTextureKey, CTexture> _titledictionary
 		= new Dictionary<TitleTextureKey, CTexture>();
 
 	public static CTexture ResolveTitleTexture(TitleTextureKey titleTextureKey) {
@@ -46,14 +46,14 @@ public sealed class TitleTextureKey {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-			CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
-			if (tx文字テクスチャ.szTextureSize.Height > titleTextureKey.maxWidth) {
+			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			if (txTextTexture.szTextureSize.Height > titleTextureKey.maxWidth) {
 				//tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Height);
-				tx文字テクスチャ.vcScaleRatio.X = 1.0f;
-				tx文字テクスチャ.vcScaleRatio.Y = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szTextureSize.Height);
+				txTextTexture.vcScaleRatio.X = 1.0f;
+				txTextTexture.vcScaleRatio.Y = (float)(((double)titleTextureKey.maxWidth) / txTextTexture.szTextureSize.Height);
 			}
 
-			return tx文字テクスチャ;
+			return txTextTexture;
 		}
 	}
 
@@ -61,14 +61,14 @@ public sealed class TitleTextureKey {
 		if (titleTextureKey == null) return null;
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
-			CTexture tx文字テクスチャ = OpenTaiko.tテクスチャの生成(bmp, false);
-			if (tx文字テクスチャ.szTextureSize.Width > titleTextureKey.maxWidth) {
-				tx文字テクスチャ.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szTextureSize.Width);
-				tx文字テクスチャ.vcScaleRatio.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
+			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			if (txTextTexture.szTextureSize.Width > titleTextureKey.maxWidth) {
+				txTextTexture.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / txTextTexture.szTextureSize.Width);
+				txTextTexture.vcScaleRatio.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
 
 			}
 
-			return tx文字テクスチャ;
+			return txTextTexture;
 		}
 	}
 
@@ -89,8 +89,8 @@ public sealed class TitleTextureKey {
 	public readonly int maxWidth;
 	public readonly Color? secondEdge;
 
-	public TitleTextureKey(string str文字, CCachedFontRenderer cPrivateFastFont, Color forecolor, Color backcolor, int maxHeight, Color? secondEdge = null) {
-		this.str = str文字;
+	public TitleTextureKey(string strText, CCachedFontRenderer cPrivateFastFont, Color forecolor, Color backcolor, int maxHeight, Color? secondEdge = null) {
+		this.str = strText;
 		this.cPrivateFastFont = cPrivateFastFont;
 		this.forecolor = forecolor;
 		this.backcolor = backcolor;

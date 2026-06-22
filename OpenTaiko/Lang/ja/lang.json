@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "システムに関係する項目を設定します。",
 		"SETTINGS_GAME": "ゲームプレイ設定",
 		"SETTINGS_GAME_DESC": "ドラムの演奏に関する項目を設定します。",
+		"SETTINGS_THEME": "テーマ設定",
+		"SETTINGS_THEME_DESC": "現在のスキン固有の設定です。\nスキンフォルダのThemeSettings.jsonで定義されます。",
 		"SETTINGS_EXIT": "出る",
 		"SETTINGS_EXIT_DESC": "設定を保存し、コンフィグ画面を終了します。",
 
@@ -122,6 +124,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "BGMの再生：\nこれをOFFにすると、BGM を再生しな\nくなります。",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL使用",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": ".tjaファイルのSONGVOLヘッダを音源の音量に適用します。設定による音量調整を使用する場合はこの設定をOFFにしてください。",
+		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
 		"SETTINGS_SYSTEM_SEVOL": "効果音音量",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "効果音の音量を調節します。",
 		"SETTINGS_SYSTEM_VOICEVOL": "ボイス音量",

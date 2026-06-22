@@ -55,8 +55,6 @@ end
 
 function draw()
     func:DrawGraph(0, 0, "Background.png")
-    func:DrawText(0, 0, "selectedChara: "..tostring(selectedChara))
-    func:DrawText(0, 16, "frames: "..tostring(frames[selectedChara]))
     if loadingAnimeType == 0 then
         func:DrawGraph(1657, 821, "Loading/"..tostring(selectedChara).."/"..tostring(math.floor(currentTime * 10) % frames[selectedChara])..".png")
         -- func:SetRotation(optkAngle, "OpTKIcon.png")

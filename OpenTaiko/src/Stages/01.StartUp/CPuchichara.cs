@@ -17,7 +17,7 @@ class CPuchichara {
 		=> effect.GetCoinMultiplier(HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity), allPurpleEnabled, autorollEnabled, showAdlibEnabled, splitLaneEnabled);
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = OpenTaiko.GetActualPlayer(_player);
+		int player = _player;
 		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedPuchicharas;
 		bool _edited = false;
 

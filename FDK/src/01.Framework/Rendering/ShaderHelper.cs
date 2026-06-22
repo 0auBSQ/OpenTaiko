@@ -48,4 +48,21 @@ public static class ShaderHelper {
 
 		return program;
 	}
+
+	/// <summary>Compile + link a GLES 3.1 compute shader into a standalone program (the GPU
+	/// raytracer's path-tracing kernel). Requires a 3.1+ context (see Game.ComputeShadersAvailable).</summary>
+	public static uint CreateComputeProgramFromSource(string computeCode) {
+		uint cs = CreateShader(computeCode, ShaderType.ComputeShader);
+
+		uint program = Game.Gl.CreateProgram();
+		Game.Gl.AttachShader(program, cs);
+		Game.Gl.LinkProgram(program);
+		Game.Gl.GetProgram(program, ProgramPropertyARB.LinkStatus, out int linkStatus);
+		if (linkStatus != (int)GLEnum.True)
+			throw new Exception($"Compute program failed to link:{Game.Gl.GetProgramInfoLog(program)}");
+
+		Game.Gl.DetachShader(program, cs);
+		Game.Gl.DeleteShader(cs);
+		return program;
+	}
 }

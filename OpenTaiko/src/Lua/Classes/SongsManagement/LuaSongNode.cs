@@ -1,0 +1,459 @@
+﻿namespace OpenTaiko {
+	internal class LuaSongNode {
+		private CSongListNode? _node;
+		private List<LuaSongChart> _charts = new List<LuaSongChart>();
+		private LuaUnlockCondition _unlockCondition = new LuaUnlockCondition();
+		private string _rarity = "-";
+		private CLocalizationData? _unlockText = null;
+		protected List<LuaSongNode> _children = new List<LuaSongNode>();
+		protected LuaSongNode? _parent;
+
+		public bool NotNull {
+			get {
+				return _node != null;
+			}
+		}
+
+		#region [Node type]
+
+		private CSongListNode.ENodeType? NodeType {
+			get {
+				return _node?.nodeType ?? null;
+			}
+		}
+
+		public bool IsFolder {
+			get {
+				return NodeType == CSongListNode.ENodeType.BOX;
+			}
+		}
+
+		public bool IsRandom {
+			get {
+				return NodeType == CSongListNode.ENodeType.RANDOM;
+			}
+		}
+
+		public bool IsReturn {
+			get {
+				return NodeType == CSongListNode.ENodeType.BACKBOX;
+			}
+		}
+
+		public bool IsSong {
+			get {
+				return NodeType == CSongListNode.ENodeType.SCORE;
+			}
+		}
+
+		#region [Folder specific]
+
+		private bool _opened = false;
+
+		public bool Opened {
+			get {
+				return IsFolder && _opened;
+			}
+			set {
+				_opened = value;
+			}
+		}
+
+		#endregion
+
+		#endregion
+
+		#region [Tree structure]
+
+		public int ChildrenCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count;
+			}
+		}
+
+		public int SongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count((child) => child.IsSong);
+			}
+		}
+
+		public int RecursiveSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return SongCount + _children.Sum((child) => child.RecursiveSongCount);
+			}
+		}
+
+		public int VisibleSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return _children.Count((child) => child.IsSong && child.HiddenIndex != (int)DBSongUnlockables.EHiddenIndex.HIDDEN);
+			}
+		}
+
+		public int RecursiveVisibleSongCount {
+			get {
+				if (!IsFolder && !IsRoot) return 0;
+				return VisibleSongCount + _children.Sum((child) => child.RecursiveVisibleSongCount);
+			}
+		}
+
+		public bool IsLeaf {
+			get {
+				return (ChildrenCount == 0 || !Opened) && !IsRoot;
+			}
+		}
+
+		public bool IsRoot {
+			get {
+				return _parent == null;
+			}
+		}
+
+		public LuaSongNode? Parent {
+			get {
+				return _parent;
+			}
+		}
+
+		public List<LuaSongNode> Siblings {
+			get {
+				return (Parent != null) ? Parent.Children : new List<LuaSongNode>() { this };
+			}
+		}
+
+		public LuaSongNode? Child(int i) {
+			return _children[i];
+		}
+
+		public List<LuaSongNode> Children {
+			get {
+				return _children;
+			}
+		}
+
+		#endregion
+
+		#region [Visuals]
+
+		public string? BoxType {
+			get {
+				return _node?.BoxType ?? null;
+			}
+		}
+
+		public string? BgType {
+			get {
+				return _node?.BgType ?? null;
+			}
+		}
+
+		public string? BoxChara {
+			get {
+				return _node?.BoxChara ?? null;
+			}
+		}
+
+		public LuaColor? ForeColor {
+			get {
+				return _node != null ? new(_node.ForeColor) : null;
+			}
+		}
+
+		public LuaColor? BackColor {
+			get {
+				return _node != null ? new(_node.BackColor) : null;
+			}
+		}
+
+		public LuaColor? BoxColor {
+			get {
+				return _node != null ? new(_node.BoxColor) : null;
+			}
+		}
+
+
+		#endregion
+
+		#region [Unlockables]
+
+		public LuaUnlockCondition UnlockCondition {
+			get {
+				return _unlockCondition;
+			}
+		}
+
+		public string UnlockText {
+			get {
+				if (_unlockText != null) return _unlockText.GetString("");
+				return _unlockCondition.GetConditionMessage();
+			}
+		}
+
+		public bool IsLocked {
+			get {
+				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
+					return OpenTaiko.Databases.DBSongUnlockables.tIsSongLocked(_node);
+				}
+				return false;
+			}
+		}
+
+		public int HiddenIndex {
+			get {
+				if (_node != null && _node.nodeType == CSongListNode.ENodeType.SCORE) {
+					return (int)OpenTaiko.Databases.DBSongUnlockables.tGetSongHiddenIndex(_node);
+				}
+				return (int)DBSongUnlockables.EHiddenIndex.DISPLAYED;
+			}
+		}
+
+		public string Rarity {
+			get {
+				// Folders, Back boxes, Random boxes have a rarity of "-" has they cannot be unlockables
+				return _rarity;
+			}
+		}
+
+		#endregion
+
+		#region [Chart difficulties]
+
+		public LuaSongChart? GetChart(int diff) {
+			return _charts.FirstOrDefault(x => (int)x.Difficulty == diff);
+		}
+
+		#endregion
+
+		#region [Custom commands]
+
+		/// <summary>Gets a global-scope custom command value (commands starting with "." placed before any COURSE header).</summary>
+		public string? GetCustomCommand(string key) {
+			if (_node == null) return null;
+			_node.customMetadataGScope.TryGetValue(key, out string? value);
+			return value;
+		}
+
+		/// <summary>Returns all global-scope custom commands as a Lua-accessible table (Dictionary).</summary>
+		public Dictionary<string, string>? GetCustomCommands() {
+			return _node?.customMetadataGScope;
+		}
+
+		#endregion
+
+		#region [Media metadata]
+
+		/// <summary>Loads the song's preimage from disk and returns it wrapped in a LuaTexture, or null if none.</summary>
+		public LuaTexture? GetPreimage() {
+			if (!HasPreimage) return null;
+			var tex = OpenTaiko.Tx.TxCAbsolute(PreimagePath);
+			return tex != null ? new LuaTexture(tex) : null;
+		}
+
+		private CScore? _GetFirstAvailableScore() {
+			if (_node == null || !IsSong) return null;
+			for (int i = 0; i < (int)Difficulty.Total; i++) {
+				if (_node.score[i] != null)
+					return _node.score[i];
+			}
+			return null;
+		}
+
+		public int DemoStart {
+			get {
+
+				return _GetFirstAvailableScore()?.ChartInfo.nDemoBGMOffset ?? 0;
+			}
+		}
+
+		public string PreimagePath {
+			get {
+				var score = _GetFirstAvailableScore();
+				var fPath = score?.FileInfo.FolderAbsolutePath ?? "";
+				var pPath = score?.ChartInfo.Preimage ?? "";
+				return ((!Path.IsPathRooted(pPath)) ? fPath : "") + pPath;
+			}
+		}
+
+		public bool HasPreimage {
+			get {
+				return !string.IsNullOrEmpty(_GetFirstAvailableScore()?.ChartInfo.Preimage ?? "");
+			}
+		}
+
+		public string AudioPath {
+			get {
+				var score = _GetFirstAvailableScore() ?? null;
+				if (score == null) return "";
+				return score.FileInfo.FolderAbsolutePath + score.ChartInfo.strBGMFileName;
+			}
+		}
+
+		#endregion
+
+		#region [General metadata]
+
+		public string? UniqueId {
+			get {
+				return _node?.tGetUniqueId() ?? null;
+			}
+		}
+
+		public string? Title {
+			get {
+				if (IsRandom) return CLangManager.LangInstance.GetString("SONGSELECT_RANDOM_PATH", _parent?.Title ?? "/");
+				else if (IsReturn) return CLangManager.LangInstance.GetString("SONGSELECT_RETURN_PATH", _parent?.Title ?? "/");
+				return _node?.ldTitle.GetString("") ?? null;
+			}
+		}
+
+		public string? Subtitle {
+			get {
+				return _node?.ldSubtitle.GetString("") ?? null;
+			}
+		}
+
+		public string? Genre {
+			get {
+				return _node?.songGenre ?? null;
+			}
+		}
+
+		public string? Maker {
+			get {
+				return _node?.strMaker ?? null;
+			}
+		}
+
+		public string[]? Charters {
+			get {
+				return _node?.strMaker.SplitByCommas() ?? null;
+			}
+		}
+
+		public int Side {
+			get {
+				return (int)(_node?.nSide ?? CTja.ESide.eEx);
+			}
+		}
+
+		#endregion
+
+		#region [Extended metadata]
+
+		public bool? Explicit {
+			get {
+				return _node?.bExplicit ?? null;
+			}
+		}
+
+		public bool? HasVideo {
+			get {
+				return _node?.bMovie ?? null;
+			}
+		}
+
+		#endregion
+
+		#region [Tree structure internal methods]
+
+		/// <summary>Appends a child node to this node's children list. For internal C# use only (virtual folder construction).</summary>
+		internal void AppendChildInternal(LuaSongNode child) {
+			_children.Add(child);
+		}
+
+		private void _FetchCharts() {
+			_charts = new List<LuaSongChart>();
+
+			for (int i = 0; i < (int)Difficulty.Total; i++) {
+				if (_node?.nLevel[i] != -1) _charts.Add(new LuaSongChart(this, _node, i));
+			}
+		}
+
+		private void _FetchChildren(LuaSongListSettings lsls) {
+			_children = new List<LuaSongNode>();
+
+			_node?.childrenList?.ForEach((child) => {
+				if (lsls.IsNodeExcludedAtGeneration(child) == false) {
+					LuaSongNode _child = new LuaSongNode(child, this, true, lsls);
+					_children.Add(_child);
+				}
+			});
+			lsls.AlterNodeListWithRequestedNodes(_node, _children, this);
+		}
+
+		public void AttachSongListNode(CSongListNode node, bool recursive, LuaSongListSettings lsls) {
+			_node = node;
+			if (node != null && node.nodeType == CSongListNode.ENodeType.SCORE) {
+				// Register a local Unlock.json (if present) before querying the DB,
+				// so that the per-song file integrates transparently with the unlock system.
+				string? folderPath = null;
+				for (int i = 0; i < node.score.Length; i++) {
+					if (node.score[i] != null) { folderPath = node.score[i].FileInfo.FolderAbsolutePath; break; }
+				}
+				if (folderPath != null)
+					OpenTaiko.Databases.DBSongUnlockables.tTryRegisterLocalUnlock(node.tGetUniqueId(), folderPath);
+
+				var _unlockable = OpenTaiko.Databases.DBSongUnlockables.tGetUnlockableByUniqueId(node);
+				_unlockCondition = new LuaUnlockCondition(_unlockable?.unlockConditions ?? null);
+				// Songs without unlock conditions are Common by default
+				_rarity = _unlockable?.rarity ?? "Common";
+				_unlockText = _unlockable?.customUnlockText ?? null;
+			}
+			_FetchCharts();
+			if (recursive) _FetchChildren(lsls);
+		}
+
+		/// <summary>Internal accessor for C#-side code (e.g. LuaDanBuildFunc). Not exposed to Lua.</summary>
+		internal CSongListNode? InternalNode => _node;
+
+		// Should never be called from the Lua side, the objects are returned in a read only form for the LuaSongList Root node method
+		public List<CSongListNode>? INTERNAL_GetChildrenList(object requester) {
+			if (requester is CBlankClass) return _node?.childrenList;
+			return null;
+		}
+
+		#endregion
+
+		// Mount the song node so it gets played when transitioning to the gameplay screen
+		public bool Mount(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {
+			if (!IsSong || _node == null) return false;
+
+			int[] diffs = { p1diff, p2diff, p3diff, p4diff, p5diff };
+
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				// Difficulty out of bounds
+				if (diffs[i] < 0 || diffs[i] >= (int)Difficulty.Total) return false;
+
+				// Difficulty not found in chart
+				LuaSongChart? _chart = _charts.FirstOrDefault(x => (int)x.Difficulty == diffs[i]);
+				if (_chart == null) return false;
+
+				// Mount difficulty if valid
+				_chart.Select(i);
+			}
+
+			OpenTaiko.SongMount.rChoosenSong = _node;
+			OpenTaiko.SongMount.strChosenSongGenre = Genre ?? "???";
+
+			return true;
+		}
+
+		public bool MountIfNotLocked(int p1diff = 0, int p2diff = 0, int p3diff = 0, int p4diff = 0, int p5diff = 0) {
+			if (IsLocked) return false;
+			return Mount(p1diff, p2diff, p3diff, p4diff, p5diff);
+		}
+
+		public LuaSongNode() {
+
+		}
+
+		public LuaSongNode(CSongListNode node, LuaSongNode? parent = null, bool recursive = true, LuaSongListSettings? lsls = null) {
+			LuaSongListSettings _settings = lsls ?? LuaSongListSettings.Generate();
+			AttachSongListNode(node, recursive, _settings);
+			this._parent = parent;
+		}
+	}
+}

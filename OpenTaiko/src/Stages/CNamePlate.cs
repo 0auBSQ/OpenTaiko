@@ -1,11 +1,16 @@
-﻿namespace OpenTaiko;
+using FDK;
+
+namespace OpenTaiko;
 
 class CNamePlate {
-	public CLuaNamePlateScript lcNamePlate { get; private set; }
-	public void RefleshSkin() {
-		lcNamePlate?.Dispose();
-		lcNamePlate = new CLuaNamePlateScript(CSkin.Path("Modules/NamePlate"));
+	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("nameplate");
 
+	// Draw modes passed as first arg to the Lua draw(mode, ...) function
+	private const int DrawModeFull  = 0;
+	private const int DrawModeDan   = 1;
+	private const int DrawModeTitle = 2;
+
+	public void RefleshSkin() {
 		for (int player = 0; player < 5; player++) {
 			tNamePlateRefreshTitles(player);
 		}
@@ -17,13 +22,11 @@ class CNamePlate {
 			else if (OpenTaiko.SaveFileInstances[player].data.DanType > 2) OpenTaiko.SaveFileInstances[player].data.DanType = 2;
 
 			if (OpenTaiko.SaveFileInstances[player].data.TitleType < 0) OpenTaiko.SaveFileInstances[player].data.TitleType = 0;
-
 		}
-		RefleshSkin();
 	}
 
 	public void tNamePlateRefreshTitles(int player) {
-		int actualPlayer = OpenTaiko.GetActualPlayer(player);
+		int actualPlayer = player;
 
 		string[] stages = { "初", "二", "三", "四", "五", "六", "七", "八", "九", "極" };
 
@@ -33,29 +36,79 @@ class CNamePlate {
 
 		bool isAI = OpenTaiko.ConfigIni.bAIBattleMode && player == 1;
 		if (isAI) {
-			name = CLangManager.LangInstance.GetString("AI_NAME");
-			title = CLangManager.LangInstance.GetString("AI_TITLE");
+			// Name: display name from the AI character's metadata.
+			int aiCharaIdx = CVirtualSlotManager.FindCharacterIndexByName(CVirtualSlotManager.AI.CharacterFolderName);
+			name = OpenTaiko.Tx?.Characters?[aiCharaIdx]?.metadata?.tGetName()
+			       ?? CLangManager.LangInstance.GetString("AI_NAME");
+
 			dan = stages[Math.Max(0, OpenTaiko.ConfigIni.nAILevel - 1)] + "面";
+
+			// The AI virtual slot owns a permanent SaveFile.Data (VirtualData) whose
+			// title/rarity/type fields were pre-set to nameplate #66 by RefreshAINameplate().
+			// Lua stores VirtualData by reference, so updates here are visible in draw().
+			var aiVData = CVirtualSlotManager.AI.VirtualData;
+			title           = aiVData.Title;
+			aiVData.Name    = name;
+			aiVData.Dan     = dan;
+
+			Script?.Activate(player, name, title, dan, aiVData);
 		} else {
-			name = OpenTaiko.SaveFileInstances[actualPlayer].data.Name;
-			title = OpenTaiko.SaveFileInstances[actualPlayer].data.Title;
-			dan = OpenTaiko.SaveFileInstances[actualPlayer].data.Dan;
+			// Check for a virtual-slot or cross-player mount override.
+			string? mount = CVirtualSlotManager.GetMount(player);
+			CVirtualSlotData? vslot = mount != null ? CVirtualSlotManager.GetVirtualData(mount) : null;
+
+			if (vslot != null) {
+				name  = vslot.NameplatePlayerName;
+				title = vslot.NameplateTitle;
+				dan   = vslot.NameplateDan;
+
+				// Keep VirtualData.Name/Dan in sync so draw() reads the right values.
+				vslot.VirtualData.Name = name;
+				vslot.VirtualData.Dan  = dan;
+
+				bIsPrevAI[player] = isAI;
+				// Honor a shared gold dan plate (mirrors the real-save-file branch below).
+				if (vslot.VirtualData.DanGold)
+					Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", vslot.VirtualData);
+				else
+					Script?.Activate(player, name, title, dan, vslot.VirtualData);
+				return;
+			} else {
+				// Use the player's real save file (possibly redirected to another slot).
+				var overrideData = CVirtualSlotManager.GetNameplateOverride(player);
+				SaveFile.Data data;
+				if (overrideData.HasValue) {
+					// Cross-player redirect (e.g. "2P" mounted to player 3).
+					// The override values come from the source save file — just use it directly.
+					int srcPlayer = 0;
+					// Re-parse to get the source player index for the real data object.
+					if (mount != null && mount.Length == 2 && mount[1] == 'P' && char.IsDigit(mount[0]))
+						srcPlayer = mount[0] - '1';
+					data = OpenTaiko.SaveFileInstances[srcPlayer].data;
+					name  = data.Name;
+					title = data.Title;
+					dan   = data.Dan;
+				} else {
+					data  = OpenTaiko.SaveFileInstances[actualPlayer].data;
+					name  = data.Name;
+					title = data.Title;
+					dan   = data.Dan;
+				}
+
+				bIsPrevAI[player] = isAI;
+				if (data.DanGold)
+					Script?.Activate(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", data);
+				else
+					Script?.Activate(player, name, title, dan, data);
+				return;
+			}
 		}
 		bIsPrevAI[player] = isAI;
-
-		if (OpenTaiko.SaveFileInstances[player].data.DanGold)
-			lcNamePlate?.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
-		else
-			lcNamePlate?.SetInfos(player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
 	}
 
-
 	public void tNamePlateDraw(int x, int y, int player, bool bTitle = false, int Opacity = 255) {
-		float resolutionScaleX = OpenTaiko.Skin.Resolution[0] / 1280.0f;
-		float resolutionScaleY = OpenTaiko.Skin.Resolution[1] / 720.0f;
-
 		int basePlayer = player;
-		player = OpenTaiko.GetActualPlayer(player);
+		player = player;
 
 		bool isAI = OpenTaiko.ConfigIni.bAIBattleMode && basePlayer == 1;
 		if (bIsPrevAI[basePlayer] != isAI) {
@@ -63,7 +116,35 @@ class CNamePlate {
 		}
 		bIsPrevAI[basePlayer] = isAI;
 
-		lcNamePlate?.Draw(x, y, Opacity, basePlayer, OpenTaiko.P1IsBlue() ? 1 : 0);
+		Draw(x, y, Opacity, basePlayer, OpenTaiko.P1IsBlue() ? 1 : 0);
+	}
+
+	/// <summary>Draws the full nameplate for a player slot.</summary>
+	public void Draw(int x, int y, int opacity, int player, int side) {
+		Script?.Draw(DrawModeFull, x, y, opacity, player, side);
+	}
+
+	/// <summary>Draws only the dan plate (used in My Room gallery).</summary>
+	public void DrawDan(int x, int y, int opacity, int danGrade, LuaTexture text) {
+		Script?.Draw(DrawModeDan, x, y, opacity, danGrade, text);
+	}
+
+	/// <inheritdoc cref="DrawDan(int,int,int,int,LuaTexture)"/>
+	public void DrawDan(int x, int y, int opacity, int danGrade, CTexture text) =>
+		DrawDan(x, y, opacity, danGrade, new LuaTexture(text));
+
+	/// <summary>Draws only the title plate (used in My Room gallery and modal).</summary>
+	public void DrawTitlePlate(int x, int y, int opacity, int type, LuaTexture text, int rarity, int nameplateId) {
+		Script?.Draw(DrawModeTitle, x, y, opacity, type, text, rarity, nameplateId);
+	}
+
+	/// <inheritdoc cref="DrawTitlePlate(int,int,int,int,LuaTexture,int,int)"/>
+	public void DrawTitlePlate(int x, int y, int opacity, int type, CTexture text, int rarity, int nameplateId) =>
+		DrawTitlePlate(x, y, opacity, type, new LuaTexture(text), rarity, nameplateId);
+
+	/// <summary>Advances nameplate animation state; call once per frame.</summary>
+	public void Update() {
+		Script?.Update();
 	}
 
 	private bool[] bIsPrevAI = new bool[5];

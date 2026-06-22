@@ -1,0 +1,15 @@
+{
+    // 本地化文件 — 中文
+    "Entries": {
+
+        // 主题设置查看器关卡
+        "VIEWER_TITLE":     "主题设置查看器",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "范围",
+        "VIEWER_COL_TYPE":  "类型",
+        "VIEWER_COL_VALUE": "值",
+        "VIEWER_HINT_SCROLL": "上/下滚动   取消退出",
+        "VIEWER_HINT_EXIT":   "取消退出"
+
+    }
+}

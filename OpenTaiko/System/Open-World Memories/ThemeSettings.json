@@ -1,0 +1,93 @@
+[
+  {
+    "id": "aislot_chara",
+    "type": "string",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "AI Slot Character",
+        "ja": "AIスロットキャラクター",
+        "ko": "AI 슬롯 캐릭터",
+        "zh": "AI 战斗角色"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Name of the character used for the AI battle slot.\nMust match the character's folder name.",
+        "ja": "AIバトルスロットに使用するキャラクターの名前。\nキャラクターのフォルダ名と一致する必要があります。",
+        "ko": "AI 배틀 슬롯에 사용할 캐릭터 이름.\n캐릭터 폴더 이름과 일치해야 합니다.",
+        "zh": "AI 战斗槽使用的角色名称。\n必须与角色的文件夹名称匹配。"
+      }
+    },
+    "default": "10v2 - AItritus"
+  },
+  {
+    "id": "test_int",
+    "type": "int",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Test Integer Setting"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Test setting for integer values.\nUsed to verify the theme settings system works correctly."
+      }
+    },
+    "default": "5",
+    "min": 1,
+    "max": 20
+  },
+  {
+    "id": "test_double",
+    "type": "double",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Test Decimal Setting"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Test setting for decimal (double) values.\nUsed to verify the theme settings system works correctly."
+      }
+    },
+    "default": "0.30",
+    "min": 0.0,
+    "max": 1.0
+  },
+  {
+    "id": "test_enum",
+    "type": "enum",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Test Enum Setting"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Test setting for enum (list) values.\nUsed to verify the theme settings system works correctly."
+      }
+    },
+    "default": "Default",
+    "options": ["Default", "Classic", "Pixel", "Neon"]
+  },
+  {
+    "id": "test_bool",
+    "type": "bool",
+    "scope": "save",
+    "label": {
+      "strings": {
+        "default": "Test Boolean Setting"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Test setting for boolean (on/off) values, save-scoped.\nUsed to verify the per-save theme settings system works correctly."
+      }
+    },
+    "default": "1"
+  }
+]

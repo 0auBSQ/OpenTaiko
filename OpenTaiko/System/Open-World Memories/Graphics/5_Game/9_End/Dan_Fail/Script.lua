@@ -78,6 +78,11 @@ function clearOut(player)
 end
 
 function init()
+    animeCounter = 0
+    dan_in_move = 0
+    dan_first_in_move = 0
+    dan_second_in_move = 0
+    dan_in_slam = 0
     func:AddGraph("Dan_In.png")
     func:AddGraph("Dan_In_Shadow.png")
     func:AddGraph("Slam.png")

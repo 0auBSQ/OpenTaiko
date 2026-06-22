@@ -13,6 +13,7 @@ class ScriptBGFunc {
 		Textures = texs;
 		DirPath = dirPath;
 	}
+
 	public (int x, int y) DrawText(double x, double y, string text) {
 		return OpenTaiko.actTextConsole.Print((int)x, (int)y, CTextConsole.EFontType.White, text);
 	}
@@ -24,19 +25,26 @@ class ScriptBGFunc {
 		trueFileName = trueFileName.Replace('\\', Path.DirectorySeparatorChar);
 		if (this.Textures.ContainsKey(fileName)) // already loaded
 			return;
-		Textures.Add(fileName, OpenTaiko.tテクスチャの生成($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}"));
+		// Load SYNC: BG scripts read func:GetTextureWidth/Height right after AddGraph (in init) to size their
+		// scroll/tile loops — a streamed/async texture has size 0 until its upload finishes, which corrupts the
+		// layout (broken-looking background). The BG loads behind the loading bar, so an inline load here is fine.
+		bool prev = CTexture.SyncForce;
+		CTexture.SyncForce = true;
+		try { Textures.Add(fileName, OpenTaiko.tTextureCreate($@"{DirPath}{Path.DirectorySeparatorChar}{trueFileName}")); }
+		finally { CTexture.SyncForce = prev; }
+		Textures[fileName]?.SetTextureWrapMode(Silk.NET.OpenGLES.TextureWrapMode.Repeat);
 	}
 	public void DrawGraph(double x, double y, string fileName) {
-		Textures[fileName]?.t2D描画((int)x, (int)y);
+		Textures[fileName]?.t2DDraw((int)x, (int)y);
 	}
 	public void DrawRectGraph(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName) {
-		Textures[fileName]?.t2D描画((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		Textures[fileName]?.t2DDraw((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 	}
 	public void DrawGraphCenter(double x, double y, string fileName) {
-		Textures[fileName]?.t2D拡大率考慮中央基準描画((int)x, (int)y);
+		Textures[fileName]?.t2DScaledCenterBasedDraw((int)x, (int)y);
 	}
 	public void DrawGraphRectCenter(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string fileName) {
-		Textures[fileName]?.t2D拡大率考慮中央基準描画((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		Textures[fileName]?.t2DScaledCenterBasedDraw((int)x, (int)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 	}
 	public void SetOpacity(double opacity, string fileName) {
 		if (Textures[fileName] != null)
@@ -50,7 +58,7 @@ class ScriptBGFunc {
 	}
 	public void SetRotation(double angle, string fileName) {
 		if (Textures[fileName] != null) {
-			Textures[fileName].fZ軸中心回転 = (float)(angle * Math.PI / 180);
+			Textures[fileName].fZAxisCenterRotate = (float)(angle * Math.PI / 180);
 		}
 	}
 	public void SetColor(double r, double g, double b, string fileName) {
@@ -63,34 +71,34 @@ class ScriptBGFunc {
 			switch (type) {
 				case "Normal":
 				default:
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Add":
-					Textures[fileName].b加算合成 = true;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = true;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Multi":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = true;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = true;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Sub":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = true;
-					Textures[fileName].bスクリーン合成 = false;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = true;
+					Textures[fileName].bScreenBlend = false;
 					break;
 				case "Screen":
-					Textures[fileName].b加算合成 = false;
-					Textures[fileName].b乗算合成 = false;
-					Textures[fileName].b減算合成 = false;
-					Textures[fileName].bスクリーン合成 = true;
+					Textures[fileName].bAddBlend = false;
+					Textures[fileName].bMultiplyBlend = false;
+					Textures[fileName].bSubtractBlend = false;
+					Textures[fileName].bScreenBlend = true;
 					break;
 			}
 		}
@@ -111,9 +119,12 @@ class ScriptBGFunc {
 	}
 }
 class ScriptBG : IDisposable {
-	public Dictionary<string, CTexture> Textures;
+	public Dictionary<string, CTexture> Textures = [];
+	public HashSet<LuaTexture> TextureList = [];
+	public HashSet<LuaSound> SoundList = [];
+	public HashSet<LuaText> TextList = [];
 
-	protected Lua LuaScript;
+	protected Lua? LuaScript;
 	protected string FilePath;
 	protected string FilePathShort;
 
@@ -143,15 +154,27 @@ class ScriptBG : IDisposable {
 		this.FilePathShort = Path.Join(Path.GetFileName(Path.GetDirectoryName(filePath)), Path.GetFileName(filePath));
 		Textures = new Dictionary<string, CTexture>();
 
+
 		if (!File.Exists(filePath)) return;
 
-		try {
-			LuaScript = new Lua();
-			LuaScript.State.Encoding = Encoding.UTF8;
-			LuaSecurity.Secure(LuaScript);
+		LuaScript = new Lua();
+		LuaScript.State.Encoding = Encoding.UTF8;
+		LuaSecurity.Secure(LuaScript, filePath);
 
-			LuaScript["func"] = new ScriptBGFunc(Textures, Path.GetDirectoryName(filePath));
-			using (var streamAPI = new StreamReader(OpenTaiko.ResolveAssetPath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "BGScriptAPI.lua")), Encoding.UTF8)) {
+		string path = Path.GetDirectoryName(filePath) ?? "";
+		LuaScript["func"] = new ScriptBGFunc(Textures, path);
+		LuaScript["TEXTURE"] = new LuaTextureFunc(TextureList, path);
+		LuaScript["SOUND"] = new LuaSoundFunc(SoundList, path);
+		LuaScript["TEXT"] = new LuaTextFunc(TextList, path);
+		LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(path);
+		LuaScript["INPUT"] = new LuaInputFunc();
+		LuaScript["COLOR"] = new LuaColorFunc();
+		LuaScript["COUNTER"] = new LuaCounterFunc();
+		LuaScript["CONFIG"] = new LuaConfigIniFunc();
+
+
+		try {
+			using (var streamAPI = new StreamReader(OpenTaiko.ResolveAssetPath(Path.Combine(OpenTaiko.strEXEFolder, "BGScriptAPI.lua")), Encoding.UTF8)) {
 				using (var stream = new StreamReader(filePath, Encoding.UTF8)) {
 					var text = $"{streamAPI.ReadToEnd()}\n{stream.ReadToEnd()}";
 					LuaScript.DoString(text, this.FilePathShort);
@@ -199,16 +222,18 @@ class ScriptBG : IDisposable {
 		LuaScript = null;
 	}
 	public void Dispose() {
-		List<CTexture> texs = new List<CTexture>();
-		foreach (var tex in Textures.Values) {
-			texs.Add(tex);
-		}
-		for (int i = 0; i < texs.Count; i++) {
-			var tex = texs[i];
-			OpenTaiko.tテクスチャの解放(ref tex);
-		}
-
+		foreach (var (key, tex) in this.Textures)
+			tex?.Dispose();
 		Textures.Clear();
+
+		void freeDisposableList<T>(ICollection<T> list) where T : IDisposable? {
+			foreach (var disposable in list)
+				disposable?.Dispose();
+			list.Clear();
+		}
+		freeDisposableList(this.TextureList);
+		freeDisposableList(this.SoundList);
+		freeDisposableList(this.TextList);
 
 		LuaScript?.Dispose();
 
@@ -232,8 +257,8 @@ class ScriptBG : IDisposable {
 
 			if (OpenTaiko.Tx.Puchichara != null && OpenTaiko.Tx.Characters != null) {
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					raritiesP[i] = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(OpenTaiko.GetActualPlayer(i))].metadata.Rarity;
-					raritiesC[i] = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(i)].data.Character].metadata.Rarity;
+					raritiesP[i] = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(i)].metadata.Rarity;
+					raritiesC[i] = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[i].data.Character].metadata.Rarity;
 				}
 			}
 
@@ -252,7 +277,7 @@ class ScriptBG : IDisposable {
 				0,
 				OpenTaiko.stageGameScreen.AIBattleState,
 				OpenTaiko.stageGameScreen.bIsAIBattleWin,
-				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue,
 				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
 				new bool[] { false, false, false, false, false },
 				-1
@@ -270,7 +295,7 @@ class ScriptBG : IDisposable {
 			float currentFloorPositionMax140 = 0;
 
 			if (OpenTaiko.SongMount.rChoosenSong != null && OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
-				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor;
+				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 				int nightTime = Math.Max(140, maxFloor / 2);
 
 				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
@@ -293,7 +318,7 @@ class ScriptBG : IDisposable {
 				(double)currentFloorPositionMax140,
 				OpenTaiko.stageGameScreen.AIBattleState,
 				OpenTaiko.stageGameScreen.bIsAIBattleWin,
-				OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値,
+				OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue,
 				OpenTaiko.stageGameScreen.actPlayInfo.dbBPM,
 				OpenTaiko.stageGameScreen.bIsGOGOTIME,
 				timestamp);

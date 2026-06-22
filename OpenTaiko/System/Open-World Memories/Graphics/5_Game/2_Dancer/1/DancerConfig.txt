@@ -1,0 +1,12 @@
+Game_Dancer_X=960,1260,660,300,1600
+
+Game_Dancer_Y=770,770,770,770,770
+
+Game_Dancer_Motion=0,1,2,3,4,5,5,6,7
+
+
+Game_Dancer_Beat=2
+Game_Dancer_In_Interval=360
+
+
+Game_Dancer_Gauge=0,0,0,40,80

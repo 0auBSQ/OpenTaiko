@@ -3,6 +3,7 @@
     <ProjectReference Include="..\FDK\FDK.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LightningDB" Version="0.18.1" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -25,6 +26,7 @@
     <Content Include=".init/**" CopyToOutputDirectory="PreserveNewest" />
     <None Remove="system\open-world memories\modules\modal\Config.json" />
     <Content Include="BGScriptAPI.lua" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="CharaScript.lua" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="OpenTaiko.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
@@ -33,9 +35,12 @@
     <Folder Include="System\Open-World Memories\Modules\Modal\Sounds\" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>0.6.0.107</Version>
+    <Version>0.6.1.0</Version>
     <OutputType Condition="'$(BuildingAsLibrary)' != 'true'">WinExe</OutputType>
     <OutputType Condition="'$(BuildingAsLibrary)' == 'true'">Library</OutputType>
+    <!-- iOS references this project with BuildingAsLibrary=true. LightningDB/LMDB ships no iOS-native
+         binary, so it is excluded above; LuaDataStorage then compiles to a no-op under this constant. -->
+    <DefineConstants Condition="'$(BuildingAsLibrary)' == 'true'">$(DefineConstants);BUILDING_AS_LIBRARY</DefineConstants>
     <TargetFramework>net8.0</TargetFramework>
         <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -45,5 +50,8 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="OpenTaiko.iOS" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="OpenTaiko.Tests" />
   </ItemGroup>
 </Project>

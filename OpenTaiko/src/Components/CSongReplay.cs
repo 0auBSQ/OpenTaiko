@@ -36,7 +36,8 @@ class CSongReplay {
 		Avalanche = 1 << 5,
 		Minesweeper = 1 << 6,
 		Just = 1 << 7,
-		Safe = 1 << 8
+		Safe = 1 << 8,
+		DynamicBeat = 1 << 9
 	}
 
 	public CSongReplay() {
@@ -234,7 +235,7 @@ class CSongReplay {
 
 	public void tResultsRegisterReplayInformations(int Coins, int Clear, int SRank) {
 		// Actual player (Used for saved informations)
-		int actualPlayer = OpenTaiko.GetActualPlayer(storedPlayer);
+		int actualPlayer = storedPlayer;
 
 		// Game mode
 		switch (OpenTaiko.SongMount.nChoosenSongDifficulty[0]) {
@@ -259,7 +260,7 @@ class CSongReplay {
 		OkCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nGood;
 		BadCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMiss;
 		RollCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nRoll;
-		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[storedPlayer];
+		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[storedPlayer];
 		BoomCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMine;
 		ADLibCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nADLIB;
 		Score = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nScore;
@@ -301,6 +302,7 @@ class CSongReplay {
 		if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Stealth) ModFlags |= (int)EModFlag.PerfectMemory;
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Avalanche) ModFlags |= (int)EModFlag.Avalanche;
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Minesweeper) ModFlags |= (int)EModFlag.Minesweeper;
+		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.DynamicBeat) ModFlags |= (int)EModFlag.DynamicBeat;
 		if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 1) ModFlags |= (int)EModFlag.Just;
 		if (OpenTaiko.ConfigIni.bJust[actualPlayer] == 2) ModFlags |= (int)EModFlag.Safe;
 		/* Gauge type
@@ -310,7 +312,7 @@ class CSongReplay {
 		 */
 		GaugeType = (byte)HGaugeMethods.tGetGaugeTypeEnum(storedPlayer);
 		// Gauge fill value
-		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.db現在のゲージ値[storedPlayer];
+		GaugeFill = (float)OpenTaiko.stageGameScreen.actGauge.dbCurrentGaugeValue[storedPlayer];
 		// Generation timestamp (in ticks)
 		Timestamp = DateTime.Now.Ticks;
 		// Compressed inputs and size
@@ -318,9 +320,11 @@ class CSongReplay {
 		CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
+		// DanBuilder charts have no persistent uniqueId; skip replay recording for them.
+		if (OpenTaiko.SongMount.rChoosenSong?.uniqueId == null) return;
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
-		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].譜面情報.nレベル[ChartDifficulty]);
+		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].ChartInfo.nLevel[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
 		// Replay Checksum (Calculate at the end)

@@ -19,10 +19,10 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using FDK;
 using ImGuiNET;
 using Silk.NET.Core;
 using Silk.NET.GLFW;
@@ -31,6 +31,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGLES;
 using Silk.NET.OpenGLES.Extensions.ImGui;
 using Silk.NET.Windowing;
+using Silk.NET.Windowing.Sdl;
 using SkiaSharp;
 
 namespace FDK;
@@ -38,9 +39,13 @@ namespace FDK;
 /// <summary>
 /// Presents an easy to use wrapper for making games and samples.
 /// </summary>
-public abstract class Game : IDisposable {
+public abstract partial class Game : IDisposable {
 	public static GL Gl { get; private set; }
 	public static Silk.NET.Core.Contexts.IGLContext Context { get; private set; }
+
+	/// <summary>True when the GL context is GLES 3.1+, i.e. compute shaders (the GPU renderer path)
+	/// are usable. False on the GLES 2.0 fallback, where the CPU renderers are used instead.</summary>
+	public static bool ComputeShadersAvailable { get; private set; }
 	
 	private static string[] parameters;
 	private static string GetParameterValue(string parameter = "", string parameter_full = "") {
@@ -94,7 +99,13 @@ public abstract class Game : IDisposable {
 #endif
 	}
 
-	public static List<Action> AsyncActions { get; private set; } = new();
+	public static ConcurrentQueue<Action> AsyncActions { get; private set; } = new ConcurrentQueue<Action>();
+
+	// Per-frame time budget for draining AsyncActions (the single render-thread "finalize" queue: deferred GL
+	// texture uploads + sound/shared creation). Small in normal gameplay so runtime async loads trickle in
+	// without hurting fps; CLoadSession raises it behind a loading screen, where nothing else needs the frame.
+	public const double DefaultAsyncBudgetMs = 3.0;
+	public static double AsyncBudgetMs = DefaultAsyncBudgetMs;
 
 	public Thread thInput { get; private set; }
 	private CancellationTokenSource thInputCancel;
@@ -187,8 +198,21 @@ public abstract class Game : IDisposable {
 
 	public static int MainThreadID { get; private set; }
 
-	private Vector2D<int> ViewPortSize = new Vector2D<int>();
-	private Vector2D<int> ViewPortOffset = new Vector2D<int>();
+	// ── virtual clock (offline video export) ────────────────────────────────────────────────────
+	// When enabled, TimeMs/dbTimeMs come from VirtualClockMs instead of the window's wall clock.
+	// Everything timed off Game.TimeMs (CTimer.MultiMedia, CSoundTimer in OS-timer mode, video
+	// decoders) then advances exactly as fast as the exporter steps this value — one fixed step
+	// per rendered frame — so render duration no longer affects game time at all.
+	public static bool VirtualClockEnabled = false;
+	public static double VirtualClockMs = 0;
+	/// <summary>Create the window invisible (offline export); set before Run().</summary>
+	public bool StartHidden = false;
+
+	// Public so input mapping can convert window-pixel mouse coords into game-surface
+	// coords (the rendered surface is aspect-fit inside the window, leaving letterbox
+	// borders described by these two values).
+	public static Vector2D<int> ViewPortSize = new Vector2D<int>();
+	public static Vector2D<int> ViewPortOffset = new Vector2D<int>();
 
 	public unsafe SKBitmap GetScreenShot() {
 		int ViewportWidth = ViewPortSize.X;
@@ -279,10 +303,30 @@ public abstract class Game : IDisposable {
 		//GetError();
 	}
 
-	private RawImage GetIconData(string fileName) {
-		SKCodec codec = SKCodec.Create(fileName);
-		using SKBitmap bitmap = SKBitmap.Decode(codec, new SKImageInfo(codec.Info.Width, codec.Info.Height, SKColorType.Rgba8888));
-		return new RawImage(bitmap.Width, bitmap.Height, bitmap.GetPixelSpan().ToArray());
+	[DllImport("user32.dll")] private static extern nint SendMessage(nint h, uint msg, nuint w, nint l);
+	[DllImport("user32.dll")] private static extern nint SetClassLongPtr(nint h, int idx, nint val);
+
+	// glfwSetWindowIcon sets ICON_SMALL (title bar) and ICON_BIG, but never ICON_SMALL2.
+	// Windows 10/11 taskbar reads ICON_SMALL2 for the button icon — sync it here.
+	private static void SyncTaskbarIcon(nint hwnd) {
+		nint hIcon = SendMessage(hwnd, 0x007F /* WM_GETICON */, 1 /* ICON_BIG */, 0);
+		if (hIcon == 0) return;
+		SendMessage(hwnd, 0x0080 /* WM_SETICON */, 2 /* ICON_SMALL2 */, hIcon);
+		SetClassLongPtr(hwnd, -14 /* GCLP_HICON */, hIcon);
+	}
+
+	private RawImage? GetIconData(string fileName) {
+		try {
+			string path = Path.IsPathRooted(fileName) ? fileName : Path.Combine(AppContext.BaseDirectory, fileName);
+			using var src = SKBitmap.Decode(path);
+			if (src == null) return null;
+			using var rgba = src.Copy(SKColorType.Rgba8888);
+			if (rgba == null) return null;
+			return new RawImage(rgba.Width, rgba.Height, rgba.Bytes);
+		} catch (Exception ex) {
+			Trace.TraceWarning($"[GetIconData] {ex.Message}");
+			return null;
+		}
 	}
 
 	/// <summary>
@@ -323,6 +367,7 @@ public abstract class Game : IDisposable {
 
 		options.WindowBorder = WindowBorder.Resizable;
 		options.Title = Text;
+		options.IsVisible = !StartHidden;
 
 		#region Override Windowing
 		string windowing_override = GetParameterValue("-w", "--windowing");
@@ -425,14 +470,29 @@ public abstract class Game : IDisposable {
 			_hostStartTimeMs = Stopwatch.GetTimestamp();
 			_hostTimeInitialized = true;
 		}
-		TimeMs = (Stopwatch.GetTimestamp() - _hostStartTimeMs) * 1000 / Stopwatch.Frequency;
+		// Set BOTH clocks: dbTimeMs feeds CTimer.NowTimeMs_Double -> CFPS.DeltaTime, which drives the Lua
+		// counters that advance screen transitions.
+		double hostElapsedMs = (Stopwatch.GetTimestamp() - _hostStartTimeMs) * 1000.0 / Stopwatch.Frequency;
+		dbTimeMs = hostElapsedMs;
+		TimeMs = (long)hostElapsedMs;
 
 		Update();
 
 		Camera = Matrix4X4<float>.Identity;
-		if (AsyncActions.Count > 0) {
-			AsyncActions[0]?.Invoke();
-			AsyncActions.Remove(AsyncActions[0]);
+
+		// Drain queued main-thread actions (deferred GL uploads from background loaders and texture
+		// streaming) within a time budget. Same idiom as Window_Render, see the note there.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
+					break;
+			}
 		}
 
 		// Draw the scene into the host's render target; the host presents it (no GL swap).
@@ -526,7 +586,15 @@ public abstract class Game : IDisposable {
 	}
 
 	protected virtual void Events() {
-		Window_.DoEvents();
+		// Silk's GLFW event pump can intermittently throw (seen as "Nullable object must have a
+		// value") under very rapid input, especially with the cursor locked. It's a transient in
+		// the windowing backend, not our state — swallow it and re-pump next frame instead of
+		// letting it crash the whole game.
+		try {
+			Window_.DoEvents();
+		} catch (Exception e) {
+			System.Diagnostics.Trace.TraceWarning($"Window event pump threw (ignored): {e}");
+		}
 	}
 
 	protected virtual void Update() {
@@ -547,7 +615,12 @@ public abstract class Game : IDisposable {
 
 
 	public void Window_Load() {
-		Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(GetIconData(strIconFileName)));
+		var icon = GetIconData(strIconFileName);
+		if (icon.HasValue) {
+			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icon.Value));
+			if (OperatingSystem.IsWindows() && Window_.Native?.Win32 is { } w && w.Hwnd != 0)
+				SyncTaskbarIcon(w.Hwnd);
+		}
 
 		if (OperatingSystem.IsMacOS()) {
 			if (Window_.GLContext == null) {
@@ -576,6 +649,21 @@ public abstract class Game : IDisposable {
 
 		Gl = GL.GetApi(Context);
 
+		// Detect compute-shader capability (GLES 3.1+) so renderers can pick the GPU or CPU path.
+		ComputeShadersAvailable = false;
+		try {
+			if (Context is AngleContext ac) {
+				ComputeShadersAvailable = ac.ContextMajor > 3 || (ac.ContextMajor == 3 && ac.ContextMinor >= 1);
+			} else {
+				int glMaj = Gl.GetInteger(GLEnum.MajorVersion);
+				int glMin = Gl.GetInteger(GLEnum.MinorVersion);
+				ComputeShadersAvailable = glMaj > 3 || (glMaj == 3 && glMin >= 1);
+			}
+			if (ComputeShadersAvailable && !Context.TryGetProcAddress("glDispatchCompute", out _))
+				ComputeShadersAvailable = false;
+		} catch { ComputeShadersAvailable = false; }
+		Trace.TraceInformation($"Compute shaders available: {ComputeShadersAvailable}");
+
 		Gl.Enable(GLEnum.Blend);
 		BlendHelper.SetBlend(BlendType.Normal);
 		CTexture.Init();
@@ -584,7 +672,7 @@ public abstract class Game : IDisposable {
 
 		if (!OperatingSystem.IsMacOS())
 			Gl.Viewport(0, 0, (uint)Window_.Size.X, (uint)Window_.Size.Y);
-		
+
 		Context.SwapInterval(VSync ? 1 : 0);
 
 		Initialize();
@@ -631,22 +719,56 @@ public abstract class Game : IDisposable {
 
 	public void Window_Update(double deltaTime) {
 		double fps = 1.0f / deltaTime;
-		dbTimeMs = Window_.Time * 1000;
-		TimeMs = (long)(Window_.Time * 1000);
+		if (VirtualClockEnabled) {
+			dbTimeMs = VirtualClockMs;
+			TimeMs = (long)VirtualClockMs;
+		} else {
+			dbTimeMs = Window_.Time * 1000;
+			TimeMs = (long)(Window_.Time * 1000);
+		}
+		unsafe {
+			if (SdlWindowing.IsViewSdl(Window_)) {
+				Silk.NET.SDL.Event sdlEvent;
+				while (Silk.NET.SDL.SdlProvider.SDL.Value.PollEvent(&sdlEvent) != 0) {
 
+				}
+			}
+		}
 		Update();
 
 		ImGuiController?.Update((float)deltaTime);
 	}
 
 	public void Window_Render(double deltaTime) {
+		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
 		Camera = Matrix4X4<float>.Identity;
 		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
 
+		/*
 		if (AsyncActions.Count > 0) {
 			AsyncActions[0]?.Invoke();
 			AsyncActions.Remove(AsyncActions[0]);
 		}
+		*/
+
+		// Drain queued main-thread actions (mostly deferred GL texture uploads from background loaders —
+		// boot atlas, song-load game-screen activation). Process a batch within a small time budget so a
+		// large burst uploads quickly instead of trickling out one-per-frame, while still capping the time
+		// spent so the frame rate stays smooth. When the queue is empty (the normal in-game case) the very
+		// first TryDequeue fails and the loop exits immediately — no per-frame cost.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
+					break;
+			}
+		}
+
 		Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 		Draw();

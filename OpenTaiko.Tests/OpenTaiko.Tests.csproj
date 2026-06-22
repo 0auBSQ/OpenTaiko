@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>OpenTaiko.Tests</AssemblyName>
+    <!-- the game project is a WinExe; tests load it as a library -->
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+    <!-- songlist.db cache uses BinaryFormatter; tests exercise its schema-version guard -->
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenTaiko\OpenTaiko.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- data-driven TJA cases: each .json declares the chart + expected values -->
+    <None Include="TjaCases\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

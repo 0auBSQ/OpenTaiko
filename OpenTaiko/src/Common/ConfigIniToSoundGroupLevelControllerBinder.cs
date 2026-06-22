@@ -15,6 +15,7 @@ internal static class ConfigIniToSoundGroupLevelControllerBinder {
 		soundGroupLevelController.SetLevel(ESoundGroup.Voice, configIni.VoiceLevel);
 		soundGroupLevelController.SetLevel(ESoundGroup.SongPreview, configIni.SongPreviewLevel);
 		soundGroupLevelController.SetLevel(ESoundGroup.SongPlayback, configIni.SongPlaybackLevel);
+		soundGroupLevelController.SetLevel(ESoundGroup.Master, configIni.MasterLevel);
 		soundGroupLevelController.SetKeyboardSoundLevelIncrement(configIni.KeyboardSoundLevelIncrement);
 
 		configIni.PropertyChanged += (sender, args) => {
@@ -30,6 +31,9 @@ internal static class ConfigIniToSoundGroupLevelControllerBinder {
 					break;
 				case nameof(CConfigIni.SongPlaybackLevel):
 					soundGroupLevelController.SetLevel(ESoundGroup.SongPlayback, configIni.SongPlaybackLevel);
+					break;
+				case nameof(CConfigIni.MasterLevel):
+					soundGroupLevelController.SetLevel(ESoundGroup.Master, configIni.MasterLevel);
 					break;
 				case nameof(CConfigIni.KeyboardSoundLevelIncrement):
 					soundGroupLevelController.SetKeyboardSoundLevelIncrement(configIni.KeyboardSoundLevelIncrement);
@@ -50,6 +54,9 @@ internal static class ConfigIniToSoundGroupLevelControllerBinder {
 					break;
 				case ESoundGroup.SongPlayback:
 					configIni.SongPlaybackLevel = args.Level;
+					break;
+				case ESoundGroup.Master:
+					configIni.MasterLevel = args.Level;
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();

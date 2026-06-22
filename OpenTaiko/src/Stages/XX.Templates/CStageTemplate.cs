@@ -20,7 +20,7 @@ class CStageTemplate : CStage {
 			return;
 
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.eフェードアウト完了時の戻り値 = EReturnValue.Continuation;
+		this.eFadeOutCompleteWhenReturnValue = EReturnValue.Continuation;
 
 
 
@@ -57,7 +57,7 @@ class CStageTemplate : CStage {
 				if (this.actFOtoTitle.Draw() == 0) {
 					break;
 				}
-				return (int)this.eフェードアウト完了時の戻り値;
+				return (int)this.eFadeOutCompleteWhenReturnValue;
 
 		}
 
@@ -67,7 +67,7 @@ class CStageTemplate : CStage {
 	#region [Private]
 
 
-	public EReturnValue eフェードアウト完了時の戻り値;
+	public EReturnValue eFadeOutCompleteWhenReturnValue;
 	public CActFIFOBlack actFOtoTitle;
 
 	#endregion

@@ -6,8 +6,15 @@ class CSavableT<T> where T : new() {
 		protected set;
 	}
 	public void tDBInitSavable() {
-		if (!File.Exists(_fn))
+		// iOS: the app bundle is read-only, so writes go to the Documents copy (ResolveWritePath). Seed
+		// it once from any existing/bundled file (ResolveAssetPath) so a shipped default isn't lost.
+		string writeFn = OpenTaiko.ResolveWritePath(_fn);
+		if (!File.Exists(writeFn)) {
+			string readFn = OpenTaiko.ResolveAssetPath(_fn);
+			if (readFn != writeFn && File.Exists(readFn))
+				data = ConfigManager.GetConfig<T>(readFn);
 			tSaveFile();
+		}
 
 		tLoadFile();
 	}
@@ -17,11 +24,11 @@ class CSavableT<T> where T : new() {
 	#region [private]
 
 	private void tSaveFile() {
-		ConfigManager.SaveConfig(data, _fn);
+		ConfigManager.SaveConfig(data, OpenTaiko.ResolveWritePath(_fn));
 	}
 
 	private void tLoadFile() {
-		data = ConfigManager.GetConfig<T>(_fn);
+		data = ConfigManager.GetConfig<T>(OpenTaiko.ResolveWritePath(_fn));
 	}
 
 	#endregion

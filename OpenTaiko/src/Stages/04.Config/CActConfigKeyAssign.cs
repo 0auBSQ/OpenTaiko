@@ -6,58 +6,58 @@ namespace OpenTaiko;
 internal class CActConfigKeyAssign : CActivity {
 	// Properties
 
-	public bool bキー入力待ちの最中である {
+	public bool bKeyInputWaitMiddle {
 		get {
-			return this.bキー入力待ち;
+			return this.bKeyInputWait;
 		}
 	}
 
 
 	// メソッド
 
-	public void t開始(EKeyConfigPart part, EKeyConfigPad pad, string strパッド名) {
+	public void tStart(EKeyConfigPart part, EKeyConfigPad pad, string strPadName) {
 		if (part != EKeyConfigPart.Unknown) {
 			this.part = part;
 			this.pad = pad;
-			this.strパッド名 = strパッド名;
+			this.strPadName = strPadName;
 			for (int i = 0; i < 0x10; i++) {
-				this.structReset用KeyAssign[i].InputDevice = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].InputDevice;
-				this.structReset用KeyAssign[i].ID = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].ID;
-				this.structReset用KeyAssign[i].Code = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].Code;
+				this.structResetKeyAssign[i].InputDevice = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].InputDevice;
+				this.structResetKeyAssign[i].ID = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].ID;
+				this.structResetKeyAssign[i].Code = OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad][i].Code;
 			}
 		}
 	}
 
-	public void tEnter押下() {
-		if (!this.bキー入力待ち) {
+	public void tEnterPressed() {
+		if (!this.bKeyInputWait) {
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
-			switch (this.n現在の選択行) {
+			switch (this.nCurrentSelectedLine) {
 				case 0x10:
 					for (int i = 0; i < 0x10; i++) {
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].InputDevice = this.structReset用KeyAssign[i].InputDevice;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].ID = this.structReset用KeyAssign[i].ID;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].Code = this.structReset用KeyAssign[i].Code;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].InputDevice = this.structResetKeyAssign[i].InputDevice;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].ID = this.structResetKeyAssign[i].ID;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][i].Code = this.structResetKeyAssign[i].Code;
 						OpenTaiko.Pad.InvalidateInputToPadCache();
 					}
 					return;
 
 				case 0x11:
-					OpenTaiko.stageConfig.tアサイン完了通知();
+					OpenTaiko.stageConfig.tAssignCompleteNotify();
 					return;
 			}
-			this.bキー入力待ち = true;
+			this.bKeyInputWait = true;
 		}
 	}
-	public void t次に移動() {
-		if (!this.bキー入力待ち) {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在の選択行 = (this.n現在の選択行 + 1) % 0x12;
+	public void tNextMove() {
+		if (!this.bKeyInputWait) {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
+			this.nCurrentSelectedLine = (this.nCurrentSelectedLine + 1) % 0x12;
 		}
 	}
-	public void t前に移動() {
-		if (!this.bキー入力待ち) {
-			OpenTaiko.Skin.soundカーソル移動音.tPlay();
-			this.n現在の選択行 = ((this.n現在の選択行 - 1) + 0x12) % 0x12;
+	public void tPrevMove() {
+		if (!this.bKeyInputWait) {
+			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
+			this.nCurrentSelectedLine = ((this.nCurrentSelectedLine - 1) + 0x12) % 0x12;
 		}
 	}
 
@@ -67,10 +67,10 @@ internal class CActConfigKeyAssign : CActivity {
 	public override void Activate() {
 		this.part = EKeyConfigPart.Unknown;
 		this.pad = EKeyConfigPad.Unknown;
-		this.strパッド名 = "";
-		this.n現在の選択行 = 0;
-		this.bキー入力待ち = false;
-		this.structReset用KeyAssign = new CConfigIni.CKeyAssign.STKEYASSIGN[0x10];
+		this.strPadName = "";
+		this.nCurrentSelectedLine = 0;
+		this.bKeyInputWait = false;
+		this.structResetKeyAssign = new CConfigIni.CKeyAssign.STKEYASSIGN[0x10];
 		base.Activate();
 	}
 	public override void DeActivate() {
@@ -90,34 +90,34 @@ internal class CActConfigKeyAssign : CActivity {
 	}
 	public override int Draw() {
 		if (!base.IsDeActivated) {
-			if (this.bキー入力待ち) {
+			if (this.bKeyInputWait) {
 				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
 					OpenTaiko.Skin.soundCancelSFX.tPlay();
-					this.bキー入力待ち = false;
+					this.bKeyInputWait = false;
 					OpenTaiko.InputManager.Polling();
-				} else if ((this.tキーチェックとアサイン_Keyboard() || this.tキーチェックとアサイン_MidiIn()) || (this.tキーチェックとアサイン_Joypad() || tキーチェックとアサイン_Gamepad() || this.tキーチェックとアサイン_Mouse())) {
+				} else if ((this.tKeyCheckAssign_Keyboard() || this.tKeyCheckAssign_MidiIn()) || (this.tKeyCheckAssign_Joypad() || tKeyCheckAssign_Gamepad() || this.tKeyCheckAssign_Mouse())) {
 					OpenTaiko.Pad.InvalidateInputToPadCache();
-					this.bキー入力待ち = false;
+					this.bKeyInputWait = false;
 					OpenTaiko.InputManager.Polling();
 				}
-			} else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Delete) && (this.n現在の選択行 >= 0)) && (this.n現在の選択行 <= 15)) {
+			} else if ((OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Delete) && (this.nCurrentSelectedLine >= 0)) && (this.nCurrentSelectedLine <= 15)) {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Unknown;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Unknown;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = 0;
 				OpenTaiko.Pad.InvalidateInputToPadCache();
 			}
 			if (OpenTaiko.Tx.Menu_Highlight != null) {
 				int num = OpenTaiko.Skin.Config_KeyAssign_Move;
 				int num2 = OpenTaiko.Skin.Config_KeyAssign_Menu_Highlight[0];
-				int num3 = OpenTaiko.Skin.Config_KeyAssign_Menu_Highlight[1] + (num * (this.n現在の選択行 + 1));
+				int num3 = OpenTaiko.Skin.Config_KeyAssign_Menu_Highlight[1] + (num * (this.nCurrentSelectedLine + 1));
 				//TJAPlayer3.Tx.Menu_Highlight.t2D描画( num2, num3, new Rectangle( 0, 0, 0x10, 0x20 ) );
 				float scale = 0.55f;
 				for (int j = 0; j < 14; j++) {
 					OpenTaiko.Tx.Menu_Highlight.vcScaleRatio.X = scale;
 					OpenTaiko.Tx.Menu_Highlight.vcScaleRatio.Y = scale;
 
-					OpenTaiko.Tx.Menu_Highlight.t2D描画(num2, num3);
+					OpenTaiko.Tx.Menu_Highlight.t2DDraw(num2, num3);
 					num2 += (int)(OpenTaiko.Tx.Menu_Highlight.szTextureSize.Width * scale);
 
 					OpenTaiko.Tx.Menu_Highlight.vcScaleRatio.X = 1;
@@ -128,43 +128,43 @@ internal class CActConfigKeyAssign : CActivity {
 			int num5 = OpenTaiko.Skin.Config_KeyAssign_Move;
 			int x = OpenTaiko.Skin.Config_KeyAssign_Font[0];
 			int y = OpenTaiko.Skin.Config_KeyAssign_Font[1];
-			OpenTaiko.stageConfig.actFont.t文字列描画(x, y, this.strパッド名, false, 0.75f);
+			OpenTaiko.stageConfig.actFont.tStringDraw(x, y, this.strPadName, false, 0.75f);
 			y += num5;
 			CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad];
 			for (int i = 0; i < 0x10; i++) {
 				switch (stkeyassignArray[i].InputDevice) {
 					case InputDeviceType.Keyboard:
-						this.tアサインコードの描画_Keyboard(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.n現在の選択行 == i);
+						this.tAssignCodeDraw_Keyboard(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.nCurrentSelectedLine == i);
 						break;
 
 					case InputDeviceType.MidiIn:
-						this.tアサインコードの描画_MidiIn(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.n現在の選択行 == i);
+						this.tAssignCodeDraw_MidiIn(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.nCurrentSelectedLine == i);
 						break;
 
 					case InputDeviceType.Joystick:
-						this.tアサインコードの描画_Joypad(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.n現在の選択行 == i);
+						this.tAssignCodeDraw_Joypad(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.nCurrentSelectedLine == i);
 						break;
 
 					case InputDeviceType.Gamepad:
-						this.tアサインコードの描画_Gamepad(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.n現在の選択行 == i);
+						this.tAssignCodeDraw_Gamepad(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.nCurrentSelectedLine == i);
 						break;
 
 					case InputDeviceType.Mouse:
-						this.tアサインコードの描画_Mouse(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.n現在の選択行 == i);
+						this.tAssignCodeDraw_Mouse(i + 1, x + num5, y, stkeyassignArray[i].ID, stkeyassignArray[i].Code, this.nCurrentSelectedLine == i);
 						break;
 
 					default:
-						OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, string.Format("{0,2}.", i + 1), this.n現在の選択行 == i, 0.75f);
+						OpenTaiko.stageConfig.actFont.tStringDraw(x + num5, y, string.Format("{0,2}.", i + 1), this.nCurrentSelectedLine == i, 0.75f);
 						break;
 				}
 				y += num5;
 			}
-			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "Reset", this.n現在の選択行 == 0x10, 0.75f);
+			OpenTaiko.stageConfig.actFont.tStringDraw(x + num5, y, "Reset", this.nCurrentSelectedLine == 0x10, 0.75f);
 			y += num5;
-			OpenTaiko.stageConfig.actFont.t文字列描画(x + num5, y, "<< Return to List", this.n現在の選択行 == 0x11, 0.75f);
+			OpenTaiko.stageConfig.actFont.tStringDraw(x + num5, y, "<< Return to List", this.nCurrentSelectedLine == 0x11, 0.75f);
 			y += num5;
-			if (this.bキー入力待ち && (OpenTaiko.Tx.Config_KeyAssign != null)) {
-				OpenTaiko.Tx.Config_KeyAssign.t2D描画(OpenTaiko.Skin.Config_KeyAssign[0], OpenTaiko.Skin.Config_KeyAssign[1]);
+			if (this.bKeyInputWait && (OpenTaiko.Tx.Config_KeyAssign != null)) {
+				OpenTaiko.Tx.Config_KeyAssign.t2DDraw(OpenTaiko.Skin.Config_KeyAssign[0], OpenTaiko.Skin.Config_KeyAssign[1]);
 			}
 		}
 		return 0;
@@ -185,7 +185,7 @@ internal class CActConfigKeyAssign : CActivity {
 		}
 	}
 
-	private bool bキー入力待ち;
+	private bool bKeyInputWait;
 	private STKEYLABEL[] KeyLabel = new STKEYLABEL[] {
 		new STKEYLABEL(0x35, "[ESC]"), new STKEYLABEL(1, "[ 1 ]"), new STKEYLABEL(2, "[ 2 ]"), new STKEYLABEL(3, "[ 3 ]"), new STKEYLABEL(4, "[ 4 ]"), new STKEYLABEL(5, "[ 5 ]"), new STKEYLABEL(6, "[ 6 ]"), new STKEYLABEL(7, "[ 7 ]"), new STKEYLABEL(8, "[ 8 ]"), new STKEYLABEL(9, "[ 9 ]"), new STKEYLABEL(0, "[ 0 ]"), new STKEYLABEL(0x53, "[ - ]"), new STKEYLABEL(0x34, "[ = ]"), new STKEYLABEL(0x2a, "[BSC]"), new STKEYLABEL(0x81, "[TAB]"), new STKEYLABEL(0x1a, "[ Q ]"),
 		new STKEYLABEL(0x20, "[ W ]"), new STKEYLABEL(14, "[ E ]"), new STKEYLABEL(0x1b, "[ R ]"), new STKEYLABEL(0x1d, "[ T ]"), new STKEYLABEL(0x22, "[ Y ]"), new STKEYLABEL(30, "[ U ]"), new STKEYLABEL(0x12, "[ I ]"), new STKEYLABEL(0x18, "[ O ]"), new STKEYLABEL(0x19, "[ P ]"), new STKEYLABEL(0x4a, "[ [ ]"), new STKEYLABEL(0x73, "[ ] ]"), new STKEYLABEL(0x75, "[Enter]"), new STKEYLABEL(0x4b, "[L-Ctrl]"), new STKEYLABEL(10, "[ A ]"), new STKEYLABEL(0x1c, "[ S ]"), new STKEYLABEL(13, "[ D ]"),
@@ -197,21 +197,21 @@ internal class CActConfigKeyAssign : CActivity {
 		new STKEYLABEL(0x69, "[ / ]"), new STKEYLABEL(0x80, "[PrtScn]"), new STKEYLABEL(0x77, "[R-Alt]"), new STKEYLABEL(110, "[Pause]"), new STKEYLABEL(70, "[Home]"), new STKEYLABEL(0x84, "[Up]"), new STKEYLABEL(0x6d, "[PageUp]"), new STKEYLABEL(0x4c, "[Left]"), new STKEYLABEL(0x76, "[Right]"), new STKEYLABEL(0x33, "[End]"), new STKEYLABEL(50, "[Down]"), new STKEYLABEL(0x6c, "[PageDown]"), new STKEYLABEL(0x47, "[Insert]"), new STKEYLABEL(0x31, "[Delete]"), new STKEYLABEL(0x4f, "[L-Win]"), new STKEYLABEL(0x79, "[R-Win]"),
 		new STKEYLABEL(0x27, "[APP]"), new STKEYLABEL(0x71, "[Power]"), new STKEYLABEL(0x7d, "[Sleep]"), new STKEYLABEL(0x87, "[Wake]")
 	};
-	private int n現在の選択行;
+	private int nCurrentSelectedLine;
 	private EKeyConfigPad pad;
 	private EKeyConfigPart part;
-	private CConfigIni.CKeyAssign.STKEYASSIGN[] structReset用KeyAssign;
-	private string strパッド名;
+	private CConfigIni.CKeyAssign.STKEYASSIGN[] structResetKeyAssign;
+	private string strPadName;
 	//private CTexture txHitKeyダイアログ;
 	//private CTexture txカーソル;
 
-	private void tアサインコードの描画_Joypad(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, $"{String.Format("{0,2}", line)}. Joystick #{nID} - {OpenTaiko.InputManager.Joystick(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", b強調, 0.75f);
+	private void tAssignCodeDraw_Joypad(int line, int x, int y, int nID, int nCode, bool bEmphasis) {
+		OpenTaiko.stageConfig.actFont.tStringDraw(x, y, $"{String.Format("{0,2}", line)}. Joystick #{nID} - {OpenTaiko.InputManager.Joystick(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", bEmphasis, 0.75f);
 	}
-	private void tアサインコードの描画_Gamepad(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, $"{String.Format("{0,2}", line)}. Gamepad #{nID} - {OpenTaiko.InputManager.Gamepad(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", b強調, 0.75f);
+	private void tAssignCodeDraw_Gamepad(int line, int x, int y, int nID, int nCode, bool bEmphasis) {
+		OpenTaiko.stageConfig.actFont.tStringDraw(x, y, $"{String.Format("{0,2}", line)}. Gamepad #{nID} - {OpenTaiko.InputManager.Gamepad(nID)?.GetButtonName(nCode) ?? "(Missing Device)"}", bEmphasis, 0.75f);
 	}
-	private void tアサインコードの描画_Keyboard(int line, int x, int y, int nID, int nCode, bool b強調) {
+	private void tAssignCodeDraw_Keyboard(int line, int x, int y, int nID, int nCode, bool bEmphasis) {
 		string str = null;
 		foreach (STKEYLABEL stkeylabel in this.KeyLabel) {
 			if (stkeylabel.nCode == nCode) {
@@ -222,16 +222,16 @@ internal class CActConfigKeyAssign : CActivity {
 		if (str == null) {
 			str = string.Format("{0,2}. Key 0x{1:X2}", line, nCode);
 		}
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, str, b強調, 0.75f);
+		OpenTaiko.stageConfig.actFont.tStringDraw(x, y, str, bEmphasis, 0.75f);
 	}
-	private void tアサインコードの描画_MidiIn(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. MidiIn #{1} {2}", line, nID, CInputMIDI.GetButtonName(nCode)), b強調, 0.75f);
+	private void tAssignCodeDraw_MidiIn(int line, int x, int y, int nID, int nCode, bool bEmphasis) {
+		OpenTaiko.stageConfig.actFont.tStringDraw(x, y, string.Format("{0,2}. MidiIn #{1} {2}", line, nID, CInputMIDI.GetButtonName(nCode)), bEmphasis, 0.75f);
 	}
-	private void tアサインコードの描画_Mouse(int line, int x, int y, int nID, int nCode, bool b強調) {
-		OpenTaiko.stageConfig.actFont.t文字列描画(x, y, string.Format("{0,2}. Mouse Button{1}", line, nCode), b強調, 0.75f);
+	private void tAssignCodeDraw_Mouse(int line, int x, int y, int nID, int nCode, bool bEmphasis) {
+		OpenTaiko.stageConfig.actFont.tStringDraw(x, y, string.Format("{0,2}. Mouse Button{1}", line, nCode), bEmphasis, 0.75f);
 	}
 
-	private bool tキーチェックとアサイン_Gamepad() {
+	private bool tKeyCheckAssign_Gamepad() {
 		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.Gamepad) {
 				for (int i = 0; i < device.ButtonStates.Length; i++)
@@ -239,9 +239,9 @@ internal class CActConfigKeyAssign : CActivity {
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(InputDeviceType.Gamepad, device.ID, i, this.pad);
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Gamepad;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Gamepad;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = device.ID;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = i;
 						return true;
 					}
 				}
@@ -249,7 +249,7 @@ internal class CActConfigKeyAssign : CActivity {
 		}
 		return false;
 	}
-	private bool tキーチェックとアサイン_Joypad() {
+	private bool tKeyCheckAssign_Joypad() {
 		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.Joystick) {
 				for (int i = 0; i < device.ButtonStates.Length; i++)
@@ -257,9 +257,9 @@ internal class CActConfigKeyAssign : CActivity {
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(InputDeviceType.Joystick, device.ID, i, this.pad);
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Joystick;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Joystick;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = device.ID;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = i;
 						return true;
 					}
 				}
@@ -267,7 +267,7 @@ internal class CActConfigKeyAssign : CActivity {
 		}
 		return false;
 	}
-	private bool tキーチェックとアサイン_Keyboard() {
+	private bool tKeyCheckAssign_Keyboard() {
 		for (int i = 0; i < 144; i++) {
 			//if (i != (int)SlimDXKeys.Key.Escape &&
 			//	i != (int)SlimDXKeys.Key.Return &&
@@ -283,31 +283,31 @@ internal class CActConfigKeyAssign : CActivity {
 				OpenTaiko.Skin.soundDecideSFX.tPlay();
 				if (pad < EKeyConfigPad.Capture)
 					OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(InputDeviceType.Keyboard, 0, i, this.pad);
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Keyboard;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Keyboard;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = i;
 				return true;
 			} else if (i == (int)SlimDXKeys.Key.Return && OpenTaiko.InputManager.Keyboard.KeyPressed(i)) // Remove keybind
 			{
 				OpenTaiko.Skin.soundCancelSFX.tPlay();
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Unknown;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Unknown;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = 0;
 				return true;
 			}
 		}
 		return false;
 	}
-	private bool tキーチェックとアサイン_MidiIn() {
+	private bool tKeyCheckAssign_MidiIn() {
 		foreach (CInputButtonsBase device in OpenTaiko.InputManager.InputDevices) {
 			if (device.CurrentType == InputDeviceType.MidiIn) {
 				for (int i = 0; i < device.ButtonStates.Length; i++) {
 					if (device.KeyPressed(i)) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(InputDeviceType.MidiIn, device.ID, i, this.pad);
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.MidiIn;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = device.ID;
-						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.MidiIn;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = device.ID;
+						OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = i;
 						return true;
 					}
 				}
@@ -315,13 +315,13 @@ internal class CActConfigKeyAssign : CActivity {
 		}
 		return false;
 	}
-	private bool tキーチェックとアサイン_Mouse() {
+	private bool tKeyCheckAssign_Mouse() {
 		for (int i = 0; i < 8; i++) {
 			if (OpenTaiko.InputManager.Mouse.KeyPressed(i)) {
 				OpenTaiko.ConfigIni.RemoveDuplicateKeyAssignments(InputDeviceType.Mouse, 0, i, this.pad);
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].InputDevice = InputDeviceType.Mouse;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].ID = 0;
-				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.n現在の選択行].Code = i;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].InputDevice = InputDeviceType.Mouse;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].ID = 0;
+				OpenTaiko.ConfigIni.KeyAssign[(int)this.part][(int)this.pad][this.nCurrentSelectedLine].Code = i;
 			}
 		}
 		return false;

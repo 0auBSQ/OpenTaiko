@@ -51,7 +51,7 @@ public class CPad {
 	}
 
 	// Methods
-	public List<(EPad pad, STInputEvent inputEvent, int order)> GetEvents(EInstrumentPad part) {
+	public List<(EPad pad, STInputEvent inputEvent, int order)> GetEvents(EKeyConfigPart part) {
 		var stkeyassignArray = this.rConfigIni.KeyAssign[(int)part];
 		List<(EPad pad, STInputEvent inputEvent, int order)> list = new();
 		// すべての入力デバイスについて…
@@ -73,8 +73,8 @@ public class CPad {
 		return list;
 	}
 
-	public bool HasInput(EInstrumentPad part, EPad pad, Func<IInputDevice?, int, bool> predicate) {
-		if (part == EInstrumentPad.Unknown) {
+	public bool HasInput(EKeyConfigPart part, EPad pad, Func<IInputDevice?, int, bool> predicate) {
+		if (part == EKeyConfigPart.Unknown) {
 			return false;
 		}
 
@@ -86,26 +86,16 @@ public class CPad {
 		return false;
 	}
 
-	public bool bPressed(EInstrumentPad part, EPad pad)
+	public bool bPressed(EKeyConfigPart part, EPad pad)
 		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressed(keyCode) ?? false);
 
-	public bool bPressedDGB(EPad pad) {
-		if (!this.bPressed(EInstrumentPad.Drums, pad) && !this.bPressed(EInstrumentPad.Guitar, pad)) {
-			return this.bPressed(EInstrumentPad.Bass, pad);
-		}
-		return true;
-	}
+	public bool bPressed(EKeyConfigPart part, EKeyConfigPad pad) => bPressed(part, (EPad)pad);
 
-	public bool bPressedGB(EPad pad) {
-		return this.bPressed(EInstrumentPad.Guitar, pad) || this.bPressed(EInstrumentPad.Bass, pad);
-	}
-
-	public bool IsPressing(EInstrumentPad part, EPad pad)
+	public bool IsPressing(EKeyConfigPart part, EPad pad)
 		=> HasInput(part, pad, (device, keyCode) => device?.KeyPressing(keyCode) ?? false);
 
-	public bool IsPressingGB(EPad pad) {
-		return this.IsPressing(EInstrumentPad.Guitar, pad) || this.IsPressing(EInstrumentPad.Bass, pad);
-	}
+	public bool IsPressing(EKeyConfigPart part, EKeyConfigPad pad) => IsPressing(part, (EPad)pad);
+
 	public void InvalidateInputToPadCache() => inputToPadCacheValid = false;
 
 	public bool IsUsedByPlayer(InputDeviceType device, int id, int key, int iPlayer) {
@@ -115,6 +105,102 @@ public class CPad {
 
 	internal bool IsUsedByPlayer(ref CConfigIni.CKeyAssign.STKEYASSIGN keyAssign, int iPlayer)
 		=> IsUsedByPlayer(keyAssign.InputDevice, keyAssign.ID, keyAssign.Code, iPlayer);
+
+	public bool IsReleasing(EKeyConfigPart part, EPad pad) { return IsReleasing(part, (EKeyConfigPad)pad); }
+	public bool IsReleasing(EKeyConfigPart part, EKeyConfigPad pad) {
+		if (part == EKeyConfigPart.Unknown) {
+			return false;
+		}
+
+		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+		for (int i = 0; i < stkeyassignArray.Length; i++) {
+			switch (stkeyassignArray[i].InputDevice) {
+				case InputDeviceType.Keyboard:
+					if (!this.inputManager.Keyboard.KeyReleasing(stkeyassignArray[i].Code)) {
+						return false;
+					}
+					break;
+
+				case InputDeviceType.Joystick: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) break;
+						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (!device.KeyReleasing(stkeyassignArray[i].Code))
+						return false;
+
+						break;
+					}
+
+				case InputDeviceType.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
+							break;
+						}
+						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (!device.KeyReleasing(stkeyassignArray[i].Code))
+							return false;
+
+						break;
+					}
+				case InputDeviceType.Mouse:
+					if (!this.inputManager.Mouse.KeyReleasing(stkeyassignArray[i].Code)) {
+						return false;
+					}
+					break;
+			}
+		}
+		return true;
+	}
+
+	public bool IsReleased(EKeyConfigPart part, EPad pad) { return IsReleased(part, (EKeyConfigPad)pad); }
+	public bool IsReleased(EKeyConfigPart part, EKeyConfigPad pad) {
+		if (part == EKeyConfigPart.Unknown) {
+			return false;
+		}
+
+		CConfigIni.CKeyAssign.STKEYASSIGN[] stkeyassignArray = this.rConfigIni.KeyAssign[(int)part][(int)pad];
+		for (int i = 0; i < stkeyassignArray.Length; i++) {
+			switch (stkeyassignArray[i].InputDevice) {
+				case InputDeviceType.Keyboard:
+					if (this.inputManager.Keyboard.KeyReleased(stkeyassignArray[i].Code))
+						return true;
+					break;
+
+				case InputDeviceType.MidiIn: {
+						IInputDevice device2 = this.inputManager.MidiIn(stkeyassignArray[i].ID);
+						if (device2 == null) break;
+						if (device2.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case InputDeviceType.Joystick: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.inputManager.Joystick(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (device.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case InputDeviceType.Gamepad: {
+						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+							break;
+
+						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
+						if (device == null) break;
+						if (device.KeyReleased(stkeyassignArray[i].Code))
+							return true;
+						break;
+					}
+				case InputDeviceType.Mouse:
+					if (this.inputManager.Mouse.KeyReleased(stkeyassignArray[i].Code))
+						return true;
+					break;
+			}
+		}
+		return false;
+	}
 
 	#region [ private ]
 	//-----------------
@@ -135,7 +221,9 @@ public class CPad {
 
 	private void RebuildInputToPadCache() {
 		this.inputToPadCache.Clear();
-		for (EInstrumentPad part = 0; part < EInstrumentPad.Total; ++part) {
+		// Only the gameplay parts feed this cache — System keys (Capture, volume, …) must never map to
+		// a gameplay pad. EKeyConfigPart.System is the first non-gameplay part, so it is the exclusive bound.
+		for (EKeyConfigPart part = 0; part < EKeyConfigPart.System; ++part) {
 			for (EPad pad = 0; pad < EPad.Max; ++pad) {
 				var keyAssigns = this.rConfigIni.KeyAssign[(int)part][(int)pad];
 				for (int i = 0; i < keyAssigns.Length; ++i) {

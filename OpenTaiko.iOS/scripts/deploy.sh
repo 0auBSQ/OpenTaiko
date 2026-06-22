@@ -374,7 +374,9 @@ do_device() {
     fi
   else
     if [[ -z "$DEVICE" ]]; then
-      DEVICE=$(xcrun devicectl list devices 2>/dev/null | { grep -E '(available|connected).*paired|connected' || true; } | awk '{for(i=1;i<=NF;i++) if($i ~ /^[A-F0-9]{8}-/) print $i}' | head -1)
+      # devicectl auto-detect grabs the WiFi transport first (install times out); honor a wired-id override.
+      [ -f /tmp/opentaiko-wired-device ] && DEVICE=$(cat /tmp/opentaiko-wired-device)
+      [ -z "$DEVICE" ] && DEVICE=$(xcrun devicectl list devices 2>/dev/null | { grep -E '(available|connected).*paired|connected' || true; } | awk '{for(i=1;i<=NF;i++) if($i ~ /^[A-F0-9]{8}-/) print $i}' | head -1)
       if [[ -z "$DEVICE" ]]; then
         echo "No device found via devicectl. Use --imobile for libimobiledevice."
         echo ""; echo "Available devices:"; xcrun devicectl list devices 2>&1

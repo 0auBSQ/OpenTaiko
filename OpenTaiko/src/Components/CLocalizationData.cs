@@ -3,13 +3,15 @@
 namespace OpenTaiko;
 
 [Serializable]
-internal class CLocalizationData {
+public class CLocalizationData {
 	[JsonProperty("strings")]
 	private Dictionary<string, string> Strings = new Dictionary<string, string>();
 
 	public CLocalizationData() {
 		Strings = new Dictionary<string, string>();
 	}
+
+	public CLocalizationData(Dictionary<string, string> strings) { Strings = strings; }
 
 	public string[] GetAllStrings() {
 		return Strings.Values.ToArray();

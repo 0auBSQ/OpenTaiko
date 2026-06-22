@@ -42,6 +42,11 @@ function playEndAnime(player)
 end
 
 function init()
+    animeTimer = 0
+    scrollRiseTransition = 0
+    scrollSlideTransition = 0
+    scrollRisePos = 0
+    scrollSlidePos = 0
     func:AddGraph("Scroll.png")
     func:AddGraph("Scroll_Back.png")
     func:AddGraph("Scroll_Back_Overlay.png")

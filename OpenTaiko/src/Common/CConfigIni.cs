@@ -31,6 +31,11 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private const int MaximumKeyboardSoundLevelIncrement = 20;
 	private const int DefaultKeyboardSoundLevelIncrement = 5;
 
+	public static readonly int MinimumSongSpeed = 2;
+	public static readonly int MaximumSongSpeed = 200;
+	public static readonly int MinimumScrollSpeed = 0;
+	public static readonly int MaximumScrollSpeed = 99;
+
 	// Class
 
 	#region [ CKeyAssign ]
@@ -110,8 +115,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 			public STKEYASSIGN[] QuickConfig => pads[(int)EKeyConfigPad.QuickConfig];
 
-			public STKEYASSIGN[] NewHeya => pads[(int)EKeyConfigPad.NewHeya];
-
 			public STKEYASSIGN[] SortSongs => pads[(int)EKeyConfigPad.SortSongs];
 
 			public STKEYASSIGN[] ToggleAutoP1 => pads[(int)EKeyConfigPad.ToggleAutoP1];
@@ -157,9 +160,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		private readonly CKeyAssignPad[] padSets = Enumerable.Range(0, (int)EKeyConfigPart.Total).Select(i => new CKeyAssignPad()).ToArray();
 		public CKeyAssignPad this[int index] { get => padSets[index]; internal set => padSets[index] = value; }
-		public CKeyAssignPad Bass => padSets[(int)EKeyConfigPart.Bass];
-		public CKeyAssignPad Drums => padSets[(int)EKeyConfigPart.Drums];
-		public CKeyAssignPad Guitar => padSets[(int)EKeyConfigPart.Guitar];
 		public CKeyAssignPad Taiko => padSets[(int)EKeyConfigPart.Taiko];
 		public CKeyAssignPad System => padSets[(int)EKeyConfigPart.System];
 	}
@@ -211,7 +211,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bOutputDetailedDTXLog;
 	public bool bOutputSongSearchLog;
 	public bool bOutputCreationReleaseLog;
-	public STDGBVALUE<bool> bReverse;
+	public bool bReverse;
 
 	public bool bDanTowerHide;
 
@@ -269,6 +269,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 		set => SetProperty(ref _applySongVol, value, nameof(ApplySongVol));
 	}
 
+	private int _masterLevel;
+
+	public int MasterLevel {
+		get => _masterLevel;
+		set => SetProperty(ref _masterLevel, value, nameof(MasterLevel));
+	}
+
 	private int _soundEffectLevel;
 
 	public int SoundEffectLevel {
@@ -307,7 +314,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			nameof(KeyboardSoundLevelIncrement));
 	}
 
-	public STDGBVALUE<int> nMinDisplayedCombo;
+	public int nMinDisplayedCombo;
 	public int[] nScrollSpeed;
 	public int[] nTimingZones;
 	public EGameType[] nGameType;
@@ -335,7 +342,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool[] bAutoPlay = new bool[5];
 
-	public bool bAuto先生の連打;
+	public bool bAutoSenseiRoll;
 	public int nRollsPerSec;
 	public int nDefaultAILevel = 4;
 	public int nAILevel = 4;
@@ -395,7 +402,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public EStealthMode[] eSTEALTH;
 	public bool bNoInfo;
 
-	public int nDefaultSongSort;
 	public int nRecentlyPlayedMax;
 	public EGame eGameMode;
 	public int TokkunSkipMeasures;
@@ -418,7 +424,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public bool bEndingAnime = false; // 2017.01.27 DD 「また遊んでね」画面の有効/無効オプション追加
 
-	public STDGBVALUE<EJudgeTextDisplayPosition> JudgeTextDisplayPosition;
+	public EJudgeTextDisplayPosition JudgeTextDisplayPosition;
 	public int nInputAdjustTimeMs;
 	public int nGlobalOffsetMs;
 	public bool bIsAutoResultCapture; // #25399 2011.6.9 yyagi リザルト画像自動保存機能のON/OFF制御
@@ -489,14 +495,14 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bUseOSTimer; // #33689 2014.6.6 yyagi 演奏タイマーの種類
 	public bool bDynamicBassMixerManagement; // #24820
 	public bool bTimeStretch; // #23664 2013.2.24 yyagi ピッチ変更無しで再生速度を変更するかどうか
-	public STDGBVALUE<EInvisible> eInvisible; // #32072 2013.9.20 yyagi チップを非表示にする
+	public EInvisible eInvisible; // #32072 2013.9.20 yyagi チップを非表示にする
 	public int nDisplayTimesMs, nFadeoutTimeMs;
 
-	public STDGBVALUE<int> nViewerScrollSpeed;
+	public int nViewerScrollSpeed;
 	public bool bViewerVSyncWait;
 	public bool bViewerShowDebugStatus;
 	public bool bViewerTimeStretch;
-	public bool bViewerDrums有効, bViewerGuitar有効;
+	public bool bViewerDrumsEnabled, bViewerGuitarEnabled;
 	public int nMasterVolume;
 	public bool ShinuchiMode; // 真打モード
 	public bool FastRender; // 事前画像描画モード
@@ -770,8 +776,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.bDanTowerHide = false;
 
 		this.bIncludeSubfoldersOnRandomSelect = true;
-		this.nMinDisplayedCombo = new STDGBVALUE<int>();
-		this.nMinDisplayedCombo.Drums = 10;
+		this.nMinDisplayedCombo = 10;
 		this.nRollsPerSec = 15;
 		this.nAILevel = 1;
 		this.bAIBattleMode = false;
@@ -801,15 +806,14 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.TargetLoudness = -7.4;
 
 		this.ApplySongVol = false;
+		this.MasterLevel = CSound.DefaultMasterLevel;
 		this.SoundEffectLevel = CSound.DefaultSoundEffectLevel;
 		this.VoiceLevel = CSound.DefaultVoiceLevel;
 		this.SongPreviewLevel = CSound.DefaultSongPreviewLevel;
 		this.SongPlaybackLevel = CSound.DefaultSongPlaybackLevel;
 		this.KeyboardSoundLevelIncrement = DefaultKeyboardSoundLevelIncrement;
 		this.bOutputLogs = true;
-		this.bReverse = new STDGBVALUE<bool>();
 		this.eRandom = new ERandomMode[5];
-		this.JudgeTextDisplayPosition = new STDGBVALUE<EJudgeTextDisplayPosition>();
 		this.nScrollSpeed = new int[5] { 9, 9, 9, 9, 9 };
 		this.nTimingZones = new int[5] { 2, 2, 2, 2, 2 };
 		this.nGameType = new EGameType[5] {
@@ -819,10 +823,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 			new EFunMods[5] { EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None, EFunMods.None };
 		this.nInputAdjustTimeMs = 0;
 		this.nGlobalOffsetMs = 0;
-		for (int i = 0; i < 3; i++) {
-			this.bReverse[i] = false;
-			this.JudgeTextDisplayPosition[i] = EJudgeTextDisplayPosition.AboveLane;
-		}
+		this.bReverse = false;
+		this.JudgeTextDisplayPosition = EJudgeTextDisplayPosition.AboveLane;
 
 
 		for (int i = 0; i < 5; i++) {
@@ -840,7 +842,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			this.bAutoPlay[i] = false;
 		}
 
-		this.bAuto先生の連打 = true;
+		this.bAutoSenseiRoll = true;
 
 		#endregion
 
@@ -923,8 +925,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		bViewerVSyncWait = true;
 		bViewerShowDebugStatus = true;
 		bViewerTimeStretch = false;
-		bViewerDrums有効 = true;
-		bViewerGuitar有効 = true;
+		bViewerDrumsEnabled = true;
+		bViewerGuitarEnabled = true;
 
 
 		this.bBranchGuide = false;
@@ -957,7 +959,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		//this.bNoMP3Streaming = false;
 		this.nMasterVolume = 100; // #33700 2014.4.26 yyagi マスターボリュームの設定(WASAPI/ASIO用)
 		this.bHispeedRandom = false;
-		this.nDefaultSongSort = 2;
 		this.nRecentlyPlayedMax = 5;
 		this.eGameMode = EGame.Off;
 		this.TokkunMashInterval = 750;
@@ -988,9 +989,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		#endregion
 	}
 
-	public CConfigIni(string iniファイル名)
+	public CConfigIni(string iniFileName)
 		: this() {
-		this.LoadFromFile(iniファイル名);
+		this.LoadFromFile(iniFileName);
 	}
 
 
@@ -1021,8 +1022,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		}
 	}
 
-	public void t書き出し(string iniファイル名) {
-		StreamWriter sw = new StreamWriter(iniファイル名, false, Encoding.GetEncoding(OpenTaiko.sEncType));
+	public void tExport(string iniFileName) {
+		StreamWriter sw = new StreamWriter(iniFileName, false, Encoding.GetEncoding(OpenTaiko.sEncType));
 		sw.WriteLine(";-------------------");
 
 		#region [ System ]
@@ -1054,12 +1055,12 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		#region [ Skinパスの絶対パス→相対パス変換 ]
 
-		Uri uriRoot = new Uri(System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
+		Uri uriRoot = new Uri(System.IO.Path.Combine(OpenTaiko.strEXEFolder,
 			"System" + System.IO.Path.DirectorySeparatorChar));
 		if (strSystemSkinSubfolderFullName != null && strSystemSkinSubfolderFullName.Length == 0) {
 			// Config.iniが空の状態でDTXManiaをViewerとして起動_終了すると、strSystemSkinSubfolderFullName が空の状態でここに来る。
 			// → 初期値として Default/ を設定する。
-			strSystemSkinSubfolderFullName = OpenTaiko.ResolveAssetPath(System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
+			strSystemSkinSubfolderFullName = OpenTaiko.ResolveAssetPath(System.IO.Path.Combine(OpenTaiko.strEXEFolder,
 				"System" + System.IO.Path.DirectorySeparatorChar + "Default" +
 				System.IO.Path.DirectorySeparatorChar));
 		}
@@ -1310,7 +1311,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("DanTowerHide={0}", this.bDanTowerHide ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; 最小表示コンボ数");
-		sw.WriteLine("MinComboDrums={0}", this.nMinDisplayedCombo.Drums);
+		sw.WriteLine("MinComboDrums={0}", this.nMinDisplayedCombo);
 		sw.WriteLine();
 		sw.WriteLine("; RANDOM SELECT で子BOXを検索対象に含める (0:OFF, 1:ON)");
 		sw.WriteLine("RandomFromSubBox={0}", this.bIncludeSubfoldersOnRandomSelect ? 1 : 0);
@@ -1331,6 +1332,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; .tjaファイルのSONGVOLヘッダを音源の音量に適用する (0:OFF, 1:ON)");
 		sw.WriteLine("; Apply SONGVOL (0:OFF, 1:ON)");
 		sw.WriteLine("{0}={1}", nameof(ApplySongVol), this.ApplySongVol ? 1 : 0);
+		sw.WriteLine();
+		sw.WriteLine($"; Master volume level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
+		sw.WriteLine("{0}={1}", nameof(MasterLevel), MasterLevel);
 		sw.WriteLine();
 		sw.WriteLine($"; 効果音の音量 ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
 		sw.WriteLine($"; Sound effect level ({CSound.MinimumGroupLevel}-{CSound.MaximumGroupLevel}%)");
@@ -1433,7 +1437,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("Taiko3P={0}", this.bAutoPlay[2] ? 1 : 0);
 		sw.WriteLine("Taiko4P={0}", this.bAutoPlay[3] ? 1 : 0);
 		sw.WriteLine("Taiko5P={0}", this.bAutoPlay[4] ? 1 : 0);
-		sw.WriteLine("TaikoAutoRoll={0}", this.bAuto先生の連打 ? 1 : 0);
+		sw.WriteLine("TaikoAutoRoll={0}", this.bAutoSenseiRoll ? 1 : 0);
 		sw.WriteLine("RollsPerSec={0}", this.nRollsPerSec);
 		sw.WriteLine("DefaultAILevel={0}", this.nDefaultAILevel);
 		sw.WriteLine();
@@ -1484,7 +1488,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("EnableCountDownTimer={0}", this.bEnableCountdownTimer ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; ドラムREVERSEモード(0:OFF, 1:ON)");
-		sw.WriteLine("DrumsReverse={0}", this.bReverse.Drums ? 1 : 0);
+		sw.WriteLine("DrumsReverse={0}", this.bReverse ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; RISKYモード(0:OFF, 1-10)"); // #23559 2011.6.23 yyagi
 		sw.WriteLine("; RISKY mode. 0=OFF, 1-10 is the times of misses to be Failed."); //
@@ -1516,7 +1520,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("Gametype5P={0}", (int)this.nGameType[4]);
 		sw.WriteLine();
 		sw.WriteLine(
-			"; Fun Mods (0 : None, 1 : Avalanche (random scroll speed per note/chip), 2 : Minesweeper (replace randomly notes by bombs))");
+			"; Fun Mods (0 : None, 1 : Avalanche (random scroll speed per note/chip), 2 : Minesweeper (replace randomly notes by bombs), 3 : Dynamic Beat (song speed adapts to performance, shared among all players))");
 		sw.WriteLine("FunMods1P={0}", (int)this.nFunMods[0]);
 		sw.WriteLine("FunMods2P={0}", (int)this.nFunMods[1]);
 		sw.WriteLine("FunMods3P={0}", (int)this.nFunMods[2]);
@@ -1558,9 +1562,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; 譜面分岐のアニメーション(0:7～14, 1:15)");
 		sw.WriteLine("BranchAnime={0}", this.nBranchAnime);
 		sw.WriteLine();
-		sw.WriteLine("; デフォルトの曲ソート(0:絶対パス順, 1:ジャンル名ソートOLD, 2:ジャンル名ソートNEW )");
-		sw.WriteLine("0:Path, 1:GenreName(AC8～AC14), 2GenreName(AC15～)");
-		sw.WriteLine("DefaultSongSort={0}", this.nDefaultSongSort);
 		sw.WriteLine("RecentlyPlayedMax={0}", this.nRecentlyPlayedMax);
 		sw.WriteLine();
 		sw.WriteLine(
@@ -1664,97 +1665,97 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine();
 
 		sw.Write("LeftRed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed);
 		sw.WriteLine();
 		sw.Write("RightRed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed);
 		sw.WriteLine();
 		sw.Write("LeftBlue="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed2P);
 		sw.WriteLine();
 		sw.Write("RightRed2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed2P);
 		sw.WriteLine();
 		sw.Write("LeftBlue2P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue2P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue2P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue2P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue2P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue2P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed3P);
 		sw.WriteLine();
 		sw.Write("RightRed3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed3P);
 		sw.WriteLine();
 		sw.Write("LeftBlue3P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue3P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue3P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue3P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue3P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue3P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed4P);
 		sw.WriteLine();
 		sw.Write("RightRed4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed4P);
 		sw.WriteLine();
 		sw.Write("LeftBlue4P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue4P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue4P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue4P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue4P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue4P); //
 		sw.WriteLine();
 
 		sw.Write("LeftRed5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftRed5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftRed5P);
 		sw.WriteLine();
 		sw.Write("RightRed5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightRed5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightRed5P);
 		sw.WriteLine();
 		sw.Write("LeftBlue5P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftBlue5P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftBlue5P); //
 		sw.WriteLine(); //
 		sw.Write("RightBlue5P="); // #27029 2012.1.4 from
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightBlue5P); //
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightBlue5P); //
 		sw.WriteLine();
 
 		sw.Write("Clap=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap);
 		sw.WriteLine();
 		sw.Write("Clap2P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap2P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap2P);
 		sw.WriteLine();
 		sw.Write("Clap3P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap3P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap3P);
 		sw.WriteLine();
 		sw.Write("Clap4P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap4P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap4P);
 		sw.WriteLine();
 		sw.Write("Clap5P=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Clap5P);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Clap5P);
 		sw.WriteLine();
 
 		sw.Write("Decide=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Decide);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Decide);
 		sw.WriteLine();
 		sw.Write("Cancel=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.Cancel);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.Cancel);
 		sw.WriteLine();
 		sw.Write("LeftChange=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.LeftChange);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.LeftChange);
 		sw.WriteLine();
 		sw.Write("RightChange=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.RightChange);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.RightChange);
 		sw.WriteLine();
 
 		sw.WriteLine();
@@ -1783,9 +1784,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.Write("QuickConfig=");
 		this.WriteKeyAssignment(sw, this.KeyAssign.System.QuickConfig);
 		sw.WriteLine();
-		sw.Write("NewHeya=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.System.NewHeya);
-		sw.WriteLine();
+
 		sw.Write("SortSongs=");
 		this.WriteKeyAssignment(sw, this.KeyAssign.System.SortSongs);
 		sw.WriteLine();
@@ -1810,52 +1809,52 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("[TrainingKeyAssign]");
 		sw.WriteLine();
 		sw.Write("TrainingIncreaseScrollSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingIncreaseScrollSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingDecreaseScrollSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingDecreaseScrollSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingIncreaseSongSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingIncreaseSongSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingDecreaseSongSpeed=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingDecreaseSongSpeed);
 		sw.WriteLine();
 		sw.Write("TrainingToggleAuto=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingToggleAuto);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingToggleAuto);
 		sw.WriteLine();
 		sw.Write("TrainingBranchNormal=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchNormal);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchNormal);
 		sw.WriteLine();
 		sw.Write("TrainingBranchExpert=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchExpert);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchExpert);
 		sw.WriteLine();
 		sw.Write("TrainingBranchMaster=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBranchMaster);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBranchMaster);
 		sw.WriteLine();
 		sw.Write("TrainingPause=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingPause);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingPause);
 		sw.WriteLine();
 		sw.Write("TrainingBookmark=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingBookmark);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingBookmark);
 		sw.WriteLine();
 		sw.Write("TrainingMoveForwardMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingMoveForwardMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingMoveBackMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingMoveBackMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingSkipForwardMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingSkipForwardMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingSkipBackMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingSkipBackMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingJumpToFirstMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingJumpToFirstMeasure);
 		sw.WriteLine();
 		sw.Write("TrainingJumpToLastMeasure=");
-		this.WriteKeyAssignment(sw, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+		this.WriteKeyAssignment(sw, this.KeyAssign.Taiko.TrainingJumpToLastMeasure);
 		sw.WriteLine();
 		sw.WriteLine();
 
@@ -1973,7 +1972,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "SkinPath": {
 					string absSkinPath = value;
 					if (!System.IO.Path.IsPathRooted(value)) {
-						absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ, "System");
+						absSkinPath = System.IO.Path.Combine(OpenTaiko.strEXEFolder, "System");
 						absSkinPath = System.IO.Path.Combine(absSkinPath, value);
 						Uri u = new Uri(absSkinPath);
 						absSkinPath = u.AbsolutePath.ToString(); // str4内に相対パスがある場合に備える
@@ -2111,8 +2110,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bIncludeSubfoldersOnRandomSelect = CConversion.bONorOFF(value[0]);
 				break;
 			case "MinComboDrums":
-				this.nMinDisplayedCombo.Drums =
-					CConversion.ParseIntInRange(value, 1, 0x1869f, this.nMinDisplayedCombo.Drums);
+				this.nMinDisplayedCombo =
+					CConversion.ParseIntInRange(value, 1, 0x1869f, this.nMinDisplayedCombo);
 				break;
 			case "ShowDebugStatus":
 				this.bDisplayDebugInfo = CConversion.bONorOFF(value[0]);
@@ -2126,6 +2125,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case nameof(this.ApplySongVol):
 				this.ApplySongVol = CConversion.bONorOFF(value[0]);
+				break;
+			case nameof(this.MasterLevel):
+				this.MasterLevel = CConversion.ParseIntInRange(value, CSound.MinimumGroupLevel,
+					CSound.MaximumGroupLevel, this.MasterLevel);
 				break;
 			case nameof(this.SoundEffectLevel):
 				this.SoundEffectLevel = CConversion.ParseIntInRange(value, CSound.MinimumGroupLevel,
@@ -2239,7 +2242,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bAutoPlay[4] = CConversion.bONorOFF(value[0]);
 				break;
 			case "TaikoAutoRoll":
-				this.bAuto先生の連打 = CConversion.bONorOFF(value[0]);
+				this.bAutoSenseiRoll = CConversion.bONorOFF(value[0]);
 				break;
 			case "RollsPerSec":
 				this.nRollsPerSec = int.Parse(value);
@@ -2313,33 +2316,33 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bEnableCountdownTimer = CConversion.bONorOFF(value[0]);
 				break;
 			case "DrumsReverse":
-				this.bReverse.Drums = CConversion.bONorOFF(value[0]);
+				this.bReverse = CConversion.bONorOFF(value[0]);
 				break;
 			case "DrumsPosition":
-				this.JudgeTextDisplayPosition.Drums =
+				this.JudgeTextDisplayPosition =
 					(EJudgeTextDisplayPosition)CConversion.ParseIntInRange(value, 0, 2,
-						(int)this.JudgeTextDisplayPosition.Drums);
+						(int)this.JudgeTextDisplayPosition);
 				break;
 			case "DrumsScrollSpeed":
 			case "DrumsScrollSpeed1P":
 				this.nScrollSpeed[0] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[0]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[0]);
 				break;
 			case "DrumsScrollSpeed2P":
 				this.nScrollSpeed[1] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[1]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[1]);
 				break;
 			case "DrumsScrollSpeed3P":
 				this.nScrollSpeed[2] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[2]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[2]);
 				break;
 			case "DrumsScrollSpeed4P":
 				this.nScrollSpeed[3] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[3]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[3]);
 				break;
 			case "DrumsScrollSpeed5P":
 				this.nScrollSpeed[4] =
-					CConversion.ParseIntInRange(value, 0, 0x7cf, this.nScrollSpeed[4]);
+					CConversion.ParseIntInRange(value, MinimumScrollSpeed, MaximumScrollSpeed, this.nScrollSpeed[4]);
 				break;
 			case "TimingZones1P":
 				this.nTimingZones[0] =
@@ -2481,7 +2484,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "PlaySpeed":
 				this.nSongSpeed =
-					CConversion.ParseIntInRange(value, 5, 400, this.nSongSpeed);
+					CConversion.ParseIntInRange(value, MinimumSongSpeed, MaximumSongSpeed, this.nSongSpeed);
 				break;
 			case "PlaySpeedNotEqualOneNoSound":
 				this.bNoAudioIfNot1xSpeed = CConversion.bONorOFF(value[0]);
@@ -2521,10 +2524,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "NoInfo":
 				this.bNoInfo = CConversion.bONorOFF(value[0]);
-				break;
-			case "DefaultSongSort":
-				this.nDefaultSongSort =
-					CConversion.ParseIntInRange(value, 0, 2, this.nDefaultSongSort);
 				break;
 			case "RecentlyPlayedMax":
 				this.nRecentlyPlayedMax =
@@ -2570,10 +2569,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.bViewerTimeStretch = CConversion.bONorOFF(value[0]);
 				break;
 			case "ViewerGuitar":
-				this.bViewerGuitar有効 = CConversion.bONorOFF(value[0]);
+				this.bViewerGuitarEnabled = CConversion.bONorOFF(value[0]);
 				break;
 			case "ViewerDrums":
-				this.bViewerDrums有効 = CConversion.bONorOFF(value[0]);
+				this.bViewerDrumsEnabled = CConversion.bONorOFF(value[0]);
 				break;
 		}
 	}
@@ -2594,91 +2593,91 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void ProcessDrumKeyAssignmentSection(string key, string value) {
 		switch (key) {
 			case "LeftRed":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed);
 				break;
 			case "RightRed":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed);
 				break;
 			case "LeftBlue":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue);
 				break;
 			case "RightBlue":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue);
 				break;
 			case "LeftRed2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed2P);
 				break;
 			case "RightRed2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed2P);
 				break;
 			case "LeftBlue2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue2P);
 				break;
 			case "RightBlue2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue2P);
 				break;
 			case "LeftRed3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed3P);
 				break;
 			case "RightRed3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed3P);
 				break;
 			case "LeftBlue3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue3P);
 				break;
 			case "RightBlue3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue3P);
 				break;
 			case "LeftRed4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed4P);
 				break;
 			case "RightRed4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed4P);
 				break;
 			case "LeftBlue4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue4P);
 				break;
 			case "RightBlue4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue4P);
 				break;
 			case "LeftRed5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftRed5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftRed5P);
 				break;
 			case "RightRed5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightRed5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightRed5P);
 				break;
 			case "LeftBlue5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftBlue5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftBlue5P);
 				break;
 			case "RightBlue5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightBlue5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightBlue5P);
 				break;
 			case "Clap":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap);
 				break;
 			case "Clap2P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap2P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap2P);
 				break;
 			case "Clap3P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap3P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap3P);
 				break;
 			case "Clap4P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap4P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap4P);
 				break;
 			case "Clap5P":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Clap5P);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Clap5P);
 				break;
 			case "Decide":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Decide);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Decide);
 				break;
 			case "Cancel":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.Cancel);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.Cancel);
 				break;
 			case "LeftChange":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.LeftChange);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.LeftChange);
 				break;
 			case "RightChange":
-				this.ReadAndSetKey(value, this.KeyAssign.Drums.RightChange);
+				this.ReadAndSetKey(value, this.KeyAssign.Taiko.RightChange);
 				break;
 		}
 	}
@@ -2709,10 +2708,6 @@ internal class CConfigIni : INotifyPropertyChanged {
 					this.ReadAndSetKey(value, this.KeyAssign.System.QuickConfig);
 					break;
 				}
-			case "NewHeya": {
-					this.ReadAndSetKey(value, this.KeyAssign.System.NewHeya);
-					break;
-				}
 			case "SortSongs": {
 					this.ReadAndSetKey(value, this.KeyAssign.System.SortSongs);
 					break;
@@ -2739,67 +2734,67 @@ internal class CConfigIni : INotifyPropertyChanged {
 	private void ProcessTrainingKeyAssignmentSection(string key, string value) {
 		switch (key) {
 			case "TrainingIncreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseScrollSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingIncreaseScrollSpeed);
 					break;
 				}
 			case "TrainingDecreaseScrollSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseScrollSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingDecreaseScrollSpeed);
 					break;
 				}
 			case "TrainingIncreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingIncreaseSongSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingIncreaseSongSpeed);
 					break;
 				}
 			case "TrainingDecreaseSongSpeed": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingDecreaseSongSpeed);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingDecreaseSongSpeed);
 					break;
 				}
 			case "TrainingToggleAuto": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingToggleAuto);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingToggleAuto);
 					break;
 				}
 			case "TrainingBranchNormal": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchNormal);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchNormal);
 					break;
 				}
 			case "TrainingBranchExpert": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchExpert);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchExpert);
 					break;
 				}
 			case "TrainingBranchMaster": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBranchMaster);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBranchMaster);
 					break;
 				}
 			case "TrainingPause": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingPause);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingPause);
 					break;
 				}
 			case "TrainingBookmark": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingBookmark);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingBookmark);
 					break;
 				}
 			case "TrainingMoveForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveForwardMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingMoveForwardMeasure);
 					break;
 				}
 			case "TrainingMoveBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingMoveBackMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingMoveBackMeasure);
 					break;
 				}
 			case "TrainingSkipForwardMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipForwardMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingSkipForwardMeasure);
 					break;
 				}
 			case "TrainingSkipBackMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingSkipBackMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingSkipBackMeasure);
 					break;
 				}
 			case "TrainingJumpToFirstMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToFirstMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingJumpToFirstMeasure);
 					break;
 				}
 			case "TrainingJumpToLastMeasure": {
-					this.ReadAndSetKey(value, this.KeyAssign.Drums.TrainingJumpToLastMeasure);
+					this.ReadAndSetKey(value, this.KeyAssign.Taiko.TrainingJumpToLastMeasure);
 					break;
 				}
 		}
@@ -2991,7 +2986,6 @@ SongVolumeDecrease=K0115
 DisplayHits=K057
 DisplayDebug=K049
 QuickConfig=K055
-NewHeya=K062
 SortSongs=K0126
 ToggleAutoP1=K056
 ToggleAutoP2=K057

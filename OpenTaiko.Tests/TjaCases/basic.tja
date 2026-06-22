@@ -1,0 +1,13 @@
+TITLE:Test Song
+SUBTITLE:--sub
+BPM:180
+OFFSET:-1.5
+WAVE:test.ogg
+COURSE:Oni
+LEVEL:8
+
+#START
+1011,
+2022,
+1122,
+#END

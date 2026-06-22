@@ -40,9 +40,9 @@ internal class CActCalibrationMode : CActivity {
 
 		CalibrateTick.Tick();
 
-		bool decide = OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed) ||
-					  OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed) ||
+		bool decide = OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.Decide) ||
+					  OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RRed) ||
+					  OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LRed) ||
 					  OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return);
 
 		if (CalibrateTick.IsEnded) {
@@ -50,13 +50,13 @@ internal class CActCalibrationMode : CActivity {
 			CalibrateTick.Start(0, 500, 1, OpenTaiko.Timer);
 		}
 
-		if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange) ||
-			OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LBlue) ||
+		if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LeftChange) ||
+			OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LBlue) ||
 			OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 			buttonIndex = Math.Max(buttonIndex - 1, 0);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
-		} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange) ||
-				   OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RBlue) ||
+		} else if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RightChange) ||
+				   OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RBlue) ||
 				   OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
 			buttonIndex = Math.Min(buttonIndex + 1, 2);
 			OpenTaiko.Skin.soundChangeSFX.tPlay();
@@ -72,7 +72,7 @@ internal class CActCalibrationMode : CActivity {
 		} else if (buttonIndex == 2 && decide) // Save
 		{
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = GetMedianOffset();
-			OpenTaiko.stageConfig.actList.iGlobalOffsetMs.n現在の値 = GetMedianOffset();
+			OpenTaiko.stageConfig.actList.iGlobalOffsetMs.nCurrentValue = GetMedianOffset();
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 			Stop();
 
@@ -96,30 +96,30 @@ internal class CActCalibrationMode : CActivity {
 			OpenTaiko.Tx.Tile_Black.Opacity = 128;
 			for (int i = 0; i <= GameWindowSize.Width; i += OpenTaiko.Tx.Tile_Black.szTextureSize.Width) {
 				for (int j = 0; j <= GameWindowSize.Height; j += OpenTaiko.Tx.Tile_Black.szTextureSize.Height) {
-					OpenTaiko.Tx.Tile_Black.t2D描画(i, j);
+					OpenTaiko.Tx.Tile_Black.t2DDraw(i, j);
 				}
 			}
 			OpenTaiko.Tx.Tile_Black.Opacity = 255;
 		}
 
-		OpenTaiko.Tx.CalibrateBG?.t2D描画(OpenTaiko.Skin.Config_Calibration_Highlights[buttonIndex].X,
+		OpenTaiko.Tx.CalibrateBG?.t2DDraw(OpenTaiko.Skin.Config_Calibration_Highlights[buttonIndex].X,
 			OpenTaiko.Skin.Config_Calibration_Highlights[buttonIndex].Y,
 			OpenTaiko.Skin.Config_Calibration_Highlights[buttonIndex]);
-		OpenTaiko.Tx.CalibrateFG?.t2D描画(0, 0);
+		OpenTaiko.Tx.CalibrateFG?.t2DDraw(0, 0);
 
-		OpenTaiko.Tx.Lane_Background_Main?.t2D描画(OpenTaiko.Skin.Game_Lane_X[0], OpenTaiko.Skin.Game_Lane_Y[0]);
-		OpenTaiko.Tx.Lane_Background_Sub?.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
-		OpenTaiko.Tx.Taiko_Frame[2]?.t2D描画(OpenTaiko.Skin.Game_Taiko_Frame_X[0], OpenTaiko.Skin.Game_Taiko_Frame_Y[0]);
+		OpenTaiko.Tx.Lane_Background_Main?.t2DDraw(OpenTaiko.Skin.Game_Lane_X[0], OpenTaiko.Skin.Game_Lane_Y[0]);
+		OpenTaiko.Tx.Lane_Background_Sub?.t2DDraw(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
+		OpenTaiko.Tx.Taiko_Frame[2]?.t2DDraw(OpenTaiko.Skin.Game_Taiko_Frame_X[0], OpenTaiko.Skin.Game_Taiko_Frame_Y[0]);
 
-		OpenTaiko.Tx.Notes[0]?.t2D描画(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+		OpenTaiko.Tx.Notes[0]?.t2DDraw(OpenTaiko.Skin.nScrollFieldX[0], OpenTaiko.Skin.nScrollFieldY[0], new RectangleF(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 
 		for (int x = OpenTaiko.Skin.nScrollFieldX[0]; x < GameWindowSize.Width + 500; x += 500) {
-			OpenTaiko.Tx.Bar?.t2D描画(
+			OpenTaiko.Tx.Bar?.t2DDraw(
 				(x - CalibrateTick.CurrentValue) + ((OpenTaiko.Skin.Game_Notes_Size[0] - OpenTaiko.Tx.Bar.szTextureSize.Width) / 2),
 				OpenTaiko.Skin.nScrollFieldY[0],
 				new Rectangle(0, 0, OpenTaiko.Tx.Bar.szTextureSize.Width, OpenTaiko.Skin.Game_Notes_Size[1])
 			);
-			OpenTaiko.Tx.Notes[0]?.t2D描画(
+			OpenTaiko.Tx.Notes[0]?.t2DDraw(
 				(x - CalibrateTick.CurrentValue),
 				OpenTaiko.Skin.nScrollFieldY[0],
 				new Rectangle(OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1], OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1])
@@ -127,13 +127,13 @@ internal class CActCalibrationMode : CActivity {
 		}
 
 		if (OpenTaiko.P1IsBlue())
-			OpenTaiko.Tx.Taiko_Background[4]?.t2D描画(OpenTaiko.Skin.Game_Taiko_Background_X[0], OpenTaiko.Skin.Game_Taiko_Background_Y[0]);
+			OpenTaiko.Tx.Taiko_Background[4]?.t2DDraw(OpenTaiko.Skin.Game_Taiko_Background_X[0], OpenTaiko.Skin.Game_Taiko_Background_Y[0]);
 		else
-			OpenTaiko.Tx.Taiko_Background[0]?.t2D描画(OpenTaiko.Skin.Game_Taiko_Background_X[0], OpenTaiko.Skin.Game_Taiko_Background_Y[0]);
+			OpenTaiko.Tx.Taiko_Background[0]?.t2DDraw(OpenTaiko.Skin.Game_Taiko_Background_X[0], OpenTaiko.Skin.Game_Taiko_Background_Y[0]);
 
 		#region Calibration Info
 
-		offsettext?.t2D描画(OpenTaiko.Skin.Config_Calibration_OffsetText[0] - offsettext.szTextureSize.Width, OpenTaiko.Skin.Config_Calibration_OffsetText[1]);
+		offsettext?.t2DDraw(OpenTaiko.Skin.Config_Calibration_OffsetText[0] - offsettext.szTextureSize.Width, OpenTaiko.Skin.Config_Calibration_OffsetText[1]);
 
 		int xInfo = OpenTaiko.Skin.Config_Calibration_InfoText[0];
 		int yInfo = OpenTaiko.Skin.Config_Calibration_InfoText[1];

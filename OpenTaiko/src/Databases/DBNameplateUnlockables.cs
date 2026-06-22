@@ -7,7 +7,7 @@ namespace OpenTaiko;
 
 internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnlockable>> {
 	public DBNameplateUnlockables() {
-		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.db3";
+		_fn = @$"{OpenTaiko.strEXEFolder}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.db3";
 
 		using (var connection = new SqliteConnection(@$"Data Source={_fn}")) {
 			connection.Open();
@@ -74,7 +74,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 	}
 
 	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = OpenTaiko.GetActualPlayer(_player);
+		int player = _player;
 		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedNameplateIds;
 		bool _edited = false;
 
@@ -91,8 +91,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 						new Modal(
 							Modal.EModalType.Title,
 							HRarity.tRarityToModalInt(item.Value.rarity),
-							item,
-							OpenTaiko.NamePlate.lcNamePlate
+							new LuaNameplateInfo(item.Value, (int)item.Key)
 						),
 						_player);
 
@@ -107,7 +106,7 @@ internal class DBNameplateUnlockables : CSavableT<Dictionary<Int64, NameplateUnl
 
 	public bool AddToDatabase(string title, int type, string rarity, string unlock_condition, string unlock_type, string unlock_values, string unlock_references, Dictionary<string, string> translations) {
 		Trace.TraceInformation("Requested a new entry into NameplateUnlockables.db3.");
-		_fn = @$"{OpenTaiko.strEXEのあるフォルダ}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.db3";
+		_fn = @$"{OpenTaiko.strEXEFolder}Databases{Path.DirectorySeparatorChar}NameplateUnlockables.db3";
 
 		using (var connection = new SqliteConnection($"Data Source={_fn}")) {
 			connection.Open();

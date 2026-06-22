@@ -82,5 +82,17 @@
     <BundleResource Include="..\OpenTaiko\.init\**" Link=".init\%(RecursiveDir)%(Filename)%(Extension)" />
     <BundleResource Include="..\OpenTaiko\Songs\**" Link="Songs\%(RecursiveDir)%(Filename)%(Extension)" />
     <BundleResource Include="..\OpenTaiko\BGScriptAPI.lua" Link="BGScriptAPI.lua" />
+    <BundleResource Include="..\OpenTaiko\CharaScript.lua" Link="CharaScript.lua" />
   </ItemGroup>
+
+  <!-- LightningDB (LMDB) ships only desktop natives. OpenTaiko references it for desktop Lua data
+       persistence; on iOS LuaDataStorage is a no-op (BUILDING_AS_LIBRARY). NuGet RID-fallback would
+       otherwise stage the macOS lmdb.dylib into the iOS link ("building for iOS-simulator, but
+       linking in dylib built for macOS"). Drop it from the native reference set after it is gathered. -->
+  <Target Name="_RemoveLmdbNativeReference" AfterTargets="_ExpandNativeReferences">
+    <ItemGroup>
+      <_FileNativeReference Remove="@(_FileNativeReference)"
+          Condition="$([System.String]::Copy('%(Filename)').ToLowerInvariant().Contains('lmdb'))" />
+    </ItemGroup>
+  </Target>
 </Project>

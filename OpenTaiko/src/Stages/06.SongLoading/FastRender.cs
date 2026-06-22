@@ -25,7 +25,7 @@ class FastRender {
 	private void NullCheckAndRender(ref CTexture tx) {
 		if (tx == null) return;
 		tx.Opacity = 0;
-		tx.t2D描画(0, 0);
+		tx.t2DDraw(0, 0);
 		tx.Opacity = 255;
 	}
 }

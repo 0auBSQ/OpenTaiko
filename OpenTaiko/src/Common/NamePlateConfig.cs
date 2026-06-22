@@ -15,7 +15,7 @@ class NamePlateConfig {
 			return;
 
 		for (int i = 0; i < 5; i++) {
-			int p = OpenTaiko.GetActualPlayer(i);
+			int p = i;
 
 			data.Medals[p] += amounts[i];
 		}

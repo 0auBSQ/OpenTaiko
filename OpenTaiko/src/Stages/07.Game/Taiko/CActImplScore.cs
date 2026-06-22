@@ -2,8 +2,16 @@
 
 namespace OpenTaiko;
 
-internal class CActImplScore : CAct演奏スコア共通 {
+internal class CActImplScore : CActPlayScoreCommon {
 	// CActivity 実装（共通クラスからの差分のみ）
+
+	// Reused per-frame scratch buffers for player draw positions, filled fresh every Draw (no per-frame alloc).
+	private readonly int[] x = new int[5];
+	private readonly int[] y = new int[5];
+	private readonly int[] add_x = new int[5];
+	private readonly int[] add_y = new int[5];
+	private readonly int[] addBonus_x = new int[5];
+	private readonly int[] addBonus_y = new int[5];
 
 	public unsafe override int Draw() {
 		if (!base.IsDeActivated) {
@@ -23,10 +31,10 @@ internal class CActImplScore : CAct演奏スコア共通 {
 			}
 
 			for (int i = 0; i < 5; i++) {
-				if (!this.ct点数アニメタイマ[i].IsStoped) {
-					this.ct点数アニメタイマ[i].Tick();
-					if (this.ct点数アニメタイマ[i].IsEnded) {
-						this.ct点数アニメタイマ[i].Stop();
+				if (!this.ctPointsAnimeTimer[i].IsStoped) {
+					this.ctPointsAnimeTimer[i].Tick();
+					if (this.ctPointsAnimeTimer[i].IsEnded) {
+						this.ctPointsAnimeTimer[i].Stop();
 					}
 				}
 			}
@@ -40,13 +48,6 @@ internal class CActImplScore : CAct演奏スコア共通 {
 					}
 				}
 			}
-
-			int[] x = new int[5];
-			int[] y = new int[5];
-			int[] add_x = new int[5];
-			int[] add_y = new int[5];
-			int[] addBonus_x = new int[5];
-			int[] addBonus_y = new int[5];
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
@@ -78,28 +79,28 @@ internal class CActImplScore : CAct演奏スコア共通 {
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode) break;
 
-				base.t小文字表示(x[i], y[i], string.Format("{0,7:######0}", this.nCurrentlyDisplayedScore[i]), 0, 256, i);
+				base.tSmallDisplay(x[i], y[i], string.Format("{0,7:######0}", this.nCurrentlyDisplayedScore[i]), 0, 256, i);
 			}
 
 			for (int i = 0; i < 256; i++) {
-				if (this.stScore[i].b使用中) {
+				if (this.stScore[i].bUse) {
 					if (!this.stScore[i].ctTimer.IsStoped) {
 						this.stScore[i].ctTimer.Tick();
 						if (this.stScore[i].ctTimer.IsEnded) {
-							if (this.stScore[i].b表示中 == true)
+							if (this.stScore[i].bDisplaying == true)
 								this.nNowDisplayedAddScore--;
 							this.stScore[i].ctTimer.Stop();
-							this.stScore[i].b使用中 = false;
+							this.stScore[i].bUse = false;
 							OpenTaiko.stageGameScreen.actDan.Update();
 						}
 
 						if (!stScore[i].bAddEnd) {
 							stScore[i].bAddEnd = true;
-							if (ct点数アニメタイマ[stScore[i].nPlayer].IsUnEnded) {
-								this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
-								this.ct点数アニメタイマ[stScore[i].nPlayer].CurrentValue = 1;
+							if (ctPointsAnimeTimer[stScore[i].nPlayer].IsUnEnded) {
+								this.ctPointsAnimeTimer[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
+								this.ctPointsAnimeTimer[stScore[i].nPlayer].CurrentValue = 1;
 							} else {
-								this.ct点数アニメタイマ[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
+								this.ctPointsAnimeTimer[stScore[i].nPlayer] = new CCounter(0, 11, 13, OpenTaiko.Timer);
 							}
 						}
 
@@ -180,12 +181,12 @@ internal class CActImplScore : CAct演奏スコア共通 {
 							pl = 1;
 
 						if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == false && !OpenTaiko.ConfigIni.SimpleMode)
-							base.t小文字表示(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[i].nPlayer == 0 && OpenTaiko.ConfigIni.nPlayerCount <= 2 ? add_y[this.stScore[i].nPlayer] + yAdd : add_y[this.stScore[i].nPlayer] - yAdd, string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
+							base.tSmallDisplay(add_x[this.stScore[i].nPlayer] + xAdd, this.stScore[i].nPlayer == 0 && OpenTaiko.ConfigIni.nPlayerCount <= 2 ? add_y[this.stScore[i].nPlayer] + yAdd : add_y[this.stScore[i].nPlayer] - yAdd, string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
 						if (this.nNowDisplayedAddScore < 10 && this.stScore[i].bBonusScore == true && !OpenTaiko.ConfigIni.SimpleMode)
-							base.t小文字表示(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[this.stScore[i].nPlayer], string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
+							base.tSmallDisplay(addBonus_x[this.stScore[i].nPlayer] + xAdd, addBonus_y[this.stScore[i].nPlayer], string.Format("{0,7:######0}", this.stScore[i].nAddScore), pl + 1, alpha, stScore[i].nPlayer);
 						else {
 							this.nNowDisplayedAddScore--;
-							this.stScore[i].b表示中 = false;
+							this.stScore[i].bDisplaying = false;
 						}
 					}
 				}

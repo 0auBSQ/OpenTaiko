@@ -101,9 +101,9 @@ internal class CActImplClearAnimation : CActivity {
 			return;
 
 		if (this.Mode[iPlayer] == EndMode.Total)
-			this.ct進行メイン[iPlayer] = null;
+			this.ctProgressMain[iPlayer] = null;
 		else
-			this.ct進行メイン[iPlayer] ??= new CCounter(0, 300, 22, OpenTaiko.Timer);
+			this.ctProgressMain[iPlayer] ??= new CCounter(0, 300, 22, OpenTaiko.Timer);
 		bSoundPlayed[iPlayer] = false;
 	}
 
@@ -173,7 +173,13 @@ internal class CActImplClearAnimation : CActivity {
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i) {
 			this.Mode[i] = EndMode.Total;
 			this.bSoundPlayed[i] = false;
-			this.ct進行メイン[i] = null;
+			this.ctProgressMain[i] = null;
+		}
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			this.soundFailed[i]?.tStopSound();
+			this.soundClear[i]?.tStopSound();
+			this.soundFullCombo[i]?.tStopSound();
+			this.soundPerfectCombo[i]?.tStopSound();
 		}
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
@@ -204,9 +210,16 @@ internal class CActImplClearAnimation : CActivity {
 
 	public override void DeActivate() {
 		for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i)
-			this.ct進行メイン[i] = null;
+			this.ctProgressMain[i] = null;
 
 		this.ReleaseManagedResource(true);
+
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_END_FAILED);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_END_CLEAR);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_END_FULLCOMBO);
+			CCharacter.RemoveEssentialVoice(i, CCharacter.VOICE_END_ALLPERFECT);
+		}
 
 		base.DeActivate();
 	}
@@ -285,12 +298,12 @@ internal class CActImplClearAnimation : CActivity {
 		return ret;
 	}
 	protected int Draw(int iPlayer, int nDrawnPlayers) {
-		if (this.ct進行メイン[iPlayer] != null) {
+		if (this.ctProgressMain[iPlayer] != null) {
 			bool playerStageFailed = OpenTaiko.stageGameScreen.IsStageFailed(iPlayer);
 			if (!((playerStageFailed && !OpenTaiko.ConfigIni.bAIBattleMode) || OpenTaiko.stageGameScreen.IsStageFailed_Fast() || OpenTaiko.stageGameScreen.IsStageCompleted()))
 				return 0;
 
-			this.ct進行メイン[iPlayer].Tick();
+			this.ctProgressMain[iPlayer].Tick();
 
 			var (script, sound, voices) = this.Mode[iPlayer] switch {
 				EndMode.StageFailed => (FailedScript, this.soundFailed[iPlayer], OpenTaiko.Skin.voiceClearFailed),
@@ -303,7 +316,7 @@ internal class CActImplClearAnimation : CActivity {
 				EndMode.AI_Win_FullCombo => (AIWin_FullComboScript, this.soundAIWinFullCombo ?? this.soundFullCombo[iPlayer], OpenTaiko.Skin.voiceAIWin),
 				EndMode.AI_Win_Perfect => (AIWin_PerfectScript, this.soundAIWinPerfectCombo ?? this.soundPerfectCombo[iPlayer], OpenTaiko.Skin.voiceAIWin),
 
-				EndMode.Tower_Dropout => (Tower_DropoutScript, this.soundTowerDropout ?? this.soundFailed[iPlayer], OpenTaiko.Skin.voiceClearFailed),
+			EndMode.Tower_Dropout => (Tower_DropoutScript, this.soundTowerDropout ?? this.soundFailed[iPlayer], OpenTaiko.Skin.voiceClearFailed),
 				EndMode.Tower_TopReached_Pass => (Tower_TopReached_PassScript, this.soundTowerTopPass ?? this.soundClear[iPlayer], OpenTaiko.Skin.voiceClearClear),
 				EndMode.Tower_TopReached_FullCombo => (Tower_TopReached_FullComboScript, this.soundTowerTopFC ?? this.soundFullCombo[iPlayer], OpenTaiko.Skin.voiceClearFullCombo),
 				EndMode.Tower_TopReached_Perfect => (Tower_TopReached_PerfectScript, this.soundTowerTopPerfect ?? this.soundPerfectCombo[iPlayer], OpenTaiko.Skin.voiceClearAllPerfect),
@@ -324,8 +337,8 @@ internal class CActImplClearAnimation : CActivity {
 				script?.PlayEndAnime(iPlayer);
 				sound?.SetPanning(pan);
 				sound?.PlayStart();
-				voices?[OpenTaiko.GetActualPlayer(iPlayer)]?.SetPanning(pan);
-				voices?[OpenTaiko.GetActualPlayer(iPlayer)]?.tPlay();
+				voices?[iPlayer]?.SetPanning(pan);
+				voices?[iPlayer]?.tPlay();
 
 				bSoundPlayed[iPlayer] = true;
 			}
@@ -334,7 +347,7 @@ internal class CActImplClearAnimation : CActivity {
 				script?.Update(iPlayer);
 			script?.Draw(iPlayer);
 
-			if (this.ct進行メイン[iPlayer].IsEnded) {
+			if (this.ctProgressMain[iPlayer].IsEnded) {
 				return 1;
 			}
 		}
@@ -370,7 +383,7 @@ internal class CActImplClearAnimation : CActivity {
 	public EndAnimeScript Dan_Gold_PerfectScript { get; private set; }
 
 	bool[] bSoundPlayed = new bool[OpenTaiko.MAX_PLAYERS];
-	CCounter[] ct進行メイン = new CCounter[OpenTaiko.MAX_PLAYERS];
+	CCounter[] ctProgressMain = new CCounter[OpenTaiko.MAX_PLAYERS];
 
 	/*
     CCounter ctEnd_ClearFailed;
@@ -380,7 +393,7 @@ internal class CActImplClearAnimation : CActivity {
     CCounter ctEnd_DondaFullComboLoop;
     */
 
-	CCounter ct進行Loop;
+	CCounter ctProgressLoop;
 	CSound[] soundClear = new CSound[5];
 	CSound[] soundFailed = new CSound[5];
 	CSound[] soundFullCombo = new CSound[5];

@@ -46,6 +46,7 @@ public partial class GameViewController : UIViewController {
 	// IOSurface and Metal composites + presents it via CAMetalLayer.
 	private MetalPresenter? _metalPresenter;
 	private CInputKeyboard_iOS? _keyboardInput;
+	private int _autoAdvanceFrame;   // iOS auto-advance Don-pulse counter (see RenderFrame)
 	private bool _initialized;
 	private NSObject? _resignActiveObserver;
 	private NSObject? _becomeActiveObserver;
@@ -292,6 +293,27 @@ public partial class GameViewController : UIViewController {
 			// set after init), recreating it on change so it never under/over-sizes the render.
 			_game.HostRenderTargetFbo = _metalPresenter!.EnsureRenderTarget(FDK.GameWindowSize.Width, FDK.GameWindowSize.Height);
 
+			// iOS dev auto-advance: drive the Lua stages hands-free for testing. Confirm pulse (Return for the
+			// raw KeyboardPressed checks + Don for the Decide action) every 40 frames; between them, navigate
+			// forward (DownArrow + Ka) so multi-item menus (e.g. _boot's volume page, where "Continue" is last)
+			// reach the bottom before each confirm. Released by ReleaseTouchKeys() below = clean single-frame pulses.
+			if (global::OpenTaiko.OpenTaiko.iOSAutoAdvanceUI) {
+				_autoAdvanceFrame++;
+				// Drive to the song-select softlock. _title's first entry (Performance Mode) already routes to
+				// regular_song_select, so DON'T navigate there (navigating scrolls down onto Intro Nokon etc.) —
+				// just Decide twice (menu → player-count prompt → song-select). Everywhere else (_boot's volume
+				// page needs the last "Continue"; song-select needs to move the cursor + enter a folder) navigate
+				// then confirm. Confirm = Return (raw KeyboardPressed) + Don (Decide action); nav = DownArrow + Ka.
+				string sn = global::OpenTaiko.OpenTaiko.rCurrentStage?.customStageName ?? "";
+				if (_autoAdvanceFrame % 40 == 0) {
+					_keyboardInput?.TouchKeyDown(0x28);   // Return
+					_keyboardInput?.TouchKeyDown(HID_F);  // Don
+				} else if ((sn == "_boot" || sn.Contains("song_select")) && _autoAdvanceFrame % 6 == 0) {
+					_keyboardInput?.TouchKeyDown(0x51);   // DownArrow
+					_keyboardInput?.TouchKeyDown(HID_K);  // Ka-right
+				}
+			}
+
 			_game.RenderHostedFrame(delta);
 
 			// Composite the just-rendered shared surface and present it.
@@ -315,30 +337,26 @@ public partial class GameViewController : UIViewController {
 		}
 	}
 
-	// Texture memory below which we never release on pressure — we prefer keeping everything
-	// resident for smooth performance over minimizing footprint. Only above this do we evict.
-	private const long TextureMemoryTolerance = 1024L * 1024 * 1024; // 1 GB
-
 	public override void DidReceiveMemoryWarning() {
 		base.DidReceiveMemoryWarning();
-		// An iOS memory warning means the OS thinks we're approaching the jetsam limit — always log
-		// the footprint so the log shows how close we got, then evict if we're over tolerance.
+		// An iOS memory warning means the OS thinks we're approaching the jetsam limit — log the
+		// footprint so the log shows how close we got, then evict prior-scene textures if over tolerance.
 		LogMemory("memory-warning");
 		EvictTexturesUnderPressure();
 	}
 
-	// Release least-recently-drawn deferred textures when texture memory exceeds the tolerance.
-	// Below the tolerance we keep everything resident, preferring smooth performance over footprint.
+	// Texture memory below which we never evict — prefer keeping everything resident for smooth
+	// performance over minimizing footprint. Only above this do we release least-recently-drawn textures.
+	private const long TextureMemoryTolerance = 1024L * 1024 * 1024; // 1 GB
+
+	// Release least-recently-drawn file-backed textures when texture memory exceeds the tolerance; they
+	// re-decode transparently on their next draw (see CTexture.tCacheOnDraw / EvictLeastRecentlyDrawnDownTo).
 	private void EvictTexturesUnderPressure() {
-		long before = CTexture.TotalTextureBytes;
-		if (before <= TextureMemoryTolerance)
-			return; // keep everything; prefer performance over footprint below the tolerance
-		// DeleteTexture needs the GL context current; the warning fires on the main thread, between
+		if (FDK.CTexture.TotalTextureBytes <= TextureMemoryTolerance) return;
+		// DeleteTexture needs the GL context current; the warning fires on the main thread between
 		// CADisplayLink frames, so the context may not be bound right now.
-		if (_glContext != null)
-			EAGLContext.SetCurrentContext(_glContext);
-		long freed = CTexture.EvictLeastRecentlyDrawnDownTo(TextureMemoryTolerance);
-		Trace.TraceInformation($"[Mem] evicted {freed / 1048576} MB of prior-scene textures (textures {before / 1048576} -> {CTexture.TotalTextureBytes / 1048576} MB)");
+		if (_glContext != null) EAGLContext.SetCurrentContext(_glContext);
+		FDK.CTexture.EvictLeastRecentlyDrawnDownTo(TextureMemoryTolerance);
 	}
 
 	// --- Memory diagnostics → OpenTaiko.log ---------------------------------------------------
@@ -358,23 +376,23 @@ public partial class GameViewController : UIViewController {
 		return -1;
 	}
 
-	// Footprint (jetsam-enforced), managed GC heap, and GL texture totals in MB. footprint is -1 if
-	// unavailable. The managed figure lets us split the footprint into managed vs native+GL: a small
-	// managed number with a large footprint means the growth is native memory (e.g. SkiaSharp), not
-	// C# objects. GC.GetTotalMemory(false) does not force a collection, so it's cheap enough per-frame.
-	private static (long footprint, long managed, long textures) GetMemoryMB() {
+	// Footprint (jetsam-enforced) and managed GC heap in MB. footprint is -1 if unavailable. The
+	// managed figure lets us split the footprint into managed vs native: a small managed number with
+	// a large footprint means the growth is native memory (e.g. SkiaSharp), not C# objects.
+	// GC.GetTotalMemory(false) does not force a collection, so it's cheap enough per-frame.
+	private static (long footprint, long managed) GetMemoryMB() {
 		long fpBytes = GetPhysFootprintBytes();
 		return (
 			fpBytes >= 0 ? fpBytes / 1048576 : -1,
-			GC.GetTotalMemory(false) / 1048576,
-			CTexture.TotalTextureBytes / 1048576);
+			GC.GetTotalMemory(false) / 1048576);
 	}
 
 	private void LogMemory(string reason) {
-		var (fp, managed, textures) = GetMemoryMB();
+		var (fp, managed) = GetMemoryMB();
 		string fpStr = fp >= 0 ? $"{fp} MB" : "?";
 		string stage = global::OpenTaiko.OpenTaiko.rCurrentStage?.GetType().Name ?? "-";
-		Trace.TraceInformation($"[Mem] {reason}: footprint={fpStr}, managed={managed} MB, textures={textures} MB ({CTexture.LiveTextureCount} live), stage={stage}");
+		long texMB = FDK.CTexture.s_gpuTextureBytes / 1048576;
+		Trace.TraceInformation($"[Mem] {reason}: footprint={fpStr}, managed={managed} MB, gpuTex={FDK.CTexture.s_gpuTextureCount} ({texMB} MB), stage={stage}");
 	}
 
 	#region Keyboard Input
@@ -477,9 +495,9 @@ public partial class GameViewController : UIViewController {
 		if (_debugHud == null) return;
 		int fps = global::OpenTaiko.OpenTaiko.FPS?.NowFPS ?? 0;
 		string stage = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID.ToString() ?? "?";
-		var (fp, managed, textures) = GetMemoryMB();
+		var (fp, managed) = GetMemoryMB();
 		string fpStr = fp >= 0 ? fp.ToString() : "?";
-		_debugHud.Text = $" FPS: {fps}  Stage: {stage}\n GL: {_backingWidth}x{_backingHeight}\n Mem: fp{fpStr} mg{managed} tx{textures} MB";
+		_debugHud.Text = $" FPS: {fps}  Stage: {stage}\n GL: {_backingWidth}x{_backingHeight}\n Mem: fp{fpStr} mg{managed} MB";
 	}
 
 	protected override void Dispose(bool disposing) {

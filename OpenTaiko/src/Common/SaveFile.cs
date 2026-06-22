@@ -20,16 +20,16 @@ internal class SaveFile {
 
 	public void tInitSaveFile() {
 		lock (this) {
-			// Best plays
-			data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
-			data.tFactorizeBestPlays();
+		// Best plays
+		data.bestPlays = DBSaves.GetBestPlaysAsDict(data.SaveId);
+		data.tFactorizeBestPlays();
 
-			// Global triggers
-			data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
+		// Global triggers
+		data.ActiveTriggers = DBSaves.GetActiveTriggersSet(data.SaveId);
 
-			// Global counters
-			data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
-		}
+		// Global counters
+		data.GlobalCounters = DBSaves.GetGlobalCountersDict(data.SaveId);
+	}
 	}
 
 	public void tLoadUnlockables() {
@@ -243,6 +243,11 @@ internal class SaveFile {
 		[JsonIgnore]
 		public int AIBattleModeWins = 0;
 
+		/// <summary>Folder name of the selected hitsound set (e.g. "Taiko").
+		/// Stored per save-file so every player can have their own hitsounds.</summary>
+		[JsonIgnore]
+		public string SelectedHitsounds = "Taiko";
+
 		[JsonProperty("character")]
 		public int Character = 0;
 
@@ -292,6 +297,10 @@ internal class SaveFile {
 
 		[JsonIgnore]
 		public BestPlayRecords.CBestPlayStats bestPlaysStats = new BestPlayRecords.CBestPlayStats();
+
+		// Never null once the _boot stage is active
+		[JsonIgnore]
+		public CLuaCharacterScript? mountedCharacter = null;
 
 		public BestPlayRecords.CSongSelectTableEntry tGetSongSelectTableEntry(string uniqueId) {
 			if (songSelectTableEntries.ContainsKey(uniqueId)) return songSelectTableEntries[uniqueId];
@@ -361,6 +370,7 @@ internal class SaveFile {
 				songSelectTableEntries[key].HighScore[(int)bestPlay.ChartDifficulty] = (int)bestPlay.HighScore;
 				songSelectTableEntries[key].ScoreRanks[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ScoreRank + 1; // 0 start
 				songSelectTableEntries[key].ClearStatuses[(int)bestPlay.ChartDifficulty] = (int)bestPlay.ClearStatus + 1; // 0 start
+				songSelectTableEntries[key].PlayedDifficulties[(int)bestPlay.ChartDifficulty] = true;
 			}
 
 			bestPlaysStats = BestPlayRecords.tGenerateBestPlayStats(bestPlaysDistinctCharts.Values, bestPlaysDistinctSongs.Values);

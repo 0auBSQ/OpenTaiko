@@ -186,7 +186,7 @@ public class CInputManager : IDisposable {
 		this.Dispose(true);
 	}
 	public void Dispose(bool disposeManagedObjects) {
-		if (!this.bDisposed済み) {
+		if (!this.bDisposedDone) {
 			if (disposeManagedObjects) {
 				foreach (IInputDevice device in this.InputDevices) {
 					if (device is CInputMIDI tmidi)
@@ -199,7 +199,7 @@ public class CInputManager : IDisposable {
 
 				Context?.Dispose();
 			}
-			this.bDisposed済み = true;
+			this.bDisposedDone = true;
 		}
 	}
 
@@ -245,7 +245,7 @@ public class CInputManager : IDisposable {
 	private IInputContext? Context;
 	private IInputDevice? _Keyboard;
 	private IInputDevice? _Mouse;
-	private bool bDisposed済み;
+	private bool bDisposedDone;
 	private object lockInputDevices = new object();
 	//private CTimer timer;
 

@@ -1,0 +1,8 @@
+{
+  "tja": "basic.tja",
+  "loadChart": false,
+  "expect": {
+    "title": "Test Song",
+    "bpm": 180
+  }
+}

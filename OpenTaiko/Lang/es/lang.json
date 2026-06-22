@@ -29,6 +29,8 @@
 		"SETTINGS_SYSTEM_DESC": "Ajustes del sistema en general.",
 		"SETTINGS_GAME": "Opciones de la Jugabilidad",
 		"SETTINGS_GAME_DESC": "Ajustes para tocar los tambores.",
+		"SETTINGS_THEME": "Configuración del tema",
+		"SETTINGS_THEME_DESC": "Configuración específica del skin actual.\nDefinida en ThemeSettings.json en la carpeta del skin.",
 		"SETTINGS_EXIT": "Salir",
 		"SETTINGS_EXIT_DESC": "Guarda los ajustes y sale del menú de\nCONFIGURACIÓN.",
 
