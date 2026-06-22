@@ -31,7 +31,7 @@ internal class CTextConsole : CActivity {
 				int index = printableCharacters.IndexOf(ch);
 				if (index >= 0) {
 					if (this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)] != null) {
-						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2D描画(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
+						this.fontTextures[(int)((int)font / (int)EFontType.WhiteSlim)].t2DDraw(x, y, this.characterRectangles[(int)((int)font % (int)EFontType.WhiteSlim), index]);
 					}
 				}
 
@@ -42,9 +42,6 @@ internal class CTextConsole : CActivity {
 	}
 
 	public override void DeActivate() {
-		if (this.characterRectangles != null)
-			this.characterRectangles = null;
-
 		base.DeActivate();
 	}
 
@@ -77,6 +74,9 @@ internal class CTextConsole : CActivity {
 		if (base.IsDeActivated) {
 			return;
 		}
+
+		if (this.characterRectangles != null)
+			this.characterRectangles = null;
 
 		for (int i = 0; i < 2; i++) {
 			if (this.fontTextures[i] == null) {

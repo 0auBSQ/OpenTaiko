@@ -1,0 +1,7 @@
+{
+  "tja": "courses.tja",
+  "difficulty": 0,
+  "expect": {
+    "dons": 1
+  }
+}

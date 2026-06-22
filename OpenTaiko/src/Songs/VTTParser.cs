@@ -8,7 +8,7 @@ using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
 
-public class VTTParser : IDisposable {
+public class VTTParser {
 	// TODO : timestamp tag support
 	[Flags]
 	private enum ParseMode {
@@ -33,49 +33,18 @@ public class VTTParser : IDisposable {
 		public string Language;
 	}
 
-	private static string[] _vttdelimiter;
+	private static string[] _vttdelimiter = new[] { "-->", "- >", "->" };
 
-	private static Regex regexTimestamp;
+	private static Regex regexTimestamp = new Regex(@"(-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+)");
 
-	private static Regex regexOffset;
-	private static Regex regexLang;
+	private static Regex regexOffset = new Regex(@"Offset:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Offset: 00:01.001;" , "WEBVTT Offset: 1.001;"
+	private static Regex regexLang = new Regex(@"Language:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Language: ja;"
 
-	private static bool isUsingLang;
+	private bool isUsingLang = false;
 
 	private bool _isDisposed;
 
-	public VTTParser() {
-		_vttdelimiter = new[] { "-->", "- >", "->" };
-
-		regexTimestamp = new Regex(@"(-)?(([0-9]+):)?([0-9]+):([0-9]+)[,\\.]([0-9]+)");
-
-		regexOffset = new Regex(@"Offset:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Offset: 00:01.001;" , "WEBVTT Offset: 1.001;"
-		regexLang = new Regex(@"Language:\s*(.*?(?=;|$))"); // i.e. "WEBVTT Language: ja;"
-
-		isUsingLang = false;
-	}
-
-	#region Dispose stuff
-	public void Dispose() {
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected virtual void Dispose(bool disposing) {
-		if (!_isDisposed && disposing) {
-			_vttdelimiter = null;
-			regexTimestamp = null;
-
-			regexOffset = null;
-			regexLang = null;
-
-			isUsingLang = false;
-
-			_isDisposed = true;
-		}
-
-	}
-	#endregion
+	public VTTParser() { }
 
 	// note: List<STLYRIC> is List of actual value, appending it to another list will copy alot
 	internal void ParseVTTFile(List<STLYRIC> lrclist, string filepath, long offset) {
@@ -454,7 +423,7 @@ public class VTTParser : IDisposable {
 			max_height += height[i];
 		}
 
-		SKBitmap lyrictex = new SKBitmap(max_width > 0 ? max_width : 1, max_height - rubyheightoffset.Sum() > 0 ? max_height - rubyheightoffset.Sum() : 1); // Prevent exception with 0x0y Bitmap
+		SKBitmap lyrictex = new SKBitmap(Math.Max(max_width, 1), Math.Max(max_height - rubyheightoffset.Sum(), 1)); // Prevent exception with 0x0y Bitmap
 
 		if (textures.Count > 0) {
 			using (SKCanvas canvas = new SKCanvas(lyrictex)) {

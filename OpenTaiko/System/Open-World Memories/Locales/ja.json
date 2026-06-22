@@ -1,0 +1,15 @@
+{
+    // スキンローカルファイル — 日本語
+    "Entries": {
+
+        // テーマ設定ビューワーステージ
+        "VIEWER_TITLE":     "テーマ設定ビューワー",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "スコープ",
+        "VIEWER_COL_TYPE":  "タイプ",
+        "VIEWER_COL_VALUE": "値",
+        "VIEWER_HINT_SCROLL": "上/下でスクロール   キャンセルで終了",
+        "VIEWER_HINT_EXIT":   "キャンセルで終了"
+
+    }
+}

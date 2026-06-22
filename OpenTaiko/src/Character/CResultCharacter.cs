@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿/*
+using FDK;
 
 namespace OpenTaiko;
 
@@ -33,7 +34,7 @@ class CResultCharacter {
 	}
 
 	private static bool _usesSubstituteTexture(int player, ECharacterResult eca) {
-		int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
@@ -64,7 +65,7 @@ class CResultCharacter {
 	}
 
 	public static CTexture[] _getReferenceArray(int player, ECharacterResult eca) {
-		int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 
 		if (_charaId >= 0 && _charaId < OpenTaiko.Skin.Characters_Ptn) {
 			switch (eca) {
@@ -122,7 +123,7 @@ class CResultCharacter {
 	}
 
 	public static int _getReferenceAnimationDuration(int player, ECharacterResult eca) {
-		int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 
 		switch (eca) {
 			case (ECharacterResult.NORMAL): {
@@ -185,7 +186,7 @@ class CResultCharacter {
 	}
 
 	public static void tMenuDisplayCharacter(int player, int x, int y, ECharacterResult eca, int pos = 0, int opacity = 255) {
-		int _charaId = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.Character;
+		int _charaId = OpenTaiko.SaveFileInstances[player].data.Character;
 		CTexture[] _ref = _getReferenceArray(player, eca);
 		CCounter[] _ctref = _getReferenceCounter(eca);
 		bool _substitute = _usesSubstituteTexture(player, eca);
@@ -232,3 +233,5 @@ class CResultCharacter {
 		}
 	}
 }
+
+*/

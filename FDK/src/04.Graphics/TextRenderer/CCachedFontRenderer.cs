@@ -111,11 +111,9 @@ public class CCachedFontRenderer : CFontRenderer {
 			fc.Vertical = false;
 			fc.KeepCenter = keepCenter;
 			listFontCache.Add(fc);
-			Debug.WriteLine(drawstr + ": Cacheにヒットせず。(cachesize=" + listFontCache.Count + ")");
 			#endregion
 			#region [ もしキャッシュがあふれたら、最も古いキャッシュを破棄する ]
 			if (listFontCache.Count > MAXCACHESIZE) {
-				Debug.WriteLine("Cache溢れ。" + listFontCache[0].drawstr + " を解放します。");
 				if (listFontCache[0].bmp != null) {
 					listFontCache[0].bmp.Dispose();
 				}
@@ -126,7 +124,6 @@ public class CCachedFontRenderer : CFontRenderer {
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[listFontCache.Count - 1].bmp.Copy();
 		} else {
-			Debug.WriteLine(drawstr + ": Cacheにヒット!! index=" + index);
 			#region [ キャッシュにヒット。レンダリングは行わず、キャッシュ内のデータを返して終了。]
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[index].bmp.Copy();
@@ -166,11 +163,9 @@ public class CCachedFontRenderer : CFontRenderer {
 			fc.Vertical = true;
 			fc.KeepCenter = keepCenter;
 			listFontCache.Add(fc);
-			Debug.WriteLine(drawstr + ": Cacheにヒットせず。(cachesize=" + listFontCache.Count + ")");
 			#endregion
 			#region [ もしキャッシュがあふれたら、最も古いキャッシュを破棄する ]
 			if (listFontCache.Count > MAXCACHESIZE) {
-				Debug.WriteLine("Cache溢れ。" + listFontCache[0].drawstr + " を解放します。");
 				if (listFontCache[0].bmp != null) {
 					listFontCache[0].bmp.Dispose();
 				}
@@ -181,7 +176,6 @@ public class CCachedFontRenderer : CFontRenderer {
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[listFontCache.Count - 1].bmp.Copy();
 		} else {
-			Debug.WriteLine(drawstr + ": Cacheにヒット!! index=" + index);
 			#region [ キャッシュにヒット。レンダリングは行わず、キャッシュ内のデータを返して終了。]
 			// 呼び出し元のDispose()でキャッシュもDispose()されないように、Clone()で返す。
 			return listFontCache[index].bmp.Copy();

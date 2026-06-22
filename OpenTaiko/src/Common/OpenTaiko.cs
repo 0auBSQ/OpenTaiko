@@ -64,6 +64,13 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
+	/// <summary>
+	/// When non-null, the song-loading stage will use this pre-built <see cref="CTja"/> instead of
+	/// reading from <c>SongMount.rChosenScore.ファイル情報.ファイルの絶対パス</c>.
+	/// Consumed (set back to null) immediately after the handoff so it is used only once.
+	/// </summary>
+	public static CTja? DanBuilderPrebuiltTja = null;
+
 	#region [DTX instances]
 	public static CTja? TJA { // only for P1
 		get => tja[0];
@@ -124,7 +131,7 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CSongs管理 Songs管理 {
+	public static CSongManager SongManager {
 		get;
 		set;    // 2012.1.26 yyagi private解除 CStage起動でのdesirialize読み込みのため
 	}
@@ -185,15 +192,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStage起動 stageStartup {
+	public static CStageStartup stageStartup {
 		get;
 		private set;
 	}
-	public static CStageTitle stageTitle {
-		get;
-		private set;
-	}
-	public static CStageコンフィグ stageConfig {
+	public static CStageConfig stageConfig {
 		get;
 		private set;
 	}
@@ -202,14 +205,6 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStageSongSelect stageSongSelect {
-		get;
-		private set;
-	}
-	public static CStage段位選択 stageDanSongSelect {
-		get;
-		private set;
-	}
 	public static CStageHeya stageHeya {
 		get;
 		private set;
@@ -220,25 +215,20 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-	public static CStageTowerSelect stageTowerSelect {
-		get;
-		private set;
-	}
-
 	public static CStageCutScene stageCutScene {
 		get;
 		private set;
 	}
 
-	public static CStage曲読み込み stageSongLoading {
+	public static CStageSongLoading stageSongLoading {
 		get;
 		private set;
 	}
-	public static CStage演奏ドラム画面 stageGameScreen {
+	public static CStagePlayDrumsScreen stageGameScreen {
 		get;
 		private set;
 	}
-	public static CStage結果 stageResults {
+	public static CStageResult stageResults {
 		get;
 		private set;
 	}
@@ -246,13 +236,17 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
-	public static CStage終了 stageExit {
+	public static CStageTransition stageTransition {
+		get;
+		private set;
+	}
+	public static CStageShutdown stageExit {
 		get;
 		private set;
 	}
 	public static CStage rCurrentStage = null;
 	public static CStage rPreviousStage = null;
-	public static string strEXEのあるフォルダ {
+	public static string strEXEFolder {
 		get;
 		private set;
 	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
@@ -274,9 +268,9 @@ internal class OpenTaiko : Game {
 	public static string ResolveAssetPath(string path) {
 		if (strBundleFolder != null && !File.Exists(path) && !Directory.Exists(path)) {
 			string relative;
-			if (path.StartsWith(strEXEのあるフォルダ)) {
+			if (path.StartsWith(strEXEFolder)) {
 				// Absolute path under Documents — try equivalent under bundle
-				relative = path.Substring(strEXEのあるフォルダ.Length);
+				relative = path.Substring(strEXEFolder.Length);
 			} else if (!Path.IsPathRooted(path)) {
 				// Relative path (resolved against CWD=Documents) — try under bundle
 				relative = path;
@@ -286,6 +280,25 @@ internal class OpenTaiko : Game {
 			string bundlePath = strBundleFolder + relative;
 			if (File.Exists(bundlePath) || Directory.Exists(bundlePath))
 				return bundlePath;
+		}
+		return path;
+	}
+
+	// Writable mirror (under Documents) for files whose natural path is inside the read-only app bundle.
+	private const string strBundleWritableMirror = "UserData";
+
+	/// <summary>
+	/// Resolve a path for WRITING. On iOS the app bundle is read-only (especially on device — a
+	/// CreateDirectory/write there fails with "Operation not permitted"), so a path that points into
+	/// the bundle is remapped under a dedicated writable subtree of Documents (UserData/…). It is
+	/// deliberately NOT placed directly under Documents at the same relative path: that would create a
+	/// partial copy of a skin folder (e.g. System/&lt;skin&gt;/), which ResolveAssetPath would then treat
+	/// as the whole skin and hide the complete bundle skin (→ "boot stage not found"). On other
+	/// platforms — and for paths already under Documents — the path is returned unchanged.
+	/// </summary>
+	public static string ResolveWritePath(string path) {
+		if (strBundleFolder != null && path.StartsWith(strBundleFolder)) {
+			return System.IO.Path.Combine(strEXEFolder, strBundleWritableMirror, path.Substring(strBundleFolder.Length));
 		}
 		return path;
 	}
@@ -300,8 +313,8 @@ internal class OpenTaiko : Game {
 			return Directory.Exists(path) ? Directory.GetDirectories(path, searchPattern) : Array.Empty<string>();
 
 		string relative;
-		if (path.StartsWith(strEXEのあるフォルダ))
-			relative = path.Substring(strEXEのあるフォルダ.Length);
+		if (path.StartsWith(strEXEFolder))
+			relative = path.Substring(strEXEFolder.Length);
 		else if (!Path.IsPathRooted(path))
 			relative = path;
 		else
@@ -336,16 +349,9 @@ internal class OpenTaiko : Game {
 	}
 	public static DiscordRpcClient DiscordClient;
 
-	// 0 : 1P, 1 : 2P
-	public static int SaveFile = 0;
-
 	public static SaveFile[] SaveFileInstances = new SaveFile[5];
 
-	public static SaveFile PrimarySaveFile {
-		get {
-			return SaveFileInstances[SaveFile];
-		}
-	}
+	public static SaveFile PrimarySaveFile => SaveFileInstances[0];
 
 	// 0 : Hidari, 1 : Migi (1P only)
 	public static int PlayerSide = 0;
@@ -362,13 +368,9 @@ internal class OpenTaiko : Game {
 		private set;
 	}
 
-
-	public static int GetActualPlayer(int player) {
-		if (SaveFile == 0 || player > 1)
-			return player;
-		if (player == 0)
-			return 1;
-		return 0;
+	public static LuaGlobalStores GlobalStores {
+		get;
+		private set;
 	}
 
 	public static bool P1IsBlue() {
@@ -410,7 +412,12 @@ internal class OpenTaiko : Game {
 	/// </summary>
 	public static bool ConfigIsNew;
 
-	public void MountStage(CStage Stage) {
+
+	// メソッド
+
+	public void MountActivity(CActivity? Stage) {
+		if (Stage == null)
+			return;
 		Stage.Activate();
 		if (!ConfigIni.PreAssetsLoading) {
 			Stage.CreateManagedResource();
@@ -418,37 +425,84 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public void UnmountStage(CStage Stage) {
-		if (Stage != null) {
-			Stage.DeActivate();
-			if (!ConfigIni.PreAssetsLoading) {
-				Stage.ReleaseManagedResource();
-				Stage.ReleaseUnmanagedResource();
-			}
+	public void UnmountActivity(CActivity? Stage) {
+		if (Stage == null)
+			return;
+		Stage.DeActivate();
+		if (!ConfigIni.PreAssetsLoading) {
+			Stage.ReleaseManagedResource();
+			Stage.ReleaseUnmanagedResource();
 		}
 	}
 
-	public void UnmountCurrentStage() {
-		UnmountStage(rCurrentStage);
-	}
-
-	public void ChangeStage(CStage Stage) {
-		UnmountCurrentStage();
-		MountStage(Stage);
+	public void ChangeStage(CStage Stage, string? traceMessage = null) {
+		MountActivity(Stage);
+		if (traceMessage != null) {
+			Trace.TraceInformation("----------------------");
+			Trace.TraceInformation($"■ {traceMessage}");
+		}
 		rPreviousStage = rCurrentStage;
 		rCurrentStage = Stage;
 	}
 
+	public void UnmountAndChangeStage(CStage Stage, string? traceMessage = null) {
+		// A Lua Exit(...) requested a transition: hand the switch to CStageTransition (it renders the still-
+		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
+		var pendingTransition = CStageTransition.ConsumePendingScript();
+		if (pendingTransition != null && Stage != null) {
+			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pendingTransition, traceMessage);
+			rPreviousStage = rCurrentStage;
+			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
+			return;
+		}
+
+		UnmountActivity(rCurrentStage);
+		this.ChangeStage(Stage, traceMessage);
+	}
+
+	// Enter the song load. With a transition module available, run it as ONE transition (fade the outgoing
+	// stage out → drive CStageSongLoading [its screen + bar] → fade the loaded game screen in), so there's no
+	// abrupt cut. Otherwise fall back to the legacy song-loading stage. `outgoing` is the still-mounted stage
+	// being left (song select, or the cutscene). ESC during the load returns to the last song select.
+	public void EnterSongLoad(CStage outgoing) {
+		var slScript = LuaTransitionWrapper.Get("song_loading");
+		if (slScript != null) {
+			CStageTransition.ClearPendingScript();   // play path always uses the song_loading transition
+			stageTransition.Begin(outgoing, stageGameScreen, new SongLoadStep(stageSongLoading),
+				new TransitionOptions { NoAssetPhase = true, LoaderDrivesBar = true, RevealsGameplay = true,
+				                        CancelTarget = latestSongSelect ?? outgoing },
+				slScript, "Song Loading");
+			rPreviousStage = rCurrentStage;
+			rCurrentStage = stageTransition;
+		} else {
+			UnmountAndChangeStage(stageSongLoading, "Song Loading");
+		}
+	}
+
+	public void UnmountAndChangeLuaStageOrError(string name, string? traceMessage = null, CSystemError.Errno errno = CSystemError.Errno.ENO_INVALIDSTAGENAME) {
+		LuaStageWrapper.ForceSetNextRequestedStage(name);
+		LuaStageWrapper? _stage = LuaStageWrapper.GetNextRequestedStage();
+		if (_stage != null) {
+			UnmountAndChangeStage(_stage, traceMessage ?? $"Lua Stage: {name}");
+		} else {
+			TriggerSystemError(errno);
+		}
+	}
+
 	public void TriggerSystemError(CSystemError.Errno errno, Exception? exception = null, string? message = null) {
+		CStageTransition.ClearPendingScript();   // don't carry a pending transition into the error stage
 		if (exception != null)
 			Trace.TraceError(exception.ToString());
 		if (message != null)
 			Trace.TraceError(message);
 		SystemError.LoadError(errno, exception, message);
-		ChangeStage(SystemError);
+		UnmountAndChangeStage(SystemError);
 	}
 
-	// メソッド
+	public void EnterRefreshSkinStage(bool isSavedBeforeUpdate = false) {
+		stageChangeSkin.SavePreviousStage(isSavedBeforeUpdate ? rCurrentStage : rPreviousStage);
+	}
+
 
 
 	#region [ #24609 リザルト画像をpngで保存する ]		// #24609 2011.3.14 yyagi; to save result screen in case BestRank or HiSkill.
@@ -491,17 +545,17 @@ internal class OpenTaiko : Game {
 			// Writable files (Config.ini, databases, etc.) live in Documents.
 			// Customizable trees (Global/, System/, Lang/) merge bundle defaults with Documents additions:
 			// listings via GetMergedDirectories(), single assets via ResolveAssetPath() (Documents override, bundle fallback).
-			strEXEのあるフォルダ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar;
+			strEXEFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar;
 			// strBundleFolder is set by GameViewController before game launch
 			// Set CWD so relative paths (Favorite.json, etc.) resolve to writable Documents dir
-			Directory.SetCurrentDirectory(strEXEのあるフォルダ);
+			Directory.SetCurrentDirectory(strEXEFolder);
 		} else {
-			strEXEのあるフォルダ = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
+			strEXEFolder = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
 		}
 
 		ConfigIni = new CConfigIni();
 
-		string path = strEXEのあるフォルダ + "Config.ini";
+		string path = strEXEFolder + "Config.ini";
 		if (File.Exists(path)) {
 			try {
 				// Load config info
@@ -515,36 +569,38 @@ internal class OpenTaiko : Game {
 		}
 
 		if (ConfigIsNew) {
-			GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+			GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 
 			if (OperatingSystem.IsWindows()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+				GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 				ConfigIni.nGraphicsDeviceType = 0;
 			}
 			// While we aren't able to support MacOS, this check is included just in case this changes.
 			else if (OperatingSystem.IsMacOS()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+				GraphicsDeviceType_ = AnglePlatformType.Metal;
 				ConfigIni.nGraphicsDeviceType = 3;
 			} else if (OperatingSystem.IsLinux()) {
-				GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+				GraphicsDeviceType_ = AnglePlatformType.Vulkan;
 				ConfigIni.nGraphicsDeviceType = 2;
 			}
 		} else {
 			switch (ConfigIni.nGraphicsDeviceType) {
 				case 0:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.OpenGL;
+					GraphicsDeviceType_ = AnglePlatformType.OpenGL;
 					break;
 				case 1:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.D3D11;
+					GraphicsDeviceType_ = AnglePlatformType.D3D11;
 					break;
 				case 2:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Vulkan;
+					GraphicsDeviceType_ = AnglePlatformType.Vulkan;
 					break;
 				case 3:
-					GraphicsDeviceType_ = Silk.NET.GLFW.AnglePlatformType.Metal;
+					GraphicsDeviceType_ = AnglePlatformType.Metal;
 					break;
 			}
 		}
+
+		if (VideoExporter.Active) VideoExporter.ApplyBootOverrides(this);
 
 		if (!OperatingSystem.IsIOS()) {
 			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
@@ -568,11 +624,11 @@ internal class OpenTaiko : Game {
 
 	protected override void LoadContent() {
 		if (ConfigIni.bWindowMode) {
-			if (!this.bマウスカーソル表示中) {
-				this.bマウスカーソル表示中 = true;
+			if (!this.bMouseCursorDisplaying) {
+				this.bMouseCursorDisplaying = true;
 			}
-		} else if (this.bマウスカーソル表示中) {
-			this.bマウスカーソル表示中 = false;
+		} else if (this.bMouseCursorDisplaying) {
+			this.bMouseCursorDisplaying = false;
 		}
 
 		if (this.listTopLevelActivities != null) {
@@ -612,8 +668,8 @@ internal class OpenTaiko : Game {
 			if (rCurrentStage != null) {
 				// set up camera before drawing main UI
 				if (!ConfigIni.bTokkunMode && rCurrentStage?.eStageID != CStage.EStage.CRASH) {
-					float screen_ratiox = OpenTaiko.Skin.Resolution[0] / 1280.0f;
-					float screen_ratioy = OpenTaiko.Skin.Resolution[1] / 720.0f;
+					float screen_ratiox = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[0] / 1280.0f : 1.0f;
+					float screen_ratioy = OpenTaiko.Skin != null ? OpenTaiko.Skin.Resolution[1] / 720.0f : 1.0f;
 
 					Camera = Matrix4X4<float>.Identity;
 
@@ -635,16 +691,23 @@ internal class OpenTaiko : Game {
 				}
 
 				if (OperatingSystem.IsIOS() && _iosStageDebugCounter++ % 300 == 0) {
-					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage.eStageID}, Phase: {rCurrentStage.ePhaseID}");
+					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage.eStageID}{(string.IsNullOrEmpty(rCurrentStage.customStageName) ? "" : $" ({rCurrentStage.customStageName})")}, Phase: {rCurrentStage.ePhaseID}");
 				}
-				// Mark a new scene on stage change so memory-pressure eviction protects the new
-				// stage's textures and only releases ones left over from the previous stage.
-				if (rCurrentStage.eStageID != _lastSceneStageId) {
-					_lastSceneStageId = rCurrentStage.eStageID;
-					CTexture.BeginNewScene();
-				}
-				OpenTaiko.NamePlate?.lcNamePlate?.Update();
+				OpenTaiko.NamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
+
+				if (VideoExporter.Active)
+					this.nDrawLoopReturnValue = VideoExporter.Tick(this, this.nDrawLoopReturnValue);
+
+				// Skip the chart object overlay while a transition COVERS the screen, so chips don't punch through
+				// a black/cover fade. Exception: during the song-loading → gameplay reveal the loading screen
+				// fades out OVER the chips, so we DO draw them (they stay visible as the screen clears).
+				if (OpenTaiko.TJA != null && (rCurrentStage?.eStageID != CStage.EStage.Transition || stageTransition.RevealingGameplay)) {
+					//object rendering
+					foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
+						pair.Value.tDraw();
+					}
+				}
 
 				// draw the remaining elements normally
 				Camera = Matrix4X4<float>.Identity;
@@ -655,23 +718,20 @@ internal class OpenTaiko : Game {
 
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
+
 				switch (rCurrentStage.eStageID) {
-					case CStage.EStage.Title:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
+					case CStage.EStage.Heya:
+					case CStage.EStage.CUSTOM:
 						if (EnumSongs != null) {
-							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if (rCurrentStage.eStageID == CStage.EStage.Title &&
+							#region [ Start the thread for song enumaration ]
+							if (rCurrentStage.eStageID == CStage.EStage.CUSTOM &&
 								rPreviousStage.eStageID == CStage.EStage.StartUp &&
 								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
 								!EnumSongs.IsSongListEnumStarted) {
-								actEnumSongs.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									actEnumSongs.CreateManagedResource();
-									actEnumSongs.CreateUnmanagedResource();
-								}
-								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = true;
+								MountActivity(actEnumSongs);
 								EnumSongs.Init();   // 取得した曲数を、新インスタンスにも与える
 								EnumSongs.StartEnumFromDisk();      // 曲検索スレッドの起動_開始
 							}
@@ -683,20 +743,12 @@ internal class OpenTaiko : Game {
 									case 0:     // 何もない
 										EnumSongs.Resume();
 										EnumSongs.IsSlowdown = false;
-										actEnumSongs.Activate();
-										if (!ConfigIni.PreAssetsLoading) {
-											actEnumSongs.CreateManagedResource();
-											actEnumSongs.CreateUnmanagedResource();
-										}
+										MountActivity(actEnumSongs);
 										break;
 
 									case 2:     // 曲決定
 										EnumSongs.Suspend();                        // #27060 バックグラウンドの曲検索を一時停止
-										actEnumSongs.DeActivate();
-										if (!ConfigIni.PreAssetsLoading) {
-											actEnumSongs.ReleaseManagedResource();
-											actEnumSongs.ReleaseUnmanagedResource();
-										}
+										UnmountActivity(actEnumSongs);
 										break;
 								}
 							}
@@ -713,18 +765,16 @@ internal class OpenTaiko : Game {
 							#region [ 曲検索が完了したら、実際の曲リストに反映する ]
 							// CStage選曲.On活性化() に回した方がいいかな？
 							if (EnumSongs.state is CEnumSongs.DTXEnumState.Enumeratad or CEnumSongs.DTXEnumState.Canceled) {
-								actEnumSongs.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									actEnumSongs.ReleaseManagedResource();
-									actEnumSongs.ReleaseUnmanagedResource();
-								}
-								OpenTaiko.stageSongSelect.bIsEnumeratingSongs = false;
+								UnmountActivity(actEnumSongs);
 
 								if (EnumSongs.IsSongListEnumerated) {
-									bool bRemakeSongTitleBar = (rCurrentStage.eStageID == CStage.EStage.SongSelect) ? true : false;
-									OpenTaiko.stageSongSelect.Refresh(EnumSongs.Songs管理, bRemakeSongTitleBar);
-									EnumSongs.SongListEnumCompletelyDone();
-								}
+								OpenTaiko.SongManager = EnumSongs.SongManager;
+								EnumSongs.SongListEnumCompletelyDone();
+
+								// Propagate AfterSongEnum events to all lua stages
+								LuaStageWrapper.PropagateAfterSongEnumEvent();
+								LuaActivityWrapper.PropagateAfterSongEnumEvent();
+							}
 							}
 							#endregion
 						}
@@ -740,275 +790,56 @@ internal class OpenTaiko : Game {
 						break;
 
 					case CStage.EStage.StartUp:
-						#region [ *** ]
-						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							ChangeStage(stageTitle);
-							Trace.TraceInformation("----------------------");
-							Trace.TraceInformation("■ Title");
-
+							UnmountAndChangeLuaStageOrError("_boot", "Boot", CSystemError.Errno.ENO_BOOTNOTFOUND);
 							this.tExecuteGarbageCollection();
 						}
-						//-----------------------------
-						#endregion
 						break;
 
-					case CStage.EStage.Title:
-						#region [ *** ]
-						//-----------------------------
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.GAMESTART:
-								#region [ Song select ]
-								//-----------------------------
-								ChangeStage(stageSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Select");
-
-								OpenTaiko.latestSongSelect = stageSongSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.DANGAMESTART:
-								#region [ Dan song select ]
-								//-----------------------------
-								ChangeStage(stageDanSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Dan Select");
-
-								OpenTaiko.latestSongSelect = stageDanSongSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.TAIKOTOWERSSTART:
-								#region [ Tower song select ]
-								//-----------------------------
-								ChangeStage(stageTowerSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Tower Select");
-
-								OpenTaiko.latestSongSelect = stageTowerSelect;
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.HEYA:
-								#region [Heya menu]
-								//-----------------------------
-								ChangeStage(stageHeya);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Taiko Heya");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.ONLINELOUNGE:
-								#region [Online Lounge]
-								//-----------------------------
-								ChangeStage(stageOnlineLounge);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Online Lounge");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.CONFIG:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageConfig);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Config");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.EXIT:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageExit);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ End");
-								//-----------------------------
-								#endregion
-								break;
-
-							case (int)EReturnValue.AIBATTLEMODE:
-								#region [ Song select (with AI) ]
-								//-----------------------------
-								ChangeStage(stageSongSelect);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ AI Battle Song Select");
-
-								OpenTaiko.latestSongSelect = stageSongSelect;
-								ConfigIni.nPreviousPlayerCount = ConfigIni.nPlayerCount;
-								ConfigIni.nPlayerCount = 2;
-								ConfigIni.bAIBattleMode = true;
-								ConfigIni.tInitializeAILevel();
-								//-----------------------------
-								#endregion
-								break;
-
+					case CStage.EStage.Transition:
+						// Transition finished. Normal: take over the target it already mounted (rPreviousStage
+						// stays the stage we came from). Cancelled song load (ESC): tear down the chart + go back
+						// to song select.
+						if (this.nDrawLoopReturnValue != 0) {
+							if (stageTransition.Canceled) {
+								CStage? cancelTo = stageTransition.CancelTarget;
+								stageTransition.Finish();
+								OpenTaiko.Pad.detectedDevice.Clear();
+								if (TJA != null) {
+									TJA.DeActivate();
+									TJA.ReleaseManagedResource();
+									TJA.ReleaseUnmanagedResource();
+								}
+								SongMount.bIsAfterSongJump = false;
+								UnmountAndChangeStage(cancelTo ?? latestSongSelect, "Return to song select menu");
+								this.tExecuteGarbageCollection();
+							} else {
+								CStage? _target = stageTransition.Target;
+								stageTransition.Finish();
+								rCurrentStage = _target ?? rCurrentStage;
+							}
 						}
-
-						//-----------------------------
-						#endregion
 						break;
 
 					case CStage.EStage.Config:
 						#region [ *** ]
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
-							switch (rPreviousStage.eStageID) {
-								case CStage.EStage.Title:
-									#region [ *** ]
-									//-----------------------------
-									ChangeStage(stageTitle);
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Title");
-									stageTitle.tReloadMenus();
-
+							// update target stage
+							switch (rPreviousStage?.eStageID) {
+								default:
+								case CStage.EStage.CUSTOM:
+									UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 									this.tExecuteGarbageCollection();
 									break;
-								//-----------------------------
-								#endregion
 
-								case CStage.EStage.SongSelect:
-									#region [ *** ]
-									//-----------------------------
-									ChangeStage(stageSongSelect);
-									Trace.TraceInformation("----------------------");
-									Trace.TraceInformation("■ Song Select");
-
-									this.tExecuteGarbageCollection();
-									break;
-									//-----------------------------
-									#endregion
+							}
+							if (stageChangeSkin.IsPreviousStageSaved) { // change skin
+								UnmountAndChangeStage(stageChangeSkin);
 							}
 							return;
 						}
 						//-----------------------------
-						#endregion
-						break;
-
-					case CStage.EStage.SongSelect:
-						#region [ *** ]
-						//-----------------------------
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								if (ConfigIni.bAIBattleMode == true) {
-									ConfigIni.nPlayerCount = ConfigIni.nPreviousPlayerCount;
-									ConfigIni.bAIBattleMode = false;
-								}
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.PlayCutSceneIntro:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageCutScene);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Cut Scene");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageSongLoading);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Loading");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.ConfigMenuOpened:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageConfig);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Config");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SkinChange:
-
-								#region [ *** ]
-								//-----------------------------
-								UnmountCurrentStage();
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Skin Change");
-								stageChangeSkin.Activate();
-								rPreviousStage = rCurrentStage;
-								rCurrentStage = stageChangeSkin;
-								break;
-								//-----------------------------
-								#endregion
-						}
-						//-----------------------------
-						#endregion
-						break;
-
-					case CStage.EStage.DanDojoSelect:
-						#region [ *** ]
-						switch (this.nDrawLoopReturnValue) {
-							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
-								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
-
-								this.tExecuteGarbageCollection();
-								break;
-							//-----------------------------
-							#endregion
-
-							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
-								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
-								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation(playCutScenes ? "■ Cut Scene" : "■ Song Loading");
-
-								this.tExecuteGarbageCollection();
-								break;
-								//-----------------------------
-								#endregion
-						}
 						#endregion
 						break;
 
@@ -1018,12 +849,7 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
+								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1037,16 +863,13 @@ internal class OpenTaiko : Game {
 						#region [ *** ]
 						switch (this.nDrawLoopReturnValue) {
 							case (int)CStageCutScene.EReturnValue.IntroFinished:
-								ChangeStage(stageSongLoading);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Loading");
-
+								EnterSongLoad(rCurrentStage);   // song_loading transition, or legacy stage fallback
 								this.tExecuteGarbageCollection();
 								break;
 
 							case (int)CStageCutScene.EReturnValue.OutroFinished:
-								this.UnmountCurrentStage();
-								this.ReturnToSongSelection(OpenTaiko.stageResults);
+								UnmountActivity(rCurrentStage);
+								this.NextSongSelectStage(OpenTaiko.stageResults);
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1059,9 +882,9 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							OpenTaiko.Pad.detectedDevice.Clear();
-							UnmountCurrentStage();
 							#region [ If ESC is pressed, cancel the loading and go back to song select ]
 							if (this.nDrawLoopReturnValue == (int)ESongLoadingScreenReturnValue.LoadCanceled) {
+								UnmountActivity(rCurrentStage);
 
 								if (TJA != null) {
 									TJA.DeActivate();
@@ -1069,26 +892,30 @@ internal class OpenTaiko : Game {
 									TJA.ReleaseUnmanagedResource();
 								}
 
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Return to song select menu");
-								MountStage(OpenTaiko.latestSongSelect);
-
-								rPreviousStage = rCurrentStage;
-
-								// Seek latest registered song select screen
-								rCurrentStage = OpenTaiko.latestSongSelect;
-
+								SongMount.bIsAfterSongJump = false;
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								break;
 							}
 							#endregion
 
 							Trace.TraceInformation("----------------------");
 							Trace.TraceInformation("■ Gameplay (Drum Screen)");
-
-							rPreviousStage = rCurrentStage;
-							rCurrentStage = stageGameScreen;
-
 							this.tExecuteGarbageCollection();
+
+							// Gameplay was already activated during the song load. Hand off via a reveal transition
+							// (fade the loading screen out + the game screen in, both clock-driven so audio/notes stay
+							// in sync) instead of the abrupt cut. The chart-object overlay is held during the fade
+							// (see the EStage.Transition guard above). No transition module ⇒ legacy direct swap.
+							var revealScript = LuaTransitionWrapper.Get(null);
+							if (revealScript != null) {
+								stageTransition.Begin(rCurrentStage, stageGameScreen, null, default, revealScript, "Gameplay (Drum Screen)");
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageTransition;
+							} else {
+								UnmountActivity(rCurrentStage);
+								rPreviousStage = rCurrentStage;
+								rCurrentStage = stageGameScreen;
+							}
 						}
 						//-----------------------------
 						#endregion
@@ -1104,18 +931,7 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								rCurrentStage.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									rCurrentStage.ReleaseManagedResource();
-									rCurrentStage.ReleaseUnmanagedResource();
-								}
-								stageSongLoading.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageSongLoading.CreateManagedResource();
-									stageSongLoading.CreateUnmanagedResource();
-								}
-								rPreviousStage = rCurrentStage;
-								rCurrentStage = stageSongLoading;
+								UnmountAndChangeStage(stageSongLoading);
 								this.tExecuteGarbageCollection();
 								break;
 							#endregion
@@ -1132,25 +948,9 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								rCurrentStage.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									rCurrentStage.ReleaseManagedResource();
-									rCurrentStage.ReleaseUnmanagedResource();
-								}
+								SongMount.bIsAfterSongJump = false;
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Return to song select menu");
-								OpenTaiko.latestSongSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									OpenTaiko.latestSongSelect.CreateManagedResource();
-									OpenTaiko.latestSongSelect.CreateUnmanagedResource();
-								}
-								rPreviousStage = rCurrentStage;
-
-								// Seek latest registered song select screen
-								rCurrentStage = OpenTaiko.latestSongSelect;
-
-								this.tExecuteGarbageCollection();
 								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
@@ -1164,22 +964,8 @@ internal class OpenTaiko : Game {
 								TJA.DeActivate();
 								TJA.ReleaseManagedResource();
 								TJA.ReleaseUnmanagedResource();
-								rCurrentStage.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									rCurrentStage.ReleaseManagedResource();
-									rCurrentStage.ReleaseUnmanagedResource();
-								}
-
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Song Select");
-								stageSongSelect.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageSongSelect.CreateManagedResource();
-									stageSongSelect.CreateUnmanagedResource();
-								}
-								rPreviousStage = rCurrentStage;
-								rCurrentStage = stageSongSelect;
-
+								SongMount.bIsAfterSongJump = false;
+								UnmountAndChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 								break;
 							//-----------------------------
@@ -1190,25 +976,25 @@ internal class OpenTaiko : Game {
 								//-----------------------------
 
 								// Fetch the results of the finished play
-								CScoreIni.C演奏記録 c演奏記録_Drums;
-								stageGameScreen.t演奏結果を格納する(out c演奏記録_Drums);
+								stageGameScreen.bPreviousPlayWasEndedNormally = true;
+								CScoreIni.CPlayRecord cPlayRecord_Drums;
+								stageGameScreen.tPlayResultStore(out cPlayRecord_Drums);
+								stageResults.stPlayRecord = cPlayRecord_Drums;
+								UnmountAndChangeStage(stageResults, "Results");
+								break;
+								//-----------------------------
+								#endregion
 
-								rCurrentStage.DeActivate();
-								if (!ConfigIni.PreAssetsLoading) {
-									rCurrentStage.ReleaseManagedResource();
-									rCurrentStage.ReleaseUnmanagedResource();
-								}
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Results");
-								stageResults.st演奏記録.Drums = c演奏記録_Drums;
-								stageResults.Activate();
-								if (!ConfigIni.PreAssetsLoading) {
-									stageResults.CreateManagedResource();
-									stageResults.CreateUnmanagedResource();
-								}
-								rPreviousStage = rCurrentStage;
-								rCurrentStage = stageResults;
-
+							case (int)EGameplayScreenReturnValue.SongJump:
+								#region [ Song jump (skip results, load new song) ]
+								//-----------------------------
+								SongMount.bSongJumpPending = false;
+								TJA?.tStopAllChipsAndRemoveFromMixer();
+								TJA?.DeActivate();
+								TJA?.ReleaseManagedResource();
+								TJA?.ReleaseUnmanagedResource();
+								UnmountAndChangeStage(stageSongLoading, "Song Loading");
+								this.tExecuteGarbageCollection();
 								break;
 								//-----------------------------
 								#endregion
@@ -1222,27 +1008,21 @@ internal class OpenTaiko : Game {
 						//-----------------------------
 						if (this.nDrawLoopReturnValue != 0) {
 							//DTX.t全チップの再生一時停止();
-							TJA.t全チップの再生停止とミキサーからの削除();
+							TJA.tStopAllChipsAndRemoveFromMixer();
 							TJA.DeActivate();
 							TJA.ReleaseManagedResource();
 							TJA.ReleaseUnmanagedResource();
-							rCurrentStage.DeActivate();
-							if (!ConfigIni.PreAssetsLoading) {
-								rCurrentStage.ReleaseManagedResource();
-								rCurrentStage.ReleaseUnmanagedResource();
-							}
+							UnmountActivity(rCurrentStage);
 							this.tExecuteGarbageCollection();
 
-							if (stageCutScene.LoadCutScenes(rCurrentStage)) {
+							// Online VS: no outro cutscene — every player would otherwise sit through it out of sync.
+							bool _onlineNoCut = LuaNetworking.Active?.PlaySyncActive == true;
+							if (!_onlineNoCut && stageCutScene.LoadCutScenes(rCurrentStage)) {
 								//-----------------------------
-								this.MountStage(stageCutScene);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Cut Scene");
-
-								rPreviousStage = rCurrentStage;
-								rCurrentStage = stageCutScene;
+								this.ChangeStage(stageCutScene, "Cut Scene");
 							} else {
-								this.ReturnToSongSelection(rCurrentStage);
+								SongMount.bIsAfterSongJump = false;
+								this.NextSongSelectStage(rCurrentStage);
 							}
 						}
 						//-----------------------------
@@ -1250,18 +1030,26 @@ internal class OpenTaiko : Game {
 						break;
 
 
-					case CStage.EStage.TaikoTowers:
+					case CStage.EStage.ChangeSkin:
 						#region [ *** ]
+						//-----------------------------
+						if (this.nDrawLoopReturnValue != 0) {
+							// After a skin (re)load, enter the new skin's _boot stage (same entry point as the
+							// initial startup) instead of silently reverting to the previous screen.
+							UnmountAndChangeLuaStageOrError("_boot", "Boot", CSystemError.Errno.ENO_BOOTNOTFOUND);
+							this.tExecuteGarbageCollection();
+						}
+						//-----------------------------
+						#endregion
+						break;
+
+					case CStage.EStage.CUSTOM:
+						#region [ Lua Stages ]
 						switch (this.nDrawLoopReturnValue) {
 							case (int)EReturnValue.BackToTitle:
-								#region [ *** ]
+								#region [ Back to title screen ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
+								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1269,33 +1057,44 @@ internal class OpenTaiko : Game {
 							#endregion
 
 							case (int)EReturnValue.SongSelected:
-								#region [ *** ]
+								#region [ Song selected ]
 								//-----------------------------
-								bool playCutScenes = stageCutScene.LoadCutScenes(rCurrentStage);
-								ChangeStage(playCutScenes ? stageCutScene : stageSongLoading);
-								latestSongSelect = stageTowerSelect;
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation(playCutScenes ? "■ Cut Scene" : "■ Song Loading");
-
+								// Online VS: skip intro cutscenes — the lobby already bracketed the play round
+								// (PlaySyncActive), and a cutscene would desync every player's start.
+								bool playCutScenes = LuaNetworking.Active?.PlaySyncActive != true
+									&& stageCutScene.LoadCutScenes(rCurrentStage, true);
+								latestSongSelect = rCurrentStage;
+								if (playCutScenes) {
+									UnmountAndChangeStage(stageCutScene, "Cut Scene");
+								} else {
+									EnterSongLoad(rCurrentStage);   // song_loading transition, or legacy stage fallback
+								}
 								this.tExecuteGarbageCollection();
 								break;
-								//-----------------------------
-								#endregion
-						}
-						#endregion
-						break;
+							//-----------------------------
+							#endregion
 
-					case CStage.EStage.ChangeSkin:
-						#region [ *** ]
-						//-----------------------------
-						if (this.nDrawLoopReturnValue != 0) {
-							ChangeStage(stageSongSelect);
-							Trace.TraceInformation("----------------------");
-							Trace.TraceInformation("■ Song Select");
+							case (int)EReturnValue.JumpToLuaStage: // Transition to another Lua Stage
+								UnmountAndChangeLuaStageOrError(LuaStageWrapper.GetNextRequestedStageName());
+								this.tExecuteGarbageCollection();
+								break;
 
-							this.tExecuteGarbageCollection();
+							case (int)EReturnValue.HEYA:
+								UnmountAndChangeStage(stageHeya, "Taiko Heya");
+								break;
+
+							case (int)EReturnValue.ONLINELOUNGE:
+								UnmountAndChangeStage(stageOnlineLounge, "Online Lounge");
+								break;
+
+							case (int)EReturnValue.CONFIG:
+								UnmountAndChangeStage(stageConfig, "Config");
+								break;
+
+							case (int)EReturnValue.EXIT:
+								UnmountAndChangeStage(stageExit, "End");
+								break;
 						}
-						//-----------------------------
 						#endregion
 						break;
 
@@ -1316,12 +1115,7 @@ internal class OpenTaiko : Game {
 							case (int)EReturnValue.BackToTitle:
 								#region [ *** ]
 								//-----------------------------
-								ChangeStage(stageTitle);
-								Trace.TraceInformation("----------------------");
-								Trace.TraceInformation("■ Title");
-
-								CSongSelectSongManager.stopSong();
-								CSongSelectSongManager.enable();
+								UnmountAndChangeLuaStageOrError("_title", "Title", CSystemError.Errno.ENO_TITLENOTFOUND);
 
 								this.tExecuteGarbageCollection();
 								break;
@@ -1334,20 +1128,6 @@ internal class OpenTaiko : Game {
 
 				actScanningLoudness?.Draw();
 
-				if (rCurrentStage != null
-					&& rCurrentStage.eStageID != CStage.EStage.StartUp
-					&& rCurrentStage.eStageID != CStage.EStage.CRASH
-					&& OpenTaiko.Tx.Network_Connection != null) {
-					if (FDK.SoundManager.PlayTimer != null && this.PreviousSystemTimeMs != long.MinValue && Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
-						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
-						Task.Factory.StartNew(() => {
-							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
-							PingReply reply = new Ping().Send("8.8.8.8", 5000);
-							this.bInternetConnectionSuccess = reply.Status == IPStatus.Success;
-						});
-					}
-					OpenTaiko.Tx.Network_Connection.t2D描画(GameWindowSize.Width - (OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2), GameWindowSize.Height - OpenTaiko.Tx.Network_Connection.szTextureSize.Height, new Rectangle((OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2) * (this.bInternetConnectionSuccess ? 0 : 1), 0, OpenTaiko.Tx.Network_Connection.szTextureSize.Width / 2, OpenTaiko.Tx.Network_Connection.szTextureSize.Height));
-				}
 				// オーバレイを描画する(テクスチャの生成されていない起動ステージは例外
 
 				// Display log cards
@@ -1358,36 +1138,27 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Overlay != null
 					&& !OperatingSystem.IsIOS()) {
-					OpenTaiko.Tx.Overlay.t2D描画(0, 0);
+					OpenTaiko.Tx.Overlay.t2DDraw(0, 0);
 				}
 			}
 
 			if (OpenTaiko.ConfigIni.KeyAssign.System.Capture.IsPressed()) {
 #if DEBUG
 				if (OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl)) {
-					if (rCurrentStage.eStageID != CStage.EStage.Game) {
-						RefreshSkin();
-						rCurrentStage.DeActivate();
-						if (!ConfigIni.PreAssetsLoading) {
-							rCurrentStage.ReleaseManagedResource();
-							rCurrentStage.ReleaseUnmanagedResource();
-						}
-						rCurrentStage.Activate();
-						if (!ConfigIni.PreAssetsLoading) {
-							rCurrentStage.CreateManagedResource();
-							rCurrentStage.CreateUnmanagedResource();
-						}
+					if (rCurrentStage.eStageID is not (CStage.EStage.StartUp or CStage.EStage.Game or CStage.EStage.ChangeSkin)) {
+						this.EnterRefreshSkinStage();
+						this.UnmountAndChangeStage(stageChangeSkin);
 					}
 				} else {
 					// Debug.WriteLine( "capture: " + string.Format( "{0:2x}", (int) e.KeyCode ) + " " + (int) e.KeyCode );
 					string strFullPath =
-						Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
+						Path.Combine(OpenTaiko.strEXEFolder, "Capture_img");
 					strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
 					SaveResultScreen(strFullPath);
 				}
 #else
 				string strFullPath =
-					Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Capture_img");
+					Path.Combine(OpenTaiko.strEXEFolder, "Capture_img");
 				strFullPath = Path.Combine(strFullPath, DateTime.Now.ToString("yyyyMMddHHmmss") + ".png");
 				SaveResultScreen(strFullPath);
 #endif
@@ -1426,17 +1197,9 @@ internal class OpenTaiko : Game {
 #endif
 	}
 
-	private void ReturnToSongSelection(CStage fromStage) {
-		Trace.TraceInformation("----------------------");
-		Trace.TraceInformation("■ Return to song select menu");
-		this.MountStage(OpenTaiko.latestSongSelect);
+	private void NextSongSelectStage(CStage fromStage) {
+		ChangeStage(OpenTaiko.latestSongSelect, "Return to song select menu");
 		rPreviousStage = fromStage;
-
-		// Seek latest registered song select screen
-		rCurrentStage = OpenTaiko.latestSongSelect;
-
-		stageSongSelect.NowSong++;
-
 		this.tExecuteGarbageCollection();
 	}
 
@@ -1444,15 +1207,26 @@ internal class OpenTaiko : Game {
 
 	#region [ 汎用ヘルパー ]
 	//-----------------
-	public static CTexture tテクスチャの生成(string fileName) {
-		return tテクスチャの生成(fileName, false);
+	public static CTexture tTextureCreate(string fileName) {
+		return tTextureCreate(fileName, false);
 	}
-	public static CTexture tテクスチャの生成(string fileName, bool b黒を透過する) {
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
+#if DEBUG
+		Trace.TraceInformation($"[ALLOC_TEX] {fileName}");
+#endif
+		// Fast-skip missing files: returning null avoids a FileNotFoundException per missing texture, which is
+		// very slow under a debugger (first-chance handling) — a malformed asset (e.g. a dancer whose
+		// DancerConfig count exceeds its frame folders) otherwise throws dozens of them and freezes the load.
+		// FileExistsCached uses a per-directory listing (no slow per-file metadata hit on AV-scanned folders).
+		if (!CTexture.FileExistsCached(fileName)) {
+			Trace.TraceWarning("Could not find specified texture file. ({0})", fileName);
+			return null;
+		}
 		try {
-			return new CTexture(fileName, b黒を透過する);
+			return new CTexture(fileName, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);
@@ -1462,16 +1236,16 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 	}
-	public static void tテクスチャの解放(ref CTexture tx) {
+	public static void tTextureRelease(ref CTexture tx) {
 		OpenTaiko.tDisposeSafely(ref tx);
 	}
-	public static void tテクスチャの解放(ref CTextureAf tx) {
+	public static void tTextureRelease(ref CTextureAf tx) {
 		OpenTaiko.tDisposeSafely(ref tx);
 	}
-	public static CTexture tテクスチャの生成(SKBitmap bitmap) {
-		return tテクスチャの生成(bitmap, false);
+	public static CTexture tTextureCreate(SKBitmap bitmap) {
+		return tTextureCreate(bitmap, false);
 	}
-	public static CTexture tテクスチャの生成(SKBitmap bitmap, bool b黒を透過する) {
+	public static CTexture tTextureCreate(SKBitmap bitmap, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
@@ -1480,7 +1254,7 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 		try {
-			return new CTexture(bitmap, b黒を透過する);
+			return new CTexture(bitmap, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. (txData)");
@@ -1488,15 +1262,15 @@ internal class OpenTaiko : Game {
 		}
 	}
 
-	public static CTextureAf tテクスチャの生成Af(string fileName) {
-		return tテクスチャの生成Af(fileName, false);
+	public static CTextureAf tTextureCreateAf(string fileName) {
+		return tTextureCreateAf(fileName, false);
 	}
-	public static CTextureAf tテクスチャの生成Af(string fileName, bool b黒を透過する) {
+	public static CTextureAf tTextureCreateAf(string fileName, bool bBlackTransparent) {
 		if (app == null) {
 			return null;
 		}
 		try {
-			return new CTextureAf(fileName, b黒を透過する);
+			return new CTextureAf(fileName, bBlackTransparent);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);
@@ -1533,9 +1307,9 @@ internal class OpenTaiko : Game {
 	/// <summary>
 	/// そのフォルダの連番画像の最大値を返す。
 	/// </summary>
-	public static int t連番画像の枚数を数える(string ディレクトリ名, string プレフィックス = "", string 拡張子 = ".png") {
+	public static int tSequenceImageSheetCountCount(string DirectoryName, string Prefix = "", string Extension = ".png") {
 		int num = 0;
-		while (File.Exists(ディレクトリ名 + プレフィックス + num + 拡張子)) {
+		while (File.Exists(DirectoryName + Prefix + num + Extension)) {
 			num++;
 		}
 		return num;
@@ -1586,10 +1360,8 @@ internal class OpenTaiko : Game {
 
 	#region [ private ]
 	//-----------------
-	private bool bマウスカーソル表示中 = true;
-	private bool b終了処理完了済み;
-	public bool bInternetConnectionSuccess { get; private set; } = false;
-	private long PreviousSystemTimeMs = long.MinValue;
+	private bool bMouseCursorDisplaying = true;
+	private bool bEndProcessCompleteDone;
 	private static CTja[] tja = new CTja[MAX_PLAYERS];
 
 	public static TextureLoader Tx = new TextureLoader();
@@ -1597,7 +1369,6 @@ internal class OpenTaiko : Game {
 	public List<CActivity> listTopLevelActivities;
 	private int nDrawLoopReturnValue;
 	private int _iosStageDebugCounter;
-	private CStage.EStage _lastSceneStageId = CStage.EStage.None; // tracks stage changes for CTexture.BeginNewScene()
 	private string strWindowTitle
 	// ayo komi isn't this useless code? - tfd500
 	{
@@ -1616,7 +1387,7 @@ internal class OpenTaiko : Game {
 	private static void tStartupLog() {
 		Trace.AutoFlush = true;
 		try {
-			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEのあるフォルダ, "OpenTaiko.log"), false, Encoding.UTF8)));
+			Trace.Listeners.Add(FileLogListener = new CTraceLogListener(new StreamWriter(System.IO.Path.Combine(strEXEFolder, "OpenTaiko.log"), false, Encoding.UTF8)));
 		} catch (System.UnauthorizedAccessException e)            // #24481 2011.2.20 yyagi
 		{
 			// still has console logging
@@ -1639,6 +1410,12 @@ internal class OpenTaiko : Game {
 			this.listTopLevelActivities.Add(SystemError);
 
 			VisualLogManager = new CVisualLogManager();
+
+			#region [ Lua global stores initialisation ]
+
+			GlobalStores = new LuaGlobalStores();
+
+			#endregion
 		} catch (Exception ex) {
 			Trace.TraceError(ex.ToString());
 			Trace.TraceError("Error message interface initialization falied.");
@@ -1880,11 +1657,7 @@ internal class OpenTaiko : Game {
 				Trace.Indent();
 				try {
 					actScanningLoudness = new CActScanningLoudness();
-					actScanningLoudness.Activate();
-					if (!ConfigIni.PreAssetsLoading) {
-						actScanningLoudness.CreateManagedResource();
-						actScanningLoudness.CreateUnmanagedResource();
-					}
+					MountActivity(actScanningLoudness);
 					LoudnessMetadataScanner.ScanningStateChanged +=
 						(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
 					LoudnessMetadataScanner.StartBackgroundScanning();
@@ -1920,7 +1693,7 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing song list...");
 		Trace.Indent();
 		try {
-			Songs管理 = new CSongs管理();
+			SongManager = new CSongManager();
 			//				Songs管理_裏読 = new CSongs管理();
 			EnumSongs = new CEnumSongs();
 			actEnumSongs = new CActEnumSongs();
@@ -1953,38 +1726,31 @@ internal class OpenTaiko : Game {
 		//---------------------
 		rCurrentStage = null;
 		rPreviousStage = null;
-		stageStartup = new CStage起動();
-		stageTitle = new CStageTitle();
-		stageConfig = new CStageコンフィグ();
+		stageStartup = new CStageStartup();
+		stageConfig = new CStageConfig();
 		SongMount = new CSongMount();
-		stageSongSelect = new CStageSongSelect();
-		stageDanSongSelect = new CStage段位選択();
 		stageHeya = new CStageHeya();
 		stageOnlineLounge = new CStageOnlineLounge();
-		stageTowerSelect = new CStageTowerSelect();
 		stageCutScene = new CStageCutScene();
-		stageSongLoading = new CStage曲読み込み();
-		stageGameScreen = new CStage演奏ドラム画面();
-		stageResults = new CStage結果();
+		stageSongLoading = new CStageSongLoading();
+		stageGameScreen = new CStagePlayDrumsScreen();
+		stageResults = new CStageResult();
 		stageChangeSkin = new CStageChangeSkin();
-		stageExit = new CStage終了();
+		stageTransition = new CStageTransition();
+		stageExit = new CStageShutdown();
 		NamePlate = new CNamePlate();
-		SaveFile = 0;
 
 		this.listTopLevelActivities.Add(actEnumSongs);
 		this.listTopLevelActivities.Add(actTextConsole);
 		this.listTopLevelActivities.Add(stageStartup);
-		this.listTopLevelActivities.Add(stageTitle);
 		this.listTopLevelActivities.Add(stageConfig);
-		this.listTopLevelActivities.Add(stageSongSelect);
-		this.listTopLevelActivities.Add(stageDanSongSelect);
 		this.listTopLevelActivities.Add(stageHeya);
 		this.listTopLevelActivities.Add(stageOnlineLounge);
-		this.listTopLevelActivities.Add(stageTowerSelect);
 		this.listTopLevelActivities.Add(stageSongLoading);
 		this.listTopLevelActivities.Add(stageGameScreen);
 		this.listTopLevelActivities.Add(stageResults);
 		this.listTopLevelActivities.Add(stageChangeSkin);
+		this.listTopLevelActivities.Add(stageTransition);
 		this.listTopLevelActivities.Add(stageExit);
 		//---------------------
 		#endregion
@@ -2013,7 +1779,12 @@ internal class OpenTaiko : Game {
 
 		#region [ Move to Startup Stage ]
 		//---------------------
-		ChangeStage(stageStartup);
+		// The skin's Lua modules are NOT loaded here anymore. The boot stage loads them incrementally in its
+		// own Draw loop (so the loading bar animates via the normal render loop, no manual presenting), and
+		// once done it runs NamePlate/Modal RefleshSkin + starts the song-list enum. This keeps OnLoad fast
+		// so the render loop (and the loading screen) starts immediately.
+		CLoadingProgress.Begin();
+		ChangeStage(stageStartup, "Startup");
 		Trace.TraceInformation("----------------------");
 		Trace.TraceInformation("■ Startup");
 		//---------------------
@@ -2030,7 +1801,7 @@ internal class OpenTaiko : Game {
 	}
 
 	private void tExitProcess() {
-		if (!this.b終了処理完了済み) {
+		if (!this.bEndProcessCompleteDone) {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
 
@@ -2051,6 +1822,8 @@ internal class OpenTaiko : Game {
 				try {
 					actEnumSongs.DeActivate();
 					actEnumSongs = null;
+					EnumSongs.Suspend(); // stop thread to prevent using disposed resources
+					EnumSongs.WaitUntilSuspended();
 					Trace.TraceInformation("Enumeration of songs closed down successfully.");
 				} catch (Exception e) {
 					Trace.TraceError(e.ToString());
@@ -2068,11 +1841,7 @@ internal class OpenTaiko : Game {
 				Trace.TraceInformation("Exiting stage...");
 				Trace.Indent();
 				try {
-					rCurrentStage.DeActivate();
-					if (!ConfigIni.PreAssetsLoading) {
-						rCurrentStage.ReleaseManagedResource();
-						rCurrentStage.ReleaseUnmanagedResource();
-					}
+					UnmountActivity(rCurrentStage);
 					Trace.TraceInformation("Stage exited.");
 				} finally {
 					Trace.Unindent();
@@ -2086,19 +1855,18 @@ internal class OpenTaiko : Game {
 			#endregion
 			#region [ 曲リストの終了処理 ]
 			//---------------------
-			if (Songs管理 != null) {
+			if (SongManager != null) {
 				Trace.TraceInformation("Ending song list...");
 				Trace.Indent();
 				try {
 #pragma warning disable SYSLIB0011
 					if (EnumSongs.IsSongListEnumCompletelyDone) {
-						BinaryFormatter songlistdb_ = new BinaryFormatter();
-						using Stream songlistdb = File.OpenWrite($"{OpenTaiko.strEXEのあるフォルダ}songlist.db");
-						songlistdb_.Serialize(songlistdb, Songs管理.listSongsDB);
+						using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
+						CEnumSongs.WriteSongListCache(songlistdb, SongManager.listSongsDB);
 					}
 #pragma warning restore SYSLIB0011
 
-					Songs管理 = null;
+					SongManager = null;
 					Trace.TraceInformation("Song list terminated.");
 				} catch (Exception exception) {
 					Trace.TraceError(exception.ToString());
@@ -2236,10 +2004,11 @@ internal class OpenTaiko : Game {
 			//---------------------
 			Trace.TraceInformation("Outputting Config.ini...");
 			Trace.TraceInformation("This only needs to be done once, unless you have deleted the file!");
-			string str = strEXEのあるフォルダ + "Config.ini";
+			string str = strEXEFolder + "Config.ini";
 			Trace.Indent();
 			try {
-				ConfigIni.t書き出し(str);
+				// the exporter mutates the config (hidden window, auto, player count) — never persist that
+				if (!VideoExporter.Active) ConfigIni.tExport(str);
 				Trace.TraceInformation("Saved succesfully. ({0})", str);
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());
@@ -2254,11 +2023,7 @@ internal class OpenTaiko : Game {
 				SoundGroupLevelController = null;
 				SongGainController = null;
 				LoudnessMetadataScanner.StopBackgroundScanning(joinImmediately: true);
-				actScanningLoudness?.DeActivate();
-				if (!ConfigIni.PreAssetsLoading) {
-					actScanningLoudness?.ReleaseManagedResource();
-					actScanningLoudness?.ReleaseUnmanagedResource();
-				}
+				UnmountActivity(actScanningLoudness);
 				actScanningLoudness = null;
 			} finally {
 				Trace.Unindent();
@@ -2270,7 +2035,7 @@ internal class OpenTaiko : Game {
 			//---------------------
 			#endregion
 			Trace.TraceInformation("OpenTaiko has closed down successfully.");
-			this.b終了処理完了済み = true;
+			this.bEndProcessCompleteDone = true;
 		}
 	}
 
@@ -2288,33 +2053,62 @@ internal class OpenTaiko : Game {
 	}
 
 	public void RefreshSkin() {
+		this.ChangeSkin();
+		this.LoadSkin();
+	}
+
+	public void ChangeSkin() {
 		Trace.TraceInformation("Skin Change:" + OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(false));
 
 		OpenTaiko.actTextConsole.DeActivate();
 		actTextConsole.ReleaseManagedResource();
 		actTextConsole.ReleaseUnmanagedResource();
 
+		EnumSongs.Suspend(); // stop thread to prevent using disposed resources
+		EnumSongs.WaitUntilSuspended();
+
 		stageGameScreen.actEnd.ReleaseManagedResource(); // force release due to lazy release
 
 		OpenTaiko.Skin.Dispose();
-		OpenTaiko.Skin = null;
 		OpenTaiko.Skin = new CSkin(OpenTaiko.ConfigIni.strSystemSkinSubfolderFullName, false);
 
-		OpenTaiko.Tx.DisposeTexture();
-
 		ChangeResolution(OpenTaiko.Skin.Resolution[0], OpenTaiko.Skin.Resolution[1]);
-
-		OpenTaiko.Tx.LoadTexture();
 
 		OpenTaiko.actTextConsole.Activate();
 		actTextConsole.CreateManagedResource();
 		actTextConsole.CreateUnmanagedResource();
+	}
+
+	public void LoadSkin() {
+		// Synchronous full (re)load — kept for any caller that doesn't drive the incremental path.
+		var loader = LoadSkinBegin();
+		while (loader.MoveNext()) { }
+		LoadSkinFinish();
+	}
+
+	// Incremental skin (re)load, so CStageChangeSkin can drive it across frames with a loading bar (the same
+	// pattern boot uses). LoadSkinBegin returns the module loader to MoveNext each frame; LoadSkinFinish runs
+	// once it (and the streamed onStart textures) are done.
+	public System.Collections.Generic.IEnumerator<float> LoadSkinBegin() {
+		OpenTaiko.Skin.PreloadSystemSounds();
+		return OpenTaiko.Skin.LoadModulesIncrementally();
+	}
+
+	public void LoadSkinFinish() {
+		OpenTaiko.Tx.DisposeTexture();
+		OpenTaiko.Tx.LoadTexture();
+
+		// Re-propagate AfterSongEnum events to all lua stages
+		if (EnumSongs.IsSongListEnumCompletelyDone) {
+			LuaStageWrapper.PropagateAfterSongEnumEvent();
+			LuaActivityWrapper.PropagateAfterSongEnumEvent();
+		}
+		EnumSongs.Resume();
 
 		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		CActSelectPopupMenu.RefleshSkin();
-		CActSelect段位リスト.RefleshSkin();
 	}
 	#endregion
 

@@ -10,6 +10,10 @@
 # Build output
 */bin
 */obj
+
+# Test run output (TRX + the generated grouped-HTML report)
+TestResults/
+*.trx
 *.exe
 
 # Other
@@ -55,6 +59,23 @@
 
 /OpenTaiko Launcher
 /OpenTaiko Launcher/node_modules
+
+# Song folders
+/OpenTaiko/Songs/0*
+/OpenTaiko/Songs/C*
+/OpenTaiko/Songs/E*
+/OpenTaiko/Songs/L1*
+/OpenTaiko/Songs/L2*
+/OpenTaiko/Songs/L3*
+/OpenTaiko/Songs/S*
+/OpenTaiko/System/Open-World Memories/Modules/Stages/isodemo
+/OpenTaiko/System/Open-World Memories/Modules/Stages/egg
+/OpenTaiko/System/Open-World Memories/Modules/Stages/raytracer
+/OpenTaiko/System/Open-World Memories/Modules/Stages/iso_demo2
+/OpenTaiko/System/Open-World Memories/Modules/Stages/myroom
+/OpenTaiko/System/Open-World Memories/Modules/Stages/voxel/tools
+/OpenTaiko/System/Open-World Memories/Modules/Stages/sprites
+/OpenTaiko/System/Open-World Memories/Modules/Stages/kart_racing
 
 # OpenTaiko.iOS
 /OpenTaiko.iOS/NativeStubs/

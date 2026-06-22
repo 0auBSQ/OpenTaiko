@@ -20,6 +20,7 @@
     <PackageReference Include="ManagedBass.Wasapi" Version="3.1.1" />
     <PackageReference Include="ManagedBass.Asio" Version="3.1.1" />
     <PackageReference Include="ManagedBass.Mix" Version="3.1.1" />
+    <PackageReference Include="ManagedBass.Opus" Version="3.1.1" />
     <PackageReference Include="SkiaSharp" Version="2.88.8" />
     <PackageReference Include="FFmpeg.AutoGen" Version="5.1.1" />
     <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.8" />

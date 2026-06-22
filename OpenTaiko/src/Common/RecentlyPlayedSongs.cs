@@ -11,11 +11,11 @@ internal class RecentlyPlayedSongs {
 	#region [Auxiliary methods]
 
 	public void tAddChart(string chartID) {
-		if (!data.recentlyplayedsongs[OpenTaiko.SaveFile].Contains(chartID))
-			data.recentlyplayedsongs[OpenTaiko.SaveFile].Enqueue(chartID);
+		if (!data.recentlyplayedsongs[0].Contains(chartID))
+			data.recentlyplayedsongs[0].Enqueue(chartID);
 
-		while (data.recentlyplayedsongs[OpenTaiko.SaveFile].Count > OpenTaiko.ConfigIni.nRecentlyPlayedMax)
-			data.recentlyplayedsongs[OpenTaiko.SaveFile].Dequeue();
+		while (data.recentlyplayedsongs[0].Count > OpenTaiko.ConfigIni.nRecentlyPlayedMax)
+			data.recentlyplayedsongs[0].Dequeue();
 
 		tSaveFile();
 	}

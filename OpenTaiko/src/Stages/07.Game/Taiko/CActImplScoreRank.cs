@@ -31,7 +31,7 @@ class CActImplScoreRank : CActivity {
 	}
 
 	public override void CreateManagedResource() {
-		TowerResult_ScoreRankEffect = OpenTaiko.tテクスチャの生成(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
+		TowerResult_ScoreRankEffect = OpenTaiko.tTextureCreate(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.TOWERRESULT}ScoreRankEffect.png"));
 
 		base.CreateManagedResource();
 	}
@@ -113,9 +113,9 @@ class CActImplScoreRank : CActivity {
 		}
 
 		if (mode == 0)
-			tex.t2D拡大率考慮中央基準描画(xpos, ypos, new System.Drawing.Rectangle(0, height * i, width, height));
+			tex.t2DScaledCenterBasedDraw(xpos, ypos, new System.Drawing.Rectangle(0, height * i, width, height));
 		else if (mode == 1 && player == 0)
-			tex.t2D拡大率考慮中央基準描画(xpos, ypos, new System.Drawing.Rectangle(width * i, 0, width, height));
+			tex.t2DScaledCenterBasedDraw(xpos, ypos, new System.Drawing.Rectangle(width * i, 0, width, height));
 	}
 
 	public override int Draw() {
@@ -177,7 +177,7 @@ class CActImplScoreRank : CActivity {
 				} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
 					#region [Tower score ranks]
 
-					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].譜面情報.nTotalFloor);
+					double progress = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor / ((double)OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor);
 
 					bool[] conditions =
 					{

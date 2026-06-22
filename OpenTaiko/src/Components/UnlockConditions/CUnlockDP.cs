@@ -29,7 +29,7 @@ namespace OpenTaiko {
 				return CLangManager.LangInstance.GetString("UNLOCK_CONDITION_ERROR", this.ConditionId, this.RequiredArgCount);
 
 			// Only the player loaded as 1P can check unlockables in real time
-			var SaveData = OpenTaiko.SaveFileInstances[OpenTaiko.SaveFile].data;
+			var SaveData = OpenTaiko.SaveFileInstances[0].data;
 			var ChartStats = SaveData.bestPlaysStats;
 
 			// Check distinct plays

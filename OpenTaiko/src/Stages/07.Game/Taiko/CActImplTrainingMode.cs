@@ -11,7 +11,7 @@ class CActImplTrainingMode : CActivity {
 	public override void Activate() {
 		this.nCurrentMeasure = 0;
 		this.bTrainingPAUSE = false;
-		this.n最終演奏位置ms = 0;
+		this.nLastPlayPositionms = 0;
 
 		base.Activate();
 
@@ -25,13 +25,13 @@ class CActImplTrainingMode : CActivity {
 
 		for (int index = 0; index < OpenTaiko.TJA.listChip.Count; index++) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0xff) {
-				endtime = OpenTaiko.TJA.listChip[index].n発声時刻ms;
+				endtime = OpenTaiko.TJA.listChip[index].nSoundTimems;
 				break;
 			}
 		}
 		for (int index = 0; index < OpenTaiko.TJA.listChip.Count; index++) {
 			if (OpenTaiko.TJA.listChip[index].nChannelNo == 0x01) {
-				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration() + OpenTaiko.TJA.listChip[index].n発声時刻ms;
+				bgmlength = OpenTaiko.TJA.listChip[index].GetDuration() + OpenTaiko.TJA.listChip[index].nSoundTimems;
 				break;
 			}
 		}
@@ -44,12 +44,12 @@ class CActImplTrainingMode : CActivity {
 		for (int i = 0; i < dTX.listChip.Count; i++) {
 			CChip pChip = dTX.listChip[i];
 
-			if (pChip.n整数値_内部番号 > measureCount && pChip.nChannelNo == 0x50) measureCount = pChip.n整数値_内部番号;
+			if (pChip.nIntValue_InternalNumber > measureCount && pChip.nChannelNo == 0x50) measureCount = pChip.nIntValue_InternalNumber;
 
 			if (pChip.nChannelNo == 0x9E && !bIsInGoGo) {
 				bIsInGoGo = true;
 
-				var current = pChip.db発声時刻ms;
+				var current = pChip.dbSoundTimems;
 				var width = 0;
 				if (OpenTaiko.Tx.Tokkun_ProgressBar != null) width = OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width;
 
@@ -93,16 +93,16 @@ class CActImplTrainingMode : CActivity {
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, "TRAINING MODE (BETA)");
 
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingPause.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0)) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingPause.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0)) {
 				if (this.bTrainingPAUSE) {
-					OpenTaiko.Skin.sound特訓再生音.tPlay();
+					OpenTaiko.Skin.soundTrainingPlaybackSound.tPlay();
 					this.tResumePlay();
 				} else {
-					OpenTaiko.Skin.sound特訓停止音.tPlay();
+					OpenTaiko.Skin.soundTrainingStopSound.tPlay();
 					this.tPausePlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipForwardMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingSkipForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure += OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure > this.nMeasureCount)
@@ -112,7 +112,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingSkipBackMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingSkipBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					this.nCurrentMeasure -= OpenTaiko.ConfigIni.TokkunSkipMeasures;
 					if (this.nCurrentMeasure <= 0)
@@ -122,7 +122,7 @@ class CActImplTrainingMode : CActivity {
 					OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveForwardMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingMoveForwardMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure++;
@@ -130,7 +130,7 @@ class CActImplTrainingMode : CActivity {
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 					}
-					if (t配列の値interval以下か(ref this.RBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
+					if (tIsArrayValueBelowInterval(ref this.RBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
 						for (int index = 0; index < this.JumpPointList.Count; index++) {
 							if (this.JumpPointList[index].Time >= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
@@ -143,7 +143,7 @@ class CActImplTrainingMode : CActivity {
 
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingMoveBackMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingMoveBackMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure--;
@@ -152,11 +152,11 @@ class CActImplTrainingMode : CActivity {
 						this.tMatchWithTheChartDisplayPosition(true);
 						OpenTaiko.Skin.soundTrainingModeScrollSFX.tPlay();
 					}
-					if (t配列の値interval以下か(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
+					if (tIsArrayValueBelowInterval(ref this.LBlue, SoundManager.PlayTimer.SystemTimeMs, OpenTaiko.ConfigIni.TokkunMashInterval)) {
 						for (int index = this.JumpPointList.Count - 1; index >= 0; index--) {
 							if (this.JumpPointList[index].Time <= tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs)) {
 								this.nCurrentMeasure = this.JumpPointList[index].Measure;
-								OpenTaiko.Skin.sound特訓スキップ音.tPlay();
+								OpenTaiko.Skin.soundTrainingSkipSound.tPlay();
 								this.tMatchWithTheChartDisplayPosition(false);
 								break;
 							}
@@ -164,23 +164,23 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingDecreaseSongSpeed.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingDecreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
-					if (OpenTaiko.ConfigIni.nSongSpeed > 6) {
+					if (OpenTaiko.ConfigIni.nSongSpeed > CConfigIni.MinimumSongSpeed + 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed - 2;
 						this.tMatchWithTheChartDisplayPosition(false);
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingIncreaseSongSpeed.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingIncreaseSongSpeed.IsPressed()) {
 				if (this.bTrainingPAUSE) {
-					if (OpenTaiko.ConfigIni.nSongSpeed < 399) {
+					if (OpenTaiko.ConfigIni.nSongSpeed < CConfigIni.MaximumSongSpeed - 1) {
 						OpenTaiko.ConfigIni.nSongSpeed = OpenTaiko.ConfigIni.nSongSpeed + 2;
 						this.tMatchWithTheChartDisplayPosition(false);
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToFirstMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingJumpToFirstMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure > 1) {
 						this.nCurrentMeasure = 1;
@@ -190,7 +190,7 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingJumpToLastMeasure.IsPressed()) {
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingJumpToLastMeasure.IsPressed()) {
 				if (this.bTrainingPAUSE) {
 					if (this.nCurrentMeasure < this.nMeasureCount) {
 						this.nCurrentMeasure = this.nMeasureCount;
@@ -200,28 +200,28 @@ class CActImplTrainingMode : CActivity {
 					}
 				}
 			}
-			if (OpenTaiko.ConfigIni.KeyAssign.Drums.TrainingBookmark.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0))
+			if (OpenTaiko.ConfigIni.KeyAssign.Taiko.TrainingBookmark.IsPressedExcludePlayer(this.bTrainingPAUSE ? null : 0))
 				this.tToggleBookmarkAtTheCurrentPosition();
 
 			if (this.bCurrentlyScrolling) {
-				int msTargetTime = (int)Easing.EaseOut(this.ctScrollCounter, (int)this.nスクロール前ms, (int)this.nスクロール後ms, Easing.CalcType.Circular);
+				int msTargetTime = (int)Easing.EaseOut(this.ctScrollCounter, (int)this.nScrollPrevms, (int)this.nScrollAfterms, Easing.CalcType.Circular);
 
 				this.ctScrollCounter.Tick();
 
-				if (msTargetTime == (int)this.nスクロール後ms) {
+				if (msTargetTime == (int)this.nScrollAfterms) {
 					this.bCurrentlyScrolling = false;
 				}
 				CChip? lastChipAtNow = OpenTaiko.TJA!.listChip.ElementAtOrDefault(OpenTaiko.stageGameScreen.nCurrentTopChip[0] - 1);
-				if (lastChipAtNow != null && !CStage演奏画面共通.hasChipBeenPlayedAt(lastChipAtNow, OpenTaiko.TJA!.GameTimeToTjaTime(msTargetTime)))
-					OpenTaiko.stageGameScreen.t数値の初期化(false, false); // rewind
+				if (lastChipAtNow != null && !CStagePlayScreenCommon.hasChipBeenPlayedAt(lastChipAtNow, OpenTaiko.TJA!.GameTimeToTjaTime(msTargetTime)))
+					OpenTaiko.stageGameScreen.tValueInitialize(false, false); // rewind
 
 				SoundManager.PlayTimer.NowTimeMs = msTargetTime;
 			}
 			if (!this.bTrainingPAUSE) {
 				this.nCurrentMeasure = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0];
 
-				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) > this.n最終演奏位置ms) {
-					this.n最終演奏位置ms = (long)(tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
+				if (tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs) > this.nLastPlayPositionms) {
+					this.nLastPlayPositionms = (long)(tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs));
 				}
 			}
 
@@ -229,7 +229,7 @@ class CActImplTrainingMode : CActivity {
 
 		if (OpenTaiko.Tx.Tokkun_GoGoPoint != null) {
 			foreach (int xpos in gogoXList) {
-				OpenTaiko.Tx.Tokkun_GoGoPoint.t2D描画(xpos + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_GoGoPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_GoGoPoint_Y);
+				OpenTaiko.Tx.Tokkun_GoGoPoint.t2DDraw(xpos + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_GoGoPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_GoGoPoint_Y);
 			}
 		}
 
@@ -239,14 +239,14 @@ class CActImplTrainingMode : CActivity {
 				if (OpenTaiko.Tx.Tokkun_ProgressBar != null) width = OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width;
 
 				int x = (int)((double)width * ((double)xpos.Time / (double)length));
-				OpenTaiko.Tx.Tokkun_JumpPoint.t2D描画(x + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_JumpPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_JumpPoint_Y);
+				OpenTaiko.Tx.Tokkun_JumpPoint.t2DDraw(x + OpenTaiko.Skin.Game_Training_ProgressBar_XY[0] - (OpenTaiko.Tx.Tokkun_JumpPoint.szTextureSize.Width / 2), OpenTaiko.Skin.Game_Training_JumpPoint_Y);
 			}
 		}
 
 		return base.Draw();
 	}
 
-	public int On進行描画_背景() {
+	public int OnProgressDraw_Background() {
 		CTja tja = OpenTaiko.TJA!;
 
 		if (this.ctBackgroundScrollTimer != null) {
@@ -255,38 +255,38 @@ class CActImplTrainingMode : CActivity {
 			double TexSize = OpenTaiko.Skin.Resolution[0] / OpenTaiko.Tx.Tokkun_Background_Up.szTextureSize.Width;
 			// 1280をテクスチャサイズで割ったものを切り上げて、プラス+1足す。
 			int ForLoop = (int)Math.Ceiling(TexSize) + 1;
-			OpenTaiko.Tx.Tokkun_Background_Up.t2D描画(0 - this.ctBackgroundScrollTimer.CurrentValue, OpenTaiko.Skin.Background_Scroll_Y[0]);
+			OpenTaiko.Tx.Tokkun_Background_Up.t2DDraw(0 - this.ctBackgroundScrollTimer.CurrentValue, OpenTaiko.Skin.Background_Scroll_Y[0]);
 			for (int l = 1; l < ForLoop + 1; l++) {
-				OpenTaiko.Tx.Tokkun_Background_Up.t2D描画(+(l * OpenTaiko.Tx.Tokkun_Background_Up.szTextureSize.Width) - this.ctBackgroundScrollTimer.CurrentValue, OpenTaiko.Skin.Background_Scroll_Y[0]);
+				OpenTaiko.Tx.Tokkun_Background_Up.t2DDraw(+(l * OpenTaiko.Tx.Tokkun_Background_Up.szTextureSize.Width) - this.ctBackgroundScrollTimer.CurrentValue, OpenTaiko.Skin.Background_Scroll_Y[0]);
 			}
 		}
 
-		if (OpenTaiko.Tx.Tokkun_DownBG != null) OpenTaiko.Tx.Tokkun_DownBG.t2D描画(OpenTaiko.Skin.Game_Training_DownBG[0], OpenTaiko.Skin.Game_Training_DownBG[1]);
-		if (OpenTaiko.Tx.Tokkun_BigTaiko != null) OpenTaiko.Tx.Tokkun_BigTaiko.t2D描画(OpenTaiko.Skin.Game_Training_BigTaiko[0], OpenTaiko.Skin.Game_Training_BigTaiko[1]);
+		if (OpenTaiko.Tx.Tokkun_DownBG != null) OpenTaiko.Tx.Tokkun_DownBG.t2DDraw(OpenTaiko.Skin.Game_Training_DownBG[0], OpenTaiko.Skin.Game_Training_DownBG[1]);
+		if (OpenTaiko.Tx.Tokkun_BigTaiko != null) OpenTaiko.Tx.Tokkun_BigTaiko.t2DDraw(OpenTaiko.Skin.Game_Training_BigTaiko[0], OpenTaiko.Skin.Game_Training_BigTaiko[1]);
 
 		// make the progress bar part of background to reduce obscuring vertical scrolling notes
 		var current = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 		var percentage = double.Clamp(current / length, 0, 1);
 
-		var currentWhite = (double)(this.n最終演奏位置ms);
+		var currentWhite = (double)(this.nLastPlayPositionms);
 		var percentageWhite = double.Clamp(currentWhite / length, 0, 1);
 
-		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
-		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2D描画(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
+		if (OpenTaiko.Tx.Tokkun_ProgressBarWhite != null) OpenTaiko.Tx.Tokkun_ProgressBarWhite.t2DDraw(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Width * percentageWhite), OpenTaiko.Tx.Tokkun_ProgressBarWhite.szTextureSize.Height));
+		if (OpenTaiko.Tx.Tokkun_ProgressBar != null) OpenTaiko.Tx.Tokkun_ProgressBar.t2DDraw(OpenTaiko.Skin.Game_Training_ProgressBar_XY[0], OpenTaiko.Skin.Game_Training_ProgressBar_XY[1], new Rectangle(1, 1, (int)(OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Width * percentage), OpenTaiko.Tx.Tokkun_ProgressBar.szTextureSize.Height));
 
 		return base.Draw();
 	}
 
-	public void On進行描画_小節_速度() {
+	public void OnProgressDraw_Measure_Speed() {
 		if (OpenTaiko.Tx.Tokkun_Speed_Measure != null)
-			OpenTaiko.Tx.Tokkun_Speed_Measure.t2D描画(OpenTaiko.Skin.Game_Training_Speed_Measure[0], OpenTaiko.Skin.Game_Training_Speed_Measure[1]);
+			OpenTaiko.Tx.Tokkun_Speed_Measure.t2DDraw(OpenTaiko.Skin.Game_Training_Speed_Measure[0], OpenTaiko.Skin.Game_Training_Speed_Measure[1]);
 		var maxMeasureStr = this.nMeasureCount.ToString();
 		var measureStr = this.nCurrentMeasure.ToString();
 		if (OpenTaiko.Tx.Tokkun_SmallNumber != null) {
 			var x = OpenTaiko.Skin.Game_Training_MaxMeasureCount_XY[0];
 			foreach (char c in maxMeasureStr) {
 				var currentNum = int.Parse(c.ToString());
-				OpenTaiko.Tx.Tokkun_SmallNumber.t2D描画(x, OpenTaiko.Skin.Game_Training_MaxMeasureCount_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_SmallNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_SmallNumber_Width, OpenTaiko.Tx.Tokkun_SmallNumber.szTextureSize.Height));
+				OpenTaiko.Tx.Tokkun_SmallNumber.t2DDraw(x, OpenTaiko.Skin.Game_Training_MaxMeasureCount_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_SmallNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_SmallNumber_Width, OpenTaiko.Tx.Tokkun_SmallNumber.szTextureSize.Height));
 				x += OpenTaiko.Skin.Game_Training_SmallNumber_Width - 2;
 			}
 		}
@@ -297,7 +297,7 @@ class CActImplTrainingMode : CActivity {
 			var x = OpenTaiko.Skin.Game_Training_CurrentMeasureCount_XY[0];
 			foreach (char c in measureStr) {
 				var currentNum = int.Parse(c.ToString());
-				OpenTaiko.Tx.Tokkun_BigNumber.t2D描画(x - subtractVal, OpenTaiko.Skin.Game_Training_CurrentMeasureCount_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
+				OpenTaiko.Tx.Tokkun_BigNumber.t2DDraw(x - subtractVal, OpenTaiko.Skin.Game_Training_CurrentMeasureCount_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
 				x += OpenTaiko.Skin.Game_Training_BigNumber_Width - 2;
 			}
 
@@ -309,7 +309,7 @@ class CActImplTrainingMode : CActivity {
 			var playSpdStr = Decimal.Round((decimal)playSpdI, 1, MidpointRounding.AwayFromZero).ToString();
 			var decimalStr = (playSpdStr == "0") ? "0" : playSpdStr[2].ToString();
 
-			OpenTaiko.Tx.Tokkun_BigNumber.t2D描画(OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[0], OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * int.Parse(decimalStr), 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
+			OpenTaiko.Tx.Tokkun_BigNumber.t2DDraw(OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[0], OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * int.Parse(decimalStr), 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
 
 			x = OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[0] - 25;
 
@@ -317,7 +317,7 @@ class CActImplTrainingMode : CActivity {
 
 			foreach (char c in ((int)playSpd).ToString()) {
 				var currentNum = int.Parse(c.ToString());
-				OpenTaiko.Tx.Tokkun_BigNumber.t2D描画(x - subtractVal, OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
+				OpenTaiko.Tx.Tokkun_BigNumber.t2DDraw(x - subtractVal, OpenTaiko.Skin.Game_Training_SpeedDisplay_XY[1], new Rectangle(OpenTaiko.Skin.Game_Training_BigNumber_Width * currentNum, 0, OpenTaiko.Skin.Game_Training_BigNumber_Width, OpenTaiko.Tx.Tokkun_BigNumber.szTextureSize.Height));
 				x += OpenTaiko.Skin.Game_Training_BigNumber_Width - 2;
 			}
 		}
@@ -326,7 +326,7 @@ class CActImplTrainingMode : CActivity {
 	public void tPausePlay() {
 		CTja dTX = OpenTaiko.TJA;
 
-		this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
+		this.nScrollAfterms = SoundManager.PlayTimer.NowTimeMs;
 
 		OpenTaiko.stageGameScreen.Activate();
 		OpenTaiko.stageGameScreen.Pause();
@@ -352,18 +352,18 @@ class CActImplTrainingMode : CActivity {
 		CTja dTX = OpenTaiko.TJA;
 
 		this.bCurrentlyScrolling = false;
-		SoundManager.PlayTimer.NowTimeMs = this.nスクロール後ms;
+		SoundManager.PlayTimer.NowTimeMs = this.nScrollAfterms;
 
 		int finalStartBar;
 
 		finalStartBar = this.nCurrentMeasure;
 		if (finalStartBar < 0) finalStartBar = 0;
 
-		var (n演奏開始Chip, msStartGameTime) = OpenTaiko.stageGameScreen.t演奏位置の変更(finalStartBar);
+		var (nPlayStartChip, msStartGameTime) = OpenTaiko.stageGameScreen.tPlayPositionChange(finalStartBar);
 
-		OpenTaiko.stageGameScreen.t数値の初期化(true, true);
+		OpenTaiko.stageGameScreen.tValueInitialize(true, true);
 
-		for (int i = 0; i < n演奏開始Chip; i++) {
+		for (int i = 0; i < nPlayStartChip; i++) {
 			//2020.07.08 ノーツだけ消す。
 			CChip chip = dTX.listChip[i];
 			if (!NotesManager.IsHittableNote(chip)) {
@@ -385,23 +385,23 @@ class CActImplTrainingMode : CActivity {
 	}
 
 	public void tMatchWithTheChartDisplayPosition(bool doScroll) {
-		this.nスクロール前ms = SoundManager.PlayTimer.NowTimeMs;
+		this.nScrollPrevms = SoundManager.PlayTimer.NowTimeMs;
 
 		CTja dTX = OpenTaiko.TJA;
 
 		int iCurrentMeasureChip = dTX.GetListChipIndexOfMeasure(this.nCurrentMeasure);
 		if (OpenTaiko.stageGameScreen.hasChipBeenPlayed(iCurrentMeasureChip + 1, 0)) {
-			OpenTaiko.stageGameScreen.t数値の初期化(false, false); // reset to handle past chips
+			OpenTaiko.stageGameScreen.tValueInitialize(false, false); // reset to handle past chips
 		}
 
 		if (doScroll) {
-			this.nスクロール後ms = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].n発声時刻ms);
+			this.nScrollAfterms = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].nSoundTimems);
 			this.bCurrentlyScrolling = true;
 
 			this.ctScrollCounter = new CCounter(0, OpenTaiko.Skin.Game_Training_ScrollTime, 1, OpenTaiko.Timer);
 		} else {
-			SoundManager.PlayTimer.NowTimeMs = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].n発声時刻ms);
-			this.nスクロール後ms = SoundManager.PlayTimer.NowTimeMs;
+			SoundManager.PlayTimer.NowTimeMs = (long)dTX.TjaTimeToGameTime(dTX.listChip[iCurrentMeasureChip].nSoundTimems);
+			this.nScrollAfterms = SoundManager.PlayTimer.NowTimeMs;
 		}
 	}
 
@@ -419,7 +419,7 @@ class CActImplTrainingMode : CActivity {
 		}
 	}
 
-	private bool t配列の値interval以下か(ref long[] array, long num, int interval) {
+	private bool tIsArrayValueBelowInterval(ref long[] array, long num, int interval) {
 		long[] arraytmp = array;
 		for (int index = 0; index < (array.Length - 1); index++) {
 			array[index] = array[index + 1];
@@ -432,9 +432,9 @@ class CActImplTrainingMode : CActivity {
 	public int nMeasureCount;
 
 	#region [private]
-	private long nスクロール前ms;
-	private long nスクロール後ms;
-	private long n最終演奏位置ms;
+	private long nScrollPrevms;
+	private long nScrollAfterms;
+	private long nLastPlayPositionms;
 
 	public bool bTrainingPAUSE { get; private set; }
 	private bool bCurrentlyScrolling;

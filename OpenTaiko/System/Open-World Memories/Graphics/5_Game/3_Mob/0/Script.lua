@@ -21,24 +21,22 @@ local mob_out_counter = 0
 
 local mob_state = 0
 
-function mobIn()
+local function mobIn()
     mob_state = 1
     mob_in_counter = 0
 end
 
-function mobOut()
+local function mobOut()
     mob_state = 2
     mob_out_counter = 0
 end
 
 function init()
     func:AddGraph("Mob_Front.png")
-    func:AddGraph("Mob_Back_0.png")
-    func:AddGraph("Mob_Back_1.png")
+    func:AddGraph("Mob_Back.png")
     func:AddGraph("Mob_Back2_0.png")
     func:AddGraph("Mob_Back2_1.png")
-    func:AddGraph("Mob_Back3_0.png")
-    func:AddGraph("Mob_Back3_1.png")
+    func:AddGraph("Mob_Back3.png")
     mob_height = func:GetTextureHeight("Mob_Front.png")
 end
 
@@ -76,7 +74,7 @@ function update()
             mob_action_counter = 0
         end
 
-        mobinValue = (1.0 - math.sin(mob_in_counter * math.pi / 2))
+        local mobinValue = (1.0 - math.sin(mob_in_counter * math.pi / 2))
         mob_front_y = 1080 + (540 * mobinValue)
         mob_back_y = 1080 + (540 * mobinValue)
         mob_back2_y = 1080 + (540 * mobinValue)
@@ -91,7 +89,7 @@ function update()
             mob_state = 0
         end
 
-        mobOutValue = (1 - math.cos(mob_out_counter * math.pi))
+        local mobOutValue = (1 - math.cos(mob_out_counter * math.pi))
         mob_front_y = 1080 + (540 * mobOutValue)
         mob_back_y = 1080 + (540 * mobOutValue)
         mob_back2_y = 1080 + (540 * mobOutValue)
@@ -111,7 +109,7 @@ function update()
         end
 
 
-        mob_loop_value = (1.0 - math.sin(mob_counter * math.pi))
+        local mob_loop_value = (1.0 - math.sin(mob_counter * math.pi))
         mob_front_y = 1080 + (mob_loop_value * 45)
         mob_back_y = 1080 + (mob_loop_value * 70)
         mob_back2_y = 1080 + (mob_loop_value * 105)
@@ -124,16 +122,12 @@ function draw()
     else
         if mob_action_counter > 0.25 and mob_action_counter < 0.5 then
         func:DrawGraph(mob_x, mob_back2_y - mob_height, "Mob_Back2_1.png")
-            func:DrawGraph(mob_x, mob_back_y - mob_height, "Mob_Back_1.png")
         else
         func:DrawGraph(mob_x, mob_back2_y - mob_height, "Mob_Back2_0.png")
-            func:DrawGraph(mob_x, mob_back_y - mob_height, "Mob_Back_0.png")
         end
-        if (mob_counter > 0.500 and mob_counter < 0.6) or (mob_counter > 0.7 and mob_counter < 0.8) then
-            func:DrawGraph(mob_x, mob_back3_y - mob_height, "Mob_Back3_1.png")
-        else
-            func:DrawGraph(mob_x, mob_back3_y - mob_height, "Mob_Back3_0.png")
-        end
+
+        func:DrawGraph(mob_x, mob_back_y - mob_height, "Mob_Back.png")
+        func:DrawGraph(mob_x, mob_back3_y - mob_height, "Mob_Back3.png")
         func:DrawGraph(mob_x, mob_front_y - mob_height, "Mob_Front.png")
     end
 end

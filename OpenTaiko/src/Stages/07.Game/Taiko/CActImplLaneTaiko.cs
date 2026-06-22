@@ -16,12 +16,12 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public override void Activate() {
 		for (int i = 0; i < 5; i++) {
-			this.st状態[i].ct進行 = new CCounter();
-			this.stBranch[i].ct分岐アニメ進行 = new CCounter();
-			this.stBranch[i].nフラッシュ制御タイマ = -1;
-			this.stBranch[i].nBranchレイヤー透明度 = 0;
-			this.stBranch[i].nBranch文字透明度 = 0;
-			this.stBranch[i].nY座標 = 0;
+			this.stState[i].ctProgress = new CCounter();
+			this.stBranch[i].ctBranchAnimeProgress = new CCounter();
+			this.stBranch[i].nFlashControlTimer = -1;
+			this.stBranch[i].nBranchLayerOpacity = 0;
+			this.stBranch[i].nBranchTextOpacity = 0;
+			this.stBranch[i].nYCoord = 0;
 			this.stBranch[i].ctFadeIn = null;
 			this.stBranch[i].dxFadeIn = 0;
 
@@ -29,19 +29,19 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 		if (OpenTaiko.Tx.Lane_Base[0] != null)
 			OpenTaiko.Tx.Lane_Base[0].Opacity = 255;
-		this.ctゴーゴー = new CCounter();
+		this.ctGoGo = new CCounter();
 
 
-		this.ctゴーゴー炎 = new CCounter(0, 6, 50, OpenTaiko.Timer);
+		this.ctGoGoFlame = new CCounter(0, 6, 50, OpenTaiko.Timer);
 		base.Activate();
 	}
 
 	public override void DeActivate() {
 		for (int i = 0; i < 5; i++) {
-			this.st状態[i].ct進行 = null;
-			this.stBranch[i].ct分岐アニメ進行 = null;
+			this.stState[i].ctProgress = null;
+			this.stBranch[i].ctBranchAnimeProgress = null;
 		}
-		this.ctゴーゴー = null;
+		this.ctGoGo = null;
 
 		base.DeActivate();
 	}
@@ -57,7 +57,7 @@ internal class CActImplLaneTaiko : CActivity {
 	public override int Draw() {
 		if (base.IsFirstDraw) {
 			for (int i = 0; i < 5; i++)
-				this.stBranch[i].nフラッシュ制御タイマ = SoundManager.PlayTimer.NowTimeMs;
+				this.stBranch[i].nFlashControlTimer = SoundManager.PlayTimer.NowTimeMs;
 			base.IsFirstDraw = false;
 		}
 
@@ -86,9 +86,9 @@ internal class CActImplLaneTaiko : CActivity {
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (i == 1 && OpenTaiko.ConfigIni.bAIBattleMode && OpenTaiko.Tx.Lane_Background_AI != null)
-				OpenTaiko.Tx.Lane_Background_AI?.t2D描画(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Background_AI?.t2DDraw(x[i], y[i]);
 			else
-				OpenTaiko.Tx.Lane_Background_Main?.t2D描画(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Background_Main?.t2DDraw(x[i], y[i]);
 		}
 
 		#endregion
@@ -98,29 +98,29 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ 分岐アニメ制御タイマー ]
 			long num = FDK.SoundManager.PlayTimer.NowTimeMs;
-			if (num < this.stBranch[i].nフラッシュ制御タイマ) {
-				this.stBranch[i].nフラッシュ制御タイマ = num;
+			if (num < this.stBranch[i].nFlashControlTimer) {
+				this.stBranch[i].nFlashControlTimer = num;
 			}
-			while ((num - this.stBranch[i].nフラッシュ制御タイマ) >= 30) {
-				if (this.stBranch[i].nBranchレイヤー透明度 <= 255) {
-					this.stBranch[i].nBranchレイヤー透明度 += 10;
+			while ((num - this.stBranch[i].nFlashControlTimer) >= 30) {
+				if (this.stBranch[i].nBranchLayerOpacity <= 255) {
+					this.stBranch[i].nBranchLayerOpacity += 10;
 				}
 
-				if (this.stBranch[i].nBranch文字透明度 >= 0) {
-					this.stBranch[i].nBranch文字透明度 -= 10;
+				if (this.stBranch[i].nBranchTextOpacity >= 0) {
+					this.stBranch[i].nBranchTextOpacity -= 10;
 				}
 
-				if (this.stBranch[i].nY座標 != 0 && this.stBranch[i].nY座標 <= 20) {
-					this.stBranch[i].nY座標++;
+				if (this.stBranch[i].nYCoord != 0 && this.stBranch[i].nYCoord <= 20) {
+					this.stBranch[i].nYCoord++;
 				}
 
-				this.stBranch[i].nフラッシュ制御タイマ += 8;
+				this.stBranch[i].nFlashControlTimer += 8;
 			}
 
-			if (!this.stBranch[i].ct分岐アニメ進行.IsStoped) {
-				this.stBranch[i].ct分岐アニメ進行.Tick();
-				if (this.stBranch[i].ct分岐アニメ進行.IsEnded) {
-					this.stBranch[i].ct分岐アニメ進行.Stop();
+			if (!this.stBranch[i].ctBranchAnimeProgress.IsStoped) {
+				this.stBranch[i].ctBranchAnimeProgress.Tick();
+				if (this.stBranch[i].ctBranchAnimeProgress.IsEnded) {
+					this.stBranch[i].ctBranchAnimeProgress.Stop();
 					this.stBranch[i].nBefore = this.stBranch[i].nAfter;
 				}
 			}
@@ -142,25 +142,25 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ ゴーゴータイムレーン背景レイヤー ]
 			if (OpenTaiko.Tx.Lane_Background_GoGo != null && OpenTaiko.stageGameScreen.bIsGOGOTIME[i]) {
-				if (!this.ctゴーゴー.IsStoped) {
-					this.ctゴーゴー.Tick();
+				if (!this.ctGoGo.IsStoped) {
+					this.ctGoGo.Tick();
 				}
 
-				if (this.ctゴーゴー.CurrentValue <= 4) {
+				if (this.ctGoGo.CurrentValue <= 4) {
 					OpenTaiko.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.2f;
-					OpenTaiko.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 54);
-				} else if (this.ctゴーゴー.CurrentValue <= 5) {
+					OpenTaiko.Tx.Lane_Background_GoGo.t2DDraw(x[i], y[i] + 54);
+				} else if (this.ctGoGo.CurrentValue <= 5) {
 					OpenTaiko.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.4f;
-					OpenTaiko.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 40);
-				} else if (this.ctゴーゴー.CurrentValue <= 6) {
+					OpenTaiko.Tx.Lane_Background_GoGo.t2DDraw(x[i], y[i] + 40);
+				} else if (this.ctGoGo.CurrentValue <= 6) {
 					OpenTaiko.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.6f;
-					OpenTaiko.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 26);
-				} else if (this.ctゴーゴー.CurrentValue <= 8) {
+					OpenTaiko.Tx.Lane_Background_GoGo.t2DDraw(x[i], y[i] + 26);
+				} else if (this.ctGoGo.CurrentValue <= 8) {
 					OpenTaiko.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 0.8f;
-					OpenTaiko.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i] + 13);
-				} else if (this.ctゴーゴー.CurrentValue >= 9) {
+					OpenTaiko.Tx.Lane_Background_GoGo.t2DDraw(x[i], y[i] + 13);
+				} else if (this.ctGoGo.CurrentValue >= 9) {
 					OpenTaiko.Tx.Lane_Background_GoGo.vcScaleRatio.Y = 1.0f;
-					OpenTaiko.Tx.Lane_Background_GoGo.t2D描画(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Background_GoGo.t2DDraw(x[i], y[i]);
 				}
 			}
 			#endregion
@@ -170,9 +170,9 @@ internal class CActImplLaneTaiko : CActivity {
 
 		if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 			if (OpenTaiko.Tx.Lane_Background_Sub != null) {
-				OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
+				OpenTaiko.Tx.Lane_Background_Sub.t2DDraw(OpenTaiko.Skin.Game_Lane_Sub_X[0], OpenTaiko.Skin.Game_Lane_Sub_Y[0]);
 				if (OpenTaiko.stageGameScreen.isMultiPlay) {
-					OpenTaiko.Tx.Lane_Background_Sub.t2D描画(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
+					OpenTaiko.Tx.Lane_Background_Sub.t2DDraw(OpenTaiko.Skin.Game_Lane_Sub_X[1], OpenTaiko.Skin.Game_Lane_Sub_Y[1]);
 				}
 			}
 		}
@@ -236,7 +236,7 @@ internal class CActImplLaneTaiko : CActivity {
 						break;
 				}
 
-				tex?.t2D描画(frame_x, frame_y);
+				tex?.t2DDraw(frame_x, frame_y);
 			}
 
 			/*
@@ -260,20 +260,20 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (this.n総移動時間[i] == -1) {
+			if (this.nTotalMoveTime[i] == -1) {
 				continue;
 			}
 			var nTime = (int)(long)OpenTaiko.GetTJA(i)!.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
-			if (nTime < this.n移動開始時刻[i]) { // in case of rewinding
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i];
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i];
-			} else if (nTime < this.n移動開始時刻[i] + this.n総移動時間[i]) {
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動開始X[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.n移動距離px[i]);
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動開始Y[i] + (((nTime - this.n移動開始時刻[i]) / (double)this.n総移動時間[i]) * this.nVerticalJSPos[i]);
+			if (nTime < this.nMoveStartTime[i]) { // in case of rewinding
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.nMoveStartX[i];
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.nMoveStartY[i];
+			} else if (nTime < this.nMoveStartTime[i] + this.nTotalMoveTime[i]) {
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.nMoveStartX[i] + (((nTime - this.nMoveStartTime[i]) / (double)this.nTotalMoveTime[i]) * this.nMoveDistancepx[i]);
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.nMoveStartY[i] + (((nTime - this.nMoveStartTime[i]) / (double)this.nTotalMoveTime[i]) * this.nVerticalJSPos[i]);
 			} else {
-				this.n総移動時間[i] = -1;
-				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.n移動目的場所X[i];
-				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.n移動目的場所Y[i];
+				this.nTotalMoveTime[i] = -1;
+				OpenTaiko.stageGameScreen.JPOSCROLLX[i] = this.nMoveDestPlaceX[i];
+				OpenTaiko.stageGameScreen.JPOSCROLLY[i] = this.nMoveDestPlaceY[i];
 			}
 		}
 
@@ -301,12 +301,12 @@ internal class CActImplLaneTaiko : CActivity {
 				continue;
 			}
 
-			if (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nY座標 == 21) {
-				this.stBranch[i].nY座標 = 0;
+			if (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 21) {
+				this.stBranch[i].nYCoord = 0;
 			}
-			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ct分岐アニメ進行.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nY座標 == 0)) {
+			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress.IsTicked || (OpenTaiko.ConfigIni.nBranchAnime == 1 && this.stBranch[i].nYCoord == 0)) {
 				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].Opacity = 255;
-				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
+				OpenTaiko.Tx.Lane_Text[(int)OpenTaiko.stageGameScreen.nTargetBranch[i]].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				continue;
 			}
 
@@ -314,7 +314,7 @@ internal class CActImplLaneTaiko : CActivity {
 			int nAfter = (int)this.stBranch[i].nAfter;
 
 			if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
-				int progress = this.stBranch[i].ct分岐アニメ進行.CurrentValue;
+				int progress = this.stBranch[i].ctBranchAnimeProgress.CurrentValue;
 				if (Math.Abs(nAfter - nBefore) >= 2) {
 					// 2-level change
 					if (progress < 150) {
@@ -332,31 +332,31 @@ internal class CActImplLaneTaiko : CActivity {
 					float max = (float)(OpenTaiko.Skin.ScaleY * 30);
 					if (nAfter > nBefore) {
 						// AC7~14 level up: fly down
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					} else {
 						// AC7~14 level down: fly up
-						OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-						OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+						OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 					}
 				} else {
 					OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i]);
+					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i]);
 				}
 			} else {
-				var opacity = Math.Min(255, this.stBranch[i].nBranchレイヤー透明度);
+				var opacity = Math.Min(255, this.stBranch[i].nBranchLayerOpacity);
 				OpenTaiko.Tx.Lane_Text[nBefore].Opacity = 255 - opacity;
 				OpenTaiko.Tx.Lane_Text[nAfter].Opacity = opacity;
-				double ratio = this.stBranch[i].nY座標 / 20.0;
+				double ratio = this.stBranch[i].nYCoord / 20.0;
 				float max = (float)(OpenTaiko.Skin.ScaleY * 20);
 				if (nAfter > nBefore) {
 					// AC15~ level up: fly up
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] - Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				} else {
 					// AC15~ level down: fly down
-					OpenTaiko.Tx.Lane_Text[nBefore].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
-					OpenTaiko.Tx.Lane_Text[nAfter].t2D描画(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nBefore].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, 0, max, Easing.CalcType.Back));
+					OpenTaiko.Tx.Lane_Text[nAfter].t2DDraw(x[i] + this.stBranch[i].dxFadeIn, y[i] + Easing.EaseIn(ratio, -max, 0, Easing.CalcType.Back));
 				}
 			}
 		}
@@ -370,10 +370,10 @@ internal class CActImplLaneTaiko : CActivity {
 			}
 
 			#region[ 動いていない ]
-			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ct分岐アニメ進行.IsTicked) {
+			if (OpenTaiko.ConfigIni.SimpleMode || !this.stBranch[i].ctBranchAnimeProgress.IsTicked) {
 				int nBranch = (int)OpenTaiko.stageGameScreen.nTargetBranch[i];
 				OpenTaiko.Tx.Lane_Base[nBranch].Opacity = 255;
-				OpenTaiko.Tx.Lane_Base[nBranch].t2D描画(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Base[nBranch].t2DDraw(x[i], y[i]);
 				continue;
 			}
 			#endregion
@@ -385,15 +385,15 @@ internal class CActImplLaneTaiko : CActivity {
 			if (OpenTaiko.ConfigIni.nBranchAnime == 1) {
 				#region[ AC15～風の背後レイヤー ]
 				OpenTaiko.Tx.Lane_Base[nBranchLower].Opacity = 255;
-				OpenTaiko.Tx.Lane_Base[nBranchLower].t2D描画(x[i], y[i]);
-				OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity = this.stBranch[i].nBranchレイヤー透明度;
+				OpenTaiko.Tx.Lane_Base[nBranchLower].t2DDraw(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity = this.stBranch[i].nBranchLayerOpacity;
 				if (isLevelDown) // level down
 					OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity = 255 - OpenTaiko.Tx.Lane_Base[nBranchHigher].Opacity;
-				OpenTaiko.Tx.Lane_Base[nBranchHigher].t2D描画(x[i], y[i]);
+				OpenTaiko.Tx.Lane_Base[nBranchHigher].t2DDraw(x[i], y[i]);
 				#endregion
 			} else if (OpenTaiko.ConfigIni.nBranchAnime == 0) {
 				#region[ AC7～14風の背後レイヤー ]
-				var progress = this.stBranch[i].ct分岐アニメ進行.CurrentValue;
+				var progress = this.stBranch[i].ctBranchAnimeProgress.CurrentValue;
 				if (Math.Abs(nBranchHigher - nBranchLower) < 2) {
 					// 1-level change
 					if (isLevelDown)
@@ -409,12 +409,12 @@ internal class CActImplLaneTaiko : CActivity {
 				}
 				if (progress < 100) {
 					OpenTaiko.Tx.Lane_Base[nBranchLower].Opacity = 255;
-					OpenTaiko.Tx.Lane_Base[nBranchLower].t2D描画(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower].t2DDraw(x[i], y[i]);
 					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].Opacity = (Math.Min(100, progress) * 0xff) / 100;
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2D描画(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2DDraw(x[i], y[i]);
 				} else {
 					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].Opacity = 255;
-					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2D描画(x[i], y[i]);
+					OpenTaiko.Tx.Lane_Base[nBranchLower + 1].t2DDraw(x[i], y[i]);
 				}
 				#endregion
 			}
@@ -423,16 +423,16 @@ internal class CActImplLaneTaiko : CActivity {
 
 	public void ResetPlayStates() {
 		for (int i = 0; i < 5; ++i) {
-			this.n総移動時間[i] = -1;
+			this.nTotalMoveTime[i] = -1;
 		}
 	}
 
-	public void ゴーゴー炎() {
+	public void GoGoFlame() {
 		//判定枠
 		if (OpenTaiko.Tx.Judge_Frame != null) {
-			OpenTaiko.Tx.Judge_Frame.b加算合成 = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
+			OpenTaiko.Tx.Judge_Frame.bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				OpenTaiko.Tx.Judge_Frame.t2D描画(
+				OpenTaiko.Tx.Judge_Frame.t2DDraw(
 					OpenTaiko.stageGameScreen.GetNoteOriginX(i),
 					OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 			}
@@ -442,14 +442,14 @@ internal class CActImplLaneTaiko : CActivity {
 		#region[ ゴーゴー炎 ]
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.stageGameScreen.bIsGOGOTIME[i] && !OpenTaiko.ConfigIni.SimpleMode) {
-				this.ctゴーゴー炎.TickLoop();
+				this.ctGoGoFlame.TickLoop();
 
 				if (OpenTaiko.Tx.Effects_Fire != null) {
-					float f倍率 = 1.0f;
+					float fScale = 1.0f;
 
-					float[] ar倍率 = new float[] { 0.8f, 1.2f, 1.7f, 2.5f, 2.3f, 2.2f, 2.0f, 1.8f, 1.7f, 1.6f, 1.6f, 1.5f, 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1.0f };
+					float[] arScale = new float[] { 0.8f, 1.2f, 1.7f, 2.5f, 2.3f, 2.2f, 2.0f, 1.8f, 1.7f, 1.6f, 1.6f, 1.5f, 1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1.0f };
 
-					f倍率 = ar倍率[this.ctゴーゴー.CurrentValue];
+					fScale = arScale[this.ctGoGo.CurrentValue];
 
 					/*
                     Matrix mat = Matrix.Identity;
@@ -463,8 +463,8 @@ internal class CActImplLaneTaiko : CActivity {
 					int width = OpenTaiko.Tx.Effects_Fire.szTextureSize.Width / 7;
 					int height = OpenTaiko.Tx.Effects_Fire.szTextureSize.Height;
 
-					float x = -(width * (f倍率 - 1.0f) / 2.0f);
-					float y = -(height * (f倍率 - 1.0f) / 2.0f);
+					float x = -(width * (fScale - 1.0f) / 2.0f);
+					float y = -(height * (fScale - 1.0f) / 2.0f);
 
 					if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
 						x += OpenTaiko.Skin.Game_Effect_Fire_5P[0] + (OpenTaiko.Skin.Game_UIMove_5P[0] * i);
@@ -480,25 +480,25 @@ internal class CActImplLaneTaiko : CActivity {
 					x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(i);
 					y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(i);
 
-					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.X = f倍率;
-					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.Y = f倍率;
+					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.X = fScale;
+					OpenTaiko.Tx.Effects_Fire.vcScaleRatio.Y = fScale;
 
-					OpenTaiko.Tx.Effects_Fire.t2D描画(x, y,
-						new Rectangle(width * (this.ctゴーゴー炎.CurrentValue), 0, width, height));
+					OpenTaiko.Tx.Effects_Fire.t2DDraw(x, y,
+						new Rectangle(width * (this.ctGoGoFlame.CurrentValue), 0, width, height));
 				}
 			}
 		}
 		#endregion
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!this.st状態[i].ct進行.IsStoped) {
-				this.st状態[i].ct進行.Tick();
-				if (this.st状態[i].ct進行.IsEnded) {
-					this.st状態[i].ct進行.Stop();
+			if (!this.stState[i].ctProgress.IsStoped) {
+				this.stState[i].ctProgress.Tick();
+				if (this.stState[i].ctProgress.IsEnded) {
+					this.stState[i].ctProgress.Stop();
 				}
 				//if( this.txアタックエフェクトLower != null )
 				{
 					//this.txアタックエフェクトLower.b加算合成 = true;
-					int n = this.st状態[i].IsBig ? 520 : 0;
+					int n = this.stState[i].IsBig ? 520 : 0;
 
 					float x = 0;
 					float y = 0;
@@ -516,25 +516,25 @@ internal class CActImplLaneTaiko : CActivity {
 					x += OpenTaiko.stageGameScreen.GetJPOSCROLLX(i);
 					y += OpenTaiko.stageGameScreen.GetJPOSCROLLY(i);
 
-					switch (st状態[i].judge) {
+					switch (stState[i].judge) {
 						case ENoteJudge.Perfect:
 						case ENoteJudge.Great:
 						case ENoteJudge.Auto:
 							if (!OpenTaiko.ConfigIni.SimpleMode) {
 								//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n, 260, 260 ) );
-								if (this.st状態[i].IsBig && OpenTaiko.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue] != null)
-									OpenTaiko.Tx.Effects_Hit_Great_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
-								else if (OpenTaiko.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue] != null)
-									OpenTaiko.Tx.Effects_Hit_Great[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+								if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress.CurrentValue] != null)
+									OpenTaiko.Tx.Effects_Hit_Great_Big[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
+								else if (OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress.CurrentValue] != null)
+									OpenTaiko.Tx.Effects_Hit_Great[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
 							}
 							break;
 
 						case ENoteJudge.Good:
 							//this.txアタックエフェクトLower.t2D描画( CDTXMania.app.Device, 285, 127, new Rectangle( this.st状態[ i ].ct進行.n現在の値 * 260, n + 260, 260, 260 ) );
-							if (this.st状態[i].IsBig && OpenTaiko.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue] != null)
-								OpenTaiko.Tx.Effects_Hit_Good_Big[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
-							else if (OpenTaiko.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue] != null)
-								OpenTaiko.Tx.Effects_Hit_Good[this.st状態[i].ct進行.CurrentValue].t2D描画(x, y);
+							if (this.stState[i].IsBig && OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress.CurrentValue] != null)
+								OpenTaiko.Tx.Effects_Hit_Good_Big[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
+							else if (OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress.CurrentValue] != null)
+								OpenTaiko.Tx.Effects_Hit_Good[this.stState[i].ctProgress.CurrentValue].t2DDraw(x, y);
 							break;
 
 						case ENoteJudge.Miss:
@@ -548,38 +548,38 @@ internal class CActImplLaneTaiko : CActivity {
 
 	}
 
-	public virtual void Start(NotesManager.ENoteType Lane, EGameType gameType, ENoteJudge judge, bool b両手入力, int nPlayer) {
+	public virtual void Start(NotesManager.ENoteType Lane, EGameType gameType, ENoteJudge judge, bool bBothHandsInput, int nPlayer) {
 		//2017.08.15 kairera0467 排他なので番地をそのまま各レーンの状態として扱う
 
 		//for( int n = 0; n < 1; n++ )
 		{
-			this.st状態[nPlayer].ct進行 = new CCounter(0, 14, 20, OpenTaiko.Timer);
-			this.st状態[nPlayer].judge = judge;
-			this.st状態[nPlayer].nPlayer = nPlayer;
-			this.st状態[nPlayer].IsBig = NotesManager.IsBigNoteTaiko(Lane, gameType) && b両手入力;
+			this.stState[nPlayer].ctProgress = new CCounter(0, 14, 20, OpenTaiko.Timer);
+			this.stState[nPlayer].judge = judge;
+			this.stState[nPlayer].nPlayer = nPlayer;
+			this.stState[nPlayer].IsBig = NotesManager.IsBigNoteTaiko(Lane, gameType) && bBothHandsInput;
 		}
 	}
 
 
 	public void GOGOSTART() {
-		this.ctゴーゴー = new CCounter(0, 17, 18, OpenTaiko.Timer);
+		this.ctGoGo = new CCounter(0, 17, 18, OpenTaiko.Timer);
 		if (OpenTaiko.ConfigIni.nPlayerCount == 1 && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) OpenTaiko.stageGameScreen.GoGoSplash.StartSplash();
 	}
 
 
 	public void ChangeBranch(CTja.ECourse nAfter, int nPlayer, bool stopAnime = false) {
 		if (stopAnime) {
-			this.stBranch[nPlayer].ct分岐アニメ進行.Stop();
+			this.stBranch[nPlayer].ctBranchAnimeProgress.Stop();
 			this.stBranch[nPlayer].nBefore = this.stBranch[nPlayer].nAfter = nAfter;
 			return;
 		}
 		if (this.stBranch[nPlayer].nAfter == nAfter) {
 			return;
 		}
-		this.stBranch[nPlayer].ct分岐アニメ進行 = new CCounter(0, 300, 2, OpenTaiko.Timer);
+		this.stBranch[nPlayer].ctBranchAnimeProgress = new CCounter(0, 300, 2, OpenTaiko.Timer);
 
-		this.stBranch[nPlayer].nBranchレイヤー透明度 = 6;
-		this.stBranch[nPlayer].nY座標 = 1;
+		this.stBranch[nPlayer].nBranchLayerOpacity = 6;
+		this.stBranch[nPlayer].nYCoord = 1;
 
 		this.stBranch[nPlayer].nBefore = this.stBranch[nPlayer].nAfter;
 		this.stBranch[nPlayer].nAfter = nAfter;
@@ -592,15 +592,15 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 	}
 
-	public void t判定枠移動(int nPlayer, CTja.CJPOSSCROLL jposscroll, int msTimeNote) {
-		this.n移動開始時刻[nPlayer] = msTimeNote;
-		this.n移動開始X[nPlayer] = jposscroll.pxOrigX;
-		this.n移動開始Y[nPlayer] = jposscroll.pxOrigY;
-		this.n総移動時間[nPlayer] = (int)jposscroll.msMoveDt;
-		double pxMoveDx = this.n移動距離px[nPlayer] = jposscroll.pxMoveDx;
+	public void tJudgeFrameMove(int nPlayer, CTja.CJPOSSCROLL jposscroll, int msTimeNote) {
+		this.nMoveStartTime[nPlayer] = msTimeNote;
+		this.nMoveStartX[nPlayer] = jposscroll.pxOrigX;
+		this.nMoveStartY[nPlayer] = jposscroll.pxOrigY;
+		this.nTotalMoveTime[nPlayer] = (int)jposscroll.msMoveDt;
+		double pxMoveDx = this.nMoveDistancepx[nPlayer] = jposscroll.pxMoveDx;
 		double pxMoveDy = this.nVerticalJSPos[nPlayer] = jposscroll.pxMoveDy;
-		this.n移動目的場所X[nPlayer] = jposscroll.pxOrigX + pxMoveDx;
-		this.n移動目的場所Y[nPlayer] = jposscroll.pxOrigY + pxMoveDy;
+		this.nMoveDestPlaceX[nPlayer] = jposscroll.pxOrigX + pxMoveDx;
+		this.nMoveDestPlaceY[nPlayer] = jposscroll.pxOrigY + pxMoveDy;
 	}
 
 	#region[ private ]
@@ -625,48 +625,48 @@ internal class CActImplLaneTaiko : CActivity {
 
 	//private CTextureAf txアタックエフェクトLower;
 
-	protected STSTATUS[] st状態 = new STSTATUS[5];
+	protected STSTATUS[] stState = new STSTATUS[5];
 
 	//private CTexture[] txゴーゴースプラッシュ;
 
 	[StructLayout(LayoutKind.Sequential)]
 	protected struct STSTATUS {
-		public bool b使用中;
-		public CCounter ct進行;
+		public bool bUse;
+		public CCounter ctProgress;
 		public ENoteJudge judge;
 		public bool IsBig;
-		public int n透明度;
+		public int nOpacity;
 		public int nPlayer;
 	}
-	private CCounter ctゴーゴー;
-	private CCounter ctゴーゴー炎;
+	private CCounter ctGoGo;
+	private CCounter ctGoGoFlame;
 
 
 
 	public STBRANCH[] stBranch = new STBRANCH[5];
 	[StructLayout(LayoutKind.Sequential)]
 	public struct STBRANCH {
-		public CCounter ct分岐アニメ進行;
+		public CCounter ctBranchAnimeProgress;
 		public CTja.ECourse nBefore;
 		public CTja.ECourse nAfter;
 
-		public long nフラッシュ制御タイマ;
-		public int nBranchレイヤー透明度;
-		public int nBranch文字透明度;
-		public int nY座標;
+		public long nFlashControlTimer;
+		public int nBranchLayerOpacity;
+		public int nBranchTextOpacity;
+		public int nYCoord;
 		public int dxFadeIn;
 		public CCounter? ctFadeIn;
 	}
 
 
-	private int[] n総移動時間 = new int[5];
-	private double[] n移動開始X = new double[5];
-	private double[] n移動開始Y = new double[5];
-	private int[] n移動開始時刻 = new int[5];
-	private double[] n移動距離px = new double[5];
+	private int[] nTotalMoveTime = new int[5];
+	private double[] nMoveStartX = new double[5];
+	private double[] nMoveStartY = new double[5];
+	private int[] nMoveStartTime = new int[5];
+	private double[] nMoveDistancepx = new double[5];
 	private double[] nVerticalJSPos = new double[5];
-	private double[] n移動目的場所X = new double[5];
-	private double[] n移動目的場所Y = new double[5];
+	private double[] nMoveDestPlaceX = new double[5];
+	private double[] nMoveDestPlaceY = new double[5];
 
 	//-----------------
 	#endregion

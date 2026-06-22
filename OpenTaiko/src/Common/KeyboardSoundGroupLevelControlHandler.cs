@@ -30,21 +30,21 @@ internal static class KeyboardSoundGroupLevelControlHandler {
 		if (!(isAdjustmentPositive || isAdjustmentNegative)) return;
 
 		ESoundGroup soundGroup;
-		CSkin.CSystemSound システムサウンド = null;
+		CSkin.CSystemSound SystemSound = null;
 
 		if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftControl) ||
 			keyboard.KeyPressing((int)SlimDXKeys.Key.RightControl)) {
 			soundGroup = ESoundGroup.SoundEffect;
-			システムサウンド = skin.soundDecideSFX;
+			SystemSound = skin.soundDecideSFX;
 		} else if (keyboard.KeyPressing((int)SlimDXKeys.Key.LeftShift) ||
 				   keyboard.KeyPressing((int)SlimDXKeys.Key.RightShift)) {
 			soundGroup = ESoundGroup.Voice;
-			システムサウンド = skin.soundゲーム開始音;
+			SystemSound = skin.soundGameStartSound;
 		} else {
 			soundGroup = ESoundGroup.SongPlayback;
 		}
 
 		soundGroupLevelController.AdjustLevel(soundGroup, isAdjustmentPositive);
-		システムサウンド?.tPlay();
+		SystemSound?.tPlay();
 	}
 }

@@ -23,6 +23,12 @@ public class SoundManager   // : CSound
 
 	public static bool bIsTimeStretch = false;
 
+	/// <summary>Silences the output device's master mixer (offline video export). Per-channel volume
+	/// attributes are untouched, so the exporter's sound-event capture still reads true levels.</summary>
+	public static void MuteMasterOutput() {
+		try { if (SoundDevice != null) SoundDevice.nMasterVolume = 0; } catch { /* best effort */ }
+	}
+
 	private static IWindow Window_;
 
 	private static int _nMasterVolume;
@@ -164,6 +170,7 @@ public class SoundManager   // : CSound
 		}
 	}
 
+	public static long nBytesPerSec => SoundDevice.nBytesPerSec;
 	#endregion
 
 
@@ -183,7 +190,7 @@ public class SoundManager   // : CSound
 	}
 
 	public void Dispose() {
-		t終了();
+		tEnd();
 	}
 
 	//public static void t初期化()
@@ -275,7 +282,7 @@ public class SoundManager   // : CSound
 	}
 
 
-	public static void t終了() {
+	public static void tEnd() {
 		SoundDevice.Dispose();
 		PlayTimer.Dispose();    // Global.Bass を解放した後に解放すること。（Global.Bass で参照されているため）
 	}
@@ -370,13 +377,13 @@ public class SoundManager   // : CSound
 		}
 	}
 
-	public void AddMixer(CSound cs, double db再生速度, bool _b演奏終了後も再生が続くチップである) {
-		cs.b演奏終了後も再生が続くチップである = _b演奏終了後も再生が続くチップである;
-		cs.PlaySpeed = db再生速度;
+	public void AddMixer(CSound cs, double dbPlaybackSpeed, bool _bPlayEndAfterPlaybackContinuesChip) {
+		cs.bPlayEndAfterPlaybackContinuesChip = _bPlayEndAfterPlaybackContinuesChip;
+		cs.PlaySpeed = dbPlaybackSpeed;
 		cs.AddBassSoundFromMixer();
 	}
-	public void AddMixer(CSound cs, double db再生速度) {
-		cs.PlaySpeed = db再生速度;
+	public void AddMixer(CSound cs, double dbPlaybackSpeed) {
+		cs.PlaySpeed = dbPlaybackSpeed;
 		cs.AddBassSoundFromMixer();
 	}
 	public void AddMixer(CSound cs) {

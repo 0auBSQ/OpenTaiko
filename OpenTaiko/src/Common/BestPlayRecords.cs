@@ -46,6 +46,8 @@ internal class BestPlayRecords {
 		public int[] ClearStatuses = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
 		public int[] ScoreRanks = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
 		public int[] HighScore = new int[(int)Difficulty.Total] { 0, 0, 0, 0, 0, 0, 0 };
+		/// <summary>Per-difficulty flag: true if at least one play has been registered for that difficulty.</summary>
+		public bool[] PlayedDifficulties = new bool[(int)Difficulty.Total];
 	}
 
 	public class CBestPlayRecord {

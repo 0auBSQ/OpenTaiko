@@ -1,0 +1,17 @@
+{
+    // Skin locale file — English
+    // Format: { "Entries": { "KEY": "value", ... } }
+    // Keys are shared across all locale files for this skin.
+    "Entries": {
+
+        // Theme Settings Viewer stage
+        "VIEWER_TITLE":     "Theme Settings Viewer",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "Scope",
+        "VIEWER_COL_TYPE":  "Type",
+        "VIEWER_COL_VALUE": "Value",
+        "VIEWER_HINT_SCROLL": "up/down to scroll   Cancel to exit",
+        "VIEWER_HINT_EXIT":   "Cancel to exit"
+
+    }
+}

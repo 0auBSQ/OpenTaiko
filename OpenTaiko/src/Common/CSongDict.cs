@@ -6,13 +6,13 @@ internal class CSongDict {
 	private static Dictionary<string, CSongListNode> nodes = new Dictionary<string, CSongListNode>();
 	private static HashSet<string> urls = new HashSet<string>();
 
-	public static CActSelect曲リスト.CScorePad[][] ScorePads = new CActSelect曲リスト.CScorePad[5][]
+	public static CActSelectSongList.CScorePad[][] ScorePads = new CActSelectSongList.CScorePad[5][]
 	{
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() },
-		new CActSelect曲リスト.CScorePad[(int)Difficulty.Edit + 2] { new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad(), new CActSelect曲リスト.CScorePad() }
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() },
+		new CActSelectSongList.CScorePad[(int)Difficulty.Edit + 2] { new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad(), new CActSelectSongList.CScorePad() }
 	};
 
 	public static int tGetNodesCount() {
@@ -32,8 +32,10 @@ internal class CSongDict {
 	}
 
 	public static void tAddSongNode(CSongUniqueID sid, CSongListNode node) {
-		if (sid != null && sid.data.id != null && sid.data.id != "" && !nodes.ContainsKey(sid.data.id))
-			nodes.Add(sid.data.id, node.Clone());
+		var id = sid?.data?.id ?? "";
+
+		if (!string.IsNullOrEmpty(id) && !nodes.ContainsKey(id))
+			nodes.Add(id, node.Clone());
 		tAddSongUrl(sid);
 	}
 
@@ -41,21 +43,21 @@ internal class CSongDict {
 		return urls.Contains(url);
 	}
 
-	public static void tAddSongUrl(CSongUniqueID sid) {
-		var url = sid.data.url;
+	public static void tAddSongUrl(CSongUniqueID? sid) {
+		var url = sid?.data?.url ?? "";
 
-		if (url != null && url != "" && !urls.Contains(url))
+		if (!string.IsNullOrEmpty(url) && !urls.Contains(url))
 			urls.Add(url);
 	}
 
-	public static void tRemoveSongUrl(CSongUniqueID sid) {
-		var url = sid.data.url;
+	public static void tRemoveSongUrl(CSongUniqueID? sid) {
+		var url = sid?.data?.url ?? "";
 
-		if (url != null && url != "" && urls.Contains(url))
+		if (!string.IsNullOrEmpty(url) && urls.Contains(url))
 			urls.Remove(url);
 	}
 
-	public static void tRemoveSongNode(CSongUniqueID sid) {
+	public static void tRemoveSongNode(CSongUniqueID? sid) {
 		if (sid != null && nodes.ContainsKey(sid.data.id)) {
 			tRemoveSongUrl(sid);
 			nodes.Remove(sid.data.id);
@@ -72,13 +74,13 @@ internal class CSongDict {
 	#region [Extra methods]
 
 	// Generate a back button
-	public static CSongListNode tGenerateBackButton(CSongListNode parent, string path = "/", List<string> listStrBoxDef = null) {
+	public static CSongListNode tGenerateBackButton(CSongListNode parent, string? path = "/", List<string> listStrBoxDef = null) {
 		CSongListNode itemBack = new CSongListNode();
 		itemBack.nodeType = CSongListNode.ENodeType.BACKBOX;
 
 
 		// とじる
-		itemBack.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RETURN_PATH", path, path);
+		itemBack.ldTitle = (path == null) ? new CLocalizationData() : CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RETURN_PATH", path, path);
 
 		itemBack.BackColor = ColorTranslator.FromHtml("#513009");
 		itemBack.BoxColor = Color.White;
@@ -101,27 +103,27 @@ internal class CSongDict {
 		}
 
 		itemBack.strBreadcrumbs = (itemBack.rParentNode == null) ?
-			itemBack.ldTitle.GetString("") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("");
+			itemBack.ldTitle.GetString("BACKBOX") : itemBack.rParentNode.strBreadcrumbs + " > " + itemBack.ldTitle.GetString("BACKBOX");
 
 		itemBack.score[0] = new CScore();
-		itemBack.score[0].ファイル情報.フォルダの絶対パス = "";
-		itemBack.score[0].譜面情報.タイトル = itemBack.ldTitle.GetString("");
-		itemBack.score[0].譜面情報.コメント = "";
+		itemBack.score[0].FileInfo.FolderAbsolutePath = "";
+		itemBack.score[0].ChartInfo.Title = itemBack.ldTitle.GetString("");
+		itemBack.score[0].ChartInfo.Comment = "";
 
 		return (itemBack);
 	}
 
-	public static CSongListNode tGenerateRandomButton(CSongListNode parent, string path = "/") {
+	public static CSongListNode tGenerateRandomButton(CSongListNode? parent, string? path = "/") {
 		CSongListNode itemRandom = new CSongListNode();
 		itemRandom.nodeType = CSongListNode.ENodeType.RANDOM;
 
-		itemRandom.ldTitle = CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
+		itemRandom.ldTitle = (path == null) ? new CLocalizationData() : CLangManager.GetAllStringsAsLocalizationDataWithArgs("SONGSELECT_RANDOM_PATH", path, path);
 
 		itemRandom.difficultiesCount = (int)Difficulty.Total;
 		itemRandom.rParentNode = parent;
 
 		itemRandom.strBreadcrumbs = (itemRandom.rParentNode == null) ?
-			itemRandom.ldTitle.GetString("") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("");
+			itemRandom.ldTitle.GetString("RANDOM") : itemRandom.rParentNode.strBreadcrumbs + " > " + itemRandom.ldTitle.GetString("RANDOM");
 
 		itemRandom.score[0] = new CScore();
 
@@ -172,7 +174,7 @@ internal class CSongDict {
 	public static List<CSongListNode> tFetchFavoriteFolder(CSongListNode parent) {
 		List<CSongListNode> childList = new List<CSongListNode>();
 
-		foreach (string id in OpenTaiko.Favorites.data.favorites[OpenTaiko.SaveFile]) {
+		foreach (string id in OpenTaiko.Favorites.data.favorites[0]) {
 			var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 			if (node != null) {
 				childList.Add(node);
@@ -193,7 +195,7 @@ internal class CSongDict {
 	public static List<CSongListNode> tFetchRecentlyPlayedSongsFolder(CSongListNode parent) {
 		List<CSongListNode> childList = new List<CSongListNode>();
 
-		foreach (string id in OpenTaiko.RecentlyPlayedSongs.data.recentlyplayedsongs[OpenTaiko.SaveFile].Reverse()) {
+		foreach (string id in OpenTaiko.RecentlyPlayedSongs.data.recentlyplayedsongs[0].Reverse()) {
 			var node = tReadaptChildNote(parent, tGetNodeFromID(id));
 			if (node != null) {
 				childList.Add(node);
@@ -255,7 +257,7 @@ internal class CSongDict {
 				if (node != null) childList.Add(node);
 			}
 			// Check if Charter is listed in NOTESDESIGNER(x) command instead
-			else if (type == ETitleType.Charter) { 
+			else if (type == ETitleType.Charter) {
 				foreach (string charter in nodeT.strNotesDesigner) {
 					if (charter.Contains(text, StringComparison.InvariantCultureIgnoreCase)) {
 						var node = tReadaptChildNote(parent, nodeT);
@@ -301,11 +303,11 @@ internal class CSongDict {
 
 	public static void tRefreshScoreTables() {
 		for (int pl = 0; pl < 5; pl++) {
-			CActSelect曲リスト.CScorePad[] SPArrRef = ScorePads[pl];
-			var BestPlayStats = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(pl)].data.bestPlaysStats;
+			CActSelectSongList.CScorePad[] SPArrRef = ScorePads[pl];
+			var BestPlayStats = OpenTaiko.SaveFileInstances[pl].data.bestPlaysStats;
 
 			for (int s = 0; s <= (int)Difficulty.Edit + 1; s++) {
-				CActSelect曲リスト.CScorePad SPRef = SPArrRef[s];
+				CActSelectSongList.CScorePad SPRef = SPArrRef[s];
 
 				if (s <= (int)Difficulty.Edit) {
 					SPRef.ScoreRankCount = BestPlayStats.ScoreRanks[s].Skip(1).ToArray(); ;

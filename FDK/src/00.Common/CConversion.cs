@@ -165,8 +165,8 @@ public class CConversion {
 		listIntArray = new List<int>();
 
 		for (int n = 0; n < strArray.Length; n++) {
-			int n追加する数値 = Convert.ToInt32(strArray[n]);
-			listIntArray.Add(n追加する数値);
+			int nAddValue = Convert.ToInt32(strArray[n]);
+			listIntArray.Add(nAddValue);
 		}
 		int[] nArray = new int[] { 1 };
 		nArray = listIntArray.ToArray();

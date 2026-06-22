@@ -19,6 +19,7 @@ internal sealed class CSongListNodeComparerLevelIcon : IComparer<CSongListNode> 
 	}
 
 	private int _diffOf(CSongListNode n1) {
-		return (int)n1.nLevelIcon[OpenTaiko.stageSongSelect.actSongList.tFetchDifficulty(n1)];
+		int diff = Math.Clamp(OpenTaiko.ConfigIni.nDefaultCourse, 0, n1.nLevelIcon.Length - 1);
+		return (int)n1.nLevelIcon[diff];
 	}
 }

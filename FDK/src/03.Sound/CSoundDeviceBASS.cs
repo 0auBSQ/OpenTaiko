@@ -43,6 +43,8 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 		protected set;
 	}
 
+	public long nBytesPerSec { get; protected set; }
+
 	public float CPUUsage => (float)Bass.CPUUsage;
 
 	// マスターボリュームの制御コードは、WASAPI/ASIOで全く同じ。

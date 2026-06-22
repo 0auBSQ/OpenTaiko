@@ -15,7 +15,7 @@ internal class CActImplRunner : CActivity {
 
 	public void Start(int Player, bool IsMiss, CChip? pChip) {
 		if (Runner != null && !OpenTaiko.ConfigIni.SimpleMode) {
-			while (stRunners[Index].b使用中) {
+			while (stRunners[Index].bUse) {
 				Index += 1;
 				if (Index >= 128) {
 					Index = 0;
@@ -23,15 +23,15 @@ internal class CActImplRunner : CActivity {
 				}
 			}
 			if (!(NotesManager.IsGenericRoll(pChip) || NotesManager.IsRollEnd(pChip))) {
-				if (!stRunners[Index].b使用中) {
-					stRunners[Index].b使用中 = true;
+				if (!stRunners[Index].bUse) {
+					stRunners[Index].bUse = true;
 					stRunners[Index].nPlayer = Player;
 					if (IsMiss == true) {
 						stRunners[Index].nType = 0;
 					} else {
 						stRunners[Index].nType = random.Next(1, Type + 1);
 					}
-					stRunners[Index].ct進行 = new CCounter(0, OpenTaiko.Skin.Resolution[0], Timer, OpenTaiko.Timer);
+					stRunners[Index].ctProgress = new CCounter(0, OpenTaiko.Skin.Resolution[0], Timer, OpenTaiko.Timer);
 					stRunners[Index].nOldValue = 0;
 					stRunners[Index].nNowPtn = 0;
 					stRunners[Index].fX = 0;
@@ -49,8 +49,8 @@ internal class CActImplRunner : CActivity {
 
 		for (int i = 0; i < 128; i++) {
 			stRunners[i] = new STRunner();
-			stRunners[i].b使用中 = false;
-			stRunners[i].ct進行 = new CCounter();
+			stRunners[i].bUse = false;
+			stRunners[i].ctProgress = new CCounter();
 		}
 
 		var preset = HScenePreset.GetBGPreset();
@@ -69,7 +69,7 @@ internal class CActImplRunner : CActivity {
 					: (dirs.Length > 0 ? dirs[random.Next(0, dirs.Length)] : "");
 				LoadRunnerConifg(path);
 
-				Runner = OpenTaiko.tテクスチャの生成($@"{path}{Path.DirectorySeparatorChar}Runner.png");
+				Runner = OpenTaiko.tTextureCreate($@"{path}{Path.DirectorySeparatorChar}Runner.png");
 			}
 		}
 
@@ -84,7 +84,7 @@ internal class CActImplRunner : CActivity {
 		}
 
 		for (int i = 0; i < 128; i++) {
-			stRunners[i].ct進行 = null;
+			stRunners[i].ctProgress = null;
 		}
 
 		OpenTaiko.tDisposeSafely(ref Runner);
@@ -106,23 +106,23 @@ internal class CActImplRunner : CActivity {
 		}
 
 		for (int i = 0; i < 128; i++) {
-			if (stRunners[i].b使用中) {
-				stRunners[i].nOldValue = stRunners[i].ct進行.CurrentValue;
-				stRunners[i].ct進行.Tick();
-				if (stRunners[i].ct進行.IsEnded || stRunners[i].fX > OpenTaiko.Skin.Resolution[0]) {
-					stRunners[i].ct進行.Stop();
-					stRunners[i].b使用中 = false;
+			if (stRunners[i].bUse) {
+				stRunners[i].nOldValue = stRunners[i].ctProgress.CurrentValue;
+				stRunners[i].ctProgress.Tick();
+				if (stRunners[i].ctProgress.IsEnded || stRunners[i].fX > OpenTaiko.Skin.Resolution[0]) {
+					stRunners[i].ctProgress.Stop();
+					stRunners[i].bUse = false;
 				}
-				for (int n = stRunners[i].nOldValue; n < stRunners[i].ct進行.CurrentValue; n++) {
+				for (int n = stRunners[i].nOldValue; n < stRunners[i].ctProgress.CurrentValue; n++) {
 					stRunners[i].fX += (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[stRunners[i].nPlayer]) / 18;
 					int Width = OpenTaiko.Skin.Resolution[0] / Ptn;
 					stRunners[i].nNowPtn = (int)stRunners[i].fX / Width;
 				}
 				if (Runner != null) {
 					if (stRunners[i].nPlayer == 0) {
-						Runner.t2D描画((int)(StartPoint_X[0] + stRunners[i].fX), StartPoint_Y[0], new Rectangle(stRunners[i].nNowPtn * Size[0], stRunners[i].nType * Size[1], Size[0], Size[1]));
+						Runner.t2DDraw((int)(StartPoint_X[0] + stRunners[i].fX), StartPoint_Y[0], new Rectangle(stRunners[i].nNowPtn * Size[0], stRunners[i].nType * Size[1], Size[0], Size[1]));
 					} else {
-						Runner.t2D描画((int)(StartPoint_X[1] + stRunners[i].fX), StartPoint_Y[1], new Rectangle(stRunners[i].nNowPtn * Size[0], stRunners[i].nType * Size[1], Size[0], Size[1]));
+						Runner.t2DDraw((int)(StartPoint_X[1] + stRunners[i].fX), StartPoint_Y[1], new Rectangle(stRunners[i].nNowPtn * Size[0], stRunners[i].nType * Size[1], Size[0], Size[1]));
 					}
 				}
 			}
@@ -134,13 +134,13 @@ internal class CActImplRunner : CActivity {
 	//-----------------
 	[StructLayout(LayoutKind.Sequential)]
 	private struct STRunner {
-		public bool b使用中;
+		public bool bUse;
 		public int nPlayer;
 		public int nType;
 		public int nOldValue;
 		public int nNowPtn;
 		public float fX;
-		public CCounter ct進行;
+		public CCounter ctProgress;
 	}
 	private STRunner[] stRunners = new STRunner[128];
 	Random random = new Random();

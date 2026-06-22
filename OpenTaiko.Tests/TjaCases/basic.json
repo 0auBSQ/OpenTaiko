@@ -1,0 +1,9 @@
+{
+  "expect": {
+    "title": "Test Song",
+    "bpm": 180,
+    "dons": 5,
+    "kas": 5,
+    "monotonicTimes": true
+  }
+}

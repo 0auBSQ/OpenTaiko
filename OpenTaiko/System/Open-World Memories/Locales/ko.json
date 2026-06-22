@@ -1,0 +1,15 @@
+{
+    // 로케일 파일 — 한국어
+    "Entries": {
+
+        // 테마 설정 뷰어 스테이지
+        "VIEWER_TITLE":     "테마 설정 뷰어",
+        "VIEWER_COL_ID":    "ID",
+        "VIEWER_COL_SCOPE": "범위",
+        "VIEWER_COL_TYPE":  "유형",
+        "VIEWER_COL_VALUE": "값",
+        "VIEWER_HINT_SCROLL": "위/아래로 스크롤   취소로 종료",
+        "VIEWER_HINT_EXIT":   "취소로 종료"
+
+    }
+}

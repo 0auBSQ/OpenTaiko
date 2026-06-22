@@ -7,7 +7,7 @@ namespace OpenTaiko;
 
 internal class DBSaves {
 	private static string _savesDBFilename = $@"Saves.db3";
-	private static string _savesDBPath = @$"{OpenTaiko.strEXEのあるフォルダ}{_savesDBFilename}";
+	private static string _savesDBPath = @$"{OpenTaiko.strEXEFolder}{_savesDBFilename}";
 	private static SqliteConnection SavesDBConnection = new SqliteConnection(@$"Data Source={_savesDBPath}");
 
 	private static string _DBNotFoundError = @$"The database {_savesDBFilename} was not found or the connection failed";
@@ -27,7 +27,7 @@ internal class DBSaves {
 	}
 
 	public static Int64 GetPlayerSaveId(int player) {
-		return OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data.SaveId;
+		return OpenTaiko.SaveFileInstances[player].data.SaveId;
 	}
 
 	#region [Unlocked Dan Titles]
@@ -165,6 +165,7 @@ internal class DBSaves {
 			sf.data.AIBattleModeWins = (int)(Int64)reader["AIBattleModeWins"];
 			sf.data.TitleRarityInt = (int)(Int64)reader["PlayerNameplateRarityInt"];
 			sf.data.TitleId = (int)(Int64)reader["PlayerNameplateId"];
+			sf.data.SelectedHitsounds = reader["SelectedHitsounds"] as string ?? "Taiko";
 			sf.tInitSaveFile();
 			sf.tLoadUnlockables();
 
@@ -196,6 +197,17 @@ internal class DBSaves {
 
 		var command = connection.CreateCommand();
 		command.CommandText = @$"UPDATE saves SET AIBattleModePlaycount = AIBattleModePlaycount + 1, AIBattleModeWins = AIBattleModeWins + {AIBattleWinsDelta} WHERE SaveId = {SaveId};";
+		command.ExecuteNonQuery();
+	}
+
+	public static void SetSelectedHitsounds(Int64 SaveId, string hitsoundName) {
+		SqliteConnection? connection = GetSavesDBConnection();
+		if (connection == null) return;
+
+		var command = connection.CreateCommand();
+		command.CommandText = $"""
+		UPDATE saves SET SelectedHitsounds = '{hitsoundName.EscapeSingleQuotes()}' WHERE SaveId = {SaveId};
+		""";
 		command.ExecuteNonQuery();
 	}
 
@@ -386,12 +398,15 @@ internal class DBSaves {
 		SqliteConnection? connection = GetSavesDBConnection();
 		if (connection == null) return false;
 
-		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[OpenTaiko.GetActualPlayer(player)].data;
+		SaveFile.Data saveData = OpenTaiko.SaveFileInstances[player].data;
 		BestPlayRecords.CBestPlayRecord currentPlay = new BestPlayRecords.CBestPlayRecord();
 		var choosenSong = OpenTaiko.SongMount.rChoosenSong;
 		var choosenDifficulty = OpenTaiko.SongMount.nChoosenSongDifficulty[player];
 		var chartScore = OpenTaiko.stageGameScreen.CChartScore[player];
 		List<int>[] danResults = new List<int>[7] { new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+
+		// Do not register plays for DanBuilder charts (no persistent unique ID)
+		if (choosenSong.uniqueId == null) return false;
 
 		// Do not register the play if Dan/Tower and any mod is ON
 		if ((choosenDifficulty == (int)Difficulty.Tower || choosenDifficulty == (int)Difficulty.Dan) && !ModIcons.tPlayIsStock(player)) return false;
@@ -405,7 +420,7 @@ internal class DBSaves {
 			currentPlay.Artist = choosenSong.ldSubtitle.GetString(""); // There is no direct Artist tag on the .tja format, so we directly use the subtitle as a guess
 			currentPlay.PlayMods = ModIcons.tModsToPlayModsFlags(player);
 			currentPlay.ChartDifficulty = choosenDifficulty;
-			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].譜面情報.nレベル[choosenDifficulty];
+			currentPlay.ChartLevel = choosenSong.score[choosenDifficulty].ChartInfo.nLevel[choosenDifficulty];
 			currentPlay.ClearStatus = clearStatus;
 			currentPlay.ScoreRank = scoreRank;
 			currentPlay.HighScore = chartScore.nScore;
@@ -424,7 +439,7 @@ internal class DBSaves {
 			currentPlay.HighScoreGoodCount = chartScore.nGreat;
 			currentPlay.HighScoreOkCount = chartScore.nGood;
 			currentPlay.HighScoreBadCount = chartScore.nMiss;
-			currentPlay.HighScoreMaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.最高値[player];
+			currentPlay.HighScoreMaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[player];
 			currentPlay.HighScoreRollCount = chartScore.nRoll;
 			currentPlay.HighScoreADLibCount = chartScore.nADLIB;
 			currentPlay.HighScoreBoomCount = chartScore.nMine;

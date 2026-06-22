@@ -46,7 +46,7 @@ public unsafe class CVideoDecoder : IDisposable {
 				Trace.WriteLine("avcodec_open2 failed\n");
 
 			this.FrameSize = new Size(codec_context->width, codec_context->height);
-			this.Duration = (video_stream->avg_frame_rate.num / (double)video_stream->avg_frame_rate.den) * video_stream->nb_frames;
+			this.Duration = video_stream->nb_frames / (video_stream->avg_frame_rate.num / (double)video_stream->avg_frame_rate.den);
 			this.Framerate = video_stream->avg_frame_rate;
 
 			frameconv = new CFrameConverter(FrameSize, codec_context->pix_fmt);
@@ -61,26 +61,51 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Dispose() {
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+
+	// Finalizer fallback: if a decoder is ever collected without Dispose() — e.g. the constructor threw
+	// after the FFmpeg contexts were allocated, or a caller forgot to dispose — still free the NATIVE
+	// FFmpeg memory so it does not leak. Only native resources are touched from the finalizer; managed
+	// and GL resources (frameconv, lastTexture, frames) are left to their own finalizers and must never
+	// be freed from the finalizer thread.
+	~CVideoDecoder() {
+		Dispose(false);
+	}
+
+	protected virtual void Dispose(bool disposing) {
 		if (this.close)
 			return;
+		this.close = true;
 
-		bDrawing = false;
-		close = true;
-		cts?.Cancel();
-		while (DS != DecodingState.Stopped) ;
-		frameconv.Dispose();
+		if (disposing) {
+			bDrawing = false;
+			cts?.Cancel();
+			while (DS != DecodingState.Stopped) ;
+			frameconv?.Dispose();
+		}
 
-		ffmpeg.avcodec_flush_buffers(codec_context);
-		if (ffmpeg.avcodec_close(codec_context) < 0)
-			Trace.TraceError("codec context close error.");
+		// Native FFmpeg contexts (the large allocations from avformat_open_input / avcodec_alloc_context3).
+		// Guarded for nulls so a constructor that threw part-way through can still be finalized safely.
+		if (codec_context != null) {
+			ffmpeg.avcodec_flush_buffers(codec_context);
+			if (ffmpeg.avcodec_close(codec_context) < 0)
+				Trace.TraceError("codec context close error.");
+		}
 		video_stream = null;
 		fixed (AVFormatContext** format_contexttmp = &format_context) {
-			ffmpeg.avformat_close_input(format_contexttmp);
+			if (*format_contexttmp != null)
+				ffmpeg.avformat_close_input(format_contexttmp);
 		}
-		if (lastTexture != null)
-			lastTexture.Dispose();
-		while (decodedframes.TryDequeue(out CDecodedFrame frame))
-			frame.Dispose();
+
+		if (disposing) {
+			if (lastTexture != null)
+				lastTexture.Dispose();
+			if (decodedframes != null)
+				while (decodedframes.TryDequeue(out CDecodedFrame frame))
+					frame.Dispose();
+		}
 	}
 
 	public void Start() {
@@ -180,7 +205,11 @@ public unsafe class CVideoDecoder : IDisposable {
 	private void EnqueueFrames() {
 		if (DS != DecodingState.Running && !close) {
 			cts = new CancellationTokenSource();
-			Task.Factory.StartNew(() => EnqueueOneFrame());
+			// LongRunning → dedicated thread, not a thread-pool worker. EnqueueOneFrame is a loop that lives
+			// for the whole video (it Thread.Sleep(1)s while the frame queue is full); on the pool it would
+			// occupy a worker for minutes and make the pool inject/retire extra threads (the "[thread]
+			// exited with code 0" churn seen in-game) and risk starving other pooled work.
+			Task.Factory.StartNew(() => EnqueueOneFrame(), TaskCreationOptions.LongRunning);
 		}
 	}
 
