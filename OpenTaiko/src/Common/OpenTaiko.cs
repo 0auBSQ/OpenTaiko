@@ -508,7 +508,7 @@ internal class OpenTaiko : Game {
 
 		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
-		FullScreen = ConfigIni.bFullScreen;
+		WindowMode = ConfigIni.nWindowMode;
 		VSync = ConfigIni.bEnableVSync;
 		Framerate = 0;
 
@@ -1064,8 +1064,7 @@ internal class OpenTaiko : Game {
 
 			#region [ Fullscreen Toggle ]
 			if (this.bSwitchFullScreenAtNextFrame) {
-				ConfigIni.bFullScreen = !ConfigIni.bFullScreen;
-				app.ToggleWindowMode();
+				app.WindowMode = ConfigIni.nWindowMode;   // menu already set the chosen mode; apply it to the window
 				this.bSwitchFullScreenAtNextFrame = false;
 			}
 			#endregion
@@ -1683,11 +1682,15 @@ internal class OpenTaiko : Game {
 			Trace.TraceInformation("----------------------");
 			Trace.TraceInformation("■ Shutdown");
 
-			ConfigIni.nWindowBaseXPosition = WindowPosition.X;
-			ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
-			ConfigIni.nWindowWidth = WindowSize.X;
-			ConfigIni.nWindowHeight = WindowSize.Y;
-			ConfigIni.bFullScreen = FullScreen;
+			ConfigIni.nWindowMode = WindowMode;
+			// Only persist window geometry from a WINDOWED session — in fullscreen/borderless the window size is the
+			// monitor size (or GLFW's fullscreen size), which must not overwrite the user's saved windowed dimensions.
+			if (WindowMode == 0) {
+				ConfigIni.nWindowBaseXPosition = WindowPosition.X;
+				ConfigIni.nWindowBaseYPosition = WindowPosition.Y;
+				ConfigIni.nWindowWidth = WindowSize.X;
+				ConfigIni.nWindowHeight = WindowSize.Y;
+			}
 			ConfigIni.bEnableVSync = VSync;
 			Framerate = 0;
 
@@ -1927,6 +1930,19 @@ internal class OpenTaiko : Game {
 		GameWindowSize.Width = nWidth;
 		GameWindowSize.Height = nHeight;
 
+		// Apply the skin render-scale: snap the saved multiplier to one this skin actually offers (the list always
+		// contains 1.0) and push it to the engine. The global render-scale FBO rebuilds itself lazily when this (or
+		// GameWindowSize) changes, so 2D/text/3D/textures all start rendering at the new internal resolution.
+		double cur = OpenTaiko.ConfigIni.fRenderScale;
+		double snapped = 1.0;
+		if (OpenTaiko.Skin != null) {
+			foreach (var r in OpenTaiko.Skin.Resolutions) {
+				if (Math.Abs(r.val - cur) < 1e-4) { snapped = r.val; break; }
+			}
+		}
+		OpenTaiko.ConfigIni.fRenderScale = (float)snapped;
+		Game.RenderScale = (float)snapped;
+
 		//WindowSize = new Silk.NET.Maths.Vector2D<int>(nWidth, nHeight);
 	}
 
@@ -1987,6 +2003,7 @@ internal class OpenTaiko : Game {
 		OpenTaiko.NamePlate.RefleshSkin();
 		OpenTaiko.ModalManager.RefleshSkin();
 		OpenTaiko.PopupMenuManager.RefleshSkin();
+		CVirtualSlotManager.RefreshAICharacter();   // AI battle slot character now comes from the (reloaded) skin
 	}
 	#endregion
 

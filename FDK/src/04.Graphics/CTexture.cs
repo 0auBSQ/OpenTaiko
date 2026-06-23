@@ -410,6 +410,20 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	private int _pixBufW = 0;
 	private int _pixBufH = 0;
 
+	// Render-scale: a surface whose GL pixel buffer is smaller than its LOGICAL display size (a 3D scene rendered at
+	// reduced internal resolution). When set, the texture lays out + draws at the logical size while sampling the
+	// smaller GL texture (UVs are fractions of rcFullImage, so this is transparent). Re-asserted after pixel-buffer
+	// reallocations so a CPU-rasterised canvas keeps presenting at full size.
+	private int _logicalW = 0, _logicalH = 0;
+	public void SetLogicalSize(int w, int h) {
+		_logicalW = w; _logicalH = h;
+		if (w > 0 && h > 0) {
+			this.szImageSize = new Size(w, h);
+			this.rcFullImage = new Rectangle(0, 0, w, h);
+			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+		}
+	}
+
 	/// <summary>
 	/// Creates or updates this texture from a raw RGBA pixel buffer
 	/// (length = width * height * 4, top-left origin).
@@ -433,6 +447,11 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 						this.szImageSize = new Size(width, height);
 						this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 						this.rcFullImage = new Rectangle(0, 0, width, height);
+						if (_logicalW > 0 && _logicalH > 0) {   // render-scale: keep the logical display size despite the smaller buffer
+							this.szImageSize = new Size(_logicalW, _logicalH);
+							this.rcFullImage = new Rectangle(0, 0, _logicalW, _logicalH);
+							this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+						}
 					} else {
 						Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
 						Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0,
@@ -675,10 +694,29 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
 
+			int origW = bitmap.Width, origH = bitmap.Height;   // LOGICAL size: layout + UV (fractions of rcFullImage) use this
+
+			// Render-scale: downsample the GL texture to cut VRAM + upload bandwidth on low-end machines. szImageSize
+			// stays the ORIGINAL size, so every draw (incl. sprite-sheet sub-rects) is unchanged — only sampling detail
+			// drops. UVs are fractions of rcFullImage, independent of the GL texture's pixel count, so this is transparent.
+			SKBitmap glBitmap = bitmap;
+			bool ownGlBitmap = false;
+			float rs = Game.RenderScale;
+			if (rs < 0.999f) {
+				int dw = Math.Max(1, (int)Math.Round(origW * rs));
+				int dh = Math.Max(1, (int)Math.Round(origH * rs));
+				if (dw < origW || dh < origH) {
+					var resized = bitmap.Resize(new SKImageInfo(dw, dh), SKFilterQuality.Medium);
+					if (resized != null) { glBitmap = resized; ownGlBitmap = true; }
+				}
+			}
+
 			if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
-				Pointer = tGenFromBitmap(bitmap);
+				Pointer = tGenFromBitmap(glBitmap);
+				if (ownGlBitmap) glBitmap.Dispose();
 			} else {
-				var asyncCopy = bitmap.Copy();
+				var asyncCopy = glBitmap.Copy();
+				if (ownGlBitmap) glBitmap.Dispose();
 				Action createInstance = () => {
 					try {
 						Pointer = tGenFromBitmap(asyncCopy);
@@ -689,7 +727,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				Game.AsyncActions.Enqueue(createInstance);
 			}
 
-			this.szImageSize = new Size(bitmap.Width, bitmap.Height);
+			this.szImageSize = new Size(origW, origH);
 			this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
 			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 		} catch (Exception ex) {

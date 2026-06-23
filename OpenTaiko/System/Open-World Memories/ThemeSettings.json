@@ -1,27 +1,5 @@
 [
   {
-    "id": "aislot_chara",
-    "type": "string",
-    "scope": "global",
-    "label": {
-      "strings": {
-        "default": "AI Slot Character",
-        "ja": "AIスロットキャラクター",
-        "ko": "AI 슬롯 캐릭터",
-        "zh": "AI 战斗角色"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Name of the character used for the AI battle slot.\nMust match the character's folder name.",
-        "ja": "AIバトルスロットに使用するキャラクターの名前。\nキャラクターのフォルダ名と一致する必要があります。",
-        "ko": "AI 배틀 슬롯에 사용할 캐릭터 이름.\n캐릭터 폴더 이름과 일치해야 합니다.",
-        "zh": "AI 战斗槽使用的角色名称。\n必须与角色的文件夹名称匹配。"
-      }
-    },
-    "default": "10v2 - AItritus"
-  },
-  {
     "id": "test_int",
     "type": "int",
     "scope": "global",

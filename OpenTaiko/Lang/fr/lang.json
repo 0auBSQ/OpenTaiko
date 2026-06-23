@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "Plein écran",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Choisir entre le mode plein \nécran et fenêtre.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "Mode d'affichage",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Choisir Fenêtré, Plein écran ou Plein écran sans bordure.\nSans bordure couvre l'écran sans décorations.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Fenêtré",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "Plein écran",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Sans bordure",
 		"SETTINGS_SYSTEM_VSYNC": "Mode VSync",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Activer ou non la synchronisation verticale.\nLimite les FPS à 60,\nrendant le défilement fluide\nmais augmentant la latence des entrées.\nSi désactivé, il n'y a pas de limite\naux FPS donc moins de latences,\nmais le défilement des notes peut être sacadé.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
@@ -116,6 +121,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "Skin actuel",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Choisir le skin utilisé dans le dossier System.",
+		"SETTINGS_SYSTEM_RESOLUTION": "Résolution de rendu",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "Affiche le jeu à une fraction de la résolution du skin, agrandie à la fenêtre.\nLes valeurs basses sont plus rapides (moins nettes). Changer recharge le skin.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Activer la musique en jeu",

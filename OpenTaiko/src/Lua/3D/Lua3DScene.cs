@@ -22,8 +22,9 @@ namespace OpenTaiko {
 		internal LuaCanvas _canvas;
 		internal HashSet<Lua3DScene>? _disposeList = null;
 
-		internal int _w;   // mutable: RenderView temporarily shrinks the viewport for reduced-res reflections
+		internal int _w;   // PIXEL size (rasterise + project here); mutable: RenderView temporarily shrinks it for reduced-res reflections
 		internal int _h;
+		internal int _logicalW = 1, _logicalH = 1;   // LOGICAL size: what Lua requested / sees / the surface presents at (render-scale)
 		internal float[] _depth;
 
 		// Camera, owned by the scene: position + orientation (yaw/pitch → basis) +
@@ -78,7 +79,14 @@ namespace OpenTaiko {
 		internal int Revision;
 
 		public Lua3DScene(int width, int height) {
-			_canvas = new LuaCanvas(width, height);
+			_logicalW = Math.Max(1, width);
+			_logicalH = Math.Max(1, height);
+			// Render-scale: rasterise into a reduced-resolution buffer (GPU win on low-end machines) but keep the
+			// LOGICAL size for projection-readback + presentation, so Lua stages/characters need no changes.
+			double rs = FDK.Game.RenderScale;
+			int pw = Math.Max(1, (int)Math.Round(_logicalW * rs));
+			int ph = Math.Max(1, (int)Math.Round(_logicalH * rs));
+			_canvas = new LuaCanvas(pw, ph, _logicalW, _logicalH);
 			_w = _canvas._w;
 			_h = _canvas._h;
 			_depth = new float[_w * _h];
@@ -88,12 +96,17 @@ namespace OpenTaiko {
 			_renderer = FDK.Game.ComputeShadersAvailable ? (_gpuRasterizer = new GpuRasterizer()) : _rasterizer;
 		}
 
-		public int Width => _w;
-		public int Height => _h;
+		public int Width => _logicalW;
+		public int Height => _logicalH;
 
 		#region Frame setup / 2D / textures
 		public void Clear(int r, int g, int b, int a) => _canvas.Clear(r, g, b, a);
 		public void FillRect(int x, int y, int w, int h, int r, int g, int b, int a) {
+			if (_w != _logicalW) {   // render-scale: inputs are LOGICAL → map to the reduced pixel buffer
+				double sc = (double)_w / _logicalW;
+				int x2 = (int)Math.Round((x + w) * sc), y2 = (int)Math.Round((y + h) * sc);
+				x = (int)Math.Round(x * sc); y = (int)Math.Round(y * sc); w = x2 - x; h = y2 - y;
+			}
 			if (_gpuOwnsCanvas && _gpuRasterizer != null) _gpuRasterizer.Rect2D(this, x, y, w, h, r, g, b, a);   // after GPU 3D: composite onto the canvas texture
 			else _canvas.FillRect(x, y, w, h, r, g, b, a);
 		}
@@ -140,7 +153,8 @@ namespace OpenTaiko {
 			double cz = rx * _Fx + ry * _Fy + rz * _Fz;
 			if (cz <= _near) return (0, 0, -1);
 			double iz = 1.0 / cz;
-			return (_w * 0.5 + cx * iz * _scale, _h * 0.5 - cy * iz * _scale, cz);
+			double inv = (_w != 0) ? (double)_logicalW / _w : 1.0;   // pixel → logical screen coords (render-scale)
+			return ((_w * 0.5 + cx * iz * _scale) * inv, (_h * 0.5 - cy * iz * _scale) * inv, cz);
 		}
 
 		// ── Render-to-texture cameras ───────────────────────────────────────────────────
@@ -341,7 +355,8 @@ namespace OpenTaiko {
 			if (cz < _near) return (0, 0, false);
 			double cx = rx * _Rx + ry * _Ry + rz * _Rz;
 			double cyv = rx * _Ux + ry * _Uy + rz * _Uz;
-			return (_w * 0.5 + cx / cz * _scale, _h * 0.5 - cyv / cz * _scale, true);
+			double inv = (_w != 0) ? (double)_logicalW / _w : 1.0;   // pixel → logical screen coords (render-scale)
+			return ((_w * 0.5 + cx / cz * _scale) * inv, (_h * 0.5 - cyv / cz * _scale) * inv, true);
 		}
 
 		public void RegisterTexture(int id, LuaTable pixels, int w, int h) {
@@ -380,6 +395,11 @@ namespace OpenTaiko {
 
 		/// <summary>2D line in the colour buffer (screen pixels), drawn on top (no depth).</summary>
 		public void DrawLine(int x0, int y0, int x1, int y1, int r, int g, int b) {
+			if (_w != _logicalW) {   // render-scale: inputs are LOGICAL → map to the reduced pixel buffer
+				double sc = (double)_w / _logicalW;
+				x0 = (int)Math.Round(x0 * sc); y0 = (int)Math.Round(y0 * sc);
+				x1 = (int)Math.Round(x1 * sc); y1 = (int)Math.Round(y1 * sc);
+			}
 			if (_gpuOwnsCanvas && _gpuRasterizer != null) { _gpuRasterizer.Line2D(this, x0, y0, x1, y1, r, g, b); return; }   // after GPU 3D: composite onto the canvas texture
 			byte br = RenderUtil.CB(r), bg = RenderUtil.CB(g), bb = RenderUtil.CB(b);
 			int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;

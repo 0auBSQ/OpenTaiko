@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "전체화면 모드",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경할 수 있습니다.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "창 모드",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "창, 전체 화면 또는 테두리 없는 전체 화면을 선택합니다.\n테두리 없음은 장식 없이 모니터를 채웁니다.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "창 모드",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "전체 화면",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "테두리 없음",
 		"SETTINGS_SYSTEM_VSYNC": "VSync 모드",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "VSync로 전환, 또는 해제할 수 있습니다.\nVSync 모드로 전환하시면, 프레임이 60FPS로 고정됩니다, 하지만 인풋렉은 늘어납니다.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "그래픽 API",
@@ -116,6 +121,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "현재 스킨",
 		"SETTINGS_SYSTEM_SKIN_DESC": "System 폴더에 있는 스킨들을 고르세요..",
+		"SETTINGS_SYSTEM_RESOLUTION": "렌더 해상도",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "스킨 해상도의 배율로 렌더링하여 창에 확대합니다.\n낮은 값은 저사양에서 더 빠릅니다(덜 선명). 변경하면 스킨을 다시 불러옵니다.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "곡 재생",

@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "全画面モード",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "画面モード設定：\nON で全画面モード、OFF でウィンド\nウモードになります。",
+		"SETTINGS_SYSTEM_WINDOWMODE": "ウィンドウモード",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "ウィンドウ・フルスクリーン・ボーダーレスから選択します。\nボーダーレスは枠なしで画面全体を覆います。",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "ウィンドウ",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "フルスクリーン",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "ボーダーレス",
 		"SETTINGS_SYSTEM_VSYNC": "垂直帰線同期",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "垂直帰線同期：\n画面の描画をディスプレイの垂直帰\n線中に行なう場合には ON を指定し\nます。ON にすると、ガタつきのない\n滑らかな画面描画が実現されます。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "グラフィックスAPI",
@@ -116,6 +121,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "スキン (全体)",
 		"SETTINGS_SYSTEM_SKIN_DESC": "スキン切替：\nスキンを切り替えます。",
+		"SETTINGS_SYSTEM_RESOLUTION": "描画解像度",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "スキン解像度の倍率で描画し、ウィンドウに拡大表示します。\n低い値は低スペックでも軽くなります（ぼやけます）。変更するとスキンが再読み込みされます。",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "音源使用",

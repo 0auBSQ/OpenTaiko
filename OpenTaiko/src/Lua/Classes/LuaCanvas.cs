@@ -16,25 +16,35 @@ namespace OpenTaiko {
 		internal HashSet<LuaCanvas>? _disposeList = null;
 
 		internal byte[] _buf;         // RGBA, top-left origin
-		internal readonly int _w;
+		internal readonly int _w;     // GL pixel buffer size (may be reduced by the render-scale)
 		internal readonly int _h;
+		internal readonly int _logW;  // LOGICAL display size (what Lua sees + how the surface is presented)
+		internal readonly int _logH;
 		private bool _dirty;
 		// dirty rectangle (inclusive) so Upload only sends the changed region
 		private int _dx0, _dy0, _dx1, _dy1;
 
 		public uint Pointer => _texture != null ? _texture.Pointer : 0;
-		public int Width => _w;
-		public int Height => _h;
+		public int Width => _logW;
+		public int Height => _logH;
 
-		public LuaCanvas(int width, int height) {
-			_w = Math.Max(1, width);
-			_h = Math.Max(1, height);
+		public LuaCanvas(int width, int height) : this(width, height, width, height) { }
+
+		/// <summary>Create a canvas whose GL pixel buffer is <paramref name="pixelW"/>×<paramref name="pixelH"/> but that
+		/// presents at <paramref name="logicalW"/>×<paramref name="logicalH"/> (used by render-scaled 3D scenes: render
+		/// fewer pixels, display + report full size). When logical == pixel this is an ordinary full-res canvas.</summary>
+		public LuaCanvas(int pixelW, int pixelH, int logicalW, int logicalH) {
+			_w = Math.Max(1, pixelW);
+			_h = Math.Max(1, pixelH);
+			_logW = Math.Max(1, logicalW);
+			_logH = Math.Max(1, logicalH);
 			_buf = new byte[_w * _h * 4];          // all zero → fully transparent
 			_texture = new CTexture(_w, _h);
 			_texture.tUpdateColor4(new(1f, 1f, 1f, 1f));  // no tint
 			_texture.tUpdateOpacity(255);
 			MarkDirty(0, 0, _w - 1, _h - 1);
 			Upload();                              // allocate the GL texture up front
+			if (_logW != _w || _logH != _h) _texture.SetLogicalSize(_logW, _logH);   // present at the logical size
 		}
 
 		internal void MarkDirty(int x0, int y0, int x1, int y1) {
@@ -259,7 +269,7 @@ namespace OpenTaiko {
 				"bottomright" => CTexture.RefPnt.DownRight,
 				_ => CTexture.RefPnt.UpLeft
 			};
-			_texture?.t2DScaledDraw(ref_anchor, x, y, new(0, 0, _w, _h));
+			_texture?.t2DScaledDraw(ref_anchor, x, y, new(0, 0, _logW, _logH));
 		}
 		public void SetScale(float scale_x, float scale_y) {
 			_texture?.tSetScale(scale_x, scale_y);

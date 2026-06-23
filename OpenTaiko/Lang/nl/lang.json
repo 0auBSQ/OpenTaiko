@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "Volledig scherm Modus",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wissel tussen volledig scherm en venster modus.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "Venstermodus",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Kies Venster, Volledig scherm of Randloos.\nRandloos vult het scherm zonder vensterrand.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Venster",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "Volledig scherm",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Randloos",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Modus",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Schakelt VSync aan/uit.\nAls dit aan staat zal het op maximaal 60FPS spelen,\nzodat muziek noten soepel scrollt,\nmaar er is meer input vertraging.\nAls dit uit staat is er geen FPS limiet,\nvoor minder input vertraging,\nmaar scrollen van muziek noten kan onstabiel zijn.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
@@ -116,6 +121,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "Huidige Skin",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Kies een skin uit de systeemfolder om te gebruiken.",
+		"SETTINGS_SYSTEM_RESOLUTION": "Renderresolutie",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "Rendert het spel op een fractie van de skinresolutie, opgeschaald naar het venster.\nLagere waarden draaien sneller (minder scherp). Wijzigen herlaadt de skin.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Muziek Afspelen",
