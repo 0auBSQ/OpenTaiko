@@ -2013,7 +2013,19 @@ internal class CActSelect曲リスト : CActivity {
 		// 0 - Position
 		// 1 - Title type
 		else if (emc == eMenuContext.SearchByText) {
-			if (_contextVars[0] == 1) searchTextInput.Update();
+			if (_contextVars[0] == 1) {
+				bool confirmed = searchTextInput.Update();
+				if (OperatingSystem.IsIOS()) {
+					if (confirmed && !string.IsNullOrWhiteSpace(searchTextInput.Text)) {
+						// iOS native alert completed with text — advance past text entry
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
+						_contextVars[0] = 2;
+					} else if (searchTextInput.iOSCancelled) {
+						// iOS native alert cancelled — go back to type selection
+						_contextVars[0] = 0;
+					}
+				}
+			}
 
 			OpenTaiko.Tx.SongSelect_Search_Window?.t2D描画(0, 0);
 

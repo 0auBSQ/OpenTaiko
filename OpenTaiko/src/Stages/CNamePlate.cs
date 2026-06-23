@@ -44,9 +44,9 @@ class CNamePlate {
 		bIsPrevAI[player] = isAI;
 
 		if (OpenTaiko.SaveFileInstances[player].data.DanGold)
-			lcNamePlate.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
+			lcNamePlate?.SetInfos(player, name, title, $"<g.#FFE34A.#EA9622>{dan}</g>", OpenTaiko.SaveFileInstances[actualPlayer].data);
 		else
-			lcNamePlate.SetInfos(player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
+			lcNamePlate?.SetInfos(player, name, title, dan, OpenTaiko.SaveFileInstances[actualPlayer].data);
 	}
 
 
@@ -63,7 +63,7 @@ class CNamePlate {
 		}
 		bIsPrevAI[basePlayer] = isAI;
 
-		lcNamePlate.Draw(x, y, Opacity, basePlayer, OpenTaiko.P1IsBlue() ? 1 : 0);
+		lcNamePlate?.Draw(x, y, Opacity, basePlayer, OpenTaiko.P1IsBlue() ? 1 : 0);
 	}
 
 	private bool[] bIsPrevAI = new bool[5];

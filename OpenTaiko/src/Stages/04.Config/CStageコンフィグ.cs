@@ -86,6 +86,10 @@ internal class CStageコンフィグ : CStage {
 		try {
 			OpenTaiko.Skin.bgmコンフィグ画面.tStop();
 
+			// Leaving config via ESC/cancel skips the per-tab
+			// flush that switching to the Exit menu performs, so flush the current tab into
+			// ConfigIni before writing it out.
+			this.actList.t項目リストの設定_Exit();
 			OpenTaiko.ConfigIni.t書き出し(OpenTaiko.strEXEのあるフォルダ + "Config.ini");    // CONFIGだけ
 			for (int i = 0; i < 4; i++) {
 				this.ctキー反復用[i] = null;
@@ -448,12 +452,12 @@ internal class CStageコンフィグ : CStage {
 			}
 			this.ctキー反復用.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
 			this.ctキー反復用.R.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.HH), new CCounter.KeyProcess(this.tカーソルを上へ移動する));
-			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD)) {
+			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.SD) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 				this.tカーソルを上へ移動する();
 			}
 			this.ctキー反復用.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
 			this.ctキー反復用.B.KeyIntervalFunc(OpenTaiko.Pad.IsPressingGB(EPad.BD), new CCounter.KeyProcess(this.tカーソルを下へ移動する));
-			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT)) {
+			if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LT) || OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 				this.tカーソルを下へ移動する();
 			}
 		}

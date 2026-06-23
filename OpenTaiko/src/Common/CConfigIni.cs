@@ -341,6 +341,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public int nAILevel = 4;
 	public bool bAIBattleMode = false;
 	public int nControllerDeadzone = 50;
+	public int nTouchDrumVisual = 30; // Don radius as percentage of screen width (10-50)
 
 	public CAIPerformances[] apAIPerformances = {
 		new CAIPerformances(500, 400, 100, 7, 200),
@@ -472,6 +473,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	}
 
 	public int nGraphicsDeviceType;
+	public bool biOSUnlimitedFrameRate; // iOS only: CADisplayLink device-max fps vs 60 (host reads at launch)
 	public int nRisky; // #23559 2011.6.20 yyagi Riskyでの残ミス数。0で閉店
 	public bool bIsAllowedDoubleClickFullscreen; // #26752 2011.11.27 yyagi ダブルクリックしてもフルスクリーンに移行しない
 
@@ -896,6 +898,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.strSystemSkinSubfolderFullName = ""; // #28195 2012.5.2 yyagi 使用中のSkinサブフォルダ名
 		this.bTight = false; // #29500 2012.9.11 kairera0467 TIGHTモード
 		nGraphicsDeviceType = 0;
+		biOSUnlimitedFrameRate = false;
 
 		#region [ WASAPI/ASIO ]
 
@@ -1056,9 +1059,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		if (strSystemSkinSubfolderFullName != null && strSystemSkinSubfolderFullName.Length == 0) {
 			// Config.iniが空の状態でDTXManiaをViewerとして起動_終了すると、strSystemSkinSubfolderFullName が空の状態でここに来る。
 			// → 初期値として Default/ を設定する。
-			strSystemSkinSubfolderFullName = System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
+			strSystemSkinSubfolderFullName = OpenTaiko.ResolveAssetPath(System.IO.Path.Combine(OpenTaiko.strEXEのあるフォルダ,
 				"System" + System.IO.Path.DirectorySeparatorChar + "Default" +
-				System.IO.Path.DirectorySeparatorChar);
+				System.IO.Path.DirectorySeparatorChar));
 		}
 
 		Uri uriPath = new Uri(System.IO.Path.Combine(this.strSystemSkinSubfolderFullName,
@@ -1184,6 +1187,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 		sw.WriteLine("; 垂直帰線同期(0:OFF,1:ON)");
 		sw.WriteLine("VSyncWait={0}", this.bEnableVSync ? 1 : 0);
+		sw.WriteLine();
+		sw.WriteLine("; iOS only: 1 = render at the display's max refresh (e.g. 120Hz), 0 = cap at 60fps. Applied at launch.");
+		sw.WriteLine("iOSUnlimitedFrameRate={0}", this.biOSUnlimitedFrameRate ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; フレーム毎のsleep値[ms] (-1でスリープ無し, 0以上で毎フレームスリープ。動画キャプチャ等で活用下さい)"); // #xxxxx 2011.11.27 yyagi add
 		sw.WriteLine("; A sleep time[ms] per frame."); //
@@ -1358,6 +1364,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; Set the deadzone for all connected controllers' thumbsticks.");
 		sw.WriteLine("; Can be between 10% and 90%.");
 		sw.WriteLine("ControllerDeadzone={0}", this.nControllerDeadzone);
+		sw.WriteLine();
+		sw.WriteLine("; Touch drum radius as percentage of screen width (10-50).");
+		sw.WriteLine("TouchDrumVisual={0}", this.nTouchDrumVisual);
 		sw.WriteLine();
 		sw.WriteLine("; リザルト画像自動保存機能(0:OFF, 1:ON)"); // #25399 2011.6.9 yyagi
 		sw.WriteLine("; Set \"1\" if you'd like to save result screen image automatically"); //
@@ -1979,7 +1988,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 						absSkinPath += System.IO.Path.DirectorySeparatorChar;
 					}
 
-					this.strSystemSkinSubfolderFullName = absSkinPath;
+					this.strSystemSkinSubfolderFullName = OpenTaiko.ResolveAssetPath(absSkinPath);
 					break;
 				}
 			case nameof(this.PreAssetsLoading):
@@ -2063,6 +2072,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "VSyncWait":
 				this.bEnableVSync = CConversion.bONorOFF(value[0]);
+				break;
+			case "iOSUnlimitedFrameRate":
+				this.biOSUnlimitedFrameRate = CConversion.bONorOFF(value[0]);
 				break;
 			case "SleepTimePerFrame":
 				this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(value, -1, 50, this.nMsSleepPerFrame);
@@ -2162,6 +2174,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "ControllerDeadzone":
 				this.nControllerDeadzone = CConversion.ParseIntInRange(value, 10, 90, this.nControllerDeadzone);
+				break;
+			case "TouchDrumVisual":
+				this.nTouchDrumVisual = CConversion.ParseIntInRange(value, 10, 50, this.nTouchDrumVisual);
 				break;
 			case "PolyphonicSounds":
 				this.nPoliphonicSounds = CConversion.ParseIntInRange(value, 1, 8, this.nPoliphonicSounds);

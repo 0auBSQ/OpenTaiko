@@ -79,6 +79,8 @@
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경할 수 있습니다.",
 		"SETTINGS_SYSTEM_VSYNC": "VSync 모드",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "VSync로 전환, 또는 해제할 수 있습니다.\nVSync 모드로 전환하시면, 프레임이 60FPS로 고정됩니다, 하지만 인풋렉은 늘어납니다.",
+		"SETTINGS_SYSTEM_FRAMERATE": "프레임 레이트",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "최대 프레임 레이트입니다.\nUnlimited는 디스플레이의 주사율\n(예: ProMotion에서 120Hz)을 사용합니다.\n재시작 후 적용됩니다.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "그래픽 API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "그래픽 API 옵션:\nOpenGL, DirectX11, Vulkan, 또는 Metal을 선택할 수 있습니다.\nOpenGL은 느리지만, 호환성, 안정성이 좋습니다.\nDirectX11은 빠르고 안정하지만, 윈도우에서만 지원합니다.\nVulkan은 리눅스OS에서 빠릅니다.\nMetal은 MacOS에서만 지원됩니다.\n\n게임을 재시작하여야 변경 사항이 적용됩니다.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync 텍스처 로딩",

@@ -79,6 +79,8 @@
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wissel tussen volledig scherm en venster modus.",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Modus",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Schakelt VSync aan/uit.\nAls dit aan staat zal het op maximaal 60FPS spelen,\nzodat muziek noten soepel scrollt,\nmaar er is meer input vertraging.\nAls dit uit staat is er geen FPS limiet,\nvoor minder input vertraging,\nmaar scrollen van muziek noten kan onstabiel zijn.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Framerate",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximale framerate.\nUnlimited gebruikt de verversingssnelheid\nvan het scherm (bijv. 120 Hz op ProMotion).\nWordt na herstart toegepast.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode:\nSelecteer de opties OpenGL,\nDirectX11, Vulkan of Metal.\nOpenGL is langzaam, maar compatibel en stabiel.\nDirectX11 is snel en stabiel, maar\n werkt alleen op Windows.\nVulkan werkt het snelst op Linux.\nMetal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",

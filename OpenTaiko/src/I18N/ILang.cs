@@ -28,10 +28,12 @@ static internal class CLangManager {
 	// temporary garbage code
 	public static string[] Langcodes {
 		get {
-			if (_langCodes == null)
-				_langCodes = Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), "*", SearchOption.TopDirectoryOnly)
-					.Select(result => Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang"), result))
+			if (_langCodes == null) {
+				var langDir = Path.Combine(OpenTaiko.strEXEのあるフォルダ, "Lang");
+				_langCodes = OpenTaiko.GetMergedDirectories(langDir, "*")
+					.Select(result => Path.GetFileName(result))
 					.ToArray();
+			}
 
 			return _langCodes;
 		}

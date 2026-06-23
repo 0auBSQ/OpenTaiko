@@ -47,10 +47,12 @@ internal class CActConfigList : CActivity {
 			case "DirectX11": return 1;
 			case "Vulkan": return 2;
 			case "Metal": return 3;
+			case "Metal (iOS)": return 3;
 			default: return 0;
 		}
 	}
 	private static string GraphicsDeviceFromInt(int device) {
+		if (OperatingSystem.IsIOS()) return "Metal (iOS)";
 		switch (device) {
 			case 0: return "OpenGL";
 			case 1: return "DirectX11";
@@ -61,6 +63,7 @@ internal class CActConfigList : CActivity {
 	}
 
 	private static string[] AvailableGraphicsDevices { get {
+			if (OperatingSystem.IsIOS()) return ["Metal (iOS)"];
 			if (OperatingSystem.IsWindows()) return ["OpenGL", "DirectX11", "Vulkan"];
 			if (OperatingSystem.IsMacOS()) return ["OpenGL", "Metal"];
 			if (OperatingSystem.IsLinux()) return ["OpenGL", "Vulkan"];
@@ -119,6 +122,8 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_TIMESTRETCH_DESC"));
 		this.list項目リスト.Add(this.iSystemTimeStretch);
 
+		// The graphics-API selector's backends are limited per-platform by AvailableGraphicsDevices.
+		// On iOS the only backend is Metal (provided natively by the host) — a single "Metal (iOS)" entry.
 		this.iSystemGraphicsType = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI"), CItemList.EPanelType.Normal, GraphicsDeviceIntFromConfigInt(),
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_GRAPHICSAPI_DESC"),
 			AvailableGraphicsDevices);
@@ -132,9 +137,17 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC"));
 		this.list項目リスト.Add(this.iSystemRandomFromSubBox);
 
-		this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC"), OpenTaiko.ConfigIni.bEnableVSync,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC_DESC"));
-		this.list項目リスト.Add(this.iSystemVSyncWait);
+		// One framerate control per platform: iOS caps FPS (thermal/CPU, not real VSync); desktop is VSync.
+		if (OperatingSystem.IsIOS()) {
+			this.iSystemIOSFrameRate = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FRAMERATE"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.biOSUnlimitedFrameRate ? 1 : 0,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FRAMERATE_DESC"),
+				new string[] { "60 FPS", "Unlimited" });
+			this.list項目リスト.Add(this.iSystemIOSFrameRate);
+		} else {
+			this.iSystemVSyncWait = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC"), OpenTaiko.ConfigIni.bEnableVSync,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_VSYNC_DESC"));
+			this.list項目リスト.Add(this.iSystemVSyncWait);
+		}
 
 		this.iSystemAVI = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE"), OpenTaiko.ConfigIni.bEnableAVI,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_BGMOVIE_DESC"));
@@ -427,6 +440,12 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_GAME_CONTROLLERDEADZONE_DESC"));
 		this.list項目リスト.Add(this.iControllerDeadzone);
 
+		if (OperatingSystem.IsIOS()) {
+			this.iTouchDrumVisual = new CItemInteger("Touch Drum Size", 10, 50, OpenTaiko.ConfigIni.nTouchDrumVisual,
+				"Radius of the Don drum circle as % of screen width.");
+			this.list項目リスト.Add(this.iTouchDrumVisual);
+		}
+
 		this.iDrumsGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_GAME_DESC"));
 		this.list項目リスト.Add(this.iDrumsGoToKeyAssign);
@@ -640,7 +659,9 @@ internal class CActConfigList : CActivity {
 			if (this.list項目リスト[this.n現在の選択項目] == this.iSystemFullscreen) {
 				OpenTaiko.app.bSwitchFullScreenAtNextFrame = true;
 			} else if (this.list項目リスト[this.n現在の選択項目] == this.iSystemVSyncWait) {
-				OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
+				if (!OperatingSystem.IsIOS()) {
+					OpenTaiko.ConfigIni.bEnableVSync = this.iSystemVSyncWait.bON;
+				}
 				OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true;
 			}
 			#region [ キーアサインへの遷移と脱出 ]
@@ -1529,6 +1550,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iSystemBGMSound;
 	private CItemToggle iSystemDebugInfo;
 	private CItemList iSystemGraphicsType;                 // #24820 2013.1.3 yyagi
+	private CItemList iSystemIOSFrameRate;
 	private CItemToggle iSystemFullscreen;
 	private CItemInteger iSystemMinComboDrums;
 	private CItemInteger iSystemPreviewImageWait;
@@ -1594,6 +1616,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iTaikoAutoRoll;
 	private CItemToggle iTaikoIgnoreSongUnlockables;
 	private CItemInteger iControllerDeadzone;
+	private CItemInteger iTouchDrumVisual;
 
 	private CItemInteger iRollsPerSec;
 	private CItemInteger iAILevel;
@@ -1674,6 +1697,9 @@ internal class CActConfigList : CActivity {
 	private void tConfigIniへ記録する_System() {
 		OpenTaiko.ConfigIni.nSongSpeed = this.iCommonPlaySpeed.n現在の値;
 
+		if (OperatingSystem.IsIOS()) {
+			OpenTaiko.ConfigIni.biOSUnlimitedFrameRate = this.iSystemIOSFrameRate.n現在選択されている項目番号 == 1;
+		}
 		OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.n現在選択されている項目番号]);
 		OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
@@ -1763,6 +1789,9 @@ internal class CActConfigList : CActivity {
 		OpenTaiko.ConfigIni.nGlobalOffsetMs = this.iGlobalOffsetMs.n現在の値;
 		OpenTaiko.ConfigIni.nControllerDeadzone = this.iControllerDeadzone.n現在の値;
 		OpenTaiko.InputManager.Deadzone = OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f;
+		if (OperatingSystem.IsIOS()) {
+			OpenTaiko.ConfigIni.nTouchDrumVisual = this.iTouchDrumVisual.n現在の値;
+		}
 		OpenTaiko.ConfigIni.bIgnoreSongUnlockables = this.iTaikoIgnoreSongUnlockables.bON;
 
 		OpenTaiko.ConfigIni.nMinDisplayedCombo.Drums = this.iSystemMinComboDrums.n現在の値;

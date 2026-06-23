@@ -80,8 +80,15 @@ class TextureLoader {
 		return tex;
 	}
 
+	// Like TxC but does NOT track the texture in listTexture — the caller (e.g. CLazyTextureMap)
+	// owns its lifetime and disposes it on eviction / skin teardown.
+	internal CTexture TxUntracked(string FileName) {
+		var texpath = HLocalizedPath.GetAvailableLocalizedPath(CSkin.Path(BASE + FileName));
+		return OpenTaiko.tテクスチャの生成(texpath, false);
+	}
+
 	internal CTexture TxCGlobal(string FileName) {
-		var tex = OpenTaiko.tテクスチャの生成(OpenTaiko.strEXEのあるフォルダ + GLOBAL + FileName, false);
+		var tex = OpenTaiko.tテクスチャの生成(OpenTaiko.ResolveAssetPath(OpenTaiko.strEXEのあるフォルダ + GLOBAL + FileName), false);
 		listTexture.Add(tex);
 		return tex;
 	}
@@ -269,10 +276,11 @@ class TextureLoader {
 
 		{
 			string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}"), "GenreBackground_*.png");
-			SongSelect_GenreBack = new();
+			// Resident cap 3: current + previous genre are drawn together during a cross-fade, plus slack.
+			SongSelect_GenreBack = new CLazyTextureMap(3, TxUntracked);
 			for (int i = 0; i < genre_files.Length; i++) {
 				string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[1];
-				SongSelect_GenreBack.Add(name, TxC(SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}GenreBackground_" + name + ".png"));
+				SongSelect_GenreBack.Register(name, SONGSELECT + @$"Genre_Background{Path.DirectorySeparatorChar}GenreBackground_" + name + ".png");
 			}
 		}
 
@@ -314,10 +322,11 @@ class TextureLoader {
 
 		{
 			string[] genre_files = Directory.GetFiles(CSkin.Path(BASE + SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}"), "Difficulty_Back_*.png");
-			Difficulty_Back = new();
+			// Resident cap 2: one box-type background shown at a time, plus slack for a transition.
+			Difficulty_Back = new CLazyTextureMap(2, TxUntracked);
 			for (int i = 0; i < genre_files.Length; i++) {
 				string name = Path.GetFileNameWithoutExtension(genre_files[i]).Split('_')[2];
-				Difficulty_Back.Add(name, TxC(SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}Difficulty_Back_" + name + ".png"));
+				Difficulty_Back.Register(name, SONGSELECT + @$"Difficulty_Select{Path.DirectorySeparatorChar}Difficulty_Back{Path.DirectorySeparatorChar}Difficulty_Back_" + name + ".png");
 			}
 		}
 		#endregion
@@ -731,7 +740,7 @@ class TextureLoader {
 
 		#region PuchiChara
 
-		var puchicharaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + PUCHICHARA);
+		var puchicharaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + PUCHICHARA);
 		OpenTaiko.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
 		Puchichara = new CPuchichara[OpenTaiko.Skin.Puchichara_Ptn];
@@ -987,7 +996,7 @@ class TextureLoader {
 
 		#region [Character count initialisations]
 
-		var charaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS);
+		var charaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS);
 		OpenTaiko.Skin.Characters_Ptn = charaDirs.Length;
 
 		Characters_Heya_Preview = new CTexture[OpenTaiko.Skin.Characters_Ptn];
@@ -1265,6 +1274,26 @@ class TextureLoader {
 				act.CreateUnmanagedResource();
 			}
 		}
+
+		PinGameplayTextures();
+	}
+
+	// Preload + pin gameplay-critical textures (notes, hit effects, gogo) so they are uploaded
+	// ahead of play and never evicted under memory pressure — avoids an in-game decode stutter
+	// the first time a note / hit effect / gogo splash appears.
+	private void PinGameplayTextures() {
+		void Pin(CTexture? t) => t?.Preload();
+		void PinAll(CTexture[]? arr) { if (arr != null) foreach (var t in arr) t?.Preload(); }
+
+		PinAll(Notes); Pin(Judge_Frame); PinAll(SENotes); Pin(SENotesExtension); Pin(Notes_Arm); Pin(ChipEffect);
+		Pin(Taiko_Combo_Effect);
+		PinAll(Taiko_Combo); Pin(Taiko_Combo_Text); PinAll(Taiko_Combo_Guide); Pin(ScoreRank);
+		Pin(Gauge_Soul_Fire); PinAll(Gauge_Soul_Explosion);
+		Pin(Effects_Hit_Explosion); Pin(Effects_Hit_Explosion_Big); Pin(Effects_Hit_FireWorks); Pin(Effects_Hit_Bomb);
+		Pin(Effects_Fire); Pin(Effects_Rainbow); Pin(Effects_GoGoSplash);
+		PinAll(Effects_Hit_Great); PinAll(Effects_Hit_Great_Big); PinAll(Effects_Hit_Good); PinAll(Effects_Hit_Good_Big);
+		PinAll(Effects_Roll);
+		Pin(Lane_Background_GoGo);
 	}
 
 	public int[] CreateNumberedArrayFromInt(int total) {
@@ -1436,7 +1465,7 @@ class TextureLoader {
 			#endregion
 		}
 
-		string charaPath = OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC];
+		string charaPath = OpenTaiko.ResolveAssetPath(OpenTaiko.strEXEのあるフォルダ + GLOBAL + CHARACTERS + OpenTaiko.Skin.Characters_DirName[newC]);
 
 		if ((newC >= 0 &&
 			 OpenTaiko.SaveFileInstances[0].data.Character != newC &&
@@ -2277,6 +2306,10 @@ class TextureLoader {
 		}
 		listTexture.Clear();
 
+		// Lazily-loaded background sets aren’t tracked in listTexture, so dispose them explicitly.
+		SongSelect_GenreBack?.Dispose();
+		Difficulty_Back?.Dispose();
+
 		//if (TJAPlayer3.ConfigIni.PreAssetsLoading)
 		{
 			foreach (var act in OpenTaiko.app.listTopLevelActivities) {
@@ -2386,8 +2419,10 @@ class TextureLoader {
 		SongSelect_Search_Window,
 
 		SongSelect_ScoreWindow_Text;
-	public Dictionary<string, CTexture> SongSelect_GenreBack,
-		SongSelect_Bar_Genre,
+	// Full-screen per-genre backgrounds — only the current (and previous, mid cross-fade) are ever
+	// drawn, so load lazily instead of holding all ~10 at 1920x1080 in GPU memory.
+	public CLazyTextureMap SongSelect_GenreBack;
+	public Dictionary<string, CTexture> SongSelect_Bar_Genre,
 		SongSelect_Bar_Genre_Overlap,
 		SongSelect_Box_Chara;
 	public CTexture[]
@@ -2409,7 +2444,8 @@ class TextureLoader {
 	public CTexture Difficulty_Option_Select;
 
 	public CTexture[] Difficulty_Select_Bar = new CTexture[5];
-	public Dictionary<string, CTexture> Difficulty_Back;
+	// Full-screen per-box-type difficulty backgrounds — one shown at a time; load lazily.
+	public CLazyTextureMap Difficulty_Back;
 	#endregion
 
 	public CTexture NewHeya_Close;

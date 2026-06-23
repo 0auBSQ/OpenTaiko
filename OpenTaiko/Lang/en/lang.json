@@ -79,6 +79,8 @@
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Toggle between fullscreen and windowed mode.",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Mode",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Toggle whether VSync is used.\nTurning it on will cap the FPS at 60,\nwhich will make the note scroll appear smoother\nbut increase input delay.\nTurning it off will uncap the fps,\nwhich will decrease input delay\nbut make the note scroll appear more unstable.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Frame Rate",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximum frame rate.\nUnlimited uses the display's refresh rate\n(e.g. 120Hz on ProMotion).\nApplies after restart.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Drawing Method:\nSelect from either OpenGL,\nDirectX11, Vulkan, or Metal.\nOpenGL is slow, but compatible & stable.\nDirectX11 is fast and stable, but only\nworks on Windows.\nVulkan works fastest on Linux.\nMetal only works on MacOS.\n\nThis will take effect after game reboot.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture Loading",

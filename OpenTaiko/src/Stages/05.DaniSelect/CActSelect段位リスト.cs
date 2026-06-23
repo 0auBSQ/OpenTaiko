@@ -678,6 +678,10 @@ class CActSelect段位リスト : CStage {
 	}
 
 	private void tUpdateSongs() {
+		// Filter out SCORE nodes without a Dan chart (e.g. regular TJAs co-located with a Dan TJA
+		// in the same folder, often #NEXTSONG-referenced songs); tバーの初期化 dereferences
+		// song.score[(int)Difficulty.Dan].譜面情報 for every SCORE node and would throw a NullReferenceException on them.
+		Cursor.Items.RemoveAll(n => n.nodeType == CSongListNode.ENodeType.SCORE && n.score[(int)Difficulty.Dan] == null);
 		stバー情報 = new STバー情報[Cursor.Items.Count];
 		this.tバーの初期化();
 	}

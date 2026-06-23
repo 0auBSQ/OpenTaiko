@@ -55,3 +55,9 @@
 
 /OpenTaiko Launcher
 /OpenTaiko Launcher/node_modules
+
+# OpenTaiko.iOS
+/OpenTaiko.iOS/NativeStubs/
+/OpenTaiko.iOS/Libs/
+/OpenTaiko.iOS/Frameworks/
+/OpenTaiko.iOS/dist/

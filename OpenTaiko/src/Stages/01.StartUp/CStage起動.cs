@@ -156,7 +156,11 @@ internal class CStage起動 : CStage {
 							this.ePhaseID = EPhase.Startup_Complete;
 							OpenTaiko.Skin.bgm起動画面.tStop();
 						}
-						if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
+						// iOS has a single GL context bound to the render thread, so texture
+						// creation off a Task.Run worker has no current context and fails;
+						// load synchronously there regardless of the ASyncTextureLoad setting.
+						// TODO(iOS perf): async loading could be restored with a shared GL sharegroup / second context on the loader thread.
+						if (OpenTaiko.ConfigIni.ASyncTextureLoad && !OperatingSystem.IsIOS()) {
 							Task.Run(loadTexture);
 						} else {
 							loadTexture();
@@ -199,11 +203,14 @@ internal class CStage起動 : CStage {
 					y += langList[i].szTextureSize.Height;
 				}
 
-				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)) {
+				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.DownArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.RightArrow)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RightChange)) {
 					langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LeftChange)) {
 					langSelectIndex = Math.Max(langSelectIndex - 1, 0);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);

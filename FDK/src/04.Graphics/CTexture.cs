@@ -342,6 +342,7 @@ public class CTexture : IDisposable {
 	}
 
 	public void UpdateTexture(CTexture texture, int n幅, int n高さ) {
+		texture.EnsureUploaded(); // in case the source is a deferred-load texture not yet drawn
 		Pointer = texture.Pointer;
 		this.sz画像サイズ = new Size(n幅, n高さ);
 		this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
@@ -413,14 +414,108 @@ public class CTexture : IDisposable {
 		if (!File.Exists(strファイル名))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
 			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strファイル名));
 
+		// Defer the pixel decode + GL upload until this texture is first drawn (EnsureUploaded()).
+		// Read just the dimensions now (from the file header, cheap) so layout that reads
+		// szTextureSize / rc全画像 / sz画像サイズ before drawing keeps working.
+		try {
+			using var codec = SKCodec.Create(strファイル名);
+			if (codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
+				this.sz画像サイズ = new Size(codec.Info.Width, codec.Info.Height);
+				this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
+				this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+				this._lazyPath = strファイル名;
+				this._lazyTransparent = b黒を透過する;
+				return;
+			}
+		} catch {
+			// fall through to eager decode below
+		}
+
 		SKBitmap bitmap = SKBitmap.Decode(strファイル名);
 		MakeTexture(bitmap, b黒を透過する);
 		bitmap.Dispose();
 	}
 
+	// Decode + upload a deferred (file-backed) texture the first time it is drawn. Runs on the GL
+	// (main/render) thread because it is invoked from the draw methods. No-op for already-uploaded
+	// or non-file textures.
+	/// <summary>Upload this texture now (instead of lazily on first draw) and mark it so it is never
+	/// evicted under memory pressure. Use for gameplay-critical textures (notes, hit effects, gogo)
+	/// to avoid an in-play decode stutter the first time they appear. Must run on the GL thread.</summary>
+	public void Preload() {
+		_pinned = true;
+		EnsureUploaded();
+	}
+
+	private void EnsureUploaded() {
+		if (_uploaded || _lazyPath == null || bDispose完了済み)
+			return;
+		_uploaded = true; // mark first so a decode failure isn't retried every frame
+		try {
+			using SKBitmap bitmap = SKBitmap.Decode(_lazyPath);
+			if (bitmap != null) {
+				MakeTexture(bitmap, _lazyTransparent);
+				CTextureMemoryManager.Register(this); // track for memory-pressure eviction
+			}
+		} catch {
+			// leave Pointer == 0; the draw simply renders nothing, as with any failed texture
+		}
+	}
+
 	public CTexture(SKBitmap bitmap, bool b黒を透過する)
 		: this() {
 		MakeTexture(bitmap, b黒を透過する);
+	}
+
+	private static int _maxTextureSize = 0;
+
+	// This texture's own decoded RGBA8 footprint uploaded to GL. The cross-texture total/count tally
+	// lives on CTextureMemoryManager; this instance notifies it on upload/release/dispose.
+	private long _uploadedBytes;
+
+	// Deferred GL upload: a file-backed texture records its path + dimensions at construction but
+	// only decodes pixels and uploads to GL the first time it is actually drawn (EnsureUploaded).
+	// So a texture that is loaded but never rendered this session costs zero GPU memory.
+	private string? _lazyPath;
+	private bool _lazyTransparent;
+	private bool _uploaded;
+	private bool _pinned; // pinned textures are uploaded ahead of time and never evicted
+	private uint _lastDrawnTick;        // ms tick of the last draw (eviction order among old scenes)
+	private int _lastDrawnGeneration;   // scene generation in which this was last drawn
+
+	// Instance state the memory manager reads when making eviction decisions.
+	internal bool IsPinned => _pinned;
+	internal uint LastDrawnTick => _lastDrawnTick;
+	internal int LastDrawnGeneration => _lastDrawnGeneration;
+	internal long UploadedBytes => _uploadedBytes;
+
+	/// <summary>Begin a new scene (call on stage change). Textures drawn before this point become
+	/// eligible for memory-pressure eviction; those drawn after it are protected as the working set.</summary>
+	public static void BeginNewScene() => CTextureMemoryManager.BeginNewScene();
+	public static long TotalTextureBytes => CTextureMemoryManager.TotalTextureBytes;
+	public static int LiveTextureCount => CTextureMemoryManager.LiveTextureCount;
+
+	/// <summary>
+	/// Free the GPU memory of the least-recently-drawn deferred textures until the total uploaded
+	/// texture memory is at or below <paramref name="targetBytes"/>. Evicted textures keep their path
+	/// and re-upload automatically the next time they are drawn. Intended to be called from the iOS
+	/// memory-warning callback (on the GL thread, context current). Returns the bytes freed.
+	/// </summary>
+	public static long EvictLeastRecentlyDrawnDownTo(long targetBytes) => CTextureMemoryManager.EvictLeastRecentlyDrawnDownTo(targetBytes);
+
+	// Release this texture's GL handle but keep it re-uploadable (EnsureUploaded re-decodes on next
+	// draw). Distinct from Dispose, which permanently retires the texture.
+	internal void ReleaseGpu() {
+		if (!_uploaded || _lazyPath == null)
+			return;
+		try { Game.Gl.DeleteTexture(Pointer); } catch { }
+		Pointer = 0;
+		_uploaded = false;
+		if (_uploadedBytes > 0) {
+			CTextureMemoryManager.RemoveUploadedBytes(_uploadedBytes);
+			_uploadedBytes = 0;
+		}
+		CTextureMemoryManager.Unregister(this);
 	}
 
 	private unsafe uint GenTexture(void* data, uint width, uint height, PixelFormat pixelFormat) {
@@ -430,7 +525,17 @@ public class CTexture : IDisposable {
 		//-----
 
 		//テクスチャのデータをVramに送る
-		if (OperatingSystem.IsMacOS()) {
+		if (OperatingSystem.IsIOS()) {
+			// iOS ES 2.0 requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
+			int internalFormat = pixelFormat switch {
+				PixelFormat.Bgra => (int)InternalFormat.Rgba,
+				PixelFormat.Rgba => (int)InternalFormat.Rgba,
+				PixelFormat.Rgb => (int)InternalFormat.Rgb,
+				_ => (int)InternalFormat.Rgba
+			};
+
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		} else if (OperatingSystem.IsMacOS()) {
 			// Desktop OpenGL requires sized internal formats
 			int internalFormat = pixelFormat switch {
 				PixelFormat.Bgra => (int)InternalFormat.Rgba8,
@@ -438,7 +543,7 @@ public class CTexture : IDisposable {
 				PixelFormat.Rgb => (int)InternalFormat.Rgb8,
 				_ => (int)InternalFormat.Rgba8
 			};
-			
+
 			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
 		} else {
 			// OpenGL ES allows unsized internal formats
@@ -447,11 +552,24 @@ public class CTexture : IDisposable {
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest); //この場合は補完しない
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMinFilter.Nearest);
+		if (OperatingSystem.IsIOS()) {
+			// iOS/GLES 2.0: NPOT textures require CLAMP_TO_EDGE, otherwise they are incomplete
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.ClampToEdge);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.ClampToEdge);
+		}
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
+
+		// Account for the GL texture's decoded footprint. If this instance is replacing an earlier
+		// upload (UpdateTexture deletes + regenerates), drop the previous bytes first.
+		if (_uploadedBytes > 0) {
+			CTextureMemoryManager.RemoveUploadedBytes(_uploadedBytes);
+		}
+		_uploadedBytes = (long)width * height * (pixelFormat == PixelFormat.Rgb ? 3 : 4);
+		CTextureMemoryManager.AddUploadedBytes(_uploadedBytes);
 
 		return handle;
 	}
@@ -460,6 +578,23 @@ public class CTexture : IDisposable {
 		try {
 			if (bitmap == null) {
 				bitmap = new SKBitmap(10, 10);
+			}
+
+			// Scale down if bitmap exceeds GL_MAX_TEXTURE_SIZE
+			if (_maxTextureSize == 0) {
+				_maxTextureSize = Game.Gl.GetInteger(GLEnum.MaxTextureSize);
+				if (_maxTextureSize <= 0) _maxTextureSize = 4096;
+			}
+			SKBitmap scaledBitmap = null;
+			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
+				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
+				int newW = Math.Max(1, (int)(bitmap.Width * scale));
+				int newH = Math.Max(1, (int)(bitmap.Height * scale));
+				scaledBitmap = new SKBitmap(newW, newH);
+				using (var canvas = new SKCanvas(scaledBitmap)) {
+					canvas.DrawBitmap(bitmap, new SKRect(0, 0, newW, newH));
+				}
+				bitmap = scaledBitmap;
 			}
 
 			unsafe {
@@ -485,6 +620,8 @@ public class CTexture : IDisposable {
 			this.sz画像サイズ = new Size(bitmap.Width, bitmap.Height);
 			this.rc全画像 = new Rectangle(0, 0, this.sz画像サイズ.Width, this.sz画像サイズ.Height);
 			this.szTextureSize = this.t指定されたサイズを超えない最適なテクスチャサイズを返す(this.sz画像サイズ);
+
+			scaledBitmap?.Dispose();
 		} catch (Exception ex) {
 			this.Dispose();
 			// throw new CTextureCreateFailedException( string.Format( "テクスチャの生成に失敗しました。\n{0}", strファイル名 ) );
@@ -709,6 +846,9 @@ public class CTexture : IDisposable {
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		EnsureUploaded(); // decode + upload on first draw (deferred-load textures)
+		_lastDrawnTick = (uint)Environment.TickCount;             // eviction order among previous scenes
+		_lastDrawnGeneration = CTextureMemoryManager.SceneGeneration; // mark as part of the current scene's working set
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
 
 		//MVPを設定----
@@ -766,6 +906,7 @@ public class CTexture : IDisposable {
 
 		BlendHelper.SetBlend(BlendType.Normal);
 	}
+
 	public void t2D描画(int x, int y, float depth, Rectangle rc画像内の描画領域) {
 		t2D描画((float)x, (float)y, depth, rc画像内の描画領域);
 	}
@@ -845,6 +986,9 @@ public class CTexture : IDisposable {
 
 		Game.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
+		EnsureUploaded(); // decode + upload on first draw (deferred-load textures)
+		_lastDrawnTick = (uint)Environment.TickCount;             // eviction order among previous scenes
+		_lastDrawnGeneration = CTextureMemoryManager.SceneGeneration; // mark as part of the current scene's working set
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer); //テクスチャをバインド
 
 		//MVPを設定----
@@ -908,6 +1052,14 @@ public class CTexture : IDisposable {
 	public void Dispose() {
 		if (!this.bDispose完了済み) {
 			Game.Gl.DeleteTexture(Pointer); //解放
+
+			if (_uploadedBytes > 0) {
+				CTextureMemoryManager.RemoveUploadedBytes(_uploadedBytes);
+				_uploadedBytes = 0;
+			}
+			if (_lazyPath != null) {
+				CTextureMemoryManager.Unregister(this);
+			}
 
 			this.bDispose完了済み = true;
 		}

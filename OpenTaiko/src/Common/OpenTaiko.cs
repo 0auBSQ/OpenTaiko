@@ -107,6 +107,11 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	}
+	/// <summary>
+	/// iOS: set external input devices (e.g. the iOS keyboard) before calling InitWithExternalContext().
+	/// </summary>
+	internal static List<IInputDevice> ExternalInputDevices { get; set; }
+
 	public static CPad Pad {
 		get;
 		private set;
@@ -251,6 +256,72 @@ internal class OpenTaiko : Game {
 		get;
 		private set;
 	} = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
+
+	// Read assets straight from the app bundle to avoid copying all game data into Documents (keeps app size + first-launch time down).
+	/// <summary>
+	/// iOS only: read-only app bundle path. Null on other platforms.
+	/// Used as a fallback for assets not copied to Documents (Global/, Lang/, etc.).
+	/// </summary>
+	public static string strBundleFolder {
+		get;
+		set;
+	}
+
+	/// <summary>
+	/// Resolve a path for reading. On iOS, if the path doesn't exist under the
+	/// Documents directory, falls back to the equivalent path under the app bundle.
+	/// </summary>
+	public static string ResolveAssetPath(string path) {
+		if (strBundleFolder != null && !File.Exists(path) && !Directory.Exists(path)) {
+			string relative;
+			if (path.StartsWith(strEXEのあるフォルダ)) {
+				// Absolute path under Documents — try equivalent under bundle
+				relative = path.Substring(strEXEのあるフォルダ.Length);
+			} else if (!Path.IsPathRooted(path)) {
+				// Relative path (resolved against CWD=Documents) — try under bundle
+				relative = path;
+			} else {
+				return path;
+			}
+			string bundlePath = strBundleFolder + relative;
+			if (File.Exists(bundlePath) || Directory.Exists(bundlePath))
+				return bundlePath;
+		}
+		return path;
+	}
+
+	/// <summary>
+	/// On iOS, merge subdirectories from both Documents and bundle for a given path.
+	/// Documents entries take priority (user overrides). On other platforms, just
+	/// returns Directory.GetDirectories(path).
+	/// </summary>
+	public static string[] GetMergedDirectories(string path, string searchPattern = "*") {
+		if (strBundleFolder == null)
+			return Directory.Exists(path) ? Directory.GetDirectories(path, searchPattern) : Array.Empty<string>();
+
+		string relative;
+		if (path.StartsWith(strEXEのあるフォルダ))
+			relative = path.Substring(strEXEのあるフォルダ.Length);
+		else if (!Path.IsPathRooted(path))
+			relative = path;
+		else
+			return Directory.Exists(path) ? Directory.GetDirectories(path, searchPattern) : Array.Empty<string>();
+
+		string bundleDir = strBundleFolder + relative;
+
+		// Collect subdirectory names from both locations, Documents wins on overlap
+		var dirs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+		if (Directory.Exists(bundleDir)) {
+			foreach (string d in Directory.GetDirectories(bundleDir, searchPattern))
+				dirs[Path.GetFileName(d)] = d;
+		}
+		if (Directory.Exists(path)) {
+			foreach (string d in Directory.GetDirectories(path, searchPattern))
+				dirs[Path.GetFileName(d)] = d; // overrides bundle entry
+		}
+		return dirs.Values.ToArray();
+	}
+
 	public static CTimer Timer {
 		get;
 		private set;
@@ -415,6 +486,19 @@ internal class OpenTaiko : Game {
 
 
 	protected override void Configuration() {
+		if (OperatingSystem.IsIOS()) {
+			// iOS: Documents is writable; the bundle ships read-only defaults.
+			// Writable files (Config.ini, databases, etc.) live in Documents.
+			// Customizable trees (Global/, System/, Lang/) merge bundle defaults with Documents additions:
+			// listings via GetMergedDirectories(), single assets via ResolveAssetPath() (Documents override, bundle fallback).
+			strEXEのあるフォルダ = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar;
+			// strBundleFolder is set by GameViewController before game launch
+			// Set CWD so relative paths (Favorite.json, etc.) resolve to writable Documents dir
+			Directory.SetCurrentDirectory(strEXEのあるフォルダ);
+		} else {
+			strEXEのあるフォルダ = Environment.CurrentDirectory + Path.DirectorySeparatorChar;
+		}
+
 		ConfigIni = new CConfigIni();
 
 		string path = strEXEのあるフォルダ + "Config.ini";
@@ -462,10 +546,11 @@ internal class OpenTaiko : Game {
 			}
 		}
 
-
-		WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
-		WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
-		FullScreen = ConfigIni.bFullScreen;
+		if (!OperatingSystem.IsIOS()) {
+			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
+			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
+			FullScreen = ConfigIni.bFullScreen;
+		}
 		VSync = ConfigIni.bEnableVSync;
 		Framerate = 0;
 
@@ -549,7 +634,16 @@ internal class OpenTaiko : Game {
 					}
 				}
 
-				OpenTaiko.NamePlate?.lcNamePlate.Update();
+				if (OperatingSystem.IsIOS() && _iosStageDebugCounter++ % 300 == 0) {
+					Console.WriteLine($"[OpenTaiko] Stage: {rCurrentStage.eStageID}, Phase: {rCurrentStage.ePhaseID}");
+				}
+				// Mark a new scene on stage change so memory-pressure eviction protects the new
+				// stage's textures and only releases ones left over from the previous stage.
+				if (rCurrentStage.eStageID != _lastSceneStageId) {
+					_lastSceneStageId = rCurrentStage.eStageID;
+					CTexture.BeginNewScene();
+				}
+				OpenTaiko.NamePlate?.lcNamePlate?.Update();
 				this.nDrawLoopReturnValue = (rCurrentStage != null) ? rCurrentStage.Draw() : 0;
 
 				// draw the remaining elements normally
@@ -1244,7 +1338,7 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Network_Connection != null) {
-					if (Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
+					if (FDK.SoundManager.PlayTimer != null && this.PreviousSystemTimeMs != long.MinValue && Math.Abs(SoundManager.PlayTimer.SystemTimeMs - this.PreviousSystemTimeMs) > 10000) {
 						this.PreviousSystemTimeMs = SoundManager.PlayTimer.SystemTimeMs;
 						Task.Factory.StartNew(() => {
 							//IPv4 8.8.8.8にPingを送信する(timeout 5000ms)
@@ -1262,7 +1356,8 @@ internal class OpenTaiko : Game {
 				if (rCurrentStage != null
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
-					&& OpenTaiko.Tx.Overlay != null) {
+					&& OpenTaiko.Tx.Overlay != null
+					&& !OperatingSystem.IsIOS()) {
 					OpenTaiko.Tx.Overlay.t2D描画(0, 0);
 				}
 			}
@@ -1326,7 +1421,7 @@ internal class OpenTaiko : Game {
 			Trace.WriteLine("");
 			Trace.WriteLine("An error has occured.");
 			AssemblyName asmApp = Assembly.GetExecutingAssembly().GetName();
-			throw e;
+			throw;
 		}
 #endif
 	}
@@ -1501,6 +1596,8 @@ internal class OpenTaiko : Game {
 
 	public List<CActivity> listTopLevelActivities;
 	private int nDrawLoopReturnValue;
+	private int _iosStageDebugCounter;
+	private CStage.EStage _lastSceneStageId = CStage.EStage.None; // tracks stage changes for CTexture.BeginNewScene()
 	private string strWindowTitle
 	// ayo komi isn't this useless code? - tfd500
 	{
@@ -1690,7 +1787,12 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 		Trace.Indent();
 		try {
-			InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+			if (OperatingSystem.IsIOS() && ExternalInputDevices != null) {
+				// iOS: use externally-provided input devices (touch) instead of Silk.NET
+				InputManager = new CInputManager(ExternalInputDevices);
+			} else {
+				InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
+			}
 			InputManager.SetID(ConfigIni.StableIdToGuid);
 			Trace.TraceInformation("DirectInput has been initialized.");
 		} catch (Exception ex) {
@@ -1725,74 +1827,90 @@ internal class OpenTaiko : Game {
 
 		#region [ Sound Device initialization ]
 		//---------------------
-		Trace.TraceInformation("Initializing sound device...");
-		Trace.Indent();
-		try {
-			ESoundDeviceType soundDeviceType;
-			switch (OpenTaiko.ConfigIni.nSoundDeviceType) {
-				case 0:
-					soundDeviceType = ESoundDeviceType.Bass;
-					break;
-				case 1:
-					soundDeviceType = ESoundDeviceType.ASIO;
-					break;
-				case 2:
-					soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
-					break;
-				case 3:
-					soundDeviceType = ESoundDeviceType.SharedWASAPI;
-					break;
-				default:
-					soundDeviceType = ESoundDeviceType.Unknown;
-					break;
-			}
+		if (OperatingSystem.IsIOS()) {
+			Trace.TraceInformation("iOS: initializing BASS sound device (direct playback).");
 			SoundManager = new SoundManager(Window_,
-				soundDeviceType,
+				ESoundDeviceType.Bass,
 				OpenTaiko.ConfigIni.nBassBufferSizeMs,
 				OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
-				// CDTXMania.ConfigIni.nASIOBufferSizeMs,
 				0,
 				OpenTaiko.ConfigIni.nASIODevice,
-				OpenTaiko.ConfigIni.bUseOSTimer
-			);
-			//Sound管理 = FDK.CSound管理.Instance;
-			//Sound管理.t初期化( soundDeviceType, 0, 0, CDTXMania.ConfigIni.nASIODevice, base.Window.Handle );
-
-
-			Trace.TraceInformation("Initializing loudness scanning, song gain control, and sound group level control...");
+				OpenTaiko.ConfigIni.bUseOSTimer);
+			// iOS: the desktop branch below also creates these; without SongGainController the first note NREs (CTja.tチップの再生).
+			SongGainController = new SongGainController();
+			ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
+			SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+			ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+		} else {
+			Trace.TraceInformation("Initializing sound device...");
 			Trace.Indent();
 			try {
-				actScanningLoudness = new CActScanningLoudness();
-				actScanningLoudness.Activate();
-				if (!ConfigIni.PreAssetsLoading) {
-					actScanningLoudness.CreateManagedResource();
-					actScanningLoudness.CreateUnmanagedResource();
+				ESoundDeviceType soundDeviceType;
+				switch (OpenTaiko.ConfigIni.nSoundDeviceType) {
+					case 0:
+						soundDeviceType = ESoundDeviceType.Bass;
+						break;
+					case 1:
+						soundDeviceType = ESoundDeviceType.ASIO;
+						break;
+					case 2:
+						soundDeviceType = ESoundDeviceType.ExclusiveWASAPI;
+						break;
+					case 3:
+						soundDeviceType = ESoundDeviceType.SharedWASAPI;
+						break;
+					default:
+						soundDeviceType = ESoundDeviceType.Unknown;
+						break;
 				}
-				LoudnessMetadataScanner.ScanningStateChanged +=
-					(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
-				LoudnessMetadataScanner.StartBackgroundScanning();
+				SoundManager = new SoundManager(Window_,
+					soundDeviceType,
+					OpenTaiko.ConfigIni.nBassBufferSizeMs,
+					OpenTaiko.ConfigIni.nWASAPIBufferSizeMs,
+					// CDTXMania.ConfigIni.nASIOBufferSizeMs,
+					0,
+					OpenTaiko.ConfigIni.nASIODevice,
+					OpenTaiko.ConfigIni.bUseOSTimer
+				);
+				//Sound管理 = FDK.CSound管理.Instance;
+				//Sound管理.t初期化( soundDeviceType, 0, 0, CDTXMania.ConfigIni.nASIODevice, base.Window.Handle );
 
-				SongGainController = new SongGainController();
-				ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
 
-				SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
-				ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+				Trace.TraceInformation("Initializing loudness scanning, song gain control, and sound group level control...");
+				Trace.Indent();
+				try {
+					actScanningLoudness = new CActScanningLoudness();
+					actScanningLoudness.Activate();
+					if (!ConfigIni.PreAssetsLoading) {
+						actScanningLoudness.CreateManagedResource();
+						actScanningLoudness.CreateUnmanagedResource();
+					}
+					LoudnessMetadataScanner.ScanningStateChanged +=
+						(_, args) => actScanningLoudness.bIsActivelyScanning = args.IsActivelyScanning;
+					LoudnessMetadataScanner.StartBackgroundScanning();
+
+					SongGainController = new SongGainController();
+					ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
+
+					SoundGroupLevelController = new SoundGroupLevelController(CSound.SoundInstances);
+					ConfigIniToSoundGroupLevelControllerBinder.Bind(ConfigIni, SoundGroupLevelController);
+				} finally {
+					Trace.Unindent();
+					Trace.TraceInformation("Initialized loudness scanning, song gain control, and sound group level control.");
+				}
+
+				ShowWindowTitle();
+				FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
+				SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
+				Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
+			} catch (Exception e) {
+				Trace.TraceError(e.ToString());
+				TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
+				return;
+				// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
 			} finally {
 				Trace.Unindent();
-				Trace.TraceInformation("Initialized loudness scanning, song gain control, and sound group level control.");
 			}
-
-			ShowWindowTitle();
-			FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
-			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
-			Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
-		} catch (Exception e) {
-			Trace.TraceError(e.ToString());
-			TriggerSystemError(CSystemError.Errno.ENO_NOAUDIODEVICE, e);
-			return;
-			// throw new NullReferenceException("No sound devices are enabled. Please check your audio settings.", e);
-		} finally {
-			Trace.Unindent();
 		}
 		//---------------------
 		#endregion
