@@ -85,7 +85,7 @@ namespace OpenTaiko {
 		}
 
 		public void ClearSharedSound(string key) {
-			if (SharedTextures.ContainsKey(key)) SharedSounds[key].Clear();
+			if (SharedSounds.ContainsKey(key)) SharedSounds[key].Clear();
 		}
 
 		public LuaTexture GetSharedTexture(string key) {
