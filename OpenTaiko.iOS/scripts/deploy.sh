@@ -123,6 +123,7 @@ BUNDLE_ID_ARG=()
 bootstrap_ios_deps() {
   [[ -d "OpenTaiko.iOS/Libs/bass24-ios" ]] || bash OpenTaiko.iOS/scripts/download-bass.sh
   [[ -d "OpenTaiko.iOS/Frameworks/liblua54.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lua54.sh
+  [[ -d "OpenTaiko.iOS/Frameworks/liblmdb.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lmdb.sh
 }
 
 # ios_build <config> <rid> [extra dotnet args...]

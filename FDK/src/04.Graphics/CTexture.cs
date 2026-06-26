@@ -722,20 +722,10 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		if (OperatingSystem.IsIOS()) {
-			// iOS/GLES 2.0 has no glTexParameterIiv (Silk.NET TexParameterI); use the scalar glTexParameteri.
-			// GLES 2.0 also requires CLAMP_TO_EDGE for NPOT textures: any other wrap (e.g. the Repeat that
-			// LuaTexture sets by default) makes a NPOT texture INCOMPLETE, so it samples as black. Force it.
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear);
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.ClampToEdge);
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.ClampToEdge);
-		} else {
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
-		}
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
@@ -828,15 +818,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	public void SetTextureWrapMode(TextureWrapMode wrapMode) {
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
 
-		if (OperatingSystem.IsIOS()) {
-			// iOS/GLES 2.0: scalar glTexParameteri, and NPOT textures require CLAMP_TO_EDGE or they are
-			// incomplete (black) — so ignore a non-clamp request (e.g. Repeat) on this backend.
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.ClampToEdge);
-			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.ClampToEdge);
-		} else {
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
-			Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
-		}
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
 		_wrapMode = wrapMode;

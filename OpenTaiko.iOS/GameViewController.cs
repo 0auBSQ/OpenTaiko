@@ -67,7 +67,7 @@ public partial class GameViewController : UIViewController {
 		View.ContentScaleFactor = UIScreen.MainScreen.Scale;
 
 		// Create OpenGL ES 2.0 context (used for off-screen rendering)
-		_glContext = new EAGLContext(EAGLRenderingAPI.OpenGLES2);
+		_glContext = new EAGLContext(EAGLRenderingAPI.OpenGLES3);
 		if (_glContext == null) {
 			throw new Exception("Failed to create EAGLContext");
 		}

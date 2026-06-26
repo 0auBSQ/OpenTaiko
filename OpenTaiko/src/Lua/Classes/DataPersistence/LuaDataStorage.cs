@@ -1,7 +1,5 @@
 ﻿using System.Text;
-#if !BUILDING_AS_LIBRARY
 using LightningDB;
-#endif
 
 namespace OpenTaiko {
 	/// <summary>
@@ -21,18 +19,14 @@ namespace OpenTaiko {
 		private readonly string Path;
 
 		public LuaDataStorage(string path) {
-			Path = path;
-#if !BUILDING_AS_LIBRARY
-			// LMDB needs the environment directory to exist before Open(); create it once up front so the
-			// first read of a brand-new store doesn't error. iOS has no LMDB (Read/Write are no-ops), so
-			// skip the directory creation — it would otherwise hit the read-only app bundle on device.
-			try { System.IO.Directory.CreateDirectory(path); }
+			// Remap to the writable location: a no-op on desktop, the writable Documents mirror on iOS (the
+			// app bundle is read-only there). LMDB needs the environment directory to exist before Open().
+			Path = OpenTaiko.ResolveWritePath(path);
+			try { System.IO.Directory.CreateDirectory(Path); }
 			catch (Exception ex) { LogNotification.PopError($"Failed to init the database: {ex.Message}"); }
-#endif
 		}
 
 		public void Write(string key, string value) {
-#if !BUILDING_AS_LIBRARY
 			try {
 				using var env = new LightningEnvironment(Path);
 				env.Open();
@@ -43,24 +37,9 @@ namespace OpenTaiko {
 			} catch (Exception ex) {
 				LogNotification.PopError($"Failed to write the value '{value}' to the entry '{key}': {ex.Message}");
 			}
-#else
-			// iOS: LMDB has no iOS-native binary; persist as a JSON key/value file under the writable
-			// Documents area (the app bundle is read-only on device). Used by e.g. the boot stage's
-			// "new_user" flag, so this MUST persist — a no-op would trap boot in first-time setup forever.
-			try {
-				var all = tLoadAll();
-				all[key] = value;
-				string dir = OpenTaiko.ResolveWritePath(Path);
-				System.IO.Directory.CreateDirectory(dir);
-				System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "store.json"), Newtonsoft.Json.JsonConvert.SerializeObject(all));
-			} catch (Exception ex) {
-				LogNotification.PopError($"Failed to write the value '{value}' to the entry '{key}': {ex.Message}");
-			}
-#endif
 		}
 
 		public string? Read(string key) {
-#if !BUILDING_AS_LIBRARY
 			try {
 				using var env = new LightningEnvironment(Path);
 				env.Open();
@@ -72,24 +51,8 @@ namespace OpenTaiko {
 				LogNotification.PopError($"Failed to read the entry '{key}': {ex.Message}");
 				return null;
 			}
-#else
-			try {
-				return tLoadAll().TryGetValue(key, out var v) ? v : null;
-			} catch { return null; }
-#endif
 		}
 
-#if BUILDING_AS_LIBRARY
-		// iOS JSON backing store: one store.json per database dir, under the writable Documents area.
-		private System.Collections.Generic.Dictionary<string, string> tLoadAll() {
-			try {
-				string file = System.IO.Path.Combine(OpenTaiko.ResolveWritePath(Path), "store.json");
-				if (System.IO.File.Exists(file))
-					return Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, string>>(System.IO.File.ReadAllText(file)) ?? new System.Collections.Generic.Dictionary<string, string>();
-			} catch { }
-			return new System.Collections.Generic.Dictionary<string, string>();
-		}
-#endif
 
 		public void Dispose() { }   // nothing persistent is held; each operation disposes its own environment
 	}

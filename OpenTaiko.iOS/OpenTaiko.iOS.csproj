@@ -36,6 +36,14 @@
     </NativeReference>
   </ItemGroup>
 
+  <!-- liblmdb built from LMDB source (scripts/build-lmdb.sh); LightningDB P/Invokes the native lmdb -->
+  <ItemGroup>
+    <NativeReference Include="Frameworks/liblmdb.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+
   <!-- BASS audio libraries for iOS (from un4seen.com) -->
   <ItemGroup>
     <NativeReference Include="Libs/bass24-ios/bass.xcframework">
@@ -85,14 +93,13 @@
     <BundleResource Include="..\OpenTaiko\CharaScript.lua" Link="CharaScript.lua" />
   </ItemGroup>
 
-  <!-- LightningDB (LMDB) ships only desktop natives. OpenTaiko references it for desktop Lua data
-       persistence; on iOS LuaDataStorage is a no-op (BUILDING_AS_LIBRARY). NuGet RID-fallback would
-       otherwise stage the macOS lmdb.dylib into the iOS link ("building for iOS-simulator, but
-       linking in dylib built for macOS"). Drop it from the native reference set after it is gathered. -->
+  <!-- The LightningDB NuGet ships a desktop lmdb.dylib (via RID-fallback) that cannot link for iOS;
+       drop it so our own iOS-built liblmdb.xcframework provides the native lmdb instead. Exact "lmdb"
+       match leaves our "liblmdb" framework binary in place. -->
   <Target Name="_RemoveLmdbNativeReference" AfterTargets="_ExpandNativeReferences">
     <ItemGroup>
       <_FileNativeReference Remove="@(_FileNativeReference)"
-          Condition="$([System.String]::Copy('%(Filename)').ToLowerInvariant().Contains('lmdb'))" />
+          Condition="$([System.String]::Copy('%(Filename)').ToLowerInvariant()) == 'lmdb'" />
     </ItemGroup>
   </Target>
 </Project>
