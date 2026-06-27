@@ -26,7 +26,7 @@ public class CVirtualSlotData {
 /// Manages the six virtual character slots and per-player-spot mount overrides.
 ///
 /// Slots:
-///   AI   – the AI battle opponent, character driven by the skin's "aislot_chara" setting.
+///   AI   – the AI battle opponent, character driven by the skin's "AIBattleCharacter" setting (SkinConfig.ini).
 ///   V[0] – V[4]  (V1-V5) – five generic slots for skinners to use (e.g. story mode).
 ///
 /// MountSlot(playerSpot, slotInfo) redirects what character/puchi/nameplate data is
@@ -73,11 +73,11 @@ public static class CVirtualSlotManager {
 	}
 
 	/// <summary>
-	/// Re-reads the "aislot_chara" theme setting and updates the AI slot's character.
-	/// Call after theme settings are (re)loaded.
+	/// Re-reads the AI battle slot character from the active skin (SkinConfig.ini <c>AIBattleCharacter=</c>) and
+	/// updates the AI slot's character. Call after the skin is (re)loaded.
 	/// </summary>
 	public static void RefreshAICharacter() {
-		string charaName = OpenTaiko.Databases?.DBThemeSettings?.GetSetting("aislot_chara") ?? "None";
+		string charaName = OpenTaiko.Skin?.AIBattleCharacter ?? "None";
 		AI.CharacterFolderName = charaName;
 	}
 

@@ -220,7 +220,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bOutputLogs; // For ensuring complete log messages, output is enabled before reading Config.ini
 	public bool bDisplayDebugInfo;
 	public bool bEnableVSync;
-	public bool bFullScreen;
+	public int nWindowMode;   // 0 = Windowed, 1 = Fullscreen (exclusive), 2 = Borderless Fullscreen
+	public float fRenderScale = 1.0f;   // skin render-scale multiplier in (0,1]; internal render res = skin Resolution × this
 	public bool bIgnoreSongUnlockables;
 	public int nWindowBaseXPosition; // #30675 2013.02.04 ikanick add
 	public int nWindowBaseYPosition;
@@ -457,6 +458,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bWindowMode {
 		get { return !this.bFullScreen; }
 		set { this.bFullScreen = !value; }
+	}
+
+	// Compat shim: both Fullscreen (1) and Borderless (2) count as "fullscreen" for existing callers; the
+	// canonical state is nWindowMode (0/1/2). Legacy "FullScreen=" config still reads/writes through this.
+	public bool bFullScreen {
+		get { return this.nWindowMode != 0; }
+		set { this.nWindowMode = value ? 1 : 0; }
 	}
 
 	public bool bDoNotDisplayPerformanceInfos {
@@ -1135,9 +1143,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; 使用する描画API(0=OpenGL, 1=DirectX11, 2=Vulkan, 3=Metal)");
 		sw.WriteLine("GraphicsDeviceType={0}", (int)this.nGraphicsDeviceType);
 		sw.WriteLine();
-		sw.WriteLine("; 画面モード(0:ウィンドウ, 1:全画面)");
-		sw.WriteLine("; Screen mode. (0:Window, 1:Fullscreen)");
-		sw.WriteLine("FullScreen={0}", this.bFullScreen ? 1 : 0);
+		sw.WriteLine("; 画面モード(0:ウィンドウ, 1:全画面, 2:ボーダーレス)");
+		sw.WriteLine("; Screen mode. (0:Window, 1:Fullscreen, 2:Borderless)");
+		sw.WriteLine("WindowMode={0}", this.nWindowMode);
+		sw.WriteLine("FullScreen={0}", this.bFullScreen ? 1 : 0);   // kept for backward compatibility with older builds
+		sw.WriteLine();
+		sw.WriteLine("; Render scale (0-1): internal render resolution = skin resolution × this, upscaled to the window.");
+		sw.WriteLine("RenderScale={0}", this.fRenderScale.ToString(System.Globalization.CultureInfo.InvariantCulture));
 		sw.WriteLine();
 		sw.WriteLine("; ウインドウモード時の画面幅"); // #23510 2010.10.31 yyagi add
 		sw.WriteLine("; A width size in the window mode."); //
@@ -2006,7 +2018,14 @@ internal class CConfigIni : INotifyPropertyChanged {
 				this.nGraphicsDeviceType = CConversion.ParseIntInRange(value, 0, 4, this.nGraphicsDeviceType);
 				break;
 			case "FullScreen":
-				this.bFullScreen = CConversion.bONorOFF(value[0]);
+				this.bFullScreen = CConversion.bONorOFF(value[0]);   // legacy key (0/1) → Windowed/Fullscreen
+				break;
+			case "WindowMode":
+				this.nWindowMode = CConversion.ParseIntInRange(value, 0, 2, this.nWindowMode);   // 0/1/2, authoritative
+				break;
+			case "RenderScale":
+				if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var _rs))
+					this.fRenderScale = Math.Clamp(_rs, 0.05f, 1.0f);
 				break;
 			case "WindowX":
 				this.nWindowBaseXPosition = CConversion.ParseIntInRange(

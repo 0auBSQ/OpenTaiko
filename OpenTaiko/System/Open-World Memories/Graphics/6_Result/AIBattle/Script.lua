@@ -1,14 +1,7 @@
---func:DrawText(x, y, text)
---func:DrawNum(x, y, num)
---func:AddGraph("filename")
---func:DrawGraph(x, y, filename)
---func:DrawRectGraph(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:DrawGraphCenter(x, y, filename)
---func:DrawGraphRectCenter(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:SetOpacity(opacity, "filename")
---func:SetRotation(angle, "fileName")
---func:SetScale(xscale, yscale, "filename")
---func:SetColor(r, g, b, "filename")
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- AI battle result background: win/lose backdrop + gradation overlay.
+
+local tx = {}
 
 function clearIn(player)
 end
@@ -16,20 +9,27 @@ end
 function clearOut(player)
 end
 
-function init()
-    func:AddGraph("Background_Win.png")
-    func:AddGraph("Background_Lose.png")
-    func:AddGraph("Background_Gradation.png")
+function onStart()
+    tx["Background_Win.png"] = TEXTURE:CreateTextureSync("Background_Win.png")
+    tx["Background_Lose.png"] = TEXTURE:CreateTextureSync("Background_Lose.png")
+    tx["Background_Gradation.png"] = TEXTURE:CreateTextureSync("Background_Gradation.png")
 end
 
-function update()
+function update(timestamp, state)
 end
 
-function draw()
-    if battleWin then
-        func:DrawGraph(0, 0, "Background_Win.png")
+function draw(state)
+    if state.battleWin then
+        tx["Background_Win.png"]:Draw(0, 0)
     else
-        func:DrawGraph(0, 0, "Background_Lose.png")
+        tx["Background_Lose.png"]:Draw(0, 0)
     end
-    func:DrawGraph(0, 0, "Background_Gradation.png")
+    tx["Background_Gradation.png"]:Draw(0, 0)
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

@@ -169,16 +169,47 @@ public abstract partial class Game : IDisposable {
 		}
 	}
 
-	private bool _FullScreen;
-	public bool FullScreen {
-		get {
-			return _FullScreen;
-		}
+	private int _windowMode;   // 0 = Windowed, 1 = Fullscreen (exclusive), 2 = Borderless Fullscreen
+	public int WindowMode {
+		get { return _windowMode; }
 		set {
-			_FullScreen = value;
-			if (Window_ != null) {
-				Window_.WindowState = value ? WindowState.Fullscreen : WindowState.Normal;
-			}
+			_windowMode = value;
+			ApplyWindowMode();
+		}
+	}
+	// Compat for callers that only distinguish fullscreen vs windowed: both Fullscreen (1) and Borderless (2)
+	// count as "fullscreen".
+	public bool FullScreen {
+		get { return _windowMode != 0; }
+		set { WindowMode = value ? 1 : 0; }
+	}
+
+	/// <summary>Apply the current <see cref="WindowMode"/> to the live window (no-op before the window exists; the
+	/// initial WindowOptions also seed it at creation). Borderless = an undecorated window filling the monitor.</summary>
+	private void ApplyWindowMode() {
+		if (Window_ == null) return;
+		switch (_windowMode) {
+			case 1:   // exclusive fullscreen
+				Window_.WindowBorder = WindowBorder.Resizable;
+				Window_.WindowState = WindowState.Fullscreen;
+				break;
+			case 2:   // borderless fullscreen
+				Window_.WindowState = WindowState.Normal;
+				Window_.WindowBorder = WindowBorder.Hidden;
+				var mon = Window_.Monitor;
+				if (mon != null) {
+					Window_.Position = mon.Bounds.Origin;
+					Window_.Size = mon.Bounds.Size;
+				}
+				break;
+			default:  // windowed
+				Window_.WindowState = WindowState.Normal;
+				Window_.WindowBorder = WindowBorder.Resizable;
+				// Restore the configured windowed size/position — borderless (and exclusive fullscreen) resized the
+				// window to the monitor, so without this the window stays monitor-sized and looks still-borderless.
+				Window_.Size = WindowSize;
+				Window_.Position = WindowPosition;
+				break;
 		}
 	}
 
@@ -360,12 +391,12 @@ public abstract partial class Game : IDisposable {
 		options.Position = WindowPosition;
 		options.UpdatesPerSecond = VSync ? 0 : Framerate;
 		options.FramesPerSecond = VSync ? 0 : Framerate;
-		options.WindowState = FullScreen ? WindowState.Fullscreen : WindowState.Normal;
+		options.WindowState = (WindowMode == 1) ? WindowState.Fullscreen : WindowState.Normal;
 		options.VSync = VSync;
 
 		if (!OperatingSystem.IsMacOS()) options.API = GraphicsAPI.None;
 
-		options.WindowBorder = WindowBorder.Resizable;
+		options.WindowBorder = (WindowMode == 2) ? WindowBorder.Hidden : WindowBorder.Resizable;
 		options.Title = Text;
 		options.IsVisible = !StartHidden;
 
@@ -675,6 +706,10 @@ public abstract partial class Game : IDisposable {
 
 		Context.SwapInterval(VSync ? 1 : 0);
 
+		// Finalise the window mode now that the window + monitor exist (esp. Borderless, which needs the monitor
+		// bounds to size the undecorated window — WindowOptions can't query the monitor before creation).
+		ApplyWindowMode();
+
 		Initialize();
 		LoadContent();
 
@@ -708,6 +743,7 @@ public abstract partial class Game : IDisposable {
 
 	public void Window_Closing() {
 		CTexture.Terminate();
+		DeleteRenderScaleFbo();
 
 		UnloadContent();
 		OnExiting();
@@ -737,6 +773,51 @@ public abstract partial class Game : IDisposable {
 		Update();
 
 		ImGuiController?.Update((float)deltaTime);
+	}
+
+	// ── Render-scale (global resolution downscale) ────────────────────────────────────────────────
+	// When RenderScale < 1, the whole frame (all 2D + composited 3D) is rendered into an offscreen FBO sized
+	// (GameWindowSize × RenderScale) and then upscale-blitted to the window's letterboxed region on present. Content
+	// keeps drawing in the unchanged GameWindowSize logical coordinates, so nothing else needs to know about the scale —
+	// it just renders into fewer physical pixels. Set by the skin's chosen resolution multiplier.
+	public static float RenderScale = 1.0f;
+	private uint _rsFbo, _rsColorTex, _rsDepthRb;
+	private int _rsW, _rsH;
+
+	private unsafe bool EnsureRenderScaleFbo() {
+		int tw = Math.Max(1, (int)Math.Round(GameWindowSize.Width * RenderScale));
+		int th = Math.Max(1, (int)Math.Round(GameWindowSize.Height * RenderScale));
+		if (_rsFbo != 0 && _rsW == tw && _rsH == th) return true;
+		DeleteRenderScaleFbo();
+		_rsW = tw; _rsH = th;
+		_rsFbo = Gl.GenFramebuffer();
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _rsFbo);
+		_rsColorTex = Gl.GenTexture();
+		Gl.BindTexture(TextureTarget.Texture2D, _rsColorTex);
+		Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, (uint)tw, (uint)th, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (void*)0);
+		Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+		Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+		Gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, _rsColorTex, 0);
+		_rsDepthRb = Gl.GenRenderbuffer();
+		Gl.BindRenderbuffer(RenderbufferTarget.Renderbuffer, _rsDepthRb);
+		Gl.RenderbufferStorage(RenderbufferTarget.Renderbuffer, InternalFormat.DepthComponent24, (uint)tw, (uint)th);
+		Gl.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, _rsDepthRb);
+		var status = Gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+		Gl.BindTexture(TextureTarget.Texture2D, 0);
+		if (status != GLEnum.FramebufferComplete) {
+			Trace.TraceWarning($"Render-scale FBO incomplete ({status}); rendering at full resolution.");
+			DeleteRenderScaleFbo();
+			return false;
+		}
+		return true;
+	}
+
+	private void DeleteRenderScaleFbo() {
+		if (_rsColorTex != 0) { Gl.DeleteTexture(_rsColorTex); _rsColorTex = 0; }
+		if (_rsDepthRb != 0) { Gl.DeleteRenderbuffer(_rsDepthRb); _rsDepthRb = 0; }
+		if (_rsFbo != 0) { Gl.DeleteFramebuffer(_rsFbo); _rsFbo = 0; }
+		_rsW = _rsH = 0;
 	}
 
 	public void Window_Render(double deltaTime) {
@@ -769,9 +850,27 @@ public abstract partial class Game : IDisposable {
 			}
 		}
 
-		Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-		Draw();
+		bool useScale = RenderScale < 0.999f && EnsureRenderScaleFbo();
+		if (useScale) {
+			// clear the window first (the letterbox bars stay the border colour), render the whole frame into the
+			// scaled offscreen FBO, then upscale-blit it into the window's letterboxed region.
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, _rsFbo);
+			Gl.Viewport(0, 0, (uint)_rsW, (uint)_rsH);
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Draw();
+			Gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, _rsFbo);
+			Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+			Gl.BlitFramebuffer(0, 0, _rsW, _rsH,
+				ViewPortOffset.X, ViewPortOffset.Y, ViewPortOffset.X + ViewPortSize.X, ViewPortOffset.Y + ViewPortSize.Y,
+				ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);   // restore for ImGui/post
+		} else {
+			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			Draw();
+		}
 
 		double fps = 1.0f / deltaTime;
 

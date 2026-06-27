@@ -630,15 +630,15 @@ internal class CStageResult : CStage {
 				this.ttkRemaningLifes = new TitleTextureKey(OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString() + " / " + OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives.ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 				this.ttkScoreCount = new TitleTextureKey(OpenTaiko.stageGameScreen.actScore.Get(0).ToString(), pfTowerText, Color.Black, Color.Transparent, 700);
 			} else if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan) {
-				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}Script.lua"));
-				Background.Init();
+				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.DANRESULT}"));
+				Background.Activate(_state.Refreshed());
 			} else if (OpenTaiko.ConfigIni.bAIBattleMode) {
-				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle{Path.DirectorySeparatorChar}Script.lua"));
-				Background.Init();
+				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}AIBattle"));
+				Background.Activate(_state.Refreshed());
 			} else {
 				//Luaに移植する時にコメントアウトを解除
-				Background = new ResultBG(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}{Path.DirectorySeparatorChar}Script.lua"));
-				Background.Init();
+				Background = new LuaBackgroundWrapper(CSkin.Path($@"{TextureLoader.BASE}{TextureLoader.RESULT}"));
+				Background.Activate(_state.Refreshed());
 			}
 
 			this.ttkDanTitles = new TitleTextureKey[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
@@ -724,8 +724,9 @@ internal class CStageResult : CStage {
 
 			// 描画
 
-			Background?.Update();
-			Background?.Draw();
+			_state.RefreshGameplay();   // result reflects the just-finished game (clear/fail, gauge, etc.)
+			Background?.Update(_state);
+			Background?.Draw(_state);
 
 			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) {
 				#region [Ensou game result screen]
@@ -1637,7 +1638,8 @@ internal class CStageResult : CStage {
 	private bool bAnimeComplete;
 	private bool bIsCheckedWhetherResultScreenShouldSaveOrNot;              // #24509 2011.3.14 yyagi
 	private CSound rResultSound;
-	public ResultBG Background;
+	public LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 
 	public bool[] bClear {
 		get {

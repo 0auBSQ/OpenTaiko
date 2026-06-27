@@ -1,109 +1,59 @@
-﻿using System.Diagnostics;
 using FDK;
 
 namespace OpenTaiko;
 
-internal class CActCutScenePauseMenu : CActSelectPopupMenu {
-	// コンストラクタ
+// Thin adapter: cutscene pause menu (Resume / Skip) driving the shared CPopupMenuManager (which renders via the
+// popup_menu ROActivity). Replaces the old CActSelectPopupMenu-based implementation.
+internal class CActCutScenePauseMenu : CActivity {
+	private enum EOrder { Continue, Skip }
+	private List<EOrder> menuActions = new();
 
 	public CActCutScenePauseMenu() {
-		CActCutScenePauseMenuMain();
+		base.IsDeActivated = true;
 	}
 
-	private void CActCutScenePauseMenuMain() {
-		this.bEscEnabled = false;
-		lci = new List<List<List<CItemBase>>>();                                    // この画面に来る度に、メニューを作り直す。
-		for (int nConfSet = 0; nConfSet < 2; nConfSet++) {
-			lci.Add(new List<List<CItemBase>>());                                   // ConfSet用の3つ分の枠。
-			for (int nInst = 0; nInst < 3; nInst++) {
-				lci[nConfSet].Add(null);                                        // Drum/Guitar/Bassで3つ分、枠を作っておく
-				lci[nConfSet][nInst] = MakeListCItemBase(nConfSet, nInst);
-			}
-		}
-		base.Initialize(lci[nCurrentConfigSet][0], true, CLangManager.LangInstance.GetString("PAUSE_TITLE"), 0);    // ConfSet=0, nInst=Drums
+	public bool bIsActivePopupMenu => OpenTaiko.PopupMenuManager.IsActive;
+
+	public void tActivatePopupMenu(EKeyConfigPart einst) {
+		var items = new List<string> {
+			CLangManager.LangInstance.GetString("PAUSE_RESUME"),
+			CLangManager.LangInstance.GetString("PAUSE_SKIP"),
+		};
+		menuActions = new List<EOrder> { EOrder.Continue, EOrder.Skip };
+
+		OpenTaiko.PopupMenuManager.Open(
+			CLangManager.LangInstance.GetString("PAUSE_TITLE"),
+			items.ToArray(), 0, OnDecide, null, escEnabled: false);
 	}
 
-	private List<CItemBase> MakeListCItemBase(int nConfigSet, int nInst) {
-		List<CItemBase> l = new List<CItemBase>();
+	public void tDeativatePopupMenu() => OpenTaiko.PopupMenuManager.Close();
 
-		#region [ 共通 SET切り替え/More/Return ]
-		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_RESUME"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "" }));
-		l.Add(new CSwitchItemList(CLangManager.LangInstance.GetString("PAUSE_SKIP"), CItemBase.EPanelType.Normal, 0, "", "", new string[] { "", "" }));
-		#endregion
-
-		return l;
-	}
-
-	// メソッド
-	public override void tActivatePopupMenu(EKeyConfigPart einst) {
-		this.CActCutScenePauseMenuMain();
-		CActSelectPopupMenu.bSelected = false;
-		base.tActivatePopupMenu(einst);
-	}
-	//public void tDeativatePopupMenu()
-	//{
-	//	base.tDeativatePopupMenu();
-	//}
-
-	public override void tEnterPressedMain(int nSortOrder) {
-		switch (nCurrentSelectedLine) {
-			case (int)EOrder.Continue:
+	private void OnDecide(int index) {
+		if (index < 0 || index >= menuActions.Count) return;
+		switch (menuActions[index]) {
+			case EOrder.Continue:
 				OpenTaiko.stageCutScene.Resume();
-				CActSelectPopupMenu.bSelected = true;
-				this.tDeativatePopupMenu();
+				OpenTaiko.PopupMenuManager.Close();
 				break;
-
-			case (int)EOrder.Skip:
+			case EOrder.Skip:
 				OpenTaiko.stageCutScene.Skip();
-				CActSelectPopupMenu.bSelected = true;
-				this.tDeativatePopupMenu();
-				break;
-			default:
+				OpenTaiko.PopupMenuManager.Close();
 				break;
 		}
 	}
 
-	public override void tCancel() {
+	public int Update() {
+		OpenTaiko.PopupMenuManager.Update();
+		return 0;
 	}
 
-	// CActivity 実装
-
-	public override void Activate() {
-		base.Activate();
-		this.bGotoDetailConfig = false;
+	public override int Draw() {
+		OpenTaiko.PopupMenuManager.Draw();
+		return 0;
 	}
+
 	public override void DeActivate() {
+		if (OpenTaiko.PopupMenuManager.IsActive) OpenTaiko.PopupMenuManager.Close();
 		base.DeActivate();
 	}
-	public override void CreateManagedResource() {
-		string pathPanelBody = CSkin.Path(@$"Graphics{Path.DirectorySeparatorChar}ScreenSelect popup auto settings.png");
-		if (File.Exists(pathPanelBody)) {
-			this.txPanelBody = OpenTaiko.tTextureCreate(pathPanelBody, true);
-		}
-
-		base.CreateManagedResource();
-	}
-	public override void ReleaseManagedResource() {
-		OpenTaiko.tTextureRelease(ref this.txPanelBody);
-		OpenTaiko.tTextureRelease(ref this.txStringPanel);
-		base.ReleaseManagedResource();
-	}
-
-	#region [ private ]
-	//-----------------
-	private int nCurrentTarget = 0;
-	private int nCurrentConfigSet = 0;
-	private List<List<List<CItemBase>>> lci;
-	private enum EOrder : int {
-		Continue,
-		Skip,
-		END,
-		Default = 99,
-	};
-
-	private bool bSelected;
-	private CTexture txPanelBody;
-	private CTexture txStringPanel;
-	//-----------------
-	#endregion
 }

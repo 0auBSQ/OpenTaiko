@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "切换全屏/窗口模式。",
+		"SETTINGS_SYSTEM_WINDOWMODE": "窗口模式",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "选择窗口、全屏或无边框全屏。\n无边框将无装饰地铺满显示器。",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "窗口",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "全屏",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "无边框",
 		"SETTINGS_SYSTEM_VSYNC": "垂直同步",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "切换是否开启垂直同步。打开后帧率将上限为 60 FPS，\n音符卷动会更加顺畅，但输入延迟会增加。\n关闭后帧率将没有上限，减少输入延迟，但会使音符卷动\n更加不稳定。",
 		"SETTINGS_SYSTEM_FRAMERATE": "帧率",
@@ -118,6 +123,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "当前皮肤",
 		"SETTINGS_SYSTEM_SKIN_DESC": "从 System 文件夹中选择皮肤。（安装皮肤时请将皮肤\n文件夹放入 System 文件夹中，重启游戏并在此选择）",
+		"SETTINGS_SYSTEM_RESOLUTION": "渲染分辨率",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "以皮肤分辨率的倍数渲染，再放大到窗口。\n较低的值在低配机上更流畅（不够清晰）。更改后会重新加载皮肤。",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "播放歌曲",

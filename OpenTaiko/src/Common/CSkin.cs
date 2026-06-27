@@ -950,7 +950,37 @@ internal class CSkin : IDisposable {
 									this.Skin_Creator = strParam;
 									break;
 								}
-							case "Resolution": {
+							case "Resolutions": {
+										// comma list of render-scale multipliers; each a decimal (e.g. 0.5) or an a/b
+										// fraction (e.g. 2/3), clamped to (0,1]. 1.0 is always present + first. (';' can't
+										// separate — it starts a comment line in SkinConfig.ini.)
+										var list = new List<(double val, string label)>();
+										foreach (var rawTok in strParam.Split(',')) {
+											var tok = rawTok.Trim();
+											if (tok.Length == 0) continue;
+											double v;
+											int slash = tok.IndexOf('/');
+											if (slash > 0) {
+												if (double.TryParse(tok.Substring(0, slash).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var num)
+													&& double.TryParse(tok.Substring(slash + 1).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var den)
+													&& den != 0.0) {
+													v = num / den;
+												} else continue;
+											} else if (!double.TryParse(tok, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out v)) {
+												continue;
+											}
+											if (v > 0.0 && v <= 1.0 && !list.Any(e => Math.Abs(e.val - v) < 1e-6)) list.Add((v, tok));
+										}
+										if (!list.Any(e => Math.Abs(e.val - 1.0) < 1e-6)) list.Add((1.0, "1"));
+										list.Sort((a, b) => b.val.CompareTo(a.val));   // 1.0 first, descending
+										this.Resolutions = list;
+										break;
+									}
+								case "AIBattleCharacter": {
+										this.AIBattleCharacter = strParam;
+										break;
+									}
+								case "Resolution": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
 										Resolution[i] = int.Parse(strSplit[i]);
@@ -7518,6 +7548,15 @@ internal class CSkin : IDisposable {
 	public int[] Resolution = new int[] { 1280, 720 };
 	public double ScaleX => Resolution[0] / 1280.0;
 	public double ScaleY => Resolution[1] / 720.0;
+		/// <summary>
+		/// Selectable render-scale multipliers (each in (0,1]) from SkinConfig.ini <c>Resolutions=</c> (decimals or
+		/// <c>a/b</c> fractions, semicolon-separated). <c>1.0</c> is always present and is the default. The internal
+		/// render resolution = <see cref="Resolution"/> × multiplier, upscaled to the window — lets low-end machines
+		/// trade sharpness for speed. Sorted descending (1.0 first).
+		/// </summary>
+		public List<(double val, string label)> Resolutions = new List<(double, string)> { (1.0, "1") };
+		/// <summary>Character folder name used for the AI battle slot; set via <c>AIBattleCharacter=</c> in SkinConfig.ini.</summary>
+		public string AIBattleCharacter = "10v2 - AItritus";
 	public string FontName { get { return _fontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }
 	private Dictionary<string, string> _fontNameLocalized = new Dictionary<string, string>();
 	public string BoxFontName { get { return _boxFontNameLocalized.TryGetValue(CLangManager.fetchLang(), out string value) ? value : ""; } }

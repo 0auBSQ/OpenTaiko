@@ -130,9 +130,14 @@ internal class CActConfigList : CActivity {
 			AvailableGraphicsDevices);
 		this.listItemList.Add(this.iSystemGraphicsType);
 
-		this.iSystemFullscreen = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN"), OpenTaiko.ConfigIni.bFullScreen,
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_FULLSCREEN_DESC"));
-		this.listItemList.Add(this.iSystemFullscreen);
+		this.iSystemWindowMode = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WINDOWMODE"), CItemList.EPanelType.Normal, OpenTaiko.ConfigIni.nWindowMode,
+			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WINDOWMODE_DESC"),
+			new string[] {
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WINDOWMODE_WINDOWED"),
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN"),
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS")
+			});
+		this.listItemList.Add(this.iSystemWindowMode);
 
 		this.iSystemRandomFromSubBox = new CItemToggle(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER"), OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect,
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC"));
@@ -314,6 +319,25 @@ internal class CActConfigList : CActivity {
 			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_SKIN_DESC"),
 			skinNames);
 		this.listItemList.Add(this.iSystemSkinSubfolder);
+
+		// Render-resolution selector (under the skin selector). Values come from the current skin's "Resolutions";
+		// each label is "<multiplier> (<width>x<height>)", e.g. "2/3 (1280x720)". Changing it reloads the skin (like a
+		// skin change) so the whole game re-renders at skinResolution × multiplier, upscaled to the window.
+		{
+			var res = OpenTaiko.Skin.Resolutions;
+			var resLabels = new string[res.Count];
+			int resIndex = 0;
+			for (int i = 0; i < res.Count; i++) {
+				int rw = (int)Math.Round(OpenTaiko.Skin.Resolution[0] * res[i].val);
+				int rh = (int)Math.Round(OpenTaiko.Skin.Resolution[1] * res[i].val);
+				resLabels[i] = res[i].label + " (" + rw + "x" + rh + ")";
+				if (Math.Abs(res[i].val - OpenTaiko.ConfigIni.fRenderScale) < 1e-4) resIndex = i;
+			}
+			this.iSystemResolution = new CItemList(CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RESOLUTION"), CItemBase.EPanelType.Normal, resIndex,
+				CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_RESOLUTION_DESC"),
+				resLabels);
+			this.listItemList.Add(this.iSystemResolution);
+		}
 
 		this.iSystemGoToKeyAssign = new CItemBase(CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM"), CItemBase.EPanelType.Normal,
 			CLangManager.LangInstance.GetString("SETTINGS_KEYASSIGN_SYSTEM_DESC"));
@@ -759,7 +783,8 @@ internal class CActConfigList : CActivity {
 			}
 			// Enter押下後の後処理
 
-			if (this.listItemList[this.nCurrentSelectedItem] == this.iSystemFullscreen) {
+			if (this.listItemList[this.nCurrentSelectedItem] == this.iSystemWindowMode) {
+				OpenTaiko.ConfigIni.nWindowMode = this.iSystemWindowMode.nCurrentSelectedItemNumber;
 				OpenTaiko.app.bSwitchFullScreenAtNextFrame = true;
 			} else if (this.listItemList[this.nCurrentSelectedItem] == this.iSystemVSyncWait) {
 				if (!OperatingSystem.IsIOS()) {
@@ -1123,6 +1148,7 @@ internal class CActConfigList : CActivity {
 			skinSubFolders[ns + i] = OpenTaiko.Skin.strBoxDefSkinSubfolders[i];
 		}
 		skinSubFolder_org = OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true);
+		fRenderScale_org = OpenTaiko.ConfigIni.fRenderScale;
 		Array.Sort(skinSubFolders);
 		skinNames = CSkin.GetSkinName(skinSubFolders);
 		nSkinIndex = Array.BinarySearch(skinSubFolders, skinSubFolder_org);
@@ -1160,8 +1186,9 @@ internal class CActConfigList : CActivity {
 
 		base.DeActivate();
 		#region [ Skin変更 ]
-		if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org) {
-			OpenTaiko.app.EnterRefreshSkinStage(isSavedBeforeUpdate: true);
+		if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != this.skinSubFolder_org
+			|| OpenTaiko.ConfigIni.fRenderScale != this.fRenderScale_org) {
+			OpenTaiko.app.EnterRefreshSkinStage(isSavedBeforeUpdate: true);   // resolution change reloads the skin too
 		}
 		#endregion
 
@@ -1671,7 +1698,7 @@ internal class CActConfigList : CActivity {
 	private CItemToggle iSystemDebugInfo;
 	private CItemList iSystemGraphicsType;                 // #24820 2013.1.3 yyagi
 	private CItemList iSystemIOSFrameRate;
-	private CItemToggle iSystemFullscreen;
+	private CItemList iSystemWindowMode;                   // Windowed / Fullscreen / Borderless
 	private CItemInteger iSystemMinComboDrums;
 	private CItemInteger iSystemPreviewImageWait;
 	private CItemInteger iSystemPreviewSoundWait;
@@ -1717,6 +1744,7 @@ internal class CActConfigList : CActivity {
 	private string[] skinSubFolders;
 	private string[] skinNames;
 	private string skinSubFolder_org;
+	private float fRenderScale_org;   // render-scale at menu entry; a change triggers a skin reload on exit
 	private int nSkinSampleIndex;
 	private int nSkinIndex;
 
@@ -1783,6 +1811,7 @@ internal class CActConfigList : CActivity {
 	public CItemInteger iGlobalOffsetMs;
 
 	private CItemList iSystemSkinSubfolder;             // #28195 2012.5.2 yyagi
+	private CItemList iSystemResolution;                // render-scale multiplier (under the skin selector)
 	private CItemBase iSystemReloadDTX;                 // #32081 2013.10.21 yyagi
 	private CItemBase iSystemHardReloadDTX;
 	private CItemBase isSystemImportingScore;
@@ -1838,7 +1867,12 @@ internal class CActConfigList : CActivity {
 			OpenTaiko.ConfigIni.biOSUnlimitedFrameRate = this.iSystemIOSFrameRate.nCurrentSelectedItemNumber == 1;
 		}
 		OpenTaiko.ConfigIni.nGraphicsDeviceType = GraphicsDeviceFromString(AvailableGraphicsDevices[this.iSystemGraphicsType.nCurrentSelectedItemNumber]);
-		OpenTaiko.ConfigIni.bFullScreen = this.iSystemFullscreen.bON;
+		OpenTaiko.ConfigIni.nWindowMode = this.iSystemWindowMode.nCurrentSelectedItemNumber;
+		{
+			var res = OpenTaiko.Skin.Resolutions;
+			int ri = Math.Clamp(this.iSystemResolution.nCurrentSelectedItemNumber, 0, res.Count - 1);
+			OpenTaiko.ConfigIni.fRenderScale = (float)res[ri].val;
+		}
 		OpenTaiko.ConfigIni.bIncludeSubfoldersOnRandomSelect = this.iSystemRandomFromSubBox.bON;
 
 		if (!OperatingSystem.IsIOS())   // iSystemVSyncWait only exists on desktop (iOS shows iSystemIOSFrameRate instead)

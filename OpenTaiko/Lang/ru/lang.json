@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "Полноэкранный режим",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Переключение между полноэкранным и оконным\nрежимами.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "Режим окна",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Выберите оконный, полноэкранный или безрамочный режим.\nБезрамочный заполняет монитор без рамок.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Оконный",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "Полноэкранный",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Безрамочный",
 		"SETTINGS_SYSTEM_VSYNC": "Режим VSync",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Выбрать, используется ли функция VSync.\nПри его включении (ON) частота кадров будет\nснижена до 60, что сделает прокрутку заметок\nболее плавной, но увеличит задержку ввода.\nПри его выключении (OFF) частота кадров будет\nснижена, что уменьшит задержку ввода, но\nсделает прокрутку нот более нестабильной.",
 		"SETTINGS_SYSTEM_FRAMERATE": "Частота кадров",
@@ -118,6 +123,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "Текущий скин",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Выбрать скин для использования в папке\nSystem.",
+		"SETTINGS_SYSTEM_RESOLUTION": "Разрешение рендера",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "Отрисовка игры в доле от разрешения скина с растяжением до окна.\nМеньшие значения быстрее на слабых ПК (менее чётко). Изменение перезагружает скин.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Переключение воспроизведения песни",

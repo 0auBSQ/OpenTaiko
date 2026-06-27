@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "Fullscreen Mode",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Toggle between fullscreen and windowed mode.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "Window Mode",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Choose Windowed, Fullscreen, or Borderless Fullscreen.\nBorderless covers the monitor with no decorations.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Windowed",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "Fullscreen",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Borderless",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Mode",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Toggle whether VSync is used.\nTurning it on will cap the FPS at 60,\nwhich will make the note scroll appear smoother\nbut increase input delay.\nTurning it off will uncap the fps,\nwhich will decrease input delay\nbut make the note scroll appear more unstable.",
 		"SETTINGS_SYSTEM_FRAMERATE": "Frame Rate",
@@ -118,6 +123,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "Current Skin",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Choose a skin to use from the system folder.",
+		"SETTINGS_SYSTEM_RESOLUTION": "Render Resolution",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "Render the game at a fraction of the skin resolution, upscaled to the window.\nLower values run faster on weaker machines (less sharp). Changing this reloads the skin.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Toggle Song Playback",

@@ -89,7 +89,6 @@
     <BundleResource Include="..\OpenTaiko\System\**" Link="System\%(RecursiveDir)%(Filename)%(Extension)" />
     <BundleResource Include="..\OpenTaiko\.init\**" Link=".init\%(RecursiveDir)%(Filename)%(Extension)" />
     <BundleResource Include="..\OpenTaiko\Songs\**" Link="Songs\%(RecursiveDir)%(Filename)%(Extension)" />
-    <BundleResource Include="..\OpenTaiko\BGScriptAPI.lua" Link="BGScriptAPI.lua" />
     <BundleResource Include="..\OpenTaiko\CharaScript.lua" Link="CharaScript.lua" />
   </ItemGroup>
 

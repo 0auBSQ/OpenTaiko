@@ -1,20 +1,13 @@
---func:DrawText(x, y, text)
---func:DrawNum(x, y, num)
---func:AddGraph("filename")
---func:DrawGraph(x, y, filename)
---func:DrawRectGraph(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:DrawGraphCenter(x, y, filename)
---func:DrawGraphRectCenter(x, y, rect_x, rect_y, rect_width, rect_height, filename)
---func:SetOpacity(opacity, "filename")
---func:SetRotation(angle, "fileName")
---func:SetScale(xscale, yscale, "filename")
---func:SetColor(r, g, b, "filename")
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Startup/boot loading background: static background + a small per-character loading animation.
 
 local loadingAnimeType = 0
 
 local currentTime = 0
-local frames = {9, 6}
+local frames = { 9, 6 }
 local selectedChara = 1
+
+local tx = {}
 
 function clearIn(player)
 end
@@ -22,43 +15,39 @@ end
 function clearOut(player)
 end
 
-function init()
-    func:AddGraph("Background.png")
+function onStart()
+    tx["Background.png"] = TEXTURE:CreateTextureSync("Background.png")
 
-    seed = os.time()
+    local seed = os.time()
     math.randomseed(seed)
-    selectedChara = math.random(2);
+    selectedChara = math.random(2)
 
     if loadingAnimeType == 0 then
-        -- func:AddGraph("OpTKIcon.png")
-        -- func:AddGraph("0.png")
-        -- func:AddGraph("1.png")
-        -- func:AddGraph("2.png")
-        -- func:AddGraph("3.png")
-        -- func:AddGraph("4.png")
-        -- func:AddGraph("5.png")
-        -- func:AddGraph("6.png")
         for i = 0, frames[selectedChara] - 1 do
-            func:AddGraph("Loading/"..tostring(selectedChara).."/"..tostring(i)..".png")
+            tx["Loading/" .. tostring(selectedChara) .. "/" .. tostring(i) .. ".png"] = TEXTURE:CreateTextureSync("Loading/" .. tostring(selectedChara) .. "/" .. tostring(i) .. ".png")
         end
     elseif loadingAnimeType == 1 then
     end
 end
 
-function update()
+function update(timestamp, state)
     if loadingAnimeType == 0 then
-        currentTime = (currentTime + deltaTime)
-        -- optkAngle = optkAngle + (360 * deltaTime)
+        currentTime = (currentTime + fps.deltaTime)
     elseif loadingAnimeType == 1 then
     end
 end
 
-function draw()
-    func:DrawGraph(0, 0, "Background.png")
+function draw(state)
+    tx["Background.png"]:Draw(0, 0)
     if loadingAnimeType == 0 then
-        func:DrawGraph(1657, 821, "Loading/"..tostring(selectedChara).."/"..tostring(math.floor(currentTime * 10) % frames[selectedChara])..".png")
-        -- func:SetRotation(optkAngle, "OpTKIcon.png")
-        -- func:DrawGraph(1720, 880, "OpTKIcon.png")
+        tx["Loading/" .. tostring(selectedChara) .. "/" .. tostring(math.floor(currentTime * 10) % frames[selectedChara]) .. ".png"]:Draw(1657, 821)
     elseif loadingAnimeType == 1 then
     end
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

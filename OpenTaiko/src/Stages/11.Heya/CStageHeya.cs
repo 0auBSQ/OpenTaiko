@@ -157,8 +157,8 @@ class CStageHeya : CStage {
 
 		this.PuchiChara.IdleAnimation();
 
-		Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.HEYA}Script.lua"));
-		Background.Init();
+		Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.HEYA}"));
+		Background.Activate(_state.Refreshed());
 
 		CCharacter.AddPreviewAnimation(CCharacter.ANIM_PREVIEW);
 		CCharacter.AddPreviewAnimation(CCharacter.ANIM_RENDER);
@@ -196,8 +196,8 @@ class CStageHeya : CStage {
 
 		ScrollCounter.Tick();
 
-		Background.Update();
-		Background.Draw();
+		Background.Update(_state);
+		Background.Draw(_state);
 		//Heya_Background.t2D描画(0, 0);
 
 		#region [Main menu (Side bar)]
@@ -937,7 +937,8 @@ class CStageHeya : CStage {
 
 	#endregion
 
-	private ScriptBG Background;
+	private LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 	private CCharacterController characterController;
 
 	private TitleTextureKey[] ttkMainMenuOpt;

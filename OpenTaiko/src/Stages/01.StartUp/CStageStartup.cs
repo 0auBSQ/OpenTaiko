@@ -19,8 +19,8 @@ internal class CStageStartup : CStage {
 		Trace.TraceInformation("起動ステージを活性化します。");
 		Trace.Indent();
 		try {
-			Background = new ScriptBG(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}Script.lua"));
-			Background.Init();
+			Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.STARTUP}"));
+			Background.Activate(_state.Refreshed());
 
 			// Note: CLoadingProgress.Begin() is NOT called here — the boot stage is activated twice during
 			// startup, which would reset the bar mid-preload. Begin() is called once in tStartupProcess,
@@ -88,8 +88,8 @@ internal class CStageStartup : CStage {
 
 			// CSongs管理 s管理 = CDTXMania.Songs管理;
 
-			Background.Update();
-			Background.Draw();
+			Background.Update(_state);
+			Background.Draw(_state);
 			CLoadingScreen.Draw();   // engine loading bar overlay
 
 			#region [ Incremental Lua module loading (0-55% bar) + texture stream drain (55-60%), before the song enum ]
@@ -209,7 +209,8 @@ internal class CStageStartup : CStage {
 	#region [ private ]
 	//-----------------
 	private string strCurrentProgress = "";
-	private ScriptBG Background;
+	private LuaBackgroundWrapper Background;
+	private readonly LuaBackgroundState _state = new();
 	private CEnumSongs es;
 	private bool bIsLoadingTextures;
 	private CLoadSession _session;       // drives the incremental skin-module load + onStart-texture stream

@@ -726,17 +726,16 @@ public static class ImGuiDebugWindow {
 					$"Module #{index}", $"MODULE{index++}_RESC");
 			}
 
-			long popup(ScriptBG script, string label, string id)
-				=> ResourceListPopup<T>(resourceType, script, label, id);
+			// Backgrounds / mobs / kusudama / clear-animations are now LuaBackgroundWrapper (CLuaScript) instances,
+			// already counted in the CLuaScript.listScripts loop above, so these per-element popups no-op (return 0).
+			long popup(LuaBackgroundWrapper script, string label, string id) => 0;
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
 				#region Game
 				case CStage.EStage.Game:
 
-					currentStageMemoryUsage += popup(OpenTaiko.stageGameScreen.actBackground.UpScript,
-						"Up Background", "RESC_LUA_UPBG");
-					currentStageMemoryUsage += popup(OpenTaiko.stageGameScreen.actBackground.DownScript,
-						"Down Background", "RESC_LUA_DOWNBG");
+					// Up/Down backgrounds are now LuaBackgroundWrapper (CLuaScript) instances, already counted in
+					// the CLuaScript.listScripts loop above — no separate ScriptBG popup needed.
 					currentStageMemoryUsage += popup(OpenTaiko.stageGameScreen.actMob.MobScript,
 						"Mob", "RESC_LUA_MOB");
 					currentStageMemoryUsage += popup(OpenTaiko.stageGameScreen.actBalloon.KusudamaScript,
@@ -907,17 +906,6 @@ public static class ImGuiDebugWindow {
 			ImGui.Text($"{label} {resourceType}: (updating...)");
 			return 0;
 		}
-	}
-	private static long ResourceListPopup<T>(string resourceType, ScriptBG script, string label, string id) {
-		if (script == null) return 0;
-		if (typeof(T) == typeof(CTexture))
-			return CResourceListPopup(resourceType, script.Textures.Values
-				.Concat(script.TextureList.Select(x => x._texture))
-				.Concat(script.TextList.SelectMany(x => x._titles.Values.Select(x => x._texture))),
-				label, id);
-		if (typeof(T) == typeof(CSkin.CSystemSound))
-			return CResourceListPopup(resourceType, script.SoundList.Select(x => x._sound), label, id);
-		return 0;
 	}
 	private static long ResourceListPopup<T>(string resourceType, CLuaScript script, string label, string id) {
 		if (script == null) return 0;

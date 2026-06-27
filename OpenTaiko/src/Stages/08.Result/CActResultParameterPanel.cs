@@ -160,7 +160,7 @@ internal class CActResultParameterPanel : CActivity {
 
 
 	public void tSkipResultAnimations() {
-		OpenTaiko.stageResults.Background.SkipAnimation();
+		OpenTaiko.stageResults.Background.Call("skipAnime");
 		ctMainCounter.CurrentValue = (int)MountainAppearValue;
 
 		for (int i = 0; i < bAudioPlayback.Length; i++) {

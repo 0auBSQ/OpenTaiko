@@ -1,7 +1,14 @@
+---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
+-- Normal-down background 3 (Space): single sprite-atlas (Assets.png) space scene — starfield + comet on the
+-- normal layer, crossfading into a "clear" layer with planet/spaceship/UFO/parallax stars. 1P only (no per-player branches).
+-- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
+
 local time = 0
 
 local bgClearFade = 0
 local clearMultiplier = -1
+
+local tx = {}
 
 local NormalBG = {
     x = 0,
@@ -59,22 +66,22 @@ local Comet = {
 }
 
 function Draw(asset, x, y)
-    func:DrawRectGraph(x, y + 540, asset.x, asset.y, asset.w, asset.h, "Assets.png")
+    tx["Assets.png"]:DrawRect(x, y + 540, asset.x, asset.y, asset.w, asset.h)
 end
 function DrawCenter(asset, x, y)
-    func:DrawGraphRectCenter(x, y + 540, asset.x, asset.y, asset.w, asset.h, "Assets.png")
+    tx["Assets.png"]:DrawRectAtAnchor(x, y + 540, asset.x, asset.y, asset.w, asset.h, "center")
 end
 function Rotate(angle)
-    func:SetRotation(angle, "Assets.png")
+    tx["Assets.png"]:SetRotation(angle)
 end
 function Scale(scale_x, scale_y)
-    func:SetScale(scale_x, scale_y, "Assets.png")
+    tx["Assets.png"]:SetScale(scale_x, scale_y)
 end
 function SimpleScale(scale)
     Scale(scale, scale)
 end
 function Opacity(opacity)
-    func:SetOpacity(opacity, "Assets.png")
+    tx["Assets.png"]:SetOpacity(opacity / 255)
 end
 function Reset()
     Opacity(255)
@@ -88,16 +95,16 @@ end
 function clearOut(player)
 end
 
-function init()
-    func:AddGraph("Assets.png");
+function onStart()
+    tx["Assets.png"] = TEXTURE:CreateTextureSync("Assets.png")
 end
 
-function update()
-    time = time + deltaTime
+function update(timestamp, state)
+    time = time + fps.deltaTime
 
-    clearMultiplier = (isClear[0]) and 1 or -1;
+    clearMultiplier = (state.isClear[0]) and 1 or -1;
 
-    bgClearFade = bgClearFade + (clearMultiplier * 1500 * deltaTime);
+    bgClearFade = bgClearFade + (clearMultiplier * 1500 * fps.deltaTime);
 
     if bgClearFade > 255 then
         bgClearFade = 255;
@@ -107,7 +114,7 @@ function update()
     end
 end
 
-function draw()
+function draw(state)
     Opacity(255);
     Scale(1, 1)
     Rotate(0)
@@ -140,7 +147,7 @@ function draw()
         star(1024, 176, 10.6)
         star(924, 276, 11)
         star(824, 376, 11.3)
-        
+
         Reset()
 
         local comet_length = startime - 10
@@ -173,4 +180,11 @@ function draw()
         Draw(Spaceship, 1480 + (75 * fadeSinHalfToZero), 50 + (20 * fadeSin) + (25 * math.sin(time)));
         Draw(UFO, 28 - (75 * fadeSinHalfToZero), 13 - (20 * fadeSin) + (25 * math.sin(time)));
     end
+end
+
+function onDestroy()
+    for _, t in pairs(tx) do
+        if t ~= nil then t:Dispose() end
+    end
+    tx = {}
 end

@@ -79,6 +79,11 @@
 		// Settings - System - Graphics
 		"SETTINGS_SYSTEM_FULLSCREEN": "Modo de Pantalla Completa",
 		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Alterna entre modo de ventana y pantalla completa.",
+		"SETTINGS_SYSTEM_WINDOWMODE": "Modo de ventana",
+		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Elige Ventana, Pantalla completa o Sin bordes.\nSin bordes cubre el monitor sin decoraciones.",
+		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Ventana",
+		"SETTINGS_SYSTEM_WINDOWMODE_FULLSCREEN": "Pantalla completa",
+		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Sin bordes",
 		"SETTINGS_SYSTEM_VSYNC": "Modo de VSync",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Alterna si VSync es utilizado.\nActivarlo limitará los FPS a 60, suavizará el\ndesplazamiento de notas pero aumentará el \nretraso de entrada.\nDesactivarlo no limitará los FPS, disminuirá el\nretraso de entrada pero hará que el desplazamiento\nde nota parezca más inestable.",
 		"SETTINGS_SYSTEM_FRAMERATE": "Frecuencia de fotogramas",
@@ -118,6 +123,8 @@
 
 		"SETTINGS_SYSTEM_SKIN": "Skin Actual",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Elige una skin desde la carpeta de sistema.",
+		"SETTINGS_SYSTEM_RESOLUTION": "Resolución de renderizado",
+		"SETTINGS_SYSTEM_RESOLUTION_DESC": "Renderiza el juego a una fracción de la resolución del skin, escalado a la ventana.\nValores bajos van más rápido (menos nítido). Cambiarlo recarga el skin.",
 
 		// Settings - System - Audio
 		"SETTINGS_SYSTEM_SONGPLAYBACK": "Alternar Reproducción de Canción",
