@@ -22,9 +22,12 @@ internal class CStageConfig : CStage {
 		this.actFont = font = new CActDFPFont();
 		base.ChildActivities.Add(font);
 		base.ChildActivities.Add(this.actFIFO = new CActFIFOWhite());
-		base.ChildActivities.Add(this.actList = new CActConfigList());
-		base.ChildActivities.Add(this.actKeyAssign = new CActConfigKeyAssign());
-		base.ChildActivities.Add(this.actOptionPanel = new CActOptionPanel());
+		// The legacy UI activities are kept as fields (other files reference them) but NOT auto-managed:
+		// the config UI is now the Lua config_ui ROActivity. Not activating actList avoids it clobbering the
+		// live config writes (its DeActivate would re-record stale item values).
+		this.actList = new CActConfigList();
+		this.actKeyAssign = new CActConfigKeyAssign();
+		this.actOptionPanel = new CActOptionPanel();
 		base.ChildActivities.Add(this.actCalibrationMode = new CActCalibrationMode());
 		base.IsDeActivated = true;
 	}
@@ -55,30 +58,74 @@ internal class CStageConfig : CStage {
 		try {
 			OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
-			this.nCurrentMenuNumber = 0;                                                    //
-			for (int i = 0; i < 4; i++)                                                 //
-			{                                                                               //
-				this.ctKeyRepeat[i] = new CCounter(0, 0, 0, OpenTaiko.Timer);          //
-			}                                                                               //
-			this.bMenuFocus = true;                                           // ここまでOPTIONと共通
-			this.eItemPanelMode = EItemPanelMode.PadList;
+			// snapshot the entry values whose heavy apply is deferred to exit (skin / render scale / sound device)
+			_skinOrg = OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true);
+			_renderOrg = OpenTaiko.ConfigIni.fRenderScale;
+			_soundTypeOrg = OpenTaiko.ConfigIni.nSoundDeviceType;
+			_bassBufOrg = OpenTaiko.ConfigIni.nBassBufferSizeMs;
+			_wasapiBufOrg = OpenTaiko.ConfigIni.nWASAPIBufferSizeMs;
+			_asioOrg = OpenTaiko.ConfigIni.nASIODevice;
+			_osTimerOrg = OpenTaiko.ConfigIni.bUseOSTimer;
 
-			ReloadMenus();
-
-			Background = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}"));
-			Background.Activate(_state.Refreshed());
-
-
-			if (this.bMenuFocus) {
-				this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
-			} else {
-				this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
-			}
+			RebuildModel();
+			UI?.Activate(_model);   // hand the schema to the Lua config_ui ROActivity (it draws its own calm gradient bg)
 		} finally {
 			Trace.TraceInformation("コンフィグステージの活性化を完了しました。");
 			Trace.Unindent();
 		}
 		base.Activate();        // 2011.3.14 yyagi: On活性化()をtryの中から外に移動
+	}
+
+	private static LuaROActivityWrapper? UI => LuaROActivityWrapper.GetROActivity("config_ui");
+	private CLuaConfigModel _model;
+	private CConfigOptionBuilder.Hooks _hooks;
+	private string _skinOrg;
+	private float _renderOrg;
+	private int _soundTypeOrg, _bassBufOrg, _wasapiBufOrg, _asioOrg;
+	private bool _osTimerOrg;
+
+	private void RebuildModel() {
+		if (_hooks == null) {
+			_hooks = new CConfigOptionBuilder.Hooks {
+				// language change → rebuild the localized model + push it to Lua
+				Relocalize = () => { _model = CConfigOptionBuilder.Build(_hooks); UI?.Call("reload", _model); },
+				Calibration = () => actCalibrationMode.Start(),
+				ReloadSongs = () => tReloadSongs(false),
+				HardReloadSongs = () => tReloadSongs(true),
+				ImportScore = () => { try { new System.Threading.Thread(CScoreIni_Importer.ImportScoreInisToSavesDb3).Start(); } catch (Exception e) { Trace.TraceError(e.ToString()); } },
+			};
+		}
+		_model = CConfigOptionBuilder.Build(_hooks);
+	}
+
+	private void tReloadSongs(bool hard) {
+		if (OpenTaiko.EnumSongs.IsEnumerating) {
+			OpenTaiko.EnumSongs.Abort();
+			OpenTaiko.actEnumSongs.DeActivate();
+		}
+		OpenTaiko.EnumSongs.StartEnumFromDisk(hard);
+		OpenTaiko.EnumSongs.ChangeEnumeratePriority(System.Threading.ThreadPriority.Normal);
+		OpenTaiko.actEnumSongs.bCommandSongDataGet = true;
+		OpenTaiko.actEnumSongs.Activate();
+	}
+
+	private void tApplySoundDeviceIfChanged() {
+		var cfg = OpenTaiko.ConfigIni;
+		if (OperatingSystem.IsWindows()) {
+			if (_soundTypeOrg != cfg.nSoundDeviceType || _bassBufOrg != cfg.nBassBufferSizeMs ||
+				_wasapiBufOrg != cfg.nWASAPIBufferSizeMs || _asioOrg != cfg.nASIODevice || _osTimerOrg != cfg.bUseOSTimer) {
+				ESoundDeviceType t = cfg.nSoundDeviceType switch {
+					0 => ESoundDeviceType.Bass, 1 => ESoundDeviceType.ASIO,
+					2 => ESoundDeviceType.ExclusiveWASAPI, 3 => ESoundDeviceType.SharedWASAPI, _ => ESoundDeviceType.Unknown,
+				};
+				OpenTaiko.SoundManager.tInitialize(t, cfg.nBassBufferSizeMs, cfg.nWASAPIBufferSizeMs, 0, cfg.nASIODevice, cfg.bUseOSTimer);
+				OpenTaiko.app.ShowWindowTitle();
+				OpenTaiko.Skin.ReloadSystemSounds();
+				OpenTaiko.Skin.PreloadSystemSounds();
+			}
+		} else if (_bassBufOrg != cfg.nBassBufferSizeMs || _osTimerOrg != cfg.bUseOSTimer) {
+			OpenTaiko.SoundManager.tInitialize(ESoundDeviceType.Bass, cfg.nBassBufferSizeMs, 0, 0, 0, cfg.bUseOSTimer);
+		}
 	}
 	public override void DeActivate() {
 		Trace.TraceInformation("コンフィグステージを非活性化します。");
@@ -86,20 +133,26 @@ internal class CStageConfig : CStage {
 		try {
 			OpenTaiko.Skin.bgmConfigScreen.tStop();
 
-			OpenTaiko.ConfigIni.tExport(OpenTaiko.strEXEFolder + "Config.ini");    // CONFIGだけ
-			for (int i = 0; i < 4; i++) {
-				this.ctKeyRepeat[i] = null;
-			}
+			UI?.Deactivate();
 
-			for (int i = 0; i < txMenuItemLeft.GetLength(0); i++) {
-				txMenuItemLeft[i, 0].Dispose();
-				txMenuItemLeft[i, 0] = null;
-				txMenuItemLeft[i, 1].Dispose();
-				txMenuItemLeft[i, 1] = null;
-			}
-			txMenuItemLeft = null;
+			OpenTaiko.ConfigIni.tExport(OpenTaiko.strEXEFolder + "Config.ini");    // save on exit
 
-			OpenTaiko.tDisposeSafely(ref Background);
+			// deferred heavy apply (the live writes already landed in ConfigIni; here we reload what's expensive)
+			if (OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != _skinOrg
+				|| OpenTaiko.ConfigIni.fRenderScale != _renderOrg) {
+				OpenTaiko.app.EnterRefreshSkinStage(isSavedBeforeUpdate: true);   // resolution change reloads the skin too
+			}
+			tApplySoundDeviceIfChanged();
+			FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
+
+			for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
+				int id = OpenTaiko.SaveFileInstances[i].data.TitleId;
+				if (id > 0) {
+					var title = OpenTaiko.Databases.DBNameplateUnlockables.data[id];
+					OpenTaiko.SaveFileInstances[i].data.Title = title.nameplateInfo.cld.GetString("");
+				}
+				OpenTaiko.NamePlate.tNamePlateRefreshTitles(i);
+			}
 
 			base.DeActivate();
 		} catch (UnauthorizedAccessException e) {
@@ -212,252 +265,42 @@ internal class CStageConfig : CStage {
 			base.IsFirstDraw = false;
 		}
 
-		//ctBackgroundAnime.t進行Loop();
-
-		// 描画
-
-		#region [ Background ]
-
-		//---------------------
-		/*
-		for(int i = 0; i < 2; i++)
-			if (TJAPlayer3.Tx.Config_Background != null )
-				TJAPlayer3.Tx.Config_Background.t2D描画( 0 + -(TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width * i) + ctBackgroundAnime.n現在の値, 0 );
-		if(TJAPlayer3.Tx.Config_Header != null )
-            TJAPlayer3.Tx.Config_Header.t2D描画( 0, 0 );
-		*/
-		Background.Update(_state);
-		Background.Draw(_state);
-		//---------------------
-
-		#endregion
-
-		#region [ Menu Cursor ]
-		//---------------------
-		if (OpenTaiko.Tx.Config_Cursor != null) {
-			#region Old
-			/*
-			Rectangle rectangle;
-            TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.Opacity = this.bメニューにフォーカス中 ? 255 : 128;
-			int x = 110;
-			int y = (int)( 145.5 + ( this.n現在のメニュー番号 * 37.5 ) );
-			int num3 = 340;
-            TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( x, y, new Rectangle( 0, 0, 32, 48 ) );
-            TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( ( x + num3 ) - 32, y, new Rectangle( 20, 0, 32, 48 ) );
-			x += 32;
-			for( num3 -= 64; num3 > 0; num3 -= rectangle.Width )
-			{
-				rectangle = new Rectangle( 16, 0, 32, 48 );
-				if( num3 < 32 )
-				{
-					rectangle.Width -= 32 - num3;
-				}
-                TJAPlayer3.Tx.TJAPlayer3.Tx.Config_Cursor.t2D描画( x, y, rectangle );
-				x += rectangle.Width;
-			}
-			*/
-			#endregion
-
-
-			int x = OpenTaiko.Skin.Config_Item_X[this.nCurrentMenuNumber];
-			int y = OpenTaiko.Skin.Config_Item_Y[this.nCurrentMenuNumber];
-
-			int width = OpenTaiko.Tx.Config_Cursor.szImageSize.Width / 3;
-			int height = OpenTaiko.Tx.Config_Cursor.szImageSize.Height;
-
-			int move = OpenTaiko.Skin.Config_Item_Width;
-
-			//Left
-			OpenTaiko.Tx.Config_Cursor.t2DCenterBasedDraw(x - (width / 2) - move, y,
-				new Rectangle(0, 0, width, height));
-
-			//Right
-			OpenTaiko.Tx.Config_Cursor.t2DCenterBasedDraw(x + (width / 2) + move, y,
-				new Rectangle(width * 2, 0, width, height));
-
-			//Center
-			OpenTaiko.Tx.Config_Cursor.vcScaleRatio.X = (move / (float)width) * 2.0f;
-			OpenTaiko.Tx.Config_Cursor.t2DScaledCenterBasedDraw(x, y,
-				new Rectangle(width, 0, width, height));
-
-			OpenTaiko.Tx.Config_Cursor.vcScaleRatio.X = 1.0f;
-		}
-		//---------------------
-		#endregion
-
-		#region [ Menu ]
-		//---------------------
-		//int menuY = 162 - 22 + 13;
-		//int stepY = 39;
-		for (int i = 0; i < txMenuItemLeft.GetLength(0); i++) {
-			//Bitmap bmpStr = (this.n現在のメニュー番号 == i) ?
-			//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black, Color.Yellow, Color.OrangeRed ) :
-			//      prvFont.DrawPrivateFont( strMenuItem[ i ], Color.White, Color.Black );
-			//txMenuItemLeft = CDTXMania.tテクスチャの生成( bmpStr, false );
-
-			int flag = (this.nCurrentMenuNumber == i) ? 1 : 0;
-			txMenuItemLeft[i, flag].t2DCenterBasedDraw(OpenTaiko.Skin.Config_Item_X[i] + OpenTaiko.Skin.Config_Item_Font_Offset[0], OpenTaiko.Skin.Config_Item_Y[i] + OpenTaiko.Skin.Config_Item_Font_Offset[1]); //55
-																																																		 //txMenuItem.Dispose();
-																																																		 //menuY += stepY;
-		}
-		//---------------------
-		#endregion
-
-		#region [ Explanation Panel ]
-		//---------------------
-		if (this.txDescriptionPanel != null)
-			this.txDescriptionPanel.t2DDraw(OpenTaiko.Skin.Config_ExplanationPanel[0], OpenTaiko.Skin.Config_ExplanationPanel[1]);
-		//---------------------
-		#endregion
-
-		#region [ Item ]
-		//---------------------
-		switch (this.eItemPanelMode) {
-			case EItemPanelMode.PadList:
-				this.actList.Draw(!this.bMenuFocus);
-				break;
-
-			case EItemPanelMode.KeyCodeList:
-				this.actKeyAssign.Draw();
-				break;
-		}
-		//---------------------
-		#endregion
-
-		//#region [ 上部パネル ]
-		////---------------------
-		//if( this.tx上部パネル != null )
-		//	this.tx上部パネル.t2D描画( CDTXMania.app.Device, 0, 0 );
-		////---------------------
-		//#endregion
-		//#region [ 下部パネル ]
-		////---------------------
-		//if( this.tx下部パネル != null )
-		//	this.tx下部パネル.t2D描画( CDTXMania.app.Device, 0, 720 - this.tx下部パネル.szテクスチャサイズ.Height );
-		////---------------------
-		//#endregion
-
-		#region [ Option Panel ]
-		//---------------------
-		//this.actオプションパネル.On進行描画();
-		//---------------------
-		#endregion
-
-		#region [ FadeOut ]
-		//---------------------
-		switch (base.ePhaseID) {
-			case CStage.EPhase.Common_FADEIN:
-				if (this.actFIFO.Draw() != 0) {
-					base.ePhaseID = CStage.EPhase.Common_NORMAL;
-				}
-				break;
-
-			case CStage.EPhase.Common_FADEOUT:
-				if (this.actFIFO.Draw() == 0) {
-					break;
-				}
-				return 1;
-		}
-		//---------------------
-		#endregion
-
-		#region [ Enumerating Songs ]
-		// CActEnumSongs側で表示する
-		#endregion
-
-		// キー入力
-
-		if ((base.ePhaseID != CStage.EPhase.Common_NORMAL)
-			|| this.actKeyAssign.bKeyInputWaitMiddle)
-			return 0;
-
 		if (actCalibrationMode.IsStarted) {
+			// the calibration tap-test owns the screen + input until it finishes
 			if (OpenTaiko.Skin.bgmConfigScreen.bIsPlaying)
 				OpenTaiko.Skin.bgmConfigScreen.tStop();
-
 			actCalibrationMode.Update();
 			actCalibrationMode.Draw();
-		} else if (actList.ScoreIniImportThreadIsActive) {
-			HBlackBackdrop.Draw(191);
-
-			using (var prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale)) {
-				using (var status_text = new CTexture(prvFont.DrawText(
-						   CScoreIni_Importer.Status,
-						   Color.White,
-						   Color.Black,
-						   null,
-						   30,
-						   true))) {
-					status_text.t2D_DisplayImage_AnchorCenter(GameWindowSize.Width / 2, GameWindowSize.Height / 2);
-				}
-			}
-		}
-		// 曲データの一覧取得中は、キー入力を無効化する
-		else if (!OpenTaiko.EnumSongs.IsEnumerating || OpenTaiko.actEnumSongs.bCommandSongDataGet != true) {
+		} else {
 			if (!OpenTaiko.Skin.bgmConfigScreen.bIsPlaying)
 				OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
-			if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.FT)) {
-				OpenTaiko.Skin.soundCancelSFX.tPlay();
-				if (!this.bMenuFocus) {
-					if (this.eItemPanelMode == EItemPanelMode.KeyCodeList) {
-						OpenTaiko.stageConfig.tAssignCompleteNotify();
-						return 0;
-					}
-					bool wasEditingStringInput = this.actList.bIsFocusingParameter;
-					if (!this.actList.bIsKeyAssignSelected && !wasEditingStringInput)   // #24525 2011.3.15 yyagi, #32059 2013.9.17 yyagi
-					{
-						this.bMenuFocus = true;
-					}
-					// Only reset the description panel when not simply cancelling a string text input.
-					if (!wasEditingStringInput)
-						this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
-					this.actList.tEscPressed();                              // #24525 2011.3.15 yyagi ESC押下時の右メニュー描画用
+			if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+				if (_model != null && _model.Keys.IsCapturing) {
+					// C# owns input this frame: poll the device sweep for the key being bound
+					_model.Keys.PollCaptureFrame();
 				} else {
-					this.actFIFO.tFadeOutStart();
-					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-				}
-			} else if ((OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.CY) || OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.RD)) || (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LC) || (OpenTaiko.ConfigIni.bEnterIsNotUsedInKeyAssignments && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)))) {
-				if (this.nCurrentMenuNumber == 3) {
-					// Exit
-					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					this.actFIFO.tFadeOutStart();
-					base.ePhaseID = CStage.EPhase.Common_FADEOUT;
-				} else if (this.bMenuFocus) {
-					OpenTaiko.Skin.soundDecideSFX.tPlay();
-					this.bMenuFocus = false;
-					this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
-				} else {
-					switch (this.eItemPanelMode) {
-						case EItemPanelMode.PadList:
-							bool bIsKeyAssignSelectedBeforeHitEnter = this.actList.bIsKeyAssignSelected;    // #24525 2011.3.15 yyagi
-							this.actList.tEnterPressed();
-
-							this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();
-
-							if (this.actList.bCurrentSelectedItemReturnToMenu) {
-								this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
-								if (bIsKeyAssignSelectedBeforeHitEnter == false)                            // #24525 2011.3.15 yyagi
-								{
-									this.bMenuFocus = true;
-								}
-							}
-							break;
-
-						case EItemPanelMode.KeyCodeList:
-							this.actKeyAssign.tEnterPressed();
-							break;
+					var r = UI?.Update();   // Lua handles nav/edit/cancel; returns "exit" at the top level
+					if (r != null && r.Length > 0 && (r[0] as string) == "exit") {
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
+						this.actFIFO.tFadeOutStart();
+						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
 					}
 				}
 			}
-			this.ctKeyRepeat.Up.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.UpArrow), new CCounter.KeyProcess(this.tCursorTopMove));
-			if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.SD)) {
-				this.tCursorTopMove();
-			}
-			this.ctKeyRepeat.Down.KeyIntervalFunc(OpenTaiko.InputManager.Keyboard.KeyPressing((int)SlimDXKeys.Key.DownArrow), new CCounter.KeyProcess(this.tCursorBottomMove));
-			if (OpenTaiko.Pad.bPressed(EKeyConfigPart.Taiko, EPad.LT)) {
-				this.tCursorBottomMove();
-			}
+			UI?.Draw();
+		}
+
+		switch (base.ePhaseID) {
+			case CStage.EPhase.Common_FADEIN:
+				if (this.actFIFO.Draw() != 0)
+					base.ePhaseID = CStage.EPhase.Common_NORMAL;
+				break;
+
+			case CStage.EPhase.Common_FADEOUT:
+				if (this.actFIFO.Draw() == 0)
+					break;
+				return 1;
 		}
 		return 0;
 	}
@@ -536,9 +379,6 @@ internal class CStageConfig : CStage {
 	private CTexture txDescriptionPanel;
 	//private CTexture tx背景;
 	private CTexture[,] txMenuItemLeft;
-
-	private LuaBackgroundWrapper Background;
-	private readonly LuaBackgroundState _state = new();
 
 	private void tCursorBottomMove() {
 		if (!this.bMenuFocus) {

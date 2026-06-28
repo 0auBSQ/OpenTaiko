@@ -187,7 +187,10 @@ public abstract partial class Game : IDisposable {
 	/// <summary>Apply the current <see cref="WindowMode"/> to the live window (no-op before the window exists; the
 	/// initial WindowOptions also seed it at creation). Borderless = an undecorated window filling the monitor.</summary>
 	private void ApplyWindowMode() {
-		if (Window_ == null) return;
+		// Skip entirely for a deliberately-hidden window (offline video export, --mode=record): the
+		// WindowState/WindowBorder/Size/Position setters below force a hidden GLFW window to show itself,
+		// which would pop the export window open. Export only reads the backbuffer, so it needs no mode.
+		if (Window_ == null || StartHidden) return;
 		switch (_windowMode) {
 			case 1:   // exclusive fullscreen
 				Window_.WindowBorder = WindowBorder.Resizable;

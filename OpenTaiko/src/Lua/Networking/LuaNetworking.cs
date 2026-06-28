@@ -156,6 +156,11 @@ namespace OpenTaiko {
 		/// host (id 1) + initial host-role holder, and return the encrypted room code carrying the connection
 		/// candidates + secrets {ip/ips/pub, stageid, payload, k, tok}. maxPlayers caps joiners (default 8).</summary>
 		public string CreateRoom(string stageId, string payload, int maxPlayers) {
+			// gated off by default; ConfigIni is always set in-game (null only in headless tests → allow)
+			if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections) {
+				Enqueue("error", 0, "", "Networking is disabled. Enable 'Allow LuaNetworking connections' in Settings (only with people you trust).");
+				return null;
+			}
 			Leave();
 			lock (_lock) {
 				_isHost = true; _selfId = 1; _hostRoleId = 1; _nextId = 2;
@@ -206,6 +211,10 @@ namespace OpenTaiko {
 		/// Tries the code's direct addresses first, then the P2P rendezvous (the host dials us back).
 		/// Returns false immediately only if the code itself is malformed.</summary>
 		public bool JoinRoom(string roomCode) {
+			if (OpenTaiko.ConfigIni != null && !OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections) {
+				Enqueue("error", 0, "", "Networking is disabled. Enable 'Allow LuaNetworking connections' in Settings (only with people you trust).");
+				return false;
+			}
 			var o = DecodeRoom(roomCode);
 			if (o == null) return false;
 			string stage = o["stageid"]?.ToString() ?? ""; string pay = o["payload"]?.ToString() ?? "";
