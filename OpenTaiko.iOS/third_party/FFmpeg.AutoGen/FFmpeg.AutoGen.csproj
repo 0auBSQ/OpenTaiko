@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- FFmpeg.AutoGen 5.1.1 from source, iOS only: upstream/ is fetched and patched by
+       scripts/fetch-ffmpeg-autogen.sh. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>FFmpeg.AutoGen</AssemblyName>
+    <RootNamespace>FFmpeg.AutoGen</RootNamespace>
+    <Version>5.1.1</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1705;169;108;1591;1573</NoWarn>
+  </PropertyGroup>
+
+  <Target Name="_RequireUpstreamSource" BeforeTargets="CoreCompile" Condition="!Exists('$(MSBuildThisFileDirectory)upstream/FFmpeg.cs')">
+    <Error Text="FFmpeg.AutoGen upstream source missing. Run OpenTaiko.iOS/scripts/fetch-ffmpeg-autogen.sh (deploy.sh runs it automatically)." />
+  </Target>
+
+</Project>

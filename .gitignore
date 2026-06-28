@@ -26,6 +26,11 @@ TestResults/
 # NuGet
 /packages
 
+# FFmpeg.AutoGen (iOS): upstream source fetched at build time + build output
+/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/upstream
+/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/bin
+/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/obj
+
 # FDK
 /FDK/bin
 

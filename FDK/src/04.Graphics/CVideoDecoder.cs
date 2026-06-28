@@ -11,6 +11,13 @@ namespace FDK;
 /// 演奏とは別のタイマーを使用しているので、ずれる可能性がある。
 /// </summary>
 public unsafe class CVideoDecoder : IDisposable {
+	static CVideoDecoder() {
+		// iOS links FFmpeg into the app as one framework (scripts/build-ffmpeg.sh), so resolve
+		// symbols from the main image instead of dlopen'ing per-library dylibs from RootPath.
+		if (OperatingSystem.IsIOS())
+			ffmpeg.GetOrLoadLibrary = _ => System.Runtime.InteropServices.NativeLibrary.GetMainProgramHandle();
+	}
+
 	public CVideoDecoder(string filename) {
 		if (!File.Exists(filename))
 			throw new FileNotFoundException(filename + " not found...");

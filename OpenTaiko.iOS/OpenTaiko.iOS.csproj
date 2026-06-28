@@ -9,6 +9,9 @@
     <!-- Use iossimulator-arm64 for simulator, ios-arm64 for device -->
     <RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
 
+    <!-- third_party holds separate projects; keep them out of this app's source globs (CS0436/CS0579). -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);third_party/**</DefaultItemExcludes>
+
     <!-- Application metadata -->
     <ApplicationId Condition="'$(ApplicationId)' == ''">com.opentaiko.OpenTaiko</ApplicationId>
     <XSAppIconAssets>Assets.xcassets/AppIcon.appiconset</XSAppIconAssets>
@@ -45,6 +48,21 @@
       <SmartLink>True</SmartLink>
     </NativeReference>
   </ItemGroup>
+
+  <!-- FFmpeg decode libs merged into one dynamic framework (scripts/build-ffmpeg.sh). Must stay
+       dynamic: a static link localizes the symbols and breaks FFmpeg.AutoGen's dlsym lookup. -->
+  <ItemGroup>
+    <NativeReference Include="Frameworks/ffmpeg.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+
+  <!-- Fail loudly when UseVendoredFFmpeg is missing: the NuGet binding it would silently fall
+       back to throws PlatformNotSupportedException on iOS. deploy.sh passes it globally. -->
+  <Target Name="_RequireVendoredFFmpeg" BeforeTargets="CoreCompile" Condition="'$(UseVendoredFFmpeg)' != 'true'">
+    <Error Text="Build the iOS app with deploy.sh (or pass -p:UseVendoredFFmpeg=true). Without it FFmpeg.AutoGen resolves to the desktop NuGet package, which throws PlatformNotSupportedException on iOS." />
+  </Target>
 
   <!-- BASS audio libraries for iOS (from un4seen.com) -->
   <ItemGroup>

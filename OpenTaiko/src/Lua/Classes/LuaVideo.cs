@@ -28,7 +28,8 @@ namespace OpenTaiko {
 		// Attach the decoder once it's been opened off-thread (async-load path) + apply any buffered play state.
 		// Until then every method no-ops and Texture returns empty, so the video just starts when it's ready.
 		internal void SetVideo(CVideoDecoder video) {
-			if (_disposedValue) { video.Dispose(); return; }   // disposed before the open finished → don't leak
+			if (_disposedValue) { System.Diagnostics.Trace.TraceInformation("[vopen] attached after dispose; dropping"); video.Dispose(); return; }   // disposed before the open finished → don't leak
+			System.Diagnostics.Trace.TraceInformation("[vopen] attached"); // DEBUG probe
 			_video = video;
 			if (_pendingSeek.HasValue) video.Seek((long)(_pendingSeek.Value * 1000.0));
 			if (_pendingSpeed.HasValue) video.dbPlaySpeed = _pendingSpeed.Value;
@@ -136,6 +137,7 @@ namespace OpenTaiko {
 				// load phase the bar waits for it (NotePending/NoteDone). Works from onStart OR activate.
 				bool inPhase = CAsyncLoad.Active;
 				if (inPhase) CAsyncLoad.NotePending();
+				System.Diagnostics.Trace.TraceInformation($"[vopen] queue {path} inPhase={inPhase}"); // DEBUG probe
 				Task.Run(() => {
 					try {
 						var vid = new CVideoDecoder(full_path);

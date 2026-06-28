@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\FDK\FDK.csproj" />
+    <!-- BuildingAsLibrary is local to OpenTaiko. Undefine it here and below to avoid rebuilding FDK
+         when not needed. -->
+    <ProjectReference Include="..\FDK\FDK.csproj" UndefineProperties="BuildingAsLibrary" />
+    <!-- The iOS build sets UseVendoredFFmpeg=true and compiles from source instead of using Nuget.
+         See OpenTaiko.iOS/third_party/FFmpeg.AutoGen/README.md. -->
+    <PackageReference Include="FFmpeg.AutoGen" Version="5.1.1" Condition="'$(UseVendoredFFmpeg)' != 'true'" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../OpenTaiko.iOS/third_party/FFmpeg.AutoGen/FFmpeg.AutoGen.csproj" Condition="'$(UseVendoredFFmpeg)' == 'true'" UndefineProperties="BuildingAsLibrary" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LightningDB" Version="0.18.1" />
