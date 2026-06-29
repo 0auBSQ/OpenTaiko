@@ -12,6 +12,8 @@ public partial class GameViewController {
 
 	// HID usage codes: D=0x07(Ka-left), F=0x09(Don-left), J=0x0D(Don-right), K=0x0E(Ka-right), Escape=0x29
 	private const long HID_D = 0x07, HID_F = 0x09, HID_J = 0x0D, HID_K = 0x0E, HID_ESC = 0x29;
+	// Arrow-pad / confirm HID codes for the config-menu D-pad (the new Lua config UI navigates by arrow keys).
+	private const long HID_RIGHT = 0x4F, HID_LEFT = 0x50, HID_DOWN = 0x51, HID_UP = 0x52, HID_RETURN = 0x28;
 
 	// Escape zone (normalized coords)
 	private static readonly CGRect EscapeZone = new CGRect(0, 0, 0.10, 0.15);
@@ -23,6 +25,9 @@ public partial class GameViewController {
 	private double DonRadius => (global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumVisual ?? 30) / 100.0;
 
 	private UIView? _touchOverlay;
+	// Config-menu D-pad overlay (software arrow keys). Shown only in the Config stage.
+	private UIView? _arrowOverlay;
+	private bool _arrowNavMode;
 
 	private void CreateTouchOverlay() {
 		_touchOverlay = new UIView(View!.Bounds) {
@@ -94,7 +99,7 @@ public partial class GameViewController {
 		base.TouchesBegan(touches, evt);
 		foreach (UITouch touch in touches.Cast<UITouch>()) {
 			var location = touch.LocationInView(View);
-			long hidCode = HitTestTouchZone(location);
+			long hidCode = _arrowNavMode ? HitTestArrowZone(location) : HitTestTouchZone(location);
 			if (hidCode >= 0) {
 				_keyboardInput?.TouchKeyDown(hidCode);
 			}
@@ -107,5 +112,68 @@ public partial class GameViewController {
 
 	public override void TouchesCancelled(NSSet touches, UIEvent? evt) {
 		base.TouchesCancelled(touches, evt);
+	}
+
+	// ---- Config-menu software D-pad: synthesizes the arrow/Return keys the Lua config UI reads ----------------
+
+	// Bottom-right cross of arrow buttons + a centre OK. The same rects drive the visuals and the hit-test.
+	private (CGRect rect, long hid)[] ArrowButtons() {
+		var b = View!.Bounds;
+		var safe = View.SafeAreaInsets;
+		nfloat sz = 72, gap = 6;
+		nfloat step = sz + gap;
+		nfloat cx = b.Width - safe.Right - 24 - step - sz / 2;
+		nfloat cy = b.Height - safe.Bottom - 24 - step - sz / 2;
+		return new (CGRect, long)[] {
+			(new CGRect(cx - sz / 2, cy - sz / 2 - step, sz, sz), HID_UP),
+			(new CGRect(cx - sz / 2, cy - sz / 2 + step, sz, sz), HID_DOWN),
+			(new CGRect(cx - sz / 2 - step, cy - sz / 2, sz, sz), HID_LEFT),
+			(new CGRect(cx - sz / 2 + step, cy - sz / 2, sz, sz), HID_RIGHT),
+			(new CGRect(cx - sz / 2, cy - sz / 2, sz, sz), HID_RETURN),
+		};
+	}
+
+	private static UILabel MakeOverlayButton(CGRect rect, string text, nfloat fontSize) {
+		var v = new UILabel(rect) {
+			BackgroundColor = UIColor.FromRGBA(0.10f, 0.10f, 0.12f, 0.72f),
+			Text = text,
+			TextColor = UIColor.White,
+			TextAlignment = UITextAlignment.Center,
+			Font = UIFont.BoldSystemFontOfSize(fontSize),
+		};
+		v.Layer.CornerRadius = 10;
+		v.Layer.BorderWidth = 1.5f;
+		v.Layer.BorderColor = UIColor.White.ColorWithAlpha(0.7f).CGColor;
+		v.ClipsToBounds = true;
+		return v;
+	}
+
+	// Built once (lazily from OnFrame); toggled visible only while in the Config stage.
+	private void CreateArrowOverlay() {
+		_arrowOverlay = new UIView(View!.Bounds) {
+			UserInteractionEnabled = false,
+			BackgroundColor = UIColor.Clear,
+			Hidden = true,
+		};
+		var b = View.Bounds;
+		var safe = View.SafeAreaInsets;
+		// ESC (top-left), mirroring the drum overlay so back/exit still works.
+		var escRect = new CGRect(safe.Left + 8, safe.Top + 8, EscapeZone.Width * b.Width - 8, EscapeZone.Height * b.Height - 8);
+		_arrowOverlay.AddSubview(MakeOverlayButton(escRect, "ESC", 14));
+		foreach (var (rect, hid) in ArrowButtons()) {
+			string label = hid == HID_UP ? "▲" : hid == HID_DOWN ? "▼" : hid == HID_LEFT ? "◄" : hid == HID_RIGHT ? "►" : "OK";
+			_arrowOverlay.AddSubview(MakeOverlayButton(rect, label, hid == HID_RETURN ? 18 : 24));
+		}
+		View.AddSubview(_arrowOverlay);
+	}
+
+	private long HitTestArrowZone(CGPoint location) {
+		var b = View!.Bounds;
+		var safe = View.SafeAreaInsets;
+		if (location.X <= safe.Left + EscapeZone.Width * b.Width && location.Y <= safe.Top + EscapeZone.Height * b.Height)
+			return HID_ESC;
+		foreach (var (rect, hid) in ArrowButtons())
+			if (rect.Contains(location)) return hid;
+		return -1;
 	}
 }
