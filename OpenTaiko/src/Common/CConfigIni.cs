@@ -538,6 +538,13 @@ internal class CConfigIni : INotifyPropertyChanged {
 	/// </summary>
 	public int nGameEventBroadcastingPort;
 
+	/// <summary>
+	/// Allow Lua scripts (the NET global / OpenTaiko Online) to open and join online rooms. Off by default:
+	/// sharing a room code shares your IP address, so this should only be enabled with people you trust.
+	/// While off, hosting/joining fails with a surfaced "networking is disabled" error.
+	/// </summary>
+	public bool bAllowLuaNetworkingConnections;
+
 	#region [ STRANGE ]
 
 	public STRANGE nHitRangeMs;
@@ -982,6 +989,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		SendDiscordPlayingInformation = true;
 		bEnableGameEventBroadcasting = false;
 		nGameEventBroadcastingPort = 2354;
+		bAllowLuaNetworkingConnections = false;
 
 		#region[ Ver.K追加 ]
 
@@ -1398,6 +1406,10 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine();
 		sw.WriteLine("; Port for game event broadcasting.");
 		sw.WriteLine("{0}={1}", nameof(nGameEventBroadcastingPort), nGameEventBroadcastingPort);
+		sw.WriteLine();
+		sw.WriteLine("; Allow Lua scripts to open/join online rooms. (0:OFF, 1:ON)");
+		sw.WriteLine("; WARNING: sharing a room code shares your IP address - only enable with people you trust.");
+		sw.WriteLine("{0}={1}", nameof(bAllowLuaNetworkingConnections), bAllowLuaNetworkingConnections ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; 再生速度変更を、ピッチ変更で行うかどうか(0:ピッチ変更, 1:タイムストレッチ"); // #23664 2013.2.24 yyagi
 		sw.WriteLine("; (WASAPI/ASIO使用時のみ有効) ");
@@ -2184,6 +2196,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case nameof(this.nGameEventBroadcastingPort):
 				this.nGameEventBroadcastingPort = CConversion.ParseIntInRange(value, 0, 65535, this.nGameEventBroadcastingPort);
+				break;
+			case nameof(this.bAllowLuaNetworkingConnections):
+				this.bAllowLuaNetworkingConnections = CConversion.bONorOFF(value[0]);
 				break;
 			case "TimeStretch":
 				this.bTimeStretch = CConversion.bONorOFF(value[0]);

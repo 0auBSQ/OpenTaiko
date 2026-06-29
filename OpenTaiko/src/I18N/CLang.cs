@@ -58,6 +58,10 @@ internal class CLang {
 		return File.Exists(out_path);
 	}
 
+	/// <summary>True if this language file actually defines <paramref name="key"/> (so callers can fall back to
+	/// another source, e.g. a per-skin locale, instead of getting the InvalidKey placeholder).</summary>
+	public bool HasString(string key) => Entries != null && Entries.ContainsKey(key);
+
 	public string GetString(string key) {
 		return (Entries.TryGetValue(key, out string? value)) ? value : InvalidKey.SafeFormat(key);
 	}
