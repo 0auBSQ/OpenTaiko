@@ -25,12 +25,28 @@ public partial class CTexture {
 	[ThreadStatic] public static bool AsyncLoad;
 	public static volatile bool SyncForce;       // force inline decode + upload (CreateTextureSync)
 
-	private struct StreamItem { public CTexture tex; public string path; public bool black; public bool inPhase; public int gen; }
-	private static readonly ConcurrentQueue<StreamItem> _pending = new();
-	private static int _phaseTotal, _phaseDone, _phaseGen;
-	private static int _decodeWorkers;
+	private class Phase {
+		public ConcurrentQueue<StreamItem> Pending = new();
+		public int Done = 0;
+
+		public int Total => Pending.Count + Volatile.Read(ref Done);
+		public float Fraction {
+			get {
+				var done = Volatile.Read(ref Done);
+				return this.Pending.IsEmpty ? 1f
+					: done <= 0 ? 0f
+					: Math.Min(1f, 1 / (float)(this.Pending.Count / (float)done + 1)); // = done / (count + done)
+			}
+		}
+	};
+
+	private struct StreamItem { public CTexture tex; public string path; public bool black; public Phase? phase; }
+	private static readonly ConcurrentQueue<Phase> _phaseOlds = new();
+	private static Phase _phaseNow = new();
+	private static readonly ManualResetEventSlim _canDecodeBytes = new(true);
 	private static long _readyBytes;                                       // decoded-but-not-uploaded bytes (backpressure)
 	private static readonly int _maxWorkers = Math.Max(2, Environment.ProcessorCount / 2);
+	private static readonly SemaphoreSlim _spareDecodeWorkers = new(_maxWorkers, _maxWorkers);
 
 	// ── Cached file existence ─────────────────────────────────────────────────────────────────────
 	// A stage activation checks existence for hundreds of texture paths. On systems where the game folder is
@@ -64,10 +80,9 @@ public partial class CTexture {
 	public static void ClearFileListCache() => _dirListCache.Clear();
 
 	/// <summary>Loading-bar progress 0..1 for the current load phase (1 when nothing is queued).</summary>
-	public static float StreamFraction => Volatile.Read(ref _phaseTotal) <= 0 ? 1f
-		: Math.Min(1f, Volatile.Read(ref _phaseDone) / (float)Volatile.Read(ref _phaseTotal));
+	public static float StreamFraction => Volatile.Read(ref _phaseNow).Fraction;
 	/// <summary>True once every texture queued during the current phase has been uploaded (or skipped).</summary>
-	public static bool StreamComplete => Volatile.Read(ref _phaseDone) >= Volatile.Read(ref _phaseTotal);
+	public static bool StreamComplete => Volatile.Read(ref _phaseNow).Pending.IsEmpty;
 
 	/// <summary>Queue a path-load for background decode + render-thread upload. Returns false only if the file is
 	/// missing (→ the caller's inline path handles it / throws). DELIBERATELY does NOT open the file to read the
@@ -77,9 +92,8 @@ public partial class CTexture {
 	private bool tQueueAsyncTexture(string strFileName, bool bBlackTransparent) {
 		if (!FileExistsCached(strFileName))
 			return false;
-		bool inPhase = StreamingLoad;
-		if (inPhase) Interlocked.Increment(ref _phaseTotal);
-		_pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, inPhase = inPhase, gen = Volatile.Read(ref _phaseGen) });
+		var phase = Volatile.Read(ref _phaseNow);
+		phase.Pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, phase = phase });
 		EnsureDecodeWorkers();
 		return true;
 	}
@@ -87,29 +101,43 @@ public partial class CTexture {
 	// Ensure up to _maxWorkers decode tasks are draining _pending. Decode-only on a capped pool → leaves cores
 	// for the render thread; tasks exit when the queue empties and restart on new work.
 	private static void EnsureDecodeWorkers() {
-		while (true) {
-			int cur = Volatile.Read(ref _decodeWorkers);
-			if (cur >= _maxWorkers) return;
-			if (Interlocked.CompareExchange(ref _decodeWorkers, cur + 1, cur) == cur) break;
-		}
-		System.Threading.Tasks.Task.Run(DecodeLoop);
+		if (_spareDecodeWorkers.Wait(0))
+			System.Threading.Tasks.Task.Run(DecodeLoop);
 	}
 
 	private static void DecodeLoop() {
 		const long readyByteCap = 96L * 1024 * 1024;
+		var phaseNow = Volatile.Read(ref _phaseNow);
 		try {
-			while (_pending.TryDequeue(out var item)) {
-				// Backpressure: don't decode faster than the render thread uploads (bounded memory).
-				while (Volatile.Read(ref _readyBytes) >= readyByteCap) System.Threading.Thread.Sleep(1);
-				if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
-				SKBitmap? bmp = tDecodeForUpload(item.path);
-				if (bmp != null) Interlocked.Add(ref _readyBytes, bmp.ByteCount);
-				var captured = item;
-				Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp));
+			void dequeue(Phase phase) {
+				while (phase.Pending.TryDequeue(out var item)) {
+					// Backpressure: don't decode faster than the render thread uploads (bounded memory).
+					bool multipleWorkers = _maxWorkers - _spareDecodeWorkers.CurrentCount > 1;
+					while (multipleWorkers && Volatile.Read(ref _readyBytes) >= readyByteCap) {
+						_canDecodeBytes.Reset();
+						_canDecodeBytes.Wait();
+					}
+					if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
+					SKBitmap? bmp = tDecodeForUpload(item.path);
+					if (bmp != null)
+						Interlocked.Add(ref _readyBytes, bmp.ByteCount);
+					var captured = item;
+					Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp));
+				}
 			}
+			while (_phaseOlds.TryDequeue(out var phase)) {
+				if (phase != null)
+					dequeue(phase);
+			}
+			dequeue(Volatile.Read(ref _phaseNow));
 		} finally {
-			Interlocked.Decrement(ref _decodeWorkers);
-			if (!_pending.IsEmpty) EnsureDecodeWorkers();   // an item raced in just as this worker exited
+			try {
+				_spareDecodeWorkers.Release();
+			} catch (SemaphoreFullException) {
+				// ignore unpaired Wait/Release
+			}
+			if (!Volatile.Read(ref _phaseNow).Pending.IsEmpty)
+				EnsureDecodeWorkers();   // an item raced in just as this worker exited
 		}
 	}
 
@@ -121,7 +149,11 @@ public partial class CTexture {
 				item.tex.MakeTexture(bmp, item.black);
 		} catch { /* leave the stub blank on upload failure */ }
 		finally {
-			if (bmp != null) { Interlocked.Add(ref _readyBytes, -bmp.ByteCount); bmp.Dispose(); }
+			if (bmp != null) {
+				Interlocked.Add(ref _readyBytes, -bmp.ByteCount);
+				_canDecodeBytes.Set();
+				bmp.Dispose();
+			}
 			CompleteItem(item);
 		}
 	}
@@ -129,8 +161,8 @@ public partial class CTexture {
 	// Count a phase item toward the bar — but only for the CURRENT generation, so stale items from an ended or
 	// cancelled phase can't corrupt a new phase's progress.
 	private static void CompleteItem(StreamItem item) {
-		if (item.inPhase && item.gen == Volatile.Read(ref _phaseGen))
-			Interlocked.Increment(ref _phaseDone);
+		if (item.phase != null)
+			Interlocked.Increment(ref item.phase.Done);
 	}
 
 	/// <summary>Decode an image to BGRA8888 UNPREMUL so the GL upload is zero-copy (GetPixels) and matches the
@@ -151,13 +183,17 @@ public partial class CTexture {
 		try { return SKBitmap.Decode(path); } catch { return null; }
 	}
 
+	private static void NextPhase() {
+		var phase = Interlocked.Exchange(ref _phaseNow, new());
+		if (phase != null && !phase.Pending.IsEmpty)
+			_phaseOlds.Enqueue(phase);
+	}
+
 	// ── Load-phase API (CAsyncLoad / CStageSongLoading) ─────────────────────────────────────────────
 	/// <summary>Begin a load phase: queued textures count toward the bar. A new generation detaches any still
 	/// in-flight items from a previous phase. Render thread, before the streamed activation.</summary>
 	public static void BeginStreaming() {
-		Interlocked.Increment(ref _phaseGen);
-		Interlocked.Exchange(ref _phaseTotal, 0);
-		Interlocked.Exchange(ref _phaseDone, 0);
+		NextPhase();
 		StreamingLoad = true;
 	}
 
@@ -167,15 +203,16 @@ public partial class CTexture {
 	public static void PumpUploads(double budgetMs) { }
 
 	/// <summary>End a load phase normally (all items uploaded).</summary>
-	public static void EndStreaming() { StreamingLoad = false; }
+	public static void EndStreaming() {
+		StreamingLoad = false;
+		NextPhase();
+	}
 
 	/// <summary>Cancel a load phase (ESC mid-load): stop counting + reset the bar. In-flight uploads to the
 	/// torn-down textures skip via the disposed check; the new generation detaches their counting. Call BEFORE
 	/// the screen's DeActivate disposes the stub textures.</summary>
 	public static void CancelStreaming() {
 		StreamingLoad = false;
-		Interlocked.Increment(ref _phaseGen);
-		Interlocked.Exchange(ref _phaseTotal, 0);
-		Interlocked.Exchange(ref _phaseDone, 0);
+		NextPhase();
 	}
 }
