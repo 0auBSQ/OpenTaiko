@@ -104,6 +104,7 @@ internal class CStageTransition : CStage {
 
 	// The stage being transitioned to (mounted by this transition / the load; the main loop reads it once finished).
 	public CStage? Target { get; private set; }
+	public int? TargetDrawLoopReturnValue { get; private set; }
 
 	// Set when a load was cancelled (ESC): the main loop sends the player to CancelTarget instead of Target.
 	public bool Canceled { get; private set; }
@@ -114,9 +115,9 @@ internal class CStageTransition : CStage {
 	public bool RevealingGameplay => _revealsGameplay && _phase == Phase.FadeIn;
 
 	// Pending-script handoff: set by the requesting stage's Exit, consumed by UnmountAndChangeStage.
-	private static LuaTransitionWrapper? _pendingScript;
-	public static void SetPendingScript(LuaTransitionWrapper script) => _pendingScript = script;
-	public static LuaTransitionWrapper? ConsumePendingScript() { var s = _pendingScript; _pendingScript = null; return s; }
+	private static (CStage stage, LuaTransitionWrapper script)? _pendingScript;
+	public static void SetPendingScript(CStage stage, LuaTransitionWrapper script) => _pendingScript = (stage, script);
+	public static (CStage stage, LuaTransitionWrapper script)? ConsumePendingScript() { var s = _pendingScript; _pendingScript = null; return s; }
 	public static void ClearPendingScript() => _pendingScript = null;
 
 	// The right load step for a target stage: a Lua stage activates incrementally; anything else mounts in one shot.
@@ -138,6 +139,7 @@ internal class CStageTransition : CStage {
 		}
 		_outgoing = outgoing;
 		Target = target;
+		TargetDrawLoopReturnValue = null;
 		_session = load != null ? new CLoadSession(load, manageAssetPhase: !opts.NoAssetPhase) : null;
 		_loaderDrivesBar = opts.LoaderDrivesBar;
 		_revealsGameplay = opts.RevealsGameplay;
@@ -162,8 +164,9 @@ internal class CStageTransition : CStage {
 	public override int Draw() {
 		switch (_phase) {
 			case Phase.FadeOut: {
-				_outgoing?.Draw();
-				double t = Math.Clamp(Elapsed(_phaseStart) / FadeOutSeconds, 0.0, 1.0);
+				int ret = _outgoing?.Draw() ?? 0;
+				bool endEarly = (EReturnValue)ret != EReturnValue.Continuation;
+				double t = endEarly ? 1.0 : Math.Clamp(Elapsed(_phaseStart) / FadeOutSeconds, 0.0, 1.0);
 				_script?.FadeOut(t);
 				if (t >= 1.0) {
 					OpenTaiko.app.UnmountActivity(_outgoing);
@@ -217,8 +220,11 @@ internal class CStageTransition : CStage {
 			}
 
 			case Phase.FadeIn: {
-				Target?.Draw();
-				double t = Math.Clamp(Elapsed(_phaseStart) / FadeInSeconds, 0.0, 1.0);
+				var ret = Target?.Draw() ?? 0;
+				bool endEarly = (EReturnValue)ret != EReturnValue.Continuation;
+				if (endEarly)
+					TargetDrawLoopReturnValue = ret;
+				double t = endEarly ? 1.0 : Math.Clamp(Elapsed(_phaseStart) / FadeInSeconds, 0.0, 1.0);
 				_script?.FadeIn(t);
 				if (t >= 1.0) {
 					_phase = Phase.Idle;
