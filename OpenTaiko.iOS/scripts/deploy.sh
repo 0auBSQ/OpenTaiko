@@ -124,6 +124,7 @@ bootstrap_ios_deps() {
   [[ -d "OpenTaiko.iOS/Libs/bass24-ios" ]] || bash OpenTaiko.iOS/scripts/download-bass.sh
   [[ -d "OpenTaiko.iOS/Frameworks/liblua54.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lua54.sh
   [[ -d "OpenTaiko.iOS/Frameworks/liblmdb.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lmdb.sh
+  [[ -f "OpenTaiko.iOS/Assets.xcassets/AppIcon.appiconset/icon_1024.png" ]] || bash OpenTaiko.iOS/scripts/build-appicons.sh
 }
 
 # ios_build <config> <rid> [extra dotnet args...]
