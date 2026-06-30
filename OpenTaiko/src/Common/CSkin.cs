@@ -702,22 +702,26 @@ internal class CSkin : IDisposable {
 	public void PreloadSystemSounds() {
 		int count = this.listSystemSound.Count;
 		for (int i = 0; i < count; ++i) { // concurrent
-			var snd = this.listSystemSound.ElementAtOrDefault(i);
-			if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
-			{
-				CSystemSound cSystemSound = snd;
-				if (cSystemSound.bCompactTarget) {
-					try {
-						cSystemSound.tLoading();
-						Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
-					} catch (FileNotFoundException e) {
-						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドが存在しません。({0})", cSystemSound.strFileName);
-					} catch (Exception e) {
-						Trace.TraceWarning(e.ToString());
-						Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cSystemSound.strFileName);
+			try {
+				var snd = this.listSystemSound.ElementAtOrDefault(i);
+				if (snd != null && !snd.bExclusive)   // BGM系以外のみ読み込む。(BGM系は必要になったときに読み込む)
+				{
+					CSystemSound cSystemSound = snd;
+					if (cSystemSound.bCompactTarget) {
+						try {
+							cSystemSound.tLoading();
+							Trace.TraceInformation("システムサウンドを読み込みました。({0})", cSystemSound.strFileName);
+						} catch (FileNotFoundException e) {
+							Trace.TraceWarning(e.ToString());
+							Trace.TraceWarning("システムサウンドが存在しません。({0})", cSystemSound.strFileName);
+						} catch (Exception e) {
+							Trace.TraceWarning(e.ToString());
+							Trace.TraceWarning("システムサウンドの読み込みに失敗しました。({0})", cSystemSound.strFileName);
+						}
 					}
 				}
+			} catch (InvalidOperationException) {
+				// ignore this elements
 			}
 			// Boot loading bar: modules 0-60%, then system sounds 60-66%, then textures 66-100%.
 			CLoadingProgress.ReportSegment(0.60f, 0.66f, i + 1, count);
@@ -867,10 +871,14 @@ internal class CSkin : IDisposable {
 
 	public void tRemoveMixerAll() {
 		for (int i = 0; i < this.listSystemSound.Count; ++i) { // concurrent
-			var snd = this.listSystemSound.ElementAtOrDefault(i);
-			if (snd?.bLoadedSuccessfuly ?? false) {
-				snd.tStop();
-				snd.tRemoveMixer();
+			try {
+				var snd = this.listSystemSound.ElementAtOrDefault(i);
+				if (snd?.bLoadedSuccessfuly ?? false) {
+					snd.tStop();
+					snd.tRemoveMixer();
+				}
+			} catch (InvalidOperationException) {
+				// ignore this element
 			}
 		}
 

@@ -364,9 +364,9 @@ internal class OpenTaiko : Game {
 	public void UnmountAndChangeStage(CStage Stage, string? traceMessage = null) {
 		// A Lua Exit(...) requested a transition: hand the switch to CStageTransition (it renders the still-
 		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
-		var pendingTransition = CStageTransition.ConsumePendingScript();
-		if (pendingTransition != null && Stage != null) {
-			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pendingTransition, traceMessage);
+		var pending = CStageTransition.ConsumePendingScript();
+		if (rCurrentStage == pending?.stage && Stage != null) {
+			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pending.Value.script, traceMessage);
 			rPreviousStage = rCurrentStage;
 			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
 			return;
@@ -681,6 +681,7 @@ internal class OpenTaiko : Game {
 				}
 				#endregion
 
+			handleDrawLoopReturnValue:
 				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.None:
 						break;
@@ -716,6 +717,11 @@ internal class OpenTaiko : Game {
 								CStage? _target = stageTransition.Target;
 								stageTransition.Finish();
 								rCurrentStage = _target ?? rCurrentStage;
+								// forward target's return value
+								if (stageTransition.TargetDrawLoopReturnValue != null && rCurrentStage != stageTransition) {
+									this.nDrawLoopReturnValue = stageTransition.TargetDrawLoopReturnValue.Value;
+									goto handleDrawLoopReturnValue;
+								}
 							}
 						}
 						break;
