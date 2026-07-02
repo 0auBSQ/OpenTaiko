@@ -121,9 +121,8 @@ class TextureLoader {
 		// Match .png case-insensitively so mixed-case frame names work on case-sensitive filesystems (iOS).
 		if (!Directory.Exists(folder)) return null;
 		var byIndex = new Dictionary<int, string>();
-		foreach (var file in Directory.EnumerateFiles(folder)) {
-			if (Path.GetExtension(file).Equals(".png", StringComparison.OrdinalIgnoreCase)
-				&& int.TryParse(Path.GetFileNameWithoutExtension(file), out int n))
+		foreach (var file in Directory.EnumerateFiles(folder, "*.png", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })) {
+			if (int.TryParse(Path.GetFileNameWithoutExtension(file), out int n))
 				byIndex[n] = file;
 		}
 		var textures = new List<CTexture>();
