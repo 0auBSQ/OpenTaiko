@@ -629,6 +629,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			if (codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
 				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
 				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+				// t2DDraw reads rcFullImage before the deferred upload sets it, so set it here too.
+				this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
 				this._deferred = true;
 				return;
 			}
