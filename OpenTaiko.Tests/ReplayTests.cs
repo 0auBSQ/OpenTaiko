@@ -19,9 +19,9 @@ namespace OpenTaikoTests {
 			return (dir, tja);
 		}
 
-		private static CSongReplay Save(string tja, string uid, int diff, int score, int mods, int seed, long ts) {
+		private static CSongReplay Save(string tja, string uid, int diff, int score, int mods, int seed, long ts, int version = 601) {
 			var r = new CSongReplay(tja, 0) {
-				GameMode = 0, GameVersion = 601, PlayerName = "Tester",
+				GameMode = 0, GameVersion = version, PlayerName = "Tester",
 				GoodCount = 50, OkCount = 10, BadCount = 2, RollCount = 5, MaxCombo = 60, BoomCount = 1, ADLibCount = 3,
 				Score = score, ClearStatus = 2, ScoreRank = 5,
 				ModFlags = mods, RandomSeed = seed, Timestamp = ts,
@@ -63,6 +63,10 @@ namespace OpenTaikoTests {
 				Assert.Equal(3, h.ChartDifficulty);
 				Assert.Equal(4242, h.RandomSeed);
 				Assert.True(h.Watchable);                 // mirror is deterministic
+				// chart md5 captured (written by the ctor) + current-version replay carries no warning
+				string md5 = Convert.ToHexString(MD5.HashData(File.ReadAllBytes(tja)));
+				Assert.Equal(md5, h.ChartChecksum);
+				Assert.False(h.OldVersion);
 				// judge counts (shown on the best-plays card)
 				Assert.Equal(50, h.Good); Assert.Equal(10, h.Ok); Assert.Equal(2, h.Bad);
 				Assert.Equal(5, h.Roll); Assert.Equal(60, h.MaxCombo); Assert.Equal(1, h.Boom); Assert.Equal(3, h.ADLib);
@@ -145,6 +149,53 @@ namespace OpenTaikoTests {
 				Assert.True(result.GetType().IsArray);
 				Assert.Equal(2, result.Length);
 				Assert.Equal(200, result[0].Score);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
+		public void ListReplays_FlagsChecksumMismatch_WhenChartEdited() {
+			var (dir, tja) = NewSong();
+			try {
+				Save(tja, "uid-A", 3, 100, 0, -1, 1);
+				// unchanged chart: no mismatch
+				var list = CSongReplay.tListReplays(dir, "uid-A", 3, 50, tja);
+				Assert.Single(list);
+				Assert.False(list[0].ChecksumMismatch);
+				// edit the chart -> md5 differs -> mismatch flagged
+				File.AppendAllText(tja, "\n// edited after the play\n");
+				list = CSongReplay.tListReplays(dir, "uid-A", 3, 50, tja);
+				Assert.True(list[0].ChecksumMismatch);
+				// without a chartPath the flag stays off (nothing to compare against)
+				list = CSongReplay.tListReplays(dir, "uid-A", 3, 50);
+				Assert.False(list[0].ChecksumMismatch);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
+		public void ListReplays_FlagsOldVersion() {
+			var (dir, tja) = NewSong();
+			try {
+				Save(tja, "uid-A", 3, 100, 0, -1, 1, version: 600);   // pre-601 replay
+				var list = CSongReplay.tListReplays(dir, "uid-A", 3, 50);
+				Assert.Single(list);
+				Assert.True(list[0].OldVersion);
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
+		public void EvaluateWarnings_SetsPlaybackFlags() {
+			var (dir, tja) = NewSong();
+			try {
+				Save(tja, "uid-A", 3, 100, 0, -1, 1);
+				string file = Directory.GetFiles(Path.Combine(dir, "Replay"), "Replay_*.optkr")[0];
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				rep.tEvaluateWarnings(tja);
+				Assert.False(rep.WarnOldVersion);
+				Assert.False(rep.WarnChecksumMismatch);
+				File.AppendAllText(tja, "\n// edited\n");
+				rep.tEvaluateWarnings(tja);
+				Assert.True(rep.WarnChecksumMismatch);
 			} finally { Directory.Delete(dir, true); }
 		}
 

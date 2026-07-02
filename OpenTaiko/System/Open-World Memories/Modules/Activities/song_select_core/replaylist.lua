@@ -6,6 +6,9 @@
 -- animation come from PopUI widgets, but hover/press are driven here by the mouse so Enter never activates a
 -- card. Clicking a watchable card opens a confirm showing the play's rank/score/date/player; confirming arms
 -- the replay (REPLAY:Watch) and mounts the chart, then song_select_core returns "play".
+--
+-- Scrolling is smooth (eased pixel offset) with a draggable scrollbar; cards sliding past the strip's top or
+-- bottom fade out across a short band (no scissor in the draw API, so the fade is the clean clip).
 
 local PopUI = require("PopUI")
 
@@ -14,6 +17,7 @@ local G            -- shared state injected by Script.lua
 local ui           -- PopUI manager (widget baking + theme + sfx)
 local cards = {}   -- pool of card widgets, reused across scroll
 local dimCanvas    -- full-screen dim behind the confirm
+local warnTex      -- baked warning-triangle canvas (2x supersampled, drawn at half scale)
 
 -- ── Layout ──────────────────────────────────────────────────────────────────────
 -- Card vertical budget (local y, top-left origin; CARD_H = 212):
@@ -25,11 +29,17 @@ local STRIP_W   = 450
 local CARD_W    = 400
 local CARD_H    = 212
 local CARD_GAP  = 10
+local STEP      = CARD_H + CARD_GAP
 local CARD_X    = 1920 - STRIP_W + math.floor((STRIP_W - CARD_W) / 2)   -- 1495
-local LIST_TOP  = 262    -- moved down 150px
-local HEADER_Y  = 206    -- moved down 150px
-local ROWS      = 3      -- 262 + 3*(212+10) = 928 -> bottom 918 <= 1080
+local LIST_TOP  = 262
+local HEADER_Y  = 206
+local VISIBLE   = 3                              -- cards fully visible at once
+local POOL      = VISIBLE + 2                    -- pool covers the viewport + a partial card at each edge
+local VIEW_H    = VISIBLE * STEP - CARD_GAP      -- 656; viewport bottom = 918 <= 1080
+local VIEW_BOT  = LIST_TOP + VIEW_H
+local EDGE_FADE = 56                             -- fade band (px) at the viewport's top/bottom edges
 local PAD       = 18
+local SB_X, SB_W = CARD_X + CARD_W + 10, 6       -- scrollbar gutter right of the cards
 
 -- ── Theme (matches the settings menu: cool steel-blue, light card faces) ──────────
 local THEME = {
@@ -68,13 +78,18 @@ local JUDGES = {
     { tag = "ADL",   field = "ADLib", col = { 96, 150, 196 } },
 }
 
+local function clamp(v, lo, hi) if v < lo then return lo elseif v > hi then return hi else return v end end
+
 -- ── Init ──────────────────────────────────────────────────────────────────────
 function M.init(g)
     G = g
     G.replayList    = nil   -- best plays for the hovered chart+difficulty (a C# ReplayHeader[])
     G.replayListKey = nil   -- uniqueId/diff the list was fetched for
-    G.replayScroll  = 0      -- index of the top visible card
-    G.replayConfirm = nil    -- { filepath, diff, header, rank } while the confirm prompt is up
+    G.replayScroll  = 0      -- current scroll offset in PIXELS (eased toward M._scrollTarget)
+    G.replayConfirm = nil    -- { filepath, diff, header, rank, chartPath } while the confirm prompt is up
+    M._scrollTarget = 0
+    M._sbDrag       = false
+    M._lastTs       = nil
 end
 
 -- regular (performance) song select: the only mode that shows best plays / can launch a replay.
@@ -102,13 +117,16 @@ local function hoveredChart()
     return chart, bar.difficulty
 end
 
--- (re)fetch the ranked replay list when the hovered chart/difficulty changes
+-- (re)fetch the ranked replay list when the hovered chart/difficulty changes. Passing the chart file path lets
+-- C# flag each replay whose stored chart md5 no longer matches (chart edited since the play).
 local function refresh(chart, diff)
     local key = (chart.UniqueId or "") .. "/" .. diff
     if G.replayListKey == key and G.replayList ~= nil then return end
-    G.replayList    = REPLAY:ListReplays(chart.SongFolder, chart.UniqueId, diff, 50)
+    G.replayChartPath = chart.ChartPath
+    G.replayList    = REPLAY:ListReplays(chart.SongFolder, chart.UniqueId, diff, 50, chart.ChartPath)
     G.replayListKey = key
     G.replayScroll  = 0
+    M._scrollTarget = 0
 end
 
 -- ── Card content ────────────────────────────────────────────────────────────────
@@ -142,18 +160,43 @@ local function drawIconScaled(tex, cx, cy, scale, op)
     tex:SetOpacity(1)
 end
 
+-- bake a clean warning triangle (amber, dark outline, "!" cut in) at 2x; drawn at half scale so the edges are
+-- smoothed by the downscale filtering
+local function bakeWarnTriangle()
+    local W, H = 64, 56
+    local c = CANVAS:CreateCanvas(W, H)
+    c:Clear(0, 0, 0, 0)
+    local cx = W / 2
+    -- dark outline triangle (full size)
+    for y = 0, H - 1 do
+        local half = ((y + 1) / H) * (W / 2 - 1)
+        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 146, 96, 10, 255)
+    end
+    -- amber face, inset from the outline
+    for y = 6, H - 4 do
+        local half = ((y - 5) / (H - 9)) * (W / 2 - 5)
+        c:FillRect(math.floor(cx - half), y, math.max(1, math.floor(half * 2 + 0.5)), 1, 246, 189, 55, 255)
+    end
+    -- "!" glyph: rounded bar + dot, dark
+    c:FillRect(math.floor(cx - 3), 20, 6, 18, 84, 54, 4, 255)
+    c:FillRect(math.floor(cx - 2), 18, 4, 2, 84, 54, 4, 255)
+    c:FillRect(math.floor(cx - 3), 43, 6, 6, 84, 54, 4, 255)
+    c:Upload()
+    return c
+end
+
 -- draw one card's content; cx,cy = card centre, s = hover/press scale
 local function drawCardContent(slot, cx, cy, s)
     local r = slot.row
     if r == nil then return end
-    local op = slot.enabled and 1.0 or 0.45
+    local op = (slot.enabled and 1.0 or 0.45) * (slot.edgeFade or 1)
 
     -- local (card top-left origin) → screen, with the hover scale baked in
     local function lx(x) return cx + (x - CARD_W / 2) * s end
     local function ly(y) return cy + (y - CARD_H / 2) * s end
 
     -- rank / score / player / date (left column)
-    ui:drawText(22, "#" .. (slot.rank or 0), lx(PAD), ly(12), COL_ACCENT, op, s)
+    ui:drawText(22, string.format("#%d", slot.rank or 0), lx(PAD), ly(12), COL_ACCENT, op, s)
     ui:drawText(30, commas(r.Score),         lx(PAD), ly(40), COL_SCORE,  op, s)
     ui:drawText(17, r.PlayerName,            lx(PAD), ly(80), COL_TEXT,   op, s)
     ui:drawText(13, r.Date,                  lx(PAD), ly(100), COL_SUB,   op, s)
@@ -177,6 +220,17 @@ local function drawCardContent(slot, cx, cy, s)
         G.modicons_ro:Call("drawFlags", math.floor(lx(PAD)), math.floor(ly(166)),
             r.ModFlags, r.ScrollSpeed, r.SongSpeed, r.JudgeStrictness, "menu", op * 255)
     end
+
+    -- warning triangle (older replay version / chart edited since the play), top-left corner;
+    -- the details show in a tooltip while the card is hovered (see M.draw)
+    if r.OldVersion or r.ChecksumMismatch then
+        if warnTex == nil then warnTex = bakeWarnTriangle() end
+        warnTex:SetScale(0.5 * s, 0.5 * s)
+        warnTex:SetOpacity(op)
+        warnTex:DrawAtAnchor(math.floor(lx(24)), math.floor(ly(22)), "center")
+        warnTex:SetScale(1, 1)
+        warnTex:SetOpacity(1)
+    end
 end
 
 -- ── UI build ────────────────────────────────────────────────────────────────────
@@ -190,7 +244,7 @@ local function ensureUI()
             hover = function() G.sounds.Skip:Play() end,
         },
     }
-    for i = 1, ROWS do
+    for i = 1, POOL do
         local slot = ui:button{
             text = " ", w = CARD_W, h = CARD_H, x = CARD_X, y = LIST_TOP,
             onClick = function(self)
@@ -198,18 +252,44 @@ local function ensureUI()
                     G.replayConfirm = {
                         filepath = self.row.FilePath, diff = self.diff,
                         header   = self.row, rank = self.rank,
+                        chartPath = G.replayChartPath,
                     }
                 end
             end,
         }
         slot.focusable = false            -- mouse-only; never take keyboard focus
+        slot.edgeFade  = 1
         slot.drawContent = function(self, cx, cy, sc) drawCardContent(self, cx, cy, sc) end
+        -- widget draw with the edge fade folded into the body/ring opacity (soft clip at the viewport edges)
+        slot.draw = function(self)
+            local fade = self.edgeFade or 1
+            if not self.visible or fade <= 0.01 then return end
+            local ccx, ccy = self.x + self.w * 0.5, self.y + self.h * 0.5
+            local sc = self._scaleCur or 1
+            if self._ring and (self._hiCur or 0) > 0.01 then
+                self._ring.canvas:SetOpacity(self._hiCur * fade)
+                self._ring.canvas:SetScale(sc, sc)
+                self._ring.canvas:DrawAtAnchor(math.floor(ccx), math.floor(ccy), "center")
+            end
+            if self._body then
+                self._body.canvas:SetColor(1, 1, 1)
+                self._body.canvas:SetOpacity((self.enabled and 1.0 or 0.5) * fade)
+                self._body.canvas:SetScale(sc, sc)
+                self._body.canvas:DrawAtAnchor(math.floor(ccx), math.floor(ccy), "center")
+            end
+            self:drawContent(ccx, ccy, sc)
+        end
         cards[i] = slot
     end
 end
 
 local function hideAll()
     for _, c in ipairs(cards) do c:setVisible(false); c:setHover(false) end
+end
+
+local function contentMetrics(n)
+    local contentH = n * STEP - CARD_GAP
+    return contentH, math.max(0, contentH - VIEW_H)
 end
 
 -- ── Per-frame update (mouse only) ─────────────────────────────────────────────────
@@ -220,7 +300,7 @@ function M.handleUpdate(ts)
         if INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return") then
             local c = G.replayConfirm
             G.replayConfirm = nil
-            if REPLAY:Watch(c.filepath) then
+            if REPLAY:Watch(c.filepath, c.chartPath) then
                 G.selectedSongNode:Mount(c.diff, 0, 0, 0, 0)
                 G.sounds.Decide:Play()
                 G.lastSignal = "play"
@@ -237,23 +317,62 @@ function M.handleUpdate(ts)
     refresh(chart, diff)
     ensureUI()
 
-    local n = (G.replayList and G.replayList.Length) or 0
-    local maxScroll = math.max(0, n - ROWS)
-    local _, dy = INPUT:GetScrollDelta()
-    if dy ~= 0 then G.replayScroll = math.max(0, math.min(maxScroll, G.replayScroll - dy)) end
-    if G.replayScroll > maxScroll then G.replayScroll = maxScroll end
+    -- frame delta for the scroll easing
+    local dt = 1 / 60
+    if ts ~= nil then
+        if M._lastTs ~= nil then dt = clamp((ts - M._lastTs) / 1000.0, 0, 0.1) end
+        M._lastTs = ts
+    end
 
-    -- assign data + position the pool
-    for i = 1, ROWS do
+    local n = (G.replayList and G.replayList.Length) or 0
+    local contentH, maxScroll = contentMetrics(n)
+    local mx, my  = INPUT:GetMouseXY()
+    local inside  = INPUT:IsMouseInside()
+
+    -- mouse wheel: one card per notch, eased below
+    local _, dy = INPUT:GetScrollDelta()
+    if dy ~= 0 then M._scrollTarget = clamp(M._scrollTarget - dy * STEP, 0, maxScroll) end
+
+    -- scrollbar drag: press anywhere on the gutter jumps/drags the thumb
+    if maxScroll > 0 and inside then
+        local onGutter = mx >= SB_X - 6 and mx <= SB_X + SB_W + 6 and my >= LIST_TOP and my <= VIEW_BOT
+        if INPUT:MousePressed("Left") and onGutter then M._sbDrag = true end
+    end
+    if M._sbDrag then
+        if INPUT:MousePressing("Left") then
+            local thumbH = math.max(28, VIEW_H * VIEW_H / math.max(1, contentH))
+            local t = clamp((my - LIST_TOP - thumbH / 2) / math.max(1, VIEW_H - thumbH), 0, 1)
+            M._scrollTarget = t * maxScroll
+            G.replayScroll  = M._scrollTarget          -- track the pointer directly while dragging
+        else
+            M._sbDrag = false
+            -- snap to a card boundary so no card rests half-faded at the viewport edge
+            M._scrollTarget = clamp(math.floor(M._scrollTarget / STEP + 0.5) * STEP, 0, maxScroll)
+        end
+    end
+
+    -- ease the scroll toward the target
+    M._scrollTarget = clamp(M._scrollTarget, 0, maxScroll)
+    G.replayScroll = G.replayScroll + (M._scrollTarget - G.replayScroll) * math.min(1, dt * 14)
+    if math.abs(M._scrollTarget - G.replayScroll) < 0.5 then G.replayScroll = M._scrollTarget end
+
+    -- assign data + position the pool (pixel-scrolled; edge cards fade at the viewport bounds)
+    local firstIdx = math.max(0, math.floor(G.replayScroll / STEP))
+    for i = 1, POOL do
         local slot = cards[i]
-        local idx  = G.replayScroll + (i - 1)
-        if idx < n then
+        local idx  = firstIdx + (i - 1)
+        local y    = LIST_TOP + idx * STEP - G.replayScroll
+        if idx < n and y + CARD_H > LIST_TOP - EDGE_FADE and y < VIEW_BOT + EDGE_FADE then
             slot.row  = G.replayList[idx]
             slot.rank = idx + 1
             slot.diff = diff
             slot.x    = CARD_X
-            slot.y    = LIST_TOP + (i - 1) * (CARD_H + CARD_GAP)
-            slot:setVisible(true)
+            slot.y    = math.floor(y + 0.5)
+            -- fade by PROTRUSION past the viewport edge: fully opaque while inside, gone once it slides
+            -- EDGE_FADE px past the top/bottom bound (at-rest positions are card-aligned, so nothing rests faded)
+            slot.edgeFade = clamp(1 - math.max(0, LIST_TOP - y) / EDGE_FADE, 0, 1)
+                          * clamp(1 - math.max(0, (y + CARD_H) - VIEW_BOT) / EDGE_FADE, 0, 1)
+            slot:setVisible(slot.edgeFade > 0.01)
             slot:setEnabled(slot.row.Watchable)
         else
             slot.row = nil
@@ -261,14 +380,15 @@ function M.handleUpdate(ts)
         end
     end
 
-    -- manual mouse hover/press (so the keyboard stays free for the difficulty bars)
-    local mx, my  = INPUT:GetMouseXY()
-    local inside  = INPUT:IsMouseInside()
-    local hoverW  = nil
-    if inside then
-        for i = ROWS, 1, -1 do
+    -- manual mouse hover/press (so the keyboard stays free for the difficulty bars); gated to the viewport so a
+    -- faded edge card can't be clicked through the header or below the strip
+    local hoverW = nil
+    if inside and not M._sbDrag and my >= LIST_TOP and my <= VIEW_BOT then
+        for i = POOL, 1, -1 do
             local slot = cards[i]
-            if slot.visible and slot.enabled and slot:hitTest(mx, my) then hoverW = slot; break end
+            if slot.visible and slot.enabled and (slot.edgeFade or 1) > 0.35 and slot:hitTest(mx, my) then
+                hoverW = slot; break
+            end
         end
     end
     if hoverW ~= M._hoverW then
@@ -281,7 +401,7 @@ function M.handleUpdate(ts)
         M._pressW:release(M._pressW:hitTest(mx, my)); M._pressW = nil
     end
 
-    for i = 1, ROWS do if cards[i].visible then cards[i]:update(nil) end end
+    for i = 1, POOL do if cards[i].visible then cards[i]:update(nil) end end
     return nil
 end
 
@@ -312,7 +432,40 @@ function M.draw()
     if n == 0 then
         ui:drawText(18, "No replays yet", CARD_X, LIST_TOP, COL_SUB, 1)
     else
-        for i = 1, ROWS do if cards[i].visible then cards[i]:draw() end end
+        for i = 1, POOL do if cards[i].visible then cards[i]:draw() end end
+    end
+
+    -- scrollbar (track + thumb) when the list overflows the viewport
+    local contentH, maxScroll = contentMetrics(n)
+    if maxScroll > 0 then
+        local thumbH = math.max(28, VIEW_H * VIEW_H / contentH)
+        local t = clamp(G.replayScroll / maxScroll, 0, 1)
+        local thumbY = LIST_TOP + t * (VIEW_H - thumbH)
+        ui:rect(SB_X, LIST_TOP, SB_W, VIEW_H, 70, 84, 104, 70)
+        ui:rect(SB_X, thumbY, SB_W, thumbH,
+            M._sbDrag and 200 or 150, 200, 232, M._sbDrag and 255 or 220)
+    end
+
+    -- warning tooltip while hovering a flagged card (matches the triangle badge)
+    local hov = M._hoverW
+    if G.replayConfirm == nil and hov ~= nil and hov.visible and hov.row ~= nil
+            and (hov.row.OldVersion or hov.row.ChecksumMismatch) then
+        local lines = {}
+        if hov.row.OldVersion then lines[#lines + 1] = "Recorded on an older game version" end
+        if hov.row.ChecksumMismatch then lines[#lines + 1] = "The chart was modified after this play" end
+        local w = 0
+        for _, l in ipairs(lines) do w = math.max(w, ui:measureText(16, l)) end
+        local pad, lineH = 14, 24
+        local bw = w + pad * 2 + 14              -- extra slack: glyph edges render wider than the advance sum
+        local bh = #lines * lineH + pad * 2 - 6
+        local mx, my = INPUT:GetMouseXY()
+        local bx = math.max(8, math.min(mx + 18, 1920 - bw - 8))
+        local by = math.max(8, my - bh - 12)
+        ui:rect(bx, by, bw, bh, 32, 36, 46, 235)
+        ui:rect(bx, by, bw, 4, 232, 172, 40, 255)
+        for i, l in ipairs(lines) do
+            ui:drawText(16, l, bx + pad, by + pad - 2 + (i - 1) * lineH, { 236, 228, 205 }, 1)
+        end
     end
 
     -- confirm prompt
@@ -333,7 +486,7 @@ function M.draw()
             drawIconScaled(clearTex(h.ClearStatus), cx,        by + 150, 0.55, 1)
             drawIconScaled(rankTex(h.ScoreRank),    cx,        by + 150, 0.55, 1)
 
-            local line1 = "#" .. (c.rank or 0) .. "    " .. commas(h.Score) .. " pts"
+            local line1 = string.format("#%d", c.rank or 0) .. "    " .. commas(h.Score) .. " pts"
             local w1 = ui:measureText(26, line1)
             ui:drawText(26, line1, cx - w1 / 2, by + 218, { 210, 222, 236 }, 1)
 
@@ -350,9 +503,16 @@ function M.draw()
     end
 end
 
--- clear the confirm prompt (called when leaving difficulty select)
+-- clear the confirm prompt and drop the cached list (called when leaving difficulty select and on activity
+-- re-activation — i.e. also right after a play, so a freshly saved replay shows up without switching difficulty)
 function M.reset()
     G.replayConfirm = nil
+    G.replayList    = nil
+    G.replayListKey = nil
+    G.replayScroll  = 0
+    M._scrollTarget = 0
+    M._sbDrag       = false
+    M._lastTs       = nil
     if M._hoverW then M._hoverW:setHover(false); M._hoverW = nil end
     M._pressW = nil
 end
@@ -361,6 +521,7 @@ end
 function M.dispose()
     if ui ~= nil then ui:disposeWidgets() end
     if dimCanvas ~= nil then dimCanvas:Dispose(); dimCanvas = nil end
+    if warnTex ~= nil then warnTex:Dispose(); warnTex = nil end
     ui = nil; cards = {}
 end
 

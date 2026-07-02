@@ -1905,6 +1905,9 @@ internal class OpenTaiko : Game {
 			string str = strEXEFolder + "Config.ini";
 			Trace.Indent();
 			try {
+				// quitting the game while a replay is armed/playing: put the player's real mods back before the
+				// export below persists the config (the replay's virtual mods must never reach Config.ini)
+				CSongReplay.tRestoreVirtualMods();
 				// the exporter mutates the config (hidden window, auto, player count) — never persist that
 				if (!VideoExporter.Active) ConfigIni.tExport(str);
 				Trace.TraceInformation("Saved succesfully. ({0})", str);

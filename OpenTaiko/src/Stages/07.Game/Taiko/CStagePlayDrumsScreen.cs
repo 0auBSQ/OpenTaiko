@@ -304,6 +304,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void DeActivate() {
 		this.ctHandHold = null;
 
+		this.pfReplayModeText?.Dispose(); this.pfReplayModeText = null;
+		this.pfReplayModeTextSmall?.Dispose(); this.pfReplayModeTextSmall = null;
+		this.ttkReplayMode = null; this.ttkReplayInvalid = null;
+
 		// leaving a replay anywhere except to the result screen (quit / retry) → drop replay mode + restore the
 		// real mods now, so the next play isn't hijacked by the recording. (the cleared→result path restores in the
 		// result screen instead, so the auto modicon + persistence-skip survive through results.)
@@ -498,6 +502,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// Layer: above-note elements
 
 			this.actMtaiko.Draw();
+			this.tDrawReplayModeIndicator();
 
 			if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				this.actAIBattle.Draw();
@@ -804,6 +809,45 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	// cursor into each replay's recorded input list, advanced as the play clock passes each input's time
 	private int[] replayCursor = new int[5];
+
+	// "> Replay Mode <" indicator under the 1P lane while watching a replay (fonts disposed in DeActivate)
+	private CCachedFontRenderer pfReplayModeText;
+	private CCachedFontRenderer pfReplayModeTextSmall;
+	private TitleTextureKey ttkReplayMode;
+	private TitleTextureKey ttkReplayInvalid;
+
+	private void tDrawReplayModeIndicator() {
+		if (!OpenTaiko.bReplayMode[0]) return;
+		if (this.pfReplayModeText == null) {
+			this.pfReplayModeText = HPrivateFastFont.tInstantiateMainFont(30);
+			this.pfReplayModeTextSmall = HPrivateFastFont.tInstantiateMainFont(20);
+			this.ttkReplayMode = new TitleTextureKey("> Replay Mode <", this.pfReplayModeText,
+				System.Drawing.Color.White, System.Drawing.Color.Black, 600);
+			this.ttkReplayInvalid = new TitleTextureKey("(Invalid replay file)", this.pfReplayModeTextSmall,
+				System.Drawing.Color.OrangeRed, System.Drawing.Color.Black, 600);
+		}
+		int laneW = OpenTaiko.Tx.Lane_Background_Main?.szTextureSize.Width ?? 1000;
+		int laneH = OpenTaiko.Tx.Lane_Background_Main?.szTextureSize.Height ?? 195;
+		int cx = OpenTaiko.Skin.Game_Lane_X[0] + laneW / 2;
+		int cy = OpenTaiko.Skin.Game_Lane_Y[0] + laneH + 26;
+
+		// slow blink (1s cycle) so it reads as a status, not an alert
+		double phase = (OpenTaiko.Timer.NowTimeMs % 1000) / 1000.0;
+		var tx = TitleTextureKey.ResolveTitleTexture(this.ttkReplayMode);
+		if (tx != null) {
+			tx.Opacity = (int)(255 * (0.35 + 0.65 * Math.Abs(Math.Sin(Math.PI * phase))));
+			tx.t2DScaledCenterBasedDraw(cx, cy);
+		}
+
+		var rep = OpenTaiko.ReplayPlayback[0];
+		if (rep != null && (rep.WarnOldVersion || rep.WarnChecksumMismatch)) {
+			var tx2 = TitleTextureKey.ResolveTitleTexture(this.ttkReplayInvalid);
+			if (tx2 != null) {
+				tx2.Opacity = 255;
+				tx2.t2DScaledCenterBasedDraw(cx, cy + 32);
+			}
+		}
+	}
 
 	// feed a replay's recorded (tjaTime, pad) inputs through the judge as the play clock reaches them
 	private void tPumpReplayInputs() {
