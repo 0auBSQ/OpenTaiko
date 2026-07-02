@@ -118,9 +118,18 @@ class TextureLoader {
 	}
 
 	public CTexture[] TxCSongFolder(string folder) {
-		var count = OpenTaiko.tSequenceImageSheetCountCount(folder);
-		var texture = count == 0 ? null : TxCSong(count, folder + "{0}.png");
-		return texture;
+		// Match .png case-insensitively so mixed-case frame names work on case-sensitive filesystems (iOS).
+		if (!Directory.Exists(folder)) return null;
+		var byIndex = new Dictionary<int, string>();
+		foreach (var file in Directory.EnumerateFiles(folder)) {
+			if (Path.GetExtension(file).Equals(".png", StringComparison.OrdinalIgnoreCase)
+				&& int.TryParse(Path.GetFileNameWithoutExtension(file), out int n))
+				byIndex[n] = file;
+		}
+		var textures = new List<CTexture>();
+		for (int i = 0; byIndex.TryGetValue(i, out string path); i++)
+			textures.Add(TxCSong(path));
+		return textures.Count == 0 ? null : textures.ToArray();
 	}
 
 	internal CTexture TxCUntrackedSong(string path) {
