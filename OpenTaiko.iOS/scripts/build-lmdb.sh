@@ -20,7 +20,7 @@ if [[ -d "$OUTPUT_DIR" ]]; then
   exit 0
 fi
 
-LMDB_VERSION="0.9.31"
+LMDB_VERSION="0.9.33"
 LMDB_URL="https://github.com/LMDB/lmdb/archive/refs/tags/LMDB_${LMDB_VERSION}.tar.gz"
 TMPDIR=$(mktemp -d)
 trap "rm -rf $TMPDIR" EXIT
@@ -70,9 +70,9 @@ cat > "$INFOPLIST" << 'PLIST'
   <key>CFBundleName</key>
   <string>liblmdb</string>
   <key>CFBundleVersion</key>
-  <string>0.9.31</string>
+  <string>0.9.33</string>
   <key>CFBundleShortVersionString</key>
-  <string>0.9.31</string>
+  <string>0.9.33</string>
   <key>CFBundlePackageType</key>
   <string>FMWK</string>
   <key>MinimumOSVersion</key>

@@ -26,6 +26,8 @@
     <!-- Exclude KeraLua's device-only liblua54.framework; we provide our own xcframework
          with both device and simulator slices (built from source by scripts/build-lua54.sh) -->
     <PackageReference Include="KeraLua" Version="1.4.1" ExcludeAssets="native" />
+    <!-- Exclude LightningDB's native lmdb dylibs so only our liblmdb.xcframework provides lmdb on iOS. -->
+    <PackageReference Include="LightningDB" Version="0.18.1" ExcludeAssets="native" />
   </ItemGroup>
 
   <!-- liblua54 built from Lua 5.4.6 source (scripts/build-lua54.sh) -->
@@ -99,6 +101,14 @@
     <ItemGroup>
       <_FileNativeReference Remove="@(_FileNativeReference)"
           Condition="$([System.String]::Copy('%(Filename)').ToLowerInvariant()) == 'lmdb'" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Drop LightningDB's loose iOS liblmdb.dylib from the app bundle root (our liblmdb.xcframework provides lmdb). -->
+  <Target Name="_RemoveLooseLmdbDylib" AfterTargets="_ComputeDynamicLibrariesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+          Condition="'%(Filename)%(Extension)' == 'liblmdb.dylib'" />
     </ItemGroup>
   </Target>
 </Project>

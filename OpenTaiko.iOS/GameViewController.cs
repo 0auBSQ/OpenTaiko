@@ -167,6 +167,22 @@ public partial class GameViewController : UIViewController {
 			typeof(ManagedBass.Fx.BassFx).Assembly, resolver);
 	}
 
+
+	/// <summary>
+	/// Register a DllImport resolver so LightningDB's [DllImport("lmdb")] finds our liblmdb.framework.
+	/// </summary>
+	private static void RegisterLmdbResolver() {
+		System.Runtime.InteropServices.DllImportResolver resolver =
+			(libraryName, assembly, searchPath) => {
+				if (libraryName == "lmdb" &&
+					System.Runtime.InteropServices.NativeLibrary.TryLoad("@rpath/liblmdb.framework/liblmdb", out var handle))
+					return handle;
+				return IntPtr.Zero;
+			};
+		System.Runtime.InteropServices.NativeLibrary.SetDllImportResolver(
+			typeof(LightningDB.LightningEnvironment).Assembly, resolver);
+	}
+
 	private void InitializeGame() {
 		CrashLog.FlushPreviousCrashLogs();
 
@@ -188,6 +204,7 @@ public partial class GameViewController : UIViewController {
 
 		// Register BASS native library resolver before any ManagedBass calls
 		RegisterBassResolver();
+		RegisterLmdbResolver();
 
 		// Copy writable/user-facing assets from bundle to Documents directory.
 		// Read-only assets (Global/, Lang/, etc.) are resolved from the bundle at runtime.
