@@ -777,9 +777,10 @@ internal class CTja : CActivity {
 		LocalTriggers = new CLocalTriggers(player);
 	}
 
-	public void tRandomizeTaikoChips(int player = 0) {
+	public void tRandomizeTaikoChips(int player = 0, int seed = -1) {
 		//2016.02.11 kairera0467
-		Random rnd = new System.Random();
+		// a fixed seed makes the shuffle reproducible, so Random/Super-Random replays can be watched back
+		Random rnd = seed >= 0 ? new System.Random(seed) : new System.Random();
 
 		var eRandom = OpenTaiko.ConfigIni.eRandom[player];
 

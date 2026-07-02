@@ -2415,6 +2415,41 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.actScore.Draw();
 	}
 
+	// Per-player scan cursor for the replay precise auto-miss (see tReplayAutoMissBefore). Reset per play.
+	protected readonly int[] replayMissScan = new int[5];
+
+	// Replay-only, precise auto-miss. Watching a replay re-feeds recorded inputs at their EXACT recorded time, but
+	// the normal per-frame auto-miss (tProgressDraw_Chip ~3289) resolves passed notes on the render clock — whose
+	// cadence differs between the recording and playback sessions, so the recorded card and the re-judged playback
+	// diverge (verified: at ~50ms/frame the same inputs re-judge to 28 bad instead of the recorded 33). Before each
+	// recorded input at tjaTime, this misses every standard note whose bad window closed strictly before tjaTime,
+	// so the input only sees notes that were genuinely still hittable then — making playback frame-cadence
+	// independent (reproduces the recording at any fps). Keyed only on the recorded input times + chart chip times;
+	// never called outside replay playback, so live play is untouched. Rolls/waits keep the normal per-frame path.
+	protected void tReplayAutoMissBefore(int nPlayer, long tjaTime) {
+		CTja tja = OpenTaiko.GetTJA(nPlayer);
+		if (tja == null) return;
+		var list = tja.listNoteChip;
+		while (replayMissScan[nPlayer] < list.Count
+			&& (list[replayMissScan[nPlayer]].bHit || list[replayMissScan[nPlayer]].IsMissed))
+			replayMissScan[nPlayer]++;
+		for (int i = replayMissScan[nPlayer]; i < list.Count; i++) {
+			CChip pChip = list[i];
+			if (pChip.nSoundTimems > tjaTime || pChip.bHit || pChip.IsMissed) continue;   // future / already resolved
+			if (this.eGetChipJudgeAtTime(tjaTime, pChip, nPlayer) != ENoteJudge.Miss) continue;   // still hittable
+			if (pChip.bVisible && NotesManager.IsHittableNote(pChip) && !NotesManager.IsGenericRoll(pChip)
+				&& pChip.eNoteState != ENoteState.Wait) {   // mirror the standard-note branch of tProgressDraw_Chip
+				if (!this.IsNoteIfMet(pChip, nPlayer)) {
+					pChip.bHit = true;
+				} else {
+					pChip.IsMissed = true;
+					this.tChipHitProcess(tjaTime, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
+					pChip.eNoteState = ENoteState.Bad;
+				}
+			}
+		}
+	}
+
 	protected bool tProgressDraw_Chip(EKeyConfigPart ePlayMode, int nPlayer) {
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 

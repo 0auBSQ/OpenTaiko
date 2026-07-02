@@ -415,6 +415,7 @@ end
 			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
 			LuaScript["INILOADER"] = new LuaIniLoaderFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
+			LuaScript["REPLAY"] = new LuaReplayFunc();   // list a chart's replays + start watching one
 			LuaScript["SIZE"] = new LuaSizeFunc();
 			LuaScript["VECTOR2"] = new LuaVector2Func();
 			LuaScript["VECTOR3"] = new LuaVector3Func();

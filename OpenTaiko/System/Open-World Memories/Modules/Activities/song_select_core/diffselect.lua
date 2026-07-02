@@ -2,6 +2,8 @@
 -- diffselect.lua  —  Difficulty-select draw panel and update handler
 --                    for song_select_core.
 
+local Replay = require("replaylist")
+
 local M = {}
 local G   -- shared state injected by Script.lua
 
@@ -47,6 +49,7 @@ local PUCHI_OFFSET_X     = 60
 
 function M.init(g)
     G = g
+    Replay.init(g)
 end
 
 -- ── Helpers ───────────────────────────────────────────────────────────────────
@@ -84,6 +87,7 @@ function M.resetToSongSelect()
     G.difficultySelectElemOpacity = 0
     G.songSelectShift = 0
     G.activeScreen    = "songselect"
+    Replay.reset()
 end
 
 -- ── Private draw helpers ──────────────────────────────────────────────────────
@@ -196,6 +200,10 @@ function M.drawPanel()
         local s     = is35 and DIFFSELECT_CHARA_SCALE_35P  or DIFFSELECT_CHARA_SCALE_12P
         local r1Count = (p == 5 and 3) or (p > 2 and 2) or p
 
+        -- single-player performance mode shows the best-plays cards down the right edge;
+        -- nudge the character/nameplate/mod-icons left so the two don't overlap
+        if p == 1 and Replay.isRegular() then ox = ox - 200 end
+
         for i = 0, p - 1 do
             local isRow2 = i >= r1Count
             local r      = isRow2 and 1 or 0
@@ -233,12 +241,20 @@ function M.drawPanel()
             arrowR:DrawAtAnchor(cx + 55 + ax, 980, "left")
         end
     end
+
+    Replay.draw()
 end
 
 -- ── Update handler ────────────────────────────────────────────────────────────
 -- Returns "play", "cancel" (unused here; cancel goes back to songselect), or nil.
 
-function M.handleUpdate()
+function M.handleUpdate(ts)
+    -- best-plays cards: confirm prompt + mouse hover/scroll/click (single-player performance mode only).
+    -- "play" launches a replay; "consume" means the confirm prompt ate this frame's input.
+    local rsig = Replay.handleUpdate(ts)
+    if rsig == "play" then return "play" end
+    if rsig == "consume" then return nil end
+
     local allDiffsSelected = true
     local canceled         = false
 

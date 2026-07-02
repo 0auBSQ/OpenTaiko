@@ -16,6 +16,7 @@
 local Sort    = require("sort")
 local Nav     = require("navigation")
 local Diff    = require("diffselect")
+local Replay  = require("replaylist")
 local DrawSS  = require("draw_songselect")
 local Search  = require("search")
 local Unlocks = require("unlockables")
@@ -404,6 +405,7 @@ function afterSongEnum()
 end
 
 function onDestroy()
+    Replay.dispose()
     if G.text      ~= nil then G.text:Dispose()      end
     if G.textSmall ~= nil then G.textSmall:Dispose()  end
     if G.textLarge ~= nil then G.textLarge:Dispose()  end
@@ -451,7 +453,7 @@ end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
 
-function update()
+function update(ts)
     for _, c in pairs(G.ctx) do c:Tick() end
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
@@ -528,7 +530,7 @@ function update()
     if G.activeScreen == "songselect" then
         return Nav.handleSongSelectInput(Sort, Diff)
     elseif G.activeScreen == "difficultyselect" then
-        return Diff.handleUpdate()
+        return Diff.handleUpdate(ts)
     end
 
     return nil

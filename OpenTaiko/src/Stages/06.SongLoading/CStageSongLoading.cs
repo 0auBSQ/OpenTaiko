@@ -436,10 +436,19 @@ internal class CStageSongLoading : CStage {
 						OpenTaiko.TJA.PlanToAddMixerChannel();
 					}
 
+					// consume a pending replay watch: THIS play is a replay iff it was armed from song select.
+					// setting it here (not at Watch) guarantees a normal play can never inherit a stale replay flag.
+					OpenTaiko.bReplayMode[0] = OpenTaiko.ReplayWatchArmed;
+					OpenTaiko.ReplayPlayback[0] = OpenTaiko.ReplayWatchArmed ? OpenTaiko.PendingReplay : null;
+					for (int rp = 1; rp < 5; rp++) OpenTaiko.bReplayMode[rp] = false;
+					OpenTaiko.ReplayWatchArmed = false;
+
 					for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 						var _dtx = OpenTaiko.GetTJA(i);
 						_dtx?.tInitLocalStores(i);
-						_dtx?.tRandomizeTaikoChips(i);
+						// while watching a replay the seed is already set (from the replay); otherwise pick a fresh one to record
+						if (!OpenTaiko.bReplayMode[i]) OpenTaiko.ReplaySeed[i] = System.Random.Shared.Next(0, int.MaxValue);
+						_dtx?.tRandomizeTaikoChips(i, OpenTaiko.ReplaySeed[i]);
 						_dtx?.tApplyFunMods(i);
 						OpenTaiko.ReplayInstances[i] = new CSongReplay(_dtx.strFullPath, i);
 					}

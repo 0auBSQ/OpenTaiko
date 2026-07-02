@@ -102,6 +102,17 @@ internal class OpenTaiko : Game {
 
 	public static CSongReplay[] ReplayInstances = new CSongReplay[5];
 
+	// ── replay playback ──
+	// note-shuffle seed used for the current play, per player; written into the saved replay and re-applied when watching
+	public static int[] ReplaySeed = new int[5];
+	// while true, that player's hits come from a recorded replay instead of live input (and the auto modicon is shown)
+	public static bool[] bReplayMode = new bool[5];
+	// the replay being played back for each player (set when bReplayMode is true)
+	public static CSongReplay[] ReplayPlayback = new CSongReplay[5];
+	// set by REPLAY:Watch from song select; the gameplay stage consumes it on activation to enter replay mode
+	public static bool ReplayWatchArmed = false;
+	public static CSongReplay PendingReplay = null;
+
 	public static CFPS FPS {
 		get;
 		private set;

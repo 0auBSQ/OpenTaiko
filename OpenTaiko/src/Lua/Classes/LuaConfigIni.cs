@@ -137,7 +137,8 @@ namespace OpenTaiko {
 
 		public bool GetAutoStatus(int player) {
 			if (player < 0 || player >= OpenTaiko.MAX_PLAYERS) return false;
-			return OpenTaiko.ConfigIni.bAutoPlay[player];
+			// replay playback shows the auto modicon too (even though it isn't auto-judging)
+			return OpenTaiko.ConfigIni.bAutoPlay[player] || OpenTaiko.bReplayMode[player];
 		}
 
 		public void SetAutoStatus(int player, bool isAuto) {

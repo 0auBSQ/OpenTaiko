@@ -209,6 +209,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {
 		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.tValueInitialize(bPlayRecord, bPlayState);
+		for (int i = 0; i < 5; i++) { replayCursor[i] = 0; replayMissScan[i] = 0; }
 
 		if (bPlayState) {
 			this.actGame.tTatakikiriShow_Initialize();
@@ -302,6 +303,16 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	public override void DeActivate() {
 		this.ctHandHold = null;
+
+		// leaving a replay anywhere except to the result screen (quit / retry) → drop replay mode + restore the
+		// real mods now, so the next play isn't hijacked by the recording. (the cleared→result path restores in the
+		// result screen instead, so the auto modicon + persistence-skip survive through results.)
+		if (OpenTaiko.bReplayMode[0]
+			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared
+			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageFailed) {
+			CSongReplay.tRestoreVirtualMods();
+			for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
+		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (this.soundRed[i] != null)
@@ -465,6 +476,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: notes & bar lines
 			this.ctHandHold.TickLoop();
+
+			// Replay playback: feed the recorded inputs (each with its own auto-miss resolved to its exact time)
+			// BEFORE the per-frame auto-miss below, so playback judges frame-cadence independently and reproduces
+			// the recorded card at any fps. No-op outside replay mode (tPumpReplayInputs skips non-replay players).
+			tPumpReplayInputs();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
@@ -786,9 +802,34 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 	}
 
+	// cursor into each replay's recorded input list, advanced as the play clock passes each input's time
+	private int[] replayCursor = new int[5];
+
+	// feed a replay's recorded (tjaTime, pad) inputs through the judge as the play clock reaches them
+	private void tPumpReplayInputs() {
+		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+			if (!OpenTaiko.bReplayMode[p]) continue;
+			var rep = OpenTaiko.ReplayPlayback[p];
+			CTja tja = OpenTaiko.GetTJA(p);
+			if (rep == null || tja == null) continue;
+			var inputs = rep.Inputs;
+			long nowTja = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			while (replayCursor[p] < inputs.Count && inputs[replayCursor[p]].Item1 <= nowTja) {
+				long tHit = (long)inputs[replayCursor[p]].Item1;
+				// resolve auto-misses up to this hit's EXACT recorded time first, so a recorded input can only claim
+				// a note that was genuinely still hittable at tHit (frame-cadence independent — see tReplayAutoMissBefore)
+				this.tReplayAutoMissBefore(p, tHit);
+				this.ProcessPadInput(p, (EPad)inputs[replayCursor[p]].Item2, tHit);
+				replayCursor[p]++;
+			}
+		}
+	}
+
 	protected override void tInputProcess_Drums() {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
+
+		tPumpReplayInputs();
 
 		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EKeyConfigPart.Taiko)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
@@ -796,6 +837,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
 				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
 				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
+				|| OpenTaiko.bReplayMode[nUsePlayer]   // replay playback: ignore live input, inputs come from the recording
 				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
 				|| (LuaNetworking.Active != null && LuaNetworking.Active.IsRemoteSpot(nUsePlayer))   // online VS: spots 2-5 are remote players — ignore any local input mapped to them
 				) {
