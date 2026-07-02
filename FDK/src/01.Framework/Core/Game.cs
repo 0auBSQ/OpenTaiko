@@ -532,7 +532,8 @@ public abstract partial class Game : IDisposable {
 		// Draw the scene into the host's render target; the host presents it (no GL swap).
 		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, HostRenderTargetFbo);
 		Gl.Viewport(0, 0, (uint)GameWindowSize.Width, (uint)GameWindowSize.Height);
-		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// Border color fills any margin the camera transform leaves around the scene.
+		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
 		Gl.Clear(ClearBufferMask.ColorBufferBit);
 		Draw();
 		Gl.Flush(); // submit GL commands so the host can sample the rendered surface
