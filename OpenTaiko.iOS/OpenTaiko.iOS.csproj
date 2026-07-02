@@ -13,7 +13,7 @@
     <ApplicationId Condition="'$(ApplicationId)' == ''">com.opentaiko.OpenTaiko</ApplicationId>
     <XSAppIconAssets>Assets.xcassets/AppIcon.appiconset</XSAppIconAssets>
     <ApplicationDisplayVersion>0.6.0</ApplicationDisplayVersion>
-    <ApplicationVersion>13</ApplicationVersion>
+    <ApplicationVersion>14</ApplicationVersion>
   </PropertyGroup>
 
   <ItemGroup>
