@@ -74,6 +74,7 @@ end
 function M.refreshPage(skipMedia)
     G.currentPage = {}
     G.pageTexts   = {}
+    G.unlocks.invalidateCondCache()   -- selection changed: recompute the unlock-condition panel cache
 
     for i = -5, 5 do
         local node = G.songList:GetSongNodeAtOffset(i)
@@ -81,11 +82,8 @@ function M.refreshPage(skipMedia)
         if node == nil then
             G.pageTexts[i] = nil
         else
-            if i == 0 then
-                G.pageTexts[i] = G.text:GetText(node.Title, false, 525, COLOR:CreateColorFromARGB(255,242,207,1))
-            else
-                G.pageTexts[i] = G.text:GetText(node.Title, false, 525)
-            end
+            -- glyph draw at render time; only the string is cached (i == 0 = the selected bar, gold)
+            G.pageTexts[i] = { text = node.Title, gold = (i == 0) }
             if G.genre_overlays[node.Genre] == nil then
                 if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
                     G.genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")

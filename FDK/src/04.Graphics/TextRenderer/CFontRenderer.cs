@@ -119,6 +119,16 @@ public class CFontRenderer : IDisposable {
 		return this.textRenderer.DrawText(drawstr, drawmode, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor, edge_Ratio, keepCenter);
 	}
 
+	// Per-side bitmap padding the text renderer bakes around the ink (the +50/+25 constants in its DrawText):
+	// 25px left/right/bottom; the ink top sits at y=0 of the returned bitmap.
+	public const int TextPadding = 25;
+
+	// advance width of s in px (no padding; includes trailing spaces) — for glyph-composed layout
+	public float MeasureText(string s) => this.textRenderer?.MeasureText(s) ?? 0f;
+
+	// ink line height (ascent + descent); a 1-line DrawText bitmap is this + TextPadding tall
+	public float GetLineHeight() => this.textRenderer?.GetLineHeight() ?? 0f;
+
 
 	public SKBitmap DrawText_V(string drawstr, Color fontColor, bool keepCenter = false) {
 		return DrawText_V(drawstr, CFontRenderer.DrawMode.Normal, fontColor, Color.White, null, Color.White, Color.White, 0, keepCenter);

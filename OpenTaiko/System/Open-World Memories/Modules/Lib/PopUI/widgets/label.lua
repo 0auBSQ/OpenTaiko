@@ -37,11 +37,13 @@ end
 function Label:restyle()
     self.eff = self.mgr:resolveTheme(self.style)
     local c = self.eff.colors
-    local fg = self.color or c.text
-    local bg = self.chip and U.shade(c.surface, 1.0) or U.withAlpha({ 255, 255, 255 }, 0)
-    self._tex = self.mgr:renderText(self:_fontSize(), self.text, fg, self.chip and nil or U.withAlpha(c.surface, 0), false, self.maxWidth)
-    self.w = (self._tex.Width or 10)
-    self.h = (self._tex.Height or 10)
+    local sz = self:_fontSize()
+    self._fg = self.color or c.text
+    -- chip labels keep the (former GetText-default) black outline; plain labels draw with none
+    self._bg = self.chip and { 0, 0, 0, 255 } or U.withAlpha(c.surface, 0)
+    -- the box a GetText texture would have had (ink + 50 padding, squished down to maxWidth)
+    self.w = math.min(self.mgr:measureText(sz, self.text) + 50, self.maxWidth)
+    self.h = self.mgr:textHeight(sz)
     if self.chip then
         self._chipW = self.w + self.padX * 2
         self._chipH = self.h + self.padY * 2
@@ -61,19 +63,14 @@ end
 function Label:update(ctx) end  -- static; no anim
 
 function Label:draw()
-    if not self.visible or not self._tex then return end
+    if not self.visible then return end
     local x, y = math.floor(self.x), math.floor(self.y)
     if self.chip then
         self._chip.canvas:SetColor(1, 1, 1); self._chip.canvas:SetOpacity(1)
         self._chip.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + self.h * 0.5), "center")
     end
-    if self.align == "center" then
-        self._tex:DrawAtAnchor(x, y, "top")
-    elseif self.align == "right" then
-        self._tex:DrawAtAnchor(x, y, "topright")
-    else
-        self._tex:Draw(x, y)
-    end
+    local anchor = (self.align == "center") and "top" or (self.align == "right") and "topright" or "topleft"
+    self.mgr:drawTextEx(self:_fontSize(), self.text, x, y, self._fg, self._bg, 1, 1, self.maxWidth, anchor)
 end
 
 return Label

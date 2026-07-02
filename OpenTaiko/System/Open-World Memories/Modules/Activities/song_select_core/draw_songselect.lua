@@ -2,6 +2,7 @@
 -- draw_songselect.lua  —  Song-select panel drawing for song_select_core.
 
 local M = {}
+local SONGLIST_GOLD = COLOR:CreateColorFromARGB(255, 242, 207, 1)   -- selected-bar title tint
 local G   -- shared state injected by Script.lua
 
 -- ── Layout constants ──────────────────────────────────────────────────────────
@@ -253,12 +254,12 @@ function M.drawPanel()
             end
 
             local focusedChart = getSongNodeFocusChart(ssn)
-            G.textSmall:GetText(ssn.Subtitle, false, SONGINFO_SUBTITLE_MWIDTH)
-                :DrawAtAnchor(SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y, "center")
-            G.textSmall:GetText("Chart - " .. ssn.Maker, false, SONGINFO_CHARTER_MWIDTH)
-                :Draw(SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y)
-            G.textSmall:GetText("Length - " .. formatDuration(G.previewDurationMs), false, SONGINFO_LENGTH_MWIDTH)
-                :Draw(SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y)
+            G.textSmall:Draw(ssn.Subtitle, SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y,
+                nil, nil, 1, 1, SONGINFO_SUBTITLE_MWIDTH, "center")
+            G.textSmall:Draw("Chart - " .. ssn.Maker, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
+                nil, nil, 1, 1, SONGINFO_CHARTER_MWIDTH)
+            G.textSmall:Draw("Length - " .. formatDuration(G.previewDurationMs), SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
+                nil, nil, 1, 1, SONGINFO_LENGTH_MWIDTH)
 
             if focusedChart ~= nil then
                 local mult    = CONFIG.SongSpeed / 20
@@ -269,15 +270,18 @@ function M.drawPanel()
                 end
                 local col = "FFFFFFFF"
                 if mult < 1 then col = "ff95ccff" elseif mult > 1 then col = "ffff9ec3" end
-                G.text:GetText(bpmText, false, SONGINFO_BPM_MWIDTH, COLOR:CreateColorFromHex(col))
-                    :DrawAtAnchor(SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y, "center")
+                G.text:Draw(bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
+                    COLOR:CreateColorFromHex(col), nil, 1, 1, SONGINFO_BPM_MWIDTH, "center")
             end
         end
     end
 
     drawPreimage()
 
-    -- Song list bars
+    -- Song list bars (titles are glyph-drawn from the cached strings; gold = the selected bar)
+    local function drawBarTitle(pt, x, y)
+        G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, 525, "center")
+    end
     if G.pageTexts ~= nil then
         for i, tx in pairs(G.pageTexts) do
             local xpos = SONGLIST_ORIGIN_X + (i + G.selectBoxDist) * SONGLIST_OFFSET_X - G.songSelectShift
@@ -310,7 +314,7 @@ function M.drawPanel()
                         if hi == 2 then
                             G.unlocks.drawBluredStatic(xpos, ypos)
                         else
-                            tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
+                            drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                         end
                         -- Lock icon on top of title area
                         G.unlocks.drawLockIcon(node, xpos, ypos)
@@ -325,14 +329,14 @@ function M.drawPanel()
                         drawFavIcon(node, xpos, ypos)
                         if node.IsSong then drawBarleft(node, xpos, ypos) end
                         drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
-                        tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
+                        drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                     end
                 elseif node.IsRandom then
                     G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
-                    tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
+                    drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                 elseif node.IsReturn then
                     G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
-                    tx:DrawAtAnchor(xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y, "center")
+                    drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                 end
 
             end
@@ -365,19 +369,17 @@ function M.drawPanel()
         local pathStack  = {}
         local currentNode = ssn.Parent
         while currentNode ~= nil do
-            local _tx = currentNode.Title ~= nil and currentNode.Title or "/"
-            table.insert(pathStack, G.text:GetText(_tx, false, 270))
+            table.insert(pathStack, currentNode.Title ~= nil and currentNode.Title or "/")
             currentNode = currentNode.Parent
         end
         local xpos = HEADER_OFFSET_X - G.songSelectShift
         for i, title in ipairs(pathStack) do
             G.bgtx["header-box"]:SetOpacity(opacityNorm)
             G.bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
-            title:SetOpacity(opacityNorm)
-            title:DrawAtAnchor(
+            G.text:Draw(title,
                 xpos - G.bgtx["header-box"].Width + HEADER_BOX_TEXT_OFFSET_X,
                 HEADER_BOX_TEXT_OFFSET_Y + G.bgtx["header-box"].Height / 2,
-                "center")
+                nil, nil, opacityNorm, 1, 270, "center")
             G.bgtx["header-arrow"]:SetOpacity(opacityNorm)
             if i ~= #pathStack then
                 G.bgtx["header-arrow"]:DrawAtAnchor(xpos - G.bgtx["header-box"].Width, 0, "topright")
@@ -417,10 +419,7 @@ function M.drawPanel()
             local nFC      = sav:GetClearStatusCount(diff, 3)
             local nClear   = sav:GetClearStatusCount(diff, 2)
             local function drawStat(n, x)
-                local tx = G.textStats:GetText(tostring(n), false, 99999, white)
-                tx:SetOpacity(opacityNorm)
-                tx:DrawAtAnchor(x, 1058, "center")
-                tx:SetOpacity(1)
+                G.textStats:Draw(tostring(n), x, 1058, white, nil, opacityNorm, 1, 0, "center")
             end
             drawStat(nPerfect, 95)
             drawStat(nFC,     212)

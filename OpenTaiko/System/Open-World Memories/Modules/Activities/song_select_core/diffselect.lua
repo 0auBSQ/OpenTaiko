@@ -111,15 +111,15 @@ local function drawDifficultyBar(index, barinfo)
         end
     end
     tex:DrawAtAnchor(xpos, ypos, "bottomright")
-    local nd = G.textSmall:GetText("Charter - " .. barinfo.charter, false, 1000)
-    nd:DrawAtAnchor(xpos, ypos + DIFFSELECT_NOTESDESIGNER_OFFSET_Y, "topright")
+    G.textSmall:Draw("Charter - " .. barinfo.charter, xpos, ypos + DIFFSELECT_NOTESDESIGNER_OFFSET_Y,
+        nil, nil, 1, 1, 1000, "topright")
 
     -- Vault chart: custom name (.VAULT_NAME) centered at (316, 216) from the bar's top-left
     if barinfo.vault and barinfo.vaultName ~= nil and barinfo.vaultName ~= "" then
         local black     = COLOR:CreateColorFromARGB(255, 0, 0, 0)
         local noOutline = COLOR:CreateColorFromARGB(0, 0, 0, 0)
-        local nameTx = G.textStats:GetText(barinfo.vaultName, false, 260, black, noOutline)
-        nameTx:DrawAtAnchor(xpos - tex.Width + 316, ypos - tex.Height + 216, "center")
+        G.textStats:Draw(barinfo.vaultName, xpos - tex.Width + 316, ypos - tex.Height + 216,
+            black, noOutline, 1, 1, 260, "center")
     end
 
     local xbar  = xpos - tex.Width + DIFFSELECT_LEVEL_BAR_X
@@ -177,10 +177,8 @@ function M.drawPanel()
     G.bgtx["overlay_difficulty"]:DrawAtAnchor(1920, 0, "TopRight")
 
     if G.selectedSongNode ~= nil then
-        local titleTx    = G.textLarge:GetText(G.selectedSongNode.Title,    false, 1280)
-        local subtitleTx = G.text:GetText(G.selectedSongNode.Subtitle, false, 1280)
-        titleTx:SetOpacity(opacityNorm);    titleTx:Draw(1926 - G.songSelectShift, 0)
-        subtitleTx:SetOpacity(opacityNorm); subtitleTx:Draw(1926 - G.songSelectShift, 67)
+        G.textLarge:Draw(G.selectedSongNode.Title, 1926 - G.songSelectShift, 0, nil, nil, opacityNorm, 1, 1280)
+        G.text:Draw(G.selectedSongNode.Subtitle, 1926 - G.songSelectShift, 67, nil, nil, opacityNorm, 1, 1280)
 
         for i = 0, 2 + #G.diffBars do
             local barinfo = nil
@@ -223,22 +221,14 @@ function M.drawPanel()
     -- AI level slider (AI battle only)
     if G.activeConfig.mountAISlotToP2 then
         local cx      = 1490 + xshift
-        local labelTx = G.textSmall:GetText("Starting AI Level", false, 400)
-        labelTx:SetOpacity(opacityNorm)
-        labelTx:DrawAtAnchor(cx, 940, "center")
-        local levelTx = G.text:GetText(tostring(CONFIG.AILevel), false, 200)
-        levelTx:SetOpacity(opacityNorm)
-        levelTx:DrawAtAnchor(cx, 980, "center")
+        G.textSmall:Draw("Starting AI Level", cx, 940, nil, nil, opacityNorm, 1, 400, "center")
+        G.text:Draw(tostring(CONFIG.AILevel), cx, 980, nil, nil, opacityNorm, 1, 200, "center")
         local ax = G.arrowsDistance
         if CONFIG.AILevel > 1 then
-            local arrowL = G.textSmall:GetText("◀", false, 60)
-            arrowL:SetOpacity(opacityNorm)
-            arrowL:DrawAtAnchor(cx - 55 - ax, 980, "right")
+            G.textSmall:Draw("◀", cx - 55 - ax, 980, nil, nil, opacityNorm, 1, 60, "right")
         end
         if CONFIG.AILevel < 10 then
-            local arrowR = G.textSmall:GetText("▶", false, 60)
-            arrowR:SetOpacity(opacityNorm)
-            arrowR:DrawAtAnchor(cx + 55 + ax, 980, "left")
+            G.textSmall:Draw("▶", cx + 55 + ax, 980, nil, nil, opacityNorm, 1, 60, "left")
         end
     end
 

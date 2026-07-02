@@ -68,15 +68,18 @@ end
 function Bubble:_rewrap()
     local c = self.eff.colors
     local size = self.eff.font.label
-    local maxW = self.w - 2 * self.pad
+    local maxW = self.w - 2 * self.pad - 50   -- glyph box pads 25px per side; keep both margins equal
     self._size = size
     self._fg = c.text
+    self._lines = self.mgr:wrapLines(size, self.text, maxW)   -- glyph-measured wrap (no texture allocation)
     if self.typewriter then
-        self._lines = self.mgr:wrapLines(size, self.text, maxW)   -- measureText-based wrap (no GetText churn)
+        -- per-line UTF-8 char lists so the reveal never splits a multi-byte character
+        self._lineChars = {}
         self._fullLen = 0
-        for _, l in ipairs(self._lines) do self._fullLen = self._fullLen + #l end
-    else
-        self._textTex = self.mgr:renderText(size, self.text, c.text, U.withAlpha(c.surface, 0), false, maxW)
+        for i, l in ipairs(self._lines) do
+            self._lineChars[i] = self.mgr:utf8chars(l)
+            self._fullLen = self._fullLen + #self._lineChars[i]
+        end
     end
 end
 
@@ -143,19 +146,21 @@ function Bubble:draw()
     local x = math.floor(self.x + self.pad)
     local y = math.floor(self.y + self.pad)
     local fg = self._fg or self.eff.colors.text
+    local lineH = math.floor(self._size * 1.32)
     if self.typewriter then
-        -- glyph-atlas draw: the revealed substring changes every frame; the atlas is a bounded per-char
-        -- cache (correct advances), so no per-frame texture allocation and correct letter spacing.
-        local lineH = math.floor(self._size * 1.32)
+        -- glyph draw: the revealed substring changes every frame; the glyph cache is bounded per character,
+        -- so no per-frame texture allocation. Reveal counts UTF-8 characters, never splitting a sequence.
         local rem = math.floor(self._shown)
-        for i, line in ipairs(self._lines or {}) do
+        for i, chars in ipairs(self._lineChars or {}) do
             if rem <= 0 then break end
-            local sub = (rem >= #line) and line or line:sub(1, rem)
+            local sub = (rem >= #chars) and self._lines[i] or table.concat(chars, "", 1, rem)
             self.mgr:drawText(self._size, sub, x, y + (i - 1) * lineH, fg)
-            rem = rem - #line
+            rem = rem - #chars
         end
-    elseif self._textTex then
-        self._textTex:Draw(x, y)
+    else
+        for i, line in ipairs(self._lines or {}) do
+            self.mgr:drawText(self._size, line, x, y + (i - 1) * lineH, fg)
+        end
     end
 end
 

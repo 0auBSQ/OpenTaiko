@@ -10,4 +10,8 @@ internal interface ITextRenderer : IDisposable {
 	string Purify(string input);
 
 	List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor);
+
+	float MeasureText(string s);
+
+	float GetLineHeight();
 }

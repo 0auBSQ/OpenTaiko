@@ -26,10 +26,10 @@ function Panel:restyle()
     local c = self.eff.colors
     self:bakeBody(c.surface, c.surface2)
     if self.title and self.title ~= "" then
-        local txt = self.mgr:renderText(self.eff.font.title, self.title, c.textOnAccent, U.shade(c.primary2, 0.5), false, self.w - 40)
-        self._titleText = txt
-        local tw = (txt.Width or 100) + 56
-        local th = (txt.Height or 30) + 22
+        -- glyph-composed title; +50 = the box padding a GetText texture carried
+        local ink = math.min(self.mgr:measureText(self.eff.font.title, self.title) + 50, self.w - 40)
+        local tw = ink + 56
+        local th = self.mgr:textHeight(self.eff.font.title) + 22
         local m = 6
         local cv = self.mgr:reuseCanvas(self._titlePill and self._titlePill.canvas, tw + 2 * m, th + 2 * m)
         Shape.panel(cv, m, m, tw, th, { radius = self.eff.radiusSmall, outline = { col = c.outline, width = self.eff.outlineWidth }, top = c.primary, bottom = c.primary2, gloss = c.gloss })
@@ -57,7 +57,9 @@ function Panel:draw()
         local ty = math.floor(self.y)
         self._titlePill.canvas:SetColor(1, 1, 1); self._titlePill.canvas:SetOpacity(1)
         self._titlePill.canvas:DrawAtAnchor(tx, ty, "center")
-        self._titleText:DrawAtAnchor(tx, ty, "center")
+        local c = self.eff.colors
+        self.mgr:drawTextEx(self.eff.font.title, self.title, tx, ty,
+            c.textOnAccent, U.shade(c.primary2, 0.5), 1, 1, self.w - 40, "center")
     end
 end
 

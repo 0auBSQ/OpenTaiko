@@ -207,10 +207,11 @@ G.unlocks = Unlocks
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function onStart()
-    G.text      = TEXT:Create(28)
-    G.textSmall = TEXT:Create(18)
-    G.textLarge = TEXT:Create(40)
-    G.textStats = TEXT:Create(24)
+    -- glyph-composed fonts: one texture per unique character (bounded), no per-string texture cache
+    G.text      = TEXT:CreateGlyphCached(28)
+    G.textSmall = TEXT:CreateGlyphCached(18)
+    G.textLarge = TEXT:CreateGlyphCached(40)
+    G.textStats = TEXT:CreateGlyphCached(24)
 
     SHARED:SetSharedTexture("background", "Textures/bg0.png")
 
@@ -321,6 +322,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
     Diff.resetToSongSelect()
+    Unlocks.invalidateCondCache()
 
     -- (search state is owned by LuaSongList; reloading the song list resets it)
 
@@ -422,8 +424,7 @@ local function drawWaitScreen(msg)
     -- Black fill
     local black = COLOR:CreateColorFromHex("ff000000")
     local white = COLOR:CreateColorFromHex("ffffffff")
-    local tx = G.textLarge:GetText(msg, false, 1600, white)
-    tx:DrawAtAnchor(960, 540, "center")
+    G.textLarge:Draw(msg, 960, 540, white, nil, 1, 1, 1600, "center")
 end
 
 function draw(mode)

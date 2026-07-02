@@ -21,12 +21,24 @@ local HI_BLURED    = 2
 -- Flash animation: nil = white; non-nil = animated color (red → white)
 -- Shared by both standard locked songs and vault locked songs (mutually exclusive).
 local flashColor = nil
+local lastFlashVal = nil
+
+-- Per-selection cache of the unlock-condition text. UnlockText/GetConditionMessage BUILD a new string on
+-- every call (and each cross-boundary string marshal allocates), so querying them per frame steadily stacks
+-- garbage while a locked song is selected. Fetch once per selected node instead.
+local condCache = nil   -- { node, has, text, scale }
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
 function M.init(g)
     G = g
     flashColor = nil
+    condCache = nil
+end
+
+-- drop the cached condition text (call on activity re-activation: unlock progress may have changed)
+function M.invalidateCondCache()
+    condCache = nil
 end
 
 -- Call from Script.lua onStart() to load all unlock-related textures into G.bars.
@@ -150,50 +162,55 @@ end
 
 -- ── Conditions panels ─────────────────────────────────────────────────────────
 
-local function drawCondText(condText)
+-- unlock text keeps the original behavior: no horizontal wrap — the width squishes to the box (806) while
+-- the HEIGHT shrinks independently (scaleY) when the newline-stacked block exceeds the 380px text area
+local function drawCondText(condText, scale)
     if condText == nil or condText == "" then return end
-    local tx = G.text:GetText(condText, false, 806)
-    local origScaleX = tx:GetScale().X
-    if tx.Height > 380 then
-        tx:SetScale(origScaleX, 380 / tx.Height)
+    G.text:Draw(condText, 350, 605, flashColor, nil, 1, 1, 806, "topleft", scale or 1)
+end
+
+-- Rebuilt only when the cache is invalid (selection moved / activity re-activated / unlock attempted):
+-- classifies the selected node once and precomputes the text + shrink scale, so the per-frame draw does
+-- ZERO cross-boundary accessor calls (each NLua property read allocates; per-frame reads stack garbage).
+local function refreshCondCache()
+    condCache = { mode = nil }
+    local ssn = G.songList:GetSelectedSongNode()
+    if ssn == nil then return end
+    if ssn.IsSong and ssn.IsLocked then
+        local cond = ssn.UnlockCondition
+        if not cond.HasCondition then return end
+        local text = ssn.UnlockText
+        if type(text) ~= "string" or text == "" then text = cond:GetConditionMessage() end
+        if text == nil or text == "" then return end
+        local h = G.text:MeasureWrapped(text, 0)
+        condCache = { mode = "locked", text = text, scale = (h > 380) and (380 / h) or 1 }
+        return
     end
-    if flashColor ~= nil then
-        tx:SetColor(flashColor)
+    if M.isVaultLocked(ssn) then
+        condCache = { mode = "vault" }
+    elseif M.isVaultFolder(ssn) then
+        condCache = { mode = "vaultFolder" }
     end
-    tx:Draw(350, 605)
-    tx:SetColor(COLOR:CreateColorFromHex("ffffffff"))
-    tx:SetScale(origScaleX, 1)
 end
 
 -- Draw condsbox.png and the unlock condition text for the currently selected locked
 -- song. Also applies the flash-red animation when the player just failed to unlock.
 function M.drawCondsPanel()
-    local ssn = G.songList:GetSelectedSongNode()
-    if ssn == nil or not ssn.IsSong or not ssn.IsLocked then return end
-    local cond = ssn.UnlockCondition
-    if not cond.HasCondition then return end
-
+    if condCache == nil then refreshCondCache() end
+    if condCache.mode ~= "locked" then return end
     G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
-
-    -- Get condition text; fall back to GetConditionMessage() if UnlockText is empty
-    local condText = ssn.UnlockText
-    if type(condText) ~= "string" or condText == "" then
-        condText = cond:GetConditionMessage()
-    end
-    drawCondText(condText)
+    drawCondText(condCache.text, condCache.scale)
 end
 
 -- Draw condsbox.png and the vault message for the currently selected vault-locked song or vault folder.
 function M.drawVaultCondsPanel()
-    local ssn = G.songList:GetSelectedSongNode()
-    if ssn == nil then return end
-
-    if M.isVaultLocked(ssn) then
+    if condCache == nil then refreshCondCache() end
+    if condCache.mode == "vault" then
         G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
-        drawCondText("Get this song in the Secret Vault menu")
-    elseif M.isVaultFolder(ssn) then
+        drawCondText("Get this song in the Secret Vault menu", 1)
+    elseif condCache.mode == "vaultFolder" then
         G.bars["condsbox"]:DrawAtAnchor(317, 572, "topleft")
-        drawCondText("4 keys is what you need...")
+        drawCondText("4 keys is what you need...", 1)
     end
 end
 
@@ -205,8 +222,13 @@ end
 -- ── Decide handlers ───────────────────────────────────────────────────────────
 
 local function startFlash()
+    lastFlashVal = nil
     G.startCounter("unlock_flash", 0, 255, 1/510, "none", function(val)
-        flashColor = COLOR:CreateColorFromARGB(255, 255, math.floor(val), math.floor(val))
+        val = math.floor(val)
+        if val ~= lastFlashVal then
+            lastFlashVal = val
+            flashColor = COLOR:CreateColorFromARGB(255, 255, val, val)
+        end
     end, function()
         flashColor = nil
     end)
@@ -215,6 +237,7 @@ end
 -- Called when the player presses Decide on a standard locked song.
 -- Opens confirm_dialog if the condition is met; otherwise flashes the condition text.
 function M.onDecideLocked(player, node)
+    condCache = nil
     local cond = node.UnlockCondition
     if cond:IsUnlockable(player) then
         local cd = G.act_inner["confirm_dialog"]
@@ -232,6 +255,7 @@ end
 -- Called when the player presses Decide on a vault-locked song.
 -- Always flashes the vault message (no purchase possible from here).
 function M.onDecideVaultLocked(player, node)
+    condCache = nil
     G.sounds.Cancel:Play()
     startFlash()
     return "flashed"
@@ -239,6 +263,7 @@ end
 
 -- Called when the player presses Decide on a locked vault folder.
 function M.onDecideVaultFolder(player, node)
+    condCache = nil
     G.sounds.Cancel:Play()
     startFlash()
     return "flashed"

@@ -26,6 +26,7 @@ class CLuaScript : IDisposable {
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];
 	public HashSet<LuaText> TextList = [];
+	public HashSet<LuaGlyphText> GlyphTextList = [];
 	public HashSet<LuaGradientMap> GradientList = [];
 	//public Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures = new();
 	//public Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds = new();
@@ -411,7 +412,7 @@ end
 			LuaScript["MODEL"] = new LuaModelFunc(dir);
 			LuaScript["SOUND"] = lsf;
 			LuaScript["VIDEO"] = new LuaVideoFunc(VideoList, dir);
-			LuaScript["TEXT"] = new LuaTextFunc(TextList, dir);
+			LuaScript["TEXT"] = new LuaTextFunc(TextList, GlyphTextList, dir);
 			LuaScript["JSONLOADER"] = new LuaJsonLoaderFunc(dir);
 			LuaScript["INILOADER"] = new LuaIniLoaderFunc(dir);
 			LuaScript["INPUT"] = new LuaInputFunc();
@@ -503,6 +504,7 @@ end
 		freeDisposableList(this.SoundList);
 		freeDisposableList(this.VideoList);
 		freeDisposableList(this.TextList);
+		freeDisposableList(this.GlyphTextList);
 		freeDisposableList(this.GradientList);
 
 		LuaScript.Dispose();

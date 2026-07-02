@@ -135,10 +135,12 @@ namespace OpenTaiko {
 	}
 	public class LuaTextFunc {
 		public HashSet<LuaText> Texts;
+		public HashSet<LuaGlyphText> GlyphTexts;
 		public string DirPath;
 
-		public LuaTextFunc(HashSet<LuaText> texts, string dirPath) {
+		public LuaTextFunc(HashSet<LuaText> texts, HashSet<LuaGlyphText> glyphTexts, string dirPath) {
 			Texts = texts;
+			GlyphTexts = glyphTexts;
 			DirPath = dirPath;
 		}
 
@@ -162,5 +164,20 @@ namespace OpenTaiko {
 
 
 		public LuaText Create(int size, params string[] style) => Create(size, style, autoDispose: true);
+
+		// glyph-composed text (bounded per-character cache); see LuaGlyphText
+		public LuaGlyphText CreateGlyphCached(int size, params string[] style) {
+			LuaGlyphText text = new();
+			try {
+				text = new(size, style);
+				GlyphTexts.Add(text);
+				text._disposeList = this.GlyphTexts;
+			} catch (Exception e) {
+				LogNotification.PopError($"Lua GlyphText failed to load: {e}");
+				OpenTaiko.tDisposeSafely(ref text);
+				text = new();
+			}
+			return text;
+		}
 	}
 }

@@ -36,8 +36,8 @@ local rarityToInt = { Poor=0, Common=0, Uncommon=1, Rare=2, Epic=3, Legendary=4,
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function onStart()
-    text      = TEXT:Create(24)
-    textLarge = TEXT:Create(36)
+    text      = TEXT:CreateGlyphCached(24)
+    textLarge = TEXT:CreateGlyphCached(36)
     bgtile    = TEXTURE:CreateTexture("Textures/BgTile.png")
 end
 
@@ -90,13 +90,8 @@ end
 
 local function drawLine(str, y, large, col)
     col = col or COLOR:CreateColorFromHex("ffffffff")
-    local t
-    if large then
-        t = textLarge:GetText(str, false, 1200, col)
-    else
-        t = text:GetText(str, false, 1200, col)
-    end
-    t:DrawAtAnchor(SCREEN_W / 2, y, "center")
+    local f = large and textLarge or text
+    f:Draw(str, SCREEN_W / 2, y, col, nil, 1, 1, 1200, "center")
 end
 
 function draw()

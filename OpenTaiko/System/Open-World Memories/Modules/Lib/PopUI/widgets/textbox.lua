@@ -79,9 +79,11 @@ function TextBox:drawContent(cx, cy, s)
     local avail = self.w - 2 * self.padX
     local w = self.mgr:measureText(sz, str)
     if w > avail then
+        -- clip whole UTF-8 characters from the left, never splitting a multi-byte sequence
+        local chars = self.mgr:utf8chars(str)
         local i = 1
-        while i < #str and w > avail do w = w - self.mgr:measureText(sz, str:sub(i, i)); i = i + 1 end
-        str = str:sub(i)
+        while i < #chars and w > avail do w = w - self.mgr:measureText(sz, chars[i]); i = i + 1 end
+        str = table.concat(chars, "", i)
     end
     self.mgr:drawText(sz, str, x, y, col)
 end

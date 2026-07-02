@@ -112,13 +112,12 @@ function Chooser:draw()
     end
     drawCap(self._capL, self.x + 6 + self._arrowW * 0.5, "left")
     drawCap(self._capR, self.x + self.w - 6 - self._arrowW * 0.5, "right")
-    -- value text (centred). renderText caches one texture per string (the option set is finite → bounded,
-    -- no leak) and goes through the font → unlike the ASCII glyph atlas it renders CJK option names too.
+    -- value text (centred), glyph-composed: no per-string textures, CJK-correct, squished to the avail width
     local txt = tostring(self:value() or "")
     local sz = self.eff.font.button
     local avail = math.max(20, self.w - 2 * self._arrowW - 24)
-    local tex = self.mgr:renderText(sz, txt, self.eff.colors.text, U.withAlpha({ 255, 255, 255 }, 0), false, avail)
-    tex:DrawAtAnchor(math.floor(cx), math.floor(cy + self.mgr:textNudge(sz)), "center")
+    self.mgr:drawTextEx(sz, txt, math.floor(cx), math.floor(cy + self.mgr:textNudge(sz)),
+        self.eff.colors.text, U.withAlpha({ 255, 255, 255 }, 0), self.enabled and 1 or 0.5, 1, avail, "center")
 end
 
 return Chooser

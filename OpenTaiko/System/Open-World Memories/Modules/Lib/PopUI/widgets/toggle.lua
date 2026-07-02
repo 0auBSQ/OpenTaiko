@@ -74,10 +74,10 @@ function Toggle:restyle()
         Shape.fillRound(knob, m + 3, m + 3, kd - 6, kd - 6, (kd - 6) * 0.5, { 255, 255, 255, 255 })
         knob:Upload(); self._knob = { canvas = knob, m = m, d = kd }
     end
-    -- side label
-    self._label = self.mgr:renderText(self.eff.font.label, self.text, c.text, U.withAlpha({ 255, 255, 255 }, 160), false, 1200)
-    self.h = math.max(ch, self._label.Height or 24)
-    self.w = cw + self.gap + (self._label.Width or 0)
+    -- side label (glyph-composed; +50 = the box padding a GetText texture carried)
+    self._labelInk = self.mgr:measureText(self.eff.font.label, self.text)
+    self.h = math.max(ch, self.mgr:textHeight(self.eff.font.label))
+    self.w = cw + self.gap + (self._labelInk > 0 and self._labelInk + 50 or 0)
     self:bakeRing()
 end
 
@@ -118,9 +118,11 @@ function Toggle:draw()
         self._knob.canvas:SetColor(1, 1, 1); self._knob.canvas:SetOpacity(1); self._knob.canvas:SetScale(s, s)
         self._knob.canvas:DrawAtAnchor(math.floor(kx), math.floor(ctrlCY), "center")
     end
-    if self._label then
-        self._label:SetOpacity(self.enabled and 1 or 0.5)
-        self._label:DrawAtAnchor(math.floor(self.x + cw + self.gap), math.floor(ctrlCY + self.mgr:textNudge(self.eff.font.label)), "left")
+    if self.text and self.text ~= "" then
+        local U160 = { 255, 255, 255, 160 }
+        self.mgr:drawTextEx(self.eff.font.label, self.text,
+            math.floor(self.x + cw + self.gap), math.floor(ctrlCY + self.mgr:textNudge(self.eff.font.label)),
+            self.eff.colors.text, U160, self.enabled and 1 or 0.5, 1, 1200, "left")
     end
 end
 

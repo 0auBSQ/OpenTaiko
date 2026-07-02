@@ -1,7 +1,7 @@
-{
+﻿{
     // Fichier de locale — Français
     "Entries": {
-        "SETTINGS_UI_KEYS": "Réglages des entrées",
+        "SETTINGS_UI_KEYS": "Entrées",
         "SETTINGS_UI_EXIT": "Retour",
         "SETTINGS_UI_BACK": "< Retour",
         "SETTINGS_UI_RUN": "Exécuter",
