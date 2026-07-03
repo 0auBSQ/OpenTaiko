@@ -12,8 +12,8 @@
     <!-- Application metadata -->
     <ApplicationId Condition="'$(ApplicationId)' == ''">com.opentaiko.OpenTaiko</ApplicationId>
     <XSAppIconAssets>Assets.xcassets/AppIcon.appiconset</XSAppIconAssets>
-    <ApplicationDisplayVersion>0.6.0</ApplicationDisplayVersion>
-    <ApplicationVersion>14</ApplicationVersion>
+    <ApplicationDisplayVersion>0.6.1</ApplicationDisplayVersion>
+    <ApplicationVersion>15</ApplicationVersion>
   </PropertyGroup>
 
   <ItemGroup>
