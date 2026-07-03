@@ -93,19 +93,18 @@ local function drawLevelTag(lv, x, y)
     local labelW = G.bars["levellabels"].Width
 
     if lv.isVault then
-        -- Vault songs: animated strip (same frame counter as storm), always-on gray border
+        -- Vault songs: animated strip (same frame counter as storm)
         G.bars["levellabelsvault"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_VAULT_GRAY)
     elseif lv.diff < 3 or lv.lv <= 10 then
         G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
     elseif lv.diff == 3 then
         G.bars["levellabelsfire"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_TAG_FIRE)
     else
         G.bars["levellabelsstorm"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_TAG_STORM)
     end
     G.drawNumberCentered(lv.lv, "levellabels", x, y)
+    -- Fill numbers over the base ones, tinted to the genre (song bar) colour brightened 50% (any level)
+    G.drawNumberCentered(lv.lv, "levellabelsfill", x, y, lv.fillColor)
     if lv.isPlus then
         if lv.isVault then
             G.bars["levellabelsplusvault"]:DrawAtAnchor(x, y, "center")

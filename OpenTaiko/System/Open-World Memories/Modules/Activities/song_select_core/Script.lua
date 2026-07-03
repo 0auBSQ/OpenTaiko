@@ -236,7 +236,7 @@ function onStart()
         G.bgtx["sinfo_difficulties_" .. i .. "_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_0_plus.png")
     end
     for i = 0, 9 do
-        G.bgtx["levellabelsborder" .. i] = TEXTURE:CreateTexture("Textures/BarLevelBorder/" .. i .. ".png")
+        G.bgtx["levellabelsfill" .. i]   = TEXTURE:CreateTexture("Textures/BarLevelFill/" .. i .. ".png")
         G.bgtx["levellabels" .. i]       = TEXTURE:CreateTexture("Textures/BarLevel/" .. i .. ".png")
         G.bgtx["sinfo_level" .. i]       = TEXTURE:CreateTexture("Textures/SinfoLevel/" .. i .. ".png")
         G.bgtx["diffsel_level" .. i]     = TEXTURE:CreateTexture("Textures/DifficultyBars/Level/" .. i .. ".png")

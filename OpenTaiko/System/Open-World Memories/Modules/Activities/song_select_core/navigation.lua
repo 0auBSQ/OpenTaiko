@@ -75,6 +75,15 @@ end
 -- (node.IsSong, chart:GetPlayerBestScore, …) allocates on each call, so per-frame reads in the draw loop
 -- stack garbage and stutter the GC. The draw code consumes only these plain-Lua caches.
 
+-- The genre (song bar) colour brightened by 50% toward white — used to tint the BarLevelFill numbers so
+-- they read as a lighter shade of the bar regardless of the chart's star rating. Precomputed per selection
+-- (never per frame) since COLOR:Create allocates. Falls back to white when the node has no box colour.
+local function brightenedFill(boxColor)
+    local function up(c) return math.min(255, math.floor(c + (255 - c) * 0.5)) end
+    if boxColor == nil then return COLOR:CreateColorFromRGBA(255, 255, 255, 255) end
+    return COLOR:CreateColorFromRGBA(up(boxColor.R), up(boxColor.G), up(boxColor.B), 255)
+end
+
 local function focusChart(songNode)
     if songNode.IsSong ~= true then return nil end
     local default = math.min(4, CONFIG:GetDefaultCourse(0))
@@ -119,7 +128,8 @@ local function buildSlot(node, isSelected)
             local chart = focusChart(node)
             if chart ~= nil then
                 slot.level = { lv = chart.Level, diff = chart.DifficultyAsInt,
-                               isPlus = chart.IsPlus == true, isVault = slot.genre == "Secret Vault" }
+                               isPlus = chart.IsPlus == true, isVault = slot.genre == "Secret Vault",
+                               fillColor = brightenedFill(slot.boxColor) }
                 local info = chart:GetPlayerBestScore(G.highlightedPlayer)
                 slot.barleft = { played = info.HasBeenPlayed, cs = info.ClearStatus, sr = info.ScoreRank }
             end
