@@ -101,10 +101,16 @@ public class AngleContext : IGLContext {
 		Egl.Initialize(Display, out int major, out int minor);
 		Egl.BindAPI(RenderApi.ES);
 
+		// 8-bit color channels MUST be requested explicitly: with no size constraints, eglChooseConfig sorts
+		// smaller buffers first, and on the D3D11 backend a 16-bit (RGB565) config wins — visible banding on
+		// gradients. Requesting nonzero R/G/B flips the sort to prefer the deepest matching config (8888).
 		IntPtr[] configs = new IntPtr[1];
 		int[] configAttributes = new int[]
 		{
 			Egl.RENDERABLE_TYPE, Egl.OPENGL_ES2_BIT,
+			Egl.RED_SIZE, 8,
+			Egl.GREEN_SIZE, 8,
+			Egl.BLUE_SIZE, 8,
 			Egl.BUFFER_SIZE, 0,
 			Egl.NONE
 		};
@@ -124,6 +130,9 @@ public class AngleContext : IGLContext {
 			int[] configAttributes3 = new int[]
 			{
 				Egl.RENDERABLE_TYPE, OPENGL_ES3_BIT_KHR,
+				Egl.RED_SIZE, 8,
+				Egl.GREEN_SIZE, 8,
+				Egl.BLUE_SIZE, 8,
 				Egl.BUFFER_SIZE, 0,
 				Egl.NONE
 			};
