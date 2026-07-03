@@ -92,6 +92,7 @@ namespace OpenTaiko {
 				try {
 					using var bmp = ((CFontRenderer)_font).DrawText(s, tintable ? Color.White : fore, outline, null, 30, false);
 					entry.Tex = new LuaTexture(OpenTaiko.tTextureCreate(bmp, false));
+					if (entry.Tex != null) Interlocked.Increment(ref LiveGlyphs);
 				} catch (Exception e) {
 					Trace.TraceWarning($"LuaGlyphText: glyph bake failed for U+{cp:X4}: {e.Message}");
 					entry.Tex = null;
@@ -241,9 +242,17 @@ namespace OpenTaiko {
 
 		#region Dispose
 		private bool _disposedValue;
+		// Live baked-glyph gauge for the [MEMTRACE] debug line (attributes CTexture growth to glyphs vs images).
+		public static int LiveGlyphs;
+
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
-				foreach (var g in _glyphs.Values) g.Tex?.Dispose();
+				foreach (var g in _glyphs.Values) {
+					if (g.Tex != null) {
+						g.Tex.Dispose();
+						Interlocked.Decrement(ref LiveGlyphs);
+					}
+				}
 				_glyphs.Clear();
 				_advances.Clear();
 				_font?.Dispose();

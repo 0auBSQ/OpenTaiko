@@ -70,10 +70,94 @@ function M.init(g)
 end
 
 -- ── Page refresh ──────────────────────────────────────────────────────────────
+-- All node-derived draw data is extracted HERE, once per selection change: every NLua property read
+-- (node.IsSong, chart:GetPlayerBestScore, …) allocates on each call, so per-frame reads in the draw loop
+-- stack garbage and stutter the GC. The draw code consumes only these plain-Lua caches.
+
+local function focusChart(songNode)
+    if songNode.IsSong ~= true then return nil end
+    local default = math.min(4, CONFIG:GetDefaultCourse(0))
+    local chart   = songNode:GetChart(default)
+    local i = 4
+    while chart == nil and i >= 0 do chart = songNode:GetChart(i); i = i - 1 end
+    return chart
+end
+
+-- vault lock icon key from the highest available difficulty's level
+local function vaultLockKey(node)
+    local c = nil
+    for d = 4, 0, -1 do
+        c = node:GetChart(d)
+        if c ~= nil then break end
+    end
+    local lvl = c and c.Level or 0
+    if lvl >= 3 then return "vault_lock2"
+    elseif lvl >= 2 then return "vault_lock1"
+    else return "vault_lock0" end
+end
+
+local function buildSlot(node, isSelected)
+    local slot = { text = node.Title, gold = isSelected }
+    slot.isSong, slot.isFolder = node.IsSong == true, node.IsFolder == true
+    slot.isRandom, slot.isReturn = node.IsRandom == true, node.IsReturn == true
+    slot.genre = node.Genre
+    if slot.isSong or slot.isFolder then
+        slot.boxColor    = node.BoxColor
+        slot.vaultLocked = slot.isSong and G.unlocks.isVaultLocked(node) or false
+        slot.vaultFolder = slot.isFolder and G.unlocks.isVaultFolder(node) or false
+        slot.isLocked    = slot.isSong and node.IsLocked == true or false
+        slot.hi          = slot.isSong and G.unlocks.effectiveHiddenIndex(node) or 0
+        if slot.vaultLocked then slot.vaultLockKey = vaultLockKey(node) end
+        if slot.isLocked then
+            slot.lockedBarOverride = slot.hi >= 1                       -- GRAYED/BLURED use bar_1
+            slot.lockKey = slot.hi >= 1 and "lock_1" or "lock_0"
+        end
+        if slot.isSong then
+            local saveId = GetSaveFile(G.highlightedPlayer).SaveId
+            slot.fav = node.UniqueId ~= nil and G.favs ~= nil and G.favs.isFavorite(saveId, node.UniqueId) or false
+            local chart = focusChart(node)
+            if chart ~= nil then
+                slot.level = { lv = chart.Level, diff = chart.DifficultyAsInt,
+                               isPlus = chart.IsPlus == true, isVault = slot.genre == "Secret Vault" }
+                local info = chart:GetPlayerBestScore(G.highlightedPlayer)
+                slot.barleft = { played = info.HasBeenPlayed, cs = info.ClearStatus, sr = info.ScoreRank }
+            end
+        end
+    end
+    return slot
+end
+
+-- selected-node info for the right panel / breadcrumb / preimage / selected-bar visuals
+local function buildSelInfo(node)
+    local sel = {}
+    sel.isSong, sel.isRandom = node.IsSong == true, node.IsRandom == true
+    sel.crumbs = {}
+    local cur = node.Parent
+    while cur ~= nil do
+        sel.crumbs[#sel.crumbs + 1] = cur.Title ~= nil and cur.Title or "/"
+        cur = cur.Parent
+    end
+    if not sel.isSong then return sel end
+    sel.hi = G.unlocks.effectiveHiddenIndex(node)
+    sel.hasVideo, sel.explicit = node.HasVideo == true, node.Explicit == true
+    sel.isVault  = node.Genre == "Secret Vault"
+    sel.subtitle = node.Subtitle
+    sel.charter  = "Chart - " .. node.Maker
+    sel.diffs = {}
+    for i = 0, 4 do
+        local c = node:GetChart(i)
+        if c ~= nil then sel.diffs[i] = { level = c.Level, isPlus = c.IsPlus == true } end
+    end
+    local fc = focusChart(node)
+    if fc ~= nil then sel.bpmBase, sel.bpmMin, sel.bpmMax = fc.BaseBPM, fc.MinBPM, fc.MaxBPM end
+    sel.isUnlockedSong = node.IsLocked ~= true and not G.unlocks.isVaultLocked(node)
+    return sel
+end
 
 function M.refreshPage(skipMedia)
     G.currentPage = {}
     G.pageTexts   = {}
+    G.selInfo     = nil
     G.unlocks.invalidateCondCache()   -- selection changed: recompute the unlock-condition panel cache
 
     for i = -5, 5 do
@@ -82,8 +166,8 @@ function M.refreshPage(skipMedia)
         if node == nil then
             G.pageTexts[i] = nil
         else
-            -- glyph draw at render time; only the string is cached (i == 0 = the selected bar, gold)
-            G.pageTexts[i] = { text = node.Title, gold = (i == 0) }
+            G.pageTexts[i] = buildSlot(node, i == 0)
+            if i == 0 then G.selInfo = buildSelInfo(node) end
             if G.genre_overlays[node.Genre] == nil then
                 if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
                     G.genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
@@ -254,6 +338,7 @@ function M.handleSongSelectInput(Sort, Diff)
             local saveId = GetSaveFile(G.highlightedPlayer).SaveId
             G.favs.toggleFavorite(saveId, ssn.UniqueId)
             G.sounds.Decide:Play()
+            M.refreshPage(true)   -- the fav icon is cached in the page slots
         end
     end
 

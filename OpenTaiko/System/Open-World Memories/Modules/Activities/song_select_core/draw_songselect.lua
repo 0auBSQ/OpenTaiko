@@ -3,6 +3,15 @@
 
 local M = {}
 local SONGLIST_GOLD = COLOR:CreateColorFromARGB(255, 242, 207, 1)   -- selected-bar title tint
+-- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame)
+local COL_WHITE      = COLOR:CreateColorFromHex("ffffffff")
+local COL_VAULT_GRAY = COLOR:CreateColorFromHex("ff808080")
+local COL_TAG_FIRE   = COLOR:CreateColorFromHex("ffac0c0c")
+local COL_TAG_STORM  = COLOR:CreateColorFromHex("ff83159e")
+local COL_BPM_SLOW   = COLOR:CreateColorFromHex("ff95ccff")
+local COL_BPM_FAST   = COLOR:CreateColorFromHex("ffff9ec3")
+
+local statsCache = { player = -1, diff = -1 }   -- clear-count queries are save-file scans; key on (player, course)
 local G   -- shared state injected by Script.lua
 
 -- ── Layout constants ──────────────────────────────────────────────────────────
@@ -77,59 +86,45 @@ local function formatNumber(n, decimals)
     return s
 end
 
-local function getSongNodeFocusChart(songNode)
-    if songNode.IsSong ~= true then return nil end
-    local default = math.min(4, CONFIG:GetDefaultCourse(0))
-    local chart   = songNode:GetChart(default)
-    local i = 4
-    while chart == nil and i >= 0 do chart = songNode:GetChart(i); i = i - 1 end
-    return chart
-end
+-- lv = the slot's cached { lv, diff, isPlus, isVault } (nil when the node has no chart)
+local function drawLevelTag(lv, x, y)
+    if lv == nil then return end
+    local labelH = G.bars["levellabels"].Height / 5
+    local labelW = G.bars["levellabels"].Width
 
-local function drawLevelTag(songNode, x, y)
-    local chart = getSongNodeFocusChart(songNode)
-    if chart == nil then return end
-    local level      = chart.Level
-    local difficulty = chart.DifficultyAsInt
-    local labelH     = G.bars["levellabels"].Height / 5
-    local labelW     = G.bars["levellabels"].Width
-    local isVault    = songNode.Genre == "Secret Vault"
-
-    if isVault then
+    if lv.isVault then
         -- Vault songs: animated strip (same frame counter as storm), always-on gray border
         G.bars["levellabelsvault"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(level, "levellabelsborder", x, y, COLOR:CreateColorFromHex("ff808080"))
-    elseif difficulty < 3 or level <= 10 then
-        G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
-    elseif difficulty == 3 then
+        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_VAULT_GRAY)
+    elseif lv.diff < 3 or lv.lv <= 10 then
+        G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
+    elseif lv.diff == 3 then
         G.bars["levellabelsfire"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(level, "levellabelsborder", x, y, COLOR:CreateColorFromHex("ffac0c0c"))
+        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_TAG_FIRE)
     else
         G.bars["levellabelsstorm"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
-        G.drawNumberCentered(level, "levellabelsborder", x, y, COLOR:CreateColorFromHex("ff83159e"))
+        G.drawNumberCentered(lv.lv, "levellabelsborder", x, y, COL_TAG_STORM)
     end
-    G.drawNumberCentered(level, "levellabels", x, y)
-    if chart.IsPlus == true then
-        if isVault then
+    G.drawNumberCentered(lv.lv, "levellabels", x, y)
+    if lv.isPlus then
+        if lv.isVault then
             G.bars["levellabelsplusvault"]:DrawAtAnchor(x, y, "center")
         else
-            G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * difficulty, labelW, labelH, "center")
+            G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
         end
     end
 end
 
--- Draw fav.png at x=39 y=80 relative to bar.png top-left (without anchor).
-local function drawFavIcon(node, xpos, ypos)
-    if not node.IsSong or node.UniqueId == nil then return end
-    if G.favs == nil or G.favoriteicon == nil then return end
-    local saveId = GetSaveFile(G.highlightedPlayer).SaveId
-    if not G.favs.isFavorite(saveId, node.UniqueId) then return end
+-- Draw fav.png at x=39 y=80 relative to bar.png top-left (the favorite flag is cached in the page slot).
+local function drawFavIcon(xpos, ypos)
+    if G.favoriteicon == nil then return end
     local bar_tl_x = xpos - G.bars["bar"].Width  / 2
     local bar_tl_y = ypos - G.bars["bar"].Height / 2
     G.favoriteicon:Draw(bar_tl_x + 39, bar_tl_y + 80)
 end
 
-local function drawBarleft(node, xpos, ypos)
+-- bl = the slot's cached { played, cs, sr } best-score info (nil when the node has no chart)
+local function drawBarleft(bl, xpos, ypos)
     local barW = G.bars["bar"].Width
     local barH = G.bars["bar"].Height
     local lx   = xpos - barW / 2 + BARLEFT_X_OFFSET
@@ -137,17 +132,15 @@ local function drawBarleft(node, xpos, ypos)
 
     G.bars["barleft"]:Draw(lx, ly)
 
-    local chart = getSongNodeFocusChart(node)
-    if chart == nil then
+    if bl == nil then
         G.bars["scorerank_none"]:Draw(lx, ly)
         G.bars["clearstatus_none"]:Draw(lx, ly)
         return
     end
 
-    local info   = chart:GetPlayerBestScore(G.highlightedPlayer)
-    local played = info.HasBeenPlayed
-    local cs     = info.ClearStatus
-    local sr     = info.ScoreRank
+    local played = bl.played
+    local cs     = bl.cs
+    local sr     = bl.sr
 
     -- cs stored: 0=never played/failed, 1=assisted, 2=clear, 3=FC, 4=perfect.
     if not played then
@@ -172,9 +165,8 @@ local function drawBarleft(node, xpos, ypos)
 end
 
 local function drawPreimage()
-    local node = G.songList:GetSongNodeAtOffset(0)
-    if node == nil or node.IsSong ~= true then return end
-    if G.unlocks.effectiveHiddenIndex(node) >= 2 then return end
+    local sel = G.selInfo
+    if sel == nil or not sel.isSong or sel.hi >= 2 then return end
     G.bgtx["preimage_load"]:Draw(PREIMAGE_ORIGIN_X - G.songSelectShift, PREIMAGE_ORIGIN_Y)
     G.bgtx["load"]:DrawAtAnchor(
         PREIMAGE_ORIGIN_X - G.songSelectShift + PREIMAGE_SIZE_X / 2,
@@ -190,62 +182,62 @@ end
 
 function M.drawPanel()
     local opacityNorm = G.songSelectElemOpacity / 255
-    local ssn = G.songList:GetSelectedSongNode()
+    local sel = G.selInfo
 
-    -- Random / song info panels
-    if ssn ~= nil and ssn.IsRandom then
+    -- Random / song info panels (all node-derived data comes from the selection cache — see navigation.lua)
+    if sel ~= nil and sel.isRandom then
         G.bgtx["randominfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
     end
 
-    if ssn ~= nil and ssn.IsSong then
-        local ssnHI = G.unlocks.effectiveHiddenIndex(ssn)
+    if sel ~= nil and sel.isSong then
         -- BLURED / vault locked: skip the song info panel entirely
-        if ssnHI < 2 then
+        if sel.hi < 2 then
             G.bgtx["songinfo"]:DrawAtAnchor(1920 - G.songSelectShift, 0, "topright")
-            if ssn.HasVideo then
+            if sel.hasVideo then
                 G.bgtx["sinfo_video"]:Draw(SONGINFO_HASVIDEO_ORIGIN_X - G.songSelectShift, SONGINFO_HASVIDEO_ORIGIN_Y)
             end
-            if ssn.Explicit then
+            if sel.explicit then
                 G.bgtx["sinfo_explicit"]:DrawAtAnchor(
                     SONGINFO_EXPLICIT_ORIGIN_X - G.songSelectShift, SONGINFO_EXPLICIT_ORIGIN_Y, "topright")
             end
 
             -- Difficulty icons: hidden for GRAYED and above
-            if ssnHI == 0 then
-                local isVaultSong = ssn.Genre == "Secret Vault"
+            if sel.hi == 0 then
+                local isVaultSong = sel.isVault
+                local has3, has4 = sel.diffs[3] ~= nil, sel.diffs[4] ~= nil
                 for i = 0, 4 do
-                    local chart = ssn:GetChart(i)
+                    local d     = sel.diffs[i]
                     local xpos  = SONGINFO_DIFFICULTIES_ORIGIN_X - G.songSelectShift
                     local ypos  = SONGINFO_DIFFICULTIES_ORIGIN_Y + SONGINFO_DIFFICULTIES_GAP_Y * math.min(i, 3)
-                    if ssn:GetChart(3) ~= nil and i == 4 then
-                        if chart ~= nil then
+                    if has3 and i == 4 then
+                        if d ~= nil then
                             local difftx = isVaultSong and G.bgtx["sinfo_difficulties_vault"] or G.bgtx["sinfo_difficulties_4"]
                             difftx:SetOpacity(G.difficultyFade4 / 255)
                             difftx:Draw(xpos, ypos)
                             difftx:SetOpacity(1)
-                            G.drawNumberCentered(chart.Level, "sinfo_level",
+                            G.drawNumberCentered(d.level, "sinfo_level",
                                 xpos + difftx.Width / 2,
                                 ypos + difftx.Height / 2,
                                 nil, G.difficultyFade4 / 255)
-                            if chart.IsPlus then
+                            if d.isPlus then
                                 local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
                                 plustx:SetOpacity(G.difficultyFade4 / 255)
                                 plustx:Draw(xpos, ypos)
                                 plustx:SetOpacity(1)
                             end
                         end
-                    elseif chart == nil then
+                    elseif d == nil then
                         -- Vault songs: never show the "missing" indicator
-                        if not isVaultSong and (ssn:GetChart(4) == nil or i ~= 3) then
+                        if not isVaultSong and (not has4 or i ~= 3) then
                             G.bgtx["sinfo_difficulties_missing"]:Draw(xpos, ypos)
                         end
                     else
                         local difftx = isVaultSong and G.bgtx["sinfo_difficulties_vault"] or G.bgtx["sinfo_difficulties_" .. i]
                         difftx:Draw(xpos, ypos)
-                        G.drawNumberCentered(chart.Level, "sinfo_level",
+                        G.drawNumberCentered(d.level, "sinfo_level",
                             xpos + difftx.Width / 2,
                             ypos + difftx.Height / 2)
-                        if chart.IsPlus then
+                        if d.isPlus then
                             local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
                             plustx:Draw(xpos, ypos)
                         end
@@ -253,25 +245,33 @@ function M.drawPanel()
                 end
             end
 
-            local focusedChart = getSongNodeFocusChart(ssn)
-            G.textSmall:Draw(ssn.Subtitle, SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y,
+            G.textSmall:Draw(sel.subtitle, SONGINFO_SUBTITLE_ORIGIN_X - G.songSelectShift, SONGINFO_SUBTITLE_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_SUBTITLE_MWIDTH, "center")
-            G.textSmall:Draw("Chart - " .. ssn.Maker, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
+            G.textSmall:Draw(sel.charter, SONGINFO_CHARTER_ORIGIN_X - G.songSelectShift, SONGINFO_CHARTER_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_CHARTER_MWIDTH)
-            G.textSmall:Draw("Length - " .. formatDuration(G.previewDurationMs), SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
+            -- rebuild the length string only when the async preview load lands a new duration
+            if sel.lenMs ~= G.previewDurationMs then
+                sel.lenMs   = G.previewDurationMs
+                sel.lenText = "Length - " .. formatDuration(sel.lenMs)
+            end
+            G.textSmall:Draw(sel.lenText, SONGINFO_LENGTH_ORIGIN_X - G.songSelectShift, SONGINFO_LENGTH_ORIGIN_Y,
                 nil, nil, 1, 1, SONGINFO_LENGTH_MWIDTH)
 
-            if focusedChart ~= nil then
-                local mult    = CONFIG.SongSpeed / 20
-                local bpmText = formatNumber(focusedChart.BaseBPM * mult, 3)
-                if focusedChart.BaseBPM ~= focusedChart.MinBPM or focusedChart.BaseBPM ~= focusedChart.MaxBPM then
-                    bpmText = bpmText .. " (" .. formatNumber(focusedChart.MinBPM * mult, 3)
-                           .. "-" .. formatNumber(focusedChart.MaxBPM * mult, 3) .. ")"
+            if sel.bpmBase ~= nil then
+                -- rebuild the BPM string/color only when the song-speed multiplier changes
+                local mult = CONFIG.SongSpeed / 20
+                if sel.bpmMult ~= mult then
+                    sel.bpmMult = mult
+                    local bpmText = formatNumber(sel.bpmBase * mult, 3)
+                    if sel.bpmBase ~= sel.bpmMin or sel.bpmBase ~= sel.bpmMax then
+                        bpmText = bpmText .. " (" .. formatNumber(sel.bpmMin * mult, 3)
+                               .. "-" .. formatNumber(sel.bpmMax * mult, 3) .. ")"
+                    end
+                    sel.bpmText  = bpmText
+                    sel.bpmColor = (mult < 1) and COL_BPM_SLOW or (mult > 1) and COL_BPM_FAST or COL_WHITE
                 end
-                local col = "FFFFFFFF"
-                if mult < 1 then col = "ff95ccff" elseif mult > 1 then col = "ffff9ec3" end
-                G.text:Draw(bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
-                    COLOR:CreateColorFromHex(col), nil, 1, 1, SONGINFO_BPM_MWIDTH, "center")
+                G.text:Draw(sel.bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
+                    sel.bpmColor, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center")
             end
         end
     end
@@ -288,53 +288,55 @@ function M.drawPanel()
             local ypos = SONGLIST_ORIGIN_Y + (i + G.selectBoxDist) * SONGLIST_OFFSET_Y
             if i == 0 then xpos = xpos + SONGLIST_SELECTED_X_DIFF end
             if tx ~= nil then
-                local node = G.currentPage[i]
-                if node.IsSong or node.IsFolder then
-                    if node.IsSong and G.unlocks.isVaultLocked(node) then
+                if tx.isSong or tx.isFolder then
+                    if tx.isSong and tx.vaultLocked then
                         -- Secret Vault locked song: vault bar + vault lock icon, no title, no level tag
-                        G.unlocks.drawVaultBar(node, xpos, ypos)
-                        G.unlocks.drawVaultLockIcon(node, xpos, ypos)
-                    elseif node.IsFolder and G.unlocks.isVaultFolder(node) then
+                        G.bars["vault_bar"]:DrawAtAnchor(xpos, ypos, "center")
+                        if G.bars[tx.vaultLockKey] then
+                            G.bars[tx.vaultLockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
+                        end
+                    elseif tx.isFolder and tx.vaultFolder then
                         -- Secret Vault folder (locked): normal bar, blurred glitch, lockF overlay, no title
-                        G.bars["bar"]:SetColor(node.BoxColor)
+                        G.bars["bar"]:SetColor(tx.boxColor)
                         G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
                         G.unlocks.drawBluredStatic(xpos, ypos)
-                        G.unlocks.drawVaultFolderLock(node, xpos, ypos)
-                    elseif node.IsLocked then
-                        -- Draw the HiddenIndex-appropriate bar (GRAYED/BLURED both use bar_1);
-                        -- DISPLAYED locked songs fall through to the normal bar below.
-                        if not G.unlocks.drawLockedBar(node, xpos, ypos) then
-                            G.bars["bar"]:SetColor(node.BoxColor)
+                        if G.bars["vault_lockF"] then G.bars["vault_lockF"]:DrawAtAnchor(xpos, ypos, "center") end
+                    elseif tx.isLocked then
+                        -- GRAYED/BLURED use bar_1; DISPLAYED locked songs keep the normal bar
+                        if tx.lockedBarOverride then
+                            G.bars["bar_1"]:DrawAtAnchor(xpos, ypos, "center")
+                        else
+                            G.bars["bar"]:SetColor(tx.boxColor)
                             G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
-                            G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
+                            G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
                         end
-                        local hi = node.IsSong and node.HiddenIndex or 0
-                        -- Title area content (over bar, under lock icon):
-                        -- BLURED → static.png with GL noise; others → normal title text.
-                        if hi == 2 then
+                        -- Title area content: BLURED → static.png with GL noise; others → title text
+                        if tx.hi == 2 then
                             G.unlocks.drawBluredStatic(xpos, ypos)
                         else
                             drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                         end
                         -- Lock icon on top of title area
-                        G.unlocks.drawLockIcon(node, xpos, ypos)
+                        if tx.lockKey and G.bars[tx.lockKey] then
+                            G.bars[tx.lockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
+                        end
                         -- Level tag: only DISPLAYED locked songs (hi == 0)
-                        if node.IsSong and hi == 0 then
-                            drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+                        if tx.isSong and tx.hi == 0 then
+                            drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
                         end
                     else
-                        G.bars["bar"]:SetColor(node.BoxColor)
+                        G.bars["bar"]:SetColor(tx.boxColor)
                         G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
-                        G.genre_overlays[node.Genre]:DrawAtAnchor(xpos, ypos, "center")
-                        drawFavIcon(node, xpos, ypos)
-                        if node.IsSong then drawBarleft(node, xpos, ypos) end
-                        drawLevelTag(node, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+                        G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
+                        if tx.fav then drawFavIcon(xpos, ypos) end
+                        if tx.isSong then drawBarleft(tx.barleft, xpos, ypos) end
+                        drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
                         drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                     end
-                elseif node.IsRandom then
+                elseif tx.isRandom then
                     G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
                     drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-                elseif node.IsReturn then
+                elseif tx.isReturn then
                     G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
                     drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
                 end
@@ -348,8 +350,7 @@ function M.drawPanel()
         local ax     = G.arrowsDistance
         local xlshift = ax * math.cos(7 * math.pi / 12)
         local ylshift = ax * math.sin(7 * math.pi / 12)
-        local isSong = ssn ~= nil and ssn.IsSong
-        local isUnlockedSong = isSong and (ssn.IsLocked ~= true) and not G.unlocks.isVaultLocked(ssn)
+        local isUnlockedSong = sel ~= nil and sel.isSong and sel.isUnlockedSong
         if isUnlockedSong then
             -- selectedlarge covers bar + barleft; align its right edge with selected's right edge
             local largeCenterX = x0 - (G.bars["selectedlarge"].Width - G.bars["selected"].Width) / 2
@@ -365,13 +366,8 @@ function M.drawPanel()
 
     -- Header breadcrumb
     G.bgtx["header"]:Draw(-G.songSelectShift, 0)
-    if ssn ~= nil then
-        local pathStack  = {}
-        local currentNode = ssn.Parent
-        while currentNode ~= nil do
-            table.insert(pathStack, currentNode.Title ~= nil and currentNode.Title or "/")
-            currentNode = currentNode.Parent
-        end
+    if sel ~= nil then
+        local pathStack = sel.crumbs
         local xpos = HEADER_OFFSET_X - G.songSelectShift
         for i, title in ipairs(pathStack) do
             G.bgtx["header-box"]:SetOpacity(opacityNorm)
@@ -411,19 +407,23 @@ function M.drawPanel()
         NAMEPLATE:DrawPlayerNameplate(x0 + NAMEPLATE_OFFSET_X, y0 + NAMEPLATE_OFFSET_Y, G.songSelectElemOpacity, G.highlightedPlayer)
 
         -- Perfect / FC / Clear counts for the highlighted player at the displayed difficulty
+        -- (queried only when the player/course key changes — the counts are save-file scans)
         if G.textStats ~= nil then
-            local diff    = math.min(4, CONFIG:GetDefaultCourse(0))
-            local sav     = GetSaveFile(G.highlightedPlayer)
-            local white   = COLOR:CreateColorFromHex("ffffffff")
-            local nPerfect = sav:GetClearStatusCount(diff, 4)
-            local nFC      = sav:GetClearStatusCount(diff, 3)
-            local nClear   = sav:GetClearStatusCount(diff, 2)
-            local function drawStat(n, x)
-                G.textStats:Draw(tostring(n), x, 1058, white, nil, opacityNorm, 1, 0, "center")
+            local diff = math.min(4, CONFIG:GetDefaultCourse(0))
+            local sc = statsCache
+            if sc.player ~= G.highlightedPlayer or sc.diff ~= diff then
+                local sav = GetSaveFile(G.highlightedPlayer)
+                sc.player, sc.diff = G.highlightedPlayer, diff
+                sc.perfect = tostring(sav:GetClearStatusCount(diff, 4))
+                sc.fc      = tostring(sav:GetClearStatusCount(diff, 3))
+                sc.clear   = tostring(sav:GetClearStatusCount(diff, 2))
             end
-            drawStat(nPerfect, 95)
-            drawStat(nFC,     212)
-            drawStat(nClear,  329)
+            local function drawStat(n, x)
+                G.textStats:Draw(n, x, 1058, COL_WHITE, nil, opacityNorm, 1, 0, "center")
+            end
+            drawStat(sc.perfect, 95)
+            drawStat(sc.fc,     212)
+            drawStat(sc.clear,  329)
         end
     end
 

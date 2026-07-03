@@ -619,9 +619,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
 			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
 
-		SKBitmap bitmap = SKBitmap.Decode(strFileName);
+		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
+		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
+		// falls through to MakeTexture's null-guard (blank 10x10), as before.
+		SKBitmap bitmap = tDecodeForUpload(strFileName);
 		MakeTexture(bitmap, bBlackTransparent);
-		bitmap.Dispose();
+		bitmap?.Dispose();
 	}
 
 	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────
@@ -673,13 +676,49 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	/// (unpremultiplied) alpha, so: if the bitmap is already Unpremul Bgra/Rgba, hand GL its native buffer via
 	/// GetPixels() (no managed copy); otherwise read .Pixels, which converts to unpremultiplied BGRA (correct,
 	/// but copies the whole image — the old behavior, kept as a safe fallback). Render thread only (calls GL).</summary>
+	// Returns a bitmap tGenFromBitmap can upload zero-copy (straight-alpha or opaque BGRA/RGBA), owned by the
+	// caller. takeOwnership: src is either returned directly or disposed after conversion; otherwise src is
+	// left intact and a copy is returned.
+	private static SKBitmap tPrepareUploadBitmap(SKBitmap src, bool takeOwnership) {
+		bool eligible = (src.AlphaType == SKAlphaType.Unpremul || src.AlphaType == SKAlphaType.Opaque)
+			&& (src.ColorType == SKColorType.Bgra8888 || src.ColorType == SKColorType.Rgba8888);
+		if (eligible)
+			return takeOwnership ? src : src.Copy();
+
+		var info = new SKImageInfo(src.Width, src.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		var conv = new SKBitmap(info);
+		bool ok;
+		using (var pm = src.PeekPixels())
+			ok = pm != null && conv.GetPixels() != IntPtr.Zero && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes);
+		if (!ok) {
+			conv.Dispose();
+			return takeOwnership ? src : src.Copy();   // tGenFromBitmap's fallback converts it instead
+		}
+		if (takeOwnership) src.Dispose();
+		return conv;
+	}
+
 	private uint tGenFromBitmap(SKBitmap b) {
-		if (b.AlphaType == SKAlphaType.Unpremul && (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
+		// Zero-copy upload: raw bytes are already straight-alpha (or fully opaque — decoded JPEGs) BGRA/RGBA.
+		if ((b.AlphaType == SKAlphaType.Unpremul || b.AlphaType == SKAlphaType.Opaque)
+			&& (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
 			var fmt = b.ColorType == SKColorType.Rgba8888 ? PixelFormat.Rgba : PixelFormat.Bgra;
 			unsafe {
 				void* p = (void*)b.GetPixels();
 				if (p != null)
 					return GenTexture(p, (uint)b.Width, (uint)b.Height, fmt);
+			}
+		}
+		// Everything else (premul PNG decodes, exotic color types): convert to straight-alpha BGRA natively.
+		// Never use SKBitmap.Pixels here — it allocates a w*h managed SKColor[] per upload (8-30MB of LOH
+		// garbage per decoded image; scrolling song select stacked hundreds of MB of it between Gen2 GCs).
+		var info = new SKImageInfo(b.Width, b.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		using (var conv = new SKBitmap(info))
+		using (var pm = b.PeekPixels()) {
+			unsafe {
+				void* dst = (void*)conv.GetPixels();
+				if (dst != null && pm != null && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes))
+					return GenTexture(dst, (uint)b.Width, (uint)b.Height, PixelFormat.Bgra);
 			}
 		}
 		unsafe {
@@ -689,12 +728,24 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		}
 	}
 
+	// Live-texture accounting for the [MEMTRACE] debug line: decoded size (w*h*4) is added on MakeTexture
+	// and removed on Dispose, so a climbing LiveBytes means textures are created but never disposed.
+	public static int LiveCount;
+	public static long LiveBytes;
+	private long _countedBytes;
+
 	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) {
 		try {
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
 
 			int origW = bitmap.Width, origH = bitmap.Height;   // LOGICAL size: layout + UV (fractions of rcFullImage) use this
+
+			long newBytes = (long)origW * origH * 4;
+			Interlocked.Add(ref LiveBytes, newBytes - _countedBytes);
+			if (_countedBytes == 0)
+				Interlocked.Increment(ref LiveCount);
+			_countedBytes = newBytes;
 
 			// Render-scale: downsample the GL texture to cut VRAM + upload bandwidth on low-end machines. szImageSize
 			// stays the ORIGINAL size, so every draw (incl. sprite-sheet sub-rects) is unchanged — only sampling detail
@@ -715,8 +766,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				Pointer = tGenFromBitmap(glBitmap);
 				if (ownGlBitmap) glBitmap.Dispose();
 			} else {
-				var asyncCopy = glBitmap.Copy();
-				if (ownGlBitmap) glBitmap.Dispose();
+				// Pre-convert on this (background) thread so the queued render-thread action is a pure
+				// zero-copy GL upload — converting a large image there stalls the frame.
+				var asyncCopy = tPrepareUploadBitmap(glBitmap, ownGlBitmap);
 				Action createInstance = () => {
 					try {
 						Pointer = tGenFromBitmap(asyncCopy);
@@ -1226,6 +1278,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (!this.bDisposeCompleteDone) {
 			Game.Gl.DeleteTexture(Pointer); //解放
 			this.Pointer = 0;
+
+			if (_countedBytes != 0) {
+				Interlocked.Add(ref LiveBytes, -_countedBytes);
+				Interlocked.Decrement(ref LiveCount);
+				_countedBytes = 0;
+			}
 
 			this.bDisposeCompleteDone = true;
 		}

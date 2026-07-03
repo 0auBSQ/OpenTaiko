@@ -58,7 +58,11 @@ public unsafe class CVideoDecoder : IDisposable {
 
 			CTimer = new CTimer(CTimer.TimerType.MultiMedia);
 		}
+		Interlocked.Increment(ref LiveCount);
 	}
+
+	// Live-decoder gauge for the [MEMTRACE] debug line (FFmpeg contexts + frame buffers are large).
+	public static int LiveCount;
 
 	public void Dispose() {
 		Dispose(true);
@@ -78,6 +82,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (this.close)
 			return;
 		this.close = true;
+		Interlocked.Decrement(ref LiveCount);
 
 		if (disposing) {
 			bDrawing = false;
