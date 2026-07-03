@@ -857,7 +857,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			CTja tja = OpenTaiko.GetTJA(p);
 			if (rep == null || tja == null) continue;
 			var inputs = rep.Inputs;
-			long nowTja = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
+			// warp-aware chart time: recorded timestamps are in WARPED tja time (see tInputProcess_Drums), so
+			// releasing them against the raw clock desynced Dynamic Beat replays once the factor left 1.0
+			long nowTja = this.GetChartTimeNow(p);
 			while (replayCursor[p] < inputs.Count && inputs[replayCursor[p]].Item1 <= nowTja) {
 				long tHit = (long)inputs[replayCursor[p]].Item1;
 				// resolve auto-misses up to this hit's EXACT recorded time first, so a recorded input can only claim
@@ -1307,11 +1309,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 			double msBarRollProgress = 0;
+			// Chart time including the Dynamic Beat warp — the raw clock diverges from chip times once the
+			// warp factor moves off 1.0, which made this window miss and hid the roll/kusudama/fuse numbers.
+			long nowTime = this.GetChartTimeNow(i);
 			for (int iChip = this.chipCurrentProcessingRollChip[i].Count; iChip-- > 0;) {
 				var chkChip = this.chipCurrentProcessingRollChip[i][iChip];
 				if (!chkChip.bVisible)
 					continue;
-				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
 				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
 					this.ProcessRollHeadEffects(i, chkChip);
@@ -1343,6 +1347,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					this.UpdateClearAnimation(i);
 			}
 		}
+
+		if (!this.actTokkun.bTrainingPAUSE)
+			this.tCheckBgmDrift();
 
 		#region [ Branch guide for P1 ]
 		//現在実験状態です。

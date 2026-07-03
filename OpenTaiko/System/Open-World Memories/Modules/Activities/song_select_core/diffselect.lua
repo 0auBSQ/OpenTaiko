@@ -199,8 +199,9 @@ function M.drawPanel()
         local r1Count = (p == 5 and 3) or (p > 2 and 2) or p
 
         -- single-player performance mode shows the best-plays cards down the right edge;
-        -- nudge the character/nameplate/mod-icons left so the two don't overlap
-        if p == 1 and Replay.isRegular() then ox = ox - 200 end
+        -- nudge the character/nameplate/mod-icons left so the two don't overlap. Any mode without the
+        -- strip (training, AI battle, lobby, multiplayer) keeps the base layout.
+        if Replay.isActive() then ox = ox - 200 end
 
         for i = 0, p - 1 do
             local isRow2 = i >= r1Count

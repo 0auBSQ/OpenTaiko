@@ -16,10 +16,11 @@ local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
         G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+            -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small
             if songNode.HasPreimage then
-                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 })
             else
-                SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
+                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 })
             end
         end)
     else
@@ -386,6 +387,7 @@ function M.handleSongSelectInput(Sort, Diff)
             return "play"
         end
         Diff.loadDiffBars(G.selectedSongNode)
+        require("replaylist").prefetchForSong(G.selectedSongNode)   -- async; lists land while the panel opens
         stopHold()
         G.activeScreen   = "transition"
         G.diffIndex      = {0, 0, 0, 0, 0}

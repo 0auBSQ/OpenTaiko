@@ -605,7 +605,17 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		: this() {
 		MakeTexture(strFileName, bBlackTransparent);
 	}
-	public void MakeTexture(string strFileName, bool bBlackTransparent) {
+	public CTexture(string strFileName, bool bBlackTransparent, int maxDimension)
+		: this() {
+		MakeTexture(strFileName, bBlackTransparent, maxDimension);
+	}
+	public void MakeTexture(string strFileName, bool bBlackTransparent) => MakeTexture(strFileName, bBlackTransparent, 0);
+
+	// maxDimension > 0 clamps the DECODED size: the bitmap is downscaled at load time so its long side is at
+	// most maxDimension px. Use for oversized art drawn small (song jackets: a 3000x3000 source decodes to
+	// 34MB but displays at ~400px). Width/Height then report the clamped size — callers that scale to a
+	// target box (w/tex.Width) are unaffected.
+	public void MakeTexture(string strFileName, bool bBlackTransparent, int maxDimension) {
 		// Async fast path: queue the decode + GL upload instead of doing GL here (see CTexture.Streaming.cs).
 		// Triggered by a runtime async load (AsyncLoad) or a load phase (StreamingLoad); SyncForce overrides it
 		// (pixels needed now). The GL upload always lands on the render thread (Game.AsyncActions), so this is
@@ -613,7 +623,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// is unreliable. Background decode workers call the MakeTexture(SKBitmap) overload, never this. The texture
 		// stays blank (t2DDraw no-ops) until uploaded.
 		if (!SyncForce && (StreamingLoad || AsyncLoad)
-			&& tQueueAsyncTexture(strFileName, bBlackTransparent))
+			&& tQueueAsyncTexture(strFileName, bBlackTransparent, maxDimension))
 			return;
 
 		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
@@ -622,9 +632,24 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
 		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
 		// falls through to MakeTexture's null-guard (blank 10x10), as before.
-		SKBitmap bitmap = tDecodeForUpload(strFileName);
+		SKBitmap bitmap = tClampToMaxDimension(tDecodeForUpload(strFileName), maxDimension);
 		MakeTexture(bitmap, bBlackTransparent);
 		bitmap?.Dispose();
+	}
+
+	// Downscale so the long side is at most maxDimension px (0 = no clamp). Keeps the zero-copy upload
+	// format; disposes the original when a resize happens.
+	internal static SKBitmap tClampToMaxDimension(SKBitmap bmp, int maxDimension) {
+		if (bmp == null || maxDimension <= 0) return bmp;
+		int longSide = Math.Max(bmp.Width, bmp.Height);
+		if (longSide <= maxDimension) return bmp;
+		double f = (double)maxDimension / longSide;
+		int dw = Math.Max(1, (int)Math.Round(bmp.Width * f));
+		int dh = Math.Max(1, (int)Math.Round(bmp.Height * f));
+		var resized = bmp.Resize(new SKImageInfo(dw, dh, SKColorType.Bgra8888, SKAlphaType.Unpremul), SKFilterQuality.Medium);
+		if (resized == null) return bmp;
+		bmp.Dispose();
+		return resized;
 	}
 
 	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────

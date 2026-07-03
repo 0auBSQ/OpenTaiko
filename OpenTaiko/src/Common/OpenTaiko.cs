@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -568,24 +568,6 @@ internal class OpenTaiko : Game {
 		FPSInput?.Update(); // events polled before Update() is called
 	}
 
-#if DEBUG
-	// Once-per-second live-resource gauges: which class stacks when memory climbs (e.g. song-select scroll).
-	private static long _memTraceLast;
-	private static void tTraceMemStats() {
-		long now = Environment.TickCount64;
-		if (now - _memTraceLast < 1000) return;
-		_memTraceLast = now;
-		Trace.TraceInformation(
-			"[MEMTRACE] tex={0} ({1:N1}MB) glyphs={2} vid={3} snd={4} bass={5} titleTex={6} gc={7:N0}MB ws={8:N0}MB",
-			CTexture.LiveCount, CTexture.LiveBytes / 1048576.0,
-			LuaGlyphText.LiveGlyphs,
-			CVideoDecoder.LiveCount,
-			CSound.SoundInstances.Count, SoundManager.nStreams,
-			TitleTextureKey._titledictionary.Count,
-			GC.GetTotalMemory(false) / 1048576.0,
-			Environment.WorkingSet / 1048576.0);
-	}
-#endif
 	protected override void Draw() {
 #if !DEBUG
 		try
@@ -594,9 +576,6 @@ internal class OpenTaiko : Game {
 			Timer?.Update();
 			SoundManager.PlayTimer?.Update();
 			FPS?.Update();
-#if DEBUG
-			tTraceMemStats();
-#endif
 
 			// #xxxxx 2013.4.8 yyagi; sleepの挿入位置を、EndScnene～Present間から、BeginScene前に移動。描画遅延を小さくするため。
 
@@ -1146,7 +1125,8 @@ internal class OpenTaiko : Game {
 	public static CTexture tTextureCreate(string fileName) {
 		return tTextureCreate(fileName, false);
 	}
-	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) {
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) => tTextureCreate(fileName, bBlackTransparent, 0);
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent, int maxDimension) {
 		if (app == null) {
 			return null;
 		}
@@ -1162,7 +1142,7 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 		try {
-			return new CTexture(fileName, bBlackTransparent);
+			return new CTexture(fileName, bBlackTransparent, maxDimension);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);

@@ -113,6 +113,16 @@ namespace OpenTaiko {
 		public void SetSharedTextureUsingAbsolutePath(string key, string path, Action<LuaTexture>? onCreate = null)
 			=> SetSharedTextureGeneric(key, path, onCreate, (path) => _luaTextureFunc.CreateTextureFromAbsolutePath(path, autoDispose: false));
 
+		// Options-table variants ({ maxSize = N } clamps the decoded long side — see LuaTextureFunc.tParseMaxSize).
+		public void SetSharedTexture(string key, string path, NLua.LuaTable options, Action<LuaTexture>? onCreate = null) {
+			int maxDim = LuaTextureFunc.tParseMaxSize(options);
+			SetSharedTextureGeneric(key, path, onCreate, (path) => _luaTextureFunc.CreateTexture(path, autoDispose: false, maxDim));
+		}
+		public void SetSharedTextureUsingAbsolutePath(string key, string path, NLua.LuaTable options, Action<LuaTexture>? onCreate = null) {
+			int maxDim = LuaTextureFunc.tParseMaxSize(options);
+			SetSharedTextureGeneric(key, path, onCreate, (path) => _luaTextureFunc.CreateTextureFromAbsolutePath(path, autoDispose: false, maxDim));
+		}
+
 		internal void SetSharedSoundGeneric(string key, string path, Action<LuaSound>? onCreate, Func<string, LuaSound> factory) {
 			LuaSharedResource<LuaSound> _sharedSound;
 

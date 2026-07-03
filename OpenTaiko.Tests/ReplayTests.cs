@@ -116,14 +116,16 @@ namespace OpenTaikoTests {
 		}
 
 		[Theory]
-		[InlineData(0, -1, true)]                                                  // no mods
-		[InlineData((int)CSongReplay.EModFlag.Mirror, -1, true)]                   // mirror is deterministic
-		[InlineData((int)CSongReplay.EModFlag.Random, 123, true)]                  // random WITH a seed
-		[InlineData((int)CSongReplay.EModFlag.Random, -1, false)]                  // random WITHOUT a seed
-		[InlineData((int)CSongReplay.EModFlag.SuperRandom, -1, false)]
-		[InlineData((int)CSongReplay.EModFlag.Avalanche, 123, false)]             // unseeded RNG mod
-		public void IsReplayWatchable_FollowsRngRules(int mods, int seed, bool expected) {
-			Assert.Equal(expected, CSongReplay.tIsReplayWatchable(mods, seed));
+		[InlineData(0, -1, CSongReplay.STORED_GAME_VERSION, true)]                                    // no mods
+		[InlineData((int)CSongReplay.EModFlag.Mirror, -1, CSongReplay.STORED_GAME_VERSION, true)]     // mirror is deterministic
+		[InlineData((int)CSongReplay.EModFlag.Random, 123, CSongReplay.STORED_GAME_VERSION, true)]    // random WITH a seed
+		[InlineData((int)CSongReplay.EModFlag.Random, -1, CSongReplay.STORED_GAME_VERSION, false)]    // random WITHOUT a seed
+		[InlineData((int)CSongReplay.EModFlag.SuperRandom, -1, CSongReplay.STORED_GAME_VERSION, false)]
+		[InlineData((int)CSongReplay.EModFlag.Avalanche, 123, CSongReplay.STORED_GAME_VERSION, false)]  // unseeded RNG mod
+		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.STORED_GAME_VERSION, true)]  // deterministic from inputs on the same version
+		[InlineData((int)CSongReplay.EModFlag.DynamicBeat, -1, CSongReplay.STORED_GAME_VERSION - 1, false)]  // evaluation logic may differ
+		public void IsReplayWatchable_FollowsRngRules(int mods, int seed, int gameVersion, bool expected) {
+			Assert.Equal(expected, CSongReplay.tIsReplayWatchable(mods, seed, gameVersion));
 		}
 
 		[Fact]

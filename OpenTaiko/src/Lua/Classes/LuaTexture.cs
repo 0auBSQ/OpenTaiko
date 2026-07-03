@@ -166,8 +166,16 @@ namespace OpenTaiko {
 		}
 
 		public LuaTexture CreateTexture() => new();
-		internal LuaTexture CreateTexture(string path, bool autoDispose)
-			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose);
+		internal LuaTexture CreateTexture(string path, bool autoDispose, int maxDimension = 0)
+			=> CreateTextureFromAbsolutePath($@"{DirPath}{Path.DirectorySeparatorChar}{path}", autoDispose, maxDimension);
+
+		// Options table shared by the texture-creating APIs: { maxSize = N } downscales the image at decode
+		// time so its long side is at most N px (for big art drawn small, e.g. song jackets).
+		internal static int tParseMaxSize(NLua.LuaTable options) {
+			object v = options?["maxSize"];
+			if (v == null) return 0;
+			try { return Math.Max(0, (int)Convert.ToDouble(v)); } catch { return 0; }
+		}
 
 		// Default: load ASYNCHRONOUSLY — the texture is blank (draws no-op) until the background decode + GL
 		// upload finish, so a runtime load never freezes the render thread (it pops in when ready).
@@ -175,6 +183,13 @@ namespace OpenTaiko {
 			bool prev = CTexture.AsyncLoad;
 			CTexture.AsyncLoad = true;
 			try { return CreateTexture(path, autoDispose: true); }
+			finally { CTexture.AsyncLoad = prev; }
+		}
+
+		public LuaTexture CreateTexture(string path, NLua.LuaTable options) {
+			bool prev = CTexture.AsyncLoad;
+			CTexture.AsyncLoad = true;
+			try { return CreateTexture(path, autoDispose: true, tParseMaxSize(options)); }
 			finally { CTexture.AsyncLoad = prev; }
 		}
 
@@ -188,13 +203,13 @@ namespace OpenTaiko {
 			finally { CTexture.SyncForce = prev; }
 		}
 
-		internal LuaTexture CreateTextureFromAbsolutePath(string path, bool autoDispose) {
+		internal LuaTexture CreateTextureFromAbsolutePath(string path, bool autoDispose, int maxDimension = 0) {
 			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaTexture luatex = new();
 			if (File.Exists(full_path)) {
 				try {
-					var tex = OpenTaiko.tTextureCreate(full_path);
+					var tex = OpenTaiko.tTextureCreate(full_path, false, maxDimension);
 					luatex = new LuaTexture(tex);
 					Textures.Add(luatex);
 					if (autoDispose)
@@ -212,6 +227,7 @@ namespace OpenTaiko {
 			return luatex;
 		}
 		public LuaTexture CreateTextureFromAbsolutePath(string path) => CreateTextureFromAbsolutePath(path, autoDispose: true);
+		public LuaTexture CreateTextureFromAbsolutePath(string path, NLua.LuaTable options) => CreateTextureFromAbsolutePath(path, autoDispose: true, tParseMaxSize(options));
 
 		public bool Exists(string path) {
 			return File.Exists($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}");

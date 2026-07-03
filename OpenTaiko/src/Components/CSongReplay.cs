@@ -74,6 +74,20 @@ class CSongReplay {
 		}
 	}
 
+	// The best-plays prefetch hashes the same chart file once per difficulty — cache by write time.
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (long ticks, string md5)> _md5Cache = new();
+	private static string tComputeChartMd5Cached(string path) {
+		try {
+			long t = File.GetLastWriteTimeUtc(path).Ticks;
+			if (_md5Cache.TryGetValue(path, out var e) && e.ticks == t) return e.md5;
+			string m = tComputeChartMd5(path);
+			_md5Cache[path] = (t, m);
+			return m;
+		} catch {
+			return "";
+		}
+	}
+
 	public void tRegisterInput(double timestamp, byte keypress) {
 		allInputs.Add(Tuple.Create(timestamp, keypress));
 	}
@@ -197,6 +211,7 @@ class CSongReplay {
 		public string FilePath = "";
 		public string ChartChecksum = "";
 		public bool Watchable;
+		public string UnwatchableReason = "";   // tooltip text when Watchable is false
 		// warnings surfaced on the best-plays card (tooltip + badge)
 		public bool OldVersion;         // recorded by an older game version (calculations may differ)
 		public bool ChecksumMismatch;   // chart md5 no longer matches (chart edited since the play)
@@ -209,13 +224,22 @@ class CSongReplay {
 	// RNG mods reproducible via the stored note-shuffle seed (only meaningful once a seed exists)
 	private const int RNG_SEEDABLE_MODS = (int)(EModFlag.Random | EModFlag.SuperRandom);
 	// RNG mods that aren't seeded, so their replays can never be reproduced (for now)
-	private const int RNG_UNSEEDED_MODS = (int)(EModFlag.Avalanche | EModFlag.Minesweeper | EModFlag.DynamicBeat);
+	private const int RNG_UNSEEDED_MODS = (int)(EModFlag.Avalanche | EModFlag.Minesweeper);
 
 	// true if the replay can be played back faithfully (no unreproducible RNG)
-	public static bool tIsReplayWatchable(int modFlags, int randomSeed) {
-		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return false;
-		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0) return false;
-		return true;
+	public static bool tIsReplayWatchable(int modFlags, int randomSeed, int gameVersion)
+		=> tUnwatchableReason(modFlags, randomSeed, gameVersion) == null;
+
+	// null when watchable, else the reason shown on the best-plays card's error tooltip.
+	// Dynamic Beat is deterministic given the replayed inputs (the warp factor is re-derived from the same
+	// judgements), but only while the evaluation logic matches the recorder's — so it needs the same version.
+	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion) {
+		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "Uses random mods that cannot be replayed";
+		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion != STORED_GAME_VERSION)
+			return "Dynamic Beat replay from a different game version";
+		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0)
+			return "Recorded before the note shuffle was seeded";
+		return null;
 	}
 
 	// Reads a replay's metadata without decompressing the input log (seeks past it). Returns null on failure.
@@ -249,7 +273,8 @@ class CSongReplay {
 			r.ReadByte();                                // ChartLevel
 			r.ReadInt64();                               // OnlineScoreID
 			h.RandomSeed = (h.GameVersion >= 601) ? r.ReadInt32() : -1;
-			h.Watchable = tIsReplayWatchable(h.ModFlags, h.RandomSeed);
+			h.UnwatchableReason = tUnwatchableReason(h.ModFlags, h.RandomSeed, h.GameVersion) ?? "";
+			h.Watchable = h.UnwatchableReason.Length == 0;
 			h.OldVersion = h.GameVersion < STORED_GAME_VERSION;
 			return h;
 		} catch {
@@ -265,7 +290,7 @@ class CSongReplay {
 		try {
 			string dir = Path.Combine(songFolder, "Replay");
 			if (!Directory.Exists(dir)) return result;
-			string currentMd5 = string.IsNullOrEmpty(chartPath) ? "" : tComputeChartMd5(chartPath);
+			string currentMd5 = string.IsNullOrEmpty(chartPath) ? "" : tComputeChartMd5Cached(chartPath);
 			foreach (var file in Directory.EnumerateFiles(dir, "Replay_*.optkr")) {
 				var h = tParseHeader(file);
 				if (h == null || h.GameMode != 0 || h.ChartUniqueID != uniqueId || h.ChartDifficulty != difficulty) continue;

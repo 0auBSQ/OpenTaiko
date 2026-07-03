@@ -498,6 +498,17 @@ public class CSound : IDisposable {
 			//}
 		}
 	}
+	/// <summary>Playback position on the play-timer timeline in ms — the inverse of tSetPositonToBegin's
+	/// mapping (source seconds ÷ (Frequency × PlaySpeed)). Returns -1 when unavailable.</summary>
+	public long tGetPositionOnTimelineMs() {
+		if (!this.IsBassSound) return -1;
+		long posByte = BassMix.ChannelGetPosition(this.hBassStream);
+		if (posByte < 0) return -1;
+		double denom = this.Frequency * this.PlaySpeed;
+		if (denom <= 0.0) return -1;
+		return (long)(1000.0 * Bass.ChannelBytes2Seconds(this.hBassStream, posByte) / denom);
+	}
+
 	/// <summary>
 	/// デバッグ用
 	/// </summary>

@@ -40,7 +40,7 @@ public partial class CTexture {
 		}
 	};
 
-	private struct StreamItem { public CTexture tex; public string path; public bool black; public Phase? phase; }
+	private struct StreamItem { public CTexture tex; public string path; public bool black; public int maxDim; public Phase? phase; }
 	private static readonly ConcurrentQueue<Phase> _phaseOlds = new();
 	private static Phase _phaseNow = new();
 	private static readonly ManualResetEventSlim _canDecodeBytes = new(true);
@@ -89,11 +89,11 @@ public partial class CTexture {
 	/// size: opening triggers per-file AV scanning (~15-20ms), so reading hundreds of headers during an Activate
 	/// is itself a multi-second freeze. Pointer + size stay 0 until the upload fills them; t2DDraw no-ops
 	/// meanwhile, and a load phase isn't considered done (StreamComplete) until every item uploads. Render thread.</summary>
-	private bool tQueueAsyncTexture(string strFileName, bool bBlackTransparent) {
+	private bool tQueueAsyncTexture(string strFileName, bool bBlackTransparent, int maxDimension = 0) {
 		if (!FileExistsCached(strFileName))
 			return false;
 		var phase = Volatile.Read(ref _phaseNow);
-		phase.Pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, phase = phase });
+		phase.Pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, maxDim = maxDimension, phase = phase });
 		EnsureDecodeWorkers();
 		return true;
 	}
@@ -118,7 +118,7 @@ public partial class CTexture {
 						_canDecodeBytes.Wait();
 					}
 					if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
-					SKBitmap? bmp = tDecodeForUpload(item.path);
+					SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(item.path), item.maxDim);
 					if (bmp != null)
 						Interlocked.Add(ref _readyBytes, bmp.ByteCount);
 					var captured = item;
