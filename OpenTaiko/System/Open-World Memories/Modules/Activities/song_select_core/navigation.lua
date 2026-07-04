@@ -250,6 +250,15 @@ end
 local function animTick(v) if G.folderAnim ~= nil then G.folderAnim.t = v end end
 local function finishFolderAnim() G.folderAnim = nil end   -- normal list draw resumes from the settled page
 
+-- copy the current header breadcrumb titles (G.selInfo.crumbs) before an open/close so the header can animate
+local function copyCrumbs()
+    local c = {}
+    if G.selInfo ~= nil and G.selInfo.crumbs ~= nil then
+        for i, title in ipairs(G.selInfo.crumbs) do c[i] = title end
+    end
+    return c
+end
+
 -- Phase durations (seconds) — skinner-tunable via Config/layout.json.
 local ANIM_OPEN_OUT_S  = CFG.num("folder_anim.open_out_seconds",    0.13)  -- phase 1: parent siblings slide out left
 local ANIM_OPEN_FAN_S  = CFG.num("folder_anim.open_fan_seconds",    0.30)  -- phase 2: folder contents fan out
@@ -282,14 +291,15 @@ end
 -- contents into place. Returns false if there is nothing to open (leaves state untouched).
 local function startOpenAnim(Sort)
     if G.folderAnim ~= nil then return true end
-    local folder   = G.songList:GetSelectedSongNode()   -- the folder being opened
-    local folderPt = G.pageTexts[0]
-    local oldBars  = snapshotBars(true)                 -- parent siblings (the folder stays put)
+    local folder    = G.songList:GetSelectedSongNode()   -- the folder being opened
+    local folderPt  = G.pageTexts[0]
+    local oldBars   = snapshotBars(true)                 -- parent siblings (the folder stays put)
+    local oldCrumbs = copyCrumbs()                       -- header path before opening (new path adds the folder)
     if not G.songList:OpenFolder() then return false end
     Sort.applySort()
     restoreFolderFocus(folder)                          -- return to the previously-focused child, if any
     M.refreshPage()                                     -- page = folder contents; starts the selection's media
-    G.folderAnim = { mode = "open", phase = 1, t = 0,
+    G.folderAnim = { mode = "open", phase = 1, t = 0, oldCrumbs = oldCrumbs,
                      oldBars = oldBars, newBars = snapshotBars(false), folderPt = folderPt }
     G.sounds.Decide:Play()
     startPhase(ANIM_OPEN_OUT_S, "IN", "CUBIC", function()
@@ -305,9 +315,10 @@ end
 -- animation). Returns false only if there is no folder to close (at the root → the caller exits).
 local function startCloseAnim(Sort)
     if G.folderAnim ~= nil then return true end
-    local child   = G.songList:GetSelectedSongNode()
-    local folder  = child ~= nil and child.Parent or nil
-    local oldBars = snapshotBars(false)                 -- the folder's contents
+    local child     = G.songList:GetSelectedSongNode()
+    local folder    = child ~= nil and child.Parent or nil
+    local oldBars   = snapshotBars(false)                 -- the folder's contents
+    local oldCrumbs = copyCrumbs()                        -- header path before closing (new path drops the folder)
     if not G.songList:CloseFolder() then return false end
     Sort.applySort()
     M.refreshPage()
@@ -318,7 +329,7 @@ local function startCloseAnim(Sort)
     if not (folder ~= nil and sel ~= nil and sel.IsFolder == true and sel.Title == folder.Title) then
         return true
     end
-    G.folderAnim = { mode = "close", phase = 1, t = 0,
+    G.folderAnim = { mode = "close", phase = 1, t = 0, oldCrumbs = oldCrumbs,
                      oldBars = oldBars, newBars = snapshotBars(true), folderPt = G.pageTexts[0] }
     startPhase(ANIM_CLOSE_GRP_S, "IN", "CUBIC", function()
         if G.folderAnim == nil then return end

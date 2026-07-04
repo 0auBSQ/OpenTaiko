@@ -299,6 +299,57 @@ local function drawFolderAnim()
 end
 M.drawFolderAnim = drawFolderAnim
 
+-- ── Header breadcrumb (shared by the normal draw + the folder open/close animation) ──
+-- Draw one crumb: its box + title, right edge at xRight, with alpha; plus its connecting arrow (to the left).
+local function drawCrumb(title, xRight, alpha, drawArrow)
+    local boxW = G.bgtx["header-box"].Width
+    local boxH = G.bgtx["header-box"].Height
+    G.bgtx["header-box"]:SetOpacity(alpha)
+    G.bgtx["header-box"]:DrawAtAnchor(xRight, 0, "topright")
+    G.text:Draw(title, xRight - boxW + HEADER_BOX_TEXT_OFFSET_X,
+        HEADER_BOX_TEXT_OFFSET_Y + boxH / 2, nil, nil, alpha, 1, 270, "center")
+    if drawArrow then
+        G.bgtx["header-arrow"]:SetOpacity(alpha)
+        G.bgtx["header-arrow"]:DrawAtAnchor(xRight - boxW, 0, "topright")
+    end
+    G.bgtx["header-box"]:SetOpacity(1)
+    G.bgtx["header-arrow"]:SetOpacity(1)
+end
+
+-- Header path animation, synced to G.folderAnim (same mode/phase/t as the song-list animation).
+-- Opening: existing crumbs slide left (phase 1), the new folder crumb fades in (phase 2).
+-- Closing: the innermost crumb fades out (phase 1), the remaining crumbs slide right (phase 2).
+local function drawHeaderCrumbsAnim(opacityNorm)
+    local fa  = G.folderAnim
+    local old = fa.oldCrumbs or {}
+    local new = (G.selInfo and G.selInfo.crumbs) or {}
+    local SLOT = G.bgtx["header-box"].Width + G.bgtx["header-arrow"].Width
+    local X0   = HEADER_OFFSET_X - G.songSelectShift
+    local t    = fa.t or 0
+    local function slotX(s) return X0 - s * SLOT end
+
+    if fa.mode == "open" then
+        local N = #old                     -- new path = { opened folder } ++ old
+        for j = 1, N do                    -- existing crumbs move from slot (j-1) to slot j
+            local x = (fa.phase == 1) and slotX(lerp(j - 1, j, t)) or slotX(j)
+            drawCrumb(old[j], x, opacityNorm, j < N)
+        end
+        if fa.phase == 2 and new[1] ~= nil then
+            drawCrumb(new[1], slotX(0), opacityNorm * t, #new > 1)   -- new folder crumb fades in
+        end
+    else
+        local N = #old                     -- old path = { closed folder } ++ new
+        for k = 2, N do                    -- remaining crumbs slide from slot (k-1) to slot (k-2)
+            local x = (fa.phase == 1) and slotX(k - 1) or slotX(lerp(k - 1, k - 2, t))
+            drawCrumb(old[k], x, opacityNorm, k < N)
+        end
+        if fa.phase == 1 and old[1] ~= nil then
+            drawCrumb(old[1], slotX(0), opacityNorm * (1 - t), N > 1)   -- innermost crumb fades out
+        end
+    end
+end
+M.drawHeaderCrumbsAnim = drawHeaderCrumbsAnim
+
 -- ── Draw panel ────────────────────────────────────────────────────────────────
 
 function M.drawPanel()
@@ -434,21 +485,14 @@ function M.drawPanel()
     G.bgtx["header"]:SetOpacity(headerAlpha)
     G.bgtx["header"]:Draw(-G.songSelectShift, 0)
     G.bgtx["header"]:SetOpacity(1)
-    if sel ~= nil then
-        local pathStack = sel.crumbs
-        local xpos = HEADER_OFFSET_X - G.songSelectShift
-        for i, title in ipairs(pathStack) do
-            G.bgtx["header-box"]:SetOpacity(opacityNorm)
-            G.bgtx["header-box"]:DrawAtAnchor(xpos, 0, "topright")
-            G.text:Draw(title,
-                xpos - G.bgtx["header-box"].Width + HEADER_BOX_TEXT_OFFSET_X,
-                HEADER_BOX_TEXT_OFFSET_Y + G.bgtx["header-box"].Height / 2,
-                nil, nil, opacityNorm, 1, 270, "center")
-            G.bgtx["header-arrow"]:SetOpacity(opacityNorm)
-            if i ~= #pathStack then
-                G.bgtx["header-arrow"]:DrawAtAnchor(xpos - G.bgtx["header-box"].Width, 0, "topright")
-            end
-            xpos = xpos - G.bgtx["header-box"].Width - G.bgtx["header-arrow"].Width
+    -- Breadcrumbs: the folder open/close animation drives them (in sync with the list) while it runs.
+    if G.folderAnim ~= nil then
+        drawHeaderCrumbsAnim(opacityNorm)
+    elseif sel ~= nil then
+        local SLOT = G.bgtx["header-box"].Width + G.bgtx["header-arrow"].Width
+        local X0   = HEADER_OFFSET_X - G.songSelectShift
+        for i, title in ipairs(sel.crumbs) do
+            drawCrumb(title, X0 - (i - 1) * SLOT, opacityNorm, i ~= #sel.crumbs)
         end
     end
 

@@ -28,8 +28,16 @@ namespace OpenTaiko {
 		// The node version of RootGenreFolder, to use if there is a risk of having multiple folders with the same genre as a string, takes precedence over RootGenreFolder
 		public LuaSongNode? RootGenreFolderNode = null;
 
-		// If the chart doesn't have all the mandatory specified difficulties, the node is not included
+		// Difficulty requirement for a SCORE node to be included. null = no requirement. How the list is
+		// matched is controlled by MandatoryDifficultyMatchAll below.
 		public Difficulty[]? MandatoryDifficultyList = null;
+
+		// How MandatoryDifficultyList is matched:
+		//   true  (default) = AND: the node must have ALL listed difficulties.
+		//   false           = OR:  the node must have AT LEAST ONE listed difficulty (e.g. list Easy..Edit to
+		//                          drop Tower/Dan-only charts, which have no standard playable difficulty, from
+		//                          the regular song list).
+		public bool MandatoryDifficultyMatchAll = true;
 
 		// Hide folder where there is nothing to show (No song, no locked song having a non-hidden hidden index)
 		public bool HideEmptyFolders = true;
@@ -89,12 +97,22 @@ namespace OpenTaiko {
 				if (this.ExcludedGenreFolders.Contains(node.songGenre)) return true;
 			}
 
-			// Exclude any song node that does not have all required difficulties
+			// Exclude any song node that fails the mandatory-difficulty requirement:
+			//   AND → missing any listed difficulty; OR → missing all listed difficulties.
 			if (node.nodeType == CSongListNode.ENodeType.SCORE) {
-				if (this.MandatoryDifficultyList != null) {
-					foreach (Difficulty diff in this.MandatoryDifficultyList) {
-						if ((int)diff < 0 || diff >= Difficulty.Total) continue;
-						if (node.nLevel[(int)diff] < 0) return true;
+				if (this.MandatoryDifficultyList != null && this.MandatoryDifficultyList.Length > 0) {
+					if (this.MandatoryDifficultyMatchAll) {
+						foreach (Difficulty diff in this.MandatoryDifficultyList) {
+							if ((int)diff < 0 || diff >= Difficulty.Total) continue;
+							if (node.nLevel[(int)diff] < 0) return true;   // missing a required difficulty
+						}
+					} else {
+						bool hasAny = false;
+						foreach (Difficulty diff in this.MandatoryDifficultyList) {
+							if ((int)diff < 0 || diff >= Difficulty.Total) continue;
+							if (node.nLevel[(int)diff] >= 0) { hasAny = true; break; }
+						}
+						if (!hasAny) return true;   // has none of the acceptable difficulties
 					}
 				}
 			}

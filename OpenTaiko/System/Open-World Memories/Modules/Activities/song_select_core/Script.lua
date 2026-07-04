@@ -418,6 +418,8 @@ function afterSongEnum()
     lsls.ModuloPagination    = false
     lsls.HideEmptyFolders    = true
     lsls.FlattenOpenedFolders = false
+    lsls:SetMandatoryDifficultyList({0, 1, 2, 3, 4})   -- Easy..Edit
+    lsls.MandatoryDifficultyMatchAll = false           -- OR: keep charts with at least one playable difficulty
     G.songList       = RequestSongList(lsls)
     G.originalOrders = {}
     Sort.applySort()
