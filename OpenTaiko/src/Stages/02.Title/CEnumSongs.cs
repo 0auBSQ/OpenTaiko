@@ -130,6 +130,26 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 		}
 	}
 
+	// OpenTaiko song-file extensions the scan (CSongManager.tSongSearchListCreate) turns into song nodes;
+	// this must match the extensions that increment nSearchFileCount so the progress total lines up.
+	private static readonly HashSet<string> SongFileExtensions = new(StringComparer.OrdinalIgnoreCase) {
+		".tja", ".tci", ".optktci", ".tcm", ".optktcm"
+	};
+
+	// Count song files under a folder, recursing manually so an inaccessible subfolder is skipped
+	// rather than aborting the whole count (Directory.EnumerateFiles(AllDirectories) throws on the first).
+	private static int CountSongFilesRecursive(string dir) {
+		int n = 0;
+		try {
+			foreach (var f in Directory.EnumerateFiles(dir)) {
+				if (SongFileExtensions.Contains(Path.GetExtension(f))) n++;
+			}
+			foreach (var d in Directory.EnumerateDirectories(dir))
+				n += CountSongFilesRecursive(d);
+		} catch { /* skip unreadable folders */ }
+		return n;
+	}
+
 	private void HardReloadSongList() {
 		this.LoadSongListStructure(true);
 	}
@@ -282,6 +302,17 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 				if (!string.IsNullOrEmpty(OpenTaiko.ConfigIni.strSongsPath)) {
 					CSongDict.tClearSongNodes();
 					string[] strArray = OpenTaiko.ConfigIni.strSongsPath.Split(new char[] { ';' });
+
+					// Pre-count all song files (.tja/.dtx) across the search roots so the enumeration display
+					// can show a real "loaded / total" progress bar as the scan below parses them.
+					this.SongManager.nSearchFileCount = 0;
+					int totalSongFiles = 0;
+					foreach (string str in strArray) {
+						string cp = Path.IsPathRooted(str) ? str : OpenTaiko.strEXEFolder + str;
+						totalSongFiles += CountSongFilesRecursive(cp);
+					}
+					this.SongManager.nTotalSongFilesToSearch = totalSongFiles;
+
 					if (strArray.Length > 0) {
 						// 全パスについて…
 						foreach (string str in strArray) {

@@ -15,8 +15,8 @@ public sealed class CLuaKeyAction {
 
 /// <summary>
 /// Exposes key-binding read/clear + multi-frame capture to the Lua config UI. The Lua INPUT API can't poll raw
-/// gamepad/MIDI/all-keyboard input or read/write bindings, so capture is owned by C# here (reusing the
-/// <see cref="CActConfigKeyAssign"/> sweep) and DRIVEN by <see cref="CStageConfig"/> calling
+/// gamepad/MIDI/all-keyboard input or read/write bindings, so capture is owned by C# here (the device sweep
+/// once done by the legacy key-assign screen) and DRIVEN by <see cref="CStageConfig"/> calling
 /// <see cref="PollCaptureFrame"/> each frame while <see cref="IsCapturing"/>.
 /// </summary>
 public sealed class CLuaKeyConfigService {

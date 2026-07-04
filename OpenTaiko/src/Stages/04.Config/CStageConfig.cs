@@ -1,53 +1,25 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using FDK;
-using SkiaSharp;
 
 namespace OpenTaiko;
 
 internal class CStageConfig : CStage {
 	// Properties
 
-	public CActDFPFont actFont { get; private set; }
 	public CActCalibrationMode actCalibrationMode;
 
 
 	// Constructor
 
 	public CStageConfig() {
-		CActDFPFont font;
 		base.eStageID = CStage.EStage.Config;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.actFont = font = new CActDFPFont();
-		base.ChildActivities.Add(font);
 		base.ChildActivities.Add(this.actFIFO = new CActFIFOWhite());
-		// The legacy UI activities are kept as fields (other files reference them) but NOT auto-managed:
-		// the config UI is now the Lua config_ui ROActivity. Not activating actList avoids it clobbering the
-		// live config writes (its DeActivate would re-record stale item values).
-		this.actList = new CActConfigList();
-		this.actKeyAssign = new CActConfigKeyAssign();
-		this.actOptionPanel = new CActOptionPanel();
+		// The config UI is the Lua config_ui ROActivity (see Draw). The old C# config screen
+		// (CActConfigList / CActConfigKeyAssign / CActDFPFont) has been removed entirely.
 		base.ChildActivities.Add(this.actCalibrationMode = new CActCalibrationMode());
 		base.IsDeActivated = true;
 	}
-
-
-	// メソッド
-
-	public void tAssignCompleteNotify()                                                         // CONFIGにのみ存在
-	{                                                                                       //
-		this.eItemPanelMode = EItemPanelMode.PadList;                               //
-	}                                                                                       //
-	public void tPadSelectedNotify(EKeyConfigPart part, EKeyConfigPad pad)                            //
-	{                                                                                       //
-		this.actKeyAssign.tStart(part, pad, this.actList.ibCurrentSelectedItem.strItemName);        //
-		this.eItemPanelMode = EItemPanelMode.KeyCodeList;                         //
-	}                                                                                       //
-	public void tItemChangeNotify()                                                               // OPTIONと共通
-	{                                                                                       //
-		this.tDescriptionPanelCurrentSelectedItemDescriptionDraw();                     //
-	}                                                                                       //
 
 
 	// CStage 実装
@@ -168,93 +140,6 @@ internal class CStageConfig : CStage {
 		}
 	}
 
-	public void ReloadMenus() {
-		string[] strMenuItem = {
-			CLangManager.LangInstance.GetString("SETTINGS_SYSTEM"),
-			CLangManager.LangInstance.GetString("SETTINGS_GAME"),
-			CLangManager.LangInstance.GetString("SETTINGS_THEME"),
-			CLangManager.LangInstance.GetString("SETTINGS_EXIT")
-		};
-
-		txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
-
-		using (var prvFont = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Config_Font_Scale)) {
-			for (int i = 0; i < strMenuItem.Length; i++) {
-				using (var bmpStr = prvFont.DrawText(strMenuItem[i], Color.White, Color.Black, null, 30)) {
-					txMenuItemLeft[i, 0]?.Dispose();
-					txMenuItemLeft[i, 0] = OpenTaiko.tTextureCreate(bmpStr, false);
-				}
-				using (var bmpStr = prvFont.DrawText(strMenuItem[i],
-						   Color.White,
-						   Color.Black,
-						   null,
-						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_1,
-						   OpenTaiko.Skin.Config_Selected_Menu_Text_Grad_Color_2,
-						   30)) {
-					txMenuItemLeft[i, 1]?.Dispose();
-					txMenuItemLeft[i, 1] = OpenTaiko.tTextureCreate(bmpStr, false);
-				}
-			}
-		}
-	}
-
-	public override void CreateManagedResource()                                            // OPTIONと画像以外共通
-	{
-		//if (HPrivateFastFont.FontExists(TJAPlayer3.Skin.FontName))
-		//{
-		//    this.ftフォント = new CCachedFontRenderer(TJAPlayer3.Skin.FontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-		//}
-		//else
-		//{
-		//    this.ftフォント = new CCachedFontRenderer(CFontRenderer.DefaultFontName, (int)TJAPlayer3.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-		//}
-		this.ftFont = HPrivateFastFont.tInstantiateMainFont((int)OpenTaiko.Skin.Config_Font_Scale_Description, CFontRenderer.FontStyle.Bold);
-
-
-		OpenTaiko.Tx.Config_Cursor = OpenTaiko.tTextureCreate(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.CONFIG}Cursor.png"));
-
-		//ctBackgroundAnime = new CCounter(0, TJAPlayer3.Tx.Config_Background.szテクスチャサイズ.Width, 20, TJAPlayer3.Timer);
-
-		/*
-		string[] strMenuItem = {
-			CLangManager.LangInstance.GetString(10085),
-			CLangManager.LangInstance.GetString(10086),
-			CLangManager.LangInstance.GetString(10087)
-		};
-
-		txMenuItemLeft = new CTexture[strMenuItem.Length, 2];
-
-		using (var prvFont = new CPrivateFastFont(new FontFamily(string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName) ? "MS UI Gothic" :  TJAPlayer3.ConfigIni.FontName), 20))
-		{
-			for (int i = 0; i < strMenuItem.Length; i++)
-			{
-				using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black))
-				{
-					txMenuItemLeft[i, 0] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-				}
-				using (var bmpStr = prvFont.DrawPrivateFont(strMenuItem[i], Color.White, Color.Black, Color.Yellow, Color.OrangeRed))
-				{
-					txMenuItemLeft[i, 1] = TJAPlayer3.tテクスチャの生成(bmpStr, false);
-				}
-			}
-		}
-		*/
-		base.CreateManagedResource();
-	}
-	public override void ReleaseManagedResource()                                           // OPTIONと同じ(COnfig.iniの書き出しタイミングのみ異なるが、無視して良い)
-	{
-		if (this.ftFont != null) {
-			this.ftFont.Dispose();
-			this.ftFont = null;
-		}
-		//CDTXMania.tテクスチャの解放( ref this.tx背景 );
-		//CDTXMania.tテクスチャの解放( ref this.tx上部パネル );
-		//CDTXMania.tテクスチャの解放( ref this.tx下部パネル );
-		//CDTXMania.tテクスチャの解放( ref this.txMenuカーソル );
-
-		OpenTaiko.tTextureRelease(ref this.txDescriptionPanel);
-		base.ReleaseManagedResource();
-	}
 	public override int Draw() {
 		if (base.IsDeActivated)
 			return 0;
@@ -310,193 +195,7 @@ internal class CStageConfig : CStage {
 
 	#region [ private ]
 	//-----------------
-	private enum EItemPanelMode {
-		PadList,
-		KeyCodeList
-	}
-
-	[StructLayout(LayoutKind.Sequential)]
-	private struct STKeyRepeatCounter {
-		public CCounter Up;
-		public CCounter Down;
-		public CCounter R;
-		public CCounter B;
-		public CCounter this[int index] {
-			get {
-				switch (index) {
-					case 0:
-						return this.Up;
-
-					case 1:
-						return this.Down;
-
-					case 2:
-						return this.R;
-
-					case 3:
-						return this.B;
-				}
-				throw new IndexOutOfRangeException();
-			}
-			set {
-				switch (index) {
-					case 0:
-						this.Up = value;
-						return;
-
-					case 1:
-						this.Down = value;
-						return;
-
-					case 2:
-						this.R = value;
-						return;
-
-					case 3:
-						this.B = value;
-						return;
-				}
-				throw new IndexOutOfRangeException();
-			}
-		}
-	}
-
-	//private CCounter ctBackgroundAnime;
 	private CActFIFOWhite actFIFO;
-	private CActConfigKeyAssign actKeyAssign;
-	public CActConfigList actList;
-	private CActOptionPanel actOptionPanel;
-	private bool bMenuFocus;
-	private STKeyRepeatCounter ctKeyRepeat;
-	private const int DESC_H = 0x80;
-	private const int DESC_W = 220;
-	private EItemPanelMode eItemPanelMode;
-	internal CCachedFontRenderer ftFont;
-	private int nCurrentMenuNumber;
-	//private CTexture txMenuカーソル;
-	//private CTexture tx下部パネル;
-	//private CTexture tx上部パネル;
-	private CTexture txDescriptionPanel;
-	//private CTexture tx背景;
-	private CTexture[,] txMenuItemLeft;
-
-	private void tCursorBottomMove() {
-		if (!this.bMenuFocus) {
-			switch (this.eItemPanelMode) {
-				case EItemPanelMode.PadList:
-					this.actList.tNextMove();
-					return;
-
-				case EItemPanelMode.KeyCodeList:
-					this.actKeyAssign.tNextMove();
-					return;
-			}
-		} else {
-			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
-			this.nCurrentMenuNumber = (this.nCurrentMenuNumber + 1) % 4;
-			switch (this.nCurrentMenuNumber) {
-				case 0:
-					this.actList.tItemListSettings_System();
-					break;
-
-				case 1:
-					this.actList.tItemListSettings_Drums();
-					break;
-
-				case 2:
-					this.actList.tItemListSettings_Theme();
-					break;
-
-				case 3:
-					this.actList.tItemListSettings_Exit();
-					break;
-			}
-			this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
-		}
-	}
-	private void tCursorTopMove() {
-		if (!this.bMenuFocus) {
-			switch (this.eItemPanelMode) {
-				case EItemPanelMode.PadList:
-					this.actList.tPrevMove();
-					return;
-
-				case EItemPanelMode.KeyCodeList:
-					this.actKeyAssign.tPrevMove();
-					return;
-			}
-		} else {
-			OpenTaiko.Skin.soundCursorMoveSound.tPlay();
-			this.nCurrentMenuNumber = ((this.nCurrentMenuNumber - 1) + 4) % 4;
-			switch (this.nCurrentMenuNumber) {
-				case 0:
-					this.actList.tItemListSettings_System();
-					break;
-
-				case 1:
-					this.actList.tItemListSettings_Drums();
-					break;
-
-				case 2:
-					this.actList.tItemListSettings_Theme();
-					break;
-
-				case 3:
-					this.actList.tItemListSettings_Exit();
-					break;
-			}
-			this.tDescriptionPanelCurrentSelectedMenuDescriptionDraw();
-		}
-	}
-	private void tDescriptionPanelCurrentSelectedMenuDescriptionDraw() {
-		try {
-			string text = "";
-			switch (this.nCurrentMenuNumber) {
-				case 0:
-					text = CLangManager.LangInstance.GetString("SETTINGS_SYSTEM_DESC");
-					break;
-				case 1:
-					text = CLangManager.LangInstance.GetString("SETTINGS_GAME_DESC");
-					break;
-				case 2:
-					text = CLangManager.LangInstance.GetString("SETTINGS_THEME_DESC");
-					break;
-				case 3:
-					text = CLangManager.LangInstance.GetString("SETTINGS_EXIT_DESC");
-					break;
-			}
-			SKBitmap image = ftFont.DrawText(text, Color.White, Color.Black, null, 30);
-			if (this.txDescriptionPanel != null) {
-				this.txDescriptionPanel.Dispose();
-			}
-			this.txDescriptionPanel = new CTexture(image);
-			image.Dispose();
-		} catch (CTextureCreateFailedException e) {
-			Trace.TraceError(e.ToString());
-			Trace.TraceError("説明文テクスチャの作成に失敗しました。");
-			this.txDescriptionPanel = null;
-		}
-	}
-	private void tDescriptionPanelCurrentSelectedItemDescriptionDraw() {
-		try {
-			var image = new SKBitmap(440, 288);     // 説明文領域サイズの縦横 2 倍。（描画時に 0.5 倍で表示する___のは中止。処理速度向上のため。）
-
-			CItemBase item = this.actList.ibCurrentSelectedItem;
-			if ((item.strDescription != null) && (item.strDescription.Length > 0)) {
-				image.Dispose();
-				image = ftFont.DrawText(item.strDescription, Color.White, Color.Black, null, 30);
-			}
-			if (this.txDescriptionPanel != null) {
-				this.txDescriptionPanel.Dispose();
-			}
-			this.txDescriptionPanel = new CTexture(image);
-			image.Dispose();
-		} catch (CTextureCreateFailedException e) {
-			Trace.TraceError(e.ToString());
-			Trace.TraceError("説明文パネルテクスチャの作成に失敗しました。");
-			this.txDescriptionPanel = null;
-		}
-	}
 	//-----------------
 	#endregion
 }
