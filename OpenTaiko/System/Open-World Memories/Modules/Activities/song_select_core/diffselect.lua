@@ -44,6 +44,7 @@ local NOTE_BASE_Y      = CFG.num("difficulty_select.note.base_y", -78)
 local NOTE_FLOAT_AMP_X = CFG.num("difficulty_select.note.float_amp_x", 6)     -- px, gentle horizontal drift
 local NOTE_FLOAT_AMP_Y = CFG.num("difficulty_select.note.float_amp_y", 12)    -- px, gentle vertical bob
 local NOTE_ROT_AMP     = CFG.num("difficulty_select.note.rot_amp", 1.5)       -- degrees; sine amplitude of the gentle sway (not a turn count)
+local NOTE_FIXED_TILT  = CFG.num("difficulty_select.note.fixed_tilt", 5)      -- degrees; constant tilt of the whole note (positive = tilt right/clockwise)
 
 -- Option bars (0 / 1 / Customize), top-left anchor relative to Note; first position, step to each next.
 local OPT_ORIG_X = CFG.num("difficulty_select.option_bars.origin_x", 595)
@@ -176,7 +177,8 @@ local function computeNoteXform()
     local ph  = (G.noteFloatPhase or 0) * math.pi / 180
     local fx  = math.sin(ph * 2) * NOTE_FLOAT_AMP_X
     local fy  = math.sin(ph) * NOTE_FLOAT_AMP_Y
-    nAngleDeg = math.sin(ph + 0.9) * NOTE_ROT_AMP
+    -- constant right tilt (subtract: SetRotation is CCW, so negative = clockwise/right) plus the gentle sway
+    nAngleDeg = math.sin(ph + 0.9) * NOTE_ROT_AMP - NOTE_FIXED_TILT
     local rad = nAngleDeg * math.pi / 180
     nCosA, nSinA = math.cos(rad), math.sin(rad)
 

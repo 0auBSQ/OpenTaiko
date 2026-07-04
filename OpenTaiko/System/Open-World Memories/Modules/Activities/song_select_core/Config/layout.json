@@ -72,7 +72,7 @@
     "difficulty_select": {
         "chara_12p": { "origin_x": 1300, "origin_y": 760, "gap_x": 468, "scale": 0.8 },
         "chara_35p": { "origin_x": 1250, "origin_y": 470, "gap_x": 332, "gap_y": 457, "scale": 0.5 },
-        "note": { "base_x": -115, "base_y": -78, "float_amp_x": 6, "float_amp_y": 12, "rot_amp": 1.5 },
+        "note": { "base_x": -115, "base_y": -78, "float_amp_x": 6, "float_amp_y": 12, "rot_amp": 1.5, "fixed_tilt": 5 },
         "option_bars": { "origin_x": 595, "origin_y": 139, "step_x": -245, "step_y": 57 },
         "difficulty_bars": { "origin_x": 173, "origin_y": 332, "step_x": 39, "step_y": 140 },
         "level": { "center_x": 399, "center_y": 108, "digit_step_x": 34, "digit_step_y": -9 },
