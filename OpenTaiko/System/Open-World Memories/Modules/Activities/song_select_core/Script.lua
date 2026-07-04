@@ -18,6 +18,11 @@ local Nav     = require("navigation")
 local Diff    = require("diffselect")
 local Replay  = require("replaylist")
 local DrawSS  = require("draw_songselect")
+local CFG     = require("sscore_config")
+
+-- Song-preview volume fades (skinner-tunable in Config/layout.json).
+local PREVIEW_FADE_IN_MS  = CFG.num("preview.fade_in_ms", 280)
+local PREVIEW_FADE_OUT_MS = CFG.num("preview.fade_out_ms", 140)
 local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
@@ -82,7 +87,9 @@ local G = {
     previewDemoStart    = 0,
     previewDurationMs   = 0,
     previewLoaded       = false,
-    previewLoopCooldown = false,
+    previewWasPlaying   = false, -- was the preview observed playing? (falling edge → loop restart)
+    previewFadeVol      = 0,    -- current applied preview volume (0..100), eased toward previewFadeTarget
+    previewFadeTarget   = 0,    -- 0 = fading out (scroll), 100 = fading in (new preview playing)
 
     -- Difficulty select
     diffBars     = {},
@@ -391,6 +398,10 @@ function deactivate()
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
 
     SHARED:GetSharedSound("presound"):Stop()
+    G.previewFadeVol    = 0
+    G.previewFadeTarget = 0
+    G.previewLoaded     = false
+    G.previewWasPlaying = false
 
     for p = 0, 4 do
         local chara = GetSaveFile(p):GetCharacter()
@@ -474,16 +485,41 @@ function update(ts)
         return nil
     end
 
-    -- Loop preview sound; cooldown prevents double-seek on the same restart.
-    if G.previewLoaded and not G.previewLoopCooldown then
+    -- Ease the preview volume toward its target: a prompt fade-out when scrolling away, a short fade-in
+    -- when a new preview starts (navigation.lua sets the target + resets the volume on start).
+    do
         local psnd = SHARED:GetSharedSound("presound")
-        if psnd.Loaded and not psnd.IsPlaying then
-            G.previewLoopCooldown = true
-            psnd:Play()
-            psnd:SetTimestamp(G.previewDemoStart)
-            G.startCounter("preview_loop_cooldown", 0, 1, 0.5, "none", nil, function()
-                G.previewLoopCooldown = false
-            end)
+        if psnd.Loaded and G.previewFadeVol ~= G.previewFadeTarget then
+            local dtms = 1000 / 60
+            if ts ~= nil and G.previewPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.previewPrevTs)) end
+            local dur  = (G.previewFadeTarget > G.previewFadeVol) and PREVIEW_FADE_IN_MS or PREVIEW_FADE_OUT_MS
+            local step = (dur > 0) and (100 * dtms / dur) or 100
+            if G.previewFadeVol < G.previewFadeTarget then
+                G.previewFadeVol = math.min(G.previewFadeTarget, G.previewFadeVol + step)
+            else
+                G.previewFadeVol = math.max(G.previewFadeTarget, G.previewFadeVol - step)
+            end
+            psnd:SetVolume(math.floor(G.previewFadeVol + 0.5))
+        end
+    end
+    if ts ~= nil then G.previewPrevTs = ts end
+
+    -- Loop the preview on the FALLING EDGE of IsPlaying (observed playing, then stopped = genuine end).
+    -- IsPlaying also reads false for a frame right after a fresh start/seek, but there it has never been
+    -- observed true yet, so previewWasPlaying is false and the restart doesn't fire — no race, no cooldown.
+    -- Stop() before Play() additionally guarantees the system sound's two internal buffers never overlap
+    -- (playing both at once was the doubled/loud distorted replay).
+    if G.previewLoaded then
+        local psnd = SHARED:GetSharedSound("presound")
+        if psnd.Loaded then
+            if psnd.IsPlaying then
+                G.previewWasPlaying = true
+            elseif G.previewWasPlaying then
+                G.previewWasPlaying = false
+                psnd:Stop()
+                psnd:Play()
+                psnd:SetTimestamp(G.previewDemoStart)
+            end
         end
     end
 

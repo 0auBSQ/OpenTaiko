@@ -44,6 +44,11 @@
         "size_y": 500
     },
 
+    "preview": {
+        "fade_in_ms": 280,
+        "fade_out_ms": 140
+    },
+
     "header": {
         "offset_x": 1780,
         "box_text_offset_x": 250,

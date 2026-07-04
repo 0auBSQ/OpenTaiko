@@ -34,8 +34,11 @@ local function playPreview(songNode)
     G.previewDurationMs     = 0
     G.previewDemoStartRaw   = 0
     G.previewDemoStart      = 0
-    G.previewLoopCooldown   = false
-    SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
+    G.previewWasPlaying     = false
+    -- Fade the currently-playing preview out promptly (Script.lua eases previewFadeVol → target). The old
+    -- code hard-swapped in silence here, which cut the audio abruptly; now the throttled new preview simply
+    -- replaces the faded-out one when it loads (or it plays out silently if we land on a folder/random).
+    G.previewFadeTarget     = 0
     if songNode.IsSong == true then
         -- Suppress audio preview for GRAYED/BLURED locked songs
         if G.unlocks ~= nil and G.unlocks.suppressPreview(songNode) then
@@ -47,11 +50,15 @@ local function playPreview(songNode)
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
                 local speed = CONFIG.SongSpeed / 20
                 snd:SetSpeed(speed)
+                snd:SetVolume(0)            -- start silent; Script.lua fades it in to full
                 snd:Play()
                 snd:SetTimestamp(math.floor(demoStart / speed))
                 G.previewDurationMs   = snd:GetDurationMs()
                 G.previewDemoStartRaw = demoStart
                 G.previewDemoStart    = math.floor(demoStart / speed)
+                G.previewFadeVol      = 0
+                G.previewFadeTarget   = 100
+                G.previewWasPlaying   = false   -- falling-edge loop starts fresh (see Script.lua update)
                 G.previewLoaded       = true
             end)
         end)
