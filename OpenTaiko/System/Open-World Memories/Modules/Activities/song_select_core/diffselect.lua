@@ -8,67 +8,76 @@
 -- songselect→diffselect transition (difficultySelectElemOpacity) and shares the horizontal scroll (xshift).
 
 local Replay = require("replaylist")
+local CFG    = require("sscore_config")   -- Config/layout.json (skinner-editable); values fall back to the defaults below
 
 local M = {}
 local G   -- shared state injected by Script.lua
 
--- ── Layout constants ──────────────────────────────────────────────────────────
+-- ── Layout constants (defaults; overridable via Config/layout.json) ─────────────
 
-local DIFFSELECT_CHARA_ORIG_X_35P = 1250
-local DIFFSELECT_CHARA_ORIG_Y_35P = 470
-local DIFFSELECT_CHARA_GAP_X_35P  = 332
-local DIFFSELECT_CHARA_GAP_Y_35P  = 457
-local DIFFSELECT_CHARA_SCALE_35P  = 0.5
-local DIFFSELECT_CHARA_ORIG_X_12P = 1300
-local DIFFSELECT_CHARA_ORIG_Y_12P = 760
-local DIFFSELECT_CHARA_GAP_X_12P  = 468
-local DIFFSELECT_CHARA_SCALE_12P  = 0.8
+local DIFFSELECT_CHARA_ORIG_X_35P = CFG.num("difficulty_select.chara_35p.origin_x", 1250)
+local DIFFSELECT_CHARA_ORIG_Y_35P = CFG.num("difficulty_select.chara_35p.origin_y", 470)
+local DIFFSELECT_CHARA_GAP_X_35P  = CFG.num("difficulty_select.chara_35p.gap_x", 332)
+local DIFFSELECT_CHARA_GAP_Y_35P  = CFG.num("difficulty_select.chara_35p.gap_y", 457)
+local DIFFSELECT_CHARA_SCALE_35P  = CFG.num("difficulty_select.chara_35p.scale", 0.5)
+local DIFFSELECT_CHARA_ORIG_X_12P = CFG.num("difficulty_select.chara_12p.origin_x", 1300)
+local DIFFSELECT_CHARA_ORIG_Y_12P = CFG.num("difficulty_select.chara_12p.origin_y", 760)
+local DIFFSELECT_CHARA_GAP_X_12P  = CFG.num("difficulty_select.chara_12p.gap_x", 468)
+local DIFFSELECT_CHARA_SCALE_12P  = CFG.num("difficulty_select.chara_12p.scale", 0.8)
 
 -- Per-difficulty LevelCol tint (index = difficulty + 1); vault overrides to LVL_VAULT_COLOR.
-local DIFFSELECT_LEVEL_COLORS = {
+local DIFFSELECT_LEVEL_COLORS = CFG.colorList("colors.level", {
     COLOR:CreateColorFromHex("FF65A9F7"),
     COLOR:CreateColorFromHex("FF8FF5A9"),
     COLOR:CreateColorFromHex("FFE6DA76"),
     COLOR:CreateColorFromHex("FFF39898"),
     COLOR:CreateColorFromHex("FFCD7EE6"),
-}
+})
 local COL_WHITE       = COLOR:CreateColorFromHex("FFFFFFFF")
-local LVL_VAULT_COLOR = COLOR:CreateColorFromHex("FF1F5050")
-local VAULT_BLACK     = COLOR:CreateColorFromARGB(255, 0, 0, 0)
-local VAULT_NOOUTLINE = COLOR:CreateColorFromARGB(0, 0, 0, 0)
+local LVL_VAULT_COLOR = CFG.color("colors.level_vault", COLOR:CreateColorFromHex("FF1F5050"))
+local VAULT_BLACK     = CFG.color("colors.vault_text", COLOR:CreateColorFromARGB(255, 0, 0, 0))
+local VAULT_NOOUTLINE = CFG.color("colors.vault_text_outline", COLOR:CreateColorFromARGB(0, 0, 0, 0))
 
 -- Note frame: base position relative to the difficulty-select scroll, plus the float/rotate idle.
-local NOTE_BASE_X, NOTE_BASE_Y = -115, -78
-local NOTE_FLOAT_AMP_X = 6     -- px, gentle horizontal drift
-local NOTE_FLOAT_AMP_Y = 12    -- px, gentle vertical bob
-local NOTE_ROT_AMP     = 1.5     -- degrees; the Note gently bounces its rotation in [-AMP, +AMP] (never a full
-                               -- spin — this is the sine amplitude, not a turn count)
+local NOTE_BASE_X      = CFG.num("difficulty_select.note.base_x", -115)
+local NOTE_BASE_Y      = CFG.num("difficulty_select.note.base_y", -78)
+local NOTE_FLOAT_AMP_X = CFG.num("difficulty_select.note.float_amp_x", 6)     -- px, gentle horizontal drift
+local NOTE_FLOAT_AMP_Y = CFG.num("difficulty_select.note.float_amp_y", 12)    -- px, gentle vertical bob
+local NOTE_ROT_AMP     = CFG.num("difficulty_select.note.rot_amp", 1.5)       -- degrees; sine amplitude of the gentle sway (not a turn count)
 
--- Option bars (0 / 1 / Customize), top-left anchor relative to Note; spec first position (587,109) nudged
--- by (8,30), step to each next.
-local OPT_ORIG_X, OPT_ORIG_Y = 595, 139
-local OPT_STEP_X, OPT_STEP_Y = -245, 57
+-- Option bars (0 / 1 / Customize), top-left anchor relative to Note; first position, step to each next.
+local OPT_ORIG_X = CFG.num("difficulty_select.option_bars.origin_x", 595)
+local OPT_ORIG_Y = CFG.num("difficulty_select.option_bars.origin_y", 139)
+local OPT_STEP_X = CFG.num("difficulty_select.option_bars.step_x", -245)
+local OPT_STEP_Y = CFG.num("difficulty_select.option_bars.step_y", 57)
 
--- Difficulty bars (compact list, one slot each along the diagonal); first at (173,332), step to each next.
-local DBAR_ORIG_X, DBAR_ORIG_Y = 173, 332
-local DBAR_STEP_X, DBAR_STEP_Y = 39, 140
+-- Difficulty bars (compact list, one slot each along the diagonal); first position, step to each next.
+local DBAR_ORIG_X = CFG.num("difficulty_select.difficulty_bars.origin_x", 173)
+local DBAR_ORIG_Y = CFG.num("difficulty_select.difficulty_bars.origin_y", 332)
+local DBAR_STEP_X = CFG.num("difficulty_select.difficulty_bars.step_x", 39)
+local DBAR_STEP_Y = CFG.num("difficulty_select.difficulty_bars.step_y", 140)
 
 -- LevelCol number, relative to a difficulty bar's top-left. The whole digit set is centred at (LVL_CX,LVL_CY);
 -- multiple digits step by (LVL_DIGIT_DX, LVL_DIGIT_DY) (a slight up-right slant matching the layout).
-local LVL_CX, LVL_CY             = 399, 108
-local LVL_DIGIT_DX, LVL_DIGIT_DY = 34, -9
+local LVL_CX       = CFG.num("difficulty_select.level.center_x", 399)
+local LVL_CY       = CFG.num("difficulty_select.level.center_y", 108)
+local LVL_DIGIT_DX = CFG.num("difficulty_select.level.digit_step_x", 34)
+local LVL_DIGIT_DY = CFG.num("difficulty_select.level.digit_step_y", -9)
 
--- Charter names (up to 3), relative to a difficulty bar's top-left. First centred at (CHARTER_CX,CHARTER_CY),
--- each subsequent offset by (CHARTER_DX, CHARTER_DY); each squished to CHARTER_MAXW and tilted CHARTER_ROT.
-local CHARTER_CX, CHARTER_CY = 551, 58
-local CHARTER_DX, CHARTER_DY = 7, 26
-local CHARTER_MAXW  = 100
-local CHARTER_ROT   = 13.76    -- degrees; up-right tilt (CCW, matching SetRotation). Flip if it tilts down.
-local CHARTER_MAX   = 3
+-- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
+-- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
+local CHARTER_CX   = CFG.num("difficulty_select.charter.center_x", 551)
+local CHARTER_CY   = CFG.num("difficulty_select.charter.center_y", 58)
+local CHARTER_DX   = CFG.num("difficulty_select.charter.step_x", 7)
+local CHARTER_DY   = CFG.num("difficulty_select.charter.step_y", 26)
+local CHARTER_MAXW = CFG.num("difficulty_select.charter.max_width", 100)
+local CHARTER_ROT  = CFG.num("difficulty_select.charter.rotation", 13.76)   -- degrees; up-right tilt (CCW). Flip if it tilts down.
+local CHARTER_MAX  = CFG.num("difficulty_select.charter.max_count", 3)
 
 -- Vault chart name, relative to a difficulty bar's top-left (centred), squished + tilted like the charters.
-local VAULT_CX, VAULT_CY = 178, 215
-local VAULT_MAXW         = 222
+local VAULT_CX   = CFG.num("difficulty_select.vault.center_x", 178)
+local VAULT_CY   = CFG.num("difficulty_select.vault.center_y", 215)
+local VAULT_MAXW = CFG.num("difficulty_select.vault.max_width", 222)
 
 -- Charter/vault labels render to a single cached texture each (TEXT:GetText) rather than per-glyph, so
 -- rotating them stays smooth (a rotated composite of many small glyph quads jitters). Bounded strings.
@@ -82,15 +91,20 @@ end
 -- difficulty bar (drawn at (PSEL_DIFF_DX,PSEL_DIFF_DY) from the bar's top-left), the small BOTTOM half
 -- frames an option bar. The bottom half's art sits in the texture's left ~PSEL_OPT_W px, so it is centred
 -- on the option bar (centring on the full 674px width put it far to the right), then nudged by (PSEL_OPT_DX,DY).
-local PSEL_SPLIT_Y               = 292
-local PSEL_DIFF_DX, PSEL_DIFF_DY = 8, -7
-local PSEL_OPT_W                 = 290
-local PSEL_OPT_DX, PSEL_OPT_DY   = 22, -6
+local PSEL_SPLIT_Y = CFG.num("difficulty_select.player_selector.split_y", 292)
+local PSEL_DIFF_DX = CFG.num("difficulty_select.player_selector.diff_offset_x", 8)
+local PSEL_DIFF_DY = CFG.num("difficulty_select.player_selector.diff_offset_y", -7)
+local PSEL_OPT_W   = CFG.num("difficulty_select.player_selector.opt_width", 290)
+local PSEL_OPT_DX  = CFG.num("difficulty_select.player_selector.opt_offset_x", 22)
+local PSEL_OPT_DY  = CFG.num("difficulty_select.player_selector.opt_offset_y", -6)
 
-local NAMEPLATE_HEIGHT   = 81
-local NAMEPLATE_OFFSET_X = 27
-local NAMEPLATE_OFFSET_Y = 37
-local PUCHI_OFFSET_X     = 60
+-- Header alpha eases 100% (song select) → HEADER_DIFF_ALPHA (difficulty select) across the transition.
+local HEADER_DIFF_ALPHA  = CFG.num("header.diffselect_alpha", 0.4)
+
+local NAMEPLATE_HEIGHT   = CFG.num("difficulty_select.nameplate.height", 81)
+local NAMEPLATE_OFFSET_X = CFG.num("difficulty_select.nameplate.offset_x", 27)
+local NAMEPLATE_OFFSET_Y = CFG.num("difficulty_select.nameplate.offset_y", 37)
+local PUCHI_OFFSET_X     = CFG.num("difficulty_select.nameplate.puchi_offset_x", 60)
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -320,7 +334,7 @@ function M.drawPanel()
 
     -- bg_header (semi-transparent on difficulty select) then bg_overlay_difficulty OVER it, then the song
     -- title/subtitle — all over the Note. Header alpha eases 100%→40% across the songselect→diffselect move.
-    local headerAlpha = 1.0 - 0.6 * math.min(1, G.songSelectShift / 1920)
+    local headerAlpha = 1.0 - (1.0 - HEADER_DIFF_ALPHA) * math.min(1, G.songSelectShift / 1920)
     G.bgtx["header"]:SetOpacity(headerAlpha)
     G.bgtx["header"]:Draw(xshift, 0)
     G.bgtx["header"]:SetOpacity(1)

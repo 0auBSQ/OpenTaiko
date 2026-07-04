@@ -1,70 +1,74 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
 -- draw_songselect.lua  —  Song-select panel drawing for song_select_core.
 
+local CFG = require("sscore_config")   -- Config/layout.json (skinner-editable); values fall back to the defaults below
+
 local M = {}
-local SONGLIST_GOLD = COLOR:CreateColorFromARGB(255, 242, 207, 1)   -- selected-bar title tint
--- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame)
+-- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame); overridable via config
+local SONGLIST_GOLD  = CFG.color("colors.songlist_gold", COLOR:CreateColorFromARGB(255, 242, 207, 1))   -- selected-bar title tint
 local COL_WHITE      = COLOR:CreateColorFromHex("ffffffff")
-local COL_VAULT_GRAY = COLOR:CreateColorFromHex("ff808080")
-local COL_TAG_FIRE   = COLOR:CreateColorFromHex("ffac0c0c")
-local COL_TAG_STORM  = COLOR:CreateColorFromHex("ff83159e")
-local COL_BPM_SLOW   = COLOR:CreateColorFromHex("ff95ccff")
-local COL_BPM_FAST   = COLOR:CreateColorFromHex("ffff9ec3")
+local COL_VAULT_GRAY = CFG.color("colors.vault_gray", COLOR:CreateColorFromHex("ff808080"))
+local COL_TAG_FIRE   = CFG.color("colors.tag_fire", COLOR:CreateColorFromHex("ffac0c0c"))
+local COL_TAG_STORM  = CFG.color("colors.tag_storm", COLOR:CreateColorFromHex("ff83159e"))
+local COL_BPM_SLOW   = CFG.color("colors.bpm_slow", COLOR:CreateColorFromHex("ff95ccff"))
+local COL_BPM_FAST   = CFG.color("colors.bpm_fast", COLOR:CreateColorFromHex("ffff9ec3"))
 
 local statsCache = { player = -1, diff = -1 }   -- clear-count queries are save-file scans; key on (player, course)
 local G   -- shared state injected by Script.lua
 
--- ── Layout constants ──────────────────────────────────────────────────────────
+-- ── Layout constants (defaults; overridable via Config/layout.json) ─────────────
 
-local SONGLIST_ORIGIN_X          = 660
-local SONGLIST_ORIGIN_Y          = 500
-local SONGLIST_OFFSET_X          = 45
-local SONGLIST_OFFSET_Y          = 120
-local SONGLIST_TEXT_OFFSET_X     = -65
-local SONGLIST_TEXT_OFFSET_Y     = 15
-local SONGLIST_SELECTED_X_DIFF   = 50
-local SONGLIST_SELECTED_ARROW_GAP = 925
-local SONGBAR_LABEL_X_OFFSET     = 288
+local SONGLIST_ORIGIN_X           = CFG.num("song_list.origin_x", 660)
+local SONGLIST_ORIGIN_Y           = CFG.num("song_list.origin_y", 500)
+local SONGLIST_OFFSET_X           = CFG.num("song_list.offset_x", 45)
+local SONGLIST_OFFSET_Y           = CFG.num("song_list.offset_y", 120)
+local SONGLIST_TEXT_OFFSET_X      = CFG.num("song_list.text_offset_x", -65)
+local SONGLIST_TEXT_OFFSET_Y      = CFG.num("song_list.text_offset_y", 15)
+local SONGLIST_SELECTED_X_DIFF    = CFG.num("song_list.selected_x_diff", 50)
+local SONGLIST_SELECTED_ARROW_GAP = CFG.num("song_list.selected_arrow_gap", 925)
+local SONGBAR_LABEL_X_OFFSET      = CFG.num("song_list.label_x_offset", 288)
 
-local SONGINFO_DIFFICULTIES_ORIGIN_X = 1790
-local SONGINFO_DIFFICULTIES_ORIGIN_Y = 154
-local SONGINFO_DIFFICULTIES_GAP_Y    = 130
-local SONGINFO_HASVIDEO_ORIGIN_X     = 1064
-local SONGINFO_HASVIDEO_ORIGIN_Y     = 257
-local SONGINFO_EXPLICIT_ORIGIN_X     = 1266
-local SONGINFO_EXPLICIT_ORIGIN_Y     = 151
-local SONGINFO_SUBTITLE_ORIGIN_X     = 1536
-local SONGINFO_SUBTITLE_ORIGIN_Y     = 689
-local SONGINFO_SUBTITLE_MWIDTH       = 530
-local SONGINFO_BPM_ORIGIN_X          = 1780
-local SONGINFO_BPM_ORIGIN_Y          = 877
-local SONGINFO_BPM_MWIDTH            = 240
-local SONGINFO_CHARTER_ORIGIN_X      = 1216
-local SONGINFO_CHARTER_ORIGIN_Y      = 750
-local SONGINFO_CHARTER_MWIDTH        = 512
-local SONGINFO_LENGTH_ORIGIN_X       = 1216
-local SONGINFO_LENGTH_ORIGIN_Y       = 806
-local SONGINFO_LENGTH_MWIDTH         = 420
+local SONGINFO_DIFFICULTIES_ORIGIN_X = CFG.num("song_info.difficulties_origin_x", 1790)
+local SONGINFO_DIFFICULTIES_ORIGIN_Y = CFG.num("song_info.difficulties_origin_y", 154)
+local SONGINFO_DIFFICULTIES_GAP_Y    = CFG.num("song_info.difficulties_gap_y", 130)
+local SONGINFO_HASVIDEO_ORIGIN_X     = CFG.num("song_info.has_video_origin_x", 1064)
+local SONGINFO_HASVIDEO_ORIGIN_Y     = CFG.num("song_info.has_video_origin_y", 257)
+local SONGINFO_EXPLICIT_ORIGIN_X     = CFG.num("song_info.explicit_origin_x", 1266)
+local SONGINFO_EXPLICIT_ORIGIN_Y     = CFG.num("song_info.explicit_origin_y", 151)
+local SONGINFO_SUBTITLE_ORIGIN_X     = CFG.num("song_info.subtitle_origin_x", 1536)
+local SONGINFO_SUBTITLE_ORIGIN_Y     = CFG.num("song_info.subtitle_origin_y", 689)
+local SONGINFO_SUBTITLE_MWIDTH       = CFG.num("song_info.subtitle_max_width", 530)
+local SONGINFO_BPM_ORIGIN_X          = CFG.num("song_info.bpm_origin_x", 1780)
+local SONGINFO_BPM_ORIGIN_Y          = CFG.num("song_info.bpm_origin_y", 877)
+local SONGINFO_BPM_MWIDTH            = CFG.num("song_info.bpm_max_width", 240)
+local SONGINFO_BPM_ROTATION          = CFG.num("song_info.bpm_rotation", 355.55)   -- tilt to match the BPM plate image
+local SONGINFO_CHARTER_ORIGIN_X      = CFG.num("song_info.charter_origin_x", 1216)
+local SONGINFO_CHARTER_ORIGIN_Y      = CFG.num("song_info.charter_origin_y", 750)
+local SONGINFO_CHARTER_MWIDTH        = CFG.num("song_info.charter_max_width", 512)
+local SONGINFO_LENGTH_ORIGIN_X       = CFG.num("song_info.length_origin_x", 1216)
+local SONGINFO_LENGTH_ORIGIN_Y       = CFG.num("song_info.length_origin_y", 806)
+local SONGINFO_LENGTH_MWIDTH         = CFG.num("song_info.length_max_width", 420)
 
-local PREIMAGE_ORIGIN_X = 1276
-local PREIMAGE_ORIGIN_Y = 146
-local PREIMAGE_SIZE_X   = 500
-local PREIMAGE_SIZE_Y   = 500
+local PREIMAGE_ORIGIN_X = CFG.num("preimage.origin_x", 1276)
+local PREIMAGE_ORIGIN_Y = CFG.num("preimage.origin_y", 146)
+local PREIMAGE_SIZE_X   = CFG.num("preimage.size_x", 500)
+local PREIMAGE_SIZE_Y   = CFG.num("preimage.size_y", 500)
 
-local HEADER_OFFSET_X         = 1780
-local HEADER_BOX_TEXT_OFFSET_X = 250
-local HEADER_BOX_TEXT_OFFSET_Y = 12
+local HEADER_OFFSET_X          = CFG.num("header.offset_x", 1780)
+local HEADER_BOX_TEXT_OFFSET_X = CFG.num("header.box_text_offset_x", 250)
+local HEADER_BOX_TEXT_OFFSET_Y = CFG.num("header.box_text_offset_y", 12)
+local HEADER_DIFF_ALPHA        = CFG.num("header.diffselect_alpha", 0.4)
 
-local BARLEFT_X_OFFSET             = -67   -- pixels left of bar.png topleft
+local BARLEFT_X_OFFSET             = CFG.num("song_list.barleft_x_offset", -67)   -- pixels left of bar.png topleft
 
-local NAMEPLATE_BOX_FOLDED_SIZE_Y  = 182
-local NAMEPLATE_SECONDARY_OFFSET_Y = 81
-local NAMEPLATE_BOX_START_X        = 0
-local NAMEPLATE_BOX_SPACING_X      = 384
-local NAMEPLATE_OFFSET_X           = 27
-local NAMEPLATE_OFFSET_Y           = 37
-local NAMEPLATE_HEIGHT             = 81
-local PUCHI_OFFSET_X               = 60
+local NAMEPLATE_BOX_FOLDED_SIZE_Y  = CFG.num("nameplate.box_folded_size_y", 182)
+local NAMEPLATE_SECONDARY_OFFSET_Y = CFG.num("nameplate.secondary_offset_y", 81)
+local NAMEPLATE_BOX_START_X        = CFG.num("nameplate.box_start_x", 0)
+local NAMEPLATE_BOX_SPACING_X      = CFG.num("nameplate.box_spacing_x", 384)
+local NAMEPLATE_OFFSET_X           = CFG.num("nameplate.offset_x", 27)
+local NAMEPLATE_OFFSET_Y           = CFG.num("nameplate.offset_y", 37)
+local NAMEPLATE_HEIGHT             = CFG.num("nameplate.height", 81)
+local PUCHI_OFFSET_X               = CFG.num("nameplate.puchi_offset_x", 60)
 
 -- ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -270,7 +274,7 @@ function M.drawPanel()
                     sel.bpmColor = (mult < 1) and COL_BPM_SLOW or (mult > 1) and COL_BPM_FAST or COL_WHITE
                 end
                 G.text:Draw(sel.bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
-                    sel.bpmColor, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center")
+                    sel.bpmColor, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center", 0, SONGINFO_BPM_ROTATION)
             end
         end
     end
@@ -363,8 +367,8 @@ function M.drawPanel()
         G.bars["selected-arrow-r"]:DrawAtAnchor(x0 + SONGLIST_SELECTED_ARROW_GAP/2 - xlshift, y0 + ylshift, "right")
     end
 
-    -- Header breadcrumb. Header alpha eases 100%→40% across songselect→diffselect (matches diffselect).
-    local headerAlpha = 1.0 - 0.6 * math.min(1, G.songSelectShift / 1920)
+    -- Header breadcrumb. Header alpha eases 100%→HEADER_DIFF_ALPHA across songselect→diffselect (matches diffselect).
+    local headerAlpha = 1.0 - (1.0 - HEADER_DIFF_ALPHA) * math.min(1, G.songSelectShift / 1920)
     G.bgtx["header"]:SetOpacity(headerAlpha)
     G.bgtx["header"]:Draw(-G.songSelectShift, 0)
     G.bgtx["header"]:SetOpacity(1)

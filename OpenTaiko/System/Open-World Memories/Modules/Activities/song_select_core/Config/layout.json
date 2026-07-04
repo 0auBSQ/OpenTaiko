@@ -1,0 +1,90 @@
+{
+    "_note": "Song-select-core layout. Edit to reposition/retune the song-select and difficulty-select screens without touching Lua. Any missing key falls back to the in-code default, so partial edits are safe. Colours are 'AARRGGBB' hex strings.",
+
+    "song_list": {
+        "origin_x": 660,
+        "origin_y": 500,
+        "offset_x": 45,
+        "offset_y": 120,
+        "text_offset_x": -65,
+        "text_offset_y": 15,
+        "selected_x_diff": 50,
+        "selected_arrow_gap": 925,
+        "label_x_offset": 288,
+        "barleft_x_offset": -67
+    },
+
+    "song_info": {
+        "difficulties_origin_x": 1790,
+        "difficulties_origin_y": 154,
+        "difficulties_gap_y": 130,
+        "has_video_origin_x": 1064,
+        "has_video_origin_y": 257,
+        "explicit_origin_x": 1266,
+        "explicit_origin_y": 151,
+        "subtitle_origin_x": 1536,
+        "subtitle_origin_y": 689,
+        "subtitle_max_width": 530,
+        "bpm_origin_x": 1780,
+        "bpm_origin_y": 877,
+        "bpm_max_width": 240,
+        "bpm_rotation": 355.55,
+        "charter_origin_x": 1216,
+        "charter_origin_y": 750,
+        "charter_max_width": 512,
+        "length_origin_x": 1216,
+        "length_origin_y": 806,
+        "length_max_width": 420
+    },
+
+    "preimage": {
+        "origin_x": 1276,
+        "origin_y": 146,
+        "size_x": 500,
+        "size_y": 500
+    },
+
+    "header": {
+        "offset_x": 1780,
+        "box_text_offset_x": 250,
+        "box_text_offset_y": 12,
+        "diffselect_alpha": 0.4
+    },
+
+    "nameplate": {
+        "box_folded_size_y": 182,
+        "secondary_offset_y": 81,
+        "box_start_x": 0,
+        "box_spacing_x": 384,
+        "offset_x": 27,
+        "offset_y": 37,
+        "height": 81,
+        "puchi_offset_x": 60
+    },
+
+    "difficulty_select": {
+        "chara_12p": { "origin_x": 1300, "origin_y": 760, "gap_x": 468, "scale": 0.8 },
+        "chara_35p": { "origin_x": 1250, "origin_y": 470, "gap_x": 332, "gap_y": 457, "scale": 0.5 },
+        "note": { "base_x": -115, "base_y": -78, "float_amp_x": 6, "float_amp_y": 12, "rot_amp": 1.5 },
+        "option_bars": { "origin_x": 595, "origin_y": 139, "step_x": -245, "step_y": 57 },
+        "difficulty_bars": { "origin_x": 173, "origin_y": 332, "step_x": 39, "step_y": 140 },
+        "level": { "center_x": 399, "center_y": 108, "digit_step_x": 34, "digit_step_y": -9 },
+        "charter": { "center_x": 551, "center_y": 58, "step_x": 7, "step_y": 26, "max_width": 100, "rotation": 13.76, "max_count": 3 },
+        "vault": { "center_x": 178, "center_y": 215, "max_width": 222 },
+        "player_selector": { "split_y": 292, "diff_offset_x": 8, "diff_offset_y": -7, "opt_width": 290, "opt_offset_x": 22, "opt_offset_y": -6 },
+        "nameplate": { "height": 81, "offset_x": 27, "offset_y": 37, "puchi_offset_x": 60 }
+    },
+
+    "colors": {
+        "level": ["FF65A9F7", "FF8FF5A9", "FFE6DA76", "FFF39898", "FFCD7EE6"],
+        "level_vault": "FF1F5050",
+        "vault_text": "FF000000",
+        "vault_text_outline": "00000000",
+        "songlist_gold": "FFF2CF01",
+        "vault_gray": "FF808080",
+        "tag_fire": "FFAC0C0C",
+        "tag_storm": "FF83159E",
+        "bpm_slow": "FF95CCFF",
+        "bpm_fast": "FFFF9EC3"
+    }
+}
