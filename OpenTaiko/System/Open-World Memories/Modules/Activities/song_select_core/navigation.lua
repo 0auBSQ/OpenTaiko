@@ -1,6 +1,8 @@
----@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter
 -- navigation.lua  —  Page management, media loading, hold-scroll and song-select
 --                    input handling for song_select_core.
+
+local CFG = require("sscore_config")
 
 local M = {}
 local G   -- shared state injected by Script.lua
@@ -10,17 +12,33 @@ local BOX_SCROLL_SECONDS   = 0.06
 local HOLD_DELAY_SECONDS   = 0.16
 local HOLD_REPEAT_SECONDS  = 0.06
 
+-- Preimage/jacket "pop" on appear: scale from PREIMAGE_POP_START up to 1.0 with a short overshoot.
+local PREIMAGE_POP_START = CFG.num("preimage.pop_start_scale", 0.7)
+local PREIMAGE_POP_MS    = CFG.num("preimage.pop_duration_ms", 180)
+
+-- Kick the pop animation (called from the shared-texture onCreate, i.e. the moment the jacket appears).
+-- The counter's built-in OUT/BACK easing does the 0→1-with-overshoot "bounce"; the listener already
+-- receives the eased value, so we just map it onto [pop_start .. 1].
+local function startPreimagePop()
+    G.preimagePopScale = PREIMAGE_POP_START
+    local c = G.startCounter("preimage_pop", 0, 1, PREIMAGE_POP_MS / 1000, "none",
+        function(t) G.preimagePopScale = PREIMAGE_POP_START + (1 - PREIMAGE_POP_START) * t end,
+        function() G.preimagePopScale = 1 end)
+    c:SetEasing("OUT", "BACK")
+end
+
 -- ── Media loaders ─────────────────────────────────────────────────────────────
 
 local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
         G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
-            -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small
+            -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small.
+            -- onCreate fires when the jacket is actually swapped in → start the pop-in animation then.
             if songNode.HasPreimage then
-                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 })
+                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 }, function() startPreimagePop() end)
             else
-                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 })
+                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 }, function() startPreimagePop() end)
             end
         end)
     else

@@ -90,6 +90,7 @@ local G = {
     previewWasPlaying   = false, -- was the preview observed playing? (falling edge → loop restart)
     previewFadeVol      = 0,    -- current applied preview volume (0..100), eased toward previewFadeTarget
     previewFadeTarget   = 0,    -- 0 = fading out (scroll), 100 = fading in (new preview playing)
+    preimagePopScale    = 1,    -- jacket pop-in scale multiplier (navigation drives it on appear)
 
     -- Difficulty select
     diffBars     = {},

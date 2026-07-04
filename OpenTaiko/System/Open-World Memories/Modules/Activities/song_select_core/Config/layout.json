@@ -41,7 +41,9 @@
         "origin_x": 1276,
         "origin_y": 146,
         "size_x": 500,
-        "size_y": 500
+        "size_y": 500,
+        "pop_start_scale": 0.7,
+        "pop_duration_ms": 180
     },
 
     "preview": {
