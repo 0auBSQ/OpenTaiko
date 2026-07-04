@@ -510,10 +510,11 @@ internal class CStageResult : CStage {
 					_sf.tRegisterAIBattleModePlay(bClear[0]);
 				}
 
-				if (this.nEarnedMedalsCount[i] > 0)
+				if (this.nEarnedMedalsCount[i] > 0 && !OpenTaiko.bReplayMode[i])
 					_sf.tEarnCoins(this.nEarnedMedalsCount[i]);
 
 				if (!OpenTaiko.ConfigIni.bAutoPlay[i]
+					&& !OpenTaiko.bReplayMode[i]   // watching a replay must not write score/coins/playcount
 					&& !(OpenTaiko.ConfigIni.bAIBattleMode && i == 1)) {
 					int _cs = -1;
 					if (!OpenTaiko.stageGameScreen.IsStageFailed(i) && HGaugeMethods.UNSAFE_FastNormaCheck(i)) {
@@ -555,7 +556,7 @@ internal class CStageResult : CStage {
 			#region [Replay files generation]
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (OpenTaiko.ConfigIni.bAutoPlay[i])
+				if (OpenTaiko.ConfigIni.bAutoPlay[i] || OpenTaiko.bReplayMode[i])
 					continue;
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1)
 					continue;
@@ -568,7 +569,7 @@ internal class CStageResult : CStage {
 			#region [Modals preprocessing]
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				if (OpenTaiko.ConfigIni.bAutoPlay[i] || OpenTaiko.ConfigIni.bAIBattleMode && i == 1) continue;
+				if (OpenTaiko.ConfigIni.bAutoPlay[i] || OpenTaiko.bReplayMode[i] || OpenTaiko.ConfigIni.bAIBattleMode && i == 1) continue;   // replays award nothing
 
 				if (this.nEarnedMedalsCount[i] > 0)
 					OpenTaiko.ModalManager.rModalQueue.tAddModal(
@@ -661,6 +662,13 @@ internal class CStageResult : CStage {
 			bgmResultIn.tPlay();
 	}
 	public override void DeActivate() {
+		// leaving the result screen after watching a replay: drop replay mode + restore the real mods (kept this
+		// long so the auto modicon + persistence-skip held through results)
+		if (OpenTaiko.bReplayMode[0]) {
+			CSongReplay.tRestoreVirtualMods();
+			for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
+		}
+
 		OpenTaiko.tDisposeSafely(ref Background);
 
 		if (this.rResultSound != null) {

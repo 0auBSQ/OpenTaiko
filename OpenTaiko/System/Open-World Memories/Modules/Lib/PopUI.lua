@@ -38,4 +38,7 @@ PopUI.SettingsList = require("PopUI.widgets.settingslist")
 --- Create a UI manager. opts = { theme = {…}?, sfx = { hover, click, move, toggle, error }?, bg = bool? }
 function PopUI.new(opts) return PopUI.Manager.new(opts) end
 
+--- Dispose + drop the shared font caches (call when the language — and thus the main font — changes)
+function PopUI.flushSharedFonts() return PopUI.Manager.flushSharedFonts() end
+
 return PopUI

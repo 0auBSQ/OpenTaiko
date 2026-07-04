@@ -1,7 +1,7 @@
-{
+﻿{
     // Archivo de localización — Español
     "Entries": {
-        "SETTINGS_UI_KEYS": "Ajustes de entrada",
+        "SETTINGS_UI_KEYS": "Entrada",
         "SETTINGS_UI_EXIT": "Volver",
         "SETTINGS_UI_BACK": "< Atrás",
         "SETTINGS_UI_RUN": "Ejecutar",

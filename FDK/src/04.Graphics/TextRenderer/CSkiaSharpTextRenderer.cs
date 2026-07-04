@@ -109,6 +109,16 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		return Regex.Replace(input, TagRegex, "");
 	}
 
+	// advance width in px (includes trailing spaces) — the same measure DrawText uses to place tokens
+	public float MeasureText(string s) {
+		return paint.MeasureText(s);
+	}
+
+	// ink line height (ascent + descent) — the line pitch DrawText uses when stacking \n lines
+	public float GetLineHeight() {
+		return paint.FontMetrics.Descent - paint.FontMetrics.Ascent;
+	}
+
 	public List<SStringToken> Tokenize(string input, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor) {
 		List<SStringToken> tokens = new List<SStringToken>();
 		Stack<string> tags = new Stack<string>();

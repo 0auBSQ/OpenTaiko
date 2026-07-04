@@ -25,6 +25,16 @@ internal class CSongManager {
 		get;
 		set;
 	}
+	// Enumeration progress (drives the song_enum ROActivity bar): OpenTaiko song files (.tja, .tci/.optktci,
+	// .tcm/.optktcm) parsed so far, and the total pre-counted before the scan (see CEnumSongs.LoadSongListStructure).
+	public int nSearchFileCount {
+		get;
+		set;
+	}
+	public int nTotalSongFilesToSearch {
+		get;
+		set;
+	}
 	public Dictionary<string, CSongListNode> listSongsDB;                   // songs.dbから構築されるlist
 	public CSongListNode? SongRootDownload = null;
 	public List<CSongListNode> listSongRoot;         // 起動時にフォルダ検索して構築されるlist
@@ -56,6 +66,8 @@ internal class CSongManager {
 		this.listSongRoot = new List<CSongListNode>();
 		this.nSearchSongNodeCount = 0;
 		this.nSearchScoreCount = 0;
+		this.nSearchFileCount = 0;
+		this.nTotalSongFilesToSearch = 0;
 		this.bIsSuspending = false;                     // #27060
 		this.AutoReset = new AutoResetEvent(true);  // #27060
 		this.searchCount = 0;
@@ -120,7 +132,8 @@ internal class CSongManager {
 				SlowOrSuspendSearchTask();      // #27060 中断要求があったら、解除要求が来るまで待機, #PREMOVIE再生中は検索負荷を落とす
 				string strExt = fileinfo.Extension.ToLower();
 
-				if ((strExt.Equals(".tja") || strExt.Equals(".dtx"))) {
+				if (strExt.Equals(".tja")) {
+					this.nSearchFileCount++;    // enumeration progress (song files parsed so far)
 					// 2017.06.02 kairera0467 廃止。
 
 					#region[ 新処理 ]
@@ -293,6 +306,7 @@ internal class CSongManager {
 					}
 					#endregion
 				} else if (strExt.Equals(".optktci") || strExt.Equals(".tci")) {
+					this.nSearchFileCount++;    // enumeration progress (song files parsed so far)
 					string filePath = strBaseFolder + fileinfo.Name;
 					using SHA1 tciHash = SHA1.Create();
 					using var tciFs = File.OpenRead(filePath);
@@ -873,6 +887,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 	private void ProcessDeferredTcm(List<(string filePath, List<CSongListNode> nodeList, CSongListNode? parent)> deferred) {
 		foreach (var (filePath, nodeList, parent) in deferred) {
 			SlowOrSuspendSearchTask();
+			this.nSearchFileCount++;    // enumeration progress (deferred .tcm song files parsed so far)
 			try {
 				using SHA1 tcmHash = SHA1.Create();
 				using var tcmFs = File.OpenRead(filePath);

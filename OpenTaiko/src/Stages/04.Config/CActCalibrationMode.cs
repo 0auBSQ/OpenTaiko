@@ -72,9 +72,6 @@ internal class CActCalibrationMode : CActivity {
 		} else if (buttonIndex == 2 && decide) // Save
 		{
 			OpenTaiko.ConfigIni.nGlobalOffsetMs = GetMedianOffset();
-			// legacy list item may be inactive under the new Lua config UI; ConfigIni above is the source of truth
-			if (OpenTaiko.stageConfig.actList?.iGlobalOffsetMs != null)
-				OpenTaiko.stageConfig.actList.iGlobalOffsetMs.nCurrentValue = GetMedianOffset();
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 			Stop();
 

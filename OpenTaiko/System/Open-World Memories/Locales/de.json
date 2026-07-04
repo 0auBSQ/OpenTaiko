@@ -1,7 +1,7 @@
-{
+﻿{
     // Locale-Datei — Deutsch
     "Entries": {
-        "SETTINGS_UI_KEYS": "Eingabeeinstellungen",
+        "SETTINGS_UI_KEYS": "Eingabe",
         "SETTINGS_UI_EXIT": "Zurück",
         "SETTINGS_UI_BACK": "< Zurück",
         "SETTINGS_UI_RUN": "Ausführen",

@@ -1,6 +1,8 @@
----@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter
 -- navigation.lua  —  Page management, media loading, hold-scroll and song-select
 --                    input handling for song_select_core.
+
+local CFG = require("sscore_config")
 
 local M = {}
 local G   -- shared state injected by Script.lua
@@ -10,16 +12,33 @@ local BOX_SCROLL_SECONDS   = 0.06
 local HOLD_DELAY_SECONDS   = 0.16
 local HOLD_REPEAT_SECONDS  = 0.06
 
+-- Preimage/jacket "pop" on appear: scale from PREIMAGE_POP_START up to 1.0 with a short overshoot.
+local PREIMAGE_POP_START = CFG.num("preimage.pop_start_scale", 0.7)
+local PREIMAGE_POP_MS    = CFG.num("preimage.pop_duration_ms", 180)
+
+-- Kick the pop animation (called from the shared-texture onCreate, i.e. the moment the jacket appears).
+-- The counter's built-in OUT/BACK easing does the 0→1-with-overshoot "bounce"; the listener already
+-- receives the eased value, so we just map it onto [pop_start .. 1].
+local function startPreimagePop()
+    G.preimagePopScale = PREIMAGE_POP_START
+    local c = G.startCounter("preimage_pop", 0, 1, PREIMAGE_POP_MS / 1000, "none",
+        function(t) G.preimagePopScale = PREIMAGE_POP_START + (1 - PREIMAGE_POP_START) * t end,
+        function() G.preimagePopScale = 1 end)
+    c:SetEasing("OUT", "BACK")
+end
+
 -- ── Media loaders ─────────────────────────────────────────────────────────────
 
 local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
         G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+            -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small.
+            -- onCreate fires when the jacket is actually swapped in → start the pop-in animation then.
             if songNode.HasPreimage then
-                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 }, function() startPreimagePop() end)
             else
-                SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
+                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 }, function() startPreimagePop() end)
             end
         end)
     else
@@ -33,8 +52,11 @@ local function playPreview(songNode)
     G.previewDurationMs     = 0
     G.previewDemoStartRaw   = 0
     G.previewDemoStart      = 0
-    G.previewLoopCooldown   = false
-    SHARED:SetSharedPreview("presound", "Sounds/empty.ogg")
+    G.previewWasPlaying     = false
+    -- Fade the currently-playing preview out promptly (Script.lua eases previewFadeVol → target). The old
+    -- code hard-swapped in silence here, which cut the audio abruptly; now the throttled new preview simply
+    -- replaces the faded-out one when it loads (or it plays out silently if we land on a folder/random).
+    G.previewFadeTarget     = 0
     if songNode.IsSong == true then
         -- Suppress audio preview for GRAYED/BLURED locked songs
         if G.unlocks ~= nil and G.unlocks.suppressPreview(songNode) then
@@ -46,11 +68,15 @@ local function playPreview(songNode)
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
                 local speed = CONFIG.SongSpeed / 20
                 snd:SetSpeed(speed)
+                snd:SetVolume(0)            -- start silent; Script.lua fades it in to full
                 snd:Play()
                 snd:SetTimestamp(math.floor(demoStart / speed))
                 G.previewDurationMs   = snd:GetDurationMs()
                 G.previewDemoStartRaw = demoStart
                 G.previewDemoStart    = math.floor(demoStart / speed)
+                G.previewFadeVol      = 0
+                G.previewFadeTarget   = 100
+                G.previewWasPlaying   = false   -- falling-edge loop starts fresh (see Script.lua update)
                 G.previewLoaded       = true
             end)
         end)
@@ -70,10 +96,105 @@ function M.init(g)
 end
 
 -- ── Page refresh ──────────────────────────────────────────────────────────────
+-- All node-derived draw data is extracted HERE, once per selection change: every NLua property read
+-- (node.IsSong, chart:GetPlayerBestScore, …) allocates on each call, so per-frame reads in the draw loop
+-- stack garbage and stutter the GC. The draw code consumes only these plain-Lua caches.
+
+-- The genre (song bar) colour brightened by 50% toward white — used to tint the BarLevelFill numbers so
+-- they read as a lighter shade of the bar regardless of the chart's star rating. Precomputed per selection
+-- (never per frame) since COLOR:Create allocates. Falls back to white when the node has no box colour.
+local function brightenedFill(boxColor)
+    local function up(c) return math.min(255, math.floor(c + (255 - c) * 0.5)) end
+    if boxColor == nil then return COLOR:CreateColorFromRGBA(255, 255, 255, 255) end
+    return COLOR:CreateColorFromRGBA(up(boxColor.R), up(boxColor.G), up(boxColor.B), 255)
+end
+
+local function focusChart(songNode)
+    if songNode.IsSong ~= true then return nil end
+    local default = math.min(4, CONFIG:GetDefaultCourse(0))
+    local chart   = songNode:GetChart(default)
+    local i = 4
+    while chart == nil and i >= 0 do chart = songNode:GetChart(i); i = i - 1 end
+    return chart
+end
+
+-- vault lock icon key from the highest available difficulty's level
+local function vaultLockKey(node)
+    local c = nil
+    for d = 4, 0, -1 do
+        c = node:GetChart(d)
+        if c ~= nil then break end
+    end
+    local lvl = c and c.Level or 0
+    if lvl >= 3 then return "vault_lock2"
+    elseif lvl >= 2 then return "vault_lock1"
+    else return "vault_lock0" end
+end
+
+local function buildSlot(node, isSelected)
+    local slot = { text = node.Title, gold = isSelected }
+    slot.isSong, slot.isFolder = node.IsSong == true, node.IsFolder == true
+    slot.isRandom, slot.isReturn = node.IsRandom == true, node.IsReturn == true
+    slot.genre = node.Genre
+    if slot.isSong or slot.isFolder then
+        slot.boxColor    = node.BoxColor
+        slot.vaultLocked = slot.isSong and G.unlocks.isVaultLocked(node) or false
+        slot.vaultFolder = slot.isFolder and G.unlocks.isVaultFolder(node) or false
+        slot.isLocked    = slot.isSong and node.IsLocked == true or false
+        slot.hi          = slot.isSong and G.unlocks.effectiveHiddenIndex(node) or 0
+        if slot.vaultLocked then slot.vaultLockKey = vaultLockKey(node) end
+        if slot.isLocked then
+            slot.lockedBarOverride = slot.hi >= 1                       -- GRAYED/BLURED use bar_1
+            slot.lockKey = slot.hi >= 1 and "lock_1" or "lock_0"
+        end
+        if slot.isSong then
+            local saveId = GetSaveFile(G.highlightedPlayer).SaveId
+            slot.fav = node.UniqueId ~= nil and G.favs ~= nil and G.favs.isFavorite(saveId, node.UniqueId) or false
+            local chart = focusChart(node)
+            if chart ~= nil then
+                slot.level = { lv = chart.Level, diff = chart.DifficultyAsInt,
+                               isPlus = chart.IsPlus == true, isVault = slot.genre == "Secret Vault",
+                               fillColor = brightenedFill(slot.boxColor) }
+                local info = chart:GetPlayerBestScore(G.highlightedPlayer)
+                slot.barleft = { played = info.HasBeenPlayed, cs = info.ClearStatus, sr = info.ScoreRank }
+            end
+        end
+    end
+    return slot
+end
+
+-- selected-node info for the right panel / breadcrumb / preimage / selected-bar visuals
+local function buildSelInfo(node)
+    local sel = {}
+    sel.isSong, sel.isRandom = node.IsSong == true, node.IsRandom == true
+    sel.crumbs = {}
+    local cur = node.Parent
+    while cur ~= nil do
+        sel.crumbs[#sel.crumbs + 1] = cur.Title ~= nil and cur.Title or "/"
+        cur = cur.Parent
+    end
+    if not sel.isSong then return sel end
+    sel.hi = G.unlocks.effectiveHiddenIndex(node)
+    sel.hasVideo, sel.explicit = node.HasVideo == true, node.Explicit == true
+    sel.isVault  = node.Genre == "Secret Vault"
+    sel.subtitle = node.Subtitle
+    sel.charter  = "Chart - " .. node.Maker
+    sel.diffs = {}
+    for i = 0, 4 do
+        local c = node:GetChart(i)
+        if c ~= nil then sel.diffs[i] = { level = c.Level, isPlus = c.IsPlus == true } end
+    end
+    local fc = focusChart(node)
+    if fc ~= nil then sel.bpmBase, sel.bpmMin, sel.bpmMax = fc.BaseBPM, fc.MinBPM, fc.MaxBPM end
+    sel.isUnlockedSong = node.IsLocked ~= true and not G.unlocks.isVaultLocked(node)
+    return sel
+end
 
 function M.refreshPage(skipMedia)
     G.currentPage = {}
     G.pageTexts   = {}
+    G.selInfo     = nil
+    G.unlocks.invalidateCondCache()   -- selection changed: recompute the unlock-condition panel cache
 
     for i = -5, 5 do
         local node = G.songList:GetSongNodeAtOffset(i)
@@ -81,11 +202,8 @@ function M.refreshPage(skipMedia)
         if node == nil then
             G.pageTexts[i] = nil
         else
-            if i == 0 then
-                G.pageTexts[i] = G.text:GetText(node.Title, false, 525, COLOR:CreateColorFromARGB(255,242,207,1))
-            else
-                G.pageTexts[i] = G.text:GetText(node.Title, false, 525)
-            end
+            G.pageTexts[i] = buildSlot(node, i == 0)
+            if i == 0 then G.selInfo = buildSelInfo(node) end
             if G.genre_overlays[node.Genre] == nil then
                 if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
                     G.genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
@@ -256,6 +374,7 @@ function M.handleSongSelectInput(Sort, Diff)
             local saveId = GetSaveFile(G.highlightedPlayer).SaveId
             G.favs.toggleFavorite(saveId, ssn.UniqueId)
             G.sounds.Decide:Play()
+            M.refreshPage(true)   -- the fav icon is cached in the page slots
         end
     end
 
@@ -303,6 +422,7 @@ function M.handleSongSelectInput(Sort, Diff)
             return "play"
         end
         Diff.loadDiffBars(G.selectedSongNode)
+        require("replaylist").prefetchForSong(G.selectedSongNode)   -- async; lists land while the panel opens
         stopHold()
         G.activeScreen   = "transition"
         G.diffIndex      = {0, 0, 0, 0, 0}

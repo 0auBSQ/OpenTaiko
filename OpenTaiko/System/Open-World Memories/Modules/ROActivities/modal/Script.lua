@@ -88,8 +88,10 @@ function onStart()
 	modal_preimage_default = TEXTURE:CreateTexture(TEXTURES_DIR .. "preimage.png")
 	scalePreimage(modal_preimage_default)
 
-	font_modal_header = TEXT:Create(84, "regular")
-	font_modal_body   = TEXT:Create(84, "regular")
+	-- glyph-composed (bounded per-character cache): the header/body strings change per modal, so per-string
+	-- textures at 84px were a large leak. The plate keeps GetText: DrawTitlePlate consumes a texture object.
+	font_modal_header = TEXT:CreateGlyphCached(84, "regular")
+	font_modal_body   = TEXT:CreateGlyphCached(84, "regular")
 	font_modal_plate  = TEXT:Create(16, "regular")
 
 	modal_body_fg = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
@@ -189,18 +191,15 @@ function draw()
 		icon_players[modal_current_player]:Draw(0, 0)
 	end
 
-	local tx_header = font_modal_header:GetText(modal_header_text, false, 99999)
-
 	if modal_current_type == 0 then
 		-- Coin
 		if modal_tx_coin ~= nil then modal_tx_coin:Draw(0, 0) end
-		tx_header:DrawAtAnchor(960, 180, "center")
-		local tx_body = font_modal_body:GetText(modal_body_text, false, 99999)
-		tx_body:DrawAtAnchor(960, 490, "center")
+		font_modal_header:Draw(modal_header_text, 960, 180, nil, nil, 1, 1, 0, "center")
+		font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
 	else
 		-- Others
 		if modal_tx[modal_asset_id] ~= nil then modal_tx[modal_asset_id]:Draw(0, 0) end
-		tx_header:DrawAtAnchor(960, 180, "center")
+		font_modal_header:Draw(modal_header_text, 960, 180, nil, nil, 1, 1, 0, "center")
 
 		if modal_current_type == 1 then
 			-- Character (LuaCharacter)
@@ -208,16 +207,14 @@ function draw()
 				modal_current_info:Update(CHARACTER.ANIM_RENDER, true)
 				modal_current_info:DrawAtAnchor(960, 390, CHARACTER.ANIM_RENDER, "center")
 			end
-			local tx_body = font_modal_body:GetText(modal_body_text, false, 99999)
-			tx_body:DrawAtAnchor(960, 490, "center")
+			font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
 
 		elseif modal_current_type == 2 then
 			-- Puchichara (legacy)
 			if modal_current_info ~= nil and modal_current_info.tx ~= nil then
 				modal_current_info.tx:DrawAtAnchor(960, 490, "center")
 			end
-			local tx_body = font_modal_body:GetText(modal_body_text, false, 99999)
-			tx_body:DrawAtAnchor(960, 790, "center")
+			font_modal_body:Draw(modal_body_text, 960, 790, nil, nil, 1, 1, 0, "center")
 
 		elseif modal_current_type == 3 then
 			-- Nameplate (LuaNameplateInfo)
@@ -235,12 +232,10 @@ function draw()
 			if preimage ~= nil then
 				preimage:DrawAtAnchor(960, 490, "center")
 			end
-			local tx_body = font_modal_body:GetText(modal_body_text, false, 99999)
-			tx_body:DrawAtAnchor(960, 790, "center")
+			font_modal_body:Draw(modal_body_text, 960, 790, nil, nil, 1, 1, 0, "center")
 
 		else
-			local tx_body = font_modal_body:GetText(modal_body_text, false, 99999)
-			tx_body:DrawAtAnchor(960, 490, "center")
+			font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
 		end
 	end
 end

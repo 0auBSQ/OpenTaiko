@@ -178,7 +178,6 @@ class TextureLoader {
 		Tile_Black = TxC(@$"Tile_Black.png");
 		Menu_Title = TxC(@$"Menu_Title.png");
 		Menu_Highlight = TxC(@$"Menu_Highlight.png");
-		Enum_Song = TxC(@$"Enum_Song.png");
 		Loading = TxC(@$"Loading.png");
 		Scanning_Loudness = TxC(@$"Scanning_Loudness.png");
 		Overlay = TxC(@$"Overlay.png");
@@ -187,15 +186,10 @@ class TextureLoader {
 		#endregion
 
 		#region 2_コンフィグ画面
-		//Config_Background = TxC(CONFIG + @$"Background.png");
-		//Config_Header = TxC(CONFIG + @$"Header.png");
-		Config_Cursor = TxC(CONFIG + @$"Cursor.png");
-		Config_ItemBox = TxC(CONFIG + @$"ItemBox.png");
-		Config_Arrow = TxC(CONFIG + @$"Arrow.png");
-		Config_KeyAssign = TxC(CONFIG + @$"KeyAssign.png");
-		Config_Font = TxC(CONFIG + @$"Font.png");
-		Config_Font_Bold = TxC(CONFIG + @$"Font_Bold.png");
-		Config_Enum_Song = TxC(CONFIG + @$"Enum_Song.png");
+		// The legacy C# config screen's rendering was replaced by the Lua config_ui ROActivity, so its UI
+		// textures (Cursor / ItemBox / Arrow / KeyAssign / Font / Font_Bold) are never drawn any more and are
+		// no longer loaded. The "Enumerating songs…" icon likewise moved to the Lua song_enum ROActivity, so
+		// Enum_Song / Config_Enum_Song are no longer loaded here either.
 		#endregion
 
 		#region 3_段位選択画面 (textures still used by result/gameplay stages)
@@ -903,7 +897,6 @@ class TextureLoader {
 	public CTexture Tile_Black,
 		Menu_Title,
 		Menu_Highlight,
-		Enum_Song,
 		Loading,
 		Scanning_Loudness,
 		NamePlateBase,
@@ -911,18 +904,6 @@ class TextureLoader {
 
 	#endregion
 
-	#region 2_コンフィグ画面
-	public CTexture
-		/*Config_Background,
-        Config_Header,*/
-		Config_Cursor,
-		Config_ItemBox,
-		Config_Arrow,
-		Config_KeyAssign,
-		Config_Font,
-		Config_Font_Bold,
-		Config_Enum_Song;
-	#endregion
 
 	#region 3_段位選択画面 (textures still used by result/gameplay stages)
 

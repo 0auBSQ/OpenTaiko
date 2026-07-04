@@ -597,7 +597,7 @@ internal class CTja : CActivity {
 	}
 	public CTja(string strFileName, int difficulty = 0, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
 		: this() {
-		this.Activate();
+		this.Activate(loadChart);
 		this.tInput(strFileName, difficulty, nPlayerSide, loadChart, nBGMAdjust);
 	}
 
@@ -780,9 +780,10 @@ internal class CTja : CActivity {
 		LocalTriggers = new CLocalTriggers(player);
 	}
 
-	public void tRandomizeTaikoChips(int player = 0) {
+	public void tRandomizeTaikoChips(int player = 0, int seed = -1) {
 		//2016.02.11 kairera0467
-		Random rnd = new System.Random();
+		// a fixed seed makes the shuffle reproducible, so Random/Super-Random replays can be watched back
+		Random rnd = seed >= 0 ? new System.Random(seed) : new System.Random();
 
 		var eRandom = OpenTaiko.ConfigIni.eRandom[player];
 
@@ -1012,6 +1013,9 @@ internal class CTja : CActivity {
 	#endregion
 
 	public void tInput(string file_name, int difficulty, int nPlayerSide, bool loadChart, int nBGMAdjust) {
+		if (this.IsDeActivated || (loadChart && !this.bLoadChart))
+			this.Activate(loadChart); // ensure Activate() is called; ensure Activate(true) is called if this.bLoadChart will be true
+
 		this.strFullPath = Path.GetFullPath(file_name);
 		this.strFileName = Path.GetFileName(this.strFullPath);
 		this.strFolderPath = Path.GetDirectoryName(this.strFullPath) + Path.DirectorySeparatorChar;
@@ -2195,7 +2199,7 @@ internal class CTja : CActivity {
 			this.listChip.Add(chip);
 		} else if (command == "#LYRIC" && !usingLyricsFile && OpenTaiko.ConfigIni.nPlayerCount < 4) // Do not parse LYRIC tags if a lyric file is already loaded
 		{
-			if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading)//起動時に重たくなってしまう問題の修正用
+			if (this.bLoadChart)//起動時に重たくなってしまう問題の修正用
 				this.listLyric.Add(this.pfLyricsFont.DrawText(argumentFull, OpenTaiko.Skin.Game_Lyric_ForeColor, OpenTaiko.Skin.Game_Lyric_BackColor, null, 30));
 
 			var chip = this.NewEventChipAtDefCursor(0xF1, this.listLyric.Count - 1);
@@ -3755,7 +3759,7 @@ internal class CTja : CActivity {
 
 					if (File.Exists(filePaths[i])) {
 						try {
-							if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
+							if (this.bLoadChart) {
 								if (filePaths[i].EndsWith(".vtt")) {
 									new VTTParser().ParseVTTFile(this.listLyric2, filePaths[i], 0);
 								} else if (filePaths[i].EndsWith(".lrc")) {
@@ -4257,8 +4261,10 @@ internal class CTja : CActivity {
 
 	// CActivity 実装
 	private CCachedFontRenderer pfLyricsFont;
-	public override void Activate() {
-		if (OpenTaiko.rCurrentStage.eStageID == CStage.EStage.SongLoading) {
+	public override void Activate() => Activate(loadChart: false);
+	public void Activate(bool loadChart) {
+		this.bLoadChart |= loadChart;
+		if (this.bLoadChart) {
 			//まさかこれが原因で曲の読み込みが停止するとは思わなかった...
 			//どういうことかというとスキンを読み込むときに...いや厳密には
 			//RefleshSkinを呼び出した後一回Disposeしてnullにして解放(その後にまたインスタンスを作成する)するんだけど

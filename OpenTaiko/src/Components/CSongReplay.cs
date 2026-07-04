@@ -7,10 +7,11 @@ class CSongReplay {
 	 * 531 = 0.5.3.1
 	 * 540 = 0.5.4
 	 * 600 = 0.6.0
+	 * 601 = 0.6.1 (adds the note-shuffle RandomSeed at the end of the file)
 	 * 700 = 0.7.0
 	 * 1000 = 1.0.0
 	 */
-	public int STORED_GAME_VERSION = 600;
+	public const int STORED_GAME_VERSION = 601;
 	public string REPLAY_FOLDER_NAME = "Replay";
 
 	/* Mod Flags
@@ -58,6 +59,33 @@ class CSongReplay {
 		}
 
 		storedPlayer = player;
+		chartPath = ChartPath;
+		ChartChecksum = tComputeChartMd5(ChartPath);
+	}
+
+	// md5 of the chart's .tja file (hex), or "" if it can't be read
+	private static string tComputeChartMd5(string path) {
+		try {
+			using var stream = File.OpenRead(path);
+			using var md5 = System.Security.Cryptography.MD5.Create();
+			return Convert.ToHexString(md5.ComputeHash(stream));
+		} catch {
+			return "";
+		}
+	}
+
+	// The best-plays prefetch hashes the same chart file once per difficulty — cache by write time.
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (long ticks, string md5)> _md5Cache = new();
+	private static string tComputeChartMd5Cached(string path) {
+		try {
+			long t = File.GetLastWriteTimeUtc(path).Ticks;
+			if (_md5Cache.TryGetValue(path, out var e) && e.ticks == t) return e.md5;
+			string m = tComputeChartMd5(path);
+			_md5Cache[path] = (t, m);
+			return m;
+		} catch {
+			return "";
+		}
 	}
 
 	public void tRegisterInput(double timestamp, byte keypress) {
@@ -156,11 +184,124 @@ class CSongReplay {
 					ChartDifficulty = reader.ReadByte();
 					ChartLevel = reader.ReadByte();
 					OnlineScoreID = reader.ReadInt64();
+					// note-shuffle seed (added in 601); older replays have none → -1 (not replayable if RNG mods were used)
+					RandomSeed = (GameVersion >= 601) ? reader.ReadInt32() : -1;
 				}
 			}
 		} catch (Exception ex) {
 
 		}
+	}
+
+	// Lightweight metadata read by the best-plays list. Field order is coupled to tSaveReplayFile/tLoadReplayFile.
+	public sealed class ReplayHeader {
+		public byte GameMode;
+		public int GameVersion;
+		public string PlayerName = "";
+		public int Good, Ok, Bad, Roll, MaxCombo, Boom, ADLib;   // judge counts (for the best-plays card)
+		public int Score;
+		public byte ClearStatus;
+		public byte ScoreRank;
+		public int ModFlags;
+		public int ScrollSpeed, SongSpeed, JudgeStrictness;   // mod-icon values (scroll/song-speed/timing zone)
+		public long Timestamp;
+		public string ChartUniqueID = "";
+		public byte ChartDifficulty;
+		public int RandomSeed = -1;
+		public string FilePath = "";
+		public string ChartChecksum = "";
+		public bool Watchable;
+		public string UnwatchableReason = "";   // tooltip text when Watchable is false
+		// warnings surfaced on the best-plays card (tooltip + badge)
+		public bool OldVersion;         // recorded by an older game version (calculations may differ)
+		public bool ChecksumMismatch;   // chart md5 no longer matches (chart edited since the play)
+		// human-readable play date for the list (Timestamp is DateTime.Now.Ticks)
+		public string Date {
+			get { try { return new DateTime(Timestamp).ToString("yyyy-MM-dd HH:mm"); } catch { return ""; } }
+		}
+	}
+
+	// RNG mods reproducible via the stored note-shuffle seed (only meaningful once a seed exists)
+	private const int RNG_SEEDABLE_MODS = (int)(EModFlag.Random | EModFlag.SuperRandom);
+	// RNG mods that aren't seeded, so their replays can never be reproduced (for now)
+	private const int RNG_UNSEEDED_MODS = (int)(EModFlag.Avalanche | EModFlag.Minesweeper);
+
+	// true if the replay can be played back faithfully (no unreproducible RNG)
+	public static bool tIsReplayWatchable(int modFlags, int randomSeed, int gameVersion)
+		=> tUnwatchableReason(modFlags, randomSeed, gameVersion) == null;
+
+	// null when watchable, else the reason shown on the best-plays card's error tooltip.
+	// Dynamic Beat is deterministic given the replayed inputs (the warp factor is re-derived from the same
+	// judgements), but only while the evaluation logic matches the recorder's — so it needs the same version.
+	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion) {
+		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "Uses random mods that cannot be replayed";
+		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion != STORED_GAME_VERSION)
+			return "Dynamic Beat replay from a different game version";
+		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0)
+			return "Recorded before the note shuffle was seeded";
+		return null;
+	}
+
+	// Reads a replay's metadata without decompressing the input log (seeks past it). Returns null on failure.
+	public static ReplayHeader tParseHeader(string optkrFilePath) {
+		try {
+			using var fs = new FileStream(optkrFilePath, FileMode.Open, FileAccess.Read);
+			using var r = new BinaryReader(fs);
+			var h = new ReplayHeader { FilePath = optkrFilePath };
+			h.GameMode = r.ReadByte();
+			h.GameVersion = r.ReadInt32();
+			h.ChartChecksum = r.ReadString();
+			h.PlayerName = r.ReadString();
+			h.Good = r.ReadInt32(); h.Ok = r.ReadInt32(); h.Bad = r.ReadInt32(); h.Roll = r.ReadInt32();
+			h.MaxCombo = r.ReadInt32(); h.Boom = r.ReadInt32(); h.ADLib = r.ReadInt32();
+			h.Score = r.ReadInt32();
+			r.ReadInt16();                               // CoinValue
+			r.ReadInt32(); r.ReadInt32();                // ReachedFloor, RemainingLives
+			int danCount = r.ReadInt32();
+			for (int i = 0; i < danCount * 8; i++) r.ReadInt32();   // per-dan-song stats (8 ints each)
+			h.ClearStatus = r.ReadByte();
+			h.ScoreRank = r.ReadByte();
+			h.ScrollSpeed = r.ReadInt32(); h.SongSpeed = r.ReadInt32(); h.JudgeStrictness = r.ReadInt32();
+			h.ModFlags = r.ReadInt32();
+			r.ReadByte();                                // GaugeType
+			r.ReadSingle();                              // GaugeFill
+			h.Timestamp = r.ReadInt64();
+			int compSize = r.ReadInt32();
+			fs.Seek(compSize, SeekOrigin.Current);       // skip the compressed input log
+			h.ChartUniqueID = r.ReadString();
+			h.ChartDifficulty = r.ReadByte();
+			r.ReadByte();                                // ChartLevel
+			r.ReadInt64();                               // OnlineScoreID
+			h.RandomSeed = (h.GameVersion >= 601) ? r.ReadInt32() : -1;
+			h.UnwatchableReason = tUnwatchableReason(h.ModFlags, h.RandomSeed, h.GameVersion) ?? "";
+			h.Watchable = h.UnwatchableReason.Length == 0;
+			h.OldVersion = h.GameVersion < STORED_GAME_VERSION;
+			return h;
+		} catch {
+			return null;
+		}
+	}
+
+	// Regular (GameMode 0) replays for a chart+difficulty, ranked by score (highest first), capped to topN.
+	// When chartPath is given, each header's ChecksumMismatch is set by comparing its stored chart md5 against
+	// the chart file's current md5 (a mismatch means the chart was edited after the play was recorded).
+	public static List<ReplayHeader> tListReplays(string songFolder, string uniqueId, int difficulty, int topN, string chartPath = null) {
+		var result = new List<ReplayHeader>();
+		try {
+			string dir = Path.Combine(songFolder, "Replay");
+			if (!Directory.Exists(dir)) return result;
+			string currentMd5 = string.IsNullOrEmpty(chartPath) ? "" : tComputeChartMd5Cached(chartPath);
+			foreach (var file in Directory.EnumerateFiles(dir, "Replay_*.optkr")) {
+				var h = tParseHeader(file);
+				if (h == null || h.GameMode != 0 || h.ChartUniqueID != uniqueId || h.ChartDifficulty != difficulty) continue;
+				if (h.Score <= 0) continue;   // skip empty/incomplete plays (score 0)
+				h.ChecksumMismatch = currentMd5 != "" && h.ChartChecksum != "" && !string.Equals(h.ChartChecksum, currentMd5, StringComparison.OrdinalIgnoreCase);
+				result.Add(h);
+			}
+			result.Sort((a, b) => b.Score.CompareTo(a.Score));
+			if (topN > 0 && result.Count > topN) result.RemoveRange(topN, result.Count - topN);
+		} catch { }
+		return result;
 	}
 
 	#endregion
@@ -226,6 +367,7 @@ class CSongReplay {
 					writer.Write(ChartDifficulty);
 					writer.Write(ChartLevel);
 					writer.Write(OnlineScoreID);
+					writer.Write(RandomSeed);
 				}
 			}
 		} catch (Exception ex) {
@@ -251,8 +393,7 @@ class CSongReplay {
 		}
 		// Game version
 		GameVersion = STORED_GAME_VERSION;
-		// Chart Checksum (temporary)
-		ChartChecksum = "";
+		// Chart checksum (md5 of the .tja file) is set in the constructor; don't overwrite it here
 		// Player Name
 		PlayerName = OpenTaiko.SaveFileInstances[actualPlayer].data.Name;
 		// Performance informations
@@ -263,7 +404,7 @@ class CSongReplay {
 		MaxCombo = OpenTaiko.stageGameScreen.actCombo.nCurrentCombo.MaxValue[storedPlayer];
 		BoomCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nMine;
 		ADLibCount = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nADLIB;
-		Score = OpenTaiko.stageGameScreen.CChartScore[storedPlayer].nScore;
+		Score = (int)OpenTaiko.stageGameScreen.actScore.Get(storedPlayer);   // match the result-screen score (actScore, incl. the deferred +10000 combo bonus) not CChartScore.nScore
 		CoinValue = (short)Coins;
 		// Tower parameters
 		if (GameMode == 2) {
@@ -327,8 +468,91 @@ class CSongReplay {
 		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].ChartInfo.nLevel[ChartDifficulty]);
 		// Online score ID used for online leaderboards linking, given by the server (Defaulted to 0 for now)
 		OnlineScoreID = 0;
+		// Note-shuffle seed used this play (so Random/Super-Random replays can be reproduced)
+		RandomSeed = OpenTaiko.ReplaySeed[storedPlayer];
 		// Replay Checksum (Calculate at the end)
 		ReplayChecksum = "";
+	}
+
+	#endregion
+
+	#region [Virtual mods for replay playback]
+
+	// warnings for the watched replay (in-game "(Invalid replay file)" line); never written to disk
+	public bool WarnOldVersion;
+	public bool WarnChecksumMismatch;
+
+	// set the playback warnings by comparing this loaded replay against the chart it is about to be played on
+	public void tEvaluateWarnings(string currentChartPath) {
+		WarnOldVersion = GameVersion < STORED_GAME_VERSION;
+		string currentMd5 = string.IsNullOrEmpty(currentChartPath) ? "" : tComputeChartMd5(currentChartPath);
+		WarnChecksumMismatch = currentMd5 != "" && ChartChecksum != "" && !string.Equals(ChartChecksum, currentMd5, StringComparison.OrdinalIgnoreCase);
+	}
+
+	// snapshot of player-0 mod state, so a watched replay applies its own mods in memory and restores them after
+	private static bool _modsSnapped = false;
+	private static bool _snapAuto;
+	private static ERandomMode _snapRandom;
+	private static EStealthMode _snapStealth;
+	private static EFunMods _snapFunMods;
+	private static int _snapJust, _snapScroll, _snapTimingZones, _snapSongSpeed, _snapSeed;
+	private static string _snapName;
+
+	// apply this replay's recorded mods to player 0 IN MEMORY (never exported to Config.ini), snapshotting first
+	public void tApplyVirtualMods() {
+		var cfg = OpenTaiko.ConfigIni;
+		if (!_modsSnapped) {
+			_snapAuto = cfg.bAutoPlay[0]; _snapRandom = cfg.eRandom[0]; _snapStealth = cfg.eSTEALTH[0];
+			_snapFunMods = cfg.nFunMods[0]; _snapJust = cfg.bJust[0]; _snapScroll = cfg.nScrollSpeed[0];
+			_snapTimingZones = cfg.nTimingZones[0]; _snapSongSpeed = cfg.nSongSpeed; _snapSeed = OpenTaiko.ReplaySeed[0];
+			_snapName = OpenTaiko.SaveFileInstances[0].data.Name;
+			_modsSnapped = true;
+		}
+		// show the replay's recorded player name on the 1P nameplate for this play (in-memory only: nothing
+		// writes data.Name to disk during a play, and tRestoreVirtualMods puts the real name back)
+		if (!string.IsNullOrEmpty(PlayerName)) {
+			OpenTaiko.SaveFileInstances[0].data.Name = PlayerName;
+			OpenTaiko.NamePlate?.tNamePlateRefreshTitles(0);
+		}
+		if ((ModFlags & (int)EModFlag.Random) != 0 && (ModFlags & (int)EModFlag.Mirror) != 0) cfg.eRandom[0] = ERandomMode.MirrorRandom;
+		else if ((ModFlags & (int)EModFlag.SuperRandom) != 0) cfg.eRandom[0] = ERandomMode.SuperRandom;
+		else if ((ModFlags & (int)EModFlag.Random) != 0) cfg.eRandom[0] = ERandomMode.Random;
+		else if ((ModFlags & (int)EModFlag.Mirror) != 0) cfg.eRandom[0] = ERandomMode.Mirror;
+		else cfg.eRandom[0] = ERandomMode.Off;
+
+		if ((ModFlags & (int)EModFlag.Invisible) != 0) cfg.eSTEALTH[0] = EStealthMode.Doron;
+		else if ((ModFlags & (int)EModFlag.PerfectMemory) != 0) cfg.eSTEALTH[0] = EStealthMode.Stealth;
+		else cfg.eSTEALTH[0] = EStealthMode.Off;
+
+		if ((ModFlags & (int)EModFlag.Avalanche) != 0) cfg.nFunMods[0] = EFunMods.Avalanche;
+		else if ((ModFlags & (int)EModFlag.Minesweeper) != 0) cfg.nFunMods[0] = EFunMods.Minesweeper;
+		else if ((ModFlags & (int)EModFlag.DynamicBeat) != 0) cfg.nFunMods[0] = EFunMods.DynamicBeat;
+		else cfg.nFunMods[0] = EFunMods.None;
+
+		cfg.bJust[0] = (ModFlags & (int)EModFlag.Just) != 0 ? 1 : ((ModFlags & (int)EModFlag.Safe) != 0 ? 2 : 0);
+		cfg.nScrollSpeed[0] = ScrollSpeedValue;
+		cfg.nSongSpeed = SongSpeedValue;
+		cfg.nTimingZones[0] = JudgeStrictnessAdjust;
+		cfg.bAutoPlay[0] = false;   // the recorded inputs do the judging, not auto (the auto icon shows via bReplayMode)
+		OpenTaiko.ReplaySeed[0] = RandomSeed;
+	}
+
+	// restore the player-0 mod state captured by tApplyVirtualMods (idempotent)
+	public static void tRestoreVirtualMods() {
+		if (!_modsSnapped) return;
+		var cfg = OpenTaiko.ConfigIni;
+		cfg.bAutoPlay[0] = _snapAuto; cfg.eRandom[0] = _snapRandom; cfg.eSTEALTH[0] = _snapStealth;
+		cfg.nFunMods[0] = _snapFunMods; cfg.bJust[0] = _snapJust; cfg.nScrollSpeed[0] = _snapScroll;
+		cfg.nTimingZones[0] = _snapTimingZones; cfg.nSongSpeed = _snapSongSpeed; OpenTaiko.ReplaySeed[0] = _snapSeed;
+		if (_snapName != null) {
+			// defensive: this also runs from the game-exit path, where nameplate/save structures may be tearing down
+			try {
+				OpenTaiko.SaveFileInstances[0].data.Name = _snapName;
+				OpenTaiko.NamePlate?.tNamePlateRefreshTitles(0);
+			} catch { }
+			_snapName = null;
+		}
+		_modsSnapped = false;
 	}
 
 	#endregion
@@ -479,6 +703,11 @@ class CSongReplay {
 	public byte ChartLevel;
 	// Online score ID used for online leaderboards linking, given by the server
 	public long OnlineScoreID;
+	// note-shuffle seed (added in version 601); -1 = none recorded (RNG-mod replays from before this are not replayable)
+	public int RandomSeed = -1;
 
 	#endregion
+
+	// the recorded inputs (tja time, pad) read by tLoadReplayFile; used to drive replay playback
+	public IReadOnlyList<Tuple<double, byte>> Inputs => allInputs;
 }

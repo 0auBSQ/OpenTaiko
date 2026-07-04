@@ -117,7 +117,7 @@
 			var tr = LuaTransitionWrapper.Get(transitionName);
 			if (tr != null) {
 				// Hand off this frame so CStageTransition plays the fade-out/loading/fade-in (skip the legacy fade).
-				CStageTransition.SetPendingScript(tr);
+				CStageTransition.SetPendingScript(this, tr);
 				_exitImmediate = true;
 			} else {
 				// No transition modules in this skin — fall back to the legacy black fade-out.

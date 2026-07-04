@@ -806,6 +806,17 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	protected double dbDynBeatTjaOffset     = 0.0; // TJA-time continuity offset when factor changes mid-song (double for precision)
 	protected long   msDynBeatRawGameTime   = 0;   // rawGameTime captured at the start of the current frame's chip processing
 	protected long   msDynBeatSectionStart  = 0;
+
+	/// <summary>Current chart (TJA) time for a player, including the Dynamic Beat warp (factor + offset)
+	/// applied by tProgressDraw_Chip — any comparison against chip times must use this, not the raw clock.</summary>
+	public long GetChartTimeNow(int nPlayer) {
+		CTja tja = OpenTaiko.GetTJA(nPlayer)!;
+		long rawGameTime = this.IsFailStopped() ? this.msFailedStopSystemTime : SoundManager.PlayTimer.NowTimeMs;
+		double tjaTime = tja.GameTimeToTjaTime(rawGameTime);
+		if (OpenTaiko.ConfigIni.nFunMods[nPlayer] == EFunMods.DynamicBeat)
+			return (long)(tjaTime * dbDynamicBeatFactor + dbDynBeatTjaOffset);
+		return (long)tjaTime;
+	}
 	protected int[]  nDynBeatSectionPerfects = new int[5];
 	protected int[]  nDynBeatSectionBads     = new int[5];
 	protected int[]  nDynBeatSectionNotes    = new int[5];
@@ -2291,6 +2302,65 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		#endregion
 	}
 
+	// ── BGM drift watchdog ─────────────────────────────────────────────────────────
+	// The play timer free-runs on the OS clock (bUseOSTimer default), so a long frame stall (GC, driver)
+	// that starves the audio feed leaves the music permanently behind the chart — previously only a manual
+	// pause→resume re-seeked it back. Watch the BGM position against the timer and, when a large drift
+	// persists over two consecutive checks, re-seek through the same correction the BGMAdjust keys use.
+	private long msLastBgmDriftCheck = 0;
+	private int nBgmDriftStrikes = 0;
+	private const long msBgmDriftCheckInterval = 500;
+	private const long msBgmDriftThreshold = 100;
+
+	protected void tCheckBgmDrift() {
+		if (this.bPAUSE || this.isRewinding || this.IsFailStopped()) {
+			this.nBgmDriftStrikes = 0;
+			return;
+		}
+		// Dynamic Beat retunes the music speed mid-song (SetSpeedWhilePlaying) — the constant-speed mapping
+		// between timer time and stream position no longer holds, so any "drift" measured here is phantom
+		// and correcting it repeatedly seeks the music ahead of the chart.
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (OpenTaiko.ConfigIni.nFunMods[i] == EFunMods.DynamicBeat) {
+				this.nBgmDriftStrikes = 0;
+				return;
+			}
+		}
+		long now = SoundManager.PlayTimer.SystemTimeMs;
+		if (now - this.msLastBgmDriftCheck < msBgmDriftCheckInterval) return;
+		this.msLastBgmDriftCheck = now;
+
+		CTja tja = OpenTaiko.TJA;
+		if (tja?.listWAV == null) return;
+
+		long worst = 0;
+		foreach (CTja.CWAV wc in tja.listWAV.Values) {
+			// same "long sound" gate as tWavePlaybackPositionAutoCorrection
+			if (wc.rSound[0] == null || wc.rSound[0].TotalPlayTime < 5000) continue;
+			for (int i = 0; i < wc.rSound.Length; i++) {
+				CSound snd = wc.rSound[i];
+				if (snd == null || !snd.IsPlaying) continue;
+				long expected = now - wc.nPlaybackStartTime[i] + wc.nInitialSeekMs;
+				long timelineLength = (long)(snd.TotalPlayTime / Math.Max(0.01, snd.Frequency * snd.PlaySpeed));
+				if (expected < 1000 || expected > timelineLength - 1000) continue;   // start settle-in / near end
+				long actual = snd.tGetPositionOnTimelineMs();
+				if (actual < 0) continue;
+				long drift = actual - expected;
+				if (Math.Abs(drift) > Math.Abs(worst)) worst = drift;
+			}
+		}
+
+		if (Math.Abs(worst) > msBgmDriftThreshold) {
+			if (++this.nBgmDriftStrikes >= 2) {
+				tja.tWavePlaybackPositionAutoCorrection();
+				Trace.TraceWarning($"[BGMDrift] music drifted {worst}ms from the play timer (frame stall?) — re-seeked to sync.");
+				this.nBgmDriftStrikes = 0;
+			}
+		} else {
+			this.nBgmDriftStrikes = 0;
+		}
+	}
+
 	public void Pause() {
 		this.bPAUSE = true;
 		SoundManager.PlayTimer.Pause();
@@ -2414,6 +2484,41 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	}
 	protected void tProgressDraw_Score() {
 		this.actScore.Draw();
+	}
+
+	// Per-player scan cursor for the replay precise auto-miss (see tReplayAutoMissBefore). Reset per play.
+	protected readonly int[] replayMissScan = new int[5];
+
+	// Replay-only, precise auto-miss. Watching a replay re-feeds recorded inputs at their EXACT recorded time, but
+	// the normal per-frame auto-miss (tProgressDraw_Chip ~3289) resolves passed notes on the render clock — whose
+	// cadence differs between the recording and playback sessions, so the recorded card and the re-judged playback
+	// diverge (verified: at ~50ms/frame the same inputs re-judge to 28 bad instead of the recorded 33). Before each
+	// recorded input at tjaTime, this misses every standard note whose bad window closed strictly before tjaTime,
+	// so the input only sees notes that were genuinely still hittable then — making playback frame-cadence
+	// independent (reproduces the recording at any fps). Keyed only on the recorded input times + chart chip times;
+	// never called outside replay playback, so live play is untouched. Rolls/waits keep the normal per-frame path.
+	protected void tReplayAutoMissBefore(int nPlayer, long tjaTime) {
+		CTja tja = OpenTaiko.GetTJA(nPlayer);
+		if (tja == null) return;
+		var list = tja.listNoteChip;
+		while (replayMissScan[nPlayer] < list.Count
+			&& (list[replayMissScan[nPlayer]].bHit || list[replayMissScan[nPlayer]].IsMissed))
+			replayMissScan[nPlayer]++;
+		for (int i = replayMissScan[nPlayer]; i < list.Count; i++) {
+			CChip pChip = list[i];
+			if (pChip.nSoundTimems > tjaTime || pChip.bHit || pChip.IsMissed) continue;   // future / already resolved
+			if (this.eGetChipJudgeAtTime(tjaTime, pChip, nPlayer) != ENoteJudge.Miss) continue;   // still hittable
+			if (pChip.bVisible && NotesManager.IsHittableNote(pChip) && !NotesManager.IsGenericRoll(pChip)
+				&& pChip.eNoteState != ENoteState.Wait) {   // mirror the standard-note branch of tProgressDraw_Chip
+				if (!this.IsNoteIfMet(pChip, nPlayer)) {
+					pChip.bHit = true;
+				} else {
+					pChip.IsMissed = true;
+					this.tChipHitProcess(tjaTime, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
+					pChip.eNoteState = ENoteState.Bad;
+				}
+			}
+		}
 	}
 
 	protected bool tProgressDraw_Chip(EKeyConfigPart ePlayMode, int nPlayer) {

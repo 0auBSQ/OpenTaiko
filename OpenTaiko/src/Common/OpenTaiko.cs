@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -101,6 +101,17 @@ internal class OpenTaiko : Game {
 	#endregion
 
 	public static CSongReplay[] ReplayInstances = new CSongReplay[5];
+
+	// ── replay playback ──
+	// note-shuffle seed used for the current play, per player; written into the saved replay and re-applied when watching
+	public static int[] ReplaySeed = new int[5];
+	// while true, that player's hits come from a recorded replay instead of live input (and the auto modicon is shown)
+	public static bool[] bReplayMode = new bool[5];
+	// the replay being played back for each player (set when bReplayMode is true)
+	public static CSongReplay[] ReplayPlayback = new CSongReplay[5];
+	// set by REPLAY:Watch from song select; the gameplay stage consumes it on activation to enter replay mode
+	public static bool ReplayWatchArmed = false;
+	public static CSongReplay PendingReplay = null;
 
 	public static CFPS FPS {
 		get;
@@ -459,9 +470,9 @@ internal class OpenTaiko : Game {
 	public void UnmountAndChangeStage(CStage Stage, string? traceMessage = null) {
 		// A Lua Exit(...) requested a transition: hand the switch to CStageTransition (it renders the still-
 		// mounted outgoing stage during fade-out, activates the target behind a loading screen, then fades in).
-		var pendingTransition = CStageTransition.ConsumePendingScript();
-		if (pendingTransition != null && Stage != null) {
-			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pendingTransition, traceMessage);
+		var pending = CStageTransition.ConsumePendingScript();
+		if (rCurrentStage == pending?.stage && Stage != null) {
+			stageTransition.Begin(rCurrentStage, Stage, CStageTransition.ActivateStep(Stage), default, pending.Value.script, traceMessage);
 			rPreviousStage = rCurrentStage;
 			rCurrentStage = stageTransition;   // outgoing stays mounted; the transition unmounts it after fade-out
 			return;
@@ -665,6 +676,7 @@ internal class OpenTaiko : Game {
 		InputManager?.Polling();
 		FPSInput?.Update(); // events polled before Update() is called
 	}
+
 	protected override void Draw() {
 #if !DEBUG
 		try
@@ -792,6 +804,7 @@ internal class OpenTaiko : Game {
 				}
 				#endregion
 
+			handleDrawLoopReturnValue:
 				switch (rCurrentStage.eStageID) {
 					case CStage.EStage.None:
 						break;
@@ -827,6 +840,11 @@ internal class OpenTaiko : Game {
 								CStage? _target = stageTransition.Target;
 								stageTransition.Finish();
 								rCurrentStage = _target ?? rCurrentStage;
+								// forward target's return value
+								if (stageTransition.TargetDrawLoopReturnValue != null && rCurrentStage != stageTransition) {
+									this.nDrawLoopReturnValue = stageTransition.TargetDrawLoopReturnValue.Value;
+									goto handleDrawLoopReturnValue;
+								}
 							}
 						}
 						break;
@@ -1219,7 +1237,8 @@ internal class OpenTaiko : Game {
 	public static CTexture tTextureCreate(string fileName) {
 		return tTextureCreate(fileName, false);
 	}
-	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) {
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent) => tTextureCreate(fileName, bBlackTransparent, 0);
+	public static CTexture tTextureCreate(string fileName, bool bBlackTransparent, int maxDimension) {
 		if (app == null) {
 			return null;
 		}
@@ -1235,7 +1254,7 @@ internal class OpenTaiko : Game {
 			return null;
 		}
 		try {
-			return new CTexture(fileName, bBlackTransparent);
+			return new CTexture(fileName, bBlackTransparent, maxDimension);
 		} catch (CTextureCreateFailedException e) {
 			Trace.TraceError(e.ToString());
 			Trace.TraceError("Texture generation has failed. ({0})", fileName);
@@ -2022,6 +2041,9 @@ internal class OpenTaiko : Game {
 			string str = strEXEFolder + "Config.ini";
 			Trace.Indent();
 			try {
+				// quitting the game while a replay is armed/playing: put the player's real mods back before the
+				// export below persists the config (the replay's virtual mods must never reach Config.ini)
+				CSongReplay.tRestoreVirtualMods();
 				// the exporter mutates the config (hidden window, auto, player count) — never persist that
 				if (!VideoExporter.Active) ConfigIni.tExport(str);
 				Trace.TraceInformation("Saved succesfully. ({0})", str);

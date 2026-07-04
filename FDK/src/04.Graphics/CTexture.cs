@@ -605,10 +605,21 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		: this() {
 		MakeTexture(strFileName, bBlackTransparent);
 	}
-	public void MakeTexture(string strFileName, bool bBlackTransparent) {
-		// Remember the source so the LRU cache can re-decode this texture after a memory-pressure eviction.
+	public CTexture(string strFileName, bool bBlackTransparent, int maxDimension)
+		: this() {
+		MakeTexture(strFileName, bBlackTransparent, maxDimension);
+	}
+	public void MakeTexture(string strFileName, bool bBlackTransparent) => MakeTexture(strFileName, bBlackTransparent, 0);
+
+	// maxDimension > 0 clamps the DECODED size: the bitmap is downscaled at load time so its long side is at
+	// most maxDimension px. Use for oversized art drawn small (song jackets: a 3000x3000 source decodes to
+	// 34MB but displays at ~400px). Width/Height then report the clamped size — callers that scale to a
+	// target box (w/tex.Width) are unaffected.
+	public void MakeTexture(string strFileName, bool bBlackTransparent, int maxDimension) {
+		// Remember the source so the LRU cache can re-decode this texture at the same clamp after eviction.
 		this._sourcePath = strFileName;
 		this._sourceBlackTransparent = bBlackTransparent;
+		this._sourceMaxDimension = maxDimension;
 		// Async fast path: queue the decode + GL upload instead of doing GL here (see CTexture.Streaming.cs).
 		// Triggered by a runtime async load (AsyncLoad) or a load phase (StreamingLoad); SyncForce overrides it
 		// (pixels needed now). The GL upload always lands on the render thread (Game.AsyncActions), so this is
@@ -616,7 +627,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// is unreliable. Background decode workers call the MakeTexture(SKBitmap) overload, never this. The texture
 		// stays blank (t2DDraw no-ops) until uploaded.
 		if (!SyncForce && (StreamingLoad || AsyncLoad)
-			&& tQueueAsyncTexture(strFileName, bBlackTransparent))
+			&& tQueueAsyncTexture(strFileName, bBlackTransparent, maxDimension))
 			return;
 
 		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
@@ -624,9 +635,10 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 		// Read only the header dimensions now and defer the pixel decode + GL upload to first draw,
 		// so undrawn textures never reach GPU memory.
+		// Skip when maxDimension clamps the size: the header is full-size and would misreport Width/Height.
 		try {
 			using var codec = SKCodec.Create(strFileName);
-			if (codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
+			if (maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
 				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
 				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 				// t2DDraw reads rcFullImage before the deferred upload sets it, so set it here too.
@@ -636,9 +648,27 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 		} catch { /* fall through to eager decode */ }
 
-		SKBitmap bitmap = SKBitmap.Decode(strFileName);
+		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
+		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
+		// falls through to MakeTexture's null-guard (blank 10x10), as before.
+		SKBitmap bitmap = tClampToMaxDimension(tDecodeForUpload(strFileName), maxDimension);
 		MakeTexture(bitmap, bBlackTransparent);
-		bitmap.Dispose();
+		bitmap?.Dispose();
+	}
+
+	// Downscale so the long side is at most maxDimension px (0 = no clamp). Keeps the zero-copy upload
+	// format; disposes the original when a resize happens.
+	internal static SKBitmap tClampToMaxDimension(SKBitmap bmp, int maxDimension) {
+		if (bmp == null || maxDimension <= 0) return bmp;
+		int longSide = Math.Max(bmp.Width, bmp.Height);
+		if (longSide <= maxDimension) return bmp;
+		double f = (double)maxDimension / longSide;
+		int dw = Math.Max(1, (int)Math.Round(bmp.Width * f));
+		int dh = Math.Max(1, (int)Math.Round(bmp.Height * f));
+		var resized = bmp.Resize(new SKImageInfo(dw, dh, SKColorType.Bgra8888, SKAlphaType.Unpremul), SKFilterQuality.Medium);
+		if (resized == null) return bmp;
+		bmp.Dispose();
+		return resized;
 	}
 
 	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────
@@ -664,6 +694,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	private long _gpuBytes = 0;
 	private string? _sourcePath;            // file this texture was loaded from, for re-decode after eviction
 	private bool _sourceBlackTransparent;
+	private int _sourceMaxDimension;         // clamp applied at load, re-applied when re-decoding after eviction
 	private uint _lastDrawnTick;            // Game.TimeMs at last draw — LRU order
 	private bool _deferred;                  // Pointer==0 but uploadable from _sourcePath on next draw (lazy-pending OR evicted)
 	private static readonly HashSet<CTexture> s_liveTextures = new();
@@ -704,7 +735,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		_lastDrawnTick = (uint)Game.TimeMs;
 		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
 			_deferred = false;
-			try { using SKBitmap bmp = SKBitmap.Decode(_sourcePath); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
+			try { using SKBitmap bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
 			catch { }
 		}
 	}
@@ -766,13 +797,49 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	/// (unpremultiplied) alpha, so: if the bitmap is already Unpremul Bgra/Rgba, hand GL its native buffer via
 	/// GetPixels() (no managed copy); otherwise read .Pixels, which converts to unpremultiplied BGRA (correct,
 	/// but copies the whole image — the old behavior, kept as a safe fallback). Render thread only (calls GL).</summary>
+	// Returns a bitmap tGenFromBitmap can upload zero-copy (straight-alpha or opaque BGRA/RGBA), owned by the
+	// caller. takeOwnership: src is either returned directly or disposed after conversion; otherwise src is
+	// left intact and a copy is returned.
+	private static SKBitmap tPrepareUploadBitmap(SKBitmap src, bool takeOwnership) {
+		bool eligible = (src.AlphaType == SKAlphaType.Unpremul || src.AlphaType == SKAlphaType.Opaque)
+			&& (src.ColorType == SKColorType.Bgra8888 || src.ColorType == SKColorType.Rgba8888);
+		if (eligible)
+			return takeOwnership ? src : src.Copy();
+
+		var info = new SKImageInfo(src.Width, src.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		var conv = new SKBitmap(info);
+		bool ok;
+		using (var pm = src.PeekPixels())
+			ok = pm != null && conv.GetPixels() != IntPtr.Zero && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes);
+		if (!ok) {
+			conv.Dispose();
+			return takeOwnership ? src : src.Copy();   // tGenFromBitmap's fallback converts it instead
+		}
+		if (takeOwnership) src.Dispose();
+		return conv;
+	}
+
 	private uint tGenFromBitmap(SKBitmap b) {
-		if (b.AlphaType == SKAlphaType.Unpremul && (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
+		// Zero-copy upload: raw bytes are already straight-alpha (or fully opaque — decoded JPEGs) BGRA/RGBA.
+		if ((b.AlphaType == SKAlphaType.Unpremul || b.AlphaType == SKAlphaType.Opaque)
+			&& (b.ColorType == SKColorType.Bgra8888 || b.ColorType == SKColorType.Rgba8888)) {
 			var fmt = b.ColorType == SKColorType.Rgba8888 ? PixelFormat.Rgba : PixelFormat.Bgra;
 			unsafe {
 				void* p = (void*)b.GetPixels();
 				if (p != null)
 					return GenTexture(p, (uint)b.Width, (uint)b.Height, fmt);
+			}
+		}
+		// Everything else (premul PNG decodes, exotic color types): convert to straight-alpha BGRA natively.
+		// Never use SKBitmap.Pixels here — it allocates a w*h managed SKColor[] per upload (8-30MB of LOH
+		// garbage per decoded image; scrolling song select stacked hundreds of MB of it between Gen2 GCs).
+		var info = new SKImageInfo(b.Width, b.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+		using (var conv = new SKBitmap(info))
+		using (var pm = b.PeekPixels()) {
+			unsafe {
+				void* dst = (void*)conv.GetPixels();
+				if (dst != null && pm != null && pm.ReadPixels(info, conv.GetPixels(), conv.RowBytes))
+					return GenTexture(dst, (uint)b.Width, (uint)b.Height, PixelFormat.Bgra);
 			}
 		}
 		unsafe {
@@ -781,6 +848,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 		}
 	}
+
+	// Live-texture accounting for the [MEMTRACE] debug line: decoded size (w*h*4) is added on MakeTexture
+	// and removed on Dispose, so a climbing LiveBytes means textures are created but never disposed.
+	public static int LiveCount;
+	public static long LiveBytes;
+	private long _countedBytes;
 
 	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) {
 		try {
@@ -806,6 +879,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 			int origW = bitmap.Width, origH = bitmap.Height;   // LOGICAL size: layout + UV (fractions of rcFullImage) use this
 
+			long newBytes = (long)origW * origH * 4;
+			Interlocked.Add(ref LiveBytes, newBytes - _countedBytes);
+			if (_countedBytes == 0)
+				Interlocked.Increment(ref LiveCount);
+			_countedBytes = newBytes;
+
 			// Render-scale: downsample the GL texture to cut VRAM + upload bandwidth on low-end machines. szImageSize
 			// stays the ORIGINAL size, so every draw (incl. sprite-sheet sub-rects) is unchanged — only sampling detail
 			// drops. UVs are fractions of rcFullImage, independent of the GL texture's pixel count, so this is transparent.
@@ -824,8 +903,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				Pointer = tGenFromBitmap(glBitmap);
 				if (ownGlBitmap) glBitmap.Dispose();
 			} else {
-				var asyncCopy = glBitmap.Copy();
-				if (ownGlBitmap) glBitmap.Dispose();
+				// Pre-convert on this (background) thread so the queued render-thread action is a pure
+				// zero-copy GL upload — converting a large image there stalls the frame.
+				var asyncCopy = tPrepareUploadBitmap(glBitmap, ownGlBitmap);
 				Action createInstance = () => {
 					try {
 						Pointer = tGenFromBitmap(asyncCopy);
@@ -1343,6 +1423,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			if (_gpuBytes > 0) s_gpuTextureCount--;
 			_gpuBytes = 0;
 			lock (s_cacheLock) s_liveTextures.Remove(this);
+
+			if (_countedBytes != 0) {
+				Interlocked.Add(ref LiveBytes, -_countedBytes);
+				Interlocked.Decrement(ref LiveCount);
+				_countedBytes = 0;
+			}
 
 			this.bDisposeCompleteDone = true;
 		}

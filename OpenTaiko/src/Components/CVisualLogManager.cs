@@ -46,19 +46,26 @@ class CVisualLogManager {
 	}
 
 	public void Display() {
-		var firstCard = this.firstCard; // concurrent
-		if (firstCard?.IsExpired() ?? true) {
-			while (this.cards.TryDequeue(out firstCard) && firstCard.IsExpired())
-				;
+		LogCard? firstCard;
+		lock (this.cards) { // concurrent with only Display()
+			firstCard = this.firstCard;
+			if (firstCard?.IsExpired() ?? true) {
+				while (this.cards.TryDequeue(out firstCard) && firstCard.IsExpired())
+					;
+			}
+			this.firstCard = firstCard;
 		}
-		this.firstCard = firstCard;
 		int y = 0;
 		if (firstCard != null)
 			y = firstCard.Display(y);
-		for (int i = 0; i < this.cards.Count; ++i) { // concurrent
-			var card = this.cards.ElementAtOrDefault(i);
-			if (card != null)
-				y = card.Display(y);
+		try {
+			for (int i = 0; i < this.cards.Count; ++i) { // concurrent with PushCard()
+				var card = this.cards.ElementAtOrDefault(i);
+				if (card != null)
+					y = card.Display(y);
+			}
+		} catch (InvalidOperationException) {
+			// skip display
 		}
 	}
 

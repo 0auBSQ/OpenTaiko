@@ -70,7 +70,6 @@ local current         -- the page being shown + scrolled
 local activeTabIndex
 local previewPanel
 local keysBack, keysTitle
-local descCache       -- { key, title, nameTex, descTex }
 local bgCanvas
 local scrollTarget, scrollCur = 0, 0
 local lastTs = 0
@@ -267,7 +266,7 @@ local function addBindRow(page, act)
             captureBtn = self
             local slot = M.Keys:FirstFreeSlot(act); if slot < 0 then slot = 0 end   -- full -> overwrite slot 0
             -- refresh via the capture callback and via the IsCapturing transition
-            M.Keys:StartCapture(act, slot, function(ok) if ok then self:setText(M.Keys:GetAllBindings(act)); descCache = nil end end)
+            M.Keys:StartCapture(act, slot, function(ok) if ok then self:setText(M.Keys:GetAllBindings(act)) end end)
         end }
     btn:setVisible(false)
     local entry = { kind = "option", nameLabel = nameLbl, ctrl = btn, opt = { Name = act.Name, Desc = act.Desc }, customDisplay = false }
@@ -311,7 +310,6 @@ local function showPage(page)
     for _, w in ipairs(page.widgets) do w:setVisible(true) end
     current = page
     scrollTarget, scrollCur = 0, 0
-    descCache = nil
     lastFocusIdx = -1   -- force one ensureFocusedVisible after the page changes
     ui:_rebuildFocus()
 end
@@ -440,6 +438,7 @@ end
 
 -- ── gradient background ───────────────────────────────────────────────────────────
 local function bakeGradient()
+    if bgCanvas then return end   -- static bake; survives language reloads (freed in deactivate)
     local H = 256
     bgCanvas = CANVAS:CreateCanvas(2, H)
     for iy = 0, H - 1 do
@@ -488,17 +487,19 @@ end
 local function drawPreview()
     local innerX, innerY, innerW = PX + 34, VY + 34, PW - 68
     local title, desc, opt = currentTitleDesc()
-    local key = opt or mode
-    if not descCache or descCache.key ~= key or descCache.title ~= title then
-        descCache = {
-            key = key, title = title,
-            nameTex = ui:renderText(nameFont, title or "", THEME.colors.primary2, TRANSP, false, innerW),
-            descTex = (desc and desc ~= "") and ui:renderText(descFont, desc, DESC_COLOR, TRANSP, false, innerW) or nil,
-        }
-    end
+    -- glyph-composed: no per-string textures. The title squishes per-letter into the pane width; the
+    -- description WORD-WRAPS to it (translations no longer need hand-placed line feeds) and its drawn
+    -- height positions whatever follows (the thumbnail).
     local y = innerY
-    if descCache.nameTex then descCache.nameTex:Draw(innerX, y); y = y + (descCache.nameTex.Height or 30) + 22 end
-    if descCache.descTex then descCache.descTex:Draw(innerX, y); y = y + (descCache.descTex.Height or 20) + 28 end
+    if title and title ~= "" then
+        ui:drawText(nameFont, title, innerX, y, THEME.colors.primary2, 1, 1, innerW)
+        y = y + ui:textHeight(nameFont) + 22
+    end
+    if desc and desc ~= "" then
+        -- wrap the ink to innerW-50: the glyph box pads 25px per side, so this keeps the visual right
+        -- margin equal to the left one
+        y = y + ui:drawWrapped(descFont, desc, innerX, y, innerW - 50, DESC_COLOR) + 28
+    end
     if opt and opt.Thumbnails ~= nil then drawThumb(opt, innerX, y, innerW, 380) end
     -- multi-bind hint while configuring keys
     if mode == "bind" then
@@ -523,20 +524,18 @@ function onStart() end
 
 function activate(model)
     M = model
-    mode = "main"; descCache = nil; scrollTarget, scrollCur = 0, 0; lastTs = 0
+    mode = "main"; scrollTarget, scrollCur = 0, 0; lastTs = 0
     wasCapturing = false; captureBtn = nil; lastThumbIdx, lastThumbOpt = nil, nil
     thumbWantIdx, thumbWantOpt, thumbWantSince = nil, nil, 0
     catPages = {}; bindPages = {}; tabs = {}; current = nil
 
     ui = PopUI.new{ theme = THEME, bg = false }
-    ui:_prewarm(ui.theme.font.small)
-    ui:_prewarm(ui.theme.font.button)
     bakeGradient()
 
     -- build the tabs first so they become the leading focusables (categories, then the keys tab)
     local tabLabels = {}
     for i = 0, M.CategoryLabels.Count - 1 do tabLabels[#tabLabels + 1] = M.CategoryLabels[i] end
-    tabLabels[#tabLabels + 1] = tr("SETTINGS_UI_KEYS", "Input Settings")
+    tabLabels[#tabLabels + 1] = tr("SETTINGS_UI_KEYS", "Input")
     local tx = VX
     local function tabNavDown() if mode == "main" and current and current.firstCtrl then setFocusTo(current.firstCtrl); return true end return false end
     local function tabNavUp() if mode == "main" and current and current.lastCtrl then setFocusTo(current.lastCtrl); return true end return true end
@@ -577,9 +576,19 @@ function activate(model)
 end
 
 function reload(model)
+    -- language changed: rebuild with the new localized strings, keeping the user's place. The main font is
+    -- language-dependent, so the shared PopUI fonts must be flushed and rebuilt with the new typeface
+    -- (their old glyph textures are disposed with them — nothing stacks across switches).
+    PopUI.flushSharedFonts()
+    local keepTab   = activeTabIndex or 1
+    local keepFocus = ui and ui.focusIdx or 1
+    local keepST, keepSC = scrollTarget, scrollCur
     if ui then ui:disposeWidgets(); ui:clear() end
-    if bgCanvas then bgCanvas:Dispose(); bgCanvas = nil end
-    activate(model)   -- language changed: rebuild with the new localized strings
+    activate(model)
+    if keepTab > 1 and keepTab <= nTabs then switchTab(keepTab) end
+    scrollTarget, scrollCur = keepST, keepSC
+    ui.focusIdx = clamp(keepFocus, 1, math.max(1, #ui.focusables))
+    lastFocusIdx = ui.focusIdx   -- keep the restored scroll: no focus-follow snap on the next update
 end
 
 function update(ts)
@@ -590,7 +599,6 @@ function update(ts)
     if wasCapturing then
         wasCapturing = false
         if captureBtn and captureBtn._act then captureBtn:setText(M.Keys:GetAllBindings(captureBtn._act)) end
-        descCache = nil
     end
 
     local dt = (ts - lastTs) / 1000.0
@@ -623,7 +631,7 @@ function update(ts)
             if fw and fw._act then
                 local slot = M.Keys:LastBoundSlot(fw._act)
                 if slot >= 0 then M.Keys:ClearBinding(fw._act, slot) end
-                fw:setText(M.Keys:GetAllBindings(fw._act)); descCache = nil
+                fw:setText(M.Keys:GetAllBindings(fw._act))
             end
         end
     end

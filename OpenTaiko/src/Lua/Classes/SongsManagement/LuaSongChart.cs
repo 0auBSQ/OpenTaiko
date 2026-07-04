@@ -192,6 +192,12 @@
 
 		#endregion
 
+		// folder holding this chart's .tja (its Replay/ subfolder lives here) and the song's unique id — used by the
+		// best-plays list to find replays for this chart
+		public string SongFolder => _score != null ? (_score.FileInfo.FolderAbsolutePath ?? "") : "";
+		public string ChartPath => _score != null ? (_score.FileInfo.FileAbsolutePath ?? "") : "";
+		public string UniqueId => _parentListNode?.uniqueId?.data.id ?? "";
+
 		public bool Select(int player) {
 			if (!NotNull) return false;
 

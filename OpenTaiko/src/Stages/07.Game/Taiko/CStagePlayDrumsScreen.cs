@@ -209,6 +209,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {
 		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.tValueInitialize(bPlayRecord, bPlayState);
+		for (int i = 0; i < 5; i++) { replayCursor[i] = 0; replayMissScan[i] = 0; }
 
 		if (bPlayState) {
 			this.actGame.tTatakikiriShow_Initialize();
@@ -302,6 +303,20 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	public override void DeActivate() {
 		this.ctHandHold = null;
+
+		this.pfReplayModeText?.Dispose(); this.pfReplayModeText = null;
+		this.pfReplayModeTextSmall?.Dispose(); this.pfReplayModeTextSmall = null;
+		this.ttkReplayMode = null; this.ttkReplayInvalid = null;
+
+		// leaving a replay anywhere except to the result screen (quit / retry) → drop replay mode + restore the
+		// real mods now, so the next play isn't hijacked by the recording. (the cleared→result path restores in the
+		// result screen instead, so the auto modicon + persistence-skip survive through results.)
+		if (OpenTaiko.bReplayMode[0]
+			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageCleared
+			&& this.eFadeOutCompleteWhenReturnValue != EGameplayScreenReturnValue.StageFailed) {
+			CSongReplay.tRestoreVirtualMods();
+			for (int i = 0; i < 5; i++) { OpenTaiko.bReplayMode[i] = false; OpenTaiko.ReplayPlayback[i] = null; }
+		}
 
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (this.soundRed[i] != null)
@@ -466,6 +481,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// Layer: notes & bar lines
 			this.ctHandHold.TickLoop();
 
+			// Replay playback: feed the recorded inputs (each with its own auto-miss resolved to its exact time)
+			// BEFORE the per-frame auto-miss below, so playback judges frame-cadence independently and reproduces
+			// the recorded card at any fps. No-op outside replay mode (tPumpReplayInputs skips non-replay players).
+			tPumpReplayInputs();
+
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
 				bool btmp = this.tProgressDraw_Chip(EKeyConfigPart.Taiko, i);
@@ -482,6 +502,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// Layer: above-note elements
 
 			this.actMtaiko.Draw();
+			this.tDrawReplayModeIndicator();
 
 			if (OpenTaiko.ConfigIni.bAIBattleMode) {
 				this.actAIBattle.Draw();
@@ -786,9 +807,75 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 	}
 
+	// cursor into each replay's recorded input list, advanced as the play clock passes each input's time
+	private int[] replayCursor = new int[5];
+
+	// "> Replay Mode <" indicator under the 1P lane while watching a replay (fonts disposed in DeActivate)
+	private CCachedFontRenderer pfReplayModeText;
+	private CCachedFontRenderer pfReplayModeTextSmall;
+	private TitleTextureKey ttkReplayMode;
+	private TitleTextureKey ttkReplayInvalid;
+
+	private void tDrawReplayModeIndicator() {
+		if (!OpenTaiko.bReplayMode[0]) return;
+		if (this.pfReplayModeText == null) {
+			this.pfReplayModeText = HPrivateFastFont.tInstantiateMainFont(30);
+			this.pfReplayModeTextSmall = HPrivateFastFont.tInstantiateMainFont(20);
+			this.ttkReplayMode = new TitleTextureKey("> Replay Mode <", this.pfReplayModeText,
+				System.Drawing.Color.White, System.Drawing.Color.Black, 600);
+			this.ttkReplayInvalid = new TitleTextureKey("(Invalid replay file)", this.pfReplayModeTextSmall,
+				System.Drawing.Color.OrangeRed, System.Drawing.Color.Black, 600);
+		}
+		int laneW = OpenTaiko.Tx.Lane_Background_Main?.szTextureSize.Width ?? 1000;
+		int laneH = OpenTaiko.Tx.Lane_Background_Main?.szTextureSize.Height ?? 195;
+		int cx = OpenTaiko.Skin.Game_Lane_X[0] + laneW / 2;
+		int cy = OpenTaiko.Skin.Game_Lane_Y[0] + laneH + 26;
+
+		// slow blink (1s cycle) so it reads as a status, not an alert
+		double phase = (OpenTaiko.Timer.NowTimeMs % 1000) / 1000.0;
+		var tx = TitleTextureKey.ResolveTitleTexture(this.ttkReplayMode);
+		if (tx != null) {
+			tx.Opacity = (int)(255 * (0.35 + 0.65 * Math.Abs(Math.Sin(Math.PI * phase))));
+			tx.t2DScaledCenterBasedDraw(cx, cy);
+		}
+
+		var rep = OpenTaiko.ReplayPlayback[0];
+		if (rep != null && (rep.WarnOldVersion || rep.WarnChecksumMismatch)) {
+			var tx2 = TitleTextureKey.ResolveTitleTexture(this.ttkReplayInvalid);
+			if (tx2 != null) {
+				tx2.Opacity = 255;
+				tx2.t2DScaledCenterBasedDraw(cx, cy + 32);
+			}
+		}
+	}
+
+	// feed a replay's recorded (tjaTime, pad) inputs through the judge as the play clock reaches them
+	private void tPumpReplayInputs() {
+		for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
+			if (!OpenTaiko.bReplayMode[p]) continue;
+			var rep = OpenTaiko.ReplayPlayback[p];
+			CTja tja = OpenTaiko.GetTJA(p);
+			if (rep == null || tja == null) continue;
+			var inputs = rep.Inputs;
+			// warp-aware chart time: recorded timestamps are in WARPED tja time (see tInputProcess_Drums), so
+			// releasing them against the raw clock desynced Dynamic Beat replays once the factor left 1.0
+			long nowTja = this.GetChartTimeNow(p);
+			while (replayCursor[p] < inputs.Count && inputs[replayCursor[p]].Item1 <= nowTja) {
+				long tHit = (long)inputs[replayCursor[p]].Item1;
+				// resolve auto-misses up to this hit's EXACT recorded time first, so a recorded input can only claim
+				// a note that was genuinely still hittable at tHit (frame-cadence independent — see tReplayAutoMissBefore)
+				this.tReplayAutoMissBefore(p, tHit);
+				this.ProcessPadInput(p, (EPad)inputs[replayCursor[p]].Item2, tHit);
+				replayCursor[p]++;
+			}
+		}
+	}
+
 	protected override void tInputProcess_Drums() {
 		// Input adjust deprecated
 		var nInputAdjustTimeMs = 0; // OpenTaiko.ConfigIni.nInputAdjustTimeMs;
+
+		tPumpReplayInputs();
 
 		foreach (var (nPad, inputEvent, order) in OpenTaiko.Pad.GetEvents(EKeyConfigPart.Taiko)) {      // #27029 2012.1.4 from: <10 to <=10; Eパッドの要素が１つ（HP）増えたため。
 																//		  2012.1.5 yyagi: (int)Eパッド.MAX に変更。Eパッドの要素数への依存を無くすため。
@@ -796,6 +883,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (nUsePlayer >= OpenTaiko.ConfigIni.nPlayerCount
 				|| OpenTaiko.stageGameScreen.isDeniedPlaying[nUsePlayer] || OpenTaiko.stageGameScreen.IsStageFailed_Fast()
 				|| ((!OpenTaiko.ConfigIni.bTokkunMode || nUsePlayer > 0) && OpenTaiko.ConfigIni.bAutoPlay[nUsePlayer]) //2020.05.18 Mr-Ojii オート時の入力キャンセル
+				|| OpenTaiko.bReplayMode[nUsePlayer]   // replay playback: ignore live input, inputs come from the recording
 				|| (nUsePlayer == 1 && OpenTaiko.ConfigIni.bAIBattleMode)
 				|| (LuaNetworking.Active != null && LuaNetworking.Active.IsRemoteSpot(nUsePlayer))   // online VS: spots 2-5 are remote players — ignore any local input mapped to them
 				) {
@@ -1221,11 +1309,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 			double msBarRollProgress = 0;
+			// Chart time including the Dynamic Beat warp — the raw clock diverges from chip times once the
+			// warp factor moves off 1.0, which made this window miss and hid the roll/kusudama/fuse numbers.
+			long nowTime = this.GetChartTimeNow(i);
 			for (int iChip = this.chipCurrentProcessingRollChip[i].Count; iChip-- > 0;) {
 				var chkChip = this.chipCurrentProcessingRollChip[i][iChip];
 				if (!chkChip.bVisible)
 					continue;
-				long nowTime = (long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 				//int n = this.chip現在処理中の連打チップ[i].nチャンネル番号;
 				if (!this.bPAUSE && !this.isRewinding && !chkChip.bProcessed) {
 					this.ProcessRollHeadEffects(i, chkChip);
@@ -1257,6 +1347,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					this.UpdateClearAnimation(i);
 			}
 		}
+
+		if (!this.actTokkun.bTrainingPAUSE)
+			this.tCheckBgmDrift();
 
 		#region [ Branch guide for P1 ]
 		//現在実験状態です。

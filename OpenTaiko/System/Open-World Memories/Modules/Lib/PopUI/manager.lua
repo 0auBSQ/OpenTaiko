@@ -19,8 +19,23 @@ local SettingsList = require("PopUI.widgets.settingslist")
 local SCREEN_W, SCREEN_H = 1920, 1080
 local HOLD_DELAY, HOLD_REPEAT = 0.20, 0.07
 
+-- Module-shared font caches. Managers come and go (config_ui rebuilds on language change) but fonts are
+-- size-keyed and theme-independent, so sharing them keeps the baked glyphs alive across rebuilds — no
+-- re-rasterization lag and no orphaned font objects stacking up.
+-- The MAIN FONT itself is language-dependent (CLangManager.LangInstance.FontName): call
+-- M.flushSharedFonts() when the language changes so the caches rebuild with the new typeface.
+local sharedFonts, sharedGFonts = {}, {}
+
 local M = {}
 M.__index = M
+
+-- dispose + drop every shared font (their baked glyph textures free with them); the next text draw
+-- recreates them with the CURRENT language's font
+function M.flushSharedFonts()
+    for _, f in pairs(sharedFonts) do pcall(function() f:Dispose() end) end
+    for _, f in pairs(sharedGFonts) do pcall(function() f:Dispose() end) end
+    sharedFonts, sharedGFonts = {}, {}
+end
 
 function M.new(opts)
     opts = opts or {}
@@ -36,9 +51,7 @@ function M.new(opts)
     self._hoverW = nil
     self._pressW = nil
     self._captureWidget = nil   -- a textbox currently eating keystrokes
-    self._fonts = {}
     self._colors = {}
-    self._atlases = {}          -- per-size glyph atlas for dynamic text (see _atlas/drawText)
     self._rep = {}
     self._lastTs = 0
     self._ctx = {}
@@ -53,8 +66,8 @@ end
 function M:resolveTheme(style) return Theme.resolve(self.userTheme, style) end
 
 function M:font(size)
-    local f = self._fonts[size]
-    if not f then f = TEXT:Create(size); self._fonts[size] = f end
+    local f = sharedFonts[size]
+    if not f then f = TEXT:Create(size); sharedFonts[size] = f end
     return f
 end
 
@@ -73,98 +86,67 @@ function M:renderText(size, str, fg, bg, centered, maxWidth)
     return f:GetText(tostring(str), centered or false, maxWidth or 99999, fc, bc)
 end
 
--- ── glyph-atlas text letter-by-letter ───────────────
--- A glyph texture's Width includes ~pad px of edge padding; the true advance is (Width - pad) where
--- pad = 2*W("8") - W("88"). We cache one White/Black glyph texture per char (tinted at draw → colour-free,
--- so the cache is the alphabet, not strings). for dynamic strings (slider value, textbox,
--- typewriter, footer) in order to prevent clogging the RAM.
--- ASCII only (iterates bytes); fall back to renderText for non-ASCII.
-function M:_atlas(size)
-    local a = self._atlases[size]
-    if not a then
-        local f = self:font(size)
-        -- White fill + transparent edge (alpha 0): tinting at draw gives clean coloured text with NO black
-        -- outline (matching the static labels, which also use a transparent backcolor) → lighter, not "super dark".
-        local white, edge = self:color(255, 255, 255), self:color(0, 0, 0, 0)
-        local function W(s) return f:GetText(s, false, 9999, white, edge).Width or 0 end
-        a = {
-            font = f, white = white, edge = edge,
-            pad = 2 * W("8") - W("88"),
-            space = math.max(1, W("0 0") - W("00")),
-            h = f:GetText("8", false, 9999, white, edge).Height or size,
-            glyphs = {},
-        }
-        self._atlases[size] = a
-    end
-    return a
-end
-
-function M:_glyph(a, ch)
-    local g = a.glyphs[ch]
-    if not g then
-        local tex = a.font:GetText(ch, false, 9999, a.white, a.edge)
-        g = { tex = tex, adv = math.max(1, (tex.Width or 0) - a.pad) }
-        a.glyphs[ch] = g
-    end
-    return g
+-- ── glyph-composed text (C# LuaGlyphText: bounded per-character texture cache) ─────
+-- One texture per unique character; strings are composed at draw time with per-letter post-processing
+-- (the maxWidth squish scales each glyph individually). UTF-8 correct (the C# side iterates code points),
+-- exact font advances, and word wrap for text blocks. Dynamic strings never allocate per-frame textures.
+function M:gfont(size)
+    local f = sharedGFonts[size]
+    if not f then f = TEXT:CreateGlyphCached(size); sharedGFonts[size] = f end
+    return f
 end
 
 function M:measureText(size, str)
-    local a = self:_atlas(size)
-    local w = 0
-    str = tostring(str)
-    for i = 1, #str do
-        local ch = str:sub(i, i)
-        w = w + ((ch == " ") and a.space or self:_glyph(a, ch).adv)
-    end
-    return w
+    return self:gfont(size):Measure(tostring(str))
 end
 
-function M:textHeight(size) return self:_atlas(size).h end
+function M:textHeight(size) return self:gfont(size).BoxHeight end
 
--- draw str glyph-by-glyph, top-anchored at (x,y). color = {r,g,b}. returns the end x.
-function M:drawText(size, str, x, y, color, opacity, scale)
-    local a = self:_atlas(size)
-    local r, g, b = color[1] / 255, color[2] / 255, color[3] / 255
-    local op, s = opacity or 1, scale or 1
-    local px = x
+-- draw str glyph-by-glyph, top-anchored at (x,y). color = {r,g,b}. optional maxWidth applies the per-letter
+-- squish. returns the end x (unsquished ink end, like the old atlas).
+function M:drawText(size, str, x, y, color, opacity, scale, maxWidth)
     str = tostring(str)
-    for i = 1, #str do
-        local ch = str:sub(i, i)
-        if ch == " " then
-            px = px + a.space * s
-        else
-            local gl = self:_glyph(a, ch)
-            local t = gl.tex
-            t:SetColor(r, g, b); t:SetOpacity(op); t:SetScale(s, s)
-            t:Draw(math.floor(px), math.floor(y))
-            t:SetColor(1, 1, 1); t:SetOpacity(1); t:SetScale(1, 1)   -- reset (glyph tex is shared)
-            px = px + gl.adv * s
-        end
-    end
-    return px
+    local gf = self:gfont(size)
+    local fc = color and self:color(color[1], color[2], color[3], color[4]) or self:color(255, 255, 255)
+    gf:Draw(str, x, y, fc, self:color(0, 0, 0, 0), opacity or 1, scale or 1, maxWidth or 0, "topleft")
+    return x + gf:Measure(str) * (scale or 1)
 end
 
--- word/newline wrap to <= maxWidth using measureText (NO texture allocation). Returns a list of lines.
+-- full-control glyph draw for widget labels: fg/bg {r,g,b,a} (bg = outline; nil = none), anchor = the same
+-- 9 anchor names as DrawAtAnchor, anchoring the text's box (ink + the same padding a GetText texture has).
+function M:drawTextEx(size, str, x, y, fg, bg, opacity, scale, maxWidth, anchor)
+    local gf = self:gfont(size)
+    local fc = fg and self:color(fg[1], fg[2], fg[3], fg[4]) or self:color(255, 255, 255)
+    local bc = bg and self:color(bg[1], bg[2], bg[3], bg[4]) or self:color(0, 0, 0, 0)
+    gf:Draw(tostring(str), x, y, fc, bc, opacity or 1, scale or 1, maxWidth or 0, anchor or "topleft")
+end
+
+-- word/newline wrap to <= maxWidth (UTF-8 correct, CJK-aware; no texture allocation). Returns a list of lines.
 function M:wrapLines(size, str, maxWidth)
+    local arr = self:gfont(size):WrapToLines(tostring(str), maxWidth)
     local lines = {}
-    for para in (tostring(str) .. "\n"):gmatch("(.-)\n") do
-        local cur = ""
-        for word in para:gmatch("%S+") do
-            local cand = (cur == "") and word or (cur .. " " .. word)
-            if self:measureText(size, cand) <= maxWidth or cur == "" then cur = cand
-            else lines[#lines + 1] = cur; cur = word end
-        end
-        lines[#lines + 1] = cur
-    end
+    for i = 0, arr.Length - 1 do lines[i + 1] = arr[i] end
     return lines
 end
 
--- rasterize digits + printable ASCII once, so steady-state dynamic text allocates nothing
-function M:_prewarm(size)
-    local a = self:_atlas(size)
-    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;!?+-/%()'\""
-    for i = 1, #chars do self:_glyph(a, chars:sub(i, i)) end
+-- word-wrapped text block, left-aligned at (x,y); returns the drawn height (for stacking layout below it)
+function M:drawWrapped(size, str, x, y, wrapWidth, color, opacity, scale, lineSpacing)
+    local gf = self:gfont(size)
+    local fc = color and self:color(color[1], color[2], color[3], color[4]) or self:color(255, 255, 255)
+    return gf:DrawWrapped(tostring(str), x, y, wrapWidth, fc, self:color(0, 0, 0, 0),
+        opacity or 1, scale or 1, lineSpacing or 1)
+end
+
+-- height drawWrapped would take, without drawing
+function M:measureWrapped(size, str, wrapWidth, scale, lineSpacing)
+    return self:gfont(size):MeasureWrapped(tostring(str), wrapWidth, scale or 1, lineSpacing or 1)
+end
+
+-- UTF-8 character list (the sandbox has no utf8.*); for suffix/prefix clipping without splitting sequences
+function M:utf8chars(str)
+    local chars = {}
+    for ch in tostring(str):gmatch("[%z\1-\127\194-\244][\128-\191]*") do chars[#chars + 1] = ch end
+    return chars
 end
 
 -- reuse an existing canvas if the size matches (just clear it); else dispose the old one + make a new one.

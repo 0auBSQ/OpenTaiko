@@ -24,7 +24,6 @@ function Menu.new(o)
         else self.items[#self.items + 1] = { text = tostring(it), value = it } end
     end
     self._scrollCur, self._scrollTarget = 0, 0
-    self._labels = {}
     return self
 end
 
@@ -76,14 +75,6 @@ function Menu:restyle()
     end
     self._row = row(self._row and self._row.canvas, c.surface, c.surface2, c.outline)
     self._rowSel = row(self._rowSel and self._rowSel.canvas, c.primary, c.primary2, c.outline)
-    -- cache row labels
-    self._labels = {}
-    for i, it in ipairs(self.items) do
-        self._labels[i] = {
-            normal = self.mgr:renderText(self.eff.font.label, it.text, c.text, U.withAlpha({ 255, 255, 255 }, 150), false, rw - 48),
-            sel    = self.mgr:renderText(self.eff.font.label, it.text, c.textOnAccent, U.shade(c.primary2, 0.5), false, rw - 48),
-        }
-    end
     self:_clampScroll()
     -- ROW-sized focus ring (drawn on the selected row) — not a full-menu ring
     local rwid = self.eff.outlineWidth + 4
@@ -134,10 +125,13 @@ function Menu:draw()
             self._ring.canvas:SetOpacity(self._hiCur)
             self._ring.canvas:DrawAtAnchor(rcx, rcy, "center")
         end
-        local lab = self._labels[i]
-        if lab then
-            local t = isSel and lab.sel or lab.normal
-            t:DrawAtAnchor(math.floor(self.x + 28), rcy, "left")
+        local it = self.items[i]
+        if it then
+            local c = self.eff.colors
+            local fg = isSel and c.textOnAccent or c.text
+            local bg = isSel and U.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
+            self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), rcy,
+                fg, bg, 1, 1, self.w - 48, "left")
         end
     end
 end

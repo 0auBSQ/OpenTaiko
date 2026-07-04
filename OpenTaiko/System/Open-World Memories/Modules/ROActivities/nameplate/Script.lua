@@ -76,7 +76,7 @@ local font_title = nil
 local font_dan = nil
 
 local player_data = { nil, nil, nil, nil, nil }
--- Stores the raw text and color for each player slot so GetText can be called at draw time
+-- Stores the raw text and color for each player slot so the text can be drawn at draw time
 local name_text    = { nil, nil, nil, nil, nil }
 local title_text   = { nil, nil, nil, nil, nil }
 local dan_text     = { nil, nil, nil, nil, nil }  -- coloured dan string (gold or normal)
@@ -384,11 +384,12 @@ function onStart()
 		title_stars[i] = stars
 	end
 
-	font_name_normal_size = TEXT:Create(config_font_name_normal_size, "regular")
-	font_name_withtitle   = TEXT:Create(config_font_name_withtitle_size, "regular")
-	font_name_full        = TEXT:Create(config_font_name_full_size, "regular")
-	font_title            = TEXT:Create(config_font_title_size, "regular")
-	font_dan              = TEXT:Create(config_font_dan_size, "regular")
+	-- glyph-composed fonts (bounded per-character cache; the maxsize clamp becomes the per-letter squish)
+	font_name_normal_size = TEXT:CreateGlyphCached(config_font_name_normal_size, "regular")
+	font_name_withtitle   = TEXT:CreateGlyphCached(config_font_name_withtitle_size, "regular")
+	font_name_full        = TEXT:CreateGlyphCached(config_font_name_full_size, "regular")
+	font_title            = TEXT:CreateGlyphCached(config_font_title_size, "regular")
+	font_dan              = TEXT:CreateGlyphCached(config_font_dan_size, "regular")
 
 	-- Cached color objects for title plate text (black on transparent)
 	title_fg = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
@@ -475,45 +476,31 @@ local function implDrawFullNameplate(x, y, opacity, player_lua, side_lua,
 
 	-- Dan text (small, inside the dan ring)
 	if not _nodan and not _notitle then
-		local t = font_dan:GetText(danText, false, 99999)
-		t:SetScale(math.min(config_font_dan_maxsize / t.Width, 1.0), 1.0)
-		t:SetOpacity(op)
-		t:DrawAtAnchor(x + config_text_dan_offset_x, y + config_text_dan_offset_y, "center")
+		font_dan:Draw(danText, x + config_text_dan_offset_x, y + config_text_dan_offset_y,
+			nil, nil, op, 1, config_font_dan_maxsize, "center")
 	end
 
 	-- Name / title text (three layout variants depending on _notitle / _nodan)
 	if not _nodan and _notitle then
 		-- Dan title replaces the nameplate title slot; name shown in "with-title" size
-		local t = font_title:GetText(danShortTxt, false, 99999)
-		t:SetScale(math.min(config_font_name_normal_maxsize / t.Width, 1.0), 1.0)
-		t:SetOpacity(op)
-		t:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
-		local n = font_name_withtitle:GetText(dispName, false, 99999)
-		n:SetScale(math.min(config_font_name_withtitle_maxsize / n.Width, 1.0), 1.0)
-		n:SetOpacity(op)
-		n:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+		font_title:Draw(danShortTxt, x + config_text_title_offset_x, y + config_text_title_offset_y,
+			nil, nil, op, 1, config_font_name_normal_maxsize, "center")
+		font_name_withtitle:Draw(dispName, x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y,
+			nil, nil, op, 1, config_font_name_withtitle_maxsize, "center")
 	elseif _notitle then
 		-- No title plate and no dan: name takes the full nameplate area
-		local n = font_name_normal_size:GetText(dispName, false, 99999)
-		n:SetScale(math.min(config_font_name_normal_maxsize / n.Width, 1.0), 1.0)
-		n:SetOpacity(op)
-		n:DrawAtAnchor(x + config_text_name_normal_offset_x, y + config_text_name_normal_offset_y, "center")
+		font_name_normal_size:Draw(dispName, x + config_text_name_normal_offset_x, y + config_text_name_normal_offset_y,
+			nil, nil, op, 1, config_font_name_normal_maxsize, "center")
 	else
 		-- Full layout: title plate text + name (smaller when dan is also present)
-		local t = font_title:GetText(titleText, false, 99999, title_fg, title_bg)
-		t:SetScale(math.min(config_font_title_maxsize / t.Width, 1.0), 1.0)
-		t:SetOpacity(op)
-		t:DrawAtAnchor(x + config_text_title_offset_x, y + config_text_title_offset_y, "center")
+		font_title:Draw(titleText, x + config_text_title_offset_x, y + config_text_title_offset_y,
+			title_fg, title_bg, op, 1, config_font_title_maxsize, "center")
 		if _nodan then
-			local n = font_name_withtitle:GetText(dispName, false, 99999)
-			n:SetScale(math.min(config_font_name_withtitle_maxsize / n.Width, 1.0), 1.0)
-			n:SetOpacity(op)
-			n:DrawAtAnchor(x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y, "center")
+			font_name_withtitle:Draw(dispName, x + config_text_name_withtitle_offset_x, y + config_text_name_withtitle_offset_y,
+				nil, nil, op, 1, config_font_name_withtitle_maxsize, "center")
 		else
-			local n = font_name_full:GetText(dispName, false, 99999)
-			n:SetScale(math.min(config_font_name_full_maxsize / n.Width, 1.0), 1.0)
-			n:SetOpacity(op)
-			n:DrawAtAnchor(x + config_text_name_full_offset_x, y + config_text_name_full_offset_y, "center")
+			font_name_full:Draw(dispName, x + config_text_name_full_offset_x, y + config_text_name_full_offset_y,
+				nil, nil, op, 1, config_font_name_full_maxsize, "center")
 		end
 	end
 end

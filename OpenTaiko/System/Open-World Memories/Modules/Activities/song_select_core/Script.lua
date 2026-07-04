@@ -16,7 +16,13 @@
 local Sort    = require("sort")
 local Nav     = require("navigation")
 local Diff    = require("diffselect")
+local Replay  = require("replaylist")
 local DrawSS  = require("draw_songselect")
+local CFG     = require("sscore_config")
+
+-- Song-preview volume fades (skinner-tunable in Config/layout.json).
+local PREVIEW_FADE_IN_MS  = CFG.num("preview.fade_in_ms", 280)
+local PREVIEW_FADE_OUT_MS = CFG.num("preview.fade_out_ms", 140)
 local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
@@ -60,6 +66,7 @@ local G = {
     difficultyFade4 = 0,
     arrowsDistance  = 0,
     selectBoxDist   = 0,
+    noteFloatPhase  = 0,
 
     -- Screen state
     activeScreen         = "songselect",
@@ -80,7 +87,10 @@ local G = {
     previewDemoStart    = 0,
     previewDurationMs   = 0,
     previewLoaded       = false,
-    previewLoopCooldown = false,
+    previewWasPlaying   = false, -- was the preview observed playing? (falling edge → loop restart)
+    previewFadeVol      = 0,    -- current applied preview volume (0..100), eased toward previewFadeTarget
+    previewFadeTarget   = 0,    -- 0 = fading out (scroll), 100 = fading in (new preview playing)
+    preimagePopScale    = 1,    -- jacket pop-in scale multiplier (navigation drives it on appear)
 
     -- Difficulty select
     diffBars     = {},
@@ -206,10 +216,11 @@ G.unlocks = Unlocks
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function onStart()
-    G.text      = TEXT:Create(28)
-    G.textSmall = TEXT:Create(18)
-    G.textLarge = TEXT:Create(40)
-    G.textStats = TEXT:Create(24)
+    -- glyph-composed fonts: one texture per unique character (bounded), no per-string texture cache
+    G.text      = TEXT:CreateGlyphCached(28)
+    G.textSmall = TEXT:CreateGlyphCached(18)
+    G.textLarge = TEXT:CreateGlyphCached(40)
+    G.textStats = TEXT:CreateGlyphCached(24)
 
     SHARED:SetSharedTexture("background", "Textures/bg0.png")
 
@@ -234,10 +245,9 @@ function onStart()
         G.bgtx["sinfo_difficulties_" .. i .. "_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_0_plus.png")
     end
     for i = 0, 9 do
-        G.bgtx["levellabelsborder" .. i] = TEXTURE:CreateTexture("Textures/BarLevelBorder/" .. i .. ".png")
+        G.bgtx["levellabelsfill" .. i]   = TEXTURE:CreateTexture("Textures/BarLevelFill/" .. i .. ".png")
         G.bgtx["levellabels" .. i]       = TEXTURE:CreateTexture("Textures/BarLevel/" .. i .. ".png")
         G.bgtx["sinfo_level" .. i]       = TEXTURE:CreateTexture("Textures/SinfoLevel/" .. i .. ".png")
-        G.bgtx["diffsel_level" .. i]     = TEXTURE:CreateTexture("Textures/DifficultyBars/Level/" .. i .. ".png")
         G.bgtx["diffsel_levelcol" .. i]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/" .. i .. ".png")
     end
     G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
@@ -263,12 +273,13 @@ function onStart()
     for i = 2, 7 do
         G.bars["difficultybar" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/" .. i .. ".png")
     end
+    -- Note.png: the frame all difficulty-select elements are laid out relative to (floats + rotates).
+    G.bars["diffnote"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Note.png")
+    -- Option bars, in the on-screen order 0 / 1 / Customize (see diffselect.lua positions + actions).
     G.bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
-    G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
-    G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
-    for i = 1, 7 do
-        G.bars["difficultybarlevel" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff" .. i .. ".png")
-    end
+    G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
+    G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
+    -- Diff1~Diff7 (level-fill gauges) and the Level/ number folder are deprecated: only LevelCol is used now.
 
     Unlocks.loadTextures()
 
@@ -320,6 +331,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.sounds.SongDecide = SHARED:GetSharedSound("SongDecide")
 
     Diff.resetToSongSelect()
+    Unlocks.invalidateCondCache()
 
     -- (search state is owned by LuaSongList; reloading the song list resets it)
 
@@ -361,6 +373,11 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)
         G.puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
     end)
+    -- Difficulty-select Note float/rotation phase (0..360, ~8s loop). Ticks in G.ctx every frame regardless of
+    -- activeScreen, so the Note animates during the songselect→diffselect transition too. diffselect reads it.
+    G.startCounter("diffnote_float", 0, 360, 1/45, "loop", function(val)
+        G.noteFloatPhase = val
+    end)
 
     G.portraits = {}
     for p = 0, 4 do
@@ -382,6 +399,10 @@ function deactivate()
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
 
     SHARED:GetSharedSound("presound"):Stop()
+    G.previewFadeVol    = 0
+    G.previewFadeTarget = 0
+    G.previewLoaded     = false
+    G.previewWasPlaying = false
 
     for p = 0, 4 do
         local chara = GetSaveFile(p):GetCharacter()
@@ -404,6 +425,7 @@ function afterSongEnum()
 end
 
 function onDestroy()
+    Replay.dispose()
     if G.text      ~= nil then G.text:Dispose()      end
     if G.textSmall ~= nil then G.textSmall:Dispose()  end
     if G.textLarge ~= nil then G.textLarge:Dispose()  end
@@ -420,8 +442,7 @@ local function drawWaitScreen(msg)
     -- Black fill
     local black = COLOR:CreateColorFromHex("ff000000")
     local white = COLOR:CreateColorFromHex("ffffffff")
-    local tx = G.textLarge:GetText(msg, false, 1600, white)
-    tx:DrawAtAnchor(960, 540, "center")
+    G.textLarge:Draw(msg, 960, 540, white, nil, 1, 1, 1600, "center")
 end
 
 function draw(mode)
@@ -441,8 +462,10 @@ function draw(mode)
     end
     if mode == "bg_only" then return end
 
-    if G.difficultySelectModes[G.activeScreen] then Diff.drawPanel()   end
+    -- Song select first, then difficulty select OVER it, so the Note covers the song-select right segment
+    -- as it scrolls in (drawing diff under song select left a cutout there).
     if G.songSelectModes[G.activeScreen]        then DrawSS.drawPanel() end
+    if G.difficultySelectModes[G.activeScreen] then Diff.drawPanel()   end
 
     for _, at in pairs(G.act_inner) do
         if at.IsActive then at:Draw() end
@@ -451,7 +474,7 @@ end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
 
-function update()
+function update(ts)
     for _, c in pairs(G.ctx) do c:Tick() end
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
@@ -463,16 +486,41 @@ function update()
         return nil
     end
 
-    -- Loop preview sound; cooldown prevents double-seek on the same restart.
-    if G.previewLoaded and not G.previewLoopCooldown then
+    -- Ease the preview volume toward its target: a prompt fade-out when scrolling away, a short fade-in
+    -- when a new preview starts (navigation.lua sets the target + resets the volume on start).
+    do
         local psnd = SHARED:GetSharedSound("presound")
-        if psnd.Loaded and not psnd.IsPlaying then
-            G.previewLoopCooldown = true
-            psnd:Play()
-            psnd:SetTimestamp(G.previewDemoStart)
-            G.startCounter("preview_loop_cooldown", 0, 1, 0.5, "none", nil, function()
-                G.previewLoopCooldown = false
-            end)
+        if psnd.Loaded and G.previewFadeVol ~= G.previewFadeTarget then
+            local dtms = 1000 / 60
+            if ts ~= nil and G.previewPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.previewPrevTs)) end
+            local dur  = (G.previewFadeTarget > G.previewFadeVol) and PREVIEW_FADE_IN_MS or PREVIEW_FADE_OUT_MS
+            local step = (dur > 0) and (100 * dtms / dur) or 100
+            if G.previewFadeVol < G.previewFadeTarget then
+                G.previewFadeVol = math.min(G.previewFadeTarget, G.previewFadeVol + step)
+            else
+                G.previewFadeVol = math.max(G.previewFadeTarget, G.previewFadeVol - step)
+            end
+            psnd:SetVolume(math.floor(G.previewFadeVol + 0.5))
+        end
+    end
+    if ts ~= nil then G.previewPrevTs = ts end
+
+    -- Loop the preview on the FALLING EDGE of IsPlaying (observed playing, then stopped = genuine end).
+    -- IsPlaying also reads false for a frame right after a fresh start/seek, but there it has never been
+    -- observed true yet, so previewWasPlaying is false and the restart doesn't fire — no race, no cooldown.
+    -- Stop() before Play() additionally guarantees the system sound's two internal buffers never overlap
+    -- (playing both at once was the doubled/loud distorted replay).
+    if G.previewLoaded then
+        local psnd = SHARED:GetSharedSound("presound")
+        if psnd.Loaded then
+            if psnd.IsPlaying then
+                G.previewWasPlaying = true
+            elseif G.previewWasPlaying then
+                G.previewWasPlaying = false
+                psnd:Stop()
+                psnd:Play()
+                psnd:SetTimestamp(G.previewDemoStart)
+            end
         end
     end
 
@@ -528,7 +576,7 @@ function update()
     if G.activeScreen == "songselect" then
         return Nav.handleSongSelectInput(Sort, Diff)
     elseif G.activeScreen == "difficultyselect" then
-        return Diff.handleUpdate()
+        return Diff.handleUpdate(ts)
     end
 
     return nil

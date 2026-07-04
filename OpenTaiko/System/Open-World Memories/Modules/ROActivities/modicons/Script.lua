@@ -46,8 +46,7 @@ local function drawIcon(icon, x, y, alpha)
     if alpha ~= nil then icon:SetOpacity(1) end
 end
 
-local function getHsIcon(player)
-    local speed = CONFIG:GetScrollSpeed(player)
+local function getHsIconForSpeed(speed)
     if speed >= HS_THRESHOLDS[1] then
         -- Fast: find the last threshold still satisfied
         local idx = -1
@@ -65,6 +64,10 @@ local function getHsIcon(player)
     end
     -- speed == 9 (default) or no threshold matched → no icon
     return tx["None"]
+end
+
+local function getHsIcon(player)
+    return getHsIconForSpeed(CONFIG:GetScrollSpeed(player))
 end
 
 -- ─── Lifecycle ───────────────────────────────────────────────────────────────
@@ -131,6 +134,64 @@ function draw(x, y, player, layout, alpha)
     if CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"], x + ox[8], y + oy[8], alpha)
     else                                 drawIcon(tx["None"], x + ox[8], y + oy[8], alpha)
     end
+end
+
+-- Draw the mod icons for an arbitrary recorded play (e.g. a replay) instead of a live player's CONFIG.
+-- mods   : the replay's ModFlags bitfield (see CSongReplay.EModFlag)
+-- scroll : scroll-speed value (9 = x1), song : song-speed value (20 = x1), timing : timing zone (2 = Normal)
+-- The Auto slot is intentionally omitted here (replay cards don't show Auto).
+function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
+    if not _isActive then return end
+    mods = mods or 0
+    local ox = (layout == "game") and OFFSET_X_GAME or OFFSET_X_MENU
+    local oy = (layout == "game") and OFFSET_Y_GAME or OFFSET_Y_MENU
+
+    -- bit values mirror CSongReplay.EModFlag
+    local function has(bit) return math.floor(mods / bit) % 2 == 1 end
+    local Mirror, Random, Super, Invisible, PerfectMem = 1, 2, 4, 8, 16
+    local Avalanche, Minesweeper, Just, Safe, DynamicBeat = 32, 64, 128, 256, 512
+
+    -- Slot 1: Scroll speed
+    drawIcon(getHsIconForSpeed(scroll or 9), x + ox[1], y + oy[1], alpha)
+
+    -- Slot 2: Doron / Stealth
+    if     has(Invisible)  then drawIcon(tx["Doron"],   x + ox[2], y + oy[2], alpha)
+    elseif has(PerfectMem) then drawIcon(tx["Stealth"], x + ox[2], y + oy[2], alpha)
+    else                        drawIcon(tx["None"],    x + ox[2], y + oy[2], alpha)
+    end
+
+    -- Slot 3: Random / Mirror / Super / Hyper (Mirror+Random)
+    if     has(Mirror) and has(Random) then drawIcon(tx["Hyper"],  x + ox[3], y + oy[3], alpha)
+    elseif has(Super)                  then drawIcon(tx["Super"],  x + ox[3], y + oy[3], alpha)
+    elseif has(Random)                 then drawIcon(tx["Random"], x + ox[3], y + oy[3], alpha)
+    elseif has(Mirror)                 then drawIcon(tx["Mirror"], x + ox[3], y + oy[3], alpha)
+    else                                    drawIcon(tx["None"],   x + ox[3], y + oy[3], alpha)
+    end
+
+    -- Slot 4: Fun Mod
+    if     has(Avalanche)   then drawIcon(tx["Fun_1"], x + ox[4], y + oy[4], alpha)
+    elseif has(Minesweeper) then drawIcon(tx["Fun_2"], x + ox[4], y + oy[4], alpha)
+    elseif has(DynamicBeat) then drawIcon(tx["Fun_3"], x + ox[4], y + oy[4], alpha)
+    else                         drawIcon(tx["None"],  x + ox[4], y + oy[4], alpha)
+    end
+
+    -- Slot 5: Just / Safe
+    if     has(Just) then drawIcon(tx["Just"], x + ox[5], y + oy[5], alpha)
+    elseif has(Safe) then drawIcon(tx["Safe"], x + ox[5], y + oy[5], alpha)
+    else                  drawIcon(tx["None"], x + ox[5], y + oy[5], alpha)
+    end
+
+    -- Slot 6: Timing zone (2 = Normal → no icon)
+    if timing ~= nil and timing ~= 2 then drawIcon(tx["Timing_" .. timing], x + ox[6], y + oy[6], alpha)
+    else                                   drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
+    end
+
+    -- Slot 7: Song speed (20 = 1.0× → no icon)
+    if     (song or 20) > 20 then drawIcon(tx["SongSpeed_1"], x + ox[7], y + oy[7], alpha)
+    elseif (song or 20) < 20 then drawIcon(tx["SongSpeed_0"], x + ox[7], y + oy[7], alpha)
+    else                          drawIcon(tx["None"],        x + ox[7], y + oy[7], alpha)
+    end
+    -- (Slot 8 / Auto intentionally not drawn for replay cards)
 end
 
 function update(...) end

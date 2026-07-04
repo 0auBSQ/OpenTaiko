@@ -45,7 +45,7 @@ local function buildMenus()
             title = "The Fox Dojo",
             desc  = "Challenge various dan exams tailored by the Fox Band!\nSingle player only.",
             c     = col(0, 50, 150),
-            via   = "stage", stage = "dan_select",
+            via   = "stage", stage = "dan_select", trans = "dan_doors",
         },
         {
             title = "Taiko Towers",
@@ -117,8 +117,8 @@ local function buildMenus()
     }
 
     -- Debug stages
-    local function dbgEntry(title, desc, stage)
-        return { title = title, desc = desc .. "\nThis Debug stage will not be included in the full 0.6.1 release.", c = dbg, via = "stage", stage = stage }
+    local function dbgEntry(title, desc, stage, trans)
+        return { title = title, desc = desc .. "\nThis Debug stage will not be included in the full 0.6.1 release.", c = dbg, via = "stage", stage = stage, trans = trans }
     end
     m[#m + 1] = dbgEntry("Demo1 (Debug)",              "The first demo using Lua stages.",                          "demo1")
     m[#m + 1] = dbgEntry("Demo2 (Debug)",              "Was used to debug and test song lists.",                    "demo2")
@@ -257,11 +257,11 @@ end
 
 local function doExit()
     local m = menus[curIdx]
-    if     m.via == "stage"       then return Exit("stage",  m.stage)
-    elseif m.via == "heya"        then return Exit("legacy", "heya")
-    elseif m.via == "config"      then return Exit("legacy", "config")
-    elseif m.via == "exit"        then return Exit("legacy", "exit")
-    elseif m.via == "onlinelounge"then return Exit("legacy", "onlinelounge")
+    if     m.via == "stage"       then return Exit("stage",  m.stage, m.trans)
+    elseif m.via == "heya"        then return Exit("legacy", "heya", m.trans)
+    elseif m.via == "config"      then return Exit("legacy", "config", m.trans)
+    elseif m.via == "exit"        then return Exit("legacy", "exit", m.trans)
+    elseif m.via == "onlinelounge"then return Exit("legacy", "onlinelounge", m.trans)
     end
 end
 

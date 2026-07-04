@@ -1,9 +1,9 @@
-{
+﻿{
     // Skin locale file — English
     // Format: { "Entries": { "KEY": "value", ... } }
     // Keys are shared across all locale files for this skin.
     "Entries": {
-        "SETTINGS_UI_KEYS": "Input Settings",
+        "SETTINGS_UI_KEYS": "Input",
         "SETTINGS_UI_EXIT": "Exit",
         "SETTINGS_UI_BACK": "< Back",
         "SETTINGS_UI_RUN": "Run",
