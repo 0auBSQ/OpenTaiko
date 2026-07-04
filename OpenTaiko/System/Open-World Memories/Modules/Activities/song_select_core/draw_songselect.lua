@@ -363,8 +363,11 @@ function M.drawPanel()
         G.bars["selected-arrow-r"]:DrawAtAnchor(x0 + SONGLIST_SELECTED_ARROW_GAP/2 - xlshift, y0 + ylshift, "right")
     end
 
-    -- Header breadcrumb
+    -- Header breadcrumb. Header alpha eases 100%→40% across songselect→diffselect (matches diffselect).
+    local headerAlpha = 1.0 - 0.6 * math.min(1, G.songSelectShift / 1920)
+    G.bgtx["header"]:SetOpacity(headerAlpha)
     G.bgtx["header"]:Draw(-G.songSelectShift, 0)
+    G.bgtx["header"]:SetOpacity(1)
     if sel ~= nil then
         local pathStack = sel.crumbs
         local xpos = HEADER_OFFSET_X - G.songSelectShift

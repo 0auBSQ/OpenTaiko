@@ -29,16 +29,19 @@ namespace OpenTaiko {
 
 
 		#region Drawing
-		public void Draw(int x, int y) {
-			_texture?.t2DDraw(x, y);
+		// Coordinates are doubles so callers can draw at sub-pixel positions — the engine's t2DDraw/
+		// t2DScaledDraw take floats and never floor, so a smoothly-moving/rotating sprite doesn't snap
+		// pixel-to-pixel (which reads as jitter). Integer args from existing callers behave unchanged.
+		public void Draw(double x, double y) {
+			_texture?.t2DDraw((float)x, (float)y);
 		}
-		public void DrawRect(int x, int y, int rect_x, int rect_y, int rect_width, int rect_height) {
-			_texture?.t2DDraw(x, y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		public void DrawRect(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height) {
+			_texture?.t2DDraw((float)x, (float)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 		}
-		public void DrawAtAnchor(int x, int y, string anchor) {
+		public void DrawAtAnchor(double x, double y, string anchor) {
 			DrawRectAtAnchor(x, y, 0, 0, Width, Height, anchor);
 		}
-		public void DrawRectAtAnchor(int x, int y, int rect_x, int rect_y, int rect_width, int rect_height, string anchor) {
+		public void DrawRectAtAnchor(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string anchor) {
 			CTexture.RefPnt ref_anchor = anchor.ToLower() switch {
 				"topleft" => CTexture.RefPnt.UpLeft,
 				"top" => CTexture.RefPnt.Up,
@@ -52,7 +55,7 @@ namespace OpenTaiko {
 				_ => CTexture.RefPnt.UpLeft
 			};
 
-			_texture?.t2DScaledDraw(ref_anchor, x, y, new(rect_x, rect_y, rect_width, rect_height));
+			_texture?.t2DScaledDraw(ref_anchor, (float)x, (float)y, new(rect_x, rect_y, rect_width, rect_height));
 		}
 		#endregion
 		#region Gets

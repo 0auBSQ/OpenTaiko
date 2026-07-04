@@ -118,9 +118,12 @@ namespace OpenTaiko {
 		/// full box (ink + 50px padding, like a GetText texture) fits, matching GetText's squish. anchor uses
 		/// the same 9 points as DrawAtAnchor and anchors that box. '\n' stacks lines (left-aligned).
 		/// scaleY (when > 0) scales the vertical axis independently — e.g. shrink a tall block into a fixed
-		/// box while the squish still makes the width fill it. Returns the box's right-edge x.</summary>
+		/// box while the squish still makes the width fill it. rotationDeg (when != 0) rotates the whole
+		/// composed block rigidly about the anchor point (x,y) — each glyph is repositioned along the rotated
+		/// baseline and spun to match. Returns the box's right-edge x.</summary>
 		public double Draw(string text, double x, double y, LuaColor? forecolor = null, LuaColor? backcolor = null,
-			double opacity = 1.0, double scale = 1.0, double maxWidth = 0, string anchor = "topleft", double scaleY = 0) {
+			double opacity = 1.0, double scale = 1.0, double maxWidth = 0, string anchor = "topleft", double scaleY = 0,
+			double rotationDeg = 0) {
 			if (string.IsNullOrEmpty(text) || _font == null) return x;
 			Color fore = FromLua(forecolor, DefaultFore);
 			Color outline = FromLua(backcolor, DefaultOutline);
@@ -141,6 +144,10 @@ namespace OpenTaiko {
 			double startX = x - ax * boxW;
 			double startY = y - ay * boxH;
 
+			bool rot = rotationDeg != 0;
+			double rad = rotationDeg * Math.PI / 180.0;
+			double cosR = Math.Cos(rad), sinR = Math.Sin(rad);
+
 			for (int li = 0; li < lines.Count; li++) {
 				var line = lines[li];
 				double pen = 0;
@@ -160,7 +167,23 @@ namespace OpenTaiko {
 						glyph.Tex.SetScale((float)(f * scale), (float)sy);
 						glyph.Tex.SetColor(glyph.Tint.R / 255f, glyph.Tint.G / 255f, glyph.Tint.B / 255f);
 						glyph.Tex.SetOpacity((float)opacity);
-						glyph.Tex.Draw((int)Math.Floor(startX + pen * f * scale), (int)Math.Floor(lineY));
+						double gx = startX + pen * f * scale;
+						double gy = lineY;
+						if (rot) {
+							// rotate this glyph's centre about the anchor (x,y), then spin the glyph to match.
+							// SetRotation is CCW on screen, so the position rotation is the matching CCW form
+							// (y-down screen) — otherwise the glyphs and their placement disagree.
+							double gw = glyph.Tex.Width * f * scale;
+							double gh = glyph.Tex.Height * sy;
+							double relx = gx + gw / 2 - x, rely = gy + gh / 2 - y;
+							double rcx = x + relx * cosR + rely * sinR;
+							double rcy = y - relx * sinR + rely * cosR;
+							glyph.Tex.SetRotation((float)rotationDeg);
+							glyph.Tex.Draw(rcx - gw / 2, rcy - gh / 2);   // sub-pixel: rotated text must not snap
+							glyph.Tex.SetRotation(0);
+						} else {
+							glyph.Tex.Draw(Math.Floor(gx), Math.Floor(gy));   // upright: integer-crisp
+						}
 						glyph.Tex.SetScale(1, 1);
 						glyph.Tex.SetColor(1, 1, 1);
 						glyph.Tex.SetOpacity(1);

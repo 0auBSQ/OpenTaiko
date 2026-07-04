@@ -61,6 +61,7 @@ local G = {
     difficultyFade4 = 0,
     arrowsDistance  = 0,
     selectBoxDist   = 0,
+    noteFloatPhase  = 0,
 
     -- Screen state
     activeScreen         = "songselect",
@@ -239,7 +240,6 @@ function onStart()
         G.bgtx["levellabelsfill" .. i]   = TEXTURE:CreateTexture("Textures/BarLevelFill/" .. i .. ".png")
         G.bgtx["levellabels" .. i]       = TEXTURE:CreateTexture("Textures/BarLevel/" .. i .. ".png")
         G.bgtx["sinfo_level" .. i]       = TEXTURE:CreateTexture("Textures/SinfoLevel/" .. i .. ".png")
-        G.bgtx["diffsel_level" .. i]     = TEXTURE:CreateTexture("Textures/DifficultyBars/Level/" .. i .. ".png")
         G.bgtx["diffsel_levelcol" .. i]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/" .. i .. ".png")
     end
     G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
@@ -265,12 +265,13 @@ function onStart()
     for i = 2, 7 do
         G.bars["difficultybar" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/" .. i .. ".png")
     end
+    -- Note.png: the frame all difficulty-select elements are laid out relative to (floats + rotates).
+    G.bars["diffnote"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Note.png")
+    -- Option bars, in the on-screen order 0 / 1 / Customize (see diffselect.lua positions + actions).
     G.bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
-    G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
-    G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
-    for i = 1, 7 do
-        G.bars["difficultybarlevel" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/Diff" .. i .. ".png")
-    end
+    G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
+    G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
+    -- Diff1~Diff7 (level-fill gauges) and the Level/ number folder are deprecated: only LevelCol is used now.
 
     Unlocks.loadTextures()
 
@@ -364,6 +365,11 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.startCounter("puchi_sine", 0, 360, 1/120, "loop", function(val)
         G.puchiSineY = math.sin(val * math.pi / 180) * PUCHI_FLOAT_AMP
     end)
+    -- Difficulty-select Note float/rotation phase (0..360, ~8s loop). Ticks in G.ctx every frame regardless of
+    -- activeScreen, so the Note animates during the songselect→diffselect transition too. diffselect reads it.
+    G.startCounter("diffnote_float", 0, 360, 1/45, "loop", function(val)
+        G.noteFloatPhase = val
+    end)
 
     G.portraits = {}
     for p = 0, 4 do
@@ -444,8 +450,10 @@ function draw(mode)
     end
     if mode == "bg_only" then return end
 
-    if G.difficultySelectModes[G.activeScreen] then Diff.drawPanel()   end
+    -- Song select first, then difficulty select OVER it, so the Note covers the song-select right segment
+    -- as it scrolls in (drawing diff under song select left a cutout there).
     if G.songSelectModes[G.activeScreen]        then DrawSS.drawPanel() end
+    if G.difficultySelectModes[G.activeScreen] then Diff.drawPanel()   end
 
     for _, at in pairs(G.act_inner) do
         if at.IsActive then at:Draw() end
