@@ -14,6 +14,14 @@
         "barleft_x_offset": -67
     },
 
+    "folder_anim": {
+        "offscreen_left_x": -1000,
+        "open_out_seconds": 0.13,
+        "open_fan_seconds": 0.30,
+        "close_group_seconds": 0.20,
+        "close_in_seconds": 0.22
+    },
+
     "song_info": {
         "difficulties_origin_x": 1790,
         "difficulties_origin_y": 154,

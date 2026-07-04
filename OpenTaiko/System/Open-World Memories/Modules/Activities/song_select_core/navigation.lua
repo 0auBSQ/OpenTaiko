@@ -219,7 +219,113 @@ function M.refreshPage(skipMedia)
         end
     end
 
+    -- Remember which child is focused inside each folder, so reopening that folder returns to it.
+    -- Keyed + valued by the node itself: node wrappers are stable cached objects (like sort.lua's
+    -- originalOrders), so this restores the exact node — robust for boxes, which have no UniqueId.
+    -- Record ANY node type (song / folder / back / random): if you quit while on the back box, reopening
+    -- must land on the back box, not the last song you passed.
+    local sel = G.currentPage[0]
+    if sel ~= nil and sel.Parent ~= nil then
+        G.folderReopenMemory = G.folderReopenMemory or {}
+        G.folderReopenMemory[sel.Parent] = sel
+    end
+
     if G.ctx["extreme_fade"] then G.ctx["extreme_fade"]:Start() end
+end
+
+-- ── Folder open/close animation ───────────────────────────────────────────────
+-- Snapshot the current page's bars as { {i, pt}, ... }, sorted outer-first so the centre bar draws on top.
+local function snapshotBars(excludeZero)
+    local arr = {}
+    for i = -5, 5 do
+        local pt = G.pageTexts[i]
+        if pt ~= nil and (not excludeZero or i ~= 0) then
+            arr[#arr + 1] = { i = i, pt = pt }
+        end
+    end
+    table.sort(arr, function(a, b) return math.abs(a.i) > math.abs(b.i) end)
+    return arr
+end
+
+local function animTick(v) if G.folderAnim ~= nil then G.folderAnim.t = v end end
+local function finishFolderAnim() G.folderAnim = nil end   -- normal list draw resumes from the settled page
+
+-- Phase durations (seconds) — skinner-tunable via Config/layout.json.
+local ANIM_OPEN_OUT_S  = CFG.num("folder_anim.open_out_seconds",    0.13)  -- phase 1: parent siblings slide out left
+local ANIM_OPEN_FAN_S  = CFG.num("folder_anim.open_fan_seconds",    0.30)  -- phase 2: folder contents fan out
+local ANIM_CLOSE_GRP_S = CFG.num("folder_anim.close_group_seconds", 0.20)  -- phase 1: folder contents group at the focus
+local ANIM_CLOSE_IN_S  = CFG.num("folder_anim.close_in_seconds",    0.22)  -- phase 2: parent siblings slide back in
+
+-- Start a phase: a 0→1 counter whose value is eased by the engine (SetEasing), so the draw side just lerps.
+local function startPhase(dur, easeType, easeFn, onFinish)
+    local c = G.startCounter("folder_anim", 0, 1, dur, "none", animTick, onFinish)
+    c:SetEasing(easeType, easeFn)   -- listener receives the eased value
+end
+
+-- After OpenFolder (cursor at the first child), jump back to the child node that was focused when this
+-- folder was last closed. Node wrappers are stable cached objects, so reference == matches the exact node
+-- (survives re-sorting between close and reopen). If it was removed / the list was re-enumerated, no match
+-- and the cursor stays on the first child.
+local function restoreFolderFocus(folder)
+    if G.folderReopenMemory == nil then return end
+    local target = G.folderReopenMemory[folder]
+    if target == nil then return end
+    local limit = (folder.ChildrenCount or 0) + 2   -- children + the Return/Random bars in the page
+    for k = 1, limit do
+        local n = G.songList:GetSongNodeAtOffset(k)
+        if n == nil then break end
+        if n == target then G.songList:Move(k); return end
+    end
+end
+
+-- Opening a real folder: slide the parent list out (keeping the folder bar), then fan the folder's
+-- contents into place. Returns false if there is nothing to open (leaves state untouched).
+local function startOpenAnim(Sort)
+    if G.folderAnim ~= nil then return true end
+    local folder   = G.songList:GetSelectedSongNode()   -- the folder being opened
+    local folderPt = G.pageTexts[0]
+    local oldBars  = snapshotBars(true)                 -- parent siblings (the folder stays put)
+    if not G.songList:OpenFolder() then return false end
+    Sort.applySort()
+    restoreFolderFocus(folder)                          -- return to the previously-focused child, if any
+    M.refreshPage()                                     -- page = folder contents; starts the selection's media
+    G.folderAnim = { mode = "open", phase = 1, t = 0,
+                     oldBars = oldBars, newBars = snapshotBars(false), folderPt = folderPt }
+    G.sounds.Decide:Play()
+    startPhase(ANIM_OPEN_OUT_S, "IN", "CUBIC", function()
+        if G.folderAnim == nil then return end
+        G.folderAnim.phase = 2; G.folderAnim.t = 0
+        startPhase(ANIM_OPEN_FAN_S, "OUT", "BACK", finishFolderAnim)   -- overshoot = the "book" pop
+    end)
+    return true
+end
+
+-- Closing a folder: group the contents at the focus, show the folder bar, then slide the parent list
+-- back in. Virtual folders (favorites/search) aren't in the real structure so they close instantly (no
+-- animation). Returns false only if there is no folder to close (at the root → the caller exits).
+local function startCloseAnim(Sort)
+    if G.folderAnim ~= nil then return true end
+    local child   = G.songList:GetSelectedSongNode()
+    local folder  = child ~= nil and child.Parent or nil
+    local oldBars = snapshotBars(false)                 -- the folder's contents
+    if not G.songList:CloseFolder() then return false end
+    Sort.applySort()
+    M.refreshPage()
+    G.sounds.Cancel:Play()
+    -- A real close lands on the just-closed folder (now the selection); a virtual close restores the
+    -- cursor elsewhere, so the folder is NOT the selection → skip the animation.
+    local sel = G.songList:GetSelectedSongNode()
+    if not (folder ~= nil and sel ~= nil and sel.IsFolder == true and sel.Title == folder.Title) then
+        return true
+    end
+    G.folderAnim = { mode = "close", phase = 1, t = 0,
+                     oldBars = oldBars, newBars = snapshotBars(true), folderPt = G.pageTexts[0] }
+    startPhase(ANIM_CLOSE_GRP_S, "IN", "CUBIC", function()
+        if G.folderAnim == nil then return end
+        G.folderAnim.phase = 2; G.folderAnim.t = 0
+        startPhase(ANIM_CLOSE_IN_S, "OUT", "CUBIC", finishFolderAnim)
+    end)
+    return true
 end
 
 -- ── Folder navigation ─────────────────────────────────────────────────────────
@@ -233,13 +339,9 @@ local function handleDecideSongSelect(Sort)
             G.unlocks.onDecideVaultFolder(G.highlightedPlayer, ssn)
             return nil
         end
-        local success = G.songList:OpenFolder()
-        if success then Sort.applySort(); G.sounds.Decide:Play() end
-        M.refreshPage()
+        startOpenAnim(Sort)
     elseif ssn.IsReturn == true then
-        local success = G.songList:CloseFolder()
-        if success then Sort.applySort(); G.sounds.Cancel:Play() end
-        M.refreshPage()
+        startCloseAnim(Sort)
     elseif ssn.IsSong == true then
         if G.unlocks ~= nil and G.unlocks.isVaultLocked(ssn) then
             G.unlocks.onDecideVaultLocked(G.highlightedPlayer, ssn)
@@ -258,11 +360,6 @@ local function handleDecideSongSelect(Sort)
         if rdNd ~= nil then G.sounds.SongDecide:Play(); return rdNd end
     end
     return nil
-end
-
-local function handleFolderClose()
-    if G.songList == nil then return false end
-    return G.songList:CloseFolder()
 end
 
 -- ── Hold scroll ───────────────────────────────────────────────────────────────
@@ -305,6 +402,9 @@ end
 
 function M.handleSongSelectInput(Sort, Diff)
     G.selectedSongNode = nil
+
+    -- Lock all input while a folder open/close animation is playing.
+    if G.folderAnim ~= nil then return nil end
 
     -- Debug / dev shortcuts
     if INPUT:KeyboardPressed("S") then
@@ -358,9 +458,7 @@ function M.handleSongSelectInput(Sort, Diff)
         G.selectedSongNode = handleDecideSongSelect(Sort)
     elseif (inpset.cancel ~= nil and INPUT:Pressed(inpset.cancel)) or INPUT:KeyboardPressed("Escape") then
         stopHold()
-        if handleFolderClose() then
-            Sort.applySort(); M.refreshPage(); G.sounds.Decide:Play()
-        else
+        if not startCloseAnim(Sort) then
             G.sounds.Cancel:Play()
             return "cancel"
         end

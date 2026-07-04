@@ -186,6 +186,119 @@ local function drawPreimage()
     end
 end
 
+-- ── Song-list bar drawing (shared by the normal list + the folder open/close animation) ─────
+
+local function drawBarTitle(pt, x, y)
+    G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, 525, "center")
+end
+
+-- Draw one song-list bar's full visuals (bar art + overlays + title + level tag) at (xpos, ypos).
+local function drawBar(tx, xpos, ypos)
+    if tx == nil then return end
+    if tx.isSong or tx.isFolder then
+        if tx.isSong and tx.vaultLocked then
+            G.bars["vault_bar"]:DrawAtAnchor(xpos, ypos, "center")
+            if G.bars[tx.vaultLockKey] then
+                G.bars[tx.vaultLockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
+            end
+        elseif tx.isFolder and tx.vaultFolder then
+            G.bars["bar"]:SetColor(tx.boxColor)
+            G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+            G.unlocks.drawBluredStatic(xpos, ypos)
+            if G.bars["vault_lockF"] then G.bars["vault_lockF"]:DrawAtAnchor(xpos, ypos, "center") end
+        elseif tx.isLocked then
+            if tx.lockedBarOverride then
+                G.bars["bar_1"]:DrawAtAnchor(xpos, ypos, "center")
+            else
+                G.bars["bar"]:SetColor(tx.boxColor)
+                G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+                G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
+            end
+            if tx.hi == 2 then
+                G.unlocks.drawBluredStatic(xpos, ypos)
+            else
+                drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
+            end
+            if tx.lockKey and G.bars[tx.lockKey] then
+                G.bars[tx.lockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
+            end
+            if tx.isSong and tx.hi == 0 then
+                drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+            end
+        else
+            G.bars["bar"]:SetColor(tx.boxColor)
+            G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
+            G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
+            if tx.fav then drawFavIcon(xpos, ypos) end
+            if tx.isSong then drawBarleft(tx.barleft, xpos, ypos) end
+            drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
+            drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
+        end
+    elseif tx.isRandom then
+        G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
+        drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
+    elseif tx.isReturn then
+        G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
+        drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
+    end
+end
+M.drawBar = drawBar
+
+-- Rest position of the bar at page offset i (dist = the in-flight scroll amount, 0 at rest).
+function M.barPos(i, dist)
+    dist = dist or 0
+    local xpos = SONGLIST_ORIGIN_X + (i + dist) * SONGLIST_OFFSET_X - G.songSelectShift
+    local ypos = SONGLIST_ORIGIN_Y + (i + dist) * SONGLIST_OFFSET_Y
+    if i == 0 then xpos = xpos + SONGLIST_SELECTED_X_DIFF end
+    return xpos, ypos
+end
+
+-- ── Folder open/close animation ─────────────────────────────────────────────────
+-- Driven by G.folderAnim (set up in navigation.lua): { mode="open"/"close", phase=1/2, t=0..1,
+-- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.
+-- t is the phase counter's value, already EASED by the counter (navigation sets SetEasing per phase),
+-- so drawing is a plain lerp between the bars' rest slots (M.barPos) and the off-screen / centre point.
+local ANIM_OFFLEFT_X = CFG.num("folder_anim.offscreen_left_x", -1000)  -- where bars slide out to / in from
+local function lerp(a, b, t) return a + (b - a) * t end
+
+local function drawFolderAnim()
+    local fa = G.folderAnim
+    local cx, cy = M.barPos(0, 0)
+    local t = fa.t or 0
+    if fa.mode == "open" then
+        if fa.phase == 1 then
+            -- slide the parent siblings out to the left; the opened folder bar stays centred
+            for _, b in ipairs(fa.oldBars) do
+                local bx, by = M.barPos(b.i, 0)
+                drawBar(b.pt, lerp(bx, ANIM_OFFLEFT_X, t), by)
+            end
+            drawBar(fa.folderPt, cx, cy)
+        else
+            -- fan the folder's contents out from the centre into their slots ("opening a book")
+            for _, b in ipairs(fa.newBars) do
+                local bx, by = M.barPos(b.i, 0)
+                drawBar(b.pt, lerp(cx, bx, t), lerp(cy, by, t))
+            end
+        end
+    else
+        if fa.phase == 1 then
+            -- group the folder's contents back toward the focused spot
+            for _, b in ipairs(fa.oldBars) do
+                local bx, by = M.barPos(b.i, 0)
+                drawBar(b.pt, lerp(bx, cx, t), lerp(by, cy, t))
+            end
+        else
+            -- the folder bar sits at the focus; the parent siblings slide back in from the left
+            drawBar(fa.folderPt, cx, cy)
+            for _, b in ipairs(fa.newBars) do
+                local bx, by = M.barPos(b.i, 0)
+                drawBar(b.pt, lerp(ANIM_OFFLEFT_X, bx, t), by)
+            end
+        end
+    end
+end
+M.drawFolderAnim = drawFolderAnim
+
 -- ── Draw panel ────────────────────────────────────────────────────────────────
 
 function M.drawPanel()
@@ -286,70 +399,14 @@ function M.drawPanel()
 
     drawPreimage()
 
-    -- Song list bars (titles are glyph-drawn from the cached strings; gold = the selected bar)
-    local function drawBarTitle(pt, x, y)
-        G.text:Draw(pt.text, x, y, pt.gold and SONGLIST_GOLD or nil, nil, 1, 1, 525, "center")
-    end
-    if G.pageTexts ~= nil then
+    -- Song list bars. While a folder is opening/closing, the animation owns the list (and hides the
+    -- selected-bar frame + arrows); otherwise draw the normal diagonal list.
+    if G.folderAnim ~= nil then
+        drawFolderAnim()
+    elseif G.pageTexts ~= nil then
         for i, tx in pairs(G.pageTexts) do
-            local xpos = SONGLIST_ORIGIN_X + (i + G.selectBoxDist) * SONGLIST_OFFSET_X - G.songSelectShift
-            local ypos = SONGLIST_ORIGIN_Y + (i + G.selectBoxDist) * SONGLIST_OFFSET_Y
-            if i == 0 then xpos = xpos + SONGLIST_SELECTED_X_DIFF end
-            if tx ~= nil then
-                if tx.isSong or tx.isFolder then
-                    if tx.isSong and tx.vaultLocked then
-                        -- Secret Vault locked song: vault bar + vault lock icon, no title, no level tag
-                        G.bars["vault_bar"]:DrawAtAnchor(xpos, ypos, "center")
-                        if G.bars[tx.vaultLockKey] then
-                            G.bars[tx.vaultLockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
-                        end
-                    elseif tx.isFolder and tx.vaultFolder then
-                        -- Secret Vault folder (locked): normal bar, blurred glitch, lockF overlay, no title
-                        G.bars["bar"]:SetColor(tx.boxColor)
-                        G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
-                        G.unlocks.drawBluredStatic(xpos, ypos)
-                        if G.bars["vault_lockF"] then G.bars["vault_lockF"]:DrawAtAnchor(xpos, ypos, "center") end
-                    elseif tx.isLocked then
-                        -- GRAYED/BLURED use bar_1; DISPLAYED locked songs keep the normal bar
-                        if tx.lockedBarOverride then
-                            G.bars["bar_1"]:DrawAtAnchor(xpos, ypos, "center")
-                        else
-                            G.bars["bar"]:SetColor(tx.boxColor)
-                            G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
-                            G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
-                        end
-                        -- Title area content: BLURED → static.png with GL noise; others → title text
-                        if tx.hi == 2 then
-                            G.unlocks.drawBluredStatic(xpos, ypos)
-                        else
-                            drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-                        end
-                        -- Lock icon on top of title area
-                        if tx.lockKey and G.bars[tx.lockKey] then
-                            G.bars[tx.lockKey]:DrawAtAnchor(xpos - G.bars["bar"].Width / 2, ypos, "left")
-                        end
-                        -- Level tag: only DISPLAYED locked songs (hi == 0)
-                        if tx.isSong and tx.hi == 0 then
-                            drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
-                        end
-                    else
-                        G.bars["bar"]:SetColor(tx.boxColor)
-                        G.bars["bar"]:DrawAtAnchor(xpos, ypos, "center")
-                        G.genre_overlays[tx.genre]:DrawAtAnchor(xpos, ypos, "center")
-                        if tx.fav then drawFavIcon(xpos, ypos) end
-                        if tx.isSong then drawBarleft(tx.barleft, xpos, ypos) end
-                        drawLevelTag(tx.level, xpos + SONGBAR_LABEL_X_OFFSET, ypos)
-                        drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-                    end
-                elseif tx.isRandom then
-                    G.bars["random"]:DrawAtAnchor(xpos, ypos, "center")
-                    drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-                elseif tx.isReturn then
-                    G.bars["back"]:DrawAtAnchor(xpos, ypos, "center")
-                    drawBarTitle(tx, xpos + SONGLIST_TEXT_OFFSET_X, ypos + SONGLIST_TEXT_OFFSET_Y)
-                end
-
-            end
+            local xpos, ypos = M.barPos(i, G.selectBoxDist)
+            drawBar(tx, xpos, ypos)
         end
 
         -- Selected bar + animated arrows
