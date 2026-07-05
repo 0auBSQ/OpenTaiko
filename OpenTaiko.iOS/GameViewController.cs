@@ -512,11 +512,15 @@ public partial class GameViewController : UIViewController {
 		};
 		_debugHud.Layer.CornerRadius = 6;
 		_debugHud.ClipsToBounds = true;
+		_debugHud.Hidden = true;
 		View.AddSubview(_debugHud);
 	}
 
 	private void UpdateDebugHud() {
 		if (_debugHud == null) return;
+		bool show = global::OpenTaiko.OpenTaiko.ConfigIni?.bShowDebugHud ?? false;
+		_debugHud.Hidden = !show;
+		if (!show) return;
 		int fps = global::OpenTaiko.OpenTaiko.FPS?.NowFPS ?? 0;
 		string stage = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID.ToString() ?? "?";
 		var (fp, managed) = GetMemoryMB();
