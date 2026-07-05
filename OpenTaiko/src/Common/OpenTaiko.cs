@@ -610,10 +610,16 @@ internal class OpenTaiko : Game {
 				if (VideoExporter.Active)
 					this.nDrawLoopReturnValue = VideoExporter.Tick(this, this.nDrawLoopReturnValue);
 
-				// Skip the chart object overlay while a transition COVERS the screen, so chips don't punch through
-				// a black/cover fade. Exception: during the song-loading → gameplay reveal the loading screen
-				// fades out OVER the chips, so we DO draw them (they stay visible as the screen clears).
-				if (OpenTaiko.TJA != null && (rCurrentStage?.eStageID != CStage.EStage.Transition || stageTransition.RevealingGameplay)) {
+				// Chart-object overlay. During normal gameplay the play screen draws these itself (correctly
+				// layered UNDER its fade-out), so we only draw them here for:
+				//  (a) the song-loading → gameplay reveal, where the play screen isn't the current stage yet but
+				//      the objects should show through the fading loading screen, and
+				//  (b) Tokkun/training mode, where the play screen skips its own object draw.
+				// This keeps the objects from lingering over the clear/result screens after the play ends, and
+				// lets the play's fade cover them instead of them punching through on top.
+				if (OpenTaiko.TJA != null &&
+					((rCurrentStage?.eStageID == CStage.EStage.Transition && stageTransition.RevealingGameplay)
+					 || (rCurrentStage?.eStageID == CStage.EStage.Game && OpenTaiko.ConfigIni.bTokkunMode))) {
 					//object rendering
 					foreach (KeyValuePair<string, CSongObject> pair in OpenTaiko.TJA.listObj) {
 						pair.Value.tDraw();
@@ -978,7 +984,10 @@ internal class OpenTaiko : Game {
 								//-----------------------------
 								// Online VS: skip intro cutscenes — the lobby already bracketed the play round
 								// (PlaySyncActive), and a cutscene would desync every player's start.
+								// Watching a replay: skip the intro cutscene entirely — don't play it and don't run
+								// LoadCutScenes (which would trip the cutscene's "first met" conditions).
 								bool playCutScenes = LuaNetworking.Active?.PlaySyncActive != true
+									&& !OpenTaiko.ReplayWatchArmed
 									&& stageCutScene.LoadCutScenes(rCurrentStage, true);
 								latestSongSelect = rCurrentStage;
 								if (playCutScenes) {
