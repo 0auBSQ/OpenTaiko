@@ -13,6 +13,8 @@ local _isActive = false
 
 -- Loaded in onStart(), disposed in onDestroy()
 local tx = {}
+local valueFont       -- glyph font for the scroll/song-speed value numbers
+local colWhite        -- white text colour
 
 -- ─── Layouts ─────────────────────────────────────────────────────────────────
 -- Each table has 8 entries (one per slot, Lua-1-based):
@@ -27,15 +29,11 @@ local OFFSET_Y_MENU = {  0,  0,  0,   0,   0,   0,   0,   0 }
 local OFFSET_X_GAME = {  0, 45, 90, 135,   0,  45,  90, 135 }
 local OFFSET_Y_GAME = {  0,  0,  0,   0,  45,  45,  45,  45 }
 
--- ─── HS thresholds ───────────────────────────────────────────────────────────
--- Fast speeds (>= 10): ascending thresholds.
--- Show HS/i.png for the highest i where speed >= HS_THRESHOLDS[i+1].
-local HS_THRESHOLDS = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 24, 29, 34, 39}
-
--- Slow speeds (<= 8): descending thresholds.
--- Show HS/slow/i.png for the highest i where speed <= LOW_HS_THRESHOLDS[i+1].
--- By default every integer from 8 down to 0, giving 9 slow icons (slow/0 … slow/8).
-local LOW_HS_THRESHOLDS = {8, 7, 6, 5, 4, 3, 2, 1, 0}
+-- ─── Speed values ────────────────────────────────────────────────────────────
+-- Scroll speed: nScrollSpeed 9 = x1 (multiplier = (value+1)/10). Any other value shows a single HS icon plus
+-- the numeric value (1 decimal). Song speed: 20 = x1 (multiplier = value/20), value shown with 2 decimals.
+-- Icons are ~37px, so keep the value font small.
+local VALUE_FONT_SIZE = 16
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -46,28 +44,31 @@ local function drawIcon(icon, x, y, alpha)
     if alpha ~= nil then icon:SetOpacity(1) end
 end
 
+-- x1 (nScrollSpeed 9) shows nothing; any other value shows the single HS icon (the value is drawn as text).
 local function getHsIconForSpeed(speed)
-    if speed >= HS_THRESHOLDS[1] then
-        -- Fast: find the last threshold still satisfied
-        local idx = -1
-        for i, t in ipairs(HS_THRESHOLDS) do
-            if speed >= t then idx = i - 1 else break end
-        end
-        if idx >= 0 then return tx["HS_" .. idx] end
-    elseif speed <= LOW_HS_THRESHOLDS[1] then
-        -- Slow: find the last (smallest) threshold still satisfied
-        local idx = -1
-        for i, t in ipairs(LOW_HS_THRESHOLDS) do
-            if speed <= t then idx = i - 1 else break end
-        end
-        if idx >= 0 then return tx["HS_slow_" .. idx] end
-    end
-    -- speed == 9 (default) or no threshold matched → no icon
-    return tx["None"]
+    if speed == 9 then return tx["None"] end
+    return tx["HS"]
 end
 
-local function getHsIcon(player)
-    return getHsIconForSpeed(CONFIG:GetScrollSpeed(player))
+-- Value labels (nil when x1 → no text). Scroll = 1 decimal ((v+1)/10), Song = 2 decimals (v/20).
+-- (explicit if, not `cond and nil or x` — that Lua idiom breaks when the true-value is nil)
+local function scrollValueText(speed)
+    if speed == 9 then return nil end
+    return string.format("%.1f", (speed + 1) / 10.0)
+end
+local function songValueText(song)
+    if song == 20 then return nil end
+    return string.format("%.2f", song / 20.0)
+end
+
+-- Draw a small value number at the bottom-centre of an already-drawn icon. The glyph box carries ~25px of
+-- padding (bigger than these ~37px icons), so a "bottom" anchor overshoots upward; instead we CENTRE the text
+-- half a font-height above the icon's bottom edge, which sits the number on the bottom for any icon size.
+-- maxWidth caps it to the icon width (+ glyph padding) so long values squish to fit rather than overflow.
+local function drawValue(str, icon, x, y, alpha)
+    if str == nil or icon == nil or valueFont == nil then return end
+    valueFont:Draw(str, x + icon.Width / 2, y + icon.Height - VALUE_FONT_SIZE / 2, colWhite, nil,
+        (alpha or 255) / 255, 1, icon.Width + 50, "center")
 end
 
 -- ─── Lifecycle ───────────────────────────────────────────────────────────────
@@ -85,8 +86,11 @@ function draw(x, y, player, layout, alpha)
     local ox = (layout == "game") and OFFSET_X_GAME or OFFSET_X_MENU
     local oy = (layout == "game") and OFFSET_Y_GAME or OFFSET_Y_MENU
 
-    -- Slot 1: Scroll speed (HS / slow HS)
-    drawIcon(getHsIcon(player), x + ox[1], y + oy[1], alpha)
+    -- Slot 1: Scroll speed (single HS icon + numeric value when not x1)
+    local scroll = CONFIG:GetScrollSpeed(player)
+    local hsIcon = getHsIconForSpeed(scroll)
+    drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
+    drawValue(scrollValueText(scroll), hsIcon, x + ox[1], y + oy[1], alpha)
 
     -- Slot 2: Doron / Stealth
     local stealth = CONFIG:GetStealthMod(player)
@@ -123,12 +127,11 @@ function draw(x, y, player, layout, alpha)
     else                drawIcon(tx["None"],               x + ox[6], y + oy[6], alpha)
     end
 
-    -- Slot 7: Song speed  (20 = 1.0× → no icon)
+    -- Slot 7: Song speed  (20 = 1.0× → no icon; numeric value shown when not x1)
     local songSpeed = CONFIG.SongSpeed
-    if     songSpeed > 20 then drawIcon(tx["SongSpeed_1"], x + ox[7], y + oy[7], alpha)
-    elseif songSpeed < 20 then drawIcon(tx["SongSpeed_0"], x + ox[7], y + oy[7], alpha)
-    else                       drawIcon(tx["None"],        x + ox[7], y + oy[7], alpha)
-    end
+    local ssIcon = (songSpeed > 20) and tx["SongSpeed_1"] or (songSpeed < 20) and tx["SongSpeed_0"] or tx["None"]
+    drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
+    drawValue(songValueText(songSpeed), ssIcon, x + ox[7], y + oy[7], alpha)
 
     -- Slot 8: Auto
     if CONFIG:GetAutoStatus(player) then drawIcon(tx["Auto"], x + ox[8], y + oy[8], alpha)
@@ -151,8 +154,11 @@ function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
     local Mirror, Random, Super, Invisible, PerfectMem = 1, 2, 4, 8, 16
     local Avalanche, Minesweeper, Just, Safe, DynamicBeat = 32, 64, 128, 256, 512
 
-    -- Slot 1: Scroll speed
-    drawIcon(getHsIconForSpeed(scroll or 9), x + ox[1], y + oy[1], alpha)
+    -- Slot 1: Scroll speed (single HS icon + numeric value when not x1)
+    local sc = scroll or 9
+    local hsIcon = getHsIconForSpeed(sc)
+    drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
+    drawValue(scrollValueText(sc), hsIcon, x + ox[1], y + oy[1], alpha)
 
     -- Slot 2: Doron / Stealth
     if     has(Invisible)  then drawIcon(tx["Doron"],   x + ox[2], y + oy[2], alpha)
@@ -186,11 +192,11 @@ function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
     else                                   drawIcon(tx["None"],              x + ox[6], y + oy[6], alpha)
     end
 
-    -- Slot 7: Song speed (20 = 1.0× → no icon)
-    if     (song or 20) > 20 then drawIcon(tx["SongSpeed_1"], x + ox[7], y + oy[7], alpha)
-    elseif (song or 20) < 20 then drawIcon(tx["SongSpeed_0"], x + ox[7], y + oy[7], alpha)
-    else                          drawIcon(tx["None"],        x + ox[7], y + oy[7], alpha)
-    end
+    -- Slot 7: Song speed (20 = 1.0× → no icon; numeric value shown when not x1)
+    local sp = song or 20
+    local ssIcon = (sp > 20) and tx["SongSpeed_1"] or (sp < 20) and tx["SongSpeed_0"] or tx["None"]
+    drawIcon(ssIcon, x + ox[7], y + oy[7], alpha)
+    drawValue(songValueText(sp), ssIcon, x + ox[7], y + oy[7], alpha)
     -- (Slot 8 / Auto intentionally not drawn for replay cards)
 end
 
@@ -210,15 +216,11 @@ function onStart()
     tx["SongSpeed_0"] = TEXTURE:CreateTexture("Textures/Mods/SongSpeed/0.png")
     tx["SongSpeed_1"] = TEXTURE:CreateTexture("Textures/Mods/SongSpeed/1.png")
 
-    -- Fast HS icons: HS/0.png … HS/13.png
-    for i = 0, #HS_THRESHOLDS - 1 do
-        tx["HS_" .. i] = TEXTURE:CreateTexture("Textures/Mods/HS/" .. i .. ".png")
-    end
+    -- Single HS icon for any non-x1 scroll speed (the exact value is drawn as text over it)
+    tx["HS"] = TEXTURE:CreateTexture("Textures/Mods/HS.png")
 
-    -- Slow HS icons: HS/slow/0.png … HS/slow/N.png  (one per LOW_HS_THRESHOLDS entry)
-    for i = 0, #LOW_HS_THRESHOLDS - 1 do
-        tx["HS_slow_" .. i] = TEXTURE:CreateTexture("Textures/Mods/HS/slow/" .. i .. ".png")
-    end
+    valueFont = TEXT:CreateGlyphCached(VALUE_FONT_SIZE)
+    colWhite  = COLOR:CreateColorFromARGB(255, 255, 255, 255)
 
     -- Fun: 1=Avalanche, 2=Minesweeper, 3=DynamicBeat
     for i = 1, 3 do
@@ -236,4 +238,5 @@ function onDestroy()
         if t ~= nil then t:Dispose() end
     end
     tx = {}
+    if valueFont ~= nil then valueFont:Dispose(); valueFont = nil end
 end
