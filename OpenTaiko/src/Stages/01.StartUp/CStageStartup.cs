@@ -166,7 +166,7 @@ internal class CStageStartup : CStage {
 							this.ePhaseID = EPhase.Startup_Complete;
 							OpenTaiko.Skin.bgmStartupScreen.tStop();
 						}
-						if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
+						if (OpenTaiko.ConfigIni.ASyncTextureLoad && !OperatingSystem.IsIOS()) {
 							Task.Run(loadTexture);
 						} else {
 							loadTexture();

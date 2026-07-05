@@ -4,7 +4,7 @@ using ManagedBass.Mix;
 
 namespace FDK;
 
-public class CSoundDeviceBASS : ISoundDevice {
+public partial class CSoundDeviceBASS : ISoundDevice {
 	// Properties
 
 	public ESoundDeviceType SoundDeviceType {
@@ -83,6 +83,11 @@ public class CSoundDeviceBASS : ISoundDevice {
 
 		if (!Bass.Init(-1, freq, DeviceInitFlags.Default))
 			throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
+
+		if (OperatingSystem.IsIOS()) {
+			InitializeDirectPlayback();
+			return;
+		}
 
 		if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
 			Trace.TraceWarning($"BASS_SetConfig({nameof(Configuration.UpdatePeriod)}) に失敗しました。[{Bass.LastError}]");

@@ -12,6 +12,7 @@ internal class CLuaNamePlateScript : CLuaScript {
 	private NamedLuaFunction lfDraw = new("draw");
 
 	public CLuaNamePlateScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true) : base(dir, texturesDir, soundsDir, loadAssets) {
+		if (bCrashed) return;
 		lfGetCharaOffset.Load(LuaScript);
 		lfSetInfos.Load(LuaScript);
 		lfDrawDan.Load(LuaScript);

@@ -16,15 +16,16 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		Initialize(fontpath, pt, style);
 	}
 
-	public CSkiaSharpTextRenderer(Stream fontstream, int pt, CFontRenderer.FontStyle style) {
-		Initialize(fontstream, pt, style);
+	public CSkiaSharpTextRenderer(Stream fontstream, string fontKey, int pt, CFontRenderer.FontStyle style) {
+		Initialize(fontstream, fontKey, pt, style);
 	}
 
-	protected void Initialize(Stream fontstream, int pt, CFontRenderer.FontStyle style) {
+	protected void Initialize(Stream fontstream, string fontKey, int pt, CFontRenderer.FontStyle style) {
 		paint = new SKPaint();
 
 		//stream・filepathから生成した場合に、style設定をどうすればいいのかがわからない
-		paint.Typeface = SKFontManager.Default.CreateTypeface(fontstream);
+		// A stream has no path, so the caller provides the source name as the cache key.
+		paint.Typeface = GetCachedTypeface($"stream:{fontKey}", () => SKFontManager.Default.CreateTypeface(fontstream));
 
 		paint.TextSize = (pt * 1.3f);
 		paint.IsAntialias = true;
@@ -51,21 +52,40 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 			//paint.FontMetrics.UnderlinePosition;
 		}
 
+		// Typefaces are cached and shared (see _typefaceCache): loading one copies the whole
+		// font file into native memory, SKPaint does not own/free its Typeface, and renderers
+		// are created per stage/HUD element. Resolve into a local rather than reading
+		// paint.Typeface back, so paint disposal can never dispose a cached typeface.
+		SKTypeface typeface = null;
+
 		if (SKFontManager.Default.FontFamilies.Contains(fontpath))
-			paint.Typeface = SKTypeface.FromFamilyName(fontpath, weight, width, slant);
+			typeface = GetCachedTypeface($"family:{fontpath}:{weight}:{width}:{slant}",
+				() => SKTypeface.FromFamilyName(fontpath, weight, width, slant));
 
 		//stream・filepathから生成した場合に、style設定をどうすればいいのかがわからない
-		if (File.Exists(fontpath))
-			paint.Typeface = SKTypeface.FromFile(fontpath, 0);
+		if (File.Exists(fontpath)) {
+			typeface = GetCachedTypeface($"file:{fontpath}", () => {
+				if (OperatingSystem.IsIOS()) {
+					// SKTypeface.FromFile can silently return a broken typeface on iOS;
+					// loading via stream works reliably.
+					using var fs = File.OpenRead(fontpath);
+					return SKTypeface.FromStream(fs);
+				} else {
+					return SKTypeface.FromFile(fontpath, 0);
+				}
+			});
+		}
 
-		if (paint.Typeface == null) {
+		if (typeface == null) {
 			Trace.TraceWarning($"The requested font '{fontpath}' could not be found from a file or font family name. Falling back to SkiaSharp's default typeface.");
-			paint.Typeface = SKTypeface.CreateDefault();
+			typeface = GetCachedTypeface("default", () => SKTypeface.CreateDefault());
 		}
 
 		// If a font couldn't be loaded despite the fallback implemented above, we're absolutely cooked.
-		if (paint.Typeface == null)
+		if (typeface == null)
 			throw new FileNotFoundException("All attempts to load this font failed, including using SkiaSharp's default typeface as a fallback.", fontpath);
+
+		paint.Typeface = typeface;
 
 		paint.TextSize = (pt * 1.3f);
 		paint.IsAntialias = true;
@@ -212,7 +232,8 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 
 			//少し大きめにとる(定数じゃない方法を考えましょう)
 			SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
-			SKCanvas canvas = new SKCanvas(bitmap);
+			// Canvas that composites the glyph layers onto the bitmap; native, disposed via using.
+			using SKCanvas canvas = new SKCanvas(bitmap);
 
 			int x_offset = 0;
 
@@ -221,10 +242,12 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 
 				if (drawMode.HasFlag(CFontRenderer.DrawMode.Edge) || tok.UseOutline) {
 
-					SKPath path = paint.GetTextPath(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25);
+					// Glyph outline path for the edge stroke; native, disposed via using.
+					using SKPath path = paint.GetTextPath(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25);
 
 					if (secondEdgeColor != null) {
-						SKPaint secondEdgePaint = new SKPaint();
+						// Temporary paint for the outer outline; native, disposed via using.
+						using SKPaint secondEdgePaint = new SKPaint();
 						secondEdgePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
 						secondEdgePaint.StrokeJoin = SKStrokeJoin.Round;
 						secondEdgePaint.Color = new SKColor(secondEdgeColor.Value.R, secondEdgeColor.Value.G, secondEdgeColor.Value.B, secondEdgeColor.Value.A);
@@ -233,7 +256,7 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 						canvas.DrawPath(path, secondEdgePaint);
 					}
 
-					SKPaint edgePaint = new SKPaint();
+					using SKPaint edgePaint = new SKPaint();
 					edgePaint.StrokeWidth = paint.TextSize * (secondEdgeColor == null ? 8 : 4) / edge_Ratio;
 					edgePaint.StrokeJoin = SKStrokeJoin.Round;
 					edgePaint.Color = new SKColor(tok.OutlineColor.R, tok.OutlineColor.G, tok.OutlineColor.B, tok.OutlineColor.A);
@@ -259,6 +282,13 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 				}
 
 				canvas.DrawText(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25, paint);
+
+				// paint is a persistent member; release the per-token gradient shader so its native
+				// memory isn't leaked until finalization (the GC heap doesn't track it).
+				if (paint.Shader != null) {
+					paint.Shader.Dispose();
+					paint.Shader = null;
+				}
 
 				x_offset += token_width;
 			}
@@ -302,13 +332,29 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 
 
 
-		SKImage image = skSurface.Snapshot();
+		// Snapshot the surface, then copy into the returned bitmap; the SKImage is native, so dispose it via using.
+		using SKImage image = skSurface.Snapshot();
 		//返します
 		return SKBitmap.FromImage(image);
 	}
 
 	public void Dispose() {
 		paint.Dispose();
+	}
+
+	// Typefaces are immutable and safe to share across SKPaint instances. Loading one copies
+	// the entire font file (~16 MB for CJK fonts) into native memory and SKPaint does not free
+	// its Typeface, so without this cache every per-stage/per-HUD renderer leaked a full font
+	// copy. Cached for the application's lifetime (a small, bounded set of font/style combos).
+	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, SKTypeface> _typefaceCache = new();
+
+	private static SKTypeface GetCachedTypeface(string key, Func<SKTypeface> factory) {
+		if (_typefaceCache.TryGetValue(key, out var cached))
+			return cached;
+		var created = factory();
+		if (created != null)
+			_typefaceCache[key] = created;
+		return created;
 	}
 
 	private SKPaint paint = null;

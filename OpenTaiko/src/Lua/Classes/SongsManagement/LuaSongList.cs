@@ -160,7 +160,8 @@ namespace OpenTaiko {
 			return this.FindFirst((node) => node.UniqueId == id, _root);
 		}
 
-		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, Func<LuaSongNode, bool>? predicate = null) {
+		public LuaSongNode? GetRandomNodeInFolder(LuaSongNode randomBoxLocation, bool recursive = true, LuaFunction? predicateFn = null) {
+			Func<LuaSongNode, bool>? predicate = LuaDelegate.AsPredicate<LuaSongNode>(predicateFn);
 			List<LuaSongNode> _randomPool = new List<LuaSongNode>();
 			bool includeAllLocked = _settings.IgnoreUnlockables;
 
@@ -179,17 +180,17 @@ namespace OpenTaiko {
 
 		#region [Temporary, give a method to attach it to a folder instead?]
 
-		public List<LuaSongNode> SearchSongsByPredicate(Func<LuaSongNode, bool> predicate) {
-			return this.FindAll(predicate, _root, true);
+		public List<LuaSongNode> SearchSongsByPredicate(LuaFunction predicate) {
+			return this.FindAll(LuaDelegate.AsPredicate<LuaSongNode>(predicate)!, _root, true);
 		}
 
 		// Placeholder for testing the predicate
-		public LuaSongNode? SearchFirstSongByPredicate(Func<LuaSongNode, bool> predicate) {
-			return this.FindFirst(predicate, _root, true);
+		public LuaSongNode? SearchFirstSongByPredicate(LuaFunction predicate) {
+			return this.FindFirst(LuaDelegate.AsPredicate<LuaSongNode>(predicate)!, _root, true);
 		}
 
-		public List<LuaSongNode> SearchNodesByPredicate(Func<LuaSongNode, bool> predicate) {
-			return this.FindAll(predicate, _root, false);
+		public List<LuaSongNode> SearchNodesByPredicate(LuaFunction predicate) {
+			return this.FindAll(LuaDelegate.AsPredicate<LuaSongNode>(predicate)!, _root, false);
 		}
 
 		#endregion

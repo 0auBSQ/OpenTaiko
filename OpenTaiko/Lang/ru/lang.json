@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Безрамочный",
 		"SETTINGS_SYSTEM_VSYNC": "Режим VSync",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Выбрать, используется ли функция VSync. При его включении (ON) частота кадров будет снижена до 60, что сделает прокрутку заметок более плавной, но увеличит задержку ввода. При его выключении (OFF) частота кадров будет снижена, что уменьшит задержку ввода, но сделает прокрутку нот более нестабильной.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Частота кадров",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Максимальная частота кадров.\nUnlimited использует частоту обновления\nдисплея (например, 120 Гц на ProMotion).\nПрименяется после перезапуска.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Графический интерфейс",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Метод рисования: Выбрать OpenGL, DirectX 11, Vulkan, или Metal. OpenGL работает медленно, но совместимо и стабильно. DirectX 11 быстр и стабилен, но работает только в Windows. Быстрее всего Vulkan работает в Linux. Metal работает только на macOS.\n\nЭто изменение вступит в силу после перезапуска игры.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "Асинхронная загрузка текстур",

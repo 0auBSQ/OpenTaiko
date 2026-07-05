@@ -19,10 +19,10 @@ namespace OpenTaiko {
 		private readonly string Path;
 
 		public LuaDataStorage(string path) {
-			Path = path;
-			// LMDB needs the environment directory to exist before Open(); create it once up front so the
-			// first read of a brand-new store doesn't error.
-			try { System.IO.Directory.CreateDirectory(path); }
+			// Remap to the writable location: a no-op on desktop, the writable Documents mirror on iOS (the
+			// app bundle is read-only there). LMDB needs the environment directory to exist before Open().
+			Path = OpenTaiko.ResolveWritePath(path);
+			try { System.IO.Directory.CreateDirectory(Path); }
 			catch (Exception ex) { LogNotification.PopError($"Failed to init the database: {ex.Message}"); }
 		}
 
@@ -52,6 +52,7 @@ namespace OpenTaiko {
 				return null;
 			}
 		}
+
 
 		public void Dispose() { }   // nothing persistent is held; each operation disposes its own environment
 	}

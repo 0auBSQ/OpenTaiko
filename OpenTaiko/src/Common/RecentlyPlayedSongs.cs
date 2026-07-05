@@ -35,7 +35,11 @@ internal class RecentlyPlayedSongs {
 	}
 
 	private void tLoadFile() {
-		data = ConfigManager.GetConfig<Data>(@"RecentlyPlayedSongs.json");
+		try {
+			data = ConfigManager.GetConfig<Data>(@"RecentlyPlayedSongs.json");
+		} catch {
+			data = new Data();
+		}
 	}
 
 	#endregion

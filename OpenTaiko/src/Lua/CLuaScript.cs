@@ -195,6 +195,7 @@ end
 	// swallowed so none crosses back into native Lua.
 	private static readonly KeraLua.LuaHookFunction _yieldHook = YieldHook;
 
+	[MonoPInvokeCallback(typeof(KeraLua.LuaHookFunction))]
 	private static void YieldHook(IntPtr L, IntPtr ar) {
 		try {
 			if (Stopwatch.GetElapsedTime(_resumeStartTs).TotalMilliseconds < YieldBudgetMs) return;   // under budget — keep running
@@ -367,6 +368,8 @@ end
 		return TitleTextureKey.ResolveTitleTexture(titleTextureKey, vertical, keepCenter);
 	}
 
+	public bool IsAvailable { get; private set; }
+
 	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true, string fallbackScript = "") {
 		strDir = dir;
 		strScriptPath = Path.Join(strDir, "Script.lua");
@@ -374,6 +377,7 @@ end
 		strTexturesDir = texturesDir ?? $"{dir}/Textures";
 		strSounsdDir = soundsDir ?? $"{dir}/Sounds";
 
+		IsAvailable = true;
 
 		LuaScript = new Lua();
 		LuaScript.LoadCLRPackage();
@@ -507,7 +511,7 @@ end
 		freeDisposableList(this.GlyphTextList);
 		freeDisposableList(this.GradientList);
 
-		LuaScript.Dispose();
+		LuaScript?.Dispose();
 
 		bDisposed = true;
 		bLoadedAssets = false;
@@ -517,6 +521,7 @@ end
 
 	protected void Crash(Exception exception) {
 		bCrashed = true;
+		// iOS: surface Lua errors to the device console (os_log), which is easier to read than the on-screen overlay.
 
 		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
 		Trace.TraceError($"Full script path: {this.strScriptPath}");

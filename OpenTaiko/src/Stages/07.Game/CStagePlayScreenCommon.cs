@@ -284,7 +284,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		// playing. Restored to the previous mode in DeActivate. (SustainedLowLatency, not Batch — Batch
 		// favors throughput and still permits the blocking gen-2 collections we're trying to avoid.)
 		this.gclatencymode = System.Runtime.GCSettings.LatencyMode;
-		System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
+		// GCSettings.LatencyMode is unsupported on iOS (throws PlatformNotSupportedException); it's only a GC-pause tweak.
+		if (!OperatingSystem.IsIOS()) System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
 		this.bIsAlreadyCleared = new bool[5];
 		this.bIsAlreadyMaxed = new bool[5];
 
@@ -498,7 +499,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		listChip = null;
 		queueMixerSound.Clear();
 		queueMixerSound = null;
-		System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode
+		if (!OperatingSystem.IsIOS()) System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode (unsupported on iOS)
 
 		this.actAVI.rVD = null; // Will be disposed by TJA.DeActivate() later
 

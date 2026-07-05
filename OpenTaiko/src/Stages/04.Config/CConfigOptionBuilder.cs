@@ -123,8 +123,18 @@ public static class CConfigOptionBuilder {
 			O.Add(CLuaConfigOption.Choice_(SYS, secDisplay,L("SETTINGS_SYSTEM_RESOLUTION"), L("SETTINGS_SYSTEM_RESOLUTION_DESC"),
 				labels, cur, idx => { idx = Math.Clamp(idx, 0, res.Count - 1); cfg.fRenderScale = (float)res[idx].val; }));
 		}
-		O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_VSYNC"), L("SETTINGS_SYSTEM_VSYNC_DESC"),
-			cfg.bEnableVSync, v => { cfg.bEnableVSync = v; OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true; }));
+		// One framerate control per platform: iOS caps FPS (60 vs the display's max), desktop toggles VSync.
+		if (OperatingSystem.IsIOS())
+			O.Add(CLuaConfigOption.Choice_(SYS, secDisplay,L("SETTINGS_SYSTEM_FRAMERATE"), L("SETTINGS_SYSTEM_FRAMERATE_DESC"),
+				new[] { "60 FPS", "Unlimited" }, cfg.biOSUnlimitedFrameRate ? 1 : 0,
+				idx => cfg.biOSUnlimitedFrameRate = idx == 1));
+		else
+			O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_VSYNC"), L("SETTINGS_SYSTEM_VSYNC_DESC"),
+				cfg.bEnableVSync, v => { cfg.bEnableVSync = v; OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true; }));
+		// iOS only: resize the on-screen Don drum circle (radius as % of screen width).
+		if (OperatingSystem.IsIOS())
+			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,"Touch Drum Size", "Radius of the Don drum circle as % of screen width.",
+				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
 		O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_LANEOPACITY"), L("SETTINGS_SYSTEM_LANEOPACITY_DESC"),
 			cfg.nBackgroundTransparency, 0, 255, 5, v => cfg.nBackgroundTransparency = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_FASTRENDER"), L("SETTINGS_SYSTEM_FASTRENDER_DESC"),
@@ -325,13 +335,14 @@ public static class CConfigOptionBuilder {
 
 	// ── helpers mirrored from CActConfigList ──
 	private static string[] AvailableGraphicsDevices() {
+		if (OperatingSystem.IsIOS()) return new[] { "Metal (iOS)" };
 		if (OperatingSystem.IsWindows()) return new[] { "OpenGL", "DirectX11", "Vulkan" };
 		if (OperatingSystem.IsMacOS()) return new[] { "OpenGL", "Metal" };
 		if (OperatingSystem.IsLinux()) return new[] { "OpenGL", "Vulkan" };
 		return new[] { "OpenGL", "DirectX11", "Vulkan", "Metal" };
 	}
-	private static string GraphicsName(int i) => i switch { 0 => "OpenGL", 1 => "DirectX11", 2 => "Vulkan", 3 => "Metal", _ => "OpenGL" };
-	private static int GraphicsInt(string s) => s switch { "OpenGL" => 0, "DirectX11" => 1, "Vulkan" => 2, "Metal" => 3, _ => 0 };
+	private static string GraphicsName(int i) => OperatingSystem.IsIOS() ? "Metal (iOS)" : (i switch { 0 => "OpenGL", 1 => "DirectX11", 2 => "Vulkan", 3 => "Metal", _ => "OpenGL" });
+	private static int GraphicsInt(string s) => s switch { "OpenGL" => 0, "DirectX11" => 1, "Vulkan" => 2, "Metal" => 3, "Metal (iOS)" => 3, _ => 0 };
 
 	private static void RefreshBroadcasting() {
 		var cfg = OpenTaiko.ConfigIni;

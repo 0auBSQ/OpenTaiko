@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "无边框",
 		"SETTINGS_SYSTEM_VSYNC": "垂直同步",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "切换是否开启垂直同步。打开后帧率将上限为 60 FPS，音符卷动会更加顺畅，但输入延迟会增加。关闭后帧率将没有上限，减少输入延迟，但会使音符卷动更加不稳定。",
+		"SETTINGS_SYSTEM_FRAMERATE": "帧率",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "最大帧率。\nUnlimited 使用显示器的刷新率\n（例如 ProMotion 的 120Hz）。\n重启后生效。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "图像 API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "绘制方式：从 OpenGL、DirectX11、Vulkan，或 Metal 中选择。OpenGL 速度较慢，但稳定性和兼容性较好。DirectX11 较快且稳定，但只能在 Windows 上使用。Vulkan 在 Linux 上速度最快。Metal 只能在 MacOS 上使用。\n\n该项设置将在重启 OpenTaiko 后生效。",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "异步贴图加载",

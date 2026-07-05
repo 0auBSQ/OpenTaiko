@@ -736,9 +736,12 @@ internal class CTja : CActivity {
 
 		var eFun = OpenTaiko.ConfigIni.nFunMods[player];
 		var chara = OpenTaiko.Tx.Characters[OpenTaiko.SaveFileInstances[player].data.Character];
+		// The selected character or its effect data can be null (e.g. on iOS, or if Effects.json failed to
+		// load), so fall back to default effect values so fun-mods still apply.
+		var effect = chara?.effect ?? new DBCharacter.CharacterEffect();
 
-		var bombFactor = Math.Max(1, Math.Min(100, chara.effect.BombFactor));
-		var fuseRollFactor = Math.Max(0, Math.Min(100, chara.effect.FuseRollFactor));
+		var bombFactor = Math.Max(1, Math.Min(100, effect.BombFactor));
+		var fuseRollFactor = Math.Max(0, Math.Min(100, effect.FuseRollFactor));
 
 		switch (eFun) {
 			case EFunMods.Minesweeper:

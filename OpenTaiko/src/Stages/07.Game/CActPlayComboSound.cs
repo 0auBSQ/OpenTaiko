@@ -61,7 +61,7 @@ internal class CActPlayComboSound : CActivity {
 
 			string charaPath = CCharacter.GetCharacter(i)._path;
 
-			var currentDir = Path.Combine(charaPath, "Sounds", "Combo") + Path.DirectorySeparatorChar;
+			var currentDir = OpenTaiko.ResolveAssetPath(Path.Combine(charaPath, "Sounds", "Combo") + Path.DirectorySeparatorChar);
 			if (Directory.Exists(currentDir)) {
 				foreach (var item in Directory.GetFiles(currentDir)) {
 					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;
@@ -83,7 +83,7 @@ internal class CActPlayComboSound : CActivity {
 
 			#region [Floor voices]
 
-			var floorDir = Path.Combine(charaPath, "Sounds", "Tower_Combo") + Path.DirectorySeparatorChar;
+			var floorDir = OpenTaiko.ResolveAssetPath(Path.Combine(charaPath, "Sounds", "Tower_Combo") + Path.DirectorySeparatorChar);
 			if (Directory.Exists(floorDir)) {
 				foreach (var item in Directory.GetFiles(floorDir)) {
 					if (!int.TryParse(Path.GetFileNameWithoutExtension(item), out int threshold)) continue;

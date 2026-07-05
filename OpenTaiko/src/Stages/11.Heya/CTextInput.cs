@@ -10,6 +10,12 @@ namespace OpenTaiko {
 	/// <para>The ImGui window is only visible in Debug builds; in Release the host draws <see cref="DisplayText"/>.</para>
 	/// </summary>
 	public unsafe class CTextInput {
+		/// <summary>
+		/// Set by the iOS project to provide native text input via UIAlertController.
+		/// Parameters: (currentText, maxLength, callback with result string or null if cancelled).
+		/// </summary>
+		public static Action<string, uint, Action<string?>>? iOSTextInputHandler;
+
 		public CTextInput() { _cb = InputCallback; }
 		/// <param name="text">Text to start with. Changes as user inputs text.</param>
 		/// <param name="max_length">Max length in bytes that the string can be.</param>
@@ -33,6 +39,10 @@ namespace OpenTaiko {
 		/// Returns <c>true</c> if the user presses Enter to confirm their text.
 		/// </summary>
 		public bool Update() {
+			if (OperatingSystem.IsIOS()) {
+				return UpdateiOS();
+			}
+
 			ImGui.SetNextWindowSize(new(300,150));
 
 			ImGui.Begin("Text Input", ImGuiWindowFlags.NoResize);
@@ -54,6 +64,45 @@ namespace OpenTaiko {
 			return entered;
 		}
 
+		private bool _iOSAlertShown;
+		private bool _iOSCompleted;
+		private string? _iOSResult;
+
+		/// <summary>
+		/// True when the iOS alert was dismissed via Cancel.
+		/// Checked by callers to back out of text input state.
+		/// Resets on next Update() call.
+		/// </summary>
+		public bool iOSCancelled { get; private set; }
+
+		private bool UpdateiOS() {
+			iOSCancelled = false;
+
+			if (_iOSCompleted) {
+				bool confirmed = _iOSResult != null;
+				if (confirmed) {
+					Text = _iOSResult!;
+				} else {
+					iOSCancelled = true;
+				}
+				// Reset for potential reuse
+				_iOSAlertShown = false;
+				_iOSCompleted = false;
+				_iOSResult = null;
+				return confirmed;
+			}
+
+			if (!_iOSAlertShown && iOSTextInputHandler != null) {
+				_iOSAlertShown = true;
+				iOSTextInputHandler(Text, MaxLength, result => {
+					_iOSResult = result;
+					_iOSCompleted = true;
+				});
+			}
+
+			return false;
+		}
+
 		public string Text = "";
 		/// <summary>
 		/// The current text with a blinking caret inserted at ImGui's real caret position (so Left/Right/Home/End are
@@ -62,6 +111,8 @@ namespace OpenTaiko {
 		public string DisplayText {
 			get
 			{
+				if (OperatingSystem.IsIOS() && _iOSAlertShown && !_iOSCompleted)
+					return Text; // No blinking cursor while alert is shown
 				if (OpenTaiko.Timer.SystemTimeMs % 1000 < 300) return Text;   // blink off
 				int c = ByteToCharIndex(Text, _cursorBytePos);
 				return Text.Substring(0, c) + "|" + Text.Substring(c);

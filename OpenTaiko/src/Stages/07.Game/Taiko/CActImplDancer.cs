@@ -126,7 +126,7 @@ internal class CActImplDancer : CActivity {
 		}
 
 		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower && OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Dan) {
-			if (OpenTaiko.ConfigIni.ShowDancer && (this.arDancerMotionNumber.Length - 1) != 0) {
+			if (OpenTaiko.ConfigIni.ShowDancer && this.arDancerMotionNumber != null && (this.arDancerMotionNumber.Length - 1) != 0) {
 				if (!OpenTaiko.stageGameScreen.bPAUSE)
 					nNowDancerCounter += Math.Abs((float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]) / 60.0f) * (float)OpenTaiko.FPS.DeltaTime / nDancerBeat;
 				if (nNowDancerCounter >= 1) {

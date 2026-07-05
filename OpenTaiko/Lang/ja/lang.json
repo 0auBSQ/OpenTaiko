@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "ボーダーレス",
 		"SETTINGS_SYSTEM_VSYNC": "垂直帰線同期",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "垂直帰線同期：画面の描画をディスプレイの垂直帰線中に行なう場合には ON を指定します。ON にすると、ガタつきのない滑らかな画面描画が実現されます。",
+		"SETTINGS_SYSTEM_FRAMERATE": "フレームレート",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "最大フレームレート。\nUnlimited を選ぶとディスプレイのリフレッシュ\nレート（ProMotion では 120Hz など）になります。\n再起動後に反映されます。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "グラフィックスAPI",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "描画の方式:OpenGL, DirectX11, Vulkan, Metalの中からグラフィックスAPIを選択します。OpenGLは遅いですが互換性が高く安定してます\nDirectX9は古いデバイスで高速です、DirectX11はWindowsでしか動作しませんが、早くて安定しています\nVulkanはWindowsとLinux環境で最速です\nMetalはMacのみですが最速です\n\nこの変更は再起動後に反映されます",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "非同期テクスチャ読み込み",

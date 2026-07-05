@@ -76,6 +76,14 @@ TestResults/
 /OpenTaiko/System/Open-World Memories/Modules/Stages/voxel/tools
 /OpenTaiko/System/Open-World Memories/Modules/Stages/sprites
 /OpenTaiko/System/Open-World Memories/Modules/Stages/kart_racing
+
+# OpenTaiko.iOS
+/OpenTaiko.iOS/NativeStubs/
+/OpenTaiko.iOS/Libs/
+/OpenTaiko.iOS/Frameworks/
+/OpenTaiko.iOS/dist/
+# AppIcon PNGs are generated from OpenTaiko/OpenTaiko.ico at build (scripts/build-appicons.sh)
+/OpenTaiko.iOS/Assets.xcassets/AppIcon.appiconset/icon_*.png
 /OpenTaiko/System/Open-World Memories/Modules/Stages/experimentp
 OpenTaiko/System/Open-World Memories/Modules/Stages/experimentp.zip
 /OpenTaiko/System/Open-World Memories/Modules/Stages/owyrsiloe

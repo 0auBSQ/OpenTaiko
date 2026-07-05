@@ -104,8 +104,8 @@ namespace OpenTaiko {
 			Value = Begin;
 		}
 
-		public void Listen(Action<double> listener) {
-			lfListeners.Add(listener);
+		public void Listen(LuaFunction listener) {
+			lfListeners.Add(LuaDelegate.AsAction<double>(listener)!);
 		}
 
 		public void ClearListeners() {

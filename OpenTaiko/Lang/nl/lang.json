@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Randloos",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Modus",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Schakelt VSync aan/uit. Als dit aan staat zal het op maximaal 60FPS spelen, zodat muziek noten soepel scrollt, maar er is meer input vertraging. Als dit uit staat is er geen FPS limiet, voor minder input vertraging, maar scrollen van muziek noten kan onstabiel zijn.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Framerate",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximale framerate.\nUnlimited gebruikt de verversingssnelheid\nvan het scherm (bijv. 120 Hz op ProMotion).\nWordt na herstart toegepast.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode: Selecteer de opties OpenGL, DirectX11, Vulkan of Metal. OpenGL is langzaam, maar compatibel en stabiel. DirectX11 is snel en stabiel, maar werkt alleen op Windows. Vulkan werkt het snelst op Linux. Metal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",

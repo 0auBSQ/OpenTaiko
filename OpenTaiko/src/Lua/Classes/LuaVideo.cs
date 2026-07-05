@@ -76,6 +76,9 @@ namespace OpenTaiko {
 		}
 
 		public double GetPlayPosition() {
+			// iOS has no FFmpeg native lib, so a video never decodes (_video stays null). Report it as
+			// finished so video-end-gated logic (e.g. the boot intro) advances instead of black-waiting.
+			if (_video == null && OperatingSystem.IsIOS()) return Duration;
 			return (_video?.msPlayPosition ?? 0) / 1000.0;
 		}
 

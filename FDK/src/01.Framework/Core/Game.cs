@@ -380,6 +380,12 @@ public abstract partial class Game : IDisposable {
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
 		Configuration();
 
+		if (OperatingSystem.IsIOS()) {
+			// Window and GL context are managed externally by the host.
+			// The host calls InitWithExternalContext() and drives the game loop directly.
+			return;
+		}
+
 		//GlfwProvider.GLFW.Value.WindowHint(WindowHintContextApi.ContextCreationApi, ContextApi.EglContextApi);
 
 		WindowOptions options = WindowOptions.Default;
@@ -450,11 +456,104 @@ public abstract partial class Game : IDisposable {
 	/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 	/// </summary>
 	public void Dispose() {
+		if (OperatingSystem.IsIOS())
+			return;
 		Window_.Dispose();
 	}
 
 	public void Exit() {
+		if (OperatingSystem.IsIOS())
+			return;
 		Window_.Close();
+	}
+
+	/// <summary>
+	/// Initializes the GL context and game systems using an externally-provided GL context.
+	/// Used when the window and GL surface are managed by an external host.
+	/// </summary>
+	public void InitWithExternalContext(Silk.NET.Core.Contexts.IGLContext externalContext, int viewportWidth, int viewportHeight) {
+		Context = externalContext;
+		Context.MakeCurrent();
+
+		Gl = GL.GetApi(Context);
+
+		Gl.Enable(GLEnum.Blend);
+		BlendHelper.SetBlend(BlendType.Normal);
+		CTexture.Init();
+
+		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		Window_Resize(new Vector2D<int>(viewportWidth, viewportHeight));
+
+		Context.SwapInterval(VSync ? 1 : 0);
+
+		Initialize();
+		LoadContent();
+	}
+
+	private long _hostStartTimeMs;
+	private bool _hostTimeInitialized;
+
+	// Render target supplied by the host; the hosted frame draws the scene into it at game resolution, and the host presents it.
+	public uint HostRenderTargetFbo;
+
+	/// <summary>
+	/// Called by the host once per frame; drives Update() and the render.
+	/// </summary>
+	public void RenderHostedFrame(double deltaTime) {
+		if (!_hostTimeInitialized) {
+			_hostStartTimeMs = Stopwatch.GetTimestamp();
+			_hostTimeInitialized = true;
+		}
+		// Set BOTH clocks: dbTimeMs feeds CTimer.NowTimeMs_Double -> CFPS.DeltaTime, which drives the Lua
+		// counters that advance screen transitions.
+		double hostElapsedMs = (Stopwatch.GetTimestamp() - _hostStartTimeMs) * 1000.0 / Stopwatch.Frequency;
+		dbTimeMs = hostElapsedMs;
+		TimeMs = (long)hostElapsedMs;
+
+		Update();
+
+		Camera = Matrix4X4<float>.Identity;
+
+		// Drain queued main-thread actions (deferred GL uploads from background loaders and texture
+		// streaming) within a time budget. Same idiom as Window_Render, see the note there.
+		if (!AsyncActions.IsEmpty) {
+			long asyncStart = System.Diagnostics.Stopwatch.GetTimestamp();
+			while (AsyncActions.TryDequeue(out var action)) {
+				try {
+					action();
+				} catch (Exception ex) {
+					Console.Error.WriteLine($"Error in async action: {ex}");
+				}
+				if (System.Diagnostics.Stopwatch.GetElapsedTime(asyncStart).TotalMilliseconds >= AsyncBudgetMs)
+					break;
+			}
+		}
+
+		// Draw the scene into the host's render target; the host presents it (no GL swap).
+		Gl.BindFramebuffer(FramebufferTarget.Framebuffer, HostRenderTargetFbo);
+		Gl.Viewport(0, 0, (uint)GameWindowSize.Width, (uint)GameWindowSize.Height);
+		// Border color fills any margin the camera transform leaves around the scene.
+		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
+		Gl.Clear(ClearBufferMask.ColorBufferBit);
+		Draw();
+		Gl.Flush(); // submit GL commands so the host can sample the rendered surface
+	}
+
+	/// <summary>
+	/// Called by the host when shutting down.
+	/// </summary>
+	public void ShutdownHosted() {
+		CTexture.Terminate();
+		UnloadContent();
+		OnExiting();
+		Context.Dispose();
+	}
+
+	/// <summary>
+	/// Called by the host when the viewport size changes.
+	/// </summary>
+	public void ResizeViewport(int width, int height) {
+		Window_Resize(new Vector2D<int>(width, height));
 	}
 
 	protected void ToggleWindowMode() {
@@ -488,6 +587,11 @@ public abstract partial class Game : IDisposable {
 	/// Runs the game.
 	/// </summary>
 	public void Run() {
+		if (OperatingSystem.IsIOS()) {
+			// The game loop is driven externally by the host.
+			// Run() is a no-op; the host calls InitWithExternalContext() then RenderHostedFrame() each frame.
+			return;
+		}
 		Window_.Run();
 	}
 

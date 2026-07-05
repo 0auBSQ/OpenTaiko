@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Sin bordes",
 		"SETTINGS_SYSTEM_VSYNC": "Modo de VSync",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Alterna si VSync es utilizado. Activarlo limitará los FPS a 60, suavizará el desplazamiento de notas pero aumentará el retraso de entrada. Desactivarlo no limitará los FPS, disminuirá el retraso de entrada pero hará que el desplazamiento de nota parezca más inestable.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Frecuencia de fotogramas",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Frecuencia de fotogramas máxima.\nUnlimited usa la frecuencia de actualización\nde la pantalla (p. ej. 120 Hz en ProMotion).\nSe aplica tras reiniciar.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "API Gráfica",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Método de Renderizado: Elige entre OpenGL, DirectX 11, Vulkan, o Metal. OpenGL es lento, pero compatible y estable. DirectX11 es rápido y estable, pero solo funciona en Windows. Vulkan funciona más rápido en Linux. Metal solo funciona en MacOS.\n\nEsto tendrá efecto después de reiniciar el juego.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "Carga de Texturas Asíncronas",

@@ -7,7 +7,7 @@ namespace OpenTaiko {
 		private static readonly string DefaultScript;
 
 		static CLuaCharacterScript() {
-			using StreamReader streamReader = new StreamReader(CHARA_SCRIPT_FILE_PATH);
+			using StreamReader streamReader = new StreamReader(OpenTaiko.ResolveAssetPath(CHARA_SCRIPT_FILE_PATH));
 			DefaultScript = streamReader.ReadToEnd();
 		}
 

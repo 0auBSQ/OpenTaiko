@@ -616,6 +616,10 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	// 34MB but displays at ~400px). Width/Height then report the clamped size — callers that scale to a
 	// target box (w/tex.Width) are unaffected.
 	public void MakeTexture(string strFileName, bool bBlackTransparent, int maxDimension) {
+		// Remember the source so the LRU cache can re-decode this texture at the same clamp after eviction.
+		this._sourcePath = strFileName;
+		this._sourceBlackTransparent = bBlackTransparent;
+		this._sourceMaxDimension = maxDimension;
 		// Async fast path: queue the decode + GL upload instead of doing GL here (see CTexture.Streaming.cs).
 		// Triggered by a runtime async load (AsyncLoad) or a load phase (StreamingLoad); SyncForce overrides it
 		// (pixels needed now). The GL upload always lands on the render thread (Game.AsyncActions), so this is
@@ -628,6 +632,21 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 		if (!FileExistsCached(strFileName))     // #27122 2012.1.13 from: ImageInformation では FileNotFound 例外は返ってこないので、ここで自分でチェックする。わかりやすいログのために。
 			throw new FileNotFoundException(string.Format("ファイルが存在しません。\n[{0}]", strFileName));
+
+		// Read only the header dimensions now and defer the pixel decode + GL upload to first draw,
+		// so undrawn textures never reach GPU memory.
+		// Skip when maxDimension clamps the size: the header is full-size and would misreport Width/Height.
+		try {
+			using var codec = SKCodec.Create(strFileName);
+			if (maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
+				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
+				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+				// t2DDraw reads rcFullImage before the deferred upload sets it, so set it here too.
+				this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
+				this._deferred = true;
+				return;
+			}
+		} catch { /* fall through to eager decode */ }
 
 		// Decode straight into the zero-copy upload format (BGRA8888 unpremul) — a plain SKBitmap.Decode
 		// yields premul, forcing a full-size conversion pass per image at upload time. A failed decode
@@ -662,6 +681,65 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		MakeTexture(bitmap, bBlackTransparent);
 	}
 
+	// iOS GPUs can report a smaller GL_MAX_TEXTURE_SIZE than desktop; uploads larger than it render black.
+	// Cached once (0 = not yet queried) and used by MakeTexture(SKBitmap) to downscale oversized bitmaps.
+	private static int _maxTextureSize = 0;
+
+	// iOS texture memory cache: LRU eviction on top of the streaming model.
+	// Live GPU texture memory: bytes uploaded via GenTexture, freed on Dispose or eviction. Under memory
+	// pressure the least-recently-drawn file-backed textures free their GL handle and re-decode on next draw.
+	public static long s_gpuTextureBytes = 0;
+	public static int s_gpuTextureCount = 0;
+	public static long TotalTextureBytes => s_gpuTextureBytes;
+	private long _gpuBytes = 0;
+	private string? _sourcePath;            // file this texture was loaded from, for re-decode after eviction
+	private bool _sourceBlackTransparent;
+	private int _sourceMaxDimension;         // clamp applied at load, re-applied when re-decoding after eviction
+	private uint _lastDrawnTick;            // Game.TimeMs at last draw — LRU order
+	private bool _deferred;                  // Pointer==0 but uploadable from _sourcePath on next draw (lazy-pending OR evicted)
+	private static readonly HashSet<CTexture> s_liveTextures = new();
+	private static readonly object s_cacheLock = new();
+
+	/// <summary>Free the least-recently-drawn file-backed textures (keeping them re-uploadable) until the
+	/// total uploaded texture memory is at or below <paramref name="targetBytes"/>. Render thread (GL context
+	/// current). Returns the bytes freed.</summary>
+	public static long EvictLeastRecentlyDrawnDownTo(long targetBytes) {
+		if (s_gpuTextureBytes <= targetBytes) return 0;
+		CTexture[] snapshot;
+		lock (s_cacheLock) snapshot = s_liveTextures.ToArray();
+		Array.Sort(snapshot, static (a, b) => a._lastDrawnTick.CompareTo(b._lastDrawnTick)); // oldest first
+		long freed = 0;
+		foreach (var t in snapshot) {
+			if (s_gpuTextureBytes <= targetBytes) break;
+			if (t._sourcePath == null || t.Pointer == 0) continue;   // not re-loadable (render target/text) ⇒ keep
+			long b = t._gpuBytes;
+			t.ReleaseGpu();
+			freed += b;
+		}
+		return freed;
+	}
+
+	// Free this texture's GL handle but keep it re-uploadable (re-decoded from _sourcePath on next draw).
+	internal void ReleaseGpu() {
+		if (Pointer == 0 || _sourcePath == null) return;
+		try { Game.Gl.DeleteTexture(Pointer); } catch { }
+		Pointer = 0;
+		if (_gpuBytes > 0) { s_gpuTextureBytes -= _gpuBytes; s_gpuTextureCount--; _gpuBytes = 0; }
+		_deferred = true;
+		lock (s_cacheLock) s_liveTextures.Remove(this);
+	}
+
+	// At the top of every draw: stamp the LRU time, and upload if the texture is deferred
+	// (first draw or after eviction).
+	private void tCacheOnDraw() {
+		_lastDrawnTick = (uint)Game.TimeMs;
+		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
+			_deferred = false;
+			try { using SKBitmap bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }
+			catch { }
+		}
+	}
+
 	private unsafe uint GenTexture(void* data, uint width, uint height, PixelFormat pixelFormat) {
 		//テクスチャハンドルの作成-----
 		uint handle = Game.Gl.GenTexture();
@@ -669,7 +747,17 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		//-----
 
 		//テクスチャのデータをVramに送る
-		if (OperatingSystem.IsMacOS()) {
+		if (OperatingSystem.IsIOS()) {
+			// iOS ES 2.0 requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
+			int internalFormat = pixelFormat switch {
+				PixelFormat.Bgra => (int)InternalFormat.Rgba,
+				PixelFormat.Rgba => (int)InternalFormat.Rgba,
+				PixelFormat.Rgb => (int)InternalFormat.Rgb,
+				_ => (int)InternalFormat.Rgba
+			};
+
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, GLEnum.UnsignedByte, data);
+		} else if (OperatingSystem.IsMacOS()) {
 			// Desktop OpenGL requires sized internal formats
 			int internalFormat = pixelFormat switch {
 				PixelFormat.Bgra => (int)InternalFormat.Rgba8,
@@ -686,13 +774,21 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		//-----
 
 		//拡大縮小の時の補完を指定------
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Linear); //この場合は補完しない
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Linear);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)_wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)_wrapMode);
 		//------
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0); //バインドを解除することを忘れないように
+
+		// Account live GPU bytes (replace this instance's prior figure to handle re-uploads) + register for LRU.
+		long newBytes = (long)width * height * 4;
+		s_gpuTextureBytes += newBytes - _gpuBytes;
+		if (_gpuBytes == 0) s_gpuTextureCount++;
+		_gpuBytes = newBytes;
+		_deferred = false;
+		lock (s_cacheLock) s_liveTextures.Add(this);   // HashSet ⇒ idempotent
 
 		return handle;
 	}
@@ -764,6 +860,23 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
 
+			// Scale down if the bitmap exceeds GL_MAX_TEXTURE_SIZE (smaller on iOS GPUs); oversized uploads render black.
+			if (_maxTextureSize == 0) {
+				_maxTextureSize = Game.Gl.GetInteger(GLEnum.MaxTextureSize);
+				if (_maxTextureSize <= 0) _maxTextureSize = 4096;
+			}
+			SKBitmap scaledBitmap = null;
+			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
+				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
+				int newW = Math.Max(1, (int)(bitmap.Width * scale));
+				int newH = Math.Max(1, (int)(bitmap.Height * scale));
+				scaledBitmap = new SKBitmap(newW, newH);
+				using (var canvas = new SKCanvas(scaledBitmap)) {
+					canvas.DrawBitmap(bitmap, new SKRect(0, 0, newW, newH));
+				}
+				bitmap = scaledBitmap;
+			}
+
 			int origW = bitmap.Width, origH = bitmap.Height;   // LOGICAL size: layout + UV (fractions of rcFullImage) use this
 
 			long newBytes = (long)origW * origH * 4;
@@ -786,7 +899,6 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 					if (resized != null) { glBitmap = resized; ownGlBitmap = true; }
 				}
 			}
-
 			if (Thread.CurrentThread.ManagedThreadId == Game.MainThreadID) {
 				Pointer = tGenFromBitmap(glBitmap);
 				if (ownGlBitmap) glBitmap.Dispose();
@@ -807,6 +919,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			this.szImageSize = new Size(origW, origH);
 			this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
 			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
+
+			scaledBitmap?.Dispose();
 		} catch (Exception ex) {
 			this.Dispose();
 			// throw new CTextureCreateFailedException( string.Format( "テクスチャの生成に失敗しました。\n{0}", strファイル名 ) );
@@ -823,8 +937,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	public void SetTextureWrapMode(TextureWrapMode wrapMode) {
 		Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
 
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
-		Game.Gl.TexParameterI(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)wrapMode);
+		Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)wrapMode);
 
 		Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
 		_wrapMode = wrapMode;
@@ -1023,6 +1137,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		this.t2DDraw((int)x, (int)y, 1f, rcImageInDrawRegion);
 	}
 	public void t2DDraw(float x, float y, float depth, RectangleF rcImageInDrawRegion, bool flipX = false, bool flipY = false, bool rollMode = false) {
+		tCacheOnDraw();             // LRU stamp + transparent re-upload if this texture was evicted
 		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
@@ -1204,6 +1319,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 
 	public void t2DDrawSongObj(float x, float y, float xScale, float yScale) {
+		tCacheOnDraw();             // LRU stamp + transparent re-upload if this texture was evicted
 		if (Pointer == 0) return;   // not-yet-streamed stub or disposed texture ⇒ clean no-op
 		this.color4.Alpha = this._opacity / 255f;
 
@@ -1303,6 +1419,10 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (!this.bDisposeCompleteDone) {
 			Game.Gl.DeleteTexture(Pointer); //解放
 			this.Pointer = 0;
+			s_gpuTextureBytes -= _gpuBytes;
+			if (_gpuBytes > 0) s_gpuTextureCount--;
+			_gpuBytes = 0;
+			lock (s_cacheLock) s_liveTextures.Remove(this);
 
 			if (_countedBytes != 0) {
 				Interlocked.Add(ref LiveBytes, -_countedBytes);

@@ -79,15 +79,25 @@ namespace OpenTaiko {
 		// with 0-3 args. Reads the stack directly so any arity + nil is fine.
 		//   target — "title"/"play"/"stage"/"legacy" (missing ⇒ "title"); name — module/legacy key;
 		//   transition — Transitions/ module name (omitted ⇒ default).
-		private KeraLua.LuaFunction? _exitCFunction;   // kept alive while registered with the unmanaged state
-		private int ExitFromLua(IntPtr statePtr) {
+		// Static + [MonoPInvokeCallback] so the native->managed thunk is AOT-pre-generated (iOS forbids JIT).
+		// The owning instance (for StageExitCallBack) is resolved from the calling Lua state via _exitInstances.
+		private static readonly KeraLua.LuaFunction _exitCFunction = ExitFromLua;   // kept alive while registered
+		private static readonly System.Collections.Concurrent.ConcurrentDictionary<IntPtr, CLuaStageScript> _exitInstances = new();
+		private sealed class ExitMapEntry : IDisposable {
+			private readonly IntPtr _key;
+			public ExitMapEntry(IntPtr key) { _key = key; }
+			public void Dispose() => _exitInstances.TryRemove(_key, out _);
+		}
+		[MonoPInvokeCallback(typeof(KeraLua.LuaFunction))]
+		private static int ExitFromLua(IntPtr statePtr) {
 			try {
 				var L = KeraLua.Lua.FromIntPtr(statePtr);
 				int n = L.GetTop();
+				_exitInstances.TryGetValue(L.MainThread?.Handle ?? statePtr, out var self);
 				string target = (n >= 1 && !L.IsNoneOrNil(1)) ? (L.ToString(1) ?? "title") : "title";
 				string? name = (n >= 2 && !L.IsNoneOrNil(2)) ? L.ToString(2) : null;
 				string? transition = (n >= 3 && !L.IsNoneOrNil(3)) ? L.ToString(3) : null;
-				int rv = StageExitCallBack != null ? StageExitCallBack(target, name, transition) : 0;
+				int rv = self?.StageExitCallBack != null ? self.StageExitCallBack(target, name, transition) : 0;
 				L.PushInteger(rv);
 				return 1;
 			} catch (Exception e) {
@@ -112,7 +122,9 @@ namespace OpenTaiko {
 
 				// Call "return Exit(target, name, transition)" in the Lua stage's update function to exit the
 				// stage. Registered as a raw C function (see ExitFromLua) so any arg count / nils work.
-				_exitCFunction = ExitFromLua;
+				// Map this Lua state to this instance so the static Exit C function finds StageExitCallBack.
+				_exitInstances[LuaScript.State.Handle] = this;
+				listDisposables.Add(new ExitMapEntry(LuaScript.State.Handle));
 				LuaScript.State.Register("Exit", _exitCFunction);
 
 			} catch (Exception e) {

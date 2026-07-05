@@ -118,9 +118,17 @@ class TextureLoader {
 	}
 
 	public CTexture[] TxCSongFolder(string folder) {
-		var count = OpenTaiko.tSequenceImageSheetCountCount(folder);
-		var texture = count == 0 ? null : TxCSong(count, folder + "{0}.png");
-		return texture;
+		// Match .png case-insensitively so mixed-case frame names work on case-sensitive filesystems (iOS).
+		if (!Directory.Exists(folder)) return null;
+		var byIndex = new Dictionary<int, string>();
+		foreach (var file in Directory.EnumerateFiles(folder, "*.png", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })) {
+			if (int.TryParse(Path.GetFileNameWithoutExtension(file), out int n))
+				byIndex[n] = file;
+		}
+		var textures = new List<CTexture>();
+		for (int i = 0; byIndex.TryGetValue(i, out string path); i++)
+			textures.Add(TxCSong(path));
+		return textures.Count == 0 ? null : textures.ToArray();
 	}
 
 	internal CTexture TxCUntrackedSong(string path) {
@@ -532,7 +540,7 @@ class TextureLoader {
 
 		#region PuchiChara
 
-		var puchicharaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEFolder + GLOBAL + PUCHICHARA);
+		var puchicharaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEFolder + GLOBAL + PUCHICHARA);
 		OpenTaiko.Skin.Puchichara_Ptn = puchicharaDirs.Length;
 
 		Puchichara = new CPuchichara[OpenTaiko.Skin.Puchichara_Ptn];
@@ -747,13 +755,12 @@ class TextureLoader {
 
 		#region [11_Characters]
 
-		string[] charaDirs = System.IO.Directory.GetDirectories(OpenTaiko.strEXEFolder + GLOBAL + CHARACTERS);
+		string[] charaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEFolder + GLOBAL + CHARACTERS);
 
 		Characters = new CCharacterLua[charaDirs.Length];
 
 		string[] charaDirNames = new string[charaDirs.Length];
 		for (int i = 0; i < charaDirs.Length; i++) {
-			//Characters[i] = new CCharacterLegacy(charaDirs[i], i);
 			Characters[i] = new CCharacterLua(charaDirs[i], i);
 			charaDirNames[i] = Characters[i].dirName;
 		}

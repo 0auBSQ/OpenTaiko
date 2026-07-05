@@ -1,0 +1,114 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+    <!-- Use iossimulator-arm64 for simulator, ios-arm64 for device -->
+    <RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
+
+    <!-- Application metadata -->
+    <ApplicationId Condition="'$(ApplicationId)' == ''">com.opentaiko.OpenTaiko</ApplicationId>
+    <XSAppIconAssets>Assets.xcassets/AppIcon.appiconset</XSAppIconAssets>
+    <ApplicationDisplayVersion>0.6.1</ApplicationDisplayVersion>
+    <ApplicationVersion>15</ApplicationVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FDK\FDK.csproj" />
+    <ProjectReference Include="..\OpenTaiko\OpenTaiko.csproj" AdditionalProperties="BuildingAsLibrary=true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp.NativeAssets.iOS" Version="2.88.8" />
+    <!-- Exclude KeraLua's device-only liblua54.framework; we provide our own xcframework
+         with both device and simulator slices (built from source by scripts/build-lua54.sh) -->
+    <PackageReference Include="KeraLua" Version="1.4.1" ExcludeAssets="native" />
+    <!-- Exclude LightningDB's native lmdb dylibs so only our liblmdb.xcframework provides lmdb on iOS. -->
+    <PackageReference Include="LightningDB" Version="0.18.1" ExcludeAssets="native" />
+  </ItemGroup>
+
+  <!-- liblua54 built from Lua 5.4.6 source (scripts/build-lua54.sh) -->
+  <ItemGroup>
+    <NativeReference Include="Frameworks/liblua54.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+
+  <!-- liblmdb built from LMDB source (scripts/build-lmdb.sh); LightningDB P/Invokes the native lmdb -->
+  <ItemGroup>
+    <NativeReference Include="Frameworks/liblmdb.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+
+  <!-- BASS audio libraries for iOS (from un4seen.com) -->
+  <ItemGroup>
+    <NativeReference Include="Libs/bass24-ios/bass.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Libs/bassmix24-ios/bassmix.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Libs/bass_fx24-ios/bass_fx.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+
+  <!-- iOS system frameworks required by SDL2 and BASS native libraries (device builds only) -->
+  <PropertyGroup>
+    <MtouchExtraArgs>$(MtouchExtraArgs) -gcc_flags "-framework AVFoundation -framework AudioToolbox -framework GameController -framework CoreHaptics -framework CoreBluetooth -framework CoreMotion -framework CoreGraphics -framework Metal -framework QuartzCore -framework CoreVideo -framework OpenGLES -framework UIKit"</MtouchExtraArgs>
+  </PropertyGroup>
+
+  <!-- App icon asset catalog -->
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets/**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+<!-- Exclude desktop-platform native libraries that OpenTaiko.csproj bundles as Content.
+       These are macOS/Windows/Linux binaries and must not be linked into the iOS app. -->
+  <ItemGroup>
+    <Content Remove="..\OpenTaiko\Libs\**" />
+    <Content Remove="..\OpenTaiko\FFmpeg\**" />
+    <None Remove="..\OpenTaiko\Libs\**" />
+    <None Remove="..\OpenTaiko\FFmpeg\**" />
+  </ItemGroup>
+
+  <!-- Game asset directories: re-include with BundleResource so the iOS SDK copies them
+       into the app bundle preserving directory structure. Content items from the referenced
+       OpenTaiko project get dropped for files with unrecognized extensions (.ogg, .wav, etc.). -->
+  <ItemGroup>
+    <BundleResource Include="..\OpenTaiko\Databases\**" Link="Databases\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\Global\**" Link="Global\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\Lang\**" Link="Lang\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\System\**" Link="System\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\.init\**" Link=".init\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\Songs\**" Link="Songs\%(RecursiveDir)%(Filename)%(Extension)" />
+    <BundleResource Include="..\OpenTaiko\CharaScript.lua" Link="CharaScript.lua" />
+  </ItemGroup>
+
+  <!-- The LightningDB NuGet ships a desktop lmdb.dylib (via RID-fallback) that cannot link for iOS;
+       drop it so our own iOS-built liblmdb.xcframework provides the native lmdb instead. Exact "lmdb"
+       match leaves our "liblmdb" framework binary in place. -->
+  <Target Name="_RemoveLmdbNativeReference" AfterTargets="_ExpandNativeReferences">
+    <ItemGroup>
+      <_FileNativeReference Remove="@(_FileNativeReference)"
+          Condition="$([System.String]::Copy('%(Filename)').ToLowerInvariant()) == 'lmdb'" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Drop LightningDB's loose iOS liblmdb.dylib from the app bundle root (our liblmdb.xcframework provides lmdb). -->
+  <Target Name="_RemoveLooseLmdbDylib" AfterTargets="_ComputeDynamicLibrariesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+          Condition="'%(Filename)%(Extension)' == 'liblmdb.dylib'" />
+    </ItemGroup>
+  </Target>
+</Project>

@@ -8,8 +8,10 @@ static internal class CLangManager {
 	// Cheap factory-like design pattern
 
 	private static void InitializeLangs() {
-		foreach (string path in Directory.GetDirectories(Path.Combine(OpenTaiko.strEXEFolder, "Lang"), "*", SearchOption.TopDirectoryOnly)) {
-			string id = Path.GetRelativePath(Path.Combine(OpenTaiko.strEXEFolder, "Lang"), path);
+		foreach (string path in OpenTaiko.GetMergedDirectories(Path.Combine(OpenTaiko.strEXEFolder, "Lang"), "*")) {
+			// Key by the folder name (the language code). On iOS GetMergedDirectories returns paths under
+			// the app bundle, not under strEXEFolder/Lang, so Path.GetRelativePath would not yield the code.
+			string id = new DirectoryInfo(path).Name;
 			_langs.Add(id, CLang.GetCLang(id));
 		}
 	}

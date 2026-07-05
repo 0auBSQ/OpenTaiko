@@ -17,14 +17,30 @@ public class CInputManager : IDisposable {
 		get;
 		private set;
 	}
-	public IInputDevice? Keyboard => this._Keyboard ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Keyboard);
-	public IInputDevice? Mouse => this._Mouse ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Mouse);
+	// Define a null device for platforms without a physical keyboard/mouse (such as iOS).
+	private static readonly IInputDevice _nullDevice = new CInputNull();
+
+	public IInputDevice Keyboard => this._Keyboard ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Keyboard) ?? _nullDevice;
+	public IInputDevice Mouse => this._Mouse ??= this.InputDevices.FirstOrDefault(device => device.CurrentType == InputDeviceType.Mouse) ?? _nullDevice;
 	public float Deadzone = 0.5f;
 
 
 	// Constructor
 	public CInputManager(IWindow window, bool useBufferedInput, bool bUseMidiIn = true, float gamepad_deadzone = 0.5f) {
 		Initialize(window, useBufferedInput, bUseMidiIn, gamepad_deadzone);
+	}
+
+	/// <summary>
+	/// iOS constructor: no Silk.NET window/input context, just registers external input devices (touch).
+	/// </summary>
+	public CInputManager(IEnumerable<IInputDevice> externalDevices) {
+		this.InputDevices = new List<IInputDevice>(externalDevices);
+		Trace.TraceInformation("Found {0} Input Device{1}", InputDevices.Count, InputDevices.Count != 1 ? "s:" : ":");
+		for (int i = 0; i < InputDevices.Count; i++) {
+			try {
+				Trace.TraceInformation("Input Device #" + i + " (" + InputDevices[i].CurrentType.ToString() + " - " + InputDevices[i].Name + ")");
+			} catch { }
+		}
 	}
 
 	public void Initialize(IWindow window, bool useBufferedInput, bool bUseMidiIn, float controller_deadzone) {
@@ -181,7 +197,7 @@ public class CInputManager : IDisposable {
 					this.InputDevices.Clear();
 				}
 
-				Context.Dispose();
+				Context?.Dispose();
 			}
 			this.bDisposedDone = true;
 		}
@@ -226,7 +242,7 @@ public class CInputManager : IDisposable {
 
 	#region [ private ]
 	//-----------------
-	private IInputContext Context;
+	private IInputContext? Context;
 	private IInputDevice? _Keyboard;
 	private IInputDevice? _Mouse;
 	private bool bDisposedDone;

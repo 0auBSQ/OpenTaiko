@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Borderless",
 		"SETTINGS_SYSTEM_VSYNC": "VSync Mode",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Toggle whether VSync is used. Turning it on will cap the FPS at 60, which will make the note scroll appear smoother but increase input delay. Turning it off will uncap the fps, which will decrease input delay but make the note scroll appear more unstable.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Frame Rate",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximum frame rate.\nUnlimited uses the display's refresh rate\n(e.g. 120Hz on ProMotion).\nApplies after restart.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Drawing Method: Select from either OpenGL, DirectX11, Vulkan, or Metal. OpenGL is slow, but compatible & stable. DirectX11 is fast and stable, but only works on Windows. Vulkan works fastest on Linux. Metal only works on MacOS.\n\nThis will take effect after game reboot.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture Loading",

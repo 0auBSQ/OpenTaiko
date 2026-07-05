@@ -89,7 +89,7 @@ class CHitSounds {
 	private HitSoundsData[] data;
 
 	private void tLoadFile(string path) {
-		string[] directories = Directory.GetDirectories(path);
+		string[] directories = OpenTaiko.GetMergedDirectories(path);
 		data = new HitSoundsData[directories.Length];
 		names = new CLocalizationData[data.Length];
 

@@ -92,6 +92,8 @@
 		"SETTINGS_SYSTEM_WINDOWMODE_BORDERLESS": "Randlos",
 		"SETTINGS_SYSTEM_VSYNC": "VSync-Modus",
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Bestimmt, ob VSync verwendet wird. Bei Aktivierung wird die FPS auf 60 begrenzt, was das Noten-Scrolling flüssiger macht, aber die Eingabeverzögerung erhöht. Bei Deaktivierung wird die FPS-Begrenzung aufgehoben, was die Eingabeverzögerung reduziert, aber das Noten-Scrolling instabiler machen kann.",
+		"SETTINGS_SYSTEM_FRAMERATE": "Bildrate",
+		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximale Bildrate.\nUnlimited nutzt die Bildwiederholrate des\nDisplays (z. B. 120 Hz bei ProMotion).\nWird nach einem Neustart wirksam.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Grafik-API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Zeichenmethode: Wähle zwischen OpenGL, DirectX11, Vulkan oder Metal. OpenGL ist langsam, aber kompatibel und stabil. DirectX11 ist schnell und stabil, funktioniert aber nur unter Windows. Vulkan ist am schnellsten unter Linux. Metal funktioniert nur auf MacOS.\n\nDiese Änderung wird nach einem Neustart des Spiels wirksam.",
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "Asynchrones Laden der Texturen",

@@ -39,6 +39,18 @@ internal class DBThemeSettings : IDisposable {
 		_defs = LoadDefinitions(skinFolderPath);
 
 		string dbPath = System.IO.Path.Combine(skinFolderPath, "ThemeSettings.db3");
+		if (OperatingSystem.IsIOS()) {
+			// The skin folder is in the read-only app bundle on iOS, so opening/creating ThemeSettings.db3
+			// there fails ("connection not open") and settings can't save. Mirror it into the writable
+			// UserData area, seeding from the bundle's DB on first run so any shipped values carry over.
+			string writable = OpenTaiko.ResolveWritePath(dbPath);
+			if (writable != dbPath) {
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(writable)!);
+				if (!System.IO.File.Exists(writable) && System.IO.File.Exists(dbPath))
+					System.IO.File.Copy(dbPath, writable);
+				dbPath = writable;
+			}
+		}
 		_conn = new SqliteConnection($"Data Source={dbPath}");
 		_conn.Open();
 
