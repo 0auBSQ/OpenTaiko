@@ -21,6 +21,8 @@
 --   Stage.setClock(remainingMs, show) -- nil remainingMs hides clock
 --   Stage.showFail(on)
 
+local I18N = require("i18n")
+
 local M = {}
 
 local tx   = {}
@@ -383,9 +385,9 @@ function M.draw()
     drawBlackboard()
     drawClock()
     if songList then
-        drawList(songList, "Pick the correct song!")
+        drawList(songList, I18N.tr("Pick the correct song!"))
     elseif genreList then
-        drawList(genreList, "Choose the song genre!")
+        drawList(genreList, I18N.tr("Choose the song genre!"))
     end
 
     -- Darkening overlay for evaluation phases

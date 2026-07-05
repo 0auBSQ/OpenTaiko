@@ -162,10 +162,36 @@ function Shape.dropShadow(cv, x, y, w, h, r, sh)
     end
 end
 
-local function gloss(cv, x, y, w, h, r, col)
+-- Top sheen. Canvas pixel ops OVERWRITE (no blending), so a translucent gloss drawn raw would
+-- REPLACE the opaque face pixels and leave the top of the box see-through on screen. When the face
+-- colors are known (topC/botC = the face gradient), the sheen is pre-blended row by row and written
+-- back opaque instead. Without them, falls back to the raw write (legacy behaviour).
+local function gloss(cv, x, y, w, h, r, col, topC, botC)
     local gh = floor(h * 0.46); if gh < 4 then return end
     local pad = floor(r * 0.4)
-    fillRound(cv, x + pad, y + floor(r * 0.3), w - 2 * pad, gh, max(2, r - pad), col)
+    local gx, gy, gw, gr = x + pad, y + floor(r * 0.3), w - 2 * pad, max(2, r - pad)
+    if topC == nil then
+        fillRound(cv, gx, gy, gw, gh, gr, col)
+        return
+    end
+    botC = botC or topC
+    local ga = (col[4] or 255) / 255
+    gx, gy, gw, gh = floor(gx), floor(gy), floor(gw), floor(gh)
+    gr = floor(min(gr, gw * 0.5, gh * 0.5))
+    for iy = 0, gh - 1 do
+        -- face gradient sampled at this row's position within the FACE rect (y..y+h-1)
+        local t = (h > 1) and ((gy + iy - y) / (h - 1)) or 0
+        local fr = U.lerp(topC[1], botC[1], t); local fg = U.lerp(topC[2], botC[2], t)
+        local fb = U.lerp(topC[3], botC[3], t); local fa = U.lerp(topC[4] or 255, botC[4] or 255, t)
+        local cr = floor(fr + (col[1] - fr) * ga + 0.5)
+        local cg = floor(fg + (col[2] - fg) * ga + 0.5)
+        local cb = floor(fb + (col[3] - fb) * ga + 0.5)
+        -- rounded inset of the gloss rect itself
+        local edge = min(iy, gh - 1 - iy); local inset = 0
+        if edge < gr then local k = gr - edge; inset = gr - sqrt(max(0, gr * gr - k * k)) end
+        local ix = floor(inset)
+        cv:FillRect(gx + ix, gy + iy, gw - 2 * ix, 1, cr, cg, cb, fa)
+    end
 end
 Shape.gloss = gloss
 
@@ -177,7 +203,7 @@ function Shape.panel(cv, x, y, w, h, opts)
     local ix, iy, iw, ih, ir = x + ow, y + ow, w - 2 * ow, h - 2 * ow, max(1, r - ow)
     if opts.top and opts.bottom then fillRoundGradient(cv, ix, iy, iw, ih, ir, opts.top, opts.bottom)
     elseif opts.top then fillRound(cv, ix, iy, iw, ih, ir, opts.top) end
-    if opts.gloss then gloss(cv, ix, iy, iw, ih, ir, opts.gloss) end
+    if opts.gloss then gloss(cv, ix, iy, iw, ih, ir, opts.gloss, opts.top, opts.bottom) end
 end
 
 local cos, sin, pi, huge, sort = math.cos, math.sin, math.pi, math.huge, table.sort
@@ -371,7 +397,7 @@ function Shape.bubble(cv, x, y, w, h, opts)
     fillPoly(cv, face, y + ow, y + h - ow, opts.top, opts.bottom, false)          -- gradient face (interior)
 
     if opts.gloss and shape == "round" then
-        gloss(cv, x + ow, y + ow, w - 2 * ow, h - 2 * ow, max(1, r - ow), opts.gloss)
+        gloss(cv, x + ow, y + ow, w - 2 * ow, h - 2 * ow, max(1, r - ow), opts.gloss, opts.top, opts.bottom)
     end
 end
 

@@ -5,6 +5,8 @@
 -- Game.update() / Game.draw() called every frame.
 -- Game.update() returns "exit" when the player leaves the result screen.
 
+local I18N = require("i18n")
+
 local M = {}
 
 local Stage    = nil
@@ -160,7 +162,7 @@ end
 local function showDialogue(blocks, onDone, opacity)
     local processed = {}
     for _, b in ipairs(blocks) do
-        processed[#processed + 1] = { text = sub(b.text or ""), onConfirm = b.onConfirm }
+        processed[#processed + 1] = { text = sub(I18N.tr(b.text or "")), onConfirm = b.onConfirm }
     end
     Dialogue.show(processed, onDone, opacity or 0)
 end
@@ -271,6 +273,8 @@ local function eEvalCorrect()
     scores[1] = (scores[1] or 0) + 1
     Stage.setScore(1, scores[1])
     setState("e_correct")
+    local sel = utils.getSelectedSong()
+    local songTitle = (sel and sel.Title) or "?"
     local line
     if singleSongMode and scores[1] >= 100 then
         line = pick({
@@ -280,7 +284,13 @@ local function eEvalCorrect()
             "...",
         })
     else
-        line = pick({"Splendiferous!", "Greeeeeeat!", "Good answer!", "Very for real!", "Sheeeeeeeesh!"})
+        line = I18N.trf(pick({
+            "Correct, it was \"%s\"! Splendiferous!",
+            "\"%s\" it was! Greeeeeeat!",
+            "Yes, \"%s\"! Good answer!",
+            "It was \"%s\"! Very for real!",
+            "\"%s\" indeed! Sheeeeeeeesh!",
+        }), songTitle)
     end
     showDialogue({
         { text = line, onConfirm = function() Stage.setSpotlight(1, false) end },
@@ -292,6 +302,9 @@ local function eEvalFail()
     utils.playSound("Wrong")
     Stage.setPlayerPressing(1, false)
     Stage.setSongList(nil, nil)
+    -- reveal the correct answer on the stage panel
+    local sel = utils.getSelectedSong()
+    Stage.setBlackboard(sel and sel.Title or nil)
     Stage.setDarken(true)
     Stage.setShowFail(true)
     setState("e_fail")
@@ -346,7 +359,9 @@ local function vsEvalFail()
     utils.stopPreview()
     utils.playSound("Wrong")
     Stage.setSongList(nil, nil)
-    Stage.setBlackboard(nil)
+    -- nobody found it in time — reveal the correct answer on the stage panel
+    local sel = utils.getSelectedSong()
+    Stage.setBlackboard(sel and sel.Title or nil)
     Stage.clearRoundState()
     Stage.setDarken(true)
     Stage.setShowFail(true)
@@ -378,12 +393,14 @@ local function vsEvalWin(winner, score)
     Stage.setScore(winner, scores[winner])
     setState("vs_win")
     local wname = playerNames[winner] or ("Player " .. winner)
+    local wsel = utils.getSelectedSong()
+    local wtitle = (wsel and wsel.Title) or "?"
     showDialogue({
-        { text = pick({
-            "And that's another W for " .. wname .. "!",
-            wname .. " takes the bag! Brutal!",
-            "I always knew " .. wname .. " was the best!",
-        }),
+        { text = I18N.trf(pick({
+            "And that's another W for %s! The song was \"%s\"!",
+            "%s takes the bag with \"%s\"! Brutal!",
+            "I always knew %s was the best! It was \"%s\"!",
+        }), wname, wtitle),
           onConfirm = function() Stage.setSpotlight(winner, false) end },
     }, function() vsNextRound() end, 0)
 end
@@ -391,6 +408,7 @@ end
 vsStartTurn = function()
     Stage.clearRoundState()
     Stage.setChip(nil)
+    Stage.setBlackboard(nil)
     Stage.setSongList(nil, nil)
     Stage.setGenreList(nil, nil)
     Stage.setClock(nil, false)
@@ -487,7 +505,7 @@ function M.draw()
     -- VS round counter (always visible during play)
     if gameMode == "VS" and state ~= "vs_results" and state ~= "idle" and state ~= "ceremony" then
         if txts.label then
-            txts.label:GetText("Round " .. currentRound .. " / " .. totalRounds, false, 500)
+            txts.label:GetText(I18N.trf("Round %d / %d", currentRound, totalRounds), false, 500)
                 :DrawAtAnchor(960, 28, "center")
         end
     end
@@ -495,15 +513,15 @@ function M.draw()
     -- Result screen text (rendered over the closed curtain)
     if state == "e_gameover" or state == "vs_results" then
         if txts.title then
-            local header = state == "e_gameover" and "Game Over!" or "Final Results!"
+            local header = I18N.tr(state == "e_gameover" and "Game Over!" or "Final Results!")
             txts.title:GetText(header, false, 1000):DrawAtAnchor(960, 200, "center")
         end
         if txts.label then
             if state == "e_gameover" then
-                local s = txts.label:GetText("Score: " .. (scores[1] or 0), false, 800)
+                local s = txts.label:GetText(I18N.trf("Score: %d", scores[1] or 0), false, 800)
                 s:DrawAtAnchor(960, 320, "center")
                 -- High scores
-                local hs = txts.label:GetText("High Scores", false, 600)
+                local hs = txts.label:GetText(I18N.tr("High Scores"), false, 600)
                 hs:DrawAtAnchor(960, 410, "center")
                 local playerScore = scores[1] or 0
                 for i, entry in ipairs(highScores) do
@@ -524,7 +542,7 @@ function M.draw()
                     t:DrawAtAnchor(960, 280 + rank * 60, "center")
                 end
             end
-            txts.label:GetText("Decide: Play again   Cancel: Exit", false, 1000)
+            txts.label:GetText(I18N.tr("Decide: Play again   Cancel: Exit"), false, 1000)
                 :DrawAtAnchor(960, 900, "center")
         end
     end

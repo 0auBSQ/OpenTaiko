@@ -1,8 +1,9 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, redundant-parameter, inject-field
 local DBScores  = require("DBControllers/dbScores")
+local I18N      = require("i18n")
 local Opening   = require("opening")
 local Setup     = require("setup")
-local Dialogue  = require("dialogue")
+local Dialogue  = require("nokon_dialogue")   -- stage chrome over the shared Lib/dialogue typewriter
 local Stage     = require("stage")
 local Game      = require("game")
 
@@ -315,7 +316,7 @@ end
 function draw()
     if state == "waiting_enum" then
         if text ~= nil then
-            text:GetText("Loading songs..."):DrawAtAnchor(960, 540, "center")
+            text:GetText(I18N.tr("Loading songs...")):DrawAtAnchor(960, 540, "center")
         end
     elseif state == "opening" then
         Opening.draw()
@@ -352,11 +353,12 @@ function update()
     end
 
     if quitted == true then
-        return Exit("title", nil)
+        return Exit("title", nil, "nokon_curtain")   -- close the curtain over the show, open onto the title
     end
 end
 
 function activate()
+    loadAssets()   -- streamed behind the nokon_curtain loading phase (CAsyncLoad)
     playerNames = {}
     for i = 1, 5 do
         playerNames[i] = GetSaveFile(i - 1).Name
@@ -365,8 +367,9 @@ function activate()
     originalPlayerCount = CONFIG.PlayerCount
 
     if songsEnumerated then
+        -- the entry transition already played the curtain reveal — start straight on the menu
         state = "opening"
-        Opening.reset()
+        Opening.resetToMenu()
     else
         state = "waiting_enum"
     end
@@ -377,10 +380,17 @@ function deactivate()
     stopBGM()
     stopSongPreview()
     active = false
+    disposeAssets()   -- the show holds no VRAM/samples while other stages run
 end
 
-function onStart()
-    text = TEXT:Create(16)
+-- Assets live only while the show is on: filled at activate(), emptied at deactivate(). The module
+-- tables (textures/sounds) keep their identity — Opening/Setup/Stage/Dialogue hold references to the
+-- tables and index them at draw time, so refilling in place is safe.
+local assetsLoaded = false
+
+function loadAssets()
+    if assetsLoaded then return end
+    assetsLoaded = true
 
     -- Sounds
     sounds.BGM          = SOUND:CreateBGM("Sounds/BGM.ogg")
@@ -430,15 +440,31 @@ function onStart()
     textures["Clock"]      = TEXTURE:CreateTexture("Textures/Clock/Clock.png")
     textures["SongList"]   = TEXTURE:CreateTexture("Textures/SongList.png")
     textures["SongBlock"]  = TEXTURE:CreateTexture("Textures/SongBlock.png")
-    textures["Dialogue"]   = TEXTURE:CreateTexture("Textures/Dialogue.png")
     for i = 1, 5 do
         textures["chip_" .. i] = TEXTURE:CreateTexture("Textures/Icons/" .. i .. "P.png")
     end
+end
+
+function disposeAssets()
+    if not assetsLoaded then return end
+    assetsLoaded = false
+    for k, sound in pairs(sounds) do
+        if sound ~= nil then sound:Dispose() end
+        sounds[k] = nil
+    end
+    for k, texture in pairs(textures) do
+        if texture ~= nil then texture:Dispose() end
+        textures[k] = nil
+    end
+end
+
+function onStart()
+    I18N.detect()
+    text = TEXT:Create(16)
 
     -- Text renderers
     texts.title    = TEXT:Create(36)
     texts.label    = TEXT:Create(22)
-    texts.dialogue = TEXT:Create(20)
 
     -- Utils table injected into Game module
     local utils = {
@@ -472,9 +498,13 @@ function onStart()
 
     Opening.init(textures, sounds)
     Setup.init(textures, sounds, texts, countSongsInScope)
-    Dialogue.init(textures, texts)
+    Dialogue.init(textures)
     Stage.init(textures, sounds, texts)
     Game.init(Stage, Dialogue, utils, texts)
+end
+
+function reloadLanguage()
+    I18N.detect()
 end
 
 function afterSongEnum()
@@ -483,13 +513,13 @@ function afterSongEnum()
 
     if active and state == "waiting_enum" then
         state = "opening"
-        Opening.reset()
+        Opening.resetToMenu()
     end
 end
 
 function onDestroy()
+    disposeAssets()
+    Dialogue.dispose()
     if text ~= nil then text:Dispose() end
     for _, t in pairs(texts) do if t ~= nil then t:Dispose() end end
-    for _, sound in pairs(sounds) do if sound ~= nil then sound:Dispose() end end
-    for _, texture in pairs(textures) do if texture ~= nil then texture:Dispose() end end
 end

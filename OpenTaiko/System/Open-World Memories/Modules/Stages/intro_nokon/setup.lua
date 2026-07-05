@@ -2,6 +2,8 @@
 -- setup.lua — Game configuration screen (Mode / Players / Songs) for intro_nokon.
 -- update() returns "back" or {mode, players, songs} when confirmed, nil otherwise.
 
+local I18N = require("i18n")
+
 local M = {}
 
 local tx         = {}   -- shared textures (allocated in Script.lua)
@@ -217,7 +219,7 @@ local function validateAndStart()
     if ok then
         startGo()
     else
-        showError("The game can only be started if there are at least 5 available songs.")
+        showError(I18N.tr("The game can only be started if there are at least 5 available songs."))
     end
 end
 
@@ -258,7 +260,7 @@ local function drawRoll(r, isActive)
     -- Label (gold for active, gray for others)
     if txts.label then
         local lc = isActive and col(GOLD) or col(GRAY)
-        local lt = txts.label:GetText(roll.label, false, 500, lc)
+        local lt = txts.label:GetText(I18N.tr(roll.label), false, 500, lc)
         -- Position label just above the tallest image
         local maxH = 0
         for _, item in ipairs(items) do
@@ -302,7 +304,7 @@ function M.draw()
 
     -- Title
     if txts.title then
-        local tt = txts.title:GetText("Let's set up the game show!", false, 1400, col(WHITE))
+        local tt = txts.title:GetText(I18N.tr("Let's set up the game show!"), false, 1400, col(WHITE))
         tt:Draw(30, 45)
     end
 
@@ -326,7 +328,7 @@ function M.draw()
             bgt:SetOpacity(1)
         end
         if txts.title then
-            txts.title:GetText("Round Count", false, 800, col(GOLD)):DrawAtAnchor(960, 430, "center")
+            txts.title:GetText(I18N.tr("Round Count"), false, 800, col(GOLD)):DrawAtAnchor(960, 430, "center")
         end
         if txts.label then
             local canDec = roundCount > roundStep
