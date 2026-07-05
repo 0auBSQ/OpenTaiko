@@ -33,12 +33,19 @@ local function reloadPreimage(songNode)
     SHARED:ClearSharedTexture("preimage")
     if songNode.IsSong == true then
         G.startCounter("throttle_preimage", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+            -- Selection may have changed during the throttle window — only load this node's jacket if it is
+            -- still selected (so a stale jacket / pop-in never lands on the next box).
+            if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
             -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small.
             -- onCreate fires when the jacket is actually swapped in → start the pop-in animation then.
+            local function onCreate()
+                if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
+                startPreimagePop()
+            end
             if songNode.HasPreimage then
-                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 }, function() startPreimagePop() end)
+                SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, { maxSize = 500 }, onCreate)
             else
-                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 }, function() startPreimagePop() end)
+                SHARED:SetSharedTexture("preimage", "Textures/preimage.png", { maxSize = 500 }, onCreate)
             end
         end)
     else
@@ -64,8 +71,15 @@ local function playPreview(songNode)
             return
         end
         G.startCounter("throttle_presound", 0, PREVIEW_THROTTLE_MS, 0.2/PREVIEW_THROTTLE_MS, "none", nil, function()
+            -- Selection may have changed during the throttle window (moved to another song / a back box /
+            -- a folder). Only load the preview if this node is still the selected one.
+            if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
             local demoStart = songNode.DemoStart
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
+                -- The load is async too: bail if the selection moved on while it was loading, so a stale
+                -- preview never starts playing over the next box. (Just don't Play — the load doesn't
+                -- auto-play, and Stopping could cut the shared slot if it's reused for the new selection.)
+                if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
                 local speed = CONFIG.SongSpeed / 20
                 snd:SetSpeed(speed)
                 snd:SetVolume(0)            -- start silent; Script.lua fades it in to full
