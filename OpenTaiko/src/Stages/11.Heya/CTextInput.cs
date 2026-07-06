@@ -75,13 +75,21 @@ namespace OpenTaiko {
 		/// </summary>
 		public bool iOSCancelled { get; private set; }
 
+		/// <summary>
+		/// True on the frame the iOS alert was confirmed via OK. Mirrors iOSCancelled.
+		/// Callers check it to commit and leave text input state. Resets on next Update().
+		/// </summary>
+		public bool iOSConfirmed { get; private set; }
+
 		private bool UpdateiOS() {
 			iOSCancelled = false;
+			iOSConfirmed = false;
 
 			if (_iOSCompleted) {
 				bool confirmed = _iOSResult != null;
 				if (confirmed) {
 					Text = _iOSResult!;
+					iOSConfirmed = true;
 				} else {
 					iOSCancelled = true;
 				}

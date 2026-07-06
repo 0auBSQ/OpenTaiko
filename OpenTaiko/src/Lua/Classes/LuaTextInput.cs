@@ -18,6 +18,13 @@ namespace OpenTaiko {
 		/// <summary>Processes keyboard input. Returns <c>true</c> when the user presses Enter.</summary>
 		public bool Update() => _input.Update();
 
+		/// <summary>
+		/// iOS only: true on the frame the native text alert was cancelled / confirmed. Check these to
+		/// leave text-input state on iOS, where there is no Enter/Escape key to confirm or back out.
+		/// </summary>
+		public bool iOSCancelled => _input.iOSCancelled;
+		public bool iOSConfirmed => _input.iOSConfirmed;
+
 		/// <summary>The current text value. Can be read and set at any time.</summary>
 		public string Text {
 			get => _input.Text;
