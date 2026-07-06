@@ -916,7 +916,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.strSystemSkinSubfolderFullName = ""; // #28195 2012.5.2 yyagi 使用中のSkinサブフォルダ名
 		this.bTight = false; // #29500 2012.9.11 kairera0467 TIGHTモード
 		nGraphicsDeviceType = 0;
-		biOSUnlimitedFrameRate = false;
+		biOSUnlimitedFrameRate = true;
 		bShowDebugHud = false;
 
 		#region [ WASAPI/ASIO ]
