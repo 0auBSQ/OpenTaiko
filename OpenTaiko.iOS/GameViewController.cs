@@ -241,15 +241,15 @@ public partial class GameViewController : UIViewController {
 		global::OpenTaiko.CTextInput.iOSTextInputHandler = (currentText, maxLength, callback) => {
 			InvokeOnMainThread(() => {
 				var alert = UIAlertController.Create(
-					"Search",
+					"Enter text",
 					null,
 					UIAlertControllerStyle.Alert);
 
 				alert.AddTextField(tf => {
 					tf.Text = currentText;
-					tf.Placeholder = "Enter search text";
+					tf.Placeholder = "Enter text";
 					tf.AutocorrectionType = UITextAutocorrectionType.No;
-					tf.ReturnKeyType = UIReturnKeyType.Search;
+					tf.ReturnKeyType = UIReturnKeyType.Done;
 				});
 
 				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, _ => {
