@@ -69,13 +69,13 @@ local function buildMenus()
             title = "Intro Nokon",
             desc  = "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players.",
             c     = col(140, 80, 30),
-            via   = "stage", stage = "intro_nokon",
+            via   = "stage", stage = "intro_nokon", trans = "nokon_curtain",
         },
         {
             title = "My Room",
-            desc  = "Customize your player profile and buy new characters and puchicharas using your coins here!",
+            desc  = "Decorate your personal room, place furniture, and visit other players' rooms!",
             c     = col(30, 150, 60),
-            via   = "heya",
+            via   = "stage", stage = "myroom",
         },
         {
             title = "OpenTaiko's General Store",
@@ -133,7 +133,13 @@ local function buildMenus()
     m[#m + 1] = dbgEntry("Raytracer Demo (Debug)",     "The Lua3DScene path-traced raytracer mode.", "rt_demo")
     m[#m + 1] = dbgEntry("Particle Showcase (Debug)",  "A stress test of the Lua3DScene particle engine.", "particles")
     m[#m + 1] = dbgEntry("Online Lobby (Debug)",       "(Beta, Share your room code only with people you trust)", "onlinelobby")
-    
+
+    m[#m + 1] = {
+        title = "My Room (Old)",
+        desc  = "Old (0.6.0) My Room",
+        c     = dbg,
+        via   = "heya",
+    }
 
     return m
 end

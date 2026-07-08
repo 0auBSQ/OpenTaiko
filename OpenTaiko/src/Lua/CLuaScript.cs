@@ -407,6 +407,7 @@ end
 
 			LuaScript["TEXTURE"] = ltf;
 			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
+			LuaScript["GRAPHICS"] = new LuaGraphicsFunc();   // true scissor clip for scrolling UI panels
 			LuaScript["SCENE3D"] = new Lua3DSceneFunc(Scene3DList);
 			LuaScript["PHYSICS"] = new LuaPhysicsFunc();
 			LuaScript["GLOBALCAMERA"] = new LuaGlobalCamera();
@@ -440,6 +441,7 @@ end
 			LuaScript["THEME"] = new LuaThemeFunc();
 			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, OpenTaiko.GlobalStores.SharedStrings, ltf, lsf, dir);
 			LuaScript["DATABASE"] = new LuaDataStorageFunc(dir);
+			LuaScript["HEIGHTMAP"] = new LuaHeightmapFunc(dir);
 			LuaScript["CHARACTER"] = new LuaCharacterFunc();
 			LuaScript["PUCHICHARALIST"] = OpenTaiko.Tx?.LuaPuchicharaDb;
 			LuaScript["CHARACTERLIST"] = OpenTaiko.Tx?.LuaCharacterDb;

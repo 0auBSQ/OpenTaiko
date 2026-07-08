@@ -1,0 +1,10 @@
+{
+  "_comment": "Dialable phone numbers/codes → events. Keys are matched case-INSENSITIVELY and with whitespace stripped. Fields: name (messenger; '' = no name shown), text (message body — the English text doubles as the localization key in lang/ja.lua), sound (a stem in the STAGE's Sounds/ folder e.g. myroom/Sounds/egg.ogg, played with no message when there is no text), effect ('bombs' = the Canabi bomb-storm). Any number NOT listed here falls back to the 'nobody picks up' placeholder. Add story-mode easter eggs here without touching code.",
+  "1122":    { "sound": "egg" },
+  "67":      { "name": "", "text": "Ahahah... Six seeeven! So funny!" },
+  "canabi":  { "name": "Dashy", "text": "DIE DIE DIE DIE GET OUT OF MY HEAD KILL ILL KILL", "effect": "bombs" },
+  "ootd":    { "name": "bol", "text": "OOTD is a 10+" },
+  "dragoon": { "name": "Tatsuoto", "text": "GOON?!" },
+  "887":     { "name": "", "text": "Nice try!" },
+  "889":     { "name": "", "text": "Nice try!" }
+}

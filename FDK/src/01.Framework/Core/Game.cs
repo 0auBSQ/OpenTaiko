@@ -826,6 +826,7 @@ public abstract partial class Game : IDisposable {
 
 	public void Window_Render(double deltaTime) {
 		if (GraphicsSelfTest) { RunGraphicsSelfTest(); return; }   // --mode=checkgl (see Game.GraphicsSelfTest.cs)
+		Gl.Disable(EnableCap.ScissorTest);   // a leaked UI clip (GRAPHICS:SetClip) must never survive the frame
 		Camera = Matrix4X4<float>.Identity;
 		Gl.ClearColor(BorderColor.Red, BorderColor.Green, BorderColor.Blue, BorderColor.Alpha);
 

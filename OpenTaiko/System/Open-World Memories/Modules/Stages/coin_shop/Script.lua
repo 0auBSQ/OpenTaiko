@@ -1,15 +1,21 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field, param-type-mismatch
 local DBItems = require("DBControllers/dbItems")
+local PopUI = require("PopUI")
 
 local save = nil
+local playerIndex = 0          -- which of the 5 local saves' shop we're browsing (chosen on entry)
+local confirmUI = nil          -- PopUI modal for the buy-confirm / reroll-confirm / player-select
 
 -- Assets
 local sounds = {}
 local textures = {}
 local icons = {}
+local sharedIcon = {}   -- iconIdx -> true for shared (My Room furniture) textures we must NOT dispose
 
 local text = nil
 local TxTextChar = {}
+local glyphFont = nil          -- proper variable-width glyph font for the stock badge
+local STOCK_FG, STOCK_BG = nil, nil
 
 -- Menu navigation
 local layoutSize = 5
@@ -178,18 +184,54 @@ local function findItemByCode(code)
 	return nil
 end
 
+-- My Room furniture rows use the code "furn_<id>"; the shop draws their preview from a shared texture
+-- baked by My Room (myroom_thumb_<id>) instead of loading a per-shop model/PNG.
+local function furnitureId(code)
+	if code and code:sub(1, 5) == "furn_" then return code:sub(6) end
+	return nil
+end
+
 local function setupItem(entry, iconIdx)
 	if entry == nil then return nil end
 	local item = deepcopy(entry)
 	item.LocalizedName = LANG:FromString(item.Name):GetString("")
 	item.NameTx = text:GetText(item.LocalizedName, true, 380)
 	item.SoldOut = false
+	sharedIcon[iconIdx] = nil
 	if entryHasicon(item) then
-		icons[iconIdx] = TEXTURE:CreateTexture("Textures/Icons/"..item.Code..".png")
+		local fid = furnitureId(item.Code)
+		if fid then
+			-- furniture preview = the shared texture My Room baked at onStart (myroom_thumb_<id>)
+			local shared = SHARED:GetSharedTexture("myroom_thumb_"..fid)
+			if shared and shared.Loaded then
+				icons[iconIdx] = shared
+				sharedIcon[iconIdx] = true         -- shared: never Dispose in deactivate
+				item._shared = true                -- draw centered+scaled (thumbnails aren't full-stand art)
+			else
+				icons[iconIdx] = nil               -- not baked yet (My Room not opened) → name-only
+			end
+		else
+			icons[iconIdx] = TEXTURE:CreateTexture("Textures/Icons/"..item.Code..".png")
+		end
 	else
 		icons[iconIdx] = nil
 	end
 	return item
+end
+
+-- roll a slot's stock: ranged items (StockMax>0, e.g. paints/floorings) get a random quantity you buy
+-- one unit at a time; everything else is a single purchase (Stock 1 → sold out on first buy).
+local function rollStock(item)
+	if item == nil then return end
+	local smin = tonumber(item.StockMin) or 0
+	local smax = tonumber(item.StockMax) or 0
+	if smax > 0 then
+		smin = math.max(1, smin)
+		if smax < smin then smax = smin end
+		item.Stock = math.random(smin, smax)
+	else
+		item.Stock = 1
+	end
 end
 
 -- ── Shop generation ───────────────────────────────────────────────────────────
@@ -247,6 +289,7 @@ local function poolItems()
 			bigItem = nil
 		else
 			bigItem = setupItem(bigItem, 5)
+			rollStock(bigItem)
 		end
 	else
 		bigItem = nil
@@ -273,6 +316,7 @@ local function poolItems()
 			debugLog("Pool " .. poolSize .. " - " .. roll)
 			local chosen = pickFromPool(pool, roll)
 			normalItems[n] = setupItem(chosen, n)
+			rollStock(normalItems[n])
 
 			if chosen and isUnique(chosen) then
 				-- rebuild pool without this entry
@@ -305,9 +349,11 @@ local function storeShopState(db)
 	db:Write(DB_PREFIX .. "day",     tostring(currentFreezeKey))
 	db:Write(DB_PREFIX .. "rerolls", tostring(executedRerolls))
 	db:Write(DB_PREFIX .. "soldout", tostring(soldOutMask))
-	db:Write(DB_PREFIX .. "big",     bigItem and bigItem.Code or "")
+	db:Write(DB_PREFIX .. "big",       bigItem and bigItem.Code or "")
+	db:Write(DB_PREFIX .. "big_stock", tostring(bigItem and bigItem.Stock or 0))
 	for i = 1, 6 do
-		db:Write(DB_PREFIX .. "n" .. i, normalItems[i] and normalItems[i].Code or "")
+		db:Write(DB_PREFIX .. "n" .. i,          normalItems[i] and normalItems[i].Code or "")
+		db:Write(DB_PREFIX .. "n" .. i .. "s",   tostring(normalItems[i] and normalItems[i].Stock or 0))
 	end
 end
 
@@ -315,10 +361,12 @@ local function loadShopState(db)
 	soldOutMask = tonumber(db:Read(DB_PREFIX .. "soldout") or "0") or 0
 
 	bigItem = setupItem(findItemByCode(db:Read(DB_PREFIX .. "big")), 5)
+	if bigItem then bigItem.Stock = tonumber(db:Read(DB_PREFIX .. "big_stock") or "1") or 1 end
 
 	normalItems = {}
 	for i = 1, 6 do
 		normalItems[i] = setupItem(findItemByCode(db:Read(DB_PREFIX .. "n" .. i)), i)
+		if normalItems[i] then normalItems[i].Stock = tonumber(db:Read(DB_PREFIX .. "n" .. i .. "s") or "1") or 1 end
 	end
 
 	-- Apply soldout flags from saved mask
@@ -346,8 +394,30 @@ local function drawPriceWithTag(x, y, price)
 	drawPrice(x+166, y+26, price)
 end
 
+-- "x[N]" remaining-stock badge — glyph font, RIGHT-ANCHORED at rightX (variable-width, never overflows)
+local function drawStock(rightX, y, stock)
+	if not glyphFont then return end
+	glyphFont:Draw("x"..tostring(stock), rightX, y, STOCK_FG, STOCK_BG, 1.0, 1.0, 0, "topright")
+end
+
+-- draw a flat texture centered on (cx,cy), scaled to fill a boxSize square (portraits/swatches)
+local function drawSharedIcon(tex, cx, cy, boxSize)
+	local w = tex.Width
+	if not w or w <= 0 then return end
+	local s = boxSize / w
+	tex:SetScale(s, s)
+	tex:DrawAtAnchor(cx, cy, "center")
+	tex:SetScale(1, 1)
+end
+
 function draw()
 	textures["Bg"]:Draw(0,0)
+
+	-- player-select modal (before a save is chosen: no shop contents / no `save` yet)
+	if currentScreen == "playerselect" or save == nil then
+		if confirmUI then confirmUI:rect(0, 0, 1920, 1080, 6, 8, 16, 150); confirmUI:draw() end
+		return
+	end
 
 	-- Normal items
 	for i, v in ipairs(normalItems) do
@@ -363,6 +433,8 @@ function draw()
 			local yCenter = yOrig + 200
 			if v.Type == "nameplate" then
 				NAMEPLATE:DrawNameplateTitleById(v.RefInt, xCenter, yCenter - 40, 255, text)
+			elseif v._shared and iconTex ~= nil then
+				drawSharedIcon(iconTex, xCenter, yCenter - 20, 300)
 			elseif iconTex ~= nil then
 				iconTex:Draw(xOrig, yOrig)
 			end
@@ -372,6 +444,9 @@ function draw()
 
 			-- Price
 			drawPriceWithTag(xOrig, yOrig + 320, v.Price)
+
+			-- Stock badge (x[N]) at the TOP-RIGHT of the slot
+			if v.Stock and v.Stock > 1 then drawStock(xOrig + 388, yOrig + 12, v.Stock) end
 		else
 			textures["SoldOut"]:Draw(xOrig, yOrig)
 		end
@@ -386,6 +461,8 @@ function draw()
 			local iconTex = icons[5]
 			if bigItem.Type == "nameplate" then
 				NAMEPLATE:DrawNameplateTitleById(bigItem.RefInt, 200, 400, 255, text)
+			elseif bigItem._shared and iconTex ~= nil then
+				drawSharedIcon(iconTex, 200, 400, 380)
 			elseif iconTex ~= nil then
 				iconTex:Draw(0, 0)
 			end
@@ -395,6 +472,9 @@ function draw()
 
 			-- Price
 			drawPriceWithTag(0, 800, bigItem.Price)
+
+			-- Stock badge (x[N]) at the TOP-RIGHT of the big slot
+			if bigItem.Stock and bigItem.Stock > 1 then drawStock(388, 12, bigItem.Stock) end
 		else
 			textures["SoldOut"]:Draw(0, 220)
 		end
@@ -417,37 +497,23 @@ function draw()
 	end
 
 	if currentScreen == "confirm" or currentScreen == "refresh" then
-		if currentScreen == "confirm" then
-			textures["Confirm"]:Draw(0, 0)
-
-			-- Display the selected item within the box here
-			local xCenter = 551
-			local yCenter = 490
+		if confirmUI then confirmUI:rect(0, 0, 1920, 1080, 6, 8, 16, 150) end   -- dim the shop behind the modal
+		if confirmUI then confirmUI:draw() end
+		-- the item preview sits on top of the panel body (in the gap above the price line), SCALED to a
+		-- fixed box so large icons (vault-key PNGs) don't spill over the panel text
+		if currentScreen == "confirm" and toBuyItem then
+			local px, py = 960, 322
 			if toBuyItem.Type == "nameplate" then
-				NAMEPLATE:DrawNameplateTitleById(toBuyItem.RefInt, xCenter, yCenter - 40, 255, text)
+				NAMEPLATE:DrawNameplateTitleById(toBuyItem.RefInt, px, py, 255, text)
 			elseif toBuyItemIcon ~= nil then
-				toBuyItemIcon:DrawAtAnchor(xCenter, yCenter, "center")
+				drawSharedIcon(toBuyItemIcon, px, py, 168)   -- scales ANY texture down to the box
 			end
-			drawPriceWithTag(364, 693, toBuyItem.Price)
-
-			-- Display currently owned amount if counterable
-			if toBuyItem.Type == "counterable" then
-				local _count = save:GetGlobalCounter(toBuyItem.RefText)
-				local _tx = text:GetText("Inventory: "..("%d"):format(_count), true, 600)
-				_tx:DrawAtAnchor(550, 830, "center")
-			end
-		else
-			textures["Refresh"]:Draw(0, 0)
-			drawPriceWithTag(380, 440, rerollPrice)
 		end
-
-		textures["Buttons"]:Draw(211, 878)
-		textures["ButtonsHover"]:Draw(211 + confirmIdx * 433, 878)
 	end
 
 	-- Player info
 	drawPrice(1734, 1035, save.Coins)
-	NAMEPLATE:DrawPlayerNameplate(20, 980, 255, 0)
+	NAMEPLATE:DrawPlayerNameplate(20, 980, 255, playerIndex)
 end
 
 -- ── Navigation ────────────────────────────────────────────────────────────────
@@ -497,45 +563,124 @@ local function moveInCycle(direction)
 end
 
 
-local function purchaseItem(item)
+-- buy `qty` units of a slot at once: grants qty (counterable → +qty to the counter; single-buy types
+-- ignore qty), spends price×qty, decrements the slot stock, and marks it sold out only when depleted.
+local function purchaseItemMultiple(item, slot, qty)
+	qty = math.max(1, math.min(math.floor(qty or 1), item.Stock or 1))
 	if item.Type == "nameplate" then
 		save:UnlockNameplate(item.RefInt)
 	elseif item.Type == "triggerable" then
 		save:SetGlobalTrigger(item.RefText, true)
 	elseif item.Type == "counterable" then
-		local _count = save:GetGlobalCounter(item.RefText)
-		save:SetGlobalCounter(item.RefText, _count + item.RefInt)
+		-- My Room claims the counter deltas into its inventory
+		save:SetGlobalCounter(item.RefText, save:GetGlobalCounter(item.RefText) + qty)
 	end
-	save:SpendCoins(item.Price)
-	toBuyItem.SoldOut = true
-	-- Persist the sold-out state
-	soldOutMask = markSoldOut(soldOutMask, toBuySlot)
-	shopDB:Write(DB_PREFIX .. "soldout", tostring(soldOutMask))
+	save:SpendCoins(item.Price * qty)
+	item.Stock = (item.Stock or 1) - qty
+	if item.Stock <= 0 then
+		item.SoldOut = true
+		soldOutMask = markSoldOut(soldOutMask, slot)
+	end
+	storeShopState(shopDB)   -- persist the new stock + soldout so a reopen shows the same counts
+	sounds.Buy:Play()
+end
+
+local function closeConfirm()
+	currentScreen = "shop"
+	if confirmUI then confirmUI:disposeWidgets(); confirmUI = nil end
+end
+
+-- refresh the live "Total: N" line + gray the Buy button when the selected quantity is unaffordable
+local function updateConfirmTotals()
+	if not (confirmUI and confirmUI._item) then return end
+	local qty = (confirmUI._qty and tonumber(confirmUI._qty:value())) or 1
+	local total = confirmUI._item.Price * qty
+	if confirmUI._totalLabel then confirmUI._totalLabel:setText(("Total: %d"):format(total)) end
+	if confirmUI._buyBtn then confirmUI._buyBtn.enabled = (total <= save.Coins) end
+end
+
+local SHOP_SFX  -- set in activate() once sounds exist
+
+-- confirm dialog: centred panel with the item name (title), a scaled preview (drawn in draw()), price,
+-- an optional quantity stepper, total, and VERTICALLY-stacked Buy/Cancel (matches the up/down nav). Buy
+-- is focused by default. BTN_W/CONFIRM_CX keep the two buttons aligned under the panel centre.
+local CONFIRM_CX, BTN_W = 960, 340
+local function buildConfirmUI(item, slot)
+	if confirmUI then confirmUI:disposeWidgets() end
+	confirmUI = PopUI.new{ theme = {}, sfx = SHOP_SFX }
+	local cx, bx = CONFIRM_CX, CONFIRM_CX - BTN_W / 2
+	local hasQty = (item.Stock or 1) > 1
+	local panelH = hasQty and 720 or 640
+	confirmUI:panel{ x = 660, y = 180, w = 600, h = panelH, title = item.LocalizedName or "" }
+	confirmUI:label{ text = ("Price: %d"):format(item.Price), x = cx, y = 452, size = "label", align = "center" }
+	local qtyChooser, totalY, buyY
+	if hasQty then
+		confirmUI:label{ text = "Quantity", x = cx, y = 508, size = "small", align = "center" }
+		local opts = {}
+		for i = 1, item.Stock do opts[i] = tostring(i) end
+		qtyChooser = confirmUI:chooser{ x = cx - 170, y = 546, w = BTN_W, h = 62, options = opts, index = 1,
+			wrap = false, onChange = function() updateConfirmTotals() end }
+		totalY, buyY = 634, 706
+	else
+		totalY, buyY = 520, 596
+	end
+	local totalLabel = confirmUI:label{ text = ("Total: %d"):format(item.Price), x = cx, y = totalY, size = "label", align = "center" }
+	local buyBtn = confirmUI:button{ text = "Buy", x = bx, y = buyY, w = BTN_W, h = 76, accent = true,
+		onClick = function()
+			local qty = (qtyChooser and tonumber(qtyChooser:value())) or 1
+			if item.Price * qty > save.Coins then sounds.SoldOut:Play(); return end   -- can't afford (guarded)
+			purchaseItemMultiple(item, slot, qty)
+			closeConfirm()
+		end }
+	confirmUI:button{ text = "Cancel", x = bx, y = buyY + 92, w = BTN_W, h = 76,
+		onClick = function() sounds.Cancel:Play(); closeConfirm() end }
+	confirmUI._item, confirmUI._qty = item, qtyChooser
+	confirmUI._totalLabel, confirmUI._buyBtn = totalLabel, buyBtn
+	updateConfirmTotals()
+	confirmUI:_setFocusIndex(qtyChooser and 2 or 1)   -- default focus/highlight on Buy
+end
+
+local function buildRefreshUI()
+	if confirmUI then confirmUI:disposeWidgets() end
+	confirmUI = PopUI.new{ theme = {}, sfx = SHOP_SFX }
+	local cx, bx = CONFIRM_CX, CONFIRM_CX - BTN_W / 2
+	local rerollPrice = math.floor(10 * (2 ^ executedRerolls))
+	confirmUI:panel{ x = 660, y = 280, w = 600, h = 480, title = "Reroll" }
+	confirmUI:label{ text = "Reshuffle the shop?", x = cx, y = 384, size = "label", align = "center" }
+	confirmUI:label{ text = ("Cost: %d"):format(rerollPrice), x = cx, y = 448, size = "label", align = "center" }
+	local rb = confirmUI:button{ text = "Reroll", x = bx, y = 528, w = BTN_W, h = 76, accent = true,
+		onClick = function()
+			if rerollPrice > save.Coins then sounds.SoldOut:Play(); return end
+			save:SpendCoins(rerollPrice); executedRerolls = executedRerolls + 1; soldOutMask = 0
+			poolItems(); storeShopState(shopDB); sounds.Buy:Play()
+			closeConfirm()
+		end }
+	rb.enabled = (rerollPrice <= save.Coins)
+	confirmUI:button{ text = "Cancel", x = bx, y = 620, w = BTN_W, h = 76,
+		onClick = function() sounds.Cancel:Play(); closeConfirm() end }
+	confirmUI:_setFocusIndex(1)   -- default focus/highlight on Reroll
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
 
-function update()
-	if currentScreen == "confirm" or currentScreen == "refresh" then
-		if INPUT:Pressed("RightChange") or INPUT:KeyboardPressed("RightArrow") or INPUT:Pressed("LeftChange") or INPUT:KeyboardPressed("LeftArrow") then
-			sounds.Skip:Play()
-			confirmIdx = 1 - confirmIdx
-		elseif INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") or ((INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return")) and confirmIdx == 1) then
-			sounds.Cancel:Play()
-			currentScreen = "shop"
-		elseif (INPUT:Pressed("Decide") or INPUT:KeyboardPressed("Return")) and confirmIdx == 0 then
-			if currentScreen == "confirm" then
-				purchaseItem(toBuyItem)
-				sounds.Buy:Play()
-			elseif currentScreen == "refresh" then
-				local rerollPrice = math.floor(10 * (2 ^ executedRerolls))
-				sounds.Buy:Play()
-				save:SpendCoins(rerollPrice)
-				executedRerolls = executedRerolls + 1
-				soldOutMask = 0
-				poolItems()
-				storeShopState(shopDB)
+function update(ts)
+	if currentScreen == "playerselect" then
+		if confirmUI then
+			local res = confirmUI:update(ts)
+			if currentScreen ~= "playerselect" then       -- a save was picked (enterShopFor ran)
+				confirmUI:disposeWidgets(); confirmUI = nil
+			elseif res == "cancel" then
+				sounds.Cancel:Play(); return Exit("title", nil)
 			end
+		end
+		return
+	end
+	if currentScreen == "confirm" or currentScreen == "refresh" then
+		if confirmUI then
+			if confirmUI:update(ts) == "cancel" then      -- Escape: PopUI reports it; the buttons handle the rest
+				sounds.Cancel:Play(); closeConfirm()
+			end
+		else
 			currentScreen = "shop"
 		end
 	elseif currentScreen == "shop" then
@@ -558,13 +703,9 @@ function update()
 					return Exit("title", nil)
 				-- Reroll button
 				elseif selectedItem == -1 then
-					local rerollPrice = math.floor(10 * (2 ^ executedRerolls))
-					if rerollPrice <= save.Coins then
-						currentScreen = "refresh"
-						confirmIdx = 0
-					else
-						sounds.SoldOut:Play()
-					end
+					sounds.Decide:Play()
+					currentScreen = "refresh"
+					buildRefreshUI()
 				else
 					if bigItem ~= nil and selectedItem >= #normalItems then
 						toBuyItem = bigItem
@@ -577,9 +718,10 @@ function update()
 						toBuySlot = slotIdx
 					end
 
-					if toBuyItem ~= nil and toBuyItem.SoldOut == false and toBuyItem.Price <= save.Coins then
+					if toBuyItem ~= nil and toBuyItem.SoldOut == false then
+						sounds.Decide:Play()
 						currentScreen = "confirm"
-						confirmIdx = 0
+						buildConfirmUI(toBuyItem, toBuySlot)
 					else
 						sounds.SoldOut:Play()
 					end
@@ -588,11 +730,56 @@ function update()
 	end
 end
 
+-- ── Player select + per-save shop state ────────────────────────────────────────
+
+-- commit to a save file: the shop DB is keyed by the save's SaveUID, so each save has its OWN daily
+-- rolls (falls back to slot index for saves predating the SaveUID migration).
+local function enterShopFor(index)
+	playerIndex = index
+	save = GetSaveFile(index)
+	local uid = (save.SaveUID and save.SaveUID ~= "") and save.SaveUID or ("slot" .. index)
+	DB_PREFIX = uid .. "_"
+	shopDB = DATABASE:OpenLocalDatabase("shop_state")
+	currentFreezeKey = getJstFreezeKey()
+	local storedDay = tonumber(shopDB:Read(DB_PREFIX .. "day") or "0") or 0
+	if storedDay ~= currentFreezeKey then
+		executedRerolls = 0; soldOutMask = 0; poolItems(); storeShopState(shopDB)
+	else
+		loadShopState(shopDB)
+	end
+	selectedItem = -2
+	currentScreen = "shop"
+end
+
+-- on entering the shop, pick WHICH of the 5 local saves to browse (its coins/unlocks). Skips itself
+-- when 0/1 saves exist.
+local function openShopPlayerSelect()
+	local entries = {}
+	for i = 0, 4 do
+		local sf = GetSaveFile(i)
+		if sf and sf.SaveUID and sf.SaveUID ~= "" then
+			entries[#entries + 1] = { text = ("Player %d — %s"):format(i + 1, sf.Name or ""), value = i }
+		end
+	end
+	if #entries <= 1 then enterShopFor(entries[1] and entries[1].value or 0); return end
+	if confirmUI then confirmUI:disposeWidgets() end
+	confirmUI = PopUI.new{ theme = {}, sfx = SHOP_SFX }
+	local x, y, w = 960 - 380, 210, 760
+	local h = 120 + #entries * 78 + 40
+	confirmUI:panel{ x = x, y = y, w = w, h = h, title = "Whose shop?" }
+	confirmUI:menu{ x = x + 36, y = y + 92, w = w - 72, h = #entries * 78, rowHeight = 78, items = entries,
+	                onSelect = function(_, it) enterShopFor(it.value) end }
+	confirmUI:_setFocusIndex(1)
+	currentScreen = "playerselect"
+end
+
 -- ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 function activate()
-	save = GetSaveFile(0)
+	save = nil
+	SHOP_SFX = { move = function() sounds.Skip:Play() end, click = function() sounds.Decide:Play() end }
 
+	-- (the old Confirm/Refresh/Buttons textures are no longer used — the confirm/reroll dialogs are PopUI)
 	local txNm = {
 		"Bg",
 		"Selected",
@@ -601,17 +788,13 @@ function activate()
 		"SoldOut",
 		"PriceBox",
 		"BottomPanel",
-		"BottomPanelHover",
-		"Confirm",
-		"Refresh",
-		"Buttons",
-		"ButtonsHover"
+		"BottomPanelHover"
 	}
 	for _, v in pairs(txNm) do
 		textures[v] = TEXTURE:CreateTexture("Textures/"..v..".png")
 	end
 
-	local charMap = "+-0123456789.(), "
+	local charMap = "+-0123456789.(), x"
 	TxTextChar = {}
 	for i = 1, #charMap do
 		local char = charMap:sub(i, i)
@@ -619,27 +802,11 @@ function activate()
 	end
 
 	selectedItem = -2
-	currentScreen = "shop"
-
-	-- Open persistent DB for this module, keyed per save file
-	DB_PREFIX = tostring(save.SaveId) .. "_"
-	shopDB = DATABASE:OpenLocalDatabase("shop_state")
-	currentFreezeKey = getJstFreezeKey()
-
-	-- Either pool or get the frozen shop on opening
-	local storedDay = tonumber(shopDB:Read(DB_PREFIX .. "day") or "0") or 0
-
-	if storedDay ~= currentFreezeKey then
-		executedRerolls = 0
-		soldOutMask = 0
-		poolItems()
-		storeShopState(shopDB)
-	else
-		loadShopState(shopDB)
-	end
 
 	sounds.BGM:SetLoop(true)
 	sounds.BGM:Play()
+
+	openShopPlayerSelect()   -- pick whose shop to browse (per-SaveUID rolls); enters directly if ≤1 save
 end
 
 function deactivate()
@@ -648,15 +815,18 @@ function deactivate()
 	end
 	textures = {}
 
-	for _, v in pairs(icons) do
-		v:Dispose()
+	for k, v in pairs(icons) do
+		if not sharedIcon[k] then v:Dispose() end   -- shared My Room textures are owned by the global store
 	end
 	icons = {}
+	sharedIcon = {}
 
 	-- for k, v in pairs(TxTextChar) do
 	-- 	v:Dispose()
 	-- end
 	-- TxTextChar = {}
+
+	if confirmUI then confirmUI:disposeWidgets(); confirmUI = nil end
 
 	if shopDB then shopDB:Dispose() end
 	shopDB = nil
@@ -667,6 +837,9 @@ end
 
 function onStart()
 	text = TEXT:Create(16)
+	glyphFont = TEXT:CreateGlyphCached(30)
+	STOCK_FG = COLOR:CreateColorFromHex("FFFFE9A0")
+	STOCK_BG = COLOR:CreateColorFromHex("FF000000")
 
 	sounds.Skip = SOUND:CreateSFX("Sounds/Skip.ogg")
 	sounds.Cancel = SOUND:CreateSFX("Sounds/Cancel.ogg")
@@ -680,6 +853,10 @@ end
 function onDestroy()
 	if text ~= nil then
 		text:Dispose()
+	end
+	if glyphFont ~= nil then
+		glyphFont:Dispose()
+		glyphFont = nil
 	end
 	for _, sound in pairs(sounds) do
 		sound:Dispose()

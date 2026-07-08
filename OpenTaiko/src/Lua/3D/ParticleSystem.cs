@@ -12,6 +12,9 @@ namespace OpenTaiko {
 		public double Gravity, Drag;       // m/s² downward, and velocity damping per second
 		public bool Additive;              // true = add to the framebuffer (glow), false = alpha blend
 		public int Sprite;                 // sprite id to billboard (-1 = flat square; soft circle etc.)
+		public double Rot, RotVel;         // billboard rotation (radians) + spin rate (rad/s) — leaves/petals tumble
+		public byte SizeCurve;             // 0 linear Size0→Size1, 1 ease-out, 2 pop (sin-arch: grow then die)
+		public byte FadeCurve;             // 0 linear, 1 smooth in/out, 2 flash (bright pop then long tail)
 	}
 
 	/// <summary>A pool of particles. Lua emits bursts into it, calls Update(dt) each frame, and the
@@ -23,6 +26,9 @@ namespace OpenTaiko {
 		public int Count;
 		public int Cap = 4000;   // hard cap so a stray burst can't tank the framerate (raise via PsSetCap)
 		public int CurSprite = -1;   // sprite stamped onto particles emitted next (set via PsSetSprite)
+		// stamped onto the NEXT emits like CurSprite (PsSetNextRotation / PsSetNextCurves)
+		public double CurRot, CurRotVel;
+		public byte CurSizeCurve, CurFadeCurve;
 
 		public void Add(in Particle p) {
 			if (Count >= Cap) return;

@@ -20,6 +20,7 @@ namespace OpenTaiko {
 	internal struct PhysTri {
 		public double ax, ay, az, bx, by, bz, cx, cy, cz;
 		public double nx, ny, nz;        // unit face normal
+		public int Group;                // collider group (0 = default); groups can be toggled solid/passable
 	}
 
 	public sealed class PhysicsWorld {
@@ -37,14 +38,38 @@ namespace OpenTaiko {
 		public void SetGravity(double x, double y, double z) { Gx = x; Gy = y; Gz = z; }
 		public void SetFloorMaxAngleY(double y) { FloorMaxY = y; }
 
-		public void BeginStatic() { _tris.Clear(); _grid.Clear(); }
+		// ── collider groups: tag static tris so a group can be toggled solid/passable at runtime without
+		// rebuilding the soup (trigger-streamed interiors, doors, toggleable models). Group 0 = default/always.
+		private int _curGroup = 0;
+		private bool[] _groupOff = Array.Empty<bool>();
+		public void BeginGroup(int id) { _curGroup = id < 0 ? 0 : id; }
+		public void SetGroupEnabled(int id, bool on) {
+			if (id < 0) return;
+			if (id >= _groupOff.Length) {
+				if (on) return;                              // enabled is the default — nothing to record
+				Array.Resize(ref _groupOff, id + 1);
+			}
+			_groupOff[id] = !on;
+		}
+		private bool GroupOff(int g) => g < _groupOff.Length && _groupOff[g];
+
+		public void BeginStatic() { _tris.Clear(); _grid.Clear(); _curGroup = 0; _groupOff = Array.Empty<bool>(); }
+
+		/// <summary>Release the static soup NOW (map unload): clears tris + grid AND trims their backing
+		/// storage, so a 300k-tri terrain's ~30 MB doesn't ride along into the next map (BeginStatic's
+		/// Clear keeps the capacity). Also resets the collider-group state.</summary>
+		public void ClearStatic() {
+			_tris.Clear(); _tris.TrimExcess();
+			_grid.Clear(); _grid.TrimExcess();
+			_curGroup = 0; _groupOff = Array.Empty<bool>();
+		}
 		public void AddTri(double ax, double ay, double az, double bx, double by, double bz, double cx, double cy, double cz) {
 			double ux = bx - ax, uy = by - ay, uz = bz - az;
 			double vx = cx - ax, vy = cy - ay, vz = cz - az;
 			double nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
 			double l = Math.Sqrt(nx * nx + ny * ny + nz * nz); if (l < 1e-12) return;   // degenerate
 			nx /= l; ny /= l; nz /= l;
-			_tris.Add(new PhysTri { ax = ax, ay = ay, az = az, bx = bx, by = by, bz = bz, cx = cx, cy = cy, cz = cz, nx = nx, ny = ny, nz = nz });
+			_tris.Add(new PhysTri { ax = ax, ay = ay, az = az, bx = bx, by = by, bz = bz, cx = cx, cy = cy, cz = cz, nx = nx, ny = ny, nz = nz, Group = _curGroup });
 		}
 		// also accept a quad (two tris) for convenience
 		public void AddQuad(double ax, double ay, double az, double bx, double by, double bz,
@@ -83,7 +108,10 @@ namespace OpenTaiko {
 			double qx = ty * e1z - tz * e1y, qy = tz * e1x - tx * e1z, qz = tx * e1y - ty * e1x;
 			double v = (dx * qx + dy * qy + dz * qz) * inv; if (v < 0 || u + v > 1) return false;
 			dist = (e2x * qx + e2y * qy + e2z * qz) * inv;
-			return dist > 1e-6;
+			// 1e-4 (0.1 mm), not 1e-6: rays that START on a surface (camera booms, wall probes) must not
+			// re-hit their own origin triangle through accumulated float error. Wheel rays start well
+			// above the road, so vehicles are unaffected.
+			return dist > 1e-4;
 		}
 		// Cast a ray (origin + unit-ish dir × maxDist). Returns true on the NEAREST hit within maxDist, with the
 		// hit distance and the surface normal. Iterates the grid cells the ray's XZ span touches.
@@ -96,8 +124,10 @@ namespace OpenTaiko {
 			for (int cz = z0; cz <= z1; cz++) for (int cx = x0; cx <= x1; cx++) {
 				if (!_grid.TryGetValue(Key(cx, cz), out var list)) continue;
 				for (int li = 0; li < list.Count; li++) {
-					if (RayTri(ox, oy, oz, dx, dy, dz, _tris[list[li]], out double tt) && tt < hitDist) {
-						hitDist = tt; var t = _tris[list[li]]; hnx = t.nx; hny = t.ny; hnz = t.nz; hit = true;
+					var t = _tris[list[li]];
+					if (GroupOff(t.Group)) continue;
+					if (RayTri(ox, oy, oz, dx, dy, dz, t, out double tt) && tt < hitDist) {
+						hitDist = tt; hnx = t.nx; hny = t.ny; hnz = t.nz; hit = true;
 					}
 				}
 			}
@@ -124,6 +154,9 @@ namespace OpenTaiko {
 		public void AddMesh(MeshCollider mc) { mc?.AddToWorld(this); }
 		public void RemoveBody(PhysicsBody b) { _bodies.Remove(b); }
 		public int StaticTriCount() => _tris.Count;
+		/// <summary>Backing-array capacity of the tri soup — lets the leak test assert ClearStatic's
+		/// TrimExcess deterministically (process-wide GC.GetTotalMemory is flaky under parallel tests).</summary>
+		public int StaticTriCapacity() => _tris.Capacity;
 
 		// closest point on triangle i to point p (Ericson, Real-Time Collision Detection §5.1.5)
 		private void ClosestOnTri(in PhysTri t, double px, double py, double pz, out double ox, out double oy, out double oz) {
@@ -189,7 +222,9 @@ namespace OpenTaiko {
 					for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
 						if (!_grid.TryGetValue(Key(gcx + dx, gcz + dz), out var list)) continue;
 						for (int li = 0; li < list.Count; li++) {
-							ClosestOnTri(_tris[list[li]], pxp, pyp, pzp, out double ox, out double oy, out double oz);
+							var tri = _tris[list[li]];
+							if (GroupOff(tri.Group)) continue;
+							ClosestOnTri(tri, pxp, pyp, pzp, out double ox, out double oy, out double oz);
 							double ex = pxp - ox, ey = pyp - oy, ez = pzp - oz;
 							double d2 = ex * ex + ey * ey + ez * ez;
 							if (d2 >= cr * cr || d2 < 1e-12) continue;
@@ -203,10 +238,77 @@ namespace OpenTaiko {
 			}
 		}
 
+		// ── SmoothContacts character resolution ──────────────────────────────────────────────────────
+		// The legacy CollideStatic pushes out of every overlapping tri IN LIST ORDER, one at a time. On a
+		// flat floor built from a triangle soup that catches internal edges (a shared-edge contact yields a
+		// diagonal push → the body pops/jitters while walking level ground), and at wall corners two faces
+		// push sequentially (over-shove). Here instead, per iteration: (a) GATHER every penetrating contact,
+		// (b) WELD floor seams — an edge/vertex contact whose owning face is floor-like and whose plane also
+		// separates the sphere is replaced by that face's normal (coplanar seam tris then agree on a clean
+		// vertical push), (c) apply only the DEEPEST contact and re-iterate. Walls filter passive touches
+		// (velocity clipped only when actually moving INTO the wall) and record the wall normal so the
+		// controller can steer along the tangent. Opt-in per body (characters); karts/doom are untouched.
+		private void CollideStaticSmooth(PhysicsBody b) {
+			double r = b.Radius;
+			double fty = b.FloorThresholdNy >= 0 ? b.FloorThresholdNy : FloorMaxY;
+			int iters = SlideIters + 2;
+			for (int iter = 0; iter < iters; iter++) {
+				int gcx = (int)Math.Floor(b.X / _cell), gcz = (int)Math.Floor(b.Z / _cell);
+				double bnx = 0, bny = 0, bnz = 0, bpush = 0, boy = 0; bool found = false;
+				for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
+					if (!_grid.TryGetValue(Key(gcx + dx, gcz + dz), out var list)) continue;
+					for (int li = 0; li < list.Count; li++) {
+						var t = _tris[list[li]];
+						if (GroupOff(t.Group)) continue;
+						ClosestOnTri(t, b.X, b.Y, b.Z, out double ox, out double oy, out double oz);
+						double ex = b.X - ox, ey = b.Y - oy, ez = b.Z - oz;
+						double d2 = ex * ex + ey * ey + ez * ez;
+						if (d2 >= r * r || d2 < 1e-12) continue;
+						double d = Math.Sqrt(d2);
+						double nx = ex / d, ny = ey / d, nz = ez / d;
+						double push = r - d;
+						// internal-edge weld (floor faces only): closest point on an edge/vertex → the contact
+						// normal tilts away from the face normal. If the face is walkable and its PLANE also
+						// separates the centre within r, resolve along the face normal instead — the seam's two
+						// coplanar tris then produce the same straight-up push (no diagonal catch). Wall-top
+						// edges keep the diagonal contact (t.ny below the floor cutoff), so standing on a wall
+						// never turns into a sideways shove.
+						if (t.ny > fty && nx * t.nx + ny * t.ny + nz * t.nz < 0.995) {
+							double dn = ex * t.nx + ey * t.ny + ez * t.nz;   // signed distance to the face plane
+							if (dn > 1e-9 && dn < r) { nx = t.nx; ny = t.ny; nz = t.nz; push = r - dn; }
+						}
+						if (push > bpush) { bpush = push; bnx = nx; bny = ny; bnz = nz; boy = oy; found = true; }
+					}
+				}
+				if (!found) break;
+				if (bny > fty && boy < b.Y) {
+					b.X += bnx * bpush; b.Y += bny * bpush; b.Z += bnz * bpush;
+					double vn = b.Vx * bnx + b.Vy * bny + b.Vz * bnz;
+					if (vn < 0) { b.Vx -= vn * bnx; b.Vy -= vn * bny; b.Vz -= vn * bnz; }
+					b.OnFloor = true; b.FloorNx = bnx; b.FloorNy = bny; b.FloorNz = bnz;
+				} else {
+					double hl = Math.Sqrt(bnx * bnx + bnz * bnz);
+					if (hl > 1e-6) {
+						double hnx = bnx / hl, hnz = bnz / hl;
+						b.X += hnx * bpush; b.Z += hnz * bpush;
+						double vh = b.Vx * hnx + b.Vz * hnz;
+						// clip the FULL approach velocity: leaving a residual pushes the body back in
+						// next substep and the alternating penetrate/eject reads as wall jitter
+						if (vh < 0) { b.Vx -= vh * hnx; b.Vz -= vh * hnz; }
+						b.WallHit = true; b.WallNx = hnx; b.WallNz = hnz;
+					} else if (bny < 0) {
+						b.Y += bny * bpush;                                       // ceiling: push down
+						if (b.Vy > 0) b.Vy = 0;
+					}
+				}
+			}
+		}
+
 		// resolve one body against the static soup: push out of every overlapping tri + slide its velocity
 		private void CollideStatic(PhysicsBody b) {
 			b.OnFloor = false; b.WallHit = false;
 			if (b.Shape == PhysShape.Box) { CollideBoxStatic(b); return; }
+			if (b.SmoothContacts && b.Shape == PhysShape.Sphere) { CollideStaticSmooth(b); return; }
 			double r = b.Radius;
 			for (int iter = 0; iter < SlideIters; iter++) {
 				int gcx = (int)Math.Floor(b.X / _cell), gcz = (int)Math.Floor(b.Z / _cell);
@@ -215,6 +317,7 @@ namespace OpenTaiko {
 					if (!_grid.TryGetValue(Key(gcx + dx, gcz + dz), out var list)) continue;
 					for (int li = 0; li < list.Count; li++) {
 						var t = _tris[list[li]];
+						if (GroupOff(t.Group)) continue;
 						ClosestOnTri(t, b.X, b.Y, b.Z, out double ox, out double oy, out double oz);
 						double ex = b.X - ox, ey = b.Y - oy, ez = b.Z - oz;
 						double d2 = ex * ex + ey * ey + ez * ez;
@@ -281,6 +384,26 @@ namespace OpenTaiko {
 								b.OnFloor = true; b.FloorNx = 0; b.FloorNy = 1; b.FloorNz = 0;
 							}
 						}
+					} else if (b.SmoothContacts && b.WasGrounded && !b.OnFloor && b.Vy <= 0.5) {
+						// character STEP-DOWN: walking off a stair edge / down a slope keeps the feet glued
+						// instead of a float-and-drop hop. Gated on the hit normal being walkable so the body
+						// never snaps sideways onto a wall top, and skipped when genuinely jumping (Vy > 0.5).
+						double fty2 = b.FloorThresholdNy >= 0 ? b.FloorThresholdNy : FloorMaxY;
+						if (Raycast(b.X, b.Y, b.Z, 0, -1, 0, b.Radius + 0.55, out double sd, out double snx, out double sny, out double snz) && sny > fty2) {
+							// resting height on a SLOPE is r/ny vertically (the sphere touches the plane,
+							// not the ray's hit point). Snapping to gy + r pulled the body INTO slopes by
+							// r(1/ny − 1) every frame — the push-out's horizontal component then walked it
+							// downhill: the "player slides down slopes while standing still" bug.
+							double rest = b.Radius / Math.Max(sny, 0.35);
+							double gap = sd - rest;
+							// gap 0 counts as grounded too: a body resting exactly at contact distance has
+							// no penetration for the contact pass to find, and without this it would
+							// flicker grounded/airborne every other step
+							if (gap >= -1e-9 && gap <= 0.55) {
+								b.Y -= gap > 0 ? gap : 0; if (b.Vy < 0) b.Vy = 0;
+								b.OnFloor = true; b.FloorNx = snx; b.FloorNy = sny; b.FloorNz = snz;
+							}
+						}
 					}
 					b.WasGrounded = b.OnFloor;
 				}
@@ -308,6 +431,9 @@ namespace OpenTaiko {
 				var a = _bodies[i]; if (!a.Enabled) continue;
 				for (int j = i + 1; j < _bodies.Count; j++) {
 					var c = _bodies[j]; if (!c.Enabled) continue;
+					// layer/mask filter (default layer 0 + mask ~0 = everything collides, as before).
+					// OWM3d characters run Mask=0 so the player is never blocked by NPC bodies.
+					if ((((a.Mask >> c.Layer) & 1) == 0) || (((c.Mask >> a.Layer) & 1) == 0)) continue;
 					if (Math.Abs(a.Y - c.Y) > LevelGap) continue;   // different levels (e.g. figure-8 strands) → no collision
 					// contact points (capsule-aware): closest point on each collider to the other's centre
 					ClosestXZ(a, c.X, c.Z, out double pax, out double paz);

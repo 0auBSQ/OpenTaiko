@@ -1,0 +1,202 @@
+{
+ "desk": {
+  "w": 2,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Desk",
+   "ja": "机",
+   "fr": "Bureau"
+  }
+ },
+ "chair": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Chair",
+   "ja": "椅子",
+   "fr": "Chaise"
+  }
+ },
+ "table": {
+  "w": 2,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Table",
+   "ja": "テーブル",
+   "fr": "Table"
+  }
+ },
+ "sofa": {
+  "w": 2,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Sofa",
+   "ja": "ソファ",
+   "fr": "Canapé"
+  }
+ },
+ "bookshelf": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Bookshelf",
+   "ja": "本棚",
+   "fr": "Bibliothèque"
+  }
+ },
+ "plant": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Potted Plant",
+   "ja": "観葉植物",
+   "fr": "Plante en pot"
+  }
+ },
+ "floorlamp": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Floor Lamp",
+   "ja": "フロアランプ",
+   "fr": "Lampadaire"
+  }
+ },
+ "bed": {
+  "w": 1,
+  "h": 2,
+  "place": "ground",
+  "name": {
+   "en": "Bed",
+   "ja": "ベッド",
+   "fr": "Lit"
+  }
+ },
+ "tv": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "TV",
+   "ja": "テレビ",
+   "fr": "Téléviseur"
+  }
+ },
+ "clock": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Wall Clock",
+   "ja": "壁掛け時計",
+   "fr": "Horloge murale"
+  }
+ },
+ "shelf": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Wall Shelf",
+   "ja": "壁棚",
+   "fr": "Étagère murale"
+  }
+ },
+ "poster": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Poster",
+   "ja": "ポスター",
+   "fr": "Affiche"
+  }
+ },
+ "painting": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Painting",
+   "ja": "絵画",
+   "fr": "Tableau"
+  }
+ },
+ "phone": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Phone",
+   "ja": "電話",
+   "fr": "Téléphone"
+  }
+ },
+ "computer": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Computer",
+   "ja": "パソコン",
+   "fr": "Ordinateur"
+  }
+ },
+ "arcade": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Arcade Cabinet",
+   "ja": "アーケード筐体",
+   "fr": "Borne d'arcade"
+  }
+ },
+ "arcade_neon": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Neon Arcade Cabinet",
+   "ja": "ネオンアーケード筐体",
+   "fr": "Borne d'arcade néon"
+  }
+ },
+ "pod": {
+  "w": 1,
+  "h": 1,
+  "place": "ground",
+  "name": {
+   "en": "Mysterious Pod",
+   "ja": "謎のポッド",
+   "fr": "Capsule mystérieuse"
+  }
+ },
+ "poster_nokon": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Nokon Portrait",
+   "ja": "ノコンの肖像",
+   "fr": "Portrait de Nokon"
+  }
+ },
+ "poster_bol": {
+  "w": 1,
+  "h": 1,
+  "place": "wall",
+  "name": {
+   "en": "Bol Portrait",
+   "ja": "ボルの肖像",
+   "fr": "Portrait de Bol"
+  }
+ }
+}

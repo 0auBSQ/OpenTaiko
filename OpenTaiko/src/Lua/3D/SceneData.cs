@@ -22,8 +22,22 @@ namespace OpenTaiko {
 		public bool CastShadow = true; // billboard sprites in this object cast into the sun shadow map (false = UI markers/bubbles)
 		public float DepthBias;        // polygon-offset units (GPU): <0 pulls toward camera (decals on top), >0 pushes away. 0 = off
 		public double TintR = 1, TintG = 1, TintB = 1;   // per-channel colour multiply (unlit textured)
+		public double FlatR = -1, FlatG, FlatB;          // flat albedo OVERRIDE (replaces material colour before lighting; FlatR<0 = off) — recolours one GLB part
+		public double EmR, EmG, EmB;  // emissive add (GPU): col += base * emissive; values >1 feed the diorama bloom
 		public bool Overlay;          // drawn last over a cleared depth buffer (e.g. first-person viewmodel)
 		public bool ScreenTex;        // sample the texture by screen pixel, not UV (mirrors / portals)
+		public double RippleAmp, RippleFreq, RippleSpeed;   // screen-tex sample distortion (animated water reflection)
+		public double XrayAlpha;      // >0: sprites re-draw where occluded (depth-greater silhouette at this alpha)
+		public double FresnelF0 = -1; // screen-tex mirrors: per-pixel Schlick reflectivity (F0; <0 = legacy per-vertex shade)
+		public double DeepR = -1, DeepG, DeepB;   // screen-tex water: deep colour (vShade lerps base→deep; DeepR<0 = off)
+		public string SurfaceSrc;     // screen-tex surfaces: optional CUSTOM fragment shader source
+		                              // (replaces the built-in ripple/fresnel path; null = built-in)
+		// TERRAIN SPLAT shading (GPU): blend 4 layer textures per pixel by a weight sprite instead
+		// of the per-quad dominant texture (smooth painted paths). SplatSprite < 0 = off.
+		public int SplatSprite = -1;
+		public int LayerTex1 = -1, LayerTex2 = -1, LayerTex3 = -1, LayerTex4 = -1;
+		public float SplatW = 1, SplatH = 1;      // splat coverage in world units (world.xz → splat uv)
+		public float LayerUvScale = 1;            // world units → layer-texture uv repeat (1/cellSize)
 		public double Dist;           // scratch: squared distance to camera (set each Render)
 		public int GeomVersion;       // bumped on ObjBegin; GPU rasterizer re-uploads this object's VBO only when it changes
 	}

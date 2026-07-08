@@ -54,6 +54,21 @@ namespace OpenTaiko {
 		}
 
 		public T Get() => _resource;
+
+		/// <summary>Replace the held resource with an already-built one (e.g. a texture captured from a
+		/// rendered scene rather than loaded from a path). Disposes the previous resource and bumps the
+		/// version so any in-flight async load is discarded.</summary>
+		public void Adopt(T resource) {
+			T? old;
+			lock (_lock) {
+				old = _resource;
+				_resource = resource;
+				_version++;
+			}
+			if (old != null && !ReferenceEquals(old, resource)) {
+				try { old.Dispose(); } catch { }
+			}
+		}
 	}
 
 	public class LuaSharedResourceFunc {

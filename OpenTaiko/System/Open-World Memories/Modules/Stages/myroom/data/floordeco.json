@@ -1,0 +1,9 @@
+{
+    "wood":   { "tex": "wood",   "name": { "en": "Wooden Floor", "ja": "木の床",   "fr": "Plancher en bois" } },
+    "carpet": { "tex": "carpet", "name": { "en": "Red Carpet",   "ja": "赤い絨毯", "fr": "Tapis rouge" } },
+    "stone":  { "tex": "stone",  "name": { "en": "Stone Floor",  "ja": "石の床",   "fr": "Sol en pierre" } },
+    "grass":  { "tex": "grass",  "name": { "en": "Grass Floor",  "ja": "草の床",   "fr": "Sol herbeux" } },
+    "sand":   { "tex": "sand",   "name": { "en": "Sand Floor",   "ja": "砂の床",   "fr": "Sol sablonneux" } },
+    "snow":   { "tex": "snow",   "name": { "en": "Snow Floor",   "ja": "雪の床",   "fr": "Sol enneigé" } },
+    "default_floor": { "tex": "wood", "name": { "en": "Default Floor", "ja": "標準の床", "fr": "Sol par défaut" } }
+}

@@ -40,6 +40,22 @@ namespace OpenTaiko {
 		public double FloorThresholdNy = -1;       // floor-vs-wall normal.y cutoff for THIS body (-1 = world default)
 		public void SetSnap(bool s) { Snap = s; }
 
+		// ── collision layer/mask (dynamic-vs-dynamic pass). Defaults (layer 0, mask all) keep every
+		//    existing stage byte-identical; OWM3d characters set Mask=0 so NPCs never block the player. ──
+		public int Layer = 0;                      // this body's layer index (0..30)
+		public int Mask = ~0;                      // bit i set = this body collides with Layer-i bodies
+		public void SetCollisionLayer(int l) { Layer = l < 0 ? 0 : (l > 30 ? 30 : l); }
+		public void SetCollisionMask(int m) { Mask = m; }
+
+		// ── SmoothContacts (opt-in, character controllers): gathered deepest-contact resolution with an
+		//    internal-edge weld on floor seams, passive-touch wall filtering and a floor-gated step-down
+		//    snap. Karts/doom bodies never set it, so their solver path is byte-identical. ──
+		public bool SmoothContacts;
+		public double WallNx, WallNz;              // last wall contact normal (horizontal, unit) when WallHit
+		public void SetSmoothContacts(bool on) { SmoothContacts = on; }
+		public double GetWallNx() => WallNx;
+		public double GetWallNz() => WallNz;
+
 		public void SetPos(double x, double y, double z) { X = x; Y = y; Z = z; }
 		public void SetVelocity(double x, double y, double z) { Vx = x; Vy = y; Vz = z; }
 		public void AddVelocity(double x, double y, double z) { Vx += x; Vy += y; Vz += z; }

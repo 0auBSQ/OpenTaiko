@@ -15,12 +15,19 @@ namespace OpenTaiko {
 			return jsonNode;
 		}
 
+		// Null/shape-safe extraction: Lua indexes JsonNodes freely (node["maybe-missing"]), so a
+		// missing key hands us null and a wrong-typed value throws on the cast — either took the
+		// whole stage down (the "opening the computer crashes" bug). Missing/invalid = 0 / null.
 		public double ExtractNumber(JsonValue x) {
-			return (double)x;
+			if (x == null) return 0;
+			try { return (double)x; } catch { }
+			try { return (string)x is string s && double.TryParse(s, out double v) ? v : 0; } catch { return 0; }
 		}
 
 		public string ExtractText(JsonValue x) {
-			return (string)x;
+			if (x == null) return null;
+			try { return (string)x; } catch { }
+			try { return x.ToString(); } catch { return null; }
 		}
 
 		public Dictionary<string, object> JsonParseFile(string name) {

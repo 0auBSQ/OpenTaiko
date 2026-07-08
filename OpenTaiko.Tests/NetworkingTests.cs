@@ -13,6 +13,14 @@ namespace OpenTaikoTests {
 	// AES-GCM frames — exactly the code path two machines would exercise, minus the LAN.
 	[Collection("net")]   // sequential: every test owns its port + the wall clock
 	public class NetworkingTests {
+		public NetworkingTests() {
+			// TjaParsingTests installs a process-wide ConfigIni (CTja needs one) whose DEFAULT gates
+			// LuaNetworking off — which silently killed every networking test that ran after it.
+			// The gate is a product safety default, not what these tests probe: force it open here.
+			if (OpenTaiko.OpenTaiko.ConfigIni != null)
+				OpenTaiko.OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections = true;
+		}
+
 		private static int _portSeq = 42400;
 		private static int NextPort() => Interlocked.Increment(ref _portSeq);
 

@@ -200,6 +200,9 @@ internal class SaveFile {
 		[JsonProperty("saveId")]
 		public Int64 SaveId = 0;
 
+		[JsonProperty("saveUID")]
+		public string SaveUID = "";   // uuid4, unique per save; keys per-save data such as the My Room save
+
 		[JsonProperty("name")]
 		public string Name = "プレイヤー1";
 

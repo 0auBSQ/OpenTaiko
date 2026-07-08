@@ -4273,10 +4273,14 @@ internal class CTja : CActivity {
 			//実は曲の読み込みはマルチスレッドで実行されているのでnullにした瞬間に参照される可能性も十分にある
 			//それならアプリが終了するんじゃないかと思ったのだけどtryを使ってい曲の読み込みを続行していた...
 			//いやーマルチスレッドって難しいね!
-			if (!string.IsNullOrEmpty(OpenTaiko.Skin.Game_Lyric_FontName)) {
-				this.pfLyricsFont = new CCachedFontRenderer(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize);
-			} else {
-				this.pfLyricsFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, OpenTaiko.Skin.Game_Lyric_FontSize);
+			// Skin can be null here (the skin-reload race described above, and headless test runs):
+			// skip the lyric font then; normal loads create it as before.
+			if (OpenTaiko.Skin != null) {
+				if (!string.IsNullOrEmpty(OpenTaiko.Skin.Game_Lyric_FontName)) {
+					this.pfLyricsFont = new CCachedFontRenderer(OpenTaiko.Skin.Game_Lyric_FontName, OpenTaiko.Skin.Game_Lyric_FontSize);
+				} else {
+					this.pfLyricsFont = new CCachedFontRenderer(CFontRenderer.DefaultFontName, OpenTaiko.Skin.Game_Lyric_FontSize);
+				}
 			}
 		}
 		this.listWAV = new Dictionary<int, CWAV>();

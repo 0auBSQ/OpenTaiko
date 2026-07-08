@@ -531,6 +531,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	/// note this forces a GPU sync, so use it for one-off operations, not per frame.
 	/// </summary>
 	public byte[]? ReadPixelsRGBA(out int width, out int height) {
+		tRealizeDeferred();   // a never-drawn lazy texture still has pixels to give
 		width = this.szImageSize.Width;
 		height = this.szImageSize.Height;
 		if (Pointer == 0 || width <= 0 || height <= 0) return null;
@@ -636,9 +637,11 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// Read only the header dimensions now and defer the pixel decode + GL upload to first draw,
 		// so undrawn textures never reach GPU memory.
 		// Skip when maxDimension clamps the size: the header is full-size and would misreport Width/Height.
+		// Skip under SyncForce: the caller needs the PIXELS now (e.g. RegisterSpriteFromTexture reads them
+		// back immediately) — deferring here left Pointer==0 and every billboard sprite registered empty.
 		try {
 			using var codec = SKCodec.Create(strFileName);
-			if (maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
+			if (!SyncForce && maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
 				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
 				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 				// t2DDraw reads rcFullImage before the deferred upload sets it, so set it here too.
@@ -733,6 +736,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	// (first draw or after eviction).
 	private void tCacheOnDraw() {
 		_lastDrawnTick = (uint)Game.TimeMs;
+		tRealizeDeferred();
+	}
+
+	// Realize a deferred/evicted texture NOW (decode from _sourcePath + GL upload). Also used by
+	// ReadPixelsRGBA: a readback must see the pixels even if the texture was never drawn.
+	private void tRealizeDeferred() {
 		if (Pointer == 0 && _deferred && _sourcePath != null && !bDisposeCompleteDone) {
 			_deferred = false;
 			try { using SKBitmap bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension); if (bmp != null) MakeTexture(bmp, _sourceBlackTransparent); }

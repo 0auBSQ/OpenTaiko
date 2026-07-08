@@ -149,6 +149,7 @@ internal class DBSaves {
 			SaveFile sf = new SaveFile();
 
 			sf.data.SaveId = (Int64)reader["SaveId"];
+			sf.data.SaveUID = reader["SaveUID"] as string ?? "";
 			sf.data.Name = (string)reader["PlayerName"];
 			sf.data.Title = (string)reader["PlayerNameplateTitle"];
 			sf.data.Dan = (string)reader["PlayerDanTitle"];

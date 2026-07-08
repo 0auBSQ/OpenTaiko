@@ -16,7 +16,10 @@ namespace OpenTaiko {
 	/// animated models render through the existing rasterizer with no new draw path.
 	/// </summary>
 	public sealed class GltfModel : IModel {
-		private sealed class Prim { public float[] Pos, Uv, Wt; public int[] Jt, Idx; public int Mat; }
+		// Node/Skinned: which scene node placed this primitive (glTF node TRS applies to non-skinned
+		// meshes; skinned meshes are posed purely by their joints per the glTF spec). Node -1 = raw
+		// (legacy models whose meshes are not referenced by any node).
+		private sealed class Prim { public float[] Pos, Uv, Wt; public int[] Jt, Idx; public int Mat; public int Node = -1; public bool Skinned; }
 		private sealed class Node { public double[] T = {0,0,0}; public double[] R = {0,0,0,1}; public double[] S = {1,1,1}; public int[] Children = Array.Empty<int>(); }
 		private sealed class Channel { public int Node, Path, Stride; public double[] Times; public float[] Vals; } // Path 0=T,1=R,2=S
 		private sealed class Anim { public string Name = ""; public double Dur; public List<Channel> Ch = new(); }
@@ -29,7 +32,12 @@ namespace OpenTaiko {
 		private readonly List<int> _roots = new();
 		private readonly List<Anim> _anims = new();
 		private int[] _matRgb = Array.Empty<int>();
+		private string[] _matNames = Array.Empty<string>();
+		private double[][] _matEmissive = Array.Empty<double[]>();   // glTF emissiveFactor per material (rgb 0..1)
 		private int _texBase = -1;
+		// optional part→scene-object routing (OWM3d per-part material flags): parts not in the map go to
+		// the Pose call's default objId. A "part" is one primitive instance (see PartCount()).
+		private readonly Dictionary<int, int> _partObj = new();
 
 		// scratch (reused each Pose; Pose is called single-threaded from the stage update)
 		private double[][] _local = Array.Empty<double[]>();
@@ -61,39 +69,40 @@ namespace OpenTaiko {
 			if (_matRgb.Length == 0) { scene.RegisterTexturePixels(_texBase, new int[4] { 0xB0A090, 0xB0A090, 0xB0A090, 0xB0A090 }, 2, 2); }
 		}
 
-		// ── public skinning entry: write the posed model into scene object `objId` ──────────
-		public void Pose(Lua3DScene scene, int objId, int anim, double time, double x, double y, double z, double yawDeg, double scale) {
-			// local node matrices from bind, overridden by the animation
+		// ── pose math shared by Pose / BuildCollider / GetBounds ─────────────────────────────
+
+		// node local→global matrices (bind pose, or sampled from animation `anim` at `time`) + joint bones
+		private void ComputeGlobals(int anim, double time) {
 			for (int i = 0; i < _nodes.Length; i++) {
 				var n = _nodes[i];
 				_tT[0]=n.T[0]; _tT[1]=n.T[1]; _tT[2]=n.T[2];
 				_tR[0]=n.R[0]; _tR[1]=n.R[1]; _tR[2]=n.R[2]; _tR[3]=n.R[3];
 				_tS[0]=n.S[0]; _tS[1]=n.S[1]; _tS[2]=n.S[2];
-                if (anim >= 0 && anim < _anims.Count) SampleNode(_anims[anim], i, time);
+				if (anim >= 0 && anim < _anims.Count) SampleNode(_anims[anim], i, time);
 				TRS(_tT, _tR, _tS, _local[i]);
 			}
-			// global matrices (parents already precede children in our generator, but be safe)
 			for (int i = 0; i < _nodes.Length; i++) {
 				int p = _parent[i];
 				if (p < 0) Array.Copy(_local[i], _global[i], 16);
 				else Mul(_global[p], _local[i], _global[i]);
 			}
 			for (int j = 0; j < _jointNodes.Length; j++) Mul(_global[_jointNodes[j]], _ibm[j], _bone[j]);
+		}
 
-			// instance world matrix W = T(x,y,z) * Ry(yaw) * S(scale) — column-major
-			double yr = yawDeg * Math.PI / 180.0, c = Math.Cos(yr), s = Math.Sin(yr);
-			double w0 = c * scale, w2 = -s * scale, w8 = s * scale, w10 = c * scale, w5 = scale;
-
-			scene.ObjBegin(objId);
-			var light = (lx: 0.35, ly: 0.82, lz: 0.45);
-			foreach (var pr in _prims) {
-				int texId = _texBase + (pr.Mat >= 0 ? pr.Mat : 0);
-				int nv = pr.Pos.Length / 3;
-				EnsureSkin(nv);
-				// skin every vertex once
-				for (int v = 0; v < nv; v++) {
-					double px = pr.Pos[v*3], py = pr.Pos[v*3+1], pz = pr.Pos[v*3+2];
-					double ax=0, ay=0, az=0;
+		// transform one primitive's vertices to MODEL space into _skx/_sky/_skz:
+		//  • skinned prim  → linear blend skinning (joints already produce model space)
+		//  • node-placed   → the node's global TRS (static glTF meshes: chairs, buildings, …)
+		//  • raw           → pass-through (legacy models whose meshes have no referencing node)
+		private void TransformPrim(Prim pr) {
+			int nv = pr.Pos.Length / 3;
+			EnsureSkin(nv);
+			bool skin = pr.Skinned && _bone.Length > 0;
+			double[] g = (!skin && pr.Node >= 0 && pr.Node < _global.Length) ? _global[pr.Node] : null;
+			for (int v = 0; v < nv; v++) {
+				double px = pr.Pos[v*3], py = pr.Pos[v*3+1], pz = pr.Pos[v*3+2];
+				double ax, ay, az;
+				if (skin) {
+					ax = 0; ay = 0; az = 0;
 					for (int k = 0; k < 4; k++) {
 						double wgt = pr.Wt[v*4+k];
 						if (wgt == 0) continue;
@@ -104,12 +113,47 @@ namespace OpenTaiko {
 						ay += wgt * (b[1]*px + b[5]*py + b[9]*pz + b[13]);
 						az += wgt * (b[2]*px + b[6]*py + b[10]*pz + b[14]);
 					}
-					// apply instance transform W
+				} else if (g != null) {
+					ax = g[0]*px + g[4]*py + g[8]*pz + g[12];
+					ay = g[1]*px + g[5]*py + g[9]*pz + g[13];
+					az = g[2]*px + g[6]*py + g[10]*pz + g[14];
+				} else {
+					ax = px; ay = py; az = pz;
+				}
+				_skx[v] = ax; _sky[v] = ay; _skz[v] = az;
+			}
+		}
+
+		// ── public skinning entry: write the posed model into scene object(s) ───────────────
+		// Parts routed elsewhere via SetPartObject land in their own object (per-part material flags);
+		// everything else goes to `objId`.
+		public void Pose(Lua3DScene scene, int objId, int anim, double time, double x, double y, double z, double yawDeg, double scale) {
+			ComputeGlobals(anim, time);
+
+			// instance world matrix W = T(x,y,z) * Ry(yaw) * S(scale) — column-major
+			double yr = yawDeg * Math.PI / 180.0, c = Math.Cos(yr), s = Math.Sin(yr);
+			double w0 = c * scale, w2 = -s * scale, w8 = s * scale, w10 = c * scale, w5 = scale;
+
+			// begin the default object + every distinct routed object exactly once
+			scene.ObjBegin(objId);
+			if (_partObj.Count > 0) {
+				foreach (var kv in _partObj)
+					if (kv.Value != objId) scene.ObjBegin(kv.Value);
+			}
+
+			var light = (lx: 0.35, ly: 0.82, lz: 0.45);
+			for (int p = 0; p < _prims.Count; p++) {
+				var pr = _prims[p];
+				int target = (_partObj.Count > 0 && _partObj.TryGetValue(p, out int mapped)) ? mapped : objId;
+				int texId = _texBase + (pr.Mat >= 0 ? pr.Mat : 0);
+				TransformPrim(pr);
+				int nv = pr.Pos.Length / 3;
+				for (int v = 0; v < nv; v++) {          // model space → world (instance transform)
+					double ax = _skx[v], ay = _sky[v], az = _skz[v];
 					_skx[v] = w0*ax + w8*az + x;
 					_sky[v] = w5*ay + y;
 					_skz[v] = w2*ax + w10*az + z;
 				}
-				// emit triangles
 				var idx = pr.Idx;
 				for (int t = 0; t < idx.Length; t += 3) {
 					int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
@@ -122,11 +166,81 @@ namespace OpenTaiko {
 					double nl=Math.Sqrt(nx*nx+ny*ny+nz*nz); if (nl>1e-9){nx/=nl;ny/=nl;nz/=nl;}
 					double nd=nx*light.lx+ny*light.ly+nz*light.lz; if (nd<0) nd=-nd;
 					double shade=0.5+0.5*nd;
-					scene.ObjAddTriTex(objId,
+					scene.ObjAddTriTex(target,
 						x0,y0,z0, pr.Uv[i0*2], pr.Uv[i0*2+1],
 						x1,y1,z1, pr.Uv[i1*2], pr.Uv[i1*2+1],
 						x2,y2,z2, pr.Uv[i2*2], pr.Uv[i2*2+1],
 						texId, shade);
+				}
+			}
+		}
+
+		// ── OWM3d per-part API (parts = primitive instances) ────────────────────────────────
+		public int PartCount() => _prims.Count;
+		public int PartMaterial(int part) => (part >= 0 && part < _prims.Count) ? _prims[part].Mat : -1;
+		public string MaterialName(int mat) => (mat >= 0 && mat < _matNames.Length) ? _matNames[mat] : "";
+		public int MaterialCount() => _matRgb.Length;
+		/// <summary>glTF emissiveFactor of a material (0,0,0 when none) — lets stages auto-mark glowing parts.</summary>
+		public (double r, double g, double b) MaterialEmissive(int mat) {
+			if (mat < 0 || mat >= _matEmissive.Length || _matEmissive[mat] == null) return (0, 0, 0);
+			var e = _matEmissive[mat];
+			return (e[0], e[1], e[2]);
+		}
+		/// <summary>Route a part's triangles into their own scene object on Pose (so the stage can set
+		/// transparency/emissive/mirror flags on just that part). objId -1 clears the routing.</summary>
+		public void SetPartObject(int part, int objId) {
+			if (part < 0 || part >= _prims.Count) return;
+			if (objId < 0) _partObj.Remove(part); else _partObj[part] = objId;
+		}
+		/// <summary>Drop ALL part→object routing. Models are file-cached (shared instances), so a world
+		/// that used SetPartObject must clear the routing on unload — object ids restart after a scene
+		/// clear, and stale routing would pour parts into unrelated new objects.</summary>
+		public void ClearPartObjects() => _partObj.Clear();
+
+		/// <summary>Model-space bind-pose AABB (for auto box colliders / placement bounds).</summary>
+		public (double minX, double minY, double minZ, double maxX, double maxY, double maxZ) GetBounds() {
+			ComputeGlobals(-1, 0);
+			double mnx = double.MaxValue, mny = double.MaxValue, mnz = double.MaxValue;
+			double mxx = double.MinValue, mxy = double.MinValue, mxz = double.MinValue;
+			foreach (var pr in _prims) {
+				TransformPrim(pr);
+				int nv = pr.Pos.Length / 3;
+				for (int v = 0; v < nv; v++) {
+					if (_skx[v] < mnx) mnx = _skx[v]; if (_skx[v] > mxx) mxx = _skx[v];
+					if (_sky[v] < mny) mny = _sky[v]; if (_sky[v] > mxy) mxy = _sky[v];
+					if (_skz[v] < mnz) mnz = _skz[v]; if (_skz[v] > mxz) mxz = _skz[v];
+				}
+			}
+			if (mnx > mxx) return (0, 0, 0, 0, 0, 0);   // no geometry
+			return (mnx, mny, mnz, mxx, mxy, mxz);
+		}
+
+		/// <summary>Bake the bind-pose triangles, placed at the given world transform, into a
+		/// <see cref="MeshCollider"/> (feed it to PhysicsWorld:AddMesh between BeginStatic/EndStatic).</summary>
+		public void BuildCollider(MeshCollider mc, double x, double y, double z, double yawDeg, double scale) {
+			if (mc == null) return;
+			if (scale < 0) {   // a mirrored bake flips the winding → inward normals → broken collision
+				System.Diagnostics.Trace.TraceWarning("GltfModel.BuildCollider: negative scale is not supported; using its magnitude.");
+				scale = -scale;
+			}
+			ComputeGlobals(-1, 0);
+			double yr = yawDeg * Math.PI / 180.0, c = Math.Cos(yr), s = Math.Sin(yr);
+			double w0 = c * scale, w2 = -s * scale, w8 = s * scale, w10 = c * scale, w5 = scale;
+			foreach (var pr in _prims) {
+				TransformPrim(pr);
+				int nv = pr.Pos.Length / 3;
+				for (int v = 0; v < nv; v++) {
+					double ax = _skx[v], ay = _sky[v], az = _skz[v];
+					_skx[v] = w0*ax + w8*az + x;
+					_sky[v] = w5*ay + y;
+					_skz[v] = w2*ax + w10*az + z;
+				}
+				var idx = pr.Idx;
+				for (int t = 0; t < idx.Length; t += 3) {
+					int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
+					mc.AddTri(_skx[i0], _sky[i0], _skz[i0],
+					          _skx[i1], _sky[i1], _skz[i1],
+					          _skx[i2], _sky[i2], _skz[i2]);
 				}
 			}
 		}
@@ -179,7 +293,26 @@ namespace OpenTaiko {
 		}
 
 		// ── GLB parsing ──────────────────────────────────────────────────────────────────────
+		// FILE CACHE: Load returns one shared instance per file for the process lifetime. Reparsing the
+		// same GLB on every map/stage load was the dominant memory leak: each reload claimed a fresh
+		// 256-id texture range (_nextBase) and re-decoded every base-colour texture into new pixel
+		// buffers that the scene registry then kept forever. Sharing is safe — geometry/anims are
+		// read-only after parse, Register() re-registers the same ids into any scene, and Pose targets
+		// caller-supplied objects. The one shared MUTABLE bit is the SetPartObject routing map, which is
+		// per-file now: clear it (ClearPartObjects) when a world unloads so stale object ids never route
+		// parts into a rebuilt scene. CPU pixel buffers are kept so later scenes (model-icon previews)
+		// can Register too — bounded at ≤ ~1 MB × the distinct files shipped.
+		private static readonly Dictionary<string, GltfModel> _fileCache = new(StringComparer.OrdinalIgnoreCase);
+		public static void PurgeFileCache() { lock (_fileCache) _fileCache.Clear(); }
 		public static GltfModel Load(string path) {
+			string key;
+			try { key = Path.GetFullPath(path); } catch { key = path; }
+			lock (_fileCache) if (_fileCache.TryGetValue(key, out var hit)) return hit;
+			var fresh = LoadUncached(path);
+			lock (_fileCache) _fileCache[key] = fresh;
+			return fresh;
+		}
+		private static GltfModel LoadUncached(string path) {
 			byte[] bytes = File.ReadAllBytes(path);
 			byte[] bin; string json;
 			if (BitConverter.ToUInt32(bytes, 0) == 0x46546C67) {                 // "glTF" → GLB
@@ -232,8 +365,13 @@ namespace OpenTaiko {
 			if (root.TryGetProperty("materials", out var mats)) {
 				int nm = mats.GetArrayLength();
 				g._matRgb = new int[nm];
+				g._matNames = new string[nm];
+				g._matEmissive = new double[nm][];
 				g._matPix = new int[nm][]; g._matTexW = new int[nm]; g._matTexH = new int[nm];
 				for (int m = 0; m < nm; m++) {
+					g._matNames[m] = mats[m].TryGetProperty("name", out var mnEl) ? (mnEl.GetString() ?? "") : "";
+					if (mats[m].TryGetProperty("emissiveFactor", out var emEl) && emEl.GetArrayLength() >= 3)
+						g._matEmissive[m] = new[] { emEl[0].GetDouble(), emEl[1].GetDouble(), emEl[2].GetDouble() };
 					int rgb = 0xC0C0C0; int texIdx = -1;
 					if (mats[m].TryGetProperty("pbrMetallicRoughness", out var pbr)) {
 						if (pbr.TryGetProperty("baseColorFactor", out var bc)) {
@@ -282,33 +420,41 @@ namespace OpenTaiko {
 				}
 			}
 
-			// meshes → primitives (gathers all meshes' primitives; nodes reference a mesh but for our
-			// single-skinned-mesh generator the geometry is in mesh 0 / a few primitives)
+			// meshes → primitive TEMPLATES (per mesh); instanced per referencing node below so static
+			// glTF models (chairs, buildings — geometry placed via node TRS) come out assembled
+			var meshTemplates = new List<List<Prim>>();
 			if (root.TryGetProperty("meshes", out var meshes)) {
 				foreach (var mesh in meshes.EnumerateArray()) {
+					var list = new List<Prim>();
 					foreach (var prim in mesh.GetProperty("primitives").EnumerateArray()) {
 						var att = prim.GetProperty("attributes");
+						if (!att.TryGetProperty("POSITION", out var posA)) continue;
+						if (!prim.TryGetProperty("indices", out var idxA)) continue;   // non-indexed: skip (rare)
 						var pr = new Prim {
-							Pos = ReadF(att.GetProperty("POSITION").GetInt32(), 3),
+							Pos = ReadF(posA.GetInt32(), 3),
 							Uv  = att.TryGetProperty("TEXCOORD_0", out var uvA) ? ReadF(uvA.GetInt32(), 2) : null,
 							Wt  = att.TryGetProperty("WEIGHTS_0", out var wA) ? ReadF(wA.GetInt32(), 4) : null,
 							Jt  = att.TryGetProperty("JOINTS_0", out var jA) ? ReadI(jA.GetInt32()) : null,
-							Idx = ReadI(prim.GetProperty("indices").GetInt32()),
+							Idx = ReadI(idxA.GetInt32()),
 							Mat = prim.TryGetProperty("material", out var mi) ? mi.GetInt32() : 0,
 						};
 						int nv = pr.Pos.Length / 3;
 						if (pr.Uv == null) pr.Uv = new float[nv * 2];
 						if (pr.Wt == null) { pr.Wt = new float[nv * 4]; for (int v = 0; v < nv; v++) pr.Wt[v*4] = 1; }
 						if (pr.Jt == null) pr.Jt = new int[nv * 4];
-						g._prims.Add(pr);
+						list.Add(pr);
 					}
+					meshTemplates.Add(list);
 				}
 			}
 
-			// nodes
+			// nodes (+ which mesh/skin each node references, for the expansion below)
+			int[] nodeMesh = Array.Empty<int>();
+			bool[] nodeSkin = Array.Empty<bool>();
 			if (root.TryGetProperty("nodes", out var nodesEl)) {
 				int nc = nodesEl.GetArrayLength();
 				g._nodes = new Node[nc]; g._parent = new int[nc];
+				nodeMesh = new int[nc]; nodeSkin = new bool[nc];
 				for (int i = 0; i < nc; i++) {
 					var nd = nodesEl[i]; var node = new Node();
 					if (nd.TryGetProperty("translation", out var tt)) node.T = new[]{ tt[0].GetDouble(), tt[1].GetDouble(), tt[2].GetDouble() };
@@ -319,10 +465,33 @@ namespace OpenTaiko {
 						for (int k = 0; k < c.Length; k++) c[k] = ch[k].GetInt32();
 						node.Children = c;
 					}
+					nodeMesh[i] = nd.TryGetProperty("mesh", out var nm2) ? nm2.GetInt32() : -1;
+					nodeSkin[i] = nd.TryGetProperty("skin", out _);
 					g._nodes[i] = node; g._parent[i] = -1;
 				}
 				for (int i = 0; i < nc; i++) foreach (var c in g._nodes[i].Children) g._parent[c] = i;
 				for (int i = 0; i < nc; i++) if (g._parent[i] < 0) g._roots.Add(i);
+			}
+
+			// expand node→mesh references into primitive instances (Node carries the placement TRS;
+			// skinned nodes pose via joints instead, per the glTF spec). Models whose meshes aren't
+			// referenced by any node (our legacy procedural generator) keep the old all-meshes behaviour.
+			bool anyNodeMesh = false;
+			for (int i = 0; i < nodeMesh.Length; i++) {
+				int mi2 = nodeMesh[i];
+				if (mi2 < 0 || mi2 >= meshTemplates.Count) continue;
+				anyNodeMesh = true;
+				foreach (var tpl in meshTemplates[mi2]) {
+					g._prims.Add(new Prim {
+						Pos = tpl.Pos, Uv = tpl.Uv, Wt = tpl.Wt, Jt = tpl.Jt, Idx = tpl.Idx, Mat = tpl.Mat,
+						Node = i, Skinned = nodeSkin[i],
+					});
+				}
+			}
+			if (!anyNodeMesh) {
+				bool hasSkin = root.TryGetProperty("skins", out var sk0) && sk0.GetArrayLength() > 0;
+				foreach (var list in meshTemplates)
+					foreach (var tpl in list) { tpl.Node = -1; tpl.Skinned = hasSkin; g._prims.Add(tpl); }
 			}
 
 			// skin

@@ -17,6 +17,12 @@
 			}
 		}
 
+		public string SaveUID {
+			get {
+				return _sf.data.SaveUID;
+			}
+		}
+
 		public LuaNameplateInfo NameplateInfo {
 			get {
 				int _npId = _sf.data.TitleId;

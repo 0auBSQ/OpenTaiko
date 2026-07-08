@@ -58,6 +58,8 @@ namespace OpenTaiko {
 		internal readonly Dictionary<int, int[]> _texPix = new();
 		internal readonly Dictionary<int, int> _texW = new();
 		internal readonly Dictionary<int, int> _texH = new();
+		// per-texture GPU sampling filter: 0 nearest (default), 1 linear, 2 mipmap. CPU renderers ignore it.
+		internal readonly Dictionary<int, int> _texFilter = new();
 		// bumped whenever a texture's pixels change (e.g. a per-frame mirror RTT); the GPU renderer compares
 		// it to know when to re-upload that texture's GL copy instead of using its cached (stale) upload.
 		internal readonly Dictionary<int, int> _texRev = new();
@@ -195,6 +197,7 @@ namespace OpenTaiko {
 
 		public void RenderView(int texId, double cx, double cy, double cz, double yawDeg, double pitchDeg,
 			double fovDeg, int clr, int clg, int clb, int flipX) {
+			_reflectTrue.Remove(texId);                       // legacy path reclaims this id's flip convention
 			int rw = _w >> _rttShift, rh = _h >> _rttShift;   // reduced render size
 			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
 			int ow = _w, oh = _h;
@@ -207,6 +210,18 @@ namespace OpenTaiko {
 			// mirrored. Without this the reflection pans the wrong way as the player turns.
 			if (flipX != 0) { _Rx = -_Rx; _Ry = -_Ry; _Rz = -_Rz; }
 
+			// GPU path (opt-in, SetReflectionGpu): render into a dedicated FBO/texture that the mirror
+			// surface samples directly — no CPU rasterise, no pixel upload. Falls through to the CPU
+			// capture when the GPU renderer isn't active.
+			if (_reflectGpu && _renderer == (IRenderer?)_gpuRasterizer && _gpuRasterizer != null) {
+				try { _gpuRasterizer.RenderToTexture(this, texId, rw, rh, clr, clg, clb); }
+				catch { /* fall back to CPU next frame if the driver rejects it */ _reflectGpu = false; }
+				_rttPass = false;
+				_w = ow; _h = oh;
+				SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
+				return;
+			}
+
 			// Reflections/portals always render with the CPU rasterizer into a small canvas, then upload as
 			// texId. The GPU off-screen path (GpuRasterizer.RenderToTexture) had persistent driver issues with
 			// >1 live reflection on this hardware (the main view lost geometry + portals failed to capture), so
@@ -216,6 +231,7 @@ namespace OpenTaiko {
 			{
 				var sc = _canvas; var sd = _depth;
 				if (!_rttCanvases.TryGetValue(texId, out _rttCanvas) || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+					_rttCanvas?.Dispose();   // stale-size canvas for this texId (render-scale change) — free, don't orphan
 					_rttCanvas = new LuaCanvas(rw, rh); _rttCanvases[texId] = _rttCanvas;
 					_rttDepth = new float[rw * rh]; _rttDepths[texId] = _rttDepth;
 				} else {
@@ -234,6 +250,140 @@ namespace OpenTaiko {
 
 			_w = ow; _h = oh;
 			SetCameraPosition(ox, oy, oz); SetCameraFov(ofov); SetCameraAngles(oyaw, opit);
+		}
+
+		// ── TRUE planar reflection (correct-by-construction) ─────────────────────────────────────────
+		// The legacy RenderView(flipX) only negates the camera RIGHT axis — that is a mirror composed
+		// with a 180° roll, which uRttFlip then half-compensates; horizontal planes (water) pan the
+		// wrong way. Here the eye AND all three basis vectors are reflected about the plane (det −1),
+		// which guarantees pixel-project(reflected cam, mirror(P)) == pixel-project(main cam, P) — the
+		// mode-3 same-pixel sampling is then exact. A fragment clip plane discards geometry below the
+		// mirror so it can't occlude the reflection. egg's mirrors/portals keep the old RenderView.
+		internal bool _clipOn; internal double _clipNx, _clipNy, _clipNz, _clipD;
+		internal readonly HashSet<int> _reflectTrue = new();   // texIds captured with the TRUE reflected basis
+
+		/// <summary>Reflect a direction vector about the (unit) plane normal, in place.</summary>
+		public static void ReflectVec(double nx, double ny, double nz, ref double x, ref double y, ref double z) {
+			double d = 2 * (x * nx + y * ny + z * nz);
+			x -= d * nx; y -= d * ny; z -= d * nz;
+		}
+
+		/// <summary>Render the scene's TRUE planar reflection about the plane through (px,py,pz) with
+		/// normal (nx,ny,nz) into texture <paramref name="texId"/> (reduced res per SetReflectionScale).
+		/// GPU off-screen pass when SetReflectionGpu is on; CPU capture fallback otherwise (the clip
+		/// plane only applies on the GPU). clr/g/b clears the backdrop (pass the sky horizon).</summary>
+		public void RenderViewReflect(int texId, double px, double py, double pz,
+			double nx, double ny, double nz, int clr, int clg, int clb) {
+			double nl = Math.Sqrt(nx * nx + ny * ny + nz * nz);
+			if (nl < 1e-9) return;
+			nx /= nl; ny /= nl; nz /= nl;
+			int rw = _w >> _rttShift, rh = _h >> _rttShift;
+			if (rw < 1) rw = 1; if (rh < 1) rh = 1;
+			int ow = _w, oh = _h;
+			double ox = _camX, oy = _camY, oz = _camZ, oscale = _scale;
+			double sRx = _Rx, sRy = _Ry, sRz = _Rz, sUx = _Ux, sUy = _Uy, sUz = _Uz, sFx = _Fx, sFy = _Fy, sFz = _Fz;
+
+			_w = rw; _h = rh;
+			_scale = (_h * 0.5) / Math.Tan(_fov * 0.5 * Math.PI / 180.0);
+			_rttPass = true;
+			double dist = (_camX - px) * nx + (_camY - py) * ny + (_camZ - pz) * nz;
+			_camX -= 2 * dist * nx; _camY -= 2 * dist * ny; _camZ -= 2 * dist * nz;
+			ReflectVec(nx, ny, nz, ref _Rx, ref _Ry, ref _Rz);
+			ReflectVec(nx, ny, nz, ref _Ux, ref _Uy, ref _Uz);
+			ReflectVec(nx, ny, nz, ref _Fx, ref _Fy, ref _Fz);
+			_clipOn = true; _clipNx = nx; _clipNy = ny; _clipNz = nz;
+			_clipD = -(px * nx + py * ny + pz * nz) + 0.02;   // 2 cm skirt below the plane avoids waterline cracks
+			_reflectTrue.Add(texId);
+			Revision++;
+
+			bool gpuDone = false;
+			if (_reflectGpu && _renderer == (IRenderer?)_gpuRasterizer && _gpuRasterizer != null) {
+				try { _gpuRasterizer.RenderToTexture(this, texId, rw, rh, clr, clg, clb); gpuDone = true; }
+				catch { _reflectGpu = false; }
+			}
+			if (!gpuDone) {
+				// CPU capture (same as RenderView's; the clip plane is GPU-only — at 1/16 res the
+				// below-plane bleed is invisible under the ripple)
+				var sc = _canvas; var sd = _depth;
+				if (!_rttCanvases.TryGetValue(texId, out _rttCanvas) || _rttCanvas._w != rw || _rttCanvas._h != rh) {
+					_rttCanvas?.Dispose();
+					_rttCanvas = new LuaCanvas(rw, rh); _rttCanvases[texId] = _rttCanvas;
+					_rttDepth = new float[rw * rh]; _rttDepths[texId] = _rttDepth;
+				} else {
+					_rttDepth = _rttDepths[texId];
+				}
+				_canvas = _rttCanvas; _depth = _rttDepth;
+				_rttCanvas.Clear(clr, clg, clb, 255);
+				_rasterizer.Render(this);
+				if (!_rttBufs.TryGetValue(texId, out var px2) || px2.Length != rw * rh) { px2 = new int[rw * rh]; _rttBufs[texId] = px2; }
+				var buf = _rttCanvas._buf;
+				for (int i = 0; i < px2.Length; i++) { int o = i * 4; px2[i] = (buf[o] << 16) | (buf[o + 1] << 8) | buf[o + 2]; }
+				RegisterTexturePixels(texId, px2, rw, rh);
+				_canvas = sc; _depth = sd;
+			}
+
+			_clipOn = false;
+			_rttPass = false;
+			_w = ow; _h = oh; _scale = oscale;
+			_camX = ox; _camY = oy; _camZ = oz;
+			_Rx = sRx; _Ry = sRy; _Rz = sRz; _Ux = sUx; _Uy = sUy; _Uz = sUz; _Fx = sFx; _Fy = sFy; _Fz = sFz;
+			Revision++;
+		}
+
+		/// <summary>Per-pixel Schlick fresnel reflectivity for a screen-tex mirror surface (water):
+		/// grazing views mirror fully, top-down shows the water colour. <paramref name="f0"/> ≈ 0.04
+		/// for water. Negative disables (legacy per-vertex shade reflectivity).</summary>
+		public void ObjSetFresnel(int id, double f0) {
+			var o = Obj(id); if (o != null) { o.FresnelF0 = f0; Revision++; }
+		}
+
+		/// <summary>Depth tint for a screen-tex water surface: the per-vertex shade slot (0..1) lerps
+		/// the under-mirror colour from the object's base colour (shallow) to this deep colour.</summary>
+		public void ObjSetWaterColors(int id, double dr, double dg, double db) {
+			var o = Obj(id); if (o != null) { o.DeepR = dr; o.DeepG = dg; o.DeepB = db; Revision++; }
+		}
+
+		// ── custom SURFACE shaders (GPU rasterizer) ─────────────────────────────────────────────
+		// The sky (SetSkyShader) and post pass (SetPostShader) already take raw GLSL; this extends
+		// the same principle to screen-tex SURFACES (water, mirrors, portals) so stages can replace
+		// the built-in ripple/fresnel look outright instead of tweaking baked-in parameters.
+		internal readonly float[] _surfUser = new float[16];
+
+		/// <summary>Attach a CUSTOM fragment shader to a screen-tex surface. Pass full GLSL ES 3.00
+		/// source, or just a main() body — the prelude is prepended when no #version is present:
+		///   in vec2 vUV; in float vShade; in float vCamZ; in vec3 vWorld; in vec3 vNormal;
+		///   uniform sampler2D uTex;       // the live reflection RTT (sample by gl_FragCoord >> uRsh;
+		///   uniform int uRsh, uRttFlip;   //  flip rows when uRttFlip == 1)
+		///   uniform vec3 uCam, uTint, uFlat; uniform float uTime, uAlpha; uniform vec4 uUser[4];
+		///   out vec4 frag;
+		/// Compile failure traces, surfaces GetShaderError, and falls back to the built-in path.
+		/// nil/"" detaches. Programs are cached per distinct source and freed with the render caches.</summary>
+		public void ObjSetSurfaceShader(int id, string fragSrc) {
+			var o = Obj(id); if (o == null) return;
+			o.SurfaceSrc = string.IsNullOrWhiteSpace(fragSrc) ? null : fragSrc;
+			Revision++;
+		}
+
+		/// <summary>Set uUser[slot] (slot 0..3) shared by every custom surface shader.</summary>
+		public void SetSurfaceUniform(int slot, double x, double y, double z, double w) {
+			if (slot < 0 || slot > 3) return;
+			int k = slot * 4;
+			_surfUser[k] = (float)x; _surfUser[k + 1] = (float)y; _surfUser[k + 2] = (float)z; _surfUser[k + 3] = (float)w;
+		}
+
+		/// <summary>TERRAIN SPLAT shading for an object (the terrain floor): the GPU blends four layer
+		/// textures per PIXEL by the weight sprite (an ARGB image, R/G/B/A = layer 1..4 — see
+		/// LuaSplatmap.RegisterSprite), so painted paths/beaches feather smoothly instead of cutting
+		/// at quad edges. worldW/H = the splat's world coverage; uvScale = repeats per world unit
+		/// (1/cellSize). splatSpriteId &lt; 0 disables (per-quad dominant texturing, the CPU look).</summary>
+		public void ObjSetTerrainSplat(int id, int splatSpriteId, int tex1, int tex2, int tex3, int tex4,
+			double worldW, double worldH, double uvScale) {
+			var o = Obj(id); if (o == null) return;
+			o.SplatSprite = splatSpriteId;
+			o.LayerTex1 = tex1; o.LayerTex2 = tex2; o.LayerTex3 = tex3; o.LayerTex4 = tex4;
+			o.SplatW = (float)(worldW <= 0 ? 1 : worldW); o.SplatH = (float)(worldH <= 0 ? 1 : worldH);
+			o.LayerUvScale = (float)(uvScale <= 0 ? 1 : uvScale);
+			Revision++; _geomRevision++;   // merged-static membership changes
 		}
 
 		/// <summary>HYBRID rendering: like <see cref="RenderView"/>, but the inset view is rendered by the
@@ -298,6 +448,143 @@ namespace OpenTaiko {
 			_diorama = on; _hdTilt = tilt; _hdSat = sat; _hdVig = vig; _hdBloom = bloom; Revision++;
 		}
 
+		// ── stylized-render extensions (GPU rasterizer; CPU renderers ignore them, matching existing precedent) ──
+		internal double _wetness;
+		internal double _shaderTime;
+		internal double _gradeExp = 1.0, _gradeR = 1.0, _gradeG = 1.0, _gradeB = 1.0;
+		internal string _postSrc; internal int _postSrcRev;
+		internal readonly float[] _postUser = new float[16];
+
+		/// <summary>Per-texture GPU sampling filter: "nearest" (default), "linear" or "mipmap"
+		/// (trilinear; call once after registering the texture — mip chain is generated on upload).
+		/// Photo textures (wood/plaster/brick) want mipmap; pixel-art stays nearest.</summary>
+		public void SetTextureFilter(int id, string mode) {
+			_texFilter[id] = mode == "mipmap" ? 2 : (mode == "linear" ? 1 : 0);
+			BumpTexRev(id); Revision++;
+		}
+
+		/// <summary>Emissive add for an object's surfaces: col += base * (r,g,b). Values &gt; 1 push the
+		/// pixel over the diorama bloom threshold → glowing windows/lamps/signs. 0,0,0 = off (default;
+		/// non-zero drops the object out of the static merge, so keep it for actual emitters).</summary>
+		public void ObjSetEmissive(int id, double r, double g, double b) {
+			var o = Obj(id); if (o != null) { o.EmR = r; o.EmG = g; o.EmB = b; Revision++; }
+		}
+
+		/// <summary>Global surface wetness 0..1 (rain look): darkens lit diffuse and adds a sun
+		/// specular sheen. 0 = dry (default, costs nothing).</summary>
+		public void SetWetness(double w) { _wetness = w < 0 ? 0 : (w > 1 ? 1 : w); Revision++; }
+
+		/// <summary>Shader clock in seconds — drives the screen-tex ripple and the custom post pass
+		/// (uTime). Feed your stage clock once per frame.</summary>
+		public void SetTime(double t) { _shaderTime = t; }
+
+		/// <summary>X-RAY silhouette for a sprite object: where its billboards are OCCLUDED by world
+		/// geometry they re-draw as a faint ghost (depth-greater pass at this alpha, 0..1; 0 = off).
+		/// Keeps the player/NPCs readable behind walls, hills and buildings without moving the camera.</summary>
+		public void ObjSetXray(int id, double alpha) {
+			var o = Obj(id); if (o != null) { o.XrayAlpha = alpha < 0 ? 0 : (alpha > 1 ? 1 : alpha); Revision++; }
+		}
+
+		/// <summary>Animated distortion of a screen-tex (mirror) surface's sampling — water reflection
+		/// ripple. <paramref name="amp"/> = max offset in RTT pixels (0 = off), <paramref name="freq"/> =
+		/// world-space wave frequency, <paramref name="speed"/> = animation rate (uses SetTime's clock).</summary>
+		public void ObjSetScreenTexRipple(int id, double amp, double freq, double speed) {
+			var o = Obj(id); if (o != null) { o.RippleAmp = amp < 0 ? 0 : amp; o.RippleFreq = freq; o.RippleSpeed = speed; Revision++; }
+		}
+
+		/// <summary>Colour grade folded into the diorama post pass: exposure multiply + per-channel
+		/// tint (day/night mood — dusk oranges, night blues). 1,1,1,1 = neutral. Needs SetDiorama on.</summary>
+		public void SetColorGrade(double exposure, double r, double g, double b) {
+			_gradeExp = exposure < 0 ? 0 : exposure; _gradeR = r; _gradeG = g; _gradeB = b; Revision++;
+		}
+
+		/// <summary>Attach a CUSTOM full-screen post-process fragment shader (GPU rasterizer). Pass either a
+		/// full GLSL ES 3.00 fragment source, or just a body containing <c>void main()</c> — the standard
+		/// prelude (uTex = the rendered frame, uRes, uTime, uUser[4], out vec4 frag) is prepended when no
+		/// #version line is present. Runs after the diorama grade. Compile failure traces and disables the
+		/// pass (the frame renders ungraded rather than dying). nil/"" detaches.</summary>
+		public void SetPostShader(string fragSrc) {
+			_postSrc = string.IsNullOrWhiteSpace(fragSrc) ? null : fragSrc;
+			_postSrcRev++; Revision++;
+		}
+
+		/// <summary>Set uUser[slot] (slot 0..3) for the custom post shader.</summary>
+		public void SetPostUniform(int slot, double x, double y, double z, double w) {
+			if (slot < 0 || slot > 3) return;
+			int k = slot * 4;
+			_postUser[k] = (float)x; _postUser[k + 1] = (float)y; _postUser[k + 2] = (float)z; _postUser[k + 3] = (float)w;
+		}
+
+		// ── procedural SKY pass (GPU rasterizer) ─────────────────────────────────────────────────
+		internal string _skySrc; internal int _skySrcRev;
+		internal readonly float[] _skyUser = new float[32];
+		/// <summary>Attach a full-screen SKY fragment shader, drawn into the canvas before the 3D pass
+		/// (same source rules as <see cref="SetPostShader"/>: full GLSL ES 3.00 source, or a main() body
+		/// that uses the prelude's uRes/uTime/uUser[8] — no uTex; the sky has no input image). While
+		/// attached it replaces the stage's 2D sky fill. nil/"" detaches. Compile failure disables it.</summary>
+		public void SetSkyShader(string fragSrc) {
+			_skySrc = string.IsNullOrWhiteSpace(fragSrc) ? null : fragSrc;
+			_skySrcRev++; Revision++;
+		}
+		/// <summary>Set uUser[slot] (slot 0..7) for the sky shader.</summary>
+		public void SetSkyUniform(int slot, double x, double y, double z, double w) {
+			if (slot < 0 || slot > 7) return;
+			int k = slot * 4;
+			_skyUser[k] = (float)x; _skyUser[k + 1] = (float)y; _skyUser[k + 2] = (float)z; _skyUser[k + 3] = (float)w;
+		}
+		/// <summary>Last sky/post shader compile error from the GPU renderer ("" when clean).</summary>
+		public string GetShaderError() => _gpuRasterizer?.LastShaderError ?? "";
+		internal bool? _skyCompiled;   // set by the renderer after the (re)compile attempt
+		/// <summary>True when the GPU renderer will draw the attached sky shader this frame — the stage
+		/// can skip its 2D gradient fill then. False before attach, on the CPU renderer, or after a
+		/// compile failure (the stage's band fallback takes over on the next frame).</summary>
+		public bool SkyShaderActive() => _skySrc != null && _renderer == (IRenderer?)_gpuRasterizer && _skyCompiled != false;
+
+		// ── GRASS fields (GPU rasterizer) ────────────────────────────────────────────────────────
+		// Static camera-facing blades with wind sway, batched into one VBO. CPU renderers skip them.
+		internal readonly List<float> _grass = new();
+		internal int _grassRev; internal int _grassSprite = -1;
+		internal double _grassFadeStart = 28, _grassFadeEnd = 46;
+		/// <summary>Remove every grass blade (map unload). Trims the list's capacity too — a big
+		/// terrain's million-blade buffer (~30 MB) must not ride along into the next map.</summary>
+		public void GrassClear() { _grass.Clear(); _grass.TrimExcess(); _grassRev++; Revision++; }
+
+		/// <summary>Remove the blades whose FOOT lies inside the XZ rectangle (water pools, roads,
+		/// building pads). In-place filter; one call per exclusion zone at build time.</summary>
+		public void GrassRemoveRect(double x0, double z0, double x1, double z1) {
+			if (x1 < x0) (x0, x1) = (x1, x0);
+			if (z1 < z0) (z0, z1) = (z1, z0);
+			int w = 0;
+			for (int r = 0; r < _grass.Count; r += 6) {
+				float bx = _grass[r], bz = _grass[r + 2];
+				if (bx >= x0 && bx <= x1 && bz >= z0 && bz <= z1) continue;   // culled
+				if (w != r) for (int k = 0; k < 6; k++) _grass[w + k] = _grass[r + k];
+				w += 6;
+			}
+			if (w == _grass.Count) return;
+			_grass.RemoveRange(w, _grass.Count - w);
+			_grassRev++; Revision++;
+		}
+		/// <summary>The sprite (RegisterSprite/SetSpriteRGBA id) used as the blade texture (cutout).</summary>
+		public void GrassSprite(int spriteId) { _grassSprite = spriteId; _grassRev++; }
+		/// <summary>Blades taller than this fade/shrink between the two camera distances (world units).</summary>
+		public void GrassFade(double start, double end) { _grassFadeStart = start; _grassFadeEnd = end > start ? end : start + 1; }
+		/// <summary>Plant one blade: foot at (x,y,z), world height h, sway phase (radians), shade 0..1.</summary>
+		public void GrassAdd(double x, double y, double z, double h, double phase, double shade) {
+			_grass.Add((float)x); _grass.Add((float)y); _grass.Add((float)z);
+			_grass.Add((float)h); _grass.Add((float)phase); _grass.Add((float)shade);
+			_grassRev++;
+		}
+		/// <summary>Blade count (for HUD/debug).</summary>
+		public int GrassCount() => _grass.Count / 6;
+
+		// ── reflections on the GPU ───────────────────────────────────────────────────────────────
+		internal bool _reflectGpu;
+		/// <summary>Route <see cref="RenderView"/> re-renders through the GPU off-screen pass instead of
+		/// the CPU rasterizer (much faster; each texId gets its own FBO). Off by default — existing
+		/// stages keep the proven CPU path; the OWM3d water opts in.</summary>
+		public void SetReflectionGpu(bool on) { _reflectGpu = on; }
+
 		/// <summary>Number of CPU threads the rasterizer uses (screen split into this many
 		/// horizontal row bands). 1 = single-threaded.</summary>
 		public void SetThreads(int n) {
@@ -361,6 +648,7 @@ namespace OpenTaiko {
 
 		public void RegisterTexture(int id, LuaTable pixels, int w, int h) {
 			if (pixels == null || w <= 0 || h <= 0) return;
+			if ((long)w * h > 4_194_304) { System.Diagnostics.Trace.TraceWarning($"RegisterTexture {id}: {w}x{h} exceeds the 4M-pixel cap, ignored."); return; }
 			var px = new int[w * h];
 			for (int i = 0; i < px.Length; i++) {
 				object o = pixels[i + 1];
@@ -452,14 +740,64 @@ namespace OpenTaiko {
 		/// <summary>Remove an object and its geometry.</summary>
 		public void DeleteObject(int id) { _objects.Remove(id); Revision++; _geomRevision++; }
 		/// <summary>Remove every object and particle system (e.g. when restarting a level). Textures,
-		/// lights and camera are kept. Object ids restart from 1.</summary>
-		public void ClearObjects() { _objects.Clear(); _nextObjId = 1; _particleSystems.Clear(); Revision++; _geomRevision++; }
+		/// lights and camera are kept. Object ids restart from 1. Also drops the renderer's transient
+		/// caches (per-object VBOs, merged static buffers, reflection RTT targets) and the CPU-side
+		/// reflection canvases — they rebuild on demand, so restart-style callers lose nothing while
+		/// map-switch callers stop leaking per-map GPU/CPU buffers.</summary>
+		public void ClearObjects() { _objects.Clear(); _nextObjId = 1; _particleSystems.Clear(); ClearRenderCaches(); Revision++; _geomRevision++; }
+
+		/// <summary>Drop every REBUILDABLE render cache: the CPU reflection canvases/depths/pixel
+		/// buffers and (on the GPU renderer) the per-object VBO cache, merged static buffers and
+		/// reflection FBO targets. Registered textures/sprites and compiled programs are kept.
+		/// Call on map unload; everything re-creates lazily on the next frame that needs it.</summary>
+		public void ClearRenderCaches() {
+			foreach (var c in _rttCanvases.Values) c.Dispose();
+			_rttCanvases.Clear(); _rttDepths.Clear(); _rttBufs.Clear();
+			_rttCanvas = null; _rttDepth = null;
+			_gpuRasterizer?.ClearTransient();
+			Revision++;
+		}
+
+		/// <summary>Forget a registered texture: frees the CPU pixel copy, the GPU upload and any
+		/// reflection RTT target bound to this id. Sampling it afterwards draws nothing until it is
+		/// re-registered.</summary>
+		public void UnregisterTexture(int id) {
+			_texPix.Remove(id); _texW.Remove(id); _texH.Remove(id); _texFilter.Remove(id); _texRev.Remove(id);
+			_reflectTrue.Remove(id);
+			if (_rttCanvases.TryGetValue(id, out var cv)) { cv.Dispose(); _rttCanvases.Remove(id); }
+			_rttDepths.Remove(id); _rttBufs.Remove(id);
+			_gpuRasterizer?.DropTexture(id);
+			Revision++;
+		}
+
+		/// <summary>Forget a registered particle/billboard sprite (CPU pixels + GPU upload).</summary>
+		public void UnregisterSprite(int id) {
+			_spritePix.Remove(id); _spriteW.Remove(id); _spriteH.Remove(id); _spriteFilter.Remove(id);
+			_gpuRasterizer?.DropSprite(id);
+			Revision++;
+		}
+
+		/// <summary>Memory readout for debug overlays / leak tests:
+		/// (texture count, texture bytes, sprite count, object count, grass blades, live particles).</summary>
+		public (int, long, int, int, int, int) GetMemoryStats() {
+			long texBytes = 0;
+			foreach (var px in _texPix.Values) texBytes += (long)px.Length * 4;
+			int parts = 0;
+			foreach (var ps in _particleSystems) parts += ps.Count;
+			return (_texPix.Count, texBytes, _spritePix.Count, _objects.Count, _grass.Count / 6, parts);
+		}
+
+		/// <summary>Renderer-side cache counts ("glTex=N glSprite=N rtt=N vbo=N merge=N"), or "cpu".</summary>
+		public string GetRendererStats() => _renderer == (IRenderer?)_gpuRasterizer && _gpuRasterizer != null ? _gpuRasterizer.StatsString() : "cpu";
 		/// <summary>Clear an object's primitives so it can be refilled (kind resets).</summary>
 		public void ObjBegin(int id) { var o = Obj(id); if (o != null) { o.N = 0; o.Kind = -1; o.GeomVersion++; Revision++; _geomRevision++; } }
 		public void ObjSetVisible(int id, bool v) { var o = Obj(id); if (o != null) { o.Visible = v; Revision++; } }
 		/// <summary>Per-channel colour multiply for an object's textured surfaces (1,1,1 = none).
 		/// Cheap way to flash/tint a model (e.g. a hurt enemy red). Applies in the unlit path.</summary>
 		public void ObjSetTint(int id, double r, double g, double b) { var o = Obj(id); if (o != null) { o.TintR = r; o.TintG = g; o.TintB = b; } }
+		/// <summary>Flat albedo OVERRIDE: replace the object's material/texture colour with (r,g,b) before lighting
+		/// (it still shades). Pass r&lt;0 to clear. Used to recolour a single routed GLB part (e.g. blue cab → red).</summary>
+		public void ObjSetColor(int id, double r, double g, double b) { var o = Obj(id); if (o != null) { o.FlatR = r; o.FlatG = g; o.FlatB = b; } }
 		/// <summary>Mark an object as an overlay: drawn last, over a freshly-cleared depth buffer, so it
 		/// always renders on top of the world (first-person weapon viewmodels).</summary>
 		public void ObjSetOverlay(int id, bool on) { var o = Obj(id); if (o != null) { o.Overlay = on; Revision++; } }
@@ -703,6 +1041,9 @@ namespace OpenTaiko {
 				R = r, G = g, B = b, A0 = a0, Size0 = size0, Size1 = size1,
 				Life = life, MaxLife = life, Gravity = gravity, Drag = drag, Additive = additive != 0,
 				Sprite = psy.CurSprite,
+				Rot = psy.CurRot < 0 ? _prng.NextDouble() * Math.PI * 2 : psy.CurRot,
+				RotVel = psy.CurRotVel == 0 ? 0 : psy.CurRotVel * (0.5 + _prng.NextDouble()) * (_prng.Next(2) == 0 ? -1 : 1),
+				SizeCurve = psy.CurSizeCurve, FadeCurve = psy.CurFadeCurve,
 			});
 		}
 
@@ -737,6 +1078,9 @@ namespace OpenTaiko {
 					Size0 = size0, Size1 = size1, Life = lifeF, MaxLife = lifeF,
 					Gravity = gravity, Drag = drag, Additive = additive != 0,
 					Sprite = ps.CurSprite,
+					Rot = ps.CurRot < 0 ? _prng.NextDouble() * Math.PI * 2 : ps.CurRot,
+					RotVel = ps.CurRotVel == 0 ? 0 : ps.CurRotVel * (0.5 + _prng.NextDouble()) * (_prng.Next(2) == 0 ? -1 : 1),
+					SizeCurve = ps.CurSizeCurve, FadeCurve = ps.CurFadeCurve,
 				});
 			}
 			Revision++;
@@ -749,9 +1093,38 @@ namespace OpenTaiko {
 		internal readonly Dictionary<int, int[]> _spritePix = new();
 		internal readonly Dictionary<int, int> _spriteW = new();
 		internal readonly Dictionary<int, int> _spriteH = new();
+		// per-sprite GPU sampling filter: 0 nearest (default — pixel-art characters), 1 linear (soft
+		// particles/foam/grass). Set BEFORE the sprite is first drawn (the upload bakes it).
+		internal readonly Dictionary<int, int> _spriteFilter = new();
+		/// <summary>Sampling filter for a particle/billboard sprite: "nearest" (default) or "linear"
+		/// (soft edges — particles, foam, grass blades). Call right after registering the sprite.</summary>
+		public void SetSpriteFilter(int id, string mode) {
+			_spriteFilter[id] = mode == "linear" ? 1 : 0;
+			Revision++;
+		}
 
 		/// <summary>Stamp this sprite onto particles emitted next into the system (-1 = flat square).</summary>
 		public void PsSetSprite(int id, int spriteId) { if (id >= 0 && id < _particleSystems.Count) _particleSystems[id].CurSprite = spriteId; }
+
+		/// <summary>Billboard SPIN for particles emitted next: start angle (deg; &lt; 0 = random per
+		/// particle) + spin rate (deg/s; bursts randomize magnitude ±50% and sign per particle).
+		/// Tumbling leaves / sakura petals / debris. 0,0 = off (default).</summary>
+		public void PsSetNextRotation(int id, double rotDeg, double rotVelDegPerSec) {
+			if (id < 0 || id >= _particleSystems.Count) return;
+			var ps = _particleSystems[id];
+			ps.CurRot = rotDeg * Math.PI / 180.0;
+			ps.CurRotVel = rotVelDegPerSec * Math.PI / 180.0;
+		}
+
+		/// <summary>Size/fade CURVES for particles emitted next. sizeCurve: 0 linear, 1 ease-out,
+		/// 2 pop (grow then shrink). fadeCurve: 0 linear, 1 smooth in/out, 2 flash (bright pop, long
+		/// tail). The flat linear defaults match the old behaviour.</summary>
+		public void PsSetNextCurves(int id, int sizeCurve, int fadeCurve) {
+			if (id < 0 || id >= _particleSystems.Count) return;
+			var ps = _particleSystems[id];
+			ps.CurSizeCurve = (byte)(sizeCurve < 0 ? 0 : sizeCurve > 2 ? 2 : sizeCurve);
+			ps.CurFadeCurve = (byte)(fadeCurve < 0 ? 0 : fadeCurve > 2 ? 2 : fadeCurve);
+		}
 
 		/// <summary>Register a particle sprite from a flat ARGB array (length w*h, top-left origin).</summary>
 		public void RegisterSprite(int spriteId, int[] argb, int w, int h) {
@@ -790,6 +1163,7 @@ namespace OpenTaiko {
 				a[y * res + x] = (al << 24) | 0xFFFFFF;
 			}
 			RegisterSprite(spriteId, a, res, res);
+			_spriteFilter[spriteId] = 1;   // procedural soft art — always sample linear
 		}
 
 		/// <summary>Generate a six-armed ice-crystal/snowflake sprite (white-blue) for snow/frost.</summary>
@@ -806,6 +1180,7 @@ namespace OpenTaiko {
 				a[y * res + x] = (al << 24) | 0x00E6F0FF;                // tint white-blue (230,240,255)
 			}
 			RegisterSprite(spriteId, a, res, res);
+			_spriteFilter[spriteId] = 1;   // procedural soft art — always sample linear
 		}
 
 		// ── Rasterizer forward lighting ───────────────────────────────────────────────────
@@ -885,6 +1260,27 @@ namespace OpenTaiko {
 
 		#region Display
 		public void Upload() { if (_gpuOwnsCanvas) { _gpuRasterizer?.End2D(); _gpuOwnsCanvas = false; return; } _canvas.Upload(); }
+
+		/// <summary>Copy this scene's CURRENT CPU-rendered colour buffer into an independent, standalone
+		/// texture registered in the global shared-texture store under <paramref name="key"/>, so another
+		/// stage can draw it later (e.g. the coin shop reusing My Room's furniture previews without
+		/// re-loading the models). Only valid after a CPU render — SetMode("raster_cpu") + Render + Upload;
+		/// a GPU-owned canvas exposes no readable CPU buffer, so this is a safe no-op there. The copy is
+		/// independent, so it survives the source scene/stage being disposed.</summary>
+		public void ShareCanvasAs(string key) {
+			if (string.IsNullOrEmpty(key) || _gpuOwnsCanvas || _canvas == null) return;
+			int w = _w, h = _h;
+			byte[] src = _canvas._buf;
+			if (src == null || w <= 0 || h <= 0 || src.Length < w * h * 4) return;
+			byte[] copy = new byte[w * h * 4];
+			Array.Copy(src, copy, copy.Length);
+			var ctex = new CTexture();
+			ctex.UpdatePixelBuffer(copy, w, h);
+			var tex = new LuaTexture(ctex);
+			var store = OpenTaiko.GlobalStores.SharedTextures;
+			if (store.TryGetValue(key, out var res)) res.Adopt(tex);
+			else { var r = new LuaSharedResource<LuaTexture>(); r.Adopt(tex); store[key] = r; }
+		}
 		/// <summary>Silhouette OUTLINE post-pass on the CPU canvas: inks every transparent pixel within
 		/// <paramref name="thickness"/> px of the rendered shape, with a ~1px ANTI-ALIASED falloff at the
 		/// rim. Implemented as a 3-4 chamfer distance transform (two scans, cost independent of the
@@ -962,10 +1358,15 @@ namespace OpenTaiko {
 				_gpuRasterizer?.Dispose();   // free the GPU renderer's GL resources (FBO, VBOs, textures, programs)
 				_gpuRaytracer?.Dispose();    // free the GPU path tracer's GL resources (compute program, SSBOs, accum/atlas textures, FBO)
 				_canvas?.Dispose();
+				foreach (var c in _rttCanvases.Values) c.Dispose();
+				_rttCanvases.Clear(); _rttDepths.Clear(); _rttBufs.Clear();
+				_rttCanvas?.Dispose(); _rttCanvas = null; _rttDepth = null;
 				_disposeList?.Remove(this);
 				_depth = Array.Empty<float>();
-				_texPix.Clear(); _texW.Clear(); _texH.Clear();
-				_objects.Clear(); _particleSystems.Clear();
+				_texPix.Clear(); _texW.Clear(); _texH.Clear(); _texFilter.Clear(); _texRev.Clear();
+				_spritePix.Clear(); _spriteW.Clear(); _spriteH.Clear(); _spriteFilter.Clear(); _reflectTrue.Clear();
+				_materials.Clear(); _lights.Clear(); _primitives.Clear();
+				_objects.Clear(); _particleSystems.Clear(); _grass.Clear(); _grass.TrimExcess();
 				_disposedValue = true;
 			}
 		}

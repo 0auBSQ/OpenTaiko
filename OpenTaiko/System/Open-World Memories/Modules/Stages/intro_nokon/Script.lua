@@ -87,22 +87,8 @@ local function csharpEnumerableToLuaArray(enumerable)
 end
 
 local function loadHighScores()
-    -- GetScores() returns Dictionary<int, Dictionary<string, object?>>
-    -- Outer KVP: .Key = row index, .Value = inner dict with "player"/"score" keys
-    local result = {}
-    local outerDict = DBScores:GetScores()
-    if outerDict == nil then return result end
-    local outerEnum = outerDict:GetEnumerator()
-    while outerEnum:MoveNext() do
-        local rowDict = outerEnum.Current.Value
-        if rowDict ~= nil then
-            table.insert(result, {
-                name  = tostring(rowDict.player  or rowDict["player"]  or ""),
-                score = tonumber(tostring(rowDict.score or rowDict["score"] or 0)) or 0,
-            })
-        end
-    end
-    return result
+    -- DBScores:GetScores() returns a plain Lua array of { name = string, score = int }, highest first.
+    return DBScores:GetScores() or {}
 end
 
 local function saveHighScore(score, name)

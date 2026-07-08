@@ -81,7 +81,8 @@ function Dialogue.new(opts)
     self.fonts = opts.fonts or {}
     self.gfont = opts.gfont
     self.gfontName = opts.gfontName or opts.gfont
-    self.ui = opts.ui or "plain"
+    self.ui = opts.ui or "popui"   -- the rounded PopUI-style chrome is the default skin-wide look
+                                   -- (pass ui="plain" for the old flat panel)
     self.theme = {}
     for k, v in pairs(THEME_DEFAULT) do self.theme[k] = (opts.theme and opts.theme[k]) or v end
     local box = opts.box or {}
@@ -329,13 +330,26 @@ function Dialogue:bakeFancyBox()
     row:ClearTransparent()
     Shape.fillRound(row, 0, 0, rw, rh, 18, { 255, 255, 255, 255 })
     row:Upload()
-    self._fbox = { cv = cv, m = m, pill = pill, pw = pw, ph = ph, row = row, rw = rw, rh = rh }
+    -- portrait frame (a rounded inset panel the portrait texture sits inside)
+    local pfr = nil
+    if self.portraitSize > 0 then
+        local ps = self.portraitSize + 16
+        pfr = CANVAS:CreateCanvas(ps, ps)
+        pfr:ClearTransparent()
+        Shape.panel(pfr, 0, 0, ps, ps, {
+            radius = 20, outline = { col = t.outline, width = 3 },
+            top = { 52, 58, 76, 255 }, bottom = { 34, 38, 52, 255 }, gloss = { 255, 255, 255, 26 },
+        })
+        pfr:Upload()
+    end
+    self._fbox = { cv = cv, m = m, pill = pill, pw = pw, ph = ph, row = row, rw = rw, rh = rh, pfr = pfr }
     return self._fbox
 end
 
 function Dialogue:dispose()
     if self._fbox then
         self._fbox.cv:Dispose(); self._fbox.pill:Dispose(); self._fbox.row:Dispose()
+        if self._fbox.pfr then self._fbox.pfr:Dispose() end
         self._fbox = nil
     end
     if self._dim then self._dim:Dispose(); self._dim = nil end
@@ -353,14 +367,19 @@ function Dialogue:draw()
         fb.cv:SetColor(1, 1, 1); fb.cv:SetOpacity(1); fb.cv:SetScale(1, 1)
         fb.cv:Draw(self.boxX - fb.m, self.boxY - fb.m)
         if node.name and node.name ~= "" then
+            -- the pill sits above the box, aligned with the TEXT column (right of the portrait
+            -- frame). At the old boxX+30 it overlapped the portrait frame's top band (the pill
+            -- spans down to boxY+24, the frame starts at boxY+14) and the frame — drawn later —
+            -- painted over the name.
+            local pillX = self.boxX + (self.portraitSize > 0 and (self.portraitSize + 34) or 30)
             fb.pill:SetColor(1, 1, 1); fb.pill:SetOpacity(1)
-            fb.pill:Draw(self.boxX + 30 - fb.m, self.boxY - 30 - fb.m)
+            fb.pill:Draw(pillX - fb.m, self.boxY - 30 - fb.m)
             local nf = self.gfontName or self.fonts.name
             if self.gfontName then
-                nf:Draw(node.name, self.boxX + 30 + fb.pw / 2, self.boxY - 30 + fb.ph / 2 + 2,
+                nf:Draw(node.name, pillX + fb.pw / 2, self.boxY - 30 + fb.ph / 2 + 2,
                     self:color(t.nameText[1], t.nameText[2], t.nameText[3]), nil, 1, 1, fb.pw - 24, "center")
             elseif nf then
-                nf:GetText(node.name, false, 600, self:color(t.nameText[1], t.nameText[2], t.nameText[3]), self:color(0, 0, 0)):Draw(self.boxX + 44, self.boxY - 24)
+                nf:GetText(node.name, false, 600, self:color(t.nameText[1], t.nameText[2], t.nameText[3]), self:color(0, 0, 0)):Draw(pillX + 14, self.boxY - 24)
             end
         end
     else
@@ -376,12 +395,17 @@ function Dialogue:draw()
         end
     end
 
-    -- portrait area (textured if provided, else a placeholder panel) — only when enabled
+    -- portrait area — a rounded frame in popui mode, the old flat quad otherwise
     if self.portraitSize > 0 then
-        local dim = self._dim
-        if not dim then dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload(); self._dim = dim end
-        dim:SetColor(0.10, 0.12, 0.18); dim:SetOpacity(1.0)
-        dim:SetScale(self.portraitSize / 2, self.portraitSize / 2); dim:Draw(self.boxX + 18, self.boxY + 22)
+        if self.ui == "popui" and self._fbox and self._fbox.pfr then
+            self._fbox.pfr:SetColor(1, 1, 1); self._fbox.pfr:SetOpacity(1)
+            self._fbox.pfr:Draw(self.boxX + 10, self.boxY + 14)
+        else
+            local dim = self._dim
+            if not dim then dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload(); self._dim = dim end
+            dim:SetColor(0.10, 0.12, 0.18); dim:SetOpacity(1.0)
+            dim:SetScale(self.portraitSize / 2, self.portraitSize / 2); dim:Draw(self.boxX + 18, self.boxY + 22)
+        end
         local por = node.portrait and self.portraits[node.portrait]
         if por then
             por:SetScale(self.portraitSize / (por.Width > 0 and por.Width or self.portraitSize), self.portraitSize / (por.Height > 0 and por.Height or self.portraitSize))
@@ -394,7 +418,9 @@ function Dialogue:draw()
     local upto = floor(self.revealed)
     if self.gfont ~= nil then
         local tc = (self.ui == "popui") and self:color(t.text[1], t.text[2], t.text[3]) or self:color(255, 255, 255)
-        local oc = (self.ui == "popui") and self:color(0, 0, 0, 0) or nil
+        -- a BLACK outline keeps the body readable over any panel/background (the transparent outline
+        -- left light theme text as unreadable grey); pair with a light theme.text for white+border
+        local oc = self:color(0, 0, 0, 255)
         local lineH = self.gfont.LineHeight + LINE_GAP
         local shown = 0
         for li, line in ipairs(self.glines) do
@@ -407,9 +433,13 @@ function Dialogue:draw()
             shown = shown + line.n
         end
     else
+        -- classic atlas glyphs bake white; tint them dark on the light popui panel
+        local tr, tg, tb = 1, 1, 1
+        if self.ui == "popui" then tr, tg, tb = t.text[1] / 255, t.text[2] / 255, t.text[3] / 255 end
         for i = 1, math.min(upto, self.total) do
             local gl = self.glyphs[i]
-            gl.tex:SetColor(1, 1, 1); gl.tex:Draw(self.textX + gl.x, self.textY + gl.y)
+            gl.tex:SetColor(tr, tg, tb); gl.tex:Draw(self.textX + gl.x, self.textY + gl.y)
+            gl.tex:SetColor(1, 1, 1)
         end
     end
 
@@ -428,8 +458,14 @@ function Dialogue:draw()
                 fb.row:SetOpacity((rc[4] or 255) / 255)
                 fb.row:Draw(self.textX, ry)
                 local label = (sel and "\u{25B8} " or "   ") .. ch[i].label
-                self.gfont:Draw(label, self.textX + 22, ry + fb.rh / 2,
-                    self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3]), self:color(0, 0, 0, 0), 1, 1, fb.rw - 44, "left")
+                if self.gfont then
+                    self.gfont:Draw(label, self.textX + 22, ry + fb.rh / 2,
+                        self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3]), self:color(0, 0, 0, 0), 1, 1, fb.rw - 44, "left")
+                elseif self.fonts.text then
+                    self.fonts.text:GetText(label, false, fb.rw - 44,
+                        self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3]), self:color(0, 0, 0, 0))
+                        :Draw(self.textX + 22, ry + 6)
+                end
             end
         else
             for i = 1, #ch do
