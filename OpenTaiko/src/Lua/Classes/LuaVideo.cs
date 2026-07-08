@@ -83,6 +83,11 @@ namespace OpenTaiko {
 		public double GetPlaySpeed() {
 			return _video?.dbPlaySpeed ?? 1;
 		}
+
+		// End-of-video signal that does not depend on the play-position timer.
+		public bool IsFinished() {
+			return _video?.IsFinishedPlaying ?? false;
+		}
 		#endregion
 		#region Sets
 		public void SetPlayPosition(double position) {

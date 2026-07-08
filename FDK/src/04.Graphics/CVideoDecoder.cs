@@ -331,6 +331,8 @@ public unsafe class CVideoDecoder : IDisposable {
 	public bool bPlaying { get; private set; } = false;
 	public bool bDrawing { get; private set; } = false;
 	public bool bFinishPlaying { get; private set; } = false;
+	// End of playback (stream fully read and all frames shown), unlike msPlayPosition which can stall.
+	public bool IsFinishedPlaying => bFinishPlaying && decodedframes.IsEmpty;
 	private CTimer CTimer;
 	private AVRational Framerate;
 	private CTexture lastTexture;
