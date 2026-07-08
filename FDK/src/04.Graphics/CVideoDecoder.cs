@@ -94,7 +94,9 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (disposing) {
 			bDrawing = false;
 			cts?.Cancel();
-			while (DS != DecodingState.Stopped) ;
+			// Yield so the decode thread being waited on is not starved off the CPU.
+			while (DS != DecodingState.Stopped)
+				Thread.Sleep(1);
 			frameconv?.Dispose();
 		}
 
@@ -164,7 +166,9 @@ public unsafe class CVideoDecoder : IDisposable {
 	public void Seek(long timestampms) {
 		this.bFinishPlaying = false;
 		cts?.Cancel();
-		while (DS != DecodingState.Stopped) ;
+		// Same starvation-safe wait as Dispose.
+		while (DS != DecodingState.Stopped)
+			Thread.Sleep(1);
 		if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
 			Trace.TraceError("av_seek_frame failed\n");
 		ffmpeg.avcodec_flush_buffers(codec_context);
@@ -259,6 +263,11 @@ public unsafe class CVideoDecoder : IDisposable {
 						//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
 						ffmpeg.av_packet_unref(packet);
 					} else if (error == ffmpeg.AVERROR_EOF) {
+						this.bFinishPlaying = true;
+						return;
+					} else {
+						// Treat any other read error as the end of the stream.
+						Trace.TraceError($"av_read_frame failed ({error}); stopping decode.");
 						this.bFinishPlaying = true;
 						return;
 					}
