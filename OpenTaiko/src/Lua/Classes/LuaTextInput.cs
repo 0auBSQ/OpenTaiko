@@ -22,7 +22,9 @@ namespace OpenTaiko {
 		/// iOS only: true on the frame the native text alert was cancelled / confirmed. Check these to
 		/// leave text-input state on iOS, where there is no Enter/Escape key to confirm or back out.
 		/// </summary>
+		[NLua.LuaHide]
 		public bool iOSCancelled => _input.iOSCancelled;
+		[NLua.LuaHide]
 		public bool iOSConfirmed => _input.iOSConfirmed;
 
 		/// <summary>The current text value. Can be read and set at any time.</summary>

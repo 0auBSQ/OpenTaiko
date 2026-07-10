@@ -94,9 +94,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (disposing) {
 			bDrawing = false;
 			cts?.Cancel();
-			// Yield so the decode thread being waited on is not starved off the CPU.
-			while (DS != DecodingState.Stopped)
-				Thread.Sleep(1);
+			decodeStopped.Wait();
 			frameconv?.Dispose();
 		}
 
@@ -152,7 +150,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		CTimer.Pause();
 		this.bPlaying = false;
 		bDrawing = false;
-		this.bFinishPlaying = true;
+		this.bStreamEnded = true;
 	}
 
 	public void InitRead() {
@@ -164,11 +162,9 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Seek(long timestampms) {
-		this.bFinishPlaying = false;
+		this.bStreamEnded = false;
 		cts?.Cancel();
-		// Same starvation-safe wait as Dispose.
-		while (DS != DecodingState.Stopped)
-			Thread.Sleep(1);
+		decodeStopped.Wait();
 		if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
 			Trace.TraceError("av_seek_frame failed\n");
 		ffmpeg.avcodec_flush_buffers(codec_context);
@@ -221,6 +217,7 @@ public unsafe class CVideoDecoder : IDisposable {
 	private void EnqueueFrames() {
 		if (DS != DecodingState.Running && !close) {
 			cts = new CancellationTokenSource();
+			decodeStopped.Reset();
 			// LongRunning → dedicated thread, not a thread-pool worker. EnqueueOneFrame is a loop that lives
 			// for the whole video (it Thread.Sleep(1)s while the frame queue is full); on the pool it would
 			// occupy a worker for minutes and make the pool inject/retire extra threads (the "[thread]
@@ -263,12 +260,12 @@ public unsafe class CVideoDecoder : IDisposable {
 						//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
 						ffmpeg.av_packet_unref(packet);
 					} else if (error == ffmpeg.AVERROR_EOF) {
-						this.bFinishPlaying = true;
+						this.bStreamEnded = true;
 						return;
 					} else {
 						// Treat any other read error as the end of the stream.
 						Trace.TraceError($"av_read_frame failed ({error}); stopping decode.");
-						this.bFinishPlaying = true;
+						this.bStreamEnded = true;
 						return;
 					}
 				} else {
@@ -284,6 +281,7 @@ public unsafe class CVideoDecoder : IDisposable {
 			ffmpeg.av_frame_unref(frame);
 			ffmpeg.av_free(frame);
 			DS = DecodingState.Stopped;
+			decodeStopped.Set();
 		}
 	}
 
@@ -331,6 +329,8 @@ public unsafe class CVideoDecoder : IDisposable {
 	private CancellationTokenSource cts;
 	private CDecodedFrame[] framelist = new CDecodedFrame[6];
 	private DecodingState DS = DecodingState.Stopped;
+	// Set while the decode thread is stopped; lets Dispose/Seek wait for it without polling.
+	private readonly ManualResetEventSlim decodeStopped = new ManualResetEventSlim(true);
 	private enum DecodingState {
 		Stopped,
 		Running
@@ -339,9 +339,10 @@ public unsafe class CVideoDecoder : IDisposable {
 	//for play
 	public bool bPlaying { get; private set; } = false;
 	public bool bDrawing { get; private set; } = false;
-	public bool bFinishPlaying { get; private set; } = false;
+	// Reader reached the end of the stream (or Stop was called); frames may still be queued.
+	private bool bStreamEnded = false;
 	// End of playback (stream fully read and all frames shown), unlike msPlayPosition which can stall.
-	public bool IsFinishedPlaying => bFinishPlaying && decodedframes.IsEmpty;
+	public bool IsFinishedPlaying => bStreamEnded && decodedframes.IsEmpty;
 	private CTimer CTimer;
 	private AVRational Framerate;
 	private CTexture lastTexture;

@@ -135,10 +135,6 @@ public static class CConfigOptionBuilder {
 		if (OperatingSystem.IsIOS())
 			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,"Touch Drum Size", "Radius of the Don drum circle as % of screen width.",
 				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
-		// iOS only: on-screen FPS/mem/stage debug overlay.
-		if (OperatingSystem.IsIOS())
-			O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,"Debug HUD", "Show an on-screen FPS / memory / stage overlay. Off by default.",
-				cfg.bShowDebugHud, v => cfg.bShowDebugHud = v));
 		O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_LANEOPACITY"), L("SETTINGS_SYSTEM_LANEOPACITY_DESC"),
 			cfg.nBackgroundTransparency, 0, 255, 5, v => cfg.nBackgroundTransparency = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_FASTRENDER"), L("SETTINGS_SYSTEM_FASTRENDER_DESC"),
@@ -208,6 +204,10 @@ public static class CConfigOptionBuilder {
 		O.Add(CLuaConfigOption.IntInput_(SYS, secIntegr, L("SETTINGS_SYSTEM_BROADCASTINGPORT"), L("SETTINGS_SYSTEM_BROADCASTINGPORT_DESC"), cfg.nGameEventBroadcastingPort, 0, 65535, v => { cfg.nGameEventBroadcastingPort = v; RefreshBroadcasting(); }));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_AUTOSCREENSHOT"), L("SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC"), cfg.bIsAutoResultCapture, v => cfg.bIsAutoResultCapture = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_DEBUGMODE"), L("SETTINGS_SYSTEM_DEBUGMODE_DESC"), cfg.bDisplayDebugInfo, v => cfg.bDisplayDebugInfo = v));
+		// iOS only: on-screen FPS/mem/stage debug overlay.
+		if (OperatingSystem.IsIOS())
+			O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,"Debug HUD", "Show an on-screen FPS / memory / stage overlay. Off by default.",
+				cfg.bShowDebugHud, v => cfg.bShowDebugHud = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_LOG"), L("SETTINGS_SYSTEM_LOG_DESC"), cfg.bOutputLogs, v => cfg.bOutputLogs = v));
 
 		// Input

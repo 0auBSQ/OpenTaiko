@@ -181,7 +181,7 @@ class CStageCutScene : CStage {
 		this.KeyInput();
 		this.actPauseMenu.Update();
 
-		if ((this.rVD == null || this.rVD.bFinishPlaying) && this.iCutScene < this.cutScenes!.Count) {
+		if ((this.rVD == null || this.rVD.IsFinishedPlaying) && this.iCutScene < this.cutScenes!.Count) {
 			while (++this.iCutScene < this.cutScenes!.Count) {
 				var cutScene = this.cutScenes[this.iCutScene];
 				if (this.LoadCutSceneAVI(cutScene)) {
