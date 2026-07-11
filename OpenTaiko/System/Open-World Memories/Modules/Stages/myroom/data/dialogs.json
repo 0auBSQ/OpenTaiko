@@ -1,0 +1,62 @@
+{
+  "_comment": "Named dialog lines, localized inline ({en,ja,fr}). Script.lua resolves each via LANG:FromDict with an English fallback, so a missing key degrades to English instead of crashing. {size}/{cost} are filled by the code; {shake:..} is dialogue markup. Add a dialog by adding a key here and referencing it from the code.",
+  "landlord": {
+    "name":          { "en": "Landlord", "ja": "大家さん", "fr": "Propriétaire" },
+    "greeting_rich": {
+      "en": "Well, well. If it is not my favourite tenant, come to make me a richer man.",
+      "ja": "おやおや。私のお気に入りの店子さんじゃないですか。私をもっと金持ちにしに来てくれたんですね。",
+      "fr": "Tiens, tiens. Mais c'est mon locataire préféré, venu faire de moi un homme plus riche."
+    },
+    "greeting_poor": {
+      "en": "Ah, my favourite tenant. Or you would be, if your purse were not so tragically thin.",
+      "ja": "おや、私のお気に入りの店子さん。いや、財布がもう少し重ければ、の話ですがね。",
+      "fr": "Ah, mon locataire préféré. Enfin, vous le seriez, si votre bourse n'était pas si tragiquement plate."
+    },
+    "offer_rich": {
+      "en": "I can open you up to a roomier {size} for a mere {cost} coins. Cash up front, always. So then, do we have a deal?",
+      "ja": "たったの{cost}コインで、広々とした{size}に広げて差し上げますよ。お代は前金で、いつも通りにね。それで、商談成立ということでいいですか？",
+      "fr": "Je peux vous ouvrir un {size} plus spacieux pour la modique somme de {cost} pièces. Payable d'avance, comme toujours. Alors, marché conclu ?"
+    },
+    "offer_poor": {
+      "en": "I would gladly knock you through to a roomier {size}, but that is {cost} coins and yours are looking light. Come back when you can cover it. No coin, no keys.",
+      "ja": "喜んで壁を抜いて、広々とした{size}にして差し上げたいところですがね、{cost}コインですよ。今のあなたの持ち合わせでは心もとない。用意できたらまたおいでなさい。金がなければ鍵もなし、です。",
+      "fr": "Je vous percerais volontiers un mur pour un {size} plus spacieux, mais c'est {cost} pièces et les vôtres se font rares. Revenez quand vous pourrez payer. Pas de pièces, pas de clés."
+    },
+    "maxed": {
+      "en": "You have already squeezed the biggest place I will ever rent you, and you paid dearly for every last tile. No more walls left to sell. What a shame I cannot charge you for the air.",
+      "ja": "もう私が貸せる中で一番広い部屋を手に入れましたね。しかも一タイルごとにきっちり払ってもらいました。もう売る壁は残っていません。空気に料金を取れないのが実に残念ですよ。",
+      "fr": "Vous occupez déjà le plus grand logement que je louerai jamais, et vous avez payé chaque dalle au prix fort. Il ne me reste plus un seul mur à vous vendre. Quel dommage que je ne puisse pas vous facturer l'air."
+    },
+    "choice_yes": { "en": "Deal, extend it", "ja": "商談成立、拡張してくれ", "fr": "Marché conclu, agrandissez" },
+    "choice_no":  { "en": "Not right now", "ja": "今はやめておきます", "fr": "Pas maintenant" },
+    "success": {
+      "en": "{shake:14,0.5}A pleasure doing business! I will take that coin now. Mind your step around the fresh plaster, and do enjoy every tile you paid so handsomely for.",
+      "ja": "{shake:14,0.5}毎度あり！ではコインをいただきますよ。塗りたての漆喰に足を取られないように。たっぷり払っていただいた分、一タイルも残さず楽しんでくださいね。",
+      "fr": "{shake:14,0.5}Un plaisir de faire affaire ! Je prends ces pièces tout de suite. Attention au plâtre frais, et profitez bien de chaque dalle que vous avez payée si généreusement."
+    },
+    "broke": {
+      "en": "Hah. Your purse says otherwise, friend. Come back when it is heavier and we shall talk.",
+      "ja": "はっ。あなたの財布はそう言っていませんがね。もっと重くなってから、また話しましょう。",
+      "fr": "Ha. Votre bourse dit le contraire, l'ami. Revenez quand elle sera plus lourde et nous discuterons."
+    },
+    "declined": {
+      "en": "Suit yourself. But floor space only ever gets dearer, and my prices have never once gone down.",
+      "ja": "お好きにどうぞ。ですが床というのは値上がりする一方でしてね。私の値段が下がったことなど一度もありませんよ。",
+      "fr": "Comme vous voudrez. Mais le plancher ne fait que renchérir, et mes prix n'ont jamais baissé une seule fois."
+    }
+  },
+  "pod": {
+    "locked": {
+      "en": "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.",
+      "ja": "謎のポッドのパネルを押す。低い駆動音がするが、何も開かない。まだ。",
+      "fr": "Vous appuyez sur le panneau de la capsule mystérieuse. Elle vibre doucement, mais rien ne s'ouvre. Pas encore."
+    }
+  },
+  "phone": {
+    "enum_wait": {
+      "en": "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"",
+      "ja": "回線が一瞬ざらつく。「大変申し訳ございません。ただいま楽曲カタログの整理中でして、これが済むまでお呼び立てはご遠慮いただいております。レコードが全部棚に収まった頃に、もう一度おかけ直しくださいな。」",
+      "fr": "La ligne grésille un instant. « Toutes mes excuses. Le catalogue musical est encore en cours de classement, et les visites sont un vrai désordre sans lui. Rappelez donc quand chaque disque sera sur son étagère. »"
+    }
+  }
+}

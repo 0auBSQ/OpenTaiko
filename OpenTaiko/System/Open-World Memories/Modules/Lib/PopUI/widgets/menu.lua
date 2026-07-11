@@ -20,7 +20,9 @@ function Menu.new(o)
     self.selected = o.selected or 1
     self.items = {}
     for _, it in ipairs(srcItems) do
-        if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value }
+        -- mark = highlighted row (e.g. a music player's now-playing entry): gold face + gold text.
+        -- It lives on the item table so callers can flip it live without rebuilding the menu.
+        if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value, mark = it.mark }
         else self.items[#self.items + 1] = { text = tostring(it), value = it } end
     end
     self._scrollCur, self._scrollTarget = 0, 0
@@ -107,9 +109,23 @@ function Menu:update(ctx)
     self._scrollCur = self._scrollCur + (self._scrollTarget - self._scrollCur) * math.min(1, ctx.dt * 14)
 end
 
+-- draw one baked row piece clipped to the menu viewport: fully-visible rows blit whole, edge rows
+-- are SLICED via LuaCanvas:DrawRect (source-rect draw) so nothing bleeds past the list box
+local function drawPieceClipped(piece, rcx, rcy, vy0, vy1)
+    local cv = piece.canvas
+    local cw, ch = cv.Width, cv.Height
+    local dx, dy = math.floor(rcx - cw * 0.5), math.floor(rcy - ch * 0.5)
+    local sy0 = math.max(0, math.floor(vy0 - dy))
+    local sy1 = math.min(ch, math.ceil(vy1 - dy))
+    if sy1 <= sy0 then return end
+    if sy0 == 0 and sy1 == ch then cv:DrawAtAnchor(rcx, rcy, "center")
+    else cv:DrawRect(dx, dy + sy0, 0, sy0, cw, sy1 - sy0) end
+end
+
 function Menu:draw()
     if not self.visible then return end
     local n = self:_count()
+    local vy0, vy1 = self.y, self.y + self.h              -- the viewport every row + its text clips to
     local firstVis = math.max(1, math.floor(self._scrollCur / self.rowHeight))
     local lastVis = math.min(n, math.ceil((self._scrollCur + self.h) / self.rowHeight) + 1)
     for i = firstVis, lastVis do
@@ -117,21 +133,27 @@ function Menu:draw()
         local rcy = math.floor(ry + (self.rowHeight - 10) * 0.5 + self.mgr:textNudge(self.eff.font.label))
         local rcx = math.floor(self.x + self.w * 0.5)
         local isSel = (i == self.selected)
+        local it = self.items[i]
+        local marked = it and it.mark
         local piece = isSel and self._rowSel or self._row
-        piece.canvas:SetColor(1, 1, 1); piece.canvas:SetOpacity(1)
-        piece.canvas:SetScale(isSel and 1.0 or 1.0, 1.0)
-        piece.canvas:DrawAtAnchor(rcx, rcy, "center")
+        -- marked (now-playing) rows: warm gold face tint on the plain row; the selected face keeps
+        -- its accent colour and signals through the gold text instead
+        if marked and not isSel then piece.canvas:SetColor(1.0, 0.88, 0.45)
+        else piece.canvas:SetColor(1, 1, 1) end
+        piece.canvas:SetOpacity(1)
+        piece.canvas:SetScale(1.0, 1.0)
+        drawPieceClipped(piece, rcx, rcy, vy0, vy1)
         if isSel and self.focused and self._hiCur > 0.01 then
             self._ring.canvas:SetOpacity(self._hiCur)
-            self._ring.canvas:DrawAtAnchor(rcx, rcy, "center")
+            drawPieceClipped(self._ring, rcx, rcy, vy0, vy1)
         end
-        local it = self.items[i]
         if it then
             local c = self.eff.colors
-            local fg = isSel and c.textOnAccent or c.text
+            local fg = marked and { 255, 208, 74 } or (isSel and c.textOnAccent or c.text)
             local bg = isSel and U.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
+            if marked and not isSel then bg = { 90, 62, 8, 200 } end
             self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), rcy,
-                fg, bg, 1, 1, self.w - 48, "left")
+                fg, bg, 1, 1, self.w - 48, "left", vy0, vy1)
         end
     end
 end

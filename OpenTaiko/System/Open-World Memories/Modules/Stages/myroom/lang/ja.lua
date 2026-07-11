@@ -67,16 +67,23 @@ return {
 	["Click a highlighted tile along the front edge to move the door there."] = "前端のハイライトされたタイルをクリックするとドアがそこへ移動します。",
 	["Click a placed item to remove it — furniture, wall items, rugs and wall paint go back to stock."] = "配置済みのアイテムをクリックで撤去 ― 家具・壁かけ・ラグ・壁紙は在庫に戻ります。",
 
-	-- phone
+	-- jukebox (dialog lines live in data/dialogs.json; these are the player-UI strings)
+	["Jukebox"] = "ジュークボックス",
+	["Songs"] = "曲",
+	["My Room BGM"] = "マイルームBGM",
+	["Sorting the records... the song list is still being prepared."] = "レコードを整理中…楽曲リストを準備しています。",
+	["Nothing selected"] = "未選択",
+	["Play"] = "再生",
+	["Pause"] = "一時停止",
+	["Stop"] = "停止",
+	["Repeat"] = "リピート",
+	["Speed"] = "速度",
+	["[Enter] Play music"] = "[Enter] 音楽をかける",
+	["[Enter] Examine"] = "[Enter] 調べる",
+	["No playable songs found."] = "再生できる曲が見つかりません。",
+
+	-- phone (the landlord's own lines live in data/dialogs.json + data/tiers.json, localized inline)
 	["Phone"] = "電話",
-	["Landlord"] = "大家さん",
-	["Ah, hello! Settling in alright?"] = "ああ、こんにちは！新居には慣れましたか？",
-	["I could knock a wall through and extend your place to a roomier 7x7. Interested?"] = "壁を抜いて、もっと広い7x7に拡張できますよ。いかがです？",
-	["Yes, extend it!"] = "はい、拡張してください！",
-	["Not right now"] = "今はやめておきます",
-	["You've already got the biggest place I offer! Enjoy the space."] = "もううちで一番広い部屋ですよ！ゆっくり楽しんでください。",
-	["{shake:14,0.5}There! Mind the dust — enjoy the extra room."] = "{shake:14,0.5}できました！ほこりに気をつけて ― 広くなった部屋をどうぞ。",
-	["No worries. Ring me whenever."] = "かまいませんよ。いつでも電話してください。",
 	["Call the landlord"] = "大家さんに電話",
 	["Enter a number"] = "番号を入力",
 	["Invite friends (host a room)"] = "友達を招待（ルームを開く）",
@@ -100,16 +107,23 @@ return {
 	["No code entered."] = "コードが入力されていません。",
 
 	-- HUD
-	["WASD move  ·  RMB/Q·E orbit  ·  wheel zoom  ·  [Tab] edit room  ·  Esc: leave"] = "WASD移動 ・ 右クリック/Q・Eで回転 ・ ホイールでズーム ・ [Tab]部屋を編集 ・ Esc: 退出",
-	["WASD move  ·  RMB/Q·E orbit  ·  wheel zoom  ·  Esc / door: leave the visit"] = "WASD移動 ・ 右クリック/Q・Eで回転 ・ ホイールでズーム ・ Esc/ドア: 訪問を終える",
+	["WASD — Move"] = "WASD — 移動",
+	["RMB / Q·E — Orbit"] = "右クリック / Q·E — 視点回転",
+	["Wheel — Zoom"] = "ホイール — ズーム",
+	["Tab — Edit room"] = "Tab — 部屋を編集",
+	["Esc — Leave"] = "Esc — 退出",
+	["Esc / Door — Leave visit"] = "Esc / ドア — 訪問を終える",
 	["[Enter] Use computer"] = "[Enter] パソコンを使う",
 	["[Enter] Use phone"] = "[Enter] 電話を使う",
+	["[Enter] Toggle the lamp"] = "[Enter] ランプを切り替え",
 	["[Enter] Leave the room"] = "[Enter] 部屋を出る",
+	["[Tab] Switch focus"] = "[Tab] フォーカス切り替え",
+	["Join a friend"] = "友達に参加",
+	["Player %d — %s"] = "プレイヤー%d — %s",
+	["Whose room?"] = "誰の部屋？",
 
 	-- phone: dialable numbers / easter eggs (data/phone_numbers.json)
 	["Ahahah... Six seeeven! So funny!"] = "アハハ…シックス・セブン！超ウケる！",
 	["Nice try!"] = "惜しい！",
 	["OOTD is a 10+"] = "OOTDは10+だ",
-	["You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet."] =
-		"謎のポッドのパネルを押す。低い駆動音がするが、何も開かない。まだ。",
 }

@@ -126,7 +126,19 @@ local function drawNumberColor(x, y, str, color, centered)
 	end
 end
 
+-- items buyable only ONCE ever, then never repooled: itempool.OneTime = 1 (e.g. the pod) — a plain DB
+-- column so new one-time items need no code change. (Named OneTime, not "Unique": UNIQUE is a reserved
+-- SQL word, and isUnique below already means "pulled from the pool within a roll".) A furniture grant
+-- counter (.myroom_<id>) is drained by My Room and cannot signal lasting ownership, so a bought
+-- one-time item sets a persistent "<RefText>_owned" trigger; isOwned reads it and isEntryIncluded then
+-- drops the item from every future roll.
+local function isOneTime(entry) return tonumber(entry.OneTime or 0) == 1 end
+local function ownedTrigger(entry) return entry.RefText .. "_owned" end
+
 local function isUnique(entry)
+	if isOneTime(entry) then
+		return true              -- treat as unique so it is pulled from the pool once picked / once owned
+	end
 	if entry.Type == "counterable" then
 		return false
 	end
@@ -134,6 +146,9 @@ local function isUnique(entry)
 end
 
 local function isOwned(entry)
+	if isOneTime(entry) then
+		return save:GetGlobalTrigger(ownedTrigger(entry))
+	end
 	if entry.Type == "triggerable" then
 		return save:GetGlobalTrigger(entry.RefText)
 	end
@@ -575,6 +590,7 @@ local function purchaseItemMultiple(item, slot, qty)
 		-- My Room claims the counter deltas into its inventory
 		save:SetGlobalCounter(item.RefText, save:GetGlobalCounter(item.RefText) + qty)
 	end
+	if isOneTime(item) then save:SetGlobalTrigger(ownedTrigger(item), true) end   -- bought once, never repooled
 	save:SpendCoins(item.Price * qty)
 	item.Stock = (item.Stock or 1) - qty
 	if item.Stock <= 0 then

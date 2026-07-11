@@ -17,6 +17,7 @@ local Edit     = require("editmode")
 local PopUI    = require("PopUI")
 local I18N      = require("i18n")
 local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
+local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
 local net      = MO.net
 
 local SCREEN_W, SCREEN_H = 1920, 1080
@@ -87,7 +88,20 @@ end
 -- edit/MO references stay valid); a player with no saved room gets a fresh default. Coin-shop furniture
 -- purchases (per-save global counters) are claimed into the inventory here, then persisted right away.
 local saveRoom   -- forward decl (loadRoom persists the shop-grant claim through it)
+-- the jukebox's playing song persists alongside the room (own key, same LMDB): every playback op
+-- writes it (JB ctx.onState) and loadRoom resumes it, so leaving/re-entering keeps the music going
+local function jukeboxKey() return (saveKey():gsub("^room_", "jukebox_")) end
+local persistLocked = false    -- deactivate snapshots the live state, then LOCKS so the teardown
+                               -- stopAll (which fires onState with an empty state) can't wipe it
+local function persistJukebox()
+    if persistLocked then return end
+    if net.online and not net.isHost then return end   -- never persist a host's song into a guest save
+    if store == nil then return end
+    local st = JB.persistState()
+    store:Write(jukeboxKey(), st and serialize(st) or "")
+end
 local function loadRoom()
+    persistLocked = false          -- fresh stage entry / room switch: persisting is live again
     if room == nil then room = Room.newDefault() else room:reset() end
     store = store or DATABASE:OpenLocalDatabase("myroom")
     local raw = store and store:Read(saveKey()) or nil
@@ -97,6 +111,13 @@ local function loadRoom()
     if sf then
         local gained = room:drainShopGrants(function(n) return sf:GetGlobalCounter(n) end)
         if gained then saveRoom() end   -- persist the claim ledger + new stock immediately (idempotent)
+    end
+    -- resume this save's jukebox: read BEFORE stopAll (stopping persists an empty state)
+    local jbSaved = deserialize(store and store:Read(jukeboxKey()) or nil)
+    JB.stopAll()
+    if jbSaved then
+        JB.restoreState(jbSaved)
+        persistJukebox()               -- re-persist right away (stopAll just wrote the empty state)
     end
 end
 saveRoom = function()
@@ -190,12 +211,17 @@ function activate()
         player = world.phys:newCharacter{ radius = 0.32, accel = 13, decel = 16 }
         hud = PopUI.new{}
         pcScreen = PCS.new()
-        edit = Edit.new(room, world, function() rebuild(); saveRoom(); MO.onRoomChanged() end)
+        edit = Edit.new(room, world, function()
+            rebuild(); saveRoom(); MO.onRoomChanged()
+            JB.onRoomEdited(room)      -- stop playback if its jukebox got removed; refresh its cell
+        end)
         MO.init({
             getRoom         = function() return room end,
             applyRoom       = function(t) room:loadTable(t) end,
             rebuildRoom     = function() rebuild() end,
             spawnAtEntrance = function() spawnAtEntrance() end,
+            applyJukebox    = function(t) JB.applyNetState(t) end,   -- guest: mirror the host's player
+            jukeboxState    = function() return JB.netState() end,   -- host: brief late joiners
         })
         rebuild()
         spawnAtEntrance()
@@ -208,6 +234,11 @@ function deactivate()
     saveRoom()
     if pcScreen and pcScreen:active() then pcScreen:close() end
     if mode == "edit" and edit then edit:leave() end
+    persistJukebox()                               -- snapshot the LIVE playing position first...
+    persistLocked = true                           -- ...lock it against the teardown's own onState...
+    JB.stopAll()                                   -- ...then kill jukebox audio + UI with the stage
+    JB.close()
+    JB.setDuck(false)                              -- reset the PC-screen crossfade for the next visit
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if hud then hud:disposeWidgets(); hud = nil end
     -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
@@ -216,11 +247,12 @@ function deactivate()
     mode = "play"
 end
 
-function afterSongEnum() end
+function afterSongEnum() JB.onSongEnumDone() end   -- song list ready → jukebox Songs tab unlocks
 
 function onDestroy()
     MO.leave()
     if store then store:Dispose(); store = nil end
+    JB.dispose()
     PCS.disposeBgm()
     if Edit.disposeSfx then Edit.disposeSfx() end
     for _, s in pairs(phoneSfx) do if s then pcall(function() s:Dispose() end) end end
@@ -230,8 +262,11 @@ end
 local function kd(k) return INPUT:KeyboardPressing(k) end
 local function kp(k) return INPUT:KeyboardPressed(k) end
 
--- every interactable the player is in range of, as an ordered list (exit → computer/lamp → phone).
+-- every interactable the player is in range of, as an ordered list (exit → furniture → phone).
 -- Each entry: { kind, it (furniture, when applicable), key (stable id for keeping focus) }.
+-- Multiplayer rules: GUESTS get nothing but the exit; the HOST, while hosting, keeps only the phone
+-- (to stop hosting) and his jukeboxes (playback propagates to every guest) — computer/lamp/pod are
+-- solo-only.
 local function interactablesInRange()
     local list = {}
     local pc, pr = world:worldToCell(px, pz)
@@ -241,12 +276,16 @@ local function interactablesInRange()
         for _, d in ipairs({ { 0, 0 }, { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) do
             local it, cat = room:furnitureAt(pc + d[1], pr + d[2])
             if it and cat and not seen[it] then
-                if cat.computer then
-                    seen[it] = true; list[#list + 1] = { kind = "computer", it = it, key = "computer:" .. tostring(it) }
-                elseif it.id == "floorlamp" then
-                    seen[it] = true; list[#list + 1] = { kind = "lamp", it = it, key = "lamp:" .. tostring(it) }
-                elseif cat.interact == "pod" then
-                    seen[it] = true; list[#list + 1] = { kind = "pod", it = it, key = "pod:" .. tostring(it) }
+                if cat.interact == "jukebox" and not net.connecting then
+                    seen[it] = true; list[#list + 1] = { kind = "jukebox", it = it, key = "jukebox:" .. tostring(it) }
+                elseif not net.online then
+                    if cat.computer then
+                        seen[it] = true; list[#list + 1] = { kind = "computer", it = it, key = "computer:" .. tostring(it) }
+                    elseif it.id == "floorlamp" then
+                        seen[it] = true; list[#list + 1] = { kind = "lamp", it = it, key = "lamp:" .. tostring(it) }
+                    elseif cat.interact == "pod" then
+                        seen[it] = true; list[#list + 1] = { kind = "pod", it = it, key = "pod:" .. tostring(it) }
+                    end
                 end
             end
         end
@@ -281,14 +320,24 @@ local function interactGlow(focused)
     end
 
     if inst and scene.ObjSetEmissive then
-        -- pulse an emissive ADD on the item's own object(s); the lit lamp keeps its warm base emissive
+        -- pulse an emissive ADD on the item's own object(s); the lit lamp keeps its warm base emissive,
+        -- and the jukebox's routed screen part keeps its catalog idle glow (else walking away would
+        -- leave the screen fully dark until something replays it)
         local br, bg, bb = 0, 0, 0
         if focused.kind == "lamp" and focused.it and focused.it.lit ~= false then br, bg, bb = 0.9, 0.72, 0.36 end
+        local partBase = nil
+        if focused.kind == "jukebox" and inst.parts then
+            partBase = {}
+            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = { 0.12, 0.114, 0.096 } end
+        end
         local p = 0.30 + 0.30 * (0.5 + 0.5 * sin(lastTs * 0.006))   -- 0.30 .. 0.90 glow
         world._glow = {}
         for _, o in ipairs(inst.objs or { inst.obj }) do
-            world._glow[#world._glow + 1] = { o = o, r = br, g = bg, b = bb }
-            pcall(function() scene:ObjSetEmissive(o, br + p, bg + p, bb + p) end)
+            local rb = partBase and partBase[o] or nil
+            local r0, g0, b0 = br, bg, bb
+            if rb then r0, g0, b0 = rb[1], rb[2], rb[3] end
+            world._glow[#world._glow + 1] = { o = o, r = r0, g = g0, b = b0 }
+            pcall(function() scene:ObjSetEmissive(o, r0 + p, g0 + p, b0 + p) end)
         end
         return
     end
@@ -351,10 +400,21 @@ local function dialPhone(input)
         dlg:start({ { name = "", text = I18N.trf("You dial %s... It rings, and rings. Nobody picks up.", n) } })
         return
     end
-    local name   = JSONLOADER:ExtractText(ev["name"])
-    local text   = JSONLOADER:ExtractText(ev["text"])
-    local sound  = JSONLOADER:ExtractText(ev["sound"])
-    local effect = JSONLOADER:ExtractText(ev["effect"])
+    -- guarded like every other data-file read: a malformed entry (bare string, nested field) must
+    -- degrade to the no-answer placeholder, not error out of the update path
+    local name, text, sound, effect
+    local okEv = pcall(function()
+        name   = JSONLOADER:ExtractText(ev["name"])
+        text   = JSONLOADER:ExtractText(ev["text"])
+        sound  = JSONLOADER:ExtractText(ev["sound"])
+        effect = JSONLOADER:ExtractText(ev["effect"])
+    end)
+    if not okEv then
+        local n = (input and input ~= "" and input) or I18N.tr("the number")
+        mode = "dialogue"; phoneFlow = nil
+        dlg:start({ { name = "", text = I18N.trf("You dial %s... It rings, and rings. Nobody picks up.", n) } })
+        return
+    end
     if name then name = I18N.tr(name) end        -- localized via lang/ja.lua (English text = the key)
     if text then text = I18N.tr(text) end
     if sound and sound ~= "" and (text == nil or text == "") then
@@ -386,22 +446,104 @@ local function tickBombs(dt)
     end
     if bombFx.t >= bombFx.dur then bombFx = nil end
 end
-local function landlordScript()
-    if room:canExtend() then
-        return { { name = I18N.tr("Landlord"), text = I18N.tr("Ah, hello! Settling in alright?") },
-                 { name = I18N.tr("Landlord"), text = I18N.tr("I could knock a wall through and extend your place to a roomier 7x7. Interested?"),
-                   choices = { { label = I18N.tr("Yes, extend it!"), value = "yes" }, { label = I18N.tr("Not right now"), value = "no" } } } }
+-- the landlord: a greedy little man who sells wall-knock-throughs by the coin. All of his lines live in
+-- data/dialogs.json (localized inline), the per-tier sales pitch in data/tiers.json (Room.TIERS
+-- flavorLoc); {size}/{cost} are filled from the tier entry. The English fallbacks below only cover a
+-- missing/broken dialogs.json — edit the JSON, not these.
+local LANDLORD_EN = {
+    name = "Landlord",
+    greeting_rich = "Well, well. If it is not my favourite tenant, come to make me a richer man.",
+    greeting_poor = "Ah, my favourite tenant. Or you would be, if your purse were not so tragically thin.",
+    offer_rich = "I can open you up to a roomier {size} for a mere {cost} coins. Cash up front, always. So then, do we have a deal?",
+    offer_poor = "I would gladly knock you through to a roomier {size}, but that is {cost} coins and yours are looking light. Come back when you can cover it. No coin, no keys.",
+    maxed = "You have already squeezed the biggest place I will ever rent you, and you paid dearly for every last tile. No more walls left to sell. What a shame I cannot charge you for the air.",
+    choice_yes = "Deal, extend it",
+    choice_no = "Not right now",
+    success = "{shake:14,0.5}A pleasure doing business! I will take that coin now. Mind your step around the fresh plaster, and do enjoy every tile you paid so handsomely for.",
+    broke = "Hah. Your purse says otherwise, friend. Come back when it is heavier and we shall talk.",
+    declined = "Suit yourself. But floor space only ever gets dearer, and my prices have never once gone down.",
+}
+
+-- data/dialogs.json: named dialog lines localized inline ({en,ja,fr}); missing file/key → the fallback
+local dialogsDoc = nil
+local function dlgLoc(section, key, fallback)
+    if dialogsDoc == nil then
+        local ok, doc = pcall(function() return JSONLOADER:JsonParseFileAny("data/dialogs.json") end)
+        dialogsDoc = (ok and doc ~= nil) and doc or false
     end
-    return { { name = I18N.tr("Landlord"), text = I18N.tr("You've already got the biggest place I offer! Enjoy the space.") } }
+    if dialogsDoc == false then return fallback end
+    local line = nil
+    pcall(function()
+        local sec = JSONLOADER:JsonGet(dialogsDoc, section)
+        line = sec and JSONLOADER:JsonGet(sec, key) or nil
+    end)
+    if line == nil then return fallback end
+    local ok, s = pcall(function() return LANG:FromDict(line):GetString(fallback) end)
+    if ok and s and s ~= "" then return s end
+    return fallback
+end
+local function LL(key) return dlgLoc("landlord", key, LANDLORD_EN[key] or key) end
+
+local function landlordFill(s, info)
+    s = s:gsub("{size}", info.iw .. "x" .. info.ih)
+    s = s:gsub("{cost}", tostring(info.cost))
+    return s
+end
+local function landlordScript()
+    if not room:canExtend() then
+        return { { name = LL("name"), text = LL("maxed") } }
+    end
+    local info = room:nextTierInfo()
+    local flavor = (info.flavorLoc and info.flavorLoc:GetString("")) or ""
+    local function joinSp(a, b) if a == "" then return b end if b == "" then return a end return a .. " " .. b end
+    if curSave().Coins < info.cost then
+        return { { name = LL("name"), text = LL("greeting_poor") },
+                 { name = LL("name"), text = landlordFill(joinSp(LL("offer_poor"), flavor), info) } }
+    end
+    return { { name = LL("name"), text = LL("greeting_rich") },
+             { name = LL("name"), text = landlordFill(joinSp(flavor, LL("offer_rich")), info),
+               choices = { { label = LL("choice_yes"), value = "yes" }, { label = LL("choice_no"), value = "no" } } } }
 end
 local function doExtend()
+    local info = room:nextTierInfo()
+    if not info then return false end
+    local sf = curSave()
+    if sf.Coins < info.cost then return false end
+    sf:SpendCoins(info.cost)
     local pc, pr = world:worldToCell(px, pz)
-    room:extendTo(7, 7)
+    room:extendTo(info.iw, info.ih)
     rebuild()
     px, pz = world:cellToWorld(pc, pr)
     player:setPos(px, FY + 0.05, pz)
     saveRoom()
+    return true
 end
+
+-- jukebox context: closures over the stage's live state (guarded — world/room are nil until activate)
+JB.init{
+    theme = PHONE_THEME,
+    isHost = function() return not MO.isGuest() end,     -- solo counts as the authoritative side
+    isOnline = function() return net.online end,
+    broadcast = function(st) MO.broadcastJukebox(st) end,
+    playerPos = function() return px, pz end,
+    cellToWorld = function(c, r) if world then return world:cellToWorld(c, r) end end,
+    propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
+    jukeboxItemAt = function(c, r)
+        if room == nil then return nil end
+        for _, it in ipairs(room.furniture or {}) do
+            if it.id == "jukebox" and it.c == c and it.r == r then return it end
+        end
+        return nil
+    end,
+    anyJukeboxItem = function()
+        if room == nil then return nil end
+        for _, it in ipairs(room.furniture or {}) do if it.id == "jukebox" then return it end end
+        return nil
+    end,
+    onState = function() persistJukebox() end,   -- every playback op → resume state saved per save UID
+    scene = function() return world and world.scene or nil end,
+}
+-- (the PC screen crossfades with the jukebox: JB.setDuck on open/close + PCS.tickBgmFade in update)
 
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
 
@@ -456,16 +598,34 @@ buildPhoneMenu = function()
                     closePhone(); dialPhone(t)       -- looks up data/phone_numbers.json (events/eggs)
                 end)
             elseif v == "invite" then
-                MO.host(); closePhone(); msg = net.msg; msgT = 7
+                if not JB.songsEnumReady() then
+                    -- visits need the finished song catalogue (the guests' jukebox matching runs on it)
+                    closePhone(); mode = "dialogue"; phoneFlow = nil
+                    dlg:start({ { name = "", text = dlgLoc("phone", "enum_wait",
+                        "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"") } })
+                else
+                    MO.host(); closePhone(); msg = net.msg; msgT = 7
+                end
             elseif v == "join" then
+                if not JB.songsEnumReady() then
+                    closePhone(); mode = "dialogue"; phoneFlow = nil
+                    dlg:start({ { name = "", text = dlgLoc("phone", "enum_wait",
+                        "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"") } })
+                else
                 buildPhoneTextPane(I18N.tr("Join a friend"), I18N.tr("paste the room code..."), 4096, I18N.tr("Join"), function(t)
                     closePhone()
                     local code = (t ~= "" and t) or nil
                     if code then
-                        if MO.join(code) then msg = net.msg or I18N.tr("Connecting…") else msg = net.msg or I18N.tr("Could not join.") end
+                        if MO.join(code) then
+                            JB.stopAll()   -- our own music stays home; the host's jukebox takes over
+                            msg = net.msg or I18N.tr("Connecting…")
+                        else
+                            msg = net.msg or I18N.tr("Could not join.")
+                        end
                         msgT = 6
                     end
                 end)
+                end
             elseif v == "stophost" then
                 MO.leave(); closePhone(); msg = I18N.tr("You closed the room."); msgT = 4
             else
@@ -523,11 +683,16 @@ end
 
 local function onDialogueDone(result)
     if phoneFlow == "landlord" then
-        if result == "yes" then doExtend(); phoneFlow = "end"
-            dlg:start({ { name = I18N.tr("Landlord"), text = I18N.tr("{shake:14,0.5}There! Mind the dust — enjoy the extra room.") } })
+        if result == "yes" then
+            phoneFlow = "end"
+            if doExtend() then
+                dlg:start({ { name = LL("name"), text = LL("success") } })
+            else
+                dlg:start({ { name = LL("name"), text = LL("broke") } })
+            end
         elseif result == "no" then phoneFlow = "end"
-            dlg:start({ { name = I18N.tr("Landlord"), text = I18N.tr("No worries. Ring me whenever.") } })
-        else mode = "play"; phoneFlow = nil end           -- "full room" node (no choice)
+            dlg:start({ { name = LL("name"), text = LL("declined") } })
+        else mode = "play"; phoneFlow = nil end           -- "full room" / "cannot afford" node (no choice)
     else
         mode = "play"; phoneFlow = nil
     end
@@ -536,6 +701,8 @@ end
 -- end an online session and drop back into our OWN room (a visitor leaving / being kicked, or a host
 -- closing). Reloads the player's own layout from the DB and respawns at the entrance — staying in-stage.
 local function backToOwnRoom(message)
+    JB.stopAll()                        -- the host's jukebox does not follow us home
+    JB.close()                          -- nor a stranded (invisible) jukebox window eating input
     MO.leave()
     closePhone()
     if pcScreen and pcScreen:active() then pcScreen:close() end
@@ -612,6 +779,12 @@ function update(ts)
         if net.roomGone then backToOwnRoom(I18N.tr("The host closed the room.")) end
     end
 
+    -- jukebox playback upkeep runs in EVERY mode (audio outlives the menu: distance volume, track
+    -- end/repeat, screen glow, net flush); the returned edge feeds the jukebox modal branch below.
+    -- The PC-screen BGM fade is pumped alongside so its fade-out can finish after the screen closes.
+    local jbRes = JB.update(dt, ts)
+    PCS.tickBgmFade(dt)
+
     -- ── modal overlays ──
     if mode == "playerselect" then
         if playerSelUI then
@@ -628,7 +801,10 @@ function update(ts)
         if dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pc" then
-        if pcScreen:update(ts) == "closed" then mode = "play" end
+        if pcScreen:update(ts) == "closed" then
+            mode = "play"
+            JB.setDuck(false, 0.15)        -- PC BGM fades out; the jukebox fades back in just after
+        end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "phone" then
         if phoneUI then
@@ -640,6 +816,9 @@ function update(ts)
         else
             mode = "play"
         end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "jukebox" then
+        if jbRes == "closed" or not JB.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         editCamera(dt)                 -- RMB rotate, WASD pan the target, wheel zoom (player is parked)
@@ -744,9 +923,10 @@ function update(ts)
     interactGlow(focused)
     if focused and (kp("Return") or kp("Space")) then
         if focused.kind == "exit" then
-            if MO.isGuest() then backToOwnRoom("You left the room."); return nil end
+            if MO.isGuest() then backToOwnRoom(I18N.tr("You left the room.")); return nil end
             MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); return Exit("stage", "_title")
         elseif focused.kind == "computer" then
+            JB.setDuck(true)               -- jukebox fades down first; the PC BGM fades in after it
             pcScreen:openScreen(); mode = "pc"
         elseif focused.kind == "phone" then
             openPhone()
@@ -755,7 +935,11 @@ function update(ts)
             rebuild(); saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "pod" then
             mode = "dialogue"; phoneFlow = nil
-            dlg:start({ { name = "", text = I18N.tr("You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.") } })
+            dlg:start({ { name = "", text = dlgLoc("pod", "locked",
+                "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.") } })
+        elseif focused.kind == "jukebox" then
+            JB.openFor(focused.it, Room.displayName("jukebox"))
+            mode = "jukebox"
         end
     end
     if msgT > 0 then msgT = msgT - dt end
@@ -831,6 +1015,9 @@ function draw()
     elseif mode == "phone" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         if phoneUI then phoneUI:draw() end
+    elseif mode == "jukebox" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        JB.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -838,6 +1025,8 @@ function draw()
         if prompt == "computer" then instr[#instr + 1] = { t = I18N.tr("[Enter] Use computer"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "phone" then instr[#instr + 1] = { t = I18N.tr("[Enter] Use phone"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "lamp" then instr[#instr + 1] = { t = I18N.tr("[Enter] Toggle the lamp"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "jukebox" then instr[#instr + 1] = { t = I18N.tr("[Enter] Play music"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "pod" then instr[#instr + 1] = { t = I18N.tr("[Enter] Examine"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = I18N.tr("[Enter] Leave the room"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = I18N.tr("[Tab] Switch focus"), c = { 200, 220, 240 }, s = 18 } end

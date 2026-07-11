@@ -291,6 +291,17 @@
 			}
 		}
 
+		/// <summary>MD5 of the chart file's bytes (uppercase hex; "" if unreadable) — the same
+		/// content-stable identity replays use, so two machines with the same chart agree on it
+		/// even when their per-install uniqueID.json keys differ (e.g. the myroom jukebox P2P).</summary>
+		public string ChartMd5 {
+			get {
+				var path = _GetFirstAvailableScore()?.FileInfo.FileAbsolutePath;
+				if (string.IsNullOrEmpty(path)) return "";
+				return CSongReplay.tComputeChartMd5Cached(path);
+			}
+		}
+
 		#endregion
 
 		#region [General metadata]

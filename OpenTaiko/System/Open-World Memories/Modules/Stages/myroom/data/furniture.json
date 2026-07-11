@@ -1,202 +1,283 @@
 {
- "desk": {
-  "w": 2,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Desk",
-   "ja": "机",
-   "fr": "Bureau"
+  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name {en,ja,fr}, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists).",
+  "_order": [
+    "desk",
+    "chair",
+    "table",
+    "sofa",
+    "bookshelf",
+    "plant",
+    "floorlamp",
+    "bed",
+    "tv",
+    "computer",
+    "arcade",
+    "arcade_neon",
+    "pod",
+    "jukebox",
+    "clock",
+    "poster_nokon",
+    "poster_bol",
+    "phone"
+  ],
+  "desk": {
+    "w": 2,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Desk",
+      "ja": "机",
+      "fr": "Bureau"
+    },
+    "collH": 1.15,
+    "surface": true,
+    "surfaceH": 0.82,
+    "shop": true
+  },
+  "chair": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Chair",
+      "ja": "椅子",
+      "fr": "Chaise"
+    },
+    "collH": 1.0,
+    "shop": true
+  },
+  "table": {
+    "w": 2,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Table",
+      "ja": "テーブル",
+      "fr": "Table"
+    },
+    "collH": 0.8,
+    "surface": true,
+    "surfaceH": 0.78,
+    "shop": true
+  },
+  "sofa": {
+    "w": 2,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Sofa",
+      "ja": "ソファ",
+      "fr": "Canapé"
+    },
+    "collH": 0.85,
+    "shop": true
+  },
+  "bookshelf": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Bookshelf",
+      "ja": "本棚",
+      "fr": "Bibliothèque"
+    },
+    "collH": 1.85,
+    "shop": true
+  },
+  "plant": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Potted Plant",
+      "ja": "観葉植物",
+      "fr": "Plante en pot"
+    },
+    "collH": 1.05,
+    "shop": true
+  },
+  "floorlamp": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Floor Lamp",
+      "ja": "フロアランプ",
+      "fr": "Lampadaire"
+    },
+    "collH": 1.7,
+    "collW": 0.4,
+    "collD": 0.4,
+    "shop": true
+  },
+  "bed": {
+    "w": 1,
+    "h": 2,
+    "place": "ground",
+    "name": {
+      "en": "Bed",
+      "ja": "ベッド",
+      "fr": "Lit"
+    },
+    "collH": 0.65,
+    "shop": true
+  },
+  "tv": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "TV",
+      "ja": "テレビ",
+      "fr": "Téléviseur"
+    },
+    "collH": 1.0,
+    "stackOn": true,
+    "shop": true
+  },
+  "computer": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Computer",
+      "ja": "パソコン",
+      "fr": "Ordinateur"
+    },
+    "collH": 0.9,
+    "stackOn": true,
+    "computer": true,
+    "model": "computer",
+    "collW": 0.7,
+    "collD": 0.55,
+    "shop": true
+  },
+  "arcade": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Arcade Cabinet",
+      "ja": "アーケード筐体",
+      "fr": "Borne d'arcade"
+    },
+    "collH": 1.6,
+    "model": "arcade",
+    "screen": {
+      "tex": "taiko",
+      "emit": true
+    },
+    "accent": [
+      70,
+      120,
+      220
+    ]
+  },
+  "arcade_neon": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Neon Arcade Cabinet",
+      "ja": "ネオンアーケード筐体",
+      "fr": "Borne d'arcade néon"
+    },
+    "collH": 1.6,
+    "model": "arcade",
+    "screen": {
+      "tex": "retro",
+      "emit": true
+    },
+    "accent": [
+      220,
+      50,
+      40
+    ]
+  },
+  "pod": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Mysterious Pod",
+      "ja": "謎のポッド",
+      "fr": "Capsule mystérieuse"
+    },
+    "collH": 1.9,
+    "model": "pod",
+    "interact": "pod",
+    "shop": true
+  },
+  "clock": {
+    "w": 1,
+    "h": 1,
+    "place": "wall",
+    "name": {
+      "en": "Wall Clock",
+      "ja": "壁掛け時計",
+      "fr": "Horloge murale"
+    },
+    "wallGlb": {
+      "file": "wallclock",
+      "h": 0.55,
+      "axis": "x"
+    },
+    "legacyMirror": true,
+    "shop": true
+  },
+  "poster_nokon": {
+    "w": 1,
+    "h": 1,
+    "place": "wall",
+    "name": {
+      "en": "Nokon Portrait",
+      "ja": "ノコンの肖像",
+      "fr": "Portrait de Nokon"
+    },
+    "picture": "nokon",
+    "shop": true
+  },
+  "poster_bol": {
+    "w": 1,
+    "h": 1,
+    "place": "wall",
+    "name": {
+      "en": "Bol Portrait",
+      "ja": "ボルの肖像",
+      "fr": "Portrait de Bol"
+    },
+    "picture": "bol",
+    "shop": true
+  },
+  "phone": {
+    "w": 1,
+    "h": 1,
+    "place": "wall",
+    "name": {
+      "en": "Phone",
+      "ja": "電話",
+      "fr": "Téléphone"
+    },
+    "fixed": true,
+    "wallGlb": {
+      "file": "wallphone",
+      "h": 0.62,
+      "axis": "z"
+    }
+  },
+  "jukebox": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "name": {
+      "en": "Jukebox",
+      "ja": "ジュークボックス",
+      "fr": "Juke-box"
+    },
+    "collH": 1.5,
+    "model": "jukebox",
+    "interact": "jukebox",
+    "shop": true,
+    "emissivePart": "Jukebox_Emission"
   }
- },
- "chair": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Chair",
-   "ja": "椅子",
-   "fr": "Chaise"
-  }
- },
- "table": {
-  "w": 2,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Table",
-   "ja": "テーブル",
-   "fr": "Table"
-  }
- },
- "sofa": {
-  "w": 2,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Sofa",
-   "ja": "ソファ",
-   "fr": "Canapé"
-  }
- },
- "bookshelf": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Bookshelf",
-   "ja": "本棚",
-   "fr": "Bibliothèque"
-  }
- },
- "plant": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Potted Plant",
-   "ja": "観葉植物",
-   "fr": "Plante en pot"
-  }
- },
- "floorlamp": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Floor Lamp",
-   "ja": "フロアランプ",
-   "fr": "Lampadaire"
-  }
- },
- "bed": {
-  "w": 1,
-  "h": 2,
-  "place": "ground",
-  "name": {
-   "en": "Bed",
-   "ja": "ベッド",
-   "fr": "Lit"
-  }
- },
- "tv": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "TV",
-   "ja": "テレビ",
-   "fr": "Téléviseur"
-  }
- },
- "clock": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Wall Clock",
-   "ja": "壁掛け時計",
-   "fr": "Horloge murale"
-  }
- },
- "shelf": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Wall Shelf",
-   "ja": "壁棚",
-   "fr": "Étagère murale"
-  }
- },
- "poster": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Poster",
-   "ja": "ポスター",
-   "fr": "Affiche"
-  }
- },
- "painting": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Painting",
-   "ja": "絵画",
-   "fr": "Tableau"
-  }
- },
- "phone": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Phone",
-   "ja": "電話",
-   "fr": "Téléphone"
-  }
- },
- "computer": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Computer",
-   "ja": "パソコン",
-   "fr": "Ordinateur"
-  }
- },
- "arcade": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Arcade Cabinet",
-   "ja": "アーケード筐体",
-   "fr": "Borne d'arcade"
-  }
- },
- "arcade_neon": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Neon Arcade Cabinet",
-   "ja": "ネオンアーケード筐体",
-   "fr": "Borne d'arcade néon"
-  }
- },
- "pod": {
-  "w": 1,
-  "h": 1,
-  "place": "ground",
-  "name": {
-   "en": "Mysterious Pod",
-   "ja": "謎のポッド",
-   "fr": "Capsule mystérieuse"
-  }
- },
- "poster_nokon": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Nokon Portrait",
-   "ja": "ノコンの肖像",
-   "fr": "Portrait de Nokon"
-  }
- },
- "poster_bol": {
-  "w": 1,
-  "h": 1,
-  "place": "wall",
-  "name": {
-   "en": "Bol Portrait",
-   "ja": "ボルの肖像",
-   "fr": "Portrait de Bol"
-  }
- }
 }

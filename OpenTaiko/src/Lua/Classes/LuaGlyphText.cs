@@ -111,6 +111,15 @@ namespace OpenTaiko {
 			_ => (0, 0),
 		};
 
+		// Vertical clip band (screen-space y) applied to subsequent Draw calls: glyphs outside are
+		// culled, edge glyphs are sliced pixel-exact via a source-rect draw (upright draws; rotated
+		// text ignores the band). Scrolling lists (PopUI menus) set this so text clips to the viewport
+		// like the row graphics do. Pass y1 <= y0 to clear.
+		private double _clipY0 = double.NegativeInfinity, _clipY1 = double.PositiveInfinity;
+		public void SetClipY(double y0, double y1) {
+			if (y1 <= y0) { _clipY0 = double.NegativeInfinity; _clipY1 = double.PositiveInfinity; } else { _clipY0 = y0; _clipY1 = y1; }
+		}
+
 		private static Color FromLua(LuaColor? c, Color fallback)
 			=> c == null ? fallback : Color.FromArgb(c.A, c.R, c.G, c.B);
 
@@ -182,7 +191,20 @@ namespace OpenTaiko {
 							glyph.Tex.Draw(rcx - gw / 2, rcy - gh / 2);   // sub-pixel: rotated text must not snap
 							glyph.Tex.SetRotation(0);
 						} else {
-							glyph.Tex.Draw(Math.Floor(gx), Math.Floor(gy));   // upright: integer-crisp
+							double top = Math.Floor(gy);
+							double bot = top + glyph.Tex.Height * sy;
+							if (bot <= _clipY0 || top >= _clipY1) {
+								// fully outside the clip band: culled
+							} else if (top >= _clipY0 && bot <= _clipY1) {
+								glyph.Tex.Draw(Math.Floor(gx), top);          // upright: integer-crisp
+							} else {
+								// edge glyph: slice the visible band via a source rect (exact at sy=1,
+								// the menu/list case; scaled draws slice in source pixels)
+								double v0 = Math.Max(top, _clipY0), v1 = Math.Min(bot, _clipY1);
+								int srcY = (int)Math.Floor((v0 - top) / sy);
+								int srcH = (int)Math.Ceiling((v1 - v0) / sy);
+								if (srcH > 0) glyph.Tex.DrawRect(Math.Floor(gx), Math.Floor(v0), 0, srcY, glyph.Tex.Width, srcH);
+							}
 						}
 						glyph.Tex.SetScale(1, 1);
 						glyph.Tex.SetColor(1, 1, 1);

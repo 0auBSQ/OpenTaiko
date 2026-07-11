@@ -25,11 +25,16 @@ Models taken from `Models/GLTF format/`.
 
 ## CC BY models
 
-License: **CC BY** (https://creativecommons.org/licenses/by/3.0/)
+License: **CC BY 3.0** (https://creativecommons.org/licenses/by/3.0/) unless noted otherwise per row.
 
-| File | Title | Author | Model page |
-|---|---|---|---|
-| wallclock.glb | Analog clock | Poly by Google | https://poly.pizza/m/5gAoMR2YHs3 |
-| wallphone.glb | Payphone | Poly by Google | https://poly.pizza/m/dqzY-cxJJsZ |
-| arcade.glb | Arcade Machine | J-Toastie | https://poly.pizza/m/GLDkMhiynM |
-| computer.glb | Computer | Poly by Google | https://poly.pizza/m/2EHvZLax4Y3 |
+| File | Title | Author | Model page | License |
+|---|---|---|---|---|
+| wallclock.glb | Analog clock | Poly by Google | https://poly.pizza/m/5gAoMR2YHs3 | CC BY 3.0 |
+| wallphone.glb | Payphone | Poly by Google | https://poly.pizza/m/dqzY-cxJJsZ | CC BY 3.0 |
+| arcade.glb | Arcade Machine | J-Toastie | https://poly.pizza/m/GLDkMhiynM | CC BY 3.0 |
+| computer.glb | Computer | Poly by Google | https://poly.pizza/m/2EHvZLax4Y3 | CC BY 3.0 |
+| jukebox.glb | Jukebox | Rescue3D Assets (https://sketchfab.com/rescue3d) | https://sketchfab.com/3d-models/jukebox-188e71ce378f4b6786054d9f74dd3a25 | CC BY 4.0 |
+
+jukebox.glb credit line (per the download's license.txt): This work is based on "Jukebox"
+(https://sketchfab.com/3d-models/jukebox-188e71ce378f4b6786054d9f74dd3a25) by Rescue3D Assets
+(https://sketchfab.com/rescue3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/).

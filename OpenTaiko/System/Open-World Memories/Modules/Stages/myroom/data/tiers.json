@@ -1,0 +1,78 @@
+[
+  {
+    "_comment": "Room size tiers, in purchase order. iw/ih = interior size, cost = coins the landlord charges to reach THIS tier (tier 1 = the free base room). flavor = the landlord's per-tier sales pitch, joined into his offer ({size}/{cost} are filled by the code). Add a tier by appending an entry.",
+    "iw": 5,
+    "ih": 5,
+    "cost": 0
+  },
+  {
+    "iw": 6,
+    "ih": 6,
+    "cost": 100,
+    "flavor": {
+      "en": "Between us, the first knock-through is practically charity. I barely make a thing on it. Barely.",
+      "ja": "ここだけの話、最初の壁抜きはほとんど慈善事業なんですよ。儲けなんてほんの少し。ほんの、少しね。",
+      "fr": "Entre nous, la première ouverture, c'est presque de la charité. J'y gagne à peine. À peine, hein."
+    }
+  },
+  {
+    "iw": 7,
+    "ih": 7,
+    "cost": 1000,
+    "flavor": {
+      "en": "You would not believe what passes for a wall in this building. One good sneeze and down it goes. Money well spent, I promise.",
+      "ja": "この建物の壁ときたら、ひどいものですよ。くしゃみ一つで倒れそうだ。だからこそ、お金の使いどころというわけです。",
+      "fr": "Vous n'imaginez pas ce qui passe pour un mur dans cet immeuble. Un bon éternuement et tout tombe. De l'argent bien dépensé, promis."
+    }
+  },
+  {
+    "iw": 8,
+    "ih": 8,
+    "cost": 5000,
+    "flavor": {
+      "en": "My knees ache just thinking about all that plaster. Luckily for you, aching knees are included in the price.",
+      "ja": "漆喰のことを考えるだけで膝が痛みますよ。ご安心を、その膝の痛みも料金に含まれておりますから。",
+      "fr": "Rien que de penser à tout ce plâtre, mes genoux me font mal. Rassurez-vous, les genoux douloureux sont compris dans le prix."
+    }
+  },
+  {
+    "iw": 9,
+    "ih": 8,
+    "cost": 10000,
+    "flavor": {
+      "en": "Prices went up, you say? Everything goes up. That is the beauty of it.",
+      "ja": "値上がりした、ですって？何でも上がるんですよ。そこが素晴らしいところでしてね。",
+      "fr": "Les prix ont augmenté, dites-vous ? Tout augmente. C'est ça qui est beau."
+    }
+  },
+  {
+    "iw": 10,
+    "ih": 8,
+    "cost": 10000,
+    "flavor": {
+      "en": "I knocked one of these through for my own brother once. Charged him double, mind you. Family rates.",
+      "ja": "実の弟にも一度やってあげたことがありましてね。倍額いただきましたが。身内価格というやつです。",
+      "fr": "J'en ai percé un pour mon propre frère, une fois. Je lui ai compté double, notez bien. Tarif famille."
+    }
+  },
+  {
+    "iw": 10,
+    "ih": 9,
+    "cost": 10000,
+    "flavor": {
+      "en": "Careful now. Keep buying walls from me and people will start calling you a landlord. It suits nobody but me.",
+      "ja": "お気をつけなさい。私から壁を買い続けていると、そのうち大家と呼ばれ始めますよ。似合うのは私だけで結構。",
+      "fr": "Attention, à force de m'acheter des murs, on va finir par vous prendre pour un propriétaire. Ça ne va bien qu'à moi."
+    }
+  },
+  {
+    "iw": 10,
+    "ih": 10,
+    "cost": 10000,
+    "flavor": {
+      "en": "After this one there is truly nothing left to sell you. I have lost sleep over it, believe me.",
+      "ja": "これが最後、もう売るものが本当に何もなくなりますよ。眠れない夜を過ごしました。ええ、本当に。",
+      "fr": "Après celui-ci, je n'ai vraiment plus rien à vous vendre. J'en ai perdu le sommeil, croyez-moi."
+    }
+  }
+]

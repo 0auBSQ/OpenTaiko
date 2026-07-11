@@ -461,6 +461,8 @@ end
 			LuaScript["RequestSongList"] = RequestSongList;
 			LuaScript["GenerateSongListSettings"] = LuaSongListSettings.Generate;
 			LuaScript["IsSongsEnumerating"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsEnumerating ?? false);
+			// positive "enumeration fully done" flag (IsSongsEnumerating is also false BEFORE the scan starts)
+			LuaScript["IsSongsEnumDone"] = (Func<bool>)(() => OpenTaiko.EnumSongs?.IsSongListEnumCompletelyDone ?? false);
 
 			LuaScript.DoString(LoadingApiLua, "LOADING");   // skinner loading-bar API (LOADING:Add/Tick), see tBeginYieldable
 

@@ -195,6 +195,30 @@ function MO.leave()
     resetState()
 end
 
+-- ── jukebox playback state (host → guests; see jukebox.lua) ─────────────────────────────────────
+-- One flat table crosses as one message; guests resolve the song against their own folders by
+-- md5/uid/title and stay silent when they don't have the chart. Additive channel: old clients drop it.
+local function jukeboxToJson(st)
+    return string.format(
+        '{"kind":%s,"md5":%s,"uid":%s,"title":%s,"genre":%s,"playing":%s,"paused":%s,"pos":%d,"speed":%.3f,"rep":%s,"c":%d,"r":%d}',
+        jstr(st.kind or ""), jstr(st.md5 or ""), jstr(st.uid or ""), jstr(st.title or ""), jstr(st.genre or ""),
+        st.playing and "true" or "false", st.paused and "true" or "false",
+        math.floor(st.pos or 0), st.speed or 1.0, st.rep and "true" or "false",
+        math.floor(st.c or 0), math.floor(st.r or 0))
+end
+local function jukeboxFromJson(json)
+    local root = JSONLOADER:JsonParseStringAny(json); if not root then return nil end
+    local function g(k) return JSONLOADER:JsonGet(root, k) end
+    local kind = g("kind"); if kind == "" then kind = nil end
+    return { kind = kind, md5 = g("md5"), uid = g("uid"), title = g("title"), genre = g("genre"),
+             playing = g("playing") == true, paused = g("paused") == true,
+             pos = g("pos"), speed = g("speed"), rep = g("rep") == true, c = g("c"), r = g("r") }
+end
+function MO.broadcastJukebox(st)
+    if not (net.online and net.isHost) then return end
+    NET:Broadcast("jukebox", jukeboxToJson(st or { kind = "" }))
+end
+
 function MO.sendRoomTo(id) NET:SendTo(id, "room", MO.roomToJson(C.getRoom())) end
 -- the host re-shares the layout after an edit so visitors stay in sync
 function MO.onRoomChanged() if net.online and net.isHost then NET:Broadcast("room", MO.roomToJson(C.getRoom())) end end
@@ -233,7 +257,13 @@ function MO.drain()
         if ty == "connected" then
             net.online, net.connecting = true, false; MO.refreshRoster()
         elseif ty == "joined" then
-            MO.refreshRoster(); if net.isHost then MO.sendRoomTo(e.Peer) end
+            MO.refreshRoster()
+            if net.isHost then
+                MO.sendRoomTo(e.Peer)
+                -- late joiners also get the current jukebox state (playing music, position, speed)
+                local st = C.jukeboxState and C.jukeboxState() or nil
+                if st then NET:SendTo(e.Peer, "jukebox", jukeboxToJson(st)) end
+            end
         elseif ty == "left" then
             net.posByPeer[e.Peer] = nil; MO.refreshRoster()
         elseif ty == "roomclosed" then
@@ -246,6 +276,11 @@ function MO.drain()
             elseif e.Channel == "room" then
                 local t = MO.roomFromJson(e.Data)
                 if t then C.applyRoom(t); C.rebuildRoom(); C.spawnAtEntrance(); net.gotRoom = true end
+            elseif e.Channel == "jukebox" then
+                if not net.isHost and C.applyJukebox then
+                    local t = jukeboxFromJson(e.Data)
+                    if t then C.applyJukebox(t) end
+                end
             end
         end
     end

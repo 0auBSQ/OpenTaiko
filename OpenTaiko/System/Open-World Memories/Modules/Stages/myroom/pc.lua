@@ -274,20 +274,50 @@ function ClippedMenu:update(ctx)
     end
 end
 
--- ── the MyRoom BGM (created lazily ONCE for the stage lifetime; disposed via PC.disposeBgm) ───────
+-- ── the MyRoom BGM with CROSSFADES (created lazily ONCE; disposed via PC.disposeBgm) ──────────────
+-- stage-local copy (Sounds/bgm.ogg — the jukebox BGM tab plays the same file); the skin-level
+-- Sounds/Heya/BGM.ogg stays for the C# CStageHeya room. Opening the computer fades this BGM IN
+-- (slightly delayed so the room's jukebox — ducked by Script via JB.setDuck — fades down first);
+-- closing fades it OUT and stops the stream at silence. Script pumps PC.tickBgmFade(dt) EVERY
+-- frame so the fade-out finishes after the screen has closed.
 local bgm, bgmFailed = nil, false
-local function bgmPlay()
+local bgmVol, bgmTarget, bgmDelay = 0, 0, 0
+local bgmStopAt0 = false
+local function bgmEnsure()
     if bgm == nil and not bgmFailed then
         local ok = pcall(function()
-            bgm = SOUND:CreateBGM("../../../Sounds/Heya/BGM.ogg")
+            bgm = SOUND:CreateBGM("Sounds/bgm.ogg")
             bgm:SetLoop(true)
         end)
         if not ok or bgm == nil then bgmFailed = true; bgm = nil end
     end
-    if bgm then pcall(function() bgm:Play() end) end
+    return bgm
+end
+local function bgmPlay()
+    if bgmEnsure() == nil then return end
+    bgmDelay, bgmTarget, bgmStopAt0 = 0.30, 100, false
+    pcall(function()
+        bgm:Stop()                 -- double-buffered sound: never Play twice without Stop
+        bgm:SetVolume(0)
+        bgm:Play()
+    end)
+    bgmVol = 0
 end
 local function bgmStop()
-    if bgm then pcall(function() bgm:Stop() end) end
+    bgmTarget, bgmDelay, bgmStopAt0 = 0, 0, true
+end
+function PC.tickBgmFade(dt)
+    if bgm == nil then return end
+    if bgmDelay > 0 then bgmDelay = math.max(0, bgmDelay - (dt or 0)); return end
+    if bgmVol == bgmTarget then return end
+    local step = (dt or 0) * 340                      -- full 0..100 sweep in ~0.3s
+    if math.abs(bgmTarget - bgmVol) <= step then bgmVol = bgmTarget
+    else bgmVol = bgmVol + (bgmTarget > bgmVol and step or -step) end
+    pcall(function() bgm:SetVolume(math.floor(bgmVol)) end)
+    if bgmStopAt0 and bgmVol <= 0 then
+        bgmStopAt0 = false
+        pcall(function() bgm:Stop() end)
+    end
 end
 -- the failed-unlock error blip: the skin's own error sound (same file the C# UI uses;
 -- character_shop's sounds.Error is the same idea). Cached once, disposed with the BGM.

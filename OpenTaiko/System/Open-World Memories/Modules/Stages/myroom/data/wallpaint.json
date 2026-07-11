@@ -1,10 +1,79 @@
 {
-    "plaster": { "tex": "wall",  "name": { "en": "Plaster",      "ja": "漆喰",       "fr": "Plâtre" } },
-    "blue":    { "tex": "blue",  "name": { "en": "Sky Blue",     "ja": "スカイブルー", "fr": "Bleu ciel" } },
-    "beige":   { "tex": "beige", "name": { "en": "Warm Beige",   "ja": "ベージュ",   "fr": "Beige chaud" } },
-    "sage":    { "tex": "sage",  "name": { "en": "Sage Green",   "ja": "セージ",     "fr": "Vert sauge" } },
-    "brick":     { "tex": "brick",     "name": { "en": "Brick Wall",   "ja": "レンガの壁", "fr": "Mur de briques" } },
-    "rock":      { "tex": "rock",      "name": { "en": "Rock Wall",    "ja": "岩の壁",     "fr": "Mur rocheux" } },
-    "stonewall": { "tex": "stonewall", "name": { "en": "Stone Wall",   "ja": "石壁",       "fr": "Mur de pierre" } },
-    "default_paint": { "tex": "wall", "name": { "en": "Default Wall", "ja": "標準の壁", "fr": "Mur par défaut" } }
+  "_comment": "Wall paints (Paint tab). LIVE fields: name {en,ja,fr} = display name; swatch = flat PNG used as this item's coin-shop preview (shop-sold ids only). tex is informational: texture ids bind in assets.lua (A.WALLPAINT), and the default_* entries are wired to the DEFAULT_FLOOR/DEFAULT_PAINT constants in room.lua. Add an entry AND its id to _order.",
+  "_order": [
+    "plaster",
+    "blue",
+    "beige",
+    "sage",
+    "brick",
+    "rock",
+    "stonewall",
+    "default_paint"
+  ],
+  "plaster": {
+    "tex": "wall",
+    "name": {
+      "en": "Plaster",
+      "ja": "漆喰",
+      "fr": "Plâtre"
+    }
+  },
+  "blue": {
+    "tex": "blue",
+    "name": {
+      "en": "Sky Blue",
+      "ja": "スカイブルー",
+      "fr": "Bleu ciel"
+    }
+  },
+  "beige": {
+    "tex": "beige",
+    "name": {
+      "en": "Warm Beige",
+      "ja": "ベージュ",
+      "fr": "Beige chaud"
+    }
+  },
+  "sage": {
+    "tex": "sage",
+    "name": {
+      "en": "Sage Green",
+      "ja": "セージ",
+      "fr": "Vert sauge"
+    }
+  },
+  "brick": {
+    "tex": "brick",
+    "name": {
+      "en": "Brick Wall",
+      "ja": "レンガの壁",
+      "fr": "Mur de briques"
+    },
+    "swatch": "Textures/Surfaces/brick.png"
+  },
+  "rock": {
+    "tex": "rock",
+    "name": {
+      "en": "Rock Wall",
+      "ja": "岩の壁",
+      "fr": "Mur rocheux"
+    },
+    "swatch": "Textures/Surfaces/rock.png"
+  },
+  "stonewall": {
+    "tex": "stonewall",
+    "name": {
+      "en": "Stone Wall",
+      "ja": "石壁",
+      "fr": "Mur de pierre"
+    }
+  },
+  "default_paint": {
+    "tex": "wall",
+    "name": {
+      "en": "Default Wall",
+      "ja": "標準の壁",
+      "fr": "Mur par défaut"
+    }
+  }
 }

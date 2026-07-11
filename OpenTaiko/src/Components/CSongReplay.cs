@@ -75,8 +75,9 @@ class CSongReplay {
 	}
 
 	// The best-plays prefetch hashes the same chart file once per difficulty — cache by write time.
+	// internal: LuaSongNode.ChartMd5 exposes this as the content-stable cross-machine song key.
 	private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (long ticks, string md5)> _md5Cache = new();
-	private static string tComputeChartMd5Cached(string path) {
+	internal static string tComputeChartMd5Cached(string path) {
 		try {
 			long t = File.GetLastWriteTimeUtc(path).Ticks;
 			if (_md5Cache.TryGetValue(path, out var e) && e.ticks == t) return e.md5;

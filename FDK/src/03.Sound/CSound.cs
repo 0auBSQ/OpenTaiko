@@ -160,9 +160,11 @@ public class CSound : IDisposable {
 		_gain = gain;
 		_truePeak = truePeak;
 
-		if (SoundGroup == ESoundGroup.SongPlayback) {
-			Trace.TraceInformation($"{nameof(CSound)}.{nameof(SetGain)}: Gain: {_gain}. True Peak: {_truePeak}");
-		}
+		// NOTE: no per-change trace here (nor in AutomationLevel/GroupLevel/SetVolume). With
+		// Trace.AutoFlush on, each line is a synchronous log-file flush — sounds whose volume is
+		// adjusted CONTINUOUSLY (the myroom jukebox fades its SongPlayback stream with the player's
+		// distance every step) turned these diagnostics into dozens of disk flushes per second and
+		// visibly stuttered the frame loop.
 
 		SetVolume();
 	}
@@ -184,10 +186,6 @@ public class CSound : IDisposable {
 			}
 
 			_automationLevel = value;
-
-			if (SoundGroup == ESoundGroup.SongPlayback) {
-				Trace.TraceInformation($"{nameof(CSound)}.{nameof(AutomationLevel)} set: {AutomationLevel}");
-			}
 
 			SetVolume();
 		}
@@ -215,10 +213,6 @@ public class CSound : IDisposable {
 
 			_groupLevel = value;
 
-			if (SoundGroup == ESoundGroup.SongPlayback) {
-				Trace.TraceInformation($"{nameof(CSound)}.{nameof(GroupLevel)} set: {GroupLevel}");
-			}
-
 			SetVolume();
 		}
 	}
@@ -234,11 +228,6 @@ public class CSound : IDisposable {
 
 		var safeTruePeakGain = _truePeak?.Negate() ?? new Lufs(0);
 		var finalGain = gain.Min(safeTruePeakGain);
-
-		if (SoundGroup == ESoundGroup.SongPlayback) {
-			Trace.TraceInformation(
-				$"{nameof(CSound)}.{nameof(SetVolume)}: Gain:{_gain}. Automation Level: {automationLevel}. Group Level: {groupLevel}. Summed Gain: {gain}. Safe True Peak Gain: {safeTruePeakGain}. Final Gain: {finalGain}.");
-		}
 
 		lufsVolume = finalGain;
 	}

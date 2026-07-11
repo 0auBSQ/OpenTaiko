@@ -28,17 +28,21 @@ namespace OpenTaiko {
 		// Build the underlying sound in-place (async-load path: created empty, filled on the render thread).
 		// Until this runs, every method is a harmless no-op.
 		internal void LoadDeferred(string path, ESoundGroup group) {
+			if (_disposedValue) return;   // disposed while still queued: don't resurrect an unowned native sound
 			Path = path;
 			var s = new CSkin.CSystemSound(path, false, false, false, group);
 			s.tLoading();
 			_sound = s;
-			// Apply anything set on the stub while it was still loading.
+			// Apply anything set on the stub while it was still loading. Play BEFORE the buffered seek:
+			// tPlay -> PlayStart rewinds the stream to 0, so a pending SetTimestamp must land AFTER it —
+			// the same Play-then-SetTimestamp discipline live callers follow (song-select preview, the
+			// myroom jukebox starting mid-track for late-joining guests).
 			if (_pendingLoop.HasValue) s.bLoop = _pendingLoop.Value;
 			if (_pendingVolume.HasValue) s.SetVolume(_pendingVolume.Value);
 			if (_pendingPan.HasValue) s.SetPanning(_pendingPan.Value);
-			if (_pendingTimestamp.HasValue) s.SetTimestamp(_pendingTimestamp.Value);
 			if (_pendingSpeed.HasValue) s.SetSpeed(_pendingSpeed.Value);
 			if (_pendingPlay) s.tPlay();
+			if (_pendingTimestamp.HasValue) s.SetTimestamp(_pendingTimestamp.Value);
 			_pendingLoop = null; _pendingVolume = null; _pendingPan = null; _pendingTimestamp = null; _pendingSpeed = null; _pendingPlay = false;
 		}
 

@@ -114,11 +114,15 @@ end
 
 -- full-control glyph draw for widget labels: fg/bg {r,g,b,a} (bg = outline; nil = none), anchor = the same
 -- 9 anchor names as DrawAtAnchor, anchoring the text's box (ink + the same padding a GetText texture has).
-function M:drawTextEx(size, str, x, y, fg, bg, opacity, scale, maxWidth, anchor)
+-- Optional clipY0/clipY1 clip the text to a vertical band (pixel-exact glyph slicing) — scrolling lists
+-- pass their viewport so edge rows cut cleanly instead of overflowing the list box.
+function M:drawTextEx(size, str, x, y, fg, bg, opacity, scale, maxWidth, anchor, clipY0, clipY1)
     local gf = self:gfont(size)
     local fc = fg and self:color(fg[1], fg[2], fg[3], fg[4]) or self:color(255, 255, 255)
     local bc = bg and self:color(bg[1], bg[2], bg[3], bg[4]) or self:color(0, 0, 0, 0)
+    if clipY0 ~= nil then gf:SetClipY(clipY0, clipY1 or clipY0) end
     gf:Draw(tostring(str), x, y, fc, bc, opacity or 1, scale or 1, maxWidth or 0, anchor or "topleft")
+    if clipY0 ~= nil then gf:SetClipY(0, 0) end
 end
 
 -- word/newline wrap to <= maxWidth (UTF-8 correct, CJK-aware; no texture allocation). Returns a list of lines.

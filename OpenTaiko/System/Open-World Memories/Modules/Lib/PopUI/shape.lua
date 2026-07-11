@@ -401,4 +401,35 @@ function Shape.bubble(cv, x, y, w, h, opts)
     end
 end
 
+-- ── audio-player transport icons (language-agnostic glyphs baked onto widget canvases) ─────────────
+-- kind: "play" | "pause" | "stop" | "repeat" | "back". Drawn centered at (cx,cy), overall size s,
+-- color c = {r,g,b[,a]}. Buttons pass their text color so icons match either face.
+function Shape.icon(cv, kind, cx, cy, s, c)
+    local h = s * 0.5
+    if kind == "play" then
+        fillTriangle(cv, cx - h * 0.58, cy - h * 0.88, cx - h * 0.58, cy + h * 0.88, cx + h * 0.92, cy, c)
+    elseif kind == "pause" then
+        local bw, bh = s * 0.24, s * 0.84
+        Shape.fillRoundAA(cv, cx - s * 0.27 - bw * 0.5, cy - bh * 0.5, bw, bh, bw * 0.35, c)
+        Shape.fillRoundAA(cv, cx + s * 0.27 - bw * 0.5, cy - bh * 0.5, bw, bh, bw * 0.35, c)
+    elseif kind == "stop" then
+        local d = s * 0.7
+        Shape.fillRoundAA(cv, cx - d * 0.5, cy - d * 0.5, d, d, d * 0.18, c)
+    elseif kind == "repeat" then
+        -- a rounded loop with an arrowhead on the top run
+        local W, H, t = s * 0.40, s * 0.30, s * 0.15
+        Shape.fillRoundAA(cv, cx - W, cy - H - t * 0.5, W * 1.30, t, t * 0.45, c)          -- top (stops early)
+        Shape.fillRoundAA(cv, cx - W, cy + H - t * 0.5, W * 2, t, t * 0.45, c)             -- bottom
+        Shape.fillRoundAA(cv, cx - W - t * 0.5, cy - H, t, H * 2, t * 0.45, c)             -- left
+        Shape.fillRoundAA(cv, cx + W - t * 0.5, cy - H * 0.2, t, H * 1.2, t * 0.45, c)     -- right (below arrow)
+        fillTriangle(cv, cx + W * 0.30, cy - H - s * 0.19,                                  -- arrowhead → right
+                         cx + W * 0.30, cy - H + s * 0.19,
+                         cx + W * 0.30 + s * 0.28, cy - H, c)
+    elseif kind == "back" then
+        local t = s * 0.18
+        fillTriangle(cv, cx + h * 0.05, cy - h * 0.8, cx + h * 0.05, cy + h * 0.8, cx - h * 0.88, cy, c)
+        Shape.fillRoundAA(cv, cx + h * 0.05, cy - t * 0.5, h * 0.8, t, t * 0.45, c)
+    end
+end
+
 return Shape

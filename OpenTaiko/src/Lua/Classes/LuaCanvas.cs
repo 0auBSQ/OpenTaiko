@@ -256,6 +256,11 @@ namespace OpenTaiko {
 		public void Draw(int x, int y) {
 			_texture?.t2DDraw(x, y);
 		}
+		/// <summary>Draw only a sub-rectangle of the canvas (source rect in canvas pixels) at x,y —
+		/// scrolling lists slice partially-visible rows with this so they clip to their viewport.</summary>
+		public void DrawRect(int x, int y, int rect_x, int rect_y, int rect_width, int rect_height) {
+			_texture?.t2DDraw(x, y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
+		}
 		public void DrawAtAnchor(int x, int y, string anchor) {
 			CTexture.RefPnt ref_anchor = anchor.ToLower() switch {
 				"topleft" => CTexture.RefPnt.UpLeft,
