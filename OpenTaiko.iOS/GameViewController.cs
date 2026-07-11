@@ -241,15 +241,15 @@ public partial class GameViewController : UIViewController {
 		global::OpenTaiko.CTextInput.iOSTextInputHandler = (currentText, maxLength, callback) => {
 			InvokeOnMainThread(() => {
 				var alert = UIAlertController.Create(
-					"Search",
+					"Enter text",
 					null,
 					UIAlertControllerStyle.Alert);
 
 				alert.AddTextField(tf => {
 					tf.Text = currentText;
-					tf.Placeholder = "Enter search text";
+					tf.Placeholder = "Enter text";
 					tf.AutocorrectionType = UITextAutocorrectionType.No;
-					tf.ReturnKeyType = UIReturnKeyType.Search;
+					tf.ReturnKeyType = UIReturnKeyType.Done;
 				});
 
 				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, _ => {
@@ -512,11 +512,15 @@ public partial class GameViewController : UIViewController {
 		};
 		_debugHud.Layer.CornerRadius = 6;
 		_debugHud.ClipsToBounds = true;
+		_debugHud.Hidden = true;
 		View.AddSubview(_debugHud);
 	}
 
 	private void UpdateDebugHud() {
 		if (_debugHud == null) return;
+		bool show = global::OpenTaiko.OpenTaiko.ConfigIni?.bShowDebugHud ?? false;
+		_debugHud.Hidden = !show;
+		if (!show) return;
 		int fps = global::OpenTaiko.OpenTaiko.FPS?.NowFPS ?? 0;
 		string stage = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID.ToString() ?? "?";
 		var (fp, managed) = GetMemoryMB();

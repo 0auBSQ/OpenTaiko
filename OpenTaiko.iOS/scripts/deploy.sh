@@ -125,6 +125,8 @@ bootstrap_ios_deps() {
   [[ -d "OpenTaiko.iOS/Frameworks/liblua54.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lua54.sh
   [[ -d "OpenTaiko.iOS/Frameworks/liblmdb.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lmdb.sh
   [[ -f "OpenTaiko.iOS/Assets.xcassets/AppIcon.appiconset/icon_1024.png" ]] || bash OpenTaiko.iOS/scripts/build-appicons.sh
+  [[ -d "OpenTaiko.iOS/Frameworks/ffmpeg.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-ffmpeg.sh
+  [[ -f "OpenTaiko.iOS/third_party/FFmpeg.AutoGen/upstream/FFmpeg.cs" ]] || bash OpenTaiko.iOS/scripts/fetch-ffmpeg-autogen.sh
 }
 
 # ios_build <config> <rid> [extra dotnet args...]
@@ -163,13 +165,15 @@ ios_build() {
   fi
   local log rc attempt
   log=$(mktemp)
+  # UseVendoredFFmpeg must be a GLOBAL property: NuGet restore ignores per-reference
+  # AdditionalProperties and would never discover the vendored FFmpeg.AutoGen project.
   for attempt in 1 2; do
     echo "==> Building $rid ($config)..."
     rc=0  # `|| rc=$?` keeps `set -e`/pipefail from aborting before we capture the status
     if $VERBOSE; then
-      dotnet build "$CSPROJ" -c "$config" -r "$rid" "$@" 2>&1 | tee "$log" || rc=$?
+      dotnet build "$CSPROJ" -c "$config" -r "$rid" -p:UseVendoredFFmpeg=true "$@" 2>&1 | tee "$log" || rc=$?
     else
-      dotnet build "$CSPROJ" -c "$config" -r "$rid" "$@" > "$log" 2>&1 || rc=$?
+      dotnet build "$CSPROJ" -c "$config" -r "$rid" -p:UseVendoredFFmpeg=true "$@" > "$log" 2>&1 || rc=$?
       { grep -E "(error CS|error MT|error MSB|Error\(s\)|Build succeeded)" "$log" || true; } | tail -10
     fi
     if [[ $rc -eq 0 && -d "$APP_PATH" ]]; then

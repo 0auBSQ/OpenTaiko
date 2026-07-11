@@ -28,7 +28,8 @@ namespace OpenTaiko {
 		// Attach the decoder once it's been opened off-thread (async-load path) + apply any buffered play state.
 		// Until then every method no-ops and Texture returns empty, so the video just starts when it's ready.
 		internal void SetVideo(CVideoDecoder video) {
-			if (_disposedValue) { video.Dispose(); return; }   // disposed before the open finished → don't leak
+			if (_disposedValue) { System.Diagnostics.Trace.TraceInformation("[vopen] attached after dispose; dropping"); video.Dispose(); return; }   // disposed before the open finished → don't leak
+			System.Diagnostics.Trace.TraceInformation("[vopen] attached"); // DEBUG probe
 			_video = video;
 			if (_pendingSeek.HasValue) video.Seek((long)(_pendingSeek.Value * 1000.0));
 			if (_pendingSpeed.HasValue) video.dbPlaySpeed = _pendingSpeed.Value;
@@ -76,14 +77,16 @@ namespace OpenTaiko {
 		}
 
 		public double GetPlayPosition() {
-			// iOS has no FFmpeg native lib, so a video never decodes (_video stays null). Report it as
-			// finished so video-end-gated logic (e.g. the boot intro) advances instead of black-waiting.
-			if (_video == null && OperatingSystem.IsIOS()) return Duration;
 			return (_video?.msPlayPosition ?? 0) / 1000.0;
 		}
 
 		public double GetPlaySpeed() {
 			return _video?.dbPlaySpeed ?? 1;
+		}
+
+		// End-of-video signal that does not depend on the play-position timer.
+		public bool IsFinished() {
+			return _video?.IsFinishedPlaying ?? false;
 		}
 		#endregion
 		#region Sets
@@ -136,6 +139,7 @@ namespace OpenTaiko {
 				// load phase the bar waits for it (NotePending/NoteDone). Works from onStart OR activate.
 				bool inPhase = CAsyncLoad.Active;
 				if (inPhase) CAsyncLoad.NotePending();
+				System.Diagnostics.Trace.TraceInformation($"[vopen] queue {path} inPhase={inPhase}"); // DEBUG probe
 				Task.Run(() => {
 					try {
 						var vid = new CVideoDecoder(full_path);

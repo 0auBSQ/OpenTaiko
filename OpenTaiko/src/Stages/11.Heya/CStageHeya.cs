@@ -687,7 +687,7 @@ class CStageHeya : CStage {
 				this.tResetOpts();
 			return 0;
 			}
-		} else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+		} else if (iCurrentMenu == CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return) || textInput.iOSConfirmed)) {
 			OpenTaiko.SaveFileInstances[iPlayer].data.Name = textInput.Text;
 			OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 			OpenTaiko.NamePlate.tNamePlateRefreshTitles(iPlayer);
@@ -696,7 +696,7 @@ class CStageHeya : CStage {
 			this.tResetOpts();
 			OpenTaiko.Skin.soundDecideSFX.tPlay();
 			return 0;
-		} else if (iCurrentMenu == CurrentMenu.Name && OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) {
+		} else if (iCurrentMenu == CurrentMenu.Name && (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || textInput.iOSCancelled)) {
 			OpenTaiko.Skin.soundCancelSFX.tPlay();
 			iCurrentMenu = CurrentMenu.ReturnToMenu;
 			this.ttkInfoSection = null;

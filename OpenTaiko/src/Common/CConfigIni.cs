@@ -488,6 +488,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 
 	public int nGraphicsDeviceType;
 	public bool biOSUnlimitedFrameRate; // iOS only: CADisplayLink device-max fps vs 60 (host reads at launch)
+	public bool bShowDebugHud; // iOS only: on-screen FPS/mem/stage debug overlay
 	public int nRisky; // #23559 2011.6.20 yyagi Riskyでの残ミス数。0で閉店
 	public bool bIsAllowedDoubleClickFullscreen; // #26752 2011.11.27 yyagi ダブルクリックしてもフルスクリーンに移行しない
 
@@ -915,7 +916,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		this.strSystemSkinSubfolderFullName = ""; // #28195 2012.5.2 yyagi 使用中のSkinサブフォルダ名
 		this.bTight = false; // #29500 2012.9.11 kairera0467 TIGHTモード
 		nGraphicsDeviceType = 0;
-		biOSUnlimitedFrameRate = false;
+		biOSUnlimitedFrameRate = true;
+		bShowDebugHud = false;
 
 		#region [ WASAPI/ASIO ]
 
@@ -1211,6 +1213,8 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine();
 		sw.WriteLine("; iOS only: 1 = render at the display's max refresh (e.g. 120Hz), 0 = cap at 60fps. Applied at launch.");
 		sw.WriteLine("iOSUnlimitedFrameRate={0}", this.biOSUnlimitedFrameRate ? 1 : 0);
+		sw.WriteLine("; iOS only: 1 = show the on-screen FPS/mem/stage debug HUD, 0 = hidden.");
+		sw.WriteLine("iOSShowDebugHud={0}", this.bShowDebugHud ? 1 : 0);
 		sw.WriteLine();
 		sw.WriteLine("; フレーム毎のsleep値[ms] (-1でスリープ無し, 0以上で毎フレームスリープ。動画キャプチャ等で活用下さい)"); // #xxxxx 2011.11.27 yyagi add
 		sw.WriteLine("; A sleep time[ms] per frame."); //
@@ -2105,6 +2109,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "iOSUnlimitedFrameRate":
 				this.biOSUnlimitedFrameRate = CConversion.bONorOFF(value[0]);
+				break;
+			case "iOSShowDebugHud":
+				this.bShowDebugHud = CConversion.bONorOFF(value[0]);
 				break;
 			case "SleepTimePerFrame":
 				this.nMsSleepPerFrame = CConversion.ParseIntInRangeAndClamp(value, -1, 50, this.nMsSleepPerFrame);

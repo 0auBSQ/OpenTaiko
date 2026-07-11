@@ -214,7 +214,9 @@ function update()
 			text_enter:SetOpacity(counter.Value)
 		end
 
-		if video ~= nil and video.Duration > 0.0 and video:GetPlayPosition() >= math.floor(video.Duration) then
+		-- IsFinished also covers decoders whose play position stalls below Duration.
+		if video ~= nil and (video:IsFinished()
+			or (video.Duration > 0.0 and video:GetPlayPosition() >= math.floor(video.Duration))) then
 			return Exit("title", nil)
 		end
 	end
