@@ -30,8 +30,12 @@ class PuchiChara : CActivity {
 	}
 
 	public void ChangeBPM(double secPerBeat) {
-		Counter = new CCounter(0, OpenTaiko.Skin.Game_PuchiChara[2] - 1, (int)(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]), OpenTaiko.Timer);
-		SineCounter = new CCounter(1, 360, OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180, SoundManager.PlayTimer);
+		Counter.ChangeInterval(OpenTaiko.Skin.Game_PuchiChara_Timer * secPerBeat / OpenTaiko.Skin.Game_PuchiChara[2]);
+		SineCounter.ChangeInterval(1000 * OpenTaiko.Skin.Game_PuchiChara_SineTimer * secPerBeat / 180);
+		if (!this.inGame) { // initialize value
+			Counter.CurrentValue = 0;
+			SineCounter.CurrentValue = 1;
+		}
 		this.inGame = true;
 	}
 
