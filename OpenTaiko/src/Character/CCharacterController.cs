@@ -30,6 +30,11 @@ namespace OpenTaiko {
 			bPlayingAction[player] = true;
 		}
 
+		public void StopAction(int player) {
+			strActionAnimation = null;
+			bPlayingAction[player] = false;
+		}
+
 		public void ResetCounter(int player) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
 			character.ResetAnimationCounter(player, strCurrentAnimation);
@@ -42,9 +47,7 @@ namespace OpenTaiko {
 			bool looping = !bPlayingAction[player] && bLooping;
 			bool animationEnded = character.Update(player, strCurrentAnimation, looping);
 			if (bPlayingAction[player] && animationEnded) {
-				bPlayingAction[player] = false;
-				strActionAnimation = null;
-
+				StopAction(player);
 				ResetCounter(player);
 				Update(player);
 			}

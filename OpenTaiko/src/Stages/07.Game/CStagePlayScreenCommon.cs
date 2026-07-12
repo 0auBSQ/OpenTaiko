@@ -1353,7 +1353,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return ENoteJudge.Miss;
 		}
 
-		this.actChara.bBalloonRoll[player] = true;
+		this.actChara.bBalloonRoll[player] = !IsKusudama;
+		this.actChara.ReturnDefaultAnime(player);
 		CCharacter character = CCharacter.GetCharacter(player);
 
 		if (IsKusudama) {
@@ -1361,7 +1362,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			rollCount = pChip.nRollCount = ++pChip.KusudamaRollCount;
 			balloon = pChip.KusudamaCount;
 			if (pChip.KusudamaRollCount > 0) {
-				actChara.CharacterControllers[player].PlayAction(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+				actChara.PlayGameAction(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (this.actBalloon.ctBalloonAnime[i].IsUnEnded) {
 						this.actBalloon.ctBalloonAnime[i] = new CCounter(0, 9, 14, OpenTaiko.Timer);
@@ -1372,9 +1373,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				}
 			}
 		} else {
-			actChara.CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_BALLOON_BREAKING;
+			actChara.PlayGameAction(player, CCharacter.ANIM_GAME_BALLOON_BREAKING);
 			actChara.CharacterControllers[player].ResetCounter(player);
-			actChara.CharacterControllers[player].bLooping = false;
 
 
 			if (this.actBalloon.ctBalloonAnime[player].IsUnEnded) {
@@ -1617,8 +1617,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == false) {
 				this.bIsAlreadyMaxed[nPlayer] = true;
 
-				actChara.ReturnDefaultAnime(nPlayer, true);
-				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
+				actChara.ReturnDefaultAnime(nPlayer);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
 
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
@@ -1626,8 +1626,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if (cleared && this.bIsAlreadyCleared[nPlayer] == false) {
 				this.bIsAlreadyCleared[nPlayer] = true;
 
-				actChara.ReturnDefaultAnime(nPlayer, true);
-				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
+				actChara.ReturnDefaultAnime(nPlayer);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
 
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
@@ -1642,19 +1642,19 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				this.actRunner.Start(nPlayer, true, pChip);
 			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 				this.bIsAlreadyMaxed[nPlayer] = false;
-				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
 			} else if (!bIsGOGOTIME[nPlayer]) {
 				if (Chara_MissCount[nPlayer] == 1 - 1) {
-					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
 				} else if (Chara_MissCount[nPlayer] == 6 - 1) {
-					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
 				}
 			}
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
-				actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
@@ -1680,7 +1680,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				{
 					// 魂ゲージMAXではない
 					// ジャンプ_ノーマル
-					actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_RETURN);
+					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_RETURN);
 					//this.actChara.キャラクター_アクション_10コンボ();
 				}
 			}
@@ -1725,7 +1725,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 					if (this.bIsMiss[nPlayer]) {
 						this.bIsMiss[nPlayer] = false;
-						actChara.ReturnDefaultAnime(nPlayer, true);
+						actChara.ReturnDefaultAnime(nPlayer);
 						returnChara();
 					}
 
@@ -1775,7 +1775,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 					if (this.bIsMiss[nPlayer]) {
 						this.bIsMiss[nPlayer] = false;
-						actChara.ReturnDefaultAnime(nPlayer, true);
+						actChara.ReturnDefaultAnime(nPlayer);
 						returnChara();
 					}
 
@@ -1826,15 +1826,15 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					CCharacter character = CCharacter.GetCharacter(nPlayer);
 					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 						this.bIsAlreadyMaxed[nPlayer] = false;
-						actChara.ReturnDefaultAnime(nPlayer, true);
-						actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+						actChara.ReturnDefaultAnime(nPlayer);
+						actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
 					} else if (!bIsGOGOTIME[nPlayer]) {
 						if (Chara_MissCount[nPlayer] == 1) {
-							actChara.ReturnDefaultAnime(nPlayer, true);
-							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+							actChara.ReturnDefaultAnime(nPlayer);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
 						} else if (Chara_MissCount[nPlayer] == 6) {
-							actChara.ReturnDefaultAnime(nPlayer, true);
-							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+							actChara.ReturnDefaultAnime(nPlayer);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
 						}
 					}
 
@@ -1878,14 +1878,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAXではない
 							// ジャンプ_ノーマル
-							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_10COMBO);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_10COMBO);
 						}
 					}
 					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max) {
 						if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
 							// 魂ゲージMAX
 							// ジャンプ_MAX
-							actChara.CharacterControllers[nPlayer].PlayAction(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
 						}
 					}
 				}
@@ -2855,7 +2855,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						if (true /* TJAP3/OOS */ || pChip.IsForBranch(this.nTargetBranch[nPlayer])) {
 							this.bIsGOGOTIME[nPlayer] = false;
 							if (!this.isRewinding)
-								actChara.ReturnDefaultAnime(nPlayer, true);
+								actChara.ReturnDefaultAnime(nPlayer);
 						}
 					}
 					break;
@@ -3583,9 +3583,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 								this.AddNowProcessingRollChip(i, linkedChip);
 						}
 					}
-					this.actChara.bBalloonRoll[i] = true;
 				}
 			}
+			this.actChara.bBalloonRoll[iPlayer] = false; // prevent normal balloon animation
 		}
 	}
 
@@ -3612,19 +3612,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 											this.ProcessRollEnd(p, linkedChip, resetStates);
 									}
 								}
-								actChara.KusuMiss(p);
 							}
 						}
 						chip.KusudamaRollCount = 0;
 						chip.KusudamaCount = 0;
-					}
-				} else {
-					if (!this.bPAUSE && !this.isRewinding) {
-						if (chip.nRollCount > 0) {
-							actChara.bBalloonRoll[iPlayer] = false;
-							actChara.ReturnDefaultAnime(iPlayer, true);
-							actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
-						}
 					}
 				}
 				if (NotesManager.IsFuzeRoll(chip)) {
@@ -3664,6 +3655,16 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			}
 		}
 		this.RemoveNowProcessingRollChip(iPlayer, chip, resetStates);
+
+		// process here for the correct default animation
+		if (!this.bPAUSE && !this.isRewinding) {
+			if (NotesManager.IsKusudama(chip)) {
+				actChara.KusuMiss(iPlayer);
+			} else if (NotesManager.IsGenericBalloon(chip)) {
+				if (chip.nRollCount > 0)
+					actChara.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_MISS);
+			}
+		}
 	}
 
 	public void ProcessBalloonBroke(int iPlayer, CChip chip, double msHitTjaTime, NotesManager.EInputType input) {
@@ -3711,7 +3712,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 							this.ProcessBalloonBroke(i, linkedChip, msHitTjaTime, NotesManager.EInputType.Unknown);
 					}
 				}
-				actChara.KusuSuccess(i);
 			}
 		} else {
 			//ﾊﾟｧｰﾝ
@@ -3723,12 +3723,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			//CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
 			chip.bHit = true;
 			chip.IsHitted = true;
-			//this.b連打中 = false;
-			this.actChara.bBalloonRoll[iPlayer] = false;
 			chip.bVisible = false;
-			this.actChara.ReturnDefaultAnime(iPlayer, true);
-			CCharacter character = CCharacter.GetCharacter(iPlayer);
-			actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_BROKE);
 			if (NotesManager.IsFuzeRoll(chip)) {
 				this.CChartScore[iPlayer].nMineAvoid++;
 				this.CSectionScore[iPlayer].nMineAvoid++;
@@ -3739,6 +3734,13 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			}
 		}
 		this.RemoveNowProcessingRollChip(iPlayer, chip, false);
+
+		// process here for the correct default animation
+		if (NotesManager.IsKusudama(chip)) {
+			actChara.KusuSuccess(iPlayer);
+		} else if (NotesManager.IsGenericBalloon(chip)) {
+			actChara.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_BALLOON_BROKE);
+		}
 	}
 
 	private void RemoveNowProcessingRollChip(int iPlayer, CChip chip, bool resetStates) {
@@ -3787,30 +3789,32 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (!this.chipCurrentProcessingRollChip[iPlayer].Any(x => x.bVisible && NotesManager.IsGenericBalloon(x))) {
 			this.actChara.bBalloonRoll[iPlayer] = false;
 			this.actChara.IsInKusudama = false;
-		} else if (!this.chipCurrentProcessingRollChip[iPlayer].Any(x => NotesManager.IsKusudama(x))) {
+			this.actChara.ReturnDefaultAnime(iPlayer);
+		} else if (!this.chipCurrentProcessingRollChip[iPlayer].Any(x => x.bVisible && NotesManager.IsKusudama(x))) {
 			this.actChara.IsInKusudama = false;
+			this.actChara.ReturnDefaultAnime(iPlayer);
 		}
 	}
 
 	public void StartGoGoTimeEffect(int iPlayer) {
 		CCharacter character = CCharacter.GetCharacter(iPlayer);
 
-		actChara.ReturnDefaultAnime(iPlayer, true);
+		actChara.ReturnDefaultAnime(iPlayer);
 
 		{
 			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && (!HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer))) {
 				// 魂ゲージMAXではない
 				// ゴーゴースタート_ノーマル
-				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
+				actChara.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART);
 				//this.actChara.キャラクター_アクション_10コンボ();
 			}
 			if (!HGaugeMethods.UNSAFE_IsRainbow(iPlayer) && HGaugeMethods.UNSAFE_FastNormaCheck(iPlayer)) {
-				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
+				actChara.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_CLEAR);
 			}
 			if (HGaugeMethods.UNSAFE_IsRainbow(iPlayer)) {
 				// 魂ゲージMAX
 				// ゴーゴースタート_MAX
-				actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
+				actChara.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_GOGOSTART_MAX);
 			}
 
 		}
@@ -3932,7 +3936,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 		if (rollingNotesMadeHidden) {
 			this.UpdateRollStateAfterRemove(nPlayer);
-			this.actChara.ReturnDefaultAnime(nPlayer, false);
 		}
 	}
 
@@ -4168,7 +4171,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				chip.bProcessed = false;
 			}
 			this.chipCurrentProcessingRollChip[i].Clear();
-			this.actChara.ReturnDefaultAnime(i, true);
+			this.actChara.ReturnDefaultAnime(i);
 
 			for (int iChip = 0; iChip < iPrevTopChip[i]; ++iChip) {
 				CChip chip = tja.listChip[iChip];
