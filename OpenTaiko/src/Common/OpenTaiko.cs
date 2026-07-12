@@ -1755,7 +1755,7 @@ internal class OpenTaiko : Game {
 		#region [ Modal queue initialisation ]
 
 		ModalManager = new CModalManager();
-		ModalManager.RefleshSkin();
+		ModalManager.RefreshSkin();
 
 		PopupMenuManager = new CPopupMenuManager();
 
@@ -1820,7 +1820,7 @@ internal class OpenTaiko : Game {
 		//---------------------
 		// The skin's Lua modules are NOT loaded here anymore. The boot stage loads them incrementally in its
 		// own Draw loop (so the loading bar animates via the normal render loop, no manual presenting), and
-		// once done it runs NamePlate/Modal RefleshSkin + starts the song-list enum. This keeps OnLoad fast
+		// once done it runs NamePlate/Modal RefreshSkin + starts the song-list enum. This keeps OnLoad fast
 		// so the render loop (and the loading screen) starts immediately.
 		CLoadingProgress.Begin();
 		ChangeStage(stageStartup, "Startup");
@@ -2165,9 +2165,9 @@ internal class OpenTaiko : Game {
 		EnumSongs.Resume();
 
 		actEnumSongs.RefreshSkin(EnumSongs.IsEnumerating);
-		OpenTaiko.NamePlate.RefleshSkin();
-		OpenTaiko.ModalManager.RefleshSkin();
-		OpenTaiko.PopupMenuManager.RefleshSkin();
+		OpenTaiko.NamePlate.RefreshSkin();
+		OpenTaiko.ModalManager.RefreshSkin();
+		OpenTaiko.PopupMenuManager.RefreshSkin();
 		CVirtualSlotManager.RefreshAICharacter();   // AI battle slot character now comes from the (reloaded) skin
 	}
 	#endregion

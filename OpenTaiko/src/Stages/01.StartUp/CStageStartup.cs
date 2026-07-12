@@ -103,8 +103,8 @@ internal class CStageStartup : CStage {
 					_session = null;
 					System.Diagnostics.Trace.AutoFlush = _savedAutoFlush;
 					System.Diagnostics.Trace.Flush();
-					OpenTaiko.NamePlate.RefleshSkin();
-					OpenTaiko.ModalManager.RefleshSkin();
+					OpenTaiko.NamePlate.RefreshSkin();
+					OpenTaiko.ModalManager.RefreshSkin();
 					es = new CEnumSongs();
 					es.StartEnumFromCache();   // 曲リスト取得(別スレッドで実行される)
 				}

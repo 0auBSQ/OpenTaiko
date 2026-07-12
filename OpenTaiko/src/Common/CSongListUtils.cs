@@ -45,7 +45,7 @@ internal class CActSelectSongList {
 internal class CActSelectDanList {
 	private static CCachedFontRenderer? pfDanIconTitle = null;
 
-	public static void RefleshSkin() {
+	public static void RefreshSkin() {
 		OpenTaiko.tDisposeSafely(ref pfDanIconTitle);
 	}
 

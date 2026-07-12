@@ -10,7 +10,7 @@ class CNamePlate {
 	private const int DrawModeDan   = 1;
 	private const int DrawModeTitle = 2;
 
-	public void RefleshSkin() {
+	public void RefreshSkin() {
 		for (int player = 0; player < 5; player++) {
 			tNamePlateRefreshTitles(player);
 		}
