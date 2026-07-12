@@ -772,7 +772,7 @@ local animation_beats = {
 }
 
 
-local avaiable_animations = {}
+local available_animations = {}
 
 local AnimationData = {
 	new = function()
@@ -1026,7 +1026,7 @@ local function create_render()
 	return animation_data
 end
 
-local animation_buildrs = {
+local animation_builders = {
 	[CHARACTER.ANIM_PREVIEW] = create_preview;
 	[CHARACTER.ANIM_RENDER] = create_render;
 
@@ -1082,8 +1082,8 @@ local animation_buildrs = {
 	[CHARACTER.ANIM_RESULT_FAILED] = create_animation;
 }
 
-function avaialbeAnimation(animationType)
-	local flag = avaiable_animations[animationType]
+function availableAnimation(animationType)
+	local flag = available_animations[animationType]
 	if flag ~= nil and flag == true then
 		return true
 	else
@@ -1092,10 +1092,10 @@ function avaialbeAnimation(animationType)
 end
 
 function loadAnimation(animationType)
-	animationdata_array[animationType] = animation_buildrs[animationType](animationType)
+	animationdata_array[animationType] = animation_builders[animationType](animationType)
 
 	if animationdata_array[animationType] ~= nil then
-		avaiable_animations[animationType] = true
+		available_animations[animationType] = true
 	end
 end
 
@@ -1105,7 +1105,7 @@ function disposeAnimation(animationType)
 		animation_data:dispose()
 	end
 
-	avaiable_animations[animationType] = false
+	available_animations[animationType] = false
 end
 
 function setAnimationDuration(animationType, duration)
@@ -1143,7 +1143,7 @@ function playVoice(voiceType)
 end
 
 function update(delta, animationType, looping)
-	if not avaialbeAnimation(animationType) then
+	if not availableAnimation(animationType) then
 		return false
 	end
 
@@ -1156,7 +1156,7 @@ function update(delta, animationType, looping)
 end
 
 function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, gradientMap)
-	if not avaialbeAnimation(animationType) then
+	if not availableAnimation(animationType) then
 		return
 	end
 
@@ -1175,7 +1175,7 @@ end
 -- Returns the drawn dimensions (W, H) of the current animation frame scaled to the theme resolution.
 -- Handles both regular animations (.frames) and the render animation (.render).
 function getDrawSize(animationType)
-	if not avaialbeAnimation(animationType) then
+	if not availableAnimation(animationType) then
 		return 0, 0
 	end
 	local animation = animationdata_array[animationType]

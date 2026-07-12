@@ -47,8 +47,8 @@ class CCharacterLua : CCharacter {
 
 		if (animationCounts[animationType] == 1) {
 			ImplLoadAnimation(player, animationType);
-			bool avaiable = AvaiableAnimation(player, animationType, false);
-			if (!avaiable) {
+			bool available = AvailableAnimation(player, animationType, false);
+			if (!available) {
 				animationCounts[animationType]--;
 
 				string alternative = GetAlternativeAnimation(animationType);
@@ -61,8 +61,8 @@ class CCharacterLua : CCharacter {
 	public override void DisposeAnimation(int player, string animationType) {
 		if (animationType == ANIM_NONE) return;
 
-		bool avaiable = AvaiableAnimation(player, animationType, false);
-		if (!avaiable) {
+		bool available = AvailableAnimation(player, animationType, false);
+		if (!available) {
 			string alternative = GetAlternativeAnimation(animationType);
 			DisposeAnimation(player, alternative);
 			return;
@@ -79,11 +79,11 @@ class CCharacterLua : CCharacter {
 		}
 	}
 
-	public override bool AvaiableAnimation(int player, string animationType, bool useAlternative = true) {
+	public override bool AvailableAnimation(int player, string animationType, bool useAlternative = true) {
 		if (animationType == ANIM_NONE) return false;
 		for (int i = 0; i < 5; i++) {
-			bool avaiable = Script[player].AvaialbeAnimation(animationType);
-			if (avaiable) return true;
+			bool available = Script[player].AvailableAnimation(animationType);
+			if (available) return true;
 			if (!useAlternative) return false;
 
 			animationType = GetAlternativeAnimation(animationType);

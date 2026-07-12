@@ -23,7 +23,7 @@ namespace OpenTaiko {
 
 		public void PlayAction(int player, string animationType) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			if (!character.AvaiableAnimation(player, animationType)) return;
+			if (!character.AvailableAnimation(player, animationType)) return;
 			strActionAnimation = animationType;
 			character.ResetAnimationCounter(player, animationType);
 

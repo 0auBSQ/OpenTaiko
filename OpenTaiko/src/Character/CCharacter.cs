@@ -283,8 +283,8 @@ abstract class CCharacter : IDisposable {
 
 	public static string GetAnimation(int player, CCharacter character, string animation) {
 		for (int i = 0; i < 5; i++) {
-			bool avaiable = character.AvaiableAnimation(player, animation, false);
-			if (avaiable) return animation;
+			bool available = character.AvailableAnimation(player, animation, false);
+			if (available) return animation;
 			string nextAnimation = GetAlternativeAnimation(animation);
 			animation = nextAnimation;
 		}
@@ -393,7 +393,7 @@ abstract class CCharacter : IDisposable {
 
 	}
 
-	public virtual bool AvaiableAnimation(int player, string voice, bool useAlternative = true) {
+	public virtual bool AvailableAnimation(int player, string voice, bool useAlternative = true) {
 		return false;
 	}
 
