@@ -150,7 +150,7 @@ public unsafe class CVideoDecoder : IDisposable {
 		CTimer.Pause();
 		this.bPlaying = false;
 		bDrawing = false;
-		this.bStreamEnded = true;
+		this.IsFinishedPlaying = true;
 	}
 
 	public void InitRead() {
@@ -342,7 +342,16 @@ public unsafe class CVideoDecoder : IDisposable {
 	// Reader reached the end of the stream (or Stop was called); frames may still be queued.
 	private bool bStreamEnded = false;
 	// End of playback (stream fully read and all frames shown), unlike msPlayPosition which can stall.
-	public bool IsFinishedPlaying => bStreamEnded && decodedframes.IsEmpty;
+	public bool IsFinishedPlaying {
+		get => bStreamEnded && decodedframes.IsEmpty;
+		private set {
+			this.bStreamEnded = value;
+			if (value) {
+				while (decodedframes.TryDequeue(out CDecodedFrame frame))
+					frame.RemoveFrame();
+			}
+		}
+	}
 	private CTimer CTimer;
 	private AVRational Framerate;
 	private CTexture lastTexture;
