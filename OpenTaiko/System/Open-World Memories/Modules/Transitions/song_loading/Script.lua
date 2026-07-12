@@ -27,12 +27,10 @@ local player_count = 1
 local res_w, res_h = 1920, 1080
 local slot_w       = 1920
 local characters, slide_infos = {}, {}
-local titleStr, subtitleStr = "", ""
 local dan_scroll_y = 0
 local dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
 local dan_plate_x, dan_plate_y = 0, 0
 local initialized  = false
-local initialized_title = false
 local luaPhase     = nil                      -- "out" | "load" | "in" — used to detect a fresh transition
 
 -- Tuning (mirrors the old ROActivity)
@@ -115,21 +113,15 @@ local function setup()
 		dan_title = node.Title or ""
 	end
 
-	-- cannot generate text texture here as the font might not have been loaded
-	titleStr    = (node ~= nil and node.Title) or ""
-	subtitleStr = (node ~= nil and node.Subtitle) or ""
+	if titleTex ~= nil then titleTex:Dispose(); titleTex = nil end
+	if subtitleTex ~= nil then subtitleTex:Dispose(); subtitleTex = nil end
+	local title    = (node ~= nil and node.Title) or ""
+	local subtitle = (node ~= nil and node.Subtitle) or ""
+	if title ~= "" and titleFont ~= nil then titleTex = titleFont:GetText(title) end
+	if subtitle ~= "" and subtitleFont ~= nil then subtitleTex = subtitleFont:GetText(subtitle) end
 
 	setup_characters()
 	initialized = true
-end
-
-local function setup_title()
-	if titleTex ~= nil then titleTex:Dispose(); titleTex = nil end
-	if subtitleTex ~= nil then subtitleTex:Dispose(); subtitleTex = nil end
-	if titleStr ~= "" and titleFont ~= nil then titleTex = titleFont:GetText(titleStr) end
-	if subtitleStr ~= "" and subtitleFont ~= nil then subtitleTex = subtitleFont:GetText(subtitleStr) end
-
-	initialized_title = (titleStr == "" or titleTex ~= nil) and (subtitleStr == "" or subtitleTex ~= nil)
 end
 
 local function tick_update()
@@ -210,16 +202,14 @@ end
 
 -- ── transition callbacks ──────────────────────────────────────────────────────
 function fadeOut(t)
-	if luaPhase ~= "out" then initialized = false; initialized_title = false; luaPhase = "out" end   -- fresh transition → re-resolve song
+	if luaPhase ~= "out" then initialized = false; luaPhase = "out" end   -- fresh transition → re-resolve song
 	if not initialized then setup() end
-	if not initialized_title then setup_title() end
 	draw_bg(t)   -- cross-fade the loading background IN over the song-select screen (not through black)
 end
 
 function loading(progress, elapsed)
 	luaPhase = "load"
 	if not initialized then setup() end
-	if not initialized_title then setup_title() end
 	tick_update()
 	draw_screen(progress, 1.0, true)
 end

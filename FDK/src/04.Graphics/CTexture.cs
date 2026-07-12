@@ -360,6 +360,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 
 	public uint Pointer { get; internal set; }
 
+	// Cache properties
+	public readonly Dictionary<System.Collections.IDictionary, object> CacheKeys = []; // [cacheDict] = key
+
 	// Constructor
 
 	public CTexture() {
@@ -1426,6 +1429,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	//-----------------
 	public void Dispose() {
 		if (!this.bDisposeCompleteDone) {
+			foreach (var (cacheDict, key) in this.CacheKeys)
+				cacheDict.Remove(key);
+			this.CacheKeys.Clear();
 			Game.Gl.DeleteTexture(Pointer); //解放
 			this.Pointer = 0;
 			s_gpuTextureBytes -= _gpuBytes;

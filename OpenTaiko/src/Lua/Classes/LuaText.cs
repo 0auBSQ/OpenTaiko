@@ -91,6 +91,8 @@ namespace OpenTaiko {
 
 			if (!_titles.TryGetValue(key, out var tex)) {
 				tex = new(TitleTextureKey.ResolveTitleTexture(key, false, centered));
+				if (tex._texture != null)
+					tex._texture.CacheKeys[_titles] = key;
 				_titles.Add(key, tex);
 			}
 			return tex;
@@ -103,6 +105,8 @@ namespace OpenTaiko {
 
 			if (!_titles.TryGetValue(key, out var tex)) {
 				tex = new(TitleTextureKey.ResolveTitleTexture(key, true, centered));
+				if (tex._texture != null)
+					tex._texture.CacheKeys[_titles] = key;
 				_titles.Add(key, tex);
 			}
 			return tex;

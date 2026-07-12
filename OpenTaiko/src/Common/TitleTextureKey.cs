@@ -47,6 +47,7 @@ public sealed class TitleTextureKey {
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText_V(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			txTextTexture.CacheKeys[_titledictionary] = titleTextureKey;
 			if (txTextTexture.szTextureSize.Height > titleTextureKey.maxWidth) {
 				//tx文字テクスチャ.vc拡大縮小倍率.X = (float)(((double)titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Height);
 				txTextTexture.vcScaleRatio.X = 1.0f;
@@ -62,6 +63,7 @@ public sealed class TitleTextureKey {
 		using (var bmp = titleTextureKey.cPrivateFastFont.DrawText(
 				   titleTextureKey.str, titleTextureKey.forecolor, titleTextureKey.backcolor, titleTextureKey.secondEdge, 30, keepCenter)) {
 			CTexture txTextTexture = OpenTaiko.tTextureCreate(bmp, false);
+			txTextTexture.CacheKeys[_titledictionary] = titleTextureKey;
 			if (txTextTexture.szTextureSize.Width > titleTextureKey.maxWidth) {
 				txTextTexture.vcScaleRatio.X = (float)(((double)titleTextureKey.maxWidth) / txTextTexture.szTextureSize.Width);
 				txTextTexture.vcScaleRatio.Y = 1.0f;// (float) (((double) titleTextureKey.maxWidth) / tx文字テクスチャ.szテクスチャサイズ.Width);
