@@ -59,7 +59,7 @@ internal class CActImplComboBalloon : CActivity {
 				if (OpenTaiko.PlayerSide == 1 && OpenTaiko.ConfigIni.nPlayerCount == 1)
 					j = 1;
 
-				if (!this.ctProgress[i].IsStoped) {
+				if (!this.ctProgress[i].IsStopped) {
 					this.ctProgress[i].Tick();
 					if (this.ctProgress[i].IsEnded) {
 						this.ctProgress[i].Stop();

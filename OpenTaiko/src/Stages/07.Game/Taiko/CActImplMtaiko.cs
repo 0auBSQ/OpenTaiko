@@ -247,7 +247,7 @@ internal class CActImplMtaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			if (OpenTaiko.ConfigIni.nPlayerCount > 2 || OpenTaiko.ConfigIni.SimpleMode) break;
 
-			if (!this.ctLevelUpDown[i].IsStoped) {
+			if (!this.ctLevelUpDown[i].IsStopped) {
 				this.ctLevelUpDown[i].Tick();
 				if (this.ctLevelUpDown[i].IsEnded) {
 					this.ctLevelUpDown[i].Stop();

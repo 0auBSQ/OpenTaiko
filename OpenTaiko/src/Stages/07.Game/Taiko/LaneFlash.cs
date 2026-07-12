@@ -29,7 +29,7 @@ public class LaneFlash : CActivity {
 
 	public override int Draw() {
 		if (Texture == null || Counter == null) return base.Draw();
-		if (!Counter.IsStoped) {
+		if (!Counter.IsStopped) {
 			int x;
 			int y;
 

@@ -71,7 +71,7 @@ public abstract class CTimerBase : IDisposable {
 		protected set;
 	}
 
-	public bool IsUnStoped {
+	public bool IsUnStopped {
 		get {
 			return (this.StopCount == 0);
 		}
