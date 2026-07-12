@@ -835,13 +835,53 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		var rep = OpenTaiko.ReplayPlayback[0];
-		if (rep != null && (rep.WarnOldVersion || rep.WarnChecksumMismatch)) {
+		if (!this.IsReplayValid(0, rep)) {
 			var tx2 = TitleTextureKey.ResolveTitleTexture(this.ttkReplayInvalid);
 			if (tx2 != null) {
 				tx2.Opacity = 255;
 				tx2.t2DScaledCenterBasedDraw(cx, cy + 32);
 			}
 		}
+	}
+
+	private bool IsReplayValid(int iPlayer, CSongReplay rep) {
+		if (rep == null)
+			return false;
+		if (rep.WarnChecksumMismatch)
+			return false;
+
+		// Performance informations
+		bool judgeCountValid = rep.GoodCount >= this.CChartScore[iPlayer].nGreat
+			&& rep.OkCount >= this.CChartScore[iPlayer].nGood
+			&& rep.BadCount >= this.CChartScore[iPlayer].nMiss
+			&& rep.RollCount >= this.CChartScore[iPlayer].nRoll
+			&& rep.MaxCombo >= this.actCombo.nCurrentCombo.MaxValue[iPlayer]
+			&& rep.BoomCount >= this.CChartScore[iPlayer].nMine
+			&& rep.ADLibCount >= this.CChartScore[iPlayer].nADLIB;
+		if (!judgeCountValid)
+			return false;
+
+		// Tower parameters
+		if ((Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[0] == Difficulty.Tower) {
+			bool towerValid = rep.ReachedFloor >= this.FloorManagement.LastRegisteredFloor
+				&& rep.RemainingLives <= this.FloorManagement.CurrentNumberOfLives;
+			if (!towerValid)
+				return false;
+		}
+
+		for (int songNo = 0; songNo < this.DanSongScore.Length; ++songNo) {
+			bool judgeCountValidI = rep.IndividualGoodCount[songNo] >= this.DanSongScore[songNo].nGreat
+				&& rep.IndividualOkCount[songNo] >= this.DanSongScore[songNo].nGood
+				&& rep.IndividualBadCount[songNo] >= this.DanSongScore[songNo].nMiss
+				&& rep.IndividualRollCount[songNo] >= this.DanSongScore[songNo].nRoll
+				&& rep.IndividualMaxCombo[songNo] >= this.DanSongScore[songNo].nHighestCombo
+				&& rep.IndividualBoomCount[songNo] >= this.DanSongScore[songNo].nMine
+				&& rep.IndividualADLibCount[songNo] >= this.DanSongScore[songNo].nADLIB;
+			if (!judgeCountValidI)
+				return false;
+		}
+
+		return true;
 	}
 
 	// feed a replay's recorded (tjaTime, pad) inputs through the judge as the play clock reaches them
