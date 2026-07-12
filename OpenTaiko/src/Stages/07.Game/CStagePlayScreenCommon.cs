@@ -2486,40 +2486,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		this.actScore.Draw();
 	}
 
-	// Per-player scan cursor for the replay precise auto-miss (see tReplayAutoMissBefore). Reset per play.
-	protected readonly int[] replayMissScan = new int[5];
-
-	// Replay-only, precise auto-miss. Watching a replay re-feeds recorded inputs at their EXACT recorded time, but
-	// the normal per-frame auto-miss (tProgressDraw_Chip ~3289) resolves passed notes on the render clock — whose
-	// cadence differs between the recording and playback sessions, so the recorded card and the re-judged playback
-	// diverge (verified: at ~50ms/frame the same inputs re-judge to 28 bad instead of the recorded 33). Before each
-	// recorded input at tjaTime, this misses every standard note whose bad window closed strictly before tjaTime,
-	// so the input only sees notes that were genuinely still hittable then — making playback frame-cadence
-	// independent (reproduces the recording at any fps). Keyed only on the recorded input times + chart chip times;
-	// never called outside replay playback, so live play is untouched. Rolls/waits keep the normal per-frame path.
-	protected void tReplayAutoMissBefore(int nPlayer, long tjaTime) {
-		CTja tja = OpenTaiko.GetTJA(nPlayer);
-		if (tja == null) return;
-		var list = tja.listNoteChip;
-		while (replayMissScan[nPlayer] < list.Count
-			&& (list[replayMissScan[nPlayer]].bHit || list[replayMissScan[nPlayer]].IsMissed))
-			replayMissScan[nPlayer]++;
-		for (int i = replayMissScan[nPlayer]; i < list.Count; i++) {
-			CChip pChip = list[i];
-			if (pChip.nSoundTimems > tjaTime || pChip.bHit || pChip.IsMissed) continue;   // future / already resolved
-			if (this.eGetChipJudgeAtTime(tjaTime, pChip, nPlayer) != ENoteJudge.Miss) continue;   // still hittable
-			if (pChip.bVisible && NotesManager.IsHittableNote(pChip) && !NotesManager.IsGenericRoll(pChip)
-				&& pChip.eNoteState != ENoteState.Wait) {   // mirror the standard-note branch of tProgressDraw_Chip
-				if (!this.IsNoteIfMet(pChip, nPlayer)) {
-					pChip.bHit = true;
-				} else {
-					pChip.IsMissed = true;
-					this.tChipHitProcess(tjaTime, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
-					pChip.eNoteState = ENoteState.Bad;
-				}
-			}
-		}
-	}
+	// Per-player scan time for the replay precise auto-miss/timeout (see tReplayAutoMissBefore). Reset per play.
+	protected readonly double[] msReplayTjaTime = new double[5];
+	protected double msMaxPlayedTjaTime(int nPlayer)
+		=> OpenTaiko.bReplayMode[nPlayer] ? this.msReplayTjaTime[nPlayer] : double.PositiveInfinity;
 
 	protected bool tProgressDraw_Chip(EKeyConfigPart ePlayMode, int nPlayer) {
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
@@ -3374,32 +3344,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], nCurrentTimems, th16NowBeats[(int)pChip.nBranch], scrollRate);
 
 			if (!this.bPAUSE && !this.isRewinding) {
-				if (!pChip.IsMissed && !pChip.bHit) {
-					if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip)) {
-						if (pChip.end.nSoundTimems <= nCurrentTimems) {
-							if (this.eGetChipJudgeAtTime(nCurrentTimems, pChip, nPlayer) == ENoteJudge.Miss) {
-								pChip.bHit = true;
-							}
-						} else if (pChip.nSoundTimems <= nCurrentTimems) {
-							//時間内でかつ0x9Aじゃないならならヒット処理
-							this.Autoroll(pChip, nCurrentTimems, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
-						}
-					} else if (NotesManager.IsHittableNote(pChip) && pChip.eNoteState != ENoteState.Wait)
-					{
-						//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
-						if (!NotesManager.IsMine(pChip))
-							this.AutoplayHit(pChip, nCurrentTimems, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
-						if (pChip.nSoundTimems <= nCurrentTimems) {
-							if (!this.IsNoteIfMet(pChip, nPlayer)) {
-								pChip.bHit = true; // skip silently — trigger condition not met
-							} else if (this.eGetChipJudgeAtTime(nCurrentTimems, pChip, nPlayer) == ENoteJudge.Miss) {
-								pChip.IsMissed = true;
-								this.tChipHitProcess(nCurrentTimems, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
-								pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
-							}
-						}
-					}
-				}
+				this.AutoJudge(nPlayer, nCurrentTimems, pChip, msMaxPlayedTjaTime: this.msMaxPlayedTjaTime(nPlayer));
 			}
 		}
 		#endregion
@@ -3449,6 +3394,39 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		return false;
 	}
+
+	private void AutoJudge(int nPlayer, long msTjaHitTime, CChip pChip, bool doAutoInput = true, double msMaxPlayedTjaTime = double.PositiveInfinity) {
+		if (!pChip.IsMissed && !pChip.bHit) {
+			if (NotesManager.IsGenericRoll(pChip) && !NotesManager.IsRollEnd(pChip)) {
+				if (pChip.end.nSoundTimems <= msTjaHitTime) {
+					var msJudgeTjaTime = (long)Math.Max(pChip.end.nSoundTimems, Math.Min(msTjaHitTime, msMaxPlayedTjaTime));
+					if (this.eGetChipJudgeAtTime(msJudgeTjaTime, pChip, nPlayer) == ENoteJudge.Miss) {
+						pChip.bHit = true;
+					}
+				} else if (pChip.nSoundTimems <= msTjaHitTime) {
+					//時間内でかつ0x9Aじゃないならならヒット処理
+					if (doAutoInput)
+						this.Autoroll(pChip, msTjaHitTime, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
+				}
+			} else if (NotesManager.IsHittableNote(pChip) && pChip.eNoteState != ENoteState.Wait) {
+				//こっちのほうが適格と考えたためフラグを変更.2020.04.20 Akasoko26
+				if (doAutoInput && !NotesManager.IsMine(pChip))
+					this.AutoplayHit(pChip, msTjaHitTime, nPlayer, NotesManager.GetChipGameType(pChip, nPlayer));
+				if (pChip.nSoundTimems <= msTjaHitTime) {
+					var msJudgeTjaTime = (long)Math.Max(pChip.nSoundTimems, Math.Min(msTjaHitTime, msMaxPlayedTjaTime));
+					if (!this.IsNoteIfMet(pChip, nPlayer)) {
+						pChip.bHit = true; // skip silently — trigger condition not met
+					} else if (this.eGetChipJudgeAtTime(msJudgeTjaTime, pChip, nPlayer) == ENoteJudge.Miss) {
+						pChip.IsMissed = true;
+						this.tChipHitProcess(msTjaHitTime, pChip, EKeyConfigPart.Taiko, false, 0, nPlayer);
+						pChip.eNoteState = ENoteState.Bad; // set after hit processing for detecting duplicated misses
+					}
+				}
+			}
+		}
+	}
+
+	protected abstract void MultiHitNoteTimeout(int iPlayer, CChip chip, double msTjaNowTime, double msMaxPlayedTjaTime = double.PositiveInfinity);
 
 	private void UpdateAIBattleSection(int nPlayer, long nCurrentTimems, bool endOfPlay = false) {
 		if (nPlayer != 0)
