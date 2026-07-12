@@ -1,10 +1,11 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global
 -- particles/Script.lua — showcase for the Lua3DScene particle engine, now with alpha-textured
 -- sprites (soft circles, ice crystals, glows) instead of flat squares. Free-fly camera
--- (WASD + mouse, Space/LShift up/down), number keys 1-6 switch scenes.
+-- (WASD + mouse, Space/LShift up/down), number keys 1-7 switch scenes.
 
 local floor, sin, cos, sqrt, pi, random = math.floor, math.sin, math.cos, math.sqrt, math.pi, math.random
 local max = math.max
+local exp = math.exp
 
 -- ── config ──────────────────────────────────────────────────────────────────────────────────────
 local SCREEN_W, SCREEN_H = 1920, 1080
@@ -17,6 +18,7 @@ local CAP         = 60000
 
 -- sprite ids (registered in onStart)
 local SPR_GLOW, SPR_SPARK, SPR_SMOKE, SPR_CRYSTAL = 1, 2, 3, 4
+local SPR_STREAK, SPR_RING, SPR_DROPLET = 5, 6, 7   -- rain streak, flat ripple ring, splash water droplet
 
 -- ── state ───────────────────────────────────────────────────────────────────────────────────────
 local scene, fx
@@ -31,6 +33,12 @@ local fwTimer, expState, expT = 0, 0, 0
 local lastTs = 0
 local showHelp = true
 local hudTex, hudT = nil, 0
+-- rain scene state: a wet ground quad + a pool of flat expanding ripple objects + their live state
+local RIPPLE_POOL = 56
+local rainGround = nil
+local rippleObjs = nil      -- { objId, ... } (created on rain enter, deleted on leave)
+local ripples = nil         -- per-slot { active, x, z, age }
+local splashAcc = 0         -- fractional accumulator for the splash spawn rate
 
 -- ── helpers ─────────────────────────────────────────────────────────────────────────────────────
 local function hsv(h, s, v)
@@ -50,6 +58,145 @@ end
 local function rnd(a, b) return a + (b - a) * random() end
 -- set the sprite then burst, in one call
 local function burst(spr, ...) scene:PsSetSprite(fx, spr); scene:PsBurst(fx, ...) end
+
+-- ── rain helpers ─────────────────────────────────────────────────────────────────────────────────
+-- independent spawn-rate accumulator for ground splashes (budget() is used by the streaks)
+local function splashBudget(rate, dt) splashAcc = splashAcc + rate * dt; local n = floor(splashAcc); splashAcc = splashAcc - n; return n end
+
+-- A thin, soft, vertical rain streak in a square sprite: a tight gaussian core column, brighter toward
+-- the bottom (the drop "head") fading to a wispy tail at the top. White (the particle colour tints it).
+local function buildStreakSprite(id)
+    local W, H = 48, 48
+    local px = {}
+    local c = (W - 1) / 2
+    for y = 0, H - 1 do
+        local vy = y / (H - 1)                     -- 0 = top (trailing tail), 1 = bottom (leading end)
+        local vp = 0.20 + 0.80 * vy                -- a touch brighter toward the leading end
+        if vy < 0.28 then vp = vp * (vy / 0.28) end                      -- fade the trailing tail
+        if vy > 0.94 then vp = vp * (1 - (vy - 0.94) / 0.06) end         -- soft leading tip
+        for x = 0, W - 1 do
+            local dh = (x - c) / c
+            local line = exp(-(dh * dh) * 220)     -- razor-thin core column (~1px), like real rain
+            local al = floor(line * vp * 255 + 0.5)
+            if al < 0 then al = 0 elseif al > 255 then al = 255 end
+            px[y * W + x + 1] = al * 16777216 + 0xFFFFFF
+        end
+    end
+    scene:SetSpriteRGBA(id, px, W, H)
+end
+
+-- A small water droplet: a vertically-elongated soft bead with a bright glinty core, so splash droplets
+-- read as little beads of water in flight rather than flat dots. The particle colour tints it.
+local function buildDropletSprite(id)
+    local R = 20
+    local px = {}
+    local c = (R - 1) / 2
+    for y = 0, R - 1 do
+        for x = 0, R - 1 do
+            local nx = (x - c) / c
+            local ny = ((y - c) / c) * 0.6         -- squash Y → a taller-than-wide bead
+            local d = sqrt(nx * nx + ny * ny)
+            local body = max(0, 1 - d); body = body * body
+            local core = exp(-(d * d) * 8)         -- bright centre glint (wet highlight)
+            local al = floor(max(body, core) * 255 + 0.5)
+            if al < 0 then al = 0 elseif al > 255 then al = 255 end
+            px[y * R + x + 1] = al * 16777216 + 0xFFFFFF
+        end
+    end
+    scene:SetSpriteRGBA(id, px, R, R)
+end
+
+-- A soft annulus (ring) sprite, laid flat on the ground as an expanding ripple. White; tinted bluish.
+local function buildRingSprite(id)
+    local R = 48
+    local px = {}
+    local c = (R - 1) / 2
+    for y = 0, R - 1 do
+        for x = 0, R - 1 do
+            local dx, dy = (x - c) / c, (y - c) / c
+            local rr = sqrt(dx * dx + dy * dy)
+            local ring = exp(-((rr - 0.80) / 0.14) ^ 2)
+            if rr > 1.0 then ring = ring * max(0, 1 - (rr - 1.0) * 8) end   -- clip the outer edge
+            local al = floor(ring * 235 + 0.5)
+            if al < 0 then al = 0 elseif al > 255 then al = 255 end
+            px[y * R + x + 1] = al * 16777216 + 0xFFFFFF
+        end
+    end
+    scene:SetSpriteRGBA(id, px, R, R)
+end
+
+-- Create the rain scene's retained objects: one big dark wet ground quad + a pool of ripple objects
+-- (each a single flat ring quad, faded/sized per frame). NOT scene:ClearObjects (that also wipes the
+-- particle system) — these are tracked and DeleteObject'd on leaving the scene.
+local function rainSetup()
+    rainGround = scene:NewObject()
+    scene:ObjSetPass(rainGround, 0, 17, 21, 30, 255)        -- dark wet blue-grey, opaque
+    scene:ObjSetBounds(rainGround, -600, -1, -600, 600, 1, 600)
+    scene:ObjBegin(rainGround)
+    scene:ObjAddQuadFlat(rainGround, -600, 0, -600, 600, 0, -600, 600, 0, 600, -600, 0, 600)
+    rippleObjs = {}
+    ripples = {}
+    for i = 1, RIPPLE_POOL do
+        local oid = scene:NewObject()
+        scene:ObjSetTint(oid, 0.72, 0.82, 0.98)             -- bluish-white ripple
+        scene:ObjSetVisible(oid, false)
+        scene:ObjSetBounds(oid, -2, -0.3, -2, 2, 0.3, 2)
+        rippleObjs[i] = oid
+        ripples[i] = { active = false, x = 0, z = 0, age = 0, life = 0.7, r1 = 1.6, a0 = 1.0 }
+    end
+    splashAcc = 0
+end
+
+local function rainCleanup()
+    scene:SetFog(false, 0, 0, 0, 0, 0)
+    if rippleObjs then for _, oid in ipairs(rippleObjs) do scene:DeleteObject(oid) end; rippleObjs = nil end
+    if rainGround then scene:DeleteObject(rainGround); rainGround = nil end
+    ripples = nil
+end
+
+-- spawn a ripple at (x,z); strength (~0.3 small … ~1.7 big plop) scales its lifetime, max radius and
+-- peak opacity, each with extra jitter so no two ripples are alike.
+local function spawnRipple(x, z, strength)
+    if not ripples then return end
+    strength = strength or 1.0
+    for i = 1, RIPPLE_POOL do
+        local rp = ripples[i]
+        if not rp.active then
+            rp.active = true; rp.x = x; rp.z = z; rp.age = 0
+            rp.life = (0.42 + 0.45 * strength) * rnd(0.85, 1.2)
+            rp.r1 = (0.6 + 1.5 * strength) * rnd(0.8, 1.2)
+            rp.a0 = (0.35 + 0.6 * strength) * rnd(0.7, 1.0)
+            return
+        end
+    end
+end
+
+local RIP_R0 = 0.05
+local function updateRipples(dt)
+    if not ripples then return end
+    for i = 1, RIPPLE_POOL do
+        local rp = ripples[i]
+        if rp.active then
+            rp.age = rp.age + dt
+            local oid = rippleObjs[i]
+            if rp.age >= rp.life then
+                rp.active = false
+                scene:ObjSetVisible(oid, false)
+            else
+                local f = rp.age / rp.life
+                local rad = RIP_R0 + (rp.r1 - RIP_R0) * f
+                local al = floor((1 - f) * (1 - f) * rp.a0 * 235)   -- quadratic fade, scaled by impact
+                local x, z, yy = rp.x, rp.z, 0.02
+                scene:ObjSetVisible(oid, true)
+                scene:ObjSetPass(oid, 1, 0, 0, 0, al)         -- transparent pass; a fades the sprite
+                scene:ObjSetBounds(oid, x - rad, -0.2, z - rad, x + rad, 0.2, z + rad)
+                scene:ObjBegin(oid)
+                scene:ObjAddSpriteQuad(oid, x - rad, yy, z - rad, x + rad, yy, z - rad,
+                    x + rad, yy, z + rad, x - rad, yy, z + rad, SPR_RING, 0)
+            end
+        end
+    end
+end
 
 -- ════════════════════════════════════════════════════════════════════════════════════════════════
 -- Scenes
@@ -227,6 +374,107 @@ local SCENES = {
             end
         end,
     },
+    -- 7) RAIN — heavy rain falling onto wet ground: wind-blown streaks, splash crowns + rebound jets,
+    --    low mist where drops land, and expanding ripples on the ground. Misty fog adds depth.
+    {
+        name = "Rain", bg = { 26, 31, 41 },
+        help = "Heavy rain on wet ground: long wind-blown streaks, splash crowns + mist where drops land, and expanding ripples.",
+        enter = function()
+            rainSetup()
+            scene:SetFog(true, 34, 40, 52, 26, 170)   -- hazy depth + hides the far ground edge
+        end,
+        emit = function(dt)
+            local RANGE = 30
+            local wx = 2.4 * sin(t * 0.27)            -- gentle, slowly shifting wind
+            local wz = 1.5 * cos(t * 0.19)
+            local FALL, SPAWN_Y = 30, 26
+            -- 1) falling rain: a mix of mostly fine, faint, fast drops with the occasional fatter one
+            --    (size skewed small via random²). Per-drop length, opacity, fall speed and tint all vary,
+            --    so the curtain never looks uniform — bigger drops are longer, brighter and faster.
+            scene:PsSetSprite(fx, SPR_STREAK)
+            for _ = 1, budget(9000, dt) do
+                local rx = camX + rnd(-RANGE, RANGE)
+                local rz = camZ + rnd(-RANGE, RANGE)
+                local g = random(); g = g * g                -- 0..1, skewed toward small drops
+                local len = 0.16 + g * 0.82                  -- ~0.16 (fine) … ~0.98 (fat), mostly small
+                local fall = FALL + g * 16 + rnd(-2, 3)      -- bigger drops fall faster
+                local a = 0.16 + g * 0.5 + rnd(-0.04, 0.07)  -- and are more opaque; many faint small ones
+                local tb = rnd(-14, 14)                      -- subtle per-drop tint shift (sky glints)
+                scene:PsEmit(fx, rx, SPAWN_Y, rz,
+                    wx + rnd(-1.0, 1.0), -fall, wz + rnd(-1.0, 1.0),
+                    158 + tb, 184 + tb, 216 + tb * 0.5, a, len, len, SPAWN_Y / fall, 0, 0, 0)
+            end
+            -- 2) ground impacts: real splash anatomy, not round puffs. Droplets are launched in a RING that
+            --    flares up + outward (the crown / coronet), and a thin near-vertical central JET rebounds and
+            --    beads off (Rayleigh jet); all are little elongated water beads that arc back under gravity.
+            --    Classed by drop size so most impacts are light taps and only a few are big plops.
+            for _ = 1, splashBudget(210, dt) do
+                local ang = rnd(0, 2 * pi); local rr = sqrt(random()) * RANGE
+                local sx = camX + cos(ang) * rr
+                local sz = camZ + sin(ang) * rr
+                local m = random()
+                scene:PsSetSprite(fx, SPR_DROPLET)
+                if m < 0.50 then
+                    -- light tap: a small crown of a few beads flicked up + out, a faint little ripple
+                    local n = 3 + floor(random() * 3)
+                    local cout, cup = rnd(0.9, 1.7), rnd(1.2, 2.0)
+                    for k = 1, n do
+                        local a = (k / n) * 2 * pi + rnd(-0.5, 0.5)
+                        local s = rnd(0.012, 0.024)
+                        scene:PsEmit(fx, sx, 0.03, sz, cos(a) * cout * rnd(0.8, 1.2), cup * rnd(0.85, 1.25), sin(a) * cout * rnd(0.8, 1.2),
+                            199, 215, 237, 0.7, s, s * 0.45, rnd(0.18, 0.32), 16.0, 0.3, 0)
+                    end
+                    spawnRipple(sx, sz, rnd(0.3, 0.65))
+                elseif m < 0.85 then
+                    -- splash: a flaring crown ring + a thin central rebound jet + a ripple, sometimes a wisp of mist
+                    local n = 6 + floor(random() * 5)
+                    local cout, cup = rnd(1.6, 2.6), rnd(2.0, 3.0)
+                    for k = 1, n do
+                        local a = (k / n) * 2 * pi + rnd(-0.35, 0.35)
+                        local s = rnd(0.014, 0.028)
+                        scene:PsEmit(fx, sx, 0.04, sz, cos(a) * cout * rnd(0.8, 1.2), cup * rnd(0.85, 1.3), sin(a) * cout * rnd(0.8, 1.2),
+                            203, 219, 240, 0.82, s, s * 0.45, rnd(0.30, 0.5), 15.0, 0.25, 0)
+                    end
+                    local nj = 2 + floor(random() * 2)
+                    for k = 1, nj do
+                        local s = rnd(0.016, 0.026)
+                        scene:PsEmit(fx, sx, 0.05, sz, rnd(-0.25, 0.25), rnd(3.0, 4.2) * (0.7 + 0.4 * k / nj), rnd(-0.25, 0.25),
+                            210, 224, 243, 0.85, s, s * 0.6, rnd(0.40, 0.62), 15.0, 0.2, 0)
+                    end
+                    spawnRipple(sx, sz, rnd(0.7, 1.1))
+                    if random() < 0.35 then
+                        scene:PsSetSprite(fx, SPR_SMOKE)
+                        scene:PsEmit(fx, sx, 0.05, sz, rnd(-0.12, 0.12), rnd(0.25, 0.5), rnd(-0.12, 0.12),
+                            184, 200, 222, rnd(0.05, 0.11), 0.06, rnd(0.18, 0.28), rnd(0.18, 0.30), 0.7, 1.6, 0)
+                    end
+                else
+                    -- big plop (rare): a tall flaring crown, a tall Rayleigh jet, scattered fine spray, wide ripple + mist
+                    local n = 11 + floor(random() * 8)
+                    local cout, cup = rnd(2.2, 3.4), rnd(2.8, 4.0)
+                    for k = 1, n do
+                        local a = (k / n) * 2 * pi + rnd(-0.3, 0.3)
+                        local s = rnd(0.016, 0.034)
+                        scene:PsEmit(fx, sx, 0.04, sz, cos(a) * cout * rnd(0.8, 1.25), cup * rnd(0.85, 1.35), sin(a) * cout * rnd(0.8, 1.25),
+                            205, 221, 242, 0.85, s, s * 0.45, rnd(0.35, 0.6), 15.0, 0.2, 0)
+                    end
+                    local nj = 3 + floor(random() * 3)
+                    for k = 1, nj do
+                        local s = rnd(0.018, 0.03)
+                        scene:PsEmit(fx, sx, 0.06, sz, rnd(-0.3, 0.3), rnd(4.2, 6.0) * (0.6 + 0.5 * k / nj), rnd(-0.3, 0.3),
+                            213, 227, 245, 0.9, s, s * 0.6, rnd(0.50, 0.75), 15.0, 0.15, 0)
+                    end
+                    scene:PsBurst(fx, sx, 0.05, sz, 5 + floor(random() * 6), 0, 1, 0, 0.6, rnd(2.5, 4.0),   -- fine secondary spray
+                        206, 222, 242, 12, 0.7, rnd(0.008, 0.016), 0.005, rnd(0.25, 0.45), 0.4, 15.0, 0.3, 0)
+                    spawnRipple(sx, sz, rnd(1.1, 1.7))
+                    scene:PsSetSprite(fx, SPR_SMOKE)
+                    scene:PsEmit(fx, sx, 0.06, sz, rnd(-0.2, 0.2), rnd(0.4, 0.7), rnd(-0.2, 0.2),
+                        186, 202, 226, rnd(0.10, 0.18), 0.08, rnd(0.30, 0.42), rnd(0.24, 0.38), 0.8, 1.4, 0)
+                end
+            end
+            -- 3) advance + draw the flat expanding ripples
+            updateRipples(dt)
+        end,
+    },
 }
 
 -- ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -235,6 +483,7 @@ function setScene(i)
     t = 0; emitAcc = 0
     scene:PsClear(fx)
     scene:PsSetSprite(fx, -1)
+    rainCleanup()                 -- tear down any rain ground/ripple objects + fog from a previous scene
     SCENES[sceneIdx].enter()
     hudTex = nil
 end
@@ -254,6 +503,9 @@ function onStart()
     scene:MakeSoftCircle(SPR_SPARK, 24, 0.7)
     scene:MakeSoftCircle(SPR_SMOKE, 48, 3.2)
     scene:MakeCrystal(SPR_CRYSTAL, 48)
+    buildStreakSprite(SPR_STREAK)   -- rain streak
+    buildRingSprite(SPR_RING)       -- ripple ring
+    buildDropletSprite(SPR_DROPLET) -- splash water droplet
     fontBig   = TEXT:Create(40)
     fontMid   = TEXT:Create(26)
     fontSmall = TEXT:Create(18)
@@ -339,7 +591,7 @@ function draw()
     if hudTex then hudTex:Draw(30, 74) end
     if showHelp then
         fontSmall:GetText(
-            "1-6 scenes ([ ] cycle)   WASD+mouse fly   Space/LShift up-down   LCtrl sprint   R replay scene   C reset cam   H help   Esc quit",
+            "1-7 scenes ([ ] cycle)   WASD+mouse fly   Space/LShift up-down   LCtrl sprint   R replay scene   C reset cam   H help   Esc quit",
             false, 1850, COLOR:CreateColorFromRGBA(210, 220, 230, 255), COLOR:CreateColorFromRGBA(0, 0, 0, 255)):Draw(30, 110)
         fontSmall:GetText(SCENES[sceneIdx].help, false, 1850,
             COLOR:CreateColorFromRGBA(150, 200, 170, 255), COLOR:CreateColorFromRGBA(0, 0, 0, 255)):Draw(30, 138)
