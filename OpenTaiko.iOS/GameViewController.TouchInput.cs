@@ -1,3 +1,4 @@
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using UIKit;
@@ -25,6 +26,8 @@ public partial class GameViewController {
 	private double DonRadius => (global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumVisual ?? 30) / 100.0;
 
 	private UIView? _touchOverlay;
+	// True while the shape editor is open; keeps the overlay hidden across rebuilds.
+	private bool _touchOverlaySuppressed;
 	// Config-menu D-pad overlay (software arrow keys). Shown only in the Config stage.
 	private UIView? _arrowOverlay;
 	private bool _arrowNavMode;
@@ -32,7 +35,8 @@ public partial class GameViewController {
 	private void CreateTouchOverlay() {
 		_touchOverlay = new UIView(View!.Bounds) {
 			UserInteractionEnabled = false,
-			BackgroundColor = UIColor.Clear
+			BackgroundColor = UIColor.Clear,
+			Hidden = _touchOverlaySuppressed,
 		};
 
 		var bounds = View.Bounds;
@@ -53,19 +57,40 @@ public partial class GameViewController {
 		escView.ClipsToBounds = true;
 		_touchOverlay.AddSubview(escView);
 
-		// Don circle — centered below bottom edge, clipped to show top portion
-		var r = DonRadius * w;
-		var cx = DonCenterX * w;
-		var cy = DonCenterY * h;
-		var donView = new UIView(new CGRect(cx - r, cy - r, r * 2, r * 2));
-		donView.BackgroundColor = UIColor.FromRGBA(0xFF, 0x44, 0x44, 0x20);
-		donView.Layer.CornerRadius = (nfloat)r;
-		donView.Layer.BorderWidth = 1.5f;
-		donView.Layer.BorderColor = UIColor.FromRGBA(0xFF, 0x44, 0x44, 0x40).CGColor;
-		_touchOverlay.AddSubview(donView);
+		if (TouchDrumShape.HasCustomShape) {
+			// Player drawn shapes, rendered as one merged shape
+			var path = TouchDrumShape.BuildUnionPath(TouchDrumShape.Strokes
+				.Select(s => (IReadOnlyList<CGPoint>)s.Select(p => new CGPoint(p.X * w, p.Y * h)).ToList()));
+			if (path != null) {
+				_touchOverlay.Layer.AddSublayer(new CAShapeLayer {
+					Path = path,
+					FillColor = TouchDrumShape.Tint(0x20).CGColor,
+					StrokeColor = TouchDrumShape.Tint(0x40).CGColor,
+					LineWidth = 1.5f,
+				});
+			}
+		} else {
+			// Don circle — centered below bottom edge, clipped to show top portion
+			var r = DonRadius * w;
+			var cx = DonCenterX * w;
+			var cy = DonCenterY * h;
+			var donView = new UIView(new CGRect(cx - r, cy - r, r * 2, r * 2));
+			donView.BackgroundColor = TouchDrumShape.Tint(0x20);
+			donView.Layer.CornerRadius = (nfloat)r;
+			donView.Layer.BorderWidth = 1.5f;
+			donView.Layer.BorderColor = TouchDrumShape.Tint(0x40).CGColor;
+			_touchOverlay.AddSubview(donView);
+		}
 
 		View.AddSubview(_touchOverlay);
 		View.ClipsToBounds = true;
+	}
+
+	// Rebuilds the drum overlay after the shape editor saved a new layout.
+	private void RebuildTouchOverlay() {
+		_touchOverlay?.RemoveFromSuperview();
+		_touchOverlay = null;
+		CreateTouchOverlay();
 	}
 
 	private long HitTestTouchZone(CGPoint location) {
@@ -79,12 +104,18 @@ public partial class GameViewController {
 			return HID_ESC;
 		}
 
+		// Do a simple split at the middle of the screen to determine left/right.
+		bool isLeft = location.X < w * 0.5;
+		if (TouchDrumShape.HasCustomShape) {
+			return TouchDrumShape.HitTest(location.X / w, location.Y / h)
+				? (isLeft ? HID_F : HID_J)
+				: (isLeft ? HID_D : HID_K);
+		}
+
 		// Check Don circle in pixel space
 		double dx = location.X - DonCenterX * w;
 		double dy = location.Y - DonCenterY * h;
 		double r = DonRadius * w;
-
-		bool isLeft = location.X < w * 0.5;
 
 		if (dx * dx + dy * dy <= r * r) {
 			// Inside Don circle: F (left) / J (right)

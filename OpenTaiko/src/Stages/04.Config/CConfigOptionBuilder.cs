@@ -14,6 +14,9 @@ namespace OpenTaiko;
 /// happens on stage exit via the existing <c>tExport</c>.
 /// </summary>
 public static class CConfigOptionBuilder {
+	// Set by the iOS host to open the native touch drum shape editor.
+	public static Action? iOSTouchShapeEditor;
+
 	// Settings strings come from the global game translations (Lang/*/lang.json). Anything NOT defined there
 	// (e.g. settings strings authored per-skin) falls back to the active skin's theme translations
 	// (System/<skin>/Locales/<lang>.json via CSkinLocaleManager), so a skin can localize its own settings.
@@ -135,6 +138,10 @@ public static class CConfigOptionBuilder {
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,"Touch Drum Size", "Radius of the Don drum circle as % of screen width.",
 				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
+		// iOS only: draw custom touch drum areas instead of using the circle.
+		if (OperatingSystem.IsIOS())
+			O.Add(CLuaConfigOption.Action_(SYS, secDisplay,"Touch Drum Shape", "Draw custom Don areas for the touch drum. Everything outside them is Ka.",
+				() => iOSTouchShapeEditor?.Invoke()));
 		O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_LANEOPACITY"), L("SETTINGS_SYSTEM_LANEOPACITY_DESC"),
 			cfg.nBackgroundTransparency, 0, 255, 5, v => cfg.nBackgroundTransparency = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_FASTRENDER"), L("SETTINGS_SYSTEM_FASTRENDER_DESC"),

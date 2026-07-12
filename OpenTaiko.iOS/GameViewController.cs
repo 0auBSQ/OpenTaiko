@@ -234,8 +234,34 @@ public partial class GameViewController : UIViewController {
 		// render-target FBO is (re)sized to GameWindowSize each frame in OnFrame.
 
 		// Add touch overlay controls
+		TouchDrumShape.Load();
 		CreateTouchOverlay();
 		CreateDebugHud();
+
+		global::OpenTaiko.CConfigOptionBuilder.iOSTouchShapeEditor = () => {
+			InvokeOnMainThread(() => {
+				// Scale the live game view down to the editor's screen rectangle and hide the game
+				// overlays.
+				var b = View!.Bounds;
+				var center = new CGPoint(b.Width / 2, b.Height / 2);
+				nfloat s = (nfloat)TouchDrumEditorViewController.ScreenScale;
+				_touchOverlaySuppressed = true;
+				if (_touchOverlay != null) _touchOverlay.Hidden = true;
+				if (_arrowOverlay != null) _arrowOverlay.Hidden = true;
+				UIView.Animate(0.3, () => {
+					View.Transform = CGAffineTransform.MakeScale(s, s);
+					View.Center = new CGPoint(b.Width * 0.5, b.Height * TouchDrumEditorViewController.ScreenCenterYFraction);
+				});
+				PresentViewController(new TouchDrumEditorViewController(saved => {
+					UIView.Animate(0.3, () => {
+						View.Transform = CGAffineTransform.MakeIdentity();
+						View.Center = center;
+					});
+					_touchOverlaySuppressed = false;
+					if (saved) RebuildTouchOverlay();
+				}), true, null);
+			});
+		};
 
 		// Register iOS native text input handler for CTextInput (replaces ImGui)
 		global::OpenTaiko.CTextInput.iOSTextInputHandler = (currentText, maxLength, callback) => {
@@ -335,8 +361,8 @@ public partial class GameViewController : UIViewController {
 			// the drum stays for gameplay and other menus.
 			if (_arrowOverlay == null) CreateArrowOverlay();
 			_arrowNavMode = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.Config;
-			if (_touchOverlay != null) _touchOverlay.Hidden = _arrowNavMode;
-			if (_arrowOverlay != null) _arrowOverlay.Hidden = !_arrowNavMode;
+			if (_touchOverlay != null) _touchOverlay.Hidden = _arrowNavMode || _touchOverlaySuppressed;
+			if (_arrowOverlay != null) _arrowOverlay.Hidden = !_arrowNavMode || _touchOverlaySuppressed;
 
 			_game.RenderHostedFrame(delta);
 
