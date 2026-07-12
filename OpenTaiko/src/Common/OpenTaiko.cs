@@ -901,7 +901,7 @@ internal class OpenTaiko : Game {
 								this.tExecuteGarbageCollection();
 								break;
 
-							case (int)CStageCutScene.EReturnValue.OutroFinished:
+							case (int)CStageCutScene.EReturnValue.OutroFinishedFadeOut:
 								UnmountActivity(rCurrentStage);
 								this.NextSongSelectStage(OpenTaiko.stageResults);
 
