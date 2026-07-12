@@ -1868,27 +1868,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			}
 
 			if (this.actCombo.nCurrentCombo[nPlayer] % 10 == 0 && this.actCombo.nCurrentCombo[nPlayer] > 0) {
-				//if (this.actChara.bキャラクターアクション中 == false)
-				//{
-				CCharacter character = CCharacter.GetCharacter(nPlayer);
-				// Edit character values here
 				if (!pChip.bGOGOTIME) //2018.03.11 kairera0467 チップに埋め込んだフラグから読み取る
-				{
-					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10) {
-						if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
-							// 魂ゲージMAXではない
-							// ジャンプ_ノーマル
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_10COMBO);
-						}
-					}
-					if (this.actChara.eNowAnime[nPlayer] != CActImplCharacter.Anime.Combo10_Max) {
-						if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer)) {
-							// 魂ゲージMAX
-							// ジャンプ_MAX
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_10COMBO_MAX);
-						}
-					}
-				}
+					actChara.PlayGameAction(nPlayer, HGaugeMethods.UNSAFE_IsRainbow(nPlayer) ? CCharacter.ANIM_GAME_10COMBO_MAX : CCharacter.ANIM_GAME_10COMBO);
 			}
 
 			this.tConfetti_Start();

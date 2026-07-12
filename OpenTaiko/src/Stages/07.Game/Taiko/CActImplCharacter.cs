@@ -794,39 +794,12 @@ internal class CActImplCharacter : CActivity {
 	private float[] nCharaBeat = new float[5];
 	*/
 
-	public enum Anime {
+	public enum EAnimePriority {
 		None,
 		Normal,
-		Miss,
-		MissDown,
-		Cleared,
-		Maxed,
-		MissIn,
-		MissDownIn,
-		GoGoTime,
-		GoGoTime_Maxed,
-		Combo10,
-		Combo10_Clear,
-		Combo10_Max,
-		GoGoStart,
-		GoGoStart_Clear,
-		GoGoStart_Max,
-		Become_Cleared,
-		Become_Maxed,
-		SoulOut,
-		ClearOut,
-		Return,
-		Balloon_Breaking,
-		Balloon_Broke,
-		Balloon_Miss,
-		Kusudama_Idle,
-		Kusudama_Breaking,
-		Kusudama_Broke,
-		Kusudama_Miss
+		GenericBalloon_Breaking,
+		GenericBalloon_BrokeMiss,
 	}
-
-
-	public Anime[] eNowAnime = new Anime[5];
 
 	public CCounter ctKusuIn;
 	public CCounter? ctKusuMiss;
@@ -834,17 +807,17 @@ internal class CActImplCharacter : CActivity {
 	public CCharacterController[] CharacterControllers = new CCharacterController[5];
 
 	// action keeping priority: generic balloon broke/miss > breaking > other > none
-	private static Anime ActionKeepingPriority(string? animationType) => animationType switch {
+	private static EAnimePriority ActionKeepingPriority(string? animationType) => animationType switch {
 		CCharacter.ANIM_GAME_KUSUDAMA_BROKE or CCharacter.ANIM_GAME_BALLOON_BROKE
-		or CCharacter.ANIM_GAME_KUSUDAMA_MISS or CCharacter.ANIM_GAME_BALLOON_MISS => Anime.Kusudama_Miss,
-		CCharacter.ANIM_GAME_KUSUDAMA_BREAKING or CCharacter.ANIM_GAME_BALLOON_BREAKING => Anime.Balloon_Breaking,
-		CCharacter.ANIM_NONE => Anime.None,
-		_ => Anime.Normal,
+		or CCharacter.ANIM_GAME_KUSUDAMA_MISS or CCharacter.ANIM_GAME_BALLOON_MISS => EAnimePriority.GenericBalloon_BrokeMiss,
+		CCharacter.ANIM_GAME_KUSUDAMA_BREAKING or CCharacter.ANIM_GAME_BALLOON_BREAKING => EAnimePriority.GenericBalloon_Breaking,
+		CCharacter.ANIM_NONE => EAnimePriority.None,
+		_ => EAnimePriority.Normal,
 	};
 
 	public void PlayGameAction(int player, string animationType) {
 		var priority = ActionKeepingPriority(animationType);
-		if (priority is Anime.Balloon_Breaking) {
+		if (priority is EAnimePriority.GenericBalloon_Breaking) {
 			// breaking switches between classes and interrupts all actions
 		} else if ((this.IsInKusudama && !IsKusudamaAction(animationType))
 			|| (this.bBalloonRoll[player] && !IsNonKusuBalloonAction(animationType))
