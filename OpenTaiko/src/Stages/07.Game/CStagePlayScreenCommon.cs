@@ -1354,7 +1354,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 
 		this.actChara.bBalloonRoll[player] = !IsKusudama;
-		this.actChara.ReturnDefaultAnime(player);
 		CCharacter character = CCharacter.GetCharacter(player);
 
 		if (IsKusudama) {
@@ -1362,7 +1361,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			rollCount = pChip.nRollCount = ++pChip.KusudamaRollCount;
 			balloon = pChip.KusudamaCount;
 			if (pChip.KusudamaRollCount > 0) {
-				actChara.PlayGameAction(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING);
+				actChara.PlayGameAction(player, CCharacter.ANIM_GAME_KUSUDAMA_BREAKING, true);
 				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 					if (this.actBalloon.ctBalloonAnime[i].IsUnEnded) {
 						this.actBalloon.ctBalloonAnime[i] = new CCounter(0, 9, 14, OpenTaiko.Timer);
@@ -1373,10 +1372,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				}
 			}
 		} else {
-			actChara.PlayGameAction(player, CCharacter.ANIM_GAME_BALLOON_BREAKING);
-			actChara.CharacterControllers[player].ResetCounter(player);
-
-
+			actChara.PlayGameAction(player, CCharacter.ANIM_GAME_BALLOON_BREAKING, true);
 			if (this.actBalloon.ctBalloonAnime[player].IsUnEnded) {
 				this.actBalloon.ctBalloonAnime[player] = new CCounter(0, 9, 14, OpenTaiko.Timer);
 				this.actBalloon.ctBalloonAnime[player].CurrentValue = 1;
@@ -1616,18 +1612,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 			if (HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == false) {
 				this.bIsAlreadyMaxed[nPlayer] = true;
-
-				actChara.ReturnDefaultAnime(nPlayer);
-				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_IN);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_IN, true);
 
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
 			}
 			if (cleared && this.bIsAlreadyCleared[nPlayer] == false) {
 				this.bIsAlreadyCleared[nPlayer] = true;
-
-				actChara.ReturnDefaultAnime(nPlayer);
-				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_IN, true);
 
 				OpenTaiko.stageGameScreen.actBackground.ClearIn(nPlayer);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
@@ -1642,19 +1634,19 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				this.actRunner.Start(nPlayer, true, pChip);
 			if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 				this.bIsAlreadyMaxed[nPlayer] = false;
-				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT, true);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
 			} else if (!bIsGOGOTIME[nPlayer]) {
 				if (Chara_MissCount[nPlayer] == 1 - 1) {
-					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN, true);
 				} else if (Chara_MissCount[nPlayer] == 6 - 1) {
-					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+					actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN, true);
 				}
 			}
 			if (!cleared && this.bIsAlreadyCleared[nPlayer] == true) {
 				this.bIsAlreadyCleared[nPlayer] = false;
-				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
+				actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_CLEAR_OUT, true);
 				OpenTaiko.stageGameScreen.actBackground.ClearOut(nPlayer);
 				if (isEndOfPlay ??= this.IsEndOfPlay())
 					this.UpdateClearAnimation(nPlayer);
@@ -1826,15 +1818,12 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					CCharacter character = CCharacter.GetCharacter(nPlayer);
 					if (!HGaugeMethods.UNSAFE_IsRainbow(nPlayer) && this.bIsAlreadyMaxed[nPlayer] == true) {
 						this.bIsAlreadyMaxed[nPlayer] = false;
-						actChara.ReturnDefaultAnime(nPlayer);
-						actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT);
+						actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MAX_OUT, true);
 					} else if (!bIsGOGOTIME[nPlayer]) {
 						if (Chara_MissCount[nPlayer] == 1) {
-							actChara.ReturnDefaultAnime(nPlayer);
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_IN, true);
 						} else if (Chara_MissCount[nPlayer] == 6) {
-							actChara.ReturnDefaultAnime(nPlayer);
-							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN);
+							actChara.PlayGameAction(nPlayer, CCharacter.ANIM_GAME_MISS_DOWN_IN, true);
 						}
 					}
 
@@ -3552,6 +3541,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return;
 		chip.bProcessed = true;
 		if (NotesManager.IsKusudama(chip)) {
+			this.actChara.bBalloonRoll[iPlayer] = false; // prevent normal balloon animation
 			if (iPlayer == 0) {
 				actBalloon.KusuIn();
 				actChara.KusuIn();
@@ -3566,7 +3556,6 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					}
 				}
 			}
-			this.actChara.bBalloonRoll[iPlayer] = false; // prevent normal balloon animation
 		}
 	}
 

@@ -815,7 +815,10 @@ internal class CActImplCharacter : CActivity {
 		_ => EAnimePriority.Normal,
 	};
 
-	public void PlayGameAction(int player, string animationType) {
+	public void PlayGameAction(int player, string animationType, bool updateLoopAnimation = false) {
+		if (updateLoopAnimation)
+			this.ReturnDefaultAnime(player);
+
 		var priority = ActionKeepingPriority(animationType);
 		if (priority is EAnimePriority.GenericBalloon_Breaking) {
 			// breaking switches between classes and interrupts all actions
@@ -846,16 +849,12 @@ internal class CActImplCharacter : CActivity {
 
 	public void KusuMiss(int iPlayer) {
 		ctKusuMiss = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		CCharacter character = CCharacter.GetCharacter(iPlayer);
-		ReturnDefaultAnime(iPlayer);
-		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
+		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_MISS, true);
 	}
 
 	public void KusuSuccess(int iPlayer) {
 		ctKusuSuccess = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		CCharacter character = CCharacter.GetCharacter(iPlayer);
-		ReturnDefaultAnime(iPlayer);
-		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
+		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_BROKE, true);
 	}
 
 	/*
