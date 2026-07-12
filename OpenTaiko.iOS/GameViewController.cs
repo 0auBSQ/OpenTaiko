@@ -53,6 +53,15 @@ public partial class GameViewController : UIViewController {
 	private UILabel? _debugHud;
 	private int _debugHudFrameCount;
 
+	public override bool PrefersHomeIndicatorAutoHidden => false;
+	public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+
+	public override void ViewDidAppear(bool animated) {
+		base.ViewDidAppear(animated);
+		SetNeedsUpdateOfHomeIndicatorAutoHidden();
+		SetNeedsUpdateOfScreenEdgesDeferringSystemGestures();
+	}
+
 	public override void LoadView() {
 		// GL renders off-screen into a shared IOSurface and the CAMetalLayer-backed view
 		// composites + presents it. See MetalPresenter.
@@ -258,6 +267,8 @@ public partial class GameViewController : UIViewController {
 						View.Center = center;
 					});
 					_touchOverlaySuppressed = false;
+					SetNeedsUpdateOfHomeIndicatorAutoHidden();
+					SetNeedsUpdateOfScreenEdgesDeferringSystemGestures();
 					if (saved) RebuildTouchOverlay();
 				}), true, null);
 			});

@@ -37,6 +37,15 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 		ModalTransitionStyle = UIModalTransitionStyle.CrossDissolve;
 	}
 
+	public override bool PrefersHomeIndicatorAutoHidden => false;
+	public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+
+	public override void ViewDidAppear(bool animated) {
+		base.ViewDidAppear(animated);
+		SetNeedsUpdateOfHomeIndicatorAutoHidden();
+		SetNeedsUpdateOfScreenEdgesDeferringSystemGestures();
+	}
+
 	public override void ViewDidLayoutSubviews() {
 		base.ViewDidLayoutSubviews();
 		if (_built) return;
