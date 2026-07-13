@@ -233,7 +233,9 @@ public partial class GameViewController : UIViewController {
 		);
 
 		// Register input devices for the game's input manager
-		global::OpenTaiko.OpenTaiko.ExternalInputDevices = new List<FDK.IInputDevice> { _keyboardInput };
+		var inputDevices = new List<FDK.IInputDevice> { _keyboardInput };
+		inputDevices.AddRange(CInputGamepad_iOS.CreateSlots(global::OpenTaiko.OpenTaiko.MAX_PLAYERS));
+		global::OpenTaiko.OpenTaiko.ExternalInputDevices = inputDevices;
 
 		// Create and initialize the game
 		_game = new global::OpenTaiko.OpenTaiko();
