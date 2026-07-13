@@ -1,6 +1,7 @@
 local OFFSET_MODE_MENU = "menu"
 local OFFSET_MODE_RESULT = "result"
 local OFFSET_MODE_GAME = "game"
+local OFFSET_MODE_GAME_AI = "game_ai"
 local OFFSET_MODE_GAME_BALLOON = "game_balloon"
 local OFFSET_MODE_GAME_KUSUDAMA = "game_kusudama"
 local OFFSET_MODE_GAME_TOWER = "game_tower"
@@ -107,7 +108,8 @@ local chara_config = {
 	title_beat_normal = 1;
 	title_beat_entry = 1;
 
-	game_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME; v1_scale = 1.25; };
+	game_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME; v1_scale = 1.25 --[[1 / Game_Chara_Scale]]; };
+	game_ai_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_AI; v1_scale = 1.25 --[[0.58 / Game_Chara_Scale_AI]]; };
 	game_balloon_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_BALLOON; v1_scale = 1; };
 	game_kusudama_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_KUSUDAMA; v1_scale = 1; };
 	game_chara_tower_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_TOWER; v1_scale = 1; };
@@ -795,6 +797,26 @@ local AnimationData = {
 
 local animationdata_array = {}
 
+-- flip is negative scale and flipping anchor point
+local function flip_anchor(anchor, flipX, flipY)
+	anchor = anchor:lower()
+	if flipX then
+		if anchor:find("left") then
+			anchor = anchor:gsub("left", "right")
+		elseif anchor:find("right") then
+			anchor = anchor:gsub("right", "left")
+		end
+	end
+	if flipY then
+		if anchor:find("top") then
+			anchor = anchor:gsub("top", "bottom")
+		elseif anchor:find("bottom") then
+			anchor = anchor:gsub("bottom", "top")
+		end
+	end
+	return anchor
+end
+
 local function create_animation(animationType)
 	local dir = animation_dirs[animationType]
 	if dir == nil then
@@ -862,15 +884,21 @@ local function create_animation(animationType)
 				return self.value >= 1
 			end
 		end
-		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+		animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, player_count, ai_battle_mode)
 			local frame = self.frames[self.frame_index]
 
 			local offset = overrideOffset or self.offset
+			if offset.mode == OFFSET_MODE_GAME and ai_battle_mode then
+				offset = chara_config.game_ai_offset -- replace game_offset
+			end
 			local offsetX = offset.pos.X
 			local offsetY = offset.pos.Y
 
 			local theme_resolution = THEME:GetResolution()
 			local baseScale = theme_resolution.Y / chara_config.resolution.Y
+			-- negative scale here represents flipping around center, not around anchor
+			local flipX = scaleX < 0
+			local flipY = scaleY < 0
 			scaleX = scaleX * baseScale
 			scaleY = scaleY * baseScale
 
@@ -891,6 +919,7 @@ local function create_animation(animationType)
 				if wrapMode then frame:SetWrapMode(wrapMode) end
 				if anchor ~= nil then
 					-- Anchor mode: skip legacy frame-size offset; (x,y) is the anchor point directly
+					anchor = flip_anchor(anchor, flipX, flipY)
 					if clip_w ~= nil and clip_w > 0 then
 						-- Caller supplies crop values in theme-pixel units; divide by scale to get source pixels.
 						local abs_sx = math.abs(scaleX)
@@ -904,24 +933,36 @@ local function create_animation(animationType)
 						frame:DrawAtAnchor(x + offsetX, y + offsetY, anchor)
 					end
 				else
+					local anchor = "bottom"
 					if chara_config.legacy_mode then
+						-- Legacy mode: 0.6.0's drawing coordinates are topleft-anchored in the following offset modes
+						-- 0.6.1 OWM skin unified the drawing coordinates to be bottom-anchored with new anchor points.
+						-- Due to the 0.6.1 anchor points are not directly convertible into 0.6.0 anchor points,
+						-- tokkkom gave a set of offset constants in decimals, which effectively offset in 1080p pixels.
 						if offset.mode == OFFSET_MODE_GAME then
-							offsetX = offsetX + (((frame.Width / 2.0) - (0.13020833333 * chara_config.resolution.X)) * scaleX)
-							offsetY = offsetY + ((frame.Height - (0.25555555555 * chara_config.resolution.Y)) * scaleY)
+							anchor = "topleft"
+							offsetX = offsetX - 250 / 1080.0 --[[0.13020833333 * 1920 / 1080]] * theme_resolution.Y
+							offsetY = offsetY - 276 / 1080.0 --[[0.25555555555]] * theme_resolution.Y
+						elseif offset.mode == OFFSET_MODE_GAME_AI then
+							-- bottomleft-anchored in 0.6.0
+							anchor = "bottomleft"
 						elseif offset.mode == OFFSET_MODE_GAME_BALLOON then
-							offsetX = offsetX + (((frame.Width / 2.0) - (0.27216666666 * chara_config.resolution.X)) * scaleX)
-							offsetY = offsetY + ((frame.Height - (0.26296296296 * chara_config.resolution.Y)) * scaleY)
+							anchor = "topleft"
+							offsetX = offsetX - 470 / 1080.0 --[[0.27216666666 * 0.9 * 1920 / 1080]] * theme_resolution.Y
+							offsetY = offsetY - 256 / 1080.0 --[[0.2629629629 * 0.9]] * theme_resolution.Y
 						elseif offset.mode == OFFSET_MODE_GAME_KUSUDAMA then
-							offsetX = offsetX + (((frame.Width / 2.0) - (0.2555 * chara_config.resolution.X)) * scaleX)
-							offsetY = offsetY + ((frame.Height - (0.2555 * chara_config.resolution.Y)) * scaleY)
-						-- OFFSET_MODE_MENU: no extra frame-size correction.
-						-- The old CMenuCharacter applied only Characters_Menu_Offset directly
-						-- without frame-dimension adjustments, so menu positioning is already
-						-- correct with just the scaled menu_offset — no additional correction needed.
+							anchor = "topleft"
+							offsetX = offsetX - 471 / 1080.0 --[[0.2555 * 0.96 * 1920 / 1080]] * theme_resolution.Y
+							offsetY = offsetY - 265 / 1080.0 --[[0.2555 * 0.96]] * theme_resolution.Y
+						elseif offset.mode == OFFSET_MODE_MENU then
+							-- already bottom-anchored in 0.6.0, but takkkom gave the same corrections as OFFSET_MODE_GAME (not AI battle), cancelled by Komi
+						elseif offset.mode == OFFSET_MODE_RESULT then
+							-- topleft in 0.6.0, but takkkom gave no corrections
 						end
 					end
+					anchor = flip_anchor(anchor, flipX, flipY)
 
-					frame:DrawAtAnchor(x + offsetX, y + offsetY, "bottom")
+					frame:DrawAtAnchor(x + offsetX, y + offsetY, anchor)
 				end
 				frame:SetOpacity(1.0)
 				frame:SetRotation(0)
@@ -950,7 +991,7 @@ local function create_preview()
 	end
 	animation_data.preview = preview
 
-	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, player_count, ai_battle_mode)
 		local theme_resolution = THEME:GetResolution()
 		local baseScale = theme_resolution.Y / chara_config.resolution.Y
 		scaleX = scaleX * baseScale
@@ -985,7 +1026,7 @@ local function create_render()
 		animation_data.render = TEXTURE:CreateTexture("Render.png")
 	end
 
-	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+	animation_data.draw = function(self, x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, player_count, ai_battle_mode)
 		local theme_resolution = THEME:GetResolution()
 		local baseScale = theme_resolution.Y / chara_config.resolution.Y
 		scaleX = scaleX * baseScale
@@ -1156,6 +1197,9 @@ function update(delta, animationType, looping)
 end
 
 function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, gradientMap)
+	-- 2 for 1/2 players (unimplemented: 4 for 3/4 players, 5 for 5 players)
+	local player_count = (CONFIG.PlayerCount <= 2) and 2 or (CONFIG.PlayerCount <= 4) and 4 or 5
+	local ai_battle_mode = CONFIG.IsAIBattleMode
 	if not availableAnimation(animationType) then
 		return
 	end
@@ -1167,7 +1211,7 @@ function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, 
 			overrideOffset = animation_offsets[contextType]
 		end
 		if gradientMap ~= nil then GRADIENT:SetActive(gradientMap) end
-		animation:draw(x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode)
+		animation:draw(x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, player_count, ai_battle_mode)
 		if gradientMap ~= nil then GRADIENT:ClearActive() end
 	end
 end
@@ -1207,9 +1251,7 @@ function getHeyaRenderOffset()
 	return scaledX, scaledY
 end
 
--- Returns the AI battle base position (theme pixels) for the given 0-based player index,
--- pre-adjusted so that when draw() adds game_offset (and the legacy correction, if any)
--- the net result equals the configured value.
+-- Returns the AI battle base position (theme pixels) for the given 0-based player index
 -- charaScale: the C#-side scale applied to the character (Game_Chara_Scale_AI).
 -- Returns nil when Game_Chara_X_AI / Game_Chara_Y_AI are absent in CharaConfig.txt.
 function getAIBattlePosition(player, charaScale)
@@ -1226,20 +1268,5 @@ function getAIBattlePosition(player, charaScale)
 	-- Desired final position in theme pixels.
 	local final_x = chara_config.ai_positions_x[player] * rx
 	local final_y = chara_config.ai_positions_y[player] * ry
-	-- draw() will add game_offset (scaled), so subtract it here so the net equals final.
-	local offset_x = chara_config.game_offset.pos.X * rx
-	local offset_y = chara_config.game_offset.pos.Y * ry
-	-- In legacy mode, draw() also adds a frame-size Y correction for GAME animations:
-	--   (frame.Height - 0.2555 * char_res.Y) * scaleY
-	-- where scaleY = charaScale * baseScale and baseScale = theme_res.Y / char_res.Y.
-	-- Simplified: (h - 0.2555 * theme_res.Y) * charaScale  (h = getDrawSize().Y = frame.Height * baseScale)
-	-- Subtract it here so the net bottom still equals final_y.
-	if chara_config.legacy_mode then
-		local w, h = getDrawSize(CHARACTER.ANIM_GAME_NORMAL)
-		if h > 0 then
-			local legacy_y = (h - 0.25555555555 * theme_resolution.Y) * charaScale
-			offset_y = offset_y + legacy_y
-		end
-	end
-	return final_x - offset_x, final_y - offset_y
+	return final_x, final_y
 end
