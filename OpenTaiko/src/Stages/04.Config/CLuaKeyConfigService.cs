@@ -168,12 +168,16 @@ public sealed class CLuaKeyConfigService {
 	}
 
 	// ── capture ──
-	public void StartCapture(CLuaKeyAction a, int slot, Action<bool> onDone) {
-		if (IsCapturing || slot < 0 || slot > 15) { onDone?.Invoke(false); return; }
-		_capPart = ParsePart(a.Part); _capPad = a.Pad; _capSlot = slot; _onDone = onDone;
+	// Takes LuaFunction instead of not Action<bool> to prevent NLua from calling Reflection.Emit,
+	// which is unavailable under iOS AOT.
+	public void StartCapture(CLuaKeyAction a, int slot, NLua.LuaFunction onDone) {
+		var cb = LuaDelegate.AsAction<bool>(onDone);
+		if (IsCapturing || slot < 0 || slot > 15) { cb?.Invoke(false); return; }
+		_capPart = ParsePart(a.Part); _capPad = a.Pad; _capSlot = slot; _onDone = cb;
 		IsCapturing = true;
 		OpenTaiko.InputManager.Polling();   // flush the press that opened capture
 	}
+
 	public void CancelCapture() {
 		if (!IsCapturing) return;
 		IsCapturing = false; var cb = _onDone; _onDone = null;
