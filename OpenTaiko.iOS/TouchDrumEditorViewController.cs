@@ -18,6 +18,9 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 	private const double MinPointDistance = 6.0;
 	private const double MinAreaFraction = 0.002;
 
+	// Global game translations with English fallback (same lookup the settings menu uses).
+	private static string L(string key, string fallback) => global::OpenTaiko.CConfigOptionBuilder.L(key, fallback);
+
 	private readonly Action<bool> _onDone;
 	private readonly List<List<CGPoint>> _strokes = new();
 	private List<CGPoint>? _active;
@@ -70,7 +73,7 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 			LineDashPattern = new[] { new NSNumber(6), new NSNumber(4) },
 		});
 		var screenTag = new UILabel {
-			Text = "Screen",
+			Text = L("TOUCHDRUMEDITOR_SCREEN", "Screen"),
 			TextColor = UIColor.White.ColorWithAlpha(0.35f),
 			Font = UIFont.SystemFontOfSize(11),
 		};
@@ -101,7 +104,7 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 
 		var safe = View.SafeAreaInsets;
 		_hint = new UILabel {
-			Text = "Draw Don areas (everything else is Ka). The dashed rectangle is the screen; strokes may extend past it. Save with none drawn to reset to the circle.",
+			Text = L("TOUCHDRUMEDITOR_HINT", "Draw Don areas (everything else is Ka). The dashed rectangle is the screen; strokes may extend past it. Save with none drawn to reset to the circle."),
 			TextColor = UIColor.White.ColorWithAlpha(0.9f),
 			Font = UIFont.SystemFontOfSize(13),
 			TextAlignment = UITextAlignment.Center,
@@ -114,10 +117,10 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 		View.AddSubview(_hint);
 
 		(string label, Action action)[] defs = {
-			("Save", SaveAndClose),
-			("Undo", UndoStroke),
-			("Clear", ClearStrokes),
-			("Cancel", Cancel),
+			(L("TOUCHDRUMEDITOR_SAVE", "Save"), SaveAndClose),
+			(L("TOUCHDRUMEDITOR_UNDO", "Undo"), UndoStroke),
+			(L("TOUCHDRUMEDITOR_CLEAR", "Clear"), ClearStrokes),
+			(L("TOUCHDRUMEDITOR_CANCEL", "Cancel"), Cancel),
 		};
 		nfloat bw = 96, bh = 40, gap = 12;
 		nfloat total = defs.Length * bw + (defs.Length - 1) * gap;
@@ -153,7 +156,7 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 		}
 
 		if (_strokes.Count >= MaxStrokes) {
-			ShowHint($"Up to {MaxStrokes} areas.");
+			ShowHint(string.Format(L("TOUCHDRUMEDITOR_MAXAREAS", "Up to {0} areas."), MaxStrokes));
 			return;
 		}
 		_activeTouch = touch;
@@ -182,7 +185,7 @@ internal sealed class TouchDrumEditorViewController : UIViewController {
 		if (stroke == null) return;
 
 		if (stroke.Count < 3 || PolygonArea(stroke) < MinAreaFraction * _screenRect.Width * _screenRect.Height) {
-			ShowHint("Too small; draw a larger area.");
+			ShowHint(L("TOUCHDRUMEDITOR_TOOSMALL", "Too small; draw a larger area."));
 			return;
 		}
 		_strokes.Add(stroke);

@@ -136,11 +136,11 @@ public static class CConfigOptionBuilder {
 				cfg.bEnableVSync, v => { cfg.bEnableVSync = v; OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true; }));
 		// iOS only: resize the on-screen Don drum circle (radius as % of screen width).
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
-			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,"Touch Drum Size", "Radius of the Don drum circle as % of screen width.",
+			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_TOUCHDRUMSIZE", "Touch Drum Size"), L("SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC", "Radius of the Don drum circle as % of screen width."),
 				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
 		// iOS only: draw custom touch drum areas instead of using the circle.
 		if (OperatingSystem.IsIOS())
-			O.Add(CLuaConfigOption.Action_(SYS, secDisplay,"Touch Drum Shape", "Draw custom Don areas for the touch drum. Everything outside them is Ka.",
+			O.Add(CLuaConfigOption.Action_(SYS, secDisplay,L("SETTINGS_SYSTEM_TOUCHDRUMSHAPE", "Touch Drum Shape"), L("SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC", "Draw custom Don areas for the touch drum. Everything outside them is Ka."),
 				() => iOSTouchShapeEditor?.Invoke()));
 		O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_LANEOPACITY"), L("SETTINGS_SYSTEM_LANEOPACITY_DESC"),
 			cfg.nBackgroundTransparency, 0, 255, 5, v => cfg.nBackgroundTransparency = v));
@@ -213,7 +213,7 @@ public static class CConfigOptionBuilder {
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_DEBUGMODE"), L("SETTINGS_SYSTEM_DEBUGMODE_DESC"), cfg.bDisplayDebugInfo, v => cfg.bDisplayDebugInfo = v));
 		// iOS only: on-screen FPS/mem/stage debug overlay.
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
-			O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,"Debug HUD", "Show an on-screen FPS / memory / stage overlay. Off by default.",
+			O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_DEBUGHUD", "Debug HUD"), L("SETTINGS_SYSTEM_DEBUGHUD_DESC", "Show an on-screen FPS / memory / stage overlay. Off by default."),
 				cfg.bShowDebugHud, v => cfg.bShowDebugHud = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_LOG"), L("SETTINGS_SYSTEM_LOG_DESC"), cfg.bOutputLogs, v => cfg.bOutputLogs = v));
 
