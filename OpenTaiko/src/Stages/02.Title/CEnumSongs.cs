@@ -424,8 +424,8 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 #if DEBUG
 	private static void tTraceSongEnumMemory(string tag) {
 		long managedMB = GC.GetTotalMemory(forceFullCollection: true) / (1024 * 1024);
-		if (OperatingSystem.IsIOS()) {
-			// iOS does not support the System.Diagnostics.Process working-set / paged-memory APIs
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// Mobile does not support the System.Diagnostics.Process working-set / paged-memory APIs
 			// (PlatformNotSupportedException); log managed memory only.
 			Trace.TraceInformation("[ENUM_MEM] {0}: managed(after full GC)={1:N0}MB", tag, managedMB);
 			return;
@@ -443,7 +443,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// 曲リストのserialize
 	/// </summary>
 	private void SerializeSongList() {
-		if (OperatingSystem.IsIOS()) return; // iOS: skip the songlist.db cache (BinaryFormatter is unsupported on iOS)
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) return; // mobile: skip the songlist.db cache (BinaryFormatter is unsupported there)
 		using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
 		WriteSongListCache(songlistdb, SongManager.listSongsDB);
 	}
@@ -454,7 +454,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 	/// so the caller rebuilds the list from disk. Users never have to delete songlist.db by hand.
 	/// </summary>
 	public void Deserialize() {
-		if (OperatingSystem.IsIOS()) return; // BinaryFormatter not supported on iOS
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) return; // BinaryFormatter not supported on mobile
 		try {
 			if (File.Exists($"{OpenTaiko.strEXEFolder}songlist.db")) {
 				using Stream songlistdb = File.OpenRead($"{OpenTaiko.strEXEFolder}songlist.db");

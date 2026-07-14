@@ -1,6 +1,7 @@
 #!/bin/bash
-# Fetch the FFmpeg.AutoGen 5.1.1 binding source (pinned upstream commit) and apply the iOS patch.
-# Called automatically by deploy.sh.
+# Fetch the FFmpeg.AutoGen 5.1.1 binding source (pinned upstream commit) and apply the mobile
+# patches (iOS + Android). Called automatically by deploy.sh.
+# Windows counterpart: OpenTaiko.Android/scripts/fetch-ffmpeg-autogen.ps1 (keep both in sync).
 set -euo pipefail
 
 # The last 5.1.1 commit before the abstractions rewrite; matches the published NuGet 5.1.1.
@@ -8,7 +9,7 @@ COMMIT=40873965266b526eeb7982ad45b1e51957eb5411
 REPO=https://github.com/Ruslan-B/FFmpeg.AutoGen
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DEST="$SCRIPT_DIR/../third_party/FFmpeg.AutoGen/upstream"
+DEST="$SCRIPT_DIR/../../third_party/FFmpeg.AutoGen/upstream"
 
 if [[ -f "$DEST/FFmpeg.cs" ]]; then
   echo "[fetch-ffmpeg-autogen] upstream/ already present"
@@ -26,5 +27,6 @@ rm -rf "$DEST"
 mkdir -p "$DEST"
 cp -R "$WORK/FFmpeg.AutoGen/." "$DEST/"
 rm -f "$DEST/FFmpeg.AutoGen.csproj"   # replaced by ours
-patch -p1 -d "$DEST" < "$SCRIPT_DIR/../third_party/FFmpeg.AutoGen/ios-darwin-fallback.patch"
+patch -p1 -d "$DEST" < "$SCRIPT_DIR/../../third_party/FFmpeg.AutoGen/ios-darwin-fallback.patch"
+patch -p1 -d "$DEST" < "$SCRIPT_DIR/../../third_party/FFmpeg.AutoGen/android-bionic-fallback.patch"
 echo "[fetch-ffmpeg-autogen] done -> $DEST"

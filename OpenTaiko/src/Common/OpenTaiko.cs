@@ -624,7 +624,7 @@ internal class OpenTaiko : Game {
 
 		if (VideoExporter.Active) VideoExporter.ApplyBootOverrides(this);
 
-		if (!OperatingSystem.IsIOS()) {
+		if (!(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) {
 			WindowPosition = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowBaseXPosition, ConfigIni.nWindowBaseYPosition);
 			WindowSize = new Silk.NET.Maths.Vector2D<int>(ConfigIni.nWindowWidth, ConfigIni.nWindowHeight);
 			WindowMode = ConfigIni.nWindowMode;
@@ -1174,7 +1174,7 @@ internal class OpenTaiko : Game {
 					&& rCurrentStage.eStageID != CStage.EStage.StartUp
 					&& rCurrentStage.eStageID != CStage.EStage.CRASH
 					&& OpenTaiko.Tx.Overlay != null
-					&& !OperatingSystem.IsIOS()) {
+					&& !(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) {
 					OpenTaiko.Tx.Overlay.t2DDraw(0, 0);
 				}
 			}
@@ -1601,8 +1601,8 @@ internal class OpenTaiko : Game {
 		Trace.TraceInformation("Initializing DirectInput and MIDI input...");
 		Trace.Indent();
 		try {
-			if (OperatingSystem.IsIOS() && ExternalInputDevices != null) {
-				// iOS: use externally-provided input devices (touch) instead of Silk.NET
+			if ((OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) && ExternalInputDevices != null) {
+				// Mobile: use externally-provided input devices (touch) instead of Silk.NET
 				InputManager = new CInputManager(ExternalInputDevices);
 			} else {
 				InputManager = new CInputManager(Window_, OpenTaiko.ConfigIni.bBufferedInputs, true, OpenTaiko.ConfigIni.nControllerDeadzone / 100.0f);
@@ -1641,8 +1641,8 @@ internal class OpenTaiko : Game {
 
 		#region [ Sound Device initialization ]
 		//---------------------
-		if (OperatingSystem.IsIOS()) {
-			Trace.TraceInformation("iOS: initializing BASS sound device (direct playback).");
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			Trace.TraceInformation("Mobile: initializing BASS sound device.");
 			SoundManager = new SoundManager(Window_,
 				ESoundDeviceType.Bass,
 				OpenTaiko.ConfigIni.nBassBufferSizeMs,
@@ -1903,7 +1903,8 @@ internal class OpenTaiko : Game {
 				Trace.Indent();
 				try {
 #pragma warning disable SYSLIB0011
-					if (EnumSongs.IsSongListEnumCompletelyDone) {
+					if (EnumSongs.IsSongListEnumCompletelyDone
+						&& !OperatingSystem.IsIOS() && !OperatingSystem.IsAndroid()) {   // BinaryFormatter is unsupported on mobile
 						using Stream songlistdb = File.Create($"{OpenTaiko.strEXEFolder}songlist.db");
 						CEnumSongs.WriteSongListCache(songlistdb, SongManager.listSongsDB);
 					}

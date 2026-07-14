@@ -380,8 +380,9 @@ public abstract partial class Game : IDisposable {
 		MainThreadID = Thread.CurrentThread.ManagedThreadId;
 		Configuration();
 
-		if (OperatingSystem.IsIOS()) {
-			// Window and GL context are managed externally by the host.
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// Window and GL context are managed externally by the host (iOS GameViewController /
+			// Android MainActivity).
 			// The host calls InitWithExternalContext() and drives the game loop directly.
 			return;
 		}
@@ -456,14 +457,20 @@ public abstract partial class Game : IDisposable {
 	/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 	/// </summary>
 	public void Dispose() {
-		if (OperatingSystem.IsIOS())
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			return;
 		Window_.Dispose();
 	}
 
+	// Hosted (mobile) builds have no window to close: the host installs a callback here and
+	// tears its render loop/activity down when the game asks to exit (e.g. the exit stage).
+	public static Action? HostExitRequested;
+
 	public void Exit() {
-		if (OperatingSystem.IsIOS())
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			HostExitRequested?.Invoke();
 			return;
+		}
 		Window_.Close();
 	}
 
@@ -480,6 +487,18 @@ public abstract partial class Game : IDisposable {
 		Gl.Enable(GLEnum.Blend);
 		BlendHelper.SetBlend(BlendType.Normal);
 		CTexture.Init();
+
+		// Detect compute-shader capability (GLES 3.1+) so renderers can pick the GPU or CPU path;
+		// mirrors the desktop probe in Window_Load, which hosted contexts never run.
+		ComputeShadersAvailable = false;
+		try {
+			int glMaj = Gl.GetInteger(GLEnum.MajorVersion);
+			int glMin = Gl.GetInteger(GLEnum.MinorVersion);
+			ComputeShadersAvailable = glMaj > 3 || (glMaj == 3 && glMin >= 1);
+			if (ComputeShadersAvailable && !Context.TryGetProcAddress("glDispatchCompute", out _))
+				ComputeShadersAvailable = false;
+		} catch { ComputeShadersAvailable = false; }
+		Trace.TraceInformation($"Compute shaders available (hosted): {ComputeShadersAvailable}");
 
 		Gl.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		Window_Resize(new Vector2D<int>(viewportWidth, viewportHeight));
@@ -587,7 +606,7 @@ public abstract partial class Game : IDisposable {
 	/// Runs the game.
 	/// </summary>
 	public void Run() {
-		if (OperatingSystem.IsIOS()) {
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
 			// The game loop is driven externally by the host.
 			// Run() is a no-op; the host calls InitWithExternalContext() then RenderHostedFrame() each frame.
 			return;

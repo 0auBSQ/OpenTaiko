@@ -9,8 +9,6 @@
     <!-- Use iossimulator-arm64 for simulator, ios-arm64 for device -->
     <RuntimeIdentifier>iossimulator-arm64</RuntimeIdentifier>
 
-    <!-- third_party holds separate projects; keep them out of this app's source globs (CS0436/CS0579). -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);third_party/**</DefaultItemExcludes>
 
     <!-- Application metadata -->
     <ApplicationId Condition="'$(ApplicationId)' == ''">com.opentaiko.OpenTaiko</ApplicationId>

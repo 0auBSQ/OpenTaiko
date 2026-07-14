@@ -16,6 +16,11 @@ public unsafe class CVideoDecoder : IDisposable {
 		// symbols from the main image instead of dlopen'ing per-library dylibs from RootPath.
 		if (OperatingSystem.IsIOS())
 			ffmpeg.GetOrLoadLibrary = _ => System.Runtime.InteropServices.NativeLibrary.GetMainProgramHandle();
+		// Android ships FFmpeg as unversioned lib*.so in the APK (scripts/download-ffmpeg.ps1), so
+		// load by bare soname: the linker searches the app's native library directory and resolves
+		// inter-library dependencies itself, bypassing the binding's versioned-name + RootPath scheme.
+		if (OperatingSystem.IsAndroid())
+			ffmpeg.GetOrLoadLibrary = name => System.Runtime.InteropServices.NativeLibrary.Load($"lib{name}.so");
 	}
 
 	public CVideoDecoder(string filename) {

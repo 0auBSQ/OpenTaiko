@@ -39,8 +39,8 @@ namespace OpenTaiko {
 		/// Returns <c>true</c> if the user presses Enter to confirm their text.
 		/// </summary>
 		public bool Update() {
-			if (OperatingSystem.IsIOS()) {
-				return UpdateiOS();
+			if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+				return UpdateiOS();   // the same host text-input hook serves Android
 			}
 
 			ImGui.SetNextWindowSize(new(300,150));
@@ -119,7 +119,7 @@ namespace OpenTaiko {
 		public string DisplayText {
 			get
 			{
-				if (OperatingSystem.IsIOS() && _iOSAlertShown && !_iOSCompleted)
+				if ((OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) && _iOSAlertShown && !_iOSCompleted)
 					return Text; // No blinking cursor while alert is shown
 				if (OpenTaiko.Timer.SystemTimeMs % 1000 < 300) return Text;   // blink off
 				int c = ByteToCharIndex(Text, _cursorBytePos);

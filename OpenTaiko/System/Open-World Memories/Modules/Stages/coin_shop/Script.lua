@@ -252,7 +252,10 @@ end
 -- ── Shop generation ───────────────────────────────────────────────────────────
 
 local function poolItems()
-	math.randomseed(os.time() + tonumber(tostring({}):sub(8), 16))
+	-- Address-of-a-table as extra seed entropy. %p formatting is platform-dependent (bionic
+	-- prints "0x..." where MSVC prints bare hex), so grab the trailing hex digits explicitly.
+	local ptr = tonumber(tostring({}):match("(%x+)%s*$") or "0", 16) or 0
+	math.randomseed(os.time() + ptr % 0x7FFFFFFF)
 
 	ensureCachedPools()
 	local _pools = _cachedPools

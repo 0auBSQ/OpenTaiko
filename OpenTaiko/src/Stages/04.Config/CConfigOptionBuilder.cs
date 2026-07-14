@@ -124,7 +124,7 @@ public static class CConfigOptionBuilder {
 				labels, cur, idx => { idx = Math.Clamp(idx, 0, res.Count - 1); cfg.fRenderScale = (float)res[idx].val; }));
 		}
 		// One framerate control per platform: iOS caps FPS (60 vs the display's max), desktop toggles VSync.
-		if (OperatingSystem.IsIOS())
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			O.Add(CLuaConfigOption.Choice_(SYS, secDisplay,L("SETTINGS_SYSTEM_FRAMERATE"), L("SETTINGS_SYSTEM_FRAMERATE_DESC"),
 				new[] { "60 FPS", "Unlimited" }, cfg.biOSUnlimitedFrameRate ? 1 : 0,
 				idx => cfg.biOSUnlimitedFrameRate = idx == 1));
@@ -132,7 +132,7 @@ public static class CConfigOptionBuilder {
 			O.Add(CLuaConfigOption.Toggle_(SYS, secDisplay,L("SETTINGS_SYSTEM_VSYNC"), L("SETTINGS_SYSTEM_VSYNC_DESC"),
 				cfg.bEnableVSync, v => { cfg.bEnableVSync = v; OpenTaiko.app.bSwitchVSyncAtTheNextFrame = true; }));
 		// iOS only: resize the on-screen Don drum circle (radius as % of screen width).
-		if (OperatingSystem.IsIOS())
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,"Touch Drum Size", "Radius of the Don drum circle as % of screen width.",
 				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
 		O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_LANEOPACITY"), L("SETTINGS_SYSTEM_LANEOPACITY_DESC"),
@@ -205,7 +205,7 @@ public static class CConfigOptionBuilder {
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_AUTOSCREENSHOT"), L("SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC"), cfg.bIsAutoResultCapture, v => cfg.bIsAutoResultCapture = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_DEBUGMODE"), L("SETTINGS_SYSTEM_DEBUGMODE_DESC"), cfg.bDisplayDebugInfo, v => cfg.bDisplayDebugInfo = v));
 		// iOS only: on-screen FPS/mem/stage debug overlay.
-		if (OperatingSystem.IsIOS())
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,"Debug HUD", "Show an on-screen FPS / memory / stage overlay. Off by default.",
 				cfg.bShowDebugHud, v => cfg.bShowDebugHud = v));
 		O.Add(CLuaConfigOption.Toggle_(SYS, secIntegr,L("SETTINGS_SYSTEM_LOG"), L("SETTINGS_SYSTEM_LOG_DESC"), cfg.bOutputLogs, v => cfg.bOutputLogs = v));
@@ -340,12 +340,13 @@ public static class CConfigOptionBuilder {
 	// ── helpers mirrored from CActConfigList ──
 	private static string[] AvailableGraphicsDevices() {
 		if (OperatingSystem.IsIOS()) return new[] { "Metal (iOS)" };
+		if (OperatingSystem.IsAndroid()) return new[] { "OpenGL ES (Android)" };
 		if (OperatingSystem.IsWindows()) return new[] { "OpenGL", "DirectX11", "Vulkan" };
 		if (OperatingSystem.IsMacOS()) return new[] { "OpenGL", "Metal" };
 		if (OperatingSystem.IsLinux()) return new[] { "OpenGL", "Vulkan" };
 		return new[] { "OpenGL", "DirectX11", "Vulkan", "Metal" };
 	}
-	private static string GraphicsName(int i) => OperatingSystem.IsIOS() ? "Metal (iOS)" : (i switch { 0 => "OpenGL", 1 => "DirectX11", 2 => "Vulkan", 3 => "Metal", _ => "OpenGL" });
+	private static string GraphicsName(int i) => OperatingSystem.IsIOS() ? "Metal (iOS)" : OperatingSystem.IsAndroid() ? "OpenGL ES (Android)" : (i switch { 0 => "OpenGL", 1 => "DirectX11", 2 => "Vulkan", 3 => "Metal", _ => "OpenGL" });
 	private static int GraphicsInt(string s) => s switch { "OpenGL" => 0, "DirectX11" => 1, "Vulkan" => 2, "Metal" => 3, "Metal (iOS)" => 3, _ => 0 };
 
 	private static void RefreshBroadcasting() {

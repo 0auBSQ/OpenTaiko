@@ -50,6 +50,10 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 	// マスターボリュームの制御コードは、WASAPI/ASIOで全く同じ。
 	public int nMasterVolume {
 		get {
+			// Direct playback (mobile) has no master mixer stream — the global stream volume is
+			// the master control there.
+			if (this.MixerHandle == CSound.NoMixerHandle)
+				return Bass.GlobalStreamVolume / 100;
 			float fVolume = 0.0f;
 			bool b = Bass.ChannelGetAttribute(this.MixerHandle, ChannelAttribute.Volume, out fVolume);
 			if (!b) {
@@ -59,6 +63,10 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 			return (int)(fVolume * 100);
 		}
 		set {
+			if (this.MixerHandle == CSound.NoMixerHandle) {
+				Bass.GlobalStreamVolume = Math.Clamp(value, 0, 100) * 100;   // 0..10000
+				return;
+			}
 			bool b = Bass.ChannelSetAttribute(this.MixerHandle, ChannelAttribute.Volume, (float)(value / 100.0));
 			if (!b) {
 				Errors be = Bass.LastError;
@@ -81,10 +89,23 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 
 		int freq = 44100;
 
-		if (!Bass.Init(-1, freq, DeviceInitFlags.Default))
-			throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
+		// Android: burst-aligned AAudio output at the device's native rate (see
+		// CSoundDeviceBASS.Android.cs) — the configs must be applied BEFORE Bass.Init.
+		if (OperatingSystem.IsAndroid())
+			freq = ConfigureAndroidLowLatency();
 
-		if (OperatingSystem.IsIOS()) {
+		if (!Bass.Init(-1, freq, DeviceInitFlags.Default)) {
+			// The tuned Android config can be rejected by some devices/HALs — fall back to safe
+			// defaults before giving up (audio at default latency beats no audio).
+			if (!(OperatingSystem.IsAndroid() && RetryAndroidDefaultInit(out freq)))
+				throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
+			Trace.TraceWarning("BASS_Init failed with the tuned Android config; using defaults.");
+		}
+
+		// Mobile plays each sound straight through Bass.ChannelPlay: BassMix's manual
+		// StreamProc→device pump produces no audio on iOS or Android (verified — the mixer runs but
+		// emits pure silence and is pulled well below realtime). Desktop keeps the mixer pipeline.
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
 			InitializeDirectPlayback();
 			return;
 		}

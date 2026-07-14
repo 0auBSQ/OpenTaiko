@@ -27,9 +27,9 @@ TestResults/
 /packages
 
 # FFmpeg.AutoGen (iOS): upstream source fetched at build time + build output
-/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/upstream
-/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/bin
-/OpenTaiko.iOS/third_party/FFmpeg.AutoGen/obj
+/third_party/FFmpeg.AutoGen/upstream
+/third_party/FFmpeg.AutoGen/bin
+/third_party/FFmpeg.AutoGen/obj
 
 # FDK
 /FDK/bin
@@ -94,3 +94,6 @@ OpenTaiko/System/Open-World Memories/Modules/Stages/experimentp.zip
 /tools
 /docs
 /OpenTaiko/docs
+
+# Android: native libraries are fetched by OpenTaiko.Android/scripts/download-*.ps1
+/OpenTaiko.Android/jniLibs

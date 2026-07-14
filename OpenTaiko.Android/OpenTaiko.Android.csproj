@@ -1,0 +1,136 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Android 7.0+. BASS uses AAudio automatically on 8.1+ and OpenSL ES below; the game itself
+         needs OpenGL ES 3.0 (declared in the manifest). -->
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+    <ApplicationId>com.opentaiko.OpenTaiko</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.6.1</ApplicationDisplayVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <!-- arm64 first-class; add the rest for emulators/exotics. -->
+    <RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
+    <!-- The interpreter keeps NLua/KeraLua's dynamic paths happy; AOT-only would need the same
+         LuaDelegate treatment the iOS port validated. Release defaults profiled AOT on, which
+         conflicts with the interpreter (XA0119) and fails packaging (XABLD7028: missing aot\*.dll.so),
+         so AOT is disabled explicitly for all configurations. -->
+    <UseInterpreter>true</UseInterpreter>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <!-- Debug builds default to "fast deployment" (assemblies pushed by -t:Install, NOT in the
+         APK) — a sideloaded Debug APK then aborts with "No assemblies found". Embed them so any
+         APK we produce is installable by hand. -->
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <!-- Trimming is unsafe with NLua's reflection-driven dispatch, and the APK is asset-dominated
+         anyway, so keep every assembly whole. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <!-- Optional: bundle a song library into the APK as a single songs.zip asset, unpacked into
+         Songs/ on first run. A zip is the only way in — aapt2 rejects the unicode filenames real
+         charts have. scripts/build.ps1 -BundleSongs wires this up and enforces the APK size limit
+         (APKs are 32-bit zips; past ~2 GB installation fails — the full ~4.8 GB OpenTaiko-Soundtrack
+         does NOT fit, use -PushSongs or a per-chapter subset). The repo's own Songs folder is
+         never packed either way. -->
+    <BundleSongs Condition="'$(BundleSongs)' == ''">false</BundleSongs>
+    <BundleSongsPath Condition="'$(BundleSongsPath)' == ''">$(MSBuildThisFileDirectory)..\..\OpenTaiko-Soundtrack</BundleSongsPath>
+    <!-- Don't let aapt2 re-deflate the songs zip (contents are already-compressed audio). -->
+    <AndroidStoreUncompressedFileExtensions>$(AndroidStoreUncompressedFileExtensions);.zip</AndroidStoreUncompressedFileExtensions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FDK\FDK.csproj" />
+    <ProjectReference Include="..\OpenTaiko\OpenTaiko.csproj" AdditionalProperties="BuildingAsLibrary=true" />
+  </ItemGroup>
+
+  <!-- Fail loudly when UseVendoredFFmpeg is missing: the NuGet binding it would silently fall
+       back to throws PlatformNotSupportedException on Android. Pass it globally on the command
+       line (see README) so FDK and OpenTaiko build against the patched vendored source. -->
+  <Target Name="_RequireVendoredFFmpeg" BeforeTargets="CoreCompile" Condition="'$(UseVendoredFFmpeg)' != 'true'">
+    <Error Text="Build the Android app with -p:UseVendoredFFmpeg=true. Without it FFmpeg.AutoGen resolves to the desktop NuGet package, which throws PlatformNotSupportedException on Android. Fetch the binding source first with scripts/fetch-ffmpeg-autogen.ps1 and the natives with scripts/download-ffmpeg.ps1." />
+  </Target>
+
+  <!-- csc-optimized IL crashes the Mono 8.0.10 Android interpreter at boot ("Assertion: should
+       not be reached at interp.c:3847", SIGABRT a few seconds into skin loading). Bisected on the
+       emulator: Debug+Optimize=true crashes identically; unoptimized IL boots and plays. The flag
+       must be GLOBAL (-p:Optimize=false) so it also reaches FDK/OpenTaiko; scripts/build.ps1
+       -Release passes it. Revisit when the .NET runtime is upgraded past 8.0.10. -->
+  <Target Name="_RequireUnoptimizedIL" BeforeTargets="CoreCompile" Condition="'$(Configuration)' == 'Release' And '$(Optimize)' != 'false'">
+    <Error Text="Build Android Release with -p:Optimize=false (scripts/build.ps1 -Release does this automatically): csc-optimized IL crashes the Mono interpreter at boot on Android." />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp.NativeAssets.Android" Version="2.88.8" />
+    <!-- Host-side Bass.Pause()/Bass.Start() on activity lifecycle (same version FDK uses). -->
+    <PackageReference Include="ManagedBass" Version="3.1.1" />
+    <!-- KeraLua and LightningDB both ship android-arm64 natives in their NuGet packages
+         (runtimes/android-*/native), unlike iOS where they had to be built from source. -->
+  </ItemGroup>
+
+  <!-- BASS natives for Android (un4seen.com, fetched by scripts/download-bass.ps1 into jniLibs/).
+       DllImport("bass") resolves libbass.so by SONAME convention — no resolver needed. -->
+  <ItemGroup>
+    <AndroidNativeLibrary Include="jniLibs\arm64-v8a\*.so" Abi="arm64-v8a" />
+    <AndroidNativeLibrary Include="jniLibs\x86_64\*.so" Abi="x86_64" />
+  </ItemGroup>
+
+  <!-- Exclude desktop-platform native libraries that OpenTaiko.csproj bundles as Content. -->
+  <ItemGroup>
+    <Content Remove="..\OpenTaiko\Libs\**" />
+    <Content Remove="..\OpenTaiko\FFmpeg\**" />
+    <None Remove="..\OpenTaiko\Libs\**" />
+    <None Remove="..\OpenTaiko\FFmpeg\**" />
+  </ItemGroup>
+
+  <!-- Game data ships inside the APK as assets and is extracted to the app's external files dir on
+       first launch (APK assets are not a filesystem, unlike the iOS bundle — see AssetExtractor).
+       Songs are NOT bundled: aapt2 rejects many song folder names (unicode/special characters), and
+       a song library belongs to the user — drop charts into Android/data/<app>/files/Songs over USB. -->
+  <ItemGroup>
+    <AndroidAsset Include="..\OpenTaiko\Databases\**" Link="assets\Databases\%(RecursiveDir)%(Filename)%(Extension)" />
+    <AndroidAsset Include="..\OpenTaiko\Global\**" Link="assets\Global\%(RecursiveDir)%(Filename)%(Extension)" />
+    <AndroidAsset Include="..\OpenTaiko\Lang\**" Link="assets\Lang\%(RecursiveDir)%(Filename)%(Extension)" />
+    <AndroidAsset Include="..\OpenTaiko\System\**" Link="assets\System\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- aapt2 silently drops dot-prefixed asset paths and junk names (Thumbs.db, *~) when packing
+         the APK; anything it drops must not reach assets_index.txt or first-run extraction fails
+         on a missing asset. Dot-paths under System are archives/VCS leftovers, not game data. -->
+    <AndroidAsset Remove="..\OpenTaiko\System\**\.*" />
+    <AndroidAsset Remove="..\OpenTaiko\System\**\.*\**" />
+    <AndroidAsset Remove="..\OpenTaiko\System\**\Thumbs.db" />
+    <AndroidAsset Remove="..\OpenTaiko\System\**\*~" />
+    <!-- .init must ship but is itself dot-prefixed, so it travels as __init__/ inside the APK;
+         AssetExtractor restores the real .init/ name on disk. -->
+    <AndroidAsset Include="..\OpenTaiko\.init\**" Link="assets\__init__\%(RecursiveDir)%(Filename)%(Extension)" />
+    <AndroidAsset Include="..\OpenTaiko\CharaScript.lua" Link="assets\CharaScript.lua" />
+  </ItemGroup>
+
+  <!-- Zip the song library into a single asset (kept out of assets_index.txt — AssetExtractor
+       unpacks it specially). Rebuilt only when missing: delete obj\...\songs.zip (or -Clean) to
+       pick up song changes. -->
+  <Target Name="_BundleSongsZip" BeforeTargets="_WriteAssetIndex" Condition="'$(BundleSongs)' == 'true'">
+    <Error Condition="!Exists('$(BundleSongsPath)')" Text="BundleSongs: song folder not found: $(BundleSongsPath) (pass -p:BundleSongsPath=...)" />
+    <Message Condition="!Exists('$(IntermediateOutputPath)songs.zip')" Importance="high" Text="BundleSongs: zipping $(BundleSongsPath) ..." />
+    <!-- Filtered zip (skips .git and friends) — see the script header. -->
+    <Exec Condition="!Exists('$(IntermediateOutputPath)songs.zip')"
+          Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)scripts\make-songs-zip.ps1&quot; -Source &quot;$(BundleSongsPath)&quot; -Destination &quot;$(IntermediateOutputPath)songs.zip&quot;" />
+    <ItemGroup>
+      <AndroidAsset Include="$(IntermediateOutputPath)songs.zip" Link="assets\songs.zip" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Write an index of every bundled asset so first-run extraction can stream files directly
+       instead of recursively listing the (slow) AssetManager tree. -->
+  <Target Name="_WriteAssetIndex" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <_GameAsset Include="@(AndroidAsset)" Condition="$([System.String]::Copy('%(AndroidAsset.Link)').StartsWith('assets')) And '%(AndroidAsset.Filename)%(AndroidAsset.Extension)' != 'songs.zip'" />
+      <_GameAssetLine Include="@(_GameAsset->'%(Link)'->Replace('assets\', '')->Replace('\', '/'))" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)assets_index.txt" Lines="@(_GameAssetLine)" Overwrite="true" />
+    <ItemGroup>
+      <AndroidAsset Include="$(IntermediateOutputPath)assets_index.txt" Link="assets\assets_index.txt" />
+    </ItemGroup>
+  </Target>
+</Project>

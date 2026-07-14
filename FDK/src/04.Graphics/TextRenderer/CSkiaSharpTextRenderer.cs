@@ -65,9 +65,9 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		//stream・filepathから生成した場合に、style設定をどうすればいいのかがわからない
 		if (File.Exists(fontpath)) {
 			typeface = GetCachedTypeface($"file:{fontpath}", () => {
-				if (OperatingSystem.IsIOS()) {
-					// SKTypeface.FromFile can silently return a broken typeface on iOS;
-					// loading via stream works reliably.
+				if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+					// SKTypeface.FromFile can silently return a broken typeface on iOS (stream
+					// loading is equally safe on Android); load via stream on mobile.
 					using var fs = File.OpenRead(fontpath);
 					return SKTypeface.FromStream(fs);
 				} else {

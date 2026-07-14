@@ -126,7 +126,7 @@ bootstrap_ios_deps() {
   [[ -d "OpenTaiko.iOS/Frameworks/liblmdb.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-lmdb.sh
   [[ -f "OpenTaiko.iOS/Assets.xcassets/AppIcon.appiconset/icon_1024.png" ]] || bash OpenTaiko.iOS/scripts/build-appicons.sh
   [[ -d "OpenTaiko.iOS/Frameworks/ffmpeg.xcframework" ]] || bash OpenTaiko.iOS/scripts/build-ffmpeg.sh
-  [[ -f "OpenTaiko.iOS/third_party/FFmpeg.AutoGen/upstream/FFmpeg.cs" ]] || bash OpenTaiko.iOS/scripts/fetch-ffmpeg-autogen.sh
+  [[ -f "third_party/FFmpeg.AutoGen/upstream/FFmpeg.cs" ]] || bash OpenTaiko.iOS/scripts/fetch-ffmpeg-autogen.sh
 }
 
 # ios_build <config> <rid> [extra dotnet args...]

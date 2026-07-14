@@ -756,8 +756,15 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		//-----
 
 		//テクスチャのデータをVramに送る
-		if (OperatingSystem.IsIOS()) {
-			// iOS ES 2.0 requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
+		if (OperatingSystem.IsAndroid() && pixelFormat == PixelFormat.Bgra) {
+			// Android GLES has no BGRA upload format (iOS gets one via APPLE_texture_format_BGRA8888;
+			// a BGRA upload here fails silently and the incomplete texture samples as opaque black).
+			// Upload the same bytes as RGBA and swap R/B in the sampler via the ES 3.0 texture swizzle.
+			Game.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, GLEnum.UnsignedByte, data);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureSwizzleR, (int)GLEnum.Blue);
+			Game.Gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureSwizzleB, (int)GLEnum.Red);
+		} else if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) {
+			// Native GLES (iOS/Android) requires the unsized GL_RGBA internalformat for BGRA uploads; sized formats render black.
 			int internalFormat = pixelFormat switch {
 				PixelFormat.Bgra => (int)InternalFormat.Rgba,
 				PixelFormat.Rgba => (int)InternalFormat.Rgba,

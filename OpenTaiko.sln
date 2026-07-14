@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTaiko.iOS", "OpenTaiko.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTaiko.Tests", "OpenTaiko.Tests\OpenTaiko.Tests.csproj", "{F83F049C-C2D7-4B46-AF1A-49A16332F8D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTaiko.Android", "OpenTaiko.Android\OpenTaiko.Android.csproj", "{881CFEA5-F025-438F-8353-F3F9FABAC881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{F83F049C-C2D7-4B46-AF1A-49A16332F8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F83F049C-C2D7-4B46-AF1A-49A16332F8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F83F049C-C2D7-4B46-AF1A-49A16332F8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{881CFEA5-F025-438F-8353-F3F9FABAC881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{881CFEA5-F025-438F-8353-F3F9FABAC881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{881CFEA5-F025-438F-8353-F3F9FABAC881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{881CFEA5-F025-438F-8353-F3F9FABAC881}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
