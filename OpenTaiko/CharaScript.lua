@@ -39,18 +39,18 @@ local animation_dirs = {
 	[CHARACTER.ANIM_GAME_NORMAL] = "Normal";
 	[CHARACTER.ANIM_GAME_CLEAR] = "Clear";
 	[CHARACTER.ANIM_GAME_MAX] = "Clear_Max";
-	[CHARACTER.ANIM_GAME_GOGO] = "Gogo";
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = "Gogo_Max";
+	[CHARACTER.ANIM_GAME_GOGO] = "GoGo";
+	[CHARACTER.ANIM_GAME_GOGO_MAX] = "GoGo_Max";
 	[CHARACTER.ANIM_GAME_MISS] = "Miss";
 	[CHARACTER.ANIM_GAME_MISS_DOWN] = "MissDown";
-	[CHARACTER.ANIM_GAME_10COMBO] = "10combo";
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = "10combo_Max";
+	[CHARACTER.ANIM_GAME_10COMBO] = "10combo"; -- Title-cased in 0.6.0 TextureLoader
+	[CHARACTER.ANIM_GAME_10COMBO_MAX] = "10combo_Max"; -- Title-cased in 0.6.0 TextureLoader
 	[CHARACTER.ANIM_GAME_CLEARED] = "Cleared";
 	[CHARACTER.ANIM_GAME_FAILED] = "Failed";
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = "Clearout";
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = "Clearin";
+	[CHARACTER.ANIM_GAME_CLEAR_OUT] = "ClearOut";
+	[CHARACTER.ANIM_GAME_CLEAR_IN] = "Clearin"; -- Title-cased in 0.6.0 TextureLoader
 	[CHARACTER.ANIM_GAME_MAX_OUT] = "SoulOut";
-	[CHARACTER.ANIM_GAME_MAX_IN] = "SoulIn";
+	[CHARACTER.ANIM_GAME_MAX_IN] = "Soulin"; -- Title-cased in 0.6.0 TextureLoader
 	[CHARACTER.ANIM_GAME_MISS_IN] = "MissIn";
 	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = "MissDownIn";
 	[CHARACTER.ANIM_GAME_RETURN] = "Return";
@@ -79,8 +79,8 @@ local animation_dirs = {
 	[CHARACTER.ANIM_MENU_START] = "Menu_Start";
 	[CHARACTER.ANIM_MENU_NORMAL] = "Menu_Loop";
 	[CHARACTER.ANIM_MENU_SELECT] = "Menu_Select";
-	[CHARACTER.ANIM_ENTRY_NORMAL] = "Entry_Normal";
-	[CHARACTER.ANIM_ENTRY_JUMP] = "Entry_Jump";
+	[CHARACTER.ANIM_ENTRY_NORMAL] = "Title_Normal";
+	[CHARACTER.ANIM_ENTRY_JUMP] = "Title_Entry";
 
 	[CHARACTER.ANIM_RESULT_NORMAL] = "Result_Normal";
 	[CHARACTER.ANIM_RESULT_CLEAR] = "Result_Clear";
@@ -242,7 +242,7 @@ local function load_config()
 	chara_config.title_beat_normal = chara_config_ini:GetDouble("Title_Chara_Beat_Normal", chara_config.title_beat_normal)
 
 	chara_config.title_beat_entry = chara_config_ini:GetDouble("Chara_Entry_AnimationDuration", chara_config.title_beat_entry * 1000.0) / 1000.0
-	chara_config.title_beat_entry = chara_config_ini:GetDouble("Title_Chara_Beat_Entry", chara_config.menu_beat_select)
+	chara_config.title_beat_entry = chara_config_ini:GetDouble("Title_Chara_Beat_Entry", chara_config.title_beat_entry)
 	--+++++++++++++
 
 	---Game+++++++++++++
@@ -359,7 +359,7 @@ local function load_config()
 		chara_config.game_motion_failed = csarray_to_motiontable(ini_game_motion_failed)
 	end
 
-	local ini_game_motion_clearout = chara_config_ini:GetIntArray("Game_Chara_Motion_Clearout")
+	local ini_game_motion_clearout = chara_config_ini:GetIntArray("Game_Chara_Motion_ClearOut")
 	if ini_game_motion_clearout.Length >= 1 then
 		chara_config.game_motion_clearout = csarray_to_motiontable(ini_game_motion_clearout)
 	end
@@ -369,12 +369,12 @@ local function load_config()
 		chara_config.game_motion_clearin = csarray_to_motiontable(ini_game_motion_clearin)
 	end
 
-	local ini_game_motion_soulout = chara_config_ini:GetIntArray("Game_Chara_Motion_Soulout")
+	local ini_game_motion_soulout = chara_config_ini:GetIntArray("Game_Chara_Motion_SoulOut")
 	if ini_game_motion_soulout.Length >= 1 then
 		chara_config.game_motion_soulout = csarray_to_motiontable(ini_game_motion_soulout)
 	end
 
-	local ini_game_motion_soulin = chara_config_ini:GetIntArray("Game_Chara_Motion_Soulin")
+	local ini_game_motion_soulin = chara_config_ini:GetIntArray("Game_Chara_Motion_SoulIn")
 	if ini_game_motion_soulin.Length >= 1 then
 		chara_config.game_motion_soulin = csarray_to_motiontable(ini_game_motion_soulin)
 	end
@@ -602,13 +602,13 @@ local function load_config()
 	chara_config.result_beat_normal = chara_config_ini:GetDouble("Result_Chara_Beat_Normal", chara_config.result_beat_normal)
 
 	chara_config.result_beat_clear = chara_config_ini:GetDouble("Chara_Result_Clear_AnimationDuration", chara_config.result_beat_clear * 1000.0) / 1000.0
-	chara_config.result_beat_clear = chara_config_ini:GetDouble("Result_Chara_Motion_Clear", chara_config.result_beat_clear)
+	chara_config.result_beat_clear = chara_config_ini:GetDouble("Result_Chara_Beat_Clear", chara_config.result_beat_clear)
 
 	chara_config.result_beat_failed_in = chara_config_ini:GetDouble("Chara_Result_Failed_In_AnimationDuration", chara_config.result_beat_failed_in * 1000.0) / 1000.0
-	chara_config.result_beat_failed_in = chara_config_ini:GetDouble("Result_Chara_Motion_Failed_In", chara_config.result_beat_failed_in)
+	chara_config.result_beat_failed_in = chara_config_ini:GetDouble("Result_Chara_Beat_Failed_In", chara_config.result_beat_failed_in)
 
 	chara_config.result_beat_failed = chara_config_ini:GetDouble("Chara_Result_Failed_AnimationDuration", chara_config.result_beat_failed * 1000.0) / 1000.0
-	chara_config.result_beat_failed = chara_config_ini:GetDouble("Result_Chara_Motion_Failed", chara_config.result_beat_failed)
+	chara_config.result_beat_failed = chara_config_ini:GetDouble("Result_Chara_Beat_Failed", chara_config.result_beat_failed)
 	--+++++++++++++
 end
 load_config()
