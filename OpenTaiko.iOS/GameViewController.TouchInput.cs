@@ -93,46 +93,50 @@ public partial class GameViewController {
 		CreateTouchOverlay();
 	}
 
-	private long HitTestTouchZone(CGPoint location) {
+	private bool IsEscapeZone(CGPoint location) {
+		// Offset by safe area to match the visual button.
+		var bounds = View!.Bounds;
+		var safeInsets = View.SafeAreaInsets;
+		return location.X <= safeInsets.Left + EscapeZone.Width * bounds.Width
+			&& location.Y <= safeInsets.Top + EscapeZone.Height * bounds.Height;
+	}
+
+	// Maps a drum-zone touch to a CInputTouch_iOS button.
+	private int HitTestDrumZone(CGPoint location) {
 		var bounds = View!.Bounds;
 		double w = bounds.Width;
 		double h = bounds.Height;
-
-		// Check escape zone (offset by safe area to match visual button)
-		var safeInsets = View.SafeAreaInsets;
-		if (location.X <= safeInsets.Left + EscapeZone.Width * w && location.Y <= safeInsets.Top + EscapeZone.Height * h) {
-			return HID_ESC;
-		}
-
 		// Do a simple split at the middle of the screen to determine left/right.
 		bool isLeft = location.X < w * 0.5;
+		bool isDon;
+
 		if (TouchDrumShape.HasCustomShape) {
-			return TouchDrumShape.HitTest(location.X / w, location.Y / h)
-				? (isLeft ? HID_F : HID_J)
-				: (isLeft ? HID_D : HID_K);
+			isDon = TouchDrumShape.HitTest(location.X / w, location.Y / h);
+		} else {
+			// Don circle in pixel space. Everywhere else is Ka.
+			double dx = location.X - DonCenterX * w;
+			double dy = location.Y - DonCenterY * h;
+			double r = DonRadius * w;
+			isDon = dx * dx + dy * dy <= r * r;
 		}
 
-		// Check Don circle in pixel space
-		double dx = location.X - DonCenterX * w;
-		double dy = location.Y - DonCenterY * h;
-		double r = DonRadius * w;
-
-		if (dx * dx + dy * dy <= r * r) {
-			// Inside Don circle: F (left) / J (right)
-			return isLeft ? HID_F : HID_J;
-		}
-
-		// Everywhere else is Ka: D (left) / K (right)
-		return isLeft ? HID_D : HID_K;
+		if (isDon) return isLeft ? CInputTouch_iOS.DonLeft : CInputTouch_iOS.DonRight;
+		return isLeft ? CInputTouch_iOS.KaLeft : CInputTouch_iOS.KaRight;
 	}
 
 	public override void TouchesBegan(NSSet touches, UIEvent? evt) {
 		base.TouchesBegan(touches, evt);
 		foreach (UITouch touch in touches.Cast<UITouch>()) {
 			var location = touch.LocationInView(View);
-			long hidCode = _arrowNavMode ? HitTestArrowZone(location) : HitTestTouchZone(location);
-			if (hidCode >= 0) {
-				_keyboardInput?.TouchKeyDown(hidCode);
+			if (_arrowNavMode) {
+				long hidCode = HitTestArrowZone(location);
+				if (hidCode >= 0) {
+					_keyboardInput?.TouchKeyDown(hidCode);
+				}
+			} else if (IsEscapeZone(location)) {
+				_keyboardInput?.TouchKeyDown(HID_ESC);
+			} else {
+				_touchInput?.TouchButtonDown(HitTestDrumZone(location));
 			}
 		}
 	}

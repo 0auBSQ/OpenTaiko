@@ -46,6 +46,7 @@ public partial class GameViewController : UIViewController {
 	// IOSurface and Metal composites + presents it via CAMetalLayer.
 	private MetalPresenter? _metalPresenter;
 	private CInputKeyboard_iOS? _keyboardInput;
+	private CInputTouch_iOS? _touchInput;
 	private int _autoAdvanceFrame;   // iOS auto-advance Don-pulse counter (see RenderFrame)
 	private bool _initialized;
 	private NSObject? _resignActiveObserver;
@@ -233,13 +234,17 @@ public partial class GameViewController : UIViewController {
 		);
 
 		// Register input devices for the game's input manager
-		var inputDevices = new List<FDK.IInputDevice> { _keyboardInput };
+		_touchInput = new CInputTouch_iOS();
+		var inputDevices = new List<FDK.IInputDevice> { _keyboardInput, _touchInput };
 		inputDevices.AddRange(CInputGamepad_iOS.CreateSlots(global::OpenTaiko.OpenTaiko.MAX_PLAYERS));
 		global::OpenTaiko.OpenTaiko.ExternalInputDevices = inputDevices;
 
 		// Create and initialize the game
 		_game = new global::OpenTaiko.OpenTaiko();
 		_game.InitWithExternalContext(_fdkContext, _backingWidth, _backingHeight);
+
+		_touchInput.EnsureBindings(global::OpenTaiko.OpenTaiko.ConfigIni);
+		global::OpenTaiko.OpenTaiko.Pad.InvalidateInputToPadCache();
 
 		// FDK renders the scene into the presenter's shared FBO; the host presents it. The
 		// render-target FBO is (re)sized to GameWindowSize each frame in OnFrame.
@@ -386,6 +391,7 @@ public partial class GameViewController : UIViewController {
 			// Each touch is a single-frame pulse — the key resets so the next
 			// touch-down always registers as a fresh press.
 			_keyboardInput?.ReleaseTouchKeys();
+			_touchInput?.ReleaseTouchButtons();
 
 			if (++_debugHudFrameCount % 60 == 0)
 				UpdateDebugHud();

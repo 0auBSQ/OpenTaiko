@@ -145,7 +145,11 @@ public sealed class CLuaKeyConfigService {
 			case InputDeviceType.Keyboard: return "Key " + KeyboardLabel(k.Code);
 			case InputDeviceType.MidiIn: return $"MIDI #{k.ID} {CInputMIDI.GetButtonName(k.Code)}";
 			case InputDeviceType.Joystick: return $"Joy #{k.ID} {OpenTaiko.InputManager.Joystick(k.ID)?.GetButtonName(k.Code) ?? "?"}";
-			case InputDeviceType.Gamepad: return $"Pad #{k.ID} {OpenTaiko.InputManager.Gamepad(k.ID)?.GetButtonName(k.Code) ?? "?"}";
+			case InputDeviceType.Gamepad: {
+					IInputDevice? device = OpenTaiko.InputManager.Gamepad(k.ID);
+					if (device.GUID == "ios-touch") return device.GetButtonName(k.Code);
+					return $"Pad #{k.ID} {device.GetButtonName(k.Code) ?? "?"}";
+				}
 			case InputDeviceType.Mouse: return $"Mouse {k.Code}";
 			default: return "";
 		}
