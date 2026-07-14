@@ -15,7 +15,7 @@ class CVisualLogManager {
 			=> timeSinceCreation = new CCounter(0, 10000, 1, OpenTaiko.Timer);
 
 		public int Display(int y) {
-			if (timeSinceCreation.IsStoped) {
+			if (timeSinceCreation.IsStopped) {
 				// OpenTaiko.Timer was null. Reinitialize.
 				InitTimeSinceCreation();
 			}

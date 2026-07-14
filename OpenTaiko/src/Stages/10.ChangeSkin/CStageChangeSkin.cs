@@ -97,7 +97,7 @@ internal class CStageChangeSkin : CStage {
 					_session = null;
 					System.Diagnostics.Trace.AutoFlush = _savedAutoFlush;
 					System.Diagnostics.Trace.Flush();
-					OpenTaiko.app.LoadSkinFinish();   // Tx textures + AfterSongEnum + Resume + RefleshSkin(s)
+					OpenTaiko.app.LoadSkinFinish();   // Tx textures + AfterSongEnum + Resume + RefreshSkin(s)
 					CLoadingProgress.End();
 					this.ePhaseID = EPhase.Common_FADEOUT;
 				}

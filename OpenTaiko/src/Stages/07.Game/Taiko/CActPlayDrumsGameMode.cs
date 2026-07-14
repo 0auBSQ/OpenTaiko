@@ -387,7 +387,7 @@ internal class CActPlayDrumsGameMode : CActivity {
 
 			//if( !this.st叩ききりまショー.ct残り時間.b停止中 )
 			if (this.stTatakikiriShow.bTimerUse) {
-				if (!this.stTatakikiriShow.ctRemainingTime.IsStoped || this.stTatakikiriShow.bAddAnime == true) {
+				if (!this.stTatakikiriShow.ctRemainingTime.IsStopped || this.stTatakikiriShow.bAddAnime == true) {
 					this.stTatakikiriShow.ctRemainingTime.Tick();
 					if (!OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 5000, 0) || this.stTatakikiriShow.bAddAnime == true) {
 						this.stTatakikiriShow.bTimerUse = false;
@@ -471,8 +471,8 @@ internal class CActPlayDrumsGameMode : CActivity {
 					this.tSmallDisplay(230 + (strDisplayRemainingTime.Length * OpenTaiko.Skin.Game_Taiko_Combo_Size[0] / 4), 84 + OpenTaiko.Tx.GameMode_Timer_Frame.szTextureSize.Height / 2, string.Format("{0,2:#0}", strDisplayRemainingTime));
 			}
 
-			if (!this.stTatakikiriShow.ctAddJudging.IsStoped) {
-				if (!this.stTatakikiriShow.ctAddJudging.IsStoped) {
+			if (!this.stTatakikiriShow.ctAddJudging.IsStopped) {
+				if (!this.stTatakikiriShow.ctAddJudging.IsStopped) {
 					this.stTatakikiriShow.ctAddJudging.Tick();
 					if (this.stTatakikiriShow.ctAddJudging.IsEnded) {
 						this.stTatakikiriShow.ctAddJudging.Stop();
@@ -481,8 +481,8 @@ internal class CActPlayDrumsGameMode : CActivity {
 					}
 				}
 			}
-			if (!this.stTatakikiriShow.ctAddTimeDisplay.IsStoped) {
-				if (!this.stTatakikiriShow.ctAddTimeDisplay.IsStoped) {
+			if (!this.stTatakikiriShow.ctAddTimeDisplay.IsStopped) {
+				if (!this.stTatakikiriShow.ctAddTimeDisplay.IsStopped) {
 					this.stTatakikiriShow.ctAddTimeDisplay.Tick();
 					if (this.stTatakikiriShow.ctAddTimeDisplay.IsEnded) {
 						this.stTatakikiriShow.ctAddTimeDisplay.Stop();

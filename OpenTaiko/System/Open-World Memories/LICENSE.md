@@ -8,8 +8,8 @@ The OpenTaiko Extended License gives the following permissions about usages rela
 - Monetization (ads) from videos, streams; e-sports or caritative events
 
 Additionally, the OpenTaiko Extended License forbids the following usages:
-- Any commercial use outside of the exceptions mentionned before
-- Any secondary distribution outside of the exception mentionned before
+- Any commercial use outside of the exceptions mentioned before
+- Any secondary distribution outside of the exception mentioned before
 - Any usage not related to OpenTaiko (for example, adapting any of the assets for a different game) without written permission from the copyright holders
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the assets.

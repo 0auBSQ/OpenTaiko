@@ -29,8 +29,8 @@ internal class CPopupMenuManager {
 
 	public bool IsActive => _active;
 
-	// ROActivities are reloaded wholesale by the skin loader, so this is a no-op (mirrors CModalManager.RefleshSkin).
-	public void RefleshSkin() { }
+	// ROActivities are reloaded wholesale by the skin loader, so this is a no-op (mirrors CModalManager.RefreshSkin).
+	public void RefreshSkin() { }
 
 	/// <summary>Open the popup with a title + item labels. <paramref name="onDecide"/> receives the chosen index;
 	/// it should call <see cref="Close"/> (immediate) or <see cref="LockSelection"/> (defer, e.g. the retry delay).

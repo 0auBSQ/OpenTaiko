@@ -117,7 +117,7 @@ internal class CActImplLaneTaiko : CActivity {
 				this.stBranch[i].nFlashControlTimer += 8;
 			}
 
-			if (!this.stBranch[i].ctBranchAnimeProgress.IsStoped) {
+			if (!this.stBranch[i].ctBranchAnimeProgress.IsStopped) {
 				this.stBranch[i].ctBranchAnimeProgress.Tick();
 				if (this.stBranch[i].ctBranchAnimeProgress.IsEnded) {
 					this.stBranch[i].ctBranchAnimeProgress.Stop();
@@ -142,7 +142,7 @@ internal class CActImplLaneTaiko : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region[ ゴーゴータイムレーン背景レイヤー ]
 			if (OpenTaiko.Tx.Lane_Background_GoGo != null && OpenTaiko.stageGameScreen.bIsGOGOTIME[i]) {
-				if (!this.ctGoGo.IsStoped) {
+				if (!this.ctGoGo.IsStopped) {
 					this.ctGoGo.Tick();
 				}
 
@@ -490,7 +490,7 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 		#endregion
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-			if (!this.stState[i].ctProgress.IsStoped) {
+			if (!this.stState[i].ctProgress.IsStopped) {
 				this.stState[i].ctProgress.Tick();
 				if (this.stState[i].ctProgress.IsEnded) {
 					this.stState[i].ctProgress.Stop();

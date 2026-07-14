@@ -11,12 +11,21 @@
 FADE_OUT_SECONDS = 1.0
 FADE_IN_SECONDS  = 1.0
 
+-- part of class TextureLoader in TextureLoader.cs
+local TL = {
+	BASE = "Graphics/",
+	TOWERRESULT = "8_TowerResult/",
+}
+
 local TEXTURES_DIR = "Textures/"
+local SKIN_DIR = "../../../"
+local SKIN_GRAPHICS_DIR = SKIN_DIR .. TL.BASE
 local DIFF_TOWER, DIFF_DAN = 5, 6
 
 -- Textures
 local pixel                                   -- 1x1 white, for fades + bar
 local tx_bg_normal, tx_bg_ai, tx_bg_dan, tx_bg_tower
+local tx_towers = {}
 local tx_plate
 local titleFont, subtitleFont
 local titleTex, subtitleTex
@@ -27,22 +36,23 @@ local player_count = 1
 local res_w, res_h = 1920, 1080
 local slot_w       = 1920
 local characters, slide_infos = {}, {}
-local titleStr, subtitleStr = "", ""
-local dan_scroll_y = 0
+local bg_scroll_y = 0
+local px_tower_bg_scroll_y = 0
+local tower_type = "0"
 local dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
-local dan_plate_x, dan_plate_y = 0, 0
 local initialized  = false
-local initialized_title = false
 local luaPhase     = nil                      -- "out" | "load" | "in" — used to detect a fresh transition
 
 -- Tuning (mirrors the old ROActivity)
 local SLIDE_DURATION, SLIDE_STAGGER = 0.35, 0.28
+local TOWER_SCROLL_SPEED, TOWER_SCROLL_MAX = 20, 120
 local DAN_SCROLL_SPEED, DAN_SCROLL_MAX = 20, 60
 
 -- Skin layout (1920x1080, centered) — from SongLoadingConfig.ini
 local PLATE_X, PLATE_Y      = 960, 540
 local TITLE_X, TITLE_Y      = 960, 420
 local SUBTITLE_X, SUBTITLE_Y = 960, 487
+local DANPLATE_X, DANPLATE_Y = 1682, 320
 
 -- ── helpers ──────────────────────────────────────────────────────────────────
 local function rect(x, y, w, h, r, g, b, a)
@@ -59,7 +69,10 @@ local function draw_bg(alpha)
 	else tx = tx_bg_normal end
 	if tx ~= nil then
 		tx:SetOpacity(alpha)
-		tx:Draw(0, (mode == "dan") and -dan_scroll_y or 0)
+		if mode == "tower" then tx:Draw(0, -px_tower_bg_scroll_y)
+		elseif mode == "dan" then tx:Draw(0, -bg_scroll_y)
+		else tx:Draw(0, 0)
+		end
 	end
 end
 
@@ -95,7 +108,8 @@ end
 local function setup()
 	player_count = CONFIG.PlayerCount
 	local res = THEME:GetResolution(); res_w, res_h = res.X, res.Y
-	dan_scroll_y = 0
+	bg_scroll_y = 0
+	px_tower_bg_scroll_y = 0
 
 	local diff = SONGMOUNT:ChosenDifficulty()
 	local node = SONGMOUNT:ChosenSongNode()
@@ -104,10 +118,15 @@ local function setup()
 	elseif CONFIG.IsAIBattleMode then mode = "ai"
 	else mode = "normal" end
 
+	tower_type = "0"
 	dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
 	if node ~= nil and node.IsSong then
-		local chart = node:GetChart(DIFF_DAN)
+		local chart
+		if mode == "tower" then chart = node:GetChart(DIFF_TOWER)
+		elseif mode == "dan" then chart = node:GetChart(DIFF_DAN)
+		end
 		if chart ~= nil then
+			tower_type = chart.TowerType or "0"
 			dan_tick = chart.DanTick or 0
 			local c = chart.DanTickColor
 			if c ~= nil then dan_r, dan_g, dan_b = c.R, c.G, c.B end
@@ -115,21 +134,15 @@ local function setup()
 		dan_title = node.Title or ""
 	end
 
-	-- cannot generate text texture here as the font might not have been loaded
-	titleStr    = (node ~= nil and node.Title) or ""
-	subtitleStr = (node ~= nil and node.Subtitle) or ""
+	if titleTex ~= nil then titleTex:Dispose(); titleTex = nil end
+	if subtitleTex ~= nil then subtitleTex:Dispose(); subtitleTex = nil end
+	local title    = (node ~= nil and node.Title) or ""
+	local subtitle = (node ~= nil and node.Subtitle) or ""
+	if title ~= "" and titleFont ~= nil then titleTex = titleFont:GetText(title) end
+	if subtitle ~= "" and subtitleFont ~= nil then subtitleTex = subtitleFont:GetText(subtitle) end
 
 	setup_characters()
 	initialized = true
-end
-
-local function setup_title()
-	if titleTex ~= nil then titleTex:Dispose(); titleTex = nil end
-	if subtitleTex ~= nil then subtitleTex:Dispose(); subtitleTex = nil end
-	if titleStr ~= "" and titleFont ~= nil then titleTex = titleFont:GetText(titleStr) end
-	if subtitleStr ~= "" and subtitleFont ~= nil then subtitleTex = subtitleFont:GetText(subtitleStr) end
-
-	initialized_title = (titleStr == "" or titleTex ~= nil) and (subtitleStr == "" or subtitleTex ~= nil)
 end
 
 local function tick_update()
@@ -138,8 +151,11 @@ local function tick_update()
 	local live = CONFIG.PlayerCount or player_count
 	if live ~= player_count and live >= 1 then player_count = live; setup_characters() end
 
-	if mode == "dan" and dan_scroll_y < DAN_SCROLL_MAX then
-		dan_scroll_y = math.min(dan_scroll_y + DAN_SCROLL_SPEED * dt, DAN_SCROLL_MAX)
+	if mode == "tower" and bg_scroll_y < TOWER_SCROLL_MAX then
+		bg_scroll_y = math.min(bg_scroll_y + TOWER_SCROLL_SPEED * dt, TOWER_SCROLL_MAX)
+		px_tower_bg_scroll_y = (1 - bg_scroll_y / TOWER_SCROLL_MAX) * (tx_bg_tower.Height - res_h)
+	elseif mode == "dan" and bg_scroll_y < DAN_SCROLL_MAX then
+		bg_scroll_y = math.min(bg_scroll_y + DAN_SCROLL_SPEED * dt, DAN_SCROLL_MAX)
 	end
 
 	for i = 1, player_count do
@@ -190,8 +206,16 @@ local function draw_screen(progress, alpha, showBar)
 	-- foreground: dan plate, or player characters + the song title plate
 	if mode == "dan" then
 		local danplate = ROACTIVITY:GetROActivity("danplate")
-		if danplate ~= nil then danplate:Draw(dan_plate_x, dan_plate_y, op, dan_tick, dan_r, dan_g, dan_b, dan_title) end
+		if danplate ~= nil then danplate:Draw(DANPLATE_X, DANPLATE_Y, op, dan_tick, dan_r, dan_g, dan_b, dan_title) end
 	else
+		if mode == "tower" then
+			local tx_tower = tx_towers[tower_type] or tx_towers["0"]
+			if tx_bg_tower ~= nil and tx_tower ~= nil then
+				local xFactor = (tx_bg_tower.Width - tx_tower.Width) / 2;
+				local yFactor = tx_tower.Height / tx_bg_tower.Height;
+				tx_tower:Draw(xFactor, -1 * yFactor * px_tower_bg_scroll_y);
+			end
+		end
 		if mode == "normal" then draw_characters(op) end
 		if tx_plate ~= nil then tx_plate:SetOpacity(alpha); tx_plate:DrawAtAnchor(PLATE_X, PLATE_Y, "center") end
 		if titleTex ~= nil then titleTex:SetOpacity(alpha); titleTex:DrawAtAnchor(TITLE_X, TITLE_Y, "center") end
@@ -210,16 +234,14 @@ end
 
 -- ── transition callbacks ──────────────────────────────────────────────────────
 function fadeOut(t)
-	if luaPhase ~= "out" then initialized = false; initialized_title = false; luaPhase = "out" end   -- fresh transition → re-resolve song
+	if luaPhase ~= "out" then initialized = false; luaPhase = "out" end   -- fresh transition → re-resolve song
 	if not initialized then setup() end
-	if not initialized_title then setup_title() end
 	draw_bg(t)   -- cross-fade the loading background IN over the song-select screen (not through black)
 end
 
 function loading(progress, elapsed)
 	luaPhase = "load"
 	if not initialized then setup() end
-	if not initialized_title then setup_title() end
 	tick_update()
 	draw_screen(progress, 1.0, true)
 end
@@ -235,10 +257,21 @@ function onStart()
 	tx_bg_normal = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait.png")
 	tx_bg_ai     = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_AI.png")
 	tx_bg_dan    = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_Dan.png")
-	tx_bg_tower  = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_Tower.png")
+	tx_bg_tower  = TEXTURE:CreateTexture(SKIN_DIR .. TL.BASE .. TL.TOWERRESULT .. "Background.png") --[["BgWait_Tower.png" did not exist]]
 	tx_plate     = TEXTURE:CreateTexture(TEXTURES_DIR .. "Plate.png")
 	titleFont    = TEXT:Create(46)
 	subtitleFont = TEXT:Create(30)
+
+	local dir_name = SKIN_DIR .. TL.BASE .. TL.TOWERRESULT .. "Tower"
+	if STORAGE:DirectoryExists(dir_name) then
+		local files = STORAGE:GetFiles(dir_name, "*.png")
+		for k, v in pairs(files) do
+			local file_path = dir_name.."/"..tostring(v)..".png"
+			if STORAGE:FileExists(file_path) then
+				tx_towers[v] = TEXTURE:CreateTexture(file_path)
+			end
+		end
+	end
 end
 
 function onDestroy()
@@ -249,4 +282,8 @@ function onDestroy()
 	for _, tx in pairs({ pixel, tx_bg_normal, tx_bg_ai, tx_bg_dan, tx_bg_tower, tx_plate, titleTex, subtitleTex }) do
 		if tx ~= nil then tx:Dispose() end
 	end
+	for _, tx in pairs(tx_towers) do
+		if tx ~= nil then tx:Dispose() end
+	end
+	tx_towers = {}
 end

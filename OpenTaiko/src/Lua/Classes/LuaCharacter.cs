@@ -149,7 +149,7 @@ namespace OpenTaiko {
 		}
 
 		public bool AvailableAnimation(string animation) {
-			return Character?.AvaiableAnimation(Slot, animation) ?? false;
+			return Character?.AvailableAnimation(Slot, animation) ?? false;
 		}
 
 		public void SetAnimationDuration(string animation, double duration) {

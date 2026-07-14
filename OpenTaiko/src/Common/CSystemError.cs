@@ -116,7 +116,7 @@ internal class CSystemError : CStage {
 	// CStage Implementation
 
 	public override void Activate() {
-		// Allocate the resource exceptionally on Activate as CreateManagedResource is conditionned to PreloadAssets
+		// Allocate the resource exceptionally on Activate as CreateManagedResource is conditioned to PreloadAssets
 		this._pfText = HPrivateFastFont.tInstantiateFont("", 20); // Force fallback font
 		base.Activate();
 	}

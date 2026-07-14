@@ -23,11 +23,16 @@ namespace OpenTaiko {
 
 		public void PlayAction(int player, string animationType) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			if (!character.AvaiableAnimation(player, animationType)) return;
+			if (!character.AvailableAnimation(player, animationType)) return;
 			strActionAnimation = animationType;
 			character.ResetAnimationCounter(player, animationType);
 
 			bPlayingAction[player] = true;
+		}
+
+		public void StopAction(int player) {
+			strActionAnimation = null;
+			bPlayingAction[player] = false;
 		}
 
 		public void ResetCounter(int player) {
@@ -42,9 +47,7 @@ namespace OpenTaiko {
 			bool looping = !bPlayingAction[player] && bLooping;
 			bool animationEnded = character.Update(player, strCurrentAnimation, looping);
 			if (bPlayingAction[player] && animationEnded) {
-				bPlayingAction[player] = false;
-				strActionAnimation = null;
-
+				StopAction(player);
 				ResetCounter(player);
 				Update(player);
 			}

@@ -42,7 +42,7 @@ namespace OpenTaiko {
 		// Hide folder where there is nothing to show (No song, no locked song having a non-hidden hidden index)
 		public bool HideEmptyFolders = true;
 
-		// If true, display openned folders as flatten and get all leaves instead of just the child folder
+		// If true, display opened folders as flatten and get all leaves instead of just the child folder
 		public bool FlattenOpenedFolders = true;
 
 		// If true, requested pages will cycle on overflow, else overflowing element will be set as null

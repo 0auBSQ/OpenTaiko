@@ -118,29 +118,17 @@ internal class CActImplCharacter : CActivity {
 	public override int Draw() {
 
 		ctKusuIn.Tick();
-		if (ctKusuMiss != null) {
-			ctKusuMiss.Tick();
-
-			if (ctKusuMiss.CurrentValue == ctKusuMiss.EndValue) {
-				ctKusuMiss = null;
-
-				IsInKusudama = false;
-
-				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					ReturnDefaultAnime(i, true);
-				}
-			}
-		}
-		if (ctKusuSuccess != null) {
-			ctKusuSuccess.Tick();
-
-			if (ctKusuSuccess.CurrentValue == ctKusuSuccess.EndValue) {
-				ctKusuSuccess = null;
-
-				IsInKusudama = false;
-
-				for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-					ReturnDefaultAnime(i, true);
+		foreach (var (ctKusuOut, resetKusuOut) in new (CCounter?, Action)[] {
+			(ctKusuSuccess, () => ctKusuSuccess = null),
+			(ctKusuMiss, () => ctKusuMiss = null),
+			}) {
+			if (ctKusuOut != null) {
+				ctKusuOut.Tick();
+				if (ctKusuOut.CurrentValue == ctKusuOut.EndValue) {
+					bool inKusudama = Enumerable.Range(0, OpenTaiko.ConfigIni.nPlayerCount)
+						.Any(this.IsPlayingKusudamaAction);
+					if (!inKusudama)
+						resetKusuOut();
 				}
 			}
 		}
@@ -422,7 +410,9 @@ internal class CActImplCharacter : CActivity {
 
 			float charaScale = 1.0f;
 
-			if (!bBalloonRoll[i] && !visibleKusuChara && !IsPlayingBalloonAction(i)) {
+			bool isInGenericBalloon = bBalloonRoll[i] || IsPlayingBalloonAction(i) || IsInKusudama || IsPlayingKusudamaAction(i);
+
+			if (!isInGenericBalloon) {
 				// P2 in AI battle mode is mirrored — encode as negative scaleX instead of a flipX flag.
 				bool _mirrorP2 = OpenTaiko.ConfigIni.bAIBattleMode && (i == 1);
 
@@ -430,6 +420,7 @@ internal class CActImplCharacter : CActivity {
 					charaScale = OpenTaiko.Skin.Game_Chara_Scale_AI;
 					var aiPos = CCharacter.GetCharacter(i).GetAIBattlePosition(i, charaScale);
 					chara_x = aiPos?.x ?? OpenTaiko.Skin.Game_Chara_AI_X[i];
+					chara_x += OpenTaiko.Skin.Game_AIBattle_CharaMove * OpenTaiko.stageGameScreen.AIBattleState;
 					chara_y = aiPos?.y ?? OpenTaiko.Skin.Game_Chara_AI_Y[i];
 				} else if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					chara_x = OpenTaiko.Skin.Game_Chara_X[i];
@@ -448,20 +439,12 @@ internal class CActImplCharacter : CActivity {
 					charaScale = OpenTaiko.Skin.Game_Chara_Scale_4P;
 				}
 
-				if (OpenTaiko.ConfigIni.bAIBattleMode) {
-					chara_x += OpenTaiko.Skin.Game_AIBattle_CharaMove * OpenTaiko.stageGameScreen.AIBattleState;
-					// CharaConfig.txt / skin AI X values are left-edge (old system used TOP-LEFT anchor).
-					// Lua draw always uses "bottom" anchor (center-X), so shift right by half rendered width.
-					float spriteW = (float)CCharacter.GetCharacter(i).GetDrawSize(i, CCharacter.ANIM_GAME_NORMAL).X;
-					chara_x += spriteW * charaScale / 2.0f;
-				}
-
 				//CCharacter.GetCharacter(i).Draw(i, animation, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
 				CharacterControllers[i].Draw(i, chara_x, chara_y, _mirrorP2 ? -charaScale : charaScale, charaScale, 255, Color4.White);
 			}
 
 
-			if ((!bBalloonRoll[i] && !IsPlayingBalloonAction(i)) || OpenTaiko.ConfigIni.nPlayerCount > 2) {
+			if (!isInGenericBalloon || OpenTaiko.ConfigIni.nPlayerCount > 2) {
 				if (OpenTaiko.ConfigIni.nPlayerCount <= 2) {
 					OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(OpenTaiko.Skin.Game_PuchiChara_X[i], OpenTaiko.Skin.Game_PuchiChara_Y[i], OpenTaiko.stageGameScreen.bIsAlreadyMaxed[i], player: i);
 				} else if (OpenTaiko.ConfigIni.nPlayerCount == 5) {
@@ -474,10 +457,17 @@ internal class CActImplCharacter : CActivity {
 		return base.Draw();
 	}
 
-	private bool IsPlayingBalloonAction(int i) {
-		string? action = CharacterControllers[i].strActionAnimation;
-		return action == CCharacter.ANIM_GAME_BALLOON_BROKE || action == CCharacter.ANIM_GAME_BALLOON_MISS;
-	}
+	public static bool IsNonKusuBalloonAction(string? action)
+		=> action is CCharacter.ANIM_GAME_BALLOON_BROKE or CCharacter.ANIM_GAME_BALLOON_MISS;
+
+	public static bool IsKusudamaAction(string? action)
+		=> action is CCharacter.ANIM_GAME_KUSUDAMA_BREAKING or CCharacter.ANIM_GAME_KUSUDAMA_BROKE or CCharacter.ANIM_GAME_KUSUDAMA_MISS;
+
+	private bool IsPlayingKusudamaAction(int i)
+		=> IsKusudamaAction(CharacterControllers[i].strActionAnimation);
+
+	private bool IsPlayingBalloonAction(int i)
+		=> IsNonKusuBalloonAction(CharacterControllers[i].strActionAnimation);
 
 	public void OnDraw_Balloon() {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
@@ -505,8 +495,8 @@ internal class CActImplCharacter : CActivity {
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
 					OpenTaiko.stageGameScreen.GetJPOSCROLLY(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonY[i], false, 255, true, player: i);
 		}
-		if (visibleKusuChara) {
-			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (visibleKusuChara(i)) {
 				float chara_x = OpenTaiko.Skin.Game_Chara_Kusudama_X[i];
 				float chara_y = OpenTaiko.Skin.Game_Chara_Kusudama_Y[i];
 				float charaScale = OpenTaiko.Skin.Game_Chara_Kusudama_Scale;
@@ -737,17 +727,17 @@ internal class CActImplCharacter : CActivity {
 	}
 
 
-	public void ReturnDefaultAnime(int player, bool resetCounter) {
+	public void ReturnDefaultAnime(int player) {
 		CCharacter character = CCharacter.GetCharacter(player);
 
-		if (this.IsInKusudama) {
-			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
-			CharacterControllers[player].bLooping = true;
-			return;
-		}
 		if (this.bBalloonRoll[player]) {
 			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_BALLOON_BREAKING;
 			CharacterControllers[player].bLooping = false;
+			return;
+		}
+		if (this.IsInKusudama) {
+			CharacterControllers[player].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
+			CharacterControllers[player].bLooping = true;
 			return;
 		}
 
@@ -797,46 +787,46 @@ internal class CActImplCharacter : CActivity {
 	private float[] nCharaBeat = new float[5];
 	*/
 
-	public enum Anime {
+	public enum EAnimePriority {
 		None,
 		Normal,
-		Miss,
-		MissDown,
-		Cleared,
-		Maxed,
-		MissIn,
-		MissDownIn,
-		GoGoTime,
-		GoGoTime_Maxed,
-		Combo10,
-		Combo10_Clear,
-		Combo10_Max,
-		GoGoStart,
-		GoGoStart_Clear,
-		GoGoStart_Max,
-		Become_Cleared,
-		Become_Maxed,
-		SoulOut,
-		ClearOut,
-		Return,
-		Balloon_Breaking,
-		Balloon_Broke,
-		Balloon_Miss,
-		Kusudama_Idle,
-		Kusudama_Breaking,
-		Kusudama_Broke,
-		Kusudama_Miss
+		GenericBalloon_Breaking,
+		GenericBalloon_BrokeMiss,
 	}
-
-
-	public Anime[] eNowAnime = new Anime[5];
 
 	public CCounter ctKusuIn;
 	public CCounter? ctKusuMiss;
 	public CCounter? ctKusuSuccess;
 	public CCharacterController[] CharacterControllers = new CCharacterController[5];
 
-	private bool visibleKusuChara => IsInKusudama || ctKusuSuccess != null || ctKusuMiss != null;
+	// action keeping priority: generic balloon broke/miss > breaking > other > none
+	private static EAnimePriority ActionKeepingPriority(string? animationType) => animationType switch {
+		CCharacter.ANIM_GAME_KUSUDAMA_BROKE or CCharacter.ANIM_GAME_BALLOON_BROKE
+		or CCharacter.ANIM_GAME_KUSUDAMA_MISS or CCharacter.ANIM_GAME_BALLOON_MISS => EAnimePriority.GenericBalloon_BrokeMiss,
+		CCharacter.ANIM_GAME_KUSUDAMA_BREAKING or CCharacter.ANIM_GAME_BALLOON_BREAKING => EAnimePriority.GenericBalloon_Breaking,
+		CCharacter.ANIM_NONE => EAnimePriority.None,
+		_ => EAnimePriority.Normal,
+	};
+
+	public void PlayGameAction(int player, string animationType, bool updateLoopAnimation = false) {
+		if (updateLoopAnimation)
+			this.ReturnDefaultAnime(player);
+
+		var priority = ActionKeepingPriority(animationType);
+		if (priority is EAnimePriority.GenericBalloon_Breaking) {
+			// breaking switches between classes and interrupts all actions
+		} else if ((this.IsInKusudama && !IsKusudamaAction(animationType))
+			|| (this.bBalloonRoll[player] && !IsNonKusuBalloonAction(animationType))
+			) {
+			return; // wrong action exclusive classes: kusudama, balloon
+		} else if (priority < ActionKeepingPriority(CharacterControllers[player].strActionAnimation)) {
+			return; // insufficient action keeping priority
+		}
+		CharacterControllers[player].PlayAction(player, animationType);
+	}
+
+	private bool visibleKusuChara(int iPlayer)
+		=> IsPlayingKusudamaAction(iPlayer) || (!bBalloonRoll[iPlayer] && IsInKusudama);
 
 	public void KusuIn() {
 		ctKusuIn = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
@@ -844,6 +834,7 @@ internal class CActImplCharacter : CActivity {
 		ctKusuSuccess = null;
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter character = CCharacter.GetCharacter(i);
+			CharacterControllers[i].StopAction(i); // KusuIn replaces the action
 			CharacterControllers[i].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
 			CharacterControllers[i].bLooping = true;
 		}
@@ -851,16 +842,12 @@ internal class CActImplCharacter : CActivity {
 
 	public void KusuMiss(int iPlayer) {
 		ctKusuMiss = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		CCharacter character = CCharacter.GetCharacter(iPlayer);
-		ReturnDefaultAnime(iPlayer, true);
-		CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_MISS);
+		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_MISS, true);
 	}
 
 	public void KusuSuccess(int iPlayer) {
 		ctKusuSuccess = new CCounter(0, 1000, 0.4f, OpenTaiko.Timer);
-		CCharacter character = CCharacter.GetCharacter(iPlayer);
-		ReturnDefaultAnime(iPlayer, true);
-		CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_BROKE);
+		this.PlayGameAction(iPlayer, CCharacter.ANIM_GAME_KUSUDAMA_BROKE, true);
 	}
 
 	/*
@@ -933,7 +920,7 @@ internal class CActImplCharacter : CActivity {
 	//public bool[] bキャラクターアクション中 = new bool[5];
 
 	public bool IsInKusudama = false;
-	public bool[] bBalloonRoll = new bool[5];
+	public bool[] bBalloonRoll = new bool[5]; // not Kusudama
 
 	public int[] iCurrentCharacter = new int[5] { 0, 0, 0, 0, 0 };
 }

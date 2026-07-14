@@ -35,7 +35,7 @@ internal class CActCalibrationMode : CActivity {
 	}
 
 	public int Update() {
-		if (IsDeActivated || CalibrateTick.IsStoped)
+		if (IsDeActivated || CalibrateTick.IsStopped)
 			return 1;
 
 		CalibrateTick.Tick();
@@ -88,7 +88,7 @@ internal class CActCalibrationMode : CActivity {
 	}
 
 	public override int Draw() {
-		if (IsDeActivated || CalibrateTick.IsStoped)
+		if (IsDeActivated || CalibrateTick.IsStopped)
 			return 1;
 
 		if (OpenTaiko.Tx.Tile_Black != null) {

@@ -21,7 +21,7 @@ internal class CActImplScore : CActPlayScoreCommon {
 			long num = FDK.SoundManager.PlayTimer.NowTimeMs;
 
 
-			if (!this.ctTimer.IsStoped) {
+			if (!this.ctTimer.IsStopped) {
 				this.ctTimer.Tick();
 				if (this.ctTimer.IsEnded) {
 					this.ctTimer.Stop();
@@ -31,7 +31,7 @@ internal class CActImplScore : CActPlayScoreCommon {
 			}
 
 			for (int i = 0; i < 5; i++) {
-				if (!this.ctPointsAnimeTimer[i].IsStoped) {
+				if (!this.ctPointsAnimeTimer[i].IsStopped) {
 					this.ctPointsAnimeTimer[i].Tick();
 					if (this.ctPointsAnimeTimer[i].IsEnded) {
 						this.ctPointsAnimeTimer[i].Stop();
@@ -40,7 +40,7 @@ internal class CActImplScore : CActPlayScoreCommon {
 			}
 
 			for (int i = 0; i < 5; i++) {
-				if (!this.ctBonusAddTimer[i].IsStoped) {
+				if (!this.ctBonusAddTimer[i].IsStopped) {
 					this.ctBonusAddTimer[i].Tick();
 					if (this.ctBonusAddTimer[i].IsEnded) {
 						OpenTaiko.stageGameScreen.actScore.BonusAdd(i);
@@ -84,7 +84,7 @@ internal class CActImplScore : CActPlayScoreCommon {
 
 			for (int i = 0; i < 256; i++) {
 				if (this.stScore[i].bUse) {
-					if (!this.stScore[i].ctTimer.IsStoped) {
+					if (!this.stScore[i].ctTimer.IsStopped) {
 						this.stScore[i].ctTimer.Tick();
 						if (this.stScore[i].ctTimer.IsEnded) {
 							if (this.stScore[i].bDisplaying == true)

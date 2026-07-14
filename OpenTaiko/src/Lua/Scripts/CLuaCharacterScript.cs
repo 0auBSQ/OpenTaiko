@@ -13,7 +13,8 @@ namespace OpenTaiko {
 
 		private NamedLuaFunction lfLoadAnimation = new("loadAnimation");
 		private NamedLuaFunction lfDisposeAnimation = new("disposeAnimation");
-		private NamedLuaFunction lfAvaialbeAnimation = new("avaialbeAnimation");
+		private NamedLuaFunction lfAvaialbeAnimation = new("avaialbeAnimation"); // earlier typoed API
+		private NamedLuaFunction lfAvailableAnimation = new("availableAnimation");
 		private NamedLuaFunction lfSetAnimationDuration = new("setAnimationDuration");
 		private NamedLuaFunction lfResetAnimationCounter = new("resetAnimationCounter");
 		private NamedLuaFunction lfUpdate = new("update");
@@ -34,8 +35,8 @@ namespace OpenTaiko {
 			RunLuaCode(lfDisposeAnimation, animationType);
 		}
 
-		public bool AvaialbeAnimation(string animationType) {
-			object[] result = RunLuaCode(lfAvaialbeAnimation, animationType) ?? [];
+		public bool AvailableAnimation(string animationType) {
+			object[] result = RunLuaCode(lfAvailableAnimation, animationType) ?? RunLuaCode(lfAvaialbeAnimation, animationType) ?? [];
 			if (result is not null && result.Length == 1 && result[0] is bool flag) {
 				return flag;
 			}
@@ -113,6 +114,7 @@ namespace OpenTaiko {
 				lfLoadAnimation.Load(LuaScript);
 				lfDisposeAnimation.Load(LuaScript);
 				lfAvaialbeAnimation.Load(LuaScript);
+				lfAvailableAnimation.Load(LuaScript);
 				lfSetAnimationDuration.Load(LuaScript);
 				lfResetAnimationCounter.Load(LuaScript);
 				lfUpdate.Load(LuaScript);

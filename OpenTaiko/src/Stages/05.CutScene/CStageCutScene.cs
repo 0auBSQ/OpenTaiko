@@ -194,22 +194,24 @@ class CStageCutScene : CStage {
 
 		this.actAVI.Draw();
 
+		var ret = 0;
 		if (base.ePhaseID == EPhase.Common_NORMAL && !(this.iCutScene < this.cutScenes!.Count)) {
 			base.ePhaseID = EPhase.Common_FADEOUT;
 			switch (this.mode) {
 				case ECutSceneMode.Intro:
 					this.actFOIntro.tFadeOutStart(true);
-					this.ReturnValueAfterFadingOut = EReturnValue.IntroFinished;
+					ret = (int)EReturnValue.IntroFinished;
+					this.ReturnValueAfterFadingOut = EReturnValue.IntroFinishedFadeOut;
 					break;
 
 				case ECutSceneMode.Outro:
 					this.actFOOutro.tFadeOutStart();
-					this.ReturnValueAfterFadingOut = EReturnValue.OutroFinished;
+					ret = (int)EReturnValue.OutroFinished;
+					this.ReturnValueAfterFadingOut = EReturnValue.OutroFinishedFadeOut;
 					break;
 			}
 		}
 
-		var ret = 0;
 		#region [ Fading in/out transition ]
 		switch (base.ePhaseID) {
 			case CStage.EPhase.Common_FADEOUT:
@@ -264,7 +266,9 @@ class CStageCutScene : CStage {
 	public enum EReturnValue : int {
 		Continue,
 		IntroFinished,
+		IntroFinishedFadeOut,
 		OutroFinished,
+		OutroFinishedFadeOut,
 	}
 
 	private static CSound? CreateSound(string? filepathAVI) {

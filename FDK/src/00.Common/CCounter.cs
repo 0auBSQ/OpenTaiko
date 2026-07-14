@@ -52,7 +52,7 @@ public class CCounter {
 	public bool IsTicked {
 		get { return (this.msNowTime != -1); }
 	}
-	public bool IsStoped {
+	public bool IsStopped {
 		get { return !this.IsTicked; }
 	}
 	public bool IsEnded {

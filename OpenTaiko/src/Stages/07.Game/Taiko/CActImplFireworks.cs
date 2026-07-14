@@ -140,7 +140,7 @@ internal class CActImplFireworks : CActivity {
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS state = ref this.stState[i];
 				if (state.bUse) {
-					if (!state.ctProgress.IsStoped) {
+					if (!state.ctProgress.IsStopped) {
 						state.ctProgress.Tick();
 						if (state.ctProgress.IsEnded) {
 							state.ctProgress.Stop();
@@ -191,7 +191,7 @@ internal class CActImplFireworks : CActivity {
 
 			for (int i = 0; i < 3 * 4; i++) {
 				ref STSTATUS_B state = ref this.stState_Big[i];
-				if (!state.ctProgress.IsStoped) {
+				if (!state.ctProgress.IsStopped) {
 					state.ctProgress.Tick();
 					if (state.ctProgress.IsEnded) {
 						state.ctProgress.Stop();

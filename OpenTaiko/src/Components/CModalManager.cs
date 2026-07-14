@@ -13,7 +13,7 @@ internal class CModalManager {
 	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("modal");
 
 	// Called by the skin system on skin refresh — ROActivities are managed by the skin loader.
-	public void RefleshSkin() { }
+	public void RefreshSkin() { }
 
 	public void RegisterNewModal(int player, int rarity, Modal.EModalType modalType, params object?[] args) {
 		object[] newParams = new object[] { player, rarity, (int)modalType };

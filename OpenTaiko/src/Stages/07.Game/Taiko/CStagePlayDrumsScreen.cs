@@ -209,7 +209,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	public override void tValueInitialize(bool bPlayRecord, bool bPlayState) {
 		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.tValueInitialize(bPlayRecord, bPlayState);
-		for (int i = 0; i < 5; i++) { replayCursor[i] = 0; replayMissScan[i] = 0; }
+		for (int i = 0; i < 5; i++) { replayCursor[i] = 0; msReplayTjaTime[i] = double.NegativeInfinity; }
 
 		if (bPlayState) {
 			this.actGame.tTatakikiriShow_Initialize();
@@ -480,11 +480,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			// Layer: notes & bar lines
 			this.ctHandHold.TickLoop();
-
-			// Replay playback: feed the recorded inputs (each with its own auto-miss resolved to its exact time)
-			// BEFORE the per-frame auto-miss below, so playback judges frame-cadence independently and reproduces
-			// the recorded card at any fps. No-op outside replay mode (tPumpReplayInputs skips non-replay players).
-			tPumpReplayInputs();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
@@ -840,13 +835,53 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		var rep = OpenTaiko.ReplayPlayback[0];
-		if (rep != null && (rep.WarnOldVersion || rep.WarnChecksumMismatch)) {
+		if (!this.IsReplayValid(0, rep)) {
 			var tx2 = TitleTextureKey.ResolveTitleTexture(this.ttkReplayInvalid);
 			if (tx2 != null) {
 				tx2.Opacity = 255;
 				tx2.t2DScaledCenterBasedDraw(cx, cy + 32);
 			}
 		}
+	}
+
+	private bool IsReplayValid(int iPlayer, CSongReplay rep) {
+		if (rep == null)
+			return false;
+		if (rep.WarnChecksumMismatch)
+			return false;
+
+		// Performance informations
+		bool judgeCountValid = rep.GoodCount >= this.CChartScore[iPlayer].nGreat
+			&& rep.OkCount >= this.CChartScore[iPlayer].nGood
+			&& rep.BadCount >= this.CChartScore[iPlayer].nMiss
+			&& rep.RollCount >= this.CChartScore[iPlayer].nRoll
+			&& rep.MaxCombo >= this.actCombo.nCurrentCombo.MaxValue[iPlayer]
+			&& rep.BoomCount >= this.CChartScore[iPlayer].nMine
+			&& rep.ADLibCount >= this.CChartScore[iPlayer].nADLIB;
+		if (!judgeCountValid)
+			return false;
+
+		// Tower parameters
+		if ((Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[0] == Difficulty.Tower) {
+			bool towerValid = rep.ReachedFloor >= this.FloorManagement.LastRegisteredFloor
+				&& rep.RemainingLives <= this.FloorManagement.CurrentNumberOfLives;
+			if (!towerValid)
+				return false;
+		}
+
+		for (int songNo = 0; songNo < this.DanSongScore.Length; ++songNo) {
+			bool judgeCountValidI = rep.IndividualGoodCount[songNo] >= this.DanSongScore[songNo].nGreat
+				&& rep.IndividualOkCount[songNo] >= this.DanSongScore[songNo].nGood
+				&& rep.IndividualBadCount[songNo] >= this.DanSongScore[songNo].nMiss
+				&& rep.IndividualRollCount[songNo] >= this.DanSongScore[songNo].nRoll
+				&& rep.IndividualMaxCombo[songNo] >= this.DanSongScore[songNo].nHighestCombo
+				&& rep.IndividualBoomCount[songNo] >= this.DanSongScore[songNo].nMine
+				&& rep.IndividualADLibCount[songNo] >= this.DanSongScore[songNo].nADLIB;
+			if (!judgeCountValidI)
+				return false;
+		}
+
+		return true;
 	}
 
 	// feed a replay's recorded (tjaTime, pad) inputs through the judge as the play clock reaches them
@@ -860,11 +895,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			// warp-aware chart time: recorded timestamps are in WARPED tja time (see tInputProcess_Drums), so
 			// releasing them against the raw clock desynced Dynamic Beat replays once the factor left 1.0
 			long nowTja = this.GetChartTimeNow(p);
+			this.msReplayTjaTime[p] = nowTja;
 			while (replayCursor[p] < inputs.Count && inputs[replayCursor[p]].Item1 <= nowTja) {
 				long tHit = (long)inputs[replayCursor[p]].Item1;
-				// resolve auto-misses up to this hit's EXACT recorded time first, so a recorded input can only claim
-				// a note that was genuinely still hittable at tHit (frame-cadence independent — see tReplayAutoMissBefore)
-				this.tReplayAutoMissBefore(p, tHit);
 				this.ProcessPadInput(p, (EPad)inputs[replayCursor[p]].Item2, tHit);
 				replayCursor[p]++;
 			}
@@ -1405,29 +1438,32 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			CTja tja = OpenTaiko.GetTJA(i)!;
 			var timeNow = tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs);
 			for (int iChip = 0; iChip < this.chipNowProcessingMultiHitNotes[i].Count; ++iChip) {
-				CChip chipNoHit = this.chipNowProcessingMultiHitNotes[i][iChip];
-				EGameType _gt = NotesManager.GetChipGameType(chipNoHit, i);
-				bool _isSwapNote = NotesManager.IsSwapNote(chipNoHit, _gt);
-
-				int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
-				var msWaitedTime = timeNow - (float)chipNoHit.msFirstMultiHit;
-				if (chipNoHit.eNoteState == ENoteState.Wait && msWaitedTime >= msMaxWaitTime) {
-					if (!_isSwapNote) {
-						this.tDrumsHitProcess((long)chipNoHit.msFirstMultiHit, EPad.Unknown, chipNoHit, false, i);
-						chipNoHit.padStoredHit = EPad.Unknown;
-						chipNoHit.bHit = true;
-						chipNoHit.IsHitted = true;
-					}
-					chipNoHit.eNoteState = ENoteState.None;
-				}
+				this.MultiHitNoteTimeout(i, this.chipNowProcessingMultiHitNotes[i][iChip], timeNow, msMaxPlayedTjaTime: this.msMaxPlayedTjaTime(i));
 			}
-
 			this.chipNowProcessingMultiHitNotes[i].RemoveAll(chip => chip.eNoteState != ENoteState.Wait);
 		}
 
 		#endregion
 
 		//string strNull = "Found";
+	}
+
+	protected override void MultiHitNoteTimeout(int iPlayer, CChip chip, double msTjaNowTime, double msMaxPlayedTjaTime = double.PositiveInfinity) {
+		EGameType _gt = NotesManager.GetChipGameType(chip, iPlayer);
+		bool _isSwapNote = NotesManager.IsSwapNote(chip, _gt);
+
+		int msMaxWaitTime = OpenTaiko.ConfigIni.nBigNoteWaitTimems;
+		var msJudgeTjaTime = Math.Min(msTjaNowTime, msMaxPlayedTjaTime);
+		var msWaitedTime = msJudgeTjaTime - (float)chip.msFirstMultiHit;
+		if (chip.eNoteState == ENoteState.Wait && msWaitedTime >= msMaxWaitTime) {
+			if (!_isSwapNote) {
+				this.tDrumsHitProcess((long)chip.msFirstMultiHit, EPad.Unknown, chip, false, iPlayer);
+				chip.padStoredHit = EPad.Unknown;
+				chip.bHit = true;
+				chip.IsHitted = true;
+			}
+			chip.eNoteState = ENoteState.None;
+		}
 	}
 
 	public void ChangeBranch(CTja.ECourse nAfter, int iPlayer, double msBranchPoint = double.MaxValue, bool stopAnime = false) {
