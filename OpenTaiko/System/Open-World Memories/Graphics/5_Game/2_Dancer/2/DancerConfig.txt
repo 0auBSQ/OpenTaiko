@@ -1,0 +1,13 @@
+Game_Dancer_X=960,1260,660,300,1600
+
+Game_Dancer_Y=770,770,770,770,770
+
+Game_Dancer_Motion=12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,0,1,2,3,4,5,6,7,8,9,10,11
+
+
+Game_Dancer_Beat=8
+Game_Dancer_In_Motion=0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12
+Game_Dancer_In_Interval=300
+
+
+Game_Dancer_Gauge=0,0,0,40,80
