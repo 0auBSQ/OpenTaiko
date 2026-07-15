@@ -175,6 +175,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "选择是否开启调试模式。开启后右下角会显示附加信息。敲击音效关闭时会显示延迟校准。",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "触摸太鼓大小",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "咚区域圆形的半径，以屏幕宽度的百分比表示。",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "触摸太鼓不透明度",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "屏幕上太鼓图案的不透明度（百分比）。100为完全不透明，设为0则隐藏。",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "触摸太鼓形状",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "为触摸太鼓自由绘制咚区域。区域以外均为咔。",
 		"SETTINGS_SYSTEM_DEBUGHUD": "调试HUD",

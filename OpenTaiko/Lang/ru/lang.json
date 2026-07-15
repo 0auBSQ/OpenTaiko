@@ -175,6 +175,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Указать, включен ли режим отладки. Это приведет к появлению дополнительной информации в правом нижнем углу экрана. Это отобразит вашу калибровку задержки для воспроизведения без звуков удары.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Размер сенсорного барабана",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Радиус круга Дон в % от ширины экрана.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Непрозрачность сенсорного барабана",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Непрозрачность изображения барабана на экране в процентах. 100 — полностью непрозрачный, 0 скрывает его.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Форма сенсорного барабана",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Нарисуйте свои области Дон для сенсорного барабана. Всё остальное будет Ка.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "Отладочный HUD",

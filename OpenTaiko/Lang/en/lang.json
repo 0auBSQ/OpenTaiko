@@ -175,6 +175,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Toggle whether debug mode is enabled. This will cause additional information to appear in the bottom right. This will display your latency calibration for hitsoundless play.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Touch Drum Size",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Radius of the Don drum circle as % of screen width.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Touch Drum Opacity",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Opacity of the on-screen drum overlay as a percentage. 100 is solid, 0 hides it.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Touch Drum Shape",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Draw custom Don areas for the touch drum. Everything outside them is Ka.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "Debug HUD",

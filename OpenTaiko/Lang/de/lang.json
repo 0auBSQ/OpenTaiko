@@ -175,6 +175,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Bestimmt, ob der Debug-Modus aktiviert ist. Zusätzliche Informationen erscheinen dann unten rechts. Es zeigt deine Latenzkalibrierung für das Spielen ohne Treffergeräusche an.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Touch-Trommel-Größe",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Radius des Don-Kreises in % der Bildschirmbreite.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Touch-Trommel-Deckkraft",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Deckkraft der Trommel-Anzeige auf dem Bildschirm in Prozent. 100 ist deckend, 0 blendet sie aus.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Touch-Trommel-Form",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Zeichne eigene Don-Bereiche für die Touch-Trommel. Alles außerhalb ist Ka.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "Debug-HUD",

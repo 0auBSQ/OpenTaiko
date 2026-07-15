@@ -350,6 +350,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public bool bAIBattleMode = false;
 	public int nControllerDeadzone = 50;
 	public int nTouchDrumVisual = 30; // Don radius as percentage of screen width (10-50)
+	public int nTouchDrumOpacity = 15; // touch drum overlay opacity percentage (0-100)
 
 	public CAIPerformances[] apAIPerformances = {
 		new CAIPerformances(500, 400, 100, 7, 200),
@@ -1396,6 +1397,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("; Touch drum radius as percentage of screen width (10-50).");
 		sw.WriteLine("TouchDrumVisual={0}", this.nTouchDrumVisual);
 		sw.WriteLine();
+		sw.WriteLine("; Touch drum overlay opacity percentage (0 hidden - 100 solid).");
+		sw.WriteLine("TouchDrumOpacity={0}", this.nTouchDrumOpacity);
+		sw.WriteLine();
 		sw.WriteLine("; リザルト画像自動保存機能(0:OFF, 1:ON)"); // #25399 2011.6.9 yyagi
 		sw.WriteLine("; Set \"1\" if you'd like to save result screen image automatically"); //
 		sw.WriteLine("; when you get hiscore/hiskill."); //
@@ -2221,6 +2225,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 				break;
 			case "TouchDrumVisual":
 				this.nTouchDrumVisual = CConversion.ParseIntInRange(value, 10, 50, this.nTouchDrumVisual);
+				break;
+			case "TouchDrumOpacity":
+				this.nTouchDrumOpacity = CConversion.ParseIntInRange(value, 0, 100, this.nTouchDrumOpacity);
 				break;
 			case "PolyphonicSounds":
 				this.nPoliphonicSounds = CConversion.ParseIntInRange(value, 1, 8, this.nPoliphonicSounds);

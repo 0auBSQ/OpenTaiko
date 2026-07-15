@@ -176,6 +176,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Activer ou non les informations de déboggage en jeu.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Taille du tambour tactile",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Rayon du cercle Don en % de la largeur de l'écran.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Opacité du tambour tactile",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Opacité de l'affichage du tambour à l'écran en pourcentage. 100 est opaque, 0 le masque.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Forme du tambour tactile",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Dessinez des zones Don personnalisées pour le tambour tactile. Tout le reste est Ka.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "HUD de débogage",

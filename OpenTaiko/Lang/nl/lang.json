@@ -175,6 +175,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Deze optie toont extra informatie rechtsonder op het scherm. Dit geeft de latentie kalibratie weer voor gameplay zonder geluidseffecten.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Grootte Touch-Trommel",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Straal van de Don-cirkel als % van de schermbreedte.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Dekking Touch-Trommel",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Dekking van de trommelweergave op het scherm in procenten. 100 is dekkend, 0 verbergt hem.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Vorm Touch-Trommel",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Teken eigen Don-gebieden voor de touch-trommel. Alles daarbuiten is Ka.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "Debug HUD",

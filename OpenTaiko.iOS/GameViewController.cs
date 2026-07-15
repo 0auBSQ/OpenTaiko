@@ -378,7 +378,10 @@ public partial class GameViewController : UIViewController {
 			// While in the Config stage, swap the drum overlay for the config D-pad (software arrow keys);
 			// the drum stays for gameplay and other menus.
 			if (_arrowOverlay == null) CreateArrowOverlay();
-			_arrowNavMode = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.Config;
+			bool inConfig = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.Config;
+			// Rebuild the drum overlay when leaving Config so size/opacity changes apply right away.
+			if (_arrowNavMode && !inConfig && !_touchOverlaySuppressed) RebuildTouchOverlay();
+			_arrowNavMode = inConfig;
 			if (_touchOverlay != null) _touchOverlay.Hidden = _arrowNavMode || _touchOverlaySuppressed;
 			if (_arrowOverlay != null) _arrowOverlay.Hidden = !_arrowNavMode || _touchOverlaySuppressed;
 

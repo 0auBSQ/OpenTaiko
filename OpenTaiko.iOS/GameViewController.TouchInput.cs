@@ -25,6 +25,12 @@ public partial class GameViewController {
 	// Single radius for both visual and hit detection
 	private double DonRadius => (global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumVisual ?? 30) / 100.0;
 
+	// Overlay alpha from the touch drum opacity: 100 solid, 0 hidden. Borders use weight 2.
+	private static byte OverlayAlpha(int weight) {
+		int opacity = Math.Clamp(global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumOpacity ?? 15, 0, 100);
+		return (byte)Math.Min(255, 255 * opacity * weight / 100);
+	}
+
 	private UIView? _touchOverlay;
 	// True while the shape editor is open; keeps the overlay hidden across rebuilds.
 	private bool _touchOverlaySuppressed;
@@ -64,8 +70,8 @@ public partial class GameViewController {
 			if (path != null) {
 				_touchOverlay.Layer.AddSublayer(new CAShapeLayer {
 					Path = path,
-					FillColor = TouchDrumShape.Tint(0x20).CGColor,
-					StrokeColor = TouchDrumShape.Tint(0x40).CGColor,
+					FillColor = TouchDrumShape.Tint(OverlayAlpha(1)).CGColor,
+					StrokeColor = TouchDrumShape.Tint(OverlayAlpha(2)).CGColor,
 					LineWidth = 1.5f,
 				});
 			}
@@ -75,10 +81,10 @@ public partial class GameViewController {
 			var cx = DonCenterX * w;
 			var cy = DonCenterY * h;
 			var donView = new UIView(new CGRect(cx - r, cy - r, r * 2, r * 2));
-			donView.BackgroundColor = TouchDrumShape.Tint(0x20);
+			donView.BackgroundColor = TouchDrumShape.Tint(OverlayAlpha(1));
 			donView.Layer.CornerRadius = (nfloat)r;
 			donView.Layer.BorderWidth = 1.5f;
-			donView.Layer.BorderColor = TouchDrumShape.Tint(0x40).CGColor;
+			donView.Layer.BorderColor = TouchDrumShape.Tint(OverlayAlpha(2)).CGColor;
 			_touchOverlay.AddSubview(donView);
 		}
 

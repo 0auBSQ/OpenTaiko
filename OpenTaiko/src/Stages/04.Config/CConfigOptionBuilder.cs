@@ -138,6 +138,10 @@ public static class CConfigOptionBuilder {
 		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
 			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_TOUCHDRUMSIZE", "Touch Drum Size"), L("SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC", "Radius of the Don drum circle as % of screen width."),
 				cfg.nTouchDrumVisual, 10, 50, 1, v => cfg.nTouchDrumVisual = v));
+		// iOS only: fade or hide the on-screen drum overlay.
+		if (OperatingSystem.IsIOS())
+			O.Add(CLuaConfigOption.Int_(SYS, secDisplay,L("SETTINGS_SYSTEM_TOUCHDRUMOPACITY", "Touch Drum Opacity"), L("SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC", "Opacity of the on-screen drum overlay as a percentage. 100 is solid, 0 hides it."),
+				cfg.nTouchDrumOpacity, 0, 100, 5, v => cfg.nTouchDrumOpacity = v));
 		// iOS only: draw custom touch drum areas instead of using the circle.
 		if (OperatingSystem.IsIOS())
 			O.Add(CLuaConfigOption.Action_(SYS, secDisplay,L("SETTINGS_SYSTEM_TOUCHDRUMSHAPE", "Touch Drum Shape"), L("SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC", "Draw custom Don areas for the touch drum. Everything outside them is Ka."),

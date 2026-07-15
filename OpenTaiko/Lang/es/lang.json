@@ -173,6 +173,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Alterna si modo de depuración está habilitado. Esto hará que aparezca información adicional en la parte inferior derecha. Esto mostrará la calibración de latencia para juego sin sonido.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Tamaño del Tambor Táctil",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Radio del círculo Don como % del ancho de la pantalla.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "Opacidad del Tambor Táctil",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "Opacidad del tambor en pantalla como porcentaje. 100 es opaco, 0 lo oculta.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Forma del Tambor Táctil",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Dibuja zonas Don personalizadas para el tambor táctil. Todo lo demás es Ka.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "HUD de Depuración",

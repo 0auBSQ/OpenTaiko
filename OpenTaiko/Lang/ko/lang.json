@@ -176,6 +176,8 @@
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "디버그 모드 사용 여부를 전환합니다. 디버그 모드를 키시면 우측 아래에 추가 정보를 띄웁니다.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "터치 북 크기",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE_DESC": "Don 원의 반지름을 화면 너비의 %로 지정합니다.",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY": "터치 북 불투명도",
+		"SETTINGS_SYSTEM_TOUCHDRUMOPACITY_DESC": "화면에 표시되는 북의 불투명도를 %로 지정합니다. 100이면 완전 불투명, 0이면 숨겨집니다.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "터치 북 모양",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "터치 북의 Don 영역을 직접 그려서 설정합니다. 영역 밖은 모두 Ka입니다.",
 		"SETTINGS_SYSTEM_DEBUGHUD": "디버그 HUD",
