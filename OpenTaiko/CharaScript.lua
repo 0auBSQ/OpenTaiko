@@ -406,11 +406,6 @@ local function load_config()
 		chara_config.game_motion_gogostart_max = csarray_to_motiontable(ini_game_motion_gogostart_max)
 	end
 
-	local ini_game_motion_gogostart_max = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGoStart_Max")
-	if ini_game_motion_gogostart_max.Length >= 1 then
-		chara_config.game_motion_gogostart_max = csarray_to_motiontable(ini_game_motion_gogostart_max)
-	end
-
 	local ini_game_motion_return = chara_config_ini:GetIntArray("Game_Chara_Motion_Return")
 	if ini_game_motion_return.Length >= 1 then
 		chara_config.game_motion_return = csarray_to_motiontable(ini_game_motion_return)
@@ -496,8 +491,8 @@ local function load_config()
 	chara_config.game_beat_clear_max = chara_config.game_beat_clear
 	chara_config.game_beat_clear_max = chara_config_ini:GetDouble("Game_Chara_Beat_ClearMax", chara_config.game_beat_clear_max)
 	chara_config.game_beat_gogo = chara_config_ini:GetDouble("Game_Chara_Beat_GoGo", chara_config.game_beat_gogo)
-	chara_config.game_beat_gogo_max = chara_config_ini:GetDouble("Game_Chara_Beat_GoGo", chara_config.game_beat_gogo)
 	chara_config.game_beat_gogo_max = chara_config.game_beat_gogo
+	chara_config.game_beat_gogo_max = chara_config_ini:GetDouble("Game_Chara_Beat_GoGoMax", chara_config.game_beat_gogo_max)
 	chara_config.game_beat_miss = chara_config_ini:GetDouble("Game_Chara_Beat_Miss", chara_config.game_beat_miss)
 	chara_config.game_beat_miss_down = chara_config_ini:GetDouble("Game_Chara_Beat_MissDown", chara_config.game_beat_miss_down)
 	chara_config.game_beat_10combo = chara_config_ini:GetDouble("Game_Chara_Beat_10Combo", chara_config.game_beat_10combo)
