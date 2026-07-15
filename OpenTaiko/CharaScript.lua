@@ -583,23 +583,12 @@ end
 
 animation_defs = load_animation_defs(chara_config, animation_builder)
 
-local available_animations = {}
-
 function availableAnimation(animationType)
-	local flag = available_animations[animationType]
-	if flag ~= nil and flag == true then
-		return true
-	else
-		return false
-	end
+	return animations[animationType] ~= nil
 end
 
 function loadAnimation(animationType)
 	animations[animationType] = animation_defs[animationType]:builder()
-
-	if animations[animationType] ~= nil then
-		available_animations[animationType] = true
-	end
 end
 
 function disposeAnimation(animationType)
@@ -607,8 +596,7 @@ function disposeAnimation(animationType)
 	if animation_data ~= nil then
 		animation_data:dispose()
 	end
-
-	available_animations[animationType] = false
+	animations[animationType] = nil
 end
 
 function setAnimationDuration(animationType, duration)
@@ -636,6 +624,7 @@ function disposeVoice(voiceType)
 	if voice ~= nil then
 		voice:Dispose()
 	end
+	voices[voiceType] = nil
 end
 
 function playVoice(voiceType)
