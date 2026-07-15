@@ -35,173 +35,190 @@ local voice_files = {
 	[CHARACTER.VOICE_RESULT_DANGOLDPASS] = "Sounds/Result/DanGoldPass.ogg";
 }
 
-local animation_dirs = {
-	[CHARACTER.ANIM_GAME_NORMAL] = "Normal";
-	[CHARACTER.ANIM_GAME_CLEAR] = "Clear";
-	[CHARACTER.ANIM_GAME_MAX] = "Clear_Max";
-	[CHARACTER.ANIM_GAME_GOGO] = "GoGo";
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = "GoGo_Max";
-	[CHARACTER.ANIM_GAME_MISS] = "Miss";
-	[CHARACTER.ANIM_GAME_MISS_DOWN] = "MissDown";
-	[CHARACTER.ANIM_GAME_10COMBO] = "10combo"; -- Title-cased in 0.6.0 TextureLoader
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = "10combo_Max"; -- Title-cased in 0.6.0 TextureLoader
-	[CHARACTER.ANIM_GAME_CLEARED] = "Cleared";
-	[CHARACTER.ANIM_GAME_FAILED] = "Failed";
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = "ClearOut";
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = "Clearin"; -- Title-cased in 0.6.0 TextureLoader
-	[CHARACTER.ANIM_GAME_MAX_OUT] = "SoulOut";
-	[CHARACTER.ANIM_GAME_MAX_IN] = "Soulin"; -- Title-cased in 0.6.0 TextureLoader
-	[CHARACTER.ANIM_GAME_MISS_IN] = "MissIn";
-	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = "MissDownIn";
-	[CHARACTER.ANIM_GAME_RETURN] = "Return";
-	[CHARACTER.ANIM_GAME_GOGOSTART] = "GoGoStart";
-	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = "GoGoStart_Clear";
-	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = "GoGoStart_Max";
-	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = "Balloon_Breaking";
-	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = "Balloon_Broke";
-	[CHARACTER.ANIM_GAME_BALLOON_MISS] = "Balloon_Miss";
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = "Kusudama_Breaking";
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = "Kusudama_Broke";
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = "Kusudama_Miss";
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = "Kusudama_Idle";
+local animations = {}
+local animation_defs = {}
+local function load_animation_defs(C --[[chara_config]], B --[[animation_builder]]) return {
+	[CHARACTER.ANIM_PREVIEW] = { builder = B.preview };
+	[CHARACTER.ANIM_RENDER] = { builder = B.render };
 
-	[CHARACTER.ANIM_GAME_TOWER_STANDING] = "Tower_Char/Standing";
-	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = "Tower_Char/Standing_Tired";
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = "Tower_Char/Climbing";
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = "Tower_Char/Climbing_Tired";
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = "Tower_Char/Running";
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = "Tower_Char/Running_Tired";
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = "Tower_Char/Clear";
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = "Tower_Char/Clear_Tired";
-	[CHARACTER.ANIM_GAME_TOWER_FAIL] = "Tower_Char/Fail";
+	[CHARACTER.ANIM_GAME_NORMAL] = { dir = "Normal", offset = C.game_offset, motion = C.game_motion_normal, beat = C.game_beat_normal, builder = B.animation };
+	[CHARACTER.ANIM_GAME_CLEAR] = { dir = "Clear", offset = C.game_offset, motion = C.game_motion_clear, beat = C.game_beat_clear, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MAX] = { dir = "Clear_Max", offset = C.game_offset, motion = C.game_motion_clear_max, beat = C.game_beat_clear_max, builder = B.animation };
+	[CHARACTER.ANIM_GAME_GOGO] = { dir = "GoGo", offset = C.game_offset, motion = C.game_motion_gogo, beat = C.game_beat_gogo, builder = B.animation };
+	[CHARACTER.ANIM_GAME_GOGO_MAX] = { dir = "GoGo_Max", offset = C.game_offset, motion = C.game_motion_gogo_max, beat = C.game_beat_gogo_max, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MISS] = { dir = "Miss", offset = C.game_offset, motion = C.game_motion_miss, beat = C.game_beat_miss, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MISS_DOWN] = { dir = "MissDown", offset = C.game_offset, motion = C.game_motion_miss_down, beat = C.game_beat_miss_down, builder = B.animation };
+	[CHARACTER.ANIM_GAME_10COMBO] = { dir = "10combo" --[[Title-cased in 0.6.0]], offset = C.game_offset, motion = C.game_motion_10combo, beat = C.game_beat_10combo, builder = B.animation };
+	[CHARACTER.ANIM_GAME_10COMBO_MAX] = { dir = "10combo_Max" --[[Title-cased in 0.6.0]], offset = C.game_offset, motion = C.game_motion_10combo_max, beat = C.game_beat_10combo_max, builder = B.animation };
+	[CHARACTER.ANIM_GAME_CLEARED] = { dir = "Cleared", offset = C.game_offset, motion = C.game_motion_cleared, beat = C.game_beat_cleared, builder = B.animation };
+	[CHARACTER.ANIM_GAME_FAILED] = { dir = "Failed", offset = C.game_offset, motion = C.game_motion_failed, beat = C.game_beat_failed, builder = B.animation };
+	[CHARACTER.ANIM_GAME_CLEAR_OUT] = { dir = "ClearOut", offset = C.game_offset, motion = C.game_motion_clearout, beat = C.game_beat_clearout, builder = B.animation };
+	[CHARACTER.ANIM_GAME_CLEAR_IN] = { dir = "Clearin" --[[Title-cased in 0.6.0]], offset = C.game_offset, motion = C.game_motion_clearin, beat = C.game_beat_clearin, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MAX_OUT] = { dir = "SoulOut", offset = C.game_offset, motion = C.game_motion_soulout, beat = C.game_beat_soulout, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MAX_IN] = { dir = "Soulin" --[[Title-cased in 0.6.0]], offset = C.game_offset, motion = C.game_motion_soulin, beat = C.game_beat_soulin, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MISS_IN] = { dir = "MissIn", offset = C.game_offset, motion = C.game_motion_missin, beat = C.game_beat_missin, builder = B.animation };
+	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = { dir = "MissDownIn", offset = C.game_offset, motion = C.game_motion_missdownin, beat = C.game_beat_missdownin, builder = B.animation };
+	[CHARACTER.ANIM_GAME_RETURN] = { dir = "Return", offset = C.game_offset, motion = C.game_motion_return, beat = C.game_beat_return, builder = B.animation };
+	[CHARACTER.ANIM_GAME_GOGOSTART] = { dir = "GoGoStart", offset = C.game_offset, motion = C.game_motion_gogostart, beat = C.game_beat_gogostart, builder = B.animation };
+	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = { dir = "GoGoStart_Clear", offset = C.game_offset, motion = C.game_motion_gogostart_clear, beat = C.game_beat_gogostart_clear, builder = B.animation };
+	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = { dir = "GoGoStart_Max", offset = C.game_offset, motion = C.game_motion_gogostart_max, beat = C.game_beat_gogostart_max, builder = B.animation };
+	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = { dir = "Balloon_Breaking", offset = C.game_balloon_offset, motion = C.game_motion_balloon_breaking, beat = C.game_beat_balloon_breaking, builder = B.animation };
+	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = { dir = "Balloon_Broke", offset = C.game_balloon_offset, motion = C.game_motion_balloon_broke, beat = C.game_beat_balloon_broke, builder = B.animation };
+	[CHARACTER.ANIM_GAME_BALLOON_MISS] = { dir = "Balloon_Miss", offset = C.game_balloon_offset, motion = C.game_motion_balloon_miss, beat = C.game_beat_balloon_miss, builder = B.animation };
+	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = { dir = "Kusudama_Breaking", offset = C.game_kusudama_offset, motion = C.game_motion_kusudama_breaking, beat = C.game_beat_kusudama_breaking, builder = B.animation };
+	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = { dir = "Kusudama_Broke", offset = C.game_kusudama_offset, motion = C.game_motion_kusudama_broke, beat = C.game_beat_kusudama_broke, builder = B.animation };
+	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = { dir = "Kusudama_Miss", offset = C.game_kusudama_offset, motion = C.game_motion_kusudama_miss, beat = C.game_beat_kusudama_miss, builder = B.animation };
+	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = { dir = "Kusudama_Idle", offset = C.game_kusudama_offset, motion = C.game_motion_kusudama_idle, beat = C.game_beat_kusudama_idle, builder = B.animation };
 
-	[CHARACTER.ANIM_MENU_WAIT] = "Menu_Wait";
-	[CHARACTER.ANIM_MENU_START] = "Menu_Start";
-	[CHARACTER.ANIM_MENU_NORMAL] = "Menu_Loop";
-	[CHARACTER.ANIM_MENU_SELECT] = "Menu_Select";
-	[CHARACTER.ANIM_ENTRY_NORMAL] = "Title_Normal";
-	[CHARACTER.ANIM_ENTRY_JUMP] = "Title_Entry";
+	[CHARACTER.ANIM_GAME_TOWER_STANDING] = { dir = "Tower_Char/Standing", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_standing, beat = C.game_beat_tower_standing, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = { dir = "Tower_Char/Standing_Tired", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_standing_tired, beat = C.game_beat_tower_standing_tired, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = { dir = "Tower_Char/Climbing", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_climbing, beat = C.game_beat_tower_climbing, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = { dir = "Tower_Char/Climbing_Tired", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_climbing_tired, beat = C.game_beat_tower_climbing_tired, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = { dir = "Tower_Char/Running", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_running, beat = C.game_beat_tower_running, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = { dir = "Tower_Char/Running_Tired", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_running_tired, beat = C.game_beat_tower_running_tired, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = { dir = "Tower_Char/Clear", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_clear, beat = C.game_beat_tower_clear, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = { dir = "Tower_Char/Clear_Tired", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_clear_tired, beat = C.game_beat_tower_clear_tired, builder = B.animation };
+	[CHARACTER.ANIM_GAME_TOWER_FAIL] = { dir = "Tower_Char/Fail", offset = C.game_chara_tower_offset, motion = C.game_motion_tower_fail, beat = C.game_beat_tower_fail, builder = B.animation };
 
-	[CHARACTER.ANIM_RESULT_NORMAL] = "Result_Normal";
-	[CHARACTER.ANIM_RESULT_CLEAR] = "Result_Clear";
-	[CHARACTER.ANIM_RESULT_FAILED_IN] = "Result_Failed_In";
-	[CHARACTER.ANIM_RESULT_FAILED] = "Result_Failed";
-}
+	[CHARACTER.ANIM_MENU_WAIT] = { dir = "Menu_Wait", offset = C.menu_offset, motion = C.menu_motion_normal, beat = C.menu_beat_normal, builder = B.animation };
+	[CHARACTER.ANIM_MENU_START] = { dir = "Menu_Start", offset = C.menu_offset, motion = C.menu_motion_start, beat = C.menu_beat_start, builder = B.animation };
+	[CHARACTER.ANIM_MENU_NORMAL] = { dir = "Menu_Loop", offset = C.menu_offset, motion = C.menu_motion_normal, beat = C.menu_beat_normal, builder = B.animation };
+	[CHARACTER.ANIM_MENU_SELECT] = { dir = "Menu_Select", offset = C.menu_offset, motion = C.menu_motion_select, beat = C.menu_beat_select, builder = B.animation };
+	[CHARACTER.ANIM_ENTRY_NORMAL] = { dir = "Title_Normal", offset = C.menu_offset, motion = C.title_motion_normal, beat = C.title_beat_normal, builder = B.animation };
+	[CHARACTER.ANIM_ENTRY_JUMP] = { dir = "Title_Entry", offset = C.menu_offset, motion = C.title_motion_entry, beat = C.title_beat_entry, builder = B.animation };
 
-local chara_config = {
-	chara_version = "";
-	resolution = VECTOR2:CreateVector2(1280, 720);
-	legacy_mode = true;
-	heya_render_offset = VECTOR2:CreateVector2(0, 0);
-	menu_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1.0; };
-	menu_motion_normal = nil;
-	menu_motion_wait = nil;
-	menu_motion_start = nil;
-	menu_motion_select = nil;
-	menu_beat_normal = 2;
-	menu_beat_wait = 1;
-	menu_beat_start = 1;
-	menu_beat_select = 2;
+	[CHARACTER.ANIM_RESULT_NORMAL] = { dir = "Result_Normal", offset = C.result_offset, motion = C.result_motion_normal, beat = C.result_beat_normal, builder = B.animation };
+	[CHARACTER.ANIM_RESULT_CLEAR] = { dir = "Result_Clear", offset = C.result_offset, motion = C.result_motion_clear, beat = C.result_beat_clear, builder = B.animation };
+	[CHARACTER.ANIM_RESULT_FAILED_IN] = { dir = "Result_Failed_In", offset = C.result_offset, motion = C.result_motion_failed_in, beat = C.result_beat_failed_in, builder = B.animation };
+	[CHARACTER.ANIM_RESULT_FAILED] = { dir = "Result_Failed", offset = C.result_offset, motion = C.result_motion_failed, beat = C.result_beat_failed, builder = B.animation };
+} end
 
-	title_motion_normal = nil;
-	title_motion_entry = nil;
-	title_beat_normal = 1;
-	title_beat_entry = 1;
+local chara_config = {}
+local function load_chara_config_defs(L --[[chara_config_loader]]) return { -- need to be an ordered array for fallback dependencies
+	{ key = "chara_version", default = "", config = "Chara_Version", loader = L.string };
+	{ key = "resolution", default = VECTOR2:CreateVector2(1280, 720), config = "Chara_Resolution", loader = L.int_xy };
+	{ key = "legacy_mode", default = true, config = "Chara_LegacyMode", loader = L.bool };
+	{ key = "heya_render_offset", default = VECTOR2:CreateVector2(0, 0), config = "Heya_Chara_Render_Offset", loader = L.int_xy };
 
-	game_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME; v1_scale = 1.25 --[[1 / Game_Chara_Scale]]; };
-	game_ai_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_AI; v1_scale = 1.25 --[[0.58 / Game_Chara_Scale_AI]]; };
-	game_balloon_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_BALLOON; v1_scale = 1; };
-	game_kusudama_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_KUSUDAMA; v1_scale = 1; };
-	game_chara_tower_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_TOWER; v1_scale = 1; };
-	game_motion_normal = nil;
-	game_motion_clear = nil;
-	game_motion_clear_max = nil;
-	game_motion_gogo = nil;
-	game_motion_gogo_max = nil;
-	game_motion_miss = nil;
-	game_motion_miss_down = nil;
-	game_motion_10combo = nil;
-	game_motion_10combo_max = nil;
-	game_motion_cleared = nil;
-	game_motion_failed = nil;
-	game_motion_clearout = nil;
-	game_motion_clearin = nil;
-	game_motion_soulout = nil;
-	game_motion_soulin = nil;
-	game_motion_missin = nil;
-	game_motion_missdownin = nil;
-	game_motion_return = nil;
-	game_motion_gogostart = nil;
-	game_motion_gogostart_clear = nil;
-	game_motion_gogostart_max = nil;
-	game_motion_balloon_breaking = nil;
-	game_motion_balloon_broke = nil;
-	game_motion_balloon_miss = nil;
-	game_motion_kusudama_breaking = nil;
-	game_motion_kusudama_idle = nil;
-	game_motion_kusudama_broke = nil;
-	game_motion_kusudama_miss = nil;
+	{ key = "menu_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1.0; },
+		config = "Menu_Offset", loader = L.offset, v1_scale = "Menu_Chara_Scale" };
 
-	game_motion_tower_standing = nil;
-	game_motion_tower_standing_tired = nil;
-	game_motion_tower_climbing = nil;
-	game_motion_tower_climbing_tired = nil;
-	game_motion_tower_running = nil;
-	game_motion_tower_running_tired = nil;
-	game_motion_tower_clear = nil;
-	game_motion_tower_clear_tired = nil;
-	game_motion_tower_fail = nil;
+	{ key = "menu_motion_normal", default = nil, config = "Menu_Chara_Motion_Loop", loader = L.motion };
+	{ key = "menu_motion_wait", default = nil, config = "Menu_Chara_Motion_Wait", loader = L.motion };
+	{ key = "menu_motion_start", default = nil, config = "Menu_Chara_Motion_Start", loader = L.motion };
+	{ key = "menu_motion_select", default = nil, config = "Menu_Chara_Motion_Select", loader = L.motion };
+	{ key = "menu_beat_normal", default = 2, config = "Menu_Chara_Beat_Normal", loader = L.beat, duration = "Chara_Menu_Loop_AnimationDuration", ms_per_beat = 500.0 };
+	{ key = "menu_beat_wait", default = 1, config = "Menu_Chara_Beat_Wait", loader = L.beat, duration = "Chara_Menu_Wait_AnimationDuration", ms_per_beat = 500.0 };
+	{ key = "menu_beat_start", default = 1, config = "Menu_Chara_Beat_Start", loader = L.beat, duration = "Chara_Menu_Start_AnimationDuration", ms_per_beat = 500.0 };
+	{ key = "menu_beat_select", default = 2, config = "Menu_Chara_Beat_Select", loader = L.beat, duration = "Chara_Menu_Select_AnimationDuration", ms_per_beat = 500.0 };
 
-	game_beat_normal = 1;
-	game_beat_clear = 1;
-	game_beat_clear_max = 1;
-	game_beat_gogo = 1;
-	game_beat_gogo_max = 1;
-	game_beat_miss = 1;
-	game_beat_miss_down = 1;
-	game_beat_10combo = 1.5;
-	game_beat_10combo_max = 1.5;
-	game_beat_cleared = 1.5;
-	game_beat_failed = 1.5;
-	game_beat_clearout = 1.5;
-	game_beat_clearin = 1.5;
-	game_beat_soulout = 1.5;
-	game_beat_soulin = 1.5;
-	game_beat_missin = 1;
-	game_beat_missdownin = 1;
-	game_beat_return = 1.5;
-	game_beat_gogostart = 1.5;
-	game_beat_gogostart_clear = 1.5;
-	game_beat_gogostart_max = 1.5;
-	game_beat_balloon_breaking = 0.25;
-	game_beat_balloon_broke = 2.0;
-	game_beat_balloon_miss = 2.0;
-	game_beat_kusudama_breaking = 0.25;
-	game_beat_kusudama_idle = 1.0;
-	game_beat_kusudama_broke = 2.0;
-	game_beat_kusudama_miss = 2.0;
+	{ key = "title_motion_normal", default = nil, config = "Title_Chara_Motion_Normal", loader = L.motion };
+	{ key = "title_motion_entry", default = nil, config = "Title_Chara_Motion_Entry", loader = L.motion };
+	{ key = "title_beat_normal", default = 1, config = "Title_Chara_Beat_Normal", loader = L.beat, duration = "Chara_Normal_AnimationDuration" };
+	{ key = "title_beat_entry", default = 1, config = "Title_Chara_Beat_Entry", loader = L.beat, duration = "Chara_Entry_AnimationDuration" };
 
-	game_beat_tower_standing = 1.0;
-	game_beat_tower_standing_tired = 1.0;
-	game_beat_tower_climbing = 1.0;
-	game_beat_tower_climbing_tired = 1.0;
-	game_beat_tower_running = 1.0;
-	game_beat_tower_running_tired = 1.0;
-	game_beat_tower_clear = 1.0;
-	game_beat_tower_clear_tired = 1.0;
-	game_beat_tower_fail = 1.0;
+	{ key = "game_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME; v1_scale = 1.25 --[[1 / Game_Chara_Scale]]; },
+		config = "Game_Chara_Offset", loader = L.offset, x_P1 = "Game_Chara_X", y_P1 = "Game_Chara_Y" };
+	{ key = "game_ai_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_AI; v1_scale = 1.25 --[[0.58 / Game_Chara_Scale_AI]]; } };
+	{ key = "ai_positions_x", default = nil, config = "Game_Chara_X_AI", loader = L.ints };
+	{ key = "ai_positions_y", default = nil, config = "Game_Chara_Y_AI", loader = L.ints };
+	{ key = "game_balloon_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_BALLOON; v1_scale = 1; },
+		config = "Game_Chara_Balloon_Offset", loader = L.offset, x_P1 = "Game_Chara_Balloon_X", y_P1 = "Game_Chara_Balloon_Y" };
+	{ key = "game_kusudama_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_KUSUDAMA; v1_scale = 1; },
+		config = "Game_Chara_Kusudama_Offset", loader = L.offset, x_P1 = "Game_Chara_Kusudama_X", y_P1 = "Game_Chara_Kusudama_Y" };
+	{ key = "game_chara_tower_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_GAME_TOWER; v1_scale = 1; },
+		config = "Game_Chara_Tower_Offset", loader = L.offset };
 
+	{ key = "game_motion_normal", default = nil, config = "Game_Chara_Motion_Normal", loader = L.motion };
+	{ key = "game_motion_clear", default = nil, config = "Game_Chara_Motion_Clear", loader = L.motion };
+	{ key = "game_motion_clear_max", default = nil, config = "Game_Chara_Motion_Clear_Max", loader = L.motion, fallbacks = { "game_motion_clear" } };
+	{ key = "game_motion_gogo", default = nil, config = "Game_Chara_Motion_GoGo", loader = L.motion };
+	{ key = "game_motion_gogo_max", default = nil, config = "Game_Chara_Motion_GoGo_Max", loader = L.motion, fallbacks = { "game_motion_gogo" } };
+	{ key = "game_motion_miss", default = nil, config = "Game_Chara_Motion_Miss", loader = L.motion };
+	{ key = "game_motion_miss_down", default = nil, config = "Game_Chara_Motion_Miss_Down", loader = L.motion };
+	{ key = "game_motion_10combo", default = nil, config = "Game_Chara_Motion_10Combo", loader = L.motion };
+	{ key = "game_motion_10combo_max", default = nil, config = "Game_Chara_Motion_10Combo_Max", loader = L.motion };
+	{ key = "game_motion_cleared", default = nil, config = "Game_Chara_Motion_Cleared", loader = L.motion };
+	{ key = "game_motion_failed", default = nil, config = "Game_Chara_Motion_Failed", loader = L.motion };
+	{ key = "game_motion_clearout", default = nil, config = "Game_Chara_Motion_ClearOut", loader = L.motion };
+	{ key = "game_motion_clearin", default = nil, config = "Game_Chara_Motion_ClearIn", loader = L.motion };
+	{ key = "game_motion_soulout", default = nil, config = "Game_Chara_Motion_SoulOut", loader = L.motion };
+	{ key = "game_motion_soulin", default = nil, config = "Game_Chara_Motion_SoulIn", loader = L.motion };
+	{ key = "game_motion_missin", default = nil, config = "Game_Chara_Motion_MissIn", loader = L.motion };
+	{ key = "game_motion_missdownin", default = nil, config = "Game_Chara_Motion_MissDownIn", loader = L.motion };
+	{ key = "game_motion_return", default = nil, config = "Game_Chara_Motion_Return" };
+	{ key = "game_motion_gogostart", default = nil, config = "Game_Chara_Motion_GoGoStart", loader = L.motion };
+	{ key = "game_motion_gogostart_clear", default = nil, config = "Game_Chara_Motion_GoGoStart_Clear", loader = L.motion, fallbacks = { "game_motion_gogostart" } };
+	{ key = "game_motion_gogostart_max", default = nil, config = "Game_Chara_Motion_GoGoStart_Max", loader = L.motion, fallbacks = { "game_motion_gogostart" } };
+	{ key = "game_motion_balloon_breaking", default = nil, config = "Game_Chara_Motion_Balloon_Breaking", loader = L.motion };
+	{ key = "game_motion_balloon_broke", default = nil, config = "Game_Chara_Motion_Balloon_Broke", loader = L.motion };
+	{ key = "game_motion_balloon_miss", default = nil, config = "Game_Chara_Motion_Balloon_Miss", loader = L.motion };
+	{ key = "game_motion_kusudama_breaking", default = nil, config = "Game_Chara_Motion_Kusudama_Breaking", loader = L.motion };
+	{ key = "game_motion_kusudama_idle", default = nil, config = "Game_Chara_Motion_Kusudama_Idle", loader = L.motion };
+	{ key = "game_motion_kusudama_broke", default = nil, config = "Game_Chara_Motion_Kusudama_Broke", loader = L.motion };
+	{ key = "game_motion_kusudama_miss", default = nil, config = "Game_Chara_Motion_Kusudama_Miss", loader = L.motion };
 
-	result_offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_RESULT; v1_scale = 1; };
-	result_motion_normal = nil;
-	result_motion_clear = nil;
-	result_motion_failed_in = nil;
-	result_motion_failed = nil;
-	result_beat_normal = 1;
-	result_beat_clear = 1;
-	result_beat_failed_in = 1;
-	result_beat_failed = 1;
-}
+	{ key = "game_motion_tower_standing", default = nil, config = "Game_Chara_Motion_Tower_Standing", loader = L.motion };
+	{ key = "game_motion_tower_standing_tired", default = nil, config = "Game_Chara_Motion_Tower_Standing_Tired", loader = L.motion, fallbacks = { "game_motion_tower_standing" } };
+	{ key = "game_motion_tower_climbing", default = nil, config = "Game_Chara_Motion_Tower_Climbing", loader = L.motion };
+	{ key = "game_motion_tower_climbing_tired", default = nil, config = "Game_Chara_Motion_Tower_Climbing_Tired", loader = L.motion, fallbacks = { "game_motion_tower_climbing" } };
+	{ key = "game_motion_tower_running", default = nil };
+	{ key = "game_motion_tower_running_tired", default = nil };
+	{ key = "game_motion_tower_clear", default = nil, config = "Game_Chara_Motion_Tower_Clear", loader = L.motion };
+	{ key = "game_motion_tower_clear_tired", default = nil, config = "Game_Chara_Motion_Tower_Clear_Tired", loader = L.motion, fallbacks = { "game_motion_tower_clear" } };
+	{ key = "game_motion_tower_fail", default = nil };
+
+	{ key = "game_beat_normal", default = 1, config = "Game_Chara_Beat_Normal", loader = L.beat };
+	{ key = "game_beat_clear", default = 1, config = "Game_Chara_Beat_Clear", loader = L.beat };
+	{ key = "game_beat_clear_max", default = 1, config = "Game_Chara_Beat_ClearMax", loader = L.beat, fallbacks = { "game_beat_clear" } };
+	{ key = "game_beat_gogo", default = 1, config = "Game_Chara_Beat_GoGo", loader = L.beat };
+	{ key = "game_beat_gogo_max", default = 1, config = "Game_Chara_Beat_GoGoMax", loader = L.beat, fallbacks = { "game_beat_gogo" } };
+	{ key = "game_beat_miss", default = 1, config = "Game_Chara_Beat_Miss", loader = L.beat };
+	{ key = "game_beat_miss_down", default = 1, config = "Game_Chara_Beat_MissDown", loader = L.beat };
+	{ key = "game_beat_10combo", default = 1.5, config = "Game_Chara_Beat_10Combo", loader = L.beat };
+	{ key = "game_beat_10combo_max", default = 1.5, config = "Game_Chara_Beat_10ComboMax", loader = L.beat };
+	{ key = "game_beat_cleared", default = 1.5, config = "Game_Chara_Beat_Cleared", loader = L.beat };
+	{ key = "game_beat_failed", default = 1.5, config = "Game_Chara_Beat_Failed", loader = L.beat };
+	{ key = "game_beat_clearout", default = 1.5, config = "Game_Chara_Beat_ClearOut", loader = L.beat };
+	{ key = "game_beat_clearin", default = 1.5, config = "Game_Chara_Beat_ClearIn", loader = L.beat };
+	{ key = "game_beat_soulout", default = 1.5, config = "Game_Chara_Beat_SoulOut", loader = L.beat };
+	{ key = "game_beat_soulin", default = 1.5, config = "Game_Chara_Beat_SoulIn", loader = L.beat };
+	{ key = "game_beat_missin", default = 1, config = "Game_Chara_Beat_MissIn", loader = L.beat };
+	{ key = "game_beat_missdownin", default = 1, config = "Game_Chara_Beat_MissDownIn", loader = L.beat };
+	{ key = "game_beat_return", default = 1.5, config = "Game_Chara_Beat_Return", loader = L.beat };
+	{ key = "game_beat_gogostart", default = 1.5, config = "Game_Chara_Beat_GoGoStart", loader = L.beat };
+	{ key = "game_beat_gogostart_clear", default = 1.5, config = "Game_Chara_Beat_GoGoStartClear", loader = L.beat };
+	{ key = "game_beat_gogostart_max", default = 1.5, config = "Game_Chara_Beat_GoGoStartMax", loader = L.beat };
+	{ key = "game_beat_balloon_breaking", default = 0.25, config = "Game_Chara_Beat_Balloon_Breaking", loader = L.beat };
+	{ key = "game_beat_balloon_broke", default = 2.0, config = "Game_Chara_Beat_Balloon_Broke", loader = L.beat };
+	{ key = "game_beat_balloon_miss", default = 2.0, config = "Game_Chara_Beat_Balloon_Miss", loader = L.beat };
+	{ key = "game_beat_kusudama_breaking", default = 0.25, config = "Game_Chara_Beat_Kusudama_Breaking", loader = L.beat };
+	{ key = "game_beat_kusudama_idle", default = 1.0, config = "Game_Chara_Beat_Kusudama_Idle", loader = L.beat };
+	{ key = "game_beat_kusudama_broke", default = 2.0, config = "Game_Chara_Beat_Kusudama_Broke", loader = L.beat };
+	{ key = "game_beat_kusudama_miss", default = 2.0, config = "Game_Chara_Beat_Kusudama_Miss", loader = L.beat };
+
+	{ key = "game_beat_tower_standing", default = 1.0, config = "Game_Chara_Beat_Tower_Standing", loader = L.beat };
+	{ key = "game_beat_tower_standing_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Standing_Tired", loader = L.beat };
+	{ key = "game_beat_tower_climbing", default = 1.0, config = "Game_Chara_Beat_Tower_Climbing", loader = L.beat };
+	{ key = "game_beat_tower_climbing_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Climbing_Tired", loader = L.beat };
+	{ key = "game_beat_tower_running", default = 1.0 };
+	{ key = "game_beat_tower_running_tired", default = 1.0 };
+	{ key = "game_beat_tower_clear", default = 1.0, config = "Game_Chara_Beat_Tower_Clear", loader = L.beat };
+	{ key = "game_beat_tower_clear_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Clear_Tired", loader = L.beat };
+	{ key = "game_beat_tower_fail", default = 1.0, config = "Game_Chara_Beat_Tower_Fail", loader = L.beat };
+
+	{ key = "result_offset", default = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_RESULT; v1_scale = 1; },
+		config = "Result_Offset", loader = L.offset };
+
+	{ key = "result_motion_normal", default = nil, config = "Result_Chara_Motion_Normal", loader = L.motion };
+	{ key = "result_motion_clear", default = nil, config = "Result_Chara_Motion_Clear", loader = L.motion };
+	{ key = "result_motion_failed_in", default = nil, config = "Result_Chara_Motion_Failed_In", loader = L.motion };
+	{ key = "result_motion_failed", default = nil, config = "Result_Chara_Motion_Failed", loader = L.motion };
+	{ key = "result_beat_normal", default = 1, config = "Result_Chara_Beat_Normal", loader = L.beat, duration = "Chara_Result_Normal_AnimationDuration" };
+	{ key = "result_beat_clear", default = 1, config = "Result_Chara_Beat_Clear", loader = L.beat, duration = "Chara_Result_Clear_AnimationDuration" };
+	{ key = "result_beat_failed_in", default = 1, config = "Result_Chara_Beat_Failed_In", loader = L.beat, duration = "Chara_Result_Failed_In_AnimationDuration" };
+	{ key = "result_beat_failed", default = 1, config = "Result_Chara_Beat_Failed", loader = L.beat, duration = "Chara_Result_Failed_AnimationDuration" };
+} end
 
 local function csarray_to_motiontable(csarray)
 	local luatable = {}
@@ -211,565 +228,67 @@ local function csarray_to_motiontable(csarray)
 	return luatable
 end
 
+local chara_config_loader = {} -- (Def, Ini, ValueDefault)
+function chara_config_loader.bool(D, I, V) return I:GetBool(D.config, V) end
+function chara_config_loader.double(D, I, V) return I:GetDouble(D.config, V) end
+function chara_config_loader.string(D, I, V) return I:GetString(D.config, V) end
+function chara_config_loader.motion(D, I, V)
+	local array = I:GetIntArray(D.config)
+	return (array.Length >= 1) and csarray_to_motiontable(array) or V
+end
+function chara_config_loader.beat(D, I, V)
+	local R = V
+	if D.duration ~= nil then
+		ms_per_beat = D.ms_per_beat
+		if ms_per_beat == nil then ms_per_beat = 1000.0 end
+		R = I:GetDouble(D.duration, V * ms_per_beat) / ms_per_beat
+	end
+	return I:GetDouble(D.config, R)
+end
+function chara_config_loader.int_xy(D, I, V)
+	local array = I:GetIntArray(D.config)
+	return (array.Length == 2) and VECTOR2:CreateVector2(array[0], array[1]) or V
+end
+function chara_config_loader.ints(D, I, V)
+	local array = I:GetIntArray(D.config)
+	return (array.Length >= 1) and array or V
+end
+function chara_config_loader.int_P1(D, I, V)
+	local array = I:GetIntArray(D.config)
+	if array.Length >= 1 then return array[0] end
+	return V
+end
+function chara_config_loader.offset(D, I, V)
+	-- make a copy to keep the def table intact
+	local R = { pos = VECTOR2:CreateVector2(V.pos.X, V.pos.Y); mode = V.mode; v1_scale = V.v1_scale; }
+	R.pos = chara_config_loader.int_xy({ config = D.config }, I, R.pos)
+	if D.x_P1 ~= nil then R.pos.X = chara_config_loader.int_P1({ config = D.x_P1 }, I, R.pos.X) end
+	if D.y_P1 ~= nil then R.pos.Y = chara_config_loader.int_P1({ config = D.y_P1 }, I, R.pos.Y) end
+	if D.v1_scale ~= nil then R.v1_scale = I:GetDouble(D.v1_scale, R.v1_scale) end
+	return R
+end
+
 local function load_config()
+	local chara_config_defs = load_chara_config_defs(chara_config_loader)
 	local chara_config_ini = INILOADER:LoadIni("CharaConfig.txt")
-
-	chara_config.chara_version = chara_config_ini:GetString("Chara_Version", chara_config.chara_version)
-	chara_config.legacy_mode = chara_config_ini:GetBool("Chara_LegacyMode", chara_config.legacy_mode)
-
-	local ini_chara_resolution = chara_config_ini:GetIntArray("Chara_Resolution")
-	if ini_chara_resolution.Length == 2 then
-		chara_config.resolution = VECTOR2:CreateVector2(ini_chara_resolution[0], ini_chara_resolution[1])
+	for i, v in ipairs(chara_config_defs) do
+		-- query all fallback configs from the most falled back config
+		-- because there is no Lua API to detect whether the config is defined
+		local value = v.default
+		local fallbacks = v.fallbacks or {}
+		for i = #fallbacks, 1, -1 do
+			local fallback = chara_config[fallbacks[i]]
+			if fallback ~= nil then
+				value = fallback
+			end
+		end
+		if v.loader ~= nil then
+			value = v:loader(chara_config_ini, value)
+		end
+		chara_config[v.key] = value
 	end
-
-	local ini_heya_chara_render_offset = chara_config_ini:GetIntArray("Heya_Chara_Render_Offset")
-	if ini_heya_chara_render_offset.Length == 2 then
-		chara_config.heya_render_offset = VECTOR2:CreateVector2(ini_heya_chara_render_offset[0], ini_heya_chara_render_offset[1])
-	end
-
-	--Title+++++++++++++
-	local ini_title_motion_normal = chara_config_ini:GetIntArray("Title_Chara_Motion_Normal")
-	if ini_title_motion_normal.Length >= 1 then
-		chara_config.title_motion_normal = csarray_to_motiontable(ini_title_motion_normal)
-	end
-
-	local ini_title_motion_entry = chara_config_ini:GetIntArray("Title_Chara_Motion_Entry")
-	if ini_title_motion_entry.Length >= 1 then
-		chara_config.title_motion_entry = csarray_to_motiontable(ini_title_motion_entry)
-	end
-
-	chara_config.title_beat_normal = chara_config_ini:GetDouble("Chara_Normal_AnimationDuration", chara_config.title_beat_normal * 1000.0) / 1000.0
-	chara_config.title_beat_normal = chara_config_ini:GetDouble("Title_Chara_Beat_Normal", chara_config.title_beat_normal)
-
-	chara_config.title_beat_entry = chara_config_ini:GetDouble("Chara_Entry_AnimationDuration", chara_config.title_beat_entry * 1000.0) / 1000.0
-	chara_config.title_beat_entry = chara_config_ini:GetDouble("Title_Chara_Beat_Entry", chara_config.title_beat_entry)
-	--+++++++++++++
-
-	---Game+++++++++++++
-	local ini_game_offset = chara_config_ini:GetIntArray("Game_Chara_Offset")
-	if ini_game_offset.Length == 2 then
-		chara_config.game_offset.pos = VECTOR2:CreateVector2(ini_game_offset[0], ini_game_offset[1])
-	end
-
-	local ini_game_chara_x = chara_config_ini:GetIntArray("Game_Chara_X")
-	if ini_game_chara_x.Length >= 1 then
-		chara_config.game_offset.pos.X = ini_game_chara_x[0]
-	end
-
-	local ini_game_chara_y = chara_config_ini:GetIntArray("Game_Chara_Y")
-	if ini_game_chara_y.Length >= 1 then
-		chara_config.game_offset.pos.Y = ini_game_chara_y[0]
-	end
-
-	-- Per-player AI battle positions (Game_Chara_X_AI / Game_Chara_Y_AI).
-	-- When both are present, they override the skin's Game_Chara_AI_X/Y for this character.
-	local ini_ai_x = chara_config_ini:GetIntArray("Game_Chara_X_AI")
-	local ini_ai_y = chara_config_ini:GetIntArray("Game_Chara_Y_AI")
-	if ini_ai_x.Length >= 1 and ini_ai_y.Length >= 1 then
-		chara_config.ai_positions_x = ini_ai_x
-		chara_config.ai_positions_y = ini_ai_y
-	end
-
-	local ini_game_balloon_offset = chara_config_ini:GetIntArray("Game_Chara_Balloon_Offset")
-	if ini_game_balloon_offset.Length == 2 then
-		chara_config.game_balloon_offset.pos = VECTOR2:CreateVector2(ini_game_balloon_offset[0], ini_game_balloon_offset[1])
-	end
-
-	local ini_game_balloon_x = chara_config_ini:GetIntArray("Game_Chara_Balloon_X")
-	if ini_game_balloon_x.Length >= 1 then
-		chara_config.game_balloon_offset.pos.X = ini_game_balloon_x[0]
-	end
-
-	local ini_game_balloon_y = chara_config_ini:GetIntArray("Game_Chara_Balloon_Y")
-	if ini_game_balloon_y.Length >= 1 then
-		chara_config.game_balloon_offset.pos.Y = ini_game_balloon_y[0]
-	end
-
-	local ini_game_kusudama_offset = chara_config_ini:GetIntArray("Game_Chara_Kusudama_Offset")
-	if ini_game_kusudama_offset.Length == 2 then
-		chara_config.game_kusudama_offset.pos = VECTOR2:CreateVector2(ini_game_kusudama_offset[0], ini_game_kusudama_offset[1])
-	end
-
-	local ini_game_kusudama_x = chara_config_ini:GetIntArray("Game_Chara_Kusudama_X")
-	if ini_game_kusudama_x.Length >= 1 then
-		chara_config.game_kusudama_offset.pos.X = ini_game_kusudama_x[0]
-	end
-
-	local ini_game_kusudama_y = chara_config_ini:GetIntArray("Game_Chara_Kusudama_Y")
-	if ini_game_kusudama_y.Length >= 1 then
-		chara_config.game_kusudama_offset.pos.Y = ini_game_kusudama_y[0]
-	end
-
-
-
-	local ini_game_motion_normal = chara_config_ini:GetIntArray("Game_Chara_Motion_Normal")
-	if ini_game_motion_normal.Length >= 1 then
-		chara_config.game_motion_normal = csarray_to_motiontable(ini_game_motion_normal)
-	end
-
-	local ini_game_motion_clear = chara_config_ini:GetIntArray("Game_Chara_Motion_Clear")
-	if ini_game_motion_clear.Length >= 1 then
-		chara_config.game_motion_clear = csarray_to_motiontable(ini_game_motion_clear)
-		chara_config.game_motion_clear_max = chara_config.game_motion_clear
-	end
-
-	local ini_game_motion_clear_max = chara_config_ini:GetIntArray("Game_Chara_Motion_Clear_Max")
-	if ini_game_motion_clear_max.Length >= 1 then
-		chara_config.game_motion_clear_max = csarray_to_motiontable(ini_game_motion_clear_max)
-	end
-
-	local ini_game_motion_gogo = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGo")
-	if ini_game_motion_gogo.Length >= 1 then
-		chara_config.game_motion_gogo = csarray_to_motiontable(ini_game_motion_gogo)
-		chara_config.game_motion_gogo_max = chara_config.game_motion_gogo
-	end
-
-	local ini_game_motion_gogo_max = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGo_Max")
-	if ini_game_motion_gogo_max.Length >= 1 then
-		chara_config.game_motion_gogo_max = csarray_to_motiontable(ini_game_motion_gogo_max)
-	end
-
-	local ini_game_motion_miss = chara_config_ini:GetIntArray("Game_Chara_Motion_Miss")
-	if ini_game_motion_miss.Length >= 1 then
-		chara_config.game_motion_miss = csarray_to_motiontable(ini_game_motion_miss)
-	end
-
-	local ini_game_motion_miss_down = chara_config_ini:GetIntArray("Game_Chara_Motion_Miss_Down")
-	if ini_game_motion_miss_down.Length >= 1 then
-		chara_config.game_motion_miss_down = csarray_to_motiontable(ini_game_motion_miss_down)
-	end
-
-	local ini_game_motion_10combo = chara_config_ini:GetIntArray("Game_Chara_Motion_10Combo")
-	if ini_game_motion_10combo.Length >= 1 then
-		chara_config.game_motion_miss_10combo = csarray_to_motiontable(ini_game_motion_10combo)
-	end
-
-	local ini_game_motion_10combo_max = chara_config_ini:GetIntArray("Game_Chara_Motion_10Combo_Max")
-	if ini_game_motion_10combo_max.Length >= 1 then
-		chara_config.game_motion_10combo_max = csarray_to_motiontable(ini_game_motion_10combo_max)
-	end
-
-	local ini_game_motion_cleared = chara_config_ini:GetIntArray("Game_Chara_Motion_Cleared")
-	if ini_game_motion_cleared.Length >= 1 then
-		chara_config.game_motion_cleared = csarray_to_motiontable(ini_game_motion_cleared)
-	end
-
-	local ini_game_motion_failed = chara_config_ini:GetIntArray("Game_Chara_Motion_Failed")
-	if ini_game_motion_failed.Length >= 1 then
-		chara_config.game_motion_failed = csarray_to_motiontable(ini_game_motion_failed)
-	end
-
-	local ini_game_motion_clearout = chara_config_ini:GetIntArray("Game_Chara_Motion_ClearOut")
-	if ini_game_motion_clearout.Length >= 1 then
-		chara_config.game_motion_clearout = csarray_to_motiontable(ini_game_motion_clearout)
-	end
-
-	local ini_game_motion_clearin = chara_config_ini:GetIntArray("Game_Chara_Motion_ClearIn")
-	if ini_game_motion_clearin.Length >= 1 then
-		chara_config.game_motion_clearin = csarray_to_motiontable(ini_game_motion_clearin)
-	end
-
-	local ini_game_motion_soulout = chara_config_ini:GetIntArray("Game_Chara_Motion_SoulOut")
-	if ini_game_motion_soulout.Length >= 1 then
-		chara_config.game_motion_soulout = csarray_to_motiontable(ini_game_motion_soulout)
-	end
-
-	local ini_game_motion_soulin = chara_config_ini:GetIntArray("Game_Chara_Motion_SoulIn")
-	if ini_game_motion_soulin.Length >= 1 then
-		chara_config.game_motion_soulin = csarray_to_motiontable(ini_game_motion_soulin)
-	end
-
-	local ini_game_motion_missin = chara_config_ini:GetIntArray("Game_Chara_Motion_MissIn")
-	if ini_game_motion_missin.Length >= 1 then
-		chara_config.game_motion_missin = csarray_to_motiontable(ini_game_motion_missin)
-	end
-
-	local ini_game_motion_missdownin = chara_config_ini:GetIntArray("Game_Chara_Motion_MissDownIn")
-	if ini_game_motion_missdownin.Length >= 1 then
-		chara_config.game_motion_missdownin = csarray_to_motiontable(ini_game_motion_missdownin)
-	end
-
-	local ini_game_motion_gogostart = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGoStart")
-	if ini_game_motion_gogostart.Length >= 1 then
-		chara_config.game_motion_gogostart = csarray_to_motiontable(ini_game_motion_gogostart)
-		chara_config.game_motion_gogostart_clear = chara_config.game_motion_gogostart
-		chara_config.game_motion_gogostart_max = chara_config.game_motion_gogostart
-	end
-
-	local ini_game_motion_gogostart_clear = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGoStart_Clear")
-	if ini_game_motion_gogostart_clear.Length >= 1 then
-		chara_config.game_motion_gogostart_clear = csarray_to_motiontable(ini_game_motion_gogostart_clear)
-	end
-
-	local ini_game_motion_gogostart_max = chara_config_ini:GetIntArray("Game_Chara_Motion_GoGoStart_Max")
-	if ini_game_motion_gogostart_max.Length >= 1 then
-		chara_config.game_motion_gogostart_max = csarray_to_motiontable(ini_game_motion_gogostart_max)
-	end
-
-	local ini_game_motion_return = chara_config_ini:GetIntArray("Game_Chara_Motion_Return")
-	if ini_game_motion_return.Length >= 1 then
-		chara_config.game_motion_return = csarray_to_motiontable(ini_game_motion_return)
-	end
-
-	local ini_game_motion_balloon_breaking = chara_config_ini:GetIntArray("Game_Chara_Motion_Balloon_Breaking")
-	if ini_game_motion_balloon_breaking.Length >= 1 then
-		chara_config.game_motion_balloon_breaking = csarray_to_motiontable(ini_game_motion_balloon_breaking)
-	end
-
-	local ini_game_motion_balloon_broke = chara_config_ini:GetIntArray("Game_Chara_Motion_Balloon_Broke")
-	if ini_game_motion_balloon_broke.Length >= 1 then
-		chara_config.game_motion_balloon_broke = csarray_to_motiontable(ini_game_motion_balloon_broke)
-	end
-
-	local ini_game_motion_balloon_miss = chara_config_ini:GetIntArray("Game_Chara_Motion_Balloon_Miss")
-	if ini_game_motion_balloon_miss.Length >= 1 then
-		chara_config.game_motion_balloon_miss = csarray_to_motiontable(ini_game_motion_balloon_miss)
-	end
-
-	local ini_game_motion_kusudama_breaking = chara_config_ini:GetIntArray("Game_Chara_Motion_Kusudama_Breaking")
-	if ini_game_motion_kusudama_breaking.Length >= 1 then
-		chara_config.game_motion_kusudama_breaking = csarray_to_motiontable(ini_game_motion_kusudama_breaking)
-	end
-
-	local ini_game_motion_kusudama_idle = chara_config_ini:GetIntArray("Game_Chara_Motion_Kusudama_Idle")
-	if ini_game_motion_kusudama_idle.Length >= 1 then
-		chara_config.game_motion_kusudama_idle = csarray_to_motiontable(ini_game_motion_kusudama_idle)
-	end
-
-	local ini_game_motion_kusudama_broke = chara_config_ini:GetIntArray("Game_Chara_Motion_Kusudama_Broke")
-	if ini_game_motion_kusudama_broke.Length >= 1 then
-		chara_config.game_motion_kusudama_broke = csarray_to_motiontable(ini_game_motion_kusudama_broke)
-	end
-
-	local ini_game_motion_kusudama_miss = chara_config_ini:GetIntArray("Game_Chara_Motion_Kusudama_Miss")
-	if ini_game_motion_kusudama_miss.Length >= 1 then
-		chara_config.game_motion_kusudama_miss = csarray_to_motiontable(ini_game_motion_kusudama_miss)
-	end
-
-
-	local ini_game_chara_tower_offset = chara_config_ini:GetIntArray("Game_Chara_Tower_Offset")
-	if ini_game_chara_tower_offset.Length == 2 then
-		chara_config.game_chara_tower_offset.pos = VECTOR2:CreateVector2(ini_game_chara_tower_offset[0], ini_game_chara_tower_offset[1])
-	end
-
-	local ini_game_motion_tower_standing = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Standing")
-	if ini_game_motion_tower_standing.Length >= 1 then
-		chara_config.game_motion_tower_standing = csarray_to_motiontable(ini_game_motion_tower_standing)
-		chara_config.game_motion_tower_standing_tired = chara_config.game_motion_tower_standing
-	end
-
-	local ini_game_motion_tower_standing_tired = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Standing_Tired")
-	if ini_game_motion_tower_standing_tired.Length >= 1 then
-		chara_config.game_motion_tower_standing_tired = csarray_to_motiontable(ini_game_motion_tower_standing_tired)
-	end
-
-	local ini_game_motion_tower_climbing = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Climbing")
-	if ini_game_motion_tower_climbing.Length >= 1 then
-		chara_config.game_motion_tower_climbing = csarray_to_motiontable(ini_game_motion_tower_climbing)
-		chara_config.game_motion_tower_climbing_tired = chara_config.game_motion_tower_climbing
-	end
-
-	local ini_game_motion_tower_climbing_tired = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Climbing_Tired")
-	if ini_game_motion_tower_climbing_tired.Length >= 1 then
-		chara_config.game_motion_tower_climbing_tired = csarray_to_motiontable(ini_game_motion_tower_climbing_tired)
-	end
-
-	local ini_game_motion_tower_clear = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Clear")
-	if ini_game_motion_tower_clear.Length >= 1 then
-		chara_config.game_motion_tower_clear = csarray_to_motiontable(ini_game_motion_tower_clear)
-		chara_config.game_motion_tower_clear_tired = chara_config.game_motion_tower_clear
-	end
-
-	local ini_game_motion_tower_clear_tired = chara_config_ini:GetIntArray("Game_Chara_Motion_Tower_Clear_Tired")
-	if ini_game_motion_tower_clear_tired.Length >= 1 then
-		chara_config.game_motion_tower_clear_tired = csarray_to_motiontable(ini_game_motion_tower_clear_tired)
-	end
-
-
-	chara_config.game_beat_normal = chara_config_ini:GetDouble("Game_Chara_Beat_Normal", chara_config.game_beat_normal)
-	chara_config.game_beat_clear = chara_config_ini:GetDouble("Game_Chara_Beat_Clear", chara_config.game_beat_clear)
-	chara_config.game_beat_clear_max = chara_config.game_beat_clear
-	chara_config.game_beat_clear_max = chara_config_ini:GetDouble("Game_Chara_Beat_ClearMax", chara_config.game_beat_clear_max)
-	chara_config.game_beat_gogo = chara_config_ini:GetDouble("Game_Chara_Beat_GoGo", chara_config.game_beat_gogo)
-	chara_config.game_beat_gogo_max = chara_config.game_beat_gogo
-	chara_config.game_beat_gogo_max = chara_config_ini:GetDouble("Game_Chara_Beat_GoGoMax", chara_config.game_beat_gogo_max)
-	chara_config.game_beat_miss = chara_config_ini:GetDouble("Game_Chara_Beat_Miss", chara_config.game_beat_miss)
-	chara_config.game_beat_miss_down = chara_config_ini:GetDouble("Game_Chara_Beat_MissDown", chara_config.game_beat_miss_down)
-	chara_config.game_beat_10combo = chara_config_ini:GetDouble("Game_Chara_Beat_10Combo", chara_config.game_beat_10combo)
-	chara_config.game_beat_10combo_max = chara_config_ini:GetDouble("Game_Chara_Beat_10ComboMax", chara_config.game_beat_10combo_max)
-	chara_config.game_beat_cleared = chara_config_ini:GetDouble("Game_Chara_Beat_Cleared", chara_config.game_beat_cleared)
-	chara_config.game_beat_failed = chara_config_ini:GetDouble("Game_Chara_Beat_Failed", chara_config.game_beat_failed)
-	chara_config.game_beat_clearout = chara_config_ini:GetDouble("Game_Chara_Beat_ClearOut", chara_config.game_beat_clearout)
-	chara_config.game_beat_clearin = chara_config_ini:GetDouble("Game_Chara_Beat_ClearIn", chara_config.game_beat_clearin)
-	chara_config.game_beat_soulout = chara_config_ini:GetDouble("Game_Chara_Beat_SoulOut", chara_config.game_beat_soulout)
-	chara_config.game_beat_soulin = chara_config_ini:GetDouble("Game_Chara_Beat_SoulIn", chara_config.game_beat_soulin)
-	chara_config.game_beat_missin = chara_config_ini:GetDouble("Game_Chara_Beat_MissIn", chara_config.game_beat_missin)
-	chara_config.game_beat_missdownin = chara_config_ini:GetDouble("Game_Chara_Beat_MissDownIn", chara_config.game_beat_missdownin)
-	chara_config.game_beat_return = chara_config_ini:GetDouble("Game_Chara_Beat_Return", chara_config.game_beat_return)
-	chara_config.game_beat_gogostart = chara_config_ini:GetDouble("Game_Chara_Beat_GoGoStart", chara_config.game_beat_gogostart)
-	chara_config.game_beat_gogostart_clear = chara_config_ini:GetDouble("Game_Chara_Beat_GoGoStartClear", chara_config.game_beat_gogostart_clear)
-	chara_config.game_beat_gogostart_max = chara_config_ini:GetDouble("Game_Chara_Beat_GoGoStartMax", chara_config.game_beat_gogostart_max)
-	chara_config.game_beat_balloon_breaking = chara_config_ini:GetDouble("Game_Chara_Beat_Balloon_Breaking", chara_config.game_beat_balloon_breaking)
-	chara_config.game_beat_balloon_broke = chara_config_ini:GetDouble("Game_Chara_Beat_Balloon_Broke", chara_config.game_beat_balloon_broke)
-	chara_config.game_beat_balloon_miss = chara_config_ini:GetDouble("Game_Chara_Beat_Balloon_Miss", chara_config.game_beat_balloon_miss)
-	chara_config.game_beat_kusudama_breaking = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Breaking", chara_config.game_beat_kusudama_breaking)
-	chara_config.game_beat_kusudama_idle = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Idle", chara_config.game_beat_kusudama_idle)
-	chara_config.game_beat_kusudama_broke = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Broke", chara_config.game_beat_kusudama_broke)
-	chara_config.game_beat_kusudama_miss = chara_config_ini:GetDouble("Game_Chara_Beat_Kusudama_Miss", chara_config.game_beat_kusudama_miss)
-
-	chara_config.game_beat_tower_standing = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Standing", chara_config.game_beat_tower_standing)
-	chara_config.game_beat_tower_standing_tired = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Standing_Tired", chara_config.game_beat_tower_standing_tired)
-	chara_config.game_beat_tower_climbing = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Climbing", chara_config.game_beat_tower_climbing)
-	chara_config.game_beat_tower_climbing_tired = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Climbing_Tired", chara_config.game_beat_tower_climbing_tired)
-	chara_config.game_beat_tower_fail = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Fail", chara_config.game_beat_tower_fail)
-	chara_config.game_beat_tower_clear = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Clear", chara_config.game_beat_tower_clear)
-	chara_config.game_beat_tower_clear_tired = chara_config_ini:GetDouble("Game_Chara_Beat_Tower_Clear_Tired", chara_config.game_beat_tower_clear_tired)
-	--+++++++++++++
-
-	---Menu+++++++++++++
-	local ini_menu_offset = chara_config_ini:GetIntArray("Menu_Offset")
-	if ini_menu_offset.Length == 2 then
-		chara_config.menu_offset.pos = VECTOR2:CreateVector2(ini_menu_offset[0], ini_menu_offset[1])
-	end
-
-	chara_config.menu_offset.v1_scale = chara_config_ini:GetDouble("Menu_Chara_Scale", chara_config.menu_offset.v1_scale)
-
-	local ini_menu_motion_normal = chara_config_ini:GetIntArray("Menu_Chara_Motion_Loop")
-	if ini_menu_motion_normal.Length >= 1 then
-		chara_config.menu_motion_normal = csarray_to_motiontable(ini_menu_motion_normal)
-	end
-
-	local ini_menu_motion_wait = chara_config_ini:GetIntArray("Menu_Chara_Motion_Wait")
-	if ini_menu_motion_wait.Length >= 1 then
-		chara_config.menu_motion_wait = csarray_to_motiontable(ini_menu_motion_wait)
-	end
-
-	local ini_menu_motion_start = chara_config_ini:GetIntArray("Menu_Chara_Motion_Start")
-	if ini_menu_motion_start.Length >= 1 then
-		chara_config.menu_motion_start = csarray_to_motiontable(ini_menu_motion_start)
-	end
-
-	local ini_menu_motion_select = chara_config_ini:GetIntArray("Menu_Chara_Motion_Select")
-	if ini_menu_motion_select.Length >= 1 then
-		chara_config.menu_motion_select = csarray_to_motiontable(ini_menu_motion_select)
-	end
-
-	chara_config.menu_beat_normal = chara_config_ini:GetDouble("Chara_Menu_Loop_AnimationDuration", chara_config.menu_beat_normal * 500.0) / 500.0
-	chara_config.menu_beat_normal = chara_config_ini:GetDouble("Menu_Chara_Beat_Normal", chara_config.menu_beat_normal)
-
-	chara_config.menu_beat_wait = chara_config_ini:GetDouble("Chara_Menu_Wait_AnimationDuration", chara_config.menu_beat_wait * 500.0) / 500.0
-	chara_config.menu_beat_wait = chara_config_ini:GetDouble("Menu_Chara_Beat_Wait", chara_config.menu_beat_wait)
-
-	chara_config.menu_beat_start = chara_config_ini:GetDouble("Chara_Menu_Start_AnimationDuration", chara_config.menu_beat_start * 500.0) / 500.0
-	chara_config.menu_beat_start = chara_config_ini:GetDouble("Menu_Chara_Beat_Start", chara_config.menu_beat_start)
-
-	chara_config.menu_beat_select = chara_config_ini:GetDouble("Chara_Menu_Select_AnimationDuration", chara_config.menu_beat_select * 500.0) / 500.0
-	chara_config.menu_beat_select = chara_config_ini:GetDouble("Menu_Chara_Beat_Select", chara_config.menu_beat_select)
-	--+++++++++++++
-
-	--Result+++++++++++++
-	local ini_result_offset = chara_config_ini:GetIntArray("Result_Offset")
-	if ini_result_offset.Length == 2 then
-		chara_config.result_offset.pos = VECTOR2:CreateVector2(ini_result_offset[0], ini_result_offset[1])
-	end
-
-	local ini_result_motion_normal = chara_config_ini:GetIntArray("Result_Chara_Motion_Normal")
-	if ini_result_motion_normal.Length >= 1 then
-		chara_config.result_motion_normal = csarray_to_motiontable(ini_result_motion_normal)
-	end
-
-	local ini_result_motion_clear = chara_config_ini:GetIntArray("Result_Chara_Motion_Clear")
-	if ini_result_motion_clear.Length >= 1 then
-		chara_config.result_motion_clear = csarray_to_motiontable(ini_result_motion_clear)
-	end
-
-	local ini_result_motion_failed_in = chara_config_ini:GetIntArray("Result_Chara_Motion_Failed_In")
-	if ini_result_motion_failed_in.Length >= 1 then
-		chara_config.result_motion_failed_in = csarray_to_motiontable(ini_result_motion_failed_in)
-	end
-
-	local ini_result_motion_failed = chara_config_ini:GetIntArray("Result_Chara_Motion_Failed")
-	if ini_result_motion_failed.Length >= 1 then
-		chara_config.result_motion_failed = csarray_to_motiontable(ini_result_motion_failed)
-	end
-
-	chara_config.result_beat_normal = chara_config_ini:GetDouble("Chara_Result_Normal_AnimationDuration", chara_config.result_beat_normal * 1000.0) / 1000.0
-	chara_config.result_beat_normal = chara_config_ini:GetDouble("Result_Chara_Beat_Normal", chara_config.result_beat_normal)
-
-	chara_config.result_beat_clear = chara_config_ini:GetDouble("Chara_Result_Clear_AnimationDuration", chara_config.result_beat_clear * 1000.0) / 1000.0
-	chara_config.result_beat_clear = chara_config_ini:GetDouble("Result_Chara_Beat_Clear", chara_config.result_beat_clear)
-
-	chara_config.result_beat_failed_in = chara_config_ini:GetDouble("Chara_Result_Failed_In_AnimationDuration", chara_config.result_beat_failed_in * 1000.0) / 1000.0
-	chara_config.result_beat_failed_in = chara_config_ini:GetDouble("Result_Chara_Beat_Failed_In", chara_config.result_beat_failed_in)
-
-	chara_config.result_beat_failed = chara_config_ini:GetDouble("Chara_Result_Failed_AnimationDuration", chara_config.result_beat_failed * 1000.0) / 1000.0
-	chara_config.result_beat_failed = chara_config_ini:GetDouble("Result_Chara_Beat_Failed", chara_config.result_beat_failed)
-	--+++++++++++++
 end
 load_config()
-
-
-local animation_offsets = {
-	[CHARACTER.ANIM_GAME_NORMAL] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_CLEAR] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MAX] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_GOGO] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MISS] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MISS_DOWN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_10COMBO] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_CLEARED] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_FAILED] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MAX_OUT] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MAX_IN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MISS_IN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_RETURN] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_GOGOSTART] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = chara_config.game_offset;
-	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = chara_config.game_balloon_offset;
-	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = chara_config.game_balloon_offset;
-	[CHARACTER.ANIM_GAME_BALLOON_MISS] = chara_config.game_balloon_offset;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = chara_config.game_kusudama_offset;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_kusudama_offset;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_kusudama_offset;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_kusudama_offset;
-
-	[CHARACTER.ANIM_GAME_TOWER_STANDING] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = chara_config.game_chara_tower_offset;
-	[CHARACTER.ANIM_GAME_TOWER_FAIL] = chara_config.game_chara_tower_offset;
-
-	[CHARACTER.ANIM_MENU_WAIT] = chara_config.menu_offset;
-	[CHARACTER.ANIM_MENU_START] = chara_config.menu_offset;
-	[CHARACTER.ANIM_MENU_NORMAL] = chara_config.menu_offset;
-	[CHARACTER.ANIM_MENU_SELECT] = chara_config.menu_offset;
-	[CHARACTER.ANIM_ENTRY_NORMAL] = chara_config.menu_offset;
-	[CHARACTER.ANIM_ENTRY_JUMP] = chara_config.menu_offset;
-
-	[CHARACTER.ANIM_RESULT_NORMAL] = chara_config.result_offset;
-	[CHARACTER.ANIM_RESULT_CLEAR] = chara_config.result_offset;
-	[CHARACTER.ANIM_RESULT_FAILED_IN] = chara_config.result_offset;
-	[CHARACTER.ANIM_RESULT_FAILED] = chara_config.result_offset;
-}
-
-local animation_motions = {
-	[CHARACTER.ANIM_GAME_NORMAL] = chara_config.game_motion_normal;
-	[CHARACTER.ANIM_GAME_CLEAR] = chara_config.game_motion_clear;
-	[CHARACTER.ANIM_GAME_MAX] = chara_config.game_motion_clear_max;
-	[CHARACTER.ANIM_GAME_GOGO] = chara_config.game_motion_gogo;
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = chara_config.game_motion_gogo_max;
-	[CHARACTER.ANIM_GAME_MISS] = chara_config.game_motion_miss;
-	[CHARACTER.ANIM_GAME_MISS_DOWN] = chara_config.game_motion_miss_down;
-	[CHARACTER.ANIM_GAME_10COMBO] = chara_config.game_motion_10combo;
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = chara_config.game_motion_10combo_max;
-	[CHARACTER.ANIM_GAME_CLEARED] = chara_config.game_motion_cleared;
-	[CHARACTER.ANIM_GAME_FAILED] = chara_config.game_motion_failed;
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = chara_config.game_motion_clearout;
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = chara_config.game_motion_clearin;
-	[CHARACTER.ANIM_GAME_MAX_OUT] = chara_config.game_motion_soulout;
-	[CHARACTER.ANIM_GAME_MAX_IN] = chara_config.game_motion_soulin;
-	[CHARACTER.ANIM_GAME_MISS_IN] = chara_config.game_motion_missin;
-	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = chara_config.game_motion_missdownin;
-	[CHARACTER.ANIM_GAME_RETURN] = chara_config.game_motion_return;
-	[CHARACTER.ANIM_GAME_GOGOSTART] = chara_config.game_motion_gogostart;
-	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = chara_config.game_motion_gogostart_clear;
-	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = chara_config.game_motion_gogostart_max;
-	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = chara_config.game_motion_balloon_breaking;
-	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = chara_config.game_motion_balloon_broke;
-	[CHARACTER.ANIM_GAME_BALLOON_MISS] = chara_config.game_motion_balloon_miss;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = chara_config.game_motion_kusudama_breaking;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_motion_kusudama_broke;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_motion_kusudama_miss;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_motion_kusudama_idle;
-
-	[CHARACTER.ANIM_GAME_TOWER_STANDING] = chara_config.game_motion_tower_standing;
-	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = chara_config.game_motion_tower_standing_tired;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = chara_config.game_motion_tower_climbing;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = chara_config.game_motion_tower_climbing_tired;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = chara_config.game_motion_tower_running;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = chara_config.game_motion_tower_running_tired;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = chara_config.game_motion_tower_clear;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = chara_config.game_motion_tower_clear_tired;
-	[CHARACTER.ANIM_GAME_TOWER_FAIL] = chara_config.game_motion_tower_fail;
-
-	[CHARACTER.ANIM_MENU_WAIT] = chara_config.menu_motion_normal;
-	[CHARACTER.ANIM_MENU_START] = chara_config.menu_motion_start;
-	[CHARACTER.ANIM_MENU_NORMAL] = chara_config.menu_motion_normal;
-	[CHARACTER.ANIM_MENU_SELECT] = chara_config.menu_motion_select;
-	[CHARACTER.ANIM_ENTRY_NORMAL] = chara_config.title_motion_normal;
-	[CHARACTER.ANIM_ENTRY_JUMP] = chara_config.title_motion_entry;
-
-	[CHARACTER.ANIM_RESULT_NORMAL] = chara_config.result_motion_normal;
-	[CHARACTER.ANIM_RESULT_CLEAR] = chara_config.result_motion_clear;
-	[CHARACTER.ANIM_RESULT_FAILED_IN] = chara_config.result_motion_failed_in;
-	[CHARACTER.ANIM_RESULT_FAILED] = chara_config.result_motion_failed;
-}
-
-local animation_beats = {
-	[CHARACTER.ANIM_GAME_NORMAL] = chara_config.game_beat_normal;
-	[CHARACTER.ANIM_GAME_CLEAR] = chara_config.game_beat_clear;
-	[CHARACTER.ANIM_GAME_MAX] = chara_config.game_beat_clear_max;
-	[CHARACTER.ANIM_GAME_GOGO] = chara_config.game_beat_gogo;
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = chara_config.game_beat_gogo_max;
-	[CHARACTER.ANIM_GAME_MISS] = chara_config.game_beat_miss;
-	[CHARACTER.ANIM_GAME_MISS_DOWN] = chara_config.game_beat_miss_down;
-	[CHARACTER.ANIM_GAME_10COMBO] = chara_config.game_beat_10combo;
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = chara_config.game_beat_10combo_max;
-	[CHARACTER.ANIM_GAME_CLEARED] = chara_config.game_beat_cleared;
-	[CHARACTER.ANIM_GAME_FAILED] = chara_config.game_beat_failed;
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = chara_config.game_beat_clearout;
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = chara_config.game_beat_clearin;
-	[CHARACTER.ANIM_GAME_MAX_OUT] = chara_config.game_beat_soulout;
-	[CHARACTER.ANIM_GAME_MAX_IN] = chara_config.game_beat_soulin;
-	[CHARACTER.ANIM_GAME_MISS_IN] = chara_config.game_beat_missin;
-	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = chara_config.game_beat_missdownin;
-	[CHARACTER.ANIM_GAME_RETURN] = chara_config.game_beat_return;
-	[CHARACTER.ANIM_GAME_GOGOSTART] = chara_config.game_beat_gogostart;
-	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = chara_config.game_beat_gogostart_clear;
-	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = chara_config.game_beat_gogostart_max;
-	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = chara_config.game_beat_balloon_breaking;
-	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = chara_config.game_beat_balloon_broke;
-	[CHARACTER.ANIM_GAME_BALLOON_MISS] = chara_config.game_beat_balloon_miss;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = chara_config.game_beat_kusudama_breaking;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = chara_config.game_beat_kusudama_broke;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = chara_config.game_beat_kusudama_miss;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = chara_config.game_beat_kusudama_idle;
-
-	[CHARACTER.ANIM_GAME_TOWER_STANDING] = chara_config.game_beat_tower_standing;
-	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = chara_config.game_beat_tower_standing_tired;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = chara_config.game_beat_tower_climbing;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = chara_config.game_beat_tower_climbing_tired;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = chara_config.game_beat_tower_running;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = chara_config.game_beat_tower_running_tired;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = chara_config.game_beat_tower_clear;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = chara_config.game_beat_tower_clear_tired;
-	[CHARACTER.ANIM_GAME_TOWER_FAIL] = chara_config.game_beat_tower_fail;
-
-	[CHARACTER.ANIM_MENU_WAIT] = chara_config.menu_beat_normal;
-	[CHARACTER.ANIM_MENU_START] = chara_config.menu_beat_start;
-	[CHARACTER.ANIM_MENU_NORMAL] = chara_config.menu_beat_normal;
-	[CHARACTER.ANIM_MENU_SELECT] = chara_config.menu_beat_select;
-	[CHARACTER.ANIM_ENTRY_NORMAL] = chara_config.title_beat_normal;
-	[CHARACTER.ANIM_ENTRY_JUMP] = chara_config.title_beat_entry;
-
-	[CHARACTER.ANIM_RESULT_NORMAL] = chara_config.result_beat_normal;
-	[CHARACTER.ANIM_RESULT_CLEAR] = chara_config.result_beat_clear;
-	[CHARACTER.ANIM_RESULT_FAILED_IN] = chara_config.result_beat_failed_in;
-	[CHARACTER.ANIM_RESULT_FAILED] = chara_config.result_beat_failed;
-}
-
-
-local available_animations = {}
 
 local AnimationData = {
 	new = function()
@@ -789,8 +308,6 @@ local AnimationData = {
 		return obj
 	end;
 }
-
-local animationdata_array = {}
 
 -- flip is negative scale and flipping anchor point
 local function flip_anchor(anchor, flipX, flipY)
@@ -812,24 +329,26 @@ local function flip_anchor(anchor, flipX, flipY)
 	return anchor
 end
 
-local function create_animation(animationType)
-	local dir = animation_dirs[animationType]
+local animation_builder = {}
+
+function animation_builder.animation(animation_def)
+	local dir = animation_def.dir
 	if dir == nil then
 		return nil
 	end
 
 
-	local motion = animation_motions[animationType]
-	local beat = animation_beats[animationType]
+	local motion = animation_def.motion
+	local beat = animation_def.beat
 	if beat == nil then
 		beat = 1
 	end
-	local offset = animation_offsets[animationType]
+	local offset = animation_def.offset
 	if offset == nil then
 		offset = { pos = VECTOR2:CreateVector2(0, 0); mode = OFFSET_MODE_MENU; v1_scale = 1.0; }
 	end
 
-	local dir_name = animation_dirs[animationType]
+	local dir_name = animation_def.dir
 
 	local animation_data = nil
 	if STORAGE:DirectoryExists(dir_name) then
@@ -975,7 +494,7 @@ local function create_animation(animationType)
 	return animation_data
 end
 
-local function create_preview()
+function animation_builder.preview()
 	animation_data = AnimationData.new()
 
 	local preview = nil
@@ -1015,7 +534,7 @@ local function create_preview()
 	return animation_data
 end
 
-local function create_render()
+function animation_builder.render()
 	animation_data = AnimationData.new()
 	if STORAGE:FileExists("Render.png") then
 		animation_data.render = TEXTURE:CreateTexture("Render.png")
@@ -1062,61 +581,9 @@ local function create_render()
 	return animation_data
 end
 
-local animation_builders = {
-	[CHARACTER.ANIM_PREVIEW] = create_preview;
-	[CHARACTER.ANIM_RENDER] = create_render;
+animation_defs = load_animation_defs(chara_config, animation_builder)
 
-	[CHARACTER.ANIM_GAME_NORMAL] = create_animation;
-	[CHARACTER.ANIM_GAME_CLEAR] = create_animation;
-	[CHARACTER.ANIM_GAME_MAX] = create_animation;
-	[CHARACTER.ANIM_GAME_GOGO] = create_animation;
-	[CHARACTER.ANIM_GAME_GOGO_MAX] = create_animation;
-	[CHARACTER.ANIM_GAME_MISS] = create_animation;
-	[CHARACTER.ANIM_GAME_MISS_DOWN] = create_animation;
-	[CHARACTER.ANIM_GAME_10COMBO] = create_animation;
-	[CHARACTER.ANIM_GAME_10COMBO_MAX] = create_animation;
-	[CHARACTER.ANIM_GAME_CLEARED] = create_animation;
-	[CHARACTER.ANIM_GAME_FAILED] = create_animation;
-	[CHARACTER.ANIM_GAME_CLEAR_OUT] = create_animation;
-	[CHARACTER.ANIM_GAME_CLEAR_IN] = create_animation;
-	[CHARACTER.ANIM_GAME_MAX_OUT] = create_animation;
-	[CHARACTER.ANIM_GAME_MAX_IN] = create_animation;
-	[CHARACTER.ANIM_GAME_MISS_IN] = create_animation;
-	[CHARACTER.ANIM_GAME_MISS_DOWN_IN] = create_animation;
-	[CHARACTER.ANIM_GAME_RETURN] = create_animation;
-	[CHARACTER.ANIM_GAME_GOGOSTART] = create_animation;
-	[CHARACTER.ANIM_GAME_GOGOSTART_CLEAR] = create_animation;
-	[CHARACTER.ANIM_GAME_GOGOSTART_MAX] = create_animation;
-	[CHARACTER.ANIM_GAME_BALLOON_BREAKING] = create_animation;
-	[CHARACTER.ANIM_GAME_BALLOON_BROKE] = create_animation;
-	[CHARACTER.ANIM_GAME_BALLOON_MISS] = create_animation;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BREAKING] = create_animation;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_BROKE] = create_animation;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_MISS] = create_animation;
-	[CHARACTER.ANIM_GAME_KUSUDAMA_IDLE] = create_animation;
-
-	[CHARACTER.ANIM_GAME_TOWER_STANDING] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_STANDING_TIRED] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_CLIMBING_TIRED] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_RUNNING_TIRED] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_CLEAR_TIRED] = create_animation;
-	[CHARACTER.ANIM_GAME_TOWER_FAIL] = create_animation;
-
-	[CHARACTER.ANIM_MENU_WAIT] = create_animation;
-	[CHARACTER.ANIM_MENU_START] = create_animation;
-	[CHARACTER.ANIM_MENU_NORMAL] = create_animation;
-	[CHARACTER.ANIM_MENU_SELECT] = create_animation;
-	[CHARACTER.ANIM_ENTRY_NORMAL] = create_animation;
-	[CHARACTER.ANIM_ENTRY_JUMP] = create_animation;
-
-	[CHARACTER.ANIM_RESULT_NORMAL] = create_animation;
-	[CHARACTER.ANIM_RESULT_CLEAR] = create_animation;
-	[CHARACTER.ANIM_RESULT_FAILED_IN] = create_animation;
-	[CHARACTER.ANIM_RESULT_FAILED] = create_animation;
-}
+local available_animations = {}
 
 function availableAnimation(animationType)
 	local flag = available_animations[animationType]
@@ -1128,15 +595,15 @@ function availableAnimation(animationType)
 end
 
 function loadAnimation(animationType)
-	animationdata_array[animationType] = animation_builders[animationType](animationType)
+	animations[animationType] = animation_defs[animationType]:builder()
 
-	if animationdata_array[animationType] ~= nil then
+	if animations[animationType] ~= nil then
 		available_animations[animationType] = true
 	end
 end
 
 function disposeAnimation(animationType)
-	local animation_data = animationdata_array[animationType]
+	local animation_data = animations[animationType]
 	if animation_data ~= nil then
 		animation_data:dispose()
 	end
@@ -1145,14 +612,14 @@ function disposeAnimation(animationType)
 end
 
 function setAnimationDuration(animationType, duration)
-	local animation_data = animationdata_array[animationType]
+	local animation_data = animations[animationType]
 	if animation_data ~= nil then
 		animation_data.duration = duration
 	end
 end
 
 function resetAnimationCounter(animationType)
-	local animation_data = animationdata_array[animationType]
+	local animation_data = animations[animationType]
 	if animation_data ~= nil then
 		animation_data.value = 0
 	end
@@ -1183,7 +650,7 @@ function update(delta, animationType, looping)
 		return false
 	end
 
-	local animation = animationdata_array[animationType]
+	local animation = animations[animationType]
 	if animation ~= nil then
 		return animation:update(delta, looping)
 	else
@@ -1199,11 +666,11 @@ function draw(animationType, x, y, scaleX, scaleY, opacity, color, contextType, 
 		return
 	end
 
-	local animation = animationdata_array[animationType]
+	local animation = animations[animationType]
 	if animation ~= nil then
 		local overrideOffset = nil
 		if contextType ~= nil and contextType ~= animationType then
-			overrideOffset = animation_offsets[contextType]
+			overrideOffset = animation_defs[contextType].offset
 		end
 		if gradientMap ~= nil then GRADIENT:SetActive(gradientMap) end
 		animation:draw(x, y, scaleX, scaleY, opacity, color, overrideOffset, anchor, clip_w, clip_h, clip_x, clip_y, rotation, blendMode, wrapMode, player_count, ai_battle_mode)
@@ -1217,7 +684,7 @@ function getDrawSize(animationType)
 	if not availableAnimation(animationType) then
 		return 0, 0
 	end
-	local animation = animationdata_array[animationType]
+	local animation = animations[animationType]
 	if animation == nil then return 0, 0 end
 
 	local theme_resolution = THEME:GetResolution()
