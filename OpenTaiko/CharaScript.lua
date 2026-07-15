@@ -162,11 +162,11 @@ local function load_chara_config_defs(L --[[chara_config_loader]]) return { -- n
 	{ key = "game_motion_tower_standing_tired", default = nil, config = "Game_Chara_Motion_Tower_Standing_Tired", loader = L.motion, fallbacks = { "game_motion_tower_standing" } };
 	{ key = "game_motion_tower_climbing", default = nil, config = "Game_Chara_Motion_Tower_Climbing", loader = L.motion };
 	{ key = "game_motion_tower_climbing_tired", default = nil, config = "Game_Chara_Motion_Tower_Climbing_Tired", loader = L.motion, fallbacks = { "game_motion_tower_climbing" } };
-	{ key = "game_motion_tower_running", default = nil };
-	{ key = "game_motion_tower_running_tired", default = nil };
+	{ key = "game_motion_tower_running", default = nil, config = "Game_Chara_Motion_Tower_Running", loader = L.motion };
+	{ key = "game_motion_tower_running_tired", default = nil, config = "Game_Chara_Motion_Tower_Running_Tired", loader = L.motion, fallbacks = { "game_motion_tower_running" } };
 	{ key = "game_motion_tower_clear", default = nil, config = "Game_Chara_Motion_Tower_Clear", loader = L.motion };
 	{ key = "game_motion_tower_clear_tired", default = nil, config = "Game_Chara_Motion_Tower_Clear_Tired", loader = L.motion, fallbacks = { "game_motion_tower_clear" } };
-	{ key = "game_motion_tower_fail", default = nil };
+	{ key = "game_motion_tower_fail", default = nil, config = "Game_Chara_Motion_Tower_Fail", loader = L.motion };
 
 	{ key = "game_beat_normal", default = 1, config = "Game_Chara_Beat_Normal", loader = L.beat };
 	{ key = "game_beat_clear", default = 1, config = "Game_Chara_Beat_Clear", loader = L.beat };
@@ -201,8 +201,8 @@ local function load_chara_config_defs(L --[[chara_config_loader]]) return { -- n
 	{ key = "game_beat_tower_standing_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Standing_Tired", loader = L.beat };
 	{ key = "game_beat_tower_climbing", default = 1.0, config = "Game_Chara_Beat_Tower_Climbing", loader = L.beat };
 	{ key = "game_beat_tower_climbing_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Climbing_Tired", loader = L.beat };
-	{ key = "game_beat_tower_running", default = 1.0 };
-	{ key = "game_beat_tower_running_tired", default = 1.0 };
+	{ key = "game_beat_tower_running", default = 1.0, config = "Game_Chara_Beat_Tower_Running", loader = L.beat };
+	{ key = "game_beat_tower_running_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Running_Tired", loader = L.beat };
 	{ key = "game_beat_tower_clear", default = 1.0, config = "Game_Chara_Beat_Tower_Clear", loader = L.beat };
 	{ key = "game_beat_tower_clear_tired", default = 1.0, config = "Game_Chara_Beat_Tower_Clear_Tired", loader = L.beat };
 	{ key = "game_beat_tower_fail", default = 1.0, config = "Game_Chara_Beat_Tower_Fail", loader = L.beat };
