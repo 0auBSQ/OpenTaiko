@@ -132,7 +132,7 @@ public class CPad {
 					}
 
 				case InputDeviceType.Gamepad: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID)) {
+						if (!this.rConfigIni.dicGamepad.ContainsKey(stkeyassignArray[i].ID)) {
 							break;
 						}
 						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);
@@ -184,7 +184,7 @@ public class CPad {
 						break;
 					}
 				case InputDeviceType.Gamepad: {
-						if (!this.rConfigIni.dicJoystick.ContainsKey(stkeyassignArray[i].ID))
+						if (!this.rConfigIni.dicGamepad.ContainsKey(stkeyassignArray[i].ID))
 							break;
 
 						IInputDevice device = this.inputManager.Gamepad(stkeyassignArray[i].ID);

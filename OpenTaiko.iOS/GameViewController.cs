@@ -46,12 +46,22 @@ public partial class GameViewController : UIViewController {
 	// IOSurface and Metal composites + presents it via CAMetalLayer.
 	private MetalPresenter? _metalPresenter;
 	private CInputKeyboard_iOS? _keyboardInput;
+	private CInputTouch_iOS? _touchInput;
 	private int _autoAdvanceFrame;   // iOS auto-advance Don-pulse counter (see RenderFrame)
 	private bool _initialized;
 	private NSObject? _resignActiveObserver;
 	private NSObject? _becomeActiveObserver;
 	private UILabel? _debugHud;
 	private int _debugHudFrameCount;
+
+	public override bool PrefersHomeIndicatorAutoHidden => false;
+	public override UIRectEdge PreferredScreenEdgesDeferringSystemGestures => UIRectEdge.Bottom;
+
+	public override void ViewDidAppear(bool animated) {
+		base.ViewDidAppear(animated);
+		SetNeedsUpdateOfHomeIndicatorAutoHidden();
+		SetNeedsUpdateOfScreenEdgesDeferringSystemGestures();
+	}
 
 	public override void LoadView() {
 		// GL renders off-screen into a shared IOSurface and the CAMetalLayer-backed view
@@ -224,18 +234,52 @@ public partial class GameViewController : UIViewController {
 		);
 
 		// Register input devices for the game's input manager
-		global::OpenTaiko.OpenTaiko.ExternalInputDevices = new List<FDK.IInputDevice> { _keyboardInput };
+		_touchInput = new CInputTouch_iOS();
+		var inputDevices = new List<FDK.IInputDevice> { _keyboardInput, _touchInput };
+		inputDevices.AddRange(CInputGamepad_iOS.CreateSlots(global::OpenTaiko.OpenTaiko.MAX_PLAYERS));
+		global::OpenTaiko.OpenTaiko.ExternalInputDevices = inputDevices;
 
 		// Create and initialize the game
 		_game = new global::OpenTaiko.OpenTaiko();
 		_game.InitWithExternalContext(_fdkContext, _backingWidth, _backingHeight);
 
+		_touchInput.EnsureBindings(global::OpenTaiko.OpenTaiko.ConfigIni);
+		global::OpenTaiko.OpenTaiko.Pad.InvalidateInputToPadCache();
+
 		// FDK renders the scene into the presenter's shared FBO; the host presents it. The
 		// render-target FBO is (re)sized to GameWindowSize each frame in OnFrame.
 
 		// Add touch overlay controls
+		TouchDrumShape.Load();
 		CreateTouchOverlay();
 		CreateDebugHud();
+
+		global::OpenTaiko.CConfigOptionBuilder.iOSTouchShapeEditor = () => {
+			InvokeOnMainThread(() => {
+				// Scale the live game view down to the editor's screen rectangle and hide the game
+				// overlays.
+				var b = View!.Bounds;
+				var center = new CGPoint(b.Width / 2, b.Height / 2);
+				nfloat s = (nfloat)TouchDrumEditorViewController.ScreenScale;
+				_touchOverlaySuppressed = true;
+				if (_touchOverlay != null) _touchOverlay.Hidden = true;
+				if (_arrowOverlay != null) _arrowOverlay.Hidden = true;
+				UIView.Animate(0.3, () => {
+					View.Transform = CGAffineTransform.MakeScale(s, s);
+					View.Center = new CGPoint(b.Width * 0.5, b.Height * TouchDrumEditorViewController.ScreenCenterYFraction);
+				});
+				PresentViewController(new TouchDrumEditorViewController(saved => {
+					UIView.Animate(0.3, () => {
+						View.Transform = CGAffineTransform.MakeIdentity();
+						View.Center = center;
+					});
+					_touchOverlaySuppressed = false;
+					SetNeedsUpdateOfHomeIndicatorAutoHidden();
+					SetNeedsUpdateOfScreenEdgesDeferringSystemGestures();
+					if (saved) RebuildTouchOverlay();
+				}), true, null);
+			});
+		};
 
 		// Register iOS native text input handler for CTextInput (replaces ImGui)
 		global::OpenTaiko.CTextInput.iOSTextInputHandler = (currentText, maxLength, callback) => {
@@ -334,9 +378,12 @@ public partial class GameViewController : UIViewController {
 			// While in the Config stage, swap the drum overlay for the config D-pad (software arrow keys);
 			// the drum stays for gameplay and other menus.
 			if (_arrowOverlay == null) CreateArrowOverlay();
-			_arrowNavMode = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.Config;
-			if (_touchOverlay != null) _touchOverlay.Hidden = _arrowNavMode;
-			if (_arrowOverlay != null) _arrowOverlay.Hidden = !_arrowNavMode;
+			bool inConfig = global::OpenTaiko.OpenTaiko.rCurrentStage?.eStageID == CStage.EStage.Config;
+			// Rebuild the drum overlay when leaving Config so size/opacity changes apply right away.
+			if (_arrowNavMode && !inConfig && !_touchOverlaySuppressed) RebuildTouchOverlay();
+			_arrowNavMode = inConfig;
+			if (_touchOverlay != null) _touchOverlay.Hidden = _arrowNavMode || _touchOverlaySuppressed;
+			if (_arrowOverlay != null) _arrowOverlay.Hidden = !_arrowNavMode || _touchOverlaySuppressed;
 
 			_game.RenderHostedFrame(delta);
 
@@ -347,6 +394,7 @@ public partial class GameViewController : UIViewController {
 			// Each touch is a single-frame pulse — the key resets so the next
 			// touch-down always registers as a fresh press.
 			_keyboardInput?.ReleaseTouchKeys();
+			_touchInput?.ReleaseTouchButtons();
 
 			if (++_debugHudFrameCount % 60 == 0)
 				UpdateDebugHud();

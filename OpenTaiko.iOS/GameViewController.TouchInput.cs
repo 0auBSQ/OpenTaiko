@@ -1,3 +1,4 @@
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using UIKit;
@@ -24,7 +25,15 @@ public partial class GameViewController {
 	// Single radius for both visual and hit detection
 	private double DonRadius => (global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumVisual ?? 30) / 100.0;
 
+	// Overlay alpha from the touch drum opacity: 100 solid, 0 hidden. Borders use weight 2.
+	private static byte OverlayAlpha(int weight) {
+		int opacity = Math.Clamp(global::OpenTaiko.OpenTaiko.ConfigIni?.nTouchDrumOpacity ?? 15, 0, 100);
+		return (byte)Math.Min(255, 255 * opacity * weight / 100);
+	}
+
 	private UIView? _touchOverlay;
+	// True while the shape editor is open; keeps the overlay hidden across rebuilds.
+	private bool _touchOverlaySuppressed;
 	// Config-menu D-pad overlay (software arrow keys). Shown only in the Config stage.
 	private UIView? _arrowOverlay;
 	private bool _arrowNavMode;
@@ -32,7 +41,8 @@ public partial class GameViewController {
 	private void CreateTouchOverlay() {
 		_touchOverlay = new UIView(View!.Bounds) {
 			UserInteractionEnabled = false,
-			BackgroundColor = UIColor.Clear
+			BackgroundColor = UIColor.Clear,
+			Hidden = _touchOverlaySuppressed,
 		};
 
 		var bounds = View.Bounds;
@@ -53,55 +63,86 @@ public partial class GameViewController {
 		escView.ClipsToBounds = true;
 		_touchOverlay.AddSubview(escView);
 
-		// Don circle — centered below bottom edge, clipped to show top portion
-		var r = DonRadius * w;
-		var cx = DonCenterX * w;
-		var cy = DonCenterY * h;
-		var donView = new UIView(new CGRect(cx - r, cy - r, r * 2, r * 2));
-		donView.BackgroundColor = UIColor.FromRGBA(0xFF, 0x44, 0x44, 0x20);
-		donView.Layer.CornerRadius = (nfloat)r;
-		donView.Layer.BorderWidth = 1.5f;
-		donView.Layer.BorderColor = UIColor.FromRGBA(0xFF, 0x44, 0x44, 0x40).CGColor;
-		_touchOverlay.AddSubview(donView);
+		if (TouchDrumShape.HasCustomShape) {
+			// Player drawn shapes, rendered as one merged shape
+			var path = TouchDrumShape.BuildUnionPath(TouchDrumShape.Strokes
+				.Select(s => (IReadOnlyList<CGPoint>)s.Select(p => new CGPoint(p.X * w, p.Y * h)).ToList()));
+			if (path != null) {
+				_touchOverlay.Layer.AddSublayer(new CAShapeLayer {
+					Path = path,
+					FillColor = TouchDrumShape.Tint(OverlayAlpha(1)).CGColor,
+					StrokeColor = TouchDrumShape.Tint(OverlayAlpha(2)).CGColor,
+					LineWidth = 1.5f,
+				});
+			}
+		} else {
+			// Don circle — centered below bottom edge, clipped to show top portion
+			var r = DonRadius * w;
+			var cx = DonCenterX * w;
+			var cy = DonCenterY * h;
+			var donView = new UIView(new CGRect(cx - r, cy - r, r * 2, r * 2));
+			donView.BackgroundColor = TouchDrumShape.Tint(OverlayAlpha(1));
+			donView.Layer.CornerRadius = (nfloat)r;
+			donView.Layer.BorderWidth = 1.5f;
+			donView.Layer.BorderColor = TouchDrumShape.Tint(OverlayAlpha(2)).CGColor;
+			_touchOverlay.AddSubview(donView);
+		}
 
 		View.AddSubview(_touchOverlay);
 		View.ClipsToBounds = true;
 	}
 
-	private long HitTestTouchZone(CGPoint location) {
+	// Rebuilds the drum overlay after the shape editor saved a new layout.
+	private void RebuildTouchOverlay() {
+		_touchOverlay?.RemoveFromSuperview();
+		_touchOverlay = null;
+		CreateTouchOverlay();
+	}
+
+	private bool IsEscapeZone(CGPoint location) {
+		// Offset by safe area to match the visual button.
+		var bounds = View!.Bounds;
+		var safeInsets = View.SafeAreaInsets;
+		return location.X <= safeInsets.Left + EscapeZone.Width * bounds.Width
+			&& location.Y <= safeInsets.Top + EscapeZone.Height * bounds.Height;
+	}
+
+	// Maps a drum-zone touch to a CInputTouch_iOS button.
+	private int HitTestDrumZone(CGPoint location) {
 		var bounds = View!.Bounds;
 		double w = bounds.Width;
 		double h = bounds.Height;
-
-		// Check escape zone (offset by safe area to match visual button)
-		var safeInsets = View.SafeAreaInsets;
-		if (location.X <= safeInsets.Left + EscapeZone.Width * w && location.Y <= safeInsets.Top + EscapeZone.Height * h) {
-			return HID_ESC;
-		}
-
-		// Check Don circle in pixel space
-		double dx = location.X - DonCenterX * w;
-		double dy = location.Y - DonCenterY * h;
-		double r = DonRadius * w;
-
+		// Do a simple split at the middle of the screen to determine left/right.
 		bool isLeft = location.X < w * 0.5;
+		bool isDon;
 
-		if (dx * dx + dy * dy <= r * r) {
-			// Inside Don circle: F (left) / J (right)
-			return isLeft ? HID_F : HID_J;
+		if (TouchDrumShape.HasCustomShape) {
+			isDon = TouchDrumShape.HitTest(location.X / w, location.Y / h);
+		} else {
+			// Don circle in pixel space. Everywhere else is Ka.
+			double dx = location.X - DonCenterX * w;
+			double dy = location.Y - DonCenterY * h;
+			double r = DonRadius * w;
+			isDon = dx * dx + dy * dy <= r * r;
 		}
 
-		// Everywhere else is Ka: D (left) / K (right)
-		return isLeft ? HID_D : HID_K;
+		if (isDon) return isLeft ? CInputTouch_iOS.DonLeft : CInputTouch_iOS.DonRight;
+		return isLeft ? CInputTouch_iOS.KaLeft : CInputTouch_iOS.KaRight;
 	}
 
 	public override void TouchesBegan(NSSet touches, UIEvent? evt) {
 		base.TouchesBegan(touches, evt);
 		foreach (UITouch touch in touches.Cast<UITouch>()) {
 			var location = touch.LocationInView(View);
-			long hidCode = _arrowNavMode ? HitTestArrowZone(location) : HitTestTouchZone(location);
-			if (hidCode >= 0) {
-				_keyboardInput?.TouchKeyDown(hidCode);
+			if (_arrowNavMode) {
+				long hidCode = HitTestArrowZone(location);
+				if (hidCode >= 0) {
+					_keyboardInput?.TouchKeyDown(hidCode);
+				}
+			} else if (IsEscapeZone(location)) {
+				_keyboardInput?.TouchKeyDown(HID_ESC);
+			} else {
+				_touchInput?.TouchButtonDown(HitTestDrumZone(location));
 			}
 		}
 	}
