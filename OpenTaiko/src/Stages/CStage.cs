@@ -50,6 +50,7 @@ public class CStage : CActivity {
 		Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem,
 		Startup_5_PostProcessSonglist,
 		Startup_6_LoadTextures,
+		Startup_7_SetUpNewConfig,
 		Startup_Complete,
 		Title_FadeIn,
 		SongSelect_FadeInFromResults,

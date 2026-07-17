@@ -153,7 +153,7 @@ internal class CStage起動 : CStage {
 
 							this.list進行文字列.Add("LOADING TEXTURES...OK");
 							this.str現在進行中 = "Setup done.";
-							this.ePhaseID = EPhase.Startup_Complete;
+							this.ePhaseID = EPhase.Startup_7_SetUpNewConfig;
 							OpenTaiko.Skin.bgm起動画面.tStop();
 						}
 						if (OpenTaiko.ConfigIni.ASyncTextureLoad) {
@@ -168,7 +168,7 @@ internal class CStage起動 : CStage {
 			//-----------------
 			#endregion
 
-			if (ePhaseID != EPhase.Startup_Complete) {
+			if (ePhaseID is not (EPhase.Startup_7_SetUpNewConfig or EPhase.Startup_Complete)) {
 				#region [ this.list進行文字列＋this.現在進行中 の表示 ]
 				//-----------------
 				int x = (int)(320 * OpenTaiko.Skin.Resolution[0] / 1280.0);
@@ -180,7 +180,7 @@ internal class CStage起動 : CStage {
 				}
 				//-----------------
 				#endregion
-			} else if (OpenTaiko.ConfigIsNew && !bLanguageSelected) // Prompt language selection if Config.ini is newly generated
+			} else if (OpenTaiko.ConfigIsNew && ePhaseID is EPhase.Startup_7_SetUpNewConfig) // Prompt language selection if Config.ini is newly generated
 			{
 				HBlackBackdrop.Draw();
 
@@ -207,15 +207,21 @@ internal class CStage起動 : CStage {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
-					bLanguageSelected = true;
+					ePhaseID = EPhase.Startup_Complete;
 				}
 			} else {
 				if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
 				{
 					OpenTaiko.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
+					ePhaseID = EPhase.Startup_Complete;
 
-					return 1;
+					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+						OpenTaiko.Skin.soundDecideSFX.tPlay();
+						return 1;
+					}
 				}
+
+				OpenTaiko.Tx.Readme.t2D描画(0, 0);
 			}
 
 		}
