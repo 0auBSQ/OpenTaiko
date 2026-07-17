@@ -668,13 +668,12 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
-	protected override void Events() {
-		base.Events();
+	protected override void OnEvents() {
+		base.OnEvents();
 		FPSInput?.Update();
 	}
 	protected override void Update() {
 		InputManager?.Polling();
-		FPSInput?.Update(); // events polled before Update() is called
 	}
 
 	protected override void Draw() {
