@@ -62,7 +62,7 @@ internal abstract class CStage演奏画面共通 : CStage {
 		}
 		this.ReduceMultiplayerNotes(
 			chip => NotesManager.IsKusudama(chip),
-			chip => chip.nChannelNo = NotesManager.ToChannelNo(NotesManager.ENoteType.BalloonEx),
+			chip => chip.nChannelNo = NotesManager.ToChannelNo(NotesManager.ENoteType.Balloon),
 			OpenTaiko.ConfigIni.nPlayerCount);
 		this.ReduceMultiplayerNotes(chip => chip.IsPartnerNote, chip => chip.IsPartnerNote = false, 2);
 
@@ -290,8 +290,14 @@ internal abstract class CStage演奏画面共通 : CStage {
 							break; // would not match further
 						double msError = Math.Max(Math.Abs(now.db発声時刻ms - min.db発声時刻ms), Math.Abs(now.end.db発声時刻ms - min.end.db発声時刻ms));
 						if (ReferenceEquals(now, min) || msError < msErrorMin) {
+							// downgrade unmatched notes
+							for (int id = idxNotes[i, b]; id < ic; ++id) {
+								var note = targetNotes[i, b][id];
+								reduceF(note);
+								note.multiLink = null;
+							}
 							msErrorMin = msError;
-							idxNotes[i, b] = ic + 1; // exclude from future match, leave previous matches unmatched
+							idxNotes[i, b] = ic + 1; // exclude from future match
 							matchedNotes[i, b] = now;
 						}
 					}
