@@ -503,8 +503,8 @@ class CStageHeya : CStage {
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].Opacity = ctChara_In.n現在の値 * 2;
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
-			characterController.Update(0);
-			characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
+			characterController.Update();
+			characterController.Draw(chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
 
 			#region [PuchiChara]
 

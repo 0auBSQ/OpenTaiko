@@ -21,9 +21,8 @@ internal class CActImplCharacter : CActivity {
 			ctKusuIn = new();
 
 			// Currently used character
-			int p = i;
 
-			this.iCurrentCharacter[i] = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[p].data.Character, OpenTaiko.Tx.Characters.Length - 1));
+			this.iCurrentCharacter[i] = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[i].data.Character, OpenTaiko.Tx.Characters.Length - 1));
 			CharacterControllers[i] = new CCharacterController(i);
 
 			CCharacter.AddEssentialAnimation(i, CCharacter.ANIM_GAME_NORMAL);
@@ -141,7 +140,7 @@ internal class CActImplCharacter : CActivity {
 
 			if (!OpenTaiko.stageGameScreen.bPAUSE) {
 				CharacterControllers[i].dbDuration = 60000 / Math.Abs(CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[i]));
-				CharacterControllers[i].Update(i);
+				CharacterControllers[i].Update();
 			}
 			//CCharacter.GetCharacter(i).Update(i, animation);
 
@@ -440,7 +439,7 @@ internal class CActImplCharacter : CActivity {
 				}
 
 				//CCharacter.GetCharacter(i).Draw(i, animation, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, flipX);
-				CharacterControllers[i].Draw(i, chara_x, chara_y, _mirrorP2 ? -charaScale : charaScale, charaScale, 255, Color4.White);
+				CharacterControllers[i].Draw(chara_x, chara_y, _mirrorP2 ? -charaScale : charaScale, charaScale, 255, Color4.White);
 			}
 
 
@@ -489,7 +488,7 @@ internal class CActImplCharacter : CActivity {
 			}
 
 			//CCharacter.GetCharacter(i).Draw(i, CCharacter.ANIM_GAME_BALLOON_BREAKING, chara_x, chara_y, charaScale, charaScale, 255, Color4.White, false);
-			CharacterControllers[i].Draw(i, chara_x, chara_y, charaScale, charaScale, 255, Color4.White);
+			CharacterControllers[i].Draw(chara_x, chara_y, charaScale, charaScale, 255, Color4.White);
 			if (OpenTaiko.ConfigIni.nPlayerCount <= 2 && !IsInKusudama)
 				OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 					OpenTaiko.stageGameScreen.GetJPOSCROLLX(i) + OpenTaiko.Skin.Game_PuchiChara_BalloonX[i],
@@ -518,8 +517,8 @@ internal class CActImplCharacter : CActivity {
 					kusuX *= -1;
 				}
 
-				CharacterControllers[i].Draw(i, chara_x + kusuX, chara_y + kusuY,
-				(i % 2 == 1) ? -charaScale : charaScale, charaScale, 255, Color4.White);
+				CharacterControllers[i].Draw(chara_x + kusuX, chara_y + kusuY, (i % 2 == 1) ? -charaScale : charaScale,
+				charaScale, 255, Color4.White);
 				OpenTaiko.stageGameScreen.PuchiChara.OnProgressDraw(
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaX[i] + (int)kusuX,
 					OpenTaiko.Skin.Game_PuchiChara_KusudamaY[i] + (int)kusuY, false, 255, true, player: i);
@@ -822,7 +821,7 @@ internal class CActImplCharacter : CActivity {
 		} else if (priority < ActionKeepingPriority(CharacterControllers[player].strActionAnimation)) {
 			return; // insufficient action keeping priority
 		}
-		CharacterControllers[player].PlayAction(player, animationType);
+		CharacterControllers[player].PlayAction(animationType);
 	}
 
 	private bool visibleKusuChara(int iPlayer)
@@ -834,7 +833,7 @@ internal class CActImplCharacter : CActivity {
 		ctKusuSuccess = null;
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			CCharacter character = CCharacter.GetCharacter(i);
-			CharacterControllers[i].StopAction(i); // KusuIn replaces the action
+			CharacterControllers[i].StopAction(); // KusuIn replaces the action
 			CharacterControllers[i].strLoopAnimation = CCharacter.ANIM_GAME_KUSUDAMA_IDLE;
 			CharacterControllers[i].bLooping = true;
 		}

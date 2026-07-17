@@ -246,7 +246,7 @@ internal class CActResultParameterPanel : CActivity {
 			CCharacter character = CCharacter.GetCharacter(i);
 			CCharacterController characterController = new CCharacterController(i);
 			characterController.strLoopAnimation = CCharacter.ANIM_RESULT_NORMAL;
-			characterController.ResetCounter(i);
+			characterController.ResetCounter();
 
 			this.characterController[i] = characterController;
 		}
@@ -810,8 +810,8 @@ internal class CActResultParameterPanel : CActivity {
 					CResultCharacter.tMenuDisplayCharacter(p, chara_x, chara_y, CResultCharacter.ECharacterResult.NORMAL, pos);
 				*/
 
-				characterController[p].Update(p);
-				characterController[p].Draw(p, chara_x, chara_y, (pos % 2 == 1) ? -1.0f : 1.0f, 1.0f, 255, Color4.White);
+				characterController[p].Update();
+				characterController[p].Draw(chara_x, chara_y, (pos % 2 == 1) ? -1.0f : 1.0f, 1.0f, 255, Color4.White);
 
 				#endregion
 
@@ -1215,14 +1215,14 @@ internal class CActResultParameterPanel : CActivity {
 			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARSUCCESS);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_CLEAR;
-			characterController[player].ResetCounter(player);
+			characterController[player].ResetCounter();
 		} else {
 			CCharacter character = CCharacter.GetCharacter(player);
 			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARFAILED);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_FAILED;
-			characterController[player].ResetCounter(player);
-			characterController[player].PlayAction(player, CCharacter.ANIM_RESULT_FAILED_IN);
+			characterController[player].ResetCounter();
+			characterController[player].PlayAction(CCharacter.ANIM_RESULT_FAILED_IN);
 		}
 	}
 

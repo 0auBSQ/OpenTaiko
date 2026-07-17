@@ -14,48 +14,48 @@ namespace OpenTaiko {
 		public bool bLooping { get; set; } = true;
 
 		private string strCurrentAnimation => strActionAnimation ?? strLoopAnimation;
-		private bool[] bPlayingAction = new bool[5];
-		private int nBasePlayerIndex;
+		private bool bPlayingAction = false;
+		private int iPlayer;
 
-		public CCharacterController(int basePlayerIndex) {
-			this.nBasePlayerIndex = basePlayerIndex;
+		public CCharacterController(int iPlayer) {
+			this.iPlayer = iPlayer;
 		}
 
-		public void PlayAction(int player, string animationType) {
-			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
+		public void PlayAction(string animationType) {
+			CCharacter character = CCharacter.GetCharacter(iPlayer);
 			if (!character.AvailableAnimation(animationType)) return;
 			strActionAnimation = animationType;
 			character.ResetAnimationCounter(animationType);
 
-			bPlayingAction[player] = true;
+			bPlayingAction = true;
 		}
 
-		public void StopAction(int player) {
+		public void StopAction() {
 			strActionAnimation = null;
-			bPlayingAction[player] = false;
+			bPlayingAction = false;
 		}
 
-		public void ResetCounter(int player) {
-			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
+		public void ResetCounter() {
+			CCharacter character = CCharacter.GetCharacter(iPlayer);
 			character.ResetAnimationCounter(strCurrentAnimation);
 		}
 
-		public void Update(int player) {
-			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
+		public void Update() {
+			CCharacter character = CCharacter.GetCharacter(iPlayer);
 			character.SetAnimationDuration(strCurrentAnimation, dbDuration);
 
-			bool looping = !bPlayingAction[player] && bLooping;
+			bool looping = !bPlayingAction && bLooping;
 			bool animationEnded = character.Update(strCurrentAnimation, looping);
-			if (bPlayingAction[player] && animationEnded) {
-				StopAction(player);
-				ResetCounter(player);
-				Update(player);
+			if (bPlayingAction && animationEnded) {
+				StopAction();
+				ResetCounter();
+				Update();
 			}
 		}
 
-		public void Draw(int player, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null) {
-			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			character.Draw(strCurrentAnimation, x, y, scaleX, scaleY, opacity, color, gradientMap: PaletteManager.GetEffectivePalette(player)?.LuaMap);
+		public void Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null) {
+			CCharacter character = CCharacter.GetCharacter(iPlayer);
+			character.Draw(strCurrentAnimation, x, y, scaleX, scaleY, opacity, color, gradientMap: PaletteManager.GetEffectivePalette(iPlayer)?.LuaMap);
 		}
 	}
 }
