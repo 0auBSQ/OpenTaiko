@@ -1159,7 +1159,9 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 
 		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
 			var width = OpenTaiko.Tx.Bar.szTextureSize.Width;
-			if (x >= -width / 2 && x <= GameWindowSize.Width + width / 2) {
+			var height = OpenTaiko.Skin.Game_Notes_Size[1];
+			var maxRadius = width + height; // upper limit of Math.Hypot(width, height) and a close approximant because width is small
+			if (x >= -maxRadius / 2 && x <= GameWindowSize.Width + maxRadius / 2) {
 				double theta = (pChip.dbSCROLL_Y == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
 				CTexture tex = (pChip.bBranch) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
 				tex.fZ軸中心回転 = (float)theta;
