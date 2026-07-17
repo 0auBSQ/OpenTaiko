@@ -19,57 +19,8 @@ class CCharacterLua : CCharacter {
 		Script.Dispose();
 	}
 
-	public override void LoadAnimation(string animationType) {
-		if (animationType == ANIM_NONE) return;
-		Dictionary<string, int> animationCounts = animationLoadCounts;
-		if (!animationCounts.ContainsKey(animationType)) animationCounts.Add(animationType, 0);
-
-		animationCounts[animationType]++;
-
-		if (animationCounts[animationType] == 1) {
-			ImplLoadAnimation(animationType);
-			bool available = AvailableAnimation(animationType, false);
-			if (!available) {
-				animationCounts[animationType]--;
-
-				string alternative = GetAlternativeAnimation(animationType);
-				LoadAnimation(alternative);
-			}
-		}
-
-	}
-
-	public override void DisposeAnimation(string animationType) {
-		if (animationType == ANIM_NONE) return;
-
-		bool available = AvailableAnimation(animationType, false);
-		if (!available) {
-			string alternative = GetAlternativeAnimation(animationType);
-			DisposeAnimation(alternative);
-			return;
-		}
-
-		Dictionary<string, int> animationCounts = animationLoadCounts;
-		if (!animationCounts.ContainsKey(animationType)) animationCounts.Add(animationType, 1);
-
-		animationCounts[animationType]--;
-
-		if (animationCounts[animationType] == 0) {
-			ImplDisposeAnimation(animationType);
-			animationCounts.Remove(animationType);
-		}
-	}
-
-	public override bool AvailableAnimation(string animationType, bool useAlternative = true) {
-		if (animationType == ANIM_NONE) return false;
-		for (int i = 0; i < 5; i++) {
-			bool available = Script.AvailableAnimation(animationType);
-			if (available) return true;
-			if (!useAlternative) return false;
-
-			animationType = GetAlternativeAnimation(animationType);
-		}
-		return false;
+	protected override bool AvailableResolvedAnimation(string animationType) {
+		return Script.AvailableAnimation(animationType);
 	}
 
 	public override void SetAnimationDuration(string animationType, double duration) {
@@ -78,31 +29,6 @@ class CCharacterLua : CCharacter {
 
 	public override void ResetAnimationCounter(string animationType) {
 		Script.ResetAnimationCounter(this.GetAnimation(animationType));
-	}
-
-	//voice-------------
-	public override void LoadVoice(string voice) {
-		Dictionary<string, int> voiceCounts = voiceLoadCounts;
-		if (!voiceCounts.ContainsKey(voice)) voiceCounts.Add(voice, 0);
-
-		if (voiceCounts[voice] == 0) {
-			ImplLoadVoice(voice);
-		}
-
-		voiceCounts[voice]++;
-	}
-
-	public override void DisposeVoice(string voice) {
-		Dictionary<string, int> voiceCounts = voiceLoadCounts;
-		if (!voiceCounts.ContainsKey(voice)) voiceCounts.Add(voice, 0);
-
-		if (voiceCounts[voice] <= 0) return;
-		voiceCounts[voice]--;
-
-		if (voiceCounts[voice] == 0) {
-			ImplDisposeVoice(voice);
-			voiceCounts.Remove(voice);
-		}
 	}
 
 	public override bool Update(string animationType, bool looping = true) {
@@ -135,11 +61,11 @@ class CCharacterLua : CCharacter {
 	}
 
 
-	protected override void ImplLoadAnimation(string animationType) {
+	protected override void LoadResolvedAnimation(string animationType) {
 		Script.LoadAnimation(animationType);
 	}
 
-	protected override void ImplDisposeAnimation(string animationType) {
+	protected override void DisposeResolvedAnimation(string animationType) {
 		Script.DisposeAnimation(animationType);
 	}
 
@@ -147,11 +73,11 @@ class CCharacterLua : CCharacter {
 		Script.PlayVoice(voice);
 	}
 
-	protected override void ImplLoadVoice(string voice) {
+	protected override void LoadResolvedVoice(string voice) {
 		Script.LoadVoice(voice);
 	}
 
-	protected override void ImplDisposeVoice(string voice) {
+	protected override void DisposeResolvedVoice(string voice) {
 		Script.DisposeVoice(voice);
 	}
 

@@ -121,18 +121,19 @@ abstract class CCharacter : IDisposable {
 	}.ToFrozenDictionary();
 
 	public const int DEFAULT_DURATION = 500;
+	public const int ALTERNATIVE_MAX_TRY = 5;
 
-	// reference trackers
-	public static readonly Dictionary<string, int>[] PlayerToAnimationToRefCount = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
-		.Select(i => new Dictionary<string, int>())
-		.ToArray();
+	// reference count of requested resources for previews
+	protected readonly Dictionary<string, int> animationPreviewRefCounts = new();
+	protected readonly Dictionary<string, int> voicePreviewRefCounts = new();
 
-	public static readonly Dictionary<string, int>[] PlayerToVoiceToRefCount = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
-		.Select(i => new Dictionary<string, int>())
-		.ToArray();
+	// reference count of requested resources for players, only used for switching characters
+	protected Dictionary<string, int> animationRefCounts = new();
+	protected Dictionary<string, int> voiceRefCounts = new();
 
-	protected readonly Dictionary<string, int> animationLoadCounts = new();
-	protected readonly Dictionary<string, int> voiceLoadCounts = new();
+	// reference count of actually loaded resolved resources
+	protected readonly Dictionary<string, int> animationResolvedLoadCounts = new();
+	protected readonly Dictionary<string, int> voiceResolvedLoadCounts = new();
 
 	public static CCharacter GetCharacter(int player) {
 		int _charaId = CVirtualSlotManager.GetCharacterIndex(player);
@@ -143,108 +144,132 @@ abstract class CCharacter : IDisposable {
 	private static void AddRemovePreviewResource(string resourceName, Action<CCharacter, string> addRemoveResource) {
 		foreach (var characterLua in OpenTaiko.Tx.Characters)
 			addRemoveResource(characterLua[0], resourceName); // use P1's instances for preview
+	}
+
+	private void LoadResource(string name, Dictionary<string, int> refCounts, Dictionary<string, int> resolvedLoadCounts,
+		Func<CCharacter, string, bool> available, Func<CCharacter, string, string> getAlternative, Action<CCharacter, string> loadResolved,
+		string? noneName = null, int count = 1
+		) {
+		refCounts.TryAdd(name, 0);
+		refCounts[name] += count;
+		// try alternatives until successfully loaded (available)
+		for (int t = 0; t < ALTERNATIVE_MAX_TRY; ++t) {
+			if (name == noneName)
+				return;
+			if (resolvedLoadCounts.TryAdd(name, 0))
+				loadResolved(this, name);
+			if (available(this, name)) {
+				resolvedLoadCounts[name] += count;
+				break;
+			}
+			resolvedLoadCounts.Remove(name);
+			name = getAlternative(this, name);
 		}
-
-	private static void AddEssentialResource(int player, string resourceName, Dictionary<string, int>[] playerToResourceToRefCount, Action<CCharacter, string> addResource) {
-		var resourceToRefCount = playerToResourceToRefCount[player];
-		if (!resourceToRefCount.ContainsKey(resourceName))
-			resourceToRefCount.Add(resourceName, 0);
-		if (resourceToRefCount[resourceName] == 0)
-			addResource(GetCharacter(player), resourceName);
-		resourceToRefCount[resourceName]++;
 	}
 
-	private static void RemoveEssentialResource(int player, string resourceName, Dictionary<string, int>[] playerToResourceToRefCount, Action<CCharacter, string> removeResource) {
-		var resourceToRefCount = playerToResourceToRefCount[player];
-		if (!resourceToRefCount.ContainsKey(resourceName))
-			return;
-
-		resourceToRefCount[resourceName]--;
-		if (resourceToRefCount[resourceName] == 0) {
-			removeResource(GetCharacter(player), resourceName);
-			resourceToRefCount.Remove(resourceName);
+	private void DisposeResource(string name, Dictionary<string, int> refCounts, Dictionary<string, int> resolvedLoadCounts,
+		Func<CCharacter, string, string> resolveAlternatives, Action<CCharacter, string> disposeResolved,
+		int count = 1
+		) {
+		if (refCounts.TryGetValue(name, out int prevRefCount)) {
+			refCounts[name] -= count;
+			if (prevRefCount <= count)
+				refCounts.Remove(name);
 		}
-	}
-
-	private void AddResource(string resourceName, Dictionary<string, int> resourceLoadCounts, Action<CCharacter, string> loadResource, int count = 1) {
-		if (!resourceLoadCounts.ContainsKey(resourceName))
-			resourceLoadCounts.Add(resourceName, 0);
-		if (resourceLoadCounts[resourceName] == 0)
-			loadResource(this, resourceName);
-		resourceLoadCounts[resourceName] += count;
-	}
-
-	private void RemoveResource(string resourceName, Dictionary<string, int> resourceLoadCounts, Action<CCharacter, string> disposeResource, int count = 1) {
-		if (!resourceLoadCounts.ContainsKey(resourceName))
-			return;
-		resourceLoadCounts[resourceName] -= count;
-		if (resourceLoadCounts[resourceName] <= 0) {
-			disposeResource(this, resourceName);
-			resourceLoadCounts.Remove(resourceName);
+		var resolvedName = resolveAlternatives(this, name);
+		if (resolvedLoadCounts.TryGetValue(resolvedName, out int prevResolvedLoadCount)) {
+			resolvedLoadCounts[resolvedName] -= count;
+			if (prevResolvedLoadCount <= count) {
+				resolvedLoadCounts.Remove(resolvedName);
+				disposeResolved(this, resolvedName);
+			}
 		}
 	}
 
 
 	public static void AddPreviewAnimation(string animationName) =>
-		AddRemovePreviewResource(animationName, (chara, name) => chara.AddAnimation(name));
+		AddRemovePreviewResource(animationName, (chara, name) => chara.LoadAnimation(name, forPreview: true));
 	public static void RemovePreviewAnimation(string animationName) =>
-		AddRemovePreviewResource(animationName, (chara, name) => chara.RemoveAnimation(name));
+		AddRemovePreviewResource(animationName, (chara, name) => chara.DisposeAnimation(name, forPreview: true));
 
 	public static void AddEssentialAnimation(int player, string animationName)
-		=> AddEssentialResource(player, animationName, PlayerToAnimationToRefCount, (chara, name) => chara.AddAnimation(name));
+		=> GetCharacter(player).LoadAnimation(animationName);
 	public static void RemoveEssentialAnimation(int player, string animationName)
-		=> RemoveEssentialResource(player, animationName, PlayerToAnimationToRefCount, (chara, name) => chara.RemoveAnimation(name));
+		=> GetCharacter(player).DisposeAnimation(animationName);
 
-	private void AddAnimation(string animationName, int count = 1)
-		=> AddResource(animationName, animationLoadCounts, (chara, name) => chara.ImplLoadAnimation(name), count: count);
-	private void RemoveAnimation(string animationName, int count = 1)
-		=> RemoveResource(animationName, animationLoadCounts, (chara, name) => chara.ImplDisposeAnimation(name), count: count);
+	public void LoadAnimation(string animationName, int count = 1, bool forPreview = false)
+		=> LoadResource(animationName, forPreview ? animationPreviewRefCounts : animationRefCounts, animationResolvedLoadCounts,
+			(chara, name) => chara.AvailableResolvedAnimation(name), (chara, name) => GetAlternativeAnimation(name), (chara, name) => chara.LoadResolvedAnimation(name),
+			noneName: ANIM_NONE, count: count);
+	public void DisposeAnimation(string animationName, int count = 1, bool forPreview = false)
+		=> DisposeResource(animationName, forPreview ? animationPreviewRefCounts : animationRefCounts, animationResolvedLoadCounts,
+			(chara, name) => chara.GetAnimation(name), (chara, name) => chara.DisposeResolvedAnimation(name),
+			count: count);
 
 
 	public static void AddPreviewVoice(string voiceName) =>
-		AddRemovePreviewResource(voiceName, (chara, name) => chara.AddVoice(name));
+		AddRemovePreviewResource(voiceName, (chara, name) => chara.LoadVoice(name, forPreview: true));
 	public static void RemovePreviewVoice(string voiceName) =>
-		AddRemovePreviewResource(voiceName, (chara, name) => chara.RemoveVoice(name));
+		AddRemovePreviewResource(voiceName, (chara, name) => chara.DisposeVoice(name, forPreview: true));
 
 	public static void AddEssentialVoice(int player, string voiceName)
-		=> AddEssentialResource(player, voiceName, PlayerToVoiceToRefCount, (chara, name) => chara.AddVoice(name));
+		=> GetCharacter(player).LoadVoice(voiceName);
 	public static void RemoveEssentialVoice(int player, string voiceName)
-		=> RemoveEssentialResource(player, voiceName, PlayerToVoiceToRefCount, (chara, name) => chara.RemoveVoice(name));
+		=> GetCharacter(player).DisposeVoice(voiceName);
 
-	private void AddVoice(string voiceName, int count = 1)
-		=> AddResource(voiceName, voiceLoadCounts, (chara, name) => chara.ImplLoadVoice(name), count: count);
-	private void RemoveVoice(string voiceName, int count = 1)
-		=> RemoveResource(voiceName, voiceLoadCounts, (chara, name) => chara.ImplDisposeVoice(name), count: count);
+	public void LoadVoice(string voiceName, int count = 1, bool forPreview = false)
+		=> LoadResource(voiceName, forPreview ? voicePreviewRefCounts : voiceRefCounts, voiceResolvedLoadCounts,
+			(chara, name) => true, (chara, name) => name, (chara, name) => chara.LoadResolvedVoice(name), count: count);
+	public void DisposeVoice(string voiceName, int count = 1, bool forPreview = false)
+		=> DisposeResource(voiceName, forPreview ? voicePreviewRefCounts : voiceRefCounts, voiceResolvedLoadCounts,
+			(chara, name) => name, (chara, name) => chara.DisposeResolvedVoice(name), count: count);
 
+	public record struct ResourceRefCounts(IReadOnlyDictionary<string, int> animation, IReadOnlyDictionary<string, int> voice);
 
-	public void CharaLoadFor(int player) {
-		foreach (var (name, count) in PlayerToAnimationToRefCount[player])
-			this.AddAnimation(name, count);
-		foreach (var (name, count) in PlayerToVoiceToRefCount[player])
-			this.AddVoice(name, count);
+	public void CharaLoad(ResourceRefCounts? refCounts) {
+		if (refCounts == null)
+			return;
+		foreach (var (name, count) in refCounts.Value.animation)
+			this.LoadAnimation(name, count);
+		foreach (var (name, count) in refCounts.Value.voice)
+			this.LoadVoice(name, count);
 	}
 
-	public void CharaUnloadFor(int player) {
-		foreach (var (name, count) in PlayerToAnimationToRefCount[player])
-			this.RemoveAnimation(name, count);
-		foreach (var (name, count) in PlayerToVoiceToRefCount[player])
-			this.RemoveVoice(name, count);
+	public ResourceRefCounts CharaUnload() {
+		ResourceRefCounts res = new(animationRefCounts, voiceRefCounts);
+		animationRefCounts = [];
+		voiceRefCounts = [];
+		foreach (var (name, count) in res.animation)
+			this.DisposeAnimation(name, count);
+		foreach (var (name, count) in res.voice)
+			this.DisposeVoice(name, count);
+		return res;
 	}
 
-	public static string GetAlternativeAnimation(string animation) {
+	protected static string GetAlternativeAnimation(string animation) {
 		if (!AlternativeAnimations.ContainsKey(animation)) return ANIM_NONE;
 		string nextAnimation = AlternativeAnimations[animation];
 		return nextAnimation;
 	}
 
-	public string GetAnimation(string animation) {
-		for (int i = 0; i < 5; i++) {
-			bool available = this.AvailableAnimation(animation, false);
-			if (available) return animation;
-			string nextAnimation = GetAlternativeAnimation(animation);
-			animation = nextAnimation;
+	protected string GetAnimation(string animation) {
+		for (int i = 0; i < ALTERNATIVE_MAX_TRY; i++) {
+			if (animation == ANIM_NONE || this.AvailableResolvedAnimation(animation))
+				return animation;
+			animation = GetAlternativeAnimation(animation);
 		}
 		return ANIM_NONE;
+	}
+
+	public bool AvailableAnimation(string animationType) {
+		for (int i = 0; i < ALTERNATIVE_MAX_TRY; i++) {
+			if (animationType == ANIM_NONE)
+				return false;
+			if (this.AvailableResolvedAnimation(animationType))
+				return true;
+			animationType = GetAlternativeAnimation(animationType);
+		}
+		return false;
 	}
 
 	public class Info {
@@ -327,14 +352,16 @@ abstract class CCharacter : IDisposable {
 	}
 
 	public virtual void Dispose() {
-		for (int p = 0; p < OpenTaiko.MAX_PLAYERS; ++p) {
-			foreach (var (name, count) in PlayerToAnimationToRefCount[p])
-				this.ImplDisposeAnimation(name);
-			foreach (var (name, count) in PlayerToVoiceToRefCount[p])
-				this.ImplDisposeVoice(name);
-		}
-		animationLoadCounts.Clear();
-		voiceLoadCounts.Clear();
+			foreach (var (name, count) in animationResolvedLoadCounts)
+				this.DisposeResolvedAnimation(name);
+			foreach (var (name, count) in voiceResolvedLoadCounts)
+				this.DisposeResolvedVoice(name);
+		animationPreviewRefCounts.Clear();
+		animationRefCounts.Clear();
+		animationResolvedLoadCounts.Clear();
+		voicePreviewRefCounts.Clear();
+		voiceRefCounts.Clear();
+		voiceResolvedLoadCounts.Clear();
 	}
 
 	public virtual bool Update(string animationType, bool looping = true) {
@@ -360,21 +387,13 @@ abstract class CCharacter : IDisposable {
 	/// </summary>
 	public virtual (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) => null;
 
-	public virtual void LoadAnimation(string voice) {
-
+	protected virtual void LoadResolvedAnimation(string animationType) {
 	}
 
-	public virtual void DisposeAnimation(string voice) {
-
+	protected virtual void DisposeResolvedAnimation(string animationType) {
 	}
 
-	protected virtual void ImplLoadAnimation(string animationType) {
-	}
-
-	protected virtual void ImplDisposeAnimation(string animationType) {
-	}
-
-	public virtual bool AvailableAnimation(string voice, bool useAlternative = true) {
+	protected virtual bool AvailableResolvedAnimation(string animationType) {
 		return false;
 	}
 
@@ -391,18 +410,11 @@ abstract class CCharacter : IDisposable {
 	}
 
 	//voice-------------
-	public virtual void LoadVoice(string voice) {
 
+	protected virtual void LoadResolvedVoice(string voice) {
 	}
 
-	public virtual void DisposeVoice(string voice) {
-
-	}
-
-	protected virtual void ImplLoadVoice(string voice) {
-	}
-
-	protected virtual void ImplDisposeVoice(string voice) {
+	protected virtual void DisposeResolvedVoice(string voice) {
 	}
 
 	public virtual void PlayVoice(string voice) {
