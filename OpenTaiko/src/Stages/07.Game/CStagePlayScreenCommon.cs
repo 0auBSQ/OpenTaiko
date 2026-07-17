@@ -73,7 +73,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 		this.ReduceMultiplayerNotes(
 			chip => NotesManager.IsKusudama(chip),
-			chip => chip.nChannelNo = NotesManager.ToChannelNo(NotesManager.ENoteType.BalloonEx),
+			chip => chip.nChannelNo = NotesManager.ToChannelNo(NotesManager.ENoteType.Balloon),
 			OpenTaiko.ConfigIni.nPlayerCount);
 		this.ReduceMultiplayerNotes(chip => chip.IsPartnerNote, chip => chip.IsPartnerNote = false, 2);
 
@@ -341,8 +341,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 							break; // would not match further
 						double msError = Math.Max(Math.Abs(now.dbSoundTimems - min.dbSoundTimems), Math.Abs(now.end.dbSoundTimems - min.end.dbSoundTimems));
 						if (ReferenceEquals(now, min) || msError < msErrorMin) {
+							// downgrade unmatched notes
+							for (int id = idxNotes[i, b]; id < ic; ++id) {
+								var note = targetNotes[i, b][id];
+								reduceF(note);
+								note.multiLink = null;
+							}
 							msErrorMin = msError;
-							idxNotes[i, b] = ic + 1; // exclude from future match, leave previous matches unmatched
+							idxNotes[i, b] = ic + 1; // exclude from future match
 							matchedNotes[i, b] = now;
 						}
 					}
