@@ -233,7 +233,7 @@ class CStageHeya : CStage {
 		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2DDraw(0, 0);
 		if (iCurrentMenu == CurrentMenu.Chara) {
 			string renderAnimation = CCharacter.ANIM_RENDER;
-			var chara = OpenTaiko.Tx.Characters[iCharacterCurrent][0]; // use P1's instance for preview
+			var chara = OpenTaiko.Tx.Characters[iCharacterCurrent].Preview;
 			var (offsetX, offsetY) = chara.GetHeyaRenderOffset();
 			chara.SetAnimationDuration(renderAnimation, CCharacter.DEFAULT_DURATION);
 			chara.Update(renderAnimation);
@@ -315,8 +315,8 @@ class CStageHeya : CStage {
 
 				var scroll = DrawBox_Slot(i + (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2));
 
-				OpenTaiko.Tx.Characters[pos][0].Draw(CCharacter.ANIM_PREVIEW, scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0], scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1],
-					1.0f, 1.0f, 255, color); // use P1's instance for preview
+				OpenTaiko.Tx.Characters[pos].Preview.Draw(CCharacter.ANIM_PREVIEW, scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0], scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1],
+					1.0f, 1.0f, 255, color);
 
 				#region [Database related values]
 

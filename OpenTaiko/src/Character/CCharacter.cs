@@ -143,7 +143,7 @@ abstract class CCharacter : IDisposable {
 
 	private static void AddRemovePreviewResource(string resourceName, Action<CCharacter, string> addRemoveResource) {
 		foreach (var characterLua in OpenTaiko.Tx.Characters)
-			addRemoveResource(characterLua[0], resourceName); // use P1's instances for preview
+			addRemoveResource(characterLua.Preview, resourceName);
 	}
 
 	private void LoadResource(string name, Dictionary<string, int> refCounts, Dictionary<string, int> resolvedLoadCounts,

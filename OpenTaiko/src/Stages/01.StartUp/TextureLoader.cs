@@ -1235,6 +1235,7 @@ Result_Mountain = new CTexture[4]*/;
 		public readonly CCharacterLua[] instances; // [iPlayer]
 		public CCharacter.Info info => this;
 		public CCharacterLua this[int p] => instances[p];
+		public CCharacterLua Preview => instances[0]; // use P1's instance for preview
 
 		public CCharacterLuaSet(string path, int i) : base(path, i) {
 			instances = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)

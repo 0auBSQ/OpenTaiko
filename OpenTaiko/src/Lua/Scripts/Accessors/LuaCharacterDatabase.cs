@@ -16,7 +16,7 @@ namespace OpenTaiko {
 
 		internal LuaCharacterDatabase(TextureLoader.CCharacterLuaSet[] characters) {
 			_entries = characters
-				.Select(s => s[0]) // use P1's instances for preview
+				.Select(s => s.Preview)
 				.Where(c => c != null)
 				.Select(c => new LuaCharacterEntry(c))
 				.ToArray();
