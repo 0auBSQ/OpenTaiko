@@ -1212,13 +1212,13 @@ internal class CActResultParameterPanel : CActivity {
 	private void CheckClear(int player) {
 		if (OpenTaiko.stageResults.nClear[player] >= 1) {
 			CCharacter character = CCharacter.GetCharacter(player);
-			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARSUCCESS);
+			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARSUCCESS);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_CLEAR;
 			characterController[player].ResetCounter(player);
 		} else {
 			CCharacter character = CCharacter.GetCharacter(player);
-			character.PlayVoice(player, CCharacter.VOICE_RESULT_CLEARFAILED);
+			character.PlayVoice(CCharacter.VOICE_RESULT_CLEARFAILED);
 
 			characterController[player].strLoopAnimation = CCharacter.ANIM_RESULT_FAILED;
 			characterController[player].ResetCounter(player);

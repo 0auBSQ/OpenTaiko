@@ -20,7 +20,7 @@ class CHeyaDisplayAssetInformations {
 		}
 	}
 
-	public static void DisplayCharacterInfo(CCachedFontRenderer pf, CCharacter character) {
+	public static void DisplayCharacterInfo(CCachedFontRenderer pf, CCharacter.Info character) {
 		string description = "";
 		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_NAME").SafeFormat(character.metadata.tGetName())}\n";
 		description += $"{CLangManager.LangInstance.GetString("HEYA_DESCRIPTION_RARITY").SafeFormat(

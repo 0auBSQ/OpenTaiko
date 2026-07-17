@@ -20,7 +20,7 @@ internal class OpenTaiko : Game {
 	public static readonly string AppDisplayThreePartVersion = GetAppDisplayThreePartVersion();
 	public static readonly string AppNumericThreePartVersion = GetAppNumericThreePartVersion();
 
-	public static readonly int MAX_PLAYERS = 5;
+	public const int MAX_PLAYERS = 5;
 
 	private static string GetAppDisplayThreePartVersion() {
 		return $"v{GetAppNumericThreePartVersion()}";

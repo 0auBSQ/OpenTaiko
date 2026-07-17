@@ -27,15 +27,11 @@ namespace OpenTaiko {
 			? CCharacter.GetCharacter(_player)
 			: _ownedCharacter;
 
-		// Slot used for all CCharacter calls in name-bound mode
-		// NOTE: I'd like CCharacter.Draw to not have a player number ideally, will think about how to design this
-		private int Slot => _player >= 0 ? _player : 0;
-
 		public bool IsValid => Character != null;
 
-		public string FolderName => Character?.dirName ?? "";
-		public string FullPath => Character?._path ?? "";
-		public string DisplayName => Character?.metadata?.tGetName() ?? FolderName;
+		public string FolderName => Character?.info.dirName ?? "";
+		public string FullPath => Character?.info._path ?? "";
+		public string DisplayName => Character?.info.metadata?.tGetName() ?? FolderName;
 
 		// ── Character-scope visual state ─────────────────────────────────────────
 		// All values are applied just before each draw call; frame textures are
@@ -115,16 +111,16 @@ namespace OpenTaiko {
 			: _paletteEntry?.LuaMap;
 
 		public void Draw(float x, float y, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.Draw(Slot, animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
+			Character?.Draw(animation, x, y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		public void DrawAtAnchor(float x, float y, string animation, string anchor = "bottom", float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.DrawAtAnchor(Slot, animation, x, y, anchor, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), null, null, 0f, 0f, _rotation, _blendMode, _wrapMode, DrawGradient);
+			Character?.DrawAtAnchor(animation, x, y, anchor, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), null, null, 0f, 0f, _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		/// <summary>Draws the character using the top-left corner of a layout rect as the origin.</summary>
 		public void DrawRect(float rect_x, float rect_y, float rect_w, float rect_h, string animation, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255) {
-			Character?.Draw(Slot, animation, rect_x, rect_y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
+			Character?.Draw(animation, rect_x, rect_y, _scaleX * scaleX, _scaleY * scaleY, BlendOpacity(opacity), StoredColor(), _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		/// <summary>
@@ -133,40 +129,40 @@ namespace OpenTaiko {
 		/// The caller is responsible for computing the exact draw position.
 		/// </summary>
 		public void DrawRectAtAnchor(float x, float y, float clip_w, float clip_h, string animation, int opacity = 255, float clipX = 0f, float clipY = 0f) {
-			Character?.DrawAtAnchor(Slot, animation, x, y, "topleft", _scaleX, _scaleY, BlendOpacity(opacity), StoredColor(), clip_w, clip_h, clipX, clipY, _rotation, _blendMode, _wrapMode, DrawGradient);
+			Character?.DrawAtAnchor(animation, x, y, "topleft", _scaleX, _scaleY, BlendOpacity(opacity), StoredColor(), clip_w, clip_h, clipX, clipY, _rotation, _blendMode, _wrapMode, DrawGradient);
 		}
 
 		public bool Update(string animation, bool looping = true) {
-			return Character?.Update(Slot, animation, looping) ?? false;
+			return Character?.Update(animation, looping) ?? false;
 		}
 
 		public void LoadAnimation(string animation) {
-			Character?.LoadAnimation(Slot, animation);
+			Character?.LoadAnimation(animation);
 		}
 
 		public void DisposeAnimation(string animation) {
-			Character?.DisposeAnimation(Slot, animation);
+			Character?.DisposeAnimation(animation);
 		}
 
 		public bool AvailableAnimation(string animation) {
-			return Character?.AvailableAnimation(Slot, animation) ?? false;
+			return Character?.AvailableAnimation(animation) ?? false;
 		}
 
 		public void SetAnimationDuration(string animation, double duration) {
-			Character?.SetAnimationDuration(Slot, animation, duration);
+			Character?.SetAnimationDuration(animation, duration);
 		}
 
 		public void SetAnimationCyclesFromBPM(string animation, double bpm) {
-			Character?.SetAnimationCyclesFromBPM(Slot, animation, bpm);
+			Character?.SetAnimationCyclesFromBPM(animation, bpm);
 		}
 
 		public void ResetAnimationCounter(string animation) {
-			Character?.ResetAnimationCounter(Slot, animation);
+			Character?.ResetAnimationCounter(animation);
 		}
 
 		/// <summary>Returns the drawn dimensions of the current animation frame scaled to the theme resolution. Returns (X=0, Y=0) if unavailable.</summary>
 		public LuaVector2 GetAnimationSize(string animation) {
-			return Character?.GetDrawSize(Slot, animation) ?? new LuaVector2(0, 0);
+			return Character?.GetDrawSize(animation) ?? new LuaVector2(0, 0);
 		}
 
 		#endregion
@@ -174,15 +170,15 @@ namespace OpenTaiko {
 		#region [Voice]
 
 		public void LoadVoice(string voice) {
-			Character?.LoadVoice(Slot, voice);
+			Character?.LoadVoice(voice);
 		}
 
 		public void DisposeVoice(string voice) {
-			Character?.DisposeVoice(Slot, voice);
+			Character?.DisposeVoice(voice);
 		}
 
 		public void PlayVoice(string voice) {
-			Character?.PlayVoice(Slot, voice);
+			Character?.PlayVoice(voice);
 		}
 
 		#endregion

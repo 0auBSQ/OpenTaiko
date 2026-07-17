@@ -23,9 +23,9 @@ namespace OpenTaiko {
 
 		public void PlayAction(int player, string animationType) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			if (!character.AvailableAnimation(player, animationType)) return;
+			if (!character.AvailableAnimation(animationType)) return;
 			strActionAnimation = animationType;
-			character.ResetAnimationCounter(player, animationType);
+			character.ResetAnimationCounter(animationType);
 
 			bPlayingAction[player] = true;
 		}
@@ -37,15 +37,15 @@ namespace OpenTaiko {
 
 		public void ResetCounter(int player) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			character.ResetAnimationCounter(player, strCurrentAnimation);
+			character.ResetAnimationCounter(strCurrentAnimation);
 		}
 
 		public void Update(int player) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			character.SetAnimationDuration(player, strCurrentAnimation, dbDuration);
+			character.SetAnimationDuration(strCurrentAnimation, dbDuration);
 
 			bool looping = !bPlayingAction[player] && bLooping;
-			bool animationEnded = character.Update(player, strCurrentAnimation, looping);
+			bool animationEnded = character.Update(strCurrentAnimation, looping);
 			if (bPlayingAction[player] && animationEnded) {
 				StopAction(player);
 				ResetCounter(player);
@@ -55,7 +55,7 @@ namespace OpenTaiko {
 
 		public void Draw(int player, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null) {
 			CCharacter character = CCharacter.GetCharacter(nBasePlayerIndex);
-			character.Draw(player, strCurrentAnimation, x, y, scaleX, scaleY, opacity, color, gradientMap: PaletteManager.GetEffectivePalette(player)?.LuaMap);
+			character.Draw(strCurrentAnimation, x, y, scaleX, scaleY, opacity, color, gradientMap: PaletteManager.GetEffectivePalette(player)?.LuaMap);
 		}
 	}
 }

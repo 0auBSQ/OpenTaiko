@@ -59,7 +59,7 @@ internal class CActPlayComboSound : CActivity {
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
 			#region [Combo voices]
 
-			string charaPath = CCharacter.GetCharacter(i)._path;
+			string charaPath = CCharacter.GetCharacter(i).info._path;
 
 			var currentDir = OpenTaiko.ResolveAssetPath(Path.Combine(charaPath, "Sounds", "Combo") + Path.DirectorySeparatorChar);
 			if (Directory.Exists(currentDir)) {

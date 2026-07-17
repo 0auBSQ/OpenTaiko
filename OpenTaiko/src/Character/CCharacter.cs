@@ -118,161 +118,117 @@ abstract class CCharacter : IDisposable {
 		{ ANIM_RESULT_CLEAR, ANIM_GAME_CLEAR },
 		{ ANIM_RESULT_FAILED_IN, ANIM_GAME_MISS_IN },
 		{ ANIM_RESULT_FAILED, ANIM_GAME_MISS }
-}.ToFrozenDictionary();
+	}.ToFrozenDictionary();
 
 	public const int DEFAULT_DURATION = 500;
 
-	public static readonly Dictionary<string, int> listPreviewAnimation = new Dictionary<string, int>();
-	public static readonly Dictionary<string, int>[] listEssentialAnimation = new Dictionary<string, int>[5] {
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>()
-	};
+	// reference trackers
+	public static readonly Dictionary<string, int>[] PlayerToAnimationToRefCount = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
+		.Select(i => new Dictionary<string, int>())
+		.ToArray();
 
-	public static readonly Dictionary<string, int> listPreviewVoices = new Dictionary<string, int>();
-	public static readonly Dictionary<string, int>[] listEssentialVoices = new Dictionary<string, int>[5] {
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>(),
-		new Dictionary<string, int>()
-	};
+	public static readonly Dictionary<string, int>[] PlayerToVoiceToRefCount = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
+		.Select(i => new Dictionary<string, int>())
+		.ToArray();
+
+	protected readonly Dictionary<string, int> animationLoadCounts = new();
+	protected readonly Dictionary<string, int> voiceLoadCounts = new();
 
 	public static CCharacter GetCharacter(int player) {
 		int _charaId = CVirtualSlotManager.GetCharacterIndex(player);
-		return OpenTaiko.Tx.Characters[_charaId];
+		return OpenTaiko.Tx.Characters[_charaId][player];
 	}
 
 
-
-
-	public static void AddPreviewAnimation(string animationName) {
-		if (!listPreviewAnimation.ContainsKey(animationName)) {
-			listPreviewAnimation.Add(animationName, 0);
+	private static void AddRemovePreviewResource(string resourceName, Action<CCharacter, string> addRemoveResource) {
+		foreach (var characterLua in OpenTaiko.Tx.Characters)
+			addRemoveResource(characterLua[0], resourceName); // use P1's instances for preview
 		}
 
-		if (listPreviewAnimation[animationName] == 0) {
-			foreach (CCharacter characterLua in OpenTaiko.Tx.Characters) {
-				characterLua.LoadAnimation(0, animationName);
-			}
-		}
-		listPreviewAnimation[animationName]++;
+	private static void AddEssentialResource(int player, string resourceName, Dictionary<string, int>[] playerToResourceToRefCount, Action<CCharacter, string> addResource) {
+		var resourceToRefCount = playerToResourceToRefCount[player];
+		if (!resourceToRefCount.ContainsKey(resourceName))
+			resourceToRefCount.Add(resourceName, 0);
+		if (resourceToRefCount[resourceName] == 0)
+			addResource(GetCharacter(player), resourceName);
+		resourceToRefCount[resourceName]++;
 	}
 
-	public static void RemovePreviewAnimation(string animationName) {
-		if (!listPreviewAnimation.ContainsKey(animationName)) return;
+	private static void RemoveEssentialResource(int player, string resourceName, Dictionary<string, int>[] playerToResourceToRefCount, Action<CCharacter, string> removeResource) {
+		var resourceToRefCount = playerToResourceToRefCount[player];
+		if (!resourceToRefCount.ContainsKey(resourceName))
+			return;
 
-		listPreviewAnimation[animationName]--;
-		if (listPreviewAnimation[animationName] == 0) {
-			foreach (CCharacter characterLua in OpenTaiko.Tx.Characters) {
-				characterLua.DisposeAnimation(0, animationName);
-			}
-
-			listPreviewAnimation.Remove(animationName);
+		resourceToRefCount[resourceName]--;
+		if (resourceToRefCount[resourceName] == 0) {
+			removeResource(GetCharacter(player), resourceName);
+			resourceToRefCount.Remove(resourceName);
 		}
 	}
 
-	public static void AddEssentialAnimation(int player, string animationName) {
-		Dictionary<string, int> essentialAnimationCounts = listEssentialAnimation[player];
-		if (!essentialAnimationCounts.ContainsKey(animationName)) {
-			essentialAnimationCounts.Add(animationName, 0);
-		}
-
-		if (essentialAnimationCounts[animationName] == 0) {
-			GetCharacter(player).LoadAnimation(player, animationName);
-		}
-		essentialAnimationCounts[animationName]++;
+	private void AddResource(string resourceName, Dictionary<string, int> resourceLoadCounts, Action<CCharacter, string> loadResource, int count = 1) {
+		if (!resourceLoadCounts.ContainsKey(resourceName))
+			resourceLoadCounts.Add(resourceName, 0);
+		if (resourceLoadCounts[resourceName] == 0)
+			loadResource(this, resourceName);
+		resourceLoadCounts[resourceName] += count;
 	}
 
-	public static void RemoveEssentialAnimation(int player, string animationName) {
-		Dictionary<string, int> essentialVoiceCounts = listEssentialAnimation[player];
-		if (!essentialVoiceCounts.ContainsKey(animationName)) return;
-
-		essentialVoiceCounts[animationName]--;
-		if (essentialVoiceCounts[animationName] == 0) {
-			GetCharacter(player).DisposeAnimation(player, animationName);
-
-			essentialVoiceCounts.Remove(animationName);
+	private void RemoveResource(string resourceName, Dictionary<string, int> resourceLoadCounts, Action<CCharacter, string> disposeResource, int count = 1) {
+		if (!resourceLoadCounts.ContainsKey(resourceName))
+			return;
+		resourceLoadCounts[resourceName] -= count;
+		if (resourceLoadCounts[resourceName] <= 0) {
+			disposeResource(this, resourceName);
+			resourceLoadCounts.Remove(resourceName);
 		}
 	}
 
 
+	public static void AddPreviewAnimation(string animationName) =>
+		AddRemovePreviewResource(animationName, (chara, name) => chara.AddAnimation(name));
+	public static void RemovePreviewAnimation(string animationName) =>
+		AddRemovePreviewResource(animationName, (chara, name) => chara.RemoveAnimation(name));
+
+	public static void AddEssentialAnimation(int player, string animationName)
+		=> AddEssentialResource(player, animationName, PlayerToAnimationToRefCount, (chara, name) => chara.AddAnimation(name));
+	public static void RemoveEssentialAnimation(int player, string animationName)
+		=> RemoveEssentialResource(player, animationName, PlayerToAnimationToRefCount, (chara, name) => chara.RemoveAnimation(name));
+
+	private void AddAnimation(string animationName, int count = 1)
+		=> AddResource(animationName, animationLoadCounts, (chara, name) => chara.ImplLoadAnimation(name), count: count);
+	private void RemoveAnimation(string animationName, int count = 1)
+		=> RemoveResource(animationName, animationLoadCounts, (chara, name) => chara.ImplDisposeAnimation(name), count: count);
 
 
-	public static void AddPreviewVoice(string voiceName) {
-		if (!listPreviewVoices.ContainsKey(voiceName)) {
-			listPreviewVoices.Add(voiceName, 0);
-		}
+	public static void AddPreviewVoice(string voiceName) =>
+		AddRemovePreviewResource(voiceName, (chara, name) => chara.AddVoice(name));
+	public static void RemovePreviewVoice(string voiceName) =>
+		AddRemovePreviewResource(voiceName, (chara, name) => chara.RemoveVoice(name));
 
-		if (listPreviewVoices[voiceName] == 0) {
-			foreach (CCharacter characterLua in OpenTaiko.Tx.Characters) {
-				characterLua.LoadVoice(0, voiceName);
-			}
-		}
-		listPreviewVoices[voiceName]++;
+	public static void AddEssentialVoice(int player, string voiceName)
+		=> AddEssentialResource(player, voiceName, PlayerToVoiceToRefCount, (chara, name) => chara.AddVoice(name));
+	public static void RemoveEssentialVoice(int player, string voiceName)
+		=> RemoveEssentialResource(player, voiceName, PlayerToVoiceToRefCount, (chara, name) => chara.RemoveVoice(name));
+
+	private void AddVoice(string voiceName, int count = 1)
+		=> AddResource(voiceName, voiceLoadCounts, (chara, name) => chara.ImplLoadVoice(name), count: count);
+	private void RemoveVoice(string voiceName, int count = 1)
+		=> RemoveResource(voiceName, voiceLoadCounts, (chara, name) => chara.ImplDisposeVoice(name), count: count);
+
+
+	public void CharaLoadFor(int player) {
+		foreach (var (name, count) in PlayerToAnimationToRefCount[player])
+			this.AddAnimation(name, count);
+		foreach (var (name, count) in PlayerToVoiceToRefCount[player])
+			this.AddVoice(name, count);
 	}
 
-	public static void RemovePreviewVoice(string voiceName) {
-		if (!listPreviewVoices.ContainsKey(voiceName)) return;
-
-		listPreviewVoices[voiceName]--;
-		if (listPreviewVoices[voiceName] == 0) {
-			foreach (CCharacter characterLua in OpenTaiko.Tx.Characters) {
-				characterLua.DisposeVoice(0, voiceName);
-			}
-
-			listPreviewVoices.Remove(voiceName);
-		}
-	}
-
-	public static void AddEssentialVoice(int player, string voiceName) {
-		Dictionary<string, int> essentialVoiceCounts = listEssentialVoices[player];
-		if (!essentialVoiceCounts.ContainsKey(voiceName)) {
-			essentialVoiceCounts.Add(voiceName, 0);
-		}
-
-		if (essentialVoiceCounts[voiceName] == 0) {
-			GetCharacter(player).LoadVoice(player, voiceName);
-		}
-		essentialVoiceCounts[voiceName]++;
-	}
-
-	public static void RemoveEssentialVoice(int player, string voiceName) {
-		Dictionary<string, int> essentialVoiceCounts = listEssentialVoices[player];
-		if (!essentialVoiceCounts.ContainsKey(voiceName)) return;
-
-		essentialVoiceCounts[voiceName]--;
-		if (essentialVoiceCounts[voiceName] == 0) {
-			GetCharacter(player).DisposeVoice(player, voiceName);
-
-			essentialVoiceCounts.Remove(voiceName);
-		}
-	}
-
-	public static void CharaLoad(int player, CCharacter character) {
-		Dictionary<string, int> essentialAnimationCounts = listEssentialAnimation[player];
-		foreach (var item in essentialAnimationCounts) {
-			character.LoadAnimation(player, item.Key);
-		}
-
-		Dictionary<string, int> essentialVoiceCounts = listEssentialVoices[player];
-		foreach (var item in essentialVoiceCounts) {
-			character.LoadVoice(player, item.Key);
-		}
-	}
-
-	public static void CharaUnload(int player, CCharacter character) {
-		Dictionary<string, int> essentialAnimationCounts = listEssentialAnimation[player];
-		foreach (var item in essentialAnimationCounts) {
-			character.DisposeAnimation(player, item.Key);
-		}
-
-		Dictionary<string, int> essentialVoiceCounts = listEssentialVoices[player];
-		foreach (var item in essentialVoiceCounts) {
-			character.DisposeVoice(player, item.Key);
-		}
+	public void CharaUnloadFor(int player) {
+		foreach (var (name, count) in PlayerToAnimationToRefCount[player])
+			this.RemoveAnimation(name, count);
+		foreach (var (name, count) in PlayerToVoiceToRefCount[player])
+			this.RemoveVoice(name, count);
 	}
 
 	public static string GetAlternativeAnimation(string animation) {
@@ -281,9 +237,9 @@ abstract class CCharacter : IDisposable {
 		return nextAnimation;
 	}
 
-	public static string GetAnimation(int player, CCharacter character, string animation) {
+	public string GetAnimation(string animation) {
 		for (int i = 0; i < 5; i++) {
-			bool available = character.AvailableAnimation(player, animation, false);
+			bool available = this.AvailableAnimation(animation, false);
 			if (available) return animation;
 			string nextAnimation = GetAlternativeAnimation(animation);
 			animation = nextAnimation;
@@ -291,92 +247,111 @@ abstract class CCharacter : IDisposable {
 		return ANIM_NONE;
 	}
 
-	public DBCharacter.CharacterData metadata;
-	public DBCharacter.CharacterEffect effect;
-	public CUnlockCondition? unlock;
-	public string _path;
-	public int _idx;
-	public string dirName;
+	public class Info {
+		public DBCharacter.CharacterData metadata;
+		public DBCharacter.CharacterEffect effect;
+		public CUnlockCondition? unlock;
+		public string _path;
+		public int _idx;
+		public string dirName;
 
-	public float GetEffectCoinMultiplier(bool gaugeEnabled = true) {
-		float mult = 1f;
+		public float GetEffectCoinMultiplier(bool gaugeEnabled = true) {
+			float mult = 1f;
 
-		mult *= HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity);
-		mult *= effect.GetCoinMultiplier(1f, gaugeEnabled: gaugeEnabled);
+			mult *= HRarity.tRarityToRarityToCoinMultiplier(metadata.Rarity);
+			mult *= effect.GetCoinMultiplier(1f, gaugeEnabled: gaugeEnabled);
 
-		return mult;
-	}
-
-	public void tGetUnlockedItems(int _player, ModalQueue mq) {
-		int player = _player;
-		var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedCharacters;
-		bool _edited = false;
-
-		if (!_sf.Contains(dirName)) {
-			var _fulfilled = unlock?.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1 ?? false;
-
-			if (_fulfilled) {
-				_sf.Add(dirName);
-				_edited = true;
-				mq.tAddModal(
-					new Modal(
-						Modal.EModalType.Character,
-						HRarity.tRarityToModalInt(metadata.Rarity),
-						new LuaCharacter(dirName)
-					),
-					_player);
-
-				DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[player].data.SaveId, "unlocked_characters", dirName);
-			}
+			return mult;
 		}
 
-		if (_edited)
-			OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
+		public void tGetUnlockedItems(int _player, ModalQueue mq) {
+			int player = _player;
+			var _sf = OpenTaiko.SaveFileInstances[player].data.UnlockedCharacters;
+			bool _edited = false;
+
+			if (!_sf.Contains(dirName)) {
+				var _fulfilled = unlock?.tConditionMet(player, CUnlockCondition.EScreen.Internal).Item1 ?? false;
+
+				if (_fulfilled) {
+					_sf.Add(dirName);
+					_edited = true;
+					mq.tAddModal(
+						new Modal(
+							Modal.EModalType.Character,
+							HRarity.tRarityToModalInt(metadata.Rarity),
+							new LuaCharacter(dirName)
+						),
+						_player);
+
+					DBSaves.RegisterStringUnlockedAsset(OpenTaiko.SaveFileInstances[player].data.SaveId, "unlocked_characters", dirName);
+				}
+			}
+
+			if (_edited)
+				OpenTaiko.SaveFileInstances[player].tApplyHeyaChanges();
+		}
+
+		public Info(string path, int i) {
+			_path = path;
+			dirName = Path.GetFileName(path);
+			_idx = i;
+
+			// Character metadata
+			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))
+				metadata = ConfigManager.GetConfig<DBCharacter.CharacterData>($@"{path}{Path.DirectorySeparatorChar}Metadata.json");
+			else
+				metadata = new DBCharacter.CharacterData();
+
+			// Character metadata
+			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Effects.json"))
+				effect = ConfigManager.GetConfig<DBCharacter.CharacterEffect>($@"{path}{Path.DirectorySeparatorChar}Effects.json");
+			else
+				effect = new DBCharacter.CharacterEffect();
+
+			// Character unlockables
+			if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
+				unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
+			else
+				unlock = null;
+		}
 	}
 
+	public readonly Info info;
+
 	public CCharacter(string path, int i) {
-		_path = path;
-		dirName = Path.GetFileName(path);
-		_idx = i;
+		info = new(path, i);
+	}
 
-		// Character metadata
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Metadata.json"))
-			metadata = ConfigManager.GetConfig<DBCharacter.CharacterData>($@"{path}{Path.DirectorySeparatorChar}Metadata.json");
-		else
-			metadata = new DBCharacter.CharacterData();
-
-		// Character metadata
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Effects.json"))
-			effect = ConfigManager.GetConfig<DBCharacter.CharacterEffect>($@"{path}{Path.DirectorySeparatorChar}Effects.json");
-		else
-			effect = new DBCharacter.CharacterEffect();
-
-		// Character unlockables
-		if (File.Exists($@"{path}{Path.DirectorySeparatorChar}Unlock.json"))
-			unlock = OpenTaiko.UnlockConditionFactory.GenerateUnlockObjectFromJsonPath($@"{path}{Path.DirectorySeparatorChar}Unlock.json");
-		else
-			unlock = null;
+	public CCharacter(Info info) {
+		this.info = info;
 	}
 
 	public virtual void Dispose() {
-
+		for (int p = 0; p < OpenTaiko.MAX_PLAYERS; ++p) {
+			foreach (var (name, count) in PlayerToAnimationToRefCount[p])
+				this.ImplDisposeAnimation(name);
+			foreach (var (name, count) in PlayerToVoiceToRefCount[p])
+				this.ImplDisposeVoice(name);
+		}
+		animationLoadCounts.Clear();
+		voiceLoadCounts.Clear();
 	}
 
-	public virtual bool Update(int player, string animationType, bool looping = true) {
+	public virtual bool Update(string animationType, bool looping = true) {
 		return false;
 	}
 
-	public virtual void Draw(int player, string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
+	public virtual void Draw(string animationType, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
 
 	}
 
-	public virtual void DrawAtAnchor(int player, string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
-		Draw(player, animationType, x, y, scaleX, scaleY, opacity, color, rotation, blendMode, wrapMode, gradientMap);
+	public virtual void DrawAtAnchor(string animationType, float x, float y, string anchor, float scaleX = 1.0f, float scaleY = 1.0f, int opacity = 255, Color4? color = null, float? clipW = null, float? clipH = null, float clipX = 0f, float clipY = 0f, float rotation = 0f, string? blendMode = null, string? wrapMode = null, LuaGradientMap? gradientMap = null) {
+		Draw(animationType, x, y, scaleX, scaleY, opacity, color, rotation, blendMode, wrapMode, gradientMap);
 	}
 
-	public virtual LuaVector2 GetDrawSize(int player, string animationType) => new LuaVector2(0, 0);
+	public virtual LuaVector2 GetDrawSize(string animationType) => new LuaVector2(0, 0);
 
-	public virtual (float x, float y) GetHeyaRenderOffset(int player) => (0f, 0f);
+	public virtual (float x, float y) GetHeyaRenderOffset() => (0f, 0f);
 
 	/// <summary>
 	/// Returns the character-specific AI battle base position (theme pixels) for
@@ -385,41 +360,55 @@ abstract class CCharacter : IDisposable {
 	/// </summary>
 	public virtual (float x, float y)? GetAIBattlePosition(int player, float charaScale = 1.0f) => null;
 
-	public virtual void LoadAnimation(int player, string voice) {
+	public virtual void LoadAnimation(string voice) {
 
 	}
 
-	public virtual void DisposeAnimation(int player, string voice) {
+	public virtual void DisposeAnimation(string voice) {
 
 	}
 
-	public virtual bool AvailableAnimation(int player, string voice, bool useAlternative = true) {
+	protected virtual void ImplLoadAnimation(string animationType) {
+	}
+
+	protected virtual void ImplDisposeAnimation(string animationType) {
+	}
+
+	public virtual bool AvailableAnimation(string voice, bool useAlternative = true) {
 		return false;
 	}
 
-	public virtual void SetAnimationDuration(int player, string animationType, double duration) {
+	public virtual void SetAnimationDuration(string animationType, double duration) {
 
 	}
 
-	public virtual void ResetAnimationCounter(int player, string animationType) {
+	public virtual void ResetAnimationCounter(string animationType) {
 
 	}
 
-	public void SetAnimationCyclesFromBPM(int player, string animationType, double bpm) {
-		SetAnimationDuration(player, animationType, 60000 / Math.Abs(CTja.TjaBeatSpeedToGameBeatSpeed(bpm)));
+	public void SetAnimationCyclesFromBPM(string animationType, double bpm) {
+		SetAnimationDuration(animationType, 60000 / Math.Abs(CTja.TjaBeatSpeedToGameBeatSpeed(bpm)));
 	}
 
 	//voice-------------
-	public virtual void LoadVoice(int player, string voice) {
+	public virtual void LoadVoice(string voice) {
 
 	}
 
-	public virtual void DisposeVoice(int player, string voice) {
+	public virtual void DisposeVoice(string voice) {
 
 	}
 
-	public virtual void PlayVoice(int player, string voice) {
+	protected virtual void ImplLoadVoice(string voice) {
+	}
+
+	protected virtual void ImplDisposeVoice(string voice) {
+	}
+
+	public virtual void PlayVoice(string voice) {
 
 	}
+
+
 	//------------------
 }
