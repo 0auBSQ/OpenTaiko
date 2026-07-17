@@ -16,7 +16,7 @@ namespace OpenTaiko {
 				LuaScript["ACTIVITY"] = null;
 				LuaScript["DATABASE"] = new LuaRODataStorageFunc(dir);
 			} catch (Exception e) {
-				Crash(e);
+				Crash(e, $"initializing {nameof(CLuaROActivityScript)}");
 			}
 		}
 
