@@ -19,6 +19,7 @@ local tx = {}            -- name -> LuaTexture
 -- Layout (y offsets + frame height) depends on playerCount, which the old init() read once. onStart runs
 -- before state arrives, so we (re)derive it per-play from state.playerCount instead — identical result.
 local function refreshLayout(state)
+    imageHeight = 324
     if state.playerCount <= 2 then
         y = { 204, 468, 0, 0, 0 }
     elseif state.playerCount == 5 then
