@@ -149,11 +149,7 @@ internal class CStageStartup : CStage {
 
 								this.listProgressString.Add("LOADING TEXTURES...OK");
 								this.strCurrentProgress = "Setup done.";
-								this.ePhaseID = EPhase.Startup_Complete;
-								OpenTaiko.Skin.bgmStartupScreen.tStop();
 							} catch (Exception exception) {
-								OpenTaiko.Skin.bgmStartupScreen.tStop();
-
 								Trace.TraceError(exception.ToString());
 								this.listProgressString.Add("LOADING TEXTURES...NG");
 								foreach (var text in exception.ToString().Split('\n')) {
@@ -161,8 +157,6 @@ internal class CStageStartup : CStage {
 								}
 							}
 
-							this.listProgressString.Add("LOADING TEXTURES...OK");
-							this.strCurrentProgress = "Setup done.";
 							this.ePhaseID = EPhase.Startup_Complete;
 							OpenTaiko.Skin.bgmStartupScreen.tStop();
 						}
