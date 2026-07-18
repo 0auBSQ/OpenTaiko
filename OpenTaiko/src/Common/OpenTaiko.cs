@@ -1650,6 +1650,7 @@ internal class OpenTaiko : Game {
 				0,
 				OpenTaiko.ConfigIni.nASIODevice,
 				OpenTaiko.ConfigIni.bUseOSTimer);
+			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
 			// iOS: the desktop branch below also creates these; without SongGainController the first note NREs (CTja.tチップの再生).
 			SongGainController = new SongGainController();
 			ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
