@@ -284,7 +284,7 @@ public class MainActivity : Activity, ISurfaceHolderCallback {
 		// charts into over USB/MTP.
 		Directory.CreateDirectory(Path.Combine(dataRoot, "Songs"));
 		// Offer the full official soundtrack as an in-app download (resumable; user can decline).
-		SoundtrackDownloader.EnsureSoundtrack(this, dataRoot,
+		global::OpenTaiko.SoundtrackDownloader.EnsureSoundtrack(new AndroidSoundtrackDownloadHost(this), dataRoot,
 			s => RunOnUiThread(() => { if (_loadingLabel != null) _loadingLabel.Text = s; }));
 		Directory.SetCurrentDirectory(dataRoot);
 
