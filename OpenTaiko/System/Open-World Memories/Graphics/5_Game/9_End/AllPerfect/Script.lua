@@ -28,6 +28,7 @@ function playEndAnime(player)
 end
 
 function init()
+    imageHeight = 324
     if playerCount <= 2 then
         y = { 204, 468, 0, 0, 0 }
     elseif playerCount == 5 then

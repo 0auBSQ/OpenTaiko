@@ -96,6 +96,7 @@ public abstract class Game : IDisposable {
 
 	public static List<Action> AsyncActions { get; private set; } = new();
 
+	public SemaphoreSlim thInputLock = new(1, 1);
 	public Thread thInput { get; private set; }
 	private CancellationTokenSource thInputCancel;
 
@@ -409,7 +410,20 @@ public abstract class Game : IDisposable {
 	/// Runs the game.
 	/// </summary>
 	public void Run() {
-		Window_.Run();
+		// adapted from Window_.Run();
+		Window_.Initialize();
+		Window_.Run(delegate {
+			this.EventsNoWait();
+			if (!Window_.IsClosing) {
+				Window_.DoUpdate();
+			}
+
+			if (!Window_.IsClosing) {
+				Window_.DoRender();
+			}
+		});
+		this.EventsNoWait();
+		Window_.Reset();
 	}
 
 	protected virtual void Configuration() {
@@ -437,7 +451,26 @@ public abstract class Game : IDisposable {
 
 	}
 
-	protected virtual void Events() {
+	protected void EventsNoWait() {
+		if (this.thInputLock.Wait(0)) {
+			try {
+				this.OnEvents();
+			} finally {
+				this.thInputLock.Release();
+			}
+		}
+	}
+
+	protected void Events() {
+		this.thInputLock.Wait();
+		try {
+			this.OnEvents();
+		} finally {
+			this.thInputLock.Release();
+		}
+	}
+
+	protected virtual void OnEvents() {
 		Window_.DoEvents();
 	}
 
@@ -537,7 +570,6 @@ public abstract class Game : IDisposable {
 		OnExiting();
 
 		this.thInputCancel.Cancel();
-		this.thInputCancel.Dispose();
 		Context.Dispose();
 	}
 

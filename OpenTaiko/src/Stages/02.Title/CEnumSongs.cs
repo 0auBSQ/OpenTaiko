@@ -255,13 +255,13 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 			#endregion
 
 		} finally {
-			OpenTaiko.stageStartup.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 			TimeSpan span = (TimeSpan)(DateTime.Now - now);
 			Trace.TraceInformation("起動所要時間: {0}", span.ToString());
 			lock (this)                         // #28700 2012.6.12 yyagi; state change must be in finally{} for exiting as of compact mode.
 			{
 				state = DTXEnumState.CompletelyDone;
 			}
+			OpenTaiko.stageStartup.ePhaseID = CStage.EPhase.Startup_6_LoadTextures;
 		}
 	}
 

@@ -29,33 +29,38 @@ desktop_folder="$HOME/.local/share/applications"
 archive_filename="OpenTaiko.Linux.x64.zip"
 installation_folder="$current_dir/OpenTaiko"
 git_repo="0auBSQ/OpenTaiko"
+version="$version"  # replaced with the real release tag in GitHub Action
 
 # Create cache directory
 mkdir -p "$cache_dir"
 
-# Get latest release tag via GitHub API
-echo "Fetching latest release tag for $git_repo..."
-latest_tag=$(curl -s "https://api.github.com/repos/$git_repo/releases/latest" | jq -r '.tag_name')
+# Select version
+if [ -n "$version" ]; then
+    echo "Selected version: $version"
+else
+    # Get latest release tag via GitHub API
+    echo "Fetching latest release tag for $git_repo..."
+    version=$(curl -s "https://api.github.com/repos/$git_repo/releases/latest" | jq -r '.tag_name')
 
-if [ -z "$latest_tag" ] || [ "$latest_tag" = "null" ]; then
-    echo "Failed to fetch the latest version tag."
-    exit 1
+    if [ -z "$version" ] || [ "$version" = "null" ]; then
+        echo "Failed to fetch the latest version tag."
+        exit 1
+    fi
+    echo "Latest version: $version"
 fi
-
-echo "Latest version: $latest_tag"
 
 # Create and move to installation_folder
 mkdir -p "$installation_folder"
 cd "$installation_folder" || exit 1
 
 # Check if we already have this version cached
-cached_file="$cache_dir/$latest_tag-$archive_filename"
+cached_file="$cache_dir/$version-$archive_filename"
 if [ -f "$cached_file" ]; then
     echo "Using cached version: $cached_file"
     cp "$cached_file" "$archive_filename"
 else
     # Download using curl with redirect support
-    download_url="https://github.com/$git_repo/releases/download/$latest_tag/$archive_filename"
+    download_url="https://github.com/$git_repo/releases/download/$version/$archive_filename"
     echo "Downloading from: $download_url"
     curl -L -o "$archive_filename" "$download_url" || { echo "Download failed."; exit 1; }
     

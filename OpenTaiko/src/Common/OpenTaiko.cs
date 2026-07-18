@@ -505,13 +505,12 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
-	protected override void Events() {
-		base.Events();
+	protected override void OnEvents() {
+		base.OnEvents();
 		FPSInput?.Update();
 	}
 	protected override void Update() {
 		InputManager?.Polling();
-		FPSInput?.Update(); // events polled before Update() is called
 	}
 	protected override void Draw() {
 #if !DEBUG
@@ -562,15 +561,15 @@ internal class OpenTaiko : Game {
 				actEnumSongs?.Draw();                            // "Enumerating Songs..." icon
 
 				switch (rCurrentStage.eStageID) {
+					case CStage.EStage.StartUp:
 					case CStage.EStage.Title:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
 						if (EnumSongs != null) {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if (rCurrentStage.eStageID == CStage.EStage.Title &&
-								rPreviousStage.eStageID == CStage.EStage.StartUp &&
-								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
+							if (rCurrentStage.eStageID == CStage.EStage.StartUp &&
+								rCurrentStage.ePhaseID == CStage.EPhase.Startup_Complete &&
 								!EnumSongs.IsSongListEnumStarted) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
