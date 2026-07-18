@@ -107,6 +107,7 @@ public abstract partial class Game : IDisposable {
 	public const double DefaultAsyncBudgetMs = 3.0;
 	public static double AsyncBudgetMs = DefaultAsyncBudgetMs;
 
+	public SemaphoreSlim thInputLock = new(1, 1);
 	public Thread thInput { get; private set; }
 	private CancellationTokenSource thInputCancel;
 
@@ -611,7 +612,20 @@ public abstract partial class Game : IDisposable {
 			// Run() is a no-op; the host calls InitWithExternalContext() then RenderHostedFrame() each frame.
 			return;
 		}
-		Window_.Run();
+		// adapted from Window_.Run();
+		Window_.Initialize();
+		Window_.Run(delegate {
+			this.EventsNoWait();
+			if (!Window_.IsClosing) {
+				Window_.DoUpdate();
+			}
+
+			if (!Window_.IsClosing) {
+				Window_.DoRender();
+			}
+		});
+		this.EventsNoWait();
+		Window_.Reset();
 	}
 
 	protected virtual void Configuration() {
@@ -639,7 +653,26 @@ public abstract partial class Game : IDisposable {
 
 	}
 
-	protected virtual void Events() {
+	protected void EventsNoWait() {
+		if (this.thInputLock.Wait(0)) {
+			try {
+				this.OnEvents();
+			} finally {
+				this.thInputLock.Release();
+			}
+		}
+	}
+
+	protected void Events() {
+		this.thInputLock.Wait();
+		try {
+			this.OnEvents();
+		} finally {
+			this.thInputLock.Release();
+		}
+	}
+
+	protected virtual void OnEvents() {
 		// Silk's GLFW event pump can intermittently throw (seen as "Nullable object must have a
 		// value") under very rapid input, especially with the cursor locked. It's a transient in
 		// the windowing backend, not our state — swallow it and re-pump next frame instead of
@@ -772,7 +805,6 @@ public abstract partial class Game : IDisposable {
 		OnExiting();
 
 		this.thInputCancel.Cancel();
-		this.thInputCancel.Dispose();
 		Context.Dispose();
 	}
 

@@ -201,6 +201,13 @@ jobs:
           7z u ../../../../../OpenTaiko.Linux.x64.zip "publish/Libs/linux-x64/*" "publish/FFmpeg/linux-x64/*" "publish/Songs/L2 Custom Charts/*" "publish/Songs/L3 Downloaded Songs/*" "publish/Songs/S1 Dan-i Dojo/box.def" "publish/Songs/S2 Taiko Towers/box.def" "publish/Songs/X1 Favorite/*" "publish/Songs/X2 Recent/*" "publish/Songs/X3 Search By Difficulty/*" "publish/Songs/X4 Search By Text/*"
           cd ..\..\..\..\..\
 
+      - name: Pin Version for Install Script (Linux x64)
+        run: |
+          $version = $env:versionLast
+          Write-Host "Pin version in linux_installer_standalone.bash to $version"
+          (Get-Content -Raw special/linux_installer_standalone.bash) -replace 'version="\$version"', "version=`"$version`"" |
+              Set-Content special/linux_installer_standalone.bash
+
       - name: Check if tag exists
         uses: mukunku/tag-exists-action@v1.6.0
         id: check-tag

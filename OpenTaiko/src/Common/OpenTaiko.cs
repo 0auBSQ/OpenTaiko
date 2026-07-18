@@ -668,13 +668,12 @@ internal class OpenTaiko : Game {
 		this.tExitProcess();
 		base.OnExiting();
 	}
-	protected override void Events() {
-		base.Events();
+	protected override void OnEvents() {
+		base.OnEvents();
 		FPSInput?.Update();
 	}
 	protected override void Update() {
 		InputManager?.Polling();
-		FPSInput?.Update(); // events polled before Update() is called
 	}
 
 	protected override void Draw() {
@@ -749,6 +748,7 @@ internal class OpenTaiko : Game {
 
 
 				switch (rCurrentStage.eStageID) {
+					case CStage.EStage.StartUp:
 					case CStage.EStage.Config:
 					case CStage.EStage.SongSelect:
 					case CStage.EStage.SongLoading:
@@ -756,8 +756,8 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.CUSTOM:
 						if (EnumSongs != null) {
 							#region [ Start the thread for song enumaration ]
-							if (rCurrentStage.eStageID == CStage.EStage.CUSTOM &&
-								this.nDrawLoopReturnValue == (int)EReturnValue.Continuation &&
+							if ((rCurrentStage.eStageID != CStage.EStage.StartUp
+								|| rCurrentStage.ePhaseID == CStage.EPhase.Startup_Complete) &&
 								!EnumSongs.IsSongListEnumStarted) {
 								MountActivity(actEnumSongs);
 								EnumSongs.Init();   // 取得した曲数を、新インスタンスにも与える
