@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Text;
 using System.Text.Json.Nodes;
 using FDK;
+using Newtonsoft.Json;
 using NLua;
 
 namespace OpenTaiko;
@@ -128,7 +129,8 @@ class CLuaScript : IDisposable {
 			LuaScript?.State?.GarbageCollector(KeraLua.LuaGC.Step, 0);
 			return ret;
 		} catch (Exception exception) {
-			Crash(exception);
+			var argsAsReprStrings = args.Select(v => JsonConvert.ToString(v));
+			Crash(exception, $"RunLuaCode - {luaFunction.Name}({string.Join(", ", argsAsReprStrings)})");
 		}
 		return null;
 	}
@@ -240,7 +242,7 @@ end
 			co.SetHook(_yieldHook, KeraLua.LuaHookMask.Count, Math.Max(1, YieldCheckInstructions));
 			_hookCo = co;
 		} catch (Exception exception) {
-			Crash(exception);
+			Crash(exception, $"tBeginYieldable({luaFunction.Name})");
 			tEndYieldable();
 		}
 	}
@@ -270,7 +272,7 @@ end
 			tEndYieldable();
 			return false;
 		} catch (Exception exception) {
-			Crash(exception);
+			Crash(exception, $"tStepYieldable({progress})");
 			tEndYieldable();
 			return false;
 		}
@@ -480,7 +482,7 @@ end
 
 			listScripts.Add(this);
 		} catch (Exception e) {
-			Crash(e);
+			Crash(e, $"initializing {nameof(CLuaScript)}");
 		}
 	}
 
@@ -523,11 +525,11 @@ end
 		listScripts.Remove(this);
 	}
 
-	protected void Crash(Exception exception) {
+	protected void Crash(Exception exception, string? at = null) {
 		bCrashed = true;
 		// iOS: surface Lua errors to the device console (os_log), which is easier to read than the on-screen overlay.
 
-		LogNotification.PopError($"{this.GetType().Name} Error: {exception.ToString()}");
+		LogNotification.PopError($"{this.GetType().Name} Error{(string.IsNullOrWhiteSpace(at) ? "" : $" at {at}")}: {exception.ToString()}");
 		Trace.TraceError($"Full script path: {this.strScriptPath}");
 		Trace.TraceError(exception.StackTrace);
 	}

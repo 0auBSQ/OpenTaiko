@@ -82,7 +82,7 @@ namespace OpenTaiko {
 				LuaScript["DEACTIVATE"] = Deactivate;
 
 			} catch (Exception e) {
-				Crash(e);
+				Crash(e, $"initializing {nameof(CLuaActivityScript)}");
 			}
 
 		}

@@ -118,7 +118,7 @@ class HGaugeMethods {
 
 		return gt;
 	}
-	public static EGaugeType tGetGaugeTypeEnum(CCharacter? chara)
+	public static EGaugeType tGetGaugeTypeEnum(CCharacter.Info? chara)
 		=> (chara == null) ? EGaugeType.NORMAL : tGetGaugeTypeEnum(chara.effect.tGetGaugeType());
 	public static EGaugeType? tGetGaugeTypeEnum(CTja? tja) => tja?.forceGauge;
 	public static EGaugeType tGetGaugeTypeEnum(int player)

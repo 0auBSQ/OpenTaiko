@@ -757,11 +757,11 @@ class TextureLoader {
 
 		string[] charaDirs = OpenTaiko.GetMergedDirectories(OpenTaiko.strEXEFolder + GLOBAL + CHARACTERS);
 
-		Characters = new CCharacterLua[charaDirs.Length];
+		Characters = new CCharacterLuaSet[charaDirs.Length];
 
 		string[] charaDirNames = new string[charaDirs.Length];
 		for (int i = 0; i < charaDirs.Length; i++) {
-			Characters[i] = new CCharacterLua(charaDirs[i], i);
+			Characters[i] = new(charaDirs[i], i);
 			charaDirNames[i] = Characters[i].dirName;
 		}
 
@@ -832,18 +832,14 @@ class TextureLoader {
 			return;
 
 		if (old >= 0 && !primary) {
-			int i = old;
-
-			CCharacter.CharaUnload(player, Characters[i]);
 			OpenTaiko.SaveFileInstances[player].data.mountedCharacter = null;
+			playerResourceRefCounts[player] = Characters[old][player].CharaUnload();
 		}
 
-		if ((newC >= 0 &&
-			 OpenTaiko.SaveFileInstances[player].data.Character != newC || primary)) {
-			int i = newC;
-
-			CCharacter.CharaLoad(player, Characters[i]);
-			OpenTaiko.SaveFileInstances[player].data.mountedCharacter = ((CCharacterLua)Characters[i]).GetScript(player);
+		if ((newC >= 0 && OpenTaiko.SaveFileInstances[player].data.Character != newC) || primary) {
+			Characters[newC][player].CharaLoad(playerResourceRefCounts[player]);
+			playerResourceRefCounts[player] = null;
+			OpenTaiko.SaveFileInstances[player].data.mountedCharacter = ((CCharacterLua)Characters[newC][player]).Script;
 		}
 	}
 
@@ -856,9 +852,11 @@ class TextureLoader {
 	public void SwapCharacterAnimations(int oldIdx, int newIdx, int player) {
 		if (oldIdx == newIdx) return;
 		if (oldIdx >= 0)
-			CCharacter.CharaUnload(player, Characters[oldIdx]);
-		if (newIdx >= 0)
-			CCharacter.CharaLoad(player, Characters[newIdx]);
+			playerResourceRefCounts[player] = Characters[oldIdx][player].CharaUnload();
+		if (newIdx >= 0) {
+			Characters[newIdx][player].CharaLoad(playerResourceRefCounts[player]);
+			playerResourceRefCounts[player] = null;
+		}
 	}
 
 	public void DisposeTexture() {
@@ -868,7 +866,7 @@ class TextureLoader {
 			listTexture.ElementAtOrDefault(i)?.Dispose();
 		listTexture.Clear();
 
-		foreach (CCharacter character in Characters) {
+		foreach (var character in Characters) {
 			character.Dispose();
 		}
 
@@ -1232,10 +1230,30 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Result_Clear_2P,
 		Characters_Result_Failed_2P;
 	*/
-	public CCharacterLua[] Characters = [];
+
+	public class CCharacterLuaSet : CCharacter.Info, IDisposable {
+		public readonly CCharacterLua[] instances; // [iPlayer]
+		public CCharacter.Info info => this;
+		public CCharacterLua this[int p] => instances[p];
+		public CCharacterLua Preview => instances[0]; // use P1's instance for preview
+
+		public CCharacterLuaSet(string path, int i) : base(path, i) {
+			instances = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
+				.Select(i => new CCharacterLua(this))
+				.ToArray();
+		}
+
+		public void Dispose() {
+			foreach (var instance in instances)
+				instance.Dispose();
+		}
+	}
+
+	public CCharacterLuaSet[] Characters = [];
 	public LuaCharacter[] PlayerCharacters = new LuaCharacter[5];
 	public LuaCharacterDatabase? LuaCharacterDb;
 
+	private CCharacter.ResourceRefCounts?[] playerResourceRefCounts = new CCharacter.ResourceRefCounts?[OpenTaiko.MAX_PLAYERS];
 	#endregion
 
 	#region [12_OnlineLounge]

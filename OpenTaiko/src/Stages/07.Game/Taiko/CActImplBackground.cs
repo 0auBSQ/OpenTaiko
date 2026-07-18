@@ -506,12 +506,12 @@ internal class CActImplBackground : CActivity {
 				animation = ctIsTired ? CCharacter.ANIM_GAME_TOWER_STANDING_TIRED : CCharacter.ANIM_GAME_TOWER_STANDING;
 			}
 
-			character.SetAnimationCyclesFromBPM(0, animation, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
+			character.SetAnimationCyclesFromBPM(animation, OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0]);
 
 			if (!OpenTaiko.stageGameScreen.bPAUSE) {
-				character.Update(0, animation);
+				character.Update(animation);
 			}
-			character.Draw(0, animation, x, y);
+			character.Draw(animation, x, y);
 
 			if (isClimbing) {
 				// Tired Climb

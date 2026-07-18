@@ -346,7 +346,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		var becomeStageFailed = (this.stageAbortType[iPlayer] == EStageAbort.None);
 		base.SetStageFailed(iPlayer, failType);
 		if (becomeStageFailed) {
-			this.actChara.CharacterControllers[iPlayer].PlayAction(iPlayer, CCharacter.ANIM_GAME_CLEAR_OUT);
+			this.actChara.CharacterControllers[iPlayer].PlayAction(CCharacter.ANIM_GAME_CLEAR_OUT);
 			this.actGauge.dbCurrentGaugeValue[iPlayer] = 0; // for indicate life failure in AI mode
 			this.UpdateGauge(null, EKeyConfigPart.Taiko, iPlayer, ENoteJudge.Auto); // update gauge
 			OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives = 0; // prevent clear
@@ -698,7 +698,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			anim = CCharacter.ANIM_GAME_CLEARED;
 		else
 			anim = CCharacter.ANIM_GAME_FAILED;
-		this.actChara.CharacterControllers[i].PlayAction(i, anim);
+		this.actChara.CharacterControllers[i].PlayAction(anim);
 		this.actEnd.Start(i, endOfPlay: true);
 	}
 

@@ -233,11 +233,11 @@ class CStageHeya : CStage {
 		if (iCurrentMenu == CurrentMenu.Puchi) OpenTaiko.Tx.Puchichara[iPuchiCharaCurrent].render?.t2DDraw(0, 0);
 		if (iCurrentMenu == CurrentMenu.Chara) {
 			string renderAnimation = CCharacter.ANIM_RENDER;
-			var chara = OpenTaiko.Tx.Characters[iCharacterCurrent];
-			var (offsetX, offsetY) = chara.GetHeyaRenderOffset(0);
-			chara.SetAnimationDuration(0, renderAnimation, CCharacter.DEFAULT_DURATION);
-			chara.Update(0, renderAnimation);
-			chara.Draw(0, renderAnimation, offsetX, offsetY);
+			var chara = OpenTaiko.Tx.Characters[iCharacterCurrent].Preview;
+			var (offsetX, offsetY) = chara.GetHeyaRenderOffset();
+			chara.SetAnimationDuration(renderAnimation, CCharacter.DEFAULT_DURATION);
+			chara.Update(renderAnimation);
+			chara.Draw(renderAnimation, offsetX, offsetY);
 		}
 
 		#endregion
@@ -315,8 +315,8 @@ class CStageHeya : CStage {
 
 				var scroll = DrawBox_Slot(i + (OpenTaiko.Skin.Heya_Center_Menu_Box_Count / 2));
 
-				OpenTaiko.Tx.Characters[pos].Draw(0, CCharacter.ANIM_PREVIEW, scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0],
-					scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1], 1.0f, 1.0f, 255, color);
+				OpenTaiko.Tx.Characters[pos].Preview.Draw(CCharacter.ANIM_PREVIEW, scroll.Item1 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[0], scroll.Item2 + OpenTaiko.Skin.Heya_Center_Menu_Box_Item_Offset[1],
+					1.0f, 1.0f, 255, color);
 
 				#region [Database related values]
 
@@ -503,8 +503,8 @@ class CStageHeya : CStage {
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].Opacity = ctChara_In.n現在の値 * 2;
 			//TJAPlayer3.Tx.SongSelect_Chara_Normal[ctChara_Normal.n現在の値].t2D描画(-200 + CharaX, 336 - CharaY);
 
-			characterController.Update(0);
-			characterController.Draw(0, chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
+			characterController.Update();
+			characterController.Draw(chara_x, chara_y, 1.0f, 1.0f, 255, Color4.White);
 
 			#region [PuchiChara]
 
@@ -599,7 +599,7 @@ class CStageHeya : CStage {
 					OpenTaiko.SaveFileInstances[iPlayer].tUpdateCharacterName(OpenTaiko.Tx.Characters[iCharacterCurrent].dirName);
 
 					// Welcome voice using Sanka
-					character.PlayVoice(iPlayer, CCharacter.VOICE_TITLE_SANKA);
+					character.PlayVoice(CCharacter.VOICE_TITLE_SANKA);
 
 					OpenTaiko.SaveFileInstances[iPlayer].tApplyHeyaChanges();
 

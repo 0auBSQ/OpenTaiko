@@ -127,7 +127,7 @@ namespace OpenTaiko {
 				lfDisposeVoice.Load(LuaScript);
 				lfPlayVoice.Load(LuaScript);
 			} catch (Exception e) {
-				Crash(e);
+				Crash(e, $"initializing {nameof(CLuaCharacterScript)}");
 			}
 		}
 	}

@@ -38,7 +38,7 @@ namespace OpenTaiko {
 				FadeOutSeconds = ReadSeconds("FADE_OUT_SECONDS");
 				FadeInSeconds = ReadSeconds("FADE_IN_SECONDS");
 			} catch (Exception e) {
-				Crash(e);
+				Crash(e, $"initializing {nameof(CLuaTransitionScript)}");
 			}
 		}
 

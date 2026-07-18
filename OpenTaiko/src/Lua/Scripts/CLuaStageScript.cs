@@ -128,7 +128,7 @@ namespace OpenTaiko {
 				LuaScript.State.Register("Exit", _exitCFunction);
 
 			} catch (Exception e) {
-				Crash(e);
+				Crash(e, $"initializing {nameof(CLuaStageScript)}");
 			}
 
 		}

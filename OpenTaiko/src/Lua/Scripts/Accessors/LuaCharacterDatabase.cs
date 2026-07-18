@@ -14,8 +14,9 @@ namespace OpenTaiko {
 		// Construction
 		// ────────────────────────────────────────────────────────────────────
 
-		internal LuaCharacterDatabase(CCharacterLua[] characters) {
+		internal LuaCharacterDatabase(TextureLoader.CCharacterLuaSet[] characters) {
 			_entries = characters
+				.Select(s => s.Preview)
 				.Where(c => c != null)
 				.Select(c => new LuaCharacterEntry(c))
 				.ToArray();
@@ -77,12 +78,12 @@ namespace OpenTaiko {
 		public LuaUnlockCondition UnlockCondition { get; }
 
 		internal LuaCharacterEntry(CCharacterLua character) {
-			FolderName = character.dirName;
-			DisplayName = character.metadata.tGetName();
-			Rarity = character.metadata.Rarity;
+			FolderName = character.info.dirName;
+			DisplayName = character.info.metadata.tGetName();
+			Rarity = character.info.metadata.Rarity;
 			// Non-owning: wraps the already-loaded CCharacterLua — no extra Lua scripts created.
 			Character = new LuaCharacter(character);
-			UnlockCondition = new LuaUnlockCondition(character.unlock);
+			UnlockCondition = new LuaUnlockCondition(character.info.unlock);
 		}
 
 		private bool _disposed;
