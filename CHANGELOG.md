@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.6.0.108] - 2026-07-18 (Beta)
+
+* [Fix] MIDI input crashed, fixed by updating managed-midi to 1.10.2, which includes the fix for wrong WinMM MIDI header structure
+* [Fix] Input thread concurrency crashed SDL event handling, fixed using modified window loop with mutex access to `DoEvents()`
+* [Fix] Kusudama never downgraded to regular Balloon since 0.6.0.106
+* [Fix] Rotated barline suddenly disappeared near left or right screen edges
+* [Fix] built-in dev skin: Playing All-Perfect animation in 5P mode truncated out its SENote lane part forever
+* [Feat] Restore the readme screen requiring <kbd>Enter</kbd> removed in 0.6.0.106 and allow song list enumeration at the screen
+* [Chore] Pin release version in `linux_installer_standalone.bash` for release assets in auto build
+* [Fix] speculative wayland fix [0.6.1 backport]
+
 ## [0.6.0.107] - 2026-05-23 (Beta)
 
 - [Chore] Add Unlockables for Chapter 7 (and few more)
