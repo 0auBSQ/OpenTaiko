@@ -1,22 +1,26 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Text.Json;
-using Android.App;
-using Activity = Android.App.Activity;
 
-namespace OpenTaiko.Android;
+namespace OpenTaiko;
+
+internal enum SoundtrackDownloadChoice {
+	Download,
+	Later,
+	Never,
+}
+
+internal interface ISoundtrackDownloadHost {
+	string UserAgent { get; }
+	SoundtrackDownloadChoice AskUser(int songCount, long bytes);
+	long GetFreeBytes(string dataRoot);
+	void LogInformation(string message);
+	void LogWarning(string message);
+}
 
 /// <summary>
-/// First-boot soundtrack installer + per-launch updater. The full OpenTaiko soundtrack (~4.4 GB)
-/// cannot ride inside an APK (32-bit zip, ~2 GB install ceiling), so the app offers to download it
-/// from the OpenTaiko-Soundtrack GitHub repository into files/Songs.
-///
-/// The repo's soundtrack_info.json (the same index the OpenTaiko Hub uses) drives everything:
-/// each song lists its files, per-song size and the chart's MD5. A song needs downloading when
-/// files are missing or its local .tja MD5 no longer matches (chart update → the whole song
-/// folder re-downloads). Only files listed in the index are fetched — Hub-side extras like
-/// preview/ stay out of the song list. The dialog shows the actual pending weight, computed
-/// before asking. An interrupted download resumes on the next launch; after the initial install
-/// the same check runs silently every launch (no dialog).
+/// Installs and updates the official soundtrack. Platform hosts provide the user prompt,
+/// free-space query, and logging while this component owns the shared download behavior.
 /// </summary>
 internal static class SoundtrackDownloader {
 	private const string Owner = "OpenTaiko";
@@ -24,7 +28,7 @@ internal static class SoundtrackDownloader {
 	private const string Branch = "main";
 	private const int Workers = 4;
 
-	public static void EnsureSoundtrack(Activity activity, string dataRoot, Action<string> status) {
+	internal static void EnsureSoundtrack(ISoundtrackDownloadHost host, string dataRoot, Action<string> status) {
 		string doneMarker = Path.Combine(dataRoot, ".soundtrack_done");
 		string neverMarker = Path.Combine(dataRoot, ".soundtrack_declined");
 		if (File.Exists(neverMarker))
@@ -33,7 +37,7 @@ internal static class SoundtrackDownloader {
 
 		try {
 			using var http = new HttpClient();
-			http.DefaultRequestHeaders.UserAgent.ParseAdd("OpenTaiko-Android");
+			http.DefaultRequestHeaders.UserAgent.ParseAdd(host.UserAgent);
 			http.Timeout = TimeSpan.FromMinutes(10);   // per request; big oggs on slow connections
 
 			if (!silent) status("Checking the official soundtrack…");
@@ -47,25 +51,25 @@ internal static class SoundtrackDownloader {
 			}
 
 			if (!silent) {
-				switch (AskUser(activity, pendingSongs, estimatedBytes)) {
-					case Choice.Never:
+				switch (host.AskUser(pendingSongs, estimatedBytes)) {
+					case SoundtrackDownloadChoice.Never:
 						File.WriteAllText(neverMarker, "");
 						return;
-					case Choice.Later:
+					case SoundtrackDownloadChoice.Later:
 						return;
 				}
 			}
 
-			var stat = new global::Android.OS.StatFs(dataRoot);
-			if (stat.AvailableBytes < estimatedBytes + 200_000_000) {
+			long freeBytes = host.GetFreeBytes(dataRoot);
+			if (freeBytes < estimatedBytes + 200_000_000) {
 				if (!silent) {
-					status($"Not enough space for the soundtrack: need {GB(estimatedBytes)}, free {GB(stat.AvailableBytes)}.");
+					status($"Not enough space for the soundtrack: need {GB(estimatedBytes)}, free {GB(freeBytes)}.");
 					Thread.Sleep(4000);
 				}
 				return;
 			}
 
-			if (DownloadAll(http, songsRoot, pending, status)) {
+			if (DownloadAll(host, http, songsRoot, pending, status)) {
 				File.WriteAllText(doneMarker, "");
 				if (!silent) status("Soundtrack downloaded!");
 			} else if (!silent) {
@@ -74,31 +78,12 @@ internal static class SoundtrackDownloader {
 			}
 		} catch (Exception ex) {
 			// Offline / flaky network / GitHub hiccup: never block the game over it.
-			global::Android.Util.Log.Info("OpenTaiko", $"soundtrack check skipped: {ex.Message}");
+			host.LogInformation($"soundtrack check skipped: {ex.Message}");
 			if (!silent) {
 				status("Soundtrack check failed (offline?) — it will be offered again next launch.");
 				Thread.Sleep(2000);
 			}
 		}
-	}
-
-	private enum Choice { Download, Later, Never }
-
-	private static Choice AskUser(Activity activity, int songCount, long bytes) {
-		var picked = Choice.Later;
-		using var done = new ManualResetEventSlim(false);
-		activity.RunOnUiThread(() => {
-			new AlertDialog.Builder(activity)
-				.SetTitle("OpenTaiko Soundtrack")!
-				.SetMessage($"Download the official soundtrack now?\n\n{songCount} songs, {GB(bytes)} — Wi-Fi recommended. An interrupted download resumes on the next launch. You can also add songs yourself over USB (files/Songs).")!
-				.SetPositiveButton("Download", (_, _) => { picked = Choice.Download; done.Set(); })!
-				.SetNeutralButton("Not now", (_, _) => { picked = Choice.Later; done.Set(); })!
-				.SetNegativeButton("Never", (_, _) => { picked = Choice.Never; done.Set(); })!
-				.SetCancelable(false)!
-				.Show();
-		});
-		done.Wait();
-		return picked;
 	}
 
 	private sealed record Song(string Folder, string[] Files, string? TjaPath, string? TjaMd5, double SizeMb);
@@ -154,7 +139,8 @@ internal static class SoundtrackDownloader {
 		return jobs;
 	}
 
-	private static bool DownloadAll(HttpClient http, string songsRoot, List<Job> jobsList, Action<string> status) {
+	private static bool DownloadAll(ISoundtrackDownloadHost host, HttpClient http, string songsRoot,
+		List<Job> jobsList, Action<string> status) {
 		var jobs = new ConcurrentQueue<Job>(jobsList);
 		int totalFiles = jobsList.Count, doneFiles = 0, failed = 0;
 		long doneBytes = 0;
@@ -173,7 +159,7 @@ internal static class SoundtrackDownloader {
 					// A pile of failures means something systemic (no network, blocked host) —
 					// stop burning retries; whatever is missing downloads on the next launch.
 					if (Volatile.Read(ref failed) >= 20) return;
-					long got = DownloadOne(http, songsRoot, job);
+					long got = DownloadOne(host, http, songsRoot, job);
 					if (got >= 0) {
 						Interlocked.Add(ref doneBytes, got);
 						Interlocked.Increment(ref doneFiles);
@@ -192,7 +178,7 @@ internal static class SoundtrackDownloader {
 	}
 
 	/// <summary>Bytes downloaded, or -1 on failure. Skips existing files unless the job overwrites.</summary>
-	private static long DownloadOne(HttpClient http, string songsRoot, Job job) {
+	private static long DownloadOne(ISoundtrackDownloadHost host, HttpClient http, string songsRoot, Job job) {
 		string dst = ToLocal(songsRoot, job.RepoPath);
 		if (!job.Overwrite && File.Exists(dst))
 			return 0;
@@ -213,7 +199,7 @@ internal static class SoundtrackDownloader {
 				return new FileInfo(dst).Length;
 			} catch (Exception ex) {
 				try { if (File.Exists(dst)) File.Delete(dst); } catch { }
-				global::Android.Util.Log.Warn("OpenTaiko", $"soundtrack: {job.RepoPath} attempt {attempt}: {ex.Message}");
+				host.LogWarning($"soundtrack: {job.RepoPath} attempt {attempt}: {ex.Message}");
 				Thread.Sleep(1000 * attempt);
 			}
 		}

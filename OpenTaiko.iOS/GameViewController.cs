@@ -105,11 +105,42 @@ public partial class GameViewController : UIViewController {
 		_metalPresenter.UpdateDrawableSize(_backingWidth, _backingHeight);
 		Console.WriteLine($"[OpenTaiko] Metal drawable: {_backingWidth}x{_backingHeight}");
 		if (!_initialized) {
-			InitializeGame();
 			_initialized = true;
+			StartBootstrap();
 		} else {
 			_game?.ResizeViewport(_backingWidth, _backingHeight);
 		}
+	}
+
+	/// <summary>
+	/// Starts a worker for asset copying and soundtrack preparation.
+	/// </summary>
+	private void StartBootstrap() {
+		var label = new UILabel(View!.Bounds) {
+			TextColor = UIColor.White.ColorWithAlpha(0.8f),
+			Font = UIFont.SystemFontOfSize(16),
+			TextAlignment = UITextAlignment.Center,
+			Lines = 2,
+			AutoresizingMask = UIViewAutoresizing.FlexibleDimensions,
+		};
+		View.AddSubview(label);
+		UIApplication.SharedApplication.IdleTimerDisabled = true;
+		void Status(string s) => InvokeOnMainThread(() => label.Text = s);
+
+		Task.Run(() => {
+			try {
+				CopyBundleAssetsToDocuments();
+				global::OpenTaiko.SoundtrackDownloader.EnsureSoundtrack(new iOSSoundtrackDownloadHost(this),
+					Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Status);
+			} catch (Exception ex) {
+				System.Diagnostics.Trace.TraceError($"Bootstrap failed: {ex}");
+			}
+			InvokeOnMainThread(() => {
+				UIApplication.SharedApplication.IdleTimerDisabled = false;
+				label.RemoveFromSuperview();
+				InitializeGame();
+			});
+		});
 	}
 
 	/// <summary>
@@ -216,9 +247,6 @@ public partial class GameViewController : UIViewController {
 		RegisterBassResolver();
 		RegisterLmdbResolver();
 
-		// Copy writable/user-facing assets from bundle to Documents directory.
-		// Read-only assets (Global/, Lang/, etc.) are resolved from the bundle at runtime.
-		CopyBundleAssetsToDocuments();
 		global::OpenTaiko.OpenTaiko.strBundleFolder = NSBundle.MainBundle.BundlePath + Path.DirectorySeparatorChar;
 
 		// Create input devices
