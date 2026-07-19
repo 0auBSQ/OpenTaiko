@@ -1,14 +1,14 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, lowercase-global
--- voxel/Script.lua — A small voxel engine running as a Lua stage.
+-- voxel/Script.lua — a creative-mode voxel engine running as a Lua stage.
 --
--- Terrain rendered by the SCENE3D rasterizer (textured, z-buffered, water
--- alpha). First-person player physics with AABB collision + jumping + swimming, free
--- mouse-look (cursor lock), a block-break cursor with selection wireframe + crosshair,
--- and a pause menu.
+-- INFINITE chunked terrain (generated on demand around the player) rendered by the SCENE3D
+-- rasterizer; big lattice-noise caves with glowing LAVA pools; level-based FLOWING water.
+-- CREATIVE building: left-click breaks any block instantly, right-click places the selected
+-- block (infinite), and E opens a palette of every block to fill the 9-slot hotbar.
 --
 -- Controls:
---   Move: WASD / arrows    Jump: Space    Sprint: LCtrl    Look: mouse
---   Break block: Left click    Pause: Escape
+--   Move: WASD    Jump/swim: Space    Sprint: LCtrl    Look: mouse
+--   Break: L-click    Place: R-click    Block palette: E    Hotbar: wheel + 1-9    Pause: Esc
 
 -- ════════════════════════════════════════════════════════════════════════════════
 -- Config
@@ -44,17 +44,34 @@ local SWIM_UP    = 4.2
 local WATER_MOVE = 0.6
 local WATER_DRAG = 0.86
 
-local WX, WY, WZ = 128, 128, 128
+-- INFINITE world: chunks (16×WY×16) generate on demand around the player and never end. WY is the
+-- world height; SEA_LEVEL the water table; WCFG.LAVA_Y the cave lava table (carved caves below it
+-- flood with glowing lava). WCFG packs the streaming knobs into one table (200-locals limit).
+local WY         = 128
 local SEA_LEVEL  = 64
 local SEED       = 1337
+local WCFG = {
+    LAVA_Y      = 12,    -- caves carved at/below this height fill with lava
+    GEN_CHUNKS  = 5,     -- generate chunks within this chunk radius of the player
+    MESH_UNLOAD = 7,     -- unmesh (free scene geometry of) chunks beyond this radius
+    genBudget   = 3,     -- adaptive mesh direction-steps per frame (dt-feedback in updateStreaming)
+    remeshQ = {},        -- deferred chunk remeshes (streaming + water put keys here)
+    yBounds = {},        -- [key] = highest non-AIR y in the chunk (mesh Y-bound: skips the all-air ceiling)
+    meshJobs = {},       -- FIFO queue of in-progress incremental mesh jobs (one chunk meshed across frames)
+    meshHead = 1,        -- index of the job currently being stepped in meshJobs
+    meshSet = {},        -- [key] = the job, while a chunk is queued/in-progress (dedup + stale-cancel)
+    ready = false,       -- world generated yet? (deferred to the first activate)
+}
 
 local AIR, GRASS, DIRT, STONE, SAND, WATER, WOOD, LEAVES, TORCH, BEDROCK = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 local SNOW, GLASS, COPPER_DIRT = 10, 11, 42   -- COPPER_DIRT: copper showing in the dirt layer
+local LAVA, FURNACE, PLANKS, COAL_ORE = 45, 46, 47, 48   -- lava pools / smelting / crafted planks / coal
 
 -- texture ids in one table (keeps the chunk under Lua's 200-locals limit)
 local TX = { grasstop = 1, grassside = 2, dirt = 3, stone = 4, sand = 5, logtop = 6,
              logside = 7, leaves = 8, torch = 9, bedrock = 10, snow = 11, glass = 12,
-             snowside = 28, copperdirt = 44 }
+             snowside = 28, copperdirt = 44,
+             lava = 70, furnace = 71, furnacetop = 72, planks = 73, coalore = 74 }
 local GLASS_A = 120   -- glass transparency (0..255)
 
 -- Ores & gems live in one table (so we stay under Lua's 200-locals-per-chunk limit). Each:
@@ -78,6 +95,17 @@ local ORE_DEFS = {
     { name = "Emerald",  gem = true, id = 24, tex = 25, bid = 39, btex = 41, col = {34,194,96},   yMin = 8,  yMax = 46, rate = 0.0042,  smin = 2, smax = 5 },
     { name = "Quartz",   gem = true, id = 25, tex = 26, bid = 40, btex = 42, col = {236,222,228}, yMin = 10, yMax = 70, rate = 0.0140,  smin = 3, smax = 6 },
     { name = "Diamond",  gem = true, id = 26, tex = 27, bid = 41, btex = 43, col = {150,232,242}, yMin = 2,  yMax = 18, rate = 0.0024,  smin = 2, smax = 5 },
+    -- the periodic-table expansion (+ Coal, which fuels the new furnaces). coal=true: drops the coal
+    -- ITEM when mined (like gems) instead of the ore block.
+    { name = "Coal", coal = true, id = 48, tex = 74, bid = 49, btex = 66, col = {52,52,58},   yMin = 16, yMax = 100, rate = 0.050, smin = 12, smax = 24 },
+    { name = "Titanium",  id = 60, tex = 75, bid = 61, btex = 76, col = {180,190,200}, yMin = 6,  yMax = 40, rate = 0.010,  smin = 5, smax = 10 },
+    { name = "Chromium",  id = 62, tex = 77, bid = 63, btex = 78, col = {170,205,215}, yMin = 8,  yMax = 50, rate = 0.012,  smin = 5, smax = 10 },
+    { name = "Cobalt",    id = 64, tex = 79, bid = 65, btex = 80, col = {60,90,210},   yMin = 6,  yMax = 44, rate = 0.011,  smin = 5, smax = 10 },
+    { name = "Tungsten",  id = 66, tex = 81, bid = 67, btex = 82, col = {120,118,130}, yMin = 2,  yMax = 24, rate = 0.006,  smin = 4, smax = 8 },
+    { name = "Aluminium", id = 68, tex = 83, bid = 69, btex = 84, col = {205,210,218}, yMin = 20, yMax = 80, rate = 0.020,  smin = 7, smax = 14 },
+    { name = "Nickel",    id = 70, tex = 85, bid = 71, btex = 86, col = {160,156,130}, yMin = 10, yMax = 60, rate = 0.014,  smin = 6, smax = 11 },
+    { name = "Lead",      id = 72, tex = 87, bid = 73, btex = 88, col = {96,100,116},  yMin = 4,  yMax = 40, rate = 0.012,  smin = 5, smax = 10 },
+    { name = "Uranium",   id = 74, tex = 89, bid = 75, btex = 90, col = {110,230,80},  yMin = 1,  yMax = 16, rate = 0.0035, smin = 3, smax = 7 },
 }
 local oreTexOf = {}   -- [blockId] = textureId (ore blocks AND refined "Block of X"), for texIdFor
 for _, m in ipairs(ORE_DEFS) do oreTexOf[m.id] = m.tex; oreTexOf[m.bid] = m.btex end
@@ -98,6 +126,7 @@ local WATER_R, WATER_G, WATER_B, WATER_A = 46, 110, 175, 150
 
 local floor, sqrt, abs, min, max = math.floor, math.sqrt, math.abs, math.min, math.max
 local sin = math.sin
+local Inv = require("inventory")   -- creative block palette + hotbar
 
 -- ════════════════════════════════════════════════════════════════════════════════
 -- State
@@ -106,24 +135,26 @@ local sin = math.sin
 local scene, dim = nil, nil
 local fontBig, fontMid, fontSmall = nil, nil, nil
 
-local vox = {}
+local inLava = false   -- feet/eye in cave lava (red tint; you wade through it)
 
--- Chunked mesh: the world is split into CHUNK×CHUNK columns (full height) in X/Z.
--- Each chunk keeps its own quad lists, so a block edit only remeshes the 1-5 chunks
--- it can affect instead of the whole world (the remesh hitch on break/place).
+-- INFINITE chunked world: 16×WY×16 chunks generate on demand around the player (chunkData),
+-- mesh into per-chunk retained scene objects (chunks) and unmesh when far. Block data persists
+-- for the whole session once generated, so edits survive leaving and returning.
 local CHUNK = 16
-local ncx = floor((WX + CHUNK - 1) / CHUNK)
-local ncz = floor((WZ + CHUNK - 1) / CHUNK)
-local chunks = {}   -- [cz*ncx+cx+1] = { ci, cx, cz, minX,maxX,minZ,maxZ, cenX,cenZ }
-                    -- (geometry lives in the scene's batches: tex id ci*8+dir, water id ci)
+local chunkData = {}   -- [key] = flat block array (CHUNK*WY*CHUNK)
+local chunkSky  = {}   -- [key] = per-column "lowest y that still sees sky" (skylight bake)
+local chunks    = {}   -- meshed chunks: [key] = { cx, cz, objTex = {6}, objWater, objGlass }
+local chunkLava = {}   -- [key] = gen-time lava-light anchors { {x,y,z}, ... }
+-- streaming scratch (genOrder/remeshQ) lives in WCFG: the file rides Lua's 200-local limit
+local function ckey(cx, cz) return cx .. "," .. cz end
 
 -- player
-local feetX, feetY, feetZ = WX / 2, 76, WZ / 2
+local feetX, feetY, feetZ = 8, 76, 8
 local vx, vy, vz = 0, 0, 0
 local onGround = false
 local camX, camY, camZ = 0, 0, 0
 local yaw, pitch = 45.0, -18.0
-local spawnX, spawnY, spawnZ = WX / 2, 24, WZ / 2   -- starting spot (Reset position)
+local spawnX, spawnY, spawnZ = 8, 24, 8             -- starting spot (Reset position)
 local spawnYaw, spawnPitch = 45.0, -18.0
 -- camera basis mirrored from the scene (forward + right's horizontal components,
 -- the only parts Lua needs for movement / picking / face-culling)
@@ -136,17 +167,10 @@ local hasSel = false
 local selX, selY, selZ = 0, 0, 0
 local selNx, selNy, selNz = 0, 1, 0
 
--- hotbar: the placeable block types (bedrock is intentionally absent), the held index,
--- and the break/place auto-repeat timers
-local hotbar = { GRASS, DIRT, STONE, SAND, WOOD, LEAVES, TORCH, GLASS, SNOW }
-for _, m in ipairs(ORE_DEFS) do hotbar[#hotbar + 1] = m.id end    -- ore/gem blocks
-hotbar[#hotbar + 1] = COPPER_DIRT                                 -- copper-in-dirt variant
-for _, m in ipairs(ORE_DEFS) do hotbar[#hotbar + 1] = m.bid end   -- refined "Block of X"
-local heldIdx = 1
-local hotbarIcons = {}            -- [i] = LuaCanvas preview of hotbar[i]
+-- mining/placing: both auto-repeat while the button is held (creative = instant break, no tools)
 local EDIT_INTERVAL = 0.16        -- seconds between edits while a mouse button is held
-local breakTimer = 0
 local placeTimer = 0
+local breakTimer = 0              -- same repeat cadence for breaking
 
 -- pause menu
 local paused = false
@@ -186,12 +210,18 @@ local function terrainHeight(x, z)
 end
 
 local function getVox(x, y, z)
-    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return AIR end
-    return vox[(y * WZ + z) * WX + x + 1]
+    if y < 0 or y >= WY then return AIR end
+    local cx, cz = floor(x / CHUNK), floor(z / CHUNK)
+    local d = chunkData[cx .. "," .. cz]
+    if not d then return AIR end
+    return d[((y * CHUNK) + (z - cz * CHUNK)) * CHUNK + (x - cx * CHUNK) + 1]
 end
 local function setVox(x, y, z, b)
-    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return end
-    vox[(y * WZ + z) * WX + x + 1] = b
+    if y < 0 or y >= WY then return end
+    local cx, cz = floor(x / CHUNK), floor(z / CHUNK)
+    local d = chunkData[cx .. "," .. cz]
+    if not d then return end
+    d[((y * CHUNK) + (z - cz * CHUNK)) * CHUNK + (x - cx * CHUNK) + 1] = b
 end
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -199,166 +229,60 @@ end
 -- ════════════════════════════════════════════════════════════════════════════════
 
 -- Solid for collision. Air, water and torches are walk-through; glass is solid (you bump it).
-local function isSolid(b) return b ~= AIR and b ~= WATER and b ~= TORCH end
+local function isSolid(b) return b ~= AIR and b ~= WATER and b ~= TORCH and b ~= LAVA end
 -- Blocks skylight / torch light. Same as solid but glass lets light through.
 local function blocksLight(b) return b ~= AIR and b ~= WATER and b ~= TORCH and b ~= GLASS end
 -- A face is drawn when the neighbour is see-through (air, water, torch or glass).
 -- See-through for face culling: a neighbour that doesn't fully hide the face behind it. Leaves
 -- count (they're cutout), so blocks next to leaves still draw their face (no see-through holes
 -- into solid blocks) and leaves draw faces against each other (holes reveal the leaves behind).
-local function isTransparent(b) return b == AIR or b == WATER or b == TORCH or b == GLASS or b == LEAVES end
+local function isTransparent(b) return b == AIR or b == WATER or b == LAVA or b == TORCH or b == GLASS or b == LEAVES end
 -- Targetable by the crosshair (so torches/glass can be broken, water/air cannot).
-local function isSelectable(b) return b ~= AIR and b ~= WATER end
+local function isSelectable(b) return b ~= AIR and b ~= WATER and b ~= LAVA end
 
 -- Skylight is a cheap per-column value (a cell is lit by sky only if nothing solid is above it
 -- in its column), so tunnels/overhangs go dark — it's baked into each face's shade. Torch light
 -- is now produced by the engine's forward point lights (each with a small per-torch occupancy
 -- grid so it casts real shadows), so there is no torch flood-fill here any more.
-local skyTop = {}     -- [x*WZ+z+1] = lowest y that still sees the sky (everything >= it is lit)
-local torches = {}    -- [packed idx] = {x,y,z} of each torch (for the posts + the point lights)
-local torchesDirty = false   -- set when a torch is added/removed → rebuild the torch object + lights
+local torches = {}    -- [key string] = {x,y,z} of each torch (for the posts + the point lights)
+local torchesDirty = false   -- set when a torch/lava chunk changes → rebuild posts + lights
 
 local function recomputeSkyColumn(x, z)
+    local cx, cz = floor(x / CHUNK), floor(z / CHUNK)
+    local sk = chunkSky[cx .. "," .. cz]; if not sk then return end
     local top = 0
     for y = WY - 1, 0, -1 do
         if blocksLight(getVox(x, y, z)) then top = y + 1; break end
     end
-    skyTop[x * WZ + z + 1] = top
+    sk[(z - cz * CHUNK) * CHUNK + (x - cx * CHUNK) + 1] = top
 end
 
 local function skyAt(x, y, z)
-    if x < 0 or x >= WX or y < 0 or y >= WY or z < 0 or z >= WZ then return 0 end
-    local top = skyTop[x * WZ + z + 1] or 0
+    if y >= WY then return LIGHT_MAX end
+    if y < 0 then return 0 end
+    local cx, cz = floor(x / CHUNK), floor(z / CHUNK)
+    local sk = chunkSky[cx .. "," .. cz]
+    if not sk then return LIGHT_MAX end                      -- ungenerated frontier: assume lit
+    local top = sk[(z - cz * CHUNK) * CHUNK + (x - cx * CHUNK) + 1] or 0
     if y >= top then return LIGHT_MAX end
     -- gradual falloff with depth of cover, so a block just under another isn't pitch black
     local v = LIGHT_MAX - (top - y) * SKY_FALLOFF
     return v > 0 and v or 0
 end
-local function initLight()
-    skyTop = {}
-    for x = 0, WX - 1 do for z = 0, WZ - 1 do recomputeSkyColumn(x, z) end end
-end
 
--- Plant a tree on the grass block at (x, groundY): trunk sits directly on the grass,
--- with a rounded leaf canopy. Sizes/jitter use math.random (organic, no noise banding).
-local function plantTree(x, z, groundY)
-    local th = 4 + math.random(0, 2)             -- trunk height 4..6
-    for i = 1, th do setVox(x, groundY + i, z, WOOD) end
-    local topY = groundY + th
-    for dy = -2, 2 do
-        local cy = topY + dy
-        local r = (dy <= -1) and 2 or (dy <= 1 and 2 or 1)
-        for dx = -r, r do for dz = -r, r do
-            if dx * dx + dz * dz <= r * r + 1 and getVox(x + dx, cy, z + dz) == AIR then
-                setVox(x + dx, cy, z + dz, LEAVES)
-            end
-        end end
-    end
-    setVox(x, topY + 2, z, LEAVES)               -- crown tip
-end
-
--- 3D value noise for caves (trilinear-interpolated integer hash — no sin, fast enough to run
--- over every underground cell at gen time).
-local function hash3(x, y, z)
-    local n = (x * 374761393 + y * 668265263 + z * 1274126177 + SEED * 9176)
-    n = (n ~ (n >> 13)) * 1274126177
-    n = n ~ (n >> 16)
-    return (n & 0xFFFFFF) / 16777216.0
-end
-local function vnoise3(x, y, z)
-    local x0, y0, z0 = floor(x), floor(y), floor(z)
-    local fx, fy, fz = x - x0, y - y0, z - z0
-    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz)
-    local c000, c100 = hash3(x0, y0, z0),     hash3(x0 + 1, y0, z0)
-    local c010, c110 = hash3(x0, y0 + 1, z0), hash3(x0 + 1, y0 + 1, z0)
-    local c001, c101 = hash3(x0, y0, z0 + 1), hash3(x0 + 1, y0, z0 + 1)
-    local c011, c111 = hash3(x0, y0 + 1, z0 + 1), hash3(x0 + 1, y0 + 1, z0 + 1)
-    local a = c000 + (c100 - c000) * fx
-    local b = c010 + (c110 - c010) * fx
-    local cc = c001 + (c101 - c001) * fx
-    local dd = c011 + (c111 - c011) * fx
-    local e = a + (b - a) * fy
-    local f = cc + (dd - cc) * fy
-    return e + (f - e) * fz
-end
--- Winding "worm" tunnels: where two independent noise fields are both near their mid value,
--- their zero-sets intersect in tube-like channels — a classic, cheap cave-carving trick.
-local CAVE_FREQ   = 0.05    -- bigger = tighter/twistier tunnels
-local CAVE_THRESH = 0.038   -- bigger = more/wider caves (kept lean: cave surface area is the main
-                            -- per-frame cost, since the engine rebuilds all visible faces each frame)
-local function caveAt(x, y, z)
-    local n1 = vnoise3(x * CAVE_FREQ,        y * CAVE_FREQ * 1.7,      z * CAVE_FREQ)
-    local n2 = vnoise3(x * CAVE_FREQ + 53.3, y * CAVE_FREQ * 1.7 + 18.7, z * CAVE_FREQ + 71.1)
-    return abs(n1 - 0.5) < CAVE_THRESH and abs(n2 - 0.5) < CAVE_THRESH
-end
-
-local function generateWorld()
-    -- Snow caps higher up; bare rock on the highest peaks (no grass/dirt over them).
-    local SNOW_LEVEL = SEA_LEVEL + 18
-    local STONE_PEAK = SEA_LEVEL + 26
-    math.randomseed(SEED)
-    vox = {}
-    for i = 1, WX * WY * WZ do vox[i] = AIR end
-    for x = 0, WX - 1 do
-        for z = 0, WZ - 1 do
-            local h = min(terrainHeight(x, z), WY - 1)
-            local beach = (h <= SEA_LEVEL + 1)
-            for y = 0, h do
-                local b
-                if y == 0 then b = BEDROCK                         -- unbreakable floor
-                elseif y < h - 3 then b = STONE
-                elseif y == h then                                 -- surface block by elevation
-                    if beach then b = SAND
-                    elseif h >= STONE_PEAK then b = STONE
-                    elseif h >= SNOW_LEVEL then b = SNOW
-                    else b = GRASS end
-                else                                               -- subsurface cap
-                    if beach then b = SAND
-                    elseif h >= STONE_PEAK then b = STONE
-                    else
-                        b = DIRT
-                        if math.random() < 0.02 then b = COPPER_DIRT end -- copper occasionally in the dirt layer
-                    end
-                end
-                -- carve natural cave tunnels through the terrain (never the bedrock floor)
-                if y >= 1 and caveAt(x, y, z) then b = AIR end
-                setVox(x, y, z, b)
-            end
-            for y = h + 1, SEA_LEVEL do setVox(x, y, z, WATER) end
-        end
-    end
-    -- Ore + gem veins: random-walk clusters that replace stone, within each material's
-    -- depth band. Vein count scales with map area.
-    for _, m in ipairs(ORE_DEFS) do
-        local veins = floor(m.rate * WX * WZ)
-        for _ = 1, veins do
-            local x, y, z = math.random(1, WX - 2), math.random(m.yMin, m.yMax), math.random(1, WZ - 2)
-            for _ = 1, math.random(m.smin, m.smax) do
-                if x >= 1 and x < WX - 1 and y >= 1 and y < WY - 1 and z >= 1 and z < WZ - 1 then
-                    if getVox(x, y, z) == STONE then setVox(x, y, z, m.id) end
-                else break end
-                local d = math.random(6)
-                if d == 1 then x = x + 1 elseif d == 2 then x = x - 1
-                elseif d == 3 then y = y + 1 elseif d == 4 then y = y - 1
-                elseif d == 5 then z = z + 1 else z = z - 1 end
-            end
-        end
-    end
-    -- Trees: scatter on real grass surfaces (math.random = organic, no lines), spaced out.
-    local function surfaceY(x, z)
-        for y = WY - 1, 1, -1 do if isSolid(getVox(x, y, z)) then return y end end
-        return 0
-    end
-    for x = 2, WX - 3 do for z = 2, WZ - 3 do
-        if math.random() < 0.020 then
-            local y = surfaceY(x, z)
-            if getVox(x, y, z) == GRASS and y < SNOW_LEVEL
-               and getVox(x - 1, y + 1, z) ~= WOOD and getVox(x + 1, y + 1, z) ~= WOOD
-               and getVox(x, y + 1, z - 1) ~= WOOD and getVox(x, y + 1, z + 1) ~= WOOD then
-                plantTree(x, z, y)
-            end
-        end
-    end end
+-- World generation lives in worldgen.lua (split for readability); genChunk wraps it so the
+-- torch/lava light rebuild flag stays a Script-local.
+local Worldgen = require("worldgen")
+Worldgen.init({
+    B = { AIR = AIR, GRASS = GRASS, DIRT = DIRT, STONE = STONE, SAND = SAND, WATER = WATER, WOOD = WOOD,
+          LEAVES = LEAVES, BEDROCK = BEDROCK, SNOW = SNOW, COPPER_DIRT = COPPER_DIRT, LAVA = LAVA },
+    CHUNK = CHUNK, WY = WY, SEA_LEVEL = SEA_LEVEL, SEED = SEED, WCFG = WCFG, ORE_DEFS = ORE_DEFS,
+    chunkData = chunkData, chunkSky = chunkSky, chunkLava = chunkLava, chunkYBounds = WCFG.yBounds,
+    terrainHeight = terrainHeight, recomputeSkyColumn = recomputeSkyColumn, blocksLight = blocksLight,
+    setVox = setVox, getVox = getVox,
+})
+local function genChunk(cx, cz)
+    if Worldgen.genChunk(cx, cz) then torchesDirty = true end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -458,7 +382,7 @@ local function registerTextures()
     for v = 0, 15 do for u = 0, 15 do
         local n = (hash2(u, v, 23) - 0.5) * 40
         -- scattered holes (cutout): a negative texel reads as transparent in the rasterizer, so
-        -- the leaf block shows gaps like Minecraft's. Keep the border mostly solid so the leaf
+        -- the leaf block shows see-through gaps. Keep the border mostly solid so the leaf
         -- texture still tiles as a recognisable block.
         if hash2(u, v, 63) < 0.16 then
             leaves[v * 16 + u + 1] = -1
@@ -547,6 +471,40 @@ local function registerTextures()
         reg(m.tex, texMineral(m, m.id))        -- ore in the ground
         reg(m.btex, texSolid(m, m.id + 100))   -- refined "Block of X"
     end
+    -- LAVA: dark crust with bright glowing cracks (meshed full-bright, so the cracks burn)
+    local lv = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local crack = sin(u * 0.9 + sin(v * 0.7) * 2.0) + sin(v * 1.1)
+        local glow = crack > 0 and crack or 0
+        lv[v * 16 + u + 1] = packc(90 + glow * 160, 26 + glow * 95, 14 + glow * 14)
+    end end
+    reg(TX.lava, lv)
+    -- FURNACE: stone body, dark mouth with embers on the side, vents on top
+    local fu = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local n = (hash2(u, v, 77) - 0.5) * 2 * 16
+        local c = packc(108 + n, 108 + n, 114 + n)
+        if v >= 9 and v <= 13 and u >= 4 and u <= 11 then
+            c = (v >= 11 and hash2(u, v, 91) < 0.5) and packc(235, 120, 30) or packc(24, 22, 24)   -- mouth + embers
+        end
+        fu[v * 16 + u + 1] = c
+    end end
+    reg(TX.furnace, fu)
+    local ft = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local n = (hash2(u, v, 79) - 0.5) * 2 * 14
+        local vent = ((u % 5 == 2) and v >= 3 and v <= 12) and -36 or 0
+        ft[v * 16 + u + 1] = packc(96 + n + vent, 96 + n + vent, 102 + n + vent)
+    end end
+    reg(TX.furnacetop, ft)
+    -- PLANKS: warm boards with seams
+    local pl = {}
+    for v = 0, 15 do for u = 0, 15 do
+        local n = (hash2(u, v, 81) - 0.5) * 14
+        local seam = (v % 4 == 0) and -26 or (((u + floor(v / 4) * 5) % 8 == 0) and -14 or 0)
+        pl[v * 16 + u + 1] = packc(178 + n + seam, 134 + n + seam, 84 + n + seam)
+    end end
+    reg(TX.planks, pl)
 end
 
 -- Representative face texture for a block's hotbar icon.
@@ -561,19 +519,14 @@ local function iconTexId(b)
     elseif b == BEDROCK then return TX.bedrock
     elseif b == SNOW then return TX.snow
     elseif b == GLASS then return TX.glass
-    elseif b == COPPER_DIRT then return TX.copperdirt end
+    elseif b == COPPER_DIRT then return TX.copperdirt
+    elseif b == LAVA then return TX.lava
+    elseif b == FURNACE then return TX.furnace
+    elseif b == PLANKS then return TX.planks end
     return oreTexOf[b] or TX.dirt
 end
 
--- Build a 16×16 canvas preview for each hotbar block from its stored pixel table.
-local function buildHotbarIcons()
-    for i = 1, #hotbar do
-        local px = texPix[iconTexId(hotbar[i])]
-        local c = CANVAS:CreateCanvas(16, 16)
-        if px then c:BlitPacked(px, 256) end
-        hotbarIcons[i] = c
-    end
-end
+
 
 -- ════════════════════════════════════════════════════════════════════════════════
 -- Greedy meshing
@@ -598,7 +551,10 @@ local function texIdFor(b, di)
     elseif b == SNOW then
         if di == 3 then return TX.snow elseif di == 4 then return TX.dirt else return TX.snowside end
     elseif b == GLASS then return TX.glass
-    elseif b == COPPER_DIRT then return TX.copperdirt end
+    elseif b == COPPER_DIRT then return TX.copperdirt
+    elseif b == LAVA then return TX.lava
+    elseif b == PLANKS then return TX.planks
+    elseif b == FURNACE then return (di == 3 or di == 4) and TX.furnacetop or TX.furnace end
     return oreTexOf[b] or 0
 end
 
@@ -609,11 +565,35 @@ local function cw(da, dv, pa, pval, qa, qval)
     if qa == 1 then x = qval elseif qa == 2 then y = qval else z = qval end
     return x, y, z
 end
-local _vc = { 0, 0, 0 }
-local function voxAt(da, dv, pa, pval, qa, qval)
-    _vc[1] = 0; _vc[2] = 0; _vc[3] = 0
-    _vc[da] = dv; _vc[pa] = pval; _vc[qa] = qval
-    return getVox(_vc[1], _vc[2], _vc[3])
+-- voxAt for the mesh hot path: map the (da,pa,qa)-axis coords to (x,y,z) and read the chunk's own
+-- flat block array DIRECTLY when the cell is inside this chunk (the common case — the cell itself
+-- always is; only a +sign neighbour at a chunk face crosses out), falling back to the string-keyed
+-- getVox only for that out-of-chunk border neighbour. This keeps meshing off the per-cell string
+-- churn (~half a million "cx,cz" concats/chunk) that made each chunk cost hundreds of ms.
+local function voxAt(d, cx, cz, da, dv, pa, pval, qa, qval)
+    local x, y, z = 0, 0, 0
+    if da == 1 then x = dv elseif da == 2 then y = dv else z = dv end
+    if pa == 1 then x = pval elseif pa == 2 then y = pval else z = pval end
+    if qa == 1 then x = qval elseif qa == 2 then y = qval else z = qval end
+    if y < 0 or y >= WY then return AIR end
+    local lx, lz = x - cx * CHUNK, z - cz * CHUNK
+    if lx >= 0 and lx < CHUNK and lz >= 0 and lz < CHUNK then
+        return d[(y * CHUNK + lz) * CHUNK + lx + 1]
+    end
+    return getVox(x, y, z)
+end
+
+-- skyAt for the mesh hot path: index the chunk's own skylight array directly for in-chunk columns,
+-- falling back to skyAt only for a neighbour column that lies in an adjacent chunk.
+local function skyFast(sk, cx, cz, x, y, z)
+    if y >= WY then return LIGHT_MAX end
+    if y < 0 then return 0 end
+    local lx, lz = x - cx * CHUNK, z - cz * CHUNK
+    if lx < 0 or lx >= CHUNK or lz < 0 or lz >= CHUNK then return skyAt(x, y, z) end
+    local top = sk[lz * CHUNK + lx + 1] or 0
+    if y >= top then return LIGHT_MAX end
+    local v = LIGHT_MAX - (top - y) * SKY_FALLOFF
+    return v > 0 and v or 0
 end
 
 local _mask = {}   -- scratch face mask, reused across meshChunk calls
@@ -622,156 +602,343 @@ local _mask = {}   -- scratch face mask, reused across meshChunk calls
 -- batches: one textured batch per face direction (id = ci*8 + di) plus one flat batch for
 -- water (id = ci). The geometry then lives in C# and is drawn per frame with one call per
 -- bucket — no per-quad Lua↔C# traffic on the hot path.
-local function meshChunk(cx, cz)
-    local ci = cz * ncx + cx + 1
-    local loX, hiX = cx * CHUNK, min((cx + 1) * CHUNK, WX)
-    local loZ, hiZ = cz * CHUNK, min((cz + 1) * CHUNK, WZ)
-    local ch = chunks[ci]
-    if not ch then
-        -- first time: create this chunk's retained objects (6 face directions + water).
-        -- Bounds (chunk AABB) + face normals let the scene cull & order them internally.
-        ch = { objTex = {} }
-        chunks[ci] = ch
-        for di = 1, 6 do
-            local id = scene:NewObject()
-            local cfg = DIRS[di]
-            scene:ObjSetNormal(id, cfg[5], cfg[6], cfg[7])
-            scene:ObjSetPass(id, 0, 0, 0, 0, 255)
-            scene:ObjSetBounds(id, loX, 0, loZ, hiX, WY, hiZ)
-            ch.objTex[di] = id
-        end
-        ch.objWater = scene:NewObject()
-        scene:ObjSetPass(ch.objWater, 1, WATER_R, WATER_G, WATER_B, WATER_A)
-        scene:ObjSetBounds(ch.objWater, loX, 0, loZ, hiX, WY, hiZ)
-        ch.objGlass = scene:NewObject()   -- transparent textured pass (glass panes)
-        scene:ObjSetPass(ch.objGlass, 1, 0, 0, 0, GLASS_A)
-        scene:ObjSetBounds(ch.objGlass, loX, 0, loZ, hiX, WY, hiZ)
-    end
-    local objWater, objGlass = ch.objWater, ch.objGlass
-    scene:ObjBegin(objWater)
-    scene:ObjBegin(objGlass)
-    local mask = _mask
-    local lo = { loX, 0, loZ }
-    local hi = { hiX, WY, hiZ }
-    local nb1, nb2, nb3 = 0, 0, 0            -- scratch for the lit neighbour cell coords
+-- ── chunk MESHING (incremental) ──────────────────────────────────────────────────────────────
+-- Meshing one 16×128×16 chunk is the heavy per-chunk cost, so it runs as a resumable JOB: each step
+-- computes ONE of the 6 face directions into flat Lua buffers (pure Lua, no scene calls); when all
+-- six are done the buffered quads are pushed into the scene in one emit. updateStreaming drives a few
+-- steps per frame so the framerate never drops while the world streams in. The Y range is clamped to
+-- the chunk's solid span (WCFG.yBounds) so the all-air ceiling above the terrain is never walked.
+-- All these live on WCFG (the file is at Lua's 200-local ceiling — no new top-level locals).
+
+-- Ensure a chunk's retained scene objects exist (6 face dirs + water + glass). Reused across remeshes.
+WCFG.ensureObjects = function(cx, cz)
+    local ch = chunks[ckey(cx, cz)]
+    if ch then return ch end
+    local loX, loZ = cx * CHUNK, cz * CHUNK
+    local hiX, hiZ = loX + CHUNK, loZ + CHUNK
+    ch = { objTex = {}, cx = cx, cz = cz }
     for di = 1, 6 do
+        local id = scene:NewObject()
         local cfg = DIRS[di]
-        local da, sign, pa, qa = cfg[1], cfg[2], cfg[3], cfg[4]
-        local ddLo, ddHi = lo[da], hi[da]
-        local pLo, pHi = lo[pa], hi[pa]
-        local qLo, qHi = lo[qa], hi[qa]
-        local qSpan = qHi - qLo
-        local objT = ch.objTex[di]
-        scene:ObjBegin(objT)
-        for dd = ddLo, ddHi - 1 do
-            for p = pLo, pHi - 1 do
-                local b0 = (p - pLo) * qSpan - qLo
-                for q = qLo, qHi - 1 do
-                    local b = voxAt(da, dd, pa, p, qa, q)
-                    -- mask value: 0 none, -1 water, -100-light glass, else texId*32 + light
-                    -- (so greedy only merges faces sharing texture+light; glass/water never
-                    -- merge with opaque). Torches aren't meshed here (drawn as slim posts).
-                    local val = 0
-                    if b ~= AIR and b ~= TORCH then
-                        local nb = voxAt(da, dd + sign, pa, p, qa, q)
-                        -- glass shows a face against anything but glass. Everything else shows where
-                        -- the neighbour is see-through — including leaves (so a solid block next to
-                        -- leaves still draws its face). But leaf-vs-leaf is NOT drawn: that would
-                        -- turn every canopy into a fully-faceted solid (huge face count) for no
-                        -- visible gain, so leaves stay a cheap hollow shell.
-                        local show
-                        if b == GLASS then show = nb ~= GLASS
-                        elseif b == LEAVES then show = isTransparent(nb) and nb ~= LEAVES
-                        else show = isTransparent(nb) end
-                        if show then
-                            if b == WATER then
-                                if di == 3 and nb == AIR then val = -1 end
-                            else
-                                nb1 = 0; nb2 = 0; nb3 = 0
-                                if da == 1 then nb1 = dd + sign elseif da == 2 then nb2 = dd + sign else nb3 = dd + sign end
-                                if pa == 1 then nb1 = p elseif pa == 2 then nb2 = p else nb3 = p end
-                                if qa == 1 then nb1 = q elseif qa == 2 then nb2 = q else nb3 = q end
-                                -- bake skylight exposure only; the sun, ambient and torch point
-                                -- lights are applied per-frame by the engine (scene:SetLighting).
-                                local lite = skyAt(nb1, nb2, nb3)
-                                if b == GLASS then val = -100 - lite
-                                else val = texIdFor(b, di) * 32 + lite end
-                            end
-                        end
-                    end
-                    mask[b0 + q + 1] = val
-                end
-            end
-            local planePos = dd + (sign > 0 and 1 or 0)
-            for p = pLo, pHi - 1 do
-                local b0 = (p - pLo) * qSpan - qLo
-                local q = qLo
-                while q < qHi do
-                    local val = mask[b0 + q + 1]
-                    if val == 0 then q = q + 1
-                    else
-                        -- greedy rectangle merge: grow along q, then along p, over equal vals.
-                        -- In low-light areas (caves/shade, where torches are used) we cap the quad
-                        -- size so the per-vertex torch falloff has enough vertices to look right;
-                        -- bright outdoor faces merge with no cap (kept cheap).
-                        local litev = (val <= -100) and (-val - 100) or (val % 32)
-                        local cap = (litev <= LIT_MERGE_LITE) and LIT_MERGE_CAP or 4096
-                        local qh = 1
-                        while q + qh < qHi and qh < cap and mask[b0 + q + qh + 1] == val do qh = qh + 1 end
-                        local pw = 1; local grow = true
-                        while p + pw < pHi and pw < cap and grow do
-                            local b2 = (p + pw - pLo) * qSpan - qLo
-                            for qq = q, q + qh - 1 do if mask[b2 + qq + 1] ~= val then grow = false; break end end
-                            if grow then pw = pw + 1 end
-                        end
-                        for pp = p, p + pw - 1 do
-                            local bc = (pp - pLo) * qSpan - qLo
-                            for qq = q, q + qh - 1 do mask[bc + qq + 1] = 0 end
-                        end
-                        local x0, y0, z0 = cw(da, planePos, pa, p, qa, q)
-                        local x1, y1, z1 = cw(da, planePos, pa, p + pw, qa, q)
-                        local x2, y2, z2 = cw(da, planePos, pa, p + pw, qa, q + qh)
-                        local x3, y3, z3 = cw(da, planePos, pa, p, qa, q + qh)
-                        if val == -1 then
-                            scene:ObjAddQuadFlat(objWater, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3)
-                        elseif val <= -100 then
-                            local lite = -val - 100
-                            -- pass the face's SKY EXPOSURE (0..1) as "shade"; the engine's sun is
-                            -- gated by it (so it doesn't leak into caves), and ambient fills the rest.
-                            scene:ObjAddQuadTex(objGlass, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
-                                TX.glass, pw, qh, lite / LIGHT_MAX)
-                        else
-                            local texId = val // 32
-                            local lite = val - texId * 32
-                            scene:ObjAddQuadTex(objT, x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3,
-                                texId, pw, qh, lite / LIGHT_MAX)
-                        end
-                        q = q + qh
-                    end
-                end
-            end
-        end
+        scene:ObjSetNormal(id, cfg[5], cfg[6], cfg[7])
+        scene:ObjSetPass(id, 0, 0, 0, 0, 255)
+        scene:ObjSetBounds(id, loX, 0, loZ, hiX, WY, hiZ)
+        ch.objTex[di] = id
     end
+    ch.objWater = scene:NewObject()
+    scene:ObjSetPass(ch.objWater, 1, WATER_R, WATER_G, WATER_B, WATER_A)
+    scene:ObjSetBounds(ch.objWater, loX, 0, loZ, hiX, WY, hiZ)
+    ch.objGlass = scene:NewObject()   -- transparent textured pass (glass panes)
+    scene:ObjSetPass(ch.objGlass, 1, 0, 0, 0, GLASS_A)
+    scene:ObjSetBounds(ch.objGlass, loX, 0, loZ, hiX, WY, hiZ)
+    return ch
 end
 
--- Full (re)mesh of every chunk — used once at startup.
-local function greedyMesh()
-    for cz = 0, ncz - 1 do
-        for cx = 0, ncx - 1 do meshChunk(cx, cz) end
+-- Build a fresh mesh job for a chunk: pure-Lua state (block/sky refs + flat quad buffers); no scene
+-- objects exist until emitChunk, so an unfinished job can be dropped for free.
+WCFG.newJob = function(cx, cz)
+    local key = ckey(cx, cz)
+    local yMax = WCFG.yBounds[key]
+    local yHi
+    if yMax == nil then yHi = WY                 -- defensive: unknown bound → mesh the full column
+    elseif yMax >= 0 then yHi = yMax + 1          -- mesh y∈[0, yMax]; skip the empty ceiling
+    else yHi = 0 end                              -- all-air chunk → nothing to mesh
+    return {
+        cx = cx, cz = cz, key = key,
+        d = chunkData[key], sk = chunkSky[key],
+        loX = cx * CHUNK, loZ = cz * CHUNK, hiX = cx * CHUNK + CHUNK, hiZ = cz * CHUNK + CHUNK,
+        yLo = 0, yHi = yHi, di = 1,
+        tex = { {}, {}, {}, {}, {}, {} }, texN = { 0, 0, 0, 0, 0, 0 },
+        water = {}, waterN = 0, glass = {}, glassN = 0,
+        _lo = { 0, 0, 0 }, _hi = { 0, 0, 0 },
+    }
+end
+
+-- Compute ONE face direction's greedy-merged quads into the job's flat buffers (NO scene calls).
+-- Quads are stored as flat number runs so emitChunk can replay them: textured = 16 numbers (12
+-- coords + texId,pw,qh,shade), water = 12 (coords only). Mask value: 0 none, -1 water, -100-light
+-- glass, else texId*32+light (greedy only merges faces sharing texture+light).
+WCFG.meshDir = function(job, di)
+    local d, sk, cx, cz = job.d, job.sk, job.cx, job.cz
+    local cfg = DIRS[di]
+    local da, sign, pa, qa = cfg[1], cfg[2], cfg[3], cfg[4]
+    local lo, hi = job._lo, job._hi
+    lo[1] = job.loX; lo[2] = job.yLo; lo[3] = job.loZ      -- Y (axis 2) is clamped to the solid span
+    hi[1] = job.hiX; hi[2] = job.yHi; hi[3] = job.hiZ
+    local ddLo, ddHi = lo[da], hi[da]
+    local pLo, pHi = lo[pa], hi[pa]
+    local qLo, qHi = lo[qa], hi[qa]
+    local qSpan = qHi - qLo
+    local mask = _mask
+    local CH = CHUNK
+    local cxB, czB = cx * CH, cz * CH
+    local tex, tn = job.tex[di], 0
+    local water, wn = job.water, job.waterN
+    local glass, gn = job.glass, job.glassN
+    local nb1, nb2, nb3 = 0, 0, 0            -- scratch for the lit neighbour cell coords
+    for dd = ddLo, ddHi - 1 do
+        for p = pLo, pHi - 1 do
+            local b0 = (p - pLo) * qSpan - qLo
+            for q = qLo, qHi - 1 do
+                -- the meshed cell is ALWAYS in-chunk → inline the block read (skip the voxAt call)
+                local x, y, z = 0, 0, 0
+                if da == 1 then x = dd elseif da == 2 then y = dd else z = dd end
+                if pa == 1 then x = p elseif pa == 2 then y = p else z = p end
+                if qa == 1 then x = q elseif qa == 2 then y = q else z = q end
+                local b = d[(y * CH + (z - czB)) * CH + (x - cxB) + 1]
+                local val = 0
+                if b ~= AIR and b ~= TORCH then
+                    local nb = voxAt(d, cx, cz, da, dd + sign, pa, p, qa, q)   -- neighbour may cross a border
+                    -- glass shows a face against anything but glass; everything else shows where the
+                    -- neighbour is see-through (leaves included, but leaf-vs-leaf stays a hollow shell).
+                    local show
+                    if b == GLASS then show = nb ~= GLASS
+                    elseif b == LEAVES then show = isTransparent(nb) and nb ~= LEAVES
+                    else show = isTransparent(nb) end
+                    if show then
+                        if b == WATER then
+                            if nb == AIR then val = -1 end
+                        else
+                            nb1 = 0; nb2 = 0; nb3 = 0
+                            if da == 1 then nb1 = dd + sign elseif da == 2 then nb2 = dd + sign else nb3 = dd + sign end
+                            if pa == 1 then nb1 = p elseif pa == 2 then nb2 = p else nb3 = p end
+                            if qa == 1 then nb1 = q elseif qa == 2 then nb2 = q else nb3 = q end
+                            -- bake skylight exposure only; sun/ambient/torch lights are per-frame in the engine
+                            local lite = skyFast(sk, cx, cz, nb1, nb2, nb3)
+                            if b == LAVA then lite = LIGHT_MAX end       -- lava glows on its own
+                            if b == GLASS then val = -100 - lite
+                            else val = texIdFor(b, di) * 32 + lite end
+                        end
+                    end
+                end
+                mask[b0 + q + 1] = val
+            end
+        end
+        local planePos = dd + (sign > 0 and 1 or 0)
+        for p = pLo, pHi - 1 do
+            local b0 = (p - pLo) * qSpan - qLo
+            local q = qLo
+            while q < qHi do
+                local val = mask[b0 + q + 1]
+                if val == 0 then q = q + 1
+                else
+                    -- greedy rectangle merge: grow along q, then along p, over equal vals. Low-light
+                    -- faces cap their size so per-vertex torch falloff has enough vertices; bright
+                    -- outdoor faces merge uncapped (kept cheap).
+                    local litev = (val <= -100) and (-val - 100) or (val % 32)
+                    local cap = (litev <= LIT_MERGE_LITE) and LIT_MERGE_CAP or 4096
+                    local qh = 1
+                    while q + qh < qHi and qh < cap and mask[b0 + q + qh + 1] == val do qh = qh + 1 end
+                    local pw = 1; local grow = true
+                    while p + pw < pHi and pw < cap and grow do
+                        local b2 = (p + pw - pLo) * qSpan - qLo
+                        for qq = q, q + qh - 1 do if mask[b2 + qq + 1] ~= val then grow = false; break end end
+                        if grow then pw = pw + 1 end
+                    end
+                    for pp = p, p + pw - 1 do
+                        local bc = (pp - pLo) * qSpan - qLo
+                        for qq = q, q + qh - 1 do mask[bc + qq + 1] = 0 end
+                    end
+                    local x0, y0, z0 = cw(da, planePos, pa, p, qa, q)
+                    local x1, y1, z1 = cw(da, planePos, pa, p + pw, qa, q)
+                    local x2, y2, z2 = cw(da, planePos, pa, p + pw, qa, q + qh)
+                    local x3, y3, z3 = cw(da, planePos, pa, p, qa, q + qh)
+                    if val == -1 then
+                        water[wn+1]=x0; water[wn+2]=y0; water[wn+3]=z0; water[wn+4]=x1; water[wn+5]=y1; water[wn+6]=z1
+                        water[wn+7]=x2; water[wn+8]=y2; water[wn+9]=z2; water[wn+10]=x3; water[wn+11]=y3; water[wn+12]=z3
+                        wn = wn + 12
+                    elseif val <= -100 then
+                        local lite = -val - 100   -- glass: pass SKY EXPOSURE (0..1) as shade (gates the sun)
+                        glass[gn+1]=x0; glass[gn+2]=y0; glass[gn+3]=z0; glass[gn+4]=x1; glass[gn+5]=y1; glass[gn+6]=z1
+                        glass[gn+7]=x2; glass[gn+8]=y2; glass[gn+9]=z2; glass[gn+10]=x3; glass[gn+11]=y3; glass[gn+12]=z3
+                        glass[gn+13]=TX.glass; glass[gn+14]=pw; glass[gn+15]=qh; glass[gn+16]=lite / LIGHT_MAX
+                        gn = gn + 16
+                    else
+                        local texId = val // 32
+                        local lite = val - texId * 32
+                        tex[tn+1]=x0; tex[tn+2]=y0; tex[tn+3]=z0; tex[tn+4]=x1; tex[tn+5]=y1; tex[tn+6]=z1
+                        tex[tn+7]=x2; tex[tn+8]=y2; tex[tn+9]=z2; tex[tn+10]=x3; tex[tn+11]=y3; tex[tn+12]=z3
+                        tex[tn+13]=texId; tex[tn+14]=pw; tex[tn+15]=qh; tex[tn+16]=lite / LIGHT_MAX
+                        tn = tn + 16
+                    end
+                    q = q + qh
+                end
+            end
+        end
     end
+    job.texN[di] = tn
+    job.waterN = wn
+    job.glassN = gn
+end
+
+-- Push a finished job's buffered quads into the scene (the only scene-touching part) and register the
+-- chunk as live. ObjBegin resets each object, so a remesh cleanly replaces its geometry in one swap.
+WCFG.emitChunk = function(job)
+    local ch = WCFG.ensureObjects(job.cx, job.cz)
+    for di = 1, 6 do
+        local objT = ch.objTex[di]
+        scene:ObjBegin(objT)
+        local tex, tn, k = job.tex[di], job.texN[di], 0
+        while k < tn do
+            scene:ObjAddQuadTex(objT, tex[k+1],tex[k+2],tex[k+3], tex[k+4],tex[k+5],tex[k+6],
+                tex[k+7],tex[k+8],tex[k+9], tex[k+10],tex[k+11],tex[k+12], tex[k+13],tex[k+14],tex[k+15],tex[k+16])
+            k = k + 16
+        end
+    end
+    scene:ObjBegin(ch.objWater)
+    local water, wn, k = job.water, job.waterN, 0
+    while k < wn do
+        scene:ObjAddQuadFlat(ch.objWater, water[k+1],water[k+2],water[k+3], water[k+4],water[k+5],water[k+6],
+            water[k+7],water[k+8],water[k+9], water[k+10],water[k+11],water[k+12])
+        k = k + 12
+    end
+    scene:ObjBegin(ch.objGlass)
+    local glass, gn = job.glass, job.glassN
+    k = 0
+    while k < gn do
+        scene:ObjAddQuadTex(ch.objGlass, glass[k+1],glass[k+2],glass[k+3], glass[k+4],glass[k+5],glass[k+6],
+            glass[k+7],glass[k+8],glass[k+9], glass[k+10],glass[k+11],glass[k+12], glass[k+13],glass[k+14],glass[k+15],glass[k+16])
+        k = k + 16
+    end
+    chunks[job.key] = ch
+end
+
+-- Synchronous full mesh (block edits): all six directions + emit at once. Cheap enough after the
+-- Y-bound + inlined reads to keep the edited block's own chunk responsive. Cancels any in-progress
+-- incremental job for this chunk so it can't later emit stale geometry over this fresh mesh.
+WCFG.meshChunk = function(cx, cz)
+    local key = ckey(cx, cz)
+    local j = WCFG.meshSet[key]
+    if j then j.dead = true; WCFG.meshSet[key] = nil end
+    local job = WCFG.newJob(cx, cz)
+    for di = 1, 6 do WCFG.meshDir(job, di) end
+    WCFG.emitChunk(job)
+end
+
+-- Enqueue an incremental mesh job (deduped via meshSet). The chunk must already be generated.
+WCFG.enqueueMesh = function(cx, cz)
+    local key = ckey(cx, cz)
+    if WCFG.meshSet[key] or not chunkData[key] then return end
+    local job = WCFG.newJob(cx, cz)
+    WCFG.meshSet[key] = job
+    local q = WCFG.meshJobs
+    q[#q + 1] = job
+end
+
+-- free a far chunk's scene geometry (the block DATA stays — edits persist; remeshed on return)
+local function unmeshChunk(key)
+    local ch = chunks[key]
+    if not ch then return end
+    for di = 1, 6 do scene:DeleteObject(ch.objTex[di]) end
+    scene:DeleteObject(ch.objWater)
+    scene:DeleteObject(ch.objGlass)
+    chunks[key] = nil
+    if chunkLava[key] and #chunkLava[key] > 0 then torchesDirty = true end
 end
 
 -- Remesh just the chunks affected by a block change at (x,y,z): the block's own chunk
 -- plus the chunks of its horizontal neighbours (their faces toward the block change).
 local function remeshAt(x, y, z)
-    local done = {}
-    local function mark(bx, bz)
-        if bx < 0 or bx >= WX or bz < 0 or bz >= WZ then return end
-        local cx, cz = floor(bx / CHUNK), floor(bz / CHUNK)
-        local ci = cz * ncx + cx + 1
-        if not done[ci] then done[ci] = true; meshChunk(cx, cz) end
+    -- The edited block's OWN chunk re-meshes immediately so the change shows the same frame (cheap now
+    -- that meshChunk indexes the chunk array directly). Its horizontal neighbours only change when the
+    -- edit sits on a shared border, so they are DEFERRED to the budgeted remesh drain in updateStreaming
+    -- — this kills the old "re-mesh up to five chunks on the edit frame" break/place spike.
+    local cx, cz = floor(x / CHUNK), floor(z / CHUNK)
+    if chunkData[ckey(cx, cz)] then WCFG.meshChunk(cx, cz) end
+    local function enqueue(bx, bz)
+        local ncx, ncz = floor(bx / CHUNK), floor(bz / CHUNK)
+        if ncx ~= cx or ncz ~= cz then
+            local nk = ckey(ncx, ncz)
+            if chunks[nk] then WCFG.remeshQ[nk] = true end   -- only if currently meshed (matches the drain)
+        end
     end
-    mark(x, z); mark(x - 1, z); mark(x + 1, z); mark(x, z - 1); mark(x, z + 1)
+    enqueue(x - 1, z); enqueue(x + 1, z); enqueue(x, z - 1); enqueue(x, z + 1)
+end
+
+-- ── chunk STREAMING: generate the nearest missing chunk (1/frame), drain a couple of queued
+-- remeshes, and unmesh chunks that drifted out of range. Called every frame from update.
+local function updateStreaming(dt)
+    local pcx, pcz = floor(feetX / CHUNK), floor(feetZ / CHUNK)
+    if pcx ~= WCFG.lastPcx or pcz ~= WCFG.lastPcz then WCFG.lastPcx, WCFG.lastPcz = pcx, pcz; torchesDirty = true end
+    if not WCFG.genOrder then
+        WCFG.genOrder = {}
+        local R = WCFG.GEN_CHUNKS
+        for dz = -R, R do for dx = -R, R do
+            if dx * dx + dz * dz <= (R + 0.5) * (R + 0.5) then WCFG.genOrder[#WCFG.genOrder + 1] = { dx, dz, dx * dx + dz * dz } end
+        end end
+        table.sort(WCFG.genOrder, function(a, b) return a[3] < b[3] end)
+    end
+    -- Adaptive per-frame MESH budget: meshing is incremental (one face-direction per step), so steer the
+    -- steps-per-frame off the PREVIOUS frame's dt — ramp up when there's headroom, back off when a frame
+    -- runs heavy — to fill fast while holding framerate. Lua has no sub-frame clock (os.clock stripped),
+    -- hence dt feedback. The budget self-limits stalls: it only rises while frames stay under target.
+    local target = 0.024
+    dt = dt or target
+    if dt < target then WCFG.genBudget = min(WCFG.genBudget + 1, 8)
+    elseif dt > target * 1.5 then WCFG.genBudget = max(WCFG.genBudget - 1, 1) end
+    local budget = WCFG.genBudget
+    -- GENERATE the nearest missing chunks (DATA only; capped — gen is ~a frame's worth each) and queue
+    -- their meshes; queue revisited chunks too. Generating a chunk also queues neighbour remeshes so they
+    -- hide the faces that just became interior.
+    local genned = 0
+    for _, o in ipairs(WCFG.genOrder) do
+        local cx, cz = pcx + o[1], pcz + o[2]
+        local key = ckey(cx, cz)
+        if not chunkData[key] then
+            if genned < 2 then
+                genChunk(cx, cz)
+                WCFG.enqueueMesh(cx, cz)
+                for _, n in ipairs({ { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }) do
+                    local nk = ckey(cx + n[1], cz + n[2])
+                    if chunks[nk] then WCFG.remeshQ[nk] = true end
+                end
+                genned = genned + 1
+            end
+        elseif not chunks[key] and not WCFG.meshSet[key] then
+            WCFG.enqueueMesh(cx, cz)          -- revisited area: data kept, re-mesh it
+        end
+    end
+    -- fold deferred remeshes (block edits + frontier hides) into the incremental mesh queue
+    for k in pairs(WCFG.remeshQ) do
+        WCFG.remeshQ[k] = nil
+        local ch = chunks[k]
+        if ch and not WCFG.meshSet[k] then WCFG.enqueueMesh(ch.cx, ch.cz) end
+    end
+    -- DRAIN the mesh queue: up to `budget` direction-steps this frame; at most ONE chunk emitted per
+    -- frame (the emit is the single burst of Lua→C# quad calls — capping it keeps frames even).
+    local steps = 0
+    while steps < budget do
+        local job = WCFG.meshJobs[WCFG.meshHead]
+        if not job then break end
+        if job.dead then
+            WCFG.meshHead = WCFG.meshHead + 1
+        elseif job.di <= 6 then
+            WCFG.meshDir(job, job.di); job.di = job.di + 1; steps = steps + 1
+        else
+            WCFG.emitChunk(job); WCFG.meshSet[job.key] = nil
+            WCFG.meshHead = WCFG.meshHead + 1
+            break
+        end
+    end
+    -- compact the processed prefix of the queue (drop dead weight; reset when fully drained)
+    local q = WCFG.meshJobs
+    if WCFG.meshHead > #q then
+        WCFG.meshJobs = {}; WCFG.meshHead = 1
+    elseif WCFG.meshHead > 48 then
+        local nq = {}
+        for i = WCFG.meshHead, #q do nq[#nq + 1] = q[i] end
+        WCFG.meshJobs = nq; WCFG.meshHead = 1
+    end
+    -- UNLOAD far chunks (free their scene geometry; block data persists). Also cancel any queued job
+    -- for a chunk that drifted out of range so it can't pop in behind the player.
+    for k, ch in pairs(chunks) do
+        local ddx, ddz = ch.cx - pcx, ch.cz - pcz
+        if ddx * ddx + ddz * ddz > WCFG.MESH_UNLOAD * WCFG.MESH_UNLOAD then unmeshChunk(k) end
+    end
+    for k, job in pairs(WCFG.meshSet) do
+        local ddx, ddz = job.cx - pcx, job.cz - pcz
+        if ddx * ddx + ddz * ddz > WCFG.MESH_UNLOAD * WCFG.MESH_UNLOAD then job.dead = true; WCFG.meshSet[k] = nil end
+    end
 end
 
 local torchCount = 0   -- number of torches placed (kept for HUD/debug; lights come from `torches`)
@@ -780,15 +947,121 @@ local torchCount = 0   -- number of torches placed (kept for HUD/debug; lights c
 -- torches (they drive the engine point lights, rebuilt from `torches` on the next frame), then
 -- remeshes the affected chunks. Torch light no longer touches the baked mesh, so a plain local
 -- remesh is enough.
+-- ── flowing water ────────────────────────────────────────────────────────────────────────────
+-- Water cells are either SOURCES (generated ocean/lakes; no entry in water.lvl) or FLOWING
+-- (water.lvl[k] = 7..1). Active cells sit in a queue ticked every 0.2 s: water falls into air
+-- below (the falling column stays strong), else spreads sideways with a decreasing level; flowing
+-- water with no feed (no water above, no stronger neighbour) dries up. Edits wake neighbours.
+local water = { lvl = {}, q = {}, t = 0 }   -- flowing-water state (one table: 200-locals limit)
+local function wkey(x, y, z) return x .. ":" .. y .. ":" .. z end
+local function activateWater(x, y, z) water.q[#water.q + 1] = { x, y, z } end
+local function isLiquid(b) return b == WATER or b == LAVA end
+local function activateWaterAround(x, y, z)
+    if isLiquid(getVox(x, y, z)) then activateWater(x, y, z) end
+    if isLiquid(getVox(x - 1, y, z)) then activateWater(x - 1, y, z) end
+    if isLiquid(getVox(x + 1, y, z)) then activateWater(x + 1, y, z) end
+    if isLiquid(getVox(x, y, z - 1)) then activateWater(x, y, z - 1) end
+    if isLiquid(getVox(x, y, z + 1)) then activateWater(x, y, z + 1) end
+    if isLiquid(getVox(x, y + 1, z)) then activateWater(x, y + 1, z) end
+end
+
 local function setBlock(x, y, z, newType)
     local old = getVox(x, y, z)
     if old == newType then return end
     setVox(x, y, z, newType)
     recomputeSkyColumn(x, z)
-    local tIdx = (y * WZ + z) * WX + x + 1
+    -- keep the chunk's mesh Y-bound covering a block placed above the old top, or it'd fall outside the
+    -- meshed range and stay invisible (yMax only grows here; shrinking is a harmless perf-only miss).
+    if newType ~= AIR then
+        local bk = ckey(floor(x / CHUNK), floor(z / CHUNK))
+        if y > (WCFG.yBounds[bk] or -1) then WCFG.yBounds[bk] = y end
+    end
+    local tIdx = x .. ":" .. y .. ":" .. z
     if old == TORCH then torchCount = torchCount - 1; torches[tIdx] = nil; torchesDirty = true end
     if newType == TORCH then torchCount = torchCount + 1; torches[tIdx] = { x, y, z }; torchesDirty = true end
+    -- wake any water around the edit so it can flow into / re-settle around the change
+    activateWaterAround(x, y, z)
     remeshAt(x, y, z)
+end
+
+local function tickWater(dt)
+    water.t = water.t + dt
+    if water.t < 0.2 then return end
+    water.t = 0
+    water.lavaPhase = ((water.lavaPhase or 0) + 1) % 3          -- lava flows at a third of the water rate
+    if #water.q == 0 then return end
+    local q = water.q
+    water.q = {}
+    local dirty = {}
+    local function setW(x, y, z, lvl, liquid)
+        liquid = liquid or WATER
+        -- water meeting lava (or the reverse) quenches into STONE
+        local function near(b)
+            return getVox(x - 1, y, z) == b or getVox(x + 1, y, z) == b
+                or getVox(x, y, z - 1) == b or getVox(x, y, z + 1) == b or getVox(x, y + 1, z) == b
+        end
+        if (liquid == WATER and near(LAVA)) or (liquid == LAVA and near(WATER)) then
+            setVox(x, y, z, STONE)
+            water.lvl[wkey(x, y, z)] = nil
+            dirty[ckey(floor(x / CHUNK), floor(z / CHUNK))] = true
+            recomputeSkyColumn(x, z)
+            return
+        end
+        setVox(x, y, z, liquid)
+        if lvl then water.lvl[wkey(x, y, z)] = lvl else water.lvl[wkey(x, y, z)] = nil end
+        dirty[ckey(floor(x / CHUNK), floor(z / CHUNK))] = true
+        activateWater(x, y, z)
+    end
+    local function clearW(x, y, z)
+        setVox(x, y, z, AIR)
+        water.lvl[wkey(x, y, z)] = nil
+        dirty[ckey(floor(x / CHUNK), floor(z / CHUNK))] = true
+        activateWaterAround(x, y, z)
+    end
+    local n = min(#q, 260)                      -- budget per tick; the rest re-queues
+    for i = n + 1, #q do water.q[#water.q + 1] = q[i] end
+    for i = 1, n do
+        local c = q[i]
+        local x, y, z = c[1], c[2], c[3]
+        local me = getVox(x, y, z)
+        if me == LAVA and water.lavaPhase ~= 0 then
+            water.q[#water.q + 1] = c                                   -- lava waits for its slow tick
+        elseif me == WATER or me == LAVA then
+            local maxSpread = (me == LAVA) and 4 or 8                   -- lava creeps a short distance
+            local lvl = math.min(water.lvl[wkey(x, y, z)] or 8, maxSpread)
+            -- dry up flowing water that lost its feed
+            local fed = (lvl >= maxSpread) or getVox(x, y + 1, z) == me
+            if not fed then
+                local function nl(nx, nz)
+                    if getVox(nx, y, nz) ~= me then return 0 end
+                    return water.lvl[wkey(nx, y, nz)] or 8
+                end
+                fed = nl(x - 1, z) > lvl or nl(x + 1, z) > lvl or nl(x, z - 1) > lvl or nl(x, z + 1) > lvl
+            end
+            if not fed and lvl < maxSpread then
+                clearW(x, y, z)
+            else
+                if getVox(x, y - 1, z) == AIR and y > 1 then
+                    setW(x, y - 1, z, (me == LAVA) and 3 or 7, me)        -- fall
+                elseif lvl > 1 then
+                    local below = getVox(x, y - 1, z)
+                    if below ~= AIR then                                  -- pooled: spread sideways
+                        local function trySpread(nx, nz)
+                            if getVox(nx, y, nz) == AIR then setW(nx, y, nz, lvl - 1, me)
+                            elseif getVox(nx, y, nz) == me then
+                                local ol = water.lvl[wkey(nx, y, nz)]
+                                if ol and ol < lvl - 1 then setW(nx, y, nz, lvl - 1, me) end
+                            end
+                        end
+                        trySpread(x - 1, z); trySpread(x + 1, z); trySpread(x, z - 1); trySpread(x, z + 1)
+                    end
+                end
+            end
+        end
+    end
+    for k in pairs(dirty) do
+        if chunks[k] then WCFG.remeshQ[k] = true end
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════════
@@ -948,7 +1221,20 @@ local torchObj = nil
 local function rebuildTorches()
     if torchObj == nil then return end
     scene:ObjBegin(torchObj)
-    scene:ClearLights()                      -- the torches ARE the scene's point lights
+    scene:ClearLights()                      -- torches + cave lava ARE the scene's point lights
+    -- lava anchors of meshed chunks become point lights too, capped to the 56 nearest (engine max 64)
+    local cand = {}
+    for k in pairs(chunks) do
+        for _, L in ipairs(chunkLava[k] or {}) do
+            local dx, dy, dz = L[1] - feetX, L[2] - feetY, L[3] - feetZ
+            cand[#cand + 1] = { p = L, d = dx * dx + dy * dy + dz * dz }
+        end
+    end
+    table.sort(cand, function(a, b) return a.d < b.d end)
+    for i = 1, min(#cand, 24) do      -- tighter cap: the per-fragment light loop was the orientation FPS cliff
+        local L = cand[i].p
+        scene:AddLightRanged(L[1] + 0.5, L[2] + 0.4, L[3] + 0.5, 1.0, 0.40, 0.10, 2.4, 8)
+    end
     for _, t in pairs(torches) do
         local x, y, z = t[1], t[2], t[3]
         local cxp, czp = x + 0.5, z + 0.5
@@ -982,6 +1268,18 @@ end
 -- Lifecycle
 -- ════════════════════════════════════════════════════════════════════════════════
 
+local BLOCK_NAMES = { [AIR] = "Air", [GRASS] = "Grass", [DIRT] = "Dirt", [STONE] = "Stone",
+                      [SAND] = "Sand", [WATER] = "Water", [WOOD] = "Wood", [LEAVES] = "Leaves",
+                      [TORCH] = "Torch", [BEDROCK] = "Bedrock", [SNOW] = "Snow", [GLASS] = "Glass" }
+for _, m in ipairs(ORE_DEFS) do
+    BLOCK_NAMES[m.id] = m.gem and m.name or (m.name .. " Ore")   -- "Gold Ore"; gems keep their name
+    BLOCK_NAMES[m.bid] = "Block of " .. m.name                   -- "Block of Iron"
+end
+BLOCK_NAMES[COPPER_DIRT] = "Copper Ore"
+BLOCK_NAMES[LAVA] = "Lava"
+BLOCK_NAMES[FURNACE] = "Furnace"
+BLOCK_NAMES[PLANKS] = "Planks"
+
 function onStart()
     scene = SCENE3D:CreateScene(RW, RH)
     scene:SetMode("raster")                            -- GPU hardware-pipeline rasterizer (now the engine default; CPU fallback if GLES 3.1 unavailable)
@@ -998,17 +1296,34 @@ function onStart()
     scene:SetFog(true, SKY_HOR_R, SKY_HOR_G, SKY_HOR_B, FOG_START, FOG_END)
     scene:SetThreads(THREADS)
     registerTextures()
-    buildHotbarIcons()
     torchObj = scene:NewObject()                      -- one retained object for all torches
     scene:ObjSetPass(torchObj, 0, 0, 0, 0, 255)       -- opaque (drawn before water)
     scene:ObjSetLit(torchObj, false)                  -- posts are the light source: render full-bright
     selObj = scene:NewObject()                        -- block-selection outline (3D, depth-tested)
     scene:ObjSetPass(selObj, 0, 255, 255, 0, 255)     -- opaque, yellow (shows even in the dark)
     scene:ObjSetLit(selObj, false)                    -- full-bright yellow regardless of lighting
-    generateWorld()
-    initLight()
-    greedyMesh()
+    -- item/recipe registry (needs BLOCK_NAMES + texPix, both ready by now)
+    -- creative block palette: every named block becomes a placeable item with its face-texture icon
+    Inv.init({ texPix = texPix, iconTexId = iconTexId, BLOCK_NAMES = BLOCK_NAMES,
+               blocks = { GRASS = GRASS, DIRT = DIRT, STONE = STONE, SAND = SAND, WATER = WATER,
+                          WOOD = WOOD, LEAVES = LEAVES, TORCH = TORCH, BEDROCK = BEDROCK, SNOW = SNOW,
+                          GLASS = GLASS, COPPER_DIRT = COPPER_DIRT, LAVA = LAVA, FURNACE = FURNACE,
+                          PLANKS = PLANKS, COAL_ORE = COAL_ORE } })
     updateSun(0)                                      -- set the initial sun / ambient / sky
+    rebuildBasis()
+end
+
+-- World generation is DEFERRED to the first entry (every stage's onStart runs at skin BOOT, so
+-- generating + meshing the spawn chunks there cost RAM/time even when the stage is never opened).
+local function ensureWorld()
+    if WCFG.ready then return end
+    WCFG.ready = true
+    math.randomseed(SEED)
+    -- Report real progress: 5×5 spawn chunks × 2 passes (generate, then mesh). LOADING:Tick yields a frame +
+    -- advances the bar per chunk, so the loading screen fills smoothly instead of snapping 0→100.
+    local total, done = 50, 0
+    for cz = -2, 2 do for cx = -2, 2 do genChunk(cx, cz); done = done + 1; LOADING:Tick(done / total) end end
+    for cz = -2, 2 do for cx = -2, 2 do WCFG.meshChunk(cx, cz); done = done + 1; LOADING:Tick(done / total) end end
     local gh = terrainHeight(floor(feetX), floor(feetZ))
     feetY = max(gh + 1, SEA_LEVEL + 1)
     spawnX, spawnY, spawnZ = feetX, feetY, feetZ
@@ -1028,6 +1343,9 @@ end
 function activate()
     lastTs = 0
     paused = false
+    -- First entry: build the spawn chunks behind the loading bar (LOADING:Add gives ensureWorld's Ticks a
+    -- block so they report real progress). On re-entry the world persists (WCFG.ready) → no rebuild.
+    if not WCFG.ready then LOADING:Add("World", 1, ensureWorld) end
     INPUT:SetMouseLocked(true)
 end
 
@@ -1049,6 +1367,8 @@ local MENU_RECTS = { { 960, 452, 380, 72 }, { 960, 540, 380, 72 }, { 960, 628, 3
 
 local function updateGame(dt)
     updateSun(dt)                       -- advance the day/night sun + ambient
+    updateStreaming(dt)                 -- infinite world: gen/mesh/unmesh around the player (dt drives the budget)
+    tickWater(dt)                       -- flowing water
 
     -- look: mouse delta + arrow keys
     local dmx, dmy = INPUT:GetMouseDelta()
@@ -1063,8 +1383,10 @@ local function updateGame(dt)
 
     -- water state: `underwater` (eye submerged) drives the screen tint;
     -- `swim` (eye OR feet in water) drives buoyancy so you can paddle/step out at the surface.
-    underwater = getVox(floor(camX), floor(camY), floor(camZ)) == WATER
-    local swim = underwater or getVox(floor(feetX), floor(feetY + 0.1), floor(feetZ)) == WATER
+    local eyeBlock = getVox(floor(camX), floor(camY), floor(camZ))
+    underwater = eyeBlock == WATER
+    inLava = eyeBlock == LAVA or getVox(floor(feetX), floor(feetY + 0.1), floor(feetZ)) == LAVA
+    local swim = underwater or inLava or getVox(floor(feetX), floor(feetY + 0.1), floor(feetZ)) == WATER
 
     -- horizontal movement (instant velocity from input, relative to yaw)
     local hl = sqrt(Fx * Fx + Fz * Fz); if hl < 1e-6 then hl = 1e-6 end
@@ -1113,48 +1435,50 @@ local function updateGame(dt)
         feetY = ny; onGround = false
     end
 
-    -- keep the player inside the world bounds (WX/WY/WZ are the map size, set at the top)
-    if feetX < PW then feetX = PW; vx = 0 elseif feetX > WX - PW then feetX = WX - PW; vx = 0 end
-    if feetZ < PW then feetZ = PW; vz = 0 elseif feetZ > WZ - PW then feetZ = WZ - PW; vz = 0 end
-    if feetY < 0 then feetY = 0; vy = 0 end
+    if feetY < 0 then feetY = 0; vy = 0 end          -- bedrock floor (X/Z are infinite now)
 
     camX, camY, camZ = feetX, feetY + EYE, feetZ
 
-    -- hotbar selection via mouse wheel
-    local _, sdy = INPUT:GetScrollDelta()
-    if sdy ~= 0 then
-        local n = #hotbar
-        if sdy > 0 then heldIdx = heldIdx % n + 1 else heldIdx = (heldIdx - 2) % n + 1 end
-    end
+    -- hotbar selection (mouse wheel + number keys; owned by the inventory module)
+    Inv.hotbarInput()
 
     -- block pick
     local bx, by, bz, fnx, fny, fnz = pickBlock()
     if bx then hasSel = true; selX = bx; selY = by; selZ = bz; selNx = fnx; selNy = fny; selNz = fnz else hasSel = false end
 
-    -- break (hold to repeat). Bedrock is unbreakable.
+    -- CREATIVE mining: left-click removes the block instantly (hold to repeat). Bedrock and liquids
+    -- stay put so the world floor survives.
     if hasSel and INPUT:MousePressing("Left") then
         breakTimer = breakTimer - dt
         if INPUT:MousePressed("Left") or breakTimer <= 0 then
-            if getVox(selX, selY, selZ) ~= BEDROCK then setBlock(selX, selY, selZ, AIR) end
+            local b = getVox(selX, selY, selZ)
+            if isSelectable(b) and b ~= BEDROCK then
+                setBlock(selX, selY, selZ, AIR)
+                hasSel = false
+            end
             breakTimer = EDIT_INTERVAL
-            hasSel = false   -- re-picked next frame; keeps digging into the block behind
         end
     else
         breakTimer = 0
     end
 
-    -- place the held block against the targeted face (hold to repeat).
+    -- right-click: place the selected hotbar block (infinite; hold to repeat)
     if hasSel and INPUT:MousePressing("Right") then
         placeTimer = placeTimer - dt
         if INPUT:MousePressed("Right") or placeTimer <= 0 then
             local px, py, pz = selX + selNx, selY + selNy, selZ + selNz
-            local b = hotbar[heldIdx]
-            -- torches are non-solid, so they may sit where the player stands; solids may not
-            local hitsPlayer = b ~= TORCH
-                and (feetX + PW > px) and (feetX - PW < px + 1)
-                and (feetY + PH > py) and (feetY < py + 1)
-                and (feetZ + PW > pz) and (feetZ - PW < pz + 1)
-            if getVox(px, py, pz) == AIR and not hitsPlayer then setBlock(px, py, pz, b) end
+            local _, _, item = Inv.selected()
+            local b = item and item.block or nil
+            if b then
+                -- torches are non-solid, so they may sit where the player stands; solids may not
+                local hitsPlayer = b ~= TORCH
+                    and (feetX + PW > px) and (feetX - PW < px + 1)
+                    and (feetY + PH > py) and (feetY < py + 1)
+                    and (feetZ + PW > pz) and (feetZ - PW < pz + 1)
+                if getVox(px, py, pz) == AIR and not hitsPlayer then
+                    setBlock(px, py, pz, b)
+                end
+            end
             placeTimer = EDIT_INTERVAL
             hasSel = false
         end
@@ -1183,6 +1507,24 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 end
     if dt > 0.1 then dt = 0.1 end
+
+    -- inventory / furnace UI: E toggles, Esc closes; while open it owns the mouse + keys
+    if Inv.openMode then
+        if kp("E") or kp("Escape") then
+            Inv.close()
+            INPUT:SetMouseLocked(true)
+            return nil
+        end
+        Inv.updateUI()
+        tickWater(dt)
+        renderFrame()
+        return nil
+    end
+    if kp("E") then
+        Inv.openInv()
+        INPUT:SetMouseLocked(false)
+        return nil
+    end
 
     if kp("Escape") then
         paused = not paused
@@ -1226,41 +1568,7 @@ local function txt(font, str, r, g, b)
         COLOR:CreateColorFromRGBA(0, 0, 0, 255))
 end
 
-local BLOCK_NAMES = { [AIR] = "Air", [GRASS] = "Grass", [DIRT] = "Dirt", [STONE] = "Stone",
-                      [SAND] = "Sand", [WATER] = "Water", [WOOD] = "Wood", [LEAVES] = "Leaves",
-                      [TORCH] = "Torch", [BEDROCK] = "Bedrock", [SNOW] = "Snow", [GLASS] = "Glass" }
-for _, m in ipairs(ORE_DEFS) do
-    BLOCK_NAMES[m.id] = m.gem and m.name or (m.name .. " Ore")   -- "Gold Ore"; gems keep their name
-    BLOCK_NAMES[m.bid] = "Block of " .. m.name                   -- "Block of Iron"
-end
-BLOCK_NAMES[COPPER_DIRT] = "Copper Ore"
-
--- Held-block widget in the bottom-left: ‹ icon ›, with the block name under it.
-local function drawHotbar()
-    local icon = hotbarIcons[heldIdx]
-    if not icon then return end
-    local scale = 6
-    local sz = 16 * scale              -- icon size in screen px
-    local x = 72
-    local y = SCREEN_H - sz - 80
-    local pad = 14
-    -- dark panel behind the icon (dim is a 2×2 white canvas: scale s → 2s px)
-    dim:SetColor(0.07, 0.07, 0.09)
-    dim:SetOpacity(0.5)
-    dim:SetScale((sz + pad * 2) / 2, (sz + pad * 2) / 2)
-    dim:Draw(x - pad, y - pad)
-    -- block icon
-    icon:SetColor(1, 1, 1); icon:SetOpacity(1)
-    icon:SetScale(scale, scale)
-    icon:Draw(x, y)
-    -- left / right arrows (mouse wheel cycles the selection)
-    txt(fontBig, "<", 235, 235, 240):DrawAtAnchor(x - pad - 26, y + sz / 2, "center")
-    txt(fontBig, ">", 235, 235, 240):DrawAtAnchor(x + sz + pad + 26, y + sz / 2, "center")
-    -- block id over the block name
-    local bid = hotbar[heldIdx]
-    txt(fontSmall, "ID " .. bid, 190, 205, 235):DrawAtAnchor(x + sz / 2, y + sz + pad + 6, "top")
-    txt(fontSmall, BLOCK_NAMES[bid] or "?", 235, 235, 240):DrawAtAnchor(x + sz / 2, y + sz + pad + 30, "top")
-end
+-- (BLOCK_NAMES is defined up top, before onStart — Inv.init needs it at boot)
 
 function draw()
     scene:SetColor(1, 1, 1)
@@ -1273,25 +1581,31 @@ function draw()
         dim:SetOpacity(0.42)
         dim:SetScale(SCREEN_W / 2, SCREEN_H / 2)
         dim:Draw(0, 0)
+    elseif inLava and not paused then
+        dim:SetColor(0.95, 0.30, 0.05)
+        dim:SetOpacity(0.5)
+        dim:SetScale(SCREEN_W / 2, SCREEN_H / 2)
+        dim:Draw(0, 0)
     end
 
     txt(fontMid, "Voxel Engine", 255, 255, 255):Draw(24, 16)
     if showHelp then
-        txt(fontSmall, "WASD/arrows move   Space jump/swim   LCtrl sprint   mouse look   L-click break   R-click place   wheel: select   Esc: pause",
+        txt(fontSmall, "WASD move   Space jump/swim   LCtrl sprint   L-click break   R-click place   E block palette   wheel/1-9 hotbar   Esc pause",
             235, 235, 235):Draw(24, 52)
     end
 
     if not paused then
-        drawHotbar()
-        -- hovered block: name in a textbox centred at the bottom
-        if hasSel then
+        Inv.drawHotbar(dim, { big = fontBig, mid = fontMid, small = fontSmall }, SCREEN_W, SCREEN_H)
+        -- hovered block: name in a textbox centred above the hotbar
+        if hasSel and not Inv.openMode then
             local nm = BLOCK_NAMES[getVox(selX, selY, selZ)] or "?"
-            local bw, bh = 360, 56
-            local bx, by = (SCREEN_W - bw) / 2, SCREEN_H - bh - 40
+            local bw, bh = 360, 50
+            local bx, by = (SCREEN_W - bw) / 2, SCREEN_H - bh - 130
             dim:SetColor(0.07, 0.07, 0.09); dim:SetOpacity(0.55)
             dim:SetScale(bw / 2, bh / 2); dim:Draw(bx, by)
             txt(fontMid, nm, 245, 245, 250):DrawAtAnchor(SCREEN_W / 2, by + bh / 2, "center")
         end
+        Inv.draw(dim, { big = fontBig, mid = fontMid, small = fontSmall }, SCREEN_W, SCREEN_H)
     end
 
     if paused then
