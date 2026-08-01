@@ -59,8 +59,10 @@ class CSongReplay {
 		storedPlayer = player;
 	}
 
+	public void tStartRegisterInput() => allInputs = new();
+
 	public void tRegisterInput(double timestamp, byte keypress) {
-		allInputs.Add(Tuple.Create(timestamp, keypress));
+		allInputs?.Add(Tuple.Create(timestamp, keypress));
 	}
 
 	#region [Dan methods]
@@ -336,7 +338,7 @@ class CSongReplay {
 	private int storedPlayer;
 	private int danAccumulatedScore = 0;
 
-	private List<Tuple<double, byte>> allInputs = new List<Tuple<double, byte>>();
+	private List<Tuple<double, byte>>? allInputs = null;
 
 	#endregion
 

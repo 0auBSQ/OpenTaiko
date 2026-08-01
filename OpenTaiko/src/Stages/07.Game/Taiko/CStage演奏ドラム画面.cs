@@ -212,6 +212,11 @@ internal class CStage演奏ドラム画面 : CStage演奏画面共通 {
 		int iPrevTopChipMax = this.nCurrentTopChip.Max();
 		base.t数値の初期化(b演奏記録, b演奏状態);
 
+		if (b演奏記録) {
+			for (int i = 0; i < OpenTaiko.MAX_PLAYERS; ++i)
+				OpenTaiko.ReplayInstances[i]?.tStartRegisterInput();
+		}
+
 		if (b演奏状態) {
 			this.actGame.t叩ききりまショー_初期化();
 
