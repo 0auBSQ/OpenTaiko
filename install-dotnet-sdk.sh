@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 source /etc/os-release
 
 if [[ "$ID" == "ubuntu" || "$ID_LIKE" == *"ubuntu"* ]]; then
@@ -24,4 +24,6 @@ elif [[ "$ID" == "fedora" || "$ID_LIKE" == *"fedora"* || "$ID_LIKE" == *"rhel"* 
     sudo dnf install -y dotnet-sdk-8.0
 elif [[ "$ID" == "arch" || "$ID_LIKE" == *"arch"* ]]; then
     sudo pacman -S --noconfirm dotnet-sdk
+else
+  echo "Your OS is not supported by the script: ${ID}"
 fi
