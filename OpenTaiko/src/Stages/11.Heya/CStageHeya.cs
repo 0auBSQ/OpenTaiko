@@ -101,7 +101,7 @@ class CStageHeya : CStage {
 		idx = 1;
 		if (OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedNameplateIds != null) {
 			foreach (var _ref in OpenTaiko.SaveFileInstances[iPlayer].data.UnlockedNameplateIds) {
-				var item = OpenTaiko.Databases.DBNameplateUnlockables.data?[_ref];
+				var item = OpenTaiko.Databases.DBNameplateUnlockables.data?.GetValueOrDefault(_ref);
 				if (item != null) {
 					this.ttkTitles[idx] = new TitleTextureKey(item.nameplateInfo.cld.GetString(""), this.pfHeyaFont, Color.Black, Color.Transparent, 1000);
 					this.titlesKeys[idx] = _ref;
