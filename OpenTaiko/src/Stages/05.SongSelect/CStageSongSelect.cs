@@ -829,8 +829,8 @@ internal class CStageSongSelect : CStage {
 					}
 				} else if (!this.actSortSongs.bIsActivePopupMenu && !this.actQuickConfig.bIsActivePopupMenu && !this.actDifficultySelectionScreen.bIsDifficltSelect && !actNewHeya.IsOpend) {
 					#region [ ESC ]
-					if ((OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)) && (OpenTaiko.SongMount.rCurrentlySelectedSong != null))// && (  ) ) )
-						if (OpenTaiko.SongMount.rCurrentlySelectedSong.rParentNode == null) {   // [ESC]
+					if ((OpenTaiko.Pad.bPressedDGB(EPad.Cancel) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Escape)))
+						if (OpenTaiko.SongMount.rCurrentlySelectedSong?.rParentNode == null) {  // [ESC]
 							this.actPresound.tStopSound();
 							CSongSelectSongManager.enable();
 
