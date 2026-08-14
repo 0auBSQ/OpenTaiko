@@ -106,7 +106,7 @@ internal class CStageStartup : CStage {
 					OpenTaiko.NamePlate.RefreshSkin();
 					OpenTaiko.ModalManager.RefreshSkin();
 					es = new CEnumSongs();
-					es.StartEnumFromCache();   // 曲リスト取得(別スレッドで実行される)
+					es.StartLoadSystemSound();
 				}
 			}
 			#endregion
@@ -184,13 +184,10 @@ internal class CStageStartup : CStage {
 				}
 				//-----------------
 				#endregion
-			} else {
-				if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
-				{
-					OpenTaiko.SongManager = (es != null) ? es.SongManager : null;      // 最後に、曲リストを拾い上げる
-
-					return 1;
-				}
+			} else if (es != null && es.IsSongListEnumCompletelyDone) {                     // System sound loaded
+				es.Abort(); // reset for further enumerating
+				ePhaseID = EPhase.Startup_Complete;
+				return 1;
 			}
 
 		}
