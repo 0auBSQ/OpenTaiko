@@ -91,7 +91,7 @@
 		"AF2026": {
             "UP": [ "3" ],
             "DOWN": [ "A2_af2026" ],
-            "DANCER": [ "0" ],
+            "DANCER": [ ],
             "FOOTER": [ "0" ],
             "MOB": [ "A2_af2026" ],
             "RUNNER": [ "0" ]
