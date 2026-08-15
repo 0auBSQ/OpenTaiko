@@ -49,8 +49,8 @@ class CVisualLogManager {
 		LogCard? firstCard;
 		lock (this.cards) { // concurrent with only Display()
 			firstCard = this.firstCard;
-			if (firstCard?.IsExpired() ?? true) {
-				while (this.cards.TryDequeue(out firstCard) && firstCard.IsExpired())
+			if (firstCard == null || firstCard.IsExpired()) {
+				while (this.cards.TryDequeue(out firstCard) && (firstCard == null || firstCard.IsExpired()))
 					;
 			}
 			this.firstCard = firstCard;
