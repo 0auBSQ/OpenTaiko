@@ -1096,7 +1096,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	protected long msAutoInputTime = 0;
 	protected long msAutoInputSkipKeyPollTime = 0;
-	protected void TrackMsAutoInputTime() => msAutoInputSkipKeyPollTime = msAutoInputTime = SoundManager.PlayTimer.NowTimeMs;
+	protected void TrackMsAutoInputTime() => msAutoInputSkipKeyPollTime = msAutoInputTime = SoundManager.PlayTimer.RealNowTimeMs;
 	protected bool WithinInputFrame(bool forceSkip = false) {
 		const int msWithinMax = 2;
 		long msGameTime = SoundManager.PlayTimer.RealNowTimeMs;
