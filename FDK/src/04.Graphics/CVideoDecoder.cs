@@ -63,10 +63,9 @@ public unsafe class CVideoDecoder : IDisposable {
 
 			frameconv = new CFrameConverter(FrameSize, codec_context->pix_fmt);
 
-			decodedframes = new ConcurrentQueue<CDecodedFrame>();
-
 			for (int i = 0; i < framelist.Length; i++)
 				framelist[i] = new CDecodedFrame(new Size(codec_context->width, codec_context->height));
+			framelistHead = framelistTail = 0;
 
 			CTimer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
 		}
@@ -98,8 +97,7 @@ public unsafe class CVideoDecoder : IDisposable {
 
 		if (disposing) {
 			bDrawing = false;
-			cts?.Cancel();
-			decodeStopped.Wait();
+			this.StopEnqueuingFrames();
 			frameconv?.Dispose();
 		}
 
@@ -119,9 +117,11 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (disposing) {
 			if (lastTexture != null)
 				lastTexture.Dispose();
-			if (decodedframes != null)
-				while (decodedframes.TryDequeue(out CDecodedFrame frame))
-					frame.Dispose();
+			foreach (var frame in framelist) {
+				frame.Dispose();
+				this.canEnqueueFrame.Set();
+			}
+			framelistHead = framelistTail = 0;
 		}
 	}
 
@@ -168,138 +168,167 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public void Seek(long timestampms) {
 		this.bStreamEnded = false;
-		cts?.Cancel();
-		decodeStopped.Wait();
+		this.StopEnqueuingFrames();
 		if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
 			Trace.TraceError("av_seek_frame failed\n");
 		ffmpeg.avcodec_flush_buffers(codec_context);
 		CTimer.NowTimeMs = timestampms;
-		cts?.Dispose();
-		while (decodedframes.TryDequeue(out CDecodedFrame frame))
+		foreach (var frame in framelist) {
 			frame.RemoveFrame();
-		this.EnqueueFrames();
-		if (lastTexture != null)
-			lastTexture.Dispose();
+			this.canEnqueueFrame.Set();
+		}
+		framelistHead = framelistTail = 0;
+		this.EnsureEnqueuingFrames();
+		lastTexture?.Dispose();
 		lastTexture = new CTexture(FrameSize.Width, FrameSize.Height);
 	}
 
 	public void GetNowFrame(ref CTexture Texture) {
-		if (this.bPlaying && decodedframes.Count != 0) {
+		if (this.bPlaying && framelist[framelistHead].Using) {
 			CTimer.Update();
-			if (decodedframes.TryPeek(out CDecodedFrame frame)) {
-				while (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed)) {
-					if (decodedframes.TryDequeue(out CDecodedFrame cdecodedframe)) {
-
-						if (decodedframes.Count != 0)
-							if (decodedframes.TryPeek(out frame))
-								if (frame.Time <= (CTimer.NowTimeMs * _dbPlaySpeed)) {
-									cdecodedframe.RemoveFrame();
-									continue;
-								}
-
-						lastTexture.UpdateTexture(cdecodedframe.TexPointer, cdecodedframe.TexSize.Width, cdecodedframe.TexSize.Height, Silk.NET.OpenGLES.PixelFormat.Rgba);
-
-						cdecodedframe.RemoveFrame();
-					}
-					break;
-				}
+			(int idx, CDecodedFrame frame)? nowFrame = null;
+			for ((int idx, CDecodedFrame frame)? next;
+				(next = this.FirstUsedFrame()) != null && next.Value.frame.TexPointer != 0 && next.Value.frame.Time <= this.msPlayPosition;
+				) {
+				if (nowFrame != null)
+					this.RemoveFrameAt(nowFrame.Value.idx);
+				this.PopFrameAt(next.Value.idx);
+				nowFrame = next;
 			}
-
-			if (DS == DecodingState.Stopped)
-				this.EnqueueFrames();
+			if (nowFrame != null) {
+				var frame = nowFrame.Value.frame;
+				lastTexture ??= new CTexture(FrameSize.Width, FrameSize.Height);
+				lastTexture.UpdateTexture(frame.TexPointer, frame.TexSize.Width, frame.TexSize.Height, Silk.NET.OpenGLES.PixelFormat.Rgba);
+				this.RemoveFrameAt(nowFrame.Value.idx);
+			}
+			this.EnsureEnqueuingFrames();
 		}
-
-		if (lastTexture == null)
-			lastTexture = new CTexture(FrameSize.Width, FrameSize.Height);
 
 		if (Texture == lastTexture)
 			return;
 
+		Texture?.Dispose();
 		Texture = lastTexture;
 
 	}
 
-	private void EnqueueFrames() {
-		if (DS != DecodingState.Running && !close) {
+	private void EnsureEnqueuingFrames() {
+		if (decodeStopped.IsSet && !close) {
+			this.StopEnqueuingFrames();
 			cts = new CancellationTokenSource();
 			decodeStopped.Reset();
-			// LongRunning → dedicated thread, not a thread-pool worker. EnqueueOneFrame is a loop that lives
-			// for the whole video (it Thread.Sleep(1)s while the frame queue is full); on the pool it would
+			// LongRunning → dedicated thread, not a thread-pool worker. EnqueueFrames is a loop that lives
+			// for the whole video (it canEnqueueFrame.Wait() while the frame queue is full); on the pool it would
 			// occupy a worker for minutes and make the pool inject/retire extra threads (the "[thread]
 			// exited with code 0" churn seen in-game) and risk starving other pooled work.
-			Task.Factory.StartNew(() => EnqueueOneFrame(), TaskCreationOptions.LongRunning);
+			Task.Factory.StartNew(() => EnqueueFrames(), TaskCreationOptions.LongRunning);
+		}
+	}
+	private void StopEnqueuingFrames() {
+		if (this.cts != null) {
+			this.cts.Cancel();
+			this.decodeStopped.Wait();
+			cts.Dispose();
+			cts = null;
 		}
 	}
 
-	private void EnqueueOneFrame() {
-		DS = DecodingState.Running;
-		AVFrame* frame = ffmpeg.av_frame_alloc();
+	private void EnqueueFrames() {
+		decodeStopped.Reset();
 		AVPacket* packet = ffmpeg.av_packet_alloc();
 		try {
 			while (true) {
-				if (cts.IsCancellationRequested || close)
+				if (cts!.IsCancellationRequested || close)
 					return;
 
-				//2020/10/27 Mr-Ojii 閾値フレームごとにパケット生成するのは無駄だと感じたので、ループに入ったら、パケット生成し、シークによるキャンセルまたは、EOFまで無限ループ
-				if (decodedframes.Count < framelist.Length - 1)//-1をして、余裕を持たせておく。
-				{
-					int error = ffmpeg.av_read_frame(format_context, packet);
-
-					if (error >= 0) {
-						if (packet->stream_index == video_stream->index) {
-							if (ffmpeg.avcodec_send_packet(codec_context, packet) >= 0) {
-								if (ffmpeg.avcodec_receive_frame(codec_context, frame) == 0) {
-									AVFrame* outframe = null;
-
-									outframe = frameconv.Convert(frame);
-
-									decodedframes.Enqueue(PickUnusedDcodedFrame().UpdateFrame((outframe->best_effort_timestamp - video_stream->start_time) * ((double)video_stream->time_base.num / (double)video_stream->time_base.den) * 1000, outframe));
-
-									ffmpeg.av_frame_unref(frame);
-									ffmpeg.av_frame_unref(outframe);
-									ffmpeg.av_frame_free(&outframe);
-								}
-							}
-						}
-
-						//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
-						ffmpeg.av_packet_unref(packet);
-					} else if (error == ffmpeg.AVERROR_EOF) {
-						this.bStreamEnded = true;
-						return;
-					} else {
+				int error = ffmpeg.av_read_frame(format_context, packet);
+				if (error < 0) {
+					if (error != ffmpeg.AVERROR_EOF) {
 						// Treat any other read error as the end of the stream.
 						Trace.TraceError($"av_read_frame failed ({error}); stopping decode.");
-						this.bStreamEnded = true;
-						return;
 					}
-				} else {
-					//ポーズ中に無限ループに入り、CPU使用率が異常に高くなってしまうため、1ms待つ。
-					//ネットを調べると、await Task.Delay()を使えというお話が出てくるが、unsafeなので、使えない
-					Thread.Sleep(1);
+					this.bStreamEnded = true;
+					return;
+				}
+				try {
+					if (packet->stream_index != video_stream->index || ffmpeg.avcodec_send_packet(codec_context, packet) < 0)
+						continue;
+
+					(int idx, CDecodedFrame frame)? pickedDecodeFrame;
+					while ((pickedDecodeFrame = this.PickUnusedDecodedFrame()) == null) {
+						canEnqueueFrame.Reset();
+						canEnqueueFrame.Wait(cts.Token);
+						if (cts!.IsCancellationRequested || close)
+							return;
+					}
+					var decodeFrame = pickedDecodeFrame.Value;
+					var frame = decodeFrame.frame.GetEmptyFrame();
+					if (ffmpeg.avcodec_receive_frame(codec_context, frame) != 0) {
+						this.UnpickDecodedFrameAt(decodeFrame.idx);
+						continue;
+					}
+					frameconv.Convert(frame);
+
+					double msVideoTime = (frame->best_effort_timestamp - video_stream->start_time) * (video_stream->time_base.num / (double)video_stream->time_base.den) * 1000;
+					if (msVideoTime < this.msPlayPosition) { // evict non-empty outdated frames
+						for ((int idx, CDecodedFrame frame)? f; (f = this.FirstUsedFrame()) != null && f.Value.idx != decodeFrame.idx;)
+							this.RemoveFrameAt(f.Value.idx);
+					}
+					decodeFrame.frame.UpdateFrame(msVideoTime);
+				} finally {
+					//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
+					ffmpeg.av_packet_unref(packet);
 				}
 			}
+		} catch (OperationCanceledException) {
+			// canceled requested
 		} catch (Exception e) {
 			Trace.TraceError(e.ToString());
 		} finally {
 			ffmpeg.av_packet_free(&packet);
-			ffmpeg.av_frame_unref(frame);
-			ffmpeg.av_free(frame);
-			DS = DecodingState.Stopped;
 			decodeStopped.Set();
 		}
 	}
 
-	public CDecodedFrame PickUnusedDcodedFrame() {
-		for (int i = 0; i < framelist.Length; i++) {
-			if (framelist[i].Using == false) {
-				return framelist[i];
-			}
+	public (int idx, CDecodedFrame frame)? PickUnusedDecodedFrame() {
+		var idx = framelistTail;
+		if (framelist[idx].Using)
+			return null;
+		Interlocked.CompareExchange(ref framelistTail, (idx + 1) % framelist.Length, idx);
+		return (idx, framelist[idx]);
+	}
+
+	public void UnpickDecodedFrameAt(int idx) {
+		framelist[idx].RemoveFrame();
+		int beforeTail = (framelistTail + (framelist.Length - 1)) % framelist.Length;
+		if (idx == beforeTail)
+			Interlocked.CompareExchange(ref framelistTail, beforeTail, idx);
+	}
+
+	private (int idx, CDecodedFrame frame)? FirstUsedFrame() {
+		for (int i = 0; i < framelist.Length; ++i) {
+			int idx = (framelistHead + i) % framelist.Length;
+			var frame = framelist[idx];
+			if (frame.Using)
+				return (idx, framelist[idx]);
+			if (idx == framelistTail)
+				break;
+			this.PopFrameAt(idx);
 		}
 		return null;
 	}
 
-	public double msPlayPosition => CTimer.NowTimeMs * _dbPlaySpeed;
+	private void RemoveFrameAt(int idx) {
+		framelist[idx].RemoveFrame();
+		this.PopFrameAt(idx);
+	}
+
+	private void PopFrameAt(int idx) {
+		Interlocked.CompareExchange(ref framelistHead, (idx + 1) % framelist.Length, idx);
+		this.canEnqueueFrame.Set();
+	}
+
+	public double msPlayPosition => CTimer.NowTimeMs_Double * _dbPlaySpeed;
 
 	public Size FrameSize {
 		get;
@@ -330,16 +359,13 @@ public unsafe class CVideoDecoder : IDisposable {
 	private AVFormatContext* format_context;
 	private AVStream* video_stream;
 	private AVCodecContext* codec_context;
-	private ConcurrentQueue<CDecodedFrame> decodedframes;
-	private CancellationTokenSource cts;
+	private CancellationTokenSource? cts;
 	private CDecodedFrame[] framelist = new CDecodedFrame[6];
-	private DecodingState DS = DecodingState.Stopped;
+	private int framelistHead = 0;
+	private int framelistTail = 0;
 	// Set while the decode thread is stopped; lets Dispose/Seek wait for it without polling.
 	private readonly ManualResetEventSlim decodeStopped = new ManualResetEventSlim(true);
-	private enum DecodingState {
-		Stopped,
-		Running
-	}
+	private readonly ManualResetEventSlim canEnqueueFrame = new ManualResetEventSlim(true);
 
 	//for play
 	public bool bPlaying { get; private set; } = false;
@@ -348,12 +374,16 @@ public unsafe class CVideoDecoder : IDisposable {
 	private bool bStreamEnded = false;
 	// End of playback (stream fully read and all frames shown), unlike msPlayPosition which can stall.
 	public bool IsFinishedPlaying {
-		get => bStreamEnded && decodedframes.IsEmpty;
+		get => bStreamEnded && !framelist[framelistHead].Using;
 		private set {
 			this.bStreamEnded = value;
 			if (value) {
-				while (decodedframes.TryDequeue(out CDecodedFrame frame))
+				this.StopEnqueuingFrames();
+				for (CDecodedFrame frame; (frame = framelist[framelistHead]).Using; framelistHead = (framelistHead + 1) % framelist.Length) {
 					frame.RemoveFrame();
+					this.canEnqueueFrame.Set();
+				}
+				framelistHead = framelistTail = 0;
 			}
 		}
 	}
