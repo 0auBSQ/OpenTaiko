@@ -79,11 +79,11 @@ public class CSoundTimer : CTimerBase {
 	const int msSnapTimersInternal = 1000;
 
 	private void SnapTimers() {
-		this.msDInputTimerOffset = this.ctDInputTimer.SystemTimeMs;
-		this.msSoundTimerOffset = this.SystemTimeMs;
+		this.msDInputTimerOffset = this.ctDInputTimer.SystemTimeMsReal;
+		this.msSoundTimerOffset = this.SystemTimeMsReal;
 	}
 	public long msGetPreciseNowSoundTimerTime()
-		=> this.msDInputTimeToSoundTimerTime(this.ctDInputTimer.SystemTimeMs);
+		=> this.msDInputTimeToSoundTimerTime(this.ctDInputTimer.SystemTimeMsReal);
 	private long msDInputTimeToSoundTimerTime(long msDInputTime) {
 		return msDInputTime - this.msDInputTimerOffset + this.msSoundTimerOffset;    // Timer違いによる時差を補正する
 	}
