@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -213,11 +214,11 @@ internal class CConfigIni : INotifyPropertyChanged {
 	// Properties
 
 	public class CAIPerformances {
-		public int nGoodOdds;
-		public int nPerfectOdds;
-		public int nBadOdds;
-		public int nRollSpeed;
-		public int nMineHitOdds;
+		public readonly int nGoodOdds;
+		public readonly int nPerfectOdds;
+		public readonly int nBadOdds;
+		public readonly int nRollSpeed;
+		public readonly int nMineHitOdds;
 
 		public CAIPerformances(int po, int go, int bo, int rp, int mho = 0) {
 			nGoodOdds = go;
@@ -229,9 +230,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 	}
 
 	public class CTimingZones {
-		public int nGoodZone;
-		public int nOkZone;
-		public int nBadZone;
+		public readonly int nGoodZone;
+		public readonly int nOkZone;
+		public readonly int nBadZone;
 
 		public CTimingZones(int gz, int oz, int bz) {
 			nGoodZone = gz;
@@ -398,7 +399,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 	public int nTouchDrumVisual = 30; // Don radius as percentage of screen width (10-50)
 	public int nTouchDrumOpacity = 15; // touch drum overlay opacity percentage (0-100)
 
-	public CAIPerformances[] apAIPerformances = {
+	public readonly ImmutableArray<CAIPerformances> apAIPerformances = [
 		new CAIPerformances(500, 400, 100, 7, 200),
 		new CAIPerformances(650, 310, 40, 8, 150),
 		new CAIPerformances(750, 225, 25, 9, 100),
@@ -408,18 +409,18 @@ internal class CConfigIni : INotifyPropertyChanged {
 		new CAIPerformances(920, 75, 5, 16, 20),
 		new CAIPerformances(950, 49, 1, 22, 10),
 		new CAIPerformances(975, 25, 0, 26, 5),
-		new CAIPerformances(1000, 0, 0, 30, 0)
-	};
+		new CAIPerformances(1000, 0, 0, 30, 0),
+	];
 
-	public CTimingZones[] tzLevels = {
+	public readonly ImmutableArray<CTimingZones> tzLevels = [
 		new CTimingZones(75, 108, 125), // Lv0 (Easy-Normal + "Loose" mod)
 		new CTimingZones(58, 108, 125), // Lv1 (Easy-Normal + "Lenient" mod)
 		new CTimingZones(42, 108, 125), // Lv2 (Easy-Normal / Tower Ama-kuchi or Hard-Extreme + "Loose" mod)
 		new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
 		new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
 		new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
-		new CTimingZones(17, 42, 108) // Lv6 (Hard-Extreme + "Rigorous" mod)
-	};
+		new CTimingZones(17, 42, 108), // Lv6 (Hard-Extreme + "Rigorous" mod)
+	];
 
 	public bool bJudgeBigNotes;
 	public bool bForceNormalGauge;
