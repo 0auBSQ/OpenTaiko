@@ -63,7 +63,7 @@ else
     download_url="https://github.com/$git_repo/releases/download/$version/$archive_filename"
     echo "Downloading from: $download_url"
     curl -L -o "$archive_filename" "$download_url" || { echo "Download failed."; exit 1; }
-    
+
     # Cache the download
     echo "Caching download for future use..."
     cp "$archive_filename" "$cached_file"
@@ -83,7 +83,7 @@ if [ -d "$cached_soundtrack" ]; then
     cd "$cached_soundtrack" && git pull && cd - || exit 1
 else
     echo "Cloning soundtrack repository to cache..."
-    git clone https://github.com/OpenTaiko/OpenTaiko-Soundtrack "$cached_soundtrack"
+    git clone --depth 1 https://github.com/OpenTaiko/OpenTaiko-Soundtrack "$cached_soundtrack"
 fi
 
 # Merge soundtrack into publish/Songs
