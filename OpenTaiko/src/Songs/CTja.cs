@@ -631,7 +631,7 @@ internal class CTja : CActivity {
 		if (wc.rSound[0] != null && wc.rSound[0].TotalPlayTime >= 5000) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
 				if ((wc.rSound[i] != null) && (wc.rSound[i].IsPlaying)) {
-					long nCurrentTime = SoundManager.PlayTimer.SystemTimeMs;
+					long nCurrentTime = SoundManager.PlayTimer.SystemTimeMsReal;
 					if (nCurrentTime > wc.nPlaybackStartTime[i]) {
 						long nAbsTimeFromStartPlaying = nCurrentTime - wc.nPlaybackStartTime[i];
 						// nInitialSeekMs: added by the Dan builder when the BGM chip is

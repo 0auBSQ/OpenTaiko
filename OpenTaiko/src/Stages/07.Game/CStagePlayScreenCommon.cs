@@ -2377,7 +2377,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	private long msLastBgmDriftCheck = 0;
 	private int nBgmDriftStrikes = 0;
 	private const long msBgmDriftCheckInterval = 500;
-	private const long msBgmDriftThreshold = 100;
+	private readonly long msBgmDriftThreshold = OpenTaiko.ConfigIni.tzLevels.Last().nGoodZone;
 
 	protected void tCheckBgmDrift() {
 		if (this.bPAUSE || this.isRewinding || this.IsFailStopped()) {
@@ -2393,7 +2393,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				return;
 			}
 		}
-		long now = SoundManager.PlayTimer.SystemTimeMs;
+		long now = SoundManager.PlayTimer.SystemTimeMsReal;
 		if (now - this.msLastBgmDriftCheck < msBgmDriftCheckInterval) return;
 		this.msLastBgmDriftCheck = now;
 
