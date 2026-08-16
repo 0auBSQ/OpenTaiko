@@ -80,7 +80,7 @@ cd "publish" || exit 1
 cached_soundtrack="$cache_dir/OpenTaiko-Soundtrack"
 if [ -d "$cached_soundtrack" ]; then
     echo "Updating cached soundtrack repository..."
-    cd "$cached_soundtrack" && git pull && cd - || exit 1
+    cd "$cached_soundtrack" && git fetch --depth 1 origin HEAD && git reset --hard FETCH_HEAD && cd - || exit 1
 else
     echo "Cloning soundtrack repository to cache..."
     git clone --depth 1 https://github.com/OpenTaiko/OpenTaiko-Soundtrack "$cached_soundtrack"
@@ -148,7 +148,7 @@ if pgrep -x "OpenTaiko" > /dev/null; then
 fi
 
 echo "Updating OpenTaiko repositories..."
-cd "$cache_dir/OpenTaiko-Soundtrack" && git pull
+cd "$cache_dir/OpenTaiko-Soundtrack" && git fetch --depth 1 origin HEAD && git reset --hard FETCH_HEAD
 cp -rf "$cache_dir/OpenTaiko-Soundtrack/"* "$installation_folder/publish/Songs/"
 cd "$cache_dir/OpenTaiko-Skins" && git pull
 cp -rf "$cache_dir/OpenTaiko-Skins/"* "$installation_folder/publish/"
