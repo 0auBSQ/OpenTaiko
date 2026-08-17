@@ -326,7 +326,8 @@ internal class CSongManager {
 						value.rParentNode = nodeParent;
 
 						if (value.rParentNode != null) {
-							value.strScenePresets = value.rParentNode.strScenePresets;
+							if (string.IsNullOrWhiteSpace(value.strScenePresets))
+								value.strScenePresets = value.rParentNode.strScenePresets;
 							if (value.rParentNode.IsChangedForeColor) {
 								value.ForeColor = value.rParentNode.ForeColor;
 								value.IsChangedForeColor = true;
@@ -427,10 +428,14 @@ internal class CSongManager {
 			if (File.Exists(infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def")) {
 				CBoxDef boxdef = new CBoxDef(infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def");
 				CSongListNode cSongListNode = new CSongListNode();
+
+				ApplyParentSettings(cSongListNode, nodeParent);
+
 				cSongListNode.nodeType = CSongListNode.ENodeType.BOX;
 				cSongListNode.ldTitle = boxdef.Title;
 				cSongListNode.songGenre = boxdef.Genre;
-				cSongListNode.strScenePresets = boxdef.ScenePreset;
+				if (!string.IsNullOrWhiteSpace(boxdef.ScenePreset))
+					cSongListNode.strScenePresets = boxdef.ScenePreset;
 				cSongListNode.strSelectBGPath = infoDir.FullName + Path.DirectorySeparatorChar + boxdef.SelectBG;
 				if (!File.Exists(cSongListNode.strSelectBGPath)) cSongListNode.strSelectBGPath = null;
 
@@ -1003,7 +1008,8 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 	private static void ApplyParentSettings(CSongListNode node, CSongListNode? parent) {
 		if (parent == null) return;
-		node.strScenePresets = parent.strScenePresets;
+		if (string.IsNullOrWhiteSpace(node.strScenePresets))
+			node.strScenePresets = parent.strScenePresets;
 		if (parent.IsChangedForeColor) { node.ForeColor = parent.ForeColor; node.IsChangedForeColor = true; }
 		if (parent.IsChangedBackColor) { node.BackColor = parent.BackColor; node.IsChangedBackColor = true; }
 		if (parent.isChangedBoxColor) { node.BoxColor = parent.BoxColor; node.isChangedBoxColor = true; }
