@@ -350,6 +350,12 @@
 			}
 		}
 
+		public string Compat {
+			get {
+				return (_node?.Compat ?? CTja.ETjaCompat.OOS).ToString();
+			}
+		}
+
 		#endregion
 
 		#region [Extended metadata]
