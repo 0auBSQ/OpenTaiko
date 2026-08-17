@@ -97,14 +97,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		CChip endChip = null;
 		for (int i = 0; i < listChip[0].Count; i++) {
 			CChip chip = listChip[0][i];
-			if (endChip == null || (chip.nSoundTimems > endChip.nSoundTimems && chip.nChannelNo is 0x50 or 0xFF)) {
+			if (endChip == null || (chip.dbSoundTimems > endChip.dbSoundTimems && chip.nChannelNo is 0x50 or 0xFF)) {
 				endChip = chip;
 			}
 			if (chip.nChannelNo == 0xFF)
 				break;
 		}
 
-		int battleSectionCount = 3 + ((endChip.nSoundTimems * 2) / 100000);
+		int battleSectionCount = 3 + (int)((endChip.dbSoundTimems * 2) / 100000);
 		// Avoid single section
 		if (battleSectionCount <= 1)
 			battleSectionCount = 3;
@@ -247,7 +247,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		#region [ 演奏開始前にmixer登録しておくべきサウンド(開幕してすぐに鳴らすことになるチップ音)を登録しておく ]
 		foreach (CChip pChip in listChip[0]) {
 			//				Debug.WriteLine( "CH=" + pChip.nチャンネル番号.ToString( "x2" ) + ", 整数値=" + pChip.n整数値 +  ", time=" + pChip.n発声時刻ms );
-			if (pChip.nSoundTimems <= 0) {
+			if (Math.Round(pChip.dbSoundTimems) <= 0) {
 				if (pChip.nChannelNo == 0xDA) {
 					pChip.bHit = true;
 					//						Trace.TraceInformation( "first [DA] BAR=" + pChip.n発声位置 / 384 + " ch=" + pChip.nチャンネル番号.ToString( "x2" ) + ", wav=" + pChip.n整数値 + ", time=" + pChip.n発声時刻ms );
@@ -756,8 +756,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	public int[] nCurrentTopChip = new int[] { -1, -1, -1, -1, -1 }; // [iPlayer]; indexes of CTja.listChip
 	public static bool hasChipBeenPlayedAt(int chipListIndex, int targetChipListIndex)
 		=> chipListIndex < targetChipListIndex;
-	public static bool hasChipBeenPlayedAt(CChip chip, double msTargetTjaTime)
+	public static bool hasChipBeenPlayedAt(CChip chip, long msTargetTjaTime)
 		=> chip.nSoundTimems <= msTargetTjaTime;
+	public static bool hasChipBeenPlayedAt(CChip chip, double msTargetTjaTime)
+		=> Math.Floor(chip.dbSoundTimems) <= Math.Floor(msTargetTjaTime); // to match integer version
 	public bool hasChipBeenPlayed(int chipListIndex, int iPlayer)
 		=> hasChipBeenPlayedAt(chipListIndex, nCurrentTopChip[iPlayer]);
 
@@ -2116,7 +2118,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return (null, ENoteJudge.Miss);
 
 		int getIdxChip(long msTjaTime, double direction) {
-			CChip searchChip = new() { nSoundTimems = (int)msTjaTime, dbSoundTimems = direction };
+			CChip searchChip = new() { _nSoundTimems = (int)msTjaTime, _dbSoundTimems = direction };
 			int iTop = this.listChip[nPlayer].BinarySearch(0, count, searchChip, Comparer<CChip>.Default);
 			if (iTop < 0)
 				iTop = ~iTop;
@@ -2212,8 +2214,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return pastFirstUnhit;
 
 		// past note is judged from nearest
-		int msTjaDTime_Future = Math.Abs((int)(msTjaTime - futureFirstUnhit.chip!.nSoundTimems));
-		int msTjaDTime_Past = Math.Abs((int)(msTjaTime - pastFirstUnhit.chip!.nSoundTimems));
+		long msTjaDTime_Future = Math.Abs((long)(msTjaTime - futureFirstUnhit.chip!.nSoundTimems));
+		long msTjaDTime_Past = Math.Abs((long)(msTjaTime - pastFirstUnhit.chip!.nSoundTimems));
 		return (msTjaDTime_Future < msTjaDTime_Past) ? futureFirstUnhit : pastFirstUnhit;
 	}
 
@@ -2572,7 +2574,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			? (long)(tja.GameTimeToTjaTime(rawGameTime) * dbDynamicBeatFactor + dbDynBeatTjaOffset)
 			: (long)tja.GameTimeToTjaTime(rawGameTime);
 
-		NowAIBattleSectionTime = (int)nCurrentTimems - NowAIBattleSection.StartTime;
+		NowAIBattleSectionTime = (int)(nCurrentTimems - NowAIBattleSection.StartTime);
 
 		var scrollRate = this.GetScrollRate(nPlayer);
 
@@ -2645,7 +2647,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (!this.bPAUSE && !pChip.bHit) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bBGMPlayVoiceSound) {
-							dTX.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tja.TjaTimeToGameTime(pChip.nSoundTimems)));
+							dTX.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tja.TjaTimeToGameTime(pChip.dbSoundTimems)));
 						}
 					}
 					break;
@@ -3582,7 +3584,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			NowAIBattleSectionCount++;
 			anySectionPassed = true;
 
-			NowAIBattleSectionTime = (int)nCurrentTimems - NowAIBattleSection.StartTime;
+			NowAIBattleSectionTime = (int)(nCurrentTimems - NowAIBattleSection.StartTime);
 		}
 		if (anySectionPassed && AIBattleSections.Count > NowAIBattleSectionCount) {
 			for (int i = 0; i < 5; i++) {
@@ -4362,7 +4364,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	}
 
 	// returns the chip index at the target measure of the first player
-	public (int idxChip, int msStartGameTime) tPlayPositionChange(int nStartBar) {
+	public (int idxChip, long msStartGameTime) tPlayPositionChange(int nStartBar) {
 		// まず全サウンドオフにする
 		OpenTaiko.TJA.tStopAllChips();
 		this.actAVI.Stop();
@@ -4376,17 +4378,17 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		int iTargetChip = dTX.GetListChipIndexOfMeasure(nStartBar);
 		#endregion
 		#region [ 演奏開始の発声時刻msを取得し、タイマに設定 ]
-		int nStartTime = (nStartBar == 0) ? 0
-			: ((int)dTX.TjaTimeToGameTime(dTX.listChip[iTargetChip].nSoundTimems) - OpenTaiko.ConfigIni.MusicPreTimeMs);
+		long nStartTime = (nStartBar == 0) ? 0
+			: ((long)dTX.TjaTimeToGameTime(dTX.listChip[iTargetChip].dbSoundTimems) - OpenTaiko.ConfigIni.MusicPreTimeMs);
 
 		int[] iLastChipAtStart = new int[OpenTaiko.MAX_PLAYERS];
 
 		iLastChipAtStart[0] = iTargetChip;
 		for (int nPlayer = 0; nPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++nPlayer) {
 			CTja tjai = OpenTaiko.GetTJA(nPlayer)!;
-			int msStartTjaTime = (int)tjai.GameTimeToTjaTime(nStartTime);
+			long msStartTjaTime = (long)tjai.GameTimeToTjaTime(nStartTime);
 			if (nPlayer != 0) {
-				CChip targetDummy = new() { nChannelNo = CChip.nChannelNoLeastPrior, nSoundTimems = msStartTjaTime };
+				CChip targetDummy = new() { nChannelNo = CChip.nChannelNoLeastPrior, dbSoundTimems = msStartTjaTime };
 				iLastChipAtStart[nPlayer] = tjai.listChip.BinarySearch(targetDummy);
 				if (iLastChipAtStart[nPlayer] < 0)
 					iLastChipAtStart[nPlayer] = int.Max(0, ~iLastChipAtStart[nPlayer] - 1);
@@ -4424,7 +4426,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			for (int i = 0; i <= iLastChipAtStart[nPlayer]; ++i) {
 				CChip pChip = tjai.listChip[i];
 				int nDuration = (int)CTja.TjaDurationToGameDuration(pChip.GetDuration());
-				long nSoundTimems = (long)tjai.TjaTimeToGameTime(pChip.nSoundTimems);
+				long nSoundTimems = (long)tjai.TjaTimeToGameTime(pChip.dbSoundTimems);
 				if (nSoundTimems <= nStartTime) {
 					if (pChip.nChannelNo == 0x01 && (pChip.nChannelNo >> 4) != 0xB) // wav系チャンネル、且つ、空打ちチップではない
 					{
@@ -4437,7 +4439,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						if (!b) continue;
 
 						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
-							tjai.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tjai.TjaTimeToGameTime(pChip.nSoundTimems)));
+							tjai.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tjai.TjaTimeToGameTime(pChip.dbSoundTimems)));
 							#region [ PAUSEする ]
 							int j = wc.nCurrentPlaybackSoundNumber;
 							if (wc.rSound[j] != null) {

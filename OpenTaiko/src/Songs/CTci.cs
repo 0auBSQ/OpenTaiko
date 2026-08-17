@@ -396,7 +396,7 @@ internal class CTci {
 
 	private static CChip MakeChip(int channel, int timeMs, int intVal) {
 		var c = new CChip(); c.tInitialize();
-		c.nChannelNo = channel; c.nSoundTimems = timeMs; c.dbSoundTimems = timeMs;
+		c.nChannelNo = channel; c.dbSoundTimems = timeMs;
 		c.nIntValue = intVal; c.nIntValue_InternalNumber = intVal; c.start = c; c.end = c;
 		c.bHideBarLine = false; // default is true; must be false or bar lines are never drawn
 		return c;

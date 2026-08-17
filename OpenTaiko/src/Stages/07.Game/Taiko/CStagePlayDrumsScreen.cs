@@ -1473,7 +1473,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				}
 				if (!NotesManager.IsGenericBalloon(chkChip)) {
 					if (chkChip.end.bVisible && chkChip.end.nSoundTimems >= (int)nowTime)
-						msBarRollProgress += (int)nowTime - chkChip.nSoundTimems;
+						msBarRollProgress += (int)(nowTime - chkChip.nSoundTimems);
 					continue;
 				}
 				if (!(chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip))) {

@@ -756,7 +756,7 @@ internal class CTja : CActivity {
 							: (cwav.nInternalNumber == 1);
 						if (chipBgm != null && isLastSongWave) {
 							for (int iPlayer = 0; iPlayer < OpenTaiko.ConfigIni.nPlayerCount; ++iPlayer)
-								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.nSoundTimems + cwav.rSound[i].TotalPlayTime, this.nCurrentMeasureCount, msFadeOutDelay: 0, sortListChip: true);
+								OpenTaiko.GetTJA(iPlayer)!.InsertEndOfChartChips(chipBgm.dbSoundTimems + cwav.rSound[i].TotalPlayTime, this.nCurrentMeasureCount, msFadeOutDelay: 0, sortListChip: true);
 						}
 					}
 
@@ -1026,7 +1026,7 @@ internal class CTja : CActivity {
 				) ||
 				(((0x80 <= nChannelNumber) && (nChannelNumber <= 0x89)) || ((0x90 <= nChannelNumber) && (nChannelNumber <= 0x92)))
 			   ) {
-				this.listChip[i].nSoundTimems += nBGMAdjustIncDecValue;
+				this.listChip[i].dbSoundTimems += nBGMAdjustIncDecValue;
 			}
 		}
 		foreach (CWAV cwav in this.listWAV.Values) {
@@ -1220,14 +1220,14 @@ internal class CTja : CActivity {
 					CBPM bpmPoint = listBPM[0];
 					double th16_beat = 0;
 					if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
-						bpmPoint = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.dbSoundTimems, chip.nBranch, ignoreDelay: true);
+						bpmPoint = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.dbSoundTimems, chip.nBranch, ignoreDelay: true, roundToMs: false);
 						th16_beat = CStagePlayScreenCommon.GetNowPBMTime(bpmPoint, chip.dbSoundTimems, this.COMPAT);
 					}
 
 					switch (ch) {
 						case 0x01: {
 								if (this.isOFFSET_Negative == false)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 
 								#region[listlyric2の時間合わせ]
 								// has #NEXTSONG -> skip WAVE: (if exist)
@@ -1237,7 +1237,7 @@ internal class CTja : CActivity {
 								int idxEnd = this.IdxLyric2AtSongEnds.ElementAtOrDefault(lyricFileIndex);
 								for (int ind = idxStart; ind < idxEnd; ind++) {
 									STLYRIC lyrictmp = this.listLyric2[ind];
-									lyrictmp.Time = origListLyricTime[ind] + chip.nSoundTimems;
+									lyrictmp.Time = origListLyricTime[ind] + (long)Math.Floor(chip.dbSoundTimems);
 									this.listLyric2[ind] = lyrictmp;
 								}
 								#endregion
@@ -1246,13 +1246,13 @@ internal class CTja : CActivity {
 						case 0x02:  // BarLength
 						{
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0x03:  // Initial BPM
 						{
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								// this.dbNowBPM has already been initialized
 								continue;
 							}
@@ -1283,7 +1283,7 @@ internal class CTja : CActivity {
 						case 0x08:  // 拡張BPM
 						{
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								if (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS && this.listBPM.ElementAtOrDefault(chip.nIntValue_InternalNumber) is CBPM cBPM && cBPM == chip.bpmPoint) {
 									bpm = cBPM.dbBPMValue;
 									this.dbNowBPM = bpm;
@@ -1293,21 +1293,21 @@ internal class CTja : CActivity {
 						case 0x54:  // 動画再生
 						{
 								if (this.isOFFSET_Negative == false)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0x97:
 						case 0x98:
 						case 0x99: {
 								if (this.isOFFSET_Negative) {
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x9A: {
 
 								if (this.isOFFSET_Negative) {
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
@@ -1316,26 +1316,26 @@ internal class CTja : CActivity {
 							}
 						case 0xDC: {
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xDE: {
 								if (this.isOFFSET_Negative) {
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 									chip.nBranchTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0x52: {
 								if (this.isOFFSET_Negative) {
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 									chip.nBranchTimems += this.msOFFSET_Abs;
 								}
 								continue;
 							}
 						case 0xDF: {
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								continue;
 							}
 						case 0xE0: {
@@ -1343,7 +1343,7 @@ internal class CTja : CActivity {
 							}
 						case 0xE2: { // #JPOSSCROLL
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 
 								// calculate accumulated movement by time order (not definition order)
 								CJPOSSCROLL jposs = this.listJPOSSCROLL[chip.nIntValue_InternalNumber];
@@ -1353,7 +1353,7 @@ internal class CTja : CActivity {
 								} else {
 									if (lastJPosScroll.msMoveDt > 0) {
 										double msLastMoveDt = lastJPosScroll.msMoveDt;
-										double msCanMove = double.Max(0, chip.nSoundTimems - lastJPosScroll.chip!.nSoundTimems);
+										double msCanMove = double.Max(0, chip.dbSoundTimems - lastJPosScroll.chip!.dbSoundTimems);
 										// truncate movement of last JPosScroll if unfinished
 										if (msCanMove < msLastMoveDt) {
 											double lastMoveRate = msCanMove / msLastMoveDt;
@@ -1375,16 +1375,16 @@ internal class CTja : CActivity {
 									&& chip.msMoveOffset < float.PositiveInfinity
 									&& chip.eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll
 									) {
-									var msMoveTime = chip.nSoundTimems - chip.msMoveOffset;
-									var bpmDefMove = CStagePlayScreenCommon.GetNowPBPMPoint(this, msMoveTime, chip.nBranch, ignoreDelay: true);
+									var msMoveTime = chip.dbSoundTimems - chip.msMoveOffset;
+									var bpmDefMove = CStagePlayScreenCommon.GetNowPBPMPoint(this, msMoveTime, chip.nBranch, ignoreDelay: true, roundToMs: false);
 									var th16BeatMove = CStagePlayScreenCommon.GetNowPBMTime(bpmDefMove, msMoveTime, this.COMPAT);
-									var bpmDef = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.nSoundTimems, chip.nBranch, ignoreDelay: true);
-									var th16Beat = CStagePlayScreenCommon.GetNowPBMTime(bpmDef, chip.nSoundTimems, this.COMPAT);
+									var bpmDef = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.dbSoundTimems, chip.nBranch, ignoreDelay: true, roundToMs: false);
+									var th16Beat = CStagePlayScreenCommon.GetNowPBMTime(bpmDef, chip.dbSoundTimems, this.COMPAT);
 									chip.th16DBeatPreMove = th16Beat - th16BeatMove;
 								}
 
 								if (this.isOFFSET_Negative)
-									chip.nSoundTimems += this.msOFFSET_Abs;
+									chip.dbSoundTimems += this.msOFFSET_Abs;
 								if (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) {
 									chip.dbBPM = bpm;
 								} else {
@@ -2285,7 +2285,7 @@ internal class CTja : CActivity {
 			var chip = new CChip();
 			chip.idxDefine = this.listChip.Count;
 			chip.nChannelNo = 0xDE;
-			chip.nSoundTimems = (int)JudgeChipTime.msTime;
+			chip.dbSoundTimems = JudgeChipTime.msTime;
 			chip.nSoundPos = JudgeChipTime.th384MeasurePos;
 			chip.fNow_Measure_m = JudgeChipTime.chip?.fNow_Measure_m ?? 4;
 			chip.fNow_Measure_s = JudgeChipTime.chip?.fNow_Measure_s ?? 4;
@@ -2345,7 +2345,7 @@ internal class CTja : CActivity {
 		} else if (command == "#BARLINEOFF") {
 			var chip = this.NewEventChipAtDefCursor(0xE0, 1);
 			chip.nSoundPos -= 1;
-			chip.nSoundTimems += 1;
+			chip.dbSoundTimems += 1;
 			chip.nBranch = this.nCurrentCourse;
 			this.bBARLINECUE[0] = 1;
 
@@ -2353,7 +2353,7 @@ internal class CTja : CActivity {
 		} else if (command == "#BARLINEON") {
 			var chip = this.NewEventChipAtDefCursor(0xE0, 2);
 			chip.nSoundPos -= 1;
-			chip.nSoundTimems += 1;
+			chip.dbSoundTimems += 1;
 			chip.nBranch = this.nCurrentCourse;
 			this.bBARLINECUE[0] = 0;
 
@@ -2587,7 +2587,7 @@ internal class CTja : CActivity {
 		bool[] lastIsHittables = [false, false, false];
 		for (int i = this.listChip.Count; i-- > 0;) {
 			CChip chipI = this.listChip[i].start;
-			if (chipI.nSoundTimems > chip.nSoundTimems)
+			if (chipI.dbSoundTimems > chip.dbSoundTimems)
 				continue;
 			chipI.ForEachTargetBranch(branch => {
 				int ibReal = (int)branch;
@@ -2599,8 +2599,8 @@ internal class CTja : CActivity {
 			if (lastIsHittables.All(b => b))
 				break; // all are hittable or has reached the last `#NEXTSONG`
 		}
-		CChip lastChip = lastChips.MaxBy(chip => chip.nSoundTimems)!;
-		return (lastChip.nSoundTimems > chip.nSoundTimems) ? chip : lastChip;
+		CChip lastChip = lastChips.MaxBy(chip => chip.dbSoundTimems)!;
+		return (lastChip.dbSoundTimems > chip.dbSoundTimems) ? chip : lastChip;
 	}
 
 	private void SetBPMPointAtDefCursor(EBPMPointType pointType, double msDelayDuration = 0, bool? isAfterLastBpmPoint = null) {
@@ -2707,7 +2707,7 @@ internal class CTja : CActivity {
 			var chip = this.NewEventChipAtDefCursor(channelNo, 1);
 
 			var index = this.listChip.IndexOf(camChip);
-			var msDiff = chip.nSoundTimems - camChip.nSoundTimems;
+			var msDiff = chip.dbSoundTimems - camChip.dbSoundTimems;
 
 			camChip.fObjTimeMs = msDiff;
 			this.listChip[index] = camChip;
@@ -2773,7 +2773,7 @@ internal class CTja : CActivity {
 			currentObjAnimations.TryGetValue($"{animationKey}_{name}", out CChip startChip);
 
 			var index = this.listChip.IndexOf(startChip);
-			var msDiff = chip.nSoundTimems - startChip.nSoundTimems;
+			var msDiff = chip.dbSoundTimems - startChip.dbSoundTimems;
 
 			startChip.fObjTimeMs = msDiff;
 			this.listChip[index] = startChip;
@@ -2872,7 +2872,7 @@ internal class CTja : CActivity {
 		// チップを配置。
 		var gameFadeOutChip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0xFF);
 		gameFadeOutChip.nSoundPos = ((measurePos + 2) * 384);
-		gameFadeOutChip.nSoundTimems = (int)(msTjaTimeRaw + msFadeOutDelay);
+		gameFadeOutChip.dbSoundTimems = (msTjaTimeRaw + msFadeOutDelay);
 		this.InsertChipOrdered(gameFadeOutChip, sortListChip);
 
 		// last note before end of chart
@@ -2886,7 +2886,7 @@ internal class CTja : CActivity {
 
 		var chartEndChip = this.NewEventChipAtDefCursor(0xFF, 1, argInt: 0);
 		chartEndChip.nSoundPos = lastChip.nSoundPos;
-		chartEndChip.nSoundTimems = Math.Min(lastChip.nSoundTimems + 2000, gameFadeOutChip.nSoundTimems);
+		chartEndChip.dbSoundTimems = Math.Min(lastChip.dbSoundTimems + 2000, gameFadeOutChip.dbSoundTimems);
 		this.InsertChipOrdered(chartEndChip, sortListChip);
 	}
 
@@ -3047,11 +3047,11 @@ internal class CTja : CActivity {
 				// chips used as default judgement time
 				case 0x9B: // `#NEXTSONG`, cannot judge earlier
 					for (int ib = 0; ib < 3; ++ib)
-						judgeChipTimes[ib] ??= (chip, chip.nSoundTimems + msDanNextSongDelay, chip.nSoundPos);
+						judgeChipTimes[ib] ??= (chip, chip.dbSoundTimems + msDanNextSongDelay, chip.nSoundPos);
 					i = 0; // end searching
 					continue;
 				case 0x50: // real bar line
-					judgeChipTimes[(int)chip.nBranch] ??= (chip, chip.nSoundTimems, chip.nSoundPos);
+					judgeChipTimes[(int)chip.nBranch] ??= (chip, chip.dbSoundTimems, chip.nSoundPos);
 					if (judgeChipTimes.All(x => x != null))
 						i = 0; // end searching
 					continue;
@@ -3075,9 +3075,9 @@ internal class CTja : CActivity {
 		var judgeChipTimeMin = judgeChipTime;
 
 		if (delayForRoll) {
-			var lastRollEnd = lastRollEnds.Where(x => x != null).MaxBy(x => x!.nSoundTimems);
-			if (lastRollEnd != null && lastRollEnd.nSoundTimems > judgeChipTime.Value.msTime)
-				judgeChipTime = (lastRollEnd, lastRollEnd.nSoundTimems, lastRollEnd.nSoundPos); // judge at end of last roll
+			var lastRollEnd = lastRollEnds.Where(x => x != null).MaxBy(x => x!.dbSoundTimems);
+			if (lastRollEnd != null && lastRollEnd.dbSoundTimems > judgeChipTime.Value.msTime)
+				judgeChipTime = (lastRollEnd, lastRollEnd.dbSoundTimems, lastRollEnd.nSoundPos); // judge at end of last roll
 		}
 
 		// judging at or after last measure, and (if possible) at or before branch point
@@ -3257,7 +3257,7 @@ internal class CTja : CActivity {
 			dbBPM = this.dbNowBPM,
 			dbSCROLL = this.dbNowScroll,
 			dbSCROLL_Y = this.dbNowScrollY,
-			nSoundTimems = (int)this.dbNowTime,
+			dbSoundTimems = this.dbNowTime,
 			fBMSCROLLTime = this.dbNowBMScrollTime,
 			fNow_Measure_m = this.fNow_Measure_m,
 			fNow_Measure_s = this.fNow_Measure_s,
@@ -4374,15 +4374,16 @@ internal class CTja : CActivity {
 					}
 					#endregion
 					#region [ 発音1秒前のタイミングを算出 ]
-					int nAddMixerTimems, nAddMixerPosition = 0;
-					tSoundTimemsSoundPosGet(pChip.nSoundTimems - nSoundPrevMarginms, out nAddMixerTimems, out nAddMixerPosition);
+					double msAddMixerTime = 0;
+					int nAddMixerPosition = 0;
+					tSoundTimemsSoundPosGet(pChip.dbSoundTimems - nSoundPrevMarginms, out msAddMixerTime, out nAddMixerPosition);
 
 					CChip c_AddMixer = new CChip() {
 						nChannelNo = 0xDA,
 						IsEndedBranching = true,
 						nIntValue = pChip.nIntValue,
 						nIntValue_InternalNumber = pChip.nIntValue_InternalNumber,
-						nSoundTimems = nAddMixerTimems,
+						dbSoundTimems = msAddMixerTime,
 						nSoundPos = nAddMixerPosition,
 						bPlayEndAfterPlaybackContinuesChip = false
 					};
@@ -4393,9 +4394,10 @@ internal class CTja : CActivity {
 					if (listWAV.TryGetValue(pChip.nIntValue_InternalNumber, out CTja.CWAV wc)) {
 						duration = wc.rSound[0]?.TotalPlayTime ?? 0;
 					}
-					int nNewRemoveMixerTimems, nNewRemoveMixerPosition;
-					tSoundTimemsSoundPosGet(pChip.nSoundTimems + duration + nSoundAfterMarginms, out nNewRemoveMixerTimems, out nNewRemoveMixerPosition);
-					if (nNewRemoveMixerTimems < pChip.nSoundTimems + duration)   // 曲の最後でサウンドが切れるような場合は
+					double msNewRemoveMixerTime;
+					int nNewRemoveMixerPosition;
+					tSoundTimemsSoundPosGet(pChip.dbSoundTimems + duration + nSoundAfterMarginms, out msNewRemoveMixerTime, out nNewRemoveMixerPosition);
+					if (msNewRemoveMixerTime < pChip.dbSoundTimems + duration)   // 曲の最後でサウンドが切れるような場合は
 					{
 						CChip c_AddMixer_noremove = c_AddMixer;
 						c_AddMixer_noremove.bPlayEndAfterPlaybackContinuesChip = true;
@@ -4410,10 +4412,10 @@ internal class CTja : CActivity {
 					);
 					if (index >= 0)                                                 // 過去に同じチップで発音中のものが見つかった場合
 					{                                                                   // 過去の発音のmixer削除を確定させるか、延期するかの2択。
-						int nOldRemoveMixerTimems = listRemoveTiming[index].nSoundTimems;
+						var msOldRemoveMixerTime = listRemoveTiming[index].dbSoundTimems;
 						int nOldRemoveMixerPosition = listRemoveTiming[index].nSoundPos;
 
-						if (pChip.nSoundTimems - nSoundPrevMarginms <= nOldRemoveMixerTimems)  // mixer削除前に、同じ音の再発音がある場合は、
+						if (pChip.dbSoundTimems - nSoundPrevMarginms <= msOldRemoveMixerTime)  // mixer削除前に、同じ音の再発音がある場合は、
 						{                                                                   // mixer削除時刻を遅延させる(if-else後に行う)
 																							//Debug.WriteLine( "remove TAIL of listAddMixerChannel. TAIL INDEX=" + listAddMixerChannel.Count );
 																							//DebugOut_CChipList( listAddMixerChannel );
@@ -4433,7 +4435,7 @@ internal class CTja : CActivity {
 							IsEndedBranching = true,
 							nIntValue = listRemoveTiming[index].nIntValue,
 							nIntValue_InternalNumber = listRemoveTiming[index].nIntValue_InternalNumber,
-							nSoundTimems = nNewRemoveMixerTimems,
+							dbSoundTimems = msNewRemoveMixerTime,
 							nSoundPos = nNewRemoveMixerPosition
 						};
 						listRemoveTiming[index] = c;
@@ -4445,7 +4447,7 @@ internal class CTja : CActivity {
 							IsEndedBranching = true,
 							nIntValue = pChip.nIntValue,
 							nIntValue_InternalNumber = pChip.nIntValue_InternalNumber,
-							nSoundTimems = nNewRemoveMixerTimems,
+							dbSoundTimems = msNewRemoveMixerTime,
 							nSoundPos = nNewRemoveMixerPosition
 						};
 						listRemoveTiming.Add(c);
@@ -4464,19 +4466,19 @@ internal class CTja : CActivity {
 	}
 	private void DebugOut_CChipList(List<CChip> c) {
 		for (int i = 0; i < c.Count; i++) {
-			Debug.WriteLine(i + ": ch=" + c[i].nChannelNo.ToString("x2") + ", WAV番号=" + c[i].nIntValue + ", time=" + c[i].nSoundTimems);
+			Debug.WriteLine(i + ": ch=" + c[i].nChannelNo.ToString("x2") + ", WAV番号=" + c[i].nIntValue + ", time=" + c[i].dbSoundTimems);
 		}
 	}
-	private bool tSoundTimemsSoundPosGet(int nDesiredSoundTimems, out int nNewSoundTimems, out int nNewSoundPos) {
+	private bool tSoundTimemsSoundPosGet(double nDesiredSoundTimems, out double nNewSoundTimems, out int nNewSoundPos) {
 		// 発声時刻msから発声位置を逆算することはできないため、近似計算する。
 		// 具体的には、希望発声位置前後の2つのチップの発声位置の中間を取る。
 
 		int index_min = int.MaxValue, index_max = int.MaxValue;
 		for (int i = 0; i < listChip.Count; i++)        // 希望発声位置前後の「前」の方のチップを検索
 		{
-			int nSoundTimems = listChip[i].nSoundTimems;
-			if (nSoundTimems >= nDesiredSoundTimems) {
-				if (nSoundTimems > nDesiredSoundTimems)
+			var dbSoundTimems = listChip[i].dbSoundTimems;
+			if (dbSoundTimems >= nDesiredSoundTimems) {
+				if (dbSoundTimems > nDesiredSoundTimems)
 					--i; // is max chip
 				index_min = i;
 				index_max = i + 1;
@@ -4484,7 +4486,7 @@ internal class CTja : CActivity {
 			}
 		}
 		CChip? chip_min = listChip.ElementAtOrDefault(index_min);
-		if (index_min < 0 || chip_min?.nSoundTimems < nDesiredSoundTimems) { // not on chip nor exceeding end
+		if (index_min < 0 || chip_min?.dbSoundTimems < nDesiredSoundTimems) { // not on chip nor exceeding end
 			nNewSoundTimems = nDesiredSoundTimems;
 			nNewSoundPos = chip_min?.nSoundPos ?? 0;
 			return true;
@@ -4497,7 +4499,7 @@ internal class CTja : CActivity {
 			// そこで、listの最終項目の発声時刻msと発生位置から、希望発声時刻に相当する希望発声位置を比例計算して求める。
 			index_min = index_max = listChip.Count - 1;
 		}
-		nNewSoundTimems = (listChip[index_max].nSoundTimems + listChip[index_min].nSoundTimems) / 2;
+		nNewSoundTimems = (listChip[index_max].dbSoundTimems + listChip[index_min].dbSoundTimems) / 2;
 		nNewSoundPos = (listChip[index_max].nSoundPos + listChip[index_min].nSoundPos) / 2;
 		return !isOutOfBound;
 	}
@@ -4731,7 +4733,7 @@ internal class CTja : CActivity {
 		for (int i = 0; i < this.listChip.Count; i++) {
 			CChip pChip = this.listChip[i];
 			if (((iMeasure1to == 0) ? // initial song position
-				pChip.nSoundTimems >= 0
+				pChip.dbSoundTimems >= 0
 				: (pChip.nChannelNo == 0x50 && pChip.nIntValue_InternalNumber == iMeasure1to)
 				&& (branch == null || pChip.IsForBranch(branch.Value)))
 				) {
@@ -4758,14 +4760,14 @@ internal class CTja : CActivity {
 		}
 
 		chip.bShowSudden = (!(velocityRefChip.IsSuddenHideRoll && NotesManager.IsGenericRoll(chip))
-			&& (msTjaNowTime >= velocityRefChip.nSoundTimems - velocityRefChip.msShowOffset));
+			&& (msTjaNowTime >= velocityRefChip.dbSoundTimems - velocityRefChip.msShowOffset));
 
 		double msDTimeMoveX = msDTime;
 		double msDTimeMoveY = msDTime;
 		double th16DBeatMoveX = th16DBeatX;
 		double th16DBeatMoveY = th16DBeatY;
-		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.nSoundTimems - velocityRefChip.msMoveOffset) {
-			msDTimeMoveX = (int)velocityRefChip.msMoveOffset + (chip.nSoundTimems - velocityRefChip.nSoundTimems);
+		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.dbSoundTimems - velocityRefChip.msMoveOffset) {
+			msDTimeMoveX = (int)velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
 			th16DBeatMoveX = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
 			// In TJAP3, #SUDDEN only affects horizontal scroll
 			if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
