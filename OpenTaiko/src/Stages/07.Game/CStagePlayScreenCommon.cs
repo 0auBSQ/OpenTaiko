@@ -2559,6 +2559,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		=> OpenTaiko.bReplayMode[nPlayer] ? this.msReplayTjaTime[nPlayer] : double.PositiveInfinity;
 
 	protected bool tProgressDraw_Chip(EKeyConfigPart ePlayMode, int nPlayer) {
+		bool finishedPlaying = false;
 		this.TrackMsAutoInputTime();
 		bool drawOnly = this.IsFailStopped() || (this.nCurrentTopChip[nPlayer] == -1) || IsDanFailed;
 
@@ -2864,7 +2865,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 							if (this.actDan.GetFailedAllChallenges(OpenTaiko.SongMount.rChoosenSong.DanSongs)) {
 								this.nCurrentTopChip[nPlayer] = tja.listChip.Count - 1;   // 終端にシーク
 								IsDanFailed = true;
-								return true;
+								finishedPlaying = true;
 							}
 
 							// Play next song here
@@ -3326,18 +3327,19 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (!this.bPAUSE && !pChip.bHit) { // prevent infinity pause in training mode
 						this.UpdateAIBattleSection(nPlayer, nCurrentTimems, endOfPlay: true);
 						this.isChartEnded[nPlayer] = true;
+						pChip.bHit = true;
 						if (pChip.nIntValue != 0) { // 0: last note past, 0xFF: song end
+							finishedPlaying = true;
 							if (OpenTaiko.ConfigIni.bTokkunMode) {
 								foreach (CTja.CWAV cwav in OpenTaiko.TJA.listWAV.Values) {
 									for (int i = 0; i < nPolyphonicSounds; i++) {
 										if ((cwav.rSound[i] != null) && cwav.rSound[i].IsPlaying) {
-											return false;
+											finishedPlaying = false;
+											break;
 										}
 									}
 								}
 							}
-							pChip.bHit = true;
-							return true;
 						}
 					}
 					break;
@@ -3472,7 +3474,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		}
 		#endregion
 
-		return false;
+		return finishedPlaying;
 	}
 
 	private void AutoJudge(int nPlayer, long msTjaHitTime, CChip pChip, bool doAutoInput = true, double msMaxPlayedTjaTime = double.PositiveInfinity) {
