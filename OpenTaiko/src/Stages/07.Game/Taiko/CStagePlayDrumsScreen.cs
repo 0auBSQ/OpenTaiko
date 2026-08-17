@@ -631,11 +631,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			} else if (base.ePhaseID == CStage.EPhase.Game_EndChart) {
 				if (bIsFinishedPlaying) {
 					if (OpenTaiko.ConfigIni.bTokkunMode) {
-						bIsFinishedPlaying = false;
+						isChartEnded[0] = isFinishedPlaying[0] = false;
 						actTokkun.tPausePlay();
 						OpenTaiko.Skin.soundTrainingStopSound.tPlay();
 
 						actTokkun.tMatchWithTheChartDisplayPosition(true);
+						base.ePhaseID = CStage.EPhase.Common_NORMAL;
 					} else if (LuaNetworking.Active?.PlaySyncActive == true) {
 						// Online VS: wait for every still-active player to finish, THEN play all clear anims with the
 						// gathered results (correct clear/fail/full-combo), before moving to the result screen.
@@ -709,7 +710,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 	protected override void UpdateClearAnimation(int iPlayer) {
 		base.UpdateClearAnimation(iPlayer);
-		this.actEnd.Start(iPlayer, endOfPlay: true);
+		if (!OpenTaiko.ConfigIni.bTokkunMode)
+			this.actEnd.Start(iPlayer, endOfPlay: true);
 	}
 
 	public override bool IsEndOfPlay(bool? isChartEnded = null, bool? isFinishedPlaying = null)
