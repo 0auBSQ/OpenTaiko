@@ -568,9 +568,9 @@ internal class OpenTaiko : Game {
 					case CStage.EStage.SongLoading:
 						if (EnumSongs != null) {
 							#region [ (特定条件時) 曲検索スレッドの起動_開始 ]
-							if (rCurrentStage.eStageID == CStage.EStage.StartUp &&
-								rCurrentStage.ePhaseID == CStage.EPhase.Startup_Complete &&
-								!EnumSongs.IsSongListEnumStarted) {
+							if ((rCurrentStage.eStageID != CStage.EStage.StartUp || rCurrentStage.ePhaseID == CStage.EPhase.Startup_Complete)
+								&& !EnumSongs.IsSongListEnumStarted
+								) {
 								actEnumSongs.Activate();
 								if (!ConfigIni.PreAssetsLoading) {
 									actEnumSongs.CreateManagedResource();

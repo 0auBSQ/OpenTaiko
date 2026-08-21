@@ -92,7 +92,7 @@ internal class CStage起動 : CStage {
 				this.list進行文字列.Add("");
 
 				es = new CEnumSongs();
-				es.StartEnumFromCache();                                        // 曲リスト取得(別スレッドで実行される)
+				es.StartLoadSystemSound();
 				base.IsFirstDraw = false;
 				return 0;
 			}
@@ -203,19 +203,29 @@ internal class CStage起動 : CStage {
 					langSelectIndex = Math.Min(langSelectIndex + 1, CLangManager.Languages.Length - 1);
 				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.UpArrow) || OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.LeftArrow)) {
 					langSelectIndex = Math.Max(langSelectIndex - 1, 0);
-				} else if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+				} else if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+					|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+					|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+					) {
 					OpenTaiko.Skin.soundDecideSFX.tPlay();
 					OpenTaiko.ConfigIni.sLang = CLangManager.intToLang(langSelectIndex);
 					CLangManager.langAttach(OpenTaiko.ConfigIni.sLang);
 					ePhaseID = EPhase.Startup_Complete;
 				}
 			} else {
-				if (es != null && es.IsSongListEnumCompletelyDone)                          // 曲リスト作成が終わったら
+				if (es != null && es.IsSongListEnumCompletelyDone)                          // System sound loaded
 				{
-					OpenTaiko.Songs管理 = (es != null) ? es.Songs管理 : null;      // 最後に、曲リストを拾い上げる
+					es.Abort(); // reset for further enumerating
 					ePhaseID = EPhase.Startup_Complete;
+				}
 
-					if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)) {
+				if (ePhaseID == EPhase.Startup_Complete) {
+					if (OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.Decide)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.RRed)
+						|| OpenTaiko.Pad.bPressed(EInstrumentPad.Drums, EPad.LRed)
+						|| OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.Return)
+						) {
 						OpenTaiko.Skin.soundDecideSFX.tPlay();
 						return 1;
 					}

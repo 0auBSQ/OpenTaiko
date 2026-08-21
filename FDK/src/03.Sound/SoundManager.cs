@@ -301,7 +301,7 @@ public class SoundManager   // : CSound
 		//-----------------
 		switch (SoundDeviceType) {
 			case ESoundDeviceType.Bass:
-				SoundDevice = new CSoundDeviceBASS(SoundDelayBASS, SoundUpdatePeriodBASS);
+				SoundDevice = new CSoundDeviceBASS(updatePeriod: SoundUpdatePeriodBASS, bufferSize: SoundDelayBASS);
 				break;
 
 			case ESoundDeviceType.ExclusiveWASAPI:

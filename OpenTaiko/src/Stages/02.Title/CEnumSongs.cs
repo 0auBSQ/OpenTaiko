@@ -86,12 +86,9 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 	}
 
-	/// <summary>
-	/// 曲リストのキャッシュ(songlist.db)取得スレッドの開始
-	/// </summary>
-	public void StartEnumFromCache() {
-		this.thDTXFileEnumerate = new Thread(new ThreadStart(this.t曲リストの構築1));
-		this.thDTXFileEnumerate.Name = "曲リストの構築";
+	public void StartLoadSystemSound() {
+		this.thDTXFileEnumerate = new Thread(new ThreadStart(this.LoadSystemSound));
+		this.thDTXFileEnumerate.Name = "LoadSystemSound";
 		this.thDTXFileEnumerate.IsBackground = true;
 		this.thDTXFileEnumerate.Start();
 	}
@@ -204,10 +201,7 @@ internal class CEnumSongs                           // #27060 2011.2.7 yyagi 曲
 
 
 
-	/// <summary>
-	/// songlist.dbからの曲リスト構築
-	/// </summary>
-	public void t曲リストの構築1() {
+	public void LoadSystemSound() {
 		// ！注意！
 		// 本メソッドは別スレッドで動作するが、プラグイン側でカレントディレクトリを変更しても大丈夫なように、
 		// すべてのファイルアクセスは「絶対パス」で行うこと。(2010.9.16)

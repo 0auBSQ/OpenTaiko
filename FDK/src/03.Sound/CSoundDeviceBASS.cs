@@ -79,7 +79,7 @@ public class CSoundDeviceBASS : ISoundDevice {
 
 		int freq = 44100;
 
-		if (!Bass.Init(-1, freq, DeviceInitFlags.Default))
+		if (!Bass.Init(-1, freq, DeviceInitFlags.Latency))
 			throw new Exception(string.Format("BASS の初期化に失敗しました。(BASS_Init)[{0}]", Bass.LastError.ToString()));
 
 		if (!Bass.Configure(Configuration.UpdatePeriod, updatePeriod)) {
@@ -90,6 +90,7 @@ public class CSoundDeviceBASS : ISoundDevice {
 		}
 
 		Bass.Configure(Configuration.PlaybackBufferLength, bufferSize);
+		Bass.Configure(Configuration.DeviceBufferLength, bufferSize);
 		Bass.Configure(Configuration.LogarithmicVolumeCurve, true);
 
 		this.STREAMPROC = new StreamProcedure(StreamProc);
