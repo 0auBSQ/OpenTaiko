@@ -249,7 +249,34 @@ function World:update(dt, px, py, pz)
     self.water:update(dt)   -- after the camera settles: reflections mirror the final eye
 end
 
+-- a flat backdrop instead of the day sky (interiors, voids): nil restores the sky
+function World:setSolidSky(r, g, b)
+    if r == nil then self.solidSky = nil ; return end
+    self.solidSky = { r, g, b }
+    if self.scene.SetSkyShader then pcall(function() self.scene:SetSkyShader("") end) end
+end
+
+-- no backdrop at all: the frame starts fully transparent, so the scene composites over whatever
+-- the stage drew before world:blit() (another scene, a canvas animation). Needs the engine's
+-- ClearTransparent; without it the previous frame would bleed through, so it falls back to black.
+function World:setTransparentSky()
+    self.solidSky = "none"
+    if self.scene.SetSkyShader then pcall(function() self.scene:SetSkyShader("") end) end
+end
+
 function World:drawSky()
+    if self.solidSky == "none" then
+        self.curSky = { top = { 0, 0, 0 }, hor = { 0, 0, 0 } }
+        if self.scene.ClearTransparent then self.scene:ClearTransparent()
+        else self.scene:FillRect(0, 0, self.RW, self.RH, 0, 0, 0, 255) end
+        return
+    end
+    if self.solidSky then
+        local c = self.solidSky
+        self.curSky = { top = c, hor = c }
+        self.scene:FillRect(0, 0, self.RW, self.RH, floor(c[1]), floor(c[2]), floor(c[3]), 255)
+        return
+    end
     local hour = self.hour
     if not hour then local t = os.date("*t"); hour = t.hour + t.min / 60 end
     local top, hor = skyAt(hour)

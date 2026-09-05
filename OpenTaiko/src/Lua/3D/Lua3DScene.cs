@@ -103,6 +103,9 @@ namespace OpenTaiko {
 
 		#region Frame setup / 2D / textures
 		public void Clear(int r, int g, int b, int a) => _canvas.Clear(r, g, b, a);
+		/// <summary>Reset the colour buffer to fully transparent (Clear alpha-blends, so it cannot):
+		/// the frame then composites over whatever the stage drew underneath.</summary>
+		public void ClearTransparent() => _canvas.ClearTransparent();
 		public void FillRect(int x, int y, int w, int h, int r, int g, int b, int a) {
 			if (_w != _logicalW) {   // render-scale: inputs are LOGICAL → map to the reduced pixel buffer
 				double sc = (double)_w / _logicalW;

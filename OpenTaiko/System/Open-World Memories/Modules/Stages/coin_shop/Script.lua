@@ -1,5 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local, inject-field, param-type-mismatch
 local DBItems = require("DBControllers/dbItems")
+local Almanac  = require("almanac")     -- date patterns
+local SEASONAL = require("seasonal")    -- featured big-slot items, by date
 local PopUI = require("PopUI")
 local NavInput = require("NavInput")
 local Util = require("Util")
@@ -318,6 +320,25 @@ local function poolItems()
 	end
 end
 
+-- ── Featured items ────────────────────────────────────────────────────────────
+-- The best active entry of seasonal.lua (highest priority, not owned) takes the big slot. A fresh
+-- roll and a reroll can both displace it, so this runs after every roll/load.
+local function applySeasonal()
+	if save == nil then return end
+	local pick = Almanac.pick(SEASONAL, save, function(e)
+		local item = findItemByCode(Almanac.plain(e.code))
+		return item == nil or isOwned(item)
+	end)
+	if pick == nil then return end
+	local code = Almanac.plain(pick.code)
+	if bigItem ~= nil and bigItem.Code == code then return end
+	bigItem = setupItem(findItemByCode(code), 5)
+	rollStock(bigItem)
+	soldOutMask = soldOutMask & ~(1 << (SLOT_BIG - 1))
+	layoutSize = 5
+	for i = 5, 6 do normalItems[i] = nil end
+end
+
 -- ── Persistence helpers ───────────────────────────────────────────────────────
 
 local DB_PREFIX = ""   -- set in activate() from save.SaveId so each save file has its own shop state
@@ -632,7 +653,7 @@ local function buildRefreshUI()
 		onClick = function()
 			if rerollPrice > save.Coins then sounds.SoldOut:Play(); return end
 			save:SpendCoins(rerollPrice); executedRerolls = executedRerolls + 1; soldOutMask = 0
-			poolItems(); storeShopState(shopDB); sounds.Buy:Play()
+			poolItems(); applySeasonal(); storeShopState(shopDB); sounds.Buy:Play()
 			closeConfirm()
 			return true
 		end }
@@ -726,9 +747,10 @@ local function enterShopFor(index)
 	currentFreezeKey = getJstFreezeKey()
 	local storedDay = tonumber(shopDB:Read(DB_PREFIX .. "day") or "0") or 0
 	if storedDay ~= currentFreezeKey then
-		executedRerolls = 0; soldOutMask = 0; poolItems(); storeShopState(shopDB)
+		executedRerolls = 0; soldOutMask = 0; poolItems(); applySeasonal(); storeShopState(shopDB)
 	else
 		loadShopState(shopDB)
+		applySeasonal(); storeShopState(shopDB)
 	end
 	selectedItem = -2
 	currentScreen = "shop"

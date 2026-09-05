@@ -95,7 +95,7 @@ function DayNight:update(dt)
     self.sunX, self.sunY, self.sunZ = -dx * ca, sin(el), -dz * ca
     self.dayF = min(1, daylight * 2.2)
     self.nightF = nightF
-    if not self._skyInstalled and scene.SetSkyShader then
+    if not self._skyInstalled and scene.SetSkyShader and not world.solidSky then
         self._skyInstalled = true
         require("OWM3d.sky").install(scene)
     end

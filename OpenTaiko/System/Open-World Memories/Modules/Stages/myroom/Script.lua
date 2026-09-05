@@ -18,6 +18,7 @@ local PopUI    = require("PopUI")
 local I18N      = require("i18n")
 local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
 local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
+local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
 local NavInput = require("NavInput")
 local net      = MO.net
 
@@ -242,6 +243,7 @@ function deactivate()
     JB.setDuck(false)                              -- reset the PC-screen crossfade for the next visit
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if hud then hud:disposeWidgets(); hud = nil end
+    Pod.reset()
     -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
     pcall(function() OWM.ModelIcon.disposeAll() end)
     if world ~= nil then world.scene:Dispose(); world = nil; player = nil; map = nil end
@@ -257,6 +259,7 @@ function onDestroy()
     PCS.disposeBgm()
     if Edit.disposeSfx then Edit.disposeSfx() end
     for _, s in pairs(phoneSfx) do if s then pcall(function() s:Dispose() end) end end
+    Pod.dispose()
     phoneSfx = {}; bombFx = nil
 end
 
@@ -744,14 +747,16 @@ local function clampCamera()
     if cam.pitch > -15 then cam.pitch = -15 elseif cam.pitch < -50 then cam.pitch = -50 end
 end
 
--- getting mouse deltas clears the deltas, so passed by the caller instead of getting here
+-- getting mouse deltas clears the deltas, so passed by the caller instead of getting here.
+-- frameDt = this frame's dt (set by update); Q/E orbit at a fixed degrees-per-second rate.
+local frameDt = 0
 local function panCamera(dmx, dmy)
     local cam = world.cam
     if INPUT:MousePressing("Right") then
         cam:orbit(dmx * YAW_SENS, -dmy * PITCH_SENS)
     end
-    if kd("Q") then cam:orbit(-90 * dt) end
-    if kd("E") then cam:orbit(90 * dt) end
+    if kd("Q") then cam:orbit(-90 * frameDt) end
+    if kd("E") then cam:orbit(90 * frameDt) end
     clampCamera()
 end
 
@@ -796,6 +801,7 @@ function update(ts)
     local dt = (ts - lastTs) / 1000.0
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
+    frameDt = dt
     GLOBALCAMERA:Update(dt)
     OWM.ModelIcon.newFrame()       -- per-frame first-render budget for the edit-grid preview icons
     if world == nil or map == nil then return nil end
@@ -829,6 +835,12 @@ function update(ts)
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "dialogue" then
         if dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "pod" then
+        if Pod.update(dt) == "go" then
+            MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
+            return Exit("stage", Pod.stageName(), "default")
+        end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pc" then
         if pcScreen:update(ts) == "closed" then
@@ -956,9 +968,15 @@ function update(ts)
             rebuild(); saveRoom(); MO.onRoomChanged()
         elseif focused.kind == "pod" then
             SHARED:GetSharedSound("Decide"):Play()
-            mode = "dialogue"; phoneFlow = nil
-            dlg:start({ { name = "", text = dlgLoc("pod", "locked",
-                "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.") } })
+            if Pod.stageExists() then
+                -- the pod opens: step in, rattle, vent (update handles "go")
+                mode = "pod"
+                Pod.start(world, focused.it, world._propInst and world._propInst[focused.it] or nil, px, pz, playerIndex)
+            else
+                mode = "dialogue"; phoneFlow = nil
+                dlg:start({ { name = "", text = dlgLoc("pod", "locked",
+                    "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.") } })
+            end
         elseif focused.kind == "jukebox" then
             SHARED:GetSharedSound("Decide"):Play()
             JB.openFor(focused.it, Room.displayName("jukebox"), playerIndex)
@@ -989,7 +1007,13 @@ function draw()
     world.actors:shadowsBegin()
     world.actors:actorsBegin()
     local spr = charSprite(pdir, pmoving, pframeT)
-    if spr then world.actors:actorSprite(px, py, pz, wW, hW, spr) end
+    if mode == "pod" then
+        -- stepping into the pod: the sprite slides to it and shrinks away, then stays hidden
+        local vx, vz, vs = Pod.playerVisual()
+        if spr and vx then world.actors:actorSprite(vx, py, vz, wW * vs, hW * vs, spr) end
+    elseif spr then
+        world.actors:actorSprite(px, py, pz, wW, hW, spr)
+    end
     if net.online then
         for _, p in pairs(net.posByPeer) do
             local rst = p.moving and ((math.floor(p.frameT / 0.16) % 2 == 0) and "run1" or "run2") or "idle"
@@ -1031,6 +1055,8 @@ function draw()
         if playerSelUI then playerSelUI:draw() end
     elseif mode == "dialogue" then
         dlg:draw()
+    elseif mode == "pod" then
+        Pod.draw(hud, SCREEN_W, SCREEN_H)
     elseif mode == "pc" then
         pcScreen:draw()
     elseif mode == "edit" then
