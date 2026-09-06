@@ -94,7 +94,8 @@ OpenTaiko/System/Open-World Memories/Modules/Stages/experimentp.zip
 /OpenTaiko/System/Open-World Memories/Modules/Stages/owyrsiloe
 /tools
 /docs
-/OpenTaiko/docs
 
 # Android: native libraries are fetched by OpenTaiko.Android/scripts/download-*.ps1
 /OpenTaiko.Android/jniLibs
+/OpenTaiko/System/Open-World Memories/Modules/Stages/pagoda
+/OpenTaiko/System/Open-World Memories/Modules/Stages/mysterypod/

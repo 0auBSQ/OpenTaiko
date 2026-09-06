@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OpenTaiko Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Documentation for the OpenTaiko Lua modding API, skinning, characters, puchicharas and chart unlockables." />
+  <link rel="icon" href="media/favicon.ico" />
+  <link rel="stylesheet" href="vendor/prism.min.css" />
+  <style>
+    :root { --accent:#e0402b; --accent-dark:#b8301f; --ink:#2c3e50; --muted:#8a9099;
+            --line:#eef0f2; --code-bg:#f7f7f9; --sidebar-w:24rem; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",
+           "Hiragino Kaku Gothic ProN","Meiryo","Malgun Gothic","Microsoft YaHei",Arial,sans-serif;
+           color:var(--ink); background:#fff; line-height:1.7; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+
+    /* Layout */
+    #sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w); overflow-y:auto;
+               border-right:1px solid var(--line); padding:1.2rem 1rem 3rem; background:#fff; }
+    #main { margin-left:var(--sidebar-w); padding:2.2rem 3rem 6rem; max-width:60rem; }
+    @media (max-width:900px) {
+      #sidebar { transform:translateX(-100%); transition:transform .2s; z-index:40; box-shadow:0 0 30px rgba(0,0,0,.15); }
+      body.nav-open #sidebar { transform:translateX(0); }
+      #main { margin-left:0; padding:1.4rem 1.2rem 4rem; }
+      #menu-toggle { display:inline-flex !important; }
+    }
+
+    /* Brand + version */
+    .brand { display:flex; align-items:center; gap:.5rem; font-weight:800; font-size:1.15rem; color:var(--ink); }
+    .brand a { color:inherit; }
+    .app-version { display:inline-block; padding:.05rem .5rem; font-size:12px; font-weight:700;
+                   color:#fff; background:var(--accent); border-radius:999px; }
+
+    /* Language selector */
+    #langbar { margin:1rem 0 .6rem; }
+    #langbar select { width:100%; font:inherit; font-size:13px; padding:.45rem .55rem; border:1px solid var(--line);
+                      background:#fff; color:#333; border-radius:8px; cursor:pointer; }
+    #langbar select:hover { border-color:var(--accent); }
+    #langbar select:focus { outline:none; border-color:var(--accent); }
+
+    /* Search */
+    #search { width:100%; padding:.5rem .7rem; font:inherit; font-size:14px; border:1px solid var(--line);
+              border-radius:8px; margin-bottom:1rem; }
+    #search:focus { outline:none; border-color:var(--accent); }
+
+    /* Nav */
+    .nav-group { margin-bottom:1rem; }
+    .nav-group > p { margin:.2rem 0 .35rem; font-size:11px; font-weight:700; text-transform:uppercase;
+                     letter-spacing:.06em; color:var(--muted); }
+    .nav-group ul { list-style:none; margin:0; padding:0; }
+    .nav-group li a { display:block; padding:.28rem .55rem; border-radius:6px; color:#4a5568;
+                      font-size:14.5px; }
+    .nav-group li a:hover { background:#fbeae7; text-decoration:none; }
+    .nav-group li a.active { background:var(--accent); color:#fff; font-weight:600; }
+
+    /* Content */
+    #main h1 { font-weight:800; font-size:2rem; margin:.2rem 0 1rem; }
+    #main h2 { font-weight:700; border-bottom:1px solid var(--line); padding-bottom:.3rem; margin:2.4rem 0 1rem; }
+    #main h3 { margin-top:1.8rem; }
+    #main table { border-collapse:collapse; width:100%; display:block; overflow-x:auto; margin:1rem 0; }
+    #main th,#main td { border:1px solid #e6e8ea; padding:.5rem .7rem; text-align:left; vertical-align:top; font-size:14.5px; }
+    #main th { background:#faf7f6; }
+    #main :not(pre) > code { color:var(--accent-dark); background:#fbeae7; padding:.1em .35em; border-radius:4px; font-size:.9em; }
+    #main pre { background:var(--code-bg); border:1px solid var(--line); border-radius:8px; padding:1rem; overflow:auto; }
+    #main blockquote { margin:1rem 0; padding:.4rem 1rem; border-left:3px solid #dfe3e6; color:#566; background:#fafbfc; }
+    #main img { max-width:100%; }
+
+    .badge-exp { display:inline-block; padding:.05rem .45rem; font-size:11px; font-weight:700; text-transform:uppercase;
+                 letter-spacing:.04em; color:#7a4a00; background:#ffe7ad; border:1px solid #f2c86a; border-radius:4px; vertical-align:middle; }
+    .nav-badge { margin-left:.35rem; padding:0 .3rem; font-size:9px; }
+    .nav-group li a { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .nav-row { display:flex; align-items:center; }
+    .nav-row > a { flex:1 1 auto; min-width:0; }
+    .nav-caret { flex:0 0 auto; width:1.5rem; height:1.5rem; margin-left:.15rem; border:0; background:none; cursor:pointer;
+                 color:var(--muted); font-size:11px; line-height:1; border-radius:6px; transition:transform .12s; }
+    .nav-caret:hover { background:#fbeae7; color:var(--accent-dark); }
+    li.open > .nav-row > .nav-caret { transform:rotate(90deg); }
+    .nav-anchors { list-style:none; margin:.15rem 0 .45rem 1.1rem; padding:0 0 0 .9rem; border-left:2px solid var(--line); }
+    .nav-anchors li a { padding:.16rem .55rem; font-size:12.5px; color:#6b7480; }
+    .nav-anchors li a.active { background:#fbeae7; color:var(--accent-dark); font-weight:600; }
+    #main h2[id], #main h3[id] { scroll-margin-top:1rem; }
+    .badge-new { display:inline-block; padding:.05rem .45rem; font-size:11px; font-weight:700; color:#0b6b3a;
+                 background:#d5f3e1; border:1px solid #9bdcb8; border-radius:4px; vertical-align:middle; }
+    .callout { border-left:4px solid var(--accent); background:#fbeae7; padding:.8rem 1rem; margin:1rem 0; border-radius:0 6px 6px 0; }
+    .callout.warn { border-left-color:#f2c86a; background:#fff7e6; }
+    /* rarity names in the game's colours, on a dark chip so the light ones stay readable */
+    .rarity { display:inline-block; padding:.05rem .55rem; font-weight:700; border-radius:4px; background:#2b2e34; }
+    .rarity-poor { color:#808080; } .rarity-common { color:#ffffff; } .rarity-uncommon { color:#00ff00; }
+    .rarity-rare { color:#0088ff; } .rarity-epic { color:#c800ff; } .rarity-legendary { color:#ffa500; } .rarity-mythical { color:#ffc0cb; }
+
+    /* Search results */
+    .search-results h1 { margin-bottom:1rem; }
+    .search-hit { display:block; padding:.7rem .9rem; border:1px solid var(--line); border-radius:8px; margin-bottom:.6rem; color:inherit; }
+    .search-hit:hover { border-color:var(--accent); text-decoration:none; background:#fffaf9; }
+    .search-hit b { color:var(--accent-dark); }
+    .search-hit .snip { display:block; color:#667; font-size:13.5px; margin-top:.2rem; }
+
+    #menu-toggle { display:none; position:fixed; top:.7rem; left:.7rem; z-index:50; align-items:center; justify-content:center;
+                   width:2.4rem; height:2.4rem; border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; font-size:1.2rem; }
+    #scrim { display:none; position:fixed; inset:0; background:rgba(0,0,0,.25); z-index:30; }
+    body.nav-open #scrim { display:block; }
+  </style>
+</head>
+<body>
+  <button id="menu-toggle" aria-label="Menu">&#9776;</button>
+  <div id="scrim"></div>
+  <aside id="sidebar">
+    <div class="brand"><a href="#/" id="brand-link"></a> <span class="app-version"></span></div>
+    <div id="langbar"></div>
+    <input id="search" type="search" autocomplete="off" />
+    <nav id="nav"></nav>
+  </aside>
+  <main id="main"><p>Loading the OpenTaiko documentation ...</p></main>
+
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/prism.js" data-manual></script>
+  <script src="vendor/prism-lua.min.js"></script>
+  <script src="vendor/prism-ini.min.js"></script>
+  <script src="vendor/prism-json.min.js"></script>
+  <script src="vendor/prism-bash.min.js"></script>
+  <script src="content.js"></script>
+  <script>
+  (function () {
+    var D = window.__DOCS__;
+    var mainEl = document.getElementById("main");
+    var navEl = document.getElementById("nav");
+    var langbarEl = document.getElementById("langbar");
+    var searchEl = document.getElementById("search");
+    if (!D) { mainEl.innerHTML = "<h1>Could not load content</h1><p>content.js failed to load.</p>"; return; }
+
+    if (window.marked && marked.setOptions) marked.setOptions({ gfm: true, breaks: false });
+    document.querySelector(".brand .app-version").textContent = "v" + D.version;
+    document.getElementById("brand-link").textContent = D.name;
+
+    var currentLang = "en", currentRoute = D.home;
+    function ui(k) { return ((D.ui && D.ui[currentLang]) || D.ui.en)[k]; }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" })[c]; }); }
+
+    function resolveRoute(baseRoute, target) {
+      target = target.split("#")[0];
+      if (!target) return null;
+      var trailing = target.charAt(target.length - 1) === "/";
+      target = target.replace(/\.md$/, "");
+      var stack = baseRoute.split("/"); stack.pop();
+      target.split("/").forEach(function (seg) {
+        if (seg === "" || seg === ".") return;
+        if (seg === "..") { if (stack.length) stack.pop(); return; }
+        stack.push(seg);
+      });
+      var r = stack.join("/");
+      if (trailing || r === "") r = r ? r + "/README" : "README";
+      return r;
+    }
+
+    function hasPage(lang, route) { return D.docs[lang] && D.docs[lang][route] != null; }
+
+    // "#/lang/route#anchor": the part after a second "#" is a heading id inside the page
+    var currentAnchor = "";
+    function parseHash() {
+      var h = location.hash.replace(/^#\/?/, "");
+      if (!h) return { lang: "en", route: D.home, anchor: "" };
+      var anchor = "";
+      var cut = h.indexOf("#");
+      if (cut >= 0) { anchor = h.slice(cut + 1); h = h.slice(0, cut); }
+      var parts = h.split("/");
+      var lang = parts[0];
+      if (!D.docs[lang]) { lang = "en"; } else { parts.shift(); }
+      var route = parts.join("/") || D.home;
+      return { lang: lang, route: route, anchor: anchor };
+    }
+
+    // same slug rule as build.py: lower case, runs of non-letters/digits become "-"
+    function slug(text) {
+      return text.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, "-").replace(/^-+|-+$/g, "");
+    }
+
+    function renderSidebar() {
+      langbarEl.innerHTML = '<select id="langsel" aria-label="Language">' + D.langs.map(function (l) {
+        return '<option value="' + l.code + '"' + (l.code === currentLang ? " selected" : "") + ">" + esc(l.label) + "</option>";
+      }).join("") + "</select>";
+      searchEl.placeholder = ui("search");
+      var groups = D.nav[currentLang] || D.nav.en;
+      navEl.innerHTML = groups.map(function (g) {
+        return '<div class="nav-group"><p>' + esc(g.group) + "</p><ul>" + g.items.map(function (it) {
+          var isCurrent = it.route === currentRoute;
+          var active = isCurrent ? ' class="active"' : "";
+          var badge = it.badge ? ' <span class="badge-exp nav-badge">' + esc(it.badge) + "</span>" : "";
+          var hasAnchors = it.anchors && it.anchors.length;
+          var open = hasAnchors && expanded[it.route];
+          var link = '<a href="#/' + currentLang + "/" + it.route + '"' + active + ' title="' + esc(it.label) + '">' + esc(it.label) + badge + "</a>";
+          // a caret expands the page's sections (namespaces such as STORAGE) without opening the page
+          var caret = hasAnchors ? '<button type="button" class="nav-caret" data-route="' + esc(it.route) + '" aria-label="' + (open ? "Collapse" : "Expand") + '">&#9656;</button>' : "";
+          var html = '<li class="' + (hasAnchors ? "has-anchors" : "") + (open ? " open" : "") + '"><div class="nav-row">' + link + caret + "</div>";
+          if (open) {
+            html += '<ul class="nav-anchors">' + it.anchors.map(function (a) {
+              var on = (isCurrent && a.id === currentAnchor) ? ' class="active"' : "";
+              return '<li><a href="#/' + currentLang + "/" + it.route + "#" + a.id + '"' + on + ' title="' + esc(a.label) + '">' + esc(a.label) + "</a></li>";
+            }).join("") + "</ul>";
+          }
+          return html + "</li>";
+        }).join("") + "</ul></div>";
+      }).join("");
+    }
+
+    // which pages show their sections; the open page is expanded when it is entered
+    var expanded = {};
+    navEl.addEventListener("click", function (e) {
+      var btn = e.target.closest(".nav-caret");
+      if (!btn) return;
+      e.preventDefault();
+      var r = btn.getAttribute("data-route");
+      expanded[r] = !expanded[r];
+      var side = document.getElementById("sidebar");
+      var keep = side ? side.scrollTop : 0;
+      renderSidebar();
+      if (side) side.scrollTop = keep;
+    });
+
+    function rewriteLinks() {
+      mainEl.querySelectorAll("a[href]").forEach(function (a) {
+        var href = a.getAttribute("href");
+        if (!href) return;
+        if (/^[a-z]+:\/\//i.test(href) || href.indexOf("mailto:") === 0) { a.target = "_blank"; a.rel = "noopener"; return; }
+        if (href.charAt(0) === "#") { a.setAttribute("href", "#/" + currentLang + "/" + currentRoute + "#" + href.slice(1)); return; }
+        if (href.charAt(0) === "/") { a.setAttribute("href", "#/" + currentLang + "/" + D.home); return; }
+        var frag = "";
+        var cut = href.indexOf("#");
+        if (cut >= 0) { frag = href.slice(cut); href = href.slice(0, cut); }
+        var route = resolveRoute(currentRoute, href);
+        if (route != null) a.setAttribute("href", "#/" + currentLang + "/" + route + frag);
+      });
+    }
+
+    function renderPage() {
+      var md = (D.docs[currentLang] || {})[currentRoute];
+      if (md == null) md = (D.docs.en || {})[currentRoute];
+      if (md == null) {
+        mainEl.innerHTML = "<h1>Page not found</h1><p><a href='#/" + currentLang + "/" + D.home + "'>Back to the start page</a></p>";
+        return;
+      }
+      mainEl.innerHTML = marked.parse(md);
+      // stable ids on section headings (badge text excluded), so anchors work in every language
+      var seen = {};
+      mainEl.querySelectorAll("h2, h3").forEach(function (h) {
+        var clone = h.cloneNode(true);
+        clone.querySelectorAll("span").forEach(function (s) { s.remove(); });
+        var id = slug(clone.textContent.trim());
+        if (!id) return;
+        if (seen[id]) { seen[id] += 1; id = id + "-" + seen[id]; } else { seen[id] = 1; }
+        h.id = id;
+      });
+      rewriteLinks();
+      if (window.Prism) try { Prism.highlightAllUnder(mainEl); } catch (e) {}
+      var t = (D.titles[currentLang] || {})[currentRoute] || D.name;
+      document.title = t + " | " + D.name;
+      var target = currentAnchor ? document.getElementById(currentAnchor) : null;
+      try {
+        if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+      } catch (e) {}
+    }
+
+    function renderSearch(q) {
+      var pages = D.docs[currentLang] || {};
+      var titles = D.titles[currentLang] || {};
+      var ql = q.toLowerCase(), hits = [];
+      Object.keys(pages).forEach(function (route) {
+        var md = pages[route], low = md.toLowerCase();
+        var title = titles[route] || route;
+        var inTitle = title.toLowerCase().indexOf(ql) >= 0;
+        var idx = low.indexOf(ql);
+        if (!inTitle && idx < 0) return;
+        var score = (inTitle ? 100 : 0) + (idx >= 0 ? 1 : 0);
+        var snip = "";
+        if (idx >= 0) {
+          var st = Math.max(0, idx - 40);
+          snip = (st > 0 ? "..." : "") + md.substring(st, idx + ql.length + 70).replace(/[#*`>|]/g, "").replace(/\s+/g, " ").trim() + " ...";
+        }
+        hits.push({ route: route, title: title, score: score, snip: snip });
+      });
+      hits.sort(function (a, b) { return b.score - a.score; });
+      var html = '<div class="search-results"><h1>' + esc(ui("results")) + " (" + hits.length + ")</h1>";
+      if (!hits.length) html += "<p>" + esc(ui("none")) + "</p>";
+      html += hits.map(function (h) {
+        return '<a class="search-hit" href="#/' + currentLang + "/" + h.route + '"><b>' + esc(h.title) +
+               "</b>" + (h.snip ? '<span class="snip">' + esc(h.snip) + "</span>" : "") + "</a>";
+      }).join("");
+      mainEl.innerHTML = html + "</div>";
+      try { window.scrollTo(0, 0); } catch (e) {}
+    }
+
+    function route() {
+      var p = parseHash();
+      var samePage = (p.lang === currentLang && p.route === currentRoute && mainEl.querySelector("h1"));
+      if (p.route !== currentRoute || !mainEl.querySelector("h1")) expanded[p.route] = true;
+      currentLang = p.lang; currentRoute = p.route; currentAnchor = p.anchor;
+      document.body.classList.remove("nav-open");
+      renderSidebar();
+      if (searchEl.value.trim()) { renderSearch(searchEl.value.trim()); return; }
+      if (samePage && currentAnchor) {
+        // moving between sections of the open page: just scroll
+        var target = document.getElementById(currentAnchor);
+        if (target) { try { target.scrollIntoView(); } catch (e) {} return; }
+      }
+      renderPage();
+    }
+
+    // Language switch keeps the current page when it exists in the target language.
+    langbarEl.addEventListener("change", function (e) {
+      var sel = e.target.closest("select");
+      if (!sel) return;
+      var L = sel.value;
+      var r = hasPage(L, currentRoute) ? currentRoute : D.home;
+      searchEl.value = "";
+      location.hash = "#/" + L + "/" + r;
+    });
+
+    var tmr = null;
+    searchEl.addEventListener("input", function () {
+      clearTimeout(tmr);
+      tmr = setTimeout(function () {
+        var q = searchEl.value.trim();
+        if (q) renderSearch(q); else renderPage();
+      }, 120);
+    });
+
+    document.getElementById("menu-toggle").addEventListener("click", function () { document.body.classList.toggle("nav-open"); });
+    document.getElementById("scrim").addEventListener("click", function () { document.body.classList.remove("nav-open"); });
+
+    window.addEventListener("hashchange", route);
+    if (!location.hash) location.replace("#/en/" + D.home);
+    route();
+  })();
+  </script>
+</body>
+</html>

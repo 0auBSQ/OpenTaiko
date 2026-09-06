@@ -1,0 +1,56 @@
+{
+  "en": {
+    "search": "Search",
+    "none": "No results found.",
+    "menu": "Menu",
+    "results": "Results"
+  },
+  "de": {
+    "search": "Suchen",
+    "none": "Keine Ergebnisse gefunden.",
+    "menu": "Menü",
+    "results": "Ergebnisse"
+  },
+  "es": {
+    "search": "Buscar",
+    "none": "No se encontraron resultados.",
+    "menu": "Menú",
+    "results": "Resultados"
+  },
+  "fr": {
+    "search": "Rechercher",
+    "none": "Aucun résultat trouvé.",
+    "menu": "Menu",
+    "results": "Résultats"
+  },
+  "ja": {
+    "search": "検索",
+    "none": "結果が見つかりません。",
+    "menu": "メニュー",
+    "results": "検索結果"
+  },
+  "ko": {
+    "search": "검색",
+    "none": "검색 결과가 없습니다.",
+    "menu": "메뉴",
+    "results": "검색 결과"
+  },
+  "nl": {
+    "search": "Zoeken",
+    "none": "Geen resultaten gevonden.",
+    "menu": "Menu",
+    "results": "Resultaten"
+  },
+  "ru": {
+    "search": "Поиск",
+    "none": "Ничего не найдено.",
+    "menu": "Меню",
+    "results": "Результаты"
+  },
+  "zh": {
+    "search": "搜索",
+    "none": "未找到结果。",
+    "menu": "菜单",
+    "results": "结果"
+  }
+}

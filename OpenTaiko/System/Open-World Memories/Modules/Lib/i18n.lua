@@ -2,8 +2,10 @@
 -- i18n.lua — per-stage localization (shared; each stage's Lua VM gets its own instance). English strings
 -- in the code are the canonical keys; the stage's own lang/ja.lua provides exact-match translations
 -- (missing entries fall back to English, so partial coverage degrades gracefully). The current game
--- language is read through the engine's CLocalizationData; call detect() at onStart and from a
--- reloadLanguage() global. lang/ja.lua is resolved via package.path, so it is per-stage.
+-- language is read through the engine's CLocalizationData; call detect() in activate (it runs on every
+-- entry, so a language change applies on the next visit). A reloadLanguage() global is only needed by a
+-- module that stays on screen while the language changes. lang/ja.lua is resolved via package.path, so
+-- it is per-stage.
 
 local M = {}
 
