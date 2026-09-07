@@ -416,9 +416,9 @@ internal class CConfigIni : INotifyPropertyChanged {
 		new CTimingZones(75, 108, 125), // Lv0 (Easy-Normal + "Loose" mod)
 		new CTimingZones(58, 108, 125), // Lv1 (Easy-Normal + "Lenient" mod)
 		new CTimingZones(42, 108, 125), // Lv2 (Easy-Normal / Tower Ama-kuchi or Hard-Extreme + "Loose" mod)
-		new CTimingZones(42, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
+		new CTimingZones(33, 75, 108), // Lv3 (Hard-Extreme + "Lenient" timing mod or Easy-Normal + "Strict" mod)
 		new CTimingZones(25, 75, 108), // Lv4 (Hard-Extreme / Tower Ex Kara-kuchi / Dan or Easy-Normal + "Rigorous" mod)
-		new CTimingZones(25, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod (Tatsu))
+		new CTimingZones(21, 58, 108), // Lv5 (Hard-Extreme + "Strict" mod)
 		new CTimingZones(17, 42, 108), // Lv6 (Hard-Extreme + "Rigorous" mod)
 	];
 
