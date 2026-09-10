@@ -5,27 +5,31 @@ using System.Drawing;
 using FDK;
 
 namespace OpenTaiko {
-	// Glyph-composed text: caches ONE texture per unique character (per color variant) and composes strings at
-	// draw time, instead of caching one texture per string (LuaText.GetText) which grows without bound. Post-
-	// processing applies per letter: the maxWidth squish scales every glyph individually. Glyph bitmaps share
-	// GetText's geometry (25px left/right/bottom padding, ink top at y=0), so a glyph drawn at (x + pen, y)
-	// lands exactly where the equivalent string texture drawn at (x, y) would put that character.
+	// Glyph-composed text: caches textures per unique character and composes strings at draw time, instead
+	// of caching one texture per string (LuaText.GetText) which grows without bound. Post-processing applies
+	// per letter: the maxWidth squish scales every glyph individually. Glyph bitmaps share GetText's geometry
+	// (25px left/right/bottom padding, ink top at y=0), so a glyph drawn at (x + pen, y) lands exactly where
+	// the equivalent string texture drawn at (x, y) would put that character.
 	//
-	// Bake strategy: when the outline is black or fully transparent, the fill is baked WHITE and tinted at draw
-	// (a black outline stays black under tinting), so any number of fore colors share one glyph. Non-black
-	// opaque outlines bake the actual colors and key the cache on them.
+	// Each character bakes a white fill (tinted with the fore colour at draw) and, on first use with a visible
+	// outline, a white edge stroke (tinted with the outline colour). Gradient fills bake their colours in.
+	// A draw call places every glyph, then draws all the edges and all the fills on top, like the string
+	// renderer does for a token: a letter's outline never bites into its neighbour's ink.
 	public class LuaGlyphText : IDisposable {
 		private CCachedFontRenderer? _font;
 		internal HashSet<LuaGlyphText>? _disposeList = null;
 
-		private readonly record struct GlyphKey(int CodePoint, int ForeArgb, int OutlineArgb, int GradTopArgb, int GradBottomArgb);
-		private sealed class GlyphEntry {
-			public LuaTexture? Tex;      // null for whitespace (advance only)
-			public double Advance;
-			public Color Tint;           // color applied at draw (White when the fore is baked in)
-		}
-		private readonly Dictionary<GlyphKey, GlyphEntry> _glyphs = [];
+		private readonly record struct FillKey(int CodePoint, int GradTopArgb, int GradBottomArgb);
+		private readonly Dictionary<FillKey, LuaTexture?> _fills = [];   // null = whitespace or a failed bake
+		private readonly Dictionary<int, LuaTexture?> _edges = [];
 		private readonly Dictionary<int, double> _advances = [];
+
+		private struct Placement {
+			public LuaTexture? Fill, Edge;
+			public double X, Y;          // glyph box origin before pixel snapping
+			public Color Fore, Outline;
+		}
+		private readonly List<Placement> _placements = [];
 
 		private static readonly Color DefaultFore = Color.White;
 		private static readonly Color DefaultOutline = Color.Black;
@@ -73,47 +77,52 @@ namespace OpenTaiko {
 
 		// ── glyph cache ─────────────────────────────────────────────────────────────
 
-		private static bool IsTintable(Color outline)
-			=> outline.A == 0 || (outline.R == 0 && outline.G == 0 && outline.B == 0);
+		private LuaTexture? Bake(string s, bool edgeOnly) {
+			if (_font == null || string.IsNullOrWhiteSpace(s)) return null;
+			// base cast: render directly, skipping CCachedFontRenderer's FIFO (it would hold a duplicate copy).
+			// A failed bake (e.g. the font resource was swapped by a language change) degrades to an
+			// advance-only glyph instead of aborting the caller's whole draw pass.
+			try {
+				using var bmp = edgeOnly
+					? ((CFontRenderer)_font).DrawTextEdgeOnly(s, Color.White, 30)
+					: ((CFontRenderer)_font).DrawText(s, Color.White, false);
+				var tex = new LuaTexture(OpenTaiko.tTextureCreate(bmp, false));
+				if (tex._texture == null) return null;
+				Interlocked.Increment(ref LiveGlyphs);
+				return tex;
+			} catch (Exception e) {
+				Trace.TraceWarning($"LuaGlyphText: glyph bake failed for '{s}': {e.Message}");
+				return null;
+			}
+		}
 
-		private GlyphEntry GetGlyph(int cp, Color fore, Color outline, Color? gradTop = null, Color? gradBottom = null) {
+		private LuaTexture? GetFill(int cp, Color? gradTop, Color? gradBottom) {
 			bool grad = gradTop.HasValue && gradBottom.HasValue;
-			// gradient glyphs bake their vertical gradient in and are never tinted; otherwise a black/transparent
-			// outline lets us bake WHITE once and tint the fore at draw so many fore colors share one glyph.
-			bool tintable = !grad && IsTintable(outline);
-			var key = new GlyphKey(cp,
-				grad ? fore.ToArgb() : (tintable ? Color.White.ToArgb() : fore.ToArgb()),
-				outline.ToArgb(),
-				grad ? gradTop.Value.ToArgb() : 0,
-				grad ? gradBottom.Value.ToArgb() : 0);
-			Color tint = (grad || !tintable) ? Color.White : fore;
-			if (_glyphs.TryGetValue(key, out var entry)) {
-				entry.Tint = tint;
-				return entry;
-			}
-			entry = new GlyphEntry { Advance = AdvanceOf(cp), Tint = tint };
+			var key = new FillKey(cp, grad ? gradTop.Value.ToArgb() : 0, grad ? gradBottom.Value.ToArgb() : 0);
+			if (_fills.TryGetValue(key, out var tex)) return tex;
 			string s = char.ConvertFromUtf32(cp);
-			if (!string.IsNullOrWhiteSpace(s) && _font != null) {
-				// base cast: render directly, skipping CCachedFontRenderer's FIFO (it would hold a duplicate copy).
-				// A failed bake (e.g. the font resource was swapped by a language change) degrades to an
-				// advance-only glyph instead of aborting the caller's whole draw pass.
-				try {
-					// The text renderer only paints a vertical gradient for a token that carries a <g.#top.#bottom>
-					// TAG — the DrawMode.Gradation flag and the gradient-colour args alone are ignored. So wrap the
-					// glyph in that tag to trigger it (the outline still bakes). Non-gradient glyphs bake flat.
-					string bake = grad
-						? $"<g.#{gradTop.Value.R:X2}{gradTop.Value.G:X2}{gradTop.Value.B:X2}.#{gradBottom.Value.R:X2}{gradBottom.Value.G:X2}{gradBottom.Value.B:X2}>{s}</g>"
-						: s;
-					using var bmp = ((CFontRenderer)_font).DrawText(bake, (grad || tintable) ? Color.White : fore, outline, null, 30, false);
-					entry.Tex = new LuaTexture(OpenTaiko.tTextureCreate(bmp, false));
-					if (entry.Tex != null) Interlocked.Increment(ref LiveGlyphs);
-				} catch (Exception e) {
-					Trace.TraceWarning($"LuaGlyphText: glyph bake failed for U+{cp:X4}: {e.Message}");
-					entry.Tex = null;
-				}
-			}
-			_glyphs[key] = entry;
-			return entry;
+			// The text renderer only paints a vertical gradient for a token wrapped in a <g.#top.#bottom> tag
+			// (the DrawMode.Gradation flag alone is ignored), so a gradient glyph bakes as that tagged token.
+			string bake = grad
+				? $"<g.#{gradTop.Value.R:X2}{gradTop.Value.G:X2}{gradTop.Value.B:X2}.#{gradBottom.Value.R:X2}{gradBottom.Value.G:X2}{gradBottom.Value.B:X2}>{s}</g>"
+				: s;
+			tex = Bake(bake, false);
+			_fills[key] = tex;
+			return tex;
+		}
+
+		private LuaTexture? GetEdge(int cp) {
+			if (_edges.TryGetValue(cp, out var tex)) return tex;
+			tex = Bake(char.ConvertFromUtf32(cp), true);
+			_edges[cp] = tex;
+			return tex;
+		}
+
+		private void Place(int cp, double gx, double gy, Color fore, Color outline, Color? gradTop, Color? gradBottom) {
+			var fill = GetFill(cp, gradTop, gradBottom);
+			var edge = outline.A > 0 ? GetEdge(cp) : null;
+			if (fill == null && edge == null) return;
+			_placements.Add(new Placement { Fill = fill, Edge = edge, X = gx, Y = gy, Fore = fore, Outline = outline });
 		}
 
 		// ── drawing ─────────────────────────────────────────────────────────────────
@@ -167,17 +176,12 @@ namespace OpenTaiko {
 			double startX = x - ax * boxW;
 			double startY = y - ay * boxH;
 
-			bool rot = rotationDeg != 0;
-			double rad = rotationDeg * Math.PI / 180.0;
-			double cosR = Math.Cos(rad), sinR = Math.Sin(rad);
-
 			for (int li = 0; li < lines.Count; li++) {
 				var line = lines[li];
 				double pen = 0;
 				double lineY = startY + li * LineHeight * sy;
 				for (int i = line.Start; i < line.Start + line.Count; i++) {
 					int cp = runes[i].CodePoint;
-					double adv = AdvanceOf(cp);
 					int styleId = runes[i].StyleId;
 					Color gFore = fore, gOutline = outline;
 					Color? gGradTop = null, gGradBottom = null;
@@ -187,49 +191,68 @@ namespace OpenTaiko {
 						if (st.Outline != null) gOutline = st.Outline.Value;
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
 					}
-					var glyph = GetGlyph(cp, gFore, gOutline, gGradTop, gGradBottom);
-					if (glyph.Tex != null) {
-						glyph.Tex.SetScale((float)(f * scale), (float)sy);
-						glyph.Tex.SetColor(glyph.Tint.R / 255f, glyph.Tint.G / 255f, glyph.Tint.B / 255f);
-						glyph.Tex.SetOpacity((float)opacity);
-						double gx = startX + pen * f * scale;
-						double gy = lineY;
-						if (rot) {
-							// rotate this glyph's centre about the anchor (x,y), then spin the glyph to match.
-							// SetRotation is CCW on screen, so the position rotation is the matching CCW form
-							// (y-down screen) — otherwise the glyphs and their placement disagree.
-							double gw = glyph.Tex.Width * f * scale;
-							double gh = glyph.Tex.Height * sy;
-							double relx = gx + gw / 2 - x, rely = gy + gh / 2 - y;
-							double rcx = x + relx * cosR + rely * sinR;
-							double rcy = y - relx * sinR + rely * cosR;
-							glyph.Tex.SetRotation((float)rotationDeg);
-							glyph.Tex.Draw(rcx - gw / 2, rcy - gh / 2);   // sub-pixel: rotated text must not snap
-							glyph.Tex.SetRotation(0);
-						} else {
-							double top = Math.Floor(gy);
-							double bot = top + glyph.Tex.Height * sy;
-							if (bot <= _clipY0 || top >= _clipY1) {
-								// fully outside the clip band: culled
-							} else if (top >= _clipY0 && bot <= _clipY1) {
-								glyph.Tex.Draw(Math.Floor(gx), top);          // upright: integer-crisp
-							} else {
-								// edge glyph: slice the visible band via a source rect (exact at sy=1,
-								// the menu/list case; scaled draws slice in source pixels)
-								double v0 = Math.Max(top, _clipY0), v1 = Math.Min(bot, _clipY1);
-								int srcY = (int)Math.Floor((v0 - top) / sy);
-								int srcH = (int)Math.Ceiling((v1 - v0) / sy);
-								if (srcH > 0) glyph.Tex.DrawRect(Math.Floor(gx), Math.Floor(v0), 0, srcY, glyph.Tex.Width, srcH);
-							}
-						}
-						glyph.Tex.SetScale(1, 1);
-						glyph.Tex.SetColor(1, 1, 1);
-						glyph.Tex.SetOpacity(1);
-					}
-					pen += adv;
+					Place(cp, startX + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
+					pen += AdvanceOf(cp);
 				}
 			}
+			Compose(opacity, (float)(f * scale), (float)sy, clip: true, rotationDeg, x, y);
 			return startX + boxW;
+		}
+
+		// Draws the placed glyphs: every edge first, then every fill on top. An upright glyph snaps to the
+		// nearest pixel of its exact pen position, which is how Skia places the glyphs of a drawn string
+		// (the engine's texture draw truncates, so the snap happens here). Rotated text keeps exact positions
+		// and ignores the clip band.
+		private void Compose(double opacity, float sx, float sy, bool clip, double rotationDeg, double ox, double oy) {
+			bool rot = rotationDeg != 0;
+			double rad = rotationDeg * Math.PI / 180.0;
+			double cosR = Math.Cos(rad), sinR = Math.Sin(rad);
+			bool anyEdge = false;
+			foreach (var p in _placements) if (p.Edge != null) { anyEdge = true; break; }
+
+			for (int pass = anyEdge ? 0 : 1; pass < 2; pass++) {
+				foreach (var p in _placements) {
+					var tex = pass == 0 ? p.Edge : p.Fill;
+					if (tex == null) continue;
+					Color tint = pass == 0 ? p.Outline : p.Fore;
+					tex.SetScale(sx, sy);
+					tex.SetColor(tint.R / 255f, tint.G / 255f, tint.B / 255f);
+					tex.SetOpacity((float)(pass == 0 ? opacity * tint.A / 255.0 : opacity));
+					if (rot) {
+						// rotate this glyph's centre about the anchor, then spin the glyph to match.
+						// SetRotation is CCW on screen, so the position rotation is the matching CCW form
+						// (y-down screen); otherwise the glyphs and their placement disagree.
+						double gw = tex.Width * sx;
+						double gh = tex.Height * sy;
+						double relx = p.X + gw / 2 - ox, rely = p.Y + gh / 2 - oy;
+						double rcx = ox + relx * cosR + rely * sinR;
+						double rcy = oy - relx * sinR + rely * cosR;
+						tex.SetRotation((float)rotationDeg);
+						tex.Draw(rcx - gw / 2, rcy - gh / 2);
+						tex.SetRotation(0);
+					} else {
+						double gx = Math.Floor(p.X + 0.5);
+						double top = Math.Floor(p.Y);
+						double bot = top + tex.Height * sy;
+						if (clip && (bot <= _clipY0 || top >= _clipY1)) {
+							// fully outside the clip band: culled
+						} else if (!clip || (top >= _clipY0 && bot <= _clipY1)) {
+							tex.Draw(gx, top);
+						} else {
+							// edge glyph: slice the visible band via a source rect (exact at sy=1,
+							// the menu/list case; scaled draws slice in source pixels)
+							double v0 = Math.Max(top, _clipY0), v1 = Math.Min(bot, _clipY1);
+							int srcY = (int)Math.Floor((v0 - top) / sy);
+							int srcH = (int)Math.Ceiling((v1 - v0) / sy);
+							if (srcH > 0) tex.DrawRect(gx, Math.Floor(v0), 0, srcY, tex.Width, srcH);
+						}
+					}
+					tex.SetScale(1, 1);
+					tex.SetColor(1, 1, 1);
+					tex.SetOpacity(1);
+				}
+			}
+			_placements.Clear();
 		}
 
 		// ── word-wrapped block ──────────────────────────────────────────────────────
@@ -277,7 +300,6 @@ namespace OpenTaiko {
 				double lineY = y + li * pitch;
 				for (int i = line.Start; i < line.Start + line.Count; i++) {
 					int cp = runes[i].CodePoint;
-					double adv = AdvanceOf(cp);
 					int styleId = runes[i].StyleId;
 					Color gFore = fore, gOutline = outline;
 					Color? gGradTop = null, gGradBottom = null;
@@ -287,19 +309,11 @@ namespace OpenTaiko {
 						if (st.Outline != null) gOutline = st.Outline.Value;
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
 					}
-					var glyph = GetGlyph(cp, gFore, gOutline, gGradTop, gGradBottom);
-					if (glyph.Tex != null) {
-						glyph.Tex.SetScale((float)scale, (float)scale);
-						glyph.Tex.SetColor(glyph.Tint.R / 255f, glyph.Tint.G / 255f, glyph.Tint.B / 255f);
-						glyph.Tex.SetOpacity((float)opacity);
-						glyph.Tex.Draw((int)Math.Floor(x + pen * scale), (int)Math.Floor(lineY));
-						glyph.Tex.SetScale(1, 1);
-						glyph.Tex.SetColor(1, 1, 1);
-						glyph.Tex.SetOpacity(1);
-					}
-					pen += adv;
+					Place(cp, x + pen * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
+					pen += AdvanceOf(cp);
 				}
 			}
+			Compose(opacity, (float)scale, (float)scale, clip: false, 0, x, y);
 			return (lines.Count - 1) * pitch + BoxHeight * scale;
 		}
 
@@ -310,13 +324,21 @@ namespace OpenTaiko {
 
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
-				foreach (var g in _glyphs.Values) {
-					if (g.Tex != null) {
-						g.Tex.Dispose();
+				foreach (var tex in _fills.Values) {
+					if (tex != null) {
+						tex.Dispose();
 						Interlocked.Decrement(ref LiveGlyphs);
 					}
 				}
-				_glyphs.Clear();
+				foreach (var tex in _edges.Values) {
+					if (tex != null) {
+						tex.Dispose();
+						Interlocked.Decrement(ref LiveGlyphs);
+					}
+				}
+				_fills.Clear();
+				_edges.Clear();
+				_placements.Clear();
 				_advances.Clear();
 				_font?.Dispose();
 				_disposeList?.Remove(this);

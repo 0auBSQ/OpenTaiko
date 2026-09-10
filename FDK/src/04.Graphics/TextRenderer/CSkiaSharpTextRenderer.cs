@@ -265,23 +265,25 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 					canvas.DrawPath(path, edgePaint);
 				}
 
-				if (tok.UseGradiant) {
-					//https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
-					paint.Shader = SKShader.CreateLinearGradient(
-						new SKPoint(0, 25),
-						new SKPoint(0, height - 25),
-						new SKColor[] {
-							new SKColor(tok.GradiantTop.R, tok.GradiantTop.G, tok.GradiantTop.B, tok.GradiantTop.A),
-							new SKColor(tok.GradiantBottom.R, tok.GradiantBottom.G, tok.GradiantBottom.B, tok.GradiantBottom.A) },
-						new float[] { 0, 1 },
-						SKShaderTileMode.Clamp);
-					paint.Color = new SKColor(0xffffffff);
-				} else {
-					paint.Shader = null;
-					paint.Color = new SKColor(tok.TextColor.R, tok.TextColor.G, tok.TextColor.B);
-				}
+				if (!drawMode.HasFlag(CFontRenderer.DrawMode.NoFill)) {
+					if (tok.UseGradiant) {
+						//https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/effects/shaders/linear-gradient
+						paint.Shader = SKShader.CreateLinearGradient(
+							new SKPoint(0, 25),
+							new SKPoint(0, height - 25),
+							new SKColor[] {
+								new SKColor(tok.GradiantTop.R, tok.GradiantTop.G, tok.GradiantTop.B, tok.GradiantTop.A),
+								new SKColor(tok.GradiantBottom.R, tok.GradiantBottom.G, tok.GradiantBottom.B, tok.GradiantBottom.A) },
+							new float[] { 0, 1 },
+							SKShaderTileMode.Clamp);
+						paint.Color = new SKColor(0xffffffff);
+					} else {
+						paint.Shader = null;
+						paint.Color = new SKColor(tok.TextColor.R, tok.TextColor.G, tok.TextColor.B);
+					}
 
-				canvas.DrawText(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25, paint);
+					canvas.DrawText(tok.s, 25 + x_offset, -paint.FontMetrics.Ascent + 25, paint);
+				}
 
 				// paint is a persistent member; release the per-token gradient shader so its native
 				// memory isn't leaked until finalization (the GC heap doesn't track it).

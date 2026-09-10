@@ -42,8 +42,9 @@ public class CFontRenderer : IDisposable {
 	[Flags]
 	public enum DrawMode {
 		Normal = 0,
-		Edge,
-		Gradation
+		Edge = 1,
+		Gradation = 2,
+		NoFill = 4   // stroke the edge but skip the fill (glyph-composed text draws outlines in their own pass)
 	}
 
 	[Flags]
@@ -113,6 +114,11 @@ public class CFontRenderer : IDisposable {
 
 	public SKBitmap DrawText(string drawstr, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradataionBottomColor, int edge_Ratio, bool keepCenter = false) {
 		return DrawText(drawstr, CFontRenderer.DrawMode.Edge | CFontRenderer.DrawMode.Gradation, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradataionBottomColor, edge_Ratio, keepCenter);
+	}
+
+	// the edge stroke alone, on the same bitmap geometry as DrawText
+	public SKBitmap DrawTextEdgeOnly(string drawstr, Color edgeColor, int edge_Ratio) {
+		return DrawText(drawstr, CFontRenderer.DrawMode.Edge | CFontRenderer.DrawMode.NoFill, Color.White, edgeColor, null, Color.White, Color.White, edge_Ratio, false);
 	}
 	protected SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		//横書きに対してのCorrectionは廃止
