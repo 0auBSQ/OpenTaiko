@@ -39,6 +39,8 @@ local DEF_BOX_Y, DEF_BOX_H = 770, 250
 local DEF_PORTRAIT = 210                      -- portrait square size
 local LINE_GAP = 8
 local DEFAULT_CPS = 42
+-- a glyph box anchored by its middle draws its ink high; centred labels move down by this much
+local NAME_NUDGE, CHOICE_NUDGE = 9, 8
 
 local THEME_DEFAULT = {
     face    = { 252, 248, 244, 255 },   -- box face (top of gradient; opaque — canvas bakes overwrite)
@@ -437,7 +439,7 @@ function Dialogue:draw()
             fb.pill:Draw(pillX - fb.m, self.boxY - 30 - fb.m)
             local nf = self.gfontName or self.fonts.name
             if self.gfontName then
-                nf:Draw(node.name, pillX + fb.pw / 2, self.boxY - 30 + fb.ph / 2 + 2,
+                nf:Draw(node.name, pillX + fb.pw / 2, self.boxY - 30 + fb.ph / 2 + NAME_NUDGE,
                     self:color(t.nameText[1], t.nameText[2], t.nameText[3]), nil, 1, 1, fb.pw - 24, "center")
             elseif nf then
                 nf:GetText(node.name, false, 600, self:color(t.nameText[1], t.nameText[2], t.nameText[3]), self:color(0, 0, 0)):Draw(pillX + 14, self.boxY - 24)
@@ -510,7 +512,9 @@ function Dialogue:draw()
         if self.ui == "popui" and self._fbox then
             local fb = self._fbox
             local totalH = #ch * (fb.rh + 10) - 10
-            local cy0 = self.boxY - totalH - 26
+            -- the rows stack above the box; with a speaker they clear the name pill (boxY - 30) too
+            local named = node.name and node.name ~= ""
+            local cy0 = (named and (self.boxY - 30 - 14) or (self.boxY - 26)) - totalH
             for i = 1, #ch do
                 local sel = (i == self.choiceIdx)
                 local ry = cy0 + (i - 1) * (fb.rh + 10)
@@ -523,9 +527,9 @@ function Dialogue:draw()
                 local cc = self:color(t.choiceText[1], t.choiceText[2], t.choiceText[3])
                 if self.gfont then
                     if sel then
-                        self.gfont:Draw("\u{25B8}", self.textX + 22, ry + fb.rh / 2, cc, self:color(0, 0, 0, 0), 1, 1, 0, "left")
+                        self.gfont:Draw("\u{25B8}", self.textX + 22, ry + fb.rh / 2 + CHOICE_NUDGE, cc, self:color(0, 0, 0, 0), 1, 1, 0, "left")
                     end
-                    self.gfont:Draw(ch[i].label, self.textX + 54, ry + fb.rh / 2,
+                    self.gfont:Draw(ch[i].label, self.textX + 54, ry + fb.rh / 2 + CHOICE_NUDGE,
                         cc, self:color(0, 0, 0, 0), 1, 1, fb.rw - 76, "left")
                 elseif self.fonts.text then
                     if sel then

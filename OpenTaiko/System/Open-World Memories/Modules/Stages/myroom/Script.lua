@@ -19,6 +19,8 @@ local I18N      = require("i18n")
 local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
 local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
+local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
+local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
 local NavInput = require("NavInput")
 local net      = MO.net
 
@@ -49,6 +51,9 @@ local mode = "play"            -- "play" | "dialogue" | "pc" | "phone" | "edit"
 local phoneUI = nil            -- PopUI manager for the phone (menu / number / join panes)
 local phoneJustOpened = false  -- consume the keypress edge that opened the phone
 local phoneFlow = nil          -- landlord conversation step
+local purse = nil              -- Lib/CoinBox: the purse shown over the landlord's offers
+local playPhoneSound           -- forward decl: Sounds/<stem>.ogg, lazily loaded (defined with the dialer)
+local ringT, ringScript, ringDue = 0, nil, false  -- an outgoing call: coin, then the ring, then the answer
 local phoneSfx = {}            -- cached dialable-number SFX (stem → sound|false); disposed in onDestroy
 local bombFx = nil             -- the "Canabi" bomb-storm state (declared here so onDestroy sees it)
 
@@ -178,7 +183,15 @@ function onStart()
     -- the dialogue's black outline = readable white-with-border messages on any background.
     dlg = Dialogue.new({ gfont = TEXT:CreateGlyphCached(26),
                          fonts = { name = TEXT:Create(30), text = TEXT:Create(26) }, portraits = {},
-                         theme = { text = { 255, 255, 255 } } })
+                         theme = { text = { 255, 255, 255 } },
+                         -- {sfx:purse} in a landlord line brings the purse up; any other name is a sound
+                         onSfx = function(name)
+                             if name == "purse" then Landlord.showPurse() else playPhoneSound(name) end
+                         end,
+                         -- the landlord's voice: deep, through a scrambler; nobody else on the line blips
+                         onBlip = function()
+                             if phoneFlow == "landlord" then playPhoneSound("blip_landlord" .. math.random(3)) end
+                         end, blipEvery = 3 })
 
     -- Bake the coin-shop furniture previews ONCE as SHARED textures (the shop reads them by key,
     -- reusing My Room's models without re-declaring them). GLB/builder furniture is rendered on the CPU
@@ -200,6 +213,9 @@ function activate()
     lastTs = 0
     I18N.detect()
     INPUT:SetMouseLocked(false)
+    Landlord.reset()                             -- the landlord forgives on every visit
+    purse:hide()
+    ringT, ringScript, ringDue = 0, nil, false
     if world ~= nil then return end
     LOADING:Add("Room", 5, function()
         world = OWM.World.new{ rw = RW, rh = RH, screenW = SCREEN_W, screenH = SCREEN_H,
@@ -243,6 +259,7 @@ function deactivate()
     JB.setDuck(false)                              -- reset the PC-screen crossfade for the next visit
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if hud then hud:disposeWidgets(); hud = nil end
+    purse:dispose()
     Pod.reset()
     -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
     pcall(function() OWM.ModelIcon.disposeAll() end)
@@ -367,9 +384,18 @@ local PHONE_THEME = {
         outline  = { 52, 58, 92, 255 },    text = { 52, 58, 92, 255 },
     },
 }
-local function closePhone()
+local function closePhone(hangUp)
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if mode == "phone" then mode = "play" end
+    if hangUp then playPhoneSound("phone_hangup") end
+end
+
+-- an outgoing call: a coin into the payphone, the ringing tone, then the other side answers with
+-- `script` (the dialogue starts once the ring is over)
+local function placeCall(script)
+    playPhoneSound("phone_coin")
+    mode = "dialogue"
+    ringT, ringScript, ringDue = 2.6, script, true     -- the ring starts once the coin has dropped
 end
 
 -- ── dialable numbers / easter eggs (data/phone_numbers.json) ──────────────────────────────────────
@@ -381,7 +407,7 @@ local function phoneNumbersDoc()
     end
     return phoneDoc
 end
-local function playPhoneSound(stem)
+playPhoneSound = function(stem)
     if phoneSfx[stem] == nil then
         local s = nil
         -- easter-egg sounds live in the STAGE's own Sounds/ folder (e.g. myroom/Sounds/egg.ogg) —
@@ -453,24 +479,8 @@ local function tickBombs(dt)
     end
     if bombFx.t >= bombFx.dur then bombFx = nil end
 end
--- the landlord: a greedy little man who sells wall-knock-throughs by the coin. All of his lines live in
--- data/dialogs.json (localized inline), the per-tier sales pitch in data/tiers.json (Room.TIERS
--- flavorLoc); {size}/{cost} are filled from the tier entry. The English fallbacks below only cover a
--- missing/broken dialogs.json — edit the JSON, not these.
-local LANDLORD_EN = {
-    name = "Landlord",
-    greeting_rich = "Well, well. If it is not my favourite tenant, come to make me a richer man.",
-    greeting_poor = "Ah, my favourite tenant. Or you would be, if your purse were not so tragically thin.",
-    offer_rich = "I can open you up to a roomier {size} for a mere {cost} coins. Cash up front, always. So then, do we have a deal?",
-    offer_poor = "I would gladly knock you through to a roomier {size}, but that is {cost} coins and yours are looking light. Come back when you can cover it. No coin, no keys.",
-    maxed = "You have already squeezed the biggest place I will ever rent you, and you paid dearly for every last tile. No more walls left to sell. What a shame I cannot charge you for the air.",
-    choice_yes = "Deal, extend it",
-    choice_no = "Not right now",
-    success = "{shake:14,0.5}A pleasure doing business! I will take that coin now. Mind your step around the fresh plaster, and do enjoy every tile you paid so handsomely for.",
-    broke = "Hah. Your purse says otherwise, friend. Come back when it is heavier and we shall talk.",
-    declined = "Suit yourself. But floor space only ever gets dearer, and my prices have never once gone down.",
-}
-
+-- the landlord's phone call lives in landlord.lua (script + answers, data/dialogs.json lines);
+-- the room only lends it the save file, the room, the extension, and the purse widget
 -- data/dialogs.json: named dialog lines localized inline ({en,ja,fr}); missing file/key → the fallback
 local dialogsDoc = nil
 local function dlgLoc(section, key, fallback)
@@ -489,31 +499,12 @@ local function dlgLoc(section, key, fallback)
     if ok and s and s ~= "" then return s end
     return fallback
 end
-local function LL(key) return dlgLoc("landlord", key, LANDLORD_EN[key] or key) end
+local function dlgDoc()
+    if dialogsDoc == nil then dlgLoc("landlord", "name", "") end
+    return dialogsDoc or nil
+end
 
-local function landlordFill(s, info)
-    s = s:gsub("{size}", info.iw .. "x" .. info.ih)
-    s = s:gsub("{cost}", tostring(info.cost))
-    return s
-end
-local function landlordScript()
-    if not room:canExtend() then
-        return { { name = LL("name"), text = LL("maxed") } }
-    end
-    local info = room:nextTierInfo()
-    local flavor = (info.flavorLoc and info.flavorLoc:GetString("")) or ""
-    local function joinSp(a, b) if a == "" then return b end if b == "" then return a end return a .. " " .. b end
-    if curSave().Coins < info.cost then
-        return { { name = LL("name"), text = LL("greeting_poor") },
-                 { name = LL("name"), text = landlordFill(joinSp(LL("offer_poor"), flavor), info) } }
-    end
-    return { { name = LL("name"), text = LL("greeting_rich") },
-             { name = LL("name"), text = landlordFill(joinSp(flavor, LL("offer_rich")), info),
-               choices = { { label = LL("choice_yes"), value = "yes" }, { label = LL("choice_no"), value = "no" } } } }
-end
-local function doExtend()
-    local info = room:nextTierInfo()
-    if not info then return false end
+local function doExtend(info)
     local sf = curSave()
     if sf.Coins < info.cost then return false end
     sf:SpendCoins(info.cost)
@@ -525,6 +516,17 @@ local function doExtend()
     saveRoom()
     return true
 end
+
+-- the purse sits on the dialogue box's top edge, level with the speaker's name pill (box y 770,
+-- pill at 740..794), at the right
+purse = CoinBox.new{ x = SCREEN_W - 60 - 300, y = 770 - 36 }
+Landlord.init{
+    save = function() return curSave() end,
+    room = function() return room end,
+    extend = doExtend,
+    dlgLoc = dlgLoc, dlgDoc = dlgDoc,
+    coinBox = purse,
+}
 
 -- jukebox context: closures over the stage's live state (guarded — world/room are nil until activate)
 JB.init{
@@ -598,11 +600,12 @@ buildPhoneMenu = function()
         onSelect = function(_, it)
             local v = it.value
             if v == "landlord" then
-                closePhone(); mode = "dialogue"; phoneFlow = "landlord"
-                dlg:start(landlordScript())
+                closePhone(); phoneFlow = "landlord"
+                placeCall(Landlord.script())
             elseif v == "number" then
                 buildPhoneTextPane(I18N.tr("Enter a number"), I18N.tr("number..."), 16, I18N.tr("Call"), function(t)
                     closePhone();
+                    playPhoneSound("phone_coin")
                     return dialPhone(t)  -- looks up data/phone_numbers.json (events/eggs)
                 end)
             elseif v == "invite" then
@@ -636,8 +639,7 @@ buildPhoneMenu = function()
             elseif v == "stophost" then
                 MO.leave(); closePhone(); msg = I18N.tr("You closed the room."); msgT = 4
             else
-                SHARED:GetSharedSound("Cancel"):Play()
-                closePhone()
+                closePhone(true)
                 return true
             end
         end,
@@ -647,6 +649,7 @@ end
 local function openPhone()
     mode = "phone"
     phoneJustOpened = true
+    playPhoneSound("phone_pickup")
     buildPhoneMenu()
 end
 
@@ -696,19 +699,11 @@ end
 
 local function onDialogueDone(result)
     if phoneFlow == "landlord" then
-        if result == "yes" then
-            phoneFlow = "end"
-            if doExtend() then
-                dlg:start({ { name = LL("name"), text = LL("success") } })
-            else
-                dlg:start({ { name = LL("name"), text = LL("broke") } })
-            end
-        elseif result == "no" then phoneFlow = "end"
-            dlg:start({ { name = LL("name"), text = LL("declined") } })
-        else mode = "play"; phoneFlow = nil end           -- "full room" / "cannot afford" node (no choice)
-    else
-        mode = "play"; phoneFlow = nil
+        local nxt = Landlord.onDone(result)
+        if nxt then dlg:start(nxt) ; return end
+        playPhoneSound("phone_cut")          -- he hangs up on you, every time
     end
+    mode = "play"; phoneFlow = nil
 end
 
 -- end an online session and drop back into our OWN room (a visitor leaving / being kicked, or a host
@@ -834,7 +829,12 @@ function update(ts)
         end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "dialogue" then
-        if dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
+        purse:update(dt)
+        if ringT > 0 then
+            ringT = ringT - dt
+            if ringDue and ringT <= 1.6 then ringDue = false ; playPhoneSound("phone_ring") end
+            if ringT <= 0 and ringScript then dlg:start(ringScript) ; ringScript = nil end
+        elseif dlg:update(dt) == "done" then onDialogueDone(dlg.result) end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "pod" then
         if Pod.update(dt) == "go" then
@@ -853,8 +853,7 @@ function update(ts)
             if phoneJustOpened then
                 phoneJustOpened = false      -- consume the keypress edge that opened the phone
             elseif phoneUI:update(ts) == "cancel" then
-                SHARED:GetSharedSound("Cancel"):Play()
-                closePhone()
+                closePhone(true)
             end
         else
             mode = "play"
@@ -1054,7 +1053,11 @@ function draw()
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 150)
         if playerSelUI then playerSelUI:draw() end
     elseif mode == "dialogue" then
+        if ringT > 0 then
+            hud:drawTextEx(26, I18N.tr("Calling…"), SCREEN_W / 2, SCREEN_H - 200, { 255, 235, 160 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
+        end
         dlg:draw()
+        purse:draw()
     elseif mode == "pod" then
         Pod.draw(hud, SCREEN_W, SCREEN_H)
     elseif mode == "pc" then

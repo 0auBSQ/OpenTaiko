@@ -101,6 +101,7 @@ return {
 	["You left the room."] = "ルームを退出しました。",
 	["The host closed the room."] = "ホストがルームを閉じました。",
 	["Connecting…"] = "接続中…",
+	["Calling…"] = "呼び出し中…",
 	["Could not join."] = "参加できませんでした。",
 	["Could not open the room."] = "ルームを開けませんでした。",
 	["Room open! The code was saved to a folder — share it so friends can Join by phone."] = "ルームを開きました！コードをフォルダに保存しました ― 友達に共有すれば電話から参加できます。",

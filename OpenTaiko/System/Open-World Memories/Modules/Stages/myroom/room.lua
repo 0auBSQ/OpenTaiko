@@ -699,7 +699,7 @@ function Room:spawnCell() return self.exitCol, self.ih end
 
 -- ── tier extension: the room sizes the (greedy) landlord sells, keeping furniture; wall items follow
 -- their wall. Loaded from data/tiers.json — TIERS[n] = interior IW×IH + the coin price to reach tier n
--- (tier 1 = the free base) + flavorLoc, the landlord's localized per-tier sales pitch. The table below
+-- (tier 1 = the free base). The landlord's lines per tier live in data/dialogs.json. The table below
 -- is the emergency fallback for a missing/broken file. ───────────────────────────────────────────────
 Room.TIERS = {
     { iw = 5,  ih = 5,  cost = 0 },
@@ -719,7 +719,7 @@ pcall(function()
     for i = 1, n do
         local node = jget(doc, i)
         tiers[i] = { iw = floor(jnum(jget(node, "iw")) or 5), ih = floor(jnum(jget(node, "ih")) or 5),
-                     cost = floor(jnum(jget(node, "cost")) or 0), flavorLoc = jloc(jget(node, "flavor")) }
+                     cost = floor(jnum(jget(node, "cost")) or 0) }
     end
     Room.TIERS = tiers
 end)
