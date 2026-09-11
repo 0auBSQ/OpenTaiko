@@ -245,17 +245,20 @@ function onStart()
     G.bgtx["sinfo_explicit"]            = TEXTURE:CreateTexture("Textures/sinfo_explicit.png")
     G.bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
     G.bgtx["sinfo_difficulties_vault"]      = TEXTURE:CreateTexture("Textures/sinfo_difficulties_vault.png")
-    G.bgtx["sinfo_difficulties_vault_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_vault_plus.png")
     for i = 0, 4 do
         G.bgtx["sinfo_difficulties_" .. i]           = TEXTURE:CreateTexture("Textures/sinfo_difficulties_" .. i .. ".png")
-        G.bgtx["sinfo_difficulties_" .. i .. "_plus"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_0_plus.png")
     end
+    -- Level digits, plus the "+" glyph of each set (drawn as the last character of a plus level, e.g. "9+")
     for i = 0, 9 do
         G.bgtx["levellabelsfill" .. i]   = TEXTURE:CreateTexture("Textures/BarLevelFill/" .. i .. ".png")
         G.bgtx["levellabels" .. i]       = TEXTURE:CreateTexture("Textures/BarLevel/" .. i .. ".png")
         G.bgtx["sinfo_level" .. i]       = TEXTURE:CreateTexture("Textures/SinfoLevel/" .. i .. ".png")
         G.bgtx["diffsel_levelcol" .. i]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/" .. i .. ".png")
     end
+    G.bgtx["levellabelsfill+"]  = TEXTURE:CreateTexture("Textures/BarLevelFill/plus.png")
+    G.bgtx["levellabels+"]      = TEXTURE:CreateTexture("Textures/BarLevel/plus.png")
+    G.bgtx["sinfo_level+"]      = TEXTURE:CreateTexture("Textures/SinfoLevel/plus.png")
+    G.bgtx["diffsel_levelcol+"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus.png")
     G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
@@ -268,9 +271,7 @@ function onStart()
     G.bars["selected-arrow-l"] = TEXTURE:CreateTexture("Textures/selected-arrow-l.png")
     G.bars["selected-arrow-r"] = TEXTURE:CreateTexture("Textures/selected-arrow-r.png")
     G.bars["levellabels"]        = TEXTURE:CreateTexture("Textures/bar_levelbg.png")
-    G.bars["levellabelsplus"]    = TEXTURE:CreateTexture("Textures/bar_levelbgplus.png")
     G.bars["levellabelsvault"]   = TEXTURE:CreateTexture("Textures/bar_levelbgvault.png")
-    G.bars["levellabelsplusvault"] = TEXTURE:CreateTexture("Textures/bar_levelbgplusvault.png")
     G.bars["levellabelsfire"]    = TEXTURE:CreateTexture("Textures/bar_levelbgfire.png")
     G.bars["levellabelsstorm"]   = TEXTURE:CreateTexture("Textures/bar_levelbgstorm.png")
     for i = 1, 5 do

@@ -11,6 +11,9 @@
         "selected_x_diff": 50,
         "selected_arrow_gap": 925,
         "label_x_offset": 288,
+        "plus_dx": -19,
+        "plus_dy": -27,
+        "plus_shift": -5,
         "barleft_x_offset": -67
     },
 
@@ -26,6 +29,8 @@
         "difficulties_origin_x": 1790,
         "difficulties_origin_y": 154,
         "difficulties_gap_y": 130,
+        "plus_dx": -8,
+        "plus_dy": -14,
         "has_video_origin_x": 1064,
         "has_video_origin_y": 257,
         "explicit_origin_x": 1266,
@@ -83,7 +88,7 @@
         "note": { "base_x": -115, "base_y": -78, "float_amp_x": 6, "float_amp_y": 12, "rot_amp": 1.5, "fixed_tilt": 5 },
         "option_bars": { "origin_x": 595, "origin_y": 139, "step_x": -245, "step_y": 57 },
         "difficulty_bars": { "origin_x": 173, "origin_y": 332, "step_x": 39, "step_y": 140 },
-        "level": { "center_x": 399, "center_y": 108, "digit_step_x": 34, "digit_step_y": -9 },
+        "level": { "center_x": 399, "center_y": 108, "digit_step_x": 34, "digit_step_y": -9, "plus_dx": 7, "plus_dy": -25 },
         "charter": { "center_x": 551, "center_y": 58, "step_x": 7, "step_y": 26, "max_width": 100, "rotation": 13.76, "max_count": 3 },
         "vault": { "center_x": 178, "center_y": 215, "max_width": 222 },
         "player_selector": { "split_y": 292, "diff_offset_x": 8, "diff_offset_y": -7, "opt_width": 290, "opt_offset_x": 22, "opt_offset_y": -6 },

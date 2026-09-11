@@ -27,10 +27,18 @@ local SONGLIST_TEXT_OFFSET_Y      = CFG.num("song_list.text_offset_y", 15)
 local SONGLIST_SELECTED_X_DIFF    = CFG.num("song_list.selected_x_diff", 50)
 local SONGLIST_SELECTED_ARROW_GAP = CFG.num("song_list.selected_arrow_gap", 925)
 local SONGBAR_LABEL_X_OFFSET      = CFG.num("song_list.label_x_offset", 288)
+-- The "+" of a plus level rides the last digit's top-right corner: its centre, from the digits' right cell
+-- edge and their centre line (BarLevel/plus.png)
+local SONGBAR_PLUS_DX             = CFG.num("song_list.plus_dx", -19)
+local SONGBAR_PLUS_DY             = CFG.num("song_list.plus_dy", -27)
+-- the plus overhangs the digits' ink by ~9px, so the whole number moves left by half of that to stay centred
+local SONGBAR_PLUS_SHIFT          = CFG.num("song_list.plus_shift", -5)
 
 local SONGINFO_DIFFICULTIES_ORIGIN_X = CFG.num("song_info.difficulties_origin_x", 1790)
 local SONGINFO_DIFFICULTIES_ORIGIN_Y = CFG.num("song_info.difficulties_origin_y", 154)
 local SONGINFO_DIFFICULTIES_GAP_Y    = CFG.num("song_info.difficulties_gap_y", 130)
+local SONGINFO_PLUS_DX               = CFG.num("song_info.plus_dx", -8)
+local SONGINFO_PLUS_DY               = CFG.num("song_info.plus_dy", -14)
 local SONGINFO_HASVIDEO_ORIGIN_X     = CFG.num("song_info.has_video_origin_x", 1064)
 local SONGINFO_HASVIDEO_ORIGIN_Y     = CFG.num("song_info.has_video_origin_y", 257)
 local SONGINFO_EXPLICIT_ORIGIN_X     = CFG.num("song_info.explicit_origin_x", 1266)
@@ -106,15 +114,32 @@ local function drawLevelTag(lv, x, y)
     else
         G.bars["levellabelsstorm"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
     end
+    if lv.isPlus then x = x + SONGBAR_PLUS_SHIFT end
     G.drawNumberCentered(lv.lv, "levellabels", x, y)
     -- Fill numbers over the base ones, tinted to the genre (song bar) colour brightened 50% (any level)
     G.drawNumberCentered(lv.lv, "levellabelsfill", x, y, lv.fillColor)
     if lv.isPlus then
-        if lv.isVault then
-            G.bars["levellabelsplusvault"]:DrawAtAnchor(x, y, "center")
-        else
-            G.bars["levellabelsplus"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
-        end
+        -- the "+" overlaps the last digit's top-right corner
+        local px = x + G.calculateNumberWidth(lv.lv, "levellabels") / 2 + SONGBAR_PLUS_DX
+        local py = y + SONGBAR_PLUS_DY
+        G.bgtx["levellabels+"]:DrawAtAnchor(px, py, "center")
+        local fill = G.bgtx["levellabelsfill+"]
+        fill:SetColor(lv.fillColor or COL_WHITE)
+        fill:DrawAtAnchor(px, py, "center")
+        fill:SetColor(COL_WHITE)
+    end
+end
+
+-- Level number of a song-info difficulty icon, centred at (cx,cy); a plus level's "+" overlaps the last
+-- digit's top-right corner (SinfoLevel/plus.png)
+local function drawInfoLevel(d, cx, cy, opacity)
+    G.drawNumberCentered(d.level, "sinfo_level", cx, cy, nil, opacity)
+    if d.isPlus then
+        local plus = G.bgtx["sinfo_level+"]
+        plus:SetOpacity(opacity)
+        plus:DrawAtAnchor(cx + G.calculateNumberWidth(d.level, "sinfo_level") / 2 + SONGINFO_PLUS_DX,
+            cy + SONGINFO_PLUS_DY, "center")
+        plus:SetOpacity(1)
     end
 end
 
@@ -387,16 +412,7 @@ function M.drawPanel()
                             difftx:SetOpacity(G.difficultyFade4 / 255)
                             difftx:Draw(xpos, ypos)
                             difftx:SetOpacity(1)
-                            G.drawNumberCentered(d.level, "sinfo_level",
-                                xpos + difftx.Width / 2,
-                                ypos + difftx.Height / 2,
-                                nil, G.difficultyFade4 / 255)
-                            if d.isPlus then
-                                local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
-                                plustx:SetOpacity(G.difficultyFade4 / 255)
-                                plustx:Draw(xpos, ypos)
-                                plustx:SetOpacity(1)
-                            end
+                            drawInfoLevel(d, xpos + difftx.Width / 2, ypos + difftx.Height / 2, G.difficultyFade4 / 255)
                         end
                     elseif d == nil then
                         -- Vault songs: never show the "missing" indicator
@@ -406,13 +422,7 @@ function M.drawPanel()
                     else
                         local difftx = isVaultSong and G.bgtx["sinfo_difficulties_vault"] or G.bgtx["sinfo_difficulties_" .. i]
                         difftx:Draw(xpos, ypos)
-                        G.drawNumberCentered(d.level, "sinfo_level",
-                            xpos + difftx.Width / 2,
-                            ypos + difftx.Height / 2)
-                        if d.isPlus then
-                            local plustx = isVaultSong and G.bgtx["sinfo_difficulties_vault_plus"] or G.bgtx["sinfo_difficulties_" .. i .. "_plus"]
-                            plustx:Draw(xpos, ypos)
-                        end
+                        drawInfoLevel(d, xpos + difftx.Width / 2, ypos + difftx.Height / 2, 1)
                     end
                 end
             end

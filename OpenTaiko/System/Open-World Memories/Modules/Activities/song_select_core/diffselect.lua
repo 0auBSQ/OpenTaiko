@@ -64,6 +64,10 @@ local LVL_CX       = CFG.num("difficulty_select.level.center_x", 399)
 local LVL_CY       = CFG.num("difficulty_select.level.center_y", 108)
 local LVL_DIGIT_DX = CFG.num("difficulty_select.level.digit_step_x", 34)
 local LVL_DIGIT_DY = CFG.num("difficulty_select.level.digit_step_y", -9)
+-- A plus level's "+" (LevelCol/plus.png) rides the last digit's top-right corner: its centre from that
+-- digit's slot centre
+local LVL_PLUS_DX  = CFG.num("difficulty_select.level.plus_dx", 7)
+local LVL_PLUS_DY  = CFG.num("difficulty_select.level.plus_dy", -25)
 
 -- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
 -- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
@@ -239,25 +243,33 @@ local function drawPlayerSelector(i, bx, by, barTex, isOption, opacity)
     end
 end
 
--- LevelCol number for a difficulty bar whose Note-local top-left is (bx,by).
-local function drawLevelNumber(level, difficulty, isVault, bx, by, opacity)
+-- LevelCol number for a difficulty bar whose Note-local top-left is (bx,by). The digits stay centred; a
+-- plus level's "+" overlaps the last digit's top-right corner, in the same tint and Note rotation.
+local function drawLevelNumber(level, isPlus, difficulty, isVault, bx, by, opacity)
     local str = tostring(level)
     local n   = #str
     local col = isVault and LVL_VAULT_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
     local setcx, setcy = bx + LVL_CX, by + LVL_CY
+    local function glyph(tex, lx, ly)
+        local cx, cy = nmap(lx, ly)
+        tex:SetRotation(nAngleDeg)
+        tex:SetColor(col)
+        tex:SetOpacity(opacity)
+        tex:DrawAtAnchor(cx, cy, "center")
+        tex:SetRotation(0)
+        tex:SetColor(COL_WHITE)
+        tex:SetOpacity(1)
+    end
     for k = 1, n do
         local tex = G.bgtx["diffsel_levelcol" .. string.sub(str, k, k)]
         if tex then
             local off = (k - 1) - (n - 1) / 2
-            local cx, cy = nmap(setcx + off * LVL_DIGIT_DX, setcy + off * LVL_DIGIT_DY)
-            tex:SetRotation(nAngleDeg)
-            tex:SetColor(col)
-            tex:SetOpacity(opacity)
-            tex:DrawAtAnchor(cx, cy, "center")
-            tex:SetRotation(0)
-            tex:SetColor(COL_WHITE)
-            tex:SetOpacity(1)
+            glyph(tex, setcx + off * LVL_DIGIT_DX, setcy + off * LVL_DIGIT_DY)
         end
+    end
+    if isPlus and G.bgtx["diffsel_levelcol+"] then
+        local off = (n - 1) / 2
+        glyph(G.bgtx["diffsel_levelcol+"], setcx + off * LVL_DIGIT_DX + LVL_PLUS_DX, setcy + off * LVL_DIGIT_DY + LVL_PLUS_DY)
     end
 end
 
@@ -321,7 +333,7 @@ function M.drawPanel()
             end
             drawTexTL(tex, bx, by, opacityNorm)
             drawCharters(barinfo.charters, bx, by, opacityNorm)
-            drawLevelNumber(barinfo.level, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
+            drawLevelNumber(barinfo.level, barinfo.isplus, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
 
             if barinfo.vault and barinfo.vaultName ~= nil and barinfo.vaultName ~= "" then
                 ensureLabelFonts()
