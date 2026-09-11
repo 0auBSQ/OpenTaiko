@@ -1,0 +1,123 @@
+{
+  "_comment": "Nameplate type names (fr); missing ids fall back to lang/en.",
+  "0": {
+    "name": "Bois"
+  },
+  "1": {
+    "name": "Cuivre"
+  },
+  "2": {
+    "name": "Améthyste"
+  },
+  "3": {
+    "name": "Nature"
+  },
+  "6": {
+    "name": "Cendre"
+  },
+  "7": {
+    "name": "Arc-en-ciel"
+  },
+  "8": {
+    "name": "Espace"
+  },
+  "9": {
+    "name": "Diamant"
+  },
+  "10": {
+    "name": "Misery"
+  },
+  "11": {
+    "name": "Or"
+  },
+  "12": {
+    "name": "Perle"
+  },
+  "13": {
+    "name": "Platine"
+  },
+  "15": {
+    "name": "Dashy"
+  },
+  "16": {
+    "name": "Bleu"
+  },
+  "17": {
+    "name": "Rouge"
+  },
+  "19": {
+    "name": "IA"
+  },
+  "20": {
+    "name": "Ciel"
+  },
+  "21": {
+    "name": "Jaune"
+  },
+  "22": {
+    "name": "Crème"
+  },
+  "23": {
+    "name": "Mer"
+  },
+  "24": {
+    "name": "Vert"
+  },
+  "25": {
+    "name": "Chapitre I"
+  },
+  "26": {
+    "name": "Chapitre II"
+  },
+  "27": {
+    "name": "Chapitre III"
+  },
+  "28": {
+    "name": "OpTk clair"
+  },
+  "29": {
+    "name": "OpTk sombre"
+  },
+  "31": {
+    "name": "Nuit"
+  },
+  "32": {
+    "name": "Chapitre IV"
+  },
+  "33": {
+    "name": "Performance Clear"
+  },
+  "34": {
+    "name": "Performance Full Combo"
+  },
+  "35": {
+    "name": "Performance Perfect"
+  },
+  "37": {
+    "name": "Chapitre V"
+  },
+  "38": {
+    "name": "V-ENTURE"
+  },
+  "39": {
+    "name": "Historique Clear"
+  },
+  "40": {
+    "name": "Historique Full Combo"
+  },
+  "41": {
+    "name": "Historique Perfect"
+  },
+  "42": {
+    "name": "Ryuto Setsujin"
+  },
+  "43": {
+    "name": "Lever de soleil"
+  },
+  "44": {
+    "name": "Chapitre VI"
+  },
+  "45": {
+    "name": "Un nouveau monde"
+  }
+}

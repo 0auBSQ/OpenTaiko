@@ -1,0 +1,57 @@
+{
+  "_comment": "Display names for data/furniture.json (ja). Missing ids fall back to lang/en.",
+  "desk": {
+    "name": "机"
+  },
+  "chair": {
+    "name": "椅子"
+  },
+  "table": {
+    "name": "テーブル"
+  },
+  "sofa": {
+    "name": "ソファ"
+  },
+  "bookshelf": {
+    "name": "本棚"
+  },
+  "plant": {
+    "name": "観葉植物"
+  },
+  "floorlamp": {
+    "name": "フロアランプ"
+  },
+  "bed": {
+    "name": "ベッド"
+  },
+  "tv": {
+    "name": "テレビ"
+  },
+  "computer": {
+    "name": "パソコン"
+  },
+  "arcade": {
+    "name": "アーケード筐体"
+  },
+  "arcade_neon": {
+    "name": "ネオンアーケード筐体"
+  },
+  "pod": {
+    "name": "謎のポッド"
+  },
+  "clock": {
+    "name": "壁掛け時計"
+  },
+  "poster_nokon": {
+    "name": "ノコンの肖像"
+  },
+  "poster_bol": {
+    "name": "ボルの肖像"
+  },
+  "phone": {
+    "name": "電話"
+  },
+  "jukebox": {
+    "name": "ジュークボックス"
+  }
+}

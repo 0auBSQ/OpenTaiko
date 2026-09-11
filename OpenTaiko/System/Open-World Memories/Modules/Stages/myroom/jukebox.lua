@@ -22,6 +22,7 @@
 
 local PopUI = require("PopUI")
 local I18N = require("i18n")
+local T = I18N.texts("jukebox")   -- lang/<code>/jukebox.json
 
 local JB = {}
 
@@ -74,7 +75,7 @@ local netDirty, netAt, netNow = false, 0, 0
 local duck = { cur = 1, target = 1, delay = 0 }
 local volAcc, endAcc, glowAcc = 1, 0, 0
 
-local function tr(s) return I18N.tr(s) end
+local function tr(id) return T:tr(id) end
 local function clamp(v, a, b) if v < a then return a end if v > b then return b end return v end
 
 -- ── song list (filtered, grouped by genre) ─────────────────────────────────────────────────────
@@ -427,7 +428,7 @@ function JB.applyNetState(t)
     if not sameSrc then
         if kind == "bgm" then
             pb.speed = speed
-            pbStart({ kind = "bgm", title = tr("My Room BGM") }, pos)
+            pbStart({ kind = "bgm", title = tr("bgm_title") }, pos)
         else
             local e = resolveRemote(t.md5, t.uid, t.title)
             pb.speed = speed
@@ -474,7 +475,7 @@ end
 local function playEntry(e, item)
     local src
     if e.kind == "bgm" then
-        src = { kind = "bgm", title = tr("My Room BGM") }
+        src = { kind = "bgm", title = tr("bgm_title") }
     else
         src = { kind = "song", title = e.title, subtitle = e.subtitle, genre = e.genre,
                 audioPath = e.audioPath, node = e.node, jacket = e.jacket, uid = e.uid, md5 = e.md5 }
@@ -494,7 +495,7 @@ end
 
 local function listItems()
     if tab == "bgm" then
-        return { { text = tr("My Room BGM"), value = { kind = "bgm", title = tr("My Room BGM") } } }
+        return { { text = tr("bgm_title"), value = { kind = "bgm", title = tr("bgm_title") } } }
     end
     if not ensureGrouped() then return {} end
     local items = {}
@@ -549,7 +550,7 @@ end
 -- the right pane always shows the PLAYING source (never the hovered row)
 local function updateRightPane()
     local e = pb.src
-    if W.title then W.title:setText((e and e.title) or tr("Nothing playing")) end
+    if W.title then W.title:setText((e and e.title) or tr("nothing_playing")) end
     if W.subtitle then
         local sub = e and e.subtitle or ""
         W.subtitle:setText(sub)
@@ -601,10 +602,10 @@ function JB._rebuildList()
     end
     if W.waiting then
         if tab == "songs" and not songsReady() then
-            W.waiting:setText(tr("Sorting the records... the song list is still being prepared."))
+            W.waiting:setText(tr("waiting"))
             W.waiting:setVisible(true)
         elseif tab == "songs" and #items == 0 then
-            W.waiting:setText(tr("No playable songs found."))
+            W.waiting:setText(tr("no_songs"))
             W.waiting:setVisible(true)
         else
             W.waiting:setVisible(false)
@@ -622,16 +623,16 @@ local function switchTab(t)
     JB._rebuildList()
 end
 
-local function speedText() return tr("Speed") .. string.format("  ×%.2f", pb.speed) end
+local function speedText() return tr("speed") .. string.format("  ×%.2f", pb.speed) end
 
 local function buildUI(itemName, playerIndex)
     ui = PopUI.new{ theme = ctx and ctx.theme or nil, navPlayer = (playerIndex or 0) + 1 }
     W = {}
-    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = itemName or tr("Jukebox") }
-    W.tabBgm = ui:button{ x = TAB.x, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("BGM"),
+    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = itemName or tr("title") }
+    W.tabBgm = ui:button{ x = TAB.x, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("tab_bgm"),
                           accent = (tab == "bgm"),
                           onClick = function() switchTab("bgm") end }
-    W.tabSongs = ui:button{ x = TAB.x + TAB.w + TAB.gap, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("Songs"),
+    W.tabSongs = ui:button{ x = TAB.x + TAB.w + TAB.gap, y = TAB.y, w = TAB.w, h = TAB.h, text = tr("tab_songs"),
                             accent = (tab == "songs"),
                             onClick = function() switchTab("songs") end }
     -- sticky back (song level only): fixed at the top of the list column, never scrolls with it
@@ -643,14 +644,14 @@ local function buildUI(itemName, playerIndex)
     W.backBtn:setVisible(false)
     -- right pane: NOW-PLAYING title/subtitle + transport (centered labels take their CENTER x;
     -- both sit clear above the jacket box at JACKET_Y)
-    W.title = ui:label{ x = RIGHT_CX, y = PANEL.y + 96, w = RIGHT.w, h = 44, text = tr("Nothing playing"),
+    W.title = ui:label{ x = RIGHT_CX, y = PANEL.y + 96, w = RIGHT.w, h = 44, text = tr("nothing_playing"),
                         size = 32, align = "center", maxWidth = RIGHT.w }
     W.subtitle = ui:label{ x = RIGHT_CX, y = PANEL.y + 148, w = RIGHT.w, h = 30, text = "",
                            size = 21, align = "center", maxWidth = RIGHT.w }
     W.subtitle:setVisible(false)
     W.waiting = ui:label{ x = LIST.x + LIST.w / 2, y = LIST.y + 40, w = LIST.w, h = 48, size = 26,
                           align = "center", maxWidth = LIST.w,
-                          text = tr("Sorting the records... the song list is still being prepared.") }
+                          text = tr("waiting") }
     W.waiting:setVisible(false)
     -- icon transport (language-agnostic, like a real audio player): ▶/⏸ toggles, ⏹, and 🔁 that
     -- stays lit (accent) while repeat is on
@@ -887,7 +888,7 @@ function JB._doRestore(t)
     local pos = math.max(0, tonumber(t.pos) or 0)
     local src
     if t.kind == "bgm" then
-        src = { kind = "bgm", title = tr("My Room BGM") }
+        src = { kind = "bgm", title = tr("bgm_title") }
     else
         local e = ((t.md5 or "") ~= "") and resolveRemote(t.md5, t.uid, t.title) or nil
         if e == nil then resScan = nil; return end       -- library changed: skip (no background scan)

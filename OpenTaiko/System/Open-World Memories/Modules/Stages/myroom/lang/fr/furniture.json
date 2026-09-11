@@ -1,0 +1,57 @@
+{
+  "_comment": "Display names for data/furniture.json (fr). Missing ids fall back to lang/en.",
+  "desk": {
+    "name": "Bureau"
+  },
+  "chair": {
+    "name": "Chaise"
+  },
+  "table": {
+    "name": "Table"
+  },
+  "sofa": {
+    "name": "Canapé"
+  },
+  "bookshelf": {
+    "name": "Bibliothèque"
+  },
+  "plant": {
+    "name": "Plante en pot"
+  },
+  "floorlamp": {
+    "name": "Lampadaire"
+  },
+  "bed": {
+    "name": "Lit"
+  },
+  "tv": {
+    "name": "Téléviseur"
+  },
+  "computer": {
+    "name": "Ordinateur"
+  },
+  "arcade": {
+    "name": "Borne d'arcade"
+  },
+  "arcade_neon": {
+    "name": "Borne d'arcade néon"
+  },
+  "pod": {
+    "name": "Capsule mystérieuse"
+  },
+  "clock": {
+    "name": "Horloge murale"
+  },
+  "poster_nokon": {
+    "name": "Portrait de Nokon"
+  },
+  "poster_bol": {
+    "name": "Portrait de Bol"
+  },
+  "phone": {
+    "name": "Téléphone"
+  },
+  "jukebox": {
+    "name": "Juke-box"
+  }
+}

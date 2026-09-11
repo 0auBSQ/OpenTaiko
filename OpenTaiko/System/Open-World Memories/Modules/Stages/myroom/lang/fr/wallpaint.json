@@ -1,0 +1,27 @@
+{
+  "_comment": "Display names for data/wallpaint.json (fr). Missing ids fall back to lang/en.",
+  "plaster": {
+    "name": "Plâtre"
+  },
+  "blue": {
+    "name": "Bleu ciel"
+  },
+  "beige": {
+    "name": "Beige chaud"
+  },
+  "sage": {
+    "name": "Vert sauge"
+  },
+  "brick": {
+    "name": "Mur de briques"
+  },
+  "rock": {
+    "name": "Mur rocheux"
+  },
+  "stonewall": {
+    "name": "Mur de pierre"
+  },
+  "default_paint": {
+    "name": "Mur par défaut"
+  }
+}

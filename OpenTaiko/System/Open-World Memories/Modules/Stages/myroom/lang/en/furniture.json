@@ -1,0 +1,57 @@
+{
+  "_comment": "Display names for data/furniture.json, English (the fallback for every other language).",
+  "desk": {
+    "name": "Desk"
+  },
+  "chair": {
+    "name": "Chair"
+  },
+  "table": {
+    "name": "Table"
+  },
+  "sofa": {
+    "name": "Sofa"
+  },
+  "bookshelf": {
+    "name": "Bookshelf"
+  },
+  "plant": {
+    "name": "Potted Plant"
+  },
+  "floorlamp": {
+    "name": "Floor Lamp"
+  },
+  "bed": {
+    "name": "Bed"
+  },
+  "tv": {
+    "name": "TV"
+  },
+  "computer": {
+    "name": "Computer"
+  },
+  "arcade": {
+    "name": "Arcade Cabinet"
+  },
+  "arcade_neon": {
+    "name": "Neon Arcade Cabinet"
+  },
+  "pod": {
+    "name": "Mysterious Pod"
+  },
+  "clock": {
+    "name": "Wall Clock"
+  },
+  "poster_nokon": {
+    "name": "Nokon Portrait"
+  },
+  "poster_bol": {
+    "name": "Bol Portrait"
+  },
+  "phone": {
+    "name": "Phone"
+  },
+  "jukebox": {
+    "name": "Jukebox"
+  }
+}

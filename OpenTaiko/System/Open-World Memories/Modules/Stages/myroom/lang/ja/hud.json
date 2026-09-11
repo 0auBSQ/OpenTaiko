@@ -1,0 +1,18 @@
+{
+  "_comment": "Japanese texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "ctl_move": "WASD — 移動",
+  "ctl_orbit": "右クリック / Q·E — 視点回転",
+  "ctl_zoom": "ホイール — ズーム",
+  "ctl_edit": "Tab — 部屋を編集",
+  "ctl_leave": "Esc — 退出",
+  "ctl_leave_visit": "Esc / ドア — 訪問を終える",
+  "prompt_computer": "[Enter] パソコンを使う",
+  "prompt_phone": "[Enter] 電話を使う",
+  "prompt_lamp": "[Enter] ランプを切り替え",
+  "prompt_jukebox": "[Enter] 音楽をかける",
+  "prompt_pod": "[Enter] 調べる",
+  "prompt_exit": "[Enter] 部屋を出る",
+  "prompt_switch": "[Tab] フォーカス切り替え",
+  "player_entry": "プレイヤー%d — %s",
+  "whose_room": "誰の部屋？"
+}

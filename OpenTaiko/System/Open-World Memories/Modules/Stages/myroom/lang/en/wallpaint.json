@@ -1,0 +1,27 @@
+{
+  "_comment": "Display names for data/wallpaint.json, English (the fallback for every other language).",
+  "plaster": {
+    "name": "Plaster"
+  },
+  "blue": {
+    "name": "Sky Blue"
+  },
+  "beige": {
+    "name": "Warm Beige"
+  },
+  "sage": {
+    "name": "Sage Green"
+  },
+  "brick": {
+    "name": "Brick Wall"
+  },
+  "rock": {
+    "name": "Rock Wall"
+  },
+  "stonewall": {
+    "name": "Stone Wall"
+  },
+  "default_paint": {
+    "name": "Default Wall"
+  }
+}

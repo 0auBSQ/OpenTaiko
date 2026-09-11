@@ -1,0 +1,27 @@
+{
+  "_comment": "Display names for data/wallpaint.json (ja). Missing ids fall back to lang/en.",
+  "plaster": {
+    "name": "漆喰"
+  },
+  "blue": {
+    "name": "スカイブルー"
+  },
+  "beige": {
+    "name": "ベージュ"
+  },
+  "sage": {
+    "name": "セージ"
+  },
+  "brick": {
+    "name": "レンガの壁"
+  },
+  "rock": {
+    "name": "岩の壁"
+  },
+  "stonewall": {
+    "name": "石壁"
+  },
+  "default_paint": {
+    "name": "標準の壁"
+  }
+}

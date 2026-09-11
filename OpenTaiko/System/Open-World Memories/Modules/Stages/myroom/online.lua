@@ -20,6 +20,7 @@
 -- the decoder needs no key-enumeration helper; furniture/wallItems ship as object arrays.
 
 local I18N = require("i18n")
+local PHONE = I18N.texts("phone")   -- lang/<code>/phone.json
 
 local MO = {}
 local C   -- the context (set by MO.init)
@@ -167,26 +168,26 @@ end
 function MO.host()
     NET:SetLocalPlayer(MO.selfInfo())
     local code = NET:CreateRoom("myroom", "", 8)
-    if not code or code == "" then net.msg = I18N.tr("Could not open the room."); return false end
+    if not code or code == "" then net.msg = PHONE:tr("host_failed"); return false end
     net.code, net.online, net.isHost, net.connecting = code, true, true, false
     net.nameByPeer, net.posByPeer = {}, {}
     STORAGE:WriteLobbyCode("myroom.txt", code)
     STORAGE:RevealLobbyCodes()
     MO.refreshRoster()
-    net.msg = I18N.tr("Room open! The code was saved to a folder — share it so friends can Join by phone.")
+    net.msg = PHONE:tr("host_open")
     return true
 end
 
 function MO.join(code)
     code = (code or ""):gsub("%s", "")               -- strip whitespace from a pasted code
-    if code == "" then net.msg = I18N.tr("No code entered."); return false end
+    if code == "" then net.msg = PHONE:tr("code_empty"); return false end
     local sid = NET:PeekStageId(code)
     if sid ~= "myroom" then net.msg = sid and ("That code is for a '" .. sid .. "' room, not My Room.") or "That code isn't valid."; return false end
     NET:SetLocalPlayer(MO.selfInfo())
     net.connecting, net.isHost, net.gotRoom = true, false, false
     net.nameByPeer, net.posByPeer = {}, {}
     NET:JoinRoom(code)
-    net.msg = I18N.tr("Connecting…")
+    net.msg = PHONE:tr("connecting")
     return true
 end
 

@@ -1,0 +1,24 @@
+{
+  "_comment": "Display names for data/floordeco.json (fr). Missing ids fall back to lang/en.",
+  "wood": {
+    "name": "Plancher en bois"
+  },
+  "carpet": {
+    "name": "Tapis rouge"
+  },
+  "stone": {
+    "name": "Sol en pierre"
+  },
+  "grass": {
+    "name": "Sol herbeux"
+  },
+  "sand": {
+    "name": "Sol sablonneux"
+  },
+  "snow": {
+    "name": "Sol enneigé"
+  },
+  "default_floor": {
+    "name": "Sol par défaut"
+  }
+}

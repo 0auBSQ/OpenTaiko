@@ -1,0 +1,123 @@
+{
+  "_comment": "Nameplate type names, English (the fallback for every other language).",
+  "0": {
+    "name": "Wood"
+  },
+  "1": {
+    "name": "Copper"
+  },
+  "2": {
+    "name": "Amethyst"
+  },
+  "3": {
+    "name": "Nature"
+  },
+  "6": {
+    "name": "Ash"
+  },
+  "7": {
+    "name": "Rainbow"
+  },
+  "8": {
+    "name": "Space"
+  },
+  "9": {
+    "name": "Diamond"
+  },
+  "10": {
+    "name": "Misery"
+  },
+  "11": {
+    "name": "Gold"
+  },
+  "12": {
+    "name": "Pearl"
+  },
+  "13": {
+    "name": "Platinum"
+  },
+  "15": {
+    "name": "Dashy"
+  },
+  "16": {
+    "name": "Blue"
+  },
+  "17": {
+    "name": "Red"
+  },
+  "19": {
+    "name": "AI"
+  },
+  "20": {
+    "name": "Sky"
+  },
+  "21": {
+    "name": "Yellow"
+  },
+  "22": {
+    "name": "Cream"
+  },
+  "23": {
+    "name": "Sea"
+  },
+  "24": {
+    "name": "Green"
+  },
+  "25": {
+    "name": "Chapter I"
+  },
+  "26": {
+    "name": "Chapter II"
+  },
+  "27": {
+    "name": "Chapter III"
+  },
+  "28": {
+    "name": "OpTk Light"
+  },
+  "29": {
+    "name": "OpTk Dark"
+  },
+  "31": {
+    "name": "Night"
+  },
+  "32": {
+    "name": "Chapter IV"
+  },
+  "33": {
+    "name": "Clear Performance"
+  },
+  "34": {
+    "name": "Full Combo Performance"
+  },
+  "35": {
+    "name": "Perfect Performance"
+  },
+  "37": {
+    "name": "Chapter V"
+  },
+  "38": {
+    "name": "V-ENTURE"
+  },
+  "39": {
+    "name": "Clear History"
+  },
+  "40": {
+    "name": "Full Combo History"
+  },
+  "41": {
+    "name": "Perfect History"
+  },
+  "42": {
+    "name": "Ryuto Setsujin"
+  },
+  "43": {
+    "name": "Sunrise"
+  },
+  "44": {
+    "name": "Chapter VI"
+  },
+  "45": {
+    "name": "A new world"
+  }
+}

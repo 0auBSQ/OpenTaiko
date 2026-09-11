@@ -1,0 +1,24 @@
+{
+  "_comment": "Display names for data/floordeco.json, English (the fallback for every other language).",
+  "wood": {
+    "name": "Wooden Floor"
+  },
+  "carpet": {
+    "name": "Red Carpet"
+  },
+  "stone": {
+    "name": "Stone Floor"
+  },
+  "grass": {
+    "name": "Grass Floor"
+  },
+  "sand": {
+    "name": "Sand Floor"
+  },
+  "snow": {
+    "name": "Snow Floor"
+  },
+  "default_floor": {
+    "name": "Default Floor"
+  }
+}

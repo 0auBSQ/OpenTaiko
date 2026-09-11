@@ -1,0 +1,18 @@
+{
+  "_comment": "English texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; this file is the fallback for every other language.",
+  "ctl_move": "WASD — Move",
+  "ctl_orbit": "RMB / Q·E — Orbit",
+  "ctl_zoom": "Wheel — Zoom",
+  "ctl_edit": "Tab — Edit room",
+  "ctl_leave": "Esc — Leave",
+  "ctl_leave_visit": "Esc / Door — Leave visit",
+  "prompt_computer": "[Enter] Use computer",
+  "prompt_phone": "[Enter] Use phone",
+  "prompt_lamp": "[Enter] Toggle the lamp",
+  "prompt_jukebox": "[Enter] Play music",
+  "prompt_pod": "[Enter] Examine",
+  "prompt_exit": "[Enter] Leave the room",
+  "prompt_switch": "[Tab] Switch focus",
+  "player_entry": "Player %d — %s",
+  "whose_room": "Whose room?"
+}

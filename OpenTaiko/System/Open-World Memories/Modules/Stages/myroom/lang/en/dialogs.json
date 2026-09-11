@@ -1,0 +1,106 @@
+{
+  "_comment": "Dialog lines, English (the fallback for every other language). Translations live in lang/<code>/dialogs.json with the same structure; a missing key or line falls back to this file. {size}/{cost} are filled by the code; {shake:..} is dialogue markup; {sfx:purse} at the start of a line brings the purse up.",
+  "landlord": {
+    "_comment": "The landlord's phone call. Lists are said line by line. first_call plays once per save file (no offer); greetings picks one line at random; tiers.<n> is the offer for room tier n (2 = 6x6, 3 = 7x7, 4 = 8x8, more = every 10k tier): pitch, then broke (not enough coins, no choice) or the Yes/No choice on the last pitch line, then accepted. refuse_first/second after a No (the count resets on entering the room); refused_out replaces the call after two refusals; maxed when no bigger tier exists. {sfx:purse} at the start of a line brings the purse up (the caller's onSfx handles it).",
+    "name": "Landlord",
+    "first_call": [
+      "So you are the new tenant...",
+      "I hope you are not too noisy, you know, it is not very good for business...",
+      "The room is too small you say? Hmmm...",
+      "Call me back, and be sure to bring shiny doubloons with you.",
+      "If you can pay a generous extra, I might consider it.",
+      "Now get out, time is money, and this call is keeping me broke."
+    ],
+    "greetings": [
+      "Oh, it is you. Let's see what we are on today.",
+      "Calling me for a room extension? Let me check how rich you will make me today.",
+      "Here for a deal? Time for real business.",
+      "I can smell... the fragrance of fresh bank notes.",
+      "You want a bigger room? I want a bigger purse! Let's talk."
+    ],
+    "tiers": {
+      "2": {
+        "pitch": [
+          "{sfx:purse}Let's start simple. For a hundred of your shinies, I can give you a first decent expansion to your house.",
+          "I am being very generous, you know, it is a bit narrow in here, isn't it?...",
+          "So what do you think? Deal?"
+        ],
+        "broke": [
+          "... Wait",
+          "Whatever, brokie.",
+          "Goodbye."
+        ],
+        "accepted": [
+          "Excellent, enjoy your bigger room, while I enjoy my bigger pockets...",
+          "How did I manage to expand it like this? You would stop paying if I revealed my secrets.",
+          "Call me back if it still feels too small..."
+        ]
+      },
+      "3": {
+        "pitch": [
+          "So the current room is too small for you?",
+          "{sfx:purse}I got you. But this time the price will be a grand, for grand ambitions!",
+          "Enough talk, time to let the flooz decide!"
+        ],
+        "broke": [
+          "Ah! No flooz?",
+          "That's unfortunate, but eagles do not fly with pigeons!",
+          "Sayonara, peasant!"
+        ],
+        "accepted": [
+          "You bought it? Incredible...",
+          "How did I find the space to extend your room, you say?",
+          "Do not worry about it.",
+          "I just expelled your neighbour, he was noisy anyway! Haha",
+          "At least you will sleep better from now on too, right?"
+        ]
+      },
+      "4": {
+        "pitch": [
+          "Sounds like it is never enough for you...",
+          "{sfx:purse}5 grand. Take it or leave it."
+        ],
+        "broke": [
+          "... Ha!",
+          "Of course a kid like you does not have this kind of money.",
+          "You gotta work more for OpenBurgers, son!"
+        ],
+        "accepted": [
+          "Wait, you actually paid for it?",
+          "Not that it bothers me, but you know...",
+          "If you keep being gullible like this I might start to feel guilty about it!",
+          "Whatever, you do not seem to care anyway! Here comes the moola!"
+        ]
+      },
+      "more": {
+        "pitch": [
+          "...",
+          "{sfx:purse}10 grand. On my OpenBank, as usual."
+        ],
+        "broke": [
+          "...",
+          "*hangs up*"
+        ],
+        "accepted": [
+          "Thanks.",
+          "..."
+        ]
+      }
+    },
+    "maxed": "Sorry, there is no bigger expansion available.",
+    "refuse_first": "That's unfortunate. Feel free to call me back if you reconsider.",
+    "refuse_second": "...",
+    "refused_out": [
+      "... No, do not waste my time.",
+      "Never call again."
+    ],
+    "choice_yes": "Deal",
+    "choice_no": "No deal"
+  },
+  "pod": {
+    "locked": "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet."
+  },
+  "phone": {
+    "enum_wait": "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\""
+  }
+}

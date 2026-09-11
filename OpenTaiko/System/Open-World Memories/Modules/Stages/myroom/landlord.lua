@@ -1,13 +1,13 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil
 -- landlord.lua — the landlord's phone call: he sells room tiers (data/tiers.json) by the coin. Every
--- line lives in data/dialogs.json under "landlord": first_call (once per save file, no offer),
+-- line lives in lang/<code>/dialogs.json under "landlord": first_call (once per save file, no offer),
 -- greetings (one at random), tiers.<n>.pitch / broke / accepted per room tier (2, 3, 4, then
 -- "more" for every 10k tier), refuse_first / refuse_second after a No, refused_out once the tenant
 -- refused twice in one visit, maxed when no bigger tier exists. The purse (Lib/CoinBox) appears with
 -- the offer, shows the price, and animates the payment.
 --
 --   Landlord.init{ save = fn() -> save file, room = fn() -> Room, extend = fn(info) -> bool,
---                  dlgLoc = fn(section, key, fallback), dlgDoc = fn() -> dialogs.json node | nil,
+--                  dlgLoc = fn(section, key, fallback), dlgList = fn(section, key, ...) -> lines,
 --                  coinBox = <a Lib/CoinBox instance> }
 --   Landlord.reset()           on entering the room: the refusals are forgiven
 --   Landlord.script()          the dialogue nodes for a fresh call
@@ -48,24 +48,16 @@ function Landlord.step() return step end
 
 local function LL(key) return ctx.dlgLoc("landlord", key, EN[key] or key) end
 
--- a list of lines at a dotted path under "landlord" (tiers.2.pitch), each localized; the English
--- list when the file or the path is missing
+-- a list of lines at a dotted path under "landlord" (tiers.2.pitch) in the current language (each line
+-- falls back to English); the code's own list when the files or the path are missing
 local function lines(path, fallback)
     local out = {}
-    pcall(function()
-        local node = ctx.dlgDoc and ctx.dlgDoc() or nil
-        if node == nil then return end
-        node = JSONLOADER:JsonGet(node, "landlord")
-        for seg in path:gmatch("[^%.]+") do
-            if node == nil then return end
-            node = JSONLOADER:JsonGet(node, seg)
-        end
-        if node == nil then return end
-        for i = 1, JSONLOADER:JsonCount(node) do
-            local ok, s = pcall(function() return LANG:FromDict(JSONLOADER:JsonGet(node, i)):GetString("") end)
-            if ok and s and s ~= "" then out[#out + 1] = s end
-        end
-    end)
+    if ctx.dlgList then
+        local keys = { "landlord" }
+        for seg in path:gmatch("[^%.]+") do keys[#keys + 1] = seg end
+        local ok, res = pcall(ctx.dlgList, table.unpack(keys))
+        if ok and type(res) == "table" then out = res end
+    end
     if #out == 0 then
         for i, s in ipairs(fallback or {}) do out[i] = s end
     end

@@ -16,6 +16,8 @@ local PCS      = require("pc")
 local Edit     = require("editmode")
 local PopUI    = require("PopUI")
 local I18N      = require("i18n")
+local PHONE    = I18N.texts("phone")        -- lang/<code>/phone.json
+local HUD      = I18N.texts("hud")          -- lang/<code>/hud.json
 local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
 local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
@@ -426,9 +428,9 @@ local function dialPhone(input)
     local ev = nil
     pcall(function() ev = doc and doc[key] or nil end)
     if ev == nil then                                 -- unassigned number → the placeholder
-        local n = (input and input ~= "" and input) or I18N.tr("the number")
+        local n = (input and input ~= "" and input) or PHONE:tr("the_number")
         mode = "dialogue"; phoneFlow = nil
-        dlg:start({ { name = "", text = I18N.trf("You dial %s... It rings, and rings. Nobody picks up.", n) } })
+        dlg:start({ { name = "", text = PHONE:trf("no_answer", n) } })
         return false
     end
     -- guarded like every other data-file read: a malformed entry (bare string, nested field) must
@@ -441,13 +443,12 @@ local function dialPhone(input)
         effect = JSONLOADER:ExtractText(ev["effect"])
     end)
     if not okEv then
-        local n = (input and input ~= "" and input) or I18N.tr("the number")
+        local n = (input and input ~= "" and input) or PHONE:tr("the_number")
         mode = "dialogue"; phoneFlow = nil
-        dlg:start({ { name = "", text = I18N.trf("You dial %s... It rings, and rings. Nobody picks up.", n) } })
+        dlg:start({ { name = "", text = PHONE:trf("no_answer", n) } })
         return
     end
-    if name then name = I18N.tr(name) end        -- localized via lang/ja.lua (English text = the key)
-    if text then text = I18N.tr(text) end
+    if text then text = PHONE:tr(text) end       -- the entry's text is a phone.json id (egg_*); names stay as written
     local wantSilent
     if sound and sound ~= "" then wantSilent = playPhoneSound(sound) end
     if effect == "bombs" then startBombs() end
@@ -479,29 +480,17 @@ local function tickBombs(dt)
     end
     if bombFx.t >= bombFx.dur then bombFx = nil end
 end
--- the landlord's phone call lives in landlord.lua (script + answers, data/dialogs.json lines);
+-- the landlord's phone call lives in landlord.lua (script + answers, lang/<code>/dialogs.json lines);
 -- the room only lends it the save file, the room, the extension, and the purse widget
--- data/dialogs.json: named dialog lines localized inline ({en,ja,fr}); missing file/key → the fallback
-local dialogsDoc = nil
+-- lang/<code>/dialogs.json: named dialog lines per language (English is the fallback for a missing
+-- file, key or line; the code's own fallback covers a missing English file)
+local DIALOGS = I18N.texts("dialogs")
 local function dlgLoc(section, key, fallback)
-    if dialogsDoc == nil then
-        local ok, doc = pcall(function() return JSONLOADER:JsonParseFileAny("data/dialogs.json") end)
-        dialogsDoc = (ok and doc ~= nil) and doc or false
-    end
-    if dialogsDoc == false then return fallback end
-    local line = nil
-    pcall(function()
-        local sec = JSONLOADER:JsonGet(dialogsDoc, section)
-        line = sec and JSONLOADER:JsonGet(sec, key) or nil
-    end)
-    if line == nil then return fallback end
-    local ok, s = pcall(function() return LANG:FromDict(line):GetString(fallback) end)
-    if ok and s and s ~= "" then return s end
-    return fallback
+    return DIALOGS:get(section, key) or fallback
 end
-local function dlgDoc()
-    if dialogsDoc == nil then dlgLoc("landlord", "name", "") end
-    return dialogsDoc or nil
+-- the list of lines at a key path (section, key, ...), each line falling back to English
+local function dlgList(...)
+    return DIALOGS:list(...)
 end
 
 local function doExtend(info)
@@ -524,7 +513,7 @@ Landlord.init{
     save = function() return curSave() end,
     room = function() return room end,
     extend = doExtend,
-    dlgLoc = dlgLoc, dlgDoc = dlgDoc,
+    dlgLoc = dlgLoc, dlgList = dlgList,
     coinBox = purse,
 }
 
@@ -567,7 +556,7 @@ local function buildPhoneTextPane(title, hintText, maxLen, confirmLabel, onConfi
                            onSubmit = function(t) return onConfirm(t) end }
     ui:button{ text = confirmLabel, x = x + 40, y = y + 210, w = 300, h = 76, accent = true,
                onClick = function() return onConfirm(tb.value or "") end }
-    ui:button{ text = I18N.tr("Back"), x = x + w - 240, y = y + 210, w = 200, h = 76,
+    ui:button{ text = PHONE:tr("back"), x = x + w - 240, y = y + 210, w = 200, h = 76,
                onClick = function() buildPhoneMenu() end, sfx = { click = "cancel" } }
 end
 
@@ -578,23 +567,23 @@ buildPhoneMenu = function()
     local entries
     if net.online and net.isHost then
         -- while hosting, the phone only offers to stop hosting (no landlord/number/invite)
-        entries = { { label = I18N.tr("Stop hosting (close the room)"), value = "stophost" } }
+        entries = { { label = PHONE:tr("menu_stop_hosting"), value = "stophost" } }
     else
         entries = {
-            { label = I18N.tr("Call the landlord"), value = "landlord" },
-            { label = I18N.tr("Enter a number"), value = "number" },
+            { label = PHONE:tr("menu_landlord"), value = "landlord" },
+            { label = PHONE:tr("menu_number"), value = "number" },
         }
         if not net.online and not net.connecting then
-            entries[#entries + 1] = { label = I18N.tr("Invite friends (host a room)"), value = "invite" }
-            entries[#entries + 1] = { label = I18N.tr("Join a friend (enter code)"), value = "join" }
+            entries[#entries + 1] = { label = PHONE:tr("menu_invite"), value = "invite" }
+            entries[#entries + 1] = { label = PHONE:tr("menu_join"), value = "join" }
         end
     end
-    entries[#entries + 1] = { label = I18N.tr("Hang up"), value = "close" }
+    entries[#entries + 1] = { label = PHONE:tr("menu_hang_up"), value = "close" }
     local items = {}
     for i, e in ipairs(entries) do items[i] = { text = e.label, value = e.value } end
     local x, y, w = SCREEN_W / 2 - 360, 260, 720
     local h = 130 + #items * 78 + 60
-    ui:panel{ x = x, y = y, w = w, h = h, title = I18N.tr("Phone") }
+    ui:panel{ x = x, y = y, w = w, h = h, title = PHONE:tr("title") }
     ui:menu{
         x = x + 36, y = y + 96, w = w - 72, h = #items * 78, rowHeight = 78, items = items,
         onSelect = function(_, it)
@@ -603,7 +592,7 @@ buildPhoneMenu = function()
                 closePhone(); phoneFlow = "landlord"
                 placeCall(Landlord.script())
             elseif v == "number" then
-                buildPhoneTextPane(I18N.tr("Enter a number"), I18N.tr("number..."), 16, I18N.tr("Call"), function(t)
+                buildPhoneTextPane(PHONE:tr("menu_number"), PHONE:tr("number_placeholder"), 16, PHONE:tr("call"), function(t)
                     closePhone();
                     playPhoneSound("phone_coin")
                     return dialPhone(t)  -- looks up data/phone_numbers.json (events/eggs)
@@ -623,21 +612,21 @@ buildPhoneMenu = function()
                     dlg:start({ { name = "", text = dlgLoc("phone", "enum_wait",
                         "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"") } })
                 else
-                buildPhoneTextPane(I18N.tr("Join a friend"), I18N.tr("paste the room code..."), 4096, I18N.tr("Join"), function(t)
+                buildPhoneTextPane(PHONE:tr("join_title"), PHONE:tr("code_placeholder"), 4096, PHONE:tr("join"), function(t)
                     closePhone()
                     local code = (t ~= "" and t) or nil
                     if not code then SHARED:GetSharedSound("Cancel"):Play(); return true end
                     if MO.join(code) then
                         JB.stopAll()   -- our own music stays home; the host's jukebox takes over
-                        msg = net.msg or I18N.tr("Connecting…")
+                        msg = net.msg or PHONE:tr("connecting")
                     else
-                        msg = net.msg or I18N.tr("Could not join.")
+                        msg = net.msg or PHONE:tr("join_failed")
                     end
                     msgT = 6
                 end)
                 end
             elseif v == "stophost" then
-                MO.leave(); closePhone(); msg = I18N.tr("You closed the room."); msgT = 4
+                MO.leave(); closePhone(); msg = PHONE:tr("room_closed"); msgT = 4
             else
                 closePhone(true)
                 return true
@@ -678,7 +667,7 @@ openPlayerSelect = function()
     for i = 0, 4 do
         local sf = GetSaveFile(i)
         if sf and sf.SaveUID and sf.SaveUID ~= "" then
-            entries[#entries + 1] = { text = I18N.trf("Player %d — %s", i + 1, sf.Name or ""), value = i }
+            entries[#entries + 1] = { text = HUD:trf("player_entry", i + 1, sf.Name or ""), value = i }
         end
     end
     if #entries <= 1 then                          -- 0 or 1 save → nothing to choose, just enter
@@ -690,7 +679,7 @@ openPlayerSelect = function()
     playerSelUI = ui
     local x, y, w = SCREEN_W / 2 - 380, 210, 760
     local h = 120 + #entries * 78 + 40
-    ui:panel{ x = x, y = y, w = w, h = h, title = I18N.tr("Whose room?") }
+    ui:panel{ x = x, y = y, w = w, h = h, title = HUD:tr("whose_room") }
     ui:menu{ x = x + 36, y = y + 92, w = w - 72, h = #entries * 78, rowHeight = 78, items = entries,
              onSelect = function(_, it) pickPlayer(it.value) end }
     mode = "playerselect"
@@ -806,7 +795,7 @@ function update(ts)
     if net.online or net.connecting then
         MO.drain()
         MO.lerpRemotes(dt)
-        if net.roomGone then backToOwnRoom(I18N.tr("The host closed the room.")) end
+        if net.roomGone then backToOwnRoom(PHONE:tr("room_host_closed")) end
     end
 
     -- jukebox playback upkeep runs in EVERY mode (audio outlives the menu: distance volume, track
@@ -877,7 +866,7 @@ function update(ts)
 
     if NavInput.p[playerIndex + 1].cancel() then
         SHARED:GetSharedSound("Cancel"):Play()
-        if MO.isGuest() then backToOwnRoom(I18N.tr("You left the room.")); return nil end
+        if MO.isGuest() then backToOwnRoom(PHONE:tr("room_left")); return nil end
         MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); return Exit("stage", "_title")
     end
     -- (interactables + Tab are resolved AFTER movement below, where px/pz are current)
@@ -951,7 +940,7 @@ function update(ts)
     if focused and (NavInput.p[playerIndex + 1].decide() or kp("Space")) then
         if focused.kind == "exit" then
             SHARED:GetSharedSound("Cancel"):Play()
-            if MO.isGuest() then backToOwnRoom(I18N.tr("You left the room.")); return nil end
+            if MO.isGuest() then backToOwnRoom(PHONE:tr("room_left")); return nil end
             MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
             return Exit("stage", "_title")
         elseif focused.kind == "computer" then
@@ -1054,7 +1043,7 @@ function draw()
         if playerSelUI then playerSelUI:draw() end
     elseif mode == "dialogue" then
         if ringT > 0 then
-            hud:drawTextEx(26, I18N.tr("Calling…"), SCREEN_W / 2, SCREEN_H - 200, { 255, 235, 160 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
+            hud:drawTextEx(26, PHONE:tr("calling"), SCREEN_W / 2, SCREEN_H - 200, { 255, 235, 160 }, { 0, 0, 0, 255 }, 1, 1, 0, "top")
         end
         dlg:draw()
         purse:draw()
@@ -1074,23 +1063,23 @@ function draw()
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
         local instr = {}
-        if prompt == "computer" then instr[#instr + 1] = { t = I18N.tr("[Enter] Use computer"), c = { 150, 230, 255 }, s = 24 }
-        elseif prompt == "phone" then instr[#instr + 1] = { t = I18N.tr("[Enter] Use phone"), c = { 150, 230, 255 }, s = 24 }
-        elseif prompt == "lamp" then instr[#instr + 1] = { t = I18N.tr("[Enter] Toggle the lamp"), c = { 150, 230, 255 }, s = 24 }
-        elseif prompt == "jukebox" then instr[#instr + 1] = { t = I18N.tr("[Enter] Play music"), c = { 150, 230, 255 }, s = 24 }
-        elseif prompt == "pod" then instr[#instr + 1] = { t = I18N.tr("[Enter] Examine"), c = { 150, 230, 255 }, s = 24 }
-        elseif prompt == "exit" then instr[#instr + 1] = { t = I18N.tr("[Enter] Leave the room"), c = { 255, 230, 150 }, s = 24 }
+        if prompt == "computer" then instr[#instr + 1] = { t = HUD:tr("prompt_computer"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "phone" then instr[#instr + 1] = { t = HUD:tr("prompt_phone"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "lamp" then instr[#instr + 1] = { t = HUD:tr("prompt_lamp"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "jukebox" then instr[#instr + 1] = { t = HUD:tr("prompt_jukebox"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "pod" then instr[#instr + 1] = { t = HUD:tr("prompt_pod"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
-        if interCount > 1 then instr[#instr + 1] = { t = I18N.tr("[Tab] Switch focus"), c = { 200, 220, 240 }, s = 18 } end
+        if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end
         local ctl = { 210, 216, 230 }
-        instr[#instr + 1] = { t = I18N.tr("WASD — Move"), c = ctl, s = 18 }
-        instr[#instr + 1] = { t = I18N.tr("RMB / Q·E — Orbit"), c = ctl, s = 18 }
-        instr[#instr + 1] = { t = I18N.tr("Wheel — Zoom"), c = ctl, s = 18 }
+        instr[#instr + 1] = { t = HUD:tr("ctl_move"), c = ctl, s = 18 }
+        instr[#instr + 1] = { t = HUD:tr("ctl_orbit"), c = ctl, s = 18 }
+        instr[#instr + 1] = { t = HUD:tr("ctl_zoom"), c = ctl, s = 18 }
         if MO.isGuest() then
-            instr[#instr + 1] = { t = I18N.tr("Esc / Door — Leave visit"), c = ctl, s = 18 }
+            instr[#instr + 1] = { t = HUD:tr("ctl_leave_visit"), c = ctl, s = 18 }
         else
-            instr[#instr + 1] = { t = I18N.tr("Tab — Edit room"), c = ctl, s = 18 }
-            instr[#instr + 1] = { t = I18N.tr("Esc — Leave"), c = ctl, s = 18 }
+            instr[#instr + 1] = { t = HUD:tr("ctl_edit"), c = ctl, s = 18 }
+            instr[#instr + 1] = { t = HUD:tr("ctl_leave"), c = ctl, s = 18 }
         end
         local iy = 84
         for _, ln in ipairs(instr) do

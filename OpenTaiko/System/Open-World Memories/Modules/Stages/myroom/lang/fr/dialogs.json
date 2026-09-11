@@ -1,0 +1,105 @@
+{
+  "_comment": "Translation of lang/en/dialogs.json (same structure; missing entries fall back to English).",
+  "landlord": {
+    "name": "Propriétaire",
+    "first_call": [
+      "Alors comme ça, c'est vous le nouveau locataire...",
+      "J'espère que vous n'êtes pas trop bruyant, vous savez, ce n'est pas très bon pour les affaires...",
+      "La chambre est trop petite, dites-vous ? Hmmm...",
+      "Rappelez-moi, et n'oubliez pas d'apporter des doublons bien brillants.",
+      "Si vous pouvez payer un généreux supplément, je pourrais y réfléchir.",
+      "Maintenant du vent, le temps c'est de l'argent, et cet appel me ruine."
+    ],
+    "greetings": [
+      "Oh, c'est vous. Voyons ce qui nous occupe aujourd'hui.",
+      "Vous m'appelez pour agrandir ? Voyons combien vous allez m'enrichir aujourd'hui.",
+      "Ici pour un marché ? Passons aux choses sérieuses.",
+      "Je sens... le parfum des billets tout frais.",
+      "Vous voulez une plus grande chambre ? Moi, une plus grosse bourse ! Discutons."
+    ],
+    "tiers": {
+      "2": {
+        "pitch": [
+          "{sfx:purse}Commençons simple. Pour une centaine de vos brillantes, je vous offre une première extension convenable.",
+          "Je suis très généreux, vous savez, c'est un peu étroit ici, non ?...",
+          "Alors, qu'en dites-vous ? Marché conclu ?"
+        ],
+        "broke": [
+          "... Attendez",
+          "Peu importe, fauché.",
+          "Au revoir."
+        ],
+        "accepted": [
+          "Excellent, profitez de votre chambre plus grande, pendant que je profite de mes poches plus pleines...",
+          "Comment j'ai fait pour l'agrandir ainsi ? Vous cesseriez de payer si je révélais mes secrets.",
+          "Rappelez-moi si c'est encore trop étroit..."
+        ]
+      },
+      "3": {
+        "pitch": [
+          "Alors, la chambre actuelle est trop petite pour vous ?",
+          "{sfx:purse}Je vous comprends. Mais cette fois, le prix sera d'un bâton, pour de grandes ambitions !",
+          "Assez parlé, laissons le flouze décider !"
+        ],
+        "broke": [
+          "Ah ! Pas de flouze ?",
+          "C'est regrettable, mais les aigles ne volent pas avec les pigeons !",
+          "Sayonara, paysan !"
+        ],
+        "accepted": [
+          "Vous l'avez acheté ? Incroyable...",
+          "Comment j'ai trouvé la place pour agrandir votre chambre, dites-vous ?",
+          "Ne vous en faites pas.",
+          "J'ai juste expulsé votre voisin, il était bruyant de toute façon ! Haha",
+          "Au moins, vous dormirez mieux désormais, non ?"
+        ]
+      },
+      "4": {
+        "pitch": [
+          "On dirait que ce n'est jamais assez pour vous...",
+          "{sfx:purse}5 bâtons. À prendre ou à laisser."
+        ],
+        "broke": [
+          "... Ha !",
+          "Évidemment qu'un gamin comme vous n'a pas cet argent.",
+          "Faudra bosser plus chez OpenBurgers, fiston !"
+        ],
+        "accepted": [
+          "Attendez, vous avez vraiment payé ?",
+          "Non pas que ça me dérange, mais vous savez...",
+          "Si vous restez aussi crédule, je vais finir par culpabiliser !",
+          "Enfin, ça n'a pas l'air de vous déranger ! Et voilà le pognon !"
+        ]
+      },
+      "more": {
+        "pitch": [
+          "...",
+          "{sfx:purse}10 bâtons. Sur mon compte OpenBank, comme d'habitude."
+        ],
+        "broke": [
+          "...",
+          "*raccroche*"
+        ],
+        "accepted": [
+          "Merci.",
+          "..."
+        ]
+      }
+    },
+    "maxed": "Désolé, il n'y a pas d'extension plus grande.",
+    "refuse_first": "C'est regrettable. N'hésitez pas à me rappeler si vous changez d'avis.",
+    "refuse_second": "...",
+    "refused_out": [
+      "... Non, ne me faites pas perdre mon temps.",
+      "Ne rappelez plus jamais."
+    ],
+    "choice_yes": "Marché conclu",
+    "choice_no": "Pas de marché"
+  },
+  "pod": {
+    "locked": "Vous appuyez sur le panneau de la capsule mystérieuse. Elle vibre doucement, mais rien ne s'ouvre. Pas encore."
+  },
+  "phone": {
+    "enum_wait": "La ligne grésille un instant. « Toutes mes excuses. Le catalogue musical est encore en cours de classement, et les visites sont un vrai désordre sans lui. Rappelez donc quand chaque disque sera sur son étagère. »"
+  }
+}

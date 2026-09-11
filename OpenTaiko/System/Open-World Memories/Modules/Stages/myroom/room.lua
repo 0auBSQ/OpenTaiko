@@ -23,6 +23,7 @@
 local A = require("assets")
 local IsoMap = require("OWM3d.isomap")
 local MIG = require("migration")       -- save-table migrations (retired ids, v1→v2, starter seeding)
+local I18N = require("i18n")           -- item names: lang/<code>/<file>.json (English fallback)
 local cos, sin, pi, floor = math.cos, math.sin, math.pi, math.floor
 
 local Room = {}
@@ -134,23 +135,12 @@ local STARTER = nil
 local NEW_STARTER_STOCK = {}
 
 -- data/*.json access: JsonParseFileAny gives plain dictionaries (arrays 1-indexed), JsonGet is a
--- nil-safe lookup, LANG:FromDict turns a {en,ja,fr} node into a CLocalizationData
+-- nil-safe lookup. Display names come from lang/<code>/<file>.json (same ids, "name" field) through a
+-- handle resolved at call time, so a language change shows on the next draw.
 local function jget(d, k) return JSONLOADER:JsonGet(d, k) end
 local function jnum(v) return tonumber(v) end
 local function jflag(node, k) if jget(node, k) == true then return true end return nil end
-local function jloc(node)
-    if node == nil then return nil end
-    local ok, loc = pcall(function()
-        local l = LANG:FromDict(node)
-        -- CLocalizationData falls back to the "default" key (not "en"): mirror en into default so
-        -- languages beyond the file's en/ja/fr read English instead of the raw id
-        local en = JSONLOADER:JsonGet(node, "en")
-        if en and en ~= "" then l:SetString("default", en) end
-        return l
-    end)
-    if ok then return loc end
-    return nil
-end
+local function jloc(file, id) return I18N.texts(file):loc(id, "name") end
 
 local function buildCatalogFromJson()
     local doc = JSONLOADER:JsonParseFileAny("data/furniture.json")
@@ -170,7 +160,7 @@ local function buildCatalogFromJson()
                 interact = jget(node, "interact"), model = jget(node, "model"),
                 emissivePart = jget(node, "emissivePart"),   -- GLB material routed to its own part
                                                              -- object (runtime glow, e.g. jukebox screen)
-                nameLoc = jloc(jget(node, "name")),
+                nameLoc = jloc("furniture", id),
                 build = GROUND_BUILDERS[id], wallBuild = WALL_BUILDERS[id],
             }
             local scr = jget(node, "screen")
@@ -195,18 +185,18 @@ local function buildCatalogFromJson()
     return next(Room.CATALOG) ~= nil
 end
 
--- floorings/paints: id registry + localized names (+ shop swatch). NOTE: only `name` and `swatch` are
--- live data — texture binding stays in assets.lua (A.FLOORPAINT/A.WALLPAINT) and the infinite
+-- floorings/paints: id registry + localized names (+ shop swatch). NOTE: only the name (lang/) and
+-- `swatch` are live data — texture binding stays in assets.lua (A.FLOORPAINT/A.WALLPAINT) and the infinite
 -- "revert to default" entries are the DEFAULT_FLOOR/DEFAULT_PAINT constants above.
 local function buildDecoFromJson(file, target)
-    local doc = JSONLOADER:JsonParseFileAny(file)
+    local doc = JSONLOADER:JsonParseFileAny("data/" .. file .. ".json")
     local order = doc and jget(doc, "_order")
     local n = order and JSONLOADER:JsonCount(order) or 0
     for i = 1, n do
         local id = jget(order, i)
         local node = id and jget(doc, id)
         if node then
-            target[id] = { tex = jget(node, "tex"), nameLoc = jloc(jget(node, "name")) }
+            target[id] = { tex = jget(node, "tex"), nameLoc = jloc(file, id) }
             local sw = jget(node, "swatch")
             if sw then Room.SHOP_SWATCH_TEX[id] = sw end
         end
@@ -250,12 +240,12 @@ if not (okCat and gotCat) then
                       phone = { file = "wallphone", h = 0.62, axis = "z" } }
     LEGACY_WALL_IDS = { clock = true }
 end
-if not pcall(buildDecoFromJson, "data/floordeco.json", Room.FLOORDECO) or next(Room.FLOORDECO) == nil then
+if not pcall(buildDecoFromJson, "floordeco", Room.FLOORDECO) or next(Room.FLOORDECO) == nil then
     Room.FLOORDECO = { wood = { tex = "wood", isDefault = true }, carpet = { tex = "carpet" },
                        stone = { tex = "stone" }, grass = { tex = "grass" }, sand = { tex = "sand" },
                        snow = { tex = "snow" }, default_floor = { tex = "wood" } }
 end
-if not pcall(buildDecoFromJson, "data/wallpaint.json", Room.WALLPAINT) or next(Room.WALLPAINT) == nil then
+if not pcall(buildDecoFromJson, "wallpaint", Room.WALLPAINT) or next(Room.WALLPAINT) == nil then
     Room.WALLPAINT = { plaster = { isDefault = true }, blue = {}, beige = {}, sage = {},
                        brick = {}, rock = {}, stonewall = {}, default_paint = { tex = "wall" } }
 end
@@ -699,7 +689,7 @@ function Room:spawnCell() return self.exitCol, self.ih end
 
 -- ── tier extension: the room sizes the (greedy) landlord sells, keeping furniture; wall items follow
 -- their wall. Loaded from data/tiers.json — TIERS[n] = interior IW×IH + the coin price to reach tier n
--- (tier 1 = the free base). The landlord's lines per tier live in data/dialogs.json. The table below
+-- (tier 1 = the free base). The landlord's lines per tier live in lang/<code>/dialogs.json. The table below
 -- is the emergency fallback for a missing/broken file. ───────────────────────────────────────────────
 Room.TIERS = {
     { iw = 5,  ih = 5,  cost = 0 },

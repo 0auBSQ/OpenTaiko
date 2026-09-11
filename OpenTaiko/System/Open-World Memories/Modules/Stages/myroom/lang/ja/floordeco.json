@@ -1,0 +1,24 @@
+{
+  "_comment": "Display names for data/floordeco.json (ja). Missing ids fall back to lang/en.",
+  "wood": {
+    "name": "木の床"
+  },
+  "carpet": {
+    "name": "赤い絨毯"
+  },
+  "stone": {
+    "name": "石の床"
+  },
+  "grass": {
+    "name": "草の床"
+  },
+  "sand": {
+    "name": "砂の床"
+  },
+  "snow": {
+    "name": "雪の床"
+  },
+  "default_floor": {
+    "name": "標準の床"
+  }
+}

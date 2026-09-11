@@ -25,6 +25,7 @@ local Room      = require("room")
 local I         = require("icons")
 local PopUI     = require("PopUI")
 local I18N      = require("i18n")
+local T = I18N.texts("editmode")   -- lang/<code>/editmode.json
 local ModelIcon = require("OWM3d").ModelIcon
 
 local floor, max, min = math.floor, math.max, math.min
@@ -39,12 +40,12 @@ local FY = Room.FLOOR_Y
 local PICK2 = (SW * 0.05) ^ 2         -- squared pick radius for 3D hover
 
 local CATS = {
-    { key = "furn",   label = "Furniture" },
-    { key = "wall",   label = "Wall" },
-    { key = "floor",  label = "Floor" },
-    { key = "paint",  label = "Paint" },
-    { key = "door",   label = "Door" },
-    { key = "eraser", label = "Eraser" },
+    { key = "furn",   label = "tab_furniture" },
+    { key = "wall",   label = "tab_wall" },
+    { key = "floor",  label = "tab_floor" },
+    { key = "paint",  label = "tab_paint" },
+    { key = "door",   label = "tab_door" },
+    { key = "eraser", label = "tab_eraser" },
 }
 
 -- bar geometry (tab row on top, item grid underneath)
@@ -496,12 +497,12 @@ function Edit:select(it, kind)
     local edit = self
     local defs = {}
     if kind == "ground" then
-        defs[#defs + 1] = { I18N.tr("Rotate"), function() edit:doRotate(it); return true end }
-        defs[#defs + 1] = { I18N.tr("Move"), function() edit:beginHoldMove(); return true end }
-        defs[#defs + 1] = { I18N.tr("Remove"), function() edit:doRemove(it); return true end }
+        defs[#defs + 1] = { T:tr("action_rotate"), function() edit:doRotate(it); return true end }
+        defs[#defs + 1] = { T:tr("action_move"), function() edit:beginHoldMove(); return true end }
+        defs[#defs + 1] = { T:tr("action_remove"), function() edit:doRemove(it); return true end }
     else
-        defs[#defs + 1] = { I18N.tr("Move"), function() edit:beginHoldMove(); return true end }
-        if it.id ~= "phone" then defs[#defs + 1] = { I18N.tr("Remove"), function() edit:doRemove(it); return true end } end
+        defs[#defs + 1] = { T:tr("action_move"), function() edit:beginHoldMove(); return true end }
+        if it.id ~= "phone" then defs[#defs + 1] = { T:tr("action_remove"), function() edit:doRemove(it); return true end } end
     end
     self.selBtns = {}
     for i, d in ipairs(defs) do
@@ -753,7 +754,7 @@ function Edit:buildBar()
     for i, cdef in ipairs(CATS) do
         local ti = i
         ui:button{
-            text = I18N.tr(cdef.label), x = TAB_X0 + (i - 1) * TAB_STEP, y = TAB_Y, w = TAB_W, h = TAB_H,
+            text = T:tr(cdef.label), x = TAB_X0 + (i - 1) * TAB_STEP, y = TAB_Y, w = TAB_W, h = TAB_H,
             accent = (self.cat == i),
             style = { font = { button = 19 } },
             onClick = function() edit:setCategory(ti) end,
@@ -1404,30 +1405,30 @@ function Edit:draw()
     local ui = self.ui
     if not ui then return end
     local key = self:catKey()
-    local hint = I18N.tr("Edit Mode  —  pick a tab, choose an item, click to place.  [Tab] done")
+    local hint = T:tr("hint_default")
     if self.hold then
         if self.hold.kind == "wall" then
-            hint = I18N.trf("Moving %s   ·   point at a wall slot (low/high) · %s · [Esc] cancels",
-                Room.displayName(self.hold.it.id), I18N.tr(self.hold.drag and "release to drop" or "click to drop"))
+            hint = T:trf("hint_moving_wall",
+                Room.displayName(self.hold.it.id), T:tr(self.hold.drag and "drop_release" or "drop_click"))
         else
-            hint = I18N.trf("Moving %s   ·   wheel rotates · %s · [Esc] cancels",
-                Room.displayName(self.hold.it.id), I18N.tr(self.hold.drag and "release to drop" or "click to drop"))
+            hint = T:trf("hint_moving",
+                Room.displayName(self.hold.it.id), T:tr(self.hold.drag and "drop_release" or "drop_click"))
         end
     elseif key == "door" then
-        hint = I18N.tr("Door  —  the ghost tile follows your cursor along the front edge; click to move the doorway")
+        hint = T:tr("hint_door_tab")
     elseif key == "eraser" then
-        hint = I18N.tr("Eraser  —  click a placed item, rug or paint to remove it (back to stock)")
+        hint = T:tr("hint_eraser")
     elseif self.sel then
-        if key == "furn" then hint = I18N.trf("Placing %s   ·   wheel rotates · click a green spot · [Esc] cancels", Room.displayName(self.sel))
-        elseif key == "wall" then hint = I18N.trf("Placing %s   ·   wheel flips low/high mount · click a green spot · [Esc] cancels", Room.displayName(self.sel))
-        else hint = I18N.trf("Painting %s   ·   click & drag to apply many · [Esc] cancels", Room.displayName(self.sel)) end
+        if key == "furn" then hint = T:trf("hint_placing", Room.displayName(self.sel))
+        elseif key == "wall" then hint = T:trf("hint_placing_wall", Room.displayName(self.sel))
+        else hint = T:trf("hint_painting", Room.displayName(self.sel)) end
     elseif self.selected then
-        hint = I18N.trf("%s  —  use the buttons under it, drag it to move, or click elsewhere to dismiss", Room.displayName(self.selected.it.id))
-    elseif self.dragExit then hint = I18N.tr("Sliding the door along the front")
-    elseif self.hoverExit then hint = I18N.tr("Door  —  drag to slide it along the front (or use the Door tab)")
+        hint = T:trf("hint_selected", Room.displayName(self.selected.it.id))
+    elseif self.dragExit then hint = T:tr("hint_door_sliding")
+    elseif self.hoverExit then hint = T:tr("hint_door_hover")
     elseif self.hoverItem or self.hoverWallItem then
         local id = (self.hoverItem or self.hoverWallItem).id
-        hint = I18N.trf("Click %s to select it (drag moves it)", Room.displayName(id))
+        hint = T:trf("hint_hover_item", Room.displayName(id))
     end
     ui:rect(0, 0, SW, 46, 12, 14, 20, 180)
     ui:drawTextEx(22, hint, 28, 8, { 220, 228, 240 }, { 0, 0, 0, 230 }, 1, 1, 1860)
@@ -1437,7 +1438,7 @@ function Edit:draw()
         local gh = self.room:gridH()
         local wx, wz = self.world:cellToWorld(self.room.exitCol, gh - 1)
         local sx, sy = self.world:project(wx, FY + 0.05, wz)
-        if sx and sx > 0 then ui:drawTextEx(18, I18N.tr("Door"), sx - 22, sy - 14, { 255, 232, 150 }, { 0, 0, 0, 230 }) end
+        if sx and sx > 0 then ui:drawTextEx(18, T:tr("door_label"), sx - 22, sy - 14, { 255, 232, 150 }, { 0, 0, 0, 230 }) end
     end
 
     ui:draw()
@@ -1464,10 +1465,10 @@ function Edit:draw()
         end
     end
     if key == "door" then
-        ui:drawTextEx(19, I18N.tr("Click a highlighted tile along the front edge to move the door there."),
+        ui:drawTextEx(19, T:tr("door_help"),
             GRID_X0 + 6, GRID_Y + 22, { 92, 62, 46 }, { 255, 255, 255, 160 })
     elseif key == "eraser" then
-        ui:drawTextEx(19, I18N.tr("Click a placed item to remove it — furniture, wall items, rugs and wall paint go back to stock."),
+        ui:drawTextEx(19, T:tr("eraser_help"),
             GRID_X0 + 6, GRID_Y + 22, { 92, 62, 46 }, { 255, 255, 255, 160 })
     end
 

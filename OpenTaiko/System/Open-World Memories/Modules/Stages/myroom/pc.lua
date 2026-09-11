@@ -26,6 +26,7 @@
 
 local PopUI = require("PopUI")
 local I18N = require("i18n")
+local T = I18N.texts("computer")   -- lang/<code>/computer.json
 local NavInput = require("NavInput")
 
 local PC = {}
@@ -39,7 +40,7 @@ local DETAIL_W = PANEL.x + PANEL.w - 44 - DETAIL_X
 local DETAIL_CX = math.floor(DETAIL_X + DETAIL_W / 2)
 local ROW_H = 66
 
-local TABS = { "Characters", "Puchichara", "Dan Titles", "Nameplates", "Rename" }
+local TABS = { "tab_characters", "tab_puchichara", "tab_dan_titles", "tab_nameplates", "tab_rename" }   -- computer.json ids
 local TAB_W, TAB_STEP, TAB_X0 = 278, 290, PANEL.x + 36
 -- conditions that read exactly "???" — re-checked against the FULL CUnlockConditionFactory list
 -- (ch/cs/cm/ce coin paths, sd/dp/lp/sp/sg/sc performance, tp/ap/aw play counts are all earnable
@@ -71,7 +72,9 @@ local function bakeColors()
     danBg     = danBg or COLOR:CreateColorFromRGBA(0, 0, 0, 255)
 end
 
--- nameplate type names (data/nameplate_types.json: per-language names + "special" hidden types)
+-- nameplate types: names in lang/<code>/nameplate_types.json (English fallback), "special" hidden
+-- types flagged in data/nameplate_types.json
+local TYPE_NAMES = I18N.texts("nameplate_types")
 local typeCfg, typeCfgTried = nil, false
 local function loadTypeCfg()
     if typeCfg ~= nil or typeCfgTried then return end
@@ -417,17 +420,18 @@ function PC:buildLists()
     end
 end
 
--- display name of a nameplate type: data/nameplate_types.json per-language entry (the current
--- i18n language key, "default" fallback — no fixed language set). "special" types stay "???"
--- until the player owns at least one UNLOCKED nameplate of that type. Unknown types fall back
+-- display name of a nameplate type in the current language (English fallback). "special" types stay
+-- "???" until the player owns at least one UNLOCKED nameplate of that type. Unknown types fall back
 -- to a generic numbered label.
 function PC:typeName(t)
     loadTypeCfg()
-    local node = nil
-    pcall(function() node = typeCfg and typeCfg[tostring(t)] or nil end)
-    if node == nil then return I18N.trf("Plate Type %d", t) end
+    local name = TYPE_NAMES:get(tostring(t), "name")
+    if name == nil then return T:trf("plate_type", t) end
     local special = 0
-    pcall(function() special = JSONLOADER:ExtractNumber(node["special"]) or 0 end)
+    pcall(function()
+        local node = typeCfg and typeCfg[tostring(t)] or nil
+        special = node and JSONLOADER:ExtractNumber(node["special"]) or 0
+    end)
     if special == 1 then
         local revealed = false
         for _, np in ipairs(self.nps or {}) do
@@ -435,14 +439,8 @@ function PC:typeName(t)
             pcall(function() ty = np.Type end)
             if ty == t and self.save and self.save:IsNameplateUnlocked(np.Id) then revealed = true; break end
         end
-        if not revealed then return I18N.tr("???") end
+        if not revealed then return T:tr("unknown") end
     end
-    local name = nil
-    pcall(function() name = JSONLOADER:ExtractText(node[I18N.lang]) end)
-    if name == nil or name == "" then
-        pcall(function() name = JSONLOADER:ExtractText(node["default"]) end)
-    end
-    if name == nil or name == "" then return I18N.trf("Plate Type %d", t) end
     return name
 end
 
@@ -478,7 +476,7 @@ local function entryName(save, tab, e)
     if tab == 2 then return e.Name or e.FolderName end
     if tab == 3 then return e.Title or "?" end
     local owned = save:IsNameplateUnlocked(e.Id) or not e.UnlockCondition.HasCondition
-    return owned and (e.Title or "") or I18N.tr("???")
+    return owned and (e.Title or "") or T:tr("unknown")
 end
 
 -- the ENTRY behind row i (nil for type-section headers on the nameplates tab)
@@ -524,12 +522,12 @@ function PC:buildUI()
     local ui = PopUI.new{ theme = THEME, navPlayer = (self.playerIndex or 0) + 1 }
     self.ui = ui
     local pc = self
-    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = I18N.tr("My Computer") }
+    ui:panel{ x = PANEL.x, y = PANEL.y, w = PANEL.w, h = PANEL.h, title = T:tr("title") }
     self.tabBtns = {}
     for ti, name in ipairs(TABS) do
         local i = ti
         local t = ui:button{
-            text = I18N.tr(name), x = TAB_X0 + (ti - 1) * TAB_STEP, y = PANEL.y + 74, w = TAB_W, h = 62,
+            text = T:tr(name), x = TAB_X0 + (ti - 1) * TAB_STEP, y = PANEL.y + 74, w = TAB_W, h = 62,
             accent = (self.tab == i),
             style = { font = { button = 19 } },
             onClick = function() pc:setTab(i) end,
@@ -553,12 +551,12 @@ function PC:buildUI()
         self.renameVal = self.save and self.save.Name or ""
         self.tb = ui:textbox{
             x = LIST.x, y = LIST.y + 90, w = 640, h = 76, value = self.renameVal, maxLen = 24,
-            placeholder = I18N.tr("new name..."),
+            placeholder = T:tr("rename_placeholder"),
             onChange = function(t) pc.renameVal = t end,
             onSubmit = function(t) pc.renameVal = t; pc:applyRename() end,
         }
         self.tb.onNavUpOrPadLeft = function() setFocusTo(ui, pc.tabBtns[pc.tab]); return true end
-        ui:button{ text = I18N.tr("Apply"), x = LIST.x + 670, y = LIST.y + 86, w = 180, h = 82, accent = true,
+        ui:button{ text = T:tr("rename_apply"), x = LIST.x + 670, y = LIST.y + 86, w = 180, h = 82, accent = true,
                    onClick = function() pc:applyRename() end }
     else
         self.tb = nil
@@ -607,7 +605,7 @@ function PC:buildUI()
             setFocusTo(ui, pc.tabBtns[pc.tab]); return true
         end
         self.actionBtn = ui:button{
-            text = I18N.tr("Equip"), x = DETAIL_X + 40, y = PANEL.y + PANEL.h - 130, w = DETAIL_W - 80, h = 76, accent = true,
+            text = T:tr("equip"), x = DETAIL_X + 40, y = PANEL.y + PANEL.h - 130, w = DETAIL_W - 80, h = 76, accent = true,
             onClick = function() pc:activateSelected() end, sfx = { click = "" },
         }
         self.sel = sel
@@ -665,7 +663,7 @@ function PC:refreshDetail()
     elseif self.tab == 4 then
         d.rarity = e.Rarity
         uc = e.UnlockCondition
-        local title = d.owned and (e.Title or "") or I18N.tr("???")
+        local title = d.owned and (e.Title or "") or T:tr("unknown")
         -- baked EXACTLY like the C# customize gallery: black on transparent, maxwidth 1000
         -- (the skin's drawTitlePlate clamps the drawn width itself)
         pcall(function()
@@ -682,12 +680,12 @@ function PC:refreshDetail()
         -- "???" only for the genuinely hidden condition types
         local m = ""
         if OPAQUE_COND[ctype] then
-            m = I18N.tr("???")
+            m = T:tr("unknown")
         else
             pcall(function() m = uc:GetConditionMessage() or "" end)
             if m == "" then pcall(function() m = uc:GetBlockedMessage(0) or "" end) end
-            if m == "" and d.price > 0 then m = I18N.trf("Purchase for %d coins.", d.price) end
-            if m == "" then m = I18N.tr("???") end
+            if m == "" and d.price > 0 then m = T:trf("purchase_hint", d.price) end
+            if m == "" then m = T:tr("unknown") end
         end
         d.cond = m
         d.unlockable = false
@@ -698,14 +696,14 @@ function PC:refreshDetail()
     if self.actionBtn then
         self.actionBtn:setVisible(true)
         if d.equipped then
-            self.actionBtn:setText(I18N.tr("Equipped")); self.actionBtn:setEnabled(false)
+            self.actionBtn:setText(T:tr("equipped")); self.actionBtn:setEnabled(false)
         elseif d.owned then
-            self.actionBtn:setText(I18N.tr("Equip")); self.actionBtn:setEnabled(true)
+            self.actionBtn:setText(T:tr("equip")); self.actionBtn:setEnabled(true)
         elseif d.price and d.price > 0 and d.unlockable then
-            self.actionBtn:setText(I18N.trf("Buy & Equip  (%d coins)", d.price))
+            self.actionBtn:setText(T:trf("buy_and_equip", d.price))
             self.actionBtn:setEnabled(d.price <= (save.Coins or 0))
         else
-            self.actionBtn:setText(I18N.tr("Locked")); self.actionBtn:setEnabled(false)
+            self.actionBtn:setText(T:tr("locked")); self.actionBtn:setEnabled(false)
         end
     end
 end
@@ -726,18 +724,18 @@ function PC:activateSelected()
     end
     local function unlockEquip(owned, uc, rarity, unlock, equip)
         if owned or not (uc and uc.HasCondition) then
-            equip(); SHARED:GetSharedSound("Decide"):Play(); self.msg = I18N.tr("Equipped!")
+            equip(); SHARED:GetSharedSound("Decide"):Play(); self.msg = T:tr("msg_equipped")
             return
         end
         local can = false
         pcall(function() can = uc:IsUnlockable(0) end)
         if not can then denied(); return end
         local price = uc:GetCoinPrice() or 0
-        if price > 0 and price > (save.Coins or 0) then denied(); self.msg = I18N.tr("Not enough coins."); return end
+        if price > 0 and price > (save.Coins or 0) then denied(); self.msg = T:tr("msg_not_enough_coins"); return end
         if price > 0 then save:SpendCoins(price) end
         if unlock() then SHARED:GetSharedSound("Error"):Play(); return end
         unlockPlay(rarity); equip()
-        self.msg = (price > 0) and I18N.trf("Purchased for %d coins!", price) or I18N.tr("Unlocked!")
+        self.msg = (price > 0) and T:trf("msg_purchased", price) or T:tr("msg_unlocked")
     end
     if tab == 1 then
         unlockEquip(save:IsCharacterUnlocked(e.FolderName), e.UnlockCondition, e.Rarity,
@@ -750,7 +748,7 @@ function PC:activateSelected()
     elseif tab == 3 then
         save:ChangeDan(e.Title)
         SHARED:GetSharedSound("Decide"):Play()
-        self.msg = I18N.tr("Dan title set.")
+        self.msg = T:tr("msg_dan_title_set")
     elseif tab == 4 then
         unlockEquip(save:IsNameplateUnlocked(e.Id), e.UnlockCondition, e.Rarity,
             function() return save:UnlockNameplate(e.Id) end,
@@ -769,10 +767,10 @@ end
 function PC:applyRename()
     local n = self.renameVal
     if self.tb and self.tb.value and self.tb.value ~= "" then n = self.tb.value end
-    if n == nil or n == "" then self.msg = I18N.tr("Enter a name first."); return end
+    if n == nil or n == "" then self.msg = T:tr("rename_empty"); return end
     if self.save then
         self.save:ChangeName(n)
-        self.msg = I18N.trf("Name changed to %s.", n)
+        self.msg = T:trf("rename_done", n)
     end
 end
 
@@ -853,13 +851,13 @@ function PC:draw()
     local save = self.save
 
     -- coins (dynamic → glyph text, no per-frame texture churn)
-    ui:drawTextEx(22, I18N.trf("Coins: %d", save and save.Coins or 0),
+    ui:drawTextEx(22, T:trf("coins", save and save.Coins or 0),
         PANEL.x + PANEL.w - 60, PANEL.y + 152, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "right")
 
     if self.tab == 5 then
-        ui:drawTextEx(24, I18N.trf("Current name:  %s", tostring(save and save.Name or "")),
+        ui:drawTextEx(24, T:trf("rename_current", tostring(save and save.Name or "")),
             LIST.x, LIST.y, { 52, 58, 92 }, { 255, 255, 255, 160 })
-        ui:drawTextEx(18, I18N.tr("Type a new name, then Apply (or press Enter)."),
+        ui:drawTextEx(18, T:tr("rename_hint"),
             LIST.x, LIST.y + 46, { 108, 114, 146 }, { 255, 255, 255, 120 })
     else
         local d = self.detail
@@ -935,12 +933,12 @@ function PC:draw()
             -- the Buy button already carries the price)
             local yU = boxBottom + 18
             if d.equipped then
-                ui:drawTextEx(20, I18N.tr("[ Equipped ]"), DETAIL_CX, yU, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "top")
+                ui:drawTextEx(20, T:tr("equipped_tag"), DETAIL_CX, yU, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "top")
             elseif not d.owned then
-                ui:drawTextEx(20, I18N.tr("How to unlock:"), DETAIL_X + 40, yU, { 255, 210, 140 }, { 0, 0, 0, 210 })
+                ui:drawTextEx(20, T:tr("how_to_unlock"), DETAIL_X + 40, yU, { 255, 210, 140 }, { 0, 0, 0, 210 })
                 -- drawWrapped has no outline (transparent back): the condition text must use the
                 -- panel's DARK theme colour — near-white here vanished into the light surface
-                ui:drawWrapped(19, d.cond or I18N.tr("???"), DETAIL_X + 40, yU + 32, DETAIL_W - 80, { 52, 58, 92 })
+                ui:drawWrapped(19, d.cond or T:tr("unknown"), DETAIL_X + 40, yU + 32, DETAIL_W - 80, { 52, 58, 92 })
             end
         end
     end

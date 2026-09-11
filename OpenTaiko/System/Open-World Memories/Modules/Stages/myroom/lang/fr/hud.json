@@ -1,0 +1,18 @@
+{
+  "_comment": "French texts for on-screen controls, interaction prompts and the room picker (Script.lua). Keys are stable ids; a missing id shows the English text (lang/en).",
+  "ctl_move": "WASD — Se déplacer",
+  "ctl_orbit": "Clic droit / Q·E — Orbiter",
+  "ctl_zoom": "Molette — Zoom",
+  "ctl_edit": "Tab — Modifier la chambre",
+  "ctl_leave": "Échap — Sortir",
+  "ctl_leave_visit": "Échap / Porte — Terminer la visite",
+  "prompt_computer": "[Entrée] Utiliser l'ordinateur",
+  "prompt_phone": "[Entrée] Utiliser le téléphone",
+  "prompt_lamp": "[Entrée] Allumer/éteindre la lampe",
+  "prompt_jukebox": "[Entrée] Mettre de la musique",
+  "prompt_pod": "[Entrée] Examiner",
+  "prompt_exit": "[Entrée] Quitter la chambre",
+  "prompt_switch": "[Tab] Changer de cible",
+  "player_entry": "Joueur %d — %s",
+  "whose_room": "La chambre de qui ?"
+}
