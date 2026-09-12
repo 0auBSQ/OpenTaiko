@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0.111] - 2026-09-12 (Beta)
+
+- [Fix] Graphics Device and inputs not being properly initialized when used with OpenTaiko Hub 0.2 or newer
+
 ## [0.6.0.110] - 2026-09-05 (Beta)
 
 - [Chore] Add EXFA unlocks to SongUnlockables.db3
