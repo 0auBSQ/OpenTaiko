@@ -525,41 +525,72 @@ internal class CSkin : IDisposable {
 		// no longer blocks one whole step (the boot/skin-reload freeze). A non-yielding onStart finishes on
 		// the first step ⇒ same as before.
 
+		// Debug builds time each module's instantiation (its script's top-level chunk) and onStart into the
+		// log, so a slow module shows up by name when the boot bar stalls.
+		var sw = new Stopwatch();
+		void logStep(string kind, string name, string phase) {
+#if DEBUG
+			Trace.TraceInformation($"[BOOT] {kind} {name} {phase}: {sw.Elapsed.TotalMilliseconds:F0} ms (step {done + 1}/{total})");
+#endif
+		}
+
 		// Transitions FIRST — onStart runs before Stages/Activities so they're ready for the first stage switch.
-		var transitions = new List<LuaTransitionWrapper>();
-		foreach (string _t in _transitionsList) { transitions.Add(new LuaTransitionWrapper(_t)); yield return ++done / (float)total; }
-		foreach (var _t in transitions) {
-			_t.BeginOnStart();
+		var transitions = new List<(string name, LuaTransitionWrapper w)>();
+		foreach (string _t in _transitionsList) {
+			sw.Restart(); transitions.Add((_t, new LuaTransitionWrapper(_t))); logStep("transition", _t, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _t) in transitions) {
+			sw.Restart(); _t.BeginOnStart();
 			while (_t.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("transition", name, "onStart");
 			yield return ++done / (float)total;
 		}
 
 		// Lua Stages
-		var stages = new List<LuaStageWrapper>();
-		foreach (string _module in _modulesList) { stages.Add(new LuaStageWrapper(_module, false)); yield return ++done / (float)total; }
-		foreach (string _module in _globalModulesList) { stages.Add(new LuaStageWrapper(_module, true)); yield return ++done / (float)total; }
-		foreach (var _s in stages) {
-			_s.BeginOnStart();
+		var stages = new List<(string name, LuaStageWrapper w)>();
+		foreach (string _module in _modulesList) {
+			sw.Restart(); stages.Add((_module, new LuaStageWrapper(_module, false))); logStep("stage", _module, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _module in _globalModulesList) {
+			sw.Restart(); stages.Add((_module, new LuaStageWrapper(_module, true))); logStep("global stage", _module, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _s) in stages) {
+			sw.Restart(); _s.BeginOnStart();
 			while (_s.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("stage", name, "onStart");
 			yield return ++done / (float)total;
 		}
 
 		// Lua Activities
-		var acts = new List<LuaActivityWrapper>();
-		foreach (string _act in _actList) { acts.Add(new LuaActivityWrapper(_act, false)); yield return ++done / (float)total; }
-		foreach (string _act in _globalActList) { acts.Add(new LuaActivityWrapper(_act, true)); yield return ++done / (float)total; }
-		foreach (var _a in acts) {
-			_a.BeginOnStart();
+		var acts = new List<(string name, LuaActivityWrapper w)>();
+		foreach (string _act in _actList) {
+			sw.Restart(); acts.Add((_act, new LuaActivityWrapper(_act, false))); logStep("activity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (string _act in _globalActList) {
+			sw.Restart(); acts.Add((_act, new LuaActivityWrapper(_act, true))); logStep("global activity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _a) in acts) {
+			sw.Restart(); _a.BeginOnStart();
 			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("activity", name, "onStart");
 			yield return ++done / (float)total;
 		}
 
 		// Lua RO Activities
-		var roActs = new List<LuaROActivityWrapper>();
-		foreach (string _act in _roActList) { roActs.Add(new LuaROActivityWrapper(_act)); yield return ++done / (float)total; }
-		foreach (var _a in roActs) {
-			_a.BeginOnStart();
+		var roActs = new List<(string name, LuaROActivityWrapper w)>();
+		foreach (string _act in _roActList) {
+			sw.Restart(); roActs.Add((_act, new LuaROActivityWrapper(_act))); logStep("roactivity", _act, "load");
+			yield return ++done / (float)total;
+		}
+		foreach (var (name, _a) in roActs) {
+			sw.Restart(); _a.BeginOnStart();
 			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
+			logStep("roactivity", name, "onStart");
 			yield return ++done / (float)total;
 		}
 	}

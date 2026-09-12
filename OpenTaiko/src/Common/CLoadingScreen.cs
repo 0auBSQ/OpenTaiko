@@ -13,17 +13,17 @@ namespace OpenTaiko;
 /// in the skin's logical resolution (same space the stages draw in).
 /// </summary>
 public static class CLoadingScreen {
-	private static long _lastDrawTicks = 0;
+	private static double _lastDrawMs = 0;
 
 	public static void Draw() {
-		// Advance the eased display value using our own frame delta (clamped inside Tick).
-		long now = Game.TimeMsReal;
-		double deltaMs = _lastDrawTicks == 0 ? 0.0 : (now - _lastDrawTicks) / (double)TimeSpan.TicksPerMillisecond;
-		_lastDrawTicks = now;
+		// Advance the eased display value using our own frame delta in milliseconds (clamped inside Tick).
+		double now = Game.dbTimeMsReal;
+		double deltaMs = _lastDrawMs == 0 ? 0.0 : now - _lastDrawMs;
+		_lastDrawMs = now;
 		CLoadingProgress.Tick(deltaMs);
 
 		if (!CLoadingProgress.ShouldDraw) {
-			_lastDrawTicks = 0;   // idle: reset so the next load's first frame has a 0 delta
+			_lastDrawMs = 0;   // idle: reset so the next load's first frame has a 0 delta
 			return;
 		}
 
