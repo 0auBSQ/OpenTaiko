@@ -35,6 +35,13 @@ local DIFFSELECT_LEVEL_COLORS = CFG.colorList("colors.level", {
 })
 local COL_WHITE       = COLOR:CreateColorFromHex("FFFFFFFF")
 local LVL_VAULT_COLOR = CFG.color("colors.level_vault", COLOR:CreateColorFromHex("FF1F5050"))
+
+-- The "+" of a plus level (LevelCol/plus.png) takes the level colour like the digits; LevelCol/plus_border.png
+-- is drawn under it in a colour of its own: white, black for Ura/Edit (whose colour is light on a dark bar)
+-- and vault.
+local COL_BLACK = COLOR:CreateColorFromHex("FF000000")
+local DIFFSELECT_PLUS_BORDER_COLORS = CFG.colorList("colors.level_plus_border", { COL_WHITE, COL_WHITE, COL_WHITE, COL_WHITE, COL_BLACK })
+local LVL_VAULT_PLUS_BORDER_COLOR   = CFG.color("colors.level_plus_border_vault", COL_BLACK)
 local VAULT_BLACK     = CFG.color("colors.vault_text", COLOR:CreateColorFromARGB(255, 0, 0, 0))
 local VAULT_NOOUTLINE = CFG.color("colors.vault_text_outline", COLOR:CreateColorFromARGB(0, 0, 0, 0))
 
@@ -249,11 +256,12 @@ local function drawLevelNumber(level, isPlus, difficulty, isVault, bx, by, opaci
     local str = tostring(level)
     local n   = #str
     local col = isVault and LVL_VAULT_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
+    local borderCol = isVault and LVL_VAULT_PLUS_BORDER_COLOR or (DIFFSELECT_PLUS_BORDER_COLORS[difficulty + 1] or COL_WHITE)
     local setcx, setcy = bx + LVL_CX, by + LVL_CY
-    local function glyph(tex, lx, ly)
+    local function glyph(tex, lx, ly, tint)
         local cx, cy = nmap(lx, ly)
         tex:SetRotation(nAngleDeg)
-        tex:SetColor(col)
+        tex:SetColor(tint)
         tex:SetOpacity(opacity)
         tex:DrawAtAnchor(cx, cy, "center")
         tex:SetRotation(0)
@@ -264,12 +272,14 @@ local function drawLevelNumber(level, isPlus, difficulty, isVault, bx, by, opaci
         local tex = G.bgtx["diffsel_levelcol" .. string.sub(str, k, k)]
         if tex then
             local off = (k - 1) - (n - 1) / 2
-            glyph(tex, setcx + off * LVL_DIGIT_DX, setcy + off * LVL_DIGIT_DY)
+            glyph(tex, setcx + off * LVL_DIGIT_DX, setcy + off * LVL_DIGIT_DY, col)
         end
     end
     if isPlus and G.bgtx["diffsel_levelcol+"] then
         local off = (n - 1) / 2
-        glyph(G.bgtx["diffsel_levelcol+"], setcx + off * LVL_DIGIT_DX + LVL_PLUS_DX, setcy + off * LVL_DIGIT_DY + LVL_PLUS_DY)
+        local px, py = setcx + off * LVL_DIGIT_DX + LVL_PLUS_DX, setcy + off * LVL_DIGIT_DY + LVL_PLUS_DY
+        if G.bgtx["diffsel_levelcol+border"] then glyph(G.bgtx["diffsel_levelcol+border"], px, py, borderCol) end
+        glyph(G.bgtx["diffsel_levelcol+"], px, py, col)
     end
 end
 

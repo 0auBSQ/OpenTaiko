@@ -14,6 +14,9 @@
         "plus_dx": -19,
         "plus_dy": -27,
         "plus_shift": -5,
+        "checker_level_easy": 6,
+        "checker_level_normal": 8,
+        "checker_level_hard": 9,
         "barleft_x_offset": -67
     },
 
@@ -98,6 +101,8 @@
     "colors": {
         "level": ["FF65A9F7", "FF8FF5A9", "FFE6DA76", "FFF39898", "FFCD7EE6"],
         "level_vault": "FF1F5050",
+        "level_plus_border": ["FFFFFFFF", "FFFFFFFF", "FFFFFFFF", "FFFFFFFF", "FF000000"],
+        "level_plus_border_vault": "FF000000",
         "vault_text": "FF000000",
         "vault_text_outline": "00000000",
         "songlist_gold": "FFF2CF01",

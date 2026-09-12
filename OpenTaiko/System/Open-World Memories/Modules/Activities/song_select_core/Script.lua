@@ -259,6 +259,7 @@ function onStart()
     G.bgtx["levellabels+"]      = TEXTURE:CreateTexture("Textures/BarLevel/plus.png")
     G.bgtx["sinfo_level+"]      = TEXTURE:CreateTexture("Textures/SinfoLevel/plus.png")
     G.bgtx["diffsel_levelcol+"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus.png")
+    G.bgtx["diffsel_levelcol+border"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus_border.png")
     G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
@@ -274,6 +275,10 @@ function onStart()
     G.bars["levellabelsvault"]   = TEXTURE:CreateTexture("Textures/bar_levelbgvault.png")
     G.bars["levellabelsfire"]    = TEXTURE:CreateTexture("Textures/bar_levelbgfire.png")
     G.bars["levellabelsstorm"]   = TEXTURE:CreateTexture("Textures/bar_levelbgstorm.png")
+    -- Easy / Normal / Hard from their high levels (see draw_songselect's SONGBAR_CHECKER_LEVEL_*)
+    for i = 0, 2 do
+        G.bars["levellabelschecker" .. i] = TEXTURE:CreateTexture("Textures/bar_levelbgchecker" .. i .. ".png")
+    end
     for i = 1, 5 do
         G.bars["difficultybarselect" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/P" .. i .. ".png")
     end

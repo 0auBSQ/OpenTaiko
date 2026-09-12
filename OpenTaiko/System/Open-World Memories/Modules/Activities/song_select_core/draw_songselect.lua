@@ -33,6 +33,12 @@ local SONGBAR_PLUS_DX             = CFG.num("song_list.plus_dx", -19)
 local SONGBAR_PLUS_DY             = CFG.num("song_list.plus_dy", -27)
 -- the plus overhangs the digits' ink by ~9px, so the whole number moves left by half of that to stay centred
 local SONGBAR_PLUS_SHIFT          = CFG.num("song_list.plus_shift", -5)
+-- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
+local SONGBAR_CHECKER_LEVEL       = {
+    [0] = CFG.num("song_list.checker_level_easy", 6),
+    [1] = CFG.num("song_list.checker_level_normal", 8),
+    [2] = CFG.num("song_list.checker_level_hard", 9),
+}
 
 local SONGINFO_DIFFICULTIES_ORIGIN_X = CFG.num("song_info.difficulties_origin_x", 1790)
 local SONGINFO_DIFFICULTIES_ORIGIN_Y = CFG.num("song_info.difficulties_origin_y", 154)
@@ -107,6 +113,9 @@ local function drawLevelTag(lv, x, y)
     if lv.isVault then
         -- Vault songs: animated strip (same frame counter as storm)
         G.bars["levellabelsvault"]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
+    elseif lv.diff <= 2 and lv.lv >= SONGBAR_CHECKER_LEVEL[lv.diff] and G.bars["levellabelschecker" .. lv.diff] then
+        -- a high level for its difficulty: the tag's colour with the turning checker
+        G.bars["levellabelschecker" .. lv.diff]:DrawRectAtAnchor(x, y, 0, labelH * G.levelLabelFrame, labelW, labelH, "center")
     elseif lv.diff < 3 or lv.lv <= 10 then
         G.bars["levellabels"]:DrawRectAtAnchor(x, y, 0, labelH * lv.diff, labelW, labelH, "center")
     elseif lv.diff == 3 then
