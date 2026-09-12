@@ -56,6 +56,14 @@ local SONGINFO_BPM_ORIGIN_X          = CFG.num("song_info.bpm_origin_x", 1780)
 local SONGINFO_BPM_ORIGIN_Y          = CFG.num("song_info.bpm_origin_y", 877)
 local SONGINFO_BPM_MWIDTH            = CFG.num("song_info.bpm_max_width", 240)
 local SONGINFO_BPM_ROTATION          = CFG.num("song_info.bpm_rotation", 355.55)   -- tilt to match the BPM plate image
+-- Song speed notice over the metronome (only when the multiplier is not 1): a label and the multiplier,
+-- with two large ▶ behind them, centred on the text block, pulsing in turn once per beat of the sped-up
+-- BPM. Everything is tinted with the BPM text colour.
+local SONGINFO_SPEED_ORIGIN_X        = CFG.num("song_info.speed_origin_x", 1804)
+local SONGINFO_SPEED_LABEL_Y         = CFG.num("song_info.speed_label_y", 729)
+local SONGINFO_SPEED_VALUE_Y         = CFG.num("song_info.speed_value_y", 753)
+local SONGINFO_SPEED_ARROW_GAP       = CFG.num("song_info.speed_arrow_gap", 40)   -- between the two ▶ centres
+local SONGINFO_SPEED_LABEL           = CFG.str("song_info.speed_label", "Song speed")
 local SONGINFO_CHARTER_ORIGIN_X      = CFG.num("song_info.charter_origin_x", 1216)
 local SONGINFO_CHARTER_ORIGIN_Y      = CFG.num("song_info.charter_origin_y", 750)
 local SONGINFO_CHARTER_MWIDTH        = CFG.num("song_info.charter_max_width", 512)
@@ -150,6 +158,30 @@ local function drawInfoLevel(d, cx, cy, opacity)
             cy + SONGINFO_PLUS_DY, "center")
         plus:SetOpacity(1)
     end
+end
+
+-- The song speed notice over the metronome. The two ▶ go first, behind the text, centred on the value
+-- line (its ink top to bottom); they are one shared texture drawn twice with SetColor/SetOpacity,
+-- pulsing half a beat apart (the chase runs backward for a slowed-down song). The label and value are
+-- glyph text tinted with the BPM colour.
+local function drawSpeedNotice(sel)
+    local x = SONGINFO_SPEED_ORIGIN_X - G.songSelectShift
+    local tex = G.bgtx["sinfo_speed_arrow"]
+    if tex ~= nil then
+        local cy = SONGINFO_SPEED_VALUE_Y + G.text.LineHeight / 2
+        local phase = ((G.nowMs or 0) % sel.speedBeatMs) / sel.speedBeatMs
+        if sel.bpmMult < 1 then phase = 1 - phase end
+        tex:SetColor(sel.bpmColor)
+        for i = 0, 1 do
+            local p = (phase - i * 0.5) % 1
+            tex:SetOpacity(0.25 + 0.75 * (0.5 + 0.5 * math.cos(2 * math.pi * p)))
+            tex:DrawAtAnchor(x + (i - 0.5) * SONGINFO_SPEED_ARROW_GAP, cy, "center")
+        end
+        tex:SetOpacity(1)
+        tex:SetColor(COL_WHITE)
+    end
+    G.textSmall:Draw(SONGINFO_SPEED_LABEL, x, SONGINFO_SPEED_LABEL_Y, sel.bpmColor, nil, 1, 1, 0, "top")
+    G.text:Draw(sel.speedText, x, SONGINFO_SPEED_VALUE_Y, sel.bpmColor, nil, 1, 1, 0, "top")
 end
 
 -- Draw fav.png at x=39 y=80 relative to bar.png top-left (the favorite flag is cached in the page slot).
@@ -460,9 +492,14 @@ function M.drawPanel()
                     end
                     sel.bpmText  = bpmText
                     sel.bpmColor = (mult < 1) and COL_BPM_SLOW or (mult > 1) and COL_BPM_FAST or COL_WHITE
+                    sel.speedText = (mult ~= 1) and string.format("x%.2f", mult) or nil
+                    -- one beat of the sped-up song, in ms (clamped so extreme BPMs still read as a pulse)
+                    local bpm = (sel.bpmBase or 0) * mult
+                    sel.speedBeatMs = (bpm > 0) and math.max(150, math.min(2000, 60000 / bpm)) or 600
                 end
                 G.text:Draw(sel.bpmText, SONGINFO_BPM_ORIGIN_X - G.songSelectShift, SONGINFO_BPM_ORIGIN_Y,
                     sel.bpmColor, nil, 1, 1, SONGINFO_BPM_MWIDTH, "center", 0, SONGINFO_BPM_ROTATION)
+                if sel.speedText then drawSpeedNotice(sel) end
             end
         end
     end

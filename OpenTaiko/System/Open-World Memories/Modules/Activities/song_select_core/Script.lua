@@ -58,6 +58,7 @@ local G = {
     ctx = {},
 
     -- Scroll / animation state
+    nowMs               = 0,
     currentBackground   = 0,
     backgroundScrollX   = 0,
     songSelectShift     = 0,
@@ -242,6 +243,7 @@ function onStart()
     G.bgtx["header-arrow"]              = TEXTURE:CreateTexture("Textures/bg_header-arrow.png")
     G.bgtx["nameplate_info"]            = TEXTURE:CreateTexture("Textures/nameplate_info.png")
     G.bgtx["sinfo_video"]               = TEXTURE:CreateTexture("Textures/sinfo_video.png")
+    G.bgtx["sinfo_speed_arrow"]         = TEXTURE:CreateTexture("Textures/sinfo_speed_arrow.png")   -- one white ▶, tinted per draw
     G.bgtx["sinfo_explicit"]            = TEXTURE:CreateTexture("Textures/sinfo_explicit.png")
     G.bgtx["sinfo_difficulties_missing"] = TEXTURE:CreateTexture("Textures/sinfo_difficulties_missing.png")
     G.bgtx["sinfo_difficulties_vault"]      = TEXTURE:CreateTexture("Textures/sinfo_difficulties_vault.png")
@@ -494,6 +496,7 @@ end
 -- ── Update ────────────────────────────────────────────────────────────────────
 
 function update(ts)
+    G.nowMs = ts                                   -- the frame clock for draw-side animations (song speed arrows)
     for _, c in pairs(G.ctx) do c:Tick() end
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
