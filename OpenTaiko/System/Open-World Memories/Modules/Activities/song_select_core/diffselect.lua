@@ -76,6 +76,84 @@ local LVL_DIGIT_DY = CFG.num("difficulty_select.level.digit_step_y", -9)
 local LVL_PLUS_DX  = CFG.num("difficulty_select.level.plus_dx", 7)
 local LVL_PLUS_DY  = CFG.num("difficulty_select.level.plus_dy", -25)
 
+-- Level gauge: the dark band under the number, cut into slices baked upright in Textures/DifficultyBars/
+-- LevelGauge (seg8 for Easy/Normal, seg10 for the rest; three cells each: first / middle / last). Every
+-- slice is drawn centre-anchored at its point in bar coordinates (first, then mid stepped along the band,
+-- then last) and rotated by the band's angle plus the Note's sway. Lit slices = min(level, slices). Each
+-- slice takes its own shade: the level colour leaning toward white (light bars) or black (Ura/Edit, vault)
+-- on the first, a more saturated variant on the last; unlit slices show faintly.
+local GAUGE_ROT       = CFG.num("difficulty_select.level.gauge_rotation", 13.2)       -- degrees; the band's rise (CCW)
+-- 1 = the shades run the other way (the pale/dark end last): Ura/Edit and the vault, whose bars are dark
+local GAUGE_REVERSE       = CFG.numList("difficulty_select.level.gauge_reverse", { 0, 0, 0, 0, 1 })
+local GAUGE_REVERSE_VAULT = CFG.num("difficulty_select.level.gauge_reverse_vault", 1)
+local GAUGE_SETS = {
+    [8]  = { first = { CFG.num("difficulty_select.level.gauge8_first_x", 350.6), CFG.num("difficulty_select.level.gauge8_first_y", 177.2) },
+             mid   = { CFG.num("difficulty_select.level.gauge8_mid_x", 388.1),   CFG.num("difficulty_select.level.gauge8_mid_y", 168.4) },
+             step  = { CFG.num("difficulty_select.level.gauge8_step_x", 36.45),  CFG.num("difficulty_select.level.gauge8_step_y", -8.55) },
+             last  = { CFG.num("difficulty_select.level.gauge8_last_x", 607.7),  CFG.num("difficulty_select.level.gauge8_last_y", 116.9) } },
+    [10] = { first = { CFG.num("difficulty_select.level.gauge10_first_x", 346.5), CFG.num("difficulty_select.level.gauge10_first_y", 176.1) },
+             mid   = { CFG.num("difficulty_select.level.gauge10_mid_x", 376.7),   CFG.num("difficulty_select.level.gauge10_mid_y", 169.0) },
+             step  = { CFG.num("difficulty_select.level.gauge10_step_x", 29.18),  CFG.num("difficulty_select.level.gauge10_step_y", -6.84) },
+             last  = { CFG.num("difficulty_select.level.gauge10_last_x", 611.1),  CFG.num("difficulty_select.level.gauge10_last_y", 114.0) } },
+}
+local GAUGE_EMPTY     = CFG.num("difficulty_select.level.gauge_empty_opacity", 0.15)   -- unlit slices; 0 hides them
+local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- first slice: how far toward white/black
+local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- last slice: saturation multiplier
+-- the vault's level colour is the vault band's own colour, so its gauge starts from a lighter teal
+local LVL_VAULT_GAUGE_COLOR = CFG.color("colors.level_gauge_vault", COLOR:CreateColorFromHex("FF5FC8C8"))
+-- what the first slice leans toward, per difficulty (index = difficulty + 1) and for the vault
+local GAUGE_START_COLORS = CFG.colorList("colors.level_gauge_start", {
+    COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FFFFFFFF"),
+    COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FF000000"),
+})
+local LVL_VAULT_GAUGE_START = CFG.color("colors.level_gauge_start_vault", COLOR:CreateColorFromHex("FF000000"))
+
+local function rgbToHsv(r, g, b)
+    local mx, mn = math.max(r, g, b), math.min(r, g, b)
+    local d = mx - mn
+    local h = 0
+    if d > 0 then
+        if mx == r then h = ((g - b) / d) % 6
+        elseif mx == g then h = (b - r) / d + 2
+        else h = (r - g) / d + 4 end
+        h = h / 6
+    end
+    return h, (mx > 0) and d / mx or 0, mx
+end
+local function hsvToRgb(h, s, v)
+    local i = math.floor(h * 6) % 6
+    local f = h * 6 - math.floor(h * 6)
+    local p, q, t = v * (1 - s), v * (1 - s * f), v * (1 - s * (1 - f))
+    if i == 0 then return v, t, p elseif i == 1 then return q, v, p elseif i == 2 then return p, v, t
+    elseif i == 3 then return p, q, v elseif i == 4 then return t, p, v else return v, p, q end
+end
+-- n shades: the level colour leaning toward `toward` on the first, its saturated variant on the last
+-- (the other way round when reversed)
+local function gaugeShades(levelCol, toward, n, reversed)
+    local ok, shades = pcall(function()
+        local r, g, b = levelCol.R / 255, levelCol.G / 255, levelCol.B / 255
+        local tr, tg, tb = toward.R / 255, toward.G / 255, toward.B / 255
+        local sr, sg, sb = r + (tr - r) * GAUGE_START_MIX, g + (tg - g) * GAUGE_START_MIX, b + (tb - b) * GAUGE_START_MIX
+        local h, s, v = rgbToHsv(r, g, b)
+        local er, eg, eb = hsvToRgb(h, math.min(1, s * GAUGE_END_SAT + 0.05), v)
+        local out = {}
+        for i = 1, n do
+            local t = (n > 1) and (i - 1) / (n - 1) or 1
+            if reversed then t = 1 - t end
+            out[i] = COLOR:CreateColorFromRGBA(
+                math.floor((sr + (er - sr) * t) * 255 + 0.5),
+                math.floor((sg + (eg - sg) * t) * 255 + 0.5),
+                math.floor((sb + (eb - sb) * t) * 255 + 0.5), 255)
+        end
+        return out
+    end)
+    if ok then return shades end
+    local out = {}
+    for i = 1, n do out[i] = levelCol end
+    return out
+end
+local gaugeShadeCache = {}   -- difficulty (or "vault") -> shades, built on first use
+
 -- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
 -- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
 local CHARTER_CX   = CFG.num("difficulty_select.charter.center_x", 551)
@@ -283,6 +361,43 @@ local function drawLevelNumber(level, isPlus, difficulty, isVault, bx, by, opaci
     end
 end
 
+-- The level gauge of a difficulty bar whose Note-local top-left is (bx,by): the set's first / middle /
+-- last cells drawn centre-anchored at their configured points (the middle one stepped along the band),
+-- rotated to the band, each with SetColor (its shade) and SetOpacity (lit or faint).
+local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
+    local n = (not isVault and difficulty <= 1) and 8 or 10
+    local tex, set = G.bgtx["diffsel_gauge" .. n], GAUGE_SETS[n]
+    if tex == nil or set == nil then return end
+    local cw, ch = tex.Width / 3, tex.Height
+    local key = isVault and "vault" or difficulty
+    local shades = gaugeShadeCache[key]
+    if shades == nil then
+        local col = isVault and LVL_VAULT_GAUGE_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
+        local toward = isVault and LVL_VAULT_GAUGE_START or (GAUGE_START_COLORS[difficulty + 1] or COL_WHITE)
+        local reversed = (isVault and GAUGE_REVERSE_VAULT or (GAUGE_REVERSE[difficulty + 1] or 0)) ~= 0
+        shades = gaugeShades(col, toward, n, reversed)
+        gaugeShadeCache[key] = shades
+    end
+    local lit = math.max(0, math.min(n, math.floor(tonumber(level) or 0)))
+    tex:SetRotation(GAUGE_ROT + nAngleDeg)
+    for i = 1, n do
+        local a = (i <= lit) and opacity or (opacity * GAUGE_EMPTY)
+        if a > 0 then
+            local cell, cx, cy
+            if i == 1 then cell, cx, cy = 0, set.first[1], set.first[2]
+            elseif i == n then cell, cx, cy = 2, set.last[1], set.last[2]
+            else cell, cx, cy = 1, set.mid[1] + (i - 2) * set.step[1], set.mid[2] + (i - 2) * set.step[2] end
+            local sx, sy = nmap(bx + cx, by + cy)
+            tex:SetColor(shades[i])
+            tex:SetOpacity(a)
+            tex:DrawRectAtAnchor(sx, sy, cell * cw, 0, cw, ch, "center")
+        end
+    end
+    tex:SetRotation(0)
+    tex:SetColor(COL_WHITE)
+    tex:SetOpacity(1)
+end
+
 -- Up to CHARTER_MAX charter names for a difficulty bar whose Note-local top-left is (bx,by). Each name is a
 -- single cached texture (GetText), centre-anchored at its transformed point and rotated as one piece.
 local function drawCharters(charters, bx, by, opacity)
@@ -344,6 +459,7 @@ function M.drawPanel()
             drawTexTL(tex, bx, by, opacityNorm)
             drawCharters(barinfo.charters, bx, by, opacityNorm)
             drawLevelNumber(barinfo.level, barinfo.isplus, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
+            drawLevelGauge(barinfo.level, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
 
             if barinfo.vault and barinfo.vaultName ~= nil and barinfo.vaultName ~= "" then
                 ensureLabelFonts()

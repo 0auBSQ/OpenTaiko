@@ -262,6 +262,10 @@ function onStart()
     G.bgtx["sinfo_level+"]      = TEXTURE:CreateTexture("Textures/SinfoLevel/plus.png")
     G.bgtx["diffsel_levelcol+"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus.png")
     G.bgtx["diffsel_levelcol+border"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelCol/plus_border.png")
+    -- Level gauge sets: LevelGauge/seg8 (Easy/Normal) and seg10 (the rest), three upright white cells each
+    -- (first / middle / last slice); diffselect places and rotates them from Config/layout.json
+    G.bgtx["diffsel_gauge8"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8.png")
+    G.bgtx["diffsel_gauge10"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10.png")
     G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
