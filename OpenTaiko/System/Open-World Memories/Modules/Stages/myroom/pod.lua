@@ -2,7 +2,7 @@
 -- pod.lua — the Mysterious Pod's opening sequence: the player steps in, the pod rattles with
 -- sparks, rests, vents a cloud of steam, and the room fades to black before Script.lua leaves for
 -- the pod's own stage. Script.lua switches to mode "pod" while this runs and draws the player
--- through playerVisual(). Without that stage installed the pod keeps its "nothing opens" line.
+-- through playerVisual(). Without that stage installed the pod keeps its "does nothing" line.
 
 local Room    = require("room")
 local Almanac = require("almanac")

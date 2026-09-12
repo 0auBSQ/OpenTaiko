@@ -98,9 +98,9 @@
     "choice_no": "No deal"
   },
   "pod": {
-    "locked": "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet."
+    "locked": "You press the panel on the Mysterious pod, but it does nothing."
   },
   "phone": {
-    "enum_wait": "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\""
+    "enum_wait": "There is a note next to the phone, \"Do not use while the song catalogue is loading\" it says."
   }
 }

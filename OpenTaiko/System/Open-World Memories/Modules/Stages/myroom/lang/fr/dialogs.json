@@ -97,9 +97,9 @@
     "choice_no": "Pas de marché"
   },
   "pod": {
-    "locked": "Vous appuyez sur le panneau de la capsule mystérieuse. Elle vibre doucement, mais rien ne s'ouvre. Pas encore."
+    "locked": "Vous appuyez sur le panneau de la capsule mystérieuse, mais il ne se passe rien."
   },
   "phone": {
-    "enum_wait": "La ligne grésille un instant. « Toutes mes excuses. Le catalogue musical est encore en cours de classement, et les visites sont un vrai désordre sans lui. Rappelez donc quand chaque disque sera sur son étagère. »"
+    "enum_wait": "Il y a un mot à côté du téléphone : « Ne pas utiliser pendant le chargement du catalogue musical »."
   }
 }

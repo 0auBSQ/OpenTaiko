@@ -602,7 +602,7 @@ buildPhoneMenu = function()
                     -- visits need the finished song catalogue (the guests' jukebox matching runs on it)
                     closePhone(); mode = "dialogue"; phoneFlow = nil
                     dlg:start({ { name = "", text = dlgLoc("phone", "enum_wait",
-                        "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"") } })
+                        "There is a note next to the phone, \"Do not use while the song catalogue is loading\" it says.") } })
                 else
                     MO.host(); closePhone(); msg = net.msg; msgT = 7
                 end
@@ -610,7 +610,7 @@ buildPhoneMenu = function()
                 if not JB.songsEnumReady() then
                     closePhone(); mode = "dialogue"; phoneFlow = nil
                     dlg:start({ { name = "", text = dlgLoc("phone", "enum_wait",
-                        "The line crackles for a moment. \"Terribly sorry, dear. The music catalogue is still being sorted, and visits are such a mess without it. Do call back once every record is on its shelf.\"") } })
+                        "There is a note next to the phone, \"Do not use while the song catalogue is loading\" it says.") } })
                 else
                 buildPhoneTextPane(PHONE:tr("join_title"), PHONE:tr("code_placeholder"), 4096, PHONE:tr("join"), function(t)
                     closePhone()
@@ -963,7 +963,7 @@ function update(ts)
             else
                 mode = "dialogue"; phoneFlow = nil
                 dlg:start({ { name = "", text = dlgLoc("pod", "locked",
-                    "You press the panel on the Mysterious pod. It hums, but nothing opens. Not yet.") } })
+                    "You press the panel on the Mysterious pod, but it does nothing.") } })
             end
         elseif focused.kind == "jukebox" then
             SHARED:GetSharedSound("Decide"):Play()
