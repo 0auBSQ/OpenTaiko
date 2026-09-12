@@ -590,36 +590,23 @@ internal class OpenTaiko : Game {
 			ConfigIsNew = true;
 		}
 
-		if (ConfigIsNew) {
-			GraphicsDeviceType_ = AnglePlatformType.OpenGL;
-
-			if (OperatingSystem.IsWindows()) {
-				GraphicsDeviceType_ = AnglePlatformType.OpenGL;
-				ConfigIni.nGraphicsDeviceType = 0;
-			}
-			// While we aren't able to support MacOS, this check is included just in case this changes.
-			else if (OperatingSystem.IsMacOS()) {
-				GraphicsDeviceType_ = AnglePlatformType.Metal;
-				ConfigIni.nGraphicsDeviceType = 3;
-			} else if (OperatingSystem.IsLinux()) {
+		// Config.ini に GraphicsDeviceType が無い場合は、CConfigIni のコンストラクタが設定した
+		// OSごとの推奨値がそのまま使われる。
+		// When Config.ini doesn't specify GraphicsDeviceType, the OS-recommended value set by the
+		// CConfigIni constructor is used as-is.
+		switch (ConfigIni.nGraphicsDeviceType) {
+			case 1:
+				GraphicsDeviceType_ = AnglePlatformType.D3D11;
+				break;
+			case 2:
 				GraphicsDeviceType_ = AnglePlatformType.Vulkan;
-				ConfigIni.nGraphicsDeviceType = 2;
-			}
-		} else {
-			switch (ConfigIni.nGraphicsDeviceType) {
-				case 0:
-					GraphicsDeviceType_ = AnglePlatformType.OpenGL;
-					break;
-				case 1:
-					GraphicsDeviceType_ = AnglePlatformType.D3D11;
-					break;
-				case 2:
-					GraphicsDeviceType_ = AnglePlatformType.Vulkan;
-					break;
-				case 3:
-					GraphicsDeviceType_ = AnglePlatformType.Metal;
-					break;
-			}
+				break;
+			case 3:
+				GraphicsDeviceType_ = AnglePlatformType.Metal;
+				break;
+			default:
+				GraphicsDeviceType_ = AnglePlatformType.OpenGL;
+				break;
 		}
 
 		if (VideoExporter.Active) VideoExporter.ApplyBootOverrides(this);
