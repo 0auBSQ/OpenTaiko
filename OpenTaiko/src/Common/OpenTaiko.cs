@@ -1238,9 +1238,7 @@ internal class OpenTaiko : Game {
 		if (app == null) {
 			return null;
 		}
-#if DEBUG
-		Trace.TraceInformation($"[ALLOC_TEX] {fileName}");
-#endif
+		if (TraceAllocations) Trace.TraceInformation($"[ALLOC_TEX] {fileName}");
 		// Fast-skip missing files: returning null avoids a FileNotFoundException per missing texture, which is
 		// very slow under a debugger (first-chance handling) — a malformed asset (e.g. a dancer whose
 		// DancerConfig count exceeds its frame folders) otherwise throws dozens of them and freezes the load.
@@ -1407,6 +1405,11 @@ internal class OpenTaiko : Game {
 	}
 
 	private static CTraceLogListener? FileLogListener = null;
+
+	// Per-allocation trace lines ([ALLOC_TEX] / [ALLOC_SND], one per texture or sound created). Off unless the
+	// OPENTAIKO_TRACE_ALLOC environment variable is 1: a debugger attached to the process makes every trace line
+	// a slow OutputDebugString round trip, and the boot creates several hundred textures.
+	public static readonly bool TraceAllocations = Environment.GetEnvironmentVariable("OPENTAIKO_TRACE_ALLOC") == "1";
 
 	private static void tStartupLog() {
 		Trace.AutoFlush = true;

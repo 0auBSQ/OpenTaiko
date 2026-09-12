@@ -178,6 +178,12 @@ class TextureLoader {
 	private bool bReportTextureProgress = false;
 	private int nTexturesLoaded = 0;
 	private int nTextureEstimate = 320;   // first-run fallback; refined from strTextureCountCache afterwards
+	private long _bootTexturesStart;
+	// Boot-screen status of LoadTexture: how many textures so far (of the estimate), and the sub-phase running
+	// when it is not plain textures (the character sets)
+	public int BootTexturesLoaded => nTexturesLoaded;
+	public int BootTexturesEstimate => nTextureEstimate;
+	public volatile string BootLabel = "";
 	private void tTickTextureProgress() {
 		if (!bReportTextureProgress) return;
 		nTexturesLoaded++;
@@ -194,6 +200,7 @@ class TextureLoader {
 				nTextureEstimate = est;
 		} catch { /* estimate stays at the fallback */ }
 		bReportTextureProgress = true;
+		_bootTexturesStart = System.Diagnostics.Stopwatch.GetTimestamp();
 		#endregion
 
 		CalibrateFG = TxC(CONFIG + $@"Calibration{Path.DirectorySeparatorChar}FG.png");
@@ -788,11 +795,13 @@ class TextureLoader {
 
 		string[] charaDirNames = new string[charaDirs.Length];
 		for (int i = 0; i < charaDirs.Length; i++) {
+			BootLabel = $"CHARACTERS ... {Path.GetFileName(charaDirs[i])} ({i + 1}/{charaDirs.Length})";
 			Characters[i] = new(charaDirs[i], i);
 			charaDirNames[i] = Characters[i].dirName;
 		}
 
 		for (int i = 0; i < 5; i++) {
+			BootLabel = $"CHARACTERS ... player {i + 1} ({OpenTaiko.SaveFileInstances[i].data.Character})";
 			OpenTaiko.SaveFileInstances[i].tReindexCharacter(charaDirNames);
 			this.ReloadCharacter(-1, OpenTaiko.SaveFileInstances[i].data.Character, i, true);
 			PaletteManager.RestoreFromSave(i);
@@ -809,6 +818,7 @@ class TextureLoader {
 
 		OpenTaiko.Databases?.LoadThemeSettings();
 		CVirtualSlotManager.Initialize();
+		BootLabel = "";
 
 		#endregion
 
@@ -831,6 +841,9 @@ class TextureLoader {
 		}
 
 		#region [ Boot loading-bar bracket: end ]
+#if DEBUG
+		Trace.TraceInformation($"[BOOT] textures: {nTexturesLoaded} in {System.Diagnostics.Stopwatch.GetElapsedTime(_bootTexturesStart).TotalMilliseconds:F0} ms");
+#endif
 		bReportTextureProgress = false;
 		try {
 			File.WriteAllText(strTextureCountCache, nTexturesLoaded.ToString());
@@ -1258,21 +1271,28 @@ Result_Mountain = new CTexture[4]*/;
 		Characters_Result_Failed_2P;
 	*/
 
+	// One character folder; its per-player instances (each a Lua VM running the character script) are created
+	// on first use. Creating all of them up front cost the boot ~150 ms per character (5 VMs each) for
+	// characters that are mostly never selected.
 	public class CCharacterLuaSet : CCharacter.Info, IDisposable {
-		public readonly CCharacterLua[] instances; // [iPlayer]
+		private readonly CCharacterLua?[] instances = new CCharacterLua?[OpenTaiko.MAX_PLAYERS]; // [iPlayer]
 		public CCharacter.Info info => this;
-		public CCharacterLua this[int p] => instances[p];
-		public CCharacterLua Preview => instances[0]; // use P1's instance for preview
-
-		public CCharacterLuaSet(string path, int i) : base(path, i) {
-			instances = Enumerable.Range(0, OpenTaiko.MAX_PLAYERS)
-				.Select(i => new CCharacterLua(this))
-				.ToArray();
+		public CCharacterLua this[int p] {
+			get {
+				var inst = instances[p];
+				if (inst != null) return inst;
+				lock (instances) return instances[p] ??= new CCharacterLua(this);
+			}
 		}
+		public CCharacterLua Preview => this[0]; // use P1's instance for preview
+
+		public CCharacterLuaSet(string path, int i) : base(path, i) { }
 
 		public void Dispose() {
-			foreach (var instance in instances)
-				instance.Dispose();
+			for (int p = 0; p < instances.Length; p++) {
+				instances[p]?.Dispose();
+				instances[p] = null;
+			}
 		}
 	}
 

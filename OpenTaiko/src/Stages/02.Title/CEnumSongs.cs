@@ -225,7 +225,7 @@ internal partial class CEnumSongs                   // #27060 2011.2.7 yyagi 曲
 				OpenTaiko.Skin.bgmStartupScreen.tPlay();
 				OpenTaiko.Skin.PreloadSystemSounds();
 				lock (OpenTaiko.stageStartup.listProgressString) {
-					OpenTaiko.stageStartup.listProgressString.Add("SYSTEM SOUND...OK");
+					OpenTaiko.stageStartup.listProgressString.Add("SYSTEM SOUNDS ... OK");
 				}
 			} finally {
 				Trace.Unindent();

@@ -20,12 +20,15 @@ namespace OpenTaiko {
 
 		// Name-bound mode (non-null means we reference this instance)
 		private CCharacterLua? _ownedCharacter;
+		// Non-owning wrappers over a character set: the instance is resolved on first use (a Lua VM per
+		// character is created only when something draws or queries it).
+		private readonly Func<CCharacterLua?>? _resolver;
 		// False for non-owning wrappers — Dispose() will not destroy the underlying character.
 		private readonly bool _ownsCharacter;
 
 		private CCharacter? Character => _player >= 0
 			? CCharacter.GetCharacter(_player)
-			: _ownedCharacter;
+			: (_ownedCharacter ??= _resolver?.Invoke());
 
 		public bool IsValid => Character != null;
 
@@ -222,6 +225,16 @@ namespace OpenTaiko {
 		internal LuaCharacter(CCharacterLua character) {
 			_player = -1;
 			_ownedCharacter = character;
+			_ownsCharacter = false;
+		}
+
+		/// <summary>
+		/// Non-owning, lazy constructor: the <see cref="CCharacterLua"/> is resolved on first use, so wrapping
+		/// every character (the CHARACTERLIST database) creates no Lua VMs until one is actually drawn.
+		/// </summary>
+		internal LuaCharacter(Func<CCharacterLua?> resolver) {
+			_player = -1;
+			_resolver = resolver;
 			_ownsCharacter = false;
 		}
 

@@ -148,9 +148,7 @@ namespace OpenTaiko {
 
 		internal LuaSound CreateSoundFromAbsolutePath(string path, ESoundGroup group, bool autoDispose = true) {
 			string full_path = $@"{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
-#if DEBUG
-			Trace.TraceInformation($"[ALLOC_SND] {full_path}");
-#endif
+			if (OpenTaiko.TraceAllocations) Trace.TraceInformation($"[ALLOC_SND] {full_path}");
 
 			// Return an empty stub + create the BASS stream non-blocking on the render thread (BASS is sync-
 			// critical, so it is NOT moved off-thread — just spread across frames). Until it's built every method

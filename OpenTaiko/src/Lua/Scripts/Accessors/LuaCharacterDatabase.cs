@@ -16,9 +16,8 @@ namespace OpenTaiko {
 
 		internal LuaCharacterDatabase(TextureLoader.CCharacterLuaSet[] characters) {
 			_entries = characters
-				.Select(s => s.Preview)
-				.Where(c => c != null)
-				.Select(c => new LuaCharacterEntry(c))
+				.Where(s => s != null)
+				.Select(s => new LuaCharacterEntry(s))
 				.ToArray();
 		}
 
@@ -55,8 +54,8 @@ namespace OpenTaiko {
 
 	/// <summary>
 	/// A single entry in <see cref="LuaCharacterDatabase"/>.
-	/// Holds a name-bound <see cref="LuaCharacter"/> (no textures pre-loaded)
-	/// and exposes character metadata and unlock helpers to Lua scripts.
+	/// Holds a <see cref="LuaCharacter"/> over the character's preview instance, which (like its textures)
+	/// is only created when first used, and exposes character metadata and unlock helpers to Lua scripts.
 	/// </summary>
 	public class LuaCharacterEntry : IDisposable {
 		/// <summary>Folder-name key used in save files.</summary>
@@ -77,13 +76,13 @@ namespace OpenTaiko {
 		/// <summary>Exposes the unlock condition to Lua.</summary>
 		public LuaUnlockCondition UnlockCondition { get; }
 
-		internal LuaCharacterEntry(CCharacterLua character) {
-			FolderName = character.info.dirName;
-			DisplayName = character.info.metadata.tGetName();
-			Rarity = character.info.metadata.Rarity;
-			// Non-owning: wraps the already-loaded CCharacterLua — no extra Lua scripts created.
-			Character = new LuaCharacter(character);
-			UnlockCondition = new LuaUnlockCondition(character.info.unlock);
+		internal LuaCharacterEntry(TextureLoader.CCharacterLuaSet set) {
+			FolderName = set.dirName;
+			DisplayName = set.metadata.tGetName();
+			Rarity = set.metadata.Rarity;
+			// Non-owning: wraps the set's preview instance, created by the set on first access.
+			Character = new LuaCharacter(() => set.Preview);
+			UnlockCondition = new LuaUnlockCondition(set.unlock);
 		}
 
 		private bool _disposed;

@@ -80,6 +80,7 @@ internal class CStageStartup : CStage {
 				// trace flush is batched here. The song-list enum is started once module loading finishes (below).
 				_session = new CLoadSession(new EnumeratorStep(OpenTaiko.Skin.LoadModulesIncrementally()));
 				_session.Begin();
+				this.strCurrentProgress = "MODULES ...";
 				_savedAutoFlush = System.Diagnostics.Trace.AutoFlush;
 				System.Diagnostics.Trace.AutoFlush = false;
 				base.IsFirstDraw = false;
@@ -98,6 +99,10 @@ internal class CStageStartup : CStage {
 				// 0-55%: module onStart;  55-60%: streamed onStart-texture upload drain.
 				CLoadingProgress.Report(_session.SourceDone ? 0.55f + 0.05f * _session.AssetFraction
 				                                            : 0.55f * _session.SourceProgress);
+				// the live line: which Lua module is being loaded / started, then the texture upload drain
+				this.strCurrentProgress = _session.SourceDone
+					? $"MODULES ... uploading textures ({(int)(_session.AssetFraction * 100)}%)"
+					: $"MODULES ... {CSkin.LoadingModuleLabel} ({CSkin.LoadingModuleStep}/{CSkin.LoadingModuleTotal})";
 				if (!more) {
 					_session.End();
 					_session = null;
@@ -105,6 +110,8 @@ internal class CStageStartup : CStage {
 					System.Diagnostics.Trace.Flush();
 					OpenTaiko.NamePlate.RefreshSkin();
 					OpenTaiko.ModalManager.RefreshSkin();
+					lock (this.listProgressString) this.listProgressString.Add($"MODULES ... OK ({CSkin.LoadingModuleTotal / 2} loaded)");
+					this.strCurrentProgress = "SYSTEM SOUNDS ...";
 					es = new CEnumSongs();
 					es.StartLoadSystemSound();
 				}
@@ -115,45 +122,53 @@ internal class CStageStartup : CStage {
 			//-----------------
 			switch (base.ePhaseID) {
 				case CStage.EPhase.Startup_0_CreateSystemSound:
-					this.strCurrentProgress = "SYSTEM SOUND...";
+					this.strCurrentProgress = "SYSTEM SOUNDS ...";
 					break;
 
 				case CStage.EPhase.Startup_1_InitializeSonglist:
-					this.strCurrentProgress = "SONG LIST...";
+					this.strCurrentProgress = "SONG LIST ... initializing";
 					break;
 
 				case CStage.EPhase.Startup_2_EnumerateSongs:
-					this.strCurrentProgress = string.Format("{0} ... {1}", "Enumerating songs", es.SongManager.nSearchScoreCount);
+					this.strCurrentProgress = string.Format("SONG LIST ... enumerating ({0} charts)", es.SongManager.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_3_ApplyScoreCache:
-					this.strCurrentProgress = string.Format("{0} ... {1}/{2}", "Loading score properties from songs.db", es.SongManager.nScoresAppliedFromScoreCache, es.SongManager.nSearchScoreCount);
+					this.strCurrentProgress = string.Format("SONG LIST ... scores from songs.db ({0}/{1})", es.SongManager.nScoresAppliedFromScoreCache, es.SongManager.nSearchScoreCount);
 					break;
 
 				case CStage.EPhase.Startup_4_LoadSongsNotSeenInScoreCacheAndApplyThem:
-					this.strCurrentProgress = string.Format("{0} ... {1}/{2}", "Loading score properties from files", es.SongManager.nScoresAppliedFromFile, es.SongManager.nSearchScoreCount - es.SongManager.nScoresAppliedFromScoreCache);
+					this.strCurrentProgress = string.Format("SONG LIST ... scores from files ({0}/{1})", es.SongManager.nScoresAppliedFromFile, es.SongManager.nSearchScoreCount - es.SongManager.nScoresAppliedFromScoreCache);
 					break;
 
 				case CStage.EPhase.Startup_5_PostProcessSonglist:
-					this.strCurrentProgress = string.Format("{0} ... ", "Building songlists");
+					this.strCurrentProgress = "SONG LIST ... building lists";
 					break;
 
 				case CStage.EPhase.Startup_6_LoadTextures:
-					if (!bIsLoadingTextures) {
+					if (bIsLoadingTextures) {
+						// live: the texture count, or the character sets while those load
+						string sub = OpenTaiko.Tx.BootLabel;
+						this.strCurrentProgress = sub != "" ? sub
+							: $"TEXTURES ... {OpenTaiko.Tx.BootTexturesLoaded}/{OpenTaiko.Tx.BootTexturesEstimate}";
+					} else {
 						void loadTexture() {
-							this.listProgressString.Add("LOADING TEXTURES...");
-
 							try {
 								OpenTaiko.Tx.LoadTexture();
 								CLoadingProgress.End();   // textures done → snap the boot bar to 100%
 
-								this.listProgressString.Add("LOADING TEXTURES...OK");
+								lock (this.listProgressString) {
+									this.listProgressString.Add($"CHARACTERS ... OK ({OpenTaiko.Tx.Characters.Length})");
+									this.listProgressString.Add($"TEXTURES ... OK ({OpenTaiko.Tx.BootTexturesLoaded})");
+								}
 								this.strCurrentProgress = "Setup done.";
 							} catch (Exception exception) {
 								Trace.TraceError(exception.ToString());
-								this.listProgressString.Add("LOADING TEXTURES...NG");
-								foreach (var text in exception.ToString().Split('\n')) {
-									this.listProgressString.Add(text);
+								lock (this.listProgressString) {
+									this.listProgressString.Add("TEXTURES ... NG");
+									foreach (var text in exception.ToString().Split('\n')) {
+										this.listProgressString.Add(text);
+									}
 								}
 							}
 
@@ -178,10 +193,15 @@ internal class CStageStartup : CStage {
 				int x = (int)(320 * OpenTaiko.Skin.Resolution[0] / 1280.0);
 				int y = (int)(20 * OpenTaiko.Skin.Resolution[1] / 720.0);
 				int dy = (int)((OpenTaiko.actTextConsole.fontHeight + 8) * OpenTaiko.Skin.Resolution[1] / 720.0);
-				for (int i = 0; i < this.listProgressString.Count; i++) {
-					y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.listProgressString[i]).y;
-					y += dy;
+				lock (this.listProgressString) {
+					for (int i = 0; i < this.listProgressString.Count; i++) {
+						y = OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.listProgressString[i]).y;
+						y += dy;
+					}
 				}
+				// the step in progress, under the completed ones
+				if (!string.IsNullOrEmpty(this.strCurrentProgress))
+					OpenTaiko.actTextConsole.Print(x, y, CTextConsole.EFontType.White, this.strCurrentProgress);
 				//-----------------
 				#endregion
 			} else if (es != null && es.IsSongListEnumCompletelyDone) {                     // System sound loaded

@@ -503,6 +503,12 @@ internal class CSkin : IDisposable {
 	/// Instantiate-all-then-onStart-all per category preserves the original ordering (a module's onStart may
 	/// reference another already-instantiated module).
 	/// </summary>
+	// Boot-screen status of the incremental module preload: what is loading right now and how far along
+	// (the startup stage prints it under its step list).
+	public static volatile string LoadingModuleLabel = "";
+	public static volatile int LoadingModuleStep = 0;
+	public static volatile int LoadingModuleTotal = 0;
+
 	internal IEnumerator<float> LoadModulesIncrementally() {
 		// Main Menu Settings
 		MainMenuSettings = new CMainMenuSettings();
@@ -525,9 +531,16 @@ internal class CSkin : IDisposable {
 		// no longer blocks one whole step (the boot/skin-reload freeze). A non-yielding onStart finishes on
 		// the first step ⇒ same as before.
 
-		// Debug builds time each module's instantiation (its script's top-level chunk) and onStart into the
-		// log, so a slow module shows up by name when the boot bar stalls.
+		// Each unit of work announces itself to the boot screen (kind, name, phase, step count); debug builds
+		// also time each module's instantiation (its script's top-level chunk) and onStart into the log, so a
+		// slow module shows up by name when the boot bar stalls.
 		var sw = new Stopwatch();
+		LoadingModuleTotal = total; LoadingModuleStep = 0;
+		void beginStep(string kind, string name, string phase) {
+			LoadingModuleLabel = $"{kind} {name} ({phase})";
+			LoadingModuleStep = done + 1;
+			sw.Restart();
+		}
 		void logStep(string kind, string name, string phase) {
 #if DEBUG
 			Trace.TraceInformation($"[BOOT] {kind} {name} {phase}: {sw.Elapsed.TotalMilliseconds:F0} ms (step {done + 1}/{total})");
@@ -537,11 +550,11 @@ internal class CSkin : IDisposable {
 		// Transitions FIRST — onStart runs before Stages/Activities so they're ready for the first stage switch.
 		var transitions = new List<(string name, LuaTransitionWrapper w)>();
 		foreach (string _t in _transitionsList) {
-			sw.Restart(); transitions.Add((_t, new LuaTransitionWrapper(_t))); logStep("transition", _t, "load");
+			beginStep("transition", _t, "load"); transitions.Add((_t, new LuaTransitionWrapper(_t))); logStep("transition", _t, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _t) in transitions) {
-			sw.Restart(); _t.BeginOnStart();
+			beginStep("transition", name, "onStart"); _t.BeginOnStart();
 			while (_t.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
 			logStep("transition", name, "onStart");
 			yield return ++done / (float)total;
@@ -550,15 +563,15 @@ internal class CSkin : IDisposable {
 		// Lua Stages
 		var stages = new List<(string name, LuaStageWrapper w)>();
 		foreach (string _module in _modulesList) {
-			sw.Restart(); stages.Add((_module, new LuaStageWrapper(_module, false))); logStep("stage", _module, "load");
+			beginStep("stage", _module, "load"); stages.Add((_module, new LuaStageWrapper(_module, false))); logStep("stage", _module, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (string _module in _globalModulesList) {
-			sw.Restart(); stages.Add((_module, new LuaStageWrapper(_module, true))); logStep("global stage", _module, "load");
+			beginStep("global stage", _module, "load"); stages.Add((_module, new LuaStageWrapper(_module, true))); logStep("global stage", _module, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _s) in stages) {
-			sw.Restart(); _s.BeginOnStart();
+			beginStep("stage", name, "onStart"); _s.BeginOnStart();
 			while (_s.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
 			logStep("stage", name, "onStart");
 			yield return ++done / (float)total;
@@ -567,15 +580,15 @@ internal class CSkin : IDisposable {
 		// Lua Activities
 		var acts = new List<(string name, LuaActivityWrapper w)>();
 		foreach (string _act in _actList) {
-			sw.Restart(); acts.Add((_act, new LuaActivityWrapper(_act, false))); logStep("activity", _act, "load");
+			beginStep("activity", _act, "load"); acts.Add((_act, new LuaActivityWrapper(_act, false))); logStep("activity", _act, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (string _act in _globalActList) {
-			sw.Restart(); acts.Add((_act, new LuaActivityWrapper(_act, true))); logStep("global activity", _act, "load");
+			beginStep("global activity", _act, "load"); acts.Add((_act, new LuaActivityWrapper(_act, true))); logStep("global activity", _act, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _a) in acts) {
-			sw.Restart(); _a.BeginOnStart();
+			beginStep("activity", name, "onStart"); _a.BeginOnStart();
 			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
 			logStep("activity", name, "onStart");
 			yield return ++done / (float)total;
@@ -584,15 +597,16 @@ internal class CSkin : IDisposable {
 		// Lua RO Activities
 		var roActs = new List<(string name, LuaROActivityWrapper w)>();
 		foreach (string _act in _roActList) {
-			sw.Restart(); roActs.Add((_act, new LuaROActivityWrapper(_act))); logStep("roactivity", _act, "load");
+			beginStep("roactivity", _act, "load"); roActs.Add((_act, new LuaROActivityWrapper(_act))); logStep("roactivity", _act, "load");
 			yield return ++done / (float)total;
 		}
 		foreach (var (name, _a) in roActs) {
-			sw.Restart(); _a.BeginOnStart();
+			beginStep("roactivity", name, "onStart"); _a.BeginOnStart();
 			while (_a.StepOnStart(out var sub)) yield return (done + Math.Clamp(sub, 0f, 1f)) / total;
 			logStep("roactivity", name, "onStart");
 			yield return ++done / (float)total;
 		}
+		LoadingModuleLabel = ""; LoadingModuleStep = total;
 	}
 
 	/// <summary>
