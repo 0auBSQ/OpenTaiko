@@ -1890,6 +1890,32 @@ internal class CConfigIni : INotifyPropertyChanged {
 		}
 
 		this.LoadFromString(str);
+
+		// キーアサインが一つも無い Config.ini は操作不能なので、既定値に戻す。
+		// A Config.ini in which every single key assignment is empty leaves the game with no way to
+		// play or even navigate the menus, so it is never something a player set up on purpose.
+		// 0.6.0.110 and earlier wrote exactly that out after being started with a partially written
+		// Config.ini (e.g. the one OpenTaiko Hub generates), so recover instead of honouring it.
+		if (!this.HasAnyKeyAssignment()) {
+			Trace.TraceWarning(
+				"Config.ini does not assign a single input; restoring the default key assignments.");
+			this.SetDefaultKeyAssignments();
+		}
+	}
+
+	private bool HasAnyKeyAssignment() {
+		for (int i = 0; i <= (int)EKeyConfigPart.System; i++) {
+			for (int j = 0; j < (int)EKeyConfigPad.Max; j++) {
+				CKeyAssign.STKEYASSIGN[] assign = this.KeyAssign[i][j];
+				for (int k = 0; k < assign.Length; k++) {
+					if (assign[k].InputDevice != InputDeviceType.Unknown) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private void LoadFromString(string strAllSettings) {
