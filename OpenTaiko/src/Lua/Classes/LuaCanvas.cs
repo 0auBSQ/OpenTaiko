@@ -11,10 +11,7 @@ namespace OpenTaiko {
 	/// thousands of coloured quads per frame, write into the buffer and draw it as a
 	/// single texture.
 	/// </summary>
-	public class LuaCanvas : IDisposable {
-		internal CTexture? _texture = null;
-		internal HashSet<LuaCanvas>? _disposeList = null;
-
+	public class LuaCanvas : LuaTexture, IDisposable {
 		internal byte[] _buf;         // RGBA, top-left origin
 		internal readonly int _w;     // GL pixel buffer size (may be reduced by the render-scale)
 		internal readonly int _h;
@@ -24,16 +21,15 @@ namespace OpenTaiko {
 		// dirty rectangle (inclusive) so Upload only sends the changed region
 		private int _dx0, _dy0, _dx1, _dy1;
 
-		public uint Pointer => _texture != null ? _texture.Pointer : 0;
-		public int Width => _logW;
-		public int Height => _logH;
+		public override int Width => _logW;
+		public override int Height => _logH;
 
 		public LuaCanvas(int width, int height) : this(width, height, width, height) { }
 
 		/// <summary>Create a canvas whose GL pixel buffer is <paramref name="pixelW"/>×<paramref name="pixelH"/> but that
 		/// presents at <paramref name="logicalW"/>×<paramref name="logicalH"/> (used by render-scaled 3D scenes: render
 		/// fewer pixels, display + report full size). When logical == pixel this is an ordinary full-res canvas.</summary>
-		public LuaCanvas(int pixelW, int pixelH, int logicalW, int logicalH) {
+		public LuaCanvas(int pixelW, int pixelH, int logicalW, int logicalH) : base() {
 			_w = Math.Max(1, pixelW);
 			_h = Math.Max(1, pixelH);
 			_logW = Math.Max(1, logicalW);
@@ -252,62 +248,20 @@ namespace OpenTaiko {
 		}
 		#endregion
 
-		#region Drawing (mirrors LuaTexture)
-		public void Draw(int x, int y) {
-			_texture?.t2DDraw(x, y);
-		}
-		/// <summary>Draw only a sub-rectangle of the canvas (source rect in canvas pixels) at x,y —
-		/// scrolling lists slice partially-visible rows with this so they clip to their viewport.</summary>
-		public void DrawRect(int x, int y, int rect_x, int rect_y, int rect_width, int rect_height) {
-			_texture?.t2DDraw(x, y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
-		}
-		public void DrawAtAnchor(int x, int y, string anchor) {
-			CTexture.RefPnt ref_anchor = anchor.ToLower() switch {
-				"topleft" => CTexture.RefPnt.UpLeft,
-				"top" => CTexture.RefPnt.Up,
-				"topright" => CTexture.RefPnt.UpRight,
-				"left" => CTexture.RefPnt.Left,
-				"center" => CTexture.RefPnt.Center,
-				"right" => CTexture.RefPnt.Right,
-				"bottomleft" => CTexture.RefPnt.DownLeft,
-				"bottom" => CTexture.RefPnt.Down,
-				"bottomright" => CTexture.RefPnt.DownRight,
-				_ => CTexture.RefPnt.UpLeft
-			};
-			_texture?.t2DScaledDraw(ref_anchor, x, y, new(0, 0, _logW, _logH));
-		}
-		public void SetScale(float scale_x, float scale_y) {
-			_texture?.tSetScale(scale_x, scale_y);
-		}
-		public void SetOpacity(float opacity) {
-			_texture?.tUpdateOpacity((int)(opacity * 255));
-		}
-		public void SetColor(float red, float green, float blue) {
-			_texture?.tUpdateColor4(new(red, green, blue, 1f));
-		}
-		#endregion
-
 		#region Dispose
-		private bool _disposedValue;
-		protected virtual void Dispose(bool disposing) {
+		protected override void Dispose(bool disposing) {
 			if (!_disposedValue) {
-				OpenTaiko.tDisposeSafely(ref _texture);
-				_disposeList?.Remove(this);
 				_buf = Array.Empty<byte>();
-				_disposedValue = true;
 			}
-		}
-		public void Dispose() {
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
+			base.Dispose(disposing);
 		}
 		#endregion
 	}
 
 	public class LuaCanvasFunc {
-		private HashSet<LuaCanvas> Canvases;
+		private HashSet<LuaTexture> Canvases;
 
-		public LuaCanvasFunc(HashSet<LuaCanvas> canvases) {
+		public LuaCanvasFunc(HashSet<LuaTexture> canvases) {
 			Canvases = canvases;
 		}
 

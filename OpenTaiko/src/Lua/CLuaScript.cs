@@ -22,7 +22,7 @@ public abstract class CLuaScript : IDisposable {
 	#region [For the new Lua module methods]
 
 	public HashSet<LuaTexture> TextureList = [];
-	public HashSet<LuaCanvas> CanvasList = [];
+	public HashSet<LuaTexture> CanvasList = []; // LuaCanvas tracked internally as LuaTexture
 	public HashSet<Lua3DScene> Scene3DList = [];
 	public HashSet<LuaSound> SoundList = [];
 	public HashSet<LuaVideo> VideoList = [];

@@ -3,8 +3,8 @@ using FDK;
 
 namespace OpenTaiko {
 	public class LuaTexture : IDisposable {
-		internal CTexture? _texture = null;
-		internal HashSet<LuaTexture>? _disposeList = null;
+		protected internal CTexture? _texture = null;
+		protected internal HashSet<LuaTexture>? _disposeList = null;
 		public uint Pointer => _texture != null ? _texture.Pointer : 0;
 
 		// One-time GPU→CPU readback cache (a texture's pixels rarely change). Consumers
@@ -60,8 +60,8 @@ namespace OpenTaiko {
 		#endregion
 		#region Gets
 		public bool Loaded => _texture != null;
-		public int Height => _texture?.szTextureSize.Height ?? -1;
-		public int Width => _texture?.szTextureSize.Width ?? -1;
+		public virtual int Height => _texture?.szTextureSize.Height ?? -1;
+		public virtual int Width => _texture?.szTextureSize.Width ?? -1;
 		public LuaVector2 GetScale() {
 			return _texture != null ? new LuaVector2(_texture.vcScaleRatio.X, _texture.vcScaleRatio.Y) : new LuaVector2(0, 0);
 		}
@@ -144,7 +144,7 @@ namespace OpenTaiko {
 		public void ClearGradientMap() => _texture?.ClearGradientMap();
 		#endregion
 		#region Dispose
-		private bool _disposedValue;
+		protected bool _disposedValue;
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				OpenTaiko.tDisposeSafely(ref _texture);
