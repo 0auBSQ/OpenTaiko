@@ -8,6 +8,7 @@
 -- songselect→diffselect transition (difficultySelectElemOpacity) and shares the horizontal scroll (xshift).
 
 local Replay = require("replaylist")
+local Color  = require("Color")            -- Lib: colour space conversions / adjustments
 local CFG    = require("sscore_config")   -- Config/layout.json (skinner-editable); values fall back to the defaults below
 
 local M = {}
@@ -80,12 +81,12 @@ local LVL_PLUS_DY  = CFG.num("difficulty_select.level.plus_dy", -25)
 -- LevelGauge (seg8 for Easy/Normal, seg10 for the rest; three cells each: first / middle / last). Every
 -- slice is drawn centre-anchored at its point in bar coordinates (first, then mid stepped along the band,
 -- then last) and rotated by the band's angle plus the Note's sway. Lit slices = min(level, slices). Each
--- slice takes its own shade: the level colour leaning toward white (light bars) or black (Ura/Edit, vault)
--- on the first, a more saturated variant on the last; unlit slices show faintly.
+-- slice takes its own shade, two styles: light bars run from a pale tint of the level colour to its vivid
+-- variant; dark bars (Ura/Edit, vault) run from the vivid variant to a lighter one. Unlit slices show faintly.
 local GAUGE_ROT       = CFG.num("difficulty_select.level.gauge_rotation", 13.2)       -- degrees; the band's rise (CCW)
--- 1 = the shades run the other way (the pale/dark end last): Ura/Edit and the vault, whose bars are dark
-local GAUGE_REVERSE       = CFG.numList("difficulty_select.level.gauge_reverse", { 0, 0, 0, 0, 1 })
-local GAUGE_REVERSE_VAULT = CFG.num("difficulty_select.level.gauge_reverse_vault", 1)
+-- 1 = the dark-bar style (vivid first, lighter last), per difficulty (index = difficulty + 1) and for the vault
+local GAUGE_VIVID_FIRST       = CFG.numList("difficulty_select.level.gauge_vivid_first", { 0, 0, 0, 0, 1 })
+local GAUGE_VIVID_FIRST_VAULT = CFG.num("difficulty_select.level.gauge_vivid_first_vault", 1)
 local GAUGE_SETS = {
     [8]  = { first = { CFG.num("difficulty_select.level.gauge8_first_x", 350.6), CFG.num("difficulty_select.level.gauge8_first_y", 177.2) },
              mid   = { CFG.num("difficulty_select.level.gauge8_mid_x", 388.1),   CFG.num("difficulty_select.level.gauge8_mid_y", 168.4) },
@@ -97,54 +98,25 @@ local GAUGE_SETS = {
              last  = { CFG.num("difficulty_select.level.gauge10_last_x", 611.1),  CFG.num("difficulty_select.level.gauge10_last_y", 114.0) } },
 }
 local GAUGE_EMPTY     = CFG.num("difficulty_select.level.gauge_empty_opacity", 0.15)   -- unlit slices; 0 hides them
-local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- first slice: how far toward white/black
-local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- last slice: saturation multiplier
+local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- light bars, first slice: how far toward white
+local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- vivid end: saturation multiplier
+local GAUGE_END_LIGHT = CFG.num("difficulty_select.level.gauge_end_lighten", 0.4)     -- dark bars, last slice: how far toward white (HSL lightness)
 -- the vault's level colour is the vault band's own colour, so its gauge starts from a lighter teal
 local LVL_VAULT_GAUGE_COLOR = CFG.color("colors.level_gauge_vault", COLOR:CreateColorFromHex("FF5FC8C8"))
--- what the first slice leans toward, per difficulty (index = difficulty + 1) and for the vault
-local GAUGE_START_COLORS = CFG.colorList("colors.level_gauge_start", {
-    COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FFFFFFFF"),
-    COLOR:CreateColorFromHex("FFFFFFFF"), COLOR:CreateColorFromHex("FF000000"),
-})
-local LVL_VAULT_GAUGE_START = CFG.color("colors.level_gauge_start_vault", COLOR:CreateColorFromHex("FF000000"))
 
-local function rgbToHsv(r, g, b)
-    local mx, mn = math.max(r, g, b), math.min(r, g, b)
-    local d = mx - mn
-    local h = 0
-    if d > 0 then
-        if mx == r then h = ((g - b) / d) % 6
-        elseif mx == g then h = (b - r) / d + 2
-        else h = (r - g) / d + 4 end
-        h = h / 6
-    end
-    return h, (mx > 0) and d / mx or 0, mx
-end
-local function hsvToRgb(h, s, v)
-    local i = math.floor(h * 6) % 6
-    local f = h * 6 - math.floor(h * 6)
-    local p, q, t = v * (1 - s), v * (1 - s * f), v * (1 - s * (1 - f))
-    if i == 0 then return v, t, p elseif i == 1 then return q, v, p elseif i == 2 then return p, v, t
-    elseif i == 3 then return p, q, v elseif i == 4 then return t, p, v else return v, p, q end
-end
--- n shades: the level colour leaning toward `toward` on the first, its saturated variant on the last
--- (the other way round when reversed)
-local function gaugeShades(levelCol, toward, n, reversed)
+-- n shades of the level colour: pale tint -> vivid (light bars), or vivid -> lighter (dark bars)
+local function gaugeShades(levelCol, n, vividFirst)
     local ok, shades = pcall(function()
-        local r, g, b = levelCol.R / 255, levelCol.G / 255, levelCol.B / 255
-        local tr, tg, tb = toward.R / 255, toward.G / 255, toward.B / 255
-        local sr, sg, sb = r + (tr - r) * GAUGE_START_MIX, g + (tg - g) * GAUGE_START_MIX, b + (tb - b) * GAUGE_START_MIX
-        local h, s, v = rgbToHsv(r, g, b)
-        local er, eg, eb = hsvToRgb(h, math.min(1, s * GAUGE_END_SAT + 0.05), v)
-        local out = {}
-        for i = 1, n do
-            local t = (n > 1) and (i - 1) / (n - 1) or 1
-            if reversed then t = 1 - t end
-            out[i] = COLOR:CreateColorFromRGBA(
-                math.floor((sr + (er - sr) * t) * 255 + 0.5),
-                math.floor((sg + (eg - sg) * t) * 255 + 0.5),
-                math.floor((sb + (eb - sb) * t) * 255 + 0.5), 255)
+        local r, g, b = Color.fromEngine(levelCol)
+        local vr, vg, vb = Color.saturate(r, g, b, GAUGE_END_SAT, 0.05)
+        local from, to
+        if vividFirst then
+            from, to = { vr, vg, vb }, { Color.lighten(r, g, b, GAUGE_END_LIGHT) }
+        else
+            from, to = { Color.mix(r, g, b, 1, 1, 1, GAUGE_START_MIX) }, { vr, vg, vb }
         end
+        local out = {}
+        for i, c in ipairs(Color.ramp(from, to, n)) do out[i] = Color.toEngine(c[1], c[2], c[3]) end
         return out
     end)
     if ok then return shades end
@@ -373,9 +345,8 @@ local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
     local shades = gaugeShadeCache[key]
     if shades == nil then
         local col = isVault and LVL_VAULT_GAUGE_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
-        local toward = isVault and LVL_VAULT_GAUGE_START or (GAUGE_START_COLORS[difficulty + 1] or COL_WHITE)
-        local reversed = (isVault and GAUGE_REVERSE_VAULT or (GAUGE_REVERSE[difficulty + 1] or 0)) ~= 0
-        shades = gaugeShades(col, toward, n, reversed)
+        local vividFirst = (isVault and GAUGE_VIVID_FIRST_VAULT or (GAUGE_VIVID_FIRST[difficulty + 1] or 0)) ~= 0
+        shades = gaugeShades(col, n, vividFirst)
         gaugeShadeCache[key] = shades
     end
     local lit = math.max(0, math.min(n, math.floor(tonumber(level) or 0)))
