@@ -61,7 +61,26 @@
         "VIEWER_COL_TYPE":  "Type",
         "VIEWER_COL_VALUE": "Valeur",
         "VIEWER_HINT_SCROLL": "haut/bas pour défiler   Annuler pour quitter",
-        "VIEWER_HINT_EXIT":   "Annuler pour quitter"
+        "VIEWER_HINT_EXIT":   "Annuler pour quitter",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "Voir les raccourcis",
+        "SONGSELECT_SHORTCUTS_TITLE": "Raccourcis",
+        "SONGSELECT_SHORTCUTS_CLOSE": "Fermer",
+        "SONGSELECT_UNBOUND": "(non assigné)",
+        "SONGSELECT_SC_HELP": "Afficher cette liste",
+        "SONGSELECT_SC_SORT": "Trier les chansons",
+        "SONGSELECT_SC_SEARCH": "Rechercher dans le dossier actuel",
+        "SONGSELECT_SC_FAVORITE": "Ajouter la chanson sélectionnée aux favoris, ou la retirer",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "Ouvrir vos favoris",
+        "SONGSELECT_SC_AUTO_P1": "Activer ou désactiver l'auto du joueur 1",
+        "SONGSELECT_SC_AUTO_P2": "Activer ou désactiver l'auto du joueur 2",
+        "SONGSELECT_SC_COURSE": "Changer la difficulté affichée sur les barres",
+        "SONGSELECT_SC_PLAYER": "Changer le joueur configuré",
+        "SONGSELECT_SC_SPEED_DOWN": "Réduire la vitesse de la chanson",
+        "SONGSELECT_SC_SPEED_UP": "Augmenter la vitesse de la chanson",
+        "SONGSELECT_SC_PLAYER_COUNT": "Changer le nombre de joueurs",
+        "SONGSELECT_BOX_BEGINNERS": "Chansons recommandées pour débuter"
 
     }
 }

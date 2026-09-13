@@ -170,6 +170,18 @@ local function makeControl(opt)
         local w = ui:button{ text = tr("SETTINGS_UI_CONFIGURE", "Configure"), h = 56,
             onClick = function() enterKeys(opt.KeyGroup ~= "" and opt.KeyGroup or "system") end }
         return w, false
+    elseif kind == "Key" then
+        -- a theme "key" setting: the button shows the key; decide/click captures one (Esc keeps the old one)
+        local w = ui:button{ text = opt:Display(), h = 56, w = 300,
+            onClick = function(self)
+                captureBtn = self
+                M.Keys:StartKeyNameCapture(function(name)
+                    if name ~= nil and name ~= "" then opt:SetKey(name) end
+                    self:setText(opt:Display())
+                end)
+            end }
+        w._keyOpt = opt
+        return w, false
     end
     return ui:button{ text = "?", h = 56 }, false
 end
@@ -614,6 +626,10 @@ function update(ts)
     if wasCapturing then
         wasCapturing = false
         if captureBtn and captureBtn._act then captureBtn:setText(M.Keys:GetAllBindings(captureBtn._act)) end
+        -- a captured key may have been freed from another Key row: refresh them all
+        for _, w in ipairs(ui.widgets or {}) do
+            if w._keyOpt ~= nil then w:setText(w._keyOpt:Display()) end
+        end
     end
 
     local dt = (ts - lastTs) / 1000.0

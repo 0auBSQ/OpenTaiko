@@ -89,6 +89,7 @@ RequestSongList が返す、カーソル、フォルダ移動、検索を備え�
 | `list:OpenFolder()  -> bool` | カーソル下のフォルダを開き、カーソルをその最初の子に移動します。カーソルが閉じた空でないフォルダ上にない場合は false を返します。 |
 | `list:CloseFolder()  -> bool` | カーソルを含むフォルダを閉じ、カーソルをそのフォルダに移動します。閉じるものがなければ false を返します。仮想フォルダを離れると OpenVirtualFolder が保存したカーソルが復元されます。 |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Lua テーブル `songs` (キー 1..n) の楽曲ノードを含む `title` という名前の一時フォルダを、生成された戻るボックスと末尾のランダムボックス付きで開き、カーソルをその中に移動します。`baseFolder` が仮想フォルダの親になります。テーブルに楽曲ノードがなければ false を返します。 |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | `baseFolder` の子の `index` 番目 (0 = 先頭) に、`title` という名前の恒久的な仮想ボックスを挿入します。Lua テーブル `songs` (キー 1..n) の楽曲ノードを、生成された戻るボックスと末尾のランダムボックス付きで含み、リストが再構築されるまで通常のフォルダと同じように開閉できます。`genre` (省略可) はジャンル別アート用のボックスのジャンルです。カーソルは移動しません。ボックスを返し、テーブルに楽曲ノードがなければ nil を返します。 |
 | `list:GetSongByUniqueId(id)  -> song node` | 固有 id が一致する最初の楽曲を返します。なければ nil。 |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | `node` の兄弟 (それを含むページ) の中からランダムに楽曲を選びます。`recursive` (既定 true) のとき、兄弟フォルダ内の楽曲も選択の対象になります。IgnoreUnlockables が設定されていない限りロックされた楽曲はスキップします。`predicate` は任意です。該当がなければ nil を返します。 |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | ツリー内で述語が true を返すすべての楽曲ノードを返します。 |
@@ -120,6 +121,7 @@ end
 | `node.IsFolder  (bool)` | ノードがフォルダのとき true。 |
 | `node.IsRandom  (bool)` | ノードがランダムボックスのとき true。 |
 | `node.IsReturn  (bool)` | ノードが戻るボックスのとき true。 |
+| `node.IsVirtual  (bool)` | フォルダを楽曲ツリーではなくスキンが作成した (OpenVirtualFolder または InsertVirtualFolder) とき true。 |
 | `node.IsSong  (bool)` | ノードがプレイ可能な楽曲のとき true。 |
 | `node.SongCount  (int)` | 直接の子である楽曲の数。 |
 | `node.RecursiveSongCount  (int)` | サブフォルダを含む、このノード配下の楽曲数。 |

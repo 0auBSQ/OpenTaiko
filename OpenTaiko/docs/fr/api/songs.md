@@ -89,6 +89,7 @@ Les méthodes de recherche prennent une fonction Lua qui reçoit un nœud de cha
 | `list:OpenFolder()  -> bool` | Ouvre le dossier sous le curseur et place le curseur sur son premier enfant ; renvoie false si le curseur n'est pas sur un dossier fermé et non vide. |
 | `list:CloseFolder()  -> bool` | Ferme le dossier contenant le curseur et place le curseur sur ce dossier ; renvoie false s'il n'y a rien à fermer. Quitter un dossier virtuel restaure le curseur sauvegardé par OpenVirtualFolder. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Ouvre un dossier temporaire nommé `title` contenant les nœuds de chanson de la table Lua `songs` (clés 1..n), avec des boîtes de retour générées et une boîte aléatoire finale, et place le curseur dedans. `baseFolder` devient le parent du dossier virtuel. Renvoie false si la table ne contient aucun nœud de chanson. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | Insère une boîte virtuelle durable nommée `title` parmi les enfants de `baseFolder` à la position `index` (0 = première), contenant les nœuds de chanson de la table Lua `songs` (clés 1..n) avec des boîtes de retour générées et une boîte aléatoire à la fin ; elle s'ouvre et se ferme comme tout dossier jusqu'à la reconstruction de la liste. `genre` (optionnel) est le genre de la boîte pour l'art par genre. Le curseur ne bouge pas. Retourne la boîte, ou nil si la table ne contient aucun nœud de chanson. |
 | `list:GetSongByUniqueId(id)  -> song node` | Renvoie la première chanson dont l'identifiant unique correspond, ou nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | Choisit une chanson au hasard parmi les frères et sœurs de `node` (la page qui le contient). Avec `recursive` (true par défaut), le tirage couvre aussi les chansons des dossiers frères. Il ignore les chansons verrouillées sauf si IgnoreUnlockables est défini. `predicate` est facultatif. Renvoie nil quand rien ne convient. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | Renvoie chaque nœud de chanson de l'arbre pour lequel le prédicat renvoie true. |
@@ -120,6 +121,7 @@ Le handle de liste de chansons, SONGMOUNT:ChosenSongNode() et DANBUILDER:GetSong
 | `node.IsFolder  (bool)` | Vrai quand le nœud est un dossier. |
 | `node.IsRandom  (bool)` | Vrai quand le nœud est une boîte aléatoire. |
 | `node.IsReturn  (bool)` | Vrai quand le nœud est une boîte de retour. |
+| `node.IsVirtual  (bool)` | Vrai quand le dossier a été créé par le skin (OpenVirtualFolder ou InsertVirtualFolder) et non par l'arbre des chansons. |
 | `node.IsSong  (bool)` | Vrai quand le nœud est une chanson jouable. |
 | `node.SongCount  (int)` | Nombre de chansons enfants directes. |
 | `node.RecursiveSongCount  (int)` | Nombre de chansons sous ce nœud, sous-dossiers compris. |

@@ -123,7 +123,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Fonts/`：`FontName` 键引用的 `.ttf` 文件。
 - `Locales/`：每种语言一个 JSON 文件（`en.json`、`ja.json`、...），形如 `{ "Entries": { "KEY": "text" } }`。这些字符串为皮肤自己的设置提供标签，Lua 通过 `THEME:GetSkinString(key)` 读取它们。当前语言中缺失某个键时，游戏会在 `DefaultLocale` 文件中查找它。
 - `Modules/`：Lua 模块树（第 8 步）。
-- `ThemeSettings.json`：选项界面在“主题设置”下显示的设置数组。每个条目有 `id`、`type`（`bool`、`int`、`double`、`string` 或 `enum`）、`scope`（`global`，默认，或 `save` 表示每个存档一个值）、本地化的 `label` 和 `description`、`default`，以及视类型而定的 `min`/`max` 或 `options`。
+- `ThemeSettings.json`：选项界面在“主题设置”下显示的设置数组。每个条目有 `id`、`type`（`bool`、`int`、`double`、`string`、`enum`，或 `key`：选项界面捕获的一个键盘按键，以其名称保存供 `INPUT:KeyboardPressed` 使用）、`scope`（`global`，默认，或 `save` 表示每个存档一个值）、本地化的 `label` 和 `description`、`default`，以及视类型而定的 `min`/`max` 或 `options`。
 - `SkinConfig.ini` 及其包含的 `*Config.ini` 文件。
 - `README.txt`、`LICENSE.md`、`Licenses/`：署名文件。游戏不读取它们。
 

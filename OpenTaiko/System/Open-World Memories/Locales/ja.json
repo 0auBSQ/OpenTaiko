@@ -61,7 +61,26 @@
         "VIEWER_COL_TYPE":  "タイプ",
         "VIEWER_COL_VALUE": "値",
         "VIEWER_HINT_SCROLL": "上/下でスクロール   キャンセルで終了",
-        "VIEWER_HINT_EXIT":   "キャンセルで終了"
+        "VIEWER_HINT_EXIT":   "キャンセルで終了",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "ショートカットを見る",
+        "SONGSELECT_SHORTCUTS_TITLE": "ショートカット",
+        "SONGSELECT_SHORTCUTS_CLOSE": "閉じる",
+        "SONGSELECT_UNBOUND": "(未割り当て)",
+        "SONGSELECT_SC_HELP": "この一覧を表示",
+        "SONGSELECT_SC_SORT": "曲を並び替える",
+        "SONGSELECT_SC_SEARCH": "現在のフォルダを検索",
+        "SONGSELECT_SC_FAVORITE": "選択中の曲をお気に入りに追加・解除",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "お気に入りを開く",
+        "SONGSELECT_SC_AUTO_P1": "1P のオートプレイを切り替える",
+        "SONGSELECT_SC_AUTO_P2": "2P のオートプレイを切り替える",
+        "SONGSELECT_SC_COURSE": "曲バーに表示する難易度を切り替える",
+        "SONGSELECT_SC_PLAYER": "設定するプレイヤーを切り替える",
+        "SONGSELECT_SC_SPEED_DOWN": "曲の速度を下げる",
+        "SONGSELECT_SC_SPEED_UP": "曲の速度を上げる",
+        "SONGSELECT_SC_PLAYER_COUNT": "プレイ人数を変更する",
+        "SONGSELECT_BOX_BEGINNERS": "初心者におすすめの曲"
 
     }
 }

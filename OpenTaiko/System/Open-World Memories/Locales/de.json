@@ -61,7 +61,26 @@
         "VIEWER_COL_TYPE":  "Typ",
         "VIEWER_COL_VALUE": "Wert",
         "VIEWER_HINT_SCROLL": "oben/unten scrollen   Abbrechen zum Beenden",
-        "VIEWER_HINT_EXIT":   "Abbrechen zum Beenden"
+        "VIEWER_HINT_EXIT":   "Abbrechen zum Beenden",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "Tastenkürzel anzeigen",
+        "SONGSELECT_SHORTCUTS_TITLE": "Tastenkürzel",
+        "SONGSELECT_SHORTCUTS_CLOSE": "Schließen",
+        "SONGSELECT_UNBOUND": "(nicht belegt)",
+        "SONGSELECT_SC_HELP": "Diese Liste anzeigen",
+        "SONGSELECT_SC_SORT": "Songs sortieren",
+        "SONGSELECT_SC_SEARCH": "Im aktuellen Ordner suchen",
+        "SONGSELECT_SC_FAVORITE": "Den gewählten Song zu den Favoriten hinzufügen oder entfernen",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "Favoriten öffnen",
+        "SONGSELECT_SC_AUTO_P1": "Auto-Spiel für Spieler 1 umschalten",
+        "SONGSELECT_SC_AUTO_P2": "Auto-Spiel für Spieler 2 umschalten",
+        "SONGSELECT_SC_COURSE": "Die auf den Songleisten angezeigte Schwierigkeit wechseln",
+        "SONGSELECT_SC_PLAYER": "Den eingestellten Spieler wechseln",
+        "SONGSELECT_SC_SPEED_DOWN": "Songgeschwindigkeit verringern",
+        "SONGSELECT_SC_SPEED_UP": "Songgeschwindigkeit erhöhen",
+        "SONGSELECT_SC_PLAYER_COUNT": "Spielerzahl ändern",
+        "SONGSELECT_BOX_BEGINNERS": "Empfohlene Songs für Einsteiger"
 
     }
 }

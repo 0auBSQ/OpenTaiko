@@ -123,7 +123,7 @@ Con el skin incluido como referencia, la raíz del skin contiene:
 - `Fonts/`: los archivos `.ttf` referenciados por las claves `FontName`.
 - `Locales/`: un archivo JSON por idioma (`en.json`, `ja.json`, ...) con la forma `{ "Entries": { "KEY": "text" } }`. Estas cadenas etiquetan los ajustes propios del skin, y Lua las lee a través de `THEME:GetSkinString(key)`. Cuando una clave falta en el idioma activo, el juego la busca en el archivo de `DefaultLocale`.
 - `Modules/`: el árbol de módulos Lua (Paso 8).
-- `ThemeSettings.json`: un array de ajustes que la pantalla de opciones muestra bajo Ajustes de tema. Cada entrada tiene `id`, `type` (`bool`, `int`, `double`, `string` o `enum`), `scope` (`global`, el valor por defecto, o `save` para un valor por archivo de guardado), `label` y `description` localizados, `default`, y `min`/`max` u `options` según el tipo.
+- `ThemeSettings.json`: un array de ajustes que la pantalla de opciones muestra bajo Ajustes de tema. Cada entrada tiene `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, o `key` para una tecla del teclado que la pantalla de opciones captura y guarda por su nombre para `INPUT:KeyboardPressed`), `scope` (`global`, el valor por defecto, o `save` para un valor por archivo de guardado), `label` y `description` localizados, `default`, y `min`/`max` u `options` según el tipo.
 - `SkinConfig.ini` y los archivos `*Config.ini` incluidos.
 - `README.txt`, `LICENSE.md`, `Licenses/`: archivos de atribución. El juego no los lee.
 

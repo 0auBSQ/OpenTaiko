@@ -26,6 +26,8 @@ public sealed class CLuaKeyConfigService {
 	private int _capPad;
 	private int _capSlot;
 	private Action<bool>? _onDone;
+	// a key-name capture (theme "key" settings): keyboard only, resolves with the SlimDXKeys.Key name or ""
+	private Action<string>? _onKeyName;
 
 	private CConfigIni.CKeyAssign Keys => OpenTaiko.ConfigIni.KeyAssign;
 
@@ -182,10 +184,35 @@ public sealed class CLuaKeyConfigService {
 
 	public void CancelCapture() {
 		if (!IsCapturing) return;
+		if (_onKeyName != null) { FinishKeyName(""); return; }
 		IsCapturing = false; var cb = _onDone; _onDone = null;
 		OpenTaiko.InputManager.Polling();
 		cb?.Invoke(false);
 	}
+
+	/// <summary>Captures one keyboard key for a theme "key" setting. <paramref name="onDone"/> receives the key's
+	/// SlimDXKeys.Key name, or "" when cancelled (Escape). Other devices are ignored; Return is refused.</summary>
+	public void StartKeyNameCapture(NLua.LuaFunction onDone) {
+		var cb = onDone.AsAction<string>();
+		if (IsCapturing) { cb?.Invoke(""); return; }
+		_onKeyName = cb;
+		IsCapturing = true;
+		OpenTaiko.InputManager.Polling();   // flush the press that opened capture
+	}
+
+	private void FinishKeyName(string keyName) {
+		IsCapturing = false; var cb = _onKeyName; _onKeyName = null;
+		OpenTaiko.InputManager.Polling();
+		cb?.Invoke(keyName);
+	}
+
+	/// <summary>The display label of a keyboard key given by its SlimDXKeys.Key name ("" for none).</summary>
+	public static string KeyboardLabelOf(string keyName) {
+		if (string.IsNullOrEmpty(keyName)) return CConfigOptionBuilder.L("SETTINGS_KEYASSIGN_NONE", "(none)");
+		if (Enum.TryParse(typeof(SlimDXKeys.Key), keyName, true, out var k)) return KeyboardLabel((int)k);
+		return keyName;
+	}
+	public string KeyLabel(string keyName) => KeyboardLabelOf(keyName);
 
 	/// <summary>One capture poll, driven by the stage while IsCapturing. Returns (true, ...) when it resolved.</summary>
 	[NLua.LuaHide]
@@ -195,6 +222,18 @@ public sealed class CLuaKeyConfigService {
 
 		var validPresseds = GetAllKeysEvents(
 			de => de.ev.Pressed && Enum.IsDefined(de.type) && de.type is not (InputDeviceType.Total or InputDeviceType.Unknown));
+		if (_onKeyName != null) {
+			foreach (var (type, id, ev) in validPresseds) {
+				if (type is not InputDeviceType.Keyboard) continue;
+				var key = (SlimDXKeys.Key)ev.nKey;
+				if (key == SlimDXKeys.Key.Escape) { OpenTaiko.Skin.soundCancelSFX.tPlay(); FinishKeyName(""); return (true, false); }
+				if (key == SlimDXKeys.Key.Return) { OpenTaiko.Skin.soundError.tPlay(); continue; }
+				OpenTaiko.Skin.soundDecideSFX.tPlay();
+				FinishKeyName(key.ToString());
+				return (true, true);
+			}
+			return (false, false);
+		}
 		foreach (var (type, id, ev) in validPresseds) {
 			if (type is InputDeviceType.Keyboard) {
 				switch ((SlimDXKeys.Key)ev.nKey) {

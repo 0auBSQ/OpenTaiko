@@ -50,7 +50,12 @@
       }
     },
     "default": "Default",
-    "options": ["Default", "Classic", "Pixel", "Neon"]
+    "options": [
+      "Default",
+      "Classic",
+      "Pixel",
+      "Neon"
+    ]
   },
   {
     "id": "test_bool",
@@ -67,5 +72,341 @@
       }
     },
     "default": "1"
+  },
+  {
+    "id": "songselect_key_help",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: show shortcuts",
+        "ja": "選曲: ショートカット一覧",
+        "fr": "Sélection : afficher les raccourcis",
+        "de": "Songauswahl: Tastenkürzel anzeigen",
+        "es": "Selección: mostrar atajos",
+        "ko": "곡 선택: 단축키 보기",
+        "zh": "选曲：显示快捷键"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Opens the list of the song select's keyboard shortcuts.",
+        "ja": "選曲画面のキーボードショートカット一覧を開きます。",
+        "fr": "Ouvre la liste des raccourcis clavier de la sélection de chanson.",
+        "de": "Öffnet die Liste der Tastenkürzel der Songauswahl.",
+        "es": "Abre la lista de atajos de teclado de la selección de canciones.",
+        "ko": "곡 선택 화면의 키보드 단축키 목록을 엽니다.",
+        "zh": "打开选曲界面的键盘快捷键列表。"
+      }
+    },
+    "default": "Tab"
+  },
+  {
+    "id": "songselect_key_sort",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: sort",
+        "ja": "選曲: 並び替え",
+        "fr": "Sélection : trier",
+        "de": "Songauswahl: Sortieren",
+        "es": "Selección: ordenar",
+        "ko": "곡 선택: 정렬",
+        "zh": "选曲：排序"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Opens the sort dialog.",
+        "ja": "並び替えダイアログを開きます。",
+        "fr": "Ouvre la fenêtre de tri.",
+        "de": "Öffnet den Sortierdialog.",
+        "es": "Abre el diálogo de ordenación.",
+        "ko": "정렬 대화 상자를 엽니다.",
+        "zh": "打开排序对话框。"
+      }
+    },
+    "default": "Space"
+  },
+  {
+    "id": "songselect_key_search",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: search",
+        "ja": "選曲: 検索",
+        "fr": "Sélection : rechercher",
+        "de": "Songauswahl: Suchen",
+        "es": "Selección: buscar",
+        "ko": "곡 선택: 검색",
+        "zh": "选曲：搜索"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Opens the search dialog for the current folder.",
+        "ja": "現在のフォルダを対象に検索ダイアログを開きます。",
+        "fr": "Ouvre la recherche dans le dossier actuel.",
+        "de": "Öffnet die Suche im aktuellen Ordner.",
+        "es": "Abre la búsqueda en la carpeta actual.",
+        "ko": "현재 폴더에서 검색 대화 상자를 엽니다.",
+        "zh": "在当前文件夹中打开搜索对话框。"
+      }
+    },
+    "default": "F1"
+  },
+  {
+    "id": "songselect_key_favorite",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: favorite",
+        "ja": "選曲: お気に入り登録",
+        "fr": "Sélection : favori",
+        "de": "Songauswahl: Favorit",
+        "es": "Selección: favorito",
+        "ko": "곡 선택: 즐겨찾기",
+        "zh": "选曲：收藏"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Adds the selected song to your favorites, or removes it.",
+        "ja": "選択中の曲をお気に入りに追加、または解除します。",
+        "fr": "Ajoute la chanson sélectionnée aux favoris, ou la retire.",
+        "de": "Fügt den gewählten Song den Favoriten hinzu oder entfernt ihn.",
+        "es": "Añade la canción seleccionada a favoritos, o la quita.",
+        "ko": "선택한 곡을 즐겨찾기에 추가하거나 제거합니다.",
+        "zh": "将选中的歌曲加入收藏，或取消收藏。"
+      }
+    },
+    "default": "LeftControl"
+  },
+  {
+    "id": "songselect_key_favorites_folder",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: open favorites",
+        "ja": "選曲: お気に入りを開く",
+        "fr": "Sélection : ouvrir les favoris",
+        "de": "Songauswahl: Favoriten öffnen",
+        "es": "Selección: abrir favoritos",
+        "ko": "곡 선택: 즐겨찾기 열기",
+        "zh": "选曲：打开收藏"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Opens your favorites as a folder.",
+        "ja": "お気に入りをフォルダとして開きます。",
+        "fr": "Ouvre vos favoris sous forme de dossier.",
+        "de": "Öffnet die Favoriten als Ordner.",
+        "es": "Abre tus favoritos como una carpeta.",
+        "ko": "즐겨찾기를 폴더로 엽니다.",
+        "zh": "以文件夹形式打开收藏。"
+      }
+    },
+    "default": "F2"
+  },
+  {
+    "id": "songselect_key_auto_p1",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: auto (player 1)",
+        "ja": "選曲: オート (1P)",
+        "fr": "Sélection : auto (joueur 1)",
+        "de": "Songauswahl: Auto (Spieler 1)",
+        "es": "Selección: auto (jugador 1)",
+        "ko": "곡 선택: 오토 (1P)",
+        "zh": "选曲：自动（玩家 1）"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Toggles auto play for player 1.",
+        "ja": "1P のオートプレイを切り替えます。",
+        "fr": "Active ou désactive le jeu automatique du joueur 1.",
+        "de": "Schaltet das automatische Spiel für Spieler 1 um.",
+        "es": "Activa o desactiva el juego automático del jugador 1.",
+        "ko": "1P의 오토 플레이를 전환합니다.",
+        "zh": "切换玩家 1 的自动演奏。"
+      }
+    },
+    "default": "F3"
+  },
+  {
+    "id": "songselect_key_auto_p2",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: auto (player 2)",
+        "ja": "選曲: オート (2P)",
+        "fr": "Sélection : auto (joueur 2)",
+        "de": "Songauswahl: Auto (Spieler 2)",
+        "es": "Selección: auto (jugador 2)",
+        "ko": "곡 선택: 오토 (2P)",
+        "zh": "选曲：自动（玩家 2）"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Toggles auto play for player 2.",
+        "ja": "2P のオートプレイを切り替えます。",
+        "fr": "Active ou désactive le jeu automatique du joueur 2.",
+        "de": "Schaltet das automatische Spiel für Spieler 2 um.",
+        "es": "Activa o desactiva el juego automático del jugador 2.",
+        "ko": "2P의 오토 플레이를 전환합니다.",
+        "zh": "切换玩家 2 的自动演奏。"
+      }
+    },
+    "default": "F4"
+  },
+  {
+    "id": "songselect_key_player_count",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: player count",
+        "ja": "選曲: プレイ人数",
+        "fr": "Sélection : nombre de joueurs",
+        "de": "Songauswahl: Spielerzahl",
+        "es": "Selección: número de jugadores",
+        "ko": "곡 선택: 플레이어 수",
+        "zh": "选曲：玩家人数"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Changes the number of players.",
+        "ja": "プレイ人数を変更します。",
+        "fr": "Change le nombre de joueurs.",
+        "de": "Ändert die Spielerzahl.",
+        "es": "Cambia el número de jugadores.",
+        "ko": "플레이어 수를 변경합니다.",
+        "zh": "更改玩家人数。"
+      }
+    },
+    "default": "F5"
+  },
+  {
+    "id": "songselect_key_player",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: set-up player",
+        "ja": "選曲: 設定するプレイヤー",
+        "fr": "Sélection : joueur configuré",
+        "de": "Songauswahl: eingestellter Spieler",
+        "es": "Selección: jugador configurado",
+        "ko": "곡 선택: 설정 중인 플레이어",
+        "zh": "选曲：设置中的玩家"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Switches which player the song select is setting up.",
+        "ja": "選曲画面で設定するプレイヤーを切り替えます。",
+        "fr": "Change le joueur que la sélection configure.",
+        "de": "Wechselt den Spieler, den die Songauswahl einstellt.",
+        "es": "Cambia el jugador que configura la selección.",
+        "ko": "곡 선택에서 설정하는 플레이어를 전환합니다.",
+        "zh": "切换选曲界面正在设置的玩家。"
+      }
+    },
+    "default": "F6"
+  },
+  {
+    "id": "songselect_key_course",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: displayed difficulty",
+        "ja": "選曲: 表示する難易度",
+        "fr": "Sélection : difficulté affichée",
+        "de": "Songauswahl: angezeigte Schwierigkeit",
+        "es": "Selección: dificultad mostrada",
+        "ko": "곡 선택: 표시 난이도",
+        "zh": "选曲：显示的难度"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Cycles the difficulty shown on the song bars.",
+        "ja": "曲バーに表示する難易度を切り替えます。",
+        "fr": "Change la difficulté affichée sur les barres de chansons.",
+        "de": "Wechselt die auf den Songleisten angezeigte Schwierigkeit.",
+        "es": "Cambia la dificultad mostrada en las barras de canciones.",
+        "ko": "곡 바에 표시되는 난이도를 순환합니다.",
+        "zh": "切换歌曲条上显示的难度。"
+      }
+    },
+    "default": "F7"
+  },
+  {
+    "id": "songselect_key_speed_down",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: slower",
+        "ja": "選曲: 曲速ダウン",
+        "fr": "Sélection : plus lent",
+        "de": "Songauswahl: langsamer",
+        "es": "Selección: más lento",
+        "ko": "곡 선택: 느리게",
+        "zh": "选曲：减速"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Lowers the song speed.",
+        "ja": "曲の速度を下げます。",
+        "fr": "Réduit la vitesse de la chanson.",
+        "de": "Verringert die Songgeschwindigkeit.",
+        "es": "Reduce la velocidad de la canción.",
+        "ko": "곡 속도를 낮춥니다.",
+        "zh": "降低歌曲速度。"
+      }
+    },
+    "default": "PageDown"
+  },
+  {
+    "id": "songselect_key_speed_up",
+    "type": "key",
+    "scope": "global",
+    "label": {
+      "strings": {
+        "default": "Song select: faster",
+        "ja": "選曲: 曲速アップ",
+        "fr": "Sélection : plus rapide",
+        "de": "Songauswahl: schneller",
+        "es": "Selección: más rápido",
+        "ko": "곡 선택: 빠르게",
+        "zh": "选曲：加速"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Raises the song speed.",
+        "ja": "曲の速度を上げます。",
+        "fr": "Augmente la vitesse de la chanson.",
+        "de": "Erhöht die Songgeschwindigkeit.",
+        "es": "Aumenta la velocidad de la canción.",
+        "ko": "곡 속도를 높입니다.",
+        "zh": "提高歌曲速度。"
+      }
+    },
+    "default": "PageUp"
   }
 ]

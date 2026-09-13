@@ -63,7 +63,26 @@
         "VIEWER_COL_TYPE":  "Type",
         "VIEWER_COL_VALUE": "Value",
         "VIEWER_HINT_SCROLL": "up/down to scroll   Cancel to exit",
-        "VIEWER_HINT_EXIT":   "Cancel to exit"
+        "VIEWER_HINT_EXIT":   "Cancel to exit",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "Show shortcuts",
+        "SONGSELECT_SHORTCUTS_TITLE": "Shortcuts",
+        "SONGSELECT_SHORTCUTS_CLOSE": "Close",
+        "SONGSELECT_UNBOUND": "(not bound)",
+        "SONGSELECT_SC_HELP": "Show this list",
+        "SONGSELECT_SC_SORT": "Sort the songs",
+        "SONGSELECT_SC_SEARCH": "Search the current folder",
+        "SONGSELECT_SC_FAVORITE": "Add the selected song to your favorites, or remove it",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "Open your favorites",
+        "SONGSELECT_SC_AUTO_P1": "Toggle auto play for player 1",
+        "SONGSELECT_SC_AUTO_P2": "Toggle auto play for player 2",
+        "SONGSELECT_SC_COURSE": "Change the difficulty shown on the song bars",
+        "SONGSELECT_SC_PLAYER": "Switch the player being set up",
+        "SONGSELECT_SC_SPEED_DOWN": "Lower the song speed",
+        "SONGSELECT_SC_SPEED_UP": "Raise the song speed",
+        "SONGSELECT_SC_PLAYER_COUNT": "Change the number of players",
+        "SONGSELECT_BOX_BEGINNERS": "Recommended songs for beginners"
 
     }
 }

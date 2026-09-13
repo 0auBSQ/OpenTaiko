@@ -123,7 +123,7 @@ Mit dem mitgelieferten Skin als Referenz enthält die Skin-Wurzel:
 - `Fonts/`: die `.ttf`-Dateien, auf die die `FontName`-Schlüssel verweisen.
 - `Locales/`: eine JSON-Datei pro Sprache (`en.json`, `ja.json`, ...) mit der Form `{ "Entries": { "KEY": "text" } }`. Diese Strings beschriften die eigenen Einstellungen des Skins, und Lua liest sie über `THEME:GetSkinString(key)`. Fehlt ein Schlüssel in der aktiven Sprache, schlägt das Spiel ihn in der `DefaultLocale`-Datei nach.
 - `Modules/`: der Lua-Modulbaum (Schritt 8).
-- `ThemeSettings.json`: ein Array von Einstellungen, die der Optionsbildschirm unter Theme-Einstellungen anzeigt. Jeder Eintrag hat `id`, `type` (`bool`, `int`, `double`, `string` oder `enum`), `scope` (`global`, der Standard, oder `save` für einen Wert pro Spielstand), lokalisierte `label` und `description`, `default` sowie je nach Typ `min`/`max` oder `options`.
+- `ThemeSettings.json`: ein Array von Einstellungen, die der Optionsbildschirm unter Theme-Einstellungen anzeigt. Jeder Eintrag hat `id`, `type` (`bool`, `int`, `double`, `string`, `enum` oder `key` für eine Tastaturtaste, die der Optionsbildschirm erfasst und als Name für `INPUT:KeyboardPressed` speichert), `scope` (`global`, der Standard, oder `save` für einen Wert pro Spielstand), lokalisierte `label` und `description`, `default` sowie je nach Typ `min`/`max` oder `options`.
 - `SkinConfig.ini` und die eingebundenen `*Config.ini`-Dateien.
 - `README.txt`, `LICENSE.md`, `Licenses/`: Dateien zur Namensnennung. Das Spiel liest sie nicht.
 

@@ -1,0 +1,31 @@
+{
+  "_comment": "Curated boxes inserted before the first folder of the song list, in this order; a box shows only when at least one of its songs (by unique id) is in the library. title_key is a skin locale key, title the fallback.",
+  "boxes": [
+    {
+      "id": "beginners",
+      "genre": "Recommended",
+      "title_key": "SONGSELECT_BOX_BEGINNERS",
+      "title": "Recommended songs for beginners",
+      "uids": [
+        "spRyuto",
+        "hRa6ukuLziowBJq65ulSiI8LMPtyZ6GbNgLkEXRcrzRTzmfgTkNhbkR9VsavWqjm",
+        "BRwePFFczz5aP2DtxXdnAh0R1CRXZSYyUD9FjPEHfRPYC7yNECmSzjd1Qi1U3zpl",
+        "sR5rRUAUWt49NPMXqLHdPIWki09vHd84K1xSqfOGv3kkdYAYDF05DU406tyuLKk0",
+        "euphoriCMakotora",
+        "novaNightalden",
+        "mUSicfORLIFefaLLfEaTELUaMAGa",
+        "NiJiHaKIRaiotomEAMEComPOsITioNShiTSUDOkEi",
+        "HEarTsiNmoTioNgaMEEditMAKoTOrA",
+        "contINUe100miLLioNsTiMESzomBkOWITHTakAkAtokkyPRodasAKuraMORi",
+        "AshEsinthEgeArboxSnikIox3Ll3n",
+        "sparkleonDiscoholic2026",
+        "PIKopIkoPArADETonYFeATHAtSuNEMiKu",
+        "NEO888KARASUsanDaShyDashydesU",
+        "outfox01",
+        "touhou02",
+        "touhou03",
+        "pentjet02"
+      ]
+    }
+  ]
+}

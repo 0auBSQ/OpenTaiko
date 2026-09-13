@@ -466,7 +466,7 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json の設定定義の数。 |
 | `THEME:GetDefinitionId(index)  -> string` | 0 始まりのインデックスの定義の id。なければ空文字列。 |
 | `THEME:GetDefinitionScope(index)  -> string` | 定義のスコープ: "global" または "save"。 |
-| `THEME:GetDefinitionType(index)  -> string` | 定義の型: "bool"、"int"、"double"、"string"、"enum"。 |
+| `THEME:GetDefinitionType(index)  -> string` | 定義の型: "bool"、"int"、"double"、"string"、"enum"、"key"。 |
 
 ### LANG
 

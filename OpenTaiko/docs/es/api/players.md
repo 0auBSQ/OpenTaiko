@@ -466,7 +466,7 @@ El skin declara los ajustes de tema en ThemeSettings.json y guarda sus valores e
 | `THEME:GetDefinitionCount()  -> integer` | Número de definiciones de ajustes en ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Id de la definición en un índice desde 0, o una cadena vacía. |
 | `THEME:GetDefinitionScope(index)  -> string` | Ámbito de la definición: "global" o "save". |
-| `THEME:GetDefinitionType(index)  -> string` | Tipo de la definición: "bool", "int", "double", "string" o "enum". |
+| `THEME:GetDefinitionType(index)  -> string` | Tipo de la definición: "bool", "int", "double", "string", "enum" o "key". |
 
 ### LANG
 

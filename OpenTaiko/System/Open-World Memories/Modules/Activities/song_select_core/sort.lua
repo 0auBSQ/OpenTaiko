@@ -47,12 +47,13 @@ function M.applySort()
 
     local children = folderNode.Children
 
-    -- Separate special nodes from sortable regular nodes
-    local regular, backs, randoms, origPos = {}, {}, {}, {}
+    -- Separate special nodes from sortable regular nodes (virtual boxes the skin inserted stay first)
+    local regular, backs, randoms, pinned, origPos = {}, {}, {}, {}, {}
     for idx, node in ipairs(orig) do
         origPos[node] = idx
         if     node.IsReturn then backs[#backs + 1]   = node
         elseif node.IsRandom then randoms[#randoms + 1] = node
+        elseif node.IsVirtual == true and node.IsFolder == true then pinned[#pinned + 1] = node
         else                       regular[#regular + 1]  = node
         end
     end
@@ -169,8 +170,9 @@ function M.applySort()
         return false
     end)
 
-    -- Rebuild children list: unlocked first, then locked
+    -- Rebuild children list: the pinned boxes, then unlocked, then locked
     children:Clear()
+    for _, node in ipairs(pinned)        do children:Add(node) end
     for _, node in ipairs(unlocked)      do children:Add(node) end
     for _, node in ipairs(locked_nodes)  do children:Add(node) end
 

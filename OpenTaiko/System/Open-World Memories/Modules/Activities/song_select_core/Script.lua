@@ -33,6 +33,8 @@ local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
 local BG      = require("backgrounds")   -- per-genre background sets, crossfaded with the selection
+local SC      = require("shortcuts")     -- keyboard shortcuts (theme "key" settings) + the help panel
+local Featured = require("featured")     -- curated boxes at the top of the root list
 
 -- ── Shared state (G) ─────────────────────────────────────────────────────────
 -- All modules receive a reference to this table via their init() call.
@@ -117,13 +119,6 @@ local G = {
 
     -- Per-player input bindings
     NavInput = NavInput,
-    inputSets = {
-        { auto = "ToggleAutoP1" },
-        { auto = "ToggleAutoP2" },
-        { auto = nil },
-        { auto = nil },
-        { auto = nil },
-    },
 }
 
 -- ── Shared utility functions (stored in G so every module can call them) ──────
@@ -219,6 +214,9 @@ Unlocks.init(G)
 Favs.init(G)
 BG.init(G)
 G.backgrounds = BG
+SC.init(G)
+G.shortcuts = SC
+Featured.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
 -- without needing a direct reference to Sort.
@@ -371,6 +369,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
 
     BG.setMode(backgroundMode)
     BG.reset()
+    SC.reload()   -- the bindings can change in the settings between visits
 
     -- localized overlays for the current language (it can change between visits); freed in deactivate()
     for key, default in pairs(OVERLAY_FILES) do
@@ -438,6 +437,7 @@ function deactivate()
         VIRTUALSLOTS:MountSlot(2, "2P")
     end
     G.lastSignal = nil
+    SC.dispose()
 
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
     Diff.resetTransitionVisuals()
@@ -469,6 +469,7 @@ function afterSongEnum()
     lsls:SetMandatoryDifficultyList({0, 1, 2, 3, 4})   -- Easy..Edit
     lsls.MandatoryDifficultyMatchAll = false           -- OR: keep charts with at least one playable difficulty
     G.songList       = RequestSongList(lsls)
+    Featured.insertAll()   -- the curated boxes go in before the first folder; the cursor stays on that folder
     G.originalOrders = {}
     Sort.applySort()
     Nav.refreshPage()
@@ -518,6 +519,7 @@ function draw(mode)
     for _, at in pairs(G.act_inner) do
         if at.IsActive then at:Draw() end
     end
+    SC.draw()
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -622,6 +624,9 @@ function update(ts)
     Unlocks.tick()
 
     if hasActiveInnerModal then return nil end
+
+    -- the shortcuts panel takes the input while it is up
+    if SC.isOpen() then SC.update(ts); return nil end
 
     if G.activeScreen == "songselect" then
         return Nav.handleSongSelectInput(Sort, Diff)

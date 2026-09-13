@@ -434,23 +434,31 @@ function M.handleSongSelectInput(Sort, Diff)
     -- Lock all input while a folder open/close animation is playing.
     if G.folderAnim ~= nil then return nil end
 
-    -- Debug / dev shortcuts
-    if INPUT:KeyboardPressed("S") then
+    local SC = G.shortcuts
+
+    -- the shortcuts panel
+    if SC.pressed("help") then
+        stopHold()
+        SC.open()
+        return nil
+    end
+
+    -- Displayed course / set-up player
+    if SC.pressed("course") then
         G.sounds.Skip:Play()
         CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
         Sort.applySort(); M.refreshPage(true)
     end
-    if INPUT:KeyboardPressed("P") and not G.activeConfig.mountAISlotToP2 then
+    if SC.pressed("player") and not G.activeConfig.mountAISlotToP2 then
         G.sounds.Skip:Play()
         local prev = G.highlightedPlayer
         G.highlightedPlayer = (G.highlightedPlayer + 1) % CONFIG.PlayerCount
         if G.highlightedPlayer ~= prev then Sort.applySort(); M.refreshPage(true) end
     end
     if not G.activeConfig.songOnly then   -- online lobby (songOnly): Auto cannot be toggled in song select
-        for p = 1, CONFIG.PlayerCount, 1 do
+        for p = 1, math.min(2, CONFIG.PlayerCount), 1 do
             local isAI = (G.activeConfig.mountAISlotToP2 and p == 2)
-            local inputPn = G.inputSets[p]
-            if not isAI and inputPn.auto ~= nil and INPUT:Pressed(inputPn.auto) then
+            if not isAI and SC.pressed("auto_p" .. p) then
                 G.sounds.Decide:Play(); CONFIG:SetAutoStatus(p - 1, not CONFIG:GetAutoStatus(p - 1))
             end
         end
@@ -464,13 +472,13 @@ function M.handleSongSelectInput(Sort, Diff)
     end
 
     -- Main navigation
-    if INPUT:KeyboardPressed("Space") then
+    if SC.pressed("sort") then
         stopHold()
         local sd = G.act_inner["sort_search_dialog"]
         if sd ~= nil and not sd.IsActive then
             sd:Activate(G.highlightedPlayer)
         end
-    elseif INPUT:KeyboardPressed("A") then
+    elseif SC.pressed("search") then
         stopHold()
         local sd = G.act_inner["sort_search_dialog"]
         if sd ~= nil and not sd.IsActive and G.songList ~= nil then
@@ -494,7 +502,7 @@ function M.handleSongSelectInput(Sort, Diff)
     end
 
     -- Favorites: toggle on selected song (song node, not locked, not vault-locked)
-    if (INPUT:KeyboardPressed("LeftControl") or INPUT:KeyboardPressed("RightControl")) and G.favs ~= nil then
+    if SC.pressed("favorite") and G.favs ~= nil then
         local ssn = G.songList ~= nil and G.songList:GetSelectedSongNode() or nil
         if ssn ~= nil and ssn.IsSong and not ssn.IsLocked
                 and (G.unlocks == nil or not G.unlocks.isVaultLocked(ssn)) then
@@ -506,19 +514,19 @@ function M.handleSongSelectInput(Sort, Diff)
     end
 
     -- Favorites folder: open snapshot virtual folder for the highlighted player
-    if INPUT:KeyboardPressed("O") and G.favs ~= nil then
+    if SC.pressed("favorites_folder") and G.favs ~= nil then
         G.favs.openFavoritesFolder(G.highlightedPlayer)
     end
 
     -- Song speed
-    if INPUT:KeyboardPressed("Q") then
+    if SC.pressed("speed_down") then
         G.sounds.Skip:Play()
         CONFIG.SongSpeed = CONFIG.SongSpeed - 1
         local spd = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
         SHARED:GetSharedSound("presound"):SetSpeed(spd)
         if G.previewDemoStartRaw > 0 then G.previewDemoStart = math.floor(G.previewDemoStartRaw / spd) end
     end
-    if INPUT:KeyboardPressed("W") then
+    if SC.pressed("speed_up") then
         G.sounds.Skip:Play()
         CONFIG.SongSpeed = CONFIG.SongSpeed + 1
         local spd = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
@@ -527,7 +535,7 @@ function M.handleSongSelectInput(Sort, Diff)
     end
 
     -- Player count
-    if G.activeConfig.allowPlayerCount ~= false and INPUT:KeyboardPressed("L") then
+    if G.activeConfig.allowPlayerCount ~= false and SC.pressed("player_count") then
         G.sounds.Skip:Play()
         CONFIG.PlayerCount = 1 + (CONFIG.PlayerCount % 5)
     end

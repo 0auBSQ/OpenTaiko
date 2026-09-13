@@ -89,6 +89,7 @@ Los métodos de búsqueda reciben una función Lua que recibe un nodo de canció
 | `list:OpenFolder()  -> bool` | Abre la carpeta bajo el cursor y mueve el cursor a su primer hijo; devuelve false si el cursor no está sobre una carpeta cerrada y no vacía. |
 | `list:CloseFolder()  -> bool` | Cierra la carpeta que contiene el cursor y mueve el cursor a esa carpeta; devuelve false si no hay nada que cerrar. Salir de una carpeta virtual restaura el cursor guardado por OpenVirtualFolder. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Abre una carpeta temporal llamada `title` que contiene los nodos de canción de la tabla Lua `songs` (claves 1..n), con casillas de retorno generadas y una casilla aleatoria al final, y mueve el cursor dentro de ella. `baseFolder` pasa a ser el padre de la carpeta virtual. Devuelve false si la tabla no contiene nodos de canción. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | Inserta una caja virtual duradera llamada `title` entre los hijos de `baseFolder` en la posición `index` (0 = primera), con los nodos de canción de la tabla Lua `songs` (claves 1..n), cajas de retorno generadas y una caja aleatoria al final; se abre y se cierra como cualquier carpeta hasta que la lista se reconstruye. `genre` (opcional) es el género de la caja para el arte por género. El cursor no se mueve. Devuelve la caja, o nil si la tabla no contiene nodos de canción. |
 | `list:GetSongByUniqueId(id)  -> song node` | Devuelve la primera canción cuyo id único coincide, o nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | Elige una canción al azar entre los hermanos de `node` (la página que lo contiene). Con `recursive` (true por defecto), la elección también abarca las canciones dentro de las carpetas hermanas. Omite las canciones bloqueadas salvo que IgnoreUnlockables esté establecido. `predicate` es opcional. Devuelve nil cuando nada cumple los requisitos. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | Devuelve todos los nodos de canción del árbol para los que el predicado devuelve true. |
@@ -120,6 +121,7 @@ El handle de lista de canciones, SONGMOUNT:ChosenSongNode() y DANBUILDER:GetSong
 | `node.IsFolder  (bool)` | Verdadero cuando el nodo es una carpeta. |
 | `node.IsRandom  (bool)` | Verdadero cuando el nodo es una casilla aleatoria. |
 | `node.IsReturn  (bool)` | Verdadero cuando el nodo es una casilla de retorno. |
+| `node.IsVirtual  (bool)` | Verdadero cuando la carpeta la creó el skin (OpenVirtualFolder o InsertVirtualFolder) y no el árbol de canciones. |
 | `node.IsSong  (bool)` | Verdadero cuando el nodo es una canción jugable. |
 | `node.SongCount  (int)` | Número de canciones hijas directas. |
 | `node.RecursiveSongCount  (int)` | Número de canciones bajo este nodo, incluidas las subcarpetas. |

@@ -89,6 +89,7 @@ RequestSongList가 반환하는, 커서·폴더 탐색·검색이 있는 탐색 
 | `list:OpenFolder()  -> bool` | 커서 아래의 폴더를 열고 커서를 첫 자식으로 옮깁니다. 커서가 닫힌 비어 있지 않은 폴더 위에 없으면 false를 반환합니다. |
 | `list:CloseFolder()  -> bool` | 커서를 포함하는 폴더를 닫고 커서를 그 폴더로 옮깁니다. 닫을 것이 없으면 false를 반환합니다. 가상 폴더를 떠나면 OpenVirtualFolder가 저장한 커서를 복원합니다. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Lua 테이블 `songs`(키 1..n)의 곡 노드를 담은 `title`이라는 임시 폴더를 생성된 뒤로 가기 박스와 끝의 랜덤 박스와 함께 열고, 커서를 그 안으로 옮깁니다. `baseFolder`가 가상 폴더의 부모가 됩니다. 테이블에 곡 노드가 없으면 false를 반환합니다. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | `baseFolder`의 자식 `index` 위치(0 = 첫 번째)에 `title`이라는 이름의 영구 가상 박스를 삽입합니다. Lua 테이블 `songs`(키 1..n)의 곡 노드를 생성된 뒤로 박스와 끝의 랜덤 박스와 함께 담으며, 목록이 다시 만들어질 때까지 다른 폴더처럼 열고 닫힙니다. `genre`(선택)는 장르별 아트를 위한 박스의 장르입니다. 커서는 움직이지 않습니다. 박스를 반환하며, 테이블에 곡 노드가 없으면 nil을 반환합니다. |
 | `list:GetSongByUniqueId(id)  -> song node` | 고유 id가 일치하는 첫 곡을 반환하며, 없으면 nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | `node`의 형제(그것을 포함하는 페이지) 중에서 곡을 무작위로 고릅니다. `recursive`(기본값 true)이면 형제 폴더 안의 곡도 선택 대상에 포함합니다. IgnoreUnlockables가 설정되지 않은 한 잠긴 곡은 건너뜁니다. `predicate`는 선택 사항입니다. 조건에 맞는 것이 없으면 nil을 반환합니다. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | 트리에서 조건 함수가 true를 반환하는 모든 곡 노드를 반환합니다. |
@@ -120,6 +121,7 @@ end
 | `node.IsFolder  (bool)` | 노드가 폴더이면 true. |
 | `node.IsRandom  (bool)` | 노드가 랜덤 박스이면 true. |
 | `node.IsReturn  (bool)` | 노드가 뒤로 가기 박스이면 true. |
+| `node.IsVirtual  (bool)` | 폴더를 곡 트리가 아니라 스킨이 만들었을 때(OpenVirtualFolder 또는 InsertVirtualFolder) true. |
 | `node.IsSong  (bool)` | 노드가 플레이 가능한 곡이면 true. |
 | `node.SongCount  (int)` | 직계 자식 곡 수. |
 | `node.RecursiveSongCount  (int)` | 하위 폴더를 포함해 이 노드 아래의 곡 수. |

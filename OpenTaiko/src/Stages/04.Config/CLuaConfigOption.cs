@@ -14,7 +14,7 @@ namespace OpenTaiko;
 public sealed class CLuaConfigOption {
 	public string Category { get; init; } = "System";   // "System" | "Game" | "Theme"
 	public string Section { get; init; } = "";           // sub-section header (free text)
-	public string Kind { get; init; } = "Toggle";        // "Toggle" | "Int" | "Choice" | "Action" | "KeyConfig"
+	public string Kind { get; init; } = "Toggle";        // "Toggle" | "Int" | "Choice" | "Action" | "KeyConfig" | "Key"
 	public string Name { get; init; } = "";              // localized label
 	public string Desc { get; init; } = "";              // localized description / help text
 
@@ -40,6 +40,10 @@ public sealed class CLuaConfigOption {
 	/// values like a port where dragging a 0..65535 slider is useless. Still uses Value/Min/Max/SetValue.</summary>
 	public bool TextInput { get; init; }
 
+	/// <summary>Key rows: the bound keyboard key as a SlimDXKeys.Key name ("F", "Space", "LeftControl"); "" = unbound.
+	/// The Lua side captures a key through the key-config service and calls <see cref="SetKey"/>.</summary>
+	public string KeyName { get; private set; } = "";
+
 	/// <summary>Human-readable current value ("ON"/"OFF" handled Lua-side; here: choice label, int, scaled double…).</summary>
 	public string Display() => _display(this);
 
@@ -58,6 +62,13 @@ public sealed class CLuaConfigOption {
 		Index = ni; _apply();
 	}
 	public void Activate() { _action?.Invoke(_actionDone); } // Action / KeyConfig rows
+	public void SetKey(string keyName) {
+		keyName ??= "";
+		if (keyName == KeyName) return;
+		KeyName = keyName; _apply();
+	}
+	/// <summary>Drops the binding without running the apply hook (another Key row took this key).</summary>
+	internal void ClearKeySilently() { KeyName = ""; }
 
 	// --- C#-only wiring (never touched from Lua) ---
 	internal Action _apply = () => { };                  // write config + live side effect
@@ -112,4 +123,12 @@ public sealed class CLuaConfigOption {
 	}
 	internal static CLuaConfigOption KeyConfig_(string cat, string sec, string name, string desc, string part, string group, Action? open = null)
 		=> KeyConfig_(cat, sec, name, desc, part, group, (open == null) ? onClose => { } : onClose => open());
+	/// <summary>A single keyboard key (a theme "key" setting): the row shows the key's label and captures a new one.</summary>
+	internal static CLuaConfigOption Key_(string cat, string sec, string name, string desc, string cur, Action<string> apply) {
+		var o = new CLuaConfigOption { Category = cat, Section = sec, Kind = "Key", Name = name, Desc = desc };
+		o.KeyName = cur ?? "";
+		o._apply = () => apply(o.KeyName);
+		o._display = x => CLuaKeyConfigService.KeyboardLabelOf(x.KeyName);
+		return o;
+	}
 }

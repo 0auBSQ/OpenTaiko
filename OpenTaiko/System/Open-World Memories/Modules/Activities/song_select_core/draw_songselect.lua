@@ -7,6 +7,7 @@ local M = {}
 -- hoisted colors (per-frame COLOR:Create* calls allocate userdata every frame); overridable via config
 local SONGLIST_GOLD  = CFG.color("colors.songlist_gold", COLOR:CreateColorFromARGB(255, 242, 207, 1))   -- selected-bar title tint
 local COL_WHITE      = COLOR:CreateColorFromHex("ffffffff")
+local COL_BLACK      = COLOR:CreateColorFromHex("ff000000")
 local COL_VAULT_GRAY = CFG.color("colors.vault_gray", COLOR:CreateColorFromHex("ff808080"))
 local COL_TAG_FIRE   = CFG.color("colors.tag_fire", COLOR:CreateColorFromHex("ffac0c0c"))
 local COL_TAG_STORM  = CFG.color("colors.tag_storm", COLOR:CreateColorFromHex("ff83159e"))
@@ -33,6 +34,21 @@ local SONGBAR_PLUS_DX             = CFG.num("song_list.plus_dx", -19)
 local SONGBAR_PLUS_DY             = CFG.num("song_list.plus_dy", -27)
 -- the plus overhangs the digits' ink by ~9px, so the whole number moves left by half of that to stay centred
 local SONGBAR_PLUS_SHIFT          = CFG.num("song_list.plus_shift", -5)
+-- the "[key] - Show shortcuts" line under the Select-a-Song overlay: position and its slow opacity pulse
+local HELPER_X           = CFG.num("song_list.shortcuts_helper_x", 44)
+local HELPER_Y           = CFG.num("song_list.shortcuts_helper_y", 178)
+local HELPER_PULSE_MS    = CFG.num("song_list.shortcuts_helper_pulse_ms", 2400)
+local HELPER_OPACITY_MIN = CFG.num("song_list.shortcuts_helper_opacity_min", 0.45)
+local HELPER_PAD_X       = CFG.num("song_list.shortcuts_helper_pad_x", 16)       -- the dark box around the line
+local HELPER_PAD_Y       = CFG.num("song_list.shortcuts_helper_pad_y", 8)
+local HELPER_BOX_ALPHA   = CFG.num("song_list.shortcuts_helper_box_alpha", 150)
+local HELPER_BOX_RADIUS  = CFG.num("song_list.shortcuts_helper_box_radius", 10)
+-- the translucent band under the song list, sheared to the bars' diagonal (origin/offset above): its
+-- horizontal width, its centre's horizontal offset from the bar centre line, its alpha and edge fade
+local BACKDROP_W         = CFG.num("song_list.backdrop_width", 980)
+local BACKDROP_DX        = CFG.num("song_list.backdrop_offset_x", 0)
+local BACKDROP_ALPHA     = CFG.num("song_list.backdrop_alpha", 120)
+local BACKDROP_FADE      = CFG.num("song_list.backdrop_fade", 36)
 -- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
 local SONGBAR_CHECKER_LEVEL       = {
     [0] = CFG.num("song_list.checker_level_easy", 6),
@@ -319,6 +335,66 @@ function M.barPos(i, dist)
     return xpos, ypos
 end
 
+-- ── The shortcuts helper line: white glyph text on a rounded dark box sized to it ─────────
+local helperBox = nil          -- { canvas, w, h, text }: rebaked when the text changes (language, binding)
+local function drawHelperLine(text, opacity)
+    local gf = G.textStats
+    local inkH = math.ceil(gf.LineHeight)
+    local pad = gf.BoxHeight - inkH            -- the glyph box's padding around the ink
+    if helperBox == nil or helperBox.text ~= text then
+        if helperBox ~= nil then helperBox.canvas:Dispose() end
+        local w = math.ceil(gf:Measure(text)) + 2 * HELPER_PAD_X
+        local h = inkH + 2 * HELPER_PAD_Y
+        local cv = CANVAS:CreateCanvas(w, h)
+        cv:ClearTransparent()
+        local r = math.max(0, math.min(HELPER_BOX_RADIUS, math.floor(h / 2)))
+        cv:FillRect(r, 0, w - 2 * r, h, 0, 0, 0, HELPER_BOX_ALPHA)
+        cv:FillRect(0, r, w, h - 2 * r, 0, 0, 0, HELPER_BOX_ALPHA)
+        for _, c in ipairs({ { r, r }, { w - r - 1, r }, { r, h - r - 1 }, { w - r - 1, h - r - 1 } }) do
+            cv:FillCircle(c[1], c[2], r, 0, 0, 0, HELPER_BOX_ALPHA)
+        end
+        cv:Upload()
+        helperBox = { canvas = cv, w = w, h = h, text = text }
+    end
+    helperBox.canvas:SetOpacity(opacity)
+    helperBox.canvas:Draw(HELPER_X, HELPER_Y)
+    helperBox.canvas:SetOpacity(1)
+    gf:Draw(text, HELPER_X + HELPER_PAD_X - pad, HELPER_Y + HELPER_PAD_Y, COL_WHITE, COL_BLACK, opacity, 1, 0, "topleft")
+end
+
+-- ── The song list backdrop: a translucent black band behind the bars, along their diagonal ──
+-- Baked once as a screen-high canvas: every row is the band shifted by the bars' slope (offset_x per
+-- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in 4 px steps.
+local backdrop = nil           -- { canvas, x0 }: x0 = the canvas' screen x before the panel shift
+local function drawListBackdrop(opacity)
+    if backdrop == nil then
+        local slope = SONGLIST_OFFSET_X / SONGLIST_OFFSET_Y
+        local W, H = math.floor(BACKDROP_W), 1080
+        local span = math.ceil(H * slope)
+        local cv = CANVAS:CreateCanvas(W + span + 2, H)
+        cv:ClearTransparent()
+        local fade = math.max(4, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
+        local step = 4
+        for y = 0, H - 1 do
+            local x = math.floor(y * slope + 0.5)
+            cv:FillRect(x + fade, y, W - 2 * fade, 1, 0, 0, 0, BACKDROP_ALPHA)
+            for f = 0, fade - 1, step do
+                local a = math.floor(BACKDROP_ALPHA * (f + step) / (fade + step) + 0.5)
+                local wdt = math.min(step, fade - f)
+                cv:FillRect(x + f, y, wdt, 1, 0, 0, 0, a)
+                cv:FillRect(x + W - f - wdt, y, wdt, 1, 0, 0, 0, a)
+            end
+        end
+        cv:Upload()
+        -- the band is centred on the bar centre line (BACKDROP_DX to its right): row 0's left edge
+        backdrop = { canvas = cv, x0 = SONGLIST_ORIGIN_X + BACKDROP_DX - SONGLIST_ORIGIN_Y * slope - W / 2 }
+    end
+    local cv = backdrop.canvas
+    cv:SetOpacity(opacity)
+    cv:Draw(math.floor(backdrop.x0 - G.songSelectShift + 0.5), 0)
+    cv:SetOpacity(1)
+end
+
 -- ── Folder open/close animation ─────────────────────────────────────────────────
 -- Driven by G.folderAnim (set up in navigation.lua): { mode="open"/"close", phase=1/2, t=0..1,
 -- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.
@@ -421,6 +497,9 @@ M.drawHeaderCrumbsAnim = drawHeaderCrumbsAnim
 function M.drawPanel()
     local opacityNorm = G.songSelectElemOpacity / 255
     local sel = G.selInfo
+
+    -- the translucent band the bars sit on: under everything else of the panel, the song info included
+    if opacityNorm > 0 then drawListBackdrop(opacityNorm) end
 
     -- Random / song info panels (all node-derived data comes from the selection cache — see navigation.lua)
     if sel ~= nil and sel.isRandom then
@@ -552,9 +631,14 @@ function M.drawPanel()
         end
     end
 
-    -- Overlay
+    -- Overlay, then the shortcuts helper line under it (song select only: it fades with the panel)
     G.bgtx["overlay"]:SetOpacity(opacityNorm)
     G.bgtx["overlay"]:Draw(0, 0)
+    local helper = G.shortcuts and G.shortcuts.helperText()
+    if helper ~= nil and opacityNorm > 0 then
+        local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * (G.nowMs or 0) / HELPER_PULSE_MS)
+        drawHelperLine(helper, opacityNorm * (HELPER_OPACITY_MIN + (1 - HELPER_OPACITY_MIN) * pulse))
+    end
 
     -- Unlock conditions panel (shown when a locked song is highlighted)
     G.unlocks.drawCondsPanel()

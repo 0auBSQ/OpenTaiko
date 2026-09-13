@@ -321,11 +321,26 @@ public static class CConfigOptionBuilder {
 			} else db.SetSetting(def.Id, valueStr);
 		}
 
+		var keyRows = new List<(CThemeSettingDef def, CLuaConfigOption opt)>();
 		foreach (var def in db.Definitions) {
 			string label = def.Label.GetString(def.Id);
 			string desc = def.Description.GetString("");
 			string stored = def.IsSaveScoped ? db.GetSettingForSave(def.Id, repSaveId) : db.GetSetting(def.Id);
 			switch (def.Type.ToLowerInvariant()) {
+				case "key": {
+						// one keyboard key per setting; binding a key already held by another key setting frees it there
+						var opt = CLuaConfigOption.Key_("Theme", secThemeSettings, label, desc, stored, v => {
+							Persist(def, v);
+							if (v == "") return;
+							foreach (var (odef, oopt) in keyRows)
+								if (odef != def && string.Equals(oopt.KeyName, v, StringComparison.OrdinalIgnoreCase)) {
+									oopt.ClearKeySilently(); Persist(odef, "");
+								}
+						});
+						keyRows.Add((def, opt));
+						O.Add(opt);
+						break;
+					}
 				case "bool":
 					O.Add(CLuaConfigOption.Toggle_("Theme", secThemeSettings,label, desc,
 						stored == "1" || string.Equals(stored, "true", StringComparison.OrdinalIgnoreCase),

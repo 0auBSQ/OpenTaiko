@@ -123,7 +123,7 @@ Met de meegeleverde skin als referentie bevat de skinroot:
 - `Fonts/`: de `.ttf`-bestanden waarnaar de `FontName`-sleutels verwijzen.
 - `Locales/`: één JSON-bestand per taal (`en.json`, `ja.json`, ...) met de vorm `{ "Entries": { "KEY": "text" } }`. Deze strings labelen de eigen instellingen van de skin, en Lua leest ze via `THEME:GetSkinString(key)`. Wanneer een sleutel in de actieve taal ontbreekt, zoekt het spel hem op in het `DefaultLocale`-bestand.
 - `Modules/`: de Lua-moduleboom (Stap 8).
-- `ThemeSettings.json`: een array van instellingen die het optiescherm onder Thema-instellingen toont. Elk item heeft `id`, `type` (`bool`, `int`, `double`, `string` of `enum`), `scope` (`global`, de standaard, of `save` voor één waarde per opslagbestand), gelokaliseerde `label` en `description`, `default`, en `min`/`max` of `options` afhankelijk van het type.
+- `ThemeSettings.json`: een array van instellingen die het optiescherm onder Thema-instellingen toont. Elk item heeft `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, of `key` voor één toetsenbordtoets die het optiescherm vastlegt en als naam opslaat voor `INPUT:KeyboardPressed`), `scope` (`global`, de standaard, of `save` voor één waarde per opslagbestand), gelokaliseerde `label` en `description`, `default`, en `min`/`max` of `options` afhankelijk van het type.
 - `SkinConfig.ini` en de ingesloten `*Config.ini`-bestanden.
 - `README.txt`, `LICENSE.md`, `Licenses/`: naamsvermeldingsbestanden. Het spel leest ze niet.
 

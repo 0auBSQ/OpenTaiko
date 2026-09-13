@@ -123,7 +123,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Fonts/`: `FontName` 키가 참조하는 `.ttf` 파일.
 - `Locales/`: 언어별 JSON 파일(`en.json`, `ja.json`, ...) 하나씩, 형태는 `{ "Entries": { "KEY": "text" } }`. 이 문자열은 스킨 자체 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 파일에서 찾습니다.
 - `Modules/`: Lua 모듈 트리(8단계).
-- `ThemeSettings.json`: 옵션 화면이 테마 설정 아래에 표시하는 설정 배열. 각 항목은 `id`, `type`(`bool`, `int`, `double`, `string`, `enum`), `scope`(기본값 `global`, 또는 세이브 파일마다 값 하나인 `save`), 지역화된 `label`과 `description`, `default`, 그리고 타입에 따라 `min`/`max` 또는 `options`를 가집니다.
+- `ThemeSettings.json`: 옵션 화면이 테마 설정 아래에 표시하는 설정 배열. 각 항목은 `id`, `type`(`bool`, `int`, `double`, `string`, `enum`, 또는 `key`: 옵션 화면이 캡처하는 키보드 키 하나로, `INPUT:KeyboardPressed`용 이름으로 저장됩니다), `scope`(기본값 `global`, 또는 세이브 파일마다 값 하나인 `save`), 지역화된 `label`과 `description`, `default`, 그리고 타입에 따라 `min`/`max` 또는 `options`를 가집니다.
 - `SkinConfig.ini`와 포함되는 `*Config.ini` 파일.
 - `README.txt`, `LICENSE.md`, `Licenses/`: 저작자 표시 파일. 게임은 읽지 않습니다.
 

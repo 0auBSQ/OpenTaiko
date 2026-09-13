@@ -466,7 +466,7 @@ end
 | `THEME:GetDefinitionCount()  -> integer` | Число определений настроек в ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Идентификатор определения по индексу от 0 или пустая строка. |
 | `THEME:GetDefinitionScope(index)  -> string` | Область определения: "global" или "save". |
-| `THEME:GetDefinitionType(index)  -> string` | Тип определения: "bool", "int", "double", "string" или "enum". |
+| `THEME:GetDefinitionType(index)  -> string` | Тип определения: "bool", "int", "double", "string", "enum" или "key". |
 
 ### LANG
 

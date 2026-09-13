@@ -61,7 +61,26 @@
         "VIEWER_COL_TYPE":  "类型",
         "VIEWER_COL_VALUE": "值",
         "VIEWER_HINT_SCROLL": "上/下滚动   取消退出",
-        "VIEWER_HINT_EXIT":   "取消退出"
+        "VIEWER_HINT_EXIT":   "取消退出",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "查看快捷键",
+        "SONGSELECT_SHORTCUTS_TITLE": "快捷键",
+        "SONGSELECT_SHORTCUTS_CLOSE": "关闭",
+        "SONGSELECT_UNBOUND": "（未绑定）",
+        "SONGSELECT_SC_HELP": "显示此列表",
+        "SONGSELECT_SC_SORT": "歌曲排序",
+        "SONGSELECT_SC_SEARCH": "在当前文件夹中搜索",
+        "SONGSELECT_SC_FAVORITE": "将选中的歌曲加入或移出收藏",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "打开收藏",
+        "SONGSELECT_SC_AUTO_P1": "切换玩家 1 的自动演奏",
+        "SONGSELECT_SC_AUTO_P2": "切换玩家 2 的自动演奏",
+        "SONGSELECT_SC_COURSE": "切换歌曲条上显示的难度",
+        "SONGSELECT_SC_PLAYER": "切换正在设置的玩家",
+        "SONGSELECT_SC_SPEED_DOWN": "降低歌曲速度",
+        "SONGSELECT_SC_SPEED_UP": "提高歌曲速度",
+        "SONGSELECT_SC_PLAYER_COUNT": "更改玩家人数",
+        "SONGSELECT_BOX_BEGINNERS": "推荐给新手的歌曲"
 
     }
 }

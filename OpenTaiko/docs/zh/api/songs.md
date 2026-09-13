@@ -89,6 +89,7 @@ local node = list:GetSelectedSongNode()
 | `list:OpenFolder()  -> bool` | 打开光标所在的文件夹并把光标移到其第一个子节点；光标不在已关闭的非空文件夹上时返回 false。 |
 | `list:CloseFolder()  -> bool` | 关闭包含光标的文件夹并把光标移到该文件夹；没有可关闭的内容时返回 false。离开虚拟文件夹时恢复 OpenVirtualFolder 保存的光标。 |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | 打开一个名为 `title` 的临时文件夹，包含 Lua 表 `songs`（键 1..n）中的歌曲节点，带有生成的返回项和末尾的随机选曲项，并把光标移入其中。`baseFolder` 成为虚拟文件夹的父节点。表中没有歌曲节点时返回 false。 |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | 在 `baseFolder` 的子项第 `index` 位（0 = 第一个）插入一个名为 `title` 的持久虚拟盒子，包含 Lua 表 `songs`（键 1..n）中的歌曲节点，并自动生成返回盒子和末尾的随机盒子；在列表重建之前，它像普通文件夹一样打开和关闭。`genre`（可选）是该盒子的流派，用于按流派的美术。光标不会移动。返回该盒子；若表中没有歌曲节点则返回 nil。 |
 | `list:GetSongByUniqueId(id)  -> song node` | 返回唯一 id 匹配的第一首歌曲，或 nil。 |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | 在 `node` 的同级节点（包含它的那一页）中随机挑选一首歌曲。`recursive`（默认 true）时，挑选范围也涵盖同级文件夹内的歌曲。除非设置了 IgnoreUnlockables，否则它跳过锁定的歌曲。`predicate` 是可选的。没有符合条件的歌曲时返回 nil。 |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | 返回树中谓词返回 true 的每个歌曲节点。 |
@@ -120,6 +121,7 @@ end
 | `node.IsFolder  (bool)` | 节点是文件夹时为 true。 |
 | `node.IsRandom  (bool)` | 节点是随机选曲项时为 true。 |
 | `node.IsReturn  (bool)` | 节点是返回项时为 true。 |
+| `node.IsVirtual  (bool)` | 当文件夹由皮肤创建（OpenVirtualFolder 或 InsertVirtualFolder）而非歌曲树时为 true。 |
 | `node.IsSong  (bool)` | 节点是可演奏的歌曲时为 true。 |
 | `node.SongCount  (int)` | 直接子歌曲的数量。 |
 | `node.RecursiveSongCount  (int)` | 本节点下（含子文件夹）的歌曲数量。 |

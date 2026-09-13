@@ -61,7 +61,26 @@
         "VIEWER_COL_TYPE":  "유형",
         "VIEWER_COL_VALUE": "값",
         "VIEWER_HINT_SCROLL": "위/아래로 스크롤   취소로 종료",
-        "VIEWER_HINT_EXIT":   "취소로 종료"
+        "VIEWER_HINT_EXIT":   "취소로 종료",
+
+        // Song select: the shortcuts helper and panel, the curated boxes
+        "SONGSELECT_SHORTCUTS_HELPER": "단축키 보기",
+        "SONGSELECT_SHORTCUTS_TITLE": "단축키",
+        "SONGSELECT_SHORTCUTS_CLOSE": "닫기",
+        "SONGSELECT_UNBOUND": "(할당 없음)",
+        "SONGSELECT_SC_HELP": "이 목록 표시",
+        "SONGSELECT_SC_SORT": "곡 정렬",
+        "SONGSELECT_SC_SEARCH": "현재 폴더에서 검색",
+        "SONGSELECT_SC_FAVORITE": "선택한 곡을 즐겨찾기에 추가하거나 제거",
+        "SONGSELECT_SC_FAVORITES_FOLDER": "즐겨찾기 열기",
+        "SONGSELECT_SC_AUTO_P1": "1P 오토 플레이 전환",
+        "SONGSELECT_SC_AUTO_P2": "2P 오토 플레이 전환",
+        "SONGSELECT_SC_COURSE": "곡 바에 표시되는 난이도 변경",
+        "SONGSELECT_SC_PLAYER": "설정 중인 플레이어 전환",
+        "SONGSELECT_SC_SPEED_DOWN": "곡 속도 낮추기",
+        "SONGSELECT_SC_SPEED_UP": "곡 속도 높이기",
+        "SONGSELECT_SC_PLAYER_COUNT": "플레이어 수 변경",
+        "SONGSELECT_BOX_BEGINNERS": "초보자에게 추천하는 곡"
 
     }
 }

@@ -642,7 +642,6 @@ function M.handleUpdate(ts)
             uniNavPlayer = i + 1
         end
         local navPn = G.NavInput.p[i]
-        local inputPn = G.inputSets[i]
 
         if G.activeConfig.mountAISlotToP2 and i == 2 then
             -- AI mirrors P1
@@ -679,7 +678,7 @@ function M.handleUpdate(ts)
                 else canceled = true end
             end
                 
-            if inputPn.auto ~= nil and INPUT:Pressed(inputPn.auto) then
+            if i <= 2 and G.shortcuts.pressed("auto_p" .. i) then
                 G.sounds.Decide:Play(); CONFIG:SetAutoStatus(i - 1, not CONFIG:GetAutoStatus(i - 1))
             end
         end

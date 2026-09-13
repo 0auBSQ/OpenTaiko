@@ -466,7 +466,7 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json 中设置定义的数量。 |
 | `THEME:GetDefinitionId(index)  -> string` | 0 起索引处定义的 id，或空字符串。 |
 | `THEME:GetDefinitionScope(index)  -> string` | 定义的范围："global" 或 "save"。 |
-| `THEME:GetDefinitionType(index)  -> string` | 定义的类型："bool"、"int"、"double"、"string" 或 "enum"。 |
+| `THEME:GetDefinitionType(index)  -> string` | 定义的类型："bool"、"int"、"double"、"string"、"enum" 或 "key"。 |
 
 ### LANG
 

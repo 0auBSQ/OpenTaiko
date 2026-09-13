@@ -89,6 +89,7 @@ Suchmethoden nehmen eine Lua-Funktion, die einen Song-Knoten erhält und einen B
 | `list:OpenFolder()  -> bool` | Öffnet den Ordner unter dem Cursor und setzt den Cursor auf sein erstes Kind; gibt false zurück, wenn der Cursor nicht auf einem geschlossenen, nicht-leeren Ordner steht. |
 | `list:CloseFolder()  -> bool` | Schließt den Ordner, der den Cursor enthält, und setzt den Cursor auf diesen Ordner; gibt false zurück, wenn es nichts zu schließen gibt. Beim Verlassen eines virtuellen Ordners wird der von OpenVirtualFolder gespeicherte Cursor wiederhergestellt. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Öffnet einen temporären Ordner namens `title`, der die Song-Knoten aus der Lua-Tabelle `songs` (Schlüssel 1..n) enthält, mit generierten Zurück-Boxen und einer abschließenden Zufalls-Box, und setzt den Cursor hinein. `baseFolder` wird zum übergeordneten Ordner des virtuellen Ordners. Gibt false zurück, wenn die Tabelle keine Song-Knoten enthält. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | Fügt eine dauerhafte virtuelle Box namens `title` an Position `index` (0 = erste) in die Kinder von `baseFolder` ein, mit den Songknoten der Lua-Tabelle `songs` (Schlüssel 1..n), generierten Zurück-Boxen und einer Zufallsbox am Ende; sie öffnet und schließt sich wie jeder Ordner, bis die Liste neu aufgebaut wird. `genre` (optional) ist das Genre der Box für genrebezogene Grafik. Der Cursor bewegt sich nicht. Gibt die Box zurück, oder nil, wenn die Tabelle keine Songknoten enthält. |
 | `list:GetSongByUniqueId(id)  -> song node` | Gibt den ersten Song zurück, dessen eindeutige ID passt, oder nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | Wählt einen zufälligen Song unter den Geschwistern von `node` (die Seite, die ihn enthält). Mit `recursive` (Standard true) umfasst die Auswahl auch Songs in Geschwisterordnern. Gesperrte Songs überspringt sie, sofern nicht IgnoreUnlockables gesetzt ist. `predicate` ist optional. Gibt nil zurück, wenn nichts in Frage kommt. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | Gibt jeden Song-Knoten im Baum zurück, für den das Prädikat true liefert. |
@@ -120,6 +121,7 @@ Das Songlisten-Handle, SONGMOUNT:ChosenSongNode() und DANBUILDER:GetSong() geben
 | `node.IsFolder  (bool)` | True, wenn der Knoten ein Ordner ist. |
 | `node.IsRandom  (bool)` | True, wenn der Knoten eine Zufalls-Box ist. |
 | `node.IsReturn  (bool)` | True, wenn der Knoten eine Zurück-Box ist. |
+| `node.IsVirtual  (bool)` | True, wenn der Skin den Ordner erzeugt hat (OpenVirtualFolder oder InsertVirtualFolder) und nicht der Songbaum. |
 | `node.IsSong  (bool)` | True, wenn der Knoten ein spielbarer Song ist. |
 | `node.SongCount  (int)` | Anzahl der direkten Kind-Songs. |
 | `node.RecursiveSongCount  (int)` | Anzahl der Songs unter diesem Knoten, einschließlich Unterordnern. |

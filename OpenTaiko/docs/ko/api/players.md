@@ -466,7 +466,7 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json의 설정 정의 수. |
 | `THEME:GetDefinitionId(index)  -> string` | 0부터 시작하는 인덱스의 정의 id. 없으면 빈 문자열. |
 | `THEME:GetDefinitionScope(index)  -> string` | 정의의 범위: "global" 또는 "save". |
-| `THEME:GetDefinitionType(index)  -> string` | 정의의 타입: "bool", "int", "double", "string", "enum". |
+| `THEME:GetDefinitionType(index)  -> string` | 정의의 타입: "bool", "int", "double", "string", "enum", "key". |
 
 ### LANG
 

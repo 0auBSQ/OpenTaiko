@@ -11,7 +11,8 @@ internal class CThemeSettingDef {
 	public string Id { get; set; } = "";
 
 	/// <summary>
-	/// Type of setting value: "bool", "int", "double", "string", or "enum".
+	/// Type of setting value: "bool", "int", "double", "string", "enum", or "key" (a keyboard key name;
+	/// the settings menu captures it, skins read it and match it with INPUT:KeyboardPressed).
 	/// </summary>
 	[JsonProperty("type")]
 	public string Type { get; set; } = "string";

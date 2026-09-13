@@ -89,6 +89,7 @@ Zoekmethoden nemen een Lua-functie die een nummerknoop ontvangt en een boolean t
 | `list:OpenFolder()  -> bool` | Opent de map onder de cursor en zet de cursor op het eerste kind; geeft false terug als de cursor niet op een gesloten, niet-lege map staat. |
 | `list:CloseFolder()  -> bool` | Sluit de map die de cursor bevat en zet de cursor op die map; geeft false terug als er niets te sluiten valt. Bij het verlaten van een virtuele map wordt de door OpenVirtualFolder bewaarde cursor hersteld. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Opent een tijdelijke map met de naam `title` die de nummerknopen uit de Lua-tabel `songs` (sleutels 1..n) bevat, met gegenereerde terugboxen en een randombox aan het einde, en zet de cursor erin. `baseFolder` wordt de bovenliggende map van de virtuele map. Geeft false terug als de tabel geen nummerknopen bevat. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | Voegt een blijvende virtuele box met de naam `title` in bij de kinderen van `baseFolder` op positie `index` (0 = eerste), met de songnodes uit de Lua-tabel `songs` (sleutels 1..n), gegenereerde terugboxen en een willekeurige box aan het einde; hij opent en sluit als elke map totdat de lijst opnieuw wordt opgebouwd. `genre` (optioneel) is het genre van de box voor genre-specifieke art. De cursor beweegt niet. Geeft de box terug, of nil als de tabel geen songnodes bevat. |
 | `list:GetSongByUniqueId(id)  -> song node` | Geeft het eerste nummer terug waarvan het unieke id overeenkomt, of nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | Kiest een willekeurig nummer onder de broers en zussen van `node` (de pagina die het bevat). Met `recursive` (standaard true) omvat de keuze ook nummers binnen naburige mappen. Het slaat vergrendelde nummers over tenzij IgnoreUnlockables is gezet. `predicate` is optioneel. Geeft nil terug wanneer niets in aanmerking komt. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | Geeft elke nummerknoop in de boom terug waarvoor het predicaat true teruggeeft. |
@@ -120,6 +121,7 @@ De nummerlijst-handle, SONGMOUNT:ChosenSongNode() en DANBUILDER:GetSong() geven 
 | `node.IsFolder  (bool)` | True wanneer de knoop een map is. |
 | `node.IsRandom  (bool)` | True wanneer de knoop een randombox is. |
 | `node.IsReturn  (bool)` | True wanneer de knoop een terugbox is. |
+| `node.IsVirtual  (bool)` | True wanneer de skin de map heeft gemaakt (OpenVirtualFolder of InsertVirtualFolder) en niet de songboom. |
 | `node.IsSong  (bool)` | True wanneer de knoop een speelbaar nummer is. |
 | `node.SongCount  (int)` | Aantal directe kindnummers. |
 | `node.RecursiveSongCount  (int)` | Aantal nummers onder deze knoop, inclusief submappen. |

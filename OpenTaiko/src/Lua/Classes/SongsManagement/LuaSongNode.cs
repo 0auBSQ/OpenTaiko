@@ -375,6 +375,14 @@
 			_children.Add(child);
 		}
 
+		/// <summary>Inserts a child at an index of this node's children list (virtual box construction).</summary>
+		internal void InsertChildInternal(int index, LuaSongNode child) {
+			_children.Insert(Math.Clamp(index, 0, _children.Count), child);
+		}
+
+		/// <summary>True for a folder the skin created (a virtual folder or an inserted virtual box), not one from the song tree.</summary>
+		public bool IsVirtual { get; internal set; }
+
 		private void _FetchCharts() {
 			_charts = new List<LuaSongChart>();
 

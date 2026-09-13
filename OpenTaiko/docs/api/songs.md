@@ -89,6 +89,7 @@ Search methods take a Lua function that receives a song node and returns a boole
 | `list:OpenFolder()  -> bool` | Opens the folder under the cursor and moves the cursor to its first child; returns false if the cursor is not on a closed, non-empty folder. |
 | `list:CloseFolder()  -> bool` | Closes the folder containing the cursor and moves the cursor to that folder; returns false if there is nothing to close. Leaving a virtual folder restores the cursor saved by OpenVirtualFolder. |
 | `list:OpenVirtualFolder(baseFolder, songs, title)  -> bool` | Opens a temporary folder named `title` containing the song nodes from the Lua table `songs` (keys 1..n), with generated back boxes and a trailing random box, and moves the cursor into it. `baseFolder` becomes the virtual folder's parent. Returns false if the table holds no song nodes. |
+| `list:InsertVirtualFolder(baseFolder, index, songs, title, genre)  -> songNode` | Inserts a lasting virtual box named `title` into `baseFolder`'s children at `index` (0 = first), holding the song nodes from the Lua table `songs` (keys 1..n) with generated back boxes and a trailing random box; it opens and closes like any folder until the list is rebuilt. `genre` (optional) is the box's genre for per-genre art. The cursor does not move. Returns the box, or nil if the table holds no song nodes. |
 | `list:GetSongByUniqueId(id)  -> song node` | Returns the first song whose unique id matches, or nil. |
 | `list:GetRandomNodeInFolder(node, recursive, predicate)  -> song node` | Picks a random song among the siblings of `node` (the page containing it). With `recursive` (default true), the pick also covers songs inside sibling folders. It skips locked songs unless IgnoreUnlockables is set. `predicate` is optional. Returns nil when nothing qualifies. |
 | `list:SearchSongsByPredicate(predicate)  -> list of song nodes` | Returns every song node in the tree for which the predicate returns true. |
@@ -120,6 +121,7 @@ The song list handle, SONGMOUNT:ChosenSongNode() and DANBUILDER:GetSong() return
 | `node.IsFolder  (bool)` | True when the node is a folder. |
 | `node.IsRandom  (bool)` | True when the node is a random box. |
 | `node.IsReturn  (bool)` | True when the node is a back box. |
+| `node.IsVirtual  (bool)` | True when the skin created the folder (OpenVirtualFolder or InsertVirtualFolder) rather than the song tree. |
 | `node.IsSong  (bool)` | True when the node is a playable song. |
 | `node.SongCount  (int)` | Number of direct child songs. |
 | `node.RecursiveSongCount  (int)` | Number of songs under this node, including subfolders. |
