@@ -286,8 +286,8 @@ internal class CTja : CActivity {
 	public class CBranchPointInfo {
 		public CChip? chipBranchStart;
 		public int nMeasureCount;
-		public double dbTime;
-		public double dbBMScrollTime;
+		public double dbTime, dbTimeLast;
+		public double dbBMScrollTime, dbBMScrollTimeLast;
 		public double dbBPM;
 		public float fMeasure_s;
 		public float fMeasure_m;
@@ -2909,7 +2909,9 @@ internal class CTja : CActivity {
 		this.cBranchStart.chipBranchStart = null;
 		this.cBranchEnd.nMeasureCount = this.cBranchStart.nMeasureCount = this.nCurrentMeasureCount;
 		this.cBranchEnd.dbTime = this.cBranchStart.dbTime = this.dbNowTime;
+		this.cBranchEnd.dbTimeLast = this.cBranchStart.dbTimeLast = this.dbLastTime;
 		this.cBranchEnd.dbBMScrollTime = this.cBranchStart.dbBMScrollTime = this.dbNowBMScrollTime;
+		this.cBranchEnd.dbBMScrollTimeLast = this.cBranchStart.dbBMScrollTimeLast = this.dbLastBMScrollTime;
 		this.cBranchEnd.dbBPM = this.cBranchStart.dbBPM = this.dbNowBPM;
 		this.cBranchEnd.fMeasure_s = this.cBranchStart.fMeasure_s = this.fNow_Measure_s;
 		this.cBranchEnd.fMeasure_m = this.cBranchStart.fMeasure_m = this.fNow_Measure_m;
@@ -2931,7 +2933,9 @@ internal class CTja : CActivity {
 			if (this.nCurrentMeasureCount > this.cBranchEnd.nMeasureCount || this.dbNowTime > this.cBranchEnd.dbTime) {
 				this.cBranchEnd.nMeasureCount = this.nCurrentMeasureCount;
 				this.cBranchEnd.dbTime = this.dbNowTime;
+				this.cBranchEnd.dbTimeLast = this.dbLastTime;
 				this.cBranchEnd.dbBMScrollTime = this.dbNowBMScrollTime;
+				this.cBranchEnd.dbBMScrollTimeLast = this.dbLastBMScrollTime;
 			}
 		}
 	}
@@ -2946,7 +2950,9 @@ internal class CTja : CActivity {
 		this.nCurrentCourse = branch;
 		this.nCurrentMeasureCount = this.cBranchStart.nMeasureCount;
 		this.dbNowTime = this.cBranchStart.dbTime;
+		this.dbLastTime = this.cBranchStart.dbTimeLast;
 		this.dbNowBMScrollTime = this.cBranchStart.dbBMScrollTime;
+		this.dbLastBMScrollTime = this.cBranchStart.dbBMScrollTimeLast;
 		this.dbNowBPM = this.cBranchStart.dbBPM;
 		this.fNow_Measure_s = this.cBranchStart.fMeasure_s;
 		this.fNow_Measure_m = this.cBranchStart.fMeasure_m;
@@ -2963,7 +2969,9 @@ internal class CTja : CActivity {
 		if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS) || forced) {
 			this.nCurrentMeasureCount = this.cBranchEnd.nMeasureCount;
 			this.dbNowTime = this.cBranchEnd.dbTime;
+			this.dbLastTime = this.cBranchEnd.dbTimeLast;
 			this.dbNowBMScrollTime = this.cBranchEnd.dbBMScrollTime;
+			this.dbLastBMScrollTime = this.cBranchEnd.dbBMScrollTimeLast;
 			this.dbNowBPM = this.cBranchEnd.dbBPM;
 			this.fNow_Measure_s = this.cBranchEnd.fMeasure_s;
 			this.fNow_Measure_m = this.cBranchEnd.fMeasure_m;
