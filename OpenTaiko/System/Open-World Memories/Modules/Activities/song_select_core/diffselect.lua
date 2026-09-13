@@ -110,6 +110,25 @@ local GAUGE_FX_PULSE_OP  = CFG.num("difficulty_select.level.gauge_fx_pulse_opaci
 local GAUGE_FX_LIGHTEN   = CFG.num("difficulty_select.level.gauge_fx_lighten", 0.55)       -- the pulse shade: how far toward white
 local GAUGE_FX_FRAME_MS  = CFG.num("difficulty_select.level.gauge_fx_frame_ms", 70)        -- space overlay frame time
 local GAUGE_FX_SPACE_OP  = CFG.num("difficulty_select.level.gauge_fx_space_opacity", 0.9)  -- space overlay opacity
+-- Level stars: one per level past the gauge's last slice, on three slots along the band (bar-relative
+-- centres, from Textures/DifficultyBars/stars.xcf). 13+ fills the three slots; 12 puts two stars pulled
+-- toward the middle by STAR_PAIR_PULL of their half-distance; 11 puts one in the middle of slots 1 and 3.
+local STAR_FROM_LEVEL = CFG.num("difficulty_select.level.star_from_level", 11)
+local STAR_SLOTS = {
+    { CFG.num("difficulty_select.level.star1_x", 447.5), CFG.num("difficulty_select.level.star1_y", 168) },
+    { CFG.num("difficulty_select.level.star2_x", 481.5), CFG.num("difficulty_select.level.star2_y", 163) },
+    { CFG.num("difficulty_select.level.star3_x", 513.5), CFG.num("difficulty_select.level.star3_y", 152) },
+}
+local STAR_PAIR_PULL      = CFG.num("difficulty_select.level.star_pair_pull", 0.25)
+-- the glitter: an additive shine pulse on the star and two glints blinking in turn
+local STAR_SHINE_MS       = CFG.num("difficulty_select.level.star_shine_ms", 900)
+local STAR_SHINE_OP       = CFG.num("difficulty_select.level.star_shine_opacity", 0.45)
+local STAR_GLINT_MS       = CFG.num("difficulty_select.level.star_glint_ms", 1500)
+local STAR_GLINT_OP       = CFG.num("difficulty_select.level.star_glint_opacity", 0.95)
+local STAR_GLINT_OFFSETS  = {   -- star-relative (bar coordinates), rotating with the Note
+    { CFG.num("difficulty_select.level.star_glint1_dx", 9),  CFG.num("difficulty_select.level.star_glint1_dy", -11) },
+    { CFG.num("difficulty_select.level.star_glint2_dx", -9), CFG.num("difficulty_select.level.star_glint2_dy", 6) },
+}
 local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- light bars, first slice: how far toward white
 local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- vivid end: saturation multiplier
 local GAUGE_END_LIGHT = CFG.num("difficulty_select.level.gauge_end_lighten", 0.4)     -- dark bars, last slice: how far toward white (HSL lightness)
@@ -410,6 +429,60 @@ local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
     if fxTex ~= nil then fxTex:SetRotation(0); fxTex:SetOpacity(1) end
 end
 
+-- The level stars of a difficulty bar whose Note-local top-left is (bx,by), for the bar texture index
+-- `bar` (star<bar>.png; nothing when the bar ships none). Each star: the sprite, an additive shine pulse,
+-- then its glints (additive, blinking with their own phases and a slow spin).
+local function drawLevelStars(level, bar, bx, by, opacity)
+    local lv = math.floor(tonumber(level) or 0)
+    if lv < STAR_FROM_LEVEL then return end
+    local tex = G.bgtx["diffsel_star" .. bar]
+    if tex == nil then return end
+    local count = math.min(3, lv - STAR_FROM_LEVEL + 1)
+    local s1, s3 = STAR_SLOTS[1], STAR_SLOTS[3]
+    local mx, my = (s1[1] + s3[1]) / 2, (s1[2] + s3[2]) / 2
+    local t = G.nowMs or 0
+    local glint = G.bgtx["diffsel_star_glint"]
+    for i = 1, count do
+        local px, py
+        if count == 3 then px, py = STAR_SLOTS[i][1], STAR_SLOTS[i][2]
+        elseif count == 2 then
+            local s = (i == 1) and s1 or s3
+            px, py = s[1] + (mx - s[1]) * STAR_PAIR_PULL, s[2] + (my - s[2]) * STAR_PAIR_PULL
+        else px, py = mx, my end
+        local shine = 0.5 + 0.5 * math.sin(2 * math.pi * t / STAR_SHINE_MS + i * 1.3)
+        local sx, sy = nmap(bx + px, by + py)
+        tex:SetRotation(nAngleDeg)
+        tex:SetOpacity(opacity)
+        tex:DrawAtAnchor(sx, sy, "center")
+        tex:SetBlendMode("add")
+        tex:SetOpacity(opacity * STAR_SHINE_OP * shine)
+        tex:DrawAtAnchor(sx, sy, "center")
+        tex:SetBlendMode("normal")
+        tex:SetRotation(0)
+        tex:SetOpacity(1)
+        if glint ~= nil then
+            glint:SetBlendMode("add")
+            for k, off in ipairs(STAR_GLINT_OFFSETS) do
+                -- each glint blinks once per STAR_GLINT_MS, offset per star and per glint so they take turns
+                local gp = (t / STAR_GLINT_MS + i * 0.37 + k * 0.5) % 1
+                local blink = math.sin(gp * math.pi)
+                blink = blink * blink * blink
+                if blink > 0.02 then
+                    local gx, gy = nmap(bx + px + off[1], by + py + off[2])
+                    glint:SetRotation(nAngleDeg + gp * 90)
+                    glint:SetScale(0.6 + 0.6 * blink, 0.6 + 0.6 * blink)
+                    glint:SetOpacity(opacity * STAR_GLINT_OP * blink)
+                    glint:DrawAtAnchor(gx, gy, "center")
+                end
+            end
+            glint:SetBlendMode("normal")
+            glint:SetRotation(0)
+            glint:SetScale(1, 1)
+            glint:SetOpacity(1)
+        end
+    end
+end
+
 -- Up to CHARTER_MAX charter names for a difficulty bar whose Note-local top-left is (bx,by). Each name is a
 -- single cached texture (GetText), centre-anchored at its transformed point and rotated as one piece.
 local function drawCharters(charters, bx, by, opacity)
@@ -472,6 +545,7 @@ function M.drawPanel()
             drawCharters(barinfo.charters, bx, by, opacityNorm)
             drawLevelNumber(barinfo.level, barinfo.isplus, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
             drawLevelGauge(barinfo.level, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
+            drawLevelStars(barinfo.level, barinfo.vault and 7 or (barinfo.difficulty + 2), bx, by, opacityNorm)
 
             if barinfo.vault and barinfo.vaultName ~= nil and barinfo.vaultName ~= "" then
                 ensureLabelFonts()

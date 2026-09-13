@@ -270,6 +270,14 @@ function onStart()
     G.bgtx["diffsel_gauge10"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10.png")
     G.bgtx["diffsel_gauge8_space"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8_space.png")
     G.bgtx["diffsel_gauge10_space"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10_space.png")
+    -- Level stars (levels past the gauge's 10 slices): DifficultyBars/star<bar>.png per bar texture index
+    -- (2 = Easy .. 6 = Ura, 7 = vault); only the bars that ship one show stars. star_glint.png = the glitter.
+    for i = 2, 7 do
+        if TEXTURE:Exists("Textures/DifficultyBars/star" .. i .. ".png") then
+            G.bgtx["diffsel_star" .. i] = TEXTURE:CreateTexture("Textures/DifficultyBars/star" .. i .. ".png")
+        end
+    end
+    G.bgtx["diffsel_star_glint"] = TEXTURE:CreateTexture("Textures/DifficultyBars/star_glint.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
     G.bars["bar"]              = TEXTURE:CreateTexture("Textures/bar.png")
