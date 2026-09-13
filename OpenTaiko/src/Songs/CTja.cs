@@ -407,7 +407,7 @@ internal class CTja : CActivity {
 	public double dbDTXVPlaySpeed;
 	public int nDemoBGMOffset;
 
-	private int nCurrentMeasureCount = 1;
+	private int nCurrentMeasureCount = 0; // 0: pre-#START, 1: post-#START
 	private int iNowMeasureAllBranches = 0;
 
 	private int[] nNowRollCountBranch = new int[3] { -1, -1, -1 };
@@ -1690,7 +1690,7 @@ internal class CTja : CActivity {
 
 			//読み込み部分本体に渡す譜面を作成。
 			//0:ヘッダー情報 1:#START以降 となる。個数の定義は後からされるため、ここでは省略。
-			this.nCurrentMeasureCount = 1;
+			this.nCurrentMeasureCount = 0; // pre-#START
 			this.iNowMeasureAllBranches = 0;
 			try {
 				{
@@ -2800,6 +2800,10 @@ internal class CTja : CActivity {
 		};
 
 	private void InitializeChartDefinitionBody() {
+		if (this.nCurrentMeasureCount > 0)
+			return; // already initialized
+		this.nCurrentMeasureCount = 1; // post-#START
+
 		// apply global offset
 		var msOFFSET_Signed = this.isOFFSET_Negative ? -this.msOFFSET_Abs : this.msOFFSET_Abs;
 		msOFFSET_Signed += OpenTaiko.ConfigIni.nGlobalOffsetMs;
@@ -3415,14 +3419,17 @@ internal class CTja : CActivity {
 	private void TryParsePlayerSideHeader(string InputText, bool allowCommands) {
 		// pre-#START commands
 		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
-			if (!allowCommands)
-				return; // might be from previous player-sides, ignore
+			// might be from previous player-sides || post-#START and a normal command, ignore
+			if (!allowCommands || this.nCurrentMeasureCount > 0)
+				return;
 			if (command == "#NMSCROLL") {
 				eScrollMode = EScrollMode.Normal;
 			} else if (command == "#HBSCROLL") {
 				eScrollMode = EScrollMode.HBScroll;
 			} else if (command == "#BMSCROLL") {
 				eScrollMode = EScrollMode.BMScroll;
+			} else if (command == "#START") {
+				this.nCurrentMeasureCount = 1; // post-#START
 			}
 			return;
 		}
