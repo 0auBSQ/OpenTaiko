@@ -17,8 +17,8 @@ function activate()
 	exitingToPlay = false
 	CONFIG.IsAIBattleMode = true
 	-- PlayerCount now returns 2 (forced by IsAIBattleMode); lock it and mount AI slot.
-	act:Activate(false, CONFIG.PlayerCount, true)
-	-- Override the scrolling background set by the activity.
+	act:Activate(false, CONFIG.PlayerCount, true, false, "shared")
+	-- "shared": the activity scrolls this texture instead of its per-genre sets
 	SHARED:SetSharedTexture("background", "Textures/BG_Space.png")
 end
 

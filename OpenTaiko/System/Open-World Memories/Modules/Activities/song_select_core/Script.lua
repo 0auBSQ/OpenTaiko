@@ -32,6 +32,7 @@ local PREVIEW_FADE_OUT_MS = CFG.num("preview.fade_out_ms", 140)
 local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
+local BG      = require("backgrounds")   -- per-genre background sets, crossfaded with the selection
 
 -- ── Shared state (G) ─────────────────────────────────────────────────────────
 -- All modules receive a reference to this table via their init() call.
@@ -216,6 +217,8 @@ DrawSS.init(G)
 Search.init(G)
 Unlocks.init(G)
 Favs.init(G)
+BG.init(G)
+G.backgrounds = BG
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
 -- without needing a direct reference to Sort.
@@ -233,7 +236,7 @@ function onStart()
     G.textLarge = TEXT:CreateGlyphCached(40)
     G.textStats = TEXT:CreateGlyphCached(24)
 
-    SHARED:SetSharedTexture("background", "Textures/bg0.png")
+    BG.loadDefault()   -- bg1.png, the set every genre without its own falls back to
 
     G.bgtx["load"]                      = TEXTURE:CreateTexture("Textures/load.png")
     G.bgtx["preimage_load"]             = TEXTURE:CreateTexture("Textures/preimage_load.png")
@@ -330,7 +333,9 @@ function onStart()
     G.favs = Favs
 end
 
-function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly)
+-- backgroundMode: nil = the per-genre sets (backgrounds.lua); "shared" = the host draws its own via the
+-- SHARED "background" texture (set after this call), scrolled as before
+function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly, backgroundMode)
     G.activeConfig = {
         allowPlayerCount  = allowPlayerCount,
         lockedPlayerCount = lockedPlayerCount,
@@ -364,7 +369,8 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
 
     -- (search state is owned by LuaSongList; reloading the song list resets it)
 
-    SHARED:SetSharedTexture("background", "Textures/bg0.png")
+    BG.setMode(backgroundMode)
+    BG.reset()
 
     -- localized overlays for the current language (it can change between visits); freed in deactivate()
     for key, default in pairs(OVERLAY_FILES) do
@@ -478,6 +484,7 @@ function onDestroy()
     for _, bar     in pairs(G.bars)          do bar:Dispose()     end
     for _, bg      in pairs(G.bgtx)          do bg:Dispose()      end
     for _, overlay in pairs(G.genre_overlays) do overlay:Dispose() end
+    BG.dispose()
 end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────────
@@ -500,10 +507,7 @@ function draw(mode)
         return
     end
 
-    if mode ~= "no_bg" then
-        SHARED:GetSharedTexture("background"):Draw(-G.backgroundScrollX, 0)
-        SHARED:GetSharedTexture("background"):Draw(-G.backgroundScrollX + 1920, 0)
-    end
+    if mode ~= "no_bg" then BG.draw() end
     if mode == "bg_only" then return end
 
     -- Song select first, then difficulty select OVER it, so the Note covers the song-select right segment
@@ -521,6 +525,7 @@ end
 function update(ts)
     G.nowMs = ts                                   -- the frame clock for draw-side animations (song speed arrows)
     for _, c in pairs(G.ctx) do c:Tick() end
+    BG.update()
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
     if IsSongsEnumerating() or G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then

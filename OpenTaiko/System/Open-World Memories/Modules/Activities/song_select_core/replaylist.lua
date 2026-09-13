@@ -488,21 +488,12 @@ end
 -- ── Draw (called from diffselect.drawPanel; only when the panel is settled) ─────────
 
 -- repaint the layers that actually cover the strip's screen region, in their draw order (Script.lua draw
--- + diffselect.drawPanel), each clipped to the band. The strip sits over the WRAPPING SCROLLED shared
--- background — bg_difficultyselect is a 1006px-wide left panel that never reaches it (sampling it out of
--- range was the "weird patterns" bug), the header strip covers y<120 and the top-right overlay y<218.
+-- + diffselect.drawPanel), each clipped to the band. The strip sits over the background (its image layers,
+-- via backgrounds.drawBand) — bg_difficultyselect is a 1006px-wide left panel that never reaches it
+-- (sampling it out of range was the "weird patterns" bug), the header strip covers y<120 and the
+-- top-right overlay y<218.
 local function drawMaskBand(bx, by, bw, bh)
-    local bgTex = SHARED:GetSharedTexture("background")
-    if bgTex.Width > 0 then
-        for k = 0, 1 do
-            local tileX = -G.backgroundScrollX + 1920 * k
-            local x0 = math.max(bx, tileX)
-            local x1 = math.min(bx + bw, tileX + 1920)
-            if x1 > x0 then
-                bgTex:DrawRect(math.floor(x0), by, math.floor(x0 - tileX), by, math.ceil(x1 - x0), bh)
-            end
-        end
-    end
+    G.backgrounds.drawBand(bx, by, bw, bh)
     local pan = G.bgtx["difficultyselect"]
     if bx < pan.Width then
         pan:DrawRect(bx, by, bx, by, math.min(bw, pan.Width - bx), math.min(bh, pan.Height - by))

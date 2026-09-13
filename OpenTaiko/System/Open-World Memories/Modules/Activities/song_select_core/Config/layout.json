@@ -118,6 +118,8 @@
         "nameplate": { "height": 81, "offset_x": 27, "offset_y": 37, "puchi_offset_x": 60 }
     },
 
+    "background": { "fade_ms": 450, "cache_sets": 6 },
+
     "colors": {
         "level": ["FF65A9F7", "FF8FF5A9", "FFE6DA76", "FFF39898", "FFCD7EE6"],
         "level_vault": "FF1F5050",

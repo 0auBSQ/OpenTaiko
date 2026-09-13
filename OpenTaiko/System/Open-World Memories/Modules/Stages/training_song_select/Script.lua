@@ -15,8 +15,8 @@ function activate()
 	if act == nil then act = ACTIVITY:GetActivity("song_select_core") end
 	exitingToPlay = false
 	CONFIG.IsTrainingMode = true
-	act:Activate(false, 1)  -- no player count toggle, locked to 1P, no AI slot
-	-- Override the background with the training-specific scrolling BG
+	act:Activate(false, 1, false, false, "shared")  -- no player count toggle, locked to 1P, no AI slot
+	-- "shared": the activity scrolls this texture instead of its per-genre sets
 	SHARED:SetSharedTexture("background", "Textures/BG.png")
 end
 

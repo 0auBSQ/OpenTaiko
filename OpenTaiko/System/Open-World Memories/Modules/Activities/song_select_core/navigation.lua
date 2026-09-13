@@ -218,6 +218,8 @@ function M.refreshPage(skipMedia)
         else
             G.pageTexts[i] = buildSlot(node, i == 0)
             if i == 0 then G.selInfo = buildSelInfo(node) end
+            -- the selected node's genre picks the background; the rest of the page warms its sets up
+            if i == 0 then G.backgrounds.select(node.Genre) else G.backgrounds.prefetch(node.Genre) end
             if G.genre_overlays[node.Genre] == nil then
                 if TEXTURE:Exists("Textures/Overlay/"..node.Genre..".png") then
                     G.genre_overlays[node.Genre] = TEXTURE:CreateTexture("Textures/Overlay/"..node.Genre..".png")
