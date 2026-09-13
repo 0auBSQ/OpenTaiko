@@ -343,6 +343,10 @@ Der Liste gehört das gemeinsam genutzte Handle in der Eigenschaft Character; ge
 | `entry.FolderName  -> string` | Ordnername; Spielstände verwenden ihn als Schlüssel. |
 | `entry.DisplayName  -> string` | Lokalisierter Anzeigename. |
 | `entry.Rarity  -> string` | Seltenheitsname (siehe Namensschild-Info-Handle für die Liste). |
+| `entry.Author  -> string` | Lokalisierter Autorenname. |
+| `entry.Description  -> string` | Lokalisierte Beschreibung; leer, wenn der Charakter keine hat. |
+| `entry.Effects  -> dict` | Werte aus Effects.json, nach Feldname: Gauge (Normal, Hard oder Extreme), BombFactor, FuseRollFactor und jeder später hinzugefügte Effekt. Einzelwerte mit `JSONLOADER:JsonGet(entry.Effects, "Gauge")` lesen oder mit `:GetEnumerator()` durchlaufen. |
+| `entry.CoinMultiplier  -> number` | Münzmultiplikator aus Seltenheit und Gauge-Typ. |
 | `entry.Character  -> character` | Charakter-Handle für diesen Eintrag. |
 | `entry.UnlockCondition  -> unlockCondition` | Die Freischaltbedingung (siehe Freischaltbedingungs-Handle). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST und sf:GetPuchichara geben diese Handles zurück. Der Liste gehö
 | `puchi.render  -> texture` | Vollständiges Render, geladen aus Render.png. |
 | `puchi.Name  -> string` | Lokalisierter Anzeigename. |
 | `puchi.Author  -> string` | Lokalisierter Autorenname. |
+| `puchi.Description  -> string` | Lokalisierte Beschreibung; leer, wenn das Puchichara keine hat. |
+| `puchi.Effects  -> dict` | Werte aus Effects.json, nach Feldname: AllPurple, Autoroll, ShowAdlib, SplitLane und jeder später hinzugefügte Effekt. Einzelwerte mit `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` lesen oder mit `:GetEnumerator()` durchlaufen. |
+| `puchi.CoinMultiplier  -> number` | Münzmultiplikator aus Seltenheit und Effekten. |
 | `puchi.Rarity  -> string` | Seltenheitsname (siehe Namensschild-Info-Handle für die Liste). |
 | `puchi.FolderName  -> string` | Ordnername; Spielstände verwenden ihn als Schlüssel. |
 | `puchi.UnlockCondition  -> unlockCondition` | Die Freischaltbedingung (siehe Freischaltbedingungs-Handle). |

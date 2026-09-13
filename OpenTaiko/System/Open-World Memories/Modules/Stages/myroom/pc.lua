@@ -28,6 +28,8 @@ local PopUI = require("PopUI")
 local I18N = require("i18n")
 local T = I18N.texts("computer")   -- lang/<code>/computer.json
 local NavInput = require("NavInput")
+local CoinBox = require("CoinBox")   -- Lib: the coin purse, the same element the room's dialogues use
+local Util = require("Util")
 
 local PC = {}
 PC.__index = PC
@@ -39,6 +41,33 @@ local DETAIL_X = LIST.x + LIST.w + 50                -- right pane left edge
 local DETAIL_W = PANEL.x + PANEL.w - 44 - DETAIL_X
 local DETAIL_CX = math.floor(DETAIL_X + DETAIL_W / 2)
 local ROW_H = 66
+-- an unlocked character / puchichara: the preview takes the pane's left half, its information the right
+local DETAIL_PREVIEW_CX = math.floor(DETAIL_X + DETAIL_W * 0.27)
+local DETAIL_PREVIEW_W  = math.floor(DETAIL_W * 0.5) - 40
+local DETAIL_INFO_X     = DETAIL_X + math.floor(DETAIL_W * 0.53)
+local DETAIL_INFO_W     = DETAIL_X + DETAIL_W - 24 - DETAIL_INFO_X
+-- the purse sits under the tab row, flush with the panel's right edge, above the list / detail top
+local PURSE = { w = 300, h = 52, x = PANEL.x + PANEL.w - 44 - 300, y = PANEL.y + 140 }
+local GAUGE_COL = { Normal = { 52, 58, 92 }, Hard = { 214, 64, 56 }, Extreme = { 140, 0, 0 } }
+-- the Minesweeper rate tags: a pill with the note's icon (Textures/Icons/<name>.png, derived from the
+-- mine note and the fuse-roll clock in Graphics/5_Game) and the percentage
+local TAG_H, TAG_ICON, TAG_PAD, TAG_GAP, TAG_FONT = 36, 26, 8, 12, 19
+local TAG_FACE, TAG_INK = { 212, 216, 234, 255 }, { 52, 58, 92 }
+-- an entry's Effects (a .NET dictionary keyed by the Effects.json field names) as a plain table
+local function effectsOf(e)
+    local ok, fx = pcall(function()
+        local d = e.Effects
+        if d == nil then return {} end
+        if d.GetEnumerator == nil then return d end   -- already a plain table
+        return Util.cloneTable(d)
+    end)
+    return (ok and type(fx) == "table") and fx or {}
+end
+-- gauge type -> its name id and its note id in computer.json
+local GAUGE_KEYS = {
+    Normal = { "gauge_normal", "gauge_normal_desc" }, Hard = { "gauge_hard", "gauge_hard_desc" },
+    Extreme = { "gauge_extreme", "gauge_extreme_desc" },
+}
 
 local TABS = { "tab_characters", "tab_puchichara", "tab_dan_titles", "tab_nameplates", "tab_rename" }   -- computer.json ids
 local TAB_W, TAB_STEP, TAB_X0 = 278, 290, PANEL.x + 36
@@ -671,6 +700,37 @@ function PC:refreshDetail()
             d.plateTx = self.ui:font(HEYA_FONT):GetText(title, false, 1000, plateFg, plateBg)
         end)
     end
+    -- an unlocked character / puchichara: its description (under the preview) and its information column
+    if d.owned and (self.tab == 1 or self.tab == 2) then
+        pcall(function() d.description = e.Description or "" end)
+        d.info = {}
+        local function line(text, color, size) d.info[#d.info + 1] = { text = text, color = color, size = size } end
+        local author = ""
+        pcall(function() author = e.Author or "" end)
+        if author ~= "" then line(T:trf("author", author)) end
+        local fx = effectsOf(e)
+        if self.tab == 1 then
+            local gauge = fx.Gauge or "Normal"
+            local keys = GAUGE_KEYS[gauge]
+            line(T:trf("gauge_type", keys and T:tr(keys[1]) or gauge), GAUGE_COL[gauge])
+            if keys then line(T:tr(keys[2]), nil, 16) end
+            d.info[#d.info + 1] = { kind = "tags", label = T:tr("minesweeper_rates"), tags = {
+                { icon = "mine", text = tostring(math.floor(tonumber(fx.BombFactor) or 0)) .. "%" },
+                { icon = "fuse", text = tostring(math.floor(tonumber(fx.FuseRollFactor) or 0)) .. "%" },
+            } }
+        else
+            local any = false
+            if fx.AllPurple == true then line(T:tr("effect_all_swap")); any = true end
+            if fx.ShowAdlib == true then line(T:tr("effect_show_adlib")); any = true end
+            if (tonumber(fx.Autoroll) or 0) > 0 then line(T:trf("effect_autoroll", tonumber(fx.Autoroll))); any = true end
+            if fx.SplitLane == true then line(T:tr("effect_split_lane")); any = true end
+            if not any then line(T:tr("effect_none")) end
+        end
+        local mult = 1
+        pcall(function() mult = e.CoinMultiplier or 1 end)
+        local shown = string.format("%.2f", mult):gsub("0+$", ""):gsub("%.$", "")
+        line(T:trf("coin_multiplier", shown))
+    end
     if not d.owned and uc and uc.HasCondition then
         d.price = 0
         pcall(function() d.price = uc:GetCoinPrice() or 0 end)
@@ -732,7 +792,7 @@ function PC:activateSelected()
         if not can then denied(); return end
         local price = uc:GetCoinPrice() or 0
         if price > 0 and price > (save.Coins or 0) then denied(); self.msg = T:tr("msg_not_enough_coins"); return end
-        if price > 0 then save:SpendCoins(price) end
+        if price > 0 then save:SpendCoins(price); if self.purse then self.purse:pay(price) end end
         if unlock() then SHARED:GetSharedSound("Error"):Play(); return end
         unlockPlay(rarity); equip()
         self.msg = (price > 0) and T:trf("msg_purchased", price) or T:tr("msg_unlocked")
@@ -787,6 +847,12 @@ function PC:openScreen()
     self.loadedAnims = {}
     self:buildLists()
     self:buildUI()
+    self.purse = CoinBox.new{ x = PURSE.x, y = PURSE.y, w = PURSE.w, h = PURSE.h }
+    self.purse:show(self.save and self.save.Coins or 0)
+    self.icons, self.tagPills = {}, {}
+    for _, name in ipairs({ "mine", "fuse" }) do
+        self.icons[name] = TEXTURE:CreateTexture("Textures/Icons/" .. name .. ".png")
+    end
     bgmPlay()
 end
 
@@ -794,6 +860,10 @@ function PC:close()
     self.isOpen = false
     if self.ui then self.ui:disposeWidgets(); self.ui = nil end
     self.menu, self.actionBtn, self.tb, self.tabBtns = nil, nil, nil, nil
+    if self.purse then self.purse:dispose(); self.purse = nil end
+    for _, tex in pairs(self.icons or {}) do pcall(function() tex:Dispose() end) end
+    for _, cv in pairs(self.tagPills or {}) do pcall(function() cv:Dispose() end) end
+    self.icons, self.tagPills = nil, nil
     -- free the character menu animations loaded for previews
     for _, entry in pairs(self.loadedAnims or {}) do
         pcall(function() entry.Character:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
@@ -818,6 +888,7 @@ function PC:update(ts)
     -- failed-unlock red flash decay (~0.4 s)
     local dt = math.max(0, math.min(0.1, (ts - (self._lastTs or ts)) / 1000))
     self._lastTs = ts
+    if self.purse then self.purse:update(dt) end
     if self.menu and self.menu._flashT then
         self.menu._flashT = self.menu._flashT - dt
         if self.menu._flashT <= 0 then
@@ -843,6 +914,44 @@ local function ensureCharaAnim(self, entry)
     return true
 end
 
+-- a labelled row of icon + percentage pills at (x, y); returns the row's height. The glyph box has the
+-- GetText padding around its ink (box height - line height, on every side), so the text is placed by its
+-- ink: box x = ink x - pad, box top = ink top.
+function PC:drawTags(row, x, y)
+    local ui = self.ui
+    ui:drawTextEx(16, row.label, x, y, { 108, 114, 146 }, { 255, 255, 255, 140 })
+    local ty = y + 28
+    local tx = x
+    local gf = ui:gfont(TAG_FONT)
+    local inkH = math.ceil(gf.LineHeight)
+    local pad = ui:textHeight(TAG_FONT) - inkH
+    for _, tag in ipairs(row.tags) do
+        local textW = math.ceil(ui:measureText(TAG_FONT, tag.text))
+        local w = TAG_PAD + TAG_ICON + 8 + textW + TAG_PAD
+        local pill = self.tagPills[w]
+        if pill == nil then
+            pill = CANVAS:CreateCanvas(w, TAG_H)
+            pill:ClearTransparent()
+            local rad = math.floor(TAG_H / 2)
+            pill:FillRect(rad, 0, w - 2 * rad, TAG_H, TAG_FACE[1], TAG_FACE[2], TAG_FACE[3], TAG_FACE[4])
+            pill:FillCircle(rad, rad, rad, TAG_FACE[1], TAG_FACE[2], TAG_FACE[3], TAG_FACE[4])
+            pill:FillCircle(w - rad - 1, rad, rad, TAG_FACE[1], TAG_FACE[2], TAG_FACE[3], TAG_FACE[4])
+            pill:Upload()
+            self.tagPills[w] = pill
+        end
+        pill:Draw(tx, ty)
+        local icon = self.icons and self.icons[tag.icon]
+        if icon ~= nil and icon.Width > 0 then
+            icon:SetScale(TAG_ICON / icon.Width, TAG_ICON / icon.Height)
+            icon:DrawAtAnchor(tx + TAG_PAD + TAG_ICON / 2, ty + TAG_H / 2, "center")
+            icon:SetScale(1, 1)
+        end
+        ui:drawTextEx(TAG_FONT, tag.text, tx + TAG_PAD + TAG_ICON + 8 - pad, ty + math.floor((TAG_H - inkH) / 2), TAG_INK, nil)
+        tx = tx + w + TAG_GAP
+    end
+    return 28 + TAG_H
+end
+
 function PC:draw()
     if not self.isOpen or self.ui == nil then return end
     local ui = self.ui
@@ -850,9 +959,7 @@ function PC:draw()
     ui:draw()
     local save = self.save
 
-    -- coins (dynamic → glyph text, no per-frame texture churn)
-    ui:drawTextEx(22, T:trf("coins", save and save.Coins or 0),
-        PANEL.x + PANEL.w - 60, PANEL.y + 152, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "right")
+    if self.purse then self.purse:draw() end
 
     if self.tab == 5 then
         ui:drawTextEx(24, T:trf("rename_current", tostring(save and save.Name or "")),
@@ -873,19 +980,23 @@ function PC:draw()
             local boxTop, boxH = y + 96, 300
             local boxBottom = boxTop + boxH
             local e = d.entry
+            -- an unlocked character / puchichara previews on the left half, its information on the right
+            local split = d.info ~= nil
+            local pcx = split and DETAIL_PREVIEW_CX or DETAIL_CX
+            local pmaxW = split and DETAIL_PREVIEW_W or (DETAIL_W - 100)
             if self.tab == 1 then
                 if ensureCharaAnim(self, e) then
                     pcall(function()
                         local sc = 0.8
                         local sz = e.Character:GetAnimationSize(CHARACTER.ANIM_MENU_NORMAL)
                         if sz and sz.Y and sz.Y > 0 then
-                            sc = math.min(1.15, boxH / sz.Y, (DETAIL_W - 100) / math.max(1, sz.X))
+                            sc = math.min(1.15, boxH / sz.Y, pmaxW / math.max(1, sz.X))
                         end
                         local col = d.owned and 1.0 or 0.42
                         e.Character:SetColor(col, col, col)
                         e.Character:SetScale(sc, sc)
                         e.Character:Update(CHARACTER.ANIM_MENU_NORMAL, true)
-                        e.Character:DrawAtAnchor(DETAIL_CX, boxBottom, CHARACTER.ANIM_MENU_NORMAL, "bottom")
+                        e.Character:DrawAtAnchor(pcx, boxBottom, CHARACTER.ANIM_MENU_NORMAL, "bottom")
                     end)
                 end
             elseif self.tab == 2 then
@@ -893,11 +1004,11 @@ function PC:draw()
                     if e.tx ~= nil and e.tx.Loaded then
                         local frameW = math.floor(e.tx.Width / 2)
                         local frameH = e.tx.Height
-                        local sc = math.min(1.5, boxH / math.max(1, frameH), (DETAIL_W - 140) / math.max(1, frameW))
+                        local sc = math.min(1.5, boxH / math.max(1, frameH), (pmaxW - 40) / math.max(1, frameW))
                         local g = d.owned and 255 or 110
                         e.tx:SetColor(COLOR:CreateColorFromRGBA(g, g, g, 255))
                         e.tx:SetScale(sc, sc)
-                        e.tx:DrawRectAtAnchor(DETAIL_CX, boxBottom, 0, 0, frameW, frameH, "bottom")
+                        e.tx:DrawRectAtAnchor(pcx, boxBottom, 0, 0, frameW, frameH, "bottom")
                     end
                 end)
             elseif self.tab == 3 then
@@ -929,10 +1040,34 @@ function PC:draw()
                     end)
                 end
             end
+            if split then
+                -- the information column: the equipped tag, then one line per fact (the gauge's note
+                -- wraps in the small size); the description sits under the preview box
+                local iy = boxTop + 6
+                if d.equipped then
+                    ui:drawTextEx(20, T:tr("equipped_tag"), DETAIL_INFO_X, iy, { 255, 226, 130 }, { 0, 0, 0, 220 })
+                    iy = iy + 34
+                end
+                for _, l in ipairs(d.info) do
+                    local size = l.size or 19
+                    if l.kind == "tags" then
+                        iy = iy + self:drawTags(l, DETAIL_INFO_X, iy) + 10
+                    elseif size < 19 then
+                        iy = iy + ui:drawWrapped(size, l.text, DETAIL_INFO_X, iy, DETAIL_INFO_W, { 108, 114, 146 }) + 8
+                    else
+                        ui:drawTextEx(size, l.text, DETAIL_INFO_X, iy, l.color or { 52, 58, 92 }, { 255, 255, 255, 160 }, 1, 1, DETAIL_INFO_W)
+                        iy = iy + 30
+                    end
+                end
+            end
             -- status / unlock block, always BELOW the preview box (the coin price line is gone:
             -- the Buy button already carries the price)
             local yU = boxBottom + 18
-            if d.equipped then
+            if split then
+                if d.description and d.description ~= "" then
+                    ui:drawWrapped(19, d.description, DETAIL_X + 40, yU, DETAIL_W - 80, { 52, 58, 92 })
+                end
+            elseif d.equipped then
                 ui:drawTextEx(20, T:tr("equipped_tag"), DETAIL_CX, yU, { 255, 226, 130 }, { 0, 0, 0, 220 }, 1, 1, 0, "top")
             elseif not d.owned then
                 ui:drawTextEx(20, T:tr("how_to_unlock"), DETAIL_X + 40, yU, { 255, 210, 140 }, { 0, 0, 0, 210 })

@@ -343,6 +343,10 @@ end
 | `entry.FolderName  -> string` | Имя папки; файлы сохранений используют его как ключ. |
 | `entry.DisplayName  -> string` | Локализованное отображаемое имя. |
 | `entry.Rarity  -> string` | Имя редкости (список см. в «Дескриптор сведений о табличке имени»). |
+| `entry.Author  -> string` | Локализованное имя автора. |
+| `entry.Description  -> string` | Локализованное описание; пусто, если у персонажа его нет. |
+| `entry.Effects  -> dict` | Значения Effects.json по имени поля: Gauge (Normal, Hard или Extreme), BombFactor, FuseRollFactor и любой эффект, добавленный позже. Читайте одно через `JSONLOADER:JsonGet(entry.Effects, "Gauge")` или перебирайте через `:GetEnumerator()`. |
+| `entry.CoinMultiplier  -> number` | Множитель монет по редкости и типу шкалы. |
 | `entry.Character  -> character` | Дескриптор персонажа для этой записи. |
 | `entry.UnlockCondition  -> unlockCondition` | Условие разблокировки (см. «Дескриптор условия разблокировки»). |
 
@@ -376,6 +380,9 @@ end
 | `puchi.render  -> texture` | Полный рендер, загруженный из Render.png. |
 | `puchi.Name  -> string` | Локализованное отображаемое имя. |
 | `puchi.Author  -> string` | Локализованное имя автора. |
+| `puchi.Description  -> string` | Локализованное описание; пусто, если у пучичары его нет. |
+| `puchi.Effects  -> dict` | Значения Effects.json по имени поля: AllPurple, Autoroll, ShowAdlib, SplitLane и любой эффект, добавленный позже. Читайте одно через `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` или перебирайте через `:GetEnumerator()`. |
+| `puchi.CoinMultiplier  -> number` | Множитель монет по редкости и эффектам. |
 | `puchi.Rarity  -> string` | Имя редкости (список см. в «Дескриптор сведений о табличке имени»). |
 | `puchi.FolderName  -> string` | Имя папки; файлы сохранений используют его как ключ. |
 | `puchi.UnlockCondition  -> unlockCondition` | Условие разблокировки (см. «Дескриптор условия разблокировки»). |

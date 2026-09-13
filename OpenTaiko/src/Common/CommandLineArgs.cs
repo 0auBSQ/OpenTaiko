@@ -18,9 +18,11 @@ internal enum AppMode {
 /// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
 ///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--out file.mp4]
 ///   --mode=checkgl
+///   --hidden       run without showing the window (automated boot checks; the log still records everything)
 /// </summary>
 internal sealed class CommandLineArgs {
 	public AppMode Mode = AppMode.Normal;
+	public bool Hidden = false;   // --hidden: the window is created but never shown
 
 	// --mode=record options (unused in other modes)
 	public string Uid = "";
@@ -37,6 +39,7 @@ internal sealed class CommandLineArgs {
 			"checkgl" => AppMode.CheckGl,
 			_ => AppMode.Normal,
 		};
+		cli.Hidden = args.Any(a => a.Equals("--hidden", StringComparison.OrdinalIgnoreCase));
 		if (cli.Mode != AppMode.Record) return cli;
 
 		cli.Uid = (Get(args, "--uid") ?? "").Trim();

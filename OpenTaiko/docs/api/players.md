@@ -343,6 +343,10 @@ The list owns the shared handle in the Character property; do not dispose it. Lo
 | `entry.FolderName  -> string` | Folder name; save files use it as the key. |
 | `entry.DisplayName  -> string` | Localized display name. |
 | `entry.Rarity  -> string` | Rarity name (see Nameplate info handle for the list). |
+| `entry.Author  -> string` | Localized author name. |
+| `entry.Description  -> string` | Localized description; empty when the character has none. |
+| `entry.Effects  -> dict` | Effects.json values keyed by field name: Gauge (Normal, Hard or Extreme), BombFactor, FuseRollFactor, and any effect added later. Read one with `JSONLOADER:JsonGet(entry.Effects, "Gauge")` or enumerate with `:GetEnumerator()`. |
+| `entry.CoinMultiplier  -> number` | Coin multiplier from the rarity and the gauge type. |
 | `entry.Character  -> character` | Character handle for this entry. |
 | `entry.UnlockCondition  -> unlockCondition` | The unlock condition (see Unlock condition handle). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST and sf:GetPuchichara return these handles. The list owns the text
 | `puchi.render  -> texture` | Full render loaded from Render.png. |
 | `puchi.Name  -> string` | Localized display name. |
 | `puchi.Author  -> string` | Localized author name. |
+| `puchi.Description  -> string` | Localized description; empty when the puchichara has none. |
+| `puchi.Effects  -> dict` | Effects.json values keyed by field name: AllPurple, Autoroll, ShowAdlib, SplitLane, and any effect added later. Read one with `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` or enumerate with `:GetEnumerator()`. |
+| `puchi.CoinMultiplier  -> number` | Coin multiplier from the rarity and the effects. |
 | `puchi.Rarity  -> string` | Rarity name (see Nameplate info handle for the list). |
 | `puchi.FolderName  -> string` | Folder name; save files use it as the key. |
 | `puchi.UnlockCondition  -> unlockCondition` | The unlock condition (see Unlock condition handle). |

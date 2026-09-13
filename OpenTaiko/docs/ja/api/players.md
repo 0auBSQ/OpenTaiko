@@ -343,6 +343,10 @@ Character プロパティの共有ハンドルはリストが所有します。�
 | `entry.FolderName  -> string` | フォルダ名。セーブファイルはこれをキーとして使います。 |
 | `entry.DisplayName  -> string` | ローカライズされた表示名。 |
 | `entry.Rarity  -> string` | レアリティ名 (一覧はネームプレート情報ハンドルを参照)。 |
+| `entry.Author  -> string` | ローカライズされた作者名。 |
+| `entry.Description  -> string` | ローカライズされた説明。キャラクターに説明がなければ空文字列。 |
+| `entry.Effects  -> dict` | Effects.json の値をフィールド名でまとめた辞書: Gauge (Normal、Hard、Extreme)、BombFactor、FuseRollFactor、および今後追加される効果。`JSONLOADER:JsonGet(entry.Effects, "Gauge")` で 1 つ読むか、`:GetEnumerator()` で列挙します。 |
+| `entry.CoinMultiplier  -> number` | レアリティとゲージタイプから決まるコイン倍率。 |
 | `entry.Character  -> character` | このエントリのキャラクターハンドル。 |
 | `entry.UnlockCondition  -> unlockCondition` | アンロック条件 (アンロック条件ハンドルを参照)。 |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST と sf:GetPuchichara がこのハンドルを返します。テ�
 | `puchi.render  -> texture` | Render.png から読み込まれた全身のレンダー。 |
 | `puchi.Name  -> string` | ローカライズされた表示名。 |
 | `puchi.Author  -> string` | ローカライズされた作者名。 |
+| `puchi.Description  -> string` | ローカライズされた説明。ぷちキャラに説明がなければ空文字列。 |
+| `puchi.Effects  -> dict` | Effects.json の値をフィールド名でまとめた辞書: AllPurple、Autoroll、ShowAdlib、SplitLane、および今後追加される効果。`JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` で 1 つ読むか、`:GetEnumerator()` で列挙します。 |
+| `puchi.CoinMultiplier  -> number` | レアリティと効果から決まるコイン倍率。 |
 | `puchi.Rarity  -> string` | レアリティ名 (一覧はネームプレート情報ハンドルを参照)。 |
 | `puchi.FolderName  -> string` | フォルダ名。セーブファイルはこれをキーとして使います。 |
 | `puchi.UnlockCondition  -> unlockCondition` | アンロック条件 (アンロック条件ハンドルを参照)。 |

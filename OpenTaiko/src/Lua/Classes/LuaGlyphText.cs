@@ -147,8 +147,9 @@ namespace OpenTaiko {
 			=> c == null ? fallback : Color.FromArgb(c.A, c.R, c.G, c.B);
 
 		/// <summary>Draws text composed from cached glyphs. maxWidth squishes each letter horizontally so the
-		/// full box (ink + 50px padding, like a GetText texture) fits, matching GetText's squish. anchor uses
-		/// the same 9 points as DrawAtAnchor and anchors that box. '\n' stacks lines (left-aligned).
+		/// full box (ink + 50px padding, like a GetText texture) fits; unlike GetText's squish only the ink
+		/// shrinks and the padding stays, so a squished line keeps its ink edges where its neighbours have
+		/// theirs. anchor uses the same 9 points as DrawAtAnchor and anchors that box. '\n' stacks lines (left-aligned).
 		/// scaleY (when > 0) scales the vertical axis independently — e.g. shrink a tall block into a fixed
 		/// box while the squish still makes the width fill it. rotationDeg (when != 0) rotates the whole
 		/// composed block rigidly about the anchor point (x,y) — each glyph is repositioned along the rotated
@@ -168,13 +169,24 @@ namespace OpenTaiko {
 			foreach (var line in lines) inkW = Math.Max(inkW, line.Width);
 			double pad = CFontRenderer.TextPadding;
 			double naturalBoxW = (inkW + 2 * pad) * scale;
-			double f = GlyphTextLayout.SquishFactor(naturalBoxW, maxWidth);
-			double boxW = naturalBoxW * f;
+			// the squish factor applies to the ink alone; the padding keeps its size on both sides (a maxWidth
+			// too small for even the padding falls back to squishing the whole box)
+			double f = 1.0;
+			bool inkSquish = false;
+			if (maxWidth > 0 && naturalBoxW > maxWidth) {
+				double inkRoom = maxWidth - 2 * pad * scale;
+				if (inkRoom > 0 && inkW > 0) { f = Math.Min(1.0, inkRoom / (inkW * scale)); inkSquish = true; }
+				else f = GlyphTextLayout.SquishFactor(naturalBoxW, maxWidth);
+			}
+			double boxW = inkSquish ? maxWidth : naturalBoxW * f;
 			double boxH = (lines.Count - 1) * LineHeight * sy + BoxHeight * sy;
 
 			var (ax, ay) = AnchorFractions(anchor);
 			double startX = x - ax * boxW;
 			double startY = y - ay * boxH;
+			// each glyph bitmap carries the padding and is scaled by f with the ink, so the run shifts right by
+			// what the first glyph's left padding lost, keeping the ink at startX + pad
+			double padShift = inkSquish ? pad * scale * (1 - f) : 0;
 
 			for (int li = 0; li < lines.Count; li++) {
 				var line = lines[li];
@@ -191,7 +203,7 @@ namespace OpenTaiko {
 						if (st.Outline != null) gOutline = st.Outline.Value;
 						gGradTop = st.GradTop; gGradBottom = st.GradBottom;
 					}
-					Place(cp, startX + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
+					Place(cp, startX + padShift + pen * f * scale, lineY, gFore, gOutline, gGradTop, gGradBottom);
 					pen += AdvanceOf(cp);
 				}
 			}

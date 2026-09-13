@@ -76,7 +76,18 @@ namespace OpenTaiko {
 		/// <summary>Exposes the unlock condition to Lua.</summary>
 		public LuaUnlockCondition UnlockCondition { get; }
 
+		// Metadata read on access so a language change shows through.
+		public string Author => _set.metadata?.tGetAuthor() ?? "";
+		public string Description => _set.metadata?.tGetDescription() ?? "";
+		/// <summary>Effects.json values keyed by name (Gauge, BombFactor, FuseRollFactor, and any added later).</summary>
+		public Dictionary<string, object> Effects => _effects ??= LuaEffectDict.From(_set.effect);
+		public float CoinMultiplier => _set.GetEffectCoinMultiplier();
+
+		private readonly TextureLoader.CCharacterLuaSet _set;
+		private Dictionary<string, object>? _effects;
+
 		internal LuaCharacterEntry(TextureLoader.CCharacterLuaSet set) {
+			_set = set;
 			FolderName = set.dirName;
 			DisplayName = set.metadata.tGetName();
 			Rarity = set.metadata.Rarity;

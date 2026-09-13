@@ -343,6 +343,10 @@ La lista es propietaria del handle compartido de la propiedad Character; no lo l
 | `entry.FolderName  -> string` | Nombre de carpeta; los archivos de guardado lo usan como clave. |
 | `entry.DisplayName  -> string` | Nombre de visualización localizado. |
 | `entry.Rarity  -> string` | Nombre de rareza (consulta la lista en Handle de información de placa de nombre). |
+| `entry.Author  -> string` | Nombre del autor localizado. |
+| `entry.Description  -> string` | Descripción localizada; vacía cuando el personaje no tiene. |
+| `entry.Effects  -> dict` | Valores de Effects.json por nombre de campo: Gauge (Normal, Hard o Extreme), BombFactor, FuseRollFactor y cualquier efecto añadido después. Lee uno con `JSONLOADER:JsonGet(entry.Effects, "Gauge")` o recorre con `:GetEnumerator()`. |
+| `entry.CoinMultiplier  -> number` | Multiplicador de monedas según la rareza y el tipo de barra. |
 | `entry.Character  -> character` | Handle de personaje de esta entrada. |
 | `entry.UnlockCondition  -> unlockCondition` | La condición de desbloqueo (consulta Handle de condición de desbloqueo). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST y sf:GetPuchichara devuelven estos handles. La lista es propietar
 | `puchi.render  -> texture` | Render completo cargado desde Render.png. |
 | `puchi.Name  -> string` | Nombre de visualización localizado. |
 | `puchi.Author  -> string` | Nombre de autor localizado. |
+| `puchi.Description  -> string` | Descripción localizada; vacía cuando el puchichara no tiene. |
+| `puchi.Effects  -> dict` | Valores de Effects.json por nombre de campo: AllPurple, Autoroll, ShowAdlib, SplitLane y cualquier efecto añadido después. Lee uno con `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` o recorre con `:GetEnumerator()`. |
+| `puchi.CoinMultiplier  -> number` | Multiplicador de monedas según la rareza y los efectos. |
 | `puchi.Rarity  -> string` | Nombre de rareza (consulta la lista en Handle de información de placa de nombre). |
 | `puchi.FolderName  -> string` | Nombre de carpeta; los archivos de guardado lo usan como clave. |
 | `puchi.UnlockCondition  -> unlockCondition` | La condición de desbloqueo (consulta Handle de condición de desbloqueo). |

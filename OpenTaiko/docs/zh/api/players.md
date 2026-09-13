@@ -343,6 +343,10 @@ end
 | `entry.FolderName  -> string` | 文件夹名称；存档用它作为键。 |
 | `entry.DisplayName  -> string` | 本地化显示名称。 |
 | `entry.Rarity  -> string` | 稀有度名称（列表见“名牌信息句柄”）。 |
+| `entry.Author  -> string` | 本地化的作者名。 |
+| `entry.Description  -> string` | 本地化的描述；角色没有描述时为空。 |
+| `entry.Effects  -> dict` | 按字段名整理的 Effects.json 值：Gauge（Normal、Hard 或 Extreme）、BombFactor、FuseRollFactor，以及以后新增的效果。用 `JSONLOADER:JsonGet(entry.Effects, "Gauge")` 读取一项，或用 `:GetEnumerator()` 枚举。 |
+| `entry.CoinMultiplier  -> number` | 由稀有度和血条类型决定的金币倍率。 |
 | `entry.Character  -> character` | 本条目的角色句柄。 |
 | `entry.UnlockCondition  -> unlockCondition` | 解锁条件（见“解锁条件句柄”）。 |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST 和 sf:GetPuchichara 返回这些句柄。列表拥有这些纹�
 | `puchi.render  -> texture` | 从 Render.png 加载的完整立绘。 |
 | `puchi.Name  -> string` | 本地化显示名称。 |
 | `puchi.Author  -> string` | 本地化作者名称。 |
+| `puchi.Description  -> string` | 本地化的描述；小角色没有描述时为空。 |
+| `puchi.Effects  -> dict` | 按字段名整理的 Effects.json 值：AllPurple、Autoroll、ShowAdlib、SplitLane，以及以后新增的效果。用 `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` 读取一项，或用 `:GetEnumerator()` 枚举。 |
+| `puchi.CoinMultiplier  -> number` | 由稀有度和效果决定的金币倍率。 |
 | `puchi.Rarity  -> string` | 稀有度名称（列表见“名牌信息句柄”）。 |
 | `puchi.FolderName  -> string` | 文件夹名称；存档用它作为键。 |
 | `puchi.UnlockCondition  -> unlockCondition` | 解锁条件（见“解锁条件句柄”）。 |

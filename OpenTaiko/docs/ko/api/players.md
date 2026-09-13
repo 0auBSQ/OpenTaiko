@@ -343,6 +343,10 @@ Character 프로퍼티의 공유 핸들은 목록이 소유합니다. 해제하�
 | `entry.FolderName  -> string` | 폴더 이름. 세이브 파일이 키로 사용합니다. |
 | `entry.DisplayName  -> string` | 지역화된 표시 이름. |
 | `entry.Rarity  -> string` | 희귀도 이름(목록은 네임플레이트 정보 핸들 참고). |
+| `entry.Author  -> string` | 현지화된 작성자 이름. |
+| `entry.Description  -> string` | 현지화된 설명. 캐릭터에 설명이 없으면 빈 문자열. |
+| `entry.Effects  -> dict` | 필드 이름으로 정리한 Effects.json 값: Gauge (Normal, Hard 또는 Extreme), BombFactor, FuseRollFactor, 그리고 나중에 추가되는 효과. `JSONLOADER:JsonGet(entry.Effects, "Gauge")`로 하나를 읽거나 `:GetEnumerator()`로 열거합니다. |
+| `entry.CoinMultiplier  -> number` | 희귀도와 게이지 종류에 따른 코인 배율. |
 | `entry.Character  -> character` | 이 항목의 캐릭터 핸들. |
 | `entry.UnlockCondition  -> unlockCondition` | 잠금 해제 조건(잠금 해제 조건 핸들 참고). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `puchi.render  -> texture` | Render.png에서 로드한 전체 렌더. |
 | `puchi.Name  -> string` | 지역화된 표시 이름. |
 | `puchi.Author  -> string` | 지역화된 제작자 이름. |
+| `puchi.Description  -> string` | 현지화된 설명. 푸치캐릭에 설명이 없으면 빈 문자열. |
+| `puchi.Effects  -> dict` | 필드 이름으로 정리한 Effects.json 값: AllPurple, Autoroll, ShowAdlib, SplitLane, 그리고 나중에 추가되는 효과. `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")`로 하나를 읽거나 `:GetEnumerator()`로 열거합니다. |
+| `puchi.CoinMultiplier  -> number` | 희귀도와 효과에 따른 코인 배율. |
 | `puchi.Rarity  -> string` | 희귀도 이름(목록은 네임플레이트 정보 핸들 참고). |
 | `puchi.FolderName  -> string` | 폴더 이름. 세이브 파일이 키로 사용합니다. |
 | `puchi.UnlockCondition  -> unlockCondition` | 잠금 해제 조건(잠금 해제 조건 핸들 참고). |

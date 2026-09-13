@@ -27,13 +27,23 @@ namespace OpenTaiko {
 		/// <summary>Exposes the unlock condition to Lua.</summary>
 		public LuaUnlockCondition UnlockCondition { get; }
 
+		/// <summary>Localised description; empty when the puchichara has none.</summary>
+		public string Description => _metadata.tGetDescription();
+
+		/// <summary>Effects.json values keyed by name (AllPurple, Autoroll, ShowAdlib, SplitLane, and any added later).</summary>
+		public Dictionary<string, object> Effects => _effects ??= LuaEffectDict.From(_puchi.effect);
+		public float CoinMultiplier => _puchi.GetEffectCoinMultiplier();
+
 		private readonly DBPuchichara.PuchicharaData _metadata;
+		private readonly CPuchichara _puchi;
+		private Dictionary<string, object>? _effects;
 
 		// ────────────────────────────────────────────────────────────────────
 		// Construction (internal — created by LuaPuchicharaDatabase only)
 		// ────────────────────────────────────────────────────────────────────
 
 		internal LuaPuchichara(CPuchichara puchi) {
+			_puchi = puchi;
 			_metadata = puchi.metadata;
 			FolderName = Path.GetFileName(puchi._path);
 			UnlockCondition = new LuaUnlockCondition(puchi.unlock);

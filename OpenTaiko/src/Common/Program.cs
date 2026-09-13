@@ -112,8 +112,10 @@ internal class Program {
 						}
 					}
 
-					using (var mania = new OpenTaiko(args))
+					using (var mania = new OpenTaiko(args)) {
+						if (cli.Hidden) mania.StartHidden = true;
 						mania.Run();
+					}
 
 					Trace.WriteLine("");
 					Trace.WriteLine("Thank you for playing!");

@@ -343,6 +343,10 @@ La liste détient le handle partagé de la propriété Character ; ne le libér
 | `entry.FolderName  -> string` | Nom de dossier ; les fichiers de sauvegarde l'utilisent comme clé. |
 | `entry.DisplayName  -> string` | Nom d'affichage localisé. |
 | `entry.Rarity  -> string` | Nom de rareté (voir le Handle d'informations de plaque de nom pour la liste). |
+| `entry.Author  -> string` | Nom d'auteur localisé. |
+| `entry.Description  -> string` | Description localisée ; vide quand le personnage n'en a pas. |
+| `entry.Effects  -> dict` | Valeurs d'Effects.json par nom de champ : Gauge (Normal, Hard ou Extreme), BombFactor, FuseRollFactor et tout effet ajouté plus tard. Lisez-en une avec `JSONLOADER:JsonGet(entry.Effects, "Gauge")` ou parcourez avec `:GetEnumerator()`. |
+| `entry.CoinMultiplier  -> number` | Multiplicateur de pièces d'après la rareté et le type de jauge. |
 | `entry.Character  -> character` | Handle de personnage pour cette entrée. |
 | `entry.UnlockCondition  -> unlockCondition` | La condition de déblocage (voir Handle de condition de déblocage). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST et sf:GetPuchichara renvoient ces handles. La liste détient les 
 | `puchi.render  -> texture` | Rendu complet chargé depuis Render.png. |
 | `puchi.Name  -> string` | Nom d'affichage localisé. |
 | `puchi.Author  -> string` | Nom d'auteur localisé. |
+| `puchi.Description  -> string` | Description localisée ; vide quand le puchichara n'en a pas. |
+| `puchi.Effects  -> dict` | Valeurs d'Effects.json par nom de champ : AllPurple, Autoroll, ShowAdlib, SplitLane et tout effet ajouté plus tard. Lisez-en une avec `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` ou parcourez avec `:GetEnumerator()`. |
+| `puchi.CoinMultiplier  -> number` | Multiplicateur de pièces d'après la rareté et les effets. |
 | `puchi.Rarity  -> string` | Nom de rareté (voir le Handle d'informations de plaque de nom pour la liste). |
 | `puchi.FolderName  -> string` | Nom de dossier ; les fichiers de sauvegarde l'utilisent comme clé. |
 | `puchi.UnlockCondition  -> unlockCondition` | La condition de déblocage (voir Handle de condition de déblocage). |

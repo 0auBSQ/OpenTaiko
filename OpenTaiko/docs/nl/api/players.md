@@ -343,6 +343,10 @@ De lijst is eigenaar van de gedeelde handle in de eigenschap Character; geef hem
 | `entry.FolderName  -> string` | Mapnaam; opslagbestanden gebruiken die als sleutel. |
 | `entry.DisplayName  -> string` | Gelokaliseerde weergavenaam. |
 | `entry.Rarity  -> string` | Zeldzaamheidsnaam (zie Naamplaatje-info-handle voor de lijst). |
+| `entry.Author  -> string` | Gelokaliseerde auteursnaam. |
+| `entry.Description  -> string` | Gelokaliseerde beschrijving; leeg wanneer het personage er geen heeft. |
+| `entry.Effects  -> dict` | Waarden uit Effects.json op veldnaam: Gauge (Normal, Hard of Extreme), BombFactor, FuseRollFactor en elk later toegevoegd effect. Lees er een met `JSONLOADER:JsonGet(entry.Effects, "Gauge")` of doorloop ze met `:GetEnumerator()`. |
+| `entry.CoinMultiplier  -> number` | Muntvermenigvuldiger op basis van zeldzaamheid en gauge-type. |
 | `entry.Character  -> character` | Personage-handle voor dit item. |
 | `entry.UnlockCondition  -> unlockCondition` | De ontgrendelvoorwaarde (zie Ontgrendelvoorwaarde-handle). |
 
@@ -376,6 +380,9 @@ PUCHICHARALIST en sf:GetPuchichara geven deze handles terug. De lijst is eigenaa
 | `puchi.render  -> texture` | Volledige render geladen uit Render.png. |
 | `puchi.Name  -> string` | Gelokaliseerde weergavenaam. |
 | `puchi.Author  -> string` | Gelokaliseerde auteursnaam. |
+| `puchi.Description  -> string` | Gelokaliseerde beschrijving; leeg wanneer de puchichara er geen heeft. |
+| `puchi.Effects  -> dict` | Waarden uit Effects.json op veldnaam: AllPurple, Autoroll, ShowAdlib, SplitLane en elk later toegevoegd effect. Lees er een met `JSONLOADER:JsonGet(puchi.Effects, "Autoroll")` of doorloop ze met `:GetEnumerator()`. |
+| `puchi.CoinMultiplier  -> number` | Muntvermenigvuldiger op basis van zeldzaamheid en effecten. |
 | `puchi.Rarity  -> string` | Zeldzaamheidsnaam (zie Naamplaatje-info-handle voor de lijst). |
 | `puchi.FolderName  -> string` | Mapnaam; opslagbestanden gebruiken die als sleutel. |
 | `puchi.UnlockCondition  -> unlockCondition` | De ontgrendelvoorwaarde (zie Ontgrendelvoorwaarde-handle). |
