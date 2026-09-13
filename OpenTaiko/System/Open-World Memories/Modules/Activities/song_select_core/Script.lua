@@ -268,6 +268,8 @@ function onStart()
     -- (first / middle / last slice); diffselect places and rotates them from Config/layout.json
     G.bgtx["diffsel_gauge8"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8.png")
     G.bgtx["diffsel_gauge10"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10.png")
+    G.bgtx["diffsel_gauge8_space"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8_space.png")
+    G.bgtx["diffsel_gauge10_space"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10_space.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
     G.bars["bar"]              = TEXTURE:CreateTexture("Textures/bar.png")

@@ -98,15 +98,28 @@ local GAUGE_SETS = {
              last  = { CFG.num("difficulty_select.level.gauge10_last_x", 611.1),  CFG.num("difficulty_select.level.gauge10_last_y", 114.0) } },
 }
 local GAUGE_EMPTY     = CFG.num("difficulty_select.level.gauge_empty_opacity", 0.15)   -- unlit slices; 0 hides them
+-- High-level slices (Easy / Normal / Hard from the song list's checker levels, slice index >= level) pulse
+-- brighter and carry the space overlay (LevelGauge/seg<n>_space.png: same cells, one frame per row)
+local GAUGE_FX_LEVEL = {
+    [0] = CFG.num("song_list.checker_level_easy", 6),
+    [1] = CFG.num("song_list.checker_level_normal", 8),
+    [2] = CFG.num("song_list.checker_level_hard", 9),
+}
+local GAUGE_FX_PULSE_MS  = CFG.num("difficulty_select.level.gauge_fx_pulse_ms", 1100)      -- one brightness pulse
+local GAUGE_FX_PULSE_OP  = CFG.num("difficulty_select.level.gauge_fx_pulse_opacity", 0.6)  -- pulse peak, over the slice
+local GAUGE_FX_LIGHTEN   = CFG.num("difficulty_select.level.gauge_fx_lighten", 0.55)       -- the pulse shade: how far toward white
+local GAUGE_FX_FRAME_MS  = CFG.num("difficulty_select.level.gauge_fx_frame_ms", 70)        -- space overlay frame time
+local GAUGE_FX_SPACE_OP  = CFG.num("difficulty_select.level.gauge_fx_space_opacity", 0.9)  -- space overlay opacity
 local GAUGE_START_MIX = CFG.num("difficulty_select.level.gauge_start_mix", 0.45)      -- light bars, first slice: how far toward white
 local GAUGE_END_SAT   = CFG.num("difficulty_select.level.gauge_end_saturation", 1.45) -- vivid end: saturation multiplier
 local GAUGE_END_LIGHT = CFG.num("difficulty_select.level.gauge_end_lighten", 0.4)     -- dark bars, last slice: how far toward white (HSL lightness)
 -- the vault's level colour is the vault band's own colour, so its gauge starts from a lighter teal
 local LVL_VAULT_GAUGE_COLOR = CFG.color("colors.level_gauge_vault", COLOR:CreateColorFromHex("FF5FC8C8"))
 
--- n shades of the level colour: pale tint -> vivid (light bars), or vivid -> lighter (dark bars)
+-- n shades of the level colour: pale tint -> vivid (light bars), or vivid -> lighter (dark bars); plus the
+-- lighter shade of each, for the high-level pulse
 local function gaugeShades(levelCol, n, vividFirst)
-    local ok, shades = pcall(function()
+    local ok, shades, bright = pcall(function()
         local r, g, b = Color.fromEngine(levelCol)
         local vr, vg, vb = Color.saturate(r, g, b, GAUGE_END_SAT, 0.05)
         local from, to
@@ -115,16 +128,19 @@ local function gaugeShades(levelCol, n, vividFirst)
         else
             from, to = { Color.mix(r, g, b, 1, 1, 1, GAUGE_START_MIX) }, { vr, vg, vb }
         end
-        local out = {}
-        for i, c in ipairs(Color.ramp(from, to, n)) do out[i] = Color.toEngine(c[1], c[2], c[3]) end
-        return out
+        local out, up = {}, {}
+        for i, c in ipairs(Color.ramp(from, to, n)) do
+            out[i] = Color.toEngine(c[1], c[2], c[3])
+            up[i]  = Color.toEngine(Color.lighten(c[1], c[2], c[3], GAUGE_FX_LIGHTEN))
+        end
+        return out, up
     end)
-    if ok then return shades end
+    if ok then return shades, bright end
     local out = {}
     for i = 1, n do out[i] = levelCol end
-    return out
+    return out, out
 end
-local gaugeShadeCache = {}   -- difficulty (or "vault") -> shades, built on first use
+local gaugeShadeCache = {}   -- difficulty (or "vault") -> { shades, bright }, built on first use
 
 -- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
 -- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
@@ -342,14 +358,27 @@ local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
     if tex == nil or set == nil then return end
     local cw, ch = tex.Width / 3, tex.Height
     local key = isVault and "vault" or difficulty
-    local shades = gaugeShadeCache[key]
-    if shades == nil then
+    local cached = gaugeShadeCache[key]
+    if cached == nil then
         local col = isVault and LVL_VAULT_GAUGE_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
         local vividFirst = (isVault and GAUGE_VIVID_FIRST_VAULT or (GAUGE_VIVID_FIRST[difficulty + 1] or 0)) ~= 0
-        shades = gaugeShades(col, n, vividFirst)
-        gaugeShadeCache[key] = shades
+        cached = { gaugeShades(col, n, vividFirst) }
+        gaugeShadeCache[key] = cached
     end
+    local shades, bright = cached[1], cached[2]
     local lit = math.max(0, math.min(n, math.floor(tonumber(level) or 0)))
+    -- the high-level effect: from which slice (nil = none for this bar), its frame and pulse clock
+    local fxFrom = (not isVault) and GAUGE_FX_LEVEL[difficulty] or nil
+    local fxTex, fxFrame, fxRows, t
+    if fxFrom ~= nil and lit >= fxFrom then
+        fxTex = G.bgtx["diffsel_gauge" .. n .. "_space"]
+        t = G.nowMs or 0
+        fxRows = (fxTex ~= nil and fxTex.Height > 0) and math.max(1, math.floor(fxTex.Height / ch)) or 1
+        fxFrame = math.floor(t / GAUGE_FX_FRAME_MS) % fxRows
+        if fxTex ~= nil then fxTex:SetRotation(GAUGE_ROT + nAngleDeg) end
+    else
+        fxFrom = nil
+    end
     tex:SetRotation(GAUGE_ROT + nAngleDeg)
     for i = 1, n do
         local a = (i <= lit) and opacity or (opacity * GAUGE_EMPTY)
@@ -362,11 +391,23 @@ local function drawLevelGauge(level, difficulty, isVault, bx, by, opacity)
             tex:SetColor(shades[i])
             tex:SetOpacity(a)
             tex:DrawRectAtAnchor(sx, sy, cell * cw, 0, cw, ch, "center")
+            if fxFrom ~= nil and i >= fxFrom and i <= lit then
+                -- brightness pulse: the lighter shade over the slice, staggered along the gauge
+                local pulse = 0.5 + 0.5 * math.sin(2 * math.pi * t / GAUGE_FX_PULSE_MS + i * 0.6)
+                tex:SetColor(bright[i])
+                tex:SetOpacity(a * GAUGE_FX_PULSE_OP * pulse)
+                tex:DrawRectAtAnchor(sx, sy, cell * cw, 0, cw, ch, "center")
+                if fxTex ~= nil then
+                    fxTex:SetOpacity(a * GAUGE_FX_SPACE_OP)
+                    fxTex:DrawRectAtAnchor(sx, sy, cell * cw, fxFrame * ch, cw, ch, "center")
+                end
+            end
         end
     end
     tex:SetRotation(0)
     tex:SetColor(COL_WHITE)
     tex:SetOpacity(1)
+    if fxTex ~= nil then fxTex:SetRotation(0); fxTex:SetOpacity(1) end
 end
 
 -- Up to CHARTER_MAX charter names for a difficulty bar whose Note-local top-left is (bx,by). Each name is a
