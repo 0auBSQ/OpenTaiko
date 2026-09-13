@@ -20,6 +20,11 @@ local Replay  = require("replaylist")
 local DrawSS  = require("draw_songselect")
 local CFG     = require("sscore_config")
 local NavInput = require("NavInput")
+local I18N    = require("i18n")
+
+-- Overlays with baked text: localized, so loaded by activate() for the current language and freed by
+-- deactivate() (G.bgtx key -> default file; the "<name>_<code>.png" variant is used when it exists)
+local OVERLAY_FILES = { overlay = "Textures/bg_overlay.png", overlay_difficulty = "Textures/bg_overlay_difficulty.png" }
 
 -- Song-preview volume fades (skinner-tunable in Config/layout.json).
 local PREVIEW_FADE_IN_MS  = CFG.num("preview.fade_in_ms", 280)
@@ -59,7 +64,6 @@ local G = {
 
     -- Scroll / animation state
     nowMs               = 0,
-    currentBackground   = 0,
     backgroundScrollX   = 0,
     songSelectShift     = 0,
     songSelectElemOpacity      = 255,
@@ -233,8 +237,6 @@ function onStart()
 
     G.bgtx["load"]                      = TEXTURE:CreateTexture("Textures/load.png")
     G.bgtx["preimage_load"]             = TEXTURE:CreateTexture("Textures/preimage_load.png")
-    G.bgtx["overlay"]                   = TEXTURE:CreateTexture("Textures/bg_overlay.png")
-    G.bgtx["overlay_difficulty"]        = TEXTURE:CreateTexture("Textures/bg_overlay_difficulty.png")
     G.bgtx["songinfo"]                  = TEXTURE:CreateTexture("Textures/bg_songinfo.png")
     G.bgtx["randominfo"]                = TEXTURE:CreateTexture("Textures/bg_randominfo.png")
     G.bgtx["difficultyselect"]          = TEXTURE:CreateTexture("Textures/bg_difficultyselect.png")
@@ -266,7 +268,6 @@ function onStart()
     -- (first / middle / last slice); diffselect places and rotates them from Config/layout.json
     G.bgtx["diffsel_gauge8"]  = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg8.png")
     G.bgtx["diffsel_gauge10"] = TEXTURE:CreateTexture("Textures/DifficultyBars/LevelGauge/seg10.png")
-    G.bgtx["placeholder_chara"]   = TEXTURE:CreateTexture("Textures/placeholder_chara.png")
     G.bgtx["placeholder_portrait"] = TEXTURE:CreateTexture("Textures/placeholder_portrait.png")
 
     G.bars["bar"]              = TEXTURE:CreateTexture("Textures/bar.png")
@@ -297,7 +298,6 @@ function onStart()
     G.bars["smallbar0"] = TEXTURE:CreateTexture("Textures/DifficultyBars/0.png")
     G.bars["smallbar1"] = TEXTURE:CreateTexture("Textures/DifficultyBars/1.png")
     G.bars["smallbar2"] = TEXTURE:CreateTexture("Textures/DifficultyBars/Customize.png")
-    -- Diff1~Diff7 (level-fill gauges) and the Level/ number folder are deprecated: only LevelCol is used now.
 
     Unlocks.loadTextures()
 
@@ -354,8 +354,13 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
 
     -- (search state is owned by LuaSongList; reloading the song list resets it)
 
-    G.currentBackground = 0
     SHARED:SetSharedTexture("background", "Textures/bg0.png")
+
+    -- localized overlays for the current language (it can change between visits); freed in deactivate()
+    for key, default in pairs(OVERLAY_FILES) do
+        if G.bgtx[key] ~= nil then G.bgtx[key]:Dispose() end
+        G.bgtx[key] = TEXTURE:CreateTexture(I18N.localizedPath(default))
+    end
 
     if G.songList ~= nil then
         Sort.applySort()
@@ -433,6 +438,10 @@ function deactivate()
         if G.portraits[p] ~= nil then G.portraits[p]:Dispose(); G.portraits[p] = nil end
     end
     G.portraits = {}
+
+    for key in pairs(OVERLAY_FILES) do
+        if G.bgtx[key] ~= nil then G.bgtx[key]:Dispose(); G.bgtx[key] = nil end
+    end
 end
 
 function afterSongEnum()

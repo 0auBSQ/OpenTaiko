@@ -30,6 +30,20 @@ local function currentCode()
     return (ok and type(res) == "string" and res ~= "") and res or "en"
 end
 
+M.currentCode = currentCode
+
+-- Art with baked text: "<name>_<code>.<ext>" when the stage ships that variant next to `path`
+-- (the engine's rule for its own textures), else `path` itself. Relative to the stage folder.
+function M.localizedPath(path, code)
+    code = code or currentCode()
+    local base, ext = path:match("^(.*)(%.[^%./\\]+)$")
+    if base == nil then return path end
+    local lp = base .. "_" .. code .. ext
+    local ok, found = pcall(function() return TEXTURE:Exists(lp) end)
+    if ok and found then return lp end
+    return path
+end
+
 -- select a language (also used directly by the headless harnesses): the JSON texts follow M.code on
 -- every lookup; a legacy Lua dictionary is loaded here when the stage ships one
 function M.load(lang)
