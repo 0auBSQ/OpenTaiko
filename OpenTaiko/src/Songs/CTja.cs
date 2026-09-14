@@ -458,12 +458,12 @@ internal class CTja : CActivity {
 
 	public float fNow_Measure_s = 4.0f;
 	public float fNow_Measure_m = 4.0f;
-	public double dbNowTime = 0.0;
-	public double dbNowBMScrollTime = 0.0;
+	public double dbNowTime = double.NegativeInfinity; // make pre-#START commands already occur in the beginning
+	public double dbNowBMScrollTime = double.NegativeInfinity;
 	public double dbNowScroll = 1.0;
 	public double dbNowScrollY = 0.0; //2016.08.13 kairera0467 複素数スクロール
-	public double dbLastTime = 0.0; // for TaikoJiro 1 #DELAY stops' beginning time
-	public double dbLastBMScrollTime = 0.0;
+	public double dbLastTime = double.NegativeInfinity; // for TaikoJiro 1 #DELAY stops' beginning time
+	public double dbLastBMScrollTime = double.NegativeInfinity;
 	private EGameType? nowGameType = null;
 
 	public bool isAfterLastBpmPoint = false; // set to true whenever this.dbNowTime is changed (except for rounding)
@@ -1851,8 +1851,8 @@ internal class CTja : CActivity {
 			bool isAfterLastBpmPoint = this.isAfterLastBpmPoint;
 			this.ForEachCurrentBranch(branch => {
 				var bpmPoint = this.SetBPMPointAtDefCursor(branch, EBPMPointType.Bpm, isAfterLastBpmPoint: isAfterLastBpmPoint);
-				this.listChip.Add(this.NewEventChipAtDefCursor(0x08, bpmPoint.nInternalNumber, branch: branch));
-				this.listChip.Add(this.NewEventChipAtDefCursor(0x9C, bpmPoint.nInternalNumber, branch: branch));
+				this.listChip.Add(this.NewEventChipAtDefCursor(0x08, bpmPoint?.nInternalNumber ?? -1, branch: branch));
+				this.listChip.Add(this.NewEventChipAtDefCursor(0x9C, bpmPoint?.nInternalNumber ?? -1, branch: branch));
 			});
 
 			this.isBpmChangeInsertedBeforeDiv = true;
@@ -2609,7 +2609,10 @@ internal class CTja : CActivity {
 	}
 
 	// If called directly, isAfterLastBpmPoint is required except for InitBpm
-	private CBPM SetBPMPointAtDefCursor(ECourse branch, EBPMPointType pointType, double msDelayDuration = 0, bool? isAfterLastBpmPoint = null) {
+	private CBPM? SetBPMPointAtDefCursor(ECourse branch, EBPMPointType pointType, double msDelayDuration = 0, bool? isAfterLastBpmPoint = null) {
+		if (this.nCurrentMeasureCount <= 0) // ignore pre-#START BPM points as they will be "merged" into InitBpm
+			return null;
+
 		isAfterLastBpmPoint ??= this.isAfterLastBpmPoint;
 		// deduplicate BPM points
 		CBPM? bpmPoint = null;
@@ -2810,13 +2813,16 @@ internal class CTja : CActivity {
 		this.msOFFSET_Abs = Math.Abs(msOFFSET_Signed);
 		this.isOFFSET_Negative = (msOFFSET_Signed < 0);
 
+		// reset time
+		this.dbLastTime = this.dbNowTime = 0;
+		this.dbLastBMScrollTime = this.dbNowBMScrollTime = 0;
 
 		// add initial SCROLL chip
 		this.listChip.Add(this.NewEventChipAtDefCursor(0x9D, argInt: 0x00));
 
 		// apply initial BPM
 		for (int ib = 0; ib < 3; ++ib) {
-			CBPM bpmPointInit = this.SetBPMPointAtDefCursor((ECourse)ib, EBPMPointType.InitBpm);
+			CBPM bpmPointInit = this.SetBPMPointAtDefCursor((ECourse)ib, EBPMPointType.InitBpm)!;
 
 			if (ib == 0) {
 				// add initial BPM chip
@@ -3119,6 +3125,8 @@ internal class CTja : CActivity {
 			} else {
 				if (this.bMeasureLineInsert == false) {
 					// 小節線にもやってあげないと
+					if (this.nCurrentMeasureCount <= 0) // missing #START
+						this.InitializeChartDefinitionBody();
 					this.ForEachCurrentBranch((branch) => {
 						int iBranch = (int)branch;
 						CChip chip = this.NewScrolledChipAtDefCursor(0x50, 0, Math.Max(1, nTextCount), branch);
@@ -3422,13 +3430,8 @@ internal class CTja : CActivity {
 			// might be from previous player-sides || post-#START and a normal command, ignore
 			if (!allowCommands || this.nCurrentMeasureCount > 0)
 				return;
-			if (command == "#NMSCROLL") {
-				eScrollMode = EScrollMode.Normal;
-			} else if (command == "#HBSCROLL") {
-				eScrollMode = EScrollMode.HBScroll;
-			} else if (command == "#BMSCROLL") {
-				eScrollMode = EScrollMode.BMScroll;
-			} else if (command == "#START") {
+			// placeholder for future player-side commands
+			if (command == "#START") {
 				this.nCurrentMeasureCount = 1; // post-#START
 			}
 			return;
