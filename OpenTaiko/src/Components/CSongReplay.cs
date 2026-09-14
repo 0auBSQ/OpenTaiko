@@ -214,7 +214,7 @@ class CSongReplay {
 		public string FilePath = "";
 		public string ChartChecksum = "";
 		public bool Watchable;
-		public string UnwatchableReason = "";   // tooltip text when Watchable is false
+		public string UnwatchableReason = "";   // reason code when Watchable is false (see tUnwatchableReason)
 		// warnings surfaced on the best-plays card (tooltip + badge)
 		public bool OldVersion;         // recorded by an older game version (calculations may differ)
 		public bool ChecksumMismatch;   // chart md5 no longer matches (chart edited since the play)
@@ -233,15 +233,16 @@ class CSongReplay {
 	public static bool tIsReplayWatchable(int modFlags, int randomSeed, int gameVersion)
 		=> tUnwatchableReason(modFlags, randomSeed, gameVersion) == null;
 
-	// null when watchable, else the reason shown on the best-plays card's error tooltip.
+	// null when watchable, else a reason code the skin turns into its own wording ("rng_mods",
+	// "dynamic_beat_version" or "unseeded_shuffle").
 	// Dynamic Beat is deterministic given the replayed inputs (the warp factor is re-derived from the same
 	// judgements), but only while the evaluation logic matches the recorder's — so it needs the same version.
 	public static string? tUnwatchableReason(int modFlags, int randomSeed, int gameVersion) {
-		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "Uses random mods that cannot be replayed";
+		if ((modFlags & RNG_UNSEEDED_MODS) != 0) return "rng_mods";
 		if ((modFlags & (int)EModFlag.DynamicBeat) != 0 && gameVersion != STORED_GAME_VERSION)
-			return "Dynamic Beat replay from a different game version";
+			return "dynamic_beat_version";
 		if ((modFlags & RNG_SEEDABLE_MODS) != 0 && randomSeed < 0)
-			return "Recorded before the note shuffle was seeded";
+			return "unseeded_shuffle";
 		return null;
 	}
 

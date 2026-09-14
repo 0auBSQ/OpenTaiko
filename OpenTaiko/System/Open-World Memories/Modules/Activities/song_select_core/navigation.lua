@@ -471,6 +471,27 @@ function M.handleSongSelectInput(Sort, Diff)
     elseif G.holdDir == -1 and not navPn.leftPressing() then stopHold()
     end
 
+    -- Pointer navigation (one human player only): the mouse wheel moves one song per notch (wheel down =
+    -- the next song); a touch swipe will feed the same step function later
+    local mouse = G.mouseAllowed()
+    local _, wheel = INPUT:GetScrollDelta()
+    if mouse and wheel ~= 0 and G.songList ~= nil then
+        stopHold()
+        for _ = 1, math.min(5, math.floor(math.abs(wheel) + 0.5)) do doMove(wheel < 0 and 1 or -1) end
+    end
+
+    -- a click on a bar: the selected bar decides, another bar becomes the selection
+    local clickDecide = false
+    if mouse and INPUT:MousePressed("Left") and INPUT:IsMouseInside() and G.songList ~= nil then
+        local slot = G.songListHit(INPUT:GetMouseXY())
+        if slot == 0 then
+            clickDecide = true
+        elseif slot ~= nil then
+            stopHold()
+            for _ = 1, math.abs(slot) do doMove(slot > 0 and 1 or -1) end
+        end
+    end
+
     -- Main navigation
     if SC.pressed("sort") then
         stopHold()
@@ -490,7 +511,7 @@ function M.handleSongSelectInput(Sort, Diff)
         doMove(1); startHold(1)
     elseif navPn.left() and G.songList ~= nil then
         doMove(-1); startHold(-1)
-    elseif navPn.decide() then
+    elseif navPn.decide() or clickDecide then
         stopHold()
         G.selectedSongNode = handleDecideSongSelect(Sort)
     elseif navPn.cancel() then

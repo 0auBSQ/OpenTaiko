@@ -80,7 +80,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "降低歌曲速度",
         "SONGSELECT_SC_SPEED_UP": "提高歌曲速度",
         "SONGSELECT_SC_PLAYER_COUNT": "更改玩家人数",
-        "SONGSELECT_BOX_BEGINNERS": "推荐给新手的歌曲"
+        "SONGSELECT_BOX_BEGINNERS": "推荐给新手的歌曲",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "歌曲排序",
+        "SONGSELECT_SORT_FILEPATH": "文件路径",
+        "SONGSELECT_SORT_SONG_TITLE": "歌曲标题",
+        "SONGSELECT_SORT_SUBTITLE": "副标题",
+        "SONGSELECT_SORT_LEVEL": "显示的难度",
+        "SONGSELECT_SORT_BPM": "基准 BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "最高分",
+        "SONGSELECT_SORT_CLEAR_STATUS": "通关状态",
+        "SONGSELECT_SORT_ASC": "升序",
+        "SONGSELECT_SORT_DESC": "降序",
+        "SONGSELECT_SORT_OFF": "关闭",
+        "SONGSELECT_SORT_OK": "确定",
+        "SONGSELECT_SEARCH_TITLE": "搜索歌曲",
+        "SONGSELECT_SEARCH_DIFFICULTY": "难度",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "等级下限",
+        "SONGSELECT_SEARCH_LEVEL_TO": "等级上限",
+        "SONGSELECT_SEARCH_SONG_TITLE": "歌曲标题",
+        "SONGSELECT_SEARCH_SUBTITLE": "副标题",
+        "SONGSELECT_SEARCH_CHARTER": "谱面作者",
+        "SONGSELECT_SEARCH_ANY": "不限",
+        "SONGSELECT_SEARCH_OK": "搜索",
+        "SONGSELECT_SEARCH_CANCEL": "取消",
+        "SONGSELECT_SEARCH_COUNT": "找到 %d 首歌曲",
+        "SONGSELECT_DIFF_EASY": "简单",
+        "SONGSELECT_DIFF_NORMAL": "普通",
+        "SONGSELECT_DIFF_HARD": "困难",
+        "SONGSELECT_DIFF_ONI_EDIT": "魔王 + 里",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "最佳记录",
+        "SONGSELECT_REPLAY_LOADING": "正在加载回放",
+        "SONGSELECT_REPLAY_NONE": "暂无回放",
+        "SONGSELECT_REPLAY_SCORE": "分数",
+        "SONGSELECT_REPLAY_CONFIRM": "观看此回放？",
+        "SONGSELECT_REPLAY_WATCH": "观看",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "此回放无法观看",
+        "SONGSELECT_REPLAY_OLD_VERSION": "由旧版本游戏记录",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "谱面在此次游玩后已被修改",
+        "SONGSELECT_REPLAY_REASON_RNG": "使用了无法回放的随机模组",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "来自其他游戏版本的 Dynamic Beat 回放",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "记录于音符随机打乱加入种子之前"
 
     }
 }

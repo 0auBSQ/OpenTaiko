@@ -80,7 +80,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "曲の速度を下げる",
         "SONGSELECT_SC_SPEED_UP": "曲の速度を上げる",
         "SONGSELECT_SC_PLAYER_COUNT": "プレイ人数を変更する",
-        "SONGSELECT_BOX_BEGINNERS": "初心者におすすめの曲"
+        "SONGSELECT_BOX_BEGINNERS": "初心者におすすめの曲",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "曲の並び替え",
+        "SONGSELECT_SORT_FILEPATH": "ファイルパス",
+        "SONGSELECT_SORT_SONG_TITLE": "曲名",
+        "SONGSELECT_SORT_SUBTITLE": "サブタイトル",
+        "SONGSELECT_SORT_LEVEL": "表示中の難易度",
+        "SONGSELECT_SORT_BPM": "基準 BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "ベストスコア",
+        "SONGSELECT_SORT_CLEAR_STATUS": "クリア状況",
+        "SONGSELECT_SORT_ASC": "昇順",
+        "SONGSELECT_SORT_DESC": "降順",
+        "SONGSELECT_SORT_OFF": "解除",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "曲を検索",
+        "SONGSELECT_SEARCH_DIFFICULTY": "難易度",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "レベル (下限)",
+        "SONGSELECT_SEARCH_LEVEL_TO": "レベル (上限)",
+        "SONGSELECT_SEARCH_SONG_TITLE": "曲名",
+        "SONGSELECT_SEARCH_SUBTITLE": "サブタイトル",
+        "SONGSELECT_SEARCH_CHARTER": "譜面作者",
+        "SONGSELECT_SEARCH_ANY": "指定なし",
+        "SONGSELECT_SEARCH_OK": "検索",
+        "SONGSELECT_SEARCH_CANCEL": "キャンセル",
+        "SONGSELECT_SEARCH_COUNT": "%d 曲が見つかりました",
+        "SONGSELECT_DIFF_EASY": "かんたん",
+        "SONGSELECT_DIFF_NORMAL": "ふつう",
+        "SONGSELECT_DIFF_HARD": "むずかしい",
+        "SONGSELECT_DIFF_ONI_EDIT": "おに + 裏",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "ベストプレイ",
+        "SONGSELECT_REPLAY_LOADING": "リプレイを読み込み中",
+        "SONGSELECT_REPLAY_NONE": "リプレイはまだありません",
+        "SONGSELECT_REPLAY_SCORE": "スコア",
+        "SONGSELECT_REPLAY_CONFIRM": "このリプレイを見ますか？",
+        "SONGSELECT_REPLAY_WATCH": "見る",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "このリプレイは再生できません",
+        "SONGSELECT_REPLAY_OLD_VERSION": "古いバージョンで記録されたリプレイです",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "プレイ後に譜面が変更されています",
+        "SONGSELECT_REPLAY_REASON_RNG": "再現できないランダム系モッドを使用しています",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "別のゲームバージョンで記録されたダイナミックビートのリプレイです",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "音符シャッフルがシード化される前に記録されました"
 
     }
 }

@@ -80,7 +80,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "Reducir la velocidad de la canción",
         "SONGSELECT_SC_SPEED_UP": "Aumentar la velocidad de la canción",
         "SONGSELECT_SC_PLAYER_COUNT": "Cambiar el número de jugadores",
-        "SONGSELECT_BOX_BEGINNERS": "Canciones recomendadas para principiantes"
+        "SONGSELECT_BOX_BEGINNERS": "Canciones recomendadas para principiantes",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "Ordenar canciones",
+        "SONGSELECT_SORT_FILEPATH": "Ruta del archivo",
+        "SONGSELECT_SORT_SONG_TITLE": "Título",
+        "SONGSELECT_SORT_SUBTITLE": "Subtítulo",
+        "SONGSELECT_SORT_LEVEL": "Nivel mostrado",
+        "SONGSELECT_SORT_BPM": "BPM base",
+        "SONGSELECT_SORT_BEST_SCORE": "Mejor puntuación",
+        "SONGSELECT_SORT_CLEAR_STATUS": "Estado de superación",
+        "SONGSELECT_SORT_ASC": "ascendente",
+        "SONGSELECT_SORT_DESC": "descendente",
+        "SONGSELECT_SORT_OFF": "desactivado",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "Buscar canciones",
+        "SONGSELECT_SEARCH_DIFFICULTY": "Dificultad",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "Nivel desde",
+        "SONGSELECT_SEARCH_LEVEL_TO": "Nivel hasta",
+        "SONGSELECT_SEARCH_SONG_TITLE": "Título",
+        "SONGSELECT_SEARCH_SUBTITLE": "Subtítulo",
+        "SONGSELECT_SEARCH_CHARTER": "Autor de la partitura",
+        "SONGSELECT_SEARCH_ANY": "Cualquiera",
+        "SONGSELECT_SEARCH_OK": "Buscar",
+        "SONGSELECT_SEARCH_CANCEL": "Cancelar",
+        "SONGSELECT_SEARCH_COUNT": "%d canciones encontradas",
+        "SONGSELECT_DIFF_EASY": "Fácil",
+        "SONGSELECT_DIFF_NORMAL": "Normal",
+        "SONGSELECT_DIFF_HARD": "Difícil",
+        "SONGSELECT_DIFF_ONI_EDIT": "Oni + Edit",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "Mejores partidas",
+        "SONGSELECT_REPLAY_LOADING": "Cargando repeticiones",
+        "SONGSELECT_REPLAY_NONE": "Aún no hay repeticiones",
+        "SONGSELECT_REPLAY_SCORE": "score",
+        "SONGSELECT_REPLAY_CONFIRM": "¿Ver esta repetición?",
+        "SONGSELECT_REPLAY_WATCH": "Ver",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "Esta repetición no se puede ver",
+        "SONGSELECT_REPLAY_OLD_VERSION": "Grabada en una versión anterior del juego",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "La partitura fue modificada después de esta partida",
+        "SONGSELECT_REPLAY_REASON_RNG": "Usa mods aleatorios que no se pueden reproducir",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Repetición de Dynamic Beat de otra versión del juego",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Grabada antes de que la mezcla de notas tuviera semilla"
 
     }
 }

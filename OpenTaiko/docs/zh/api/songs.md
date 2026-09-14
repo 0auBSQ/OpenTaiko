@@ -417,7 +417,7 @@ REPLAY:ListReplays 返回的数组或回放列表句柄的 Result 的元素。�
 | `rep.GameMode  (int)` | 所录制演奏的游戏模式。 |
 | `rep.GameVersion  (int)` | 录制该回放的游戏版本。 |
 | `rep.Watchable  (bool)` | 游戏能够如实播放该回放时为 true。 |
-| `rep.UnwatchableReason  (string)` | Watchable 为 false 时，回放不可观看的原因。 |
+| `rep.UnwatchableReason  (string)` | Watchable 为 false 时的原因代码：`rng_mods`、`dynamic_beat_version` 或 `unseeded_shuffle`；否则为空字符串。 |
 | `rep.OldVersion  (bool)` | 该回放由旧版游戏录制时为 true。 |
 | `rep.ChecksumMismatch  (bool)` | 谱面文件已与录制时不一致时为 true（仅在你传入谱面路径时计算）。 |
 

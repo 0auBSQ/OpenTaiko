@@ -417,7 +417,7 @@ Elementos del array devuelto por REPLAY:ListReplays o del Result de un handle de
 | `rep.GameMode  (int)` | El modo de juego de la partida grabada. |
 | `rep.GameVersion  (int)` | La versión del juego que grabó la repetición. |
 | `rep.Watchable  (bool)` | Verdadero cuando el juego puede reproducir la repetición fielmente. |
-| `rep.UnwatchableReason  (string)` | Por qué la repetición no se puede ver, cuando Watchable es false. |
+| `rep.UnwatchableReason  (string)` | Un código de motivo cuando Watchable es false: `rng_mods`, `dynamic_beat_version` o `unseeded_shuffle`; vacío en caso contrario. |
 | `rep.OldVersion  (bool)` | Verdadero cuando una versión anterior del juego grabó la repetición. |
 | `rep.ChecksumMismatch  (bool)` | Verdadero cuando el archivo de chart ya no coincide con la grabación (se calcula solo cuando pasas una ruta de chart). |
 

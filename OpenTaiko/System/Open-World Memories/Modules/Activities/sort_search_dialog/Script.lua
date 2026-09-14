@@ -1,565 +1,227 @@
 ---@diagnostic disable: undefined-global, undefined-field, need-check-nil, unused-local
--- sort_search_dialog — pure UI dialog for sorting and searching.
+-- sort_search_dialog — the song select's sort and search dialogs, as PopUI panels over the list.
 --
--- Sort state persisted via save-file global counters (per player):
---   "ss_sort_method"  (0–6)   active sort method
---   "ss_sort_dir"     (0–2)   0=OFF, 1=ASC, 2=DESC
+-- Sort: one row per method with three buttons, ascending / descending / off, the active one lit; only one
+-- method is on at a time. The choice persists per player in the save file's global counters
+-- "ss_sort_method" (0-6) and "ss_sort_dir" (0 = off, 1 = ascending, 2 = descending); song_select_core
+-- re-sorts when the dialog closes.
+-- Search: a difficulty chooser, level sliders (from 0..13, to 0..12 then "13~" = no upper bound), three
+-- text fields, a live match count. Confirming
+-- hands the parameters to song_select_core through Lib/SongSearch (save counters + shared strings and the
+-- ss_search_ready flag), which opens the results as a virtual folder.
 --
--- When search OK is confirmed the params are written to shared storage and
--- a ready flag is set so song_select_core/search.lua can apply the search:
---   SHARED strings : "ss_title", "ss_subtitle", "ss_charter"
---   Save counters  : "ss_diff", "ss_levelFrom", "ss_levelFromP",
---                    "ss_levelTo",   "ss_levelToP",   "ss_levelToOE"
---   Save counter   : "ss_search_ready" = 1  (cleared by search.lua after reading)
---
--- activate(player, mode?)
---   player — which player's save file to use for sort persistence
---   mode   — "sort" (default) | "search"
+-- activate(player, mode, baseFolder): player = whose save file; mode = "sort" (default) | "search";
+-- baseFolder = the folder the search counts in.
 
-local NavInput = require("NavInput")
+local PopUI = require("PopUI")
+local SongSearch = require("SongSearch")
 
-local bg        = nil
-local text      = nil
-local textSmall = nil
-local sounds    = {}
-local tx        = {}
-local ctx       = {}
+local SW, SH = 1920, 1080
+local SORT_METHODS = { "SONGSELECT_SORT_FILEPATH", "SONGSELECT_SORT_SONG_TITLE", "SONGSELECT_SORT_SUBTITLE",
+                       "SONGSELECT_SORT_LEVEL", "SONGSELECT_SORT_BPM", "SONGSELECT_SORT_BEST_SCORE", "SONGSELECT_SORT_CLEAR_STATUS" }
+local METHOD_KEY, DIR_KEY = "ss_sort_method", "ss_sort_dir"
+local DEFAULT_METHOD, DEFAULT_DIR = 0, 1
 
-local activePlayer = 0
-local activeMode   = "sort"   -- "sort" | "search"
-local reactive     = false
-
--- ── Slide-in transition ──────────────────────────────────────────────────────
-
-local bgpos  = 1080
-local bgtlop = 0
-
--- ── Sort state ───────────────────────────────────────────────────────────────
-
-local SORT_METHODS = {
-    { key = "filepath",    label = "File Path"       },
-    { key = "title",       label = "Song Title"      },
-    { key = "subtitle",    label = "Song Subtitle"   },
-    { key = "level",       label = "Displayed Level" },
-    { key = "bpm",         label = "Base BPM"        },
-    { key = "bestscore",   label = "Best Score"      },
-    { key = "clearstatus", label = "Clear Status"    },
+local UI_THEME = {
+    colors = {
+        surface  = { 250, 252, 255, 255 }, surface2 = { 230, 236, 244, 255 },
+        primary  = { 96, 132, 180, 255 },  primary2 = { 72, 108, 156, 255 },
+        accent   = { 126, 196, 200, 255 }, accent2  = { 96, 168, 176, 255 },
+        outline  = { 70, 84, 104, 255 },   text = { 44, 56, 74, 255 }, textOnAccent = { 255, 255, 255, 255 },
+    },
+    font = { small = 18, label = 22, button = 22, title = 30 },
 }
-local METHOD_KEY     = "ss_sort_method"
-local DIR_KEY        = "ss_sort_dir"
-local DEFAULT_METHOD = 0
-local DEFAULT_DIR    = 1
-
-local sortCursorIndex = 1   -- 1-based
-
--- ── Search state ─────────────────────────────────────────────────────────────
-
-local activeBaseFolder = nil   -- LuaSongNode passed from navigation for live count
-
-local DIFF_OPTIONS = {
-    { label = "Any",      value = -1 },
-    { label = "Easy",     value =  0 },
-    { label = "Normal",   value =  1 },
-    { label = "Hard",     value =  2 },
-    { label = "Oni+Edit", value = 34 },
+local CLOSE_STYLE = {
+    radius = 40,
+    colors = { primary = { 208, 62, 56, 255 }, primary2 = { 158, 34, 30, 255 },
+               outline = { 96, 24, 20, 255 }, textOnAccent = { 255, 255, 255, 255 } },
 }
+local COL_MUTED = { 108, 114, 146 }
 
-local LEVEL_OPTIONS = {
-    { label = "Any",  value = -1, plus = false, openEnd = false },
-    { label = "1",    value =  1, plus = false, openEnd = false },
-    { label = "2",    value =  2, plus = false, openEnd = false },
-    { label = "3",    value =  3, plus = false, openEnd = false },
-    { label = "4",    value =  4, plus = false, openEnd = false },
-    { label = "5",    value =  5, plus = false, openEnd = false },
-    { label = "6",    value =  6, plus = false, openEnd = false },
-    { label = "7",    value =  7, plus = false, openEnd = false },
-    { label = "8",    value =  8, plus = false, openEnd = false },
-    { label = "9",    value =  9, plus = false, openEnd = false },
-    { label = "10",   value = 10, plus = false, openEnd = false },
-    { label = "10+",  value = 10, plus = true,  openEnd = false },
-    { label = "11",   value = 11, plus = false, openEnd = false },
-    { label = "11+",  value = 11, plus = true,  openEnd = false },
-    { label = "12",   value = 12, plus = false, openEnd = false },
-    { label = "12+",  value = 12, plus = true,  openEnd = false },
-    { label = "13~",  value = 13, plus = false, openEnd = true  },
-}
-
-local SF_DIFF      = 1
-local SF_LEVELFROM = 2
-local SF_LEVELTO   = 3
-local SF_TITLE     = 4
-local SF_SUBTITLE  = 5
-local SF_CHARTER   = 6
-local SF_OK        = 7
-local SF_CANCEL    = 8
-local SF_COUNT     = 8
-
-local SF_FIELDS = {
-    { label = "Difficulty",    ftype = "cycle"  },
-    { label = "Level From",    ftype = "cycle"  },
-    { label = "Level To",      ftype = "cycle"  },
-    { label = "Song Title",    ftype = "text"   },
-    { label = "Song Subtitle", ftype = "text"   },
-    { label = "Charter",       ftype = "text"   },
-    { label = "OK",            ftype = "button" },
-    { label = "Cancel",        ftype = "button" },
-}
-
-local diffIdx      = 1
-local levelFromIdx = 1
-local levelToIdx   = #LEVEL_OPTIONS
-local titleText    = ""
-local subtitleText = ""
-local charterText  = ""
-local sfFieldIdx   = SF_DIFF
-local textInput    = nil
-local editField    = nil
-
--- ── Counter helper ────────────────────────────────────────────────────────────
-
-local function startCounter(key, s, e, interval, mode, cb, onFinish)
-    local c = COUNTER:CreateCounter(s, e, interval, onFinish)
-    if mode == "loop" then c:SetLoop(true) end
-    if cb ~= nil then c:Listen(cb) end
-    ctx[key] = c
-    c:Start()
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback or key
 end
 
-local function updateTransitionVisuals(val)
-    bgpos  = val
-    local op = 255 - (val * (255 / 540))
-    bgtlop = math.max(0, math.min(255, op))
+local ui = nil
+local sounds = {}
+local activePlayer, activeMode, activeBaseFolder = 0, "sort", nil
+local wantClose, justOpened = false, false
+local panel = { x = 0, y = 0, w = 0, h = 0 }
+local counter = { text = "", label = nil }
+local sortButtons = {}   -- [method 0-6] = { [1] = asc, [2] = desc, [0] = off }
+
+-- ── sort ─────────────────────────────────────────────────────────────────────
+
+local function readSort()
+    local sav = GetSaveFile(activePlayer)
+    local m = math.floor(sav:GetGlobalCounter(METHOD_KEY) + 0.5)
+    local d = math.floor(sav:GetGlobalCounter(DIR_KEY) + 0.5)
+    if m < 0 or m >= #SORT_METHODS then m = DEFAULT_METHOD end
+    if d < 1 or d > 2 then m, d = DEFAULT_METHOD, DEFAULT_DIR end   -- off (a fresh save) = the file order
+    return m, d
 end
 
--- ── Sort save helpers ─────────────────────────────────────────────────────────
-
-local function readMethod()
-    local v = math.floor(GetSaveFile(activePlayer):GetGlobalCounter(METHOD_KEY) + 0.5)
-    if v < 0 or v >= #SORT_METHODS then v = DEFAULT_METHOD end
-    return v
+local function writeSort(m, d)
+    if d == 0 then m, d = DEFAULT_METHOD, DEFAULT_DIR end   -- off = back to the file order
+    local sav = GetSaveFile(activePlayer)
+    sav:SetGlobalCounter(METHOD_KEY, m)
+    sav:SetGlobalCounter(DIR_KEY, d)
 end
 
-local function readDir()
-    local v = math.floor(GetSaveFile(activePlayer):GetGlobalCounter(DIR_KEY) + 0.5)
-    if v < 0 or v > 2 then v = DEFAULT_DIR end
-    return v
-end
-
-local function writeSort(methodIdx0, dirIdx)
-    if dirIdx == 0 then methodIdx0 = DEFAULT_METHOD; dirIdx = DEFAULT_DIR end
-    GetSaveFile(activePlayer):SetGlobalCounter(METHOD_KEY, methodIdx0)
-    GetSaveFile(activePlayer):SetGlobalCounter(DIR_KEY, dirIdx)
-end
-
--- ── Search helpers (for live count) ──────────────────────────────────────────
-
-local function buildPredicate(params)
-    local diff           = params.diff
-    local levelFrom      = params.levelFrom
-    local levelFromPlus  = params.levelFromPlus
-    local levelTo        = params.levelTo
-    local levelToPlus    = params.levelToPlus
-    local levelToOpenEnd = params.levelToOpenEnd
-    local titlePat       = (params.title    or ""):lower()
-    local subtitlePat    = (params.subtitle or ""):lower()
-    local charterPat     = (params.charter  or ""):lower()
-
-    local effFrom = (levelFrom == -1) and -math.huge
-                    or (levelFrom + (levelFromPlus and 0.5 or 0))
-    local effTo   = (levelToOpenEnd or levelTo == -1) and math.huge
-                    or (levelTo + (levelToPlus and 0.5 or 0))
-
-    local function isAcceptedDiff(i)
-        if diff == -1 then return true end
-        if diff == 34 then return i == 3 or i == 4 end
-        return i == diff
-    end
-
-    return function(node)
-        if not node.IsSong then return false end
-        if node.IsLocked then return false end
-        -- Exclude vault songs when vault is not opened or the song itself is not yet unlocked
-        if node.Genre == "Secret Vault" then
-            local sf = GetSaveFile(0)
-            if not sf:GetGlobalTrigger(".vault_opened") then return false end
-            if not sf:GetGlobalTrigger(".vault_song_unlocked_" .. (node.UniqueId or "")) then return false end
-        end
-        if titlePat    ~= "" and not (node.Title    or ""):lower():find(titlePat,    1, true) then return false end
-        if subtitlePat ~= "" and not (node.Subtitle or ""):lower():find(subtitlePat, 1, true) then return false end
-
-        local accepted = {}
-        for i = 0, 4 do
-            if isAcceptedDiff(i) then
-                local chart = node:GetChart(i)
-                if chart ~= nil then accepted[#accepted + 1] = chart end
-            end
-        end
-        if #accepted == 0 then return false end
-
-        local levelOk = false
-        for _, chart in ipairs(accepted) do
-            local eff = chart.Level + (chart.IsPlus and 0.5 or 0)
-            if eff >= effFrom and eff <= effTo then levelOk = true; break end
-        end
-        if not levelOk then return false end
-
-        if charterPat ~= "" then
-            local ok = false
-            for _, chart in ipairs(accepted) do
-                if (chart.NotesDesigner or ""):lower():find(charterPat, 1, true) then ok = true; break end
-            end
-            if not ok then return false end
-        end
-
-        return true
-    end
-end
-
-local function collectSongs(folderNode, predicate, results)
-    for i = 0, folderNode.ChildrenCount - 1 do
-        local node = folderNode:Child(i)
-        if node.IsSong then
-            if predicate(node) then results[#results + 1] = node end
-        elseif node.IsFolder then
-            collectSongs(node, predicate, results)
+-- every row's three buttons show the saved state: the active method's direction is lit, everything else off
+local function refreshSortButtons()
+    local m, d = readSort()
+    for method, btns in pairs(sortButtons) do
+        for dir, btn in pairs(btns) do
+            local lit = (method == m and dir == d) or (method ~= m and dir == 0)
+            if btn.accent ~= lit then btn.accent = lit; btn:restyle() end
         end
     end
 end
 
-local function currentParams()
+local SORT_ROW_H = 66
+local function buildSort()
+    panel.w, panel.h = 900, 96 + #SORT_METHODS * SORT_ROW_H + 120
+    panel.x, panel.y = math.floor((SW - panel.w) / 2), math.floor((SH - panel.h) / 2)
+    ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = tr("SONGSELECT_SORT_TITLE", "Sort songs") }
+    -- the choice is saved as it is made; OK just closes the dialog
+    ui:button{ text = tr("SONGSELECT_SORT_OK", "OK"), x = panel.x + panel.w / 2 - 140, y = panel.y + panel.h - 90, w = 280, h = 60, accent = true,
+               onClick = function() sounds.Decide:Play(); wantClose = true end }
+    local bw, bh, gap = 124, 50, 8
+    local bx0 = panel.x + panel.w - 40 - 3 * bw - 2 * gap
+    sortButtons = {}
+    for i, key in ipairs(SORT_METHODS) do
+        local y = panel.y + 84 + (i - 1) * SORT_ROW_H
+        local method = i - 1
+        ui:label{ text = tr(key, key), x = panel.x + 40, y = y + math.floor((bh - 22) / 2), size = "label", color = UI_THEME.colors.text, maxWidth = bx0 - panel.x - 60 }
+        sortButtons[method] = {}
+        for k, dir in ipairs({ 1, 2, 0 }) do
+            local labelKey = (dir == 1) and "SONGSELECT_SORT_ASC" or ((dir == 2) and "SONGSELECT_SORT_DESC" or "SONGSELECT_SORT_OFF")
+            local fallback = (dir == 1) and "ascending" or ((dir == 2) and "descending" or "off")
+            sortButtons[method][dir] = ui:button{
+                text = tr(labelKey, fallback), x = bx0 + (k - 1) * (bw + gap), y = y, w = bw, h = bh, style = { font = { button = 18 } },
+                onClick = function() writeSort(method, dir); refreshSortButtons() end,
+            }
+        end
+    end
+    refreshSortButtons()
+end
+
+-- ── search ───────────────────────────────────────────────────────────────────
+
+local LEVEL_MAX = SongSearch.LEVEL_MAX
+local search = { diffIdx = 1, from = 0, to = LEVEL_MAX, title = "", subtitle = "", charter = "" }
+
+local function optionLabel(opt)
+    if opt.key ~= nil then return tr(opt.key, opt.label or opt.key) end
+    return opt.label
+end
+
+-- the sliders: from 0..13; to 0..12, its top value reads "13~" and means no upper bound
+local function searchParams()
     return {
-        diff           = DIFF_OPTIONS[diffIdx].value,
-        levelFrom      = LEVEL_OPTIONS[levelFromIdx].value,
-        levelFromPlus  = LEVEL_OPTIONS[levelFromIdx].plus,
-        levelTo        = LEVEL_OPTIONS[levelToIdx].value,
-        levelToPlus    = LEVEL_OPTIONS[levelToIdx].plus,
-        levelToOpenEnd = LEVEL_OPTIONS[levelToIdx].openEnd,
-        title          = titleText,
-        subtitle       = subtitleText,
-        charter        = charterText,
+        diff = SongSearch.DIFF_OPTIONS[search.diffIdx].value,
+        levelFrom = search.from,
+        levelTo = search.to, levelToOpenEnd = search.to >= LEVEL_MAX,
+        title = search.title, subtitle = search.subtitle, charter = search.charter,
     }
 end
 
-local function countMatches()
-    if activeBaseFolder == nil then return 0 end
-    local results = {}
-    collectSongs(activeBaseFolder, buildPredicate(currentParams()), results)
-    return #results
+-- the live count runs on every change, not every frame (it walks the whole folder)
+local function recount()
+    local n = SongSearch.count(activeBaseFolder, searchParams())
+    counter.text = string.format(tr("SONGSELECT_SEARCH_COUNT", "%d songs found"), n)
+    if counter.label then counter.label:setText(counter.text) end
 end
 
--- ── Search param helpers ──────────────────────────────────────────────────────
-
-local function commitSearchParams()
-    local sav = GetSaveFile(activePlayer)
-    SHARED:SetSharedString("ss_title",    titleText)
-    SHARED:SetSharedString("ss_subtitle", subtitleText)
-    SHARED:SetSharedString("ss_charter",  charterText)
-    sav:SetGlobalCounter("ss_diff",          DIFF_OPTIONS[diffIdx].value)
-    sav:SetGlobalCounter("ss_levelFrom",     LEVEL_OPTIONS[levelFromIdx].value)
-    sav:SetGlobalCounter("ss_levelFromP",    LEVEL_OPTIONS[levelFromIdx].plus  and 1 or 0)
-    sav:SetGlobalCounter("ss_levelTo",       LEVEL_OPTIONS[levelToIdx].value)
-    sav:SetGlobalCounter("ss_levelToP",      LEVEL_OPTIONS[levelToIdx].plus    and 1 or 0)
-    sav:SetGlobalCounter("ss_levelToOE",     LEVEL_OPTIONS[levelToIdx].openEnd and 1 or 0)
-    sav:SetGlobalCounter("ss_search_ready",  1)
-end
-
--- ── Background draw ───────────────────────────────────────────────────────────
-
-local function drawBg(opacity)
-    tx["bgtile"]:SetOpacity((opacity * bgtlop) / 255)
-    for i = 0, 10 do
-        for j = 0, 10 do tx["bgtile"]:Draw(i * 192, j * 108) end
+local function buildSearch()
+    panel.w, panel.h = 940, 96 + 6 * 74 + 170
+    panel.x, panel.y = math.floor((SW - panel.w) / 2), math.floor((SH - panel.h) / 2)
+    ui:panel{ x = panel.x, y = panel.y, w = panel.w, h = panel.h, title = tr("SONGSELECT_SEARCH_TITLE", "Search songs") }
+    local labelX, fieldX, fieldW = panel.x + 40, panel.x + 330, panel.w - 370
+    local y = panel.y + 90
+    local function row(labelKey, fallback)
+        ui:label{ text = tr(labelKey, fallback), x = labelX, y = y + 20, size = "label", color = UI_THEME.colors.text, maxWidth = 270 }
     end
+    local function labels(opts)
+        local out = {}
+        for i, o in ipairs(opts) do out[i] = optionLabel(o) end
+        return out
+    end
+    row("SONGSELECT_SEARCH_DIFFICULTY", "Difficulty")
+    ui:chooser{ x = fieldX, y = y, w = fieldW, h = 60, options = labels(SongSearch.DIFF_OPTIONS), index = search.diffIdx, wrap = true,
+                onChange = function(i) search.diffIdx = i; recount() end }
+    y = y + 74
+    row("SONGSELECT_SEARCH_LEVEL_FROM", "Level from")
+    ui:slider{ x = fieldX, y = y + 10, w = fieldW - 90, h = 40, min = 0, max = LEVEL_MAX, step = 1, value = search.from,
+               onChange = function(v) search.from = math.floor(v + 0.5); recount() end }
+    y = y + 74
+    row("SONGSELECT_SEARCH_LEVEL_TO", "Level to")
+    ui:slider{ x = fieldX, y = y + 10, w = fieldW - 90, h = 40, min = 0, max = LEVEL_MAX, step = 1, value = search.to,
+               showValue = function(self) local v = math.floor(self.value + 0.5); return (v >= LEVEL_MAX) and (LEVEL_MAX .. "~") or tostring(v) end,
+               onChange = function(v) search.to = math.floor(v + 0.5); recount() end }
+    y = y + 74
+    local any = tr("SONGSELECT_SEARCH_ANY", "Any")
+    for _, f in ipairs({ { "SONGSELECT_SEARCH_SONG_TITLE", "Song title", "title" }, { "SONGSELECT_SEARCH_SUBTITLE", "Song subtitle", "subtitle" },
+                         { "SONGSELECT_SEARCH_CHARTER", "Charter", "charter" } }) do
+        row(f[1], f[2])
+        ui:textbox{ x = fieldX, y = y - 4, w = fieldW, h = 64, value = search[f[3]], placeholder = any, maxLen = 64,
+                    onChange = function(t) search[f[3]] = t; recount() end }
+        y = y + 74
+    end
+    counter.label = ui:label{ text = "", x = labelX, y = y + 8, size = "small", color = COL_MUTED, maxWidth = panel.w - 80 }
+    recount()
+    local by = panel.y + panel.h - 90
+    ui:button{ text = tr("SONGSELECT_SEARCH_OK", "Search"), x = panel.x + panel.w / 2 - 300, y = by, w = 280, h = 60, accent = true,
+               onClick = function() SongSearch.write(GetSaveFile(activePlayer), searchParams()); sounds.Decide:Play(); wantClose = true end }
+    ui:button{ text = tr("SONGSELECT_SEARCH_CANCEL", "Cancel"), x = panel.x + panel.w / 2 + 20, y = by, w = 280, h = 60,
+               onClick = function() sounds.Cancel:Play(); wantClose = true end }
 end
 
--- ── Lifecycle ─────────────────────────────────────────────────────────────────
+-- ── lifecycle ────────────────────────────────────────────────────────────────
 
 function onStart()
-    bg              = TEXTURE:CreateTexture("Textures/Background.png")
-    tx["bgtile"]    = TEXTURE:CreateTexture("Textures/BgTile.png")
-    text            = TEXT:Create(28)
-    textSmall       = TEXT:Create(18)
-    sounds.Move   = SHARED:GetSharedSound("Move")
     sounds.Decide = SHARED:GetSharedSound("Decide")
     sounds.Cancel = SHARED:GetSharedSound("Cancel")
     sounds.Skip   = SHARED:GetSharedSound("Skip")
 end
 
 function activate(player, mode, baseFolder)
-    activePlayer     = player or 0
-    activeMode       = mode or "sort"
-    activeBaseFolder = baseFolder
-
-    if activeMode == "sort" then
-        sortCursorIndex = readMethod() + 1
-    else
-        sfFieldIdx = SF_DIFF
-        if textInput ~= nil then textInput:Dispose(); textInput = nil end
-        editField = nil
-    end
-
-    bgpos  = 1080
-    bgtlop = 0
-    startCounter("enter", 1080, 0, -0.5 / 1080, "none", updateTransitionVisuals, function()
-        reactive = true
-    end)
+    activePlayer, activeMode, activeBaseFolder = player or 0, mode or "sort", baseFolder
+    wantClose, justOpened = false, true
+    if ui ~= nil then ui:disposeWidgets() end
+    ui = PopUI.new{
+        theme = UI_THEME, bg = false, navPlayer = activePlayer + 1,
+        sfx = { click = function() sounds.Decide:Play() end, hover = function() sounds.Skip:Play() end },
+    }
+    ui:button{ text = "×", w = 60, h = 60, accent = true, style = CLOSE_STYLE, sfx = { click = "" },
+               onClick = function() sounds.Cancel:Play(); wantClose = true end }
+    if activeMode == "sort" then buildSort() else buildSearch() end
+    -- the close button sits on the panel's corner once the panel size is known
+    ui.widgets[1].x, ui.widgets[1].y = panel.x + panel.w - 62, panel.y - 14
 end
 
 function deactivate()
-    reactive = false
-    if textInput ~= nil then textInput:Dispose(); textInput = nil end
-    editField = nil
+    if ui ~= nil then ui:disposeWidgets(); ui = nil end
+    sortButtons, counter.label = {}, nil
 end
 
-local function closeDialog()
-    reactive = false
-    startCounter("exit", 0, 1080, 0.5 / 1080, "none", updateTransitionVisuals, function()
-        DEACTIVATE()
-    end)
-end
-
--- ── Update ────────────────────────────────────────────────────────────────────
-
-local function updateSort()
-    local navPn = NavInput.p[activePlayer + 1]
-    if navPn.upOrPadLeft() then
-        sounds.Skip:Play()
-        sortCursorIndex = ((sortCursorIndex - 2) % #SORT_METHODS) + 1
-    elseif navPn.downOrPadRight() then
-        sounds.Skip:Play()
-        sortCursorIndex = (sortCursorIndex % #SORT_METHODS) + 1
-    end
-
-    local curMethod0 = sortCursorIndex - 1
-    local pointedDir = (curMethod0 == readMethod()) and readDir() or 0
-
-    if navPn.decide() or navPn.rightOtherPlayer() then
-        sounds.Decide:Play()
-        local newDir = (pointedDir == 0) and 1 or ((pointedDir % 3) + 1)
-        writeSort(curMethod0, newDir == 3 and 0 or newDir)
-    elseif navPn.leftOtherPlayer() then
-        sounds.Decide:Play()
-        local newDir = (pointedDir - 1 + 3) % 3
-        writeSort(curMethod0, newDir)
-    end
-
-    if navPn.cancel() then
-        sounds.Cancel:Play()
-        closeDialog()
-    end
-end
-
-local function updateSearch()
-    -- Text input active
-    if editField ~= nil and textInput ~= nil then
-        local confirmed = textInput:Update()
-        local raw       = textInput.Text
-        if confirmed or INPUT:KeyboardPressed("Return") then
-            sounds.Decide:Play()
-            if editField == SF_TITLE    then titleText    = raw end
-            if editField == SF_SUBTITLE then subtitleText = raw end
-            if editField == SF_CHARTER  then charterText  = raw end
-            textInput:Dispose(); textInput = nil; editField = nil
-        elseif INPUT:KeyboardPressed("Escape") then
-            sounds.Cancel:Play()
-            textInput:Dispose(); textInput = nil; editField = nil
-        end
-        return
-    end
-
-    -- Field navigation
-    local navPn = NavInput.p[activePlayer + 1]
-    if NavInput.upOrPadLeft() then
-        sounds.Skip:Play()
-        sfFieldIdx = ((sfFieldIdx - 2) % SF_COUNT) + 1
-    elseif NavInput.downOrPadRight() then
-        sounds.Skip:Play()
-        sfFieldIdx = (sfFieldIdx % SF_COUNT) + 1
-    end
-
-    local field = SF_FIELDS[sfFieldIdx]
-
-    if field.ftype == "cycle" then
-        local function right()
-            if sfFieldIdx == SF_DIFF          then diffIdx      = (diffIdx      % #DIFF_OPTIONS)  + 1
-            elseif sfFieldIdx == SF_LEVELFROM then levelFromIdx = (levelFromIdx % #LEVEL_OPTIONS) + 1
-            else                                   levelToIdx   = (levelToIdx   % #LEVEL_OPTIONS) + 1
-            end
-        end
-        local function left()
-            if sfFieldIdx == SF_DIFF          then diffIdx      = ((diffIdx      - 2) % #DIFF_OPTIONS)  + 1
-            elseif sfFieldIdx == SF_LEVELFROM then levelFromIdx = ((levelFromIdx - 2) % #LEVEL_OPTIONS) + 1
-            else                                   levelToIdx   = ((levelToIdx   - 2) % #LEVEL_OPTIONS) + 1
-            end
-        end
-        if navPn.rightOtherPlayer() or navPn.decide() then
-            sounds.Skip:Play(); right()
-        elseif navPn.leftOtherPlayer() then
-            sounds.Skip:Play(); left()
-        end
-
-    elseif field.ftype == "text" then
-        local function curText()
-            if sfFieldIdx == SF_TITLE    then return titleText    end
-            if sfFieldIdx == SF_SUBTITLE then return subtitleText end
-            return charterText
-        end
-        local function clearText()
-            if sfFieldIdx == SF_TITLE    then titleText    = "" end
-            if sfFieldIdx == SF_SUBTITLE then subtitleText = "" end
-            if sfFieldIdx == SF_CHARTER  then charterText  = "" end
-        end
-        if navPn.decide() then
-            sounds.Decide:Play()
-            textInput = INPUT:CreateTextInput(curText(), 64)
-            editField = sfFieldIdx
-        elseif navPn.rightOtherPlayer() or navPn.leftOtherPlayer() then
-            if curText() ~= "" then sounds.Skip:Play(); clearText() end
-        end
-
-    elseif field.ftype == "button" then
-        if navPn.decide() then
-            if sfFieldIdx == SF_OK then
-                sounds.Decide:Play()
-                commitSearchParams()
-                closeDialog()
-            else
-                sounds.Cancel:Play()
-                closeDialog()
-            end
-        end
-    end
-
-    if navPn.cancel() then
-        sounds.Cancel:Play()
-        closeDialog()
-    end
-end
-
-function update()
-    for _, c in pairs(ctx) do c:Tick() end
-    if not reactive then return end
-
-    if activeMode == "sort" then
-        updateSort()
-    else
-        updateSearch()
-    end
-end
-
--- ── Draw ──────────────────────────────────────────────────────────────────────
-
-local function drawSort(alpha, cx)
-    local activeMethod0 = readMethod()
-    local activeDir     = readDir()
-    local DIR_LABELS    = { [0] = "OFF", [1] = "ASC", [2] = "DESC" }
-
-    local cy    = 280
-    local title = text:GetText("Sort Songs", false, 600)
-    title:SetOpacity(alpha); title:DrawAtAnchor(cx, cy - 70, "center"); title:SetOpacity(1)
-
-    for i, method in ipairs(SORT_METHODS) do
-        local isActive = (activeMethod0 == i - 1)
-        local isCursor = (sortCursorIndex == i)
-        local dir      = isActive and activeDir or 0
-        local color
-        if isCursor and isActive then
-            color = COLOR:CreateColorFromARGB(255, 255, 220, 60)
-        elseif isCursor then
-            color = COLOR:CreateColorFromARGB(255, 242, 207, 1)
-        elseif isActive then
-            color = COLOR:CreateColorFromARGB(255, 140, 230, 140)
-        else
-            color = COLOR:CreateColorFromARGB(255, 200, 200, 200)
-        end
-        local dirStr = isActive and DIR_LABELS[dir] or "—"
-        local rowTx  = text:GetText(method.label .. "     " .. dirStr, false, 760, color)
-        rowTx:SetOpacity(alpha); rowTx:DrawAtAnchor(cx, cy + (i - 1) * 58, "center"); rowTx:SetOpacity(1)
-    end
-
-    local hint = textSmall:GetText(
-        "↑↓ Navigate     → Cycle ASC/DESC     ← Cycle Back     Esc Close", false, 960)
-    hint:SetOpacity(alpha); hint:DrawAtAnchor(cx, cy + #SORT_METHODS * 58 + 50, "center"); hint:SetOpacity(1)
-end
-
-local function drawSearch(alpha, cx)
-    local cy   = 160
-    local rowH = 68
-
-    local lblCol = COLOR:CreateColorFromARGB(math.floor(200 * alpha), 180, 180, 180)
-    local selCol = COLOR:CreateColorFromARGB(math.floor(255 * alpha), 242, 207,   1)
-    local valCol = COLOR:CreateColorFromARGB(math.floor(255 * alpha), 255, 255, 255)
-
-    local titleTx = text:GetText("Search Songs", false, 600)
-    titleTx:SetOpacity(alpha); titleTx:DrawAtAnchor(cx, cy - 60, "center"); titleTx:SetOpacity(1)
-
-    for i, field in ipairs(SF_FIELDS) do
-        local isCursor = (sfFieldIdx == i)
-        local y        = cy + (i - 1) * rowH
-        local nameCol  = isCursor and selCol or lblCol
-
-        if field.ftype == "cycle" then
-            local valStr
-            if i == SF_DIFF          then valStr = DIFF_OPTIONS[diffIdx].label
-            elseif i == SF_LEVELFROM then valStr = LEVEL_OPTIONS[levelFromIdx].label
-            else                          valStr = LEVEL_OPTIONS[levelToIdx].label
-            end
-            local lbl = text:GetText(field.label, false, 300, nameCol)
-            local val = text:GetText(valStr,      false, 300, isCursor and selCol or valCol)
-            lbl:SetOpacity(alpha); lbl:DrawAtAnchor(cx - 20, y, "right"); lbl:SetOpacity(1)
-            val:SetOpacity(alpha); val:DrawAtAnchor(cx + 20, y, "left");  val:SetOpacity(1)
-
-        elseif field.ftype == "text" then
-            local raw     = (i == SF_TITLE and titleText or i == SF_SUBTITLE and subtitleText or charterText)
-            local isEdit  = (editField == i)
-            local display = (isEdit and textInput ~= nil) and textInput.DisplayText
-                            or (raw == "" and "Any" or raw)
-            local dispCol = (raw == "" and not isEdit) and lblCol or valCol
-            local lbl = text:GetText(field.label, false, 300, nameCol)
-            local val = text:GetText(display,     false, 380, isCursor and selCol or dispCol)
-            lbl:SetOpacity(alpha); lbl:DrawAtAnchor(cx - 20, y, "right"); lbl:SetOpacity(1)
-            val:SetOpacity(alpha); val:DrawAtAnchor(cx + 20, y, "left");  val:SetOpacity(1)
-
-        elseif field.ftype == "button" then
-            local bCol = isCursor and selCol or valCol
-            local btn  = text:GetText(field.label, false, 200, bCol)
-            btn:SetOpacity(alpha); btn:DrawAtAnchor(cx, y, "center"); btn:SetOpacity(1)
-        end
-    end
-
-    -- Live match count
-    local count    = countMatches()
-    local countCol = COLOR:CreateColorFromARGB(math.floor(180 * alpha), 180, 230, 180)
-    local countStr = count .. (count == 1 and " song found" or " songs found")
-    local cTx = textSmall:GetText(countStr, false, 600, countCol)
-    cTx:SetOpacity(alpha); cTx:DrawAtAnchor(cx, cy + SF_COUNT * rowH + 20, "center"); cTx:SetOpacity(1)
-
-    local hint = textSmall:GetText(
-        "↑↓ Navigate     ←→ Cycle / Clear     Decide Edit text     Esc Close", false, 960)
-    hint:SetOpacity(alpha); hint:DrawAtAnchor(cx, cy + SF_COUNT * rowH + 50, "center"); hint:SetOpacity(1)
+function update(ts)
+    if ui == nil then return end
+    if justOpened then justOpened = false; return end   -- the press that opened the dialog never reaches it
+    local r = ui:update(ts)
+    if r == "cancel" and not ui:isCapturing() then sounds.Cancel:Play(); wantClose = true end
+    if wantClose then DEACTIVATE() end
 end
 
 function draw()
-    drawBg(0.5)
-    bg:SetOpacity(bgtlop / 255)
-    bg:Draw(0, bgpos)
-
-    if bgtlop == 0 then return end
-    local alpha = bgtlop / 255
-    local cx    = 960
-
-    if activeMode == "sort" then
-        drawSort(alpha, cx)
-    else
-        drawSearch(alpha, cx)
-    end
+    if ui == nil then return end
+    ui:rect(0, 0, SW, SH, 8, 10, 18, 150)
+    ui:draw()
 end
 
 function onDestroy()
-    if bg        ~= nil then bg:Dispose()        end
-    if text      ~= nil then text:Dispose()      end
-    if textSmall ~= nil then textSmall:Dispose() end
-    if textInput ~= nil then textInput:Dispose(); textInput = nil end
+    if ui ~= nil then ui:disposeWidgets(); ui = nil end
 end
-
-function afterSongEnum() end

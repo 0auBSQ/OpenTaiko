@@ -395,6 +395,23 @@ local function drawListBackdrop(opacity)
     cv:SetOpacity(1)
 end
 
+-- the list slot (-5..5) whose bar plate is under (mx, my), or nil. The plate is the slanted strip inside
+-- the bar texture (765x130: opaque rows 17..116, its left edge sliding 0.34 px right per row).
+local BAR_PLATE = { top = 17, bottom = 116, left = 20, width = 690, skew = 0.34 }
+function M.hitTest(mx, my)
+    local tex = G.bars["bar"]
+    local hw, hh = tex.Width / 2, tex.Height / 2
+    for i = -5, 5 do
+        local cx, cy = M.barPos(i, G.selectBoxDist)
+        local row = my - (cy - hh)
+        if row >= BAR_PLATE.top and row <= BAR_PLATE.bottom then
+            local left = cx - hw + BAR_PLATE.left + (row - BAR_PLATE.top) * BAR_PLATE.skew
+            if mx >= left and mx <= left + BAR_PLATE.width then return i end
+        end
+    end
+    return nil
+end
+
 -- ── Folder open/close animation ─────────────────────────────────────────────────
 -- Driven by G.folderAnim (set up in navigation.lua): { mode="open"/"close", phase=1/2, t=0..1,
 -- oldBars/newBars = { {i, pt}, ... } sorted outer-first, folderPt = the folder's own bar }.

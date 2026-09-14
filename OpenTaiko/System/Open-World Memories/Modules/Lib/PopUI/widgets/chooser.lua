@@ -96,7 +96,7 @@ function Chooser:update(ctx)
     Widget.update(self, ctx)
     local capturing, silence = self.capturing, false
     local hoverThird = self._hoverThird
-    if not self.focused then capturing = false end
+    if not self.focused then capturing = false; silence = true end   -- losing focus ends capture quietly
     -- which arrow is the mouse over? (left / right third) — drives hover/press visual feedback
     if not (self.hovered and ctx.inside or self.pressed) then
         hoverThird = nil

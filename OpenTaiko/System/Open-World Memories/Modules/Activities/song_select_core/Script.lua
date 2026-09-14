@@ -216,6 +216,10 @@ BG.init(G)
 G.backgrounds = BG
 SC.init(G)
 G.shortcuts = SC
+G.songListHit = DrawSS.hitTest
+-- the mouse drives the song list and the difficulty bars only when one person plays; the AI battle's
+-- second slot is the bot, so that mode counts as one
+G.mouseAllowed = function() return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true end
 Featured.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it

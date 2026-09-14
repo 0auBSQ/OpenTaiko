@@ -82,7 +82,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "Lower the song speed",
         "SONGSELECT_SC_SPEED_UP": "Raise the song speed",
         "SONGSELECT_SC_PLAYER_COUNT": "Change the number of players",
-        "SONGSELECT_BOX_BEGINNERS": "Recommended songs for beginners"
+        "SONGSELECT_BOX_BEGINNERS": "Recommended songs for beginners",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "Sort songs",
+        "SONGSELECT_SORT_FILEPATH": "File path",
+        "SONGSELECT_SORT_SONG_TITLE": "Song title",
+        "SONGSELECT_SORT_SUBTITLE": "Song subtitle",
+        "SONGSELECT_SORT_LEVEL": "Displayed level",
+        "SONGSELECT_SORT_BPM": "Base BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "Best score",
+        "SONGSELECT_SORT_CLEAR_STATUS": "Clear status",
+        "SONGSELECT_SORT_ASC": "ascending",
+        "SONGSELECT_SORT_DESC": "descending",
+        "SONGSELECT_SORT_OFF": "off",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "Search songs",
+        "SONGSELECT_SEARCH_DIFFICULTY": "Difficulty",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "Level from",
+        "SONGSELECT_SEARCH_LEVEL_TO": "Level to",
+        "SONGSELECT_SEARCH_SONG_TITLE": "Song title",
+        "SONGSELECT_SEARCH_SUBTITLE": "Song subtitle",
+        "SONGSELECT_SEARCH_CHARTER": "Charter",
+        "SONGSELECT_SEARCH_ANY": "Any",
+        "SONGSELECT_SEARCH_OK": "Search",
+        "SONGSELECT_SEARCH_CANCEL": "Cancel",
+        "SONGSELECT_SEARCH_COUNT": "%d songs found",
+        "SONGSELECT_DIFF_EASY": "Easy",
+        "SONGSELECT_DIFF_NORMAL": "Normal",
+        "SONGSELECT_DIFF_HARD": "Hard",
+        "SONGSELECT_DIFF_ONI_EDIT": "Oni + Edit",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "Best Plays",
+        "SONGSELECT_REPLAY_LOADING": "Loading replays",
+        "SONGSELECT_REPLAY_NONE": "No replays yet",
+        "SONGSELECT_REPLAY_SCORE": "score",
+        "SONGSELECT_REPLAY_CONFIRM": "Watch this replay?",
+        "SONGSELECT_REPLAY_WATCH": "Watch",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "This replay cannot be watched",
+        "SONGSELECT_REPLAY_OLD_VERSION": "Recorded on an older game version",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "The chart was modified after this play",
+        "SONGSELECT_REPLAY_REASON_RNG": "Uses random mods that cannot be replayed",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Dynamic Beat replay from a different game version",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Recorded before the note shuffle was seeded"
 
     }
 }

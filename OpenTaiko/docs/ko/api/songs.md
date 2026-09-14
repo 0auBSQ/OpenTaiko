@@ -417,7 +417,7 @@ REPLAY:ListReplays가 반환하는 배열이나 리플레이 목록 핸들의 Re
 | `rep.GameMode  (int)` | 기록된 플레이의 게임 모드. |
 | `rep.GameVersion  (int)` | 리플레이를 기록한 게임 버전. |
 | `rep.Watchable  (bool)` | 게임이 리플레이를 충실히 재생할 수 있으면 true. |
-| `rep.UnwatchableReason  (string)` | Watchable이 false일 때 리플레이를 볼 수 없는 이유. |
+| `rep.UnwatchableReason  (string)` | Watchable이 false일 때의 이유 코드: `rng_mods`, `dynamic_beat_version` 또는 `unseeded_shuffle`. 그 외에는 빈 문자열. |
 | `rep.OldVersion  (bool)` | 이전 게임 버전이 리플레이를 기록했으면 true. |
 | `rep.ChecksumMismatch  (bool)` | 채보 파일이 더 이상 기록과 일치하지 않으면 true(채보 경로를 넘겼을 때만 계산됨). |
 

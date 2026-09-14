@@ -417,7 +417,7 @@ Elementen van de array die REPLAY:ListReplays teruggeeft of van de Result van ee
 | `rep.GameMode  (int)` | De spelmodus van de opgenomen spelbeurt. |
 | `rep.GameVersion  (int)` | De spelversie die de replay heeft opgenomen. |
 | `rep.Watchable  (bool)` | True wanneer het spel de replay getrouw kan afspelen. |
-| `rep.UnwatchableReason  (string)` | Waarom de replay niet bekeken kan worden, wanneer Watchable false is. |
+| `rep.UnwatchableReason  (string)` | Een redencode wanneer Watchable false is: `rng_mods`, `dynamic_beat_version` of `unseeded_shuffle`; anders leeg. |
 | `rep.OldVersion  (bool)` | True wanneer een oudere spelversie de replay heeft opgenomen. |
 | `rep.ChecksumMismatch  (bool)` | True wanneer het chartbestand niet meer overeenkomt met de opname (alleen berekend wanneer je een chartpad doorgeeft). |
 

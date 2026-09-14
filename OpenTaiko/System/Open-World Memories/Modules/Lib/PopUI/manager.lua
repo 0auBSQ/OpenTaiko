@@ -186,7 +186,12 @@ end
 -- Vertical-centering nudge for text: a GetText/atlas texture carries the font's line height (ascent +
 -- descent), so a glyph anchored "center" reads as sitting slightly too HIGH. Nudge centered text down by a
 -- small, size-proportional amount so it looks vertically centered inside buttons/rows/etc.
-function M:textNudge(size) return math.floor((size or 22) * 0.13) end
+-- The glyph box is the ink plus the padding under it (the GetText geometry), so a box anchored at its
+-- middle sits its ink half the padding too high; widgets add this to their middle line to centre the ink.
+function M:textNudge(size)
+    local f = self:gfont(size or 22)
+    return math.floor((f.BoxHeight - math.ceil(f.LineHeight)) / 2) - 1
+end
 
 -- ── widgets ────────────────────────────────────────────────────────────────────────
 function M:add(w)

@@ -417,7 +417,7 @@ local mirrored = (flags & REPLAY.MODFLAG.Mirror) ~= 0
 | `rep.GameMode  (int)` | Игровой режим записанной игры. |
 | `rep.GameVersion  (int)` | Версия игры, записавшая реплей. |
 | `rep.Watchable  (bool)` | Истина, если игра может достоверно воспроизвести реплей. |
-| `rep.UnwatchableReason  (string)` | Почему реплей нельзя воспроизвести, когда Watchable равно false. |
+| `rep.UnwatchableReason  (string)` | Код причины, когда Watchable равно false: `rng_mods`, `dynamic_beat_version` или `unseeded_shuffle`; иначе пустая строка. |
 | `rep.OldVersion  (bool)` | Истина, если реплей записала более старая версия игры. |
 | `rep.ChecksumMismatch  (bool)` | Истина, если файл чарта больше не соответствует записи (вычисляется, только когда вы передали путь к чарту). |
 

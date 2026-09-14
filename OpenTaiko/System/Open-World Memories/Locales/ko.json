@@ -80,7 +80,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "곡 속도 낮추기",
         "SONGSELECT_SC_SPEED_UP": "곡 속도 높이기",
         "SONGSELECT_SC_PLAYER_COUNT": "플레이어 수 변경",
-        "SONGSELECT_BOX_BEGINNERS": "초보자에게 추천하는 곡"
+        "SONGSELECT_BOX_BEGINNERS": "초보자에게 추천하는 곡",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "곡 정렬",
+        "SONGSELECT_SORT_FILEPATH": "파일 경로",
+        "SONGSELECT_SORT_SONG_TITLE": "곡 제목",
+        "SONGSELECT_SORT_SUBTITLE": "부제",
+        "SONGSELECT_SORT_LEVEL": "표시 난이도",
+        "SONGSELECT_SORT_BPM": "기준 BPM",
+        "SONGSELECT_SORT_BEST_SCORE": "최고 점수",
+        "SONGSELECT_SORT_CLEAR_STATUS": "클리어 상태",
+        "SONGSELECT_SORT_ASC": "오름차순",
+        "SONGSELECT_SORT_DESC": "내림차순",
+        "SONGSELECT_SORT_OFF": "해제",
+        "SONGSELECT_SORT_OK": "확인",
+        "SONGSELECT_SEARCH_TITLE": "곡 검색",
+        "SONGSELECT_SEARCH_DIFFICULTY": "난이도",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "레벨 (최소)",
+        "SONGSELECT_SEARCH_LEVEL_TO": "레벨 (최대)",
+        "SONGSELECT_SEARCH_SONG_TITLE": "곡 제목",
+        "SONGSELECT_SEARCH_SUBTITLE": "부제",
+        "SONGSELECT_SEARCH_CHARTER": "채보 제작자",
+        "SONGSELECT_SEARCH_ANY": "제한 없음",
+        "SONGSELECT_SEARCH_OK": "검색",
+        "SONGSELECT_SEARCH_CANCEL": "취소",
+        "SONGSELECT_SEARCH_COUNT": "%d곡을 찾았습니다",
+        "SONGSELECT_DIFF_EASY": "쉬움",
+        "SONGSELECT_DIFF_NORMAL": "보통",
+        "SONGSELECT_DIFF_HARD": "어려움",
+        "SONGSELECT_DIFF_ONI_EDIT": "오니 + 우라",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "베스트 플레이",
+        "SONGSELECT_REPLAY_LOADING": "리플레이 불러오는 중",
+        "SONGSELECT_REPLAY_NONE": "아직 리플레이가 없습니다",
+        "SONGSELECT_REPLAY_SCORE": "점수",
+        "SONGSELECT_REPLAY_CONFIRM": "이 리플레이를 볼까요?",
+        "SONGSELECT_REPLAY_WATCH": "보기",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "이 리플레이는 볼 수 없습니다",
+        "SONGSELECT_REPLAY_OLD_VERSION": "이전 게임 버전에서 기록됨",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "플레이 이후 채보가 수정되었습니다",
+        "SONGSELECT_REPLAY_REASON_RNG": "다시 재생할 수 없는 랜덤 모드를 사용합니다",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "다른 게임 버전의 다이내믹 비트 리플레이입니다",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "노트 셔플에 시드가 적용되기 전에 기록되었습니다"
 
     }
 }

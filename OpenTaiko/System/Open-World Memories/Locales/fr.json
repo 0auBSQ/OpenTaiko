@@ -80,7 +80,50 @@
         "SONGSELECT_SC_SPEED_DOWN": "Réduire la vitesse de la chanson",
         "SONGSELECT_SC_SPEED_UP": "Augmenter la vitesse de la chanson",
         "SONGSELECT_SC_PLAYER_COUNT": "Changer le nombre de joueurs",
-        "SONGSELECT_BOX_BEGINNERS": "Chansons recommandées pour débuter"
+        "SONGSELECT_BOX_BEGINNERS": "Chansons recommandées pour débuter",
+
+        // Song select: the sort and search dialogs
+        "SONGSELECT_SORT_TITLE": "Trier les chansons",
+        "SONGSELECT_SORT_FILEPATH": "Chemin du fichier",
+        "SONGSELECT_SORT_SONG_TITLE": "Titre",
+        "SONGSELECT_SORT_SUBTITLE": "Sous-titre",
+        "SONGSELECT_SORT_LEVEL": "Niveau affiché",
+        "SONGSELECT_SORT_BPM": "BPM de base",
+        "SONGSELECT_SORT_BEST_SCORE": "Meilleur score",
+        "SONGSELECT_SORT_CLEAR_STATUS": "Statut de réussite",
+        "SONGSELECT_SORT_ASC": "croissant",
+        "SONGSELECT_SORT_DESC": "décroissant",
+        "SONGSELECT_SORT_OFF": "désactivé",
+        "SONGSELECT_SORT_OK": "OK",
+        "SONGSELECT_SEARCH_TITLE": "Rechercher des chansons",
+        "SONGSELECT_SEARCH_DIFFICULTY": "Difficulté",
+        "SONGSELECT_SEARCH_LEVEL_FROM": "Niveau minimum",
+        "SONGSELECT_SEARCH_LEVEL_TO": "Niveau maximum",
+        "SONGSELECT_SEARCH_SONG_TITLE": "Titre",
+        "SONGSELECT_SEARCH_SUBTITLE": "Sous-titre",
+        "SONGSELECT_SEARCH_CHARTER": "Créateur de la partition",
+        "SONGSELECT_SEARCH_ANY": "Indifférent",
+        "SONGSELECT_SEARCH_OK": "Rechercher",
+        "SONGSELECT_SEARCH_CANCEL": "Annuler",
+        "SONGSELECT_SEARCH_COUNT": "%d chansons trouvées",
+        "SONGSELECT_DIFF_EASY": "Facile",
+        "SONGSELECT_DIFF_NORMAL": "Normal",
+        "SONGSELECT_DIFF_HARD": "Difficile",
+        "SONGSELECT_DIFF_ONI_EDIT": "Oni + Edit",
+
+        // Song select: the best-plays panel on difficulty select
+        "SONGSELECT_REPLAY_TITLE": "Meilleures parties",
+        "SONGSELECT_REPLAY_LOADING": "Chargement des replays",
+        "SONGSELECT_REPLAY_NONE": "Aucun replay pour l'instant",
+        "SONGSELECT_REPLAY_SCORE": "score",
+        "SONGSELECT_REPLAY_CONFIRM": "Regarder ce replay ?",
+        "SONGSELECT_REPLAY_WATCH": "Regarder",
+        "SONGSELECT_REPLAY_UNWATCHABLE": "Ce replay ne peut pas être lu",
+        "SONGSELECT_REPLAY_OLD_VERSION": "Enregistré sur une version plus ancienne du jeu",
+        "SONGSELECT_REPLAY_CHART_CHANGED": "La partition a été modifiée après cette partie",
+        "SONGSELECT_REPLAY_REASON_RNG": "Utilise des mods aléatoires impossibles à rejouer",
+        "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Replay Dynamic Beat enregistré sur une autre version du jeu",
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Enregistré avant que le mélange des notes ne soit seedé"
 
     }
 }

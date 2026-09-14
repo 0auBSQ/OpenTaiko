@@ -417,7 +417,7 @@ REPLAY:ListReplays が返す配列、またはリプレイリストハンドル�
 | `rep.GameMode  (int)` | 記録されたプレイのゲームモード。 |
 | `rep.GameVersion  (int)` | リプレイを記録したゲームバージョン。 |
 | `rep.Watchable  (bool)` | ゲームがリプレイを忠実に再生できるとき true。 |
-| `rep.UnwatchableReason  (string)` | Watchable が false のとき、リプレイを観賞できない理由。 |
+| `rep.UnwatchableReason  (string)` | Watchable が false のときの理由コード: `rng_mods`、`dynamic_beat_version`、`unseeded_shuffle` のいずれか。それ以外は空文字列。 |
 | `rep.OldVersion  (bool)` | 古いゲームバージョンがリプレイを記録したとき true。 |
 | `rep.ChecksumMismatch  (bool)` | 譜面ファイルが記録時のものと一致しなくなったとき true (譜面パスを渡した場合にのみ計算されます)。 |
 

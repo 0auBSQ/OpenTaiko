@@ -417,7 +417,7 @@ Elemente des Arrays, das REPLAY:ListReplays oder das Result eines Replay-Listen-
 | `rep.GameMode  (int)` | Der Spielmodus des aufgezeichneten Spiels. |
 | `rep.GameVersion  (int)` | Die Spielversion, die das Replay aufgezeichnet hat. |
 | `rep.Watchable  (bool)` | True, wenn das Spiel das Replay originalgetreu wiedergeben kann. |
-| `rep.UnwatchableReason  (string)` | Warum das Replay nicht ansehbar ist, wenn Watchable false ist. |
+| `rep.UnwatchableReason  (string)` | Ein Grundcode, wenn Watchable false ist: `rng_mods`, `dynamic_beat_version` oder `unseeded_shuffle`; sonst leer. |
 | `rep.OldVersion  (bool)` | True, wenn eine ältere Spielversion das Replay aufgezeichnet hat. |
 | `rep.ChecksumMismatch  (bool)` | True, wenn die Chart-Datei nicht mehr zur Aufzeichnung passt (nur berechnet, wenn Sie einen Chart-Pfad übergeben). |
 

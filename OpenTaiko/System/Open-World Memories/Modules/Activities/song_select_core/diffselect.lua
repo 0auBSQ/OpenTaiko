@@ -297,6 +297,41 @@ local function nmap(lx, ly)
     return nPivX + rx * nCosA + ry * nSinA, nPivY - rx * nSinA + ry * nCosA
 end
 
+-- screen → Note-local (the inverse of nmap), for mouse hit-testing against the bars
+local function unmap(sx, sy)
+    local dx, dy = sx - nPivX, sy - nPivY
+    local rx = dx * nCosA - dy * nSinA
+    local ry = dx * nSinA + dy * nCosA
+    return rx + nPivX - nNoteX, ry + nPivY - nNoteY
+end
+
+-- The bars' plates are slanted rectangles inside their textures (measured on the art): centre, rise angle and
+-- half extents along / across the plate. A point is on a bar when it is inside that rectangle.
+local PLATE_DIFF = { cx = 342, cy = 135, angle = 13.2, along = 318, across = 62 }
+local PLATE_OPT  = { cx = 132, cy = 101, angle = 10.9, along = 104, across = 68 }
+local function onPlate(plate, bx, by, lx, ly)
+    local a = math.rad(plate.angle)
+    local dx, dy = lx - (bx + plate.cx), ly - (by + plate.cy)
+    local u = dx * math.cos(a) - dy * math.sin(a)
+    local v = dx * math.sin(a) + dy * math.cos(a)
+    return math.abs(u) <= plate.along and math.abs(v) <= plate.across
+end
+
+-- the diffIndex under the mouse (options 0..2, difficulties 3+), or nil; the later-drawn bars win overlaps
+local function mouseTarget()
+    if nCosA == nil or not INPUT:IsMouseInside() then return nil end
+    local mx, my = INPUT:GetMouseXY()
+    local lx, ly = unmap(mx, my)
+    for s = #G.diffBars - 1, 0, -1 do
+        if onPlate(PLATE_DIFF, DBAR_ORIG_X + s * DBAR_STEP_X, DBAR_ORIG_Y + s * DBAR_STEP_Y, lx, ly) then return 3 + s end
+    end
+    for o = 0, 2 do
+        local pslot = 2 - o
+        if onPlate(PLATE_OPT, OPT_ORIG_X + pslot * OPT_STEP_X, OPT_ORIG_Y + pslot * OPT_STEP_Y, lx, ly) then return o end
+    end
+    return nil
+end
+
 -- Draw a whole texture whose Note-local top-left is (ox,oy), transformed rigidly with the Note. Sub-pixel
 -- positions are kept (no floor) so the rotation stays smooth instead of snapping pixel-to-pixel.
 local function drawTexTL(tex, ox, oy, opacity)
@@ -655,13 +690,20 @@ function M.handleUpdate(ts)
                 CONFIG.AILevel = CONFIG.AILevel + 1; G.sounds.Skip:Play()
             end
         elseif G.diffSelected[i] == false then
+            -- one human player: the mouse hovers a bar to select it and clicks it to decide
+            local click = false
+            if i == 1 and G.mouseAllowed() then
+                local target = mouseTarget()
+                if target ~= nil and target ~= G.diffIndex[1] then G.sounds.Skip:Play(); G.diffIndex[1] = target end
+                click = target ~= nil and INPUT:MousePressed("Left")
+            end
             if navPn.right(i == uniNavPlayer) then
                 G.sounds.Skip:Play()
                 G.diffIndex[i] = (G.diffIndex[i] + 1) % (3 + #G.diffBars)
             elseif navPn.left(i == uniNavPlayer) then
                 G.sounds.Skip:Play()
                 G.diffIndex[i] = (G.diffIndex[i] - 1) % (3 + #G.diffBars)
-            elseif navPn.decide(i == uniNavPlayer) then
+            elseif navPn.decide(i == uniNavPlayer) or click then
                 if G.diffIndex[i] == 0 then
                     canceled = true
                 elseif G.diffIndex[i] == 1 then
