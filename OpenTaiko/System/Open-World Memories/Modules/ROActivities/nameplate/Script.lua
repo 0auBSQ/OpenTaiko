@@ -63,6 +63,23 @@ local slash = nil
 
 local title_stars_folders = { "1", "2", "3", "4" }
 local title_stars = { { } }
+-- the rarity stars are the difficulty bars' level star sprites (31x34, recoloured by
+-- tools/gen_nameplate_stars.py) and glitter the same way: each star pulses additively over itself and
+-- two glints (Stars/glint.png) blink in turn beside it. STAR_SPOTS = each overlay's star centres, sprite
+-- widths and the clockwise rotation the generator gave that star (the stars fan: left as drawn, middle
+-- upright, right leaning the other way); the glint offsets are the bars' own, turned with each star.
+local star_glint = nil
+local star_time = 0
+local STAR_SPOTS = {
+	{ { 186, 23, 31, 16 } },
+	{ { 160, 23, 31, 0 }, { 202, 23, 31, 32 } },
+	{ { 153, 28, 31, 0 }, { 186, 23, 31, 16 }, { 219, 28, 31, 32 } },
+}
+STAR_SPOTS[4] = STAR_SPOTS[3]
+local STAR_SHINE_MS, STAR_SHINE_OP = 900, 0.45
+local STAR_GLINT_MS, STAR_GLINT_OP = 1500, 0.95
+local STAR_GLINT_OFFSETS = { { 9, -11 }, { -9, 6 } }
+local STAR_TIME_WRAP = 45000                       -- a multiple of both periods
 
 local title_badge_of_achievement = nil
 local nameplates_achievement = {134,135,136,78,66,71,44,11,215,218,220,225,229,234,239,246,251,256,260,292}
@@ -237,8 +254,49 @@ local function implDrawRarityStars(o_x, o_y, opacity, rarity)
 	if star_count > 0 then
 		local star_frame = 1 + math.ceil(titleplate_counter * (#title_stars[star_count] - 1))
 		local tx_titlestar = title_stars[star_count][star_frame]
-		tx_titlestar:SetOpacity(toOpacity(opacity))
-		tx_titlestar:Draw(x + config_title_plate_offset_x, y + config_title_plate_offset_y)
+		local op = toOpacity(opacity)
+		local ox, oy = x + config_title_plate_offset_x, y + config_title_plate_offset_y
+		tx_titlestar:SetOpacity(op)
+		tx_titlestar:Draw(ox, oy)
+		-- the glitter: each star's patch of the overlay pulses additively with its own phase, then its glints
+		local spots = STAR_SPOTS[star_count]
+		local t = star_time
+		tx_titlestar:SetBlendMode("add")
+		for i, spot in ipairs(spots) do
+			local shine = 0.5 + 0.5 * math.sin(2 * math.pi * t / STAR_SHINE_MS + i * 1.3)
+			local half = math.floor(spot[3] / 2) + 5      -- room for the rotated sprite's box
+			local sx, sy = spot[1] - half, math.max(0, spot[2] - half)
+			tx_titlestar:SetOpacity(op * STAR_SHINE_OP * shine)
+			tx_titlestar:DrawRectAtAnchor(ox + sx, oy + sy, sx, sy, 2 * half, 2 * half, "topleft")
+		end
+		tx_titlestar:SetBlendMode("normal")
+		tx_titlestar:SetOpacity(1)
+		if star_glint ~= nil then
+			star_glint:SetBlendMode("add")
+			for i, spot in ipairs(spots) do
+				local k = spot[3] / 31
+				local rot = math.rad(spot[4] or 0)
+				local cr, sr = math.cos(rot), math.sin(rot)
+				for g, off in ipairs(STAR_GLINT_OFFSETS) do
+					local gp = (t / STAR_GLINT_MS + i * 0.37 + g * 0.5) % 1
+					local blink = math.sin(gp * math.pi)
+					blink = blink * blink * blink
+					if blink > 0.02 then
+						-- the bars' offset turned with this star (clockwise on screen, y down)
+						local dx = (off[1] * cr - off[2] * sr) * k
+						local dy = (off[1] * sr + off[2] * cr) * k
+						star_glint:SetRotation((spot[4] or 0) + gp * 90)
+						star_glint:SetScale((0.6 + 0.6 * blink) * k, (0.6 + 0.6 * blink) * k)
+						star_glint:SetOpacity(op * STAR_GLINT_OP * blink)
+						star_glint:DrawAtAnchor(math.floor(ox + spot[1] + dx), math.floor(oy + spot[2] + dy), "center")
+					end
+				end
+			end
+			star_glint:SetBlendMode("normal")
+			star_glint:SetRotation(0)
+			star_glint:SetScale(1, 1)
+			star_glint:SetOpacity(1)
+		end
 	end
 end
 
@@ -383,6 +441,7 @@ function onStart()
 		end
 		title_stars[i] = stars
 	end
+	star_glint = TEXTURE:CreateTexture(TEXTURES_DIR .. "Stars/glint.png")
 
 	-- glyph-composed fonts (bounded per-character cache; the maxsize clamp becomes the per-letter squish)
 	font_name_normal_size = TEXT:CreateGlyphCached(config_font_name_normal_size, "regular")
@@ -416,6 +475,8 @@ function update()
 
 	namePlateEffect_counter = namePlateEffect_counter + (60 * fps.deltaTime)
 	if namePlateEffect_counter >= 120 then namePlateEffect_counter = 0 end
+
+	star_time = (star_time + fps.deltaTime * 1000) % STAR_TIME_WRAP
 end
 
 -- ── Shared full-nameplate renderer ───────────────────────────────────────────
