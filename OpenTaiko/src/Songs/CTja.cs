@@ -250,7 +250,7 @@ internal class CTja : CActivity {
 		public CChip? chipBranchStart;
 		public int nMeasureCount;
 		public double dbTime;
-		public double dbBMScollTime;
+		public double dbBMScrollTime;
 		public double dbBPM;
 		public float fMeasure_s;
 		public float fMeasure_m;
@@ -422,7 +422,7 @@ internal class CTja : CActivity {
 	public float fNow_Measure_s = 4.0f;
 	public float fNow_Measure_m = 4.0f;
 	public double dbNowTime = 0.0;
-	public double dbNowBMScollTime = 0.0;
+	public double dbNowBMScrollTime = 0.0;
 	public double dbNowScroll = 1.0;
 	public double dbNowScrollY = 0.0; //2016.08.13 kairera0467 複素数スクロール
 	public double dbLastTime = 0.0; //直前の小節の開始時間
@@ -1810,7 +1810,7 @@ internal class CTja : CActivity {
 			// チップを配置。
 
 			this.dbNowTime += nDELAY;
-			this.dbNowBMScollTime += nDELAY * this.dbNowBPM / 15000;
+			this.dbNowBMScrollTime += nDELAY * this.dbNowBPM / 15000;
 
 			this.listChip.Add(chip);
 		} else if (command == "#GOGOSTART") {
@@ -2358,7 +2358,7 @@ internal class CTja : CActivity {
 
 			// 6.2秒ディレイ
 			this.dbNowTime += msDanNextSongDelay;
-			this.dbNowBMScollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
+			this.dbNowBMScrollTime += msDanNextSongDelay * this.dbNowBPM / 15000;
 
 			AddPreBakedMusicPreTimeMs(); // 段位の幕が開いてからの遅延。
 
@@ -2465,7 +2465,7 @@ internal class CTja : CActivity {
 			nNotationTopNumber = this.listChip.Count,
 			dbBPMValue = this.dbNowBPM,
 			bpm_change_time = this.dbNowTime,
-			bpm_change_bmscroll_time = this.dbNowBMScollTime,
+			bpm_change_bmscroll_time = this.dbNowBMScrollTime,
 			bpm_change_course = branch,
 		};
 		this.listBPM.Add(bpmPoint);
@@ -2712,7 +2712,7 @@ internal class CTja : CActivity {
 		this.cBranchStart.chipBranchStart = null;
 		this.cBranchEnd.nMeasureCount = this.cBranchStart.nMeasureCount = this.nCurrentMeasureCount;
 		this.cBranchEnd.dbTime = this.cBranchStart.dbTime = this.dbNowTime;
-		this.cBranchEnd.dbBMScollTime = this.cBranchStart.dbBMScollTime = this.dbNowBMScollTime;
+		this.cBranchEnd.dbBMScrollTime = this.cBranchStart.dbBMScrollTime = this.dbNowBMScrollTime;
 		this.cBranchEnd.dbBPM = this.cBranchStart.dbBPM = this.dbNowBPM;
 		this.cBranchEnd.fMeasure_s = this.cBranchStart.fMeasure_s = this.fNow_Measure_s;
 		this.cBranchEnd.fMeasure_m = this.cBranchStart.fMeasure_m = this.fNow_Measure_m;
@@ -2734,7 +2734,7 @@ internal class CTja : CActivity {
 			if (this.nCurrentMeasureCount > this.cBranchEnd.nMeasureCount || this.dbNowTime > this.cBranchEnd.dbTime) {
 				this.cBranchEnd.nMeasureCount = this.nCurrentMeasureCount;
 				this.cBranchEnd.dbTime = this.dbNowTime;
-				this.cBranchEnd.dbBMScollTime = this.dbNowBMScollTime;
+				this.cBranchEnd.dbBMScrollTime = this.dbNowBMScrollTime;
 			}
 		}
 	}
@@ -2749,7 +2749,7 @@ internal class CTja : CActivity {
 		this.nCurrentCourse = branch;
 		this.nCurrentMeasureCount = this.cBranchStart.nMeasureCount;
 		this.dbNowTime = this.cBranchStart.dbTime;
-		this.dbNowBMScollTime = this.cBranchStart.dbBMScollTime;
+		this.dbNowBMScrollTime = this.cBranchStart.dbBMScrollTime;
 		this.dbNowBPM = this.cBranchStart.dbBPM;
 		this.fNow_Measure_s = this.cBranchStart.fMeasure_s;
 		this.fNow_Measure_m = this.cBranchStart.fMeasure_m;
@@ -2765,7 +2765,7 @@ internal class CTja : CActivity {
 		if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS) || forced) {
 			this.nCurrentMeasureCount = this.cBranchEnd.nMeasureCount;
 			this.dbNowTime = this.cBranchEnd.dbTime;
-			this.dbNowBMScollTime = this.cBranchEnd.dbBMScollTime;
+			this.dbNowBMScrollTime = this.cBranchEnd.dbBMScrollTime;
 			this.dbNowBPM = this.cBranchEnd.dbBPM;
 			this.fNow_Measure_s = this.cBranchEnd.fMeasure_s;
 			this.fNow_Measure_m = this.cBranchEnd.fMeasure_m;
@@ -2936,9 +2936,9 @@ internal class CTja : CActivity {
 					if (inputChar == ",") {
 						if (nTextCount == 0) {
 							this.dbLastTime = this.dbNowTime;
-							this.dbLastBMScrollTime = this.dbNowBMScollTime;
+							this.dbLastBMScrollTime = this.dbNowBMScrollTime;
 							this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / 1));
-							this.dbNowBMScollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / 1));
+							this.dbNowBMScrollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / 1));
 						}
 						++this.iNowMeasureAllBranches;
 						this.nCurrentMeasureCount++;
@@ -2999,9 +2999,9 @@ internal class CTja : CActivity {
 					this.ResetNoteSymbolOneShotCommands();
 
 					this.dbLastTime = this.dbNowTime;
-					this.dbLastBMScrollTime = this.dbNowBMScollTime;
+					this.dbLastBMScrollTime = this.dbNowBMScrollTime;
 					this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / nTextCount));
-					this.dbNowBMScollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / (double)nTextCount));
+					this.dbNowBMScrollTime += (((this.fNow_Measure_s / this.fNow_Measure_m)) * (16.0 / (double)nTextCount));
 				}
 			}
 		}
@@ -3045,7 +3045,7 @@ internal class CTja : CActivity {
 			dbSCROLL = this.dbNowScroll,
 			dbSCROLL_Y = this.dbNowScrollY,
 			nSoundTimems = (int)this.dbNowTime,
-			fBMSCROLLTime = this.dbNowBMScollTime,
+			fBMSCROLLTime = this.dbNowBMScrollTime,
 			fNow_Measure_m = this.fNow_Measure_m,
 			fNow_Measure_s = this.fNow_Measure_s,
 			nIntValue = argInt,
@@ -4454,7 +4454,7 @@ internal class CTja : CActivity {
 	/// </summary>
 	private void AddPreBakedMusicPreTimeMs() {
 		this.dbNowTime += OpenTaiko.ConfigIni.MusicPreTimeMs;
-		this.dbNowBMScollTime += OpenTaiko.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
+		this.dbNowBMScrollTime += OpenTaiko.ConfigIni.MusicPreTimeMs * this.dbNowBPM / 15000;
 	}
 	//-----------------
 	#endregion

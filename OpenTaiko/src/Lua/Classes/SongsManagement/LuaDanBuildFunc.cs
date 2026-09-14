@@ -215,7 +215,7 @@ namespace OpenTaiko {
 
 				// OFFSET compensation for HBSCROLL/BMSCROLL.
 				//
-				// CTja sets fBMSCROLLTime and bpm_change_time from dbNowBMScollTime / dbNowTime
+				// CTja sets fBMSCROLLTime and bpm_change_time from dbNowBMScrollTime / dbNowTime
 				// BEFORE the OFFSET adjustment is applied to chip.n発声時刻ms. For a source song
 				// with OFFSET = -X (isOFFSET_Negative=true), note chips receive
 				//   chip.n発声時刻ms += X   (default case in the second-pass loop)
