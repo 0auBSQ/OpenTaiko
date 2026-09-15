@@ -21,6 +21,13 @@ function Panel.new(o)
     return self
 end
 
+local function drop(self, field)
+    local e = self[field]
+    if e == nil then return end
+    if e.key then self.mgr.releaseBaked(e.key) else self.mgr.releaseCanvas(e.canvas) end
+    self[field] = nil
+end
+
 function Panel:restyle()
     self:resolveStyle()
     local c = self.eff.colors
@@ -31,12 +38,12 @@ function Panel:restyle()
         local tw = ink + 56
         local th = self.mgr:textHeight(self.eff.font.title) + 22
         local m = 6
-        local cv = self.mgr:reuseCanvas(self._titlePill and self._titlePill.canvas, tw + 2 * m, th + 2 * m)
-        Shape.panel(cv, m, m, tw, th, { radius = self.eff.radiusSmall, outline = { col = c.outline, width = self.eff.outlineWidth }, top = c.primary, bottom = c.primary2, gloss = c.gloss })
-        cv:Upload()
-        self._titlePill = { canvas = cv, m = m, w = tw, h = th }
+        local rs, ow = self.eff.radiusSmall, self.eff.outlineWidth
+        self:bakeShared("_titlePill", "panel.title", tw + 2 * m, th + 2 * m, function(cv)
+            Shape.panel(cv, m, m, tw, th, { radius = rs, outline = { col = c.outline, width = ow }, top = c.primary, bottom = c.primary2, gloss = c.gloss })
+        end, { m = m, w = tw, h = th })
     else
-        if self._titlePill then self._titlePill.canvas:Dispose(); self._titlePill = nil end
+        drop(self, "_titlePill")
     end
 end
 
@@ -55,7 +62,7 @@ function Panel:draw()
     if self._titlePill then
         local tx = math.floor(self.x + self.w * 0.5)
         local ty = math.floor(self.y)
-        self._titlePill.canvas:SetColor(1, 1, 1); self._titlePill.canvas:SetOpacity(1)
+        self._titlePill.canvas:SetColor(1, 1, 1); self._titlePill.canvas:SetOpacity(1); self._titlePill.canvas:SetScale(1, 1)
         self._titlePill.canvas:DrawAtAnchor(tx, ty, "center")
         local c = self.eff.colors
         self.mgr:drawTextEx(self.eff.font.title, self.title, tx, ty,

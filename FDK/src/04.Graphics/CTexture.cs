@@ -527,6 +527,23 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		}
 	}
 
+	/// <summary>Upload a tightly packed straight-alpha RGBA block (rw*rh*4 bytes) into the region at (rx, ry) of an
+	/// already allocated pixel-buffer texture (see UpdatePixelBuffer). Glyph atlases stamp glyphs with this: one
+	/// TexSubImage2D, no page-sized copy. Main thread only; a no-op until the texture is allocated.</summary>
+	public void UpdateSubRegionTight(byte[] tight, int rx, int ry, int rw, int rh) {
+		if (tight == null || Pointer == 0 || rw <= 0 || rh <= 0) return;
+		if (rx < 0 || ry < 0 || rx + rw > _pixBufW || ry + rh > _pixBufH) return;
+		if (tight.Length < rw * rh * 4) return;
+		unsafe {
+			fixed (byte* p = tight) {
+				Game.Gl.BindTexture(TextureTarget.Texture2D, Pointer);
+				Game.Gl.TexSubImage2D(TextureTarget.Texture2D, 0, rx, ry,
+					(uint)rw, (uint)rh, PixelFormat.Rgba, GLEnum.UnsignedByte, p);
+				Game.Gl.BindTexture(TextureTarget.Texture2D, 0);
+			}
+		}
+	}
+
 	/// <summary>
 	/// Reads this texture's pixels back from the GPU as a top-left-origin RGBA byte buffer
 	/// (length = Width*Height*4). Attaches the texture to a temporary framebuffer and uses

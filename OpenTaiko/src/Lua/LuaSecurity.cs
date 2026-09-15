@@ -63,6 +63,7 @@ import = function () end
 			// Lua's built-in require uses fopen() which is ANSI code-page-limited on Windows.
 			// Expose a C# reader so the custom searcher below can open files on any Unicode path.
 			lua["_csReadFile"] = (Func<string, string?>)(path => {
+				if (!FDK.CTexture.FileExistsCached(path)) return null;
 				try { return File.ReadAllText(path, Encoding.UTF8); }
 				catch { return null; }
 			});

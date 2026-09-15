@@ -51,22 +51,23 @@ function Chooser:restyle()
     local aw = math.floor(ah)
     self._arrowH = ah; self._arrowW = aw
     local m = 4
-    local function cap(old, dir)
-        local cv = self.mgr:reuseCanvas(old, aw + 2 * m, ah + 2 * m)
-        Shape.fillRoundAA(cv, m, m, aw, ah, math.min(self.eff.radiusSmall, ah * 0.5), c.primary)
-        -- triangle (left or right) in textOnAccent
-        local t = c.textOnAccent
-        local cx, cy = m + aw * 0.5, m + ah * 0.5
-        local s = ah * 0.22
-        if dir < 0 then
-            Shape.fillTriangle(cv, cx + s, cy - s, cx + s, cy + s, cx - s, cy, t)
-        else
-            Shape.fillTriangle(cv, cx - s, cy - s, cx - s, cy + s, cx + s, cy, t)
-        end
-        cv:Upload(); return { canvas = cv, m = m }
+    local rs = self.eff.radiusSmall
+    local function cap(field, dir)
+        self:bakeShared(field, "chooser.cap", aw + 2 * m, ah + 2 * m, function(cv)
+            Shape.fillRoundAA(cv, m, m, aw, ah, math.min(rs, ah * 0.5), c.primary)
+            -- triangle (left or right) in textOnAccent
+            local t = c.textOnAccent
+            local cx, cy = m + aw * 0.5, m + ah * 0.5
+            local s = ah * 0.22
+            if dir < 0 then
+                Shape.fillTriangle(cv, cx + s, cy - s, cx + s, cy + s, cx - s, cy, t)
+            else
+                Shape.fillTriangle(cv, cx - s, cy - s, cx - s, cy + s, cx + s, cy, t)
+            end
+        end, { m = m }, dir)
     end
-    self._capL = cap(self._capL and self._capL.canvas, -1)
-    self._capR = cap(self._capR and self._capR.canvas, 1)
+    cap("_capL", -1)
+    cap("_capR", 1)
 end
 
 function Chooser:onCapturing(silence)

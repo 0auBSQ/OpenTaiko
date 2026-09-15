@@ -70,22 +70,22 @@ function Menu:restyle()
     local c = self.eff.colors
     local rw, rh = self.w, self.rowHeight - 10
     local m = 6
-    local function row(old, top, bot, outlineCol)
-        local cv = self.mgr:reuseCanvas(old, rw + 2 * m, rh + 2 * m)
-        Shape.panel(cv, m, m, rw, rh, { radius = self.eff.radiusSmall, outline = { col = outlineCol, width = math.max(2, self.eff.outlineWidth - 2) }, top = top, bottom = bot })
-        cv:Upload(); return { canvas = cv, m = m }
+    local rs, ow = self.eff.radiusSmall, math.max(2, self.eff.outlineWidth - 2)
+    local function row(field, top, bot, outlineCol)
+        self:bakeShared(field, "menu.row", rw + 2 * m, rh + 2 * m, function(cv)
+            Shape.panel(cv, m, m, rw, rh, { radius = rs, outline = { col = outlineCol, width = ow }, top = top, bottom = bot })
+        end, { m = m }, top, bot, outlineCol)
     end
-    self._row = row(self._row and self._row.canvas, c.surface, c.surface2, c.outline)
-    self._rowSel = row(self._rowSel and self._rowSel.canvas, c.primary, c.primary2, c.outline)
+    row("_row", c.surface, c.surface2, c.outline)
+    row("_rowSel", c.primary, c.primary2, c.outline)
     self:_clampScroll()
     -- ROW-sized focus ring (drawn on the selected row) — not a full-menu ring
     local rwid = self.eff.outlineWidth + 4
     local ir = self.eff.radiusSmall
-    local ring = self.mgr:reuseCanvas(self._ring and self._ring.canvas, rw + 2 * m, rh + 2 * m)
-    Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
-    Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
-    ring:Upload()
-    self._ring = { canvas = ring, m = m }
+    self:bakeShared("_ring", "menu.ring", rw + 2 * m, rh + 2 * m, function(ring)
+        Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
+        Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
+    end, { m = m })
 end
 
 function Menu:update(ctx)
@@ -145,7 +145,7 @@ function Menu:draw()
         piece.canvas:SetScale(1.0, 1.0)
         drawPieceClipped(piece, rcx, rcy, vy0, vy1)
         if isSel and self.focused and self._hiCur > 0.01 then
-            self._ring.canvas:SetOpacity(self._hiCur)
+            self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1)
             drawPieceClipped(self._ring, rcx, rcy, vy0, vy1)
         end
         if it then

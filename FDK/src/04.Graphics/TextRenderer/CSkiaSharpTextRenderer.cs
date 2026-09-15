@@ -340,8 +340,50 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 		return SKBitmap.FromImage(image);
 	}
 
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin) {
+		SKRect bounds = new SKRect();
+		var fm = paint.FontMetrics;
+		int width = (int)Math.Ceiling(paint.MeasureText(glyph, ref bounds)) + 2 * margin;
+		int height = (int)Math.Ceiling(fm.Descent - fm.Ascent) + margin;
+		// Skia rasterises premultiplied; the straight-alpha copy below is what the GL upload wants
+		using var premul = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+		using (var canvas = new SKCanvas(premul)) {
+			float baseline = -fm.Ascent;
+			if (edgeOnly) {
+				// stroking the text through a stroke-style paint is the same outline stroke as extracting the
+				// glyph path and stroking that, at a fraction of the cost (measured 16x)
+				if (strokePaint == null) {
+					strokePaint = new SKPaint();
+					strokePaint.Typeface = paint.Typeface;
+					strokePaint.TextSize = paint.TextSize;
+					strokePaint.IsAntialias = true;
+					strokePaint.StrokeJoin = SKStrokeJoin.Round;
+					strokePaint.Style = SKPaintStyle.Stroke;
+					strokePaint.Color = SKColors.White;
+				}
+				strokePaint.StrokeWidth = paint.TextSize * 8 / edge_Ratio;
+				canvas.DrawText(glyph, margin, baseline, strokePaint);
+			} else {
+				paint.Shader = null;
+				paint.Color = SKColors.White;
+				canvas.DrawText(glyph, margin, baseline, paint);
+			}
+			canvas.Flush();
+		}
+		var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+		var straight = new SKBitmap(info);
+		using (var pm = premul.PeekPixels()) {
+			if (pm == null || !pm.ReadPixels(info, straight.GetPixels(), straight.RowBytes)) {
+				straight.Dispose();
+				return premul.Copy();
+			}
+		}
+		return straight;
+	}
+
 	public void Dispose() {
 		paint.Dispose();
+		strokePaint?.Dispose();
 	}
 
 	// Typefaces are immutable and safe to share across SKPaint instances. Loading one copies
@@ -360,4 +402,6 @@ internal class CSkiaSharpTextRenderer : ITextRenderer {
 	}
 
 	private SKPaint paint = null;
+
+	private SKPaint strokePaint;   // the edge stroke's paint, built on first use from `paint`
 }

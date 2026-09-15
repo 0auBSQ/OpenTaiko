@@ -120,6 +120,12 @@ public class CFontRenderer : IDisposable {
 	public SKBitmap DrawTextEdgeOnly(string drawstr, Color edgeColor, int edge_Ratio) {
 		return DrawText(drawstr, CFontRenderer.DrawMode.Edge | CFontRenderer.DrawMode.NoFill, Color.White, edgeColor, null, Color.White, Color.White, edge_Ratio, false);
 	}
+
+	// a single white glyph (or its edge stroke) on a tight straight-alpha bitmap: `margin` px left/right/bottom,
+	// ascender line at y = 0. The fast path for glyph caches: no tokenizing, no compositing pass, one raster.
+	public SKBitmap DrawGlyph(string glyph, bool edgeOnly, int edge_Ratio, int margin) {
+		return this.textRenderer.DrawGlyph(glyph, edgeOnly, edge_Ratio, margin);
+	}
 	protected SKBitmap DrawText(string drawstr, CFontRenderer.DrawMode drawmode, Color fontColor, Color edgeColor, Color? secondEdgeColor, Color gradationTopColor, Color gradationBottomColor, int edge_Ratio, bool keepCenter = false) {
 		//横書きに対してのCorrectionは廃止
 		return this.textRenderer.DrawText(drawstr, drawmode, fontColor, edgeColor, secondEdgeColor, gradationTopColor, gradationBottomColor, edge_Ratio, keepCenter);

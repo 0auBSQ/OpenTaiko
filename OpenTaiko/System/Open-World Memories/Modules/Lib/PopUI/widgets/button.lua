@@ -32,6 +32,13 @@ function Button:setIcon(k)
     self.icon = k; self:restyle()
 end
 
+local function drop(self, field)
+    local e = self[field]
+    if e == nil then return end
+    if e.key then self.mgr.releaseBaked(e.key) else self.mgr.releaseCanvas(e.canvas) end
+    self[field] = nil
+end
+
 function Button:restyle()
     self:resolveStyle()
     local c = self.eff.colors
@@ -49,13 +56,12 @@ function Button:restyle()
         -- bake the glyph in the face's text colour; rebaked with the body on accent flips
         local isz = math.floor(math.min(self.w, self.h) * 0.46)
         local pad = 8
-        local cv = self.mgr:reuseCanvas(self._icon and self._icon.canvas, isz + 2 * pad, isz + 2 * pad)
-        Shape.icon(cv, self.icon, (isz + 2 * pad) * 0.5, (isz + 2 * pad) * 0.5, isz, self._fg)
-        cv:Upload()
-        self._icon = { canvas = cv }
+        local icon, fg = self.icon, self._fg
+        self:bakeShared("_icon", "button.icon", isz + 2 * pad, isz + 2 * pad, function(cv)
+            Shape.icon(cv, icon, (isz + 2 * pad) * 0.5, (isz + 2 * pad) * 0.5, isz, fg)
+        end, nil, icon, fg)
     elseif self._icon then
-        pcall(function() self._icon.canvas:Dispose() end)
-        self._icon = nil
+        drop(self, "_icon")
     end
 end
 

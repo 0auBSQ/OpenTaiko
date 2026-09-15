@@ -60,31 +60,33 @@ function Slider:restyle()
     self._ow = ow
     self._m = m
     -- track (rounded pill) — reuse the canvas across restyles (no leak)
-    local track = self.mgr:reuseCanvas(self._track and self._track.canvas, self.w + 2 * m, th + 2 * m)
-    Shape.panel(track, m, m, self.w, th, { radius = th * 0.5, outline = { col = c.outline, width = ow }, top = c.track, bottom = U.shade(c.track, 0.92) })
-    track:Upload(); self._track = { canvas = track, m = m }
+    local w = self.w
+    self:bakeShared("_track", "slider.track", w + 2 * m, th + 2 * m, function(track)
+        Shape.panel(track, m, m, w, th, { radius = th * 0.5, outline = { col = c.outline, width = ow }, top = c.track, bottom = U.shade(c.track, 0.92) })
+    end, { m = m }, th, ow)
     -- fill = two static pieces (baked once):
     --   _capL = rounded-left cap (left semicircle; radius == track interior radius → never pokes the border)
     --   _mid  = a flat vertical-gradient strip, scaled horizontally to reach the knob (flat → no distortion)
     self._fillH = math.max(2, th - 2 * ow)
     self._capW = math.ceil(self._fillH * 0.5)
-    local cap = self.mgr:reuseCanvas(self._capL and self._capL.canvas, self._capW, self._fillH)
-    Shape.fillFillBar(cap, 0, 0, self._capW, self._fillH, self._fillH * 0.5, c.primary, c.primary2)
-    cap:Upload(); self._capL = { canvas = cap }
+    local capW, fillH = self._capW, self._fillH
+    self:bakeShared("_capL", "slider.cap", capW, fillH, function(cap)
+        Shape.fillFillBar(cap, 0, 0, capW, fillH, fillH * 0.5, c.primary, c.primary2)
+    end)
     local STRIP = 8
-    local mid = self.mgr:reuseCanvas(self._mid and self._mid.canvas, STRIP, self._fillH)
-    Shape.fillRoundGradient(mid, 0, 0, STRIP, self._fillH, 0, c.primary, c.primary2)
-    mid:Upload(); self._mid = { canvas = mid, w = STRIP }
+    self:bakeShared("_mid", "slider.mid", STRIP, fillH, function(mid)
+        Shape.fillRoundGradient(mid, 0, 0, STRIP, fillH, 0, c.primary, c.primary2)
+    end, { w = STRIP })
     -- knob: an anti-aliased circle (smooth edge) with a face + tintable pip
     local kd = self.h  -- knob diameter
-    local knob = self.mgr:reuseCanvas(self._knob and self._knob.canvas, kd + 2 * m, kd + 2 * m)
-    Shape.fillRoundAA(knob, m, m, kd, kd, kd * 0.5, c.outline)                                  -- smooth outer circle
-    Shape.fillRound(knob, m + ow, m + ow, kd - 2 * ow, kd - 2 * ow, (kd - 2 * ow) * 0.5, c.surface)
-    knob:Upload(); self._knob = { canvas = knob, m = m, d = kd }
+    self:bakeShared("_knob", "slider.knob", kd + 2 * m, kd + 2 * m, function(knob)
+        Shape.fillRoundAA(knob, m, m, kd, kd, kd * 0.5, c.outline)                                  -- smooth outer circle
+        Shape.fillRound(knob, m + ow, m + ow, kd - 2 * ow, kd - 2 * ow, (kd - 2 * ow) * 0.5, c.surface)
+    end, { m = m, d = kd }, ow)
     local pipd = math.max(2, math.floor(kd * 0.30))
-    local pip = self.mgr:reuseCanvas(self._pip and self._pip.canvas, pipd + 2 * m, pipd + 2 * m)
-    Shape.fillRound(pip, m, m, pipd, pipd, pipd * 0.5, { 255, 255, 255, 255 })
-    pip:Upload(); self._pip = { canvas = pip, m = m, d = pipd }
+    self:bakeShared("_pip", "slider.pip", pipd + 2 * m, pipd + 2 * m, function(pip)
+        Shape.fillRound(pip, m, m, pipd, pipd, pipd * 0.5, { 255, 255, 255, 255 })
+    end, { m = m, d = pipd })
     self:bakeRing()
 end
 
@@ -134,7 +136,7 @@ function Slider:draw()
     local cy = math.floor(self.y + self.h * 0.5)
     local R = self._trackR
     if self._ring and self._hiCur > 0.01 then
-        self._ring.canvas:SetOpacity(self._hiCur)
+        self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1)
         self._ring.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), cy, "center")
     end
     self._track.canvas:SetColor(1, 1, 1); self._track.canvas:SetOpacity(1); self._track.canvas:SetScale(1, 1)

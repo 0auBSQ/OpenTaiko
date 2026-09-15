@@ -69,7 +69,9 @@ namespace OpenTaiko {
 
 		public object? JsonParseFileAny(string name) {
 			string fullPath = Path.IsPathRooted(name) ? name : Path.Combine(DirPath, name);
-			if (!File.Exists(fullPath)) return null;
+			// an optional file (a language's lang/<code>/<name>.json) is probed often; the cached directory
+			// listing answers a miss without a per-file metadata hit
+			if (!FDK.CTexture.FileExistsCached(fullPath)) return null;
 			string json = File.ReadAllText(fullPath);
 			if (string.IsNullOrWhiteSpace(json)) return null;
 			var token = JToken.Parse(json);

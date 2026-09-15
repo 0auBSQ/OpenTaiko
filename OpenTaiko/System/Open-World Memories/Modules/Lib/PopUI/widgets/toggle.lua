@@ -51,28 +51,29 @@ function Toggle:restyle()
     self._ctrlW, self._ctrlH = cw, ch
     local ow = math.max(3, self.eff.outlineWidth - 1)
     local m = 4
+    local rs = self.eff.radiusSmall
     if self.variant == "checkbox" then
-        local box = self.mgr:reuseCanvas(self._box and self._box.canvas, cw + 2 * m, ch + 2 * m)
-        Shape.panel(box, m, m, cw, ch, { radius = self.eff.radiusSmall, outline = { col = c.outline, width = ow }, top = c.surface, bottom = c.surface2 })
-        box:Upload(); self._box = { canvas = box, m = m }
-        local chk = self.mgr:reuseCanvas(self._check and self._check.canvas, cw + 2 * m, ch + 2 * m)
-        local a = c.primary
-        chk:StrokeLine(m + cw * 0.24, m + ch * 0.52, m + cw * 0.42, m + ch * 0.72, 4, a[1], a[2], a[3], 255)
-        chk:StrokeLine(m + cw * 0.42, m + ch * 0.72, m + cw * 0.78, m + ch * 0.26, 4, a[1], a[2], a[3], 255)
-        chk:Upload(); self._check = { canvas = chk, m = m }
+        self:bakeShared("_box", "toggle.box", cw + 2 * m, ch + 2 * m, function(box)
+            Shape.panel(box, m, m, cw, ch, { radius = rs, outline = { col = c.outline, width = ow }, top = c.surface, bottom = c.surface2 })
+        end, { m = m })
+        self:bakeShared("_check", "toggle.check", cw + 2 * m, ch + 2 * m, function(chk)
+            local a = c.primary
+            chk:StrokeLine(m + cw * 0.24, m + ch * 0.52, m + cw * 0.42, m + ch * 0.72, 4, a[1], a[2], a[3], 255)
+            chk:StrokeLine(m + cw * 0.42, m + ch * 0.72, m + cw * 0.78, m + ch * 0.26, 4, a[1], a[2], a[3], 255)
+        end, { m = m })
     else
-        local function pill(old, top, bot)
-            local cv = self.mgr:reuseCanvas(old, cw + 2 * m, ch + 2 * m)
-            Shape.panel(cv, m, m, cw, ch, { radius = ch * 0.5, outline = { col = c.outline, width = ow }, top = top, bottom = bot })
-            cv:Upload(); return { canvas = cv, m = m }
+        local function pill(field, top, bot)
+            self:bakeShared(field, "toggle.pill", cw + 2 * m, ch + 2 * m, function(cv)
+                Shape.panel(cv, m, m, cw, ch, { radius = ch * 0.5, outline = { col = c.outline, width = ow }, top = top, bottom = bot })
+            end, { m = m }, top, bot)
         end
-        self._trackOff = pill(self._trackOff and self._trackOff.canvas, c.track, U.shade(c.track, 0.92))
-        self._trackOn  = pill(self._trackOn and self._trackOn.canvas, c.primary, c.primary2)
+        pill("_trackOff", c.track, U.shade(c.track, 0.92))
+        pill("_trackOn", c.primary, c.primary2)
         local kd = ch - 12
-        local knob = self.mgr:reuseCanvas(self._knob and self._knob.canvas, kd + 2 * m, kd + 2 * m)
-        Shape.fillRound(knob, m, m, kd, kd, kd * 0.5, c.outline)
-        Shape.fillRound(knob, m + 3, m + 3, kd - 6, kd - 6, (kd - 6) * 0.5, { 255, 255, 255, 255 })
-        knob:Upload(); self._knob = { canvas = knob, m = m, d = kd }
+        self:bakeShared("_knob", "toggle.knob", kd + 2 * m, kd + 2 * m, function(knob)
+            Shape.fillRound(knob, m, m, kd, kd, kd * 0.5, c.outline)
+            Shape.fillRound(knob, m + 3, m + 3, kd - 6, kd - 6, (kd - 6) * 0.5, { 255, 255, 255, 255 })
+        end, { m = m, d = kd })
     end
     -- side label (glyph-composed; +50 = the box padding a GetText texture carried)
     self._labelInk = self.mgr:measureText(self.eff.font.label, self.text)
@@ -104,14 +105,14 @@ function Toggle:draw()
         self._box.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
         local v = self._valCur
         if v > 0.01 then
-            self._check.canvas:SetOpacity(v); self._check.canvas:SetScale(s * (0.6 + 0.4 * v), s * (0.6 + 0.4 * v))
+            self._check.canvas:SetColor(1, 1, 1); self._check.canvas:SetOpacity(v); self._check.canvas:SetScale(s * (0.6 + 0.4 * v), s * (0.6 + 0.4 * v))
             self._check.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
         end
     else
-        self._trackOff.canvas:SetOpacity(1); self._trackOff.canvas:SetScale(s, s)
+        self._trackOff.canvas:SetColor(1, 1, 1); self._trackOff.canvas:SetOpacity(1); self._trackOff.canvas:SetScale(s, s)
         self._trackOff.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
         if self._valCur > 0.01 then
-            self._trackOn.canvas:SetOpacity(self._valCur); self._trackOn.canvas:SetScale(s, s)
+            self._trackOn.canvas:SetColor(1, 1, 1); self._trackOn.canvas:SetOpacity(self._valCur); self._trackOn.canvas:SetScale(s, s)
             self._trackOn.canvas:DrawAtAnchor(math.floor(ctrlCX), math.floor(ctrlCY), "center")
         end
         local kx = U.lerp(self.x + ch * 0.5, self.x + cw - ch * 0.5, self._valCur)

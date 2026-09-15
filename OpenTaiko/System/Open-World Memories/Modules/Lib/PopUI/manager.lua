@@ -40,6 +40,128 @@ function M.flushSharedFonts()
     sharedFonts, sharedGFonts = {}, {}
 end
 
+-- Module-shared canvas pool. A canvas a widget lets go of (disposeWidgets, a restyle to another size) parks
+-- here by size and comes back to the next widget of that size, cleared: rebuilding a screen (a PC tab
+-- switch, the settings reload on a language change) then keeps its GL textures instead of deleting and
+-- allocating every one again — the allocation churn, not the pixel work, is what made rebuilds crawl.
+-- Bounded by bytes; past the cap a released canvas is disposed for real. flushCanvasPool frees it all.
+local canvasPool, canvasPoolBytes = {}, 0
+local CANVAS_POOL_MAX_BYTES = 24 * 1024 * 1024
+
+function M.releaseCanvas(cv)
+    if cv == nil then return end
+    local w, h = cv.Width, cv.Height
+    local bytes = w * h * 4
+    if canvasPoolBytes + bytes > CANVAS_POOL_MAX_BYTES then pcall(function() cv:Dispose() end); return end
+    local key = w * 65536 + h
+    local list = canvasPool[key]
+    if list == nil then list = {}; canvasPool[key] = list end
+    list[#list + 1] = cv
+    canvasPoolBytes = canvasPoolBytes + bytes
+end
+
+function M.acquireCanvas(w, h)
+    local list = canvasPool[w * 65536 + h]
+    if list ~= nil and #list > 0 then
+        local cv = table.remove(list)
+        canvasPoolBytes = canvasPoolBytes - w * h * 4
+        cv:ClearTransparent()
+        return cv
+    end
+    return CANVAS:CreateCanvas(w, h)
+end
+
+function M.flushCanvasPool()
+    for _, list in pairs(canvasPool) do
+        for _, cv in ipairs(list) do pcall(function() cv:Dispose() end) end
+    end
+    canvasPool, canvasPoolBytes = {}, 0
+end
+
+-- Baked-canvas cache, over the pool. Two widgets that bake the same thing (same site, size and theme, see
+-- Widget:bakeShared) share one canvas, reference counted; a canvas nobody holds any more parks with its
+-- pixels intact, so the same screen built again (a language reload, a tab switch) gets every body, ring,
+-- track and knob back without running a single bake or upload. Parked canvases are bounded by bytes, the
+-- oldest released first going back to the plain pool.
+local baked = {}                  -- key -> { canvas, refs, bytes }
+local parkedKeys, parkedBytes = {}, 0
+local BAKED_PARK_MAX_BYTES = 32 * 1024 * 1024
+
+local function unpark(key)
+    for i, k in ipairs(parkedKeys) do
+        if k == key then table.remove(parkedKeys, i); break end
+    end
+end
+
+function M:bakedCanvas(key, w, h, bake)
+    local e = baked[key]
+    if e ~= nil then
+        if e.refs == 0 then unpark(key); parkedBytes = parkedBytes - e.bytes end
+        e.refs = e.refs + 1
+        return e.canvas
+    end
+    local cv = M.acquireCanvas(w, h)
+    bake(cv)
+    cv:Upload()
+    baked[key] = { canvas = cv, refs = 1, bytes = w * h * 4 }
+    return cv
+end
+
+function M.releaseBaked(key)
+    local e = baked[key]
+    if e == nil then return end
+    e.refs = e.refs - 1
+    if e.refs > 0 then return end
+    e.refs = 0
+    parkedKeys[#parkedKeys + 1] = key
+    parkedBytes = parkedBytes + e.bytes
+    while parkedBytes > BAKED_PARK_MAX_BYTES and #parkedKeys > 0 do
+        local old = table.remove(parkedKeys, 1)
+        local oe = baked[old]
+        baked[old] = nil
+        parkedBytes = parkedBytes - oe.bytes
+        M.releaseCanvas(oe.canvas)
+    end
+end
+
+function M.flushBakedCanvases()
+    for _, e in pairs(baked) do pcall(function() e.canvas:Dispose() end) end
+    baked, parkedKeys, parkedBytes = {}, {}, 0
+end
+
+-- a string naming everything a bake can read from a resolved theme (colours, sizes, shadow, gloss), cached
+-- per theme table; the widget adds its own dimensions and colour overrides on top
+local themeKeys = setmetatable({}, { __mode = "k" })
+local function serialize(v, out)
+    local t = type(v)
+    if t == "number" then out[#out + 1] = string.format("%g", v)
+    elseif t == "boolean" then out[#out + 1] = v and "T" or "F"
+    elseif t == "string" then out[#out + 1] = v
+    elseif t == "table" then
+        local keys = {}
+        for k in pairs(v) do if type(k) == "string" or type(k) == "number" then keys[#keys + 1] = k end end
+        table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+        out[#out + 1] = "{"
+        for _, k in ipairs(keys) do
+            local x = v[k]
+            if type(x) ~= "function" and type(x) ~= "userdata" then
+                out[#out + 1] = tostring(k) .. "="; serialize(x, out); out[#out + 1] = ";"
+            end
+        end
+        out[#out + 1] = "}"
+    end
+end
+function M.keyOf(...)
+    local out = {}
+    for i = 1, select("#", ...) do serialize((select(i, ...)), out); out[#out + 1] = "," end
+    return table.concat(out)
+end
+function M:themeKey(eff)
+    local k = themeKeys[eff]
+    if k == nil then k = M.keyOf(eff); themeKeys[eff] = k end
+    return k
+end
+
 function M.new(opts)
     opts = opts or {}
     local self = setmetatable({}, M)
@@ -165,8 +287,8 @@ end
 function M:reuseCanvas(old, w, h)
     w, h = math.floor(w), math.floor(h)
     if old and old.Width == w and old.Height == h then old:ClearTransparent(); return old end
-    if old then old:Dispose() end
-    return CANVAS:CreateCanvas(w, h)
+    if old then M.releaseCanvas(old) end
+    return M.acquireCanvas(w, h)
 end
 
 function M:playSfx(name) return Sfx.playSfx(self.sfx, name) end

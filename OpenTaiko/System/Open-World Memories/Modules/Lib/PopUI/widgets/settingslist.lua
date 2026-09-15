@@ -47,20 +47,21 @@ function List:restyle()
     local rw, rh = self.w, self.rowHeight - 10
     local m = 6
     self._m = m
-    local function row(old, top, bot)
-        local cv = self.mgr:reuseCanvas(old, rw + 2 * m, rh + 2 * m)
-        Shape.panel(cv, m, m, rw, rh, { radius = self.eff.radiusSmall, outline = { col = c.outline, width = math.max(2, self.eff.outlineWidth - 2) }, top = top, bottom = bot })
-        cv:Upload(); return { canvas = cv, m = m }
+    local rs, ow = self.eff.radiusSmall, math.max(2, self.eff.outlineWidth - 2)
+    local function row(field, top, bot)
+        self:bakeShared(field, "list.row", rw + 2 * m, rh + 2 * m, function(cv)
+            Shape.panel(cv, m, m, rw, rh, { radius = rs, outline = { col = c.outline, width = ow }, top = top, bottom = bot })
+        end, { m = m }, top, bot)
     end
-    self._row = row(self._row and self._row.canvas, c.surface, c.surface2)
-    self._rowSel = row(self._rowSel and self._rowSel.canvas, c.primary, c.primary2)
+    row("_row", c.surface, c.surface2)
+    row("_rowSel", c.primary, c.primary2)
     -- selected-row focus ring
     local rwid = self.eff.outlineWidth + 4
     local ir = self.eff.radiusSmall
-    local ring = self.mgr:reuseCanvas(self._ring and self._ring.canvas, rw + 2 * m, rh + 2 * m)
-    Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
-    Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
-    ring:Upload(); self._ring = { canvas = ring, m = m }
+    self:bakeShared("_ring", "list.ring", rw + 2 * m, rh + 2 * m, function(ring)
+        Shape.fillRoundAA(ring, m - 2, m - 2, rw + 4, rh + 4, ir + 2, c.focusRing)
+        Shape.fillRound(ring, m - 2 + rwid, m - 2 + rwid, rw + 4 - 2 * rwid, rh + 4 - 2 * rwid, math.max(1, ir + 2 - rwid), { 0, 0, 0, 0 })
+    end, { m = m })
 end
 
 function List:_count() return #self.rows end
@@ -186,7 +187,7 @@ function List:draw()
             piece.canvas:SetColor(1, 1, 1); piece.canvas:SetOpacity(1); piece.canvas:SetScale(1, 1)
             piece.canvas:DrawAtAnchor(rcx, rcy, "center")
             if isSel and self.focused and self._hiCur > 0.01 then
-                self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:DrawAtAnchor(rcx, rcy, "center")
+                self._ring.canvas:SetOpacity(self._hiCur); self._ring.canvas:SetScale(1, 1); self._ring.canvas:DrawAtAnchor(rcx, rcy, "center")
             end
             local opt = r.opt
             local nameCol = isSel and self._hiCapCur > 0.01

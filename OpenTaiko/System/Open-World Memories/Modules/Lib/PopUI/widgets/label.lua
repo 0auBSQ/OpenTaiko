@@ -34,6 +34,13 @@ function Label:_fontSize()
     return self.eff.font[self.size] or self.eff.font.label
 end
 
+local function drop(self, field)
+    local e = self[field]
+    if e == nil then return end
+    if e.key then self.mgr.releaseBaked(e.key) else self.mgr.releaseCanvas(e.canvas) end
+    self[field] = nil
+end
+
 function Label:restyle()
     self:resolveStyle()
     local c = self.eff.colors
@@ -48,15 +55,15 @@ function Label:restyle()
         self._chipW = self.w + self.padX * 2
         self._chipH = self.h + self.padY * 2
         local m = 6
-        local cv = self.mgr:reuseCanvas(self._chip and self._chip.canvas, self._chipW + 2 * m, self._chipH + 2 * m)
-        Shape.panel(cv, m, m, self._chipW, self._chipH, {
-            radius = self.eff.radiusSmall, outline = { col = c.outline, width = math.max(2, self.eff.outlineWidth - 2) },
-            top = c.surface, bottom = c.surface2,
-        })
-        cv:Upload()
-        self._chip = { canvas = cv, m = m }
+        local cw, ch, rs, ow = self._chipW, self._chipH, self.eff.radiusSmall, math.max(2, self.eff.outlineWidth - 2)
+        self:bakeShared("_chip", "label.chip", cw + 2 * m, ch + 2 * m, function(cv)
+            Shape.panel(cv, m, m, cw, ch, {
+                radius = rs, outline = { col = c.outline, width = ow },
+                top = c.surface, bottom = c.surface2,
+            })
+        end, { m = m })
     else
-        if self._chip then self._chip.canvas:Dispose(); self._chip = nil end
+        drop(self, "_chip")
     end
 end
 
@@ -66,7 +73,7 @@ function Label:draw()
     if not self.visible then return end
     local x, y = math.floor(self.x), math.floor(self.y)
     if self.chip then
-        self._chip.canvas:SetColor(1, 1, 1); self._chip.canvas:SetOpacity(1)
+        self._chip.canvas:SetColor(1, 1, 1); self._chip.canvas:SetOpacity(1); self._chip.canvas:SetScale(1, 1)
         self._chip.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + self.h * 0.5), "center")
     end
     local anchor = (self.align == "center") and "top" or (self.align == "right") and "topright" or "topleft"

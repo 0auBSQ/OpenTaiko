@@ -233,7 +233,8 @@ namespace OpenTaiko {
 		public LuaTexture CreateTextureFromAbsolutePath(string path, NLua.LuaTable options) => CreateTextureFromAbsolutePath(path, autoDispose: true, tParseMaxSize(options));
 
 		public bool Exists(string path) {
-			return File.Exists($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}");
+			// the cached directory listing: a localized-art probe (<name>_<code>.png) runs on every activation
+			return CTexture.FileExistsCached($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}");
 		}
 	}
 }

@@ -52,40 +52,63 @@ function Widget:isHighlighted() return self.enabled and (self.hovered or self.fo
 function Widget:isCapturingHighlighted() return self.enabled and (self.capturing) end
 
 -- ── baking (only place canvases are built; called on construct + restyle) ──────────
--- a transparent canvas sized to the body + a shadow margin, REUSING `old` when the size matches (no leak)
-function Widget:_newBodyCanvas(old)
+-- the margin a body canvas keeps around the widget for its shadow
+function Widget:_bodyMargin()
     local sh = self.eff.shadow
     local m = math.ceil((sh.layers or 4) * (sh.grow or 3) + math.max(math.abs(sh.dx or 0), math.abs(sh.dy or 6)) + 2)
     self._m = m
-    return self.mgr:reuseCanvas(old, math.floor(self.w + 2 * m), math.floor(self.h + 2 * m)), m
+    return m
+end
+
+-- A baked surface stored in self[field] as { canvas, key, ... }, shared through the manager's cache with
+-- every widget that bakes the same thing: `site` names the bake, w/h its canvas, the resolved theme and
+-- the extra key parts (colour overrides, variant numbers) complete the key. bake(cv) runs only for a key
+-- no live or parked canvas has; an unchanged key keeps the surface the widget already holds. The shared
+-- canvas must never be drawn into again — every draw sets the scale/colour/opacity it needs first.
+function Widget:bakeShared(field, site, w, h, bake, extra, ...)
+    w, h = math.floor(w), math.floor(h)
+    local key = site .. "|" .. w .. "x" .. h .. "|" .. self.mgr:themeKey(self.eff) .. "|" .. self.mgr.keyOf(...)
+    local old = self[field]
+    if old ~= nil and old.key == key then return old end
+    if old ~= nil then
+        if old.key then self.mgr.releaseBaked(old.key) else self.mgr.releaseCanvas(old.canvas) end
+    end
+    local e = { canvas = self.mgr:bakedCanvas(key, w, h, bake), key = key }
+    if extra then for k, v in pairs(extra) do e[k] = v end end
+    self[field] = e
+    return e
 end
 
 -- bake the standard body: soft shadow + bordered gradient panel + gloss. faceTop/faceBottom override the
 -- theme surface gradient (e.g. an accent button passes primary/primary2).
 function Widget:bakeBody(faceTop, faceBottom)
     local c = self.eff.colors
-    local cv, m = self:_newBodyCanvas(self._body and self._body.canvas)
-    Shape.dropShadow(cv, m, m, self.w, self.h, self:radius(), { col = c.shadow,
-        dx = self.eff.shadow.dx, dy = self.eff.shadow.dy, layers = self.eff.shadow.layers, grow = self.eff.shadow.grow })
-    Shape.panel(cv, m, m, self.w, self.h, {
-        radius = self:radius(),
-        outline = { col = c.outline, width = self.eff.outlineWidth },
-        top = faceTop or c.surface, bottom = faceBottom or c.surface2,
-        gloss = self.eff.gloss and c.gloss or nil,
-    })
-    cv:Upload()
-    self._body = { canvas = cv, m = m }
+    local m = self:_bodyMargin()
+    local top, bot = faceTop or c.surface, faceBottom or c.surface2
+    local w, h, r = self.w, self.h, self:radius()
+    local eff = self.eff
+    self:bakeShared("_body", "body", w + 2 * m, h + 2 * m, function(cv)
+        Shape.dropShadow(cv, m, m, w, h, r, { col = c.shadow,
+            dx = eff.shadow.dx, dy = eff.shadow.dy, layers = eff.shadow.layers, grow = eff.shadow.grow })
+        Shape.panel(cv, m, m, w, h, {
+            radius = r,
+            outline = { col = c.outline, width = eff.outlineWidth },
+            top = top, bottom = bot,
+            gloss = eff.gloss and c.gloss or nil,
+        })
+    end, { m = m }, top, bot, r)
 end
 
 -- bake the focus/hover ring (gold rounded outline) as its own canvas, drawn over the body when highlighted
 function Widget:bakeRing()
     local c = self.eff.colors
-    local cv, m = self:_newBodyCanvas(self._ring and self._ring.canvas)
+    local m = self:_bodyMargin()
     local rw = self.eff.outlineWidth + 4
-    Shape.fillRoundAA(cv, m - 2, m - 2, self.w + 4, self.h + 4, self:radius() + 2, c.focusRing)   -- smooth outer
-    Shape.fillRound(cv, m - 2 + rw, m - 2 + rw, self.w + 4 - 2 * rw, self.h + 4 - 2 * rw, self:radius() + 2 - rw, { 0, 0, 0, 0 })
-    cv:Upload()
-    self._ring = { canvas = cv, m = m }
+    local w, h, r = self.w, self.h, self:radius()
+    self:bakeShared("_ring", "ring", w + 2 * m, h + 2 * m, function(cv)
+        Shape.fillRoundAA(cv, m - 2, m - 2, w + 4, h + 4, r + 2, c.focusRing)   -- smooth outer
+        Shape.fillRound(cv, m - 2 + rw, m - 2 + rw, w + 4 - 2 * rw, h + 4 - 2 * rw, r + 2 - rw, { 0, 0, 0, 0 })
+    end, { m = m }, r)
 end
 
 function Widget:resolveStyle()
@@ -213,15 +236,23 @@ end
 function Widget:setEnabled(b) self.enabled = b; self.focusable = b and (self._focusableWant ~= false); self:_refreshHighlight(); self:_refreshCapturingHighlight() end
 function Widget:setVisible(b) self.visible = b end
 
--- free the GPU canvases this widget baked (LuaCanvas has no finalizer). Every baked surface is stored as a
--- `{ canvas = <LuaCanvas>, ... }` field (_body/_ring/_track/_knob/_capL/…); cached GetText textures are stored
--- bare (not wrapped) and are owned by the font cache, so this leaves them alone. Call before dropping a UI.
+-- release the GPU canvases this widget baked (LuaCanvas has no finalizer) into the manager's pool, where the
+-- next widget of the same size picks them up. Every baked surface is stored as a `{ canvas = <LuaCanvas>, ... }`
+-- field (_body/_ring/_track/_knob/_capL/…); cached GetText textures are stored bare (not wrapped) and are
+-- owned by the font cache, so this leaves them alone. Call before dropping a UI.
 function Widget:dispose()
     local keys = {}
     for k, v in pairs(self) do
         if type(v) == "table" and v.canvas ~= nil then keys[#keys + 1] = k end
     end
-    for _, k in ipairs(keys) do pcall(function() self[k].canvas:Dispose() end); self[k] = nil end
+    local mgr = self.mgr                                     -- nil before init: dispose outright
+    for _, k in ipairs(keys) do
+        local e = self[k]
+        if mgr and e.key then pcall(mgr.releaseBaked, e.key)
+        elseif mgr then pcall(mgr.releaseCanvas, e.canvas)
+        else pcall(function() e.canvas:Dispose() end) end
+        self[k] = nil
+    end
 end
 
 -- ── per-frame ───────────────────────────────────────────────────────────────────
