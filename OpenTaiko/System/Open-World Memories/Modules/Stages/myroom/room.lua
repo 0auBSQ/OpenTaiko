@@ -357,10 +357,11 @@ function Room:furnitureAt(c, r)
     return self:groundItemAt(c, r)
 end
 
--- the floor-standing occupant of a cell (surfaces live below stacked items)
-function Room:groundItemAt(c, r)
+-- the floor-standing occupant of a cell (surfaces live below stacked items). `ignore` skips one item
+-- entirely, so a piece being rotated or moved never hides another occupant of the same cell.
+function Room:groundItemAt(c, r, ignore)
     for _, it in ipairs(self.furniture) do
-        if not it.on then
+        if not it.on and it ~= ignore then
             local cat = Room.CATALOG[it.id]
             if (cat == nil or cat.place ~= "wall") and itemCovers(it, cat, c, r) then return it, cat end
         end
@@ -368,9 +369,9 @@ function Room:groundItemAt(c, r)
     return nil
 end
 
-function Room:stackedItemAt(c, r)
+function Room:stackedItemAt(c, r, ignore)
     for _, it in ipairs(self.furniture) do
-        if it.on then
+        if it.on and it ~= ignore then
             local cat = Room.CATALOG[it.id]
             if (cat == nil or cat.place ~= "wall") and itemCovers(it, cat, c, r) then return it, cat end
         end
@@ -550,16 +551,18 @@ function Room:canPlace(id, c, r, facing, ignore)
     local surf = nil
     for _, cell in ipairs(self:footprint(id, c, r, facing)) do
         if self:cellType(cell[1], cell[2]) ~= "O" then return false end
-        local st = self:stackedItemAt(cell[1], cell[2])
-        if st and st ~= ignore then
+        -- the lookups skip `ignore` themselves: the item being turned or moved (already carrying its
+        -- new facing) must not shadow another occupant of the cell
+        local st = self:stackedItemAt(cell[1], cell[2], ignore)
+        if st then
             -- a cell held by ANOTHER stacked item blocks us — unless we're that item's surface
             -- moving with it (it stays inside our new footprint). Multiple riders coexist as long
             -- as their cells don't overlap (this per-cell test is what enforces that).
             local riderOk = ownRiders[st] and self:footprintContains(id, c, r, facing, st)
             if not riderOk then return false end
         end
-        local g, gcat = self:groundItemAt(cell[1], cell[2])
-        if g and g ~= ignore then
+        local g, gcat = self:groundItemAt(cell[1], cell[2], ignore)
+        if g then
             -- landing on a surface: a stackOn item may share the surface with other riders as
             -- long as its own cells are free (checked above), so no whole-surface exclusion here
             if not (cat.stackOn and gcat and gcat.surface) then return false end

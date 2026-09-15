@@ -23,6 +23,7 @@ local JB       = require("jukebox")         -- the Jukebox furniture's audio pla
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
 local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
+local Integrity = require("integrity")      -- the load-time placement sweep; see integrity.lua
 local NavInput = require("NavInput")
 local net      = MO.net
 
@@ -115,12 +116,22 @@ local function loadRoom()
     store = store or DATABASE:OpenLocalDatabase("myroom")
     local raw = store and store:Read(saveKey()) or nil
     local t = deserialize(raw)
-    if t then room:loadTable(t) end
+    local dirty = false
+    if t then
+        room:loadTable(t)
+        -- pieces the live rules would refuse (overlaps from older builds) go back to stock
+        local evicted = Integrity.sweep(room)
+        if #evicted > 0 then
+            dirty = true
+            if debugLog then debugLog("myroom: returned to stock on load: " .. table.concat(evicted, ", ")) end
+        end
+    end
     local sf = curSave()
     if sf then
         local gained = room:drainShopGrants(function(n) return sf:GetGlobalCounter(n) end)
-        if gained then saveRoom() end   -- persist the claim ledger + new stock immediately (idempotent)
+        if gained then dirty = true end
     end
+    if dirty then saveRoom() end   -- persist the sweep, the claim ledger and new stock right away (idempotent)
     -- resume this save's jukebox: read BEFORE stopAll (stopping persists an empty state)
     local jbSaved = deserialize(store and store:Read(jukeboxKey()) or nil)
     JB.stopAll()
