@@ -163,13 +163,15 @@ local gaugeShadeCache = {}   -- difficulty (or "vault") -> { shades, bright }, b
 
 -- Charter names (up to CHARTER_MAX), relative to a difficulty bar's top-left. First centred at
 -- (CHARTER_CX,CHARTER_CY), each next offset by (CHARTER_DX,CHARTER_DY); squished to CHARTER_MAXW, tilted CHARTER_ROT.
-local CHARTER_CX   = CFG.num("difficulty_select.charter.center_x", 551)
+-- White, outlined in the level colour darkened by CHARTER_BORDER_DARKEN.
+local CHARTER_CX   = CFG.num("difficulty_select.charter.center_x", 553)
 local CHARTER_CY   = CFG.num("difficulty_select.charter.center_y", 58)
 local CHARTER_DX   = CFG.num("difficulty_select.charter.step_x", 7)
 local CHARTER_DY   = CFG.num("difficulty_select.charter.step_y", 26)
-local CHARTER_MAXW = CFG.num("difficulty_select.charter.max_width", 100)
+local CHARTER_MAXW = CFG.num("difficulty_select.charter.max_width", 132)
 local CHARTER_ROT  = CFG.num("difficulty_select.charter.rotation", 13.76)   -- degrees; up-right tilt (CCW). Flip if it tilts down.
 local CHARTER_MAX  = CFG.num("difficulty_select.charter.max_count", 3)
+local CHARTER_BORDER_DARKEN = CFG.num("difficulty_select.charter.border_darken", 0.55)
 
 -- Vault chart name, relative to a difficulty bar's top-left (centred), squished + tilted like the charters.
 local VAULT_CX   = CFG.num("difficulty_select.vault.center_x", 178)
@@ -182,6 +184,21 @@ local charterFont, vaultFont
 local function ensureLabelFonts()
     if charterFont == nil then charterFont = TEXT:Create(18) end
     if vaultFont   == nil then vaultFont   = TEXT:Create(24) end
+end
+
+-- the charter outline: the level colour darkened, one COLOR object per level colour
+local charterBorders = {}
+local function charterBorderFor(col)
+    local border = charterBorders[col]
+    if border == nil then
+        local ok, made = pcall(function()
+            local r, g, b = Color.fromEngine(col)
+            return Color.toEngine(Color.darken(r, g, b, CHARTER_BORDER_DARKEN))
+        end)
+        border = (ok and made) or COLOR:CreateColorFromRGBA(0, 0, 0, 255)
+        charterBorders[col] = border
+    end
+    return border
 end
 
 -- Player selector (P1..P5) texture is split vertically at y = PSEL_SPLIT_Y: the wide TOP half frames a
@@ -519,13 +536,16 @@ local function drawLevelStars(level, bar, bx, by, opacity)
 end
 
 -- Up to CHARTER_MAX charter names for a difficulty bar whose Note-local top-left is (bx,by). Each name is a
--- single cached texture (GetText), centre-anchored at its transformed point and rotated as one piece.
-local function drawCharters(charters, bx, by, opacity)
+-- single cached texture (GetText), white with an outline in the bar's level colour darkened,
+-- centre-anchored at its transformed point and rotated as one piece.
+local function drawCharters(charters, difficulty, isVault, bx, by, opacity)
     if charters == nil then return end
     ensureLabelFonts()
+    local col = isVault and LVL_VAULT_COLOR or (DIFFSELECT_LEVEL_COLORS[difficulty + 1] or COL_WHITE)
+    local border = charterBorderFor(col)
     for k = 1, math.min(CHARTER_MAX, #charters) do
         local sx, sy = nmap(bx + CHARTER_CX + (k - 1) * CHARTER_DX, by + CHARTER_CY + (k - 1) * CHARTER_DY)
-        local tex = charterFont:GetText(charters[k], true, CHARTER_MAXW)
+        local tex = charterFont:GetText(charters[k], true, CHARTER_MAXW, COL_WHITE, border)
         tex:SetRotation(CHARTER_ROT + nAngleDeg)
         tex:SetOpacity(opacity)
         tex:DrawAtAnchor(sx, sy, "center")
@@ -577,7 +597,7 @@ function M.drawPanel()
                 end
             end
             drawTexTL(tex, bx, by, opacityNorm)
-            drawCharters(barinfo.charters, bx, by, opacityNorm)
+            drawCharters(barinfo.charters, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
             drawLevelNumber(barinfo.level, barinfo.isplus, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
             drawLevelGauge(barinfo.level, barinfo.difficulty, barinfo.vault, bx, by, opacityNorm)
             drawLevelStars(barinfo.level, barinfo.vault and 7 or (barinfo.difficulty + 2), bx, by, opacityNorm)
