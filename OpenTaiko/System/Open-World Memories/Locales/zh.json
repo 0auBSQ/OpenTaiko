@@ -123,7 +123,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "谱面在此次游玩后已被修改",
         "SONGSELECT_REPLAY_REASON_RNG": "使用了无法回放的随机模组",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "来自其他游戏版本的 Dynamic Beat 回放",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "记录于音符随机打乱加入种子之前"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "记录于音符随机打乱加入种子之前",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "演奏模式",
+        "TITLE_PERFORMANCE_DESC": "用你喜欢的设置游玩太鼓谱面！\n可供 1 至 5 人游玩。",
+        "TITLE_DOJO": "狐之道场",
+        "TITLE_DOJO_DESC": "挑战狐狸乐队精心准备的段位认定！\n仅限单人。",
+        "TITLE_TOWERS": "生存模式",
+        "TITLE_TOWERS_DESC": "在生存挑战中攀登高塔，试着登上顶端！\n仅限单人。",
+        "TITLE_AI_BATTLE": "AI 对战模式",
+        "TITLE_AI_BATTLE_DESC": "在你喜欢的谱面上与 AItritus 一决高下，赢下胜利！\n仅限单人。",
+        "TITLE_TRAINING": "练习模式",
+        "TITLE_TRAINING_DESC": "练习你喜欢的谱面，直到熟练掌握！\n仅限单人。",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "表演时间到！在 Nokon 的最佳节目中展示你的音乐知识！\n可供 1 至 5 人游玩。",
+        "TITLE_MYROOM": "我的房间",
+        "TITLE_MYROOM_DESC": "装饰你的专属房间，摆放家具，并拜访其他玩家的房间！",
+        "TITLE_STORE": "OpenTaiko 杂货店",
+        "TITLE_STORE_DESC": "用你的 OpenTaiko 金币换取超棒的好物！*眨眼*",
+        "TITLE_VAULT": "秘密金库",
+        "TITLE_VAULT_DESC": "一个充满谜团的地方，钥匙在这里似乎有着特别的价值……",
+        "TITLE_SETTINGS": "设置",
+        "TITLE_SETTINGS_DESC": "调整设置，打造适合你的游戏体验！",
+        "TITLE_EXIT": "退出",
+        "TITLE_EXIT_DESC": "下次见！",
+        "TITLE_VAULT_LOCKED_DESC": "你能听见我吗……？"
 
     }
 }

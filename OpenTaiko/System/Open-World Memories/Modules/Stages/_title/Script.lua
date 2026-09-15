@@ -24,6 +24,15 @@ local function darken(c, f)     f = f or 0.35
 local white = col(255, 255, 255)
 local black = col(0, 0, 0)
 
+-- ── Locale ────────────────────────────────────────────────────────────────────
+-- the skin's Locales/<code>.json through THEME; the English text stays in the code as the fallback
+
+local function tr(key, fallback)
+    local ok, s = pcall(function() return THEME:GetSkinString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[" then return s end
+    return fallback
+end
+
 -- ── Vault unlock check ────────────────────────────────────────────────────────
 
 local function isVaultUnlocked()
@@ -37,51 +46,51 @@ local function buildMenus()
 
     local m = {
         {
-            title = "Performance Mode",
-            desc  = "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players.",
+            title = tr("TITLE_PERFORMANCE", "Performance Mode"),
+            desc  = tr("TITLE_PERFORMANCE_DESC", "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players."),
             c     = col(255, 140, 0),
             via   = "stage", stage = "regular_song_select",
             playerPrompt = true,
         },
         {
-            title = "The Fox Dojo",
-            desc  = "Challenge various dan exams tailored by the Fox Band!\nSingle player only.",
+            title = tr("TITLE_DOJO", "The Fox Dojo"),
+            desc  = tr("TITLE_DOJO_DESC", "Challenge various dan exams tailored by the Fox Band!\nSingle player only."),
             c     = col(0, 50, 150),
             via   = "stage", stage = "dan_select", trans = "dan_doors",
         },
         {
-            title = "Taiko Towers",
-            desc  = "Climb the towers through survival challenges and try getting to the top!\nSingle player only.",
+            title = tr("TITLE_TOWERS", "Survival Mode"),
+            desc  = tr("TITLE_TOWERS_DESC", "Climb the towers through survival challenges and try getting to the top!\nSingle player only."),
             c     = col(100, 210, 50),
             via   = "stage", stage = "tower_select",
         },
         {
-            title = "AI Battle Mode",
-            desc  = "Fight AItritus on your favorite charts and try to get the W!\nSingle player only.",
+            title = tr("TITLE_AI_BATTLE", "AI Battle Mode"),
+            desc  = tr("TITLE_AI_BATTLE_DESC", "Fight AItritus on your favorite charts and try to get the W!\nSingle player only."),
             c     = col(0, 200, 220),
             via   = "stage", stage = "ai_battle_song_select",
         },
         {
-            title = "Training Mode",
-            desc  = "Practice your favorite charts to get the hang of them!\nSingle player only.",
+            title = tr("TITLE_TRAINING", "Training Mode"),
+            desc  = tr("TITLE_TRAINING_DESC", "Practice your favorite charts to get the hang of them!\nSingle player only."),
             c     = col(210, 185, 130),
             via   = "stage", stage = "training_song_select",
         },
         {
-            title = "Intro Nokon",
-            desc  = "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players.",
+            title = tr("TITLE_INTRO_NOKON", "Intro Nokon"),
+            desc  = tr("TITLE_INTRO_NOKON_DESC", "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players."),
             c     = col(140, 80, 30),
             via   = "stage", stage = "intro_nokon", trans = "nokon_curtain",
         },
         {
-            title = "My Room",
-            desc  = "Decorate your personal room, place furniture, and visit other players' rooms!",
+            title = tr("TITLE_MYROOM", "My Room"),
+            desc  = tr("TITLE_MYROOM_DESC", "Decorate your personal room, place furniture, and visit other players' rooms!"),
             c     = col(30, 150, 60),
             via   = "stage", stage = "myroom",
         },
         {
-            title = "OpenTaiko's General Store",
-            desc  = "Spend your OpenTaiko coins for very nice goods! *wink*",
+            title = tr("TITLE_STORE", "OpenTaiko's General Store"),
+            desc  = tr("TITLE_STORE_DESC", "Spend your OpenTaiko coins for very nice goods! *wink*"),
             c     = col(0, 160, 170),
             via   = "stage", stage = "coin_shop",
         },
@@ -90,15 +99,15 @@ local function buildMenus()
     -- Vault entry: conditional on unlock state
     if isVaultUnlocked() then
         m[#m + 1] = {
-            title = "Secret Vault",
-            desc  = "A place full of mysteries where keys seems to have a particular value...",
+            title = tr("TITLE_VAULT", "Secret Vault"),
+            desc  = tr("TITLE_VAULT_DESC", "A place full of mysteries where keys seems to have a particular value..."),
             c     = col(80, 80, 90),
             via   = "stage", stage = "secret_vault_rw",
         }
     else
         m[#m + 1] = {
             title  = "???",
-            desc   = "Can you hear me...?",
+            desc   = tr("TITLE_VAULT_LOCKED_DESC", "Can you hear me...?"),
             c      = col(80, 80, 90),
             via    = "stage", stage = "secret_vault_rw",
             static = true,
@@ -106,14 +115,14 @@ local function buildMenus()
     end
 
     m[#m + 1] = {
-        title = "Settings",
-        desc  = "Adjust your settings to fit with your play experience!",
+        title = tr("TITLE_SETTINGS", "Settings"),
+        desc  = tr("TITLE_SETTINGS_DESC", "Adjust your settings to fit with your play experience!"),
         c     = col(170, 170, 175),
         via   = "config",
     }
     m[#m + 1] = {
-        title = "Exit",
-        desc  = "See you next time!",
+        title = tr("TITLE_EXIT", "Exit"),
+        desc  = tr("TITLE_EXIT_DESC", "See you next time!"),
         c     = col(100, 100, 105),
         via   = "exit",
     }
@@ -308,6 +317,13 @@ function deactivate()
 end
 
 function afterSongEnum()
+end
+
+-- the boxes carry localized text: rebuild them in the new language (the cache holds string textures)
+function reloadLanguage()
+    menus     = buildMenus()
+    textCache = {}
+    curIdx    = math.max(1, math.min(curIdx, #menus))
 end
 
 -- ── Draw ──────────────────────────────────────────────────────────────────────

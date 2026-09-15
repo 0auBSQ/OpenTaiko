@@ -123,7 +123,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "Die Notenkarte wurde nach diesem Spiel geändert",
         "SONGSELECT_REPLAY_REASON_RNG": "Verwendet Zufalls-Mods, die nicht wiedergegeben werden können",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Dynamic-Beat-Replay aus einer anderen Spielversion",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Aufgenommen, bevor das Notenmischen einen Seed bekam"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Aufgenommen, bevor das Notenmischen einen Seed bekam",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Performance-Modus",
+        "TITLE_PERFORMANCE_DESC": "Spiele Taiko-Charts mit deinen bevorzugten Einstellungen!\nSpielbar mit 1 bis 5 Spielern.",
+        "TITLE_DOJO": "Das Fuchs-Dojo",
+        "TITLE_DOJO_DESC": "Stelle dich den Dan-Prüfungen der Fox Band!\nNur für einen Spieler.",
+        "TITLE_TOWERS": "Überlebensmodus",
+        "TITLE_TOWERS_DESC": "Erklimme die Türme in Überlebens-Challenges und versuche, die Spitze zu erreichen!\nNur für einen Spieler.",
+        "TITLE_AI_BATTLE": "KI-Kampfmodus",
+        "TITLE_AI_BATTLE_DESC": "Tritt auf deinen Lieblings-Charts gegen AItritus an und hol dir den Sieg!\nNur für einen Spieler.",
+        "TITLE_TRAINING": "Trainingsmodus",
+        "TITLE_TRAINING_DESC": "Übe deine Lieblings-Charts, bis du sie beherrschst!\nNur für einen Spieler.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "Showtime! Zeig dein Musikwissen in Nokons bester Show!\nSpielbar mit 1 bis 5 Spielern.",
+        "TITLE_MYROOM": "Mein Zimmer",
+        "TITLE_MYROOM_DESC": "Richte dein eigenes Zimmer ein, stelle Möbel auf und besuche die Zimmer anderer Spieler!",
+        "TITLE_STORE": "OpenTaikos Gemischtwarenladen",
+        "TITLE_STORE_DESC": "Gib deine OpenTaiko-Münzen für richtig schöne Waren aus! *zwinker*",
+        "TITLE_VAULT": "Geheimtresor",
+        "TITLE_VAULT_DESC": "Ein Ort voller Rätsel, an dem Schlüssel einen besonderen Wert zu haben scheinen...",
+        "TITLE_SETTINGS": "Einstellungen",
+        "TITLE_SETTINGS_DESC": "Passe deine Einstellungen an dein Spielerlebnis an!",
+        "TITLE_EXIT": "Beenden",
+        "TITLE_EXIT_DESC": "Bis zum nächsten Mal!",
+        "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?"
 
     }
 }

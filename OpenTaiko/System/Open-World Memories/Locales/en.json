@@ -125,7 +125,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "The chart was modified after this play",
         "SONGSELECT_REPLAY_REASON_RNG": "Uses random mods that cannot be replayed",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Dynamic Beat replay from a different game version",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Recorded before the note shuffle was seeded"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Recorded before the note shuffle was seeded",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Performance Mode",
+        "TITLE_PERFORMANCE_DESC": "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players.",
+        "TITLE_DOJO": "The Fox Dojo",
+        "TITLE_DOJO_DESC": "Challenge various dan exams tailored by the Fox Band!\nSingle player only.",
+        "TITLE_TOWERS": "Survival Mode",
+        "TITLE_TOWERS_DESC": "Climb the towers through survival challenges and try getting to the top!\nSingle player only.",
+        "TITLE_AI_BATTLE": "AI Battle Mode",
+        "TITLE_AI_BATTLE_DESC": "Fight AItritus on your favorite charts and try to get the W!\nSingle player only.",
+        "TITLE_TRAINING": "Training Mode",
+        "TITLE_TRAINING_DESC": "Practice your favorite charts to get the hang of them!\nSingle player only.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players.",
+        "TITLE_MYROOM": "My Room",
+        "TITLE_MYROOM_DESC": "Decorate your personal room, place furniture, and visit other players' rooms!",
+        "TITLE_STORE": "OpenTaiko's General Store",
+        "TITLE_STORE_DESC": "Spend your OpenTaiko coins for very nice goods! *wink*",
+        "TITLE_VAULT": "Secret Vault",
+        "TITLE_VAULT_DESC": "A place full of mysteries where keys seems to have a particular value...",
+        "TITLE_SETTINGS": "Settings",
+        "TITLE_SETTINGS_DESC": "Adjust your settings to fit with your play experience!",
+        "TITLE_EXIT": "Exit",
+        "TITLE_EXIT_DESC": "See you next time!",
+        "TITLE_VAULT_LOCKED_DESC": "Can you hear me...?"
 
     }
 }

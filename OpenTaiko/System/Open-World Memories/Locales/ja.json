@@ -123,7 +123,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "プレイ後に譜面が変更されています",
         "SONGSELECT_REPLAY_REASON_RNG": "再現できないランダム系モッドを使用しています",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "別のゲームバージョンで記録されたダイナミックビートのリプレイです",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "音符シャッフルがシード化される前に記録されました"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "音符シャッフルがシード化される前に記録されました",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "演奏モード",
+        "TITLE_PERFORMANCE_DESC": "好きな設定で太鼓の譜面をプレイしよう！\n1〜5人でプレイできます。",
+        "TITLE_DOJO": "狐の道場",
+        "TITLE_DOJO_DESC": "狐バンドが仕立てた段位認定に挑戦しよう！\n1人プレイ専用。",
+        "TITLE_TOWERS": "サバイバルモード",
+        "TITLE_TOWERS_DESC": "サバイバル形式でタワーを登り、頂上を目指そう！\n1人プレイ専用。",
+        "TITLE_AI_BATTLE": "AIバトルモード",
+        "TITLE_AI_BATTLE_DESC": "お気に入りの譜面でAItritusと対戦して勝利をつかめ！\n1人プレイ専用。",
+        "TITLE_TRAINING": "特訓モード",
+        "TITLE_TRAINING_DESC": "お気に入りの譜面を練習して身につけよう！\n1人プレイ専用。",
+        "TITLE_INTRO_NOKON": "イントロ・ノコン",
+        "TITLE_INTRO_NOKON_DESC": "ショータイム！ノコンのベストショーで音楽の知識を披露しよう！\n1〜5人でプレイできます。",
+        "TITLE_MYROOM": "マイルーム",
+        "TITLE_MYROOM_DESC": "自分の部屋を飾って家具を置き、他のプレイヤーの部屋を訪ねよう！",
+        "TITLE_STORE": "OpenTaiko雑貨店",
+        "TITLE_STORE_DESC": "OpenTaikoコインを使って素敵な品物を手に入れよう！ *ウィンク*",
+        "TITLE_VAULT": "ムショ行要素",
+        "TITLE_VAULT_DESC": "鍵が特別な価値を持つらしい、謎に満ちた場所…",
+        "TITLE_SETTINGS": "設定",
+        "TITLE_SETTINGS_DESC": "プレイ環境に合わせて設定を調整しよう！",
+        "TITLE_EXIT": "終了",
+        "TITLE_EXIT_DESC": "またね！",
+        "TITLE_VAULT_LOCKED_DESC": "聞こえますか…？"
 
     }
 }

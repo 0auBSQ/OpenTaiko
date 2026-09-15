@@ -123,7 +123,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "La partitura fue modificada después de esta partida",
         "SONGSELECT_REPLAY_REASON_RNG": "Usa mods aleatorios que no se pueden reproducir",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "Repetición de Dynamic Beat de otra versión del juego",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Grabada antes de que la mezcla de notas tuviera semilla"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "Grabada antes de que la mezcla de notas tuviera semilla",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "Modo Actuación",
+        "TITLE_PERFORMANCE_DESC": "¡Juega partituras de Taiko con tus ajustes preferidos!\nDe 1 a 5 jugadores.",
+        "TITLE_DOJO": "El Dojo del Zorro",
+        "TITLE_DOJO_DESC": "¡Enfréntate a los exámenes de dan preparados por la Fox Band!\nSolo un jugador.",
+        "TITLE_TOWERS": "Modo Supervivencia",
+        "TITLE_TOWERS_DESC": "¡Escala las torres en desafíos de supervivencia e intenta llegar a la cima!\nSolo un jugador.",
+        "TITLE_AI_BATTLE": "Modo Batalla contra IA",
+        "TITLE_AI_BATTLE_DESC": "¡Lucha contra AItritus en tus partituras favoritas y llévate la victoria!\nSolo un jugador.",
+        "TITLE_TRAINING": "Modo Entrenamiento",
+        "TITLE_TRAINING_DESC": "¡Practica tus partituras favoritas hasta dominarlas!\nSolo un jugador.",
+        "TITLE_INTRO_NOKON": "Intro Nokon",
+        "TITLE_INTRO_NOKON_DESC": "¡Es hora del show! ¡Demuestra tus conocimientos musicales en el mejor show de Nokon!\nDe 1 a 5 jugadores.",
+        "TITLE_MYROOM": "Mi Habitación",
+        "TITLE_MYROOM_DESC": "¡Decora tu habitación, coloca muebles y visita las habitaciones de otros jugadores!",
+        "TITLE_STORE": "La Tienda General de OpenTaiko",
+        "TITLE_STORE_DESC": "¡Gasta tus monedas OpenTaiko en artículos muy bonitos! *guiño*",
+        "TITLE_VAULT": "Bóveda Secreta",
+        "TITLE_VAULT_DESC": "Un lugar lleno de misterios donde las llaves parecen tener un valor especial...",
+        "TITLE_SETTINGS": "Ajustes",
+        "TITLE_SETTINGS_DESC": "¡Ajusta la configuración a tu experiencia de juego!",
+        "TITLE_EXIT": "Salir",
+        "TITLE_EXIT_DESC": "¡Hasta la próxima!",
+        "TITLE_VAULT_LOCKED_DESC": "¿Me oyes...?"
 
     }
 }

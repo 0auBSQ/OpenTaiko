@@ -123,7 +123,32 @@
         "SONGSELECT_REPLAY_CHART_CHANGED": "플레이 이후 채보가 수정되었습니다",
         "SONGSELECT_REPLAY_REASON_RNG": "다시 재생할 수 없는 랜덤 모드를 사용합니다",
         "SONGSELECT_REPLAY_REASON_DYNAMIC_BEAT": "다른 게임 버전의 다이내믹 비트 리플레이입니다",
-        "SONGSELECT_REPLAY_REASON_UNSEEDED": "노트 셔플에 시드가 적용되기 전에 기록되었습니다"
+        "SONGSELECT_REPLAY_REASON_UNSEEDED": "노트 셔플에 시드가 적용되기 전에 기록되었습니다",
+
+        // Title screen: the menu boxes (the debug entries stay English)
+        "TITLE_PERFORMANCE": "연주 모드",
+        "TITLE_PERFORMANCE_DESC": "원하는 설정으로 태고 채보를 플레이하세요!\n1~5명이 플레이할 수 있습니다.",
+        "TITLE_DOJO": "여우 도장",
+        "TITLE_DOJO_DESC": "폭스 밴드가 준비한 단위 인정에 도전하세요!\n1인 전용.",
+        "TITLE_TOWERS": "서바이벌 모드",
+        "TITLE_TOWERS_DESC": "서바이벌 도전으로 타워를 오르며 정상을 노려보세요!\n1인 전용.",
+        "TITLE_AI_BATTLE": "AI 배틀 모드",
+        "TITLE_AI_BATTLE_DESC": "좋아하는 채보에서 AItritus와 맞서 승리를 거머쥐세요!\n1인 전용.",
+        "TITLE_TRAINING": "트레이닝 모드",
+        "TITLE_TRAINING_DESC": "좋아하는 채보를 연습해서 완벽하게 익히세요!\n1인 전용.",
+        "TITLE_INTRO_NOKON": "인트로 노콘",
+        "TITLE_INTRO_NOKON_DESC": "쇼 타임! 노콘의 최고의 쇼에서 음악 지식을 뽐내세요!\n1~5명이 플레이할 수 있습니다.",
+        "TITLE_MYROOM": "마이 룸",
+        "TITLE_MYROOM_DESC": "나만의 방을 꾸미고 가구를 배치하고 다른 플레이어의 방을 방문하세요!",
+        "TITLE_STORE": "OpenTaiko 잡화점",
+        "TITLE_STORE_DESC": "OpenTaiko 코인으로 멋진 물건을 장만하세요! *윙크*",
+        "TITLE_VAULT": "비밀 금고",
+        "TITLE_VAULT_DESC": "열쇠가 특별한 가치를 지닌 듯한, 수수께끼로 가득한 곳...",
+        "TITLE_SETTINGS": "설정",
+        "TITLE_SETTINGS_DESC": "플레이 환경에 맞게 설정을 조정하세요!",
+        "TITLE_EXIT": "종료",
+        "TITLE_EXIT_DESC": "다음에 또 만나요!",
+        "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?"
 
     }
 }
