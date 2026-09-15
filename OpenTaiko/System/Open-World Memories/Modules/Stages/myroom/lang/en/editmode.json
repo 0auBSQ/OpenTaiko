@@ -9,7 +9,7 @@
   "action_rotate": "Rotate",
   "action_move": "Move",
   "action_remove": "Remove",
-  "hint_default": "Edit Mode  —  pick a tab, choose an item, click to place.  [Tab] done",
+  "hint_default": "Edit Mode  —  pick a tab, choose an item, click to place.  RMB orbits · MMB / WASD pans · [Tab] done",
   "hint_moving_wall": "Moving %s   ·   point at a wall slot (low/high) · %s · [Esc] cancels",
   "hint_moving": "Moving %s   ·   wheel rotates · %s · [Esc] cancels",
   "drop_release": "release to drop",

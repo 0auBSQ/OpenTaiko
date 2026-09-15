@@ -778,16 +778,32 @@ local function getMoveUnitIsoXZ()
 end
 
 -- edit-mode camera: RMB drag rotates, wheel zooms, WASD/arrows PAN the look-at target on the ground
--- plane (the player character does not move while editing). Same clamps as play mode.
+-- plane, and a middle-button drag pans it too, the ground following the mouse (the player character
+-- does not move while editing). Same clamps as play mode.
 local function getEditCameraFuncs(dt) return {
     pan = panCamera,
     zoom = zoomCamera,
-    move = function()
+    move = function(dmx, dmy)
+        local cam = world.cam
+        local tx, tz = cam.tx or 0, cam.tz or 0
         local ix, iz = getMoveUnitIsoXZ()
         if ix ~= 0 or iz ~= 0 then
-            local cam = world.cam
             local sp = 7 * dt
-            cam:setTarget((cam.tx or 0) + ix * sp, cam.ty or (FY + 0.4), (cam.tz or 0) + iz * sp)
+            tx, tz = tx + ix * sp, tz + iz * sp
+        end
+        if INPUT:MousePressing("middle") and (dmx ~= 0 or dmy ~= 0) then
+            -- world units per pixel at the target's depth; the vertical axis stretches over the
+            -- ground by the camera's pitch. Dragging right slides the ground right (target left).
+            local fy = rad(cam.yaw)
+            local fwdX, fwdZ = sin(fy), cos(fy)
+            local rgtX, rgtZ = cos(fy), -sin(fy)
+            local k = (cam.dist or 20) * 2 * math.tan(rad((cam.fov or FOV) / 2)) / SCREEN_H
+            local ky = k / math.max(0.25, sin(rad(math.abs(cam.pitch or -40))))
+            tx = tx - rgtX * dmx * k + fwdX * dmy * ky
+            tz = tz - rgtZ * dmx * k + fwdZ * dmy * ky
+        end
+        if tx ~= (cam.tx or 0) or tz ~= (cam.tz or 0) then
+            cam:setTarget(tx, cam.ty or (FY + 0.4), tz)
         end
     end,
 } end
@@ -937,8 +953,7 @@ function update(ts)
             fit = math.min(world.cam.maxDist or fit, math.max(world.cam.minDist or fit, fit))
             world.cam:setRig{ yaw = 45, pitch = -40, fov = FOV, dist = fit }
             world.cam:setTarget(room:gridW() * 0.5, FY + 0.4, room:gridH() * 0.5)
-            edit:enter(pc, pr); mode = "edit"
-            SHARED:GetSharedSound("Decide"):Play()
+            edit:enter(pc, pr); mode = "edit"      -- Edit:enter plays its own open sound
             return nil
         end
     end

@@ -9,7 +9,7 @@
   "action_rotate": "Pivoter",
   "action_move": "Déplacer",
   "action_remove": "Retirer",
-  "hint_default": "Mode édition  —  choisissez un onglet, un objet, puis cliquez pour placer.  [Tab] terminer",
+  "hint_default": "Mode édition  —  choisissez un onglet, un objet, puis cliquez pour placer.  Clic droit : orbite · molette enfoncée / WASD : déplacer · [Tab] terminer",
   "hint_moving_wall": "Déplacement de %s   ·   visez un emplacement mural (bas/haut) · %s · [Échap] annule",
   "hint_moving": "Déplacement de %s   ·   molette pour pivoter · %s · [Échap] annule",
   "drop_release": "relâchez pour poser",

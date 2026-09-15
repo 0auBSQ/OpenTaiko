@@ -9,7 +9,7 @@
   "action_rotate": "回転",
   "action_move": "移動",
   "action_remove": "撤去",
-  "hint_default": "編集モード ― タブを選び、アイテムを選んでクリックで配置。[Tab]で終了",
+  "hint_default": "編集モード ― タブを選び、アイテムを選んでクリックで配置。右ドラッグで回転・中ドラッグ/WASDで移動・[Tab]で終了",
   "hint_moving_wall": "%sを移動中 ・ 壁のスロット（上/下）を指して・%s・[Esc]でキャンセル",
   "hint_moving": "%sを移動中 ・ ホイールで回転・%s・[Esc]でキャンセル",
   "drop_release": "離して設置",
