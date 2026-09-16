@@ -144,6 +144,7 @@ local function buildMenus()
     m[#m + 1] = dbgEntry("Raytracer Demo (Debug)",     "The Lua3DScene path-traced raytracer mode.", "rt_demo")
     m[#m + 1] = dbgEntry("Particle Showcase (Debug)",  "A stress test of the Lua3DScene particle engine.", "particles")
     m[#m + 1] = dbgEntry("Online Lobby (Debug)",       "(Beta, Share your room code only with people you trust)", "onlinelobby")
+    m[#m + 1] = dbgEntry("Modal Test (Debug)",         "Plays the reward and unlock modals of every rarity and type.", "modal_test")
 
     m[#m + 1] = {
         title = "My Room (Old)",

@@ -9,11 +9,15 @@
 --   local purse = CoinBox.new{ x = 1560, y = 60, w = 300, h = 66,        -- default: top-right corner
 --                              sfx = <sound handle>,                    -- coins landing: the modal's Coin.ogg
 --                              paySfx = <sound handle> }                -- a payment: the coin shop's Buy.ogg
---   purse:show(coins)   purse:hide()   purse:visible()   purse:setPrice(n | nil)
---   purse:pay(n)        purse:gain(n)  purse:update(dt)  purse:draw()   purse:dispose()
+--   purse:show(coins)   purse:hide()   purse:visible()   purse:setPrice(n | nil)   purse:setBonus(n | nil)
+--   purse:pay(n)        purse:gain(n)  purse:add(n)     purse:update(dt)          purse:draw()   purse:dispose()
 --
 -- Every coin figure passed in is the true balance change; the number on the pill catches up on
--- its own once the coins have landed.
+-- its own once the coins have landed. setBonus shows a green "+n" above the pill (coins still to
+-- come, e.g. while the unlock modal pours them into its piggy bank) and add rolls the balance up
+-- without any coin flying in, for callers animating the coins themselves; drawCoin draws the coin
+-- for them. The coin is the "Coin" shared texture (_boot registers Textures/Coin.png, so an artist
+-- can redraw it); a drawn fallback covers a skin without one.
 
 local CoinBox = {}
 CoinBox.__index = CoinBox
@@ -41,7 +45,7 @@ local function pill(w, h, r, g, b)
     return cv
 end
 
--- the game's coin: a dark rim, red top half, blue bottom half, a glint
+-- the fallback coin: a dark rim, red top half, blue bottom half, a glint
 local function coinIcon(s)
     local cv = CANVAS:CreateCanvas(s, s)
     local c, r = floor(s / 2), floor(s / 2) - 1
@@ -96,7 +100,9 @@ function CoinBox:_ensureArt()
     if self.pillCv then return end
     self.pillCv = pill(self.w, self.h, self.face[1], self.face[2], self.face[3])
     self.shadowCv = pill(self.w, self.h, 40, 34, 60)
-    self.coinCv = coinIcon(ICON)
+    if self.coinTex == nil then
+        pcall(function() self.coinTex = SHARED:GetSharedTexture("Coin") end)
+    end
     if self.sfx == nil then
         pcall(function() self.sfx = SOUND:CreateSFX(COIN_SFX) end)
         self.ownSfx = self.sfx ~= nil
@@ -119,6 +125,24 @@ function CoinBox:_chime()
     if self.sfx then pcall(function() self.sfx:Play() end) end
 end
 
+-- the coin, centred at (x, y), sized as the pill's icon times (sx, sy): the shared texture when it
+-- has loaded, the drawn fallback otherwise
+function CoinBox:drawCoin(x, y, sx, sy, opacity)
+    sx, sy, opacity = sx or 1, sy or 1, opacity or 1
+    local tex = self.coinTex
+    if tex ~= nil and (tex.Width or 0) > 0 then
+        local k = ICON / tex.Width
+        tex:SetScale(k * sx, k * sy) ; tex:SetOpacity(opacity)
+        tex:DrawAtAnchor(x, y, "center")
+        tex:SetScale(1, 1) ; tex:SetOpacity(1)
+        return
+    end
+    if self.coinCv == nil then self.coinCv = coinIcon(ICON) end
+    self.coinCv:SetScale(sx, sy) ; self.coinCv:SetOpacity(opacity)
+    self.coinCv:DrawAtAnchor(floor(x + 0.5), floor(y + 0.5), "center")
+    self.coinCv:SetScale(1, 1) ; self.coinCv:SetOpacity(1)
+end
+
 -- ── state ─────────────────────────────────────────────────────────────────────────────────────
 function CoinBox:show(n)
     self:_ensureArt()
@@ -126,10 +150,18 @@ function CoinBox:show(n)
     self.shown = true
 end
 
-function CoinBox:hide() self.shown = false ; self.price = nil end
+function CoinBox:hide() self.shown = false ; self.price = nil ; self.bonus = nil end
 function CoinBox:visible() return self.shown or self.alpha > 0.01 end
 function CoinBox:setPrice(n) self.price = n end
+function CoinBox:setBonus(n) self.bonus = (n ~= nil and n > 0) and n or nil end
 function CoinBox:balanceValue() return self.balance end
+
+-- the balance rolls up right away; the caller draws the coins
+function CoinBox:add(n)
+    self:_ensureArt()
+    self.balance = self.balance + n
+    self.rollDelay = 0
+end
 
 -- the price label turns red and drops into the purse; coins follow it; the balance rolls down
 function CoinBox:pay(n)
@@ -195,10 +227,12 @@ function CoinBox:draw()
     local x, y, w, h = self.x, self.y, self.w, self.h
     self.shadowCv:SetOpacity(0.35 * a) ; self.shadowCv:Draw(x + 4, y + 6) ; self.shadowCv:SetOpacity(1)
     self.pillCv:SetOpacity(a) ; self.pillCv:Draw(x, y) ; self.pillCv:SetOpacity(1)
-    self.coinCv:SetOpacity(a) ; self.coinCv:Draw(x + 11, y + (h - ICON) / 2) ; self.coinCv:SetOpacity(1)
+    self:drawCoin(x + 11 + ICON / 2, y + h / 2, 1, 1, a)
     self:_text(30, floor(self.rolling + 0.5), x + w - 24, y + h / 2, self.textColor, a, "right")
     if self.price ~= nil then
         self:_text(24, self.price, x + w - 24, y - 26, self.textColor, a, "right")
+    elseif self.bonus ~= nil then
+        self:_text(26, "+" .. tostring(self.bonus), x + w - 24, y - 26, GREEN, a, "right")
     end
     for _, d in ipairs(self.drops) do
         local k = easeIn(min(1, d.t / d.dur))
@@ -215,23 +249,21 @@ function CoinBox:draw()
             local cx = c.x + (c.tx - c.x) * e
             local cy = c.y + (c.ty - c.y) * e - sin(k * 3.14159) * 34
             local s = 0.5 + 0.2 * sin(k * 12 * c.spin)             -- a little wobble reads as a spin
-            self.coinCv:SetScale(s, 0.5) ; self.coinCv:SetOpacity(a)
-            self.coinCv:DrawAtAnchor(cx, cy, "center")
-            self.coinCv:SetScale(1, 1) ; self.coinCv:SetOpacity(1)
+            self:drawCoin(cx, cy, s, 0.5, a)
         end
     end
 end
 
 function CoinBox:dispose()
     for _, cv in ipairs({ self.pillCv, self.shadowCv, self.coinCv }) do if cv then pcall(function() cv:Dispose() end) end end
-    self.pillCv, self.shadowCv, self.coinCv = nil, nil, nil
+    self.pillCv, self.shadowCv, self.coinCv, self.coinTex = nil, nil, nil, nil     -- the shared texture is not ours to dispose
     if self.ownSfx and self.sfx then pcall(function() self.sfx:Dispose() end) end
     if self.ownPaySfx and self.paySfx then pcall(function() self.paySfx:Dispose() end) end
     self.sfx, self.ownSfx, self.paySfx, self.ownPaySfx = nil, false, nil, false
     for _, f in pairs(self._fonts or {}) do pcall(function() f:Dispose() end) end
     self._fonts, self._colors = {}, {}
     self.drops, self.rises, self.coins = {}, {}, {}
-    self.shown, self.alpha, self.price = false, 0, nil
+    self.shown, self.alpha, self.price, self.bonus = false, 0, nil, nil
 end
 
 return CoinBox

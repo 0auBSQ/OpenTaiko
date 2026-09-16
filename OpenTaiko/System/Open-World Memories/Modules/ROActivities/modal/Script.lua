@@ -1,252 +1,164 @@
--- Modal ROActivity
--- Ported from Modules/Modal/Script.lua to the new Lua API.
--- Textures and sounds are loaded from the original Modules/Modal/ location.
+---@diagnostic disable: undefined-global, undefined-field, need-check-nil, lowercase-global
+-- Modal ROActivity — the unlock and reward pop-ups. Activated by the engine after a result screen
+-- (one modal per queued reward) and by Lua stages (shops, the vault) with the same signature:
+--
+--   activate(player1to, rarity, type, info, secondary)
+--     type 0 coins:      info = amount, secondary = the balance after the reward
+--     type 1 character:  info = LuaCharacter (owned: disposed when the modal closes)
+--     type 2 puchichara: info = LuaPuchichara
+--     type 3 nameplate:  info = LuaNameplateInfo
+--     type 4 song:       info = LuaSongNode
+--     rarity = modal int 0..4 (common, uncommon, rare, epic, legendary); the item's own Rarity
+--       string (all seven, poor to mythical) is what picks the chest and colours when it is known:
+--       puchicharas, nameplates and songs carry it, characters are looked up in CHARACTERLIST.
+--       For types 1..4 a rarity name in `secondary` overrides that (the debug stage uses it).
 
 local NavInput = require("NavInput")
+local Fx = require("modal_fx")
+local Coins = require("modal_coins")
+local Chest = require("modal_chest")
+local Card = require("modal_card")
 
-local TEXTURES_DIR = "Textures/"
-local SOUNDS_DIR   = "Sounds/"
+local TEX, SND = "Textures/", "Sounds/"
+local ANIM_SOUNDS = { "slide", "coin", "coin_alt", "jingle", "puff", "cushion", "chest", "latch", "sparkle", "flash", "reveal", "close",
+                      "box_land", "box_rustle", "box_open" }
+local ANIM_TEXTURES = { "piggy", "cushion", "smoke", "dust", "wheel", "glow", "star", "spark", "web", "web2",
+                        "case_front", "case_side", "case_top", "rainbow" }
 
--- Target size for song preimages (both the per-song loaded image and the default fallback)
-local PREIMAGE_W = 400
-local PREIMAGE_H = 400
+-- the asset bag every flow draws from
+local A = { tex = {}, sfx = {}, fanfare = {}, icons = {} }
 
-local function scalePreimage(tex)
-	if tex == nil then return end
-	local w = tex.Width
-	local h = tex.Height
-	if w <= 0 or h <= 0 then return end
-	tex:SetScale(math.min(PREIMAGE_W / w, PREIMAGE_H / h), math.min(PREIMAGE_W / w, PREIMAGE_H / h))
+function A:play(name)
+    local s = self.sfx[name]
+    if s ~= nil then pcall(function() s:Play() end) end
 end
 
--- Current modal state
-local modal_current_type   = 0
-local modal_current_rarity = 1
-local modal_current_player = 1
-local modal_current_info   = nil
+-- key: one of Fx.RARITIES; each rarity has its own fanfare, growing with the tier
+function A:playFanfare(key)
+    local s = self.fanfare[key] or self.fanfare.common
+    if s ~= nil then pcall(function() s:Play() end) end
+end
 
--- Graphics
-local icon_players   = {}
-local modal_tx       = {}
-local modal_tx_coin  = nil
-
--- Sounds
-local modal_sfx      = {}
-local modal_sfx_coin = nil
-
--- Fonts
-local font_modal_header = nil
-local font_modal_body   = nil
-local font_modal_plate  = nil
-
--- Text strings set when a new modal is registered
-local modal_header_text = ""
-local modal_body_text   = ""
-local modal_body_fg     = nil
-local modal_body_bg     = nil
-
--- Animation counters
-local modal_duration          = 500
-local modal_counter           = 0
-local modal_loopanim_duration = 1000
-local modal_loopanim_counter  = 0
-
--- Song modal: per-modal preimage (disposed on deactivate) and persistent default fallback
-local modal_preimage_ref     = nil
-local modal_preimage_default = nil
-
--- Tmp (rarity index, 1-based)
-local modal_asset_id = 0
-
--- LangInt rarity for star display (matches HRarity.RarityToLangInt)
--- Used only for DrawTitlePlate calls that expect the lang-int scale.
-local modal_rarity_lang_int = 0
-local rarity_lang_int_map = {
-	["Poor"]      = 0,
-	["Common"]    = 1,
-	["Uncommon"]  = 2,
-	["Rare"]      = 3,
-	["Epic"]      = 4,
-	["Legendary"] = 5,
-	["Mythical"]  = 6,
-}
-
--- ────────────────────────────────────────────────────────────────────────────
--- ROActivity lifecycle
--- ────────────────────────────────────────────────────────────────────────────
+local coins, chest, card
+local state = nil            -- "coins" | "chest" | "card"
+local player = 1
+local pending = nil          -- the item waiting behind the chest reveal
+local nav = NavInput.p[""]
+local age = 0                -- seconds since activate: the press that opened the modal must not also skip it
+local INPUT_GRACE = 0.25
 
 function onStart()
-	for i = 1, 5 do
-		icon_players[i] = TEXTURE:CreateTexture(TEXTURES_DIR .. tostring(i) .. "P.png")
-	end
+    for i = 1, 5 do A.icons[i] = TEXTURE:CreateTexture(TEX .. i .. "P.png") end
+    A.tex.panel = TEXTURE:CreateTexture(TEX .. "0.png")          -- the one panel; the card tints it per rarity
+    for _, n in ipairs(ANIM_TEXTURES) do A.tex[n] = TEXTURE:CreateTexture(TEX .. "Anim/" .. n .. ".png") end
+    for _, r in ipairs(Fx.RARITIES) do
+        A.tex["chest_" .. r] = TEXTURE:CreateTexture(TEX .. "Anim/chest_" .. r .. ".png")
+        A.fanfare[r] = SOUND:CreateSFX(SND .. "Anim/fanfare_" .. r .. ".ogg")
+        if r ~= "poor" then A.sfx["open_" .. r] = SOUND:CreateSFX(SND .. "Anim/open_" .. r .. ".ogg") end
+    end
+    for _, n in ipairs(ANIM_SOUNDS) do A.sfx[n] = SOUND:CreateSFX(SND .. "Anim/" .. n .. ".ogg") end
+    A.tex.preimage = TEXTURE:CreateTexture(TEX .. "preimage.png")
+    A.fillCv = Fx.makeFill()
 
-	for i = 0, 4 do
-		modal_tx[i + 1]   = TEXTURE:CreateTexture(TEXTURES_DIR .. tostring(i) .. ".png")
-		modal_sfx[i + 1]  = SOUND:CreateSFX(SOUNDS_DIR .. tostring(i) .. ".ogg")
-	end
+    -- glyph fonts, all without a style token: CoinBox creates its own the same way and one script
+    -- must not mix the two forms (the NLua params cache)
+    A.fontHeader = TEXT:CreateGlyphCached(84)
+    A.fontName = TEXT:CreateGlyphCached(56)
+    A.fontSmall = TEXT:CreateGlyphCached(32)
+    A.fontPlate = TEXT:Create(16, "regular")
+    A.colPlateFg = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
+    A.colPlateBg = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+    A.colInk = COLOR:CreateColorFromRGBA(52, 58, 92, 255)
+    A.colInkOutline = COLOR:CreateColorFromRGBA(255, 255, 255, 230)
+    A.colPillText = COLOR:CreateColorFromRGBA(255, 255, 255, 255)
+    A.colPillOutline = COLOR:CreateColorFromRGBA(30, 30, 44, 255)
 
-	modal_tx_coin        = TEXTURE:CreateTexture(TEXTURES_DIR .. "Coin.png")
-	modal_sfx_coin       = SOUND:CreateSFX(SOUNDS_DIR .. "Coin.ogg")
-	modal_preimage_default = TEXTURE:CreateTexture(TEXTURES_DIR .. "preimage.png")
-	scalePreimage(modal_preimage_default)
-
-	-- glyph-composed (bounded per-character cache): the header/body strings change per modal, so per-string
-	-- textures at 84px were a large leak. The plate keeps GetText: DrawTitlePlate consumes a texture object.
-	font_modal_header = TEXT:CreateGlyphCached(84, "regular")
-	font_modal_body   = TEXT:CreateGlyphCached(84, "regular")
-	font_modal_plate  = TEXT:Create(16, "regular")
-
-	modal_body_fg = COLOR:CreateColorFromRGBA(0, 0, 0, 255)
-	modal_body_bg = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
+    coins, chest, card = Coins.new(A), Chest.new(A), Card.new(A)
 end
 
--- modal_asset_informations by type:
---   0 (Coin)       : coin amount (number)
---   1 (Character)  : LuaCharacter
---   2 (Puchichara) : CPuchichara (legacy)
---   3 (Nameplate)  : LuaNameplateInfo
---   4 (Song)       : LuaSongNode
-function activate(player1to, rarity, modal_type, modal_asset_informations, modal_asset_secondary)
-	local header_str = ""
-	local body_str   = ""
+-- the item's rarity string: its own field, or the character database entry for a LuaCharacter
+local function itemRarity(modal_type, info)
+    local r
+    pcall(function()
+        if modal_type == 1 then
+            local entry = CHARACTERLIST ~= nil and CHARACTERLIST:GetByName(info.FolderName) or nil
+            r = entry ~= nil and entry.Rarity or nil
+        else
+            r = info.Rarity
+        end
+    end)
+    return r
+end
 
-	modal_current_type   = modal_type
-	modal_current_rarity = rarity
-	modal_current_player = player1to
-	modal_current_info   = modal_asset_informations
+function activate(player1to, rarity, modal_type, info, secondary)
+    player = math.max(0, math.min(5, math.floor(tonumber(player1to) or 1)))
+    nav = NavInput.p[player] or NavInput.p[""]
+    rarity = math.floor(tonumber(rarity) or 0)
+    age = 0
+    if modal_type == 0 then
+        coins:start(info, secondary)
+        state = "coins"
+    else
+        local key = Fx.rarityKey(rarity, itemRarity(modal_type, info))
+        if type(secondary) == "string" and Fx.RARITY_COLOR[secondary:lower()] then key = secondary:lower() end
+        pending = { kind = modal_type, rarity = rarity, key = key, info = info }
+        -- a character's menu animation loads now, so the work hides behind the reveal instead of
+        -- landing on the card's pop-in frame
+        if modal_type == 1 and info ~= nil then pcall(function() info:LoadAnimation(CHARACTER.ANIM_MENU_NORMAL) end) end
+        chest:start(key)
+        state = "chest"
+    end
+end
 
-	modal_counter          = 0
-	modal_loopanim_counter = 0
-
-	if modal_type == 0 then
-		-- Coin
-		modal_current_rarity = 1
-		header_str = LANG:GetString("MODAL_TITLE_COIN")
-		body_str   = LANG:GetString("MODAL_MESSAGE_COIN", tostring(modal_asset_informations), tostring(modal_asset_secondary))
-		modal_sfx_coin:Play()
-
-	elseif modal_type == 1 then
-		-- Character (LuaCharacter)
-		header_str = LANG:GetString("MODAL_TITLE_CHARA")
-		body_str   = modal_current_info.DisplayName
-		modal_current_info:LoadAnimation(CHARACTER.ANIM_RENDER)
-
-	elseif modal_type == 2 then
-		-- Puchichara (LuaPuchichara)
-		header_str = LANG:GetString("MODAL_TITLE_PUCHI")
-		body_str   = modal_current_info.Name
-
-	elseif modal_type == 3 then
-		-- Nameplate (LuaNameplateInfo)
-		header_str = LANG:GetString("MODAL_TITLE_NAMEPLATE")
-		body_str   = modal_current_info.Title
-		modal_rarity_lang_int = rarity_lang_int_map[modal_current_info.Rarity] or 0
-
-	elseif modal_type == 4 then
-		-- Song (LuaSongNode)
-		header_str     = LANG:GetString("MODAL_TITLE_SONG")
-		body_str       = modal_current_info.Title or "??? (Not found)"
-		modal_preimage_ref = modal_current_info:GetPreimage()
-		scalePreimage(modal_preimage_ref)
-	end
-
-	modal_header_text = header_str
-	modal_body_text   = body_str
-
-	modal_asset_id = math.max(1, math.min(5, modal_current_rarity + 1))
-
-	if modal_type ~= 0 then
-		modal_sfx[modal_asset_id]:Play()
-	end
+local function close()
+    if state == "coins" then coins:stop()
+    elseif state == "chest" then chest:stop()
+    elseif state == "card" then card:stop() end
+    state, pending = nil, nil
+    DEACTIVATE()
 end
 
 function deactivate()
-	-- Dispose the owned LuaCharacter when the character modal closes
-	if modal_current_type == 1 and modal_current_info ~= nil then
-		modal_current_info:DisposeAnimation(CHARACTER.ANIM_RENDER)
-		modal_current_info:Dispose()
-	end
-	-- Dispose the per-song preimage texture to avoid leaking
-	if modal_preimage_ref ~= nil then
-		modal_preimage_ref:Dispose()
-		modal_preimage_ref = nil
-	end
+    -- a stage may drop the modal mid-sequence: release what the card still owns
+    if state == "card" then card:stop() end
+    if state == "chest" and pending ~= nil and pending.kind == 1 and pending.info ~= nil then
+        pcall(function() pending.info:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end)
+        pcall(function() pending.info:Dispose() end)
+    end
+    state, pending = nil, nil
 end
 
 function update()
-	if modal_counter <= modal_duration then
-		modal_counter = modal_counter + (1000 * fps.deltaTime)
-	else
-		modal_loopanim_counter = modal_loopanim_counter + (1000 * fps.deltaTime)
-		if modal_loopanim_counter >= modal_loopanim_duration then
-			modal_loopanim_counter = 0
-		end
-
-		if NavInput.p[modal_current_player + 1].decide() then
-			DEACTIVATE()
-		end
-	end
+    if state == nil then return end
+    local dt = math.min(fps.deltaTime, 0.1)
+    age = age + dt
+    local decide = age > INPUT_GRACE and nav.decide()
+    if state == "coins" then
+        if coins:update(dt, decide) then close() end
+    elseif state == "chest" then
+        if chest:update(dt, decide) then
+            chest:stop()
+            card:start(pending.kind, pending.rarity, pending.key, pending.info)
+            state = "card"
+        end
+    elseif state == "card" then
+        if card:update(dt, decide) then close() end
+    end
 end
 
 function draw()
-	if icon_players[modal_current_player] ~= nil then
-		icon_players[modal_current_player]:Draw(0, 0)
-	end
-
-	if modal_current_type == 0 then
-		-- Coin
-		if modal_tx_coin ~= nil then modal_tx_coin:Draw(0, 0) end
-		font_modal_header:Draw(modal_header_text, 960, 180, nil, nil, 1, 1, 0, "center")
-		font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
-	else
-		-- Others
-		if modal_tx[modal_asset_id] ~= nil then modal_tx[modal_asset_id]:Draw(0, 0) end
-		font_modal_header:Draw(modal_header_text, 960, 180, nil, nil, 1, 1, 0, "center")
-
-		if modal_current_type == 1 then
-			-- Character (LuaCharacter)
-			if modal_current_info ~= nil then
-				modal_current_info:Update(CHARACTER.ANIM_RENDER, true)
-				modal_current_info:DrawAtAnchor(960, 390, CHARACTER.ANIM_RENDER, "center")
-			end
-			font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
-
-		elseif modal_current_type == 2 then
-			-- Puchichara (legacy)
-			if modal_current_info ~= nil and modal_current_info.tx ~= nil then
-				modal_current_info.tx:DrawAtAnchor(960, 490, "center")
-			end
-			font_modal_body:Draw(modal_body_text, 960, 790, nil, nil, 1, 1, 0, "center")
-
-		elseif modal_current_type == 3 then
-			-- Nameplate (LuaNameplateInfo)
-			local tx_plate = font_modal_plate:GetText(modal_body_text, false, 99999, modal_body_fg, modal_body_bg)
-			NAMEPLATE:DrawTitlePlate(
-				960, 490, 255,
-				modal_current_info.Type,
-				tx_plate,
-				modal_rarity_lang_int,
-				modal_current_info.Id)
-
-		elseif modal_current_type == 4 then
-			-- Song
-			local preimage = modal_preimage_ref or modal_preimage_default
-			if preimage ~= nil then
-				preimage:DrawAtAnchor(960, 490, "center")
-			end
-			font_modal_body:Draw(modal_body_text, 960, 790, nil, nil, 1, 1, 0, "center")
-
-		else
-			font_modal_body:Draw(modal_body_text, 960, 490, nil, nil, 1, 1, 0, "center")
-		end
-	end
+    if state == nil then return end
+    if state == "coins" then coins:draw()
+    elseif state == "chest" then chest:draw()
+    elseif state == "card" then card:draw() end
+    local icon = A.icons[player]
+    if icon ~= nil then icon:Draw(0, 0) end
 end
 
 function afterSongEnum() end
 
 function onDestroy()
-	if modal_preimage_default ~= nil then
-		modal_preimage_default:Dispose()
-		modal_preimage_default = nil
-	end
+    if coins then coins:dispose() end
+    if card then card:dispose() end
+    if A.fillCv then pcall(function() A.fillCv:Dispose() end) end
 end
