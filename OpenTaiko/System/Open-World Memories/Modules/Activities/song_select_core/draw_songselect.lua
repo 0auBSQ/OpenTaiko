@@ -47,7 +47,11 @@ local HELPER_BOX_RADIUS  = CFG.num("song_list.shortcuts_helper_box_radius", 10)
 -- horizontal width, its centre's horizontal offset from the bar centre line, its alpha and edge fade
 local BACKDROP_W         = CFG.num("song_list.backdrop_width", 980)
 local BACKDROP_DX        = CFG.num("song_list.backdrop_offset_x", 0)
-local BACKDROP_ALPHA     = CFG.num("song_list.backdrop_alpha", 120)
+-- the band's colour and alpha: blending toward a dark grey drains the saturation of what is under the
+-- band (chroma scales by 1 - alpha) while pulling its brightness toward the grey, a mild darkening on
+-- most backgrounds; black would only darken
+local BACKDROP_COLOR     = CFG.numList("song_list.backdrop_color", { 88, 88, 96 })
+local BACKDROP_ALPHA     = CFG.num("song_list.backdrop_alpha", 150)
 local BACKDROP_FADE      = CFG.num("song_list.backdrop_fade", 36)
 -- Easy / Normal / Hard levels from which the tag plays its checker animation (bar_levelbgchecker<diff>.png)
 local SONGBAR_CHECKER_LEVEL       = {
@@ -362,7 +366,7 @@ local function drawHelperLine(text, opacity)
     gf:Draw(text, HELPER_X + HELPER_PAD_X - pad, HELPER_Y + HELPER_PAD_Y, COL_WHITE, COL_BLACK, opacity, 1, 0, "topleft")
 end
 
--- ── The song list backdrop: a translucent black band behind the bars, along their diagonal ──
+-- ── The song list backdrop: a translucent grey band behind the bars, along their diagonal ──
 -- Baked once as a screen-high canvas: every row is the band shifted by the bars' slope (offset_x per
 -- offset_y), so its edges are the list's own diagonal; the edges fade over BACKDROP_FADE px in 4 px steps.
 local backdrop = nil           -- { canvas, x0 }: x0 = the canvas' screen x before the panel shift
@@ -375,14 +379,15 @@ local function drawListBackdrop(opacity)
         cv:ClearTransparent()
         local fade = math.max(4, math.min(math.floor(BACKDROP_FADE), math.floor(W / 4)))
         local step = 4
+        local cr, cg, cb = BACKDROP_COLOR[1] or 0, BACKDROP_COLOR[2] or 0, BACKDROP_COLOR[3] or 0
         for y = 0, H - 1 do
             local x = math.floor(y * slope + 0.5)
-            cv:FillRect(x + fade, y, W - 2 * fade, 1, 0, 0, 0, BACKDROP_ALPHA)
+            cv:FillRect(x + fade, y, W - 2 * fade, 1, cr, cg, cb, BACKDROP_ALPHA)
             for f = 0, fade - 1, step do
                 local a = math.floor(BACKDROP_ALPHA * (f + step) / (fade + step) + 0.5)
                 local wdt = math.min(step, fade - f)
-                cv:FillRect(x + f, y, wdt, 1, 0, 0, 0, a)
-                cv:FillRect(x + W - f - wdt, y, wdt, 1, 0, 0, 0, a)
+                cv:FillRect(x + f, y, wdt, 1, cr, cg, cb, a)
+                cv:FillRect(x + W - f - wdt, y, wdt, 1, cr, cg, cb, a)
             end
         end
         cv:Upload()
