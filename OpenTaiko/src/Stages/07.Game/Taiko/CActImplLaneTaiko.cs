@@ -597,11 +597,11 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 	}
 
-	public void tJudgeFrameMove(int nPlayer, CTja.CJPOSSCROLL jposscroll, int msTimeNote) {
+	public void tJudgeFrameMove(int nPlayer, CTja.CJPOSSCROLL jposscroll, double msTimeNote) {
 		this.nMoveStartTime[nPlayer] = msTimeNote;
 		this.nMoveStartX[nPlayer] = jposscroll.pxOrigX;
 		this.nMoveStartY[nPlayer] = jposscroll.pxOrigY;
-		this.nTotalMoveTime[nPlayer] = (int)jposscroll.msMoveDt;
+		this.nTotalMoveTime[nPlayer] = jposscroll.msMoveDt;
 		double pxMoveDx = this.nMoveDistancepx[nPlayer] = jposscroll.pxMoveDx;
 		double pxMoveDy = this.nVerticalJSPos[nPlayer] = jposscroll.pxMoveDy;
 		this.nMoveDestPlaceX[nPlayer] = jposscroll.pxOrigX + pxMoveDx;
@@ -664,10 +664,10 @@ internal class CActImplLaneTaiko : CActivity {
 	}
 
 
-	private int[] nTotalMoveTime = new int[5];
+	private double[] nTotalMoveTime = new double[5];
 	private double[] nMoveStartX = new double[5];
 	private double[] nMoveStartY = new double[5];
-	private int[] nMoveStartTime = new int[5];
+	private double[] nMoveStartTime = new double[5];
 	private double[] nMoveDistancepx = new double[5];
 	private double[] nVerticalJSPos = new double[5];
 	private double[] nMoveDestPlaceX = new double[5];
