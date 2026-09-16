@@ -300,9 +300,10 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public void UnpickDecodedFrameAt(int idx) {
 		framelist[idx].RemoveFrame();
-		int beforeTail = (framelistTail + (framelist.Length - 1)) % framelist.Length;
+		int tail = framelistTail;
+		int beforeTail = (tail + (framelist.Length - 1)) % framelist.Length;
 		if (idx == beforeTail)
-			Interlocked.CompareExchange(ref framelistTail, beforeTail, idx);
+			Interlocked.CompareExchange(ref framelistTail, idx, tail);
 	}
 
 	private (int idx, CDecodedFrame frame)? FirstUsedFrame() {

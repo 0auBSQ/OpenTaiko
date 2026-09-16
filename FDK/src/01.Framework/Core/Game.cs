@@ -248,6 +248,7 @@ public abstract partial class Game : IDisposable {
 	// borders described by these two values).
 	public static Vector2D<int> ViewPortSize = new Vector2D<int>();
 	public static Vector2D<int> ViewPortOffset = new Vector2D<int>();
+	public static Vector2D<int> WindowBorderSize = new Vector2D<int>();
 
 	public unsafe SKBitmap GetScreenShot() {
 		int ViewportWidth = ViewPortSize.X;
@@ -431,6 +432,7 @@ public abstract partial class Game : IDisposable {
 			throw;
         }
 
+		WindowBorderSize = Window_.Size;
 		ViewPortSize.X = Window_.Size.X;
 		ViewPortSize.Y = Window_.Size.Y;
 		ViewPortOffset.X = 0;
@@ -914,7 +916,7 @@ public abstract partial class Game : IDisposable {
 				ViewPortOffset.X, ViewPortOffset.Y, ViewPortOffset.X + ViewPortSize.X, ViewPortOffset.Y + ViewPortSize.Y,
 				ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 			Gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);   // restore for ImGui/post
+			Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);   // restore for post
 		} else {
 			Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 			Draw();
@@ -923,7 +925,9 @@ public abstract partial class Game : IDisposable {
 		double fps = 1.0f / deltaTime;
 
 #if DEBUG
+		Gl.Viewport(0, 0, (uint)WindowBorderSize.X, (uint)WindowBorderSize.Y); // prevent ImGui GUI from being distorted
 		ImGuiController?.Render();
+		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y); // restore for post
 #endif
 
 		if (!OperatingSystem.IsMacOS()) Context.SwapBuffers();
@@ -931,6 +935,7 @@ public abstract partial class Game : IDisposable {
 
 	public void Window_Resize(Vector2D<int> size) {
 		if (size.X > 0 && size.Y > 0) {
+			WindowBorderSize = size;
 			float resolutionAspect = (float)GameWindowSize.Width / GameWindowSize.Height;
 			float windowAspect = (float)size.X / size.Y;
 			if (windowAspect > resolutionAspect) {
@@ -942,8 +947,8 @@ public abstract partial class Game : IDisposable {
 			}
 		}
 
-		ViewPortOffset.X = (size.X - ViewPortSize.X) / 2;
-		ViewPortOffset.Y = (size.Y - ViewPortSize.Y) / 2;
+		ViewPortOffset.X = (WindowBorderSize.X - ViewPortSize.X) / 2;
+		ViewPortOffset.Y = (WindowBorderSize.Y - ViewPortSize.Y) / 2;
 
 
 		Gl.Viewport(ViewPortOffset.X, ViewPortOffset.Y, (uint)ViewPortSize.X, (uint)ViewPortSize.Y);
