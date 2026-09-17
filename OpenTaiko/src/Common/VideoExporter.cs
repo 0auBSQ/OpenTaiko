@@ -41,7 +41,7 @@ internal static class VideoExporter {
 	private static byte[]? _bgra;
 	private static string _tempVideoPath = "";
 
-	private readonly record struct SoundEvent(string Path, double TimeMs, float Vol, float Pan, double Speed);
+	private readonly record struct SoundEvent(string Path, double TimeMs, double msSeek, float Vol, float Pan, double Speed);
 	private static readonly List<SoundEvent> _events = new();
 	private static readonly object _eventsLock = new();
 
@@ -227,8 +227,9 @@ internal static class VideoExporter {
 		if (string.IsNullOrEmpty(f) || !File.Exists(f)) return;
 		var (vol, pan) = snd.tGetChannelLevels();
 		if (vol <= 0.0001f) return;
+		snd.tGetPlayPosition(out var bytesSeek, out var msSeek);
 		lock (_eventsLock)
-			_events.Add(new SoundEvent(f, Game.VirtualClockMs, vol, pan, snd.PlaySpeed * snd.Frequency));
+			_events.Add(new SoundEvent(f, Game.VirtualClockMs, msSeek, vol, pan, snd.PlaySpeed * snd.Frequency));
 	}
 
 	// ── chart lookup ─────────────────────────────────────────────────────────────────────────────
@@ -372,19 +373,22 @@ internal static class VideoExporter {
 			if (start >= samples) continue;
 
 			float[] pcm = DecodeToStereo48k(ev.Path);
-			if (pcm.Length == 0) continue;
+			long frameSeek = (long)(48000 * (ev.msSeek / 1000.0));
+			long byteSeek = 2 * frameSeek;
+			if (pcm.Length < byteSeek) continue;
 
 			float volL = ev.Vol * Math.Min(1f, 1f - ev.Pan);
 			float volR = ev.Vol * Math.Min(1f, 1f + ev.Pan);
 			double speed = (ev.Speed > 0.01 && Math.Abs(ev.Speed - 1.0) > 0.001) ? ev.Speed : 1.0;
-			long srcFrames = pcm.Length / 2;
+			long origFrames = pcm.Length / 2;
+			long srcFrames = origFrames - frameSeek;
 			long dstFrames = (long)(srcFrames / speed);
 			long room = samples - start;
 			if (dstFrames > room) dstFrames = room;
 
 			for (long i = 0; i < dstFrames; i++) {
-				long s = (speed == 1.0) ? i : (long)(i * speed);
-				if (s >= srcFrames) break;
+				long s = frameSeek + ((speed == 1.0) ? i : (long)(i * speed));
+				if (s >= origFrames) break;
 				long o = (start + i) * 2;
 				mixL[o] += pcm[s * 2] * volL;
 				mixL[o + 1] += pcm[s * 2 + 1] * volR;
