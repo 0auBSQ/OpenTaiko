@@ -397,7 +397,7 @@ internal class CActPlayDrumsGameMode : CActivity {
 			}
 
 			if (!this.stTatakikiriShow.bTimerUse && this.stTatakikiriShow.bAddAnime == false) {
-				if ((this.stTatakikiriShow.bFirstChipHit == true && (OpenTaiko.stageGameScreen.rIsChipInSearchRange(SoundManager.PlayTimer.NowTimeMs, 2000, 0)))) {
+				if ((this.stTatakikiriShow.bFirstChipHit == true && (OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 2000, 0)))) {
 					this.stTatakikiriShow.bTimerUse = true;
 					int nCount = this.stTatakikiriShow.ctRemainingTime.CurrentValue;
 					this.stTatakikiriShow.ctRemainingTime = new CCounter(0, 25000, 1, OpenTaiko.Timer);
