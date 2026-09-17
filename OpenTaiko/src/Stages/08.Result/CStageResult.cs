@@ -79,6 +79,7 @@ internal class CStageResult : CStage {
 		Trace.TraceInformation("結果ステージを活性化します。");
 		Trace.Indent();
 		bAddedToRecentlyPlayedSongs = false;
+		this.modalDuck = this.modalDuckFrom = this.modalDuckTo = 100;
 		try {
 			/*
 			 * Notes about the difference between Replay - Save statuses and the "Assisted clear" clear status
@@ -662,6 +663,7 @@ internal class CStageResult : CStage {
 			bgmResultIn.tPlay();
 	}
 	public override void DeActivate() {
+		this.tSetMusicLevel(100);
 		// leaving the result screen after watching a replay: drop replay mode + restore the real mods (kept this
 		// long so the auto modicon + persistence-skip held through results)
 		if (OpenTaiko.bReplayMode[0]) {
@@ -1349,6 +1351,7 @@ internal class CStageResult : CStage {
 			#region [Display modals]
 
 			OpenTaiko.ModalManager.Draw();
+			this.tDuckMusicForModal(OpenTaiko.ModalManager.IsShowing);
 
 			#endregion
 
@@ -1760,6 +1763,36 @@ internal class CStageResult : CStage {
 
 	// Coins information
 	private int[] nEarnedMedalsCount = { 0, 0, 0, 0, 0 };
+
+	// The result music dims while a reward modal plays so the modal's own sounds are heard: its automation
+	// level (percent) eases with a smoothstep down to MODAL_DUCK_LEVEL and back up, so neither edge is rough.
+	private const int MODAL_DUCK_LEVEL = 30;
+	private const double MODAL_DUCK_IN_MS = 350;
+	private const double MODAL_DUCK_OUT_MS = 800;
+	private double modalDuck = 100, modalDuckFrom = 100, modalDuckTo = 100, modalDuckMs = 1;
+	private long modalDuckStartMs;
+
+	private void tDuckMusicForModal(bool dimmed) {
+		double target = dimmed ? MODAL_DUCK_LEVEL : 100;
+		if (target != this.modalDuckTo) {
+			this.modalDuckFrom = this.modalDuck;
+			this.modalDuckTo = target;
+			this.modalDuckMs = dimmed ? MODAL_DUCK_IN_MS : MODAL_DUCK_OUT_MS;
+			this.modalDuckStartMs = OpenTaiko.Timer.NowTimeMs;
+		}
+		if (this.modalDuck == this.modalDuckTo) return;
+		double k = Math.Clamp((OpenTaiko.Timer.NowTimeMs - this.modalDuckStartMs) / this.modalDuckMs, 0.0, 1.0);
+		k = k * k * (3.0 - 2.0 * k);
+		this.modalDuck = this.modalDuckFrom + (this.modalDuckTo - this.modalDuckFrom) * k;
+		this.tSetMusicLevel((int)Math.Round(this.modalDuck));
+	}
+
+	// the skin's result sounds outlive the stage, so the level is put back on the way out
+	private void tSetMusicLevel(int level) {
+		if (this.bgmResultLoop != null) this.bgmResultLoop.nAutomationLevel_CurrentSound = level;
+		if (OpenTaiko.Skin.bgmDanResult != null) OpenTaiko.Skin.bgmDanResult.nAutomationLevel_CurrentSound = level;
+		if (OpenTaiko.Skin.bgmTowerResult != null) OpenTaiko.Skin.bgmTowerResult.nAutomationLevel_CurrentSound = level;
+	}
 
 
 	//-----------------

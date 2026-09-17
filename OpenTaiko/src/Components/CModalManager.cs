@@ -10,6 +10,9 @@ internal class CModalManager {
 	/// </summary>
 	public bool AllModalsDone { get; set; } = false;
 
+	/// <summary>A modal is on screen (the stage dims its music behind it).</summary>
+	public bool IsShowing => displayedModals != null;
+
 	private static LuaROActivityWrapper? Script => LuaROActivityWrapper.GetROActivity("modal");
 
 	// Called by the skin system on skin refresh — ROActivities are managed by the skin loader.

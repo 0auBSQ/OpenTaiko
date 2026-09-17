@@ -3,10 +3,12 @@
 local Gate  = require("gate")
 local Vault = require("vault")
 local NavInput = require("NavInput")
+local MusicDuck = require("MusicDuck")
 
 local textures = {}
 local sounds   = {}
 local texts    = {}
+local musicDuck   -- dims the BGM while the reward modal plays
 
 -- "waiting_enum" → "gate" → "vault"
 local phase          = "waiting_enum"
@@ -55,10 +57,15 @@ function update()
             return Exit("title", nil)
         end
     end
+    if musicDuck then
+        local modal = ROACTIVITY:GetROActivity("modal")
+        musicDuck:update(math.min((fps and fps.deltaTime) or 1 / 60, 0.1), modal ~= nil and modal.IsActive)
+    end
 end
 
 function activate()
     active = true
+    if musicDuck then musicDuck:reset() end
     Vault.onActivate()  -- clear enterCtr so vault UI stays hidden during gate
     if songsEnumerated then
         phase = "gate"
@@ -95,6 +102,7 @@ function onStart()
     sounds.SongDecide = SOUND:CreateSFX("Sounds/SongDecide.ogg")
     sounds.Unlock     = SOUND:CreateSFX("Sounds/Unlock.ogg")
     sounds.KeySnap    = SOUND:CreateSFX("Sounds/KeySnap.ogg")
+    musicDuck = MusicDuck.new{ sound = sounds.BGM }
 
     textures["Gate/Bg"]       = TEXTURE:CreateTexture("Textures/Gate/Bg.png")
     textures["Gate/Keyhole"]  = TEXTURE:CreateTexture("Textures/Gate/Keyhole.png")

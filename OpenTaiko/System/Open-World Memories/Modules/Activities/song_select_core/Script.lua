@@ -29,6 +29,8 @@ local OVERLAY_FILES = { overlay = "Textures/bg_overlay.png", overlay_difficulty 
 -- Song-preview volume fades (skinner-tunable in Config/layout.json).
 local PREVIEW_FADE_IN_MS  = CFG.num("preview.fade_in_ms", 280)
 local PREVIEW_FADE_OUT_MS = CFG.num("preview.fade_out_ms", 140)
+local MusicDuck = require("MusicDuck")
+local previewDuck = MusicDuck.new()   -- dims the preview while the unlock reward modal plays
 local Search  = require("search")
 local Unlocks = require("unlockables")
 local Favs    = require("favorites")
@@ -447,6 +449,7 @@ function deactivate()
     Diff.resetTransitionVisuals()
 
     SHARED:GetSharedSound("presound"):Stop()
+    previewDuck:reset()
     G.previewFadeVol    = 0
     G.previewFadeTarget = 0
     G.previewLoaded     = false
@@ -543,12 +546,16 @@ function update(ts)
     end
 
     -- Ease the preview volume toward its target: a prompt fade-out when scrolling away, a short fade-in
-    -- when a new preview starts (navigation.lua sets the target + resets the volume on start).
+    -- when a new preview starts (navigation.lua sets the target + resets the volume on start). The
+    -- reward modal (opened by confirm_dialog) dims it on top, so the modal's own sounds are heard.
     do
         local psnd = SHARED:GetSharedSound("presound")
-        if psnd.Loaded and G.previewFadeVol ~= G.previewFadeTarget then
-            local dtms = 1000 / 60
-            if ts ~= nil and G.previewPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.previewPrevTs)) end
+        local dtms = 1000 / 60
+        if ts ~= nil and G.previewPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.previewPrevTs)) end
+        local modal = ROACTIVITY:GetROActivity("modal")
+        local duckBefore = previewDuck.factor
+        local duck = previewDuck:update(dtms / 1000, modal ~= nil and modal.IsActive)
+        if psnd.Loaded and (G.previewFadeVol ~= G.previewFadeTarget or duck ~= duckBefore) then
             local dur  = (G.previewFadeTarget > G.previewFadeVol) and PREVIEW_FADE_IN_MS or PREVIEW_FADE_OUT_MS
             local step = (dur > 0) and (100 * dtms / dur) or 100
             if G.previewFadeVol < G.previewFadeTarget then
@@ -556,7 +563,7 @@ function update(ts)
             else
                 G.previewFadeVol = math.max(G.previewFadeTarget, G.previewFadeVol - step)
             end
-            psnd:SetVolume(math.floor(G.previewFadeVol + 0.5))
+            psnd:SetVolume(math.floor(G.previewFadeVol * duck + 0.5))
         end
     end
     if ts ~= nil then G.previewPrevTs = ts end
