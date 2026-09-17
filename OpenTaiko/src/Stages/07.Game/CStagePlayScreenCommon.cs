@@ -819,6 +819,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return (long)(tjaTime * dbDynamicBeatFactor + dbDynBeatTjaOffset);
 		return (long)tjaTime;
 	}
+	public static double TjaTimeToFrameworkTime(CTja tja, double msTjaTime)
+		=> SoundManager.PlayTimer.SystemTimeToFrameworkTime(SoundManager.PlayTimer.GameTimeToSystemTime(tja.TjaTimeToGameTime(msTjaTime)));
 	protected int[]  nDynBeatSectionPerfects = new int[5];
 	protected int[]  nDynBeatSectionBads     = new int[5];
 	protected int[]  nDynBeatSectionNotes    = new int[5];
@@ -1322,14 +1324,14 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		pChip.msAutoLastHit = msFirstHit + (nHits - 1) * msPerRollTja;
 	}
 
-	protected void PlayHitNoteSound(int iPlayer, NotesManager.EInputType input) {
+	protected void PlayHitNoteSound(int iPlayer, NotesManager.EInputType input, double msTjaTime) {
 		var sound = input switch {
 			NotesManager.EInputType.Red or NotesManager.EInputType.RedBig => this.soundRed[iPlayer],
 			NotesManager.EInputType.Blue or NotesManager.EInputType.BlueBig => this.soundBlue[iPlayer],
 			NotesManager.EInputType.Clap => this.soundClap[iPlayer],
 			_ => null,
 		};
-		sound?.PlayStart();
+		sound?.PlayStart(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msTjaTime));
 	}
 
 	protected void StartHitNoteLaneFlash(int iPlayer, NotesManager.EInputType input, EGameType gt) {
@@ -1414,7 +1416,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			this.CChartScore[nPlayer].nScore = __score;
 			this.CSectionScore[nPlayer].nScore = __score;
 
-			this.PlayHitNoteSound(nPlayer, sort);
+			this.PlayHitNoteSound(nPlayer, sort, msHitTjaTime);
 			this.StartHitNoteLaneFlash(nPlayer, sort, gt);
 			//赤か青かの分岐
 			if (sort is NotesManager.EInputType.Red or NotesManager.EInputType.RedBig) {
@@ -1523,7 +1525,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		if (balloon - rollCount <= 0)
 			this.ProcessBalloonBroke(player, pChip, msHitTjaTime, sort);
 		else
-			this.PlayHitNoteSound(player, sort);
+			this.PlayHitNoteSound(player, sort, msHitTjaTime);
 		return ENoteJudge.Perfect;
 	}
 
@@ -1588,7 +1590,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					eJudgeResult = ENoteJudge.Perfect; // Prevent ADLIB notes breaking DFC runs
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, false, nPlayer);
-					this.soundAdlib[nPlayer]?.PlayStart();
+					this.soundAdlib[nPlayer]?.PlayStart(TjaTimeToFrameworkTime(tja, msHitTjaTime));
 					this.StartHitNoteLaneFlash(nPlayer, nNowInput, gt);
 					this.actTaikoLaneFlash.PlayerLane[nPlayer].Start(PlayerLane.FlashType.Hit, gt);
 					if (!isDeniedJudgeCount) {
@@ -1610,11 +1612,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					this.actJudgeString.Start(nPlayer, eJudgeResult != ENoteJudge.Bad ? ENoteJudge.Mine : ENoteJudge.Bad);
 					bBombHit = true;
 					eJudgeResult = ENoteJudge.Bad;
-					this.PlayHitNoteSound(nPlayer, nNowInput);
+					this.PlayHitNoteSound(nPlayer, nNowInput, msHitTjaTime);
 					this.StartHitNoteLaneFlash(nPlayer, nNowInput, gt);
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, false, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, ENoteJudge.Mine, false, nPlayer);
-					OpenTaiko.Skin.soundBomb?.tPlay();
+					OpenTaiko.Skin.soundBomb?.tPlay(TjaTimeToFrameworkTime(tja, msHitTjaTime));
 					if (!isDeniedJudgeCount) {
 					this.CChartScore[nPlayer].nMine++;
 					this.CSectionScore[nPlayer].nMine++;
@@ -1638,7 +1640,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 				if (eJudgeResult != ENoteJudge.Auto && eJudgeResult != ENoteJudge.Miss) {
 					this.actJudgeString.Start(nPlayer, eJudgeResult);
 					bool isBigInput = nNowInput is NotesManager.EInputType.RedBig or NotesManager.EInputType.BlueBig || !OpenTaiko.ConfigIni.bJudgeBigNotes;
-					this.PlayHitNoteSound(nPlayer, nNowInput);
+					this.PlayHitNoteSound(nPlayer, nNowInput, msHitTjaTime);
 					this.StartHitNoteLaneFlash(nPlayer, nNowInput, gt);
 					OpenTaiko.stageGameScreen.actLaneTaiko.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
 					OpenTaiko.stageGameScreen.actChipFireD.Start(pChip, gt, eJudgeResult, isBigInput, nPlayer);
@@ -3744,7 +3746,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (iPlayer == 0) {
 						if (!this.bPAUSE && !this.isRewinding) {
 							actBalloon.KusuMiss();
-							OpenTaiko.Skin.soundKusudamaMiss.tPlay();
+							OpenTaiko.Skin.soundKusudamaMiss.tPlay(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, chip.end.dbSoundTimems));
 							for (int p = 0; p < OpenTaiko.ConfigIni.nPlayerCount; p++) {
 								if (chip.multiLink != null) {
 									for (int b = 0; b <= (int)CTja.ECourse.eMaster; ++b) {
@@ -3765,7 +3767,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						this.actJudgeString.Start(iPlayer, ENoteJudge.Mine);
 						OpenTaiko.stageGameScreen.actLaneTaiko.Start(chip, gt, ENoteJudge.Bad, false, iPlayer);
 						OpenTaiko.stageGameScreen.actChipFireD.Start(chip, gt, ENoteJudge.Mine, false, iPlayer);
-						OpenTaiko.Skin.soundBomb?.tPlay();
+						OpenTaiko.Skin.soundBomb?.tPlay(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, chip.end.dbSoundTimems));
 						chip.bVisible = false;
 						this.Chara_MissCount[iPlayer]++;
 						if (!(this.isDeniedPlaying[iPlayer] || this.IsStageFailed_Fast())) {
@@ -3834,9 +3836,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 		if (NotesManager.IsKusudama(chip)) {
 			if (input != NotesManager.EInputType.Unknown) { // finished from this player
-			OpenTaiko.Skin.soundKusudama.tPlay();
+			OpenTaiko.Skin.soundKusudama.tPlay(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msHitTjaTime));
 			if (!OpenTaiko.Skin.soundKusudama.bIsPlaying)
-				this.PlayHitNoteSound(iPlayer, input); // fallback sound
+				this.PlayHitNoteSound(iPlayer, input, msHitTjaTime); // fallback sound
 				actBalloon.KusuBroke();
 				chip.KusudamaRollCount = 0;
 				chip.KusudamaCount = 0;
@@ -3856,9 +3858,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			}
 		} else {
 			//ﾊﾟｧｰﾝ
-			OpenTaiko.Skin.soundBalloon.tPlay();
+			OpenTaiko.Skin.soundBalloon.tPlay(TjaTimeToFrameworkTime(OpenTaiko.GetTJA(iPlayer)!, msHitTjaTime));
 			if (!OpenTaiko.Skin.soundBalloon.bIsPlaying)
-				this.PlayHitNoteSound(iPlayer, input); // fallback sound
+				this.PlayHitNoteSound(iPlayer, input, msHitTjaTime); // fallback sound
 			OpenTaiko.stageGameScreen.FlyingNotes.Start(NotesManager.ENoteType.DonBig, NotesManager.GetChipGameType(chip, iPlayer), iPlayer, forceFirework: true);
 			OpenTaiko.stageGameScreen.Rainbow.Start(iPlayer);
 			//CDTXMania.stage演奏ドラム画面.actChipFireD.Start( 0, player );
@@ -4438,7 +4440,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						if (!b) continue;
 
 						if ((wc.bIsBGMSound && OpenTaiko.ConfigIni.bBGMPlayVoiceSound) || (!wc.bIsBGMSound)) {
-							tjai.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tjai.TjaTimeToGameTime(pChip.dbSoundTimems)));
+							tjai.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime(nSoundTimems));
 							#region [ PAUSEする ]
 							int j = wc.nCurrentPlaybackSoundNumber;
 							if (wc.rSound[j] != null) {

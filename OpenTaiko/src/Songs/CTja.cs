@@ -996,7 +996,7 @@ internal class CTja : CActivity {
 					OpenTaiko.SongGainController.Set(wc.SongVol, wc.SongLoudnessMetadata, sound);
 
 					sound.SoundPosition = wc.nPosition;
-					sound.PlayStart();
+					sound.PlayStart(SoundManager.PlayTimer.SystemTimeToFrameworkTime(nPlaybackStartSystemTimems));
 				}
 				wc.nPlaybackStartTime[wc.nCurrentPlaybackSoundNumber] = nPlaybackStartSystemTimems;
 				this.tWavePlaybackPositionAutoCorrection(wc);

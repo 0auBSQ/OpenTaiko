@@ -1021,7 +1021,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		eJudge ??= (chipNoHit == null) ? ENoteJudge.Miss : this.eGetChipJudgeAtTime((long)msHitTjaTime, chipNoHit, nUsePlayer);
 		var gameType = this.eGameType[nUsePlayer];
 		if (eJudge != ENoteJudge.Miss) {
-			eJudge = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, (long)msHitTjaTime, eJudge.Value);
+			eJudge = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, eJudge.Value);
 			if (eJudge is not (ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB)) // ADLIB here for "empty hit but not a miss"
 				gameType = NotesManager.GetChipGameType(chipNoHit!, nUsePlayer);
 		}
@@ -1033,7 +1033,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 		if (nLane is not PlayerLane.FlashType.Total && eJudge is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
-			this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPad));
+			this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPad), msHitTjaTime);
 			this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPad), gameType);
 
 			// BAD or TIGHT 時の処理。

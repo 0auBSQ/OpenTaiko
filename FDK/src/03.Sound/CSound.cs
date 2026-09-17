@@ -336,15 +336,15 @@ public class CSound : IDisposable {
 		}
 	}
 
-	public void PlayStart() {
+	public void PlayStart(double? msFrameworkTime = null) {
 		tSetPositionToBegin();
 		if (!bSpeedRaiseTooProblem)
-			tPlay(false);
+			tPlay(false, msFrameworkTime);
 	}
-	public void PlayStart(bool looped) {
+	public void PlayStart(bool looped, double? msFrameworkTime = null) {
 		this.SetLoop(looped);
 		tSetPositionToBegin();
-		tPlay(looped);
+		tPlay(looped, msFrameworkTime);
 	}
 
 	public void StopReset() {
@@ -355,8 +355,8 @@ public class CSound : IDisposable {
 		tStop(true);
 		this.PauseCount++;
 	}
-	public void Resume(bool looped) {
-		tPlay(looped);
+	public void Resume(bool looped, double? msFrameworkTime = null) {
+		tPlay(looped, msFrameworkTime);
 		this.PauseCount--;
 	}
 	public void Resume(long t)  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★
@@ -431,14 +431,14 @@ public class CSound : IDisposable {
 		this.Dispose(disposeWithManaged, deleteInstance);
 		//Debug.WriteLine( "Disposed: " + _bインスタンス削除 + " : " + Path.GetFileName( this.strファイル名 ) );
 	}
-	public void tPlay() {
-		tPlay(false);
+	public void tPlay(double? msFrameworkTime = null) {
+		tPlay(false, msFrameworkTime);
 	}
 
 	// ── offline-export capture ──────────────────────────────────────────────────────────────────
 	// Every actual playback start funnels through tPlaySound(); the video exporter subscribes here
 	// to log (file, virtual time, volume, pan) and later reproduce the session's audio offline.
-	public static Action<CSound>? SoundPlayCapture = null;
+	public static Action<CSound, double>? SoundPlayCapture = null;
 
 	/// <summary>Current effective BASS channel volume/pan of this sound (1.0/0.0 when unavailable).</summary>
 	public (float volume, float pan) tGetChannelLevels() {
@@ -450,8 +450,8 @@ public class CSound : IDisposable {
 		return (vol, pan);
 	}
 
-	public void tPlay(bool bLoop) {
-		SoundPlayCapture?.Invoke(this);
+	public void tPlay(bool bLoop, double? msFrameworkTime = null) {
+		SoundPlayCapture?.Invoke(this, msFrameworkTime ?? Game.dbTimeMs);
 		this.SetLoop(bLoop);
 		if (this.IsBassSound)           // BASSサウンド時のループ処理は、t再生を開始する()側に実装。ここでは「bループする」は未使用。
 		{

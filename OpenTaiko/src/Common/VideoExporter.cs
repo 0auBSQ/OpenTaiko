@@ -221,7 +221,7 @@ internal static class VideoExporter {
 
 	// ── sound capture ────────────────────────────────────────────────────────────────────────────
 
-	private static void OnSoundPlay(CSound snd) {
+	private static void OnSoundPlay(CSound snd, double msFrameworkTime) {
 		if (_phase != Phase.Capturing && _phase != Phase.Loading) return;
 		string? f = snd.FileName;
 		if (string.IsNullOrEmpty(f) || !File.Exists(f)) return;
@@ -229,7 +229,7 @@ internal static class VideoExporter {
 		if (vol <= 0.0001f) return;
 		snd.tGetPlayPosition(out var bytesSeek, out var msSeek);
 		lock (_eventsLock)
-			_events.Add(new SoundEvent(f, Game.VirtualClockMs, msSeek, vol, pan, snd.PlaySpeed * snd.Frequency));
+			_events.Add(new SoundEvent(f, msFrameworkTime, msSeek, vol, pan, snd.PlaySpeed * snd.Frequency));
 	}
 
 	// ── chart lookup ─────────────────────────────────────────────────────────────────────────────
