@@ -16,7 +16,7 @@ internal enum AppMode {
 /// inside <see cref="FDK.Game"/>; this only owns the app-level switches.
 ///
 /// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
-///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--out file.mp4]
+///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--sample-rate 48000] [--clip-volume=true] [--out file.mp4]
 ///   --mode=checkgl
 ///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
 /// </summary>
@@ -29,6 +29,8 @@ internal sealed class CommandLineArgs {
 	public int[] Difficulties = Array.Empty<int>();
 	public int Fps = 60;
 	public int Width = 1920, Height = 1080;
+	public int SampleRate = 48000;
+	public bool ClipVolume = true;
 	public string OutPath = "";
 	public string? DifficultiesError;   // set when --difficulties was malformed (surfaced by the consumer)
 
@@ -61,6 +63,11 @@ internal sealed class CommandLineArgs {
 				cli.Width = w; cli.Height = h;
 			}
 		}
+
+		if (int.TryParse(Get(args, "--sample-rate"), out int sampleRate) && sampleRate >= 44100 && sampleRate <= 96000)
+			cli.SampleRate = sampleRate;
+		if (bool.TryParse(Get(args, "--clip-volume"), out bool clipVolume))
+			cli.ClipVolume = clipVolume;
 
 		cli.OutPath = Get(args, "--out") ?? $"export_{cli.Uid}_{string.Join("-", cli.Difficulties)}.mp4";
 		return cli;

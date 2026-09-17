@@ -31,6 +31,9 @@ internal static class VideoExporter {
 	private static int[] _diffs = Array.Empty<int>();
 	private static int _fps = 60;
 	private static int _reqW = 0, _reqH = 0;
+	private static int _sampleRate = 48000;
+	private static bool _clipVolume = true; // somehow the final video's audio has a limiter applied (on Windows), possibly from AAC encoder
+											// unsure for other platforms, so still clip the volume by default
 	private static string _outPath = "";
 
 	private enum Phase { Boot, WaitSongs, Loading, Capturing, Done }
@@ -107,6 +110,8 @@ internal static class VideoExporter {
 		_diffs = cli.Difficulties;
 		_fps = cli.Fps;
 		_reqW = cli.Width; _reqH = cli.Height;
+		_sampleRate = cli.SampleRate;
+		_clipVolume = cli.ClipVolume;
 		_outPath = cli.OutPath;
 		Active = true;
 
@@ -289,10 +294,10 @@ internal static class VideoExporter {
 		double durationSec = (double)_frames / _fps;
 		int eventCount; lock (_eventsLock) eventCount = _events.Count;
 		Status($"mixing audio ({eventCount} sound events)...");
-		float[] pcm = MixAudio(durationSec);
+		float[] pcm = MixAudio(durationSec, _sampleRate);
 
 		Status("muxing final mp4...");
-		FFVideoWriter.MuxWithAudio(_tempVideoPath, _outPath, pcm, 48000);
+		FFVideoWriter.MuxWithAudio(_tempVideoPath, _outPath, pcm, _sampleRate);
 		try { File.Delete(_tempVideoPath); } catch { }
 
 		string full = Path.GetFullPath(_outPath);
@@ -321,20 +326,20 @@ internal static class VideoExporter {
 		Environment.Exit(2);
 	}
 
-	// ── offline audio mix (BASS decode → 48 kHz stereo float, events at their virtual times) ─────
+	// ── offline audio mix (BASS decode → resampled stereo float, events at their virtual times) ─────
 
 	private static readonly Dictionary<string, float[]> _pcmCache = new();
 
-	private static float[] DecodeToStereo48k(string path) {
+	private static float[] DecodeToStereoResampled(string path, int sampleRate) {
 		if (_pcmCache.TryGetValue(path, out var cached)) return cached;
 		float[] result = Array.Empty<float>();
 		int src = Bass.CreateStream(path, 0, 0, BassFlags.Decode | BassFlags.Float | BassFlags.Prescan);
 		if (src != 0) {
-			int mix = BassMix.CreateMixerStream(48000, 2, BassFlags.Decode | BassFlags.Float | BassFlags.MixerEnd);
+			int mix = BassMix.CreateMixerStream(sampleRate, 2, BassFlags.Decode | BassFlags.Float | BassFlags.MixerEnd);
 			if (mix != 0) {
 				BassMix.MixerAddChannel(mix, src, BassFlags.MixerDownMix);
 				var chunks = new List<float[]>();
-				var buf = new float[48000 * 2];
+				var buf = new float[sampleRate * 2];
 				long total = 0;
 				while (true) {
 					int bytes = Bass.ChannelGetData(mix, buf, buf.Length * 4);
@@ -355,8 +360,8 @@ internal static class VideoExporter {
 		return result;
 	}
 
-	private static float[] MixAudio(double durationSec) {
-		long samples = (long)(durationSec * 48000) + 4800;   // small tail headroom
+	private static float[] MixAudio(double durationSec, int samplingRate) {
+		long samples = (long)(durationSec * samplingRate) + 4800;   // small tail headroom
 		var mixL = new float[samples * 2];                    // interleaved L/R
 
 		SoundEvent[] events;
@@ -369,11 +374,11 @@ internal static class VideoExporter {
 			double relMs = ev.TimeMs - _t0Ms;
 			if (relMs < -0.5) continue;                       // pre-capture noise (loading screen)
 			if (relMs < 0) relMs = 0;
-			long start = (long)(relMs / 1000.0 * 48000);
+			long start = (long)(relMs / 1000.0 * samplingRate);
 			if (start >= samples) continue;
 
-			float[] pcm = DecodeToStereo48k(ev.Path);
-			long frameSeek = (long)(48000 * (ev.msSeek / 1000.0));
+			float[] pcm = DecodeToStereoResampled(ev.Path, samplingRate);
+			long frameSeek = (long)(samplingRate * (ev.msSeek / 1000.0));
 			long byteSeek = 2 * frameSeek;
 			if (pcm.Length < byteSeek) continue;
 
@@ -396,15 +401,17 @@ internal static class VideoExporter {
 		}
 
 		// gentle fade-out over the last half second (avoids a click where the BGM is truncated)
-		long fade = Math.Min(samples, 48000 / 2);
+		long fade = Math.Min(samples, samplingRate / 2);
 		for (long i = 0; i < fade; i++) {
 			float g = (float)i / fade;
 			long o = (samples - 1 - i) * 2;
 			mixL[o] *= g; mixL[o + 1] *= g;
 		}
-		// hard safety clamp
-		for (long i = 0; i < mixL.LongLength; i++) {
-			if (mixL[i] > 1f) mixL[i] = 1f; else if (mixL[i] < -1f) mixL[i] = -1f;
+		if (_clipVolume) {
+			// hard safety clamp
+			for (long i = 0; i < mixL.LongLength; i++) {
+				if (mixL[i] > 1f) mixL[i] = 1f; else if (mixL[i] < -1f) mixL[i] = -1f;
+			}
 		}
 		return mixL;
 	}
@@ -600,7 +607,7 @@ internal unsafe sealed class FFVideoWriter {
 		outV->codecpar->codec_tag = 0;
 		outV->time_base = inV->time_base;
 
-		// audio: AAC 48 kHz stereo
+		// audio: AAC resampled stereo
 		AVCodec* aac = ffmpeg.avcodec_find_encoder_by_name("aac");
 		if (aac == null) throw new InvalidOperationException("AAC encoder unavailable in the shipped FFmpeg.");
 		AVCodecContext* aenc = ffmpeg.avcodec_alloc_context3(aac);
