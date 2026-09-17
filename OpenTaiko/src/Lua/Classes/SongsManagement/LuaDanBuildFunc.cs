@@ -506,9 +506,8 @@ namespace OpenTaiko {
 				foreach (var srcNoteChip in src.listNoteChip) {
 					if (chipMap.TryGetValue(srcNoteChip, out var clonedNoteChip)) {
 						clonedNoteChip.nIntValue_InternalNumber = output.listNoteChip.Count;
-						clonedNoteChip.msShowOffset = clonedNoteChip.nSoundTimems - nextsongTime;
-						clonedNoteChip.msMoveOffset = double.PositiveInfinity; // always move at natural speed
-						clonedNoteChip.IsSuddenHideRoll = false;                  // don't hide roll bodies
+						// merge with existing #SUDDEN effects
+						clonedNoteChip.msShowOffset = Math.Min(clonedNoteChip.msShowOffset, clonedNoteChip.dbSoundTimems - nextsongTime);
 						output.listNoteChip.Add(clonedNoteChip);
 					}
 				}
