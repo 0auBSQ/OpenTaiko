@@ -2114,28 +2114,28 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		return (chip, judge);
 	}
 
+	private int GetIdxChip(int iPlayer, long msTjaTime, double direction) {
+		CChip searchChip = new() { _nSoundTimems = (int)msTjaTime, _dbSoundTimems = direction };
+		int iTop = this.listChip[iPlayer].BinarySearch(0, this.listChip[iPlayer].Count, searchChip, Comparer<CChip>.Default);
+		if (iTop < 0)
+			iTop = ~iTop;
+		return iTop;
+	}
+
+	private int GetIdxChipAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, msTjaTime, double.PositiveInfinity);
+	private int GetIdxChipAtOrAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, msTjaTime, double.NegativeInfinity);
+
 	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer, EPad pad) {
 		int count = listChip[nPlayer].Count;
 		if (count <= 0)         // 演奏データとして1個もチップがない場合は
 			return (null, ENoteJudge.Miss);
 
-		int getIdxChip(long msTjaTime, double direction) {
-			CChip searchChip = new() { _nSoundTimems = (int)msTjaTime, _dbSoundTimems = direction };
-			int iTop = this.listChip[nPlayer].BinarySearch(0, count, searchChip, Comparer<CChip>.Default);
-			if (iTop < 0)
-				iTop = ~iTop;
-			return iTop;
-		}
-
-		int getIdxChipAfter(long msTjaTime) => getIdxChip(msTjaTime, double.PositiveInfinity);
-		int getIdxChipAtOrBefore(long msTjaTime) => getIdxChip(msTjaTime, double.NegativeInfinity);
-
 		#region [ search for the first future note chips ]
 		// search for the correct top chip at given time; `this.nCurrentTopChip[nPlayer]` could incorrect due to input or audio resyncs)
-		int iTop = getIdxChipAfter(msTjaTime);
+		int iTop = GetIdxChipAfter(nPlayer, msTjaTime);
 
 		int badZone = this.timingZones[nPlayer].nBadZone;
-		int idxFutureFirstMissZone = getIdxChipAfter(msTjaTime + badZone);
+		int idxFutureFirstMissZone = GetIdxChipAfter(nPlayer, msTjaTime + badZone);
 		(CChip? chip, ENoteJudge judge) futureFirstUnhit = (null, ENoteJudge.Miss);
 		for (int i = iTop; i < idxFutureFirstMissZone; ++i) {
 			CChip chip = listChip[nPlayer][i];
@@ -2155,7 +2155,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		var firstWaitingTime = this.chipNowProcessingMultiHitNotes[nPlayer]
 			.FirstOrDefault(chip => IsAcceptMultiHit(chip, msTjaTime))
 			?.nSoundTimems ?? msTjaTime;
-		int idxPastFirstNonMissZone = getIdxChipAtOrBefore(Math.Min(firstWaitingTime, msTjaTime - badZone));
+		int idxPastFirstNonMissZone = GetIdxChipAtOrAfter(nPlayer, Math.Min(firstWaitingTime, msTjaTime - badZone));
 		(CChip? chip, ENoteJudge judge) pastFirstUnhit = (null, ENoteJudge.Miss);
 		(CChip? chip, ENoteJudge judge) pastFirstUnhitNotBad = (null, ENoteJudge.Miss);
 		(CChip? chip, ENoteJudge judge) pastFirstUnhitRoll = (null, ENoteJudge.Miss);
@@ -2221,15 +2221,12 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		return (msTjaDTime_Future < msTjaDTime_Past) ? futureFirstUnhit : pastFirstUnhit;
 	}
 
-	public bool rIsChipInSearchRange(long nTime, int nSearchRangeTimems, int nPlayer) {
-		for (int i = 0; i < listChip[nPlayer].Count; i++) {
+	public bool rIsChipInSearchRange(long msTjaTime, int nSearchRangeTimems, int nPlayer) {
+		int idxFirstAfterRange = GetIdxChipAtOrAfter(nPlayer, msTjaTime + nSearchRangeTimems);
+		for (int i = idxFirstAfterRange; i-- > 0;) {
 			CChip chip = listChip[nPlayer][i];
-			if (chip.bVisible && !chip.bHit) {
-				if (NotesManager.IsMissableNote(chip)) {
-					if (chip.nSoundTimems < nTime + nSearchRangeTimems) {
-						return true;
-					}
-				}
+			if (chip.bVisible && !chip.bHit && NotesManager.IsMissableNote(chip)) {
+				return true;
 			}
 		}
 
