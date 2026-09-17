@@ -36,6 +36,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		base.ChildActivities.Add(this.actDancer = new CActImplDancer());
 		base.ChildActivities.Add(this.actMtaiko = new CActImplMtaiko());
 		base.ChildActivities.Add(this.actLaneTaiko = new CActImplLaneTaiko());
+		base.ChildActivities.Add(this.actFlashlight = new CActImplFlashlight());
 		base.ChildActivities.Add(this.actRoll = new CActImplRoll());
 		base.ChildActivities.Add(this.actBalloon = new CActImplBalloon());
 		base.ChildActivities.Add(this.actChara = new CActImplCharacter());
@@ -289,6 +290,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		this.nWaitBigNoteCoord = 0;
 
 		this.actLaneTaiko.ResetPlayStates();
+		this.actFlashlight.Reset();
 
 		for (int i = 0; i < 5; i++)
 			PuchiChara.ChangeBPM(OpenTaiko.stageGameScreen.actPlayInfo.secPerGameBeatAbs(i));
@@ -357,6 +359,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives = 0; // prevent clear
 			if (!OpenTaiko.ConfigIni.bAIBattleMode)
 				this.actEnd.Start(iPlayer);
+			this.actFlashlight.BeginFade();
 		}
 	}
 	public override int Draw() {
@@ -477,26 +480,27 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (!OpenTaiko.ConfigIni.bNoInfo && !OpenTaiko.ConfigIni.bTokkunMode)
 				this.tProgressDraw_Gauge();
 
-			this.actLaneTaiko.GoGoFlame();
+			this.actLaneTaiko.GoGoFlame(overLight: false);
 
 			// bIsFinishedPlaying was dependent on 2P in this case
 
 			this.actDan.Draw();
 
-			// Layer: notes & bar lines
+			// Layer: notes & bar lines. Players under the Flashlight canvas draw first, then the canvas,
+			// then the players it must not darken (their judge frames included).
 			this.ctHandHold.TickLoop();
 
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
-				// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
-				bool btmp = this.tProgressDraw_Chip(EKeyConfigPart.Taiko, i);
-				if (btmp == true)
-					isFinishedPlaying[i] = true;
+				if (!this.actFlashlight.DrawsOverLight(i))
+					this.tProgressDraw_Chips(i);
+			}
 
-#if DEBUG
-				if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.D0)) {
-					isFinishedPlaying[i] = true;
-				}
-#endif
+			this.actFlashlight.Draw();
+			this.actLaneTaiko.GoGoFlame(overLight: true);
+
+			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				if (this.actFlashlight.DrawsOverLight(i))
+					this.tProgressDraw_Chips(i);
 			}
 
 			// Layer: above-note elements
@@ -706,6 +710,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			anim = CCharacter.ANIM_GAME_FAILED;
 		this.actChara.CharacterControllers[i].PlayAction(anim);
 		this.actEnd.Start(i, endOfPlay: true);
+		this.actFlashlight.BeginFade();
 	}
 
 	protected override void UpdateClearAnimation(int iPlayer) {
@@ -732,6 +737,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	private CActImplPad actPad;
 	public CActImplMtaiko actMtaiko;
 	public CActImplLaneTaiko actLaneTaiko;
+	public CActImplFlashlight actFlashlight;
 	public CActImplClearAnimation actEnd;
 	private CActPlayDrumsGameMode actGame;
 	public CActImplTrainingMode actTokkun;
@@ -817,6 +823,61 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	private CCachedFontRenderer pfReplayModeTextSmall;
 	private TitleTextureKey ttkReplayMode;
 	private TitleTextureKey ttkReplayInvalid;
+
+	#region [Hidden / Flashlight]
+
+	// Hidden: a note is fully drawn while it is further than this share of the lane (judge zone to the
+	// screen edge, in skin pixels) from the judge zone, and gone once closer than the second share;
+	// linear in between. Flashlight lives in CActImplFlashlight.
+	private const double HIDDEN_FADE_START = 0.55;
+	private const double HIDDEN_FADE_END = 0.22;
+
+	// the opacity the Hidden mod gives a note `dist` pixels away from the judge zone (1 when the mod is off)
+	private float tHiddenOpacity(int nPlayer, double dist) {
+		if (OpenTaiko.ConfigIni.eSTEALTH[nPlayer] != EStealthMode.Hidden) return 1f;
+		// the base judge position (the judge-scroll offset excluded), so a moved judge zone keeps the same fade window
+		double lane = Math.Max(300, OpenTaiko.Skin.Resolution[0] - (GetNoteOriginX(nPlayer) - GetJPOSCROLLX(nPlayer)));
+		double start = lane * HIDDEN_FADE_START, end = lane * HIDDEN_FADE_END;
+		if (dist >= start) return 1f;
+		if (dist <= end) return 0f;
+		return (float)((dist - end) / (start - end));
+	}
+
+	// the distance from the judge zone of a note drawn at (x, y): the judge-scroll offset is part of the
+	// origin, so a scrolling judge zone measures from where it is now
+	private double tDistanceFromJudge(int nPlayer, int x, int y) {
+		double dx = x - GetNoteOriginX(nPlayer), dy = y - GetNoteOriginY(nPlayer);
+		return Math.Sqrt(dx * dx + dy * dy);
+	}
+
+	// the opacity the Hidden or Flashlight mod gives a note whose slot's top-left is (x, y)
+	private float tNoteOpacity(int nPlayer, int x, int y) {
+		if (this.actFlashlight.IsFlashlit(nPlayer)) return this.actFlashlight.NoteOpacity(nPlayer, x, y);
+		return this.tHiddenOpacity(nPlayer, this.tDistanceFromJudge(nPlayer, x, y));
+	}
+
+	// the same for a roll or balloon from its head (x, y) to its tail: Hidden fades the whole roll by its
+	// head, Flashlight by whichever part of it is closest to the light
+	private float tRollOpacity(int nPlayer, int x, int y, int xEnd, int yEnd) {
+		if (this.actFlashlight.IsFlashlit(nPlayer)) return this.actFlashlight.RollOpacity(nPlayer, x, y, xEnd, yEnd);
+		return this.tHiddenOpacity(nPlayer, this.tDistanceFromJudge(nPlayer, x, y));
+	}
+
+	#endregion
+
+	// one player's bar lines and notes (and their update phase)
+	private void tProgressDraw_Chips(int i) {
+		// bIsFinishedPlaying = this.t進行描画_チップ(E楽器パート.DRUMS, i);
+		bool btmp = this.tProgressDraw_Chip(EKeyConfigPart.Taiko, i);
+		if (btmp == true)
+			isFinishedPlaying[i] = true;
+
+#if DEBUG
+		if (OpenTaiko.InputManager.Keyboard.KeyPressed((int)SlimDXKeys.Key.D0)) {
+			isFinishedPlaying[i] = true;
+		}
+#endif
+	}
 
 	private void tDrawReplayModeIndicator() {
 		if (!OpenTaiko.bReplayMode[0]) return;
@@ -1074,9 +1135,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 				#region[ HIDSUD & STEALTH ]
 				EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[nPlayer];
-				if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
+				if (hiddenMode != EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
 					hiddenMode = EStealthMode.Stealth;
-				if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])
+				if (!hiddenMode.HidesNotes() && this.bCustomDoron[nPlayer])
 					hiddenMode = EStealthMode.Doron;
 				#endregion
 
@@ -1096,12 +1157,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
 						int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
 						var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
-						if (NotesManager.IsHittableNote(nt)) {
-							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode);
-							NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, hiddenMode: hiddenMode);
+						float opacity = this.tNoteOpacity(nPlayer, x, y);
+						if (NotesManager.IsHittableNote(nt) && opacity > 0f) {
+							NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+							NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, hiddenMode: hiddenMode, opacity: opacity);
 							if (!NotesManager.IsADLIB(nt))
-										NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
-									}
+								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
+						}
 					}
 				}
 			}
@@ -1150,15 +1212,26 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			#region[ HIDSUD & STEALTH ]
 			EStealthMode hiddenMode = OpenTaiko.ConfigIni.eSTEALTH[nPlayer];
-			if (hiddenMode < EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
+			if (hiddenMode != EStealthMode.Stealth && !(pChip.bShow && pChip.bShowSudden))
 				hiddenMode = EStealthMode.Stealth;
-			if (hiddenMode < EStealthMode.Doron && this.bCustomDoron[nPlayer])
+			if (!hiddenMode.HidesNotes() && this.bCustomDoron[nPlayer])
 				hiddenMode = EStealthMode.Doron;
 			#endregion
 
 			if (isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
 					int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
+
+					// a roll-end chip is judged from its head like the rest of the roll
+					float opacity;
+					if (NotesManager.IsRollEnd(nt) && pChip.start != null) {
+						int xHead = x - pChip.nHorizontalChipDistance + pChip.start.nHorizontalChipDistance;
+						int yHead = y - pChip.nVerticalChipDistance + pChip.start.nVerticalChipDistance;
+						opacity = this.tRollOpacity(nPlayer, xHead, yHead, x, y);
+					} else {
+						opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
+					}
+					if (opacity <= 0f) return;
 
 					//136, 30
 					var _size = OpenTaiko.Skin.Game_SENote_Size;
@@ -1186,10 +1259,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					var effectedColor = new Color4(1.0f, fDecreaseColor, fDecreaseColor, 1f);
 					var normalColor = new Color4(1.0f, 1.0f, 1.0f, 1f);
 
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode);
-						NotesManager.DisplayRoll(nPlayer, x, y, pChip, pxFaceTxOffset, normalColor, effectedColor, xEnd, yEnd, hiddenMode);
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+						NotesManager.DisplayRoll(nPlayer, x, y, pChip, pxFaceTxOffset, normalColor, effectedColor, xEnd, yEnd, hiddenMode, opacity);
 
-						if (hiddenMode < EStealthMode.Stealth && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+						if (!hiddenMode.HidesSENotes() && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
+							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
 							if (!NotesManager.IsFuzeRoll(nt)) {
 								int _shift = NotesManager.IsBigRollTaiko(nt, _gt) ? 26 : 0;
 								int senote = pChip.nSenote;
@@ -1204,21 +1279,24 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 								}
 								OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x - (_shift / 13), y + nSenotesY, new Rectangle(0, _size[1] * senote, _size[0], _size[1]));
 							} else {
-								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip);
+								NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, opacity: opacity);
 							}
-
+							OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
 						}
 
 					} else if (NotesManager.IsBalloon(nt) || NotesManager.IsKusudama(nt)) {
-						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode);
-						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode);
-						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode);
-					} else if (hiddenMode < EStealthMode.Stealth && NotesManager.IsRollEnd(nt)) {
+						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
+						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode, opacity);
+						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
+					} else if (!hiddenMode.HidesSENotes() && NotesManager.IsRollEnd(nt)) {
 						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
 						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
 							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
-						if (!NotesManager.IsGenericBalloon(pChip.start)) {
-							OpenTaiko.Tx.SENotes[(int)_gt]?.t2DDraw(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
+						if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
+							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
+							OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
+							OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
 						}
 
 					}
@@ -1334,11 +1412,16 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			var height = OpenTaiko.Skin.Game_Notes_Size[1];
 			var maxRadius = width + height; // upper limit of Math.Hypot(width, height) and a close approximant because width is small
 			if (x >= -maxRadius / 2 && x <= GameWindowSize.Width + maxRadius / 2) {
+				float opacity = this.actFlashlight.NoteOpacity(nPlayer, x, y);
+				if (opacity <= 0f) return;
 				double theta = (pChip.dbSCROLL_Y == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
 				CTexture tex = (pChip.bBranch) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
+				int savedOpacity = tex.Opacity;
+				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);
 				tex.fZAxisCenterRotate = (float)theta;
 				tex.t2DDraw(x + ((OpenTaiko.Skin.Game_Notes_Size[0] - tex.szTextureSize.Width) / 2), y, new Rectangle(0, 0, tex.szTextureSize.Width, OpenTaiko.Skin.Game_Notes_Size[1]));
 				tex.fZAxisCenterRotate = 0;
+				tex.Opacity = savedOpacity;
 			}
 		}
 	}

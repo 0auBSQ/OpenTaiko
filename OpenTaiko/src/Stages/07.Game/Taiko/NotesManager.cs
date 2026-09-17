@@ -313,9 +313,21 @@ class NotesManager {
 		}
 	}
 
+	// Draws with a texture faded to `opacity` (0..1) and restores its opacity afterwards: the Hidden mod's
+	// fade-out, applied to every note-related texture without leaving state behind.
+	private static void DrawFaded(CTexture tex, float opacity, Action<CTexture> draw) {
+		if (tex == null) return;
+		if (opacity >= 1f) { draw(tex); return; }
+		if (opacity <= 0f) return;
+		int saved = tex.Opacity;
+		tex.Opacity = (int)(saved * opacity);
+		draw(tex);
+		tex.Opacity = saved;
+	}
+
 	// Regular display
-	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1, EStealthMode hiddenMode = EStealthMode.Off) {
-		if (hiddenMode >= EStealthMode.Doron)
+	public static void DisplayNote(int player, int x, int y, CChip chip, int frame, int length = -1, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
+		if (hiddenMode.HidesNotes())
 			return;
 
 		if (length == -1) {
@@ -326,32 +338,32 @@ class NotesManager {
 		EGameType _gt = GetChipGameType(chip, player);
 
 		if (IsMine(nt)) {
-			OpenTaiko.Tx.Note_Mine?.t2DDraw(x, y);
+			DrawFaded(OpenTaiko.Tx.Note_Mine, opacity, t => t.t2DDraw(x, y));
 			return;
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			OpenTaiko.Tx.Note_Swap?.t2DDraw(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
+			DrawFaded(OpenTaiko.Tx.Note_Swap, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1])));
 			return;
 		} else if (IsKusudama(nt)) {
-			OpenTaiko.Tx.Note_Kusu?.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+			DrawFaded(OpenTaiko.Tx.Note_Kusu, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
 			return;
 		} else if (IsADLIB(nt)) {
 			var puchichara = OpenTaiko.Tx.Puchichara[PuchiChara.tGetPuchiCharaIndexByName(player)];
 			if (puchichara.effect.ShowAdlib) {
 				OpenTaiko.Tx.Note_Adlib?.tUpdateOpacity(50);
-				OpenTaiko.Tx.Note_Adlib?.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+				DrawFaded(OpenTaiko.Tx.Note_Adlib, opacity, t => t.t2DDraw(x, y, new Rectangle(0, frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
 			}
 			return;
 		}
 
 		int noteType = NoteTextureColumn(chip, _gt);
-		OpenTaiko.Tx.Notes[(int)_gt]?.t2DDraw(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1]));
+		DrawFaded(OpenTaiko.Tx.Notes[(int)_gt], opacity, t => t.t2DDraw(x, y, new Rectangle(noteType * OpenTaiko.Skin.Game_Notes_Size[0], frame, length, OpenTaiko.Skin.Game_Notes_Size[1])));
 	}
 
 	// Roll display
 	public static void DisplayRoll(int player, int x, int y, CChip chip, int frame,
-		Color4 normalColor, Color4 effectedColor, int xEnd, int yEnd, EStealthMode hiddenMode = EStealthMode.Off
+		Color4 normalColor, Color4 effectedColor, int xEnd, int yEnd, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f
 		) {
-		if (hiddenMode >= EStealthMode.Doron)
+		if (hiddenMode.HidesNotes() || opacity <= 0f)
 			return;
 
 		ENoteType nt = GetNoteType(chip);
@@ -381,6 +393,10 @@ class NotesManager {
 		}
 
 		if (_texarr == null) return;
+
+		// the fade applies to the head, body and tail alike, restored once the roll is drawn
+		int savedOpacity = _texarr.Opacity;
+		if (opacity < 1f) _texarr.Opacity = (int)(savedOpacity * opacity);
 
 		if (chip.bShowRoll) {
 			var theta = -Math.Atan2(yEnd - y, xEnd - x);
@@ -430,6 +446,7 @@ class NotesManager {
 		// Head
 		_texarr.t2DDraw(x, y, 0, new Rectangle(rollOrigin + _offset, frame, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
 		_texarr.color4 = normalColor;
+		_texarr.Opacity = savedOpacity;
 	}
 
 	// SENotes
@@ -440,29 +457,42 @@ class NotesManager {
 		>= 5 => (OpenTaiko.Skin.nSENotes_5P[0], OpenTaiko.Skin.nSENotes_5P[1]),
 	};
 
-	public static void DisplaySENotes(int player, int x, int y, CChip chip, EStealthMode hiddenMode = EStealthMode.Off) {
-		if (hiddenMode >= EStealthMode.Stealth)
+	public static void DisplaySENotes(int player, int x, int y, CChip chip, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
+		if (hiddenMode.HidesSENotes())
 			return;
 
 		ENoteType nt = GetNoteType(chip);
 		EGameType _gt = GetChipGameType(chip, player);
+		int w = OpenTaiko.Skin.Game_SENote_Size[0], h = OpenTaiko.Skin.Game_SENote_Size[1];
 
 		if (IsMine(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1], OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h, w, h)));
 		} else if (IsPurpleNoteTaiko(nt, _gt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, 0, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, 0, w, h)));
 		} else if (IsFuzeRoll(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 2, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * 2, w, h)));
 		} else if (IsKusudama(nt)) {
-			OpenTaiko.Tx.SENotesExtension?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * 3, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			DrawFaded(OpenTaiko.Tx.SENotesExtension, opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * 3, w, h)));
 		} else {
-			OpenTaiko.Tx.SENotes[(int)_gt]?.t2DDraw(x, y, new Rectangle(0, OpenTaiko.Skin.Game_SENote_Size[1] * chip.nSenote, OpenTaiko.Skin.Game_SENote_Size[0], OpenTaiko.Skin.Game_SENote_Size[1]));
+			DrawFaded(OpenTaiko.Tx.SENotes[(int)_gt], opacity, t => t.t2DDraw(x, y, new Rectangle(0, h * chip.nSenote, w, h)));
 		}
 	}
 
-	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveCounterValue, EStealthMode hiddenMode = EStealthMode.Off) {
-		if (!chip.IsPartnerNote || (hiddenMode >= EStealthMode.Doron))
+	public static void DisplayNoteArm(int player, int x, int y, CChip chip, float moveCounterValue, EStealthMode hiddenMode = EStealthMode.Off, float opacity = 1f) {
+		if (!chip.IsPartnerNote || hiddenMode.HidesNotes() || opacity <= 0f)
 			return;
+
+		var arm = OpenTaiko.Tx.Notes_Arm;
+		int savedArmOpacity = arm?.Opacity ?? 255;
+		if (arm != null && opacity < 1f) arm.Opacity = (int)(savedArmOpacity * opacity);
+		try {
+			DisplayNoteArmInner(player, x, y, chip, moveCounterValue);
+		} finally {
+			if (arm != null) arm.Opacity = savedArmOpacity;
+		}
+	}
+
+	private static void DisplayNoteArmInner(int player, int x, int y, CChip chip, float moveCounterValue) {
 
 		float moveAmount = (moveCounterValue < 30 ? moveCounterValue : 60 - moveCounterValue) / 30.0f;
 		int moveX = (int)(moveAmount * OpenTaiko.Skin.Game_Notes_Arm_Move[0]);

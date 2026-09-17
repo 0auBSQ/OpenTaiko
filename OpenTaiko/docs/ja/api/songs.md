@@ -362,7 +362,7 @@ node.UnlockCondition がこのオブジェクトを返します。HasCondition �
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | 同じ列挙をバックグラウンドスレッドで実行し、ポーリング用のハンドルを返します。 |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | リプレイファイルを読み込み、次のプレイの再生を準備します。ファイルの読み込みに失敗するかリプレイが観賞不可の場合は false を返します。chartPath はゲーム内の「無効なリプレイ」警告を有効にします。 |
 | `REPLAY:Watch(filepath)  -> bool` | 同上。譜面パスなし。 |
-| `REPLAY.MODFLAG  (object)` | ModFlags のビット値: None (0)、Mirror (1)、Random (2)、SuperRandom (4)、Invisible (8)、PerfectMemory (16)、Avalanche (32)、Minesweeper (64)、Just (128)、Safe (256)、DynamicBeat (512)。 |
+| `REPLAY.MODFLAG  (object)` | ModFlags のビット値: None (0)、Mirror (1)、Random (2)、SuperRandom (4)、Invisible (8)、PerfectMemory (16)、Avalanche (32)、Minesweeper (64)、Just (128)、Safe (256)、DynamicBeat (512)、Hidden (1024)、Flashlight (2048)。 |
 
 ```lua
 local flags = header.ModFlags

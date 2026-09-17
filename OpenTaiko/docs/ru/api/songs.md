@@ -362,7 +362,7 @@ end
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | Выполняет то же перечисление в фоновом потоке и возвращает дескриптор для опроса. |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | Загружает файл реплея и готовит воспроизведение для следующей игры; возвращает false, если файл не загружается или реплей не воспроизводим. chartPath включает внутриигровые предупреждения «недействительный реплей». |
 | `REPLAY:Watch(filepath)  -> bool` | То же без пути к чарту. |
-| `REPLAY.MODFLAG  (object)` | Битовые значения для ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512). |
+| `REPLAY.MODFLAG  (object)` | Битовые значения для ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512), Hidden (1024), Flashlight (2048). |
 
 ```lua
 local flags = header.ModFlags

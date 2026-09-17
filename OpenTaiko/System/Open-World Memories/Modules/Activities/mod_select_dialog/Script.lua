@@ -123,12 +123,14 @@ local OPTION_DEFS = {
     {
         meta = "invisible",
         text = "Invisible",
-        desc = "Hide the notes and rely on your memory to win!",
+        desc = "Hide the notes, in one way or another, and rely on your memory and reflexes!",
         type = "multi",
         choices = {
-            { label = "None",    color = COL_WHITE, desc = "Notes are fully visible." },
-            { label = "Doron",   color = COL_WHITE, desc = "Invisible notes, but SE notes indications are still here." },
-            { label = "Stealth", color = COL_WHITE, desc = "Nothing here, only your memory can help you!" },
+            { label = "None",       color = COL_WHITE, desc = "Notes are fully visible." },
+            { label = "Doron",      color = COL_WHITE, desc = "Invisible notes, but SE notes indications are still here." },
+            { label = "Stealth",    color = COL_WHITE, desc = "Nothing here, only your memory can help you!" },
+            { label = "Hidden",     color = COL_WHITE, desc = "Notes fade away as they approach the judge zone. Read ahead!" },
+            { label = "Flashlight", color = COL_WHITE, desc = "Only a circle of light around the judge zone shows the notes, and it shrinks as your combo grows." },
         }
     },
     {

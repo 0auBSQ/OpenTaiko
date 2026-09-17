@@ -94,10 +94,11 @@ function draw(x, y, player, layout, alpha)
     drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
     drawValue(scrollValueText(scroll), hsIcon, x + ox[1], y + oy[1], alpha)
 
-    -- Slot 2: Doron / Stealth
+    -- Slot 2: Doron / Stealth / Hidden / Flashlight
     local stealth = CONFIG:GetStealthMod(player)
     local STEALTH = CONFIG.STEALTH
-    for _, v in ipairs{ { STEALTH.Doron, "Doron" }, { STEALTH.Stealth, "Stealth" }, { stealth, "None" } } do
+    for _, v in ipairs{ { STEALTH.Doron, "Doron" }, { STEALTH.Stealth, "Stealth" },
+        { STEALTH.Hidden or -1, "Hidden" }, { STEALTH.Flashlight or -1, "Flashlight" }, { stealth, "None" } } do
         local mod, key = table.unpack(v)
         if stealth == mod then drawIcon(tx[key], x + ox[2], y + oy[2], alpha); break end
     end
@@ -167,8 +168,9 @@ function drawFlags(x, y, mods, scroll, song, timing, layout, alpha)
     drawIcon(hsIcon, x + ox[1], y + oy[1], alpha)
     drawValue(scrollValueText(sc), hsIcon, x + ox[1], y + oy[1], alpha)
 
-    -- Slot 2: Doron / Stealth
-    for _, v in ipairs{ { MOD.Invisible, "Doron" }, { MOD.PerfectMemory, "Stealth" }, { 0, "None" } } do
+    -- Slot 2: Doron / Stealth / Hidden / Flashlight
+    for _, v in ipairs{ { MOD.Invisible, "Doron" }, { MOD.PerfectMemory, "Stealth" },
+        { MOD.Hidden or -1, "Hidden" }, { MOD.Flashlight or -1, "Flashlight" }, { 0, "None" } } do
         local bit, name = table.unpack(v)
         if has(bit) then drawIcon(tx[name], x + ox[2], y + oy[2], alpha); break end
     end
@@ -221,6 +223,8 @@ function onStart()
     tx["Auto"]    = TEXTURE:CreateTexture("Textures/Mods/Auto.png")
     tx["Doron"]   = TEXTURE:CreateTexture("Textures/Mods/Doron.png")
     tx["Stealth"] = TEXTURE:CreateTexture("Textures/Mods/Stealth.png")
+    tx["Hidden"]  = TEXTURE:CreateTexture("Textures/Mods/Hidden.png")
+    tx["Flashlight"] = TEXTURE:CreateTexture("Textures/Mods/Flashlight.png")
     tx["Just"]    = TEXTURE:CreateTexture("Textures/Mods/Just.png")
     tx["Safe"]    = TEXTURE:CreateTexture("Textures/Mods/Safe.png")
     tx["Mirror"]  = TEXTURE:CreateTexture("Textures/Mods/Mirror.png")

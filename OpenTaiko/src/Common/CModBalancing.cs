@@ -25,10 +25,16 @@ internal static class CModBalancing {
 		return 1f + 0.2f * _compare;
 	}
 
+	// coins only: Doron 1.1, Stealth 1.4, Hidden a little under Doron, Flashlight between Doron and Stealth
 	public static float tGetDoronFactor(EBalancingType ebt, int player = 0) {
-		var _compare = (int)OpenTaiko.ConfigIni.eSTEALTH[player];
-		if (ebt == EBalancingType.SCORE || _compare == 0) return 1f;
-		return 1f + 0.1f * (float)Math.Pow(_compare, 2);
+		if (ebt == EBalancingType.SCORE) return 1f;
+		return OpenTaiko.ConfigIni.eSTEALTH[player] switch {
+			EStealthMode.Doron => 1.1f,
+			EStealthMode.Stealth => 1.4f,
+			EStealthMode.Hidden => 1.06f,
+			EStealthMode.Flashlight => 1.28f,
+			_ => 1f,
+		};
 	}
 
 	public static float tGetModMultiplier(EBalancingType ebt, int player = 0) {

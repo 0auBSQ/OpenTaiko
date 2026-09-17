@@ -178,6 +178,8 @@ namespace OpenTaiko {
 			public const int Off = (int)EStealthMode.Off;
 			public const int Doron = (int)EStealthMode.Doron;
 			public const int Stealth = (int)EStealthMode.Stealth;
+			public const int Hidden = (int)EStealthMode.Hidden;
+			public const int Flashlight = (int)EStealthMode.Flashlight;
 		}
 		public readonly StealthMod STEALTH = new();
 		public int GetStealthMod(int player) {

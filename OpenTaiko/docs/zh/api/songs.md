@@ -362,7 +362,7 @@ node.UnlockCondition 返回此对象。HasCondition 是属性；其余是方法�
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | 在后台线程运行同样的列举，并返回一个可轮询的句柄。 |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | 加载回放文件并为下一次演奏预备回放；文件加载失败或回放不可观看时返回 false。chartPath 启用游戏内的“无效回放”警告。 |
 | `REPLAY:Watch(filepath)  -> bool` | 同上，但不带谱面路径。 |
-| `REPLAY.MODFLAG  (object)` | ModFlags 的位值：None（0）、Mirror（1）、Random（2）、SuperRandom（4）、Invisible（8）、PerfectMemory（16）、Avalanche（32）、Minesweeper（64）、Just（128）、Safe（256）、DynamicBeat（512）。 |
+| `REPLAY.MODFLAG  (object)` | ModFlags 的位值：None（0）、Mirror（1）、Random（2）、SuperRandom（4）、Invisible（8）、PerfectMemory（16）、Avalanche（32）、Minesweeper（64）、Just（128）、Safe（256）、DynamicBeat（512）、Hidden（1024）、Flashlight（2048）。 |
 
 ```lua
 local flags = header.ModFlags

@@ -427,11 +427,14 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 	}
 
-	public void GoGoFlame() {
+	// judge frames, go-go flames and hit bursts; called once per layer around the Flashlight canvas,
+	// each player drawn on the layer CActImplFlashlight.DrawsOverLight puts it on
+	public void GoGoFlame(bool overLight) {
 		//判定枠
 		if (OpenTaiko.Tx.Judge_Frame != null) {
 			OpenTaiko.Tx.Judge_Frame.bAddBlend = OpenTaiko.Skin.Game_JudgeFrame_AddBlend;
 			for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+				if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
 				OpenTaiko.Tx.Judge_Frame.t2DDraw(
 					OpenTaiko.stageGameScreen.GetNoteOriginX(i),
 					OpenTaiko.stageGameScreen.GetNoteOriginY(i), new Rectangle(0, 0, OpenTaiko.Skin.Game_Notes_Size[0], OpenTaiko.Skin.Game_Notes_Size[1]));
@@ -441,6 +444,7 @@ internal class CActImplLaneTaiko : CActivity {
 
 		#region[ ゴーゴー炎 ]
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
 			if (OpenTaiko.stageGameScreen.bIsGOGOTIME[i] && !OpenTaiko.ConfigIni.SimpleMode) {
 				this.ctGoGoFlame.TickLoop();
 
@@ -490,6 +494,7 @@ internal class CActImplLaneTaiko : CActivity {
 		}
 		#endregion
 		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			if (OpenTaiko.stageGameScreen.actFlashlight.DrawsOverLight(i) != overLight) continue;
 			if (!this.stState[i].ctProgress.IsStopped) {
 				this.stState[i].ctProgress.Tick();
 				if (this.stState[i].ctProgress.IsEnded) {

@@ -279,7 +279,7 @@ CONFIG の定数テーブルは上記の整数値に名前を与えます。`SON
 | `CONFIG.DEFAULT_COURSE` | `Easy`、`Normal`、`Hard`、`Oni`、`Edit`。 |
 | `CONFIG.LEGACY_SCORING` | `Gen1Oni`、`Gen1_2`、`Gen2`、`Gen3`。 |
 | `CONFIG.RANDOM` | `Off`、`Random`、`Mirror`、`SuperRandom`、`MirrorRandom`。 |
-| `CONFIG.STEALTH` | `Off`、`Doron`、`Stealth`。 |
+| `CONFIG.STEALTH` | `Off`、`Doron`、`Stealth`、`Hidden`、`Flashlight`。 |
 | `CONFIG.FUN` | `None`、`Avalanche`、`Minesweeper`、`DynamicBeat`、`Total`。 |
 | `CONFIG.JUSTICE` | `None`、`Just`、`Safe`。 |
 

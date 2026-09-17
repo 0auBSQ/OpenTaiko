@@ -25,6 +25,9 @@ class CSongReplay {
 	 * - 6 (64) : Minesweeper
 	 * - 7 (128) : Just (Ok => Bad)
 	 * - 8 (256) : Safe (Bad => Ok)
+	 * - 9 (512) : Dynamic Beat
+	 * - 10 (1024) : Hidden (notes fade out before the judge zone)
+	 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
 	 */
 	[Flags]
 	public enum EModFlag {
@@ -38,7 +41,9 @@ class CSongReplay {
 		Minesweeper = 1 << 6,
 		Just = 1 << 7,
 		Safe = 1 << 8,
-		DynamicBeat = 1 << 9
+		DynamicBeat = 1 << 9,
+		Hidden = 1 << 10,
+		Flashlight = 1 << 11
 	}
 
 	public CSongReplay() {
@@ -437,6 +442,9 @@ class CSongReplay {
 		 * - 6 (64) : Minesweeper
 		 * - 7 (128) : Just (Ok => Bad)
 		 * - 8 (256) : Safe (Bad => Ok)
+		 * - 9 (512) : Dynamic Beat
+		 * - 10 (1024) : Hidden (notes fade out before the judge zone)
+		 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
 		 */
 		ModFlags = (int)EModFlag.None;
 		if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.Mirror) ModFlags |= (int)EModFlag.Mirror;
@@ -445,6 +453,8 @@ class CSongReplay {
 		if (OpenTaiko.ConfigIni.eRandom[actualPlayer] == ERandomMode.MirrorRandom) ModFlags |= ((int)EModFlag.Random | (int)EModFlag.Mirror);
 		if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Doron) ModFlags |= (int)EModFlag.Invisible;
 		if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Stealth) ModFlags |= (int)EModFlag.PerfectMemory;
+		if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Hidden) ModFlags |= (int)EModFlag.Hidden;
+		if (OpenTaiko.ConfigIni.eSTEALTH[actualPlayer] == EStealthMode.Flashlight) ModFlags |= (int)EModFlag.Flashlight;
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Avalanche) ModFlags |= (int)EModFlag.Avalanche;
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.Minesweeper) ModFlags |= (int)EModFlag.Minesweeper;
 		if (OpenTaiko.ConfigIni.nFunMods[actualPlayer] == EFunMods.DynamicBeat) ModFlags |= (int)EModFlag.DynamicBeat;
@@ -526,6 +536,8 @@ class CSongReplay {
 
 		if ((ModFlags & (int)EModFlag.Invisible) != 0) cfg.eSTEALTH[0] = EStealthMode.Doron;
 		else if ((ModFlags & (int)EModFlag.PerfectMemory) != 0) cfg.eSTEALTH[0] = EStealthMode.Stealth;
+		else if ((ModFlags & (int)EModFlag.Hidden) != 0) cfg.eSTEALTH[0] = EStealthMode.Hidden;
+		else if ((ModFlags & (int)EModFlag.Flashlight) != 0) cfg.eSTEALTH[0] = EStealthMode.Flashlight;
 		else cfg.eSTEALTH[0] = EStealthMode.Off;
 
 		if ((ModFlags & (int)EModFlag.Avalanche) != 0) cfg.nFunMods[0] = EFunMods.Avalanche;
@@ -681,6 +693,9 @@ class CSongReplay {
 	 * - 6 (64) : Minesweeper
 	 * - 7 (128) : Just (Ok => Bad)
 	 * - 8 (256) : Safe (Bad => Ok)
+	 * - 9 (512) : Dynamic Beat
+	 * - 10 (1024) : Hidden (notes fade out before the judge zone)
+	 * - 11 (2048) : Flashlight (only a circle around the judge zone is lit)
 	 */
 	public int ModFlags;
 	/* Gauge type

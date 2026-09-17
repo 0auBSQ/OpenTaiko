@@ -362,7 +362,7 @@ Disponible como la global REPLAY. ListReplays devuelve un array C# de cabeceras 
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | Ejecuta el mismo listado en un hilo en segundo plano y devuelve un handle para consultar. |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | Carga el archivo de repetición y prepara la reproducción para la siguiente partida; devuelve false cuando el archivo no consigue cargarse o la repetición no se puede ver. chartPath activa los avisos de "repetición inválida" en el juego. |
 | `REPLAY:Watch(filepath)  -> bool` | Igual sin ruta de chart. |
-| `REPLAY.MODFLAG  (object)` | Valores de bit para ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512). |
+| `REPLAY.MODFLAG  (object)` | Valores de bit para ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512), Hidden (1024), Flashlight (2048). |
 
 ```lua
 local flags = header.ModFlags

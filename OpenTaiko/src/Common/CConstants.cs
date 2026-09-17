@@ -291,10 +291,21 @@ public enum ENoteState {
 	Bad
 }
 
+// Doron and Stealth hide the notes outright; Hidden fades them out as they near the judge zone;
+// Flashlight keeps them visible only inside a lit circle around the judge zone. One choice per player.
 public enum EStealthMode {
 	Off = 0,
 	Doron = 1,
-	Stealth = 2
+	Stealth = 2,
+	Hidden = 3,
+	Flashlight = 4,
+}
+
+public static class StealthModeExtensions {
+	/// <summary>The notes themselves are not drawn at all (Doron, Stealth).</summary>
+	public static bool HidesNotes(this EStealthMode m) => m == EStealthMode.Doron || m == EStealthMode.Stealth;
+	/// <summary>The SE-note captions are not drawn either (Stealth).</summary>
+	public static bool HidesSENotes(this EStealthMode m) => m == EStealthMode.Stealth;
 }
 
 /// <summary>

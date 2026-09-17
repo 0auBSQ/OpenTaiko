@@ -279,7 +279,7 @@ CONFIG의 상수 테이블은 위의 정수 값에 이름을 붙입니다. `SONG
 | `CONFIG.DEFAULT_COURSE` | `Easy`, `Normal`, `Hard`, `Oni`, `Edit`. |
 | `CONFIG.LEGACY_SCORING` | `Gen1Oni`, `Gen1_2`, `Gen2`, `Gen3`. |
 | `CONFIG.RANDOM` | `Off`, `Random`, `Mirror`, `SuperRandom`, `MirrorRandom`. |
-| `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`. |
+| `CONFIG.STEALTH` | `Off`, `Doron`, `Stealth`, `Hidden`, `Flashlight`. |
 | `CONFIG.FUN` | `None`, `Avalanche`, `Minesweeper`, `DynamicBeat`, `Total`. |
 | `CONFIG.JUSTICE` | `None`, `Just`, `Safe`. |
 

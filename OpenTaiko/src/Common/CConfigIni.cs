@@ -1657,7 +1657,7 @@ internal class CConfigIni : INotifyPropertyChanged {
 		sw.WriteLine("TaikoRandom4P={0}", (int)this.eRandom[3]);
 		sw.WriteLine("TaikoRandom5P={0}", (int)this.eRandom[4]);
 		sw.WriteLine();
-		sw.WriteLine("; STEALTHモード(0:OFF, 1:ドロン, 2:ステルス)");
+		sw.WriteLine("; STEALTHモード(0:OFF, 1:ドロン, 2:ステルス, 3:Hidden, 4:Flashlight)");
 		sw.WriteLine("TaikoStealth1P={0}", (int)this.eSTEALTH[0]);
 		sw.WriteLine("TaikoStealth2P={0}", (int)this.eSTEALTH[1]);
 		sw.WriteLine("TaikoStealth3P={0}", (int)this.eSTEALTH[2]);
@@ -2580,23 +2580,23 @@ internal class CConfigIni : INotifyPropertyChanged {
 			case "TaikoStealth1P":
 			case "TaikoStealth":
 				this.eSTEALTH[0] =
-					(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[0]);
+					(EStealthMode)CConversion.ParseIntInRange(value, 0, (int)EStealthMode.Flashlight, (int)this.eSTEALTH[0]);
 				break;
 			case "TaikoStealth2P":
 				this.eSTEALTH[1] =
-					(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[1]);
+					(EStealthMode)CConversion.ParseIntInRange(value, 0, (int)EStealthMode.Flashlight, (int)this.eSTEALTH[1]);
 				break;
 			case "TaikoStealth3P":
 				this.eSTEALTH[2] =
-					(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[2]);
+					(EStealthMode)CConversion.ParseIntInRange(value, 0, (int)EStealthMode.Flashlight, (int)this.eSTEALTH[2]);
 				break;
 			case "TaikoStealth4P":
 				this.eSTEALTH[3] =
-					(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[3]);
+					(EStealthMode)CConversion.ParseIntInRange(value, 0, (int)EStealthMode.Flashlight, (int)this.eSTEALTH[3]);
 				break;
 			case "TaikoStealth5P":
 				this.eSTEALTH[4] =
-					(EStealthMode)CConversion.ParseIntInRange(value, 0, 3, (int)this.eSTEALTH[4]);
+					(EStealthMode)CConversion.ParseIntInRange(value, 0, (int)EStealthMode.Flashlight, (int)this.eSTEALTH[4]);
 				break;
 			case "TaikoRandom1P":
 			case "TaikoRandom":

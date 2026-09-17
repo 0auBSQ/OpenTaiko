@@ -362,7 +362,7 @@ Als globales Objekt REPLAY verfügbar. ListReplays gibt ein C#-Array von Replay-
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | Führt dieselbe Auflistung auf einem Hintergrund-Thread aus und gibt ein Handle zum Abfragen zurück. |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | Lädt die Replay-Datei und bereitet die Wiedergabe für das nächste Spiel vor; gibt false zurück, wenn das Laden der Datei fehlschlägt oder das Replay nicht ansehbar ist. chartPath aktiviert die Warnungen "ungültiges Replay" im Spiel. |
 | `REPLAY:Watch(filepath)  -> bool` | Dasselbe ohne Chart-Pfad. |
-| `REPLAY.MODFLAG  (object)` | Bitwerte für ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512). |
+| `REPLAY.MODFLAG  (object)` | Bitwerte für ModFlags: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512), Hidden (1024), Flashlight (2048). |
 
 ```lua
 local flags = header.ModFlags

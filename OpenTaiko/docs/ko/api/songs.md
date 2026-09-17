@@ -362,7 +362,7 @@ node.UnlockCondition이 이 객체를 반환합니다. HasCondition은 프로퍼
 | `REPLAY:ListReplaysAsync(songFolder, uniqueId, difficulty, topN, chartPath)  -> replay list handle` | 같은 나열을 백그라운드 스레드에서 실행하고 폴링할 핸들을 반환합니다. |
 | `REPLAY:Watch(filepath, chartPath)  -> bool` | 리플레이 파일을 로드하고 다음 플레이의 재생을 준비합니다. 파일 로드에 실패하거나 리플레이를 볼 수 없으면 false를 반환합니다. chartPath는 게임 내 "유효하지 않은 리플레이" 경고를 켭니다. |
 | `REPLAY:Watch(filepath)  -> bool` | 채보 경로 없이 같은 동작. |
-| `REPLAY.MODFLAG  (object)` | ModFlags의 비트 값: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512). |
+| `REPLAY.MODFLAG  (object)` | ModFlags의 비트 값: None (0), Mirror (1), Random (2), SuperRandom (4), Invisible (8), PerfectMemory (16), Avalanche (32), Minesweeper (64), Just (128), Safe (256), DynamicBeat (512), Hidden (1024), Flashlight (2048). |
 
 ```lua
 local flags = header.ModFlags
