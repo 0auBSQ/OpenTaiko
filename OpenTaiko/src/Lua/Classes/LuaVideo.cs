@@ -139,9 +139,13 @@ namespace OpenTaiko {
 		internal LuaVideo Create(string path, bool autoDispose) => Create(path, autoDispose, withAudio: false);
 
 		// withAudio: the file's own audio track plays with it (music volume group) and clocks the picture
-		internal LuaVideo Create(string path, bool autoDispose, bool withAudio) {
-			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
+		internal LuaVideo Create(string path, bool autoDispose, bool withAudio)
+			=> Open($@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}", path, autoDispose, withAudio);
 
+		internal LuaVideo CreateFromAbsolutePath(string path, bool autoDispose, bool withAudio)
+			=> Open(path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar), path, autoDispose, withAudio);
+
+		private LuaVideo Open(string full_path, string path, bool autoDispose, bool withAudio) {
 			LuaVideo luavid = new();
 			if (File.Exists(full_path)) {
 				Videos.Add(luavid);
@@ -181,5 +185,7 @@ namespace OpenTaiko {
 
 		public LuaVideo CreateVideo(string path) => Create(path, autoDispose: true);
 		public LuaVideo CreateVideo(string path, bool withAudio) => Create(path, autoDispose: true, withAudio: withAudio);
+		public LuaVideo CreateVideoFromAbsolutePath(string path) => CreateFromAbsolutePath(path, autoDispose: true, withAudio: false);
+		public LuaVideo CreateVideoFromAbsolutePath(string path, bool withAudio) => CreateFromAbsolutePath(path, autoDispose: true, withAudio: withAudio);
 	}
 }

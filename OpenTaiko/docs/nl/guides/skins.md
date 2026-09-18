@@ -155,7 +155,7 @@ Binnen elke categorie maakt het spel eerst elke module aan en draait daarna `onS
 Het spel zoekt deze modules op naam op, en de meegeleverde skin levert ze allemaal:
 
 - Stages `_boot` en `_title`. Het spel stopt met een fout als een van beide ontbreekt.
-- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum` en `danplate`.
+- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` en `danplate`.
 - Transitions `default` en `song_loading`. `song_loading` speelt terwijl het spel een nummer laadt; het spel gebruikt `default` wanneer `Exit` geen transitie noemt of een noemt die niet bestaat. Een skin zonder enige transitiemodule valt terug op een gewone zwarte fade.
 
 Houd al deze modules op hun plaats bij het bouwen van een skin; voeg je eigen modules ernaast toe.
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   (als eerste geladen; "default" en "song_loading" door het spel gebruikt)
   Stages/        <name>/Script.lua   ("_boot" en "_title" vereist)
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, danplate vereist)
+  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, cutscene, danplate vereist)
   Lib/           gedeelde .lua-bestanden bereikt met require, niet gescand
 ```
 

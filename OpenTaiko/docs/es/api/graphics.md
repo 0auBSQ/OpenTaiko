@@ -278,6 +278,8 @@ Las rutas son relativas al directorio del script. El decodificador se abre en un
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Abre un archivo de vídeo y devuelve su handle. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Abre un archivo de vídeo; con `withAudio` en true su propia pista de audio suena con él al volumen de reproducción de canción, y la imagen sigue el reloj de ese sonido, así que no pueden desincronizarse. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Abre un archivo de vídeo desde una ruta completa. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Abre un archivo de vídeo desde una ruta completa, con su propia pista de audio si `withAudio` es true. |
 
 ### Handle de vídeo
 

@@ -155,7 +155,7 @@ My New Skin/
 游戏按名称查找以下模块，自带皮肤提供了全部：
 
 - 舞台 `_boot` 和 `_title`。任一缺失时游戏会报错停止。
-- 只读活动 `modal`、`config_ui`、`nameplate`、`popup_menu`、`modicons`、`song_enum` 和 `danplate`。
+- 只读活动 `modal`、`config_ui`、`nameplate`、`popup_menu`、`modicons`、`song_enum`, `cutscene` 和 `danplate`。
 - 过渡 `default` 和 `song_loading`。`song_loading` 在游戏加载歌曲时播放；`Exit` 未指定过渡或指定的过渡不存在时，游戏使用 `default`。完全没有过渡模块的皮肤回退为纯黑色淡入淡出。
 
 构建皮肤时请保留所有这些模块；把你自己的模块添加在它们旁边。
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   （最先加载；游戏使用 "default" 和 "song_loading"）
   Stages/        <name>/Script.lua   （"_boot" 和 "_title" 必需）
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   （modal、config_ui、nameplate、popup_menu、modicons、song_enum、danplate 必需）
+  ROActivities/  <name>/Script.lua   （modal、config_ui、nameplate、popup_menu、modicons、song_enum、cutscene、danplate 必需）
   Lib/           通过 require 访问的共享 .lua 文件，不会被扫描
 ```
 

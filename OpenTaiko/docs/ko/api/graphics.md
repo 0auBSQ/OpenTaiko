@@ -278,6 +278,8 @@ end
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 비디오 파일을 열고 핸들을 반환합니다. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | 동영상 파일을 엽니다. `withAudio`가 true이면 동영상 자체의 오디오 트랙이 곡 재생 볼륨으로 함께 재생되고, 영상은 그 소리의 시계를 따르므로 둘이 어긋날 수 없습니다. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | 전체 경로에서 동영상 파일을 엽니다. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | 전체 경로에서 동영상 파일을 열며, `withAudio`가 true이면 자체 오디오 트랙과 함께 엽니다. |
 
 ### 비디오 핸들
 

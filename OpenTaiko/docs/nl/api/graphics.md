@@ -278,6 +278,8 @@ Paden zijn relatief ten opzichte van de scriptmap. De decoder opent op een achte
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Opent een videobestand en geeft zijn handle terug. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Opent een videobestand; met `withAudio` true speelt zijn eigen audiospoor mee op het nummerweergavevolume, en het beeld volgt de klok van dat geluid, zodat de twee niet uit elkaar kunnen lopen. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Opent een videobestand van een volledig pad. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Opent een videobestand van een volledig pad, met zijn eigen audiospoor als `withAudio` true is. |
 
 ### Video-handle
 

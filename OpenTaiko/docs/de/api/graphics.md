@@ -278,6 +278,8 @@ Pfade sind relativ zum Skriptverzeichnis. Der Decoder öffnet auf einem Hintergr
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Öffnet eine Videodatei und gibt ihr Handle zurück. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Öffnet eine Videodatei; mit `withAudio` true spielt ihre eigene Tonspur in der Songwiedergabe-Lautstärke mit, und das Bild folgt der Uhr dieses Tons, sodass beide nicht auseinanderlaufen können. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Öffnet eine Videodatei aus einem vollständigen Pfad. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Öffnet eine Videodatei aus einem vollständigen Pfad, mit ihrer eigenen Tonspur, wenn `withAudio` true ist. |
 
 ### Video-Handle
 

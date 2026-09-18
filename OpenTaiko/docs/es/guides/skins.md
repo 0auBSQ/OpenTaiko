@@ -155,7 +155,7 @@ Dentro de cada categoría el juego crea primero todos los módulos y después ej
 El juego busca estos módulos por nombre, y el skin incluido los proporciona todos:
 
 - Stages `_boot` y `_title`. El juego se detiene con un error si falta cualquiera de los dos.
-- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum` y `danplate`.
+- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` y `danplate`.
 - Transitions `default` y `song_loading`. `song_loading` se reproduce mientras el juego carga una canción; el juego usa `default` cuando `Exit` no nombra ninguna transición o nombra una que no existe. Un skin sin ningún módulo de transición recurre a un fundido a negro simple.
 
 Mantén todos estos en su sitio al construir un skin; añade tus propios módulos junto a ellos.
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   (se cargan primero; el juego usa "default" y "song_loading")
   Stages/        <name>/Script.lua   ("_boot" y "_title" obligatorios)
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, danplate obligatorios)
+  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, cutscene, danplate obligatorios)
   Lib/           archivos .lua compartidos accesibles con require, no se escanean
 ```
 

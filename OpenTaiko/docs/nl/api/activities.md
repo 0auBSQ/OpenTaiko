@@ -201,6 +201,7 @@ De engine zoekt sommige ROActivities op vaste mapnaam op en stuurt ze zelf aan. 
 | `popup_menu` | `activate(title, items, fontSize, ...)` waarbij items de labels zijn, samengevoegd met regeleinden, gevolgd door de PopupMenu-skinposities; `draw(selected)` elk frame; `deactivate()` bij sluiten. |
 | `config_ui` | `activate(model)` met het instellingenmodel; `update()` elk frame, dat "exit" teruggeeft om het instellingenscherm te verlaten; `draw()`; `reload(model)` via Call wanneer de engine het model opnieuw opbouwt; `deactivate()`. |
 | `song_enum` | `activate()`, daarna `draw(isCommandSongDataGet, done, total)` elk frame terwijl de nummerscan draait; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)` met de videobestanden op volgorde en een fade naar zwart na de laatste (0 voor geen); `update()` elk frame, geeft "finished" terug zodra elke video is afgespeeld en de fade voorbij is; `draw()`; `deactivate()`. Speelt elk bestand met zijn eigen audiospoor en beheert de pauzepopup; waar de cutscene voor dient bepaalt de aanroeper. |
 
 ## Achtergronden
 

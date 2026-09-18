@@ -3,71 +3,38 @@ using FDK;
 
 namespace OpenTaiko;
 
+// The intro/outro cutscene stage. The videos, their audio, the pause popup and the closing fade all live in
+// the Lua "cutscene" ROActivity, which knows nothing about intros or outros; this stage decides which
+// cutscenes qualify (save-file triggers, clear requirements), hands their files and the fade it wants to the
+// script, and turns its "finished" into the stage flow's return value.
 class CStageCutScene : CStage {
 	public CStageCutScene() {
 		base.eStageID = EStage.CutScene;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-
-		// Load CActivity objects here
-		// base.list子Activities.Add(this.act = new CAct());
-
-		base.ChildActivities.Add(this.actAVI = new());
-		base.ChildActivities.Add(this.actFOIntro = new());
-		base.ChildActivities.Add(this.actFOOutro = new());
-		base.ChildActivities.Add(this.actPauseMenu = new());
 	}
 
-	public override void Activate() {
-		// On activation
+	private static LuaROActivityWrapper? UI => LuaROActivityWrapper.GetROActivity("cutscene");
 
+	// the outro fades to black before song select; the intro hands over at once, the loading transition covers it
+	private const double OUTRO_FADE_SECONDS = 0.6;
+
+	public override void Activate() {
 		if (base.IsActivated)
 			return;
 
-		if (this.cutScenes == null)
-			this.cutScenes = [];
-		//this.LoadCutScenes(OpenTaiko.rPreviousStage);
-
-		this.iCutScene = -1;
-
+		this.cutScenes ??= [];
+		this.returned = false;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
-		this.ReturnValueAfterFadingOut = EReturnValue.Continue;
 
-		this.isPause = false;
+		var ui = UI;
+		if (ui == null) {
+			Trace.TraceWarning("No cutscene ROActivity in this skin; the cutscene is skipped.");
+		} else {
+			ui.Activate(this.cutScenes.Select(c => c.FullPath).ToArray(),
+				this.mode == ECutSceneMode.Outro ? OUTRO_FADE_SECONDS : 0.0);
+		}
 
 		base.Activate();
-	}
-
-	public void Pause() {
-		this.isPause = true;
-
-		SoundManager.PlayTimer.Pause();
-		OpenTaiko.Timer.Pause();
-
-		this.sound?.Pause();
-		this.actAVI.Pause();
-	}
-
-	public void Resume() {
-		this.isPause = false;
-
-		OpenTaiko.Timer.Resume();
-		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
-		SoundManager.PlayTimer.Resume();
-
-		this.actAVI.Resume();
-		if (this.rVD != null) {
-			this.sound?.Resume((long)this.rVD.msPlayPosition);
-		}
-	}
-
-	public void Skip() {
-		this.isPause = false;
-
-		OpenTaiko.Timer.Resume();
-		SoundManager.PlayTimer.NowTimeMs = OpenTaiko.Timer.NowTimeMs;
-		SoundManager.PlayTimer.Resume();
-
-		this.actAVI.Stop(); // only skip one video
 	}
 
 	public bool LoadCutScenes(CStage stageLast, bool isLuaStageIntro = false) {
@@ -145,122 +112,33 @@ class CStageCutScene : CStage {
 	}
 
 	public override void DeActivate() {
-		// On de-activation
-		this.StopSound();
-		this.rVD?.Dispose();
-		this.rVD = null;
-
+		UI?.Deactivate();
 		this.cutScenes?.Clear();
 		this.cutScenes = null;
-
 		base.DeActivate();
-	}
-
-	public override void CreateManagedResource() {
-		// Ressource allocation
-
-		base.CreateManagedResource();
-	}
-
-	public override void ReleaseManagedResource() {
-		// Ressource freeing
-
-		base.ReleaseManagedResource();
 	}
 
 	public override int Draw() {
 		if (!base.IsActivated)
 			return 0;
 
-		#region [ First draw (unused) ]
-		if (base.IsFirstDraw) {
-			base.IsFirstDraw = false;
-		}
-		#endregion
-
-		this.KeyInput();
-		this.actPauseMenu.Update();
-
-		if ((this.rVD == null || this.rVD.IsFinishedPlaying) && this.iCutScene < this.cutScenes!.Count) {
-			while (++this.iCutScene < this.cutScenes!.Count) {
-				var cutScene = this.cutScenes[this.iCutScene];
-				if (this.LoadCutSceneAVI(cutScene)) {
-					this.actAVI.Start(this.rVD!, true);
-					this.sound?.PlayStart();
-					break;
-				}
-			}
+		var ui = UI;
+		bool finished;
+		if (ui == null) {
+			finished = true;
+		} else {
+			var r = ui.Update();
+			ui.Draw();
+			finished = r != null && r.Length > 0 && (r[0] as string) == "finished";
 		}
 
-		this.actAVI.Draw();
-
-		var ret = 0;
-		if (base.ePhaseID == EPhase.Common_NORMAL && !(this.iCutScene < this.cutScenes!.Count)) {
-			base.ePhaseID = EPhase.Common_FADEOUT;
-			switch (this.mode) {
-				case ECutSceneMode.Intro:
-					this.actFOIntro.tFadeOutStart(true);
-					ret = (int)EReturnValue.IntroFinished;
-					this.ReturnValueAfterFadingOut = EReturnValue.IntroFinishedFadeOut;
-					break;
-
-				case ECutSceneMode.Outro:
-					this.actFOOutro.tFadeOutStart();
-					ret = (int)EReturnValue.OutroFinished;
-					this.ReturnValueAfterFadingOut = EReturnValue.OutroFinishedFadeOut;
-					break;
-			}
+		// the stage flow acts on the value once; the script keeps drawing its last picture while the next
+		// stage's transition covers it
+		if (finished && !this.returned) {
+			this.returned = true;
+			return (int)(this.mode == ECutSceneMode.Intro ? EReturnValue.IntroFinished : EReturnValue.OutroFinishedFadeOut);
 		}
-
-		#region [ Fading in/out transition ]
-		switch (base.ePhaseID) {
-			case CStage.EPhase.Common_FADEOUT:
-				int fadeOutDrawResult = this.mode switch {
-					ECutSceneMode.Intro => this.actFOIntro.Draw(),
-					ECutSceneMode.Outro or _ => this.actFOOutro.Draw(),
-				};
-				if (fadeOutDrawResult == 0) {
-					break;
-				}
-				ret = (int)this.ReturnValueAfterFadingOut;
-				break;
-		}
-		#endregion
-
-		// draw above anything
-		this.actPauseMenu.Draw();
-
-		return ret;
-	}
-
-	private bool LoadCutSceneAVI(CTja.CutSceneDef cutScene) {
-		try {
-			this.StopSound();
-			this.rVD?.Dispose();
-			this.rVD = new CVideoDecoder(cutScene.FullPath);
-			this.rVD.Pause();
-			this.rVD.InitRead();
-			this.rVD.dbPlaySpeed = 1;
-			this.sound = CreateSound(cutScene.FullPath);
-			return true;
-		} catch (Exception e) {
-			Trace.TraceWarning(e.ToString() + "\n"
-				+ $"Failed to load cutscene video: {cutScene.FullPath}; skipped.");
-			return false;
-		}
-	}
-
-	private void KeyInput() {
-		IInputDevice keyboard = OpenTaiko.InputManager.Keyboard;
-		if ((base.ePhaseID == CStage.EPhase.Common_NORMAL) && (
-			keyboard.KeyPressed((int)SlimDXKeys.Key.Escape) || keyboard.KeyPressed((int)SlimDXKeys.Key.F1)
-			)) {
-			if (!this.actPauseMenu.bIsActivePopupMenu && !this.isPause) {
-				OpenTaiko.Skin.soundChangeSFX.tPlay();
-				this.Pause();
-				this.actPauseMenu.tActivatePopupMenu(0);
-			}
-		}
+		return (int)EReturnValue.Continue;
 	}
 
 	public enum EReturnValue : int {
@@ -271,44 +149,6 @@ class CStageCutScene : CStage {
 		OutroFinishedFadeOut,
 	}
 
-	private static CSound? CreateSound(string? filepathAVI) {
-		if (string.IsNullOrEmpty(filepathAVI) || !File.Exists(filepathAVI)) {
-			return null;
-		}
-		CSound? sound = null;
-		try {
-			// load video as audio
-			sound = OpenTaiko.SoundManager.tCreateSound(filepathAVI, ESoundGroup.SongPlayback);
-			if (sound == null)
-				return null;
-
-			// 2018-08-27 twopointzero - DO attempt to load (or queue scanning) loudness metadata here.
-			//                           Initialization, song enumeration, and/or interactions may have
-			//                           caused background scanning and the metadata may now be available.
-			//                           If is not yet available then we wish to queue scanning.
-			var loudnessMetadata = LoudnessMetadataScanner.LoadForAudioPath(filepathAVI);
-			OpenTaiko.SongGainController.Set(CSound.DefaultSongVol, loudnessMetadata, sound);
-
-			Trace.TraceInformation($"Loaded sound ({filepathAVI}) for video ({filepathAVI})");
-
-			return sound;
-		} catch (Exception e) {
-			Trace.TraceError(e.ToString());
-			Trace.TraceError($"Failed to load sound ({filepathAVI}) for video ({filepathAVI})");
-			sound?.Dispose();
-			return null;
-		}
-	}
-
-	public void StopSound() {
-		if (this.sound != null) {
-			this.sound.StopReset();
-			OpenTaiko.SoundManager.tDisposeSound(this.sound);
-			this.sound = null;
-		}
-	}
-
-
 	#region [Private]
 
 	private enum ECutSceneMode {
@@ -317,19 +157,8 @@ class CStageCutScene : CStage {
 	}
 
 	private ECutSceneMode mode;
-	private EReturnValue ReturnValueAfterFadingOut;
-
-	private CActPlayAVI actAVI;
-	private CActFIFOStart actFOIntro;
-	private CActFIFOBlack actFOOutro;
-
 	private List<CTja.CutSceneDef>? cutScenes;
-	private int iCutScene;
-	private CVideoDecoder? rVD;
-	private CSound? sound;
-
-	private bool isPause;
-	private CActCutScenePauseMenu actPauseMenu;
+	private bool returned;
 
 	#endregion
 }

@@ -278,6 +278,8 @@ Paths are relative to the script directory. The decoder opens on a background th
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Opens a video file and returns its handle. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Opens a video file; with `withAudio` true its own audio track plays with it at the song playback volume, and the picture is clocked by that sound so the two cannot drift apart. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Opens a video file from a full path. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Opens a video file from a full path, with its own audio track when `withAudio` is true. |
 
 ### Video handle
 

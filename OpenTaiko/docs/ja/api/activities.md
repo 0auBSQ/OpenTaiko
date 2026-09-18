@@ -201,6 +201,7 @@ end
 | `popup_menu` | `activate(title, items, fontSize, ...)`。items は改行で連結したラベルで、その後に PopupMenu のスキン位置が続きます。毎フレーム `draw(selected)`。閉じるときに `deactivate()`。 |
 | `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |
 | `song_enum` | `activate()`、その後楽曲のスキャン中は毎フレーム `draw(isCommandSongDataGet, done, total)`。`deactivate()`。 |
+| `cutscene` | `activate(paths, fadeOutSeconds)`。動画ファイルを順に、続けて最後の動画の後の黒へのフェード秒数（0 でなし）。毎フレーム `update()` を呼び、すべての動画が再生し終わりフェードも終わると "finished" を返します。`draw()`、`deactivate()`。各ファイルを自身の音声トラックと共に再生し、ポーズポップアップも持ちます。カットシーンの用途は呼び出し側が決めます。 |
 
 ## バックグラウンド
 

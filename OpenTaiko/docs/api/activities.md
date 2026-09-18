@@ -201,6 +201,7 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 | `popup_menu` | `activate(title, items, fontSize, ...)` where items are the labels joined by newlines, followed by the PopupMenu skin positions; `draw(selected)` every frame; `deactivate()` on close. |
 | `config_ui` | `activate(model)` with the settings model; `update()` every frame, returning "exit" to leave the settings screen; `draw()`; `reload(model)` through Call when the engine rebuilds the model; `deactivate()`. |
 | `song_enum` | `activate()`, then `draw(isCommandSongDataGet, done, total)` every frame while the song scan runs; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)` with the video files in order and a fade to black after the last one (0 for none); `update()` every frame, returning "finished" once every video has played and the fade is over; `draw()`; `deactivate()`. It plays each file with its own audio track and owns the pause popup; what the cutscene is for is the caller's business. |
 
 ## Backgrounds
 

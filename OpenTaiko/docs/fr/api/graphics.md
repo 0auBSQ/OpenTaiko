@@ -278,6 +278,8 @@ Les chemins sont relatifs au répertoire du script. Le décodeur s'ouvre sur un 
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Ouvre un fichier vidéo et renvoie son handle. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Ouvre un fichier vidéo ; avec `withAudio` à true, sa propre piste audio joue avec lui au volume de lecture des chansons, et l'image suit l'horloge de ce son, si bien que les deux ne peuvent pas se désynchroniser. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Ouvre un fichier vidéo depuis un chemin complet. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Ouvre un fichier vidéo depuis un chemin complet, avec sa propre piste audio quand `withAudio` est true. |
 
 ### Handle de vidéo
 

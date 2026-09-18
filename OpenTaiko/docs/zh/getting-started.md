@@ -86,7 +86,7 @@ end
 
 - 舞台（Modules/Stages）：游戏切换到的完整界面。它拥有整帧画面，处理输入，并通过调用 Exit 离开。凡是自成一个界面的内容都用它。
 - 活动（Modules/Activities）：舞台在内部使用的子界面，例如对话框。它是一个单例，你通过 ACTIVITY:GetActivity(name) 查找它；宿主舞台调用它的 Activate、Update、Draw 和 Deactivate。用于可能写入游戏状态的共享组件。
-- 只读活动（Modules/ROActivities）：活动的只读形式，你通过 ROACTIVITY:GetROActivity(name) 查找它。它获得只读的 CONFIG、DATABASE 和 GetSaveFile，且没有 ACTIVITY 全局对象。用于只读取状态的组件，这涵盖了大多数可复用的 UI。引擎自身的若干覆盖层也以固定名称的只读活动形式承载（nameplate、modal、modicons、danplate、popup_menu、config_ui、song_enum）；皮肤只要提供同名文件夹并保留引擎调用的回调，即可替换其中之一。
+- 只读活动（Modules/ROActivities）：活动的只读形式，你通过 ROACTIVITY:GetROActivity(name) 查找它。它获得只读的 CONFIG、DATABASE 和 GetSaveFile，且没有 ACTIVITY 全局对象。用于只读取状态的组件，这涵盖了大多数可复用的 UI。引擎自身的若干覆盖层也以固定名称的只读活动形式承载（nameplate、modal、modicons、danplate、popup_menu、config_ui、song_enum、cutscene）；皮肤只要提供同名文件夹并保留引擎调用的回调，即可替换其中之一。
 - 背景：Graphics 下的 Script.lua，绘制在引擎某个界面的背后或之上。背景获得与只读活动相同的只读全局对象。
 - 过渡（Modules/Transitions）：游戏在舞台之间播放的淡出、加载和淡入。舞台通过 Exit 的第三个参数按名称选择过渡；舞台未指定名称或名称不存在时，游戏回退到名为 default 的过渡，进入演奏时则播放名为 song_loading 的过渡。
 - 角色：参见[添加角色](guides/characters.md)。

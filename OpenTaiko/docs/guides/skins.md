@@ -155,7 +155,7 @@ Within each category the game creates every module first and then runs `onStart`
 The game looks up these modules by name, and the shipped skin provides all of them:
 
 - Stages `_boot` and `_title`. The game stops with an error if either is missing.
-- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum` and `danplate`.
+- ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` and `danplate`.
 - Transitions `default` and `song_loading`. `song_loading` plays while the game loads a song; the game uses `default` when `Exit` names no transition or names one that does not exist. A skin with no transition modules at all falls back to a plain black fade.
 
 Keep all of these in place when building a skin; add your own modules alongside them.
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   (loaded first; "default" and "song_loading" used by the game)
   Stages/        <name>/Script.lua   ("_boot" and "_title" required)
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, danplate required)
+  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, cutscene, danplate required)
   Lib/           shared .lua files reached with require, not scanned
 ```
 

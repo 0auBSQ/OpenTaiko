@@ -86,7 +86,7 @@ end
 
 - ステージ (Modules/Stages): ゲームが切り替える完全な画面。フレームを所有し、入力を処理し、Exit を呼んで離れます。それ自体が 1 つの画面であるものに使います。
 - アクティビティ (Modules/Activities): ダイアログなど、ステージが内側から使うサブ画面。ACTIVITY:GetActivity(name) で参照するシングルトンで、ホストするステージがその Activate、Update、Draw、Deactivate を呼びます。ゲームの状態を書き換える可能性がある共有部品に使います。
-- ROActivity (Modules/ROActivities): アクティビティの読み取り専用の形で、ROACTIVITY:GetROActivity(name) で参照します。読み取り専用の CONFIG、DATABASE、GetSaveFile を受け取り、ACTIVITY グローバルを持ちません。状態を読むだけの部品に使います。再利用可能な UI の大半はこれに当てはまります。エンジンは自身のオーバーレイのいくつかを決まった名前の ROActivity としてホストしています (nameplate、modal、modicons、danplate、popup_menu、config_ui、song_enum)。スキンは、その名前のフォルダを同梱し、エンジンが呼ぶコールバックを維持することでこれらを置き換えます。
+- ROActivity (Modules/ROActivities): アクティビティの読み取り専用の形で、ROACTIVITY:GetROActivity(name) で参照します。読み取り専用の CONFIG、DATABASE、GetSaveFile を受け取り、ACTIVITY グローバルを持ちません。状態を読むだけの部品に使います。再利用可能な UI の大半はこれに当てはまります。エンジンは自身のオーバーレイのいくつかを決まった名前の ROActivity としてホストしています (nameplate、modal、modicons、danplate、popup_menu、config_ui、song_enum, cutscene)。スキンは、その名前のフォルダを同梱し、エンジンが呼ぶコールバックを維持することでこれらを置き換えます。
 - バックグラウンド: Graphics の下の Script.lua で、エンジンの画面の背後または手前に描画します。バックグラウンドは ROActivity と同じ読み取り専用のグローバルを受け取ります。
 - トランジション (Modules/Transitions): ゲームがステージ間で再生するフェードアウト、ローディング、フェードイン。ステージは Exit の第 3 引数で名前を指定して選びます。ステージが名前を指定しないか名前が存在しない場合、ゲームは default という名前のものにフォールバックし、ゲームプレイに入るときは song_loading という名前のものを再生します。
 - キャラクター: [キャラクターの追加](guides/characters.md)を参照してください。

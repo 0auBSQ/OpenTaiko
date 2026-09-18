@@ -201,6 +201,7 @@ El motor busca algunas ROActivities por nombre de carpeta fijo y las dirige él 
 | `popup_menu` | `activate(title, items, fontSize, ...)` donde items son las etiquetas unidas por saltos de línea, seguidas de las posiciones PopupMenu del skin; `draw(selected)` cada fotograma; `deactivate()` al cerrar. |
 | `config_ui` | `activate(model)` con el modelo de ajustes; `update()` cada fotograma, devolviendo "exit" para abandonar la pantalla de ajustes; `draw()`; `reload(model)` mediante Call cuando el motor reconstruye el modelo; `deactivate()`. |
 | `song_enum` | `activate()`, luego `draw(isCommandSongDataGet, done, total)` cada fotograma mientras se ejecuta el escaneo de canciones; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)` con los archivos de vídeo en orden y un fundido a negro tras el último (0 para ninguno); `update()` cada fotograma, devolviendo "finished" cuando todos los vídeos han sonado y el fundido ha terminado; `draw()`; `deactivate()`. Reproduce cada archivo con su propia pista de audio y posee el popup de pausa; para qué sirve la cinemática es cosa de quien la llama. |
 
 ## Fondos
 

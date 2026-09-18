@@ -278,6 +278,8 @@ end
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Открывает видеофайл и возвращает его дескриптор. |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | Открывает видеофайл; при `withAudio` = true его собственная звуковая дорожка играет вместе с ним на громкости воспроизведения песен, а картинка идёт по часам этого звука, так что они не могут разойтись. |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | Открывает видеофайл по полному пути. |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | Открывает видеофайл по полному пути, со своей звуковой дорожкой при `withAudio` = true. |
 
 ### Дескриптор видео
 

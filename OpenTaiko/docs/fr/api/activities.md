@@ -201,6 +201,7 @@ Le moteur recherche certaines ROActivities par un nom de dossier fixe et les pil
 | `popup_menu` | `activate(title, items, fontSize, ...)` où items sont les libellés joints par des sauts de ligne, suivis des positions PopupMenu du skin ; `draw(selected)` à chaque frame ; `deactivate()` à la fermeture. |
 | `config_ui` | `activate(model)` avec le modèle des paramètres ; `update()` à chaque frame, renvoyant "exit" pour quitter l'écran des paramètres ; `draw()` ; `reload(model)` via Call quand le moteur reconstruit le modèle ; `deactivate()`. |
 | `song_enum` | `activate()`, puis `draw(isCommandSongDataGet, done, total)` à chaque frame pendant que l'analyse des chansons s'exécute ; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)` avec les fichiers vidéo dans l'ordre et un fondu au noir après le dernier (0 pour aucun) ; `update()` à chaque frame, renvoyant "finished" une fois toutes les vidéos jouées et le fondu terminé ; `draw()` ; `deactivate()`. Il joue chaque fichier avec sa propre piste audio et possède le popup de pause ; l'usage de la cinématique regarde l'appelant. |
 
 ## Arrière-plans
 

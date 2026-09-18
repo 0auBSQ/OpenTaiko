@@ -86,7 +86,7 @@ end
 
 - 스테이지(Modules/Stages): 게임이 전환해 들어가는 전체 화면. 프레임을 소유하고, 입력을 처리하며, Exit를 호출해 떠납니다. 독립된 화면이 되는 모든 것에 사용하십시오.
 - 액티비티(Modules/Activities): 대화 상자처럼 스테이지가 안에서 사용하는 하위 화면. ACTIVITY:GetActivity(name)로 찾는 싱글턴이며, 호스트 스테이지가 그 Activate, Update, Draw, Deactivate를 호출합니다. 게임 상태를 쓸 수 있는 공용 요소에 사용하십시오.
-- ROActivity(Modules/ROActivities): 액티비티의 읽기 전용 형태로, ROACTIVITY:GetROActivity(name)로 찾습니다. 읽기 전용 CONFIG, DATABASE, GetSaveFile을 받고 ACTIVITY 전역이 없습니다. 상태를 읽기만 하는 요소에 사용하십시오. 재사용 가능한 UI 대부분이 여기에 해당합니다. 엔진은 자체 오버레이 몇 가지를 정해진 이름의 ROActivity로 호스팅합니다(nameplate, modal, modicons, danplate, popup_menu, config_ui, song_enum). 스킨은 같은 이름의 폴더를 제공해 이를 교체하되, 엔진이 호출하는 콜백은 유지해야 합니다.
+- ROActivity(Modules/ROActivities): 액티비티의 읽기 전용 형태로, ROACTIVITY:GetROActivity(name)로 찾습니다. 읽기 전용 CONFIG, DATABASE, GetSaveFile을 받고 ACTIVITY 전역이 없습니다. 상태를 읽기만 하는 요소에 사용하십시오. 재사용 가능한 UI 대부분이 여기에 해당합니다. 엔진은 자체 오버레이 몇 가지를 정해진 이름의 ROActivity로 호스팅합니다(nameplate, modal, modicons, danplate, popup_menu, config_ui, song_enum, cutscene). 스킨은 같은 이름의 폴더를 제공해 이를 교체하되, 엔진이 호출하는 콜백은 유지해야 합니다.
 - 배경: Graphics 아래에 있으며 엔진 화면 중 하나의 뒤나 위에 그리는 Script.lua. 배경은 ROActivity와 같은 읽기 전용 전역을 받습니다.
 - 트랜지션(Modules/Transitions): 게임이 스테이지 사이에 재생하는 페이드아웃, 로딩, 페이드인. 스테이지는 Exit의 세 번째 인자에서 이름으로 하나를 고릅니다. 스테이지가 이름을 지정하지 않았거나 이름이 존재하지 않으면 게임은 default라는 이름의 것으로 대체하고, 게임플레이에 들어갈 때는 song_loading이라는 이름의 것을 재생합니다.
 - 캐릭터: [캐릭터 추가하기](guides/characters.md)를 참고하십시오.

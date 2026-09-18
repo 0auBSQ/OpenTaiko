@@ -155,7 +155,7 @@ My New Skin/
 Игра ищет следующие модули по имени, и поставляемый скин предоставляет их все:
 
 - Сцены `_boot` и `_title`. Игра останавливается с ошибкой, если любая из них отсутствует.
-- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum` и `danplate`.
+- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` и `danplate`.
 - Переходы `default` и `song_loading`. `song_loading` проигрывается, пока игра загружает песню; игра использует `default`, когда `Exit` не называет переход или называет несуществующий. Скин вообще без модулей переходов откатывается к простому затемнению в чёрный.
 
 Сохраняйте все их при сборке скина; добавляйте собственные модули рядом с ними.
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   (загружаются первыми; "default" и "song_loading" использует игра)
   Stages/        <name>/Script.lua   ("_boot" и "_title" обязательны)
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, danplate обязательны)
+  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, cutscene, danplate обязательны)
   Lib/           общие .lua-файлы, доступные через require, не сканируются
 ```
 

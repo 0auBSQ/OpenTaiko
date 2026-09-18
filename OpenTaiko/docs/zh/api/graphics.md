@@ -278,6 +278,8 @@ end
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 打开一个视频文件并返回其句柄。 |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | 打开视频文件；`withAudio` 为 true 时，视频自带的音轨会以歌曲播放音量一起播放，画面以该声音为时钟推进，因此两者不会错开。 |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | 从完整路径打开视频文件。 |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | 从完整路径打开视频文件；`withAudio` 为 true 时带着自身音轨。 |
 
 ### 视频句柄
 

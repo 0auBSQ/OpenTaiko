@@ -155,7 +155,7 @@ My New Skin/
 게임은 이 모듈들을 이름으로 찾으며, 기본 제공 스킨은 모두 제공합니다.
 
 - 스테이지 `_boot`와 `_title`. 둘 중 하나라도 없으면 게임은 오류로 멈춥니다.
-- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `danplate`.
+- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene`, `danplate`.
 - 트랜지션 `default`와 `song_loading`. `song_loading`은 게임이 곡을 로드하는 동안 재생되고, `default`는 `Exit`가 트랜지션을 지정하지 않았거나 존재하지 않는 것을 지정했을 때 게임이 사용합니다. 트랜지션 모듈이 전혀 없는 스킨은 단순한 검은 페이드로 대체됩니다.
 
 스킨을 만들 때 이 모듈들을 모두 유지하고, 자신의 모듈을 그 옆에 추가하십시오.
@@ -165,7 +165,7 @@ Modules/
   Transitions/   <name>/Script.lua   (가장 먼저 로드됨. 게임이 "default"와 "song_loading"을 사용)
   Stages/        <name>/Script.lua   ("_boot"와 "_title" 필수)
   Activities/    <name>/Script.lua
-  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, danplate 필수)
+  ROActivities/  <name>/Script.lua   (modal, config_ui, nameplate, popup_menu, modicons, song_enum, cutscene, danplate 필수)
   Lib/           require로 접근하는 공용 .lua 파일. 스캔되지 않음
 ```
 

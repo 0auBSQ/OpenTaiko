@@ -201,6 +201,7 @@ Die Engine schlägt einige ROActivities unter festem Ordnernamen nach und steuer
 | `popup_menu` | `activate(title, items, fontSize, ...)`, wobei items die durch Zeilenumbrüche verbundenen Beschriftungen sind, gefolgt von den PopupMenu-Positionen des Skins; `draw(selected)` jeden Frame; `deactivate()` beim Schließen. |
 | `config_ui` | `activate(model)` mit dem Einstellungsmodell; `update()` jeden Frame, gibt "exit" zurück, um den Einstellungsbildschirm zu verlassen; `draw()`; `reload(model)` über Call, wenn die Engine das Modell neu aufbaut; `deactivate()`. |
 | `song_enum` | `activate()`, dann `draw(isCommandSongDataGet, done, total)` jeden Frame, während der Song-Scan läuft; `deactivate()`. |
+| `cutscene` | `activate(paths, fadeOutSeconds)` mit den Videodateien in Reihenfolge und einem Ausblenden nach Schwarz nach der letzten (0 für keines); `update()` jeden Frame, gibt "finished" zurück, sobald jedes Video gespielt hat und das Ausblenden vorbei ist; `draw()`; `deactivate()`. Spielt jede Datei mit ihrer eigenen Tonspur und besitzt das Pause-Popup; wofür die Cutscene dient, ist Sache des Aufrufers. |
 
 ## Hintergründe
 

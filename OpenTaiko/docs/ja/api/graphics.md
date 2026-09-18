@@ -278,6 +278,8 @@ end
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 動画ファイルを開き、そのハンドルを返します。 |
 | `VIDEO:CreateVideo(path, withAudio)  -> video` | 動画ファイルを開きます。`withAudio` が true なら動画自身の音声トラックが楽曲再生音量で一緒に再生され、映像はその音声の時刻に合わせて進むため、両者がずれることはありません。 |
+| `VIDEO:CreateVideoFromAbsolutePath(path)  -> video` | 完全なパスから動画ファイルを開きます。 |
+| `VIDEO:CreateVideoFromAbsolutePath(path, withAudio)  -> video` | 完全なパスから動画ファイルを開きます。`withAudio` が true なら自身の音声トラック付きです。 |
 
 ### 動画ハンドル
 
