@@ -277,6 +277,7 @@ end
 | 方法 | 说明 |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 打开一个视频文件并返回其句柄。 |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | 打开视频文件；`withAudio` 为 true 时，视频自带的音轨会以歌曲播放音量一起播放，画面以该声音为时钟推进，因此两者不会错开。 |
 
 ### 视频句柄
 
@@ -299,6 +300,9 @@ end
 | `video.DurationMs  -> number` | 总时长（毫秒）。 |
 | `video.Texture  -> texture` | 当前解码出的帧。 |
 | `video:IsFinished()  -> bool` | 流已结束且没有剩余帧时为 true。 |
+| `video.HasAudio  -> bool` | 视频带着自身音轨打开时为 true。 |
+| `video:GetVolumePercent()  -> number` | 音轨的音量（百分比），没有音轨时为 100。 |
+| `video:SetVolumePercent(vol)  -> nil` | 以百分比设置音轨的音量。 |
 | `video:GetTimestampMs()  -> number` | 当前播放位置（毫秒）。 |
 | `video:SetTimestampMs(ms)  -> nil` | 跳转到以毫秒计的位置。 |
 | `video:GetSpeed()  -> number` | 当前播放速度倍率（1 = 正常）。 |

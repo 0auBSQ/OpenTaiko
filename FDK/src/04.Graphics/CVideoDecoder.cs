@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using FFmpeg.AutoGen;
+using ManagedBass;
 using Size = System.Drawing.Size;
 
 namespace FDK;
@@ -9,8 +11,83 @@ namespace FDK;
 /// ビデオのデコードをするクラス
 /// ファイル名・nullのCTextureをもらえれば、勝手に、CTextureに映像を格納して返す。
 /// 演奏とは別のタイマーを使用しているので、ずれる可能性がある。
+/// With an audio factory given, the file's audio track is decoded too: its samples wait in a ring buffer
+/// that one BASS user stream, made by the factory around the decoder's stream procedure, fetches from for
+/// the life of the video. The frames are then clocked by what that stream has played instead of the
+/// timer, so picture and sound start together and cannot drift apart. A seek flushes the ring and the
+/// clock restarts from the target; the speed is applied live on the same stream.
 /// </summary>
 public unsafe class CVideoDecoder : IDisposable {
+	public delegate CSound AudioFactory(int frequency, int channels, double durationSeconds, StreamProcedure proc);
+
+	// Decoded audio between the reader and the stream procedure. Frames are interleaved floats; the reader
+	// waits when it is full and the procedure hands out what it has, or nothing (a stall) when it is empty.
+	private sealed class AudioRing {
+		private readonly float[] buf;
+		private readonly int channels;
+		private int head, count;   // in floats
+		private readonly object gate = new();
+		private readonly ManualResetEventSlim spaceFreed = new(true);
+		public readonly int Rate;
+		public long DeliveredFrames { get; private set; }   // handed to BASS since the last flush
+		public bool Ended;
+
+		public AudioRing(int rate, int channels, double seconds) {
+			this.Rate = rate;
+			this.channels = channels;
+			this.buf = new float[(int)(rate * seconds) * channels];
+		}
+
+		public double QueuedMs { get { lock (this.gate) return this.count / (double)this.channels * 1000.0 / this.Rate; } }
+
+		// the stream procedure: as many whole frames as fit, nothing when empty
+		public int Read(IntPtr dst, int bytes) {
+			lock (this.gate) {
+				int floats = Math.Min(bytes / sizeof(float), this.count);
+				floats -= floats % this.channels;
+				if (floats <= 0) return 0;
+				int first = Math.Min(floats, this.buf.Length - this.head);
+				Marshal.Copy(this.buf, this.head, dst, first);
+				if (floats > first) Marshal.Copy(this.buf, 0, dst + first * sizeof(float), floats - first);
+				this.head = (this.head + floats) % this.buf.Length;
+				this.count -= floats;
+				this.DeliveredFrames += floats / this.channels;
+				this.spaceFreed.Set();
+				return floats * sizeof(float);
+			}
+		}
+
+		// the reader: waits for room rather than dropping samples
+		public void Write(IntPtr src, int floats, CancellationToken ct) {
+			int done = 0;
+			while (done < floats) {
+				int written;
+				lock (this.gate) {
+					int room = Math.Min(floats - done, this.buf.Length - this.count);
+					if (room > 0) {
+						int tail = (this.head + this.count) % this.buf.Length;
+						int first = Math.Min(room, this.buf.Length - tail);
+						Marshal.Copy(src + done * sizeof(float), this.buf, tail, first);
+						if (room > first) Marshal.Copy(src + (done + first) * sizeof(float), this.buf, 0, room - first);
+						this.count += room;
+					}
+					written = room;
+					if (written == 0) this.spaceFreed.Reset();
+				}
+				done += written;
+				if (written == 0) this.spaceFreed.Wait(ct);
+			}
+		}
+
+		public void Flush() {
+			lock (this.gate) {
+				this.head = this.count = 0;
+				this.DeliveredFrames = 0;
+				this.Ended = false;
+				this.spaceFreed.Set();
+			}
+		}
+	}
 	static CVideoDecoder() {
 		// iOS links FFmpeg into the app as one framework (scripts/build-ffmpeg.sh), so resolve
 		// symbols from the main image instead of dlopen'ing per-library dylibs from RootPath.
@@ -23,7 +100,9 @@ public unsafe class CVideoDecoder : IDisposable {
 			ffmpeg.GetOrLoadLibrary = name => System.Runtime.InteropServices.NativeLibrary.Load($"lib{name}.so");
 	}
 
-	public CVideoDecoder(string filename) {
+	public CVideoDecoder(string filename) : this(filename, null) { }
+
+	public CVideoDecoder(string filename, AudioFactory? audioOut) {
 		if (!File.Exists(filename))
 			throw new FileNotFoundException(filename + " not found...");
 
@@ -68,9 +147,89 @@ public unsafe class CVideoDecoder : IDisposable {
 			framelistHead = framelistTail = 0;
 
 			CTimer = new CTimer(CTimer.TimerType.GameTimeAtDraw);
+
+			if (audioOut != null) this.OpenAudio(audioOut);
 		}
 		Interlocked.Increment(ref LiveCount);
 	}
+
+	// the first audio stream, decoded to interleaved float (surround folded to stereo) and pushed into a
+	// sound of the music group so the volume settings apply to it
+	private void OpenAudio(AudioFactory audioOut) {
+		for (int i = 0; i < (int)format_context->nb_streams; i++) {
+			if (format_context->streams[i]->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_AUDIO) {
+				audio_stream = format_context->streams[i];
+				break;
+			}
+		}
+		if (audio_stream == null) return;
+
+		AVCodec* codec = ffmpeg.avcodec_find_decoder(audio_stream->codecpar->codec_id);
+		if (codec == null) { audio_stream = null; Trace.TraceWarning("No decoder for the video's audio track."); return; }
+		audio_codec_context = ffmpeg.avcodec_alloc_context3(codec);
+		if (ffmpeg.avcodec_parameters_to_context(audio_codec_context, audio_stream->codecpar) < 0
+			|| ffmpeg.avcodec_open2(audio_codec_context, codec, null) != 0) {
+			Trace.TraceWarning("The video's audio track could not be opened.");
+			this.CloseAudio();
+			return;
+		}
+
+		audioRate = audio_codec_context->sample_rate;
+		audioChannels = Math.Min(2, audio_codec_context->ch_layout.nb_channels);
+		if (audioRate <= 0 || audioChannels <= 0) { this.CloseAudio(); return; }
+
+		AVChannelLayout outLayout;
+		ffmpeg.av_channel_layout_default(&outLayout, audioChannels);
+		AVChannelLayout inLayout = audio_codec_context->ch_layout;
+		SwrContext* s = null;
+		if (ffmpeg.swr_alloc_set_opts2(&s, &outLayout, AVSampleFormat.AV_SAMPLE_FMT_FLT, audioRate,
+				&inLayout, audio_codec_context->sample_fmt, audio_codec_context->sample_rate, 0, null) < 0
+			|| ffmpeg.swr_init(s) < 0) {
+			Trace.TraceWarning("The video's audio track could not be converted.");
+			if (s != null) ffmpeg.swr_free(&s);
+			this.CloseAudio();
+			return;
+		}
+		swr = s;
+		audioOutCapacity = 8192;
+		audioOut_ = (byte*)ffmpeg.av_malloc((ulong)(audioOutCapacity * audioChannels * sizeof(float)));
+		audioFrame = ffmpeg.av_frame_alloc();
+
+		try {
+			this.audioRing = new AudioRing(audioRate, audioChannels, AudioRingSeconds);
+			this.audioProc = this.AudioStreamProc;
+			this.audio = audioOut(audioRate, audioChannels, this.Duration, this.audioProc);
+		} catch (Exception e) {
+			Trace.TraceWarning("The video's audio track has no output: " + e.Message);
+			this.CloseAudio();
+		}
+	}
+
+	// BASS asks for samples on its mixing thread
+	private int AudioStreamProc(int handle, IntPtr buffer, int length, IntPtr user) {
+		var ring = this.audioRing;
+		return ring == null ? 0 : ring.Read(buffer, length);
+	}
+
+	private void CloseAudio() {
+		this.audio?.Dispose();
+		this.audio = null;
+		this.audioRing = null;
+		this.audioProc = null;
+		if (swr != null) { var s = swr; ffmpeg.swr_free(&s); swr = null; }
+		if (audioFrame != null) { var f = audioFrame; ffmpeg.av_frame_free(&f); audioFrame = null; }
+		if (audioOut_ != null) { ffmpeg.av_free(audioOut_); audioOut_ = null; }
+		if (audio_codec_context != null) {
+			var c = audio_codec_context;
+			ffmpeg.avcodec_free_context(&c);
+			audio_codec_context = null;
+		}
+		audio_stream = null;
+	}
+
+	/// <summary>The audio track's sound while one plays, for volume control; null without audio.</summary>
+	public CSound? Audio => this.audio;
+	public bool HasAudio => this.audio != null;
 
 	// Live-decoder gauge for the [MEMTRACE] debug line (FFmpeg contexts + frame buffers are large).
 	public static int LiveCount;
@@ -99,6 +258,7 @@ public unsafe class CVideoDecoder : IDisposable {
 			bDrawing = false;
 			this.StopEnqueuingFrames();
 			frameconv?.Dispose();
+			this.CloseAudio();
 		}
 
 		// Native FFmpeg contexts (the large allocations from avformat_open_input / avcodec_alloc_context3).
@@ -126,8 +286,10 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 
 	public void Start() {
+		if (this.bStreamEnded) this.Seek(0);   // after Stop or the end: from the top again
 		CTimer.Reset();
 		CTimer.Resume();
+		this.audio?.PlayStart();
 		this.bPlaying = true;
 		bDrawing = true;
 
@@ -135,11 +297,13 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public void Pause() {
 		CTimer.Pause();
+		this.audio?.Pause();
 		this.bPlaying = false;
 	}
 
 	public void Resume() {
 		CTimer.Resume();
+		this.audio?.Resume(false);
 		this.bPlaying = true;
 	}
 
@@ -153,6 +317,7 @@ public unsafe class CVideoDecoder : IDisposable {
 
 	public void Stop() {
 		CTimer.Pause();
+		this.audio?.tStop();
 		this.bPlaying = false;
 		bDrawing = false;
 		this.IsFinishedPlaying = true;
@@ -169,23 +334,41 @@ public unsafe class CVideoDecoder : IDisposable {
 	public void Seek(long timestampms) {
 		this.bStreamEnded = false;
 		this.StopEnqueuingFrames();
-		if (ffmpeg.av_seek_frame(format_context, video_stream->index, timestampms, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
+		// the demuxer takes stream ticks: the keyframe at or before the target, from which the decoder
+		// runs forward and drops what lies before it
+		long ticks = ffmpeg.av_rescale_q(timestampms, new AVRational { num = 1, den = 1000 }, video_stream->time_base);
+		if (video_stream->start_time != ffmpeg.AV_NOPTS_VALUE) ticks += video_stream->start_time;
+		if (ffmpeg.av_seek_frame(format_context, video_stream->index, ticks, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
 			Trace.TraceError("av_seek_frame failed\n");
 		ffmpeg.avcodec_flush_buffers(codec_context);
 		CTimer.NowTimeMs = timestampms;
+		if (this.audio != null) {
+			// the ring starts over at the target; the mixer's own buffer of old samples is dropped when BASS
+			// allows it, and counted as still playing otherwise, so the clock holds at the target until the
+			// new samples are heard
+			ffmpeg.avcodec_flush_buffers(audio_codec_context);
+			this.audioRing!.Flush();
+			this.audio.UserStreamFlush();
+			audioBaseMs = timestampms;
+		}
 		foreach (var frame in framelist) {
 			frame.RemoveFrame();
 			this.canEnqueueFrame.Set();
 		}
 		framelistHead = framelistTail = 0;
+		this.presentAfterSeek = true;   // the picture at the new time shows even while paused
 		this.EnsureEnqueuingFrames();
-		lastTexture?.Dispose();
-		lastTexture = new CTexture(FrameSize.Width, FrameSize.Height);
+		// callers draw the texture right after GetNowFrame, so there is always one: the last picture stays
+		// up until the frame at the new time replaces it
+		lastTexture ??= new CTexture(FrameSize.Width, FrameSize.Height);
 	}
 
+	// set by a seek: the next decoded frame is shown at once, even while paused, the way a player scrubs
+	private bool presentAfterSeek;
+
 	public void GetNowFrame(ref CTexture Texture) {
-		if (this.bPlaying && framelist[framelistHead].Using) {
-			CTimer.Update();
+		if ((this.bPlaying || this.presentAfterSeek) && framelist[framelistHead].Using) {
+			if (this.bPlaying) CTimer.Update();
 			(int idx, CDecodedFrame frame)? nowFrame = null;
 			for ((int idx, CDecodedFrame frame)? next;
 				(next = this.FirstUsedFrame()) != null && next.Value.frame.TexPointer != 0 && next.Value.frame.Time <= this.msPlayPosition;
@@ -195,7 +378,21 @@ public unsafe class CVideoDecoder : IDisposable {
 				this.PopFrameAt(next.Value.idx);
 				nowFrame = next;
 			}
+			if (nowFrame == null && this.presentAfterSeek) {
+				// paused past the target: the first frame decoded beyond it is the one to show
+				var first = this.FirstUsedFrame();
+				if (first != null && first.Value.frame.TexPointer != 0) {
+					this.PopFrameAt(first.Value.idx);
+					nowFrame = first;
+				}
+			}
 			if (nowFrame != null) {
+				// a paused seek keeps showing newer frames until the one at the target (within a frame) is up,
+				// since the decoder starts at the keyframe before it and works forward
+				if (this.presentAfterSeek) {
+					double frameMs = Framerate.num > 0 ? 1000.0 * Framerate.den / Framerate.num : 1000.0 / 30;
+					if (nowFrame.Value.frame.Time + frameMs > this.msPlayPosition) this.presentAfterSeek = false;
+				}
 				var frame = nowFrame.Value.frame;
 				lastTexture ??= new CTexture(FrameSize.Width, FrameSize.Height);
 				lastTexture.UpdateTexture(frame.TexPointer, frame.TexSize.Width, frame.TexSize.Height, Silk.NET.OpenGLES.PixelFormat.Rgba);
@@ -233,13 +430,44 @@ public unsafe class CVideoDecoder : IDisposable {
 		}
 	}
 
+	// Video packets read while every frame slot is taken and the sound still needs data. Compressed, so a
+	// long run of video packets muxed ahead of the audio costs little; without this the reader would block
+	// on the full frame queue while the picture waits for an audio clock that has nothing to play.
+	private readonly Queue<IntPtr> pendingVideo = new();
+	private const int MaxPendingVideoPackets = 256;
+	private const double AudioLeadMs = 600;
+
 	private void EnqueueFrames() {
 		decodeStopped.Reset();
 		AVPacket* packet = ffmpeg.av_packet_alloc();
 		try {
+			bool eof = false;
 			while (true) {
 				if (cts!.IsCancellationRequested || close)
 					return;
+
+				// stashed video packets go first, as slots free up
+				while (pendingVideo.Count > 0) {
+					var slot = this.PickUnusedDecodedFrame();
+					if (slot == null) break;
+					AVPacket* p = (AVPacket*)pendingVideo.Dequeue();
+					this.DecodeVideoPacket(p, slot.Value);
+					ffmpeg.av_packet_free(&p);
+				}
+
+				if (eof) {
+					if (pendingVideo.Count == 0) {
+						if (this.audioRing != null) this.audioRing.Ended = true;
+						this.bStreamEnded = true;
+						return;
+					}
+					this.WaitForFrameSlot();
+					continue;
+				}
+				if (pendingVideo.Count >= MaxPendingVideoPackets) {
+					this.WaitForFrameSlot();
+					continue;
+				}
 
 				int error = ffmpeg.av_read_frame(format_context, packet);
 				if (error < 0) {
@@ -247,34 +475,35 @@ public unsafe class CVideoDecoder : IDisposable {
 						// Treat any other read error as the end of the stream.
 						Trace.TraceError($"av_read_frame failed ({error}); stopping decode.");
 					}
-					this.bStreamEnded = true;
-					return;
+					eof = true;
+					continue;
 				}
 				try {
-					if (packet->stream_index != video_stream->index || ffmpeg.avcodec_send_packet(codec_context, packet) < 0)
-						continue;
-
-					(int idx, CDecodedFrame frame)? pickedDecodeFrame;
-					while ((pickedDecodeFrame = this.PickUnusedDecodedFrame()) == null) {
-						canEnqueueFrame.Reset();
-						canEnqueueFrame.Wait(cts.Token);
-						if (cts!.IsCancellationRequested || close)
-							return;
-					}
-					var decodeFrame = pickedDecodeFrame.Value;
-					var frame = decodeFrame.frame.GetEmptyFrame();
-					if (ffmpeg.avcodec_receive_frame(codec_context, frame) != 0) {
-						this.UnpickDecodedFrameAt(decodeFrame.idx);
+					if (this.audio != null && packet->stream_index == audio_stream->index) {
+						this.PushAudioPacket(packet);
 						continue;
 					}
-					frameconv.Convert(frame);
+					if (packet->stream_index != video_stream->index)
+						continue;
 
-					double msVideoTime = (frame->best_effort_timestamp - video_stream->start_time) * (video_stream->time_base.num / (double)video_stream->time_base.den) * 1000;
-					if (msVideoTime < this.msPlayPosition) { // evict non-empty outdated frames
-						for ((int idx, CDecodedFrame frame)? f; (f = this.FirstUsedFrame()) != null && f.Value.idx != decodeFrame.idx;)
-							this.RemoveFrameAt(f.Value.idx);
+					// anything stashed goes first, so a new packet never overtakes it and frames stay in order
+					if (pendingVideo.Count > 0) {
+						pendingVideo.Enqueue((IntPtr)ffmpeg.av_packet_clone(packet));
+						continue;
 					}
-					decodeFrame.frame.UpdateFrame(msVideoTime);
+					var slot = this.PickUnusedDecodedFrame();
+					if (slot == null) {
+						if (this.audioRing != null && this.audioRing.QueuedMs < AudioLeadMs) {
+							pendingVideo.Enqueue((IntPtr)ffmpeg.av_packet_clone(packet));
+							continue;
+						}
+						while ((slot = this.PickUnusedDecodedFrame()) == null) {
+							this.WaitForFrameSlot();
+							if (cts!.IsCancellationRequested || close)
+								return;
+						}
+					}
+					this.DecodeVideoPacket(packet, slot.Value);
 				} finally {
 					//2020/10/27 Mr-Ojii packetが解放されない周回があった問題を修正。
 					ffmpeg.av_packet_unref(packet);
@@ -286,7 +515,71 @@ public unsafe class CVideoDecoder : IDisposable {
 			Trace.TraceError(e.ToString());
 		} finally {
 			ffmpeg.av_packet_free(&packet);
+			this.ClearPendingVideo();
 			decodeStopped.Set();
+		}
+	}
+
+	private void WaitForFrameSlot() {
+		// the sound has run dry while every slot holds a frame the clock has not reached: the clock cannot
+		// move until the sound gets data, and the sound cannot get data until a slot frees. Drop the oldest
+		// frame so the reader can go on; the picture skips instead of freezing with the sound.
+		if (this.audioRing != null && !this.bStreamEnded && this.audioRing.QueuedMs <= 0) {
+			var head = this.FirstUsedFrame();
+			if (head != null) {
+				Trace.TraceWarning("Video audio starved with a full frame queue; dropping a frame to keep the sound fed.");
+				this.RemoveFrameAt(head.Value.idx);
+				return;
+			}
+		}
+		canEnqueueFrame.Reset();
+		canEnqueueFrame.Wait(cts!.Token);
+	}
+
+	private void ClearPendingVideo() {
+		while (pendingVideo.Count > 0) {
+			AVPacket* p = (AVPacket*)pendingVideo.Dequeue();
+			ffmpeg.av_packet_free(&p);
+		}
+	}
+
+	// decodes one video packet into a reserved slot; the slot is given back when no frame comes out
+	private void DecodeVideoPacket(AVPacket* packet, (int idx, CDecodedFrame frame) slot) {
+		if (ffmpeg.avcodec_send_packet(codec_context, packet) < 0) {
+			this.UnpickDecodedFrameAt(slot.idx);
+			return;
+		}
+		var frame = slot.frame.GetEmptyFrame();
+		if (ffmpeg.avcodec_receive_frame(codec_context, frame) != 0) {
+			this.UnpickDecodedFrameAt(slot.idx);
+			return;
+		}
+		frameconv.Convert(frame);
+
+		double msVideoTime = (frame->best_effort_timestamp - video_stream->start_time) * (video_stream->time_base.num / (double)video_stream->time_base.den) * 1000;
+		if (msVideoTime < this.msPlayPosition) { // evict non-empty outdated frames
+			for ((int idx, CDecodedFrame frame)? f; (f = this.FirstUsedFrame()) != null && f.Value.idx != slot.idx;)
+				this.RemoveFrameAt(f.Value.idx);
+		}
+		slot.frame.UpdateFrame(msVideoTime);
+	}
+
+	// decodes one audio packet and queues its samples; those before a seek target are dropped
+	private void PushAudioPacket(AVPacket* packet) {
+		if (ffmpeg.avcodec_send_packet(audio_codec_context, packet) < 0) return;
+		while (ffmpeg.avcodec_receive_frame(audio_codec_context, audioFrame) == 0) {
+			long start = audio_stream->start_time == ffmpeg.AV_NOPTS_VALUE ? 0 : audio_stream->start_time;
+			double msAudio = (audioFrame->best_effort_timestamp - start) * (audio_stream->time_base.num / (double)audio_stream->time_base.den) * 1000;
+			double msFrame = audioFrame->nb_samples * 1000.0 / Math.Max(1, audioFrame->sample_rate);
+			if (msAudio + msFrame < audioBaseMs) continue;
+			if (audioFrame->nb_samples > audioOutCapacity) {
+				ffmpeg.av_free(audioOut_);
+				audioOutCapacity = audioFrame->nb_samples;
+				audioOut_ = (byte*)ffmpeg.av_malloc((ulong)(audioOutCapacity * audioChannels * sizeof(float)));
+			}
+			byte* outBuf = audioOut_;
+			int samples = ffmpeg.swr_convert(swr, &outBuf, audioOutCapacity, audioFrame->extended_data, audioFrame->nb_samples);
+			if (samples > 0) this.audioRing!.Write((IntPtr)audioOut_, samples * audioChannels, cts!.Token);
 		}
 	}
 
@@ -329,7 +622,19 @@ public unsafe class CVideoDecoder : IDisposable {
 		this.canEnqueueFrame.Set();
 	}
 
-	public double msPlayPosition => CTimer.NowTimeMs_Double * _dbPlaySpeed;
+	// with an audio track the clock is what has actually been heard: the frames the stream procedure handed
+	// out, less what the mixer still holds, from the last seek target
+	public double msPlayPosition {
+		get {
+			if (this.audio == null || this.audioRing == null) return CTimer.NowTimeMs_Double * _dbPlaySpeed;
+			long bytesPerFrame = audioChannels * sizeof(float);
+			double heardFrames = this.audioRing.DeliveredFrames - this.audio.UserStreamBufferedBytes / (double)bytesPerFrame;
+			return audioBaseMs + Math.Max(0.0, heardFrames) * 1000.0 / audioRate;
+		}
+	}
+
+	/// <summary>Decoded audio waiting to be played, in milliseconds (0 without an audio track).</summary>
+	public double AudioQueuedMs => this.audioRing?.QueuedMs ?? 0.0;
 
 	public Size FrameSize {
 		get;
@@ -346,7 +651,9 @@ public unsafe class CVideoDecoder : IDisposable {
 		}
 		set {
 			if (value > 0) {
+				if (value == this._dbPlaySpeed) return;
 				this._dbPlaySpeed = value;
+				this.audio?.SetSpeedLive(value);   // on the stream already in the mixer; the clock is in media time either way
 			} else {
 				throw new ArgumentOutOfRangeException();
 			}
@@ -390,6 +697,20 @@ public unsafe class CVideoDecoder : IDisposable {
 	}
 	private CTimer CTimer;
 	private AVRational Framerate;
+
+	//for the audio track
+	private AVStream* audio_stream;
+	private AVCodecContext* audio_codec_context;
+	private SwrContext* swr;
+	private AVFrame* audioFrame;
+	private byte* audioOut_;
+	private int audioOutCapacity;
+	private int audioRate, audioChannels;
+	private CSound? audio;
+	private AudioRing? audioRing;
+	private StreamProcedure? audioProc;   // referenced for as long as BASS may call it
+	private const double AudioRingSeconds = 12;   // more than the reader ever runs ahead
+	private double audioBaseMs;   // media time the ring was last started from (a seek target)
 	private CTexture lastTexture;
 	private bool bqueueinitialized = false;
 

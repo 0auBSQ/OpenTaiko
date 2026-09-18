@@ -277,6 +277,7 @@ Les chemins sont relatifs au répertoire du script. Le décodeur s'ouvre sur un 
 | Méthode | Description |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Ouvre un fichier vidéo et renvoie son handle. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | Ouvre un fichier vidéo ; avec `withAudio` à true, sa propre piste audio joue avec lui au volume de lecture des chansons, et l'image suit l'horloge de ce son, si bien que les deux ne peuvent pas se désynchroniser. |
 
 ### Handle de vidéo
 
@@ -299,6 +300,9 @@ Les positions sont en millisecondes ; Duration est en secondes. Lisez Texture �
 | `video.DurationMs  -> number` | Durée totale en millisecondes. |
 | `video.Texture  -> texture` | L'image décodée courante. |
 | `video:IsFinished()  -> bool` | Vrai une fois le flux terminé et qu'il ne reste aucune image. |
+| `video.HasAudio  -> bool` | True quand la vidéo a été ouverte avec sa piste audio. |
+| `video:GetVolumePercent()  -> number` | Volume de la piste audio en pourcentage (100 sans piste). |
+| `video:SetVolumePercent(vol)  -> nil` | Règle le volume de la piste audio en pourcentage. |
 | `video:GetTimestampMs()  -> number` | Position de lecture courante en millisecondes. |
 | `video:SetTimestampMs(ms)  -> nil` | Se positionne à une position en millisecondes. |
 | `video:GetSpeed()  -> number` | Multiplicateur de vitesse de lecture courant (1 = normal). |

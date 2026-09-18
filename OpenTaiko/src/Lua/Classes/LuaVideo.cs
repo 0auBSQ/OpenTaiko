@@ -16,6 +16,7 @@ namespace OpenTaiko {
 		private bool _pendingStart;
 		private double? _pendingSeek;
 		private double? _pendingSpeed;
+		private double? _pendingVolume;
 
 		public LuaVideo() {
 			_video = null;
@@ -33,8 +34,9 @@ namespace OpenTaiko {
 			_video = video;
 			if (_pendingSeek.HasValue) video.Seek((long)_pendingSeek.Value);
 			if (_pendingSpeed.HasValue) video.dbPlaySpeed = _pendingSpeed.Value;
+			if (_pendingVolume.HasValue) video.Audio?.SetGain((int)Math.Clamp(_pendingVolume.Value, 0, 100));
 			if (_pendingStart) video.Start();
-			_pendingStart = false; _pendingSeek = null; _pendingSpeed = null;
+			_pendingStart = false; _pendingSeek = null; _pendingSpeed = null; _pendingVolume = null;
 		}
 
 		public void Start() {
@@ -83,6 +85,10 @@ namespace OpenTaiko {
 		public double GetSpeed() => _video?.dbPlaySpeed ?? 1;
 		public double GetPlaySpeed() => GetSpeed(); // older API
 
+		// the audio track, when the video was opened with one
+		public bool HasAudio => _video?.HasAudio ?? false;
+		public double GetVolumePercent() => _video?.Audio?.GetGainPercent() ?? 100;
+
 		// End-of-video signal that does not depend on the play-position timer.
 		public bool IsFinished() {
 			return _video?.IsFinishedPlaying ?? false;
@@ -98,6 +104,10 @@ namespace OpenTaiko {
 			if (_video != null) _video.dbPlaySpeed = speed; else _pendingSpeed = speed;
 		}
 		public void SetPlaySpeed(double playSpeed) => SetSpeed(playSpeed); // older API
+
+		public void SetVolumePercent(double vol) {
+			if (_video != null) _video.Audio?.SetGain((int)Math.Clamp(vol, 0, 100)); else _pendingVolume = vol;
+		}
 
 		#endregion
 
@@ -126,7 +136,10 @@ namespace OpenTaiko {
 			DirPath = dirPath;
 		}
 
-		internal LuaVideo CreateVideo(string path, bool autoDispose) {
+		internal LuaVideo Create(string path, bool autoDispose) => Create(path, autoDispose, withAudio: false);
+
+		// withAudio: the file's own audio track plays with it (music volume group) and clocks the picture
+		internal LuaVideo Create(string path, bool autoDispose, bool withAudio) {
 			string full_path = $@"{DirPath}{Path.DirectorySeparatorChar}{path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar)}";
 
 			LuaVideo luavid = new();
@@ -143,7 +156,9 @@ namespace OpenTaiko {
 				System.Diagnostics.Trace.TraceInformation($"[vopen] queue {path} inPhase={inPhase}"); // DEBUG probe
 				Task.Run(() => {
 					try {
-						var vid = new CVideoDecoder(full_path);
+						var vid = new CVideoDecoder(full_path, withAudio
+							? (rate, channels, seconds, proc) => OpenTaiko.SoundManager.tCreateUserSound(rate, channels, seconds, proc, ESoundGroup.SongPlayback)
+							: null);
 						vid.InitRead();
 						Game.AsyncActions.Enqueue(() => {
 							try { luavid.SetVideo(vid); }
@@ -164,6 +179,7 @@ namespace OpenTaiko {
 			return luavid;
 		}
 
-		public LuaVideo CreateVideo(string path) => CreateVideo(path, autoDispose: true);
+		public LuaVideo CreateVideo(string path) => Create(path, autoDispose: true);
+		public LuaVideo CreateVideo(string path, bool withAudio) => Create(path, autoDispose: true, withAudio: withAudio);
 	}
 }

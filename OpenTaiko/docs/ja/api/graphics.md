@@ -277,6 +277,7 @@ end
 | メソッド | 説明 |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 動画ファイルを開き、そのハンドルを返します。 |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | 動画ファイルを開きます。`withAudio` が true なら動画自身の音声トラックが楽曲再生音量で一緒に再生され、映像はその音声の時刻に合わせて進むため、両者がずれることはありません。 |
 
 ### 動画ハンドル
 
@@ -299,6 +300,9 @@ end
 | `video.DurationMs  -> number` | 合計時間 (ミリ秒)。 |
 | `video.Texture  -> texture` | 現在デコードされているフレーム。 |
 | `video:IsFinished()  -> bool` | ストリームが終了し、フレームが残っていないとき true。 |
+| `video.HasAudio  -> bool` | 動画が音声トラック付きで開かれていれば true。 |
+| `video:GetVolumePercent()  -> number` | 音声トラックの音量（パーセント）。トラックがなければ 100。 |
+| `video:SetVolumePercent(vol)  -> nil` | 音声トラックの音量をパーセントで設定します。 |
 | `video:GetTimestampMs()  -> number` | 現在の再生位置 (ミリ秒)。 |
 | `video:SetTimestampMs(ms)  -> nil` | ミリ秒単位の位置にシークします。 |
 | `video:GetSpeed()  -> number` | 現在の再生速度の倍率 (1 = 通常)。 |

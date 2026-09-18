@@ -342,6 +342,14 @@ public class SoundManager   // : CSound
 
 		CSound.tReloadSound(SoundDevice);       // すでに生成済みのサウンドがあれば作り直す。
 	}
+	// a sound fed from code through a stream procedure (a video's audio track)
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		if (SoundDeviceType == ESoundDeviceType.Unknown) {
+			throw new Exception(string.Format("未対応の SoundDeviceType です。[{0}]", SoundDeviceType.ToString()));
+		}
+		return SoundDevice.tCreateUserSound(frequency, channels, durationSeconds, proc, soundGroup);
+	}
+
 	public CSound tCreateSound(string filename, ESoundGroup soundGroup) {
 		if (!File.Exists(filename)) {
 			Trace.TraceWarning($"[i18n] File does not exist: {filename}");

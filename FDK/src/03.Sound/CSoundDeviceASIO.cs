@@ -320,6 +320,12 @@ internal class CSoundDeviceASIO : ISoundDevice {
 	public void tCreateSound(string strFileName, CSound sound) {
 		sound.CreateASIOSound(strFileName, this.hMixer);
 	}
+
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		var sound = new CSound(soundGroup);
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, ESoundDeviceType.ASIO, SoundManager.bIsTimeStretch);
+		return sound;
+	}
 	#endregion
 
 

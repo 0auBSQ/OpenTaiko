@@ -277,6 +277,7 @@ end
 | 메서드 | 설명 |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | 비디오 파일을 열고 핸들을 반환합니다. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | 동영상 파일을 엽니다. `withAudio`가 true이면 동영상 자체의 오디오 트랙이 곡 재생 볼륨으로 함께 재생되고, 영상은 그 소리의 시계를 따르므로 둘이 어긋날 수 없습니다. |
 
 ### 비디오 핸들
 
@@ -299,6 +300,9 @@ end
 | `video.DurationMs  -> number` | 전체 길이(밀리초). |
 | `video.Texture  -> texture` | 현재 디코드된 프레임. |
 | `video:IsFinished()  -> bool` | 스트림이 끝나고 남은 프레임이 없으면 true. |
+| `video.HasAudio  -> bool` | 동영상이 오디오 트랙과 함께 열렸으면 true입니다. |
+| `video:GetVolumePercent()  -> number` | 오디오 트랙의 볼륨(퍼센트)입니다. 트랙이 없으면 100입니다. |
+| `video:SetVolumePercent(vol)  -> nil` | 오디오 트랙의 볼륨을 퍼센트로 설정합니다. |
 | `video:GetTimestampMs()  -> number` | 현재 재생 위치(밀리초). |
 | `video:SetTimestampMs(ms)  -> nil` | 밀리초 단위 위치로 탐색합니다. |
 | `video:GetSpeed()  -> number` | 현재 재생 속도 배율(1 = 보통). |

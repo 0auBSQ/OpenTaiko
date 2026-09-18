@@ -371,6 +371,12 @@ internal class CSoundDeviceWASAPI : ISoundDevice {
 	public void tCreateSound(string strFileName, CSound sound) {
 		sound.CreateWASAPISound(strFileName, this.hMixer, this.SoundDeviceType);
 	}
+
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		var sound = new CSound(soundGroup);
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.hMixer, proc, this.SoundDeviceType, SoundManager.bIsTimeStretch);
+		return sound;
+	}
 	#endregion
 
 	#region [ Dispose-Finallizeパターン実装 ]

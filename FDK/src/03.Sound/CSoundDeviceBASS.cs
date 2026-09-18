@@ -197,6 +197,12 @@ public partial class CSoundDeviceBASS : ISoundDevice {
 	public void tCreateSound(string strFilename, CSound sound) {
 		sound.CreateBassSound(strFilename, this.MixerHandle);
 	}
+
+	public CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup) {
+		var sound = new CSound(soundGroup);
+		sound.CreateBassUserSound(frequency, channels, durationSeconds, this.MixerHandle, proc, ESoundDeviceType.Bass, SoundManager.bIsTimeStretch);
+		return sound;
+	}
 	#endregion
 
 

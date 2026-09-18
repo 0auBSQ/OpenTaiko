@@ -77,6 +77,7 @@ public class CSound : IDisposable {
 			return _PlaySpeed;
 		}
 		set {
+			if (this.IsUserStream) { this.SetSpeedLive(value); return; }
 			if (_PlaySpeed != value) {
 				_PlaySpeed = value;
 				IsNormalSpeed = (_PlaySpeed == 1.000f);
@@ -508,6 +509,7 @@ public class CSound : IDisposable {
 	}
 
 	public void tSetPositionToBegin() {
+		if (this.IsUserStream) return;
 		if (this.IsBassSound) {
 			if (this.hMixer == NoMixerHandle) {
 				Bass.ChannelSetPosition(this.hBassStream, 0);
@@ -518,7 +520,12 @@ public class CSound : IDisposable {
 		}
 	}
 	public void tSetPosition(long positionMs) {
+		if (this.IsUserStream) return;
 		if (this.IsBassSound) {
+			// A stream that has a mixer but is not plugged into it cannot be seeked through the mixer, and it
+			// does not need to be: AddBassSoundFromMixer rewinds it when it next starts. This is the normal
+			// state of a system sound's idle buffer, so it is not an error.
+			if (this.hMixer != NoMixerHandle && BassMix.ChannelGetMixer(this.hBassStream) == 0) return;
 			bool b = true;
 			try {
 				long bytes = Bass.ChannelSeconds2Bytes(this.hBassStream, positionMs * this.Frequency * this.PlaySpeed / 1000.0);
@@ -717,6 +724,71 @@ public class CSound : IDisposable {
 	private double _Frequency = 1.0;
 	private double _PlaySpeed = 1.0;
 	private bool IsNormalSpeed = true;
+
+	// A stream fed from code through a BASS stream procedure (a video's audio track). The owner holds the
+	// samples and the position, so the BASS position calls are no-ops here; pause, resume and volume work as
+	// on any other sound, and the speed is applied live on the stream in the mixer (SetSpeedLive). It is
+	// not rebuilt when the sound device changes; the owner recreates it.
+	public bool IsUserStream { get; private set; }
+	private StreamProcedure? _userProc;   // referenced for as long as BASS may call it
+
+	public void CreateBassUserSound(int frequency, int channels, double durationSeconds, int hMixer, StreamProcedure proc, ESoundDeviceType deviceType = ESoundDeviceType.Bass, bool timeStretch = false) {
+		this.CurrnetCreateType = CreateType.Unknown;
+		this.FileName = "";
+		this.IsUserStream = true;
+		this._userProc = proc;
+
+		// a decoding stream for a mixer; a playable one when there is no mixer (direct output)
+		var flags = hMixer == NoMixerHandle ? BassFlags.Float : BassFlags.Decode | BassFlags.Float;
+		this._hBassStream = Bass.CreateStream(frequency, channels, flags, proc, IntPtr.Zero);
+		if (this._hBassStream == 0)
+			throw new Exception(string.Format("サウンドストリームの生成に失敗しました。(BASS_StreamCreate user)[{0}]", Bass.LastError.ToString()));
+
+		nBytes = durationSeconds > 0 ? Bass.ChannelSeconds2Bytes(this._hBassStream, durationSeconds) : long.MaxValue;
+
+		tBASSSoundCreate_StreamCreateAfterCommonProcess(hMixer);
+		// with time-stretch the tempo stream is the one in the mixer from the start, so the speed can change
+		// at any time without touching the mixer
+		if (timeStretch && this._hTempoStream != 0) this.hBassStream = this._hTempoStream;
+		this.CurrentSoundDeviceType = deviceType;   // set once creation succeeded, like the file-backed sounds
+	}
+
+	// the speed on the stream that is in the mixer: tempo (pitch kept) when the tempo stream is there,
+	// the sample rate otherwise
+	public void SetSpeedLive(double speed) {
+		this._PlaySpeed = speed;
+		this.IsNormalSpeed = (speed == 1.000);
+		if (!this.IsBassSound) return;
+		if (this.hBassStream == this._hTempoStream && this._hTempoStream != 0)
+			Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Tempo, (float)(speed * 100 - 100));
+		else
+			Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Frequency, (float)(this._Frequency * speed * this.nOriginalFrequency));
+	}
+
+	/// <summary>Bytes taken from the stream procedure and not yet heard: the mixer's buffering, or BASS's own playback buffer without a mixer.</summary>
+	public long UserStreamBufferedBytes {
+		get {
+			if (!this.IsBassSound) return 0;
+			if (this.hMixer == NoMixerHandle) {
+				int buffered = Bass.ChannelGetData(this.hBassStream, IntPtr.Zero, (int)DataFlags.Available);
+				return buffered < 0 ? 0 : buffered;
+			}
+			long pulled = Bass.ChannelGetPosition(this.hBassStream);
+			long output = BassMix.ChannelGetPosition(this.hBassStream);
+			if (pulled < 0 || output < 0) return 0;
+			return Math.Max(0, pulled - output);
+		}
+	}
+
+	/// <summary>Drops what the mixer still buffers from the stream (a seek); false when BASS refuses.</summary>
+	public bool UserStreamFlush() {
+		if (!this.IsBassSound) return false;
+		return this.hMixer == NoMixerHandle
+			? Bass.ChannelSetPosition(this.hBassStream, 0)
+			: BassMix.ChannelSetPosition(this.hBassStream, 0);
+	}
+
+	public long UserStreamBytesPerSecond => this.IsBassSound ? Bass.ChannelSeconds2Bytes(this._hBassStream, 1.0) : 0;
 
 	public void CreateBassSound(string strFileName, int hMixer, BassFlags flags) {
 		this.CurrnetCreateType = CreateType.FromFile;

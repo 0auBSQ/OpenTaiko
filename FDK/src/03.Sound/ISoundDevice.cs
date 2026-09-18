@@ -1,4 +1,6 @@
-﻿namespace FDK;
+﻿using ManagedBass;
+
+namespace FDK;
 
 internal interface ISoundDevice : IDisposable {
 	ESoundDeviceType SoundDeviceType { get; }
@@ -14,4 +16,6 @@ internal interface ISoundDevice : IDisposable {
 
 	CSound tCreateSound(string strFileName, ESoundGroup soundGroup);
 	void tCreateSound(string strFileName, CSound sound);
+	// a stream fed from code through a stream procedure (a video's audio track)
+	CSound tCreateUserSound(int frequency, int channels, double durationSeconds, StreamProcedure proc, ESoundGroup soundGroup);
 }

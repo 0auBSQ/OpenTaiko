@@ -277,6 +277,7 @@ Paden zijn relatief ten opzichte van de scriptmap. De decoder opent op een achte
 | Methode | Beschrijving |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Opent een videobestand en geeft zijn handle terug. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | Opent een videobestand; met `withAudio` true speelt zijn eigen audiospoor mee op het nummerweergavevolume, en het beeld volgt de klok van dat geluid, zodat de twee niet uit elkaar kunnen lopen. |
 
 ### Video-handle
 
@@ -299,6 +300,9 @@ Posities zijn in milliseconden; Duration is in seconden. Lees elk frame Texture 
 | `video.DurationMs  -> number` | Totale duur in milliseconden. |
 | `video.Texture  -> texture` | Het huidige gedecodeerde frame. |
 | `video:IsFinished()  -> bool` | True zodra de stream is geëindigd en er geen frames meer over zijn. |
+| `video.HasAudio  -> bool` | True wanneer de video met zijn audiospoor is geopend. |
+| `video:GetVolumePercent()  -> number` | Volume van het audiospoor in procent (100 zonder spoor). |
+| `video:SetVolumePercent(vol)  -> nil` | Stelt het volume van het audiospoor in procent in. |
 | `video:GetTimestampMs()  -> number` | Huidige afspeelpositie in milliseconden. |
 | `video:SetTimestampMs(ms)  -> nil` | Springt naar een positie in milliseconden. |
 | `video:GetSpeed()  -> number` | Huidige afspeelsnelheidsfactor (1 = normaal). |

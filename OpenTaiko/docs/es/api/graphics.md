@@ -277,6 +277,7 @@ Las rutas son relativas al directorio del script. El decodificador se abre en un
 | Método | Descripción |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Abre un archivo de vídeo y devuelve su handle. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | Abre un archivo de vídeo; con `withAudio` en true su propia pista de audio suena con él al volumen de reproducción de canción, y la imagen sigue el reloj de ese sonido, así que no pueden desincronizarse. |
 
 ### Handle de vídeo
 
@@ -299,6 +300,9 @@ Las posiciones están en milisegundos; Duration está en segundos. Lee Texture c
 | `video.DurationMs  -> number` | Duración total en milisegundos. |
 | `video.Texture  -> texture` | El fotograma decodificado actual. |
 | `video:IsFinished()  -> bool` | Verdadero una vez que el flujo ha terminado y no quedan fotogramas. |
+| `video.HasAudio  -> bool` | True cuando el vídeo se abrió con su pista de audio. |
+| `video:GetVolumePercent()  -> number` | Volumen de la pista de audio en porcentaje (100 si no hay). |
+| `video:SetVolumePercent(vol)  -> nil` | Fija el volumen de la pista de audio en porcentaje. |
 | `video:GetTimestampMs()  -> number` | Posición de reproducción actual en milisegundos. |
 | `video:SetTimestampMs(ms)  -> nil` | Salta a una posición en milisegundos. |
 | `video:GetSpeed()  -> number` | Multiplicador de velocidad de reproducción actual (1 = normal). |

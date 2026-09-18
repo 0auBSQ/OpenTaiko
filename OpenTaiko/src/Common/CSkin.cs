@@ -233,8 +233,8 @@ internal class CSkin : IDisposable {
 					this.bNotLoadedYet = false;
 				}
 			}
-			this.rSound[0]?.tSetPosition(ms);
-			this.rSound[1]?.tSetPosition(ms);
+			// the buffer that plays; the idle one starts from the beginning whenever it is next used
+			this.nowSound?.tSetPosition(ms);
 		}
 
 		public void tRemoveMixer() {

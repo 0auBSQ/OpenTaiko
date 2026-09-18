@@ -187,7 +187,6 @@ function update()
 					database:Write("new_user", "false")
 					counter:Start()
 					video:Start()
-					sounds.BGM:Play()
 				else
 					volselected = not volselected
 					if volselected then
@@ -227,10 +226,9 @@ end
 function activate()
 	text = TEXT:Create(32)
 	text_enter = text:GetText("Press Enter to Start!")
-	video = VIDEO:CreateVideo("Videos/intro.mp4")
+	-- the intro plays its own audio track, clocked together with the picture
+	video = VIDEO:CreateVideo("Videos/intro.mp4", true)
 	
-	sounds.BGM = SOUND:CreateBGM("Sounds/BGM.ogg")
-	--sounds.BGM:SetLoop(true)
 	sounds.Decide = SHARED:GetSharedSound("Decide")
 	sounds.Skip = SHARED:GetSharedSound("Skip")
 	sounds.Move = SHARED:GetSharedSound("Move")
@@ -242,7 +240,6 @@ function activate()
 	if not firsttime then
 		counter:Start()
 		video:Start()
-		sounds.BGM:Play()
 	else
 		bg = TEXTURE:CreateTexture("Textures/Tile.png")
 		sounds.Song = SOUND:CreateBGM("Sounds/StartupSong.ogg")
@@ -267,9 +264,6 @@ end
 function deactivate()
 	if video ~= nil then
 		video:Dispose()
-	end
-	if sounds.BGM ~= nil then
-		sounds.BGM:Dispose()
 	end
 	if text ~= nil then
 		text:Dispose()
@@ -309,9 +303,6 @@ function onStart()
 end
 
 function afterSongEnum()
-	if sounds ~= nil and sounds.BGM ~= nil and video ~= nil then
-		sounds.BGM:SetTimestamp(video:GetPlayPosition() * 1000)
-	end
 end
 
 function onDestroy()

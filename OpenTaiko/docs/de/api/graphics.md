@@ -277,6 +277,7 @@ Pfade sind relativ zum Skriptverzeichnis. Der Decoder öffnet auf einem Hintergr
 | Methode | Beschreibung |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Öffnet eine Videodatei und gibt ihr Handle zurück. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | Öffnet eine Videodatei; mit `withAudio` true spielt ihre eigene Tonspur in der Songwiedergabe-Lautstärke mit, und das Bild folgt der Uhr dieses Tons, sodass beide nicht auseinanderlaufen können. |
 
 ### Video-Handle
 
@@ -299,6 +300,9 @@ Positionen sind in Millisekunden; Duration ist in Sekunden. Lesen Sie Texture je
 | `video.DurationMs  -> number` | Gesamtdauer in Millisekunden. |
 | `video.Texture  -> texture` | Das aktuell dekodierte Bild. |
 | `video:IsFinished()  -> bool` | True, sobald der Stream beendet ist und keine Bilder mehr verbleiben. |
+| `video.HasAudio  -> bool` | True, wenn das Video mit seiner Tonspur geöffnet wurde. |
+| `video:GetVolumePercent()  -> number` | Lautstärke der Tonspur in Prozent (100 ohne Tonspur). |
+| `video:SetVolumePercent(vol)  -> nil` | Setzt die Lautstärke der Tonspur in Prozent. |
 | `video:GetTimestampMs()  -> number` | Aktuelle Wiedergabeposition in Millisekunden. |
 | `video:SetTimestampMs(ms)  -> nil` | Springt zu einer Position in Millisekunden. |
 | `video:GetSpeed()  -> number` | Aktueller Geschwindigkeitsfaktor der Wiedergabe (1 = normal). |

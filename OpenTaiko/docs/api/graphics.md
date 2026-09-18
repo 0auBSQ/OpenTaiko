@@ -277,6 +277,7 @@ Paths are relative to the script directory. The decoder opens on a background th
 | Method | Description |
 | --- | --- |
 | `VIDEO:CreateVideo(path)  -> video` | Opens a video file and returns its handle. |
+| `VIDEO:CreateVideo(path, withAudio)  -> video` | Opens a video file; with `withAudio` true its own audio track plays with it at the song playback volume, and the picture is clocked by that sound so the two cannot drift apart. |
 
 ### Video handle
 
@@ -299,6 +300,9 @@ Positions are in milliseconds; Duration is in seconds. Read Texture every frame 
 | `video.DurationMs  -> number` | Total duration in milliseconds. |
 | `video.Texture  -> texture` | The current decoded frame. |
 | `video:IsFinished()  -> bool` | True once the stream has ended and no frames remain. |
+| `video.HasAudio  -> bool` | True when the video was opened with its audio track. |
+| `video:GetVolumePercent()  -> number` | Volume of the audio track in percent (100 without one). |
+| `video:SetVolumePercent(vol)  -> nil` | Sets the audio track's volume in percent. |
 | `video:GetTimestampMs()  -> number` | Current playback position in milliseconds. |
 | `video:SetTimestampMs(ms)  -> nil` | Seeks to a position in milliseconds. |
 | `video:GetSpeed()  -> number` | Current playback speed multiplier (1 = normal). |
