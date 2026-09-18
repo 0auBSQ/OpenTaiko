@@ -4492,7 +4492,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	protected abstract void tProgressDraw_Chip_Drums(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void tProgressDraw_ChipBody_Drums(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY);
-	protected abstract void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt);
+	protected abstract void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false);
 
 	protected abstract void tProgressDraw_Chip_FillIn(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double nowTime, bool bBranch);

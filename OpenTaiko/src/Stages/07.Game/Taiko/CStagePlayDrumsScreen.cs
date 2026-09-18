@@ -1099,6 +1099,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		NotesManager.ENoteType nt = NotesManager.GetNoteType(pChip);
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
+		if (NotesManager.IsRollEnd(pChip)) {
+			nt = NotesManager.GetNoteType(pChip.start);
+			_gt = NotesManager.GetChipGameType(pChip.start, nPlayer);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, nt, _gt, isEnd: true);
+			return;
+		}
 		if (NotesManager.IsGenericRoll(nt)) {
 			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, nt, _gt);
 			return;
@@ -1170,7 +1176,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 		#endregion
 	}
-	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt) {
+	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false) {
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1178,10 +1184,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		#region[ 作り直したもの ]
 		if (pChip.bVisible) {
-			bool pHasBar = (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt));
+			bool pHasBar = !isEnd && (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt));
 
-			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
-			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
+			int x = GetNoteOriginX(nPlayer) + pChip.start.nHorizontalChipDistance;
+			int y = GetNoteOriginY(nPlayer) + pChip.start.nVerticalChipDistance;
 			int xEnd = GetNoteOriginX(nPlayer) + pChip.end.nHorizontalChipDistance;
 			int yEnd = GetNoteOriginY(nPlayer) + pChip.end.nVerticalChipDistance;
 
@@ -1189,10 +1195,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				if ((long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime < pChip.end.nSoundTimems) {
 					// TaikoJiro1 behavior: active balloons can still go right
 					if (!(tja.COMPAT is CTja.ETjaCompat.Jiro1 && pChip.nHorizontalChipDistance > 0 && !NotesManager.IsKusudama(pChip))) {
-						pChip.nHorizontalChipDistance = 0;
+						if (!isEnd)
+							pChip.nHorizontalChipDistance = 0;
 						x = GetNoteOriginX(nPlayer);
 					}
-					pChip.nVerticalChipDistance = 0;
+					if (!isEnd)
+						pChip.nVerticalChipDistance = 0;
 					y = GetNoteOriginY(nPlayer);
 				} else if (msTjaNowTime >= pChip.end.nSoundTimems) {
 					x = xEnd;
@@ -1246,7 +1254,19 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 					var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 
-					if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
+					if (isEnd) {
+						if (!hiddenMode.HidesSENotes()) {
+							//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
+							if (OpenTaiko.Tx.Notes[(int)_gt] != null)
+								OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
+							if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+								int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
+								if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
+								OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(xEnd + 56, yEnd + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
+								OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
+							}
+						}
+					} else if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
 						if (NotesManager.IsRoll(nt)) {
 					//kairera0467氏 の TJAPlayer2forPC のコードを参考にし、打数に応じて色を変える(打数の変更以外はほとんどそのまんま) ろみゅ～？ 2018/8/20
 					pChip.RollInputTime?.Tick();
@@ -1293,17 +1313,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode, opacity);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
-					} else if (!hiddenMode.HidesSENotes() && NotesManager.IsRollEnd(nt)) {
-						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
-						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
-							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
-						if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
-							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
-							OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
-							OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
-						}
-
 					}
 				}
 			}
