@@ -389,7 +389,10 @@ internal class CActPlayDrumsGameMode : CActivity {
 			if (this.stTatakikiriShow.bTimerUse) {
 				if (!this.stTatakikiriShow.ctRemainingTime.IsStopped || this.stTatakikiriShow.bAddAnime == true) {
 					this.stTatakikiriShow.ctRemainingTime.Tick();
-					if (!OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 5000, 0) || this.stTatakikiriShow.bAddAnime == true) {
+					if (OpenTaiko.stageGameScreen.actTokkun.bTrainingPAUSE
+						|| !OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 5000, 0)
+						|| this.stTatakikiriShow.bAddAnime == true
+						) {
 						this.stTatakikiriShow.bTimerUse = false;
 						this.stTatakikiriShow.ctRemainingTime.Stop();
 					}
@@ -397,7 +400,10 @@ internal class CActPlayDrumsGameMode : CActivity {
 			}
 
 			if (!this.stTatakikiriShow.bTimerUse && this.stTatakikiriShow.bAddAnime == false) {
-				if ((this.stTatakikiriShow.bFirstChipHit == true && (OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 2000, 0)))) {
+				if ((this.stTatakikiriShow.bFirstChipHit == true
+					&& !OpenTaiko.stageGameScreen.actTokkun.bTrainingPAUSE
+					&& (OpenTaiko.stageGameScreen.rIsChipInSearchRange((long)tja.GameTimeToTjaTime(SoundManager.PlayTimer.NowTimeMs), 2000, 0)))
+					) {
 					this.stTatakikiriShow.bTimerUse = true;
 					int nCount = this.stTatakikiriShow.ctRemainingTime.CurrentValue;
 					this.stTatakikiriShow.ctRemainingTime = new CCounter(0, 25000, 1, OpenTaiko.Timer);
