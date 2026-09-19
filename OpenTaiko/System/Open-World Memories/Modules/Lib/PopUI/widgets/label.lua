@@ -73,8 +73,10 @@ function Label:draw()
     if not self.visible then return end
     local x, y = math.floor(self.x), math.floor(self.y)
     if self.chip then
+        -- the chip is centred on the glyph line, not on the text box (which carries the bottom padding)
+        local lineH = self.mgr:gfont(self:_fontSize()).LineHeight
         self._chip.canvas:SetColor(1, 1, 1); self._chip.canvas:SetOpacity(1); self._chip.canvas:SetScale(1, 1)
-        self._chip.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + self.h * 0.5), "center")
+        self._chip.canvas:DrawAtAnchor(math.floor(self.x + self.w * 0.5), math.floor(self.y + lineH * 0.5), "center")
     end
     local anchor = (self.align == "center") and "top" or (self.align == "right") and "topright" or "topleft"
     self.mgr:drawTextEx(self:_fontSize(), self.text, x, y, self._fg, self._bg, 1, 1, self.maxWidth, anchor)

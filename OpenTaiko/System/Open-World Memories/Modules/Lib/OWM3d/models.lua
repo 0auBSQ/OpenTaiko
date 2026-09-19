@@ -128,7 +128,7 @@ function Models:add(o)
                 end
                 inst.objs[#inst.objs + 1] = po
                 for _, idx in ipairs(idxs) do
-                    inst.parts[#inst.parts + 1] = { part = idx, obj = po }
+                    inst.parts[#inst.parts + 1] = { part = idx, obj = po, material = p.material }
                 end
             end
         end

@@ -1640,7 +1640,7 @@ internal class OpenTaiko : Game {
 				0,
 				OpenTaiko.ConfigIni.nASIODevice,
 				OpenTaiko.ConfigIni.bUseOSTimer);
-			SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
+			SoundManager.nMasterVolume = StartHidden ? 0 : OpenTaiko.ConfigIni.nMasterVolume;   // a hidden run is a silent one
 			// iOS: the desktop branch below also creates these; without SongGainController the first note NREs (CTja.tチップの再生).
 			SongGainController = new SongGainController();
 			ConfigIniToSongGainControllerBinder.Bind(ConfigIni, SongGainController);
@@ -1702,7 +1702,7 @@ internal class OpenTaiko : Game {
 
 				ShowWindowTitle();
 				FDK.SoundManager.bIsTimeStretch = OpenTaiko.ConfigIni.bTimeStretch;
-				SoundManager.nMasterVolume = OpenTaiko.ConfigIni.nMasterVolume;
+				SoundManager.nMasterVolume = StartHidden ? 0 : OpenTaiko.ConfigIni.nMasterVolume;   // a hidden run is a silent one
 				Trace.TraceInformation("サウンドデバイスの初期化を完了しました。");
 			} catch (Exception e) {
 				Trace.TraceError(e.ToString());

@@ -709,6 +709,8 @@ public abstract partial class Game : IDisposable {
 
 
 	public void Window_Load() {
+		// a hidden run stays hidden whatever the windowing backend applied after creating the window
+		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
 		var icon = GetIconData(strIconFileName);
 		if (icon.HasValue) {
 			Window_.SetWindowIcon(new ReadOnlySpan<RawImage>(icon.Value));
@@ -816,6 +818,7 @@ public abstract partial class Game : IDisposable {
 	}
 
 	public void Window_Update(double deltaTime) {
+		if (StartHidden && Window_.IsVisible) Window_.IsVisible = false;
 		double fps = 1.0f / deltaTime;
 		dbTimeMs = dbGetTimeMsReal!();
 		TimeMs = (long)dbTimeMs;

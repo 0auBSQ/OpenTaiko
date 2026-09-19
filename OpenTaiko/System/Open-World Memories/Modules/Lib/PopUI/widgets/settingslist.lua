@@ -178,9 +178,12 @@ function List:draw()
         local ry = self.y + (i - 1) * self.rowHeight - self._scrollCur
         local rcy = math.floor(ry + (self.rowHeight - 10) * 0.5 + 5)
         local rcx = math.floor(self.x + self.w * 0.5)
+        -- top-anchored text: the box top sits half a box above the row centre, plus the nudge so the
+        -- glyph line (not the padded box) is what gets centred
+        local ty = math.floor(rcy - th * 0.5 + self.mgr:textNudge(sz))
         if r.header then
             -- section header: just the label, no row body
-            self.mgr:drawText(hsz, tostring(r.header), math.floor(self.x + 18), math.floor(rcy - self.mgr:textHeight(hsz) * 0.5), self.eff.colors.accent2 or self.eff.colors.primary2)
+            self.mgr:drawText(hsz, tostring(r.header), math.floor(self.x + 18), math.floor(rcy - self.mgr:textHeight(hsz) * 0.5 + self.mgr:textNudge(hsz)), self.eff.colors.accent2 or self.eff.colors.primary2)
         else
             local isSel = (i == selRowIdx)
             local piece = isSel and self._rowSel or self._row
@@ -193,7 +196,7 @@ function List:draw()
             local nameCol = isSel and self._hiCapCur > 0.01
                 and U.lerpColor(self.eff.colors.text, self.eff.colors.primary2, self._hiCapCur)
                 or self.eff.colors.text
-            self.mgr:drawText(sz, tostring(opt.Name or ""), math.floor(self.x + 28), math.floor(rcy - th * 0.5), nameCol)
+            self.mgr:drawText(sz, tostring(opt.Name or ""), math.floor(self.x + 28), ty, nameCol)
             local val = opt:Display() or ""
             if val ~= "" then
                 local vw = self.mgr:measureText(sz, val)
@@ -203,10 +206,10 @@ function List:draw()
                 local suffix = ""
                 if isSel and self.focused and (opt.Kind == "Int" or opt.Kind == "Choice") then suffix = " ›" end
                 if prefix ~= "" then
-                    self.mgr:drawText(sz, prefix, math.floor(vx - self.mgr:measureText(sz, prefix)), math.floor(rcy - th * 0.5), nameCol)
-                    self.mgr:drawText(sz, val .. suffix, math.floor(vx), math.floor(rcy - th * 0.5), nameCol)
+                    self.mgr:drawText(sz, prefix, math.floor(vx - self.mgr:measureText(sz, prefix)), ty, nameCol)
+                    self.mgr:drawText(sz, val .. suffix, math.floor(vx), ty, nameCol)
                 else
-                    self.mgr:drawText(sz, val, math.floor(vx), math.floor(rcy - th * 0.5), nameCol)
+                    self.mgr:drawText(sz, val, math.floor(vx), ty, nameCol)
                 end
             end
         end

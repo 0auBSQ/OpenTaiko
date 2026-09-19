@@ -21,6 +21,7 @@
 -- accepts v1 tables (absent v) and migrates wall furniture + the fixed phone into wallItems.
 
 local A = require("assets")
+local TVMod = require("tv")           -- the TV screen constant (room.lua routes the screen part with it)
 local IsoMap = require("OWM3d.isomap")
 local MIG = require("migration")       -- save-table migrations (retired ids, v1→v2, starter seeding)
 local I18N = require("i18n")           -- item names: lang/<code>/<file>.json (English fallback)
@@ -160,6 +161,8 @@ local function buildCatalogFromJson()
                 interact = jget(node, "interact"), model = jget(node, "model"),
                 emissivePart = jget(node, "emissivePart"),   -- GLB material routed to its own part
                                                              -- object (runtime glow, e.g. jukebox screen)
+                screenPart = jget(node, "screenPart"),       -- GLB material shown unlit + flat-coloured
+                                                             -- while the item is on (the TV screen)
                 nameLoc = jloc("furniture", id),
                 build = GROUND_BUILDERS[id], wallBuild = WALL_BUILDERS[id],
             }
@@ -874,7 +877,7 @@ local function modelStem(id)
 end
 Room.modelStem = modelStem     -- editmode's icon path needs the GLB stem for variant items
 
-local function tryModel(world, id, cx, cz, yaw, cat, baseY)
+local function tryModel(world, id, cx, cz, yaw, cat, baseY, it)
     local stem = modelStem(id)
     if GLB_STATE[stem] == "missing" then return nil end
     -- per-variant ACCENT: recolour ONLY the model's "Blue" material part to the accent colour (flat
@@ -890,6 +893,13 @@ local function tryModel(world, id, cx, cz, yaw, cat, baseY)
     if cat and cat.emissivePart then
         parts = parts or {}
         parts[#parts + 1] = { material = cat.emissivePart, emissive = { 1, 0.95, 0.8, 0.12 } }
+    end
+    -- catalog screenPart: while the item is on (it.tvOn) its screen ignores the sun and the shadow map
+    -- and draws a flat colour pushed over the bloom threshold; tv.lua writes the colour every frame
+    if cat and cat.screenPart and it and it.tvOn then
+        parts = parts or {}
+        local e = TVMod.SCREEN_EMISSIVE
+        parts[#parts + 1] = { material = cat.screenPart, unlit = true, color = { 0.55, 0.7, 1.0 }, emissive = { 1, 1, 1, e } }
     end
     local inst = nil
     local ok = pcall(function()
@@ -947,7 +957,7 @@ function Room:buildOneProp(world, phys, gh, it, baseY, stacked)
     if (it.facing or 0) % 2 == 1 then w, h = h, w end
     local cx, cz = world:footprintCenter(it.c, it.r, w, h)
     local yaw = (it.facing or 0) * 90
-    local inst = tryModel(world, it.id, cx, cz, yaw, cat, baseY)
+    local inst = tryModel(world, it.id, cx, cz, yaw, cat, baseY, it)
     if inst == nil then
         if cat.build then cat.build(world, cx, cz, yaw, baseY)
         else   -- model file absent: a plain box the size of the footprint marks the spot

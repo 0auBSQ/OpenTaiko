@@ -88,7 +88,9 @@
     "place": "ground",
     "collH": 1.0,
     "stackOn": true,
-    "shop": true
+    "shop": true,
+    "interact": "tv",
+    "screenPart": "metal"
   },
   "computer": {
     "w": 1,

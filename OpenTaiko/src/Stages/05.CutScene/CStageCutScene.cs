@@ -26,6 +26,14 @@ class CStageCutScene : CStage {
 		this.returned = false;
 		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 
+		// whatever plays now can be watched again (My Room's TV reads this trigger, named like the
+		// reg/met ones: .seencutscene_{uid}_{Intro|Outro}_{file})
+		string uid = OpenTaiko.SongMount.rChoosenSong?.tGetUniqueId() ?? "";
+		foreach (var c in this.cutScenes) {
+			string seen = $".seencutscene_{uid}_{this.mode.ToString()}_{Path.GetFileName(c.FullPath)}".EscapeSingleQuotes();
+			OpenTaiko.PrimarySaveFile.tSetGlobalTrigger(seen, true);
+		}
+
 		var ui = UI;
 		if (ui == null) {
 			Trace.TraceWarning("No cutscene ROActivity in this skin; the cutscene is skipped.");

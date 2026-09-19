@@ -401,12 +401,80 @@ function Shape.bubble(cv, x, y, w, h, opts)
     end
 end
 
--- ── audio-player transport icons (language-agnostic glyphs baked onto widget canvases) ─────────────
--- kind: "play" | "pause" | "stop" | "repeat" | "back". Drawn centered at (cx,cy), overall size s,
--- color c = {r,g,b[,a]}. Buttons pass their text color so icons match either face.
+-- ── audio/video-player transport icons (language-agnostic glyphs baked onto widget canvases) ───────
+-- kind: "play" | "pause" | "stop" | "repeat" | "back" | "restart" | "rewind" | "forward" | "lock".
+-- Drawn centered at (cx,cy), overall size s, color c = {r,g,b[,a]}. Buttons pass their text color so
+-- icons match either face; menus draw "lock" over rows that cannot be chosen.
 function Shape.icon(cv, kind, cx, cy, s, c)
     local h = s * 0.5
-    if kind == "play" then
+    if kind == "restart" then
+        -- a bar and a triangle pointing at it: back to the start
+        local t = s * 0.18
+        Shape.fillRoundAA(cv, cx - h * 0.9, cy - h * 0.8, t, h * 1.6, t * 0.45, c)
+        fillTriangle(cv, cx + h * 0.9, cy - h * 0.8, cx + h * 0.9, cy + h * 0.8, cx - h * 0.9 + t + s * 0.06, cy, c)
+    elseif kind == "rewind" then
+        -- two triangles pointing left: a few seconds back
+        fillTriangle(cv, cx + h * 0.05, cy - h * 0.7, cx + h * 0.05, cy + h * 0.7, cx - h * 0.95, cy, c)
+        fillTriangle(cv, cx + h * 1.0, cy - h * 0.7, cx + h * 1.0, cy + h * 0.7, cx + h * 0.0, cy, c)
+    elseif kind == "forward" then
+        -- two triangles pointing right: a few seconds ahead
+        fillTriangle(cv, cx - h * 1.0, cy - h * 0.7, cx - h * 1.0, cy + h * 0.7, cx - h * 0.0, cy, c)
+        fillTriangle(cv, cx - h * 0.05, cy - h * 0.7, cx - h * 0.05, cy + h * 0.7, cx + h * 0.95, cy, c)
+    elseif kind == "close" then
+        -- two diagonal bars with round ends: close / dismiss
+        local t = s * 0.16
+        local r = h * 0.6
+        local function bar(x0, y0, x1, y1)
+            local dx, dy = x1 - x0, y1 - y0
+            local len = math.sqrt(dx * dx + dy * dy)
+            local nx, ny = -dy / len * t * 0.5, dx / len * t * 0.5
+            fillTriangle(cv, x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, c)
+            fillTriangle(cv, x0 + nx, y0 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny, c)
+            Shape.fillRoundAA(cv, x0 - t * 0.5, y0 - t * 0.5, t, t, t * 0.5, c)
+            Shape.fillRoundAA(cv, x1 - t * 0.5, y1 - t * 0.5, t, t, t * 0.5, c)
+        end
+        bar(cx - r, cy - r, cx + r, cy + r)
+        bar(cx - r, cy + r, cx + r, cy - r)
+    elseif kind == "volume" or kind == "muted" then
+        -- a speaker: a small box with a cone; sound waves beside it, or a cross when muted
+        local bw, bh = s * 0.18, s * 0.34
+        local sx = cx - s * 0.42
+        Shape.fillRoundAA(cv, sx, cy - bh * 0.5, bw, bh, bw * 0.3, c)
+        fillTriangle(cv, sx + bw * 0.8, cy - bh * 0.5, sx + bw * 0.8, cy + bh * 0.5, sx + bw * 0.8, cy, c)
+        fillTriangle(cv, sx + bw * 0.6, cy - bh * 0.5, sx + bw * 0.6 + s * 0.28, cy - s * 0.42, sx + bw * 0.6 + s * 0.28, cy + s * 0.42, c)
+        fillTriangle(cv, sx + bw * 0.6, cy + bh * 0.5, sx + bw * 0.6 + s * 0.28, cy - s * 0.42, sx + bw * 0.6 + s * 0.28, cy + s * 0.42, c)
+        local t = s * 0.09
+        if kind == "volume" then
+            Shape.fillRoundAA(cv, cx + s * 0.1, cy - s * 0.16, t, s * 0.32, t * 0.5, c)
+            Shape.fillRoundAA(cv, cx + s * 0.26, cy - s * 0.3, t, s * 0.6, t * 0.5, c)
+        else
+            local x0, y0, x1, y1 = cx + s * 0.1, cy - s * 0.2, cx + s * 0.42, cy + s * 0.2
+            fillTriangle(cv, x0, y0, x0 + t, y0 - t * 0.2, x1 + t, y1 - t * 0.2, c)
+            fillTriangle(cv, x0, y0, x1 + t, y1 - t * 0.2, x1, y1, c)
+            fillTriangle(cv, x0, y1, x0 + t, y1 + t * 0.2, x1 + t, y0 + t * 0.2, c)
+            fillTriangle(cv, x0, y1, x1 + t, y0 + t * 0.2, x1, y0, c)
+        end
+    elseif kind == "lock" then
+        -- a padlock: body, shackle (a ring with its lower half hidden by the body), keyhole, and a chain
+        -- of three links running across the body
+        local bw, bh = s * 0.62, s * 0.48
+        local bx, by = cx - bw * 0.5, cy - bh * 0.15
+        local t = s * 0.1
+        local sr = s * 0.2
+        Shape.fillRoundAA(cv, cx - sr - t * 0.5, by - sr - t * 0.2, t, sr + t * 0.2, t * 0.45, c)   -- shackle legs
+        Shape.fillRoundAA(cv, cx + sr - t * 0.5, by - sr - t * 0.2, t, sr + t * 0.2, t * 0.45, c)
+        Shape.fillRoundAA(cv, cx - sr - t * 0.5, by - sr - t * 0.2 - t, sr * 2 + t, t, t * 0.5, c)  -- shackle top
+        Shape.fillRoundAA(cv, bx, by, bw, bh, s * 0.08, c)                                          -- body
+        local kc = { c[1] * 0.35, c[2] * 0.35, c[3] * 0.35, c[4] or 255 }
+        Shape.fillRoundAA(cv, cx - s * 0.05, cy + bh * 0.05, s * 0.1, s * 0.16, s * 0.05, kc)      -- keyhole
+        local lw, lh, lt = s * 0.22, s * 0.13, s * 0.045                                            -- chain links
+        for i = -1, 1 do
+            local lx = cx + i * lw * 0.85 - lw * 0.5
+            local ly = cy + bh * 0.12 - lh * 0.5
+            Shape.fillRoundAA(cv, lx, ly, lw, lh, lh * 0.5, c)
+            Shape.fillRoundAA(cv, lx + lt, ly + lt, lw - 2 * lt, lh - 2 * lt, (lh - 2 * lt) * 0.5, kc)
+        end
+    elseif kind == "play" then
         fillTriangle(cv, cx - h * 0.58, cy - h * 0.88, cx - h * 0.58, cy + h * 0.88, cx + h * 0.92, cy, c)
     elseif kind == "pause" then
         local bw, bh = s * 0.24, s * 0.84

@@ -10,6 +10,7 @@
   "prompt_phone": "[Enter] 電話を使う",
   "prompt_lamp": "[Enter] ランプを切り替え",
   "prompt_jukebox": "[Enter] 音楽をかける",
+  "prompt_tv": "[Enter] テレビを使う",
   "prompt_pod": "[Enter] 調べる",
   "prompt_exit": "[Enter] 部屋を出る",
   "prompt_switch": "[Tab] フォーカス切り替え",

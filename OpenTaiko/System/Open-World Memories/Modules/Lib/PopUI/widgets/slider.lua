@@ -17,6 +17,7 @@ function Slider.new(o)
     self.min = o.min or 0
     self.max = o.max or 100
     self.step = o.step or 1
+    self.navStep = o.navStep   -- a key/pad step coarser than the snap step (nil: the snap step)
     self.value = o.value or self.min
     if o.showValue == nil or o.showValue == true then
         self.showValue = function (self) return tostring(math.floor(self.value)) end
@@ -105,11 +106,11 @@ function Slider:onCancel()
     return false
 end
 function Slider:onNavLeft(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); self:setValue(self.value - self.step); return true end
+    if not forPad or self.capturing then self:setCapturing(true, true); self:setValue(self.value - (self.navStep or self.step)); return true end
     return false
 end
 function Slider:onNavRight(forPad)
-    if not forPad or self.capturing then self:setCapturing(true, true); self:setValue(self.value + self.step); return true end
+    if not forPad or self.capturing then self:setCapturing(true, true); self:setValue(self.value + (self.navStep or self.step)); return true end
     return false
 end
 
@@ -117,7 +118,8 @@ function Slider:update(ctx)
     Widget.update(self, ctx)
     local R = self._trackR
     local capturing, silence = self.capturing, false
-    if not self.focused then capturing = false end
+    -- losing focus (the mouse moved on) ends the capture quietly: nobody pressed cancel
+    if not self.focused then capturing = false; silence = true end
     if ctx.mPressing then
         capturing = self.pressed
         if self.pressed then

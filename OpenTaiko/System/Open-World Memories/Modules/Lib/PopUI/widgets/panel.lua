@@ -65,7 +65,8 @@ function Panel:draw()
         self._titlePill.canvas:SetColor(1, 1, 1); self._titlePill.canvas:SetOpacity(1); self._titlePill.canvas:SetScale(1, 1)
         self._titlePill.canvas:DrawAtAnchor(tx, ty, "center")
         local c = self.eff.colors
-        self.mgr:drawTextEx(self.eff.font.title, self.title, tx, ty,
+        -- the text box is anchored below the pill's centre by the nudge so its glyph line sits on it
+        self.mgr:drawTextEx(self.eff.font.title, self.title, tx, ty + self.mgr:textNudge(self.eff.font.title),
             c.textOnAccent, U.shade(c.primary2, 0.5), 1, 1, self.w - 40, "center")
     end
 end

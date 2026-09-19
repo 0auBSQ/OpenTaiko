@@ -20,6 +20,7 @@ local PHONE    = I18N.texts("phone")        -- lang/<code>/phone.json
 local HUD      = I18N.texts("hud")          -- lang/<code>/hud.json
 local MO       = require("online")          -- P2P "visit my room" (lobby + presence); see online.lua
 local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
+local TV       = require("tv")              -- the TV: on/off screen light + the cutscene browser; see tv.lua
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
 local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
@@ -177,6 +178,7 @@ local function rebuild()
           r = 0.75, g = 0.85, b = 1.0, intensity = 0.4, range = 5.5 },
     }
     for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
+    for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
     world.daynight:setLights(lights)
 end
 
@@ -317,6 +319,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "computer", it = it, key = "computer:" .. tostring(it) }
                     elseif it.id == "floorlamp" then
                         seen[it] = true; list[#list + 1] = { kind = "lamp", it = it, key = "lamp:" .. tostring(it) }
+                    elseif cat.interact == "tv" then
+                        seen[it] = true; list[#list + 1] = { kind = "tv", it = it, key = "tv:" .. tostring(it) }
                     elseif cat.interact == "pod" then
                         seen[it] = true; list[#list + 1] = { kind = "pod", it = it, key = "pod:" .. tostring(it) }
                     end
@@ -364,14 +368,18 @@ local function interactGlow(focused)
             partBase = {}
             for _, pp in ipairs(inst.parts) do partBase[pp.obj] = { 0.12, 0.114, 0.096 } end
         end
+        -- an on TV's screen keeps its own light: only the body pulses
+        local skipObj = (focused.kind == "tv") and TV.screenObj(focused.it) or nil
         local p = 0.30 + 0.30 * (0.5 + 0.5 * sin(lastTs * 0.006))   -- 0.30 .. 0.90 glow
         world._glow = {}
         for _, o in ipairs(inst.objs or { inst.obj }) do
-            local rb = partBase and partBase[o] or nil
-            local r0, g0, b0 = br, bg, bb
-            if rb then r0, g0, b0 = rb[1], rb[2], rb[3] end
-            world._glow[#world._glow + 1] = { o = o, r = r0, g = g0, b = b0 }
-            pcall(function() scene:ObjSetEmissive(o, r0 + p, g0 + p, b0 + p) end)
+            if o ~= skipObj then
+                local rb = partBase and partBase[o] or nil
+                local r0, g0, b0 = br, bg, bb
+                if rb then r0, g0, b0 = rb[1], rb[2], rb[3] end
+                world._glow[#world._glow + 1] = { o = o, r = r0, g = g0, b = b0 }
+                pcall(function() scene:ObjSetEmissive(o, r0 + p, g0 + p, b0 + p) end)
+            end
         end
         return
     end
@@ -553,6 +561,21 @@ JB.init{
     scene = function() return world and world.scene or nil end,
 }
 -- (the PC screen crossfades with the jukebox: JB.setDuck on open/close + PCS.tickBgmFade in update)
+
+-- TV context: the screen colour/light of sets that are on, and the cutscene browser (jukebox ducked
+-- while a cutscene plays)
+TV.init{
+    theme = PHONE_THEME,
+    playerIndex = function() return playerIndex end,
+    save = function() return curSave() end,
+    room = function() return room end,
+    scene = function() return world and world.scene or nil end,
+    propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
+    catalog = function(id) return Room.CATALOG[id] end,
+    displayName = function() return Room.displayName("tv") end,
+    onToggled = function() rebuild(); saveRoom(); MO.onRoomChanged() end,
+    duck = function(on) JB.setDuck(on, on and 0 or 0.15) end,
+}
 
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
 
@@ -830,6 +853,7 @@ function update(ts)
     -- The PC-screen BGM fade is pumped alongside so its fade-out can finish after the screen closes.
     local jbRes = JB.update(dt, ts)
     PCS.tickBgmFade(dt)
+    TV.tick(dt)                    -- the screens of TVs that are on drift their colour in every mode
 
     -- ── modal overlays ──
     if mode == "playerselect" then
@@ -877,6 +901,9 @@ function update(ts)
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "jukebox" then
         if jbRes == "closed" or not JB.isOpen() then mode = "play" end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "tv" then
+        if TV.update(dt, ts) == "closed" or not TV.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
@@ -995,6 +1022,10 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             JB.openFor(focused.it, Room.displayName("jukebox"), playerIndex)
             mode = "jukebox"
+        elseif focused.kind == "tv" then
+            SHARED:GetSharedSound("Decide"):Play()
+            TV.openFor(focused.it, Room.displayName("tv"))
+            mode = "tv"
         end
     end
     if msgT > 0 then msgT = msgT - dt end
@@ -1085,6 +1116,9 @@ function draw()
     elseif mode == "jukebox" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         JB.draw()
+    elseif mode == "tv" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        TV.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -1093,6 +1127,7 @@ function draw()
         elseif prompt == "phone" then instr[#instr + 1] = { t = HUD:tr("prompt_phone"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "lamp" then instr[#instr + 1] = { t = HUD:tr("prompt_lamp"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "jukebox" then instr[#instr + 1] = { t = HUD:tr("prompt_jukebox"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "tv" then instr[#instr + 1] = { t = HUD:tr("prompt_tv"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "pod" then instr[#instr + 1] = { t = HUD:tr("prompt_pod"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end

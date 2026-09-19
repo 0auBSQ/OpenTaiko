@@ -10,6 +10,7 @@
   "prompt_phone": "[Entrée] Utiliser le téléphone",
   "prompt_lamp": "[Entrée] Allumer/éteindre la lampe",
   "prompt_jukebox": "[Entrée] Mettre de la musique",
+  "prompt_tv": "[Entrée] Utiliser la télé",
   "prompt_pod": "[Entrée] Examiner",
   "prompt_exit": "[Entrée] Quitter la chambre",
   "prompt_switch": "[Tab] Changer de cible",

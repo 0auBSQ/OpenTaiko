@@ -22,7 +22,7 @@ function Menu.new(o)
     for _, it in ipairs(srcItems) do
         -- mark = highlighted row (e.g. a music player's now-playing entry): gold face + gold text.
         -- It lives on the item table so callers can flip it live without rebuilding the menu.
-        if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value, mark = it.mark }
+        if type(it) == "table" then self.items[#self.items + 1] = { text = it.text or "", value = it.value, mark = it.mark, locked = it.locked }
         else self.items[#self.items + 1] = { text = tostring(it), value = it } end
     end
     self._scrollCur, self._scrollTarget = 0, 0
@@ -61,6 +61,8 @@ function Menu:onNavUpOrPadLeft() if self.selected > 1 then self:setSelected(self
 
 function Menu:onActivate()
     local it = self.items[self.selected]
+    -- a locked row can be looked at but not chosen
+    if it and it.locked then self:playSfx("error"); return end
     if it and self.onSelect and self.onSelect(self.selected, it, self) then return end
     self:playSfx("click")
 end
@@ -131,15 +133,20 @@ function Menu:draw()
     local lastVis = math.min(n, math.ceil((self._scrollCur + self.h) / self.rowHeight) + 1)
     for i = firstVis, lastVis do
         local ry = self.y + (i - 1) * self.rowHeight - self._scrollCur
-        local rcy = math.floor(ry + (self.rowHeight - 10) * 0.5 + self.mgr:textNudge(self.eff.font.label))
+        -- the row piece sits on the row's centre line; the text box is anchored below it by the nudge so
+        -- its line of glyphs lands on that same centre (the box carries the font's bottom padding)
+        local rcy = math.floor(ry + self.rowHeight * 0.5)
+        local tcy = rcy + self.mgr:textNudge(self.eff.font.label)
         local rcx = math.floor(self.x + self.w * 0.5)
         local isSel = (i == self.selected)
         local it = self.items[i]
         local marked = it and it.mark
+        local locked = it and it.locked
         local piece = isSel and self._rowSel or self._row
         -- marked (now-playing) rows: warm gold face tint on the plain row; the selected face keeps
-        -- its accent colour and signals through the gold text instead
+        -- its accent colour and signals through the gold text instead; locked rows go grey
         if marked and not isSel then piece.canvas:SetColor(1.0, 0.88, 0.45)
+        elseif locked then piece.canvas:SetColor(0.62, 0.62, 0.66)
         else piece.canvas:SetColor(1, 1, 1) end
         piece.canvas:SetOpacity(1)
         piece.canvas:SetScale(1.0, 1.0)
@@ -153,8 +160,21 @@ function Menu:draw()
             local fg = marked and { 255, 208, 74 } or (isSel and c.textOnAccent or c.text)
             local bg = isSel and U.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
             if marked and not isSel then bg = { 90, 62, 8, 200 } end
-            self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), rcy,
-                fg, bg, 1, 1, self.w - 48, "left", vy0, vy1)
+            if locked then fg = { 120, 122, 130 } end
+            local textW = locked and (self.w - 48 - self.rowHeight) or (self.w - 48)
+            self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), tcy,
+                fg, bg, 1, 1, textW, "left", vy0, vy1)
+            if locked then
+                -- the padlock and its chain sit at the row's right end
+                local isz = math.floor(self.rowHeight * 0.62)
+                self:bakeShared("_lock", "menu.lock", isz + 8, isz + 8, function(cv)
+                    Shape.icon(cv, "lock", (isz + 8) * 0.5, (isz + 8) * 0.5, isz, { 236, 238, 244 })
+                end, nil, isz)
+                if self._lock and ry + self.rowHeight <= vy1 + 1 and ry >= vy0 - 1 then
+                    self._lock.canvas:SetColor(1, 1, 1); self._lock.canvas:SetOpacity(1); self._lock.canvas:SetScale(1, 1)
+                    self._lock.canvas:DrawAtAnchor(math.floor(self.x + self.w - 24 - isz * 0.5), rcy, "center")
+                end
+            end
         end
     end
 end

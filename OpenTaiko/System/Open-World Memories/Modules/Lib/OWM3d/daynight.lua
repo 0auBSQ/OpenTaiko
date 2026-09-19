@@ -29,11 +29,12 @@ function DayNight:enableCycle(secondsPerDay)
     self.cycleSpeed = (secondsPerDay and secondsPerDay > 0) and (24 / secondsPerDay) or 0
 end
 
--- adopt a map's light list (maps.lua calls this on load; nil on unload)
+-- adopt a map's light list (maps.lua calls this on load; nil on unload). A def with flicker > 0 or
+-- live = true (its colour is written by the owner every frame) makes the list rebuild every frame.
 function DayNight:setLights(defs)
     self.lightDefs = defs
     self._flicker = false
-    for _, l in ipairs(defs or {}) do if (l.flicker or 0) > 0 then self._flicker = true end end
+    for _, l in ipairs(defs or {}) do if (l.flicker or 0) > 0 or l.live then self._flicker = true end end
     self._lightsDirty = true
 end
 

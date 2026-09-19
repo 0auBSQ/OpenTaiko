@@ -18,11 +18,11 @@ internal enum AppMode {
 /// Forms accepted for every option: <c>--name value</c> and <c>--name=value</c> (case-insensitive).
 ///   --mode=record  --uid &lt;id&gt;  [--difficulties 3,4] [--fps 60] [--size 1920x1080] [--out file.mp4]
 ///   --mode=checkgl
-///   --hidden       run without showing the window (automated boot checks; the log still records everything)
+///   --hidden       run without showing the window or making a sound (automated boot checks; the log still records everything)
 /// </summary>
 internal sealed class CommandLineArgs {
 	public AppMode Mode = AppMode.Normal;
-	public bool Hidden = false;   // --hidden: the window is created but never shown
+	public bool Hidden = false;   // --hidden: the window is created but never shown, and the master volume stays at 0
 
 	// --mode=record options (unused in other modes)
 	public string Uid = "";
