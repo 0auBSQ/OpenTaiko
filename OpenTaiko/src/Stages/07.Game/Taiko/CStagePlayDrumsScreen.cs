@@ -1234,16 +1234,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
 					int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
-
-					// a roll-end chip is judged from its head like the rest of the roll
-					float opacity;
-					if (NotesManager.IsRollEnd(nt) && pChip.start != null) {
-						int xHead = x - pChip.nHorizontalChipDistance + pChip.start.nHorizontalChipDistance;
-						int yHead = y - pChip.nVerticalChipDistance + pChip.start.nVerticalChipDistance;
-						opacity = this.tRollOpacity(nPlayer, xHead, yHead, x, y);
-					} else {
-						opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
-					}
+					float opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
 					if (opacity <= 0f) return;
 
 					//136, 30
