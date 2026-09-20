@@ -57,11 +57,11 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public int VideoStartTimeMs;
 	public int nHorizontalChipDistance;
 	public int nVerticalChipDistance;
-	public int nIntValue;
+	public int nIntValue; // a debug-only value of chip's final index within CTja.listChip[]
 	public int nTextCount = 16;
 
 	public CBPM? bpmPoint;
-	public int nIntValue_InternalNumber;
+	public int nIntValue_InternalNumber; // either channel-specific integer argument or the index of the chip within the same channel
 	public int nOpacity = 255;
 	public int nSoundPos;
 	public double nBranchCondition1_Professional;
