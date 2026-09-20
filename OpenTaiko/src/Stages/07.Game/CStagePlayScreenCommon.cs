@@ -2114,16 +2114,15 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		return (chip, judge);
 	}
 
-	private int GetIdxChip(int iPlayer, long msTjaTime, double direction) {
-		CChip searchChip = new() { _nSoundTimems = (int)msTjaTime, _dbSoundTimems = direction };
+	private int GetIdxChip(int iPlayer, CChip searchChip) {
 		int iTop = this.listChip[iPlayer].BinarySearch(0, this.listChip[iPlayer].Count, searchChip, Comparer<CChip>.Default);
 		if (iTop < 0)
 			iTop = ~iTop;
 		return iTop;
 	}
 
-	private int GetIdxChipAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, msTjaTime, double.PositiveInfinity);
-	private int GetIdxChipAtOrAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, msTjaTime, double.NegativeInfinity);
+	private int GetIdxChipAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, CChip.GetSearchChipAfter(msTjaTime));
+	private int GetIdxChipAtOrAfter(int iPlayer, long msTjaTime) => GetIdxChip(iPlayer, CChip.GetSearchChipAtOrAfter(msTjaTime));
 
 	protected (CChip? chip, ENoteJudge rawJudge) GetChipToJudgeIgnoringRollBody(long msTjaTime, int nPlayer, EPad pad) {
 		int count = listChip[nPlayer].Count;

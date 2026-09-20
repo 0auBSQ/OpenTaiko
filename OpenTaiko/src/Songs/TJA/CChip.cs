@@ -72,14 +72,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
-	public int _nSoundTimems;
+	private int _nSoundTimems;
 	public int nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
 
 	private double _msBorder = double.PositiveInfinity; // Branch judge chip: Branch point time, Kusudama: Bonus border time
 	public double nBranchTimems { get => _msBorder; set => _msBorder = value; } // Branch judge chip
 	public double msKusudamaBonusBorder { get => _msBorder; set => _msBorder = value; } // Kusudama
 
-	public double _dbSoundTimems;
+	private double _dbSoundTimems;
 	public double dbSoundTimems {
 		get => _dbSoundTimems;
 		set {
@@ -374,6 +374,14 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public const int nChannelNoMostPrior = 0;
 	public const int nChannelNoLeastPrior = 0xDD; // #SECTION
+
+	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt, bool allowAt) => new() {
+		_nSoundTimems = (int)Math.Clamp(msTjaTimeInt, int.MinValue, int.MaxValue),
+		_dbSoundTimems = allowAt ? double.NegativeInfinity : double.PositiveInfinity,
+		nChannelNo = allowAt ? nChannelNoMostPrior : nChannelNoLeastPrior,
+	};
+	public static CChip GetSearchChipAtOrAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: true);
+	public static CChip GetSearchChipAfter(long msTjaTimeInt) => GetSearchChipAtOrAfter(msTjaTimeInt, allowAt: false);
 
 	public int CompareTo(CChip other) {
 		//譜面解析メソッドV4では発声時刻msで比較する。
