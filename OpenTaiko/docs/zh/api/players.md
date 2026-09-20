@@ -481,6 +481,7 @@ GetString 用额外的参数格式化条目。GetLanguageIds 和 GetLanguageName
 | `LANG:GetString(key, ...)  -> string` | 某个键的本地化字符串，格式占位符由额外参数填充。 |
 | `LANG:ChangeLanguage(id)  -> bool` | 若该 id 存在且不同于当前语言，则切换当前语言，然后对每个已加载脚本调用 `reloadLanguage`；返回是否切换了。它不会改动 CONFIG.Language。 |
 | `LANG:GetLanguageIds()  -> string[]` | 可用语言的 id。 |
+| `LANG:GetLanguageId()  -> string` | 当前使用语言的 id。 |
 | `LANG:GetLanguageNames()  -> string[]` | 可用语言的显示名称，顺序相同。 |
 | `LANG:GetAvailableLanguages()  -> dict` | 语言 id 到显示名称的映射。 |
 | `LANG:GetExamName(type)  -> string` | 一种段位考核类型的本地化名称。 |

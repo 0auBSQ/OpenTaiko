@@ -481,6 +481,7 @@ GetString formatteert het item met eventuele extra argumenten. GetLanguageIds en
 | `LANG:GetString(key, ...)  -> string` | De gelokaliseerde string voor een sleutel, met formatplaceholders ingevuld vanuit de extra argumenten. |
 | `LANG:ChangeLanguage(id)  -> bool` | Wisselt de actieve taal als het id bestaat en verschilt van de huidige, en roept daarna `reloadLanguage` aan op elk geladen script; geeft terug of er is gewisseld. Het laat CONFIG.Language ongewijzigd. |
 | `LANG:GetLanguageIds()  -> string[]` | Id's van de beschikbare talen. |
+| `LANG:GetLanguageId()  -> string` | Id van de gebruikte taal. |
 | `LANG:GetLanguageNames()  -> string[]` | Weergavenamen van de beschikbare talen, in dezelfde volgorde. |
 | `LANG:GetAvailableLanguages()  -> dict` | Taal-id naar weergavenaam. |
 | `LANG:GetExamName(type)  -> string` | Gelokaliseerde naam van een dan-examentype. |

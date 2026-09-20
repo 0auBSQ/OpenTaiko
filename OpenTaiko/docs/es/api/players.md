@@ -481,6 +481,7 @@ GetString formatea la entrada con los argumentos adicionales. GetLanguageIds y G
 | `LANG:GetString(key, ...)  -> string` | La cadena localizada de una clave, con los marcadores de formato rellenados con los argumentos adicionales. |
 | `LANG:ChangeLanguage(id)  -> bool` | Cambia el idioma activo si el id existe y difiere del actual, y luego llama a `reloadLanguage` en todos los scripts cargados; devuelve si cambió. Deja CONFIG.Language sin cambios. |
 | `LANG:GetLanguageIds()  -> string[]` | Ids de los idiomas disponibles. |
+| `LANG:GetLanguageId()  -> string` | Id del idioma en uso. |
 | `LANG:GetLanguageNames()  -> string[]` | Nombres de visualización de los idiomas disponibles, en el mismo orden. |
 | `LANG:GetAvailableLanguages()  -> dict` | Id de idioma a nombre de visualización. |
 | `LANG:GetExamName(type)  -> string` | Nombre localizado de un tipo de examen dan. |

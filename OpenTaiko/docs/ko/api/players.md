@@ -481,6 +481,7 @@ GetString은 추가 인자로 항목을 형식화합니다. GetLanguageIds와 Ge
 | `LANG:GetString(key, ...)  -> string` | 키의 지역화 문자열. 형식 자리 표시자는 추가 인자로 채워집니다. |
 | `LANG:ChangeLanguage(id)  -> bool` | id가 존재하고 현재와 다르면 활성 언어를 전환한 뒤 로드된 모든 스크립트에서 `reloadLanguage`를 호출합니다. 전환했는지 반환합니다. CONFIG.Language는 바꾸지 않습니다. |
 | `LANG:GetLanguageIds()  -> string[]` | 사용 가능한 언어의 id. |
+| `LANG:GetLanguageId()  -> string` | 사용 중인 언어의 id. |
 | `LANG:GetLanguageNames()  -> string[]` | 사용 가능한 언어의 표시 이름, 같은 순서. |
 | `LANG:GetAvailableLanguages()  -> dict` | 언어 id에서 표시 이름으로. |
 | `LANG:GetExamName(type)  -> string` | 단위 시험 유형의 지역화된 이름. |

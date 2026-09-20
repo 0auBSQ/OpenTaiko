@@ -481,6 +481,7 @@ GetString formatiert den Eintrag mit den zusätzlichen Argumenten. GetLanguageId
 | `LANG:GetString(key, ...)  -> string` | Der lokalisierte String für einen Schlüssel, mit aus den zusätzlichen Argumenten gefüllten Formatplatzhaltern. |
 | `LANG:ChangeLanguage(id)  -> bool` | Wechselt die aktive Sprache, wenn die ID existiert und sich von der aktuellen unterscheidet, und ruft dann `reloadLanguage` auf jedem geladenen Skript auf; gibt zurück, ob gewechselt wurde. CONFIG.Language lässt es unverändert. |
 | `LANG:GetLanguageIds()  -> string[]` | IDs der verfügbaren Sprachen. |
+| `LANG:GetLanguageId()  -> string` | Id der verwendeten Sprache. |
 | `LANG:GetLanguageNames()  -> string[]` | Anzeigenamen der verfügbaren Sprachen, in derselben Reihenfolge. |
 | `LANG:GetAvailableLanguages()  -> dict` | Sprach-ID zu Anzeigename. |
 | `LANG:GetExamName(type)  -> string` | Lokalisierter Name eines Dan-Prüfungstyps. |

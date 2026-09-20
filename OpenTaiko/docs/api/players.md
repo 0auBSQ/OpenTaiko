@@ -481,6 +481,7 @@ GetString formats the entry with any extra arguments. GetLanguageIds and GetLang
 | `LANG:GetString(key, ...)  -> string` | The localized string for a key, with format placeholders filled from the extra arguments. |
 | `LANG:ChangeLanguage(id)  -> bool` | Switches the active language if the id exists and differs from the current one, then calls `reloadLanguage` on every loaded script; returns whether it switched. It leaves CONFIG.Language unchanged. |
 | `LANG:GetLanguageIds()  -> string[]` | Ids of the available languages. |
+| `LANG:GetLanguageId()  -> string` | Id of the language in use. |
 | `LANG:GetLanguageNames()  -> string[]` | Display names of the available languages, in the same order. |
 | `LANG:GetAvailableLanguages()  -> dict` | Language id to display name. |
 | `LANG:GetExamName(type)  -> string` | Localized name of a dan exam type. |

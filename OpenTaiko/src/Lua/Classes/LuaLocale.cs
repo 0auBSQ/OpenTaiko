@@ -19,6 +19,11 @@ namespace OpenTaiko {
 		public string[] GetLanguageIds() {
 			return CLangManager.Langcodes;
 		}
+
+		// the id of the language in use (the Lang/ folder name), "en" and so on
+		public string GetLanguageId() {
+			return CLangManager.fetchLang();
+		}
 		public string[] GetLanguageNames() {
 			return CLangManager.Languages;
 		}

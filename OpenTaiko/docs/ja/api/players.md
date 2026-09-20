@@ -481,6 +481,7 @@ GetString は追加の引数でエントリを書式化します。GetLanguageId
 | `LANG:GetString(key, ...)  -> string` | キーのローカライズ文字列。書式プレースホルダは追加の引数で埋められます。 |
 | `LANG:ChangeLanguage(id)  -> bool` | id が存在し現在のものと異なればアクティブな言語を切り替え、読み込み済みのすべてのスクリプトで `reloadLanguage` を呼びます。切り替えたかどうかを返します。CONFIG.Language は変更しません。 |
 | `LANG:GetLanguageIds()  -> string[]` | 利用可能な言語の id。 |
+| `LANG:GetLanguageId()  -> string` | 使用中の言語の ID。 |
 | `LANG:GetLanguageNames()  -> string[]` | 利用可能な言語の表示名 (同じ順序)。 |
 | `LANG:GetAvailableLanguages()  -> dict` | 言語 id から表示名へ。 |
 | `LANG:GetExamName(type)  -> string` | 段位の試験の種類のローカライズされた名前。 |

@@ -5,9 +5,9 @@
 -- keyed by stable ids; lang/en holds the English and is the fallback for every other language. A module
 -- takes its file once, `local T = I18N.texts("phone")`, then T:tr("menu_join"), T:trf("no_answer", n),
 -- T:get(path...), T:list(path...) (arrays, line by line) and T:loc(path...) (a GetString handle resolved at
--- call time). The current game language is read through the engine's CLocalizationData; call detect() in
--- activate (it runs on every entry, so a language change applies on the next visit). A reloadLanguage()
--- global is only needed by a module that stays on screen while the language changes.
+-- call time). The current game language is LANG:GetLanguageId(); call detect() in activate (it runs on
+-- every entry, so a language change applies on the next visit). A reloadLanguage() global is only needed
+-- by a module that stays on screen while the language changes.
 --
 -- Older stages keep the exact-English-key dictionary: lang/<code>.lua returns a table and M.tr(s) maps the
 -- English text in the code to its translation.
@@ -18,15 +18,9 @@ M.code = "en"        -- the game's language code (the Lang/ folder name: en, ja,
 M.lang = "default"   -- the loaded dictionary's language, "default" when none is loaded
 local dict = {}      -- the legacy Lua dictionary of the loaded language
 
--- the engine's language codes, keyed on themselves so CLocalizationData:GetString returns the active one
-local CODES = { "de", "en", "es", "fr", "ja", "ko", "nl", "ru", "zh" }
-
+-- the id of the language in use; "en" when the engine does not answer (a headless harness)
 local function currentCode()
-    local parts = {}
-    for _, c in ipairs(CODES) do parts[#parts + 1] = '"' .. c .. '":"' .. c .. '"' end
-    local ok, res = pcall(function()
-        return LANG:FromString("{" .. table.concat(parts, ",") .. ',"default":"en"}'):GetString("en")
-    end)
+    local ok, res = pcall(function() return LANG:GetLanguageId() end)
     return (ok and type(res) == "string" and res ~= "") and res or "en"
 end
 
