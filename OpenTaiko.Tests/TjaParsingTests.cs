@@ -58,7 +58,7 @@ namespace OpenTaikoTests {
 			using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(CasesDir, name + ".json")));
 			var root = doc.RootElement;
 			string tjaName = root.TryGetProperty("tja", out var t) ? t.GetString() : name + ".tja";
-			int difficulty = root.TryGetProperty("difficulty", out var d) ? d.GetInt32() : 3;
+			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
 			bool loadChart = !root.TryGetProperty("loadChart", out var lc) || lc.GetBoolean();
 
 			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, loadChart);
@@ -97,7 +97,7 @@ namespace OpenTaikoTests {
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
-		private static CTja Parse(string tjaPath, int difficulty, bool loadChart) {
+		private static CTja Parse(string tjaPath, Difficulty difficulty, bool loadChart) {
 			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(dir);
 			try {

@@ -335,7 +335,7 @@ internal class CStageSongLoading : CStage {
 						_dtxLoadTask = Task.Run(() => {
 							for (int i = 0; i < playerCount; i++) {
 								cts.Token.ThrowIfCancellationRequested();
-								captured[i] = new CTja(str, compat, chosenDiffs[i], i, loadChart: true);
+								captured[i] = new CTja(str, compat, (Difficulty)chosenDiffs[i], i, loadChart: true);
 							}
 						}, cts.Token);
 					}

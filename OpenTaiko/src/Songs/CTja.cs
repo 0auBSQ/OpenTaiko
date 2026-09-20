@@ -655,7 +655,7 @@ internal class CTja : CActivity {
 
 		this.CutSceneOutros = new();
 	}
-	public CTja(string strFileName, ETjaCompat? compatMode = null, int difficulty = 0, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
+	public CTja(string strFileName, ETjaCompat? compatMode = null, Difficulty difficulty = Difficulty.Easy, int nPlayerSide = 0, bool loadChart = false, int nBGMAdjust = 0)
 		: this() {
 		this.Activate(loadChart);
 		if (compatMode != null)
@@ -1074,7 +1074,7 @@ internal class CTja : CActivity {
 	}
 	#endregion
 
-	public void tInput(string file_name, int difficulty, int nPlayerSide, bool loadChart, int nBGMAdjust) {
+	public void tInput(string file_name, Difficulty difficulty, int nPlayerSide, bool loadChart, int nBGMAdjust) {
 		if (this.IsDeActivated || (loadChart && !this.bLoadChart))
 			this.Activate(loadChart); // ensure Activate() is called; ensure Activate(true) is called if this.bLoadChart will be true
 
@@ -1095,7 +1095,7 @@ internal class CTja : CActivity {
 			Trace.TraceError("An exception occurred, but processing will continue. (79ff8639-9b3c-477f-bc4a-f2eea9784860)");
 		}
 	}
-	public void tProcessAllText(string strAllInputString, int Difficulty, int nBGMAdjust) {
+	public void tProcessAllText(string strAllInputString, Difficulty Difficulty, int nBGMAdjust) {
 		if (!string.IsNullOrEmpty(strAllInputString)) {
 			#region [ 初期化 ]
 			for (int j = 0; j < 36 * 36; j++) {
@@ -1593,14 +1593,14 @@ internal class CTja : CActivity {
 	///
 	/// </summary>
 	/// <param name="strInput">譜面のデータ</param>
-	private void tInput_V4(string strInput, int difficulty) {
+	private void tInput_V4(string strInput, Difficulty difficulty) {
 		if (!String.IsNullOrEmpty(strInput)) //空なら通さない
 		{
 			strInput = this.preprocessTjaStr(strInput);
 
 			#region[譜面]
 
-			int nLoadCourse = 3;
+			Difficulty nLoadCourse = Difficulty.Oni;
 			int nChartCount = 0; //2017.07.22 kairera0467 tjaに含まれる譜面の数
 
 			//まずはコースごとに譜面を分割。
@@ -1623,26 +1623,26 @@ internal class CTja : CActivity {
 			}
 
 			#region[ 読み込ませるコースを決定 ]
-			if (this.bChartExists[difficulty] == false) {
+			if (this.bChartExists[(int)difficulty] == false) {
 				nLoadCourse = difficulty;
 				nLoadCourse++;
-				for (int n = 1; n < (int)Difficulty.Total; n++) {
-					if (this.bChartExists[nLoadCourse] == false) {
+				for (Difficulty n = (Difficulty)1; n < Difficulty.Total; n++) {
+					if (this.bChartExists[(int)nLoadCourse] == false) {
 						nLoadCourse++;
-						if (nLoadCourse > (int)Difficulty.Total - 1)
-							nLoadCourse = 0;
+						if (nLoadCourse >= Difficulty.Total)
+							nLoadCourse = (Difficulty)0;
 					} else
 						break;
 				}
 			} else
 				nLoadCourse = difficulty;
-			this.nReferenceDifficulty = nLoadCourse;
+			this.nReferenceDifficulty = (int)nLoadCourse;
 			#endregion
 
 			//指定したコースの譜面の命令を消去する。
 			var (strUpperHeaders, strCourse) = CDTXStyleExtractor.tSessionChart(
-				globalCourse, strSplitChart[nLoadCourse],
-				(Difficulty)nLoadCourse,
+				globalCourse, strSplitChart[(int)nLoadCourse],
+				nLoadCourse,
 				OpenTaiko.ConfigIni.bAIBattleMode ? 1 : OpenTaiko.ConfigIni.nPlayerCount,
 				this.nPlayerSide,
 				this.strFullPath);
