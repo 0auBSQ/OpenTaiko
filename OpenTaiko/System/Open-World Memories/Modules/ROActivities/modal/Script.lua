@@ -3,7 +3,8 @@
 -- (one modal per queued reward) and by Lua stages (shops, the vault) with the same signature:
 --
 --   activate(player1to, rarity, type, info, secondary)
---     type 0 coins:      info = amount, secondary = the balance after the reward
+--     type 0 coins:      info = amount, secondary = the balance after the reward; a negative amount is
+--                        a payment (coins leave the piggy bank), secondary = the balance after paying
 --     type 1 character:  info = LuaCharacter (owned: disposed when the modal closes)
 --     type 2 puchichara: info = LuaPuchichara
 --     type 3 nameplate:  info = LuaNameplateInfo
@@ -20,7 +21,7 @@ local Chest = require("modal_chest")
 local Card = require("modal_card")
 
 local TEX, SND = "Textures/", "Sounds/"
-local ANIM_SOUNDS = { "slide", "coin", "coin_alt", "jingle", "puff", "cushion", "chest", "latch", "sparkle", "flash", "reveal", "close",
+local ANIM_SOUNDS = { "slide", "coin", "coin_alt", "jingle", "pay", "puff", "cushion", "chest", "latch", "sparkle", "flash", "reveal", "close",
                       "box_land", "box_rustle", "box_open" }
 local ANIM_TEXTURES = { "piggy", "cushion", "smoke", "dust", "wheel", "glow", "star", "spark", "web", "web2",
                         "case_front", "case_side", "case_top", "rainbow" }

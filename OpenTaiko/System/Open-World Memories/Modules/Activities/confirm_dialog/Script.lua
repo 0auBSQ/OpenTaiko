@@ -10,8 +10,8 @@
 --   "unlock"   — free unlock; shows "Unlock [title]?" + Yes/No
 --   "purchase" — coin cost; shows "Purchase [title]?" + cost + Yes/No
 --
--- On Yes: deduct coins (if any), unlock the song, then play the modal ROActivity
---         and wait for it to finish before DEACTIVATE.
+-- On Yes: deduct coins (if any), unlock the song, then play the modal ROActivity (the coin payment
+--         first when there was one, then the new song) and wait for it to finish before DEACTIVATE.
 
 local NavInput = require("NavInput")
 
@@ -23,6 +23,7 @@ local _coins     = 0
 
 -- Set to true after unlock while waiting for the modal animation to complete
 local _waitingForModal = false
+local _modalQueue = {}       -- the modals still to show, each { player, rarity, type, info, secondary }
 
 local text      = nil
 local textLarge = nil
@@ -142,26 +143,36 @@ local function pressedCancel()
     return NavInput.p[_player + 1].cancel()
 end
 
-local function doUnlock()
+-- shows the next queued modal; without one (or without the modal activity) the dialog closes
+local function nextModal()
+    local modal = ROACTIVITY:GetROActivity("modal")
+    local m = table.remove(_modalQueue, 1)
+    if modal == nil or m == nil then
+        _modalQueue = {}
+        _waitingForModal = false
+        DEACTIVATE()
+        return
+    end
+    modal:Activate(m[1], m[2], m[3], m[4], m[5])
+    _waitingForModal = true
+end
+
+local function doUnlock(paid)
     local sf = GetSaveFile(0)
     sf:UnlockSong(_node.UniqueId)
-    local modal = ROACTIVITY:GetROActivity("modal")
-    if modal ~= nil then
-        local rarity = rarityToInt[_node.Rarity] or 0
-        modal:Activate(0, rarity, 4, _node)
-        _waitingForModal = true
-    else
-        DEACTIVATE()
-    end
+    _modalQueue = {}
+    -- the coins leaving the piggy bank first, then the song
+    if paid and paid > 0 then _modalQueue[#_modalQueue + 1] = { 0, 0, 0, -paid, sf.Coins } end
+    _modalQueue[#_modalQueue + 1] = { 0, rarityToInt[_node.Rarity] or 0, 4, _node }
+    nextModal()
 end
 
 function update()
-    -- While waiting for the modal, update it and deactivate when it finishes
+    -- While waiting for a modal, update it and move on (or close) when it finishes
     if _waitingForModal then
         local modal = ROACTIVITY:GetROActivity("modal")
         if modal == nil or not modal.IsActive then
-            _waitingForModal = false
-            DEACTIVATE()
+            nextModal()
         else
             modal:Update()
         end
@@ -190,7 +201,7 @@ function update()
                 return
             end
             sf:SpendCoins(_coinPrice)
-            doUnlock()
+            doUnlock(_coinPrice)
         end
     end
 end

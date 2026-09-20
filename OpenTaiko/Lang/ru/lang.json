@@ -461,6 +461,7 @@
 
 		// Modals
 		"MODAL_TITLE_COIN": "Монеты получены!",
+		"MODAL_TITLE_SPEND": "Монеты потрачены!",
 		"MODAL_TITLE_CHARA": "Новый персонаж!",
 		"MODAL_TITLE_PUCHI": "Новый пти-персонаж!",
 		"MODAL_TITLE_NAMEPLATE": "Новый ранг!",

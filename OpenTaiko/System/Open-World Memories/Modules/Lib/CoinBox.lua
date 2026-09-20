@@ -14,8 +14,9 @@
 --
 -- Every coin figure passed in is the true balance change; the number on the pill catches up on
 -- its own once the coins have landed. setBonus shows a green "+n" above the pill (coins still to
--- come, e.g. while the unlock modal pours them into its piggy bank) and add rolls the balance up
--- without any coin flying in, for callers animating the coins themselves; drawCoin draws the coin
+-- come, e.g. while the unlock modal pours them into its piggy bank) or a red "-n" for a negative
+-- value (coins still to go) and add rolls the balance up, or down for a negative value, without any
+-- coin flying in, for callers animating the coins themselves; drawCoin draws the coin
 -- for them. The coin is the "Coin" shared texture (_boot registers Textures/Coin.png, so an artist
 -- can redraw it); a drawn fallback covers a skin without one.
 
@@ -153,7 +154,7 @@ end
 function CoinBox:hide() self.shown = false ; self.price = nil ; self.bonus = nil end
 function CoinBox:visible() return self.shown or self.alpha > 0.01 end
 function CoinBox:setPrice(n) self.price = n end
-function CoinBox:setBonus(n) self.bonus = (n ~= nil and n > 0) and n or nil end
+function CoinBox:setBonus(n) self.bonus = (n ~= nil and n ~= 0) and n or nil end
 function CoinBox:balanceValue() return self.balance end
 
 -- the balance rolls up right away; the caller draws the coins
@@ -232,7 +233,8 @@ function CoinBox:draw()
     if self.price ~= nil then
         self:_text(24, self.price, x + w - 24, y - 26, self.textColor, a, "right")
     elseif self.bonus ~= nil then
-        self:_text(26, "+" .. tostring(self.bonus), x + w - 24, y - 26, GREEN, a, "right")
+        local up = self.bonus > 0
+        self:_text(26, (up and "+" or "-") .. tostring(math.abs(self.bonus)), x + w - 24, y - 26, up and GREEN or RED, a, "right")
     end
     for _, d in ipairs(self.drops) do
         local k = easeIn(min(1, d.t / d.dur))

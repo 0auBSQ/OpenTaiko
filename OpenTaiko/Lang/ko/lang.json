@@ -463,6 +463,7 @@
 
 		// Modals
 		"MODAL_TITLE_COIN": "새 코인!",
+		"MODAL_TITLE_SPEND": "코인 사용!",
 		"MODAL_TITLE_CHARA": "새 캐릭터!",
 		"MODAL_TITLE_PUCHI": "새 푸치 캐릭터!",
 		"MODAL_TITLE_NAMEPLATE": "새 타이틀!",

@@ -72,8 +72,8 @@ local function showCoins(amount)
     if modal == nil then return end
     local total = amount
     pcall(function() total = (GetSaveFile(0).Coins or 0) + amount end)
-    modal:Activate(1, 0, 0, amount, total)
-    setStatus("Coins: +" .. amount)
+    modal:Activate(1, 0, 0, amount, total)   -- a negative amount is a payment
+    setStatus("Coins: " .. (amount >= 0 and "+" or "") .. amount)
 end
 
 local function showItem(kind, rarityName)
@@ -109,6 +109,7 @@ function onStart()
     ui:label{ text = "Coins", x = 80, y = 150, size = "button" }
     for i, amount in ipairs(COIN_AMOUNTS) do
         ui:button{ text = "+" .. amount, x = 80 + (i - 1) * 200, y = 200, w = 180, h = 64, accent = true, onClick = function() showCoins(amount) end }
+        ui:button{ text = "-" .. amount, x = 80 + (#COIN_AMOUNTS + i - 1) * 200, y = 200, w = 180, h = 64, onClick = function() showCoins(-amount) end }
     end
 
     local kinds = { { 1, "Character" }, { 2, "Puchichara" }, { 3, "Nameplate" }, { 4, "Song" } }

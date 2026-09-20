@@ -461,6 +461,7 @@
 
 		// Modals
 		"MODAL_TITLE_COIN": "Coins Obtained!",
+		"MODAL_TITLE_SPEND": "Coins Spent!",
 		"MODAL_TITLE_CHARA": "New Character!",
 		"MODAL_TITLE_PUCHI": "New Puchichara!",
 		"MODAL_TITLE_NAMEPLATE": "New Title!",

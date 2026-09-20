@@ -459,6 +459,7 @@
 
 		// Modals
 		"MODAL_TITLE_COIN": "¡Monedas conseguidas!",
+		"MODAL_TITLE_SPEND": "¡Monedas gastadas!",
 		"MODAL_TITLE_CHARA": "¡Personaje conseguido!",
 		"MODAL_TITLE_PUCHI": "¡Puchichara conseguido!",
 		"MODAL_TITLE_NAMEPLATE": "¡Titulo conseguido!",

@@ -461,6 +461,7 @@
 
 		// Modals
 		"MODAL_TITLE_COIN": "获得金币！",
+		"MODAL_TITLE_SPEND": "花费金币！",
 		"MODAL_TITLE_CHARA": "获得新角色！",
 		"MODAL_TITLE_PUCHI": "获得迷你角色！",
 		"MODAL_TITLE_NAMEPLATE": "获得新称号！",
