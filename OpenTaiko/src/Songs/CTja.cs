@@ -476,8 +476,8 @@ internal class CTja : CActivity {
 	public bool bMeasureLineInsert = false;
 
 	//Normal Regular Masterにしたいけどここは我慢。
-	private List<int>[] listBalloon_Branch;
-	private List<int> listBalloon; //旧構文用
+	private List<int>[] listBalloon_Branch; // [3] for common
+	private byte[] listBalloon_Branch_defined; // [3] for common; 0 = not defined, 1 = defined for previous player sides, 2 = defined for current player sides
 
 	public List<SKBitmap> listLyric; //歌詞を格納していくリスト。スペル忘れた(ぉい
 	public List<STLYRIC> listLyric2;
@@ -487,7 +487,7 @@ internal class CTja : CActivity {
 
 	public bool usingLyricsFile; //If lyric file is used (VTT/LRC), ignore #LYRIC tags & do not parse other lyric file tags
 
-	private int[] listBalloon_Branch_ValueManager;
+	private int[] listBalloon_Branch_iLast; // [3] for common
 
 	public string[] scenePresets = [];
 
@@ -631,7 +631,8 @@ internal class CTja : CActivity {
 		this.nInfiniteBPM = new int[36 * 36];
 		this.nInfinitePAN = new int[36 * 36];
 		this.nInfiniteSIZE = new int[36 * 36];
-		this.listBalloon_Branch_ValueManager = new int[3];
+		this.listBalloon_Branch_defined = Enumerable.Repeat<byte>(0, 4).ToArray();
+		this.listBalloon_Branch_iLast = Enumerable.Repeat(-1, 4).ToArray();
 		this.nRESULTIMAGEPriority = new int[7];
 		this.nRESULTMOVIEPriority = new int[7];
 		this.nRESULTSOUNDPriority = new int[7];
@@ -1649,21 +1650,11 @@ internal class CTja : CActivity {
 			//ここで1行の文字数をカウント。配列にして返す。
 			int divPerMeasure = 0;
 			try {
-				if (nChartCount > 0) {
-					//2017.07.22 kairera0467 譜面が2つ以上ある場合はCOURSE以下のBALLOON命令を使う
-					this.listBalloon.Clear();
-					foreach (var listBalloon in this.listBalloon_Branch)
-						listBalloon.Clear();
-					for (int i = 0; i < listBalloon_Branch_ValueManager.Length; ++i)
-						this.listBalloon_Branch_ValueManager[i] = 0;
-				}
-
-
-				foreach ((string part, bool allowCommands) in new []{ (strUpperHeaders, false), (strCourse, true) }) {
+				foreach ((string part, bool forCurrentPlayerSide) in new []{ (strUpperHeaders, false), (strCourse, true) }) {
 					using StringReader reader = new(part);
 					for (string? line; (line = reader.ReadLine()) != null;) {
 						if (!String.IsNullOrEmpty(line)) {
-							this.TryParsePlayerSideHeader(line, allowCommands);
+							this.TryParsePlayerSideHeader(line, forCurrentPlayerSide);
 						}
 					}
 				}
@@ -3177,6 +3168,7 @@ internal class CTja : CActivity {
 					var noteType = NotesManager.GetNoteType(inputChar);
 
 					if (noteType != NotesManager.ENoteType.Empty) {
+						bool beforeInsertNote = true;
 						this.ForEachCurrentBranch((branch) => {
 							int iBranch = (int)branch;
 
@@ -3212,7 +3204,8 @@ internal class CTja : CActivity {
 									$"Unknown note symbol {inputChar} treated as a non-roll blank in branch {branch} at measure {this.nCurrentMeasureCount}. Input: {InputText}"
 									: $"Unknown note symbol {inputChar} treated as a non-roll blank at measure {this.nCurrentMeasureCount}. Input: {InputText}");
 							} else {
-								InsertNoteAtDefCursor(noteType, n, nTextCount, branch);
+								InsertNoteAtDefCursor(noteType, n, nTextCount, branch, beforeInsertNote);
+								beforeInsertNote = false;
 							}
 						});
 					}
@@ -3296,7 +3289,7 @@ internal class CTja : CActivity {
 		return chip;
 	}
 
-	private void InsertNoteAtDefCursor(NotesManager.ENoteType noteType, int iDiv, int divsPerMeasure, ECourse branch) {
+	private void InsertNoteAtDefCursor(NotesManager.ENoteType noteType, int iDiv, int divsPerMeasure, ECourse branch, bool firstInsertedForDiv = false) {
 		int iBranch = (int)branch;
 
 		CChip chip = this.NewScrolledChipAtDefCursor(NotesManager.ToChannelNo(noteType), iDiv, divsPerMeasure, branch);
@@ -3319,12 +3312,39 @@ internal class CTja : CActivity {
 
 		if (NotesManager.IsGenericBalloon(chip)) {
 			//this.n現在のコースをswitchで分岐していたため風船の値がうまく割り当てられていない 2020.04.21 akasoko26
-			var listBalloon = this.listBalloon_Branch[iBranch];
-			if (listBalloon.Count == 0) {
+			// NOTICE: prefer BALLOON: unless branched ones are intended; consider compat mode when ambiguous
+			var listBalloon_Branch_maxDefined = this.listBalloon_Branch_defined.Max();
+			var listBalloon_Branch_isDefined = this.listBalloon_Branch_defined.Select(x => x > 0 && x == listBalloon_Branch_maxDefined).ToArray();
+			var (useCommon, useCommonAsNor) = listBalloon_Branch_isDefined switch {
+				// expected [nor, exp, mas, common]
+				{ Length: not 4 } => (false, false),
+				// none of BALLOONEXP/MAS: defined -> use common
+				[false, false, false, _] => (true, false),
+				// BALLOON: defined, BALLOONNOR: defined -> use commmon
+				[true, _, _, true] => (true, false),
+				// BALLOON: defined, BALLOONNOR: undefined, any of BALLOONEXP/MAS: defined -> ambiguous; use BALLOON: as branched if TJAP3 / OOS
+				[false, _, _, true] => (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? (false, true) : (true, false),
+				// BALLOON: undefined, any of BALLOONNOR/EXP/MAS: defined -> use branched
+				[_, _, _, false] => (false, false),
+			};
+			++this.listBalloon_Branch_iLast[iBranch];
+			if (firstInsertedForDiv)
+				++this.listBalloon_Branch_iLast[3];
+
+			var listBalloon = this.listBalloon_Branch[(useCommon || (useCommonAsNor && branch == ECourse.eNormal)) ? 3 : iBranch];
+			var iBalloon = this.listBalloon_Branch_iLast[useCommon ? 3 : iBranch];
+			if (iBalloon < listBalloon.Count) {
+				chip.nBalloon = listBalloon[iBalloon];
+			} else {
+				StringBuilder msg = new($"Undefined pop count defaulted to 5 hits for note {noteType}");
+				if (!this.IsEndedBranching)
+					msg.Append($" in branch {branch}");
+				msg.Append($", at division {iDiv + 1}/{divsPerMeasure}, measure {this.nCurrentMeasureCount}. Pop count used {iBalloon + 1} / defined {listBalloon.Count}");
+				if (!useCommon)
+					msg.Append($"(for {branch})");
+				msg.Append('.');
+				this.AddWarn(msg.ToString());
 				chip.nBalloon = 5;
-			} else if (listBalloon.Count > this.listBalloon_Branch_ValueManager[iBranch]) {
-				chip.nBalloon = listBalloon[this.listBalloon_Branch_ValueManager[iBranch]];
-				this.listBalloon_Branch_ValueManager[iBranch]++;
 			}
 		}
 		if (NotesManager.IsRollEnd(chip)) {
@@ -3425,11 +3445,11 @@ internal class CTja : CActivity {
 		}
 	}
 
-	private void TryParsePlayerSideHeader(string InputText, bool allowCommands) {
+	private void TryParsePlayerSideHeader(string InputText, bool forCurrentPlaySide) {
 		// pre-#START commands
 		if (TokenizeCommand(InputText, out string command, out string commandArgumentFull, out string commandArgument)) {
 			// might be from previous player-sides || post-#START and a normal command, ignore
-			if (!allowCommands || this.nCurrentMeasureCount > 0)
+			if (!forCurrentPlaySide || this.nCurrentMeasureCount > 0)
 				return;
 			// placeholder for future player-side commands
 			if (command == "#START") {
@@ -3447,7 +3467,7 @@ internal class CTja : CActivity {
 			strCommandParam = strArray[1].Trim();
 		}
 		try {
-			this.ParsePerPlayerSideHeader(strCommandName, strCommandParam);
+			this.ParsePerPlayerSideHeader(strCommandName, strCommandParam, forCurrentPlaySide);
 		} catch (Exception ex) {
 			this.AddCommandError(strCommandName, strCommandParam, ex);
 		}
@@ -3458,7 +3478,7 @@ internal class CTja : CActivity {
 	/// (BALLOONなど。)
 	/// </summary>
 	/// <param name="InputText"></param>
-	private void ParsePerPlayerSideHeader(string strCommandName, string strCommandParam) {
+	private void ParsePerPlayerSideHeader(string strCommandName, string strCommandParam, bool forCurrentPlaySide) {
 		void ParseOptionalInt16(Action<short> setValue) {
 			this.ParseOptionalInt16(strCommandName, strCommandParam, setValue);
 		}
@@ -3483,14 +3503,14 @@ internal class CTja : CActivity {
 		} else if (strCommandName.Equals("DANTICKCOLOR")) {
 			var tickcolor = ColorTranslator.FromHtml(strCommandParam);
 			this.DANTICKCOLOR = tickcolor;
-		} else if (strCommandName.Equals("BALLOON") || strCommandName.Equals("BALLOONNOR")) {
-			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eNormal]);
+		} else if (strCommandName.Equals("BALLOON")) {
+			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, 3);
+		} else if (strCommandName.Equals("BALLOONNOR")) {
+			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, (int)ECourse.eNormal);
 		} else if (strCommandName.Equals("BALLOONEXP")) {
-			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eExpert]);
-			//tbBALLOON.Text = strCommandParam;
+			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, (int)ECourse.eExpert);
 		} else if (strCommandName.Equals("BALLOONMAS")) {
-			ParseBalloon(strCommandName, strCommandParam, ref this.listBalloon_Branch[(int)ECourse.eMaster]);
-			//tbBALLOON.Text = strCommandParam;
+			ParseBalloon(strCommandName, strCommandParam, forCurrentPlaySide, (int)ECourse.eMaster);
 		} else if (strCommandName.Equals(".FORCEGAUGE")) {
 			this.forceGauge = strConvertForceGauge(strCommandParam);
 		} else if (strCommandName.Equals(".BOOMRULE")) {
@@ -3659,7 +3679,7 @@ internal class CTja : CActivity {
 	}
 
 
-	private void ParseBalloon(string strCommandName, string strCommandParam, ref List<int> listBalloon) {
+	private void ParseBalloon(string strCommandName, string strCommandParam, bool isForCurrentPlaySide, int iBranch) {
 		string[] strParam = strCommandParam.Split(',');
 		var listTmp = new List<int>(strParam.Length);
 		for (int n = 0; n < strParam.Length; n++) {
@@ -3677,7 +3697,8 @@ internal class CTja : CActivity {
 			listTmp.Add(nHitCount);
 		}
 		// Arguments are valid, update balloon list
-		listBalloon = listTmp;
+		this.listBalloon_Branch[iBranch] = listTmp;
+		this.listBalloon_Branch_defined[iBranch] = (byte)(isForCurrentPlaySide ? 2 : 1);
 	}
 
 	// Parsing (file-)global and COURSE-global headers
@@ -4558,8 +4579,7 @@ internal class CTja : CActivity {
 		this.listChip_Branch[2] = new List<CChip>();
 		this.listBarLineChip = new List<CChip>();
 		this.listNoteChip = new List<CChip>();
-		this.listBalloon = new List<int>();
-		this.listBalloon_Branch = new[] { new List<int>(), new List<int>(), new List<int>() };
+		this.listBalloon_Branch = Enumerable.Range(0, 4).Select(x => new List<int>()).ToArray();
 		this.listBRANCH = new List<CChip>();
 		this.divsPerMeasureAllBranches = new List<int>();
 		this.listLyric = new List<SKBitmap>();
@@ -4597,7 +4617,6 @@ internal class CTja : CActivity {
 		this.listNoteChip?.Clear();
 		this.listBRANCH?.Clear();
 
-		this.listBalloon?.Clear();
 		foreach (var listBalloon in this.listBalloon_Branch)
 			listBalloon?.Clear();
 
