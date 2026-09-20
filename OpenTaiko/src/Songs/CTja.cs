@@ -4799,9 +4799,28 @@ internal class CTja : CActivity {
 
 		double scrollSpeed = ((scrollModeForced == EScrollMode.BMScroll) ? 1.0 : velocityRefChip.dbSCROLL) * scrollRate;
 		double scrollSpeed_Y = ((scrollModeForced == EScrollMode.BMScroll) ? 0.0 : velocityRefChip.dbSCROLL_Y) * scrollRate;
-		chip.nHorizontalChipDistance = (int)NotesManager.GetNoteX(msDTimeMoveX, th16DBeatMoveX, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
-		chip.nVerticalChipDistance = (int)NotesManager.GetNoteY(msDTimeMoveY, th16DBeatMoveY, velocityRefChip.dbBPM, scrollSpeed_Y, scrollModeForced);
+		double dx = NotesManager.GetNoteX(msDTimeMoveX, th16DBeatMoveX, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
+		double dy = NotesManager.GetNoteY(msDTimeMoveY, th16DBeatMoveY, velocityRefChip.dbBPM, scrollSpeed_Y, scrollModeForced);
 
+		double dy_ = dy;
+		// TJAP3 behavior: bar lines and roll-type notes are not affected by #DIRECTION
+		if (!(this.COMPAT == ETjaCompat.TJAP3 && (chip.nChannelNo == 0x50 || NotesManager.IsGenericRoll(chip)))) {
+			(dx, dy_) = chip.nScrollDirection switch {
+				1 => (0, -dx), // ↓
+				2 => (0, dx), // ↑
+				3 => (dx, -dx), // ↙
+				4 => (dx, +dx), // ↖
+				5 => (-dx, 0), // →
+				6 => (-dx, -dx), // ↘
+				7 => (-dx, dx), // ↗
+				0 or _ => (dx, dy), // ←
+			};
+			if (!(this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS && dy != 0)) // TJAP3 behavior: vertical scrolling of non-real `#SCROLL` is kept
+				dy = dy_;
+		}
+
+		chip.nHorizontalChipDistance = (int)dx;
+		chip.nVerticalChipDistance = (int)dy;
 	}
 	
 	public bool GetScrolledChipForceNMScroll(CChip chip, CBPM bpmPointNow, double msTjaNowTime) {
