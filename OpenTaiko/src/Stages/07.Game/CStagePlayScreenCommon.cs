@@ -3335,7 +3335,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 						this.UpdateAIBattleSection(nPlayer, (long)nCurrentTimems, endOfPlay: true);
 						this.isChartEnded[nPlayer] = true;
 						pChip.bHit = true;
-						if (pChip.nIntValue != 0) { // 0: last note past, 0xFF: song end
+						if (pChip.nIntValue_InternalNumber != 0) { // 0: last note past, 0xFF: song end
 							finishedPlaying = true;
 							if (OpenTaiko.ConfigIni.bTokkunMode) {
 								foreach (CTja.CWAV cwav in OpenTaiko.TJA.listWAV.Values) {

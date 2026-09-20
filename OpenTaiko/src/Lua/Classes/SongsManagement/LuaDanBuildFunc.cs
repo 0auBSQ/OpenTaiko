@@ -694,7 +694,7 @@ namespace OpenTaiko {
 			var chartEndChip = new CChip();
 			chartEndChip.tInitialize();
 			chartEndChip.nChannelNo = 0xFF;
-			chartEndChip.nIntValue = 0;
+			chartEndChip.nIntValue_InternalNumber = 0;
 			chartEndChip.dbSoundTimems = lastDanChipMs + 2000.0;
 			chartEndChip.start = chartEndChip;
 			chartEndChip.end = chartEndChip;
@@ -703,7 +703,7 @@ namespace OpenTaiko {
 			var gameFadeOutChip = new CChip();
 			gameFadeOutChip.tInitialize();
 			gameFadeOutChip.nChannelNo = 0xFF;
-			gameFadeOutChip.nIntValue = 0xFF;
+			gameFadeOutChip.nIntValue_InternalNumber = 0xFF;
 			gameFadeOutChip.dbSoundTimems = lastDanChipMs + 3000.0;
 			gameFadeOutChip.start = gameFadeOutChip;
 			gameFadeOutChip.end = gameFadeOutChip;
