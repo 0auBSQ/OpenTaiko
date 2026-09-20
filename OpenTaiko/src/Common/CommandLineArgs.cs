@@ -33,6 +33,7 @@ internal sealed class CommandLineArgs {
 	public bool ClipVolume = true;
 	public string OutPath = "";
 	public string? DifficultiesError;   // set when --difficulties was malformed (surfaced by the consumer)
+	public List<string> Warns = [];
 
 	public static CommandLineArgs Parse(string[] args) {
 		var cli = new CommandLineArgs();
@@ -54,20 +55,40 @@ internal sealed class CommandLineArgs {
 		if (cli.Difficulties.Length < 1 || cli.Difficulties.Length > 5 || cli.Difficulties.Any(d => d < 0 || d > 4))
 			cli.DifficultiesError = "--difficulties must be 1 to 5 comma-separated values between 0 and 4.";
 
-		if (int.TryParse(Get(args, "--fps"), out int fps) && fps >= 10 && fps <= 240) cli.Fps = fps;
+		string? strFps = Get(args, "--fps");
+		if (strFps != null) {
+			const int fpsMin = 10, fpsMax = 240;
+			if (int.TryParse(strFps, out int fps) && fps >= fpsMin && fps <= fpsMax)
+				cli.Fps = fps;
+			else
+				cli.Warns.Add($"--fps must be a valid whole number between {fpsMin} and {fpsMax}; defaulted to {cli.Fps}.");
+		}
 
 		string? size = Get(args, "--size");
 		if (size != null) {
 			var p = size.ToLowerInvariant().Split('x');
 			if (p.Length == 2 && int.TryParse(p[0], out int w) && int.TryParse(p[1], out int h) && w > 0 && h > 0) {
 				cli.Width = w; cli.Height = h;
+			} else {
+				cli.Warns.Add($"--size must be WxH, where W and H are positive whole numbers; defaulted to {cli.Width}x{cli.Height}.");
 			}
 		}
 
-		if (int.TryParse(Get(args, "--sample-rate"), out int sampleRate) && sampleRate >= 44100 && sampleRate <= 96000)
-			cli.SampleRate = sampleRate;
-		if (bool.TryParse(Get(args, "--clip-volume"), out bool clipVolume))
-			cli.ClipVolume = clipVolume;
+		string? strSampleRate = Get(args, "--sample-rate");
+		if (strSampleRate != null) {
+			const int sampleRateMin = 44100, sampleRateMax = 96000;
+			if (int.TryParse(strSampleRate, out int sampleRate) && sampleRate >= sampleRateMin && sampleRate <= sampleRateMax)
+				cli.SampleRate = sampleRate;
+			else
+				cli.Warns.Add($"--sample-rate must be a valid whole number between {sampleRateMin} and {sampleRateMax}; defaulted to {cli.SampleRate}.");
+		}
+		string? strClipVolume = Get(args, "--clip-volume");
+		if (strClipVolume != null) {
+			if (bool.TryParse(strClipVolume, out bool clipVolume))
+				cli.ClipVolume = clipVolume;
+			else
+				cli.Warns.Add($"--clip-volume must be true or false (case-insensitive); defaulted to {cli.ClipVolume}.");
+		}
 
 		cli.OutPath = Get(args, "--out") ?? $"export_{cli.Uid}_{string.Join("-", cli.Difficulties)}.mp4";
 		return cli;

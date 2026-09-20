@@ -106,6 +106,9 @@ internal static class VideoExporter {
 			Console.Error.WriteLine(cli.DifficultiesError);
 			Environment.Exit(2);
 		}
+		foreach (var warn in cli.Warns)
+			Console.Error.WriteLine(warn);
+
 		_uid = cli.Uid;
 		_diffs = cli.Difficulties;
 		_fps = cli.Fps;
