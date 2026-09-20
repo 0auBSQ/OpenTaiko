@@ -4819,6 +4819,8 @@ internal class CTja : CActivity {
 
 		double scrollSpeed = ((scrollModeForced == EScrollMode.BMScroll) ? 1.0 : velocityRefChip.dbSCROLL) * scrollRate;
 		double scrollSpeed_Y = ((scrollModeForced == EScrollMode.BMScroll) ? 0.0 : velocityRefChip.dbSCROLL_Y) * scrollRate;
+		if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS))
+			scrollSpeed_Y = -scrollSpeed_Y;
 		double dx = NotesManager.GetNoteX(msDTimeMoveX, th16DBeatMoveX, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
 		double dy = NotesManager.GetNoteY(msDTimeMoveY, th16DBeatMoveY, velocityRefChip.dbBPM, scrollSpeed_Y, scrollModeForced);
 
