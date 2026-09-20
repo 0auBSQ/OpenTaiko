@@ -3257,10 +3257,11 @@ internal class CTja : CActivity {
 	}
 
 	private void SetChipSudden(CChip chip) {
+		Func<double, double> roundMove = (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? ms => ms : Math.Truncate;
 		bool isNonDefaultShowOffset = (Math.Abs(Math.Truncate(this.msSuddenShowOffset)) >= 1);
 		bool isNonDefaultMoveOffset = (Math.Abs(Math.Truncate(this.msSuddenMoveOffset)) >= 1);
 		chip.msShowOffset = (isNonDefaultShowOffset ? this.msSuddenShowOffset : double.PositiveInfinity);
-		chip.msMoveOffset = (isNonDefaultMoveOffset ? Math.Truncate(this.msSuddenMoveOffset) : double.PositiveInfinity); // TJAP3 compat
+		chip.msMoveOffset = (isNonDefaultMoveOffset ? roundMove(this.msSuddenMoveOffset) : double.PositiveInfinity);
 		chip.IsSuddenHideRoll = (isNonDefaultShowOffset && !isNonDefaultMoveOffset);
 	}
 
@@ -4785,7 +4786,7 @@ internal class CTja : CActivity {
 		double th16DBeatMoveX = th16DBeatX;
 		double th16DBeatMoveY = th16DBeatY;
 		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.dbSoundTimems - velocityRefChip.msMoveOffset) {
-			msDTimeMoveX = (int)velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
+			msDTimeMoveX = velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
 			th16DBeatMoveX = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
 			// In TJAP3, #SUDDEN only affects horizontal scroll
 			if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
