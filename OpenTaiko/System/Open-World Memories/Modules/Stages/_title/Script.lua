@@ -2,6 +2,7 @@
 -- _title/Script.lua  —  Main menu for OpenTaiko
 
 local NavInput = require("NavInput")
+local EM       = require("EventMode")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -40,6 +41,9 @@ local function isVaultUnlocked()
 end
 
 -- ── Menu definitions ──────────────────────────────────────────────────────────
+
+-- Event Mode: the title offers the three modes an event runs on and nothing else
+local EVENT_STAGES = { regular_song_select = true, ai_battle_song_select = true, dan_select = true }
 
 local function buildMenus()
     local dbg = col(150, 150, 155)
@@ -131,6 +135,12 @@ local function buildMenus()
     local function dbgEntry(title, desc, stage, trans)
         return { title = title, desc = desc .. "\nThis Debug stage will not be included in the full 0.6.1 release.", c = dbg, via = "stage", stage = stage, trans = trans }
     end
+    if EM.on() then
+        local kept = {}
+        for _, e in ipairs(m) do if e.via == "stage" and EVENT_STAGES[e.stage] then kept[#kept + 1] = e end end
+        return kept
+    end
+
     m[#m + 1] = dbgEntry("Demo1 (Debug)",              "The first demo using Lua stages.",                          "demo1")
     m[#m + 1] = dbgEntry("Demo2 (Debug)",              "Was used to debug and test song lists.",                    "demo2")
     m[#m + 1] = dbgEntry("Demo3 (Debug)",              "Was used to debug and test databases.",                     "demo3")
@@ -301,6 +311,7 @@ function onStart()
 end
 
 function activate()
+    if not EM.on() then EM.resetSession() end   -- no event running: the plays counter waits at zero
     menus     = buildMenus()
     textCache = {}
     curIdx    = math.max(1, math.min(curIdx, #menus))  -- keep last position, clamp to new size

@@ -22,6 +22,12 @@
         "DANSELECT_STANDARD_DESC": "道場が選んだ課題で腕前を証明しよう！",
         "DANSELECT_PAGODA_DESC": "ランダムな段位を連続で駆け上がろう！",
         "DANSELECT_EXIT": "退出",
+        "DANSELECT_CONFIRM": "挑戦しますか？",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "残りプレイ回数: %d",
+        "EVENT_THANKS": "プレイありがとうございました！",
+        "EVENT_THANKS_SUB": "またのご来店をお待ちしています！",
 
         "SETTINGS_UI_KEYS": "入力設定",
         "SETTINGS_UI_EXIT": "戻る",

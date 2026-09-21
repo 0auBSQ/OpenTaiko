@@ -462,6 +462,8 @@ De skin declareert thema-instellingen in ThemeSettings.json en slaat hun waarden
 | `THEME:GetResolution()  -> vector2` | De resolutie van de skin. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Waarde van een instelling met globale scope. |
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Waarde van een instelling met save-scope voor de 1-gebaseerde speler, of haar standaardwaarde als het opslagbestand geen waarde heeft. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schrijft een in ThemeSettings.json gedeclareerde globale instelling (een sessie-instelling blijft alleen voor deze run bewaard); false bij een onbekend id. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schrijft een save-gebonden instelling voor de 1-gebaseerde speler; false bij een onbekend id. |
 | `THEME:GetSkinString(key)  -> string` | Gelokaliseerde string uit de map Locales van de skin: eerst de huidige taal, dan de standaardlocale van de skin, dan `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Aantal instellingsdefinities in ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Id van de definitie op een 0-gebaseerde index, of een lege string. |

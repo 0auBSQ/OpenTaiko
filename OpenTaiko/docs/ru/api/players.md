@@ -462,6 +462,8 @@ end
 | `THEME:GetResolution()  -> vector2` | Разрешение скина. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Значение настройки глобальной области. |
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Значение настройки области сохранения для игрока с номером от 1 или её значение по умолчанию, если в сохранении значения нет. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Записывает глобальную настройку, объявленную в ThemeSettings.json (настройка сессии хранится только до выхода); false для неизвестного id. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Записывает настройку уровня сохранения для игрока (нумерация с 1); false для неизвестного id. |
 | `THEME:GetSkinString(key)  -> string` | Локализованная строка из папки Locales скина: сначала текущий язык, затем локаль скина по умолчанию, затем `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Число определений настроек в ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | Идентификатор определения по индексу от 0 или пустая строка. |

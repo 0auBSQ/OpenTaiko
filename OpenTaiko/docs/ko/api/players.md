@@ -462,6 +462,8 @@ PUCHICHARALIST와 sf:GetPuchichara가 이 핸들을 반환합니다. 텍스처�
 | `THEME:GetResolution()  -> vector2` | 스킨의 해상도. |
 | `THEME:GetThemeSetting(settingId)  -> string` | 전역 범위 설정의 값. |
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | 1부터 시작하는 플레이어의 세이브 범위 설정 값. 세이브에 값이 없으면 기본값. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | ThemeSettings.json에 선언된 전역 설정을 씁니다 (세션 설정은 이번 실행 동안만 유지). 알 수 없는 id면 false. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | 1부터 시작하는 플레이어의 세이브 단위 설정을 씁니다. 알 수 없는 id면 false. |
 | `THEME:GetSkinString(key)  -> string` | 스킨의 Locales 폴더에서 온 지역화 문자열: 현재 언어 먼저, 그다음 스킨의 기본 로케일, 그다음 `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | ThemeSettings.json의 설정 정의 수. |
 | `THEME:GetDefinitionId(index)  -> string` | 0부터 시작하는 인덱스의 정의 id. 없으면 빈 문자열. |

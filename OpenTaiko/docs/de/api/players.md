@@ -462,6 +462,8 @@ Der Skin deklariert Theme-Einstellungen in ThemeSettings.json und speichert ihre
 | `THEME:GetResolution()  -> vector2` | Die Auflösung des Skins. |
 | `THEME:GetThemeSetting(settingId)  -> string` | Wert einer Einstellung mit globalem Geltungsbereich. |
 | `THEME:GetThemeSettingForPlayer(settingId, player)  -> string` | Wert einer Einstellung mit Spielstand-Geltungsbereich für den 1-basierten Spieler, oder ihr Standardwert, wenn der Spielstand keinen Wert hat. |
+| `THEME:SetThemeSetting(settingId, value)  -> bool` | Schreibt eine in ThemeSettings.json deklarierte globale Einstellung (eine Sitzungseinstellung wird nur für diesen Lauf behalten); false bei unbekannter Id. |
+| `THEME:SetThemeSettingForPlayer(settingId, player, value)  -> bool` | Schreibt eine spielstandbezogene Einstellung für den 1-basierten Spieler; false bei unbekannter Id. |
 | `THEME:GetSkinString(key)  -> string` | Lokalisierter String aus dem Locales-Ordner des Skins: zuerst die aktuelle Sprache, dann die Standard-Locale des Skins, dann `[LOCALE NOT FOUND: key]`. |
 | `THEME:GetDefinitionCount()  -> integer` | Anzahl der Einstellungsdefinitionen in ThemeSettings.json. |
 | `THEME:GetDefinitionId(index)  -> string` | ID der Definition an einem 0-basierten Index, oder ein leerer String. |

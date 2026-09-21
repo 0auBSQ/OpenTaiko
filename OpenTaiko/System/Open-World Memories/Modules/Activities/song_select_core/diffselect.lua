@@ -335,6 +335,24 @@ local function onPlate(plate, bx, by, lx, ly)
 end
 
 -- the diffIndex under the mouse (options 0..2, difficulties 3+), or nil; the later-drawn bars win overlaps
+-- Event Mode takes the customize bar away, and the back bar too while the countdown runs
+local function optionShown(o)
+    if G.event == nil or not G.event.on() then return true end
+    if o == 2 then return false end
+    if o == 0 then return G.eventTimer == nil end
+    return true
+end
+
+-- the next index from `idx` in direction `dir` that the cursor may land on
+local function stepIndex(idx, dir)
+    local n = 3 + #G.diffBars
+    for _ = 1, n do
+        idx = (idx + dir) % n
+        if idx >= 3 or optionShown(idx) then return idx end
+    end
+    return idx
+end
+
 local function mouseTarget()
     if nCosA == nil or not INPUT:IsMouseInside() then return nil end
     local mx, my = INPUT:GetMouseXY()
@@ -344,7 +362,7 @@ local function mouseTarget()
     end
     for o = 0, 2 do
         local pslot = 2 - o
-        if onPlate(PLATE_OPT, OPT_ORIG_X + pslot * OPT_STEP_X, OPT_ORIG_Y + pslot * OPT_STEP_Y, lx, ly) then return o end
+        if optionShown(o) and onPlate(PLATE_OPT, OPT_ORIG_X + pslot * OPT_STEP_X, OPT_ORIG_Y + pslot * OPT_STEP_Y, lx, ly) then return o end
     end
     return nil
 end
@@ -571,16 +589,18 @@ function M.drawPanel()
         -- Option bars, shown left→right as 0 / 1 / Customize. diffIndex 0/1/2 select them (0=back, 1=mods,
         -- 2=customize); the slots run right→left (slot = 2 - diffIndex) so the on-screen order reads 0,1,Customize.
         for o = 0, 2 do
-            local pslot = 2 - o
-            local bx = OPT_ORIG_X + pslot * OPT_STEP_X
-            local by = OPT_ORIG_Y + pslot * OPT_STEP_Y
-            local barTex = G.bars["smallbar" .. o]
-            for i = 1, CONFIG.PlayerCount do
-                if G.diffIndex[i] == o and not (G.activeConfig.mountAISlotToP2 and i == 2) then
-                    drawPlayerSelector(i, bx, by, barTex, true, opacityNorm)
+            if optionShown(o) then
+                local pslot = 2 - o
+                local bx = OPT_ORIG_X + pslot * OPT_STEP_X
+                local by = OPT_ORIG_Y + pslot * OPT_STEP_Y
+                local barTex = G.bars["smallbar" .. o]
+                for i = 1, CONFIG.PlayerCount do
+                    if G.diffIndex[i] == o and not (G.activeConfig.mountAISlotToP2 and i == 2) then
+                        drawPlayerSelector(i, bx, by, barTex, true, opacityNorm)
+                    end
                 end
+                drawTexTL(barTex, bx, by, opacityNorm)
             end
-            drawTexTL(barTex, bx, by, opacityNorm)
         end
 
         -- Difficulty bars (compact list; diffIndex 3+ select these).
@@ -692,6 +712,18 @@ function M.handleUpdate(ts)
     local decided          = false
     local uniNavPlayer = 1
 
+    -- Event Mode, the countdown over: every player still choosing takes the hovered difficulty, or the
+    -- first one, and the song starts
+    if G.eventExpired then
+        G.eventExpired = false
+        for i = 1, CONFIG.PlayerCount do
+            if not G.diffSelected[i] then
+                if G.diffIndex[i] < 3 then G.diffIndex[i] = 3 end
+                G.diffSelected[i] = true
+            end
+        end
+    end
+
     for i = 1, CONFIG.PlayerCount do
         if i == uniNavPlayer and G.diffSelected[i] then
             uniNavPlayer = i + 1
@@ -719,10 +751,10 @@ function M.handleUpdate(ts)
             end
             if navPn.right(i == uniNavPlayer) then
                 G.sounds.Skip:Play()
-                G.diffIndex[i] = (G.diffIndex[i] + 1) % (3 + #G.diffBars)
+                G.diffIndex[i] = stepIndex(G.diffIndex[i], 1)
             elseif navPn.left(i == uniNavPlayer) then
                 G.sounds.Skip:Play()
-                G.diffIndex[i] = (G.diffIndex[i] - 1) % (3 + #G.diffBars)
+                G.diffIndex[i] = stepIndex(G.diffIndex[i], -1)
             elseif navPn.decide(i == uniNavPlayer) or click then
                 if G.diffIndex[i] == 0 then
                     canceled = true
@@ -737,6 +769,7 @@ function M.handleUpdate(ts)
                 end
             elseif navPn.cancel(i == uniNavPlayer) then
                 if G.diffSelected[i] then G.diffSelected[i] = false; G.sounds.Cancel:Play()
+                elseif not optionShown(0) then G.sounds.Error:Play()   -- no way back while the countdown runs
                 else canceled = true end
             end
                 
@@ -748,7 +781,7 @@ function M.handleUpdate(ts)
         if G.diffSelected[i] == false then allDiffsSelected = false end
     end
 
-    if canceled or G.NavInput.cancel() then
+    if canceled or (G.NavInput.cancel() and optionShown(0)) then
         G.sounds.Cancel:Play()
         G.activeScreen = "transition"
         G.startCounter("screen_transition", 1920, 0, -0.5/1920, "none", M.updateTransitionVisuals, function()

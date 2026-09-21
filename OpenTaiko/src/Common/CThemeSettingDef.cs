@@ -33,12 +33,12 @@ internal class CThemeSettingDef {
 	public CLocalizationData Description { get; set; } = new();
 
 	/// <summary>
-	/// Optional localized sub-section header the setting is listed under on the Theme page; settings
-	/// sharing a section are listed together, in the order of their first appearance. Empty = the page's
-	/// default "Theme Settings" header.
+	/// Optional sub-section the setting is listed under on the Theme page: the id of an entry of the file's
+	/// "sections" map (a localized header declared once), or a plain header text. Settings sharing a section
+	/// are listed together, in the order of their first appearance. Empty = the page's default header.
 	/// </summary>
 	[JsonProperty("section")]
-	public CLocalizationData? Section { get; set; }
+	public string Section { get; set; } = "";
 
 	/// <summary>Default value serialized as a string (parsed according to Type).</summary>
 	[JsonProperty("default")]
@@ -55,6 +55,21 @@ internal class CThemeSettingDef {
 	/// <summary>Ordered list of option strings for enum type.</summary>
 	[JsonProperty("options")]
 	public string[] Options { get; set; } = [];
+
+	/// <summary>Step of the settings menu's left/right for int types (1 when absent).</summary>
+	[JsonProperty("step")]
+	public int Step { get; set; } = 1;
+
+	/// <summary>
+	/// A session setting lives in memory only: it starts at its default on every launch and is never
+	/// written to ThemeSettings.db3 (an event mode switch, a counter for the session).
+	/// </summary>
+	[JsonProperty("session")]
+	public bool Session { get; set; } = false;
+
+	/// <summary>A hidden setting is not listed in the settings menu; skins read and write it themselves.</summary>
+	[JsonProperty("hidden")]
+	public bool Hidden { get; set; } = false;
 
 	// ── Helpers ──────────────────────────────────────────────────────────
 

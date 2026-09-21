@@ -24,6 +24,12 @@
         "DANSELECT_STANDARD_DESC": "Prove your skills through the dojo's selection!",
         "DANSELECT_PAGODA_DESC": "Go through multiple randomized dans in a row!",
         "DANSELECT_EXIT": "Exit",
+        "DANSELECT_CONFIRM": "Take the challenge?",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "Plays left: %d",
+        "EVENT_THANKS": "Thank you for playing!",
+        "EVENT_THANKS_SUB": "See you next time!",
 
         "SETTINGS_UI_KEYS": "Input",
         "SETTINGS_UI_EXIT": "Exit",

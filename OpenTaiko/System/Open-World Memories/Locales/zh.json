@@ -22,6 +22,12 @@
         "DANSELECT_STANDARD_DESC": "通过道场精选的课题证明你的实力！",
         "DANSELECT_PAGODA_DESC": "连续挑战多个随机段位！",
         "DANSELECT_EXIT": "退出",
+        "DANSELECT_CONFIRM": "接受挑战？",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "剩余次数：%d",
+        "EVENT_THANKS": "感谢游玩！",
+        "EVENT_THANKS_SUB": "下次再见！",
 
         "SETTINGS_UI_KEYS": "输入设置",
         "SETTINGS_UI_EXIT": "返回",

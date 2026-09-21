@@ -123,7 +123,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Fonts/`: `FontName` 키가 참조하는 `.ttf` 파일.
 - `Locales/`: 언어별 JSON 파일(`en.json`, `ja.json`, ...) 하나씩, 형태는 `{ "Entries": { "KEY": "text" } }`. 이 문자열은 스킨 자체 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 파일에서 찾습니다.
 - `Modules/`: Lua 모듈 트리(8단계).
-- `ThemeSettings.json`: 옵션 화면이 테마 설정 아래에 표시하는 설정 배열. 각 항목은 `id`, `type`(`bool`, `int`, `double`, `string`, `enum`, 또는 `key`: 옵션 화면이 캡처하는 키보드 키 하나로, `INPUT:KeyboardPressed`용 이름으로 저장됩니다), `scope`(기본값 `global`, 또는 세이브 파일마다 값 하나인 `save`), 지역화된 `label`과 `description`, `default`, 그리고 타입에 따라 `min`/`max` 또는 `options`를 가집니다. 선택적인 현지화된 `section`은 테마 페이지에서 설정을 자체 소제목 아래로 묶습니다. 없는 설정은 기본 제목 아래에 놓입니다.
+- `ThemeSettings.json`: 옵션 화면이 테마 설정 아래에 표시하는 설정 배열. 각 항목은 `id`, `type`(`bool`, `int`, `double`, `string`, `enum`, 또는 `key`: 옵션 화면이 캡처하는 키보드 키 하나로, `INPUT:KeyboardPressed`용 이름으로 저장됩니다), `scope`(기본값 `global`, 또는 세이브 파일마다 값 하나인 `save`), 지역화된 `label`과 `description`, `default`, 그리고 타입에 따라 `min`/`max` 또는 `options`를 가집니다. 파일은 대신 `sections`(id에서 현지화된 제목으로, 한 번만 선언)와 `settings`(배열)를 가진 객체일 수 있습니다. 항목의 선택적 `section`은 그 id 중 하나이거나 제목 문자열 자체이며, 테마 페이지에서 그 소제목 아래로 묶입니다. `session: true`는 값을 메모리에만 두고 (실행할 때마다 기본값으로 복귀), `hidden: true`는 설정 메뉴에서 빼서 스킨이 직접 읽고 쓰게 하며, `step`은 int의 증감 폭을 정합니다.
 - `SkinConfig.ini`와 포함되는 `*Config.ini` 파일.
 - `README.txt`, `LICENSE.md`, `Licenses/`: 저작자 표시 파일. 게임은 읽지 않습니다.
 

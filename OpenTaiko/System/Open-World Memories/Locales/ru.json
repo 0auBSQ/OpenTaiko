@@ -24,6 +24,12 @@
         "DANSELECT_STANDARD_DESC": "Докажите своё мастерство на испытаниях додзё!",
         "DANSELECT_PAGODA_DESC": "Пройдите несколько случайных данов подряд!",
         "DANSELECT_EXIT": "Выход",
+        "DANSELECT_CONFIRM": "Принять вызов?",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "Осталось игр: %d",
+        "EVENT_THANKS": "Спасибо за игру!",
+        "EVENT_THANKS_SUB": "До новых встреч!",
 
         "SETTINGS_UI_KEYS": "Управление",
         "SETTINGS_UI_EXIT": "Выход",

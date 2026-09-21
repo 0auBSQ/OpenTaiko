@@ -22,11 +22,24 @@ internal class DBThemeSettings : IDisposable {
 	/// <summary>Ordered list of setting definitions loaded from ThemeSettings.json.</summary>
 	public IReadOnlyList<CThemeSettingDef> Definitions => _defs;
 
+	/// <summary>The file's "sections" map: section id → localized header (empty for the plain array form).</summary>
+	public IReadOnlyDictionary<string, CLocalizationData> Sections => _sections;
+
+	/// <summary>The header text a definition is listed under: its section resolved through the map, the text
+	/// itself when it is not a declared id, "" when it has none.</summary>
+	public string SectionLabel(CThemeSettingDef def) {
+		if (string.IsNullOrWhiteSpace(def.Section)) return "";
+		return _sections.TryGetValue(def.Section, out var loc) ? loc.GetString(def.Section) : def.Section;
+	}
+
 	// ── Private state ─────────────────────────────────────────────────────
 
 	private List<CThemeSettingDef> _defs = [];
+	private Dictionary<string, CLocalizationData> _sections = new();
 	private SqliteConnection? _conn;
 	private bool _disposed;
+	// the values of session settings, for this run only (keyed by id, or "id|saveId" when save-scoped)
+	private readonly Dictionary<string, string> _session = new();
 
 	// ── Lifecycle ─────────────────────────────────────────────────────────
 
@@ -36,7 +49,7 @@ internal class DBThemeSettings : IDisposable {
 	/// Safe to call if the JSON file does not exist — definitions will be empty.
 	/// </summary>
 	public void Load(string skinFolderPath) {
-		_defs = LoadDefinitions(skinFolderPath);
+		(_defs, _sections) = LoadDefinitions(skinFolderPath);
 
 		string dbPath = System.IO.Path.Combine(skinFolderPath, "ThemeSettings.db3");
 		if (OperatingSystem.IsIOS()) {
@@ -71,6 +84,7 @@ internal class DBThemeSettings : IDisposable {
 	/// <summary>Returns the stored value for a global setting, or the default if not found.</summary>
 	public string GetSetting(string settingId) {
 		var def = FindDef(settingId);
+		if (def != null && def.Session) return _session.TryGetValue(settingId, out var sv) ? sv : def.Default;
 		if (def == null || _conn == null) return def?.Default ?? "";
 
 		var cmd = _conn.CreateCommand();
@@ -87,6 +101,7 @@ internal class DBThemeSettings : IDisposable {
 	/// </summary>
 	public string GetSettingForSave(string settingId, long saveId) {
 		var def = FindDef(settingId);
+		if (def != null && def.Session) return _session.TryGetValue($"{settingId}|{saveId}", out var sv) ? sv : def.Default;
 		if (def == null || _conn == null) return def?.Default ?? "";
 
 		var cmd = _conn.CreateCommand();
@@ -97,8 +112,9 @@ internal class DBThemeSettings : IDisposable {
 		return result is string s ? s : def.Default;
 	}
 
-	/// <summary>Persists a value for a global setting.</summary>
+	/// <summary>Persists a value for a global setting (a session setting is only remembered for this run).</summary>
 	public void SetSetting(string settingId, string value) {
+		if (FindDef(settingId) is { Session: true }) { _session[settingId] = value; return; }
 		if (_conn == null) return;
 		var cmd = _conn.CreateCommand();
 		cmd.CommandText = @"INSERT INTO global_settings(SettingId, Value) VALUES($id, $val)
@@ -112,6 +128,7 @@ internal class DBThemeSettings : IDisposable {
 	/// Persists a value for a save-scoped setting identified by <paramref name="saveId"/>.
 	/// </summary>
 	public void SetSettingForSave(string settingId, long saveId, string value) {
+		if (FindDef(settingId) is { Session: true }) { _session[$"{settingId}|{saveId}"] = value; return; }
 		if (_conn == null) return;
 		var cmd = _conn.CreateCommand();
 		cmd.CommandText = @"INSERT INTO save_settings(SettingId, SaveId, Value) VALUES($id, $sid, $val)
@@ -124,15 +141,24 @@ internal class DBThemeSettings : IDisposable {
 
 	// ── Private helpers ───────────────────────────────────────────────────
 
-	private static List<CThemeSettingDef> LoadDefinitions(string skinFolderPath) {
+	// the file is either a plain array of definitions, or { "sections": { id: localized header }, "settings": [...] }
+	private sealed class FileForm {
+		[JsonProperty("sections")] public Dictionary<string, CLocalizationData>? Sections { get; set; }
+		[JsonProperty("settings")] public List<CThemeSettingDef>? Settings { get; set; }
+	}
+
+	private static (List<CThemeSettingDef>, Dictionary<string, CLocalizationData>) LoadDefinitions(string skinFolderPath) {
 		string jsonPath = System.IO.Path.Combine(skinFolderPath, "ThemeSettings.json");
-		if (!File.Exists(jsonPath)) return [];
+		if (!File.Exists(jsonPath)) return ([], new());
 		try {
 			string json = File.ReadAllText(jsonPath);
-			return JsonConvert.DeserializeObject<List<CThemeSettingDef>>(json) ?? [];
+			if (json.TrimStart('\uFEFF', ' ', '\t', '\r', '\n').StartsWith('['))
+				return (JsonConvert.DeserializeObject<List<CThemeSettingDef>>(json) ?? [], new());
+			var form = JsonConvert.DeserializeObject<FileForm>(json);
+			return (form?.Settings ?? [], form?.Sections ?? new());
 		} catch (Exception ex) {
 			Trace.TraceError($"[DBThemeSettings] Failed to parse ThemeSettings.json: {ex}");
-			return [];
+			return ([], new());
 		}
 	}
 

@@ -22,6 +22,12 @@
         "DANSELECT_STANDARD_DESC": "Beweise dein Können in der Auswahl des Dojos!",
         "DANSELECT_PAGODA_DESC": "Bestehe mehrere zufällige Dans hintereinander!",
         "DANSELECT_EXIT": "Beenden",
+        "DANSELECT_CONFIRM": "Die Herausforderung annehmen?",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "Verbleibende Spiele: %d",
+        "EVENT_THANKS": "Danke fürs Spielen!",
+        "EVENT_THANKS_SUB": "Bis zum nächsten Mal!",
 
         "SETTINGS_UI_KEYS": "Eingabe",
         "SETTINGS_UI_EXIT": "Zurück",

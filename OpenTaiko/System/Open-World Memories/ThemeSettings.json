@@ -1,9 +1,6 @@
-[
-  {
-    "id": "songselect_mouse",
-    "type": "bool",
-    "scope": "global",
-    "section": {
+{
+  "sections": {
+    "songselect": {
       "strings": {
         "default": "Song Select",
         "ja": "選曲",
@@ -14,74 +11,18 @@
         "zh": "选曲"
       }
     },
-    "label": {
+    "event": {
       "strings": {
-        "default": "Enable mouse navigation",
-        "ja": "マウス操作を有効にする",
-        "fr": "Activer la navigation à la souris",
-        "de": "Mausnavigation aktivieren",
-        "es": "Activar la navegación con el ratón",
-        "ko": "마우스 조작 사용",
-        "zh": "启用鼠标操作"
+        "default": "Event Mode",
+        "ja": "イベントモード",
+        "fr": "Mode événement",
+        "de": "Eventmodus",
+        "es": "Modo evento",
+        "ko": "이벤트 모드",
+        "zh": "活动模式"
       }
     },
-    "description": {
-      "strings": {
-        "default": "Lets the mouse browse the song list and the difficulty bars: the wheel scrolls, hovering picks and a click decides.\nTakes effect only in single player. The best plays list stays usable with the mouse even when this is off.",
-        "ja": "マウスで曲リストと難易度バーを操作できます: ホイールでスクロール、ホバーで選択、クリックで決定。\n1 人プレイのときのみ有効です。オフでもベストプレイ一覧はマウスで操作できます。",
-        "fr": "Permet à la souris de parcourir la liste des chansons et les barres de difficulté : la molette fait défiler, le survol sélectionne et un clic valide.\nNe s'applique qu'en solo. La liste des meilleures parties reste utilisable à la souris même si l'option est désactivée.",
-        "de": "Lässt die Maus die Songliste und die Schwierigkeitsleisten bedienen: das Rad scrollt, Zeigen wählt aus, ein Klick bestätigt.\nGilt nur im Einzelspieler. Die Liste der besten Spiele bleibt auch bei ausgeschalteter Option mit der Maus bedienbar.",
-        "es": "Permite al ratón recorrer la lista de canciones y las barras de dificultad: la rueda desplaza, pasar por encima selecciona y un clic confirma.\nSolo tiene efecto en un jugador. La lista de mejores partidas sigue pudiendo usarse con el ratón aunque esté desactivado.",
-        "ko": "마우스로 곡 목록과 난이도 바를 조작합니다: 휠로 스크롤, 올려서 선택, 클릭으로 결정.\n1인 플레이에서만 적용됩니다. 꺼져 있어도 베스트 플레이 목록은 마우스로 사용할 수 있습니다.",
-        "zh": "允许用鼠标浏览歌曲列表和难度条：滚轮滚动，悬停选择，点击确定。\n仅在单人游戏时生效。即使关闭，最佳成绩列表仍可用鼠标操作。"
-      }
-    },
-    "default": "1"
-  },
-  {
-    "id": "songselect_replays",
-    "type": "bool",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Song Select",
-        "ja": "選曲",
-        "fr": "Sélection de chanson",
-        "de": "Songauswahl",
-        "es": "Selección de canciones",
-        "ko": "곡 선택",
-        "zh": "选曲"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Show best plays",
-        "ja": "ベストプレイを表示する",
-        "fr": "Afficher les meilleures parties",
-        "de": "Beste Spiele anzeigen",
-        "es": "Mostrar las mejores partidas",
-        "ko": "베스트 플레이 표시",
-        "zh": "显示最佳成绩"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Shows the best plays of the hovered difficulty on the difficulty select, where a replay can be watched.\nWhen off, the list does not appear at all.",
-        "ja": "難易度選択で、選択中の難易度のベストプレイ一覧を表示します。リプレイを見ることもできます。\nオフにすると一覧は表示されません。",
-        "fr": "Affiche les meilleures parties de la difficulté survolée sur la sélection de difficulté, où un replay peut être regardé.\nDésactivée, la liste n'apparaît pas du tout.",
-        "de": "Zeigt bei der Schwierigkeitswahl die besten Spiele der markierten Schwierigkeit, wo ein Replay angesehen werden kann.\nAusgeschaltet erscheint die Liste gar nicht.",
-        "es": "Muestra en la selección de dificultad las mejores partidas de la dificultad marcada, donde se puede ver una repetición.\nDesactivado, la lista no aparece en absoluto.",
-        "ko": "난이도 선택에서 선택 중인 난이도의 베스트 플레이를 표시하며, 리플레이를 볼 수 있습니다.\n끄면 목록이 전혀 나타나지 않습니다.",
-        "zh": "在难度选择中显示所选难度的最佳成绩，并可观看回放。\n关闭后列表完全不显示。"
-      }
-    },
-    "default": "1"
-  },
-  {
-    "id": "songselect_key_help",
-    "type": "key",
-    "scope": "global",
-    "section": {
+    "inputs": {
       "strings": {
         "default": "Inputs",
         "ja": "入力",
@@ -91,458 +32,555 @@
         "ko": "입력",
         "zh": "输入"
       }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: show shortcuts",
-        "ja": "選曲: ショートカット一覧",
-        "fr": "Sélection : afficher les raccourcis",
-        "de": "Songauswahl: Tastenkürzel anzeigen",
-        "es": "Selección: mostrar atajos",
-        "ko": "곡 선택: 단축키 보기",
-        "zh": "选曲：显示快捷键"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Opens the list of the song select's keyboard shortcuts.",
-        "ja": "選曲画面のキーボードショートカット一覧を開きます。",
-        "fr": "Ouvre la liste des raccourcis clavier de la sélection de chanson.",
-        "de": "Öffnet die Liste der Tastenkürzel der Songauswahl.",
-        "es": "Abre la lista de atajos de teclado de la selección de canciones.",
-        "ko": "곡 선택 화면의 키보드 단축키 목록을 엽니다.",
-        "zh": "打开选曲界面的键盘快捷键列表。"
-      }
-    },
-    "default": "Tab"
+    }
   },
-  {
-    "id": "songselect_key_sort",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+  "settings": [
+    {
+      "id": "songselect_mouse",
+      "type": "bool",
+      "scope": "global",
+      "section": "songselect",
+      "label": {
+        "strings": {
+          "default": "Enable mouse navigation",
+          "ja": "マウス操作を有効にする",
+          "fr": "Activer la navigation à la souris",
+          "de": "Mausnavigation aktivieren",
+          "es": "Activar la navegación con el ratón",
+          "ko": "마우스 조작 사용",
+          "zh": "启用鼠标操作"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Lets the mouse browse the song list and the difficulty bars: the wheel scrolls, hovering picks and a click decides.\nTakes effect only in single player. The best plays list stays usable with the mouse even when this is off.",
+          "ja": "マウスで曲リストと難易度バーを操作できます: ホイールでスクロール、ホバーで選択、クリックで決定。\n1 人プレイのときのみ有効です。オフでもベストプレイ一覧はマウスで操作できます。",
+          "fr": "Permet à la souris de parcourir la liste des chansons et les barres de difficulté : la molette fait défiler, le survol sélectionne et un clic valide.\nNe s'applique qu'en solo. La liste des meilleures parties reste utilisable à la souris même si l'option est désactivée.",
+          "de": "Lässt die Maus die Songliste und die Schwierigkeitsleisten bedienen: das Rad scrollt, Zeigen wählt aus, ein Klick bestätigt.\nGilt nur im Einzelspieler. Die Liste der besten Spiele bleibt auch bei ausgeschalteter Option mit der Maus bedienbar.",
+          "es": "Permite al ratón recorrer la lista de canciones y las barras de dificultad: la rueda desplaza, pasar por encima selecciona y un clic confirma.\nSolo tiene efecto en un jugador. La lista de mejores partidas sigue pudiendo usarse con el ratón aunque esté desactivado.",
+          "ko": "마우스로 곡 목록과 난이도 바를 조작합니다: 휠로 스크롤, 올려서 선택, 클릭으로 결정.\n1인 플레이에서만 적용됩니다. 꺼져 있어도 베스트 플레이 목록은 마우스로 사용할 수 있습니다.",
+          "zh": "允许用鼠标浏览歌曲列表和难度条：滚轮滚动，悬停选择，点击确定。\n仅在单人游戏时生效。即使关闭，最佳成绩列表仍可用鼠标操作。"
+        }
+      },
+      "default": "1"
     },
-    "label": {
-      "strings": {
-        "default": "Song select: sort",
-        "ja": "選曲: 並び替え",
-        "fr": "Sélection : trier",
-        "de": "Songauswahl: Sortieren",
-        "es": "Selección: ordenar",
-        "ko": "곡 선택: 정렬",
-        "zh": "选曲：排序"
-      }
+    {
+      "id": "songselect_replays",
+      "type": "bool",
+      "scope": "global",
+      "section": "songselect",
+      "label": {
+        "strings": {
+          "default": "Show best plays",
+          "ja": "ベストプレイを表示する",
+          "fr": "Afficher les meilleures parties",
+          "de": "Beste Spiele anzeigen",
+          "es": "Mostrar las mejores partidas",
+          "ko": "베스트 플레이 표시",
+          "zh": "显示最佳成绩"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Shows the best plays of the hovered difficulty on the difficulty select, where a replay can be watched.\nWhen off, the list does not appear at all.",
+          "ja": "難易度選択で、選択中の難易度のベストプレイ一覧を表示します。リプレイを見ることもできます。\nオフにすると一覧は表示されません。",
+          "fr": "Affiche les meilleures parties de la difficulté survolée sur la sélection de difficulté, où un replay peut être regardé.\nDésactivée, la liste n'apparaît pas du tout.",
+          "de": "Zeigt bei der Schwierigkeitswahl die besten Spiele der markierten Schwierigkeit, wo ein Replay angesehen werden kann.\nAusgeschaltet erscheint die Liste gar nicht.",
+          "es": "Muestra en la selección de dificultad las mejores partidas de la dificultad marcada, donde se puede ver una repetición.\nDesactivado, la lista no aparece en absoluto.",
+          "ko": "난이도 선택에서 선택 중인 난이도의 베스트 플레이를 표시하며, 리플레이를 볼 수 있습니다.\n끄면 목록이 전혀 나타나지 않습니다.",
+          "zh": "在难度选择中显示所选难度的最佳成绩，并可观看回放。\n关闭后列表完全不显示。"
+        }
+      },
+      "default": "1"
     },
-    "description": {
-      "strings": {
-        "default": "Opens the sort dialog.",
-        "ja": "並び替えダイアログを開きます。",
-        "fr": "Ouvre la fenêtre de tri.",
-        "de": "Öffnet den Sortierdialog.",
-        "es": "Abre el diálogo de ordenación.",
-        "ko": "정렬 대화 상자를 엽니다.",
-        "zh": "打开排序对话框。"
-      }
+    {
+      "id": "event_mode",
+      "type": "bool",
+      "scope": "global",
+      "session": true,
+      "section": "event",
+      "label": {
+        "strings": {
+          "default": "Use Event Mode",
+          "ja": "イベントモードを使う",
+          "fr": "Utiliser le mode événement",
+          "de": "Eventmodus verwenden",
+          "es": "Usar el modo evento",
+          "ko": "이벤트 모드 사용",
+          "zh": "使用活动模式"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "A kiosk mode for events. It lasts only this session: quitting the game turns it off again.\nThe title screen offers only Taiko Mode, AI Battle Mode and The Fox Dojo; none of them can be left, a clock counts down the song choice, replays, the customize button, the favorites and the auto shortcuts are away, mods reset after every play, and a thank-you screen follows the last allowed play.",
+          "ja": "イベント向けのキオスクモードです。この起動中だけ有効で、ゲームを終了するとオフに戻ります。\nタイトルには演奏モード・AI バトル・狐の道場のみが並び、どれも途中で抜けられず、選曲は残り時間で進み、リプレイ・カスタマイズボタン・お気に入り・オートのショートカットは使えず、プレイごとに改造はリセットされ、最後のプレイの後にお礼の画面が出ます。",
+          "fr": "Un mode borne pour les événements. Il ne dure que cette session : quitter le jeu le désactive.\nL'écran titre ne propose que le mode Taiko, le mode Combat IA et le Dojo du Renard ; aucun ne peut être quitté, un compte à rebours mène le choix de la chanson, les replays, le bouton Personnaliser, les favoris et les raccourcis auto disparaissent, les mods se réinitialisent après chaque partie, et un écran de remerciement suit la dernière partie autorisée.",
+          "de": "Ein Kioskmodus für Veranstaltungen. Er gilt nur für diese Sitzung: das Beenden des Spiels schaltet ihn wieder aus.\nDer Titelbildschirm bietet nur Taiko-Modus, KI-Kampf und das Fuchs-Dojo; keiner lässt sich verlassen, eine Uhr zählt die Songwahl herunter, Replays, der Anpassen-Knopf, die Favoriten und die Auto-Kürzel fehlen, Mods werden nach jedem Spiel zurückgesetzt, und nach dem letzten erlaubten Spiel folgt ein Dankesbildschirm.",
+          "es": "Un modo quiosco para eventos. Solo dura esta sesión: salir del juego lo desactiva de nuevo.\nLa pantalla de título solo ofrece el modo Taiko, el modo Batalla IA y el Dojo del Zorro; ninguno puede abandonarse, un reloj cuenta atrás la elección de canción, las repeticiones, el botón Personalizar, los favoritos y los atajos de auto desaparecen, los mods se reinician tras cada partida, y una pantalla de agradecimiento sigue a la última partida permitida.",
+          "ko": "행사용 키오스크 모드입니다. 이번 실행 동안만 유지되며 게임을 종료하면 다시 꺼집니다.\n타이틀에는 태고 모드, AI 배틀, 여우 도장만 남고 어느 것도 나갈 수 없으며, 곡 선택은 남은 시간으로 진행되고, 리플레이·커스터마이즈 버튼·즐겨찾기·오토 단축키는 사라지며, 플레이마다 모드가 초기화되고, 마지막 허용 플레이 뒤에 감사 화면이 나옵니다.",
+          "zh": "用于活动的展台模式。只在本次运行中有效：退出游戏后自动关闭。\n标题画面只保留太鼓模式、AI 对战和狐狸道场，三者都无法中途退出；选曲有倒计时，回放、自定义按钮、收藏和自动快捷键不可用，每次游玩后重置改造，最后一次允许的游玩结束后显示感谢画面。"
+        }
+      },
+      "default": "0"
     },
-    "default": "Space"
-  },
-  {
-    "id": "songselect_key_search",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+    {
+      "id": "event_play_count",
+      "type": "int",
+      "scope": "global",
+      "section": "event",
+      "label": {
+        "strings": {
+          "default": "Play count",
+          "ja": "プレイ回数",
+          "fr": "Nombre de parties",
+          "de": "Anzahl Spiele",
+          "es": "Número de partidas",
+          "ko": "플레이 횟수",
+          "zh": "游玩次数"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "How many plays an Event Mode session allows before the thank-you screen. 0 = no limit.\nThe Fox Dojo always allows one play, unless there is no limit.",
+          "ja": "イベントモードの 1 セッションでお礼の画面までに遊べる回数。0 は無制限。\n狐の道場は無制限でない限り常に 1 回です。",
+          "fr": "Le nombre de parties qu'une session en mode événement autorise avant l'écran de remerciement. 0 = sans limite.\nLe Dojo du Renard n'autorise toujours qu'une partie, sauf sans limite.",
+          "de": "Wie viele Spiele eine Eventmodus-Sitzung vor dem Dankesbildschirm erlaubt. 0 = keine Grenze.\nDas Fuchs-Dojo erlaubt immer ein Spiel, außer ohne Grenze.",
+          "es": "Cuántas partidas permite una sesión del modo evento antes de la pantalla de agradecimiento. 0 = sin límite.\nEl Dojo del Zorro siempre permite una partida, salvo sin límite.",
+          "ko": "이벤트 모드 한 세션에서 감사 화면 전까지 허용되는 플레이 횟수. 0은 무제한.\n여우 도장은 무제한이 아닌 한 항상 1회입니다.",
+          "zh": "活动模式一场会话在感谢画面前允许的游玩次数。0 表示不限。\n狐狸道场除非不限，否则始终只有一次。"
+        }
+      },
+      "default": "3",
+      "min": 0,
+      "max": 9
     },
-    "label": {
-      "strings": {
-        "default": "Song select: search",
-        "ja": "選曲: 検索",
-        "fr": "Sélection : rechercher",
-        "de": "Songauswahl: Suchen",
-        "es": "Selección: buscar",
-        "ko": "곡 선택: 검색",
-        "zh": "选曲：搜索"
-      }
+    {
+      "id": "event_select_seconds",
+      "type": "int",
+      "scope": "global",
+      "section": "event",
+      "label": {
+        "strings": {
+          "default": "Song select timer (seconds)",
+          "ja": "選曲の制限時間 (秒)",
+          "fr": "Minuteur de sélection (secondes)",
+          "de": "Songwahl-Timer (Sekunden)",
+          "es": "Temporizador de selección (segundos)",
+          "ko": "곡 선택 제한 시간 (초)",
+          "zh": "选曲计时（秒）"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "The seconds a player has to choose a song once a menu opens. 0 = no limit.\nWhen it runs out, the hovered song is taken (or a random one), the difficulty choice gets 30 more seconds with no way back, and the dojo returns to the title.",
+          "ja": "メニューを開いてから曲を選ぶまでの秒数。0 は無制限。\n時間切れになると選択中の曲 (なければランダム) が決まり、難易度選択には戻れない 30 秒が与えられ、道場ではタイトルに戻ります。",
+          "fr": "Les secondes dont dispose un joueur pour choisir une chanson une fois un menu ouvert. 0 = sans limite.\nÀ zéro, la chanson survolée est prise (sinon une au hasard), le choix de difficulté reçoit 30 secondes sans retour possible, et le dojo revient au titre.",
+          "de": "Die Sekunden, die ein Spieler nach dem Öffnen eines Menüs für die Songwahl hat. 0 = keine Grenze.\nLäuft sie ab, wird der markierte Song genommen (sonst ein zufälliger), die Schwierigkeitswahl bekommt 30 Sekunden ohne Zurück, und das Dojo kehrt zum Titel zurück.",
+          "es": "Los segundos que tiene un jugador para elegir una canción una vez abierto un menú. 0 = sin límite.\nAl agotarse, se toma la canción marcada (o una al azar), la elección de dificultad recibe 30 segundos sin vuelta atrás, y el dojo vuelve al título.",
+          "ko": "메뉴가 열린 뒤 곡을 고를 수 있는 초. 0은 무제한.\n시간이 다 되면 선택 중인 곡(없으면 무작위)이 결정되고, 난이도 선택에는 되돌아갈 수 없는 30초가 주어지며, 도장은 타이틀로 돌아갑니다.",
+          "zh": "菜单打开后玩家用于选曲的秒数。0 表示不限。\n倒计时结束时选择当前悬停的歌曲（否则随机），难度选择再给 30 秒且不能返回，道场则回到标题。"
+        }
+      },
+      "default": "100",
+      "min": 0,
+      "max": 300,
+      "step": 20
     },
-    "description": {
-      "strings": {
-        "default": "Opens the search dialog for the current folder.",
-        "ja": "現在のフォルダを対象に検索ダイアログを開きます。",
-        "fr": "Ouvre la recherche dans le dossier actuel.",
-        "de": "Öffnet die Suche im aktuellen Ordner.",
-        "es": "Abre la búsqueda en la carpeta actual.",
-        "ko": "현재 폴더에서 검색 대화 상자를 엽니다.",
-        "zh": "在当前文件夹中打开搜索对话框。"
-      }
+    {
+      "id": "event_pagoda",
+      "type": "bool",
+      "scope": "global",
+      "section": "event",
+      "label": {
+        "strings": {
+          "default": "Enable Pagoda",
+          "ja": "未知の塔を有効にする",
+          "fr": "Activer la Pagode",
+          "de": "Pagode aktivieren",
+          "es": "Activar la Pagoda",
+          "ko": "탑 사용",
+          "zh": "启用宝塔"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Offers the Pagoda of the Unknown in The Fox Dojo during Event Mode.\nWhen off, the dojo opens straight on the regular dan list.",
+          "ja": "イベントモード中、狐の道場に未知の塔を表示します。\nオフにすると道場はそのまま通常段位の一覧で開きます。",
+          "fr": "Propose la Pagode de l'Inconnu dans le Dojo du Renard en mode événement.\nDésactivée, le dojo s'ouvre directement sur la liste des dans classiques.",
+          "de": "Bietet im Eventmodus die Pagode des Unbekannten im Fuchs-Dojo an.\nAusgeschaltet öffnet das Dojo direkt die Liste der regulären Dans.",
+          "es": "Ofrece la Pagoda de lo Desconocido en el Dojo del Zorro durante el modo evento.\nDesactivado, el dojo se abre directamente en la lista de danes normales.",
+          "ko": "이벤트 모드 중 여우 도장에서 미지의 탑을 제공합니다.\n끄면 도장은 바로 일반 단위 목록으로 열립니다.",
+          "zh": "活动模式下在狐狸道场中提供未知之塔。\n关闭后道场直接打开常规段位列表。"
+        }
+      },
+      "default": "1"
     },
-    "default": "F1"
-  },
-  {
-    "id": "songselect_key_favorite",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+    {
+      "id": "event_plays_done",
+      "type": "int",
+      "scope": "global",
+      "session": true,
+      "hidden": true,
+      "section": "event",
+      "label": {
+        "strings": {
+          "default": "Plays done this event session"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Kept by the skin: the plays finished since the session began."
+        }
+      },
+      "default": "0"
     },
-    "label": {
-      "strings": {
-        "default": "Song select: favorite",
-        "ja": "選曲: お気に入り登録",
-        "fr": "Sélection : favori",
-        "de": "Songauswahl: Favorit",
-        "es": "Selección: favorito",
-        "ko": "곡 선택: 즐겨찾기",
-        "zh": "选曲：收藏"
-      }
+    {
+      "id": "songselect_key_help",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: show shortcuts",
+          "ja": "選曲: ショートカット一覧",
+          "fr": "Sélection : afficher les raccourcis",
+          "de": "Songauswahl: Tastenkürzel anzeigen",
+          "es": "Selección: mostrar atajos",
+          "ko": "곡 선택: 단축키 보기",
+          "zh": "选曲：显示快捷键"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Opens the list of the song select's keyboard shortcuts.",
+          "ja": "選曲画面のキーボードショートカット一覧を開きます。",
+          "fr": "Ouvre la liste des raccourcis clavier de la sélection de chanson.",
+          "de": "Öffnet die Liste der Tastenkürzel der Songauswahl.",
+          "es": "Abre la lista de atajos de teclado de la selección de canciones.",
+          "ko": "곡 선택 화면의 키보드 단축키 목록을 엽니다.",
+          "zh": "打开选曲界面的键盘快捷键列表。"
+        }
+      },
+      "default": "Tab"
     },
-    "description": {
-      "strings": {
-        "default": "Adds the selected song to your favorites, or removes it.",
-        "ja": "選択中の曲をお気に入りに追加、または解除します。",
-        "fr": "Ajoute la chanson sélectionnée aux favoris, ou la retire.",
-        "de": "Fügt den gewählten Song den Favoriten hinzu oder entfernt ihn.",
-        "es": "Añade la canción seleccionada a favoritos, o la quita.",
-        "ko": "선택한 곡을 즐겨찾기에 추가하거나 제거합니다.",
-        "zh": "将选中的歌曲加入收藏，或取消收藏。"
-      }
+    {
+      "id": "songselect_key_sort",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: sort",
+          "ja": "選曲: 並び替え",
+          "fr": "Sélection : trier",
+          "de": "Songauswahl: Sortieren",
+          "es": "Selección: ordenar",
+          "ko": "곡 선택: 정렬",
+          "zh": "选曲：排序"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Opens the sort dialog.",
+          "ja": "並び替えダイアログを開きます。",
+          "fr": "Ouvre la fenêtre de tri.",
+          "de": "Öffnet den Sortierdialog.",
+          "es": "Abre el diálogo de ordenación.",
+          "ko": "정렬 대화 상자를 엽니다.",
+          "zh": "打开排序对话框。"
+        }
+      },
+      "default": "Space"
     },
-    "default": "LeftControl"
-  },
-  {
-    "id": "songselect_key_favorites_folder",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+    {
+      "id": "songselect_key_search",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: search",
+          "ja": "選曲: 検索",
+          "fr": "Sélection : rechercher",
+          "de": "Songauswahl: Suchen",
+          "es": "Selección: buscar",
+          "ko": "곡 선택: 검색",
+          "zh": "选曲：搜索"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Opens the search dialog for the current folder.",
+          "ja": "現在のフォルダを対象に検索ダイアログを開きます。",
+          "fr": "Ouvre la recherche dans le dossier actuel.",
+          "de": "Öffnet die Suche im aktuellen Ordner.",
+          "es": "Abre la búsqueda en la carpeta actual.",
+          "ko": "현재 폴더에서 검색 대화 상자를 엽니다.",
+          "zh": "在当前文件夹中打开搜索对话框。"
+        }
+      },
+      "default": "F1"
     },
-    "label": {
-      "strings": {
-        "default": "Song select: open favorites",
-        "ja": "選曲: お気に入りを開く",
-        "fr": "Sélection : ouvrir les favoris",
-        "de": "Songauswahl: Favoriten öffnen",
-        "es": "Selección: abrir favoritos",
-        "ko": "곡 선택: 즐겨찾기 열기",
-        "zh": "选曲：打开收藏"
-      }
+    {
+      "id": "songselect_key_favorite",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: favorite",
+          "ja": "選曲: お気に入り登録",
+          "fr": "Sélection : favori",
+          "de": "Songauswahl: Favorit",
+          "es": "Selección: favorito",
+          "ko": "곡 선택: 즐겨찾기",
+          "zh": "选曲：收藏"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Adds the selected song to your favorites, or removes it.",
+          "ja": "選択中の曲をお気に入りに追加、または解除します。",
+          "fr": "Ajoute la chanson sélectionnée aux favoris, ou la retire.",
+          "de": "Fügt den gewählten Song den Favoriten hinzu oder entfernt ihn.",
+          "es": "Añade la canción seleccionada a favoritos, o la quita.",
+          "ko": "선택한 곡을 즐겨찾기에 추가하거나 제거합니다.",
+          "zh": "将选中的歌曲加入收藏，或取消收藏。"
+        }
+      },
+      "default": "LeftControl"
     },
-    "description": {
-      "strings": {
-        "default": "Opens your favorites as a folder.",
-        "ja": "お気に入りをフォルダとして開きます。",
-        "fr": "Ouvre vos favoris sous forme de dossier.",
-        "de": "Öffnet die Favoriten als Ordner.",
-        "es": "Abre tus favoritos como una carpeta.",
-        "ko": "즐겨찾기를 폴더로 엽니다.",
-        "zh": "以文件夹形式打开收藏。"
-      }
+    {
+      "id": "songselect_key_favorites_folder",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: open favorites",
+          "ja": "選曲: お気に入りを開く",
+          "fr": "Sélection : ouvrir les favoris",
+          "de": "Songauswahl: Favoriten öffnen",
+          "es": "Selección: abrir favoritos",
+          "ko": "곡 선택: 즐겨찾기 열기",
+          "zh": "选曲：打开收藏"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Opens your favorites as a folder.",
+          "ja": "お気に入りをフォルダとして開きます。",
+          "fr": "Ouvre vos favoris sous forme de dossier.",
+          "de": "Öffnet die Favoriten als Ordner.",
+          "es": "Abre tus favoritos como una carpeta.",
+          "ko": "즐겨찾기를 폴더로 엽니다.",
+          "zh": "以文件夹形式打开收藏。"
+        }
+      },
+      "default": "F2"
     },
-    "default": "F2"
-  },
-  {
-    "id": "songselect_key_auto_p1",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+    {
+      "id": "songselect_key_auto_p1",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: auto (player 1)",
+          "ja": "選曲: オート (1P)",
+          "fr": "Sélection : auto (joueur 1)",
+          "de": "Songauswahl: Auto (Spieler 1)",
+          "es": "Selección: auto (jugador 1)",
+          "ko": "곡 선택: 오토 (1P)",
+          "zh": "选曲：自动（玩家 1）"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Toggles auto play for player 1.",
+          "ja": "1P のオートプレイを切り替えます。",
+          "fr": "Active ou désactive le jeu automatique du joueur 1.",
+          "de": "Schaltet das automatische Spiel für Spieler 1 um.",
+          "es": "Activa o desactiva el juego automático del jugador 1.",
+          "ko": "1P의 오토 플레이를 전환합니다.",
+          "zh": "切换玩家 1 的自动演奏。"
+        }
+      },
+      "default": "F3"
     },
-    "label": {
-      "strings": {
-        "default": "Song select: auto (player 1)",
-        "ja": "選曲: オート (1P)",
-        "fr": "Sélection : auto (joueur 1)",
-        "de": "Songauswahl: Auto (Spieler 1)",
-        "es": "Selección: auto (jugador 1)",
-        "ko": "곡 선택: 오토 (1P)",
-        "zh": "选曲：自动（玩家 1）"
-      }
+    {
+      "id": "songselect_key_auto_p2",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: auto (player 2)",
+          "ja": "選曲: オート (2P)",
+          "fr": "Sélection : auto (joueur 2)",
+          "de": "Songauswahl: Auto (Spieler 2)",
+          "es": "Selección: auto (jugador 2)",
+          "ko": "곡 선택: 오토 (2P)",
+          "zh": "选曲：自动（玩家 2）"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Toggles auto play for player 2.",
+          "ja": "2P のオートプレイを切り替えます。",
+          "fr": "Active ou désactive le jeu automatique du joueur 2.",
+          "de": "Schaltet das automatische Spiel für Spieler 2 um.",
+          "es": "Activa o desactiva el juego automático del jugador 2.",
+          "ko": "2P의 오토 플레이를 전환합니다.",
+          "zh": "切换玩家 2 的自动演奏。"
+        }
+      },
+      "default": "F4"
     },
-    "description": {
-      "strings": {
-        "default": "Toggles auto play for player 1.",
-        "ja": "1P のオートプレイを切り替えます。",
-        "fr": "Active ou désactive le jeu automatique du joueur 1.",
-        "de": "Schaltet das automatische Spiel für Spieler 1 um.",
-        "es": "Activa o desactiva el juego automático del jugador 1.",
-        "ko": "1P의 오토 플레이를 전환합니다.",
-        "zh": "切换玩家 1 的自动演奏。"
-      }
+    {
+      "id": "songselect_key_player_count",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: player count",
+          "ja": "選曲: プレイ人数",
+          "fr": "Sélection : nombre de joueurs",
+          "de": "Songauswahl: Spielerzahl",
+          "es": "Selección: número de jugadores",
+          "ko": "곡 선택: 플레이어 수",
+          "zh": "选曲：玩家人数"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Changes the number of players.",
+          "ja": "プレイ人数を変更します。",
+          "fr": "Change le nombre de joueurs.",
+          "de": "Ändert die Spielerzahl.",
+          "es": "Cambia el número de jugadores.",
+          "ko": "플레이어 수를 변경합니다.",
+          "zh": "更改玩家人数。"
+        }
+      },
+      "default": "F5"
     },
-    "default": "F3"
-  },
-  {
-    "id": "songselect_key_auto_p2",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
+    {
+      "id": "songselect_key_player",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: set-up player",
+          "ja": "選曲: 設定するプレイヤー",
+          "fr": "Sélection : joueur configuré",
+          "de": "Songauswahl: eingestellter Spieler",
+          "es": "Selección: jugador configurado",
+          "ko": "곡 선택: 설정 중인 플레이어",
+          "zh": "选曲：设置中的玩家"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Switches which player the song select is setting up.",
+          "ja": "選曲画面で設定するプレイヤーを切り替えます。",
+          "fr": "Change le joueur que la sélection configure.",
+          "de": "Wechselt den Spieler, den die Songauswahl einstellt.",
+          "es": "Cambia el jugador que configura la selección.",
+          "ko": "곡 선택에서 설정하는 플레이어를 전환합니다.",
+          "zh": "切换选曲界面正在设置的玩家。"
+        }
+      },
+      "default": "F6"
     },
-    "label": {
-      "strings": {
-        "default": "Song select: auto (player 2)",
-        "ja": "選曲: オート (2P)",
-        "fr": "Sélection : auto (joueur 2)",
-        "de": "Songauswahl: Auto (Spieler 2)",
-        "es": "Selección: auto (jugador 2)",
-        "ko": "곡 선택: 오토 (2P)",
-        "zh": "选曲：自动（玩家 2）"
-      }
+    {
+      "id": "songselect_key_course",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: displayed difficulty",
+          "ja": "選曲: 表示する難易度",
+          "fr": "Sélection : difficulté affichée",
+          "de": "Songauswahl: angezeigte Schwierigkeit",
+          "es": "Selección: dificultad mostrada",
+          "ko": "곡 선택: 표시 난이도",
+          "zh": "选曲：显示的难度"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Cycles the difficulty shown on the song bars.",
+          "ja": "曲バーに表示する難易度を切り替えます。",
+          "fr": "Change la difficulté affichée sur les barres de chansons.",
+          "de": "Wechselt die auf den Songleisten angezeigte Schwierigkeit.",
+          "es": "Cambia la dificultad mostrada en las barras de canciones.",
+          "ko": "곡 바에 표시되는 난이도를 순환합니다.",
+          "zh": "切换歌曲条上显示的难度。"
+        }
+      },
+      "default": "F7"
     },
-    "description": {
-      "strings": {
-        "default": "Toggles auto play for player 2.",
-        "ja": "2P のオートプレイを切り替えます。",
-        "fr": "Active ou désactive le jeu automatique du joueur 2.",
-        "de": "Schaltet das automatische Spiel für Spieler 2 um.",
-        "es": "Activa o desactiva el juego automático del jugador 2.",
-        "ko": "2P의 오토 플레이를 전환합니다.",
-        "zh": "切换玩家 2 的自动演奏。"
-      }
+    {
+      "id": "songselect_key_speed_down",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: slower",
+          "ja": "選曲: 曲速ダウン",
+          "fr": "Sélection : plus lent",
+          "de": "Songauswahl: langsamer",
+          "es": "Selección: más lento",
+          "ko": "곡 선택: 느리게",
+          "zh": "选曲：减速"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Lowers the song speed.",
+          "ja": "曲の速度を下げます。",
+          "fr": "Réduit la vitesse de la chanson.",
+          "de": "Verringert die Songgeschwindigkeit.",
+          "es": "Reduce la velocidad de la canción.",
+          "ko": "곡 속도를 낮춥니다.",
+          "zh": "降低歌曲速度。"
+        }
+      },
+      "default": "PageDown"
     },
-    "default": "F4"
-  },
-  {
-    "id": "songselect_key_player_count",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: player count",
-        "ja": "選曲: プレイ人数",
-        "fr": "Sélection : nombre de joueurs",
-        "de": "Songauswahl: Spielerzahl",
-        "es": "Selección: número de jugadores",
-        "ko": "곡 선택: 플레이어 수",
-        "zh": "选曲：玩家人数"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Changes the number of players.",
-        "ja": "プレイ人数を変更します。",
-        "fr": "Change le nombre de joueurs.",
-        "de": "Ändert die Spielerzahl.",
-        "es": "Cambia el número de jugadores.",
-        "ko": "플레이어 수를 변경합니다.",
-        "zh": "更改玩家人数。"
-      }
-    },
-    "default": "F5"
-  },
-  {
-    "id": "songselect_key_player",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: set-up player",
-        "ja": "選曲: 設定するプレイヤー",
-        "fr": "Sélection : joueur configuré",
-        "de": "Songauswahl: eingestellter Spieler",
-        "es": "Selección: jugador configurado",
-        "ko": "곡 선택: 설정 중인 플레이어",
-        "zh": "选曲：设置中的玩家"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Switches which player the song select is setting up.",
-        "ja": "選曲画面で設定するプレイヤーを切り替えます。",
-        "fr": "Change le joueur que la sélection configure.",
-        "de": "Wechselt den Spieler, den die Songauswahl einstellt.",
-        "es": "Cambia el jugador que configura la selección.",
-        "ko": "곡 선택에서 설정하는 플레이어를 전환합니다.",
-        "zh": "切换选曲界面正在设置的玩家。"
-      }
-    },
-    "default": "F6"
-  },
-  {
-    "id": "songselect_key_course",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: displayed difficulty",
-        "ja": "選曲: 表示する難易度",
-        "fr": "Sélection : difficulté affichée",
-        "de": "Songauswahl: angezeigte Schwierigkeit",
-        "es": "Selección: dificultad mostrada",
-        "ko": "곡 선택: 표시 난이도",
-        "zh": "选曲：显示的难度"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Cycles the difficulty shown on the song bars.",
-        "ja": "曲バーに表示する難易度を切り替えます。",
-        "fr": "Change la difficulté affichée sur les barres de chansons.",
-        "de": "Wechselt die auf den Songleisten angezeigte Schwierigkeit.",
-        "es": "Cambia la dificultad mostrada en las barras de canciones.",
-        "ko": "곡 바에 표시되는 난이도를 순환합니다.",
-        "zh": "切换歌曲条上显示的难度。"
-      }
-    },
-    "default": "F7"
-  },
-  {
-    "id": "songselect_key_speed_down",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: slower",
-        "ja": "選曲: 曲速ダウン",
-        "fr": "Sélection : plus lent",
-        "de": "Songauswahl: langsamer",
-        "es": "Selección: más lento",
-        "ko": "곡 선택: 느리게",
-        "zh": "选曲：减速"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Lowers the song speed.",
-        "ja": "曲の速度を下げます。",
-        "fr": "Réduit la vitesse de la chanson.",
-        "de": "Verringert die Songgeschwindigkeit.",
-        "es": "Reduce la velocidad de la canción.",
-        "ko": "곡 속도를 낮춥니다.",
-        "zh": "降低歌曲速度。"
-      }
-    },
-    "default": "PageDown"
-  },
-  {
-    "id": "songselect_key_speed_up",
-    "type": "key",
-    "scope": "global",
-    "section": {
-      "strings": {
-        "default": "Inputs",
-        "ja": "入力",
-        "fr": "Entrées",
-        "de": "Eingaben",
-        "es": "Entradas",
-        "ko": "입력",
-        "zh": "输入"
-      }
-    },
-    "label": {
-      "strings": {
-        "default": "Song select: faster",
-        "ja": "選曲: 曲速アップ",
-        "fr": "Sélection : plus rapide",
-        "de": "Songauswahl: schneller",
-        "es": "Selección: más rápido",
-        "ko": "곡 선택: 빠르게",
-        "zh": "选曲：加速"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Raises the song speed.",
-        "ja": "曲の速度を上げます。",
-        "fr": "Augmente la vitesse de la chanson.",
-        "de": "Erhöht die Songgeschwindigkeit.",
-        "es": "Aumenta la velocidad de la canción.",
-        "ko": "곡 속도를 높입니다.",
-        "zh": "提高歌曲速度。"
-      }
-    },
-    "default": "PageUp"
-  }
-]
+    {
+      "id": "songselect_key_speed_up",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Song select: faster",
+          "ja": "選曲: 曲速アップ",
+          "fr": "Sélection : plus rapide",
+          "de": "Songauswahl: schneller",
+          "es": "Selección: más rápido",
+          "ko": "곡 선택: 빠르게",
+          "zh": "选曲：加速"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Raises the song speed.",
+          "ja": "曲の速度を上げます。",
+          "fr": "Augmente la vitesse de la chanson.",
+          "de": "Erhöht die Songgeschwindigkeit.",
+          "es": "Aumenta la velocidad de la canción.",
+          "ko": "곡 속도를 높입니다.",
+          "zh": "提高歌曲速度。"
+        }
+      },
+      "default": "PageUp"
+    }
+  ]
+}

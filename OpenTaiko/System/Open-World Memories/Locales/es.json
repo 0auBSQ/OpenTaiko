@@ -22,6 +22,12 @@
         "DANSELECT_STANDARD_DESC": "¡Demuestra tu nivel con la selección del dojo!",
         "DANSELECT_PAGODA_DESC": "¡Supera varios danes aleatorios seguidos!",
         "DANSELECT_EXIT": "Salir",
+        "DANSELECT_CONFIRM": "¿Aceptas el desafío?",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "Partidas restantes: %d",
+        "EVENT_THANKS": "¡Gracias por jugar!",
+        "EVENT_THANKS_SUB": "¡Hasta la próxima!",
 
         "SETTINGS_UI_KEYS": "Entrada",
         "SETTINGS_UI_EXIT": "Volver",

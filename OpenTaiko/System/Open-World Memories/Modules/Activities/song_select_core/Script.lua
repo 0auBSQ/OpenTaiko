@@ -17,6 +17,7 @@ local Sort    = require("sort")
 local Nav     = require("navigation")
 local Diff    = require("diffselect")
 local Replay  = require("replaylist")
+local EM      = require("EventMode")
 local DrawSS  = require("draw_songselect")
 local CFG     = require("sscore_config")
 local NavInput = require("NavInput")
@@ -240,6 +241,12 @@ G.mouseAllowed = function()
     if not G.themeFlag("songselect_mouse") then return false end
     return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true
 end
+-- Event Mode: the countdown to a forced choice (song select, then difficulty select), the plays left,
+-- and whether this visit ends the session (the thank-you screen follows the last allowed play)
+G.event = EM
+G.eventTimer = nil
+G.eventOver = false
+G.playedSinceLastVisit = false
 Featured.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
@@ -396,6 +403,20 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     SC.reload()   -- the bindings can change in the settings between visits
     G.reloadThemeFlags()
 
+    -- Event Mode: a play just ended counts, resets every player's mods, and may end the session; a
+    -- visit that goes on gets a fresh countdown
+    G.eventOver = false
+    G.eventTimer = nil
+    G.eventExpired = false
+    if EM.on() then
+        if G.playedSinceLastVisit then
+            EM.resetMods()
+            if EM.registerPlay("song") then G.eventOver = true end
+        end
+        if not G.eventOver and EM.selectSeconds() > 0 then G.eventTimer = EM.newTimer(EM.selectSeconds()) end
+    end
+    G.playedSinceLastVisit = false
+
     -- localized overlays for the current language (it can change between visits); freed in deactivate()
     for key, default in pairs(OVERLAY_FILES) do
         if G.bgtx[key] ~= nil then G.bgtx[key]:Dispose() end
@@ -461,6 +482,7 @@ function deactivate()
     if G.activeConfig.mountAISlotToP2 and G.lastSignal ~= "play" then
         VIRTUALSLOTS:MountSlot(2, "2P")
     end
+    G.playedSinceLastVisit = (G.lastSignal == "play")   -- the next activate is the return from that play
     G.lastSignal = nil
     SC.dispose()
 
@@ -524,6 +546,7 @@ local function drawWaitScreen(msg)
 end
 
 function draw(mode)
+    if G.eventOver then return end   -- leaving for the thank-you screen: nothing under the fade
     -- Loading / no-songs guard: black screen with status message.
     if IsSongsEnumerating() then
         drawWaitScreen("Loading songs, please wait...")
@@ -546,6 +569,10 @@ function draw(mode)
         if at.IsActive then at:Draw() end
     end
     SC.draw()
+    if EM.on() then
+        local secs = G.eventTimer ~= nil and G.eventTimer:seconds() or nil
+        EM.drawHud(secs, EM.playsLeft("song"))
+    end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -554,6 +581,24 @@ function update(ts)
     G.nowMs = ts                                   -- the frame clock for draw-side animations (song speed arrows)
     for _, c in pairs(G.ctx) do c:Tick() end
     BG.update()
+
+    -- the session's last play is done: the stage takes the player to the thank-you screen
+    if G.eventOver then return "thanks" end
+
+    -- the Event Mode countdown runs whatever is open; when it ends, any dialog in the way closes and the
+    -- screen's input handler makes the choice (the flag waits for it through a folder animation)
+    if G.eventTimer ~= nil then
+        local dtms = 1000 / 60
+        if ts ~= nil and G.eventPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.eventPrevTs)) end
+        if G.eventTimer:update(dtms / 1000) then
+            G.eventExpired = true
+            for _, at in pairs(G.act_inner) do
+                if at.IsActive then pcall(function() at:Deactivate() end) end
+            end
+            if SC.isOpen() then SC.close() end
+        end
+    end
+    G.eventPrevTs = ts
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
     if IsSongsEnumerating() or G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then

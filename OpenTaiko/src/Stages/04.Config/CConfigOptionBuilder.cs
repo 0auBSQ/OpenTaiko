@@ -325,7 +325,8 @@ public static class CConfigOptionBuilder {
 		var sections = new List<string>();
 		var bySection = new Dictionary<string, List<CThemeSettingDef>>();
 		foreach (var def in db.Definitions) {
-			string sec = def.Section?.GetString("") ?? "";
+			if (def.Hidden) continue;   // read and written by the skin itself
+			string sec = db.SectionLabel(def);
 			if (string.IsNullOrWhiteSpace(sec)) sec = secThemeSettings;
 			if (!bySection.TryGetValue(sec, out var list)) { list = new List<CThemeSettingDef>(); bySection[sec] = list; sections.Add(sec); }
 			list.Add(def);
@@ -360,7 +361,7 @@ public static class CConfigOptionBuilder {
 					break;
 				case "int":
 					O.Add(CLuaConfigOption.Int_("Theme", secThemeSettings_, label, desc,
-						int.TryParse(stored, out int iv) ? iv : def.DefaultInt, (int)def.Min, (int)def.Max, 1,
+						int.TryParse(stored, out int iv) ? iv : def.DefaultInt, (int)def.Min, (int)def.Max, Math.Max(1, def.Step),
 						v => Persist(def, v.ToString())));
 					break;
 				case "double": {

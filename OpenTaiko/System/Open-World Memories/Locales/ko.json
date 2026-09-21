@@ -22,6 +22,12 @@
         "DANSELECT_STANDARD_DESC": "도장이 고른 과제로 실력을 증명하세요!",
         "DANSELECT_PAGODA_DESC": "무작위 단위를 연속으로 돌파하세요!",
         "DANSELECT_EXIT": "나가기",
+        "DANSELECT_CONFIRM": "도전하시겠습니까?",
+
+        // Event mode: the plays-left line of the clock and the thank-you screen
+        "EVENT_PLAYS_LEFT": "남은 플레이: %d",
+        "EVENT_THANKS": "플레이해 주셔서 감사합니다!",
+        "EVENT_THANKS_SUB": "다음에 또 만나요!",
 
         "SETTINGS_UI_KEYS": "입력 설정",
         "SETTINGS_UI_EXIT": "뒤로",

@@ -123,7 +123,7 @@ AIBattleCharacter=10v2 - AItritus
 - `Fonts/`: `FontName` キーで参照される `.ttf` ファイル。
 - `Locales/`: 言語ごとに 1 つの JSON ファイル (`en.json`、`ja.json`、...) で、形式は `{ "Entries": { "KEY": "text" } }`。これらの文字列はスキン自身の設定のラベルとなり、Lua は `THEME:GetSkinString(key)` を通じてこれらを読み取ります。アクティブな言語にキーがない場合、ゲームは `DefaultLocale` のファイルからそれを検索します。
 - `Modules/`: Lua モジュールツリー (ステップ 8)。
-- `ThemeSettings.json`: オプション画面がテーマ設定の下に表示する設定の配列。各エントリは `id`、`type` (`bool`、`int`、`double`、`string`、`enum`、または `key`: オプション画面が取り込むキーボードのキー 1 つで、`INPUT:KeyboardPressed` 用の名前として保存されます)、`scope` (既定の `global`、またはセーブファイルごとに 1 つの値を持つ `save`)、ローカライズされた `label` と `description`、`default`、そして型に応じて `min`/`max` または `options` を持ちます。 任意のローカライズ済み `section` を指定すると、テーマページでその小見出しの下に設定がまとめられます。指定のない設定は既定の見出しの下に並びます。
+- `ThemeSettings.json`: オプション画面がテーマ設定の下に表示する設定の配列。各エントリは `id`、`type` (`bool`、`int`、`double`、`string`、`enum`、または `key`: オプション画面が取り込むキーボードのキー 1 つで、`INPUT:KeyboardPressed` 用の名前として保存されます)、`scope` (既定の `global`、またはセーブファイルごとに 1 つの値を持つ `save`)、ローカライズされた `label` と `description`、`default`、そして型に応じて `min`/`max` または `options` を持ちます。 ファイルは代わりに `sections` (id からローカライズ済み見出しへ、一度だけ宣言) と `settings` (配列) を持つオブジェクトにもできます。エントリの任意の `section` はその id のひとつ、または見出しの文字列そのもので、テーマページでその小見出しの下にまとめられます。 `session: true` は値をメモリにだけ保持し (起動のたびに既定値に戻ります)、`hidden: true` は設定メニューに載せずスキン自身が読み書きし、`step` は int の増分を決めます。
 - `SkinConfig.ini` とインクルードされる `*Config.ini` ファイル。
 - `README.txt`、`LICENSE.md`、`Licenses/`: 帰属表示のファイル。ゲームは読み取りません。
 

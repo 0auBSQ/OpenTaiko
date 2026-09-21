@@ -61,7 +61,14 @@ end
 
 M.keys = {}      -- id -> key name ("" = unbound)
 
+-- Event Mode leaves these out: no auto play, no favorites; sort and search stay
+local EVENT_DISABLED = { favorite = true, favorites_folder = true, auto_p1 = true, auto_p2 = true }
+
 function M.init(g) G = g end
+
+local function disabled(id)
+    return EVENT_DISABLED[id] == true and G ~= nil and G.event ~= nil and G.event.on()
+end
 
 -- read every binding from the theme settings (a missing definition keeps the default)
 function M.reload()
@@ -72,6 +79,7 @@ function M.reload()
 end
 
 function M.pressed(id)
+    if disabled(id) then return false end
     local k = M.keys[id]
     if k == nil or k == "" then return false end
     return INPUT:KeyboardPressed(k)
@@ -121,7 +129,7 @@ local justOpened = false
 local function buildPanel()
     lines = {}
     for _, d in ipairs(DEFS) do
-        lines[#lines + 1] = { key = M.label(d.id), text = tr(d.text, d.id) }
+        if not disabled(d.id) then lines[#lines + 1] = { key = M.label(d.id), text = tr(d.text, d.id) } end
     end
     panel.h = HEAD_H + #lines * ROW_H + FOOT_H
     panel.x = math.floor((SW - panel.w) / 2)
@@ -154,6 +162,7 @@ local function close()
     if ui ~= nil then ui:disposeWidgets(); ui = nil end
     G.sounds.Cancel:Play()
 end
+M.close = close
 
 -- runs instead of the song select input while the panel is up
 function M.update(ts)

@@ -428,6 +428,21 @@ end
 -- Returns "cancel", or nil.  Sets G.selectedSongNode and starts screen_transition
 -- when a song is chosen.
 
+-- Event Mode, the countdown over: the hovered song, else a random song of the current box, else a
+-- random song of the whole library
+local function forcedChoice()
+    local ssn = G.songList:GetSelectedSongNode()
+    if ssn ~= nil and ssn.IsSong and not ssn.IsLocked and (G.unlocks == nil or not G.unlocks.isVaultLocked(ssn)) then return ssn end
+    local pred = function(node) return G.unlocks == nil or not G.unlocks.isVaultLocked(node) end
+    local pick = nil
+    if ssn ~= nil then pick = G.songList:GetRandomNodeInFolder(ssn, true, pred) end
+    if pick == nil then
+        local root = G.songList:GetRoot()
+        if root ~= nil and (root.ChildrenCount or 0) > 0 then pick = G.songList:GetRandomNodeInFolder(root:Child(0), true, pred) end
+    end
+    return pick
+end
+
 function M.handleSongSelectInput(Sort, Diff)
     G.selectedSongNode = nil
 
@@ -435,6 +450,13 @@ function M.handleSongSelectInput(Sort, Diff)
     if G.folderAnim ~= nil then return nil end
 
     local SC = G.shortcuts
+
+    if G.eventExpired then
+        G.eventExpired = false
+        stopHold()
+        G.selectedSongNode = forcedChoice()
+        if G.selectedSongNode == nil then return nil end
+    end
 
     -- the shortcuts panel
     if SC.pressed("help") then
@@ -455,7 +477,7 @@ function M.handleSongSelectInput(Sort, Diff)
         G.highlightedPlayer = (G.highlightedPlayer + 1) % CONFIG.PlayerCount
         if G.highlightedPlayer ~= prev then Sort.applySort(); M.refreshPage(true) end
     end
-    if not G.activeConfig.songOnly then   -- online lobby (songOnly): Auto cannot be toggled in song select
+    if not G.activeConfig.songOnly and not G.event.on() then   -- online lobby (songOnly) and Event Mode: no Auto toggle
         for p = 1, math.min(2, CONFIG.PlayerCount), 1 do
             local isAI = (G.activeConfig.mountAISlotToP2 and p == 2)
             if not isAI and SC.pressed("auto_p" .. p) then
@@ -511,12 +533,16 @@ function M.handleSongSelectInput(Sort, Diff)
         doMove(1); startHold(1)
     elseif navPn.left() and G.songList ~= nil then
         doMove(-1); startHold(-1)
+    elseif G.selectedSongNode ~= nil then
+        -- the countdown chose above
     elseif navPn.decide() or clickDecide then
         stopHold()
         G.selectedSongNode = handleDecideSongSelect(Sort)
     elseif navPn.cancel() then
         stopHold()
         if not startCloseAnim(Sort) then
+            -- Event Mode keeps the player here unless the plays are unlimited
+            if not G.event.canLeave() then G.sounds.Error:Play(); return nil end
             G.sounds.Cancel:Play()
             return "cancel"
         end
@@ -585,6 +611,14 @@ function M.handleSongSelectInput(Sort, Diff)
         G.activeScreen   = "transition"
         G.diffIndex      = {0, 0, 0, 0, 0}
         G.diffSelected   = {false, false, false, false, false}
+        -- Event Mode: the difficulty choice gets its own, shorter countdown; the cursor starts on the
+        -- first difficulty since the back and customize bars are out of reach
+        if G.eventTimer ~= nil then
+            G.eventTimer:restart(G.event.DIFF_SECONDS)
+            for i = 1, 5 do G.diffIndex[i] = 3 end
+        elseif G.event.on() then
+            for i = 1, 5 do G.diffIndex[i] = 3 end
+        end
         G.startCounter("screen_transition", 0, 1920, 0.5/1920, "none", Diff.updateTransitionVisuals, function()
             G.activeScreen = "difficultyselect"
         end)

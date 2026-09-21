@@ -24,6 +24,27 @@ namespace OpenTaiko {
 			return OpenTaiko.Databases?.DBThemeSettings?.GetSettingForSave(settingId, saveId) ?? "";
 		}
 
+		/// <summary>
+		/// Writes a global theme setting declared in ThemeSettings.json (a session setting is only remembered
+		/// for this run). Returns false for an unknown id.
+		/// </summary>
+		public bool SetThemeSetting(string settingId, string value) {
+			var db = OpenTaiko.Databases?.DBThemeSettings;
+			if (db == null || !db.Definitions.Any(d => d.Id == settingId)) return false;
+			db.SetSetting(settingId, value ?? "");
+			return true;
+		}
+
+		/// <summary>Writes a save-scoped theme setting for the 1-based player. Returns false for an unknown id.</summary>
+		public bool SetThemeSettingForPlayer(string settingId, int player, string value) {
+			var db = OpenTaiko.Databases?.DBThemeSettings;
+			if (db == null || !db.Definitions.Any(d => d.Id == settingId)) return false;
+			int slot = Math.Max(0, Math.Min(player - 1, OpenTaiko.SaveFileInstances.Length - 1));
+			long saveId = OpenTaiko.SaveFileInstances[slot]?.data?.SaveId ?? 0L;
+			db.SetSettingForSave(settingId, saveId, value ?? "");
+			return true;
+		}
+
 		// ── Skin-scoped localization ──────────────────────────────────────────────
 
 		/// <summary>
