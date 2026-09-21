@@ -58,8 +58,17 @@ namespace OpenTaikoTests {
 			using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(CasesDir, name + ".json")));
 			var root = doc.RootElement;
 			string tjaName = root.TryGetProperty("tja", out var t) ? t.GetString() : name + ".tja";
-			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
 			bool loadChart = !root.TryGetProperty("loadChart", out var lc) || lc.GetBoolean();
+			if (root.TryGetProperty("cases", out var cases)) { // grouped case for testing multiple difficulties or player-sides
+				foreach (var (expect, i) in cases.EnumerateArray().Select((v, i) => (v, i)))
+					SimpleCase($"{name}#{i + 1}", tjaName, loadChart, expect);
+			} else {
+				SimpleCase(name, tjaName, loadChart, root);
+			}
+		}
+
+		private static void SimpleCase(string name, string tjaName, bool loadChart, JsonElement root) {
+			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
 
 			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
