@@ -4446,10 +4446,8 @@ internal class CTja : CActivity {
 					}
 
 					#region [ 発音終了2秒後にmixerから削除するが、その前に再発音することになるのかを確認(再発音ならmixer削除タイミングを延期) ]
-					int nIntValue = pChip.nIntValue;
-					int index = listRemoveTiming.FindIndex(
-						delegate (CChip cchip) { return cchip.nIntValue == nIntValue; }
-					);
+					int argInt = pChip.nIntValue_InternalNumber;
+					int index = listRemoveTiming.FindIndex(cchip => cchip.nIntValue_InternalNumber == argInt);
 					if (index >= 0)                                                 // 過去に同じチップで発音中のものが見つかった場合
 					{                                                                   // 過去の発音のmixer削除を確定させるか、延期するかの2択。
 						var msOldRemoveMixerTime = listRemoveTiming[index].dbSoundTimems;
