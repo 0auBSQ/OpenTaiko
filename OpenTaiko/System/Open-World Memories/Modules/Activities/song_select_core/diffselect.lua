@@ -339,7 +339,7 @@ end
 local function optionShown(o)
     if G.event == nil or not G.event.on() then return true end
     if o == 2 then return false end
-    if o == 0 then return G.eventTimer == nil end
+    if o == 0 then return not G.eventCountdown end
     return true
 end
 

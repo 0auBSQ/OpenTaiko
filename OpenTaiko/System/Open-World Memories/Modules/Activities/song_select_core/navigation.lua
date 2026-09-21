@@ -613,10 +613,8 @@ function M.handleSongSelectInput(Sort, Diff)
         G.diffSelected   = {false, false, false, false, false}
         -- Event Mode: the difficulty choice gets its own, shorter countdown; the cursor starts on the
         -- first difficulty since the back and customize bars are out of reach
-        if G.eventTimer ~= nil then
-            G.eventTimer:restart(G.event.DIFF_SECONDS)
-            for i = 1, 5 do G.diffIndex[i] = 3 end
-        elseif G.event.on() then
+        if G.eventCountdown and G.eventTimer ~= nil then G.eventTimer:Call("restart", G.event.DIFF_SECONDS) end
+        if G.event.on() then
             for i = 1, 5 do G.diffIndex[i] = 3 end
         end
         G.startCounter("screen_transition", 0, 1920, 0.5/1920, "none", Diff.updateTransitionVisuals, function()

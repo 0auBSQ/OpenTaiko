@@ -83,10 +83,19 @@ local out_target = nil           -- "standard" | "pagoda" | "title", acted on on
 local exiting     = false
 local dan_bgm_vol = 100.0
 
--- Event Mode: the countdown to the title while a dan is being chosen, and whether the one allowed dan
--- play is done (the thank-you screen follows)
+-- Event Mode: the countdown to the title while a dan is being chosen (the event_timer ROActivity, with
+-- the plays-left hud), and whether the one allowed dan play is done (the thank-you screen follows)
 local event_timer = nil
 local event_over  = false
+
+local function startEventTimer()
+    event_timer = ROACTIVITY:GetROActivity("event_timer")
+    if event_timer ~= nil then event_timer:Activate(EM.selectSeconds(), "dan") end
+end
+
+local function stopEventTimer()
+    if event_timer ~= nil and event_timer.IsActive then event_timer:Deactivate() end
+end
 
 -- ── Textures / sounds ─────────────────────────────────────────────────────────
 
@@ -294,10 +303,10 @@ function activate()
         state = "standard_dan"
         standard_dan.enter(CB, true)
         startBGM()
-        if EM.on() and EM.selectSeconds() > 0 then event_timer = EM.newTimer(EM.selectSeconds()) end
+        if EM.on() then startEventTimer() end
         return
     end
-    if EM.on() and EM.selectSeconds() > 0 then event_timer = EM.newTimer(EM.selectSeconds()) end
+    if EM.on() then startEventTimer() end
 
     -- ── Enter the menu directly ───────────────────────────────────────────────
     -- The dojo doors are the dan_doors transition (played by _title on entry). Event Mode without the
@@ -318,6 +327,7 @@ end
 function deactivate()
     active = false
     stopBGM()
+    stopEventTimer()
 
     -- Deactivate the active sub-module (if any)
     if state == "standard_dan" then
@@ -399,8 +409,8 @@ function update()
     end
 
     -- the Event Mode countdown: while a dan is still being chosen, running out sends the player to the title
-    if event_timer ~= nil and (state == "menu" or state == "menu_out" or state == "standard_dan") then
-        if event_timer:update(dt) then
+    if event_timer ~= nil and event_timer.IsActive and (state == "menu" or state == "menu_out" or state == "standard_dan") then
+        if EM.signal(event_timer:Update()) == "expired" then
             if state == "standard_dan" then standard_dan.leave() end
             exiting, state = true, "leaving"
             return Exit("title", nil, "dan_doors")
@@ -432,7 +442,7 @@ function update()
             _load_menu_chara()
         elseif result == "play" then
             -- standard_dan already called stopBGM() and set _in_play = true
-            event_timer = nil
+            stopEventTimer()
             return Exit("play", nil)
         end
         return
@@ -570,7 +580,7 @@ function draw()
     -- ── Sub-module draw (standard_dan) ─────────────────────────────────────────
     if state == "standard_dan" then
         standard_dan.draw()
-        if EM.on() then EM.drawHud(event_timer ~= nil and event_timer:seconds() or nil, EM.playsLeft("dan")) end
+        if event_timer ~= nil and event_timer.IsActive then event_timer:Draw() end
         return
     end
 
@@ -582,7 +592,5 @@ function draw()
         CB.drawPlayerChara(NP_X + 140, NP_Y - 6,            1.0)
         CB.drawPlayerPuchi(NP_X + 220, NP_Y + CB.puchiSineY, 1.0, CB.puchiIdxFrame)
     end
-    if EM.on() and state ~= "leaving" then
-        EM.drawHud(event_timer ~= nil and event_timer:seconds() or nil, EM.playsLeft("dan"))
-    end
+    if event_timer ~= nil and event_timer.IsActive and state ~= "leaving" then event_timer:Draw() end
 end

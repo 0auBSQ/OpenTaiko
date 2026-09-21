@@ -241,10 +241,12 @@ G.mouseAllowed = function()
     if not G.themeFlag("songselect_mouse") then return false end
     return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true
 end
--- Event Mode: the countdown to a forced choice (song select, then difficulty select), the plays left,
--- and whether this visit ends the session (the thank-you screen follows the last allowed play)
+-- Event Mode: the countdown to a forced choice (song select, then difficulty select) and its hud are the
+-- event_timer ROActivity; G.eventCountdown says whether one is running this visit (the difficulty select
+-- then hides its back bar); G.eventOver = this visit ends the session (the thank-you screen follows)
 G.event = EM
 G.eventTimer = nil
+G.eventCountdown = false
 G.eventOver = false
 G.playedSinceLastVisit = false
 Featured.init(G)
@@ -404,16 +406,20 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     G.reloadThemeFlags()
 
     -- Event Mode: a play just ended counts, resets every player's mods, and may end the session; a
-    -- visit that goes on gets a fresh countdown
+    -- visit that goes on gets the countdown hud
     G.eventOver = false
-    G.eventTimer = nil
+    G.eventCountdown = false
     G.eventExpired = false
+    G.eventTimer = ROACTIVITY:GetROActivity("event_timer")
     if EM.on() then
         if G.playedSinceLastVisit then
             EM.resetMods()
             if EM.registerPlay("song") then G.eventOver = true end
         end
-        if not G.eventOver and EM.selectSeconds() > 0 then G.eventTimer = EM.newTimer(EM.selectSeconds()) end
+        if not G.eventOver and G.eventTimer ~= nil then
+            G.eventCountdown = EM.selectSeconds() > 0
+            G.eventTimer:Activate(EM.selectSeconds(), "song")
+        end
     end
     G.playedSinceLastVisit = false
 
@@ -484,6 +490,7 @@ function deactivate()
     end
     G.playedSinceLastVisit = (G.lastSignal == "play")   -- the next activate is the return from that play
     G.lastSignal = nil
+    if G.eventTimer ~= nil and G.eventTimer.IsActive then G.eventTimer:Deactivate() end
     SC.dispose()
 
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
@@ -569,10 +576,7 @@ function draw(mode)
         if at.IsActive then at:Draw() end
     end
     SC.draw()
-    if EM.on() then
-        local secs = G.eventTimer ~= nil and G.eventTimer:seconds() or nil
-        EM.drawHud(secs, EM.playsLeft("song"))
-    end
+    if G.eventTimer ~= nil and G.eventTimer.IsActive then G.eventTimer:Draw() end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -587,10 +591,8 @@ function update(ts)
 
     -- the Event Mode countdown runs whatever is open; when it ends, any dialog in the way closes and the
     -- screen's input handler makes the choice (the flag waits for it through a folder animation)
-    if G.eventTimer ~= nil then
-        local dtms = 1000 / 60
-        if ts ~= nil and G.eventPrevTs ~= nil then dtms = math.max(0, math.min(100, ts - G.eventPrevTs)) end
-        if G.eventTimer:update(dtms / 1000) then
+    if G.eventTimer ~= nil and G.eventTimer.IsActive then
+        if EM.signal(G.eventTimer:Update()) == "expired" then
             G.eventExpired = true
             for _, at in pairs(G.act_inner) do
                 if at.IsActive then pcall(function() at:Deactivate() end) end
@@ -598,7 +600,6 @@ function update(ts)
             if SC.isOpen() then SC.close() end
         end
     end
-    G.eventPrevTs = ts
 
     -- While songs are loading or unavailable, only allow Cancel/Escape to exit.
     if IsSongsEnumerating() or G.songList == nil or G.songList:GetSongNodeAtOffset(0) == nil then

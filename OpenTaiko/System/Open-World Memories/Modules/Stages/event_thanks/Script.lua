@@ -122,5 +122,4 @@ function onDestroy()
     for _, cv in ipairs({ fill, piece }) do if cv ~= nil then pcall(function() cv:Dispose() end) end end
     for _, f in ipairs({ gfontTitle, gfontSub }) do if f ~= nil then pcall(function() f:Dispose() end) end end
     if snd ~= nil then pcall(function() snd:Dispose() end) end
-    EM.dispose()
 end
