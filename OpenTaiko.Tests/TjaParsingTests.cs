@@ -106,6 +106,16 @@ namespace OpenTaikoTests {
 					Assert.True(Math.Abs(want[i] - gaps[i]) <= tol,
 						$"{name}: gap {i} expected {want[i]}±{tol}ms, got {gaps[i]}ms");
 			}
+
+			if (exp.TryGetProperty($"popCounts", out v)) {
+				var popcounts = GenericBalloonPopCount(tja);
+				var want = v.EnumerateArray().Select(x => x.GetInt32()).ToList();
+				Assert.True(want.Count == popcounts.Count,
+					$"{name}: expected {want.Count} pop counts, got {popcounts.Count} [{string.Join(", ", popcounts)}]");
+				for (int i = 0; i < want.Count; ++i)
+					Assert.True(want[i] == popcounts[i],
+						$"{name}: popcount {i} expected {want[i]} hits, got {popcounts[i]} hits");
+			}
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
@@ -126,6 +136,14 @@ namespace OpenTaikoTests {
 		private static List<int> NoteTimes(CTja tja)
 			=> tja.listChip.Where(c => c.nChannelNo >= 0x11 && c.nChannelNo <= 0x14)
 				.Select(c => c.nSoundTimems).ToList();
+
+		// listNoteChip[] order (the definition order), includes branches in their definition order as in TJA
+		// (or listChip[] sorted by CChip.idxDefine in case listNoteChip[] has different order in the future)
+		private static List<int> GenericBalloonPopCount(CTja tja)
+			=> tja.listNoteChip
+				.Where(c => NotesManager.IsGenericBalloon(c))
+				.Select(c => c.nBalloon)
+				.ToList();
 	}
 
 	[CollectionDefinition("tja", DisableParallelization = true)]
