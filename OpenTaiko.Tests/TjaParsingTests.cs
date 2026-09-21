@@ -69,8 +69,11 @@ namespace OpenTaikoTests {
 
 		private static void SimpleCase(string name, string tjaName, bool loadChart, JsonElement root) {
 			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
+			int playerCount = root.TryGetProperty("playerCount", out var pc) ? pc.GetInt32() : 1;
+			int playerSide = root.TryGetProperty("playerSide", out var ps) ? ps.GetInt32() : 0;
 
-			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, loadChart);
+			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = playerCount;
+			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
 
 			if (!root.TryGetProperty("expect", out var exp)) return;
@@ -106,7 +109,7 @@ namespace OpenTaikoTests {
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
-		private static CTja Parse(string tjaPath, Difficulty difficulty, bool loadChart) {
+		private static CTja Parse(string tjaPath, Difficulty difficulty, int playerSide, bool loadChart) {
 			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(dir);
 			try {
@@ -114,7 +117,7 @@ namespace OpenTaikoTests {
 				File.Copy(tjaPath, p);
 				var tja = new CTja();
 				tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
-				tja.tInput(p, difficulty, 0, loadChart, 0);
+				tja.tInput(p, difficulty, playerSide, loadChart, 0);
 				return tja;
 			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}
