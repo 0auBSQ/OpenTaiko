@@ -19,6 +19,12 @@
         "PAGODA_LEAVE_CONFIRM":  "Weet je het zeker? Je voortgang gaat verloren als je weggaat",
         "PAGODA_EXIT":      "Afsluiten",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Standaard dan-uitdaging",
+        "DANSELECT_STANDARD_DESC": "Bewijs je kunnen met de selectie van de dojo!",
+        "DANSELECT_PAGODA_DESC": "Doorloop meerdere willekeurige dans achter elkaar!",
+        "DANSELECT_EXIT": "Afsluiten",
+
         "SETTINGS_UI_KEYS": "Besturing",
         "SETTINGS_UI_EXIT": "Afsluiten",
         "SETTINGS_UI_BACK": "< Terug",

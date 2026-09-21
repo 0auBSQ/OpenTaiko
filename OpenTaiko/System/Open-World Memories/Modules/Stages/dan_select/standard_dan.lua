@@ -11,9 +11,11 @@ local TX  = "Textures/"
 
 local DIFF_DAN = 6
 
-local PAGE_BEFORE = 6
-local PAGE_AFTER  = 7
-local PAGE_SIZE   = PAGE_BEFORE + 1 + PAGE_AFTER  -- 14
+-- one bar more than the screen holds at each end: the bar that slides in on a scroll is already
+-- there, just past the edge, instead of appearing at it
+local PAGE_BEFORE = 7
+local PAGE_AFTER  = 8
+local PAGE_SIZE   = PAGE_BEFORE + 1 + PAGE_AFTER  -- 16
 
 local BAR_SEL_X   = 1636
 local BAR_SEL_Y   = 458
@@ -70,6 +72,7 @@ local modicons_ro      = nil
 local act              = {}
 local act_was_active   = {}
 local snd_move         = nil
+local snd_tick         = nil       -- Sounds/tick.ogg: a wooden tok for each bar as the list builds up
 
 local font_bar_title   = nil
 local font_hdr_title   = nil
@@ -225,7 +228,10 @@ local function _draw_content(node, y_offset)
     tx_content:DrawAtAnchor(CONTENT_X, CONTENT_Y + (y_offset or 0), "topleft")
 end
 
-local function _load_resources()
+-- the assets stay loaded with the skin (M.init at the stage's onStart, freed in M.destroy), so entering
+-- the list costs nothing but the per-entry setup below: nothing to decode or upload on the way in
+function M.init()
+    if tx_header ~= nil then return end
     tx_header        = TEXTURE:CreateTexture(TX .. "Header.png")
     tx_content       = TEXTURE:CreateTexture(TX .. "Contents.png")
     tx_confirm_bg    = TEXTURE:CreateTexture(TX .. "Confirm/BgTile.png")
@@ -240,6 +246,30 @@ local function _load_resources()
     tx_bars["Folder"] = TEXTURE:CreateTexture(TX .. "SideBars/Folder.png")
     tx_bars["Select"] = TEXTURE:CreateTexture(TX .. "SideBars/Select.png")
 
+    local ok, s = pcall(function() return SOUND:CreateSFX("Sounds/tick.ogg") end)
+    if ok then snd_tick = s end
+
+    font_bar_title = TEXT:Create(TITLE_FONT_SIZE, "regular")
+    font_hdr_title = TEXT:Create(HDR_TITLE_FONT,  "regular")
+    font_hdr_sub   = TEXT:Create(HDR_SUB_FONT,    "regular")
+
+    ContentsDrawer.load()
+end
+
+-- the dan folder's song list, built when enumeration finishes so the first entry has it ready
+local function _build_song_list()
+    local lsls = GenerateSongListSettings()
+    lsls.SubBackBoxFrequency  = 5
+    lsls.ModuloPagination     = false
+    lsls.AppendMainRandomBox  = false
+    lsls.AppendSubRandomBoxes = false
+    lsls.FlattenOpenedFolders = false
+    lsls.RootGenreFolder      = "段位道場"
+    lsls:SetMandatoryDifficultyList({DIFF_DAN})
+    return RequestSongList(lsls)
+end
+
+local function _setup_entry()
     danplate_ro = ROACTIVITY:GetROActivity("danplate")
     modicons_ro = ROACTIVITY:GetROActivity("modicons")
     if modicons_ro ~= nil then modicons_ro:Activate() end
@@ -256,27 +286,10 @@ local function _load_resources()
     bar_select_pulse = COUNTER:CreateCounterDuration(0.3, 1.0, 0.6)
     bar_select_pulse:SetBounce(true)
     bar_select_pulse:Start()
-
-    if font_bar_title == nil then
-        font_bar_title = TEXT:Create(TITLE_FONT_SIZE, "regular")
-        font_hdr_title = TEXT:Create(HDR_TITLE_FONT,  "regular")
-        font_hdr_sub   = TEXT:Create(HDR_SUB_FONT,    "regular")
-    end
-
-    ContentsDrawer.load()
 end
 
-local function _unload_resources()
+local function _teardown_entry()
     if modicons_ro ~= nil then modicons_ro:Deactivate() end
-
-    local function sd(t) if t ~= nil then t:Dispose() end end
-    sd(tx_header)        ; tx_header        = nil
-    sd(tx_content)       ; tx_content       = nil
-    sd(tx_confirm_bg)    ; tx_confirm_bg    = nil
-    sd(tx_confirm_hover) ; tx_confirm_hover = nil
-    for i = 0, 3 do sd(tx_confirm[i]) ; tx_confirm[i] = nil end
-    for _, t in pairs(tx_bars) do sd(t) end
-    tx_bars = {}
 
     snd_move = nil
 
@@ -293,8 +306,6 @@ local function _unload_resources()
     modicons_ro = nil
     for k in pairs(act) do act[k] = nil end
     for k in pairs(act_was_active) do act_was_active[k] = nil end
-
-    ContentsDrawer.unload()
 end
 
 local function _reset_anim_state()
@@ -323,20 +334,11 @@ function M.enter(CB, is_return)
     _CB = CB
     _in_play   = false
 
-    _load_resources()
+    M.init()
+    _setup_entry()
     _reset_anim_state()
 
-    if not is_return and _song_list == nil then
-        local lsls = GenerateSongListSettings()
-        lsls.SubBackBoxFrequency  = 5
-        lsls.ModuloPagination     = false
-        lsls.AppendMainRandomBox  = false
-        lsls.AppendSubRandomBoxes = false
-        lsls.FlattenOpenedFolders = false
-        lsls.RootGenreFolder      = "段位道場"
-        lsls:SetMandatoryDifficultyList({DIFF_DAN})
-        _song_list = RequestSongList(lsls)
-    end
+    if not is_return and _song_list == nil then _song_list = _build_song_list() end
 
     _refresh_page()
     _start_setup_anim(true)
@@ -344,22 +346,37 @@ end
 
 -- Called when user cancels back to the 3-way menu
 function M.leave()
-    _unload_resources()
+    _teardown_entry()
 end
 
 -- Called from Script.lua's deactivate() while standard_dan is active
 function M.deactivate()
-    _unload_resources()
+    _teardown_entry()
 end
 
 function M.afterSongEnum()
+    -- the list follows the library: rebuilt now (this runs for every stage, active or not) so the
+    -- next entry into the dojo does not build it on the spot
     _song_list = nil
+    local ok, list = pcall(_build_song_list)
+    if ok then _song_list = list end
 end
 
 function M.destroy()
+    _teardown_entry()
+    local function sd(t) if t ~= nil then t:Dispose() end end
+    sd(tx_header)        ; tx_header        = nil
+    sd(tx_content)       ; tx_content       = nil
+    sd(tx_confirm_bg)    ; tx_confirm_bg    = nil
+    sd(tx_confirm_hover) ; tx_confirm_hover = nil
+    for i = 0, 3 do sd(tx_confirm[i]) ; tx_confirm[i] = nil end
+    for _, t in pairs(tx_bars) do sd(t) end
+    tx_bars = {}
+    if snd_tick ~= nil then pcall(function() snd_tick:Dispose() end) ; snd_tick = nil end
     if font_bar_title ~= nil then font_bar_title:Dispose() ; font_bar_title = nil end
     if font_hdr_title ~= nil then font_hdr_title:Dispose() ; font_hdr_title = nil end
     if font_hdr_sub   ~= nil then font_hdr_sub:Dispose()   ; font_hdr_sub   = nil end
+    ContentsDrawer.unload()
     ContentsDrawer.destroy()
 end
 
@@ -432,9 +449,16 @@ function M.update(dt)
     -- ── SONG SELECT SETUP ─────────────────────────────────────────────────────
     if _state == "song_select_setup" then
         bar_timer = bar_timer + dt
+        local shown = 0
         for i = 1, PAGE_SIZE do
             if not bar_visible[i] and bar_timer >= (i - 1) * BAR_STAGGER_SEC then
                 bar_visible[i] = true
+                -- each bar that appears ticks (once per frame, should two land on the same frame);
+                -- an empty slot shows no bar and stays silent
+                if _get_bar_tex(page_nodes[i]) ~= nil then
+                    shown = shown + 1
+                    if snd_tick ~= nil and shown == 1 then pcall(function() snd_tick:Play() end) end
+                end
             end
         end
         if bar_visible[PAGE_SIZE] then _state = "song_select" end

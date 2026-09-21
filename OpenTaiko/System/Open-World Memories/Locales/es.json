@@ -17,6 +17,12 @@
         "PAGODA_LEAVE_CONFIRM":  "¿Seguro? Perderás tu progreso si sales",
         "PAGODA_EXIT":      "Salir",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Desafío de dan estándar",
+        "DANSELECT_STANDARD_DESC": "¡Demuestra tu nivel con la selección del dojo!",
+        "DANSELECT_PAGODA_DESC": "¡Supera varios danes aleatorios seguidos!",
+        "DANSELECT_EXIT": "Salir",
+
         "SETTINGS_UI_KEYS": "Entrada",
         "SETTINGS_UI_EXIT": "Volver",
         "SETTINGS_UI_BACK": "< Atrás",

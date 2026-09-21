@@ -17,6 +17,12 @@
         "PAGODA_LEAVE_CONFIRM":  "정말인가요? 나가면 진행 상황이 사라집니다",
         "PAGODA_EXIT":      "나가기",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "일반 단위 도전",
+        "DANSELECT_STANDARD_DESC": "도장이 고른 과제로 실력을 증명하세요!",
+        "DANSELECT_PAGODA_DESC": "무작위 단위를 연속으로 돌파하세요!",
+        "DANSELECT_EXIT": "나가기",
+
         "SETTINGS_UI_KEYS": "입력 설정",
         "SETTINGS_UI_EXIT": "뒤로",
         "SETTINGS_UI_BACK": "< 뒤로",

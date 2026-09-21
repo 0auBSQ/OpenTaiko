@@ -17,6 +17,12 @@
         "PAGODA_LEAVE_CONFIRM":  "确定吗？离开将失去当前进度",
         "PAGODA_EXIT":      "退出",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "标准段位挑战",
+        "DANSELECT_STANDARD_DESC": "通过道场精选的课题证明你的实力！",
+        "DANSELECT_PAGODA_DESC": "连续挑战多个随机段位！",
+        "DANSELECT_EXIT": "退出",
+
         "SETTINGS_UI_KEYS": "输入设置",
         "SETTINGS_UI_EXIT": "返回",
         "SETTINGS_UI_BACK": "< 返回",

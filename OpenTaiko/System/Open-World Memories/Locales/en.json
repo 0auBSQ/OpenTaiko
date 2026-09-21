@@ -19,6 +19,12 @@
         "PAGODA_LEAVE_CONFIRM":  "Are you sure? Your progress will be lost if you leave",
         "PAGODA_EXIT":      "Exit",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Standard Dan Challenge",
+        "DANSELECT_STANDARD_DESC": "Prove your skills through the dojo's selection!",
+        "DANSELECT_PAGODA_DESC": "Go through multiple randomized dans in a row!",
+        "DANSELECT_EXIT": "Exit",
+
         "SETTINGS_UI_KEYS": "Input",
         "SETTINGS_UI_EXIT": "Exit",
         "SETTINGS_UI_BACK": "< Back",

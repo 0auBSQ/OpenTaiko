@@ -19,6 +19,12 @@
         "PAGODA_LEAVE_CONFIRM":  "Вы уверены? Если уйти, прогресс будет потерян",
         "PAGODA_EXIT":      "Выход",
 
+        // The Fox Dojo entrance (dan_select): the two boards and the exit
+        "DANSELECT_STANDARD": "Стандартный экзамен на дан",
+        "DANSELECT_STANDARD_DESC": "Докажите своё мастерство на испытаниях додзё!",
+        "DANSELECT_PAGODA_DESC": "Пройдите несколько случайных данов подряд!",
+        "DANSELECT_EXIT": "Выход",
+
         "SETTINGS_UI_KEYS": "Управление",
         "SETTINGS_UI_EXIT": "Выход",
         "SETTINGS_UI_BACK": "< Назад",

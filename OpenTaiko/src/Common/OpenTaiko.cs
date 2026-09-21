@@ -2077,10 +2077,22 @@ internal class OpenTaiko : Game {
 		}
 	}
 
+	// Runs at every stage change. A blocking full collection suspends every managed thread, the sound
+	// device's callback included; on a heap this size that took long enough to starve the audio buffer,
+	// heard as crackling on each transition. A background collection reclaims the same memory with only
+	// brief pauses; what the finalizer thread frees afterwards goes at the next collection. When a
+	// transition is running, even that pause would land on the frame the player just acted on, so the
+	// transition collects later, behind its cover, once the outgoing stage is unmounted.
 	private void tExecuteGarbageCollection() {
-		GC.Collect(GC.MaxGeneration);
-		GC.WaitForPendingFinalizers();
-		GC.Collect(GC.MaxGeneration);
+		if (rCurrentStage == stageTransition && !stageTransition.IsDeActivated) {
+			stageTransition.CollectBehindCover = true;
+			return;
+		}
+		CollectInBackground();
+	}
+
+	internal static void CollectInBackground() {
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: false, compacting: false);
 	}
 
 	private void ChangeResolution(int nWidth, int nHeight) {

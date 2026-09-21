@@ -86,6 +86,8 @@ internal class CStageTransition : CStage {
 
 	private const double DefaultFadeSeconds = 0.5;          // a transition may override via FADE_OUT/IN_SECONDS (Lua)
 	private const double LoadingScreenDelaySeconds = 0.5;   // shorter loads show no loading screen (anti-blink)
+	private const double SettleSeconds = 0.2;               // the cover stays up this long after the load: uploads and
+	                                                        //   sounds settle before the new stage is revealed
 	private const float ActivateBarSpan = 0.8f;             // source fills 0..0.8 of the bar, asset drain 0.8..1
 
 	// Effective fade durations: the transition script's declared override, else the default.
@@ -100,6 +102,8 @@ internal class CStageTransition : CStage {
 	private CStage? _cancelTarget;      // ESC during the load → here
 	private long _phaseStart;
 	private long _loadStart;
+	private long _loadDone;             // when the load finished (0 while loading); the settle hold counts from here
+	private bool _fadeInFirstFrame;     // the fade-in clock starts after the target's first draw, not before it
 	private long _lastTickTs;           // for advancing the loading-bar easing each Load frame
 
 	// The stage being transitioned to (mounted by this transition / the load; the main loop reads it once finished).
@@ -109,6 +113,10 @@ internal class CStageTransition : CStage {
 	// Set when a load was cancelled (ESC): the main loop sends the player to CancelTarget instead of Target.
 	public bool Canceled { get; private set; }
 	public CStage? CancelTarget { get; private set; }
+
+	// The stage change's collection, deferred by OpenTaiko.tExecuteGarbageCollection to the moment the
+	// outgoing stage is unmounted and the cover is fully up, where its pause cannot be seen.
+	public bool CollectBehindCover { get; set; }
 
 	// True while fading the song-loading screen out to reveal gameplay: the main loop draws the note chips during
 	// this phase (the loading screen fades over them) so notes stay visible as the screen clears.
@@ -147,6 +155,9 @@ internal class CStageTransition : CStage {
 		_script = script;
 		Canceled = false;
 		CancelTarget = null;
+		_loadDone = 0;
+		_fadeInFirstFrame = false;
+		CollectBehindCover = false;
 		_phase = Phase.FadeOut;
 		_phaseStart = Stopwatch.GetTimestamp();
 		base.IsDeActivated = false;
@@ -171,10 +182,15 @@ internal class CStageTransition : CStage {
 				if (t >= 1.0) {
 					OpenTaiko.app.UnmountActivity(_outgoing);
 					_outgoing = null;
+					if (CollectBehindCover) {
+						CollectBehindCover = false;
+						OpenTaiko.CollectInBackground();
+					}
 					_loadStart = Stopwatch.GetTimestamp();
 					if (_session == null) {                 // nothing to load → reveal the already-mounted target
 						_phase = Phase.FadeIn;
 						_phaseStart = _loadStart;
+						_fadeInFirstFrame = true;
 					} else {
 						CLoadingProgress.Begin();           // reset the bar (Report is monotonic) + start easing
 						_lastTickTs = 0;
@@ -192,8 +208,9 @@ internal class CStageTransition : CStage {
 				if (_lastTickTs != 0) CLoadingProgress.Tick(Stopwatch.GetElapsedTime(_lastTickTs, now).TotalMilliseconds);
 				_lastTickTs = now;
 
-				bool more = _session!.Step();
-				if (_session.Canceled) {
+				// once the load is done the cover holds for the settle time; the session is not stepped again
+				bool more = _loadDone == 0 && _session!.Step();
+				if (_session!.Canceled) {
 					_session.Cancel();
 					Canceled = true;
 					CancelTarget = _cancelTarget;
@@ -210,10 +227,14 @@ internal class CStageTransition : CStage {
 					CLoadingProgress.Report(bar);   // monotonic raw target → eased by Tick above
 					DrawLoading(CLoadingProgress.DisplayProgress);
 				}
-				if (!more) {
+				if (!more && _loadDone == 0) {
 					_session.End();
+					_loadDone = now;
+				}
+				if (_loadDone != 0 && Elapsed(_loadDone) >= SettleSeconds) {
 					_phase = Phase.FadeIn;
 					_phaseStart = Stopwatch.GetTimestamp();
+					_fadeInFirstFrame = true;
 					CLoadingProgress.End();
 				}
 				return 0;
@@ -224,6 +245,12 @@ internal class CStageTransition : CStage {
 				bool endEarly = (EReturnValue)ret != EReturnValue.Continuation;
 				if (endEarly)
 					TargetDrawLoopReturnValue = ret;
+				// the target's first draw may be slow (a first shader compile, a big upload): the clock starts
+				// after it, with the cover still fully up, so the reveal never skips its first frames
+				if (_fadeInFirstFrame) {
+					_fadeInFirstFrame = false;
+					_phaseStart = Stopwatch.GetTimestamp();
+				}
 				double t = endEarly ? 1.0 : Math.Clamp(Elapsed(_phaseStart) / FadeInSeconds, 0.0, 1.0);
 				_script?.FadeIn(t);
 				if (t >= 1.0) {
