@@ -148,7 +148,7 @@ namespace OpenTaikoTests {
 					"TITLE:LevelParseTest\nBPM:120\nWAVE:none.ogg\nCOURSE:Oni\nLEVEL:7\n#START\n1010,\n#END\n");
 				var tja = new CTja();
 				tja.Activate();
-				tja.tInput(p, 3 /* Oni */, 0, false, 0);
+				tja.tInput(p, Difficulty.Oni, 0, false, 0);
 				Assert.Equal(7, tja.LEVEL);
 			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}

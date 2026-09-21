@@ -114,8 +114,8 @@ class NotesManager {
 			_ => 0,
 		};
 
-	public static CChip GetVelocityRefChip(CChip chip)
-		=> (IsRollEnd(chip) && true /* TJAP3/OOS */) ? chip.start : chip; // && !StretchRoll
+	public static CChip GetVelocityRefChip(CChip chip, CTja.ETjaCompat compat)
+		=> (IsRollEnd(chip) && compat is CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS) ? chip.start : chip; // && !StretchRoll
 
 	#endregion
 
@@ -398,7 +398,7 @@ class NotesManager {
 		int savedOpacity = _texarr.Opacity;
 		if (opacity < 1f) _texarr.Opacity = (int)(savedOpacity * opacity);
 
-		if (chip.bShowRoll) {
+		if (chip.canShowBody) {
 			var theta = -Math.Atan2(yEnd - y, xEnd - x);
 
 			var dist = Math.Sqrt(Math.Pow(xEnd - x, 2) + Math.Pow(yEnd - y, 2));

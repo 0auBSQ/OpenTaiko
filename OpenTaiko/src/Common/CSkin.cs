@@ -166,7 +166,7 @@ internal class CSkin : IDisposable {
 			this.bLoadedSuccessfuly = true;
 			this.bDisposed = false;
 		}
-		public void tPlay(bool resume = false) {
+		public void tPlay(bool resume, double? msFrameworkTime = null) {
 			if (this.bNotLoadedYet) {
 				try {
 					tLoading();
@@ -183,16 +183,17 @@ internal class CSkin : IDisposable {
 				rLastPlaybackExclusiveSystemSound = this;
 			}
 			if (resume) {
-				this.rSound[0]?.Resume(this.bLoop);
-				this.rSound[1]?.Resume(this.bLoop);
+				this.rSound[0]?.Resume(this.bLoop, msFrameworkTime);
+				this.rSound[1]?.Resume(this.bLoop, msFrameworkTime);
 			} else {
-				this.nextSound?.PlayStart(this.bLoop);
+				this.nextSound?.PlayStart(this.bLoop, msFrameworkTime);
 			}
 
 			this.bPlayed = true;
 			this.nNextPlayingSoundNumber = 1 - this.nNextPlayingSoundNumber;
 		}
-		public void tResume() => tPlay(resume: true);
+		public void tPlay(double? msFrameworkTime = null) => tPlay(resume: false, msFrameworkTime: msFrameworkTime);
+		public void tResume(double? msFrameworkTime = null) => tPlay(resume: true, msFrameworkTime: msFrameworkTime);
 		public void tStop(bool pause = false) {
 			this.bPlayed = false;
 

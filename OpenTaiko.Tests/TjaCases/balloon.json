@@ -1,5 +1,6 @@
 {
-  "expect": {
-    "balloons": 2
-  }
+	"expect": {
+		"balloons": 2,
+		"popCounts": [ 5, 10 ]
+	}
 }

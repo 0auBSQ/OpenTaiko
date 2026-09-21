@@ -640,10 +640,12 @@ public static class ImGuiDebugWindow {
 								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eExpert),
 								CStagePlayScreenCommon.GetNowPBPMPoint(dtx, play_time, CTja.ECourse.eMaster),
 							};
-							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStagePlayScreenCommon.GetNowPBMTime(bp, play_time)).ToArray();
+							float[] play_th16Beats = play_bpm_points.Select(bp => (float)CStagePlayScreenCommon.GetNowPBMTime(bp, play_time, dtx.COMPAT)).ToArray();
 							for (int ib = 0; ib < 3; ++ib) {
 								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib] / 4:0.00} 16ths\n"
-									+ $" {play_bpm_points[ib]}\n");
+									+ $" {play_bpm_points[ib]}\n"
+									+ $"nextBpmChangeAtDiv: CBPM#{play_bpm_points[ib].next_bpm_change?.nInternalNumber ?? -1} "
+									+ $"{play_bpm_points[ib].next_bpm_change?.bpm_change_time ?? double.PositiveInfinity:0.00} ms");
 							}
 
 							ImGui.NewLine();
@@ -652,15 +654,14 @@ public static class ImGuiDebugWindow {
 							ImGui.Text("Title: " + dtx.TITLE.GetString(""));
 							ImGui.Text("Subtitle: " + dtx.SUBTITLE.GetString(""));
 							ImGui.Text("Charter: " + dtx.MAKER);
+							ImGui.Text("Compat: " + dtx.COMPAT);
 
-							ImGui.Text("BPM: " + dtx.BASEBPM + (dtx.listBPM.Count > 1 ? (" (Min: " + dtx.MinBPM + " / Max: " + dtx.MaxBPM + ")") : ""));
-							if (dtx.listBPM.Count > 1) {
-								if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
-									foreach (CTja.CBPM bpm in dtx.listBPM) {
-										ImGui.Text($"(Time: {String.Format("{0:0.#}s", (bpm.bpm_change_time / 1000))}) {bpm.dbBPMValue}");
-									}
-									ImGui.TreePop();
+							ImGui.Text("BPM: " + dtx.BASEBPM + ((dtx.MinBPM != dtx.MaxBPM) ? (" (Min: " + dtx.MinBPM + " / Max: " + dtx.MaxBPM + ")") : ""));
+							if (ImGui.TreeNodeEx($"BPM List ({dtx.listBPM.Count})###GAME_BPM_LIST_{i}")) {
+								foreach (CTja.CBPM bpm in dtx.listBPM) {
+									ImGui.Text(bpm.ToString());
 								}
+								ImGui.TreePop();
 							}
 
 							ImGui.Text("Lyrics: " + (dtx.usingLyricsFile ? dtx.listLyric2.Count : dtx.listLyric.Count));

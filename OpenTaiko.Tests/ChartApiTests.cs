@@ -57,7 +57,7 @@ namespace OpenTaikoTests {
 				"#START",
 				"1000,",
 				"#END");
-			var tja = Parse(content, (int)Difficulty.Oni);
+			var tja = Parse(content, Difficulty.Oni);
 			var md = tja.SongListCourseMetadata[(int)Difficulty.Oni];
 
 			Assert.Equal(12, md.LEVELtaiko);                         // truncated int kept as before
@@ -66,7 +66,7 @@ namespace OpenTaikoTests {
 			Assert.Equal(8, LuaSongChart.FirstDecimalDigit(md.LEVELtaikoDecimal));
 		}
 
-		private static CTja Parse(string content, int difficulty) {
+		private static CTja Parse(string content, Difficulty difficulty) {
 			string dir = Path.Combine(Path.GetTempPath(), "ot_deci_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(dir);
 			try {

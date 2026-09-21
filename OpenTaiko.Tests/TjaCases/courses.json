@@ -1,0 +1,17 @@
+{
+	"tja": "courses.tja",
+	"cases": [
+		{
+			"difficulty": 0,
+			"expect": {
+				"dons": 1
+			}
+		},
+		{
+			"difficulty": 3,
+			"expect": {
+				"dons": 4
+			}
+		}
+	]
+}

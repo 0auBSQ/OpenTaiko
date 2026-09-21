@@ -29,6 +29,8 @@ internal class CBoxDef {
 	public bool IsChangedBoxChara;
 	public string DefaultPreimage;
 	public string ScenePreset;
+	public bool IsChangedCompat;
+	public CTja.ETjaCompat Compat;
 
 	// Constructor
 
@@ -43,6 +45,7 @@ internal class CBoxDef {
 		BgColor = Color.White;
 		DefaultPreimage = null;
 		ScenePreset = null;
+		Compat = CTja.ETjaCompat.OOS;
 	}
 	public CBoxDef(string boxdefFileName)
 		: this() {
@@ -113,6 +116,9 @@ internal class CBoxDef {
 								this.ScenePreset = value;
 							} else if (key == "#DEFAULTPREIMAGE") {
 								this.DefaultPreimage = Path.Combine(Directory.GetParent(boxdefFileName).FullName, value);
+							} else if (key == "#COMPAT") {
+								this.Compat = CTja.strConvertTjaCompat(value);
+								IsChangedCompat = true;
 							} else {
 								for (int i = 0; i < 3; i++) {
 									if (key == "#BOXEXPLANATION" + (i + 1).ToString()) {

@@ -123,6 +123,10 @@ public abstract class CTimerBase : IDisposable {
 		=> msGameTime + this.PrevResetTimeMs_Double;
 	public double SystemTimeToGameTime(double msSystemTime)
 		=> msSystemTime - this.PrevResetTimeMs_Double;
+	public double SystemTimeToFrameworkTime(double msSystemTime)
+		=> msSystemTime + (Game.dbTimeMs - this.SystemTimeMs);
+	public double FrameworkTimeToSystemTime(double msFrameworkTime)
+		=> msFrameworkTime + (this.SystemTimeMs - Game.dbTimeMs);
 
 	#region [ protected ]
 	//-----------------

@@ -782,7 +782,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	private readonly STTextPosition[] stLargePosition;
 	//-----------------
 
-	private ENoteJudge tDrumsHitProcess(long nHitTime, EPad type, CChip pChip, bool bBothHandsInput, int nPlayer) {
+	private ENoteJudge tDrumsHitProcess(double nHitTime, EPad type, CChip pChip, bool bBothHandsInput, int nPlayer) {
 		var nInput = NotesManager.PadToInputType(type, bBothHandsInput);
 		if (!(pChip != null && NotesManager.IsHittableNote(pChip) && !NotesManager.IsRollEnd(pChip)))
 			return ENoteJudge.Miss;
@@ -793,7 +793,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		if (eJudge == ENoteJudge.Miss)
 			return ENoteJudge.Miss;
 
-		this.actGame.tTatakikiriShow_IncreaseValuesFromJudge(eJudge, (int)(nHitTime - pChip.nSoundTimems));
+		this.actGame.tTatakikiriShow_IncreaseValuesFromJudge(eJudge, (int)((long)nHitTime - pChip.nSoundTimems));
 		return eJudge;
 	}
 
@@ -1016,9 +1016,9 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 	}
 
-	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, long msHitTjaTime, CChip? chipNoHit, ENoteJudge? eJudge) {
+	protected override void ProcessPadInput(int nUsePlayer, EPad nPad, double msHitTjaTime, CChip? chipNoHit, ENoteJudge? eJudge) {
 		// test judgement
-		eJudge ??= (chipNoHit == null) ? ENoteJudge.Miss : this.eGetChipJudgeAtTime(msHitTjaTime, chipNoHit, nUsePlayer);
+		eJudge ??= (chipNoHit == null) ? ENoteJudge.Miss : this.eGetChipJudgeAtTime((long)msHitTjaTime, chipNoHit, nUsePlayer);
 		var gameType = this.eGameType[nUsePlayer];
 		if (eJudge != ENoteJudge.Miss) {
 			eJudge = this.JudgePadInput(nUsePlayer, chipNoHit, nPad, msHitTjaTime, eJudge.Value);
@@ -1033,7 +1033,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		#region [ ヒットしてなかった場合は、レーンフラッシュ、パッドアニメ、空打ち音再生を実行 ]
 		if (nLane is not PlayerLane.FlashType.Total && eJudge is ENoteJudge.Miss or ENoteJudge.Auto or ENoteJudge.ADLIB) { // ADLIB here for "empty hit but not a miss"
-			this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPad));
+			this.PlayHitNoteSound(nUsePlayer, NotesManager.PadToInputType(nPad), msHitTjaTime);
 			this.StartHitNoteLaneFlash(nUsePlayer, NotesManager.PadToInputType(nPad), gameType);
 
 			// BAD or TIGHT 時の処理。
@@ -1043,7 +1043,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		#endregion
 	}
 
-	protected override ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, long msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false) {
+	protected override ENoteJudge JudgePadInput(int nUsePlayer, CChip? chipNoHit, EPad nPad, double msHitTjaTime, ENoteJudge rawJudge, bool skipHit = false) {
 		if (this.IsStageFailed_Fast()) // deny judgement
 			return ENoteJudge.Miss;
 
@@ -1070,12 +1070,12 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				return ENoteJudge.ADLIB; // here for "empty hit but not a miss"
 			} else if (chipNoHit.eNoteState == ENoteState.Wait) {
 				bool _isExpected = NotesManager.IsExpectedPadMultiHit(chipNoHit.padStoredHit, nPad, chipNoHit, gameType);
-				if (_isExpected && IsAcceptMultiHit(chipNoHit, msHitTjaTime)) {
+				if (_isExpected && IsAcceptMultiHit(chipNoHit, (long)msHitTjaTime)) {
 					if (skipHit)
 						return ENoteJudge.Perfect;
 					chipNoHit.eNoteState = ENoteState.None;
 					chipNoHit.padStoredHit = EPad.Unknown;
-					return this.tDrumsHitProcess((long)chipNoHit.msFirstMultiHit, nPad, chipNoHit, true, nUsePlayer);
+					return this.tDrumsHitProcess(chipNoHit.msFirstMultiHit, nPad, chipNoHit, true, nUsePlayer);
 				}
 			}
 			return ENoteJudge.Miss;
@@ -1095,12 +1095,18 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			BgFilename = OpenTaiko.TJA.strBGIMAGE_PATH;
 		base.tBackgroundTextureCreate(DefaultBgFilename, bgrect, BgFilename);
 	}
-	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nPlayTime) {
+	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nPlayTime, double th16NowBeat, double th16NowBeatY) {
 		NotesManager.ENoteType nt = NotesManager.GetNoteType(pChip);
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
+		if (NotesManager.IsRollEnd(pChip)) {
+			nt = NotesManager.GetNoteType(pChip.start);
+			_gt = NotesManager.GetChipGameType(pChip.start, nPlayer);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, nt, _gt, isEnd: true);
+			return;
+		}
 		if (NotesManager.IsGenericRoll(nt)) {
-			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, nt, _gt);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, nt, _gt);
 			return;
 		}
 
@@ -1108,23 +1114,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		if (pChip.bVisible) {
 			if (!pChip.bHit) {
-				int dx = pChip.nHorizontalChipDistance;
-				int dy = pChip.nVerticalChipDistance;
-				(dx, var dy_) = pChip.nScrollDirection switch {
-					1 => (0, -dx), // ↓
-					2 => (0, dx), // ↑
-					3 => (dx, -dx), // ↙
-					4 => (dx, +dx), // ↖
-					5 => (-dx, 0), // →
-					6 => (-dx, -dx), // ↘
-					7 => (-dx, dx), // ↗
-					0 or _ => (dx, dy), // ←
-				};
-				if (dy == 0) // TJAP3 behavior: vertical scrolling of non-real `#SCROLL` is kept
-					dy = dy_;
-
-				int x = GetNoteOriginX(nPlayer) + dx;
-				int y = GetNoteOriginY(nPlayer) + dy;
+				int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
+				int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 
 				#region[ 両手待ち時 ]
 				if (pChip.eNoteState == ENoteState.Wait) {
@@ -1149,7 +1140,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					}
 				}
 
-				if (pChip.nSoundTimems < nPlayTime) {
+				if (pChip.nSoundTimems < (long)nPlayTime) {
 					this.actGame.stTatakikiriShow.bFirstChipHit = true;
 				}
 
@@ -1170,7 +1161,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 		#endregion
 	}
-	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime, NotesManager.ENoteType nt, EGameType _gt) {
+	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false) {
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1178,18 +1169,25 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		#region[ 作り直したもの ]
 		if (pChip.bVisible) {
-			bool pHasBar = (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt));
+			bool pHasBar = !isEnd && (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt));
 
-			int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
-			int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
+			int x = GetNoteOriginX(nPlayer) + pChip.start.nHorizontalChipDistance;
+			int y = GetNoteOriginY(nPlayer) + pChip.start.nVerticalChipDistance;
 			int xEnd = GetNoteOriginX(nPlayer) + pChip.end.nHorizontalChipDistance;
 			int yEnd = GetNoteOriginY(nPlayer) + pChip.end.nVerticalChipDistance;
 
 			if (NotesManager.IsGenericBalloon(nt)) {
-				if (nowTime >= pChip.nSoundTimems && nowTime < pChip.end.nSoundTimems) {
-					x = GetNoteOriginX(nPlayer);
+				if ((long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime < pChip.end.nSoundTimems) {
+					// TaikoJiro1 behavior: active balloons can still go right
+					if (!(tja.COMPAT is CTja.ETjaCompat.Jiro1 && pChip.nHorizontalChipDistance > 0 && !NotesManager.IsKusudama(pChip))) {
+						if (!isEnd)
+							pChip.nHorizontalChipDistance = 0;
+						x = GetNoteOriginX(nPlayer);
+					}
+					if (!isEnd)
+						pChip.nVerticalChipDistance = 0;
 					y = GetNoteOriginY(nPlayer);
-				} else if (nowTime >= pChip.end.nSoundTimems) {
+				} else if (msTjaNowTime >= pChip.end.nSoundTimems) {
 					x = xEnd;
 					y = yEnd;
 				}
@@ -1207,7 +1205,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			bool isBodyXInScreen = (Math.Min(x, xEnd) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, xEnd) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
 			if (pHasBar) {
-				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, nowTime);
+				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime, th16NowBeatX, th16NowBeatY);
 			}
 
 			#region[ HIDSUD & STEALTH ]
@@ -1221,16 +1219,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (isBodyXInScreen) {
 				if (OpenTaiko.Tx.Notes[(int)_gt] != null) {
 					int pxFaceTxOffset = this.GetPxFaceTextureOffset(nPlayer);
-
-					// a roll-end chip is judged from its head like the rest of the roll
-					float opacity;
-					if (NotesManager.IsRollEnd(nt) && pChip.start != null) {
-						int xHead = x - pChip.nHorizontalChipDistance + pChip.start.nHorizontalChipDistance;
-						int yHead = y - pChip.nVerticalChipDistance + pChip.start.nVerticalChipDistance;
-						opacity = this.tRollOpacity(nPlayer, xHead, yHead, x, y);
-					} else {
-						opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
-					}
+					float opacity = this.tRollOpacity(nPlayer, x, y, xEnd, yEnd);
 					if (opacity <= 0f) return;
 
 					//136, 30
@@ -1241,7 +1230,19 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 					var (nSenotesX, nSenotesY) = NotesManager.GetSENotesPos(nPlayer);
 
-					if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
+					if (isEnd) {
+						if (!hiddenMode.HidesSENotes()) {
+							//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
+							if (OpenTaiko.Tx.Notes[(int)_gt] != null)
+								OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
+							if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
+								int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
+								if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
+								OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(xEnd + 56, yEnd + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
+								OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
+							}
+						}
+					} else if (NotesManager.IsRoll(nt) || NotesManager.IsFuzeRoll(nt)) {
 						if (NotesManager.IsRoll(nt)) {
 					//kairera0467氏 の TJAPlayer2forPC のコードを参考にし、打数に応じて色を変える(打数の変更以外はほとんどそのまんま) ろみゅ～？ 2018/8/20
 					pChip.RollInputTime?.Tick();
@@ -1271,7 +1272,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 								if (senote == 0xA && _gt is EGameType.Konga) // DRUMROLL
 									senote = 7; // drumroll
 
-								if (pChip.bShowRoll) {
+								if (pChip.canShowBody) {
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = xEnd - x - 44 - _shift;
 									OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 90 + _shift, y + nSenotesY, new Rectangle(_60_cut, 8 * _size[1], 1, _size[1]));
 									OpenTaiko.Tx.SENotes[(int)_gt].vcScaleRatio.X = 1.0f;
@@ -1288,17 +1289,6 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 						NotesManager.DisplayNoteArm(nPlayer, x, y, pChip, this.ctHandHold.CurrentValue, hiddenMode: hiddenMode, opacity: opacity);
 						NotesManager.DisplayNote(nPlayer, x, y, pChip, pxFaceTxOffset, OpenTaiko.Skin.Game_Notes_Size[0] * 2, hiddenMode, opacity);
 						NotesManager.DisplaySENotes(nPlayer, x + nSenotesX, y + nSenotesY, pChip, hiddenMode, opacity);
-					} else if (!hiddenMode.HidesSENotes() && NotesManager.IsRollEnd(nt)) {
-						//大きい連打か小さい連打かの区別方法を考えてなかったよちくしょう
-						if (OpenTaiko.Tx.Notes[(int)_gt] != null)
-							OpenTaiko.Tx.Notes[(int)_gt].vcScaleRatio.X = 1.0f;
-						if (!NotesManager.IsGenericBalloon(pChip.start) && OpenTaiko.Tx.SENotes[(int)_gt] != null) {
-							int savedSeOpacity = OpenTaiko.Tx.SENotes[(int)_gt].Opacity;
-							if (opacity < 1f) OpenTaiko.Tx.SENotes[(int)_gt].Opacity = (int)(savedSeOpacity * opacity);
-							OpenTaiko.Tx.SENotes[(int)_gt].t2DDraw(x + 56, y + nSenotesY, new Rectangle(_58_cut, 9 * _size[1], _78_cut, _size[1]));
-							OpenTaiko.Tx.SENotes[(int)_gt].Opacity = savedSeOpacity;
-						}
-
 					}
 				}
 			}
@@ -1336,11 +1326,28 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	/// Detect and hide screen-obscuring rolls when any tips are out of screen
-	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, long nowTime) {
-		// display judging rolls
-		if (nowTime >= pChip.nSoundTimems && nowTime <= pChip.end.nSoundTimems) {
-			pChip.bShowRoll = true;
+	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY) {
+		// display judging and in-beat rolls
+		if ((long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime <= pChip.end.nSoundTimems) {
+			pChip.canShowBody = true;
 			return;
+		}
+		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
+			var (th16ChipBeatX, th16ChipBeatY) = (pChip.fBMSCROLLTime, pChip.fBMSCROLLTime);
+			var (th16ChipEndBeatX, th16ChipEndBeatY) = (pChip.end.fBMSCROLLTime, pChip.end.fBMSCROLLTime);
+			var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
+			if (compat is CTja.ETjaCompat.Jiro1) {
+				th16ChipBeatX += pChip.bpmPoint!.th16BeatDriftX;
+				th16ChipBeatY += pChip.bpmPoint!.th16BeatDriftY;
+				th16ChipEndBeatX += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftX;
+				th16ChipEndBeatY += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftY;
+			}
+			if ((th16NowBeatX >= th16ChipBeatX && th16NowBeatX <= th16ChipEndBeatX)
+					|| (th16NowBeatY >= th16ChipBeatY && th16NowBeatY <= th16ChipEndBeatY)
+					) {
+				pChip.canShowBody = true;
+				return;
+			}
 		}
 
 		// ignore already out-of-screen rolls
@@ -1355,7 +1362,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		bool endInScreen = (xEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[0] && xEnd < OpenTaiko.Skin.Resolution[0])
 			&& (yEnd > 0 - OpenTaiko.Skin.Game_Notes_Size[1] && yEnd < OpenTaiko.Skin.Resolution[1]);
 		if (headInScreen && endInScreen) {
-			pChip.bShowRoll = true;
+			pChip.canShowBody = true;
 			return;
 		}
 
@@ -1381,7 +1388,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		// If the nearest point is roll body, only orthogonal moves may prevent obscuring.
 		float drAway = (pos > 0 && pos < 1) ? Math.Abs(Vector2.Dot(dr, rollNorm)) : dr.Length();
 		bool canMoveAway = drAway >= drCanMoveAwayMin;
-		pChip.bShowRoll = canMoveAway;
+		pChip.canShowBody = canMoveAway;
 	}
 
 	private static float NearestLineSegRelPos(Vector2 head, Vector2 end, Vector2 target) {
@@ -1401,13 +1408,13 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	protected override void tProgressDraw_Chip_FillIn(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime) {
 
 	}
-	protected override void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, long nowTime) {
+	protected override void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nowTime, bool isBranched) {
 		//int n小節番号plus1 = pChip.n発声位置 / 384;
 		//int n小節番号plus1 = this.actPlayInfo.NowMeasure[nPlayer];
 		int x = GetNoteOriginX(nPlayer) + pChip.nHorizontalChipDistance;
 		int y = GetNoteOriginY(nPlayer) + pChip.nVerticalChipDistance;
 
-		if ((pChip.bVisible && !pChip.bHideBarLine) && (OpenTaiko.Tx.Bar != null)) {
+		if ((pChip.bVisible && !pChip.bHideBarLine && pChip.canShowBody) && (OpenTaiko.Tx.Bar != null)) {
 			var width = OpenTaiko.Tx.Bar.szTextureSize.Width;
 			var height = OpenTaiko.Skin.Game_Notes_Size[1];
 			var maxRadius = width + height; // upper limit of Math.Hypot(width, height) and a close approximant because width is small
@@ -1415,7 +1422,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				float opacity = this.actFlashlight.NoteOpacity(nPlayer, x, y);
 				if (opacity <= 0f) return;
 				double theta = (pChip.dbSCROLL_Y == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
-				CTexture tex = (pChip.bBranch) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
+				CTexture tex = (isBranched) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
 				int savedOpacity = tex.Opacity;
 				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);
 				tex.fZAxisCenterRotate = (float)theta;
@@ -1450,16 +1457,16 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 					this.ProcessRollHeadEffects(i, chkChip);
 				}
 				if (!NotesManager.IsGenericBalloon(chkChip)) {
-					if (chkChip.end.bVisible && chkChip.end.nSoundTimems >= (int)nowTime)
-						msBarRollProgress += (int)nowTime - chkChip.nSoundTimems;
+					if (chkChip.end.bVisible && chkChip.end.nSoundTimems >= nowTime)
+						msBarRollProgress += nowTime - chkChip.nSoundTimems;
 					continue;
 				}
 				if (!(chkChip.nRollCount > 0 || NotesManager.IsKusudama(chkChip))) {
 					continue;
 				}
 				//if (this.chip現在処理中の連打チップ.n発声時刻ms <= (int)CSound管理.rc演奏用タイマ.n現在時刻ms && this.chip現在処理中の連打チップ.nノーツ終了時刻ms >= (int)CSound管理.rc演奏用タイマ.n現在時刻ms)
-				if (chkChip.nSoundTimems <= (int)nowTime
-					&& chkChip.end.nSoundTimems + 500 >= (int)nowTime
+				if (chkChip.nSoundTimems <= nowTime
+					&& chkChip.end.nSoundTimems + 500 >= nowTime
 					) {
 					var balloon = NotesManager.IsKusudama(chkChip) ? chkChip.KusudamaCount : chkChip.nBalloon;
 					var rollCount = NotesManager.IsKusudama(chkChip) ? chkChip.KusudamaRollCount : chkChip.nRollCount;
@@ -1548,10 +1555,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		EGameType _gt = NotesManager.GetChipGameType(chip, iPlayer);
 		bool _isSwapNote = NotesManager.IsSwapNote(chip, _gt);
 
-		var msJudgeTjaTime = Math.Min(msTjaNowTime, msMaxPlayedTjaTime);
+		var msJudgeTjaTime = Math.Min((long)msTjaNowTime, msMaxPlayedTjaTime);
 		if (chip.eNoteState == ENoteState.Wait && !IsAcceptMultiHit(chip, msJudgeTjaTime)) {
 			if (!_isSwapNote) {
-				this.tDrumsHitProcess((long)chip.msFirstMultiHit, EPad.Unknown, chip, false, iPlayer);
+				this.tDrumsHitProcess(chip.msFirstMultiHit, EPad.Unknown, chip, false, iPlayer);
 				chip.padStoredHit = EPad.Unknown;
 				chip.bHit = true;
 				chip.IsHitted = true;

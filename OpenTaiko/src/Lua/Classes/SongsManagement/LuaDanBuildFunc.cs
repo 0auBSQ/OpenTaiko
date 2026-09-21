@@ -192,7 +192,7 @@ namespace OpenTaiko {
 				string tjaExt = Path.GetExtension(tjaPath).ToLowerInvariant();
 				CTja src = tjaExt is ".optktci" or ".tci"
 					? new CTci(tjaPath).BuildCtja(diff)
-					: new CTja(tjaPath, diff, 0, loadChart: true);
+					: new CTja(tjaPath, internalNode.Compat, (Difficulty)diff, 0, loadChart: true);
 
 				// BGM chip in source is the channel-0x01 chip that plays the audio.
 				CChip? srcBgmChip = src.listChip.FirstOrDefault(c => c.nChannelNo == 0x01);
@@ -215,7 +215,7 @@ namespace OpenTaiko {
 
 				// OFFSET compensation for HBSCROLL/BMSCROLL.
 				//
-				// CTja sets fBMSCROLLTime and bpm_change_time from dbNowBMScollTime / dbNowTime
+				// CTja sets fBMSCROLLTime and bpm_change_time from dbNowBMScrollTime / dbNowTime
 				// BEFORE the OFFSET adjustment is applied to chip.n発声時刻ms. For a source song
 				// with OFFSET = -X (isOFFSET_Negative=true), note chips receive
 				//   chip.n発声時刻ms += X   (default case in the second-pass loop)
@@ -261,6 +261,7 @@ namespace OpenTaiko {
 					animBpmListIdx = output.listBPM.Count;
 					double th16AtAnimBpm = bmscrollAccum;   // th16 at nextsongTime+1.0
 					output.listBPM.Add(new CTja.CBPM {
+						point_type = CTja.EBPMPointType.InitBpm,
 						nInternalNumber = animBpmListIdx,
 						nNotationTopNumber = animBpmListIdx,
 						dbBPMValue = srcInitialBpm,
@@ -283,6 +284,7 @@ namespace OpenTaiko {
 					for (int ib = 0; ib < 3; ib++) {
 						double branchBpm = (ib < src.listBPM.Count) ? src.listBPM[ib].dbBPMValue : 120.0;
 						output.listBPM.Add(new CTja.CBPM {
+							point_type = CTja.EBPMPointType.InitBpm,
 							nInternalNumber = ib,
 							nNotationTopNumber = ib,
 							dbBPMValue = branchBpm,
@@ -309,14 +311,11 @@ namespace OpenTaiko {
 				for (int bi = 3; bi < src.listBPM.Count; bi++) {
 					var srcBpm = src.listBPM[bi];
 					int newIdx = output.listBPM.Count;
-					output.listBPM.Add(new CTja.CBPM {
-						nInternalNumber = newIdx,
-						nNotationTopNumber = srcBpm.nNotationTopNumber,
-						dbBPMValue = srcBpm.dbBPMValue,
-						bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset,
-						bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum,
-						bpm_change_course = srcBpm.bpm_change_course,
-					});
+					var bpm = srcBpm.Copy();
+					bpm.nInternalNumber = newIdx;
+					bpm.bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset;
+					bpm.bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum;
+					output.listBPM.Add(bpm);
 					bpmIdxMap[bi] = newIdx;
 				}
 
@@ -355,7 +354,6 @@ namespace OpenTaiko {
 				nextsongChip.tInitialize();
 				nextsongChip.nChannelNo = 0x9B;
 				nextsongChip.nIntValue_InternalNumber = si;
-				nextsongChip.nSoundTimems = (int)Math.Round(nextsongTime);
 				nextsongChip.dbSoundTimems = nextsongTime;
 				nextsongChip.nBranch = CTja.ECourse.eNormal;
 				nextsongChip.start = nextsongChip;
@@ -373,7 +371,6 @@ namespace OpenTaiko {
 					animBpmChip.tInitialize();
 					animBpmChip.nChannelNo = 0x9C;
 					animBpmChip.nIntValue_InternalNumber = animBpmListIdx;
-					animBpmChip.nSoundTimems = (int)Math.Round(songBoundaryTime + 1.0);
 					animBpmChip.dbSoundTimems = songBoundaryTime + 1.0;
 					animBpmChip.start = animBpmChip;
 					animBpmChip.end = animBpmChip;
@@ -402,7 +399,6 @@ namespace OpenTaiko {
 				// Zero OFFSET:             srcBgmTimeDb = 0, BGM fires exactly at accum.
 				// Positive OFFSET:         srcBgmTimeDb = 0, first note after BGM start.
 				double bgmChipTimeDb = srcBgmTimeDb + offsetDb;
-				bgmChip.nSoundTimems = (int)Math.Round(bgmChipTimeDb);
 				bgmChip.dbSoundTimems = bgmChipTimeDb;
 				bgmChip.start = bgmChip;
 				bgmChip.end = bgmChip;
@@ -436,8 +432,7 @@ namespace OpenTaiko {
 					if (srcChip.nChannelNo == 0xFF) continue; // end-of-chart sentinel — one is appended after the last song
 
 					var newChip = (CChip)srcChip.Clone();
-					newChip.nSoundTimems = srcChip.nSoundTimems + offsetMs; // setter updates db too
-					newChip.dbSoundTimems = srcChip.dbSoundTimems + offsetDb;  // restore double precision
+					newChip.dbSoundTimems = srcChip.dbSoundTimems + offsetDb;
 					// Shift HBSCROLL/BMSCROLL position: fBMSCROLLTime is in the same 16th-beat
 					// units as bpm_change_bmscroll_time, so add bmscrollAccum (not offsetDb).
 					newChip.fBMSCROLLTime = srcChip.fBMSCROLLTime + bmscrollAccum;
@@ -511,9 +506,8 @@ namespace OpenTaiko {
 				foreach (var srcNoteChip in src.listNoteChip) {
 					if (chipMap.TryGetValue(srcNoteChip, out var clonedNoteChip)) {
 						clonedNoteChip.nIntValue_InternalNumber = output.listNoteChip.Count;
-						clonedNoteChip.msShowOffset = clonedNoteChip.nSoundTimems - nextsongTime;
-						clonedNoteChip.msMoveOffset = double.PositiveInfinity; // always move at natural speed
-						clonedNoteChip.IsSuddenHideRoll = false;                  // don't hide roll bodies
+						// merge with existing #SUDDEN effects
+						clonedNoteChip.msShowOffset = Math.Min(clonedNoteChip.msShowOffset, clonedNoteChip.dbSoundTimems - nextsongTime);
 						output.listNoteChip.Add(clonedNoteChip);
 					}
 				}
@@ -615,13 +609,11 @@ namespace OpenTaiko {
 				// Not emitted after the final song (no next song to protect).
 				if (si < _songs.Count - 1) {
 					double resetTime = nextsongTime + 1.0;
-					int resetTimeMs = (int)Math.Round(resetTime);
 
 					CChip MakeReset(int channel) {
 						var c = new CChip();
 						c.tInitialize();
 						c.nChannelNo = channel;
-						c.nSoundTimems = resetTimeMs;
 						c.dbSoundTimems = resetTime;
 						c.start = c; c.end = c;
 						return c;
@@ -702,8 +694,7 @@ namespace OpenTaiko {
 			var chartEndChip = new CChip();
 			chartEndChip.tInitialize();
 			chartEndChip.nChannelNo = 0xFF;
-			chartEndChip.nIntValue = 0;
-			chartEndChip.nSoundTimems = lastDanChipMs + 2000;
+			chartEndChip.nIntValue_InternalNumber = 0;
 			chartEndChip.dbSoundTimems = lastDanChipMs + 2000.0;
 			chartEndChip.start = chartEndChip;
 			chartEndChip.end = chartEndChip;
@@ -712,8 +703,7 @@ namespace OpenTaiko {
 			var gameFadeOutChip = new CChip();
 			gameFadeOutChip.tInitialize();
 			gameFadeOutChip.nChannelNo = 0xFF;
-			gameFadeOutChip.nIntValue = 0xFF;
-			gameFadeOutChip.nSoundTimems = lastDanChipMs + 3000;
+			gameFadeOutChip.nIntValue_InternalNumber = 0xFF;
 			gameFadeOutChip.dbSoundTimems = lastDanChipMs + 3000.0;
 			gameFadeOutChip.start = gameFadeOutChip;
 			gameFadeOutChip.end = gameFadeOutChip;

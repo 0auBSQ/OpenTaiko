@@ -58,10 +58,22 @@ namespace OpenTaikoTests {
 			using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(CasesDir, name + ".json")));
 			var root = doc.RootElement;
 			string tjaName = root.TryGetProperty("tja", out var t) ? t.GetString() : name + ".tja";
-			int difficulty = root.TryGetProperty("difficulty", out var d) ? d.GetInt32() : 3;
 			bool loadChart = !root.TryGetProperty("loadChart", out var lc) || lc.GetBoolean();
+			if (root.TryGetProperty("cases", out var cases)) { // grouped case for testing multiple difficulties or player-sides
+				foreach (var (expect, i) in cases.EnumerateArray().Select((v, i) => (v, i)))
+					SimpleCase($"{name}#{i + 1}", tjaName, loadChart, expect);
+			} else {
+				SimpleCase(name, tjaName, loadChart, root);
+			}
+		}
 
-			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, loadChart);
+		private static void SimpleCase(string name, string tjaName, bool loadChart, JsonElement root) {
+			Difficulty difficulty = root.TryGetProperty("difficulty", out var d) ? (Difficulty)d.GetInt32() : Difficulty.Oni;
+			int playerCount = root.TryGetProperty("playerCount", out var pc) ? pc.GetInt32() : 1;
+			int playerSide = root.TryGetProperty("playerSide", out var ps) ? ps.GetInt32() : 0;
+
+			OpenTaiko.OpenTaiko.ConfigIni.nPlayerCount = playerCount;
+			var tja = Parse(Path.Combine(CasesDir, tjaName), difficulty, playerSide, loadChart);
 			Assert.NotNull(tja.listChip);   // the parse must at least have survived
 
 			if (!root.TryGetProperty("expect", out var exp)) return;
@@ -94,10 +106,20 @@ namespace OpenTaikoTests {
 					Assert.True(Math.Abs(want[i] - gaps[i]) <= tol,
 						$"{name}: gap {i} expected {want[i]}±{tol}ms, got {gaps[i]}ms");
 			}
+
+			if (exp.TryGetProperty($"popCounts", out v)) {
+				var popcounts = GenericBalloonPopCount(tja);
+				var want = v.EnumerateArray().Select(x => x.GetInt32()).ToList();
+				Assert.True(want.Count == popcounts.Count,
+					$"{name}: expected {want.Count} pop counts, got {popcounts.Count} [{string.Join(", ", popcounts)}]");
+				for (int i = 0; i < want.Count; ++i)
+					Assert.True(want[i] == popcounts[i],
+						$"{name}: popcount {i} expected {want[i]} hits, got {popcounts[i]} hits");
+			}
 		}
 
 		/// <summary>Parse in a temp copy: t入力 writes a uniqueID.json next to the chart.</summary>
-		private static CTja Parse(string tjaPath, int difficulty, bool loadChart) {
+		private static CTja Parse(string tjaPath, Difficulty difficulty, int playerSide, bool loadChart) {
 			string dir = Path.Combine(Path.GetTempPath(), "ot_tja_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(dir);
 			try {
@@ -105,7 +127,7 @@ namespace OpenTaikoTests {
 				File.Copy(tjaPath, p);
 				var tja = new CTja();
 				tja.Activate();   // allocates listChip & friends (CActivity lifecycle)
-				tja.tInput(p, difficulty, 0, loadChart, 0);
+				tja.tInput(p, difficulty, playerSide, loadChart, 0);
 				return tja;
 			} finally { try { Directory.Delete(dir, true); } catch { } }
 		}
@@ -114,6 +136,14 @@ namespace OpenTaikoTests {
 		private static List<int> NoteTimes(CTja tja)
 			=> tja.listChip.Where(c => c.nChannelNo >= 0x11 && c.nChannelNo <= 0x14)
 				.Select(c => c.nSoundTimems).ToList();
+
+		// listNoteChip[] order (the definition order), includes branches in their definition order as in TJA
+		// (or listChip[] sorted by CChip.idxDefine in case listNoteChip[] has different order in the future)
+		private static List<int> GenericBalloonPopCount(CTja tja)
+			=> tja.listNoteChip
+				.Where(c => NotesManager.IsGenericBalloon(c))
+				.Select(c => c.nBalloon)
+				.ToList();
 	}
 
 	[CollectionDefinition("tja", DisableParallelization = true)]

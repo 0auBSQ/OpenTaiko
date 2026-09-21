@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using OpenTaiko.CSongListNodeComparers;
 
 namespace OpenTaiko;
@@ -325,7 +326,8 @@ internal class CSongManager {
 						value.rParentNode = nodeParent;
 
 						if (value.rParentNode != null) {
-							value.strScenePresets = value.rParentNode.strScenePresets;
+							if (string.IsNullOrWhiteSpace(value.strScenePresets))
+								value.strScenePresets = value.rParentNode.strScenePresets;
 							if (value.rParentNode.IsChangedForeColor) {
 								value.ForeColor = value.rParentNode.ForeColor;
 								value.IsChangedForeColor = true;
@@ -353,6 +355,10 @@ internal class CSongManager {
 							if (value.rParentNode.isChangedBoxChara) {
 								value.BoxChara = value.rParentNode.BoxChara;
 								value.isChangedBoxChara = true;
+							}
+							if (value.rParentNode.isChangedCompat) {
+								value.Compat = value.rParentNode.Compat;
+								value.isChangedCompat = true;
 							}
 						}
 
@@ -422,10 +428,14 @@ internal class CSongManager {
 			if (File.Exists(infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def")) {
 				CBoxDef boxdef = new CBoxDef(infoDir.FullName + @$"{Path.DirectorySeparatorChar}box.def");
 				CSongListNode cSongListNode = new CSongListNode();
+
+				ApplyParentSettings(cSongListNode, nodeParent);
+
 				cSongListNode.nodeType = CSongListNode.ENodeType.BOX;
 				cSongListNode.ldTitle = boxdef.Title;
 				cSongListNode.songGenre = boxdef.Genre;
-				cSongListNode.strScenePresets = boxdef.ScenePreset;
+				if (!string.IsNullOrWhiteSpace(boxdef.ScenePreset))
+					cSongListNode.strScenePresets = boxdef.ScenePreset;
 				cSongListNode.strSelectBGPath = infoDir.FullName + Path.DirectorySeparatorChar + boxdef.SelectBG;
 				if (!File.Exists(cSongListNode.strSelectBGPath)) cSongListNode.strSelectBGPath = null;
 
@@ -456,6 +466,10 @@ internal class CSongManager {
 				if (boxdef.IsChangedBoxChara) {
 					cSongListNode.BoxChara = boxdef.BoxChara;
 					cSongListNode.isChangedBoxChara = true;
+				}
+				if (boxdef.IsChangedCompat) {
+					cSongListNode.Compat = boxdef.Compat;
+					cSongListNode.isChangedCompat = true;
 				}
 
 
@@ -524,6 +538,9 @@ internal class CSongManager {
 						}
 						if (cSongListNode.isChangedBoxChara) {
 							sb.Append(", BoxChara=" + cSongListNode.BoxChara.ToString());
+						}
+						if (cSongListNode.isChangedCompat) {
+							sb.Append(", Compat=" + cSongListNode.Compat.ToString());
 						}
 						Trace.TraceInformation(sb.ToString());
 					} finally {
@@ -991,7 +1008,8 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 
 	private static void ApplyParentSettings(CSongListNode node, CSongListNode? parent) {
 		if (parent == null) return;
-		node.strScenePresets = parent.strScenePresets;
+		if (string.IsNullOrWhiteSpace(node.strScenePresets))
+			node.strScenePresets = parent.strScenePresets;
 		if (parent.IsChangedForeColor) { node.ForeColor = parent.ForeColor; node.IsChangedForeColor = true; }
 		if (parent.IsChangedBackColor) { node.BackColor = parent.BackColor; node.IsChangedBackColor = true; }
 		if (parent.isChangedBoxColor) { node.BoxColor = parent.BoxColor; node.isChangedBoxColor = true; }
@@ -999,6 +1017,7 @@ Debug.WriteLine( dBPM + ":" + c曲リストノード.strタイトル );
 		if (parent.isChangedBgType) { node.BgType = parent.BgType; node.isChangedBgType = true; }
 		if (parent.isChangedBoxType) { node.BoxType = parent.BoxType; node.isChangedBoxType = true; }
 		if (parent.isChangedBoxChara) { node.BoxChara = parent.BoxChara; node.isChangedBoxChara = true; }
+		if (parent.isChangedCompat) { node.Compat = parent.Compat; node.isChangedCompat = true; }
 		if (node.score[0] != null && parent.score[0] != null && string.IsNullOrEmpty(node.score[0].ChartInfo.Preimage))
 			node.score[0].ChartInfo.Preimage = parent.score[0].ChartInfo.Preimage;
 	}
