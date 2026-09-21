@@ -321,15 +321,27 @@ public static class CConfigOptionBuilder {
 			} else db.SetSetting(def.Id, valueStr);
 		}
 
-		var keyRows = new List<(CThemeSettingDef def, CLuaConfigOption opt)>();
+		// the page lists each section's settings together, sections in the order they first appear
+		var sections = new List<string>();
+		var bySection = new Dictionary<string, List<CThemeSettingDef>>();
 		foreach (var def in db.Definitions) {
+			string sec = def.Section?.GetString("") ?? "";
+			if (string.IsNullOrWhiteSpace(sec)) sec = secThemeSettings;
+			if (!bySection.TryGetValue(sec, out var list)) { list = new List<CThemeSettingDef>(); bySection[sec] = list; sections.Add(sec); }
+			list.Add(def);
+		}
+
+		var keyRows = new List<(CThemeSettingDef def, CLuaConfigOption opt)>();
+		foreach (var section in sections)
+		foreach (var def in bySection[section]) {
+			string secThemeSettings_ = section;
 			string label = def.Label.GetString(def.Id);
 			string desc = def.Description.GetString("");
 			string stored = def.IsSaveScoped ? db.GetSettingForSave(def.Id, repSaveId) : db.GetSetting(def.Id);
 			switch (def.Type.ToLowerInvariant()) {
 				case "key": {
 						// one keyboard key per setting; binding a key already held by another key setting frees it there
-						var opt = CLuaConfigOption.Key_("Theme", secThemeSettings, label, desc, stored, v => {
+						var opt = CLuaConfigOption.Key_("Theme", secThemeSettings_, label, desc, stored, v => {
 							Persist(def, v);
 							if (v == "") return;
 							foreach (var (odef, oopt) in keyRows)
@@ -342,19 +354,19 @@ public static class CConfigOptionBuilder {
 						break;
 					}
 				case "bool":
-					O.Add(CLuaConfigOption.Toggle_("Theme", secThemeSettings,label, desc,
+					O.Add(CLuaConfigOption.Toggle_("Theme", secThemeSettings_, label, desc,
 						stored == "1" || string.Equals(stored, "true", StringComparison.OrdinalIgnoreCase),
 						v => Persist(def, v ? "1" : "0")));
 					break;
 				case "int":
-					O.Add(CLuaConfigOption.Int_("Theme", secThemeSettings,label, desc,
+					O.Add(CLuaConfigOption.Int_("Theme", secThemeSettings_, label, desc,
 						int.TryParse(stored, out int iv) ? iv : def.DefaultInt, (int)def.Min, (int)def.Max, 1,
 						v => Persist(def, v.ToString())));
 					break;
 				case "double": {
 						int scale = 100;
 						double dv = double.TryParse(stored, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double d) ? d : def.DefaultDouble;
-						O.Add(CLuaConfigOption.Int_("Theme", secThemeSettings,label, desc,
+						O.Add(CLuaConfigOption.Int_("Theme", secThemeSettings_, label, desc,
 							(int)Math.Round(dv * scale), (int)Math.Round(def.Min * scale), (int)Math.Round(def.Max * scale), 1,
 							v => Persist(def, (v / 100.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)),
 							o => (o.Value / 100.0).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)));
@@ -362,7 +374,7 @@ public static class CConfigOptionBuilder {
 					}
 				case "enum":
 					if (def.Options != null && def.Options.Length > 0)
-						O.Add(CLuaConfigOption.Choice_("Theme", secThemeSettings,label, desc, def.Options,
+						O.Add(CLuaConfigOption.Choice_("Theme", secThemeSettings_, label, desc, def.Options,
 							Math.Max(0, Array.IndexOf(def.Options, stored)), idx => Persist(def, def.Options[idx])));
 					break;
 				// "string" theme settings omitted from the inline UI for now (rare; need a text editor).

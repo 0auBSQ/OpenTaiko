@@ -123,7 +123,7 @@ With the shipped skin as the reference, the skin root contains:
 - `Fonts/`: the `.ttf` files referenced by the `FontName` keys.
 - `Locales/`: one JSON file per language (`en.json`, `ja.json`, ...) with the shape `{ "Entries": { "KEY": "text" } }`. These strings label the skin's own settings, and Lua reads them through `THEME:GetSkinString(key)`. When a key is missing from the active language, the game looks it up in the `DefaultLocale` file.
 - `Modules/`: the Lua module tree (Step 8).
-- `ThemeSettings.json`: an array of settings that the options screen shows under Theme Settings. Each entry has `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, or `key` for one keyboard key the options screen captures, stored as its name for `INPUT:KeyboardPressed`), `scope` (`global`, the default, or `save` for one value per save file), localized `label` and `description`, `default`, and `min`/`max` or `options` depending on the type.
+- `ThemeSettings.json`: an array of settings that the options screen shows under Theme Settings. Each entry has `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, or `key` for one keyboard key the options screen captures, stored as its name for `INPUT:KeyboardPressed`), `scope` (`global`, the default, or `save` for one value per save file), localized `label` and `description`, `default`, and `min`/`max` or `options` depending on the type. An optional localized `section` groups settings under their own sub-header on the Theme page; settings without one sit under the default header.
 - `SkinConfig.ini` and the included `*Config.ini` files.
 - `README.txt`, `LICENSE.md`, `Licenses/`: attribution files. The game does not read them.
 

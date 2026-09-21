@@ -1,74 +1,78 @@
 [
   {
-    "id": "test_int",
-    "type": "int",
-    "scope": "global",
-    "label": {
-      "strings": {
-        "default": "Test Integer Setting"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Test setting for integer values.\nUsed to verify the theme settings system works correctly."
-      }
-    },
-    "default": "5",
-    "min": 1,
-    "max": 20
-  },
-  {
-    "id": "test_double",
-    "type": "double",
-    "scope": "global",
-    "label": {
-      "strings": {
-        "default": "Test Decimal Setting"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Test setting for decimal (double) values.\nUsed to verify the theme settings system works correctly."
-      }
-    },
-    "default": "0.30",
-    "min": 0.0,
-    "max": 1.0
-  },
-  {
-    "id": "test_enum",
-    "type": "enum",
-    "scope": "global",
-    "label": {
-      "strings": {
-        "default": "Test Enum Setting"
-      }
-    },
-    "description": {
-      "strings": {
-        "default": "Test setting for enum (list) values.\nUsed to verify the theme settings system works correctly."
-      }
-    },
-    "default": "Default",
-    "options": [
-      "Default",
-      "Classic",
-      "Pixel",
-      "Neon"
-    ]
-  },
-  {
-    "id": "test_bool",
+    "id": "songselect_mouse",
     "type": "bool",
-    "scope": "save",
+    "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Song Select",
+        "ja": "選曲",
+        "fr": "Sélection de chanson",
+        "de": "Songauswahl",
+        "es": "Selección de canciones",
+        "ko": "곡 선택",
+        "zh": "选曲"
+      }
+    },
     "label": {
       "strings": {
-        "default": "Test Boolean Setting"
+        "default": "Enable mouse navigation",
+        "ja": "マウス操作を有効にする",
+        "fr": "Activer la navigation à la souris",
+        "de": "Mausnavigation aktivieren",
+        "es": "Activar la navegación con el ratón",
+        "ko": "마우스 조작 사용",
+        "zh": "启用鼠标操作"
       }
     },
     "description": {
       "strings": {
-        "default": "Test setting for boolean (on/off) values, save-scoped.\nUsed to verify the per-save theme settings system works correctly."
+        "default": "Lets the mouse browse the song list and the difficulty bars: the wheel scrolls, hovering picks and a click decides.\nTakes effect only in single player. The best plays list stays usable with the mouse even when this is off.",
+        "ja": "マウスで曲リストと難易度バーを操作できます: ホイールでスクロール、ホバーで選択、クリックで決定。\n1 人プレイのときのみ有効です。オフでもベストプレイ一覧はマウスで操作できます。",
+        "fr": "Permet à la souris de parcourir la liste des chansons et les barres de difficulté : la molette fait défiler, le survol sélectionne et un clic valide.\nNe s'applique qu'en solo. La liste des meilleures parties reste utilisable à la souris même si l'option est désactivée.",
+        "de": "Lässt die Maus die Songliste und die Schwierigkeitsleisten bedienen: das Rad scrollt, Zeigen wählt aus, ein Klick bestätigt.\nGilt nur im Einzelspieler. Die Liste der besten Spiele bleibt auch bei ausgeschalteter Option mit der Maus bedienbar.",
+        "es": "Permite al ratón recorrer la lista de canciones y las barras de dificultad: la rueda desplaza, pasar por encima selecciona y un clic confirma.\nSolo tiene efecto en un jugador. La lista de mejores partidas sigue pudiendo usarse con el ratón aunque esté desactivado.",
+        "ko": "마우스로 곡 목록과 난이도 바를 조작합니다: 휠로 스크롤, 올려서 선택, 클릭으로 결정.\n1인 플레이에서만 적용됩니다. 꺼져 있어도 베스트 플레이 목록은 마우스로 사용할 수 있습니다.",
+        "zh": "允许用鼠标浏览歌曲列表和难度条：滚轮滚动，悬停选择，点击确定。\n仅在单人游戏时生效。即使关闭，最佳成绩列表仍可用鼠标操作。"
+      }
+    },
+    "default": "1"
+  },
+  {
+    "id": "songselect_replays",
+    "type": "bool",
+    "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Song Select",
+        "ja": "選曲",
+        "fr": "Sélection de chanson",
+        "de": "Songauswahl",
+        "es": "Selección de canciones",
+        "ko": "곡 선택",
+        "zh": "选曲"
+      }
+    },
+    "label": {
+      "strings": {
+        "default": "Show best plays",
+        "ja": "ベストプレイを表示する",
+        "fr": "Afficher les meilleures parties",
+        "de": "Beste Spiele anzeigen",
+        "es": "Mostrar las mejores partidas",
+        "ko": "베스트 플레이 표시",
+        "zh": "显示最佳成绩"
+      }
+    },
+    "description": {
+      "strings": {
+        "default": "Shows the best plays of the hovered difficulty on the difficulty select, where a replay can be watched.\nWhen off, the list does not appear at all.",
+        "ja": "難易度選択で、選択中の難易度のベストプレイ一覧を表示します。リプレイを見ることもできます。\nオフにすると一覧は表示されません。",
+        "fr": "Affiche les meilleures parties de la difficulté survolée sur la sélection de difficulté, où un replay peut être regardé.\nDésactivée, la liste n'apparaît pas du tout.",
+        "de": "Zeigt bei der Schwierigkeitswahl die besten Spiele der markierten Schwierigkeit, wo ein Replay angesehen werden kann.\nAusgeschaltet erscheint die Liste gar nicht.",
+        "es": "Muestra en la selección de dificultad las mejores partidas de la dificultad marcada, donde se puede ver una repetición.\nDesactivado, la lista no aparece en absoluto.",
+        "ko": "난이도 선택에서 선택 중인 난이도의 베스트 플레이를 표시하며, 리플레이를 볼 수 있습니다.\n끄면 목록이 전혀 나타나지 않습니다.",
+        "zh": "在难度选择中显示所选难度的最佳成绩，并可观看回放。\n关闭后列表完全不显示。"
       }
     },
     "default": "1"
@@ -77,6 +81,17 @@
     "id": "songselect_key_help",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: show shortcuts",
@@ -105,6 +120,17 @@
     "id": "songselect_key_sort",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: sort",
@@ -133,6 +159,17 @@
     "id": "songselect_key_search",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: search",
@@ -161,6 +198,17 @@
     "id": "songselect_key_favorite",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: favorite",
@@ -189,6 +237,17 @@
     "id": "songselect_key_favorites_folder",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: open favorites",
@@ -217,6 +276,17 @@
     "id": "songselect_key_auto_p1",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: auto (player 1)",
@@ -245,6 +315,17 @@
     "id": "songselect_key_auto_p2",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: auto (player 2)",
@@ -273,6 +354,17 @@
     "id": "songselect_key_player_count",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: player count",
@@ -301,6 +393,17 @@
     "id": "songselect_key_player",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: set-up player",
@@ -329,6 +432,17 @@
     "id": "songselect_key_course",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: displayed difficulty",
@@ -357,6 +471,17 @@
     "id": "songselect_key_speed_down",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: slower",
@@ -385,6 +510,17 @@
     "id": "songselect_key_speed_up",
     "type": "key",
     "scope": "global",
+    "section": {
+      "strings": {
+        "default": "Inputs",
+        "ja": "入力",
+        "fr": "Entrées",
+        "de": "Eingaben",
+        "es": "Entradas",
+        "ko": "입력",
+        "zh": "输入"
+      }
+    },
     "label": {
       "strings": {
         "default": "Song select: faster",

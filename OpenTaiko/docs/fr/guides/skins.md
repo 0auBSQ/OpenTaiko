@@ -123,7 +123,7 @@ Avec le skin fourni comme référence, la racine du skin contient :
 - `Fonts/` : les fichiers `.ttf` référencés par les clés `FontName`.
 - `Locales/` : un fichier JSON par langue (`en.json`, `ja.json`, ...) de la forme `{ "Entries": { "KEY": "text" } }`. Ces chaînes étiquettent les réglages propres au skin, et Lua les lit via `THEME:GetSkinString(key)`. Quand une clé est absente de la langue active, le jeu la recherche dans le fichier `DefaultLocale`.
 - `Modules/` : l'arborescence des modules Lua (étape 8).
-- `ThemeSettings.json` : un tableau de réglages que l'écran des options affiche sous Paramètres du thème. Chaque entrée a `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, ou `key` pour une touche du clavier que l'écran d'options capture et stocke par son nom pour `INPUT:KeyboardPressed`), `scope` (`global`, par défaut, ou `save` pour une valeur par fichier de sauvegarde), `label` et `description` localisés, `default`, et `min`/`max` ou `options` selon le type.
+- `ThemeSettings.json` : un tableau de réglages que l'écran des options affiche sous Paramètres du thème. Chaque entrée a `id`, `type` (`bool`, `int`, `double`, `string`, `enum`, ou `key` pour une touche du clavier que l'écran d'options capture et stocke par son nom pour `INPUT:KeyboardPressed`), `scope` (`global`, par défaut, ou `save` pour une valeur par fichier de sauvegarde), `label` et `description` localisés, `default`, et `min`/`max` ou `options` selon le type. Un `section` localisé facultatif regroupe les réglages sous leur propre sous-titre dans la page du thème ; les réglages sans section vont sous le titre par défaut.
 - `SkinConfig.ini` et les fichiers `*Config.ini` inclus.
 - `README.txt`, `LICENSE.md`, `Licenses/` : fichiers d'attribution. Le jeu ne les lit pas.
 

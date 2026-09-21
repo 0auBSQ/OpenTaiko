@@ -32,6 +32,14 @@ internal class CThemeSettingDef {
 	[JsonProperty("description")]
 	public CLocalizationData Description { get; set; } = new();
 
+	/// <summary>
+	/// Optional localized sub-section header the setting is listed under on the Theme page; settings
+	/// sharing a section are listed together, in the order of their first appearance. Empty = the page's
+	/// default "Theme Settings" header.
+	/// </summary>
+	[JsonProperty("section")]
+	public CLocalizationData? Section { get; set; }
+
 	/// <summary>Default value serialized as a string (parsed according to Type).</summary>
 	[JsonProperty("default")]
 	public string Default { get; set; } = "";

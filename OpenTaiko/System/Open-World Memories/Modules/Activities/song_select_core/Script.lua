@@ -219,9 +219,27 @@ G.backgrounds = BG
 SC.init(G)
 G.shortcuts = SC
 G.songListHit = DrawSS.hitTest
--- the mouse drives the song list and the difficulty bars only when one person plays; the AI battle's
--- second slot is the bot, so that mode counts as one
-G.mouseAllowed = function() return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true end
+-- the skin's bool theme settings, read once per visit (a missing definition counts as on)
+local themeFlags = {}
+G.reloadThemeFlags = function()
+    themeFlags = {}
+    for _, id in ipairs({ "songselect_mouse", "songselect_replays" }) do
+        local ok, v = pcall(function() return THEME:GetThemeSetting(id) end)
+        themeFlags[id] = not (ok and (v == "0" or v == "false"))
+    end
+end
+G.themeFlag = function(id)
+    local v = themeFlags[id]
+    if v == nil then return true end
+    return v
+end
+-- the mouse drives the song list and the difficulty bars only when one person plays (the AI battle's
+-- second slot is the bot, so that mode counts as one) and the theme setting allows it; the best plays
+-- list keeps its own mouse handling whatever the setting says
+G.mouseAllowed = function()
+    if not G.themeFlag("songselect_mouse") then return false end
+    return CONFIG.PlayerCount == 1 or G.activeConfig.mountAISlotToP2 == true
+end
 Featured.init(G)
 
 -- Expose applySort through G so other modules (e.g. search.lua) can call it
@@ -376,6 +394,7 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
     BG.setMode(backgroundMode)
     BG.reset()
     SC.reload()   -- the bindings can change in the settings between visits
+    G.reloadThemeFlags()
 
     -- localized overlays for the current language (it can change between visits); freed in deactivate()
     for key, default in pairs(OVERLAY_FILES) do

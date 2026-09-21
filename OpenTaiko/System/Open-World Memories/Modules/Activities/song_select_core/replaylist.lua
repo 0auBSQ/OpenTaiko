@@ -332,7 +332,7 @@ function M.isRegular()
 end
 
 local function active()
-    return CONFIG.PlayerCount == 1 and M.isRegular()
+    return CONFIG.PlayerCount == 1 and M.isRegular() and G.themeFlag("songselect_replays")
 end
 
 -- diffselect shifts the chara/nameplate left only when the strip actually shows
