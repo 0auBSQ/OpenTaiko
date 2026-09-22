@@ -4,6 +4,8 @@ local TowerArt = require("TowerArt")
 local songlist = nil
 
 local art = nil   -- the towers, composed from the pieces of each chart's tower look (Lib/TowerArt.lua)
+local tex_pedestal = nil      -- back, random and folder entries: a badge floating over a pedestal
+local tex_icons = {}
 local tex_bg = TEXTURE:CreateTexture()
 local tex_info = TEXTURE:CreateTexture()
 local tex_info_spicy = TEXTURE:CreateTexture()
@@ -27,8 +29,12 @@ local title_y = {}
 local tower_scale = {}
 
 local tower_titles = {}
-local tower_kinds = {}   -- per slot: the tower look and the floors drawn (folders get the default look)
+local tower_kinds = {}   -- per slot: kind "song" (with the tower look and the floors drawn), "back", "random", "folder" or "none"
 local tower_info = nil
+local clock = 0
+
+local ICON_LIFT = 60      -- the badge floats this far over the pedestal
+local ICON_BOB = 8        -- and bobs by this much
 
 local tex_number_interval = 32
 
@@ -70,7 +76,7 @@ local function refresh()
 
     for i = loop_start,loop_end do
         tower_titles[i] = TEXTURE:CreateTexture()
-        tower_kinds[i] = { look = nil, floors = TOWER_FLOORS_MAX }
+        tower_kinds[i] = { kind = "none", look = nil, floors = TOWER_FLOORS_MAX }
 
         if songlist == nil then
             goto continue
@@ -83,11 +89,15 @@ local function refresh()
             end
 
             if node.IsSong then
+                tower_kinds[i].kind = "song"
                 local chart = node:GetChart(5)
                 if chart ~= nil then
                     tower_kinds[i].look = chart.TowerType
                     tower_kinds[i].floors = math.max(1, math.min(TOWER_FLOORS_MAX, chart.TotalFloorCount or TOWER_FLOORS_MAX))
                 end
+            elseif node.IsReturn then tower_kinds[i].kind = "back"
+            elseif node.IsRandom then tower_kinds[i].kind = "random"
+            elseif node.IsFolder then tower_kinds[i].kind = "folder"
             end
 
             if i == 0 then
@@ -139,6 +149,10 @@ local function handleDecide()
         local success = songlist:CloseFolder()
         refresh()
         return success
+    elseif node.IsRandom then
+        local pick = songlist:GetRandomNodeInFolder(node, true)
+        if pick == nil then return false end
+        return pick:Mount(5), "song"
     elseif node.IsSong then
         local success = node:Mount(5)
         return success, "song"
@@ -236,8 +250,17 @@ function draw()
             local scale = position(tower_scale, i)
 
             local kind = tower_kinds[i]
-            if art ~= nil and kind ~= nil then
+            if kind ~= nil and kind.kind == "song" and art ~= nil then
                 art:draw(kind.look, x, y, TOWER_SCALE * scale, kind.floors, { color = fade })
+            elseif kind ~= nil and tex_icons[kind.kind] ~= nil then
+                tex_pedestal:SetScale(scale, scale)
+                tex_pedestal:SetColor(fade)
+                tex_pedestal:DrawAtAnchor(x, y, "Bottom")
+                local icon = tex_icons[kind.kind]
+                local bob = math.sin(clock * 2 + i * 0.8) * ICON_BOB
+                icon:SetScale(scale, scale)
+                icon:SetColor(fade)
+                icon:DrawAtAnchor(x, y - (tex_pedestal.Height + ICON_LIFT + icon.Height / 2 + bob) * scale, "Center")
             end
             tower_titles[i]:SetScale(scale, scale)
             tower_titles[i]:SetColor(fade)
@@ -257,6 +280,7 @@ function draw()
 end
 
 function update()
+    clock = clock + fps.deltaTime
     local navPn = NavInput.p[1]
     if songlist ~= nil then
         if navPn.right() then
@@ -299,6 +323,12 @@ function activate()
 
     art = TowerArt.load()
     preloadTowers()
+    tex_pedestal = TEXTURE:CreateTexture("Textures/pedestal.png")
+    tex_icons = {
+        back = TEXTURE:CreateTexture("Textures/icon_back.png"),
+        random = TEXTURE:CreateTexture("Textures/icon_random.png"),
+        folder = TEXTURE:CreateTexture("Textures/icon_folder.png"),
+    }
     tex_bg = TEXTURE:CreateTexture("Textures/BG.png")
     tex_info = TEXTURE:CreateTexture("Textures/Info.png")
     tex_info_spicy = TEXTURE:CreateTexture("Textures/Spicy_Full.png")
@@ -312,6 +342,9 @@ end
 
 function deactivate()
     if art ~= nil then art:dispose(); art = nil end
+    if tex_pedestal ~= nil then tex_pedestal:Dispose(); tex_pedestal = nil end
+    for _, t in pairs(tex_icons) do t:Dispose() end
+    tex_icons = {}
     if tex_bg ~= nil then tex_bg:Dispose() end
     if tex_info ~= nil then tex_info:Dispose() end
     if tex_info_spicy ~= nil then tex_info_spicy:Dispose() end
