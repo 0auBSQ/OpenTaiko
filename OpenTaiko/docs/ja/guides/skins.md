@@ -153,7 +153,7 @@ My New Skin/
 ゲームは次のモジュールを名前で参照し、同梱スキンはそのすべてを提供しています。
 
 - ステージ `_boot` と `_title`。どちらかがなければゲームはエラーで停止します。
-- ROActivity `modal`、`config_ui`、`nameplate`、`popup_menu`、`modicons`、`song_enum`, `cutscene`、`danplate`。
+- ROActivity `modal`、`config_ui`、`nameplate`、`popup_menu`、`modicons`、`song_enum`, `cutscene`, `tower_view`, `tower_hud`、`danplate`。
 - トランジション `default` と `song_loading`。`song_loading` はゲームが楽曲を読み込む間に再生され、`Exit` がトランジションを指定しないか、存在しないものを指定したときにゲームは `default` を使います。トランジションモジュールをまったく持たないスキンは単純な黒のフェードにフォールバックします。
 
 スキンを作るときはこれらすべてを残し、独自のモジュールをその隣に追加してください。

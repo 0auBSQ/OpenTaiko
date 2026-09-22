@@ -160,7 +160,13 @@
         "TITLE_SETTINGS_DESC": "Passe deine Einstellungen an dein Spielerlebnis an!",
         "TITLE_EXIT": "Beenden",
         "TITLE_EXIT_DESC": "Bis zum nächsten Mal!",
-        "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?"
+        "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Erreichte Etage",
+        "TOWER_HUD_FLOOR_PREFIX": "Etage ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Leben"
 
     }
 }

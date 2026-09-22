@@ -160,7 +160,13 @@
         "TITLE_SETTINGS_DESC": "プレイ環境に合わせて設定を調整しよう！",
         "TITLE_EXIT": "終了",
         "TITLE_EXIT_DESC": "またね！",
-        "TITLE_VAULT_LOCKED_DESC": "聞こえますか…？"
+        "TITLE_VAULT_LOCKED_DESC": "聞こえますか…？",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "到達階数",
+        "TOWER_HUD_FLOOR_PREFIX": "",
+        "TOWER_HUD_FLOOR_SUFFIX": "階",
+        "TOWER_HUD_LIVES": "ライフ"
 
     }
 }

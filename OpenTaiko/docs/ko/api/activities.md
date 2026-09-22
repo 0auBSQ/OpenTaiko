@@ -198,6 +198,8 @@ end
 | `modal` | 큐에 있는 각 잠금 해제 모달에 대해 `activate(player, rarity, modalType, ...)`, 그다음 매 프레임 `update()`와 `draw()`. 스크립트는 DEACTIVATE()를 호출해 모달을 닫고, 엔진은 그다음 것을 활성화합니다. |
 | `modicons` | 한 번 `activate()`, 그다음 layout이 "menu" 또는 "game"인 `draw(x, y, player, layout, alpha)`. MODICONS 전역이 이를 감쌉니다. |
 | `danplate` | 결과 화면과 단위 코스에서 `draw(x, y, opacity, danTick, r, g, b, titleText)`. |
+| `tower_view` | 타워 결과 화면에서 채보의 타워 룩과 층 수로 `activate(look, floors)`; 매 프레임 `draw(scroll, opacity)`, scroll 0은 지면, 1은 하늘; `deactivate()`. song_loading 전환도 같은 방식으로 구동합니다. |
+| `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
 | `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남; `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
 | `song_enum` | `activate()`, 그다음 곡 스캔이 실행되는 동안 매 프레임 `draw(isCommandSongDataGet, done, total)`; `deactivate()`. |

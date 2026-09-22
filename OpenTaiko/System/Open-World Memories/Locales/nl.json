@@ -162,7 +162,13 @@
         "TITLE_SETTINGS_DESC": "Pas je instellingen aan je speelervaring aan!",
         "TITLE_EXIT": "Afsluiten",
         "TITLE_EXIT_DESC": "Tot de volgende keer!",
-        "TITLE_VAULT_LOCKED_DESC": "Hoor je me...?"
+        "TITLE_VAULT_LOCKED_DESC": "Hoor je me...?",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Bereikte verdieping",
+        "TOWER_HUD_FLOOR_PREFIX": "Niveau ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Levens"
 
     }
 }

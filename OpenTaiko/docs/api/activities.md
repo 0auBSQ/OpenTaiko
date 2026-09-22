@@ -198,6 +198,8 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 | `modal` | `activate(player, rarity, modalType, ...)` for each queued unlock modal, then `update()` and `draw()` every frame. The script calls DEACTIVATE() to dismiss the modal; the engine then activates the next one. |
 | `modicons` | `activate()` once, then `draw(x, y, player, layout, alpha)` with layout "menu" or "game". The MODICONS global wraps this. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` on the result screen and in dan courses. |
+| `tower_view` | `activate(look, floors)` on the tower result with the chart's tower look and floor count; `draw(scroll, opacity)` every frame, scroll 0 being the ground and 1 the sky; `deactivate()`. The song_loading transition drives it the same way. |
+| `tower_hud` | `activate(maxFloor)` when a tower play starts; `update()` and `draw()` every frame over the upper background; `deactivate()`. It reads the floor and the lives from PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` where items are the labels joined by newlines, followed by the PopupMenu skin positions; `draw(selected)` every frame; `deactivate()` on close. |
 | `config_ui` | `activate(model)` with the settings model; `update()` every frame, returning "exit" to leave the settings screen; `draw()`; `reload(model)` through Call when the engine rebuilds the model; `deactivate()`. |
 | `song_enum` | `activate()`, then `draw(isCommandSongDataGet, done, total)` every frame while the song scan runs; `deactivate()`. |

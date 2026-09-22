@@ -198,6 +198,8 @@ Die Engine schlägt einige ROActivities unter festem Ordnernamen nach und steuer
 | `modal` | `activate(player, rarity, modalType, ...)` für jedes eingereihte Freischalt-Modal, dann `update()` und `draw()` jeden Frame. Das Skript ruft DEACTIVATE() auf, um das Modal zu schließen; die Engine aktiviert dann das nächste. |
 | `modicons` | `activate()` einmal, dann `draw(x, y, player, layout, alpha)` mit layout "menu" oder "game". Das globale Objekt MODICONS kapselt dies. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` auf dem Ergebnisbildschirm und in Dan-Kursen. |
+| `tower_view` | `activate(look, floors)` im Tower-Ergebnis mit dem Tower-Look und der Stockwerkzahl des Charts; `draw(scroll, opacity)` in jedem Frame, wobei scroll 0 der Boden und 1 der Himmel ist; `deactivate()`. Der Übergang song_loading steuert es genauso. |
+| `tower_hud` | `activate(maxFloor)` beim Start eines Tower-Spiels; `update()` und `draw()` in jedem Frame über dem oberen Hintergrund; `deactivate()`. Es liest das Stockwerk und die Leben aus PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, wobei items die durch Zeilenumbrüche verbundenen Beschriftungen sind, gefolgt von den PopupMenu-Positionen des Skins; `draw(selected)` jeden Frame; `deactivate()` beim Schließen. |
 | `config_ui` | `activate(model)` mit dem Einstellungsmodell; `update()` jeden Frame, gibt "exit" zurück, um den Einstellungsbildschirm zu verlassen; `draw()`; `reload(model)` über Call, wenn die Engine das Modell neu aufbaut; `deactivate()`. |
 | `song_enum` | `activate()`, dann `draw(isCommandSongDataGet, done, total)` jeden Frame, während der Song-Scan läuft; `deactivate()`. |

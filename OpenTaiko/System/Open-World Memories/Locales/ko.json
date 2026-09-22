@@ -160,7 +160,13 @@
         "TITLE_SETTINGS_DESC": "플레이 환경에 맞게 설정을 조정하세요!",
         "TITLE_EXIT": "종료",
         "TITLE_EXIT_DESC": "다음에 또 만나요!",
-        "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?"
+        "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "도달한 층",
+        "TOWER_HUD_FLOOR_PREFIX": "",
+        "TOWER_HUD_FLOOR_SUFFIX": "층",
+        "TOWER_HUD_LIVES": "라이프"
 
     }
 }

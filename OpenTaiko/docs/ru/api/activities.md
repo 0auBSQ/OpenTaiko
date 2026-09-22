@@ -198,6 +198,8 @@ end
 | `modal` | `activate(player, rarity, modalType, ...)` для каждого модального окна разблокировки в очереди, затем `update()` и `draw()` каждый кадр. Скрипт вызывает DEACTIVATE(), чтобы закрыть окно; затем движок активирует следующее. |
 | `modicons` | `activate()` один раз, затем `draw(x, y, player, layout, alpha)` с layout "menu" или "game". Глобальный объект MODICONS оборачивает эту ROActivity. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` на экране результатов и в дан-курсах. |
+| `tower_view` | `activate(look, floors)` на результате башни с обликом башни и числом этажей чарта; `draw(scroll, opacity)` каждый кадр, где scroll 0 — земля, 1 — небо; `deactivate()`. Переход song_loading управляет им так же. |
+| `tower_hud` | `activate(maxFloor)` при старте игры в башне; `update()` и `draw()` каждый кадр поверх верхнего фона; `deactivate()`. Этаж и жизни он читает из PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`, где items — метки, соединённые переносами строк, за которыми следуют позиции PopupMenu из скина; `draw(selected)` каждый кадр; `deactivate()` при закрытии. |
 | `config_ui` | `activate(model)` с моделью настроек; `update()` каждый кадр, возвращающий "exit" для выхода с экрана настроек; `draw()`; `reload(model)` через Call, когда движок перестраивает модель; `deactivate()`. |
 | `song_enum` | `activate()`, затем `draw(isCommandSongDataGet, done, total)` каждый кадр, пока идёт сканирование песен; `deactivate()`. |

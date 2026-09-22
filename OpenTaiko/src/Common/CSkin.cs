@@ -4402,14 +4402,6 @@ internal class CSkin : IDisposable {
 									Gauge_Soul_Y_AI = int.Parse(strParam);
 									break;
 								}
-							case "Gauge_Soul_X_Tower": {
-									Gauge_Soul_X_Tower = int.Parse(strParam);
-									break;
-								}
-							case "Gauge_Soul_Y_Tower": {
-									Gauge_Soul_Y_Tower = int.Parse(strParam);
-									break;
-								}
 							case "Gauge_Soul_Fire_X": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -4432,50 +4424,10 @@ internal class CSkin : IDisposable {
 									Gauge_Soul_Fire_Y_AI = int.Parse(strParam);
 									break;
 								}
-							case "Gauge_Soul_Fire_X_Tower": {
-									Gauge_Soul_Fire_X_Tower = int.Parse(strParam);
-									break;
-								}
-							case "Gauge_Soul_Fire_Y_Tower": {
-									Gauge_Soul_Fire_Y_Tower = int.Parse(strParam);
-									break;
-								}
 							case "Game_Gauge_Rainbow_Timer": {
 									if (int.Parse(strParam) != 0) {
 										Game_Gauge_Rainbow_Timer = int.Parse(strParam);
 									}
-									break;
-								}
-							case "Game_Tower_Floor_Number": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floor_Number[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Life_Number": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Life_Number[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_TouTatsuKaiSuu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Font_TouTatsuKaiSuu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_Kai": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Font_Kai[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Font_TowerText": {
-									Game_Tower_Font_TowerText = int.Parse(strParam);
 									break;
 								}
 
@@ -8424,14 +8376,10 @@ internal class CSkin : IDisposable {
 	public int[] Gauge_Soul_Y = new int[] { 125, 516 };
 	public int Gauge_Soul_X_AI = 1200;
 	public int Gauge_Soul_Y_AI = 140;
-	public int Gauge_Soul_X_Tower = 958;
-	public int Gauge_Soul_Y_Tower = 95;
 	public int[] Gauge_Soul_Fire_X = new int[] { 1112, 1112 };
 	public int[] Gauge_Soul_Fire_Y = new int[] { 52, 443 };
 	public int Gauge_Soul_Fire_X_AI = 1143;
 	public int Gauge_Soul_Fire_Y_AI = 83;
-	public int Gauge_Soul_Fire_X_Tower = 886;
-	public int Gauge_Soul_Fire_Y_Tower = 22;
 	public int Game_Gauge_Rainbow_Ptn;
 	public int Game_Gauge_Rainbow_2PGauge_Ptn;
 	public int Game_Gauge_Rainbow_Flat_Ptn;
@@ -8649,14 +8597,9 @@ internal class CSkin : IDisposable {
 
 	public int[] Game_Tower_Miss = new int[] { 640, 520 };
 
-	public int[] Game_Tower_Floor_Number = new int[] { 556, 84 };
 
-	public int[] Game_Tower_Life_Number = new int[] { 996, 106 };
 
-	public int[] Game_Tower_Font_TouTatsuKaiSuu = new int[] { 350, 32 };
-	public int[] Game_Tower_Font_Kai = new int[] { 550, 104 };
 
-	public int Game_Tower_Font_TowerText = 28;
 	#endregion
 	#region AIBattle
 	public int Game_AIBattle_CharaMove = 71;

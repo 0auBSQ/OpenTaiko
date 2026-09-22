@@ -153,7 +153,7 @@ My New Skin/
 Игра ищет следующие модули по имени, и поставляемый скин предоставляет их все:
 
 - Сцены `_boot` и `_title`. Игра останавливается с ошибкой, если любая из них отсутствует.
-- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` и `danplate`.
+- ROActivity `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene`, `tower_view`, `tower_hud` и `danplate`.
 - Переходы `default` и `song_loading`. `song_loading` проигрывается, пока игра загружает песню; игра использует `default`, когда `Exit` не называет переход или называет несуществующий. Скин вообще без модулей переходов откатывается к простому затемнению в чёрный.
 
 Сохраняйте все их при сборке скина; добавляйте собственные модули рядом с ними.

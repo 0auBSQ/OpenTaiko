@@ -160,7 +160,13 @@
         "TITLE_SETTINGS_DESC": "调整设置，打造适合你的游戏体验！",
         "TITLE_EXIT": "退出",
         "TITLE_EXIT_DESC": "下次见！",
-        "TITLE_VAULT_LOCKED_DESC": "你能听见我吗……？"
+        "TITLE_VAULT_LOCKED_DESC": "你能听见我吗……？",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "到达楼层",
+        "TOWER_HUD_FLOOR_PREFIX": "",
+        "TOWER_HUD_FLOOR_SUFFIX": "层",
+        "TOWER_HUD_LIVES": "生命"
 
     }
 }

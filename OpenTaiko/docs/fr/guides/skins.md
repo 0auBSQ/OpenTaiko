@@ -153,7 +153,7 @@ Au sein de chaque catégorie, le jeu crée d'abord chaque module puis exécute `
 Le jeu recherche les modules suivants par leur nom, et le skin fourni les propose tous :
 
 - Les stages `_boot` et `_title`. Le jeu s'arrête avec une erreur si l'un des deux manque.
-- Les ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene` et `danplate`.
+- Les ROActivities `modal`, `config_ui`, `nameplate`, `popup_menu`, `modicons`, `song_enum`, `cutscene`, `tower_view`, `tower_hud` et `danplate`.
 - Les transitions `default` et `song_loading`. `song_loading` se joue pendant que le jeu charge une chanson ; le jeu utilise `default` quand `Exit` ne nomme aucune transition ou en nomme une qui n'existe pas. Un skin sans aucun module de transition retombe sur un simple fondu au noir.
 
 Conservez tous ces modules en construisant un skin ; ajoutez vos propres modules à côté.

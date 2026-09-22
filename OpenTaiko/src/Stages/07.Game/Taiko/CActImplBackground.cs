@@ -1,6 +1,4 @@
 ﻿using FDK;
-using Color = System.Drawing.Color;
-using Rectangle = System.Drawing.Rectangle;
 
 namespace OpenTaiko;
 
@@ -119,23 +117,9 @@ internal class CActImplBackground : CActivity {
 			CCharacter.AddEssentialVoice(0, CCharacter.VOICE_TOWER_MISS);
 		}
 
-		this.pfTowerText = HPrivateFastFont.tInstantiateMainFont(OpenTaiko.Skin.Game_Tower_Font_TowerText);
-
-		/*
-        if (!string.IsNullOrEmpty(TJAPlayer3.ConfigIni.FontName))
-        {
-            this.pfTowerText = new CPrivateFastFont(new FontFamily(TJAPlayer3.ConfigIni.FontName), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
-        }
-        else
-        {
-            this.pfTowerText = new CPrivateFastFont(new FontFamily("MS UI Gothic"), TJAPlayer3.Skin.Game_Tower_Font_TowerText);
-        }
-        */
-
-		this.ttkTouTatsuKaiSuu = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_REACHED"), pfTowerText, Color.White, Color.Black, 700);
-		this.ttkKai = new TitleTextureKey(CLangManager.LangInstance.GetString("TOWER_FLOOR_INITIAL"), pfTowerText, Color.White, Color.Black, 700);
-
-		this.ctFlame = new CCounter(0, 6, 50, OpenTaiko.Timer);
+		// the floor and lives display over the upper background is the tower_hud ROActivity
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)
+			TowerHud?.Activate(OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo.nTotalFloor ?? 1);
 
 		this.currentCharacter = Math.Max(0, Math.Min(OpenTaiko.SaveFileInstances[0].data.Character, OpenTaiko.Tx.Characters.Length - 1));
 
@@ -220,7 +204,7 @@ internal class CActImplBackground : CActivity {
 		OpenTaiko.tDisposeSafely(ref UpScript);
 		OpenTaiko.tDisposeSafely(ref DownScript);
 
-		OpenTaiko.tDisposeSafely(ref pfTowerText);
+		if (TowerHud != null && TowerHud.IsActive) TowerHud.Deactivate();
 
 		base.DeActivate();
 	}
@@ -261,13 +245,7 @@ internal class CActImplBackground : CActivity {
 				#region [Tower background informations]
 
 				if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
-					TitleTextureKey.ResolveTitleTexture(ttkTouTatsuKaiSuu).t2DDraw(OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[0], OpenTaiko.Skin.Game_Tower_Font_TouTatsuKaiSuu[1]);
-					TitleTextureKey.ResolveTitleTexture(ttkKai).t2DDraw(OpenTaiko.Skin.Game_Tower_Font_Kai[0], OpenTaiko.Skin.Game_Tower_Font_Kai[1]);
-
-					this.ctFlame.TickLoop();
 					OpenTaiko.stageGameScreen.FloorManagement.loopFrames();
-
-					#region [Floor number]
 
 					if (OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives > 0) {
 						OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1;
@@ -277,68 +255,11 @@ internal class CActImplBackground : CActivity {
 						}
 					}
 
-					string floorStr = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor.ToString();
-
-					int len = floorStr.Length;
-
-					int digitLength = OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Width / 10;
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 0.6f, 0.2f, 1f);
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.4f;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.4f;
-
-					for (int idx = len - 1; idx >= 0; idx--) {
-						int currentNum = int.Parse(floorStr[idx].ToString());
-
-						OpenTaiko.Tx.Taiko_Combo[0].t2DDraw(OpenTaiko.Skin.Game_Tower_Floor_Number[0] - ((digitLength - 8) * (len - idx) * 1.4f),
-							OpenTaiko.Skin.Game_Tower_Floor_Number[1],
-							new Rectangle(digitLength * currentNum, 0,
-								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
+					// the floor and lives planks (tower_hud ROActivity) read the floor and the lives from PLAYSTATE
+					if (TowerHud != null && TowerHud.IsActive) {
+						if (!OpenTaiko.stageGameScreen.bPAUSE) TowerHud.Update();
+						TowerHud.Draw();
 					}
-
-					#endregion
-
-					#region [Life Tamashii icon]
-
-					int soulfire_width = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Width / 8;
-					int soulfire_height = OpenTaiko.Tx.Gauge_Soul_Fire.szTextureSize.Height;
-
-					int soul_height = OpenTaiko.Tx.Gauge_Soul.szTextureSize.Height / 2;
-
-					OpenTaiko.Tx.Gauge_Soul_Fire?.t2DDraw(OpenTaiko.Skin.Gauge_Soul_Fire_X_Tower, OpenTaiko.Skin.Gauge_Soul_Fire_Y_Tower, new Rectangle(soulfire_width * (this.ctFlame.CurrentValue), 0, soulfire_width, soulfire_height));
-					OpenTaiko.Tx.Gauge_Soul?.t2DDraw(OpenTaiko.Skin.Gauge_Soul_X_Tower, OpenTaiko.Skin.Gauge_Soul_Y_Tower, new Rectangle(0, soul_height, OpenTaiko.Tx.Gauge_Soul.szTextureSize.Width, soul_height));
-
-					#endregion
-
-					#region [Life number]
-					string lifeStr = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives.ToString();
-
-					len = lifeStr.Length;
-
-					bool lifeSpecialCase = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives == 1 && OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives != 1;
-					float lifeRatio = OpenTaiko.stageGameScreen.FloorManagement.CurrentNumberOfLives / (float)OpenTaiko.stageGameScreen.FloorManagement.MaxNumberOfLives;
-
-					Color4 lifeColor = (lifeRatio > 0.5f && !lifeSpecialCase) ? new Color4(0.2f, 1f, 0.2f, 1f)
-						: ((lifeRatio >= 0.2f && !lifeSpecialCase) ? new Color4(1f, 1f, 0.2f, 1f)
-							: new Color4(1f, 0.2f, 0.2f, 1f));
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = lifeColor;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.X = 1.1f;
-					OpenTaiko.Tx.Taiko_Combo[0].vcScaleRatio.Y = 1.1f;
-
-					for (int idx = 0; idx < len; idx++) {
-						int currentNum = int.Parse(lifeStr[len - idx - 1].ToString());
-
-						OpenTaiko.Tx.Taiko_Combo[0].t2DDraw(OpenTaiko.Skin.Game_Tower_Life_Number[0] + ((digitLength - 8) * (len - idx) * 1.1f),
-							OpenTaiko.Skin.Game_Tower_Life_Number[1],
-							new Rectangle(digitLength * currentNum, 0,
-								digitLength, OpenTaiko.Tx.Taiko_Combo[0].szTextureSize.Height));
-					}
-
-					OpenTaiko.Tx.Taiko_Combo[0].color4 = new Color4(1f, 1f, 1f, 1f);
-
-					#endregion
-
 				}
 
 				#endregion
@@ -574,9 +495,7 @@ internal class CActImplBackground : CActivity {
 	public LuaBackgroundWrapper DownScript;
 	private readonly LuaBackgroundState _state = new();
 
-	private TitleTextureKey ttkTouTatsuKaiSuu;
-	private TitleTextureKey ttkKai;
-	private CCachedFontRenderer pfTowerText;
+	private static LuaROActivityWrapper? TowerHud => LuaROActivityWrapper.GetROActivity("tower_hud");
 
 	private bool bFloorChanged = false;
 	private int currentCharacter;
@@ -592,7 +511,6 @@ internal class CActImplBackground : CActivity {
 	private CCounter ctClimbDuration;
 	private bool TowerFinished;
 
-	private CCounter ctFlame;
 
 	private bool IsUpNotFound;
 	private bool IsDownNotFound;

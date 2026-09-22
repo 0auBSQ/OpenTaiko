@@ -198,6 +198,8 @@ El motor busca algunas ROActivities por nombre de carpeta fijo y las dirige él 
 | `modal` | `activate(player, rarity, modalType, ...)` por cada modal de desbloqueo en cola, luego `update()` y `draw()` cada fotograma. El script llama a DEACTIVATE() para cerrar el modal; el motor activa entonces el siguiente. |
 | `modicons` | `activate()` una vez, luego `draw(x, y, player, layout, alpha)` con layout "menu" o "game". La global MODICONS envuelve esto. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` en la pantalla de resultados y en los cursos dan. |
+| `tower_view` | `activate(look, floors)` en el resultado de la torre con el aspecto de torre y el número de pisos del chart; `draw(scroll, opacity)` en cada fotograma, donde scroll 0 es el suelo y 1 el cielo; `deactivate()`. La transición song_loading lo maneja de la misma forma. |
+| `tower_hud` | `activate(maxFloor)` al empezar una partida de torre; `update()` y `draw()` en cada fotograma sobre el fondo superior; `deactivate()`. Lee el piso y las vidas de PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` donde items son las etiquetas unidas por saltos de línea, seguidas de las posiciones PopupMenu del skin; `draw(selected)` cada fotograma; `deactivate()` al cerrar. |
 | `config_ui` | `activate(model)` con el modelo de ajustes; `update()` cada fotograma, devolviendo "exit" para abandonar la pantalla de ajustes; `draw()`; `reload(model)` mediante Call cuando el motor reconstruye el modelo; `deactivate()`. |
 | `song_enum` | `activate()`, luego `draw(isCommandSongDataGet, done, total)` cada fotograma mientras se ejecuta el escaneo de canciones; `deactivate()`. |

@@ -308,10 +308,9 @@ namespace OpenTaiko {
 			return startX + boxW;
 		}
 
-		// Draws the placed glyphs: every edge first, then every fill on top. An upright glyph snaps to the
-		// nearest pixel of its exact pen position, which is how Skia places the glyphs of a drawn string
-		// (the engine's texture draw truncates, so the snap happens here). Rotated text keeps exact positions
-		// and ignores the clip band.
+		// Draws the placed glyphs: every edge first, then every fill on top. Every glyph keeps its exact
+		// (fractional) pen position, so text that moves a little every frame glides instead of stepping.
+		// Rotated text ignores the clip band.
 		private void Compose(double opacity, float sx, float sy, bool clip, double rotationDeg, double ox, double oy) {
 			bool rot = rotationDeg != 0;
 			double rad = rotationDeg * Math.PI / 180.0;
@@ -346,16 +345,16 @@ namespace OpenTaiko {
 						double offy = -padShift / 2 * sy;
 						double tcx = vcx + offy * sinR, tcy = vcy + offy * cosR;
 						page.fZAxisCenterRotate = (float)(rotationDeg * Math.PI / 180);
-						page.t2DDraw((float)(tcx - slot.W * sx / 2), (float)(tcy - slot.H * sy / 2), slot.Rect);
+						page.t2DDraw((float)(tcx - slot.W * sx / 2), (float)(tcy - slot.H * sy / 2), 1f, slot.Rect);
 						page.fZAxisCenterRotate = 0;
 					} else {
-						double gx = Math.Floor(px + 0.5);
-						double top = Math.Floor(p.Y);
+						double gx = px;
+						double top = p.Y;
 						double bot = top + slot.H * sy;
 						if (clip && (bot <= _clipY0 || top >= _clipY1)) {
 							// fully outside the clip band: culled
 						} else if (!clip || (top >= _clipY0 && bot <= _clipY1)) {
-							page.t2DDraw((float)gx, (float)top, slot.Rect);
+							page.t2DDraw((float)gx, (float)top, 1f, slot.Rect);
 						} else {
 							// edge glyph: slice the visible band via a source rect (exact at sy=1,
 							// the menu/list case; scaled draws slice in source pixels)
@@ -363,7 +362,7 @@ namespace OpenTaiko {
 							int srcY = (int)Math.Floor((v0 - top) / sy);
 							int srcH = Math.Min(slot.H - srcY, (int)Math.Ceiling((v1 - v0) / sy));
 							if (srcH > 0)
-								page.t2DDraw((float)gx, (float)Math.Floor(v0), new RectangleF(slot.Rect.X, slot.Rect.Y + srcY, slot.Rect.Width, srcH));
+								page.t2DDraw((float)gx, (float)v0, 1f, new RectangleF(slot.Rect.X, slot.Rect.Y + srcY, slot.Rect.Width, srcH));
 						}
 					}
 					page.tSetScale(1, 1);

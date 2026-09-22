@@ -198,6 +198,8 @@ De engine zoekt sommige ROActivities op vaste mapnaam op en stuurt ze zelf aan. 
 | `modal` | `activate(player, rarity, modalType, ...)` voor elke ontgrendelmodal in de wachtrij, daarna `update()` en `draw()` elk frame. Het script roept DEACTIVATE() aan om de modal te sluiten; de engine activeert dan de volgende. |
 | `modicons` | `activate()` eenmalig, daarna `draw(x, y, player, layout, alpha)` met layout "menu" of "game". De MODICONS-global omhult dit. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` op het resultatenscherm en in dan-cursussen. |
+| `tower_view` | `activate(look, floors)` op het torenresultaat met de torenlook en het aantal verdiepingen van de chart; `draw(scroll, opacity)` elk frame, waarbij scroll 0 de grond is en 1 de lucht; `deactivate()`. De overgang song_loading stuurt het op dezelfde manier aan. |
+| `tower_hud` | `activate(maxFloor)` bij de start van een torenspel; `update()` en `draw()` elk frame boven de bovenste achtergrond; `deactivate()`. Het leest de verdieping en de levens uit PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` waarbij items de labels zijn, samengevoegd met regeleinden, gevolgd door de PopupMenu-skinposities; `draw(selected)` elk frame; `deactivate()` bij sluiten. |
 | `config_ui` | `activate(model)` met het instellingenmodel; `update()` elk frame, dat "exit" teruggeeft om het instellingenscherm te verlaten; `draw()`; `reload(model)` via Call wanneer de engine het model opnieuw opbouwt; `deactivate()`. |
 | `song_enum` | `activate()`, daarna `draw(isCommandSongDataGet, done, total)` elk frame terwijl de nummerscan draait; `deactivate()`. |

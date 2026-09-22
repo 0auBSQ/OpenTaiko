@@ -198,6 +198,8 @@ Le moteur recherche certaines ROActivities par un nom de dossier fixe et les pil
 | `modal` | `activate(player, rarity, modalType, ...)` pour chaque fenêtre modale de déblocage en file, puis `update()` et `draw()` à chaque frame. Le script appelle DEACTIVATE() pour fermer la fenêtre ; le moteur active ensuite la suivante. |
 | `modicons` | `activate()` une fois, puis `draw(x, y, player, layout, alpha)` avec layout "menu" ou "game". La globale MODICONS l'enveloppe. |
 | `danplate` | `draw(x, y, opacity, danTick, r, g, b, titleText)` sur l'écran de résultats et dans les parcours dan. |
+| `tower_view` | `activate(look, floors)` sur le résultat de la tour avec le look de tour et le nombre d'étages du chart ; `draw(scroll, opacity)` à chaque image, scroll 0 étant le sol et 1 le ciel ; `deactivate()`. La transition song_loading le pilote de la même façon. |
+| `tower_hud` | `activate(maxFloor)` au début d'une partie de tour ; `update()` et `draw()` à chaque image au-dessus de l'arrière-plan supérieur ; `deactivate()`. Il lit l'étage et les vies dans PLAYSTATE. |
 | `popup_menu` | `activate(title, items, fontSize, ...)` où items sont les libellés joints par des sauts de ligne, suivis des positions PopupMenu du skin ; `draw(selected)` à chaque frame ; `deactivate()` à la fermeture. |
 | `config_ui` | `activate(model)` avec le modèle des paramètres ; `update()` à chaque frame, renvoyant "exit" pour quitter l'écran des paramètres ; `draw()` ; `reload(model)` via Call quand le moteur reconstruit le modèle ; `deactivate()`. |
 | `song_enum` | `activate()`, puis `draw(isCommandSongDataGet, done, total)` à chaque frame pendant que l'analyse des chansons s'exécute ; `deactivate()`. |

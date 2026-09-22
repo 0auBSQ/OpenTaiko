@@ -160,7 +160,13 @@
         "TITLE_SETTINGS_DESC": "Ajustez vos réglages pour une expérience de jeu sur mesure !",
         "TITLE_EXIT": "Quitter",
         "TITLE_EXIT_DESC": "À la prochaine !",
-        "TITLE_VAULT_LOCKED_DESC": "Vous m'entendez... ?"
+        "TITLE_VAULT_LOCKED_DESC": "Vous m'entendez... ?",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Étage atteint",
+        "TOWER_HUD_FLOOR_PREFIX": "Étage ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Vies"
 
     }
 }

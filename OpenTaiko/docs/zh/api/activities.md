@@ -198,6 +198,8 @@ end
 | `modal` | 对每个排队的解锁弹窗调用 `activate(player, rarity, modalType, ...)`，然后每帧调用 `update()` 和 `draw()`。脚本调用 DEACTIVATE() 关闭弹窗；引擎随后激活下一个。 |
 | `modicons` | 调用一次 `activate()`，然后调用 `draw(x, y, player, layout, alpha)`，layout 为 "menu" 或 "game"。MODICONS 全局对象封装了它。 |
 | `danplate` | 在结算界面和段位课程中调用 `draw(x, y, opacity, danTick, r, g, b, titleText)`。 |
+| `tower_view` | 在塔结算画面用谱面的塔外观和楼层数调用 `activate(look, floors)`；每帧 `draw(scroll, opacity)`，scroll 0 为地面、1 为天空；`deactivate()`。song_loading 过渡以同样方式驱动它。 |
+| `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
 | `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
 | `song_enum` | 调用 `activate()`，然后在歌曲扫描进行期间每帧调用 `draw(isCommandSongDataGet, done, total)`；调用 `deactivate()`。 |

@@ -162,7 +162,13 @@
         "TITLE_SETTINGS_DESC": "Настройте игру под себя!",
         "TITLE_EXIT": "Выход",
         "TITLE_EXIT_DESC": "До следующего раза!",
-        "TITLE_VAULT_LOCKED_DESC": "Ты меня слышишь...?"
+        "TITLE_VAULT_LOCKED_DESC": "Ты меня слышишь...?",
+
+        // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
+        "TOWER_HUD_REACHED": "Достигнутый этаж",
+        "TOWER_HUD_FLOOR_PREFIX": "Этаж ",
+        "TOWER_HUD_FLOOR_SUFFIX": "",
+        "TOWER_HUD_LIVES": "Жизни"
 
     }
 }
