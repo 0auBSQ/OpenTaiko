@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "Étage atteint",
         "TOWER_HUD_FLOOR_PREFIX": "Étage ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Vies"
+        "TOWER_HUD_LIVES": "Vies",
+        "TOWERSELECT_CONFIRM": "Défier la tour ?",
+        "TOWERSELECT_RANDOM": "Tour aléatoire",
+        "TOWERSELECT_RETURN": "Retour"
 
     }
 }

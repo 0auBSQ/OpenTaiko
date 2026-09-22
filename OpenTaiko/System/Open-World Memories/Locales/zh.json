@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "到达楼层",
         "TOWER_HUD_FLOOR_PREFIX": "",
         "TOWER_HUD_FLOOR_SUFFIX": "层",
-        "TOWER_HUD_LIVES": "生命"
+        "TOWER_HUD_LIVES": "生命",
+        "TOWERSELECT_CONFIRM": "挑战高塔？",
+        "TOWERSELECT_RANDOM": "随机高塔",
+        "TOWERSELECT_RETURN": "返回"
 
     }
 }

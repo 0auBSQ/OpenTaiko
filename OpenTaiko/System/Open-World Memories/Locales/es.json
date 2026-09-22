@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "Piso alcanzado",
         "TOWER_HUD_FLOOR_PREFIX": "Piso ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Vidas"
+        "TOWER_HUD_LIVES": "Vidas",
+        "TOWERSELECT_CONFIRM": "¿Desafiar la torre?",
+        "TOWERSELECT_RANDOM": "Torre aleatoria",
+        "TOWERSELECT_RETURN": "Regresar"
 
     }
 }

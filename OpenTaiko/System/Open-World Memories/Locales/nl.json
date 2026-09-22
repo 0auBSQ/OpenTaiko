@@ -168,7 +168,10 @@
         "TOWER_HUD_REACHED": "Bereikte verdieping",
         "TOWER_HUD_FLOOR_PREFIX": "Niveau ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Levens"
+        "TOWER_HUD_LIVES": "Levens",
+        "TOWERSELECT_CONFIRM": "De toren uitdagen?",
+        "TOWERSELECT_RANDOM": "Willekeurige toren",
+        "TOWERSELECT_RETURN": "Terug"
 
     }
 }

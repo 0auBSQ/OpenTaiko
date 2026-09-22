@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "도달한 층",
         "TOWER_HUD_FLOOR_PREFIX": "",
         "TOWER_HUD_FLOOR_SUFFIX": "층",
-        "TOWER_HUD_LIVES": "라이프"
+        "TOWER_HUD_LIVES": "라이프",
+        "TOWERSELECT_CONFIRM": "타워에 도전하시겠습니까?",
+        "TOWERSELECT_RANDOM": "랜덤 타워",
+        "TOWERSELECT_RETURN": "뒤로가기"
 
     }
 }

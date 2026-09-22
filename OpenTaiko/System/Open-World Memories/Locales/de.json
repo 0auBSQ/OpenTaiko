@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "Erreichte Etage",
         "TOWER_HUD_FLOOR_PREFIX": "Etage ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Leben"
+        "TOWER_HUD_LIVES": "Leben",
+        "TOWERSELECT_CONFIRM": "Den Turm herausfordern?",
+        "TOWERSELECT_RANDOM": "Zufälliger Turm",
+        "TOWERSELECT_RETURN": "Zurück"
 
     }
 }

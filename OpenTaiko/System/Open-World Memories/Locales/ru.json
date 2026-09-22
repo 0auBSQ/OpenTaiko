@@ -168,7 +168,10 @@
         "TOWER_HUD_REACHED": "Достигнутый этаж",
         "TOWER_HUD_FLOOR_PREFIX": "Этаж ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Жизни"
+        "TOWER_HUD_LIVES": "Жизни",
+        "TOWERSELECT_CONFIRM": "Бросить вызов башне?",
+        "TOWERSELECT_RANDOM": "Случайная башня",
+        "TOWERSELECT_RETURN": "Назад"
 
     }
 }

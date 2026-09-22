@@ -168,7 +168,10 @@
         "TOWER_HUD_REACHED": "Reached floor",
         "TOWER_HUD_FLOOR_PREFIX": "Floor ",
         "TOWER_HUD_FLOOR_SUFFIX": "",
-        "TOWER_HUD_LIVES": "Lives"
+        "TOWER_HUD_LIVES": "Lives",
+        "TOWERSELECT_CONFIRM": "Challenge the Tower?",
+        "TOWERSELECT_RANDOM": "Random Tower",
+        "TOWERSELECT_RETURN": "Return"
 
     }
 }

@@ -166,7 +166,10 @@
         "TOWER_HUD_REACHED": "到達階数",
         "TOWER_HUD_FLOOR_PREFIX": "",
         "TOWER_HUD_FLOOR_SUFFIX": "階",
-        "TOWER_HUD_LIVES": "ライフ"
+        "TOWER_HUD_LIVES": "ライフ",
+        "TOWERSELECT_CONFIRM": "タワーに挑戦しますか？",
+        "TOWERSELECT_RANDOM": "おまかせ",
+        "TOWERSELECT_RETURN": "とじる"
 
     }
 }
