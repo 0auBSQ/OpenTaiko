@@ -105,9 +105,7 @@ Quand l'analyseur rencontre une ligne de la forme `#include SomeFile.ini`, il li
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
 #include TowerResultConfig.ini
-#include TowerSelectConfig.ini
 #include OnlineLoungeConfig.ini
-#include OpenEncyclopediaConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
 #include Result4PConfig.ini
@@ -118,7 +116,7 @@ Quand l'analyseur rencontre une ligne de la forme `#include SomeFile.ini`, il li
 
 Avec le skin fourni comme référence, la racine du skin contient :
 
-- `Graphics/` : images regroupées dans des dossiers numérotés par écran (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`, `13_TowerSelect`, `15_OpenEncyclopedia`) plus quelques images partagées à la racine. Les arrière-plans animés sont des fichiers `Script.lua` qui se trouvent à côté des images du dossier auquel ils appartiennent (par exemple `Graphics/0_Startup/Script.lua` et les dossiers sous `Graphics/5_Game/5_Background/`).
+- `Graphics/` : images regroupées dans des dossiers numérotés par écran (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`) plus quelques images partagées à la racine. Les arrière-plans animés sont des fichiers `Script.lua` qui se trouvent à côté des images du dossier auquel ils appartiennent (par exemple `Graphics/0_Startup/Script.lua` et les dossiers sous `Graphics/5_Game/5_Background/`). Un look de tour est un dossier sous `Graphics/5_Game/5_Background/Tower/Down/` qui contient le ciel, les étages (`Base/`), le toit (`Top.png`), une décoration facultative (`Deco/`) et sa disposition dans `Config.json` ; un chart le choisit avec `TOWERTYPE:`, et la sélection de tour, l'écran de chargement et le résultat composent la même tour à partir de ces pièces.
 - `Sounds/` : sons système et musiques que le jeu charge par nom de fichier fixe, par exemple `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. Si un fichier est absent, ce son n'est pas joué.
 - `Fonts/` : les fichiers `.ttf` référencés par les clés `FontName`.
 - `Locales/` : un fichier JSON par langue (`en.json`, `ja.json`, ...) de la forme `{ "Entries": { "KEY": "text" } }`. Ces chaînes étiquettent les réglages propres au skin, et Lua les lit via `THEME:GetSkinString(key)`. Quand une clé est absente de la langue active, le jeu la recherche dans le fichier `DefaultLocale`.

@@ -210,7 +210,7 @@ De engine zoekt sommige ROActivities op vaste mapnaam op en stuurt ze zelf aan. 
 Een Script.lua die één schermachtergrond, gameplaylaag, mob, clear-animatie of kusudama-effect tekent, gehost door de eigen schermen van de engine.
 
 <div class="callout warn">
-Achtergronden staan buiten de map Modules, onder de map Graphics van de skin, in de map van het scherm dat ze aankleden, bijvoorbeeld Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua en Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Waar een map meerdere varianten bevat, kiest de engine er bij elke spelbeurt een willekeurig (of uit de scènepreset van de chart). Het hostscherm maakt een achtergrondinstantie aan (de gameplay-achtergronden elke keer dat de engine het spelscherm betreedt) en geeft haar samen met het scherm vrij, dus tijdens de gameplay zijn er meerdere tegelijk actief. Een achtergrondscript ontvangt dezelfde globals als een ROActivity (alleen-lezen CONFIG, DATABASE en GetSaveFile; geen ACTIVITY). De onderstaande event-hooks zijn optioneel, en de engine roept elk ervan eenmaal aan wanneer zijn gebeurtenis plaatsvindt.
+Achtergronden staan buiten de map Modules, onder de map Graphics van de skin, in de map van het scherm dat ze aankleden, bijvoorbeeld Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua en Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Waar een map meerdere varianten bevat, kiest de engine er bij elke spelbeurt een willekeurig (of uit de scènepreset van de chart). Het hostscherm maakt een achtergrondinstantie aan (de gameplay-achtergronden elke keer dat de engine het spelscherm betreedt) en geeft haar samen met het scherm vrij, dus tijdens de gameplay zijn er meerdere tegelijk actief. Een achtergrondscript ontvangt dezelfde globals als een ROActivity (alleen-lezen CONFIG, DATABASE en GetSaveFile; geen ACTIVITY). De onderstaande event-hooks zijn optioneel, en de engine roept elk ervan eenmaal aan wanneer zijn gebeurtenis plaatsvindt. Bij de toren benoemt de `TOWERTYPE` van de chart de map Down.
 </div>
 
 | Methode | Beschrijving |
@@ -242,6 +242,8 @@ Eén instantie per host, die de host elk frame ter plekke bijwerkt. De arrayveld
 | `state.bpm  -> number[]` | De huidige BPM van elke speler. |
 | `state.gogo  -> boolean[]` | Of elke speler zich in go-go-time bevindt. |
 | `state.towerNightNum  -> number` | Dag-naar-nachtfactor van de toren, van 0 tot 1. |
+| `state.towerFloor  -> number` | Verdieping die gespeeld wordt, vanaf 0 (torenspel). |
+| `state.towerMaxFloor  -> number` | Aantal verdiepingen van de chart (torenspel). |
 | `state.battleState  -> number` | Statuscode van het AI-gevecht. |
 | `state.battleWin  -> boolean` | True wanneer de speler het AI-gevecht aan het winnen is. |
 | `state.timeStamp  -> number` | Met de chart gesynchroniseerde tijd in seconden; -1 buiten de gameplay. |

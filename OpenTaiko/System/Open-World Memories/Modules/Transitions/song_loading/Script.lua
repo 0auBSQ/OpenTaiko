@@ -11,21 +11,13 @@
 FADE_OUT_SECONDS = 1.0
 FADE_IN_SECONDS  = 1.0
 
--- part of class TextureLoader in TextureLoader.cs
-local TL = {
-	BASE = "Graphics/",
-	TOWERRESULT = "8_TowerResult/",
-}
-
 local TEXTURES_DIR = "Textures/"
-local SKIN_DIR = "../../../"
-local SKIN_GRAPHICS_DIR = SKIN_DIR .. TL.BASE
 local DIFF_TOWER, DIFF_DAN = 5, 6
 
 -- Textures
 local pixel                                   -- 1x1 white, for fades + bar
-local tx_bg_normal, tx_bg_ai, tx_bg_dan, tx_bg_tower
-local tx_towers = {}
+local tx_bg_normal, tx_bg_ai, tx_bg_dan
+local tower_view                              -- tower mode: the panorama + the chart's tower (tower_view ROActivity)
 local tx_plate
 local titleFont, subtitleFont
 local titleTex, subtitleTex
@@ -37,8 +29,6 @@ local res_w, res_h = 1920, 1080
 local slot_w       = 1920
 local characters, slide_infos = {}, {}
 local bg_scroll_y = 0
-local px_tower_bg_scroll_y = 0
-local tower_type = "0"
 local dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
 local initialized  = false
 local luaPhase     = nil                      -- "out" | "load" | "in" — used to detect a fresh transition
@@ -61,19 +51,27 @@ local function rect(x, y, w, h, r, g, b, a)
 end
 
 -- The loading background for the current mode, at the given opacity (used to cross-fade in from song select).
+-- The tower climbs its panorama from the ground to the sky while the chart loads.
 local function draw_bg(alpha)
+	if mode == "tower" then
+		if tower_view ~= nil and tower_view.IsActive then tower_view:Draw(bg_scroll_y / TOWER_SCROLL_MAX, alpha) end
+		return
+	end
 	local tx
 	if mode == "dan" then tx = tx_bg_dan
-	elseif mode == "tower" then tx = tx_bg_tower
 	elseif mode == "ai" then tx = tx_bg_ai
 	else tx = tx_bg_normal end
 	if tx ~= nil then
 		tx:SetOpacity(alpha)
-		if mode == "tower" then tx:Draw(0, -px_tower_bg_scroll_y)
-		elseif mode == "dan" then tx:Draw(0, -bg_scroll_y)
+		if mode == "dan" then tx:Draw(0, -bg_scroll_y)
 		else tx:Draw(0, 0)
 		end
 	end
+end
+
+local function close_tower_view()
+	if tower_view ~= nil and tower_view.IsActive then tower_view:Deactivate() end
+	tower_view = nil
 end
 
 -- (Re)build the per-player character renders + slide-in animations for the current player count.
@@ -109,7 +107,7 @@ local function setup()
 	player_count = CONFIG.PlayerCount
 	local res = THEME:GetResolution(); res_w, res_h = res.X, res.Y
 	bg_scroll_y = 0
-	px_tower_bg_scroll_y = 0
+	close_tower_view()
 
 	local diff = SONGMOUNT:ChosenDifficulty()
 	local node = SONGMOUNT:ChosenSongNode()
@@ -118,7 +116,7 @@ local function setup()
 	elseif CONFIG.IsAIBattleMode then mode = "ai"
 	else mode = "normal" end
 
-	tower_type = "0"
+	local tower_look, tower_floors = nil, 0
 	dan_tick, dan_r, dan_g, dan_b, dan_title = 0, 255, 255, 255, ""
 	if node ~= nil and node.IsSong then
 		local chart
@@ -126,12 +124,17 @@ local function setup()
 		elseif mode == "dan" then chart = node:GetChart(DIFF_DAN)
 		end
 		if chart ~= nil then
-			tower_type = chart.TowerType or "0"
+			tower_look = chart.TowerType
+			tower_floors = chart.TotalFloorCount or 0
 			dan_tick = chart.DanTick or 0
 			local c = chart.DanTickColor
 			if c ~= nil then dan_r, dan_g, dan_b = c.R, c.G, c.B end
 		end
 		dan_title = node.Title or ""
+	end
+	if mode == "tower" then
+		tower_view = ROACTIVITY:GetROActivity("tower_view")
+		if tower_view ~= nil then tower_view:Activate(tower_look, tower_floors) end
 	end
 
 	if titleTex ~= nil then titleTex:Dispose(); titleTex = nil end
@@ -153,7 +156,6 @@ local function tick_update()
 
 	if mode == "tower" and bg_scroll_y < TOWER_SCROLL_MAX then
 		bg_scroll_y = math.min(bg_scroll_y + TOWER_SCROLL_SPEED * dt, TOWER_SCROLL_MAX)
-		px_tower_bg_scroll_y = (1 - bg_scroll_y / TOWER_SCROLL_MAX) * (tx_bg_tower.Height - res_h)
 	elseif mode == "dan" and bg_scroll_y < DAN_SCROLL_MAX then
 		bg_scroll_y = math.min(bg_scroll_y + DAN_SCROLL_SPEED * dt, DAN_SCROLL_MAX)
 	end
@@ -208,14 +210,6 @@ local function draw_screen(progress, alpha, showBar)
 		local danplate = ROACTIVITY:GetROActivity("danplate")
 		if danplate ~= nil then danplate:Draw(DANPLATE_X, DANPLATE_Y, op, dan_tick, dan_r, dan_g, dan_b, dan_title) end
 	else
-		if mode == "tower" then
-			local tx_tower = tx_towers[tower_type] or tx_towers["0"]
-			if tx_bg_tower ~= nil and tx_tower ~= nil then
-				local xFactor = (tx_bg_tower.Width - tx_tower.Width) / 2;
-				local yFactor = tx_tower.Height / tx_bg_tower.Height;
-				tx_tower:Draw(xFactor, -1 * yFactor * px_tower_bg_scroll_y);
-			end
-		end
 		if mode == "normal" then draw_characters(op) end
 		if tx_plate ~= nil then tx_plate:SetOpacity(alpha); tx_plate:DrawAtAnchor(PLATE_X, PLATE_Y, "center") end
 		if titleTex ~= nil then titleTex:SetOpacity(alpha); titleTex:DrawAtAnchor(TITLE_X, TITLE_Y, "center") end
@@ -250,6 +244,7 @@ function fadeIn(t)
 	luaPhase = "in"
 	tick_update()                       -- keep characters animating while they fade
 	draw_screen(1.0, 1.0 - t, false)    -- fade the loading screen out → reveal gameplay (notes draw on top)
+	if t >= 1 then close_tower_view() end   -- the last call: the tower view's textures are not needed in play
 end
 
 function onStart()
@@ -257,22 +252,9 @@ function onStart()
 	tx_bg_normal = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait.png")
 	tx_bg_ai     = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_AI.png")
 	tx_bg_dan    = TEXTURE:CreateTexture(TEXTURES_DIR .. "BgWait_Dan.png")
-	tx_bg_tower  = TEXTURE:CreateTexture(SKIN_DIR .. TL.BASE .. TL.TOWERRESULT .. "Background.png") --[["BgWait_Tower.png" did not exist]]
 	tx_plate     = TEXTURE:CreateTexture(TEXTURES_DIR .. "Plate.png")
 	titleFont    = TEXT:Create(46)
 	subtitleFont = TEXT:Create(30)
-
-	local dir_name = SKIN_DIR .. TL.BASE .. TL.TOWERRESULT .. "Tower"
-	if STORAGE:DirectoryExists(dir_name) then
-		local files = STORAGE:GetFiles(dir_name, "*.png")
-		for i = 0, files.Length - 1, 1 do
-			local v = files[i]
-			local file_path = dir_name.."/"..tostring(v)..".png"
-			if STORAGE:FileExists(file_path) then
-				tx_towers[v] = TEXTURE:CreateTexture(file_path)
-			end
-		end
-	end
 end
 
 function onDestroy()
@@ -280,11 +262,8 @@ function onDestroy()
 		if characters[i] ~= nil then characters[i]:DisposeAnimation(CHARACTER.ANIM_RENDER) end
 	end
 	characters, slide_infos = {}, {}
-	for _, tx in pairs({ pixel, tx_bg_normal, tx_bg_ai, tx_bg_dan, tx_bg_tower, tx_plate, titleTex, subtitleTex }) do
+	for _, tx in pairs({ pixel, tx_bg_normal, tx_bg_ai, tx_bg_dan, tx_plate, titleTex, subtitleTex }) do
 		if tx ~= nil then tx:Dispose() end
 	end
-	for _, tx in pairs(tx_towers) do
-		if tx ~= nil then tx:Dispose() end
-	end
-	tx_towers = {}
+	close_tower_view()
 end

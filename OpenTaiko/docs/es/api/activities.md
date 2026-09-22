@@ -210,7 +210,7 @@ El motor busca algunas ROActivities por nombre de carpeta fijo y las dirige él 
 Un Script.lua que dibuja un fondo de pantalla, una capa de juego, un mob, una animación de clear o un efecto de kusudama, alojado por las propias pantallas del motor.
 
 <div class="callout warn">
-Los fondos viven fuera de la carpeta Modules, dentro de la carpeta Graphics del skin, en el directorio de la pantalla que decoran, por ejemplo Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua y Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Cuando una carpeta contiene varias variantes, el motor elige una al azar (o según el preajuste de escena del chart) en cada partida. La pantalla anfitriona crea una instancia de fondo (los fondos de juego cada vez que el motor entra en la pantalla de juego) y la libera junto con la pantalla, así que durante el juego hay varias activas a la vez. Un script de fondo recibe las mismas globales que una ROActivity (CONFIG, DATABASE y GetSaveFile de solo lectura; sin ACTIVITY). Los ganchos de evento de abajo son opcionales, y el motor llama a cada uno una vez cuando ocurre su evento.
+Los fondos viven fuera de la carpeta Modules, dentro de la carpeta Graphics del skin, en el directorio de la pantalla que decoran, por ejemplo Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua y Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Cuando una carpeta contiene varias variantes, el motor elige una al azar (o según el preajuste de escena del chart) en cada partida. La pantalla anfitriona crea una instancia de fondo (los fondos de juego cada vez que el motor entra en la pantalla de juego) y la libera junto con la pantalla, así que durante el juego hay varias activas a la vez. Un script de fondo recibe las mismas globales que una ROActivity (CONFIG, DATABASE y GetSaveFile de solo lectura; sin ACTIVITY). Los ganchos de evento de abajo son opcionales, y el motor llama a cada uno una vez cuando ocurre su evento. En la torre, el `TOWERTYPE` del chart nombra la carpeta Down.
 </div>
 
 | Método | Descripción |
@@ -242,6 +242,8 @@ Una instancia por anfitrión, que el anfitrión actualiza en el sitio cada fotog
 | `state.bpm  -> number[]` | BPM actual de cada jugador. |
 | `state.gogo  -> boolean[]` | Si cada jugador está en go-go time. |
 | `state.towerNightNum  -> number` | Factor de día a noche de la Torre, de 0 a 1. |
+| `state.towerFloor  -> number` | Piso que se está jugando, desde 0 (juego de torre). |
+| `state.towerMaxFloor  -> number` | Número de pisos del chart (juego de torre). |
 | `state.battleState  -> number` | Código de estado de la batalla contra la IA. |
 | `state.battleWin  -> boolean` | Verdadero cuando el jugador va ganando la batalla contra la IA. |
 | `state.timeStamp  -> number` | Tiempo sincronizado con el chart en segundos; -1 fuera del juego. |

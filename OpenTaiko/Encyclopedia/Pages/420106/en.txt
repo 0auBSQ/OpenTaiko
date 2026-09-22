@@ -1,4 +1,0 @@
-[Image Manipulation]
-
-func:SetScale(xscale, yscale, "filename");
-Set the scale of your image. 1 is the default value.

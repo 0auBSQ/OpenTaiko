@@ -105,9 +105,7 @@ AIBattleCharacter=10v2 - AItritus
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
 #include TowerResultConfig.ini
-#include TowerSelectConfig.ini
 #include OnlineLoungeConfig.ini
-#include OpenEncyclopediaConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
 #include Result4PConfig.ini
@@ -118,7 +116,7 @@ AIBattleCharacter=10v2 - AItritus
 
 Если взять поставляемый скин за образец, корень скина содержит:
 
-- `Graphics/`: изображения, сгруппированные в пронумерованные папки по экранам (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`, `13_TowerSelect`, `15_OpenEncyclopedia`), плюс несколько общих изображений на верхнем уровне. Анимированные фоны — файлы `Script.lua`, которые лежат рядом с изображениями папки, к которой они относятся (например `Graphics/0_Startup/Script.lua` и папки в `Graphics/5_Game/5_Background/`).
+- `Graphics/`: изображения, сгруппированные в пронумерованные папки по экранам (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`), плюс несколько общих изображений на верхнем уровне. Анимированные фоны — файлы `Script.lua`, которые лежат рядом с изображениями папки, к которой они относятся (например `Graphics/0_Startup/Script.lua` и папки в `Graphics/5_Game/5_Background/`). Облик башни — это одна папка в `Graphics/5_Game/5_Background/Tower/Down/`, в которой лежат небо, этажи (`Base/`), крыша (`Top.png`), необязательное украшение (`Deco/`) и её раскладка в `Config.json`; чарт выбирает облик через `TOWERTYPE:`, а выбор башни, экран загрузки и результат собирают из этих частей ту же башню.
 - `Sounds/`: системные звуки и BGM, которые игра загружает по фиксированным именам файлов, например `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. Если файл отсутствует, этот звук не проигрывается.
 - `Fonts/`: файлы `.ttf`, на которые ссылаются ключи `FontName`.
 - `Locales/`: по одному JSON-файлу на язык (`en.json`, `ja.json`, ...) вида `{ "Entries": { "KEY": "text" } }`. Эти строки подписывают собственные настройки скина, и Lua читает их через `THEME:GetSkinString(key)`. Когда ключ отсутствует в активном языке, игра ищет его в файле `DefaultLocale`.

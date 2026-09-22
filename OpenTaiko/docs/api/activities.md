@@ -210,7 +210,7 @@ The engine looks up some ROActivities by fixed folder name and drives them itsel
 A Script.lua that draws one screen background, gameplay layer, mob, clear animation or kusudama effect, hosted by the engine's own screens.
 
 <div class="callout warn">
-Backgrounds live outside the Modules folder, under the skin's Graphics folder in the directory of the screen they decorate, for example Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua and Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Where a folder holds several variants, the engine picks one at random (or from the chart's scene preset) each play. The host screen creates a background instance (the gameplay backgrounds each time the engine enters the game screen) and disposes it with the screen, so several are live at once during gameplay. A background script receives the same globals as an ROActivity (read-only CONFIG, DATABASE and GetSaveFile; no ACTIVITY). The event hooks below are optional, and the engine calls each one once when its event happens.
+Backgrounds live outside the Modules folder, under the skin's Graphics folder in the directory of the screen they decorate, for example Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua and Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Where a folder holds several variants, the engine picks one at random (or from the chart's scene preset) each play. The host screen creates a background instance (the gameplay backgrounds each time the engine enters the game screen) and disposes it with the screen, so several are live at once during gameplay. A background script receives the same globals as an ROActivity (read-only CONFIG, DATABASE and GetSaveFile; no ACTIVITY). The event hooks below are optional, and the engine calls each one once when its event happens. For the tower, the chart's `TOWERTYPE` names the Down folder.
 </div>
 
 | Method | Description |
@@ -242,6 +242,8 @@ One instance per host, which the host updates in place each frame. The array fie
 | `state.bpm  -> number[]` | Each player's current BPM. |
 | `state.gogo  -> boolean[]` | Whether each player is in go-go time. |
 | `state.towerNightNum  -> number` | Tower day-to-night factor from 0 to 1. |
+| `state.towerFloor  -> number` | Floor being played, from 0 (tower gameplay). |
+| `state.towerMaxFloor  -> number` | The chart's floor count (tower gameplay). |
 | `state.battleState  -> number` | AI battle state code. |
 | `state.battleWin  -> boolean` | True when the player is winning the AI battle. |
 | `state.timeStamp  -> number` | Chart-synced time in seconds; -1 outside gameplay. |

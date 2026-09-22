@@ -381,7 +381,6 @@ internal class CSkin : IDisposable {
 
 	public CSystemSound soundHeyaBGM = null;
 	public CSystemSound soundOnlineLoungeBGM = null;
-	public CSystemSound soundEncyclopediaBGM = null;
 	public CSystemSound soundTowerSelectBGM = null;
 
 	public CSystemSound[] soundExToExtra = null;
@@ -736,7 +735,6 @@ internal class CSkin : IDisposable {
 
 		this.soundHeyaBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Heya{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 		this.soundOnlineLoungeBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}OnlineLounge{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
-		this.soundEncyclopediaBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Encyclopedia{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 		this.soundTowerSelectBGM = SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}Tower{System.IO.Path.DirectorySeparatorChar}BGM.ogg", true, false, false, ESoundGroup.SongPlayback);
 
 		soundExToExtra = new[] { SndCAbsolute(@$"Sounds{System.IO.Path.DirectorySeparatorChar}SongSelect{System.IO.Path.DirectorySeparatorChar}0{System.IO.Path.DirectorySeparatorChar}ExToExtra.ogg", false, false, false, ESoundGroup.SoundEffect) }; // Placeholder until Komi decides
@@ -5341,27 +5339,6 @@ internal class CSkin : IDisposable {
 									}
 									break;
 								}
-							case "Game_Tower_Floors_Body": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Body[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Floors_Deco": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Deco[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "Game_Tower_Floors_Move": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										Game_Tower_Floors_Move[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
 							case "Game_Tower_Don": {
 									string[] strSplit = strParam.Split(',');
 									for (int i = 0; i < 2; i++) {
@@ -7050,110 +7027,6 @@ internal class CSkin : IDisposable {
 								}
 							#endregion
 
-							#region TowerSelect
-							case "TowerSelect_Title_Size": {
-									TowerSelect_Title_Size = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Title_MaxWidth": {
-									TowerSelect_Title_MaxWidth = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Title_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerSelect_Title_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_SubTitle_Size": {
-									TowerSelect_SubTitle_Size = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_SubTitle_MaxWidth": {
-									TowerSelect_SubTitle_MaxWidth = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_SubTitle_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										TowerSelect_SubTitle_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_Bar_Count": {
-									TowerSelect_Bar_Count = int.Parse(strParam);
-									break;
-								}
-							case "TowerSelect_Bar_X": {
-									TowerSelect_Bar_X = new int[TowerSelect_Bar_Count];
-
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < TowerSelect_Bar_Count; i++) {
-										TowerSelect_Bar_X[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "TowerSelect_Bar_Y": {
-									TowerSelect_Bar_Y = new int[TowerSelect_Bar_Count];
-
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < TowerSelect_Bar_Count; i++) {
-										TowerSelect_Bar_Y[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							#endregion
-
-							#region OpenEncyclopedia
-							case "OpenEncyclopedia_Context_Item2": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_Item2[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Context_Item3": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_Item3[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Context_PageText": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Context_PageText[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu_Move": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu_Move[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Side_Menu_Text_Offset": {
-									string[] strSplit = strParam.Split(',');
-									for (int i = 0; i < 2; i++) {
-										OpenEncyclopedia_Side_Menu_Text_Offset[i] = int.Parse(strSplit[i]);
-									}
-									break;
-								}
-							case "OpenEncyclopedia_Font_EncyclopediaMenu_Size": {
-									OpenEncyclopedia_Font_EncyclopediaMenu_Size = int.Parse(strParam);
-									break;
-								}
-							#endregion
-
 							#region Exit
 							case "Exit_Duration": {
 									Exit_Duration = int.Parse(strParam);
@@ -8405,19 +8278,6 @@ internal class CSkin : IDisposable {
 
 	#endregion
 
-	#region Tower
-
-	public int Game_Tower_Ptn;
-	public int[] Game_Tower_Ptn_Deco,
-		Game_Tower_Ptn_Base;
-
-	public string[] Game_Tower_Names;
-	public int Game_Tower_Ptn_Result;
-
-	public int Game_Tower_Ptn_Don;
-
-	#endregion
-
 	#region Mob
 	public int Game_Mob_Beat,
 		Game_Mob_Ptn_Beat = 1;
@@ -8783,10 +8643,6 @@ internal class CSkin : IDisposable {
 	#region Tower
 	public int[] Game_Tower_Sky_Gradient = new int[] { 0, 360 };
 	public int[] Game_Tower_Sky_Gradient_Size = new int[] { 1280, 316 };
-
-	public int[] Game_Tower_Floors_Body = new int[] { 640, 676 };
-	public int[] Game_Tower_Floors_Deco = new int[] { 460, 640 };
-	public int[] Game_Tower_Floors_Move = new int[] { 0, 288 };
 
 	public int[] Game_Tower_Don = new int[] { 590, 648 };
 	public int[] Game_Tower_Don_Move = new int[] { 300, 0 };
@@ -9187,32 +9043,6 @@ internal class CSkin : IDisposable {
 
 	public int OnlineLounge_Font_OLFont = 14;
 	public int OnlineLounge_Font_OLFontLarge = 28;
-
-	#endregion
-
-	#region TowerSelect
-
-	public int TowerSelect_Title_Size = 30;
-	public int TowerSelect_Title_MaxWidth = 230;
-	public int[] TowerSelect_Title_Offset = new int[] { 0, -30 };
-	public int TowerSelect_SubTitle_Size = 30;
-	public int TowerSelect_SubTitle_MaxWidth = 230;
-	public int[] TowerSelect_SubTitle_Offset = new int[] { 0, 10 };
-	public int TowerSelect_Bar_Count = 7;
-	public int[] TowerSelect_Bar_X = new int[] { -260, 40, 340, 640, 940, 1240, 1540 };
-	public int[] TowerSelect_Bar_Y = new int[] { 420, 400, 380, 360, 380, 400, 420 };
-
-	#endregion
-
-	#region OpenEncyclopedia
-
-	public int[] OpenEncyclopedia_Context_Item2 = new int[] { 960, 180 };
-	public int[] OpenEncyclopedia_Context_Item3 = new int[] { 640, 360 };
-	public int[] OpenEncyclopedia_Context_PageText = new int[] { 960, 720 };
-	public int[] OpenEncyclopedia_Side_Menu = new int[] { 320, 360 };
-	public int[] OpenEncyclopedia_Side_Menu_Move = new int[] { 0, 90 };
-	public int[] OpenEncyclopedia_Side_Menu_Text_Offset = new int[] { 0, 0 };
-	public int OpenEncyclopedia_Font_EncyclopediaMenu_Size = 14;
 
 	#endregion
 

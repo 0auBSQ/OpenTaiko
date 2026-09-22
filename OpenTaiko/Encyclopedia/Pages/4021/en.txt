@@ -1,5 +1,0 @@
-- Combo Voices :
-Combo/[number]
-
-- Tower Floor Voices :
-Tower_Combo/[number]

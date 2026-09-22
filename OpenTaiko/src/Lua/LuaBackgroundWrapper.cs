@@ -24,6 +24,8 @@ public sealed class LuaBackgroundState {
 	// Per-frame gameplay — filled by RefreshGameplay() (gameplay hosts only; stage backgrounds leave defaults).
 	public bool[] isClear = new bool[5];
 	public double towerNightNum;
+	public int towerFloor;      // the floor being played (0-based) and the chart's floor count: the tower look's
+	public int towerMaxFloor;   // Down script slides its floors on these
 	public int battleState;
 	public bool battleWin;
 	public double[] gauge = new double[5];
@@ -69,10 +71,13 @@ public sealed class LuaBackgroundState {
 
 		// Tower day→night factor (0..1 over the first half of the climb), as computed in ScriptBG.Update.
 		float towerNight = 0;
+		towerFloor = gs.actPlayInfo.NowMeasure[0];
+		towerMaxFloor = 0;
 		if (OpenTaiko.SongMount.rChoosenSong != null && OpenTaiko.SongMount.rChoosenSong.score[5] != null) {
 			int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
 			int nightTime = Math.Max(140, maxFloor / 2);
 			towerNight = Math.Min(gs.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
+			towerMaxFloor = maxFloor;
 		}
 		towerNightNum = towerNight;
 

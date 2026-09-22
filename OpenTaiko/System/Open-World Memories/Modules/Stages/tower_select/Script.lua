@@ -1,8 +1,9 @@
 ﻿local NavInput = require("NavInput")
+local TowerArt = require("TowerArt")
 
 local songlist = nil
 
-local tex_tower = TEXTURE:CreateTexture()
+local art = nil   -- the towers, composed from the pieces of each chart's tower look (Lib/TowerArt.lua)
 local tex_bg = TEXTURE:CreateTexture()
 local tex_info = TEXTURE:CreateTexture()
 local tex_info_spicy = TEXTURE:CreateTexture()
@@ -26,14 +27,33 @@ local title_y = {}
 local tower_scale = {}
 
 local tower_titles = {}
+local tower_kinds = {}   -- per slot: the tower look and the floors drawn (folders get the default look)
 local tower_info = nil
 
 local tex_number_interval = 32
 
 local config = JSONLOADER:JsonParseFile("Config.json")
+local TOWER_SCALE = JSONLOADER:JsonGet(config, "tower_scale") or 0.36
+local TOWER_FLOORS_MAX = JSONLOADER:JsonGet(config, "tower_floors_max") or 3
+
+-- every look of the list gets its pieces loaded up front (behind the transition cover), so browsing never
+-- waits on a texture
+local function preloadTowers()
+    if art == nil or songlist == nil then return end
+    art:preload(nil)
+    local songs = songlist:SearchSongsByPredicate(function(n) return true end)
+    if songs == nil then return end
+    for i = 0, songs.Count - 1 do
+        pcall(function()
+            local chart = songs[i]:GetChart(5)
+            if chart ~= nil then art:preload(chart.TowerType) end
+        end)
+    end
+end
 
 local function refresh()
     tower_titles = {}
+    tower_kinds = {}
     tower_info = {
             IsSong = false,
 
@@ -50,6 +70,7 @@ local function refresh()
 
     for i = loop_start,loop_end do
         tower_titles[i] = TEXTURE:CreateTexture()
+        tower_kinds[i] = { look = nil, floors = TOWER_FLOORS_MAX }
 
         if songlist == nil then
             goto continue
@@ -59,6 +80,14 @@ local function refresh()
         if node ~= nil then
             if font ~= nil then
                 tower_titles[i] = font:GetText(node.Title, false, 480)
+            end
+
+            if node.IsSong then
+                local chart = node:GetChart(5)
+                if chart ~= nil then
+                    tower_kinds[i].look = chart.TowerType
+                    tower_kinds[i].floors = math.max(1, math.min(TOWER_FLOORS_MAX, chart.TotalFloorCount or TOWER_FLOORS_MAX))
+                end
             end
 
             if i == 0 then
@@ -206,9 +235,10 @@ function draw()
             local fade = COLOR:CreateColorFromRGBA(fade_amount, fade_amount, fade_amount)
             local scale = position(tower_scale, i)
 
-            tex_tower:SetScale(scale, scale)
-            tex_tower:SetColor(fade)
-            tex_tower:DrawAtAnchor(x, y, "Bottom")
+            local kind = tower_kinds[i]
+            if art ~= nil and kind ~= nil then
+                art:draw(kind.look, x, y, TOWER_SCALE * scale, kind.floors, { color = fade })
+            end
             tower_titles[i]:SetScale(scale, scale)
             tower_titles[i]:SetColor(fade)
             tower_titles[i]:DrawAtAnchor(x, y-540+(540*(1-scale)), "Center")
@@ -267,8 +297,8 @@ function activate()
     CONFIG.PlayerCount = 1
     CONFIG.SongSpeed   = 20   -- reset speed (other modes may have changed it)
 
-    tex_tower = TEXTURE:CreateTexture("Textures/Tower.png")
-    tex_tower:SetWrapMode("Border")
+    art = TowerArt.load()
+    preloadTowers()
     tex_bg = TEXTURE:CreateTexture("Textures/BG.png")
     tex_info = TEXTURE:CreateTexture("Textures/Info.png")
     tex_info_spicy = TEXTURE:CreateTexture("Textures/Spicy_Full.png")
@@ -281,7 +311,7 @@ function activate()
 end
 
 function deactivate()
-    if tex_tower ~= nil then tex_tower:Dispose() end
+    if art ~= nil then art:dispose(); art = nil end
     if tex_bg ~= nil then tex_bg:Dispose() end
     if tex_info ~= nil then tex_info:Dispose() end
     if tex_info_spicy ~= nil then tex_info_spicy:Dispose() end
@@ -312,6 +342,7 @@ function afterSongEnum()
     settings.MandatoryDifficultyList = {5}
     settings.FlattenOpenedFolders = false
     songlist = RequestSongList(settings)
+    preloadTowers()
     refresh()
 end
 

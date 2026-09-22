@@ -27,7 +27,6 @@ class TextureLoader {
 
 	public static string MODALS = @$"11_Modals{Path.DirectorySeparatorChar}";
 	public static string ONLINELOUNGE = @$"12_OnlineLounge{Path.DirectorySeparatorChar}";
-	public static string TOWERSELECT = @$"13_TowerSelect{Path.DirectorySeparatorChar}";
 
 	// InGame
 	public static string DANCER = @$"2_Dancer{Path.DirectorySeparatorChar}";
@@ -54,10 +53,6 @@ class TextureLoader {
 	// Special balloons
 	public static string KUSUDAMA = @$"Kusudama{Path.DirectorySeparatorChar}";
 	public static string FUSE = @$"Fuseroll{Path.DirectorySeparatorChar}";
-
-	// Tower infos
-	public static string TOWERDON = @$"Tower_Don{Path.DirectorySeparatorChar}";
-	public static string TOWERFLOOR = @$"Tower_Floors{Path.DirectorySeparatorChar}";
 
 	// InGame_Effects
 	public static string FIRE = @$"Fire{Path.DirectorySeparatorChar}";
@@ -610,40 +605,9 @@ class TextureLoader {
 
 		#region [20_Tower]
 
+		// The tower itself (its floors, roof and sky) is a tower look, a Down background folder under
+		// 5_Background/Tower/Down/, drawn by its own script and composed by Lua elsewhere
 		Tower_Miss = TxC(GAME + TOWER + @$"Miss.png");
-
-		// Tower elements
-		string[] towerDirectories = System.IO.Directory.GetDirectories(CSkin.Path(BASE + GAME + TOWER + TOWERFLOOR));
-		OpenTaiko.Skin.Game_Tower_Ptn = towerDirectories.Length;
-		OpenTaiko.Skin.Game_Tower_Names = new string[OpenTaiko.Skin.Game_Tower_Ptn];
-		for (int i = 0; i < OpenTaiko.Skin.Game_Tower_Ptn; i++)
-			OpenTaiko.Skin.Game_Tower_Names[i] = new DirectoryInfo(towerDirectories[i]).Name;
-		Tower_Top = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn];
-		Tower_Base = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn][];
-		Tower_Deco = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn][];
-
-		OpenTaiko.Skin.Game_Tower_Ptn_Base = new int[OpenTaiko.Skin.Game_Tower_Ptn];
-		OpenTaiko.Skin.Game_Tower_Ptn_Deco = new int[OpenTaiko.Skin.Game_Tower_Ptn];
-
-		for (int i = 0; i < OpenTaiko.Skin.Game_Tower_Ptn; i++) {
-			OpenTaiko.Skin.Game_Tower_Ptn_Base[i] = OpenTaiko.tSequenceImageSheetCountCount((towerDirectories[i] + @$"{Path.DirectorySeparatorChar}Base{Path.DirectorySeparatorChar}"), "Base");
-			OpenTaiko.Skin.Game_Tower_Ptn_Deco[i] = OpenTaiko.tSequenceImageSheetCountCount((towerDirectories[i] + @$"{Path.DirectorySeparatorChar}Deco{Path.DirectorySeparatorChar}"), "Deco");
-
-			Tower_Top[i] = TxC(GAME + TOWER + TOWERFLOOR + OpenTaiko.Skin.Game_Tower_Names[i] + @$"{Path.DirectorySeparatorChar}Top.png");
-
-			Tower_Base[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Base[i]];
-			Tower_Deco[i] = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Deco[i]];
-
-			for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Base[i]; j++) {
-				Tower_Base[i][j] = TxC(GAME + TOWER + TOWERFLOOR + OpenTaiko.Skin.Game_Tower_Names[i] + @$"{Path.DirectorySeparatorChar}Base{Path.DirectorySeparatorChar}Base" + j.ToString() + ".png");
-			}
-
-			for (int j = 0; j < OpenTaiko.Skin.Game_Tower_Ptn_Deco[i]; j++) {
-				Tower_Deco[i][j] = TxC(GAME + TOWER + TOWERFLOOR + OpenTaiko.Skin.Game_Tower_Names[i] + @$"{Path.DirectorySeparatorChar}Deco{Path.DirectorySeparatorChar}Deco" + j.ToString() + ".png");
-			}
-		}
-
-
 
 		#endregion
 
@@ -760,17 +724,10 @@ class TextureLoader {
 
 		#region [8_TowerResults]
 
-		OpenTaiko.Skin.Game_Tower_Ptn_Result = OpenTaiko.tSequenceImageSheetCountCount(CSkin.Path(BASE + TOWERRESULT + @$"Tower{Path.DirectorySeparatorChar}"));
-		TowerResult_Tower = new CTexture[OpenTaiko.Skin.Game_Tower_Ptn_Result];
-
-		TowerResult_Background = TxC(TOWERRESULT + @$"Background.png");
+		// the panorama and the tower behind the panel are the tower_view ROActivity
 		TowerResult_Panel = TxC(TOWERRESULT + @$"Panel.png");
 
 		TowerResult_ScoreRankEffect = TxC(TOWERRESULT + @$"ScoreRankEffect.png");
-
-		for (int i = 0; i < OpenTaiko.Skin.Game_Tower_Ptn_Result; i++) {
-			TowerResult_Tower[i] = TxC(TOWERRESULT + @$"Tower{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
-		}
 
 		#endregion
 
@@ -1103,12 +1060,6 @@ class TextureLoader {
 
 	public CTexture Tower_Miss;
 
-	public CTexture[] Tower_Top;
-
-	public CTexture[][] Tower_Base,
-		Tower_Deco;
-
-
 	#endregion
 
 	#region [22_AIBattle]
@@ -1192,11 +1143,8 @@ Result_Mountain = new CTexture[4]*/;
 
 	#region [8_TowerResults]
 
-	public CTexture TowerResult_Background,
-		TowerResult_ScoreRankEffect,
+	public CTexture TowerResult_ScoreRankEffect,
 		TowerResult_Panel;
-	public CTexture[]
-		TowerResult_Tower;
 
 	#endregion
 

@@ -611,10 +611,12 @@ internal class CStageResult : CStage {
 			ctShine_Plate = new CCounter(0, 1000, 1, OpenTaiko.Timer);
 			ctWork_Plate = new CCounter(0, 4000, 1, OpenTaiko.Timer);
 
-			if (OpenTaiko.Tx.TowerResult_Background != null)
-				ctTower_Animation = new CCounter(0, OpenTaiko.Tx.TowerResult_Background.szTextureSize.Height - OpenTaiko.Skin.Resolution[1], 25, OpenTaiko.Timer);
-			else
-				ctTower_Animation = new CCounter();
+			// the tower view comes down from the sky to the ground over the result
+			ctTower_Animation = new CCounter(0, 1000, 13.5, OpenTaiko.Timer);
+			if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower) {
+				var towerChart = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo;
+				TowerView?.Activate(towerChart?.nTowerType, towerChart?.nTotalFloor ?? 0);
+			}
 
 
 			ctDanSongInfoChange = new CCounter(0, 3000, 1, OpenTaiko.Timer);
@@ -672,6 +674,7 @@ internal class CStageResult : CStage {
 		}
 
 		OpenTaiko.tDisposeSafely(ref Background);
+		if (TowerView != null && TowerView.IsActive) TowerView.Deactivate();
 
 		if (this.rResultSound != null) {
 			OpenTaiko.SoundManager.tDisposeSound(this.rResultSound);
@@ -1206,23 +1209,9 @@ internal class CStageResult : CStage {
 
 					#region [Tower background]
 
-					if (OpenTaiko.Skin.Game_Tower_Ptn_Result > 0) {
-						int xFactor = 0;
-						float yFactor = 1f;
-
-						int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTowerType);
-
-						if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn_Result)
-							currentTowerType = 0;
-
-						if (OpenTaiko.Tx.TowerResult_Background != null && OpenTaiko.Tx.TowerResult_Tower[currentTowerType] != null) {
-							xFactor = (OpenTaiko.Tx.TowerResult_Background.szTextureSize.Width - OpenTaiko.Tx.TowerResult_Tower[currentTowerType].szTextureSize.Width) / 2;
-							yFactor = OpenTaiko.Tx.TowerResult_Tower[currentTowerType].szTextureSize.Height / (float)OpenTaiko.Tx.TowerResult_Background.szTextureSize.Height;
-						}
-
-						OpenTaiko.Tx.TowerResult_Background?.t2DDraw(0, -1 * this.ctTower_Animation.CurrentValue);
-						OpenTaiko.Tx.TowerResult_Tower[currentTowerType]?.t2DDraw(xFactor, -1 * yFactor * this.ctTower_Animation.CurrentValue);
-					}
+					// the panorama and the chart's tower (tower_view ROActivity): scroll 1 = the sky, 0 = the ground
+					if (TowerView != null && TowerView.IsActive)
+						TowerView.Draw(1.0 - this.ctTower_Animation.CurrentValue / 1000.0, 1.0);
 
 					#endregion
 
@@ -1730,6 +1719,7 @@ internal class CStageResult : CStage {
 
 	// Tower informations
 	private CCounter ctTower_Animation;
+	private static LuaROActivityWrapper? TowerView => LuaROActivityWrapper.GetROActivity("tower_view");
 	private TitleTextureKey ttkMaxFloors;
 	private TitleTextureKey ttkToutatsu;
 	private TitleTextureKey ttkTen;

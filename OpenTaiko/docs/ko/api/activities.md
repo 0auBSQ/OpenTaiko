@@ -210,7 +210,7 @@ end
 화면 배경, 게임플레이 레이어, 몹, 클리어 애니메이션, 쿠스다마 효과 중 하나를 그리는 Script.lua로, 엔진 자체 화면이 호스팅합니다.
 
 <div class="callout warn">
-배경은 Modules 폴더 밖, 스킨의 Graphics 폴더 아래 꾸미는 화면의 디렉터리에 있습니다. 예를 들어 Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua, Graphics/5_Game/11_Balloon/Kusudama/Script.lua입니다. 폴더에 여러 변형이 있으면 엔진이 플레이마다 하나를 무작위로(또는 채보의 장면 프리셋에서) 고릅니다. 호스트 화면이 배경 인스턴스를 생성하고(게임플레이 배경은 엔진이 게임 화면에 들어갈 때마다) 화면과 함께 해제하므로, 게임플레이 중에는 여러 개가 동시에 살아 있습니다. 배경 스크립트는 ROActivity와 같은 전역(읽기 전용 CONFIG, DATABASE, GetSaveFile; ACTIVITY 없음)을 받습니다. 아래 이벤트 훅은 선택 사항이며, 엔진은 각 훅을 해당 이벤트가 일어날 때 한 번 호출합니다.
+배경은 Modules 폴더 밖, 스킨의 Graphics 폴더 아래 꾸미는 화면의 디렉터리에 있습니다. 예를 들어 Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua, Graphics/5_Game/11_Balloon/Kusudama/Script.lua입니다. 폴더에 여러 변형이 있으면 엔진이 플레이마다 하나를 무작위로(또는 채보의 장면 프리셋에서) 고릅니다. 호스트 화면이 배경 인스턴스를 생성하고(게임플레이 배경은 엔진이 게임 화면에 들어갈 때마다) 화면과 함께 해제하므로, 게임플레이 중에는 여러 개가 동시에 살아 있습니다. 배경 스크립트는 ROActivity와 같은 전역(읽기 전용 CONFIG, DATABASE, GetSaveFile; ACTIVITY 없음)을 받습니다. 아래 이벤트 훅은 선택 사항이며, 엔진은 각 훅을 해당 이벤트가 일어날 때 한 번 호출합니다. 타워에서는 채보의 `TOWERTYPE`이 Down 폴더를 지정합니다.
 </div>
 
 | 메서드 | 설명 |
@@ -242,6 +242,8 @@ end
 | `state.bpm  -> number[]` | 각 플레이어의 현재 BPM. |
 | `state.gogo  -> boolean[]` | 각 플레이어가 고고타임인지 여부. |
 | `state.towerNightNum  -> number` | 타워의 낮에서 밤으로의 계수, 0에서 1. |
+| `state.towerFloor  -> number` | 플레이 중인 층, 0부터 (타워 플레이). |
+| `state.towerMaxFloor  -> number` | 채보의 층 수 (타워 플레이). |
 | `state.battleState  -> number` | AI 배틀 상태 코드. |
 | `state.battleWin  -> boolean` | 플레이어가 AI 배틀에서 이기고 있으면 true. |
 | `state.timeStamp  -> number` | 채보에 동기화된 시간(초). 게임플레이 밖에서는 -1. |

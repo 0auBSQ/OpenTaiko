@@ -105,9 +105,7 @@ Trifft der Parser auf eine Zeile der Form `#include SomeFile.ini`, liest er dies
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
 #include TowerResultConfig.ini
-#include TowerSelectConfig.ini
 #include OnlineLoungeConfig.ini
-#include OpenEncyclopediaConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
 #include Result4PConfig.ini
@@ -118,7 +116,7 @@ Trifft der Parser auf eine Zeile der Form `#include SomeFile.ini`, liest er dies
 
 Mit dem mitgelieferten Skin als Referenz enthält die Skin-Wurzel:
 
-- `Graphics/`: Bilder, gruppiert in nummerierten Ordnern pro Bildschirm (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`, `13_TowerSelect`, `15_OpenEncyclopedia`) plus einige gemeinsame Bilder auf oberster Ebene. Animierte Hintergründe sind `Script.lua`-Dateien, die neben den Bildern des Ordners liegen, zu dem sie gehören (zum Beispiel `Graphics/0_Startup/Script.lua` und die Ordner unter `Graphics/5_Game/5_Background/`).
+- `Graphics/`: Bilder, gruppiert in nummerierten Ordnern pro Bildschirm (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`) plus einige gemeinsame Bilder auf oberster Ebene. Animierte Hintergründe sind `Script.lua`-Dateien, die neben den Bildern des Ordners liegen, zu dem sie gehören (zum Beispiel `Graphics/0_Startup/Script.lua` und die Ordner unter `Graphics/5_Game/5_Background/`). Ein Tower-Look ist ein Ordner unter `Graphics/5_Game/5_Background/Tower/Down/`, der den Himmel, die Stockwerke (`Base/`), das Dach (`Top.png`), eine optionale Dekoration (`Deco/`) und sein Layout in `Config.json` enthält; ein Chart wählt ihn mit `TOWERTYPE:`, und die Tower-Auswahl, der Ladebildschirm und das Ergebnis setzen denselben Tower aus diesen Teilen zusammen.
 - `Sounds/`: Systemsounds und BGM, die das Spiel über feste Dateinamen lädt, zum Beispiel `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. Fehlt eine Datei, wird dieser Sound nicht abgespielt.
 - `Fonts/`: die `.ttf`-Dateien, auf die die `FontName`-Schlüssel verweisen.
 - `Locales/`: eine JSON-Datei pro Sprache (`en.json`, `ja.json`, ...) mit der Form `{ "Entries": { "KEY": "text" } }`. Diese Strings beschriften die eigenen Einstellungen des Skins, und Lua liest sie über `THEME:GetSkinString(key)`. Fehlt ein Schlüssel in der aktiven Sprache, schlägt das Spiel ihn in der `DefaultLocale`-Datei nach.

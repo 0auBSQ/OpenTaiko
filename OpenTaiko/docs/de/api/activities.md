@@ -210,7 +210,7 @@ Die Engine schlägt einige ROActivities unter festem Ordnernamen nach und steuer
 Eine Script.lua, die einen Bildschirmhintergrund, eine Gameplay-Ebene, einen Mob, eine Clear-Animation oder einen Kusudama-Effekt zeichnet, gehostet von den eigenen Bildschirmen der Engine.
 
 <div class="callout warn">
-Hintergründe liegen außerhalb des Modules-Ordners, unter dem Graphics-Ordner des Skins im Verzeichnis des Bildschirms, den sie dekorieren, zum Beispiel Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua und Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Wo ein Ordner mehrere Varianten enthält, wählt die Engine bei jedem Spiel eine zufällig (oder aus dem Szenen-Preset des Charts) aus. Der Host-Bildschirm erzeugt eine Hintergrundinstanz (die Gameplay-Hintergründe bei jedem Betreten des Spielbildschirms durch die Engine) und gibt sie mit dem Bildschirm frei, sodass während des Spiels mehrere gleichzeitig aktiv sind. Ein Hintergrundskript erhält dieselben globalen Objekte wie eine ROActivity (schreibgeschützte CONFIG, DATABASE und GetSaveFile; kein ACTIVITY). Die Ereignis-Hooks unten sind optional, und die Engine ruft jeden einmal auf, wenn sein Ereignis eintritt.
+Hintergründe liegen außerhalb des Modules-Ordners, unter dem Graphics-Ordner des Skins im Verzeichnis des Bildschirms, den sie dekorieren, zum Beispiel Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua und Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Wo ein Ordner mehrere Varianten enthält, wählt die Engine bei jedem Spiel eine zufällig (oder aus dem Szenen-Preset des Charts) aus. Der Host-Bildschirm erzeugt eine Hintergrundinstanz (die Gameplay-Hintergründe bei jedem Betreten des Spielbildschirms durch die Engine) und gibt sie mit dem Bildschirm frei, sodass während des Spiels mehrere gleichzeitig aktiv sind. Ein Hintergrundskript erhält dieselben globalen Objekte wie eine ROActivity (schreibgeschützte CONFIG, DATABASE und GetSaveFile; kein ACTIVITY). Die Ereignis-Hooks unten sind optional, und die Engine ruft jeden einmal auf, wenn sein Ereignis eintritt. Beim Tower benennt das `TOWERTYPE` des Charts den Down-Ordner.
 </div>
 
 | Methode | Beschreibung |
@@ -242,6 +242,8 @@ Eine Instanz pro Host, die der Host jeden Frame an Ort und Stelle aktualisiert. 
 | `state.bpm  -> number[]` | Aktuelle BPM jedes Spielers. |
 | `state.gogo  -> boolean[]` | Ob sich jeder Spieler in der Go-Go-Time befindet. |
 | `state.towerNightNum  -> number` | Tag-zu-Nacht-Faktor des Tower-Modus von 0 bis 1. |
+| `state.towerFloor  -> number` | Gerade gespieltes Stockwerk, ab 0 (Tower-Gameplay). |
+| `state.towerMaxFloor  -> number` | Anzahl der Stockwerke des Charts (Tower-Gameplay). |
 | `state.battleState  -> number` | Zustandscode des KI-Kampfs. |
 | `state.battleWin  -> boolean` | True, wenn der Spieler den KI-Kampf gerade gewinnt. |
 | `state.timeStamp  -> number` | Chart-synchrone Zeit in Sekunden; -1 außerhalb des Spiels. |

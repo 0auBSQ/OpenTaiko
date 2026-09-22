@@ -1,5 +1,0 @@
-[Image Manipulation]
-
-func:SetColor(r, g, b, "filename");
-Use a Multiply filter to recolor your image.
-Values must be between 0 and 1.

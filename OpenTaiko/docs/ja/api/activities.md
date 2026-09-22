@@ -210,7 +210,7 @@ end
 エンジン自身の画面にホストされ、画面背景、ゲームプレイのレイヤー、モブ、クリアアニメーション、くす玉エフェクトのいずれか 1 つを描画する Script.lua です。
 
 <div class="callout warn">
-バックグラウンドは Modules フォルダの外、スキンの Graphics フォルダの下の、装飾する画面のディレクトリに置かれます。例えば Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua、Graphics/5_Game/11_Balloon/Kusudama/Script.lua です。フォルダが複数のバリアントを持つ場合、エンジンはプレイごとにランダムに (または譜面のシーンプリセットから) 1 つを選びます。ホスト画面がバックグラウンドのインスタンスを作成し (ゲームプレイのバックグラウンドはエンジンがゲーム画面に入るたびに)、画面とともに破棄するため、ゲームプレイ中は複数が同時に生存します。バックグラウンドスクリプトは ROActivity と同じグローバルを受け取ります (読み取り専用の CONFIG、DATABASE、GetSaveFile。ACTIVITY はなし)。以下のイベントフックは任意で、エンジンはそれぞれをイベントが発生したときに 1 回呼びます。
+バックグラウンドは Modules フォルダの外、スキンの Graphics フォルダの下の、装飾する画面のディレクトリに置かれます。例えば Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua、Graphics/5_Game/11_Balloon/Kusudama/Script.lua です。フォルダが複数のバリアントを持つ場合、エンジンはプレイごとにランダムに (または譜面のシーンプリセットから) 1 つを選びます。ホスト画面がバックグラウンドのインスタンスを作成し (ゲームプレイのバックグラウンドはエンジンがゲーム画面に入るたびに)、画面とともに破棄するため、ゲームプレイ中は複数が同時に生存します。バックグラウンドスクリプトは ROActivity と同じグローバルを受け取ります (読み取り専用の CONFIG、DATABASE、GetSaveFile。ACTIVITY はなし)。以下のイベントフックは任意で、エンジンはそれぞれをイベントが発生したときに 1 回呼びます。 塔では、譜面の `TOWERTYPE` が Down フォルダを指定します。
 </div>
 
 | メソッド | 説明 |
@@ -242,6 +242,8 @@ end
 | `state.bpm  -> number[]` | 各プレイヤーの現在の BPM。 |
 | `state.gogo  -> boolean[]` | 各プレイヤーがゴーゴータイム中かどうか。 |
 | `state.towerNightNum  -> number` | 塔の昼から夜への係数 (0 から 1)。 |
+| `state.towerFloor  -> number` | プレイ中の階 (0 から、塔のプレイ)。 |
+| `state.towerMaxFloor  -> number` | 譜面の階数 (塔のプレイ)。 |
 | `state.battleState  -> number` | AI バトルの状態コード。 |
 | `state.battleWin  -> boolean` | プレイヤーが AI バトルで優勢のとき true。 |
 | `state.timeStamp  -> number` | 譜面に同期した秒単位の時間。ゲームプレイ外では -1。 |

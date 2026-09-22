@@ -105,9 +105,7 @@ Wanneer de parser een regel van de vorm `#include SomeFile.ini` tegenkomt, leest
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
 #include TowerResultConfig.ini
-#include TowerSelectConfig.ini
 #include OnlineLoungeConfig.ini
-#include OpenEncyclopediaConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
 #include Result4PConfig.ini
@@ -118,7 +116,7 @@ Wanneer de parser een regel van de vorm `#include SomeFile.ini` tegenkomt, leest
 
 Met de meegeleverde skin als referentie bevat de skinroot:
 
-- `Graphics/`: afbeeldingen gegroepeerd in genummerde mappen per scherm (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`, `13_TowerSelect`, `15_OpenEncyclopedia`) plus enkele gedeelde afbeeldingen bovenaan. Geanimeerde achtergronden zijn `Script.lua`-bestanden die naast de afbeeldingen van de map staan waartoe ze behoren (bijvoorbeeld `Graphics/0_Startup/Script.lua` en de mappen onder `Graphics/5_Game/5_Background/`).
+- `Graphics/`: afbeeldingen gegroepeerd in genummerde mappen per scherm (`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`) plus enkele gedeelde afbeeldingen bovenaan. Geanimeerde achtergronden zijn `Script.lua`-bestanden die naast de afbeeldingen van de map staan waartoe ze behoren (bijvoorbeeld `Graphics/0_Startup/Script.lua` en de mappen onder `Graphics/5_Game/5_Background/`). Een torenlook is één map onder `Graphics/5_Game/5_Background/Tower/Down/` met de lucht, de verdiepingen (`Base/`), het dak (`Top.png`), een optionele decoratie (`Deco/`) en zijn indeling in `Config.json`; een chart kiest er een met `TOWERTYPE:`, en de torenselectie, het laadscherm en het resultaat bouwen dezelfde toren uit die onderdelen.
 - `Sounds/`: systeemgeluiden en BGM die het spel via vaste bestandsnamen laadt, bijvoorbeeld `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. Als een bestand ontbreekt, speelt dat geluid niet af.
 - `Fonts/`: de `.ttf`-bestanden waarnaar de `FontName`-sleutels verwijzen.
 - `Locales/`: één JSON-bestand per taal (`en.json`, `ja.json`, ...) met de vorm `{ "Entries": { "KEY": "text" } }`. Deze strings labelen de eigen instellingen van de skin, en Lua leest ze via `THEME:GetSkinString(key)`. Wanneer een sleutel in de actieve taal ontbreekt, zoekt het spel hem op in het `DefaultLocale`-bestand.

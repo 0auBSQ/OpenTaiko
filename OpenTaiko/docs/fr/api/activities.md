@@ -210,7 +210,7 @@ Le moteur recherche certaines ROActivities par un nom de dossier fixe et les pil
 Un Script.lua qui dessine un arrière-plan d'écran, une couche de gameplay, une foule, une animation de réussite ou un effet de kusudama, hébergé par les écrans propres du moteur.
 
 <div class="callout warn">
-Les arrière-plans vivent hors du dossier Modules, sous le dossier Graphics du skin, dans le répertoire de l'écran qu'ils décorent, par exemple Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua et Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Quand un dossier contient plusieurs variantes, le moteur en choisit une au hasard (ou d'après le préréglage de scène de la partition) à chaque partie. L'écran hôte crée une instance d'arrière-plan (les arrière-plans de gameplay à chaque fois que le moteur entre dans l'écran de jeu) et la libère avec l'écran, si bien que plusieurs sont actives en même temps pendant le gameplay. Un script d'arrière-plan reçoit les mêmes globales qu'une ROActivity (CONFIG, DATABASE et GetSaveFile en lecture seule ; pas d'ACTIVITY). Les crochets d'événement ci-dessous sont facultatifs, et le moteur appelle chacun d'eux une fois quand son événement se produit.
+Les arrière-plans vivent hors du dossier Modules, sous le dossier Graphics du skin, dans le répertoire de l'écran qu'ils décorent, par exemple Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua et Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Quand un dossier contient plusieurs variantes, le moteur en choisit une au hasard (ou d'après le préréglage de scène de la partition) à chaque partie. L'écran hôte crée une instance d'arrière-plan (les arrière-plans de gameplay à chaque fois que le moteur entre dans l'écran de jeu) et la libère avec l'écran, si bien que plusieurs sont actives en même temps pendant le gameplay. Un script d'arrière-plan reçoit les mêmes globales qu'une ROActivity (CONFIG, DATABASE et GetSaveFile en lecture seule ; pas d'ACTIVITY). Les crochets d'événement ci-dessous sont facultatifs, et le moteur appelle chacun d'eux une fois quand son événement se produit. Pour la tour, le `TOWERTYPE` du chart nomme le dossier Down.
 </div>
 
 | Méthode | Description |
@@ -242,6 +242,8 @@ Une instance par hôte, que l'hôte met à jour sur place à chaque frame. Les c
 | `state.bpm  -> number[]` | BPM courant de chaque joueur. |
 | `state.gogo  -> boolean[]` | Si chaque joueur est en go-go time. |
 | `state.towerNightNum  -> number` | Facteur jour-vers-nuit de la Tour, de 0 à 1. |
+| `state.towerFloor  -> number` | Étage en cours, à partir de 0 (jeu de la tour). |
+| `state.towerMaxFloor  -> number` | Nombre d'étages du chart (jeu de la tour). |
 | `state.battleState  -> number` | Code d'état de la bataille contre l'IA. |
 | `state.battleWin  -> boolean` | Vrai quand le joueur est en train de gagner la bataille contre l'IA. |
 | `state.timeStamp  -> number` | Temps synchronisé sur la partition, en secondes ; -1 hors gameplay. |

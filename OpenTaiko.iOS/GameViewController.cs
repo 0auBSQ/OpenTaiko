@@ -150,7 +150,7 @@ public partial class GameViewController : UIViewController {
 	/// <summary>
 	/// Copy writable/user-facing assets from the app bundle to the Documents directory.
 	/// Only copies if the target doesn't exist yet (first launch or new directory).
-	/// Read-only assets (Global/, Lang/, Encyclopedia/, BGScriptAPI.lua) stay in the bundle
+	/// Read-only assets (Global/, Lang/, BGScriptAPI.lua) stay in the bundle
 	/// and are resolved at runtime via OpenTaiko.ResolveAssetPath().
 	/// </summary>
 	private static void CopyBundleAssetsToDocuments() {

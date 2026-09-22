@@ -105,9 +105,7 @@ AIBattleCharacter=10v2 - AItritus
 #include DaniSelectConfig.ini
 #include DanResultConfig.ini
 #include TowerResultConfig.ini
-#include TowerSelectConfig.ini
 #include OnlineLoungeConfig.ini
-#include OpenEncyclopediaConfig.ini
 #include ModalConfig.ini
 #include Game4PConfig.ini
 #include Result4PConfig.ini
@@ -118,7 +116,7 @@ AIBattleCharacter=10v2 - AItritus
 
 기본 제공 스킨을 기준으로, 스킨 루트에는 다음이 있습니다.
 
-- `Graphics/`: 번호가 매겨진 화면별 폴더(`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`, `13_TowerSelect`, `15_OpenEncyclopedia`)로 묶인 이미지와 상단의 몇몇 공용 이미지. 애니메이션 배경은 속한 폴더의 이미지 옆에 놓인 `Script.lua` 파일입니다(예: `Graphics/0_Startup/Script.lua`와 `Graphics/5_Game/5_Background/` 아래 폴더).
+- `Graphics/`: 번호가 매겨진 화면별 폴더(`0_Startup`, `1_Title`, `2_Config`, `3_DaniSelect`, `5_Game`, `6_Result`, `7_DanResult`, `7_Exit`, `8_TowerResult`, `10_Heya`, `12_OnlineLounge`)로 묶인 이미지와 상단의 몇몇 공용 이미지. 애니메이션 배경은 속한 폴더의 이미지 옆에 놓인 `Script.lua` 파일입니다(예: `Graphics/0_Startup/Script.lua`와 `Graphics/5_Game/5_Background/` 아래 폴더). 타워 룩은 `Graphics/5_Game/5_Background/Tower/Down/` 아래의 폴더 하나로, 하늘, 층(`Base/`), 지붕(`Top.png`), 선택적인 장식(`Deco/`), 그리고 `Config.json`의 배치를 담습니다. 채보는 `TOWERTYPE:`으로 룩을 고르고, 타워 선택, 로딩 화면, 결과 화면은 그 조각들로 같은 타워를 조립합니다.
 - `Sounds/`: 게임이 고정 파일 이름으로 로드하는 시스템 소리와 BGM. 예: `Sounds/Move.ogg`, `Sounds/Decide.ogg`, `Sounds/Cancel.ogg`, `Sounds/BGM/Title.ogg`, `Sounds/BGM/SongSelect.ogg`, `Sounds/BGM/Result.ogg`. 파일이 없으면 그 소리는 재생되지 않습니다.
 - `Fonts/`: `FontName` 키가 참조하는 `.ttf` 파일.
 - `Locales/`: 언어별 JSON 파일(`en.json`, `ja.json`, ...) 하나씩, 형태는 `{ "Entries": { "KEY": "text" } }`. 이 문자열은 스킨 자체 설정의 라벨이며 Lua는 `THEME:GetSkinString(key)`로 이를 읽습니다. 활성 언어에 키가 없으면 게임은 `DefaultLocale` 파일에서 찾습니다.

@@ -210,7 +210,7 @@ end
 绘制一个界面背景、演奏图层、观众、过关动画或花球效果的 Script.lua，由引擎自身的界面承载。
 
 <div class="callout warn">
-背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。
+背景位于 Modules 文件夹之外，在皮肤的 Graphics 文件夹下、其所装饰界面的目录中，例如 Graphics/0_Startup/Script.lua、Graphics/10_Heya/Script.lua、Graphics/6_Result/Script.lua、Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua、Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua、Graphics/5_Game/3_Mob/{variant}/Script.lua、Graphics/5_Game/9_End/{result}/Script.lua 和 Graphics/5_Game/11_Balloon/Kusudama/Script.lua。当一个文件夹包含多个变体时，引擎每次演奏随机挑选一个（或按谱面的场景预设挑选）。宿主界面创建背景实例（演奏背景在每次引擎进入游戏界面时创建）并随界面一起释放，因此演奏期间会同时存在多个实例。背景脚本获得与只读活动相同的全局对象（只读的 CONFIG、DATABASE 和 GetSaveFile；没有 ACTIVITY）。下面的事件钩子是可选的，引擎在对应事件发生时调用每个钩子一次。 对塔而言，谱面的 `TOWERTYPE` 指定 Down 文件夹。
 </div>
 
 | 方法 | 说明 |
@@ -242,6 +242,8 @@ end
 | `state.bpm  -> number[]` | 每个玩家当前的 BPM。 |
 | `state.gogo  -> boolean[]` | 每个玩家是否处于 GoGo 时间。 |
 | `state.towerNightNum  -> number` | 塔模式的昼夜系数，0 到 1。 |
+| `state.towerFloor  -> number` | 正在游玩的楼层，从 0 起（塔模式）。 |
+| `state.towerMaxFloor  -> number` | 谱面的楼层数（塔模式）。 |
 | `state.battleState  -> number` | AI 对战状态代码。 |
 | `state.battleWin  -> boolean` | 玩家在 AI 对战中领先时为 true。 |
 | `state.timeStamp  -> number` | 与谱面同步的时间（秒）；演奏之外为 -1。 |

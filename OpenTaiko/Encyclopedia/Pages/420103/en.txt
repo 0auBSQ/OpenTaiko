@@ -1,8 +1,0 @@
-[Image Drawing]
-
-func:DrawGraph(x, y, "filename");
-Draw a given image at a position.
-
-func:DrawGraphCenter(x, y, "filename");
-Draw a given image at a position, centered at the
-given coordinates.

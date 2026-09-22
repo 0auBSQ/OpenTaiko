@@ -26,7 +26,6 @@ public class CStage : CActivity {
 		BoukenTitle,
 		BoukenMap,
 		OnlineLounge,
-		Encyclopedia,
 		AIBattleMode,
 		PlayerStats,
 		ChartEditor,

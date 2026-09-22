@@ -38,6 +38,16 @@ internal class CActImplBackground : CActivity {
 		DownScript?.Call("clearOut", player);
 	}
 
+	/// <summary>The Down folder of the tower chart's look (its TOWERTYPE), or null when the chart names none or
+	/// the skin has no folder of that name (a preset or a random pick then applies).</summary>
+	private static string? TowerLookPath(string bgOrigindir) {
+		if (OpenTaiko.SongMount.nChoosenSongDifficulty[0] != (int)Difficulty.Tower) return null;
+		string? look = OpenTaiko.SongMount.rChoosenSong?.score[(int)Difficulty.Tower]?.ChartInfo.nTowerType;
+		if (string.IsNullOrEmpty(look) || look.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) return null;
+		string path = $@"{bgOrigindir}{Path.DirectorySeparatorChar}Down{Path.DirectorySeparatorChar}{look}";
+		return Directory.Exists(path) ? path : null;
+	}
+
 	public override void Activate() {
 		if (!this.IsDeActivated)
 			return;
@@ -82,6 +92,10 @@ internal class CActImplBackground : CActivity {
 			var downPath = (preset != null && System.IO.Directory.Exists(_presetPath))
 				? _presetPath
 				: downDirs[random.Next(0, downDirs.Length)];
+
+			// A tower chart names its look (TOWERTYPE): the Down folder of that name holds the sky and the tower
+			var towerLook = TowerLookPath(bgOrigindir);
+			if (towerLook != null) downPath = towerLook;
 
 			DownScript = new LuaBackgroundWrapper(downPath);
 			DownScript.Activate(_state);
@@ -168,7 +182,6 @@ internal class CActImplBackground : CActivity {
 		}
 		*/
 
-		this.ctSlideAnimation = new CCounter();
 		this.ctClimbDuration = new CCounter();
 		//this.ctStandingAnimation = new CCounter(0, 1000, (60000f / (float)CTja.TjaBeatSpeedToGameBeatSpeed(OpenTaiko.stageGameScreen.actPlayInfo.dbBPM[0])) * OpenTaiko.Skin.Characters_Beat_Tower_Standing[currentCharacter] / OpenTaiko.Skin.Characters_Tower_Standing_Ptn[currentCharacter], OpenTaiko.Timer);
 		this.ctStandingAnimation = new CCounter(0, 1000, OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(0) * 1 / 1, OpenTaiko.Timer);
@@ -229,13 +242,6 @@ internal class CActImplBackground : CActivity {
 
 		//this.ct上背景FIFOタイマー?.t進行();
 
-
-		#region [Tower specific variables declaration]
-
-		float currentFloorPositionMax140 = 0;
-
-		#endregion
-
 		// fNow_Measure_s (/ m)
 
 		#region [Upper background]
@@ -249,9 +255,6 @@ internal class CActImplBackground : CActivity {
 				this.bFloorChanged = OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor > 0 && (OpenTaiko.stageGameScreen.FloorManagement.LastRegisteredFloor < OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1);
 
 				int maxFloor = OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTotalFloor;
-				int nightTime = Math.Max(140, maxFloor / 2);
-
-				currentFloorPositionMax140 = Math.Min(OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / (float)nightTime, 1f);
 
 				#endregion
 
@@ -352,97 +355,11 @@ internal class CActImplBackground : CActivity {
 
 			OpenTaiko.actTextConsole.Print(0, 0, CTextConsole.EFontType.White, maxFloor.ToString());
 
-			int nightTime = Math.Max(140, maxFloor / 2);
-
-			int currentTowerType = Array.IndexOf(OpenTaiko.Skin.Game_Tower_Names, OpenTaiko.SongMount.rChoosenSong.score[5].ChartInfo.nTowerType);
-
-			if (currentTowerType < 0 || currentTowerType >= OpenTaiko.Skin.Game_Tower_Ptn)
-				currentTowerType = 0;
-
 			#region [Tower lower background]
 
-			float nextPositionMax140 = Math.Min((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / (float)nightTime, 1f);
-
-			if (bFloorChanged == true)
-				ctSlideAnimation.Start(0, 1000, OpenTaiko.stageGameScreen.actPlayInfo.msPerGameBeatAbs(0) / 500, OpenTaiko.Timer);
-
-			float progressFactor = (nextPositionMax140 - currentFloorPositionMax140) * (ctSlideAnimation.CurrentValue / 1000f);
-
-
-
-			#region [Skybox]
-
-			//int skyboxYPosition = (int)((TJAPlayer3.Tx.Tower_Sky_Gradient.szテクスチャサイズ.Height - TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]) * (1f - (currentFloorPositionMax140 + progressFactor)));
-
-			//TJAPlayer3.Tx.Tower_Sky_Gradient?.t2D描画(TJAPlayer3.Skin.Game_Tower_Sky_Gradient[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient[1],
-			//new Rectangle(0, skyboxYPosition, TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[0], TJAPlayer3.Skin.Game_Tower_Sky_Gradient_Size[1]));
-
-			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript.Update(_state);
-			DownScript.Draw(_state);
-
-			#endregion
-
-
-			#region [Tower body]
-
-			progressFactor = ctSlideAnimation.CurrentValue / 1000f;
-
-			int currentTower = currentTowerType;
-
-			// Will implement the roof later, need the beforehand total floor count calculation before
-			int nextTowerBase = ((OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
-			int towerBase = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] / 10) % OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower];
-
-			int currentDeco = OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
-			int nextDeco = (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1) % OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower];
-
-			// Microfix for the first floor suddenly changing texture
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Deco[currentTower] > 1)
-				currentDeco++;
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] == 0 && OpenTaiko.Skin.Game_Tower_Ptn_Base[currentTower] > 1)
-				towerBase++;
-
-			int widthChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[0]);
-			int heightChange = (int)(progressFactor * OpenTaiko.Skin.Game_Tower_Floors_Move[1]);
-
-			// Current trunk
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][towerBase]?.t2DBottomCenterBasedDraw(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange); // 316 + 360
-			else
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2DBottomCenterBasedDraw(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] + heightChange);
-
-			// Current deco
-			OpenTaiko.Tx.Tower_Deco[currentTower][currentDeco]?.t2DBottomCenterBasedDraw(
-				OpenTaiko.Skin.Game_Tower_Floors_Deco[0] + widthChange,
-				OpenTaiko.Skin.Game_Tower_Floors_Deco[1] + heightChange);
-
-			int originY = OpenTaiko.Skin.Game_Tower_Floors_Move[1] - heightChange;
-
-			// Next trunk
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 < maxFloor)
-				OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase]?.t2DBottomCenterBasedDraw(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
-					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Width, OpenTaiko.Tx.Tower_Base[currentTower][nextTowerBase].szTextureSize.Height - originY));
-			else if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 == maxFloor) {
-				OpenTaiko.Tx.Tower_Top[currentTower]?.t2DBottomCenterBasedDraw(
-					OpenTaiko.Skin.Game_Tower_Floors_Body[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Body[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange,
-					new Rectangle(0, originY, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Width, OpenTaiko.Tx.Tower_Top[currentTower].szTextureSize.Height - originY));
-			}
-
-			// Next deco
-			if (OpenTaiko.stageGameScreen.actPlayInfo.NowMeasure[0] + 1 <= maxFloor)
-				OpenTaiko.Tx.Tower_Deco[currentTower][nextDeco]?.t2DBottomCenterBasedDraw(
-					OpenTaiko.Skin.Game_Tower_Floors_Deco[0] - OpenTaiko.Skin.Game_Tower_Floors_Move[0] + widthChange,
-					OpenTaiko.Skin.Game_Tower_Floors_Deco[1] - OpenTaiko.Skin.Game_Tower_Floors_Move[1] + heightChange);
-
-
-			#endregion
+			// the tower look's Down script draws the sky and the tower body (the floors sliding under the player)
+			if (!OpenTaiko.stageGameScreen.bPAUSE) DownScript?.Update(_state);
+			DownScript?.Draw(_state);
 
 			#region [Climbing don]
 
@@ -593,7 +510,6 @@ internal class CActImplBackground : CActivity {
 
 			#endregion
 
-			ctSlideAnimation?.Tick();
 			ctClimbDuration?.Tick();
 			ctStandingAnimation?.TickLoop();
 			ctClimbingAnimation?.TickLoop();
@@ -664,7 +580,6 @@ internal class CActImplBackground : CActivity {
 
 	private bool bFloorChanged = false;
 	private int currentCharacter;
-	private CCounter ctSlideAnimation;
 	private CCounter ctStandingAnimation;
 	private CCounter ctClimbingAnimation;
 	private CCounter ctRunningAnimation;

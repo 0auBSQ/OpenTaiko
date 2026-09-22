@@ -210,7 +210,7 @@ end
 Script.lua, который рисует один фон экрана, слой игрового процесса, толпу, анимацию клира или эффект кусудамы и размещается собственными экранами движка.
 
 <div class="callout warn">
-Фоны живут вне папки Modules, в папке Graphics скина, в каталоге того экрана, который они украшают, например Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua и Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Если папка содержит несколько вариантов, движок при каждой игре выбирает один из них случайно (или из пресета сцены в чарте). Экран-хост создаёт экземпляр фона (игровые фоны — при каждом входе движка на игровой экран) и уничтожает его вместе с экраном, поэтому во время игры одновременно живут несколько экземпляров. Скрипт фона получает те же глобальные объекты, что и ROActivity (CONFIG, DATABASE и GetSaveFile только для чтения; без ACTIVITY). Обработчики событий ниже необязательны, и движок вызывает каждый из них один раз, когда происходит его событие.
+Фоны живут вне папки Modules, в папке Graphics скина, в каталоге того экрана, который они украшают, например Graphics/0_Startup/Script.lua, Graphics/10_Heya/Script.lua, Graphics/6_Result/Script.lua, Graphics/5_Game/5_Background/Normal/Up/{variant}/Script.lua, Graphics/5_Game/5_Background/Normal/Down/{variant}/Script.lua, Graphics/5_Game/3_Mob/{variant}/Script.lua, Graphics/5_Game/9_End/{result}/Script.lua и Graphics/5_Game/11_Balloon/Kusudama/Script.lua. Если папка содержит несколько вариантов, движок при каждой игре выбирает один из них случайно (или из пресета сцены в чарте). Экран-хост создаёт экземпляр фона (игровые фоны — при каждом входе движка на игровой экран) и уничтожает его вместе с экраном, поэтому во время игры одновременно живут несколько экземпляров. Скрипт фона получает те же глобальные объекты, что и ROActivity (CONFIG, DATABASE и GetSaveFile только для чтения; без ACTIVITY). Обработчики событий ниже необязательны, и движок вызывает каждый из них один раз, когда происходит его событие. Для башни папку Down называет `TOWERTYPE` чарта.
 </div>
 
 | Метод | Описание |
@@ -242,6 +242,8 @@ Script.lua, который рисует один фон экрана, слой �
 | `state.bpm  -> number[]` | Текущий BPM каждого игрока. |
 | `state.gogo  -> boolean[]` | Находится ли каждый игрок в гоу-гоу-тайме. |
 | `state.towerNightNum  -> number` | Коэффициент перехода от дня к ночи в башне, от 0 до 1. |
+| `state.towerFloor  -> number` | Текущий этаж, начиная с 0 (игра в башне). |
+| `state.towerMaxFloor  -> number` | Число этажей чарта (игра в башне). |
 | `state.battleState  -> number` | Код состояния битвы с ИИ. |
 | `state.battleWin  -> boolean` | Истина, когда игрок выигрывает битву с ИИ. |
 | `state.timeStamp  -> number` | Время, синхронизированное с чартом, в секундах; -1 вне игрового процесса. |
