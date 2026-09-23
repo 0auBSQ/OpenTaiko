@@ -4797,7 +4797,7 @@ internal class CTja : CActivity {
 		return 0; // 対象小節が存在しないなら、最初から再生
 	}
 
-	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, double th16NowBeatIm, double scrollRate) {
+	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, Complex th16NowBeat, double scrollRate) {
 		CChip velocityRefChip = NotesManager.GetVelocityRefChip(chip, this.COMPAT);
 		if (velocityRefChip.eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll
 			&& nowBpmPoint.point_type.HasFlag(EBPMPointType.DelayStop)
@@ -4806,49 +4806,41 @@ internal class CTja : CActivity {
 		}
 
 		double msDTime = chip.dbSoundTimems - msTjaNowTime;
-		// the real beat difference for each screen axis, and the imaginary one (complex #HISPEED)
-		double th16DBeatX = chip.fBMSCROLLTime.Real - th16NowBeatX;
-		double th16DBeatY = chip.fBMSCROLLTime.Real - th16NowBeatY;
-		double th16DBeatIm = chip.fBMSCROLLTime.Imaginary - th16NowBeatIm;
+		var th16DBeat = chip.fBMSCROLLTime - th16NowBeat;
 		if (this.COMPAT is ETjaCompat.Jiro1) {
-			th16DBeatX += chip.bpmPoint!.th16BeatDrift.Real;
-			th16DBeatY += chip.bpmPoint!.th16BeatDrift.Imaginary;
+			th16DBeat += chip.bpmPoint!.th16BeatDrift;
 		}
 
 		chip.bShowSudden = (!(velocityRefChip.IsSuddenHideRoll && NotesManager.IsGenericRoll(chip))
 			&& (msTjaNowTime >= velocityRefChip.dbSoundTimems - velocityRefChip.msShowOffset));
 
-		double msDTimeMoveX = msDTime;
-		double msDTimeMoveY = msDTime;
-		Complex th16DBeatMoveX = new(th16DBeatX, th16DBeatIm);
-		Complex th16DBeatMoveY = new(th16DBeatY, th16DBeatIm);
-		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.dbSoundTimems - velocityRefChip.msMoveOffset) {
-			msDTimeMoveX = velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
-			th16DBeatMoveX = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
-			// In TJAP3, #SUDDEN only affects horizontal scroll
-			if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
-				msDTimeMoveY = msDTimeMoveX;
-				th16DBeatMoveY = th16DBeatMoveX;
-			}
+		double msDTimeMove = msDTime;
+		Complex th16DBeatMove = th16DBeat;
+		bool isPreMove = NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.dbSoundTimems - velocityRefChip.msMoveOffset;
+		if (isPreMove) {
+			msDTimeMove = velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
+			th16DBeatMove = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
 		}
 		
 		bool forceNMScroll = this.GetScrolledChipForceNMScroll(velocityRefChip, nowBpmPoint, msTjaNowTime);
 		EScrollMode scrollModeForced = forceNMScroll ? EScrollMode.Normal : velocityRefChip.eScrollMode;
 
-		double scrollSpeed_Re = ((scrollModeForced == EScrollMode.BMScroll) ? 1.0 : velocityRefChip.dbSCROLL.Real) * scrollRate;
-		double scrollSpeed_Im = ((scrollModeForced == EScrollMode.BMScroll) ? 0.0 : velocityRefChip.dbSCROLL.Imaginary) * scrollRate;
-		if (this.COMPAT is ETjaCompat.TJAP3 && NotesManager.IsGenericRoll(chip))
-			scrollSpeed_Im = 0;
-		// the imaginary axis points down the screen in TJAP3/OOS and up otherwise; the beat's imaginary part
-		// (complex #HISPEED) follows the same axis as the scroll's
-		double ySign = (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? 1 : -1;
-		scrollSpeed_Im *= ySign;
-		var (dx, dy) = NotesManager.GetNoteXY(msDTimeMoveX, msDTimeMoveY, new(th16DBeatMoveX.Real, th16DBeatMoveX.Imaginary * ySign), new(th16DBeatMoveY.Real, th16DBeatMoveY.Imaginary * ySign), velocityRefChip.dbBPM, new(scrollSpeed_Re, scrollSpeed_Im), scrollModeForced);
+		var scrollSpeed = ((scrollModeForced == EScrollMode.BMScroll) ? 1.0 : velocityRefChip.dbSCROLL) * scrollRate;
+		var (dx, dy) = NotesManager.GetNoteXY(msDTimeMove, th16DBeatMove, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced);
 
-		double dy_ = dy;
-		// TJAP3 behavior: bar lines and roll-type notes are not affected by #DIRECTION
+		// In TJAP3, #SUDDEN only affects horizontal scroll
+		if (isPreMove && this.COMPAT is (ETjaCompat.TJAP3 or ETjaCompat.OOS))
+			dy = NotesManager.GetNoteXY(msDTime, th16DBeat, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced).y;
+
+		if (this.COMPAT is ETjaCompat.TJAP3 && NotesManager.IsGenericRoll(chip))
+			dy = 0; // TJAPlayer3 behavior: rolls never had vertical component
+		else if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS))
+			dy = -dy; // the imaginary axis points up (screen -y), contrary to TJAP3/OOS behavior - points down (screen +y)
+
+		// TJAP3 behavior: bar lines and roll-type notes are not affected by #DIRECTION		
 		if (!(this.COMPAT == ETjaCompat.TJAP3 && (chip.nChannelNo == 0x50 || NotesManager.IsGenericRoll(chip)))) {
-			(dx, dy_) = chip.nScrollDirection switch {
+			var dyOrig = dy;
+			(dx, dy) = chip.nScrollDirection switch {
 				1 => (0, -dx), // ↓
 				2 => (0, dx), // ↑
 				3 => (dx, -dx), // ↙
@@ -4858,8 +4850,8 @@ internal class CTja : CActivity {
 				7 => (-dx, dx), // ↗
 				0 or _ => (dx, dy), // ←
 			};
-			if (!(this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS && dy != 0)) // TJAP3 behavior: vertical scrolling of non-real `#SCROLL` is kept
-				dy = dy_;
+			if (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS && dyOrig != 0) // TJAP3 behavior: vertical scrolling of non-real `#SCROLL` is kept
+				dy = dyOrig;
 		}
 
 		chip.nHorizontalChipDistance = (int)dx;

@@ -68,12 +68,12 @@ class NotesManager {
 		=> NoteTypeToChar.GetValueOrDefault(nt);
 	public static int ToChannelNo(ENoteType nt) => (int)nt;
 
-	public static double GetNoteX(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
-		if (eScrollMode is EScrollMode.BMScroll) {
-			scroll = 1.0;
-		}
-		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
-		return PxFromN4BeatsX(n4Beats);
+	// HBScroll/BMScroll: the position as the complex product scroll × Δbeat in the screen's frame
+	// (a complex #HISPEED gives the beat an imaginary part)
+	// NMScroll: time-based (#HISPEED is ignored as in TaikoManyGimmicks)
+	public static (double x, double y) GetNoteXY(double msDTime, Complex th16DBeat, double bpm, Complex scroll, EScrollMode eScrollMode) {
+		var n4Beats = getN4Beats(msDTime, th16DBeat, bpm, scroll, eScrollMode);
+		return (PxFromN4BeatsX(n4Beats.Real), PxFromN4BeatsY(n4Beats.Imaginary));
 	}
 
 	public static double PxFromN4BeatsX(double n4Beats) {
@@ -88,38 +88,6 @@ class NotesManager {
 		return px / pxPer4Beats / screenScale;
 	}
 
-	// the position as the complex product scroll × Δbeat in the HBScroll/BMScroll modes (a complex #HISPEED gives
-	// the beat an imaginary part), in the screen's frame; time-based otherwise. Each screen axis takes its own
-	// real and imaginary beat differences (they differ per axis under the TaikoJiro 1 drift and TJAP3's #SUDDEN).
-	public static (double dx, double dy) GetNoteXY(double msDTimeX, double msDTimeY, Complex th16DBeatX, Complex th16DBeatY, double bpm, Complex scroll, EScrollMode eScrollMode) {
-		if (eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll) {
-			var (n4X, n4Y) = ComplexN4BeatsXY(th16DBeatX, th16DBeatY, scroll, eScrollMode);
-			return (PxFromN4BeatsX(n4X), PxFromN4BeatsY(n4Y));
-		}
-		return (GetNoteX(msDTimeX, th16DBeatX.Real, bpm, scroll.Real, eScrollMode), GetNoteY(msDTimeY, th16DBeatY.Real, bpm, scroll.Imaginary, eScrollMode));
-	}
-
-	public static (double X, double Y) ComplexN4BeatsXY(Complex th16DBeatX, Complex th16DBeatY, Complex scroll, EScrollMode eScrollMode) {
-		var n4X = ComplexN4Beats(th16DBeatX, scroll, eScrollMode).Real;
-		var n4Y = ComplexN4Beats(th16DBeatY, scroll, eScrollMode).Imaginary;
-		return (n4X, n4Y);
-	}
-
-	public static Complex ComplexN4Beats(Complex th16DBeat, Complex scroll, EScrollMode eScrollMode) {
-		if (eScrollMode is EScrollMode.BMScroll) {
-			scroll = 1.0;
-		}
-		return scroll * th16DBeat / 16.0;
-	}
-
-	public static double GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
-		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
-			return 0;
-		}
-		double n4Beats = getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
-		return PxFromN4BeatsY(n4Beats);
-	}
-
 	public static double PxFromN4BeatsY(double n4Beats) {
 		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
 		double screenScale = OpenTaiko.Skin.Resolution[1] / 720.0;
@@ -132,7 +100,13 @@ class NotesManager {
 		return px * pxPer4Beats * screenScale;
 	}
 
-	public static double getN4Beats(double msDTime, double th16DBeat, double bpm, EScrollMode eScrollMode)
+	public static Complex getN4Beats(Complex msDTime, Complex th16DBeat, double bpm, Complex scroll, EScrollMode eScrollMode) {
+		if (eScrollMode is EScrollMode.BMScroll)
+			scroll = 1.0;
+		return getN4Beats(scroll * msDTime, scroll * th16DBeat, bpm, eScrollMode);
+	}
+
+	public static Complex getN4Beats(Complex msDTime, Complex th16DBeat, double bpm, EScrollMode eScrollMode)
 		=> eScrollMode switch {
 			EScrollMode.Normal => msDTime * bpm / 240000.0,
 			EScrollMode.BMScroll or EScrollMode.HBScroll => th16DBeat / 16.0,

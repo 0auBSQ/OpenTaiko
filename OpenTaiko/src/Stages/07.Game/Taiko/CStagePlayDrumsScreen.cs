@@ -1095,18 +1095,18 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			BgFilename = OpenTaiko.TJA.strBGIMAGE_PATH;
 		base.tBackgroundTextureCreate(DefaultBgFilename, bgrect, BgFilename);
 	}
-	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nPlayTime, double th16NowBeat, double th16NowBeatY, double th16NowBeatIm) {
+	protected override void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double nPlayTime, Complex th16NowBeat) {
 		NotesManager.ENoteType nt = NotesManager.GetNoteType(pChip);
 		EGameType _gt = NotesManager.GetChipGameType(pChip, nPlayer);
 
 		if (NotesManager.IsRollEnd(pChip)) {
 			nt = NotesManager.GetNoteType(pChip.start);
 			_gt = NotesManager.GetChipGameType(pChip.start, nPlayer);
-			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, th16NowBeatIm, nt, _gt, isEnd: true);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, nt, _gt, isEnd: true);
 			return;
 		}
 		if (NotesManager.IsGenericRoll(nt)) {
-			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, th16NowBeatY, th16NowBeatIm, nt, _gt);
+			this.tProgressDraw_Chip_TaikoRoll(configIni, ref tja, ref pChip, nPlayer, nPlayTime, th16NowBeat, nt, _gt);
 			return;
 		}
 
@@ -1161,7 +1161,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 		#endregion
 	}
-	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, double th16NowBeatIm, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false) {
+	protected override void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja tja, ref CChip pChip, int nPlayer, double msTjaNowTime, Complex th16NowBeat, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false) {
 		// 2016.11.2 kairera0467
 		// 黄連打音符を赤くするやつの実装方法メモ
 		//前面を黄色、背面を変色後にしたものを重ねて、打数に応じて前面の透明度を操作すれば、色を操作できるはず。
@@ -1205,7 +1205,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			bool isBodyXInScreen = (Math.Min(x, xEnd) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, xEnd) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
 			if (pHasBar) {
-				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime, th16NowBeatX, th16NowBeatY, th16NowBeatIm);
+				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime, th16NowBeat);
 			}
 
 			#region[ HIDSUD & STEALTH ]
@@ -1326,27 +1326,24 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 	}
 
 	/// Detect and hide screen-obscuring rolls when any tips are out of screen
-	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, double th16NowBeatIm) {
+	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime, Complex th16NowBeat) {
 		// display judging and in-beat rolls
 		if ((long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime <= pChip.end.nSoundTimems) {
 			pChip.canShowBody = true;
 			return;
 		}
 		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
-			var (th16ChipBeatX, th16ChipBeatY) = (pChip.fBMSCROLLTime.Real, pChip.fBMSCROLLTime.Real);
-			var (th16ChipEndBeatX, th16ChipEndBeatY) = (pChip.end.fBMSCROLLTime.Real, pChip.end.fBMSCROLLTime.Real);
-			// a roll spanning imaginary beat (complex #HISPEED) is in beat along that axis too
-			var (th16ChipBeatIm, th16ChipEndBeatIm) = (pChip.fBMSCROLLTime.Imaginary, pChip.end.fBMSCROLLTime.Imaginary);
+			var th16ChipBeat = pChip.fBMSCROLLTime;
+			var th16ChipEndBeat = pChip.end.fBMSCROLLTime;
 			var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
 			if (compat is CTja.ETjaCompat.Jiro1) {
-				th16ChipBeatX += pChip.bpmPoint!.th16BeatDrift.Real;
-				th16ChipBeatY += pChip.bpmPoint!.th16BeatDrift.Imaginary;
-				th16ChipEndBeatX += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift.Real;
-				th16ChipEndBeatY += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift.Imaginary;
+				th16ChipBeat += pChip.bpmPoint!.th16BeatDrift;
+				th16ChipEndBeat += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift;
 			}
-			if ((th16NowBeatX >= th16ChipBeatX && th16NowBeatX <= th16ChipEndBeatX)
-					|| (th16NowBeatY >= th16ChipBeatY && th16NowBeatY <= th16ChipEndBeatY)
-					|| (th16ChipBeatIm != th16ChipEndBeatIm && th16NowBeatIm >= Math.Min(th16ChipBeatIm, th16ChipEndBeatIm) && th16NowBeatIm <= Math.Max(th16ChipBeatIm, th16ChipEndBeatIm))
+			if ((th16NowBeat.Real >= th16ChipBeat.Real && th16NowBeat.Real <= th16ChipEndBeat.Real)
+					|| (th16ChipBeat.Imaginary != th16ChipEndBeat.Imaginary
+						&& th16NowBeat.Imaginary >= Math.Min(th16ChipBeat.Imaginary, th16ChipEndBeat.Imaginary)
+						&& th16NowBeat.Imaginary <= Math.Max(th16ChipBeat.Imaginary, th16ChipEndBeat.Imaginary))
 					) {
 				pChip.canShowBody = true;
 				return;
@@ -1370,9 +1367,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		// displacement per sec: the visual beat runs at #HISPEED × BPM
-		double th16DBeat = -4 * pChip.dbBPM / 60;
-		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.dbHISPEED, th16DBeat * pChip.dbHISPEED, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
-		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.end.dbHISPEED, th16DBeat * pChip.end.dbHISPEED, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.eScrollMode);
+		var th16DBeatHead = -4 * pChip.dbBPM / 60 * pChip.dbHISPEED;
+		var th16DBeatEnd = -4 * pChip.dbBPM / 60 * pChip.end.dbHISPEED;
+		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, th16DBeatHead, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, th16DBeatEnd, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.eScrollMode);
 		int dxHead = (int)dxHeadD, dyHead = (int)dyHeadD, dxEnd = (int)dxEndD, dyEnd = (int)dyEndD;
 
 		// get move speed near the judgement mark

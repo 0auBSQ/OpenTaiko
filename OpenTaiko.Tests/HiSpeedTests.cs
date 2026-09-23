@@ -110,7 +110,7 @@ namespace OpenTaikoTests {
 				for (int i = 26; i < dons.Count; i++) {
 					var d = dons[i].fBMSCROLLTime - b;
 					var s = r.NoteScrolls[i];
-					var p = NotesManager.ComplexN4Beats(d, dons[i].dbSCROLL, EScrollMode.HBScroll);
+					var p = getN4Beats_BeatBasedScroll(d, dons[i].dbSCROLL);
 					var sd = s * d;
 					AssertClose(sd.Real / 16, p.Real, $"note {i} rosette Re");
 					AssertClose(sd.Imaginary / 16, p.Imaginary, $"note {i} rosette Im");
@@ -167,33 +167,22 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
-		public void PlainComplexScrollIsUnchangedPerAxis() {
-			// without #HISPEED the imaginary beat is 0 and each screen axis keeps its own real beat difference, as
-			// before: x = scroll × Δx, y = scrollY × Δy, even when the two differ (TJAP3's #SUDDEN freezes only x,
-			// TaikoJiro 1 drifts each axis on its own)
-			var (x, y) = NotesManager.ComplexN4BeatsXY(new(8, 0), new(16, 0), new(1.5, 1), EScrollMode.HBScroll);
-			AssertClose(1.5 * 8 / 16.0, x, "x from its own beat"); AssertClose(1 * 16 / 16.0, y, "y from its own beat");
-			(x, y) = NotesManager.ComplexN4BeatsXY(new(8, 0), new(16, 0), new(2, 0), EScrollMode.HBScroll);
-			AssertClose(1, x, "real scroll x"); AssertClose(0, y, "real scroll y");
-			// with an imaginary beat the product mixes the axes, each output axis from its own pair
-			(x, y) = NotesManager.ComplexN4BeatsXY(new(8, 4), new(16, 2), new(1, 1), EScrollMode.HBScroll);
-			AssertClose((1 * 8 - 1 * 4) / 16.0, x, "x pair"); AssertClose((1 * 2 + 1 * 16) / 16.0, y, "y pair");
-		}
-
-		[Fact]
 		public void PositionIsTheComplexProductOfScrollAndBeat() {
 			// scroll × Δbeat with Δbeat = 16 sixteenths (one measure): i turns a real beat up the imaginary axis
-			var b = NotesManager.ComplexN4Beats(new(16, 0), new(0, 1), EScrollMode.HBScroll);
+			var b = getN4Beats_BeatBasedScroll(new(16, 0), new(0, 1));
 			AssertClose(0, b.Real, "i × 16"); AssertClose(1, b.Imaginary, "i × 16");
 			// and an imaginary beat (complex #HISPEED) back onto the real axis, the other way
-			b = NotesManager.ComplexN4Beats(new(0, 16), new(0, 1), EScrollMode.HBScroll);
+			b = getN4Beats_BeatBasedScroll(new(0, 16), new(0, 1));
 			AssertClose(-1, b.Real, "i × 16i"); AssertClose(0, b.Imaginary, "i × 16i");
 			// a general product
-			b = NotesManager.ComplexN4Beats(new(16, 16), new(2, 1), EScrollMode.HBScroll);
+			b = getN4Beats_BeatBasedScroll(new(16, 16), new(2, 1));
 			AssertClose((2 * 16 - 1 * 16) / 16.0, b.Real, "(2+i)(16+16i) re"); AssertClose((2 * 16 + 1 * 16) / 16.0, b.Imaginary, "(2+i)(16+16i) im");
 			// BMScroll ignores the scroll but keeps the beat's imaginary part
-			b = NotesManager.ComplexN4Beats(new(16, 8), new(3, 3), EScrollMode.BMScroll);
+			b = getN4Beats_BeatBasedScroll(new(16, 8), new(3, 3), EScrollMode.BMScroll);
 			AssertClose(1, b.Real, "bmscroll re"); AssertClose(0.5, b.Imaginary, "bmscroll im");
 		}
+
+		private static Complex getN4Beats_BeatBasedScroll(Complex th16DBeat, Complex scroll, EScrollMode eScrollMode = EScrollMode.HBScroll)
+			=> NotesManager.getN4Beats(new(double.NaN, double.NaN), th16DBeat, double.NaN, scroll, eScrollMode);
 	}
 }
