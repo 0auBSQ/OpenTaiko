@@ -3,6 +3,7 @@
 
 local NavInput = require("NavInput")
 local EM       = require("EventMode")
+local PS       = require("player_select")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -173,9 +174,8 @@ local menus      = {}
 local curIdx     = 1
 local textCache  = {}   -- [i] = { title = LuaTexture, desc = LuaTexture }
 
--- Player count prompt
+-- Player count prompt (player_select.lua)
 local inPrompt   = false
-local promptCnt  = 1
 
 -- Hold-scroll tracking
 local holdDir    = 0
@@ -213,22 +213,23 @@ end
 
 -- ── Draw helpers ──────────────────────────────────────────────────────────────
 
+local BGTILE_W, BGTILE_H = 192, 108   -- BgTile.png; Width reads 0 until the texture is uploaded
+
 local function drawBgTile(opacity)
-    if bgtile == nil then return end
+    if bgtile == nil or bgtile.Width <= 0 then return end
     opacity = opacity or 1.0
     bgtile:SetOpacity(opacity)
-    local tw = math.max(1, bgtile.Width)
-    local th = math.max(1, bgtile.Height)
-    for x = 0, 1919, tw do
-        for y = 0, 1079, th do
+    for x = 0, 1919, BGTILE_W do
+        for y = 0, 1079, BGTILE_H do
             bgtile:Draw(x, y)
         end
     end
     bgtile:SetOpacity(1.0)
 end
 
-local function drawBoxes()
-    if boxTex == nil or #menus == 0 then return end
+-- alpha fades the whole menu out behind the player prompt
+local function drawBoxes(alpha)
+    if boxTex == nil or #menus == 0 or alpha <= 0 then return end
     local bh      = boxTex.Height
     local spacing = bh + 20
 
@@ -245,14 +246,18 @@ local function drawBoxes()
         -- Box
         if isStatic then boxTex:SetUseNoiseEffect(true) end
         boxTex:SetColor(mkCol(m.c))
+        boxTex:SetOpacity(alpha)
         boxTex:DrawAtAnchor(960, boxY, "center")
+        boxTex:SetOpacity(1)
         boxTex:SetColor(mkCol(white))
         if isStatic then boxTex:SetUseNoiseEffect(false) end
 
         -- Hover overlay for selected entry
         if i == curIdx and hoverTex ~= nil then
             if isStatic then hoverTex:SetUseNoiseEffect(true) end
+            hoverTex:SetOpacity(alpha)
             hoverTex:DrawAtAnchor(960, boxY, "center")
+            hoverTex:SetOpacity(1)
             if isStatic then hoverTex:SetUseNoiseEffect(false) end
         end
 
@@ -260,7 +265,9 @@ local function drawBoxes()
         local titleTex = getTitleTex(i)
         if titleTex ~= nil then
             if isStatic then titleTex:SetUseNoiseEffect(true) end
+            titleTex:SetOpacity(alpha)
             titleTex:DrawAtAnchor(960, boxY - bh / 2 + 10, "top")
+            titleTex:SetOpacity(1)
             if isStatic then titleTex:SetUseNoiseEffect(false) end
         end
 
@@ -268,7 +275,9 @@ local function drawBoxes()
         local descTex = getDescTex(i)
         if descTex ~= nil then
             if isStatic then descTex:SetUseNoiseEffect(true) end
+            descTex:SetOpacity(alpha)
             descTex:DrawAtAnchor(960, boxY - bh / 2 + 100, "top")
+            descTex:SetOpacity(1)
             if isStatic then descTex:SetUseNoiseEffect(false) end
         end
 
@@ -308,6 +317,8 @@ function onStart()
 
     sounds.BGM    = SOUND:CreateBGM("Sounds/BGM.ogg")
     sounds.BGM:SetLoop(true)
+
+    PS.load(tr)
 end
 
 function activate()
@@ -317,7 +328,7 @@ function activate()
     curIdx    = math.max(1, math.min(curIdx, #menus))  -- keep last position, clamp to new size
     scrollPos = curIdx   -- start at target so there's no animation on first open
     inPrompt  = false
-    promptCnt = math.max(1, math.min(5, CONFIG.PlayerCount or 1))
+    PS.reset()
     holdDir   = 0
     sounds.Decide = SHARED:GetSharedSound("Decide")
     sounds.Cancel = SHARED:GetSharedSound("Cancel")
@@ -327,6 +338,7 @@ end
 
 function deactivate()
     if sounds.BGM ~= nil then sounds.BGM:Stop() end
+    PS.clearSounds()
 end
 
 function afterSongEnum()
@@ -337,6 +349,7 @@ function reloadLanguage()
     menus     = buildMenus()
     textCache = {}
     curIdx    = math.max(1, math.min(curIdx, #menus))
+    PS.reloadLanguage()
 end
 
 -- ── Draw ──────────────────────────────────────────────────────────────────────
@@ -344,7 +357,7 @@ end
 function draw()
     if background ~= nil then background:Draw(0, 0) end
     drawBgTile(0.65)
-    drawBoxes()
+    drawBoxes(1 - PS.dim() / 0.6)
 
     -- Version watermark (top-left, no anchor)
     if textVersion ~= nil then
@@ -352,20 +365,10 @@ function draw()
         if vTex ~= nil then vTex:Draw(0, 0) end
     end
 
-    -- Player-count prompt overlay
-    if inPrompt then
-        drawBgTile(0.85)
-
-        if textBig ~= nil then
-            local pTitle = textBig:GetText("Select number of players", false, 750, mkCol(white), mkCol(black))
-            local pCount = textBig:GetText(tostring(promptCnt), false, 200, mkCol(white), mkCol(black))
-            local pHint  = textSmall:GetText(
-                "◄ / ►  to change   •   Decide to confirm   •   Cancel to go back",
-                false, 900, mkCol(white), mkCol(black))
-            if pTitle ~= nil then pTitle:DrawAtAnchor(960, 380, "center") end
-            if pCount ~= nil then pCount:DrawAtAnchor(960, 490, "center") end
-            if pHint  ~= nil then pHint:DrawAtAnchor(960,  600, "center") end
-        end
+    -- Player-count prompt overlay (also while its cancel outro plays)
+    if PS.visible() then
+        drawBgTile(PS.dim())
+        PS.draw()
     end
 end
 
@@ -391,26 +394,31 @@ function update(ts)
     end
 
     -- ── Prompt mode ───────────────────────────────────────────────────────────
+    if PS.update(ts, dt) then return doExit() end   -- the decide confirm has played out
     if inPrompt then
-        if NavInput.cancel() then
+        if PS.deciding() then return nil end
+
+        local decide = NavInput.decide() and PS.canDecide()
+        if NavInput.cancel() or (decide and PS.count() == 0) then
             sounds.Cancel:Play()
+            PS.cancel()
             inPrompt = false
             holdDir  = 0
             return nil
         end
 
-        if NavInput.decide() then
+        if decide then
             sounds.Decide:Play()
-            CONFIG.PlayerCount = promptCnt
-            inPrompt = false
+            CONFIG.PlayerCount = PS.count()
+            PS.decide()
             holdDir  = 0
-            return doExit()
+            return nil
         end
 
         local rp = NavInput.down() or NavInput.right()
         local lp = NavInput.up() or NavInput.left()
-        if rp then promptCnt = promptCnt % 5 + 1;              sounds.Move:Play() end
-        if lp then promptCnt = (promptCnt - 2) % 5 + 1;        sounds.Move:Play() end
+        if rp then PS.move(1, true);   sounds.Move:Play() end
+        if lp then PS.move(-1, true);  sounds.Move:Play() end
 
         -- Hold repeat for prompt
         local rHeld = NavInput.downPressing() or NavInput.rightPressing()
@@ -418,7 +426,7 @@ function update(ts)
         local pDir  = rHeld and 1 or (lHeld and -1 or 0)
         if pDir ~= holdDir then holdDir = pDir; holdStart = ts; holdLast = ts
         elseif pDir ~= 0 and ts - holdStart >= HOLD_DELAY and ts - holdLast >= HOLD_REPEAT then
-            promptCnt = (promptCnt - 1 + (pDir == 1 and 1 or 4)) % 5 + 1
+            PS.move(pDir, false)
             sounds.Move:Play()
             holdLast = ts
         end
@@ -455,7 +463,7 @@ function update(ts)
         local m = menus[curIdx]
         if m.playerPrompt then
             inPrompt  = true
-            promptCnt = math.max(1, math.min(5, CONFIG.PlayerCount or 1))
+            PS.open(CONFIG.PlayerCount or 1)
             holdDir   = 0
             return nil
         end

@@ -161,6 +161,13 @@
         "TITLE_EXIT": "Beenden",
         "TITLE_EXIT_DESC": "Bis zum nächsten Mal!",
         "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?",
+        "TITLE_PLAYERS_PROMPT": "Wie viele Trommler betreten die Bühne?",
+        "TITLE_PLAYERS_BACK": "Zurück",
+        "TITLE_PLAYERS_1": "1 Spieler",
+        "TITLE_PLAYERS_2": "2 Spieler",
+        "TITLE_PLAYERS_3": "3 Spieler",
+        "TITLE_PLAYERS_4": "4 Spieler",
+        "TITLE_PLAYERS_5": "5 Spieler",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "Erreichte Etage",

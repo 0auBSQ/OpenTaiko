@@ -161,6 +161,13 @@
         "TITLE_EXIT": "Salir",
         "TITLE_EXIT_DESC": "¡Hasta la próxima!",
         "TITLE_VAULT_LOCKED_DESC": "¿Me oyes...?",
+        "TITLE_PLAYERS_PROMPT": "¿Cuántos tamborileros suben al escenario?",
+        "TITLE_PLAYERS_BACK": "Volver",
+        "TITLE_PLAYERS_1": "1 Jugador",
+        "TITLE_PLAYERS_2": "2 Jugadores",
+        "TITLE_PLAYERS_3": "3 Jugadores",
+        "TITLE_PLAYERS_4": "4 Jugadores",
+        "TITLE_PLAYERS_5": "5 Jugadores",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "Piso alcanzado",

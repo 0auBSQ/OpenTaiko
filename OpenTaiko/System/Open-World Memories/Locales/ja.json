@@ -161,6 +161,13 @@
         "TITLE_EXIT": "終了",
         "TITLE_EXIT_DESC": "またね！",
         "TITLE_VAULT_LOCKED_DESC": "聞こえますか…？",
+        "TITLE_PLAYERS_PROMPT": "何人でステージに立つ？",
+        "TITLE_PLAYERS_BACK": "戻る",
+        "TITLE_PLAYERS_1": "1人プレイ",
+        "TITLE_PLAYERS_2": "2人プレイ",
+        "TITLE_PLAYERS_3": "3人プレイ",
+        "TITLE_PLAYERS_4": "4人プレイ",
+        "TITLE_PLAYERS_5": "5人プレイ",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "到達階数",

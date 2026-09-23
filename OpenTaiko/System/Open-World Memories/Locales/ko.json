@@ -161,6 +161,13 @@
         "TITLE_EXIT": "종료",
         "TITLE_EXIT_DESC": "다음에 또 만나요!",
         "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?",
+        "TITLE_PLAYERS_PROMPT": "몇 명이 무대에 오를까요?",
+        "TITLE_PLAYERS_BACK": "뒤로",
+        "TITLE_PLAYERS_1": "1인 플레이",
+        "TITLE_PLAYERS_2": "2인 플레이",
+        "TITLE_PLAYERS_3": "3인 플레이",
+        "TITLE_PLAYERS_4": "4인 플레이",
+        "TITLE_PLAYERS_5": "5인 플레이",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "도달한 층",

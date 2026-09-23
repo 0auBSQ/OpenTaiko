@@ -163,6 +163,13 @@
         "TITLE_EXIT": "Afsluiten",
         "TITLE_EXIT_DESC": "Tot de volgende keer!",
         "TITLE_VAULT_LOCKED_DESC": "Hoor je me...?",
+        "TITLE_PLAYERS_PROMPT": "Hoeveel drummers betreden het podium?",
+        "TITLE_PLAYERS_BACK": "Terug",
+        "TITLE_PLAYERS_1": "1 Speler",
+        "TITLE_PLAYERS_2": "2 Spelers",
+        "TITLE_PLAYERS_3": "3 Spelers",
+        "TITLE_PLAYERS_4": "4 Spelers",
+        "TITLE_PLAYERS_5": "5 Spelers",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "Bereikte verdieping",

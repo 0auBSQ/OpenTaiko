@@ -163,6 +163,13 @@
         "TITLE_EXIT": "Выход",
         "TITLE_EXIT_DESC": "До следующего раза!",
         "TITLE_VAULT_LOCKED_DESC": "Ты меня слышишь...?",
+        "TITLE_PLAYERS_PROMPT": "Сколько барабанщиков выйдет на сцену?",
+        "TITLE_PLAYERS_BACK": "Назад",
+        "TITLE_PLAYERS_1": "1 игрок",
+        "TITLE_PLAYERS_2": "2 игрока",
+        "TITLE_PLAYERS_3": "3 игрока",
+        "TITLE_PLAYERS_4": "4 игрока",
+        "TITLE_PLAYERS_5": "5 игроков",
 
         // Tower gameplay: the floor and lives planks (tower_hud ROActivity)
         "TOWER_HUD_REACHED": "Достигнутый этаж",
