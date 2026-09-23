@@ -162,6 +162,8 @@
         "TITLE_SETTINGS_DESC": "Настройте игру под себя!",
         "TITLE_EXIT": "Выход",
         "TITLE_EXIT_DESC": "До следующего раза!",
+        "TITLE_ONLINE_LOBBY": "Онлайн-лобби",
+        "TITLE_ONLINE_LOBBY_DESC": "(Бета. Делитесь кодом комнаты только с теми, кому доверяете)",
         "TITLE_VAULT_LOCKED_DESC": "Ты меня слышишь...?",
         "TITLE_PLAYERS_PROMPT": "Сколько барабанщиков выйдет на сцену?",
         "TITLE_PLAYERS_BACK": "Назад",

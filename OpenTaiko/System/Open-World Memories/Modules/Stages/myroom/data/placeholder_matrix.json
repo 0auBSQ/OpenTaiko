@@ -1,0 +1,89 @@
+{
+  "_comment": "The debug scenes the Placeholder Matrix (matrix.lua) lists, in order. stage = the Lua stage folder it opens; price = coins to unlock it once per save (0 = open from the start).",
+  "scenes": [
+    {
+      "stage": "demo1",
+      "name": "Demo1",
+      "desc": "The first demo using Lua stages.",
+      "price": 0
+    },
+    {
+      "stage": "demo2",
+      "name": "Demo2",
+      "desc": "Was used to debug and test song lists.",
+      "price": 0
+    },
+    {
+      "stage": "demo3",
+      "name": "Demo3",
+      "desc": "Was used to debug and test databases.",
+      "price": 0
+    },
+    {
+      "stage": "theme_settings_test",
+      "name": "Theme Settings Test",
+      "desc": "Shows the current theme settings values and specifications.",
+      "price": 0
+    },
+    {
+      "stage": "dan_plate_test",
+      "name": "Dan Plate Test",
+      "desc": "Shows multiple dan plates with different styling.",
+      "price": 0
+    },
+    {
+      "stage": "dan_builder_test",
+      "name": "Dan Builder Test",
+      "desc": "A minimalist random Dan player.",
+      "price": 0
+    },
+    {
+      "stage": "character_shop",
+      "name": "Character Shop",
+      "desc": "A minimalist My Room reproduction.",
+      "price": 9999999
+    },
+    {
+      "stage": "test_gradient",
+      "name": "Gradient Map Test",
+      "desc": "Shows P1 character with 3 different colour palettes.",
+      "price": 0
+    },
+    {
+      "stage": "canvas_test",
+      "name": "Canvas Test",
+      "desc": "A tiny paint program: draw on a white sheet with the mouse, demonstrating the LuaCanvas + mouse input.",
+      "price": 50
+    },
+    {
+      "stage": "voxel",
+      "name": "Voxel Engine",
+      "desc": "A voxel world rendered via a Lua3DScene window.",
+      "price": 200
+    },
+    {
+      "stage": "rt_demo",
+      "name": "Raytracer Demo",
+      "desc": "The Lua3DScene path-traced raytracer mode.",
+      "price": 200
+    },
+    {
+      "stage": "particles",
+      "name": "Particle Showcase",
+      "desc": "A stress test of the Lua3DScene particle engine.",
+      "price": 100
+    },
+    {
+      "stage": "modal_test",
+      "name": "Modal Test",
+      "desc": "Plays the reward and unlock modals of every rarity and type.",
+      "price": 100
+    },
+    {
+      "stage": "video_player",
+      "name": "Video Player",
+      "desc": "The boot intro in a player: play, pause, seek on the timeline, speed and volume.",
+      "price": 50
+    }
+  ]
+}

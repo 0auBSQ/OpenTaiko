@@ -160,6 +160,8 @@
         "TITLE_SETTINGS_DESC": "플레이 환경에 맞게 설정을 조정하세요!",
         "TITLE_EXIT": "종료",
         "TITLE_EXIT_DESC": "다음에 또 만나요!",
+        "TITLE_ONLINE_LOBBY": "온라인 로비",
+        "TITLE_ONLINE_LOBBY_DESC": "(베타, 방 코드는 신뢰할 수 있는 사람에게만 공유하세요)",
         "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?",
         "TITLE_PLAYERS_PROMPT": "몇 명이 무대에 오를까요?",
         "TITLE_PLAYERS_BACK": "뒤로",

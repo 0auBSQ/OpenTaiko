@@ -250,9 +250,9 @@ function update()
 
     if not enumerated then return end
 
-    -- Escape → back to title
+    -- Escape → back to My Room
     if INPUT:KeyboardPressed("Escape") then
-        return Exit("title", nil)
+        return Exit("stage", "myroom")
     end
 
     -- Q: decrease song count

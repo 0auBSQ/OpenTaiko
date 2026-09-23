@@ -493,7 +493,7 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
 
-    if kp("Escape") then return Exit("stage", "_title") end
+    if kp("Escape") then return Exit("stage", "myroom") end
     for i = 1, 8 do if kp("D" .. i) then switchScene(i) end end
 
     local moved = false

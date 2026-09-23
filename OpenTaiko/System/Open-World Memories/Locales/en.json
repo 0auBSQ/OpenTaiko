@@ -162,6 +162,8 @@
         "TITLE_SETTINGS_DESC": "Adjust your settings to fit with your play experience!",
         "TITLE_EXIT": "Exit",
         "TITLE_EXIT_DESC": "See you next time!",
+        "TITLE_ONLINE_LOBBY": "Online Lobby",
+        "TITLE_ONLINE_LOBBY_DESC": "(Beta, Share your room code only with people you trust)",
         "TITLE_VAULT_LOCKED_DESC": "Can you hear me...?",
         "TITLE_PLAYERS_PROMPT": "How many drummers take the stage?",
         "TITLE_PLAYERS_BACK": "Back",

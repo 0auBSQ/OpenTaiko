@@ -53,5 +53,8 @@
   },
   "jukebox": {
     "name": "ジュークボックス"
+  },
+  "placeholder_matrix": {
+    "name": "プレースホルダー・マトリクス"
   }
 }

@@ -43,7 +43,7 @@ function update()
 	end
 	if existing then
 		existing = false
-		return Exit("title", nil)
+		return Exit("stage", "myroom")
 	end
 
 	test_counter:Tick()

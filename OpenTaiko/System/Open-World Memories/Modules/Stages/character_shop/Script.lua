@@ -532,7 +532,7 @@ function update()
     if currentScreen == "main" then
         if navPn.cancel() then
             if sounds.Cancel ~= nil then sounds.Cancel:Play() end
-            return Exit("title", nil)
+            return Exit("stage", "myroom")
         end
 
         if navPn.downOrPadRight() then

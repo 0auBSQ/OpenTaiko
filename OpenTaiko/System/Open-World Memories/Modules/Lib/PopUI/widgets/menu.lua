@@ -1,6 +1,10 @@
 ---@diagnostic disable: undefined-global, lowercase-global, need-check-nil
 -- PopUI vertical menu / list: keyboard (Up/Down) + mouse hover + wheel scroll, one shared selection
 -- highlight. onChange = selection moved; onSelect = chosen (Decide / click). Off-viewport rows are culled.
+-- A locked row can't be chosen unless onLockedSelect is given: choosing one then calls it instead (e.g. to
+-- offer an unlock), and it plays the error sound only when that callback returns false. A locked row shows
+-- a padlock at its right end, or whatever drawLocked(item, right, cy, menu) draws there (e.g. a price),
+-- with lockedW pixels kept free for it.
 --   ui:menu{ x=, y=, w=, h=, items={"One",{text="Two",value=2}}, selected=1, onChange=fn, onSelect=fn }
 
 local Widget = require("PopUI.widget")
@@ -61,8 +65,11 @@ function Menu:onNavUpOrPadLeft() if self.selected > 1 then self:setSelected(self
 
 function Menu:onActivate()
     local it = self.items[self.selected]
-    -- a locked row can be looked at but not chosen
-    if it and it.locked then self:playSfx("error"); return end
+    -- a locked row can be looked at but not chosen, unless the caller handles it
+    if it and it.locked then
+        if self.onLockedSelect and self.onLockedSelect(self.selected, it, self) ~= false then return end
+        self:playSfx("error"); return
+    end
     if it and self.onSelect and self.onSelect(self.selected, it, self) then return end
     self:playSfx("click")
 end
@@ -161,10 +168,14 @@ function Menu:draw()
             local bg = isSel and U.shade(c.primary2, 0.5) or { 255, 255, 255, 150 }
             if marked and not isSel then bg = { 90, 62, 8, 200 } end
             if locked then fg = { 120, 122, 130 } end
-            local textW = locked and (self.w - 48 - self.rowHeight) or (self.w - 48)
+            local textW = locked and (self.w - 48 - (self.lockedW or self.rowHeight)) or (self.w - 48)
             self.mgr:drawTextEx(self.eff.font.label, it.text, math.floor(self.x + 28), tcy,
                 fg, bg, 1, 1, textW, "left", vy0, vy1)
-            if locked then
+            if locked and self.drawLocked then
+                if ry + self.rowHeight <= vy1 + 1 and ry >= vy0 - 1 then
+                    self.drawLocked(it, math.floor(self.x + self.w - 24), rcy, self)
+                end
+            elseif locked then
                 -- the padlock and its chain sit at the row's right end
                 local isz = math.floor(self.rowHeight * 0.62)
                 self:bakeShared("_lock", "menu.lock", isz + 8, isz + 8, function(cv)

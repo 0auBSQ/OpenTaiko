@@ -4,7 +4,7 @@
 -- every item type (character, puchichara, nameplate, song). Each button picks the first installed
 -- item of that rarity, or the first item at all when none matches, and passes the rarity name to
 -- the modal so the chest and colours always follow the button; nothing is written to the save
--- file. Esc returns to the title.
+-- file. Esc returns to My Room.
 
 local PopUI = require("PopUI")
 
@@ -147,7 +147,7 @@ function update(ts)
         return
     end
     local r = ui:update(ts)
-    if r == "cancel" then return Exit("stage", "_title") end
+    if r == "cancel" then return Exit("stage", "myroom") end
 end
 
 function draw()

@@ -53,5 +53,8 @@
   },
   "jukebox": {
     "name": "Jukebox"
+  },
+  "placeholder_matrix": {
+    "name": "Placeholder Matrix"
   }
 }

@@ -51,7 +51,7 @@ function update()
 	end
 
 	if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-		return Exit("title", nil)
+		return Exit("stage", "myroom")
 	end
 
 end

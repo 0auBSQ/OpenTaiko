@@ -12,6 +12,7 @@
   "prompt_jukebox": "[Enter] 音楽をかける",
   "prompt_tv": "[Enter] テレビを使う",
   "prompt_pod": "[Enter] 調べる",
+  "prompt_matrix": "[Enter] プレースホルダー・マトリクスを使う",
   "prompt_exit": "[Enter] 部屋を出る",
   "prompt_switch": "[Tab] フォーカス切り替え",
   "player_entry": "プレイヤー%d — %s",

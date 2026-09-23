@@ -92,7 +92,7 @@ end
 
 function update(ts)
     if NavInput.decide() or NavInput.cancel() then
-        Exit("stage", "_title")
+        Exit("stage", "myroom")
         return
     end
 
@@ -150,7 +150,7 @@ function draw()
         if labelCache["mode"] ~= nil then labelCache["mode"]:DrawAtAnchor(960, 30, "top") end
 
         if not labelCache["hint"] then
-            labelCache["hint"] = textFont:GetText("Return / Escape  ->  back to title")
+            labelCache["hint"] = textFont:GetText("Return / Escape  ->  back to My Room")
         end
         if labelCache["hint"] ~= nil then labelCache["hint"]:DrawAtAnchor(960, 1075, "bottom") end
     end

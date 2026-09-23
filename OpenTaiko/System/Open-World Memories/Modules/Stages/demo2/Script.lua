@@ -124,7 +124,7 @@ local function handleDecide()
 end
 
 local function handleFolderClose()
-	if songList == nil then return Exit("title", nil) end
+	if songList == nil then return Exit("stage", "myroom") end
 	-- if no folder to close, trigger exit scene instead
 	return songList:CloseFolder()
 end
@@ -199,7 +199,7 @@ function update()
 			sounds.Decide:Play()
 		else
 			sounds.Cancel:Play()
-			return Exit("title", nil)
+			return Exit("stage", "myroom")
 		end
 	end
 

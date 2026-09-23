@@ -1,5 +1,5 @@
 {
-  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names live in lang/<code>/furniture.json.",
+  "_comment": "AUTHORITATIVE furniture catalog (room.lua builds Room.CATALOG from this; the Lua DEFAULTS are only an emergency fallback). Fields: w/h footprint cells, place ground|wall, name, collH/collW/collD collision, surface+surfaceH (stackables sit on top), stackOn (may ride a surface), computer/fixed/interact behavior flags, emissiveColor [r,g,b,scale] = the emissivePart's glow (default a dim warm white), model = GLB stem override (Models/<id>.glb is auto-used when present), screen {tex,emit} + accent [r,g,b] arcade variants (tex resolves via A.SCREEN), picture resolves via A.PICTURE, wallGlb {file,h,axis,flip} wall-mounted GLB metadata, legacyMirror mirrors into the v1 furniture array, shop = sold in the coin shop (3D thumbnail baked at onStart). New items: add an entry AND its id to _order plus a GLB in Models/ (a plain placeholder box renders until the model exists). Display names live in lang/<code>/furniture.json.",
   "_order": [
     "desk",
     "chair",
@@ -18,7 +18,8 @@
     "clock",
     "poster_nokon",
     "poster_bol",
-    "phone"
+    "phone",
+    "placeholder_matrix"
   ],
   "desk": {
     "w": 2,
@@ -191,5 +192,22 @@
     "interact": "jukebox",
     "shop": true,
     "emissivePart": "Jukebox_Emission"
+  },
+  "placeholder_matrix": {
+    "w": 1,
+    "h": 1,
+    "place": "ground",
+    "collH": 1.3,
+    "collW": 0.8,
+    "collD": 0.8,
+    "interact": "matrix",
+    "shop": true,
+    "emissivePart": "MatrixGlow",
+    "emissiveColor": [
+      0.3,
+      1.0,
+      0.5,
+      0.9
+    ]
   }
 }

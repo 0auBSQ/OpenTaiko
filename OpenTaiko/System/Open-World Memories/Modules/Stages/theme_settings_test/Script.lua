@@ -94,7 +94,7 @@ function update(_timestamp)
     -- Cancel / Back → exit back to the previous stage
     if NavInput.cancel() then
         sounds.Cancel:Play()
-        return Exit("title", nil)
+        return Exit("stage", "myroom")
     end
 
     local maxScroll = math.max(0, #rows - VISIBLE_ROWS)

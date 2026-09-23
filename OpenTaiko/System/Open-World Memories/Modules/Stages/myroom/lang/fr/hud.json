@@ -12,6 +12,7 @@
   "prompt_jukebox": "[Entrée] Mettre de la musique",
   "prompt_tv": "[Entrée] Utiliser la télé",
   "prompt_pod": "[Entrée] Examiner",
+  "prompt_matrix": "[Entrée] Utiliser la Placeholder Matrix",
   "prompt_exit": "[Entrée] Quitter la chambre",
   "prompt_switch": "[Tab] Changer de cible",
   "player_entry": "Joueur %d — %s",

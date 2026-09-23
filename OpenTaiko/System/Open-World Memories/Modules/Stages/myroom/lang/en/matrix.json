@@ -1,0 +1,9 @@
+{
+  "_comment": "English texts for the Placeholder Matrix (matrix.lua). Keys are stable ids; this file is the fallback for every other language.",
+  "hint": "Choose a scene to project it.",
+  "unlock_title": "Locked scene",
+  "unlock_q": "Unlock \"%s\"?",
+  "unlock_yes": "Unlock",
+  "unlock_no": "Back",
+  "broke": "Not enough coins."
+}

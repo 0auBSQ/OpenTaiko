@@ -525,7 +525,7 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
 
-    if kp("Escape") then INPUT:SetMouseLocked(false); return Exit("stage", "_title") end
+    if kp("Escape") then INPUT:SetMouseLocked(false); return Exit("stage", "myroom") end
     if kp("H") then showHelp = not showHelp end
     for i = 1, #SCENES do if kp(tostring(i)) then setScene(i) end end
     if kp("LeftBracket") then setScene(sceneIdx - 1) end

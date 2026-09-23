@@ -173,6 +173,11 @@ local function buildCatalogFromJson()
             end
             local acc = jget(node, "accent")
             if acc then e.accent = { jnum(jget(acc, 1)) or 255, jnum(jget(acc, 2)) or 255, jnum(jget(acc, 3)) or 255 } end
+            local glow = jget(node, "emissiveColor")
+            if glow then
+                e.emissiveColor = { jnum(jget(glow, 1)) or 1, jnum(jget(glow, 2)) or 1, jnum(jget(glow, 3)) or 1,
+                                    jnum(jget(glow, 4)) or 1 }
+            end
             local pic = jget(node, "picture")
             if pic and A.PICTURE[pic] then e.picture = A.PICTURE[pic] end
             local wg = jget(node, "wallGlb")
@@ -892,7 +897,7 @@ local function tryModel(world, id, cx, cz, yaw, cat, baseY, it)
     -- code (the jukebox screen) finds it via world._propInst[it].parts and pulses ObjSetEmissive
     if cat and cat.emissivePart then
         parts = parts or {}
-        parts[#parts + 1] = { material = cat.emissivePart, emissive = { 1, 0.95, 0.8, 0.12 } }
+        parts[#parts + 1] = { material = cat.emissivePart, emissive = cat.emissiveColor or { 1, 0.95, 0.8, 0.12 } }
     end
     -- catalog screenPart: while the item is on (it.tvOn) its screen ignores the sun and the shadow map
     -- and draws a flat colour pushed over the bloom threshold; tv.lua writes the colour every frame

@@ -3,7 +3,7 @@
 -- ------------------------------------------------------------------------------------------------------
 -- The boot intro in the video_player ROActivity, to try the audio-track handling: restart, 10 s back,
 -- play/pause, 10 s ahead, stop, a timeline that can be clicked and dragged, a speed dropdown and a volume
--- slider. Esc closes the player, which brings the title screen back.
+-- slider. Esc closes the player, which brings My Room back.
 
 local VIDEO_PATH = info.dir .. "/../_boot/Videos/intro.mp4"
 
@@ -22,9 +22,9 @@ function deactivate()
 end
 
 function update(ts)
-    if player == nil then return Exit("stage", "_title") end
+    if player == nil then return Exit("stage", "myroom") end
     player:Update()
-    if not player.IsActive then return Exit("stage", "_title") end
+    if not player.IsActive then return Exit("stage", "myroom") end
 end
 
 function draw()

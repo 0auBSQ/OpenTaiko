@@ -285,7 +285,7 @@ function update(ts)
     lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
     if kp("Escape") or INPUT:Pressed("Cancel") then
-        return Exit("stage", "_title")
+        return Exit("stage", "myroom")
     end
 
     -- undo / redo

@@ -22,6 +22,7 @@ local MO       = require("online")          -- P2P "visit my room" (lobby + pres
 local JB       = require("jukebox")         -- the Jukebox furniture's audio player; see jukebox.lua
 local TV       = require("tv")              -- the TV: on/off screen light + the cutscene browser; see tv.lua
 local Pod      = require("pod")             -- the Mysterious Pod's entry sequence; see pod.lua
+local MX       = require("matrix")          -- the Placeholder Matrix: its glow + the debug scene list; see matrix.lua
 local CoinBox  = require("CoinBox")         -- Lib: the coin purse laid over the landlord's offers
 local Landlord = require("landlord")        -- the landlord's phone call; see landlord.lua
 local Integrity = require("integrity")      -- the load-time placement sweep; see integrity.lua
@@ -179,6 +180,7 @@ local function rebuild()
     }
     for _, l in ipairs(room:lampLights(world)) do lights[#lights + 1] = l end   -- lit floor lamps
     for _, l in ipairs(TV.lights(world)) do lights[#lights + 1] = l end         -- screens of TVs that are on
+    for _, l in ipairs(MX.lights(world)) do lights[#lights + 1] = l end         -- the green glow of each matrix
     world.daynight:setLights(lights)
 end
 
@@ -274,6 +276,7 @@ function deactivate()
     JB.setDuck(false)                              -- reset the PC-screen crossfade for the next visit
     if phoneUI then phoneUI:disposeWidgets(); phoneUI = nil end
     if hud then hud:disposeWidgets(); hud = nil end
+    MX.dispose()
     purse:dispose()
     Pod.reset()
     -- safety net: free any 3D preview icon (edit grid / popup) its owner missed
@@ -323,6 +326,8 @@ local function interactablesInRange()
                         seen[it] = true; list[#list + 1] = { kind = "tv", it = it, key = "tv:" .. tostring(it) }
                     elseif cat.interact == "pod" then
                         seen[it] = true; list[#list + 1] = { kind = "pod", it = it, key = "pod:" .. tostring(it) }
+                    elseif cat.interact == "matrix" then
+                        seen[it] = true; list[#list + 1] = { kind = "matrix", it = it, key = "matrix:" .. tostring(it) }
                     end
                 end
             end
@@ -367,6 +372,11 @@ local function interactGlow(focused)
         if focused.kind == "jukebox" and inst.parts then
             partBase = {}
             for _, pp in ipairs(inst.parts) do partBase[pp.obj] = { 0.12, 0.114, 0.096 } end
+        end
+        if focused.kind == "matrix" and inst.parts then
+            partBase = {}
+            local g = MX.glowNow()
+            for _, pp in ipairs(inst.parts) do partBase[pp.obj] = g end
         end
         -- an on TV's screen keeps its own light: only the body pulses
         local skipObj = (focused.kind == "tv") and TV.screenObj(focused.it) or nil
@@ -575,6 +585,17 @@ TV.init{
     displayName = function() return Room.displayName("tv") end,
     onToggled = function() rebuild(); saveRoom(); MO.onRoomChanged() end,
     duck = function(on) JB.setDuck(on, on and 0 or 0.15) end,
+}
+
+-- Placeholder Matrix context: its glow and light, and the debug scene list
+MX.init{
+    theme = PHONE_THEME,
+    playerIndex = function() return playerIndex end,
+    save = function() return curSave() end,
+    room = function() return room end,
+    scene = function() return world and world.scene or nil end,
+    propInstFor = function(it) return world and world._propInst and world._propInst[it] or nil end,
+    displayName = function() return Room.displayName(MX.ID) end,
 }
 
 local buildPhoneMenu   -- forward decl (the textbox panes route Back into it)
@@ -854,6 +875,7 @@ function update(ts)
     local jbRes = JB.update(dt, ts)
     PCS.tickBgmFade(dt)
     TV.tick(dt)                    -- the screens of TVs that are on drift their colour in every mode
+    MX.tick(dt)                    -- the matrix glow breathes in every mode
 
     -- ── modal overlays ──
     if mode == "playerselect" then
@@ -904,6 +926,17 @@ function update(ts)
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "tv" then
         if TV.update(dt, ts) == "closed" or not TV.isOpen() then mode = "play" end
+        settlePlayer(dt); world:update(dt, px, py, pz); return nil
+    elseif mode == "matrix" then
+        local res, stage = MX.update(dt, ts)
+        if res == "go" then
+            -- a debug scene was chosen: leave the room for it the way the door does
+            SHARED:GetSharedSound("Decide"):Play()
+            mode = "play"
+            MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
+            return Exit("stage", stage)
+        end
+        if res == "closed" or not MX.isOpen() then mode = "play" end
         settlePlayer(dt); world:update(dt, px, py, pz); return nil
     elseif mode == "edit" then
         if edit:update(ts, getEditCameraFuncs(dt)) == "exit" then
@@ -1026,6 +1059,10 @@ function update(ts)
             SHARED:GetSharedSound("Decide"):Play()
             TV.openFor(focused.it, Room.displayName("tv"))
             mode = "tv"
+        elseif focused.kind == "matrix" then
+            SHARED:GetSharedSound("Decide"):Play()
+            MX.open()
+            mode = "matrix"
         end
     end
     if msgT > 0 then msgT = msgT - dt end
@@ -1119,6 +1156,9 @@ function draw()
     elseif mode == "tv" then
         hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
         TV.draw()
+    elseif mode == "matrix" then
+        hud:rect(0, 0, SCREEN_W, SCREEN_H, 8, 10, 18, 130)
+        MX.draw()
     else
         -- input instructions: TOP-RIGHT, right-aligned, one per line (readability). The contextual
         -- action prompt (bright) leads, then any [Tab] switch, then the persistent controls.
@@ -1129,6 +1169,7 @@ function draw()
         elseif prompt == "jukebox" then instr[#instr + 1] = { t = HUD:tr("prompt_jukebox"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "tv" then instr[#instr + 1] = { t = HUD:tr("prompt_tv"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "pod" then instr[#instr + 1] = { t = HUD:tr("prompt_pod"), c = { 150, 230, 255 }, s = 24 }
+        elseif prompt == "matrix" then instr[#instr + 1] = { t = HUD:tr("prompt_matrix"), c = { 150, 230, 255 }, s = 24 }
         elseif prompt == "exit" then instr[#instr + 1] = { t = HUD:tr("prompt_exit"), c = { 255, 230, 150 }, s = 24 }
         end
         if interCount > 1 then instr[#instr + 1] = { t = HUD:tr("prompt_switch"), c = { 200, 220, 240 }, s = 18 } end

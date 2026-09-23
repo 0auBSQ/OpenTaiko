@@ -2,7 +2,7 @@
 -- Visual test stage for the "danplate" ROActivity.
 -- Displays a grid of dan plates covering all frame indices (0–8), three tint
 -- colours, and title strings of varying lengths.
--- Escape / Cancel → exit back to title.
+-- Escape / Cancel → exit back to My Room.
 
 local danplate = nil
 local font     = nil
@@ -67,7 +67,7 @@ end
 
 function update(_ts)
     if INPUT:Pressed("Cancel") or INPUT:KeyboardPressed("Escape") then
-        return Exit("title", nil)
+        return Exit("stage", "myroom")
     end
 end
 

@@ -47,8 +47,6 @@ end
 local EVENT_STAGES = { regular_song_select = true, ai_battle_song_select = true, dan_select = true }
 
 local function buildMenus()
-    local dbg = col(150, 150, 155)
-
     local m = {
         {
             title = tr("TITLE_PERFORMANCE", "Performance Mode"),
@@ -131,39 +129,18 @@ local function buildMenus()
         c     = col(100, 100, 105),
         via   = "exit",
     }
+    m[#m + 1] = {
+        title = tr("TITLE_ONLINE_LOBBY", "Online Lobby"),
+        desc  = tr("TITLE_ONLINE_LOBBY_DESC", "(Beta, Share your room code only with people you trust)"),
+        c     = col(72, 36, 112),
+        via   = "stage", stage = "onlinelobby",
+    }
 
-    -- Debug stages
-    local function dbgEntry(title, desc, stage, trans)
-        return { title = title, desc = desc .. "\nThis Debug stage will not be included in the full 0.6.1 release.", c = dbg, via = "stage", stage = stage, trans = trans }
-    end
     if EM.on() then
         local kept = {}
         for _, e in ipairs(m) do if e.via == "stage" and EVENT_STAGES[e.stage] then kept[#kept + 1] = e end end
         return kept
     end
-
-    m[#m + 1] = dbgEntry("Demo1 (Debug)",              "The first demo using Lua stages.",                          "demo1")
-    m[#m + 1] = dbgEntry("Demo2 (Debug)",              "Was used to debug and test song lists.",                    "demo2")
-    m[#m + 1] = dbgEntry("Demo3 (Debug)",              "Was used to debug and test databases.",                     "demo3")
-    m[#m + 1] = dbgEntry("Theme Settings Test (Debug)","Shows the current theme settings values and specifications.","theme_settings_test")
-    m[#m + 1] = dbgEntry("Dan Plate Test (Debug)",     "Shows multiple dan plates with different styling.",         "dan_plate_test")
-    m[#m + 1] = dbgEntry("Dan Builder Test (Debug)",   "A minimalist random Dan player.",                          "dan_builder_test")
-    m[#m + 1] = dbgEntry("Character Shop (Debug)",     "A minimalist My Room reproduction.",                       "character_shop")
-    m[#m + 1] = dbgEntry("Gradient Map Test (Debug)",  "Shows P1 character with 3 different colour palettes.",     "test_gradient")
-    m[#m + 1] = dbgEntry("Canvas Test (Debug)",        "A tiny paint program: draw on a white sheet with the mouse, demonstrating the LuaCanvas + mouse input.", "canvas_test")
-    m[#m + 1] = dbgEntry("Voxel Engine (Debug)",       "A voxel world rendered via a Lua3DScene window.", "voxel")
-    m[#m + 1] = dbgEntry("Raytracer Demo (Debug)",     "The Lua3DScene path-traced raytracer mode.", "rt_demo")
-    m[#m + 1] = dbgEntry("Particle Showcase (Debug)",  "A stress test of the Lua3DScene particle engine.", "particles")
-    m[#m + 1] = dbgEntry("Online Lobby (Debug)",       "(Beta, Share your room code only with people you trust)", "onlinelobby")
-    m[#m + 1] = dbgEntry("Modal Test (Debug)",         "Plays the reward and unlock modals of every rarity and type.", "modal_test")
-    m[#m + 1] = dbgEntry("Video Player (Debug)",       "The boot intro in a player: play, pause, seek on the timeline, speed and volume.", "video_player")
-
-    m[#m + 1] = {
-        title = "My Room (Old)",
-        desc  = "Old (0.6.0) My Room",
-        c     = dbg,
-        via   = "heya",
-    }
 
     return m
 end

@@ -1,0 +1,9 @@
+{
+  "_comment": "Textes français de la Matrice (matrix.lua).",
+  "hint": "Choisissez une scène à projeter.",
+  "unlock_title": "Scène verrouillée",
+  "unlock_q": "Déverrouiller « %s » ?",
+  "unlock_yes": "Déverrouiller",
+  "unlock_no": "Retour",
+  "broke": "Pas assez de pièces."
+}

@@ -160,6 +160,8 @@
         "TITLE_SETTINGS_DESC": "Ajustez vos réglages pour une expérience de jeu sur mesure !",
         "TITLE_EXIT": "Quitter",
         "TITLE_EXIT_DESC": "À la prochaine !",
+        "TITLE_ONLINE_LOBBY": "Salon en ligne",
+        "TITLE_ONLINE_LOBBY_DESC": "(Bêta, ne partagez votre code de salon qu'avec des personnes de confiance)",
         "TITLE_VAULT_LOCKED_DESC": "Vous m'entendez... ?",
         "TITLE_PLAYERS_PROMPT": "Combien de batteurs montent sur scène ?",
         "TITLE_PLAYERS_BACK": "Retour",

@@ -1499,7 +1499,7 @@ local function menuActivate(idx)
         paused = false; INPUT:SetMouseLocked(true)
     elseif menuItems[idx] == "Quit" then
         INPUT:SetMouseLocked(false)
-        return Exit("stage", "_title")
+        return Exit("stage", "myroom")
     end
     return nil
 end
