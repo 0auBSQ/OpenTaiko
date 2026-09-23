@@ -91,7 +91,7 @@ namespace OpenTaikoTests {
 				var (x, y) = r.Beat16(beat);
 				AssertClose(beat * r.MsPerBeat, dons[i].dbSoundTimems, $"note {i} time", 0.01);
 				AssertClose(x, dons[i].fBMSCROLLTime, $"note {i} beat X");
-				AssertClose(y, dons[i].fBMSCROLLTimeY, $"note {i} beat Y");
+				AssertClose(y, dons[i].fBMSCROLLTimeIm, $"note {i} beat Y");
 			}
 
 			// every note keeps its own scroll next to the hispeed (the burst notes are half a millisecond apart, so
@@ -107,7 +107,7 @@ namespace OpenTaikoTests {
 				var point = CStagePlayScreenCommon.GetNowPBPMPoint(tja, t0, CTja.ECourse.eNormal);
 				var (bx, by) = CStagePlayScreenCommon.GetNowPBMTime(point, t0, tja.COMPAT);
 				for (int i = 26; i < dons.Count; i++) {
-					var (dx, dy) = (dons[i].fBMSCROLLTime - bx, dons[i].fBMSCROLLTimeY - by);
+					var (dx, dy) = (dons[i].fBMSCROLLTime - bx, dons[i].fBMSCROLLTimeIm - by);
 					var (sx, sy) = r.NoteScrolls[i];
 					var (px, py) = NotesManager.ComplexN4Beats(dx, dy, dons[i].dbSCROLL, dons[i].dbSCROLL_Y, EScrollMode.HBScroll);
 					AssertClose((sx * dx - sy * dy) / 16, px, $"note {i} rosette X");
@@ -115,8 +115,8 @@ namespace OpenTaikoTests {
 				}
 				// the note at beat 12 sits on the judge mark, its neighbours do not
 				AssertClose(0, dons[42].fBMSCROLLTime - bx, "beat-12 note X");
-				AssertClose(0, dons[42].fBMSCROLLTimeY - by, "beat-12 note Y");
-				Assert.True(Math.Abs(dons[41].fBMSCROLLTime - bx) + Math.Abs(dons[41].fBMSCROLLTimeY - by) > 0.1, "the note before beat 12 is off the judge mark");
+				AssertClose(0, dons[42].fBMSCROLLTimeIm - by, "beat-12 note Y");
+				Assert.True(Math.Abs(dons[41].fBMSCROLLTime - bx) + Math.Abs(dons[41].fBMSCROLLTimeIm - by) > 0.1, "the note before beat 12 is off the judge mark");
 			}
 
 			// the played beat at any time follows the same integral, on the real timing points
@@ -139,7 +139,7 @@ namespace OpenTaikoTests {
 
 		[Fact]
 		public void HispeedAndScrollActTogether() {
-			var tja = Parse("TITLE:both\nBPM:120\nCOURSE:Oni\n#HBSCROLL\n#START\n#HISPEED 2\n1,\n#SCROLL 2\n1,\n#HISPEED(1.5)\n1,\n#SCROLL 1+1i\n1,\n#HISPEED -i\n1,\n#END\n");
+			var tja = Parse("TITLE:both\nBPM:120\nCOURSE:Oni\n#HBSCROLL\n#START\n#HISPEED 2\n1,\n#SCROLL 2\n1,\n#HISPEED 1.5\n1,\n#SCROLL 1+1i\n1,\n#HISPEED -i\n1,\n#END\n");
 			var dons = Dons(tja);
 			Assert.Equal(5, dons.Count);
 			// (hispeed, scroll) per note: neither command touches the other
@@ -155,13 +155,27 @@ namespace OpenTaikoTests {
 			double[] wantY = { 0, 0, 0, 0, 0 };
 			for (int i = 0; i < 5; i++) {
 				AssertClose(wantX[i], dons[i].fBMSCROLLTime, $"note {i} beat X");
-				AssertClose(wantY[i], dons[i].fBMSCROLLTimeY, $"note {i} beat Y");
+				AssertClose(wantY[i], dons[i].fBMSCROLLTimeIm, $"note {i} beat Y");
 			}
 			// under #HISPEED -i the beat runs down the imaginary axis: 16 sixteenths later it is at -16i
 			var point = CStagePlayScreenCommon.GetNowPBPMPoint(tja, dons[4].dbSoundTimems + 2000, CTja.ECourse.eNormal);
 			var (px, py) = CStagePlayScreenCommon.GetNowPBMTime(point, dons[4].dbSoundTimems + 2000, tja.COMPAT);
 			AssertClose(112, px, "played beat X under -i");
 			AssertClose(-16, py, "played beat Y under -i");
+		}
+
+		[Fact]
+		public void PlainComplexScrollIsUnchangedPerAxis() {
+			// without #HISPEED the imaginary beat is 0 and each screen axis keeps its own real beat difference, as
+			// before: x = scroll × Δx, y = scrollY × Δy, even when the two differ (TJAP3's #SUDDEN freezes only x,
+			// TaikoJiro 1 drifts each axis on its own)
+			var (x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 0, 0, 1.5, 1, EScrollMode.HBScroll);
+			AssertClose(1.5 * 8 / 16.0, x, "x from its own beat"); AssertClose(1 * 16 / 16.0, y, "y from its own beat");
+			(x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 0, 0, 2, 0, EScrollMode.HBScroll);
+			AssertClose(1, x, "real scroll x"); AssertClose(0, y, "real scroll y");
+			// with an imaginary beat the product mixes the axes, each output axis from its own pair
+			(x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 4, 2, 1, 1, EScrollMode.HBScroll);
+			AssertClose((1 * 8 - 1 * 4) / 16.0, x, "x pair"); AssertClose((1 * 2 + 1 * 16) / 16.0, y, "y pair");
 		}
 
 		[Fact]

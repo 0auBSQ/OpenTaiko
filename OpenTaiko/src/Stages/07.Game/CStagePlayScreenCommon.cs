@@ -2605,8 +2605,10 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eMaster),
 		};
 		var th16NowBeats = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time, tja.COMPAT)).ToArray();
-		double[] th16NowBeatXs = th16NowBeats.Select(b => b.X).ToArray();
-		double[] th16NowBeatYs = th16NowBeats.Select(b => b.Y).ToArray();
+		// the real beat for each screen axis (each with its own TaikoJiro 1 drift) and the imaginary beat (complex #HISPEED)
+		double[] th16NowBeatXs = th16NowBeats.Select(b => b.Re).ToArray();
+		double[] th16NowBeatYs = [..th16NowBeatXs];
+		double[] th16NowBeatIms = th16NowBeats.Select(b => b.Im).ToArray();
 		if (tja.COMPAT is CTja.ETjaCompat.Jiro1) {
 			for (int ib = 0; ib < 3; ++ib) {
 				th16NowBeatXs[ib] += play_bpm_points[ib].th16BeatDriftX;
@@ -3427,7 +3429,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if (!pChip.bVisible)
 				continue;
 
-			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch], scrollRate);
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch], th16NowBeatIms[(int)pChip.nBranch], scrollRate);
 
 			// TaikoJiro 1 behavior: only 8 bar lines (including hidden ones) are shown, mentioned in: https://note.com/lime_5137/n/n672c0a41495d
 			if (shownBarLines == null) {
@@ -3472,7 +3474,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			if (!pChip.bVisible)
 				continue;
 
-			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch], scrollRate);
+			tja.UpdateScrolledChipPosition(pChip, play_bpm_points[(int)pChip.nBranch], nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch], th16NowBeatIms[(int)pChip.nBranch], scrollRate);
 
 			if (!this.bPAUSE && !this.isRewinding)
 				this.AutoJudge(nPlayer, nCurrentTimems, pChip, msMaxPlayedTjaTime: this.msMaxPlayedTjaTime(nPlayer));
@@ -3504,7 +3506,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		#region [draw phase (note), backward for correct stack order]
 		for (int iChip = dTX.listNoteChip.Count; iChip-- > 0;) {
 			CChip pChip = dTX.listNoteChip[iChip];
-			this.tProgressDraw_Chip_Taiko(configIni, ref dTX, ref pChip, nPlayer, nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch]);
+			this.tProgressDraw_Chip_Taiko(configIni, ref dTX, ref pChip, nPlayer, nCurrentTimems, th16NowBeatXs[(int)pChip.nBranch], th16NowBeatYs[(int)pChip.nBranch], th16NowBeatIms[(int)pChip.nBranch]);
 		}
 		#endregion
 
@@ -4113,11 +4115,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	// the visual beat at play_time: it advances at #HISPEED × BPM from the point, the imaginary part of a complex
 	// #HISPEED building the beat's imaginary part
-	public static (double X, double Y) GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
+	public static (double Re, double Im) GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
 		if (cBPM.point_type.HasFlag(CTja.EBPMPointType.DelayStop) && compat is not (CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS))
-			return (cBPM.bpm_change_bmscroll_time, cBPM.bpm_change_bmscroll_time_y);
+			return (cBPM.bpm_change_bmscroll_time, cBPM.bpm_change_bmscroll_time_im);
 		double th16 = (play_time - cBPM.bpm_change_time) * cBPM.dbBPMValue / 15000.0;
-		return (cBPM.bpm_change_bmscroll_time + th16 * cBPM.hispeed, cBPM.bpm_change_bmscroll_time_y + th16 * cBPM.hispeed_y);
+		return (cBPM.bpm_change_bmscroll_time + th16 * cBPM.hispeed, cBPM.bpm_change_bmscroll_time_im + th16 * cBPM.hispeed_y);
 	}
 
 	public void tReload() {
@@ -4494,8 +4496,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	protected abstract void tProgressDraw_Chip_Drums(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void tProgressDraw_ChipBody_Drums(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
-	protected abstract void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY);
-	protected abstract void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false);
+	protected abstract void tProgressDraw_Chip_Taiko(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY, double th16NowBeatIm);
+	protected abstract void tProgressDraw_Chip_TaikoRoll(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double msTjaNowTime, double th16NowBeat, double th16NowBeatY, double th16NowBeatIm, NotesManager.ENoteType nt, EGameType _gt, bool isEnd = false);
 
 	protected abstract void tProgressDraw_Chip_FillIn(CConfigIni configIni, ref CTja dTX, ref CChip pChip, long nowTime);
 	protected abstract void tProgressDraw_Chip_MeasureLine(CConfigIni configIni, ref CTja dTX, ref CChip pChip, int nPlayer, double nowTime, bool bBranch);

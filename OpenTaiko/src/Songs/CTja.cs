@@ -44,7 +44,7 @@ internal class CTja : CActivity {
 		public double ms_delay_duration;
 		public double bpm_change_time;
 		public double bpm_change_bmscroll_time;
-		public double bpm_change_bmscroll_time_y; // the visual beat's imaginary part (complex #HISPEED)
+		public double bpm_change_bmscroll_time_im; // the visual beat's imaginary part (complex #HISPEED)
 		public double hispeed = 1.0; // #HISPEED in effect from this point: the visual beat advances at hispeed × BPM
 		public double hispeed_y = 0.0;
 		public double bpm_change_scroll;
@@ -64,7 +64,7 @@ internal class CTja : CActivity {
 				builder.Append($" {this.ms_delay_duration} ms");
 			builder.Append($"), ");
 			builder.Append((time_signness >= 0) ? $"{this.bpm_change_time:0.00} ms~" : $"~ {this.bpm_change_time:0.00} ms");
-			builder.Append($", Beat: {this.bpm_change_bmscroll_time:0.00}+{this.bpm_change_bmscroll_time_y:0.00}i 16ths, Branch: {this.bpm_change_course}, ");
+			builder.Append($", Beat: {this.bpm_change_bmscroll_time:0.00}+{this.bpm_change_bmscroll_time_im:0.00}i 16ths, Branch: {this.bpm_change_course}, ");
 			builder.Append($"{this.scroll_mode}, BPM:{this.dbBPMValue}, HiSpeed:{this.hispeed:0.00}+{this.hispeed_y:0.00}i, Scroll:{this.bpm_change_scroll:0.00}+{this.bpm_change_scroll_y:0.00}i, ");
 			builder.Append($"Drift:{this.th16BeatDriftX:0.00}+{this.th16BeatDriftY:0.00}i");
 			return builder.ToString();
@@ -292,7 +292,7 @@ internal class CTja : CActivity {
 		public int nMeasureCount;
 		public double dbTime, dbTimeLast;
 		public double dbBMScrollTime, dbBMScrollTimeLast;
-		public double dbBMScrollTimeY, dbBMScrollTimeYLast;
+		public double dbBMScrollTimeIm, dbBMScrollTimeImLast;
 		public double dbBPM;
 		public float fMeasure_s;
 		public float fMeasure_m;
@@ -473,8 +473,8 @@ internal class CTja : CActivity {
 	public double dbNowHiSpeedY = 0.0;
 	public double dbLastTime = double.NegativeInfinity; // for TaikoJiro 1 #DELAY stops' beginning time
 	public double dbLastBMScrollTime = double.NegativeInfinity;
-	public double dbNowBMScrollTimeY = 0.0; // the visual beat's imaginary part
-	public double dbLastBMScrollTimeY = 0.0;
+	public double dbNowBMScrollTimeIm = 0.0; // the visual beat's imaginary part
+	public double dbLastBMScrollTimeIm = 0.0;
 	private EGameType? nowGameType = null;
 
 	public bool isAfterLastBpmPoint = false; // set to true whenever this.dbNowTime is changed (except for rounding)
@@ -1230,10 +1230,10 @@ internal class CTja : CActivity {
 
 					// placeholder values
 					CBPM bpmPoint = listBPM[0];
-					double th16_beat = 0, th16_beat_y = 0;
+					double th16_beat = 0, th16_beat_im = 0;
 					if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
 						bpmPoint = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.dbSoundTimems, chip.nBranch, ignoreDelay: true);
-						(th16_beat, th16_beat_y) = CStagePlayScreenCommon.GetNowPBMTime(bpmPoint, chip.dbSoundTimems, this.COMPAT);
+						(th16_beat, th16_beat_im) = CStagePlayScreenCommon.GetNowPBMTime(bpmPoint, chip.dbSoundTimems, this.COMPAT);
 					}
 
 					switch (ch) {
@@ -1389,11 +1389,11 @@ internal class CTja : CActivity {
 									) {
 									var msMoveTime = chip.dbSoundTimems - chip.msMoveOffset;
 									var bpmDefMove = CStagePlayScreenCommon.GetNowPBPMPoint(this, msMoveTime, chip.nBranch, ignoreDelay: true);
-									var (th16BeatMoveX, th16BeatMoveY) = CStagePlayScreenCommon.GetNowPBMTime(bpmDefMove, msMoveTime, this.COMPAT);
+									var (th16BeatMoveRe, th16BeatMoveIm) = CStagePlayScreenCommon.GetNowPBMTime(bpmDefMove, msMoveTime, this.COMPAT);
 									var bpmDef = CStagePlayScreenCommon.GetNowPBPMPoint(this, chip.dbSoundTimems, chip.nBranch, ignoreDelay: true);
-									var (th16BeatX, th16BeatY) = CStagePlayScreenCommon.GetNowPBMTime(bpmDef, chip.dbSoundTimems, this.COMPAT);
-									chip.th16DBeatPreMove = th16BeatX - th16BeatMoveX;
-									chip.th16DBeatPreMoveY = th16BeatY - th16BeatMoveY;
+									var (th16BeatRe, th16BeatIm) = CStagePlayScreenCommon.GetNowPBMTime(bpmDef, chip.dbSoundTimems, this.COMPAT);
+									chip.th16DBeatPreMove = th16BeatRe - th16BeatMoveRe;
+									chip.th16DBeatPreMoveIm = th16BeatIm - th16BeatMoveIm;
 								}
 
 								if (this.isOFFSET_Negative)
@@ -1402,7 +1402,7 @@ internal class CTja : CActivity {
 									chip.dbBPM = bpm;
 								} else {
 									chip.fBMSCROLLTime = th16_beat;
-									chip.fBMSCROLLTimeY = th16_beat_y;
+									chip.fBMSCROLLTimeIm = th16_beat_im;
 									chip.bpmPoint = bpmPoint;
 									chip.dbBPM = bpmPoint.dbBPMValue;
 									chip.dbHISPEED = bpmPoint.hispeed;
@@ -1887,17 +1887,14 @@ internal class CTja : CActivity {
 
 			this.listChip.Add(chip);
 		} else if (command == "#HISPEED") {
-			// #HISPEED(x) or #HISPEED x, x real or complex: from here the visual beat advances at x × BPM, as
-			// #BPMCHANGE x×BPM with #MEASURE x×measure would, without their 0 or infinite BPM; a complex x turns
-			// the direction of every note, on top of each note's own #SCROLL
-			string strHiSpeed = argument.Trim();
-			if (strHiSpeed.StartsWith('(') && strHiSpeed.EndsWith(')'))
-				strHiSpeed = strHiSpeed[1..^1];
+			// #HISPEED x, x real or complex: from here the visual beat advances at x × BPM, as #BPMCHANGE x×BPM
+			// with #MEASURE x×measure would, without their 0 or infinite BPM; a complex x turns the direction of
+			// every note, on top of each note's own #SCROLL
 			double[] dbHiSpeed = new double[2];
-			if (strHiSpeed.IndexOf('i') != -1)
-				this.tParsedComplexNumber(strHiSpeed, ref dbHiSpeed);
+			if (argument.IndexOf('i') != -1)
+				this.tParsedComplexNumber(argument, ref dbHiSpeed);
 			else
-				dbHiSpeed[0] = strHiSpeed.ParseReal();
+				dbHiSpeed[0] = argument.ParseReal();
 			this.dbNowHiSpeed = dbHiSpeed[0];
 			this.dbNowHiSpeedY = dbHiSpeed[1];
 
@@ -1930,24 +1927,24 @@ internal class CTja : CActivity {
 
 			if (nDELAY < 0) {
 				// place the destination (earlier) BPM point first
-				var (timeSrc, beatSrc, beatSrcY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY);
+				var (timeSrc, beatSrc, beatSrcY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm);
 				this.dbNowTime += nDELAY;
 				this.AdvanceBMScrollTime(nDELAY);
-				var (timeDest, beatDest, beatDestY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY);
+				var (timeDest, beatDest, beatDestY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm);
 				this.SetBPMPointAtDefCursor(EBPMPointType.DelayEnd, isAfterLastBpmPoint: true);
 
 				// temporarily restore timing to place the source (later) BPM point
-				(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY) = (timeSrc, beatSrc, beatSrcY);
+				(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm) = (timeSrc, beatSrc, beatSrcY);
 				this.SetBPMPointAtDefCursor(EBPMPointType.DelayStart, nDELAY, isAfterLastBpmPoint: true);
 
 				// restore timing to destination
-				(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY) = (timeDest, beatDest, beatDestY);
+				(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm) = (timeDest, beatDest, beatDestY);
 				this.isAfterLastBpmPoint = true;
 
 				// offset next stops' time
 				this.dbLastTime += nDELAY;
 				this.dbLastBMScrollTime += nDELAY * this.dbNowBPM / 15000 * this.dbNowHiSpeed;
-				this.dbLastBMScrollTimeY += nDELAY * this.dbNowBPM / 15000 * this.dbNowHiSpeedY;
+				this.dbLastBMScrollTimeIm += nDELAY * this.dbNowBPM / 15000 * this.dbNowHiSpeedY;
 			} else if (nDELAY > 0) {
 				if (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) {
 					this.SetBPMPointAtDefCursor(EBPMPointType.DelayStart, nDELAY);
@@ -1959,14 +1956,14 @@ internal class CTja : CActivity {
 					// TODO: If end at-or-after the 1st next BPM change, move the stop to start at that BPM change
 					// If still at-or-after the 2nd next BPM change after moving, move to that BPM change, and so on
 					// Notice that the stop can be rearranged after later placed shorter stops.
-					var (timeSrc, beatSrc, beatSrcY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY);
-					(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY) = (this.dbLastTime, this.dbLastBMScrollTime, this.dbLastBMScrollTimeY);
+					var (timeSrc, beatSrc, beatSrcY) = (this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm);
+					(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm) = (this.dbLastTime, this.dbLastBMScrollTime, this.dbLastBMScrollTimeIm);
 					this.SetBPMPointAtDefCursor(EBPMPointType.DelayStop, nDELAY);
 					this.dbNowTime += nDELAY;
 					this.SetBPMPointAtDefCursor(EBPMPointType.DelayEnd, isAfterLastBpmPoint: true);
 
 					// restore timing to destination and reapply delay
-					(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeY) = (timeSrc, beatSrc, beatSrcY);
+					(this.dbNowTime, this.dbNowBMScrollTime, this.dbNowBMScrollTimeIm) = (timeSrc, beatSrc, beatSrcY);
 					this.dbNowTime += nDELAY;
 					this.isAfterLastBpmPoint = true;
 
@@ -2655,11 +2652,11 @@ internal class CTja : CActivity {
 				if (alignToLast) {
 					this.dbNowTime = lastBPMPoint.bpm_change_time;
 					this.dbNowBMScrollTime = lastBPMPoint.bpm_change_bmscroll_time;
-					this.dbNowBMScrollTimeY = lastBPMPoint.bpm_change_bmscroll_time_y;
+					this.dbNowBMScrollTimeIm = lastBPMPoint.bpm_change_bmscroll_time_im;
 				} else if (alignToNow) {
 					lastBPMPoint.bpm_change_time = this.dbNowTime;
 					lastBPMPoint.bpm_change_bmscroll_time = this.dbNowBMScrollTime;
-					lastBPMPoint.bpm_change_bmscroll_time_y = this.dbNowBMScrollTimeY;
+					lastBPMPoint.bpm_change_bmscroll_time_im = this.dbNowBMScrollTimeIm;
 				}
 				pointType |= lastBPMPoint.point_type;
 			}
@@ -2676,7 +2673,7 @@ internal class CTja : CActivity {
 				nNotationTopNumber = this.listChip.Count,
 				bpm_change_time = this.dbNowTime,
 				bpm_change_bmscroll_time = this.dbNowBMScrollTime,
-				bpm_change_bmscroll_time_y = this.dbNowBMScrollTimeY,
+				bpm_change_bmscroll_time_im = this.dbNowBMScrollTimeIm,
 				dbBPMValue = this.dbNowBPM,
 				ms_delay_duration = msDelayDuration,
 			};
@@ -2844,7 +2841,7 @@ internal class CTja : CActivity {
 		// reset time
 		this.dbLastTime = this.dbNowTime = 0;
 		this.dbLastBMScrollTime = this.dbNowBMScrollTime = 0;
-		this.dbLastBMScrollTimeY = this.dbNowBMScrollTimeY = 0;
+		this.dbLastBMScrollTimeIm = this.dbNowBMScrollTimeIm = 0;
 		this.dbNowHiSpeed = 1.0;
 		this.dbNowHiSpeedY = 0.0;
 
@@ -2953,8 +2950,8 @@ internal class CTja : CActivity {
 		this.cBranchEnd.dbTimeLast = this.cBranchStart.dbTimeLast = this.dbLastTime;
 		this.cBranchEnd.dbBMScrollTime = this.cBranchStart.dbBMScrollTime = this.dbNowBMScrollTime;
 		this.cBranchEnd.dbBMScrollTimeLast = this.cBranchStart.dbBMScrollTimeLast = this.dbLastBMScrollTime;
-		this.cBranchEnd.dbBMScrollTimeY = this.cBranchStart.dbBMScrollTimeY = this.dbNowBMScrollTimeY;
-		this.cBranchEnd.dbBMScrollTimeYLast = this.cBranchStart.dbBMScrollTimeYLast = this.dbLastBMScrollTimeY;
+		this.cBranchEnd.dbBMScrollTimeIm = this.cBranchStart.dbBMScrollTimeIm = this.dbNowBMScrollTimeIm;
+		this.cBranchEnd.dbBMScrollTimeImLast = this.cBranchStart.dbBMScrollTimeImLast = this.dbLastBMScrollTimeIm;
 		this.cBranchEnd.dbBPM = this.cBranchStart.dbBPM = this.dbNowBPM;
 		this.cBranchEnd.fMeasure_s = this.cBranchStart.fMeasure_s = this.fNow_Measure_s;
 		this.cBranchEnd.fMeasure_m = this.cBranchStart.fMeasure_m = this.fNow_Measure_m;
@@ -2979,8 +2976,8 @@ internal class CTja : CActivity {
 				this.cBranchEnd.dbTimeLast = this.dbLastTime;
 				this.cBranchEnd.dbBMScrollTime = this.dbNowBMScrollTime;
 				this.cBranchEnd.dbBMScrollTimeLast = this.dbLastBMScrollTime;
-				this.cBranchEnd.dbBMScrollTimeY = this.dbNowBMScrollTimeY;
-				this.cBranchEnd.dbBMScrollTimeYLast = this.dbLastBMScrollTimeY;
+				this.cBranchEnd.dbBMScrollTimeIm = this.dbNowBMScrollTimeIm;
+				this.cBranchEnd.dbBMScrollTimeImLast = this.dbLastBMScrollTimeIm;
 			}
 		}
 	}
@@ -2998,8 +2995,8 @@ internal class CTja : CActivity {
 		this.dbLastTime = this.cBranchStart.dbTimeLast;
 		this.dbNowBMScrollTime = this.cBranchStart.dbBMScrollTime;
 		this.dbLastBMScrollTime = this.cBranchStart.dbBMScrollTimeLast;
-		this.dbNowBMScrollTimeY = this.cBranchStart.dbBMScrollTimeY;
-		this.dbLastBMScrollTimeY = this.cBranchStart.dbBMScrollTimeYLast;
+		this.dbNowBMScrollTimeIm = this.cBranchStart.dbBMScrollTimeIm;
+		this.dbLastBMScrollTimeIm = this.cBranchStart.dbBMScrollTimeImLast;
 		this.dbNowBPM = this.cBranchStart.dbBPM;
 		this.fNow_Measure_s = this.cBranchStart.fMeasure_s;
 		this.fNow_Measure_m = this.cBranchStart.fMeasure_m;
@@ -3019,8 +3016,8 @@ internal class CTja : CActivity {
 			this.dbLastTime = this.cBranchEnd.dbTimeLast;
 			this.dbNowBMScrollTime = this.cBranchEnd.dbBMScrollTime;
 			this.dbLastBMScrollTime = this.cBranchEnd.dbBMScrollTimeLast;
-			this.dbNowBMScrollTimeY = this.cBranchEnd.dbBMScrollTimeY;
-			this.dbLastBMScrollTimeY = this.cBranchEnd.dbBMScrollTimeYLast;
+			this.dbNowBMScrollTimeIm = this.cBranchEnd.dbBMScrollTimeIm;
+			this.dbLastBMScrollTimeIm = this.cBranchEnd.dbBMScrollTimeImLast;
 			this.dbNowBPM = this.cBranchEnd.dbBPM;
 			this.fNow_Measure_s = this.cBranchEnd.fMeasure_s;
 			this.fNow_Measure_m = this.cBranchEnd.fMeasure_m;
@@ -3273,7 +3270,7 @@ internal class CTja : CActivity {
 	// the visual beat (HBScroll/BMScroll) advances at #HISPEED × BPM: by a beat distance (a div) or by a time (a delay)
 	private void AdvanceBMScrollBeat(double th16) {
 		this.dbNowBMScrollTime += th16 * this.dbNowHiSpeed;
-		this.dbNowBMScrollTimeY += th16 * this.dbNowHiSpeedY;
+		this.dbNowBMScrollTimeIm += th16 * this.dbNowHiSpeedY;
 	}
 	private void AdvanceBMScrollTime(double ms) => this.AdvanceBMScrollBeat(ms * this.dbNowBPM / 15000);
 
@@ -3286,7 +3283,7 @@ internal class CTja : CActivity {
 
 		this.dbLastTime = this.dbNowTime;
 		this.dbLastBMScrollTime = this.dbNowBMScrollTime;
-		this.dbLastBMScrollTimeY = this.dbNowBMScrollTimeY;
+		this.dbLastBMScrollTimeIm = this.dbNowBMScrollTimeIm;
 		this.dbNowTime += (15000.0 / this.dbNowBPM * (this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / nDivs));
 		this.AdvanceBMScrollBeat((this.fNow_Measure_s / this.fNow_Measure_m) * (16.0 / (double)nDivs));
 		this.isAfterLastBpmPoint = true;
@@ -3335,7 +3332,7 @@ internal class CTja : CActivity {
 			dbHISPEED_Y = this.dbNowHiSpeedY,
 			dbSoundTimems = this.dbNowTime,
 			fBMSCROLLTime = this.dbNowBMScrollTime,
-			fBMSCROLLTimeY = this.dbNowBMScrollTimeY,
+			fBMSCROLLTimeIm = this.dbNowBMScrollTimeIm,
 			fNow_Measure_m = this.fNow_Measure_m,
 			fNow_Measure_s = this.fNow_Measure_s,
 			nIntValue = argInt,
@@ -4842,7 +4839,7 @@ internal class CTja : CActivity {
 		return 0; // 対象小節が存在しないなら、最初から再生
 	}
 
-	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, double scrollRate) {
+	public void UpdateScrolledChipPosition(CChip chip, CBPM nowBpmPoint, double msTjaNowTime, double th16NowBeatX, double th16NowBeatY, double th16NowBeatIm, double scrollRate) {
 		CChip velocityRefChip = NotesManager.GetVelocityRefChip(chip, this.COMPAT);
 		if (velocityRefChip.eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll
 			&& nowBpmPoint.point_type.HasFlag(EBPMPointType.DelayStop)
@@ -4851,8 +4848,10 @@ internal class CTja : CActivity {
 		}
 
 		double msDTime = chip.dbSoundTimems - msTjaNowTime;
+		// the real beat difference for each screen axis, and the imaginary one (complex #HISPEED)
 		double th16DBeatX = chip.fBMSCROLLTime - th16NowBeatX;
-		double th16DBeatY = chip.fBMSCROLLTimeY - th16NowBeatY;
+		double th16DBeatY = chip.fBMSCROLLTime - th16NowBeatY;
+		double th16DBeatIm = chip.fBMSCROLLTimeIm - th16NowBeatIm;
 		if (this.COMPAT is ETjaCompat.Jiro1) {
 			th16DBeatX += chip.bpmPoint!.th16BeatDriftX;
 			th16DBeatY += chip.bpmPoint!.th16BeatDriftY;
@@ -4865,13 +4864,17 @@ internal class CTja : CActivity {
 		double msDTimeMoveY = msDTime;
 		double th16DBeatMoveX = th16DBeatX;
 		double th16DBeatMoveY = th16DBeatY;
+		double th16DBeatImMoveX = th16DBeatIm;
+		double th16DBeatImMoveY = th16DBeatIm;
 		if (NotesManager.IsHittableNote(chip) && msTjaNowTime < velocityRefChip.dbSoundTimems - velocityRefChip.msMoveOffset) {
 			msDTimeMoveX = velocityRefChip.msMoveOffset + (chip.dbSoundTimems - velocityRefChip.dbSoundTimems);
 			th16DBeatMoveX = velocityRefChip.th16DBeatPreMove + (chip.fBMSCROLLTime - velocityRefChip.fBMSCROLLTime);
+			th16DBeatImMoveX = velocityRefChip.th16DBeatPreMoveIm + (chip.fBMSCROLLTimeIm - velocityRefChip.fBMSCROLLTimeIm);
 			// In TJAP3, #SUDDEN only affects horizontal scroll
 			if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS)) {
 				msDTimeMoveY = msDTimeMoveX;
-				th16DBeatMoveY = velocityRefChip.th16DBeatPreMoveY + (chip.fBMSCROLLTimeY - velocityRefChip.fBMSCROLLTimeY);
+				th16DBeatMoveY = th16DBeatMoveX;
+				th16DBeatImMoveY = th16DBeatImMoveX;
 			}
 		}
 		
@@ -4886,7 +4889,7 @@ internal class CTja : CActivity {
 		// (complex #HISPEED) follows the same axis as the scroll's
 		double ySign = (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? 1 : -1;
 		scrollSpeed_Y *= ySign;
-		var (dx, dy) = NotesManager.GetNoteXY(msDTimeMoveX, msDTimeMoveY, th16DBeatMoveX, th16DBeatMoveY * ySign, velocityRefChip.dbBPM, scrollSpeed, scrollSpeed_Y, scrollModeForced);
+		var (dx, dy) = NotesManager.GetNoteXY(msDTimeMoveX, msDTimeMoveY, th16DBeatMoveX, th16DBeatMoveY, th16DBeatImMoveX * ySign, th16DBeatImMoveY * ySign, velocityRefChip.dbBPM, scrollSpeed, scrollSpeed_Y, scrollModeForced);
 
 		double dy_ = dy;
 		// TJAP3 behavior: bar lines and roll-type notes are not affected by #DIRECTION

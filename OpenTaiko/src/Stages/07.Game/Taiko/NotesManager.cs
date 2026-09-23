@@ -88,13 +88,20 @@ class NotesManager {
 	}
 
 	// the position as the complex product scroll × Δbeat in the HBScroll/BMScroll modes (a complex #HISPEED gives
-	// the beat an imaginary part), both given in the screen's frame; time-based otherwise
-	public static (double dx, double dy) GetNoteXY(double msDTimeX, double msDTimeY, double th16DBeatX, double th16DBeatY, double bpm, double scroll, double scrollY, EScrollMode eScrollMode) {
+	// the beat an imaginary part), in the screen's frame; time-based otherwise. Each screen axis takes its own
+	// real and imaginary beat differences (they differ per axis under the TaikoJiro 1 drift and TJAP3's #SUDDEN).
+	public static (double dx, double dy) GetNoteXY(double msDTimeX, double msDTimeY, double th16DBeatX, double th16DBeatY, double th16DBeatImX, double th16DBeatImY, double bpm, double scroll, double scrollY, EScrollMode eScrollMode) {
 		if (eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll) {
-			var (n4X, n4Y) = ComplexN4Beats(th16DBeatX, th16DBeatY, scroll, scrollY, eScrollMode);
+			var (n4X, n4Y) = ComplexN4BeatsXY(th16DBeatX, th16DBeatY, th16DBeatImX, th16DBeatImY, scroll, scrollY, eScrollMode);
 			return (PxFromN4BeatsX(n4X), PxFromN4BeatsY(n4Y));
 		}
 		return (GetNoteX(msDTimeX, th16DBeatX, bpm, scroll, eScrollMode), GetNoteY(msDTimeY, th16DBeatY, bpm, scrollY, eScrollMode));
+	}
+
+	public static (double X, double Y) ComplexN4BeatsXY(double th16DBeatX, double th16DBeatY, double th16DBeatImX, double th16DBeatImY, double scroll, double scrollY, EScrollMode eScrollMode) {
+		var (n4X, _) = ComplexN4Beats(th16DBeatX, th16DBeatImX, scroll, scrollY, eScrollMode);
+		var (_, n4Y) = ComplexN4Beats(th16DBeatY, th16DBeatImY, scroll, scrollY, eScrollMode);
+		return (n4X, n4Y);
 	}
 
 	public static (double X, double Y) ComplexN4Beats(double th16DBeatX, double th16DBeatY, double scroll, double scrollY, EScrollMode eScrollMode) {

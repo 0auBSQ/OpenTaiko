@@ -642,7 +642,7 @@ public static class ImGuiDebugWindow {
 							};
 							var play_th16Beats = play_bpm_points.Select(bp => CStagePlayScreenCommon.GetNowPBMTime(bp, play_time, dtx.COMPAT)).ToArray();
 							for (int ib = 0; ib < 3; ++ib) {
-								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib].X / 4:0.00}+{play_th16Beats[ib].Y / 4:0.00}i 16ths\n"
+								ImGui.Text($"{(CTja.ECourse)ib}: {play_time:0} ms, {play_th16Beats[ib].Re / 4:0.00}+{play_th16Beats[ib].Im / 4:0.00}i 16ths\n"
 									+ $" {play_bpm_points[ib]}\n"
 									+ $"nextBpmChangeAtDiv: CBPM#{play_bpm_points[ib].next_bpm_change?.nInternalNumber ?? -1} "
 									+ $"{play_bpm_points[ib].next_bpm_change?.bpm_change_time ?? double.PositiveInfinity:0.00} ms");
