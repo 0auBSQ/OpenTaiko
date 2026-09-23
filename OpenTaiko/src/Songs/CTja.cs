@@ -1197,14 +1197,12 @@ internal class CTja : CActivity {
 						// NOTICE: still inaccurate despite the drift between BPM changes seems correct
 						// might be also affected by the incomplete negative delay simulation
 						const double pxTh16Beats_Jiro1NoteDist2 = 421 / 16.0;
-						double dPxJiro1Hs1 = pxTh16Beats_Jiro1NoteDist2 * (bpmPoint.bpm_change_bmscroll_time.Real - lastBpmChange.bpm_change_bmscroll_time.Real);
-						double th16BeatDrift_Re = (bpmPoint.bpm_change_scroll.Real == 0) ?
-							lastBpmChange.th16BeatDrift.Real
-							: lastBpmChange.th16BeatDrift.Real - bpmPoint.bpm_change_scroll.Real * dPxJiro1Hs1 % 1 / bpmPoint.bpm_change_scroll.Real / pxTh16Beats_Jiro1NoteDist2;
-						double th16BeatDrift_Im = (bpmPoint.bpm_change_scroll.Imaginary == 0) ?
-							lastBpmChange.th16BeatDrift.Imaginary
-							: lastBpmChange.th16BeatDrift.Imaginary - bpmPoint.bpm_change_scroll.Imaginary * dPxJiro1Hs1 % 1 / bpmPoint.bpm_change_scroll.Imaginary / pxTh16Beats_Jiro1NoteDist2;
-						bpmPoint.th16BeatDrift = new(th16BeatDrift_Re, th16BeatDrift_Im);
+						var dPxJiro1Hs1 = pxTh16Beats_Jiro1NoteDist2 * (bpmPoint.bpm_change_bmscroll_time - lastBpmChange.bpm_change_bmscroll_time);
+						var dPxJiro1 = bpmPoint.bpm_change_scroll * dPxJiro1Hs1;
+						Complex dPxJiro1Fix = new(dPxJiro1.Real % 1, dPxJiro1.Imaginary % 1);
+						bpmPoint.th16BeatDrift = (bpmPoint.bpm_change_scroll == 0) ?
+							lastBpmChange.th16BeatDrift
+							: lastBpmChange.th16BeatDrift - dPxJiro1Fix / bpmPoint.bpm_change_scroll / pxTh16Beats_Jiro1NoteDist2;
 
 						this.lastBpmChanges[(int)bpmPoint.bpm_change_course] = bpmPoint;
 					}
