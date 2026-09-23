@@ -1,5 +1,6 @@
 using FDK;
 using System.Drawing;
+using System.Numerics;
 
 namespace OpenTaiko {
 	/// <summary>
@@ -267,8 +268,7 @@ namespace OpenTaiko {
 						nNotationTopNumber = animBpmListIdx,
 						dbBPMValue = srcInitialBpm,
 						bpm_change_time = songBoundaryTime + 1.0,
-						bpm_change_bmscroll_time = th16AtAnimBpm,
-						bpm_change_bmscroll_time_im = bmscrollAccumIm,
+						bpm_change_bmscroll_time = new(th16AtAnimBpm, bmscrollAccumIm),
 						bpm_change_course = CTja.ECourse.eNormal,
 					});
 					// Advance bmscrollAccum from nextsongTime+1 to accum+srcBpmOffset so that
@@ -316,8 +316,7 @@ namespace OpenTaiko {
 					var bpm = srcBpm.Copy();
 					bpm.nInternalNumber = newIdx;
 					bpm.bpm_change_time = srcBpm.bpm_change_time + offsetDb + srcBpmOffset;
-					bpm.bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + bmscrollAccum;
-					bpm.bpm_change_bmscroll_time_im = srcBpm.bpm_change_bmscroll_time_im + bmscrollAccumIm;
+					bpm.bpm_change_bmscroll_time = srcBpm.bpm_change_bmscroll_time + new Complex(bmscrollAccum, bmscrollAccumIm);
 					output.listBPM.Add(bpm);
 					bpmIdxMap[bi] = newIdx;
 				}
@@ -438,8 +437,7 @@ namespace OpenTaiko {
 					newChip.dbSoundTimems = srcChip.dbSoundTimems + offsetDb;
 					// Shift HBSCROLL/BMSCROLL position: fBMSCROLLTime is in the same 16th-beat
 					// units as bpm_change_bmscroll_time, so add bmscrollAccum (not offsetDb).
-					newChip.fBMSCROLLTime = srcChip.fBMSCROLLTime + bmscrollAccum;
-					newChip.fBMSCROLLTimeIm = srcChip.fBMSCROLLTimeIm + bmscrollAccumIm;
+					newChip.fBMSCROLLTime = srcChip.fBMSCROLLTime + new Complex(bmscrollAccum, bmscrollAccumIm);
 
 					// Remap BPM-referencing chips (0x08 = extended BPM, 0x9C = animation BPM)
 					// so they point to the correct entries in the output listBPM table.
@@ -603,8 +601,8 @@ namespace OpenTaiko {
 					double srcLastRawTimeDb = srcLastTimeDb - srcBpmOffset;   // strip OFFSET → raw chart time
 					// the beat runs at the last point's #HISPEED × BPM until the boundary (and 1 ms past it)
 					double th16SrcEnd = (srcLastRawTimeDb - lastSrcBpm.bpm_change_time + 1.0) * lastSrcBpm.dbBPMValue / 15000.0;
-					bmscrollAccum = bmscrollAccum + lastSrcBpm.bpm_change_bmscroll_time + th16SrcEnd * lastSrcBpm.hispeed;
-					bmscrollAccumIm = bmscrollAccumIm + lastSrcBpm.bpm_change_bmscroll_time_im + th16SrcEnd * lastSrcBpm.hispeed_y;
+					bmscrollAccum = bmscrollAccum + lastSrcBpm.bpm_change_bmscroll_time.Real + th16SrcEnd * lastSrcBpm.hispeed.Real;
+					bmscrollAccumIm = bmscrollAccumIm + lastSrcBpm.bpm_change_bmscroll_time.Imaginary + th16SrcEnd * lastSrcBpm.hispeed.Imaginary;
 				}
 
 				// ── Inter-song gimmick resets ─────────────────────────────────────
@@ -644,7 +642,6 @@ namespace OpenTaiko {
 					// 0x9D  SCROLL = 1.0 — restore normal scroll speed
 					var scrollReset = MakeReset(0x9D);
 					scrollReset.dbSCROLL = 1.0;
-					scrollReset.dbSCROLL_Y = 0.0;
 					output.listChip.Add(scrollReset);
 
 					// 0xF2  DIRECTION = 0 — restore normal (left-to-right) scroll direction

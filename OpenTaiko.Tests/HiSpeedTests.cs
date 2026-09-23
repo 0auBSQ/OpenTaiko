@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text.Json;
 using OpenTaiko;
 using Xunit;
@@ -22,21 +23,21 @@ namespace OpenTaikoTests {
 			public double Bpm;
 			public List<Segment> Segments = new();
 			public List<double> NoteBeats = new();
-			public List<(double Re, double Im)> NoteScrolls = new();
+			public List<Complex> NoteScrolls = new();
 			public double MsPerBeat => 60000.0 / this.Bpm;
 
 			// the visual beat (in 16ths) at a quarter-note beat: the hispeed integrated from beat 0
-			public (double X, double Y) Beat16(double beat) {
-				double x = 0, y = 0;
+			public Complex Beat16(double beat) {
+				double re = 0, im = 0;
 				for (int i = 0; i < this.Segments.Count; i++) {
 					double from = this.Segments[i].FromBeat;
 					double to = (i + 1 < this.Segments.Count) ? this.Segments[i + 1].FromBeat : double.PositiveInfinity;
 					double len = Math.Min(beat, to) - from;
 					if (len <= 0) continue;
-					x += 4 * len * this.Segments[i].Re;
-					y += 4 * len * this.Segments[i].Im;
+					re += 4 * len * this.Segments[i].Re;
+					im += 4 * len * this.Segments[i].Im;
 				}
-				return (x, y);
+				return new(re, im);
 			}
 		}
 
@@ -49,7 +50,7 @@ namespace OpenTaikoTests {
 			foreach (var b in h.GetProperty("noteBeats").EnumerateArray())
 				r.NoteBeats.Add(b.GetDouble());
 			foreach (var s in h.GetProperty("noteScrolls").EnumerateArray())
-				r.NoteScrolls.Add((s[0].GetDouble(), s[1].GetDouble()));
+				r.NoteScrolls.Add(new(s[0].GetDouble(), s[1].GetDouble()));
 			return r;
 		}
 
@@ -88,52 +89,53 @@ namespace OpenTaikoTests {
 
 			for (int i = 0; i < dons.Count; i++) {
 				double beat = r.NoteBeats[i];
-				var (x, y) = r.Beat16(beat);
+				var vb = r.Beat16(beat);
 				AssertClose(beat * r.MsPerBeat, dons[i].dbSoundTimems, $"note {i} time", 0.01);
-				AssertClose(x, dons[i].fBMSCROLLTime, $"note {i} beat X");
-				AssertClose(y, dons[i].fBMSCROLLTimeIm, $"note {i} beat Y");
+				AssertClose(vb.Real, dons[i].fBMSCROLLTime.Real, $"note {i} beat Re");
+				AssertClose(vb.Imaginary, dons[i].fBMSCROLLTime.Imaginary, $"note {i} beat Im");
 			}
 
 			// every note keeps its own scroll next to the hispeed (the burst notes are half a millisecond apart, so
 			// the TaikoJiro-like compats, which take a note's scroll from the timing point at its time, keep them too)
 			for (int i = 0; i < dons.Count; i++) {
-				AssertClose(r.NoteScrolls[i].Re, dons[i].dbSCROLL, $"note {i} scroll");
-				AssertClose(r.NoteScrolls[i].Im, dons[i].dbSCROLL_Y, $"note {i} scroll Y");
+				AssertClose(r.NoteScrolls[i].Real, dons[i].dbSCROLL.Real, $"note {i} scroll Re");
+				AssertClose(r.NoteScrolls[i].Imaginary, dons[i].dbSCROLL.Imaginary, $"note {i} scroll Im");
 			}
 
 			// at mid-circle the notes form the Desmos rosette: each note's own scroll times its beat difference
 			{
 				double t0 = 12 * r.MsPerBeat;
 				var point = CStagePlayScreenCommon.GetNowPBPMPoint(tja, t0, CTja.ECourse.eNormal);
-				var (bx, by) = CStagePlayScreenCommon.GetNowPBMTime(point, t0, tja.COMPAT);
+				var b = CStagePlayScreenCommon.GetNowPBMTime(point, t0, tja.COMPAT);
 				for (int i = 26; i < dons.Count; i++) {
-					var (dx, dy) = (dons[i].fBMSCROLLTime - bx, dons[i].fBMSCROLLTimeIm - by);
-					var (sx, sy) = r.NoteScrolls[i];
-					var (px, py) = NotesManager.ComplexN4Beats(dx, dy, dons[i].dbSCROLL, dons[i].dbSCROLL_Y, EScrollMode.HBScroll);
-					AssertClose((sx * dx - sy * dy) / 16, px, $"note {i} rosette X");
-					AssertClose((sx * dy + sy * dx) / 16, py, $"note {i} rosette Y");
+					var d = dons[i].fBMSCROLLTime - b;
+					var s = r.NoteScrolls[i];
+					var p = NotesManager.ComplexN4Beats(d, dons[i].dbSCROLL, EScrollMode.HBScroll);
+					var sd = s * d;
+					AssertClose(sd.Real / 16, p.Real, $"note {i} rosette Re");
+					AssertClose(sd.Imaginary / 16, p.Imaginary, $"note {i} rosette Im");
 				}
 				// the note at beat 12 sits on the judge mark, its neighbours do not
-				AssertClose(0, dons[42].fBMSCROLLTime - bx, "beat-12 note X");
-				AssertClose(0, dons[42].fBMSCROLLTimeIm - by, "beat-12 note Y");
-				Assert.True(Math.Abs(dons[41].fBMSCROLLTime - bx) + Math.Abs(dons[41].fBMSCROLLTimeIm - by) > 0.1, "the note before beat 12 is off the judge mark");
+				AssertClose(0, dons[42].fBMSCROLLTime.Real - b.Real, "beat-12 note Re");
+				AssertClose(0, dons[42].fBMSCROLLTime.Imaginary - b.Imaginary, "beat-12 note Im");
+				Assert.True(Math.Abs(dons[41].fBMSCROLLTime.Real - b.Real) + Math.Abs(dons[41].fBMSCROLLTime.Imaginary - b.Imaginary) > 0.1, "the note before beat 12 is off the judge mark");
 			}
 
 			// the played beat at any time follows the same integral, on the real timing points
 			foreach (double beat in new[] { 0.5, 1.5, 2.5, 4, 5.5, 7.5, 9, 10.3, 12.1, 13.9, 15 }) {
 				double ms = beat * r.MsPerBeat;
 				var point = CStagePlayScreenCommon.GetNowPBPMPoint(tja, ms, CTja.ECourse.eNormal);
-				var (px, py) = CStagePlayScreenCommon.GetNowPBMTime(point, ms, tja.COMPAT);
-				var (x, y) = r.Beat16(beat);
-				AssertClose(x, px, $"played beat X at {beat}");
-				AssertClose(y, py, $"played beat Y at {beat}");
+				var p = CStagePlayScreenCommon.GetNowPBMTime(point, ms, tja.COMPAT);
+				var vb = r.Beat16(beat);
+				AssertClose(vb.Real, p.Real, $"played beat Re at {beat}");
+				AssertClose(vb.Imaginary, p.Imaginary, $"played beat Im at {beat}");
 			}
 
 			// the hispeed in effect at a note is the segment's
 			foreach (var (i, beat) in r.NoteBeats.Select((b, i) => (i, b)).Where(t => t.b > 0)) {
 				var seg = r.Segments.Last(s => s.FromBeat <= beat + 1e-9);
-				AssertClose(seg.Re, dons[i].dbHISPEED, $"note {i} hispeed");
-				AssertClose(seg.Im, dons[i].dbHISPEED_Y, $"note {i} hispeed Y");
+				AssertClose(seg.Re, dons[i].dbHISPEED.Real, $"note {i} hispeed Re");
+				AssertClose(seg.Im, dons[i].dbHISPEED.Imaginary, $"note {i} hispeed Im");
 			}
 		}
 
@@ -143,25 +145,25 @@ namespace OpenTaikoTests {
 			var dons = Dons(tja);
 			Assert.Equal(5, dons.Count);
 			// (hispeed, scroll) per note: neither command touches the other
-			var want = new (double hs, double hsY, double sc, double scY)[] { (2, 0, 1, 0), (2, 0, 2, 0), (1.5, 0, 2, 0), (1.5, 0, 1, 1), (0, -1, 1, 1) };
+			var want = new (double hsRe, double hsIm, double scRe, double scIm)[] { (2, 0, 1, 0), (2, 0, 2, 0), (1.5, 0, 2, 0), (1.5, 0, 1, 1), (0, -1, 1, 1) };
 			for (int i = 0; i < want.Length; i++) {
-				AssertClose(want[i].hs, dons[i].dbHISPEED, $"note {i} hispeed");
-				AssertClose(want[i].hsY, dons[i].dbHISPEED_Y, $"note {i} hispeed Y");
-				AssertClose(want[i].sc, dons[i].dbSCROLL, $"note {i} scroll");
-				AssertClose(want[i].scY, dons[i].dbSCROLL_Y, $"note {i} scroll Y");
+				AssertClose(want[i].hsRe, dons[i].dbHISPEED.Real, $"note {i} hispeed Re");
+				AssertClose(want[i].hsIm, dons[i].dbHISPEED.Imaginary, $"note {i} hispeed Im");
+				AssertClose(want[i].scRe, dons[i].dbSCROLL.Real, $"note {i} scroll Re");
+				AssertClose(want[i].scIm, dons[i].dbSCROLL.Imaginary, $"note {i} scroll Im");
 			}
 			// the beats: a 4/4 measure is 16 sixteenths at hispeed 1, whatever the scroll
-			double[] wantX = { 0, 32, 64, 88, 112 };
-			double[] wantY = { 0, 0, 0, 0, 0 };
+			double[] wantRe = { 0, 32, 64, 88, 112 };
+			double[] wantIm = { 0, 0, 0, 0, 0 };
 			for (int i = 0; i < 5; i++) {
-				AssertClose(wantX[i], dons[i].fBMSCROLLTime, $"note {i} beat X");
-				AssertClose(wantY[i], dons[i].fBMSCROLLTimeIm, $"note {i} beat Y");
+				AssertClose(wantRe[i], dons[i].fBMSCROLLTime.Real, $"note {i} beat Re");
+				AssertClose(wantIm[i], dons[i].fBMSCROLLTime.Imaginary, $"note {i} beat Im");
 			}
 			// under #HISPEED -i the beat runs down the imaginary axis: 16 sixteenths later it is at -16i
 			var point = CStagePlayScreenCommon.GetNowPBPMPoint(tja, dons[4].dbSoundTimems + 2000, CTja.ECourse.eNormal);
-			var (px, py) = CStagePlayScreenCommon.GetNowPBMTime(point, dons[4].dbSoundTimems + 2000, tja.COMPAT);
-			AssertClose(112, px, "played beat X under -i");
-			AssertClose(-16, py, "played beat Y under -i");
+			var p = CStagePlayScreenCommon.GetNowPBMTime(point, dons[4].dbSoundTimems + 2000, tja.COMPAT);
+			AssertClose(112, p.Real, "played beat Re under -i");
+			AssertClose(-16, p.Imaginary, "played beat Im under -i");
 		}
 
 		[Fact]
@@ -169,29 +171,29 @@ namespace OpenTaikoTests {
 			// without #HISPEED the imaginary beat is 0 and each screen axis keeps its own real beat difference, as
 			// before: x = scroll × Δx, y = scrollY × Δy, even when the two differ (TJAP3's #SUDDEN freezes only x,
 			// TaikoJiro 1 drifts each axis on its own)
-			var (x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 0, 0, 1.5, 1, EScrollMode.HBScroll);
+			var (x, y) = NotesManager.ComplexN4BeatsXY(new(8, 0), new(16, 0), new(1.5, 1), EScrollMode.HBScroll);
 			AssertClose(1.5 * 8 / 16.0, x, "x from its own beat"); AssertClose(1 * 16 / 16.0, y, "y from its own beat");
-			(x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 0, 0, 2, 0, EScrollMode.HBScroll);
+			(x, y) = NotesManager.ComplexN4BeatsXY(new(8, 0), new(16, 0), new(2, 0), EScrollMode.HBScroll);
 			AssertClose(1, x, "real scroll x"); AssertClose(0, y, "real scroll y");
 			// with an imaginary beat the product mixes the axes, each output axis from its own pair
-			(x, y) = NotesManager.ComplexN4BeatsXY(8, 16, 4, 2, 1, 1, EScrollMode.HBScroll);
+			(x, y) = NotesManager.ComplexN4BeatsXY(new(8, 4), new(16, 2), new(1, 1), EScrollMode.HBScroll);
 			AssertClose((1 * 8 - 1 * 4) / 16.0, x, "x pair"); AssertClose((1 * 2 + 1 * 16) / 16.0, y, "y pair");
 		}
 
 		[Fact]
 		public void PositionIsTheComplexProductOfScrollAndBeat() {
 			// scroll × Δbeat with Δbeat = 16 sixteenths (one measure): i turns a real beat up the imaginary axis
-			var (x, y) = NotesManager.ComplexN4Beats(16, 0, 0, 1, EScrollMode.HBScroll);
-			AssertClose(0, x, "i × 16"); AssertClose(1, y, "i × 16");
+			var b = NotesManager.ComplexN4Beats(new(16, 0), new(0, 1), EScrollMode.HBScroll);
+			AssertClose(0, b.Real, "i × 16"); AssertClose(1, b.Imaginary, "i × 16");
 			// and an imaginary beat (complex #HISPEED) back onto the real axis, the other way
-			(x, y) = NotesManager.ComplexN4Beats(0, 16, 0, 1, EScrollMode.HBScroll);
-			AssertClose(-1, x, "i × 16i"); AssertClose(0, y, "i × 16i");
+			b = NotesManager.ComplexN4Beats(new(0, 16), new(0, 1), EScrollMode.HBScroll);
+			AssertClose(-1, b.Real, "i × 16i"); AssertClose(0, b.Imaginary, "i × 16i");
 			// a general product
-			(x, y) = NotesManager.ComplexN4Beats(16, 16, 2, 1, EScrollMode.HBScroll);
-			AssertClose((2 * 16 - 1 * 16) / 16.0, x, "(2+i)(16+16i) re"); AssertClose((2 * 16 + 1 * 16) / 16.0, y, "(2+i)(16+16i) im");
+			b = NotesManager.ComplexN4Beats(new(16, 16), new(2, 1), EScrollMode.HBScroll);
+			AssertClose((2 * 16 - 1 * 16) / 16.0, b.Real, "(2+i)(16+16i) re"); AssertClose((2 * 16 + 1 * 16) / 16.0, b.Imaginary, "(2+i)(16+16i) im");
 			// BMScroll ignores the scroll but keeps the beat's imaginary part
-			(x, y) = NotesManager.ComplexN4Beats(16, 8, 3, 3, EScrollMode.BMScroll);
-			AssertClose(1, x, "bmscroll re"); AssertClose(0.5, y, "bmscroll im");
+			b = NotesManager.ComplexN4Beats(new(16, 8), new(3, 3), EScrollMode.BMScroll);
+			AssertClose(1, b.Real, "bmscroll re"); AssertClose(0.5, b.Imaginary, "bmscroll im");
 		}
 	}
 }

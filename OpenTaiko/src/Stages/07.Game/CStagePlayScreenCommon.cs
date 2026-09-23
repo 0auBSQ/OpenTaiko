@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.Numerics;
 using FDK;
 using FDK.ExtensionMethods;
 
@@ -2606,13 +2607,13 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		};
 		var th16NowBeats = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time, tja.COMPAT)).ToArray();
 		// the real beat for each screen axis (each with its own TaikoJiro 1 drift) and the imaginary beat (complex #HISPEED)
-		double[] th16NowBeatXs = th16NowBeats.Select(b => b.Re).ToArray();
+		double[] th16NowBeatXs = th16NowBeats.Select(b => b.Real).ToArray();
 		double[] th16NowBeatYs = [..th16NowBeatXs];
-		double[] th16NowBeatIms = th16NowBeats.Select(b => b.Im).ToArray();
+		double[] th16NowBeatIms = th16NowBeats.Select(b => b.Imaginary).ToArray();
 		if (tja.COMPAT is CTja.ETjaCompat.Jiro1) {
 			for (int ib = 0; ib < 3; ++ib) {
-				th16NowBeatXs[ib] += play_bpm_points[ib].th16BeatDriftX;
-				th16NowBeatYs[ib] += play_bpm_points[ib].th16BeatDriftY;
+				th16NowBeatXs[ib] += play_bpm_points[ib].th16BeatDrift.Real;
+				th16NowBeatYs[ib] += play_bpm_points[ib].th16BeatDrift.Imaginary;
 			}
 		}
 
@@ -4115,11 +4116,11 @@ internal abstract class CStagePlayScreenCommon : CStage {
 
 	// the visual beat at play_time: it advances at #HISPEED × BPM from the point, the imaginary part of a complex
 	// #HISPEED building the beat's imaginary part
-	public static (double Re, double Im) GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
+	public static Complex GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
 		if (cBPM.point_type.HasFlag(CTja.EBPMPointType.DelayStop) && compat is not (CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS))
-			return (cBPM.bpm_change_bmscroll_time, cBPM.bpm_change_bmscroll_time_im);
+			return cBPM.bpm_change_bmscroll_time;
 		double th16 = (play_time - cBPM.bpm_change_time) * cBPM.dbBPMValue / 15000.0;
-		return (cBPM.bpm_change_bmscroll_time + th16 * cBPM.hispeed, cBPM.bpm_change_bmscroll_time_im + th16 * cBPM.hispeed_y);
+		return cBPM.bpm_change_bmscroll_time + th16 * cBPM.hispeed;
 	}
 
 	public void tReload() {

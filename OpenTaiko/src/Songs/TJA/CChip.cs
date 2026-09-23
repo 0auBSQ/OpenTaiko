@@ -1,4 +1,5 @@
-﻿using FDK;
+﻿using System.Numerics;
+using FDK;
 using static OpenTaiko.CTja;
 
 namespace OpenTaiko;
@@ -18,8 +19,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public float fNow_Measure_s = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public float fNow_Measure_m = 4.0f;//強制分岐のために追加.2020.04.21.akasoko26
 	public bool IsEndedBranching = false;//分岐が終わった時の連打譜面が非可視化になってしまうためフラグを追加.2020.04.21.akasoko26
-	public double dbSCROLL;
-	public double dbSCROLL_Y;
+	public Complex dbSCROLL;
 	public ECourse nBranch;
 	public int idxDefine = -1;
 	public int idxBranchSection;
@@ -71,10 +71,8 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public bool[] hasLevelHold = []; // [iBranch]
 
 	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
-	public double fBMSCROLLTime;
-	public double fBMSCROLLTimeIm; // the visual beat's imaginary part (complex #HISPEED)
-	public double dbHISPEED = 1.0; // #HISPEED in effect at the chip
-	public double dbHISPEED_Y;
+	public Complex fBMSCROLLTime;
+	public Complex dbHISPEED = 1.0; // #HISPEED in effect at the chip
 	private int _nSoundTimems;
 	public int nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
 
@@ -96,8 +94,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double msShowOffset = double.PositiveInfinity;
 	public double msMoveOffset = double.PositiveInfinity;
 	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
-	public double th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
-	public double th16DBeatPreMoveIm;
+	public Complex th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
 
 	public int nLag;                // 2011.2.1 yyagi
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
@@ -237,9 +234,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.dbSoundPos = 0.0D;
 		this.dbSoundTimems = 0.0D;
 		this.fBMSCROLLTime = 0;
-		this.fBMSCROLLTimeIm = 0;
 		this.dbHISPEED = 1.0;
-		this.dbHISPEED_Y = 0;
 		this.nLag = int.MinValue;
 		this.bPlayEndAfterPlaybackContinuesChip = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
@@ -254,7 +249,6 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.fNow_Measure_s = 4.0f;
 		this.nScrollDirection = 0;
 		this.dbSCROLL = 1.0;
-		this.dbSCROLL_Y = 0.0f;
 	}
 
 	public static implicit operator NotesManager.ENoteType(CChip? chip) => NotesManager.GetNoteType(chip);

@@ -1333,16 +1333,16 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			return;
 		}
 		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
-			var (th16ChipBeatX, th16ChipBeatY) = (pChip.fBMSCROLLTime, pChip.fBMSCROLLTime);
-			var (th16ChipEndBeatX, th16ChipEndBeatY) = (pChip.end.fBMSCROLLTime, pChip.end.fBMSCROLLTime);
+			var (th16ChipBeatX, th16ChipBeatY) = (pChip.fBMSCROLLTime.Real, pChip.fBMSCROLLTime.Real);
+			var (th16ChipEndBeatX, th16ChipEndBeatY) = (pChip.end.fBMSCROLLTime.Real, pChip.end.fBMSCROLLTime.Real);
 			// a roll spanning imaginary beat (complex #HISPEED) is in beat along that axis too
-			var (th16ChipBeatIm, th16ChipEndBeatIm) = (pChip.fBMSCROLLTimeIm, pChip.end.fBMSCROLLTimeIm);
+			var (th16ChipBeatIm, th16ChipEndBeatIm) = (pChip.fBMSCROLLTime.Imaginary, pChip.end.fBMSCROLLTime.Imaginary);
 			var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
 			if (compat is CTja.ETjaCompat.Jiro1) {
-				th16ChipBeatX += pChip.bpmPoint!.th16BeatDriftX;
-				th16ChipBeatY += pChip.bpmPoint!.th16BeatDriftY;
-				th16ChipEndBeatX += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftX;
-				th16ChipEndBeatY += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDriftY;
+				th16ChipBeatX += pChip.bpmPoint!.th16BeatDrift.Real;
+				th16ChipBeatY += pChip.bpmPoint!.th16BeatDrift.Imaginary;
+				th16ChipEndBeatX += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift.Real;
+				th16ChipEndBeatY += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift.Imaginary;
 			}
 			if ((th16NowBeatX >= th16ChipBeatX && th16NowBeatX <= th16ChipEndBeatX)
 					|| (th16NowBeatY >= th16ChipBeatY && th16NowBeatY <= th16ChipEndBeatY)
@@ -1371,8 +1371,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		// displacement per sec: the visual beat runs at #HISPEED × BPM
 		double th16DBeat = -4 * pChip.dbBPM / 60;
-		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.dbHISPEED, th16DBeat * pChip.dbHISPEED, th16DBeat * pChip.dbHISPEED_Y, th16DBeat * pChip.dbHISPEED_Y, pChip.dbBPM, pChip.dbSCROLL, pChip.dbSCROLL_Y, pChip.eScrollMode);
-		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.end.dbHISPEED, th16DBeat * pChip.end.dbHISPEED, th16DBeat * pChip.end.dbHISPEED_Y, th16DBeat * pChip.end.dbHISPEED_Y, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.dbSCROLL_Y, pChip.end.eScrollMode);
+		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.dbHISPEED, th16DBeat * pChip.dbHISPEED, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, -1000, th16DBeat * pChip.end.dbHISPEED, th16DBeat * pChip.end.dbHISPEED, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.eScrollMode);
 		int dxHead = (int)dxHeadD, dyHead = (int)dyHeadD, dxEnd = (int)dxEndD, dyEnd = (int)dyEndD;
 
 		// get move speed near the judgement mark
@@ -1423,7 +1423,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (x >= -maxRadius / 2 && x <= GameWindowSize.Width + maxRadius / 2) {
 				float opacity = this.actFlashlight.NoteOpacity(nPlayer, x, y);
 				if (opacity <= 0f) return;
-				double theta = (pChip.dbSCROLL_Y == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
+				double theta = (pChip.dbSCROLL.Imaginary == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
 				CTexture tex = (isBranched) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
 				int savedOpacity = tex.Opacity;
 				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);
