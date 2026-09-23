@@ -1,0 +1,162 @@
+TITLE:Complex HISPEED
+SUBTITLE:--after the Desmos example lx6skvqfjm
+BPM:120
+WAVE:
+OFFSET:0
+SONGVOL:100
+SEVOL:100
+COURSE:Oni
+LEVEL:1
+COMPAT:TMG
+
+#HBSCROLL
+#START
+#BARLINEOFF
+// beat 0: eight notes, one per direction, half a millisecond apart so each keeps its own scroll
+#HISPEED 2
+#MEASURE 1/4096
+#SCROLL 1
+1,
+#SCROLL 0.70711+0.70711i
+1,
+#SCROLL i
+1,
+#SCROLL -0.70711+0.70711i
+1,
+#SCROLL -1
+1,
+#SCROLL -0.70711-0.70711i
+1,
+#SCROLL -i
+1,
+#SCROLL 0.70711-0.70711i
+1,
+// beats 0..5: the hispeed path 2, -2, 0, 1; eighth notes from beat 1
+#MEASURE 127/512
+#SCROLL 1
+0,
+#MEASURE 1/4
+#HISPEED -2
+11,
+#HISPEED 0
+11,
+#HISPEED 1
+11,
+11,
+// beats 5..9: the hispeed i, 1, -i, 1 with every other note on scroll i
+#MEASURE 1/8
+#HISPEED i
+#SCROLL 1
+1,
+#SCROLL i
+1,
+#HISPEED 1
+#SCROLL 1
+1,
+#SCROLL i
+1,
+#HISPEED -i
+#SCROLL 1
+1,
+#SCROLL i
+1,
+#HISPEED 1
+#SCROLL 1
+1,
+#SCROLL i
+1,
+// beats 9..10: scroll 1 again
+#MEASURE 1/4
+#SCROLL 1
+11,
+// beats 10..14: the hispeed turns a full circle in 16 steps while the scroll of the 32nd notes turns four times
+#MEASURE 1/32
+#HISPEED 1
+#SCROLL 2i
+1,
+#SCROLL -1.41421+1.41421i
+1,
+#HISPEED 0.92388+0.38268i
+#SCROLL -2
+1,
+#SCROLL -1.41421-1.41421i
+1,
+#HISPEED 0.70711+0.70711i
+#SCROLL -2i
+1,
+#SCROLL 1.41421-1.41421i
+1,
+#HISPEED 0.38268+0.92388i
+#SCROLL 2
+1,
+#SCROLL 1.41421+1.41421i
+1,
+#HISPEED i
+#SCROLL 2i
+1,
+#SCROLL -1.41421+1.41421i
+1,
+#HISPEED -0.38268+0.92388i
+#SCROLL -2
+1,
+#SCROLL -1.41421-1.41421i
+1,
+#HISPEED -0.70711+0.70711i
+#SCROLL -2i
+1,
+#SCROLL 1.41421-1.41421i
+1,
+#HISPEED -0.92388+0.38268i
+#SCROLL 2
+1,
+#SCROLL 1.41421+1.41421i
+1,
+#HISPEED -1
+#SCROLL 2i
+1,
+#SCROLL -1.41421+1.41421i
+1,
+#HISPEED -0.92388-0.38268i
+#SCROLL -2
+1,
+#SCROLL -1.41421-1.41421i
+1,
+#HISPEED -0.70711-0.70711i
+#SCROLL -2i
+1,
+#SCROLL 1.41421-1.41421i
+1,
+#HISPEED -0.38268-0.92388i
+#SCROLL 2
+1,
+#SCROLL 1.41421+1.41421i
+1,
+#HISPEED -i
+#SCROLL 2i
+1,
+#SCROLL -1.41421+1.41421i
+1,
+#HISPEED 0.38268-0.92388i
+#SCROLL -2
+1,
+#SCROLL -1.41421-1.41421i
+1,
+#HISPEED 0.70711-0.70711i
+#SCROLL -2i
+1,
+#SCROLL 1.41421-1.41421i
+1,
+#HISPEED 0.92388-0.38268i
+#SCROLL 2
+1,
+#SCROLL 1.41421+1.41421i
+1,
+// beat 14: the last note, the hispeed back to 1, two beats to the end
+#HISPEED 1
+#SCROLL 2i
+1,
+#MEASURE 15/32
+#SCROLL 1
+0,
+#BARLINEON
+#END

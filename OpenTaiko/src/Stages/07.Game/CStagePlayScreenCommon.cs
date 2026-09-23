@@ -2604,8 +2604,9 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eExpert),
 			GetNowPBPMPoint(dTX, play_time, CTja.ECourse.eMaster),
 		};
-		double[] th16NowBeatXs = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time, tja.COMPAT)).ToArray();
-		double[] th16NowBeatYs = [..th16NowBeatXs];
+		var th16NowBeats = play_bpm_points.Select(bp => GetNowPBMTime(bp, play_time, tja.COMPAT)).ToArray();
+		double[] th16NowBeatXs = th16NowBeats.Select(b => b.X).ToArray();
+		double[] th16NowBeatYs = th16NowBeats.Select(b => b.Y).ToArray();
 		if (tja.COMPAT is CTja.ETjaCompat.Jiro1) {
 			for (int ib = 0; ib < 3; ++ib) {
 				th16NowBeatXs[ib] += play_bpm_points[ib].th16BeatDriftX;
@@ -4110,10 +4111,13 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		return tja.listBPM[last_match];
 	}
 
-	public static double GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
+	// the visual beat at play_time: it advances at #HISPEED × BPM from the point, the imaginary part of a complex
+	// #HISPEED building the beat's imaginary part
+	public static (double X, double Y) GetNowPBMTime(CTja.CBPM cBPM, double play_time, CTja.ETjaCompat compat) {
 		if (cBPM.point_type.HasFlag(CTja.EBPMPointType.DelayStop) && compat is not (CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS))
-			return cBPM.bpm_change_bmscroll_time;
-		return cBPM.bpm_change_bmscroll_time + (play_time - cBPM.bpm_change_time) * cBPM.dbBPMValue / 15000.0;
+			return (cBPM.bpm_change_bmscroll_time, cBPM.bpm_change_bmscroll_time_y);
+		double th16 = (play_time - cBPM.bpm_change_time) * cBPM.dbBPMValue / 15000.0;
+		return (cBPM.bpm_change_bmscroll_time + th16 * cBPM.hispeed, cBPM.bpm_change_bmscroll_time_y + th16 * cBPM.hispeed_y);
 	}
 
 	public void tReload() {

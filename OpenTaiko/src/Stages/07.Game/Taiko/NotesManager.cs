@@ -87,6 +87,24 @@ class NotesManager {
 		return px / pxPer4Beats / screenScale;
 	}
 
+	// the position as the complex product scroll × Δbeat in the HBScroll/BMScroll modes (a complex #HISPEED gives
+	// the beat an imaginary part), both given in the screen's frame; time-based otherwise
+	public static (double dx, double dy) GetNoteXY(double msDTimeX, double msDTimeY, double th16DBeatX, double th16DBeatY, double bpm, double scroll, double scrollY, EScrollMode eScrollMode) {
+		if (eScrollMode is EScrollMode.BMScroll or EScrollMode.HBScroll) {
+			var (n4X, n4Y) = ComplexN4Beats(th16DBeatX, th16DBeatY, scroll, scrollY, eScrollMode);
+			return (PxFromN4BeatsX(n4X), PxFromN4BeatsY(n4Y));
+		}
+		return (GetNoteX(msDTimeX, th16DBeatX, bpm, scroll, eScrollMode), GetNoteY(msDTimeY, th16DBeatY, bpm, scrollY, eScrollMode));
+	}
+
+	public static (double X, double Y) ComplexN4Beats(double th16DBeatX, double th16DBeatY, double scroll, double scrollY, EScrollMode eScrollMode) {
+		if (eScrollMode is EScrollMode.BMScroll) {
+			scroll = 1.0;
+			scrollY = 0.0;
+		}
+		return ((scroll * th16DBeatX - scrollY * th16DBeatY) / 16.0, (scroll * th16DBeatY + scrollY * th16DBeatX) / 16.0);
+	}
+
 	public static double GetNoteY(double msDTime, double th16DBeat, double bpm, double scroll, EScrollMode eScrollMode) {
 		if (scroll == 0.0 || eScrollMode is EScrollMode.BMScroll) {
 			return 0;

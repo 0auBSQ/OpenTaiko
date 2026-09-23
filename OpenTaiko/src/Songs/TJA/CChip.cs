@@ -72,6 +72,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 
 	public double dbSoundPos;  // 発声時刻を格納していた変数のうちの１つをfloat型からdouble型に変更。(kairera0467)
 	public double fBMSCROLLTime;
+	public double fBMSCROLLTimeY; // the visual beat's imaginary part (complex #HISPEED)
+	public double dbHISPEED = 1.0; // #HISPEED in effect at the chip
+	public double dbHISPEED_Y;
 	private int _nSoundTimems;
 	public int nSoundTimems { get => _nSoundTimems; set => _dbSoundTimems = _nSoundTimems = value; }
 
@@ -94,6 +97,7 @@ internal class CChip : IComparable<CChip>, ICloneable {
 	public double msMoveOffset = double.PositiveInfinity;
 	public bool IsSuddenHideRoll; // TJAP3's >0s (show) but =0s (move) hides roll "bug"
 	public double th16DBeatPreMove; // pre-calculated HBScroll beat distance when the note should move
+	public double th16DBeatPreMoveY;
 
 	public int nLag;                // 2011.2.1 yyagi
 	public bool bGOGOTIME = false; //2018.03.11 k1airera0467 ゴーゴータイム内のチップであるか
@@ -233,6 +237,9 @@ internal class CChip : IComparable<CChip>, ICloneable {
 		this.dbSoundPos = 0.0D;
 		this.dbSoundTimems = 0.0D;
 		this.fBMSCROLLTime = 0;
+		this.fBMSCROLLTimeY = 0;
+		this.dbHISPEED = 1.0;
+		this.dbHISPEED_Y = 0;
 		this.nLag = int.MinValue;
 		this.bPlayEndAfterPlaybackContinuesChip = false;
 		this.dbChipSizeRatio = 1.0;                             // Unused
