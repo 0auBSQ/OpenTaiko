@@ -1332,10 +1332,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			pChip.canShowBody = true;
 			return;
 		}
+		var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
 		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
 			var th16ChipBeat = pChip.fBMSCROLLTime;
 			var th16ChipEndBeat = pChip.end.fBMSCROLLTime;
-			var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
 			if (compat is CTja.ETjaCompat.Jiro1) {
 				th16ChipBeat += pChip.bpmPoint!.th16BeatDrift;
 				th16ChipEndBeat += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift;
@@ -1367,10 +1367,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		}
 
 		// displacement per sec: the visual beat runs at #HISPEED × BPM
+		var vEnd = NotesManager.GetVelocityRefChip(pChip.end, compat);
 		var th16DBeatHead = -4 * pChip.dbBPM / 60 * pChip.dbHISPEED;
-		var th16DBeatEnd = -4 * pChip.dbBPM / 60 * pChip.end.dbHISPEED;
+		var th16DBeatEnd = -4 * vEnd.dbBPM / 60 * vEnd.dbHISPEED;
 		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, th16DBeatHead, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
-		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, th16DBeatEnd, pChip.end.dbBPM, pChip.end.dbSCROLL, pChip.end.eScrollMode);
+		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, th16DBeatEnd, vEnd.dbBPM, vEnd.dbSCROLL, vEnd.eScrollMode);
 		int dxHead = (int)dxHeadD, dyHead = (int)dyHeadD, dxEnd = (int)dxEndD, dyEnd = (int)dyEndD;
 
 		// get move speed near the judgement mark
