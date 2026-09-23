@@ -1371,10 +1371,10 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 		// displacement per sec: the visual beat runs at #HISPEED × BPM
 		var vEnd = pChip.end; // stretchable if reached here
-		var th16DBeatHead = -4 * pChip.dbBPM / 60 * pChip.dbHISPEED;
-		var th16DBeatEnd = -4 * vEnd.dbBPM / 60 * vEnd.dbHISPEED;
-		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, th16DBeatHead, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
-		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, th16DBeatEnd, vEnd.dbBPM, vEnd.dbSCROLL, vEnd.eScrollMode);
+		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXYPerSec(pChip.dbHISPEED, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+		(dxHeadD, dyHeadD) = tja.ApplyNoteXYDirection(pChip, dxHeadD, dyHeadD);
+		var (dxEndD, dyEndD) = NotesManager.GetNoteXYPerSec(vEnd.dbHISPEED, vEnd.dbBPM, vEnd.dbSCROLL, vEnd.eScrollMode);
+		(dxEndD, dyEndD) = tja.ApplyNoteXYDirection(vEnd, dxEndD, dyEndD);
 		int dxHead = (int)dxHeadD, dyHead = (int)dyHeadD, dxEnd = (int)dxEndD, dyEnd = (int)dyEndD;
 
 		var head = new Vector2(xHead, yHead);
@@ -1436,7 +1436,11 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			if (x >= -maxRadius / 2 && x <= GameWindowSize.Width + maxRadius / 2) {
 				float opacity = this.actFlashlight.NoteOpacity(nPlayer, x, y);
 				if (opacity <= 0f) return;
-				double theta = (pChip.dbSCROLL.Imaginary == 0.0) ? 0 : -Math.Atan2(pChip.nVerticalChipDistance, pChip.nHorizontalChipDistance);
+
+				var (vx, vy) = NotesManager.GetNoteXYPerSec(pChip.dbHISPEED, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
+				(vx, vy) = OpenTaiko.GetTJA(nPlayer)!.ApplyNoteXYDirection(pChip, vx, vy);
+				double theta = (vy == 0.0) ? 0 : -Math.Atan2(-vy, -vx);
+
 				CTexture tex = (isBranched) ? OpenTaiko.Tx.Bar_Branch : OpenTaiko.Tx.Bar;
 				int savedOpacity = tex.Opacity;
 				if (opacity < 1f) tex.Opacity = (int)(savedOpacity * opacity);

@@ -4830,6 +4830,13 @@ internal class CTja : CActivity {
 		if (isPreMove && this.COMPAT is (ETjaCompat.TJAP3 or ETjaCompat.OOS))
 			dy = NotesManager.GetNoteXY(msDTime, th16DBeat, velocityRefChip.dbBPM, scrollSpeed, scrollModeForced).y;
 
+		(dx, dy) = this.ApplyNoteXYDirection(chip, dx, dy);
+
+		chip.nHorizontalChipDistance = (int)dx;
+		chip.nVerticalChipDistance = (int)dy;
+	}
+
+	public (double x, double y) ApplyNoteXYDirection(CChip chip, double dx, double dy) {
 		if (this.COMPAT is ETjaCompat.TJAP3 && NotesManager.IsGenericRoll(chip))
 			dy = 0; // TJAPlayer3 behavior: rolls never had vertical component
 		else if (this.COMPAT is not (ETjaCompat.TJAP3 or ETjaCompat.OOS))
@@ -4852,10 +4859,9 @@ internal class CTja : CActivity {
 				dy = dyOrig;
 		}
 
-		chip.nHorizontalChipDistance = (int)dx;
-		chip.nVerticalChipDistance = (int)dy;
+		return (dx, dy);
 	}
-	
+
 	public bool GetScrolledChipForceNMScroll(CChip chip, CBPM bpmPointNow, double msTjaNowTime) {
 		if (this.COMPAT is not (ETjaCompat.Jiro1 or ETjaCompat.TMG))
 			return false;

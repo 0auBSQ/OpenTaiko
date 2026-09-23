@@ -76,6 +76,11 @@ class NotesManager {
 		return (PxFromN4BeatsX(n4Beats.Real), PxFromN4BeatsY(n4Beats.Imaginary));
 	}
 
+	public static (double vx, double vy) GetNoteXYPerSec(Complex hispeed, double bpm, Complex scroll, EScrollMode eScrollMode) {
+		var th16BeatPerSec = 4 * bpm / 60 * hispeed;
+		return GetNoteXY(-1000, -th16BeatPerSec, bpm, scroll, eScrollMode);
+	}
+
 	public static double PxFromN4BeatsX(double n4Beats) {
 		int pxPer4Beats = OpenTaiko.Skin.Game_Notes_Interval;
 		double screenScale = OpenTaiko.Skin.Resolution[0] / 1280.0;
