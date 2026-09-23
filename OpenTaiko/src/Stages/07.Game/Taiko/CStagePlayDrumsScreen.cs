@@ -1205,7 +1205,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 
 			bool isBodyXInScreen = (Math.Min(x, xEnd) < OpenTaiko.Skin.Resolution[0] && Math.Max(x, xEnd) > 0 - OpenTaiko.Skin.Game_Notes_Size[0]);
 			if (pHasBar) {
-				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime, th16NowBeat);
+				this.HideObscuringRoll(nPlayer, pChip, x, y, xEnd, yEnd, isBodyXInScreen, msTjaNowTime);
 			}
 
 			#region[ HIDSUD & STEALTH ]
@@ -1325,29 +1325,20 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 		return pxFaceTxOffset;
 	}
 
-	/// Detect and hide screen-obscuring rolls when any tips are out of screen
-	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime, Complex th16NowBeat) {
-		// display judging and in-beat rolls
-		if ((long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime <= pChip.end.nSoundTimems) {
+	// Judge whether rolls are intended to obscure the screen, then detect and hide unintended obscuring rolls when any of its tips are out of screen
+	// Rolls are unintended to obscure the screen when
+	// 1. The referenced game/engine specified by COMPAT: will hide the roll
+	// 2. OpenTaiko draws the roll different from the referenced game/engine specified by COMPAT:
+	private void HideObscuringRoll(int iPlayer, CChip pChip, int xHead, int yHead, int xEnd, int yEnd, bool isBodyXInScreen, double msTjaNowTime) {
+		var tja = OpenTaiko.GetTJA(iPlayer)!;
+		var compat = tja.COMPAT;
+		// display non-stretchable (TJAP3/OOS default) or judging rolls
+		// Jiro2: future and past notes are hidden according to on-screen note count (unimplemented); currently needs detection
+		if (compat is CTja.ETjaCompat.TJAP3 or CTja.ETjaCompat.OOS
+			|| (long)msTjaNowTime >= pChip.nSoundTimems && (long)msTjaNowTime <= pChip.end.nSoundTimems
+			) {
 			pChip.canShowBody = true;
 			return;
-		}
-		var compat = OpenTaiko.GetTJA(iPlayer)!.COMPAT;
-		if (pChip.eScrollMode is EScrollMode.HBScroll or EScrollMode.BMScroll) {
-			var th16ChipBeat = pChip.fBMSCROLLTime;
-			var th16ChipEndBeat = pChip.end.fBMSCROLLTime;
-			if (compat is CTja.ETjaCompat.Jiro1) {
-				th16ChipBeat += pChip.bpmPoint!.th16BeatDrift;
-				th16ChipEndBeat += NotesManager.GetVelocityRefChip(pChip.end, compat).bpmPoint!.th16BeatDrift;
-			}
-			if ((th16NowBeat.Real >= th16ChipBeat.Real && th16NowBeat.Real <= th16ChipEndBeat.Real)
-					|| (th16ChipBeat.Imaginary != th16ChipEndBeat.Imaginary
-						&& th16NowBeat.Imaginary >= Math.Min(th16ChipBeat.Imaginary, th16ChipEndBeat.Imaginary)
-						&& th16NowBeat.Imaginary <= Math.Max(th16ChipBeat.Imaginary, th16ChipEndBeat.Imaginary))
-					) {
-				pChip.canShowBody = true;
-				return;
-			}
 		}
 
 		// ignore already out-of-screen rolls
@@ -1366,18 +1357,41 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			return;
 		}
 
+		if (compat is CTja.ETjaCompat.Jiro1 or CTja.ETjaCompat.TMG) {
+			// TaikoJiro1 & TaikoManyGimmicks behavior: Rolls are hidden after judgement and after both tips exited the screen
+			if (!headInScreen && !endInScreen && (long)msTjaNowTime > pChip.end.nSoundTimems) {
+				pChip.canShowBody = false;
+				return;
+			} else if (compat == CTja.ETjaCompat.TMG) {
+				// other rolls in TaikoManyGimmicks are intended to obscure to screen
+				pChip.canShowBody = true;
+				return;
+			}
+		}
+
 		// displacement per sec: the visual beat runs at #HISPEED × BPM
-		var vEnd = NotesManager.GetVelocityRefChip(pChip.end, compat);
+		var vEnd = pChip.end; // stretchable if reached here
 		var th16DBeatHead = -4 * pChip.dbBPM / 60 * pChip.dbHISPEED;
 		var th16DBeatEnd = -4 * vEnd.dbBPM / 60 * vEnd.dbHISPEED;
 		var (dxHeadD, dyHeadD) = NotesManager.GetNoteXY(-1000, th16DBeatHead, pChip.dbBPM, pChip.dbSCROLL, pChip.eScrollMode);
 		var (dxEndD, dyEndD) = NotesManager.GetNoteXY(-1000, th16DBeatEnd, vEnd.dbBPM, vEnd.dbSCROLL, vEnd.eScrollMode);
 		int dxHead = (int)dxHeadD, dyHead = (int)dyHeadD, dxEnd = (int)dxEndD, dyEnd = (int)dyEndD;
 
-		// get move speed near the judgement mark
-
 		var head = new Vector2(xHead, yHead);
 		var end = new Vector2(xEnd, yEnd);
+
+		// TaikoJiro1 behavior: "flipped" rolls' bar body is not drawn; other rolls are intended to obscure to screen
+		if (compat == CTja.ETjaCompat.Jiro1) {
+			var body = end - head;
+			var barForward = new Vector2(-dxHead, -dyHead);
+			var bodyProj = Vector2.Dot(body, barForward);
+			if (bodyProj >= 0) {
+				pChip.canShowBody = true;
+				return;
+			}
+		}
+
+		// get move speed near the judgement mark
 		var origin = new Vector2(this.GetNoteOriginX(iPlayer), this.GetNoteOriginY(iPlayer));
 		float pos = NearestLineSegRelPos(head, end, origin);
 
