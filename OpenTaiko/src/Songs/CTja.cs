@@ -3267,7 +3267,7 @@ internal class CTja : CActivity {
 	}
 
 	private void SetChipSudden(CChip chip) {
-		Func<double, double> roundMove = (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? ms => ms : Math.Truncate;
+		Func<double, double> roundMove = (this.COMPAT is ETjaCompat.TJAP3 or ETjaCompat.OOS) ? Math.Truncate : ms => ms;
 		bool isNonDefaultShowOffset = (Math.Abs(Math.Truncate(this.msSuddenShowOffset)) >= 1);
 		bool isNonDefaultMoveOffset = (Math.Abs(Math.Truncate(this.msSuddenMoveOffset)) >= 1);
 		chip.msShowOffset = (isNonDefaultShowOffset ? this.msSuddenShowOffset : double.PositiveInfinity);
