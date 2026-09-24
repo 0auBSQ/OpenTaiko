@@ -91,6 +91,7 @@
         "SONGSELECT_SC_PLAYER": "切换正在设置的玩家",
         "SONGSELECT_SC_SPEED_DOWN": "降低歌曲速度",
         "SONGSELECT_SC_SPEED_UP": "提高歌曲速度",
+        "SONGSELECT_SONG_SPEED": "歌曲速度",
         "SONGSELECT_SC_PLAYER_COUNT": "更改玩家人数",
         "SONGSELECT_BOX_BEGINNERS": "推荐给新手的歌曲",
 
@@ -162,6 +163,9 @@
         "TITLE_EXIT_DESC": "下次见！",
         "TITLE_ONLINE_LOBBY": "在线大厅",
         "TITLE_ONLINE_LOBBY_DESC": "（测试版，请只与你信任的人分享房间代码）",
+        "TITLE_ONLINE_OFF_TITLE": "在线游戏已关闭",
+        "TITLE_ONLINE_OFF_DESC": "在线游戏已关闭。要打开在线大厅，请在设置（{section}）中开启「{setting}」。请只与你信任的人进行在线游戏。",
+        "TITLE_ONLINE_OFF_OK": "确定",
         "TITLE_VAULT_LOCKED_DESC": "你能听见我吗……？",
         "TITLE_PLAYERS_PROMPT": "几位鼓手登上舞台？",
         "TITLE_PLAYERS_BACK": "返回",

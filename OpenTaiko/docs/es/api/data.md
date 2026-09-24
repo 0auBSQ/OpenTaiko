@@ -238,6 +238,7 @@ Las propiedades usan la sintaxis de punto (`CONFIG.PlayerCount`), los métodos l
 | `CONFIG.UseModernScoringMethod  -> bool` | Si el juego usa el método de puntuación moderno (shin-uchi). |
 | `CONFIG.UsedLegacyScoringMethod  -> int` | Generación de puntuación legacy (consulta `CONFIG.LEGACY_SCORING`), limitada a 0..3 al escribir. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Si el juego ignora las condiciones de desbloqueo de canciones. |
+| `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Si el jugador permitió las conexiones en línea en los ajustes («Permitir conexiones de LuaNetworking», desactivado por defecto). Los scripts no pueden cambiarlo. |
 | `CONFIG.SongSpeed  -> int` | Velocidad de la canción en veinteavos del multiplicador: 20 es 1.0x. Limitada a 2..200 (0.1x a 10x) al escribir. |
 | `CONFIG.MasterVolume  -> int` | Volumen maestro, limitado a 0..100 al escribir. |
 | `CONFIG.SoundEffectVolume  -> int` | Volumen de efectos de sonido, limitado a 0..100 al escribir. |

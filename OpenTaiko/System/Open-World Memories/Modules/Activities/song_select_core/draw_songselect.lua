@@ -83,7 +83,7 @@ local SONGINFO_SPEED_ORIGIN_X        = CFG.num("song_info.speed_origin_x", 1804)
 local SONGINFO_SPEED_LABEL_Y         = CFG.num("song_info.speed_label_y", 729)
 local SONGINFO_SPEED_VALUE_Y         = CFG.num("song_info.speed_value_y", 753)
 local SONGINFO_SPEED_ARROW_GAP       = CFG.num("song_info.speed_arrow_gap", 40)   -- between the two ▶ centres
-local SONGINFO_SPEED_LABEL           = CFG.str("song_info.speed_label", "Song speed")
+local SONGINFO_SPEED_LABEL           = CFG.str("song_info.speed_label", nil)   -- a skin's own text; else the localized one
 local SONGINFO_CHARTER_ORIGIN_X      = CFG.num("song_info.charter_origin_x", 1216)
 local SONGINFO_CHARTER_ORIGIN_Y      = CFG.num("song_info.charter_origin_y", 750)
 local SONGINFO_CHARTER_MWIDTH        = CFG.num("song_info.charter_max_width", 512)
@@ -200,7 +200,12 @@ local function drawSpeedNotice(sel)
         tex:SetOpacity(1)
         tex:SetColor(COL_WHITE)
     end
-    G.textSmall:Draw(SONGINFO_SPEED_LABEL, x, SONGINFO_SPEED_LABEL_Y, sel.bpmColor, nil, 1, 1, 0, "top")
+    if G.speedLabel == nil then
+        local ok, s = pcall(function() return THEME:GetSkinString("SONGSELECT_SONG_SPEED") end)
+        G.speedLabel = SONGINFO_SPEED_LABEL
+            or ((ok and type(s) == "string" and s ~= "" and s:sub(1, 1) ~= "[") and s or "Song speed")
+    end
+    G.textSmall:Draw(G.speedLabel, x, SONGINFO_SPEED_LABEL_Y, sel.bpmColor, nil, 1, 1, 0, "top")
     G.text:Draw(sel.speedText, x, SONGINFO_SPEED_VALUE_Y, sel.bpmColor, nil, 1, 1, 0, "top")
 end
 
@@ -666,7 +671,8 @@ function M.drawPanel()
     G.unlocks.drawCondsPanel()
     G.unlocks.drawVaultCondsPanel()
 
-    -- Nameplates
+    -- Nameplates (the online lobby shows its players itself)
+    if G.activeConfig.songOnly then return end
     local playerCount = CONFIG.PlayerCount
     G.highlightedPlayer = G.highlightedPlayer % playerCount
 

@@ -21,6 +21,9 @@
 | `INPUT:Released(input)  -> bool` | 入力が離されたフレームに true。 |
 | `INPUT:Releasing(input)  -> bool` | 入力が押されていない間 true。 |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | 毎フレーム呼びます。プレイヤーが入力を押している間、`interval_seconds` ごとに `callback()` を 1 回呼び (最初の呼び出しは 1 インターバル後)、プレイヤーが入力を離すと止まります。 |
+| `INPUT:GetBindingCount(input)  -> int` | プレイヤーがキーコンフィグでその入力に割り当てた数 (不明な名前は 0)。 |
+| `INPUT:GetBindingDevice(input, index)  -> string` | `index` (0 から count - 1) の割り当てのデバイス: Keyboard、Gamepad、Joystick、MidiIn、Mouse のいずれか。`index` が範囲外なら空文字列。 |
+| `INPUT:GetBindingName(input, index)  -> string` | 割り当てのキーまたはボタン: `KeyboardPressed` が受け取る形のキーボードのキー名 (Return、F)、ゲームパッドやジョイスティックが報告するボタン名 (A、Start、Button3)、MIDI ノート (C4[60])、または `MousePressed` が受け取る形のマウスボタン名。`index` が範囲外なら空文字列。 |
 
 ### キーボード
 

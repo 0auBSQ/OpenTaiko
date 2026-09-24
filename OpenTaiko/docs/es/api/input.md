@@ -21,6 +21,9 @@ Los nombres de las entradas del tambor son los nombres de la configuración de t
 | `INPUT:Released(input)  -> bool` | Verdadero en el fotograma en que la entrada se suelta. |
 | `INPUT:Releasing(input)  -> bool` | Verdadero mientras la entrada no está pulsada. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Llámalo cada fotograma. Mientras el jugador mantiene pulsada la entrada, llama a `callback()` una vez cada `interval_seconds` (la primera llamada llega tras un intervalo) y se detiene cuando el jugador suelta la entrada. |
+| `INPUT:GetBindingCount(input)  -> int` | Cuántas asignaciones dio el jugador a la entrada en la configuración de teclas (0 para un nombre desconocido). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | El dispositivo de la asignación en `index` (de 0 a count - 1): Keyboard, Gamepad, Joystick, MidiIn o Mouse. Una cadena vacía cuando `index` está fuera de rango. |
+| `INPUT:GetBindingName(input, index)  -> string` | La tecla o el botón de la asignación: un nombre de tecla tal como lo toma `KeyboardPressed` (Return, F), el nombre de botón que da el mando o el joystick (A, Start, Button3), una nota MIDI (C4[60]) o un nombre de botón del ratón tal como lo toma `MousePressed`. Una cadena vacía cuando `index` está fuera de rango. |
 
 ### Teclado
 

@@ -21,6 +21,9 @@
 | `INPUT:Released(input)  -> bool` | 输入松开的那一帧为 true。 |
 | `INPUT:Releasing(input)  -> bool` | 输入未按住期间为 true。 |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | 请每帧调用它。玩家按住输入期间，它每隔 `interval_seconds` 调用一次 `callback()`（第一次调用在一个间隔之后），并在玩家松开输入时停止。 |
+| `INPUT:GetBindingCount(input)  -> int` | 玩家在按键设置中为该输入设置的绑定数量（未知名称为 0）。 |
+| `INPUT:GetBindingDevice(input, index)  -> string` | `index`（0 到 count - 1）处绑定的设备：Keyboard、Gamepad、Joystick、MidiIn 或 Mouse 之一。`index` 超出范围时为空字符串。 |
+| `INPUT:GetBindingName(input, index)  -> string` | 绑定的按键或按钮：`KeyboardPressed` 所接受形式的键盘按键名（Return、F）、手柄或摇杆报告的按钮名（A、Start、Button3）、MIDI 音符（C4[60]），或 `MousePressed` 所接受形式的鼠标按钮名。`index` 超出范围时为空字符串。 |
 
 ### 键盘
 

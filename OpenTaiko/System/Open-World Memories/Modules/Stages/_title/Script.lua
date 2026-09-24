@@ -4,6 +4,7 @@
 local NavInput = require("NavInput")
 local EM       = require("EventMode")
 local PS       = require("player_select")
+local PopUI    = require("PopUI")
 
 -- ── Resources ─────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,7 @@ local function buildMenus()
     m[#m + 1] = {
         title = tr("TITLE_ONLINE_LOBBY", "Online Lobby"),
         desc  = tr("TITLE_ONLINE_LOBBY_DESC", "(Beta, Share your room code only with people you trust)"),
+        requiresOnline = true,
         c     = col(72, 36, 112),
         via   = "stage", stage = "onlinelobby",
     }
@@ -262,6 +264,53 @@ local function drawBoxes(alpha)
     end
 end
 
+-- ── Online notice ─────────────────────────────────────────────────────────────
+-- An entry marked requiresOnline is refused while online connections are off in the settings: a
+-- popup names the setting and its section instead (the engine's own words for both).
+
+local notice      = nil     -- the PopUI popup while it shows
+local noticeDone  = false   -- its OK was chosen
+local noticeFresh = false   -- skip its first update (the Decide that opened it)
+
+local function onlineAllowed()
+    local ok, v = pcall(function() return CONFIG.AreLuaNetworkingConnectionsAllowed end)
+    return not (ok and v == false)
+end
+
+local function engineString(key, fallback)
+    local ok, s = pcall(function() return LANG:GetString(key) end)
+    if ok and type(s) == "string" and s ~= "" and s ~= key then return s end
+    return fallback
+end
+
+local function closeNotice()
+    if notice then pcall(function() notice:disposeWidgets() end) end
+    notice, noticeDone = nil, false
+end
+
+local function openNotice()
+    closeNotice()
+    notice = PopUI.new{ navPlayer = 1 }
+    local msg = tr("TITLE_ONLINE_OFF_DESC",
+        "Online play is turned off. To open the Online Lobby, turn on \"{setting}\" in Settings ({section}). Only play online with people you trust.")
+    local setting = engineString("SETTINGS_SYSTEM_LUANETWORKING", "Allow LuaNetworking connections")
+    local section = engineString("SETTINGS_SYSTEM", "System")
+    msg = msg:gsub("{setting}", function() return setting end):gsub("{section}", function() return section end)
+    local PW, SIZE, LINE = 1000, 26, 40
+    local lines = notice:wrapLines(SIZE, msg, PW - 120)
+    local PH = 230 + #lines * LINE
+    local panel = notice:panel{ x = (1920 - PW) / 2, y = (1080 - PH) / 2, w = PW, h = PH, pad = 34,
+                                title = tr("TITLE_ONLINE_OFF_TITLE", "Online play is off") }
+    local cx, cy, cw = panel:content()
+    for i, line in ipairs(lines) do
+        notice:label{ x = cx + cw / 2, y = cy + 14 + (i - 1) * LINE, text = line, size = SIZE, align = "center", maxWidth = cw }
+    end
+    local ok = notice:button{ text = tr("TITLE_ONLINE_OFF_OK", "OK"), x = cx + cw / 2 - 120, y = cy + 34 + #lines * LINE,
+                              w = 240, h = 76, accent = true, onClick = function() noticeDone = true end }
+    for i, f in ipairs(notice.focusables) do if f == ok then notice:_setFocusIndex(i) end end
+    noticeDone, noticeFresh = false, true
+end
+
 -- ── Navigation helpers ────────────────────────────────────────────────────────
 
 local function moveMenu(d)
@@ -314,6 +363,7 @@ function activate()
 end
 
 function deactivate()
+    closeNotice()
     if sounds.BGM ~= nil then sounds.BGM:Stop() end
     PS.clearSounds()
 end
@@ -347,6 +397,11 @@ function draw()
         drawBgTile(PS.dim())
         PS.draw()
     end
+
+    if notice then
+        drawBgTile(0.6)
+        notice:draw()
+    end
 end
 
 -- ── Update ────────────────────────────────────────────────────────────────────
@@ -368,6 +423,17 @@ function update(ts)
             -- 20% chance every 100 ms → bursts roughly 2×/sec on average
             staticUntilMs = ts + math.random(150, 500)
         end
+    end
+
+    -- ── Online notice ─────────────────────────────────────────────────────────
+    if notice then
+        if noticeFresh then noticeFresh = false; return nil end
+        if notice:update(ts) == "cancel" or noticeDone then
+            sounds.Cancel:Play()
+            closeNotice()
+            holdDir = 0
+        end
+        return nil
     end
 
     -- ── Prompt mode ───────────────────────────────────────────────────────────
@@ -436,8 +502,13 @@ function update(ts)
 
     -- ── Decide ────────────────────────────────────────────────────────────────
     if NavInput.decide() then
-        sounds.Decide:Play()
         local m = menus[curIdx]
+        if m.requiresOnline and not onlineAllowed() then
+            pcall(function() SHARED:GetSharedSound("Error"):Play() end)
+            openNotice()
+            return nil
+        end
+        sounds.Decide:Play()
         if m.playerPrompt then
             inPrompt  = true
             PS.open(CONFIG.PlayerCount or 1)

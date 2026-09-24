@@ -238,6 +238,7 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG.UseModernScoringMethod  -> bool` | 게임이 현대식(신우치) 스코어링 방식을 사용하는지 여부. |
 | `CONFIG.UsedLegacyScoringMethod  -> int` | 레거시 스코어링 세대(`CONFIG.LEGACY_SCORING` 참고). 쓸 때 0..3으로 제한됩니다. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | 게임이 곡 잠금 해제 조건을 무시하는지 여부. |
+| `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | 플레이어가 설정에서 온라인 연결을 허용했는지 여부(「LuaNetworking 연결 허용」, 기본값은 꺼짐). 스크립트에서는 변경할 수 없습니다. |
 | `CONFIG.SongSpeed  -> int` | 곡 속도(배율의 1/20 단위: 20이 1.0x). 쓸 때 2..200(0.1x에서 10x)으로 제한됩니다. |
 | `CONFIG.MasterVolume  -> int` | 마스터 볼륨. 쓸 때 0..100으로 제한됩니다. |
 | `CONFIG.SoundEffectVolume  -> int` | 효과음 볼륨. 쓸 때 0..100으로 제한됩니다. |

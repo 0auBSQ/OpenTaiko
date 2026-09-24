@@ -238,6 +238,7 @@ SHARED:GetSharedSound("Decide"):Play()
 | `CONFIG.UseModernScoringMethod  -> bool` | ゲームが新方式 (真打) のスコア計算を使うかどうか。 |
 | `CONFIG.UsedLegacyScoringMethod  -> int` | 旧方式のスコア計算の世代 (`CONFIG.LEGACY_SCORING` を参照)。書き込み時に 0..3 に制限されます。 |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | ゲームが楽曲のアンロック条件を無視するかどうか。 |
+| `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | プレイヤーが設定でオンライン接続を許可しているかどうか（「LuaNetworking接続を許可」、既定はオフ）。スクリプトからは変更できません。 |
 | `CONFIG.SongSpeed  -> int` | 曲速度 (倍率の 20 分の 1 単位): 20 が 1.0x。書き込み時に 2..200 (0.1x から 10x) に制限されます。 |
 | `CONFIG.MasterVolume  -> int` | マスター音量。書き込み時に 0..100 に制限されます。 |
 | `CONFIG.SoundEffectVolume  -> int` | 効果音の音量。書き込み時に 0..100 に制限されます。 |

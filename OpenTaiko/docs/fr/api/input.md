@@ -21,6 +21,9 @@ Les noms d'entrée tambour sont les noms de la configuration des touches, compar
 | `INPUT:Released(input)  -> bool` | Vrai sur la frame où l'entrée est relâchée. |
 | `INPUT:Releasing(input)  -> bool` | Vrai tant que l'entrée n'est pas maintenue. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Appelez-la à chaque frame. Tant que le joueur maintient l'entrée, elle appelle `callback()` une fois toutes les `interval_seconds` (le premier appel vient après un intervalle) et s'arrête quand le joueur relâche l'entrée. |
+| `INPUT:GetBindingCount(input)  -> int` | Le nombre d'assignations que le joueur a données à l'entrée dans la configuration des touches (0 pour un nom inconnu). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | Le périphérique de l'assignation à `index` (de 0 à count - 1) : Keyboard, Gamepad, Joystick, MidiIn ou Mouse. Une chaîne vide quand `index` est hors limites. |
+| `INPUT:GetBindingName(input, index)  -> string` | La touche ou le bouton de l'assignation : un nom de touche clavier tel que `KeyboardPressed` le prend (Return, F), le nom de bouton que donne la manette ou le joystick (A, Start, Button3), une note MIDI (C4[60]) ou un nom de bouton de souris tel que `MousePressed` le prend. Une chaîne vide quand `index` est hors limites. |
 
 ### Clavier
 

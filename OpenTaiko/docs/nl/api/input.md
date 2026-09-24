@@ -21,6 +21,9 @@ Namen van druminvoer zijn de namen uit de toetsconfiguratie, vergeleken zonder o
 | `INPUT:Released(input)  -> bool` | True in het frame waarin de invoer wordt losgelaten. |
 | `INPUT:Releasing(input)  -> bool` | True terwijl de invoer niet ingedrukt is. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Roep het elk frame aan. Terwijl de speler de invoer ingedrukt houdt, roept het eenmaal per `interval_seconds` `callback()` aan (de eerste aanroep komt na één interval) en het stopt wanneer de speler de invoer loslaat. |
+| `INPUT:GetBindingCount(input)  -> int` | Hoeveel toewijzingen de speler de invoer in de toetsconfiguratie heeft gegeven (0 voor een onbekende naam). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | Het apparaat van de toewijzing op `index` (0 tot count - 1): Keyboard, Gamepad, Joystick, MidiIn of Mouse. Een lege string wanneer `index` buiten bereik ligt. |
+| `INPUT:GetBindingName(input, index)  -> string` | De toets of knop van de toewijzing: een toetsnaam zoals `KeyboardPressed` hem neemt (Return, F), de knopnaam die de gamepad of joystick doorgeeft (A, Start, Button3), een MIDI-noot (C4[60]) of een muisknopnaam zoals `MousePressed` hem neemt. Een lege string wanneer `index` buiten bereik ligt. |
 
 ### Toetsenbord
 

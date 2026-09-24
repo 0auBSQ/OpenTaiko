@@ -55,6 +55,21 @@ local function reloadPreimage(songNode)
 end
 
 local function playPreview(songNode)
+    -- the online lobby's preview of this song is already playing: it goes on instead of starting over
+    if G.activeConfig.songOnly and songNode.IsSong == true and SHARED:GetSharedString("presound_path") == songNode.AudioPath then
+        local snd = SHARED:GetSharedSound("presound")
+        if snd ~= nil and snd.Loaded and snd.IsPlaying then
+            G.ctx["throttle_presound"] = COUNTER:EmptyCounter()
+            local speed = CONFIG.SONGSPEED:ToActual(CONFIG.SongSpeed)
+            G.previewDurationMs   = snd:GetDurationMs()
+            G.previewDemoStartRaw = songNode.DemoStart
+            G.previewDemoStart    = math.floor(songNode.DemoStart / speed)
+            G.previewFadeTarget   = 100
+            G.previewWasPlaying   = true
+            G.previewLoaded       = true
+            return
+        end
+    end
     G.previewLoaded         = false
     G.previewDurationMs     = 0
     G.previewDemoStartRaw   = 0
@@ -75,6 +90,7 @@ local function playPreview(songNode)
             -- a folder). Only load the preview if this node is still the selected one.
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
             local demoStart = songNode.DemoStart
+            SHARED:SetSharedString("presound_path", songNode.AudioPath)
             SHARED:SetSharedPreviewUsingAbsolutePath("presound", songNode.AudioPath, function(snd)
                 -- The load is async too: bail if the selection moved on while it was loading, so a stale
                 -- preview never starts playing over the next box. (Just don't Play — the load doesn't

@@ -93,6 +93,7 @@
         "SONGSELECT_SC_PLAYER": "Switch the player being set up",
         "SONGSELECT_SC_SPEED_DOWN": "Lower the song speed",
         "SONGSELECT_SC_SPEED_UP": "Raise the song speed",
+        "SONGSELECT_SONG_SPEED": "Song speed",
         "SONGSELECT_SC_PLAYER_COUNT": "Change the number of players",
         "SONGSELECT_BOX_BEGINNERS": "Recommended songs for beginners",
 
@@ -164,6 +165,9 @@
         "TITLE_EXIT_DESC": "See you next time!",
         "TITLE_ONLINE_LOBBY": "Online Lobby",
         "TITLE_ONLINE_LOBBY_DESC": "(Beta, Share your room code only with people you trust)",
+        "TITLE_ONLINE_OFF_TITLE": "Online play is off",
+        "TITLE_ONLINE_OFF_DESC": "Online play is turned off. To open the Online Lobby, turn on \"{setting}\" in Settings ({section}). Only play online with people you trust.",
+        "TITLE_ONLINE_OFF_OK": "OK",
         "TITLE_VAULT_LOCKED_DESC": "Can you hear me...?",
         "TITLE_PLAYERS_PROMPT": "How many drummers take the stage?",
         "TITLE_PLAYERS_BACK": "Back",

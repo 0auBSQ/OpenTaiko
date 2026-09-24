@@ -87,6 +87,11 @@ namespace OpenTaiko {
 		public bool AreSongUnlockablesDisabled {
 			get => OpenTaiko.ConfigIni.bIgnoreSongUnlockables;
 		}
+
+		// Whether the player allowed online connections in the settings; there is no setter on purpose
+		public bool AreLuaNetworkingConnectionsAllowed {
+			get => OpenTaiko.ConfigIni.bAllowLuaNetworkingConnections;
+		}
 		#endregion
 
 		#region [Gameplay mods]

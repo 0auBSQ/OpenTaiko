@@ -238,6 +238,7 @@ Eigenschappen gebruiken puntsyntaxis (`CONFIG.PlayerCount`), methoden gebruiken 
 | `CONFIG.UseModernScoringMethod  -> bool` | Of het spel de moderne (shin-uchi) scoreberekening gebruikt. |
 | `CONFIG.UsedLegacyScoringMethod  -> int` | Generatie van de legacy-scoreberekening (zie `CONFIG.LEGACY_SCORING`), bij schrijven begrensd op 0..3. |
 | `CONFIG.AreSongUnlockablesDisabled  -> bool (read-only)` | Of het spel ontgrendelvoorwaarden van nummers negeert. |
+| `CONFIG.AreLuaNetworkingConnectionsAllowed  -> bool (read-only)` | Of de speler onlineverbindingen heeft toegestaan in de instellingen („LuaNetworking-verbindingen toestaan”, standaard uit). Scripts kunnen dit niet wijzigen. |
 | `CONFIG.SongSpeed  -> int` | Nummersnelheid in twintigsten van de factor: 20 is 1,0x. Bij schrijven begrensd op 2..200 (0,1x tot 10x). |
 | `CONFIG.MasterVolume  -> int` | Hoofdvolume, bij schrijven begrensd op 0..100. |
 | `CONFIG.SoundEffectVolume  -> int` | Volume van geluidseffecten, bij schrijven begrensd op 0..100. |

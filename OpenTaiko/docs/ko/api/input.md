@@ -21,6 +21,9 @@
 | `INPUT:Released(input)  -> bool` | 입력이 떼어지는 프레임에 true. |
 | `INPUT:Releasing(input)  -> bool` | 입력이 눌려 있지 않은 동안 true. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | 매 프레임 호출하십시오. 플레이어가 입력을 누르고 있는 동안 `interval_seconds`마다 `callback()`을 한 번 호출하고(첫 호출은 한 간격 뒤), 플레이어가 입력을 떼면 멈춥니다. |
+| `INPUT:GetBindingCount(input)  -> int` | 플레이어가 키 설정에서 그 입력에 지정한 개수(알 수 없는 이름은 0). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | `index`(0부터 count - 1) 위치 지정의 장치: Keyboard, Gamepad, Joystick, MidiIn, Mouse 중 하나. `index`가 범위를 벗어나면 빈 문자열. |
+| `INPUT:GetBindingName(input, index)  -> string` | 지정의 키 또는 버튼: `KeyboardPressed`가 받는 형태의 키보드 키 이름(Return, F), 게임패드나 조이스틱이 알려 주는 버튼 이름(A, Start, Button3), MIDI 노트(C4[60]), 또는 `MousePressed`가 받는 형태의 마우스 버튼 이름. `index`가 범위를 벗어나면 빈 문자열. |
 
 ### 키보드
 

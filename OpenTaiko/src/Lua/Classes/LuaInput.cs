@@ -40,6 +40,42 @@ namespace OpenTaiko {
 		public bool Releasing(string input)
 			=> Enum.TryParse<EKeyConfigPad>(input, true, out var pad)
 				&& OpenTaiko.Pad.IsReleasing(EKeyConfigPart.Taiko, pad);
+
+		// What the player bound to a general input in the key config, for showing it (in the order of the key config)
+		private static List<CConfigIni.CKeyAssign.STKEYASSIGN> Bindings(string input) {
+			var list = new List<CConfigIni.CKeyAssign.STKEYASSIGN>();
+			if (!Enum.TryParse<EKeyConfigPad>(input, true, out var pad) || pad < 0) return list;
+			var part = CPad.ResolveKeyConfigPart(EKeyConfigPart.Taiko, pad);
+			if (part == EKeyConfigPart.Unknown) return list;
+			foreach (var k in OpenTaiko.ConfigIni.KeyAssign[(int)part][(int)pad])
+				if (k.InputDevice != InputDeviceType.Unknown) list.Add(k);
+			return list;
+		}
+		public int GetBindingCount(string input) => Bindings(input).Count;
+		// "Keyboard", "Gamepad", "Joystick", "MidiIn" or "Mouse"; "" out of range
+		public string GetBindingDevice(string input, int index) {
+			var list = Bindings(input);
+			return (index >= 0 && index < list.Count) ? list[index].InputDevice.ToString() : "";
+		}
+		// a keyboard key as KeyboardPressed takes it ("Return"), the device's button name, a MIDI note, or a mouse
+		// button as MousePressed takes it; "" out of range
+		public string GetBindingName(string input, int index) {
+			var list = Bindings(input);
+			if (index < 0 || index >= list.Count) return "";
+			var k = list[index];
+			switch (k.InputDevice) {
+				case InputDeviceType.Keyboard:
+					return Enum.IsDefined(typeof(SlimDXKeys.Key), k.Code) ? ((SlimDXKeys.Key)k.Code).ToString() : k.Code.ToString();
+				case InputDeviceType.MidiIn:
+					return CInputMIDI.GetButtonName(k.Code);
+				case InputDeviceType.Mouse:
+					return k.Code switch { 0 => "left", 1 => "right", 2 => "middle", 3 => "button4", 4 => "button5", _ => k.Code.ToString() };
+				default:
+					var device = OpenTaiko.InputManager.FindDevice(k.InputDevice, k.ID);
+					return device?.GetButtonName(k.Code) ?? $"Button{k.Code}";
+			}
+		}
+
 		// Keyboard inputs
 		public bool KeyboardPressed(string key) {
 			if (Enum.TryParse(typeof(SlimDXKeys.Key), key, true, out var result)) {

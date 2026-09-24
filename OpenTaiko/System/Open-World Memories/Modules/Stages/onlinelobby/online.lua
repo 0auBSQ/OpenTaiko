@@ -8,20 +8,44 @@
 -- snapped from the wire (OnlinePlaySync). Loading + finish are barrier-synced; results sync + host rotates.
 
 local LO = {}
+local I18N = require("i18n")
+local T = I18N.texts("lobby")     -- lang/<code>/lobby.json
+
+-- the lobby's texts, looked up once per visit (LO.resetTexts on activate); the engine's own words for the
+-- difficulty names
+local texts = {}
+function LO.tr(id)
+    local s = texts[id]
+    if s == nil then s = T:tr(id); texts[id] = s end
+    return s
+end
+function LO.trf(id, ...) return string.format(LO.tr(id), ...) end
+local DIFF_KEYS = { [0] = "DIFF_EASY", [1] = "DIFF_NORMAL", [2] = "DIFF_HARD", [3] = "DIFF_EX", [4] = "DIFF_EXTRA" }
+local DIFF_FALLBACK = { [0] = "Easy", [1] = "Normal", [2] = "Hard", [3] = "Extreme", [4] = "Extra" }
+local diffNames = {}
+function LO.diffName(d)
+    local s = diffNames[d]
+    if s == nil then
+        local ok, v = pcall(function() return LANG:GetString(DIFF_KEYS[d]) end)
+        s = (ok and type(v) == "string" and v ~= "" and v ~= DIFF_KEYS[d]) and v or (DIFF_FALLBACK[d] or "?")
+        diffNames[d] = s
+    end
+    return s
+end
+function LO.resetTexts() I18N.detect(); texts, diffNames = {}, {} end
 
 LO.net = {
     online = false, isHost = false, connecting = false, roomGone = false, code = nil, msg = nil,
     nameByPeer = {}, infoByPeer = {}, diffByPeer = {}, modByPeer = {}, readyByPeer = {}, resultByPeer = {},
     lackByPeer = {}, watchByPeer = {},
     song = nil,                       -- {uid, title, diff, speed, dyn(0/1)}
-    songLevels = {}, iLackSong = false,
+    songLevels = {}, songPlus = {}, iLackSong = false,
     goSignal = false, songChanged = false,
     resultsT = 0, resultsReadyT = nil,
 }
 local net = LO.net
 local floor = math.floor
 LO.MAXP = 5
-LO.DIFF_NAMES = { [0] = "Easy", [1] = "Normal", [2] = "Hard", [3] = "Oni", [4] = "Edit" }
 local function defMods() return { r = 0, st = 0, ju = 0, tz = 2, ss = 9 } end   -- none / normal timing / x1 scroll
 
 -- ── identity ────────────────────────────────────────────────────────────────────────────────────
@@ -95,19 +119,42 @@ function LO.resolveTitle(uid)
     local node = findSong(uid); if not node then return nil end
     local ok, t = pcall(function() return node.Title end); return ok and t or nil
 end
-function LO.stopPreview() pcall(function() SHARED:SetSharedPreview("presound", "Sounds/empty.ogg") end) end
+-- the shared preview slot; "presound_path" names the audio in it, so the lobby and its song select hand
+-- a playing preview over instead of starting it again
+function LO.stopPreview()
+    pcall(function() SHARED:SetSharedPreview("presound", "Sounds/empty.ogg"); SHARED:SetSharedString("presound_path", "") end)
+end
 
 -- load the chosen song's jacket (SHARED "preimage"), start its preview, and read its difficulty levels.
 -- Sets net.iLackSong when this client doesn't have the song. Safe to call on host + guests.
 local function setBorder(t) pcall(function() t:SetWrapMode("Border") end) end
 local function placeholderPreimage() pcall(function() SHARED:SetSharedTexture("preimage", "Textures/preimage.png", setBorder) end) end
-local function loadSongMedia()
-    net.songLevels = {}; net.iLackSong = true; net.songSubtitle = nil
-    net.previewLoaded = false; net.previewDemoStart = 0; net.previewSpeed = 1.0; net.previewCool = 0
+-- the song's preview at the room's speed from its demo start; when that audio is already playing (the song
+-- select hands it back after browsing it) it just keeps going
+local function startPreview(node)
+    local spd = net.song.speed and CONFIG.SONGSPEED:ToActual(net.song.speed) or 1
+    net.previewSpeed = spd
+    net.previewDemoStart = floor((node.DemoStart or 0) / spd)
+    local cur = SHARED:GetSharedSound("presound")
+    if SHARED:GetSharedString("presound_path") == node.AudioPath and cur ~= nil and cur.Loaded and cur.IsPlaying then
+        cur:SetSpeed(spd); cur:SetVolume(100)
+        net.previewLoaded = true
+        return
+    end
     LO.stopPreview()
-    if not net.song then placeholderPreimage(); return end
+    SHARED:SetSharedString("presound_path", node.AudioPath)
+    SHARED:SetSharedPreviewUsingAbsolutePath("presound", node.AudioPath, function(snd)
+        snd:SetSpeed(spd); snd:SetVolume(100); snd:Play(); snd:SetTimestamp(net.previewDemoStart)
+        net.previewLoaded = true
+    end)
+end
+
+local function loadSongMedia()
+    net.songLevels, net.songPlus = {}, {}; net.iLackSong = true; net.songSubtitle = nil; net.songBpm = nil
+    net.previewLoaded = false; net.previewDemoStart = 0; net.previewSpeed = 1.0; net.previewCool = 0
+    if not net.song then LO.stopPreview(); placeholderPreimage(); return end
     local node = findSong(net.song.uid)
-    if not node then net.iLackSong = true; placeholderPreimage(); return end
+    if not node then LO.stopPreview(); net.iLackSong = true; placeholderPreimage(); return end
     net.iLackSong = false
     pcall(function() net.songSubtitle = node.Subtitle end)
     -- jacket via the shared "preimage" texture. We do NOT ClearSharedTexture first: Clear bumps the resource's
@@ -117,16 +164,29 @@ local function loadSongMedia()
         if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)
         else placeholderPreimage() end
     end)
-    for d = 0, 4 do pcall(function() if node.score[d] ~= nil then net.songLevels[d] = node.nLevel[d] end end) end
-    pcall(function()
-        local spd = net.song.speed and CONFIG.SONGSPEED:ToActual(net.song.speed) or 1
-        net.previewSpeed = spd
-        net.previewDemoStart = floor((node.DemoStart or 0) / spd)
-        SHARED:SetSharedPreviewUsingAbsolutePath("presound", node.AudioPath, function(snd)
-            snd:SetSpeed(spd); snd:Play(); snd:SetTimestamp(net.previewDemoStart)
-            net.previewLoaded = true
+    for d = 0, 4 do
+        pcall(function()
+            local c = node:GetChart(d)
+            if c ~= nil then
+                net.songLevels[d] = c.Level; net.songPlus[d] = c.IsPlus == true
+                if net.songBpm == nil then net.songBpm = c.BaseBPM end
+            end
         end)
+    end
+    pcall(function() startPreview(node) end)
+end
+
+-- back from the song select without a new song: the room's jacket and preview again (the preview keeps
+-- playing when the song select was still on it)
+function LO.restoreMedia()
+    if not net.song or net.iLackSong then return end
+    local node = findSong(net.song.uid)
+    if not node then return end
+    pcall(function()
+        if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)
+        else placeholderPreimage() end
     end)
+    pcall(function() startPreview(node) end)
 end
 -- loop the lobby preview (call each frame in lobby/results; song select owns its own preview). Replays from the
 -- demo start when the preview finishes, with a short cooldown to avoid double-seeking the same restart.
@@ -185,6 +245,7 @@ function LO.refreshRoster()
         end
     end
     net.nameByPeer = names
+    LO.mountRemotes()
     for id in pairs(net.diffByPeer) do
         if not names[id] then
             net.diffByPeer[id] = nil; net.modByPeer[id] = nil; net.readyByPeer[id] = nil
@@ -200,38 +261,47 @@ local function reset()
     net.code = nil
     net.nameByPeer, net.infoByPeer, net.diffByPeer, net.modByPeer, net.readyByPeer = {}, {}, {}, {}, {}
     net.resultByPeer, net.lackByPeer, net.watchByPeer = {}, {}, {}
-    net.song = nil; net.songLevels = {}; net.iLackSong = false
+    net.song = nil; net.songLevels = {}; net.songPlus = {}; net.iLackSong = false
     net.goSignal = false; net.songChanged = false
     net.resultsT, net.resultsReadyT = 0, nil
     LO.stopPreview()
 end
 local function clearLobbyAuto() pcall(function() for sp = 0, 4 do CONFIG:SetAutoStatus(sp, false) end end) end   -- no stray Auto icon online
+-- the reason NET queued for a refused host (read before any room exists, so drain never sees it)
+local function takeError()
+    local why = nil
+    while true do
+        local e = NET:Poll(); if e == nil then break end
+        if e.Type == "error" then why = e.Data end
+    end
+    return why
+end
 function LO.host()
     clearLobbyAuto()
     NET:SetLocalPlayer(LO.selfInfo())
     local code = NET:CreateRoom("onlinelobby", "", LO.MAXP)
-    if not code or code == "" then net.msg = "Could not open the room."; return false end
+    if not code or code == "" then net.msg = takeError() or LO.tr("msg_open_failed"); return false end
     net.code, net.online, net.isHost, net.connecting = code, true, true, false
     net.nameByPeer, net.infoByPeer, net.diffByPeer, net.modByPeer, net.readyByPeer = {}, {}, {}, {}, {}
     STORAGE:WriteLobbyCode("lobby.txt", code)
     STORAGE:RevealLobbyCodes()
     LO.refreshRoster()
-    net.msg = "Room open! The code was saved to a folder - share it so friends can join."
+    net.msg = LO.tr("msg_room_open")
     return true
 end
 function LO.join(code)
     code = (code or ""):gsub("%s", "")
-    if code == "" then net.msg = "No code entered."; return false end
+    if code == "" then net.msg = LO.tr("msg_no_code"); return false end
     local sid = NET:PeekStageId(code)
-    if sid ~= "onlinelobby" then net.msg = sid and ("That code is for a '" .. sid .. "' room.") or "That code isn't valid."; return false end
+    if sid ~= "onlinelobby" then net.msg = sid and LO.trf("msg_code_other", sid) or LO.tr("msg_code_invalid"); return false end
     NET:SetLocalPlayer(LO.selfInfo())
     net.connecting, net.isHost = true, false
     net.nameByPeer, net.infoByPeer, net.diffByPeer, net.modByPeer, net.readyByPeer = {}, {}, {}, {}, {}
     NET:JoinRoom(code)
-    net.msg = "Connecting…"
+    net.msg = LO.tr("connecting")
     return true
 end
-function LO.leave() if net.online or net.connecting then NET:Leave() end reset() end
+function LO.leave() if net.online or net.connecting then NET:Leave() end reset(); LO.restoreSpots() end
 
 -- ── selections ────────────────────────────────────────────────────────────────────────────────────
 local function songJson(s)
@@ -245,10 +315,32 @@ function LO.availDiffs()
     if #a == 0 then a = { 0, 1, 2, 3, 4 } end
     return a
 end
-function LO.cycleDiff(dir)
-    local a = LO.availDiffs(); local cur = net.diffByPeer[NET:SelfId()] or 1
-    local idx = 1; for i, d in ipairs(a) do if d == cur then idx = i end end
-    LO.setDiff(a[((idx - 1 + dir) % #a) + 1])
+function LO.diffAvailable(d)
+    for _, a in ipairs(LO.availDiffs()) do if a == d then return true end end
+    return false
+end
+-- the difficulty nearest to d among those the song has (the lower one on a tie)
+function LO.nearestDiff(d)
+    local best, bestDist = d, math.huge
+    for _, a in ipairs(LO.availDiffs()) do
+        local dist = math.abs(a - d)
+        if dist < bestDist then best, bestDist = a, dist end
+    end
+    return best
+end
+-- move my difficulty to the next one the song has in that direction; false at the end of the row
+function LO.stepDiff(dir)
+    local d = LO.myDiff() + dir
+    while d >= 0 and d <= 4 do
+        if LO.diffAvailable(d) then LO.setDiff(d); return true end
+        d = d + dir
+    end
+    return false
+end
+-- keep my difficulty on one the song has (called every lobby frame; broadcasts only when it moves)
+function LO.fixDiff()
+    local cur = LO.myDiff()
+    if not LO.diffAvailable(cur) then LO.setDiff(LO.nearestDiff(cur)) end
 end
 -- apply a freshly-set/received song: clear ready, load media (jacket/preview/levels), check have, broadcast have,
 -- and snap my difficulty to one the song actually offers.
@@ -256,9 +348,7 @@ local function applySong()
     for id in pairs(net.readyByPeer) do net.readyByPeer[id] = false end
     net.songChanged = true
     loadSongMedia()
-    local a = LO.availDiffs(); local cur = net.diffByPeer[NET:SelfId()] or 1; local ok = false
-    for _, d in ipairs(a) do if d == cur then ok = true end end
-    if not ok then LO.setDiff(a[1]) end
+    LO.fixDiff()
     NET:Broadcast("have", string.format('{"h":%s}', net.iLackSong and "false" or "true"))
 end
 function LO.setSong(uid, title, diff, speed, dyn)
@@ -268,13 +358,18 @@ function LO.setSong(uid, title, diff, speed, dyn)
 end
 function LO.adjustSpeed(delta)
     if not net.song then return end
+    LO.setSpeed((net.song.speed or CONFIG.SONGSPEED.Normal) + delta)
+end
+-- the controller's song speed; the song select's speed keys and the lobby's share it through CONFIG.SongSpeed
+function LO.setSpeed(sp)
+    if not net.song then return end
     local SPEED = CONFIG.SONGSPEED
-    local sp = (net.song.speed or SPEED.Normal) + delta
     local actual = SPEED:ToActual(sp)
     if actual < 0.1 then actual = 0.1; sp = SPEED:FromActual(actual)
     elseif actual > 10 then actual = 10; sp = SPEED:FromActual(actual)
     end
     net.song.speed = sp
+    if LO.amController() then pcall(function() CONFIG.SongSpeed = sp end) end
     -- apply to the live host preview immediately (guests pick it up via the song rebroadcast → applySong reload)
     net.previewSpeed = actual
     pcall(function() local snd = SHARED:GetSharedSound("presound"); if snd then snd:SetSpeed(actual) end end)
@@ -320,11 +415,63 @@ function LO.myReady() return net.readyByPeer[NET:SelfId()] == true end
 function LO.myDiff() return net.diffByPeer[NET:SelfId()] or 1 end
 
 -- the controller can start whenever a song is chosen (even if some players aren't ready yet)
-function LO.canStart() return LO.amController() and net.song ~= nil and LO.count() >= 2 end
+-- why the controller cannot start yet: "need_song", "need_players", or nil when it can
+function LO.startProblem()
+    if net.song == nil then return "need_song" end
+    if LO.count() < 2 then return "need_players" end
+    return nil
+end
+function LO.canStart() return LO.amController() and LO.startProblem() == nil end
 function LO.hostStart()
     if not LO.canStart() then return false end
     NET:Broadcast("go", "{}"); net.goSignal = true
     return true
+end
+
+-- ── remote players on the local spots ─────────────────────────────────────────────────────────────
+-- The others take the local game's spots 2-5 (virtual slots V1-V4) in the order a round mounts them, as
+-- soon as they are in the room: the lobby shows their nameplates, and their characters are loaded before
+-- the song starts. Leaving the room gives the spots back to the local save files.
+local mountedKey, mountedAny = nil, false
+LO.spotOf = {}
+function LO.mountRemotes()
+    local me = NET:SelfId()
+    local others = {}
+    for _, id in ipairs(LO.peerIds()) do if id ~= me then others[#others + 1] = id end end
+    local spots, key = { [me] = 0 }, ""
+    for i, id in ipairs(others) do
+        if i > LO.MAXP - 1 then break end
+        spots[id] = i
+        local inf = net.infoByPeer[id] or {}
+        key = key .. id .. "|" .. tostring(inf.name) .. "|" .. tostring(inf.npid) .. "|" .. tostring(inf.char) .. "|"
+            .. tostring(inf.title) .. "|" .. tostring(inf.dan) .. ";"
+    end
+    LO.spotOf = spots
+    if key == mountedKey then return end
+    mountedKey = key
+    pcall(function()
+        for i, id in ipairs(others) do
+            if i > LO.MAXP - 1 then break end
+            local inf = net.infoByPeer[id] or {}
+            VIRTUALSLOTS:SetCharacter(i, inf.char or "None")
+            VIRTUALSLOTS:SetPuchichara(i, inf.puchi or "None")
+            VIRTUALSLOTS:SetNameplateName(i, inf.name or ("P" .. id))
+            VIRTUALSLOTS:SetNameplateTitle(i, inf.title or "")
+            VIRTUALSLOTS:SetNameplateDan(i, inf.dan or "")
+            if (inf.npid or -1) >= 0 then VIRTUALSLOTS:SetNameplateById(i, inf.npid) end
+            VIRTUALSLOTS:SetNameplateDanType(i, inf.dtype or 0)
+            VIRTUALSLOTS:SetNameplateDanGold(i, inf.dgold and true or false)
+            VIRTUALSLOTS:MountSlot(i + 1, "V" .. i)
+            mountedAny = true
+        end
+    end)
+end
+function LO.restoreSpots()
+    mountedKey = nil
+    LO.spotOf = {}
+    if not mountedAny then return end
+    mountedAny = false
+    pcall(function() for p = 2, LO.MAXP do VIRTUALSLOTS:MountSlot(p, p .. "P") end end)
 end
 
 -- ── play launch ─────────────────────────────────────────────────────────────────────────────────────
@@ -351,7 +498,7 @@ function LO.launchPlay()
     end)
     local mounted = false
     pcall(function() mounted = node:Mount(diffOf(1), diffOf(2), diffOf(3), diffOf(4), diffOf(5)) end)
-    if not mounted then net.msg = "Could not load the chart."; return false end
+    if not mounted then net.msg = LO.tr("msg_chart_failed"); return false end
     pcall(function()
         for i = 2, N do
             local id = order[i]; local inf = net.infoByPeer[id] or {}
@@ -419,7 +566,7 @@ end
 function LO.nextRound()
     if NET:IsHost() then NET:RotateHost() end
     LO.setWatching(false)
-    net.resultByPeer = {}; net.song = nil; net.songLevels = {}; net.iLackSong = false; net.goSignal = false
+    net.resultByPeer = {}; net.song = nil; net.songLevels = {}; net.songPlus = {}; net.iLackSong = false; net.goSignal = false
     net.resultsT, net.resultsReadyT = 0, nil
     for id in pairs(net.readyByPeer) do net.readyByPeer[id] = false end
     LO.stopPreview()
@@ -446,7 +593,7 @@ function LO.drain()
         elseif ty == "roomclosed" then
             net.roomGone = true
         elseif ty == "error" then
-            net.msg = e.Data or "Network error."; if not net.online then net.connecting = false end
+            net.msg = e.Data or LO.tr("msg_network_error"); if not net.online then net.connecting = false end
         elseif ty == "message" then
             local ch = e.Channel; local s = JSONLOADER:JsonParseStringAny(e.Data)
             if ch == "song" and s then

@@ -119,4 +119,78 @@ for k, v in pairs(NavInput.p[""]) do
     NavInput[k] = v
 end
 
+-- ─── What a binding answers to, for hints ─────────────────────────────────────
+
+-- SlimDX key names that read better than their enum name; letters, digits and function keys pass through
+local KEY_NAMES = {
+    LeftControl = "L-Ctrl", RightControl = "R-Ctrl", LeftShift = "L-Shift", RightShift = "R-Shift",
+    LeftAlt = "L-Alt", RightAlt = "R-Alt", Return = "Enter", Escape = "Esc", Back = "Backspace",
+    UpArrow = "Up", DownArrow = "Down", LeftArrow = "Left", RightArrow = "Right",
+    PageUp = "PgUp", PageDown = "PgDn", Insert = "Ins", Delete = "Del", CapsLock = "Caps",
+    Grave = "`", Minus = "-", Equals = "=", LeftBracket = "[", RightBracket = "]", Semicolon = ";",
+    Apostrophe = "'", Backslash = "\\", Comma = ",", Period = ".", Slash = "/",
+    NumberPadEnter = "Num Enter", NumberPadPlus = "Num +", NumberPadMinus = "Num -",
+    NumberPadStar = "Num *", NumberPadSlash = "Num /", NumberPadPeriod = "Num .",
+}
+local DEVICE_PREFIX = { Gamepad = "Pad ", Joystick = "Joy ", MidiIn = "MIDI ", Mouse = "Mouse " }
+
+-- a keyboard key's display name ("Return" -> "Enter", "D1" -> "1"); nil for none
+function NavInput.keyName(key)
+    if key == nil or key == "" then return nil end
+    if KEY_NAMES[key] then return KEY_NAMES[key] end
+    local d = key:match("^D(%d)$")
+    if d then return d end
+    local np = key:match("^NumberPad(%d)$")
+    if np then return "Num " .. np end
+    return key
+end
+
+local function addName(out, seen, name)
+    if name ~= nil and name ~= "" and not seen[name] then
+        seen[name] = true
+        out[#out + 1] = name
+    end
+end
+
+-- every binding of a key-config input ("Decide", "RRed", ...): keys by name, other devices prefixed
+local function addInput(out, seen, input)
+    if input == nil then return end
+    local ok, n = pcall(function() return INPUT:GetBindingCount(input) end)
+    if not ok or type(n) ~= "number" then return end
+    for i = 0, n - 1 do
+        local dev, name = INPUT:GetBindingDevice(input, i), INPUT:GetBindingName(input, i)
+        if dev == "Keyboard" then
+            addName(out, seen, NavInput.keyName(name))
+        elseif dev == "MidiIn" then
+            addName(out, seen, DEVICE_PREFIX.MidiIn .. (name:gsub("%[%d+%]$", "")))
+        elseif dev == "Mouse" then
+            addName(out, seen, DEVICE_PREFIX.Mouse .. name:sub(1, 1):upper() .. name:sub(2))
+        elseif DEVICE_PREFIX[dev] ~= nil then
+            addName(out, seen, DEVICE_PREFIX[dev] .. name)
+        end
+    end
+end
+
+-- the display names of everything a binding ("decide", "cancel", "right", ...) answers to for a player (as
+-- getPn takes it): its keyboard key first, then the key config's universal inputs, the player's drum
+-- inputs and the other players' ones, without repeats
+function NavInput.bindingNames(binding, player)
+    if player == nil then player = "" end
+    local def = ((player == "") and binding_union_defs or binding_player_defs)[binding]
+    local out, seen = {}, {}
+    if def == nil then return out end
+    local inputSetP = inputSets[player] or {}
+    for _, v in ipairs(def) do addName(out, seen, NavInput.keyName(inputSets.keyboard[v.navKbd or v.nav])) end
+    for _, v in ipairs(def) do addInput(out, seen, inputSets.pad[v.navPad or v.nav]) end
+    for _, v in ipairs(def) do addInput(out, seen, inputSetP[v.navPad or v.nav]) end
+    for _, v in ipairs(def) do
+        if v.navPadOther ~= nil then
+            for p = 1, 5 do
+                if p ~= player then addInput(out, seen, inputSets[p][v.navPadOther]) end
+            end
+        end
+    end
+    return out
+end
+
 return NavInput

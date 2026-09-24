@@ -91,6 +91,7 @@
         "SONGSELECT_SC_PLAYER": "Changer le joueur configuré",
         "SONGSELECT_SC_SPEED_DOWN": "Réduire la vitesse de la chanson",
         "SONGSELECT_SC_SPEED_UP": "Augmenter la vitesse de la chanson",
+        "SONGSELECT_SONG_SPEED": "Vitesse",
         "SONGSELECT_SC_PLAYER_COUNT": "Changer le nombre de joueurs",
         "SONGSELECT_BOX_BEGINNERS": "Chansons recommandées pour débuter",
 
@@ -162,6 +163,9 @@
         "TITLE_EXIT_DESC": "À la prochaine !",
         "TITLE_ONLINE_LOBBY": "Salon en ligne",
         "TITLE_ONLINE_LOBBY_DESC": "(Bêta, ne partagez votre code de salon qu'avec des personnes de confiance)",
+        "TITLE_ONLINE_OFF_TITLE": "Le jeu en ligne est désactivé",
+        "TITLE_ONLINE_OFF_DESC": "Le jeu en ligne est désactivé. Pour ouvrir le salon en ligne, activez « {setting} » dans les paramètres ({section}). Ne jouez en ligne qu'avec des personnes de confiance.",
+        "TITLE_ONLINE_OFF_OK": "OK",
         "TITLE_VAULT_LOCKED_DESC": "Vous m'entendez... ?",
         "TITLE_PLAYERS_PROMPT": "Combien de batteurs montent sur scène ?",
         "TITLE_PLAYERS_BACK": "Retour",

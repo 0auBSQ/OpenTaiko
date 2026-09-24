@@ -21,6 +21,9 @@
 | `INPUT:Released(input)  -> bool` | Истина в кадре, когда вход отпускается. |
 | `INPUT:Releasing(input)  -> bool` | Истина, пока вход не удерживается. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Вызывайте его каждый кадр. Пока игрок удерживает вход, он вызывает `callback()` раз в `interval_seconds` (первый вызов происходит по истечении одного интервала) и прекращает, когда игрок отпускает вход. |
+| `INPUT:GetBindingCount(input)  -> int` | Сколько назначений игрок дал этому входу в настройках клавиш (0 для неизвестного имени). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | Устройство назначения с номером `index` (от 0 до count - 1): Keyboard, Gamepad, Joystick, MidiIn или Mouse. Пустая строка, если `index` вне диапазона. |
+| `INPUT:GetBindingName(input, index)  -> string` | Клавиша или кнопка назначения: имя клавиши в том виде, в каком его принимает `KeyboardPressed` (Return, F), имя кнопки, которое сообщает геймпад или джойстик (A, Start, Button3), нота MIDI (C4[60]) или имя кнопки мыши в том виде, в каком его принимает `MousePressed`. Пустая строка, если `index` вне диапазона. |
 
 ### Клавиатура
 

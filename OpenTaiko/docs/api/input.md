@@ -21,6 +21,9 @@ Drum input names are the key-config names, matched case-insensitively: LRed, RRe
 | `INPUT:Released(input)  -> bool` | True on the frame the input goes up. |
 | `INPUT:Releasing(input)  -> bool` | True while the input is not held. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Call it every frame. While the player holds the input, it calls `callback()` once every `interval_seconds` (the first call comes after one interval) and stops when the player releases the input. |
+| `INPUT:GetBindingCount(input)  -> int` | How many bindings the player gave the input in the key config (0 for an unknown name). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | The device of the binding at `index` (0 to count - 1): Keyboard, Gamepad, Joystick, MidiIn or Mouse. An empty string when `index` is out of range. |
+| `INPUT:GetBindingName(input, index)  -> string` | The binding's key or button: a keyboard key name as `KeyboardPressed` takes it (Return, F), the button name the gamepad or joystick reports (A, Start, Button3), a MIDI note (C4[60]) or a mouse button name as `MousePressed` takes it. An empty string when `index` is out of range. |
 
 ### Keyboard
 

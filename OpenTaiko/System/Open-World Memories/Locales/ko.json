@@ -91,6 +91,7 @@
         "SONGSELECT_SC_PLAYER": "설정 중인 플레이어 전환",
         "SONGSELECT_SC_SPEED_DOWN": "곡 속도 낮추기",
         "SONGSELECT_SC_SPEED_UP": "곡 속도 높이기",
+        "SONGSELECT_SONG_SPEED": "곡 속도",
         "SONGSELECT_SC_PLAYER_COUNT": "플레이어 수 변경",
         "SONGSELECT_BOX_BEGINNERS": "초보자에게 추천하는 곡",
 
@@ -162,6 +163,9 @@
         "TITLE_EXIT_DESC": "다음에 또 만나요!",
         "TITLE_ONLINE_LOBBY": "온라인 로비",
         "TITLE_ONLINE_LOBBY_DESC": "(베타, 방 코드는 신뢰할 수 있는 사람에게만 공유하세요)",
+        "TITLE_ONLINE_OFF_TITLE": "온라인 플레이가 꺼져 있습니다",
+        "TITLE_ONLINE_OFF_DESC": "온라인 플레이가 꺼져 있습니다. 온라인 로비를 열려면 설정({section})에서 「{setting}」을(를) 켜 주세요. 온라인에서는 신뢰할 수 있는 사람과만 플레이하세요.",
+        "TITLE_ONLINE_OFF_OK": "확인",
         "TITLE_VAULT_LOCKED_DESC": "내 말 들려...?",
         "TITLE_PLAYERS_PROMPT": "몇 명이 무대에 오를까요?",
         "TITLE_PLAYERS_BACK": "뒤로",

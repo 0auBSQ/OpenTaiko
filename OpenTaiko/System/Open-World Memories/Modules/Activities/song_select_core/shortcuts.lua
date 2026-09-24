@@ -63,11 +63,15 @@ M.keys = {}      -- id -> key name ("" = unbound)
 
 -- Event Mode leaves these out: no auto play, no favorites; sort and search stay
 local EVENT_DISABLED = { favorite = true, favorites_folder = true, auto_p1 = true, auto_p2 = true }
+-- the online lobby's song select picks the song for one player: no auto play, no player count or switch
+local ONLINE_DISABLED = { auto_p1 = true, auto_p2 = true, player_count = true, player = true }
 
 function M.init(g) G = g end
 
 local function disabled(id)
-    return EVENT_DISABLED[id] == true and G ~= nil and G.event ~= nil and G.event.on()
+    if G == nil then return false end
+    if ONLINE_DISABLED[id] and G.activeConfig ~= nil and G.activeConfig.songOnly then return true end
+    return EVENT_DISABLED[id] == true and G.event ~= nil and G.event.on()
 end
 
 -- read every binding from the theme settings (a missing definition keeps the default)

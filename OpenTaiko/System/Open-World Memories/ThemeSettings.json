@@ -581,6 +581,35 @@
         }
       },
       "default": "PageUp"
+    },
+    {
+      "id": "onlinelobby_key_song",
+      "type": "key",
+      "scope": "global",
+      "section": "inputs",
+      "label": {
+        "strings": {
+          "default": "Online lobby: choose the song",
+          "ja": "オンラインロビー: 曲を選ぶ",
+          "fr": "Salon en ligne : choisir la chanson",
+          "de": "Online-Lobby: Song auswählen",
+          "es": "Sala en línea: elegir la canción",
+          "ko": "온라인 로비: 곡 고르기",
+          "zh": "在线大厅：选择歌曲"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Opens the song select to choose the room's song (host only).",
+          "ja": "部屋の曲を選ぶ選曲画面を開きます（ホストのみ）。",
+          "fr": "Ouvre la sélection pour choisir la chanson du salon (hôte uniquement).",
+          "de": "Öffnet die Songauswahl, um den Song des Raums zu wählen (nur Host).",
+          "es": "Abre la selección para elegir la canción de la sala (solo anfitrión).",
+          "ko": "방의 곡을 고르는 곡 선택 화면을 엽니다 (호스트 전용).",
+          "zh": "打开选曲画面以选择房间的歌曲（仅限房主）。"
+        }
+      },
+      "default": "S"
     }
   ]
 }

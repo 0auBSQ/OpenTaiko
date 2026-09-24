@@ -429,6 +429,14 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
         G.bgtx[key] = TEXTURE:CreateTexture(I18N.localizedPath(default))
     end
 
+    G.speedLabel = nil                  -- read again in the current language
+
+    -- the online lobby's preview plays on at full volume while its song stays selected (navigation hands it over)
+    if G.activeConfig.songOnly then
+        local ps = SHARED:GetSharedSound("presound")
+        if ps ~= nil and ps.Loaded and ps.IsPlaying then G.previewFadeVol, G.previewFadeTarget = 100, 100 end
+    end
+
     if G.songList ~= nil then
         Sort.applySort()
         Nav.refreshPage()
@@ -473,7 +481,9 @@ function activate(allowPlayerCount, lockedPlayerCount, mountAISlotToP2, songOnly
         G.noteFloatPhase = val
     end)
 
+    -- the players' box (characters, portraits) is not shown in the online lobby's song select
     G.portraits = {}
+    if G.activeConfig.songOnly then return end
     for p = 0, 4 do
         local chara = GetSaveFile(p):GetCharacter()
         if chara ~= nil and chara.IsValid then
@@ -496,17 +506,23 @@ function deactivate()
     for k in pairs(G.ctx) do G.ctx[k] = COUNTER:EmptyCounter() end
     Diff.resetTransitionVisuals()
 
-    SHARED:GetSharedSound("presound"):Stop()
+    -- the online lobby takes its preview back as it is; anywhere else it stops here
+    if not G.activeConfig.songOnly then
+        SHARED:GetSharedSound("presound"):Stop()
+        SHARED:SetSharedString("presound_path", "")
+    end
     previewDuck:reset()
     G.previewFadeVol    = 0
     G.previewFadeTarget = 0
     G.previewLoaded     = false
     G.previewWasPlaying = false
 
-    for p = 0, 4 do
-        local chara = GetSaveFile(p):GetCharacter()
-        if chara ~= nil and chara.IsValid then chara:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end
-        if G.portraits[p] ~= nil then G.portraits[p]:Dispose(); G.portraits[p] = nil end
+    if not G.activeConfig.songOnly then
+        for p = 0, 4 do
+            local chara = GetSaveFile(p):GetCharacter()
+            if chara ~= nil and chara.IsValid then chara:DisposeAnimation(CHARACTER.ANIM_MENU_NORMAL) end
+            if G.portraits[p] ~= nil then G.portraits[p]:Dispose(); G.portraits[p] = nil end
+        end
     end
     G.portraits = {}
 
@@ -663,7 +679,7 @@ function update(ts)
 
     -- Reload characters when customize_dialog closes
     local isCustomizeActive = G.act_inner["customize_dialog"] ~= nil and G.act_inner["customize_dialog"].IsActive
-    if G.wasCustomizeActive and not isCustomizeActive then
+    if G.wasCustomizeActive and not isCustomizeActive and not G.activeConfig.songOnly then
         for p = 0, 4 do
             local chara = GetSaveFile(p):GetCharacter()
             if chara ~= nil and chara.IsValid then

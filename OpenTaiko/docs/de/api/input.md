@@ -21,6 +21,9 @@ Namen der Trommel-Eingaben sind die Namen der Tastenkonfiguration, ohne Beachtun
 | `INPUT:Released(input)  -> bool` | True im Frame, in dem die Eingabe losgelassen wird. |
 | `INPUT:Releasing(input)  -> bool` | True, solange die Eingabe nicht gehalten wird. |
 | `INPUT:RepeatWhilePressing(input, interval_seconds, callback)  -> nil` | Rufen Sie es jeden Frame auf. Solange der Spieler die Eingabe hält, ruft es `callback()` einmal alle `interval_seconds` auf (der erste Aufruf erfolgt nach einem Intervall) und stoppt, wenn der Spieler die Eingabe loslässt. |
+| `INPUT:GetBindingCount(input)  -> int` | Wie viele Belegungen der Spieler der Eingabe in der Tastenkonfiguration gegeben hat (0 bei einem unbekannten Namen). |
+| `INPUT:GetBindingDevice(input, index)  -> string` | Das Gerät der Belegung an `index` (0 bis count - 1): Keyboard, Gamepad, Joystick, MidiIn oder Mouse. Ein leerer String, wenn `index` außerhalb des Bereichs liegt. |
+| `INPUT:GetBindingName(input, index)  -> string` | Die Taste oder der Knopf der Belegung: ein Tastenname, wie `KeyboardPressed` ihn nimmt (Return, F), der Knopfname, den das Gamepad oder der Joystick meldet (A, Start, Button3), eine MIDI-Note (C4[60]) oder ein Maustastenname, wie `MousePressed` ihn nimmt. Ein leerer String, wenn `index` außerhalb des Bereichs liegt. |
 
 ### Tastatur
 

@@ -91,6 +91,7 @@
         "SONGSELECT_SC_PLAYER": "Cambiar el jugador configurado",
         "SONGSELECT_SC_SPEED_DOWN": "Reducir la velocidad de la canción",
         "SONGSELECT_SC_SPEED_UP": "Aumentar la velocidad de la canción",
+        "SONGSELECT_SONG_SPEED": "Velocidad",
         "SONGSELECT_SC_PLAYER_COUNT": "Cambiar el número de jugadores",
         "SONGSELECT_BOX_BEGINNERS": "Canciones recomendadas para principiantes",
 
@@ -162,6 +163,9 @@
         "TITLE_EXIT_DESC": "¡Hasta la próxima!",
         "TITLE_ONLINE_LOBBY": "Sala en línea",
         "TITLE_ONLINE_LOBBY_DESC": "(Beta, comparte tu código de sala solo con personas de confianza)",
+        "TITLE_ONLINE_OFF_TITLE": "El juego en línea está desactivado",
+        "TITLE_ONLINE_OFF_DESC": "El juego en línea está desactivado. Para abrir la sala en línea, activa «{setting}» en los ajustes ({section}). Juega en línea solo con personas de confianza.",
+        "TITLE_ONLINE_OFF_OK": "Aceptar",
         "TITLE_VAULT_LOCKED_DESC": "¿Me oyes...?",
         "TITLE_PLAYERS_PROMPT": "¿Cuántos tamborileros suben al escenario?",
         "TITLE_PLAYERS_BACK": "Volver",

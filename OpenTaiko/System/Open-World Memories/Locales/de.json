@@ -91,6 +91,7 @@
         "SONGSELECT_SC_PLAYER": "Den eingestellten Spieler wechseln",
         "SONGSELECT_SC_SPEED_DOWN": "Songgeschwindigkeit verringern",
         "SONGSELECT_SC_SPEED_UP": "Songgeschwindigkeit erhöhen",
+        "SONGSELECT_SONG_SPEED": "Songtempo",
         "SONGSELECT_SC_PLAYER_COUNT": "Spielerzahl ändern",
         "SONGSELECT_BOX_BEGINNERS": "Empfohlene Songs für Einsteiger",
 
@@ -162,6 +163,9 @@
         "TITLE_EXIT_DESC": "Bis zum nächsten Mal!",
         "TITLE_ONLINE_LOBBY": "Online-Lobby",
         "TITLE_ONLINE_LOBBY_DESC": "(Beta, teile deinen Raumcode nur mit Personen, denen du vertraust)",
+        "TITLE_ONLINE_OFF_TITLE": "Online-Spiel ist deaktiviert",
+        "TITLE_ONLINE_OFF_DESC": "Das Online-Spiel ist deaktiviert. Um die Online-Lobby zu öffnen, aktiviere „{setting}“ in den Einstellungen ({section}). Spiele online nur mit Personen, denen du vertraust.",
+        "TITLE_ONLINE_OFF_OK": "OK",
         "TITLE_VAULT_LOCKED_DESC": "Kannst du mich hören...?",
         "TITLE_PLAYERS_PROMPT": "Wie viele Trommler betreten die Bühne?",
         "TITLE_PLAYERS_BACK": "Zurück",
