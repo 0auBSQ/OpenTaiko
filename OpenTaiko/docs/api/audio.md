@@ -16,7 +16,7 @@ Relative paths resolve against the script's directory; the FromAbsolutePath vari
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Loads a sound effect. |
 | `SOUND:CreateVoice(path)  -> sound` | Loads a voice clip. |
-| `SOUND:CreateBGM(path)  -> sound` | Loads background music (song playback group). |
+| `SOUND:CreateBGM(path)  -> sound` | Loads background music (song playback group). While a transition brings a stage in (except the load into gameplay), the music that stage starts waits for the end of the fade-in; IsPlaying already reports true. |
 | `SOUND:CreatePreview(path)  -> sound` | Loads a song preview clip (song preview group). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Loads a sound effect from a full path. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Loads a voice clip from a full path. |

@@ -1,25 +1,30 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
--- space.lua — the lobby's moving night sky, a Lua3DScene behind the 2D UI.
+-- SpaceSky: the Online Lobby's night sky, shared with the space_voyage transition.
+-- One module drives it at a time; the others draw its last frame.
 
-local Space = {}
+local Sky = {}
 
 local sin, cos, sqrt, pi, floor, random = math.sin, math.cos, math.sqrt, math.pi, math.floor, math.random
 
-local RW, RH = 1280, 720                     -- the scene's pixel size, scaled up to the screen
-local FOV = 60                               -- vertical field of view (degrees)
-local FAR_R = 100                            -- the star sphere's radius
+local KEY, STATE_KEY, DRIVER_KEY = "online_sky", "online_sky_state", "online_sky_driver"
 
--- colours of the sky shader (linear 0-1)
+local RW, RH = 1280, 720                     -- render size, scaled up to the screen
+local SCREEN_W, SCREEN_H = 1920, 1080
+local FOV = 60                               -- vertical, in degrees
+local FAR_R = 100                            -- star sphere radius
+
+-- sky shader colours (0-1)
 local ZENITH, HORIZON = { 0.012, 0.018, 0.070 }, { 0.070, 0.050, 0.160 }
 local NEBULA_A, NEBULA_B = { 0.30, 0.14, 0.50 }, { 0.06, 0.30, 0.40 }
-local BAND_AXIS = { 0.50, 0.70, -0.51 }      -- the milky way's great circle is the plane normal to this
+local BAND_AXIS = { 0.50, 0.70, -0.51 }      -- normal of the milky way's plane
 
--- stars: target live count, life range (s), size range (world units at FAR_R)
+-- count: alive at once; life: seconds; size: world units
 local STARS = { count = 2400, life = { 14, 30 }, size = { 0.9, 2.5 } }
 local BAND = { count = 1100, life = { 16, 32 }, size = { 0.6, 1.6 }, width = 0.10 }
 local TWINKLES = { count = 70, life = { 2.2, 4.2 }, size = { 3.0, 6.5 } }
 local DUST = { count = 160, life = { 10, 20 }, near = { 10, 28 } }
 local STAR_COLS = { { 236, 240, 255 }, { 236, 240, 255 }, { 190, 210, 255 }, { 255, 238, 205 }, { 255, 212, 170 } }
+local LAYERS = { "stars", "band", "twinkles", "dust", "meteor" }
 
 local SKY = [[
 vec3 h33(vec3 p){
@@ -54,7 +59,7 @@ void main(){
     vec3 dir = normalize(F + R * (nx * tanF * aspect) + U * (ny * tanF));
 
     vec3 col = mix(uUser[4].xyz, uUser[3].xyz, smoothstep(-0.55, 0.85, dir.y));
-    float n = fbm(dir * 2.3 + vec3(0.0, uTime * 0.004, uTime * 0.002), 3);   // soft clouds: few octaves keep it cheap
+    float n = fbm(dir * 2.3 + vec3(0.0, uTime * 0.004, uTime * 0.002), 3);   // few octaves to stay cheap
     float m = fbm(dir * 5.1 - vec3(uTime * 0.006, 0.0, 0.0), 2);
     float cloud = smoothstep(0.42, 0.80, n) * (0.55 + 0.6 * m);
     col += uUser[5].xyz * cloud * (region(dir, vec3(0.62, 0.30, -0.72), 0.95) + 0.6 * region(dir, vec3(-0.45, 0.55, 0.70), 0.7)) * 0.8;
@@ -70,17 +75,18 @@ void main(){
 ]]
 
 local scene = nil
-local ps = {}                               -- particle systems: stars, band, twinkles, dust, meteor
-local spr = { dot = 1, sparkle = 2 }
+local ps = {}
 local acc = { stars = 0, band = 0, twinkles = 0, dust = 0 }
 local t = 0
-local camX, camY, camZ, yaw, pitch = 0, 0, 0, 200, 10
+local camX, camY, camZ = 0, 0, 0
 local meteor = { wait = 3, on = false }
+local lift = { y = 0, pitch = 0 }           -- extra camera height and tilt for transitions
+local me = nil                              -- our name while we drive the sky
 
 local function rnd(a, b) return a + (b - a) * random() end
 local function norm(x, y, z) local l = sqrt(x * x + y * y + z * z); return x / l, y / l, z / l end
 
--- a random direction on the sky between two latitudes (degrees), uniform over the area
+-- random sky direction between two latitudes (degrees)
 local function skyDir(latLo, latHi)
     local y = rnd(sin(latLo * pi / 180), sin(latHi * pi / 180))
     local a = rnd(0, 2 * pi)
@@ -88,7 +94,7 @@ local function skyDir(latLo, latHi)
     return r * cos(a), y, r * sin(a)
 end
 
--- two unit vectors spanning the milky way's plane
+-- two axes in the milky way's plane
 local bx, by, bz = norm(BAND_AXIS[1], BAND_AXIS[2], BAND_AXIS[3])
 local e1x, e1y, e1z = norm(by, -bx, 0)
 local e2x, e2y, e2z = by * e1z - bz * e1y, bz * e1x - bx * e1z, bx * e1y - by * e1x
@@ -141,7 +147,7 @@ local function emitLayers(dt)
 end
 
 local function stepLayers(dt)
-    for _, key in ipairs({ "stars", "band", "twinkles", "dust", "meteor" }) do scene:PsUpdate(ps[key], dt) end
+    for _, key in ipairs(LAYERS) do scene:PsUpdate(ps[key], dt) end
 end
 
 -- shooting star
@@ -188,9 +194,9 @@ local function tickMeteor(dt)
 end
 
 local function placeCamera()
-    yaw = 200 + t * 1.1
-    pitch = 10 + 3 * sin(t * 2 * pi / 90)
-    camX, camY, camZ = 3 * sin(t * 0.05), 0.8 * sin(t * 0.07), 3 * cos(t * 0.05) - 3
+    local yaw = 200 + t * 1.1
+    local pitch = 10 + 3 * sin(t * 2 * pi / 90) + lift.pitch
+    camX, camY, camZ = 3 * sin(t * 0.05), 0.8 * sin(t * 0.07) + lift.y, 3 * cos(t * 0.05) - 3
     scene:SetCameraPosition(camX, camY, camZ)
     scene:SetCameraAngles(yaw, pitch)
 end
@@ -210,7 +216,7 @@ local function skyUniforms()
     scene:SetTime(t)
 end
 
--- fallback without the GPU sky pass (CPU renderer, or the shader failed)
+-- plain gradient when the sky shader is not available
 local function fallbackSky()
     local bands = 48
     local bh = RH / bands
@@ -223,66 +229,139 @@ local function fallbackSky()
     end
 end
 
+-- the driver's state, passed on as a shared string
+local function saveState()
+    local m = meteor
+    SHARED:SetSharedString(STATE_KEY, table.concat({
+        t, acc.stars, acc.band, acc.twinkles, acc.dust,
+        m.on and 1 or 0, m.wait or 0, m.dx or 0, m.dy or 0, m.dz or 0, m.tx or 0, m.ty or 0, m.tz or 0,
+        m.t or 0, m.dur or 0, m.speed or 0, m.lx or "n", m.ly or "n", m.lz or "n",
+        ps.stars, ps.band, ps.twinkles, ps.dust, ps.meteor }, ";"))
+end
+
+local function loadState()
+    local v, n = {}, 0
+    for s in (SHARED:GetSharedString(STATE_KEY) .. ";"):gmatch("([^;]*);") do n = n + 1; v[n] = tonumber(s) end
+    if n < 24 or v[1] == nil or v[20] == nil then return false end
+    t = v[1]
+    acc.stars, acc.band, acc.twinkles, acc.dust = v[2], v[3], v[4], v[5]
+    meteor.on, meteor.wait = v[6] == 1, v[7]
+    meteor.dx, meteor.dy, meteor.dz, meteor.tx, meteor.ty, meteor.tz = v[8], v[9], v[10], v[11], v[12], v[13]
+    meteor.t, meteor.dur, meteor.speed = v[14], v[15], v[16]
+    meteor.lx, meteor.ly, meteor.lz = v[17], v[18], v[19]
+    ps.stars, ps.band, ps.twinkles, ps.dust, ps.meteor = v[20], v[21], v[22], v[23], v[24]
+    return true
+end
+
 local function registerSprite(id, path)
     local tex = TEXTURE:CreateTextureSync(path)
     if tex then scene:RegisterSpriteFromTexture(id, tex); scene:SetSpriteFilter(id, "linear"); tex:Dispose() end
 end
 
-function Space.open()
-    if scene ~= nil or SCENE3D == nil then return end
+-- the shared sky, or nil
+local function find()
+    scene = SHARED:GetSharedScene(KEY)
+    if scene == nil then me = nil end
+    return scene
+end
+
+-- build the sky unless one is shared already; sprites = { dot, sparkle } image paths
+function Sky.create(sprites)
+    if find() ~= nil or SCENE3D == nil then return end
     scene = SCENE3D:CreateScene(RW, RH)
     scene:SetMode("raster")
     scene:SetLighting(false)
     scene:SetCameraFov(FOV)
     scene:SetCameraNear(0.05)
     scene:SetFog(false, 0, 0, 0, 0, 0)
-    registerSprite(spr.dot, "Textures/StarDot.png")
-    registerSprite(spr.sparkle, "Textures/Sparkle.png")
-    for _, key in ipairs({ "stars", "band", "twinkles", "dust", "meteor" }) do
+    registerSprite(1, sprites.dot)
+    registerSprite(2, sprites.sparkle)
+    for _, key in ipairs(LAYERS) do
         ps[key] = scene:NewParticleSystem()
         scene:PsSetCap(ps[key], 3000)
-        scene:PsSetSprite(ps[key], key == "twinkles" and spr.sparkle or spr.dot)
+        scene:PsSetSprite(ps[key], key == "twinkles" and 2 or 1)
         scene:PsSetNextRotation(ps[key], 0, 0)
     end
-    scene:PsSetNextCurves(ps.stars, 0, 1)                   -- stars fade in and out over their life
+    scene:PsSetNextCurves(ps.stars, 0, 1)                   -- fade in and out
     scene:PsSetNextCurves(ps.band, 0, 1)
-    scene:PsSetNextCurves(ps.twinkles, 2, 1)                -- twinkles swell then shrink away
+    scene:PsSetNextCurves(ps.twinkles, 2, 1)                -- swell, then shrink
     scene:PsSetNextCurves(ps.dust, 0, 1)
     scene:PsSetNextCurves(ps.meteor, 0, 0)
     scene:SetSkyShader(SKY)
-    -- start with a full sky: run the layers for a while before the first frame
+    -- fill the sky before the first frame
     t = rnd(0, 300)
+    acc = { stars = 0, band = 0, twinkles = 0, dust = 0 }
+    lift.y, lift.pitch = 0, 0
     placeCamera()
     for _ = 1, 48 do emitLayers(0.5); stepLayers(0.5) end
-    meteor.on, meteor.wait = false, rnd(2, 5)
+    meteor.on, meteor.wait, meteor.lx = false, rnd(2, 5), nil
+    -- render once now so the shader compiles before the first visible frame
+    if scene:SkyShaderActive() then skyUniforms() else fallbackSky() end
+    pcall(function() scene:Render(); scene:Upload() end)
+    SHARED:SetSharedScene(KEY, scene)
+    saveState()
+    SHARED:SetSharedString(DRIVER_KEY, "")
 end
 
-function Space.close()
-    if scene == nil then return end
-    scene:Dispose()
-    scene, ps = nil, {}
-    acc = { stars = 0, band = 0, twinkles = 0, dust = 0 }
-    meteor.on = false
+-- drive the sky as `name`, from where the last driver left it
+function Sky.claim(name)
+    if find() == nil or not loadState() then return false end
+    me = name
+    lift.y, lift.pitch = 0, 0
+    SHARED:SetSharedString(DRIVER_KEY, name)
+    return true
 end
 
-function Space.update(dt)
-    if scene == nil then return end
+-- whether we still drive the sky (another module may have taken it)
+function Sky.driving()
+    return me ~= nil and scene ~= nil and not scene.IsDisposed and SHARED:GetSharedString(DRIVER_KEY) == me
+end
+
+-- stop driving; the sky waits for the next driver
+function Sky.release()
+    if Sky.driving() then
+        saveState()
+        SHARED:SetSharedString(DRIVER_KEY, "")
+    end
+    me = nil
+end
+
+-- extra camera height (world units) and tilt (degrees); 0, 0 is the lobby view
+function Sky.setLift(y, pitch) lift.y, lift.pitch = y, pitch end
+
+function Sky.update(dt)
+    if not Sky.driving() then return end
     t = t + dt
     placeCamera()
     emitLayers(dt)
     tickMeteor(dt)
     stepLayers(dt)
+    saveState()
 end
 
-function Space.draw()
-    if scene == nil then return false end
+-- driver only
+function Sky.render()
+    if not Sky.driving() then return end
     if scene:SkyShaderActive() then skyUniforms() else fallbackSky() end
     scene:Render()
     scene:Upload()
-    scene:SetColor(1, 1, 1); scene:SetOpacity(1)
-    scene:SetScale(1920 / RW, 1080 / RH)
-    scene:Draw(0, 0)
+end
+
+-- draw the last frame with its top at y; false when there is no sky
+function Sky.draw(y, opacity)
+    if scene == nil or scene.IsDisposed then find() end
+    if scene == nil then return false end
+    scene:SetColor(1, 1, 1); scene:SetOpacity(opacity or 1)
+    scene:SetScale(SCREEN_W / RW, SCREEN_H / RH)
+    scene:Draw(0, math.floor((y or 0) + 0.5))
+    scene:SetOpacity(1)
     return true
 end
 
-return Space
+-- call before the module goes away
+function Sky.forget()
+    Sky.release()
+    scene = nil
+end
+
+return Sky

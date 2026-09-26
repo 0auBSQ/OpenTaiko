@@ -192,6 +192,8 @@ Los métodos Set* cargan en un hilo en segundo plano e intercambian el recurso e
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | Guarda una cadena bajo una clave. |
 | `SHARED:GetSharedString(key)  -> string` | Devuelve la cadena guardada bajo una clave, o una cadena vacía. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | Comparte una escena 3D bajo una clave para que otros módulos puedan dibujarla y hacerla avanzar; la escena sigue perteneciendo al módulo que la creó y desaparece con él. nil quita la clave. |
+| `SHARED:GetSharedScene(key)  -> scene` | Devuelve la escena compartida bajo una clave, o nil si no hay ninguna o su módulo la liberó. |
 | `SHARED:GetSharedTexture(key)  -> texture` | Devuelve la textura compartida de una clave, o una textura vacía si no se estableció ninguna. |
 | `SHARED:GetSharedSound(key)  -> sound` | Devuelve el sonido compartido de una clave, o un sonido vacío si no se estableció ninguno. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | Libera la textura guardada bajo una clave y la reemplaza por una vacía. |

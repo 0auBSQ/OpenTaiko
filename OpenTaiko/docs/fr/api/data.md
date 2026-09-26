@@ -192,6 +192,8 @@ Les méthodes Set* chargent sur un thread d'arrière-plan et substituent la ress
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | Stocke une chaîne sous une clé. |
 | `SHARED:GetSharedString(key)  -> string` | Renvoie la chaîne stockée sous une clé, ou une chaîne vide. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | Partage une scène 3D sous une clé pour que d'autres modules puissent la dessiner et la faire avancer ; la scène appartient toujours au module qui l'a créée et disparaît avec lui. nil retire la clé. |
+| `SHARED:GetSharedScene(key)  -> scene` | Renvoie la scène partagée sous une clé, ou nil s'il n'y en a pas ou si son module l'a libérée. |
 | `SHARED:GetSharedTexture(key)  -> texture` | Renvoie la texture partagée d'une clé, ou une texture vide si aucune n'a été définie. |
 | `SHARED:GetSharedSound(key)  -> sound` | Renvoie le son partagé d'une clé, ou un son vide si aucun n'a été défini. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | Libère la texture stockée sous une clé et la remplace par une texture vide. |

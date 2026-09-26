@@ -13,7 +13,7 @@ Das Skript, das ein Textur-, Canvas-, Text-, Video- oder Gradient-Handle erzeugt
 Lädt Bilddateien in Textur-Handles.
 
 <div class="callout warn">
-Relative Pfade werden gegen das Verzeichnis des Skripts aufgelöst; die FromAbsolutePath-Varianten nehmen einen vollständigen Pfad. Eine fehlende Datei liefert ein leeres Handle, das nichts zeichnet. CreateTexture lädt asynchron: Das Handle zeichnet nichts und meldet Width und Height von 0, bis das Dekodieren und Hochladen im Hintergrund abgeschlossen sind. Verwenden Sie CreateTextureSync, wenn Sie die Größe oder die Pixel sofort benötigen. Die Optionstabelle akzeptiert { maxSize = N }, um das Bild beim Dekodieren so zu verkleinern, dass seine längste Seite höchstens N Pixel misst.
+Relative Pfade werden gegen das Verzeichnis des Skripts aufgelöst; die FromAbsolutePath-Varianten nehmen einen vollständigen Pfad. Eine fehlende Datei liefert ein leeres Handle, das nichts zeichnet. CreateTexture lädt asynchron: Das Handle zeichnet nichts, bis das Dekodieren und Hochladen im Hintergrund abgeschlossen sind (dann wird Ready true), aber Width und Height liefern die Bildgröße sofort. Verwenden Sie CreateTextureSync, wenn das Bild schon im nächsten Frame gezeichnet werden muss. Die Optionstabelle akzeptiert { maxSize = N }, um das Bild beim Dekodieren so zu verkleinern, dass seine längste Seite höchstens N Pixel misst.
 </div>
 
 | Methode | Beschreibung |
@@ -59,8 +59,9 @@ Ankernamen: topleft, top, topright, left, center, right, bottomleft, bottom, bot
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | Zeichnet die gesamte Textur so, dass der benannte Ankerpunkt auf (x, y) liegt. |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | Zeichnet einen Quell-Teilbereich so, dass der benannte Ankerpunkt auf (x, y) liegt. |
 | `texture.Loaded  -> bool` | True, wenn das Handle eine Textur kapselt. Das Spiel setzt es, sobald es die Datei findet, noch bevor ein asynchroner Ladevorgang abgeschlossen ist. |
-| `texture.Width  -> int` | Pixelbreite; -1 auf einem leeren Handle, 0 solange ein asynchroner Ladevorgang aussteht. |
-| `texture.Height  -> int` | Pixelhöhe; -1 auf einem leeren Handle, 0 solange ein asynchroner Ladevorgang aussteht. |
+| `texture.Width  -> int` | Pixelbreite, sofort bekannt, auch während ein asynchroner Ladevorgang aussteht; -1 auf einem leeren Handle. |
+| `texture.Height  -> int` | Pixelhöhe, sofort bekannt, auch während ein asynchroner Ladevorgang aussteht; -1 auf einem leeren Handle. |
+| `texture.Ready  -> bool` | True, sobald das Zeichnen der Textur das Bild zeigt; false, solange ein asynchroner Ladevorgang ihre Pixel noch hochlädt. Nur nötig, um auf ein Bild zu warten, etwa vor einem Einblenden. |
 | `texture.Pointer  -> int` | Native GL-Textur-ID, oder 0, falls keine. |
 | `texture:GetScale()  -> vector2` | Aktuelle Zeichenskalierung als vector2 (`X`, `Y`). |
 | `texture:GetOpacity()  -> number` | Aktuelle Deckkraft, 0..1; -1 auf einem leeren Handle. |
@@ -130,7 +131,7 @@ Die Farbargumente r, g, b, a sind Ganzzahlen von 0 bis 255. Pixeländerungen sam
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | Füllt ein achsenparalleles Rechteck, beschnitten auf das Canvas. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | Füllt eine Scheibe mit dem angegebenen Radius in Pixeln. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | Malt eine dicke Linie als überlappende Scheiben des angegebenen Radius. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | Blendet eine Textur per Alpha auf das Canvas, mit ihrer linken oberen Ecke bei (x, y). Das Canvas liest die Pixel der Textur einmal pro Textur-Handle von der GPU zurück, ein langsamer Vorgang, der in den Initialisierungscode gehört. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | Blendet eine Textur per Alpha auf das Canvas, mit ihrer linken oberen Ecke bei (x, y). Das Canvas liest die Pixel der Textur einmal pro Textur-Handle (aus ihrer Bilddatei, falls sie eine hat, daher auch während die Textur noch lädt), ein langsamer Vorgang, der in den Initialisierungscode gehört. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | Blendet eine um `scale` skalierte und um `rotationDeg` im Uhrzeigersinn gedrehte Textur per Alpha ein, mit Nearest-Neighbour-Abtastung. Mit anchor "center" liegt der Texturmittelpunkt auf (x, y); jeder andere Wert platziert dort die linke obere Ecke. |
 | `canvas:Clear(r, g, b, a)  -> nil` | Füllt das gesamte Canvas mit einer Farbe. |
 | `canvas:ClearTransparent()  -> nil` | Setzt das gesamte Canvas auf vollständig transparent zurück. |

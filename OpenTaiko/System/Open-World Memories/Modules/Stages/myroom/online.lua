@@ -121,12 +121,18 @@ local function decMap(arr, valIsNum)
 end
 -- returns a plain table in the Room:toTable() shape. A missing "v" marks a v1 peer's payload — the
 -- table is returned WITHOUT v so Room:loadTable() runs its v1 migration on it.
+-- a room side from a peer; out of range (or NaN/inf) falls back, so the room build loops stay small
+local function roomSide(v, d)
+    v = floor(tonumber(v) or d)
+    return (v >= 1 and v <= 32) and v or d
+end
+
 function MO.roomFromJson(json)
     local root = JSONLOADER:JsonParseStringAny(json); if not root then return nil end
     local t = {
         tier    = floor(JSONLOADER:JsonGet(root, "tier") or 1),
-        iw      = floor(JSONLOADER:JsonGet(root, "iw") or 5),
-        ih      = floor(JSONLOADER:JsonGet(root, "ih") or 5),
+        iw      = roomSide(JSONLOADER:JsonGet(root, "iw"), 5),
+        ih      = roomSide(JSONLOADER:JsonGet(root, "ih"), 5),
         exitCol = floor(JSONLOADER:JsonGet(root, "exitCol") or 2),
         furniture = decFurniture(JSONLOADER:JsonGet(root, "furniture")),
         floorDeco = decMap(JSONLOADER:JsonGet(root, "floorDeco"), false),

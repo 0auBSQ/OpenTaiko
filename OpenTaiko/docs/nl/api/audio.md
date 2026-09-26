@@ -16,7 +16,7 @@ Relatieve paden worden opgelost ten opzichte van de map van het script; de FromA
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Laadt een geluidseffect. |
 | `SOUND:CreateVoice(path)  -> sound` | Laadt een stemfragment. |
-| `SOUND:CreateBGM(path)  -> sound` | Laadt achtergrondmuziek (groep nummerweergave). |
+| `SOUND:CreateBGM(path)  -> sound` | Laadt achtergrondmuziek (groep nummerweergave). Terwijl een transitie een stage binnenbrengt (behalve bij het laden naar de gameplay), wacht de muziek die die stage start tot het einde van de fade-in; IsPlaying geeft dan al true terug. |
 | `SOUND:CreatePreview(path)  -> sound` | Laadt een nummerpreview (groep nummerpreview). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Laadt een geluidseffect van een volledig pad. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Laadt een stemfragment van een volledig pad. |

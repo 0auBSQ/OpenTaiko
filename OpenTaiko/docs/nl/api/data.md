@@ -192,6 +192,8 @@ Set*-methoden laden op een achtergrondthread en wisselen de resource in op de re
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | Slaat een string op onder een sleutel. |
 | `SHARED:GetSharedString(key)  -> string` | Geeft de string terug die onder een sleutel is opgeslagen, of een lege string. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | Deelt een 3D-scène onder een sleutel, zodat andere modules haar kunnen tekenen en laten lopen; de scène blijft van de module die haar maakte en verdwijnt met die module. nil verwijdert de sleutel. |
+| `SHARED:GetSharedScene(key)  -> scene` | Geeft de scène terug die onder een sleutel gedeeld is, of nil als er geen is of haar module haar vrijgaf. |
 | `SHARED:GetSharedTexture(key)  -> texture` | Geeft de gedeelde textuur voor een sleutel terug, of een lege textuur als er geen is gezet. |
 | `SHARED:GetSharedSound(key)  -> sound` | Geeft het gedeelde geluid voor een sleutel terug, of een leeg geluid als er geen is gezet. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | Geeft de textuur die onder een sleutel is opgeslagen vrij en vervangt die door een lege. |

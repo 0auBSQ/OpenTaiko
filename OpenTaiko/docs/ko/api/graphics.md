@@ -13,7 +13,7 @@
 이미지 파일을 텍스처 핸들로 로드합니다.
 
 <div class="callout warn">
-상대 경로는 스크립트 디렉터리를 기준으로 해석됩니다. FromAbsolutePath 변형은 전체 경로를 받습니다. 없는 파일은 아무것도 그리지 않는 빈 핸들을 반환합니다. CreateTexture는 비동기로 로드합니다. 백그라운드 디코드와 업로드가 끝날 때까지 핸들은 아무것도 그리지 않고 Width와 Height로 0을 보고합니다. 크기나 픽셀이 즉시 필요하면 CreateTextureSync를 사용하십시오. options 테이블은 { maxSize = N }을 받아 디코드 시 이미지를 축소해 긴 변이 최대 N픽셀이 되게 합니다.
+상대 경로는 스크립트 디렉터리를 기준으로 해석됩니다. FromAbsolutePath 변형은 전체 경로를 받습니다. 없는 파일은 아무것도 그리지 않는 빈 핸들을 반환합니다. CreateTexture는 비동기로 로드합니다. 백그라운드 디코드와 업로드가 끝날 때까지 핸들은 아무것도 그리지 않지만(끝나면 Ready가 true가 됩니다), Width와 Height는 이미지 크기를 바로 알려 줍니다. 이미지를 바로 다음 프레임에 그려야 하면 CreateTextureSync를 사용하십시오. options 테이블은 { maxSize = N }을 받아 디코드 시 이미지를 축소해 긴 변이 최대 N픽셀이 되게 합니다.
 </div>
 
 | 메서드 | 설명 |
@@ -59,8 +59,9 @@ end
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | 지정한 앵커 지점이 (x, y)에 오도록 텍스처 전체를 그립니다. |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | 지정한 앵커 지점이 (x, y)에 오도록 원본의 부분 사각형을 그립니다. |
 | `texture.Loaded  -> bool` | 핸들이 텍스처를 감싸고 있으면 true. 게임은 파일을 찾는 즉시, 비동기 로드가 끝나기 전에 이를 설정합니다. |
-| `texture.Width  -> int` | 픽셀 너비. 빈 핸들이면 -1, 비동기 로드 대기 중이면 0. |
-| `texture.Height  -> int` | 픽셀 높이. 빈 핸들이면 -1, 비동기 로드 대기 중이면 0. |
+| `texture.Width  -> int` | 픽셀 너비. 비동기 로드 대기 중에도 바로 알 수 있습니다. 빈 핸들이면 -1. |
+| `texture.Height  -> int` | 픽셀 높이. 비동기 로드 대기 중에도 바로 알 수 있습니다. 빈 핸들이면 -1. |
+| `texture.Ready  -> bool` | 텍스처를 그리면 이미지가 보이는 상태이면 true. 비동기 로드가 아직 픽셀을 업로드 중이면 false. 이미지를 기다릴 때(예: 페이드인 전)에만 필요합니다. |
 | `texture.Pointer  -> int` | 네이티브 GL 텍스처 id. 없으면 0. |
 | `texture:GetScale()  -> vector2` | 현재 그리기 스케일을 vector2(`X`, `Y`)로 반환합니다. |
 | `texture:GetOpacity()  -> number` | 현재 불투명도, 0..1. 빈 핸들이면 -1. |
@@ -130,7 +131,7 @@ end
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | 축에 정렬된 사각형을 캔버스에 맞게 잘라 채웁니다. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | 지정한 픽셀 반지름의 원을 채웁니다. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | 지정한 반지름의 원을 겹쳐 두꺼운 선을 그립니다. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | 텍스처를 왼쪽 위가 (x, y)에 오도록 캔버스에 알파 블렌딩합니다. 캔버스는 텍스처의 픽셀을 텍스처 핸들마다 한 번 GPU에서 읽어 오며, 이는 느린 작업이므로 설정 코드에 두어야 합니다. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | 텍스처를 왼쪽 위가 (x, y)에 오도록 캔버스에 알파 블렌딩합니다. 캔버스는 텍스처의 픽셀을 텍스처 핸들마다 한 번 읽으며(이미지 파일이 있으면 파일에서 읽으므로 텍스처가 아직 로드 중이어도 동작합니다), 이는 느린 작업이므로 설정 코드에 두어야 합니다. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | 최근접 샘플링을 사용해 `scale`로 스케일하고 `rotationDeg`만큼 시계 방향으로 회전한 텍스처를 알파 블렌딩합니다. anchor가 "center"이면 텍스처 중심이 (x, y)에 오고, 다른 값이면 왼쪽 위가 거기에 옵니다. |
 | `canvas:Clear(r, g, b, a)  -> nil` | 캔버스 전체를 한 색으로 채웁니다. |
 | `canvas:ClearTransparent()  -> nil` | 캔버스 전체를 완전 투명으로 재설정합니다. |

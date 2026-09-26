@@ -318,11 +318,11 @@ function M.draw()
     if showRounds then
         -- Full-screen dark overlay drawn over the rolls
         local bgt = tx["bgtile"]
-        if bgt ~= nil then
+        if bgt ~= nil and bgt.Loaded then
             local res = THEME:GetResolution()
             bgt:SetOpacity(0.75)
-            for rx = 0, math.ceil(res.X / math.max(1, bgt.Width)) - 1 do
-                for ry = 0, math.ceil(res.Y / math.max(1, bgt.Height)) - 1 do
+            for rx = 0, math.ceil(res.X / bgt.Width) - 1 do
+                for ry = 0, math.ceil(res.Y / bgt.Height) - 1 do
                     bgt:Draw(rx * bgt.Width, ry * bgt.Height)
                 end
             end

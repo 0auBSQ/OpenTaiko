@@ -16,7 +16,7 @@ Las rutas relativas se resuelven respecto al directorio del script; las variante
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Carga un efecto de sonido. |
 | `SOUND:CreateVoice(path)  -> sound` | Carga un clip de voz. |
-| `SOUND:CreateBGM(path)  -> sound` | Carga música de fondo (grupo de reproducción de canción). |
+| `SOUND:CreateBGM(path)  -> sound` | Carga música de fondo (grupo de reproducción de canción). Mientras una transición trae un stage (salvo la carga hacia el juego), la música que ese stage inicia espera al final del fundido de entrada; IsPlaying ya devuelve true. |
 | `SOUND:CreatePreview(path)  -> sound` | Carga un clip de vista previa de canción (grupo de vista previa de canción). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Carga un efecto de sonido desde una ruta completa. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Carga un clip de voz desde una ruta completa. |

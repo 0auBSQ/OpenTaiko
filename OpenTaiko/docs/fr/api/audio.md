@@ -16,7 +16,7 @@ Les chemins relatifs sont résolus par rapport au répertoire du script ; les v
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Charge un effet sonore. |
 | `SOUND:CreateVoice(path)  -> sound` | Charge un extrait vocal. |
-| `SOUND:CreateBGM(path)  -> sound` | Charge une musique de fond (groupe de lecture de chanson). |
+| `SOUND:CreateBGM(path)  -> sound` | Charge une musique de fond (groupe de lecture de chanson). Pendant qu'une transition amène un stage (sauf le chargement vers le gameplay), la musique que ce stage lance attend la fin du fondu d'entrée ; IsPlaying renvoie déjà true. |
 | `SOUND:CreatePreview(path)  -> sound` | Charge un extrait d'aperçu de chanson (groupe d'aperçu de chanson). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Charge un effet sonore depuis un chemin complet. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Charge un extrait vocal depuis un chemin complet. |

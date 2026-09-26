@@ -16,7 +16,7 @@
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | 加载一个音效。 |
 | `SOUND:CreateVoice(path)  -> sound` | 加载一段语音。 |
-| `SOUND:CreateBGM(path)  -> sound` | 加载背景音乐（歌曲播放组）。 |
+| `SOUND:CreateBGM(path)  -> sound` | 加载背景音乐（歌曲播放组）。过渡引入舞台期间（进入演奏画面的加载除外），该舞台启动的音乐会等到淡入结束；此期间 IsPlaying 已返回 true。 |
 | `SOUND:CreatePreview(path)  -> sound` | 加载一段歌曲试听片段（歌曲试听组）。 |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | 从完整路径加载一个音效。 |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | 从完整路径加载一段语音。 |

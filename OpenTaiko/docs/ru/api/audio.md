@@ -16,7 +16,7 @@
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Загружает звуковой эффект. |
 | `SOUND:CreateVoice(path)  -> sound` | Загружает голосовую реплику. |
-| `SOUND:CreateBGM(path)  -> sound` | Загружает фоновую музыку (группа воспроизведения песни). |
+| `SOUND:CreateBGM(path)  -> sound` | Загружает фоновую музыку (группа воспроизведения песни). Пока переход выводит сцену (кроме загрузки в игровой процесс), музыка, которую эта сцена запускает, ждёт конца появления; IsPlaying при этом уже возвращает true. |
 | `SOUND:CreatePreview(path)  -> sound` | Загружает фрагмент превью песни (группа превью песни). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Загружает звуковой эффект по полному пути. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Загружает голосовую реплику по полному пути. |

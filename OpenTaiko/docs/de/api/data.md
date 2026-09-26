@@ -192,6 +192,8 @@ Set*-Methoden laden auf einem Hintergrund-Thread und tauschen die Ressource auf 
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | Speichert einen String unter einem Schlüssel. |
 | `SHARED:GetSharedString(key)  -> string` | Gibt den unter einem Schlüssel gespeicherten String zurück, oder einen leeren String. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | Teilt eine 3D-Szene unter einem Schlüssel, damit andere Module sie zeichnen und steuern können; die Szene gehört weiter dem Modul, das sie erstellt hat, und verschwindet mit ihm. nil entfernt den Schlüssel. |
+| `SHARED:GetSharedScene(key)  -> scene` | Gibt die unter einem Schlüssel geteilte Szene zurück, oder nil, wenn es keine gibt oder ihr Modul sie freigegeben hat. |
 | `SHARED:GetSharedTexture(key)  -> texture` | Gibt die gemeinsame Textur für einen Schlüssel zurück, oder eine leere Textur, wenn keine gesetzt wurde. |
 | `SHARED:GetSharedSound(key)  -> sound` | Gibt den gemeinsamen Sound für einen Schlüssel zurück, oder einen leeren Sound, wenn keiner gesetzt wurde. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | Gibt die unter einem Schlüssel gespeicherte Textur frei und ersetzt sie durch eine leere. |

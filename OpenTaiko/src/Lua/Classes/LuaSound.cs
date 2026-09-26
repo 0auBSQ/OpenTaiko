@@ -14,6 +14,7 @@ namespace OpenTaiko {
 	public class LuaSound : IDisposable, ILuaSeekableInMs, ILuaLoopable {
 		internal CSkin.CSystemSound? _sound;
 		internal HashSet<LuaSound>? _disposeList = null;
+		internal bool HoldExempt;   // a transition's sound: never held back
 
 		// State set on the stub before the deferred sound is built (async-load path) — applied on LoadDeferred,
 		// so e.g. SetLoop(true)/Play() called in onStart aren't lost while the BASS stream is still being created.
@@ -39,7 +40,7 @@ namespace OpenTaiko {
 		internal void LoadDeferred(string path, ESoundGroup group) {
 			if (_disposedValue) return;   // disposed while still queued: don't resurrect an unowned native sound
 			Path = path;
-			var s = new CSkin.CSystemSound(path, false, false, false, group);
+			var s = new CSkin.CSystemSound(path, false, false, false, group) { HoldExempt = HoldExempt };
 			s.tLoading();
 			_sound = s;
 			// Apply anything set on the stub while it was still loading. Play BEFORE the buffered seek:
@@ -129,6 +130,7 @@ namespace OpenTaiko {
 	public class LuaSoundFunc {
 		private HashSet<LuaSound> Sounds;
 		private string DirPath;
+		internal bool HoldExempt;   // set for a transition's scripts
 
 		public LuaSoundFunc(HashSet<LuaSound> sounds, string dirPath) {
 			Sounds = sounds;
@@ -153,7 +155,7 @@ namespace OpenTaiko {
 			// Return an empty stub + create the BASS stream non-blocking on the render thread (BASS is sync-
 			// critical, so it is NOT moved off-thread — just spread across frames). Until it's built every method
 			// is a harmless no-op and Play/Set* are buffered, so the sound simply starts working when ready.
-			LuaSound sound = new();
+			LuaSound sound = new() { HoldExempt = HoldExempt };
 			Sounds.Add(sound);
 			if (autoDispose)
 				sound._disposeList = this.Sounds;

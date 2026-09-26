@@ -157,9 +157,8 @@ local function loadSongMedia()
     if not node then LO.stopPreview(); net.iLackSong = true; placeholderPreimage(); return end
     net.iLackSong = false
     pcall(function() net.songSubtitle = node.Subtitle end)
-    -- jacket via the shared "preimage" texture. We do NOT ClearSharedTexture first: Clear bumps the resource's
-    -- async version AFTER SetShared... captured it, so the loaded jacket was discarded as stale (showed once,
-    -- never updated). SetShared... already swaps atomically; set the border wrap on the actual loaded texture.
+    -- jacket via the shared "preimage" texture: it keeps the previous jacket until the new one is loaded, then
+    -- swaps; the border wrap goes on the loaded texture (setBorder)
     pcall(function()
         if node.HasPreimage then SHARED:SetSharedTextureUsingAbsolutePath("preimage", node.PreimagePath, setBorder)
         else placeholderPreimage() end

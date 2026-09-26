@@ -13,7 +13,7 @@ Le script qui crée un handle de texture, de canvas, de texte, de vidéo ou de d
 Charge des fichiers image dans des handles de texture.
 
 <div class="callout warn">
-Les chemins relatifs sont résolus par rapport au répertoire du script ; les variantes FromAbsolutePath prennent un chemin complet. Un fichier manquant renvoie un handle vide qui ne dessine rien. CreateTexture charge de façon asynchrone : le handle ne dessine rien et rapporte Width et Height à 0 jusqu'à la fin du décodage et de l'envoi en arrière-plan. Utilisez CreateTextureSync quand vous avez besoin de la taille ou des pixels immédiatement. La table d'options accepte { maxSize = N } pour réduire l'image au décodage de sorte que son plus grand côté fasse au plus N pixels.
+Les chemins relatifs sont résolus par rapport au répertoire du script ; les variantes FromAbsolutePath prennent un chemin complet. Un fichier manquant renvoie un handle vide qui ne dessine rien. CreateTexture charge de façon asynchrone : le handle ne dessine rien jusqu'à la fin du décodage et de l'envoi en arrière-plan (Ready passe alors à true), mais Width et Height donnent la taille de l'image immédiatement. Utilisez CreateTextureSync quand l'image doit s'afficher dès la frame suivante. La table d'options accepte { maxSize = N } pour réduire l'image au décodage de sorte que son plus grand côté fasse au plus N pixels.
 </div>
 
 | Méthode | Description |
@@ -59,8 +59,9 @@ Noms d'ancre : topleft, top, topright, left, center, right, bottomleft, bottom,
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | Dessine la texture entière de sorte que le point d'ancrage nommé tombe en (x, y). |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | Dessine un sous-rectangle source de sorte que le point d'ancrage nommé tombe en (x, y). |
 | `texture.Loaded  -> bool` | Vrai quand le handle enveloppe une texture. Le jeu le définit dès qu'il trouve le fichier, avant la fin d'un chargement asynchrone. |
-| `texture.Width  -> int` | Largeur en pixels ; -1 sur un handle vide, 0 pendant qu'un chargement asynchrone est en attente. |
-| `texture.Height  -> int` | Hauteur en pixels ; -1 sur un handle vide, 0 pendant qu'un chargement asynchrone est en attente. |
+| `texture.Width  -> int` | Largeur en pixels, connue immédiatement même pendant un chargement asynchrone ; -1 sur un handle vide. |
+| `texture.Height  -> int` | Hauteur en pixels, connue immédiatement même pendant un chargement asynchrone ; -1 sur un handle vide. |
+| `texture.Ready  -> bool` | Vrai dès que dessiner la texture affiche l'image ; faux tant qu'un chargement asynchrone envoie encore ses pixels. Utile seulement pour attendre une image, par exemple avant un fondu d'entrée. |
 | `texture.Pointer  -> int` | Identifiant de texture GL natif, ou 0 s'il n'y en a pas. |
 | `texture:GetScale()  -> vector2` | Échelle de dessin courante sous forme de vector2 (`X`, `Y`). |
 | `texture:GetOpacity()  -> number` | Opacité courante, 0..1 ; -1 sur un handle vide. |
@@ -130,7 +131,7 @@ Les arguments de couleur r, g, b, a sont des entiers 0-255. Les modifications de
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | Remplit un rectangle aligné sur les axes, découpé aux bords du canvas. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | Remplit un disque du rayon donné en pixels. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | Peint une ligne épaisse sous forme de disques superposés du rayon donné. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | Fusionne en alpha une texture sur le canvas avec son coin supérieur gauche en (x, y). Le canvas relit les pixels de la texture depuis le GPU une fois par handle de texture, une opération lente qui a sa place dans le code d'initialisation. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | Fusionne en alpha une texture sur le canvas avec son coin supérieur gauche en (x, y). Le canvas lit les pixels de la texture une fois par handle de texture (depuis son fichier image s'il en a un, donc même pendant que la texture se charge encore), une opération lente qui a sa place dans le code d'initialisation. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | Fusionne en alpha une texture mise à l'échelle par `scale` et pivotée dans le sens horaire de `rotationDeg`, avec un échantillonnage au plus proche voisin. Avec l'ancre "center", le centre de la texture tombe en (x, y) ; toute autre valeur y place son coin supérieur gauche. |
 | `canvas:Clear(r, g, b, a)  -> nil` | Remplit tout le canvas d'une seule couleur. |
 | `canvas:ClearTransparent()  -> nil` | Remet tout le canvas entièrement transparent. |

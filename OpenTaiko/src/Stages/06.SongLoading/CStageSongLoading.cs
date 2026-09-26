@@ -126,6 +126,7 @@ internal class CStageSongLoading : CStage {
 				CTexture.CancelStreaming();
 				OpenTaiko.stageGameScreen.DeActivate();   // tears down whatever child actors were activated so far
 				_streamingActive = false;
+				if (!TransitionDriven) Game.AsyncBudgetMs = Game.DefaultAsyncBudgetMs;
 			}
 
 			CLoadingProgress.End();   // clear the loading bar (covers normal completion + ESC cancel)
@@ -470,6 +471,9 @@ internal class CStageSongLoading : CStage {
 						_gsPrevAutoFlush = System.Diagnostics.Trace.AutoFlush;
 						System.Diagnostics.Trace.AutoFlush = false;
 						CTexture.BeginStreaming();
+						// without the song_loading transition no CLoadSession raises the upload budget, and the stream
+						// below waits for every upload
+						if (!TransitionDriven) Game.AsyncBudgetMs = CLoadSession.FinalizeBudgetMs;
 						_gsActivate = OpenTaiko.stageGameScreen.ActivateSteps();
 						_streamingActive = true;   // set NOW so an ESC mid-build still tears the game screen down (DeActivate)
 					}
@@ -501,6 +505,7 @@ internal class CStageSongLoading : CStage {
 
 					CTexture.EndStreaming();
 					_streamingActive = false;
+					if (!TransitionDriven) Game.AsyncBudgetMs = Game.DefaultAsyncBudgetMs;
 					CLoadingProgress.Report(0.96f);
 
 					// BGA load + FastRender warm-up are synchronous + heavy; run them non-blocking on the budgeted

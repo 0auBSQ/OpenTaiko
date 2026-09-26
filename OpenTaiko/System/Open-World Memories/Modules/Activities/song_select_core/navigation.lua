@@ -38,7 +38,8 @@ local function reloadPreimage(songNode)
             if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
             -- maxSize: jackets can be up to 3000x3000 (34MB decoded) but display at ~400px — decode them small.
             -- onCreate fires when the jacket is actually swapped in → start the pop-in animation then.
-            local function onCreate()
+            local function onCreate(tex)
+                tex:SetWrapMode("Border")
                 if G.songList == nil or G.songList:GetSelectedSongNode() ~= songNode then return end
                 startPreimagePop()
             end
@@ -51,7 +52,6 @@ local function reloadPreimage(songNode)
     else
         G.ctx["throttle_preimage"] = COUNTER:EmptyCounter()
     end
-    SHARED:GetSharedTexture("preimage"):SetWrapMode("Border")
 end
 
 local function playPreview(songNode)

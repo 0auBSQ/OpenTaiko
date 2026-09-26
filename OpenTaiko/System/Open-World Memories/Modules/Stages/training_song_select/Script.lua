@@ -40,7 +40,7 @@ function update()
 		exitingToPlay = true
 		return Exit("play", nil)
 	end
-	if signal == "cancel" then return Exit("title", nil) end
+	if signal == "cancel" then return Exit("title", nil, "pill_clouds_back") end
 end
 
 function draw()

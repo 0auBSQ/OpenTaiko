@@ -20,17 +20,18 @@ local currentBackground = 0
 local difficultySelection = false
 local diffIndex = {-2, -2, -2, -2, -2}
 
+local function setBorder(tex) tex:SetWrapMode("Border") end
+
 local function reloadPreimage(songNode)
-	if songNode.IsSong == true then 
+	if songNode.IsSong == true then
 		if songNode.HasPreimage then
-			SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath)
+			SHARED:SetSharedTextureUsingAbsolutePath("preimage", songNode.PreimagePath, setBorder)
 		else
-			SHARED:SetSharedTexture("preimage", "Textures/preimage.png")
+			SHARED:SetSharedTexture("preimage", "Textures/preimage.png", setBorder)
 		end
 	else
 		SHARED:ClearSharedTexture("preimage")
 	end
-	SHARED:GetSharedTexture("preimage"):SetWrapMode("Border")
 end
 
 local function drawPreimage()

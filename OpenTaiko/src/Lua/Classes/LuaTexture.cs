@@ -14,7 +14,7 @@ namespace OpenTaiko {
 		private int _pcW, _pcH;
 		internal byte[]? GetCachedPixels(out int w, out int h) {
 			if (_pixCache != null) { w = _pcW; h = _pcH; return _pixCache; }
-			_pixCache = _texture?.ReadPixelsRGBA(out _pcW, out _pcH);
+			_pixCache = _texture?.ReadImageRGBA(out _pcW, out _pcH);   // from the file when it has one: no need to wait for the upload
 			w = _pcW; h = _pcH;
 			return _pixCache;
 		}
@@ -39,6 +39,7 @@ namespace OpenTaiko {
 			_texture?.t2DDraw((float)x, (float)y, new System.Drawing.RectangleF(rect_x, rect_y, rect_width, rect_height));
 		}
 		public void DrawAtAnchor(double x, double y, string anchor) {
+			if (_texture == null || _texture.UploadPending) return;   // nothing to show yet: skip the size read too
 			DrawRectAtAnchor(x, y, 0, 0, Width, Height, anchor);
 		}
 		public void DrawRectAtAnchor(double x, double y, int rect_x, int rect_y, int rect_width, int rect_height, string anchor) {
@@ -59,9 +60,18 @@ namespace OpenTaiko {
 		}
 		#endregion
 		#region Gets
-		public bool Loaded => _texture != null;
-		public virtual int Height => _texture?.szTextureSize.Height ?? -1;
-		public virtual int Width => _texture?.szTextureSize.Width ?? -1;
+		// a loaded texture always has its real size, even before its pixels arrive; a disposed one reads as missing
+		public bool Loaded => _texture != null && !_texture.IsDisposed;
+		public bool Ready => Loaded && !_texture.UploadPending;   // drawing it now shows the image
+		public virtual int Height => Loaded ? _texture.szTextureSize.Height : -1;
+		public virtual int Width => Loaded ? _texture.szTextureSize.Width : -1;
+
+		// run the action once the pixels are there; never inside the caller (a load phase waits for it)
+		internal void WhenReady(Action action) {
+			if (Loaded && _texture.UploadPending) _texture.WhenUploaded(action);
+			else if (CAsyncLoad.ShouldDefer) CAsyncLoad.TrackRenderThread(action);
+			else Game.AsyncActions.Enqueue(action);
+		}
 		public LuaVector2 GetScale() {
 			return _texture != null ? new LuaVector2(_texture.vcScaleRatio.X, _texture.vcScaleRatio.Y) : new LuaVector2(0, 0);
 		}
@@ -215,8 +225,7 @@ namespace OpenTaiko {
 					var tex = OpenTaiko.tTextureCreate(full_path, false, maxDimension);
 					luatex = new LuaTexture(tex);
 					Textures.Add(luatex);
-					if (autoDispose)
-						luatex._disposeList = this.Textures;
+					luatex._disposeList = this.Textures;   // leaves the list when disposed, even when a SHARED slot does it
 				} catch (Exception e) {
 					LogNotification.PopWarning($"Lua Texture failed to load: {e}");
 					luatex?.Dispose();

@@ -25,17 +25,18 @@ public partial class CTexture {
 	[ThreadStatic] public static bool AsyncLoad;
 	public static volatile bool SyncForce;       // force inline decode + upload (CreateTextureSync)
 
+	// Pending holds items not yet picked up by a decode worker; an item counts as done only once it is uploaded
+	// (or dropped), so a phase is complete when Done catches up with Queued, not when Pending is empty.
 	private class Phase {
 		public ConcurrentQueue<StreamItem> Pending = new();
+		public int Queued = 0;
 		public int Done = 0;
 
-		public int Total => Pending.Count + Volatile.Read(ref Done);
+		public bool Complete => Volatile.Read(ref Done) >= Volatile.Read(ref Queued);
 		public float Fraction {
 			get {
-				var done = Volatile.Read(ref Done);
-				return this.Pending.IsEmpty ? 1f
-					: done <= 0 ? 0f
-					: Math.Min(1f, 1 / (float)(this.Pending.Count / (float)done + 1)); // = done / (count + done)
+				int queued = Volatile.Read(ref Queued);
+				return queued <= 0 ? 1f : Math.Min(1f, Volatile.Read(ref Done) / (float)queued);
 			}
 		}
 	};
@@ -82,18 +83,25 @@ public partial class CTexture {
 	/// <summary>Loading-bar progress 0..1 for the current load phase (1 when nothing is queued).</summary>
 	public static float StreamFraction => Volatile.Read(ref _phaseNow).Fraction;
 	/// <summary>True once every texture queued during the current phase has been uploaded (or skipped).</summary>
-	public static bool StreamComplete => Volatile.Read(ref _phaseNow).Pending.IsEmpty;
+	public static bool StreamComplete => Volatile.Read(ref _phaseNow).Complete;
 
 	/// <summary>Queue a path-load for background decode + render-thread upload. Returns false only if the file is
-	/// missing (→ the caller's inline path handles it / throws). DELIBERATELY does NOT open the file to read the
-	/// size: opening triggers per-file AV scanning (~15-20ms), so reading hundreds of headers during an Activate
-	/// is itself a multi-second freeze. Pointer + size stay 0 until the upload fills them; t2DDraw no-ops
-	/// meanwhile, and a load phase isn't considered done (StreamComplete) until every item uploads. Render thread.</summary>
+	/// missing (→ the caller's inline path handles it / throws). Queueing does not open the file; the size comes
+	/// from the decode worker, or from the file header if something reads it before that (once, on the reading
+	/// thread). Pointer stays 0 until the upload; t2DDraw no-ops meanwhile, and a load phase isn't considered done
+	/// (StreamComplete) until every item uploads.</summary>
 	private bool tQueueAsyncTexture(string strFileName, bool bBlackTransparent, int maxDimension = 0) {
 		if (!FileExistsCached(strFileName))
 			return false;
+		// both before the enqueue, so the upload is always the one that clears them
+		_sizePending = true;
+		_uploadPending = true;
 		var phase = Volatile.Read(ref _phaseNow);
+		Interlocked.Increment(ref phase.Queued);   // before the enqueue, so Done can never pass Queued
 		phase.Pending.Enqueue(new StreamItem { tex = this, path = strFileName, black = bBlackTransparent, maxDim = maxDimension, phase = phase });
+		// another thread may have ended this phase meanwhile (NextPhase skips empty phases): keep it reachable
+		if (!ReferenceEquals(Volatile.Read(ref _phaseNow), phase))
+			_phaseOlds.Enqueue(phase);
 		EnsureDecodeWorkers();
 		return true;
 	}
@@ -110,17 +118,27 @@ public partial class CTexture {
 		var phaseNow = Volatile.Read(ref _phaseNow);
 		try {
 			void dequeue(Phase phase) {
-				while (phase.Pending.TryDequeue(out var item)) {
-					// Backpressure: don't decode faster than the render thread uploads (bounded memory).
-					bool multipleWorkers = _maxWorkers - _spareDecodeWorkers.CurrentCount > 1;
-					while (multipleWorkers && Volatile.Read(ref _readyBytes) >= readyByteCap) {
+				while (true) {
+					// Backpressure: don't decode faster than the render thread uploads (bounded memory). Wait BEFORE
+					// taking an item and only briefly per try: a wakeup lost between Reset and Wait then costs one short
+					// wait, never a taken item stuck forever (its phase could not complete).
+					while (_maxWorkers - _spareDecodeWorkers.CurrentCount > 1 && Volatile.Read(ref _readyBytes) >= readyByteCap) {
 						_canDecodeBytes.Reset();
-						_canDecodeBytes.Wait();
+						if (Volatile.Read(ref _readyBytes) < readyByteCap) break;
+						_canDecodeBytes.Wait(20);
 					}
+					if (!phase.Pending.TryDequeue(out var item)) break;
 					if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
-					SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(item.path), item.maxDim);
-					if (bmp != null)
+					SKBitmap? bmp;
+					try {
+						bmp = tClampToMaxDimension(tDecodeForUpload(item.path), item.maxDim);
+					} catch {
+						bmp = null;   // the upload below still completes the item, so the phase can finish
+					}
+					if (bmp != null) {
 						Interlocked.Add(ref _readyBytes, bmp.ByteCount);
+						item.tex.tPublishPendingSize(bmp.Width, bmp.Height);   // later size reads need no file read
+					}
 					var captured = item;
 					Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp));
 				}
@@ -136,7 +154,7 @@ public partial class CTexture {
 			} catch (SemaphoreFullException) {
 				// ignore unpaired Wait/Release
 			}
-			if (!Volatile.Read(ref _phaseNow).Pending.IsEmpty)
+			if (!_phaseOlds.IsEmpty || !Volatile.Read(ref _phaseNow).Pending.IsEmpty)
 				EnsureDecodeWorkers();   // an item raced in just as this worker exited
 		}
 	}
@@ -144,15 +162,36 @@ public partial class CTexture {
 	// Render-thread GL upload (drained from Game.AsyncActions). Skips textures disposed since queueing (e.g. an
 	// ESC-cancelled song load tore down the half-loaded game screen).
 	private static void UploadOne(StreamItem item, SKBitmap? bmp) {
+		// taken first: a failed upload disposes the texture, and what waited for it must still hear about it
+		Action? after = item.tex.bDisposeCompleteDone ? null : item.tex.tTakeUploadCallbacks();
 		try {
-			if (bmp != null && !item.tex.bDisposeCompleteDone)
-				item.tex.MakeTexture(bmp, item.black);
+			if (!item.tex.bDisposeCompleteDone) {
+				if (bmp != null) {
+					item.tex.MakeTexture(bmp, item.black);
+				} else {
+					// failed decode: a clear 10x10 placeholder like a sync load, so a finished load never leaves Width 0;
+					// a size already read from the header stays (the placeholder only draws nothing at it)
+					System.Diagnostics.Trace.TraceWarning($"Texture: cannot decode '{item.path}', using a 10x10 placeholder.");
+					System.Drawing.Size? known = item.tex.tSizeKnown ? item.tex.szImageSize : null;
+					using var blank = new SKBitmap(10, 10);
+					blank.Erase(SKColors.Transparent);
+					item.tex.MakeTexture(blank, item.black);
+					if (known is System.Drawing.Size k && k.Width > 0 && k.Height > 0) item.tex.SetLogicalSize(k.Width, k.Height);
+				}
+			}
 		} catch { /* leave the stub blank on upload failure */ }
 		finally {
 			if (bmp != null) {
 				Interlocked.Add(ref _readyBytes, -bmp.ByteCount);
 				_canDecodeBytes.Set();
 				bmp.Dispose();
+			}
+			item.tex.tEndUpload();
+			// what waited for the pixels runs before the phase counts the item, so a load waits for it too
+			try {
+				after?.Invoke();
+			} catch (Exception e) {
+				System.Diagnostics.Trace.TraceWarning("Texture: an after-upload callback failed: " + e.Message);
 			}
 			CompleteItem(item);
 		}

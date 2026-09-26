@@ -138,7 +138,7 @@ end
 
 local function cushionHeight(A)
     local h = A.tex.cushion and A.tex.cushion.Height or 0
-    if h <= 0 then h = 300 end          -- the shipped cushion, until an async load reports its size
+    if h <= 0 then h = 300 end          -- no cushion art: the shipped cushion's height
     return h
 end
 

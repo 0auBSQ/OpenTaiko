@@ -13,7 +13,7 @@
 画像ファイルをテクスチャハンドルに読み込みます。
 
 <div class="callout warn">
-相対パスはスクリプトのディレクトリを基準に解決されます。FromAbsolutePath 系は完全なパスを取ります。ファイルがない場合は何も描画しない空のハンドルを返します。CreateTexture は非同期に読み込みます。バックグラウンドのデコードとアップロードが完了するまで、ハンドルは何も描画せず、Width と Height は 0 を報告します。サイズやピクセルがすぐに必要な場合は CreateTextureSync を使ってください。オプションテーブルは { maxSize = N } を受け付け、デコード時に画像の長辺が最大 N ピクセルになるよう縮小します。
+相対パスはスクリプトのディレクトリを基準に解決されます。FromAbsolutePath 系は完全なパスを取ります。ファイルがない場合は何も描画しない空のハンドルを返します。CreateTexture は非同期に読み込みます。バックグラウンドのデコードとアップロードが完了するまでハンドルは何も描画しません (完了すると Ready が true になります) が、Width と Height は画像のサイズをすぐに返します。次のフレームで必ず描画したい場合は CreateTextureSync を使ってください。オプションテーブルは { maxSize = N } を受け付け、デコード時に画像の長辺が最大 N ピクセルになるよう縮小します。
 </div>
 
 | メソッド | 説明 |
@@ -59,8 +59,9 @@ end
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | 指定したアンカー点が (x, y) に来るようにテクスチャ全体を描画します。 |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | 指定したアンカー点が (x, y) に来るようにソースの部分矩形を描画します。 |
 | `texture.Loaded  -> bool` | ハンドルがテクスチャをラップしているとき true。ゲームはファイルを見つけた時点で、非同期読み込みの完了前にこれを設定します。 |
-| `texture.Width  -> int` | ピクセル幅。空のハンドルでは -1、非同期読み込み中は 0。 |
-| `texture.Height  -> int` | ピクセル高さ。空のハンドルでは -1、非同期読み込み中は 0。 |
+| `texture.Width  -> int` | ピクセル幅。非同期読み込み中でもすぐに分かります。空のハンドルでは -1。 |
+| `texture.Height  -> int` | ピクセル高さ。非同期読み込み中でもすぐに分かります。空のハンドルでは -1。 |
+| `texture.Ready  -> bool` | テクスチャを描画すると画像が表示される状態なら true。非同期読み込みがまだピクセルをアップロード中なら false。画像を待つとき (たとえばフェードインの前) にだけ必要です。 |
 | `texture.Pointer  -> int` | ネイティブの GL テクスチャ id。なければ 0。 |
 | `texture:GetScale()  -> vector2` | 現在の描画スケール (vector2 の `X`、`Y`)。 |
 | `texture:GetOpacity()  -> number` | 現在の不透明度 (0..1)。空のハンドルでは -1。 |
@@ -130,7 +131,7 @@ end
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | 軸に平行な矩形を塗りつぶします。キャンバスにクリップされます。 |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | 指定した半径 (ピクセル) の円板を塗りつぶします。 |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | 指定した半径の円板を重ねて太い線を描きます。 |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | テクスチャを左上が (x, y) になるようキャンバスにアルファ合成します。キャンバスはテクスチャのピクセルをテクスチャハンドルごとに 1 回 GPU から読み戻します。これは遅い操作で、セットアップコードに置くものです。 |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | テクスチャを左上が (x, y) になるようキャンバスにアルファ合成します。キャンバスはテクスチャのピクセルをテクスチャハンドルごとに 1 回読み取ります (画像ファイルがあればそこから読むので、テクスチャの読み込み中でも動作します)。これは遅い操作で、セットアップコードに置くものです。 |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | `scale` で拡大縮小し `rotationDeg` で時計回りに回転したテクスチャを、最近傍サンプリングでアルファ合成します。anchor が "center" ならテクスチャの中心が (x, y) に、それ以外の値なら左上が (x, y) に来ます。 |
 | `canvas:Clear(r, g, b, a)  -> nil` | キャンバス全体を 1 色で塗りつぶします。 |
 | `canvas:ClearTransparent()  -> nil` | キャンバス全体を完全に透明にリセットします。 |

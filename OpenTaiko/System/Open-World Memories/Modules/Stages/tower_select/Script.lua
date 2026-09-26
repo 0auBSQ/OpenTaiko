@@ -429,7 +429,7 @@ local function updateConfirm()
 end
 
 local function closeFolder()
-    if songlist == nil then return Exit("title", nil) end
+    if songlist == nil then return Exit("title", nil, "tower_gate_back") end
     local success = songlist:CloseFolder()
     refresh()
     return success
@@ -636,13 +636,13 @@ function update()
                 SHARED:GetSharedSound("Cancel"):Play()
             else
                 SHARED:GetSharedSound("Cancel"):Play()
-                return Exit("title", nil)
+                return Exit("title", nil, "tower_gate_back")
             end
         end
     else
         if navPn.cancel() then
             SHARED:GetSharedSound("Cancel"):Play()
-            return Exit("title", nil)
+            return Exit("title", nil, "tower_gate_back")
         end
     end
     move_counter:Tick()

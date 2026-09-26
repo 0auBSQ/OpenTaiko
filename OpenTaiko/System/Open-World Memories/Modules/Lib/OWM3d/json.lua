@@ -157,7 +157,12 @@ function Json.parse(d, dir)
 
     -- grid + cells (iso)
     local gridD = jget(d, "grid")
-    def.gridW, def.gridH = num(gridD, "w", 16), num(gridD, "h", 16)
+    -- same 1..1024 range as the editor, so a broken size cannot make the row loops endless
+    local function side(k)
+        local v = math.floor(num(gridD, k, 16))
+        return (v >= 1 and v <= 1024) and v or math.max(1, math.min(1024, v == v and v or 16))
+    end
+    def.gridW, def.gridH = side("w"), side("h")
     if def.type == "iso" then
         def.cells = parseCells(d, def.gridW, def.gridH)
         if def.cells == nil then return nil, "iso map has no cells" end

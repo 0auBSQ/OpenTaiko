@@ -13,7 +13,7 @@ El script que crea un handle de textura, canvas, texto, vídeo o gradiente es su
 Carga archivos de imagen en handles de textura.
 
 <div class="callout warn">
-Las rutas relativas se resuelven respecto al directorio del script; las variantes FromAbsolutePath reciben una ruta completa. Un archivo ausente devuelve un handle vacío que no dibuja nada. CreateTexture carga de forma asíncrona: el handle no dibuja nada y reporta Width y Height de 0 hasta que terminan la decodificación y la subida en segundo plano. Usa CreateTextureSync cuando necesites el tamaño o los píxeles de inmediato. La tabla de opciones acepta { maxSize = N } para reducir la imagen al decodificarla de modo que su lado más largo tenga como máximo N píxeles.
+Las rutas relativas se resuelven respecto al directorio del script; las variantes FromAbsolutePath reciben una ruta completa. Un archivo ausente devuelve un handle vacío que no dibuja nada. CreateTexture carga de forma asíncrona: el handle no dibuja nada hasta que terminan la decodificación y la subida en segundo plano (entonces Ready pasa a true), pero Width y Height dan el tamaño de la imagen de inmediato. Usa CreateTextureSync cuando la imagen deba dibujarse ya en el siguiente fotograma. La tabla de opciones acepta { maxSize = N } para reducir la imagen al decodificarla de modo que su lado más largo tenga como máximo N píxeles.
 </div>
 
 | Método | Descripción |
@@ -59,8 +59,9 @@ Nombres de ancla: topleft, top, topright, left, center, right, bottomleft, botto
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | Dibuja la textura completa de modo que el punto de ancla indicado caiga en (x, y). |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | Dibuja un subrectángulo de origen de modo que el punto de ancla indicado caiga en (x, y). |
 | `texture.Loaded  -> bool` | Verdadero cuando el handle envuelve una textura. El juego lo establece en cuanto encuentra el archivo, antes de que termine una carga asíncrona. |
-| `texture.Width  -> int` | Anchura en píxeles; -1 en un handle vacío, 0 mientras hay una carga asíncrona pendiente. |
-| `texture.Height  -> int` | Altura en píxeles; -1 en un handle vacío, 0 mientras hay una carga asíncrona pendiente. |
+| `texture.Width  -> int` | Anchura en píxeles, conocida de inmediato incluso con una carga asíncrona pendiente; -1 en un handle vacío. |
+| `texture.Height  -> int` | Altura en píxeles, conocida de inmediato incluso con una carga asíncrona pendiente; -1 en un handle vacío. |
+| `texture.Ready  -> bool` | Verdadero cuando dibujar la textura ya muestra la imagen; falso mientras una carga asíncrona aún sube sus píxeles. Solo hace falta para esperar una imagen, por ejemplo antes de un fundido de entrada. |
 | `texture.Pointer  -> int` | Id nativo de textura GL, o 0 si no hay ninguno. |
 | `texture:GetScale()  -> vector2` | Escala de dibujo actual como vector2 (`X`, `Y`). |
 | `texture:GetOpacity()  -> number` | Opacidad actual, 0..1; -1 en un handle vacío. |
@@ -130,7 +131,7 @@ Los argumentos de color r, g, b, a son enteros 0-255. Las ediciones de píxeles 
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | Rellena un rectángulo alineado con los ejes, recortado al canvas. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | Rellena un disco del radio indicado en píxeles. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | Pinta una línea gruesa como discos superpuestos del radio indicado. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | Mezcla por alfa una textura sobre el canvas con su esquina superior izquierda en (x, y). El canvas lee de vuelta los píxeles de la textura desde la GPU una vez por handle de textura, una operación lenta que corresponde al código de preparación. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | Mezcla por alfa una textura sobre el canvas con su esquina superior izquierda en (x, y). El canvas lee los píxeles de la textura una vez por handle de textura (desde su archivo de imagen si lo tiene, así que funciona aunque la textura aún se esté cargando), una operación lenta que corresponde al código de preparación. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | Mezcla por alfa una textura escalada por `scale` y rotada en sentido horario `rotationDeg`, con muestreo de vecino más cercano. Con el ancla "center" el centro de la textura cae en (x, y); cualquier otro valor coloca ahí su esquina superior izquierda. |
 | `canvas:Clear(r, g, b, a)  -> nil` | Rellena todo el canvas con un color. |
 | `canvas:ClearTransparent()  -> nil` | Reinicia todo el canvas a completamente transparente. |

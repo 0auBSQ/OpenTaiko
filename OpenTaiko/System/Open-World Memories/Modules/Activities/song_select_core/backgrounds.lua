@@ -42,7 +42,7 @@ local COMMON = BASE .. "_common/"
 
 -- ── Textures ─────────────────────────────────────────────────────────────────
 
-local texCache = {}      -- path -> LuaTexture (created async: blank and size 0 until uploaded)
+local texCache = {}      -- path -> LuaTexture (created async: draws nothing until its pixels are uploaded)
 
 local function resolvePath(dir, file)
     if file == nil then return nil end
@@ -300,11 +300,11 @@ function M.select(genre)
     end
 end
 
--- a set is ready to show once every image layer's texture has been uploaded: an asynchronous load
--- reports a size of 0 until then (a missing file is an empty handle, nothing to wait for)
+-- a set is ready to show once every image layer's pixels are uploaded (a missing file is an empty handle,
+-- nothing to wait for)
 local function isReady(inst)
     for _, S in ipairs(inst.layers) do
-        if S.def.type == "image" and S.tex ~= nil and S.tex.Loaded and S.tex.Width <= 0 then return false end
+        if S.def.type == "image" and S.tex ~= nil and S.tex.Loaded and not S.tex.Ready then return false end
     end
     return true
 end

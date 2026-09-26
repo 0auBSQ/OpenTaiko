@@ -64,13 +64,51 @@ internal class CSkin : IDisposable {
 		public bool bLoadedSuccessfuly;
 		public bool bExclusive;
 		public string strFileName = "";
+
+		// a BGM started during a transition waits until the fade-in ends; it reads as playing meanwhile
+		internal bool HoldExempt;                    // a transition's own sounds play at once
+		private bool _held, _heldResume;
+		private long? _heldTimestamp;
+		private static readonly List<CSystemSound> _heldSounds = [];
+
+		private bool HoldBack => SoundGroup == ESoundGroup.SongPlayback && !HoldExempt && CStageTransition.HoldsNewBgm;
+
+		private void Hold(bool resume) {
+			if (!_held) { _held = true; _heldSounds.Add(this); }
+			_heldResume = resume;
+			_heldTimestamp = null;
+		}
+
+		private void DropHold() {
+			if (!_held) return;
+			_held = false;
+			_heldSounds.Remove(this);
+		}
+
+		internal static void ReleaseHeld() {
+			var held = _heldSounds.ToArray();
+			_heldSounds.Clear();
+			foreach (var s in held) {
+				if (!s._held) continue;
+				s._held = false;
+				if (s.bDisposed) continue;
+				s.tPlay(s._heldResume);
+				if (s._heldTimestamp is long ms) s.SetTimestamp(ms);
+			}
+		}
+
+		internal static void DropHeld() {
+			foreach (var s in _heldSounds) s._held = false;
+			_heldSounds.Clear();
+		}
+
 		private CSound nowSound => this.rSound[1 - this.nNextPlayingSoundNumber];
 		private CSound nextSound => this.rSound[this.nNextPlayingSoundNumber];
 		public bool bIsPlaying {
-			get => this.nowSound?.IsPlaying ?? false;
+			get => _held || (this.nowSound?.IsPlaying ?? false);
 		}
 		public bool bIsFinishedPlaying {
-			get => this.nowSound?.IsFinishedPlaying ?? false;
+			get => !_held && (this.nowSound?.IsFinishedPlaying ?? false);
 		}
 		public int nPosition_CurrentlyPlayingSound {
 			get => this.nowSound?.SoundPosition ?? 0;
@@ -92,6 +130,7 @@ internal class CSkin : IDisposable {
 		}
 		public double msTimeStamp_nowSound {
 			get {
+				if (_held) return _heldTimestamp ?? 0;
 				double msTimeStamp = 0;
 				this.nowSound?.tGetPlayPosition(out var bytesTimeStamp, out msTimeStamp);
 				return msTimeStamp;
@@ -167,6 +206,10 @@ internal class CSkin : IDisposable {
 			this.bDisposed = false;
 		}
 		public void tPlay(bool resume, double? msFrameworkTime = null) {
+			if (HoldBack) {
+				Hold(resume);
+				return;
+			}
 			if (this.bNotLoadedYet) {
 				try {
 					tLoading();
@@ -195,6 +238,7 @@ internal class CSkin : IDisposable {
 		public void tPlay(double? msFrameworkTime = null) => tPlay(resume: false, msFrameworkTime: msFrameworkTime);
 		public void tResume(double? msFrameworkTime = null) => tPlay(resume: true, msFrameworkTime: msFrameworkTime);
 		public void tStop(bool pause = false) {
+			DropHold();
 			this.bPlayed = false;
 
 			if (pause) {
@@ -225,6 +269,10 @@ internal class CSkin : IDisposable {
 		}
 
 		public void SetTimestamp(long ms) {
+			if (_held) {
+				_heldTimestamp = ms;
+				return;
+			}
 			if (this.bNotLoadedYet) {
 				try {
 					tLoading();
@@ -251,6 +299,7 @@ internal class CSkin : IDisposable {
 		#region [ IDisposable 実装 ]
 		//-----------------
 		public void Dispose() {
+			DropHold();
 			if (!this.bDisposed) {
 				for (int i = 0; i < 2; i++) {
 					if (this.rSound[i] != null) {

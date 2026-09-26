@@ -8,14 +8,14 @@
 
 local NavInput = require("NavInput")
 local LO = require("online")
-local Space = require("space")
+local Space = require("SpaceSky")
 local net = LO.net
 local L, LF = LO.tr, LO.trf
 
 local SCREEN_W, SCREEN_H = 1920, 1080
 local dim
 local mode = "menu"                         -- "menu" | "code" | "lobby" | "songselect" | "results"
-local lastTs = 0
+local lastTs = nil                          -- nil right after activate
 local menuSel = 1
 local tab = 1                               -- per-player menu: 1 Ready/Start, 2 Difficulty, 3 Mods
 local ti = nil
@@ -201,14 +201,18 @@ local function drawEmblem(d, level, isPlus, cx, cy, k, op)
     if isPlus then sprite("Difficulty/Level/plus", cx + total / 2 + PLUS_DX * k, cy + PLUS_DY * k, k, nil, op) end
 end
 
--- ── the sky: space.lua renders it; the 2D screens only keep a clock for their own twinkles ──────────
+-- ── the sky: Lib/SpaceSky renders it; the 2D screens only keep a clock for their own twinkles ───────
+local SKY_SPRITES = { dot = "Textures/StarDot.png", sparkle = "Textures/Sparkle.png" }
+
 local function tickLook(dt)
     clock = clock + dt
+    if not Space.driving() then Space.claim("lobby") end
     Space.update(dt)
 end
 
 local function drawSky()
-    if not Space.draw() then panel(0, 0, SCREEN_W, SCREEN_H, 0.02, 0.03, 0.09, 1) end
+    Space.render()
+    if not Space.draw(0, 1) then panel(0, 0, SCREEN_W, SCREEN_H, 0.02, 0.03, 0.09, 1) end
 end
 
 -- wordmarks over Logo/LogoSmall
@@ -646,19 +650,22 @@ end
 function onStart()
     dim = CANVAS:CreateCanvas(2, 2); dim:Clear(255, 255, 255, 255); dim:Upload()
     loadArt()
+    -- build the sky early so the way in never waits for it
+    local ok, online = pcall(function() return CONFIG.AreLuaNetworkingConnectionsAllowed end)
+    if ok and online then Space.create(SKY_SPRITES) end
     -- NOTE: do NOT fetch activities here. At skin load, stages' PropagateOnStart runs BEFORE Activities and
     -- ROActivities are registered (see CSkin.FetchMenusAndModules), so GetActivity/GetROActivity return nil in
     -- onStart. We fetch them in activate() (runs on entry, after everything is loaded) — same as song_select_core.
 end
 
 function activate()
-    lastTs = 0; INPUT:SetMouseLocked(false)
+    lastTs = nil; INPUT:SetMouseLocked(false)
     LO.resetTexts()
     keyLabels, bindNames = {}, {}
     reloadKeys()
     if not modDlg then modDlg = ACTIVITY:GetActivity("mod_select_dialog") end
     if not modicons then modicons = ROACTIVITY:GetROActivity("modicons"); if modicons then pcall(function() modicons:Activate() end) end end
-    Space.open()
+    Space.create(SKY_SPRITES)                -- in case online was turned on after boot
     if pendingReturn then                    -- returned from a song
         pendingReturn = false
         if net.online then LO.broadcastResult(); LO.setWatching(true) end
@@ -666,9 +673,9 @@ function activate()
         mode = "results"
     end
 end
-function deactivate() LO.stopPreview(); if act and mode == "songselect" then act:Deactivate() end; Space.close() end
+function deactivate() LO.stopPreview(); if act and mode == "songselect" then act:Deactivate() end; Space.release() end
 function afterSongEnum() end
-function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave(); Space.close() end
+function onDestroy() if modicons then pcall(function() modicons:Deactivate() end) end LO.leave(); Space.forget() end
 
 -- ── helpers ────────────────────────────────────────────────────────────────────────────────────────
 local function setMsg(m, t) msg = m; msgT = t or 4 end
@@ -711,7 +718,15 @@ end
 
 -- ── update ───────────────────────────────────────────────────────────────────────────────────────
 function update(ts)
-    local dt = (ts - lastTs) / 1000.0; lastTs = ts
+    -- first frame: use the real frame time so the handed-over sky does not jump
+    local dt
+    if lastTs == nil then
+        local ok, d = pcall(function() return fps.deltaTime end)
+        dt = ok and tonumber(d) or 0
+    else
+        dt = (ts - lastTs) / 1000.0
+    end
+    lastTs = ts
     if dt < 0 then dt = 0 elseif dt > 0.1 then dt = 0.1 end
     if msgT > 0 then msgT = msgT - dt end
     tickLook(dt)
@@ -733,7 +748,7 @@ function update(ts)
                 if LO.host() then mode = "lobby"; tab = 1 else playError(); setMsg(net.msg or L("msg_open_failed"), 6) end
             else mode = "code"; ti = INPUT:CreateTextInput("", 4096) end
         end
-        if navPn.cancel() then return Exit("stage", "_title") end
+        if navPn.cancel() then return Exit("stage", "_title", "space_voyage_back") end
 
     elseif mode == "code" then
         if ti:Update() then

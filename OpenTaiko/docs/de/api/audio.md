@@ -16,7 +16,7 @@ Relative Pfade werden gegen das Verzeichnis des Skripts aufgelöst; die FromAbso
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | Lädt einen Soundeffekt. |
 | `SOUND:CreateVoice(path)  -> sound` | Lädt einen Sprachclip. |
-| `SOUND:CreateBGM(path)  -> sound` | Lädt Hintergrundmusik (Gruppe Songwiedergabe). |
+| `SOUND:CreateBGM(path)  -> sound` | Lädt Hintergrundmusik (Gruppe Songwiedergabe). Während ein Übergang eine Stage einblendet (außer beim Laden ins Spielgeschehen), wartet die Musik, die diese Stage startet, bis zum Ende des Einblendens; IsPlaying meldet dabei schon true. |
 | `SOUND:CreatePreview(path)  -> sound` | Lädt einen Songvorschau-Clip (Gruppe Songvorschau). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | Lädt einen Soundeffekt aus einem vollständigen Pfad. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | Lädt einen Sprachclip aus einem vollständigen Pfad. |

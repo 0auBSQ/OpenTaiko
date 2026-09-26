@@ -884,7 +884,7 @@ function update(ts)
                 phoneJustOpened = false                 -- consume the edge that opened My Room
             elseif playerSelUI:update(ts) == "cancel" then
                 closePlayerSelect(); MO.leave(); GLOBALCAMERA:Reset(); SHARED:GetSharedSound("Cancel"):Play()
-                return Exit("stage", "_title")
+                return Exit("stage", "_title", "myroom_door")
             end
         else
             mode = "play"
@@ -954,7 +954,7 @@ function update(ts)
     if NavInput.p[playerIndex + 1].cancel() then
         SHARED:GetSharedSound("Cancel"):Play()
         if MO.isGuest() then backToOwnRoom(PHONE:tr("room_left")); return nil end
-        MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); return Exit("stage", "_title")
+        MO.leave(); GLOBALCAMERA:Reset(); saveRoom(); return Exit("stage", "_title", "myroom_door")
     end
     -- (interactables + Tab are resolved AFTER movement below, where px/pz are current)
 
@@ -1028,7 +1028,7 @@ function update(ts)
             SHARED:GetSharedSound("Cancel"):Play()
             if MO.isGuest() then backToOwnRoom(PHONE:tr("room_left")); return nil end
             MO.leave(); GLOBALCAMERA:Reset(); saveRoom()
-            return Exit("stage", "_title")
+            return Exit("stage", "_title", "myroom_door")
         elseif focused.kind == "computer" then
             JB.setDuck(true)               -- jukebox fades down first; the PC BGM fades in after it
             SHARED:GetSharedSound("Decide"):Play()

@@ -331,14 +331,45 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 		}
 	}
+	// A texture queued for async upload has no pixels yet, but its size must never read as 0: the decode worker
+	// publishes it, or else the first size read takes it from the file header (tResolvePendingSize). Any size set
+	// (the upload, a resize) replaces it; the lock keeps a late header read from overwriting the upload's size.
+	private volatile bool _sizePending;
+	private readonly object _sizeLock = new();
+	private Size _szTextureSize, _szImageSize;
 	public Size szTextureSize {
-		get;
-		private set;
+		get { if (_sizePending) tResolvePendingSize(); return _szTextureSize; }
+		private set { lock (_sizeLock) { _szTextureSize = value; _sizePending = false; } }
 	}
 	public Size szImageSize {
-		get;
-		protected set;
+		get { if (_sizePending) tResolvePendingSize(); return _szImageSize; }
+		protected set { lock (_sizeLock) { _szImageSize = value; _sizePending = false; } }
 	}
+
+	// A queued texture whose pixels are still on their way: it draws nothing until they land.
+	private volatile bool _uploadPending;
+	private Action? _onUploaded;
+	public bool UploadPending => _uploadPending;
+	public bool IsDisposed => bDisposeCompleteDone;
+
+	/// <summary>Runs the action once the pending upload lands, or at once when nothing is pending. Render thread.</summary>
+	public void WhenUploaded(Action action) {
+		if (_uploadPending) _onUploaded += action;
+		else action();
+	}
+
+	// UploadOne takes these before uploading (a failed upload disposes the texture, and they must still run),
+	// then ends the pending state and runs them. Render thread.
+	internal Action? tTakeUploadCallbacks() {
+		var done = _onUploaded;
+		_onUploaded = null;
+		return done;
+	}
+	internal void tEndUpload() => _uploadPending = false;
+	internal bool tSizeKnown => !_sizePending;
+
+	// the GL texture's own size (smaller than the logical size under render-scale or the GL size limit)
+	private int _glW, _glH;
 	public Vector3D<float> vcScaleRatio;
 
 	// 画面が変わるたび以下のプロパティを設定し治すこと。
@@ -390,6 +421,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (texture.bDisposeCompleteDone)
 			return;
 		Pointer = texture.Pointer;
+		_glW = texture._glW;   // the shared GL texture's own size
+		_glH = texture._glH;
 		this.szImageSize = new Size(width, height);
 		this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 		this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
@@ -555,6 +588,27 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		width = this.szImageSize.Width;
 		height = this.szImageSize.Height;
 		if (Pointer == 0 || width <= 0 || height <= 0) return null;
+		// read what the GL texture really holds, then bring it to the logical size if it is stored smaller
+		int gw = _glW > 0 ? _glW : width, gh = _glH > 0 ? _glH : height;
+		if (gw != width || gh != height) {
+			byte[]? small = tReadBack(gw, gh);
+			if (small == null) return null;
+			var srcInfo = new SKImageInfo(gw, gh, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+			using var src = new SKBitmap();
+			unsafe {
+				fixed (byte* p = small) {
+					if (!src.InstallPixels(srcInfo, (IntPtr)p, srcInfo.RowBytes)) return null;
+					using var big = src.Resize(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul), SKFilterQuality.Medium);
+					if (big == null) return null;
+					return big.Bytes;
+				}
+			}
+		}
+		return tReadBack(width, height);
+	}
+
+	// glReadPixels of the whole GL texture (width x height must be its stored size)
+	private byte[]? tReadBack(int width, int height) {
 		byte[] px = new byte[width * height * 4];
 		// remember the currently-bound framebuffer so we restore the engine's render target
 		uint prevFbo = (uint)Game.Gl.GetInteger(GLEnum.FramebufferBinding);
@@ -660,7 +714,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		// Skip under SyncForce: the caller needs the PIXELS now (e.g. RegisterSpriteFromTexture reads them
 		// back immediately) — deferring here left Pointer==0 and every billboard sprite registered empty.
 		try {
-			using var codec = SKCodec.Create(strFileName);
+			using var fs = File.OpenRead(strFileName);   // a stream, not a path string: long Windows paths
+			using var codec = SKCodec.Create(fs);
 			if (!SyncForce && maxDimension == 0 && codec != null && codec.Info.Width > 0 && codec.Info.Height > 0) {
 				this.szImageSize = new Size(codec.Info.Width, codec.Info.Height);
 				this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
@@ -692,6 +747,68 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		if (resized == null) return bmp;
 		bmp.Dispose();
 		return resized;
+	}
+
+	// The size of a queued texture before its upload: read the file header (cheap, no pixel decode) and apply the
+	// maxDimension shrink the upload applies, so the size does not change when the pixels arrive. An unreadable
+	// file gets the 10x10 placeholder size a failed upload ends with.
+	private void tResolvePendingSize() {
+		int w = 0, h = 0;
+		if (!bDisposeCompleteDone && _sourcePath != null) {
+			try {
+				// opened as the decode opens it: a path string fails on long Windows paths, a stream does not
+				using var fs = File.OpenRead(_sourcePath);
+				using var codec = SKCodec.Create(fs);
+				if (codec != null) { w = codec.Info.Width; h = codec.Info.Height; }
+			} catch { }
+		}
+		if (w <= 0 || h <= 0) {
+			if (!bDisposeCompleteDone)
+				System.Diagnostics.Trace.TraceWarning($"Texture: cannot read the size of '{_sourcePath}', using a 10x10 placeholder.");
+			w = 10; h = 10;
+		} else if (_sourceMaxDimension > 0 && Math.Max(w, h) > _sourceMaxDimension) {
+			double f = (double)_sourceMaxDimension / Math.Max(w, h);   // the rounding tClampToMaxDimension uses
+			w = Math.Max(1, (int)Math.Round(w * f));
+			h = Math.Max(1, (int)Math.Round(h * f));
+		}
+		tPublishPendingSize(w, h);
+	}
+
+	// set the size of a queued texture unless the upload, a resize or Dispose got there first. Any thread.
+	internal void tPublishPendingSize(int w, int h) {
+		lock (_sizeLock) {
+			if (!_sizePending) return;
+			_szImageSize = new Size(w, h);
+			_szTextureSize = this.tGetOptimalTextureSize(_szImageSize);
+			this.rcFullImage = new Rectangle(0, 0, w, h);
+			_sizePending = false;
+		}
+	}
+
+	/// <summary>The image as RGBA bytes at its logical size. A file-backed texture is decoded from its file (so it
+	/// works before the upload and whatever the render scale); anything else is read back from the GPU.</summary>
+	public byte[]? ReadImageRGBA(out int width, out int height) {
+		if (_sourcePath != null && !bDisposeCompleteDone) {
+			try {
+				using SKBitmap? bmp = tClampToMaxDimension(tDecodeForUpload(_sourcePath), _sourceMaxDimension);
+				if (bmp != null && bmp.Width > 0 && bmp.Height > 0) {
+					var info = new SKImageInfo(bmp.Width, bmp.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+					byte[] px = new byte[info.BytesSize];
+					bool ok;
+					using (var pm = bmp.PeekPixels()) {
+						unsafe {
+							fixed (byte* p = px) ok = pm != null && pm.ReadPixels(info, (IntPtr)p, info.RowBytes);
+						}
+					}
+					if (ok) {
+						width = bmp.Width;
+						height = bmp.Height;
+						return px;
+					}
+				}
+			} catch { /* fall back to the GPU copy */ }
+		}
+		return ReadPixelsRGBA(out width, out height);
 	}
 
 	// ── Streamed (deferred) texture loading ───────────────────────────────────────────────────────
@@ -774,6 +891,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	}
 
 	private unsafe uint GenTexture(void* data, uint width, uint height, PixelFormat pixelFormat) {
+		_glW = (int)width;
+		_glH = (int)height;
 		//テクスチャハンドルの作成-----
 		uint handle = Game.Gl.GenTexture();
 		Game.Gl.BindTexture(TextureTarget.Texture2D, handle);
@@ -905,6 +1024,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				_maxTextureSize = Game.Gl.GetInteger(GLEnum.MaxTextureSize);
 				if (_maxTextureSize <= 0) _maxTextureSize = 4096;
 			}
+			// the LOGICAL size is taken before the GL size limit: like render-scale below, a limited texture only
+			// stores fewer pixels, so its size (and every source rect in image pixels) stays the image's own
+			int logicalW = bitmap.Width, logicalH = bitmap.Height;
 			SKBitmap scaledBitmap = null;
 			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
 				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
@@ -917,7 +1039,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				bitmap = scaledBitmap;
 			}
 
-			int origW = bitmap.Width, origH = bitmap.Height;   // LOGICAL size: layout + UV (fractions of rcFullImage) use this
+			int origW = bitmap.Width, origH = bitmap.Height;   // stored size (after the GL limit)
 
 			long newBytes = (long)origW * origH * 4;
 			Interlocked.Add(ref LiveBytes, newBytes - _countedBytes);
@@ -956,7 +1078,7 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 				Game.AsyncActions.Enqueue(createInstance);
 			}
 
-			this.szImageSize = new Size(origW, origH);
+			this.szImageSize = new Size(logicalW, logicalH);
 			this.rcFullImage = new Rectangle(0, 0, this.szImageSize.Width, this.szImageSize.Height);
 			this.szTextureSize = this.tGetOptimalTextureSize(this.szImageSize);
 
@@ -1474,6 +1596,9 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 
 			this.bDisposeCompleteDone = true;
+			_sizePending = false;
+			_uploadPending = false;
+			_onUploaded = null;
 		}
 	}
 	//-----------------

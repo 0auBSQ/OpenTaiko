@@ -5,51 +5,104 @@ namespace OpenTaiko {
 	public class LuaSharedResource<T> where T : class, IDisposable, new() {
 		private readonly object _lock = new();
 		private T _resource = new();
+		private T? _pending;                 // a ReloadWhenReady resource not shown yet
 		private volatile int _version = 0;
 
+		// under _lock: a newer load, Clear or Adopt drops the resource still waiting to show (its decode is skipped)
+		private T? tTakePending() {
+			var p = _pending;
+			_pending = null;
+			return p;
+		}
+		private static void tDispose(T? r) {
+			if (r == null) return;
+			try { r.Dispose(); } catch { }
+		}
+
+		// the slot empties at once (so a Reload right after it stands); only the old resource's disposal waits
 		public void Clear() {
-			Game.AsyncActions.Enqueue(() => {
-				_resource.Dispose();
-				_resource = new T();
+			T old;
+			T? pending;
+			lock (_lock) {
 				_version++;
+				old = _resource;
+				_resource = new T();
+				pending = tTakePending();
+			}
+			tDispose(pending);
+			Game.AsyncActions.Enqueue(() => tDispose(old));
+		}
+
+		// Swap in a resource built by the caller once whenReady says it can show (the old one stays until then);
+		// a later Reload, Clear or Adopt wins. whenReady runs its action later, on the render thread.
+		public void ReloadWhenReady(T resource, Action<Action> whenReady, Action<T>? onCreate) {
+			int capturedVersion;
+			T? stale;
+			lock (_lock) {
+				capturedVersion = ++_version;
+				stale = tTakePending();
+				_pending = resource;
+			}
+			if (!ReferenceEquals(stale, resource)) tDispose(stale);
+			whenReady(() => {
+				T? old = null;
+				bool current;
+				lock (_lock) {
+					if (ReferenceEquals(_pending, resource)) _pending = null;
+					current = _version == capturedVersion;
+					if (current) {
+						old = _resource;
+						_resource = resource;
+						_version++;
+					}
+				}
+				if (!current) {
+					tDispose(resource);
+					return;
+				}
+				if (!ReferenceEquals(old, resource)) tDispose(old);
+				onCreate?.Invoke(resource);
 			});
 		}
 
+		// Sounds: the factory runs here (render thread) and queues the sound's own build on Game.AsyncActions; the
+		// swap is queued after it (the queue is FIFO), so it happens once the sound is built. During a load phase it is
+		// counted so the bar waits for it; the version counter discards stale loads.
 		public void Reload(string path, Func<string, T> factory, Action<T>? onCreate) {
 			int capturedVersion;
 			lock (_lock) {
 				capturedVersion = ++_version;
 			}
 
-			// Already async (factory off-thread → version-deduped swap). During a load phase, count it so the bar
-			// waits for it; the version counter still discards stale loads, so no leak.
 			bool track = CAsyncLoad.ShouldDefer;
 			if (track) CAsyncLoad.NotePending();
 
-			Task.Run(() => {
-				T? newResource = null;
+			T? newResource = null;
+			try {
+				newResource = factory(path);
+			} catch (Exception e) {
+				System.Diagnostics.Trace.TraceWarning("[SharedResource] factory failed: " + e.Message);
+			}
+
+			Game.AsyncActions.Enqueue(() => {
 				try {
-					newResource = factory(path);
-				} catch (Exception e) {
-					System.Diagnostics.Trace.TraceWarning("[SharedResource] factory failed: " + e.Message);
-				}
-
-				Game.AsyncActions.Enqueue(() => {
-					try {
-						if (newResource == null) return;
+					if (newResource == null) return;
+					T old;
+					lock (_lock) {
 						if (_version != capturedVersion) {
-							try { newResource.Dispose(); } catch { }
-							return;
+							old = newResource;          // stale: drop the new one instead
+							newResource = null;
+						} else {
+							old = _resource;
+							_resource = newResource;
+							_version++;
 						}
-
-						_resource.Dispose();
-						_resource = newResource;
-						_version++;
-						onCreate?.Invoke(newResource);
-					} finally {
-						if (track) CAsyncLoad.NoteDone();
 					}
-				});
+					tDispose(old);
+					if (newResource != null) onCreate?.Invoke(newResource);
+				} finally {
+					if (track) CAsyncLoad.NoteDone();
+				}
 			});
 		}
 
@@ -59,15 +112,15 @@ namespace OpenTaiko {
 		/// rendered scene rather than loaded from a path). Disposes the previous resource and bumps the
 		/// version so any in-flight async load is discarded.</summary>
 		public void Adopt(T resource) {
-			T? old;
+			T? old, pending;
 			lock (_lock) {
 				old = _resource;
 				_resource = resource;
 				_version++;
+				pending = tTakePending();
 			}
-			if (old != null && !ReferenceEquals(old, resource)) {
-				try { old.Dispose(); } catch { }
-			}
+			if (!ReferenceEquals(pending, resource)) tDispose(pending);
+			if (old != null && !ReferenceEquals(old, resource)) tDispose(old);
 		}
 	}
 
@@ -75,14 +128,16 @@ namespace OpenTaiko {
 		private Dictionary<string, LuaSharedResource<LuaTexture>> SharedTextures;
 		private Dictionary<string, LuaSharedResource<LuaSound>> SharedSounds;
 		private Dictionary<string, string> SharedStrings;
+		private Dictionary<string, Lua3DScene> SharedScenes;
 		private LuaTextureFunc _luaTextureFunc;
 		private LuaSoundFunc _luaSoundFunc;
 		private string DirPath;
 
-		public LuaSharedResourceFunc(Dictionary<string, LuaSharedResource<LuaTexture>> st, Dictionary<string, LuaSharedResource<LuaSound>> ss, Dictionary<string, string> strs, LuaTextureFunc ltf, LuaSoundFunc lsf, string dirPath) {
+		public LuaSharedResourceFunc(Dictionary<string, LuaSharedResource<LuaTexture>> st, Dictionary<string, LuaSharedResource<LuaSound>> ss, Dictionary<string, string> strs, Dictionary<string, Lua3DScene> scenes, LuaTextureFunc ltf, LuaSoundFunc lsf, string dirPath) {
 			SharedTextures = st;
 			SharedSounds = ss;
 			SharedStrings = strs;
+			SharedScenes = scenes;
 			_luaTextureFunc = ltf;
 			_luaSoundFunc = lsf;
 			DirPath = dirPath;
@@ -94,6 +149,16 @@ namespace OpenTaiko {
 
 		public string GetSharedString(string key) {
 			return SharedStrings.TryGetValue(key, out var val) ? val : "";
+		}
+
+		// the scene is still freed with the module that made it
+		public void SetSharedScene(string key, Lua3DScene? scene) {
+			if (scene == null) SharedScenes.Remove(key);
+			else SharedScenes[key] = scene;
+		}
+
+		public Lua3DScene? GetSharedScene(string key) {
+			return SharedScenes.TryGetValue(key, out var scene) && !scene.IsDisposed ? scene : null;
 		}
 
 		public void ClearSharedTexture(string key) {
@@ -114,14 +179,23 @@ namespace OpenTaiko {
 			return new LuaSound();
 		}
 
+		// The texture is made here, on the render thread, like TEXTURE:CreateTexture: its size is known at once and its
+		// pixels decode in the background. It replaces the key's texture (and onCreate runs) once they are uploaded.
 		internal void SetSharedTextureGeneric(string key, string path, Action<LuaTexture>? onCreate, Func<string, LuaTexture> factory) {
-			LuaSharedResource<LuaTexture> _sharedTexture;
-
-			if (SharedTextures.ContainsKey(key)) _sharedTexture = SharedTextures[key];
-			else _sharedTexture = new LuaSharedResource<LuaTexture>();
-
-			_sharedTexture.Reload(path, factory, onCreate);
-			SharedTextures[key] = _sharedTexture;
+			if (!SharedTextures.TryGetValue(key, out var shared)) {
+				shared = new LuaSharedResource<LuaTexture>();
+				SharedTextures[key] = shared;
+			}
+			bool prev = CTexture.AsyncLoad;
+			CTexture.AsyncLoad = true;
+			LuaTexture tex;
+			try { tex = factory(path); }
+			catch (Exception e) {
+				System.Diagnostics.Trace.TraceWarning("[SharedResource] texture load failed: " + e.Message);
+				tex = new LuaTexture();
+			}
+			finally { CTexture.AsyncLoad = prev; }
+			shared.ReloadWhenReady(tex, tex.WhenReady, onCreate);
 		}
 
 		public void SetSharedTexture(string key, string path, LuaFunction? onCreate = null)

@@ -192,6 +192,8 @@ Set* methods load on a background thread and swap the resource in on the render 
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | Stores a string under a key. |
 | `SHARED:GetSharedString(key)  -> string` | Returns the string stored under a key, or an empty string. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | Shares a 3D scene under a key, so other modules can draw and drive it; the scene still belongs to the module that created it and goes away with it. nil removes the key. |
+| `SHARED:GetSharedScene(key)  -> scene` | Returns the scene shared under a key, or nil when there is none or its module freed it. |
 | `SHARED:GetSharedTexture(key)  -> texture` | Returns the shared texture for a key, or an empty texture if none was set. |
 | `SHARED:GetSharedSound(key)  -> sound` | Returns the shared sound for a key, or an empty sound if none was set. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | Disposes the texture stored under a key and replaces it with an empty one. |

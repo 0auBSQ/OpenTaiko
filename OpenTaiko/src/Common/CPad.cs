@@ -81,6 +81,8 @@ public class CPad {
 			: part;
 
 	public bool HasInput(EKeyConfigPart part, EKeyConfigPad pad, Func<IInputDevice?, int, bool> predicate) {
+		if (CStageTransition.BlocksInput)
+			return false;
 		part = ResolveKeyConfigPart(part, pad);
 		if (part == EKeyConfigPart.Unknown)
 			return false;

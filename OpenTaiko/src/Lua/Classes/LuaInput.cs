@@ -6,6 +6,9 @@ namespace OpenTaiko {
 		private Dictionary<string, LuaCounter> _repeatCounters = new Dictionary<string, LuaCounter>();
 		private Dictionary<string, LuaCounter> _repeatKbCounters = new Dictionary<string, LuaCounter>();
 
+		// no keys or mouse while a transition reveals the stage (CPad blocks the pad)
+		private static bool Blocked => CStageTransition.BlocksInput;
+
 		// General inputs
 		public bool Pressed(string input)
 			=> Enum.TryParse<EKeyConfigPad>(input, true, out var pad)
@@ -78,12 +81,14 @@ namespace OpenTaiko {
 
 		// Keyboard inputs
 		public bool KeyboardPressed(string key) {
+			if (Blocked) return false;
 			if (Enum.TryParse(typeof(SlimDXKeys.Key), key, true, out var result)) {
 				return OpenTaiko.InputManager.Keyboard.KeyPressed((int)result);
 			}
 			return false;
 		}
 		public bool KeyboardPressing(string key) {
+			if (Blocked) return false;
 			if (Enum.TryParse(typeof(SlimDXKeys.Key), key, true, out var result)) {
 				return OpenTaiko.InputManager.Keyboard.KeyPressing((int)result);
 			}
@@ -117,6 +122,7 @@ namespace OpenTaiko {
 			return false;
 		}
 		public bool KeyboardReleased(string key) {
+			if (Blocked) return false;
 			if (Enum.TryParse(typeof(SlimDXKeys.Key), key, true, out var result)) {
 				return OpenTaiko.InputManager.Keyboard.KeyReleased((int)result);
 			}
@@ -145,7 +151,7 @@ namespace OpenTaiko {
 
 		private (double x, double y) MouseSurfacePosition() {
 			var m = MouseDevice;
-			if (m == null) return (-1, -1);
+			if (m == null || Blocked) return (-1, -1);
 			int vw = Game.ViewPortSize.X, vh = Game.ViewPortSize.Y;
 			if (vw <= 0 || vh <= 0) return (-1, -1);
 			double sx = (m.Position.x - Game.ViewPortOffset.X) / (double)vw * GameWindowSize.Width;
@@ -178,7 +184,7 @@ namespace OpenTaiko {
 			if (!_havePrev) { _pmx = cx; _pmy = cy; _havePrev = true; return (0, 0); }
 			double dx = cx - _pmx, dy = cy - _pmy;
 			_pmx = cx; _pmy = cy;
-			return (dx, dy);
+			return Blocked ? (0, 0) : (dx, dy);
 		}
 
 		/// <summary>Wheel movement since the last call: local dx, dy = INPUT:GetScrollDelta().
@@ -187,7 +193,7 @@ namespace OpenTaiko {
 			var m = MouseDevice; if (m == null) return (0, 0);
 			double x = m.ScrollAccumX, y = m.ScrollAccumY;
 			m.ScrollAccumX = 0; m.ScrollAccumY = 0;
-			return (x, y);
+			return Blocked ? (0, 0) : (x, y);
 		}
 
 		/// <summary>True when the mouse is within the rendered surface (not on a letterbox border).</summary>
@@ -213,17 +219,17 @@ namespace OpenTaiko {
 		}
 
 		public bool MousePressing(string button) {
-			var m = MouseDevice; if (m == null) return false;
+			var m = MouseDevice; if (m == null || Blocked) return false;
 			int idx = MouseButtonIndex(button);
 			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyPressing(idx);
 		}
 		public bool MousePressed(string button) {
-			var m = MouseDevice; if (m == null) return false;
+			var m = MouseDevice; if (m == null || Blocked) return false;
 			int idx = MouseButtonIndex(button);
 			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyPressed(idx);
 		}
 		public bool MouseReleased(string button) {
-			var m = MouseDevice; if (m == null) return false;
+			var m = MouseDevice; if (m == null || Blocked) return false;
 			int idx = MouseButtonIndex(button);
 			return idx >= 0 && idx < m.ButtonStates.Length && m.KeyReleased(idx);
 		}

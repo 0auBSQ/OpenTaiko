@@ -16,7 +16,7 @@
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | 효과음을 로드합니다. |
 | `SOUND:CreateVoice(path)  -> sound` | 음성 클립을 로드합니다. |
-| `SOUND:CreateBGM(path)  -> sound` | 배경 음악을 로드합니다(곡 재생 그룹). |
+| `SOUND:CreateBGM(path)  -> sound` | 배경 음악을 로드합니다(곡 재생 그룹). 트랜지션이 스테이지를 들여오는 동안(게임플레이로 가는 로드는 제외) 그 스테이지가 시작한 음악은 페이드인이 끝날 때까지 기다립니다. 그동안에도 IsPlaying은 true를 반환합니다. |
 | `SOUND:CreatePreview(path)  -> sound` | 곡 미리 듣기 클립을 로드합니다(곡 미리 듣기 그룹). |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | 전체 경로에서 효과음을 로드합니다. |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | 전체 경로에서 음성 클립을 로드합니다. |

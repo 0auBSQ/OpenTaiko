@@ -53,32 +53,32 @@ local function buildMenus()
             title = tr("TITLE_PERFORMANCE", "Performance Mode"),
             desc  = tr("TITLE_PERFORMANCE_DESC", "Play Taiko charts with your preferred settings!\nPlayable between 1 and 5 players."),
             c     = col(255, 140, 0),
-            via   = "stage", stage = "regular_song_select",
+            via   = "stage", stage = "regular_song_select", trans = "pill_clouds",
             playerPrompt = true,
         },
         {
             title = tr("TITLE_DOJO", "The Fox Dojo"),
             desc  = tr("TITLE_DOJO_DESC", "Challenge various dan exams tailored by the Fox Band!\nSingle player only."),
             c     = col(0, 50, 150),
-            via   = "stage", stage = "dan_select", trans = "dan_doors",
+            via   = "stage", stage = "dan_select", trans = "dan_doors", fastTrans = "dan_doors_back",
         },
         {
             title = tr("TITLE_TOWERS", "Survival Mode"),
             desc  = tr("TITLE_TOWERS_DESC", "Climb the towers through survival challenges and try getting to the top!\nSingle player only."),
             c     = col(100, 210, 50),
-            via   = "stage", stage = "tower_select",
+            via   = "stage", stage = "tower_select", trans = "tower_gate", fastTrans = "tower_gate_back",
         },
         {
             title = tr("TITLE_AI_BATTLE", "AI Battle Mode"),
             desc  = tr("TITLE_AI_BATTLE_DESC", "Fight AItritus on your favorite charts and try to get the W!\nSingle player only."),
             c     = col(0, 200, 220),
-            via   = "stage", stage = "ai_battle_song_select",
+            via   = "stage", stage = "ai_battle_song_select", trans = "ai_link",
         },
         {
             title = tr("TITLE_TRAINING", "Training Mode"),
             desc  = tr("TITLE_TRAINING_DESC", "Practice your favorite charts to get the hang of them!\nSingle player only."),
             c     = col(210, 185, 130),
-            via   = "stage", stage = "training_song_select",
+            via   = "stage", stage = "training_song_select", trans = "pill_clouds_training",
         },
         {
             title = tr("TITLE_INTRO_NOKON", "Intro Nokon"),
@@ -90,7 +90,7 @@ local function buildMenus()
             title = tr("TITLE_MYROOM", "My Room"),
             desc  = tr("TITLE_MYROOM_DESC", "Decorate your personal room, place furniture, and visit other players' rooms!"),
             c     = col(30, 150, 60),
-            via   = "stage", stage = "myroom",
+            via   = "stage", stage = "myroom", trans = "myroom_door",
         },
         {
             title = tr("TITLE_STORE", "OpenTaiko's General Store"),
@@ -135,7 +135,7 @@ local function buildMenus()
         desc  = tr("TITLE_ONLINE_LOBBY_DESC", "(Beta, Share your room code only with people you trust)"),
         requiresOnline = true,
         c     = col(72, 36, 112),
-        via   = "stage", stage = "onlinelobby",
+        via   = "stage", stage = "onlinelobby", trans = "space_voyage", fastTrans = "space_voyage_back",
     }
 
     if EM.on() then
@@ -192,7 +192,7 @@ end
 
 -- ── Draw helpers ──────────────────────────────────────────────────────────────
 
-local BGTILE_W, BGTILE_H = 192, 108   -- BgTile.png; Width reads 0 until the texture is uploaded
+local BGTILE_W, BGTILE_H = 192, 108   -- BgTile.png
 
 local function drawBgTile(opacity)
     if bgtile == nil or bgtile.Width <= 0 then return end
@@ -319,9 +319,15 @@ local function moveMenu(d)
     sounds.Move:Play()
 end
 
+-- "Fast transitions" setting: use the way-out transition, which has no title card
+local function fastTransitions()
+    local ok, v = pcall(function() return THEME:GetThemeSetting("fast_transitions") end)
+    return ok and (v == "1" or v == "true")
+end
+
 local function doExit()
     local m = menus[curIdx]
-    if     m.via == "stage"       then return Exit("stage",  m.stage, m.trans)
+    if     m.via == "stage"       then return Exit("stage",  m.stage, (m.fastTrans and fastTransitions()) and m.fastTrans or m.trans)
     elseif m.via == "heya"        then return Exit("legacy", "heya", m.trans)
     elseif m.via == "config"      then return Exit("legacy", "config", m.trans)
     elseif m.via == "exit"        then return Exit("legacy", "exit", m.trans)

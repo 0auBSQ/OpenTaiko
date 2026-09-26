@@ -34,7 +34,7 @@ local SLIDE_OUT_SEC = 0.38      -- and back out
 local CARD_STAGGER  = 0.09      -- the right board follows the left one by this much
 local EXIT_FADE_SEC = 0.3       -- the exit pill fades after the boards
 local ENTRY_DELAY_SEC = 0.5     -- entering through the doors: the boards wait for them to open
-                                -- (dan_doors FADE_IN_SECONDS is 0.7; update() runs from its start)
+                                -- (the doors open over 0.7 s; update() runs from the fade-in's start)
 local OFF_X = 1000              -- a board's resting offset off screen: the left one (centre 600, half
                                 -- width 300 plus the ring and the hover scale) ends 100 px past the
                                 -- edge, the right one likewise
@@ -278,7 +278,10 @@ function activate()
     dan_bgm_vol = 100.0
     entries = menuEntries()   -- built on every entry so the texts follow the language
     menu_t, out_target = 0, nil
-    flyIn(ENTRY_DELAY_SEC)
+    -- dan_doors shows the dojo's name first and leaves how long (s) here
+    local title_sec = tonumber(SHARED:GetSharedString("dan_doors_title")) or 0
+    SHARED:SetSharedString("dan_doors_title", "")
+    flyIn(ENTRY_DELAY_SEC + title_sec)
     event_timer, event_over = nil, false
 
     _load_menu_chara()
@@ -383,10 +386,10 @@ local function afterFlyOut()
         -- Pagoda of the Unknown is its own stage: close the dojo doors over dan_select and open
         -- onto it, fading the dojo BGM out as they close.
         exiting, state = true, "leaving"
-        return Exit("stage", "pagoda", "dan_doors")
+        return Exit("stage", "pagoda", "dan_doors_back")
     else
         exiting, state = true, "leaving"
-        return Exit("title", nil, "dan_doors")   -- close the doors over dan_select, open onto the title
+        return Exit("title", nil, "dan_doors_back")   -- close the doors over dan_select, open onto the title
     end
 end
 
@@ -413,7 +416,7 @@ function update()
         if EM.signal(event_timer:Update()) == "expired" then
             if state == "standard_dan" then standard_dan.leave() end
             exiting, state = true, "leaving"
-            return Exit("title", nil, "dan_doors")
+            return Exit("title", nil, "dan_doors_back")
         end
     end
 
@@ -433,7 +436,7 @@ function update()
             if EM.canLeave() then
                 standard_dan.leave()
                 exiting, state = true, "leaving"
-                return Exit("title", nil, "dan_doors")
+                return Exit("title", nil, "dan_doors_back")
             end
         elseif result == "back" then
             standard_dan.leave()
@@ -452,7 +455,7 @@ function update()
     if state == "loading" then
         if navPn.cancel() and EM.canLeave() then
             exiting, state = true, "leaving"
-            return Exit("title", nil, "dan_doors")   -- close the doors over dan_select, open onto the title
+            return Exit("title", nil, "dan_doors_back")   -- close the doors over dan_select, open onto the title
         end
         return
     end

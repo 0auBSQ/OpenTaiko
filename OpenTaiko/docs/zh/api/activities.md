@@ -259,7 +259,7 @@ end
 绘制两个舞台之间的淡出、加载和淡入阶段的 Modules/Transitions/{name}/Script.lua。
 
 <div class="callout warn">
-Exit 的第三个参数选择过渡；调用未指定名称或引擎找不到该名称时，引擎使用 "default"。Exit("play") 之后进入演奏的加载始终使用名为 "song_loading" 的过渡，皮肤没有它时使用 "default"。引擎按顺序驱动各阶段：在即将离开的舞台之上每帧调用 fadeOut(t) 直到 t 达到 1，然后卸载该舞台并加载新舞台，期间每帧调用 loading(progress, elapsed)，然后在新舞台之上调用 fadeIn(t) 直到 t 达到 1。每段淡入淡出持续 0.5 秒，除非脚本设置了 FADE_OUT_SECONDS 或 FADE_IN_SECONDS；引擎会忽略不是正数的值。切换舞台时，只有当加载耗时超过 0.5 秒后引擎才会调用 loading；在此之前它调用的是 fadeOut(1)，以免短暂的加载闪现加载画面。歌曲加载路径则会立即显示加载阶段。
+Exit 的第三个参数选择过渡；调用未指定名称或引擎找不到该名称时，引擎使用 "default"。Exit("play") 之后进入演奏的加载始终使用名为 "song_loading" 的过渡，皮肤没有它时使用 "default"。引擎按顺序驱动各阶段：在即将离开的舞台之上每帧调用 fadeOut(t) 直到 t 达到 1，然后卸载该舞台并加载新舞台，期间每帧调用 loading(progress, elapsed)，然后在新舞台之上调用 fadeIn(t) 直到 t 达到 1。每段淡入淡出持续 0.5 秒，除非脚本设置了 FADE_OUT_SECONDS 或 FADE_IN_SECONDS；引擎会忽略不是正数的值。切换舞台时，只有当加载耗时超过 0.5 秒后引擎才会调用 loading；在此之前它调用的是 fadeOut(1)，以免短暂的加载闪现加载画面。歌曲加载路径则会立即显示加载阶段。新舞台在加载或淡入期间启动的 BGM 会等待，并在淡入结束时播放（进入演奏画面的加载除外）；过渡自己的声音会立即播放。淡入期间新舞台不会收到输入，除非淡入显示的是演奏画面。
 </div>
 
 | 方法 | 说明 |

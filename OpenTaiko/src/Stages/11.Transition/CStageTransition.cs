@@ -78,6 +78,8 @@ internal sealed class SongLoadStep : IStepLoad {
 //   Load    — unmount the outgoing, drive the CLoadSession to completion behind loading(progress, elapsed)
 //             (skipped when there's nothing to load — revealing an already-mounted target)
 //   FadeIn  — render the loaded target under fadeIn(t)                 (t 0→1)
+// The target's music waits for Finish, and it gets no input during FadeIn (HoldsNewBgm, BlocksInput);
+// neither applies to the song load into gameplay.
 // On finish Draw() returns non-zero and the main loop swaps to the (already-mounted) Target — or, if the load was
 // cancelled (ESC), to CancelTarget.
 internal class CStageTransition : CStage {
@@ -122,6 +124,13 @@ internal class CStageTransition : CStage {
 	// this phase (the loading screen fades over them) so notes stay visible as the screen clears.
 	public bool RevealingGameplay => _revealsGameplay && _phase == Phase.FadeIn;
 
+	// the new stage's music starts only once the stage is fully on screen; never on the song load into gameplay,
+	// so nothing played there can be delayed against the chart
+	internal static bool HoldsNewBgm => OpenTaiko.rCurrentStage is CStageTransition { _phase: Phase.Load or Phase.FadeIn, _revealsGameplay: false };
+
+	// no input until the fade-in ends, except when it reveals gameplay
+	internal static bool BlocksInput => OpenTaiko.rCurrentStage is CStageTransition { _phase: Phase.FadeIn, _revealsGameplay: false };
+
 	// Pending-script handoff: set by the requesting stage's Exit, consumed by UnmountAndChangeStage.
 	private static (CStage stage, LuaTransitionWrapper script)? _pendingScript;
 	public static void SetPendingScript(CStage stage, LuaTransitionWrapper script) => _pendingScript = (stage, script);
@@ -161,6 +170,7 @@ internal class CStageTransition : CStage {
 		_phase = Phase.FadeOut;
 		_phaseStart = Stopwatch.GetTimestamp();
 		base.IsDeActivated = false;
+		CSkin.CSystemSound.DropHeld();
 	}
 
 	private static double Elapsed(long since) => Stopwatch.GetElapsedTime(since).TotalSeconds;
@@ -265,6 +275,8 @@ internal class CStageTransition : CStage {
 
 	// Release the hold once the main loop has taken over the (already-mounted) target; does NOT unmount it.
 	public void Finish() {
+		// cancelled, or the target is already leaving: drop its held music
+		bool targetLeaving = Canceled || TargetDrawLoopReturnValue != null;
 		_session?.Cancel();
 		_script = null;
 		_outgoing = null;
@@ -277,5 +289,7 @@ internal class CStageTransition : CStage {
 		CancelTarget = null;
 		_phase = Phase.Idle;
 		base.IsDeActivated = true;
+		if (targetLeaving) CSkin.CSystemSound.DropHeld();
+		else CSkin.CSystemSound.ReleaseHeld();
 	}
 }

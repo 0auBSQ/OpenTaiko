@@ -13,7 +13,7 @@ Het script dat een textuur-, canvas-, tekst-, video- of gradiënt-handle aanmaak
 Laadt afbeeldingsbestanden in textuur-handles.
 
 <div class="callout warn">
-Relatieve paden worden opgelost ten opzichte van de map van het script; de FromAbsolutePath-varianten nemen een volledig pad. Een ontbrekend bestand geeft een lege handle terug die niets tekent. CreateTexture laadt asynchroon: de handle tekent niets en rapporteert een Width en Height van 0 tot het decoderen en uploaden op de achtergrond is afgerond. Gebruik CreateTextureSync wanneer je de afmeting of de pixels meteen nodig hebt. De optietabel accepteert { maxSize = N } om de afbeelding bij het decoderen te verkleinen, zodat de langste zijde hoogstens N pixels is.
+Relatieve paden worden opgelost ten opzichte van de map van het script; de FromAbsolutePath-varianten nemen een volledig pad. Een ontbrekend bestand geeft een lege handle terug die niets tekent. CreateTexture laadt asynchroon: de handle tekent niets tot het decoderen en uploaden op de achtergrond is afgerond (dan wordt Ready true), maar Width en Height geven de afmeting van de afbeelding meteen. Gebruik CreateTextureSync wanneer de afbeelding al in het volgende frame getekend moet worden. De optietabel accepteert { maxSize = N } om de afbeelding bij het decoderen te verkleinen, zodat de langste zijde hoogstens N pixels is.
 </div>
 
 | Methode | Beschrijving |
@@ -59,8 +59,9 @@ Ankernamen: topleft, top, topright, left, center, right, bottomleft, bottom, bot
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | Tekent de hele textuur zo dat het benoemde ankerpunt op (x, y) landt. |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | Tekent een bron-subrechthoek zo dat het benoemde ankerpunt op (x, y) landt. |
 | `texture.Loaded  -> bool` | True wanneer de handle een textuur omhult. Het spel zet dit zodra het het bestand vindt, voordat een asynchrone laadbeurt is afgerond. |
-| `texture.Width  -> int` | Pixelbreedte; -1 op een lege handle, 0 terwijl een asynchrone laadbeurt loopt. |
-| `texture.Height  -> int` | Pixelhoogte; -1 op een lege handle, 0 terwijl een asynchrone laadbeurt loopt. |
+| `texture.Width  -> int` | Pixelbreedte, meteen bekend, ook terwijl een asynchrone laadbeurt loopt; -1 op een lege handle. |
+| `texture.Height  -> int` | Pixelhoogte, meteen bekend, ook terwijl een asynchrone laadbeurt loopt; -1 op een lege handle. |
+| `texture.Ready  -> bool` | True zodra het tekenen van de textuur de afbeelding toont; false terwijl een asynchrone laadbeurt de pixels nog uploadt. Alleen nodig om op een afbeelding te wachten, bijvoorbeeld voor een fade-in. |
 | `texture.Pointer  -> int` | Native GL-textuur-id, of 0 als er geen is. |
 | `texture:GetScale()  -> vector2` | Huidige tekenschaal als vector2 (`X`, `Y`). |
 | `texture:GetOpacity()  -> number` | Huidige dekking, 0..1; -1 op een lege handle. |
@@ -130,7 +131,7 @@ De kleurargumenten r, g, b, a zijn gehele getallen 0-255. Pixelbewerkingen stape
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | Vult een as-uitgelijnde rechthoek, geclipt op het canvas. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | Vult een schijf met de gegeven straal in pixels. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | Schildert een dikke lijn als overlappende schijven met de gegeven straal. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | Alfa-blendt een textuur op het canvas met de linkerbovenhoek op (x, y). Het canvas leest de pixels van de textuur eenmaal per textuur-handle van de GPU terug, een trage bewerking die in setupcode thuishoort. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | Alfa-blendt een textuur op het canvas met de linkerbovenhoek op (x, y). Het canvas leest de pixels van de textuur eenmaal per textuur-handle (uit het afbeeldingsbestand als die er een heeft, dus ook terwijl de textuur nog laadt), een trage bewerking die in setupcode thuishoort. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | Alfa-blendt een textuur geschaald met `scale` en met de klok mee geroteerd over `rotationDeg`, met nearest-neighbour-sampling. Met anker "center" landt het middelpunt van de textuur op (x, y); elke andere waarde plaatst de linkerbovenhoek daar. |
 | `canvas:Clear(r, g, b, a)  -> nil` | Vult het hele canvas met één kleur. |
 | `canvas:ClearTransparent()  -> nil` | Zet het hele canvas terug naar volledig transparant. |

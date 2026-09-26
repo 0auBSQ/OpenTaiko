@@ -192,6 +192,8 @@ Set* 方法在后台线程加载，并在渲染线程上换入资源；可选的
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | 在某个键下存储一个字符串。 |
 | `SHARED:GetSharedString(key)  -> string` | 返回存储在某个键下的字符串，或空字符串。 |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | 在某个键下共享一个 3D 场景，让其他模块可以绘制和推进它；场景仍属于创建它的模块，并随该模块一起释放。传入 nil 会移除该键。 |
+| `SHARED:GetSharedScene(key)  -> scene` | 返回在某个键下共享的场景；没有或其模块已释放它时返回 nil。 |
 | `SHARED:GetSharedTexture(key)  -> texture` | 返回某个键的共享纹理；未设置时返回空纹理。 |
 | `SHARED:GetSharedSound(key)  -> sound` | 返回某个键的共享声音；未设置时返回空声音。 |
 | `SHARED:ClearSharedTexture(key)  -> nil` | 释放存储在某个键下的纹理，并用空纹理替换。 |

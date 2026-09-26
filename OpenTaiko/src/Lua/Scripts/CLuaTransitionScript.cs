@@ -10,6 +10,8 @@ namespace OpenTaiko {
 		internal double? FadeOutSeconds;
 		internal double? FadeInSeconds;
 
+		protected override bool BgmPlaysDuringReveal => true;
+
 		private NamedLuaFunction lfFadeOut = new("fadeOut");
 		private NamedLuaFunction lfLoading = new("loading");
 		private NamedLuaFunction lfFadeIn = new("fadeIn");

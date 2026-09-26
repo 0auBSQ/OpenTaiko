@@ -13,7 +13,7 @@ The script that creates a texture, canvas, text, video or gradient handle owns i
 Loads image files into texture handles.
 
 <div class="callout warn">
-Relative paths resolve against the script's directory; the FromAbsolutePath variants take a full path. A missing file returns an empty handle that draws nothing. CreateTexture loads asynchronously: the handle draws nothing and reports Width and Height of 0 until the background decode and upload finish. Use CreateTextureSync when you need the size or the pixels right away. The options table accepts { maxSize = N } to downscale the image at decode time so its longest side is at most N pixels.
+Relative paths resolve against the script's directory; the FromAbsolutePath variants take a full path. A missing file returns an empty handle that draws nothing. CreateTexture loads asynchronously: the handle draws nothing until the background decode and upload finish (Ready turns true then), but Width and Height give the image's size right away. Use CreateTextureSync when the image must draw on the very next frame. The options table accepts { maxSize = N } to downscale the image at decode time so its longest side is at most N pixels.
 </div>
 
 | Method | Description |
@@ -59,8 +59,9 @@ Anchor names: topleft, top, topright, left, center, right, bottomleft, bottom, b
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | Draws the whole texture so the named anchor point lands on (x, y). |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | Draws a source sub-rectangle so the named anchor point lands on (x, y). |
 | `texture.Loaded  -> bool` | True when the handle wraps a texture. The game sets it as soon as it finds the file, before an asynchronous load finishes. |
-| `texture.Width  -> int` | Pixel width; -1 on an empty handle, 0 while an asynchronous load is pending. |
-| `texture.Height  -> int` | Pixel height; -1 on an empty handle, 0 while an asynchronous load is pending. |
+| `texture.Width  -> int` | Pixel width, known at once even while an asynchronous load is pending; -1 on an empty handle. |
+| `texture.Height  -> int` | Pixel height, known at once even while an asynchronous load is pending; -1 on an empty handle. |
+| `texture.Ready  -> bool` | True once drawing the texture shows the image; false while an asynchronous load is still uploading its pixels. Only needed to wait for an image, for example before a fade-in. |
 | `texture.Pointer  -> int` | Native GL texture id, or 0 if none. |
 | `texture:GetScale()  -> vector2` | Current draw scale as a vector2 (`X`, `Y`). |
 | `texture:GetOpacity()  -> number` | Current opacity, 0..1; -1 on an empty handle. |
@@ -130,7 +131,7 @@ Colour arguments r, g, b, a are 0-255 integers. Pixel edits accumulate in a dirt
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | Fills an axis-aligned rectangle, clipped to the canvas. |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | Fills a disc of the given radius in pixels. |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | Paints a thick line as overlapping discs of the given radius. |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | Alpha-blends a texture onto the canvas with its top-left at (x, y). The canvas reads the texture's pixels back from the GPU once per texture handle, a slow operation that belongs in setup code. |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | Alpha-blends a texture onto the canvas with its top-left at (x, y). The canvas reads the texture's pixels once per texture handle (from its image file when it has one, so this works while the texture is still loading), a slow operation that belongs in setup code. |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | Alpha-blends a texture scaled by `scale` and rotated clockwise by `rotationDeg`, using nearest-neighbour sampling. With anchor "center" the texture centre lands on (x, y); any other value places its top-left there. |
 | `canvas:Clear(r, g, b, a)  -> nil` | Fills the whole canvas with one colour. |
 | `canvas:ClearTransparent()  -> nil` | Resets the whole canvas to fully transparent. |

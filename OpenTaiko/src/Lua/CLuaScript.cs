@@ -385,6 +385,9 @@ end
 
 	public bool IsAvailable { get; private set; }
 
+	// true for transitions, whose sounds are never held back
+	protected virtual bool BgmPlaysDuringReveal => false;
+
 	public CLuaScript(string dir, string? texturesDir = null, string? soundsDir = null, bool loadAssets = true, string fallbackScript = "", bool writable = true) {
 		strDir = dir;
 		strScriptPath = Path.Join(strDir, "Script.lua");
@@ -417,7 +420,7 @@ end
 
 			// New Lua Module API
 			var ltf = new LuaTextureFunc(TextureList, dir);
-			var lsf = new LuaSoundFunc(SoundList, dir);
+			var lsf = new LuaSoundFunc(SoundList, dir) { HoldExempt = BgmPlaysDuringReveal };
 
 			LuaScript["TEXTURE"] = ltf;
 			LuaScript["CANVAS"] = new LuaCanvasFunc(CanvasList);
@@ -456,7 +459,7 @@ end
 				LuaScript["CONFIG"] = new LuaROConfigIniFunc();
 			LuaScript["SONGMOUNT"] = new LuaSongMountFunc();   // read the song the host just confirmed (for online sync)
 			LuaScript["THEME"] = new LuaThemeFunc();
-			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, OpenTaiko.GlobalStores.SharedStrings, ltf, lsf, dir);
+			LuaScript["SHARED"] = new LuaSharedResourceFunc(OpenTaiko.GlobalStores.SharedTextures, OpenTaiko.GlobalStores.SharedSounds, OpenTaiko.GlobalStores.SharedStrings, OpenTaiko.GlobalStores.SharedScenes, ltf, lsf, dir);
 			if (writable)
 				LuaScript["DATABASE"] = new LuaDataStorageFunc(dir);
 			else

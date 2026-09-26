@@ -192,6 +192,8 @@ Set* 메서드는 백그라운드 스레드에서 로드하고 렌더 스레드�
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | 키 아래에 문자열을 저장합니다. |
 | `SHARED:GetSharedString(key)  -> string` | 키 아래에 저장된 문자열을 반환하며, 없으면 빈 문자열. |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | 3D 씬을 키 아래에 공유해 다른 모듈이 그리고 진행할 수 있게 합니다. 씬은 계속 그것을 만든 모듈의 것이며 그 모듈과 함께 해제됩니다. nil을 주면 키를 제거합니다. |
+| `SHARED:GetSharedScene(key)  -> scene` | 키 아래에 공유된 씬을 반환하며, 없거나 그 모듈이 해제했으면 nil. |
 | `SHARED:GetSharedTexture(key)  -> texture` | 키의 공유 텍스처를 반환하며, 설정된 것이 없으면 빈 텍스처. |
 | `SHARED:GetSharedSound(key)  -> sound` | 키의 공유 사운드를 반환하며, 설정된 것이 없으면 빈 사운드. |
 | `SHARED:ClearSharedTexture(key)  -> nil` | 키 아래에 저장된 텍스처를 해제하고 빈 것으로 대체합니다. |

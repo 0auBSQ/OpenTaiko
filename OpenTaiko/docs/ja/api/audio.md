@@ -16,7 +16,7 @@
 | --- | --- |
 | `SOUND:CreateSFX(path)  -> sound` | 効果音を読み込みます。 |
 | `SOUND:CreateVoice(path)  -> sound` | ボイスクリップを読み込みます。 |
-| `SOUND:CreateBGM(path)  -> sound` | BGM を読み込みます (楽曲再生グループ)。 |
+| `SOUND:CreateBGM(path)  -> sound` | BGM を読み込みます (楽曲再生グループ)。トランジションがステージを表示する間 (ゲームプレイへの読み込みは除く)、そのステージが開始した音楽はフェードインの終わりまで待ちます。その間も IsPlaying は true を返します。 |
 | `SOUND:CreatePreview(path)  -> sound` | 楽曲プレビュークリップを読み込みます (楽曲プレビューグループ)。 |
 | `SOUND:CreateSFXFromAbsolutePath(path)  -> sound` | 完全なパスから効果音を読み込みます。 |
 | `SOUND:CreateVoiceFromAbsolutePath(path)  -> sound` | 完全なパスからボイスクリップを読み込みます。 |

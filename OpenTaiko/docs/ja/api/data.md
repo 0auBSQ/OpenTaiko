@@ -192,6 +192,8 @@ Set* メソッドはバックグラウンドスレッドで読み込み、レン
 | --- | --- |
 | `SHARED:SetSharedString(key, value)  -> nil` | キーの下に文字列を保存します。 |
 | `SHARED:GetSharedString(key)  -> string` | キーの下に保存された文字列を返します。なければ空文字列。 |
+| `SHARED:SetSharedScene(key, scene)  -> nil` | 3D シーンをキーの下で共有し、他のモジュールが描画や更新をできるようにします。シーンは作成したモジュールのものであり、そのモジュールと一緒に破棄されます。nil を渡すとキーを削除します。 |
+| `SHARED:GetSharedScene(key)  -> scene` | キーの下で共有されたシーンを返します。なければ、またはそのモジュールが解放していれば nil。 |
 | `SHARED:GetSharedTexture(key)  -> texture` | キーの共有テクスチャを返します。設定されていなければ空のテクスチャ。 |
 | `SHARED:GetSharedSound(key)  -> sound` | キーの共有サウンドを返します。設定されていなければ空のサウンド。 |
 | `SHARED:ClearSharedTexture(key)  -> nil` | キーの下に保存されたテクスチャを破棄し、空のものに置き換えます。 |

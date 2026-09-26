@@ -1356,6 +1356,7 @@ namespace OpenTaiko {
 
 		#region Dispose
 		private bool _disposedValue;
+		public bool IsDisposed => _disposedValue;
 		protected virtual void Dispose(bool disposing) {
 			if (!_disposedValue) {
 				_gpuRasterizer?.Dispose();   // free the GPU renderer's GL resources (FBO, VBOs, textures, programs)

@@ -21,7 +21,7 @@ public sealed class CLoadSession {
 	// Per-frame budget for the SOURCE step (coroutine / module loop). Kept modest so this + the AsyncActions
 	// finalize drain (Game.AsyncBudgetMs, raised below) + render all fit one frame ⇒ a smooth loading screen.
 	private const double SourceBudgetMs = 6.0;
-	private const double FinalizeBudgetMs = 6.0;   // AsyncActions budget while this load is up
+	internal const double FinalizeBudgetMs = 6.0;   // AsyncActions budget while this load is up
 
 	private readonly IStepLoad _source;
 	private readonly bool _assets;     // manage a CAsyncLoad asset-streaming phase around the source

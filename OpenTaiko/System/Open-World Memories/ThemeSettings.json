@@ -32,6 +32,19 @@
         "ko": "입력",
         "zh": "输入"
       }
+    },
+    "transitions": {
+      "strings": {
+        "default": "Transitions",
+        "ja": "画面遷移",
+        "fr": "Transitions",
+        "de": "Übergänge",
+        "es": "Transiciones",
+        "ko": "화면 전환",
+        "zh": "过渡",
+        "nl": "Overgangen",
+        "ru": "Переходы"
+      }
     }
   },
   "settings": [
@@ -92,6 +105,39 @@
         }
       },
       "default": "1"
+    },
+    {
+      "id": "fast_transitions",
+      "type": "bool",
+      "scope": "global",
+      "section": "transitions",
+      "label": {
+        "strings": {
+          "default": "Fast transitions",
+          "ja": "高速な画面遷移",
+          "fr": "Transitions rapides",
+          "de": "Schnelle Übergänge",
+          "es": "Transiciones rápidas",
+          "ko": "빠른 화면 전환",
+          "zh": "快速过渡",
+          "nl": "Snelle overgangen",
+          "ru": "Быстрые переходы"
+        }
+      },
+      "description": {
+        "strings": {
+          "default": "Enters The Fox Dojo, Survival Mode and the Online Lobby with the shorter transition used to leave them, without the mode's title.",
+          "ja": "狐の道場・サバイバルモード・オンラインロビーに入るとき、モード名の演出を省き、出るときと同じ短い画面遷移を使います。",
+          "fr": "Entre dans le Dojo du Renard, le Mode Survie et le Salon en ligne avec la transition plus courte utilisée pour en sortir, sans le titre du mode.",
+          "de": "Betritt das Fuchs-Dojo, den Überlebensmodus und die Online-Lobby mit dem kürzeren Übergang, mit dem man sie verlässt, ohne den Titel des Modus.",
+          "es": "Entra en el Dojo del Zorro, el Modo Supervivencia y la Sala en línea con la transición más corta que se usa al salir, sin el título del modo.",
+          "ko": "여우 도장, 서바이벌 모드, 온라인 로비에 들어갈 때 모드 이름 연출 없이 나갈 때와 같은 짧은 화면 전환을 사용합니다.",
+          "zh": "进入狐之道场、生存模式和在线大厅时，跳过模式标题，改用离开时的较短过渡。",
+          "nl": "Gaat De Vossendojo, de Overlevingsmodus en de Online lobby binnen met de kortere overgang waarmee je ze verlaat, zonder de titel van de modus.",
+          "ru": "Лисье додзё, режим выживания и онлайн-лобби открываются с более коротким переходом, как при выходе из них, без названия режима."
+        }
+      },
+      "default": "0"
     },
     {
       "id": "event_mode",

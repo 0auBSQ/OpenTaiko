@@ -13,7 +13,7 @@
 把图像文件加载为纹理句柄。
 
 <div class="callout warn">
-相对路径相对于脚本目录解析；FromAbsolutePath 变体接受完整路径。文件缺失时返回一个什么都不绘制的空句柄。CreateTexture 异步加载：在后台解码和上传完成之前，句柄不绘制任何内容，且 Width 和 Height 报告为 0。你需要立即获得尺寸或像素时请使用 CreateTextureSync。选项表接受 { maxSize = N }，在解码时缩小图像，使其最长边不超过 N 像素。
+相对路径相对于脚本目录解析；FromAbsolutePath 变体接受完整路径。文件缺失时返回一个什么都不绘制的空句柄。CreateTexture 异步加载：在后台解码和上传完成之前，句柄不绘制任何内容（完成后 Ready 变为 true），但 Width 和 Height 会立即给出图像尺寸。需要图像在下一帧就绘制时请使用 CreateTextureSync。选项表接受 { maxSize = N }，在解码时缩小图像，使其最长边不超过 N 像素。
 </div>
 
 | 方法 | 说明 |
@@ -59,8 +59,9 @@ end
 | `texture:DrawAtAnchor(x, y, anchor)  -> nil` | 绘制整张纹理，使指定锚点落在 (x, y)。 |
 | `texture:DrawRectAtAnchor(x, y, rect_x, rect_y, rect_width, rect_height, anchor)  -> nil` | 绘制源子矩形，使指定锚点落在 (x, y)。 |
 | `texture.Loaded  -> bool` | 句柄包装了一张纹理时为 true。游戏找到文件后立即置位，早于异步加载完成。 |
-| `texture.Width  -> int` | 像素宽度；空句柄为 -1，异步加载未完成时为 0。 |
-| `texture.Height  -> int` | 像素高度；空句柄为 -1，异步加载未完成时为 0。 |
+| `texture.Width  -> int` | 像素宽度，即使异步加载未完成也能立即得到；空句柄为 -1。 |
+| `texture.Height  -> int` | 像素高度，即使异步加载未完成也能立即得到；空句柄为 -1。 |
+| `texture.Ready  -> bool` | 绘制该纹理即可显示图像时为 true；异步加载仍在上传像素时为 false。只在需要等待图像时使用，例如淡入之前。 |
 | `texture.Pointer  -> int` | 原生 GL 纹理 id；没有时为 0。 |
 | `texture:GetScale()  -> vector2` | 当前绘制缩放，以 vector2（`X`、`Y`）表示。 |
 | `texture:GetOpacity()  -> number` | 当前不透明度，0..1；空句柄为 -1。 |
@@ -130,7 +131,7 @@ end
 | `canvas:FillRect(x, y, w, h, r, g, b, a)  -> nil` | 填充一个轴对齐矩形，裁剪到画布范围内。 |
 | `canvas:FillCircle(cx, cy, radius, r, g, b, a)  -> nil` | 填充一个给定像素半径的圆盘。 |
 | `canvas:StrokeLine(x0, y0, x1, y1, radius, r, g, b, a)  -> nil` | 用给定半径的重叠圆盘绘制一条粗线。 |
-| `canvas:PasteTexture(texture, x, y)  -> nil` | 以 (x, y) 为左上角把一张纹理以 alpha 混合方式贴到画布上。画布对每个纹理句柄只从 GPU 回读一次像素，这是一个缓慢的操作，应放在初始化代码中。 |
+| `canvas:PasteTexture(texture, x, y)  -> nil` | 以 (x, y) 为左上角把一张纹理以 alpha 混合方式贴到画布上。画布对每个纹理句柄只读取一次像素（有图像文件时从文件读取，因此纹理仍在加载时也能使用），这是一个缓慢的操作，应放在初始化代码中。 |
 | `canvas:PasteTextureTransformed(texture, x, y, scale, rotationDeg, anchor)  -> nil` | 以 alpha 混合方式贴上一张按 `scale` 缩放、按 `rotationDeg` 顺时针旋转的纹理，使用最近邻采样。anchor 为 "center" 时纹理中心落在 (x, y)；其他任何值都把其左上角放在那里。 |
 | `canvas:Clear(r, g, b, a)  -> nil` | 用一种颜色填充整张画布。 |
 | `canvas:ClearTransparent()  -> nil` | 把整张画布重置为完全透明。 |

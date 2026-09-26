@@ -21,8 +21,8 @@ namespace OpenTaiko {
 		// dirty rectangle (inclusive) so Upload only sends the changed region
 		private int _dx0, _dy0, _dx1, _dy1;
 
-		public override int Width => _logW;
-		public override int Height => _logH;
+		public override int Width => Loaded ? _logW : -1;
+		public override int Height => Loaded ? _logH : -1;
 
 		public LuaCanvas(int width, int height) : this(width, height, width, height) { }
 
