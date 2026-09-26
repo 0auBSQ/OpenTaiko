@@ -487,18 +487,16 @@ function M.handleSongSelectInput(Sort, Diff)
         CONFIG:SetDefaultCourse(0, (CONFIG:GetDefaultCourse(0) + 1) % 5)
         Sort.applySort(); M.refreshPage(true)
     end
-    if SC.pressed("player") and not G.activeConfig.mountAISlotToP2 then
+    -- shortcuts.lua decides which shortcuts this select can use (player switch, auto P2, player count...)
+    if SC.pressed("player") then
         G.sounds.Skip:Play()
         local prev = G.highlightedPlayer
         G.highlightedPlayer = (G.highlightedPlayer + 1) % CONFIG.PlayerCount
         if G.highlightedPlayer ~= prev then Sort.applySort(); M.refreshPage(true) end
     end
-    if not G.activeConfig.songOnly and not G.event.on() then   -- online lobby (songOnly) and Event Mode: no Auto toggle
-        for p = 1, math.min(2, CONFIG.PlayerCount), 1 do
-            local isAI = (G.activeConfig.mountAISlotToP2 and p == 2)
-            if not isAI and SC.pressed("auto_p" .. p) then
-                G.sounds.Decide:Play(); CONFIG:SetAutoStatus(p - 1, not CONFIG:GetAutoStatus(p - 1))
-            end
+    for p = 1, math.min(2, CONFIG.PlayerCount), 1 do
+        if SC.pressed("auto_p" .. p) then
+            G.sounds.Decide:Play(); CONFIG:SetAutoStatus(p - 1, not CONFIG:GetAutoStatus(p - 1))
         end
     end
 
@@ -598,7 +596,7 @@ function M.handleSongSelectInput(Sort, Diff)
     end
 
     -- Player count
-    if G.activeConfig.allowPlayerCount ~= false and SC.pressed("player_count") then
+    if SC.pressed("player_count") then
         G.sounds.Skip:Play()
         CONFIG.PlayerCount = 1 + (CONFIG.PlayerCount % 5)
     end

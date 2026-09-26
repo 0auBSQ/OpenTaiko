@@ -68,10 +68,20 @@ local ONLINE_DISABLED = { auto_p1 = true, auto_p2 = true, player_count = true, p
 
 function M.init(g) G = g end
 
+-- A shortcut this song select cannot use is left out everywhere: the help panel does not list it and its key
+-- does nothing. Decided from the select's set-up (G.activeConfig), never from the current player count: the
+-- regular select can change its count at any time, so it keeps every player shortcut.
 local function disabled(id)
     if G == nil then return false end
-    if ONLINE_DISABLED[id] and G.activeConfig ~= nil and G.activeConfig.songOnly then return true end
-    return EVENT_DISABLED[id] == true and G.event ~= nil and G.event.on()
+    local cfg = G.activeConfig or {}
+    if ONLINE_DISABLED[id] and cfg.songOnly then return true end
+    if EVENT_DISABLED[id] and G.event ~= nil and G.event.on() then return true end
+    if id == "player_count" then return cfg.allowPlayerCount == false end   -- training, AI battle: the count is fixed
+    -- locked to one player (training), or P2 is the AI: nobody to switch to, no P2 auto play
+    if id == "player" or id == "auto_p2" then
+        return cfg.mountAISlotToP2 == true or (cfg.lockedPlayerCount ~= nil and cfg.lockedPlayerCount < 2)
+    end
+    return false
 end
 
 -- read every binding from the theme settings (a missing definition keeps the default)
