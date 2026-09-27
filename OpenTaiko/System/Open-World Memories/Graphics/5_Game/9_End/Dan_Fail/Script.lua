@@ -102,22 +102,22 @@ function clearOut(player)
 end
 
 function onStart()
-    tx["Dan_In.png"] = TEXTURE:CreateTextureSync("Dan_In.png")
-    tx["Dan_In_Shadow.png"] = TEXTURE:CreateTextureSync("Dan_In_Shadow.png")
-    tx["Slam.png"] = TEXTURE:CreateTextureSync("Slam.png")
-    tx["Message.png"] = TEXTURE:CreateTextureSync("Message.png")
-    tx["Foxes.png"] = TEXTURE:CreateTextureSync("Foxes.png")
+    tx["Dan_In.png"] = TEXTURE:CreateTexture("Dan_In.png")
+    tx["Dan_In_Shadow.png"] = TEXTURE:CreateTexture("Dan_In_Shadow.png")
+    tx["Slam.png"] = TEXTURE:CreateTexture("Slam.png")
+    tx["Message.png"] = TEXTURE:CreateTexture("Message.png")
+    tx["Foxes.png"] = TEXTURE:CreateTexture("Foxes.png")
 
-    tx["Speech/Speech.png"] = TEXTURE:CreateTextureSync("Speech/Speech.png")
+    tx["Speech/Speech.png"] = TEXTURE:CreateTexture("Speech/Speech.png")
 
     -- onStart runs before state arrives, so the language is unknown here — pre-load every speech variant and let
     -- draw pick the one for state.lang + the per-play random line.
-    tx["Speech/special/0.png"] = TEXTURE:CreateTextureSync("Speech/special/0.png")
+    tx["Speech/special/0.png"] = TEXTURE:CreateTexture("Speech/special/0.png")
     for i = 0, 4 do
-        tx["Speech/en/" .. i .. ".png"] = TEXTURE:CreateTextureSync("Speech/en/" .. i .. ".png")
-        tx["Speech/ja/" .. i .. ".png"] = TEXTURE:CreateTextureSync("Speech/ja/" .. i .. ".png")
-        tx["Speech/ru/" .. i .. ".png"] = TEXTURE:CreateTextureSync("Speech/ru/" .. i .. ".png")
-        tx["Speech/zh/" .. i .. ".png"] = TEXTURE:CreateTextureSync("Speech/zh/" .. i .. ".png")
+        tx["Speech/en/" .. i .. ".png"] = TEXTURE:CreateTexture("Speech/en/" .. i .. ".png")
+        tx["Speech/ja/" .. i .. ".png"] = TEXTURE:CreateTexture("Speech/ja/" .. i .. ".png")
+        tx["Speech/ru/" .. i .. ".png"] = TEXTURE:CreateTexture("Speech/ru/" .. i .. ".png")
+        tx["Speech/zh/" .. i .. ".png"] = TEXTURE:CreateTexture("Speech/zh/" .. i .. ".png")
     end
 end
 

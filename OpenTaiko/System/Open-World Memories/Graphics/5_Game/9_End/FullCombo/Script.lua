@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
 -- FullCombo end animation (Group C): plays a 40-frame (0..39) sprite sheet per player on full combo.
 -- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph    -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart, all frames)
+--   func:AddGraph    -> TEXTURE:CreateTexture into the local `tx` registry (onStart, all frames)
 --   func:DrawGraph   -> tx[name]:Draw
 --   update/draw/playEndAnime took a PLAYER index; now the host passes it via state.player
 --   (playEndAnime is still called directly with the index). deltaTime -> fps.deltaTime.
@@ -24,7 +24,7 @@ function onStart()
     -- Load every frame up front; onStart has no `state`, so the player-count-dependent
     -- `y` layout is (re)computed in update() where state.playerCount is available.
     for i = 0, textureCount do
-        tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
+        tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
     end
 end
 

@@ -69,6 +69,60 @@ class TextureLoader {
 	private bool _collectGameplay;
 	private int _warmIndex;
 
+	// What a gameplay texture needs to be drawn at all; the warm pass skips it when the coming play cannot draw it.
+	// A skipped texture that is drawn anyway still loads on its first draw.
+	[Flags]
+	internal enum WarmNeed {
+		Always = 0,
+		Dan = 1 << 0,
+		Tower = 1 << 1,
+		Training = 1 << 2,
+		AI = 1 << 3,
+		Konga = 1 << 4,       // a Konga player, or a chart note switched to Konga
+		Mine = 1 << 5,        // a mine or fuse-roll note in the chart (a failed fuse roll draws the bomb effect)
+		TwoPlus = 1 << 6,     // a second player (or the AI)
+		ThreePlus = 1 << 7,   // three players or more
+	}
+	private readonly Dictionary<CTexture, WarmNeed> _warmNeeds = new();
+	private WarmNeed _playNeeds;
+
+	private CTexture TxCFor(WarmNeed need, string FileName) {
+		var tex = TxC(FileName);
+		if (tex != null && need != WarmNeed.Always) _warmNeeds[tex] = need;
+		return tex!;
+	}
+
+	private CTextureAf TxCAfFor(WarmNeed need, string FileName) {
+		var tex = TxCAf(FileName);
+		if (tex != null && need != WarmNeed.Always) _warmNeeds[tex] = need;
+		return tex!;
+	}
+
+	// what the coming play can draw: its mode, its players and its charts (loaded by now)
+	private static WarmNeed tPlayNeeds() {
+		var cfg = OpenTaiko.ConfigIni;
+		var needs = WarmNeed.Always;
+		var difficulty = (Difficulty)OpenTaiko.SongMount.nChoosenSongDifficulty[0];
+		if (difficulty == Difficulty.Dan) needs |= WarmNeed.Dan;
+		if (difficulty == Difficulty.Tower) needs |= WarmNeed.Tower;
+		if (cfg.bTokkunMode) needs |= WarmNeed.Training;
+		if (cfg.bAIBattleMode) needs |= WarmNeed.AI | WarmNeed.TwoPlus;
+		if (cfg.nPlayerCount >= 2) needs |= WarmNeed.TwoPlus;
+		if (cfg.nPlayerCount >= 3) needs |= WarmNeed.ThreePlus;
+		for (int p = 0; p < cfg.nPlayerCount; p++) {
+			if (cfg.nGameType[p] == EGameType.Konga) needs |= WarmNeed.Konga;
+			if (cfg.nFunMods[p] == EFunMods.Minesweeper) needs |= WarmNeed.Mine;
+			var tja = OpenTaiko.GetTJA(p);
+			if (tja == null) continue;
+			if (tja.PlayerSideMetadata.GameType == EGameType.Konga) needs |= WarmNeed.Konga;
+			foreach (var chip in tja.listChip) {
+				if (chip.eGameType == EGameType.Konga) needs |= WarmNeed.Konga;
+				if (NotesManager.IsMine(chip) || NotesManager.IsFuzeRoll(chip)) needs |= WarmNeed.Mine;
+			}
+		}
+		return needs;
+	}
+
 	public TextureLoader() {
 		// Constructor
 	}
@@ -106,7 +160,10 @@ class TextureLoader {
 	}
 
 	/// <summary>Reset the gameplay-texture warm cursor. Call at the start of each song load.</summary>
-	public void BeginWarmGameplay() => _warmIndex = 0;
+	public void BeginWarmGameplay() {
+		_warmIndex = 0;
+		_playNeeds = tPlayNeeds();
+	}
 
 	/// <summary>Force-realize deferred gameplay textures (decode + GL upload) within a time budget so
 	/// their first in-game draw hits a resident texture instead of an inline decode hitch. Returns true
@@ -114,7 +171,10 @@ class TextureLoader {
 	public bool WarmGameplayBatch(double budgetMs) {
 		long start = System.Diagnostics.Stopwatch.GetTimestamp();
 		while (_warmIndex < gameplayTextures.Count) {
-			gameplayTextures[_warmIndex++]?.RealizeIfDeferred();
+			var tex = gameplayTextures[_warmIndex++];
+			if (tex == null) continue;
+			if (_warmNeeds.TryGetValue(tex, out var need) && (need & _playNeeds) == 0) continue;
+			tex.RealizeIfDeferred();
 			if (System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs)
 				break;
 		}
@@ -235,9 +295,9 @@ class TextureLoader {
 
 		Notes = new CTexture[2];
 		Notes[0] = TxC(GAME + @$"Notes.png");
-		Notes[1] = TxC(GAME + @$"Notes_Konga.png");
+		Notes[1] = TxCFor(WarmNeed.Konga, GAME + @$"Notes_Konga.png");
 
-		Note_Mine = TxC(GAME + @$"Mine.png");
+		Note_Mine = TxCFor(WarmNeed.Mine, GAME + @$"Mine.png");
 		Note_Swap = TxC(GAME + @$"Swap.png");
 		Note_Kusu = TxC(GAME + @$"Kusu.png");
 		Note_FuseRoll = TxC(GAME + @$"FuseRoll.png");
@@ -247,7 +307,7 @@ class TextureLoader {
 
 		SENotes = new CTexture[2];
 		SENotes[0] = TxC(GAME + @$"SENotes.png");
-		SENotes[1] = TxC(GAME + @$"SENotes_Konga.png");
+		SENotes[1] = TxCFor(WarmNeed.Konga, GAME + @$"SENotes_Konga.png");
 
 		SENotesExtension = TxC(GAME + @$"SENotes_Extension.png");
 
@@ -276,47 +336,47 @@ class TextureLoader {
 
 		Taiko_Background = new CTexture[12];
 		Taiko_Background[0] = TxC(GAME + TAIKO + @$"1P_Background.png");
-		Taiko_Background[1] = TxC(GAME + TAIKO + @$"2P_Background.png");
-		Taiko_Background[2] = TxC(GAME + TAIKO + @$"Dan_Background.png");
-		Taiko_Background[3] = TxC(GAME + TAIKO + @$"Tower_Background.png");
+		Taiko_Background[1] = TxCFor(WarmNeed.TwoPlus, GAME + TAIKO + @$"2P_Background.png");
+		Taiko_Background[2] = TxCFor(WarmNeed.Dan, GAME + TAIKO + @$"Dan_Background.png");
+		Taiko_Background[3] = TxCFor(WarmNeed.Tower, GAME + TAIKO + @$"Tower_Background.png");
 		Taiko_Background[4] = TxC(GAME + TAIKO + @$"1P_Background_Right.png");
-		Taiko_Background[5] = TxC(GAME + TAIKO + @$"1P_Background_Tokkun.png");
-		Taiko_Background[6] = TxC(GAME + TAIKO + @$"2P_Background_Tokkun.png");
-		Taiko_Background[7] = TxC(GAME + TAIKO + @$"3P_Background.png");
-		Taiko_Background[8] = TxC(GAME + TAIKO + @$"4P_Background.png");
-		Taiko_Background[9] = TxC(GAME + TAIKO + @$"AI_Background.png");
+		Taiko_Background[5] = TxCFor(WarmNeed.Training, GAME + TAIKO + @$"1P_Background_Tokkun.png");
+		Taiko_Background[6] = TxCFor(WarmNeed.Training, GAME + TAIKO + @$"2P_Background_Tokkun.png");
+		Taiko_Background[7] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"3P_Background.png");
+		Taiko_Background[8] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"4P_Background.png");
+		Taiko_Background[9] = TxCFor(WarmNeed.AI, GAME + TAIKO + @$"AI_Background.png");
 		Taiko_Background[10] = TxC(GAME + TAIKO + @$"Boss_Background.png");
-		Taiko_Background[11] = TxC(GAME + TAIKO + @$"5P_Background.png");
+		Taiko_Background[11] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"5P_Background.png");
 
 		Taiko_Frame = new CTexture[7];
 		Taiko_Frame[0] = TxC(GAME + TAIKO + @$"1P_Frame.png");
-		Taiko_Frame[1] = TxC(GAME + TAIKO + @$"2P_Frame.png");
-		Taiko_Frame[2] = TxC(GAME + TAIKO + @$"Tower_Frame.png");
-		Taiko_Frame[3] = TxC(GAME + TAIKO + @$"Tokkun_Frame.png");
-		Taiko_Frame[4] = TxC(GAME + TAIKO + @$"2P_None_Frame.png");
-		Taiko_Frame[5] = TxC(GAME + TAIKO + @$"AI_Frame.png");
-		Taiko_Frame[6] = TxC(GAME + TAIKO + @$"4PPlay_Frame.png");
+		Taiko_Frame[1] = TxCFor(WarmNeed.TwoPlus, GAME + TAIKO + @$"2P_Frame.png");
+		Taiko_Frame[2] = TxCFor(WarmNeed.Tower, GAME + TAIKO + @$"Tower_Frame.png");
+		Taiko_Frame[3] = TxCFor(WarmNeed.Training, GAME + TAIKO + @$"Tokkun_Frame.png");
+		Taiko_Frame[4] = TxCFor(WarmNeed.AI, GAME + TAIKO + @$"2P_None_Frame.png");
+		Taiko_Frame[5] = TxCFor(WarmNeed.AI, GAME + TAIKO + @$"AI_Frame.png");
+		Taiko_Frame[6] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"4PPlay_Frame.png");
 
 		Taiko_PlayerNumber = new CTexture[5];
 		Taiko_PlayerNumber[0] = TxC(GAME + TAIKO + @$"1P_PlayerNumber.png");
-		Taiko_PlayerNumber[1] = TxC(GAME + TAIKO + @$"2P_PlayerNumber.png");
-		Taiko_PlayerNumber[2] = TxC(GAME + TAIKO + @$"3P_PlayerNumber.png");
-		Taiko_PlayerNumber[3] = TxC(GAME + TAIKO + @$"4P_PlayerNumber.png");
-		Taiko_PlayerNumber[4] = TxC(GAME + TAIKO + @$"5P_PlayerNumber.png");
+		Taiko_PlayerNumber[1] = TxCFor(WarmNeed.TwoPlus, GAME + TAIKO + @$"2P_PlayerNumber.png");
+		Taiko_PlayerNumber[2] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"3P_PlayerNumber.png");
+		Taiko_PlayerNumber[3] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"4P_PlayerNumber.png");
+		Taiko_PlayerNumber[4] = TxCFor(WarmNeed.ThreePlus, GAME + TAIKO + @$"5P_PlayerNumber.png");
 
 
 		Taiko_Base = new CTexture[2];
 		Taiko_Base[0] = TxC(GAME + TAIKO + @$"Base.png");
-		Taiko_Base[1] = TxC(GAME + TAIKO + @$"Base_Konga.png");
+		Taiko_Base[1] = TxCFor(WarmNeed.Konga, GAME + TAIKO + @$"Base_Konga.png");
 
 		Taiko_Don_Left = TxC(GAME + TAIKO + @$"Don.png");
 		Taiko_Don_Right = TxC(GAME + TAIKO + @$"Don.png");
 		Taiko_Ka_Left = TxC(GAME + TAIKO + @$"Ka.png");
 		Taiko_Ka_Right = TxC(GAME + TAIKO + @$"Ka.png");
 
-		Taiko_Konga_Don = TxC(GAME + TAIKO + @$"Don_Konga.png");
-		Taiko_Konga_Ka = TxC(GAME + TAIKO + @$"Ka_Konga.png");
-		Taiko_Konga_Clap = TxC(GAME + TAIKO + @$"Clap.png");
+		Taiko_Konga_Don = TxCFor(WarmNeed.Konga, GAME + TAIKO + @$"Don_Konga.png");
+		Taiko_Konga_Ka = TxCFor(WarmNeed.Konga, GAME + TAIKO + @$"Ka_Konga.png");
+		Taiko_Konga_Clap = TxCFor(WarmNeed.Konga, GAME + TAIKO + @$"Clap.png");
 
 		Taiko_LevelUp = TxC(GAME + TAIKO + @$"LevelUp.png");
 		Taiko_LevelDown = TxC(GAME + TAIKO + @$"LevelDown.png");
@@ -356,23 +416,23 @@ class TextureLoader {
 
 		Gauge = new CTexture[8];
 		Gauge[0] = TxC(GAME + GAUGE + @$"1P.png");
-		Gauge[1] = TxC(GAME + GAUGE + @$"2P.png");
+		Gauge[1] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"2P.png");
 		Gauge[2] = TxC(GAME + GAUGE + @$"1P_Right.png");
-		Gauge[3] = TxC(GAME + GAUGE + @$"1P_4PGauge.png");
-		Gauge[4] = TxC(GAME + GAUGE + @$"2P_4PGauge.png");
-		Gauge[5] = TxC(GAME + GAUGE + @$"3P_4PGauge.png");
-		Gauge[6] = TxC(GAME + GAUGE + @$"4P_4PGauge.png");
-		Gauge[7] = TxC(GAME + GAUGE + @$"5P_4PGauge.png");
+		Gauge[3] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"1P_4PGauge.png");
+		Gauge[4] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"2P_4PGauge.png");
+		Gauge[5] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"3P_4PGauge.png");
+		Gauge[6] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"4P_4PGauge.png");
+		Gauge[7] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"5P_4PGauge.png");
 
 		Gauge_Base = new CTexture[8];
 		Gauge_Base[0] = TxC(GAME + GAUGE + @$"1P_Base.png");
-		Gauge_Base[1] = TxC(GAME + GAUGE + @$"2P_Base.png");
+		Gauge_Base[1] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"2P_Base.png");
 		Gauge_Base[2] = TxC(GAME + GAUGE + @$"1P_Base_Right.png");
-		Gauge_Base[3] = TxC(GAME + GAUGE + @$"1P_Base_4PGauge.png");
-		Gauge_Base[4] = TxC(GAME + GAUGE + @$"2P_Base_4PGauge.png");
-		Gauge_Base[5] = TxC(GAME + GAUGE + @$"3P_Base_4PGauge.png");
-		Gauge_Base[6] = TxC(GAME + GAUGE + @$"4P_Base_4PGauge.png");
-		Gauge_Base[7] = TxC(GAME + GAUGE + @$"5P_Base_4PGauge.png");
+		Gauge_Base[3] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"1P_Base_4PGauge.png");
+		Gauge_Base[4] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"2P_Base_4PGauge.png");
+		Gauge_Base[5] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"3P_Base_4PGauge.png");
+		Gauge_Base[6] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"4P_Base_4PGauge.png");
+		Gauge_Base[7] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"5P_Base_4PGauge.png");
 
 		Gauge_Line = new CTexture[2];
 		Gauge_Line[0] = TxC(GAME + GAUGE + @$"1P_Line.png");
@@ -380,18 +440,18 @@ class TextureLoader {
 
 		Gauge_Clear = new CTexture[3];
 		Gauge_Clear[0] = TxC(GAME + GAUGE + @$"Clear.png");
-		Gauge_Clear[1] = TxC(GAME + GAUGE + @$"Clear_2PGauge.png");
-		Gauge_Clear[2] = TxC(GAME + GAUGE + @$"Clear_4PGauge.png");
+		Gauge_Clear[1] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"Clear_2PGauge.png");
+		Gauge_Clear[2] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"Clear_4PGauge.png");
 
 		Gauge_Base_Norma = new CTexture[3];
 		Gauge_Base_Norma[0] = TxC(GAME + GAUGE + @$"Norma_Base.png");
-		Gauge_Base_Norma[1] = TxC(GAME + GAUGE + @$"Norma_Base_2PGauge.png");
-		Gauge_Base_Norma[2] = TxC(GAME + GAUGE + @$"Norma_Base_4PGauge.png");
+		Gauge_Base_Norma[1] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"Norma_Base_2PGauge.png");
+		Gauge_Base_Norma[2] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"Norma_Base_4PGauge.png");
 
 		Gauge_Killzone = new CTexture[3];
 		Gauge_Killzone[0] = TxC(GAME + GAUGE + @$"Killzone.png");
-		Gauge_Killzone[1] = TxC(GAME + GAUGE + @$"Killzone_2PGauge.png");
-		Gauge_Killzone[2] = TxC(GAME + GAUGE + @$"Killzone_4PGauge.png");
+		Gauge_Killzone[1] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"Killzone_2PGauge.png");
+		Gauge_Killzone[2] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"Killzone_4PGauge.png");
 
 		OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn = OpenTaiko.tSequenceImageSheetCountCount(CSkin.Path(BASE + GAME + GAUGE + @$"Rainbow{Path.DirectorySeparatorChar}"));
 		if (OpenTaiko.Skin.Game_Gauge_Rainbow_Ptn != 0) {
@@ -405,7 +465,7 @@ class TextureLoader {
 		if (OpenTaiko.Skin.Game_Gauge_Rainbow_Flat_Ptn != 0) {
 			Gauge_Rainbow_Flat = new CTexture[OpenTaiko.Skin.Game_Gauge_Rainbow_Flat_Ptn];
 			for (int i = 0; i < OpenTaiko.Skin.Game_Gauge_Rainbow_Flat_Ptn; i++) {
-				Gauge_Rainbow_Flat[i] = TxC(GAME + GAUGE + @$"Rainbow_Flat{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+				Gauge_Rainbow_Flat[i] = TxCFor(WarmNeed.ThreePlus, GAME + GAUGE + @$"Rainbow_Flat{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
 			}
 		}
 
@@ -413,7 +473,7 @@ class TextureLoader {
 		if (OpenTaiko.Skin.Game_Gauge_Rainbow_2PGauge_Ptn != 0) {
 			Gauge_Rainbow_2PGauge = new CTexture[OpenTaiko.Skin.Game_Gauge_Rainbow_2PGauge_Ptn];
 			for (int i = 0; i < OpenTaiko.Skin.Game_Gauge_Rainbow_2PGauge_Ptn; i++) {
-				Gauge_Rainbow_2PGauge[i] = TxC(GAME + GAUGE + @$"Rainbow_2PGauge{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+				Gauge_Rainbow_2PGauge[i] = TxCFor(WarmNeed.TwoPlus, GAME + GAUGE + @$"Rainbow_2PGauge{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
 			}
 		}
 
@@ -423,18 +483,18 @@ class TextureLoader {
 		if (OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn != 0) {
 			Gauge_Dan_Rainbow = new CTexture[OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn];
 			for (int i = 0; i < OpenTaiko.Skin.Game_Gauge_Dan_Rainbow_Ptn; i++) {
-				Gauge_Dan_Rainbow[i] = TxC(GAME + DANC + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
+				Gauge_Dan_Rainbow[i] = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Rainbow{Path.DirectorySeparatorChar}" + i.ToString() + ".png");
 			}
 		}
 
 		Gauge_Dan = new CTexture[6];
 
-		Gauge_Dan[0] = TxC(GAME + GAUGE + @$"1P_Dan_Base.png");
-		Gauge_Dan[1] = TxC(GAME + GAUGE + @$"1P_Dan.png");
-		Gauge_Dan[2] = TxC(GAME + GAUGE + @$"1P_Dan_Clear_Base.png");
-		Gauge_Dan[3] = TxC(GAME + GAUGE + @$"1P_Dan_Clear.png");
-		Gauge_Dan[4] = TxC(GAME + GAUGE + @$"1P_Dan_Base_Right.png");
-		Gauge_Dan[5] = TxC(GAME + GAUGE + @$"1P_Dan_Right.png");
+		Gauge_Dan[0] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan_Base.png");
+		Gauge_Dan[1] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan.png");
+		Gauge_Dan[2] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan_Clear_Base.png");
+		Gauge_Dan[3] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan_Clear.png");
+		Gauge_Dan[4] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan_Base_Right.png");
+		Gauge_Dan[5] = TxCFor(WarmNeed.Dan, GAME + GAUGE + @$"1P_Dan_Right.png");
 
 		Gauge_Soul = TxC(GAME + GAUGE + @$"Soul.png");
 		Gauge_Soul_Fire = TxC(GAME + GAUGE + @$"Fire.png");
@@ -475,7 +535,7 @@ class TextureLoader {
 		Effects_Hit_FireWorks = TxC(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}FireWorks.png");
 		if (Effects_Hit_FireWorks != null) Effects_Hit_FireWorks.bAddBlend = OpenTaiko.Skin.Game_Effect_FireWorks_AddBlend;
 
-		Effects_Hit_Bomb = TxCAf(GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}Bomb.png");
+		Effects_Hit_Bomb = TxCAfFor(WarmNeed.Mine, GAME + EFFECTS + @$"Hit{Path.DirectorySeparatorChar}Bomb.png");
 
 
 		Effects_Fire = TxC(GAME + EFFECTS + @$"Fire.png");
@@ -520,15 +580,16 @@ class TextureLoader {
 		var _suffixes = new string[] { "", "_Konga" };
 
 		for (int i = 0; i < Lane_Red.Length; i++) {
-			Lane_Red[i] = TxC(GAME + LANE + @$"Red" + _suffixes[i] + @$".png");
-			Lane_Blue[i] = TxC(GAME + LANE + @$"Blue" + _suffixes[i] + @$".png");
-			Lane_Clap[i] = TxC(GAME + LANE + @$"Clap" + _suffixes[i] + @$".png");
+			var need = i == 1 ? WarmNeed.Konga : WarmNeed.Always;
+			Lane_Red[i] = TxCFor(need, GAME + LANE + @$"Red" + _suffixes[i] + @$".png");
+			Lane_Blue[i] = TxCFor(need, GAME + LANE + @$"Blue" + _suffixes[i] + @$".png");
+			Lane_Clap[i] = TxCFor(need, GAME + LANE + @$"Clap" + _suffixes[i] + @$".png");
 		}
 
 
 		Lane_Yellow = TxC(GAME + LANE + @$"Yellow.png");
 		Lane_Background_Main = TxC(GAME + LANE + @$"Background_Main.png");
-		Lane_Background_AI = TxC(GAME + LANE + @$"Background_AI.png");
+		Lane_Background_AI = TxCFor(WarmNeed.AI, GAME + LANE + @$"Background_AI.png");
 		Lane_Background_Sub = TxC(GAME + LANE + @$"Background_Sub.png");
 		Lane_Background_GoGo = TxC(GAME + LANE + @$"Background_GoGo.png");
 
@@ -543,26 +604,26 @@ class TextureLoader {
 
 		#region DanC
 
-		DanC_Background = TxC(GAME + DANC + @$"Background.png");
+		DanC_Background = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Background.png");
 		DanC_Gauge = new CTexture[4];
 		var type = new string[] { "Normal", "Reach", "Clear", "Flush" };
 		for (int i = 0; i < 4; i++) {
-			DanC_Gauge[i] = TxC(GAME + DANC + @$"Gauge_" + type[i] + ".png");
+			DanC_Gauge[i] = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Gauge_" + type[i] + ".png");
 		}
-		DanC_Base = TxC(GAME + DANC + @$"Base.png");
-		DanC_Base_Small = TxC(GAME + DANC + @$"Base_Small.png");
+		DanC_Base = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Base.png");
+		DanC_Base_Small = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Base_Small.png");
 
-		DanC_Gauge_Base = TxC(GAME + DANC + @$"Gauge_Base.png");
-		DanC_Failed = TxC(GAME + DANC + @$"Failed.png");
-		DanC_Number = TxC(GAME + DANC + @$"Number.png");
-		DanC_Small_Number = TxC(GAME + DANC + @$"Small_Number.png");
-		DanC_ExamType = TxC(GAME + DANC + @$"ExamType.png");
-		DanC_ExamRange = TxC(GAME + DANC + @$"ExamRange.png");
-		DanC_Screen = TxC(GAME + DANC + @$"Screen.png");
-		DanC_SmallBase = TxC(GAME + DANC + @$"SmallBase.png");
-		DanC_Small_ExamCymbol = TxC(GAME + DANC + @$"Small_ExamCymbol.png");
-		DanC_ExamCymbol = TxC(GAME + DANC + @$"ExamCymbol.png");
-		DanC_MiniNumber = TxC(GAME + DANC + @$"MiniNumber.png");
+		DanC_Gauge_Base = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Gauge_Base.png");
+		DanC_Failed = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Failed.png");
+		DanC_Number = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Number.png");
+		DanC_Small_Number = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Small_Number.png");
+		DanC_ExamType = TxCFor(WarmNeed.Dan, GAME + DANC + @$"ExamType.png");
+		DanC_ExamRange = TxCFor(WarmNeed.Dan, GAME + DANC + @$"ExamRange.png");
+		DanC_Screen = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Screen.png");
+		DanC_SmallBase = TxCFor(WarmNeed.Dan, GAME + DANC + @$"SmallBase.png");
+		DanC_Small_ExamCymbol = TxCFor(WarmNeed.Dan, GAME + DANC + @$"Small_ExamCymbol.png");
+		DanC_ExamCymbol = TxCFor(WarmNeed.Dan, GAME + DANC + @$"ExamCymbol.png");
+		DanC_MiniNumber = TxCFor(WarmNeed.Dan, GAME + DANC + @$"MiniNumber.png");
 
 		#endregion
 
@@ -590,16 +651,16 @@ class TextureLoader {
 
 		#region Training
 
-		Tokkun_DownBG = TxC(GAME + TRAINING + @$"Down.png");
-		Tokkun_BigTaiko = TxC(GAME + TRAINING + @$"BigTaiko.png");
-		Tokkun_ProgressBar = TxC(GAME + TRAINING + @$"ProgressBar_Red.png");
-		Tokkun_ProgressBarWhite = TxC(GAME + TRAINING + @$"ProgressBar_White.png");
-		Tokkun_GoGoPoint = TxC(GAME + TRAINING + @$"GoGoPoint.png");
-		Tokkun_JumpPoint = TxC(GAME + TRAINING + @$"JumpPoint.png");
-		Tokkun_Background_Up = TxC(GAME + TRAINING + @$"Background_Up.png");
-		Tokkun_BigNumber = TxC(GAME + TRAINING + @$"BigNumber.png");
-		Tokkun_SmallNumber = TxC(GAME + TRAINING + @$"SmallNumber.png");
-		Tokkun_Speed_Measure = TxC(GAME + TRAINING + @$"Speed_Measure.png");
+		Tokkun_DownBG = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"Down.png");
+		Tokkun_BigTaiko = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"BigTaiko.png");
+		Tokkun_ProgressBar = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"ProgressBar_Red.png");
+		Tokkun_ProgressBarWhite = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"ProgressBar_White.png");
+		Tokkun_GoGoPoint = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"GoGoPoint.png");
+		Tokkun_JumpPoint = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"JumpPoint.png");
+		Tokkun_Background_Up = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"Background_Up.png");
+		Tokkun_BigNumber = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"BigNumber.png");
+		Tokkun_SmallNumber = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"SmallNumber.png");
+		Tokkun_Speed_Measure = TxCFor(WarmNeed.Training, GAME + TRAINING + @$"Speed_Measure.png");
 
 		#endregion
 
@@ -607,25 +668,25 @@ class TextureLoader {
 
 		// The tower itself (its floors, roof and sky) is a tower look, a Down background folder under
 		// 5_Background/Tower/Down/, drawn by its own script and composed by Lua elsewhere
-		Tower_Miss = TxC(GAME + TOWER + @$"Miss.png");
+		Tower_Miss = TxCFor(WarmNeed.Tower, GAME + TOWER + @$"Miss.png");
 
 		#endregion
 
 		#region [22_AIBattle]
 
-		AIBattle_SectionTime_Panel = TxC(GAME + AIBATTLE + @$"SectionTime_Panel.png");
+		AIBattle_SectionTime_Panel = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"SectionTime_Panel.png");
 
-		AIBattle_SectionTime_Bar_Base = TxC(GAME + AIBATTLE + @$"SectionTime_Bar_Base.png");
-		AIBattle_SectionTime_Bar_Finish = TxC(GAME + AIBATTLE + @$"SectionTime_Bar_Finish.png");
-		AIBattle_SectionTime_Bar_Normal = TxC(GAME + AIBATTLE + @$"SectionTime_Bar_Normal.png");
+		AIBattle_SectionTime_Bar_Base = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"SectionTime_Bar_Base.png");
+		AIBattle_SectionTime_Bar_Finish = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"SectionTime_Bar_Finish.png");
+		AIBattle_SectionTime_Bar_Normal = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"SectionTime_Bar_Normal.png");
 
-		AIBattle_Batch_Base = TxC(GAME + AIBATTLE + @$"Batch_Base.png");
-		AIBattle_Batch = TxC(GAME + AIBATTLE + @$"Batch.png");
+		AIBattle_Batch_Base = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"Batch_Base.png");
+		AIBattle_Batch = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"Batch.png");
 
-		AIBattle_Judge_Meter[0] = TxC(GAME + AIBATTLE + @$"Judge_Meter.png");
-		AIBattle_Judge_Meter[1] = TxC(GAME + AIBATTLE + @$"Judge_Meter_AI.png");
+		AIBattle_Judge_Meter[0] = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"Judge_Meter.png");
+		AIBattle_Judge_Meter[1] = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"Judge_Meter_AI.png");
 
-		AIBattle_Judge_Number = TxC(GAME + AIBATTLE + @$"Judge_Number.png");
+		AIBattle_Judge_Number = TxCFor(WarmNeed.AI, GAME + AIBATTLE + @$"Judge_Number.png");
 
 		#endregion
 
@@ -862,6 +923,8 @@ class TextureLoader {
 		for (int i = 0; i < listTexture.Count; ++i)
 			listTexture.ElementAtOrDefault(i)?.Dispose();
 		listTexture.Clear();
+		gameplayTextures.Clear();
+		_warmNeeds.Clear();
 
 		foreach (var character in Characters) {
 			character.Dispose();

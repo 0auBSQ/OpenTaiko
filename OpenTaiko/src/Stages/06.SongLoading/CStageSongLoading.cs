@@ -557,6 +557,7 @@ internal class CStageSongLoading : CStage {
 					this.sdLoadSound.tDispose();
 				}
 				_gameScreenBuilt = false;   // handed over: gameplay owns the game screen now
+				OpenTaiko.tTraceMemory("song loaded");
 				return (int)ESongLoadingScreenReturnValue.LoadComplete;
 		}
 		return (int)ESongLoadingScreenReturnValue.Continue;

@@ -497,7 +497,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		for (int i = 0; i < this.chipNowProcessingMultiHitNotes.Length; ++i)
 			this.chipNowProcessingMultiHitNotes[i].Clear();
 
-		listWAV.Clear();
+		listWAV = []; // the chart's own list: CTja.DeActivate disposes its sounds
 		Array.Fill(listChip, []);
 		queueMixerSound.Clear();
 		if (!(OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())) System.Runtime.GCSettings.LatencyMode = this.gclatencymode;   // restore pre-gameplay GC mode (unsupported on mobile)

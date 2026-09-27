@@ -23,14 +23,17 @@ internal class CActImplBalloon : CActivity {
 		this.ctBalloonBubbleAnime = new CCounter(0, 1, 100, OpenTaiko.Timer);
 
 		_state.RefreshConst();
-		KusudamaScript = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}"));
-		KusudamaScript.Activate(_state);
+		if (tChartHasKusudama()) {
+			KusudamaScript = new LuaBackgroundWrapper(CSkin.Path($"{TextureLoader.BASE}{TextureLoader.GAME}{TextureLoader.BALLOON}{TextureLoader.KUSUDAMA}"));
+			KusudamaScript.Activate(_state);
+		}
 
 		base.Activate();
 	}
 
 	public override void DeActivate() {
-		KusudamaScript.Dispose();
+		KusudamaScript?.Dispose();
+		KusudamaScript = null;
 
 		this.ctBalloonEnd = null;
 		this.ctBalloonBubbleAnime = null;
@@ -50,22 +53,33 @@ internal class CActImplBalloon : CActivity {
 		return base.Draw();
 	}
 
+	// the kusudama script is only loaded for a chart with one
+	private static bool tChartHasKusudama() {
+		for (int i = 0; i < OpenTaiko.ConfigIni.nPlayerCount; i++) {
+			var tja = OpenTaiko.GetTJA(i);
+			if (tja != null && tja.listChip.Any(chip => NotesManager.IsKusudama(chip)))
+				return true;
+		}
+		return false;
+	}
+
 	public void KusuIn() {
-		KusudamaScript.Call("kusuIn");
+		KusudamaScript?.Call("kusuIn");
 		KusudamaIsActive = true;
 	}
 	public void KusuBroke() {
-		KusudamaScript.Call("kusuBroke");
+		KusudamaScript?.Call("kusuBroke");
 		KusudamaIsActive = false;
 	}
 	public void KusuMiss() {
-		KusudamaScript.Call("kusuMiss");
+		KusudamaScript?.Call("kusuMiss");
 		KusudamaIsActive = false;
 	}
 
 	public bool KusudamaIsActive { get; private set; } = false;
 
 	public void tDrawKusudama(bool isTrainingPaused) {
+		if (KusudamaScript == null) return;
 		_state.RefreshGameplay();
 		if (!OpenTaiko.stageGameScreen.bPAUSE) {
 			KusudamaScript.Update(_state);
@@ -166,7 +180,7 @@ internal class CActImplBalloon : CActivity {
 		return base.Draw();
 	}
 
-	public LuaBackgroundWrapper KusudamaScript { get; private set; }
+	public LuaBackgroundWrapper? KusudamaScript { get; private set; }
 	private readonly LuaBackgroundState _state = new();
 
 

@@ -150,7 +150,7 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundAIWin ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWinFullCombo ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_FullCombo.ogg"), ESoundGroup.SoundEffect);
 			this.soundAIWinPerfectCombo ??= OpenTaiko.SoundManager.tCreateSound(CSkin.Path(@$"Sounds{Path.DirectorySeparatorChar}AIBattle_Win_AllPerfect.ogg"), ESoundGroup.SoundEffect);
-		} else {
+		} else if (!OpenTaiko.ConfigIni.bTokkunMode) { // training never plays an end animation
 			FailedScript ??= new LuaBackgroundWrapper($@"{origindir}ClearFailed");//ClearFailed
 			ClearScript ??= new LuaBackgroundWrapper($@"{origindir}Clear");
 			FullComboScript ??= new LuaBackgroundWrapper($@"{origindir}FullCombo");
@@ -228,8 +228,8 @@ internal class CActImplClearAnimation : CActivity {
 	public override void ReleaseManagedResource() => ReleaseManagedResource(false);
 
 	public void ReleaseManagedResource(bool keepForNowGameMode) {
-		// the tower sounds are kept like the other modes' (one may still be playing over the result), but the
-		// animations are not (about 270 MB decoded): each tower play loads them again inside its song load
+		// the current mode's sounds are kept (one may still be playing over the result), but no animation is
+		// (about 270 MB decoded per mode): each play loads its mode's again inside its song load
 		if (!(keepForNowGameMode && OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)) {
 			this.soundTowerDropout?.tDispose(); this.soundTowerDropout = null;
 			this.soundTowerTopPass?.tDispose(); this.soundTowerTopPass = null;
@@ -250,26 +250,27 @@ internal class CActImplClearAnimation : CActivity {
 			this.soundDanGoldClear?.tDispose(); this.soundDanGoldClear = null;
 			this.soundDanGoldFC?.tDispose(); this.soundDanGoldFC = null;
 			this.soundDanGoldPerfect?.tDispose(); this.soundDanGoldPerfect = null;
-
-			Dan_FailScript?.Dispose(); Dan_FailScript = null;
-			Dan_Red_PassScript?.Dispose(); Dan_Red_PassScript = null;
-			Dan_Red_FullComboScript?.Dispose(); Dan_Red_FullComboScript = null;
-			Dan_Red_PerfectScript?.Dispose(); Dan_Red_PerfectScript = null;
-			Dan_Gold_PassScript?.Dispose(); Dan_Gold_PassScript = null;
-			Dan_Gold_FullComboScript?.Dispose(); Dan_Gold_FullComboScript = null;
-			Dan_Gold_PerfectScript?.Dispose(); Dan_Gold_PerfectScript = null;
 		}
+
+		Dan_FailScript?.Dispose(); Dan_FailScript = null;
+		Dan_Red_PassScript?.Dispose(); Dan_Red_PassScript = null;
+		Dan_Red_FullComboScript?.Dispose(); Dan_Red_FullComboScript = null;
+		Dan_Red_PerfectScript?.Dispose(); Dan_Red_PerfectScript = null;
+		Dan_Gold_PassScript?.Dispose(); Dan_Gold_PassScript = null;
+		Dan_Gold_FullComboScript?.Dispose(); Dan_Gold_FullComboScript = null;
+		Dan_Gold_PerfectScript?.Dispose(); Dan_Gold_PerfectScript = null;
 
 		if (!(keepForNowGameMode && OpenTaiko.ConfigIni.bAIBattleMode)) {
 			this.soundAILose?.tDispose(); this.soundAILose = null;
 			this.soundAIWin?.tDispose(); this.soundAIWin = null;
 			this.soundAIWinFullCombo?.tDispose(); this.soundAIWinFullCombo = null;
 			this.soundAIWinPerfectCombo?.tDispose(); this.soundAIWinPerfectCombo = null;
-			AILoseScript?.Dispose(); AILoseScript = null;
-			AIWinScript?.Dispose(); AIWinScript = null;
-			AIWin_FullComboScript?.Dispose(); AIWin_FullComboScript = null;
-			AIWin_PerfectScript?.Dispose(); AIWin_PerfectScript = null;
 		}
+
+		AILoseScript?.Dispose(); AILoseScript = null;
+		AIWinScript?.Dispose(); AIWinScript = null;
+		AIWin_FullComboScript?.Dispose(); AIWin_FullComboScript = null;
+		AIWin_PerfectScript?.Dispose(); AIWin_PerfectScript = null;
 
 		if (!keepForNowGameMode) {
 			for (int i = 0; i < OpenTaiko.MAX_PLAYERS; i++) {
@@ -278,12 +279,12 @@ internal class CActImplClearAnimation : CActivity {
 				this.soundFullCombo[i]?.tDispose(); this.soundFullCombo[i] = null;
 				this.soundPerfectCombo[i]?.tDispose(); this.soundPerfectCombo[i] = null;
 			}
-
-			FailedScript?.Dispose(); FailedScript = null;
-			ClearScript?.Dispose(); ClearScript = null;
-			FullComboScript?.Dispose(); FullComboScript = null;
-			PerfectComboScript?.Dispose(); PerfectComboScript = null;
 		}
+
+		FailedScript?.Dispose(); FailedScript = null;
+		ClearScript?.Dispose(); ClearScript = null;
+		FullComboScript?.Dispose(); FullComboScript = null;
+		PerfectComboScript?.Dispose(); PerfectComboScript = null;
 
 		base.ReleaseManagedResource();
 	}

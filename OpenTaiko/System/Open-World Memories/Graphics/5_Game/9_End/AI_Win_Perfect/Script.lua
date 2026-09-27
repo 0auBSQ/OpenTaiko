@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
 -- AI Win Perfect end animation: water drop + stars + glowing flower/text + "Full Combo" sweep.
 -- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph        -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
+--   func:AddGraph        -> TEXTURE:CreateTexture into the local `tx` registry (onStart)
 --   func:DrawRectGraph   -> tx[name]:DrawRect
 --   func:DrawGraphRectCenter -> tx[name]:DrawRectAtAnchor(..., "center")
 --   func:SetOpacity(k*255)-> tx[name]:SetOpacity(k)   (0-255 → 0-1, k*255 simplified to k)
@@ -47,8 +47,8 @@ function playEndAnime(player)
 end
 
 function onStart()
-  tx["Assets.png"] = TEXTURE:CreateTextureSync("Assets.png")
-  tx["Background.png"] = TEXTURE:CreateTextureSync("Background.png")
+  tx["Assets.png"] = TEXTURE:CreateTexture("Assets.png")
+  tx["Background.png"] = TEXTURE:CreateTexture("Background.png")
 end
 
 function update(timestamp, state)

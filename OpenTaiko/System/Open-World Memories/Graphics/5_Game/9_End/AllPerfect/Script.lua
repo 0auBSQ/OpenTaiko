@@ -43,9 +43,9 @@ end
 
 function onStart()
     -- Load every frame up front (unconditional — onStart runs before state). The old init() forced the same sync load.
-    tx["bg.png"] = TEXTURE:CreateTextureSync("bg.png")
+    tx["bg.png"] = TEXTURE:CreateTexture("bg.png")
     for i = 0, textureCount do
-        tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
+        tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
     end
 end
 

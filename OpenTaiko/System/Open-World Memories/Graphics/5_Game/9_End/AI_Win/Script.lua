@@ -37,8 +37,8 @@ function playEndAnime(player)
 end
 
 function onStart()
-    tx["Assets.png"] = TEXTURE:CreateTextureSync("Assets.png")
-    tx["Background.png"] = TEXTURE:CreateTextureSync("Background.png")
+    tx["Assets.png"] = TEXTURE:CreateTexture("Assets.png")
+    tx["Background.png"] = TEXTURE:CreateTexture("Background.png")
 end
 
 function update(timestamp, state)

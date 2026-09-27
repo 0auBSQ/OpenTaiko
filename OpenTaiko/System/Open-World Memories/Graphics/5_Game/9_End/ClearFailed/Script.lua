@@ -41,10 +41,10 @@ end
 function onStart()
     -- Load every frame sprite (0.png .. 32.png inclusive) + the all-failed Moyai up front.
     for i = 0, textureCount do
-        tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
+        tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
     end
 
-    tx["TemplateMoyai.png"] = TEXTURE:CreateTextureSync("TemplateMoyai.png")
+    tx["TemplateMoyai.png"] = TEXTURE:CreateTexture("TemplateMoyai.png")
 end
 
 function update(timestamp, state)

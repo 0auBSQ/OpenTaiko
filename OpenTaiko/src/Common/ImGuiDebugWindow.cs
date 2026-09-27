@@ -729,7 +729,7 @@ public static class ImGuiDebugWindow {
 
 			// Backgrounds / mobs / kusudama / clear-animations are now LuaBackgroundWrapper (CLuaScript) instances,
 			// already counted in the CLuaScript.listScripts loop above, so these per-element popups no-op (return 0).
-			long popup(LuaBackgroundWrapper script, string label, string id) => 0;
+			long popup(LuaBackgroundWrapper? script, string label, string id) => 0;
 
 			switch (OpenTaiko.rCurrentStage.eStageID) {
 				#region Game

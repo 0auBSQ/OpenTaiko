@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
 -- AI Win Full Combo end animation: timed glow/star/flower/text reveal over a fading background.
 -- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   init -> onStart (CreateTextureSync into the local `tx` registry); playEndAnime(player) resets the timeline.
+--   init -> onStart (CreateTexture into the local `tx` registry); playEndAnime(player) resets the timeline.
 --   update(player)/draw(player) -> update(timestamp, state)/draw(state) with `local player = state.player`.
 --   func:SetOpacity(v*255) -> tx:SetOpacity(v) (0-255 -> 0-1); deltaTime -> fps.deltaTime.
 
@@ -46,8 +46,8 @@ function playEndAnime(player)
 end
 
 function onStart()
-  tx["Assets.png"] = TEXTURE:CreateTextureSync("Assets.png")
-  tx["Background.png"] = TEXTURE:CreateTextureSync("Background.png")
+  tx["Assets.png"] = TEXTURE:CreateTexture("Assets.png")
+  tx["Background.png"] = TEXTURE:CreateTexture("Background.png")
 end
 
 function update(timestamp, state)

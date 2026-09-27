@@ -465,6 +465,7 @@ internal class OpenTaiko : Game {
 		}
 		rPreviousStage = rCurrentStage;
 		rCurrentStage = Stage;
+		tTraceMemory(Stage.eStageID.ToString());
 	}
 
 	public void UnmountAndChangeStage(CStage Stage, string? traceMessage = null) {
@@ -837,6 +838,7 @@ internal class OpenTaiko : Game {
 								CStage? _target = stageTransition.Target;
 								stageTransition.Finish();
 								rCurrentStage = _target ?? rCurrentStage;
+								tTraceMemory(rCurrentStage.eStageID.ToString());
 								// forward target's return value
 								if (stageTransition.TargetDrawLoopReturnValue != null && rCurrentStage != stageTransition) {
 									this.nDrawLoopReturnValue = stageTransition.TargetDrawLoopReturnValue.Value;
@@ -2097,6 +2099,25 @@ internal class OpenTaiko : Game {
 
 	internal static void CollectInBackground() {
 		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: false, compacting: false);
+	}
+
+	// [STAGE_MEM] debug line: what the process holds at this point, without forcing a collection. memory is what
+	// the F11 menu shows (private bytes on Windows, working set elsewhere); gpuTextures are the texture bytes uploaded
+	// to GL; decodedTextures are the live textures' decoded size, uploaded or not. The process query takes several
+	// milliseconds, so it runs off the main thread like the F11 menu's.
+	[Conditional("DEBUG")]
+	internal static void tTraceMemory(string where) {
+		if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid()) return;
+		long managed = GC.GetTotalMemory(false) >> 20, committed = GC.GetGCMemoryInfo().TotalCommittedBytes >> 20;
+		long gpuBytes = CTexture.s_gpuTextureBytes >> 20, liveBytes = CTexture.LiveBytes >> 20;
+		int gpuCount = CTexture.s_gpuTextureCount, liveCount = CTexture.LiveCount;
+		Task.Run(() => {
+			using var proc = Process.GetCurrentProcess();
+			long memory = OperatingSystem.IsWindows() ? proc.PagedMemorySize64 : proc.WorkingSet64;
+			Trace.TraceInformation(
+				"[STAGE_MEM] {0}: memory={1:N0}MB, workingSet={2:N0}MB, managed={3:N0}MB (GC committed {4:N0}MB), gpuTextures={5:N0}MB ({6:N0}), decodedTextures={7:N0}MB ({8:N0})",
+				where, memory >> 20, proc.WorkingSet64 >> 20, managed, committed, gpuBytes, gpuCount, liveBytes, liveCount);
+		});
 	}
 
 	private void ChangeResolution(int nWidth, int nHeight) {

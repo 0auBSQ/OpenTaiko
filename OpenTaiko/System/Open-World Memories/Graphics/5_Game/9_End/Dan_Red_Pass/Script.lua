@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global  -- TEXTURE/fps injected by CLuaScript at runtime
 -- Dan Red Pass end animation: a scroll rises from the bottom then unrolls horizontally.
 -- Ported from the old ScriptBG func: API to the ROActivity LuaTexture API.
---   func:AddGraph        -> TEXTURE:CreateTextureSync into the local `tx` registry (onStart)
+--   func:AddGraph        -> TEXTURE:CreateTexture into the local `tx` registry (onStart)
 --   func:DrawRectGraph   -> tx[name]:DrawRect ; func:DrawGraph -> tx[name]:Draw
 --   update/draw(player)  -> update(timestamp, state)/draw(state) with `local player = state.player`
 --   playEndAnime(player) -> kept top-level (host calls it with the index); per-play counter reset lives here
@@ -48,9 +48,9 @@ function playEndAnime(player)
 end
 
 function onStart()
-    tx["Scroll.png"] = TEXTURE:CreateTextureSync("Scroll.png")
-    tx["Scroll_Back.png"] = TEXTURE:CreateTextureSync("Scroll_Back.png")
-    tx["Scroll_Back_Overlay.png"] = TEXTURE:CreateTextureSync("Scroll_Back_Overlay.png")
+    tx["Scroll.png"] = TEXTURE:CreateTexture("Scroll.png")
+    tx["Scroll_Back.png"] = TEXTURE:CreateTexture("Scroll_Back.png")
+    tx["Scroll_Back_Overlay.png"] = TEXTURE:CreateTexture("Scroll_Back_Overlay.png")
 end
 
 function update(timestamp, state)

@@ -46,9 +46,9 @@ function playEndAnime(player)
 end
 
 function onStart()
-    tx["Scroll.png"] = TEXTURE:CreateTextureSync("Scroll.png")
-    tx["Scroll_Back.png"] = TEXTURE:CreateTextureSync("Scroll_Back.png")
-    tx["Scroll_Back_Overlay.png"] = TEXTURE:CreateTextureSync("Scroll_Back_Overlay.png")
+    tx["Scroll.png"] = TEXTURE:CreateTexture("Scroll.png")
+    tx["Scroll_Back.png"] = TEXTURE:CreateTexture("Scroll_Back.png")
+    tx["Scroll_Back_Overlay.png"] = TEXTURE:CreateTexture("Scroll_Back_Overlay.png")
 end
 
 function update(timestamp, state)
