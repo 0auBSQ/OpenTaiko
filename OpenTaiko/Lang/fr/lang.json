@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Français (French)",
-	"Version": "0.6.0.0",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Autoriser les connexions LuaNetworking",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Permet aux niveaux Lua d'héberger des salons en ligne ou d'y entrer. Désactivé par défaut : à n'activer qu'avec des personnes de confiance ; partager un code de salon partage votre adresse IP. Désactivé, l'hébergement et la connexion sont impossibles.",
@@ -27,18 +27,18 @@
 		"DIFF_EXEXTRA": "Extrême / Extra",
 		"DIFF_TOWER": "Tour",
 		"DIFF_DAN": "Dan",
-		"DIFF_ANY": "Any",
-		"DIFF_UNKNOWN": "Unknown",
+		"DIFF_ANY": "Quelconque",
+		"DIFF_UNKNOWN": "Inconnue",
 
 		// Settings
 		"SETTINGS_SYSTEM": "Système",
-		"SETTINGS_SYSTEM_DESC": "Settings for the overall system.",
+		"SETTINGS_SYSTEM_DESC": "Paramètres généraux du système.",
 		"SETTINGS_GAME": "Jeu",
-		"SETTINGS_GAME_DESC": "Settings to play the drums.",
+		"SETTINGS_GAME_DESC": "Paramètres pour jouer du tambour.",
 		"SETTINGS_THEME": "Thème",
 		"SETTINGS_THEME_DESC": "Paramètres propres au skin actuel. Définis dans ThemeSettings.json dans le dossier du skin.",
 		"SETTINGS_EXIT": "Quitter",
-		"SETTINGS_EXIT_DESC": "Save the settings and exit from CONFIGURATION menu.",
+		"SETTINGS_EXIT_DESC": "Enregistre les paramètres et quitte le menu de configuration.",
 
 		"SETTINGS_MENU_RETURN": "<< Retour au menu",
 		"SETTINGS_MENU_RETURN_DESC": "Retour au menu principal.",
@@ -61,23 +61,23 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "Supprime le fichier de base de données et recharge les sons.",
 		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " La liste des chansons est en cours de chargement.\n         Veuillez patienter...",
 
-		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Importer les fichiers Score.ini",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Importe les fichiers Score.ini dans la base de données.\n\n<c.#f0ad4e>ATTENTION\nLes éléments suivants ne seront pas transférés :\n- Statuts de Clear\n- Modificateurs de jeu\n- Nombre de frappes (Bon, Ok, Mauvais, Roll, etc.)\n- Scores des défis Dan",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Recherche des scores...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Traitement de {0} scores...\n<c.#0bb000>{1} sur {2} importés</c> (<c.#f0ad4e>{3} ignorés</c> / <c.#b00000>{4} en échec</c>)\n\n{5}",
 		// {0}: Total # of players to be processed
 		// {1}: # of players whose scores are successfully refreshed
 		// {2}: # of players currently processed
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Actualisation des scores de {0} joueurs...\n<c.#0bb000>{1} sur {2} actualisés</c> (<c.#b00000>{3} en échec</c>)\n\n{4} : {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Réinitialiser le choix de téléchargement de la bande-son",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Efface le choix « Jamais » enregistré. La proposition de bande-son réapparaîtra au prochain lancement.",
@@ -97,19 +97,19 @@
 		"SETTINGS_SYSTEM_VSYNC_DESC": "Activer ou non la synchronisation verticale. Limite les FPS à 60, rendant le défilement fluide mais augmentant la latence des entrées. Si désactivé, il n'y a pas de limite aux FPS donc moins de latences, mais le défilement des notes peut être sacadé.",
 		"SETTINGS_SYSTEM_FRAMERATE": "Fréquence d'images",
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Fréquence d'images maximale.\nUnlimited utilise la fréquence de\nrafraîchissement de l'écran\n(p. ex. 120 Hz sur ProMotion).\nPrend effet après un redémarrage.",
-		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
-		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Drawing Method: Select from either OpenGL, DirectX11, Vulkan, or Metal. OpenGL is slow, but compatible & stable. DirectX11 is fast and stable, but only works on Windows. Vulkan works fastest on Linux. Metal only works on MacOS.\n\nThis will take effect after game reboot.",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture Loading",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Texture Loading Type: Freeze on startup disappears Turn this option off if some textures turn black This change will take effect after restarting OpenTaiko",
+		"SETTINGS_SYSTEM_GRAPHICSAPI": "API graphique",
+		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Méthode de rendu : choisissez entre OpenGL, DirectX11, Vulkan ou Metal. OpenGL est lent, mais compatible et stable. DirectX11 est rapide et stable, mais ne fonctionne que sous Windows. Vulkan est le plus rapide sous Linux. Metal ne fonctionne que sous macOS.\n\nPrend effet après le redémarrage du jeu.",
+		"SETTINGS_SYSTEM_TEXTUREASYNC": "Chargement asynchrone des textures",
+		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Mode de chargement des textures : supprime le blocage au démarrage. Désactivez cette option si certaines textures apparaissent noires. Prend effet après le redémarrage d'OpenTaiko.",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "Activer les vidéos de fond",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Activer ou non les vidéos en jeu. Si activé et qu'une musique ne contient pas de vidéo, le décor est un fond noir.",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Video Playback Display Mode",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Change how videos are displayed in the background.",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "None",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Full Display",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Mini Display",
-		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Both",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "Mode d'affichage des vidéos",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "Change la façon dont les vidéos sont affichées en arrière-plan.",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_NONE": "Aucun",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_FULL": "Affichage complet",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "Affichage réduit",
+		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "Les deux",
 		"SETTINGS_SYSTEM_LANEOPACITY": "Opacité de la lane",
 		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "Contrôle l'opacité de la lane lorsqu'une video est jouée en fond.",
 
@@ -127,8 +127,8 @@
 		"SETTINGS_SYSTEM_DISPLAYFOOTER_DESC": "Afficher le footer en jeu.",
 		"SETTINGS_SYSTEM_DISPLAYPUCHI": "Afficher les PuchiCharas",
 		"SETTINGS_SYSTEM_DISPLAYPUCHI_DESC": "Afficher les PuchiCharas en jeu.",
-		"SETTINGS_SYSTEM_SIMPLEMODE": "SimpleMode",
-		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifies drawing by hiding most visual flare and effects during gameplay.",
+		"SETTINGS_SYSTEM_SIMPLEMODE": "Mode simple",
+		"SETTINGS_SYSTEM_SIMPLEMODE_DESC": "Simplifie l'affichage en masquant la plupart des effets visuels pendant la partie.",
 
 		"SETTINGS_SYSTEM_SKIN": "Thème",
 		"SETTINGS_SYSTEM_SKIN_DESC": "Choisir le skin utilisé dans le dossier System.",
@@ -164,8 +164,8 @@
 		"SETTINGS_SYSTEM_ASIOPLAYBACK_DESC": "Choisir une inderface pour ASIO.",
 		"SETTINGS_SYSTEM_WASAPIBUFFER": "Taille du buffer Wasapi",
 		"SETTINGS_SYSTEM_WASAPIBUFFER_DESC": "Change la taille du buffer WASAPI. A définir au plus bas possible sans causer de problèmes de son comme des freezes ou un timing incorrect. Le definir à 0 pour une estimation automatique, ou chercher la valeur la plus appropriée en en essayant plusieurs.",
-		"SETTINGS_SYSTEM_BASSBUFFER": "Bass Buffer Size",
-		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Buffer size when using Bass: Size can be between 0～99999ms. A value of 0 will make the OS automatically decide the size. The smaller the value, the less audio lag there is, but may also cause abnormal/crackling audio.\n※ NOTE: Exit CONFIGURATION to make the settings take effect.",
+		"SETTINGS_SYSTEM_BASSBUFFER": "Taille du buffer Bass",
+		"SETTINGS_SYSTEM_BASSBUFFER_DESC": "Taille du buffer avec Bass : entre 0 et 99999 ms. Avec 0, le système d'exploitation choisit automatiquement la taille. Plus la valeur est petite, plus la latence audio est faible, mais le son peut devenir anormal ou grésiller.\n※ NOTE : quittez le menu de configuration pour que les paramètres prennent effet.",
 		"SETTINGS_SYSTEM_OSTIMER": "Utiliser le timer de l'OS",
 		"SETTINGS_SYSTEM_OSTIMER_DESC": "Permet un défilement plus fluide des notes, mais peut augmenter les latences sonores. Le désactiver peut rendre le défilement plus sacadé, mais assure la présence d'aucun lag sonore. Seulement disponible avec WASAPI ou ASIO.",
 		// Please revise the text above from English.
@@ -206,12 +206,12 @@
 		"SETTINGS_GAME_GLOBALOFFSET": "Décalage général",
 		"SETTINGS_GAME_GLOBALOFFSET_DESC": "Modifie la valeur OFFSET lue pour tout les sons. Définit entre -999 to 999ms. Une valeur négative peut réduire les latences d'entrées.",
 
-		"SETTINGS_GAME_CALIBRATION": "Calibrate Offset",
-		"SETTINGS_GAME_CALIBRATION_DESC": "Calibrate your offset. Global Offset will be overwritten if saved.",
-		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+		"SETTINGS_GAME_CALIBRATION": "Calibrer le décalage",
+		"SETTINGS_GAME_CALIBRATION_DESC": "Calibrez votre décalage. Le décalage général sera remplacé si vous enregistrez.",
+		"SETTINGS_GAME_CALIBRATION_OFFSET": "DÉCALAGE : {0}",
 
-		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
-		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected controllers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or restart the game to apply changes.",
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Zone morte des manettes",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Ajuste la zone morte des sticks pour toutes les manettes connectées. Entre 10 % et 90 %.\n\nAprès l'enregistrement, reconnectez la manette ou redémarrez le jeu pour appliquer les changements.",
 
 		"SETTINGS_GAME_BADCOUNT": "Mort subite",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Mode mort subite : Si 1 ou plus, spécifiez le nombre de notes ratées maximales autorisées avant de perdre la partie. Si 0 le mode mort subite est désactivé.",
@@ -228,6 +228,10 @@
 		"SETTINGS_GAME_AUTOP2_DESC": "Activer le mode automatique pour le joueur 2. Activable en appuyant sur F4 dans le menu de selection des musiques.",
 		"SETTINGS_GAME_AUTOROLL": "Vitesse des rolls",
 		"SETTINGS_GAME_AUTOROLL_DESC": "Nombre de frappes par seconde lors des rolls en mode automatique. Désactivé si 0, au maximum une frappe par image.",
+		"SETTINGS_GAME_AUTOBALLOON": "Vitesse max. des ballons",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "Nombre maximal de frappes par seconde sur les ballons en mode automatique. 0 désactive les frappes automatiques sur les ballons. -1 supprime la limite, mais peut ralentir, voire figer le jeu sur les ballons demandant un très grand nombre de frappes.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "Autoriser l'auto à sauter des frappes",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Autorise le mode automatique à sauter les frappes suivantes si elles risquent de ralentir, voire figer le jeu. Le saut est aussi autorisé temporairement en appuyant sur la touche de pause.",
 
 		"SETTINGS_GAME_NOINFO": "Pas d'informations",
 		"SETTINGS_GAME_NOINFO_DESC": "Activer ou non l'affichage des informations des musiques.",
@@ -240,14 +244,14 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "Difficulté par défaut",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Change la difficulté par défaut lors de l'écran de selection des musiques.",
-		"SETTINGS_GAME_EXEXTRAANIME": "Use Extreme/Extra Transitions",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Play a skin-defined animation while switching between Extreme & Extra.",
+		"SETTINGS_GAME_EXEXTRAANIME": "Utiliser les transitions Extrême/Extra",
+		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Joue une animation définie par le skin lors du passage entre Extrême et Extra.",
 
 		// Settings - Gameplay - Training Mode
-		"SETTINGS_TRAINING_SKIPCOUNT": "Measure Skip Count",
-		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "The number of measures to skip while pressing Skip Forward/Back Measure in Training Mode.",
-		"SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
-		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to repeatedly hit the Left/Right Blue keys in order to jump to a bookmarked measure in Training Mode.",
+		"SETTINGS_TRAINING_SKIPCOUNT": "Nombre de mesures à sauter",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "Nombre de mesures sautées en appuyant sur « Sauter des mesures en avant/en arrière » en mode entraînement.",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "Intervalle de saut vers un signet",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "Délai en millisecondes pendant lequel il faut frapper plusieurs fois les touches Ka gauche/droit pour sauter à une mesure marquée d'un signet en mode entraînement.",
 
 		// Settings - Gameplay - Unlockables
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignorer SongUnlockables.db3",
@@ -327,7 +331,6 @@
 		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE2P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka gauche.",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P": "Ka droit",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE2P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka droit.",
-		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE2P_DESC": "Assignation de la touche Bleu droit pour le tambour. (2P)",
 		"SETTINGS_KEYASSIGN_GAME_CLAP2P": "Clap 2P",
 		"SETTINGS_KEYASSIGN_GAME_CLAP2P_DESC": "Assignation de la touche Clap pour les bongos. (2P)",
 
@@ -339,7 +342,6 @@
 		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE3P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka gauche.",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P": "Ka droit",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE3P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka droit.",
-		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE3P_DESC": "Assignation de la touche Bleu droit pour le tambour. (3P)",
 		"SETTINGS_KEYASSIGN_GAME_CLAP3P": "Clap 3P",
 		"SETTINGS_KEYASSIGN_GAME_CLAP3P_DESC": "Assignation de la touche Clap pour les bongos. (3P)",
 
@@ -351,7 +353,6 @@
 		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE4P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka gauche.",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P": "Ka droit",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE4P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka droit.",
-		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE4P_DESC": "Assignation de la touche Bleu droit pour le tambour. (4P)",
 		"SETTINGS_KEYASSIGN_GAME_CLAP4P": "Clap 4P",
 		"SETTINGS_KEYASSIGN_GAME_CLAP4P_DESC": "Assignation de la touche Clap pour les bongos. (4P)",
 
@@ -363,7 +364,6 @@
 		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE5P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka gauche.",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P": "Ka droit",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE5P_DESC": "Assignation des touches du tambour : Assigner les touches/pads pour le bouton Ka droit.",
-		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE5P_DESC": "Assignation de la touche Bleu droit pour le tambour. (5P)",
 		"SETTINGS_KEYASSIGN_GAME_CLAP5P": "Clap 5P",
 		"SETTINGS_KEYASSIGN_GAME_CLAP5P_DESC": "Assignation de la touche Clap pour les bongos. (5P)",
 
@@ -437,27 +437,27 @@
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "Surprend moi! ({0})",
 
-		"SONGSELECT_SORT": "Sort Menu",
+		"SONGSELECT_SORT": "Menu de tri",
 		"SONGSELECT_SORT_PATH": "Chemin",
 		"SONGSELECT_SORT_TITLE": "Titre",
 		"SONGSELECT_SORT_SUBTITLE": "Sous-titre",
 		"SONGSELECT_SORT_LEVEL": "Niveau",
 
 		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
+		"SONGSELECT_INFO_BPM": "BPM : {0:0.###}",
 		// {0}: Main BPM
 		// {1}: Minimum BPM
 		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
+		"SONGSELECT_INFO_BPM_VARIABLE": "BPM : {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Charter: {0}",
+		"SONGSELECT_INFO_CHARTER": "Charteur : {0}",
 
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
+		"SONGSELECT_TEXTSEARCH_TITLE": "Titre",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Sous-titre",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Charteur",
 
-		"SONGSELECT_QUICKCONFIG": "Quick Config",
-		"SONGSELECT_QUICKCONFIG_MORE": "More...",
+		"SONGSELECT_QUICKCONFIG": "Config rapide",
+		"SONGSELECT_QUICKCONFIG_MORE": "Plus...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Jetons obtenus!",
@@ -465,7 +465,7 @@
 		"MODAL_TITLE_CHARA": "Personnage obtenu!",
 		"MODAL_TITLE_PUCHI": "Petit personnage obtenu!",
 		"MODAL_TITLE_NAMEPLATE": "Titre obtenu!",
-		"MODAL_TITLE_SONG": "New Song!",
+		"MODAL_TITLE_SONG": "Nouveau son !",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
 		"MODAL_MESSAGE_COIN": "+{0} Jetons (Total: {1})",
@@ -475,9 +475,9 @@
 		"ONLINE_DOWNLOAD": "Télécharger du contenu",
 		"ONLINE_DOWNLOAD_CDN": "Choisir un CDN",
 		"ONLINE_DOWNLOAD_SONG": "Télécharger des Sons",
-		"ONLINE_DOWNLOAD_CHARA": "Télécharger des Personnages (Not available)",
-		"ONLINE_DOWNLOAD_PUCHI": "Télécharger des Puchicharas (Not available)",
-		"ONLINE_MULTIPLAYER": "Multijoueur en ligne (Not available)",
+		"ONLINE_DOWNLOAD_CHARA": "Télécharger des Personnages (Non disponible)",
+		"ONLINE_DOWNLOAD_PUCHI": "Télécharger des Puchicharas (Non disponible)",
+		"ONLINE_MULTIPLAYER": "Multijoueur en ligne (Non disponible)",
 
 		// Taiko Towers
 		"TOWER_FLOOR_REACHED": "Étage atteint",
@@ -503,41 +503,41 @@
 		"HEYA_CHARA": "Personnage",
 		"HEYA_DAN": "Titre Dan",
 		"HEYA_NAMEPLATE": "Titre",
-		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
+		"HEYA_NAME": "Nom",
+		"HEYA_NAME_INFO": "Saisissez votre nom (Entrée pour enregistrer, Échap pour annuler les modifications) :",
 
 		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		"HEYA_DESCRIPTION_NAME": "Nom : {0}",
 		// {0}: Asset rarity
-		"HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
-		"HEYA_DESCRIPTION_RARITY0": "Poor",
-		"HEYA_DESCRIPTION_RARITY1": "Common",
-		"HEYA_DESCRIPTION_RARITY2": "Uncommon",
+		"HEYA_DESCRIPTION_RARITY": "Rareté : {0}",
+		"HEYA_DESCRIPTION_RARITY0": "Médiocre",
+		"HEYA_DESCRIPTION_RARITY1": "Commun",
+		"HEYA_DESCRIPTION_RARITY2": "Peu commun",
 		"HEYA_DESCRIPTION_RARITY3": "Rare",
-		"HEYA_DESCRIPTION_RARITY4": "Epic",
-		"HEYA_DESCRIPTION_RARITY5": "Legendary",
-		"HEYA_DESCRIPTION_RARITY6": "Mythical",
+		"HEYA_DESCRIPTION_RARITY4": "Épique",
+		"HEYA_DESCRIPTION_RARITY5": "Légendaire",
+		"HEYA_DESCRIPTION_RARITY6": "Mythique",
 		// {0}: Asset author
-		"HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
+		"HEYA_DESCRIPTION_AUTHOR": "Auteur : {0}",
 		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Type de jauge : {0}",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normale",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Difficile",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extrême",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Terminez la partie dans la zone Clear pour réussir le son !",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "La jauge démarre pleine et se vide fortement à chaque note ratée !\nAttention, si la jauge atteint 0, la partie est automatiquement perdue !",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "La jauge démarre pleine et se vide fortement à chaque note ratée !\nUne force étrange semble réduire la marge d'erreur au fil du son...",
 		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
+		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Facteur bombe : {0} % des notes converties en mines en mode Démineur",
 		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Facteur mèche : {0} % des ballons convertis en rolls à mèche en mode Démineur",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Toutes les grandes notes deviennent des notes <c.#c800ff>Swap</c>",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "Les notes <c.#c4ffe2>ADLib</c> deviennent visibles",
 		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "<c.#ffff00>Rolls</c> automatiques à {0} frappes/s",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Séparation</c> <c.#0088ff>des lanes</c>",
 		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Multiplicateur de jetons : x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERREUR] Condition invalide",
@@ -547,52 +547,52 @@
 		"UNLOCK_COIN_BOUGHT": "Article acheté!",
 		"UNLOCK_COIN_MORE": "Nombre de jetons insuffisant!",
 
-		"UNLOCK_CONDITION_ERROR": "La condition suivante: {0} requires {1} values.",
-		"UNLOCK_CONDITION_ERROR2": "La condition suivante: {0} requires ({1} * n) values and n references.",
+		"UNLOCK_CONDITION_ERROR": "La condition suivante : {0} nécessite {1} valeurs.",
+		"UNLOCK_CONDITION_ERROR2": "La condition suivante : {0} nécessite ({1} * n) valeurs et n références.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
-		"UNLOCK_CONDITION_EARN": "Earn a total of {0} coins to unlock this item! ({1}/{0})", // ce
+		"UNLOCK_CONDITION_EARN": "Gagnez un total de {0} jetons pour débloquer cet article ! ({1}/{0})", // ce
 		// {0}: Total AI plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_AIPLAY": "Play {0} AI battle matches to unlock this item! ({1}/{0})", // ap
+		"UNLOCK_CONDITION_AIPLAY": "Jouez {0} matchs contre l'IA pour débloquer cet article ! ({1}/{0})", // ap
 		// {0}: Total AI wins needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_AIWIN": "Win {0} AI battle matches to unlock this item! ({1}/{0})", // aw
+		"UNLOCK_CONDITION_AIWIN": "Remportez {0} matchs contre l'IA pour débloquer cet article ! ({1}/{0})", // aw
 		// {0}: Total plays needed
 		// {1}: Current progress
-		"UNLOCK_CONDITION_PLAY": "Play {0} songs to unlock this item! ({1}/{0})", // tp
+		"UNLOCK_CONDITION_PLAY": "Jouez {0} fois pour débloquer cet article ! ({1}/{0})", // tp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} sons pour débloquer cet article ! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} songs on {2} difficulty to unlock this item! ({3}/{1})", // dp
+		"UNLOCK_CONDITION_PLAYDIFF": "{0} {1} sons en difficulté {2} pour débloquer cet article ! ({3}/{1})", // dp
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Star rating (i.e. 8*, 9*, 10*, etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} songs with a star rating of {2} to unlock this item! ({3}/{1})", // lp
+		"UNLOCK_CONDITION_PLAYLEVEL": "{0} {1} sons de niveau {2} pour débloquer cet article ! ({3}/{1})", // lp
 		// {0}: Current progress
 		// {1}: Total # of challenges
-		"UNLOCK_CONDITION_CHALLENGE": "Get the following performances to unlock this item:  ({0}/{1})", // sp, sg, sc
+		"UNLOCK_CONDITION_CHALLENGE": "Réalisez les performances suivantes pour débloquer cet article : ({0}/{1})", // sp, sg, sc
 		// {0}: Clear type
 		// {1}: Song name
 		// {2}: Difficulty type
-		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} on {2} difficulty.", // sp
+		"UNLOCK_CONDITION_CHALLENGE_PLAYDIFF": "- {0} {1} en difficulté {2}.", // sp
 		// {0}: Clear type
 		// {1}: # of songs needed
 		// {2}: Genre name (i.e. "OpenTaiko Chapter II", "Dashy's Secrets", "Touhou Arrangements", etc.)
 		// {3}: Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} songs within the {2} folder. ({3}/{1})", // sg
+		"UNLOCK_CONDITION_CHALLENGE_PLAYGENRE": "- {0} {1} sons du dossier {2}. ({3}/{1})", // sg
 		// {0}: Clear type
 		// {1} # of songs needed
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
-		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} charts made by {2}. ({3}/{1})", // sc
+		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} partitions créées par {2}. ({3}/{1})", // sc
 		// {0}: Activate / Desactivate
 		// {1}: Global Trigger name
 		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} le levier global {1}. ({2})", //gt
@@ -611,16 +611,16 @@
 		"UNLOCK_CONDITION_TYPE_m": "supérieur à",
 		"UNLOCK_CONDITION_TYPE_d": "different de",
 
-		"UNLOCK_CONDITION_REQUIRE_PLAY": "Play",
-		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Play",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Get an Assisted Clear on",
-		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Get at least an Assisted Clear on",
-		"UNLOCK_CONDITION_REQUIRE_CLEAR": "Get a Clear on",
-		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Get at least a Clear on",
-		"UNLOCK_CONDITION_REQUIRE_FC": "Get a Full Combo on",
-		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Get at least a Full Combo on",
-		"UNLOCK_CONDITION_REQUIRE_PERFECT": "Get a Perfect on",
-		"UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Get a Perfect on",
+		"UNLOCK_CONDITION_REQUIRE_PLAY": "Jouez",
+		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Jouez",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST": "Obtenez un Clear assisté sur",
+		"UNLOCK_CONDITION_REQUIRE_ASSIST_MORE": "Obtenez au moins un Clear assisté sur",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR": "Obtenez un Clear sur",
+		"UNLOCK_CONDITION_REQUIRE_CLEAR_MORE": "Obtenez au moins un Clear sur",
+		"UNLOCK_CONDITION_REQUIRE_FC": "Obtenez un Full Combo sur",
+		"UNLOCK_CONDITION_REQUIRE_FC_MORE": "Obtenez au moins un Full Combo sur",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT": "Obtenez un Perfect sur",
+		"UNLOCK_CONDITION_REQUIRE_PERFECT_MORE": "Obtenez un Perfect sur",
 
 		// Pause Menu (Taiko/Tower/Dan Mode)
 		"PAUSE_TITLE": "Pause",
@@ -665,7 +665,7 @@
 		"MOD_SAFE": "Protegé",
 		"MOD_JUST": "Punitif",
 
-		"MOD_GAMETYPE": "Game Type",
+		"MOD_GAMETYPE": "Type de jeu",
 		"MOD_GAMETYPE_TAIKO": "Taiko",
 		"MOD_GAMETYPE_KONGA": "Konga",
 

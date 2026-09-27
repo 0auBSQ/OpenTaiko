@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Русский (Russian)",
-	"Version": "0.6.0.73",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Разрешить подключения LuaNetworking",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Разрешить Lua-этапам создавать онлайн-комнаты или подключаться к ним. По умолчанию выключено: включайте только с теми, кому доверяете — делясь кодом комнаты, вы делитесь своим IP-адресом. Пока выключено, создание и подключение недоступны.",
@@ -77,7 +77,7 @@
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Обновление результатов {0} игрока/ов...\n<c.#0bb000>{1} из {2} обновлено/c> (<c.#b00000>{3} не удалось</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Обновление результатов {0} игрока/ов...\n<c.#0bb000>{1} из {2} обновлено</c> (<c.#b00000>{3} не удалось</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Сбросить выбор загрузки саундтрека",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Очищает сохранённый выбор «Никогда». Запрос о загрузке саундтрека появится снова при следующем запуске.",
@@ -225,11 +225,11 @@
 		"SETTINGS_GAME_AUTOP2": "Автоигра игрока 2",
 		"SETTINGS_GAME_AUTOP2_DESC": "Выбрать, будет ли игрок 2 играть автоматически.",
 		"SETTINGS_GAME_AUTOROLL": "Скорость дроби",
-		"SETTINGS_GAME_AUTOROLL_DESC": "Когда автоигра включена, дроби будут ударить автоматически столько раз в секунду. Не оказывает никакого воздействия на шарике. 0 выключает автоматический дробь. -1 hits as many as possible without causing significant lags.",
-		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
-		"SETTINGS_GAME_AUTOBALLOON_DESC": "When auto is enabled, balloons will be automatically hit at most this many times per second. 0 disables auto balloon hits. -1 disables the limit but can lag or even freeze the game on balloons with huge amount of hits.",
-		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
-		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Когда автоигра включена, по дробям будет автоматически наноситься указанное число ударов в секунду. Не влияет на шарики. 0 выключает автоматические удары по дробям. -1 наносит столько ударов, сколько возможно без существенных подтормаживаний.",
+		"SETTINGS_GAME_AUTOBALLOON": "Макс. скорость ударов по шарикам",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "Когда автоигра включена, по шарикам будет автоматически наноситься не больше указанного числа ударов в секунду. 0 выключает автоматические удары по шарикам. -1 снимает ограничение, но на шариках с огромным числом ударов игра может подтормаживать или даже зависнуть.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "Разрешить автоигре пропускать удары",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Разрешает автоигре пропускать последующие удары, если они могут вызвать подтормаживание или даже зависание игры. Пропуск также временно разрешается при нажатии клавиши паузы.",
 
 		"SETTINGS_GAME_NOINFO": "Режим отсутствия информации",
 		"SETTINGS_GAME_NOINFO_DESC": "Переключать, будет ли отображаться информация о песне. Включение (ON) эту настройки приведёт к выключению информации о песне. Выключение (OFF) эту настройки будет доступна информация о песне.",

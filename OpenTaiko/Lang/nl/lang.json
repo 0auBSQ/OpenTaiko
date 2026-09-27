@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Nederlands (Dutch)",
-	"Version": "0.6.0.0",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking-verbindingen toestaan",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Sta Lua-stages toe om online ruimtes te hosten of eraan deel te nemen.\nStandaard uit: schakel alleen in met mensen die je vertrouwt - het delen van een ruimtecode deelt je IP-adres. Wanneer uit, zijn hosten en deelnemen uitgeschakeld.",
@@ -77,7 +77,7 @@
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Scores van {0} spelers worden vernieuwd...\n<c.#0bb000>{1} van {2} vernieuwd/c> (<c.#b00000>{3} mislukt</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Scores van {0} spelers worden vernieuwd...\n<c.#0bb000>{1} van {2} vernieuwd</c> (<c.#b00000>{3} mislukt</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Keuze voor soundtrackdownload opnieuw instellen",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Wist de opgeslagen keuze \"Nooit\". De soundtrackvraag verschijnt bij de volgende start opnieuw.",
@@ -140,8 +140,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Shakelt muziek aan/uit.",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL Metadata Toewijzen",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Dit is een deels overbodige optie die kiest of SONGVOL metadata wel/niet gebruikt wordt. Waardes tussen 0-100 verlagen liedvolume, maar waardes boven 100 doen niets.",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Hoofdvolume",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Past het algemene volume van het programma aan.",
 		"SETTINGS_SYSTEM_SEVOL": "Geluidseffect Volume",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Past de volume aan voor geluiden zoals 'don' en 'ka'.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Stemvolume",
@@ -183,7 +183,7 @@
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE": "Vorm Touch-Trommel",
 		"SETTINGS_SYSTEM_TOUCHDRUMSHAPE_DESC": "Teken eigen Don-gebieden voor de touch-trommel. Alles daarbuiten is Ka.",
 		"EXTERNALDISPLAY_NOTICE": "Het spel wordt op het externe scherm weergegeven.",
-		"SETTINGS_SYSTEM_DEBUGHUD": "Debug HUD",
+		"SETTINGS_SYSTEM_DEBUGHUD": "Debug-HUD",
 		"SETTINGS_SYSTEM_DEBUGHUD_DESC": "Toont een overlay met FPS, geheugen en stage op het scherm. Standaard uit.",
 		"TOUCHDRUMEDITOR_HINT": "Teken Don-gebieden (al het andere is Ka). De gestippelde rechthoek is het scherm; lijnen mogen erbuiten komen. Opslaan zonder iets te tekenen herstelt de cirkel.",
 		"TOUCHDRUMEDITOR_SCREEN": "Scherm",
@@ -208,8 +208,8 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "Kalibreert de offset. Globale Offset wordt overschreven waneer dit opslaat.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
 
-		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
-		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected controllers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or restart the game to apply changes.",
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Dode Zone Controller",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Past de dode zone van de analoge sticks aan voor alle aangesloten controllers. Kan tussen 10% en 90% ingesteld worden.\n\nSluit na het opslaan de controller opnieuw aan of herstart het spel om de wijzigingen toe te passen.",
 
 		"SETTINGS_GAME_BADCOUNT": "Kanpeki Modus",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Kies hoeveel 'BAD's zijn toegestaan voordat een lied automatisch mislukt. Zet de waarde op 0 om het uit te schakelen.",
@@ -217,7 +217,7 @@
 		"SETTINGS_GAME_NOTELOCK_DESC": "Kiest of het drummen tussen noten geldt als BAD (mis).",
 		"SETTINGS_GAME_AILEVEL": "AI Niveau",
 		"SETTINGS_GAME_AILEVEL_DESC": "Bepaalt hoe nauwkeurig de AI is. Op 0 is de AI uitgeschakeld. Op 1 of hoger zal 2P als de AI spelen. Uitgeschakeld als 'AUTO 2P' aan staat.",
-		"SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
+		"SETTINGS_GAME_NORMALGAUGE": "Altijd Normale Meter Gebruiken",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "Forceer het gebruik van de normale meter ongeacht het geselecteerde karakter en hun aanpassingen.",
 
 		"SETTINGS_GAME_AUTOP1": "Speler 1 Automatisch Spelen",
@@ -226,10 +226,10 @@
 		"SETTINGS_GAME_AUTOP2_DESC": "Schakelt het automatisch spelen van liedjes op speler 2 aan/uit.",
 		"SETTINGS_GAME_AUTOROLL": "Rolsnelheid",
 		"SETTINGS_GAME_AUTOROLL_DESC": "Wanneer Auto is ingeschakeld, zullen rollen automatisch worden geraakt # keer per seconde. Heeft geen effect op ballonnen. 0 schakelt automatisch rollen uit. -1 raakt rollen zo snel mogelijk zonder noemenswaardige vertraging te veroorzaken.",
-		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
-		"SETTINGS_GAME_AUTOBALLOON_DESC": "When auto is enabled, balloons will be automatically hit at most this many times per second. 0 disables auto balloon hits. -1 disables the limit but can lag or even freeze the game on balloons with huge amount of hits.",
-		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
-		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
+		"SETTINGS_GAME_AUTOBALLOON": "Maximale Ballonslagsnelheid",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "Wanneer Auto is ingeschakeld, worden ballonnen automatisch maximaal zoveel keer per seconde geraakt. 0 schakelt het automatisch raken van ballonnen uit. -1 schakelt de limiet uit, maar kan het spel laten haperen of zelfs vastlopen bij ballonnen met enorm veel slagen.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "Auto Mag Slagen Overslaan",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Laat Auto verdere slagen overslaan als die het spel kunnen laten haperen of zelfs vastlopen. Overslaan is ook tijdelijk toegestaan wanneer de pauzetoets wordt ingedrukt.",
 
 		"SETTINGS_GAME_NOINFO": "Geen Informatie Modus",
 		"SETTINGS_GAME_NOINFO_DESC": "Schakelt weergave van lied informatie aan/uit. Als dit aan staat, wordt lied informatie verborgen. Als dit uit staat word lied informatie weergeven.",
@@ -252,12 +252,12 @@
 		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "De wachttijd in milliseconden om meerdere keren de linker/rechter Kat toetsen in te drukken zodat het springt naar een gebookmarkde maat in de Training Modus.",
 
 		// Settings - Gameplay - Unlockables
-		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ignore Song Unlockables",
-		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Make all songs available ignoring SongUnlockables.db3. This does not add unlock entries to Saves.db3. Unlock notifications will still appear on results.\n\n<c.#f0ad4e>WARNING\nHaving this option ON invalidates any speedrun.</c>",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "Ontgrendelbare Nummers Negeren",
+		"SETTINGS_GAME_IGNORESONGUNLOCKABLES_DESC": "Maakt alle nummers beschikbaar en negeert SongUnlockables.db3. Dit voegt geen ontgrendelingen toe aan Saves.db3. Ontgrendelmeldingen verschijnen nog steeds bij de resultaten.\n\n<c.#f0ad4e>WAARSCHUWING\nMet deze optie op ON is elke speedrun ongeldig.</c>",
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Image Preview Buffer",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Afbeelding Voorbeeld Buffer",
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Dit is een ongebruikte optie overgezet van DTXMania. Het doet niets.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Tijd Rekking Modus",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Onzeker wat deze optie doet. Het gebruikt meer CPU kracht, en zorgt mogelijk voor problemen onder 0.9x snelheid.",
@@ -318,7 +318,6 @@
 		"SETTINGS_KEYASSIGN_GAME_LEFTBLUE_DESC": "Drum toets: Een toets/knop aan de Links Ka knop toewijzen.",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE": "Rechts Ka",
 		"SETTINGS_KEYASSIGN_GAME_RIGHTBLUE_DESC": "Drum toets: Een toets/knop aan de Rechts Ka knop toewijzen.",
-		"SETTINGS_KEYASSIGN_GAME_RIGHTLBUE_DESC": "Drum toets: Een toets/knop aan de BlauwRechts knop toewijzen.",
 		"SETTINGS_KEYASSIGN_GAME_CLAP": "Klap",
 		"SETTINGS_KEYASSIGN_GAME_CLAP_DESC": "Konga toets: Een toets/knop aan de Klap knop toewijzen.",
 
@@ -413,7 +412,7 @@
 		"TITLE_MODE_AI": "AI Gevecht Modus",
 		"TITLE_MODE_STATS": "Player Statistieken",
 		"TITLE_MODE_EDITOR": "Nummer Bewerker",
-		"TITLE_MODE_TOOLS": "Open Toolbox",
+		"TITLE_MODE_TOOLS": "Gereedschapskist",
 
 		"TITLE_MODE_TAIKO_DESC": "Speel je favoriete\nnummers op je eigen tempo!",
 		"TITLE_MODE_DAN_DESC": "Speel meerdere nummers achter elkaar\nmet uitdagende condities\nom een PASS rank te behalen!",
@@ -449,14 +448,14 @@
 		// {2}: Maximum BPM
 		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Charter: {0}",
+		"SONGSELECT_INFO_CHARTER": "Chartmaker: {0}",
 
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
+		"SONGSELECT_TEXTSEARCH_TITLE": "Titel",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Ondertitel",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Chartmaker",
 
 		"SONGSELECT_QUICKCONFIG": "Snelle Coniguratie",
-		"SONGSELECT_QUICKCONFIG_MORE": "More...",
+		"SONGSELECT_QUICKCONFIG_MORE": "Meer...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Munten Verkregen!",
@@ -480,63 +479,63 @@
 
 		// Taiko Towers
 		"TOWER_FLOOR_REACHED": "Niveau bereikt:",
-		"TOWER_FLOOR_INITIAL": "F",
+		"TOWER_FLOOR_INITIAL": "V",
 		"TOWER_SCORE": "Score",
 		"TOWER_SCORE_INITIAL": "P",
 
 		// Dan Dojo
-		"DAN_CONDITION_NAME_SOUL": "Soul gauge",
-		"DAN_CONDITION_NAME_GOOD": "Good count",
-		"DAN_CONDITION_NAME_OK": "Ok count",
-		"DAN_CONDITION_NAME_BAD": "Bad count",
+		"DAN_CONDITION_NAME_SOUL": "Zielmeter",
+		"DAN_CONDITION_NAME_GOOD": "Aantal Good",
+		"DAN_CONDITION_NAME_OK": "Aantal Ok",
+		"DAN_CONDITION_NAME_BAD": "Aantal Bad",
 		"DAN_CONDITION_NAME_SCORE": "Score",
-		"DAN_CONDITION_NAME_ROLL": "Rolls count",
-		"DAN_CONDITION_NAME_HIT": "Hit count",
+		"DAN_CONDITION_NAME_ROLL": "Aantal roltreffers",
+		"DAN_CONDITION_NAME_HIT": "Aantal treffers",
 		"DAN_CONDITION_NAME_COMBO": "Combo",
-		"DAN_CONDITION_NAME_ACCURACY": "Accuracy",
-		"DAN_CONDITION_NAME_ADLIB": "ADLIB count",
-		"DAN_CONDITION_NAME_BOMB": "Bombs hit",
+		"DAN_CONDITION_NAME_ACCURACY": "Nauwkeurigheid",
+		"DAN_CONDITION_NAME_ADLIB": "Aantal ADLIB",
+		"DAN_CONDITION_NAME_BOMB": "Geraakte bommen",
 
 		// Heya / Quick Heya
 		"HEYA_PUCHI": "Puchichara",
-		"HEYA_CHARA": "Character",
+		"HEYA_CHARA": "Karakter",
 		"HEYA_DAN": "Dan Titel",
 		"HEYA_NAMEPLATE": "Naambordje Titel",
-		"HEYA_NAME": "Name",
+		"HEYA_NAME": "Naam",
 		"HEYA_NAME_INFO": "Typ je naam (Enter om op te slaan, Escape om wijzigingen te negeren):",
 
 		// {0}: Asset name
-		"HEYA_DESCRIPTION_NAME": "Name: {0}",
+		"HEYA_DESCRIPTION_NAME": "Naam: {0}",
 		// {0}: Asset rarity
-		"HEYA_DESCRIPTION_RARITY": "Rarity: {0}",
-		"HEYA_DESCRIPTION_RARITY0": "Poor",
-		"HEYA_DESCRIPTION_RARITY1": "Common",
-		"HEYA_DESCRIPTION_RARITY2": "Uncommon",
-		"HEYA_DESCRIPTION_RARITY3": "Rare",
-		"HEYA_DESCRIPTION_RARITY4": "Epic",
-		"HEYA_DESCRIPTION_RARITY5": "Legendary",
-		"HEYA_DESCRIPTION_RARITY6": "Mythical",
+		"HEYA_DESCRIPTION_RARITY": "Zeldzaamheid: {0}",
+		"HEYA_DESCRIPTION_RARITY0": "Matig",
+		"HEYA_DESCRIPTION_RARITY1": "Gewoon",
+		"HEYA_DESCRIPTION_RARITY2": "Ongewoon",
+		"HEYA_DESCRIPTION_RARITY3": "Zeldzaam",
+		"HEYA_DESCRIPTION_RARITY4": "Episch",
+		"HEYA_DESCRIPTION_RARITY5": "Legendarisch",
+		"HEYA_DESCRIPTION_RARITY6": "Mythisch",
 		// {0}: Asset author
-		"HEYA_DESCRIPTION_AUTHOR": "Author: {0}",
+		"HEYA_DESCRIPTION_AUTHOR": "Auteur: {0}",
 		// {0}: Gauge type
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Gauge Type: {0}",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normal",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Hard",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreme",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Finish the play within the clear zone to pass the song!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "The gauge starts full and sharply depletes at each miss!\nBe careful, if the gauge value reachs 0, the play is automatically failed!",
-		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "The gauge starts full and sharply depletes at each miss!\nA strange power seems to reduce the margin of error through the song...",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE": "Metertype: {0}",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL": "Normaal",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD": "Moeilijk",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME": "Extreem",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_NORMAL_DESC": "Eindig de speelbeurt binnen de clear-zone om het nummer te halen!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_HARD_DESC": "De meter begint vol en loopt bij elke misser flink leeg!\nPas op: als de meter op 0 komt, is de speelbeurt automatisch mislukt!",
+		"HEYA_DESCRIPTION_EFFECTS_GAUGETYPE_EXTREME_DESC": "De meter begint vol en loopt bij elke misser flink leeg!\nEen vreemde kracht lijkt de foutmarge in de loop van het nummer te verkleinen...",
 		// {0}: Percentage of mines
-		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomb Factor: {0}% of notes converted to mines in Minesweeper",
+		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "Bomfactor: {0}% van de noten omgezet in mijnen in Mijnenveger",
 		// {0}: Percentage of fuse rolls
-		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Fuse Factor: {0}% of balloons converted to fuse rolls in Minesweeper",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "Lontfactor: {0}% van de ballonnen omgezet in lontrollen in Mijnenveger",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "Alle grote noten worden <c.#c800ff>Wissel</c>-noten",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>-noten worden zichtbaar",
 		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatische <c.#ffff00>Rollen</c> met {0} slagen/s",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Gesplitste</c> <c.#0088ff>Banen</c>",
 		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Munten Vermenigvuldiger: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Onjuiste conditie.",
@@ -564,7 +563,7 @@
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} verschillende liedjes om dit item te ontgrendelen! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
@@ -592,6 +591,23 @@
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} nummers gemaakt door {2}. ({3}/{1})", // sc
+		// {0}: Activate / Deactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} de globale trigger {1}. ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "De waarde van de globale teller {1} is {0} {2}. ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "Deactiveer",
+		"UNLOCK_CONDITION_TRIGGER_1": "Activeer",
+
+		"UNLOCK_CONDITION_TYPE_l": "lager dan",
+		"UNLOCK_CONDITION_TYPE_le": "lager dan of gelijk aan",
+		"UNLOCK_CONDITION_TYPE_e": "gelijk aan",
+		"UNLOCK_CONDITION_TYPE_me": "hoger dan of gelijk aan",
+		"UNLOCK_CONDITION_TYPE_m": "hoger dan",
+		"UNLOCK_CONDITION_TYPE_d": "niet gelijk aan",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Speel",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Speel",
@@ -633,7 +649,7 @@
 		"MOD_FLIP": "Noten Omkeren",
 
 		"MOD_RANDOM": "Willekeurig",
-		"MOD_RANDOM_SHUFFLE": "Shuffle",
+		"MOD_RANDOM_SHUFFLE": "Husselen",
 		"MOD_RANDOM_CHAOS": "Chaos",
 
 		"MOD_TIMING": "Timing",
@@ -645,14 +661,14 @@
 
 		"MOD_JUSTICE": "Justice Modus",
 		"MOD_SAFE": "Veilig",
-		"MOD_JUST": "Just",
+		"MOD_JUST": "Precies",
 
-		"MOD_GAMETYPE": "Game Type",
+		"MOD_GAMETYPE": "Speltype",
 		"MOD_GAMETYPE_TAIKO": "Taiko",
 		"MOD_GAMETYPE_KONGA": "Konga",
 
 		"MOD_GAMEMODE": "Game Modus",
-		"MOD_GAMEMODE_TRAINING": "Training Mode",
+		"MOD_GAMEMODE_TRAINING": "Trainingsmodus",
 
 		"MOD_AUTO": "Auto",
 
@@ -663,7 +679,7 @@
 
 		"MOD_FUN": "Leuke Mods",
 		"MOD_FUN_AVALANCHE": "Lawine",
-		"MOD_FUN_MINESWEEPER": "Minesweeper"
+		"MOD_FUN_MINESWEEPER": "Mijnenveger"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

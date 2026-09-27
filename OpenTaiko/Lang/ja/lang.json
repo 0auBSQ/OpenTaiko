@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "日本語 (Japanese)",
-	"Version": "0.6.0.0",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking接続を許可",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Luaステージがオンラインルームを開く/参加するのを許可します。既定はオフ：信頼できる相手とのみ有効にしてください。ルームコードの共有はIPアドレスの共有を意味します。オフの間は接続できません。",
@@ -28,7 +28,7 @@
 		"DIFF_TOWER": "タワー",
 		"DIFF_DAN": "段位",
 		"DIFF_ANY": "難易度問わず",
-		"DIFF_UNKNOWN": "Unknown",
+		"DIFF_UNKNOWN": "不明",
 
 		// Settings
 		"SETTINGS_SYSTEM": "システム設定",
@@ -61,23 +61,23 @@
 		"SETTINGS_SYSTEM_RELOADSONGCACHE_DESC": "キャッシュをクリアして曲データの一覧情報を取得し直します。",
 		"SETTINGS_SYSTEM_RELOADSONG_STATUS": "     曲データの一覧を\n       取得しています。\n   しばらくお待ちください。",
 
-		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Import Score.ini Files",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Imports Score.ini files to the database.\n\n<c.#f0ad4e>WARNING\nThe following will not be transferred:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Score.iniファイルのインポート",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Score.iniファイルをデータベースにインポートします。\n\n<c.#f0ad4e>警告\n以下の項目は移行されません：\n- クリア状況\n- 演奏オプション\n- 判定数（良・可・不可・連打など）\n- 段位道場の成績",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "スコアを検索しています...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "{0}件のスコアを処理しています...\n<c.#0bb000>{2}件中{1}件をインポート済み</c> (<c.#f0ad4e>{3}件スキップ</c> / <c.#b00000>{4}件失敗</c>)\n\n{5}",
 		// {0}: Total # of players to be processed
 		// {1}: # of players whose scores are successfully refreshed
 		// {2}: # of players currently processed
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "{0}人のプレイヤーのスコアを更新しています...\n<c.#0bb000>{2}人中{1}人を更新済み</c> (<c.#b00000>{3}人失敗</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "サウンドトラックのダウンロード選択をリセット",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "保存された「今後表示しない」の選択を消去します。次回起動時にサウンドトラックの確認が再び表示されます。",
@@ -102,7 +102,7 @@
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "非同期テクスチャ読み込み",
 		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "テクスチャの読み込み方法:起動時のフリーズが消えますテクスチャが黒くなる場合はこのオプションをOFFにしてくださいこの変更は再起動後に反映されます",
 
-		"SETTINGS_SYSTEM_BGMOVIE": "AVI",
+		"SETTINGS_SYSTEM_BGMOVIE": "動画再生",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "AVIの使用：動画(AVI)を再生可能にする場合に\nON にします。AVI の再生には、それなりのマシンパワーが必要とされます。",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "動画再生モード",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "動画の表示方法を変更します.",
@@ -111,9 +111,9 @@
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_MINI": "ウィンドウ",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_BOTH": "両方",
 		"SETTINGS_SYSTEM_LANEOPACITY": "レーンBG透明度",
-		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "This controls the lane background opacity while videos are playing.\n\n0 = completely transparent,\n255 = no transparency",
+		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "動画再生中のレーン背景の不透明度を調節します。\n\n0 = 完全に透明、\n255 = 透過なし",
 
-		"SETTINGS_SYSTEM_BGA": "BGA",
+		"SETTINGS_SYSTEM_BGA": "BGA表示",
 		"SETTINGS_SYSTEM_BGA_DESC": "BGAの使用：画像(BGA)を表示可能にする場合に\nON にします。BGA の再生には、それなりのマシンパワーが必要とされます。",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "キャラクター表示",
 		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "キャラクター画像を表示するかどうか",
@@ -140,8 +140,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "譜面自身が指定するBGM（音源）を再生します。全体音量ではなく譜面のBGMタグです。",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL使用",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": ".tjaファイルのSONGVOLヘッダを音源の音量に適用します。設定による音量調整を使用する場合はこの設定をOFFにしてください。",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		"SETTINGS_SYSTEM_MASTERVOL": "マスター音量",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "プログラム全体の音量を調節します。",
 		"SETTINGS_SYSTEM_SEVOL": "効果音音量",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "効果音の音量を調節します。",
 		"SETTINGS_SYSTEM_VOICEVOL": "ボイス音量",
@@ -153,7 +153,7 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "キーボード音量調整",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "キーボードで音量調整をするときの増加量、減少量を指定します。1 ～ 20 の値が指定可能です。",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "MusicPreTimeMs",
+		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "音源再生バッファ",
 		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "音源再生前の空白時間 (ms)。",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "プレビュー音量",
 		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "プレビュー時の音源の音量を調節します。",
@@ -173,7 +173,7 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Traceログ出力",
 		"SETTINGS_SYSTEM_LOG_DESC": "Traceログ出力：TJAPlayer3.txt にログを出力します。変更した場合は、OpenTaiko の再起動後に有効となります。",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "RandSubBox",
+		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "ランダム選曲に子BOXを含める",
 		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "子BOXをRANDOMの対象とする：ON にすると、RANDOM SELECT 時に子BOXも選択対象とします。",
 		"SETTINGS_SYSTEM_DEBUGMODE": "デバッグ情報",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "演奏情報の表示：演奏中、BGA領域の下部に演奏情報（FPS、BPM、演奏時間など）を表示します。また、小節線の横に小節番号が表示されるようになります。",
@@ -206,12 +206,12 @@
 		"SETTINGS_GAME_GLOBALOFFSET": "グローバルオフセット",
 		"SETTINGS_GAME_GLOBALOFFSET_DESC": "全譜面のOFFSETメタデータを変化設定です。\n-999から999msまで設ける可能です。入力遅れを減るためマイナス値をご設定ください。",
 
-		"SETTINGS_GAME_CALIBRATION": "Calibrate Offset",
-		"SETTINGS_GAME_CALIBRATION_DESC": "Calibrate your offset.Global Offset will be overwritten if saved.",
-		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+		"SETTINGS_GAME_CALIBRATION": "オフセット調整",
+		"SETTINGS_GAME_CALIBRATION_DESC": "オフセットを調整します。保存するとグローバルオフセットが上書きされます。",
+		"SETTINGS_GAME_CALIBRATION_OFFSET": "オフセット：{0}",
 
-		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
-		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected controllers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or restart the game to apply changes.",
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "コントローラーのデッドゾーン",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "接続されているすべてのコントローラーのスティックのデッドゾーンを調節します。10% ～ 90% の値が指定可能です。\n\n保存後、変更を反映するにはコントローラーを再接続するか、ゲームを再起動してください。",
 
 		"SETTINGS_GAME_BADCOUNT": "完璧モード",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Riskyモードの設定:1以上の値にすると、その回数分の不可で演奏が強制終了します。0にすると無効になり、ノルマゲージのみになります。",
@@ -222,9 +222,9 @@
 		"SETTINGS_GAME_NORMALGAUGE": "ゲージをNormalに固定",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "ゲージをNormalに固定します",
 
-		"SETTINGS_GAME_AUTOP1": "AUTO 1P",
+		"SETTINGS_GAME_AUTOP1": "1Pオートプレイ",
 		"SETTINGS_GAME_AUTOP1_DESC": "すべての音符を自動で演奏します。",
-		"SETTINGS_GAME_AUTOP2": "AUTO 2P",
+		"SETTINGS_GAME_AUTOP2": "2Pオートプレイ",
 		"SETTINGS_GAME_AUTOP2_DESC": "すべての音符を自動で演奏します。",
 		"SETTINGS_GAME_AUTOROLL": "連打速度",
 		"SETTINGS_GAME_AUTOROLL_DESC": "AUTO中で黄色連打の速度を変化します。０で設けったら叩きません。-1で設けったら、大きなラグを引き起こさない範囲で可能な限り速く叩きます。",
@@ -248,10 +248,10 @@
 		"SETTINGS_GAME_EXEXTRAANIME_DESC": "裏表移行アニメーションを有効する",
 
 		// Settings - Gameplay - Training Mode
-		"SETTINGS_TRAINING_SKIPCOUNT": "Measure Skip Count",
-		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "The number of measures to skip while pressing Skip Forward/Back Measure in\nTraining Mode.",
-		"SETTINGS_TRAINING_JUMPINTERVAL": "Measure Jump Time Interval",
-		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "The amount of time in milliseconds needed to repeatedly hit the Left/Right Blue keys in order to jump to a bookmarked measure in\nTraining Mode.",
+		"SETTINGS_TRAINING_SKIPCOUNT": "小節スキップ数",
+		"SETTINGS_TRAINING_SKIPCOUNT_DESC": "特訓モードで「複数小節進む／戻る」を押したときにスキップする小節の数です。",
+		"SETTINGS_TRAINING_JUMPINTERVAL": "小節ジャンプの入力間隔",
+		"SETTINGS_TRAINING_JUMPINTERVAL_DESC": "特訓モードでブックマークした小節へジャンプするために、左カッ／右カッのキーを連打する際に必要な時間（ミリ秒）です。",
 
 		// Settings - Gameplay - Unlockables
 		"SETTINGS_GAME_IGNORESONGUNLOCKABLES": "ロックされた曲のプレイ許可",
@@ -259,11 +259,11 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "PreImageWait",
+		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "プレビュー画像バッファ",
 		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "プレビュー画像表示までの時間：曲にカーソルが合わされてからプレビュー画像が表示されるまでの時間を指定します。0 ～ 10000 [ms] が指定可能です。",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "タイムストレッチ",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "演奏速度の変更方式:ONにすると、演奏速度の変更を、周波数変更ではなくタイムストレッチで行います。これをONにすると、サウンド処理により多くのCPU性能を使用します。また、演奏速度をx0.850以下にすると、チップのズレが大きくなります。",
-		"SETTINGS_SYSTEM_FASTRENDER": "FastRender",
+		"SETTINGS_SYSTEM_FASTRENDER": "高速描画",
 		"SETTINGS_SYSTEM_FASTRENDER_DESC": "事前画像描画機能を使うかどうか。",
 		"SETTINGS_GAME_BRANCHGUIDE": "譜面分岐ガイド",
 		"SETTINGS_GAME_BRANCHGUIDE_DESC": "譜面分岐の参考になる数値などを表示します。オートプレイだと表示されません。",
@@ -437,7 +437,7 @@
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "おまかせ ({0})",
 
-		"SONGSELECT_SORT": "Sort Menu",
+		"SONGSELECT_SORT": "ソートメニュー",
 		"SONGSELECT_SORT_PATH": "絶対パス",
 		"SONGSELECT_SORT_TITLE": "曲名",
 		"SONGSELECT_SORT_SUBTITLE": "作者名",
@@ -450,14 +450,14 @@
 		// {2}: Maximum BPM
 		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
 		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Charter: {0}",
+		"SONGSELECT_INFO_CHARTER": "譜面作者：{0}",
 
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
+		"SONGSELECT_TEXTSEARCH_TITLE": "曲名",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "サブタイトル",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "譜面作者",
 
-		"SONGSELECT_QUICKCONFIG": "Quick Config",
-		"SONGSELECT_QUICKCONFIG_MORE": "More...",
+		"SONGSELECT_QUICKCONFIG": "簡易設定",
+		"SONGSELECT_QUICKCONFIG_MORE": "その他...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "コイン取得！",
@@ -475,9 +475,9 @@
 		"ONLINE_DOWNLOAD": "コンテンツダウンロード",
 		"ONLINE_DOWNLOAD_CDN": "CDN選択",
 		"ONLINE_DOWNLOAD_SONG": "曲・譜面ダウンロード",
-		"ONLINE_DOWNLOAD_CHARA": "キャラクターダウンロード (Not available)",
-		"ONLINE_DOWNLOAD_PUCHI": "プチキャラダウンロード (Not available)",
-		"ONLINE_MULTIPLAYER": "オンラインマルチプレイヤー (Not available)",
+		"ONLINE_DOWNLOAD_CHARA": "キャラクターダウンロード (準備中)",
+		"ONLINE_DOWNLOAD_PUCHI": "プチキャラダウンロード (準備中)",
+		"ONLINE_MULTIPLAYER": "オンラインマルチプレイ (準備中)",
 
 		// Taiko Towers
 		"TOWER_FLOOR_REACHED": "到達階数",
@@ -504,7 +504,7 @@
 		"HEYA_DAN": "段位称号",
 		"HEYA_NAMEPLATE": "名札称号",
 		"HEYA_NAME": "名前",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
+		"HEYA_NAME_INFO": "名前を入力してください（Enterで保存、Escで変更を破棄）：",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "名前：{0}",
@@ -531,11 +531,11 @@
 		"HEYA_DESCRIPTION_EFFECTS_BOMBFACTOR": "爆弾ファクター：掃海で音符の{0}%は爆弾になる",
 		// {0}: Percentage of fuse rolls
 		"HEYA_DESCRIPTION_EFFECTS_FUSEFACTOR": "時爆弾ファクター：掃海でふうせんの{0}%は時爆弾になる",
-		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "All big notes become <c.#c800ff>Swap</c> notes",
-		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c> notes become visible",
+		"HEYA_DESCRIPTION_EFFECTS_ALLSWAP": "すべての大音符が<c.#c800ff>スワップ</c>音符になる",
+		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>ADLib</c>音符が見えるようになる",
 		// {0}: # of auto-rolls per second
-		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "Automatic <c.#ffff00>Rolls</c> at {0} hits/s",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": "毎秒{0}打の自動<c.#ffff00>連打</c>",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>分割</c><c.#0088ff>レーン</c>",
 		// {0}: Coin multiplier
 		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "コイン乗数：x{0}",
 
@@ -547,8 +547,8 @@
 		"UNLOCK_COIN_BOUGHT": "商品購入済み !",
 		"UNLOCK_COIN_MORE": "コインが足りません !",
 
-		"UNLOCK_CONDITION_ERROR": "下記の条件 : {0} requires {1} values.",
-		"UNLOCK_CONDITION_ERROR2": "下記の条件 : {0} requires ({1} * n) values and n references.",
+		"UNLOCK_CONDITION_ERROR": "下記の条件 : {0} には{1}個の値が必要です。",
+		"UNLOCK_CONDITION_ERROR2": "下記の条件 : {0} には({1} * n)個の値とn個の参照が必要です。",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress

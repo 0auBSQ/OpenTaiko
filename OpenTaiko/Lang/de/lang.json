@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Deutsch (German)",
-	"Version": "0.6.0.0",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking-Verbindungen zulassen",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Erlaubt Lua-Stages, Online-Räume zu hosten oder ihnen beizutreten. Standardmäßig aus: nur mit vertrauenswürdigen Personen aktivieren – das Teilen eines Raumcodes teilt deine IP-Adresse. Wenn aus, sind Hosten und Beitreten deaktiviert.",
@@ -77,7 +77,7 @@
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Aktualisiere die Ergebnisse von {0} Spielern...\n<c.#0bb000>{1} von {2} aktualisiert/c> (<c.#b00000>{3} fehlgeschlagen</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Aktualisiere die Ergebnisse von {0} Spielern...\n<c.#0bb000>{1} von {2} aktualisiert</c> (<c.#b00000>{3} fehlgeschlagen</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Soundtrack-Download-Auswahl zurücksetzen",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Löscht die gespeicherte Auswahl \"Nie\". Die Soundtrack-Abfrage erscheint beim nächsten Start erneut.",
@@ -140,8 +140,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Bestimmt, ob Musik abgespielt wird.",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL-Metadaten anwenden",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Dies ist eine teilweise redundante Einstellung, die festlegt, ob SONGVOL-Metadaten verwendet werden. Werte zwischen 0 und 100 verringern die Lautstärke des Songs, aber Werte über 100 bewirken nichts.",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Gesamtlautstärke",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Passt die Gesamtlautstärke des Programms an.",
 		"SETTINGS_SYSTEM_SEVOL": "Soundeffekt-Lautstärke",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Passt die Lautstärke der Sounds für Don und Ka an.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Sprachlautstärke",
@@ -208,8 +208,8 @@
 		"SETTINGS_GAME_CALIBRATION_DESC": "Kalibriert deinen Offset. Der globale Offset wird überschrieben, wenn gespeichert.",
 		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
 
-		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller Deadzone",
-		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Adjust the thumbstick deadzone for all connected controllers. Can be between 10% to 90%.\n\nAfter saving, reconnect the controller or restart the game to apply changes.",
+		"SETTINGS_GAME_CONTROLLERDEADZONE": "Controller-Totzone",
+		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "Passt die Totzone der Analogsticks für alle verbundenen Controller an. Kann zwischen 10% und 90% eingestellt werden.\n\nVerbinde den Controller nach dem Speichern erneut oder starte das Spiel neu, um die Änderungen zu übernehmen.",
 
 		"SETTINGS_GAME_BADCOUNT": "Kanpeki-Modus",
 		"SETTINGS_GAME_BADCOUNT_DESC": "Bestimmt, wie viele ÜBEL erlaubt sind, bevor ein Lied automatisch scheitert. Setze dies auf 0, um den Modus zu deaktivieren.",
@@ -225,11 +225,11 @@
 		"SETTINGS_GAME_AUTOP2": "Automatisches Spiel Spieler 2",
 		"SETTINGS_GAME_AUTOP2_DESC": "Bestimmt, ob Spieler 2 automatisch spielt.",
 		"SETTINGS_GAME_AUTOROLL": "Roll-Geschwindigkeit",
-		"SETTINGS_GAME_AUTOROLL_DESC": "Wenn automatisches Spielen aktiviert ist, werden Trommelrollen so oft pro Sekunde automatisch getroffen. Hat keine Auswirkung auf Ballons. 0 deaktiviert Auto-Roll. -1 hits as many as possible without causing significant lags.",
-		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
-		"SETTINGS_GAME_AUTOBALLOON_DESC": "When auto is enabled, balloons will be automatically hit at most this many times per second. 0 disables auto balloon hits. -1 disables the limit but can lag or even freeze the game on balloons with huge amount of hits.",
-		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
-		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Wenn automatisches Spielen aktiviert ist, werden Trommelrollen so oft pro Sekunde automatisch getroffen. Hat keine Auswirkung auf Ballons. 0 deaktiviert Auto-Roll. -1 trifft so oft wie möglich, ohne spürbare Ruckler zu verursachen.",
+		"SETTINGS_GAME_AUTOBALLOON": "Maximale Ballon-Schlaggeschwindigkeit",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "Wenn automatisches Spielen aktiviert ist, werden Ballons höchstens so oft pro Sekunde automatisch getroffen. 0 deaktiviert automatische Ballon-Treffer. -1 hebt die Begrenzung auf, kann aber bei Ballons mit sehr vielen Schlägen zu Rucklern oder sogar zum Einfrieren des Spiels führen.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "Automatik darf Schläge überspringen",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Erlaubt der Automatik, weitere Schläge zu überspringen, wenn das Spiel sonst ruckeln oder sogar einfrieren könnte. Beim Drücken der Pause-Taste ist das Überspringen außerdem vorübergehend erlaubt.",
 
 		"SETTINGS_GAME_NOINFO": "Kein Informationsmodus",
 		"SETTINGS_GAME_NOINFO_DESC": "Bestimmt, ob Liedinformationen angezeigt werden. Einschalten deaktiviert die Liedinformationen, ausschalten aktiviert sie.",
@@ -450,9 +450,9 @@
 		// {0}: Charter name
 		"SONGSELECT_INFO_CHARTER": "Ersteller: {0}",
 
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
+		"SONGSELECT_TEXTSEARCH_TITLE": "Titel",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Untertitel",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "Ersteller",
 
 		"SONGSELECT_QUICKCONFIG": "Schnellkonfiguration",
 		"SONGSELECT_QUICKCONFIG_MORE": "Mehr...",
@@ -563,7 +563,7 @@
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: Total plays needed
 		// {2}: Current progress
-		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} songs to unlock this item! ({2}/{1})", // sd
+		"UNLOCK_CONDITION_PLAYDISTINCT": "{0} {1} Songs, um diesen Artikel freizuschalten! ({2}/{1})", // sd
 		// {0}: Clear type (i.e. Play, Clear, FC, Perfect, etc.)
 		// {1}: # of songs needed
 		// {2}: Difficulty type (i.e. Easy, Normal, Hard, Ex, etc.)
@@ -591,6 +591,23 @@
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} Charts erstellt von {2}. ({3}/{1})", // sc
+		// {0}: Activate / Deactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} den globalen Auslöser {1}. ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "Der Wert des globalen Zählers {1} ist {0} {2}. ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "Deaktiviere",
+		"UNLOCK_CONDITION_TRIGGER_1": "Aktiviere",
+
+		"UNLOCK_CONDITION_TYPE_l": "kleiner als",
+		"UNLOCK_CONDITION_TYPE_le": "kleiner oder gleich",
+		"UNLOCK_CONDITION_TYPE_e": "gleich",
+		"UNLOCK_CONDITION_TYPE_me": "größer oder gleich",
+		"UNLOCK_CONDITION_TYPE_m": "größer als",
+		"UNLOCK_CONDITION_TYPE_d": "ungleich",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "Spiele",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "Spiele",
@@ -662,7 +679,7 @@
 
 		"MOD_FUN": "Spaß-Modifikatoren",
 		"MOD_FUN_AVALANCHE": "Lawine",
-		"MOD_FUN_MINESWEEPER": "Minesweeper"
+		"MOD_FUN_MINESWEEPER": "Minensucher"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "TASTE NICHT GEFUNDEN: {0}",

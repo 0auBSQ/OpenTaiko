@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "Español (Spanish)",
-	"Version": "0.6.0.72",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Permitir conexiones de LuaNetworking",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Permite que las fases Lua creen salas en línea o se unan a ellas. Desactivado por defecto: actívalo solo con gente de confianza: compartir un código de sala comparte tu dirección IP. Mientras esté desactivado, crear y unirse están deshabilitados.",
@@ -140,6 +140,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "Alterna si la música se reproduce.",
 		"SETTINGS_SYSTEM_USESONGVOL": "Aplicar Metadatos de SONGVOL",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": "Esto es una configuración parcialmente redundante que alterna si se utilizan metadatos de SONGVOL. Valores entre 0 y 100 reducirán el volumen de la canción, pero valores superiores a 100 no hacen nada.",
+		"SETTINGS_SYSTEM_MASTERVOL": "Volumen General",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Ajusta el volumen general del programa.",
 		"SETTINGS_SYSTEM_SEVOL": "Volumen de Efectos de Sonidos",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "Ajusta volumen de sonidos relacionados con el tambor. Para jugar sin instrumento, configúralo en 0. Debes reiniciar el juego después de salir de la config. para guardar esta opción.",
 		"SETTINGS_SYSTEM_VOICEVOL": "Volumen de Voz",
@@ -223,11 +225,11 @@
 		"SETTINGS_GAME_AUTOP2": "Juego AUTO de Jugador 2",
 		"SETTINGS_GAME_AUTOP2_DESC": "Activa si jugador 2 juega automáticamente.",
 		"SETTINGS_GAME_AUTOROLL": "Velocidad de Redoble",
-		"SETTINGS_GAME_AUTOROLL_DESC": "Cuando auto está activado, redobles serán automáticamente golpear estas veces al segundo. No tiene efecto en globos. 0 desactiva redoble auto. -1 hits as many as possible without causing significant lags.",
-		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
-		"SETTINGS_GAME_AUTOBALLOON_DESC": "When auto is enabled, balloons will be automatically hit at most this many times per second. 0 disables auto balloon hits. -1 disables the limit but can lag or even freeze the game on balloons with huge amount of hits.",
-		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
-		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
+		"SETTINGS_GAME_AUTOROLL_DESC": "Cuando auto está activado, los redobles se golpearán automáticamente esta cantidad de veces por segundo. No tiene efecto en los globos. 0 desactiva el redoble automático. -1 golpea tantas veces como sea posible sin causar ralentizaciones significativas.",
+		"SETTINGS_GAME_AUTOBALLOON": "Velocidad Máxima de Golpes en Globos",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "Cuando auto está activado, los globos se golpearán automáticamente como máximo esta cantidad de veces por segundo. 0 desactiva los golpes automáticos en globos. -1 elimina el límite, pero puede ralentizar o incluso congelar el juego en globos con una enorme cantidad de golpes.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "Permitir Omitir Golpes en Auto",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Permite que el modo auto omita los golpes restantes cuando podrían ralentizar o incluso congelar el juego. La omisión también se permite temporalmente al presionar la tecla de pausa.",
 
 		"SETTINGS_GAME_NOINFO": "Modo Sin Información",
 		"SETTINGS_GAME_NOINFO_DESC": "Activa si la información de la canción se muestra. Activar esto se deshabilitará la información de la canción. Desactivar esto se habilitará la información de la canción.",
@@ -399,7 +401,7 @@
 
 		// Title Screen
 		"TITLE_MODE_TAIKO": "Modo Taiko",
-		"TITLE_MODE_DAN": "Dan-i Dojo",
+		"TITLE_MODE_DAN": "Dojo de Dan",
 		"TITLE_MODE_TOWER": "Torres Taiko",
 		"TITLE_MODE_SHOP": "Tienda",
 		"TITLE_MODE_STORY": "Aventura Taiko",
@@ -650,7 +652,7 @@
 		"MOD_RANDOM_SHUFFLE": "Mezclado",
 		"MOD_RANDOM_CHAOS": "Caótico",
 
-		"MOD_TIMING": "Timing",
+		"MOD_TIMING": "Juicio",
 		"MOD_TIMING1": "Relajado",
 		"MOD_TIMING2": "Permisivo",
 		"MOD_TIMING3": "Normal",

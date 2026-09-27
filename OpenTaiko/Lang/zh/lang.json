@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
 	"Language": "中文 (Chinese)",
-	"Version": "0.6.0.73",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "允许 LuaNetworking 连接",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "允许 Lua 关卡创建或加入在线房间。默认关闭：仅与你信任的人启用——分享房间代码会分享你的 IP 地址。关闭时，无法创建或加入。",

@@ -7,7 +7,7 @@
   // "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
   // i.e. "日本語 (Japanese)"
     "Language": "한국어 (Korean)",
-	"Version":  "0.6.0.0",
+	"Version":  "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "LuaNetworking 연결 허용",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Lua 스테이지가 온라인 방을 열거나 참가할 수 있도록 허용합니다. 기본값은 꺼짐: 신뢰하는 사람과만 켜세요 - 방 코드를 공유하면 IP 주소가 공유됩니다. 꺼져 있는 동안에는 호스트와 참가가 비활성화됩니다.",
@@ -62,22 +62,22 @@
 		"SETTINGS_SYSTEM_RELOADSONG_STATUS": " 곡 목록을 불러오는 중입니다.\n         잠시 기다려 주세요...",
 
 		"SETTINGS_SYSTEM_IMPORTSCOREINI": "Score.ini 파일 불러오기",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Score.ini 파일을 데이터베이스로 불러옵니다.\n\n<c.#f0ad4e>경고!\n다음 항목은 불러오지 않습니다:\n- Clear statuses\n- Gameplay modifiers\n- # of hits (Good, Ok, Bad, Drumroll, etc.)\n- Dan exam scores",
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "Searching for scores...",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_DESC": "Score.ini 파일을 데이터베이스로 불러옵니다.\n\n<c.#f0ad4e>경고!\n다음 항목은 불러오지 않습니다:\n- 클리어 상태\n- 플레이 옵션\n- 타격 횟수 (얼쑤, 좋다, 에구, 연타 등)\n- 단위도장 점수",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS1": "스코어를 검색하는 중...",
 		// {0}: Total # of score.ini files to be processed
 		// {1}: # of score.ini files successfully imported
 		// {2}: # of score.ini files currently processed
 		// {3}: # of score.ini files skipped
 		// {4}: # of score.ini files that failed to import due to an error
 		// {5}: Name of the current score.ini file being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "Processing {0} scores...\n<c.#0bb000>{1} of {2} imported</c> (<c.#f0ad4e>{3} skipped</c> / <c.#b00000>{4} failed</c>)\n\n{5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS2": "스코어 {0}개 처리 중...\n<c.#0bb000>{2}개 중 {1}개 불러옴</c> (<c.#f0ad4e>{3}개 건너뜀</c> / <c.#b00000>{4}개 실패</c>)\n\n{5}",
 		// {0}: Total # of players to be processed
 		// {1}: # of players whose scores are successfully refreshed
 		// {2}: # of players currently processed
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "플레이어 {0}명의 스코어를 갱신하는 중...\n<c.#0bb000>{2}명 중 {1}명 갱신됨</c> (<c.#b00000>{3}명 실패</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "사운드트랙 다운로드 선택 초기화",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "저장된 \"안 함\" 선택을 지웁니다. 다음 실행 시 사운드트랙 안내가 다시 표시됩니다.",
@@ -102,7 +102,7 @@
 		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync 텍스처 로딩",
 		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "텍스처 로딩 타입: 게임 시작때 프리징(렉)이 없어집니다. 일부 텍스처가 검은색으로 변하면 이 옵션을 끄세요. 게임을 재시작하여야 변경 사항이 적용됩니다.",
 
-		"SETTINGS_SYSTEM_BGMOVIE": "BGMOVIE",
+		"SETTINGS_SYSTEM_BGMOVIE": "동영상 재생",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "BGMOVIE 표시 여부를 설정합니다. 파일에 동영상이 없다면, 배경이 검게 표시됩니다.",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY": "BGMOVIE 표시 모드",
 		"SETTINGS_SYSTEM_BGMOVIEDISPLAY_DESC": "BGMOVIE가 표시되는 방식을 변경할 수 있습니다.",
@@ -113,7 +113,7 @@
 		"SETTINGS_SYSTEM_LANEOPACITY": "레인 불투명도",
 		"SETTINGS_SYSTEM_LANEOPACITY_DESC": "(레인: 노트가 지나가는 곳)배경 동영상이 재생되는 동안 레인의 불투명도를 조정합니다.\n\n0 = 완전 투명하게,\n255 = 투명하지 않게",
 
-		"SETTINGS_SYSTEM_BGA": "BGA",
+		"SETTINGS_SYSTEM_BGA": "BGA 표시",
 		"SETTINGS_SYSTEM_BGA_DESC": "BGA 표시 여부를 설정합니다.",
 		"SETTINGS_SYSTEM_DISPLAYCHARA": "캐릭터 표시",
 		"SETTINGS_SYSTEM_DISPLAYCHARA_DESC": "캐릭터 이미지를 표시합니다.",
@@ -140,8 +140,8 @@
 		"SETTINGS_SYSTEM_SONGPLAYBACK_DESC": "곡 재생 여부를 설정합니다.",
 		"SETTINGS_SYSTEM_USESONGVOL": "SONGVOL 옵션 적용하기",
 		"SETTINGS_SYSTEM_USESONGVOL_DESC": ".tja 파일에 있는 SONGVOL 옵션을 적용합니다.",
-		"SETTINGS_SYSTEM_MASTERVOL": "Master Volume",
-		"SETTINGS_SYSTEM_MASTERVOL_DESC": "Adjust the overall volume of the program.",
+		"SETTINGS_SYSTEM_MASTERVOL": "마스터 볼륨",
+		"SETTINGS_SYSTEM_MASTERVOL_DESC": "프로그램의 전체 볼륨을 조정합니다.",
 		"SETTINGS_SYSTEM_SEVOL": "효과음 볼륨",
 		"SETTINGS_SYSTEM_SEVOL_DESC": "효과음 볼륨을 조정합니다.",
 		"SETTINGS_SYSTEM_VOICEVOL": "보이스 볼륨",
@@ -208,7 +208,7 @@
 
 		"SETTINGS_GAME_CALIBRATION": "오프셋 보정",
 		"SETTINGS_GAME_CALIBRATION_DESC": "오프셋을 보정합니다. 저장하면 글로벌 오프셋을 덮어씁니다.",
-		"SETTINGS_GAME_CALIBRATION_OFFSET": "OFFSET: {0}",
+		"SETTINGS_GAME_CALIBRATION_OFFSET": "오프셋: {0}",
 
 		"SETTINGS_GAME_CONTROLLERDEADZONE": "컨트롤러 데드존",
 		"SETTINGS_GAME_CONTROLLERDEADZONE_DESC": "연결된 컨트롤러의 조이스틱 데드존을 조정할 수 있습니다. 범위는 10%에서 90% 사이로 설정할 수 있습니다. 게임을 재시작하여야 변경 사항이 적용됩니다.",
@@ -227,11 +227,11 @@
 		"SETTINGS_GAME_AUTOP2": "플레이어 2 오토 플레이",
 		"SETTINGS_GAME_AUTOP2_DESC": "플레이어 2의 오토 플레이 여부를 설정합니다.",
 		"SETTINGS_GAME_AUTOROLL": "연타 속도",
-		"SETTINGS_GAME_AUTOROLL_DESC": "오토 플레이가 활성화되면 롤은 초당 정한 횟수만큼 자동으로 연타합니다. 풍선에는 영향을 미치지 않습니다. 0은 자동 롤을 비활성화합니다. -1 hits as many as possible without causing significant lags.",
-		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
-		"SETTINGS_GAME_AUTOBALLOON_DESC": "When auto is enabled, balloons will be automatically hit at most this many times per second. 0 disables auto balloon hits. -1 disables the limit but can lag or even freeze the game on balloons with huge amount of hits.",
-		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
-		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
+		"SETTINGS_GAME_AUTOROLL_DESC": "오토 플레이가 활성화되면 연타 노트를 초당 설정한 횟수만큼 자동으로 칩니다. 풍선에는 영향을 미치지 않습니다. 0은 자동 연타를 비활성화합니다. -1은 심한 렉이 걸리지 않는 선에서 최대한 많이 칩니다.",
+		"SETTINGS_GAME_AUTOBALLOON": "풍선 최대 연타 속도",
+		"SETTINGS_GAME_AUTOBALLOON_DESC": "오토 플레이가 활성화되면 풍선을 초당 최대 설정한 횟수만큼 자동으로 연타합니다. 0은 자동 풍선 연타를 비활성화합니다. -1은 제한을 해제하지만, 타수가 매우 많은 풍선에서는 렉이 걸리거나 게임이 멈출 수 있습니다.",
+		"SETTINGS_GAME_AUTOCANSKIPHIT": "오토 플레이 타격 건너뛰기 허용",
+		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "계속 치면 렉이 걸리거나 게임이 멈출 수 있는 경우, 오토 플레이가 이후의 타격을 건너뛸 수 있도록 허용합니다. 일시정지 단축키를 누를 때에도 일시적으로 건너뛰기가 허용됩니다.",
 
 		"SETTINGS_GAME_NOINFO": "정보 없음 모드",
 		"SETTINGS_GAME_NOINFO_DESC": "노래 정보 표시 여부를 설정합니다. 이 옵션을 켜면 노래 정보가 비활성화되고, 끄면 노래 정보가 활성화됩니다.",
@@ -452,9 +452,9 @@
 		// {0}: Charter name
 		"SONGSELECT_INFO_CHARTER": "제작자: {0}",
 
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
+		"SONGSELECT_TEXTSEARCH_TITLE": "제목",
+		"SONGSELECT_TEXTSEARCH_SUBTITLE": "부제목",
+		"SONGSELECT_TEXTSEARCH_CHARTER": "제작자",
 
 		"SONGSELECT_QUICKCONFIG": "빠른 설정",
 		"SONGSELECT_QUICKCONFIG_MORE": "더 보기...",
@@ -468,7 +468,7 @@
 		"MODAL_TITLE_SONG": "신곡!",
 		// {0}: Newly obtained coins
 		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0} Coins (Total: {1})",
+		"MODAL_MESSAGE_COIN": "+{0} 코인 (합계: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "메인 메뉴로 돌아가기",
@@ -481,9 +481,9 @@
 
 		// Taiko Towers
 		"TOWER_FLOOR_REACHED": "도달한 층",
-		"TOWER_FLOOR_INITIAL": "F",
+		"TOWER_FLOOR_INITIAL": "층",
 		"TOWER_SCORE": "스코어",
-		"TOWER_SCORE_INITIAL": "P",
+		"TOWER_SCORE_INITIAL": "점",
 
 		// Dan Dojo
 		"DAN_CONDITION_NAME_SOUL": "게이지",
@@ -503,8 +503,8 @@
 		"HEYA_CHARA": "캐릭터",
 		"HEYA_DAN": "단위 제목",
 		"HEYA_NAMEPLATE": "칭호 타이틀",
-		"HEYA_NAME": "Name",
-		"HEYA_NAME_INFO": "Type your name (Enter to save, Escape to discard changes):",
+		"HEYA_NAME": "이름",
+		"HEYA_NAME_INFO": "이름을 입력하세요 (Enter로 저장, Esc로 변경 취소):",
 
 		// {0}: Asset name
 		"HEYA_DESCRIPTION_NAME": "이름: {0}",
@@ -535,12 +535,12 @@
 		"HEYA_DESCRIPTION_EFFECTS_SHOWADLIB": "<c.#c4ffe2>애드립</c> 노트가 보이게 됩니다.",
 		// {0}: # of auto-rolls per second
 		"HEYA_DESCRIPTION_EFFECTS_AUTOROLL": " {0} 히트에서 자동으로 <c.#ffff00>연타가</c>됩니다.",
-		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>Split</c> <c.#0088ff>Lanes</c>",
+		"HEYA_DESCRIPTION_EFFECTS_SPLITLANE": "<c.#ff4040>분리된</c> <c.#0088ff>레인</c>",
 		// {0}: Coin multiplier
-		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "Coin multiplier: x{0}",
+		"HEYA_DESCRIPTION_COIN_MULTIPLIER": "코인 배율: x{0}",
 
 		// Unlock requirements & messages (Any Menu)
-		"UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",
+		"UNLOCK_CONDITION_INVALID": "[오류] 잘못된 조건",
 		"UNLOCK_CONDITION_SHOP": "이 아이템은 상점에서만 구매 가능합니다.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "코인 가격: {0}", // ch, cs, cm
@@ -548,7 +548,7 @@
 		"UNLOCK_COIN_MORE": "코인이 부족합니다!",
 
 		"UNLOCK_CONDITION_ERROR": "다음 조건입니다: {0}에 {1} 값이 필요합니다.",
-		"UNLOCK_CONDITION_ERROR2": "다음 조건입니다: {0} requires ({1} * n) values and n references.",
+		"UNLOCK_CONDITION_ERROR2": "다음 조건입니다: {0}에 ({1} * n)개의 값과 n개의 참조가 필요합니다.",
 
 		// {0}: Coin earn requirement
 		// {1}: Current progress
@@ -593,6 +593,23 @@
 		// {2} Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3} Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {2}이(가) 만든 {1} 곡을 {0}하세요. ({3}/{1})", // sc
+		// {0}: Activate / Deactivate
+		// {1}: Global Trigger name
+		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "글로벌 트리거 {1}을(를) {0}. ({2})", //gt
+		// {0}: Unlock condition type
+		// {1}: Global Counter name
+		// {2}: Global Counter value to compare
+		"UNLOCK_CONDITION_GLOBAL_COUNTER": "글로벌 카운터 {1}의 값이 {2}{0}. ({3})", //gc
+
+		"UNLOCK_CONDITION_TRIGGER_0": "비활성화하세요",
+		"UNLOCK_CONDITION_TRIGGER_1": "활성화하세요",
+
+		"UNLOCK_CONDITION_TYPE_l": "보다 작아야 합니다",
+		"UNLOCK_CONDITION_TYPE_le": "보다 작거나 같아야 합니다",
+		"UNLOCK_CONDITION_TYPE_e": "이어야 합니다",
+		"UNLOCK_CONDITION_TYPE_me": "보다 크거나 같아야 합니다",
+		"UNLOCK_CONDITION_TYPE_m": "보다 커야 합니다",
+		"UNLOCK_CONDITION_TYPE_d": "이(가) 아니어야 합니다",
 
 		"UNLOCK_CONDITION_REQUIRE_PLAY": "플레이",
 		"UNLOCK_CONDITION_REQUIRE_PLAY_MORE": "플레이",
@@ -614,7 +631,7 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "Deus-Ex-Machina",
+		"AI_TITLE": "데우스 엑스 마키나",
 		// {0}: Section No.
 		"AI_SECTION": "섹션 {0}",
 

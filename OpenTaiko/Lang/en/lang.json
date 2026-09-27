@@ -7,7 +7,7 @@
 	// "Language" should include the name of your language in its native text, as well as its English variant in parentheses.
 	// i.e. "日本語 (Japanese)"
 	"Language": "English",
-	"Version": "0.6.0.73",
+	"Version": "0.6.1.0",
 	"Entries": {
         "SETTINGS_SYSTEM_LUANETWORKING": "Allow LuaNetworking connections",
         "SETTINGS_SYSTEM_LUANETWORKING_DESC": "Allow Lua stages to host or join online rooms.\nOff by default: only enable with people you trust - sharing a room code shares your IP address. While off, hosting and joining are disabled.",
@@ -77,7 +77,7 @@
 		// {3}: # of players whose scores failed to import due to an error
 		// {4}: ID of the current player being processed.
 		// {5}: Name of the current player being processed.
-		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed/c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
+		"SETTINGS_SYSTEM_IMPORTSCOREINI_STATUS3": "Refreshing {0} players' scores...\n<c.#0bb000>{1} of {2} refreshed</c> (<c.#b00000>{3} failed</c>)\n\n{4}: {5}",
 
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Reset Soundtrack Download Choice",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Clear the saved \"Never\" choice. The soundtrack prompt will return on the next launch.",
@@ -591,7 +591,7 @@
 		// {2}: Charter name (i.e. Komi, bol, Dashy, Colin, etc.)
 		// {3}: Current progress
 		"UNLOCK_CONDITION_CHALLENGE_PLAYCHARTER": "- {0} {1} charts made by {2}. ({3}/{1})", // sc
-		// {0}: Activate / Desactivate
+		// {0}: Activate / Deactivate
 		// {1}: Global Trigger name
 		"UNLOCK_CONDITION_GLOBAL_TRIGGER": "{0} the global trigger {1}. ({2})", //gt
 		// {0}: Unlock condition type
@@ -599,7 +599,7 @@
 		// {2}: Global Counter value to compare
 		"UNLOCK_CONDITION_GLOBAL_COUNTER": "The global counter {1} value is {0} {2}. ({3})", //gc
 
-		"UNLOCK_CONDITION_TRIGGER_0": "Desactivate",
+		"UNLOCK_CONDITION_TRIGGER_0": "Deactivate",
 		"UNLOCK_CONDITION_TRIGGER_1": "Activate",
 
 		"UNLOCK_CONDITION_TYPE_l": "Lower than",
