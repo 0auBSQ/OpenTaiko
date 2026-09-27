@@ -82,6 +82,7 @@ local captureBtn = nil
 local lastThumbIdx, lastThumbOpt = nil, nil
 local thumbWantIdx, thumbWantOpt, thumbWantSince = nil, nil, 0   -- debounce: load the skin thumbnail after the selection settles
 local exitRequested = false   -- set by the exit tab; update() returns "exit" next
+local EXIT_TRANSITION = "settings_iris_back"   -- the way back to the title (a Modules/Transitions module)
 local sbDrag = false          -- dragging the scrollbar thumb
 
 local floor, min, max = math.floor, math.min, math.max
@@ -671,7 +672,7 @@ function update(ts)
         exitRequested = false
         if M.RequestExit then M.RequestExit() end
         SHARED:GetSharedSound("Cancel"):Play()
-        return "exit"
+        return "exit", EXIT_TRANSITION
     end
 
     -- keep number-input boxes showing the clamped model value when not being edited (click-away / esc leave the
@@ -691,7 +692,7 @@ function update(ts)
         else
             if M.RequestExit then M.RequestExit() end
             SHARED:GetSharedSound("Cancel"):Play()
-            return "exit"
+            return "exit", EXIT_TRANSITION
         end
     end
 end

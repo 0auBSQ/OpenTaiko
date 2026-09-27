@@ -201,7 +201,7 @@ end
 | `tower_view` | 塔のリザルトで、譜面の塔のルックと階数を渡して `activate(look, floors)`。毎フレーム `draw(scroll, opacity)` (scroll 0 が地面、1 が空)。`deactivate()`。song_loading トランジションも同じように駆動します。 |
 | `tower_hud` | 塔のプレイ開始時に `activate(maxFloor)`。毎フレーム上側背景の上に `update()` と `draw()`。`deactivate()`。階とライフは PLAYSTATE から読みます。 |
 | `popup_menu` | `activate(title, items, fontSize, ...)`。items は改行で連結したラベルで、その後に PopupMenu のスキン位置が続きます。毎フレーム `draw(selected)`。閉じるときに `deactivate()`。 |
-| `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |
+| `config_ui` | 設定モデルとともに `activate(model)`。毎フレーム `update()` を呼び、"exit" を返すと設定画面を離れます。続けて Modules/Transitions のモジュール名を返すと、戻りにそのトランジションを使います (スキン・解像度・サウンドデバイスの変更が適用待ちのときは通常のフェードになります)。`draw()`。エンジンがモデルを再構築したときに Call を通じて `reload(model)`。`deactivate()`。 |
 | `song_enum` | `activate()`、その後楽曲のスキャン中は毎フレーム `draw(isCommandSongDataGet, done, total)`。`deactivate()`。 |
 | `cutscene` | `activate(paths, fadeOutSeconds)`。動画ファイルを順に、続けて最後の動画の後の黒へのフェード秒数（0 でなし）。毎フレーム `update()` を呼び、すべての動画が再生し終わりフェードも終わると "finished" を返します。`draw()`、`deactivate()`。各ファイルを自身の音声トラックと共に再生し、ポーズポップアップも持ちます。カットシーンの用途は呼び出し側が決めます。 |
 

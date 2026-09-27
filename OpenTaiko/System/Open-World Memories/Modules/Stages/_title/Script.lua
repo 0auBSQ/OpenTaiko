@@ -84,7 +84,7 @@ local function buildMenus()
             title = tr("TITLE_INTRO_NOKON", "Intro Nokon"),
             desc  = tr("TITLE_INTRO_NOKON_DESC", "It's show time! Show your musical knowledge through Nokon's best show!\nPlayable between 1 and 5 players."),
             c     = col(140, 80, 30),
-            via   = "stage", stage = "intro_nokon", trans = "nokon_curtain",
+            via   = "stage", stage = "intro_nokon", trans = "nokon_curtain", fastTrans = "nokon_curtain_back",
         },
         {
             title = tr("TITLE_MYROOM", "My Room"),
@@ -122,7 +122,7 @@ local function buildMenus()
         title = tr("TITLE_SETTINGS", "Settings"),
         desc  = tr("TITLE_SETTINGS_DESC", "Adjust your settings to fit with your play experience!"),
         c     = col(170, 170, 175),
-        via   = "config",
+        via   = "config", trans = "settings_iris",
     }
     m[#m + 1] = {
         title = tr("TITLE_EXIT", "Exit"),

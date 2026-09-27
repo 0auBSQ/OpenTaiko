@@ -201,7 +201,7 @@ end
 | `tower_view` | 在塔结算画面用谱面的塔外观和楼层数调用 `activate(look, floors)`；每帧 `draw(scroll, opacity)`，scroll 0 为地面、1 为天空；`deactivate()`。song_loading 过渡以同样方式驱动它。 |
 | `tower_hud` | 塔模式开始时 `activate(maxFloor)`；每帧在上方背景之上 `update()` 和 `draw()`；`deactivate()`。楼层和生命从 PLAYSTATE 读取。 |
 | `popup_menu` | 调用 `activate(title, items, fontSize, ...)`，其中 items 是用换行符连接的标签，其后是 PopupMenu 的皮肤位置；每帧调用 `draw(selected)`；关闭时调用 `deactivate()`。 |
-| `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
+| `config_ui` | 以设置模型调用 `activate(model)`；每帧调用 `update()`，返回 "exit" 即离开设置界面，其后可再返回一个 Modules/Transitions 模块名作为返回时的过渡（若有待应用的皮肤、分辨率或声音设备更改，则改为普通淡出）；调用 `draw()`；引擎重建模型时通过 Call 调用 `reload(model)`；调用 `deactivate()`。 |
 | `song_enum` | 调用 `activate()`，然后在歌曲扫描进行期间每帧调用 `draw(isCommandSongDataGet, done, total)`；调用 `deactivate()`。 |
 | `cutscene` | `activate(paths, fadeOutSeconds)`，依次给出视频文件和最后一个视频之后的淡黑秒数（0 表示不淡出）；每帧调用 `update()`，所有视频播完且淡出结束后返回 "finished"；`draw()`；`deactivate()`。每个文件都带着自身音轨播放，并自带暂停弹窗；过场动画的用途由调用方决定。 |
 

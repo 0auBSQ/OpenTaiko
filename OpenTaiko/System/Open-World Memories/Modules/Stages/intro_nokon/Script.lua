@@ -346,7 +346,7 @@ function update()
     end
 
     if quitted == true then
-        return Exit("title", nil, "nokon_curtain")   -- close the curtain over the show, open onto the title
+        return Exit("title", nil, "nokon_curtain_back")   -- close the curtain over the show, open onto the title
     end
 end
 

@@ -27,6 +27,9 @@ internal class CStageConfig : CStage {
 	public override void Activate() {
 		Trace.TraceInformation("コンフィグステージを活性化します。");
 		Trace.Indent();
+		// a failed save on the last exit can leave the stage activated, so the first-draw reset may not run
+		_leaving = false;
+		base.ePhaseID = CStage.EPhase.Common_NORMAL;
 		try {
 			OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
@@ -81,21 +84,32 @@ internal class CStageConfig : CStage {
 		OpenTaiko.actEnumSongs.Activate();
 	}
 
+	private bool tSoundDeviceChanged() {
+		var cfg = OpenTaiko.ConfigIni;
+		if (OperatingSystem.IsWindows())
+			return _soundTypeOrg != cfg.nSoundDeviceType || _bassBufOrg != cfg.nBassBufferSizeMs ||
+				_wasapiBufOrg != cfg.nWASAPIBufferSizeMs || _asioOrg != cfg.nASIODevice || _osTimerOrg != cfg.bUseOSTimer;
+		return _bassBufOrg != cfg.nBassBufferSizeMs || _osTimerOrg != cfg.bUseOSTimer;
+	}
+
+	// the skin, render scale or sound device changed: leaving reloads them (in DeActivate)
+	private bool tHeavyApplyPending()
+		=> OpenTaiko.Skin.GetCurrentSkinSubfolderFullName(true) != _skinOrg
+		   || OpenTaiko.ConfigIni.fRenderScale != _renderOrg || tSoundDeviceChanged();
+
 	private void tApplySoundDeviceIfChanged() {
+		if (!tSoundDeviceChanged()) return;
 		var cfg = OpenTaiko.ConfigIni;
 		if (OperatingSystem.IsWindows()) {
-			if (_soundTypeOrg != cfg.nSoundDeviceType || _bassBufOrg != cfg.nBassBufferSizeMs ||
-				_wasapiBufOrg != cfg.nWASAPIBufferSizeMs || _asioOrg != cfg.nASIODevice || _osTimerOrg != cfg.bUseOSTimer) {
-				ESoundDeviceType t = cfg.nSoundDeviceType switch {
-					0 => ESoundDeviceType.Bass, 1 => ESoundDeviceType.ASIO,
-					2 => ESoundDeviceType.ExclusiveWASAPI, 3 => ESoundDeviceType.SharedWASAPI, _ => ESoundDeviceType.Unknown,
-				};
-				OpenTaiko.SoundManager.tInitialize(t, cfg.nBassBufferSizeMs, cfg.nWASAPIBufferSizeMs, 0, cfg.nASIODevice, cfg.bUseOSTimer);
-				OpenTaiko.app.ShowWindowTitle();
-				OpenTaiko.Skin.ReloadSystemSounds();
-				OpenTaiko.Skin.PreloadSystemSounds();
-			}
-		} else if (_bassBufOrg != cfg.nBassBufferSizeMs || _osTimerOrg != cfg.bUseOSTimer) {
+			ESoundDeviceType t = cfg.nSoundDeviceType switch {
+				0 => ESoundDeviceType.Bass, 1 => ESoundDeviceType.ASIO,
+				2 => ESoundDeviceType.ExclusiveWASAPI, 3 => ESoundDeviceType.SharedWASAPI, _ => ESoundDeviceType.Unknown,
+			};
+			OpenTaiko.SoundManager.tInitialize(t, cfg.nBassBufferSizeMs, cfg.nWASAPIBufferSizeMs, 0, cfg.nASIODevice, cfg.bUseOSTimer);
+			OpenTaiko.app.ShowWindowTitle();
+			OpenTaiko.Skin.ReloadSystemSounds();
+			OpenTaiko.Skin.PreloadSystemSounds();
+		} else {
 			OpenTaiko.SoundManager.tInitialize(ESoundDeviceType.Bass, cfg.nBassBufferSizeMs, 0, 0, 0, cfg.bUseOSTimer);
 		}
 	}
@@ -145,8 +159,13 @@ internal class CStageConfig : CStage {
 			return 0;
 
 		if (base.IsFirstDraw) {
-			base.ePhaseID = CStage.EPhase.Common_FADEIN;
-			this.actFIFO.tFadeInStart();
+			_leaving = false;
+			if (OpenTaiko.rCurrentStage is CStageTransition) {
+				base.ePhaseID = CStage.EPhase.Common_NORMAL;   // a transition is revealing the settings: no fade of its own
+			} else {
+				base.ePhaseID = CStage.EPhase.Common_FADEIN;
+				this.actFIFO.tFadeInStart();
+			}
 			base.IsFirstDraw = false;
 		}
 
@@ -160,21 +179,31 @@ internal class CStageConfig : CStage {
 			if (!OpenTaiko.Skin.bgmConfigScreen.bIsPlaying)
 				OpenTaiko.Skin.bgmConfigScreen.tPlay();
 
-			if (base.ePhaseID == CStage.EPhase.Common_NORMAL) {
+			if (base.ePhaseID == CStage.EPhase.Common_NORMAL && !_leaving) {
 				if (_model != null && _model.Keys.IsCapturing) {
 					// C# owns input this frame: poll the device sweep for the key being bound
 					var (done, needRefresh) = _model.Keys.PollCaptureFrame();
 					if (needRefresh)
 						_hooks.Refresh();
 				} else {
-					var r = UI?.Update();   // Lua handles nav/edit/cancel; returns "exit" at the top level
+					// Lua handles nav/edit/cancel; returns "exit" at the top level, optionally with a transition name
+					// (like a Lua stage's Exit). A pending skin/sound reload keeps the plain fade.
+					var r = UI?.Update();
 					if (r != null && r.Length > 0 && (r[0] as string) == "exit") {
-						this.actFIFO.tFadeOutStart();
-						base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+						string? name = r.Length > 1 ? r[1] as string : null;
+						var tr = !string.IsNullOrEmpty(name) && !tHeavyApplyPending() ? LuaTransitionWrapper.Get(name) : null;
+						if (tr != null) {
+							CStageTransition.SetPendingScript(this, tr);
+							_leaving = true;   // drawn (not updated) while the transition covers it
+						} else {
+							this.actFIFO.tFadeOutStart();
+							base.ePhaseID = CStage.EPhase.Common_FADEOUT;
+						}
 					}
 				}
 			}
 			UI?.Draw();
+			if (_leaving && OpenTaiko.rCurrentStage == this) return 1;   // hand over to the transition this frame
 		}
 
 		switch (base.ePhaseID) {
@@ -197,6 +226,7 @@ internal class CStageConfig : CStage {
 	#region [ private ]
 	//-----------------
 	private CActFIFOWhite actFIFO;
+	private bool _leaving;   // handed over to a transition: draw only, no input
 	//-----------------
 	#endregion
 }

@@ -201,7 +201,7 @@ end
 | `tower_view` | 타워 결과 화면에서 채보의 타워 룩과 층 수로 `activate(look, floors)`; 매 프레임 `draw(scroll, opacity)`, scroll 0은 지면, 1은 하늘; `deactivate()`. song_loading 전환도 같은 방식으로 구동합니다. |
 | `tower_hud` | 타워 플레이 시작 시 `activate(maxFloor)`; 매 프레임 상단 배경 위에 `update()`와 `draw()`; `deactivate()`. 층과 라이프는 PLAYSTATE에서 읽습니다. |
 | `popup_menu` | `activate(title, items, fontSize, ...)`. items는 줄바꿈으로 이어진 라벨이고, 그 뒤에 PopupMenu 스킨 위치가 옵니다. 매 프레임 `draw(selected)`; 닫힐 때 `deactivate()`. |
-| `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남; `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
+| `config_ui` | 설정 모델과 함께 `activate(model)`; 매 프레임 `update()`를 호출하며 "exit"를 반환하면 설정 화면을 떠남, 그 뒤에 Modules/Transitions 모듈 이름을 반환하면 돌아갈 때 그 트랜지션을 사용(스킨·해상도·사운드 장치 변경이 적용 대기 중이면 기본 페이드); `draw()`; 엔진이 모델을 다시 만들 때 Call을 통한 `reload(model)`; `deactivate()`. |
 | `song_enum` | `activate()`, 그다음 곡 스캔이 실행되는 동안 매 프레임 `draw(isCommandSongDataGet, done, total)`; `deactivate()`. |
 | `cutscene` | `activate(paths, fadeOutSeconds)`: 동영상 파일을 순서대로, 이어서 마지막 동영상 뒤의 검은 페이드 초(0이면 없음); 매 프레임 `update()`를 호출하며 모든 동영상이 재생되고 페이드가 끝나면 "finished"를 반환; `draw()`; `deactivate()`. 각 파일을 자체 오디오 트랙과 함께 재생하고 일시정지 팝업도 담당합니다. 컷신의 용도는 호출하는 쪽이 정합니다. |
 
