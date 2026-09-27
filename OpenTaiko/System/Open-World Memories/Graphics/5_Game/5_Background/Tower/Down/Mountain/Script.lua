@@ -3,7 +3,8 @@
 -- floors slide down under the player at every new floor.
 --
 -- This folder is one complete tower look. The chart picks it with TOWERTYPE:Mountain (a preset or a random pick
--- otherwise), and the tower select, the loading screen and the result compose the same tower from its pieces:
+-- otherwise). The tower select, the loading screen and the result draw the same tower from a half-size copy of
+-- its pieces, Modules/Lib/TowerArt/Mountain/: run tools/gen_tower_art.py after changing a piece or the layout.
 --   Sky_Gradient.png   the sky strip, its bottom the day and its top the night
 --   Base/BaseN.png     the floors, cycled every ten floors
 --   Deco/DecoN.png     a decoration over each floor, cycled every floor (optional)

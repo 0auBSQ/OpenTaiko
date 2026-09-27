@@ -116,7 +116,7 @@ AIBattleCharacter=10v2 - AItritus
 
 同梱スキンを基準にすると、スキンのルートには次のものがあります。
 
-- `Graphics/`: 番号付きの画面ごとのフォルダ (`0_Startup`、`1_Title`、`2_Config`、`3_DaniSelect`、`5_Game`、`6_Result`、`7_DanResult`、`7_Exit`、`8_TowerResult`、`10_Heya`、`12_OnlineLounge`) にまとめられた画像と、最上位にあるいくつかの共有画像。アニメーションする背景は、それが属するフォルダの画像の隣に置かれた `Script.lua` ファイルです (例えば `Graphics/0_Startup/Script.lua` や `Graphics/5_Game/5_Background/` の下のフォルダ)。 塔のルックは `Graphics/5_Game/5_Background/Tower/Down/` 配下の 1 つのフォルダで、空、階 (`Base/`)、屋根 (`Top.png`)、任意の装飾 (`Deco/`)、そして `Config.json` のレイアウトを持ちます。譜面は `TOWERTYPE:` でルックを選び、塔選択、ロード画面、リザルトはその部品から同じ塔を組み立てます。
+- `Graphics/`: 番号付きの画面ごとのフォルダ (`0_Startup`、`1_Title`、`2_Config`、`3_DaniSelect`、`5_Game`、`6_Result`、`7_DanResult`、`7_Exit`、`8_TowerResult`、`10_Heya`、`12_OnlineLounge`) にまとめられた画像と、最上位にあるいくつかの共有画像。アニメーションする背景は、それが属するフォルダの画像の隣に置かれた `Script.lua` ファイルです (例えば `Graphics/0_Startup/Script.lua` や `Graphics/5_Game/5_Background/` の下のフォルダ)。 塔のルックは `Graphics/5_Game/5_Background/Tower/Down/` 配下の 1 つのフォルダで、空、階 (`Base/`)、屋根 (`Top.png`)、任意の装飾 (`Deco/`)、そして `Config.json` のレイアウトを持ちます。譜面は `TOWERTYPE:` でルックを選び、塔選択、ロード画面、リザルトは `Modules/Lib/TowerArt/` 配下の同名フォルダにある専用のコピー（部品を半分のサイズにしたものと、独自の `Config.json`：`floor_height` と、階の下端中央からの装飾のずれ `deco_dx`/`deco_dy`。いずれもその部品のピクセル単位）から同じ塔を描きます。そのため、新しいルックには両方のフォルダが必要です。
 - `Sounds/`: ゲームが決まったファイル名で読み込むシステムサウンドと BGM。例: `Sounds/Move.ogg`、`Sounds/Decide.ogg`、`Sounds/Cancel.ogg`、`Sounds/BGM/Title.ogg`、`Sounds/BGM/SongSelect.ogg`、`Sounds/BGM/Result.ogg`。ファイルがなければそのサウンドは再生されません。
 - `Fonts/`: `FontName` キーで参照される `.ttf` ファイル。
 - `Locales/`: 言語ごとに 1 つの JSON ファイル (`en.json`、`ja.json`、...) で、形式は `{ "Entries": { "KEY": "text" } }`。これらの文字列はスキン自身の設定のラベルとなり、Lua は `THEME:GetSkinString(key)` を通じてこれらを読み取ります。アクティブな言語にキーがない場合、ゲームは `DefaultLocale` のファイルからそれを検索します。

@@ -74,7 +74,7 @@ local OPTION_SLOT = { back = 1, settings = 2, customize = 3, challenge = 4 }
 local tex_number_interval = 32
 
 local config = JSONLOADER:JsonParseFile("Config.json")
-local TOWER_SCALE = JSONLOADER:JsonGet(config, "tower_scale") or 0.36
+local TOWER_SCALE = JSONLOADER:JsonGet(config, "tower_scale") or 0.72   -- of the TowerArt pieces
 local TOWER_FLOORS_MAX = JSONLOADER:JsonGet(config, "tower_floors_max") or 3
 
 local function skinString(key, fallback)

@@ -2,12 +2,15 @@
 -- TowerArt.lua — draws a tower out of the pieces of a tower look, so the tower select, the loading screen and
 -- the result show the very tower the player climbs.
 --
--- A tower look is one Down background folder of the tower gameplay, Graphics/5_Game/5_Background/Tower/Down/
--- <look>/: its Script.lua draws the sky and the tower during play, and next to it sit the pieces this module
--- stacks (Base/BaseN.png the floors, cycled every ten floors; Deco/DecoN.png a decoration per floor; Top.png
--- the roof) and Config.json, the layout the script uses (body_x/body_y, deco_x/deco_y, move_x/move_y: the
--- slide from one floor to the next is the floor pitch here). The chart names its look with TOWERTYPE; a
--- chart without one gets the default look, the first lower background of the tower's default scene preset.
+-- Each look has its own folder next to this file, Modules/Lib/TowerArt/<look>/, named like the gameplay tower
+-- background it copies (Graphics/5_Game/5_Background/Tower/Down/<look>/, which the chart's TOWERTYPE names):
+--   Base/BaseN.png   the floors, cycled every ten floors
+--   Deco/DecoN.png   a decoration over each floor, cycled every floor (optional)
+--   Top.png          the roof, one more floor over the last one
+--   Config.json      in those pieces' pixels: floor_height (how far a floor's bottom sits above the one below),
+--                    deco_dx / deco_dy (the decoration's bottom centre, from its floor's bottom centre)
+-- The pieces are the gameplay ones at half size; tools/gen_tower_art.py makes them. A chart without a
+-- TOWERTYPE, or with one that has no folder here, gets DEFAULT_LOOK.
 --
 --   local TowerArt = require("TowerArt")
 --   local art = TowerArt.load()             -- call it where textures may be created (activate / onStart)
@@ -15,8 +18,8 @@
 --   art:preload(look)                       -- loads a look's pieces now (behind a cover) rather than at first draw
 --   art:ready(look)                         -- true once all its pieces can be drawn
 --   art:draw(look, x, bottomY, scale, floors, opts)
---       bottom-centre anchored; opts.color a COLOR tint, opts.opacity 0..1, opts.clipTop / opts.clipBottom
---       the screen rows outside of which floors are skipped (tall towers)
+--       bottom-centre anchored, scale 1 = the pieces' own size; opts.color a COLOR tint, opts.opacity 0..1,
+--       opts.clipTop / opts.clipBottom the screen rows outside of which floors are skipped (tall towers)
 --   art:height(look, scale, floors)         -- the drawn height in pixels
 --   art:dispose()
 --
@@ -27,36 +30,29 @@
 local TowerArt = {}
 TowerArt.__index = TowerArt
 
-local LOOKS_DIR = "Graphics/5_Game/5_Background/Tower/Down/"
-local PRESETS = "Graphics/5_Game/5_Background/Presets.json"
+local ART_DIR = "Modules/Lib/TowerArt/"
+local DEFAULT_LOOK = "Day"          -- also gameplay's: the Tower "" preset in Presets.json lists only this look
 local BASES_PER_FLOOR_CYCLE = 10
 
 local function jget(node, key) return JSONLOADER:JsonGet(node, key) end
 
-local function defaultLook(skinRoot)
-    local look = nil
-    pcall(function()
-        local presets = JSONLOADER:JsonParseFileAny(skinRoot .. PRESETS)
-        look = jget(jget(jget(jget(presets, "Tower"), ""), "DOWN"), 1)
-    end)
-    if type(look) == "string" and look ~= "" then return look end
-    return nil
-end
-
 function TowerArt.load(skinRoot)
     local self = setmetatable({}, TowerArt)
-    self.root = skinRoot or "../../../"
-    self.default = defaultLook(self.root)
+    self.dir = (skinRoot or "../../../") .. ART_DIR
     self.looks = {}
+    self.resolved = {}
     return self
 end
 
--- the look folder a chart's TowerType lands on: itself when it exists, the default look otherwise
+-- the look folder a chart's TowerType lands on: itself when it is here, the default look otherwise
 function TowerArt:resolve(look)
-    if look ~= nil and look ~= "" and STORAGE:DirectoryExists(self.root .. LOOKS_DIR .. tostring(look)) then
-        return tostring(look)
+    local key = look ~= nil and tostring(look) or ""
+    local found = self.resolved[key]
+    if found == nil then
+        found = (key ~= "" and STORAGE:DirectoryExists(self.dir .. key)) and key or DEFAULT_LOOK
+        self.resolved[key] = found
     end
-    return self.default
+    return found
 end
 
 local function loadSequence(dir, prefix)
@@ -69,7 +65,7 @@ local function loadSequence(dir, prefix)
 end
 
 local function readLayout(dir)
-    local layout = { body_x = 960, body_y = 1014, deco_x = 690, deco_y = 960, move_x = 0, move_y = 432 }
+    local layout = { floor_height = 216, deco_dx = -135, deco_dy = -27 }
     if STORAGE:FileExists(dir .. "Config.json") then
         pcall(function()
             local cfg = JSONLOADER:JsonParseFileAny(dir .. "Config.json")
@@ -84,10 +80,9 @@ end
 
 function TowerArt:preload(look)
     look = self:resolve(look)
-    if look == nil then return nil end
     local pieces = self.looks[look]
     if pieces ~= nil then return pieces end
-    local dir = self.root .. LOOKS_DIR .. look .. "/"
+    local dir = self.dir .. look .. "/"
     pieces = {
         bases = loadSequence(dir .. "Base/", "Base"),
         decos = loadSequence(dir .. "Deco/", "Deco"),
@@ -112,7 +107,7 @@ function TowerArt:height(look, scale, floors)
     local pieces = self:preload(look)
     if pieces == nil then return 0 end
     local topH = pieces.top ~= nil and pieces.top.Height or 0
-    return (math.max(0, floors) * pieces.layout.move_y + topH) * scale
+    return (math.max(0, floors) * pieces.layout.floor_height + topH) * scale
 end
 
 local function stamp(tex, x, y, scale, color, opacity)
@@ -130,8 +125,8 @@ function TowerArt:draw(look, x, bottomY, scale, floors, opts)
     local clipTop = opts.clipTop or -math.huge
     local clipBottom = opts.clipBottom or math.huge
     local layout = pieces.layout
-    local pitch = layout.move_y * scale
-    local decoDx, decoDy = (layout.deco_x - layout.body_x) * scale, (layout.deco_y - layout.body_y) * scale
+    local pitch = layout.floor_height * scale
+    local decoDx, decoDy = layout.deco_dx * scale, layout.deco_dy * scale
     floors = math.max(0, math.floor(floors or 0))
 
     -- each floor: its base, then its decoration; the loop ends once the floors leave the top of the clip

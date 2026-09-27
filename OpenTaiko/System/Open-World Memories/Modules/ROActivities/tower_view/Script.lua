@@ -15,7 +15,7 @@ local TowerArt = require("TowerArt")
 
 local TOWER_X = 960          -- the tower's centre and the ground line, in panorama pixels
 local TOWER_GROUND_Y = 1580
-local TOWER_SCALE = 0.4
+local TOWER_SCALE = 0.8          -- of the TowerArt pieces (half the gameplay size)
 
 local panorama = nil
 local art = nil

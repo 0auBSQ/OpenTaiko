@@ -121,7 +121,7 @@
     },
   "Tower": {
     "": {
-      "DOWN": [ "Day", "Sunset", "Mountain" ],
+      "DOWN": [ "Day" ],
       "FOOTER": [ "0" ]
     },
     "Day": {
