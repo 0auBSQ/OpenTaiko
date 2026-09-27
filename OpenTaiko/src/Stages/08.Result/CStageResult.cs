@@ -561,8 +561,8 @@ internal class CStageResult : CStage {
 					continue;
 				if (OpenTaiko.ConfigIni.bAIBattleMode && i == 1)
 					continue;
-				OpenTaiko.ReplayInstances[i].tResultsRegisterReplayInformations(this.nEarnedMedalsCount[i], ClearStatus_Replay[i], ScoreRank_Replay[i]);
-				OpenTaiko.ReplayInstances[i].tSaveReplayFile();
+				if (OpenTaiko.ReplayInstances[i].tResultsRegisterReplayInformations(this.nEarnedMedalsCount[i], ClearStatus_Replay[i], ScoreRank_Replay[i]))
+					OpenTaiko.ReplayInstances[i].tSaveReplayFile();
 			}
 
 			#endregion

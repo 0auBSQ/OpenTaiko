@@ -55,14 +55,6 @@ class CSongReplay {
 		string _chartFolder = Path.GetDirectoryName(ChartPath);
 		replayFolder = Path.Combine(_chartFolder, REPLAY_FOLDER_NAME);
 
-		try {
-			Directory.CreateDirectory(replayFolder);
-
-			Console.WriteLine("Folder Path: " + replayFolder);
-		} catch (Exception ex) {
-			Console.WriteLine("An error occurred: " + ex.Message);
-		}
-
 		storedPlayer = player;
 		chartPath = ChartPath;
 		ChartChecksum = tComputeChartMd5(ChartPath);
@@ -333,6 +325,7 @@ class CSongReplay {
 		string _path = replayFolder + @"/Replay_" + ChartUniqueID + @"_" + PlayerName + @"_" + Timestamp.ToString() + @".optkr";
 
 		try {
+			Directory.CreateDirectory(replayFolder);
 			using (FileStream fileStream = new FileStream(_path, FileMode.Create)) {
 				using (BinaryWriter writer = new BinaryWriter(fileStream)) {
 					writer.Write(GameMode);
@@ -380,11 +373,17 @@ class CSongReplay {
 				}
 			}
 		} catch (Exception ex) {
-
+			// a half-written file would list as a broken replay
+			try { File.Delete(_path); } catch { }
+			System.Diagnostics.Trace.TraceWarning($"Replay save failed: {_path} ({ex.Message})");
 		}
 	}
 
-	public void tResultsRegisterReplayInformations(int Coins, int Clear, int SRank) {
+	// false when the play is not to be saved: a chart without a persistent unique id (a dan-builder dan) could
+	// never be matched to its chart again
+	public bool tResultsRegisterReplayInformations(int Coins, int Clear, int SRank) {
+		if (OpenTaiko.SongMount.rChoosenSong?.uniqueId == null) return false;
+
 		// Actual player (Used for saved informations)
 		int actualPlayer = storedPlayer;
 
@@ -475,8 +474,6 @@ class CSongReplay {
 		CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(barr);
 		CompressedInputsSize = CompressedInputs.Length;
 		// Chart metadata
-		// DanBuilder charts have no persistent uniqueId; skip replay recording for them.
-		if (OpenTaiko.SongMount.rChoosenSong?.uniqueId == null) return;
 		ChartUniqueID = OpenTaiko.SongMount.rChoosenSong.uniqueId.data.id;
 		ChartDifficulty = (byte)OpenTaiko.SongMount.nChoosenSongDifficulty[storedPlayer];
 		ChartLevel = (byte)Math.Min(255, OpenTaiko.SongMount.rChoosenSong.score[ChartDifficulty].ChartInfo.nLevel[ChartDifficulty]);
@@ -486,6 +483,7 @@ class CSongReplay {
 		RandomSeed = OpenTaiko.ReplaySeed[storedPlayer];
 		// Replay Checksum (Calculate at the end)
 		ReplayChecksum = "";
+		return true;
 	}
 
 	#endregion

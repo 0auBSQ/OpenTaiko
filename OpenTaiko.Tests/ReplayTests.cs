@@ -45,6 +45,24 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
+		public void Ctor_MakesNoFolder_UntilSaved() {
+			var (dir, tja) = NewSong();
+			try {
+				new CSongReplay(tja, 0);
+				Assert.False(Directory.Exists(Path.Combine(dir, "Replay")));
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
+		public void FailedSave_LeavesNoFile() {
+			var (dir, tja) = NewSong();
+			try {
+				Save(tja, null, 3, 100, 0, -1, 1);   // no chart id: the write stops partway
+				Assert.Empty(Directory.GetFiles(Path.Combine(dir, "Replay"), "*.optkr"));
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
 		public void SaveThenParseHeader_RoundTripsMetadata() {
 			var (dir, tja) = NewSong();
 			try {
