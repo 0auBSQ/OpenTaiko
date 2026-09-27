@@ -2,6 +2,8 @@
 -- PillClouds: shared drawing for the pill_clouds transitions.
 -- Four tilted pills rise over the screen, then a cloud bank rises over them.
 
+local TA = require("TransitionArt")
+
 local PC = {}
 PC.__index = PC
 
@@ -50,10 +52,16 @@ end
 
 -- cols: four { r, g, b } pill colours (0-1), or nil for clouds only
 function PC.new(cols)
-	return setmetatable({ cols = cols, clock = 0, phase = nil }, PC)
+	return setmetatable({ cols = cols, clock = 0, phase = nil, wait = TA.new() }, PC)
 end
 
 function PC:load()
+	self.sndWind = SOUND:CreateSFX("Sounds/Wind.ogg")
+end
+
+-- the textures live only during a trip (Lib/TransitionArt)
+function PC:loadTextures()
+	if self.edge ~= nil then return end
 	if self.cols then
 		self.pill = TEXTURE:CreateTexture("Textures/Pill.png")
 		self.shine = TEXTURE:CreateTexture("Textures/PillShine.png")
@@ -61,15 +69,19 @@ function PC:load()
 	self.edge = TEXTURE:CreateTexture("Textures/CloudEdge.png")
 	self.edge:SetWrapMode("Repeat")
 	self.body = TEXTURE:CreateTexture("Textures/CloudBody.png")
-	self.sndWind = SOUND:CreateSFX("Sounds/Wind.ogg")
+end
+
+function PC:freeTextures()
+	for _, k in ipairs({ "pill", "shine", "edge", "body" }) do
+		if self[k] then self[k]:Dispose(); self[k] = nil end
+	end
 end
 
 local function play(snd) if snd then snd:Play() end end
 
 function PC:dispose()
-	for _, k in ipairs({ "pill", "shine", "edge", "body", "sndWind" }) do
-		if self[k] then self[k]:Dispose(); self[k] = nil end
-	end
+	self:freeTextures()
+	if self.sndWind then self.sndWind:Dispose(); self.sndWind = nil end
 end
 
 function PC:drawPills(along)
@@ -129,7 +141,9 @@ function PC:fadeOut(t)
 	self.clock = self.clock + frameDt()
 	if self.phase ~= "out" then                                  -- a new trip
 		self.phase, self.cloudsIn = "out", false
+		self:loadTextures(); self.wait:reset()
 	end
+	t = self.wait:progress(t, self.pill, self.shine, self.edge, self.body)
 	local k = t
 	if self.cols then
 		local along = t < ARRIVE and PILL_START * (1 - t / ARRIVE) ^ 3 or CREEP * (t - ARRIVE) / (1 - ARRIVE)
@@ -152,6 +166,7 @@ function PC:fadeIn(t)
 	self.phase = "in"
 	self.clock = self.clock + frameDt()
 	self:drawBack(BACK_START + (BACK_END - BACK_START) * easeInOut(t))
+	if t >= 1 then self:freeTextures() end   -- the trip is over
 end
 
 return PC

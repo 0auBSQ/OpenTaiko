@@ -749,6 +749,20 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 		return resized;
 	}
 
+	// The render-scale shrink MakeTexture(SKBitmap) does, done ahead by a decode worker so the render thread only
+	// uploads. Keeps the bitmap's own pixel format (straight alpha stays straight: no conversion at upload).
+	internal static SKBitmap tApplyRenderScale(SKBitmap bmp) {
+		float rs = Game.RenderScale;
+		if (bmp == null || rs >= 0.999f) return bmp;
+		int dw = Math.Max(1, (int)Math.Round(bmp.Width * rs));
+		int dh = Math.Max(1, (int)Math.Round(bmp.Height * rs));
+		if (dw >= bmp.Width && dh >= bmp.Height) return bmp;
+		var resized = bmp.Resize(bmp.Info.WithSize(dw, dh), SKFilterQuality.Medium);
+		if (resized == null) return bmp;
+		bmp.Dispose();
+		return resized;
+	}
+
 	// The size of a queued texture before its upload: read the file header (cheap, no pixel decode) and apply the
 	// maxDimension shrink the upload applies, so the size does not change when the pixels arrive. An unreadable
 	// file gets the 10x10 placeholder size a failed upload ends with.
@@ -1014,7 +1028,11 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 	public static long LiveBytes;
 	private long _countedBytes;
 
-	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) {
+	public void MakeTexture(SKBitmap bitmap, bool bBlackTransparent) => MakeTexture(bitmap, bBlackTransparent, 0, 0);
+
+	// scaledFromW/H > 0: the bitmap was already shrunk for the render scale (tApplyRenderScale) from an image of
+	// that size, which stays the texture's size
+	internal void MakeTexture(SKBitmap bitmap, bool bBlackTransparent, int scaledFromW, int scaledFromH) {
 		try {
 			if (bitmap == null)
 				bitmap = new SKBitmap(10, 10);
@@ -1026,7 +1044,8 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			}
 			// the LOGICAL size is taken before the GL size limit: like render-scale below, a limited texture only
 			// stores fewer pixels, so its size (and every source rect in image pixels) stays the image's own
-			int logicalW = bitmap.Width, logicalH = bitmap.Height;
+			bool preScaled = scaledFromW > 0 && scaledFromH > 0;
+			int logicalW = preScaled ? scaledFromW : bitmap.Width, logicalH = preScaled ? scaledFromH : bitmap.Height;
 			SKBitmap scaledBitmap = null;
 			if (bitmap.Width > _maxTextureSize || bitmap.Height > _maxTextureSize) {
 				float scale = Math.Min((float)_maxTextureSize / bitmap.Width, (float)_maxTextureSize / bitmap.Height);
@@ -1053,11 +1072,12 @@ public partial class CTexture : IDisposable {   // streaming subsystem is in CTe
 			SKBitmap glBitmap = bitmap;
 			bool ownGlBitmap = false;
 			float rs = Game.RenderScale;
-			if (rs < 0.999f) {
+			if (rs < 0.999f && !preScaled) {
 				int dw = Math.Max(1, (int)Math.Round(origW * rs));
 				int dh = Math.Max(1, (int)Math.Round(origH * rs));
 				if (dw < origW || dh < origH) {
-					var resized = bitmap.Resize(new SKImageInfo(dw, dh), SKFilterQuality.Medium);
+					// the source's own format: a straight-alpha bitmap then uploads without a conversion pass
+					var resized = bitmap.Resize(bitmap.Info.WithSize(dw, dh), SKFilterQuality.Medium);
 					if (resized != null) { glBitmap = resized; ownGlBitmap = true; }
 				}
 			}

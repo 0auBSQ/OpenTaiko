@@ -3,6 +3,7 @@
 -- The lobby's name appears letter by letter, then its menu fades in.
 
 local Sky = require("SpaceSky")
+local TA = require("TransitionArt")
 
 local ARRIVE = 1.2                   -- the letters appear within this time
 local POP = 0.2                      -- one letter's pop-in, in seconds
@@ -45,6 +46,24 @@ local col_white, col_shadow, col_clear = nil, nil, nil
 local letters = {}                   -- { ch, x, y, k, font, t0 } in appearance order
 local fired, whooshed = 0, false
 local lastPhase = nil
+local wait = TA.new()
+
+-- the textures live only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_air ~= nil then return end
+	tx_air = TEXTURE:CreateTexture("Textures/Atmosphere.png")
+	if tx_air.Height > 0 then air_h = tx_air.Height end   -- the band's height sets the slide
+	tx_sparkle = TEXTURE:CreateTexture("Textures/Sparkle.png")
+	tx_glow = TEXTURE:CreateTexture("Textures/Glow.png")
+	tx_sparkle:SetBlendMode("add")
+	tx_glow:SetBlendMode("add")
+end
+
+local function freeTextures()
+	if tx_air then tx_air:Dispose(); tx_air = nil end
+	if tx_sparkle then tx_sparkle:Dispose(); tx_sparkle = nil end
+	if tx_glow then tx_glow:Dispose(); tx_glow = nil end
+end
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
@@ -193,7 +212,9 @@ function fadeOut(t)
 		Sky.create(SKY_SPRITES)                    -- the lobby normally built it at boot
 		Sky.claim("transition")
 		layout()
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_air)
 	if not whooshed then
 		whooshed = true
 		if snd_up then snd_up:Play() end
@@ -225,17 +246,10 @@ function fadeIn(t)
 	else
 		drawSky(FULL, 1 - easeInOut(clamp01((now - TITLE_SECONDS) / REVEAL_SECONDS)))
 	end
-	if t >= 1 then Sky.release() end
+	if t >= 1 then Sky.release(); freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- sync, since Height sets the slide
-	tx_air = TEXTURE:CreateTextureSync("Textures/Atmosphere.png")
-	if tx_air.Height and tx_air.Height > 0 then air_h = tx_air.Height end
-	tx_sparkle = TEXTURE:CreateTexture("Textures/Sparkle.png")
-	tx_glow = TEXTURE:CreateTexture("Textures/Glow.png")
-	tx_sparkle:SetBlendMode("add")
-	tx_glow:SetBlendMode("add")
 	fill = CANVAS:CreateCanvas(2, 2); fill:Clear(255, 255, 255, 255); fill:Upload()
 	snd_up = SOUND:CreateSFX("Sounds/Ascend.ogg")
 	for i = 1, 4 do snd_sparkles[i] = SOUND:CreateSFX("Sounds/Sparkle.ogg") end
@@ -248,9 +262,7 @@ end
 
 function onDestroy()
 	Sky.forget()
-	if tx_air then tx_air:Dispose(); tx_air = nil end
-	if tx_sparkle then tx_sparkle:Dispose(); tx_sparkle = nil end
-	if tx_glow then tx_glow:Dispose(); tx_glow = nil end
+	freeTextures()
 	if fill then fill:Dispose(); fill = nil end
 	if snd_up then snd_up:Dispose(); snd_up = nil end
 	for _, s in ipairs(snd_sparkles) do s:Dispose() end

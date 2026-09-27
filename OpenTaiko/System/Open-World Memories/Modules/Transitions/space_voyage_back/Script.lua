@@ -19,6 +19,17 @@ local snd_down = nil
 local whooshed = false
 local lastPhase = nil
 
+-- the texture lives only during a trip; the fade-out does not show it, so nothing waits for it
+local function loadTextures()
+	if tx_air ~= nil then return end
+	tx_air = TEXTURE:CreateTexture("Textures/Atmosphere.png")
+	if tx_air.Height > 0 then air_h = tx_air.Height end   -- the band's height sets the slide
+end
+
+local function freeTextures()
+	if tx_air then tx_air:Dispose(); tx_air = nil end
+end
+
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
 
 local function frameDt()
@@ -61,6 +72,7 @@ function fadeOut(t)
 		lastPhase = "out"
 		whooshed = false
 		Sky.claim("transition")
+		loadTextures()
 	end
 	drive(0)
 	drawSky(FULL, easeInOut(t))                    -- the sky fades in over the menu
@@ -81,20 +93,17 @@ function fadeIn(t)
 	local e = easeInOut(t)
 	drive(e)
 	drawSky(FULL - (SCREEN_H + air_h) * e, 1)
-	if t >= 1 then Sky.release() end
+	if t >= 1 then Sky.release(); freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- sync, since Height sets the slide
-	tx_air = TEXTURE:CreateTextureSync("Textures/Atmosphere.png")
-	if tx_air.Height and tx_air.Height > 0 then air_h = tx_air.Height end
 	fill = CANVAS:CreateCanvas(2, 2); fill:Clear(255, 255, 255, 255); fill:Upload()
 	snd_down = SOUND:CreateSFX("Sounds/Descend.ogg")
 end
 
 function onDestroy()
 	Sky.forget()
-	if tx_air then tx_air:Dispose(); tx_air = nil end
+	freeTextures()
 	if fill then fill:Dispose(); fill = nil end
 	if snd_down then snd_down:Dispose(); snd_down = nil end
 end

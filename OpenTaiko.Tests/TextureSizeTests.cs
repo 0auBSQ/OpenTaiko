@@ -107,6 +107,25 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
+		public void RenderScaleShrinkInTheWorkerKeepsTheImageSize() {
+			// below render scale 1 the decode worker stores fewer pixels, but the size it publishes is the image's own
+			string path = Png("scaled.png", 300, 150);
+			int before = Game.AsyncActions.Count;
+			float prevScale = Game.RenderScale;
+			Game.RenderScale = 2f / 3f;
+			try {
+				var tex = Queue(path);
+				var sw = Stopwatch.StartNew();
+				while (Game.AsyncActions.Count <= before && sw.ElapsedMilliseconds < 5000) Thread.Sleep(10);
+				Assert.True(Game.AsyncActions.Count > before, "the decode worker never queued the upload");
+				Assert.Equal(300, tex.szImageSize.Width);
+				Assert.Equal(150, tex.szImageSize.Height);
+			} finally {
+				Game.RenderScale = prevScale;
+			}
+		}
+
+		[Fact]
 		public void LoadPhaseWaitsForTheUploadNotTheDecode() {
 			string path = Png("c.png", 64, 64);
 			int before = Game.AsyncActions.Count;

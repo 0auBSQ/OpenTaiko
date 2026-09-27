@@ -3,6 +3,8 @@
 -- lights dim, two spotlights circle in and merge (drum roll), the show's name falls in letter by letter, each
 -- letter hops in turn while confetti rains (applause), and the curtain opens. The way back is nokon_curtain_back.
 
+local TA = require("TransitionArt")
+
 -- the show, in seconds from the start of the fade-in (fixed: the fade-in length is read once)
 local DIM_IN = 0.3                       -- the lights go down
 local SPOT_AT, SPOT_END = 0.10, 1.70     -- the spotlights circle in; they merge at SPOT_END (the drum roll's crash)
@@ -42,6 +44,7 @@ local font, col_ink, col_edge, col_shadow = nil, nil, nil, nil
 local nudge = 0
 
 local lastPhase = nil
+local wait = TA.new()
 local played = {}
 local letters = {}                       -- { ch, x, y }
 local confetti = {}
@@ -49,6 +52,21 @@ local confetti = {}
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeOut(x) return 1 - (1 - x) ^ 3 end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
+
+-- the textures live only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_closed ~= nil then return end
+	tx_closed = TEXTURE:CreateTexture("Textures/Curtain.jpg")
+	tx_open = TEXTURE:CreateTexture("Textures/Curtain_Open.png")
+	tx_spot = TEXTURE:CreateTexture("Textures/Spot.png")
+	tx_confetti = TEXTURE:CreateTexture("Textures/Confetti.png")
+	tx_px = TEXTURE:CreateTexture("Textures/Pixel.png")
+end
+
+local function freeTextures()
+	for _, tx in pairs({ tx_closed, tx_open, tx_spot, tx_confetti, tx_px }) do tx:Dispose() end
+	tx_closed, tx_open, tx_spot, tx_confetti, tx_px = nil, nil, nil, nil, nil
+end
 
 local function once(key, snd)
 	if played[key] then return end
@@ -232,7 +250,9 @@ function fadeOut(t)
 		played = {}
 		layout()
 		makeConfetti()
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_closed, tx_open)
 	once("close", snd_curtain)
 	draw_curtain(1.0 - t)
 end
@@ -256,15 +276,10 @@ function fadeIn(t)
 	drawLights(now, fade)
 	drawLetters(now, fade)
 	drawConfetti(now - HOP_AT, 1 - clamp01((now - (FADE_IN_SECONDS - 0.4)) / 0.4))   -- gone before the stage takes over
+	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- Sync: Curtain_Open is drawn split, so it must be uploaded before the first frame.
-	tx_closed = TEXTURE:CreateTextureSync("Textures/Curtain.png")
-	tx_open   = TEXTURE:CreateTextureSync("Textures/Curtain_Open.png")
-	tx_spot = TEXTURE:CreateTexture("Textures/Spot.png")
-	tx_confetti = TEXTURE:CreateTexture("Textures/Confetti.png")
-	tx_px = TEXTURE:CreateTexture("Textures/Pixel.png")
 	snd_curtain = SOUND:CreateSFX("Sounds/CurtainOpen.ogg")
 	snd_drum = SOUND:CreateSFX("Sounds/DrumRoll.ogg")
 	snd_applause = SOUND:CreateSFX("Sounds/Applause.ogg")
@@ -276,8 +291,7 @@ function onStart()
 end
 
 function onDestroy()
-	for _, t in ipairs({ tx_closed, tx_open, tx_spot, tx_confetti, tx_px }) do t:Dispose() end
-	tx_closed, tx_open, tx_spot, tx_confetti, tx_px = nil, nil, nil, nil, nil
+	freeTextures()
 	for _, s in ipairs({ snd_curtain, snd_drum, snd_applause }) do s:Dispose() end
 	snd_curtain, snd_drum, snd_applause = nil, nil, nil
 	if font then font:Dispose(); font = nil end

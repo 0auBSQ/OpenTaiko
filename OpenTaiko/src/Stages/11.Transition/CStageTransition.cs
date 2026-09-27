@@ -80,8 +80,8 @@ internal sealed class SongLoadStep : IStepLoad {
 //   FadeIn  — render the loaded target under fadeIn(t)                 (t 0→1)
 // The target's music waits for Finish, and it gets no input during FadeIn (HoldsNewBgm, BlocksInput);
 // neither applies to the song load into gameplay.
-// On finish Draw() returns non-zero and the main loop swaps to the (already-mounted) Target — or, if the load was
-// cancelled (ESC), to CancelTarget.
+// A cancelled load (ESC) mounts the cancel target and reveals it with the same FadeIn, so every trip ends with
+// fadeIn(1). On finish Draw() returns non-zero and the main loop swaps to the (already-mounted) Target.
 internal class CStageTransition : CStage {
 	private enum Phase { Idle, FadeOut, Load, FadeIn }
 	private Phase _phase = Phase.Idle;
@@ -222,11 +222,24 @@ internal class CStageTransition : CStage {
 				bool more = _loadDone == 0 && _session!.Step();
 				if (_session!.Canceled) {
 					_session.Cancel();
-					Canceled = true;
-					CancelTarget = _cancelTarget;
-					_phase = Phase.Idle;
+					_session = null;
 					CLoadingProgress.End();
-					return 1;   // main loop sends the player to CancelTarget
+					OpenTaiko.tDropCanceledSongLoad();
+					if (_cancelTarget != null) {
+						// back where the player came from, revealed like any arrival (its music waits for the end)
+						OpenTaiko.app.MountActivity(_cancelTarget);
+						Target = _cancelTarget;
+						_cancelTarget = null;
+						_revealsGameplay = false;
+						OpenTaiko.CollectInBackground();   // the dropped chart, while the loading screen still covers
+						_phase = Phase.FadeIn;
+						_phaseStart = Stopwatch.GetTimestamp();
+						_fadeInFirstFrame = true;
+						return 0;
+					}
+					Canceled = true;
+					_phase = Phase.Idle;
+					return 1;   // nowhere to go back to: the main loop picks the last song select
 				}
 				if (_loaderDrivesBar) {
 					// The loader (CStageSongLoading) Reports the raw target; draw the EASED value.

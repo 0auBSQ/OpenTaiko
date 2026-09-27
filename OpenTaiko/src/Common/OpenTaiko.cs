@@ -482,6 +482,17 @@ internal class OpenTaiko : Game {
 		this.ChangeStage(Stage, traceMessage);
 	}
 
+	// ESC during a song load: drop the half-loaded chart (the loader already tore the game screen down)
+	internal static void tDropCanceledSongLoad() {
+		OpenTaiko.Pad.detectedDevice.Clear();
+		if (TJA != null) {
+			TJA.DeActivate();
+			TJA.ReleaseManagedResource();
+			TJA.ReleaseUnmanagedResource();
+		}
+		SongMount.bIsAfterSongJump = false;
+	}
+
 	// Enter the song load. With a transition module available, run it as ONE transition (fade the outgoing
 	// stage out → drive CStageSongLoading [its screen + bar] → fade the loaded game screen in), so there's no
 	// abrupt cut. Otherwise fall back to the legacy song-loading stage. `outgoing` is the still-mounted stage
@@ -813,20 +824,13 @@ internal class OpenTaiko : Game {
 						break;
 
 					case CStage.EStage.Transition:
-						// Transition finished. Normal: take over the target it already mounted (rPreviousStage
-						// stays the stage we came from). Cancelled song load (ESC): tear down the chart + go back
-						// to song select.
+						// Transition finished: take over the target it already mounted (rPreviousStage stays the stage
+						// we came from). A cancelled song load (ESC) reveals its cancel target the same way; only when
+						// it had none does it end here, with the chart already dropped, and go back to song select.
 						if (this.nDrawLoopReturnValue != 0) {
 							if (stageTransition.Canceled) {
 								CStage? cancelTo = stageTransition.CancelTarget;
 								stageTransition.Finish();
-								OpenTaiko.Pad.detectedDevice.Clear();
-								if (TJA != null) {
-									TJA.DeActivate();
-									TJA.ReleaseManagedResource();
-									TJA.ReleaseUnmanagedResource();
-								}
-								SongMount.bIsAfterSongJump = false;
 								UnmountAndChangeStage(cancelTo ?? latestSongSelect, "Return to song select menu");
 								this.tExecuteGarbageCollection();
 							} else {

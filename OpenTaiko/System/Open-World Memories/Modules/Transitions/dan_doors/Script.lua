@@ -2,6 +2,8 @@
 -- dan_doors: the dojo's shoji doors from the title into the Fox Dojo, with the dojo's name crossing them.
 -- The shared string "dan_doors_title" holds the name's duration, so dan_select's boards wait for it.
 
+local TA = require("TransitionArt")
+
 local PASS = 2.4             -- one line's crossing, in seconds
 local STAGGER = 0.15         -- the lower line follows the upper one by this much
 local TITLE_SECONDS = PASS + STAGGER + 0.1
@@ -27,6 +29,16 @@ local nudge = 0
 local lines = {}             -- { text, w, y, dir, t0, swished }
 local closed, opened, swishes = false, false, 0
 local lastPhase = nil
+local wait = TA.new()
+
+-- the texture lives only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_door == nil then tx_door = TEXTURE:CreateTexture("Textures/Door.jpg") end
+end
+
+local function freeTextures()
+	if tx_door ~= nil then tx_door:Dispose(); tx_door = nil end
+end
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
@@ -112,7 +124,9 @@ function fadeOut(t)
 		closed, opened, swishes = false, false, 0
 		layout()
 		SHARED:SetSharedString("dan_doors_title", tostring(TITLE_SECONDS))
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_door)
 	if not closed then
 		closed = true
 		if snd_close then snd_close:Play() end
@@ -139,11 +153,10 @@ function fadeIn(t)
 		if snd_open then snd_open:Play() end
 	end
 	draw_doors(easeInOut(clamp01((now - TITLE_SECONDS) / OPEN_SECONDS)))
+	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- Sync: the door is drawn split (its Width is read), so it must be fully uploaded, not a blank async stub.
-	tx_door = TEXTURE:CreateTextureSync("Textures/Door.png")
 	snd_close = SOUND:CreateSFX("Sounds/DoorsClose.ogg")
 	snd_open = SOUND:CreateSFX("Sounds/DoorsOpen.ogg")
 	for i = 1, 2 do snd_swish[i] = SOUND:CreateSFX("Sounds/Swish.ogg") end
@@ -155,7 +168,7 @@ function onStart()
 end
 
 function onDestroy()
-	if tx_door ~= nil then tx_door:Dispose() ; tx_door = nil end
+	freeTextures()
 	if snd_close then snd_close:Dispose(); snd_close = nil end
 	if snd_open then snd_open:Dispose(); snd_open = nil end
 	for _, s in ipairs(snd_swish) do s:Dispose() end

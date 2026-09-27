@@ -130,17 +130,22 @@ public partial class CTexture {
 					if (!phase.Pending.TryDequeue(out var item)) break;
 					if (item.tex.bDisposeCompleteDone) { CompleteItem(item); continue; }   // disposed before decode → drop
 					SKBitmap? bmp;
+					int imageW = 0, imageH = 0;
 					try {
 						bmp = tClampToMaxDimension(tDecodeForUpload(item.path), item.maxDim);
+						if (bmp != null) {
+							imageW = bmp.Width; imageH = bmp.Height;
+							bmp = tApplyRenderScale(bmp);   // here, not in the render thread's upload
+						}
 					} catch {
 						bmp = null;   // the upload below still completes the item, so the phase can finish
 					}
 					if (bmp != null) {
 						Interlocked.Add(ref _readyBytes, bmp.ByteCount);
-						item.tex.tPublishPendingSize(bmp.Width, bmp.Height);   // later size reads need no file read
+						item.tex.tPublishPendingSize(imageW, imageH);   // later size reads need no file read
 					}
 					var captured = item;
-					Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp));
+					Game.AsyncActions.Enqueue(() => UploadOne(captured, bmp, imageW, imageH));
 				}
 			}
 			while (_phaseOlds.TryDequeue(out var phase)) {
@@ -161,13 +166,13 @@ public partial class CTexture {
 
 	// Render-thread GL upload (drained from Game.AsyncActions). Skips textures disposed since queueing (e.g. an
 	// ESC-cancelled song load tore down the half-loaded game screen).
-	private static void UploadOne(StreamItem item, SKBitmap? bmp) {
+	private static void UploadOne(StreamItem item, SKBitmap? bmp, int imageW, int imageH) {
 		// taken first: a failed upload disposes the texture, and what waited for it must still hear about it
 		Action? after = item.tex.bDisposeCompleteDone ? null : item.tex.tTakeUploadCallbacks();
 		try {
 			if (!item.tex.bDisposeCompleteDone) {
 				if (bmp != null) {
-					item.tex.MakeTexture(bmp, item.black);
+					item.tex.MakeTexture(bmp, item.black, imageW, imageH);
 				} else {
 					// failed decode: a clear 10x10 placeholder like a sync load, so a finished load never leaves Width 0;
 					// a size already read from the header stays (the placeholder only draws nothing at it)

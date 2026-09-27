@@ -1,6 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
 -- dan_doors_back: the dojo's shoji doors on every trip except the title into the Fox Dojo.
 
+local TA = require("TransitionArt")
+
 FADE_OUT_SECONDS = 0.7   -- doors closing
 FADE_IN_SECONDS  = 0.7   -- doors opening
 
@@ -9,6 +11,16 @@ local tx_door = nil
 local snd_close, snd_open = nil, nil
 local closed, opened = false, false
 local lastPhase = nil
+local wait = TA.new()
+
+-- the texture lives only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_door == nil then tx_door = TEXTURE:CreateTexture("Textures/Door.jpg") end
+end
+
+local function freeTextures()
+	if tx_door ~= nil then tx_door:Dispose(); tx_door = nil end
+end
 
 -- openness: 0 = shut, 1 = off screen
 local function draw_doors(openness)
@@ -27,7 +39,9 @@ function fadeOut(t)
 	if lastPhase ~= "out" then                -- a new trip
 		lastPhase = "out"
 		closed, opened = false, false
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_door)
 	if not closed then
 		closed = true
 		if snd_close then snd_close:Play() end
@@ -49,17 +63,16 @@ function fadeIn(t)
 		if snd_open then snd_open:Play() end
 	end
 	draw_doors(t)
+	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- sync, since Width is read to split the door
-	tx_door = TEXTURE:CreateTextureSync("Textures/Door.png")
 	snd_close = SOUND:CreateSFX("Sounds/DoorsClose.ogg")
 	snd_open = SOUND:CreateSFX("Sounds/DoorsOpen.ogg")
 end
 
 function onDestroy()
-	if tx_door ~= nil then tx_door:Dispose() ; tx_door = nil end
+	freeTextures()
 	if snd_close then snd_close:Dispose(); snd_close = nil end
 	if snd_open then snd_open:Dispose(); snd_open = nil end
 end

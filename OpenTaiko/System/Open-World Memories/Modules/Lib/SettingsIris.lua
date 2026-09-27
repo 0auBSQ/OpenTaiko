@@ -3,6 +3,8 @@
 -- The settings screen: gray, with connected L lines scrolling left and the crossed tools in the middle.
 -- It opens and closes as a circle at the screen centre.
 
+local TA = require("TransitionArt")
+
 local SI = {}
 SI.__index = SI
 
@@ -29,20 +31,30 @@ end
 
 -- way: "in" (title -> settings) or "back"
 function SI.new(way)
-	return setmetatable({ way = way, clock = 0, lastPhase = nil }, SI)
+	return setmetatable({ way = way, clock = 0, lastPhase = nil, wait = TA.new() }, SI)
 end
 
 function SI:load()
-	self.pattern = TEXTURE:CreateTexture("Textures/Pattern.png")
-	self.tools = TEXTURE:CreateTexture("Textures/Tools.png")
-	self.ring = TEXTURE:CreateTexture("Textures/Ring.png")
 	self.sndZoom = SOUND:CreateSFX("Sounds/Zoom.ogg")
 end
 
-function SI:dispose()
-	for _, k in ipairs({ "pattern", "tools", "ring", "sndZoom" }) do
+-- the textures live only during a trip (Lib/TransitionArt)
+function SI:loadTextures()
+	if self.pattern ~= nil then return end
+	self.pattern = TEXTURE:CreateTexture("Textures/Pattern.png")
+	self.tools = TEXTURE:CreateTexture("Textures/Tools.png")
+	self.ring = TEXTURE:CreateTexture("Textures/Ring.png")
+end
+
+function SI:freeTextures()
+	for _, k in ipairs({ "pattern", "tools", "ring" }) do
 		if self[k] then self[k]:Dispose(); self[k] = nil end
 	end
+end
+
+function SI:dispose()
+	self:freeTextures()
+	if self.sndZoom then self.sndZoom:Dispose(); self.sndZoom = nil end
 end
 
 -- the screen inside one clip rectangle (the tools only where the rectangle meets them)
@@ -145,7 +157,9 @@ end
 -- way in: the screen grows as a circle over the title / way back: a hole in it shrinks over the settings
 function SI:fadeOut(t)
 	self.clock = self.clock + frameDt()
+	if self.lastPhase ~= "out" then self:loadTextures(); self.wait:reset() end   -- a new trip
 	self:enter("out")
+	t = self.wait:progress(t, self.pattern, self.tools, self.ring)
 	local e = ease(clamp01(t))
 	if self.way == "in" then self:drawDisc(R_FULL * e, 0.6 + 0.4 * e)
 	else self:drawHole(R_FULL * (1 - e), 1) end
@@ -165,6 +179,7 @@ function SI:fadeIn(t)
 	local e = ease(clamp01(t))
 	if self.way == "in" then self:drawHole(R_FULL * e, 1)
 	else self:drawDisc(R_FULL * (1 - e), 1 - 0.4 * e) end
+	if t >= 1 then self:freeTextures() end   -- the trip is over
 end
 
 return SI

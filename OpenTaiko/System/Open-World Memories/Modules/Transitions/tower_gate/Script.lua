@@ -2,6 +2,8 @@
 -- tower_gate: the stone gate from the title into Survival Mode.
 -- The title drops onto the shut gate letter by letter, then the gate opens.
 
+local TA = require("TransitionArt")
+
 local SHUT_AT = 0.68             -- part of the fade-out when the halves meet
 local ARRIVE = 2.0               -- the letters start falling within this time
 local FALL = 0.26                -- one letter's fall, in seconds
@@ -33,6 +35,22 @@ local nudge = 0
 local letters = {}               -- { ch, x, y, k, t0 } in arrival order
 local slid, slammed, opened, fired = false, false, false, 0
 local lastPhase = nil
+local wait = TA.new()
+
+-- the textures live only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_left == nil then
+		tx_left = TEXTURE:CreateTexture("Textures/GateLeft.jpg")
+		tx_right = TEXTURE:CreateTexture("Textures/GateRight.jpg")
+		tx_dust = TEXTURE:CreateTexture("Textures/Dust.png")
+	end
+end
+
+local function freeTextures()
+	if tx_left then tx_left:Dispose(); tx_left = nil end
+	if tx_right then tx_right:Dispose(); tx_right = nil end
+	if tx_dust then tx_dust:Dispose(); tx_dust = nil end
+end
 
 local function clamp01(x) return x < 0 and 0 or (x > 1 and 1 or x) end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
@@ -145,7 +163,9 @@ function fadeOut(t)
 		lastPhase = "out"
 		slid, slammed, opened, fired = false, false, false, 0
 		layout()
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_left, tx_right, tx_dust)
 	if not slid then
 		slid = true
 		if snd_slide then snd_slide:Play() end
@@ -184,13 +204,10 @@ function fadeIn(t)
 	local k = clamp01((now - TITLE_SECONDS) / OPEN_SECONDS)
 	drawGate(easeInOut(k), 0, 0)
 	drawDust(clamp01(k / 0.45), 0.6)
+	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	-- sync, since Width places the halves
-	tx_left = TEXTURE:CreateTextureSync("Textures/GateLeft.png")
-	tx_right = TEXTURE:CreateTextureSync("Textures/GateRight.png")
-	tx_dust = TEXTURE:CreateTexture("Textures/Dust.png")
 	snd_slide = SOUND:CreateSFX("Sounds/GateSlide.ogg")
 	snd_slam = SOUND:CreateSFX("Sounds/GateSlam.ogg")
 	snd_open = SOUND:CreateSFX("Sounds/GateOpen.ogg")
@@ -203,9 +220,7 @@ function onStart()
 end
 
 function onDestroy()
-	if tx_left then tx_left:Dispose(); tx_left = nil end
-	if tx_right then tx_right:Dispose(); tx_right = nil end
-	if tx_dust then tx_dust:Dispose(); tx_dust = nil end
+	freeTextures()
 	if snd_slide then snd_slide:Dispose(); snd_slide = nil end
 	if snd_slam then snd_slam:Dispose(); snd_slam = nil end
 	if snd_open then snd_open:Dispose(); snd_open = nil end

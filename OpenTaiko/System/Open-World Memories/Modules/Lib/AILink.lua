@@ -3,6 +3,8 @@
 -- A chip lights up on a dark screen, traces run from its pins to the screen edges,
 -- then the status box at the bottom types its line.
 
+local TA = require("TransitionArt")
+
 local AI = {}
 AI.__index = AI
 
@@ -108,14 +110,10 @@ end
 
 -- key, fallback: the skin string of the status line and its English text
 function AI.new(key, fallback)
-	return setmetatable({ key = key, fallback = fallback, clock = 0, phase = nil }, AI)
+	return setmetatable({ key = key, fallback = fallback, clock = 0, phase = nil, wait = TA.new() }, AI)
 end
 
 function AI:load()
-	self.px = TEXTURE:CreateTexture("Textures/Pixel.png")
-	self.line = TEXTURE:CreateTexture("Textures/Line.png")
-	self.dot = TEXTURE:CreateTexture("Textures/Dot.png")
-	self.ring = TEXTURE:CreateTexture("Textures/Ring.png")
 	self.sndWires = SOUND:CreateSFX("Sounds/Wires.ogg")
 	self.sndBeep = SOUND:CreateSFX("Sounds/Beep.ogg")
 	self.sndTyping = SOUND:CreateSFX("Sounds/Typing.ogg")
@@ -125,8 +123,24 @@ function AI:load()
 	self.colClear = COLOR:CreateColorFromRGBA(0, 0, 0, 0)
 end
 
+-- the textures live only during a trip (Lib/TransitionArt)
+function AI:loadTextures()
+	if self.px ~= nil then return end
+	self.px = TEXTURE:CreateTexture("Textures/Pixel.png")
+	self.line = TEXTURE:CreateTexture("Textures/Line.png")
+	self.dot = TEXTURE:CreateTexture("Textures/Dot.png")
+	self.ring = TEXTURE:CreateTexture("Textures/Ring.png")
+end
+
+function AI:freeTextures()
+	for _, k in ipairs({ "px", "line", "dot", "ring" }) do
+		if self[k] then self[k]:Dispose(); self[k] = nil end
+	end
+end
+
 function AI:dispose()
-	for _, k in ipairs({ "px", "line", "dot", "ring", "sndWires", "sndBeep", "sndTyping", "font" }) do
+	self:freeTextures()
+	for _, k in ipairs({ "sndWires", "sndBeep", "sndTyping", "font" }) do
 		if self[k] then self[k]:Dispose(); self[k] = nil end
 	end
 end
@@ -257,7 +271,9 @@ function AI:fadeOut(t)
 		self.phase, self.beeped, self.typed = "out", false, false
 		self:status()
 		play(self.sndWires)
+		self:loadTextures(); self.wait:reset()
 	end
+	t = self.wait:progress(t, self.px, self.line, self.dot, self.ring)
 	local k = clamp01((t - BOX_AT) / BOX_OPEN)
 	if k > 0 and not self.beeped then self.beeped = true; play(self.sndBeep) end
 	if t >= TYPE_AT and not self.typed then self.typed = true; play(self.sndTyping) end
@@ -284,6 +300,7 @@ function AI:fadeIn(t)
 	self:drawTraces(1, a, true)
 	self:drawChip(1, a)
 	self:drawBox(1, #(self.chars or {}), a)
+	if t >= 1 then self:freeTextures() end   -- the trip is over
 end
 
 return AI

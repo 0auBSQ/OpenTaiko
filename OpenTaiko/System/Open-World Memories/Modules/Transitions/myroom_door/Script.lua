@@ -1,6 +1,8 @@
 ---@diagnostic disable: undefined-global, undefined-field, lowercase-global, need-check-nil
 -- myroom_door: My Room's door, between the title and My Room both ways.
 
+local TA = require("TransitionArt")
+
 FADE_OUT_SECONDS = 0.8
 FADE_IN_SECONDS  = 0.9
 
@@ -13,6 +15,16 @@ local tx_door = nil
 local snd_close, snd_open = nil, nil
 local slammed, creaked = false, false
 local lastPhase = nil
+local wait = TA.new()
+
+-- the texture lives only during a trip (Lib/TransitionArt)
+local function loadTextures()
+	if tx_door == nil then tx_door = TEXTURE:CreateTexture("Textures/Door.png") end
+end
+
+local function freeTextures()
+	if tx_door then tx_door:Dispose(); tx_door = nil end
+end
 
 local function easeIn(x) return x * x * x end
 local function easeInOut(x) return x < 0.5 and 4 * x * x * x or 1 - (-2 * x + 2) ^ 3 / 2 end
@@ -33,7 +45,9 @@ function fadeOut(t)
 	if lastPhase ~= "out" then                -- a new trip
 		lastPhase = "out"
 		slammed, creaked = false, false
+		loadTextures(); wait:reset()
 	end
+	t = wait:progress(t, tx_door)
 	if t < SLAM_AT then
 		drawDoor(1 - easeIn(t / SLAM_AT), 0, 0)
 		return
@@ -60,16 +74,16 @@ function fadeIn(t)
 		if snd_open then snd_open:Play() end
 	end
 	drawDoor(easeInOut(math.min(1, t / OPEN_SPAN)), 0, 0)
+	if t >= 1 then freeTextures() end   -- the trip is over
 end
 
 function onStart()
-	tx_door = TEXTURE:CreateTextureSync("Textures/Door.png")
 	snd_close = SOUND:CreateSFX("Sounds/DoorClose.ogg")
 	snd_open = SOUND:CreateSFX("Sounds/DoorOpen.ogg")
 end
 
 function onDestroy()
-	if tx_door then tx_door:Dispose(); tx_door = nil end
+	freeTextures()
 	if snd_close then snd_close:Dispose(); snd_close = nil end
 	if snd_open then snd_open:Dispose(); snd_open = nil end
 end
