@@ -28,7 +28,7 @@ local function refreshLayout(state)
 end
 
 function onStart()
-    tx["Assets.png"] = TEXTURE:CreateTextureSync("Assets.png")
+    tx["Assets.png"] = TEXTURE:CreateTexture("Assets.png")
 end
 
 function update(timestamp, state)

@@ -228,17 +228,19 @@ internal class CActImplClearAnimation : CActivity {
 	public override void ReleaseManagedResource() => ReleaseManagedResource(false);
 
 	public void ReleaseManagedResource(bool keepForNowGameMode) {
+		// the tower sounds are kept like the other modes' (one may still be playing over the result), but the
+		// animations are not (about 270 MB decoded): each tower play loads them again inside its song load
 		if (!(keepForNowGameMode && OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Tower)) {
 			this.soundTowerDropout?.tDispose(); this.soundTowerDropout = null;
 			this.soundTowerTopPass?.tDispose(); this.soundTowerTopPass = null;
 			this.soundTowerTopFC?.tDispose(); this.soundTowerTopFC = null;
 			this.soundTowerTopPerfect?.tDispose(); this.soundTowerTopPerfect = null;
-
-			Tower_DropoutScript?.Dispose(); Tower_DropoutScript = null;
-			Tower_TopReached_PassScript?.Dispose(); Tower_TopReached_PassScript = null;
-			Tower_TopReached_FullComboScript?.Dispose(); Tower_TopReached_FullComboScript = null;
-			Tower_TopReached_PerfectScript?.Dispose(); Tower_TopReached_PerfectScript = null;
 		}
+
+		Tower_DropoutScript?.Dispose(); Tower_DropoutScript = null;
+		Tower_TopReached_PassScript?.Dispose(); Tower_TopReached_PassScript = null;
+		Tower_TopReached_FullComboScript?.Dispose(); Tower_TopReached_FullComboScript = null;
+		Tower_TopReached_PerfectScript?.Dispose(); Tower_TopReached_PerfectScript = null;
 
 		if (!(keepForNowGameMode && OpenTaiko.SongMount.nChoosenSongDifficulty[0] == (int)Difficulty.Dan)) {
 			this.soundDanFailed?.tDispose(); this.soundDanFailed = null;

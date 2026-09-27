@@ -13,6 +13,7 @@
 --   local art = TowerArt.load()             -- call it where textures may be created (activate / onStart)
 --   art:resolve(look)                       -- the folder a chart's TowerType lands on (default look otherwise)
 --   art:preload(look)                       -- loads a look's pieces now (behind a cover) rather than at first draw
+--   art:ready(look)                         -- true once all its pieces can be drawn
 --   art:draw(look, x, bottomY, scale, floors, opts)
 --       bottom-centre anchored; opts.color a COLOR tint, opts.opacity 0..1, opts.clipTop / opts.clipBottom
 --       the screen rows outside of which floors are skipped (tall towers)
@@ -21,7 +22,7 @@
 --
 -- Paths are relative to the calling module's folder; TowerArt.load(skinRoot) takes another root than the
 -- default "../../../" of a Stages/, Transitions/ or ROActivities/ module. Textures load asynchronously, so a
--- look drawn right after preload pops in a frame or two later.
+-- look drawn right after preload pops in a frame or two later, unless the caller waits for art:ready(look).
 
 local TowerArt = {}
 TowerArt.__index = TowerArt
@@ -95,6 +96,16 @@ function TowerArt:preload(look)
     }
     self.looks[look] = pieces
     return pieces
+end
+
+-- a missing file counts as ready: it never arrives
+function TowerArt:ready(look)
+    local pieces = self:preload(look)
+    if pieces == nil then return true end
+    local function done(t) return t == nil or not t.Loaded or t.Ready end
+    for _, t in ipairs(pieces.bases) do if not done(t) then return false end end
+    for _, t in ipairs(pieces.decos) do if not done(t) then return false end end
+    return done(pieces.top)
 end
 
 function TowerArt:height(look, scale, floors)

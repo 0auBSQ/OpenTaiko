@@ -109,6 +109,11 @@ end
 function activate(count)
     maxFloor = math.max(1, math.floor(tonumber(count) or 1))
     buildLayout()
+    -- every glyph the HUD shows is baked here, inside the song load, not on its first draw during play
+    fontTitle:Draw(strings.title, -10000, -10000, colText, colOutline, 0)
+    fontLabel:Draw(strings.prefix .. strings.rest, -10000, -10000, colText, colOutline, 0)
+    fontLives:Draw(strings.lives, -10000, -10000, colText, colOutline, 0)
+    fontNumber:Draw("0123456789", -10000, -10000, colText, colOutline, 0)
     readState()
     flip, clock = nil, 0
     active = true

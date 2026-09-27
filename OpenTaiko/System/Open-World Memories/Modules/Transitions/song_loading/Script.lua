@@ -70,6 +70,14 @@ local function draw_bg(alpha)
 	end
 end
 
+-- the tower view loads its panorama and pieces in the background too
+local function tower_view_ready()
+	if tower_view == nil or not tower_view.IsActive then return true end
+	local r = tower_view:Call("ready")
+	local ok, v = pcall(function() return r[0] end)
+	return not (ok and v == false)
+end
+
 local function close_tower_view()
 	if tower_view ~= nil and tower_view.IsActive then tower_view:Deactivate() end
 	tower_view = nil
@@ -248,7 +256,7 @@ end
 function fadeOut(t)
 	if luaPhase ~= "out" then initialized = false; luaPhase = "out"; wait:reset() end   -- fresh transition → re-resolve song
 	if not initialized then setup() end
-	draw_bg(wait:progress(t, tx_bg))   -- cross-fade the loading background IN over the song-select screen (not through black)
+	draw_bg(wait:progress(t, tx_bg, tower_view_ready()))   -- cross-fade the loading background IN over the song-select screen (not through black)
 end
 
 function loading(progress, elapsed)

@@ -17,11 +17,11 @@ function clearOut(player)
 end
 
 function onStart()
-    tx["day.png"] = TEXTURE:CreateTextureSync("day.png")
-    tx["night.png"] = TEXTURE:CreateTextureSync("night.png")
-    tx["1.png"] = TEXTURE:CreateTextureSync("1.png")
-    tx["2.png"] = TEXTURE:CreateTextureSync("2.png")
-    tx["3.png"] = TEXTURE:CreateTextureSync("3.png")
+    tx["day.png"] = TEXTURE:CreateTexture("day.png")
+    tx["night.png"] = TEXTURE:CreateTexture("night.png")
+    tx["1.png"] = TEXTURE:CreateTexture("1.png")
+    tx["2.png"] = TEXTURE:CreateTexture("2.png")
+    tx["3.png"] = TEXTURE:CreateTexture("3.png")
 end
 
 function update(timestamp, state)

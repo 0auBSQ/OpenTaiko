@@ -7,8 +7,9 @@
 --   activate(look, floors)   look = the chart's TowerType (nil for the default look), floors = its floor count
 --   draw(scroll, opacity)    scroll 0 = the ground, 1 = the sky; opacity 0..1
 --   deactivate()
--- The panorama and the pieces load asynchronously at activate, so they pop in a frame or two later; the
--- callers fade the view in from nothing anyway.
+--   ready()                  true once the panorama and the pieces can be drawn (song_loading waits for it)
+-- The panorama and the pieces load asynchronously at activate; the view draws only once all of them are
+-- ready, so it never shows half-built.
 
 local TowerArt = require("TowerArt")
 
@@ -28,6 +29,7 @@ function onStart()
 end
 
 function activate(which, count)
+    deactivate()                            -- a second activation replaces the first
     art = TowerArt.load()
     look = art:resolve(which)
     floors = math.max(0, math.floor(tonumber(count) or 0))
@@ -42,8 +44,13 @@ end
 
 function update() end
 
+function ready()
+    if panorama == nil or art == nil then return true end
+    return (not panorama.Loaded or panorama.Ready) and art:ready(look)
+end
+
 function draw(scroll, opacity)
-    if panorama == nil or art == nil then return end
+    if panorama == nil or art == nil or not ready() then return end
     scroll = math.max(0, math.min(1, tonumber(scroll) or 0))
     opacity = tonumber(opacity) or 1
     local span = math.max(0, panorama.Height - res_h)

@@ -115,17 +115,19 @@ internal class CStageSongLoading : CStage {
 			_wavLoadTask = null;
 			_loadedTjas  = null;
 
-			// On ESC mid-stream the game screen WAS activated (its textures are streaming in), so it must be
-			// torn down — OpenTaiko's LoadCanceled handler doesn't do it. Cancel/clear the stream queues FIRST
+			// On ESC once the game screen build has started (mid-build, mid-stream, or later while the load sound
+			// plays out) the game screen WAS activated, so it must be torn down — OpenTaiko's LoadCanceled handler
+			// doesn't do it, and the next load would skip its activation. Cancel/clear the stream queues FIRST
 			// (drops the stub references + disposes pending bitmaps), THEN DeActivate disposes the stub textures.
-			if (_streamingActive) {
+			if (_gameScreenBuilt) {
 				if (_gsActivate != null) {   // ESC mid-build: stop stepping + restore the batched-trace flag
 					_gsActivate = null;
 					System.Diagnostics.Trace.AutoFlush = _gsPrevAutoFlush;
 				}
-				CTexture.CancelStreaming();
+				if (_streamingActive) CTexture.CancelStreaming();
 				OpenTaiko.stageGameScreen.DeActivate();   // tears down whatever child actors were activated so far
 				_streamingActive = false;
+				_gameScreenBuilt = false;
 				if (!TransitionDriven) Game.AsyncBudgetMs = Game.DefaultAsyncBudgetMs;
 			}
 
@@ -476,6 +478,7 @@ internal class CStageSongLoading : CStage {
 						if (!TransitionDriven) Game.AsyncBudgetMs = CLoadSession.FinalizeBudgetMs;
 						_gsActivate = OpenTaiko.stageGameScreen.ActivateSteps();
 						_streamingActive = true;   // set NOW so an ESC mid-build still tears the game screen down (DeActivate)
+						_gameScreenBuilt = true;
 					}
 					if (_gsActivate.MoveNext()) {
 						CLoadingProgress.Report(0.12f + 0.38f * Math.Clamp(_gsActivate.Current, 0f, 1f));   // build → 0.12..0.5 of the bar
@@ -553,6 +556,7 @@ internal class CStageSongLoading : CStage {
 				if (this.sdLoadSound != null) {
 					this.sdLoadSound.tDispose();
 				}
+				_gameScreenBuilt = false;   // handed over: gameplay owns the game screen now
 				return (int)ESongLoadingScreenReturnValue.LoadComplete;
 		}
 		return (int)ESongLoadingScreenReturnValue.Continue;
@@ -594,6 +598,7 @@ internal class CStageSongLoading : CStage {
 	private CTja[]? _loadedTjas;
 	private Task? _wavLoadTask;
 	private bool _streamingActive;             // game screen activated + textures streaming in (see LoadBMPFile)
+	private bool _gameScreenBuilt;             // game screen activated by this load and not handed over yet
 	private System.Collections.Generic.IEnumerator<float>? _gsActivate;   // in-flight stepped game-screen build
 	private bool _gsPrevAutoFlush;             // Trace.AutoFlush to restore after the batched stepped build
 	private CCounter ctWait;

@@ -16,13 +16,15 @@ function TA:reset()
 	self.from = nil
 end
 
--- fade-out progress for the animation: 0 while a texture given is still loading, then 0 -> 1 in the time left
+-- fade-out progress for the animation: 0 while something given is still loading (a texture Loaded but not
+-- Ready, or false), then 0 -> 1 in the time left
 function TA:progress(t, ...)
 	if t >= 1 then return 1 end
 	if self.from == nil then
 		for i = 1, select("#", ...) do
-			local tex = select(i, ...)
-			if tex ~= nil and tex.Loaded and not tex.Ready then return 0 end
+			local x = select(i, ...)
+			if x == false then return 0 end
+			if x ~= nil and x ~= true and x.Loaded and not x.Ready then return 0 end
 		end
 		self.from = t
 	end

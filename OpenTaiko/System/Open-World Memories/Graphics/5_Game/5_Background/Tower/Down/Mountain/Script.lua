@@ -26,7 +26,7 @@ local slideSpeed = 0    -- per second: a slide lasts two beats
 local function loadSequence(dir, prefix)
     local list, i = {}, 0
     while STORAGE:FileExists(dir .. prefix .. i .. ".png") do
-        list[#list + 1] = TEXTURE:CreateTextureSync(dir .. prefix .. i .. ".png")
+        list[#list + 1] = TEXTURE:CreateTexture(dir .. prefix .. i .. ".png")
         i = i + 1
     end
     return list
@@ -46,7 +46,7 @@ function clearOut(player)
 end
 
 function onStart()
-    tx["Sky_Gradient.png"] = TEXTURE:CreateTextureSync("Sky_Gradient.png")
+    tx["Sky_Gradient.png"] = TEXTURE:CreateTexture("Sky_Gradient.png")
     if STORAGE:FileExists("Config.json") then
         local cfg = JSONLOADER:JsonParseFileAny("Config.json")
         for k, _ in pairs(layout) do
@@ -56,7 +56,7 @@ function onStart()
     end
     bases = loadSequence("Base/", "Base")
     decos = loadSequence("Deco/", "Deco")
-    if STORAGE:FileExists("Top.png") then top = TEXTURE:CreateTextureSync("Top.png") end
+    if STORAGE:FileExists("Top.png") then top = TEXTURE:CreateTexture("Top.png") end
 end
 
 function activate(state)

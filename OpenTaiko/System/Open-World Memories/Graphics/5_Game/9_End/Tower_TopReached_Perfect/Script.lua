@@ -38,9 +38,9 @@ local function refreshLayout(state)
 end
 
 function onStart()
-    tx["bg.png"] = TEXTURE:CreateTextureSync("bg.png")
+    tx["bg.png"] = TEXTURE:CreateTexture("bg.png")
     for i = 0, textureCount do
-        tx[tostring(i) .. ".png"] = TEXTURE:CreateTextureSync(tostring(i) .. ".png")
+        tx[tostring(i) .. ".png"] = TEXTURE:CreateTexture(tostring(i) .. ".png")
     end
 end
 
