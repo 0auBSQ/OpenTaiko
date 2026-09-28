@@ -29,6 +29,8 @@ namespace OpenTaiko {
 		private string _subtitle = "";
 		private int _danTick = 2;
 		private Color _danTickColor = Color.White;
+		private string _genreTitle = "";
+		private Color? _genreColor = null;
 
 		// ── Lua-visible API ───────────────────────────────────────────────────
 
@@ -58,6 +60,11 @@ namespace OpenTaiko {
 		/// <summary>Sets the Dan plate tick color (RGB 0–255 each).</summary>
 		public void SetDanTickColor(int r, int g, int b) =>
 			_danTickColor = Color.FromArgb(Math.Clamp(r, 0, 255), Math.Clamp(g, 0, 255), Math.Clamp(b, 0, 255));
+		/// <summary>Sets the title shown on the genre plate during play (default: the current song's genre folder title).</summary>
+		public void SetGenreTitle(string title) => _genreTitle = title ?? "";
+		/// <summary>Sets the genre plate color (RGB 0–255 each; default: the current song's genre folder color).</summary>
+		public void SetGenreColor(int r, int g, int b) =>
+			_genreColor = Color.FromArgb(Math.Clamp(r, 0, 255), Math.Clamp(g, 0, 255), Math.Clamp(b, 0, 255));
 
 		/// <summary>
 		/// Sets a global exam (applies to the whole Dan).
@@ -90,6 +97,8 @@ namespace OpenTaiko {
 			_subtitle = "";
 			_danTick = 2;
 			_danTickColor = Color.White;
+			_genreTitle = "";
+			_genreColor = null;
 		}
 
 		/// <summary>
@@ -556,6 +565,7 @@ namespace OpenTaiko {
 					ScoreDiff = src.PlayerSideMetadata.nScoreDiff,
 					bTitleShow = false,
 					Wave = cwav,
+					SourceNode = internalNode,
 				};
 
 				// Per-song exams
@@ -727,6 +737,11 @@ namespace OpenTaiko {
 			node.ldTitle.SetString("default", _title);
 			node.ldSubtitle.SetString("default", _subtitle);
 			node.songGenre = "Dan";
+			node.songGenrePanel = _genreTitle;
+			if (_genreColor is { } genreColor) {
+				node.BoxColor = genreColor;
+				node.isChangedBoxColor = true;
+			}
 			node.nDanTick = _danTick;
 			node.cDanTickColor = _danTickColor;
 			node.Dan_C = outputCtja.Dan_C;

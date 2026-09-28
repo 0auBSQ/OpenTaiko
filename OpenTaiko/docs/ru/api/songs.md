@@ -270,6 +270,8 @@ GetChart(diff) узла песни возвращает чарт. Свойств
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Задаёт подзаголовок курса. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Задаёт значение деления таблички дана (по умолчанию 2). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Задаёт цвет деления таблички дана из компонентов 0-255 (по умолчанию белый). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Задаёт текст таблички жанра во время игры. По умолчанию табличка показывает папку жанра текущей песни. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Задаёт цвет таблички жанра из компонентов 0-255. По умолчанию табличка берёт цвет показанной папки жанра или белый, если SetGenreTitle задал текст. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Задаёт экзамен на весь курс в указанном слоте. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Задаёт экзамен, применяемый к одной песне, по индексу песни от 1 и слоту. |
 | `DANBUILDER:Clear()  -> void` | Удаляет все песни и экзамены и сбрасывает метаданные к значениям по умолчанию. |

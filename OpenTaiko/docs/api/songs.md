@@ -270,6 +270,8 @@ Available as the global DANBUILDER. Song and slot indices are 1-based, except th
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Sets the course subtitle. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Sets the Dan plate tick value (default 2). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Sets the Dan plate tick color from 0-255 components (default white). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Sets the text of the genre plate during play. By default the plate shows the genre folder of the song being played. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Sets the genre plate color from 0-255 components. By default the plate takes the color of the genre folder it shows, or white when SetGenreTitle set the text. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Sets a course-wide exam in the given slot. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Sets an exam that applies to one song, by 1-based song index and slot. |
 | `DANBUILDER:Clear()  -> void` | Removes all songs and exams and resets the metadata to defaults. |

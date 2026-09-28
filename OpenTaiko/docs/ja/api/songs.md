@@ -270,6 +270,8 @@ chart.DanExams の要素、または chart:GetSongExam() から返されます�
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | コースのサブタイトルを設定します。 |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 段位プレートの目盛り値を設定します (既定 2)。 |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | 0-255 の成分から段位プレートの目盛り色を設定します (既定は白)。 |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | プレイ中のジャンルプレートの文字を設定します。既定では、演奏中の楽曲のジャンルフォルダを表示します。 |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 0-255 の成分からジャンルプレートの色を設定します。既定では表示中のジャンルフォルダの色になり、SetGenreTitle で文字を設定した場合は白になります。 |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 指定したスロットにコース全体の試験を設定します。 |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 1 始まりの楽曲インデックスとスロットで、1 つの楽曲に適用される試験を設定します。 |
 | `DANBUILDER:Clear()  -> void` | すべての楽曲と試験を取り除き、メタデータを既定値にリセットします。 |

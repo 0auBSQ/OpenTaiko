@@ -270,6 +270,8 @@ Als globales Objekt DANBUILDER verfügbar. Song- und Slot-Indizes sind 1-basiert
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Setzt den Kursuntertitel. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Setzt den Tick-Wert des Dan-Schilds (Standard 2). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Setzt die Tick-Farbe des Dan-Schilds aus Komponenten 0-255 (Standard weiß). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Setzt den Text des Genre-Schilds während des Spiels. Standardmäßig zeigt das Schild den Genre-Ordner des gespielten Songs. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Setzt die Farbe des Genre-Schilds aus Komponenten 0-255. Standardmäßig nimmt das Schild die Farbe des angezeigten Genre-Ordners, oder Weiß, wenn SetGenreTitle den Text gesetzt hat. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Setzt eine kursweite Prüfung im angegebenen Slot. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Setzt eine Prüfung, die für einen Song gilt, per 1-basiertem Songindex und Slot. |
 | `DANBUILDER:Clear()  -> void` | Entfernt alle Songs und Prüfungen und setzt die Metadaten auf die Standardwerte zurück. |

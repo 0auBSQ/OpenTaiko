@@ -270,6 +270,8 @@ chart.DanExams의 원소이거나 chart:GetSongExam()이 반환합니다. 모든
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | 코스 부제를 설정합니다. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 단위 플레이트 틱 값을 설정합니다(기본값 2). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | 0-255 성분으로 단위 플레이트 틱 색을 설정합니다(기본값 흰색). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | 플레이 중 장르 플레이트의 텍스트를 설정합니다. 기본적으로 플레이트는 연주 중인 곡의 장르 폴더를 표시합니다. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 0-255 성분으로 장르 플레이트 색을 설정합니다. 기본적으로 표시 중인 장르 폴더의 색을 쓰며, SetGenreTitle로 텍스트를 설정한 경우 흰색입니다. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 지정한 슬롯에 코스 전체 시험을 설정합니다. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 1부터 시작하는 곡 인덱스와 슬롯으로 곡 하나에 적용되는 시험을 설정합니다. |
 | `DANBUILDER:Clear()  -> void` | 모든 곡과 시험을 제거하고 메타데이터를 기본값으로 재설정합니다. |

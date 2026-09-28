@@ -211,6 +211,8 @@ function _launch_dan()
     DANBUILDER:SetTitle("乱打")
     DANBUILDER:SetDanTick(2)
     DANBUILDER:SetDanTickColor(220, 80, 255)   -- vivid purple
+    DANBUILDER:SetGenreTitle("Random Dan")
+    DANBUILDER:SetGenreColor(240, 110, 180)    -- pink
 
     -- Load songs into builder
     for _, entry in ipairs(selected) do

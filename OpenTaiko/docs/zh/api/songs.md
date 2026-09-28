@@ -270,6 +270,8 @@ chart.DanExams 的元素，或由 chart:GetSongExam() 返回。所有成员均�
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | 设置课程副标题。 |
 | `DANBUILDER:SetDanTick(tick)  -> void` | 设置段位牌刻度值（默认 2）。 |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | 从 0-255 的分量设置段位牌刻度颜色（默认白色）。 |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | 设置演奏时分类牌上的文字。默认情况下，分类牌显示当前歌曲所在的分类文件夹。 |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | 从 0-255 的分量设置分类牌颜色。默认使用所显示分类文件夹的颜色；若已用 SetGenreTitle 设置文字，则为白色。 |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | 在给定槽位设置一条课程范围的考核。 |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | 按 1 起歌曲索引和槽位设置一条只作用于一首歌曲的考核。 |
 | `DANBUILDER:Clear()  -> void` | 移除所有歌曲和考核，并把元数据重置为默认值。 |

@@ -270,6 +270,8 @@ Beschikbaar als de global DANBUILDER. Nummer- en slotindices beginnen bij 1, beh
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Stelt de cursusondertitel in. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Stelt de tickwaarde van het dan-plaatje in (standaard 2). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Stelt de tickkleur van het dan-plaatje in vanuit componenten 0-255 (standaard wit). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Stelt de tekst van het genreplaatje tijdens het spelen in. Standaard toont het plaatje de genremap van het nummer dat gespeeld wordt. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Stelt de kleur van het genreplaatje in vanuit componenten 0-255. Standaard krijgt het plaatje de kleur van de genremap die het toont, of wit als SetGenreTitle de tekst heeft ingesteld. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Stelt een cursusbreed examen in het gegeven slot in. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Stelt een examen in dat op één nummer van toepassing is, per 1-gebaseerde nummerindex en slot. |
 | `DANBUILDER:Clear()  -> void` | Verwijdert alle nummers en examens en zet de metadata terug op de standaardwaarden. |

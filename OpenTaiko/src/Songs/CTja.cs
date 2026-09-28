@@ -236,6 +236,10 @@ internal class CTja : CActivity {
 		[NonSerialized]
 		[JsonIgnore]  // Runtime audio handle, reloaded on demand. Not part of the mobile JSON cache.
 		public CWAV Wave;
+
+		[NonSerialized]
+		[JsonIgnore]  // Runtime: the song a dan built at runtime took this section from
+		public CSongListNode? SourceNode;
 	}
 
 	public struct STLYRIC {

@@ -270,6 +270,8 @@ Disponible comme la globale DANBUILDER. Les indices de chanson et d'emplacement 
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Définit le sous-titre du parcours. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Définit la valeur de graduation de la plaque de dan (2 par défaut). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Définit la couleur de graduation de la plaque de dan à partir de composantes 0-255 (blanc par défaut). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Définit le texte de la plaque de genre pendant la partie. Par défaut, la plaque affiche le dossier de genre de la chanson jouée. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Définit la couleur de la plaque de genre à partir de composantes 0-255. Par défaut, la plaque prend la couleur du dossier de genre qu'elle affiche, ou le blanc si SetGenreTitle a défini le texte. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Définit un examen à l'échelle du parcours dans l'emplacement donné. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Définit un examen qui s'applique à une seule chanson, par indice de chanson (à partir de 1) et emplacement. |
 | `DANBUILDER:Clear()  -> void` | Retire toutes les chansons et tous les examens et remet les métadonnées à leurs valeurs par défaut. |

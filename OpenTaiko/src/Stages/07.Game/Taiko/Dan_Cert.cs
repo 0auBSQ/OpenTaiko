@@ -62,11 +62,23 @@ internal class Dan_Cert : CActivity {
 
 		IsAnimating = true;
 
-		//段位道場
-		//TJAPlayer3.stage演奏ドラム画面.actPanel.SetPanelString(TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Title, TJAPlayer3.DTX.List_DanSongs[NowShowingNumber].Genre, 1 + NowShowingNumber + "曲目");
-		OpenTaiko.stageGameScreen.actPanel.SetPanelString(OpenTaiko.TJA.List_DanSongs[NowShowingNumber].Title,
-			CLangManager.LangInstance.GetString("TITLE_MODE_DAN"),
-			1 + NowShowingNumber + "曲目");
+		// the genre plate shows the dan's genre folder title, in the dan's colour. A dan built at runtime has no folder:
+		// it shows the genre and colour it was given, else the current song's genre folder and colour
+		var danNode = OpenTaiko.SongMount.rChoosenSong!;
+		var danSong = OpenTaiko.TJA.List_DanSongs[NowShowingNumber];
+		bool builtAtRuntime = danNode.score[(int)Difficulty.Dan]?.FileInfo.FileAbsolutePath == CTja.DanBuilderSentinelPath;
+		var colourNode = danNode;
+		var folder = tGenreFolder(danNode);
+		string genre = folder?.ldTitle.GetString("") ?? (builtAtRuntime ? danNode.songGenrePanel : "");
+		if (genre.Length == 0 && (folder = tGenreFolder(danSong.SourceNode)) != null) {
+			genre = folder.ldTitle.GetString("");
+			if (!(builtAtRuntime && danNode.isChangedBoxColor)) colourNode = danSong.SourceNode!;
+		}
+		if (genre.Length == 0) genre = !string.IsNullOrEmpty(danNode.songGenrePanel) ? danNode.songGenrePanel : danSong.Genre ?? "";
+		OpenTaiko.stageGameScreen.actPanel.SetPanelString(danSong.Title,
+			genre,
+			1 + NowShowingNumber + "曲目",
+			songNode: colourNode);
 
 		if (number == 0) {
 			Sound_Section_First?.PlayStart();
@@ -74,6 +86,19 @@ internal class Dan_Cert : CActivity {
 		} else {
 			Sound_Section?.PlayStart();
 		}
+	}
+
+	// a song's genre folder: the top-most titled box of the genre of the box it sits in (just that box when it has no
+	// genre), or null when it sits in no titled box
+	private static CSongListNode? tGenreFolder(CSongListNode? node) {
+		var box = node?.rParentNode;
+		CSongListNode? folder = null;
+		for (var p = box; p != null; p = p.rParentNode) {
+			if (p != box && (string.IsNullOrEmpty(box!.songGenre) || p.songGenre != box.songGenre)) break;
+			if (p.nodeType == CSongListNode.ENodeType.BOX && !string.IsNullOrEmpty(p.ldTitle.GetString("")))
+				folder = p;
+		}
+		return folder;
 	}
 
 	public override void Activate() {

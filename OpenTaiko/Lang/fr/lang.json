@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "Paramètres pour jouer du tambour.",
 		"SETTINGS_THEME": "Thème",
 		"SETTINGS_THEME_DESC": "Paramètres propres au skin actuel. Définis dans ThemeSettings.json dans le dossier du skin.",
-		"SETTINGS_EXIT": "Quitter",
-		"SETTINGS_EXIT_DESC": "Enregistre les paramètres et quitte le menu de configuration.",
-
-		"SETTINGS_MENU_RETURN": "<< Retour au menu",
-		"SETTINGS_MENU_RETURN_DESC": "Retour au menu principal.",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "Réglages des entrées système",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "Menu pour l'assignation des touches système.",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Réinitialiser le choix de téléchargement de la bande-son",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Efface le choix « Jamais » enregistré. La proposition de bande-son réapparaîtra au prochain lancement.",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "Masquer Dan/Tour",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Masque les sons de type Dan ou Tour dans le menu Partie rapide.\nNote: Cette option prend effet après le rechargement des sons.",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "Plein écran",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Choisir entre le mode plein écran et fenêtre.",
 		"SETTINGS_SYSTEM_WINDOWMODE": "Mode d'affichage",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Choisir Fenêtré, Plein écran ou Plein écran sans bordure. Sans bordure couvre l'écran sans décorations.",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Fenêtré",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Fréquence d'images maximale.\nUnlimited utilise la fréquence de\nrafraîchissement de l'écran\n(p. ex. 120 Hz sur ProMotion).\nPrend effet après un redémarrage.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "API graphique",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Méthode de rendu : choisissez entre OpenGL, DirectX11, Vulkan ou Metal. OpenGL est lent, mais compatible et stable. DirectX11 est rapide et stable, mais ne fonctionne que sous Windows. Vulkan est le plus rapide sous Linux. Metal ne fonctionne que sous macOS.\n\nPrend effet après le redémarrage du jeu.",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "Chargement asynchrone des textures",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Mode de chargement des textures : supprime le blocage au démarrage. Désactivez cette option si certaines textures apparaissent noires. Prend effet après le redémarrage d'OpenTaiko.",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "Activer les vidéos de fond",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Activer ou non les vidéos en jeu. Si activé et qu'une musique ne contient pas de vidéo, le décor est un fond noir.",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Volume du clavier",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Reduit le volume en appuyant sur [ et l'augmente en appuyant sur ]. Définit l'amplitude modifiée par appui. Entre 1 et 20.",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Délai avant la musique",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "Temps de delai avant le début de la musique en jeu. Reduire cette valeur peut faire que la musique soit jouée trop tôt.",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Délai avant la prévisualisation de la musique",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "Temps pris avant la prévisualisation de la musique dans le menu. Réduire cette valeur peut faire que la prévisualisation soit lancée avant l'animation du menu.",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Interface sonore",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Fonctionne seulement avec les appareils compatibles.\n- Latence d'entrée les plus faibles Wasapi:\n- Latence d'entrée généralement faible\n- Bloque les sons exterieurs à OpenTaiko Direct Sound:\n- Permet les sons exterieurs à OpenTaiko\n- Latence d'entrée élevée",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "Interface Asio",
@@ -173,8 +156,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Journalisation",
 		"SETTINGS_SYSTEM_LOG_DESC": "Génère un fichier TJAPlayer3.log file à la fermeture du jeu. Permet l'évaluation des performances et facilite l'identification des erreurs.",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Sous-dossiers pour la séléction aléatoire",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Parcourir les sous-dossiers récursivement lors de l'utilisation du bouton 'Surprend moi !'.",
 		"SETTINGS_SYSTEM_DEBUGMODE": "Mode Debug",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Activer ou non les informations de déboggage en jeu.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Taille du tambour tactile",
@@ -198,8 +179,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Permet la prise automatique de capture d'écran à la fin d'une partie. Seulement déclanché en cas de meilleur score, qui peut ne pas refleter parfaitement la qualité de celui-ci.",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Rich Presence Discord",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Active ou non le partage d'informations de jeu avec Discord.",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Bufferisation des entrées",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Génère un fichier TJAPlayer3.log file à la fermeture du jeu. Permet l'évaluation des performances et facilite l'identification des erreurs.",
 		// Please revise the text above from English.
 
 		// Settings - Gameplay
@@ -222,10 +201,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "Gauge normale par défaut",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "Ignore les gauges définies par personnage.",
 
-		"SETTINGS_GAME_AUTOP1": "Joueur 1 Auto",
-		"SETTINGS_GAME_AUTOP1_DESC": "Activer le mode automatique pour le joueur 1. Activable en appuyant sur F3 dans le menu de selection des musiques.",
-		"SETTINGS_GAME_AUTOP2": "Joueur 2 Auto",
-		"SETTINGS_GAME_AUTOP2_DESC": "Activer le mode automatique pour le joueur 2. Activable en appuyant sur F4 dans le menu de selection des musiques.",
 		"SETTINGS_GAME_AUTOROLL": "Vitesse des rolls",
 		"SETTINGS_GAME_AUTOROLL_DESC": "Nombre de frappes par seconde lors des rolls en mode automatique. Désactivé si 0, au maximum une frappe par image.",
 		"SETTINGS_GAME_AUTOBALLOON": "Vitesse max. des ballons",
@@ -233,8 +208,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "Autoriser l'auto à sauter des frappes",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Autorise le mode automatique à sauter les frappes suivantes si elles risquent de ralentir, voire figer le jeu. Le saut est aussi autorisé temporairement en appuyant sur la touche de pause.",
 
-		"SETTINGS_GAME_NOINFO": "Pas d'informations",
-		"SETTINGS_GAME_NOINFO_DESC": "Activer ou non l'affichage des informations des musiques.",
 		"SETTINGS_GAME_COMBODISPLAY": "Combo affiché minimum",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "Définit le combo minimum affiché. Entre 1 et 99999.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Resultats en direct",
@@ -244,8 +217,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "Difficulté par défaut",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Change la difficulté par défaut lors de l'écran de selection des musiques.",
-		"SETTINGS_GAME_EXEXTRAANIME": "Utiliser les transitions Extrême/Extra",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Joue une animation définie par le skin lors du passage entre Extrême et Extra.",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "Nombre de mesures à sauter",
@@ -259,8 +230,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Délai avant l'image",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Non utilisé, ancienne option de DTXMania.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Mode Time Stretch",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Non utilisé, ancienne option de DTXMania.",
 		"SETTINGS_SYSTEM_FASTRENDER": "Affichage rapide",
@@ -289,8 +258,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "Assignation de touche système : Assigner une touche pour afficher le menu de débogage. (Clavier uniquement. Les manettes ne sont pas utilisables.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Config rapide",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "Assignation de touche système : Assigner une touche pour accéder à la config rapide. (Clavier uniquement. Les manettes ne sont pas utilisables.)",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Personnalisation du joueur",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "Assignation de touche système : Assigner une touche pour la personnalisation du joueur. (Clavier uniquement. Les manettes ne sont pas utilisables.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Changer le tri des sons",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "Assignation de touche système : Assigner une touche pour retrier les sons. (Clavier uniquement. Les manettes ne sont pas utilisables.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Activer l'auto (J1)",
@@ -401,63 +368,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Aller à la dernière mesure",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Assignation des touches du tambour : Assigner une touche pour aller à la dernière mesure.",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "Partie rapide",
-		"TITLE_MODE_DAN": "Défis du Dojo",
-		"TITLE_MODE_TOWER": "Tours rhytmiques",
-		"TITLE_MODE_SHOP": "Magasin",
-		"TITLE_MODE_STORY": "Aventure",
-		"TITLE_MODE_HEYA": "Ma Pièce",
-		"TITLE_MODE_SETTINGS": "Paramètres",
-		"TITLE_MODE_EXIT": "Quitter le jeu",
-		"TITLE_MODE_ONLINE": "Salon 'l'En-Ligne'",
-		"TITLE_MODE_AI": "Mode contre l'IA",
-		"TITLE_MODE_STATS": "Statistiques",
-		"TITLE_MODE_EDITOR": "Editeur de partition",
-		"TITLE_MODE_TOOLS": "Boîte à outils",
-
-		"TITLE_MODE_TAIKO_DESC": "Jouez vos sons favoris\nà votre propre rhythme !",
-		"TITLE_MODE_DAN_DESC": "Jouez plusieurs sons à la suite\nen suivant des règles exigentes\ndans le but de reussir le défi !",
-		"TITLE_MODE_TOWER_DESC": "Jouez de longs sons avec un\nnombre de vies limité et\natteignez le sommet de la tour !",
-		"TITLE_MODE_SHOP_DESC": "Achetez de nouveaux sons ou personnages\ngrâce aux médailles acquises en jeu !",
-		"TITLE_MODE_STORY_DESC": "Surmontez une multitude d'obstables\nafin de découvrir du nouveau contenu\net de nouveaux horizons !",
-		"TITLE_MODE_HEYA_DESC": "Changez votre personnage\nou les informations de votre\nplaque nominative !",
-		"TITLE_MODE_SETTINGS_DESC": "Changez votre style de jeu\n ou les paramètres généraux !",
-		"TITLE_MODE_EXIT_DESC": "Quitter le jeu.\nÀ bientôt !",
-		"TITLE_MODE_ONLINE_DESC": "Telechargez de nouvelles\npartitions et du nouveau\ncontenu depuis internet !",
-		"TITLE_MODE_AI_DESC": "Combattez une IA puissante à\ntravers plusieurs sections et\ndécrochez la victoire !",
-		"TITLE_MODE_STATS_DESC": "Suivez votre progression en \ndirect !",
-		"TITLE_MODE_EDITOR_DESC": "Créez vos propres partitions\n.tja avec vos sons favoris !",
-		"TITLE_MODE_TOOLS_DESC": "Utilisez divers outils\nproposés afin de faciliter\nl'ajout de contenu !",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "Retour ({0})",
-		"SONGSELECT_RANDOM": "Surprend moi!",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "Surprend moi! ({0})",
 
-		"SONGSELECT_SORT": "Menu de tri",
-		"SONGSELECT_SORT_PATH": "Chemin",
 		"SONGSELECT_SORT_TITLE": "Titre",
 		"SONGSELECT_SORT_SUBTITLE": "Sous-titre",
 		"SONGSELECT_SORT_LEVEL": "Niveau",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM : {0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM : {0:0.###} ({1:0.###}-{2:0.###})",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Charteur : {0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "Titre",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Sous-titre",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charteur",
-
-		"SONGSELECT_QUICKCONFIG": "Config rapide",
-		"SONGSELECT_QUICKCONFIG_MORE": "Plus...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Jetons obtenus!",
@@ -466,9 +385,6 @@
 		"MODAL_TITLE_PUCHI": "Petit personnage obtenu!",
 		"MODAL_TITLE_NAMEPLATE": "Titre obtenu!",
 		"MODAL_TITLE_SONG": "Nouveau son !",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0} Jetons (Total: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "Retour au menu principal",
@@ -541,7 +457,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERREUR] Condition invalide",
-		"UNLOCK_CONDITION_SHOP": "L'article n'est disponible que dans le Magasin.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "Prix en jetons: {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "Article acheté!",
@@ -631,57 +546,15 @@
 
 		// AI Info
 		"AI_NAME": "IA",
-		"AI_TITLE": "Deus-Ex-Machina",
 		// {0}: Section No.
 		"AI_SECTION": "Section {0}",
 
 		// Mods
-		"MOD_NONE": "Aucun",
-		"MOD_BLANK": "-",
-		"MOD_SWITCH_OFF": "Non",
-		"MOD_SWITCH_ON": "Oui",
-		"MOD_SCOREMULTIPLY": "Multiplicateur de score: {0}",
-		"MOD_COINMULTIPLY": "Multiplicateur de pièces: {0}",
-
-		"MOD_SPEED": "Vitesse",
-
-		"MOD_HIDE": "Discret",
-		"MOD_STEALTH": "Furtif",
-
-		"MOD_FLIP": "Inverse",
-
-		"MOD_RANDOM": "Hasard",
-		"MOD_RANDOM_SHUFFLE": "Hasardeux",
-		"MOD_RANDOM_CHAOS": "Chaotique",
-
-		"MOD_TIMING": "Timing",
 		"MOD_TIMING1": "Laxiste",
 		"MOD_TIMING2": "Permissif",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Strict",
-		"MOD_TIMING5": "Rigoureux",
-
-		"MOD_JUSTICE": "Mode Punitif",
-		"MOD_SAFE": "Protegé",
-		"MOD_JUST": "Punitif",
-
-		"MOD_GAMETYPE": "Type de jeu",
-		"MOD_GAMETYPE_TAIKO": "Taiko",
-		"MOD_GAMETYPE_KONGA": "Konga",
-
-		"MOD_GAMEMODE": "Mode de jeu",
-		"MOD_GAMEMODE_TRAINING": "Mode entraînement",
-
-		"MOD_AUTO": "Auto",
-
-		"MOD_SONGSPEED": "Vitesse générale",
-		"SETTINGS_MOD_SONGSPEED_DESC": "Change le coefficient multiplicateur de la vitesse générale de la musique en jeu.Par exemple, vous pouvez la diviser par 2 en l'établissant à 0.500 afin de vous entraîner plus serainement.\n\nNote: Cette option change aussi le ton de la musique. Si TimeStretch=ON, il peut y avoir du lag si la vitesse générale est inférieure à x0.900.",
-
-		"MOD_HITSOUND": "Instrument",
-
-		"MOD_FUN": "Extras",
-		"MOD_FUN_AVALANCHE": "Avalanche",
-		"MOD_FUN_MINESWEEPER": "Démineur"
+		"MOD_TIMING5": "Rigoureux"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "Settings to play the drums.",
 		"SETTINGS_THEME": "Theme",
 		"SETTINGS_THEME_DESC": "Settings specific to the current skin. Defined by ThemeSettings.json in the skin folder.",
-		"SETTINGS_EXIT": "Exit",
-		"SETTINGS_EXIT_DESC": "Save the settings and exit from CONFIGURATION menu.",
-
-		"SETTINGS_MENU_RETURN": "<< Return to Menu",
-		"SETTINGS_MENU_RETURN_DESC": "Return to left menu.",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "System Input Settings",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "A secondary menu for assigning system keys.",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Reset Soundtrack Download Choice",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Clear the saved \"Never\" choice. The soundtrack prompt will return on the next launch.",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "Hide Dan/Tower",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Hide Dan and Tower charts in the Taiko Mode menu.\nNote: Reload songs to make this setting take effect.",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "Fullscreen Mode",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Toggle between fullscreen and windowed mode.",
 		"SETTINGS_SYSTEM_WINDOWMODE": "Window Mode",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Choose Windowed, Fullscreen, or Borderless Fullscreen. Borderless covers the monitor with no decorations.",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Windowed",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximum frame rate.\nUnlimited uses the display's refresh rate\n(e.g. 120Hz on ProMotion).\nApplies after restart.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphics API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Drawing Method: Select from either OpenGL, DirectX11, Vulkan, or Metal. OpenGL is slow, but compatible & stable. DirectX11 is fast and stable, but only works on Windows. Vulkan works fastest on Linux. Metal only works on MacOS.\n\nThis will take effect after game reboot.",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture Loading",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Texture Loading Type: Freeze on startup disappears Turn this option off if some textures turn black This change will take effect after restarting OpenTaiko",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "Toggle Video Playback",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Toggle whether background videos are used. If this is enabled and a video is missing from a folder, the background will appear blacked out.",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Keyboard Volume Increment",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Specify how much the Increase Volume and Decrease Volume system keys change the volume. You can specify from 1 to 20.",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Song Playback Buffer",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "The time taken before song playback during gameplay. Decreasing the value may cause songs to play too early.",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Song Preview Buffer",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "The time taken before a song preview is played. Decreasing this value may cause previews to begin while still scrolling. You can specify from 0ms to 10000ms.",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Sound Playback Mode",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Only works on sound devices that support asio playback\n- Has the least input delay Wasapi:\n- Only compatible with Windows\n- Has the second lowest input delay BASS:\n- Supported on all platforms\nNote: Exit CONFIGURATION to make the setting take effect.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "Asio Playback Device",
@@ -172,8 +155,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Create Log File",
 		"SETTINGS_SYSTEM_LOG_DESC": "Toggle whether a TJAPlayer3.log file is generated when the game is closed. This tracks the performance of the game and identifies errors.",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Use Subfolders in Random Selection",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Toggle whether subfolders are used during random song selection.",
 		"SETTINGS_SYSTEM_DEBUGMODE": "Debug Mode",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Toggle whether debug mode is enabled. This will cause additional information to appear in the bottom right. This will display your latency calibration for hitsoundless play.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Touch Drum Size",
@@ -197,8 +178,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Toggle whether results screenshots are automatically taken. This will only occur when a highscore is achieved, which may not correlate to the best play on that song.",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Rich Presence",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Toggle whether song information is shared with Discord.",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Buffered Input Mode",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "When this is turned on, the input resolution can exceed FPS and no inputs will be dropped When this is turned off, the input resolution is limited by FPS and inputs may be dropped.",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Global Offset",
@@ -220,10 +199,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "Always Use Normal Gauge",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "Force the normal gauge to be used at all times regardless of a character's modifiers.",
 
-		"SETTINGS_GAME_AUTOP1": "Player 1 Auto Play",
-		"SETTINGS_GAME_AUTOP1_DESC": "Toggle whether player 1 plays automatically.",
-		"SETTINGS_GAME_AUTOP2": "Player 2 Auto Play",
-		"SETTINGS_GAME_AUTOP2_DESC": "Toggle whether player 2 plays automatically.",
 		"SETTINGS_GAME_AUTOROLL": "Roll Speed",
 		"SETTINGS_GAME_AUTOROLL_DESC": "When auto is enabled, rolls will be automatically hit this many times per second. Has no effect on balloons. 0 disables auto roll. -1 hits as many as possible without causing significant lags.",
 		"SETTINGS_GAME_AUTOBALLOON": "Maximum Balloon Hit Speed",
@@ -231,8 +206,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "Allow Auto Play to Skip Hits",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Allow auto play to skip further hits if it is possible to lags or even freezes the game. The skip is also allowed temporarily when pressing the pause hotkey.",
 
-		"SETTINGS_GAME_NOINFO": "No Information Mode",
-		"SETTINGS_GAME_NOINFO_DESC": "Toggle whether song information is shown. Turning this on will disable song information. Turning this off will enable song information.",
 		"SETTINGS_GAME_COMBODISPLAY": "Minimum Combo Display",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "Choose the initial number that combo is displayed at. Can be specified between 1 and 99999.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Toggle Score Display",
@@ -242,8 +215,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "Default Difficulty",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Choose the default difficulty to be chosen on song select. If Extra is not chosen, it will not be visible unless the right arrow key is pressed on an applicable song's Extreme difficulty.",
-		"SETTINGS_GAME_EXEXTRAANIME": "Use Extreme/Extra Transitions",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Play a skin-defined animation while switching between Extreme & Extra.",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "Measure Skip Count",
@@ -257,8 +228,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Image Preview Buffer",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "This is a redundant setting ported from DTXMania. It does nothing.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Time Stretch Mode",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Not sure what this option does. It uses more CPU power, and might cause sound issues below 0.9x playback speed.",
 		"SETTINGS_SYSTEM_FASTRENDER": "Fast Render",
@@ -287,8 +256,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "System key assign: Assign any key for displaying debug menu. (You can only use keyboard. You can't use gamepads.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Quick Config",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "System key assign: Assign any key for accessing the quick config. (You can only use keyboard. You can't use gamepads.)",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Player Customization",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "System key assign: Assign any key for player customization. (You can only use keyboard. You can't use gamepads.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Change Song Sort",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "System key assign: Assign any key for resorting songs. (You can only use keyboard. You can't use gamepads.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Toggle Auto (P1)",
@@ -399,63 +366,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Jump to Last Measure",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drums key assign: Assign any key for jumping to the last measure.",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "Taiko Mode",
-		"TITLE_MODE_DAN": "Dan-i Dojo",
-		"TITLE_MODE_TOWER": "Taiko Towers",
-		"TITLE_MODE_SHOP": "Shop",
-		"TITLE_MODE_STORY": "Taiko Adventure",
-		"TITLE_MODE_HEYA": "My Room",
-		"TITLE_MODE_SETTINGS": "Settings",
-		"TITLE_MODE_EXIT": "Exit",
-		"TITLE_MODE_ONLINE": "Online Lounge",
-		"TITLE_MODE_AI": "AI Battle Mode",
-		"TITLE_MODE_STATS": "Player Stats",
-		"TITLE_MODE_EDITOR": "Chart Editor",
-		"TITLE_MODE_TOOLS": "Open Toolbox",
-
-		"TITLE_MODE_TAIKO_DESC": "Play your favorite\nsongs at your own pace!",
-		"TITLE_MODE_DAN_DESC": "Play multiple charts in continuation\nfollowing challenging exams\nin order to get a PASS rank!",
-		"TITLE_MODE_TOWER_DESC": "Play long charts within a limited\ncount of lives and reach\nthe top of the tower!",
-		"TITLE_MODE_SHOP_DESC": "Buy new songs, petit-chara or characters\nusing the medals you earned in game!",
-		"TITLE_MODE_STORY_DESC": "Surpass various obstacles and\nunlock new content and horizons!",
-		"TITLE_MODE_HEYA_DESC": "Change your nameplate info\n or your character visuals!",
-		"TITLE_MODE_SETTINGS_DESC": "Change your game style\n or general settings!",
-		"TITLE_MODE_EXIT_DESC": "Quit the game.\nSee you next time!",
-		"TITLE_MODE_ONLINE_DESC": "Download new charts\nand content from\n the internet!",
-		"TITLE_MODE_AI_DESC": "Fight a strong AI through\nmultiple sections and\naim for victory!",
-		"TITLE_MODE_STATS_DESC": "Watch and track your\nprogression!",
-		"TITLE_MODE_EDITOR_DESC": "Create your own .tja charts\nbased on your favorite songs ",
-		"TITLE_MODE_TOOLS_DESC": "Use various tools to insert\nnew custom content!",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "Return ({0})",
-		"SONGSELECT_RANDOM": "Random Song",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "Random Song ({0})",
 
-		"SONGSELECT_SORT": "Sort Menu",
-		"SONGSELECT_SORT_PATH": "Path",
 		"SONGSELECT_SORT_TITLE": "Title",
 		"SONGSELECT_SORT_SUBTITLE": "Subtitle",
 		"SONGSELECT_SORT_LEVEL": "Displayed Level",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Charter: {0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "Title",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Subtitle",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Charter",
-
-		"SONGSELECT_QUICKCONFIG": "Quick Config",
-		"SONGSELECT_QUICKCONFIG_MORE": "More...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Coins Obtained!",
@@ -464,9 +383,6 @@
 		"MODAL_TITLE_PUCHI": "New Puchichara!",
 		"MODAL_TITLE_NAMEPLATE": "New Title!",
 		"MODAL_TITLE_SONG": "New Song!",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0} Coins (Total: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "Return to main menu",
@@ -539,7 +455,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Invalid condition",
-		"UNLOCK_CONDITION_SHOP": "Item only available at the Shop.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "Coin price: {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "Item bought!",
@@ -629,57 +544,15 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "Deus-Ex-Machina",
 		// {0}: Section No.
 		"AI_SECTION": "Section {0}",
 
 		// Mods
-		"MOD_NONE": "None",
-		"MOD_BLANK": "-",
-		"MOD_SWITCH_OFF": "Off",
-		"MOD_SWITCH_ON": "On",
-		"MOD_SCOREMULTIPLY": "Score Multiplier : {0}",
-		"MOD_COINMULTIPLY": "Coins Multiplier : {0}",
-
-		"MOD_SPEED": "Scroll Speed",
-
-		"MOD_HIDE": "Invisible",
-		"MOD_STEALTH": "Stealth",
-
-		"MOD_FLIP": "Flip Notes",
-
-		"MOD_RANDOM": "Random",
-		"MOD_RANDOM_SHUFFLE": "Shuffle",
-		"MOD_RANDOM_CHAOS": "Chaos",
-
-		"MOD_TIMING": "Timing",
 		"MOD_TIMING1": "Loose",
 		"MOD_TIMING2": "Lenient",
 		"MOD_TIMING3": "Normal",
 		"MOD_TIMING4": "Strict",
-		"MOD_TIMING5": "Rigorous",
-
-		"MOD_JUSTICE": "Justice Mode",
-		"MOD_SAFE": "Safe",
-		"MOD_JUST": "Just",
-
-		"MOD_GAMETYPE": "Game Type",
-		"MOD_GAMETYPE_TAIKO": "Taiko",
-		"MOD_GAMETYPE_KONGA": "Konga",
-
-		"MOD_GAMEMODE": "Game Mode",
-		"MOD_GAMEMODE_TRAINING": "Training Mode",
-
-		"MOD_AUTO": "Auto",
-
-		"MOD_SONGSPEED": "Song Playback Speed",
-		"SETTINGS_MOD_SONGSPEED_DESC": "Change song playback speed. If the Time Stretch option is enabled, sound issues may occur below 0.9x playback speed.\nNote: It also changes the songs' pitch.",
-
-		"MOD_HITSOUND": "Instrument",
-
-		"MOD_FUN": "Fun Mods",
-		"MOD_FUN_AVALANCHE": "Avalanche",
-		"MOD_FUN_MINESWEEPER": "Minesweeper"
+		"MOD_TIMING5": "Rigorous"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

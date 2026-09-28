@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "Instellingen voor het drummen.",
 		"SETTINGS_THEME": "Thema",
 		"SETTINGS_THEME_DESC": "Instellingen specifiek voor de huidige skin. Gedefinieerd in ThemeSettings.json in de skin-map.",
-		"SETTINGS_EXIT": "Verlaat",
-		"SETTINGS_EXIT_DESC": "Sla de instellingen op en verlaat het CONFIGURATION menu.",
-
-		"SETTINGS_MENU_RETURN": "<< Terug naar Menu",
-		"SETTINGS_MENU_RETURN_DESC": "Terug naar het linker menu.",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "Systeem-invoerinstellingen",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "Een tweede menu voor het instellen van toetsen",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "Keuze voor soundtrackdownload opnieuw instellen",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "Wist de opgeslagen keuze \"Nooit\". De soundtrackvraag verschijnt bij de volgende start opnieuw.",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "Dan/Toren Verbergen",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "Verberg de Dan en Toren nummers in de Taiko Modus.\nOpmerking: Herlaad de nummers om dit te activeren.",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "Volledig scherm Modus",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "Wissel tussen volledig scherm en venster modus.",
 		"SETTINGS_SYSTEM_WINDOWMODE": "Venstermodus",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "Kies Venster, Volledig scherm of Randloos. Randloos vult het scherm zonder vensterrand.",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "Venster",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "Maximale framerate.\nUnlimited gebruikt de verversingssnelheid\nvan het scherm (bijv. 120 Hz op ProMotion).\nWordt na herstart toegepast.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "Graphische API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "Grafische tekenmethode: Selecteer de opties OpenGL, DirectX11, Vulkan of Metal. OpenGL is langzaam, maar compatibel en stabiel. DirectX11 is snel en stabiel, maar werkt alleen op Windows. Vulkan werkt het snelst op Linux. Metal werkt alleen op MacOS.\n\nHerstart het spel om te activeren.",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync Texture laden",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "Bevriezen bij het starten verdwijnt. Zet deze optie uit als sommige textures zwart worden. Deze optie activeert na het herstarten van OpenTaiko.",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "Video's Afspelen",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "Schakelt achtergrond video's aan/uit. Als dit is ingeschakeld en het lied geen video heeft, dan zal de achtergrond zwart worden.",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "Toetsenbord Volume Wijziging",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "Geeft aan hoeveel de volume wordt aangepast voor de volume omhoog/omlaag knoppen. U kunt een waarde instellen tussen 1 en 20.",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "Lied Afspeel Buffer",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "De tijdsduur voordat een lied afspeelt in het spel. Als deze waarde laag staat, kunnen nummers te vroeg afspelen.",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "Lied Voorbeeld Buffer",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "De tijdsduur voordat een lied voorbeeld afspeelt. Als deze waarde erg laag staat kunnen liedjes tijdens het scrollen afspelen. U kunt een waarde kiezen tussen 0ms en 10000ms.",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "Geluid Afspeelmodus",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO:\n- Werkt alleen op apparaten die ASIO audio ondersteunen\n- Heeft de laagste inputvertraging Wasapi:\n- Alleen compatibel met Windows\n- Heeft de op een na laagste inputvertraging BASS:\n- Op alle platforms ondersteund\nOpmerking: verlaat de instellingen om dit op te slaan.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO Afspeelapparaat",
@@ -172,8 +155,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Logbestanden Creëren",
 		"SETTINGS_SYSTEM_LOG_DESC": "Schakelt het creëren van TJAPLAYER3.log bestanden aan/uit wanneer de game wordt gesloten. Dit volgt de prestaties van het spel en identificeert storingen.",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "Gebruik Subfolders bij Willekeurige Selectie",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "Kiest of subfolders wel/niet gebruikt worden bij willekeurige selectie van liedjes.",
 		"SETTINGS_SYSTEM_DEBUGMODE": "Debug Modus",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "Deze optie toont extra informatie rechtsonder op het scherm. Dit geeft de latentie kalibratie weer voor gameplay zonder geluidseffecten.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "Grootte Touch-Trommel",
@@ -197,8 +178,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "Kiest of resultaat screenshots automatisch worden gemaakt. Dit gebeurt alleen wanneer een topscore is behaald, wat niet altijd de beste score betekent voor dat nummer.",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord Weergave",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Kiest of lied informatie wordt gedeeld met Discord.",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "Gebufferde Input Modus",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "Als deze optie is ingeschakeld, kan de ingangsresolutie hoger zijn dan de FPS en worden er geen ingangen gewist. Als deze optie is uitgeschakeld, wordt de ingangsresolutie beperkt door de FPS en kunnen er ingangen wegvallen.",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "Globale Offset",
@@ -220,10 +199,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "Altijd Normale Meter Gebruiken",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "Forceer het gebruik van de normale meter ongeacht het geselecteerde karakter en hun aanpassingen.",
 
-		"SETTINGS_GAME_AUTOP1": "Speler 1 Automatisch Spelen",
-		"SETTINGS_GAME_AUTOP1_DESC": "Schakelt het automatisch spelen van liedjes op speler 1 aan/uit.",
-		"SETTINGS_GAME_AUTOP2": "Speler 1 Automatisch Spelen",
-		"SETTINGS_GAME_AUTOP2_DESC": "Schakelt het automatisch spelen van liedjes op speler 2 aan/uit.",
 		"SETTINGS_GAME_AUTOROLL": "Rolsnelheid",
 		"SETTINGS_GAME_AUTOROLL_DESC": "Wanneer Auto is ingeschakeld, zullen rollen automatisch worden geraakt # keer per seconde. Heeft geen effect op ballonnen. 0 schakelt automatisch rollen uit. -1 raakt rollen zo snel mogelijk zonder noemenswaardige vertraging te veroorzaken.",
 		"SETTINGS_GAME_AUTOBALLOON": "Maximale Ballonslagsnelheid",
@@ -231,8 +206,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "Auto Mag Slagen Overslaan",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "Laat Auto verdere slagen overslaan als die het spel kunnen laten haperen of zelfs vastlopen. Overslaan is ook tijdelijk toegestaan wanneer de pauzetoets wordt ingedrukt.",
 
-		"SETTINGS_GAME_NOINFO": "Geen Informatie Modus",
-		"SETTINGS_GAME_NOINFO_DESC": "Schakelt weergave van lied informatie aan/uit. Als dit aan staat, wordt lied informatie verborgen. Als dit uit staat word lied informatie weergeven.",
 		"SETTINGS_GAME_COMBODISPLAY": "Minimum Combo Weergave",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "Kiest het minimumaantal combo dat wordt weergeven. Kan een waarde hebben tussen 1 en 99999.",
 		"SETTINGS_GAME_SCOREDISPLAY": "Score Display Weergeven",
@@ -242,8 +215,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "Standaard Moeilijkheidsgraad",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "Kiest de standaard moeilijkheidsgraad in nummer selectie. Als Extra niet is gekozen, zal het niet zichtbaar zijn tenzij de rechter pijltoets is ingedrukt op de Extreme moeilijkheid van dat nummer.",
-		"SETTINGS_GAME_EXEXTRAANIME": "Gebruik Extreme/Extra Animaties",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "Speel een skin-gedefinieerde animatie bij het wisselen tussen Extreme & Extra moeilijkheid.",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "Aantal Maat Skips",
@@ -257,8 +228,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "Afbeelding Voorbeeld Buffer",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "Dit is een ongebruikte optie overgezet van DTXMania. Het doet niets.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "Tijd Rekking Modus",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "Onzeker wat deze optie doet. Het gebruikt meer CPU kracht, en zorgt mogelijk voor problemen onder 0.9x snelheid.",
 		"SETTINGS_SYSTEM_FASTRENDER": "Snel Renderen",
@@ -287,8 +256,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "Systeemtoets: Een toets toewijzen om het debug menu te weergeven. (Je kan alleen een toetsenbord gebruiken. Controllers/gamepads werken niet.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "Snelle Configuratie",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "Systeemtoets: Een toets toewijzen om de snelle configuratie te openen. (Je kan alleen een toetsenbord gebruiken. Controllers/gamepads werken niet.)",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "Speler Aanpassing",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "Systeemtoets: Een toets toewijzen voor het speler aanpassingsmenu. (Je kan alleen een toetsenbord gebruiken. Controllers/gamepads werken niet.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "Nummer Sortering",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "Systeemtoets: Een toets toewijzen om nummers opnieuw te sorteren. (Je kan alleen een toetsenbord gebruiken. Controllers/gamepads werken niet.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "Auto Schakelen (P1)",
@@ -399,63 +366,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "Naar Laatste Maat Springen",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "Drum toets: Een toets toewijzen om naar de laatste maat van het nummer te springen.",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "Taiko Modus",
-		"TITLE_MODE_DAN": "Dan-i Dojo",
-		"TITLE_MODE_TOWER": "Taiko Torens",
-		"TITLE_MODE_SHOP": "Shop",
-		"TITLE_MODE_STORY": "Taiko Avontuur",
-		"TITLE_MODE_HEYA": "Mijn Kamer",
-		"TITLE_MODE_SETTINGS": "Instellingen",
-		"TITLE_MODE_EXIT": "Verlaat",
-		"TITLE_MODE_ONLINE": "Online Lounge",
-		"TITLE_MODE_AI": "AI Gevecht Modus",
-		"TITLE_MODE_STATS": "Player Statistieken",
-		"TITLE_MODE_EDITOR": "Nummer Bewerker",
-		"TITLE_MODE_TOOLS": "Gereedschapskist",
-
-		"TITLE_MODE_TAIKO_DESC": "Speel je favoriete\nnummers op je eigen tempo!",
-		"TITLE_MODE_DAN_DESC": "Speel meerdere nummers achter elkaar\nmet uitdagende condities\nom een PASS rank te behalen!",
-		"TITLE_MODE_TOWER_DESC": "Speel lange nummers met een beperkt\naantal levens om de\ntop van te toren te bereiken!",
-		"TITLE_MODE_SHOP_DESC": "Koop nieuwe nummers, petit-chara of karakters\nmet de medailles die je in het spel hebt verdiend!",
-		"TITLE_MODE_STORY_DESC": "Overkom meerdere obstakels en\nontgrendel nieuwe content en horizons!",
-		"TITLE_MODE_HEYA_DESC": "Verander de naamplaat info\nof verander de karakters!",
-		"TITLE_MODE_SETTINGS_DESC": "Verander de stijl van het spel\nen algemene instellingen!",
-		"TITLE_MODE_EXIT_DESC": "Beëindigt het spel.\nTot de volgende keer!",
-		"TITLE_MODE_ONLINE_DESC": "Download nieuwe nummers\nen content van\nhet internet!",
-		"TITLE_MODE_AI_DESC": "Vecht tegen een sterke AI door\nmeerdere secties en\nga voor de overwinning!",
-		"TITLE_MODE_STATS_DESC": "Bekijk en volg je\nvoortgang!",
-		"TITLE_MODE_EDITOR_DESC": "Creëer je eigen .tja nummers\nop basis van je favoriete liedjes!",
-		"TITLE_MODE_TOOLS_DESC": "Gebruik meerdere tools om\nnieuwe content toe te voegen!",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "Terug ({0})",
-		"SONGSELECT_RANDOM": "Willekeurig Nummer",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "Willekeurig Nummer ({0})",
 
-		"SONGSELECT_SORT": "Sorteer Menu",
-		"SONGSELECT_SORT_PATH": "Pad",
 		"SONGSELECT_SORT_TITLE": "Titel",
 		"SONGSELECT_SORT_SUBTITLE": "Ondertiteling",
 		"SONGSELECT_SORT_LEVEL": "Weergegeven Niveau",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "Chartmaker: {0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "Titel",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "Ondertitel",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "Chartmaker",
-
-		"SONGSELECT_QUICKCONFIG": "Snelle Coniguratie",
-		"SONGSELECT_QUICKCONFIG_MORE": "Meer...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "Munten Verkregen!",
@@ -464,9 +383,6 @@
 		"MODAL_TITLE_PUCHI": "Nieuwe Puchichara!",
 		"MODAL_TITLE_NAMEPLATE": "Nieuwe Titel!",
 		"MODAL_TITLE_SONG": "Nieuw Lied!",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0} Munten (Totaal: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "Terug naar het startmenu",
@@ -539,7 +455,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[ERROR] Onjuiste conditie.",
-		"UNLOCK_CONDITION_SHOP": "Item alleen in de shop beschikbaar.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "Muntprijs: {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "Item gekocht!",
@@ -629,57 +544,15 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "Deus-Ex-Machina",
 		// {0}: Section No.
 		"AI_SECTION": "Sectie {0}",
 
 		// Mods
-		"MOD_NONE": "Geen",
-		"MOD_BLANK": "-",
-		"MOD_SWITCH_OFF": "Uit",
-		"MOD_SWITCH_ON": "Aan",
-		"MOD_SCOREMULTIPLY": "Score Vermenigvuldiger : {0}",
-		"MOD_COINMULTIPLY": "Munten Vermenigvuldiger : {0}",
-
-		"MOD_SPEED": "Scroll Snelheid",
-
-		"MOD_HIDE": "Verborgen",
-		"MOD_STEALTH": "Onzichtbaar",
-
-		"MOD_FLIP": "Noten Omkeren",
-
-		"MOD_RANDOM": "Willekeurig",
-		"MOD_RANDOM_SHUFFLE": "Husselen",
-		"MOD_RANDOM_CHAOS": "Chaos",
-
-		"MOD_TIMING": "Timing",
 		"MOD_TIMING1": "Los",
 		"MOD_TIMING2": "Lenig",
 		"MOD_TIMING3": "Normaal",
 		"MOD_TIMING4": "Strikt",
-		"MOD_TIMING5": "Rigoureus",
-
-		"MOD_JUSTICE": "Justice Modus",
-		"MOD_SAFE": "Veilig",
-		"MOD_JUST": "Precies",
-
-		"MOD_GAMETYPE": "Speltype",
-		"MOD_GAMETYPE_TAIKO": "Taiko",
-		"MOD_GAMETYPE_KONGA": "Konga",
-
-		"MOD_GAMEMODE": "Game Modus",
-		"MOD_GAMEMODE_TRAINING": "Trainingsmodus",
-
-		"MOD_AUTO": "Auto",
-
-		"MOD_SONGSPEED": "Lied Afspeelsnelheid",
-		"SETTINGS_MOD_SONGSPEED_DESC": "Verandert de snelheid van het lied. Als de Tijd Rekking optie is ingeschakeld, kunnen geluidsproblemen onststaan onder 0.9x snelheid.\nOpmerking: Het verandert ook de toon van het lied.",
-
-		"MOD_HITSOUND": "Instrument",
-
-		"MOD_FUN": "Leuke Mods",
-		"MOD_FUN_AVALANCHE": "Lawine",
-		"MOD_FUN_MINESWEEPER": "Mijnenveger"
+		"MOD_TIMING5": "Rigoureus"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",

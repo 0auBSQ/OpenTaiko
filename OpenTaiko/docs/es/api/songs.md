@@ -270,6 +270,8 @@ Disponible como la global DANBUILDER. Los índices de canción y de ranura empie
 | `DANBUILDER:SetSubtitle(subtitle)  -> void` | Establece el subtítulo del curso. |
 | `DANBUILDER:SetDanTick(tick)  -> void` | Establece el valor de marca de la placa de Dan (2 por defecto). |
 | `DANBUILDER:SetDanTickColor(r, g, b)  -> void` | Establece el color de la marca de la placa de Dan a partir de componentes 0-255 (blanco por defecto). |
+| `DANBUILDER:SetGenreTitle(title)  -> void` | Establece el texto de la placa de género durante la partida. Por defecto, la placa muestra la carpeta de género de la canción que se está jugando. |
+| `DANBUILDER:SetGenreColor(r, g, b)  -> void` | Establece el color de la placa de género a partir de componentes 0-255. Por defecto, la placa toma el color de la carpeta de género que muestra, o blanco si SetGenreTitle estableció el texto. |
 | `DANBUILDER:SetGlobalExam(slot, type, red, gold, lessThan)  -> void` | Establece un examen de todo el curso en la ranura indicada. |
 | `DANBUILDER:SetPerSongExam(songIndex, slot, type, red, gold, lessThan)  -> void` | Establece un examen que se aplica a una canción, por índice de canción (desde 1) y ranura. |
 | `DANBUILDER:Clear()  -> void` | Elimina todas las canciones y exámenes y reinicia los metadatos a sus valores por defecto. |

@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "敲鼓相关设置。",
 		"SETTINGS_THEME": "主题设置",
 		"SETTINGS_THEME_DESC": "当前皮肤特有的设置。在皮肤文件夹的ThemeSettings.json中定义。",
-		"SETTINGS_EXIT": "退出",
-		"SETTINGS_EXIT_DESC": "保存设定并退出设置菜单。",
-
-		"SETTINGS_MENU_RETURN": "<< 返回上级菜单",
-		"SETTINGS_MENU_RETURN_DESC": "返回至上级菜单。",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "系统输入设置",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "二级菜单：设置系统按键。",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "重置音乐下载选择",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "清除已保存的“从不”选择。下次启动时将再次显示音乐下载提示。",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "隐藏段位/塔",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "在太鼓模式菜单中隐藏段位和塔谱面。重新加载歌曲以使此选项生效。",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "全屏模式",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "切换全屏/窗口模式。",
 		"SETTINGS_SYSTEM_WINDOWMODE": "窗口模式",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "选择窗口、全屏或无边框全屏。无边框将无装饰地铺满显示器。",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "窗口",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "最大帧率。\nUnlimited 使用显示器的刷新率\n（例如 ProMotion 的 120Hz）。\n重启后生效。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "图像 API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "绘制方式：从 OpenGL、DirectX11、Vulkan，或 Metal 中选择。OpenGL 速度较慢，但稳定性和兼容性较好。DirectX11 较快且稳定，但只能在 Windows 上使用。Vulkan 在 Linux 上速度最快。Metal 只能在 MacOS 上使用。\n\n该项设置将在重启 OpenTaiko 后生效。",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "异步贴图加载",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "贴图加载方式：启动画面消失时冻结。如果有些贴图变黑，请关闭这项设置。该项设置将在重启 OpenTaiko 后生效。",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "播放背景视频",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "选择是否开启背景视频。若此选项开启但文件夹中没有视频，背景会变为全黑。",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "键盘音量增减幅度",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "控制每次按下调整音量按键时音量的增减幅度。更改范围：1—20",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "歌曲播放缓冲",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "歌曲播放开始前的等待时间。减小该值可能会导致歌曲过早开始播放。",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "歌曲预览缓冲",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "歌曲预览等待时间。减小该值或将导致预览在卷动歌曲列表时就开始播放。范围：0—10000ms",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "声音播放模式",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO：\n— 只在支持 ASIO 的音频设备上生效\n— 输入延迟最低\nWASAPI：\n— 仅与 Windows 兼容\n— 输入延迟次低\nBASS：\n— 支持所有平台退出设置界面以使此选项生效。",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO 播放设备",
@@ -172,8 +155,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "创建日志文件",
 		"SETTINGS_SYSTEM_LOG_DESC": "选择游戏关闭时是否生成 TJAPlayer3.log 文件。该文件用于追踪游戏的性能并记录报错信息。",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "随机选曲时访问子文件夹",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "选择随机选曲时是否访问子文件夹。",
 		"SETTINGS_SYSTEM_DEBUGMODE": "调试模式",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "选择是否开启调试模式。开启后右下角会显示附加信息。敲击音效关闭时会显示延迟校准。",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "触摸太鼓大小",
@@ -197,8 +178,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "选择是否自动截屏结果。只有当获得新高分时才会截屏，但最高分并不一定是最佳演奏。",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord 状态显示",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "选择是否在 Discord 上共享歌曲信息。",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "缓冲输入模式",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "开启后，判定时间精度将不受帧率限制，且所有输入都不会被忽略。关闭后，判定时间精度将受帧率限制，且部分输入可能会被忽略。",
 
 		// Settings - Gameplay
 		"SETTINGS_GAME_GLOBALOFFSET": "全局偏移量",
@@ -220,10 +199,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "总是使用普通魂条",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "强制总是使用普通魂条，无视角色的修改器。",
 
-		"SETTINGS_GAME_AUTOP1": "玩家 1 自动演奏",
-		"SETTINGS_GAME_AUTOP1_DESC": "切换玩家 1 是否自动演奏。",
-		"SETTINGS_GAME_AUTOP2": "玩家 2 自动演奏",
-		"SETTINGS_GAME_AUTOP2_DESC": "切换玩家 2 是否自动演奏。",
 		"SETTINGS_GAME_AUTOROLL": "连打速度",
 		"SETTINGS_GAME_AUTOROLL_DESC": "设置自动演奏时连打的每秒敲击次数。不对气球生效。0 禁用自动连打。-1 以不造成卡顿的极限速度连打。",
 		"SETTINGS_GAME_AUTOBALLOON": "气球最高连打速度",
@@ -231,8 +206,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "允许自动演奏略过击打",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "允许自动演奏在继续击打会造成卡顿甚至死机时，略过后续击打。按住暂停键时也会暂时允许略过击打。",
 
-		"SETTINGS_GAME_NOINFO": "无信息模式",
-		"SETTINGS_GAME_NOINFO_DESC": "切换是否隐藏歌曲信息。打开会隐藏歌曲信息，关闭会显示歌曲信息。",
 		"SETTINGS_GAME_COMBODISPLAY": "最小连击显示",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "选择开始显示连击的数量。范围：1—99999",
 		"SETTINGS_GAME_SCOREDISPLAY": "显示判定情况",
@@ -242,8 +215,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "默认难度",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "选择选曲期间的默认难度。如果未选择魔王（里），在一合适歌曲魔王（表）难度下按下右方向键之前，魔王（里）将不可见。",
-		"SETTINGS_GAME_EXEXTRAANIME": "表里谱面过渡效果",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "播放由皮肤定义的表里谱面切换动画效果。",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "跳转小节数",
@@ -257,8 +228,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "图像预览缓冲",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "移植 DTXMania 导致的无效设置，没有任何作用。",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "时间拉伸模式",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "此选项作用不明。增加 CPU 占用，且当歌曲播放速度低于 0.9 倍时可能会出现问题。",
 		"SETTINGS_SYSTEM_FASTRENDER": "快速渲染",
@@ -287,8 +256,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "系统按键分配：分配显示调试菜单按键。（仅可使用键盘，不可使用手柄）",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "快速设置",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "系统按键分配：分配访问快速设置按键。（仅可使用键盘，不可使用手柄）",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "玩家自定义",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "系统按键分配：分配玩家自定义按键。（仅可使用键盘，不可使用手柄）",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "切换歌曲排序方式",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "系统按键分配：分配切换歌曲排序方式按键。（仅可使用键盘，不可使用手柄）",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "切换自动演奏（玩家 1）",
@@ -399,63 +366,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "跳转至最后一小节",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "鼓按键分配：分配跳转至最后一小节按键。",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "演奏模式",
-		"TITLE_MODE_DAN": "段位道场",
-		"TITLE_MODE_TOWER": "太鼓塔",
-		"TITLE_MODE_SHOP": "商店",
-		"TITLE_MODE_STORY": "太鼓冒险",
-		"TITLE_MODE_HEYA": "我的房间",
-		"TITLE_MODE_SETTINGS": "设置",
-		"TITLE_MODE_EXIT": "退出",
-		"TITLE_MODE_ONLINE": "在线大厅",
-		"TITLE_MODE_AI": "AI 对战模式",
-		"TITLE_MODE_STATS": "玩家数据",
-		"TITLE_MODE_EDITOR": "谱面编辑器",
-		"TITLE_MODE_TOOLS": "开放工具箱",
-
-		"TITLE_MODE_TAIKO_DESC": "按照您自己的节奏演奏歌曲！",
-		"TITLE_MODE_DAN_DESC": "连续演奏多个谱面并通过挑战测试！",
-		"TITLE_MODE_TOWER_DESC": "在有限次机会内演奏长谱面并到达塔顶！",
-		"TITLE_MODE_SHOP_DESC": "使用游戏中获得的金币购买歌曲和角色！",
-		"TITLE_MODE_STORY_DESC": "克服各种障碍来获得新内容！",
-		"TITLE_MODE_HEYA_DESC": "更改名牌信息或角色外观！",
-		"TITLE_MODE_SETTINGS_DESC": "更改游戏风格或设置！",
-		"TITLE_MODE_EXIT_DESC": "退出游戏，下次再见！",
-		"TITLE_MODE_ONLINE_DESC": "从网络下载新谱面和内容！",
-		"TITLE_MODE_AI_DESC": "与强大的 AI 进行多轮对战并取胜！",
-		"TITLE_MODE_STATS_DESC": "观看并追踪您的进度！",
-		"TITLE_MODE_EDITOR_DESC": "为您喜爱的乐曲制作 .tja 谱面！",
-		"TITLE_MODE_TOOLS_DESC": "用多种工具插入自制内容！",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "返回（{0}）",
-		"SONGSELECT_RANDOM": "随机歌曲",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "随机歌曲（{0}）",
 
-		"SONGSELECT_SORT": "排序菜单",
-		"SONGSELECT_SORT_PATH": "文件路径",
 		"SONGSELECT_SORT_TITLE": "标题",
 		"SONGSELECT_SORT_SUBTITLE": "副标题",
 		"SONGSELECT_SORT_LEVEL": "显示等级",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM：{0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM：{0:0.###}（{1:0.###}-{2:0.###}）",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "谱面作者：{0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "标题",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "副标题",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "谱面作者",
-
-		"SONGSELECT_QUICKCONFIG": "快速设置",
-		"SONGSELECT_QUICKCONFIG_MORE": "更多……",
 
 		// Modals
 		"MODAL_TITLE_COIN": "获得金币！",
@@ -464,9 +383,6 @@
 		"MODAL_TITLE_PUCHI": "获得迷你角色！",
 		"MODAL_TITLE_NAMEPLATE": "获得新称号！",
 		"MODAL_TITLE_SONG": "获得新歌曲！",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0}金币（总计：{1}）",
 
 		// Online Lounge
 		"ONLINE_EXIT": "返回主菜单",
@@ -539,7 +455,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "【错误】未达成条件",
-		"UNLOCK_CONDITION_SHOP": "物品仅在商店可用。", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "金币价格：{0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "购买成功！",
@@ -629,57 +544,15 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "机械降神",
 		// {0}: Section No.
 		"AI_SECTION": "{0}区",
 
 		// Mods
-		"MOD_NONE": "无",
-		"MOD_BLANK": "-",
-		"MOD_SWITCH_OFF": "关闭",
-		"MOD_SWITCH_ON": "开启",
-		"MOD_SCOREMULTIPLY": "得分倍率：{0}",
-		"MOD_COINMULTIPLY": "金币倍率：{0}",
-
-		"MOD_SPEED": "卷动速度",
-
-		"MOD_HIDE": "隐藏音符",
-		"MOD_STEALTH": "隐形",
-
-		"MOD_FLIP": "翻转",
-
-		"MOD_RANDOM": "随机",
-		"MOD_RANDOM_SHUFFLE": "洗牌",
-		"MOD_RANDOM_CHAOS": "混沌",
-
-		"MOD_TIMING": "时机判断",
 		"MOD_TIMING1": "非常宽松",
 		"MOD_TIMING2": "宽松",
 		"MOD_TIMING3": "一般",
 		"MOD_TIMING4": "严格",
-		"MOD_TIMING5": "非常严格",
-
-		"MOD_JUSTICE": "严格模式",
-		"MOD_SAFE": "安全",
-		"MOD_JUST": "严格",
-
-		"MOD_GAMETYPE": "游戏类型",
-		"MOD_GAMETYPE_TAIKO": "太鼓",
-		"MOD_GAMETYPE_KONGA": "康加鼓",
-
-		"MOD_GAMEMODE": "游戏模式",
-		"MOD_GAMEMODE_TRAINING": "训练模式",
-
-		"MOD_AUTO": "自动",
-
-		"MOD_SONGSPEED": "歌曲播放速度",
-		"SETTINGS_MOD_SONGSPEED_DESC": "调整歌曲播放速度。当时间拉伸模式开启，且歌曲播放速度低于 0.9 倍时可能会出现问题。提示：此选项会影响歌曲音高。",
-
-		"MOD_HITSOUND": "音色",
-
-		"MOD_FUN": "趣味模组",
-		"MOD_FUN_AVALANCHE": "雪崩",
-		"MOD_FUN_MINESWEEPER": "扫雷"
+		"MOD_TIMING5": "非常严格"
 	},
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "键找不到：{0}",

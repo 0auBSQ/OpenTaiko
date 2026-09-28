@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "게임 플레이 설정입니다.",
 		"SETTINGS_THEME": "테마",
 		"SETTINGS_THEME_DESC": "현재 스킨에 특화된 설정입니다. 스킨 폴더의 ThemeSettings.json에서 정의됩니다.",
-		"SETTINGS_EXIT": "나가기",
-		"SETTINGS_EXIT_DESC": "저장하고 나가기.",
-
-		"SETTINGS_MENU_RETURN": "<< 메뉴로 돌아가기",
-		"SETTINGS_MENU_RETURN_DESC": "왼쪽 메뉴로 돌아가기",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "시스템 입력 설정",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "시스템 키를 설정하는 메뉴입니다.",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "사운드트랙 다운로드 선택 초기화",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "저장된 \"안 함\" 선택을 지웁니다. 다음 실행 시 사운드트랙 안내가 다시 표시됩니다.",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "단위도장/타워모드 숨기기",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "태고 모드에서 단위도장/타워모드를 숨깁니다. 곡을 다시 불러와야 적용됩니다.",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "전체화면 모드",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "전체화면 모드, 창 모드로 변경할 수 있습니다.",
 		"SETTINGS_SYSTEM_WINDOWMODE": "창 모드",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "창, 전체 화면 또는 테두리 없는 전체 화면을 선택합니다. 테두리 없음은 장식 없이 모니터를 채웁니다.",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "창 모드",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "최대 프레임 레이트입니다.\nUnlimited는 디스플레이의 주사율\n(예: ProMotion에서 120Hz)을 사용합니다.\n재시작 후 적용됩니다.",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "그래픽 API",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "그래픽 API 옵션: OpenGL, DirectX11, Vulkan, 또는 Metal을 선택할 수 있습니다. OpenGL은 느리지만, 호환성, 안정성이 좋습니다. DirectX11은 빠르고 안정하지만, 윈도우에서만 지원합니다. Vulkan은 리눅스OS에서 빠릅니다. Metal은 MacOS에서만 지원됩니다.\n\n게임을 재시작하여야 변경 사항이 적용됩니다.",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "ASync 텍스처 로딩",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "텍스처 로딩 타입: 게임 시작때 프리징(렉)이 없어집니다. 일부 텍스처가 검은색으로 변하면 이 옵션을 끄세요. 게임을 재시작하여야 변경 사항이 적용됩니다.",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "동영상 재생",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "BGMOVIE 표시 여부를 설정합니다. 파일에 동영상이 없다면, 배경이 검게 표시됩니다.",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "키보드로 볼륨 조절",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "키보드로 볼륨 조절합니다. 볼륨 시스템 키로 조절할 수 있습니다. 1 에서 20까지 설정하실 수 있습니다.",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "곡 재생 버퍼",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "게임 플레이 중 노래가 재생되기까지 걸리는 시간입니다. 값을 낮추면 노래가 너무 일찍 재생될 수 있습니다.",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "곡 미리듣기 버퍼",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "곡 미리듣기가 재생되기까지 걸리는 시간입니다. 이 값을 낮추면 스크롤을 계속하는 동안 미리듣기가 시작될 수 있습니다.",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "곡 재생 모드",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "ASIO: ASIO를 지원하는 사운드 디바이스에서만 지원합니다. 제일 낮은 레이턴시를 가지고 있습니다.\nWASAPI: 윈도우에서만 지원합니다. 두번째로 낮은 레이턴시를 가지고 있습니다.\nBASS: 모든 기기에서 지원합니다 메인 메뉴로 돌아가시면 적용됩니다.",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIO 재생 디바이스",
@@ -173,8 +156,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "로그 파일 만들기",
 		"SETTINGS_SYSTEM_LOG_DESC": "게임을 끄면 로그 파일(TJAPlayer3.log)이 생성되도록 만듭니다.",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "랜덤 곡 서브파일 만들기",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "랜덤 곡 선택 시 서브폴더 사용 여부를 설정합니다.",
 		"SETTINGS_SYSTEM_DEBUGMODE": "디버그 모드",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "디버그 모드 사용 여부를 전환합니다. 디버그 모드를 키시면 우측 아래에 추가 정보를 띄웁니다.",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "터치 북 크기",
@@ -198,8 +179,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "최고 기록 게임 결과를 자동으로 스크린샷 해줍니다.",
 		"SETTINGS_SYSTEM_DISCORDRPC": "디스코드 활동 모드",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "디스코드 프로필에 게임 활동을 띄웁니다.",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "버퍼링 입력 모드",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "이 옵션을 켜면 입력이 무시되지 않지만 입력 폴링 속도가 감소하고, 이 옵션을 끄면 입력이 무시될 수 있지만 폴링 빈도가 높아집니다.",
 		// Please revise the text above from English.
 
 		// Settings - Gameplay
@@ -222,10 +201,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "항상 일반 게이지 사용",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "일반 게이지를 항상 사용하도록 강제합니다.",
 
-		"SETTINGS_GAME_AUTOP1": "플레이어 1 오토 플레이",
-		"SETTINGS_GAME_AUTOP1_DESC": "플레이어 1의 오토 플레이 여부를 설정합니다.",
-		"SETTINGS_GAME_AUTOP2": "플레이어 2 오토 플레이",
-		"SETTINGS_GAME_AUTOP2_DESC": "플레이어 2의 오토 플레이 여부를 설정합니다.",
 		"SETTINGS_GAME_AUTOROLL": "연타 속도",
 		"SETTINGS_GAME_AUTOROLL_DESC": "오토 플레이가 활성화되면 연타 노트를 초당 설정한 횟수만큼 자동으로 칩니다. 풍선에는 영향을 미치지 않습니다. 0은 자동 연타를 비활성화합니다. -1은 심한 렉이 걸리지 않는 선에서 최대한 많이 칩니다.",
 		"SETTINGS_GAME_AUTOBALLOON": "풍선 최대 연타 속도",
@@ -233,8 +208,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "오토 플레이 타격 건너뛰기 허용",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "계속 치면 렉이 걸리거나 게임이 멈출 수 있는 경우, 오토 플레이가 이후의 타격을 건너뛸 수 있도록 허용합니다. 일시정지 단축키를 누를 때에도 일시적으로 건너뛰기가 허용됩니다.",
 
-		"SETTINGS_GAME_NOINFO": "정보 없음 모드",
-		"SETTINGS_GAME_NOINFO_DESC": "노래 정보 표시 여부를 설정합니다. 이 옵션을 켜면 노래 정보가 비활성화되고, 끄면 노래 정보가 활성화됩니다.",
 		"SETTINGS_GAME_COMBODISPLAY": "최소 콤보 표시",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "콤보가 표시되는 초기 번호를 선택합니다. 1에서 99999 사이로 지정할 수 있습니다.",
 		"SETTINGS_GAME_SCOREDISPLAY": "판정 통계 표시",
@@ -244,8 +217,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "기본 난이도",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "노래 선택에서 선택할 기본 난이도를 선택합니다. 우라 난이도를 선택하지 않으면 오른쪽 캇을 누르지 않는 한 해당 노래의 우라 난이도가 표시되지 않습니다.",
-		"SETTINGS_GAME_EXEXTRAANIME": "귀신/우라 전환 애니메이션",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "스킨 정의 애니메이션을 재생하면서 귀신과 우라를 전환합니다.",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "마디 스킵 횟수",
@@ -259,8 +230,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "이미지 프리뷰 버퍼",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "이 설정은 DTXMania에서 가져온 중복 설정이며 아무것도 하지 않습니다.",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "시간 연장 모드",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "이 옵션의 기능을 잘 모르겠습니다 (네, 진짜로요.). 더 많은 CPU 전력을 사용하며, 재생 속도 0.9배 이하에서 사운드 문제가 발생할 수 있습니다.",
 		"SETTINGS_SYSTEM_FASTRENDER": "빠른 렌더링",
@@ -289,8 +258,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "시스템 키 설정: 디버그 메뉴를 표시하는 데 사용할 키를 설정합니다. (키보드만 사용할 수 있습니다. 게임패드는 사용할 수 없습니다.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "빠른 설정",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "시스템 키 설정: 빠른 설정에 접근하는 데 사용할 키를 설정합니다. (키보드만 사용할 수 있습니다. 게임패드는 사용할 수 없습니다.)",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "플레이어 커스터마이징",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "시스템 키 설정: 플레이어 커스터마이징에 사용할 키를 설정합니다. (키보드만 사용할 수 있습니다. 게임패드는 사용할 수 없습니다.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "곡 정렬 변경",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "시스템 키 설정: 곡을 다시 정렬하는 데 사용할 키를 설정합니다. (키보드만 사용할 수 있습니다. 게임패드는 사용할 수 없습니다.)",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "오토 플레이 (P1)",
@@ -401,63 +368,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "마지막 마디로 가기",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "드럼 키 설정: 마지막 마디로 이동하는 데 사용할 키를 설정합니다.",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "태고 모드",
-		"TITLE_MODE_DAN": "단위도장",
-		"TITLE_MODE_TOWER": "태고 타워",
-		"TITLE_MODE_SHOP": "상점",
-		"TITLE_MODE_STORY": "태고 어드벤처",
-		"TITLE_MODE_HEYA": "내 방",
-		"TITLE_MODE_SETTINGS": "설정",
-		"TITLE_MODE_EXIT": "나가기",
-		"TITLE_MODE_ONLINE": "온라인 라운지",
-		"TITLE_MODE_AI": "AI 배틀 모드",
-		"TITLE_MODE_STATS": "플레이어 정보",
-		"TITLE_MODE_EDITOR": "곡 에디터",
-		"TITLE_MODE_TOOLS": "툴 열기",
-
-		"TITLE_MODE_TAIKO_DESC": "좋아하는 곡이나\n난이도를 골라서\n플레이할 수 있어!",
-		"TITLE_MODE_DAN_DESC": "연속으로 3곡을 연주하면서\n타이틀 합격을 노려보자!\n합격하면 실력을 인정받게 돼!",
-		"TITLE_MODE_TOWER_DESC": "제한된 횟수 내에서\n긴 곡을 플레이하고\n타워의 정상에 도달하자!",
-		"TITLE_MODE_SHOP_DESC": "모은 메달로\n캐릭터, 푸치 캐릭터 또는\n곡을 구매할 수 있어!",
-		"TITLE_MODE_STORY_DESC": "다양한 장애물을 물리치고\n새로운 콘텐츠와 세계을 열어보자!",
-		"TITLE_MODE_HEYA_DESC": "플레이어 정보 또는\n캐릭터를 변경할 수 있어!",
-		"TITLE_MODE_SETTINGS_DESC": "게임 스킨 또는\n설정을 변경할 수 있어!",
-		"TITLE_MODE_EXIT_DESC": "게임을 종료합니다.\n다음에 또 만나요!",
-		"TITLE_MODE_ONLINE_DESC": "곡 또는 콘텐츠를\n인터넷을 통해 다운받을 수 있어!",
-		"TITLE_MODE_AI_DESC": "AI와 막상막하\n아슬아슬한 배틀을\n즐겨보자!",
-		"TITLE_MODE_STATS_DESC": "진행 상황을\n확인할 수 있어!",
-		"TITLE_MODE_EDITOR_DESC": "좋아하는 곡으로 나만의 .tja를 만들어보자!",
-		"TITLE_MODE_TOOLS_DESC": "다양한 툴을 사용해서\n커스텀 컨텐츠를 삽입할 수 있어!",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "뒤로가기 ({0})",
-		"SONGSELECT_RANDOM": "랜덤 곡",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "랜덤 곡 ({0})",
 
-		"SONGSELECT_SORT": "정렬 메뉴",
-		"SONGSELECT_SORT_PATH": "경로",
 		"SONGSELECT_SORT_TITLE": "제목",
 		"SONGSELECT_SORT_SUBTITLE": "부제목",
 		"SONGSELECT_SORT_LEVEL": "레벨",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "제작자: {0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "제목",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "부제목",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "제작자",
-
-		"SONGSELECT_QUICKCONFIG": "빠른 설정",
-		"SONGSELECT_QUICKCONFIG_MORE": "더 보기...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "새 코인!",
@@ -466,9 +385,6 @@
 		"MODAL_TITLE_PUCHI": "새 푸치 캐릭터!",
 		"MODAL_TITLE_NAMEPLATE": "새 타이틀!",
 		"MODAL_TITLE_SONG": "신곡!",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0} 코인 (합계: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "메인 메뉴로 돌아가기",
@@ -541,7 +457,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[오류] 잘못된 조건",
-		"UNLOCK_CONDITION_SHOP": "이 아이템은 상점에서만 구매 가능합니다.", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "코인 가격: {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "아이템 구매 완료!",
@@ -631,57 +546,15 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "데우스 엑스 마키나",
 		// {0}: Section No.
 		"AI_SECTION": "섹션 {0}",
 
 		// Mods
-		"MOD_NONE": "없음",
-		"MOD_BLANK": "-",
-		"MOD_SWITCH_OFF": "끄기",
-		"MOD_SWITCH_ON": "켜기",
-		"MOD_SCOREMULTIPLY": "점수 배율 : {0}",
-		"MOD_COINMULTIPLY": "코인 배율 : {0}",
-
-		"MOD_SPEED": "스크롤 속도",
-
-		"MOD_HIDE": "투명",
-		"MOD_STEALTH": "은신",
-
-		"MOD_FLIP": "역전",
-
-		"MOD_RANDOM": "랜덤",
-		"MOD_RANDOM_SHUFFLE": "변덕",
-		"MOD_RANDOM_CHAOS": "대충",
-
-		"MOD_TIMING": "판정",
 		"MOD_TIMING1": "더 느슨하게",
 		"MOD_TIMING2": "느슨하게",
 		"MOD_TIMING3": "보통",
 		"MOD_TIMING4": "엄격하게",
-		"MOD_TIMING5": "더 엄격하게",
-
-		"MOD_JUSTICE": "정의 모드",
-		"MOD_SAFE": "안전제일",
-		"MOD_JUST": "완벽주의",
-
-		"MOD_GAMETYPE": "게임 타입",
-		"MOD_GAMETYPE_TAIKO": "태고",
-		"MOD_GAMETYPE_KONGA": "콩가",
-
-		"MOD_GAMEMODE": "게임 모드",
-		"MOD_GAMEMODE_TRAINING": "특훈 모드",
-
-		"MOD_AUTO": "오토",
-
-		"MOD_SONGSPEED": "곡 재생 속도",
-		"SETTINGS_MOD_SONGSPEED_DESC": "노래 재생 속도를 변경합니다. 이 옵션을 활성화하면 재생 속도 0.9배 이하에서 사운드 문제가 발생할 수 있습니다. 주의: 노래의 피치도 변경됩니다.",
-
-		"MOD_HITSOUND": "음색",
-
-		"MOD_FUN": "재밌는 모드",
-		"MOD_FUN_AVALANCHE": "태풍",
-		"MOD_FUN_MINESWEEPER": "지뢰 찾기"
+		"MOD_TIMING5": "더 엄격하게"
 	},
   // In the case that a key is missing, this message will display, with the name of the missing/unknown key.
   "InvalidKey": "KEY NOT FOUND: {0}",

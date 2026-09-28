@@ -37,11 +37,6 @@
 		"SETTINGS_GAME_DESC": "ドラムの演奏に関する項目を設定します。",
 		"SETTINGS_THEME": "テーマ設定",
 		"SETTINGS_THEME_DESC": "現在のスキン固有の設定です。スキンフォルダのThemeSettings.jsonで定義されます。",
-		"SETTINGS_EXIT": "出る",
-		"SETTINGS_EXIT_DESC": "設定を保存し、コンフィグ画面を終了します。",
-
-		"SETTINGS_MENU_RETURN": "<< 戻る",
-		"SETTINGS_MENU_RETURN_DESC": "左側のメニューに戻ります。",
 
 		"SETTINGS_KEYASSIGN_SYSTEM": "システム入力設定",
 		"SETTINGS_KEYASSIGN_SYSTEM_DESC": "システムのキー入力に関する項目を設定します。",
@@ -82,12 +77,7 @@
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK": "サウンドトラックのダウンロード選択をリセット",
 		"SETTINGS_SYSTEM_RESETSOUNDTRACK_DESC": "保存された「今後表示しない」の選択を消去します。次回起動時にサウンドトラックの確認が再び表示されます。",
 
-		"SETTINGS_SYSTEM_HIDEDANTOWER": "段・タワー譜面省略",
-		"SETTINGS_SYSTEM_HIDEDANTOWER_DESC": "演奏選曲画面にタワー及び段の譜面を省略設定です。ONに設けると別々の画面にしか表示されていません。\n※ 設定は譜面の再読み込み時に有効になります。",
-
 		// Settings - System - Graphics
-		"SETTINGS_SYSTEM_FULLSCREEN": "全画面モード",
-		"SETTINGS_SYSTEM_FULLSCREEN_DESC": "画面モード設定：ON で全画面モード、OFF でウィンドウモードになります。",
 		"SETTINGS_SYSTEM_WINDOWMODE": "ウィンドウモード",
 		"SETTINGS_SYSTEM_WINDOWMODE_DESC": "ウィンドウ・フルスクリーン・ボーダーレスから選択します。ボーダーレスは枠なしで画面全体を覆います。",
 		"SETTINGS_SYSTEM_WINDOWMODE_WINDOWED": "ウィンドウ",
@@ -99,8 +89,6 @@
 		"SETTINGS_SYSTEM_FRAMERATE_DESC": "最大フレームレート。\nUnlimited を選ぶとディスプレイのリフレッシュ\nレート（ProMotion では 120Hz など）になります。\n再起動後に反映されます。",
 		"SETTINGS_SYSTEM_GRAPHICSAPI": "グラフィックスAPI",
 		"SETTINGS_SYSTEM_GRAPHICSAPI_DESC": "描画の方式:OpenGL, DirectX11, Vulkan, Metalの中からグラフィックスAPIを選択します。OpenGLは遅いですが互換性が高く安定してます\nDirectX9は古いデバイスで高速です、DirectX11はWindowsでしか動作しませんが、早くて安定しています\nVulkanはWindowsとLinux環境で最速です\nMetalはMacのみですが最速です\n\nこの変更は再起動後に反映されます",
-		"SETTINGS_SYSTEM_TEXTUREASYNC": "非同期テクスチャ読み込み",
-		"SETTINGS_SYSTEM_TEXTUREASYNC_DESC": "テクスチャの読み込み方法:起動時のフリーズが消えますテクスチャが黒くなる場合はこのオプションをOFFにしてくださいこの変更は再起動後に反映されます",
 
 		"SETTINGS_SYSTEM_BGMOVIE": "動画再生",
 		"SETTINGS_SYSTEM_BGMOVIE_DESC": "AVIの使用：動画(AVI)を再生可能にする場合に\nON にします。AVI の再生には、それなりのマシンパワーが必要とされます。",
@@ -153,11 +141,6 @@
 		"SETTINGS_SYSTEM_VOLINCREMENT": "キーボード音量調整",
 		"SETTINGS_SYSTEM_VOLINCREMENT_DESC": "キーボードで音量調整をするときの増加量、減少量を指定します。1 ～ 20 の値が指定可能です。",
 
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER": "音源再生バッファ",
-		"SETTINGS_SYSTEM_SONGPLAYBACKBUFFER_DESC": "音源再生前の空白時間 (ms)。",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER": "プレビュー音量",
-		"SETTINGS_SYSTEM_SONGPREVIEWBUFFER_DESC": "プレビュー時の音源の音量を調節します。",
-
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK": "サウンド出力方式",
 		"SETTINGS_SYSTEM_AUDIOPLAYBACK_DESC": "サウンドの出力方式:WASAPI, ASIO, DSound(DirectSound)の中からサウンド出力方式を選択します。WASAPIはVista以降でのみ使用可能です。ASIOは対応機器でのみ使用可能です。WASAPIかASIOを指定することで、遅延の少ない演奏を楽しむことができます。\n\n※ 設定はCONFIGURATION画面の終了時に有効になります。",
 		"SETTINGS_SYSTEM_ASIOPLAYBACK": "ASIOデバイス",
@@ -173,8 +156,6 @@
 		// Settings - System - Misc.
 		"SETTINGS_SYSTEM_LOG": "Traceログ出力",
 		"SETTINGS_SYSTEM_LOG_DESC": "Traceログ出力：TJAPlayer3.txt にログを出力します。変更した場合は、OpenTaiko の再起動後に有効となります。",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER": "ランダム選曲に子BOXを含める",
-		"SETTINGS_SYSTEM_RANDOMSUBFOLDER_DESC": "子BOXをRANDOMの対象とする：ON にすると、RANDOM SELECT 時に子BOXも選択対象とします。",
 		"SETTINGS_SYSTEM_DEBUGMODE": "デバッグ情報",
 		"SETTINGS_SYSTEM_DEBUGMODE_DESC": "演奏情報の表示：演奏中、BGA領域の下部に演奏情報（FPS、BPM、演奏時間など）を表示します。また、小節線の横に小節番号が表示されるようになります。",
 		"SETTINGS_SYSTEM_TOUCHDRUMSIZE": "タッチ太鼓の大きさ",
@@ -198,8 +179,6 @@
 		"SETTINGS_SYSTEM_AUTOSCREENSHOT_DESC": "リザルト画像自動保存機能：ONにすると、ハイスコア/ハイスキル時に自動でリザルト画像を曲データと同じフォルダに保存します。",
 		"SETTINGS_SYSTEM_DISCORDRPC": "Discord送信",
 		"SETTINGS_SYSTEM_DISCORDRPC_DESC": "Discordに再生中の譜面情報を送信する",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT": "バッファ入力モード",
-		"SETTINGS_SYSTEM_BUFFEREDINPUT_DESC": "バッファ入力モード：ON にすると、FPS を超える入力解像度を実現します。OFF にすると、入力解像度は FPS に等しくなります。",
 		// Please revise the text above from English.
 
 		// Settings - Gameplay
@@ -222,10 +201,6 @@
 		"SETTINGS_GAME_NORMALGAUGE": "ゲージをNormalに固定",
 		"SETTINGS_GAME_NORMALGAUGE_DESC": "ゲージをNormalに固定します",
 
-		"SETTINGS_GAME_AUTOP1": "1Pオートプレイ",
-		"SETTINGS_GAME_AUTOP1_DESC": "すべての音符を自動で演奏します。",
-		"SETTINGS_GAME_AUTOP2": "2Pオートプレイ",
-		"SETTINGS_GAME_AUTOP2_DESC": "すべての音符を自動で演奏します。",
 		"SETTINGS_GAME_AUTOROLL": "連打速度",
 		"SETTINGS_GAME_AUTOROLL_DESC": "AUTO中で黄色連打の速度を変化します。０で設けったら叩きません。-1で設けったら、大きなラグを引き起こさない範囲で可能な限り速く叩きます。",
 		"SETTINGS_GAME_AUTOBALLOON": "ふうせんの最大連打速度",
@@ -233,8 +208,6 @@
 		"SETTINGS_GAME_AUTOCANSKIPHIT": "AUTO中で叩きをやめできる",
 		"SETTINGS_GAME_AUTOCANSKIPHIT_DESC": "叩きを続けるとラグが発生したり、ゲームがフリーズしたりする場合、AUTO中でそれ以上の叩きをやめできるようにします。一時停止キーを押したときにも一時的に有効になります。",
 
-		"SETTINGS_GAME_NOINFO": "情報なし",
-		"SETTINGS_GAME_NOINFO_DESC": "有効にすると曲情報などが見えなくなります。",
 		"SETTINGS_GAME_COMBODISPLAY": "最低表示コンボ",
 		"SETTINGS_GAME_COMBODISPLAY_DESC": "表示可能な最小コンボ数（ドラム）：画面に表示されるコンボの最小の数を指定します。1 ～ 99999 の値が指定可能です。",
 		"SETTINGS_GAME_SCOREDISPLAY": "判定数表示",
@@ -244,8 +217,6 @@
 
 		"SETTINGS_GAME_DEFAULTDIFF": "デフォルト難易度",
 		"SETTINGS_GAME_DEFAULTDIFF_DESC": "デフォルトで選択される難易度",
-		"SETTINGS_GAME_EXEXTRAANIME": "裏表移行アニメーション",
-		"SETTINGS_GAME_EXEXTRAANIME_DESC": "裏表移行アニメーションを有効する",
 
 		// Settings - Gameplay - Training Mode
 		"SETTINGS_TRAINING_SKIPCOUNT": "小節スキップ数",
@@ -259,8 +230,6 @@
 
 		// Settings - Broken/Unused/Might Deprecate/Might Update
 		// Translate these anyways, even if their future is uncertain.
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER": "プレビュー画像バッファ",
-		"SETTINGS_SYSTEM_IMAGEPREVIEWBUFFER_DESC": "プレビュー画像表示までの時間：曲にカーソルが合わされてからプレビュー画像が表示されるまでの時間を指定します。0 ～ 10000 [ms] が指定可能です。",
 		"SETTINGS_SYSTEM_TIMESTRETCH": "タイムストレッチ",
 		"SETTINGS_SYSTEM_TIMESTRETCH_DESC": "演奏速度の変更方式:ONにすると、演奏速度の変更を、周波数変更ではなくタイムストレッチで行います。これをONにすると、サウンド処理により多くのCPU性能を使用します。また、演奏速度をx0.850以下にすると、チップのズレが大きくなります。",
 		"SETTINGS_SYSTEM_FASTRENDER": "高速描画",
@@ -289,8 +258,6 @@
 		"SETTINGS_KEYASSIGN_SYSTEM_DISPLAYDEBUG_DESC": "システムキー割り当て:デバッグ表示切り替えのキーを割り当てます(キーボード以外は割り当てられません)",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG": "簡易設定",
 		"SETTINGS_KEYASSIGN_SYSTEM_QUICKCONFIG_DESC": "システムキー割り当:簡易設定のキーを割り当てます(キーボード以外は割り当てられません)",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA": "プレイヤーカスタマイズ",
-		"SETTINGS_KEYASSIGN_SYSTEM_QUICKHEYA_DESC": "システムキー割り当て:プレイヤーカスタマイズのキーを割り当てます(キーボード以外は割り当てられません)",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT": "曲リストのソート切り替え",
 		"SETTINGS_KEYASSIGN_SYSTEM_SONGSORT_DESC": "システムキー割り当て:曲リストのソート切り替えのキーを割り当てます(キーボード以外は割り当てられません)",
 		"SETTINGS_KEYASSIGN_SYSTEM_AUTO1P": "1Pオート切り替え",
@@ -401,63 +368,15 @@
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST": "最後の小節へ移動",
 		"SETTINGS_KEYASSIGN_TRAINING_JUMPTOLAST_DESC": "ドラムのキー割り当て:最後の小節へ移動するキーを割り当てます。",
 
-		// Title Screen
-		"TITLE_MODE_TAIKO": "演奏ゲーム",
-		"TITLE_MODE_DAN": "段位道場",
-		"TITLE_MODE_TOWER": "太鼓タワー",
-		"TITLE_MODE_SHOP": "メダル商店",
-		"TITLE_MODE_STORY": "太鼓大冒険",
-		"TITLE_MODE_HEYA": "太鼓部屋",
-		"TITLE_MODE_SETTINGS": "設定",
-		"TITLE_MODE_EXIT": "ゲーム終了",
-		"TITLE_MODE_ONLINE": "オンライン喫茶店",
-		"TITLE_MODE_AI": "AIバトル演奏",
-		"TITLE_MODE_STATS": "プレイヤースタッツ",
-		"TITLE_MODE_EDITOR": "譜面エディター",
-		"TITLE_MODE_TOOLS": "Open工具箱",
-
-		"TITLE_MODE_TAIKO_DESC": "好きな曲を選んで演奏しよう!",
-		"TITLE_MODE_DAN_DESC": "段位に挑戦して段位称号を手に入れよう!",
-		"TITLE_MODE_TOWER_DESC": "有限のライフを持って、\nタワーの頂上を登って\n挑戦できるよ！",
-		"TITLE_MODE_SHOP_DESC": "稼いだメダルを費やして、\n新しい曲やプチキャラを買えるよ！",
-		"TITLE_MODE_STORY_DESC": "様々な障害に挑んで、\n新しい場所を発見出来るよ！",
-		"TITLE_MODE_HEYA_DESC": "キャラクタ、プチキャラ、\nネームプレートの情報を変えるよ！",
-		"TITLE_MODE_SETTINGS_DESC": "ゲームスタイルや\n一般的な設定を設けられるよ！",
-		"TITLE_MODE_EXIT_DESC": "セッションを終了できるよ。\nまた遊んでね！",
-		"TITLE_MODE_ONLINE_DESC": "インターネットで新しい譜面\nまたはコンテンツを\nダウンロードできるよ！",
-		"TITLE_MODE_AI_DESC": "腕前によって強さが変わるAIと対戦しよう!",
-		"TITLE_MODE_STATS_DESC": "自分の進歩を認められるよ！",
-		"TITLE_MODE_EDITOR_DESC": "好きな曲を使って\n創作.tja譜面を作られるよ！",
-		"TITLE_MODE_TOOLS_DESC": "様々な役に立つツールを\n使って楽に新しい\nコンテンツを追加できるよ！",
-
 		// Song Select
 		// {0}: Folder path
 		"SONGSELECT_RETURN_PATH": "とじる ({0})",
-		"SONGSELECT_RANDOM": "おまかせ",
 		// {0}: Folder path
 		"SONGSELECT_RANDOM_PATH": "おまかせ ({0})",
 
-		"SONGSELECT_SORT": "ソートメニュー",
-		"SONGSELECT_SORT_PATH": "絶対パス",
 		"SONGSELECT_SORT_TITLE": "曲名",
 		"SONGSELECT_SORT_SUBTITLE": "作者名",
 		"SONGSELECT_SORT_LEVEL": "表示レベル",
-
-		// {0}: Main BPM
-		"SONGSELECT_INFO_BPM": "BPM: {0:0.###}",
-		// {0}: Main BPM
-		// {1}: Minimum BPM
-		// {2}: Maximum BPM
-		"SONGSELECT_INFO_BPM_VARIABLE": "BPM: {0:0.###} ({1:0.###}-{2:0.###})",
-		// {0}: Charter name
-		"SONGSELECT_INFO_CHARTER": "譜面作者：{0}",
-
-		"SONGSELECT_TEXTSEARCH_TITLE": "曲名",
-		"SONGSELECT_TEXTSEARCH_SUBTITLE": "サブタイトル",
-		"SONGSELECT_TEXTSEARCH_CHARTER": "譜面作者",
-
-		"SONGSELECT_QUICKCONFIG": "簡易設定",
-		"SONGSELECT_QUICKCONFIG_MORE": "その他...",
 
 		// Modals
 		"MODAL_TITLE_COIN": "コイン取得！",
@@ -466,9 +385,6 @@
 		"MODAL_TITLE_PUCHI": "プチキャラ取得！",
 		"MODAL_TITLE_NAMEPLATE": "タイトル取得！",
 		"MODAL_TITLE_SONG": "楽曲取得！",
-		// {0}: Newly obtained coins
-		// {1}: New total coin count
-		"MODAL_MESSAGE_COIN": "+{0}コイン (累計: {1})",
 
 		// Online Lounge
 		"ONLINE_EXIT": "タイトルへ戻る",
@@ -541,7 +457,6 @@
 
 		// Unlock requirements & messages (Any Menu)
 		"UNLOCK_CONDITION_INVALID": "[エラー] 無効な条件",
-		"UNLOCK_CONDITION_SHOP": "上記の商品はコイン商店に限りです、部屋に購入ができません。", // cs
 		// {0}: Price of item
 		"UNLOCK_CONDITION_COST": "コインの値段 : {0}", // ch, cs, cm
 		"UNLOCK_COIN_BOUGHT": "商品購入済み !",
@@ -631,57 +546,15 @@
 
 		// AI Info
 		"AI_NAME": "AI",
-		"AI_TITLE": "デウス・エクス・マキナ",
 		// {0}: Section No.
 		"AI_SECTION": "{0}区",
 
 		// Mods
-		"MOD_NONE": "なし",
-		"MOD_BLANK": "使用不可",
-		"MOD_SWITCH_OFF": "しない",
-		"MOD_SWITCH_ON": "する",
-		"MOD_SCOREMULTIPLY": "スコア乗数：{0}",
-		"MOD_COINMULTIPLY": "コイン乗数：{0}",
-
-		"MOD_SPEED": "はやさ",
-
-		"MOD_HIDE": "ドロン",
-		"MOD_STEALTH": "ステルス",
-
-		"MOD_FLIP": "あべこべ",
-
-		"MOD_RANDOM": "ランダム",
-		"MOD_RANDOM_SHUFFLE": "きまぐれ",
-		"MOD_RANDOM_CHAOS": "でたらめ",
-
-		"MOD_TIMING": "タイミング",
 		"MOD_TIMING1": "緩い",
 		"MOD_TIMING2": "易しい",
 		"MOD_TIMING3": "通常",
 		"MOD_TIMING4": "厳しい",
-		"MOD_TIMING5": "過酷",
-
-		"MOD_JUSTICE": "厳密",
-		"MOD_SAFE": "無難",
-		"MOD_JUST": "厳密",
-
-		"MOD_GAMETYPE": "ゲームタイプ",
-		"MOD_GAMETYPE_TAIKO": "太鼓",
-		"MOD_GAMETYPE_KONGA": "コンガ",
-
-		"MOD_GAMEMODE": "ゲームモード",
-		"MOD_GAMEMODE_TRAINING": "特訓モード",
-
-		"MOD_AUTO": "オート",
-
-		"MOD_SONGSPEED": "再生速度",
-		"SETTINGS_MOD_SONGSPEED_DESC": "曲の演奏速度を、速くしたり遅くしたりすることができます。（※一部のサウンドカードでは正しく再生できない可能性があります。）\n\nTimeStretchがONのときに、演奏速度をx0.850以下にすると、音のズレが大きくなります。",
-
-		"MOD_HITSOUND": "音色",
-
-		"MOD_FUN": "余分なモード",
-		"MOD_FUN_AVALANCHE": "雪崩",
-		"MOD_FUN_MINESWEEPER": "掃海"
+		"MOD_TIMING5": "過酷"
 	},
 	// In the case that a key is missing, this message will display, with the name of the missing/unknown key.
 	"InvalidKey": "KEY NOT FOUND: {0}",
