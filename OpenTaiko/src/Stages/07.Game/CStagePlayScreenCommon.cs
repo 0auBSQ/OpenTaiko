@@ -272,6 +272,8 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			this.DanSongScore = new CBRANCHSCORE[OpenTaiko.SongMount.rChoosenSong.DanSongs.Count];
 			for (int i = 0; i < this.DanSongScore.Length; ++i)
 				this.DanSongScore[i] = new();
+		} else {
+			this.DanSongScore = [];
 		}
 
 
@@ -1219,6 +1221,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 			return false;
 		}
 		if (chip.eNoteState == ENoteState.None
+			&& !double.IsNegativeInfinity(chip.msAutoLastHit) // no early attempt; the cast would overflow Math.Abs
 			&& Math.Abs((long)chip.msAutoLastHit - chip.nSoundTimems) < Math.Abs((long)msTjaTime - chip.nSoundTimems)
 			)
 			return this.AutoplayDoHit(chip, chip.msAutoLastHit, iPlayer, gt); // early hit
@@ -2520,7 +2523,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 	public bool IsQuittingStage() => ePhaseID is CStage.EPhase.Common_FADEOUT or CStage.EPhase.Game_EndStage_Quit_FadeOut;
 
 	protected bool tProgressDraw_AVI() {
-		if (this.IsStageFailed_Fast() && (this.actAVI?.rVD.bPlaying ?? false)) {
+		if (this.IsStageFailed_Fast() && this.actAVI.rVD?.bPlaying == true) {
 			this.actAVI.Pause(); // paused but still shown
 		}
 		if (OpenTaiko.ConfigIni.bEnableAVI) {

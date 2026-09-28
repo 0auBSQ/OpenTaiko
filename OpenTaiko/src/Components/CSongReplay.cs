@@ -157,6 +157,7 @@ class CSongReplay {
 					ReachedFloor = reader.ReadInt32();
 					RemainingLives = reader.ReadInt32();
 					DanSongCount = reader.ReadInt32();
+					if (DanSongCount > 0) tDanRegisterSongCount(DanSongCount);
 					for (int i = 0; i < DanSongCount; i++) {
 						IndividualGoodCount[i] = reader.ReadInt32();
 						IndividualOkCount[i] = reader.ReadInt32();

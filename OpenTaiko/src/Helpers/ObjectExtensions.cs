@@ -1,6 +1,7 @@
 ﻿using System.ArrayExtensions;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 // https://github.com/Burtsev-Alexey/net-object-deep-copy/blob/master/ObjectExtensions.cs
@@ -187,6 +188,15 @@ namespace System {
 
 		public static string EscapeSingleQuotes(this string input) {
 			return input.Replace(@"'", @"''");
+		}
+
+		// the longest start of the string that fits in maxBytes of UTF-8, never cutting inside a character
+		public static string TruncateUtf8(this string input, int maxBytes) {
+			if (Encoding.UTF8.GetByteCount(input) <= maxBytes) return input;
+			byte[] bytes = Encoding.UTF8.GetBytes(input);
+			int length = maxBytes;
+			while (length > 0 && (bytes[length] & 0xC0) == 0x80) length--; // step back off continuation bytes
+			return Encoding.UTF8.GetString(bytes, 0, length);
 		}
 
 		public static string SafeFormat(this string format, params object?[] args) {

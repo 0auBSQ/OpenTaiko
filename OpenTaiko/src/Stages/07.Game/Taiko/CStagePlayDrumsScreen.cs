@@ -259,13 +259,8 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 			string details = OpenTaiko.ConfigIni.SendDiscordPlayingInformation ? OpenTaiko.SongMount.rChoosenSong.ldTitle.GetString("")
 																				 + diffToString(OpenTaiko.SongMount.nChoosenSongDifficulty[0]) : "";
 
-			// Byte count must be used instead of String.Length.
-			// The byte count is what Discord is concerned with. Some chars are greater than one byte.
-			if (Encoding.UTF8.GetBytes(details).Length > 128) {
-				byte[] details_byte = Encoding.UTF8.GetBytes(details);
-				Array.Resize(ref details_byte, 128);
-				details = Encoding.UTF8.GetString(details_byte);
-			}
+			// Discord takes at most 128 UTF-8 bytes; cutting inside a character would make it throw
+			details = details.TruncateUtf8(128);
 
 			var difficultyName = OpenTaiko.DifficultyNumberToEnum(OpenTaiko.SongMount.nChoosenSongDifficulty[0]).ToString();
 
@@ -937,7 +932,7 @@ internal partial class CStagePlayDrumsScreen : CStagePlayScreenCommon {
 				return false;
 		}
 
-		for (int songNo = 0; songNo < this.DanSongScore.Length; ++songNo) {
+		for (int songNo = 0; songNo < Math.Min(this.DanSongScore.Length, rep.DanSongCount); ++songNo) {
 			bool judgeCountValidI = rep.IndividualGoodCount[songNo] >= this.DanSongScore[songNo].nGreat
 				&& rep.IndividualOkCount[songNo] >= this.DanSongScore[songNo].nGood
 				&& rep.IndividualBadCount[songNo] >= this.DanSongScore[songNo].nMiss

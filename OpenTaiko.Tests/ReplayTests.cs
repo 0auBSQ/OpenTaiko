@@ -220,6 +220,29 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
+		public void LoadReplay_ReadsPerSongDanCounts() {
+			var (dir, tja) = NewSong();
+			try {
+				var r = new CSongReplay(tja, 0) {
+					GameMode = 1, GameVersion = 601, PlayerName = "Tester", Score = 100, Timestamp = 1,
+					ChartUniqueID = "uid-D", ChartDifficulty = 6, RandomSeed = 7,
+					CompressedInputs = SevenZip.Compression.LZMA.SevenZipHelper.Compress(Array.Empty<byte>()),
+				};
+				r.CompressedInputsSize = r.CompressedInputs.Length;
+				r.tDanRegisterSongCount(2);
+				r.IndividualGoodCount[1] = 42;
+				r.tSaveReplayFile();
+				string file = Directory.GetFiles(Path.Combine(dir, "Replay"), "Replay_*.optkr")[0];
+
+				var rep = new CSongReplay();
+				rep.tLoadReplayFile(file);
+				Assert.Equal(2, rep.DanSongCount);
+				Assert.Equal(42, rep.IndividualGoodCount[1]);
+				Assert.Equal(7, rep.RandomSeed);   // the fields after the per-song counts are read too
+			} finally { Directory.Delete(dir, true); }
+		}
+
+		[Fact]
 		public void ListReplays_MissingFolder_ReturnsEmpty() {
 			var list = CSongReplay.tListReplays(Path.Combine(Path.GetTempPath(), "ot_nope_" + Guid.NewGuid().ToString("N")), "x", 0, 50);
 			Assert.Empty(list);
