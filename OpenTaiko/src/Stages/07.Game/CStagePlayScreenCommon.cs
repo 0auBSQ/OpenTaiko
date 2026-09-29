@@ -2651,7 +2651,12 @@ internal abstract class CStagePlayScreenCommon : CStage {
 					if (!this.bPAUSE && !pChip.bHit) { // can't play while paused
 						pChip.bHit = true;
 						if (configIni.bBGMPlayVoiceSound) {
-							dTX.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tja.TjaTimeToGameTime(pChip.dbSoundTimems)));
+							// under Dynamic Beat the chart reached the chip when the warped clock did; the music then runs at the
+							// current speed, set on the stream the mixer already holds
+							double msReachedTja = isDynBeat ? (pChip.dbSoundTimems - dbDynBeatTjaOffset) / dbDynamicBeatFactor : pChip.dbSoundTimems;
+							dTX.tChipPlayback(pChip, SoundManager.PlayTimer.GameTimeToSystemTime((long)tja.TjaTimeToGameTime(msReachedTja)));
+							if (isDynBeat)
+								dTX.tUpdateDynamicBeatSpeed(OpenTaiko.ConfigIni.SongPlaybackSpeed * dbDynamicBeatFactor);
 						}
 					}
 					break;
@@ -4136,6 +4141,7 @@ internal abstract class CStagePlayScreenCommon : CStage {
 		//this.actAVI.Stop();
 		foreach (var vd in OpenTaiko.TJA.listVD) {
 			vd.Value.Stop();
+			vd.Value.dbPlaySpeed = OpenTaiko.ConfigIni.SongPlaybackSpeed;   // Dynamic Beat may have changed it
 		}
 		this.actAVI.Stop();
 		this.actPanel.tLyricsTextureRemove();

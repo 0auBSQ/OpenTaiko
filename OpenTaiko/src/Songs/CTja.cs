@@ -1012,13 +1012,26 @@ internal class CTja : CActivity {
 	}
 	public void tUpdateDynamicBeatSpeed(double newSpeed) {
 		if (this.listWAV == null) return;
+		// pause/resume and the BGM adjust keys seek to (time since the start) x speed: rebase the start so that
+		// product stays where the sound is
+		long now = SoundManager.PlayTimer.SystemTimeMs;
 		foreach (CWAV cwav in this.listWAV.Values) {
 			for (int i = 0; i < nPolyphonicSounds; i++) {
-				if (cwav.rSound[i] != null && cwav.rSound[i].IsPlaying)
-					cwav.rSound[i].SetSpeedWhilePlaying(newSpeed);
+				CSound sound = cwav.rSound[i];
+				if (sound == null || !sound.IsPlaying) continue;
+				cwav.nPlaybackStartTime[i] = tRebasedPlaybackStartTime(cwav.nPlaybackStartTime[i], now, sound.PlaySpeed, newSpeed);
+				sound.SetSpeedWhilePlaying(newSpeed);
 			}
 		}
+		if (this.listVD != null) {
+			foreach (CVideoDecoder video in this.listVD.Values)
+				video.dbPlaySpeed = newSpeed;
+		}
 	}
+
+	// the start time at which (now - start) x newSpeed is the position (now - start) x oldSpeed reached
+	internal static long tRebasedPlaybackStartTime(long start, long now, double oldSpeed, double newSpeed)
+		=> (newSpeed > 0 && now > start) ? now - (long)Math.Round((now - start) * oldSpeed / newSpeed) : start;
 
 	public void tEachAutoPlaySoundChipPlaybackTimeChange(int nBGMAdjustIncDecValue) {
 		this.nBGMAdjust += nBGMAdjustIncDecValue;

@@ -91,6 +91,10 @@ public class CSound : IDisposable {
 
 					if (SoundManager.bIsTimeStretch) {
 						Bass.ChannelSetAttribute(this.hBassStream, ChannelAttribute.Tempo, (float)(PlaySpeed * 100 - 100));
+						// clear a sample rate SetSpeedWhilePlaying left on either stream
+						Bass.ChannelSetAttribute(_hBassStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
+						if (_hTempoStream != 0)
+							Bass.ChannelSetAttribute(_hTempoStream, ChannelAttribute.Frequency, (float)(_Frequency * nOriginalFrequency));
 						//double seconds = Bass.BASS_ChannelBytes2Seconds( this.hTempoStream, nBytes );
 						//this.n総演奏時間ms = (int) ( seconds * 1000 );
 					} else {
@@ -105,7 +109,8 @@ public class CSound : IDisposable {
 	/// Sets playback speed on whichever BASS stream is currently connected to the mixer.
 	/// Unlike setting <see cref="PlaySpeed"/> directly, this works even when the sound
 	/// was initially added to the mixer at 1.0x speed (i.e. via <c>_hBassStream</c>).
-	/// Uses frequency scaling, so pitch shifts with speed — acceptable for preview audio.
+	/// With time-stretch and the tempo stream in the mixer it sets the tempo (pitch kept); otherwise it scales the sample
+	/// rate, so the pitch shifts with the speed.
 	/// </summary>
 	public void SetSpeedWhilePlaying(double speed) {
 		_PlaySpeed = speed;
@@ -115,7 +120,10 @@ public class CSound : IDisposable {
 			int streamInMixer = BassMix.ChannelGetMixer(_hBassStream) != 0
 				? _hBassStream
 				: (BassMix.ChannelGetMixer(_hTempoStream) != 0 ? _hTempoStream : hBassStream);
-			Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Frequency, (float)(_Frequency * speed * nOriginalFrequency));
+			if (SoundManager.bIsTimeStretch && _hTempoStream != 0 && streamInMixer == _hTempoStream)
+				Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Tempo, (float)(speed * 100 - 100));
+			else
+				Bass.ChannelSetAttribute(streamInMixer, ChannelAttribute.Frequency, (float)(_Frequency * speed * nOriginalFrequency));
 		}
 	}
 	#endregion

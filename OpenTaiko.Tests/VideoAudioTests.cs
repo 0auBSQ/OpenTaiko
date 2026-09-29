@@ -237,6 +237,29 @@ namespace OpenTaikoTests {
 		}
 
 		[Fact]
+		public void SilentClip_SeekLandsWhereAsked_AndASpeedChangeKeepsThePosition() {
+			string? clip = MakeClip();
+			if (clip == null) return;
+			try {
+				var video = new CVideoDecoder(clip);
+				video.Seek(1500);
+				Assert.Equal(1500.0, video.msPlayPosition, 3);
+				video.dbPlaySpeed = 1.5;
+				Assert.Equal(1500.0, video.msPlayPosition, 3);
+				video.dbPlaySpeed = 0.75;
+				Assert.Equal(1500.0, video.msPlayPosition, 3);
+				video.Seek(2000);                 // a seek lands where asked at any speed
+				Assert.Equal(2000.0, video.msPlayPosition, 3);
+				video.dbPlaySpeed = 1.5;
+				video.Seek(3000);
+				Assert.Equal(3000.0, video.msPlayPosition, 3);
+				DisposeWithoutGl(video);
+			} finally {
+				try { File.Delete(clip); } catch (IOException) { }
+			}
+		}
+
+		[Fact]
 		public void WithoutAudioFactory_NoTrackIsOpened() {
 			string? clip = MakeClip();
 			if (clip == null) return;

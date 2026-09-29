@@ -341,7 +341,8 @@ public unsafe class CVideoDecoder : IDisposable {
 		if (ffmpeg.av_seek_frame(format_context, video_stream->index, ticks, ffmpeg.AVSEEK_FLAG_BACKWARD) < 0)
 			Trace.TraceError("av_seek_frame failed\n");
 		ffmpeg.avcodec_flush_buffers(codec_context);
-		CTimer.NowTimeMs = timestampms;
+		if (this.bPlaying) CTimer.Update();
+		CTimer.NowTimeMs_Double = timestampms / this._dbPlaySpeed;   // a silent video's clock runs at media time / speed
 		if (this.audio != null) {
 			// the ring starts over at the target; the mixer's own buffer of old samples is dropped when BASS
 			// allows it, and counted as still playing otherwise, so the clock holds at the target until the
@@ -652,6 +653,11 @@ public unsafe class CVideoDecoder : IDisposable {
 		set {
 			if (value > 0) {
 				if (value == this._dbPlaySpeed) return;
+				// without audio the clock is scaled by the speed: keep the position across the change
+				if (this.audio == null || this.audioRing == null) {
+					if (this.bPlaying) CTimer.Update();
+					CTimer.NowTimeMs_Double = CTimer.NowTimeMs_Double * this._dbPlaySpeed / value;
+				}
 				this._dbPlaySpeed = value;
 				this.audio?.SetSpeedLive(value);   // on the stream already in the mixer; the clock is in media time either way
 			} else {

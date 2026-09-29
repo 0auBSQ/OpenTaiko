@@ -30,10 +30,13 @@ public abstract class CTimerBase : IDisposable {
 			return (this.UpdateSystemTime - this.PrevResetTimeMs);
 		}
 		set {
-			if (this.StopCount > 0)
+			if (this.StopCount > 0) {
 				this.PrevResetTimeMs = this.PauseSystemTimeMs - value;
-			else
+				this.PrevResetTimeMs_Double = this.PauseSystemTimeMs_Double - value;
+			} else {
 				this.PrevResetTimeMs = this.UpdateSystemTime - value;
+				this.PrevResetTimeMs_Double = this.UpdateSystemTime_Double - value;
+			}
 		}
 	}
 	public long RealNowTimeMs {
@@ -58,10 +61,13 @@ public abstract class CTimerBase : IDisposable {
 			return (this.UpdateSystemTime_Double - this.PrevResetTimeMs_Double);
 		}
 		set {
-			if (this.StopCount > 0)
+			if (this.StopCount > 0) {
 				this.PrevResetTimeMs_Double = this.PauseSystemTimeMs_Double - value;
-			else
+				this.PrevResetTimeMs = this.PauseSystemTimeMs - (long)Math.Round(value);
+			} else {
 				this.PrevResetTimeMs_Double = this.UpdateSystemTime_Double - value;
+				this.PrevResetTimeMs = this.UpdateSystemTime - (long)Math.Round(value);
+			}
 		}
 	}
 	public double RealNowTimeMs_Double {
